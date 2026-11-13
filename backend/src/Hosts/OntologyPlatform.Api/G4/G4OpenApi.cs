@@ -1,3 +1,5 @@
+using System.Text.Json.Nodes;
+using OntologyPlatform.Contracts;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
@@ -23,6 +25,24 @@ public static class G4OpenApi
             {
                 schema.Type = JsonSchemaType.Integer | (Nullable.GetUnderlyingType(context.JsonTypeInfo.Type) is null ? 0 : JsonSchemaType.Null);
                 schema.Pattern = null;
+            }
+            if (type == typeof(OracleColumnMetadata) && schema.Properties is not null)
+            {
+                // 显式枚举与DTO setter保持同一合同，不把未知字符串描述为受支持值。
+                var values = new Dictionary<string, string[]>
+                {
+                    ["charSemantics"] = ["BYTE", "CHAR"],
+                    ["timeZoneKind"] = ["NONE", "WITH_TIME_ZONE", "WITH_LOCAL_TIME_ZONE", "UNKNOWN"],
+                    ["supportStatus"] = ["SUPPORTED", "METADATA_ONLY", "UNSUPPORTED"]
+                };
+                foreach (var entry in values)
+                {
+                    if (schema.Properties.TryGetValue(entry.Key, out var property) && property is OpenApiSchema concrete)
+                    {
+                        concrete.Enum = entry.Value.Select(value => (JsonNode)JsonValue.Create(value)!).ToList();
+                        if (entry.Key == "charSemantics") concrete.Enum.Add(null!);
+                    }
+                }
             }
             if (schema.Properties?.ContainsKey("type") == true)
             {

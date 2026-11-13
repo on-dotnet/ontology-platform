@@ -24,7 +24,7 @@ public sealed partial class ConnectionApplicationService
         {
             Value = report with
             {
-                Stale = report.Stale || row.LastProbeId != probe.Id || row.State == "DISABLED"
+                Stale = report.Stale || !SourceCurrent(row) || row.LastProbeId != probe.Id || row.State == "DISABLED"
             || report.ConfigHash != row.ConfigHash || report.SecretVersion != row.SecretVersion || report.ExpiresAtUtc <= clock.GetUtcNow()
             }
         };
@@ -61,6 +61,15 @@ public sealed partial class ConnectionApplicationService
                 && value.ReportJson.Contains("RUNNING"), ct)) throw new SemanticOperationException(409, "connection_version_conflict");
             sourceConnection = row;
             profile = Source(draft?.Config ?? Decode<ConnectionConfig>(row!.ConfigJson), scope);
+            // 新探测显式重绑已改变的服务器信任材料，同时使旧ETag和探测失效。
+            if (row is not null && !SourceCurrent(row))
+            {
+                Rehash(row);
+                row.Revision++;
+                row.LastProbeId = null;
+                row.State = "DRAFT";
+                row.UpdatedAtUtc = clock.GetUtcNow();
+            }
             // 草稿Ref尚未消费；保存连接使用已绑定版本，不受入库TTL影响。
             var credential = draft is not null ? await UnboundSecretAsync(db, call.Actor, draft.SecretRef, scope, ConnectionSourceDispatcher.SecretPurpose(profile), ct)
                 : await BoundSecretAsync(db, row!, ct);
@@ -147,7 +156,7 @@ public sealed partial class ConnectionApplicationService
         // 源调用期间资源可能已经改变，不能用旧输入回写状态。
         var connection = call.Id is null ? null : await finalDb.Connections.SingleAsync(value => value.Id == call.Id, completion.Token);
         // 权限及绑定版本均是完成条件。
-        var stale = !current || record.Deadline <= clock.GetUtcNow() || connection is not null && (connection.Revision != record.Revision || connection.State == "DISABLED" || connection.ConfigHash != original.ConfigHash
+        var stale = !current || record.Deadline <= clock.GetUtcNow() || connection is not null && (!SourceCurrent(connection) || connection.Revision != record.Revision || connection.State == "DISABLED" || connection.ConfigHash != original.ConfigHash
             || connection.SecretVersion != original.SecretVersion);
         // 报告中的成功必须真实完整且没有取消或失效。
         var reportDone = original with

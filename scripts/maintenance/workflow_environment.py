@@ -350,6 +350,10 @@ def prepare_web(root,home,admission,projects,env,run_dir,node):
     return dict(status='DEPENDENCIES_READY',packages=len(rows),materializedTrees=copied,download=0,install=0,restore=0,contentFiles=sum(len(row['files']) for row in rows))
 
 
+# 本任务已验签的精确归档；原始SHA256与NuGet规范化锁散列分列。
+ORACLE_ARCHIVES = {'oracle.manageddataaccess.core/23.26.400': {'package': 'oracle.manageddataaccess.core/23.26.400', 'archiveSha256': '5d1909cf043118c4e5d9cc01ad0db2916a6026a3c2243c507dc36f9536a43ec4', 'contentHash': 'PWVJunbl2LVcdFBluW5R3678MvrTLlTrQBdXe9wR4YCauISa4zCceJ7fLHVFFiGog8/ZPxo2cY4adpVQCJf+YQ=='}, 'system.collections.immutable/10.0.13': {'package': 'system.collections.immutable/10.0.13', 'archiveSha256': '74c7c3ab2dcce3385482c7504bacfb0ba051aefaae0be7e09c1297b894f80616', 'contentHash': 'mUiVD4AJ0way0QDXNEaU/zEMDgn0kzZEW+gjtQrrC7KsB74JKuLC54hCPUxyodlpiwS/ElbQYbiyjHpZfl6ghA=='}, 'system.configuration.configurationmanager/10.0.13': {'package': 'system.configuration.configurationmanager/10.0.13', 'archiveSha256': 'db736c19b833841cbcb46597310b023b5f627c9b3e1ee82ceaaa5c323d64718d', 'contentHash': 'BkkGt1IDGMaNkSWJR+hEN3V/UMvyoYKW0rG7rlhKQwS2Ghn+9dt98aV7syIMK+ChumTk+IbDF4k0QXqVs9Zudg=='}, 'system.diagnostics.performancecounter/10.0.13': {'package': 'system.diagnostics.performancecounter/10.0.13', 'archiveSha256': '822301327d095f7262c0de211880c691a7f55ef9b98ca3e7898e616c0cbc6c2c', 'contentHash': 'K2t0EVIUB5g+gc+hZ7x9DWyGLvuTsfD/tbPJBbLaIGuW2OQl+ivm1MKIlqYrMWxX9TK+LqMDVuE0LcOCOFmueQ=='}, 'system.directoryservices.protocols/10.0.13': {'package': 'system.directoryservices.protocols/10.0.13', 'archiveSha256': 'a47c34052bfb6c8cbd212dc61e95dd835a57c7543ac830e89b94caf50bcffe18', 'contentHash': 'JZiWshNhK2+lbPnfV+JTYqKKrT27e5LRdbCU2SFkXwIIJPVKw/7KfrHU/DDbO3OXd4KwJZgAdyWbXl+kwzxWOw=='}, 'system.formats.asn1/10.0.13': {'package': 'system.formats.asn1/10.0.13', 'archiveSha256': '783c54a6ef9d259b5665c649a6cc34d7bcbf9305e5a33e385993ef5f2ff568ba', 'contentHash': 'uwKFGyJaUQ8xsf+wddv512+UIU1O4reOveom3y0gpQr86P1ReAKcQa/UdOZtg1etTIHgb01/grXp00tgeGBxqA=='}, 'system.memory/4.6.3': {'package': 'system.memory/4.6.3', 'archiveSha256': '26078aeb758c9ae985e8bf851f973026061da6a5eb4837204d0c2d2204c72955', 'contentHash': 'qdcDOgnFZY40+Q9876JUHnlHu7bosOHX8XISRoH94fwk6hgaeQGSgfZd8srWRZNt5bV9ZW2TljcegDNxsf+96A=='}, 'system.security.cryptography.pkcs/10.0.13': {'package': 'system.security.cryptography.pkcs/10.0.13', 'archiveSha256': '54ed24578ead34b5b50d259084243432f11733e2754b8b196e799d3418d304a7', 'contentHash': 'a+EovgC1fBnwdlQ6cn3j4JFBfKqiFaFvoAhjisOoSvazLAcIznaBzPQP0oYnvccmeXfqUH1KebVZOxSeH6rMaw=='}, 'system.security.cryptography.protecteddata/10.0.13': {'package': 'system.security.cryptography.protecteddata/10.0.13', 'archiveSha256': 'b0b44ace8b5decc129b96dcc6281c7ea238975dd18493f525f0dd2a04da98d6d', 'contentHash': 'aUSmC6cPjFLSE0rDTsmkR3wvUOnscqewebOaaELEToh12sNmoltZqT3f0C81mJ1zhxKjWco25soHTvYwsXCsUw=='}, 'system.text.json/10.0.13': {'package': 'system.text.json/10.0.13', 'archiveSha256': 'c36743c19c6e9d3e1f9ea8b38f724487b9fb8a959be53c621c9cc8ae93ba0b93', 'contentHash': 'IjBLCOgNyv48I7G69EWDUalJ0mVHyZdiH1drbPrNsQRJssvjmGVn0Q/CoZSG1RGUCCCgpdiQbZI4i9Z6Q5jnWQ=='}}
+
+
 def approved_archives(root, task, packages):
     """核验当前锁闭包；Oracle只继承已合入基线的Doris精确依赖，不放宽未知包。"""
     approved={p['package']:p for p in git_json(root,ARCHIVE_COMMIT,ARCHIVES)['packages']}
@@ -358,6 +362,8 @@ def approved_archives(root, task, packages):
         approved['mysqlconnector/2.6.2']=dict(package='mysqlconnector/2.6.2',
             archiveSha256='3d8758d29d2b19a5efa9f78cfac9cae824a870aaf88e2e3adc40bce3cddac748',
             contentHash='dlTc/tsBa42szdvpj4nrHvQVUb0gsMwR9HT6J0Zz2OSqfP0CdYlGw+qQPqCpbnO97idfvclSjKYtM6y5QaBQaQ==')
+    if task == 'G4-M2-ORACLE-01':
+        approved.update(ORACLE_ARCHIVES)
     require({k:v['contentHash'] for k,v in approved.items()}==packages,'APPROVED_CURRENT_LOCK_CLOSURE')
     return approved
 
@@ -392,6 +398,8 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
         name,version=key.split('/');p=ordinary(source/key/(name+'.'+version+'.nupkg'))
         if task in ('G4-M2-DORIS-01','G4-M2-ORACLE-01') and key=='mysqlconnector/2.6.2':
             p=ordinary(root/'artifacts/workflow'/task/'artifact-cache/mysqlconnector.2.6.2.nupkg')
+        if task == 'G4-M2-ORACLE-01' and key in ORACLE_ARCHIVES:
+            p=ordinary(root/'artifacts/workflow'/task/'artifact-cache'/(name+'.'+version+'.nupkg'))
         require(p.is_file(),'LOCKED_ARCHIVE_MISSING_'+key)
         raw=p.read_bytes();require(digest(raw)==row['archiveSha256'],'LOCKED_ARCHIVE_DRIFT_'+key)
         raw_archives[p.name]=raw

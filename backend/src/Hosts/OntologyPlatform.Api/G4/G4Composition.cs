@@ -50,6 +50,12 @@ public static class G4Composition
         builder.Services.AddSingleton<IWebSourceAdapter, WebSourceAdapter>();
         builder.Services.AddSingleton(new DorisAdapterOptions { RootCertificatePath = builder.Configuration["G4:Doris:RootCertificatePath"] ?? string.Empty });
         builder.Services.AddSingleton<IDorisSourceAdapter, DorisSourceAdapter>();
+        builder.Services.AddSingleton(new OracleAdapterOptions
+        {
+            RootCertificatePath = builder.Configuration["G4:Oracle:RootCertificatePath"] ?? string.Empty,
+            WalletDirectory = builder.Configuration["G4:Oracle:WalletDirectory"] ?? string.Empty
+        });
+        builder.Services.AddSingleton<IOracleSourceAdapter, OracleSourceAdapter>();
         builder.Services.AddSingleton<ConnectionSourceDispatcher>();
         builder.Services.AddSingleton(provider => new ConnectionSecretCipher(builder.Configuration["G4:KeyFile"] ?? string.Empty));
         builder.Services.AddSingleton<IConnectionSessionAuthority, G4SessionAuthority>();

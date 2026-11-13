@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { CatalogDiscoveryJobView, CatalogSnapshotListPage, CatalogSnapshotView, ConnectionView } from "../../lib/api/g4-generated";
+import type { CatalogDiscoveryJobView, OracleColumnMetadata, CatalogSnapshotListPage, CatalogSnapshotView, ConnectionView } from "../../lib/api/g4-generated";
 import { PlatformApiError } from "../../lib/api/client";
 import { command } from "../../lib/api/g2-client";
 import { createConnectionsClient } from "./api";
@@ -158,5 +158,17 @@ export function CatalogPanel({ connection, etag, canManage, onDenied, parentBusy
 }
 /** 保真展示类型、空值及精度，不把历史快照状态提升为当前源状态。 */
 export function CatalogSnapshot({ snapshot, stale }: { snapshot: CatalogSnapshotView; stale: boolean }) {
-  return <section aria-label="目录快照详情"><h3>只读目录快照 <span className="tag">{stateLabels[snapshot.status] ?? snapshot.status}</span></h3>{(stale || snapshot.status === "STALE") && <p className="connection-alert">此快照可能已过期；不能用于证明当前目录完整或当前源可访问。</p>}<p className="connection-note">捕获时间：{snapshot.capturedAtUtc}<br />指纹：{snapshot.schemaFingerprint}</p>{snapshot.objects.map(object => <details key={`${object.schema}.${object.name}`} open><summary>{object.schema}.{object.name} · {object.kind === "VIEW" ? "视图" : "表"} · {object.fields.length} 个字段</summary><div className="connection-scroll" tabIndex={0} aria-label={`${object.name}字段，可横向滚动`}><table><thead><tr><th>字段</th><th>原生类型</th><th>可为空</th><th>精度</th><th>小数位</th></tr></thead><tbody>{object.fields.map(field => <tr key={`${field.ordinal}:${field.name}`}><td>{field.name}</td><td>{field.nativeType}</td><td>{field.nullable ? "是" : "否"}</td><td>{field.precision ?? "—"}</td><td>{field.scale ?? "—"}</td></tr>)}</tbody></table></div></details>)}</section>;
+  return <section aria-label="目录快照详情"><h3>只读目录快照 <span className="tag">{stateLabels[snapshot.status] ?? snapshot.status}</span></h3>{(stale || snapshot.status === "STALE") && <p className="connection-alert">此快照可能已过期；不能用于证明当前目录完整或当前源可访问。</p>}<p className="connection-note">捕获时间：{snapshot.capturedAtUtc}<br />指纹：{snapshot.schemaFingerprint}</p>{snapshot.objects.map(object => <details key={`${object.schema}.${object.name}`} open><summary>{object.schema}.{object.name} · {object.kind === "VIEW" ? "视图" : "表"} · {object.fields.length} 个字段</summary><div className="connection-scroll" tabIndex={0} aria-label={`${object.name}字段，可横向滚动`}><table><thead><tr><th>字段</th><th>原生类型</th><th>可为空</th><th>精度</th><th>小数位</th></tr></thead><tbody>{object.fields.map(field => <tr key={`${field.ordinal}:${field.name}`}><td>{field.name}</td><td>{field.nativeType}{field.oracleMetadata && <OracleTypeDetails metadata={field.oracleMetadata} />}</td><td>{field.nullable ? "是" : "否"}</td><td>{field.precision ?? "—"}</td><td>{field.scale ?? "—"}</td></tr>)}</tbody></table></div></details>)}</section>;
+}
+
+/** Oracle特有类型语义；未知数值保持未知，不把LOB元数据当作正文。 */
+function OracleTypeDetails({ metadata }: { metadata: OracleColumnMetadata }) {
+  const zones: Record<string, string> = { NONE: "无时区", WITH_TIME_ZONE: "带时区", WITH_LOCAL_TIME_ZONE: "本地时区", UNKNOWN: "未知时区" };
+  const support: Record<string, string> = { SUPPORTED: "支持", METADATA_ONLY: "仅元数据（不读取内容）", UNSUPPORTED: "不支持" };
+  return <div className="connection-note">
+    <div>{`字节长度：${metadata.byteLength ?? "未知"} · 字符长度：${metadata.charLength ?? "未知"}`}</div>
+    <div>{`长度语义：${metadata.charSemantics === "CHAR" ? "字符" : metadata.charSemantics === "BYTE" ? "字节" : "未知"} · 秒小数精度：${metadata.fractionalSecondsPrecision ?? "未知"}`}</div>
+    <div>{zones[metadata.timeZoneKind] ?? "未知时区"} · {support[metadata.supportStatus] ?? "不支持"}</div>
+    {metadata.dataTypeOwner && <div>类型所属：{metadata.dataTypeOwner}</div>}
+  </div>;
 }

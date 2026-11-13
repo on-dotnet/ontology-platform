@@ -7,6 +7,64 @@ namespace OntologyPlatform.ConnectionsTests;
 [TestClass]
 public sealed class SourceDispatcherTests
 {
+    /// <summary>Oracle信任材料更换使已保存配置失效，重新探测可绑定新信任版本。</summary>
+    [TestMethod]
+    public void OracleTrustRotationInvalidatesStoredConfiguration()
+    {
+        // 只使用可变非秘密摘要，不接触文件、网络或数据库。
+        var oracle = new RecordingOracle();
+        // 其它适配器不会在纯哈希测试中执行。
+        var dispatcher = new ConnectionSourceDispatcher(new RecordingPg(), new RecordingWeb(), new PgAdapterOptions { RootCertificatePath = "/not-used" }, new WebOperationPolicy(), oracle: oracle);
+        // 本测试只调用无存储依赖的配置栅栏。
+        var service = new ConnectionApplicationService(null!, null!, dispatcher, null!, null!, TimeProvider.System);
+        // 固定Oracle配置序列化使用公开合同。
+        var row = new ConnectionRecord { DisplayName = "Oracle", OrganizationId = "org-demo", SiteIds = ["site-a"], ConfigJson = System.Text.Json.JsonSerializer.Serialize<ConnectionConfig>(new OracleConnectionConfig { Profile = new OracleConnectionProfile { Host = "oracle-source", Port = 2484, ServiceName = "FREEPDB1", Username = "FIXTURE_READER", Tls = true, AllowedOwners = ["PRODUCTION", "CaseOwner"] } }, G4ConnectionJson.Options) };
+        // 反射避免为测试扩大公开应用接口。
+        var rehash = typeof(ConnectionApplicationService).GetMethod("Rehash", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!;
+        rehash.Invoke(service, [row]);
+        // 捕获初始信任版本对应的哈希。
+        var before = row.ConfigHash;
+        oracle.TrustFingerprint = "rotated";
+        rehash.Invoke(service, [row]);
+        Assert.AreNotEqual(before, row.ConfigHash);
+    }
+
+    /// <summary>只提供信任版本的Oracle记录器，不构造成功报告。</summary>
+    private sealed class RecordingOracle : IOracleSourceAdapter
+    {
+        /// <summary>模拟服务端CA或wallet更换后的内容摘要。</summary>
+        public string TrustFingerprint { get; set; } = "initial";
+
+        /// <summary>纯合同测试不执行探测。</summary>
+        public Task<ConnectionProbeStage[]> ProbeAsync(OracleConnectionProfile profile, string secret, CancellationToken token) => throw new NotSupportedException();
+
+        /// <summary>纯合同测试不执行目录发现。</summary>
+        public Task<CatalogObject[]> DiscoverAsync(OracleConnectionProfile profile, string secret, CancellationToken token) => throw new NotSupportedException();
+    }
+
+    /// <summary>Oracle独立用途与逐字段目标绑定不接受数组引用或scope替换。</summary>
+    [TestMethod]
+    public void OraclePurposeAndCredentialTargetAreExact()
+    {
+        // 配置只参与合同比较，不建立网络连接。
+        var profile = new OracleConnectionProfile { Host = "oracle-source", Port = 2484, ServiceName = "FREEPDB1", Username = "FIXTURE_READER", Tls = true, AllowedOwners = ["PRODUCTION", "CaseOwner"] };
+        // 独立数组但同序同字节的owner列表是相同目标。
+        var original = new OracleConnectionConfig { Profile = profile };
+        Assert.AreEqual("ORACLE_READONLY", ConnectionSourceDispatcher.SecretPurpose(original));
+        ConnectionSourceDispatcher.DemandSameTarget(original, original with { Profile = profile with { AllowedOwners = ["PRODUCTION", "CaseOwner"] } });
+        foreach (var changed in new[]
+        {
+            profile with { Host = "other" }, profile with { Port = 1521 }, profile with { ServiceName = "OTHER" },
+            profile with { Username = "OTHER" }, profile with { Tls = false },
+            profile with { AllowedOwners = ["CaseOwner", "PRODUCTION"] }, profile with { AllowedOwners = ["PRODUCTION", "CASEOWNER"] }
+        })
+        {
+            Assert.Throws<SemanticOperationException>(() => ConnectionSourceDispatcher.DemandSameTarget(original, original with { Profile = changed }));
+        }
+        Assert.Throws<SemanticOperationException>(() => ConnectionSourceDispatcher.DemandPurpose(original, "DORIS_READONLY"));
+        Assert.Throws<SemanticOperationException>(() => ConnectionSourceDispatcher.DemandSameCredentialScope(original, Scope(), Scope() with { SiteIds = ["site-b"] }));
+    }
+
     /// <summary>Web仅准入API Key及无分页固定操作，PG与Web用途不能互换。</summary>
     [TestMethod]
     public void PurposeIsTypedAndUnsupportedModesFailBeforeBinding()

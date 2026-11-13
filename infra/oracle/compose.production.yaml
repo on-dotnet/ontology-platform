@@ -1,0 +1,9 @@
+# 仅配置参考。本任务不连接或修改用户生产/验收一体机。
+services:
+  oracle-source:
+    profiles: [not-authorized-by-this-task]
+# 平台参考环境，合并到未来获准API部署时也必须保持显式关闭。
+x-platform-api-environment:
+  ASPNETCORE_ENVIRONMENT: Production
+  G4__Enabled: "false"
+  G4__ApplyMigrations: "false"

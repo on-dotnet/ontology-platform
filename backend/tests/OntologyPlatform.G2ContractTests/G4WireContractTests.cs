@@ -7,7 +7,7 @@ namespace OntologyPlatform.G2ContractTests;
 [TestClass]
 public sealed class G4WireContractTests
 {
-    /// <summary>三个已批准用途仅扩展精确字符串值域，未知用途仍拒绝。</summary>
+    /// <summary>四个已批准用途仅扩展精确字符串值域，未知用途仍拒绝。</summary>
     [TestMethod]
     public void SecretIntakeAcceptsOnlyApprovedTypedPurposes()
     {
@@ -21,7 +21,52 @@ public sealed class G4WireContractTests
         G4ConnectionRules.Validate(request);
         G4ConnectionRules.Validate(request with { Purpose = "POSTGRESQL_READONLY" });
         G4ConnectionRules.Validate(request with { Purpose = "DORIS_READONLY" });
+        G4ConnectionRules.Validate(request with { Purpose = "ORACLE_READONLY" });
         Assert.Throws<SemanticOperationException>(() => G4ConnectionRules.Validate(request with { Purpose = "OTHER" }));
+    }
+
+    /// <summary>Oracle公开配置也必须拒绝明文，不能等到网络调用才发现降级。</summary>
+    [TestMethod]
+    public void OraclePlaintextIsRejectedBeforeCredentialConsumption()
+    {
+        // 固定其它合法字段，只改变TLS以证明请求边界拒绝明文。
+        var profile = new OracleConnectionProfile { Host = "oracle-source", Port = 2484, ServiceName = "FREEPDB1", Username = "FIXTURE_READER", Tls = true, AllowedOwners = ["PRODUCTION", "CaseOwner"] };
+        G4ConnectionRules.Config(new OracleConnectionConfig { Profile = profile });
+        Assert.Throws<SemanticOperationException>(() => G4ConnectionRules.Config(new OracleConnectionConfig { Profile = profile with { Tls = false } }));
+    }
+
+    /// <summary>Oracle元数据保留显式未知值、负scale和旧合同的省略语义。</summary>
+    [TestMethod]
+    public void OracleMetadataRoundtripsWithoutInventingKnownValues()
+    {
+        // 旧列的黄金JSON不包含新增字段，旧指纹输入必须逐字保持。
+        const string legacy = "{\"name\":\"N\",\"nativeType\":\"NUMBER\",\"nullable\":true,\"ordinal\":1,\"precision\":null,\"scale\":-2}";
+        // 新元数据明确表示未知owner/长度和时区，不以CLR默认值填充。
+        const string metadata = "{\"dataTypeOwner\":null,\"byteLength\":null,\"charLength\":null,\"charSemantics\":null,\"fractionalSecondsPrecision\":null,\"timeZoneKind\":\"UNKNOWN\",\"supportStatus\":\"METADATA_ONLY\"}";
+        // 真实序列化器必须保留所有显式null和负scale。
+        var raw = legacy[..^1] + ",\"oracleMetadata\":" + metadata + "}";
+        // 新字段存在时应完整往返。
+        var parsed = JsonSerializer.Deserialize<CatalogField>(raw, G4ConnectionJson.Options)!;
+        Assert.AreEqual(raw, JsonSerializer.Serialize(parsed, G4ConnectionJson.Options));
+        Assert.AreEqual(legacy, JsonSerializer.Serialize(JsonSerializer.Deserialize<CatalogField>(legacy, G4ConnectionJson.Options), G4ConnectionJson.Options));
+        // 两个合法字符单位都应保留大小写并完整往返。
+        foreach (var semantics in new[] { "BYTE", "CHAR" })
+        {
+            // 只替换字符单位，其余显式未知值保持原样。
+            var known = raw.Replace("\"charSemantics\":null", "\"charSemantics\":\"" + semantics + "\"");
+            Assert.AreEqual(known, JsonSerializer.Serialize(JsonSerializer.Deserialize<CatalogField>(known, G4ConnectionJson.Options), G4ConnectionJson.Options));
+        }
+        foreach (var invalid in new[]
+        {
+            raw.Replace("\"timeZoneKind\":\"UNKNOWN\",", ""),
+            raw.Replace("\"supportStatus\":\"METADATA_ONLY\"", "\"supportStatus\":\"OTHER\""),
+            raw.Replace("\"timeZoneKind\":\"UNKNOWN\"", "\"timeZoneKind\":null"),
+            raw.Replace("\"charSemantics\":null", "\"charSemantics\":\"OTHER\""),
+            raw.Replace("\"charSemantics\":null", "\"charSemantics\":\"byte\"")
+        })
+        {
+            Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<CatalogField>(invalid, G4ConnectionJson.Options));
+        }
     }
 
     /// <summary>Doris明文配置在请求验证阶段拒绝，不能消费凭据后才降级。</summary>

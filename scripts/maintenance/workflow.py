@@ -314,8 +314,8 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
         gate=registry()[name];key=actual['inputKeys'][name];policy=policy_key(name)
         if any(outcomes.get(dep) not in (None,'PASS') for dep in gate['needs']):
             rows.append(dict(gate=name,status='NOT_RUN',reason='Upstream failed or unavailable'));outcomes[name]='NOT_RUN';continue
-        product_qualification=not gate['command'] and task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002','G4-M2-DORIS-01') and name in {'environment','contract','backend','web','interaction'}
-        if not gate['command'] and task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002','G4-M2-DORIS-01') and name in {'environment','contract','backend','web','interaction'}:
+        product_qualification=not gate['command'] and task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002','G4-M2-DORIS-01','G4-M2-ORACLE-01') and name in {'environment','contract','backend','web','interaction'}
+        if not gate['command'] and task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002','G4-M2-DORIS-01','G4-M2-ORACLE-01') and name in {'environment','contract','backend','web','interaction'}:
             gate={**gate,'command':['python3','-B','scripts/maintenance/workflow_m2_evidence.py','--task',task,'--gate',name,'--input-key',key],'testsRequired':True}
         if not gate['command']:
             rows.append(dict(gate=name,status='NOT_RUN',reason='Product gate requires task-specific admitted executor'))

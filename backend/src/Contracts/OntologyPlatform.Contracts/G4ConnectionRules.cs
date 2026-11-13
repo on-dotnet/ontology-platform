@@ -29,7 +29,7 @@ public static class G4ConnectionRules
             case ConnectionSecretIntakeRequest secret:
                 Command(secret.Command, true);
                 Scope(secret.ScopeSelection);
-                Require(secret.SecretValue is { Length: >= 8 and <= 4096 } && secret.Purpose is "POSTGRESQL_READONLY" or "WEB_API_KEY" or "DORIS_READONLY");
+                Require(secret.SecretValue is { Length: >= 8 and <= 4096 } && secret.Purpose is "POSTGRESQL_READONLY" or "WEB_API_KEY" or "DORIS_READONLY" or "ORACLE_READONLY");
                 break;
             case ConnectionDraftProbeRequest probe:
                 Command(probe.Command, true);
@@ -62,7 +62,7 @@ public static class G4ConnectionRules
                 break;
             case OracleConnectionConfig { Profile: not null } oracle:
                 Require(Host(oracle.Profile.Host) && Port(oracle.Profile.Port) && Text(oracle.Profile.ServiceName, 128)
-                    && Text(oracle.Profile.Username, 63) && Names(oracle.Profile.AllowedOwners));
+                    && Text(oracle.Profile.Username, 63) && Names(oracle.Profile.AllowedOwners) && oracle.Profile.Tls);
                 break;
             case DorisConnectionConfig { Profile: not null } doris:
                 Require(Host(doris.Profile.FeHost) && Port(doris.Profile.QueryPort) && Text(doris.Profile.Catalog, 128)

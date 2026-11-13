@@ -172,7 +172,7 @@ public sealed partial class ConnectionApplicationService
     }
 
     /// <summary>只接受仍启用且与捕获版本完全一致的源输入。</summary>
-    private static bool Matches(CatalogJobRecord job, ConnectionRecord row) => row.State == "ACTIVE" && row.Revision == job.Revision
+    private bool Matches(CatalogJobRecord job, ConnectionRecord row) => SourceCurrent(row) && row.State == "ACTIVE" && row.Revision == job.Revision
         && row.SecretVersion == job.SecretVersion && row.ConfigHash == job.ConfigHash && row.OrganizationId == job.OrganizationId
         && row.SiteIds.Order(StringComparer.Ordinal).SequenceEqual(job.SiteIds.Order(StringComparer.Ordinal));
 
@@ -224,7 +224,7 @@ public sealed partial class ConnectionApplicationService
             await using var currentDb = await factory.CreateDbContextAsync(checkToken);
             // 删除、禁用和任意修订变化均失败关闭。
             var current = await currentDb.Connections.AsNoTracking().SingleOrDefaultAsync(value => value.Id == id, checkToken);
-            if (current is null || current.State == "DISABLED" || current.Revision != revision
+            if (current is null || !SourceCurrent(current) || current.State == "DISABLED" || current.Revision != revision
                 || current.SecretVersion != secretVersion || current.ConfigHash != configHash
                 || !await authority.IsCurrentAsync(call.SessionReference, call.Actor, checkToken))
             {

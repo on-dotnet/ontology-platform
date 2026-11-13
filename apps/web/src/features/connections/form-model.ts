@@ -9,7 +9,7 @@ export const typeLabels: Record<ConnectionType, string> = { POSTGRESQL: "Postgre
 export type FormField = { key: string; label: string; initial: string; choices?: string[]; optional?: boolean };
 export const formFields: Record<ConnectionType, FormField[]> = {
   POSTGRESQL: [{ key: "host", label: "主机", initial: "pg-source" }, { key: "port", label: "端口", initial: "5432" }, { key: "database", label: "数据库", initial: "fixture" }, { key: "username", label: "只读用户名", initial: "fixture_reader" }, { key: "sslMode", label: "TLS 验证", initial: "VerifyFull", choices: ["VerifyFull", "VerifyCA", "Require"] }, { key: "allowedSchemas", label: "允许的 Schema（逗号分隔）", initial: "production" }],
-  ORACLE: [{ key: "host", label: "主机", initial: "" }, { key: "port", label: "端口", initial: "1521" }, { key: "serviceName", label: "服务名称（Service Name）", initial: "" }, { key: "username", label: "用户名", initial: "" }, { key: "tls", label: "TLS 加密", initial: "true", choices: ["true", "false"] }, { key: "allowedOwners", label: "允许的 Owner（逗号分隔）", initial: "" }],
+  ORACLE: [{ key: "host", label: "主机", initial: "oracle-source" }, { key: "port", label: "端口", initial: "2484" }, { key: "serviceName", label: "服务名称（Service Name）", initial: "FREEPDB1" }, { key: "username", label: "只读用户名", initial: "FIXTURE_READER" }, { key: "tls", label: "TLS 证书和主机名验证", initial: "true", choices: ["true"] }, { key: "allowedOwners", label: "允许的 Owner（逗号分隔）", initial: "PRODUCTION, CaseOwner" }],
   DORIS: [{ key: "feHost", label: "FE 主机", initial: "localhost" }, { key: "queryPort", label: "查询端口", initial: "19030" }, { key: "catalog", label: "目录", initial: "internal" }, { key: "database", label: "数据库", initial: "fixture" }, { key: "username", label: "只读用户名", initial: "fixture_reader" }, { key: "tls", label: "TLS 证书和主机名验证", initial: "true", choices: ["true"] }],
   TDENGINE: [{ key: "wsUrl", label: "WebSocket 地址", initial: "" }, { key: "database", label: "数据库", initial: "" }, { key: "timePrecision", label: "时间精度", initial: "MILLISECOND", choices: ["MILLISECOND", "MICROSECOND", "NANOSECOND", "UNKNOWN"] }, { key: "timeZone", label: "时区（可选）", initial: "", optional: true }],
   WEB_API: [{ key: "baseOrigin", label: "已批准 HTTPS 源站", initial: "" }, { key: "operationId", label: "已批准操作", initial: "" }, { key: "method", label: "请求方法", initial: "GET", choices: ["GET"] }, { key: "approvedPath", label: "已批准路径", initial: "/" }, { key: "authentication", label: "认证方式", initial: "NONE", choices: ["NONE", "API_KEY_REF", "OAUTH_CLIENT_CREDENTIALS_REF"] }, { key: "pagination", label: "分页方式", initial: "NONE", choices: ["NONE", "PAGE", "OFFSET", "CURSOR", "LINK"] }, { key: "hostPolicyRef", label: "网络策略引用", initial: "" }],
@@ -62,8 +62,9 @@ export function configFromForm(form: ConnectionForm): ConnectionConfig {
 }
 
 /** 可执行模式决定凭据用途；服务端仍独立核验准确目标、范围和用途。 */
-export function runnablePurpose(form: ConnectionForm): "POSTGRESQL_READONLY" | "WEB_API_KEY" | "DORIS_READONLY" | null {
+export function runnablePurpose(form: ConnectionForm): "POSTGRESQL_READONLY" | "WEB_API_KEY" | "DORIS_READONLY" | "ORACLE_READONLY" | null {
   if (form.type === "POSTGRESQL") return "POSTGRESQL_READONLY";
+  if (form.type === "ORACLE" && form.values.tls === "true") return "ORACLE_READONLY";
   if (form.type === "DORIS" && form.values.tls === "true") return "DORIS_READONLY";
   if (form.type === "WEB_API" && form.values.method === "GET" && form.values.authentication === "API_KEY_REF" && form.values.pagination === "NONE") return "WEB_API_KEY";
   return null;

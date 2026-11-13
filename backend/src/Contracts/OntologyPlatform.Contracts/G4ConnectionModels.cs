@@ -76,7 +76,7 @@ public sealed record PgConnectionProfile
     public required string[] AllowedSchemas { get; init; }
 }
 
-/// <summary>Oracle配置预览，本阶段不可连接。</summary>
+/// <summary>Oracle强制TLS的类型化配置，执行目标由服务端再次限定。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed record OracleConnectionProfile
 {
@@ -389,6 +389,66 @@ public sealed record CatalogField
 
     /// <summary>原生小数位。</summary>
     public required int? Scale { get; init; }
+
+    /// <summary>Oracle专属类型信息；旧连接器和旧快照不输出该字段。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public OracleColumnMetadata? OracleMetadata { get; init; }
+
+}
+
+/// <summary>Oracle数据字典的保真列元数据，不读取列值或默认表达式。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record OracleColumnMetadata
+{
+    /// <summary>字典字符长度语义的精确可空值。</summary>
+    private string? charSemantics;
+
+    /// <summary>经精确枚举检查的时区语义，不以缺省值冒充已知。</summary>
+    private string timeZoneKind = null!;
+
+    /// <summary>经精确枚举检查的支持状态，不以缺省值冒充支持。</summary>
+    private string supportStatus = null!;
+
+    /// <summary>用户定义类型的原始owner；内置类型为null。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    public required string? DataTypeOwner { get; init; }
+
+    /// <summary>字典声明的字节长度；缺失不推断为零。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    public required int? ByteLength { get; init; }
+
+    /// <summary>字符长度，与字节长度分列。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    public required int? CharLength { get; init; }
+
+    /// <summary>BYTE或CHAR语义；非字符列为null。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    public required string? CharSemantics
+    {
+        get => charSemantics;
+        init => charSemantics = value is null or "BYTE" or "CHAR" ? value
+            : throw new System.Text.Json.JsonException("Oracle字符长度语义无效。");
+    }
+
+    /// <summary>TIMESTAMP小数秒位数；缺失保留null。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    public required int? FractionalSecondsPrecision { get; init; }
+
+    /// <summary>显式时区类别，仅接受冻结的大写值，缺失或非法值拒绝解析。</summary>
+    public required string TimeZoneKind
+    {
+        get => timeZoneKind;
+        init => timeZoneKind = value is "NONE" or "WITH_TIME_ZONE" or "WITH_LOCAL_TIME_ZONE" or "UNKNOWN"
+            ? value : throw new System.Text.Json.JsonException("Oracle时区类别无效。");
+    }
+
+    /// <summary>显式支持状态；旧快照缺省整个元数据时保持未知。</summary>
+    public required string SupportStatus
+    {
+        get => supportStatus;
+        init => supportStatus = value is "SUPPORTED" or "METADATA_ONLY" or "UNSUPPORTED"
+            ? value : throw new System.Text.Json.JsonException("Oracle类型支持状态无效。");
+    }
 }
 
 /// <summary>源角色和允许Schema交集内的可见对象。</summary>

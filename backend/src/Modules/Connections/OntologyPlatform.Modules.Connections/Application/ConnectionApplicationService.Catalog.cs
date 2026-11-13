@@ -161,7 +161,7 @@ public sealed partial class ConnectionApplicationService
         // 排序只规范化已有目录，不添加字段或改变旧快照内容。
         var canonical = objects.OrderBy(value => value.Schema, StringComparer.Ordinal).ThenBy(value => value.Name, StringComparer.Ordinal)
             .ThenBy(value => value.Kind, StringComparer.Ordinal).Select(value => value with { Fields = value.Fields.OrderBy(field => field.Ordinal).ThenBy(field => field.Name, StringComparer.Ordinal).ToArray() }).ToArray();
-        return (canonical, Hash(Encode(new { AdapterVersion = config is WebApiConnectionConfig ? "web-m2-v1" : "pg-m1-v1", Objects = canonical })));
+        return (canonical, Hash(Encode(new { AdapterVersion = config is OracleConnectionConfig ? "oracle-m2-v1" : config is WebApiConnectionConfig ? "web-m2-v1" : "pg-m1-v1", Objects = canonical })));
     }
 
 }

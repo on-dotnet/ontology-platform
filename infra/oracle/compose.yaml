@@ -1,0 +1,45 @@
+# G4-M2-ORACLE-01：仅已批准的本机合成开发实例，不拉取镜像。
+services:
+  oracle-source:
+    image: container-registry.oracle.com/database/free@sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8
+    platform: linux/arm64
+    pull_policy: never
+    hostname: oracle-source
+    restart: "no"
+    mem_limit: 4g
+    memswap_limit: 4g
+    cpus: 2
+    pids_limit: 512
+    shm_size: 1g
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    env_file:
+      - ${ORACLE_PRIVATE_ENV:?Set task-private generated environment file}
+    environment:
+      ORACLE_SID: FREE
+      ORACLE_PDB: FREEPDB1
+      ENABLE_ARCHIVELOG: "false"
+      ENABLE_FORCE_LOGGING: "false"
+      AUTO_MEM_CALCULATION: "false"
+      INIT_SGA_SIZE: "1536"
+      INIT_PGA_SIZE: "512"
+    labels:
+      ontology.task: G4-M2-ORACLE-01
+      ontology.run: ${ORACLE_RUN_ID:?Set exact run identity}
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    networks: [oracle-source]
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: "2"}
+networks:
+  oracle-source:
+    internal: true
+    labels:
+      ontology.task: G4-M2-ORACLE-01
+      ontology.run: ${ORACLE_RUN_ID:?Set exact run identity}
+volumes:
+  oracle-data:
+    labels:
+      ontology.task: G4-M2-ORACLE-01
+      ontology.run: ${ORACLE_RUN_ID:?Set exact run identity}

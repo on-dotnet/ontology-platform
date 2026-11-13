@@ -125,7 +125,26 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
     }
 
     /// <summary>包含显示名和范围的配置散列，任何编辑均使旧测试不可重新使用。</summary>
-    private static void Rehash(ConnectionRecord row) => row.ConfigHash = Hash(Encode(new { row.DisplayName, Scope = Normalize(Scope(row)), Config = Decode<ConnectionConfig>(row.ConfigJson) }));
+    private void Rehash(ConnectionRecord row) => row.ConfigHash = CurrentConfigHash(row);
+
+    /// <summary>Oracle配置含当前信任摘要；其它类型保持原序列化字节。</summary>
+    private string CurrentConfigHash(ConnectionRecord row)
+    {
+        // 类型配置只从经过校验的服务器持久记录恢复。
+        var config = Decode<ConnectionConfig>(row.ConfigJson);
+        return config is OracleConnectionConfig
+            ? Hash(Encode(new { row.DisplayName, Scope = Normalize(Scope(row)), Config = config, TrustFingerprint = adapter.TrustFingerprint(config) }))
+            : Hash(Encode(new { row.DisplayName, Scope = Normalize(Scope(row)), Config = config }));
+    }
+
+    /// <summary>缺失或更换信任材料使旧版本失效，不把配置故障显示成新鲜探测。</summary>
+    private bool SourceCurrent(ConnectionRecord row)
+    {
+        if (Decode<ConnectionConfig>(row.ConfigJson) is not OracleConnectionConfig) return true;
+        try { return row.ConfigHash == CurrentConfigHash(row); }
+        catch (PgSourceException) { return false; }
+        catch (SemanticOperationException) { return false; }
+    }
 
     /// <summary>不可变原回执的当前访问授权仍必须重验。</summary>
     private async Task<ConnectionReply?> ReplayAsync(ConnectionsDbContext db, ConnectionInvocation call, string key, string requestHash, Type type, CancellationToken token)
@@ -198,7 +217,7 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
     /// <summary>有资格启用的报告必须为完整五阶段、当前版本和有效期限。</summary>
     private async Task<bool> FreshAsync(ConnectionsDbContext db, ConnectionRecord row, CancellationToken token)
     {
-        if (row.State == "DISABLED" || row.LastProbeId is null) return false;
+        if (row.State == "DISABLED" || row.LastProbeId is null || !SourceCurrent(row)) return false;
         // 源报告不可变，是否stale是依据当前事实的投影。
         var probe = await db.ConnectionProbes.AsNoTracking().SingleOrDefaultAsync(value => value.Id == row.LastProbeId, token);
         if (probe is null || probe.ConfigHash != row.ConfigHash || probe.SecretVersion != row.SecretVersion || probe.ExpiresAtUtc <= clock.GetUtcNow()) return false;
@@ -218,6 +237,8 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
             config = web with { Profile = web.Profile with { BaseOrigin = "https://redacted.invalid", OperationId = "redacted", ApprovedPath = "/redacted", HostPolicyRef = "redacted" } };
         if (!actor.Roles.Contains("platform.operator") && config is DorisConnectionConfig doris)
             config = doris with { Profile = doris.Profile with { FeHost = "redacted", Catalog = "redacted", Database = "redacted", Username = "redacted" } };
+        if (!actor.Roles.Contains("platform.operator") && config is OracleConnectionConfig oracle)
+            config = oracle with { Profile = oracle.Profile with { Host = "redacted", ServiceName = "redacted", Username = "redacted", AllowedOwners = ["redacted"] } };
         return new ConnectionView
         {
             Id = row.Id,

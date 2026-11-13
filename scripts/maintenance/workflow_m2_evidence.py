@@ -99,8 +99,10 @@ def validate_environment(task,prepares):
     import platform
     packages,projects,files=environment.locks(build.ROOT)
     approved={item['package']:item for item in environment.git_json(build.ROOT,environment.ARCHIVE_COMMIT,environment.ARCHIVES)['packages']}
-    if task == 'G4-M2-DORIS-01':
+    if task in ('G4-M2-DORIS-01', 'G4-M2-ORACLE-01'):
         approved['mysqlconnector/2.6.2'] = dict(package='mysqlconnector/2.6.2', archiveSha256='3d8758d29d2b19a5efa9f78cfac9cae824a870aaf88e2e3adc40bce3cddac748', contentHash='dlTc/tsBa42szdvpj4nrHvQVUb0gsMwR9HT6J0Zz2OSqfP0CdYlGw+qQPqCpbnO97idfvclSjKYtM6y5QaBQaQ==')
+    if task == 'G4-M2-ORACLE-01':
+        approved.update(environment.ORACLE_ARCHIVES)
     identity=environment.identities(dict(platform=platform.system()+'-'+platform.machine(),osVersion=platform.mac_ver()[0],files=files,tools=admission['files'],sdk=environment.SDK_ARCHIVES,archives={key:value['archiveSha256'] for key,value in approved.items()}),build.ROOT)
     require(all(row['contentKey']==identity['contentKey'] and row['workspaceKey']==identity['workspaceKey'] for row in prepares),'ENV_IDENTITY_DRIFT')
     home=build.ROOT/'artifacts/workflow'/task/'environment'/identity['contentKey']
@@ -336,7 +338,146 @@ def qualify_doris(gate, input_key):
     return dict(status='PASS', executionMode='REUSED', qualificationMode='FRESH', tests=sum(counts.values()), skipped=0, counts=counts, originalEvidence=[index['proofs'][name] for name in required[gate]], limitation='Counts overlap between gates; CI, other architectures, production and online revocation are not covered')
 
 
+def oracle_audit(lifecycle_path, platform_path, api_path, output_path):
+    """当前Oracle原始脱敏SQL投影、审计关联与内存秘密扫描；不保存私有dump。"""
+    import subprocess
+    import workflow_execution as execution
+    task = 'G4-M2-ORACLE-01'
+    base = build.ROOT / 'artifacts/workflow' / task
+    paths = [execution.ordinary(path) for path in (lifecycle_path, platform_path, api_path, output_path)]
+    require(all(path.is_relative_to(base) for path in paths) and not paths[3].exists(), 'ORACLE_AUDIT_PATH')
+    lifecycle_path, platform_path, api_path, output_path = paths
+    lifecycle = json.loads(lifecycle_path.read_text())
+    browser_path = lifecycle_path.parent / lifecycle['stdout']
+    report = json.loads(browser_path.read_text())
+    require(build.sha(browser_path.read_bytes()) == lifecycle['stdoutSha256'] and report['status'] == 'PASS', 'ORACLE_AUDIT_LIFECYCLE')
+    platform = json.loads(platform_path.read_text())
+    api = json.loads(api_path.read_text())
+    docker = ['docker', '--context', 'desktop-linux']
+    ident = platform['containers']['platform-pg']['id']
+    for resource in (platform, api):
+        require(resource['taskId'] == task and resource['runId'] == report['runId'], 'ORACLE_AUDIT_IDENTITY')
+    for identifier in (ident, api['containerId']):
+        require(re.fullmatch('[a-f0-9]{64}', identifier), 'ORACLE_AUDIT_CONTAINER')
+        row = json.loads(subprocess.check_output(docker + ['inspect', identifier], timeout=5))[0]
+        require(row['Config']['Labels'].get('ontology.task') == task and row['Config']['Labels'].get('ontology.run') == report['runId'], 'ORACLE_AUDIT_CONTAINER')
+    ids = [w['jobId'] for w in report['cancellations']]
+    require(all(re.fullmatch('[a-f0-9]{32}', value) for value in [*ids, report['connectionId']]), 'ORACLE_AUDIT_IDS')
+    selected = "SELECT DISTINCT \"ConnectionId\" FROM connections.\"CatalogJobs\" WHERE \"Id\" IN (" + ','.join("'" + value + "'" for value in ids) + ") UNION SELECT '" + report['connectionId'] + "'"
+    sql = '''WITH selected AS (''' + selected + ''') SELECT json_build_object(
+'jobs',(SELECT json_agg(json_build_object('id',"Id",'connectionId',"ConnectionId",'status',"Status",'snapshotId',"SnapshotId",'traceId',"ActorJson"::json->>'traceId','fence',"Fence")) FROM connections."CatalogJobs" WHERE "ConnectionId" IN (SELECT * FROM selected)),
+'probes',(SELECT json_agg(json_build_object('id',"Id",'connectionId',"ConnectionId",'traceId',"ActorJson"::json->>'traceId')) FROM connections."ConnectionProbes" WHERE "ConnectionId" IN (SELECT * FROM selected)),
+'audit',(SELECT json_agg(json_build_object('action',"Action",'resource',"Resource",'traceId',"TraceId")) FROM governance.audit_records WHERE "Resource" IN (SELECT 'connection:' || "ConnectionId" FROM selected)),
+'connections',(SELECT json_agg(json_build_object('id',"Id",'state',"State")) FROM connections."Connections" WHERE "Id" IN (SELECT * FROM selected)));'''
+    binding = dict(lifecycleSha256=build.sha(lifecycle_path.read_bytes()), browserSha256=lifecycle['stdoutSha256'], apiBuildBinding=build.validate('api', task), sqlSha256=build.sha(sql.encode()))
+    result = execution.run(docker + ['exec', '-i', ident, 'psql', '-X', '-qAt', '-v', 'ON_ERROR_STOP=1', '-U', 'platform', '-d', 'platform'], build.ROOT, task=task, run_id=report['runId'], stage='oracle-audit-projection', timeout=15, input_key=execution.sha(execution.encoded(binding)), stdin=sql.encode())
+    require(result.returncode == 0, 'ORACLE_AUDIT_QUERY')
+    projection = json.loads(result.stdout)
+    jobs = projection['jobs']
+    require(len(jobs) == 8 and len(projection['connections']) == 2 and all(row['state'] == 'DISABLED' for row in projection['connections']), 'ORACLE_PERSISTED_COVERAGE')
+    for job in jobs:
+        require(job['status'] in ('SUCCEEDED', 'FAILED', 'PARTIAL', 'CANCELLED') and (bool(job['snapshotId']) == (job['status'] == 'SUCCEEDED')), 'ORACLE_JOB_SNAPSHOT')
+        for action in ('connection.catalog.start', 'connection.catalog.finish'):
+            require(sum(a['action'] == action and a['resource'] == 'connection:' + job['connectionId'] and a['traceId'] == job['traceId'] for a in projection['audit']) == 1, 'ORACLE_JOB_AUDIT')
+    for probe in projection['probes']:
+        for action in ('connection.probe.start', 'connection.probe.complete'):
+            require(sum(a['action'] == action and a['resource'] == 'connection:' + probe['connectionId'] and a['traceId'] == probe['traceId'] for a in projection['audit']) == 1, 'ORACLE_PROBE_AUDIT')
+    for witness in [*report['cancellations'], report['logoutWitness']]:
+        require(any(job['id'] == witness['jobId'] and job['status'] == 'CANCELLED' and not job['snapshotId'] for job in jobs), 'ORACLE_CANCEL_COMMIT')
+    # 原dump与私有合成口令只在内存比对；公开投影不含actor/口令/密文/业务值。
+    dump = subprocess.check_output(docker + ['exec', ident, 'pg_dump', '-U', 'platform', '-d', 'platform', '--data-only', '--no-owner', '--no-privileges'], timeout=20)
+    logs = subprocess.check_output(docker + ['logs', api['containerId']], stderr=subprocess.STDOUT, timeout=10)
+    private = platform_path.parent / 'private'
+    secrets = [(private / relative).read_bytes().strip() for relative in ('adapter/reader-password', 'platform/platform-password', 'platform/keycloak-password')]
+    require(all(len(value) > 16 and value not in dump and value not in logs and value not in result.stdout for value in secrets), 'ORACLE_SECRET_LEAK')
+    projection_path = output_path.with_suffix('.projection.json')
+    with projection_path.open('xb') as stream:
+        stream.write(result.stdout)
+    value = dict(taskId=task, runId=report['runId'], status='PASS', binding=binding, jobIds=sorted(job['id'] for job in jobs), jobAssociations=len(jobs), probeAssociations=len(projection['probes']), exactSourceCancellations=2, platformDumpSecretScan=True, apiLogsSecretScan=True, projection=projection_path.name, projectionSha256=build.sha(result.stdout), queryExecution=result.receipt)
+    with output_path.open('x') as stream:
+        stream.write(json.dumps(value, indent=2) + '\n')
+    return value
+
+
+def qualify_oracle(gate, input_key):
+    """Oracle本机当前原件资格：解析实际日志/退出码/构建输入，未覆盖的外部验收不补PASS。"""
+    import workflow_execution as execution
+    task = 'G4-M2-ORACLE-01'
+    base = build.ROOT / 'artifacts/workflow' / task
+    manifest = json.loads((base / 'product-gates.json').read_text())
+    require(manifest['taskId'] == task and gate in REQUIRED and manifest['gates'][gate]['inputKey'] == input_key, 'ORACLE_GATE_INPUT')
+    current = {target: build.validate(target, task) for target in ('connections', 'wire', 'api', 'web')}
+    def proof(kind):
+        reference = manifest['proofs'][kind]
+        path = execution.ordinary(build.ROOT / reference['path'])
+        require(path.is_relative_to(base) and build.sha(path.read_bytes()) == reference['sha256'], 'ORACLE_PROOF_PATH_SHA')
+        return path, json.loads(path.read_text())
+    def log(path, row):
+        target = execution.ordinary(path.parent / row['log'])
+        require(target.is_relative_to(base), 'ORACLE_LOG_PATH')
+        raw = target.read_bytes()
+        receipt = row['execution']
+        require(receipt['exitCode'] == 0 and receipt['classification'] == 'SUCCESS', 'ORACLE_ACTUAL_EXECUTION')
+        require(receipt['stderr']['sizeBytes'] == 0 and build.sha(raw) == receipt['stdout']['sha256'], 'ORACLE_EXECUTED_LOG')
+        return raw
+    total = 0
+    kinds = {'environment': ['prepare'], 'contract': ['wire', 'unit'], 'backend': ['unit', 'adapter', 'lifecycle', 'audit'], 'web': ['ui', 'lifecycle'], 'interaction': ['lifecycle', 'audit']}[gate]
+    for kind in kinds:
+        path, row = proof(kind)
+        require(row.get('taskId') == task, 'ORACLE_PROOF_TASK')
+        if kind == 'prepare':
+            require(row['status'] == 'DEPENDENCIES_READY' and row['downloads'] == row['sdkDownloads'] == row['runtimeCredentialsCopied'] == 0, 'ORACLE_PREPARE')
+            _, warm = proof('prepare2')
+            require(warm['status'] == 'DEPENDENCIES_READY' and all(warm[key] == 0 for key in ('downloads', 'sdkDownloads', 'materializedFiles', 'restoreCount', 'runtimeCredentialsCopied')), 'ORACLE_WARM_PREPARE')
+            validate_environment(task, [row, warm])
+            total += 1
+        elif kind in ('wire', 'unit', 'ui', 'adapter'):
+            target = {'wire': 'wire', 'unit': 'connections', 'ui': 'web', 'adapter': 'connections'}[kind]
+            require(row['buildBinding'] == current[target] and row['inputUnchanged'], 'ORACLE_BUILD_DRIFT')
+            require(row['execution']['inputFingerprint'] == execution.sha(execution.encoded(row['buildBinding'])), 'ORACLE_TEST_INPUT')
+            raw = log(path, row)
+            if kind == 'adapter':
+                require(row['actualExitCode'] == 0 and row['cleanupComplete'] and row['stage'] == 'PASS', 'ORACLE_ADAPTER_CLEANUP')
+            else:
+                require(row['exitCode'] == 0, 'ORACLE_LOCAL_EXIT')
+            if kind == 'ui':
+                text = re.sub(r'\x1b\[[0-9;]*m', '', raw.decode())
+                matches = re.findall(r'Tests\s+(\d+) passed \((\d+)\)', text)
+                require(len(matches) == 1 and matches[0] == ('122', '122') and not re.search(r'\d+ (?:failed|skipped|todo|pending)', text), 'ORACLE_UI_COUNT')
+                total += 122
+            else:
+                total += mtp(raw, {'wire': 19, 'unit': 46, 'adapter': 5}[kind])
+        elif kind == 'lifecycle':
+            require(row['status'] == 'LIFECYCLE_CHECKS_PASSED' and row['exitCode'] == 0 and row['buildBindings'] == {target: current[target] for target in ('api', 'web')}, 'ORACLE_LIFECYCLE_BINDING')
+            require(build.execution_unchanged(row['inputs']['drivers']), 'ORACLE_DRIVER_DRIFT')
+            raw = execution.ordinary(path.parent / row['stdout']).read_bytes()
+            require(build.sha(raw) == row['stdoutSha256'] == row['browserExecution']['stdout']['sha256'], 'ORACLE_BROWSER_ORIGINAL')
+            report = json.loads(raw)
+            expected = {'REAL_OIDC', 'ORACLE_INTAKE_REPLAY_PURPOSE_SCOPE', 'UI_INTAKE_CREATE_PROBE_ENABLE_DISCOVER', 'EXPLICIT_CANCEL_AND_DISABLE_TERMINATE_EXACT_SOURCE', 'INFLIGHT_PERMISSION_CHANGE_NO_SNAPSHOT', 'LEASE_FENCE_OLD_SOURCE_ENDED_NEW_ATTEMPT_SUCCEEDED', 'SOURCE_REVOKE_PROBE_ENABLE_WORKER_HISTORY', 'ROTATE_SINGLE_USE_STALE_PROBE_TARGET_SCOPE', 'AUDIT_FAILURE_ROLLS_BACK_ENABLE_PENDING_REPLAY_REJECTED', 'LOGOUT_TERMINATES_SOURCE_AND_FENCES_SNAPSHOT', 'DISABLE_BLOCKS_PROBE_AND_HISTORY'}
+            require(report['status'] == 'PASS' and report['skipped'] == 0 and report['tests'] == len(expected) and set(report['checks']) == expected, 'ORACLE_BROWSER_CHECKS')
+            require({item['mutation'] for item in report['cancellations']} == {'cancel', 'disable'}, 'ORACLE_CANCEL_MODES')
+            for witness in [*report['cancellations'], report['logoutWitness']]:
+                require(re.fullmatch(r'\d+:\d+', witness['sourceId']) and 0 < witness['endedAt'] - witness['cancelledAt'] < 5000 and 0 < witness['endedAt'] - witness['queuedAt'] < 7000, 'ORACLE_SOURCE_CANCELLATION')
+            total += report['tests']
+        else:
+            lifecycle_path, lifecycle = proof('lifecycle')
+            require(row['binding']['lifecycleSha256'] == build.sha(lifecycle_path.read_bytes()) and row['binding']['browserSha256'] == lifecycle['stdoutSha256'] and row['binding']['apiBuildBinding'] == current['api'], 'ORACLE_AUDIT_BINDING')
+            projection_path = execution.ordinary(path.parent / row['projection'])
+            require(projection_path.is_relative_to(base), 'ORACLE_AUDIT_PROJECTION_PATH')
+            raw = projection_path.read_bytes()
+            require(build.sha(raw) == row['projectionSha256'] == row['queryExecution']['stdout']['sha256'] and row['queryExecution']['classification'] == 'SUCCESS' and row['queryExecution']['exitCode'] == 0, 'ORACLE_AUDIT_QUERY_ORIGINAL')
+            projection = json.loads(raw)
+            require(sorted(job['id'] for job in projection['jobs']) == row['jobIds'], 'ORACLE_AUDIT_JOB_BINDING')
+            for witness in [*lifecycle['report']['cancellations'], lifecycle['report']['logoutWitness']]:
+                require(any(job['id'] == witness['jobId'] and job['status'] == 'CANCELLED' and not job['snapshotId'] for job in projection['jobs']), 'ORACLE_AUDIT_CANCEL_BINDING')
+            require(row['status'] == 'PASS' and row['platformDumpSecretScan'] and row['apiLogsSecretScan'] and row['jobAssociations'] == len(projection['jobs']) == 8 and row['exactSourceCancellations'] == 2, 'ORACLE_AUDIT_ASSOCIATIONS')
+            total += row['jobAssociations']
+    return dict(status='PASS', taskId=task, gate=gate, inputKey=input_key, tests=total, skipped=0, qualificationMode='FRESH', scope='Current local Oracle development slice; production/CI/other platforms not executed')
+
+
 def verify(task,gate,input_key):
+    if task=='G4-M2-ORACLE-01':
+        return qualify_oracle(gate,input_key)
     if task=='G4-M2-DORIS-01':
         return qualify_doris(gate,input_key)
     if task=='G4-ENG-DELIVERY-002':

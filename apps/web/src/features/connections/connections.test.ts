@@ -142,7 +142,7 @@ describe("五类受控配置与实际组件", () => {
     const html = renderToStaticMarkup(createElement(ConfigurationForm, { value: validForms[type], onChange: () => undefined, errors: {} }));
     for (const name of Object.keys(validForms[type].values)) expect(html).toContain(`name="${name}"`);
     expect(html).not.toContain('type="password"'); expect(html).not.toContain("secretRef");
-    if (["ORACLE", "TDENGINE"].includes(type)) expect(html).toContain("连接测试与保存尚未开放");
+    if (["TDENGINE"].includes(type)) expect(html).toContain("连接测试与保存尚未开放");
     else if (type === "WEB_API") expect(html).toContain("GET / API_KEY_REF / 无分页");
     else expect(html).toContain("TLS 验证证书和主机名");
   });
@@ -611,7 +611,7 @@ describe("M2 Web认证用途", () => {
     }
     expect(runnablePurpose({ ...form, values: { ...form.values, method: "POST" } })).toBeNull();
     expect(runnablePurpose(newForm("POSTGRESQL"))).toBe("POSTGRESQL_READONLY");
-    for (const type of ["ORACLE", "TDENGINE"] as const) expect(runnablePurpose(newForm(type))).toBeNull();
+    for (const type of ["TDENGINE"] as const) expect(runnablePurpose(newForm(type))).toBeNull();
   });
 });
 
@@ -624,5 +624,32 @@ describe("M2 Doris认证用途", () => {
     form.values.tls = "false";
     expect(runnablePurpose(form)).toBeNull();
     expect(validateForm(form).tls).toBeTruthy();
+  });
+});
+
+/** Oracle独立只读凭据与强制TLS，Owner大小写保持原样。 */
+describe("M2 Oracle认证用途", () => {
+  it("选择独立用途并保持精确开发默认目标，拒绝关闭TLS", () => {
+    const form = newForm("ORACLE", "开发Oracle");
+    expect(runnablePurpose(form)).toBe("ORACLE_READONLY");
+    expect(validateForm(form)).toEqual({});
+    expect(configFromForm(form).profile).toMatchObject({ host: "oracle-source", port: 2484, serviceName: "FREEPDB1", username: "FIXTURE_READER", allowedOwners: ["PRODUCTION", "CaseOwner"] });
+    form.values.tls = "false";
+    expect(runnablePurpose(form)).toBeNull();
+    expect(validateForm(form).tls).toBeTruthy();
+  });
+});
+
+/** Oracle新增字段只解释类型语义，不展示任何LOB内容。 */
+describe("Oracle目录类型表达", () => {
+  it("显示字符长度和时区，保留未知精度与负scale", () => {
+    const snapshot = { status: "SUCCEEDED", capturedAtUtc: "2026-11-13", schemaFingerprint: "hash", objects: [{ schema: "CaseOwner", name: "MixedCase", kind: "TABLE", fields: [{ name: "Value", nativeType: "CLOB", nullable: true, ordinal: 1, precision: null, scale: -2, oracleMetadata: { dataTypeOwner: null, byteLength: 48, charLength: 24, charSemantics: "CHAR", fractionalSecondsPrecision: null, timeZoneKind: "WITH_LOCAL_TIME_ZONE", supportStatus: "METADATA_ONLY" } }] }] } as CatalogSnapshotView;
+    const html = renderToStaticMarkup(createElement(CatalogSnapshot, { snapshot, stale: false }));
+    expect(html).toContain("CaseOwner");
+    expect(html).toContain("字节长度：48");
+    expect(html).toContain("字符长度：24");
+    expect(html).toContain("本地时区");
+    expect(html).toContain("仅元数据");
+    expect(html).toContain("-2");
   });
 });

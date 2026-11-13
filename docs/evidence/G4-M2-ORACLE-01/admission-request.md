@@ -1,5 +1,7 @@
 # G4-M2-ORACLE-01｜A–F 一次性准入申请
 
+> 最新覆盖裁决：用户明确接受当前冻结镜像的本机开发漏洞风险并要求继续；漏洞原件与历史阻断保留，当前状态为READY_FOR_REVIEW。生产/正式验收使用用户已授权的一体机，不在本轮操作范围。无需换版或再次风险审批；其余A–F、预算/隔离/TLS/只读与main/TDengine边界保持。
+
 > 最新裁决（2026-11-13）：用户明确批准现有A–F条件实施，并批准镜像展开13GiB、总峰值40GiB。以下申请及P0回执保留原时点语义；其中“未批准/待裁决”不再代表当前实施授权。获取前非作者准入、原件/安全、合同Review和真实门禁仍须满足；不代接受许可、不更新main、不恢复TDengine、不制作ZIP。
 
 2026-11-13；Master单写。[唯一任务卡](../../tasks/G4-M2-ORACLE-01.md)。用户明确批准附件P0，附件中后续实施申请不是本轮许可。Base=`5113d0b9b233e307664c964ae9bf3c1d6b10adfb`，fetch后远端相符；最终完整Head和普通push回执随交付给出。下文“申请/拟议”均未实施。
@@ -211,3 +213,36 @@ CI按需NOT_RUN；Mac宿主/LinuxARM64容器分列，Windows/x64/生产NOT_RUN�
 非作者确认**BLOCKED_SECURITY_ADMISSION**：原A–F要求原件/安全核验通过才启动，这次批准不包含对这些新披露风险的接受。当前不启动数据库，不编写假PASS；原镜像与所有证据KEEP。推荐取得绑定digest的官方修复/不适用证据；若需更换版本，先重新冻结精确官方ARM64制品并裁决，绝不自行拉取另一版本。若用户仍要求当前镜像试验，须明确接受以上披露及未排除适用性，仅同TaskId/同树、冻结digest、本机合成数据、无生产凭据、无宿主敏感目录/socket、仅任务控制的网络参与者和固定SQL、禁止外部客户端；期限限定自授权起24小时，期满/异常即停止任务服务，精确回收临时资源，保护用户镜像及唯一证据。风险例外不等于安全PASS，也不豁免剩余工程/资源/TLS/权限/取消门禁。
 
 当前65条HTTP元数据记录正文合计2,998,020bytes，历史未知响应上限29,943保留，保守总上限3,027,963<64MiB；11包载荷和本地XML另列，不能混充元数据额度。新增22份HTTP原件+1份本地XML；原33份字节不变。索引implementationAdmission20261113保存获取/验签/宿主/prepare摘要、诊断源码和静态清理后验。CI/Oracle运行/产品测试仍NOT_RUN；未改main、未制作ZIP、未恢复TDengine。
+
+### 实施进度 IMPLEMENTATION-20261113-02
+
+用户最新明确本机开发接受现有镜像风险，按原A–F继续；历史24小时提案未获采纳，不作为新增限制。实际锁闭包新增10包，候选EventLog10.0.13被.NET裁剪；既有包版本未升级。7份锁文件为真实传递闭包，非作者已核对。离线prepare当前contentKey为`6c8f4a758218eefe50dc8efa1a3793854725ec6ac759603f6f008ffbf30dd7ee`，零下载。
+
+已实现ORACLE_READONLY/TLS合同、严格OracleMetadata、Oracle真实驱动及目录解析、目标/owner/scope绑定、独立指纹、信任材料变更栅栏与DI。当前14项Adapter/Dispatcher测试、19项wire合同测试及4项Oracle结构入口测试通过；仅单元/结构证据，不代表真实源、取消、UI通过。新增执行入口与测试为原E表消费者范围的具体冻结：`workflow_m2_oracle.py`、`scripts/tests/WorkflowOracle.Tests.py`；阶段先仅提供结构preflight，未实现生命周期命令不会假报通过。
+
+独立Review指出信任文件IO异常及列级授权遗漏；前者已用读取边界RED→GREEN修复，后者补reader列级检查，PUBLIC/列级/角色/EXECUTE完整证明仍待真实fixture完成。控制视图不能凭过程名猜测安全，未知EXECUTE须拒绝。源实例先仅内部网络、无端口、4GiB/2CPU、精确digest；服务就绪不等于只读验收。临时公开脚本取证容器从未启动，已删除，原缺席匹配错误与纠正后验均保留。
+
+
+实施02后续实测增量：Oracle实际版本23.26.3.0.0；5项真实Adapter测试通过（正常五阶段/元数据/错误密码/错误CA/错误ODP wallet）。首次错误CA加载及阶段分类失败均保留，修复后重新运行。API与Web当前构建通过，122项Web组件测试通过。实际UI/OIDC创建、探测、启用和目录已运行；完整终态仍在验收，不将局部结果写成总PASS。
+
+只读证明采用Oracle原生用户READ ONLY + 每连接session READ_ONLY，reader仅CREATE SESSION及合成对象直接READ。原生限制已实际拒绝被额外授INSERT后的DML、可写definer调用和授权；用户自行ALTER USER READ WRITE也被拒绝。ALTER SESSION READ_ONLY=false本身可调用，但不能解除用户级限制，不误写为该语句被拒绝。四组解除只读/列级写/角色/撤销READ均被产品拒绝。PUBLIC基线与同一冻结镜像PDB$SEED原件集合核对：38826→38830，仅四个新用户默认INHERIT PRIVILEGES差异；这不证明所有外部副作用或漏洞安全。原批量REVOKE因依赖错误停止，未使用FORCE，准确恢复后才继续，失败原件保留。
+
+取消旧十秒单段sleep未能在5秒内终止，原失败保留；改为总十秒、50毫秒分段的有界fixture后，真实驱动取消及独立源端见证通过（active到会话不存在1.467秒）。该结果只覆盖本fixture，不能承诺所有Oracle长操作瞬时取消。UI cancel/disable另做精确SID/SERIAL和自然完成前提前终止检查，不能借Adapter证据代替。
+
+实施E具体路径补充：workflow_oracle_fixture.py、workflow-oracle.mjs、oracle-fixture-relay.cs.txt及apps/web/vitest.config.ts。固定relay仅API容器回环15180→任务Keycloak、15300→宿主Web，不修改产品loopback guard、全局DNS/信任或主机配置；API仅挂载公开CA/wallet，不挂载源reader口令或管理员材料。Web测试报告按G4_TEST_TASK白名单写Oracle目录，避免复用旧Doris报告路径。全部资源准确ID/限制由implementation-02下回执恢复。
+
+
+实施02最终验证增量：当前正式消费者记录11组真实OIDC/UI生命周期通过，包含凭据用途/作用域、创建/Probe/Enable/Discover、auditor脱敏、撤权历史访问、轮换/旧Probe/旧修订、进行中权限变化无快照、租约/fence接管、审计故障回滚与预约重放拒绝、注销/取消/禁用。取消计时自排队前起，准确SID/SERIAL消失均早于10秒自然延迟；注销同样无快照。8个真实作业、5个探测与原始脱敏SQL审计投影逐项关联，绑定本次lifecycle SHA与API构建，私有dump只在内存扫描。原故障/断言/启动就绪失败保留，未改写为成功。
+
+当前API、Web及Connections/wire构建均通过；46共享单元、19 wire、122 Web组件、5真实Oracle Adapter，零跳过。TypeScript类型检查和受影响文件lint通过。五类本机产品资格由workflow.py→workflow_m2_evidence的Oracle分支消费原日志/真实exit/input绑定；不以manifest自报测试数代替解析。warm prepare零下载、零restore、零materialization。坏CA/wallet/密码及真实Oracle错SAN拒绝；过期证书被Oracle orapki拒绝导入，另在同源容器已有OpenSSL监听器上完成真实TLS拒绝测试后恢复Oracle监听器，不能将它说成Oracle成功装载过期证书。
+
+E最小工程收口补充：workflow_oracle_platform.py负责本任务固定审计故障/fence控制；故障创建DDL事务化，finally清理并核准确对象缺席。workflow.py/workflow_m2_evidence.py接Oracle真实证据资格。scripts/verify.ps1和OracleFrozenMetadata.Tests.ps1仅为已批准的29,943字节config原件加入精确路径/长度/SHA格式例外，JSON/秘密检查保留；RED→GREEN，原件没有补LF或改写。部署文档已补，生产G4和迁移显式关闭。
+
+本轮属于本机开发切片，CI/Windows/x64/生产一体机未执行；整会话锁屏/睡眠及宿主RSS峰值未做连续测量，当前容器上限6GiB/4CPU，源卷实测约4.13GiB、任务artifact约3.09GiB。完整卷灾备恢复、另一Oracle精确RU/edition、生产容量和漏洞修复证明不在本轮通过声明中。既有风险按用户最新开发授权处理，不重复阻断。最终只交付本申请与一页任务状态，源码及证据在同一任务分支，不制作ZIP、不更新main、不恢复TDengine。
+
+
+最终收尾审查发现平台PG/Keycloak卷实际为tmpfs；原“只KEEP卷名”计划已撤回，未据此删除唯一状态。已持久化PG备份232,592bytes/0600和Keycloak完整私有snapshot约185MiB，私有父目录0700。正常关闭Keycloak前用准确卷保持器维持挂载，H2原件与副本SHA一致；隔离无网络PG恢复通过，11表源/恢复行数和内容摘要一致；隔离Keycloak副本准确realm OIDC HTTP200。此前卷读取用户和PG初始化就绪竞态失败保留；改用卷拥有者只读核验和TCP就绪后恢复。实际脚本原字节、成功exit0/tool会话74743链接及精确清理断言已保存，非作者复核关闭P1；逐查询双侧字符串及完整HTTP正文未单独保存，证据限制明确，不伪造补原件。不把这些局部恢复扩展为Oracle整库灾备或生产验收。
+
+最终资源收尾已完成：准确删除4容器、2网络和2个已持久化并恢复验证的tmpfs卷，共8项，全部真实exit0及缺席后验已记录；宿主Web正常结束其有界运行后已停止。Oracle普通数据卷、私有持久备份/必要密钥与用户镜像KEEP，不触碰其他任务。最终状态READY_FOR_REVIEW；Head/普通push与受影响工程检查回执随最终交付给出。
+
+最终独立只读Review无未关闭阻断项，允许同任务分支普通提交/push；八项清理实际exit/原始后验和29份新增证据散列已复核。工程仅运行本轮受影响检查及冻结原件正反例；遵照用户禁止ZIP/历史全量验收，不运行含ZIP夹具的历史全SelfTest，也不宣称整份registry verify全部PASS。

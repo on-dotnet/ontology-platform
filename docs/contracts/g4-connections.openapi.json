@@ -514,6 +514,17 @@
             ],
             "description": "原生小数位。",
             "format": "int32"
+          },
+          "oracleMetadata": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Oracle专属类型信息；旧连接器和旧快照不输出该字段。",
+                "$ref": "#/components/schemas/OracleColumnMetadata"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -1221,6 +1232,84 @@
         "additionalProperties": false,
         "description": "Doris配置预览，本阶段不可连接。"
       },
+      "OracleColumnMetadata": {
+        "required": [
+          "dataTypeOwner",
+          "byteLength",
+          "charLength",
+          "charSemantics",
+          "fractionalSecondsPrecision",
+          "timeZoneKind",
+          "supportStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "dataTypeOwner": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "用户定义类型的原始owner；内置类型为null。"
+          },
+          "byteLength": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "字典声明的字节长度；缺失不推断为零。",
+            "format": "int32"
+          },
+          "charLength": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "字符长度，与字节长度分列。",
+            "format": "int32"
+          },
+          "charSemantics": {
+            "enum": [
+              "BYTE",
+              "CHAR",
+              null
+            ],
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "BYTE或CHAR语义；非字符列为null。"
+          },
+          "fractionalSecondsPrecision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "TIMESTAMP小数秒位数；缺失保留null。",
+            "format": "int32"
+          },
+          "timeZoneKind": {
+            "enum": [
+              "NONE",
+              "WITH_TIME_ZONE",
+              "WITH_LOCAL_TIME_ZONE",
+              "UNKNOWN"
+            ],
+            "type": "string",
+            "description": "显式时区类别，仅接受冻结的大写值，缺失或非法值拒绝解析。"
+          },
+          "supportStatus": {
+            "enum": [
+              "SUPPORTED",
+              "METADATA_ONLY",
+              "UNSUPPORTED"
+            ],
+            "type": "string",
+            "description": "显式支持状态；旧快照缺省整个元数据时保持未知。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Oracle数据字典的保真列元数据，不读取列值或默认表达式。"
+      },
       "OracleConnectionProfile": {
         "required": [
           "host",
@@ -1262,7 +1351,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Oracle配置预览，本阶段不可连接。"
+        "description": "Oracle强制TLS的类型化配置，执行目标由服务端再次限定。"
       },
       "PgConnectionProfile": {
         "required": [

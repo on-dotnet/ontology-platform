@@ -1,0 +1,69 @@
+using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
+
+// 仅任务API容器的固定回环桥；不接收用户目标或代理任意外部地址。
+using var stop = new CancellationTokenSource();
+using var signal = PosixSignalRegistration.Create(PosixSignal.SIGTERM, context => { context.Cancel = true; stop.Cancel(); });
+var identity = Relay(15180, "keycloak-test", 8080, stop.Token);
+var web = Relay(15300, "host.docker.internal", 15300, stop.Token);
+using var api = Process.Start(new ProcessStartInfo("dotnet", "/app/OntologyPlatform.Api.dll") { UseShellExecute = false })!;
+try
+{
+    await Task.WhenAny(api.WaitForExitAsync(stop.Token), identity, web);
+}
+finally
+{
+    stop.Cancel();
+    if (!api.HasExited) api.Kill(entireProcessTree: true);
+    await api.WaitForExitAsync();
+    await Task.WhenAll(identity, web);
+}
+return api.ExitCode;
+
+// 监听真正回环地址，只有此容器的API能消费固定内部服务。
+static async Task Relay(int localPort, string host, int remotePort, CancellationToken token)
+{
+    var listener = new TcpListener(IPAddress.Loopback, localPort);
+    listener.Start(32);
+    // 每个固定端口最多32个活动连接，退出时等待所有转发结束。
+    var active = new List<Task>();
+    try
+    {
+        while (!token.IsCancellationRequested)
+        {
+            active.RemoveAll(task => task.IsCompleted);
+            if (active.Count >= 32)
+            {
+                await Task.WhenAny(active).WaitAsync(token);
+                continue;
+            }
+            var client = await listener.AcceptTcpClientAsync(token);
+            active.Add(Forward(client, host, remotePort, token));
+        }
+    }
+    catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+    finally { listener.Stop(); await Task.WhenAll(active); }
+}
+
+// 每个连接只流式转发，有限缓存和60秒上限；不记录正文、Cookie或认证头。
+static async Task Forward(TcpClient client, string host, int port, CancellationToken token)
+{
+    using (client)
+    using (var remote = new TcpClient())
+    using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(token))
+    {
+        timeout.CancelAfter(TimeSpan.FromSeconds(60));
+        try
+        {
+            await remote.ConnectAsync(host, port, timeout.Token);
+            var request = client.GetStream().CopyToAsync(remote.GetStream(), 8192, timeout.Token);
+            var response = remote.GetStream().CopyToAsync(client.GetStream(), 8192, timeout.Token);
+            await Task.WhenAny(request, response);
+            timeout.Cancel();
+            try { await Task.WhenAll(request, response); } catch (OperationCanceledException) { }
+        }
+        catch (Exception error) when (error is IOException or SocketException or OperationCanceledException) { }
+    }
+}

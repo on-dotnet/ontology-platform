@@ -4,7 +4,7 @@ export type JsonValue = null | boolean | number | string | JsonValue[] | { [key:
 
 export type CatalogDiscoveryJobView = { "jobId": string; "connectionId": string; "configRevision": number; "status": string; "createdAtUtc": string; "completedAtUtc": null | string; "snapshotId": null | string; "traceId": string };
 
-export type CatalogField = { "name": string; "nativeType": string; "nullable": boolean; "ordinal": number; "precision": null | number; "scale": null | number };
+export type CatalogField = { "name": string; "nativeType": string; "nullable": boolean; "ordinal": number; "precision": null | number; "scale": null | number; "oracleMetadata"?: null | OracleColumnMetadata };
 
 export type CatalogObject = { "schema": string; "name": string; "kind": string; "fields": Array<CatalogField> };
 
@@ -47,6 +47,8 @@ export type ConnectionSecretIntakeRequest = { "secretValue": string; "scopeSelec
 export type ConnectionView = { "id": string; "displayName": string; "scope": ResourceScope; "config": ConnectionConfig; "configRevision": number; "state": string; "secretConfigured": boolean; "secretVersion": number; "probeFresh": boolean; "lastProbeId": null | string; "updatedAtUtc": string };
 
 export type DorisConnectionProfile = { "feHost": string; "queryPort": number; "catalog": string; "database": string; "username": string; "tls": boolean };
+
+export type OracleColumnMetadata = { "dataTypeOwner": null | string; "byteLength": null | number; "charLength": null | number; "charSemantics": "BYTE" | "CHAR" | null; "fractionalSecondsPrecision": null | number; "timeZoneKind": "NONE" | "WITH_TIME_ZONE" | "WITH_LOCAL_TIME_ZONE" | "UNKNOWN"; "supportStatus": "SUPPORTED" | "METADATA_ONLY" | "UNSUPPORTED" };
 
 export type OracleConnectionProfile = { "host": string; "port": number; "serviceName": string; "username": string; "tls": boolean; "allowedOwners": Array<string> };
 

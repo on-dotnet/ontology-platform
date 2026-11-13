@@ -31,6 +31,10 @@ function Get-SourceFiles {
 
 function Test-FrozenEvidenceFormat {
     param([string]$RelativePath, [byte[]]$RawBytes)
+    # Oracle唯一已批准config是上游无末尾LF原件；仅精确路径/长度/散列豁免格式，JSON和秘密检查仍执行。
+    if ($RelativePath -ceq 'docs/evidence/G4-M2-ORACLE-01/metadata/dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b.json') {
+        return $RawBytes.Length -eq 29943 -and [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($RawBytes)).ToLowerInvariant() -ceq 'dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b'
+    }
     # M4原始ZIP回读manifest在已提交基线无末尾LF；精确原字节豁免格式，仍检查JSON/秘密。
     if ($RelativePath -cne 'docs/evidence/G3-M4-001/mac-master/actual-v2-manifest.json') { return $false }
     return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($RawBytes)).ToLowerInvariant() -ceq '9e632706bbf9ee27e070711dcd6901c3b02fbc0204eee171a28542f8d6a9d0e5'
