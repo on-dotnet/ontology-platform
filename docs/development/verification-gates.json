@@ -20,7 +20,9 @@
         "docs/evidence/G4-M2-WEB-01/gates/**/*.json",
         "docs/evidence/G4-M2-WEB-01/recovery/**/*.log",
         "docs/evidence/G4-ENG-DELIVERY-002/**/*.json",
-        "docs/evidence/G4-M2-DORIS-01/**/*.json"
+        "docs/evidence/G4-M2-DORIS-01/**/*.json",
+        "docs/deployment/doris.md",
+        "docs/evidence/G4-M2-DORIS-01/metadata/*.nuspec"
       ],
       "needs": [],
       "command": [
@@ -376,6 +378,26 @@
         "scripts/tests/WorkflowDelivery.Tests.py"
       ],
       "testsRequired": true
+    },
+    "doris-task-admission": {
+      "inputs": [
+        "scripts/tests/WorkflowDoris.Tests.py",
+        "scripts/maintenance/workflow_m2_doris.py",
+        "scripts/maintenance/workflow_doris_fixture.py",
+        "scripts/maintenance/workflow-doris.mjs",
+        "scripts/maintenance/doris-fixture-control.cs.txt"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowDoris.Tests.py"
+      ],
+      "testsRequired": true,
+      "identityInputs": [
+        "scripts/maintenance/workflow_execution.py",
+        "scripts/maintenance/workflow_m2_evidence.py"
+      ]
     }
   }
 }
