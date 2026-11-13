@@ -20,3 +20,22 @@
 资源 KEEP：本树及本任务分支保留到同会话后续获批、最终交付与明确回收；元数据随Git保留。没有创建容器/卷/证书/数据库。Doris保留卷、私有原件、缓存与旧树未改变；原main工作区6个未跟踪`.DS_Store`原样保留。没有ZIP、main更新、产品修改或后续阶段启动。
 
 文档轻量检查、非作者审查结论和失败见证统一写入[一次性申请](../evidence/G4-M2-TDENGINE-01/admission-request.md)，避免第二状态源。后续沿用本会话、本树、本任务，不另建恢复任务。
+
+## 2026-11-13 用户接受复审裁决（当前有效增量）
+
+用户明确接受 `Codex-G4-M2-TDENGINE-01-P0-Review-Decision-20261113.md`；已审P0 Head为 `df6c316878f81e634d316f32e0afcba495a8441b`。上文及原始证据作为历史保留；本段更新当前等待动作，不将历史状态改为PASS。
+
+```text
+P0DocumentReview: ACCEPTED
+ProductAdmission: BLOCKED
+PrimaryBlocker: LEGALLY_AVAILABLE_ENTERPRISE_TEST_SOURCE_NOT_PROVIDED
+NextAction: WAIT_FOR_EXTERNAL_INPUT
+```
+
+本轮owned_paths仅本卡与原准入申请的追加段；授权为一次文档收口、轻量Markdown/链接/diff检查、原Reviewer一次增量只读Review及原分支普通提交/push。没有新来源时不再搜索、Registry遍历、资源探测、prepare/restore或测试；不下载、启动服务、改产品/DTO/数据库/工程脚本、生成ZIP、更新main、采购/试用或开启Oracle等其他阶段。
+
+外部待输入：合法研发/合成测试用途与期限/分发限制的脱敏依据；精确Enterprise版本、Linux ARM64及配套Adapter/taosc与能力范围；官方交付形式/标识、校验元数据及取得渠道；证书信任、内跳保护、Connector兼容、取消/重试资料。不要提供密码、license key、下载令牌或生产数据。隔离既有测试实例仅可另提方案，需明确访问/负例/取消授权；生产实例不是默认验证源。
+
+恢复顺序：合法来源及取得条件 → 精确获取授权 → 原件检查和获批有界能力探针 → 一次性冻结C/E准确合同并非作者审查 → 产品实施授权 → 按影响真实验收。新材料仅触发核对，不自动授权获取/探针/实施。详细A–F限定见[原申请追加裁决](../evidence/G4-M2-TDENGINE-01/admission-request.md#2026-11-13-用户接受复审裁决与恢复条件)。
+
+KEEP：原会话、任务、托管树及 `codex/g4-m2-tdengine-01` 分支，原P0正文、metadata与历史失败；待外部输入后原地续办，最终交付并明确回收前保留。Doris保留资源及旧私有原件不动；本轮发现的 `docs/.DS_Store`、`docs/evidence/.DS_Store` 未跟踪改动原样保护。

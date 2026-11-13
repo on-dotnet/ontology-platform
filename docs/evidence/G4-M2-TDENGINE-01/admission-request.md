@@ -148,3 +148,26 @@ host_continuity.py当前`--task-id G4-M2-TDENGINE-01`实测exit2（invalid choic
 失败见证（早先调用UTC未采集，记UNKNOWN而不回填）：首次默认sandbox资源组合命令最终exit1；stderr含`sysctl: sysctl fmt -1 1024 1: Operation not permitted`及`permission denied while trying to connect to the docker API`，后来正常提权的只读查询如上。分支创建初次`git switch -c codex/g4-m2-tdengine-01`被`.git/...lock: Operation not permitted`拒绝，随后同命令正常提权exit0；没有自动审批拒绝或绕过。只读`python3 -B scripts/maintenance/host_continuity.py preflight --task-id G4-M2-TDENGINE-01`单独exit2，stderr为`argument --task-id: invalid choice: 'G4-M2-TDENGINE-01'`；该入口缺口未修复、不借旧TaskId跑。
 
 资源索引通过`docker --context desktop-linux image ls --format '{{.Repository}}:{{.Tag}} {{.ID}} {{.Size}}'`只读取得（组合命令exit0）：可见Doris历史image短ID `1d4ccee8d7cc` / `c7b4288a34af`，未出现TDengine命名仓库；该观察仅命名索引，不作为层复用或删除依据，不读取容器env、卷或私有runtime。没有资源删除候选被本任务授权。
+
+## 2026-11-13 用户接受复审裁决与恢复条件
+
+用户明确接受附件 `Codex-G4-M2-TDENGINE-01-P0-Review-Decision-20261113.md`，仅授权本申请与任务卡追加、轻量文档检查及一次增量Review、原任务分支普通提交/push。对应已审P0 Head：`df6c316878f81e634d316f32e0afcba495a8441b`。本段为当前有效裁决；此前申请、元数据原件、历史失败及 `P0_BLOCKED_WITH_WITNESS` 保留原样。P0文档接受，不是产品准入通过；唯一当前状态仍由[任务卡](../../tasks/G4-M2-TDENGINE-01.md)记录。
+
+**P0DocumentReview=ACCEPTED；ProductAdmission=BLOCKED；PrimaryBlocker=LEGALLY_AVAILABLE_ENTERPRISE_TEST_SOURCE_NOT_PROVIDED；NextAction=WAIT_FOR_EXTERNAL_INPUT。** 当前材料未提供足以准入的合法Enterprise验证来源，不推断用户没有许可，也不要求为完成P0立即采购。一般继续研究许可不替代厂商使用权或精确能力证据。
+
+| 项 | 已接受的方向及仍有效的限定 |
+|---|---|
+| A | Connector 3.2.1＋Enterprise 3.4.2.13 Linux ARM64仅保留为调查候选。公告修复号不等于唯一安全版本，也不证明企业ARM64/Adapter制品或许可存在。供应方提供其他受支持版本时只登记待审候选及一次差异，不自动换版/拉取/安装。先核合法来源、用途期限、发布者、版本/架构、交付形式、地址、校验资料和容量；OCI核index/平台manifest/config/layers，安装包核平台/大小/官方校验和/签名资料，不强求OCI字段。改安装包/自建镜像仍须另行准入。二进制内部NOTICE/SBOM/组成与运行行为留待获批取得后检查，不形成下载前必须检查内部原件的循环。旧元数据预算不重置，无新输入不重复抓取。 |
+| B | 原生WSS、链/主机名/有效期、源端最小只读与真实撤权、三层取消门槛保持。外部TLS终止或仅限制平台SELECT不能替代源权限。源码存在Reconnect后再次DoQuery路径，但是否实际重发待有界实验，不断言每次重发或零重试。合法来源明确后先另申请小范围WSS/证书负例、权限、取消/重试探针，再考虑完整Adapter/UI。取消分别见证调用方、传输、源操作终止；自然完成不冒充取消，产品账号无管理权，探针不扩大业务时序查询。优先隔离进程/容器信任；不改宿主全局信任、不假造CA接口。内跳保护未知，本轮不接受内部明文风险。 |
+| C | 同意TDENGINE_READONLY、服务器固定tdengine_reader、SecretRef仅密码及四字段Profile方向，不授权用途校验或存储实现。后续一份准确差异说明Intake/target策略版本/信任锚/scope绑定存储、失效重签、跨用途隔离、历史密文与绑定后TTL。既不推定无需迁移，也不预设新表；多账号/公开Username另批。 |
+| D | 接受规划上限6组件/容器、8 vCPU/10GiB（源4GiB、平台6GiB），源数据1GiB/日志256MiB、平台数据2GiB/过程证据1GiB；制品与解压另计、未知不写零。未准入实际资源、启动、卷/证书或VM调整，不挂载/清理Doris保留资源或复制旧秘密。 |
+| E | 认可对象类别/父stable、TAG/COLUMN、可空性unknown、源观测precision/timezone缺口；false不能代未知、用户配置不能代源事实。合法源及短能力探针可行后，才冻结C/E的DTO/OpenAPI/TS/规范化/快照兼容及必要持久化差异，先独立Review再申请实施。新TD版本规则不重算PG/Web/Doris历史指纹。Compose/部署文档仍为后续目标，G4 Guard保持。TaskId/消费者/gate/计时/缓存适配将来在本任务内常规完成，不另建工程优化任务、不逐小补丁审批；本轮不改脚本。 |
+| F | 产品、服务、prepare/restore/build、SelfTest及CI保持NOT_RUN；无新增验收或风险接受，不继承DORIS-LOCAL-01/AMBER-A1。签名可得性与完整SBOM按取得前后分阶段核验，未证有签名不是验签失败；非法来源、无源权限、TLS绕过不能由一般风险签字替代。无ZIP/main集成/其他Adapter开发。 |
+
+外部输入仅需脱敏资料：①可核查的合法研发/合成测试用途、期限、分发限制；②精确发行版本、ARM64支持、配套taosAdapter/taosc与WSS/权限范围；③官方制品标识/交付形式、校验资料及取得渠道；④证书信任、Adapter→taosd保护、Connector兼容、重试/查询取消资料。不要把密码、license key、下载令牌或生产数据放入聊天/Git。已有隔离测试实例可作为替代验证源提案，但需另核版本、数据、网络、账号、负例/取消测试授权及本机ARM64差异，不能自动访问或使用生产实例。
+
+严格恢复顺序：**合法来源及取得条件 → 精确获取授权 → 原件检查和获批有界能力探针 → 一次性冻结C/E准确合同并非作者审查 → 产品实施授权 → 按影响真实验收**。来源缺失即等待，不循环重试P0；新材料不自动解锁任何后续步骤。本轮不再联网研究、Registry遍历、资源探测、prepare/restore/测试、下载、服务、产品/DTO/数据库/工程脚本修改；不采购、试用、不新建恢复任务、不启动Oracle/M3/G6或改变总体计划。
+
+本轮保留原会话/树/分支、全部既有证据和历史状态；仅在外部输入到达并满足各步授权后原地恢复。原P0复审方未逐件重算全部22份正文、未测产品或证实企业原件，本轮亦不重复这些检查。
+
+本次增量检查与非作者Review回执：Master轻量检查exit0，确认仅两份获准Markdown变化、原Head正文逐字节保留为前缀、UTF-8/LF及本地链接/锚点有效；`git diff --check` exit0。原非作者Reviewer `/root/tdengine_p0_review` 一次增量审查通过、无阻断发现，并独立执行diff-check exit0；仅审附件与本次增量，未联网、探测资源、运行测试或重验元数据。fetch确认origin/main仍为指定Base；本轮结束普通提交/push后停在WAIT_FOR_EXTERNAL_INPUT。
