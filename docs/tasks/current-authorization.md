@@ -165,3 +165,9 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 ## 2026-11-13 严格TLS实现差异（最新明确批准）
 
 用户明确批准[tls-validation-delta](../evidence/G4-M2-DORIS-01/tls-validation-delta.md)：保留MySqlConnector2.6.2，Required仅作为启用公开验证回调的驱动选项，所有实际握手强制TLS、私有CA完整叶证书链、主机名、有效期和ServerAuth严格校验；主连接与取消辅助连接一致，无明文回退、无全局信任/新依赖/生产权限。合成CA无CRL/OCSP，在线撤销NOT_VERIFIED。真实正反例通过才恢复收口；同会话同树继续，不逐补丁审批。
+
+---
+
+# 2026-11-13 G4-M2-ORACLE-01 P0 最新明确授权（追加）
+
+用户明确批准附件Codex-G4-M2-ORACLE-01-P0-Admission-20261113.md的P0，从预期且本轮fetch确认的main `5113d0b9b233e307664c964ae9bf3c1d6b10adfb`创建独立托管树/`codex/g4-m2-oracle-01`。只读源码、官方有界公开元数据（单响应8MiB、累计64MiB，失败正文计入，URL/UTC/状态/字节/SHA256），单作者文档与非作者只读Review，普通提交/push。只交[一页状态](G4-M2-ORACLE-01.md)和[A–F申请](../evidence/G4-M2-ORACLE-01/admission-request.md)，必要原件/索引同目录。禁止制品载荷、安装/启动、产品实现、prepare/restore、历史全量、main更新及中间ZIP，不另开优化/恢复任务。TDengine保持WAIT_FOR_EXTERNAL_INPUT，不恢复调查/开发、不改其树/分支/原证据。后续获批同一Oracle会话/树继续，当前停ChatGPT准入审查；历史授权/结果不改，不宣称M2完成。
