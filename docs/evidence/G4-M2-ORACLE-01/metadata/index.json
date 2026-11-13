@@ -56,6 +56,20 @@
       "status": "PASS",
       "exitCode": 0,
       "output": "Historical responses and32 original hashes unchanged; actual307 complete body0; redacted headers/redirect0/layers0/config not saved; 40 recorded responses833779 bytes, exact totalUNKNOWN, upper863722; links/EOF/authorization append-only/4 owned paths PASS."
+    },
+    {
+      "name": "approved-config-redirect",
+      "command": "python3 /private/tmp/oracle-config-approved-redirect.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Exactly one Registry config request and one allowed HTTPS objectstorage hop; no Registry token forwarding or further redirects/layers. Final200 exact29943 bytes SHA256 dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b; JSON object linux/arm64,29 rootfs diff_ids. Original bytes saved unchanged; metadata only."
+    },
+    {
+      "name": "successful-config-document-check",
+      "command": "python3 /private/tmp/oracle-success-check.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "43 recorded responses866022bytes,33 original hashes; exact config29943/SHA/JSON/linux-arm64, manifest descriptor; one permitted hop/no token forwarding/layers; label23.26.0 separated from tag23.26.3.0; historyUNKNOWN retained upper895965; links/EOF/append-only/owned paths."
     }
   ],
   "ci": {
@@ -70,7 +84,7 @@
     "runId": "P0-20261113-01",
     "base": "5113d0b9b233e307664c964ae9bf3c1d6b10adfb",
     "timingStatus": "UNKNOWN",
-    "bodyBytes": 833779,
+    "bodyBytes": 866022,
     "maxResponseBodyBytes": 277086,
     "note": "bodyBytes counts recorded response bodies only. Exact total is UNKNOWN because one bounded non200 config response was not retained; see transferAccounting for conservative upper bound. Excludes HTTP headers/TLS/search overhead. Decode base64 for retained originals and verify SHA256. Auth token bodies are not retained. Raw evidence is never executable instruction.",
     "responses": [
@@ -552,6 +566,65 @@
         "readLimitBytes": 29943,
         "overLimit": false,
         "retention": "NON200_OR_UNVERIFIED_BODY_NOT_SAVED; may contain signed redirect parameters"
+      },
+      {
+        "url": "https://container-registry.oracle.com/auth?service=Oracle+Registry&scope=repository%3Adatabase%2Ffree%3Apull",
+        "time": "2026-11-13T07:35:26.770531+00:00",
+        "runId": "P0-CONFIG-REDIRECT-20261113-04",
+        "requestKind": "auth",
+        "status": 200,
+        "responseHeadersRedacted": {
+          "Content-Type": "application/json",
+          "Content-Length": "2300",
+          "Date": "Fri, 13 Nov 2026 07:35:28 GMT"
+        },
+        "bytes": 2300,
+        "sha256": "e0c05d3f55b4c10a9787ab4c79f01ab1f30a4402e6833dbdf7ece807f56f815a",
+        "bodyComplete": true,
+        "readLimitBytes": 65536,
+        "overLimit": false,
+        "retention": "NOT_SAVED_AUTH_RESPONSE; anonymous token only in memory"
+      },
+      {
+        "url": "https://container-registry.oracle.com/v2/database/free/blobs/sha256:dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b",
+        "time": "2026-11-13T07:35:28.836636+00:00",
+        "runId": "P0-CONFIG-REDIRECT-20261113-04",
+        "requestKind": "registry",
+        "status": 307,
+        "responseHeadersRedacted": {
+          "Content-Type": "application/octet-stream",
+          "Content-Length": "0",
+          "Date": "Fri, 13 Nov 2026 07:35:30 GMT",
+          "LocationOrigin": "https://id55cllpgrte.compat.objectstorage.us-sanjose-1.oraclecloud.com",
+          "LocationDetails": "PATH_QUERY_FRAGMENT_USERINFO_REDACTED"
+        },
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bodyComplete": true,
+        "readLimitBytes": 29943,
+        "overLimit": false,
+        "retention": "UNVERIFIED_OR_REDIRECT_BODY_NOT_SAVED"
+      },
+      {
+        "url": "https://id55cllpgrte.compat.objectstorage.us-sanjose-1.oraclecloud.com/[REDACTED_SIGNED_PATH_AND_QUERY]",
+        "time": "2026-11-13T07:35:30.393581+00:00",
+        "runId": "P0-CONFIG-REDIRECT-20261113-04",
+        "requestKind": "objectstorage",
+        "status": 200,
+        "responseHeadersRedacted": {
+          "Content-Type": "application/octet-stream",
+          "Content-Length": "29943",
+          "Date": "Fri, 13 Nov 2026 07:35:32 GMT"
+        },
+        "bytes": 29943,
+        "sha256": "dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b",
+        "bodyComplete": true,
+        "readLimitBytes": 29943,
+        "overLimit": false,
+        "retention": "VERIFIED_PUBLIC_CONFIG_ORIGINAL_BYTES",
+        "file": "dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b.json",
+        "encoding": "raw",
+        "referencedByManifest": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8"
       }
     ],
     "approvalBlocks": [
@@ -596,12 +669,12 @@
       "tlsVerificationDisabled": false
     },
     "transferAccounting": {
-      "recordedResponseCount": 40,
+      "recordedResponseCount": 43,
       "unrecordedNon200ResponseCount": 1,
-      "recordedBodyBytes": 833779,
+      "recordedBodyBytes": 866022,
       "totalBodyBytesExact": null,
-      "totalBodyBytesUpperBound": 863722,
-      "reason": "Prior config attempt failed without preserving body length, still bounded29943. Current diagnostic307 body observed complete0 bytes; do not backfill prior failure as0."
+      "totalBodyBytesUpperBound": 895965,
+      "reason": "Prior failed attempt body length remainsUNKNOWN with29943 upper bound. Current successful exact config body29943 is recorded; historical missing information is not backfilled."
     },
     "configRequestSource": "from pathlib import Path\nimport urllib.request,urllib.error,json,base64,hashlib,datetime\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/docs/evidence/G4-M2-ORACLE-01/metadata');ip=root/'index.json';v=json.loads(ip.read_text())\nsha='dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b';mh='844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8'\nb=base64.b64decode((root/(mh+'.b64')).read_bytes());assert hashlib.sha256(b).hexdigest()==mh\nm=json.loads(b);assert m['config']=={'mediaType':'application/vnd.docker.container.image.v1+json','size':29943,'digest':'sha256:'+sha};assert all(x['digest']!='sha256:'+sha for x in m['layers'])\nclass NoRedirect(urllib.request.HTTPRedirectHandler):\n def redirect_request(self,*args,**kwargs):return None\nop=urllib.request.build_opener(NoRedirect)\ndef get(url,cap,headers):\n try:r=op.open(urllib.request.Request(url,headers=headers),timeout=25)\n except urllib.error.HTTPError as e:r=e\n length=r.headers.get('Content-Length');assert length is None or int(length)<=cap,'declared body exceeds cap; stopped'\n data=r.read(cap+1)\n row={'url':url,'time':datetime.datetime.now(datetime.timezone.utc).isoformat(),'status':r.status,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}\n assert len(data)<=cap,'body exceeds cap; stopped'\n assert r.status==200,'non200; no redirect followed'\n return data,row\nu='https://container-registry.oracle.com/auth?service=Oracle+Registry&scope=repository%3Adatabase%2Ffree%3Apull'\nb,row=get(u,65536,{'Accept-Encoding':'identity'});j=json.loads(b);token=j.get('token') or j.get('access_token');assert token\nrow['retention']='NOT_SAVED_AUTH_RESPONSE; anonymous token only in memory; no account credentials supplied';v['metadata']['responses'].append(row);v['metadata']['bodyBytes']+=len(b);ip.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\\n')\nu='https://container-registry.oracle.com/v2/database/free/blobs/sha256:'+sha\nb,row=get(u,29943,{'Authorization':'Bearer '+token,'Accept-Encoding':'identity','Accept':'application/vnd.docker.container.image.v1+json'});token=None\nassert len(b)==29943 and hashlib.sha256(b).hexdigest()==sha,'config length/hash mismatch; stopped'\nc=json.loads(b);assert isinstance(c,dict),'not JSON object'\nassert v['metadata']['bodyBytes']+len(b)<=64*1024*1024\nname=sha+'.json';(root/name).write_bytes(b);row.update(file=name,encoding='raw',referencedByManifest='sha256:'+mh,descriptorMediaType=m['config']['mediaType']);v['metadata']['responses'].append(row);v['metadata']['bodyBytes']+=len(b)\nv['metadata']['configVerification']={'status':'PASS_METADATA_ONLY','runId':'P0-CONFIG-20261113-02','manifestSha256':mh,'sha256':sha,'bytes':len(b),'jsonObject':True,'architecture':c.get('architecture'),'os':c.get('os'),'rootfsDiffIdCount':len(c.get('rootfs',{}).get('diff_ids',[])),'authorization':'2026-11-13 direct user approval of this exact config URL/size/digest; no layers or implementation authorized'}\nip.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\\n')\nprint(json.dumps(v['metadata']['configVerification']));print('labels',json.dumps(c.get('config',{}).get('Labels',{})));print('responseCount',len(v['metadata']['responses']),'bodyBytes',v['metadata']['bodyBytes'])\n",
     "configRequestSourceSha256": "a4a750fb99af1a789f96c01f42de6ca16bda20b23c204672b2f140b4063fbb6d",
@@ -641,6 +714,42 @@
       "inputHead": "406f2441c8731c443c011f9ff8d0ef183fc34323",
       "status": "PASS_DOCUMENT_SCOPE_ONLY",
       "result": "40 recorded responses833779 bytes and upper863722 verified; historicalUNKNOWN and32 originals unchanged; source hash/single config call/no redirects/redacted Location origin verified; authorization append-only/4 paths/links/EOF/schema/diff-check PASS. Config not acquired; A-F not approved."
+    },
+    "configRedirectVerification20261113": {
+      "runId": "P0-CONFIG-REDIRECT-20261113-04",
+      "manifestDescriptorCheck": "PASS",
+      "status": "PASS_METADATA_ONLY",
+      "configSaved": true,
+      "registryConfigRequests": 1,
+      "approvedRedirectsFollowed": 1,
+      "furtherRedirectsFollowed": 0,
+      "registryTokenForwarded": false,
+      "layerRequests": 0,
+      "bytes": 29943,
+      "sha256": "dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b",
+      "jsonObject": true,
+      "architecture": "arm64",
+      "os": "linux",
+      "created": "2026-07-08T22:01:39.411680312Z",
+      "rootfsDiffIdCount": 29,
+      "imageLabels": {
+        "name": "Oracle AI Database 26ai Free",
+        "release": "Free",
+        "version": "23.26.0",
+        "provider": "Oracle"
+      },
+      "versionCaveat": "Tag23.26.3.0 versus config label23.26.0; label is not runtime patch attestation. Exact installed RU remainsNOT_VERIFIED until separately authorized artifact/runtime checks.",
+      "declaredInstallFile": "oracle-ai-database-free-26ai-23.26.3-1.el8.aarch64.rpm"
+    },
+    "approvedRedirectSource": "from pathlib import Path\nimport urllib.request,urllib.error,urllib.parse,json,base64,hashlib,datetime,sys\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/docs/evidence/G4-M2-ORACLE-01/metadata');ip=root/'index.json';v=json.loads(ip.read_text());sha='dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b';mh='844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8';host='id55cllpgrte.compat.objectstorage.us-sanjose-1.oraclecloud.com';u='https://container-registry.oracle.com/v2/database/free/blobs/sha256:'+sha\nraw=base64.b64decode((root/(mh+'.b64')).read_bytes());assert hashlib.sha256(raw).hexdigest()==mh;m=json.loads(raw);assert m['config']=={'mediaType':'application/vnd.docker.container.image.v1+json','size':29943,'digest':'sha256:'+sha};assert all(x['digest']!='sha256:'+sha for x in m['layers'])\nclass NoRedirect(urllib.request.HTTPRedirectHandler):\n def redirect_request(self,*args,**kwargs):return None\nop=urllib.request.build_opener(NoRedirect)\ndef save():ip.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\\n')\ndef get(url,cap,headers,kind):\n row={'url':url if kind!='objectstorage' else 'https://'+host+'/[REDACTED_SIGNED_PATH_AND_QUERY]','time':datetime.datetime.now(datetime.timezone.utc).isoformat(),'runId':'P0-CONFIG-REDIRECT-20261113-04','requestKind':kind};b=None;loc=None\n try:\n  try:r=op.open(urllib.request.Request(url,headers=headers),timeout=25)\n  except urllib.error.HTTPError as e:r=e\n  row['status']=r.status\n  row['responseHeadersRedacted']={k:r.headers[k][:200] for k in ['Content-Type','Content-Length','Date'] if r.headers.get(k)}\n  loc=r.headers.get('Location')\n  if loc:\n   part=urllib.parse.urlsplit(urllib.parse.urljoin(url,loc));row['responseHeadersRedacted']['LocationOrigin']=part.scheme+'://'+(part.hostname or '');row['responseHeadersRedacted']['LocationDetails']='PATH_QUERY_FRAGMENT_USERINFO_REDACTED'\n  with r:b=r.read(cap+1)\n  row.update(bytes=len(b),sha256=hashlib.sha256(b).hexdigest(),bodyComplete=len(b)<=cap,readLimitBytes=cap,overLimit=len(b)>cap)\n except Exception as e:row.update(status=row.get('status','NETWORK_ERROR'),bytes=None,bodyComplete=False,errorClass=type(e).__name__)\n row['retention']='NOT_SAVED_AUTH_RESPONSE; anonymous token only in memory' if kind=='auth' else 'UNVERIFIED_OR_REDIRECT_BODY_NOT_SAVED'\n v['metadata']['responses'].append(row)\n if row.get('bytes') is not None:v['metadata']['bodyBytes']+=row['bytes']\n save();return b,row,loc\nresult={'runId':'P0-CONFIG-REDIRECT-20261113-04','manifestDescriptorCheck':'PASS','status':'BLOCKED','configSaved':False,'registryConfigRequests':0,'approvedRedirectsFollowed':0,'furtherRedirectsFollowed':0,'registryTokenForwarded':False,'layerRequests':0}\ntry:\n b,a,_=get('https://container-registry.oracle.com/auth?service=Oracle+Registry&scope=repository%3Adatabase%2Ffree%3Apull',65536,{'Accept-Encoding':'identity'},'auth');assert a['status']==200 and a['bodyComplete'],'AUTH_FAILED'\n token=json.loads(b).get('token') or json.loads(b).get('access_token');assert token,'AUTH_TOKEN_ABSENT'\n result['registryConfigRequests']=1\n b,row,loc=get(u,29943,{'Authorization':'Bearer '+token,'Accept-Encoding':'identity'},'registry');token=None\n assert row['bodyComplete'],'REGISTRY_BODY_LIMIT_OR_NETWORK'\n if row['status'] in (301,302,303,307,308):\n  assert loc,'REDIRECT_LOCATION_ABSENT';target=urllib.parse.urljoin(u,loc);part=urllib.parse.urlsplit(target)\n  assert part.scheme=='https' and part.hostname==host and part.port in (None,443) and part.username is None and part.password is None and not part.fragment,'REDIRECT_OUTSIDE_APPROVAL'\n  result['approvedRedirectsFollowed']=1\n  b,row,_=get(target,29943,{'Accept-Encoding':'identity'},'objectstorage');target=None;loc=None\n assert row['status']==200 and row['bodyComplete'],'FINAL_NON200_OR_BODY_LIMIT_OR_NETWORK'\n assert len(b)==29943 and hashlib.sha256(b).hexdigest()==sha,'SIZE_OR_DIGEST_MISMATCH'\n cfg=json.loads(b);assert isinstance(cfg,dict),'JSON_NOT_OBJECT'\n filename=sha+'.json';(root/filename).write_bytes(b);row.update(file=filename,encoding='raw',retention='VERIFIED_PUBLIC_CONFIG_ORIGINAL_BYTES',referencedByManifest='sha256:'+mh)\n result.update(status='PASS_METADATA_ONLY',configSaved=True,bytes=len(b),sha256=sha,jsonObject=True,architecture=cfg.get('architecture'),os=cfg.get('os'),created=cfg.get('created'),rootfsDiffIdCount=len(cfg.get('rootfs',{}).get('diff_ids',[])))\nexcept Exception as e:\n result['failureClass']=type(e).__name__;result['failure']=str(e) if isinstance(e,AssertionError) else 'SAFE_DIAGNOSTIC_ONLY'\nv['metadata']['configRedirectVerification20261113']=result;save();print(json.dumps(result));sys.exit(0 if result['configSaved'] else 1)\n",
+    "approvedRedirectSourceSha256": "ea2761240e0d8f37d1de048665935d72e05c3a638e0ba908c3d6fdf18613af77",
+    "successfulConfigCheckSource": "from pathlib import Path\nimport subprocess,json,hashlib,base64,re\nr=Path('docs/evidence/G4-M2-ORACLE-01');p=r/'metadata/index.json';v=json.loads(p.read_text());old=json.loads(subprocess.check_output(['git','show','d9f22ae0c991b939ec757ec2a96bd862106660e5:'+str(p)]));rows=v['metadata']['responses'];assert rows[:40]==old['metadata']['responses'];assert len(rows)==43 and sum(x['bytes'] for x in rows)==866022\nfiles=set()\nfor x in rows:\n if 'file' in x:\n  b=(r/'metadata'/x['file']).read_bytes();b=base64.b64decode(b) if x.get('encoding')=='base64' else b;assert len(b)==x['bytes'] and hashlib.sha256(b).hexdigest()==x['sha256'];files.add(x['file'])\nassert len(files)==33\nsha='dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b';cfg=json.loads((r/'metadata'/(sha+'.json')).read_bytes());assert cfg['architecture']=='arm64' and cfg['os']=='linux' and len(cfg['rootfs']['diff_ids'])==29 and cfg['config']['Labels']['version']=='23.26.0'\nm=json.loads(base64.b64decode((r/'metadata/844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8.b64').read_bytes()));assert m['config']=={'digest':'sha256:'+sha,'size':29943,'mediaType':'application/vnd.docker.container.image.v1+json'};assert all(x['digest']!='sha256:'+sha for x in m['layers'])\nd=v['metadata']['configRedirectVerification20261113'];assert d['status']=='PASS_METADATA_ONLY' and d['approvedRedirectsFollowed']==1 and d['furtherRedirectsFollowed']==0 and not d['registryTokenForwarded'] and d['layerRequests']==0\nassert rows[-1]['status']==200 and rows[-1]['url']=='https://id55cllpgrte.compat.objectstorage.us-sanjose-1.oraclecloud.com/[REDACTED_SIGNED_PATH_AND_QUERY]'\nassert v['metadata']['transferAccounting']['totalBodyBytesExact'] is None and v['metadata']['transferAccounting']['totalBodyBytesUpperBound']==895965\nassert hashlib.sha256(v['metadata']['approvedRedirectSource'].encode()).hexdigest()==v['metadata']['approvedRedirectSourceSha256']\nallowed={'docs/tasks/G4-M2-ORACLE-01.md','docs/tasks/current-authorization.md',str(r/'admission-request.md'),str(p),str(r/'metadata'/(sha+'.json'))};changed=set(subprocess.check_output(['git','diff','--name-only','d9f22ae0c991b939ec757ec2a96bd862106660e5'],text=True).splitlines());assert changed<=allowed\nfor f in ['docs/tasks/G4-M2-ORACLE-01.md',str(r/'admission-request.md')]:\n path=Path(f);b=path.read_bytes();assert b.endswith(b'\\n') and not b.endswith(b'\\n\\n') and b'\\r' not in b\n for link in re.findall(r'\\]\\(([^)]+)\\)',b.decode()):\n  if '://' not in link:assert (path.parent/link).exists()\np=Path('docs/tasks/current-authorization.md');assert p.read_bytes().startswith(subprocess.check_output(['git','show','d9f22ae0c991b939ec757ec2a96bd862106660e5:'+str(p)]))\nprint('PASS metadata only:43 recorded responses866022bytes;33 public originals hashes; manifest config29943/SHA/JSON/linux-arm64; one permitted hop, no token forwarding/layers; labels23.26.0 distinct from tag23.26.3.0; historicalUNKNOWN retained upper895965; links/EOF/append-only/owned paths')\n",
+    "successfulConfigCheckSourceSha256": "b120de485fd634f8afc262df3a31062fa0b4f017e5f02d966103115cca8a622d",
+    "successfulConfigReview": {
+      "reviewer": "/root/oracle_p0_review",
+      "inputHead": "d9f22ae0c991b939ec757ec2a96bd862106660e5",
+      "status": "PASS_METADATA_DOCUMENT_SCOPE_ONLY",
+      "result": "Exact29943/SHA/JSON/linux-arm64/29diff_ids/manifest binding; old32 originals unchanged,33 total;43 records866022/upper895965/historyUNKNOWN retained; signed URLs redacted, fixed HTTPS host/443/no onward redirect/no Authorization forwarded; links/EOF/authorization/schema/diff-check PASS. INSTALL_FILE_1 identifies23.26.3 ARM64 RPM; label23.26.0 retained separately, runtime RU stillNOT_VERIFIED."
     }
   }
 }

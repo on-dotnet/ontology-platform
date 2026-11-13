@@ -179,3 +179,7 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 ## 2026-11-13 Oracle唯一config一次有界诊断授权（追加）
 
 用户批准同一Oracle工作树、同一已授权config URL的一次有界诊断：先修正错误处理，保留HTTP状态、脱敏响应头及实际正文长度，token/签名参数不保存；不自动跨域跳转、不换通道，成功仍核29,943字节与既定SHA，否则停止报告。仅更新现有材料，不下载层、不接受许可、不实施A–F、不更新main、不恢复TDengine。
+
+## 2026-11-13 Oracle精确config限定跨域读取授权（追加）
+
+用户明确“允许”此前说明的限定读取：仅同一已授权config对象，允许跟随Registry返回的HTTPS重定向到`id55cllpgrte.compat.objectstorage.us-sanjose-1.oraclecloud.com`；签名URL仅内存、不保存输出、不向目标转发Registry Bearer token，仍核29,943字节和既定SHA256，禁止进一步跳转/镜像层/A–F实施。不接受Oracle许可、不更新main、不恢复TDengine。完成元数据核验与现有材料更新后停准入。
