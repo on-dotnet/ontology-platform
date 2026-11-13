@@ -13,10 +13,11 @@ if (mode is not ("revoke" or "grant" or "backup-schema" or "restore-schema" or "
 var builder = new MySqlConnectionStringBuilder
 {
     Server = "localhost", Port = 19030, UserID = "root", Database = "fixture",
-    Password = File.ReadAllText(Path.Combine(runtime, "private", "root.pass")),
     SslMode = MySqlSslMode.VerifyFull, SslCa = Path.Combine(runtime, "tls", "ca.pem"),
     Pooling = false, ConnectionTimeout = 3, DefaultCommandTimeout = 5, CancellationTimeout = -1
 };
+// 合成管理员口令只从任务私有文件读入内存，不写入源码或日志。
+builder.Password = File.ReadAllText(Path.Combine(runtime, "private", "root.pass"));
 // 每个控制操作独立限十秒，不能无限等待。
 using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 await using var connection = new MySqlConnection(builder.ConnectionString);
