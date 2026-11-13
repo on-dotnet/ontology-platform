@@ -2,7 +2,7 @@
 
 2026-11-13；Master单写。[唯一任务卡](../../tasks/G4-M2-ORACLE-01.md)。用户明确批准附件P0，附件中后续实施申请不是本轮许可。Base=`5113d0b9b233e307664c964ae9bf3c1d6b10adfb`，fetch后远端相符；最终完整Head和普通push回执随交付给出。下文“申请/拟议”均未实施。
 
-推荐唯一组合：**Oracle AI Database 26ai Free，23.26.3.0，Linux ARM64，单FREEPDB1；Oracle.ManagedDataAccess.Core 23.26.400；仓库net10.0**。官方完整容器为`container-registry.oracle.com/database/free:23.26.3.0-arm64`，冻结digest见A。存在官方原生ARM64发行，不需要预设购买Enterprise。匿名公开Bearer握手已取得tags/index/manifest，不需要用户提供账号。当前 **P0_BLOCKED_WITH_WITNESS**：用户已直接批准精确config读取，正常权限审批已放行；已有manifest/config descriptor复核通过，但一次有界读取返回非200并停止。错误处理未保存具体状态码/响应头/实际正文长度，不能判定跳转或账号要求。未保存config原件，字节/散列/JSON仍NOT_VERIFIED；未重试或换通道。产品未准入，载荷/服务/实现均未执行。已存在本机原生制品身份，不另铺替代版本、amd64仿真或第三方镜像路线。
+推荐唯一组合：**Oracle AI Database 26ai Free，23.26.3.0，Linux ARM64，单FREEPDB1；Oracle.ManagedDataAccess.Core 23.26.400；仓库net10.0**。官方完整容器为`container-registry.oracle.com/database/free:23.26.3.0-arm64`，冻结digest见A。存在官方原生ARM64发行，不需要预设购买Enterprise。匿名公开Bearer握手已取得tags/index/manifest，不需要用户提供账号。当前 **P0_BLOCKED_WITH_WITNESS**：本次用户批准的一次有界诊断确认HTTP307、完整响应正文0字节，Location指向Oracle Cloud Object Storage跨域源站；按要求未跟随，未保存token或签名参数。config原件未取得，长度/散列/JSON仍NOT_VERIFIED。前次非200诊断缺失仍保留UNKNOWN，不能用本次307/0字节回填。产品未准入，载荷/服务/实现均未执行。已存在本机原生制品身份，不另铺替代版本、amd64仿真或第三方镜像路线。
 
 ## A｜精确版本、来源、许可和制品
 
@@ -12,7 +12,7 @@
 | 驱动平台 | 官方支持macOS ARM64≥14.7，23.26.0起支持.NET10，目标库19c及以后；仓库Directory.Build.props=net10.0，静态选net8资产 | 本机macOS27.0.1/ARM64已观测，运行NOT_RUN；未来客户19c/21c/23ai/26ai按各自精确RU/edition另验，不承诺兼容验收 |
 | 数据库发行身份锚点 | 官方页列`oracle-ai-database-free-26ai-23.26.3-1.el8.aarch64.rpm`，1,355,290,892 bytes，SHA256=`e1951c4a56eb8ef8cf5d325c90525be8ddb286486f6a318e8b4c4942e10eadbb` | RPM未获取/验签；此SHA不替代容器digest，也不授权RPM安装 |
 | ARM64部署 | 官方安装要求OL8.6+/UEK7、Neoverse N1能力（推荐Ampere）；Oracle容器README明确26ai Free ARM64支持。拟在现Linux ARM64 Docker VM运行 | Apple Silicon/Docker内核不是生产认证等价物；CPU指令/容器运行仍NOT_RUN，禁止自动amd64仿真 |
-| 官方容器 | `database/free:23.26.3.0-arm64`，index明确linux/arm64；29层压缩合计3,527,716,613 bytes≈3.285GiB | 唯一config请求非200，正文未核验；容器实际内核/环境/组件及运行版本NOT_VERIFIED；镜像层请求为0 |
+| 官方容器 | `database/free:23.26.3.0-arm64`，index明确linux/arm64；29层压缩合计3,527,716,613 bytes≈3.285GiB | 本次唯一config诊断请求HTTP307/正文0字节，未跟随跨域，config正文未取得；容器实际内核/环境/组件及运行版本NOT_VERIFIED；镜像层请求为0 |
 
 容器取得前身份：多架构index SHA256=`f988b0c04c4c386cd306a2a914c0d7a9702d83acc31b064a28ad8eb6278a8fba`，其linux/arm64描述符引用的manifest SHA256=`844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8`（4,962 bytes），与实际保存正文SHA一致。config descriptor的mediaType=`application/vnd.docker.container.image.v1+json`、size=29,943、digest=`sha256:dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b`；它和29个layer descriptor严格区分。config未取得，不能称config中的architecture/labels已验证；ARM64结论来自官方index。下载时必须按arm64 manifest digest而非浮动标签；当前只申请后续取得，不执行。
 
@@ -126,7 +126,11 @@ CatalogField只有Name/NativeType/Nullable/Ordinal/Precision/Scale，能保留NU
 
 历史两次自动审批拒绝保留于原提交及索引；本次正常审批已放行，不能继续写成审批缺失。执行前重新解码已有manifest，SHA256、config digest/size/mediaType与非layer身份均通过；沿用官方匿名认证，临时token不打印/保存；TLS正常，禁止自动重定向，正文上限29,943字节（最多额外读取1字节用于超限检测，超限即停）。唯一config请求返回非200，程序exit1并立即停止，没有跟随跳转、重试或换通道，没有保存config。
 
-本次取证缺口：断言在保存失败诊断前退出，具体HTTP状态、响应头、正文长度/散列未留存，不能说是跨域跳转、账号问题或内容不匹配；config大小/散列/JSON解析均NOT_VERIFIED。最小后续事项为对这一精确对象的非200响应作保留状态/长度的有界诊断，再裁决是否允许后续请求；本轮按停止要求不再发请求。用户无需再次批准已经明确的config范围，不请求密码/token。
+前次取证缺口：P0-CONFIG-20261113-02断言在保存失败诊断前退出，具体HTTP状态、响应头、正文长度/散列未留存，保持UNKNOWN；用户后来明确批准一次有界诊断，不是无授权重复请求。
+
+本次P0-CONFIG-DIAG-20261113-03已先修正错误处理再执行一次：再次核manifest/descriptor非layer，匿名认证token仅内存；正常TLS、禁自动重定向、正文有界。实际HTTP **307**；保留的脱敏头为Content-Type=`application/octet-stream`、Content-Length=`0`、Date=`Fri, 13 Nov 2026 07:28:13 GMT`；完整实际正文 **0 bytes**。Location仅保留源站`https://id55cllpgrte.compat.objectstorage.us-sanjose-1.oraclecloud.com`，完整路径、query、fragment、userinfo不保存，签名参数不输出/持久化。该跨域跳转未跟随，没有换通道或第二次config请求；程序exit1表示没有取得预期config，不表示已验其散列。没有保存config原件，无镜像层请求。
+
+仍需裁决：是否允许同一精确config对象到上述源站的受控跨域读取；本次不授予此许可、不自动发起该动作。该源站后续访问及内容仍NOT_VERIFIED，不能只凭域名宣称已验证来源或通过供应链。既有29,943字节/SHA256/descriptor边界保持；许可接受和A–F实施仍分别待批。
 
 本次授权不接受Oracle许可、不批准A–F实施项。仍需集中裁决许可/载荷取得、精确依赖、TLS/权限/取消、ORACLE_READONLY、DTO/生命周期、资源和部署范围；产品实施继续未授权。
 
@@ -138,7 +142,7 @@ CI按需NOT_RUN；Mac宿主/LinuxARM64容器分列，Windows/x64/生产NOT_RUN�
 
 ## 来源、轻量检查和独立审查回执
 
-[metadata/index.json](metadata/index.json)为唯一恢复索引；旧32份公开原件按内容hash/base64保存，解码后核长度/SHA，原字节不改。本次匿名认证200响应2,300字节只留URL/时间/状态/长度/hash，不留token正文；记录合计38响应/831,477 bytes，另有1次非200 config响应缺长度记录，实际总量UNKNOWN，保守上限861,420 bytes（失败正文上限29,943计入），仍低于64MiB。不得将失败正文算0或把已记录量写成完整网络流量；HTTP头/TLS/搜索服务开销不在正文计数中。唯一config对象未保存，未请求任何镜像层，返回内容未执行。
+[metadata/index.json](metadata/index.json)为唯一恢复索引；旧32份公开原件按内容hash/base64保存且未改。本次匿名认证200正文2,302字节仅保存URL/时间/状态/长度/hash，不留token；307完整正文0字节记录状态/脱敏头/长度/hash，不留Location签名URL。当前40条已记录响应正文833,779 bytes，另有前次1条失败长度UNKNOWN，总量精确值UNKNOWN，保守上限863,722 bytes（旧失败上限29,943仍计入），低于64MiB。禁止用本次0字节回填旧未知量；HTTP头/TLS/搜索开销不在正文计数中。config未取得，未请求任何镜像层，返回内容未执行。
 
 官方入口：[精确驱动](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/23.26.400)、[运行要求](https://docs.oracle.com/en/database/oracle/oracle-database/26/odpnt/InstallSystemRequirements.html)、[数据库发行](https://www.oracle.com/database/free/get-started/)、[原生部署要求](https://docs.oracle.com/en/database/oracle/oracle-database/26/xeinl/requirements.html)、[容器说明](https://github.com/oracle/docker-images/blob/main/OracleDatabase/SingleInstance/README.md)、[权限指南](https://docs.oracle.com/en/database/oracle/oracle-database/26/dbseg/guidelines-securing-user-accounts-and-privileges.html)。滚动页面只证明本次快照，恢复按原件索引。
 
@@ -149,3 +153,7 @@ CI按需NOT_RUN；Mac宿主/LinuxARM64容器分列，Windows/x64/生产NOT_RUN�
 开工保护：项目.codex仅agents配置，未发现项目setup入口；原生create_worktree只创建/注册checkout，未调用安装/restore/服务。fetch首次受FETCH_HEAD权限限制，获范围权限后exit0并核main；任务分支创建和文档写入首次受沙箱限制，获范围权限后完成，未退回main写。只读宿主/Docker首次权限失败保留于本摘要，不把空格式输出当0资源。当前无本任务容器/卷，唯一持久新资源为任务分支/托管树与公开证据，KEEP供同会话后续，禁止借收尾清理旧资源。
 
 本次增量保护：fetch正常审批后exit0，origin/main仍为预期Base；当前树新出现的`docs/.DS_Store`与`docs/evidence/.DS_Store`未跟踪文件保留，不纳入提交。只更新本卡/申请/索引及追加本次授权，不动产品、锁、脚本、main或TDengine。增量原件/manifest/链接/EOF/写范围检查、证据schema及diff-check均exit0；同一非作者Reviewer复核通过（仅文档/证据），记录在索引configIncrementReview；读取失败仍为FAIL，config内容未验。
+
+本次一次性诊断授权及真实307结果已记录于索引configDiagnostic20261113，修正后的临时诊断源码和SHA用于复核错误处理，不是工程脚本变更。所有历史失败与未知项保留。只做受影响文档/证据检查，不恢复服务或A–F实施。
+
+本次诊断增量经同一非作者Reviewer只读复核通过；40条记录/833,779字节与863,722上限、历史UNKNOWN/32原件不变、Location脱敏/单次调用/不跟跳转及4路径边界均已核对。受影响原件/链接/EOF/schema/diff-check均exit0；config取得仍FAIL，产品/CI仍NOT_RUN。

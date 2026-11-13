@@ -1,11 +1,11 @@
 # G4-M2-ORACLE-01｜Oracle P0 一次性准入核对
 
-唯一任务状态：**P0_BLOCKED_WITH_WITNESS**；原P0文档独立审查通过；本次精确元数据尝试失败，待ChatGPT准入裁决；产品未准入。2026-11-13。
+唯一任务状态：**P0_BLOCKED_WITH_WITNESS**；原P0文档独立审查通过；本次精确元数据诊断证实跨域307，未取到config，待ChatGPT准入裁决；产品未准入。2026-11-13。
 
 - 目标：集中裁决 [A–F 准入申请](../evidence/G4-M2-ORACLE-01/admission-request.md)。本轮只读调查、文档、公开有界元数据；产品仅拟议连接与目录发现。
-- 当前阻断：唯一config读取已获用户直接授权及正常权限放行，但本次请求返回非200并停止；状态码/响应头未留存，不能推断跳转或账号要求。config字节/散列/JSON尚未核验，仍待准入裁决；不重复请求、不换通道。
+- 当前阻断：本次获批一次有界诊断确认HTTP307、完整正文0字节，Location指向Oracle Cloud Object Storage跨域源站；未跟随，未保存签名参数，config未取得。后续需裁决该精确对象的跨域读取边界；此前失败具体状态/长度缺失保持UNKNOWN，不用本次结果回填。
 - Base：`5113d0b9b233e307664c964ae9bf3c1d6b10adfb`，本轮fetch成功后origin/main同值。Head由最终交付回执给出完整SHA（本页由该提交恢复，避免自引用）；分支`codex/g4-m2-oracle-01`。
-- 唯一托管树：`/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform`；operationId=`be289194-eb2d-493d-95f7-e7aaee6e5cd7`。TaskId=`G4-M2-ORACLE-01`；RunId=`P0-20261113-01`；本次增量=`P0-CONFIG-20261113-02`。KEEP：供同会话后续获批实施；审查且任务关闭后再考虑归档。
+- 唯一托管树：`/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform`；operationId=`be289194-eb2d-493d-95f7-e7aaee6e5cd7`。TaskId=`G4-M2-ORACLE-01`；RunId=`P0-20261113-01`；历史增量=`P0-CONFIG-20261113-02`；本次诊断=`P0-CONFIG-DIAG-20261113-03`。KEEP：供同会话后续获批实施；审查且任务关闭后再考虑归档。
 - Owner：本会话Master，文档唯一写者；Reviewer：非作者只读Agent，回执见申请末尾。DAG：基线/授权→源码与官方资料→A–F→轻量检查→独立审查→提交/push→停止。
 - owned_paths：本卡、`docs/evidence/G4-M2-ORACLE-01/admission-request.md`、同目录`metadata/`、`docs/tasks/current-authorization.md`（仅追加）。其余均read_only_dependencies；共享合同/锁/脚本/迁移Single Writer留待另批。
 - 已核对：驱动/依赖、数据库ARM64发行/许可、TLS/Wallet/取消、权限/类型、ORACLE_READONLY全生命周期、单机预算及后续源码范围。恢复从[原件索引](../evidence/G4-M2-ORACLE-01/metadata/index.json)按URL/散列读取，不重搜历史。

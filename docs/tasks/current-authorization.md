@@ -175,3 +175,7 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 ## 2026-11-13 Oracle唯一config元数据直接授权（追加）
 
 用户直接批准`https://container-registry.oracle.com/v2/database/free/blobs/sha256:dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b`，精确29,943字节及同名SHA256，由manifest `844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8`的`application/vnd.docker.container.image.v1+json` config descriptor引用。先核manifest/descriptor非layer，正常权限审批、官方匿名token仅内存，正文有界、核长度/散列/JSON，不跟未批跨域跳转、不执行内容；失败即停报告，不绕过。只更新现有metadata/状态/A–F，轻量检查后停准入。不是Oracle许可接受或A–F实施批准；无镜像层、安装包、pull、安装/prepare/restore/服务/产品/DTO/数据库/main/ZIP/TDengine授权。
+
+## 2026-11-13 Oracle唯一config一次有界诊断授权（追加）
+
+用户批准同一Oracle工作树、同一已授权config URL的一次有界诊断：先修正错误处理，保留HTTP状态、脱敏响应头及实际正文长度，token/签名参数不保存；不自动跨域跳转、不换通道，成功仍核29,943字节与既定SHA，否则停止报告。仅更新现有材料，不下载层、不接受许可、不实施A–F、不更新main、不恢复TDengine。

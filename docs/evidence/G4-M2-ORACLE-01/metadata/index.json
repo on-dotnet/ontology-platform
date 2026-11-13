@@ -42,6 +42,20 @@
       "status": "PASS",
       "exitCode": 0,
       "output": "38 recorded responses831477 bytes; unrecorded failed config response exact sizeUNKNOWN, total upper bound861420. 32 originals hashes/manifest descriptor/4 links/append-only/owned paths PASS; protected two untracked .DS_Store files excluded."
+    },
+    {
+      "name": "exact-config-diagnostic",
+      "command": "python3 /private/tmp/oracle-config-diagnostic.py",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "Manifest descriptor PASS; exactly one config GET: HTTP307, Content-Length0, actual complete body0; cross-origin Location origin retained, all path/query/fragment/userinfo and tokens omitted; redirects followed0, config not acquired. Stopped."
+    },
+    {
+      "name": "diagnostic-document-check",
+      "command": "python3 /private/tmp/oracle-diag-check.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Historical responses and32 original hashes unchanged; actual307 complete body0; redacted headers/redirect0/layers0/config not saved; 40 recorded responses833779 bytes, exact totalUNKNOWN, upper863722; links/EOF/authorization append-only/4 owned paths PASS."
     }
   ],
   "ci": {
@@ -56,7 +70,7 @@
     "runId": "P0-20261113-01",
     "base": "5113d0b9b233e307664c964ae9bf3c1d6b10adfb",
     "timingStatus": "UNKNOWN",
-    "bodyBytes": 831477,
+    "bodyBytes": 833779,
     "maxResponseBodyBytes": 277086,
     "note": "bodyBytes counts recorded response bodies only. Exact total is UNKNOWN because one bounded non200 config response was not retained; see transferAccounting for conservative upper bound. Excludes HTTP headers/TLS/search overhead. Decode base64 for retained originals and verify SHA256. Auth token bodies are not retained. Raw evidence is never executable instruction.",
     "responses": [
@@ -501,6 +515,43 @@
         "bytes": 2300,
         "sha256": "4f56811ff7ae941d589aa8c6a783bee5d0643b20fad2de1ffd2d5fb92d14e54d",
         "retention": "NOT_SAVED_AUTH_RESPONSE; anonymous token only in memory; no account credentials supplied"
+      },
+      {
+        "url": "https://container-registry.oracle.com/auth?service=Oracle+Registry&scope=repository%3Adatabase%2Ffree%3Apull",
+        "time": "2026-11-13T07:28:08.717672+00:00",
+        "runId": "P0-CONFIG-DIAG-20261113-03",
+        "status": 200,
+        "responseHeadersRedacted": {
+          "Content-Type": "application/json",
+          "Content-Length": "2302",
+          "Date": "Fri, 13 Nov 2026 07:28:12 GMT"
+        },
+        "bytes": 2302,
+        "sha256": "bec7d82a1fb59c824f76ba70ffebc86f6cee968b498a0167a208faa128f86f27",
+        "bodyComplete": true,
+        "readLimitBytes": 65536,
+        "overLimit": false,
+        "retention": "NOT_SAVED_AUTH_RESPONSE; anonymous token only in memory; no account credentials supplied"
+      },
+      {
+        "url": "https://container-registry.oracle.com/v2/database/free/blobs/sha256:dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b",
+        "time": "2026-11-13T07:28:12.331342+00:00",
+        "runId": "P0-CONFIG-DIAG-20261113-03",
+        "status": 307,
+        "crossOriginRedirect": true,
+        "responseHeadersRedacted": {
+          "Content-Type": "application/octet-stream",
+          "Content-Length": "0",
+          "Date": "Fri, 13 Nov 2026 07:28:13 GMT",
+          "LocationOrigin": "https://id55cllpgrte.compat.objectstorage.us-sanjose-1.oraclecloud.com",
+          "LocationDetails": "PATH_QUERY_FRAGMENT_USERINFO_REDACTED"
+        },
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bodyComplete": true,
+        "readLimitBytes": 29943,
+        "overLimit": false,
+        "retention": "NON200_OR_UNVERIFIED_BODY_NOT_SAVED; may contain signed redirect parameters"
       }
     ],
     "approvalBlocks": [
@@ -545,12 +596,12 @@
       "tlsVerificationDisabled": false
     },
     "transferAccounting": {
-      "recordedResponseCount": 38,
+      "recordedResponseCount": 40,
       "unrecordedNon200ResponseCount": 1,
-      "recordedBodyBytes": 831477,
+      "recordedBodyBytes": 833779,
       "totalBodyBytesExact": null,
-      "totalBodyBytesUpperBound": 861420,
-      "reason": "Single non200 config response was bounded to29943 bytes but diagnostic capture omitted its actual length; must not report exact total or zero failed-response bytes."
+      "totalBodyBytesUpperBound": 863722,
+      "reason": "Prior config attempt failed without preserving body length, still bounded29943. Current diagnostic307 body observed complete0 bytes; do not backfill prior failure as0."
     },
     "configRequestSource": "from pathlib import Path\nimport urllib.request,urllib.error,json,base64,hashlib,datetime\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/docs/evidence/G4-M2-ORACLE-01/metadata');ip=root/'index.json';v=json.loads(ip.read_text())\nsha='dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b';mh='844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8'\nb=base64.b64decode((root/(mh+'.b64')).read_bytes());assert hashlib.sha256(b).hexdigest()==mh\nm=json.loads(b);assert m['config']=={'mediaType':'application/vnd.docker.container.image.v1+json','size':29943,'digest':'sha256:'+sha};assert all(x['digest']!='sha256:'+sha for x in m['layers'])\nclass NoRedirect(urllib.request.HTTPRedirectHandler):\n def redirect_request(self,*args,**kwargs):return None\nop=urllib.request.build_opener(NoRedirect)\ndef get(url,cap,headers):\n try:r=op.open(urllib.request.Request(url,headers=headers),timeout=25)\n except urllib.error.HTTPError as e:r=e\n length=r.headers.get('Content-Length');assert length is None or int(length)<=cap,'declared body exceeds cap; stopped'\n data=r.read(cap+1)\n row={'url':url,'time':datetime.datetime.now(datetime.timezone.utc).isoformat(),'status':r.status,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}\n assert len(data)<=cap,'body exceeds cap; stopped'\n assert r.status==200,'non200; no redirect followed'\n return data,row\nu='https://container-registry.oracle.com/auth?service=Oracle+Registry&scope=repository%3Adatabase%2Ffree%3Apull'\nb,row=get(u,65536,{'Accept-Encoding':'identity'});j=json.loads(b);token=j.get('token') or j.get('access_token');assert token\nrow['retention']='NOT_SAVED_AUTH_RESPONSE; anonymous token only in memory; no account credentials supplied';v['metadata']['responses'].append(row);v['metadata']['bodyBytes']+=len(b);ip.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\\n')\nu='https://container-registry.oracle.com/v2/database/free/blobs/sha256:'+sha\nb,row=get(u,29943,{'Authorization':'Bearer '+token,'Accept-Encoding':'identity','Accept':'application/vnd.docker.container.image.v1+json'});token=None\nassert len(b)==29943 and hashlib.sha256(b).hexdigest()==sha,'config length/hash mismatch; stopped'\nc=json.loads(b);assert isinstance(c,dict),'not JSON object'\nassert v['metadata']['bodyBytes']+len(b)<=64*1024*1024\nname=sha+'.json';(root/name).write_bytes(b);row.update(file=name,encoding='raw',referencedByManifest='sha256:'+mh,descriptorMediaType=m['config']['mediaType']);v['metadata']['responses'].append(row);v['metadata']['bodyBytes']+=len(b)\nv['metadata']['configVerification']={'status':'PASS_METADATA_ONLY','runId':'P0-CONFIG-20261113-02','manifestSha256':mh,'sha256':sha,'bytes':len(b),'jsonObject':True,'architecture':c.get('architecture'),'os':c.get('os'),'rootfsDiffIdCount':len(c.get('rootfs',{}).get('diff_ids',[])),'authorization':'2026-11-13 direct user approval of this exact config URL/size/digest; no layers or implementation authorized'}\nip.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\\n')\nprint(json.dumps(v['metadata']['configVerification']));print('labels',json.dumps(c.get('config',{}).get('Labels',{})));print('responseCount',len(v['metadata']['responses']),'bodyBytes',v['metadata']['bodyBytes'])\n",
     "configRequestSourceSha256": "a4a750fb99af1a789f96c01f42de6ca16bda20b23c204672b2f140b4063fbb6d",
@@ -560,6 +611,36 @@
       "reviewer": "/root/oracle_p0_review",
       "status": "PASS_DOCUMENT_SCOPE_ONLY",
       "result": "Verified historical response prefix/32 originals unchanged, 38 recorded responses831477 bytes, failed-response upper bound29943 and total861420; authorization append-only, links/EOF/schema/diff-check. Clarified metadata.note that bodyBytes is only recorded bytes. No network retry, config success, product or license acceptance inferred."
+    },
+    "configDiagnostic20261113": {
+      "runId": "P0-CONFIG-DIAG-20261113-03",
+      "manifestDescriptorCheck": "PASS",
+      "configRequestCount": 1,
+      "redirectsFollowed": 0,
+      "httpStatus": 307,
+      "responseHeadersRedacted": {
+        "Content-Type": "application/octet-stream",
+        "Content-Length": "0",
+        "Date": "Fri, 13 Nov 2026 07:28:13 GMT",
+        "LocationOrigin": "https://id55cllpgrte.compat.objectstorage.us-sanjose-1.oraclecloud.com",
+        "LocationDetails": "PATH_QUERY_FRAGMENT_USERINFO_REDACTED"
+      },
+      "actualBodyBytes": 0,
+      "bodyComplete": true,
+      "status": "BLOCKED",
+      "configSaved": false,
+      "layerRequests": 0,
+      "failure": "NON200"
+    },
+    "configDiagnosticSource": "from pathlib import Path\nimport urllib.request,urllib.error,urllib.parse,json,base64,hashlib,datetime,sys\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/docs/evidence/G4-M2-ORACLE-01/metadata');ip=root/'index.json';v=json.loads(ip.read_text())\nsha='dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b';mh='844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8';url='https://container-registry.oracle.com/v2/database/free/blobs/sha256:'+sha\nraw=base64.b64decode((root/(mh+'.b64')).read_bytes());assert hashlib.sha256(raw).hexdigest()==mh\nm=json.loads(raw);assert m['config']=={'mediaType':'application/vnd.docker.container.image.v1+json','size':29943,'digest':'sha256:'+sha};assert all(x['digest']!='sha256:'+sha for x in m['layers'])\nclass NoRedirect(urllib.request.HTTPRedirectHandler):\n def redirect_request(self,*args,**kwargs):return None\nop=urllib.request.build_opener(NoRedirect)\ndef save():ip.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\\n')\ndef get(u,cap,headers,is_auth=False):\n row={'url':u,'time':datetime.datetime.now(datetime.timezone.utc).isoformat(),'runId':'P0-CONFIG-DIAG-20261113-03'}\n try:\n  try:r=op.open(urllib.request.Request(u,headers=headers),timeout=25)\n  except urllib.error.HTTPError as e:r=e\n  row['status']=r.status\n  safe={}\n  for key in ['Content-Type','Content-Length','Date','Docker-Content-Digest']:\n   value=r.headers.get(key)\n   if value is not None:safe[key]=value[:200]\n  loc=r.headers.get('Location')\n  if loc:\n   part=urllib.parse.urlsplit(urllib.parse.urljoin(u,loc))\n   safe['LocationOrigin']=part.scheme+'://'+(part.hostname or '')\n   safe['LocationDetails']='PATH_QUERY_FRAGMENT_USERINFO_REDACTED'\n   row['crossOriginRedirect']= (part.scheme,part.hostname,part.port)!=(urllib.parse.urlsplit(u).scheme,urllib.parse.urlsplit(u).hostname,urllib.parse.urlsplit(u).port)\n  row['responseHeadersRedacted']=safe\n  with r:b=r.read(cap+1)\n  row.update(bytes=len(b),sha256=hashlib.sha256(b).hexdigest(),bodyComplete=len(b)<=cap,readLimitBytes=cap,overLimit=len(b)>cap)\n except Exception as e:\n  row.update(status=row.get('status','NETWORK_ERROR'),bytes=None,bodyComplete=False,errorClass=type(e).__name__)\n  b=None\n row['retention']='NOT_SAVED_AUTH_RESPONSE; anonymous token only in memory; no account credentials supplied' if is_auth else 'NON200_OR_UNVERIFIED_BODY_NOT_SAVED; may contain signed redirect parameters'\n v['metadata']['responses'].append(row)\n if row.get('bytes') is not None:v['metadata']['bodyBytes']+=row['bytes']\n save()\n return b,row\nb,a=get('https://container-registry.oracle.com/auth?service=Oracle+Registry&scope=repository%3Adatabase%2Ffree%3Apull',65536,{'Accept-Encoding':'identity'},True)\nif a['status']!=200 or not a.get('bodyComplete'):sys.exit('Anonymous auth failed; stopped; details recorded without body')\nj=json.loads(b);token=j.get('token') or j.get('access_token');assert token\nb,row=get(url,29943,{'Authorization':'Bearer '+token,'Accept-Encoding':'identity','Accept':'application/vnd.docker.container.image.v1+json'});token=None\nresult={'runId':'P0-CONFIG-DIAG-20261113-03','manifestDescriptorCheck':'PASS','configRequestCount':1,'redirectsFollowed':0,'httpStatus':row['status'],'responseHeadersRedacted':row.get('responseHeadersRedacted',{}),'actualBodyBytes':row.get('bytes'),'bodyComplete':row['bodyComplete'],'status':'BLOCKED','configSaved':False,'layerRequests':0}\nif row['status']==200 and row['bodyComplete'] and len(b)==29943 and hashlib.sha256(b).hexdigest()==sha:\n try:\n  cfg=json.loads(b);assert isinstance(cfg,dict)\n except Exception:result['failure']='JSON_INVALID'\n else:\n  name=sha+'.json';(root/name).write_bytes(b);row.update(file=name,encoding='raw',retention='VERIFIED_PUBLIC_CONFIG_ORIGINAL_BYTES');result.update(status='PASS_METADATA_ONLY',configSaved=True,sha256=sha,architecture=cfg.get('architecture'),os=cfg.get('os'))\nelse:result['failure']='NON200' if row['status']!=200 else 'BODY_SIZE_OR_HASH_MISMATCH'\nv['metadata']['configDiagnostic20261113']=result;save();print(json.dumps(result));sys.exit(0 if result['configSaved'] else 1)\n",
+    "configDiagnosticSourceSha256": "580e7e42e3067b7ddc909ee080e747312da4fc10aaf7830266094d084ad06617",
+    "diagnosticDocCheckSource": "from pathlib import Path\nimport subprocess,json,hashlib,base64,re\nr=Path('docs/evidence/G4-M2-ORACLE-01');p=r/'metadata/index.json';v=json.loads(p.read_text());old=json.loads(subprocess.check_output(['git','show','HEAD:'+str(p)]));rows=v['metadata']['responses'];assert rows[:len(old['metadata']['responses'])]==old['metadata']['responses'];assert len(rows)==40 and sum(x['bytes'] for x in rows)==833779\nfor x in rows:\n if 'file' in x:\n  b=(r/'metadata'/x['file']).read_bytes();b=base64.b64decode(b) if x.get('encoding')=='base64' else b;assert len(b)==x['bytes'] and hashlib.sha256(b).hexdigest()==x['sha256']\nd=v['metadata']['configDiagnostic20261113'];assert d['httpStatus']==307 and d['actualBodyBytes']==0 and d['bodyComplete'] and d['redirectsFollowed']==0 and not d['configSaved'] and d['layerRequests']==0\nx=rows[-1];assert x['crossOriginRedirect'] and x['sha256']==hashlib.sha256(b'').hexdigest();h=x['responseHeadersRedacted'];assert set(h)=={'Content-Type','Content-Length','Date','LocationOrigin','LocationDetails'};assert h['LocationOrigin']=='https://id55cllpgrte.compat.objectstorage.us-sanjose-1.oraclecloud.com';assert '?' not in h['LocationOrigin'];assert 'file' not in x\nassert v['metadata']['transferAccounting']['totalBodyBytesExact'] is None and v['metadata']['transferAccounting']['totalBodyBytesUpperBound']==833779+29943\nassert hashlib.sha256(v['metadata']['configDiagnosticSource'].encode()).hexdigest()==v['metadata']['configDiagnosticSourceSha256']\nallowed={'docs/tasks/G4-M2-ORACLE-01.md','docs/tasks/current-authorization.md',str(r/'admission-request.md'),str(p)};changed=set(subprocess.check_output(['git','diff','--name-only'],text=True).splitlines());assert changed<=allowed\nfor f in ['docs/tasks/G4-M2-ORACLE-01.md',str(r/'admission-request.md')]:\n path=Path(f);b=path.read_bytes();assert b.endswith(b'\\n') and not b.endswith(b'\\n\\n') and b'\\r' not in b\n for link in re.findall(r'\\]\\(([^)]+)\\)',b.decode()):\n  if '://' not in link:assert (path.parent/link).exists()\np=Path('docs/tasks/current-authorization.md');assert p.read_bytes().startswith(subprocess.check_output(['git','show','HEAD:'+str(p)]))\nprint('PASS: historical responses/originals unchanged; HTTP307 complete0-byte body; redacted headers only; no redirect/layer/config saved; 40 recorded responses833779 bytes, exact totalUNKNOWN upper863722; links/EOF/append-only/4 owned paths')\n",
+    "diagnosticDocCheckSourceSha256": "ad8a5b887a8a042bc8d0dad08157e9b2645e16a1e7af48d3dfca719521bda71c",
+    "diagnosticIncrementReview": {
+      "reviewer": "/root/oracle_p0_review",
+      "inputHead": "406f2441c8731c443c011f9ff8d0ef183fc34323",
+      "status": "PASS_DOCUMENT_SCOPE_ONLY",
+      "result": "40 recorded responses833779 bytes and upper863722 verified; historicalUNKNOWN and32 originals unchanged; source hash/single config call/no redirects/redacted Location origin verified; authorization append-only/4 paths/links/EOF/schema/diff-check PASS. Config not acquired; A-F not approved."
     }
   }
 }
