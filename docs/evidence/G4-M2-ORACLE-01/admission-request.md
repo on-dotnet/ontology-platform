@@ -246,3 +246,5 @@ E最小工程收口补充：workflow_oracle_platform.py负责本任务固定审�
 最终资源收尾已完成：准确删除4容器、2网络和2个已持久化并恢复验证的tmpfs卷，共8项，全部真实exit0及缺席后验已记录；宿主Web正常结束其有界运行后已停止。Oracle普通数据卷、私有持久备份/必要密钥与用户镜像KEEP，不触碰其他任务。最终状态READY_FOR_REVIEW；Head/普通push与受影响工程检查回执随最终交付给出。
 
 最终独立只读Review无未关闭阻断项，允许同任务分支普通提交/push；八项清理实际exit/原始后验和29份新增证据散列已复核。工程仅运行本轮受影响检查及冻结原件正反例；遵照用户禁止ZIP/历史全量验收，不运行含ZIP夹具的历史全SelfTest，也不宣称整份registry verify全部PASS。
+
+提交后受控计划首次发现P0公开base64原件缺少gate映射；已补Oracle metadata/*.b64的policy输入，未改原件或扩大产品执行。保留首次BLOCKED计划；后续按完整Head重核。
