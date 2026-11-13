@@ -171,3 +171,7 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 # 2026-11-13 G4-M2-ORACLE-01 P0 最新明确授权（追加）
 
 用户明确批准附件Codex-G4-M2-ORACLE-01-P0-Admission-20261113.md的P0，从预期且本轮fetch确认的main `5113d0b9b233e307664c964ae9bf3c1d6b10adfb`创建独立托管树/`codex/g4-m2-oracle-01`。只读源码、官方有界公开元数据（单响应8MiB、累计64MiB，失败正文计入，URL/UTC/状态/字节/SHA256），单作者文档与非作者只读Review，普通提交/push。只交[一页状态](G4-M2-ORACLE-01.md)和[A–F申请](../evidence/G4-M2-ORACLE-01/admission-request.md)，必要原件/索引同目录。禁止制品载荷、安装/启动、产品实现、prepare/restore、历史全量、main更新及中间ZIP，不另开优化/恢复任务。TDengine保持WAIT_FOR_EXTERNAL_INPUT，不恢复调查/开发、不改其树/分支/原证据。后续获批同一Oracle会话/树继续，当前停ChatGPT准入审查；历史授权/结果不改，不宣称M2完成。
+
+## 2026-11-13 Oracle唯一config元数据直接授权（追加）
+
+用户直接批准`https://container-registry.oracle.com/v2/database/free/blobs/sha256:dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b`，精确29,943字节及同名SHA256，由manifest `844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8`的`application/vnd.docker.container.image.v1+json` config descriptor引用。先核manifest/descriptor非layer，正常权限审批、官方匿名token仅内存，正文有界、核长度/散列/JSON，不跟未批跨域跳转、不执行内容；失败即停报告，不绕过。只更新现有metadata/状态/A–F，轻量检查后停准入。不是Oracle许可接受或A–F实施批准；无镜像层、安装包、pull、安装/prepare/restore/服务/产品/DTO/数据库/main/ZIP/TDengine授权。

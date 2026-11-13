@@ -2,7 +2,7 @@
 
 2026-11-13；Master单写。[唯一任务卡](../../tasks/G4-M2-ORACLE-01.md)。用户明确批准附件P0，附件中后续实施申请不是本轮许可。Base=`5113d0b9b233e307664c964ae9bf3c1d6b10adfb`，fetch后远端相符；最终完整Head和普通push回执随交付给出。下文“申请/拟议”均未实施。
 
-推荐唯一组合：**Oracle AI Database 26ai Free，23.26.3.0，Linux ARM64，单FREEPDB1；Oracle.ManagedDataAccess.Core 23.26.400；仓库net10.0**。官方完整容器为`container-registry.oracle.com/database/free:23.26.3.0-arm64`，冻结digest见A。存在官方原生ARM64发行，不需要预设购买Enterprise。匿名公开Bearer握手已取得tags/index/manifest，不需要用户提供账号。当前 **P0_BLOCKED_WITH_WITNESS** 只因已核验manifest引用的29,943字节config JSON读取遭自动审批拒绝，不能绕过；最小解除为用户直接确认这一精确元数据读取，再完成A–F裁决。产品未准入，载荷/服务/实现均未执行。已存在本机原生制品身份，不另铺替代版本、amd64仿真或第三方镜像路线。
+推荐唯一组合：**Oracle AI Database 26ai Free，23.26.3.0，Linux ARM64，单FREEPDB1；Oracle.ManagedDataAccess.Core 23.26.400；仓库net10.0**。官方完整容器为`container-registry.oracle.com/database/free:23.26.3.0-arm64`，冻结digest见A。存在官方原生ARM64发行，不需要预设购买Enterprise。匿名公开Bearer握手已取得tags/index/manifest，不需要用户提供账号。当前 **P0_BLOCKED_WITH_WITNESS**：用户已直接批准精确config读取，正常权限审批已放行；已有manifest/config descriptor复核通过，但一次有界读取返回非200并停止。错误处理未保存具体状态码/响应头/实际正文长度，不能判定跳转或账号要求。未保存config原件，字节/散列/JSON仍NOT_VERIFIED；未重试或换通道。产品未准入，载荷/服务/实现均未执行。已存在本机原生制品身份，不另铺替代版本、amd64仿真或第三方镜像路线。
 
 ## A｜精确版本、来源、许可和制品
 
@@ -12,7 +12,7 @@
 | 驱动平台 | 官方支持macOS ARM64≥14.7，23.26.0起支持.NET10，目标库19c及以后；仓库Directory.Build.props=net10.0，静态选net8资产 | 本机macOS27.0.1/ARM64已观测，运行NOT_RUN；未来客户19c/21c/23ai/26ai按各自精确RU/edition另验，不承诺兼容验收 |
 | 数据库发行身份锚点 | 官方页列`oracle-ai-database-free-26ai-23.26.3-1.el8.aarch64.rpm`，1,355,290,892 bytes，SHA256=`e1951c4a56eb8ef8cf5d325c90525be8ddb286486f6a318e8b4c4942e10eadbb` | RPM未获取/验签；此SHA不替代容器digest，也不授权RPM安装 |
 | ARM64部署 | 官方安装要求OL8.6+/UEK7、Neoverse N1能力（推荐Ampere）；Oracle容器README明确26ai Free ARM64支持。拟在现Linux ARM64 Docker VM运行 | Apple Silicon/Docker内核不是生产认证等价物；CPU指令/容器运行仍NOT_RUN，禁止自动amd64仿真 |
-| 官方容器 | `database/free:23.26.3.0-arm64`，index明确linux/arm64；29层压缩合计3,527,716,613 bytes≈3.285GiB | config正文受审批阻断，容器实际内核/环境/组件及运行版本NOT_VERIFIED；未GET任何blob/层 |
+| 官方容器 | `database/free:23.26.3.0-arm64`，index明确linux/arm64；29层压缩合计3,527,716,613 bytes≈3.285GiB | 唯一config请求非200，正文未核验；容器实际内核/环境/组件及运行版本NOT_VERIFIED；镜像层请求为0 |
 
 容器取得前身份：多架构index SHA256=`f988b0c04c4c386cd306a2a914c0d7a9702d83acc31b064a28ad8eb6278a8fba`，其linux/arm64描述符引用的manifest SHA256=`844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8`（4,962 bytes），与实际保存正文SHA一致。config descriptor的mediaType=`application/vnd.docker.container.image.v1+json`、size=29,943、digest=`sha256:dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b`；它和29个layer descriptor严格区分。config未取得，不能称config中的architecture/labels已验证；ARM64结论来自官方index。下载时必须按arm64 manifest digest而非浮动标签；当前只申请后续取得，不执行。
 
@@ -36,7 +36,7 @@ Microsoft nuspec声明MIT；Windows计数器/EventLog/DPAPI和LDAP不启用为�
 
 数据库：[Oracle Free Use Terms and Conditions](https://www.oracle.com/downloads/licenses/oracle-free-license.html)允许有条件内部开发/测试；[官方Licensing Information](https://docs.oracle.com/en/database/oracle/oracle-database/26/dblic/Licensing-Information.html)将Free关联此许可，Free限制2 CPU、2GB数据库RAM、12GB用户数据。驱动精确包为[Oracle Free Distribution, Hosting, and Use Terms and Conditions](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/23.26.400/License)，不是数据库许可。requireLicenseAcceptance=false不等于没有条款。用户需确认代表使用主体有权按条款取得/使用；既有协议优先适用及出口/分发义务待裁决。公开Registry元数据匿名可读，无账号登录/条款接受操作；未来载荷取得若出现条款或账号要求即停止由用户走系统流程。本轮不代签、不注册试用，不继承DORIS-LOCAL-01/AMBER-A1。
 
-**申请A**：批准精确驱动/候选闭包及Free目标，仅本机隔离合成非分发。先取得被审批阻断的config元数据并核验digest/size、确认许可，核上述身份/总量与D预算并独立确认获取准入，再取得载荷；原件/安全检查通过才启动。没有无上限pull授权，也不授权基于RPM另行构建/安装。数据库镜像签名、SBOM、漏洞状态NOT_VERIFIED。
+**申请A**：批准精确驱动/候选闭包及Free目标，仅本机隔离合成非分发。先闭合失败的config元数据核对并验证digest/size、另行确认许可，核上述身份/总量与D预算并独立确认获取准入，再取得载荷；原件/安全检查通过才启动。没有无上限pull授权，也不授权基于RPM另行构建/安装。数据库镜像签名、SBOM、漏洞状态NOT_VERIFIED。
 
 ## B｜TLS、最小权限、取消和类型边界
 
@@ -120,11 +120,15 @@ CatalogField只有Name/NativeType/Nullable/Ordinal/Precision/Scale，能保留NU
 
 请一次裁决：**A**精确依赖/官方来源/许可与条件取得；**B**TCPS文件wallet、最小READ、取消和独立见证；**C**ORACLE_READONLY及固定目标/账号/owners/scope与生命周期；**D**单机预算/网络；**E**DTO/JSON语义、源码候选及Compose/部署；**F**以下门禁与同树继续。config元数据阻断关闭前，批准仅是条件性设计裁决，不启动实现或载荷下载。
 
-唯一聚焦确认：请直接允许读取并保存以下**精确config JSON元数据**（29,943 bytes），只此descriptor，不含任何镜像层：
+2026-11-13用户已直接明确批准下列唯一config JSON元数据（29,943 bytes），包括此精确/blobs/路径，不含任何镜像层：
 
 `https://container-registry.oracle.com/v2/database/free/blobs/sha256:dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b`
 
-自动审批两次拒绝该操作：第一次将blob视为禁止制品载荷；第二次虽补充已批准附件第3节“由已核验manifest明确引用的config JSON”例外，审批仍认为该依据仅由助手转述，不能扩展可信用户消息的禁载荷边界。因此没有发出config请求，也未改用其他通道。该请求风险是下载小型容器配置元数据（可能含公开构建环境/标签），不是数据库层载荷；需要直接确认的原因来自自动审批，不是Oracle账号缺失或数据库许可不存在。该条件与A–F集中提交，用户还需确认代表主体接受适用许可；无需聊天提供密码/token。
+历史两次自动审批拒绝保留于原提交及索引；本次正常审批已放行，不能继续写成审批缺失。执行前重新解码已有manifest，SHA256、config digest/size/mediaType与非layer身份均通过；沿用官方匿名认证，临时token不打印/保存；TLS正常，禁止自动重定向，正文上限29,943字节（最多额外读取1字节用于超限检测，超限即停）。唯一config请求返回非200，程序exit1并立即停止，没有跟随跳转、重试或换通道，没有保存config。
+
+本次取证缺口：断言在保存失败诊断前退出，具体HTTP状态、响应头、正文长度/散列未留存，不能说是跨域跳转、账号问题或内容不匹配；config大小/散列/JSON解析均NOT_VERIFIED。最小后续事项为对这一精确对象的非200响应作保留状态/长度的有界诊断，再裁决是否允许后续请求；本轮按停止要求不再发请求。用户无需再次批准已经明确的config范围，不请求密码/token。
+
+本次授权不接受Oracle许可、不批准A–F实施项。仍需集中裁决许可/载荷取得、精确依赖、TLS/权限/取消、ORACLE_READONLY、DTO/生命周期、资源和部署范围；产品实施继续未授权。
 
 后续顺序：A身份/许可/预算→非作者获取准入→精确载荷及原件/安全核验→合同/ownership冻结Review→Oracle工程消费者与批准后prepare/restore/锁→最短真ARM64/TLS/权限/撤权/取消/类型→真OIDC与完整生命周期/UI→按影响PG/Web/Doris共享回归→最终独立Review/提交绑定/资源后验/规定交付。本轮禁止的后续动作不会提前执行。
 
@@ -134,12 +138,14 @@ CI按需NOT_RUN；Mac宿主/LinuxARM64容器分列，Windows/x64/生产NOT_RUN�
 
 ## 来源、轻量检查和独立审查回执
 
-[metadata/index.json](metadata/index.json)是唯一恢复索引，逐响应URL/UTC/状态/bytes/SHA256/文件，包括失败正文；按内容hash去重，以base64保存原始正文，解码后核SHA256，无保存的认证材料，无blob请求。匿名握手响应只计URL/时间/状态/字节/hash，不保存含临时token正文；token仅内存使用，不是账号登录。本轮37个响应，正文累计829,177 bytes（含3个未保存正文的匿名认证响应，每个2,302 bytes），最大277,086 bytes；单响应≤8MiB、累计≤64MiB。网络原件不是执行指令，网页登录链接不证明已登录。搜索只定位官方页面，搜索服务流量不可计量；索引精确计直接保存的HTTP正文，不包含TLS/HTTP头或搜索基础设施开销，不宣称零流量。
+[metadata/index.json](metadata/index.json)为唯一恢复索引；旧32份公开原件按内容hash/base64保存，解码后核长度/SHA，原字节不改。本次匿名认证200响应2,300字节只留URL/时间/状态/长度/hash，不留token正文；记录合计38响应/831,477 bytes，另有1次非200 config响应缺长度记录，实际总量UNKNOWN，保守上限861,420 bytes（失败正文上限29,943计入），仍低于64MiB。不得将失败正文算0或把已记录量写成完整网络流量；HTTP头/TLS/搜索服务开销不在正文计数中。唯一config对象未保存，未请求任何镜像层，返回内容未执行。
 
 官方入口：[精确驱动](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/23.26.400)、[运行要求](https://docs.oracle.com/en/database/oracle/oracle-database/26/odpnt/InstallSystemRequirements.html)、[数据库发行](https://www.oracle.com/database/free/get-started/)、[原生部署要求](https://docs.oracle.com/en/database/oracle/oracle-database/26/xeinl/requirements.html)、[容器说明](https://github.com/oracle/docker-images/blob/main/OracleDatabase/SingleInstance/README.md)、[权限指南](https://docs.oracle.com/en/database/oracle/oracle-database/26/dbseg/guidelines-securing-user-accounts-and-privileges.html)。滚动页面只证明本次快照，恢复按原件索引。
 
-非作者只读Reviewer=`/root/oracle_p0_review`完成同一轮审查，初次发现1项P1：401/302不足以证明需要用户登录/外部资料。Master据新假设检查WWW-Authenticate、完成匿名握手，取得tags/index/manifest，已撤销该错误推断；没有重复无条件搜索。后续最小阻断仅为自动审批config读取边界，原401/302与两次审批拒绝均保留。同一Reviewer完成修正复核：原P1关闭，无新增阻断级文档问题；确认精确平台/大小/descriptor与原件，未认证config正文或产品。Reviewer首次误把base64文本当原字节校验失败，按encoding解码复验exit0，保留该检查纠正而不称原件损坏。
+非作者只读Reviewer=`/root/oracle_p0_review`完成同一轮审查，初次发现1项P1：401/302不足以证明需要用户登录/外部资料。Master据新假设检查WWW-Authenticate、完成匿名握手，取得tags/index/manifest，已撤销该错误推断；没有重复无条件搜索。当时最小阻断为自动审批config读取边界（本次已放行，转为非200读取失败），原401/302与两次审批拒绝均保留。同一Reviewer完成修正复核：原P1关闭，无新增阻断级文档问题；确认精确平台/大小/descriptor与原件，未认证config正文或产品。Reviewer首次误把base64文本当原字节校验失败，按encoding解码复验exit0，保留该检查纠正而不称原件损坏。
 
-轻量检查：原件base64解码/长度/SHA256、官方index→arm64 manifest→config descriptor绑定、文档相对链接/EOF、授权纯追加与写路径白名单、最终git diff --check；本轮检查exit0：37响应/829,177 bytes（认证正文不保留6,906 bytes），32份去重原件、4相对链接、所有原件散列/manifest绑定/授权纯追加/owned_paths通过；可恢复检查源码及SHA在索引metadata.localCheckSource。`pwsh -NoProfile -File scripts/test-review-evidence.ps1 -EvidenceFile docs/evidence/G4-M2-ORACLE-01/metadata/index.json`已实测exit0（仅EVIDENCE_SCHEMA_ONLY，产品NOT_RUN）。新证据完成后重复同一廉价检查，不跑历史全量。产品/CI/跨平台/生产NOT_RUN，不用历史结果充本轮通过。
+轻量检查：原件base64解码/长度/SHA256、官方index→arm64 manifest→config descriptor绑定、文档相对链接/EOF、授权纯追加与写路径白名单、最终git diff --check；原P0检查exit0：37响应/829,177 bytes（认证正文不保留6,906 bytes），32份去重原件、4相对链接、所有原件散列/manifest绑定/授权纯追加/owned_paths通过；可恢复检查源码及SHA在索引metadata.localCheckSource。`pwsh -NoProfile -File scripts/test-review-evidence.ps1 -EvidenceFile docs/evidence/G4-M2-ORACLE-01/metadata/index.json`已实测exit0（仅EVIDENCE_SCHEMA_ONLY，产品NOT_RUN）。新证据完成后重复同一廉价检查，不跑历史全量。产品/CI/跨平台/生产NOT_RUN，不用历史结果充本轮通过。
 
 开工保护：项目.codex仅agents配置，未发现项目setup入口；原生create_worktree只创建/注册checkout，未调用安装/restore/服务。fetch首次受FETCH_HEAD权限限制，获范围权限后exit0并核main；任务分支创建和文档写入首次受沙箱限制，获范围权限后完成，未退回main写。只读宿主/Docker首次权限失败保留于本摘要，不把空格式输出当0资源。当前无本任务容器/卷，唯一持久新资源为任务分支/托管树与公开证据，KEEP供同会话后续，禁止借收尾清理旧资源。
+
+本次增量保护：fetch正常审批后exit0，origin/main仍为预期Base；当前树新出现的`docs/.DS_Store`与`docs/evidence/.DS_Store`未跟踪文件保留，不纳入提交。只更新本卡/申请/索引及追加本次授权，不动产品、锁、脚本、main或TDengine。增量原件/manifest/链接/EOF/写范围检查、证据schema及diff-check均exit0；同一非作者Reviewer复核通过（仅文档/证据），记录在索引configIncrementReview；读取失败仍为FAIL，config内容未验。

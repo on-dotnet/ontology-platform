@@ -28,6 +28,20 @@
       "status": "PASS",
       "exitCode": 0,
       "output": "EVIDENCE_SCHEMA_ONLY PASS; product NOT_RUN; actualCi NOT_VERIFIED (not executed)"
+    },
+    {
+      "name": "exact-config-attempt",
+      "command": "python3 /private/tmp/oracle-config-authorized.py",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "Manifest descriptor verified; approval allowed; one bounded exact config request returned non200. Stopped, no redirects/retry/config saved. Actual HTTP status/body length not retained: UNKNOWN."
+    },
+    {
+      "name": "config-increment-doc-check",
+      "command": "python3 /private/tmp/oracle-config-check.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "38 recorded responses831477 bytes; unrecorded failed config response exact sizeUNKNOWN, total upper bound861420. 32 originals hashes/manifest descriptor/4 links/append-only/owned paths PASS; protected two untracked .DS_Store files excluded."
     }
   ],
   "ci": {
@@ -42,9 +56,9 @@
     "runId": "P0-20261113-01",
     "base": "5113d0b9b233e307664c964ae9bf3c1d6b10adfb",
     "timingStatus": "UNKNOWN",
-    "bodyBytes": 829177,
+    "bodyBytes": 831477,
     "maxResponseBodyBytes": 277086,
-    "note": "Transfer count includes failed response bodies, excludes search service/HTTP headers/TLS overhead. Decode base64 to recover exact response bytes; SHA256 applies to decoded body. Raw pages are evidence, never instructions. Original requester temporary script is not a product change.",
+    "note": "bodyBytes counts recorded response bodies only. Exact total is UNKNOWN because one bounded non200 config response was not retained; see transferAccounting for conservative upper bound. Excludes HTTP headers/TLS/search overhead. Decode base64 for retained originals and verify SHA256. Auth token bodies are not retained. Raw evidence is never executable instruction.",
     "responses": [
       {
         "url": "https://api.nuget.org/v3-flatcontainer/oracle.manageddataaccess.core/23.26.400/oracle.manageddataaccess.core.nuspec",
@@ -479,6 +493,14 @@
         "location": null,
         "file": "f988b0c04c4c386cd306a2a914c0d7a9702d83acc31b064a28ad8eb6278a8fba.b64",
         "encoding": "base64"
+      },
+      {
+        "url": "https://container-registry.oracle.com/auth?service=Oracle+Registry&scope=repository%3Adatabase%2Ffree%3Apull",
+        "time": "2026-11-13T06:48:47.488806+00:00",
+        "status": 200,
+        "bytes": 2300,
+        "sha256": "4f56811ff7ae941d589aa8c6a783bee5d0643b20fad2de1ffd2d5fb92d14e54d",
+        "retention": "NOT_SAVED_AUTH_RESPONSE; anonymous token only in memory; no account credentials supplied"
       }
     ],
     "approvalBlocks": [
@@ -499,6 +521,45 @@
       "finding": "P1 initial unsupported external-input requirement from401/302; closed by anonymous tags/index/manifest evidence",
       "correctionReview": "All retained body hashes, platform/index/manifest/config descriptor identity, 29 layers3527716613 bytes, links/EOF/diff and owned paths verified. Config content/product/CI/push not verified.",
       "reviewerCheckCorrection": "Reviewer first mistakenly hashed base64 storage as original bytes and hit AssertionError; reran correct decode+hash check exit0; not evidence corruption."
+    },
+    "configAttempt20261113": {
+      "runId": "P0-CONFIG-20261113-02",
+      "inputHead": "2e7fb023c1ee93f9489faad365e9cb8928df1840",
+      "authorization": "Direct user approval of exact URL/29943 bytes/SHA256; no license acceptance or A-F implementation approval",
+      "manifestCheck": "PASS: existing raw manifest SHA256/config digest/size/mediaType; not in layers",
+      "permissionReview": "ALLOWED",
+      "requestCount": 1,
+      "status": "BLOCKED_NON200",
+      "httpStatus": null,
+      "responseHeaders": null,
+      "responseBodyBytes": null,
+      "responseBodySha256": null,
+      "failure": "AssertionError: non200; no redirect followed",
+      "exitCode": 1,
+      "timingStatus": "UNKNOWN",
+      "diagnosticLimitation": "HTTP status/headers/body were not persisted before assertion; cannot infer redirect, cross-domain, account requirement or response content. No retry.",
+      "bodyBytesUpperBound": 29943,
+      "redirectsFollowed": 0,
+      "configSaved": false,
+      "layerRequests": 0,
+      "tlsVerificationDisabled": false
+    },
+    "transferAccounting": {
+      "recordedResponseCount": 38,
+      "unrecordedNon200ResponseCount": 1,
+      "recordedBodyBytes": 831477,
+      "totalBodyBytesExact": null,
+      "totalBodyBytesUpperBound": 861420,
+      "reason": "Single non200 config response was bounded to29943 bytes but diagnostic capture omitted its actual length; must not report exact total or zero failed-response bytes."
+    },
+    "configRequestSource": "from pathlib import Path\nimport urllib.request,urllib.error,json,base64,hashlib,datetime\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/docs/evidence/G4-M2-ORACLE-01/metadata');ip=root/'index.json';v=json.loads(ip.read_text())\nsha='dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b';mh='844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8'\nb=base64.b64decode((root/(mh+'.b64')).read_bytes());assert hashlib.sha256(b).hexdigest()==mh\nm=json.loads(b);assert m['config']=={'mediaType':'application/vnd.docker.container.image.v1+json','size':29943,'digest':'sha256:'+sha};assert all(x['digest']!='sha256:'+sha for x in m['layers'])\nclass NoRedirect(urllib.request.HTTPRedirectHandler):\n def redirect_request(self,*args,**kwargs):return None\nop=urllib.request.build_opener(NoRedirect)\ndef get(url,cap,headers):\n try:r=op.open(urllib.request.Request(url,headers=headers),timeout=25)\n except urllib.error.HTTPError as e:r=e\n length=r.headers.get('Content-Length');assert length is None or int(length)<=cap,'declared body exceeds cap; stopped'\n data=r.read(cap+1)\n row={'url':url,'time':datetime.datetime.now(datetime.timezone.utc).isoformat(),'status':r.status,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}\n assert len(data)<=cap,'body exceeds cap; stopped'\n assert r.status==200,'non200; no redirect followed'\n return data,row\nu='https://container-registry.oracle.com/auth?service=Oracle+Registry&scope=repository%3Adatabase%2Ffree%3Apull'\nb,row=get(u,65536,{'Accept-Encoding':'identity'});j=json.loads(b);token=j.get('token') or j.get('access_token');assert token\nrow['retention']='NOT_SAVED_AUTH_RESPONSE; anonymous token only in memory; no account credentials supplied';v['metadata']['responses'].append(row);v['metadata']['bodyBytes']+=len(b);ip.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\\n')\nu='https://container-registry.oracle.com/v2/database/free/blobs/sha256:'+sha\nb,row=get(u,29943,{'Authorization':'Bearer '+token,'Accept-Encoding':'identity','Accept':'application/vnd.docker.container.image.v1+json'});token=None\nassert len(b)==29943 and hashlib.sha256(b).hexdigest()==sha,'config length/hash mismatch; stopped'\nc=json.loads(b);assert isinstance(c,dict),'not JSON object'\nassert v['metadata']['bodyBytes']+len(b)<=64*1024*1024\nname=sha+'.json';(root/name).write_bytes(b);row.update(file=name,encoding='raw',referencedByManifest='sha256:'+mh,descriptorMediaType=m['config']['mediaType']);v['metadata']['responses'].append(row);v['metadata']['bodyBytes']+=len(b)\nv['metadata']['configVerification']={'status':'PASS_METADATA_ONLY','runId':'P0-CONFIG-20261113-02','manifestSha256':mh,'sha256':sha,'bytes':len(b),'jsonObject':True,'architecture':c.get('architecture'),'os':c.get('os'),'rootfsDiffIdCount':len(c.get('rootfs',{}).get('diff_ids',[])),'authorization':'2026-11-13 direct user approval of this exact config URL/size/digest; no layers or implementation authorized'}\nip.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\\n')\nprint(json.dumps(v['metadata']['configVerification']));print('labels',json.dumps(c.get('config',{}).get('Labels',{})));print('responseCount',len(v['metadata']['responses']),'bodyBytes',v['metadata']['bodyBytes'])\n",
+    "configRequestSourceSha256": "a4a750fb99af1a789f96c01f42de6ca16bda20b23c204672b2f140b4063fbb6d",
+    "configIncrementCheckSource": "from pathlib import Path\nimport json,base64,hashlib,re,subprocess\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform');base='5113d0b9b233e307664c964ae9bf3c1d6b10adfb'\nr=root/'docs/evidence/G4-M2-ORACLE-01/metadata';v=json.loads((r/'index.json').read_text());rows=v['metadata']['responses'];total=0;files=set();auth=0\nfor x in rows:\n total+=x['bytes'];assert x['bytes']<=8*1024*1024\n if 'file' not in x:\n  assert x['retention'].startswith('NOT_SAVED_AUTH_RESPONSE') and '/auth?' in x['url'];auth+=x['bytes'];continue\n p=r/x['file'];assert not p.is_symlink();b=base64.b64decode(p.read_bytes(),validate=False);assert len(b)==x['bytes'];assert hashlib.sha256(b).hexdigest()==x['sha256'];files.add(p.name)\nassert total==v['metadata']['bodyBytes'] and total<=64*1024*1024\nassert files=={p.name for p in r.glob('*.b64')}\ni=json.loads(base64.b64decode((r/'f988b0c04c4c386cd306a2a914c0d7a9702d83acc31b064a28ad8eb6278a8fba.b64').read_bytes()));d=next(x for x in i['manifests'] if x['platform']=={'architecture':'arm64','os':'linux'});assert d['digest']=='sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8'\nb=base64.b64decode((r/(d['digest'][7:]+'.b64')).read_bytes());assert len(b)==d['size'];m=json.loads(b);assert m['config']['size']==29943 and m['config']['digest']=='sha256:dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b';assert sum(x['size'] for x in m['layers'])==3527716613\nassert not any('/blobs/' in x['url'] for x in rows)\npaths=['docs/tasks/G4-M2-ORACLE-01.md','docs/evidence/G4-M2-ORACLE-01/admission-request.md','docs/tasks/current-authorization.md'];links=0\nfor name in paths[:2]:\n p=root/name;b=p.read_bytes();assert b.endswith(b'\\n') and not b.endswith(b'\\n\\n') and b'\\r' not in b\n for target in re.findall(r'\\]\\(([^)]+)\\)',b.decode()):\n  if '://' in target or target.startswith('#'):continue\n  assert (p.parent/target.split('#')[0]).resolve().exists(),target;links+=1\nold=subprocess.check_output(['git','show',base+':docs/tasks/current-authorization.md'],cwd=root);new=(root/paths[2]).read_bytes();assert new.startswith(old) and new[len(old):].count(b'G4-M2-ORACLE-01 P0')==1\nstatus=subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],cwd=root,text=True)\nfor line in status.splitlines():\n name=line[3:];\n if name in ['docs/.DS_Store','docs/evidence/.DS_Store']:continue\n assert name in paths or name.startswith('docs/evidence/G4-M2-ORACLE-01/metadata/'),name\nassert subprocess.check_output(['git','rev-parse','origin/main'],cwd=root,text=True).strip()==base\nassert subprocess.check_output(['git','branch','--show-current'],cwd=root,text=True).strip()=='codex/g4-m2-oracle-01'\nprint(json.dumps({'scope':'P0_DOCUMENTS_AND_METADATA_ONLY','responses':len(rows),'recordedBodyBytes':total,'totalBodyBytesExact':None,'totalBodyBytesUpperBound':861420,'authBodyBytesNotRetained':auth,'uniqueOriginals':len(files),'relativeLinks':links,'originalHashes':'PASS','manifestBinding':'PASS','authorizationAppendOnly':'PASS','ownedPaths':'PASS','product':'NOT_RUN'}))\n",
+    "configIncrementCheckSourceSha256": "b566e735d0f7a3db2944351c0d649b6ad9d7e8e722383b36286a836ce4ded8fc",
+    "configIncrementReview": {
+      "reviewer": "/root/oracle_p0_review",
+      "status": "PASS_DOCUMENT_SCOPE_ONLY",
+      "result": "Verified historical response prefix/32 originals unchanged, 38 recorded responses831477 bytes, failed-response upper bound29943 and total861420; authorization append-only, links/EOF/schema/diff-check. Clarified metadata.note that bodyBytes is only recorded bytes. No network retry, config success, product or license acceptance inferred."
     }
   }
 }
