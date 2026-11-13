@@ -1,0 +1,94 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+  "checks": [
+    {
+      "name": "affected-gates",
+      "status": "PASS",
+      "command": "python3 -B /tmp/doris-gates-reuse.py",
+      "exitCode": 0,
+      "output": "12 affected gates PASS; current qualification and exact original evidence paths in final-policy/finalGates.json. FRESH execution: engineering18, smoke-adapter14, policy; four engineering gates REUSED; five product evidence qualifications FRESH and original product executions REUSED. Counts overlap."
+    },
+    {
+      "name": "csharp-format",
+      "status": "PASS",
+      "command": "dotnet format backend/OntologyPlatform.slnx --verify-no-changes --no-restore --include <task changed C# paths>",
+      "exitCode": 0,
+      "output": "Original format receipt final-formatted/format.json exit0; all C# files byte-identical since4ae6492f. Subsequent edits limited to lock final LF, fixture helper and engineering Python test; no C# change."
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "command": "apps/web/node_modules/.bin/tsc --noEmit",
+      "exitCode": 0,
+      "output": "Actual command receipt in final-formatted/static.json; Web input unchanged and current UI/build qualification passes."
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "command": "apps/web/node_modules/.bin/eslint src/features/connections/create.tsx src/features/connections/form.tsx src/features/connections/form-model.ts src/features/connections/connections.test.ts vitest.config.ts",
+      "exitCode": 0,
+      "output": "Actual command receipt in final-formatted/static.json; Web input unchanged and current UI/build qualification passes."
+    },
+    {
+      "name": "resource-closeout",
+      "status": "PASS",
+      "command": "python3 -B /tmp/doris-idle-cleanup-policy.py; python3 -B /tmp/doris-resource-closeout-policy.py",
+      "exitCode": 0,
+      "output": "Final3 platform volume/network handles and2 Doris containers/2 networks removed by exact identity with absence checks. Four unique synthetic data/log volumes and private evidence/worktree KEEP through review. See final-policy/platformCloseout.json and resourceCloseout.json."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M2-DORIS-01",
+    "scope": "DORIS-LOCAL-01: local synthetic non-distributed development only; production guard remains",
+    "productProofIndex": "docs/evidence/G4-M2-DORIS-01/product-proof-index.json",
+    "sourceReview": "PASS: original independent reviewer; source-review.md",
+    "freshProductExecution": {
+      "unit": 38,
+      "wire": 17,
+      "dorisTargeted": 24,
+      "lifecycleGroups": 8,
+      "pgCompatibility": 1,
+      "httpsCompatibility": 13,
+      "expiredAndRestoredTls": 2
+    },
+    "reusedProductEvidence": {
+      "ui": 120,
+      "naturalTtl": "Unchanged shared methods and exact Web originals",
+      "probeAuditRollback": "Unchanged shared probe transaction only"
+    },
+    "timingStatus": "Actual elapsed/start/end retained in original execution receipts; no estimated durations substituted",
+    "notRun": [
+      "CI",
+      "Windows",
+      "Intel",
+      "production"
+    ],
+    "notVerified": [
+      "Online revocation",
+      "Full SBOM and exhaustive CVE coverage",
+      "User image pull network bytes"
+    ],
+    "limitations": [
+      "No production/distribution risk acceptance",
+      "No Doris-specific audit fault injection",
+      "No business-data backup recovery"
+    ],
+    "preservedFailures": [
+      "Native VerifyFull expired leaf acceptance",
+      "Early VM/network/fixture failures",
+      "Format IPC and formatting failures",
+      "Initial policy failures",
+      "Nonisolated engineering timeout self-test failure"
+    ],
+    "userFiles": "Two exact user DS_Store files preserved; per-command excludes only; see final-formatted/userFiles.json"
+  }
+}

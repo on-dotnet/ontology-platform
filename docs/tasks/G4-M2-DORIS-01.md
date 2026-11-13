@@ -1,6 +1,6 @@
 # G4-M2-DORIS-01｜条件执行清单
 
-唯一状态：**IMPLEMENTATION_VALIDATED / FINAL_REVIEW_IN_PROGRESS**（2026-11-13）。用户已通知两镜像下载完成，同树继续[A–F已授权](../evidence/G4-M2-DORIS-01/conditional-authorization.md)范围；本轮[一页状态与差异](../evidence/G4-M2-DORIS-01/post-download-status.md)。P0历史结论见提交6f985b6a，未改写历史申请。
+唯一状态：**READY_FOR_REVIEW / LOCAL_VALIDATION_PASS**（2026-11-13）。用户已通知两镜像下载完成，同树继续[A–F已授权](../evidence/G4-M2-DORIS-01/conditional-authorization.md)范围；本轮[一页状态与差异](../evidence/G4-M2-DORIS-01/post-download-status.md)。P0历史结论见提交6f985b6a，未改写历史申请。
 
 - Base/origin/main：`11595ecb6560f7ed6ceca54666d32b7afcae7f35`，本轮fetch核实一致；P0 Head `6f985b6a3c9558213a63a428ddec5eca3e05057b`，申请SHA256与批准附件一致。
 - 分支：`codex/g4-m2-doris-01`；托管树：`/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform`；Master单写，原非作者Reviewer继续；RunId=`admission-20261112-01`。
@@ -13,7 +13,7 @@
 - [x] 条件获取：缺失载荷、hash/签名/许可/组成/CVE检查、下载/磁盘累计；未知保留，非作者执行准入。
 - [x] 用户VM通知及资源/能源前提→有界ARM64启动、直接TLS/只读/源端取消最短见证；失败短定位不盲跑。
 - [x] 本任务TaskId/门禁/Vitest路径→凭据合同定向测试与Review→Adapter/UI/Compose；总deadline10秒，取消清理有界。
-- [ ] 影响测试、真实生命周期/合成恢复、适用PG/Web兼容、稳定输入Review/提交→唯一V3独立重开及回执。
+- [x] 影响测试、真实生命周期/合成恢复、适用PG/Web兼容、稳定输入Review和提交；12项门禁通过。最终V3与独立重开回执随交付。
 
 ## 冻结路径与保留
 
@@ -46,3 +46,5 @@ read_only_dependencies：AGENTS/PLANS、架构合同、现行政策、既有PG/W
 2026-11-13当前收口：用户已批准严格TLS机制差异，实际过期叶证书被拒绝，原证书恢复后读取通过。稳定源码38项单元、17项wire、24项Doris定向、120项UI、8组真实生命周期及PG1/HTTPS13项短兼容通过；两次warm prepare零下载/零restore。五类产品证据资格已重新核验通过（计数跨gate重叠，不相加）；正在完成历史共享原件资格、工程门禁、最终独立Review、提交和唯一V3。没有待批TLS事项；在线撤销、全量供应链安全结论仍NOT_VERIFIED，CI/其他宿主架构/生产NOT_RUN。以上覆盖当前状态，下方及前文早期运行描述为历史事实。
 
 最终格式构建：38单元、17wire、24Doris定向、120UI、8组真实生命周期、PG1/HTTPS13及TLS过期拒绝/恢复各1通过；生命周期`doris-210dd06860f3`。当前任务容器/宿主进程/闲置网络均已准确回收，四个唯一合成数据/日志卷及私有证据KEEP至审查结束；无需新审批。磁盘保守合计约17.44GiB，过程约69MiB，未将用户拉取流量未知写成通过。
+
+最终唯一状态：READY_FOR_REVIEW / LOCAL_VALIDATION_PASS。最新原件以[正式本地验证](../evidence/G4-M2-DORIS-01/validation.json)和[一页交付状态](../evidence/G4-M2-DORIS-01/delivery-status.md)为准。12项受影响门禁全部通过，最终FE/BE及平台临时容器、宿主进程和闲置网络已精确回收；四个合成数据/日志卷及私有原件KEEP至审查结束。无新增待批事项，停在当前审查关口，不更新main或进入生产。前文各阶段等待/失败/进行中为历史记录。

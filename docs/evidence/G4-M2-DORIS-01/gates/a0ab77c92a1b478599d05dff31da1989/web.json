@@ -1,0 +1,67 @@
+{
+  "gate": "web",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "tests": 128,
+    "skipped": 0,
+    "counts": {
+      "ui": 120,
+      "lifecycle": 8
+    },
+    "originalEvidence": [
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final/ui.json",
+        "sha256": "04206b5382fd0525c1fa8a7de643b8a7c0de2c8195ce8039f0b51513dbb66bc1",
+        "sizeBytes": 44499,
+        "encoding": "base64",
+        "path": "docs/evidence/G4-M2-DORIS-01/final/ui.json.raw.json"
+      },
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/lifecycle.json",
+        "sha256": "38446a64545dcc38e8bc58a6ea6217e10b496491565aba94671da0343cbe0829",
+        "sizeBytes": 4850,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-policy/lifecycle.json"
+      }
+    ],
+    "limitation": "Counts overlap between gates; CI, other architectures, production and online revocation are not covered"
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m2_evidence.py",
+    "--task",
+    "G4-M2-DORIS-01",
+    "--gate",
+    "web",
+    "--input-key",
+    "6092fe62be29b77a419634f2609e281476d665a9076ba11b49e51b7011cb05b0"
+  ],
+  "exitCode": 0,
+  "tests": 128,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 0.2657269159972202,
+  "inputKey": "6092fe62be29b77a419634f2609e281476d665a9076ba11b49e51b7011cb05b0",
+  "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+  "policyKey": "85bc6c90b9b23bd75e954b73e66e4649ea088c05cc71b950dd5ae355254f8721",
+  "evidenceSha256": "7c38e256d924e7797bc20d0c3996ee22fe2f4d54a84b0ee8b6bf89149cef5b65",
+  "logPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/web.txt",
+  "sourceRun": "a0ab77c92a1b478599d05dff31da1989",
+  "sourceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+  "publishedLog": {
+    "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/web.txt",
+    "sha256": "7c38e256d924e7797bc20d0c3996ee22fe2f4d54a84b0ee8b6bf89149cef5b65",
+    "sizeBytes": 795,
+    "encoding": "raw",
+    "path": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/web.txt"
+  }
+}

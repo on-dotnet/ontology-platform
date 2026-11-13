@@ -1,0 +1,512 @@
+{
+  "status": "PASS",
+  "coverage": "affected engineering gates only; product coverage requires separate task acceptance",
+  "checks": [
+    {
+      "gate": "environment",
+      "status": "PASS",
+      "executionMode": "REUSED",
+      "qualificationMode": "FRESH",
+      "productProof": {
+        "status": "PASS",
+        "executionMode": "REUSED",
+        "qualificationMode": "FRESH",
+        "tests": 2,
+        "skipped": 0,
+        "counts": {
+          "prepare1": 1,
+          "prepare2": 1
+        },
+        "originalEvidence": [
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/prepare1.json",
+            "sha256": "eb9c8a51b1ba76f1517e58f3467ca7c7f46c15b8140decb3a7cbb1476a8a2109",
+            "sizeBytes": 11159,
+            "encoding": "raw",
+            "path": "docs/evidence/G4-M2-DORIS-01/final-policy/prepare1.json"
+          },
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/prepare2.json",
+            "sha256": "8b65ae6c3889cf2a723bfa6f251d85fc4aa793a9c9ae72597c26a0afa7659039",
+            "sizeBytes": 11159,
+            "encoding": "raw",
+            "path": "docs/evidence/G4-M2-DORIS-01/final-policy/prepare2.json"
+          }
+        ],
+        "limitation": "Counts overlap between gates; CI, other architectures, production and online revocation are not covered"
+      },
+      "command": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow_m2_evidence.py",
+        "--task",
+        "G4-M2-DORIS-01",
+        "--gate",
+        "environment",
+        "--input-key",
+        "3a228a951877de0089e28c3c61a7eb314253991645e8cd63dcf1a44cf89621e5"
+      ],
+      "exitCode": 0,
+      "tests": 2,
+      "skipped": 0,
+      "diagnostic": false,
+      "hypothesis": null,
+      "inputsUnchanged": true,
+      "errorSignature": null,
+      "elapsedSeconds": 5.350485290997312,
+      "inputKey": "3a228a951877de0089e28c3c61a7eb314253991645e8cd63dcf1a44cf89621e5",
+      "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+      "policyKey": "4040d3d880da2e8b926f6fd7697a3818b441235da7f39510d6c7fd09c051ccb7",
+      "evidenceSha256": "d5c254cd05a88dfa5599f70924b89709b4bf0d130e7fda447fcdbe785bf9eef7",
+      "logPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/environment.txt",
+      "sourceRun": "a0ab77c92a1b478599d05dff31da1989",
+      "sourceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "publishedLog": {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/environment.txt",
+        "sha256": "d5c254cd05a88dfa5599f70924b89709b4bf0d130e7fda447fcdbe785bf9eef7",
+        "sizeBytes": 809,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/environment.txt"
+      }
+    },
+    {
+      "gate": "contract",
+      "status": "PASS",
+      "executionMode": "REUSED",
+      "qualificationMode": "FRESH",
+      "productProof": {
+        "status": "PASS",
+        "executionMode": "REUSED",
+        "qualificationMode": "FRESH",
+        "tests": 55,
+        "skipped": 0,
+        "counts": {
+          "unit": 38,
+          "wire": 17
+        },
+        "originalEvidence": [
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/unit.json",
+            "sha256": "f92da7ceb69fff2f562c19f4dc4ff186df16253f7872124c3c6fcf78f3496947",
+            "sizeBytes": 2127,
+            "encoding": "raw",
+            "path": "docs/evidence/G4-M2-DORIS-01/final-policy/unit.json"
+          },
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/wire.json",
+            "sha256": "c07fc6646fd2238c624bfc77815bf91bb67964994a9413e7c0ee9faa3f8b6a81",
+            "sizeBytes": 2127,
+            "encoding": "raw",
+            "path": "docs/evidence/G4-M2-DORIS-01/final-policy/wire.json"
+          }
+        ],
+        "limitation": "Counts overlap between gates; CI, other architectures, production and online revocation are not covered"
+      },
+      "command": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow_m2_evidence.py",
+        "--task",
+        "G4-M2-DORIS-01",
+        "--gate",
+        "contract",
+        "--input-key",
+        "63b7fb60d6b3c2a88a294381725dc84a08b4a50aa0972a1f4a5266b0f9ecdf2d"
+      ],
+      "exitCode": 0,
+      "tests": 55,
+      "skipped": 0,
+      "diagnostic": false,
+      "hypothesis": null,
+      "inputsUnchanged": true,
+      "errorSignature": null,
+      "elapsedSeconds": 0.227035749994684,
+      "inputKey": "63b7fb60d6b3c2a88a294381725dc84a08b4a50aa0972a1f4a5266b0f9ecdf2d",
+      "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+      "policyKey": "03cd2776ce2489e3ae6a426fd104ac06e263978ff326e8fa64e1a862fcef343d",
+      "evidenceSha256": "a324a2927fd32055c22eaebae11b06278791ce3f33fabdebc487d2ecba552eea",
+      "logPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/contract.txt",
+      "sourceRun": "a0ab77c92a1b478599d05dff31da1989",
+      "sourceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "publishedLog": {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/contract.txt",
+        "sha256": "a324a2927fd32055c22eaebae11b06278791ce3f33fabdebc487d2ecba552eea",
+        "sizeBytes": 786,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/contract.txt"
+      }
+    },
+    {
+      "gate": "backend",
+      "status": "PASS",
+      "executionMode": "REUSED",
+      "qualificationMode": "FRESH",
+      "productProof": {
+        "status": "PASS",
+        "executionMode": "REUSED",
+        "qualificationMode": "FRESH",
+        "tests": 48,
+        "skipped": 0,
+        "counts": {
+          "adapter": 24,
+          "expired": 2,
+          "pg": 1,
+          "https": 13,
+          "lifecycle": 8
+        },
+        "originalEvidence": [
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/adapter.json",
+            "sha256": "63de9861ccf9c9d416d53a9790587d69df9199db3484451d0d05c5ddb52d4615",
+            "sizeBytes": 2248,
+            "encoding": "raw",
+            "path": "docs/evidence/G4-M2-DORIS-01/final-policy/adapter.json"
+          },
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/expired.json",
+            "sha256": "09dfb52090461c0d2c95c2c750bbf65fcaef9efbdc7caadcbaec601837581edb",
+            "sizeBytes": 1334,
+            "encoding": "raw",
+            "path": "docs/evidence/G4-M2-DORIS-01/final-policy/expired.json"
+          },
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/pg.json",
+            "sha256": "aae20886096589b566a825a2cbfe188899ffdc7ee29be1b6807c10c0f28162d8",
+            "sizeBytes": 3826,
+            "encoding": "raw",
+            "path": "docs/evidence/G4-M2-DORIS-01/final-policy/pg.json"
+          },
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/https.json",
+            "sha256": "dc638c09fd8e17abeec48afdde56e9f577f0e21dad15cc68aa1efe4c3b72bb17",
+            "sizeBytes": 5274,
+            "encoding": "raw",
+            "path": "docs/evidence/G4-M2-DORIS-01/final-policy/https.json"
+          },
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/lifecycle.json",
+            "sha256": "38446a64545dcc38e8bc58a6ea6217e10b496491565aba94671da0343cbe0829",
+            "sizeBytes": 4850,
+            "encoding": "raw",
+            "path": "docs/evidence/G4-M2-DORIS-01/final-policy/lifecycle.json"
+          }
+        ],
+        "limitation": "Counts overlap between gates; CI, other architectures, production and online revocation are not covered"
+      },
+      "command": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow_m2_evidence.py",
+        "--task",
+        "G4-M2-DORIS-01",
+        "--gate",
+        "backend",
+        "--input-key",
+        "7bdfac299399c01827bbeffc64bdc07b43f07ade5cb0a7df3a6494397bdf7c73"
+      ],
+      "exitCode": 0,
+      "tests": 48,
+      "skipped": 0,
+      "diagnostic": false,
+      "hypothesis": null,
+      "inputsUnchanged": true,
+      "errorSignature": null,
+      "elapsedSeconds": 0.22602354199625552,
+      "inputKey": "7bdfac299399c01827bbeffc64bdc07b43f07ade5cb0a7df3a6494397bdf7c73",
+      "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+      "policyKey": "5c760f3c5e44c57fb2bec55b0fd52b3cb4ed523ff668ecdf192da1c013d2a082",
+      "evidenceSha256": "5ae77f589a281eaf8aa885a34b5be8acf695391747ec155e72c1ae65aa2242df",
+      "logPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/backend.txt",
+      "sourceRun": "a0ab77c92a1b478599d05dff31da1989",
+      "sourceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "publishedLog": {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/backend.txt",
+        "sha256": "5ae77f589a281eaf8aa885a34b5be8acf695391747ec155e72c1ae65aa2242df",
+        "sizeBytes": 1605,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/backend.txt"
+      }
+    },
+    {
+      "gate": "doris-task-admission",
+      "status": "PASS",
+      "executionMode": "REUSED",
+      "sourceCommit": "6064f8e1f8feeee61bc2f3b6aeba6a6870423003",
+      "sourceRun": "b055e46e5d82453abc46ac94fa79b819",
+      "evidenceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "evidencePath": "docs/evidence/G4-M2-DORIS-01/gates/b055e46e5d82453abc46ac94fa79b819/doris-task-admission.json",
+      "evidenceSha256": "e11bbb630c1a6ea91f4322ac92d7ce2a6c043ad84d3e41ecf0d0f5a73e9c9fd0",
+      "inputKey": "6fd83e6f88741d7b1a9684afb3f9a7c87ddb0660be0fb85cf5087b802c9efd7d",
+      "reason": "Immutable original success, identical input/environment/policy",
+      "qualificationCommand": "workflow.py verify --plan <current controlled plan> --reuse <index>"
+    },
+    {
+      "gate": "preflight",
+      "status": "PASS",
+      "executionMode": "REUSED",
+      "sourceCommit": "6064f8e1f8feeee61bc2f3b6aeba6a6870423003",
+      "sourceRun": "b055e46e5d82453abc46ac94fa79b819",
+      "evidenceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "evidencePath": "docs/evidence/G4-M2-DORIS-01/gates/b055e46e5d82453abc46ac94fa79b819/preflight.json",
+      "evidenceSha256": "422b281d8a53f9514149510e2a3b48a978355e221c6a139adc6b03b1e927085b",
+      "inputKey": "76d92018c4c7e80f5c596e80404cc37f96a22e77da34700aaf06bf0c7a3eaece",
+      "reason": "Immutable original success, identical input/environment/policy",
+      "qualificationCommand": "workflow.py verify --plan <current controlled plan> --reuse <index>"
+    },
+    {
+      "gate": "engineering",
+      "status": "PASS",
+      "executionMode": "FRESH",
+      "qualificationMode": "FRESH",
+      "productProof": {},
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/Workflow.Tests.py"
+      ],
+      "exitCode": 0,
+      "tests": 18,
+      "skipped": 0,
+      "diagnostic": false,
+      "hypothesis": null,
+      "inputsUnchanged": true,
+      "errorSignature": null,
+      "elapsedSeconds": 1.952202500004205,
+      "inputKey": "82a4c20f2a8e257fe1f9f01ab15e8e6a7c670ba76a119bd46a5f86d21df06bf0",
+      "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+      "policyKey": "3fec4500b1fbccb1595994771a2ded762dac48df9332f6ba72dc8f5191055c72",
+      "evidenceSha256": "5d4f2bfdf30817b263e84d070d1982d2ad787bca50e434b4d00a5e889d28d4e9",
+      "logPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/engineering.txt",
+      "sourceRun": "a0ab77c92a1b478599d05dff31da1989",
+      "sourceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "publishedLog": {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/engineering.txt",
+        "sha256": "5d4f2bfdf30817b263e84d070d1982d2ad787bca50e434b4d00a5e889d28d4e9",
+        "sizeBytes": 117,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/engineering.txt"
+      }
+    },
+    {
+      "gate": "environment-prepare",
+      "status": "PASS",
+      "executionMode": "REUSED",
+      "sourceCommit": "c64477aff9b46aaad378dfbef3ef0f1c8ed486df",
+      "sourceRun": "676c669084f740229dc91f85e90138da",
+      "evidenceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "evidencePath": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/environment-prepare.json",
+      "evidenceSha256": "91bf10ce34b2b5f6f6efdd64fd681002bb5816631b2608575fab164709c80992",
+      "inputKey": "32f19f30e45e0a1de528bfba7c5b7bd0f709d595641681ebcec42e885af49fc7",
+      "reason": "Immutable original success, identical input/environment/policy",
+      "qualificationCommand": "workflow.py verify --plan <current controlled plan> --reuse <index>"
+    },
+    {
+      "gate": "web",
+      "status": "PASS",
+      "executionMode": "REUSED",
+      "qualificationMode": "FRESH",
+      "productProof": {
+        "status": "PASS",
+        "executionMode": "REUSED",
+        "qualificationMode": "FRESH",
+        "tests": 128,
+        "skipped": 0,
+        "counts": {
+          "ui": 120,
+          "lifecycle": 8
+        },
+        "originalEvidence": [
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final/ui.json",
+            "sha256": "04206b5382fd0525c1fa8a7de643b8a7c0de2c8195ce8039f0b51513dbb66bc1",
+            "sizeBytes": 44499,
+            "encoding": "base64",
+            "path": "docs/evidence/G4-M2-DORIS-01/final/ui.json.raw.json"
+          },
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/lifecycle.json",
+            "sha256": "38446a64545dcc38e8bc58a6ea6217e10b496491565aba94671da0343cbe0829",
+            "sizeBytes": 4850,
+            "encoding": "raw",
+            "path": "docs/evidence/G4-M2-DORIS-01/final-policy/lifecycle.json"
+          }
+        ],
+        "limitation": "Counts overlap between gates; CI, other architectures, production and online revocation are not covered"
+      },
+      "command": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow_m2_evidence.py",
+        "--task",
+        "G4-M2-DORIS-01",
+        "--gate",
+        "web",
+        "--input-key",
+        "6092fe62be29b77a419634f2609e281476d665a9076ba11b49e51b7011cb05b0"
+      ],
+      "exitCode": 0,
+      "tests": 128,
+      "skipped": 0,
+      "diagnostic": false,
+      "hypothesis": null,
+      "inputsUnchanged": true,
+      "errorSignature": null,
+      "elapsedSeconds": 0.2657269159972202,
+      "inputKey": "6092fe62be29b77a419634f2609e281476d665a9076ba11b49e51b7011cb05b0",
+      "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+      "policyKey": "85bc6c90b9b23bd75e954b73e66e4649ea088c05cc71b950dd5ae355254f8721",
+      "evidenceSha256": "7c38e256d924e7797bc20d0c3996ee22fe2f4d54a84b0ee8b6bf89149cef5b65",
+      "logPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/web.txt",
+      "sourceRun": "a0ab77c92a1b478599d05dff31da1989",
+      "sourceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "publishedLog": {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/web.txt",
+        "sha256": "7c38e256d924e7797bc20d0c3996ee22fe2f4d54a84b0ee8b6bf89149cef5b65",
+        "sizeBytes": 795,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/web.txt"
+      }
+    },
+    {
+      "gate": "interaction",
+      "status": "PASS",
+      "executionMode": "REUSED",
+      "qualificationMode": "FRESH",
+      "productProof": {
+        "status": "PASS",
+        "executionMode": "REUSED",
+        "qualificationMode": "FRESH",
+        "tests": 8,
+        "skipped": 0,
+        "counts": {
+          "lifecycle": 8
+        },
+        "originalEvidence": [
+          {
+            "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/lifecycle.json",
+            "sha256": "38446a64545dcc38e8bc58a6ea6217e10b496491565aba94671da0343cbe0829",
+            "sizeBytes": 4850,
+            "encoding": "raw",
+            "path": "docs/evidence/G4-M2-DORIS-01/final-policy/lifecycle.json"
+          }
+        ],
+        "limitation": "Counts overlap between gates; CI, other architectures, production and online revocation are not covered"
+      },
+      "command": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow_m2_evidence.py",
+        "--task",
+        "G4-M2-DORIS-01",
+        "--gate",
+        "interaction",
+        "--input-key",
+        "42b7b9893bc8ef23929684ee974bd81535d4c57ca212cedaad427428978f82a1"
+      ],
+      "exitCode": 0,
+      "tests": 8,
+      "skipped": 0,
+      "diagnostic": false,
+      "hypothesis": null,
+      "inputsUnchanged": true,
+      "errorSignature": null,
+      "elapsedSeconds": 0.22334195900475606,
+      "inputKey": "42b7b9893bc8ef23929684ee974bd81535d4c57ca212cedaad427428978f82a1",
+      "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+      "policyKey": "72cd3cb51b28997ade016ce8672b15580de16da15b8483d3f57dfeaae69351d0",
+      "evidenceSha256": "0fd355350a893871fcb1124c23fe56cb0987870a89640455768f596a0cd80061",
+      "logPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/interaction.txt",
+      "sourceRun": "a0ab77c92a1b478599d05dff31da1989",
+      "sourceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "publishedLog": {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/interaction.txt",
+        "sha256": "0fd355350a893871fcb1124c23fe56cb0987870a89640455768f596a0cd80061",
+        "sizeBytes": 535,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/interaction.txt"
+      }
+    },
+    {
+      "gate": "m2-task-admission",
+      "status": "PASS",
+      "executionMode": "REUSED",
+      "sourceCommit": "c64477aff9b46aaad378dfbef3ef0f1c8ed486df",
+      "sourceRun": "676c669084f740229dc91f85e90138da",
+      "evidenceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "evidencePath": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/m2-task-admission.json",
+      "evidenceSha256": "9720dbf637e397fed9857627839b46b0a54475adf2bd212df88c4763a76a944d",
+      "inputKey": "c545c3660dd954fb340105ecb739cc952e9c06a79931e3f39856d34aab637b72",
+      "reason": "Immutable original success, identical input/environment/policy",
+      "qualificationCommand": "workflow.py verify --plan <current controlled plan> --reuse <index>"
+    },
+    {
+      "gate": "policy",
+      "status": "PASS",
+      "executionMode": "FRESH",
+      "qualificationMode": "FRESH",
+      "productProof": {},
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/verify.ps1"
+      ],
+      "exitCode": 0,
+      "tests": 0,
+      "skipped": 0,
+      "diagnostic": false,
+      "hypothesis": null,
+      "inputsUnchanged": true,
+      "errorSignature": null,
+      "elapsedSeconds": 8.520384417002788,
+      "inputKey": "ca622625f24a664af381589a8fdca2ad02671c5d055a3327a6506892d5f7496f",
+      "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+      "policyKey": "e406da2dce629e6816aa02f64331797efcd38f5039979da9bf0a409e4ca54b6e",
+      "evidenceSha256": "872f00193836293d4838c56753bbcd9f2951ee3c7dc95cad6502f9e8048f8ed6",
+      "logPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/policy.txt.raw.json",
+      "sourceRun": "a0ab77c92a1b478599d05dff31da1989",
+      "sourceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "publishedLog": {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/policy.txt",
+        "sha256": "872f00193836293d4838c56753bbcd9f2951ee3c7dc95cad6502f9e8048f8ed6",
+        "sizeBytes": 558,
+        "encoding": "base64",
+        "path": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/policy.txt.raw.json"
+      }
+    },
+    {
+      "gate": "smoke-adapter",
+      "status": "PASS",
+      "executionMode": "FRESH",
+      "qualificationMode": "FRESH",
+      "productProof": {},
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowSmoke.Tests.py"
+      ],
+      "exitCode": 0,
+      "tests": 14,
+      "skipped": 0,
+      "diagnostic": false,
+      "hypothesis": null,
+      "inputsUnchanged": true,
+      "errorSignature": null,
+      "elapsedSeconds": 0.23142833399469964,
+      "inputKey": "9d117942640f1886ba6af50d9f68cfef74d641251daece03f0646d5257e68aab",
+      "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+      "policyKey": "77a353f6406a64d8c1990f295bb6a1b264e0c0777207e7cba25a43936407e93e",
+      "evidenceSha256": "68daf98b21bed30b792bf94a4a4fa3fac4ba7fbb20a62041714fd46f229d4eda",
+      "logPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/smoke-adapter.txt",
+      "sourceRun": "a0ab77c92a1b478599d05dff31da1989",
+      "sourceCommit": "df7136651c3c99e99be11266babe0046e414ab0b",
+      "publishedLog": {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/smoke-adapter.txt",
+        "sha256": "68daf98b21bed30b792bf94a4a4fa3fac4ba7fbb20a62041714fd46f229d4eda",
+        "sizeBytes": 113,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/gates/a0ab77c92a1b478599d05dff31da1989/smoke-adapter.txt"
+      }
+    }
+  ]
+}

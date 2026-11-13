@@ -1,3 +1,5 @@
+> 最终交付：**READY_FOR_REVIEW / LOCAL_VALIDATION_PASS**。请以[一页交付状态](delivery-status.md)、[正式验证](validation.json)为准；下文保留阶段历史。
+
 # G4-M2-DORIS-01｜一页当前任务状态
 
 **IMPLEMENTATION_VALIDATED / FINAL_REVIEW_IN_PROGRESS**（2026-11-13）。同会话、`codex/g4-m2-doris-01`及原托管工作树；基线/main仍为`11595ecb6560f7ed6ceca54666d32b7afcae7f35`。
