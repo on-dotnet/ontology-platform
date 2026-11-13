@@ -183,3 +183,7 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 ## 2026-11-13 Oracle精确config限定跨域读取授权（追加）
 
 用户明确“允许”此前说明的限定读取：仅同一已授权config对象，允许跟随Registry返回的HTTPS重定向到`id55cllpgrte.compat.objectstorage.us-sanjose-1.oraclecloud.com`；签名URL仅内存、不保存输出、不向目标转发Registry Bearer token，仍核29,943字节和既定SHA256，禁止进一步跳转/镜像层/A–F实施。不接受Oracle许可、不更新main、不恢复TDengine。完成元数据核验与现有材料更新后停准入。
+
+## 2026-11-13 Oracle用户已下载镜像后的继续请求（追加）
+
+用户报告“下载完成了，同意，继续任务”。延续已约定的先核验本地精确镜像、继续准入工作；已执行只读身份/大小核对。本地展开12.178GiB超原拟12GiB，提出13GiB调整，并集中确认继续是否包含A–F条件实施；尚未收到明确答复时不将其写为全实施或许可接受，不启动容器/prepare/restore，不更新main或恢复TDengine。

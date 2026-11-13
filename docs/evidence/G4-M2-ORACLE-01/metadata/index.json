@@ -70,6 +70,20 @@
       "status": "PASS",
       "exitCode": 0,
       "output": "43 recorded responses866022bytes,33 original hashes; exact config29943/SHA/JSON/linux-arm64, manifest descriptor; one permitted hop/no token forwarding/layers; label23.26.0 separated from tag23.26.3.0; historyUNKNOWN retained upper895965; links/EOF/append-only/owned paths."
+    },
+    {
+      "name": "local-oracle-image-identity",
+      "command": "docker --context desktop-linux image inspect container-registry.oracle.com/database/free@sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8 --format <Id,RepoDigests,Architecture,Os,Size,RootFS.Layers,Descriptor>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Read-only Engine metadata: exact manifest/Descriptor4962/LinuxARM64 and29 diff_ids match frozen originals. Size13076125534 bytes=12.178GiB, exceeds proposed12GiB; proposal13GiB pending approval. Not a payload rehash/signature/vulnerability/runtime test; image retained, no container started."
+    },
+    {
+      "name": "local-image-evidence-check",
+      "command": "python3 /private/tmp/oracle-local-image-check.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Manifest/Descriptor/platform29 diff_ids match frozen metadata; Size13076125534 exceeds12GiB but fits proposed13GiB. Original33 bodies and historical responses unchanged, links/EOF/4-path/append-only PASS. Does not attest signatures/vulnerabilities/runtime or authorize implementation."
     }
   ],
   "ci": {
@@ -750,6 +764,74 @@
       "inputHead": "d9f22ae0c991b939ec757ec2a96bd862106660e5",
       "status": "PASS_METADATA_DOCUMENT_SCOPE_ONLY",
       "result": "Exact29943/SHA/JSON/linux-arm64/29diff_ids/manifest binding; old32 originals unchanged,33 total;43 records866022/upper895965/historyUNKNOWN retained; signed URLs redacted, fixed HTTPS host/443/no onward redirect/no Authorization forwarded; links/EOF/authorization/schema/diff-check PASS. INSTALL_FILE_1 identifies23.26.3 ARM64 RPM; label23.26.0 retained separately, runtime RU stillNOT_VERIFIED."
+    },
+    "localImageInspection20261113": {
+      "Id": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+      "RepoDigests": [
+        "container-registry.oracle.com/database/free@sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8"
+      ],
+      "Architecture": "arm64",
+      "Os": "linux",
+      "Size": 13076125534,
+      "RootFS.Layers": [
+        "sha256:6aa153a53a3c142a16582067c4497cd3fef05de67dead31ab46b684835464eb4",
+        "sha256:e243cb066a13674677a4702df0b361e506faf75e072fc377dfb1c1928f58b654",
+        "sha256:2e264e42a17f6727bd1d379bd83067419eb07d0c7275a39844e0d4f3ecaf461a",
+        "sha256:1eb624eaddc84763a3fc8bcd1e1873a8eb10937b9c9089a3bf80bf541c0be8ee",
+        "sha256:1245c54a35e6895223fc0f69a6f1ba9cd29f9a1cbba6961b2fc9da5f2edf5e48",
+        "sha256:658cde3367d01cae92739aa5c3c975444a8752415096f8724916e4a2a9b199bb",
+        "sha256:6051f7d952be8c4f40bdf09317ae2b58a2d1838621b38982a8cafa50607ae591",
+        "sha256:c752d77dd2986041669b1889b6b0f8c1b4f05407c9c96e5f2a0676ab6c994748",
+        "sha256:da43e53896cf8e90e7f6a06fdf6ea09d56b6c1e09da65cb436b0f7a25a3719f9",
+        "sha256:45eaa8decd1a432081396a62f78bf8057988b8ae6183ea88249606534770f0ae",
+        "sha256:9ab4f852da99b8adacdc2fa094927232e1070b0dfc33b370e429930fa148342c",
+        "sha256:98310e9501b921c9dcea73808842758c19d7d918a58fb3448a78917e20657a1b",
+        "sha256:fc7f262eaf1604f2a16dd3841a5f0bb565d6fa851c345eab099adea02506fa9e",
+        "sha256:27f113dd1bfe8a6886f8af72acb5714dba53e5573b3963bee93bac89323a9192",
+        "sha256:50ed70e4bbb4f17e767cbd3d0bdc0764edd9cae1323dd8ee9d1df244185e3002",
+        "sha256:8933675b25177437811b6a9a7c06b7b8736daba147cc1ad0eac7e9a36117701f",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+        "sha256:06673abaeb47348f753ead7b73c75b69533ebe2788db484ca5ba9bc8b4a58d9d",
+        "sha256:200cb8b6990f7f1d4a4c991373a68a36cdec501b71be0d5e5e31aab488226558",
+        "sha256:cade0810a4b3397fa4feed273aaaea2ed2a1f27314efed2c36275bcdbf27627e",
+        "sha256:314eee1c9d8e10b11a61e48c2ba88fb5c8b47eef2c9e8260984764ec961ccefb",
+        "sha256:5e05d5510517a31ddb89e8c69885a3db8ebcaa6d52ab398f3bcba0b017d70e79",
+        "sha256:f67aab4e1cf9c32c2b87d4bc581635197b1bca6a2638ebeef49de49d850044fd",
+        "sha256:5a1d0d3f9ab00e201709a2fcd0d1e9271bc005d89931e040c19bcb1089481a6a",
+        "sha256:67df92a4f7dee45ef2e9f886715135043a04b76fe465d587f940a5107daf7057",
+        "sha256:69401100c7342107bccee18a2b85dcf8f0ab5e1f466adee327fdc531b161b781",
+        "sha256:0613c2f06c35863679db4da89eb9698aac9f2d94a667a57380ebe174482b014e",
+        "sha256:d9ff288d9cb2b374d55c53137e104cc08cbd813965c04f3fcefe2648cd299dde",
+        "sha256:d718fa3adcc585d6cb37979838f5283a929883422fed7659103b2989fc7beccc"
+      ],
+      "Descriptor": {
+        "digest": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 4962
+      },
+      "time": "2026-11-13T08:11:36.358085+00:00",
+      "context": "desktop-linux",
+      "reference": "container-registry.oracle.com/database/free@sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+      "taskId": "G4-M2-ORACLE-01",
+      "runId": "P0-LOCAL-IMAGE-20261113-05",
+      "inspectionExitCode": 0,
+      "rootfsDiffIdsMatch": true,
+      "layerCount": 29,
+      "sizeGiB": 12.178090898320079,
+      "priorProposedImageLimitGiB": 12,
+      "imageLimitExceeded": true,
+      "configDigestFromVerifiedManifest": "sha256:dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b",
+      "localConfigDigestIndependentlyExposed": false,
+      "note": "Docker reports image Id as manifest digest on this store; do not equate Id to config digest. Platform,RepoDigests,Descriptor and29 RootFS diff_ids match frozen metadata. Engine metadata only, not filesystem content rehash or signature/vulnerability attestation.",
+      "lifecycle": "KEEP_USER_DOWNLOADED: user explicitly downloaded for this task; no deletion; retain pending admission/implementation, review only after task closure and reference checks."
+    },
+    "localImageCheckSource": "from pathlib import Path\nimport json,base64,hashlib,subprocess,re\nr=Path('docs/evidence/G4-M2-ORACLE-01');p=r/'metadata/index.json';v=json.loads(p.read_text());head='57514865aaff5fa233616e91ea15893740057709';old=json.loads(subprocess.check_output(['git','show',head+':'+str(p)]));assert v['metadata']['responses']==old['metadata']['responses']\nfor x in v['metadata']['responses']:\n if 'file' in x:\n  b=(p.parent/x['file']).read_bytes();b=base64.b64decode(b) if x.get('encoding')=='base64' else b;assert len(b)==x['bytes'] and hashlib.sha256(b).hexdigest()==x['sha256']\nc=json.loads((p.parent/'dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b.json').read_bytes());o=v['metadata']['localImageInspection20261113'];assert o['RootFS.Layers']==c['rootfs']['diff_ids'];assert o['Descriptor']=={'digest':'sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8','mediaType':'application/vnd.docker.distribution.manifest.v2+json','size':4962};assert o['Architecture']=='arm64' and o['Os']=='linux' and o['reference'] in o['RepoDigests'];assert 12*2**30<o['Size']==13076125534<13*2**30\nallow={str(p),str(r/'admission-request.md'),'docs/tasks/G4-M2-ORACLE-01.md','docs/tasks/current-authorization.md'};assert set(subprocess.check_output(['git','diff','--name-only',head],text=True).splitlines())<=allow\nfor name in ['docs/tasks/G4-M2-ORACLE-01.md',str(r/'admission-request.md')]:\n path=Path(name);b=path.read_bytes();assert b.endswith(b'\\n') and not b.endswith(b'\\n\\n') and b'\\r' not in b\n for link in re.findall(r'\\]\\(([^)]+)\\)',b.decode()):\n  if '://' not in link:assert (path.parent/link).exists()\np=Path('docs/tasks/current-authorization.md');assert p.read_bytes().startswith(subprocess.check_output(['git','show',head+':'+str(p)]))\nprint('PASS local identity evidence only: manifest/platform29 diff_ids match; 13076125534 bytes exceeds12GiB fits proposed13GiB; prior responses/33 originals preserved; links/EOF/4-path scope/append-only. Product and signatures NOT_RUN/NOT_VERIFIED.')\n",
+    "localImageCheckSourceSha256": "a1423fe46e759a61eff78d52eed0746e16b696730e823933c229d7b600d6a268",
+    "localImageIncrementReview": {
+      "reviewer": "/root/oracle_p0_review",
+      "inputHead": "57514865aaff5fa233616e91ea15893740057709",
+      "status": "PASS_DOCUMENT_IDENTITY_SCOPE_ONLY",
+      "result": "Recorded descriptor/repoDigest/platform29 diff_ids agree with frozen originals;12.178GiB conversion;33 original bodies and old traffic/failure records unchanged; links/EOF/schema/diff-check passed. Corrected outdated not-downloaded wording and clarified4GiB combined compressed-image/package budget inside40GiB peak. No new network/Docker execution by reviewer; runtime/signatures/vulnerability status unverified."
     }
   }
 }

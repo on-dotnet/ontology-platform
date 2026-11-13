@@ -2,7 +2,7 @@
 
 2026-11-13；Master单写。[唯一任务卡](../../tasks/G4-M2-ORACLE-01.md)。用户明确批准附件P0，附件中后续实施申请不是本轮许可。Base=`5113d0b9b233e307664c964ae9bf3c1d6b10adfb`，fetch后远端相符；最终完整Head和普通push回执随交付给出。下文“申请/拟议”均未实施。
 
-推荐唯一组合：**Oracle AI Database 26ai Free，23.26.3.0，Linux ARM64，单FREEPDB1；Oracle.ManagedDataAccess.Core 23.26.400；仓库net10.0**。官方完整容器为`container-registry.oracle.com/database/free:23.26.3.0-arm64`，冻结digest见A。存在官方原生ARM64发行，不需要预设购买Enterprise。匿名公开Bearer握手已取得tags/index/manifest，不需要用户提供账号。当前 **P0_READY_FOR_ADMISSION_REVIEW**：用户批准限定HTTPS源站跳转后，已成功取得精确config，实际29,943字节、SHA256与descriptor相符，JSON可解析并声明linux/arm64；元数据读取阻断解除。仅跟随一次已批准源站，签名地址仅内存、未转发Registry token、未继续跳转。此前失败/未知量保留，不追溯改写。产品未准入，载荷/服务/实现均未执行。已存在本机原生制品身份，不另铺替代版本、amd64仿真或第三方镜像路线。
+推荐唯一组合：**Oracle AI Database 26ai Free，23.26.3.0，Linux ARM64，单FREEPDB1；Oracle.ManagedDataAccess.Core 23.26.400；仓库net10.0**。官方完整容器为`container-registry.oracle.com/database/free:23.26.3.0-arm64`，冻结digest见A。存在官方原生ARM64发行，不需要预设购买Enterprise。匿名公开Bearer握手已取得tags/index/manifest，不需要用户提供账号。当前 **P0_READY_FOR_ADMISSION_REVIEW**：用户批准限定HTTPS源站跳转后，已成功取得精确config，实际29,943字节、SHA256与descriptor相符，JSON可解析并声明linux/arm64；元数据读取阻断解除。仅跟随一次已批准源站，签名地址仅内存、未转发Registry token、未继续跳转。此前失败/未知量保留，不追溯改写。产品未准入；用户已自行下载指定镜像，本轮Agent只做本地身份元数据核验，未启动服务或实施产品。已存在本机原生制品身份，不另铺替代版本、amd64仿真或第三方镜像路线。
 
 ## A｜精确版本、来源、许可和制品
 
@@ -12,9 +12,9 @@
 | 驱动平台 | 官方支持macOS ARM64≥14.7，23.26.0起支持.NET10，目标库19c及以后；仓库Directory.Build.props=net10.0，静态选net8资产 | 本机macOS27.0.1/ARM64已观测，运行NOT_RUN；未来客户19c/21c/23ai/26ai按各自精确RU/edition另验，不承诺兼容验收 |
 | 数据库发行身份锚点 | 官方页列`oracle-ai-database-free-26ai-23.26.3-1.el8.aarch64.rpm`，1,355,290,892 bytes，SHA256=`e1951c4a56eb8ef8cf5d325c90525be8ddb286486f6a318e8b4c4942e10eadbb` | RPM未获取/验签；此SHA不替代容器digest，也不授权RPM安装 |
 | ARM64部署 | 官方安装要求OL8.6+/UEK7、Neoverse N1能力（推荐Ampere）；Oracle容器README明确26ai Free ARM64支持。拟在现Linux ARM64 Docker VM运行 | Apple Silicon/Docker内核不是生产认证等价物；CPU指令/容器运行仍NOT_RUN，禁止自动amd64仿真 |
-| 官方容器 | `database/free:23.26.3.0-arm64`，index明确linux/arm64；29层压缩合计3,527,716,613 bytes≈3.285GiB | 本次受控跳转后config200/29,943字节与散列通过，声明linux/arm64；实际运行/组件/内核/补丁仍NOT_VERIFIED；镜像层请求为0 |
+| 官方容器 | `database/free:23.26.3.0-arm64`，index明确linux/arm64；29层压缩合计3,527,716,613 bytes≈3.285GiB | config200/29,943字节与散列通过；用户下载后，本地manifest/Descriptor/LinuxARM64/29diff_ids匹配。实际运行/组件/补丁/签名/漏洞仍NOT_VERIFIED；Agent镜像层请求为0 |
 
-容器取得前身份：多架构index SHA256=`f988b0c04c4c386cd306a2a914c0d7a9702d83acc31b064a28ad8eb6278a8fba`，其linux/arm64描述符引用的manifest SHA256=`844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8`（4,962 bytes），与实际保存正文SHA一致。config descriptor的mediaType=`application/vnd.docker.container.image.v1+json`、size=29,943、digest=`sha256:dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b`；它和29个layer descriptor严格区分。config已取得且正文长度/SHA256/JSON通过，architecture=arm64、os=linux、created=2026-07-08T22:01:39.411680312Z，rootfs.diff_ids数量29。labels为Oracle AI Database 26ai Free / release=Free / provider=Oracle，但version标签为23.26.0，与Registry tag23.26.3.0不同；同时config的INSTALL_FILE_1明确为`oracle-ai-database-free-26ai-23.26.3-1.el8.aarch64.rpm`，支持tag与声明构建输入的对应；标签可能表示基础版本，不能以此断言运行RU正确或错误。冻结制品以manifest/config digest为准，实际安装版本和RU须获批后检查，仍NOT_VERIFIED。下载时必须按arm64 manifest digest而非浮动标签；当前只申请后续取得，不执行。
+容器取得前身份：多架构index SHA256=`f988b0c04c4c386cd306a2a914c0d7a9702d83acc31b064a28ad8eb6278a8fba`，其linux/arm64描述符引用的manifest SHA256=`844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8`（4,962 bytes），与实际保存正文SHA一致。config descriptor的mediaType=`application/vnd.docker.container.image.v1+json`、size=29,943、digest=`sha256:dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b`；它和29个layer descriptor严格区分。config已取得且正文长度/SHA256/JSON通过，architecture=arm64、os=linux、created=2026-07-08T22:01:39.411680312Z，rootfs.diff_ids数量29。labels为Oracle AI Database 26ai Free / release=Free / provider=Oracle，但version标签为23.26.0，与Registry tag23.26.3.0不同；同时config的INSTALL_FILE_1明确为`oracle-ai-database-free-26ai-23.26.3-1.el8.aarch64.rpm`，支持tag与声明构建输入的对应；标签可能表示基础版本，不能以此断言运行RU正确或错误。冻结制品以manifest/config digest为准，实际安装版本和RU须获批后检查，仍NOT_VERIFIED。用户已按arm64 manifest digest取得本地镜像，Agent未下载镜像层；驱动依赖仍未取得，后续取得/运行须按准入裁决。
 
 驱动catalog公开SHA512(Base64)=`IBORVSidVfAxoWbeiD38CgRTNEHaAHT7GEfecUvDBdt8+PE0ZXlpspIK2tbZUp/NysPbbT638qpF2PAID/2cJg==`，仅为获取前锚点。目录含`.signature.p7s`不是验签通过；获取后才检签名链、原件散列、许可/组件和漏洞，未知不得写PASS。
 
@@ -88,7 +88,7 @@ TLS拟固定`oracle-source:2484/FREEPDB1`、`Tls=true`、TCPS；服务器目标�
 
 Oracle场景容器合计4 CPU/6GiB；宿主4GiB+VM上限15.63GiB+宿主保留10GiB≈29.63GiB≤32GiB（规划非实测峰值），总活跃预算8 CPU。出现旧任务并发/内存压力即错峰/停止，不改VM。启动前重新核可用量。
 
-分别预算：驱动5.66MB，Microsoft闭包压缩总量UNKNOWN（拟包下载合计≤128MiB）；Oracle29层压缩量3,527,716,613 bytes≈3.285GiB（manifest声明，未下载，拟≤4GiB）；展开/初始化UNKNOWN（拟镜像≤12GiB、源卷≤16GiB；官方安装至少10GB），合成用户数据≤256MiB包含在源卷内；平台卷≤2GiB、日志/证据≤1GiB、私有依赖/构建缓存增量≤4GiB。保守磁盘峰值≤40GiB含载荷保留和展开，未知不填0。共享缓存命中UNKNOWN，未验内容键不扣下载量；超过限额停申请，不掩盖超量。
+分别预算：驱动5.66MB，Microsoft闭包压缩总量UNKNOWN（拟包下载合计≤128MiB）；Oracle29层压缩量3,527,716,613 bytes≈3.285GiB（manifest声明；用户已下载，Agent未下载；与驱动包合计下载缓存≤4GiB）；镜像展开由Docker报告13,076,125,534 bytes≈12.178GiB（非APFS独占物理增量），超过原拟12GiB；申请镜像上限改为13GiB，未获批前不启动；初始化仍UNKNOWN、源卷拟≤16GiB（官方安装至少10GB），合成用户数据≤256MiB包含在源卷内；平台卷≤2GiB、日志/证据≤1GiB、私有依赖/构建缓存增量≤4GiB。保守磁盘峰值≤40GiB含载荷保留和展开，未知不填0。共享缓存命中UNKNOWN，未验内容键不扣下载量；超过限额停申请，不掩盖超量。
 
 内部仅TCPS2484、PG5432、OIDC8080；Oracle1521只容器内管理，不给adapter/host发布，禁5500/ORDS。source网internal，仅API/runner可达；必要调试仅127.0.0.1，API/Web候选5100/3000沿既有BFF回环规则，启用前核端口。证书/私钥/KEK/密码外置，不写明文Compose环境变量。前缀`ontology-g4-m2-oracle-01`，准确TaskId/RunId、卷ID/镜像digest/context/时间创建即记录；仅本任务关闭且无引用的合成资源按白名单before-command-exit-after及强后验回收，旧树/Doris卷/TDengine保护。
 
@@ -132,7 +132,7 @@ CatalogField只有Name/NativeType/Nullable/Ordinal/Precision/Scale，能保留NU
 
 用户随后明确“允许”此前提出的限定跳转读取。本次P0-CONFIG-REDIRECT-20261113-04再次核验manifest，使用正常TLS及临时匿名token向Registry请求同一精确对象；Registry跳转只允许HTTPS、精确源站`id55cllpgrte.compat.objectstorage.us-sanjose-1.oraclecloud.com`、无userinfo/fragment、默认443，不自动继续跳转。跨域请求不携Registry Authorization；签名路径/query仅内存，不保存/输出。最终HTTP200，正文29,943字节，SHA256=`dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b`，JSON对象解析成功，原字节保存在metadata同SHA名称的.json（保留上游无末尾LF，不格式化）。此成功仅证明精确公开config身份，不是镜像层下载、供应链/漏洞/运行验证或许可接受。
 
-仍需裁决：Oracle适用许可、后续精确制品取得与供应链/实际RU检查，以及A–F全部实施项；本次元数据授权不扩展这些范围。标签23.26.0与tag23.26.3.0差异列为后续实际补丁核验事项，不用标签猜测已安装版本，也不另开恢复任务。
+仍需裁决：Oracle适用许可、已下载Oracle镜像的后续供应链/实际RU检查及尚未取得的驱动依赖，以及A–F全部实施项；本次元数据授权不扩展这些范围。标签23.26.0与tag23.26.3.0差异列为后续实际补丁核验事项，不用标签猜测已安装版本，也不另开恢复任务。
 
 本次授权不接受Oracle许可、不批准A–F实施项。仍需集中裁决许可/载荷取得、精确依赖、TLS/权限/取消、ORACLE_READONLY、DTO/生命周期、资源和部署范围；产品实施继续未授权。
 
@@ -163,3 +163,15 @@ CI按需NOT_RUN；Mac宿主/LinuxARM64容器分列，Windows/x64/生产NOT_RUN�
 本次限定跳转读取的完整结果见索引configRedirectVerification20261113；当前状态以页首和唯一任务卡为准，以上历史失败/诊断回执保持其原时点语义。后续仍停准入，不实施A–F、不更新main、不恢复TDengine。
 
 本次04精确config成功增量已获同一非作者Reviewer只读复核通过；长度/散列/JSON/ARM64/manifest绑定、原件不变、跳转与token边界、流量核算、链接/EOF/schema/diff-check通过。config声明INSTALL_FILE_1与23.26.3 ARM64 RPM对应，仍不替代实际RU/产品验收。
+
+## 用户下载镜像后的只读准入增量（P0-LOCAL-IMAGE-20261113-05）
+
+用户报告“下载完成了，同意，继续任务”。按上一轮约定先核验本地镜像，不将此笼统表述自动扩大成全部A–F/许可批准；已集中确认是否包括条件实施及下列预算调整。用户未答复前仍停准入。
+
+本轮正常权限只读`docker --context desktop-linux image inspect`：RepoDigests与Descriptor均为冻结ARM64 manifest `sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8`，descriptor size=4962，platform=linux/arm64；29个RootFS diff_ids与已验证config逐项同序一致。当前Docker store的Id也返回manifest digest，不能把它误当config digest或据此声称config身份错误；本地独立config digest未暴露，映射依据已有验证manifest/config原件。此为Engine公开元数据核验，不是逐层载荷重算、签名验证、漏洞扫描、数据库运行或实际RU证明。`docker ps`为空，Agent未启动容器。
+
+展开大小13,076,125,534 bytes（12.178GiB）超过原申请12GiB，现提出**镜像上限13GiB**；总磁盘峰值≤40GiB暂不变（13镜像+4下载缓存（包含Oracle压缩层及≤128MiB驱动依赖，不另加）+16源卷+2平台卷+1证据+4私有构建缓存=40GiB），实际启动前还需重新确认剩余空间/共享缓存，不能将共享层/名义Size当独占磁盘。此调整待用户明确批准，不倒写已批准。
+
+用户取得的唯一镜像作为任务资源KEEP，准确引用与公开身份/时间见索引`localImageInspection20261113`；供本任务后续准入/实施，不清理用户镜像、不碰旧资源。保留条件解除需任务关闭、引用/数据归属复核及明确回收范围。本轮无下载流量；用户下载的实际网络字节未知，不能用manifest压缩总量冒充实际网络计费。
+
+本次本地镜像增量经非作者只读复核，身份/层标识/大小及33原件历史不变核对通过。已修正旧“未下载”措辞，并明确4GiB下载缓存包含驱动包；身份元数据核验、文档链接/EOF/范围、证据schema和diff-check通过，运行/安全验证及实施授权仍未通过或未执行。
