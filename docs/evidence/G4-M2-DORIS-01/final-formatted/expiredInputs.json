@@ -1,0 +1,101 @@
+{
+  "inputs": {
+    "buildBinding": {
+      "receiptSha256": "a5bac47addb85cd3270898019d5a555ba86742bcc1b65a9c178fe8d2c364435e",
+      "inputKey": "cefe95905d305d764a27b977abb6c10fb75b4c823de27eded8e5357ef5de16c2",
+      "outputKey": "b4cbee3a8ae45fdc450e6eddbf9d664d9e101e2eca4db09d5cb5232fd236a914"
+    },
+    "drivers": {
+      "scripts/maintenance/workflow_doris_fixture.py": "2e39af479e53b513e1d4df17805e79b620953ab2f1d9166f90984d57c71f99de",
+      "scripts/maintenance/workflow-doris.mjs": "fbf75a9cd00eda2e03a4c1355f3a6c2822b293f4415047dc48fa1e5a8ed2483c",
+      "scripts/maintenance/doris-fixture-control.cs.txt": "353e2a99aee33dc967dd4282a6fc25cba23efc8e185f71d6280a86424df98f19",
+      "scripts/maintenance/workflow_m2_doris.py": "fe35c8e590b9f507e9ce54b2613ff687051de6776f5239f3b1cb3fccd760d8db",
+      "scripts/maintenance/workflow_m2_web.py": "151c75db94eead4787a421bc8b19bf0fdc68ffb89da50af7dbe1659088e47377",
+      "scripts/maintenance/workflow_m2_fixture.py": "043b733082781aa7a7d6762cb712e840bd4148d27ae9d798a5b7b501825af88a",
+      "scripts/maintenance/workflow_m2_smoke.py": "8e486ee8f0a99784c580cbd9f71b2413f0fe4066b8a2e691a066fd27af58bd83",
+      "scripts/maintenance/workflow_m2_build.py": "19a81e7889472792d6ee7285215f42335ef3fda0cb4ed057f1de5da3e5e0d5e7",
+      "scripts/maintenance/workflow_smoke.py": "5ac6b9b230c1f2d4f44b7fc38cfac15a6bfdc7a81d998eb387c37ea554873c68",
+      "scripts/maintenance/workflow_execution.py": "eb21a6e92a3e5dc732d6ff957f184ef9f1236b6291de7ee6adf950399c450fd1",
+      "scripts/maintenance/workflow_environment.py": "7fa77e80de2501e06ed8836544a9e94baadcba71c5640132205f413d5ef8d073",
+      "scripts/maintenance/workflow_web_cache.py": "a090d01ac0373e4449f4abde33803582666582f9a96e4914bcae596724e83389",
+      "scripts/maintenance/workflow.py": "72afde84a56834f77c3d2f86d942dbc37bae7a86954b6cfa0461582f9a55453b",
+      "scripts/maintenance/workflow-m2-web.mjs": "4865a0d755eda53eaf579b2b04a506fb80cf3e941c2573f155389de42f846141",
+      "scripts/maintenance/workflow_m2_evidence.py": "b3f44ecb5bc96ee120bd155d2d64e89ca0e565ba5420566a0733c453393fac4c",
+      "scripts/maintenance/workflow_evidence.py": "270076ea05bc5e1c63c81536325d6544b3250dd94d06cf0bc9729a30188ea328",
+      "experiments/g4-m2-web-01/https-fixture.mjs": "523838ced9f476b053eca72c40ddd57da35f59da6bfd3d7224e00e47ae345562"
+    }
+  },
+  "inputFingerprint": "af7f68634ba216e55addf0cd24457829e18622219ef2deb6719bfcab6cc7adeb",
+  "executionReceipts": {
+    "restored-product-probe": {
+      "classification": "SUCCESS",
+      "commandId": "eee32d20e0144302b692114002a8f77c",
+      "commandSummary": {
+        "argumentCount": 8,
+        "executable": "dotnet",
+        "sha256": "89a2d88efe68a695b020777163c971e32fdcd87aa14706e67f79bef11edf4c03"
+      },
+      "cwd": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform",
+      "deadlineSeconds": 20,
+      "elapsedSeconds": 1.6459739170095418,
+      "endedAtUtc": "2026-11-13T04:01:31.513970+00:00",
+      "environmentFingerprint": "local-retained-fe",
+      "exitCode": 0,
+      "identity": "823cbe7eef9bb6ae33da27680819f419493cd18387815e8ca49a90a63d5ba991",
+      "inputFingerprint": "af7f68634ba216e55addf0cd24457829e18622219ef2deb6719bfcab6cc7adeb",
+      "parentId": "7d28ee8748084d7f8c74b30a59cb196f",
+      "runId": "tls-expired-f39164d081c7",
+      "schemaVersion": 2,
+      "signal": null,
+      "stage": "restored-product-probe",
+      "started": true,
+      "startedAtUtc": "2026-11-13T04:01:29.867983+00:00",
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/artifacts/workflow/G4-M2-DORIS-01/commands/tls-expired-f39164d081c7/eee32d20e0144302b692114002a8f77c/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/artifacts/workflow/G4-M2-DORIS-01/commands/tls-expired-f39164d081c7/eee32d20e0144302b692114002a8f77c/stdout.txt",
+        "sha256": "7ee9854be5ad9ad12ad5159a44f172bad9bf0db510de8453e61c7257df9cf035",
+        "sizeBytes": 351
+      },
+      "taskId": "G4-M2-DORIS-01"
+    },
+    "expired-rejection": {
+      "classification": "SUCCESS",
+      "commandId": "6ad5115ff71942608aa5a84d7644605f",
+      "commandSummary": {
+        "argumentCount": 8,
+        "executable": "dotnet",
+        "sha256": "b1255471d48451887ca2c6c485fbbf51bdb9e4de20105c035c39f7b11130fcb1"
+      },
+      "cwd": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform",
+      "deadlineSeconds": 20,
+      "elapsedSeconds": 0.3579275840020273,
+      "endedAtUtc": "2026-11-13T04:01:14.358529+00:00",
+      "environmentFingerprint": "local-retained-fe",
+      "exitCode": 0,
+      "identity": "f0807b1620c934159d3d26d2cda99a6aeb39ee3e2978cde423285d0f00c563a4",
+      "inputFingerprint": "af7f68634ba216e55addf0cd24457829e18622219ef2deb6719bfcab6cc7adeb",
+      "parentId": "7d28ee8748084d7f8c74b30a59cb196f",
+      "runId": "tls-expired-f39164d081c7",
+      "schemaVersion": 2,
+      "signal": null,
+      "stage": "expired-rejection",
+      "started": true,
+      "startedAtUtc": "2026-11-13T04:01:14.000608+00:00",
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/artifacts/workflow/G4-M2-DORIS-01/commands/tls-expired-f39164d081c7/6ad5115ff71942608aa5a84d7644605f/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/artifacts/workflow/G4-M2-DORIS-01/commands/tls-expired-f39164d081c7/6ad5115ff71942608aa5a84d7644605f/stdout.txt",
+        "sha256": "d560a33a0c8c84820eb6e38f6d2103927fc22dec5fce9f09ca2568f4ce0aab09",
+        "sizeBytes": 348
+      },
+      "taskId": "G4-M2-DORIS-01"
+    }
+  }
+}

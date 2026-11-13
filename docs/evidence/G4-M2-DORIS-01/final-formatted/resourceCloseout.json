@@ -1,0 +1,90 @@
+{
+  "taskId": "G4-M2-DORIS-01",
+  "resources": [
+    {
+      "kind": "container",
+      "id": "f33d4b88e7574e193be32070597357a5937453e6cae4bacba8ee27aa7eaac940",
+      "runId": "probe-format-20261113",
+      "beforeExists": true,
+      "beforeRunning": true,
+      "beforeSha256": "e6ced7fb1db3dcd7429e4ec53dad61ca628a5380c6bc05d5bd0d3ec1aa1d1df8",
+      "status": "PASS",
+      "stopExitCode": 0,
+      "deleteExitCode": 0,
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "de209373bf23aad9fd77848da2d61a499bb3ce9fa4a011d07e427fb0ae93cea6",
+      "runId": "probe-format-20261113",
+      "beforeExists": true,
+      "beforeRunning": true,
+      "beforeSha256": "3398d5e78da7bdb8e39719c81e0c7294c62de60a99a9ff6e04eac8776dcda286",
+      "status": "PASS",
+      "stopExitCode": 0,
+      "deleteExitCode": 0,
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "g4-m2-doris-01-probe_doris",
+      "beforeExists": true,
+      "status": "PASS",
+      "deleteExitCode": 0,
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "g4-m2-doris-01-probe_local-entry",
+      "beforeExists": true,
+      "status": "PASS",
+      "deleteExitCode": 0,
+      "afterAbsent": true
+    }
+  ],
+  "retained": [
+    {
+      "kind": "volume",
+      "id": "g4-m2-doris-01-probe_be-data",
+      "decision": "KEEP",
+      "reason": "Unique synthetic Doris metadata/data linked to original runtime; preserve through review",
+      "releaseCondition": "Final review accepted and exact reference recheck before scoped removal"
+    },
+    {
+      "kind": "volume",
+      "id": "g4-m2-doris-01-probe_be-log",
+      "decision": "KEEP",
+      "reason": "Unique synthetic Doris metadata/data linked to original runtime; preserve through review",
+      "releaseCondition": "Final review accepted and exact reference recheck before scoped removal"
+    },
+    {
+      "kind": "volume",
+      "id": "g4-m2-doris-01-probe_fe-data",
+      "decision": "KEEP",
+      "reason": "Unique synthetic Doris metadata/data linked to original runtime; preserve through review",
+      "releaseCondition": "Final review accepted and exact reference recheck before scoped removal"
+    },
+    {
+      "kind": "volume",
+      "id": "g4-m2-doris-01-probe_fe-log",
+      "decision": "KEEP",
+      "reason": "Unique synthetic Doris metadata/data linked to original runtime; preserve through review",
+      "releaseCondition": "Final review accepted and exact reference recheck before scoped removal"
+    },
+    {
+      "kind": "private-runtime",
+      "id": "artifacts/workflow/G4-M2-DORIS-01/probe-format-20261113",
+      "decision": "KEEP",
+      "reason": "Private original credentials/certificates and diagnostic originals; never packaged",
+      "releaseCondition": "Final review accepted and no replay requirement"
+    },
+    {
+      "kind": "worktree",
+      "id": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform",
+      "decision": "KEEP",
+      "reason": "Unmerged task branch and current user-authorized continuation",
+      "releaseCondition": "Explicit integration/disposal authorization"
+    }
+  ],
+  "status": "PASS"
+}
