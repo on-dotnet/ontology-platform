@@ -84,6 +84,48 @@
       "status": "PASS",
       "exitCode": 0,
       "output": "Manifest/Descriptor/platform29 diff_ids match frozen metadata; Size13076125534 exceeds12GiB but fits proposed13GiB. Original33 bodies and historical responses unchanged, links/EOF/4-path/append-only PASS. Does not attest signatures/vulnerabilities/runtime or authorize implementation."
+    },
+    {
+      "name": "oracle-host-tests",
+      "command": "python3 -B scripts/tests/HostContinuity.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": ".............\n----------------------------------------------------------------------\nRan 13 tests in 0.069s\n\nOK\n{\"status\": \"NOT_VERIFIED\"}\n{\"policyContinuouslyReady\": false, \"sleep\": {\"confirmedSleepMs\": 0, \"status\": \"OBSERVED_LOG_WINDOW\"}}\n{\"policyContinuouslyReady\": true, \"sleep\": {\"confirmedSleepMs\": 1000, \"status\": \"OBSERVED_LOG_WINDOW\"}}\n{\"policyContinuouslyReady\": true, \"sleep\": {\"confirmedSleepMs\": null, \"status\": \"NOT_VERIFIED\"}}\n"
+    },
+    {
+      "name": "oracle-environment-tests",
+      "command": "python3 -B scripts/tests/WorkflowEnvironment.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": ".......\n----------------------------------------------------------------------\nRan 7 tests in 0.057s\n\nOK\n"
+    },
+    {
+      "name": "oracle-web-cache-tests",
+      "command": "python3 -B scripts/tests/WorkflowM2Web.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "..............\n----------------------------------------------------------------------\nRan 14 tests in 0.054s\n\nOK\n"
+    },
+    {
+      "name": "doris-structure-regression",
+      "command": "python3 -B scripts/tests/WorkflowDoris.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "......\n----------------------------------------------------------------------\nRan 6 tests in 0.014s\n\nOK\n"
+    },
+    {
+      "name": "delivery-regression",
+      "command": "python3 -B scripts/tests/WorkflowDelivery.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": ".............\n----------------------------------------------------------------------\nRan 13 tests in 5.515s\n\nOK\n"
+    },
+    {
+      "name": "implementation-originals-schema-review",
+      "command": "本轮原件/历史前缀/授权追加/Python AST/文档链接检查；test-review-evidence.ps1；git diff --check",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "65响应原件长度/SHA核对，43历史记录/33历史原件不变，授权追加/AST/链接/EOF通过，schema通过，独立Review允许阶段提交；服务仍BLOCKED_SECURITY_ADMISSION。"
     }
   ],
   "ci": {
@@ -639,6 +681,270 @@
         "file": "dbd385a383e229ba349c103d779932a9fb24c7f92c762b5fe0420e59a1be347b.json",
         "encoding": "raw",
         "referencedByManifest": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8"
+      },
+      {
+        "url": "https://api.nuget.org/v3/registration5-semver1/system.collections.immutable/10.0.13.json",
+        "time": "2026-11-13T08:19:44.716132+00:00",
+        "status": 200,
+        "bytes": 810,
+        "sha256": "f5c9b299f37a444f9ef414ff879fc0699b379266dab5b923206951483df99e69",
+        "file": "f5c9b299f37a444f9ef414ff879fc0699b379266dab5b923206951483df99e69.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/catalog0/data/2026.10.13.17.37.48/system.collections.immutable.10.0.13.json",
+        "time": "2026-11-13T08:19:46.648968+00:00",
+        "status": 200,
+        "bytes": 13119,
+        "sha256": "e583887970cec5d5dcb6d774eddae820363c74cd241640d617737ed1c1909e4e",
+        "file": "e583887970cec5d5dcb6d774eddae820363c74cd241640d617737ed1c1909e4e.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/registration5-semver1/system.diagnostics.performancecounter/10.0.13.json",
+        "time": "2026-11-13T08:19:48.303757+00:00",
+        "status": 200,
+        "bytes": 855,
+        "sha256": "57bca67721f4359e122d3be744699b006b61a989a89b7c8f846387ce980e98ed",
+        "file": "57bca67721f4359e122d3be744699b006b61a989a89b7c8f846387ce980e98ed.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/catalog0/data/2026.10.13.17.42.01/system.diagnostics.performancecounter.10.0.13.json",
+        "time": "2026-11-13T08:19:49.778683+00:00",
+        "status": 200,
+        "bytes": 16350,
+        "sha256": "1a9b1a9da92787d3bfc1ecf8c65d0e5087a4d6bbf2e9a68f677a3754d7321200",
+        "file": "1a9b1a9da92787d3bfc1ecf8c65d0e5087a4d6bbf2e9a68f677a3754d7321200.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/registration5-semver1/system.directoryservices.protocols/10.0.13.json",
+        "time": "2026-11-13T08:19:52.290795+00:00",
+        "status": 200,
+        "bytes": 840,
+        "sha256": "04a479e4ae1df469d4900e7bf15ad1add5e8970d7ac3749d34b5bc7e948583ea",
+        "file": "04a479e4ae1df469d4900e7bf15ad1add5e8970d7ac3749d34b5bc7e948583ea.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/catalog0/data/2026.10.13.17.54.44/system.directoryservices.protocols.10.0.13.json",
+        "time": "2026-11-13T08:19:53.524499+00:00",
+        "status": 200,
+        "bytes": 18600,
+        "sha256": "5479085716031c75aed00ac15139fa47c2eefcbff244cb23c28fe4f5f6703809",
+        "file": "5479085716031c75aed00ac15139fa47c2eefcbff244cb23c28fe4f5f6703809.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/registration5-semver1/system.formats.asn1/10.0.13.json",
+        "time": "2026-11-13T08:19:56.578614+00:00",
+        "status": 200,
+        "bytes": 764,
+        "sha256": "ba1a98adb5d510a0d3ddac2872e02c4182eb164ae2a69072f931226a784ab312",
+        "file": "ba1a98adb5d510a0d3ddac2872e02c4182eb164ae2a69072f931226a784ab312.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/catalog0/data/2026.10.13.17.13.55/system.formats.asn1.10.0.13.json",
+        "time": "2026-11-13T08:19:57.685392+00:00",
+        "status": 200,
+        "bytes": 11756,
+        "sha256": "095b62a48ce770d624ab9e7ca336484bf84c5366bb14fef57e879f8b8d6d4706",
+        "file": "095b62a48ce770d624ab9e7ca336484bf84c5366bb14fef57e879f8b8d6d4706.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/registration5-semver1/system.security.cryptography.pkcs/10.0.13.json",
+        "time": "2026-11-13T08:19:59.588630+00:00",
+        "status": 200,
+        "bytes": 834,
+        "sha256": "f41fa9eb70a91dd29bb8164a8d7282c01579e9e4098bed2e11257458affd0742",
+        "file": "f41fa9eb70a91dd29bb8164a8d7282c01579e9e4098bed2e11257458affd0742.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/catalog0/data/2026.10.13.17.11.32/system.security.cryptography.pkcs.10.0.13.json",
+        "time": "2026-11-13T08:20:01.520023+00:00",
+        "status": 200,
+        "bytes": 20204,
+        "sha256": "062a2a047e28fb1b9445e2e780cb8f84d6964e4edc120a09b975cf35b9c4ccf2",
+        "file": "062a2a047e28fb1b9445e2e780cb8f84d6964e4edc120a09b975cf35b9c4ccf2.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/registration5-semver1/system.text.json/10.0.13.json",
+        "time": "2026-11-13T08:20:02.905503+00:00",
+        "status": 200,
+        "bytes": 749,
+        "sha256": "7fef5f8103bcae6814fa45d5644531f56f40abcb7547950df522ea34e06e0bb3",
+        "file": "7fef5f8103bcae6814fa45d5644531f56f40abcb7547950df522ea34e06e0bb3.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/catalog0/data/2026.10.13.17.23.09/system.text.json.10.0.13.json",
+        "time": "2026-11-13T08:20:04.803571+00:00",
+        "status": 200,
+        "bytes": 36659,
+        "sha256": "1a623a21e543662b7d48eaab508bd6d67098d90d1ee04232626187affbad712f",
+        "file": "1a623a21e543662b7d48eaab508bd6d67098d90d1ee04232626187affbad712f.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/registration5-semver1/system.memory/4.6.3.json",
+        "time": "2026-11-13T08:20:06.549183+00:00",
+        "status": 200,
+        "bytes": 727,
+        "sha256": "36802f24e54cb3cb35218ec1572298728b234ea14acc64be331003948db506d1",
+        "file": "36802f24e54cb3cb35218ec1572298728b234ea14acc64be331003948db506d1.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/catalog0/data/2026.04.10.00.14.09/system.memory.4.6.3.json",
+        "time": "2026-11-13T08:20:07.684990+00:00",
+        "status": 200,
+        "bytes": 9083,
+        "sha256": "bf9a26237884dfafbab7ca500cb179f715351e26ea19b62ff383789c22171f4b",
+        "file": "bf9a26237884dfafbab7ca500cb179f715351e26ea19b62ff383789c22171f4b.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/registration5-semver1/system.configuration.configurationmanager/10.0.13.json",
+        "time": "2026-11-13T08:20:08.950419+00:00",
+        "status": 200,
+        "bytes": 875,
+        "sha256": "2fbe5ca78e6fbd7735230bda840bd13c2497f273bca82e4ae36fef74056d0584",
+        "file": "2fbe5ca78e6fbd7735230bda840bd13c2497f273bca82e4ae36fef74056d0584.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/catalog0/data/2026.10.13.17.23.09/system.configuration.configurationmanager.10.0.13.json",
+        "time": "2026-11-13T08:20:10.409412+00:00",
+        "status": 200,
+        "bytes": 15120,
+        "sha256": "54e9dddc159effbfc855a1dd46e2548ad6e8fca045c96fab778a7d6e4307f31c",
+        "file": "54e9dddc159effbfc855a1dd46e2548ad6e8fca045c96fab778a7d6e4307f31c.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/registration5-semver1/system.diagnostics.eventlog/10.0.13.json",
+        "time": "2026-11-13T08:20:12.125021+00:00",
+        "status": 200,
+        "bytes": 804,
+        "sha256": "ce887b150929eb4e48b32f1458b5e1111e1553a2c787e367a2cf3fcc83f0c8f4",
+        "file": "ce887b150929eb4e48b32f1458b5e1111e1553a2c787e367a2cf3fcc83f0c8f4.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/catalog0/data/2026.10.13.17.32.53/system.diagnostics.eventlog.10.0.13.json",
+        "time": "2026-11-13T08:20:13.355427+00:00",
+        "status": 200,
+        "bytes": 15639,
+        "sha256": "cea63b470b19fb46baf640d80bc16e3a9d74556ad6afd16565f3b905d2e09ef4",
+        "file": "cea63b470b19fb46baf640d80bc16e3a9d74556ad6afd16565f3b905d2e09ef4.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/registration5-semver1/system.security.cryptography.protecteddata/10.0.13.json",
+        "time": "2026-11-13T08:20:14.262640+00:00",
+        "status": 200,
+        "bytes": 879,
+        "sha256": "a2fc39b72957f02128a921518d07a6dcd124f5fc4a33ea4284cc37d986f0fa1b",
+        "file": "a2fc39b72957f02128a921518d07a6dcd124f5fc4a33ea4284cc37d986f0fa1b.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://api.nuget.org/v3/catalog0/data/2026.10.13.17.21.55/system.security.cryptography.protecteddata.10.0.13.json",
+        "time": "2026-11-13T08:20:15.901109+00:00",
+        "status": 200,
+        "bytes": 14681,
+        "sha256": "17dee24b6ff572e0b98c7fbafc7a2bf2b367158669d45a51c5e34c8e1a9c08cb",
+        "file": "17dee24b6ff572e0b98c7fbafc7a2bf2b367158669d45a51c5e34c8e1a9c08cb.b64",
+        "location": null,
+        "contentType": "application/json",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://www.oracle.com/security-alerts/cpuoct2026.html",
+        "time": "2026-11-13T08:28:26.312750+00:00",
+        "status": 200,
+        "bytes": 618399,
+        "sha256": "82bee66a886ddbf52738c06c0720909ec2c658a59c0d6b94d462980df94168ac",
+        "file": "82bee66a886ddbf52738c06c0720909ec2c658a59c0d6b94d462980df94168ac.b64",
+        "location": null,
+        "contentType": "text/html; charset=UTF-8",
+        "digest": null,
+        "encoding": "base64"
+      },
+      {
+        "url": "https://www.oracle.com/security-alerts/cpuoct2026verbose.html",
+        "time": "2026-11-13T08:28:33.322030+00:00",
+        "status": 200,
+        "bytes": 1334251,
+        "sha256": "ec2bd667ea233f38e0c7e1d20aa15fa8f8d9e0d83842e24a47d72c6abb2ee812",
+        "file": "ec2bd667ea233f38e0c7e1d20aa15fa8f8d9e0d83842e24a47d72c6abb2ee812.b64",
+        "location": null,
+        "contentType": "text/html; charset=UTF-8",
+        "digest": null,
+        "encoding": "base64"
       }
     ],
     "approvalBlocks": [
@@ -832,6 +1138,641 @@
       "inputHead": "57514865aaff5fa233616e91ea15893740057709",
       "status": "PASS_DOCUMENT_IDENTITY_SCOPE_ONLY",
       "result": "Recorded descriptor/repoDigest/platform29 diff_ids agree with frozen originals;12.178GiB conversion;33 original bodies and old traffic/failure records unchanged; links/EOF/schema/diff-check passed. Corrected outdated not-downloaded wording and clarified4GiB combined compressed-image/package budget inside40GiB peak. No new network/Docker execution by reviewer; runtime/signatures/vulnerability status unverified."
+    },
+    "oracleDependencyCatalog20261113": [
+      {
+        "id": "System.Collections.Immutable",
+        "version": "10.0.13",
+        "packageSize": 795160,
+        "packageHash": "BDjn4cl3QEWm5drGNNob3x8aXHjv960OscQRMzqwKwihZvudgPfJKfkqYJj4/O/Nr7ll02zl8iwBwswyiX5AHg==",
+        "packageHashAlgorithm": "SHA512",
+        "licenseExpression": "MIT",
+        "requireLicenseAcceptance": null
+      },
+      {
+        "id": "System.Diagnostics.PerformanceCounter",
+        "version": "10.0.13",
+        "packageSize": 437855,
+        "packageHash": "zz2pVir8sWGc4UBqlqaLB06rDXqs75MFh4JQKzSdk6ED/2utBAOeAvK5zkZI4ifWTDus6mANBgeaTXKfT+jl4Q==",
+        "packageHashAlgorithm": "SHA512",
+        "licenseExpression": "MIT",
+        "requireLicenseAcceptance": null
+      },
+      {
+        "id": "System.DirectoryServices.Protocols",
+        "version": "10.0.13",
+        "packageSize": 988423,
+        "packageHash": "Kxk1HC33KFt+Fh+66XkSQTp4xMZrvnzMNEw4rYJwPQPqM82K+/c6VXABNgsoUoRzCoVUkSvtcrkJ83XImWHYpA==",
+        "packageHashAlgorithm": "SHA512",
+        "licenseExpression": "MIT",
+        "requireLicenseAcceptance": null
+      },
+      {
+        "id": "System.Formats.Asn1",
+        "version": "10.0.13",
+        "packageSize": 365282,
+        "packageHash": "na+FEZkXFdEiPp1JVRZ7pXqIqE/WgeSnCKDXXK2KX+hRJ0YmLnYGOmkv9msBAgh0GUqlCOlcgkPK7Uy27G7xvw==",
+        "packageHashAlgorithm": "SHA512",
+        "licenseExpression": "MIT",
+        "requireLicenseAcceptance": null
+      },
+      {
+        "id": "System.Security.Cryptography.Pkcs",
+        "version": "10.0.13",
+        "packageSize": 1147618,
+        "packageHash": "KH692n1QlH41LGLCit1xASxg9QEky9VY8NODv6gzV/eUHFXVTvRDLJyssMGaMxS9WfIXyJnSLgxeI8P8+ddLig==",
+        "packageHashAlgorithm": "SHA512",
+        "licenseExpression": "MIT",
+        "requireLicenseAcceptance": null
+      },
+      {
+        "id": "System.Text.Json",
+        "version": "10.0.13",
+        "packageSize": 2223245,
+        "packageHash": "6tOpmh8ULBurJZ3/aD5KJC8MutjHO5a9jApthIPYWrmk+0GYv90M9u9SG6lJ1/VJrRCUC6EmOZkApKL+qHfGnA==",
+        "packageHashAlgorithm": "SHA512",
+        "licenseExpression": "MIT",
+        "requireLicenseAcceptance": null
+      },
+      {
+        "id": "System.Memory",
+        "version": "4.6.3",
+        "packageSize": 192935,
+        "packageHash": "NXcNYlWoXe5cz9sb8Huo6x2dCZVYkhwKtgE00n/MoI8V4ZI/7/t+EI5bOhQFlZfFjjqM8+U6prjU/aARt7H/tA==",
+        "packageHashAlgorithm": "SHA512",
+        "licenseExpression": "MIT",
+        "requireLicenseAcceptance": true
+      },
+      {
+        "id": "System.Configuration.ConfigurationManager",
+        "version": "10.0.13",
+        "packageSize": 986776,
+        "packageHash": "gqNalhV+r6PqmAhYK1U2wzgvVzriP1XM3ib4Tx8wc73TQNA2yrKIbh5rm7r9UeXKgNpo45+pBz3Ay4FQF0MLfQ==",
+        "packageHashAlgorithm": "SHA512",
+        "licenseExpression": "MIT",
+        "requireLicenseAcceptance": null
+      },
+      {
+        "id": "System.Diagnostics.EventLog",
+        "version": "10.0.13",
+        "packageSize": 546769,
+        "packageHash": "DwAONGl3vt0DZ4Wu9lfveTpQAaZ9op44sgzO4SbgJmEr5Qe+Ml7FcCZuoywrO/BOA2Obce7F6DEHaOhdbIR/9A==",
+        "packageHashAlgorithm": "SHA512",
+        "licenseExpression": "MIT",
+        "requireLicenseAcceptance": null
+      },
+      {
+        "id": "System.Security.Cryptography.ProtectedData",
+        "version": "10.0.13",
+        "packageSize": 154163,
+        "packageHash": "FvE5JY5jBIf8v/4kwCp3wJY0bOoe/mZ8nH0Gj1I0uT7uK+WTtMSOsoJR8TM2NyJ27uTN9o0npdb5SE3TbvZ2hg==",
+        "packageHashAlgorithm": "SHA512",
+        "licenseExpression": "MIT",
+        "requireLicenseAcceptance": null
+      }
+    ],
+    "implementationAdmission20261113": {
+      "authorization": "用户明确批准A–F条件实施及13GiB镜像展开，总峰值40GiB",
+      "taskId": "G4-M2-ORACLE-01",
+      "runId": "IMPLEMENTATION-20261113-01",
+      "reviewer": "/root/oracle_p0_review",
+      "acquisitionReview": "非作者已复核20份registration/catalog、全部11包长度/SHA512与13,499,230bytes总量；允许精确获取。专用离线NuGet验签11包成功。安全启动门禁独立阻断。",
+      "packageBytes": 13499230,
+      "packageLimitBytes": 134217728,
+      "systemMemoryLicenseAcceptanceFlag": true,
+      "interactiveLicenseAcceptance": "NOT_RUN",
+      "hostPreflight": {
+        "acPower": true,
+        "architecture": "arm64",
+        "assertions": {
+          "PreventSystemSleep": 0,
+          "PreventUserIdleDisplaySleep": 1,
+          "PreventUserIdleSystemSleep": 1
+        },
+        "assurance": "POLICY_READY",
+        "displays": {
+          "externalDisplayCount": 0,
+          "externalDisplaysAsleep": null,
+          "status": "OBSERVED"
+        },
+        "lockDisplayTrial": "NOT_VERIFIED",
+        "os": "Darwin",
+        "pid": 93376,
+        "policy": {
+          "displaysleep": 10,
+          "sleep": 0
+        },
+        "schemaVersion": 1,
+        "screenLocked": false,
+        "sessionContinuity": "NOT_VERIFIED",
+        "taskId": "G4-M2-ORACLE-01",
+        "utc": "2026-11-13T08:18:59.930567+00:00"
+      },
+      "hostMonitor": {
+        "displayOff": "NOT_VERIFIED",
+        "endedAtUtc": "2026-11-13T08:19:30.092765+00:00",
+        "heartbeatCount": 7,
+        "lockedDisplayOffHeartbeatCount": 0,
+        "lockedHeartbeatCount": 0,
+        "maxHeartbeatGapMs": 5076,
+        "measuredElapsedMs": 30062,
+        "ownerPid": 93381,
+        "policyContinuouslyReady": true,
+        "schemaVersion": 1,
+        "sessionContinuity": "NOT_VERIFIED",
+        "sleep": {
+          "confirmedSleepMs": 0,
+          "events": [],
+          "limitation": "只计日志可确认的Sleep至Wake/DarkWake区间；无事件不证明未知窗口从未睡眠。",
+          "status": "OBSERVED_LOG_WINDOW"
+        },
+        "startedAtUtc": "2026-11-13T08:19:00.030756+00:00",
+        "stoppedBySignal": false,
+        "taskId": "G4-M2-ORACLE-01"
+      },
+      "oracleDriver": {
+        "taskId": "G4-M2-ORACLE-01",
+        "utc": "2026-11-13T08:20:39.635271+00:00",
+        "url": "https://api.nuget.org/v3-flatcontainer/oracle.manageddataaccess.core/23.26.400/oracle.manageddataaccess.core.23.26.400.nupkg",
+        "bytes": 5661004,
+        "sha256": "5d1909cf043118c4e5d9cc01ad0db2916a6026a3c2243c507dc36f9536a43ec4",
+        "sha512": "IBORVSidVfAxoWbeiD38CgRTNEHaAHT7GEfecUvDBdt8+PE0ZXlpspIK2tbZUp/NysPbbT638qpF2PAID/2cJg==",
+        "archiveEntries": 13,
+        "signaturePresent": true,
+        "signatureVerification": "NOT_VERIFIED",
+        "vulnerabilities": "NOT_VERIFIED",
+        "installation": "NOT_RUN"
+      },
+      "microsoftPackages": [
+        {
+          "id": "System.Collections.Immutable",
+          "version": "10.0.13",
+          "url": "https://api.nuget.org/v3-flatcontainer/system.collections.immutable/10.0.13/system.collections.immutable.10.0.13.nupkg",
+          "bytes": 795160,
+          "sha256": "74c7c3ab2dcce3385482c7504bacfb0ba051aefaae0be7e09c1297b894f80616",
+          "sha512": "BDjn4cl3QEWm5drGNNob3x8aXHjv960OscQRMzqwKwihZvudgPfJKfkqYJj4/O/Nr7ll02zl8iwBwswyiX5AHg==",
+          "signatureVerification": "NOT_VERIFIED"
+        },
+        {
+          "id": "System.Diagnostics.PerformanceCounter",
+          "version": "10.0.13",
+          "url": "https://api.nuget.org/v3-flatcontainer/system.diagnostics.performancecounter/10.0.13/system.diagnostics.performancecounter.10.0.13.nupkg",
+          "bytes": 437855,
+          "sha256": "822301327d095f7262c0de211880c691a7f55ef9b98ca3e7898e616c0cbc6c2c",
+          "sha512": "zz2pVir8sWGc4UBqlqaLB06rDXqs75MFh4JQKzSdk6ED/2utBAOeAvK5zkZI4ifWTDus6mANBgeaTXKfT+jl4Q==",
+          "signatureVerification": "NOT_VERIFIED"
+        },
+        {
+          "id": "System.DirectoryServices.Protocols",
+          "version": "10.0.13",
+          "url": "https://api.nuget.org/v3-flatcontainer/system.directoryservices.protocols/10.0.13/system.directoryservices.protocols.10.0.13.nupkg",
+          "bytes": 988423,
+          "sha256": "a47c34052bfb6c8cbd212dc61e95dd835a57c7543ac830e89b94caf50bcffe18",
+          "sha512": "Kxk1HC33KFt+Fh+66XkSQTp4xMZrvnzMNEw4rYJwPQPqM82K+/c6VXABNgsoUoRzCoVUkSvtcrkJ83XImWHYpA==",
+          "signatureVerification": "NOT_VERIFIED"
+        },
+        {
+          "id": "System.Formats.Asn1",
+          "version": "10.0.13",
+          "url": "https://api.nuget.org/v3-flatcontainer/system.formats.asn1/10.0.13/system.formats.asn1.10.0.13.nupkg",
+          "bytes": 365282,
+          "sha256": "783c54a6ef9d259b5665c649a6cc34d7bcbf9305e5a33e385993ef5f2ff568ba",
+          "sha512": "na+FEZkXFdEiPp1JVRZ7pXqIqE/WgeSnCKDXXK2KX+hRJ0YmLnYGOmkv9msBAgh0GUqlCOlcgkPK7Uy27G7xvw==",
+          "signatureVerification": "NOT_VERIFIED"
+        },
+        {
+          "id": "System.Security.Cryptography.Pkcs",
+          "version": "10.0.13",
+          "url": "https://api.nuget.org/v3-flatcontainer/system.security.cryptography.pkcs/10.0.13/system.security.cryptography.pkcs.10.0.13.nupkg",
+          "bytes": 1147618,
+          "sha256": "54ed24578ead34b5b50d259084243432f11733e2754b8b196e799d3418d304a7",
+          "sha512": "KH692n1QlH41LGLCit1xASxg9QEky9VY8NODv6gzV/eUHFXVTvRDLJyssMGaMxS9WfIXyJnSLgxeI8P8+ddLig==",
+          "signatureVerification": "NOT_VERIFIED"
+        },
+        {
+          "id": "System.Text.Json",
+          "version": "10.0.13",
+          "url": "https://api.nuget.org/v3-flatcontainer/system.text.json/10.0.13/system.text.json.10.0.13.nupkg",
+          "bytes": 2223245,
+          "sha256": "c36743c19c6e9d3e1f9ea8b38f724487b9fb8a959be53c621c9cc8ae93ba0b93",
+          "sha512": "6tOpmh8ULBurJZ3/aD5KJC8MutjHO5a9jApthIPYWrmk+0GYv90M9u9SG6lJ1/VJrRCUC6EmOZkApKL+qHfGnA==",
+          "signatureVerification": "NOT_VERIFIED"
+        },
+        {
+          "id": "System.Memory",
+          "version": "4.6.3",
+          "url": "https://api.nuget.org/v3-flatcontainer/system.memory/4.6.3/system.memory.4.6.3.nupkg",
+          "bytes": 192935,
+          "sha256": "26078aeb758c9ae985e8bf851f973026061da6a5eb4837204d0c2d2204c72955",
+          "sha512": "NXcNYlWoXe5cz9sb8Huo6x2dCZVYkhwKtgE00n/MoI8V4ZI/7/t+EI5bOhQFlZfFjjqM8+U6prjU/aARt7H/tA==",
+          "signatureVerification": "NOT_VERIFIED"
+        },
+        {
+          "id": "System.Configuration.ConfigurationManager",
+          "version": "10.0.13",
+          "url": "https://api.nuget.org/v3-flatcontainer/system.configuration.configurationmanager/10.0.13/system.configuration.configurationmanager.10.0.13.nupkg",
+          "bytes": 986776,
+          "sha256": "db736c19b833841cbcb46597310b023b5f627c9b3e1ee82ceaaa5c323d64718d",
+          "sha512": "gqNalhV+r6PqmAhYK1U2wzgvVzriP1XM3ib4Tx8wc73TQNA2yrKIbh5rm7r9UeXKgNpo45+pBz3Ay4FQF0MLfQ==",
+          "signatureVerification": "NOT_VERIFIED"
+        },
+        {
+          "id": "System.Diagnostics.EventLog",
+          "version": "10.0.13",
+          "url": "https://api.nuget.org/v3-flatcontainer/system.diagnostics.eventlog/10.0.13/system.diagnostics.eventlog.10.0.13.nupkg",
+          "bytes": 546769,
+          "sha256": "0f9acf5968cd1cdac7c8e82a5d4f2aa254d8cce29ccd912bf8129850ee444fc9",
+          "sha512": "DwAONGl3vt0DZ4Wu9lfveTpQAaZ9op44sgzO4SbgJmEr5Qe+Ml7FcCZuoywrO/BOA2Obce7F6DEHaOhdbIR/9A==",
+          "signatureVerification": "NOT_VERIFIED"
+        },
+        {
+          "id": "System.Security.Cryptography.ProtectedData",
+          "version": "10.0.13",
+          "url": "https://api.nuget.org/v3-flatcontainer/system.security.cryptography.protecteddata/10.0.13/system.security.cryptography.protecteddata.10.0.13.nupkg",
+          "bytes": 154163,
+          "sha256": "b0b44ace8b5decc129b96dcc6281c7ea238975dd18493f525f0dd2a04da98d6d",
+          "sha512": "FvE5JY5jBIf8v/4kwCp3wJY0bOoe/mZ8nH0Gj1I0uT7uK+WTtMSOsoJR8TM2NyJ27uTN9o0npdb5SE3TbvZ2hg==",
+          "signatureVerification": "NOT_VERIFIED"
+        }
+      ],
+      "genericCmsDiagnostic": {
+        "exitCode": 4,
+        "reason": "unsuitable certificate purpose: OpenSSL default S/MIME purpose does not verify NuGet code signing; not a NuGet signature result",
+        "nugetSignature": "NOT_VERIFIED"
+      },
+      "publicScripts": {
+        "oracle-package-metadata.py": {
+          "sha256": "154806d5013fe9cb5c4b92e2a888746ba769b289c1d8fd27287c34dcb4a0a602",
+          "source": "import urllib.request, urllib.error, json, base64, hashlib, datetime\nfrom pathlib import Path\nfrom urllib.parse import urlsplit\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform')\nfolder=root/'docs/evidence/G4-M2-ORACLE-01/metadata'\nindex=folder/'index.json'\ndata=json.loads(index.read_text())\nrows=data['metadata']['responses']\ntotal=sum(x['bytes'] for x in rows if isinstance(x.get('bytes'),int))+29943\nclass NoRedirect(urllib.request.HTTPRedirectHandler):\n def redirect_request(self,*args,**kwargs):return None\nopener=urllib.request.build_opener(NoRedirect)\npackages=['system.collections.immutable','system.diagnostics.performancecounter','system.directoryservices.protocols','system.formats.asn1','system.security.cryptography.pkcs','system.text.json','system.memory','system.configuration.configurationmanager','system.diagnostics.eventlog','system.security.cryptography.protecteddata']\nresults=[]\ndef get(url):\n global total\n u=urlsplit(url)\n assert u.scheme=='https' and u.netloc=='api.nuget.org' and not u.query and not u.fragment and not u.username\n try: response=opener.open(urllib.request.Request(url,headers={'Accept':'application/json'}),timeout=25)\n except urllib.error.HTTPError as e:response=e\n with response:\n  body=response.read(8*1024*1024+1)\n  total+=len(body)\n  assert len(body)<=8*1024*1024 and total<=64*1024*1024\n  digest=hashlib.sha256(body).hexdigest(); name=digest+'.b64'\n  target=folder/name\n  if not target.exists():target.write_bytes(base64.b64encode(body)+b'\\n')\n  rows.append(dict(url=url,time=datetime.datetime.now(datetime.timezone.utc).isoformat(),status=response.status,bytes=len(body),sha256=digest,file=name,location=None,contentType=response.headers.get('Content-Type'),digest=None,encoding='base64'))\n  index.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\\n')\n  assert response.status==200, 'HTTP_'+str(response.status)\n  return json.loads(body)\nfor package in packages:\n version='4.6.3' if package=='system.memory' else '10.0.13'\n reg=get(f'https://api.nuget.org/v3/registration5-semver1/{package}/{version}.json')\n catalog=get(reg['catalogEntry'])\n assert catalog['id'].lower()==package and catalog['version']==version\n results.append({k:catalog.get(k) for k in ['id','version','packageSize','packageHash','packageHashAlgorithm','licenseExpression','requireLicenseAcceptance']})\ndata['metadata']['oracleDependencyCatalog20261113']=results\nindex.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\\n')\nprint(json.dumps({'packages':results,'aggregatePackageBytes':sum(x['packageSize'] for x in results),'responseCount':len(rows),'conservativeBodyBytes':total}))\n"
+        },
+        "oracle-driver-acquire.py": {
+          "sha256": "9e33c31e38efe0b7e4a335382759c7c18b88e19b1817e7cdb71b44cee4a1ebc8",
+          "source": "from pathlib import Path\nimport urllib.request,urllib.error,hashlib,base64,json,datetime,zipfile,io\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform')\ncache=root/'artifacts/workflow/G4-M2-ORACLE-01/artifact-cache'\ncache.mkdir(parents=True,exist_ok=True,mode=0o700)\ntarget=cache/'oracle.manageddataaccess.core.23.26.400.nupkg'\nassert not target.exists()\nurl='https://api.nuget.org/v3-flatcontainer/oracle.manageddataaccess.core/23.26.400/oracle.manageddataaccess.core.23.26.400.nupkg'\nclass NoRedirect(urllib.request.HTTPRedirectHandler):\n def redirect_request(self,*args,**kwargs):return None\nopener=urllib.request.build_opener(NoRedirect)\ntry:\n with opener.open(url,timeout=30) as response:\n  body=response.read(5661005)\n  assert response.status==200\n assert len(body)==5661004\n digest=base64.b64encode(hashlib.sha512(body).digest()).decode()\n assert digest=='IBORVSidVfAxoWbeiD38CgRTNEHaAHT7GEfecUvDBdt8+PE0ZXlpspIK2tbZUp/NysPbbT638qpF2PAID/2cJg=='\n with zipfile.ZipFile(io.BytesIO(body)) as z:\n  entries=z.infolist()\n  assert sum(x.file_size for x in entries)<128*1024*1024\n  assert all(not x.filename.startswith('/') and '..' not in Path(x.filename).parts and '\\\\' not in x.filename for x in entries)\n  names=[x.filename for x in entries]\n  assert '.signature.p7s' in names\n target.write_bytes(body)\n receipt=dict(taskId='G4-M2-ORACLE-01',utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),url=url,bytes=len(body),sha256=hashlib.sha256(body).hexdigest(),sha512=digest,archiveEntries=len(names),signaturePresent=True,signatureVerification='NOT_VERIFIED',vulnerabilities='NOT_VERIFIED',installation='NOT_RUN')\n (cache/'oracle-driver-receipt.json').write_text(json.dumps(receipt,indent=2)+'\\n')\n print(json.dumps(receipt))\nexcept urllib.error.HTTPError as e:\n print(json.dumps(dict(status='FAIL',httpStatus=e.code,bodyBytesRead=0,redirectFollowed=False)))\n raise SystemExit(2)\n"
+        },
+        "oracle-dependencies-acquire.py": {
+          "sha256": "16c99480a7cadc31bdf2b2724721ca750b461dce76a61f49154c1437150e460d",
+          "source": "from pathlib import Path\nimport urllib.request,urllib.error,hashlib,base64,json,datetime,zipfile,io\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform')\ncache=root/'artifacts/workflow/G4-M2-ORACLE-01/artifact-cache'\nrows=json.loads((root/'docs/evidence/G4-M2-ORACLE-01/metadata/index.json').read_text())['metadata']['oracleDependencyCatalog20261113']\nassert len(rows)==10 and sum(x['packageSize'] for x in rows)+5661004<128*1024*1024\nclass NoRedirect(urllib.request.HTTPRedirectHandler):\n def redirect_request(self,*args,**kwargs):return None\nopener=urllib.request.build_opener(NoRedirect);results=[]\nfor row in rows:\n name=row['id'].lower();version=row['version'];filename=f'{name}.{version}.nupkg'\n target=cache/filename;assert not target.exists()\n url=f'https://api.nuget.org/v3-flatcontainer/{name}/{version}/{filename}'\n try:\n  with opener.open(url,timeout=30) as response:\n   body=response.read(row['packageSize']+1)\n   assert response.status==200\n except urllib.error.HTTPError as e:\n  print(json.dumps(dict(status='FAIL',httpStatus=e.code,bodyBytesRead=0,redirectFollowed=False)))\n  raise SystemExit(2)\n assert len(body)==row['packageSize'] and base64.b64encode(hashlib.sha512(body).digest()).decode()==row['packageHash']\n with zipfile.ZipFile(io.BytesIO(body)) as z:\n  assert sum(x.file_size for x in z.infolist())<128*1024*1024\n  assert z.testzip() is None\n  assert all(not x.filename.startswith('/') and '..' not in Path(x.filename).parts and '\\\\' not in x.filename for x in z.infolist())\n target.write_bytes(body)\n results.append(dict(id=row['id'],version=version,url=url,bytes=len(body),sha256=hashlib.sha256(body).hexdigest(),sha512=row['packageHash'],signatureVerification='NOT_VERIFIED'))\n (cache/'microsoft-receipt.json').write_text(json.dumps(results,indent=2)+'\\n')\nprint(json.dumps(dict(packages=len(results),bytes=sum(x['bytes'] for x in results),identity='PASS',installed=False)))\n"
+        },
+        "oracle-sdk-diagnostic.py": {
+          "sha256": "d6cf62a331c322cff10c6f5cde58520b565a3f486f0a9052533b294d822f20f7",
+          "source": "import sys,json\nfrom pathlib import Path\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform')\nsys.path.insert(0,str(root/'scripts/maintenance'))\nimport workflow_environment as e\nimport workflow_execution as x\nfrom execution_preflight import FailureState\nhome=root/'artifacts/workflow/G4-M2-ORACLE-01/environment/e250e301cd705f060f68976e87361720a2a786e50dabe212b8770b6073161305'\n_,projects,_=e.locks(root);env=e.environment(home);env['PYTHONPATH']=str(root/'.tools/pythonlibs')\ncommand=['/usr/local/share/dotnet/dotnet','--version']\nr=x.run(e.offline(command,root,home,projects),root,task='G4-M2-ORACLE-01',stage='sdk-short-diagnostic',environment=env,timeout=15,diagnostic=True,input_key=home.name)\nprint(json.dumps(dict(exitCode=r.returncode,output=r.stdout.decode().strip(),hypothesis='Normal approved host permission permits nested offline sandbox; previous restricted permission denied sandbox_apply',receipt=r.receipt)))\nassert r.returncode==0 and r.stdout.decode().strip()=='10.0.402'\npath=root/'artifacts/workflow/G4-M2-ORACLE-01/failures/158f6332612bc0755e0ee21f9eb3f271c9cf932412ebe7bcc442deaf5d1f010b.json'\nrow=json.loads(path.read_text())['failures'][0]\n# 同一版本命令/环境的短诊断已成功，只解除这一准确失败状态；原始失败回执仍保留。\nwith FailureState(path,row['inputFingerprint'],row['testBuildId'],row['testBuildVersion']) as state:\n state.record('short',0)\n"
+        },
+        "oracle-nuget-verify.py": {
+          "sha256": "d62dd4fa32e16853c36d0c24872bf80ad0a664d091e44d25f5822e45e22a7155",
+          "source": "from pathlib import Path\nimport sys,json\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform');sys.path.insert(0,str(root/'scripts/maintenance'))\nimport workflow_environment as e\nimport workflow_execution as x\nreceipt=json.loads((root/'artifacts/workflow/G4-M2-ORACLE-01/implementation-01/prepare-web-admitted.log').read_text())\nassert receipt['status']=='DEPENDENCIES_READY' and receipt['taskId']=='G4-M2-ORACLE-01'\nhome=Path(receipt['environmentDirectory']);_,projects,_=e.locks(root)\ncache=root/'artifacts/workflow/G4-M2-ORACLE-01/artifact-cache'\npackages=sorted(p for p in cache.glob('*.nupkg') if not p.name.startswith('mysqlconnector.'))\nassert len(packages)==11\ncmd=[receipt['dotnet'],'nuget','verify',*[str(p) for p in packages],'--all','--verbosity','normal']\nr=x.run(e.offline(cmd,root,home,projects),root,task='G4-M2-ORACLE-01',stage='nuget-signature-verification',environment=receipt['environment'],timeout=120,input_key=receipt['contentKey'])\n(root/'artifacts/workflow/G4-M2-ORACLE-01/implementation-01/nuget-verify.log').write_bytes(r.stdout+r.stderr)\nprint(json.dumps(dict(exitCode=r.returncode,receipt=r.receipt)))\nraise SystemExit(r.returncode)\n"
+        },
+        "oracle-static-inventory.py": {
+          "sha256": "f9a63bf6ab67ad54716a57ae4f696fa635b9d4294936454b98a9f2f4f38647ad",
+          "source": "from pathlib import Path\nimport subprocess,json,hashlib,datetime,tarfile,io,os,selectors,time\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform')\nout=root/'artifacts/workflow/G4-M2-ORACLE-01/implementation-01/static-inventory';out.mkdir(mode=0o700,exist_ok=True)\ndocker=['docker','--context','desktop-linux'];task='G4-M2-ORACLE-01';run='STATIC-INVENTORY-20261113-01'\nref='container-registry.oracle.com/database/free@sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8'\nstate=dict(taskId=task,runId=run,utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),image=ref,started=False,status='IN_PROGRESS',events=[])\ndef save(): (out/'receipt.json').write_text(json.dumps(state,indent=2)+'\\n')\ndef call(args):\n r=subprocess.run(docker+args,capture_output=True,timeout=30)\n state['events'].append(dict(action=args[0],exitCode=r.returncode));save()\n if r.returncode:raise RuntimeError('DOCKER_'+args[0]+'_FAILED')\n return r.stdout\ndef backend():return json.loads(call(['info','--format','{{json .}}']))\ndef identity():\n b=backend();return {'ID':b['ID'],'ServerVersion':b['ServerVersion']}\nbefore=identity();state['backend']=before;save();cid=None\ntry:\n cid=call(['create','--pull=never','--name','g4-m2-oracle-01-static-inventory-20261113-01','--label','taskId='+task,'--label','runId='+run,'--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges:true','--memory','128m','--cpus','0.5','--entrypoint','/bin/true',ref]).decode().strip()\n assert len(cid)==64 and all(c in '0123456789abcdef' for c in cid)\n state['containerId']=cid;save()\n def checked():\n  r=json.loads(call(['inspect',cid]))[0]\n  assert r['Id']==cid and r['Config']['Labels']['taskId']==task and r['Config']['Labels']['runId']==run\n  assert r['State']['Status']=='created' and not r['State']['Running'] and not r['Mounts']\n  assert r['HostConfig']['NetworkMode']=='none' and r['HostConfig']['ReadonlyRootfs']\n  return {'id':r['Id'],'status':r['State']['Status'],'running':r['State']['Running'],'mounts':r['Mounts']}\n state['beforeRead']=checked();save()\n path='/opt/oracle/product/26ai/dbhomeFree/inventory/ContentsXML/comps.xml'\n p=subprocess.Popen(docker+['cp',cid+':'+path,'-'],stdout=subprocess.PIPE,stderr=subprocess.PIPE)\n body=bytearray();sel=selectors.DefaultSelector();sel.register(p.stdout,selectors.EVENT_READ);deadline=time.monotonic()+30\n try:\n  while True:\n   remaining=deadline-time.monotonic()\n   if remaining<=0:raise RuntimeError('READ_TIMEOUT')\n   ready=sel.select(min(remaining,1))\n   if not ready:continue\n   b=os.read(p.stdout.fileno(),min(65536,8*1024*1024+1-len(body)))\n   if not b:break\n   body.extend(b)\n   if len(body)>8*1024*1024:raise RuntimeError('BODY_LIMIT')\n  code=p.wait(timeout=5)\n  assert code==0,'CP_FAILED'\n finally:\n  sel.close()\n  if p.poll() is None:p.kill();p.wait(timeout=5)\n  p.stdout.close();p.stderr.close()\n with tarfile.open(fileobj=io.BytesIO(body),mode='r:') as tar:\n  members=tar.getmembers();assert len(members)==1 and members[0].isfile() and members[0].name=='comps.xml'\n  raw=tar.extractfile(members[0]).read();assert len(raw)<=8*1024*1024\n  (out/'comps.xml').write_bytes(raw)\n state['inventory']=dict(path=path,tarBytes=len(body),bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest());state['status']='STATIC_READ_COMPLETE';save()\nfinally:\n if cid:\n  assert identity()==before,'ENGINE_CHANGED'\n  state['beforeRemoval']=checked();save()\n  call(['rm',cid])\n  r=subprocess.run(docker+['inspect',cid],capture_output=True,timeout=15)\n  assert r.returncode!=0 and ('No such object: '+cid).encode() in r.stderr\n  assert identity()==before\n  state['cleanup']=dict(exitCode=0,inspectExitCode=r.returncode,exactIdAbsent=True,started=False);save()\nprint(json.dumps(state))\n"
+        },
+        "oracle-security-metadata.py": {
+          "sha256": "9fc16e11d03a2f882a485ff147d8ca5471652a0a83e5642b62b9c129b3f0036d",
+          "source": "import urllib.request, urllib.error, json, base64, hashlib, datetime\nfrom pathlib import Path\nroot=Path('/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform')\nfolder=root/'docs/evidence/G4-M2-ORACLE-01/metadata';index=folder/'index.json'\ndata=json.loads(index.read_text());rows=data['metadata']['responses']\nclass NoRedirect(urllib.request.HTTPRedirectHandler):\n def redirect_request(self,*args,**kwargs):return None\nopener=urllib.request.build_opener(NoRedirect)\nfor url in ['https://www.oracle.com/security-alerts/cpuoct2026.html','https://www.oracle.com/security-alerts/cpuoct2026verbose.html']:\n try: response=opener.open(url,timeout=25)\n except urllib.error.HTTPError as e:response=e\n with response:\n  body=response.read(8*1024*1024+1)\n  assert len(body)<=8*1024*1024\n  assert sum(r['bytes'] for r in rows if isinstance(r.get('bytes'),int))+29943+len(body)<=64*1024*1024\n  sha=hashlib.sha256(body).hexdigest();target=folder/(sha+'.b64')\n  if not target.exists():target.write_bytes(base64.b64encode(body)+b'\\n')\n  rows.append(dict(url=url,time=datetime.datetime.now(datetime.timezone.utc).isoformat(),status=response.status,bytes=len(body),sha256=sha,file=target.name,location=None,contentType=response.headers.get('Content-Type'),digest=None,encoding='base64'))\n  index.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\\n')\n  assert response.status==200\n  print(json.dumps(dict(url=url,status=response.status,bytes=len(body),sha256=sha)))\n"
+        }
+      },
+      "oracle-host-tests": {
+        "sha256": "4a93be01b1ca018edf3726ea6ad33ececc9f2bc0d367d93b6765e9d532899f1c",
+        "tests": 13
+      },
+      "oracle-environment-tests": {
+        "sha256": "df3fed384cac67d52cee63c88989bfbd434c1c8298f05e0cbf12e192bb4074a1",
+        "tests": 7
+      },
+      "oracle-web-cache-tests": {
+        "sha256": "f2198f2cde05061e1fbe3bafb0f4155df9472c299f457c4e1f506eeb26692402",
+        "tests": 14
+      },
+      "metadataBodyAccounting": {
+        "responses": 65,
+        "knownBytes": 2998020,
+        "historicalUnknownResponseMaximum": 29943,
+        "conservativeMaximum": 3027963,
+        "payloadBytesSeparate": 13499230,
+        "localInventoryBytesSeparate": 388458
+      },
+      "prepare": {
+        "schemaVersion": 1,
+        "taskId": "G4-M2-ORACLE-01",
+        "status": "DEPENDENCIES_READY",
+        "contentKey": "e250e301cd705f060f68976e87361720a2a786e50dabe212b8770b6073161305",
+        "workspaceKey": "1fa6cfdabaa53a5785bd67f446aca3f7a5d1cf341b952cbf1ee9c80b7fb91941",
+        "worktree": "/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform",
+        "environmentDirectory": "/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/environment/e250e301cd705f060f68976e87361720a2a786e50dabe212b8770b6073161305",
+        "runDirectory": "/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/environment/e250e301cd705f060f68976e87361720a2a786e50dabe212b8770b6073161305/runs/1aa684e606344602bfcd2a1a18e0983a",
+        "packages": 169,
+        "projects": 21,
+        "downloads": 0,
+        "sdkDownloads": 0,
+        "materializedFiles": 0,
+        "restoreCount": 0,
+        "assets": [
+          {
+            "project": "backend/src/Contracts/OntologyPlatform.Contracts/OntologyPlatform.Contracts.csproj",
+            "assetsSha256": "45dab8fbd480a31f0dee37d0030f0699e467e948da4d75bb3fca448a1768d99e"
+          },
+          {
+            "project": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/OntologyPlatform.Modules.Agents.csproj",
+            "assetsSha256": "5ee892cafc86888ba334b7b97d5402e94559e0247e8867b93d8627fcfada06cb"
+          },
+          {
+            "project": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/OntologyPlatform.Modules.SemanticQuery.csproj",
+            "assetsSha256": "2e3358df3f0612028813316c1f240af07ada1975162208a32d051f7c6f22d4f3"
+          },
+          {
+            "project": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OntologyPlatform.Modules.Publishing.csproj",
+            "assetsSha256": "455922380d53dc405cb504cadd6bbfbdb42d71c4010c95ba2704b29148746cc9"
+          },
+          {
+            "project": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/OntologyPlatform.Modules.Publishing.Domain.csproj",
+            "assetsSha256": "e1d1664cc7e996da3566167022dc2f3e2510f9959b789cbbae48737ef680bd49"
+          },
+          {
+            "project": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyPlatform.Modules.Ontology.csproj",
+            "assetsSha256": "e43de273c4b0f36e44457a0c020153345f231ab4ec2886bb6d726e5ca4a20d42"
+          },
+          {
+            "project": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/OntologyPlatform.Modules.Ontology.Domain.csproj",
+            "assetsSha256": "b314d5c08152186c15ffdbe13f4135060f936393f23386fd4d90942675cd48b2"
+          },
+          {
+            "project": "backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj",
+            "assetsSha256": "7cf322274ae0d7d6eae97b31c0d7e845b7945ab32cf4b90a92d6ef4cb08bf148"
+          },
+          {
+            "project": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/OntologyPlatform.Modules.Governance.csproj",
+            "assetsSha256": "317e0eddc503c0c81dd2bd61d860bf520ea3e8bd20b78d43e3fa053dfc25b26c"
+          },
+          {
+            "project": "backend/src/AppHost/OntologyPlatform.AppHost.csproj",
+            "assetsSha256": "2996d9781c03343adb5c8de90853f7dc735c9f2bf0eed4c4a1eeb151cd9171f1"
+          },
+          {
+            "project": "backend/src/ServiceDefaults/OntologyPlatform.ServiceDefaults.csproj",
+            "assetsSha256": "ed9f7c4bc34bdf294ec4af4faf15f96aff3a3ca0917155309ab4f85f74c8ca02"
+          },
+          {
+            "project": "backend/src/Hosts/OntologyPlatform.InfrastructureApi/OntologyPlatform.InfrastructureApi.csproj",
+            "assetsSha256": "8b7cfc976a0aed13ab85a66ce39c8e8cd1886ba2d32478dea5639ea515b4e80b"
+          },
+          {
+            "project": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/OntologyPlatform.Modules.Connections.csproj",
+            "assetsSha256": "d5d289273b26070f0815543418e677950cd92d80cc8072870327143f9b913e3b"
+          },
+          {
+            "project": "backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj",
+            "assetsSha256": "72f55b56a7167b145bbc708af445e8ea0c0c5d9e640930e86885c8d9f50762d2"
+          },
+          {
+            "project": "backend/tests/OntologyPlatform.AgentTests/OntologyPlatform.AgentTests.csproj",
+            "assetsSha256": "e8387c72d1b0f796a86196e2efc9b4e5b721395e7b97b0a36c251fa9883b1705"
+          },
+          {
+            "project": "backend/tests/OntologyPlatform.ConnectionsTests/OntologyPlatform.ConnectionsTests.csproj",
+            "assetsSha256": "fba9c43f6fa9df8fd6483e30c87382666b73c0fe7ca550e7a81fb254a7adee04"
+          },
+          {
+            "project": "backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj",
+            "assetsSha256": "b12ef68afd31d9200137dee43f84f6949bad8934472b67adee55a5b406d3f93d"
+          },
+          {
+            "project": "backend/tests/OntologyPlatform.PublishingTests/OntologyPlatform.PublishingTests.csproj",
+            "assetsSha256": "c4c9149013d0312ee61c43a8797f2a2e3d955f310c6acabbd147adc0c28c4bbf"
+          },
+          {
+            "project": "backend/tests/OntologyPlatform.QueryTests/OntologyPlatform.QueryTests.csproj",
+            "assetsSha256": "fb0ecd25f91cdcfa6f5b4532e170b338788349249b5f36f848d63d6ab8b1ef4e"
+          },
+          {
+            "project": "backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj",
+            "assetsSha256": "da9d6c5fe6c1f8f8f51e1cb3fe202d5dbaa6f43f1801f334436a1703314867b5"
+          },
+          {
+            "project": "backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj",
+            "assetsSha256": "fdd9d4a1b68d6c669d1ed9444d7b1ac2e7f4407ce43f82832874291ec992b093"
+          }
+        ],
+        "sdkResolver": {
+          "Aspire.AppHost.Sdk": [
+            "/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/environment/e250e301cd705f060f68976e87361720a2a786e50dabe212b8770b6073161305/nuget-packages/aspire.apphost.sdk/13.6.3/Sdk/Sdk.props",
+            "/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/environment/e250e301cd705f060f68976e87361720a2a786e50dabe212b8770b6073161305/nuget-packages/aspire.apphost.sdk/13.6.3/Sdk/Sdk.targets"
+          ],
+          "MSTest.Sdk": [
+            "/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/environment/e250e301cd705f060f68976e87361720a2a786e50dabe212b8770b6073161305/nuget-packages/mstest.sdk/4.5.1/Sdk/Sdk.props",
+            "/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/environment/e250e301cd705f060f68976e87361720a2a786e50dabe212b8770b6073161305/nuget-packages/mstest.sdk/4.5.1/Sdk/Sdk.targets"
+          ]
+        },
+        "pnpmTool": "/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/environment/e250e301cd705f060f68976e87361720a2a786e50dabe212b8770b6073161305/pnpm/package/bin/pnpm.cjs",
+        "node": "/opt/homebrew/Cellar/node@24/24.22.1/bin/node",
+        "dotnet": "/usr/local/share/dotnet/dotnet",
+        "webDependencies": {
+          "status": "DEPENDENCIES_READY",
+          "packages": 391,
+          "materializedTrees": 2,
+          "download": 0,
+          "install": 0,
+          "restore": 0,
+          "contentFiles": 26176,
+          "source": {
+            "root": "/Users/chasen/.codex/worktrees/g4-eng-workflow-env/ontology-platform",
+            "rejectedCandidates": [
+              {
+                "root": "/Users/chasen/.codex/worktrees/g4-eng-workflow-001/ontology-platform",
+                "reason": "WORKSPACE_STATE_REJECTED"
+              }
+            ],
+            "contentSha256": "52ff4bc9a6bbc8744c73587f91bb3125f35ef7aacc57d379dd349a99a0909ced",
+            "shimsSha256": "d1dfe77765eaad794057552e2469e8254bf25bc3706f117217e9b843c09be69f",
+            "linksSha256": "cef886ad5fb4b15becf586db5aef40aae25bdeff7a3d58ac9dd5b2d78712c862"
+          }
+        },
+        "docker": "NOT_RUN: prepare performs no service creation",
+        "smoke": "NOT_RUN",
+        "runtimeCredentialsCopied": 0,
+        "environmentFile": "/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/environment/e250e301cd705f060f68976e87361720a2a786e50dabe212b8770b6073161305/environment.json",
+        "newOraclePackagesRestored": false
+      },
+      "nugetVerification": {
+        "exitCode": 0,
+        "packages": 11,
+        "revocationMode": "offline",
+        "onlineRevocation": "NOT_VERIFIED",
+        "logSha256": "602086ec6966a463b59a260200fec35fd43fc2ba042da3b6fb5932ea796b44e3",
+        "output": "X.509 证书链验证将使用 \"/usr/local/share/dotnet/sdk/10.0.402/trustedroots/codesignctl.pem\" 处的回退证书捆绑包。\nX.509 证书链验证将使用 \"/usr/local/share/dotnet/sdk/10.0.402/trustedroots/timestampctl.pem\" 处的回退证书捆绑包。\n\n正在验证 Oracle.ManagedDataAccess.Core.23.26.400\n内容哈希: PWVJunbl2LVcdFBluW5R3678MvrTLlTrQBdXe9wR4YCauISa4zCceJ7fLHVFFiGog8/ZPxo2cY4adpVQCJf+YQ==\n/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/artifact-cache/oracle.manageddataaccess.core.23.26.400.nupkg\n签名哈希算法: SHA256\n\n签名类型: Repository\n服务索引: https://api.nuget.org/v3/index.json\n所有者: Oracle\n正在使用证书验证 存储库主签名: \n  使用者名称: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US\n  SHA1 哈希: C72FE7739A9EECB8EC1E4F596DB3BB74039B1DE2\n  SHA256 哈希: 1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/2/23 08:00:00 至 2027/5/19 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/21 07:10:16\n正在用时间戳服务证书验证 存储库主签名 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n已成功验证包“Oracle.ManagedDataAccess.Core.23.26.400”。\n\n正在验证 System.Collections.Immutable.10.0.13\n内容哈希: mUiVD4AJ0way0QDXNEaU/zEMDgn0kzZEW+gjtQrrC7KsB74JKuLC54hCPUxyodlpiwS/ElbQYbiyjHpZfl6ghA==\n/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/artifact-cache/system.collections.immutable.10.0.13.nupkg\n签名哈希算法: SHA256\n\n签名类型: Author\n正在使用证书验证 作者主签名: \n  使用者名称: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US\n  SHA1 哈希: 80A3561749D46D67F4548F4B5416925C5195A03E\n  SHA256 哈希: 9A1B131BEE0605433056A4EA3815478A8E177961A968C6C0027C1093D1FEB630\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/9/8 08:00:00 至 2027/12/4 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/5 06:23:33\n正在用时间戳服务证书验证 作者主签名 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n签名类型: Repository\n服务索引: https://api.nuget.org/v3/index.json\n所有者: dotnetframework, Microsoft\n正在使用证书验证 存储库副署: \n  使用者名称: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US\n  SHA1 哈希: C72FE7739A9EECB8EC1E4F596DB3BB74039B1DE2\n  SHA256 哈希: 1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/2/23 08:00:00 至 2027/5/19 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/14 01:10:34\n正在用时间戳服务证书验证 存储库副署 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n已成功验证包“System.Collections.Immutable.10.0.13”。\n\n正在验证 System.Configuration.ConfigurationManager.10.0.13\n内容哈希: BkkGt1IDGMaNkSWJR+hEN3V/UMvyoYKW0rG7rlhKQwS2Ghn+9dt98aV7syIMK+ChumTk+IbDF4k0QXqVs9Zudg==\n/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/artifact-cache/system.configuration.configurationmanager.10.0.13.nupkg\n签名哈希算法: SHA256\n\n签名类型: Author\n正在使用证书验证 作者主签名: \n  使用者名称: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US\n  SHA1 哈希: 80A3561749D46D67F4548F4B5416925C5195A03E\n  SHA256 哈希: 9A1B131BEE0605433056A4EA3815478A8E177961A968C6C0027C1093D1FEB630\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/9/8 08:00:00 至 2027/12/4 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/5 06:23:35\n正在用时间戳服务证书验证 作者主签名 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n签名类型: Repository\n服务索引: https://api.nuget.org/v3/index.json\n所有者: dotnetframework, Microsoft\n正在使用证书验证 存储库副署: \n  使用者名称: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US\n  SHA1 哈希: C72FE7739A9EECB8EC1E4F596DB3BB74039B1DE2\n  SHA256 哈希: 1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/2/23 08:00:00 至 2027/5/19 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/14 01:03:38\n正在用时间戳服务证书验证 存储库副署 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n已成功验证包“System.Configuration.ConfigurationManager.10.0.13”。\n\n正在验证 System.Diagnostics.EventLog.10.0.13\n内容哈希: DkNjtQyPR5Ud/zHnWHdsOuKbFRL9nIC92Q76z0NmHVDoQm40toLtsGFTIWq7toBoVa6fo/DInL3PLxY3Asixyw==\n/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/artifact-cache/system.diagnostics.eventlog.10.0.13.nupkg\n签名哈希算法: SHA256\n\n签名类型: Author\n正在使用证书验证 作者主签名: \n  使用者名称: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US\n  SHA1 哈希: 80A3561749D46D67F4548F4B5416925C5195A03E\n  SHA256 哈希: 9A1B131BEE0605433056A4EA3815478A8E177961A968C6C0027C1093D1FEB630\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/9/8 08:00:00 至 2027/12/4 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/5 06:23:33\n正在用时间戳服务证书验证 作者主签名 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n签名类型: Repository\n服务索引: https://api.nuget.org/v3/index.json\n所有者: dotnetframework, Microsoft\n正在使用证书验证 存储库副署: \n  使用者名称: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US\n  SHA1 哈希: C72FE7739A9EECB8EC1E4F596DB3BB74039B1DE2\n  SHA256 哈希: 1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/2/23 08:00:00 至 2027/5/19 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/14 01:09:40\n正在用时间戳服务证书验证 存储库副署 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n已成功验证包“System.Diagnostics.EventLog.10.0.13”。\n\n正在验证 System.Diagnostics.PerformanceCounter.10.0.13\n内容哈希: K2t0EVIUB5g+gc+hZ7x9DWyGLvuTsfD/tbPJBbLaIGuW2OQl+ivm1MKIlqYrMWxX9TK+LqMDVuE0LcOCOFmueQ==\n/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/artifact-cache/system.diagnostics.performancecounter.10.0.13.nupkg\n签名哈希算法: SHA256\n\n签名类型: Author\n正在使用证书验证 作者主签名: \n  使用者名称: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US\n  SHA1 哈希: 80A3561749D46D67F4548F4B5416925C5195A03E\n  SHA256 哈希: 9A1B131BEE0605433056A4EA3815478A8E177961A968C6C0027C1093D1FEB630\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/9/8 08:00:00 至 2027/12/4 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/5 06:23:35\n正在用时间戳服务证书验证 作者主签名 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n签名类型: Repository\n服务索引: https://api.nuget.org/v3/index.json\n所有者: dotnetframework, Microsoft\n正在使用证书验证 存储库副署: \n  使用者名称: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US\n  SHA1 哈希: C72FE7739A9EECB8EC1E4F596DB3BB74039B1DE2\n  SHA256 哈希: 1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/2/23 08:00:00 至 2027/5/19 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/14 01:12:57\n正在用时间戳服务证书验证 存储库副署 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n已成功验证包“System.Diagnostics.PerformanceCounter.10.0.13”。\n\n正在验证 System.DirectoryServices.Protocols.10.0.13\n内容哈希: JZiWshNhK2+lbPnfV+JTYqKKrT27e5LRdbCU2SFkXwIIJPVKw/7KfrHU/DDbO3OXd4KwJZgAdyWbXl+kwzxWOw==\n/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/artifact-cache/system.directoryservices.protocols.10.0.13.nupkg\n签名哈希算法: SHA256\n\n签名类型: Author\n正在使用证书验证 作者主签名: \n  使用者名称: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US\n  SHA1 哈希: 80A3561749D46D67F4548F4B5416925C5195A03E\n  SHA256 哈希: 9A1B131BEE0605433056A4EA3815478A8E177961A968C6C0027C1093D1FEB630\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/9/8 08:00:00 至 2027/12/4 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/5 06:23:35\n正在用时间戳服务证书验证 作者主签名 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n签名类型: Repository\n服务索引: https://api.nuget.org/v3/index.json\n所有者: dotnetframework, Microsoft\n正在使用证书验证 存储库副署: \n  使用者名称: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US\n  SHA1 哈希: C72FE7739A9EECB8EC1E4F596DB3BB74039B1DE2\n  SHA256 哈希: 1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/2/23 08:00:00 至 2027/5/19 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/14 01:09:17\n正在用时间戳服务证书验证 存储库副署 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n已成功验证包“System.DirectoryServices.Protocols.10.0.13”。\n\n正在验证 System.Formats.Asn1.10.0.13\n内容哈希: uwKFGyJaUQ8xsf+wddv512+UIU1O4reOveom3y0gpQr86P1ReAKcQa/UdOZtg1etTIHgb01/grXp00tgeGBxqA==\n/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/artifact-cache/system.formats.asn1.10.0.13.nupkg\n签名哈希算法: SHA256\n\n签名类型: Author\n正在使用证书验证 作者主签名: \n  使用者名称: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US\n  SHA1 哈希: 80A3561749D46D67F4548F4B5416925C5195A03E\n  SHA256 哈希: 9A1B131BEE0605433056A4EA3815478A8E177961A968C6C0027C1093D1FEB630\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/9/8 08:00:00 至 2027/12/4 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/5 06:23:35\n正在用时间戳服务证书验证 作者主签名 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n签名类型: Repository\n服务索引: https://api.nuget.org/v3/index.json\n所有者: dotnetframework, Microsoft\n正在使用证书验证 存储库副署: \n  使用者名称: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US\n  SHA1 哈希: C72FE7739A9EECB8EC1E4F596DB3BB74039B1DE2\n  SHA256 哈希: 1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/2/23 08:00:00 至 2027/5/19 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/14 01:02:20\n正在用时间戳服务证书验证 存储库副署 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n已成功验证包“System.Formats.Asn1.10.0.13”。\n\n正在验证 System.Memory.4.6.3\n内容哈希: qdcDOgnFZY40+Q9876JUHnlHu7bosOHX8XISRoH94fwk6hgaeQGSgfZd8srWRZNt5bV9ZW2TljcegDNxsf+96A==\n/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/artifact-cache/system.memory.4.6.3.nupkg\n签名哈希算法: SHA256\n\n签名类型: Author\n正在使用证书验证 作者主签名: \n  使用者名称: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US\n  SHA1 哈希: F25C45D17C53D4E0D1DC9FB9DFD0731FCF904B77\n  SHA256 哈希: 566A31882BE208BE4422F7CFD66ED09F5D4524A5994F50CCC8B05EC0528C1353\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2023/7/27 08:00:00 至 2026/10/18 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2025/4/4 07:05:17\n正在用时间戳服务证书验证 作者主签名 的时间戳: \n  使用者名称: CN=DigiCert Timestamp 2024, O=DigiCert, C=US\n  SHA1 哈希: DBD385EE62DBD23E7BE4F67148508724D5865B45\n  SHA256 哈希: 76769FA8F2632F1F430B3A2330AED65675FED773DB05D665B9059398438F9ADB\n  颁发者: CN=DigiCert Trusted G4 RSA4096 SHA256 TimeStamping CA, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/9/26 08:00:00 至 2035/11/26 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4RSA4096SHA256TimeStampingCA.crl\n  OCSP URL: http://ocsp.digicert.com\n\n签名类型: Repository\n服务索引: https://api.nuget.org/v3/index.json\n所有者: dotnetframework, Microsoft\n正在使用证书验证 存储库副署: \n  使用者名称: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US\n  SHA1 哈希: C72FE7739A9EECB8EC1E4F596DB3BB74039B1DE2\n  SHA256 哈希: 1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/2/23 08:00:00 至 2027/5/19 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2025/4/5 02:06:48\n正在用时间戳服务证书验证 存储库副署 的时间戳: \n  使用者名称: CN=DigiCert Timestamp 2024, O=DigiCert, C=US\n  SHA1 哈希: DBD385EE62DBD23E7BE4F67148508724D5865B45\n  SHA256 哈希: 76769FA8F2632F1F430B3A2330AED65675FED773DB05D665B9059398438F9ADB\n  颁发者: CN=DigiCert Trusted G4 RSA4096 SHA256 TimeStamping CA, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/9/26 08:00:00 至 2035/11/26 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4RSA4096SHA256TimeStampingCA.crl\n  OCSP URL: http://ocsp.digicert.com\n\n已成功验证包“System.Memory.4.6.3”。\n\n正在验证 System.Security.Cryptography.Pkcs.10.0.13\n内容哈希: a+EovgC1fBnwdlQ6cn3j4JFBfKqiFaFvoAhjisOoSvazLAcIznaBzPQP0oYnvccmeXfqUH1KebVZOxSeH6rMaw==\n/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/artifact-cache/system.security.cryptography.pkcs.10.0.13.nupkg\n签名哈希算法: SHA256\n\n签名类型: Author\n正在使用证书验证 作者主签名: \n  使用者名称: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US\n  SHA1 哈希: 80A3561749D46D67F4548F4B5416925C5195A03E\n  SHA256 哈希: 9A1B131BEE0605433056A4EA3815478A8E177961A968C6C0027C1093D1FEB630\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/9/8 08:00:00 至 2027/12/4 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/5 06:23:35\n正在用时间戳服务证书验证 作者主签名 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n签名类型: Repository\n服务索引: https://api.nuget.org/v3/index.json\n所有者: dotnetframework, Microsoft\n正在使用证书验证 存储库副署: \n  使用者名称: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US\n  SHA1 哈希: C72FE7739A9EECB8EC1E4F596DB3BB74039B1DE2\n  SHA256 哈希: 1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/2/23 08:00:00 至 2027/5/19 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/14 00:59:02\n正在用时间戳服务证书验证 存储库副署 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n已成功验证包“System.Security.Cryptography.Pkcs.10.0.13”。\n\n正在验证 System.Security.Cryptography.ProtectedData.10.0.13\n内容哈希: aUSmC6cPjFLSE0rDTsmkR3wvUOnscqewebOaaELEToh12sNmoltZqT3f0C81mJ1zhxKjWco25soHTvYwsXCsUw==\n/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/artifact-cache/system.security.cryptography.protecteddata.10.0.13.nupkg\n签名哈希算法: SHA256\n\n签名类型: Author\n正在使用证书验证 作者主签名: \n  使用者名称: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US\n  SHA1 哈希: 80A3561749D46D67F4548F4B5416925C5195A03E\n  SHA256 哈希: 9A1B131BEE0605433056A4EA3815478A8E177961A968C6C0027C1093D1FEB630\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/9/8 08:00:00 至 2027/12/4 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/5 06:23:33\n正在用时间戳服务证书验证 作者主签名 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n签名类型: Repository\n服务索引: https://api.nuget.org/v3/index.json\n所有者: dotnetframework, Microsoft\n正在使用证书验证 存储库副署: \n  使用者名称: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US\n  SHA1 哈希: C72FE7739A9EECB8EC1E4F596DB3BB74039B1DE2\n  SHA256 哈希: 1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/2/23 08:00:00 至 2027/5/19 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/14 01:01:15\n正在用时间戳服务证书验证 存储库副署 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n已成功验证包“System.Security.Cryptography.ProtectedData.10.0.13”。\n\n正在验证 System.Text.Json.10.0.13\n内容哈希: IjBLCOgNyv48I7G69EWDUalJ0mVHyZdiH1drbPrNsQRJssvjmGVn0Q/CoZSG1RGUCCCgpdiQbZI4i9Z6Q5jnWQ==\n/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform/artifacts/workflow/G4-M2-ORACLE-01/artifact-cache/system.text.json.10.0.13.nupkg\n签名哈希算法: SHA256\n\n签名类型: Author\n正在使用证书验证 作者主签名: \n  使用者名称: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US\n  SHA1 哈希: 80A3561749D46D67F4548F4B5416925C5195A03E\n  SHA256 哈希: 9A1B131BEE0605433056A4EA3815478A8E177961A968C6C0027C1093D1FEB630\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/9/8 08:00:00 至 2027/12/4 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/5 06:23:34\n正在用时间戳服务证书验证 作者主签名 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n签名类型: Repository\n服务索引: https://api.nuget.org/v3/index.json\n所有者: dotnetframework, Microsoft\n正在使用证书验证 存储库副署: \n  使用者名称: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US\n  SHA1 哈希: C72FE7739A9EECB8EC1E4F596DB3BB74039B1DE2\n  SHA256 哈希: 1F4B311D9ACC115C8DC8018B5A49E00FCE6DA8E2855F9F014CA6F34570BC482D\n  颁发者: CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2024/2/23 08:00:00 至 2027/5/19 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  CRL URL: http://crl4.digicert.com/DigiCertTrustedG4CodeSigningRSA4096SHA3842021CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n时间戳: 2026/10/14 01:05:42\n正在用时间戳服务证书验证 存储库副署 的时间戳: \n  使用者名称: CN=DigiCert SHA256 RSA4096 Timestamp Responder 2026 1, O=\"DigiCert, Inc.\", C=US\n  SHA1 哈希: 51D9ABDA034973D84F4266ACA48248E6B369C439\n  SHA256 哈希: 2DA09DA7F4131F9FE72DB6C5E6E9C9656755AF043F1EA742CC0D2120E141EBFC\n  颁发者: CN=DigiCert Trusted G4 TimeStamping RSA4096 SHA256 2025 CA1, O=\"DigiCert, Inc.\", C=US\n  有效期: 2026/8/5 08:00:00 至 2037/11/5 07:59:59\n  CRL URL: http://crl3.digicert.com/DigiCertTrustedG4TimeStampingRSA4096SHA2562025CA1.crl\n  OCSP URL: http://ocsp.digicert.com\n\n已成功验证包“System.Text.Json.10.0.13”。\n"
+      },
+      "staticInventory": {
+        "taskId": "G4-M2-ORACLE-01",
+        "runId": "STATIC-INVENTORY-20261113-01",
+        "utc": "2026-11-13T08:30:50.378117+00:00",
+        "image": "container-registry.oracle.com/database/free@sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+        "started": false,
+        "status": "STATIC_READ_COMPLETE",
+        "events": [
+          {
+            "action": "info",
+            "exitCode": 0
+          },
+          {
+            "action": "create",
+            "exitCode": 0
+          },
+          {
+            "action": "inspect",
+            "exitCode": 0
+          },
+          {
+            "action": "info",
+            "exitCode": 0
+          },
+          {
+            "action": "inspect",
+            "exitCode": 0
+          },
+          {
+            "action": "rm",
+            "exitCode": 0
+          }
+        ],
+        "backend": {
+          "ID": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+          "ServerVersion": "29.9.2"
+        },
+        "containerId": "e650a11419e8d54701c8a6ede73788ed2a04c98b685ead8debcb289863ceb8ed",
+        "beforeRead": {
+          "id": "e650a11419e8d54701c8a6ede73788ed2a04c98b685ead8debcb289863ceb8ed",
+          "status": "created",
+          "running": false,
+          "mounts": []
+        },
+        "inventory": {
+          "path": "/opt/oracle/product/26ai/dbhomeFree/inventory/ContentsXML/comps.xml",
+          "tarBytes": 390144,
+          "bytes": 388458,
+          "sha256": "afda74fa2343a430bca615ac0de5db120805bb22eebfabc43d0a98df377ba903"
+        },
+        "beforeRemoval": {
+          "id": "e650a11419e8d54701c8a6ede73788ed2a04c98b685ead8debcb289863ceb8ed",
+          "status": "created",
+          "running": false,
+          "mounts": []
+        },
+        "initialCleanupPostcondition": {
+          "exitCode": 1,
+          "reason": "Expected No such object text; Engine returns No such container; rm already exit0"
+        },
+        "cleanup": {
+          "removalExitCode": 0,
+          "inspectExitCode": 1,
+          "exactIdAbsent": true,
+          "backendUnchanged": true,
+          "started": false,
+          "diagnostic": "Error response from daemon: No such container: e650a11419e8d54701c8a6ede73788ed2a04c98b685ead8debcb289863ceb8ed"
+        },
+        "originalFile": "afda74fa2343a430bca615ac0de5db120805bb22eebfabc43d0a98df377ba903.b64",
+        "componentSummary": [
+          {
+            "NAME": "oracle.server",
+            "VER": "23.0.0.0.0",
+            "BUILD_NUMBER": "0",
+            "BUILD_TIME": "20260708.120708",
+            "REP_VER": "0.0.0.0.0",
+            "RELEASE": "Production",
+            "INV_LOC": "Components/oracle.server/23.0.0.0.0/1/",
+            "LANGS": "ALL_LANGS",
+            "XML_INV_LOC": "Components21/oracle.server/23.0.0.0.0/",
+            "ACT_INST_VER": "12.2.0.9.0",
+            "DEINST_VER": "11.2.0.0.0",
+            "INSTALL_TIME": "2026.Jul.08 21:01:07 UTC",
+            "INST_LOC": "/opt/oracle/product/26ai/dbhomeFree/oracle.server"
+          },
+          {
+            "NAME": "oracle.network",
+            "VER": "23.0.0.0.0",
+            "BUILD_NUMBER": "0",
+            "BUILD_TIME": "20260708.120708",
+            "REP_VER": "0.0.0.0.0",
+            "RELEASE": "Production",
+            "INV_LOC": "Components/oracle.network/23.0.0.0.0/1/",
+            "LANGS": "en",
+            "XML_INV_LOC": "Components21/oracle.network/23.0.0.0.0/",
+            "ACT_INST_VER": "12.2.0.9.0",
+            "DEINST_VER": "11.2.0.0.0",
+            "INSTALL_TIME": "2026.Jul.08 21:01:07 UTC",
+            "INST_LOC": "/opt/oracle/product/26ai/dbhomeFree/oracle.network"
+          },
+          {
+            "NAME": "oracle.rdbms",
+            "VER": "23.0.0.0.0",
+            "BUILD_NUMBER": "0",
+            "BUILD_TIME": "20260708.120708",
+            "REP_VER": "0.0.0.0.0",
+            "RELEASE": "Production",
+            "INV_LOC": "Components/oracle.rdbms/23.0.0.0.0/1/",
+            "LANGS": "ALL_LANGS",
+            "XML_INV_LOC": "Components21/oracle.rdbms/23.0.0.0.0/",
+            "ACT_INST_VER": "12.2.0.9.0",
+            "DEINST_VER": "11.2.0.0.0",
+            "INSTALL_TIME": "2026.Jul.08 21:01:07 UTC",
+            "INST_LOC": "/opt/oracle/product/26ai/dbhomeFree/oracle_rdbms"
+          }
+        ],
+        "patchEvidence": "NOT_VERIFIED: base component versions and July build time do not prove October CPU fixes or CVE non-applicability"
+      },
+      "securityAdmission": {
+        "status": "BLOCKED_SECURITY_ADMISSION",
+        "source": "https://www.oracle.com/security-alerts/cpuoct2026verbose.html",
+        "cves": [
+          "CVE-2026-75803",
+          "CVE-2026-91568"
+        ],
+        "affectedRange": "23.4.0–23.26.3",
+        "limitations": "Version/attack-surface overlap, not proof of exploitability. No patch proof for frozen digest. Internal network, READ and TLS do not establish remediation. No risk exception authorized."
+      },
+      "failuresPreserved": [
+        {
+          "stage": "host-task-id-red",
+          "exitCode": 1,
+          "reason": "Oracle CLI choice absent before fix"
+        },
+        {
+          "stage": "inherited-closure-red",
+          "exitCode": 1,
+          "reason": "Oracle approved_archives entry absent before fix"
+        },
+        {
+          "stage": "sdk-version",
+          "exitCode": 71,
+          "reason": "sandbox_apply denied under restricted execution; approved ≤15s diagnostic succeeded, exact FailureState resolved with original receipt kept"
+        },
+        {
+          "stage": "prepare-retry",
+          "exitCode": 2,
+          "reason": "SHORT_REPRO_REQUIRED before short diagnosis"
+        },
+        {
+          "stage": "web-task-admission",
+          "exitCode": 2,
+          "reason": "Oracle absent from cache whitelist; negative test exit1 then fixed"
+        },
+        {
+          "stage": "generic-cms",
+          "exitCode": 4,
+          "reason": "unsuitable certificate purpose; actual NuGet verifier later succeeds"
+        },
+        {
+          "stage": "static-cleanup-postcondition",
+          "exitCode": 1,
+          "reason": "wrong expected diagnostic text, exact removal exit0; subsequent exact no-such-container and Engine match confirmed"
+        }
+      ],
+      "finalReview": {
+        "reviewer": "/root/oracle_p0_review",
+        "status": "PASS_FOR_STAGE_COMMIT",
+        "scope": "3工程文件+3定向测试+当前材料/23新原件",
+        "verified": "33历史原件不变；65响应2998020bytes；新包长度/SHA256/SHA512；XML长度/SHA；取证源码散列；53测试日志；diff-check exit0",
+        "correction": "初始进展段标注历史时点",
+        "serviceGate": "BLOCKED_SECURITY_ADMISSION",
+        "product": "NOT_RUN"
+      }
     }
   }
 }

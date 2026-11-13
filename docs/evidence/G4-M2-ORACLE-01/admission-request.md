@@ -1,5 +1,7 @@
 # G4-M2-ORACLE-01｜A–F 一次性准入申请
 
+> 最新裁决（2026-11-13）：用户明确批准现有A–F条件实施，并批准镜像展开13GiB、总峰值40GiB。以下申请及P0回执保留原时点语义；其中“未批准/待裁决”不再代表当前实施授权。获取前非作者准入、原件/安全、合同Review和真实门禁仍须满足；不代接受许可、不更新main、不恢复TDengine、不制作ZIP。
+
 2026-11-13；Master单写。[唯一任务卡](../../tasks/G4-M2-ORACLE-01.md)。用户明确批准附件P0，附件中后续实施申请不是本轮许可。Base=`5113d0b9b233e307664c964ae9bf3c1d6b10adfb`，fetch后远端相符；最终完整Head和普通push回执随交付给出。下文“申请/拟议”均未实施。
 
 推荐唯一组合：**Oracle AI Database 26ai Free，23.26.3.0，Linux ARM64，单FREEPDB1；Oracle.ManagedDataAccess.Core 23.26.400；仓库net10.0**。官方完整容器为`container-registry.oracle.com/database/free:23.26.3.0-arm64`，冻结digest见A。存在官方原生ARM64发行，不需要预设购买Enterprise。匿名公开Bearer握手已取得tags/index/manifest，不需要用户提供账号。当前 **P0_READY_FOR_ADMISSION_REVIEW**：用户批准限定HTTPS源站跳转后，已成功取得精确config，实际29,943字节、SHA256与descriptor相符，JSON可解析并声明linux/arm64；元数据读取阻断解除。仅跟随一次已批准源站，签名地址仅内存、未转发Registry token、未继续跳转。此前失败/未知量保留，不追溯改写。产品未准入；用户已自行下载指定镜像，本轮Agent只做本地身份元数据核验，未启动服务或实施产品。已存在本机原生制品身份，不另铺替代版本、amd64仿真或第三方镜像路线。
@@ -175,3 +177,37 @@ CI按需NOT_RUN；Mac宿主/LinuxARM64容器分列，Windows/x64/生产NOT_RUN�
 用户取得的唯一镜像作为任务资源KEEP，准确引用与公开身份/时间见索引`localImageInspection20261113`；供本任务后续准入/实施，不清理用户镜像、不碰旧资源。保留条件解除需任务关闭、引用/数据归属复核及明确回收范围。本轮无下载流量；用户下载的实际网络字节未知，不能用manifest压缩总量冒充实际网络计费。
 
 本次本地镜像增量经非作者只读复核，身份/层标识/大小及33原件历史不变核对通过。已修正旧“未下载”措辞，并明确4GiB下载缓存包含驱动包；身份元数据核验、文档链接/EOF/范围、证据schema和diff-check通过，运行/安全验证及实施授权仍未通过或未执行。
+
+## 条件实施执行记录（2026-11-13）
+
+设计依据为本文A–F，已获用户明确批准。Master单写，采用executing-plans及先失败测试后实现；不另建任务/工作树或中间交付物。路径以E表为准，宿主入口增补`host_continuity.py`与`scripts/tests/HostContinuity.Tests.py`，用于真实TaskId预检与监测；这是现有工程入口的必要适配，不扩展产品。
+
+1. 获取与资源前置：非作者复核精确载荷清单；冻结来源/散列/体积与许可条件后才能取依赖。宿主CLI先证明Oracle TaskId被拒，再最小接入，执行HostContinuity.Tests.py及本任务preflight。供下一步消费的身份是已验证原件和taskId，不是其他任务PASS。
+2. 合同冻结：E表OracleMetadata的null/省略/排序、ORACLE_READONLY及固定目标变化拒绝规则；G4WireContractTests先加负例，生成合同旧分支字节不变；非作者Review后消费合同。
+3. 工程消费者与依赖：Oracle专属结构入口/锁闭包/prepare/构建绑定；负例覆盖缺Oracle注册、错误TaskId、错散列与未知包，复用公共执行器而非复制。prepare零下载；restore仅已批私有feed；准确依赖差异超出A表则停。
+4. 真实Adapter：TCPS文件wallet、CREATE SESSION与直接READ、最小目录SQL；先OracleAdapterTests和FixtureSecurityTests，再实现接口/Adapter/dispatcher/DI。真实坏CA/SAN/过期/service/PDB、写权限继承/撤权、取消源端见证和类型负例通过才开放能力。
+5. 完整应用/UI：消费固定目标与OracleMetadata合同，贯通凭据/Probe/Enable/Discover/Worker/Catalog/轮换/禁用；先安全/并发/审计回滚测试再修改应用/UI，真实OIDC/UI检验，旧连接器按输入影响回归。
+6. 收口：每步实际命令/exit与输入绑定，非作者Review后普通提交/push；资源精确归属与KEEP/回收后验。CI/其它平台未运行分列，不更新main、不恢复TDengine、不制作ZIP。
+
+重点拒绝：无旧secret跨目标/scope复用；未知类型不能完整可信；管理员不能进入产品；取消仅调用方结束不得PASS；旧fingerprint不可因Oracle增量变化。既有公共字段/规则由Master单写，旧快照仍允许OracleMetadata缺省。
+
+实施初始时点（历史）：获取准入Review进行中；宿主只读实测AC供电、sleep=0、displaysleep=10，POLICY_READY；锁屏/整会话持续性NOT_VERIFIED。未启动服务、未取得新载荷、未运行prepare/restore。
+
+### 本次执行结果与安全门禁（IMPLEMENTATION-20261113-01）
+
+最新A–F授权已记录；Mirror/驱动下载故障已解除。本次补齐10个Microsoft包的20份官方registration/catalog原件并获非作者准入。11新包实际13,499,230bytes（其中Microsoft7,838,226），逐包长度/SHA512通过；全部保留于任务私有artifact-cache，不入Git。System.Memory的requireLicenseAcceptance=true/MIT事实保留，未执行交互接受操作。Oracle包13条目/展开11,843,773bytes/CRC通过，附带两份性能计数器脚本不执行，无自动build targets。专用`dotnet nuget verify --all`对11包exit0；offline revocation，在线撤销NOT_VERIFIED，不把通用OpenSSL用途不匹配的旧失败改写成成功。
+
+已接入Oracle TaskId的宿主/继承基线包/Web缓存入口。补充owned_paths：`scripts/maintenance/host_continuity.py`、`workflow_web_cache.py`及`scripts/tests/HostContinuity.Tests.py`、`WorkflowEnvironment.Tests.py`、`WorkflowM2Web.Tests.py`；仅为本任务最小工程适配。基线prepare完成DEPENDENCIES_READY，首次离线锁定restore成功、后续复用，网络下载0；其中MySqlConnector原件从已有Doris公开artifact-cache经固定SHA256核对后复制，未读取/复制任何旧runtime/凭据。新Oracle/Microsoft包未入锁或用于产品。宿主13+环境7+Web缓存14+Doris结构6+交付13=53定向测试通过。初次sandbox_apply失败71→正常权限短诊断exit0，失败止损记录保留；Web TaskId拒绝→先失败测试→最小修复，未重跑历史产品全链。
+
+已保存[Oracle十月CPU](https://www.oracle.com/security-alerts/cpuoct2026.html)及[风险详表](https://www.oracle.com/security-alerts/cpuoct2026verbose.html)原件。数据库表内与23.26.3范围交叠的条目包括75803、91563、91499、93569、91503、91568、101512、91479、91615、59889、101510、54399（均CVE-2026前缀；75803有不同组件条目）。组件/选件/暴露适用性尚未完整排除，不是全部已实证可利用。主要直接触达风险：
+
+| 公告 | 与方案的关系 | 当前结论 |
+|---|---|---|
+| CVE-2026-75803，RDBMS/OpenSSL，CVSS9.8 | 官方受影响范围23.4.0–23.26.3；TLS网络未认证条件。计划开放TCPS，不能以TLS加密本身排除 | 当前digest未证明修复或不适用 |
+| CVE-2026-91568，RDBMS，CVSS7.7 | 同范围；CREATE SESSION与Oracle Net条件与reader/连接方案交叠 | READ最小权限不能排除此漏洞 |
+
+为尽量先解决补丁证据缺口，非作者批准了不执行镜像的静态取证：冻结digest、--pull=never、network none、read-only、cap-drop ALL、no-new-privileges、128MiB/0.5CPU；无挂载、始终created/Running=false。唯一comps.xml正文388,458bytes，SHA256=`afda74fa2343a430bca615ac0de5db120805bb22eebfabc43d0a98df377ba903`；只见oracle.server/rdbms/network基础版本23.0.0.0.0和20260708构建时间，不能替代实际RU/补丁证明。临时容器`e650a11419e8d54701c8a6ede73788ed2a04c98b685ead8debcb289863ceb8ed`已rm exit0，原后验文字预期错误exit1保留，随后准确“No such container”与Engine身份一致通过；没有start/run/exec或服务/卷创建。
+
+非作者确认**BLOCKED_SECURITY_ADMISSION**：原A–F要求原件/安全核验通过才启动，这次批准不包含对这些新披露风险的接受。当前不启动数据库，不编写假PASS；原镜像与所有证据KEEP。推荐取得绑定digest的官方修复/不适用证据；若需更换版本，先重新冻结精确官方ARM64制品并裁决，绝不自行拉取另一版本。若用户仍要求当前镜像试验，须明确接受以上披露及未排除适用性，仅同TaskId/同树、冻结digest、本机合成数据、无生产凭据、无宿主敏感目录/socket、仅任务控制的网络参与者和固定SQL、禁止外部客户端；期限限定自授权起24小时，期满/异常即停止任务服务，精确回收临时资源，保护用户镜像及唯一证据。风险例外不等于安全PASS，也不豁免剩余工程/资源/TLS/权限/取消门禁。
+
+当前65条HTTP元数据记录正文合计2,998,020bytes，历史未知响应上限29,943保留，保守总上限3,027,963<64MiB；11包载荷和本地XML另列，不能混充元数据额度。新增22份HTTP原件+1份本地XML；原33份字节不变。索引implementationAdmission20261113保存获取/验签/宿主/prepare摘要、诊断源码和静态清理后验。CI/Oracle运行/产品测试仍NOT_RUN；未改main、未制作ZIP、未恢复TDengine。

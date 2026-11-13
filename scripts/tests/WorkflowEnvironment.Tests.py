@@ -8,6 +8,16 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 
 class EnvironmentTests(unittest.TestCase):
+    def test_oracle_inherits_verified_baseline_closure_but_rejects_unknown_package(self):
+        m = self.load()
+        packages, _, _ = m.locks(ROOT)
+        self.assertTrue(hasattr(m, 'approved_archives'), 'Oracle任务需要独立核对继承闭包的入口')
+        approved = m.approved_archives(ROOT, 'G4-M2-ORACLE-01', packages)
+        self.assertEqual(approved['mysqlconnector/2.6.2']['archiveSha256'], '3d8758d29d2b19a5efa9f78cfac9cae824a870aaf88e2e3adc40bce3cddac748')
+        self.assertEqual(set(approved), set(packages))
+        with self.assertRaisesRegex(ValueError, 'APPROVED_CURRENT_LOCK_CLOSURE'):
+            m.approved_archives(ROOT, 'G4-M2-ORACLE-01', dict(packages, unexpected='unapproved'))
+
     def test_environment_module_exists(self):
         self.assertTrue((ROOT/'scripts/maintenance/workflow_environment.py').is_file())
 

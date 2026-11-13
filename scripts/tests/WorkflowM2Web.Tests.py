@@ -20,7 +20,7 @@ class CacheTests(unittest.TestCase):
         adapter=SimpleNamespace(web_marker=reached_marker)
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory).resolve()
-            for task in ('G4-M2-DORIS-01','G4-M2-WEB-01','G4-ENG-DELIVERY-002'):
+            for task in ('G4-M2-DORIS-01','G4-M2-WEB-01','G4-ENG-DELIVERY-002','G4-M2-ORACLE-01'):
                 home=root/'artifacts/workflow'/task/'environment/key'
                 with self.assertRaisesRegex(RuntimeError,'ADMITTED_CACHE_BOUNDARY'):
                     m.prepare(root,home,{},[],{},root,'node',adapter)

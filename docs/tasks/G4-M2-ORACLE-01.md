@@ -1,16 +1,15 @@
-# G4-M2-ORACLE-01｜Oracle P0 一次性准入核对
+# G4-M2-ORACLE-01｜Oracle 条件实施
 
-唯一任务状态：**P0_READY_FOR_ADMISSION_REVIEW**；精确config及本地镜像身份元数据核验通过，待裁决A–F与展开预算调整；产品未准入。2026-11-13。
+唯一任务状态：**BLOCKED_SECURITY_ADMISSION**（2026-11-13）。A–F条件实施已获批准；当前停在数据库安全门禁，不是缺少实施授权。
 
-- 目标：集中裁决 [A–F 准入申请](../evidence/G4-M2-ORACLE-01/admission-request.md)。本轮只读调查、文档、公开有界元数据；产品仅拟议连接与目录发现。
-- 本次结果：用户报告镜像下载完成；本机desktop-linux只读核验manifest/Descriptor、Linux ARM64及29个RootFS diff_id均与冻结元数据一致。Docker报告13,076,125,534 bytes≈12.178GiB，超原拟12GiB；申请调整到13GiB，总磁盘峰值仍≤40GiB，待明确裁决。镜像KEEP，不启动/删除；签名、漏洞及实际RU未验证。
-- Base：`5113d0b9b233e307664c964ae9bf3c1d6b10adfb`，本轮fetch成功后origin/main同值。Head由最终交付回执给出完整SHA（本页由该提交恢复，避免自引用）；分支`codex/g4-m2-oracle-01`。
-- 唯一托管树：`/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform`；operationId=`be289194-eb2d-493d-95f7-e7aaee6e5cd7`。TaskId=`G4-M2-ORACLE-01`；RunId=`P0-20261113-01`；历史增量=`P0-CONFIG-20261113-02`；历史诊断=`P0-CONFIG-DIAG-20261113-03`；历史config=`P0-CONFIG-REDIRECT-20261113-04`；本次=`P0-LOCAL-IMAGE-20261113-05`。KEEP：供同会话后续获批实施；审查且任务关闭后再考虑归档。
-- Owner：本会话Master，文档唯一写者；Reviewer：非作者只读Agent，回执见申请末尾。DAG：基线/授权→源码与官方资料→A–F→轻量检查→独立审查→提交/push→停止。
-- owned_paths：本卡、`docs/evidence/G4-M2-ORACLE-01/admission-request.md`、同目录`metadata/`、`docs/tasks/current-authorization.md`（仅追加）。其余均read_only_dependencies；共享合同/锁/脚本/迁移Single Writer留待另批。
-- 已核对：驱动/依赖、数据库ARM64发行/许可、TLS/Wallet/取消、权限/类型、ORACLE_READONLY全生命周期、单机预算及后续源码范围。恢复从[原件索引](../evidence/G4-M2-ORACLE-01/metadata/index.json)按URL/散列读取，不重搜历史。
-- 执行：源码读取、官方元数据、宿主/Docker公开元信息、文档范围/链接/原件散列/格式与证据schema，结果见申请。prepare/restore/build/产品测试/历史全量/CI/生产/跨平台均**NOT_RUN**，无产品PASS。
-- 边界：不下载nupkg/RPM/镜像层，不安装/启动/生成证书/改全局信任，不更新main，不交ZIP，不另开工程优化或恢复任务。主checkout六项未跟踪`.DS_Store`保留；未操作旧资源。
-- TDengine继续**WAIT_FOR_EXTERNAL_INPUT**，未恢复调查/开发、未改其树/分支/原件，未合入其分支。M2未全部完成，不进入M3/M4。
-
-停止位置：ChatGPT准入审查；后续获批后在本Oracle会话、本树继续。
+- 目标：本机Oracle ARM64连接及只读目录切片；设计、裁决与执行记录见[A–F申请](../evidence/G4-M2-ORACLE-01/admission-request.md)。不进入M3/M4，不更新main，不制作ZIP。
+- 授权：用户明确批准A–F及镜像展开13GiB，总磁盘峰值40GiB；按原件/安全→合同Review→工程消费者→真实验证顺序推进。历史P0边界与失败保留于原提交/索引。
+- Base：`5113d0b9b233e307664c964ae9bf3c1d6b10adfb`，本轮fetch后origin/main相符；任务分支`codex/g4-m2-oracle-01`。最终Head随回执给出。
+- 唯一托管树：`/Users/chasen/.codex/worktrees/g4-m2-oracle-01/ontology-platform`，operationId=`be289194-eb2d-493d-95f7-e7aaee6e5cd7`。TaskId=`G4-M2-ORACLE-01`，RunId=`IMPLEMENTATION-20261113-01`；P0原件继续由[metadata/index.json](../evidence/G4-M2-ORACLE-01/metadata/index.json)恢复。
+- Owner：本会话Master唯一写者；非作者Reviewer=`/root/oracle_p0_review`。owned_paths为申请E表、本卡/申请/metadata及授权追加；最小工程接入补充`host_continuity.py`、`workflow_web_cache.py`及HostContinuity/WorkflowEnvironment/WorkflowM2Web三个定向测试。其余只读依赖；公共合同/锁仍Master单写。
+- 已完成：11个批准新包共13,499,230bytes，长度/SHA512匹配；NuGet专用离线验签11包成功，在线撤销NOT_VERIFIED。基线隔离prepare/锁定restore成功，零网络下载；Oracle新包尚未加入锁/产品构建。复用既有不可变依赖，不复制私有runtime或凭据。
+- 工程检查：宿主13、环境7、Web缓存14、Doris结构6、交付13，共53项定向测试通过。原失败及短诊断保留。AC/sleep0/displaysleep10；30秒7次心跳，确认睡眠0ms，锁屏/熄屏及整会话持续性NOT_VERIFIED。产品/真实Oracle/CI/Windows/x64均NOT_RUN。
+- 阻断：官方十月CPU的CVE-2026-75803（TLS未认证，9.8）及CVE-2026-91568（CREATE SESSION/Oracle Net，7.7）范围覆盖23.26.3；当前digest无修复/不适用证明，未断言已实证可利用。READ和TLS不能排除。静态comps.xml仅有基础组件/七月构建时间，无法解除门禁；完整摘要和后续裁决见申请末尾。
+- 资源：唯一用户镜像KEEP；11新包、已核验继承包及本树隔离缓存KEEP，供同树后续继续，关闭/引用复核后再回收。静态取证临时容器从未启动、无网络/挂载，已按准确ID删除并确认不存在；没有数据库服务或卷。两项未跟踪`.DS_Store`保留。
+- 下一步：获得绑定当前digest的修复/不适用证明，或明确裁决修复版本重新准入/限定风险例外，再继续合同与产品门禁。既有A–F授权持续有效，不逐补丁重新询问。
+- TDengine保持**WAIT_FOR_EXTERNAL_INPUT**，未恢复调查/开发、未改其树/分支/原件；M2未全部完成。

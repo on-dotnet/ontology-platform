@@ -1,4 +1,7 @@
 """验证宿主策略、平台隔离、睡眠证据与有界进程清理；不修改能源设置。"""
+import contextlib
+import io
+import json
 import datetime as dt
 import importlib.util
 from pathlib import Path
@@ -16,6 +19,15 @@ spec.loader.exec_module(host)
 
 
 class HostTests(unittest.TestCase):
+    def test_oracle_preflight_preserves_task_identity_without_services(self):
+        output = io.StringIO()
+        with patch.object(host.platform, 'system', return_value='Linux'), patch.object(sys, 'argv', ['host', 'preflight', '--task-id', 'G4-M2-ORACLE-01']), contextlib.redirect_stdout(output):
+            self.assertEqual(host.main(), 0)
+        result = json.loads(output.getvalue())
+        self.assertEqual(result['taskId'], 'G4-M2-ORACLE-01')
+        self.assertEqual(result['assurance'], 'NOT_APPLICABLE')
+        self.assertEqual(result['sessionContinuity'], 'NOT_VERIFIED')
+
     def reader(self,command):
         return {('pmset','-g','custom'):'Battery Power:\n sleep 1\nAC Power:\n sleep 0\n displaysleep 10\n',
                 ('pmset','-g','batt'):"Now drawing from 'AC Power'\n",
