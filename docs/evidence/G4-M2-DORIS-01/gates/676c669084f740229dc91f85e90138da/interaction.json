@@ -1,0 +1,59 @@
+{
+  "gate": "interaction",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "tests": 8,
+    "skipped": 0,
+    "counts": {
+      "lifecycle": 8
+    },
+    "originalEvidence": [
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-formatted/lifecycle.json",
+        "sha256": "de333466c76dc2bbdda9cca78060175f36605acd035f5567548342d1e117c3d0",
+        "sizeBytes": 4851,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-formatted/lifecycle.json"
+      }
+    ],
+    "limitation": "Counts overlap between gates; CI, other architectures, production and online revocation are not covered"
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m2_evidence.py",
+    "--task",
+    "G4-M2-DORIS-01",
+    "--gate",
+    "interaction",
+    "--input-key",
+    "e72defe3586c8f3192ed6506d4e5e807dc14ccbfdcab8aab7b1150b21c9153c7"
+  ],
+  "exitCode": 0,
+  "tests": 8,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 0.22092520800651982,
+  "inputKey": "e72defe3586c8f3192ed6506d4e5e807dc14ccbfdcab8aab7b1150b21c9153c7",
+  "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+  "policyKey": "72cd3cb51b28997ade016ce8672b15580de16da15b8483d3f57dfeaae69351d0",
+  "evidenceSha256": "820b9143cb827fee46f9e3ffc2203030401a7e329ca7b2faf7771e4e1d0acd1e",
+  "logPath": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/interaction.txt",
+  "sourceRun": "676c669084f740229dc91f85e90138da",
+  "sourceCommit": "c64477aff9b46aaad378dfbef3ef0f1c8ed486df",
+  "publishedLog": {
+    "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/interaction.txt",
+    "sha256": "820b9143cb827fee46f9e3ffc2203030401a7e329ca7b2faf7771e4e1d0acd1e",
+    "sizeBytes": 541,
+    "encoding": "raw",
+    "path": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/interaction.txt"
+  }
+}

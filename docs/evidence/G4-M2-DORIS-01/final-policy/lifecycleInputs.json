@@ -1,0 +1,43 @@
+{
+  "inputs": {
+    "bindings": {
+      "api": {
+        "receiptSha256": "60d817f4b9f61dd0242d3cb49fa8ad66cd22cac182406478d1bbf739d7216abc",
+        "inputKey": "055ff9555c6963f7798102b7b28886923a668a1eb4f17cfaafdb2f8dd65f355b",
+        "outputKey": "08d088ce7e6478ecee4d8161b7c710b5d32023034c6b9cd4bd1aa17895b270b2"
+      },
+      "web": {
+        "receiptSha256": "357300419d2baf756e75ac2c07ad3eaabf13998ad0d8e6a9f349459e9255b846",
+        "inputKey": "3dbce34ae47e59e07be82c2b32e8577d139cf32ed794668b778101336ed7842a",
+        "outputKey": "f87129a84475e864ce28e6303b32e634640b776f220f87930a73a1b45a6bf5ad"
+      }
+    },
+    "drivers": {
+      "scripts/maintenance/workflow_doris_fixture.py": "2e39af479e53b513e1d4df17805e79b620953ab2f1d9166f90984d57c71f99de",
+      "scripts/maintenance/workflow-doris.mjs": "fbf75a9cd00eda2e03a4c1355f3a6c2822b293f4415047dc48fa1e5a8ed2483c",
+      "scripts/maintenance/doris-fixture-control.cs.txt": "f30256e7e4bab522645cf7713b0578514c0d6a45a4d15a633c8884504277caab",
+      "scripts/maintenance/workflow_m2_doris.py": "fe35c8e590b9f507e9ce54b2613ff687051de6776f5239f3b1cb3fccd760d8db",
+      "scripts/maintenance/workflow_m2_web.py": "151c75db94eead4787a421bc8b19bf0fdc68ffb89da50af7dbe1659088e47377",
+      "scripts/maintenance/workflow_m2_fixture.py": "043b733082781aa7a7d6762cb712e840bd4148d27ae9d798a5b7b501825af88a",
+      "scripts/maintenance/workflow_m2_smoke.py": "8e486ee8f0a99784c580cbd9f71b2413f0fe4066b8a2e691a066fd27af58bd83",
+      "scripts/maintenance/workflow_m2_build.py": "19a81e7889472792d6ee7285215f42335ef3fda0cb4ed057f1de5da3e5e0d5e7",
+      "scripts/maintenance/workflow_smoke.py": "5ac6b9b230c1f2d4f44b7fc38cfac15a6bfdc7a81d998eb387c37ea554873c68",
+      "scripts/maintenance/workflow_execution.py": "eb21a6e92a3e5dc732d6ff957f184ef9f1236b6291de7ee6adf950399c450fd1",
+      "scripts/maintenance/workflow_environment.py": "7fa77e80de2501e06ed8836544a9e94baadcba71c5640132205f413d5ef8d073",
+      "scripts/maintenance/workflow_web_cache.py": "a090d01ac0373e4449f4abde33803582666582f9a96e4914bcae596724e83389",
+      "scripts/maintenance/workflow.py": "72afde84a56834f77c3d2f86d942dbc37bae7a86954b6cfa0461582f9a55453b",
+      "scripts/maintenance/workflow-m2-web.mjs": "4865a0d755eda53eaf579b2b04a506fb80cf3e941c2573f155389de42f846141",
+      "scripts/maintenance/workflow_m2_evidence.py": "b3f44ecb5bc96ee120bd155d2d64e89ca0e565ba5420566a0733c453393fac4c",
+      "scripts/maintenance/workflow_evidence.py": "270076ea05bc5e1c63c81536325d6544b3250dd94d06cf0bc9729a30188ea328",
+      "experiments/g4-m2-web-01/https-fixture.mjs": "523838ced9f476b053eca72c40ddd57da35f59da6bfd3d7224e00e47ae345562"
+    },
+    "compose": {
+      "infra/doris/compose.platform.yaml": "39f55705d8030047db411e6b9162ff6131eef6c9ed991c3d95a728d9ec51406c",
+      "infra/doris/compose.production.yaml": "86abd9d0f40ac701622f4711b704a9dba1046c276141b0b4bae8fd61310514f2",
+      "infra/doris/compose.test.yaml": "c44c18fc34cf45736f216f5350e2d5daed8a62bc972238a55b13ec73af159870",
+      "infra/doris/compose.yaml": "9fcb93383b5bb735ae905a633c78981910cf462e935d9d8a7d2f7e8931d54d3b"
+    }
+  },
+  "inputFingerprint": "a5ec2509a9dfc66504a8a8d5556cc015e672f9330a941bcab20c5d9b2795e1c6",
+  "provenance": "Captured before execution and matched actual browser receipt"
+}

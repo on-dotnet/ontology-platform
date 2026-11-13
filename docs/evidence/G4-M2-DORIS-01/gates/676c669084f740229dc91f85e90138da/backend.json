@@ -1,0 +1,91 @@
+{
+  "gate": "backend",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "tests": 48,
+    "skipped": 0,
+    "counts": {
+      "adapter": 24,
+      "expired": 2,
+      "pg": 1,
+      "https": 13,
+      "lifecycle": 8
+    },
+    "originalEvidence": [
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-formatted/adapter.json",
+        "sha256": "279514e6111769a64908f556cd0a8f766ee5c4fcbff79495d7608823507fe416",
+        "sizeBytes": 2123,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-formatted/adapter.json"
+      },
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-formatted/expired.json",
+        "sha256": "8666ef0517e373f3419f0269aa5a0ed5c15e649f56c308d8e0b62a05ac5708fc",
+        "sizeBytes": 1334,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-formatted/expired.json"
+      },
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-formatted/pg.json",
+        "sha256": "c54495243a64113922e977749bf98c4a0003f212408cae214b2f1c49319f10e3",
+        "sizeBytes": 3826,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-formatted/pg.json"
+      },
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-formatted/https.json",
+        "sha256": "dfa370bbc418d4ac6fae84ab7719339d9bb19bc7ca176489f0f16b1c391b9ff1",
+        "sizeBytes": 5273,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-formatted/https.json"
+      },
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-formatted/lifecycle.json",
+        "sha256": "de333466c76dc2bbdda9cca78060175f36605acd035f5567548342d1e117c3d0",
+        "sizeBytes": 4851,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-formatted/lifecycle.json"
+      }
+    ],
+    "limitation": "Counts overlap between gates; CI, other architectures, production and online revocation are not covered"
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m2_evidence.py",
+    "--task",
+    "G4-M2-DORIS-01",
+    "--gate",
+    "backend",
+    "--input-key",
+    "35fd6b039005efb321047abab565292e4f4275a87379ad98da4dd25c8a88265f"
+  ],
+  "exitCode": 0,
+  "tests": 48,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 0.23046616699139122,
+  "inputKey": "35fd6b039005efb321047abab565292e4f4275a87379ad98da4dd25c8a88265f",
+  "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+  "policyKey": "5c760f3c5e44c57fb2bec55b0fd52b3cb4ed523ff668ecdf192da1c013d2a082",
+  "evidenceSha256": "cfa3691762cd6e2dc8ac8635e14a116bf0f37f6dcc0e0b383ee5a27682c9990f",
+  "logPath": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/backend.txt",
+  "sourceRun": "676c669084f740229dc91f85e90138da",
+  "sourceCommit": "c64477aff9b46aaad378dfbef3ef0f1c8ed486df",
+  "publishedLog": {
+    "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/backend.txt",
+    "sha256": "cfa3691762cd6e2dc8ac8635e14a116bf0f37f6dcc0e0b383ee5a27682c9990f",
+    "sizeBytes": 1635,
+    "encoding": "raw",
+    "path": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/backend.txt"
+  }
+}

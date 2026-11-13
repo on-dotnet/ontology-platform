@@ -11,3 +11,5 @@
 复核结束后补齐的公开证据与最终提交绑定、工程门禁及V3由最终重开另行确认。
 
 最终格式/using排序经原Reviewer复核无语义变化，format verify exit0，Source Review PASS维持。最终格式构建由`doris-210dd06860f3`重新执行8组生命周期，`tls-expired-f39164d081c7`真实过期证书拒绝/恢复通过。`ece86dae`门禁映射和两项用户DS_Store的单次进程准确排除亦经窄审通过；文件位置/字节保持，未修改全局Git配置。
+
+后续policy失败仅为六份锁缺末尾LF及控制器File.ReadAllText行首启发式误报；均已修复，扫描规则未放宽。原Reviewer确认内容/行为等价并维持Source Review PASS。最新输入的真实生命周期为`doris-d36fe5954843`，最终TLS负例为`tls-expired-64c7c6371966`，以正式原件索引为准。

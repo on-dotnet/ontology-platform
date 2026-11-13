@@ -70,6 +70,6 @@ VM实际前提为 `vm.max_map_count>=2000000`、swap关闭、nofile>=60000。用
 
 2026-11-13用户批准机制差异：MySqlConnector2.6.2使用Required启用公开证书回调，所有主连接及取消辅助连接均由同一工厂强制挂接验证器。Required不代表省略验证：实际握手叶证书以显式私有CA建立CustomRootTrust完整链，校验固定TargetHost、有效期、ServerAuth及全部链错误；未知SslPolicyErrors拒绝，不使用明文回退。当前没有SslCa驱动选项，也不安装系统信任。
 
-自建链禁用证书下载；本机生命周期运行器对API/Worker和Web施加OS级仅loopback出站约束，覆盖驱动回调之前的潜在系统链构建行为。合成CA没有CRL/OCSP，在线撤销NOT_VERIFIED，不能据此承诺生产证书撤销策略。真实过期叶证书拒绝与原证书恢复后目录读取已在`tls-expired-f39164d081c7`通过；此前原生VerifyFull失败没有删除或改写。
+自建链禁用证书下载；本机生命周期运行器对API/Worker和Web施加OS级仅loopback出站约束，覆盖驱动回调之前的潜在系统链构建行为。合成CA没有CRL/OCSP，在线撤销NOT_VERIFIED，不能据此承诺生产证书撤销策略。真实过期叶证书拒绝与原证书恢复后目录读取已在`tls-expired-64c7c6371966`通过；此前原生VerifyFull失败没有删除或改写。
 
-最终源码复核同时补齐Doris的auditor脱敏投影：列表和详情隐藏FE主机、catalog、数据库和账号；operator保留经批准的非秘密配置。真实OIDC角色读取和旧revision修改409已在`doris-210dd06860f3`验证。
+最终源码复核同时补齐Doris的auditor脱敏投影：列表和详情隐藏FE主机、catalog、数据库和账号；operator保留经批准的非秘密配置。真实OIDC角色读取和旧revision修改409已在`doris-d36fe5954843`验证。

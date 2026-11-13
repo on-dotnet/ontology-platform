@@ -1,0 +1,67 @@
+{
+  "gate": "contract",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "tests": 55,
+    "skipped": 0,
+    "counts": {
+      "unit": 38,
+      "wire": 17
+    },
+    "originalEvidence": [
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-formatted/unit.json",
+        "sha256": "53bad84c6ec37bf68a33ebddac2c79bdac2e76ab48b773e9e0b01c97f9d19aa6",
+        "sizeBytes": 2127,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-formatted/unit.json"
+      },
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-formatted/wire.json",
+        "sha256": "bfe627ea6f8a45df0d6d440d3d57a8b8d963a1d327edc416cd228209d7be5fe6",
+        "sizeBytes": 2127,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-formatted/wire.json"
+      }
+    ],
+    "limitation": "Counts overlap between gates; CI, other architectures, production and online revocation are not covered"
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m2_evidence.py",
+    "--task",
+    "G4-M2-DORIS-01",
+    "--gate",
+    "contract",
+    "--input-key",
+    "0599f461506bcb6f0fbe127c5a6aaeef64650bf5c6da79f24121335cf98d145d"
+  ],
+  "exitCode": 0,
+  "tests": 55,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 0.22937450000608806,
+  "inputKey": "0599f461506bcb6f0fbe127c5a6aaeef64650bf5c6da79f24121335cf98d145d",
+  "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+  "policyKey": "03cd2776ce2489e3ae6a426fd104ac06e263978ff326e8fa64e1a862fcef343d",
+  "evidenceSha256": "10d5a38ab79b4cac2e63a0091112574e1476f56050c8af39b5862f4a2b38510b",
+  "logPath": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/contract.txt",
+  "sourceRun": "676c669084f740229dc91f85e90138da",
+  "sourceCommit": "c64477aff9b46aaad378dfbef3ef0f1c8ed486df",
+  "publishedLog": {
+    "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/contract.txt",
+    "sha256": "10d5a38ab79b4cac2e63a0091112574e1476f56050c8af39b5862f4a2b38510b",
+    "sizeBytes": 798,
+    "encoding": "raw",
+    "path": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/contract.txt"
+  }
+}

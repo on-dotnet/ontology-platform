@@ -1,0 +1,128 @@
+{
+  "taskId": "G4-M2-DORIS-01",
+  "runId": "doris-d36fe5954843",
+  "status": "LIFECYCLE_CHECKS_PASSED",
+  "buildBindings": {
+    "api": {
+      "receiptSha256": "60d817f4b9f61dd0242d3cb49fa8ad66cd22cac182406478d1bbf739d7216abc",
+      "inputKey": "055ff9555c6963f7798102b7b28886923a668a1eb4f17cfaafdb2f8dd65f355b",
+      "outputKey": "08d088ce7e6478ecee4d8161b7c710b5d32023034c6b9cd4bd1aa17895b270b2"
+    },
+    "web": {
+      "receiptSha256": "357300419d2baf756e75ac2c07ad3eaabf13998ad0d8e6a9f349459e9255b846",
+      "inputKey": "3dbce34ae47e59e07be82c2b32e8577d139cf32ed794668b778101336ed7842a",
+      "outputKey": "f87129a84475e864ce28e6303b32e634640b776f220f87930a73a1b45a6bf5ad"
+    }
+  },
+  "containers": {
+    "platform-pg": "83784c4864bd31694d45659135efb62ecea832e614503237251caa218985cd72",
+    "keycloak-test": "bea38416b503d3747950c273acd7ec44b1ad056804dd6f308a3d5799f584ec1d"
+  },
+  "createdNetworks": [
+    "g4-m2-doris-01-doris-d36fe5954843_platform-entry"
+  ],
+  "services": [
+    {
+      "name": "api",
+      "pid": 46747,
+      "status": "STARTED"
+    },
+    {
+      "name": "web",
+      "pid": 46748,
+      "status": "STARTED"
+    }
+  ],
+  "cleanup": [
+    {
+      "kind": "process-group",
+      "id": 46748,
+      "afterAbsent": true
+    },
+    {
+      "kind": "process-group",
+      "id": 46747,
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "83784c4864bd31694d45659135efb62ecea832e614503237251caa218985cd72",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "bea38416b503d3747950c273acd7ec44b1ad056804dd6f308a3d5799f584ec1d",
+      "afterAbsent": true
+    }
+  ],
+  "privateRuntime": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/.tools/security/g4-m2-doris-01/doris-d36fe5954843",
+  "hostPeakRssBytes": 1439842304,
+  "recipeSha256": "bf64b1829960d66c3d1015b807296451174e9d315dbdb4a64a6b20117e556835",
+  "volumes": [
+    "g4-m2-doris-01-doris-d36fe5954843_platform-data",
+    "g4-m2-doris-01-doris-d36fe5954843_keycloak-data"
+  ],
+  "engine": {
+    "id": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "version": "29.9.2",
+    "context": "desktop-linux"
+  },
+  "imageIds": {
+    "platform-pg": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+    "keycloak-test": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+  },
+  "browserExecution": {
+    "schemaVersion": 2,
+    "taskId": "G4-M2-DORIS-01",
+    "runId": "doris-d36fe5954843",
+    "stage": "doris-ui-lifecycle",
+    "commandId": "12885fc2bd2a4917966ac34a41acdc09",
+    "parentId": "c718febb3eab492aa43b82a73e7be687",
+    "cwd": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform",
+    "commandSummary": {
+      "executable": "sandbox-exec",
+      "argumentCount": 5,
+      "sha256": "2429e9e4033144b772327a557868080ceecffbf689f99f2d72b2c8e2d26fad63"
+    },
+    "inputFingerprint": "a5ec2509a9dfc66504a8a8d5556cc015e672f9330a941bcab20c5d9b2795e1c6",
+    "environmentFingerprint": "86e7abf0e5ab704a0cc608d8f6712076bc937430cf3704416ada9dca6635c10e",
+    "identity": "0932f4e10d16e5a12c411ec0de6c30c14d6e54ba730e0be0674a6db20d536a82",
+    "deadlineSeconds": 180,
+    "started": true,
+    "exitCode": 0,
+    "signal": null,
+    "classification": "SUCCESS",
+    "startedAtUtc": "2026-11-13T04:08:56.273273+00:00",
+    "endedAtUtc": "2026-11-13T04:09:32.732164+00:00",
+    "elapsedSeconds": 36.45850062499812,
+    "stdout": {
+      "path": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/artifacts/workflow/G4-M2-DORIS-01/commands/doris-d36fe5954843/12885fc2bd2a4917966ac34a41acdc09/stdout.txt",
+      "sha256": "40a93f78a70b8f0e7cdc2141b979cbdbedf474bb255b74da657aaef8e695e40a",
+      "sizeBytes": 714
+    },
+    "stderr": {
+      "path": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/artifacts/workflow/G4-M2-DORIS-01/commands/doris-d36fe5954843/12885fc2bd2a4917966ac34a41acdc09/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0
+    }
+  },
+  "auditAndSecretScan": {
+    "platformDump": true,
+    "hostLogs": true,
+    "actions": [
+      "connection.secret.intake",
+      "connection.create",
+      "connection.probe.start",
+      "connection.probe.complete",
+      "connection.enable",
+      "connection.disable",
+      "connection.catalog.start",
+      "connection.catalog.finish",
+      "connection.secret.rotate",
+      "connection.update"
+    ],
+    "raw": "PRIVATE_ONLY",
+    "associationsSha256": "5e9b0f81066bd54e51bd226daa3f4994734744399673351c223ffdac9acd879a"
+  },
+  "keep": "Private credentials, pre-cleanup platform dump, empty tmpfs volume handles and task networks retained for current-task diagnosis/review; tmpfs data is not retained after container removal. Release after evidence publication and scoped cleanup."
+}

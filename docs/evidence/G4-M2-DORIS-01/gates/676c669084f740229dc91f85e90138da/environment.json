@@ -1,0 +1,67 @@
+{
+  "gate": "environment",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "tests": 2,
+    "skipped": 0,
+    "counts": {
+      "prepare1": 1,
+      "prepare2": 1
+    },
+    "originalEvidence": [
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final/prepare1.json",
+        "sha256": "4011ee89683844cd515ba1d25ebff7290fe232149237c7b954c3a13c5bc7b4e8",
+        "sizeBytes": 11159,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final/prepare1.json"
+      },
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final/prepare2.json",
+        "sha256": "98dbd1ff4f8c8e9983ded84b04cc8d92b699f178283dcbd2abce5bad0e2bc90b",
+        "sizeBytes": 11159,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final/prepare2.json"
+      }
+    ],
+    "limitation": "Counts overlap between gates; CI, other architectures, production and online revocation are not covered"
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m2_evidence.py",
+    "--task",
+    "G4-M2-DORIS-01",
+    "--gate",
+    "environment",
+    "--input-key",
+    "74a20f655b612500d273bed7a9066773c9ce4f9b9ecb0d6289e7c9fa1b397e10"
+  ],
+  "exitCode": 0,
+  "tests": 2,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 8.231062542006839,
+  "inputKey": "74a20f655b612500d273bed7a9066773c9ce4f9b9ecb0d6289e7c9fa1b397e10",
+  "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+  "policyKey": "4040d3d880da2e8b926f6fd7697a3818b441235da7f39510d6c7fd09c051ccb7",
+  "evidenceSha256": "268a75d2c9f92ecb94ae2226582843b7213c77a94ca6911f0b486a85b1cba2c1",
+  "logPath": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/environment.txt",
+  "sourceRun": "676c669084f740229dc91f85e90138da",
+  "sourceCommit": "c64477aff9b46aaad378dfbef3ef0f1c8ed486df",
+  "publishedLog": {
+    "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/environment.txt",
+    "sha256": "268a75d2c9f92ecb94ae2226582843b7213c77a94ca6911f0b486a85b1cba2c1",
+    "sizeBytes": 781,
+    "encoding": "raw",
+    "path": "docs/evidence/G4-M2-DORIS-01/gates/676c669084f740229dc91f85e90138da/environment.txt"
+  }
+}
