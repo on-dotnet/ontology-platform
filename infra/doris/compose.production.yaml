@@ -1,0 +1,26 @@
+# 独立容量和私有文件必须显式提供；不可与test覆盖层叠加。
+# 模板静态检查不代表生产准入；平台G4非Development限制仍生效。
+services:
+  fe:
+    mem_limit: ${DORIS_PRODUCTION_FE_MEMORY:?Production FE capacity required}
+    memswap_limit: ${DORIS_PRODUCTION_FE_MEMORY:?Production FE capacity required}
+    volumes:
+      - type: bind
+        source: ${DORIS_PRODUCTION_FE_CONFIG:?Production FE configuration required}
+        target: /opt/apache-doris/fe/conf/fe.conf
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${DORIS_PRODUCTION_TLS_DIR:?Production certificates required}
+        target: /run/doris-tls
+        read_only: true
+        bind: {create_host_path: false}
+  be:
+    mem_limit: ${DORIS_PRODUCTION_BE_MEMORY:?Production BE capacity required}
+    memswap_limit: ${DORIS_PRODUCTION_BE_MEMORY:?Production BE capacity required}
+    volumes:
+      - type: bind
+        source: ${DORIS_PRODUCTION_BE_CONFIG:?Production BE configuration required}
+        target: /opt/apache-doris/be/conf/be.conf
+        read_only: true
+        bind: {create_host_path: false}

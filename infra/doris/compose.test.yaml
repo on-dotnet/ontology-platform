@@ -1,0 +1,9 @@
+# 仅合成本机测试。真实服务准入当前未通过，不直接执行up。
+services:
+  fe:
+    mem_limit: 4g
+    memswap_limit: 4g
+    ports: ["127.0.0.1:19030:9030"]
+  be:
+    mem_limit: 6g
+    memswap_limit: 6g

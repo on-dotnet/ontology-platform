@@ -28,4 +28,16 @@ FE容器4GiB、BE容器6GiB；平台PG0.5GiB、OIDC1GiB，四容器合计不超�
 
 制品获取与内容/风险检查 → 资源与隔离准入 → Compose静态渲染 → 有界就绪 → 原生MySQL端口TLS及坏证书/降级拒绝 → 有效只读权限与撤权 → 源端取消见证 → 平台完整凭据生命周期 → 合成备份恢复演练。首次OOM、进程退出、最终健康失败或就绪超时停昂贵链，保留证据做短定位；健康starting期间不误判失败。
 
-Compose命令、准确就绪窗口、已验JVM/BE参数和恢复命令将在选定镜像内部配置核对及真实验证后补齐；当前不提供未经验证的生产运行命令。
+## 当前源码与静态验证
+
+`infra/doris/compose.yaml`为共同来源，必须选用`compose.test.yaml`或`compose.production.yaml`之一，不叠加两种环境覆盖层。`.env.example`只含非敏感路径和合成预算；配置示例必须复制至私有目录，替换所有REPLACE标记，证书外置，不直接挂载源码示例。生产覆盖层另要求独立容量、配置和证书参数；使用独立Compose项目和卷，不能复用合成项目名。
+
+当前仅支持静态检查：从仓库根目录执行`docker compose --env-file <私有非敏感环境文件> -f infra/doris/compose.yaml -f infra/doris/compose.test.yaml config`；生产静态检查替换最后一个文件为`compose.production.yaml`，并显式提供所有生产参数。此命令不启动设施。未放行`up`，未验证备份/恢复操作，不把静态模板作为完整部署交付。
+
+Compose先插值再合并覆盖层，因此生产渲染当前仍需填写base的`DORIS_FE_MEMORY/BE_MEMORY/FE_CONFIG/BE_CONFIG/TLS_DIR`，以及对应的`DORIS_PRODUCTION_*`五项。可将base五项填为相同生产值以避免重复维护；最终合并结果使用生产覆盖值。生产缺参拒绝已验证，但不据此声称插值前提完全独立。
+
+镜像内`start_fe.sh`实际读取`JAVA_OPTS_FOR_JDK_17`；示例FE堆2GiB，BE堆512MiB及显式`mem_limit=3G`，仍待运行确认线程/非堆与最终峰值。脚本自动补充必要JDK17 opens参数，Compose直接调用已核验启动脚本，保留BE环境检查。健康检查只提示端口存活；总就绪窗口拟为240秒，真实准入还须管理员经直接TLS认证、FE存活与BE注册/Alive、fixture单副本成功。首次OOM/退出/最终超时停止昂贵链，不能无限重启。
+
+2026-11-13只读诊断发现VM的`vm.max_map_count=262144`和约1GiB swap不满足BE启动要求（至少2000000、禁用swap）；nofile65536符合。操作者完成支持的VM配置调整后再复核，不修改全局设置或设置`SKIP_CHECK_ULIMIT`绕过。宿主合成客户端目标计划为`localhost:19030`，服务证书须包含DNS SAN localhost，客户端使用显式私有CA+VerifyFull；该路径和证书验证仍NOT_RUN。实例首次启动前必须在私有FE配置中设置随机管理员口令对应的两阶段SHA1；应用不得持有它。
+
+准确启动/恢复命令将在执行准入和真实验证后补齐。当前[资源差异与剩余项](../evidence/G4-M2-DORIS-01/post-download-status.md)未闭合。

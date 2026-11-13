@@ -1,0 +1,96 @@
+# G4-M2-DORIS-01：当前仅完成静态检查；真实启动准入见任务卡。
+# 必须与一个环境覆盖层合用。镜像拉取由准入流程完成。
+services:
+  fe:
+    image: apache/doris@sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02
+    platform: linux/arm64
+    pull_policy: never
+    entrypoint: [bash, /opt/apache-doris/fe/bin/start_fe.sh, --console]
+    restart: "no"
+    mem_limit: ${DORIS_FE_MEMORY:?Set explicit FE memory limit}
+    memswap_limit: ${DORIS_FE_MEMORY:?Set explicit FE memory limit}
+    cpus: 2
+    pids_limit: 512
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    ulimits:
+      nofile: {soft: 65536, hard: 65536}
+    labels:
+      ontology.task: G4-M2-DORIS-01
+      ontology.run: ${DORIS_RUN_ID:?Set resource run identity}
+    volumes:
+      - type: bind
+        source: ${DORIS_FE_CONFIG:?Set private FE configuration path}
+        target: /opt/apache-doris/fe/conf/fe.conf
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${DORIS_TLS_DIR:?Set external certificate directory}
+        target: /run/doris-tls
+        read_only: true
+        bind: {create_host_path: false}
+      - fe-data:/opt/apache-doris/fe/doris-meta
+      - fe-log:/opt/apache-doris/fe/log
+    networks: [doris]
+    # 仅本地端口存活提示；不替代TLS、认证和SQL就绪验收。
+    healthcheck:
+      test: [CMD, bash, -c, "exec 3<>/dev/tcp/127.0.0.1/9030"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 180s
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: "2"}
+  be:
+    image: apache/doris@sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7
+    platform: linux/arm64
+    pull_policy: never
+    entrypoint: [bash, /opt/apache-doris/be/bin/start_be.sh, --console]
+    restart: "no"
+    mem_limit: ${DORIS_BE_MEMORY:?Set explicit BE memory limit}
+    memswap_limit: ${DORIS_BE_MEMORY:?Set explicit BE memory limit}
+    cpus: 2
+    pids_limit: 512
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    ulimits:
+      nofile: {soft: 65536, hard: 65536}
+    labels:
+      ontology.task: G4-M2-DORIS-01
+      ontology.run: ${DORIS_RUN_ID:?Set resource run identity}
+    volumes:
+      - type: bind
+        source: ${DORIS_BE_CONFIG:?Set private BE configuration path}
+        target: /opt/apache-doris/be/conf/be.conf
+        read_only: true
+        bind: {create_host_path: false}
+      - be-data:/opt/apache-doris/be/storage
+      - be-log:/opt/apache-doris/be/log
+    networks: [doris]
+    depends_on:
+      fe: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, bash, -c, "exec 3<>/dev/tcp/127.0.0.1/9050"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 180s
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: "2"}
+networks:
+  doris:
+    internal: true
+    labels:
+      ontology.task: G4-M2-DORIS-01
+      ontology.run: ${DORIS_RUN_ID:?Set resource run identity}
+volumes:
+  fe-data:
+    labels: {ontology.task: G4-M2-DORIS-01, ontology.run: "${DORIS_RUN_ID:?Set resource run identity}"}
+  fe-log:
+    labels: {ontology.task: G4-M2-DORIS-01, ontology.run: "${DORIS_RUN_ID:?Set resource run identity}"}
+  be-data:
+    labels: {ontology.task: G4-M2-DORIS-01, ontology.run: "${DORIS_RUN_ID:?Set resource run identity}"}
+  be-log:
+    labels: {ontology.task: G4-M2-DORIS-01, ontology.run: "${DORIS_RUN_ID:?Set resource run identity}"}

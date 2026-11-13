@@ -1,0 +1,13 @@
+# 仅6GiB容器的合成配置草案；不得设置SKIP_CHECK_ULIMIT。
+JAVA_HOME=/usr/lib/jvm/java
+JAVA_OPTS_FOR_JDK_17="-Dfile.encoding=UTF-8 -Xms128m -Xmx512m -XX:MaxDirectMemorySize=128m -XX:MaxMetaspaceSize=256m -XX:ActiveProcessorCount=2 -XX:-CriticalJNINatives -XX:+IgnoreUnrecognizedVMOptions"
+# 显式绝对值，避免按VM物理内存计算百分比；余量用于线程、JVM及非堆。
+mem_limit = 3G
+be_port = 9060
+webserver_port = 8040
+heartbeat_service_port = 9050
+brpc_port = 8060
+storage_root_path = /opt/apache-doris/be/storage
+sys_log_level = INFO
+sys_log_roll_num = 2
+AWS_EC2_METADATA_DISABLED=true

@@ -1,0 +1,20 @@
+# 仅4GiB容器的合成配置草案；尚未真实启动验证。
+# 复制到私有目录并替换全部REPLACE标记。生产另行配置容量与身份。
+JAVA_HOME=/usr/lib/jvm/java
+JAVA_OPTS_FOR_JDK_17="-Dfile.encoding=UTF-8 -Djavax.security.auth.useSubjectCredsOnly=false -Xms1024m -Xmx2048m -XX:MaxDirectMemorySize=256m -XX:MaxMetaspaceSize=384m -XX:ActiveProcessorCount=2"
+http_port = 8030
+rpc_port = 9020
+query_port = 9030
+edit_log_port = 9010
+enable_fqdn_mode = true
+enable_ssl = true
+ssl_trust_store_type = PKCS12
+mysql_ssl_default_ca_certificate = /run/doris-tls/ca_certificate.p12
+mysql_ssl_default_server_certificate = /run/doris-tls/server_certificate.p12
+mysql_ssl_default_ca_certificate_password = REPLACE_WITH_PRIVATE_STORE_PASSWORD
+mysql_ssl_default_server_certificate_password = REPLACE_WITH_PRIVATE_STORE_PASSWORD
+# 原始随机管理员口令只留私有夹具；此处填两阶段SHA1结果而非明文。
+initial_root_password = REPLACE_WITH_PRIVATE_DOUBLE_SHA1
+sys_log_level = INFO
+sys_log_roll_num = 2
+audit_log_roll_num = 2
