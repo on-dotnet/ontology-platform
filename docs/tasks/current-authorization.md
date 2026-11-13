@@ -165,3 +165,10 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 ## 2026-11-13 严格TLS实现差异（最新明确批准）
 
 用户明确批准[tls-validation-delta](../evidence/G4-M2-DORIS-01/tls-validation-delta.md)：保留MySqlConnector2.6.2，Required仅作为启用公开验证回调的驱动选项，所有实际握手强制TLS、私有CA完整叶证书链、主机名、有效期和ServerAuth严格校验；主连接与取消辅助连接一致，无明文回退、无全局信任/新依赖/生产权限。合成CA无CRL/OCSP，在线撤销NOT_VERIFIED。真实正反例通过才恢复收口；同会话同树继续，不逐补丁审批。
+
+
+## 2026-11-13 G4-M2-TDENGINE-01 P0 最新明确授权（追加）
+
+用户明确批准附件 `Codex-G4-M2-TDENGINE-01-P0-Admission-20261113.md` 的一次性P0准入核对，以main `5113d0b9b233e307664c964ae9bf3c1d6b10adfb` 新建独立托管树和 `codex/g4-m2-tdengine-01`。先精确版本/edition、WSS、真实只读与合法来源，再依赖/资源/凭据合同；Master单写文档、非作者只读Review，允许限定文档提交与普通push。只交[一页状态](G4-M2-TDENGINE-01.md)和[A–F一次性申请](../evidence/G4-M2-TDENGINE-01/admission-request.md)，同会话同树等后续批准。
+
+明确允许附件白名单官方HTTPS小型文档、公开源文件、许可证、发布页、NuGet元数据与已核官方OCI index/manifest及经descriptor绑定的config JSON；单响应正文≤8MiB、累计≤64MiB，记录实收字节/来源；不自动跟随非名单重定向，不读取镜像层、nupkg、安装包或源码压缩包。凭据不读取/输出/归档。不假定社区有企业能力、不申请试用/付费。禁止产品代码、prepare/restore/setup/install、构建/服务启动、生产或验收集群、全量历史测试、Doris保留资源清理、任何P0 Review ZIP、main更新、Oracle/M3/G6。此最新授权仅覆盖本P0，与历史任务授权分开保留。

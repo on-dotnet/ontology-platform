@@ -1,0 +1,721 @@
+<!doctype html><html lang=en-US dir=ltr class="docs-wrapper plugin-docs plugin-id-default docs-version-3.4.3 docs-doc-page docs-doc-id-operations-and-tooling/components/taosadapter/configuration" data-has-hydrated=false><head><meta charset=UTF-8><meta name=generator content="Docusaurus v3.9.2"><title data-rh=true>Configuration Reference | TDengine TSDB Docs</title><meta data-rh=true name=viewport content="width=device-width, initial-scale=1.0"/><meta data-rh=true name=twitter:card content=summary_large_image /><meta data-rh=true property=og:image content=https://docs.tdengine.com/img/docs-card.jpg /><meta data-rh=true name=twitter:image content=https://docs.tdengine.com/img/docs-card.jpg /><meta data-rh=true property=og:url content=https://docs.tdengine.com/operations-and-tooling/components/taosadapter/configuration/ /><meta data-rh=true property=og:locale content=en_US /><meta data-rh=true name=docusaurus_locale content=en /><meta data-rh=true name=docsearch:language content=en /><meta data-rh=true property=og:type content=article /><meta data-rh=true property=og:image:width content=1280 /><meta data-rh=true property=og:image:height content=640 /><meta data-rh=true property=og:image:alt content="TDengine TSDB Docs"/><meta data-rh=true property=og:image:type content=image/jpeg /><meta data-rh=true name=docusaurus_version content=3.4.3 /><meta data-rh=true name=docusaurus_tag content=docs-default-3.4.3 /><meta data-rh=true name=docsearch:version content=3.4.3 /><meta data-rh=true name=docsearch:docusaurus_tag content=docs-default-3.4.3 /><meta data-rh=true property=og:title content="Configuration Reference | TDengine TSDB Docs"/><meta data-rh=true name=description content=Configuration /><meta data-rh=true property=og:description content=Configuration /><link data-rh=true rel=icon href=/favicon.ico /><link data-rh=true rel=canonical href=https://docs.tdengine.com/operations-and-tooling/components/taosadapter/configuration/ /><link data-rh=true rel=alternate href=https://docs.tdengine.com/operations-and-tooling/components/taosadapter/configuration/ hreflang=en-US /><link data-rh=true rel=alternate href=https://docs.tdengine.com/operations-and-tooling/components/taosadapter/configuration/ hreflang=x-default /><link data-rh=true rel=preconnect href=https://913LE6LR99-dsn.algolia.net crossorigin=anonymous /><link rel=preconnect href=https://www.googletagmanager.com><script>window.dataLayer=window.dataLayer||[],function(e,t,a,n,r){e[n]=e[n]||[],e[n].push({"gtm.start":new Date().getTime(),event:"gtm.js"});var d=t.getElementsByTagName(a)[0],g=t.createElement(a);g.async=!0,g.src="https://www.googletagmanager.com/gtm.js?id="+r+("dataLayer"!=n?"&l="+n:""),d.parentNode.insertBefore(g,d)}(window,document,"script","dataLayer","GTM-K3G5M4H")</script><link rel=search type=application/opensearchdescription+xml title="TDengine TSDB Docs" href=/opensearch.xml><link rel=stylesheet href=/fonts/css/ibm-plex.min.css><link rel=stylesheet href=/assets/css/styles.703b7788.css /><script src=/assets/js/runtime~main.80e174d6.js defer></script><script src=/assets/js/main.318cacbb.js defer></script></head><body class=navigation-with-keyboard><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K3G5M4H" height=0 width=0 style=display:none;visibility:hidden></iframe></noscript>
+
+
+<svg style="display: none;"><defs>
+<symbol id=theme-svg-external-link viewBox="0 0 24 24"><path fill=currentColor d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t;document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{for(var[t,e]of new URLSearchParams(window.location.search).entries())if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id=__docusaurus><link rel=preload as=image href=/img/site-tdengine-tsdb-logo.svg /><link rel=preload as=image href=/img/footer-logo.svg /><link rel=preload as=image href=/img/soc-footer.png /><link rel=preload as=image href=/img/iso27001-footer.png /><link rel=preload as=image href=/img/iso27017-footer.png /><div role=region aria-label="Skip to main content"><a class=skipToContent_yYcR href=#__docusaurus_skipToContent_fallback>Skip to main content</a></div><nav aria-label=Main class="theme-layout-navbar navbar navbar--fixed-top navbarHideable_l503"><div class=navbar__inner><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded=false class="navbar__toggle clean-btn" type=button><svg width=30 height=30 viewBox="0 0 30 30" aria-hidden=true><path stroke=currentColor stroke-linecap=round stroke-miterlimit=10 stroke-width=2 d="M4 7h22M4 15h22M4 23h22"/></svg></button><a href=https://tdengine.com/tsdb/ target=_blank rel="noopener noreferrer" class=navbar__brand><div class=navbar__logo><img src=/img/site-tdengine-tsdb-logo.svg alt="TDengine TSDB" class="themedComponent_uqQd themedComponent--light_RWDD" height=36 width=218.25 /><img src=/img/site-tdengine-tsdb-logo.svg alt="TDengine TSDB" class="themedComponent_uqQd themedComponent--dark_Sl38" height=36 width=218.25 /></div></a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href=https://idmpdocs.tdengine.com target=_blank rel="noopener noreferrer" class="navbar__item navbar__link tdengine-button">IDMP Docs</a><a href=https://tdengine.com/contact/ target=_blank rel="noopener noreferrer" class="navbar__item navbar__link contact-button">Contact Us</a><a href=https://cloud.tdengine.com target=_blank rel="noopener noreferrer" class="navbar__item navbar__link tdengine-button">Cloud</a><div class="navbarSearchTemp navbarSearchContainer_hhWf"><button type=button class="DocSearch DocSearch-Button" aria-label="Search (Meta+k)" aria-keyshortcuts=Meta+k><span class=DocSearch-Button-Container><svg width=20 height=20 class=DocSearch-Search-Icon viewBox="0 0 24 24" aria-hidden=true><circle cx=11 cy=11 r=8 stroke=currentColor fill=none stroke-width=1.4 /><path d="m21 21-4.3-4.3" stroke=currentColor fill=none stroke-linecap=round stroke-linejoin=round /></svg><span class=DocSearch-Button-Placeholder>Search</span></span><span class=DocSearch-Button-Keys></span></button></div></div></div><div role=presentation class=navbar-sidebar__backdrop></div></nav><div id=__docusaurus_skipToContent_fallback class="theme-layout-main main-wrapper mainWrapper_QJIm"><div class=docsWrapper__R17><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_vynl" type=button></button><div class=docRoot_hCAi><aside class="theme-doc-sidebar-container docSidebarContainer_Vfql"><div class=sidebarViewport_cjDR><div class="sidebar_mhZE sidebarWithHideableNavbar__6UL"><a href=https://tdengine.com/tsdb/ target=_blank rel="noopener noreferrer" tabindex=-1 class=sidebarLogo_F_0z><img src=/img/site-tdengine-tsdb-logo.svg alt="TDengine TSDB" class="themedComponent_uqQd themedComponent--light_RWDD" height=36 width=218.25 /><img src=/img/site-tdengine-tsdb-logo.svg alt="TDengine TSDB" class="themedComponent_uqQd themedComponent--dark_Sl38" height=36 width=218.25 /></a><div class=sidebarTop_GmEg><select class=versionSelect_zc6e><option value=3.4.3 selected>v3.4.3 (Latest)<option value=3.4.2>v3.4.2<option value=cloud>Cloud<option value=3.3.8>v3.3.8<option value=3.3.6>v3.3.6 (LTS)<option value=3.2>v3.2<option value=3.1>v3.1<option value=3.0>v3.0<option value=2.6>v2.6<option value=2.4>v2.4<option value=2.0>v2.0<option value=1.6>v1.6</select><button type=button class="DocSearch DocSearch-Button" aria-label="Search (Meta+k)" aria-keyshortcuts=Meta+k><span class=DocSearch-Button-Container><svg width=20 height=20 class=DocSearch-Search-Icon viewBox="0 0 24 24" aria-hidden=true><circle cx=11 cy=11 r=8 stroke=currentColor fill=none stroke-width=1.4 /><path d="m21 21-4.3-4.3" stroke=currentColor fill=none stroke-linecap=round stroke-linejoin=round /></svg><span class=DocSearch-Button-Placeholder>Search</span></span><span class=DocSearch-Button-Keys></span></button></div><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_Y1UP"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/><span title="Reading Guide" class=linkLabel_cdMF>Reading Guide</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/product-intro/><span title=Introduction class=linkLabel_cdMF>Introduction</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/core-concepts/><span title="Time-Series Data Basics" class=linkLabel_cdMF>Time-Series Data Basics</span></a><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/quick-start/><span title="Quick Start" class=categoryLinkLabel_L7sK>Quick Start</span></a><button aria-label="Expand sidebar category 'Quick Start'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/tdengine-sql/><span title="TDengine SQL" class=categoryLinkLabel_L7sK>TDengine SQL</span></a><button aria-label="Expand sidebar category 'TDengine SQL'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/data-subscription/><span title="Data Subscription" class=categoryLinkLabel_L7sK>Data Subscription</span></a><button aria-label="Expand sidebar category 'Data Subscription'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/stream-processing/><span title="Stream Processing" class=categoryLinkLabel_L7sK>Stream Processing</span></a><button aria-label="Expand sidebar category 'Stream Processing'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/data-ingest-and-delivery/><span title="Data Ingest and Delivery" class=categoryLinkLabel_L7sK>Data Ingest and Delivery</span></a><button aria-label="Expand sidebar category 'Data Ingest and Delivery'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/ai-and-advanced-analytics/><span title="AI and Advanced Analytics" class=categoryLinkLabel_L7sK>AI and Advanced Analytics</span></a><button aria-label="Expand sidebar category 'AI and Advanced Analytics'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/developer-guide/><span title="Developer's Guide" class=categoryLinkLabel_L7sK>Developer's Guide</span></a><button aria-label="Expand sidebar category 'Developer's Guide'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/security-guide/><span title="Security Guide" class=categoryLinkLabel_L7sK>Security Guide</span></a><button aria-label="Expand sidebar category 'Security Guide'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role=button aria-expanded=true href=/operations-and-tooling/overview/><span title="Operations and Tooling" class=categoryLinkLabel_L7sK>Operations and Tooling</span></a></div><ul class=menu__list><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/overview/><span title="TDengine Components" class=linkLabel_cdMF>TDengine Components</span></a><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" tabindex=0 href=/operations-and-tooling/operations/><span title="Operations and Maintenance" class=categoryLinkLabel_L7sK>Operations and Maintenance</span></a><button aria-label="Expand sidebar category 'Operations and Maintenance'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist menu__link--active" tabindex=0 href=/operations-and-tooling/components/><span title=Components class=categoryLinkLabel_L7sK>Components</span></a><button aria-label="Collapse sidebar category 'Components'" aria-expanded=true type=button class="clean-btn menu__caret"></button></div><ul class=menu__list><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/components/taosd/><span title=taosd class=linkLabel_cdMF>taosd</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/components/taosc/><span title=taosc class=linkLabel_cdMF>taosc</span></a><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-3 menu__list-item"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist menu__link--active" tabindex=0 href=/operations-and-tooling/components/taosadapter/><span title=taosAdapter class=categoryLinkLabel_L7sK>taosAdapter</span></a><button aria-label="Collapse sidebar category 'taosAdapter'" aria-expanded=true type=button class="clean-btn menu__caret"></button></div><ul class=menu__list><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-4 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/components/taosadapter/data-ingestion/><span title="Data Ingestion Interfaces" class=linkLabel_cdMF>Data Ingestion Interfaces</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-4 menu__list-item"><a class="menu__link menu__link--active" aria-current=page tabindex=0 href=/operations-and-tooling/components/taosadapter/configuration/><span title="Configuration Reference" class=linkLabel_cdMF>Configuration Reference</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-4 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/components/taosadapter/operations/><span title="Operations and Monitoring" class=linkLabel_cdMF>Operations and Monitoring</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-4 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/components/taosadapter/high-availability/><span title="High Availability" class=linkLabel_cdMF>High Availability</span></a></ul><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/components/explorer/><span title=taosExplorer class=linkLabel_cdMF>taosExplorer</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/components/taoskeeper/><span title=taosKeeper class=linkLabel_cdMF>taosKeeper</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/components/taosx/><span title=taosX class=linkLabel_cdMF>taosX</span></a><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-3 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" tabindex=0 href=/operations-and-tooling/components/taosx-agent/><span title=taosX-Agent class=categoryLinkLabel_L7sK>taosX-Agent</span></a><button aria-label="Expand sidebar category 'taosX-Agent'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/components/tdinsight/><span title=TDinsight class=linkLabel_cdMF>TDinsight</span></a><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-3 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" tabindex=0 href=/operations-and-tooling/components/license-center/><span title="License Center" class=categoryLinkLabel_L7sK>License Center</span></a><button aria-label="Expand sidebar category 'License Center'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/components/config-scope/><span title="Configuration Parameter Scope" class=linkLabel_cdMF>Configuration Parameter Scope</span></a></ul><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" tabindex=0 href=/operations-and-tooling/tools/><span title=Tools class=categoryLinkLabel_L7sK>Tools</span></a><button aria-label="Expand sidebar category 'Tools'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/operations-and-tooling/supported-platforms/><span title="Supported Platforms" class=linkLabel_cdMF>Supported Platforms</span></a></ul><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/ecosystem-integrations/><span title="Ecosystem Integrations" class=categoryLinkLabel_L7sK>Ecosystem Integrations</span></a><button aria-label="Expand sidebar category 'Ecosystem Integrations'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/best-practices/><span title="Best Practices" class=categoryLinkLabel_L7sK>Best Practices</span></a><button aria-label="Expand sidebar category 'Best Practices'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/internals/><span title="Inside TDengine" class=categoryLinkLabel_L7sK>Inside TDengine</span></a><button aria-label="Expand sidebar category 'Inside TDengine'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/faq/><span title=FAQ class=categoryLinkLabel_L7sK>FAQ</span></a><button aria-label="Expand sidebar category 'FAQ'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_EDSo menu__link menu__link--sublist" href=/release-history/><span title="Release History" class=categoryLinkLabel_L7sK>Release History</span></a><button aria-label="Expand sidebar category 'Release History'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/roadmap/><span title="Product Roadmap" class=linkLabel_cdMF>Product Roadmap</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/tdengine-idmp/><span title="TDengine IDMP" class=linkLabel_cdMF>TDengine IDMP</span></a></ul></nav></div></div></aside><main class=docMainContainer_ctLs><div class="container padding-top--md padding-bottom--lg"><div class=row><div class="col docItemCol_WZZQ"><div class=docItemContainer_Oxeh><article><div class="tocCollapsible_y6Oc theme-doc-toc-mobile tocMobile_Xx7o"><button type=button class="clean-btn tocCollapsibleButton_ktNL">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Configuration Reference</h1></header><h2 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=configuration>Configuration<a href=#configuration class=hash-link aria-label="Direct link to Configuration" title="Direct link to Configuration" translate=no>​</a></h2>
+<p>taosAdapter supports configuration through command-line parameters, environment variables, and configuration files. The default configuration file is <code>/etc/taos/taosadapter.toml</code>, and you can specify the configuration file using the -c or --config command-line parameter..</p>
+<p>Command-line parameters take precedence over environment variables, which take precedence over configuration files. The command-line usage is arg=val, such as taosadapter -p=30000 --debug=true.</p>
+<p>See the example configuration file at <a href=https://github.com/taosdata/taosadapter/blob/3.0/example/config/taosadapter.toml target=_blank rel="noopener noreferrer" class="">example/config/taosadapter.toml</a>.</p>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=basic-configuration>Basic Configuration<a href=#basic-configuration class=hash-link aria-label="Direct link to Basic Configuration" title="Direct link to Basic Configuration" translate=no>​</a></h3>
+<p>The basic configuration parameters for <code>taosAdapter</code> are as follows:</p>
+<ul>
+<li class="">
+<p><strong><code>debug</code></strong>: Whether to enable debug mode (pprof)</p>
+<ul>
+<li class=""><strong>When set to <code>true</code> (default)</strong>: Enables Go pprof debug mode, allowing access to debug information via <code>http://&lt;fqdn>:&lt;port>/debug/pprof</code>.</li>
+<li class=""><strong>When set to <code>false</code></strong>: Disables debug mode, preventing access to debug information.</li>
+</ul>
+</li>
+<li class="">
+<p><strong><code>instanceId</code></strong>: The instance ID of <code>taosAdapter</code>, used to distinguish logs from different instances. Default value: <code>32</code>.</p>
+</li>
+<li class="">
+<p><strong><code>port</code></strong>: The port on which <code>taosAdapter</code> provides HTTP/WebSocket services. Default value: <code>6041</code>.</p>
+</li>
+<li class="">
+<p><strong><code>taosConfigDir</code></strong>: The configuration file directory for TDengine. Default value: <code>/etc/taos</code>. The <code>taos.cfg</code> file in this directory will be loaded.</p>
+</li>
+</ul>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=ssl>SSL<a href=#ssl class=hash-link aria-label="Direct link to SSL" title="Direct link to SSL" translate=no>​</a></h3>
+<p><code>[ssl]</code> enables HTTPS / WSS on taosAdapter (Enterprise Edition). See the example configuration at <a href=https://github.com/taosdata/taosadapter/blob/3.0/example/config/taosadapter.toml target=_blank rel="noopener noreferrer" class="">example/config/taosadapter.toml</a>. For certificate generation and enablement steps, see <a class="" href=/security-guide/full-trace-transport/#211-server-side-httpswss>Full-Trace Transport Security · Server HTTPS/WSS</a> and <a class="" href=/security-guide/full-trace-transport/#11-appendix-generate-a-self-signed-certificate>Appendix: Generate a Self-Signed Certificate</a>.</p>
+<ul>
+<li class=""><strong><code>ssl.enable</code></strong>: Whether to enable SSL. Default <code>false</code>. Enterprise capability.</li>
+<li class=""><strong><code>ssl.certFile</code></strong>: Path to the server certificate file (PEM).</li>
+<li class=""><strong><code>ssl.keyFile</code></strong>: Path to the server private key file (PEM); recommended permission <code>600</code>.</li>
+</ul>
+<p>After enabling, restart taosAdapter (for example <code>systemctl restart taosadapter</code>). Logs typically show <code>SSL is enabled</code>. For client TrustStore / <code>wss</code> / <code>useSSL</code>, see <a class="" href=/security-guide/client-connector-security/>Client and Connector Security</a>.</p>
+<p>Starting from version 3.3.4.0, taosAdapter supports setting the number of concurrent calls for invoking C methods:</p>
+<ul>
+<li class="">
+<p><strong><code>maxAsyncConcurrentLimit</code></strong></p>
+<p>Sets the maximum number of concurrent calls for C asynchronous methods (<code>0</code> means using the number of CPU cores).</p>
+</li>
+<li class="">
+<p><strong><code>maxSyncConcurrentLimit</code></strong></p>
+<p>Sets the maximum number of concurrent calls for C synchronous methods (<code>0</code> means using the number of CPU cores).</p>
+</li>
+</ul>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=registration-configuration>Registration Configuration<a href=#registration-configuration class=hash-link aria-label="Direct link to Registration Configuration" title="Direct link to Registration Configuration" translate=no>​</a></h3>
+<p>Starting from version <strong>3.4.0.0</strong>, taosAdapter will register itself to the TDengine TSDB. It can be queried using the SQL statement <code>select * from performance_schema.perf_instances where type = 'taosadapter'</code>.</p>
+<p>The registration configuration parameters are as follows:</p>
+<ul>
+<li class=""><strong><code>register.instance</code></strong>: The address of the taosAdapter instance, with a maximum length of 255 bytes. If not set or set to an empty string, the system will automatically generate it by concatenating the hostname and port number. If <code>ssl.enable</code> is true, a <code>https</code> protocol header will be prepended.</li>
+<li class=""><strong><code>register.description</code></strong>: The description of the taosAdapter instance, with a maximum length of 511 bytes. The default value is an empty string.</li>
+<li class=""><strong><code>register.duration</code></strong>: The registration interval for the taosAdapter instance, in seconds. The default value is 10 seconds. Every time this interval elapses, the instance will re-register to refresh its expiration time. This value must be greater than 0 and less than <code>register.expire</code>.</li>
+<li class=""><strong><code>register.expire</code></strong>: The expiration time for the taosAdapter instance registration, in seconds. The default value is 30 seconds. If no registration refresh request is received within this time, the registration information will be deleted. This value must be greater than <code>register.duration</code>.</li>
+</ul>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=cross-origin-configuration>Cross-Origin Configuration<a href=#cross-origin-configuration class=hash-link aria-label="Direct link to Cross-Origin Configuration" title="Direct link to Cross-Origin Configuration" translate=no>​</a></h3>
+<p>When making API calls from the browser, please configure the following Cross-Origin Resource Sharing (CORS) parameters based on your actual situation:</p>
+<ul>
+<li class=""><strong><code>cors.allowAllOrigins</code></strong>: Whether to allow all origins to access, default is true.</li>
+<li class=""><strong><code>cors.allowOrigins</code></strong>: A comma-separated list of origins allowed to access. Multiple origins can be specified.</li>
+<li class=""><strong><code>cors.allowHeaders</code></strong>: A comma-separated list of request headers allowed for cross-origin access. Multiple headers can be specified.</li>
+<li class=""><strong><code>cors.exposeHeaders</code></strong>: A comma-separated list of response headers exposed for cross-origin access. Multiple headers can be specified.</li>
+<li class=""><strong><code>cors.allowCredentials</code></strong>: Whether to allow cross-origin requests to include user credentials, such as cookies, HTTP authentication information, or client SSL certificates.</li>
+<li class=""><strong><code>cors.allowWebSockets</code></strong>: Whether to allow WebSockets connections.</li>
+</ul>
+<p>If you are not making API calls through a browser, you do not need to worry about these configurations.</p>
+<p>The above configurations take effect for the following interfaces:</p>
+<ul>
+<li class="">RESTful API requests</li>
+<li class="">WebSocket API requests</li>
+<li class="">InfluxDB v1 write interface</li>
+<li class="">OpenTSDB HTTP write interface</li>
+</ul>
+<p>For details about the CORS protocol, please refer to: <a href=https://www.w3.org/wiki/CORS_Enabled target=_blank rel="noopener noreferrer" class="">https://www.w3.org/wiki/CORS_Enabled</a> or <a href=https://developer.mozilla.org/docs/Web/HTTP/CORS target=_blank rel="noopener noreferrer" class="">https://developer.mozilla.org/docs/Web/HTTP/CORS</a>.</p>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=connection-pool-configuration>Connection Pool Configuration<a href=#connection-pool-configuration class=hash-link aria-label="Direct link to Connection Pool Configuration" title="Direct link to Connection Pool Configuration" translate=no>​</a></h3>
+<p>taosAdapter uses a connection pool to manage connections to TDengine, improving concurrency performance and resource utilization. The connection pool configuration applies to the following interfaces, and these interfaces share a single connection pool:</p>
+<ul>
+<li class="">RESTful API requests</li>
+<li class="">InfluxDB v1 write interface</li>
+<li class="">OpenTSDB JSON and telnet format writing</li>
+<li class="">Telegraf data writing</li>
+<li class="">collectd data writing</li>
+<li class="">StatsD data writing</li>
+<li class="">node_exporter data collection writing</li>
+<li class="">OpenMetrics data collection and writing</li>
+<li class="">Prometheus remote_read and remote_write</li>
+<li class="">JSON data writing</li>
+</ul>
+<p>The configuration parameters for the connection pool are as follows:</p>
+<ul>
+<li class=""><strong><code>pool.maxConnect</code></strong>: The maximum number of connections allowed in the pool, default is twice the number of CPU cores. It is recommended to keep the default setting.</li>
+<li class=""><strong><code>pool.maxIdle</code></strong>: The maximum number of idle connections in the pool, default is the same as <code>pool.maxConnect</code>. It is recommended to keep the default setting.</li>
+<li class=""><strong><code>pool.idleTimeout</code></strong>: Connection idle timeout, default is never timeout. It is recommended to keep the default setting.</li>
+<li class=""><strong><code>pool.waitTimeout</code></strong>: Timeout for obtaining a connection from the pool, default is set to 60 seconds. If a connection is not obtained within the timeout period, HTTP status code 503 will be returned. This parameter is available starting from version 3.3.3.0.</li>
+<li class=""><strong><code>pool.maxWait</code></strong>: The maximum number of requests waiting to get a connection in the pool, default is 0, which means no limit. When the number of queued requests exceeds this value, new requests will return HTTP status code 503. This parameter is available starting from version 3.3.3.0.</li>
+</ul>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=query-result-set-configuration>Query Result Set Configuration<a href=#query-result-set-configuration class=hash-link aria-label="Direct link to Query Result Set Configuration" title="Direct link to Query Result Set Configuration" translate=no>​</a></h3>
+<p>taosAdapter can automatically release query result sets that stay idle for a long time on the WebSocket interface (<code>/ws</code>), preventing result sets from being retained when a client stops fetching data, for example after a client-side query timeout.</p>
+<ul>
+<li class=""><strong><code>queryResult.idleTimeout</code></strong>: Idle timeout for query result sets, default is 1 hour. This configuration applies to result sets created by the <code>query</code> action and by stmt/stmt2 <code>use_result</code> on the <code>/ws</code> interface. The idle timer starts from the last fetch of a result set (or from its creation if it has never been fetched) and is reset on every fetch. A result set that stays idle longer than this duration is released automatically; afterwards, fetch requests for its id fail with a "result is nil" error. Set to 0 to disable this cleanup. This configuration does not affect the RESTful interface, which returns all results within the request.</li>
+</ul>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=http-response-code-configuration>HTTP Response Code Configuration<a href=#http-response-code-configuration class=hash-link aria-label="Direct link to HTTP Response Code Configuration" title="Direct link to HTTP Response Code Configuration" translate=no>​</a></h3>
+<p>taosAdapter uses the parameter <code>httpCodeServerError</code> to set whether to return a non-200 HTTP status code when the C interface returns an error. When set to true, it will return different HTTP status codes based on the error code returned by C. See <a class="" href=/developer-guide/connectors-reference/rest-api/>HTTP Response Codes</a> for details.</p>
+<p>This configuration only affects the <strong>RESTful interface</strong>.</p>
+<p>Parameter Description:</p>
+<ul>
+<li class=""><strong><code>httpCodeServerError</code></strong>:<!-- -->
+<ul>
+<li class=""><strong>When set to <code>true</code></strong>: Map the error code returned by the C interface to the corresponding HTTP status code.</li>
+<li class=""><strong>When set to <code>false</code></strong>: Regardless of the error returned by the C interface, always return the HTTP status code <code>200</code> (default value).</li>
+</ul>
+</li>
+</ul>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=memory-limit-configuration>Memory limit configuration<a href=#memory-limit-configuration class=hash-link aria-label="Direct link to Memory limit configuration" title="Direct link to Memory limit configuration" translate=no>​</a></h3>
+<p>taosAdapter will monitor the memory usage during its operation and adjust it through two thresholds. The valid value range is an integer from 1 to 100, and the unit is the percentage of system physical memory.</p>
+<p>This configuration only affects the following interfaces:</p>
+<ul>
+<li class="">RESTful interface request</li>
+<li class="">InfluxDB v1 write interface</li>
+<li class="">OpenTSDB HTTP write interface</li>
+<li class="">Prometheus remote_read and remote_write interfaces</li>
+</ul>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=parameter-description>Parameter Description<a href=#parameter-description class=hash-link aria-label="Direct link to Parameter Description" title="Direct link to Parameter Description" translate=no>​</a></h4>
+<ul>
+<li class=""><strong><code>pauseQueryMemoryThreshold</code></strong>:<!-- -->
+<ul>
+<li class="">When memory usage exceeds this threshold, taosAdapter will stop processing query requests.</li>
+<li class="">Default value: <code>70</code> (i.e. 70% of system physical memory).</li>
+</ul>
+</li>
+<li class=""><strong><code>pauseAllMemoryThreshold</code></strong>:<!-- -->
+<ul>
+<li class="">When memory usage exceeds this threshold, taosAdapter will stop processing all requests (including writes and queries).</li>
+<li class="">Default value: <code>80</code> (i.e. 80% of system physical memory).</li>
+</ul>
+</li>
+</ul>
+<p>When memory usage falls below the threshold, taosAdapter will automatically resume the corresponding function.</p>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=http-return-content>HTTP return content<a href=#http-return-content class=hash-link aria-label="Direct link to HTTP return content" title="Direct link to HTTP return content" translate=no>​</a></h4>
+<ul>
+<li class="">
+<p><strong>When <code>pauseQueryMemoryThreshold</code> is exceeded</strong>:</p>
+<ul>
+<li class="">HTTP status code: <code>503</code></li>
+<li class="">Return content: <code>"query memory exceeds threshold"</code></li>
+</ul>
+</li>
+<li class="">
+<p><strong>When <code>pauseAllMemoryThreshold</code> is exceeded</strong>:</p>
+<ul>
+<li class="">HTTP status code: <code>503</code></li>
+<li class="">Return content: <code>"memory exceeds threshold"</code></li>
+</ul>
+</li>
+</ul>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=status-check-interface>Status check interface<a href=#status-check-interface class=hash-link aria-label="Direct link to Status check interface" title="Direct link to Status check interface" translate=no>​</a></h4>
+<p>The memory status of taosAdapter can be checked through the following interface:</p>
+<ul>
+<li class=""><strong>Normal status</strong>: <code>http://&lt;fqdn>:6041/-/ping</code> returns <code>code 200</code>.</li>
+<li class=""><strong>Memory exceeds threshold</strong>:<!-- -->
+<ul>
+<li class="">If the memory exceeds <code>pauseAllMemoryThreshold</code>, <code>code 503</code> is returned.</li>
+<li class="">If the memory exceeds <code>pauseQueryMemoryThreshold</code> and the request parameter contains <code>action=query</code>, <code>code 503</code> is returned.</li>
+</ul>
+</li>
+</ul>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=related-configuration-parameters>Related configuration parameters<a href=#related-configuration-parameters class=hash-link aria-label="Direct link to Related configuration parameters" title="Direct link to Related configuration parameters" translate=no>​</a></h4>
+<ul>
+<li class=""><strong><code>monitor.collectDuration</code></strong>: memory monitoring interval, default value is <code>3s</code>, environment variable is <code>TAOS_MONITOR_COLLECT_DURATION</code>.</li>
+<li class=""><strong><code>monitor.incgroup</code></strong>: whether to run in a container (set to <code>true</code> for running in a container), default value is <code>false</code>, environment variable is <code>TAOS_MONITOR_INCGROUP</code>.</li>
+<li class=""><strong><code>monitor.pauseQueryMemoryThreshold</code></strong>: memory threshold (percentage) for query request pause, default value is <code>70</code>, environment variable is <code>TAOS_MONITOR_PAUSE_QUERY_MEMORY_THRESHOLD</code>.</li>
+<li class=""><strong><code>monitor.pauseAllMemoryThreshold</code></strong>: memory threshold (percentage) for query and write request pause, default value is <code>80</code>, environment variable is <code>TAOS_MONITOR_PAUSE_ALL_MEMORY_THRESHOLD</code>.</li>
+</ul>
+<p>You can make corresponding adjustments based on the specific project application scenario and operation strategy, and it is recommended to use operation monitoring software to monitor the system memory status in a timely manner. The load balancer can also check the operation status of taosAdapter through this interface.</p>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=schemaless-write-create-db-configuration>Schemaless write create DB configuration<a href=#schemaless-write-create-db-configuration class=hash-link aria-label="Direct link to Schemaless write create DB configuration" title="Direct link to Schemaless write create DB configuration" translate=no>​</a></h3>
+<p>Starting from <strong>version 3.0.4.0</strong>, taosAdapter provides the parameter <code>smlAutoCreateDB</code> to control whether to automatically create a database (DB) when writing to the schemaless protocol.</p>
+<p>The <code>smlAutoCreateDB</code> parameter only affects the following interfaces:</p>
+<ul>
+<li class="">InfluxDB v1 write interface</li>
+<li class="">OpenTSDB JSON and telnet format writing</li>
+<li class="">Telegraf data writing</li>
+<li class="">collectd data writing</li>
+<li class="">StatsD data writing</li>
+<li class="">node_exporter data writing</li>
+<li class="">OpenMetrics data collection and writing</li>
+</ul>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=parameter-description-1>Parameter Description<a href=#parameter-description-1 class=hash-link aria-label="Direct link to Parameter Description" title="Direct link to Parameter Description" translate=no>​</a></h4>
+<ul>
+<li class=""><strong><code>smlAutoCreateDB</code></strong>:<!-- -->
+<ul>
+<li class=""><strong>When set to <code>true</code></strong>: When writing to the schemaless protocol, if the target database does not exist, taosAdapter will automatically create the database.</li>
+<li class=""><strong>When set to <code>false</code></strong>: The user needs to manually create the database, otherwise the write will fail (default value).</li>
+</ul>
+</li>
+</ul>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=number-of-results-returned-configuration>Number of results returned configuration<a href=#number-of-results-returned-configuration class=hash-link aria-label="Direct link to Number of results returned configuration" title="Direct link to Number of results returned configuration" translate=no>​</a></h3>
+<p>taosAdapter provides the parameter <code>restfulRowLimit</code> to control the number of results returned by the HTTP interface.</p>
+<p>The <code>restfulRowLimit</code> parameter only affects the return results of the following interfaces:</p>
+<ul>
+<li class="">RESTful interface</li>
+<li class="">Prometheus remote_read interface</li>
+</ul>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=parameter-description-2>Parameter Description<a href=#parameter-description-2 class=hash-link aria-label="Direct link to Parameter Description" title="Direct link to Parameter Description" translate=no>​</a></h4>
+<ul>
+<li class=""><strong><code>restfulRowLimit</code></strong>:<!-- -->
+<ul>
+<li class=""><strong>When set to a positive integer</strong>: The number of results returned by the interface will not exceed this value.</li>
+<li class=""><strong>When set to <code>-1</code></strong>: The number of results returned by the interface is unlimited (default value).</li>
+</ul>
+</li>
+</ul>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=log-configuration>Log configuration<a href=#log-configuration class=hash-link aria-label="Direct link to Log configuration" title="Direct link to Log configuration" translate=no>​</a></h3>
+<p>The log can be configured with the following parameters:</p>
+<ul>
+<li class="">
+<p><strong><code>log.path</code></strong></p>
+<p>Specifies the log storage path (Default: <code>"/var/log/taos"</code>).</p>
+</li>
+<li class="">
+<p><strong><code>log.level</code></strong></p>
+<p>Sets the log level (Default: <code>"info"</code>).</p>
+</li>
+<li class="">
+<p><strong><code>log.keepDays</code></strong></p>
+<p>Number of days to retain logs (Positive integer, Default: <code>30</code>).</p>
+</li>
+<li class="">
+<p><strong><code>log.rotationCount</code></strong></p>
+<p>Number of log files to rotate (Default: <code>30</code>).</p>
+</li>
+<li class="">
+<p><strong><code>log.rotationSize</code></strong></p>
+<p>Maximum size of a single log file (Supports KB/MB/GB units, Default: <code>"1GB"</code>).</p>
+</li>
+<li class="">
+<p><strong><code>log.compress</code></strong></p>
+<p>Whether to compress old log files (Default: <code>false</code>).</p>
+</li>
+<li class="">
+<p><strong><code>log.rotationTime</code></strong></p>
+<p>Log rotation interval (Deprecated, fixed at 24-hour rotation).</p>
+</li>
+<li class="">
+<p><strong><code>log.reservedDiskSize</code></strong></p>
+<p>Disk space reserved for log directory (Supports KB/MB/GB units, Default: <code>"1GB"</code>).</p>
+</li>
+<li class="">
+<p><strong><code>log.enableSqlToCsvLogging</code></strong></p>
+<p>Whether to record SQL to CSV files(Default: <code>false</code>).For details, see <a class="" href=/operations-and-tooling/components/taosadapter/operations/#recording-sql-to-csv-files>Recording SQL to CSV Files</a>.</p>
+</li>
+<li class="">
+<p><strong><code>log.enableStmtToCsvLogging</code></strong></p>
+<p>Whether to record STMT to CSV files(Default: <code>false</code>).For details, see <a class="" href=/operations-and-tooling/components/taosadapter/operations/#recording-stmt-to-csv-files>Recording STMT to CSV Files</a>.</p>
+</li>
+<li class="">
+<p><strong><code>log.enableRecordHttpSql</code></strong></p>
+<p><strong>This parameter is deprecated; use <a class="" href=/operations-and-tooling/components/taosadapter/operations/#recording-sql-to-csv-files>Recording SQL to CSV Files</a> instead.</strong></p>
+<p>Whether to record HTTP SQL requests (Default: <code>false</code>).</p>
+</li>
+<li class="">
+<p><strong><code>log.sqlRotationCount</code></strong></p>
+<p><strong>This parameter is deprecated; use <a class="" href=/operations-and-tooling/components/taosadapter/operations/#recording-sql-to-csv-files>Recording SQL to CSV Files</a> instead.</strong></p>
+<p>Number of SQL log files to rotate (Default: <code>2</code>).</p>
+</li>
+<li class="">
+<p><strong><code>log.sqlRotationSize</code></strong></p>
+<p><strong>This parameter is deprecated; use <a class="" href=/operations-and-tooling/components/taosadapter/operations/#recording-sql-to-csv-files>Recording SQL to CSV Files</a> instead.</strong></p>
+<p>Maximum size of a single SQL log file (Supports KB/MB/GB units, Default: <code>"1GB"</code>).</p>
+</li>
+<li class="">
+<p><strong><code>log.sqlRotationTime</code></strong></p>
+<p><strong>This parameter is deprecated; use <a class="" href=/operations-and-tooling/components/taosadapter/operations/#recording-sql-to-csv-files>Recording SQL to CSV Files</a> instead.</strong></p>
+<p>SQL log rotation interval (Default: <code>24h</code>).</p>
+</li>
+</ul>
+<p>You can set the taosAdapter log output detail level by setting the --log.level parameter or the environment variable TAOS_ADAPTER_LOG_LEVEL. Valid values include: panic, fatal, error, warn, warning, info, debug, and trace.</p>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=third-party-data-source-configuration>Third-party Data Source Configuration<a href=#third-party-data-source-configuration class=hash-link aria-label="Direct link to Third-party Data Source Configuration" title="Direct link to Third-party Data Source Configuration" translate=no>​</a></h3>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=collectd-configuration>Collectd Configuration<a href=#collectd-configuration class=hash-link aria-label="Direct link to Collectd Configuration" title="Direct link to Collectd Configuration" translate=no>​</a></h4>
+<ul>
+<li class="">
+<p><strong><code>collectd.enable</code></strong></p>
+<p>Enable/disable collectd protocol support (Default: <code>false</code>)</p>
+</li>
+<li class="">
+<p><strong><code>collectd.port</code></strong></p>
+<p>Collectd service listening port (Default: <code>6045</code>)</p>
+</li>
+<li class="">
+<p><strong><code>collectd.db</code></strong></p>
+<p>Target database for collectd data (Default: <code>"collectd"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>collectd.user</code></strong></p>
+<p>Database username (Default: <code>"root"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>collectd.password</code></strong></p>
+<p>Database password (Default: <code>"taosdata"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>collectd.token</code></strong></p>
+<p>Database token (Default: <code>""</code>). Available in TDengine Enterprise Edition 3.4.0.0 and above.</p>
+</li>
+<li class="">
+<p><strong><code>collectd.ttl</code></strong></p>
+<p>Data time-to-live (Default: <code>0</code> = no expiration)</p>
+</li>
+<li class="">
+<p><strong><code>collectd.worker</code></strong></p>
+<p>Number of write worker threads (Default: <code>10</code>)</p>
+</li>
+</ul>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=influxdb-configuration>InfluxDB Configuration<a href=#influxdb-configuration class=hash-link aria-label="Direct link to InfluxDB Configuration" title="Direct link to InfluxDB Configuration" translate=no>​</a></h4>
+<ul>
+<li class="">
+<p><strong><code>influxdb.enable</code></strong></p>
+<p>Enable/disable InfluxDB protocol support (Default: <code>true</code>)</p>
+</li>
+</ul>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=opentsdb-configuration>OpenTSDB Configuration<a href=#opentsdb-configuration class=hash-link aria-label="Direct link to OpenTSDB Configuration" title="Direct link to OpenTSDB Configuration" translate=no>​</a></h4>
+<ul>
+<li class="">
+<p><strong><code>opentsdb.enable</code></strong></p>
+<p>Enable OpenTSDB HTTP protocol (Default: <code>true</code>)</p>
+</li>
+<li class="">
+<p><strong><code>opentsdb_telnet.enable</code></strong></p>
+<p>Enable OpenTSDB Telnet (Warning: no auth, Default: <code>false</code>)</p>
+</li>
+<li class="">
+<p><strong><code>opentsdb_telnet.ports</code></strong></p>
+<p>Listening ports (Default: <code>[6046,6047,6048,6049]</code>)</p>
+</li>
+<li class="">
+<p><strong><code>opentsdb_telnet.dbs</code></strong></p>
+<p>Target databases (Default: <code>["opentsdb_telnet","collectd_tsdb","icinga2_tsdb","tcollector_tsdb"]</code>)</p>
+</li>
+<li class="">
+<p><strong><code>opentsdb_telnet.user</code></strong></p>
+<p>Database username (Default: <code>"root"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>opentsdb_telnet.password</code></strong></p>
+<p>Database password (Default: <code>"taosdata"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>opentsdb_telnet.ttl</code></strong></p>
+<p>Data TTL (Default: <code>0</code>)</p>
+</li>
+<li class="">
+<p><strong><code>opentsdb_telnet.token</code></strong></p>
+<p>Database token (Default: <code>""</code>). Available in TDengine Enterprise Edition 3.4.0.0 and above.</p>
+</li>
+<li class="">
+<p><strong><code>opentsdb_telnet.batchSize</code></strong></p>
+<p>Batch write size (Default: <code>1</code>)</p>
+</li>
+<li class="">
+<p><strong><code>opentsdb_telnet.flushInterval</code></strong></p>
+<p>Flush interval (Default: <code>0s</code>)</p>
+</li>
+<li class="">
+<p><strong><code>opentsdb_telnet.maxTCPConnections</code></strong></p>
+<p>Max TCP connections (Default: <code>250</code>)</p>
+</li>
+<li class="">
+<p><strong><code>opentsdb_telnet.tcpKeepAlive</code></strong></p>
+<p>Enable TCP KeepAlive (Default: <code>false</code>)</p>
+</li>
+</ul>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=statsd-configuration>StatsD Configuration<a href=#statsd-configuration class=hash-link aria-label="Direct link to StatsD Configuration" title="Direct link to StatsD Configuration" translate=no>​</a></h4>
+<ul>
+<li class="">
+<p><strong><code>statsd.enable</code></strong></p>
+<p>Enable StatsD protocol (Default: <code>false</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.port</code></strong></p>
+<p>Listening port (Default: <code>6044</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.protocol</code></strong></p>
+<p>Transport protocol (Options: tcp/udp/tcp4/udp4, Default: <code>"udp4"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.db</code></strong></p>
+<p>Target database (Default: <code>"statsd"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.user</code></strong></p>
+<p>Database username (Default: <code>"root"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.password</code></strong></p>
+<p>Database password (Default: <code>"taosdata"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.token</code></strong></p>
+<p>Database token (Default: <code>""</code>). Available in TDengine Enterprise Edition 3.4.0.0 and above.</p>
+</li>
+<li class="">
+<p><strong><code>statsd.ttl</code></strong></p>
+<p>Data TTL (Default: <code>0</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.gatherInterval</code></strong></p>
+<p>Collection interval (Default: <code>5s</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.worker</code></strong></p>
+<p>Worker threads (Default: <code>10</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.allowPendingMessages</code></strong></p>
+<p>Max pending messages (Default: <code>50000</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.maxTCPConnections</code></strong></p>
+<p>Max TCP connections (Default: <code>250</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.tcpKeepAlive</code></strong></p>
+<p>Enable TCP KeepAlive (Default: <code>false</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.deleteCounters</code></strong></p>
+<p>Clear counter cache after collection (Default: <code>true</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.deleteGauges</code></strong></p>
+<p>Clear gauge cache after collection (Default: <code>true</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.deleteSets</code></strong></p>
+<p>Clear sets cache after collection (Default: <code>true</code>)</p>
+</li>
+<li class="">
+<p><strong><code>statsd.deleteTimings</code></strong></p>
+<p>Clear timings cache after collection (Default: <code>true</code>)</p>
+</li>
+</ul>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=prometheus-configuration>Prometheus Configuration<a href=#prometheus-configuration class=hash-link aria-label="Direct link to Prometheus Configuration" title="Direct link to Prometheus Configuration" translate=no>​</a></h4>
+<ul>
+<li class="">
+<p><strong><code>prometheus.enable</code></strong></p>
+<p>Enable Prometheus protocol (Default: <code>true</code>)</p>
+</li>
+</ul>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=openmetrics-configuration>OpenMetrics Configuration<a href=#openmetrics-configuration class=hash-link aria-label="Direct link to OpenMetrics Configuration" title="Direct link to OpenMetrics Configuration" translate=no>​</a></h4>
+<ul>
+<li class="">
+<p><strong><code>open_metrics.enable</code></strong></p>
+<p>Enable/disable OpenMetrics data collection (Default: <code>false</code>).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.user</code></strong></p>
+<p>Username for TDengine connection (Default: <code>"root"</code>).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.password</code></strong></p>
+<p>Password for TDengine connection (Default: <code>"taosdata"</code>).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.urls</code></strong></p>
+<p>List of OpenMetrics data collection endpoints (Default: <code>["http://localhost:9100"]</code>, automatically appends <code>/metrics</code> if no route specified).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.dbs</code></strong></p>
+<p>Target databases for data writing (Default: <code>["open_metrics"]</code>, must match number of collection URLs).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.responseTimeoutSeconds</code></strong></p>
+<p>Collection timeout in seconds (Default: <code>[5]</code>, must match number of collection URLs).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.httpUsernames</code></strong></p>
+<p>Basic authentication usernames (If enabled, must match number of collection URLs, Default: empty).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.httpPasswords</code></strong></p>
+<p>Basic authentication passwords (If enabled, must match number of collection URLs, Default: empty).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.httpBearerTokenStrings</code></strong></p>
+<p>Bearer token authentication strings (If enabled, must match number of collection URLs, Default: empty).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.caCertFiles</code></strong></p>
+<p>Root certificate file paths (If enabled, must match number of collection URLs, Default: empty).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.certFiles</code></strong></p>
+<p>Client certificate file paths (If enabled, must match number of collection URLs, Default: empty).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.keyFiles</code></strong></p>
+<p>Client certificate key file paths (If enabled, must match number of collection URLs, Default: empty).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.insecureSkipVerify</code></strong></p>
+<p>Skip HTTPS certificate verification (Default: <code>true</code>).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.gatherDurationSeconds</code></strong></p>
+<p>Collection interval in seconds (Default: <code>[5]</code>, must match number of collection URLs).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.token</code></strong></p>
+<p>Database token (Default: <code>""</code>). Available in TDengine Enterprise Edition 3.4.0.0 and above.</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.ttl</code></strong></p>
+<p>Table Time-To-Live in seconds (<code>0</code> means no expiration, if enabled must match number of collection URLs, Default: empty).</p>
+</li>
+<li class="">
+<p><strong><code>open_metrics.ignoreTimestamp</code></strong></p>
+<p>Ignore timestamps in collected data (uses collection time if ignored, Default: <code>false</code>).</p>
+</li>
+</ul>
+<h4 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=node-exporter-configuration>Node Exporter Configuration<a href=#node-exporter-configuration class=hash-link aria-label="Direct link to Node Exporter Configuration" title="Direct link to Node Exporter Configuration" translate=no>​</a></h4>
+<ul>
+<li class="">
+<p><strong><code>node_exporter.enable</code></strong></p>
+<p>Enable node_exporter data collection (Default: <code>false</code>)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.db</code></strong></p>
+<p>Target database name (Default: <code>"node_exporter"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.urls</code></strong></p>
+<p>Service endpoints (Default: <code>["http://localhost:9100"]</code>)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.gatherDuration</code></strong></p>
+<p>Collection interval (Default: <code>5s</code>)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.responseTimeout</code></strong></p>
+<p>Request timeout (Default: <code>5s</code>)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.user</code></strong></p>
+<p>Database username (Default: <code>"root"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.password</code></strong></p>
+<p>Database password (Default: <code>"taosdata"</code>)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.token</code></strong></p>
+<p>Database token (Default: <code>""</code>). Available in TDengine Enterprise Edition 3.4.0.0 and above.</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.ttl</code></strong></p>
+<p>Data TTL (Default: <code>0</code>)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.httpUsername</code></strong></p>
+<p>HTTP Basic Auth username (Optional)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.httpPassword</code></strong></p>
+<p>HTTP Basic Auth password (Optional)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.httpBearerTokenString</code></strong></p>
+<p>HTTP Bearer Token (Optional)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.insecureSkipVerify</code></strong></p>
+<p>Skip SSL verification (Default: <code>true</code>)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.certFile</code></strong></p>
+<p>Client certificate path (Optional)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.keyFile</code></strong></p>
+<p>Client key path (Optional)</p>
+</li>
+<li class="">
+<p><strong><code>node_exporter.caCertFile</code></strong></p>
+<p>CA certificate path (Optional)</p>
+</li>
+</ul>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=metrics-reporting-configuration>Metrics Reporting Configuration<a href=#metrics-reporting-configuration class=hash-link aria-label="Direct link to Metrics Reporting Configuration" title="Direct link to Metrics Reporting Configuration" translate=no>​</a></h3>
+<p>taosAdapter reports metrics to taosKeeper with these parameters:</p>
+<ul>
+<li class="">
+<p><strong><code>uploadKeeper.enable</code></strong></p>
+<p>Enable metrics reporting (Default: <code>true</code>)</p>
+</li>
+<li class="">
+<p><strong><code>uploadKeeper.url</code></strong></p>
+<p>taosKeeper endpoint (Default: <code>http://127.0.0.1:6043/adapter_report</code>)</p>
+</li>
+<li class="">
+<p><strong><code>uploadKeeper.interval</code></strong></p>
+<p>Reporting interval (Default: <code>15s</code>)</p>
+</li>
+<li class="">
+<p><strong><code>uploadKeeper.timeout</code></strong></p>
+<p>Request timeout (Default: <code>5s</code>)</p>
+</li>
+<li class="">
+<p><strong><code>uploadKeeper.retryTimes</code></strong></p>
+<p>Max retries (Default: <code>3</code>)</p>
+</li>
+<li class="">
+<p><strong><code>uploadKeeper.retryInterval</code></strong></p>
+<p>Retry interval (Default: <code>5s</code>)</p>
+</li>
+</ul>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=query-request-concurrency-limit-configuration>Query Request Concurrency Limit Configuration<a href=#query-request-concurrency-limit-configuration class=hash-link aria-label="Direct link to Query Request Concurrency Limit Configuration" title="Direct link to Query Request Concurrency Limit Configuration" translate=no>​</a></h3>
+<p>Starting from version <strong>3.3.6.29</strong>/<strong>3.3.8.3</strong>, taosAdapter supports configuring concurrency limits for query requests to prevent excessive concurrent queries from exhausting system resources.
+When this feature is enabled, taosAdapter controls the number of concurrent query requests being processed simultaneously based on the configured concurrency limit. Requests exceeding the limit will enter a waiting state until processing resources become available.</p>
+<p>If the waiting time exceeds the configured timeout or the number of waiting requests exceeds the configured maximum waiting requests, taosAdapter will directly return an error response, indicating that there are too many requests.
+RESTful requests will return HTTP status code <code>503</code>, and WebSocket requests will return error code <code>0xFFFE</code>.</p>
+<p>This configuration affects the following interfaces:</p>
+<ul>
+<li class=""><strong>RESTful Interface</strong></li>
+<li class=""><strong>WebSocket SQL Execution Interface</strong></li>
+</ul>
+<p>Parameter Description</p>
+<ul>
+<li class=""><strong><code>request.queryLimitEnable</code></strong>
+<ul>
+<li class=""><strong>When set to <code>true</code></strong>: Enables the query request concurrency limit feature.</li>
+<li class=""><strong>When set to <code>false</code></strong>: Disables the query request concurrency limit feature (default value).</li>
+</ul>
+</li>
+<li class=""><strong><code>request.default.queryLimit</code></strong>
+<ul>
+<li class="">Sets the default concurrency limit for query requests (default value: <code>0</code>, meaning no limit).</li>
+</ul>
+</li>
+<li class=""><strong><code>request.default.queryWaitTimeout</code></strong>
+<ul>
+<li class="">Sets the maximum waiting time (in seconds) for requests that exceed the concurrency limit. Requests that time out while waiting will return an error directly. Default value: <code>900</code>.</li>
+</ul>
+</li>
+<li class=""><strong><code>request.default.queryMaxWait</code></strong>
+<ul>
+<li class="">Sets the maximum number of waiting requests allowed when the concurrency limit is exceeded. Requests exceeding this number will return an error directly. Default value: <code>0</code>, meaning no limit.</li>
+</ul>
+</li>
+<li class=""><strong><code>request.excludeQueryLimitSql</code></strong>
+<ul>
+<li class="">Configures a list of SQL statements that are not subject to concurrency limits. Must start with <code>select</code> (case-insensitive).</li>
+</ul>
+</li>
+<li class=""><strong><code>request.excludeQueryLimitSqlRegex</code></strong>
+<ul>
+<li class="">Configures a list of regular expressions for SQL statements that are not subject to concurrency limits.</li>
+</ul>
+</li>
+</ul>
+<p>Customizable per User</p>
+<p>Configurable only via the configuration file:</p>
+<ul>
+<li class=""><strong><code>request.users.&lt;username>.queryLimit</code></strong>
+<ul>
+<li class="">Sets the query request concurrency limit for the specified user. Takes precedence over the default setting.</li>
+</ul>
+</li>
+<li class=""><strong><code>request.users.&lt;username>.queryWaitTimeout</code></strong>
+<ul>
+<li class="">Sets the maximum waiting time (in seconds) for requests that exceed the concurrency limit for the specified user. Takes precedence over the default setting.</li>
+</ul>
+</li>
+<li class=""><strong><code>request.users.&lt;username>.queryMaxWait</code></strong>
+<ul>
+<li class="">Sets the maximum number of waiting requests allowed when the concurrency limit is exceeded for the specified user. Takes precedence over the default setting.</li>
+</ul>
+</li>
+</ul>
+<p>Example</p>
+<div class="language-toml codeBlockContainer_o68M theme-code-block" style=--prism-color:var(--contrast-2);--prism-background-color:#f6f8fa><div class=codeBlockContent_MRcs><pre tabindex=0 class="prism-code language-toml codeBlock_VWju thin-scrollbar" style=color:var(--contrast-2);background-color:#f6f8fa><code class=codeBlockLines_BwH5><span class=token-line style=color:var(--contrast-2)><span class="token punctuation" style=color:#393A34>[</span><span class="token table class-name">request</span><span class="token punctuation" style=color:#393A34>]</span><span class="token plain"></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain"></span><span class="token key property" style=color:#36acaa>queryLimitEnable</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>=</span><span class="token plain"> </span><span class="token boolean" style=color:#36acaa>true</span><span class="token plain"></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain"></span><span class="token key property" style=color:#36acaa>excludeQueryLimitSql</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>=</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>[</span><span class="token string" style=color:#e3116c>"select 1"</span><span class="token punctuation" style=color:#393A34>,</span><span class="token string" style=color:#e3116c>"select server_version()"</span><span class="token punctuation" style=color:#393A34>]</span><span class="token plain"></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain"></span><span class="token key property" style=color:#36acaa>excludeQueryLimitSqlRegex</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>=</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>[</span><span class="token string" style=color:#e3116c>'(?i)^select\s+.*from\s+information_schema.*'</span><span class="token punctuation" style=color:#393A34>]</span><span class="token plain"></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain" style=display:inline-block></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain"></span><span class="token punctuation" style=color:#393A34>[</span><span class="token table class-name">request.default</span><span class="token punctuation" style=color:#393A34>]</span><span class="token plain"></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain"></span><span class="token key property" style=color:#36acaa>queryLimit</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>=</span><span class="token plain"> </span><span class="token number" style=color:#36acaa>200</span><span class="token plain"></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain"></span><span class="token key property" style=color:#36acaa>queryWaitTimeout</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>=</span><span class="token plain"> </span><span class="token number" style=color:#36acaa>900</span><span class="token plain"></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain"></span><span class="token key property" style=color:#36acaa>queryMaxWait</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>=</span><span class="token plain"> </span><span class="token number" style=color:#36acaa>0</span><span class="token plain"></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain" style=display:inline-block></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain"></span><span class="token punctuation" style=color:#393A34>[</span><span class="token table class-name">request.users.root</span><span class="token punctuation" style=color:#393A34>]</span><span class="token plain"></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain"></span><span class="token key property" style=color:#36acaa>queryLimit</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>=</span><span class="token plain"> </span><span class="token number" style=color:#36acaa>100</span><span class="token plain"></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain"></span><span class="token key property" style=color:#36acaa>queryWaitTimeout</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>=</span><span class="token plain"> </span><span class="token number" style=color:#36acaa>200</span><span class="token plain"></span><br/></span><span class=token-line style=color:var(--contrast-2)><span class="token plain"></span><span class="token key property" style=color:#36acaa>queryMaxWait</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>=</span><span class="token plain"> </span><span class="token number" style=color:#36acaa>10</span><br/></span></code></pre></div></div>
+<ul>
+<li class=""><code>queryLimitEnable = true</code> enables the query request concurrency limit feature.</li>
+<li class=""><code>excludeQueryLimitSql = ["select 1","select server_version()"]</code> excludes two commonly used SQL queries for ping.</li>
+<li class=""><code>excludeQueryLimitSqlRegex = ['(?i)^select\s+.*from\s+information_schema.*']</code> excludes all SQL queries that query the information_schema database.</li>
+<li class=""><code>request.default</code> configures the default query request concurrency limit to 200, wait timeout to 900 seconds, and maximum wait requests to 0 (unlimited).</li>
+<li class=""><code>request.users.root</code> configures the query request concurrency limit for user root to 100, wait timeout to 200 seconds, and maximum wait requests to 10.</li>
+</ul>
+<p>When user root initiates a query request, taosAdapter will perform concurrency limit processing based on the above configuration.
+When the number of query requests exceeds 100, subsequent requests will enter a waiting state until resources are available.
+If the wait time exceeds 200 seconds or the number of waiting requests exceeds 10, taosAdapter will directly return an error response.</p>
+<p>When other users initiate query requests, the default concurrency limit configuration will be used for processing.
+Each user's configuration is independent and does not share the concurrency limit of <code>request.default</code>.
+For example, when user user1 initiates 200 concurrent query requests, user user2 can also initiate 200 concurrent query requests simultaneously without blocking.</p>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=reject-query-sql-configuration>Reject Query SQL Configuration<a href=#reject-query-sql-configuration class=hash-link aria-label="Direct link to Reject Query SQL Configuration" title="Direct link to Reject Query SQL Configuration" translate=no>​</a></h3>
+<p>Starting from <strong>version 3.3.6.34 / 3.4.0.0</strong>, taosAdapter supports rejecting specific query SQL statements through configuration, preventing the execution of unsafe or highly resource-consuming queries.<br/>
+<!-- -->When this feature is enabled, taosAdapter checks each SQL statement that does <strong>not</strong> start with <code>insert</code> (case-insensitive). If the SQL matches any of the configured reject patterns, an error response is returned indicating that the query is forbidden.</p>
+<p>When a rejected SQL query is matched, the RESTful API returns HTTP status code <code>403</code>, and the WebSocket interface returns error code <code>0xFFFD</code>.<br/>
+<!-- -->Meanwhile, taosAdapter prints a warning log containing details such as the SQL source, for example:</p>
+<div class="language-text codeBlockContainer_o68M theme-code-block" style=--prism-color:var(--contrast-2);--prism-background-color:#f6f8fa><div class=codeBlockContent_MRcs><pre tabindex=0 class="prism-code language-text codeBlock_VWju thin-scrollbar" style=color:var(--contrast-2);background-color:#f6f8fa><code class=codeBlockLines_BwH5><span class=token-line style=color:var(--contrast-2)><span class="token plain">reject sql, client_ip:192.168.1.98, port:59912, user:root, app:test_app, reject_regex:(?i)^drop\s+table\s+.*, sql:DROP taBle testdb.stb</span><br/></span></code></pre></div></div>
+<p>This configuration affects the following interfaces:</p>
+<ul>
+<li class=""><strong>RESTful interface</strong></li>
+<li class=""><strong>WebSocket SQL execution interface</strong></li>
+</ul>
+<p>Parameter Description</p>
+<ul>
+<li class=""><strong><code>rejectQuerySqlRegex</code></strong>
+<ul>
+<li class="">A list of regex patterns for rejecting SQL queries. Supports <a href=https://github.com/google/re2/wiki/Syntax target=_blank rel="noopener noreferrer" class="">Google RE2 syntax</a>.</li>
+<li class="">Default: an empty list, meaning no queries are rejected.</li>
+</ul>
+</li>
+</ul>
+<p>Example</p>
+<div class="language-toml codeBlockContainer_o68M theme-code-block" style=--prism-color:var(--contrast-2);--prism-background-color:#f6f8fa><div class=codeBlockContent_MRcs><pre tabindex=0 class="prism-code language-toml codeBlock_VWju thin-scrollbar" style=color:var(--contrast-2);background-color:#f6f8fa><code class=codeBlockLines_BwH5><span class=token-line style=color:var(--contrast-2)><span class="token key property" style=color:#36acaa>rejectQuerySqlRegex</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>=</span><span class="token plain"> </span><span class="token punctuation" style=color:#393A34>[</span><span class="token string" style=color:#e3116c>'(?i)^drop\s+database\s+.*'</span><span class="token punctuation" style=color:#393A34>,</span><span class="token string" style=color:#e3116c>'(?i)^drop\s+table\s+.*'</span><span class="token punctuation" style=color:#393A34>,</span><span class="token string" style=color:#e3116c>'(?i)^alter\s+table\s+.*'</span><span class="token punctuation" style=color:#393A34>]</span><br/></span></code></pre></div></div>
+<p>The configuration <code>rejectQuerySqlRegex = ['(?i)^drop\\s+database\\s+.*','(?i)^drop\\s+table\\s+.*','(?i)^alter\\s+table\\s+.*']</code> rejects all <code>drop database</code>, <code>drop table</code>, and <code>alter table</code> queries, ignoring case.</p>
+<h3 class="anchor anchorTargetHideOnScrollNavbar_PQ9X" id=environment-variables>Environment Variables<a href=#environment-variables class=hash-link aria-label="Direct link to Environment Variables" title="Direct link to Environment Variables" translate=no>​</a></h3>
+<p>Configuration Parameters and their corresponding environment variables:</p>
+<details class="details_IAme alert alert--info details_rJWw" data-collapsed=true><summary>Details</summary><div><div class=collapsibleContent_rA3c><table><thead><tr><th style=text-align:left>Configuration Parameter<th style=text-align:left>Environment Variable<tbody><tr><td style=text-align:left><code>collectd.db</code><td style=text-align:left><code>TAOS_ADAPTER_COLLECTD_DB</code><tr><td style=text-align:left><code>collectd.enable</code><td style=text-align:left><code>TAOS_ADAPTER_COLLECTD_ENABLE</code><tr><td style=text-align:left><code>collectd.password</code><td style=text-align:left><code>TAOS_ADAPTER_COLLECTD_PASSWORD</code><tr><td style=text-align:left><code>collectd.port</code><td style=text-align:left><code>TAOS_ADAPTER_COLLECTD_PORT</code><tr><td style=text-align:left><code>collectd.token</code><td style=text-align:left><code>TAOS_ADAPTER_COLLECTD_TOKEN</code><tr><td style=text-align:left><code>collectd.ttl</code><td style=text-align:left><code>TAOS_ADAPTER_COLLECTD_TTL</code><tr><td style=text-align:left><code>collectd.user</code><td style=text-align:left><code>TAOS_ADAPTER_COLLECTD_USER</code><tr><td style=text-align:left><code>collectd.worker</code><td style=text-align:left><code>TAOS_ADAPTER_COLLECTD_WORKER</code><tr><td style=text-align:left><code>cors.allowAllOrigins</code><td style=text-align:left><code>TAOS_ADAPTER_CORS_ALLOW_ALL_ORIGINS</code><tr><td style=text-align:left><code>cors.allowCredentials</code><td style=text-align:left><code>TAOS_ADAPTER_CORS_ALLOW_Credentials</code><tr><td style=text-align:left><code>cors.allowHeaders</code><td style=text-align:left><code>TAOS_ADAPTER_ALLOW_HEADERS</code><tr><td style=text-align:left><code>cors.allowOrigins</code><td style=text-align:left><code>TAOS_ADAPTER_ALLOW_ORIGINS</code><tr><td style=text-align:left><code>cors.allowWebSockets</code><td style=text-align:left><code>TAOS_ADAPTER_CORS_ALLOW_WebSockets</code><tr><td style=text-align:left><code>cors.exposeHeaders</code><td style=text-align:left><code>TAOS_ADAPTER_Expose_Headers</code><tr><td style=text-align:left><code>debug</code><td style=text-align:left><code>TAOS_ADAPTER_DEBUG</code><tr><td style=text-align:left><code>httpCodeServerError</code><td style=text-align:left><code>TAOS_ADAPTER_HTTP_CODE_SERVER_ERROR</code><tr><td style=text-align:left><code>influxdb.enable</code><td style=text-align:left><code>TAOS_ADAPTER_INFLUXDB_ENABLE</code><tr><td style=text-align:left><code>instanceId</code><td style=text-align:left><code>TAOS_ADAPTER_INSTANCE_ID</code><tr><td style=text-align:left><code>log.compress</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_COMPRESS</code><tr><td style=text-align:left><code>log.enableRecordHttpSql</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_ENABLE_RECORD_HTTP_SQL</code><tr><td style=text-align:left><code>log.enableSqlToCsvLogging</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_ENABLE_SQL_TO_CSV_LOGGING</code><tr><td style=text-align:left><code>log.enableStmtToCsvLogging</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_ENABLE_STMT_TO_CSV_LOGGING</code><tr><td style=text-align:left><code>log.keepDays</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_KEEP_DAYS</code><tr><td style=text-align:left><code>log.level</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_LEVEL</code><tr><td style=text-align:left><code>log.path</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_PATH</code><tr><td style=text-align:left><code>log.reservedDiskSize</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_RESERVED_DISK_SIZE</code><tr><td style=text-align:left><code>log.rotationCount</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_ROTATION_COUNT</code><tr><td style=text-align:left><code>log.rotationSize</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_ROTATION_SIZE</code><tr><td style=text-align:left><code>log.rotationTime</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_ROTATION_TIME</code><tr><td style=text-align:left><code>log.sqlRotationCount</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_SQL_ROTATION_COUNT</code><tr><td style=text-align:left><code>log.sqlRotationSize</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_SQL_ROTATION_SIZE</code><tr><td style=text-align:left><code>log.sqlRotationTime</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_SQL_ROTATION_TIME</code><tr><td style=text-align:left><code>logLevel</code><td style=text-align:left><code>TAOS_ADAPTER_LOG_LEVEL</code><tr><td style=text-align:left><code>maxAsyncConcurrentLimit</code><td style=text-align:left><code>TAOS_ADAPTER_MAX_ASYNC_CONCURRENT_LIMIT</code><tr><td style=text-align:left><code>maxSyncConcurrentLimit</code><td style=text-align:left><code>TAOS_ADAPTER_MAX_SYNC_CONCURRENT_LIMIT</code><tr><td style=text-align:left><code>monitor.collectDuration</code><td style=text-align:left><code>TAOS_ADAPTER_MONITOR_COLLECT_DURATION</code><tr><td style=text-align:left><code>monitor.disable</code><td style=text-align:left><code>TAOS_ADAPTER_MONITOR_DISABLE</code><tr><td style=text-align:left><code>monitor.identity</code><td style=text-align:left><code>TAOS_ADAPTER_MONITOR_IDENTITY</code><tr><td style=text-align:left><code>monitor.incgroup</code><td style=text-align:left><code>TAOS_ADAPTER_MONITOR_INCGROUP</code><tr><td style=text-align:left><code>monitor.pauseAllMemoryThreshold</code><td style=text-align:left><code>TAOS_ADAPTER_MONITOR_PAUSE_ALL_MEMORY_THRESHOLD</code><tr><td style=text-align:left><code>monitor.pauseQueryMemoryThreshold</code><td style=text-align:left><code>TAOS_ADAPTER_MONITOR_PAUSE_QUERY_MEMORY_THRESHOLD</code><tr><td style=text-align:left><code>node_exporter.caCertFile</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_CA_CERT_FILE</code><tr><td style=text-align:left><code>node_exporter.certFile</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_CERT_FILE</code><tr><td style=text-align:left><code>node_exporter.db</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_DB</code><tr><td style=text-align:left><code>node_exporter.enable</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_ENABLE</code><tr><td style=text-align:left><code>node_exporter.gatherDuration</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_GATHER_DURATION</code><tr><td style=text-align:left><code>node_exporter.httpBearerTokenString</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_HTTP_BEARER_TOKEN_STRING</code><tr><td style=text-align:left><code>node_exporter.httpPassword</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_HTTP_PASSWORD</code><tr><td style=text-align:left><code>node_exporter.httpUsername</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_HTTP_USERNAME</code><tr><td style=text-align:left><code>node_exporter.insecureSkipVerify</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_INSECURE_SKIP_VERIFY</code><tr><td style=text-align:left><code>node_exporter.keyFile</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_KEY_FILE</code><tr><td style=text-align:left><code>node_exporter.password</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_PASSWORD</code><tr><td style=text-align:left><code>node_exporter.responseTimeout</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_RESPONSE_TIMEOUT</code><tr><td style=text-align:left><code>node_exporter.token</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_TOKEN</code><tr><td style=text-align:left><code>node_exporter.ttl</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_TTL</code><tr><td style=text-align:left><code>node_exporter.urls</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_URLS</code><tr><td style=text-align:left><code>node_exporter.user</code><td style=text-align:left><code>TAOS_ADAPTER_NODE_EXPORTER_USER</code><tr><td style=text-align:left><code>open_metrics.enable</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_ENABLE</code><tr><td style=text-align:left><code>open_metrics.user</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_USER</code><tr><td style=text-align:left><code>open_metrics.password</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_PASSWORD</code><tr><td style=text-align:left><code>open_metrics.urls</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_URLS</code><tr><td style=text-align:left><code>open_metrics.dbs</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_DBS</code><tr><td style=text-align:left><code>open_metrics.responseTimeoutSeconds</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_RESPONSE_TIMEOUT_SECONDS</code><tr><td style=text-align:left><code>open_metrics.httpUsernames</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_HTTP_USERNAMES</code><tr><td style=text-align:left><code>open_metrics.httpPasswords</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_HTTP_PASSWORDS</code><tr><td style=text-align:left><code>open_metrics.httpBearerTokenStrings</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_HTTP_BEARER_TOKEN_STRINGS</code><tr><td style=text-align:left><code>open_metrics.caCertFiles</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_CA_CERT_FILES</code><tr><td style=text-align:left><code>open_metrics.certFiles</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_CERT_FILES</code><tr><td style=text-align:left><code>open_metrics.keyFiles</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_KEY_FILES</code><tr><td style=text-align:left><code>open_metrics.insecureSkipVerify</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_INSECURE_SKIP_VERIFY</code><tr><td style=text-align:left><code>open_metrics.gatherDurationSeconds</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_GATHER_DURATION_SECONDS</code><tr><td style=text-align:left><code>open_metrics.ignoreTimestamp</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_IGNORE_TIMESTAMP</code><tr><td style=text-align:left><code>open_metrics.token</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_TOKEN</code><tr><td style=text-align:left><code>open_metrics.ttl</code><td style=text-align:left><code>TAOS_ADAPTER_OPEN_METRICS_TTL</code><tr><td style=text-align:left><code>opentsdb.enable</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_ENABLE</code><tr><td style=text-align:left><code>opentsdb_telnet.batchSize</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_TELNET_BATCH_SIZE</code><tr><td style=text-align:left><code>opentsdb_telnet.dbs</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_TELNET_DBS</code><tr><td style=text-align:left><code>opentsdb_telnet.enable</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_TELNET_ENABLE</code><tr><td style=text-align:left><code>opentsdb_telnet.flushInterval</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_TELNET_FLUSH_INTERVAL</code><tr><td style=text-align:left><code>opentsdb_telnet.maxTCPConnections</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_TELNET_MAX_TCP_CONNECTIONS</code><tr><td style=text-align:left><code>opentsdb_telnet.password</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_TELNET_PASSWORD</code><tr><td style=text-align:left><code>opentsdb_telnet.ports</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_TELNET_PORTS</code><tr><td style=text-align:left><code>opentsdb_telnet.tcpKeepAlive</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_TELNET_TCP_KEEP_ALIVE</code><tr><td style=text-align:left><code>opentsdb_telnet.token</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_TELNET_TOKEN</code><tr><td style=text-align:left><code>opentsdb_telnet.ttl</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_TELNET_TTL</code><tr><td style=text-align:left><code>opentsdb_telnet.user</code><td style=text-align:left><code>TAOS_ADAPTER_OPENTSDB_TELNET_USER</code><tr><td style=text-align:left><code>pool.idleTimeout</code><td style=text-align:left><code>TAOS_ADAPTER_POOL_IDLE_TIMEOUT</code><tr><td style=text-align:left><code>pool.maxConnect</code><td style=text-align:left><code>TAOS_ADAPTER_POOL_MAX_CONNECT</code><tr><td style=text-align:left><code>pool.maxIdle</code><td style=text-align:left><code>TAOS_ADAPTER_POOL_MAX_IDLE</code><tr><td style=text-align:left><code>pool.maxWait</code><td style=text-align:left><code>TAOS_ADAPTER_POOL_MAX_WAIT</code><tr><td style=text-align:left><code>pool.waitTimeout</code><td style=text-align:left><code>TAOS_ADAPTER_POOL_WAIT_TIMEOUT</code><tr><td style=text-align:left><code>P</code>, <code>port</code><td style=text-align:left><code>TAOS_ADAPTER_PORT</code><tr><td style=text-align:left><code>prometheus.enable</code><td style=text-align:left><code>TAOS_ADAPTER_PROMETHEUS_ENABLE</code><tr><td style=text-align:left><code>queryResult.idleTimeout</code><td style=text-align:left><code>TAOS_ADAPTER_QUERY_RESULT_IDLE_TIMEOUT</code><tr><td style=text-align:left><code>register.description</code><td style=text-align:left><code>TAOS_ADAPTER_REGISTER_DESCRIPTION</code><tr><td style=text-align:left><code>register.duration</code><td style=text-align:left><code>TAOS_ADAPTER_REGISTER_DURATION</code><tr><td style=text-align:left><code>register.expire</code><td style=text-align:left><code>TAOS_ADAPTER_REGISTER_EXPIRE</code><tr><td style=text-align:left><code>register.instance</code><td style=text-align:left><code>TAOS_ADAPTER_REGISTER_INSTANCE</code><tr><td style=text-align:left><code>request.default.queryLimit</code><td style=text-align:left><code>TAOS_ADAPTER_REQUEST_DEFAULT_QUERY_LIMIT</code><tr><td style=text-align:left><code>request.default.queryMaxWait</code><td style=text-align:left><code>TAOS_ADAPTER_REQUEST_DEFAULT_QUERY_MAX_WAIT</code><tr><td style=text-align:left><code>request.default.queryWaitTimeout</code><td style=text-align:left><code>TAOS_ADAPTER_REQUEST_DEFAULT_QUERY_WAIT_TIMEOUT</code><tr><td style=text-align:left><code>request.excludeQueryLimitSql</code><td style=text-align:left><code>TAOS_ADAPTER_REQUEST_EXCLUDE_QUERY_LIMIT_SQL</code><tr><td style=text-align:left><code>request.excludeQueryLimitSqlRegex</code><td style=text-align:left><code>TAOS_ADAPTER_REQUEST_EXCLUDE_QUERY_LIMIT_SQL_REGEX</code><tr><td style=text-align:left><code>request.queryLimitEnable</code><td style=text-align:left><code>TAOS_ADAPTER_REQUEST_QUERY_LIMIT_ENABLE</code><tr><td style=text-align:left><code>restfulRowLimit</code><td style=text-align:left><code>TAOS_ADAPTER_RESTFUL_ROW_LIMIT</code><tr><td style=text-align:left><code>smlAutoCreateDB</code><td style=text-align:left><code>TAOS_ADAPTER_SML_AUTO_CREATE_DB</code><tr><td style=text-align:left><code>statsd.allowPendingMessages</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_ALLOW_PENDING_MESSAGES</code><tr><td style=text-align:left><code>statsd.db</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_DB</code><tr><td style=text-align:left><code>statsd.deleteCounters</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_DELETE_COUNTERS</code><tr><td style=text-align:left><code>statsd.deleteGauges</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_DELETE_GAUGES</code><tr><td style=text-align:left><code>statsd.deleteSets</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_DELETE_SETS</code><tr><td style=text-align:left><code>statsd.deleteTimings</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_DELETE_TIMINGS</code><tr><td style=text-align:left><code>statsd.enable</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_ENABLE</code><tr><td style=text-align:left><code>statsd.gatherInterval</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_GATHER_INTERVAL</code><tr><td style=text-align:left><code>statsd.maxTCPConnections</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_MAX_TCP_CONNECTIONS</code><tr><td style=text-align:left><code>statsd.password</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_PASSWORD</code><tr><td style=text-align:left><code>statsd.port</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_PORT</code><tr><td style=text-align:left><code>statsd.protocol</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_PROTOCOL</code><tr><td style=text-align:left><code>statsd.tcpKeepAlive</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_TCP_KEEP_ALIVE</code><tr><td style=text-align:left><code>statsd.token</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_TOKEN</code><tr><td style=text-align:left><code>statsd.ttl</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_TTL</code><tr><td style=text-align:left><code>statsd.user</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_USER</code><tr><td style=text-align:left><code>statsd.worker</code><td style=text-align:left><code>TAOS_ADAPTER_STATSD_WORKER</code><tr><td style=text-align:left><code>taosConfigDir</code><td style=text-align:left><code>TAOS_ADAPTER_TAOS_CONFIG_FILE</code><tr><td style=text-align:left><code>uploadKeeper.enable</code><td style=text-align:left><code>TAOS_ADAPTER_UPLOAD_KEEPER_ENABLE</code><tr><td style=text-align:left><code>uploadKeeper.interval</code><td style=text-align:left><code>TAOS_ADAPTER_UPLOAD_KEEPER_INTERVAL</code><tr><td style=text-align:left><code>uploadKeeper.retryInterval</code><td style=text-align:left><code>TAOS_ADAPTER_UPLOAD_KEEPER_RETRY_INTERVAL</code><tr><td style=text-align:left><code>uploadKeeper.retryTimes</code><td style=text-align:left><code>TAOS_ADAPTER_UPLOAD_KEEPER_RETRY_TIMES</code><tr><td style=text-align:left><code>uploadKeeper.timeout</code><td style=text-align:left><code>TAOS_ADAPTER_UPLOAD_KEEPER_TIMEOUT</code><tr><td style=text-align:left><code>uploadKeeper.url</code><td style=text-align:left><code>TAOS_ADAPTER_UPLOAD_KEEPER_URL</code></table></div></div></details></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href=/operations-and-tooling/components/taosadapter/data-ingestion/><div class=pagination-nav__sublabel>Previous</div><div class=pagination-nav__label>Data Ingestion Interfaces</div></a><a class="pagination-nav__link pagination-nav__link--next" href=/operations-and-tooling/components/taosadapter/operations/><div class=pagination-nav__sublabel>Next</div><div class=pagination-nav__label>Operations and Monitoring</div></a></nav><div class=feedback_NMCs><h2 class=feedbackTitle_E2V1>Support and Feedback</h2><p>Thank you for being part of our community! Your feedback and bug reports for TDengine and its documentation are highly appreciated.<div><span><a href=https://github.com/taosdata/TDengine/edit/main/docs/en/12-operations-and-tooling/03-components/03-taosadapter/02-configuration.md target=_blank rel="noopener noreferrer">Edit this page</a> | </span><span><a href=https://github.com/taosdata/TDengine/issues/new/choose target=_blank rel="noopener noreferrer">Submit an issue</a> | </span><span><a href=https://tdengine.com/contact/ target=_blank rel="noopener noreferrer">Contact us</a></span></div></div></div></div><div class="col col--3"><div class="tableOfContents_Z4iB thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href=#configuration class="table-of-contents__link toc-highlight">Configuration</a><ul><li><a href=#basic-configuration class="table-of-contents__link toc-highlight">Basic Configuration</a><li><a href=#ssl class="table-of-contents__link toc-highlight">SSL</a><li><a href=#registration-configuration class="table-of-contents__link toc-highlight">Registration Configuration</a><li><a href=#cross-origin-configuration class="table-of-contents__link toc-highlight">Cross-Origin Configuration</a><li><a href=#connection-pool-configuration class="table-of-contents__link toc-highlight">Connection Pool Configuration</a><li><a href=#query-result-set-configuration class="table-of-contents__link toc-highlight">Query Result Set Configuration</a><li><a href=#http-response-code-configuration class="table-of-contents__link toc-highlight">HTTP Response Code Configuration</a><li><a href=#memory-limit-configuration class="table-of-contents__link toc-highlight">Memory limit configuration</a><ul><li><a href=#parameter-description class="table-of-contents__link toc-highlight">Parameter Description</a><li><a href=#http-return-content class="table-of-contents__link toc-highlight">HTTP return content</a><li><a href=#status-check-interface class="table-of-contents__link toc-highlight">Status check interface</a><li><a href=#related-configuration-parameters class="table-of-contents__link toc-highlight">Related configuration parameters</a></ul><li><a href=#schemaless-write-create-db-configuration class="table-of-contents__link toc-highlight">Schemaless write create DB configuration</a><ul><li><a href=#parameter-description-1 class="table-of-contents__link toc-highlight">Parameter Description</a></ul><li><a href=#number-of-results-returned-configuration class="table-of-contents__link toc-highlight">Number of results returned configuration</a><ul><li><a href=#parameter-description-2 class="table-of-contents__link toc-highlight">Parameter Description</a></ul><li><a href=#log-configuration class="table-of-contents__link toc-highlight">Log configuration</a><li><a href=#third-party-data-source-configuration class="table-of-contents__link toc-highlight">Third-party Data Source Configuration</a><ul><li><a href=#collectd-configuration class="table-of-contents__link toc-highlight">Collectd Configuration</a><li><a href=#influxdb-configuration class="table-of-contents__link toc-highlight">InfluxDB Configuration</a><li><a href=#opentsdb-configuration class="table-of-contents__link toc-highlight">OpenTSDB Configuration</a><li><a href=#statsd-configuration class="table-of-contents__link toc-highlight">StatsD Configuration</a><li><a href=#prometheus-configuration class="table-of-contents__link toc-highlight">Prometheus Configuration</a><li><a href=#openmetrics-configuration class="table-of-contents__link toc-highlight">OpenMetrics Configuration</a><li><a href=#node-exporter-configuration class="table-of-contents__link toc-highlight">Node Exporter Configuration</a></ul><li><a href=#metrics-reporting-configuration class="table-of-contents__link toc-highlight">Metrics Reporting Configuration</a><li><a href=#query-request-concurrency-limit-configuration class="table-of-contents__link toc-highlight">Query Request Concurrency Limit Configuration</a><li><a href=#reject-query-sql-configuration class="table-of-contents__link toc-highlight">Reject Query SQL Configuration</a><li><a href=#environment-variables class="table-of-contents__link toc-highlight">Environment Variables</a></ul></ul></div></div></div></div></main></div></div></div><footer class=footer_xBL4><div class=inside_k1Uh><div class=top_Ap4P><div class=left_ZN5n><div class=imageContainer_PnCv><a href=https://tdengine.com><img class=logoImg_gUO0 width=150 height=30 src=/img/footer-logo.svg alt=TDengine /></a><div class=certsContainer_KCa1><a href=https://tdengine.com/legal/soc-2/><img class=socImg_edcy src=/img/soc-footer.png alt="SOC 2 compliant"/></a><a href=https://tdengine.com/legal/iso-27001/><img class=isoImg_XjhF src=/img/iso27001-footer.png alt="ISO 27001 compliant"/></a><a href=https://tdengine.com/legal/iso-27001/><img class=isoImg_XjhF src=/img/iso27017-footer.png alt="ISO 27017 compliant"/></a></div></div><p class=footerBlurb_kwjh>TDengine® is an AI-powered data platform designed for industrial applications, combining the high-performance time-series database TDengine TSDB and the AI-native data management platform TDengine IDMP. With TDengine TSDB handling data ingestion, storage, and processing, and TDengine IDMP providing contextualization, standardization, and AI-powered analytics, TDengine enables industrial enterprises to unlock the true value of their time-series data.<p class=footerBlurb_kwjh>© 2022–2026 TDengine</div><div class=right_ClYX><div class=firstColumn_Fajm><div class=firstTop_oK_d><div class=headline_jBpt>Products</div><a href=https://tdengine.com/tsdb/>TDengine TSDB</a><a href=https://tdengine.com/idmp/>TDengine IDMP</a><a href=https://cloud.tdengine.com>TDengine Cloud</a></div><div class=firstBottom_t7g5><div class=headline_jBpt>Resources</div><a href=https://docs.tdengine.com/>TDengine TSDB Docs</a><a href=https://idmpdocs.tdengine.com/>TDengine IDMP Docs</a><a href=https://tdengine.com/blog/>Blog</a><a href=https://tdengine.com/webinars/>Webinars</a></div></div><div class=secondColumn_YRES><div class=headline_jBpt>Company</div><a href=https://tdengine.com/about/>About</a><a href=https://tdengine.com/downloads/>Downloads</a><a href=https://tdengine.com/media/>Newsroom</a><a href=https://tdengine.com/security/>Security</a><a href=https://tdengine.com/legal/>Legal</a><a href=https://tdengine.com/resellers/>Resellers</a><a href=https://tdengine.com/partners/>Partners</a><a href=https://tdengine.com/contact/>Contact Us</a></div><div class=thirdColumn_xk5a><div class=headline_jBpt>Social</div><a class=socialBtn_OKmL href=https://github.com/taosdata/tdengine><span class=icon_VBv9><svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 20 20"><circle cx=10 cy=10 r=9.2 fill=none stroke=#fff /><path fill=#fff d="M10 4.3c-3.1 0-5.7 2.6-5.7 5.8 0 2.6 1.6 4.8 3.9 5.5h.1c.2 0 .3-.2.3-.3v-1c-.2 0-.4.1-.6.1-1.1 0-1.3-.9-1.3-.9-.3-.5-.7-.7-.7-.7-.5-.3 0-.4 0-.4.6.1.9.6.9.6.3.5.7.6 1 .6s.5-.1.7-.2c.1-.4.2-.6.4-.8-1.3-.1-2.6-.6-2.6-2.9 0-.6.2-1.2.6-1.6-.1 0-.3-.6 0-1.4h.1c.2 0 .7.1 1.4.6.5-.1 1-.2 1.5-.2s1 .1 1.4.2c.8-.5 1.2-.6 1.4-.6h.1c.3.8.1 1.4.1 1.5.4.4.6.9.6 1.6 0 2.2-1.3 2.7-2.6 2.9.2.2.4.5.4 1.1v1.6c0 .1.1.3.3.3h.1c2.3-.8 3.9-3 3.9-5.5 0-3.3-2.6-5.9-5.7-5.9"/></svg></span><span>GitHub</span></a><a class=socialBtn_OKmL href=https://discord.com/invite/VZdSuUg4pS><span class=icon_VBv9><svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 20 20"><circle cx=10 cy=10 r=9.2 fill=none stroke=#fff /><path fill=#fff d="M14.4 6c-.8-.4-1.7-.7-2.6-.8-.1.2-.2.4-.3.7-1-.1-1.9-.1-2.9 0-.1-.3-.3-.5-.4-.7-.9.1-1.8.4-2.6.8-1.6 2.4-2.1 4.8-1.9 7.2 1 .7 2 1.2 3.2 1.6.2-.3.5-.7.6-1.1v-.1c-.3-.1-.7-.3-1-.5V13c.1 0 .1-.1.2-.2 2.1.9 4.3.9 6.4 0l.2.2v.1c-.3.2-.6.3-1 .5v.1c.2.4.4.7.6 1.1 1.1-.3 2.2-.9 3.2-1.6.4-2.7-.3-5.1-1.7-7.2m-6.5 5.8c-.6 0-1.1-.6-1.1-1.3s.5-1.3 1.1-1.3S9 9.8 9 10.5s-.5 1.3-1.1 1.3m4.2 0c-.6 0-1.1-.6-1.1-1.3s.5-1.3 1.1-1.3 1.1.6 1.1 1.3-.5 1.3-1.1 1.3"/></svg></span><span>Discord</span></a><a class=socialBtn_OKmL href=https://www.linkedin.com/company/tdengine/><span class=icon_VBv9><svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 20 20"><circle cx=10 cy=10 r=9.2 fill=none stroke=#fff /><path fill=#fff d="M7.1 15.2H4.9v-7h2.2zM6 7.3c-.7 0-1.2-.6-1.2-1.3s.6-1.3 1.3-1.3 1.3.6 1.3 1.3c-.1.7-.7 1.3-1.4 1.3m9.2 7.9H13v-3.4c0-.8 0-1.9-1.1-1.9s-1.3.9-1.3 1.8v3.5H8.5v-7h2.1v1c.3-.6 1-1.1 2.1-1.1 2.2 0 2.6 1.5 2.6 3.3z"/></svg></span><span>LinkedIn</span></a><a class=socialBtn_OKmL href=https://twitter.com/TDengineDB><span class=icon_VBv9><svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 20 20"><circle cx=10 cy=10 r=9.2 fill=none stroke=#fff /><path fill=#fff d="M14.8 7.6v.3c0 3.3-2.5 7-7 7-1.4 0-2.7-.4-3.8-1.1h.6c1.1 0 2.2-.4 3.1-1.1-1.1 0-2-.7-2.3-1.7h.5c.2 0 .4 0 .6-.1-1.1-.2-2-1.2-2-2.4.3.2.7.3 1.1.3-.7-.4-1.1-1.2-1.1-2q0-.75.3-1.2C6 7.1 7.9 8 9.9 8.1c0-.2-.1-.4-.1-.6 0-1.4 1.1-2.5 2.5-2.5.7 0 1.3.3 1.8.8.6-.1 1.1-.3 1.6-.6-.2.6-.6 1.1-1.1 1.4.5-.1 1-.2 1.4-.4-.3.6-.8 1-1.2 1.4"/></svg></span><span>Twitter</span></a><a class=socialBtn_OKmL href=https://www.youtube.com/@tdengine><span class=icon_VBv9><svg xmlns=http://www.w3.org/2000/svg viewBox="0 0 20 20"><circle cx=10 cy=10 r=9.2 fill=none stroke=#fff /><path fill=#fff d="M15.5 7.3c-.1-.5-.5-.9-1-1C13.6 6 10 6 10 6s-3.6 0-4.4.2c-.5.1-.9.5-1 1-.3.9-.3 2.8-.3 2.8s0 1.9.2 2.8c.1.5.5.9 1 1 .9.2 4.5.2 4.5.2s3.6 0 4.4-.2c.5-.1.9-.5 1-1 .2-.9.2-2.8.2-2.8s.1-1.9-.1-2.7m-6.7 4.4V8.3l3 1.7z"/></svg></span><span>YouTube</span></a><a class=langIcon_AIcp href=https://www.taosdata.com/>中</a></div></div></div></div></footer></div></body>
