@@ -116,7 +116,9 @@ class WorkflowTests(unittest.TestCase):
         self.assertNotEqual(self.w.error_signature(first,1),self.w.error_signature(b'FAIL: test_other (Tests)',1))
 
     def test_timeout_keeps_actual_exit_and_output(self):
-        code,raw=self.w.execute_gate([sys.executable,'-u','-c','import time; print("started"); time.sleep(5)'],ROOT,0.05)
+        # 预期超时的失败状态只属于本例，不能污染仓库并阻断下一次自测。
+        with tempfile.TemporaryDirectory() as directory:
+            code,raw=self.w.execute_gate([sys.executable,'-u','-c','import time; print("started"); time.sleep(5)'],Path(directory).resolve(),0.05)
         self.assertEqual(code,124)
         self.assertIn(b'started',raw)
 

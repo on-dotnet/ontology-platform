@@ -65,3 +65,5 @@ Master唯一写者；此清单冻结批准申请第6节可确定的源码路径�
 必要兼容/证据消费者补充：`scripts/maintenance/workflow_m2_fixture.py`与`workflow_smoke.py`仅允许本任务复用已有PG/Web短夹具，冻结已批准镜像、隔离/清理与预算；不授权旧产品完整烟测或relay。`scripts/maintenance/workflow_m2_evidence.py`复用原始解析/资格框架，增加Doris准确审计关联与门禁资格。
 
 严格TLS明确批准后的必要实现：`backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Adapters/DorisCertificatePolicy.cs`，仅本任务私有CA实际握手验证。
+
+最终工程门禁窄修复：`scripts/tests/Workflow.Tests.py`仅将预期超时自测的失败状态移入该用例TemporaryDirectory，防止重复验收污染仓库；产品执行器/止损规则不变，不另建工程任务。

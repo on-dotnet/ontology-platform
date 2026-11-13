@@ -1,0 +1,91 @@
+{
+  "gate": "backend",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "tests": 48,
+    "skipped": 0,
+    "counts": {
+      "adapter": 24,
+      "expired": 2,
+      "pg": 1,
+      "https": 13,
+      "lifecycle": 8
+    },
+    "originalEvidence": [
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/adapter.json",
+        "sha256": "63de9861ccf9c9d416d53a9790587d69df9199db3484451d0d05c5ddb52d4615",
+        "sizeBytes": 2248,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-policy/adapter.json"
+      },
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/expired.json",
+        "sha256": "09dfb52090461c0d2c95c2c750bbf65fcaef9efbdc7caadcbaec601837581edb",
+        "sizeBytes": 1334,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-policy/expired.json"
+      },
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/pg.json",
+        "sha256": "aae20886096589b566a825a2cbfe188899ffdc7ee29be1b6807c10c0f28162d8",
+        "sizeBytes": 3826,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-policy/pg.json"
+      },
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/https.json",
+        "sha256": "dc638c09fd8e17abeec48afdde56e9f577f0e21dad15cc68aa1efe4c3b72bb17",
+        "sizeBytes": 5274,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-policy/https.json"
+      },
+      {
+        "originalPath": "docs/evidence/G4-M2-DORIS-01/final-policy/lifecycle.json",
+        "sha256": "38446a64545dcc38e8bc58a6ea6217e10b496491565aba94671da0343cbe0829",
+        "sizeBytes": 4850,
+        "encoding": "raw",
+        "path": "docs/evidence/G4-M2-DORIS-01/final-policy/lifecycle.json"
+      }
+    ],
+    "limitation": "Counts overlap between gates; CI, other architectures, production and online revocation are not covered"
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m2_evidence.py",
+    "--task",
+    "G4-M2-DORIS-01",
+    "--gate",
+    "backend",
+    "--input-key",
+    "7bdfac299399c01827bbeffc64bdc07b43f07ade5cb0a7df3a6494397bdf7c73"
+  ],
+  "exitCode": 0,
+  "tests": 48,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 0.22732866599108092,
+  "inputKey": "7bdfac299399c01827bbeffc64bdc07b43f07ade5cb0a7df3a6494397bdf7c73",
+  "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+  "policyKey": "5c760f3c5e44c57fb2bec55b0fd52b3cb4ed523ff668ecdf192da1c013d2a082",
+  "evidenceSha256": "5ae77f589a281eaf8aa885a34b5be8acf695391747ec155e72c1ae65aa2242df",
+  "logPath": "docs/evidence/G4-M2-DORIS-01/gates/b055e46e5d82453abc46ac94fa79b819/backend.txt",
+  "sourceRun": "b055e46e5d82453abc46ac94fa79b819",
+  "sourceCommit": "6064f8e1f8feeee61bc2f3b6aeba6a6870423003",
+  "publishedLog": {
+    "originalPath": "docs/evidence/G4-M2-DORIS-01/gates/b055e46e5d82453abc46ac94fa79b819/backend.txt",
+    "sha256": "5ae77f589a281eaf8aa885a34b5be8acf695391747ec155e72c1ae65aa2242df",
+    "sizeBytes": 1605,
+    "encoding": "raw",
+    "path": "docs/evidence/G4-M2-DORIS-01/gates/b055e46e5d82453abc46ac94fa79b819/backend.txt"
+  }
+}

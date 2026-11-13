@@ -1,0 +1,21 @@
+...............E..
+======================================================================
+ERROR: test_timeout_keeps_actual_exit_and_output (__main__.WorkflowTests.test_timeout_keeps_actual_exit_and_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/scripts/tests/Workflow.Tests.py", line 119, in test_timeout_keeps_actual_exit_and_output
+    code,raw=self.w.execute_gate([sys.executable,'-u','-c','import time; print("started"); time.sleep(5)'],ROOT,0.05)
+             ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/scripts/maintenance/workflow.py", line 240, in execute_gate
+    result=run(command,root,task=task,run_id=run_id,input_key=input_key,environment_key=environment_key,timeout=timeout,environment=environment)
+  File "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/scripts/maintenance/workflow_execution.py", line 121, in run
+    try:guard.allow(cost)
+        ~~~~~~~~~~~^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/scripts/maintenance/execution_preflight.py", line 215, in allow
+    raise ValueError(code+': 相同输入/构建/平台先定位或改变输入，不重复昂贵执行')
+ValueError: SHORT_REPRO_REQUIRED: 相同输入/构建/平台先定位或改变输入，不重复昂贵执行
+
+----------------------------------------------------------------------
+Ran 18 tests in 1.813s
+
+FAILED (errors=1)
