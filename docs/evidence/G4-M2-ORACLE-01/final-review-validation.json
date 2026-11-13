@@ -1,0 +1,197 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "f6955e272c412c5528e5698b8ce94a99a44985e1",
+  "checks": [
+    {
+      "name": "oracle-current-local-product-qualification",
+      "command": "workflow_m2_oracle local-tests/adapter-tests/lifecycle; workflow_m2_evidence Oracle qualification",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "46 shared unit;19 wire;122 UI components;5 real Oracle Adapter;11 real OIDC/UI checks;8 job/5 probe audit associations. Five local gates qualified from originals/current inputs; zero skipped. CI/production NOT_RUN."
+    },
+    {
+      "name": "oracle-resource-preservation-and-cleanup",
+      "command": "Exact same-task private backup/isolated restore; before-command-exit-after cleanup",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "PG11 tables restored with identical row/content digests; Keycloak exact realm HTTP200 from backup.8 final resources deleted with absence postconditions.Oracle persistent volume/private backups/runtime/keys and user image KEEP. TDengine untouched."
+    },
+    {
+      "name": "embedded-execution-originals",
+      "command": "Decode and verify 29 committed base64 execution originals against byte lengths and SHA256",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "29 original records verified; historical failures retained separately in metadata/index.json."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M2-ORACLE-01",
+    "scope": "Oracle local development slice only; not production, CI or whole M2 acceptance",
+    "authorization": "User explicitly approved final ZIP based on f6955e27 and independent reopen; no main update or TDengine work",
+    "priorEvidence": "docs/evidence/G4-M2-ORACLE-01/metadata/index.json",
+    "originals": [
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-unit.json",
+        "sha256": "68516d2f0d22d24af737f86e5b6b03fa16235adce1876872b23170bc8e45e7f0",
+        "byteLength": 2124
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-unit.log",
+        "sha256": "3594c3be24caca10c845a52243b3d944938b5b9bf2775ae495222c2eb7b92629",
+        "byteLength": 351
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-wire.json",
+        "sha256": "006e1f4011d50a253a83098e5aa8d78b346d3fc814f652c36533a0a8f0b47189",
+        "byteLength": 2110
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-wire.log",
+        "sha256": "b5c2e1a8db80003a07fa0046b3b65eb097f99e0308d2ec33a8fa988e8b1c6e41",
+        "byteLength": 349
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-ui.json",
+        "sha256": "2e52a570892a45b75eca52cab5ec5985c677bf3147fffc586e9a6bc4da89f2ec",
+        "byteLength": 2114
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-ui.log",
+        "sha256": "4945257139d3216d6b8f99717b1fd41aa426671f528a073f82f17b10bb42211e",
+        "byteLength": 650
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-adapter.json",
+        "sha256": "ce88276b3f576c8efba0403f0e6ea58886fc5594eea9486a1541ef032fdef584",
+        "byteLength": 2251
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-adapter.log",
+        "sha256": "c1dc6860ae5823cb93c649fea78546857bf6b4a38e1fea11ae899fe3b1802a11",
+        "byteLength": 220
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-lifecycle-02.json",
+        "sha256": "d665e9d9fc49c810ef5e836a1504bdddbba951bf2bba3d422e557006222d753d",
+        "byteLength": 8020
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-lifecycle-02.inputs.json",
+        "sha256": "186c3b6039014cc02a7f1b5cc1a1ba1d2ff4abed0ac210277dbf9259aa42e759",
+        "byteLength": 3828
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-lifecycle-02.stdout.json",
+        "sha256": "68a7908d5e802be70c394d0bddf6ed85dd19e3cf7b407d455d24bc7a746ae71a",
+        "byteLength": 1286
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-audit-bound.json",
+        "sha256": "96b558de011206dde9ba81973cbf6399bbc589536efa8a77b3505a0740767a27",
+        "byteLength": 2946
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-audit-bound.projection.json",
+        "sha256": "4a580266fa175bfd1b4ad928041c48f277f8fc00bb76b64e75d798fded7a0849",
+        "byteLength": 7808
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/current-qualification.json",
+        "sha256": "6087742794fcdc759d2be3e2fbebdf869a84d3cf0725ec3740153e4cc25b9f34",
+        "byteLength": 1698
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/source-public-baseline-provenance.json",
+        "sha256": "7be74a12977342fc5383487279986b4d9362c0d079aa2e2bf26f5ec7c205f74f",
+        "byteLength": 1286
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/source-permission-matrix.json",
+        "sha256": "12714e5a68108aa05a85b1ab0831177072e55201e51935f795f6667afa689b0d",
+        "byteLength": 1675
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/source-cancellation-witness-02.json",
+        "sha256": "504bbaf2af60da7cad1eeae8098b4e301f16618f21e30ed5f99e8db41fb4e912",
+        "byteLength": 4371
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/source-cert-negative-matrix.json",
+        "sha256": "0a0c44bfcb439317ec905d655b430fdd0d966f044882e07b0129f1e1e6ce739e",
+        "byteLength": 558
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/source-expired-tls.json",
+        "sha256": "da5059f325e12c01af17c04c0efa9e362514933a645b803b3c99829793f10e7d",
+        "byteLength": 262
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/oracle-real-wrong-san-01.json",
+        "sha256": "6e9ae57d4bf1f286b62b44b8fcf5bbb2ff8bc31c09ad24e95521d67b2798a235",
+        "byteLength": 342
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/oracle-real-wrong-san-01.log",
+        "sha256": "b7c96c3286e0fc8fbc50d6ef65b0a818a365eb69847d42c49af3c5da8a4c9e77",
+        "byteLength": 217
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/oracle-real-expired-01.json",
+        "sha256": "3fece6f45acffd605fb67148a9dae13a6b1385a843a263fb187a8536aa93bfd2",
+        "byteLength": 342
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/oracle-real-expired-01.log",
+        "sha256": "1e737ded8a1e262fdf65741284abeb7e19b4ca175190ceaefca3c6591604f1c5",
+        "byteLength": 217
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/resource-observation.json",
+        "sha256": "52fa48b9e34b20bf0eb7a9deed7fe5e2e9e140cb7c7ae861002d4234a0289e0f",
+        "byteLength": 1071
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/platform-preservation.json",
+        "sha256": "4cf35175f7b78e21946c71b4df14e6212f91df0baf8a8a0c6e4979ac7a235ac0",
+        "byteLength": 3954
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/platform-preservation-execution.json",
+        "sha256": "b85526ad47d18ccd43b7f8c11990a0bd310f127cb61d5805a1424524ebbbd528",
+        "byteLength": 30954
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/cleanup-plan.json",
+        "sha256": "a9b3ece3fb53863dc04ccec7d13d722313bc3270e322f7be361d5cea63f73f63",
+        "byteLength": 1365
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/final-cleanup.json",
+        "sha256": "d6b7920fdcd3093d29df7c462619cb476e15f1e5f6c53e7b26051e15521bd577",
+        "byteLength": 34613
+      },
+      {
+        "path": "artifacts/workflow/G4-M2-ORACLE-01/implementation-02/web-service.json",
+        "sha256": "7a3a4ee8e1507307cae387cb9ee5c9639b366e9441dca82db998d63b7ae87a0a",
+        "byteLength": 172
+      }
+    ],
+    "exclusions": [
+      "credentials",
+      "private runtime and keys",
+      "private backups",
+      "caches",
+      "ignored artifacts"
+    ],
+    "limitations": "Current affected structural/unit/format checks only. Historical full SelfTest and its ZIP fixtures NOT_RUN under user no-ZIP/no-historical-full-acceptance instruction; do not claim whole registry verify PASS.",
+    "packagingNote": "Delivery commit adds documentation only; packager independently compares all non-documentation tracked inputs to testedCommit."
+  }
+}
