@@ -146,3 +146,22 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 ## 2026-11-12 Doris A–F 条件执行授权（最新）
 
 用户明确批准[修订授权](../evidence/G4-M2-DORIS-01/conditional-authorization.md)。立即允许单响应8MiB、累计64MiB的公开有界元数据（含经manifest绑定的config JSON，不含层载荷）；精确身份/依赖/域名/预算及非作者获取准入通过后允许指定载荷取得，下载后内容/风险检查与资源准入通过后实施。DORIS-LOCAL-01仅本机隔离合成非分发无生产凭据，未知供应链项保留NOT_VERIFIED。FE4/BE6、总容器12GiB/4容器、宿主4GiB、磁盘25GiB、载荷5GiB（NuGet10MiB）上限。VM由用户调整通知，实测可见至少15GiB前禁止相关设施启动。批准申请范围Adapter/UI/Compose/合同/TaskId门禁及Vitest绑定，不解除G4生产Guard、不更新main。沿用同树同会话，条件缺失只停依赖操作，不逐补丁审批、不生成中间ZIP。
+
+## 2026-11-13 Doris 官方OS/JDK安全元数据补充
+
+用户明确批准新增`ubuntu.com`、`openjdk.org`、`www.openeuler.org`和`gitee.com/openeuler/bishengjdk-17`：仅HTTPS GET/HEAD公开安全公告、版本及厂商回补资料，沿用单响应8MiB/累计64MiB，不获取制品、不安装工具、不提交私有数据。此补充不扩大软件/镜像/生产权限；非作者要求按公告范围、本机修订与暴露条件判断适用性。用户已将VM相关设置调整，最新只读诊断map_count2000000、swap为空、nofile65536；服务执行仍待剩余准入。
+
+## 2026-11-13 Doris 本机FE入口网络差异
+
+用户明确批准[本机网络差异](../evidence/G4-M2-DORIS-01/local-network-delta.md)：仅FE新增本任务普通bridge入口网络、FE/BE保留internal网络、BE不加入入口，宿主仅127.0.0.1:19030。明确接受FE新增出站能力，仅固定合成SQL/数据、不连接外部数据源；不新增代理/容器、不改全局设置、不降级直接TLS。同树继续，保留原卷及私有证书，先验证实际端口/地址/SAN。
+
+## 2026-11-13 Doris 单项临时VM参数授权
+
+用户明确批准本任务启动前，当Docker Linux VM的vm.max_map_count低于2000000时临时设为2000000；仅使用已批准FE镜像、无网络/无宿主挂载/128MiB的临时特权容器执行该项sysctl，结束精确删除和读回。不改macOS、其它内核参数、Docker持久设置，不重启daemon。原其它全局设置禁令保持；不跳过BE环境检查。
+
+2026-11-13用户明确批准本机生命周期网络差异：平台PG/OIDC接入任务专用普通bridge，接受两服务出站能力；仅PG127.0.0.1:15432与OIDC127.0.0.1:15180。沿用固定已批准镜像、四容器11.5GiB与合成数据；不改FE/BE网络、不加镜像、不改daemon或全局路由，不使用生产凭据。该批准覆盖compose.platform.yaml草案的准确网络差异，允许条件满足后继续本任务生命周期验收。
+
+
+## 2026-11-13 严格TLS实现差异（最新明确批准）
+
+用户明确批准[tls-validation-delta](../evidence/G4-M2-DORIS-01/tls-validation-delta.md)：保留MySqlConnector2.6.2，Required仅作为启用公开验证回调的驱动选项，所有实际握手强制TLS、私有CA完整叶证书链、主机名、有效期和ServerAuth严格校验；主连接与取消辅助连接一致，无明文回退、无全局信任/新依赖/生产权限。合成CA无CRL/OCSP，在线撤销NOT_VERIFIED。真实正反例通过才恢复收口；同会话同树继续，不逐补丁审批。

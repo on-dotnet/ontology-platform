@@ -1,0 +1,100 @@
+{
+  "taskId": "G4-M2-DORIS-01",
+  "runId": "content-20261113-04",
+  "startedAtUtc": "2026-11-13T00:58:40.035436+00:00",
+  "serviceStarts": 0,
+  "images": [
+    {
+      "kind": "fe",
+      "id": "sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02",
+      "descriptor": {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02",
+        "size": 2583
+      },
+      "architecture": "arm64",
+      "sizeBytes": 3845721490,
+      "rootfsMatchesApprovedConfig": true,
+      "configMatchesApproved": true
+    },
+    {
+      "kind": "be",
+      "id": "sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7",
+      "descriptor": {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7",
+        "size": 2773
+      },
+      "architecture": "arm64",
+      "sizeBytes": 8223182065,
+      "rootfsMatchesApprovedConfig": true,
+      "configMatchesApproved": true
+    }
+  ],
+  "containers": [
+    {
+      "id": "60ba00c1566ec7002f214d0d28646ec85b9411973fd58504a4e17c24517555d6",
+      "kind": "fe",
+      "status": "REMOVED",
+      "removeExitCode": 0,
+      "afterAbsent": true
+    },
+    {
+      "id": "846b83705e795106758414771121239f85b89d5c925ef3f679aa9d0ad6c61265",
+      "kind": "be",
+      "status": "REMOVED",
+      "removeExitCode": 0,
+      "afterAbsent": true
+    }
+  ],
+  "checks": [
+    {
+      "kind": "fe",
+      "source": "/opt/apache-doris/fe/LICENSE-dist.txt",
+      "exitCode": 0,
+      "path": "artifacts/workflow/G4-M2-DORIS-01/content-20261113-04/fe-opt_apache-doris_fe_LICENSE-dist.txt.txt",
+      "sizeBytes": 84614,
+      "sha256": "ffda862505e0e9962bd525b514cca8bfb48c1887319acd979e970c02c80d3cd0"
+    },
+    {
+      "kind": "fe",
+      "source": "/opt/apache-doris/fe/licenses/LICENSE-LGPL.txt",
+      "exitCode": 0,
+      "path": "artifacts/workflow/G4-M2-DORIS-01/content-20261113-04/fe-opt_apache-doris_fe_licenses_LICENSE-LGPL.txt.txt",
+      "sizeBytes": 26529,
+      "sha256": "c8cfa082f122323774057c2808eb7e796703bde9459fa04ff6f2c9cc25f74eff"
+    },
+    {
+      "kind": "fe",
+      "source": "/opt/apache-doris/fe/licenses/LICENSE-GPLv2-CE.txt",
+      "exitCode": 0,
+      "path": "artifacts/workflow/G4-M2-DORIS-01/content-20261113-04/fe-opt_apache-doris_fe_licenses_LICENSE-GPLv2-CE.txt.txt",
+      "sizeBytes": 18546,
+      "sha256": "eb178400eb8a354b6972507915c2886345b88e3d17d6c4d970df74db6c23d6e7"
+    },
+    {
+      "kind": "be",
+      "source": "/opt/apache-doris/be/LICENSE-dist.txt",
+      "exitCode": 0,
+      "path": "artifacts/workflow/G4-M2-DORIS-01/content-20261113-04/be-opt_apache-doris_be_LICENSE-dist.txt.txt",
+      "sizeBytes": 84614,
+      "sha256": "ffda862505e0e9962bd525b514cca8bfb48c1887319acd979e970c02c80d3cd0"
+    },
+    {
+      "kind": "be",
+      "source": "/opt/apache-doris/be/licenses/LICENSE-LGPL.txt",
+      "exitCode": 0,
+      "path": "artifacts/workflow/G4-M2-DORIS-01/content-20261113-04/be-opt_apache-doris_be_licenses_LICENSE-LGPL.txt.txt",
+      "sizeBytes": 26529,
+      "sha256": "c8cfa082f122323774057c2808eb7e796703bde9459fa04ff6f2c9cc25f74eff"
+    },
+    {
+      "kind": "be",
+      "source": "/opt/apache-doris/be/licenses/LICENSE-GPLv2-CE.txt",
+      "exitCode": 0,
+      "path": "artifacts/workflow/G4-M2-DORIS-01/content-20261113-04/be-opt_apache-doris_be_licenses_LICENSE-GPLv2-CE.txt.txt",
+      "sizeBytes": 18546,
+      "sha256": "eb178400eb8a354b6972507915c2886345b88e3d17d6c4d970df74db6c23d6e7"
+    }
+  ]
+}

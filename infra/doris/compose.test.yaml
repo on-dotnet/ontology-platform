@@ -1,9 +1,18 @@
-# 仅合成本机测试。真实服务准入当前未通过，不直接执行up。
+# 仅合成本机测试。FE入口网络差异已批准，启动仍走任务执行入口。
 services:
   fe:
     mem_limit: 4g
     memswap_limit: 4g
     ports: ["127.0.0.1:19030:9030"]
+    networks: [doris, local-entry]
   be:
     mem_limit: 6g
     memswap_limit: 6g
+networks:
+  # Docker当前版本仅internal网络未生成宿主端口映射。
+  # 普通bridge仅FE加入；它允许FE出站，不宣称等同internal隔离。
+  local-entry:
+    driver: bridge
+    labels:
+      ontology.task: G4-M2-DORIS-01
+      ontology.run: ${DORIS_RUN_ID:?Set resource run identity}

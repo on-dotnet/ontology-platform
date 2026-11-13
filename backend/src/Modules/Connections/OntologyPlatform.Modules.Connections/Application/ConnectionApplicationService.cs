@@ -210,12 +210,14 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
     /// <summary>operator可见非秘密配置，auditor只得到固定脱敏只读投影。</summary>
     private async Task<ConnectionView> ViewAsync(ConnectionsDbContext db, ActorContext actor, ConnectionRecord row, CancellationToken token)
     {
-        // 持久配置为经过服务器目标核验的PG或Web类型。
+        // 持久配置为经过服务器目标核验的PG、Web或Doris类型。
         var config = Decode<ConnectionConfig>(row.ConfigJson);
         if (!actor.Roles.Contains("platform.operator") && config is PgConnectionConfig pg)
             config = pg with { Profile = pg.Profile with { Host = "redacted", Database = "redacted", Username = "redacted", AllowedSchemas = ["redacted"] } };
         if (!actor.Roles.Contains("platform.operator") && config is WebApiConnectionConfig web)
             config = web with { Profile = web.Profile with { BaseOrigin = "https://redacted.invalid", OperationId = "redacted", ApprovedPath = "/redacted", HostPolicyRef = "redacted" } };
+        if (!actor.Roles.Contains("platform.operator") && config is DorisConnectionConfig doris)
+            config = doris with { Profile = doris.Profile with { FeHost = "redacted", Catalog = "redacted", Database = "redacted", Username = "redacted" } };
         return new ConnectionView
         {
             Id = row.Id,

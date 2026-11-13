@@ -1,0 +1,35 @@
+{
+  "taskId": "G4-M2-DORIS-01",
+  "runId": "resource-20261113-05",
+  "dorisServiceStarts": 0,
+  "diagnosticContainerStarts": 1,
+  "containerId": "90753980c19f02344d4c32ce769be997bd34e0dcd499ed7f02905c9f40fa6cc4",
+  "exitCode": 0,
+  "output": "2000000\nFilename\t\t\t\tType\t\tSize\t\tUsed\t\tPriority\n65536\n",
+  "beforeCleanup": {
+    "running": false,
+    "exitCode": 0,
+    "hostConfig": {
+      "NetworkMode": "none",
+      "ReadonlyRootfs": true,
+      "Memory": 134217728,
+      "MemorySwap": 134217728,
+      "PidsLimit": 16,
+      "CapDrop": [
+        "ALL"
+      ],
+      "SecurityOpt": [
+        "no-new-privileges"
+      ],
+      "Ulimits": [
+        {
+          "Name": "nofile",
+          "Hard": 65536,
+          "Soft": 65536
+        }
+      ]
+    }
+  },
+  "removeExitCode": 0,
+  "afterAbsent": true
+}

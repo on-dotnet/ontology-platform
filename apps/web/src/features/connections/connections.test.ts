@@ -142,7 +142,9 @@ describe("五类受控配置与实际组件", () => {
     const html = renderToStaticMarkup(createElement(ConfigurationForm, { value: validForms[type], onChange: () => undefined, errors: {} }));
     for (const name of Object.keys(validForms[type].values)) expect(html).toContain(`name="${name}"`);
     expect(html).not.toContain('type="password"'); expect(html).not.toContain("secretRef");
-    if (type !== "POSTGRESQL") expect(html).toContain("连接测试与保存尚未开放");
+    if (["ORACLE", "TDENGINE"].includes(type)) expect(html).toContain("连接测试与保存尚未开放");
+    else if (type === "WEB_API") expect(html).toContain("GET / API_KEY_REF / 无分页");
+    else expect(html).toContain("TLS 验证证书和主机名");
   });
   it("字段错误与控件准确关联", () => {
     const html = renderToStaticMarkup(createElement(ConfigurationForm, { value: validForms.POSTGRESQL, onChange: () => undefined, errors: { host: "主机无效" } }));
@@ -609,6 +611,18 @@ describe("M2 Web认证用途", () => {
     }
     expect(runnablePurpose({ ...form, values: { ...form.values, method: "POST" } })).toBeNull();
     expect(runnablePurpose(newForm("POSTGRESQL"))).toBe("POSTGRESQL_READONLY");
-    for (const type of ["ORACLE", "DORIS", "TDENGINE"] as const) expect(runnablePurpose(newForm(type))).toBeNull();
+    for (const type of ["ORACLE", "TDENGINE"] as const) expect(runnablePurpose(newForm(type))).toBeNull();
+  });
+});
+
+/** Doris凭据独立于PG/Web，不能从表单降低TLS。 */
+describe("M2 Doris认证用途", () => {
+  it("仅TLS Doris选择独立用途，关闭TLS在提交前拒绝", () => {
+    const form = newForm("DORIS", "开发Doris");
+    expect(runnablePurpose(form)).toBe("DORIS_READONLY");
+    expect(validateForm(form)).toEqual({});
+    form.values.tls = "false";
+    expect(runnablePurpose(form)).toBeNull();
+    expect(validateForm(form).tls).toBeTruthy();
   });
 });

@@ -1,0 +1,122 @@
+# 本机完整生命周期配套草案；2026-11-13用户明确批准本机网络差异；不用于生产。
+services:
+  platform-pg:
+    image: postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437
+    platform: linux/arm64
+    pull_policy: never
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 1
+    pids_limit: 128
+    read_only: true
+    cap_drop:
+    - ALL
+    cap_add:
+    - CHOWN
+    - SETUID
+    - SETGID
+    - DAC_OVERRIDE
+    - FOWNER
+    security_opt:
+    - no-new-privileges:true
+    labels:
+      ontology.task: G4-M2-DORIS-01
+      ontology.run: ${DORIS_RUN_ID:?explicit task run required}
+    environment:
+      POSTGRES_DB: platform
+      POSTGRES_USER: platform
+      POSTGRES_PASSWORD_FILE: /run/secrets/platform-password
+    command:
+    - chown postgres:postgres /var/lib/postgresql; exec /usr/local/bin/docker-entrypoint.sh
+      postgres -c log_statement=none -c log_min_error_statement=panic
+    ports:
+    - 127.0.0.1:15432:5432
+    networks:
+    - platform-entry
+    volumes:
+    - platform-data:/var/lib/postgresql
+    - ${DORIS_PLATFORM_PRIVATE:?explicit private directory required}/platform-password:/run/secrets/platform-password:ro
+    tmpfs:
+    - /tmp:size=16m,mode=1777
+    - /var/run/postgresql:size=4m,mode=3775,uid=999,gid=999
+    healthcheck:
+      test:
+      - CMD
+      - pg_isready
+      - -U
+      - platform
+      - -d
+      - platform
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    entrypoint:
+    - /bin/sh
+    - -ec
+  keycloak-test:
+    image: quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4
+    platform: linux/arm64
+    pull_policy: never
+    mem_limit: 1g
+    memswap_limit: 1g
+    cpus: 1
+    pids_limit: 256
+    read_only: true
+    cap_drop:
+    - ALL
+    security_opt:
+    - no-new-privileges:true
+    labels:
+      ontology.task: G4-M2-DORIS-01
+      ontology.run: ${DORIS_RUN_ID:?explicit task run required}
+    environment:
+      JAVA_OPTS_KC_HEAP: -Xms128m -Xmx512m
+    entrypoint:
+    - /bin/bash
+    - -ec
+    command:
+    - "runtime=/opt/keycloak/data/runtime\nif [ ! -f \"$$runtime/.recovery-built\"\
+      \ ]; then\n  mkdir -p \"$$runtime\"\n  for item in bin conf lib providers themes\
+      \ LICENSE.txt README.md version.txt; do\n    if [ -e \"/opt/keycloak/$$item\"\
+      \ ]; then cp -R \"/opt/keycloak/$$item\" \"$$runtime/\"; fi\n  done\n  chmod\
+      \ -R u+rwX \"$$runtime\"\n  \"$$runtime/bin/kc.sh\" build --db=dev-file\n  touch\
+      \ \"$$runtime/.recovery-built\"\nfi\nexport KC_BOOTSTRAP_ADMIN_USERNAME=wave2-bootstrap\n\
+      export KC_BOOTSTRAP_ADMIN_PASSWORD=\"$$(cat /run/secrets/keycloak-password)\"\
+      \nexec \"$$runtime/bin/kc.sh\" start --optimized --http-enabled=true --http-port=8080\
+      \ --hostname=http://localhost:15180 --hostname-strict=true --http-access-log-enabled=false\n"
+    ports:
+    - 127.0.0.1:15180:8080
+    networks:
+    - platform-entry
+    volumes:
+    - keycloak-data:/opt/keycloak/data
+    - ${DORIS_PLATFORM_PRIVATE:?explicit private directory required}/keycloak-password:/run/secrets/keycloak-password:ro
+    tmpfs:
+    - /tmp:size=64m,mode=1777
+    user: ${DORIS_HOST_UID:?explicit host uid required}:${DORIS_HOST_GID:?explicit
+      host gid required}
+networks:
+  platform-entry:
+    driver: bridge
+    labels:
+      ontology.task: G4-M2-DORIS-01
+      ontology.run: ${DORIS_RUN_ID:?explicit task run required}
+volumes:
+  platform-data:
+    labels:
+      ontology.task: G4-M2-DORIS-01
+      ontology.run: ${DORIS_RUN_ID:?explicit task run required}
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=512m,mode=0700
+  keycloak-data:
+    labels:
+      ontology.task: G4-M2-DORIS-01
+      ontology.run: ${DORIS_RUN_ID:?explicit task run required}
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=512m,mode=0700,uid=${DORIS_HOST_UID},gid=${DORIS_HOST_GID}

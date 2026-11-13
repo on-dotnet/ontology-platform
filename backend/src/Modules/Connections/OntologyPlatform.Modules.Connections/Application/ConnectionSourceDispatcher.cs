@@ -2,7 +2,7 @@ using OntologyPlatform.Contracts;
 
 namespace OntologyPlatform.Modules.Connections;
 
-/// <summary>仅分发PG和Web两项typed能力，保持其它公开类型不可执行。</summary>
+/// <summary>仅分发PG、Web和Doris三项typed能力，保持其它公开类型不可执行。</summary>
 public sealed class ConnectionSourceDispatcher
 {
     /// <summary>冻结PG的既有真实实现。</summary>
@@ -11,6 +11,9 @@ public sealed class ConnectionSourceDispatcher
     /// <summary>固定HTTPS GET的真实实现。</summary>
     private readonly IWebSourceAdapter web;
 
+    /// <summary>可选注入的Doris真实元数据能力，缺失时拒绝执行。</summary>
+    private readonly IDorisSourceAdapter? doris;
+
     /// <summary>由服务器明确批准的原PG空public例外。</summary>
     private readonly bool allowEmptyPublic;
 
@@ -18,8 +21,9 @@ public sealed class ConnectionSourceDispatcher
     private readonly WebOperationPolicy webPolicy;
 
     /// <summary>冻结现行PG策略并注入独立typed能力。</summary>
-    public ConnectionSourceDispatcher(IPgSourceAdapter pg, IWebSourceAdapter web, PgAdapterOptions options, WebOperationPolicy webPolicy)
+    public ConnectionSourceDispatcher(IPgSourceAdapter pg, IWebSourceAdapter web, PgAdapterOptions options, WebOperationPolicy webPolicy, IDorisSourceAdapter? doris = null)
     {
+        this.doris = doris;
         this.pg = pg;
         this.web = web;
         this.webPolicy = webPolicy;
@@ -35,6 +39,7 @@ public sealed class ConnectionSourceDispatcher
     public static string SecretPurpose(ConnectionConfig config) => config switch
     {
         PgConnectionConfig => "POSTGRESQL_READONLY",
+        DorisConnectionConfig => "DORIS_READONLY",
         WebApiConnectionConfig { Profile.Authentication: "API_KEY_REF", Profile.Pagination: "NONE", Profile.Method: "GET" } => "WEB_API_KEY",
         _ => throw new SemanticOperationException(422, "connector_not_enabled")
     };
@@ -54,12 +59,28 @@ public sealed class ConnectionSourceDispatcher
             throw new SemanticOperationException(422, "connection_profile_invalid");
     }
 
+    /// <summary>Doris范围变更必须重新Intake，禁止以旧密文重新绑定组织或厂区。</summary>
+    /// <param name="config">当前已绑定的类型化配置。</param>
+    /// <param name="before">持久化凭据的原范围。</param>
+    /// <param name="after">请求的新范围。</param>
+    public static void DemandSameCredentialScope(ConnectionConfig config, ResourceScope before, ResourceScope after)
+    {
+        if (config is DorisConnectionConfig && (before.OrganizationId != after.OrganizationId
+            || !before.SiteIds.Order(StringComparer.Ordinal).SequenceEqual(after.SiteIds.Order(StringComparer.Ordinal))))
+            throw new SemanticOperationException(422, "connection_profile_invalid");
+    }
+
     /// <summary>每次绑定和网络调用前都核对服务器目标及当前scope。</summary>
     public ConnectionConfig Validate(ConnectionConfig config, ResourceScope scope)
     {
         G4ConnectionRules.Config(config);
         _ = SecretPurpose(config);
         if (config is WebApiConnectionConfig webConfig) webPolicy.Validate(webConfig.Profile, scope);
+        else if (config is DorisConnectionConfig dorisConfig)
+        {
+            DorisAdapterOptions.Validate(dorisConfig.Profile, scope);
+            if (doris is null) throw new SemanticOperationException(422, "connector_not_enabled");
+        }
         else if (config is PgConnectionConfig pgConfig)
         {
             // 保留M1精确目标和Schema规则，不能由Web上线扩大PG执行集合。
@@ -76,6 +97,7 @@ public sealed class ConnectionSourceDispatcher
     public Task<ConnectionProbeStage[]> ProbeAsync(ConnectionConfig config, ResourceScope scope, string secret, CancellationToken cancellationToken)
         => Validate(config, scope) switch
         {
+            DorisConnectionConfig value => doris!.ProbeAsync(value.Profile, secret, cancellationToken),
             PgConnectionConfig value => pg.ProbeAsync(value.Profile, secret, cancellationToken),
             WebApiConnectionConfig value => web.ProbeAsync(value.Profile, secret, cancellationToken),
             _ => throw new SemanticOperationException(422, "connector_not_enabled")
@@ -85,6 +107,7 @@ public sealed class ConnectionSourceDispatcher
     public Task<CatalogObject[]> DiscoverAsync(ConnectionConfig config, ResourceScope scope, string secret, CancellationToken cancellationToken)
         => Validate(config, scope) switch
         {
+            DorisConnectionConfig value => doris!.DiscoverAsync(value.Profile, secret, cancellationToken),
             PgConnectionConfig value => pg.DiscoverAsync(value.Profile, secret, cancellationToken),
             WebApiConnectionConfig value => web.DiscoverAsync(value.Profile, secret, cancellationToken),
             _ => throw new SemanticOperationException(422, "connector_not_enabled")

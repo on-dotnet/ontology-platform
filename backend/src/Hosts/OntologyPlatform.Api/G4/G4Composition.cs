@@ -48,6 +48,8 @@ public static class G4Composition
             RootCertificatePath = builder.Configuration["G4:Web:RootCertificatePath"] ?? string.Empty
         });
         builder.Services.AddSingleton<IWebSourceAdapter, WebSourceAdapter>();
+        builder.Services.AddSingleton(new DorisAdapterOptions { RootCertificatePath = builder.Configuration["G4:Doris:RootCertificatePath"] ?? string.Empty });
+        builder.Services.AddSingleton<IDorisSourceAdapter, DorisSourceAdapter>();
         builder.Services.AddSingleton<ConnectionSourceDispatcher>();
         builder.Services.AddSingleton(provider => new ConnectionSecretCipher(builder.Configuration["G4:KeyFile"] ?? string.Empty));
         builder.Services.AddSingleton<IConnectionSessionAuthority, G4SessionAuthority>();

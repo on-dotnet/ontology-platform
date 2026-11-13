@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "taskId": "G4-M2-DORIS-01",
+  "runId": "doris-46c58e347219",
+  "tests": 8,
+  "skipped": 0,
+  "checks": [
+    "REAL_OIDC",
+    "DORIS_INTAKE_REPLAY_PURPOSE_SCOPE",
+    "UI_INTAKE_CREATE_PROBE_ENABLE_DISCOVER",
+    "EXPLICIT_CANCEL_AND_DISABLE_TERMINATE_EXACT_SOURCE",
+    "SOURCE_REVOKE_PROBE_ENABLE_WORKER_HISTORY",
+    "EMPTY_SYNTHETIC_SCHEMA_RESTORE",
+    "ROTATE_SINGLE_USE_STALE_PROBE_TARGET_SCOPE",
+    "DISABLE_BLOCKS_PROBE_AND_HISTORY"
+  ],
+  "cancellations": [
+    {
+      "mutation": "cancel",
+      "jobId": "8dcc93d2ba29498188d26a575d65e677",
+      "sourceId": 129,
+      "observedBefore": true,
+      "absentAfter": true
+    },
+    {
+      "mutation": "disable",
+      "jobId": "c3a2308e300048f4beee047b9074aac5",
+      "sourceId": 140,
+      "observedBefore": true,
+      "absentAfter": true
+    }
+  ],
+  "connectionId": "75e09302826b4dc591ca306fd7d61e16"
+}

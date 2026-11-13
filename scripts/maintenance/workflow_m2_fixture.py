@@ -52,7 +52,7 @@ def prepare(private,run_id):
 
 
 def run(task):
-    if task not in (build.TASK,'G4-ENG-DELIVERY-002'):raise ValueError('TASK_ID')
+    if task not in (build.TASK,'G4-ENG-DELIVERY-002','G4-M2-DORIS-01'):raise ValueError('TASK_ID')
     product_task=build.TASK
     TASK=task
     binding=build.validate('connections',task)
@@ -129,7 +129,7 @@ def run(task):
 def pg_regression(task):
     """新任务独立PG回归；只运行受影响的真实TLS/只读/原生类型与认证负例。"""
     import workflow_smoke as shared
-    if task not in (build.TASK,'G4-ENG-DELIVERY-002'):raise ValueError('TASK_ID')
+    if task not in (build.TASK,'G4-ENG-DELIVERY-002','G4-M2-DORIS-01'):raise ValueError('TASK_ID')
     TASK=task
     binding=build.validate('connections',task);run_id='m2-'+secrets.token_hex(6)
     private=ROOT/'.tools/security'/TASK.lower()/run_id;private.mkdir(parents=True,mode=0o700)

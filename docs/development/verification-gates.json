@@ -19,7 +19,8 @@
         "docs/evidence/G4-M2-WEB-01/recovery/**/*.json",
         "docs/evidence/G4-M2-WEB-01/gates/**/*.json",
         "docs/evidence/G4-M2-WEB-01/recovery/**/*.log",
-        "docs/evidence/G4-ENG-DELIVERY-002/**/*.json"
+        "docs/evidence/G4-ENG-DELIVERY-002/**/*.json",
+        "docs/evidence/G4-M2-DORIS-01/**/*.json"
       ],
       "needs": [],
       "command": [
@@ -46,7 +47,10 @@
         "scripts/maintenance/workflow_m2_*.py",
         "scripts/maintenance/workflow-m2-web.mjs",
         "scripts/maintenance/workflow_smoke.py",
-        "experiments/g4-m2-web-01/**"
+        "experiments/g4-m2-web-01/**",
+        "scripts/maintenance/workflow_doris_fixture.py",
+        "scripts/maintenance/workflow-doris.mjs",
+        "scripts/maintenance/doris-fixture-control.cs.txt"
       ],
       "needs": [],
       "command": null
@@ -61,7 +65,10 @@
         "scripts/maintenance/workflow_m2_*.py",
         "scripts/maintenance/workflow-m2-web.mjs",
         "scripts/maintenance/workflow_smoke.py",
-        "experiments/g4-m2-web-01/**"
+        "experiments/g4-m2-web-01/**",
+        "scripts/maintenance/workflow_doris_fixture.py",
+        "scripts/maintenance/workflow-doris.mjs",
+        "scripts/maintenance/doris-fixture-control.cs.txt"
       ],
       "needs": [
         "environment"
@@ -78,7 +85,10 @@
         "scripts/maintenance/workflow_m2_*.py",
         "scripts/maintenance/workflow-m2-web.mjs",
         "scripts/maintenance/workflow_smoke.py",
-        "experiments/g4-m2-web-01/**"
+        "experiments/g4-m2-web-01/**",
+        "scripts/maintenance/workflow_doris_fixture.py",
+        "scripts/maintenance/workflow-doris.mjs",
+        "scripts/maintenance/doris-fixture-control.cs.txt"
       ],
       "needs": [
         "contract",
@@ -93,7 +103,10 @@
         "scripts/maintenance/workflow_m2_*.py",
         "scripts/maintenance/workflow-m2-web.mjs",
         "scripts/maintenance/workflow_smoke.py",
-        "experiments/g4-m2-web-01/**"
+        "experiments/g4-m2-web-01/**",
+        "scripts/maintenance/workflow_doris_fixture.py",
+        "scripts/maintenance/workflow-doris.mjs",
+        "scripts/maintenance/doris-fixture-control.cs.txt"
       ],
       "needs": [
         "contract"
@@ -108,7 +121,10 @@
         "scripts/maintenance/workflow_m2_*.py",
         "scripts/maintenance/workflow-m2-web.mjs",
         "scripts/maintenance/workflow_smoke.py",
-        "experiments/g4-m2-web-01/**"
+        "experiments/g4-m2-web-01/**",
+        "scripts/maintenance/workflow_doris_fixture.py",
+        "scripts/maintenance/workflow-doris.mjs",
+        "scripts/maintenance/doris-fixture-control.cs.txt"
       ],
       "needs": [
         "web",

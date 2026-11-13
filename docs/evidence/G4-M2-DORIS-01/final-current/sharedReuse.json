@@ -1,0 +1,108 @@
+{
+  "taskId": "G4-M2-DORIS-01",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "scope": [
+    "Shared natural unbound-secret TTL and bound-secret validity",
+    "Shared probe transaction audit rollback"
+  ],
+  "limitations": [
+    "No Doris-specific audit fault injection",
+    "No new Worker lease/fence or full rollback proof",
+    "Historical browser does not prove stale CAS; current lifecycle adds explicit rejection"
+  ],
+  "inputs": [
+    {
+      "commit": "820855bc239d409b9931bf4e3ba669592afb2123",
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Commands.cs",
+      "method": "UnboundSecretAsync",
+      "sha256": "430579976793ecee70c475983f083785b01051b2d40111da70a79a25fb1ab022",
+      "identical": true
+    },
+    {
+      "commit": "820855bc239d409b9931bf4e3ba669592afb2123",
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Commands.cs",
+      "method": "BoundSecretAsync",
+      "sha256": "58cf39d4e9da3e8f74538ba7074551515f6f729b62ff09e53341978b94cc6414",
+      "identical": true
+    },
+    {
+      "commit": "820855bc239d409b9931bf4e3ba669592afb2123",
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Commands.cs",
+      "method": "IntakeAsync",
+      "sha256": "9ad8bfb286d2e47a1b08247bc1ea7263af5eee27846e52bf8889353bdfceece6",
+      "identical": true
+    },
+    {
+      "commit": "820855bc239d409b9931bf4e3ba669592afb2123",
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.cs",
+      "method": "ReplayAsync",
+      "sha256": "2b8ac7d43f0fb9d5069ced1ef980eb619025aa55f611bb97921dcc309d140df5",
+      "identical": true
+    },
+    {
+      "commit": "820855bc239d409b9931bf4e3ba669592afb2123",
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.cs",
+      "method": "FreshAsync",
+      "sha256": "dc1b06c5a5fbf6cd4fea24aec4198462ce7116c94af3e2a95fe7519c2f5ed82d",
+      "identical": true
+    },
+    {
+      "commit": "820855bc239d409b9931bf4e3ba669592afb2123",
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.cs",
+      "method": "Cas",
+      "sha256": "3fc475c6efa1fea02cbe9b861a4131e629ed1e638c33f6a8f5a47b5b363151dd",
+      "identical": true
+    },
+    {
+      "commit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.cs",
+      "method": "CommandAsync",
+      "sha256": "484ca0fddd7d6efeeefc424d9ea557a0470cdb62e172986228d47f119aee4591",
+      "identical": true
+    },
+    {
+      "commit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.cs",
+      "method": "SaveAuditAsync",
+      "sha256": "e39dceeb4a848ab7d13637f6d98fb8696a3fbefb53dcc79d7a9cdc79a19065cb",
+      "identical": true
+    },
+    {
+      "commit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs",
+      "sha256": "2a460770cff2b3cb412182e595a07daee73fe103d8a9ef0882ce9251a92a87b1",
+      "identical": true
+    },
+    {
+      "commit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Probes.cs",
+      "span": "finalDb transaction through EOF",
+      "sha256": "bd0be482d24c4856eba88fc760d2ad522d220eb4427d159af858db15e1405008",
+      "identical": true
+    }
+  ],
+  "originalEvidence": [
+    {
+      "commit": "820855bc239d409b9931bf4e3ba669592afb2123",
+      "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-c72b9c07e76c/browser.json",
+      "sha256": "c980632d376e45cfaf6833b419c1d0e177f9242b9240bc510778e630b115f6b4"
+    },
+    {
+      "commit": "820855bc239d409b9931bf4e3ba669592afb2123",
+      "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-c72b9c07e76c/receipt.json",
+      "sha256": "df8f06832fabcb77e1a9e14d0bef2ac1b32310b92e2b87034524091925206078"
+    },
+    {
+      "commit": "820855bc239d409b9931bf4e3ba669592afb2123",
+      "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-c72b9c07e76c/resources.json",
+      "sha256": "064d61c7e12934719d0c7cb925faeefa1f40579af150797729e3a03a5d2b8c80"
+    },
+    {
+      "commit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+      "path": "docs/evidence/G4-M1-MAIN-INTEGRATION-001/b-continue-20261106-35/audit-rollback.json",
+      "sha256": "7da2f7f84719fdc332e8634da947f2ffebeefb7ffe8faf53a4cff6f53ae43f06"
+    }
+  ]
+}

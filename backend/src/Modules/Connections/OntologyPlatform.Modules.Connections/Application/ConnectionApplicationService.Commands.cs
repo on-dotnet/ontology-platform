@@ -119,6 +119,7 @@ public sealed partial class ConnectionApplicationService
                 if (patch.DisplayName is not null) row.DisplayName = patch.DisplayName;
                 if (patch.ScopeSelection is not null)
                 {
+                    ConnectionSourceDispatcher.DemandSameCredentialScope(Decode<ConnectionConfig>(row.ConfigJson), before, patch.ScopeSelection);
                     DemandScope(call.Actor, patch.ScopeSelection);
                     _ = Source(Decode<ConnectionConfig>(row.ConfigJson), patch.ScopeSelection);
                     // 凭据AAD必须随完整授权范围原子重新绑定，而不是丢失AEAD保护。

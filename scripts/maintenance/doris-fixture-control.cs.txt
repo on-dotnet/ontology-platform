@@ -1,0 +1,106 @@
+using MySqlConnector;
+using System.Text.Json;
+
+// 参数只能指向本任务已登记的私有运行目录；SQL集合完全固定。
+var runtime = Path.GetFullPath(args[0]);
+// 操作名称不参与SQL拼接。
+var mode = args[1];
+// 每轮备份单独命名，不覆盖其它轮次唯一原件。
+var runId = args[2];
+if (!System.Text.RegularExpressions.Regex.IsMatch(runId, "^doris-[a-f0-9]{12}$")) return 64;
+if (mode is not ("revoke" or "grant" or "backup-schema" or "restore-schema" or "active-reader")) return 64;
+// fixture管理员仅用于授权变化、合成恢复和旁路观察，绝不交给产品。
+var builder = new MySqlConnectionStringBuilder
+{
+    Server = "localhost", Port = 19030, UserID = "root", Database = "fixture",
+    Password = File.ReadAllText(Path.Combine(runtime, "private", "root.pass")),
+    SslMode = MySqlSslMode.VerifyFull, SslCa = Path.Combine(runtime, "tls", "ca.pem"),
+    Pooling = false, ConnectionTimeout = 3, DefaultCommandTimeout = 5, CancellationTimeout = -1
+};
+// 每个控制操作独立限十秒，不能无限等待。
+using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+await using var connection = new MySqlConnection(builder.ConnectionString);
+try
+{
+    await connection.OpenAsync(deadline.Token);
+    if (mode is "revoke" or "grant")
+    {
+        // 只影响准确合成reader的fixture库SELECT，不改变全局权限。
+        var sql = mode == "revoke" ? "REVOKE SELECT_PRIV ON internal.fixture.* FROM fixture_reader" : "GRANT SELECT_PRIV ON internal.fixture.* TO fixture_reader";
+        await using var command = new MySqlCommand(sql, connection);
+        await command.ExecuteNonQueryAsync(deadline.Token);
+        Console.WriteLine("{\"status\":\"APPLIED\"}");
+    }
+    else if (mode == "active-reader")
+    {
+        // 仅统计当前合成reader活动命令，不输出任何会话SQL或密码。
+        await using var command = new MySqlCommand("SHOW FULL PROCESSLIST", connection);
+        await using var rows = await command.ExecuteReaderAsync(deadline.Token);
+        // 数量用于证明取消后没有该合成账号的活动查询。
+        var ids = new List<long>();
+        while (await rows.ReadAsync(deadline.Token))
+            if (Convert.ToString(rows["User"]) == "fixture_reader" && Convert.ToString(rows["Command"]) != "Sleep") ids.Add(Convert.ToInt64(rows["Id"]));
+        Console.WriteLine(JsonSerializer.Serialize(new { activeReaderQueries = ids.Count, sourceIds = ids }));
+    }
+    else
+    {
+        // 仅恢复已知空合成表的元数据；不冒充整个Doris集群或业务数据备份。
+        var backup = Path.Combine(runtime, "private", "schema-backup-" + runId + ".json");
+        if (mode == "restore-schema")
+        {
+            // 没有已生成的元数据备份时绝不删除原表。
+            if (!File.Exists(backup) || new FileInfo(backup).Length > 4096) throw new InvalidOperationException();
+            // 在删除前验证备份为固定fixture字段，拒绝损坏或其它对象的备份。
+            var saved = JsonSerializer.Deserialize<string[][]>(await File.ReadAllTextAsync(backup, deadline.Token));
+            if (saved is not { Length: 2 } || saved.Any(field => field.Length != 4)
+                || saved[0][0] != "id" || saved[0][1] != "int(11)" || saved[0][2] != "YES" || saved[0][3] != "1"
+                || saved[1][0] != "label" || saved[1][1] != "varchar(64)" || saved[1][2] != "YES" || saved[1][3] != "2") throw new InvalidOperationException();
+            // 中断后表可能已删除；存在时必须先证明仍为空，才可重复恢复。
+            await using var exists = new MySqlCommand("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA='fixture' AND TABLE_NAME='metadata_sample'", connection);
+            if (Convert.ToInt64(await exists.ExecuteScalarAsync(deadline.Token)) != 0)
+            {
+                // 现存结构必须与已校验备份完全一致，才允许本次破坏/恢复演练。
+                await using (var shape = new MySqlCommand("SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,ORDINAL_POSITION FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='fixture' AND TABLE_NAME='metadata_sample' ORDER BY ORDINAL_POSITION", connection))
+                {
+                    await using var rows = await shape.ExecuteReaderAsync(deadline.Token);
+                    // 读取精确固定表结构，不访问任何业务行。
+                    var current = new List<string[]>();
+                    while (await rows.ReadAsync(deadline.Token)) current.Add(Enumerable.Range(0, 4).Select(index => Convert.ToString(rows.GetValue(index)) ?? "").ToArray());
+                    if (JsonSerializer.Serialize(current) != JsonSerializer.Serialize(saved)) throw new InvalidOperationException();
+                }
+                // 任何业务行都阻止删除，避免扩大合成恢复边界。
+                await using var empty = new MySqlCommand("SELECT COUNT(*) FROM fixture.metadata_sample", connection);
+                if (Convert.ToInt64(await empty.ExecuteScalarAsync(deadline.Token)) != 0) throw new InvalidOperationException();
+                await using var drop = new MySqlCommand("DROP TABLE fixture.metadata_sample", connection);
+                await drop.ExecuteNonQueryAsync(deadline.Token);
+            }
+            // 恢复只执行固定DDL，不执行从文件读取的任意SQL。
+            await using var create = new MySqlCommand("CREATE TABLE fixture.metadata_sample (id INT, label VARCHAR(64)) DUPLICATE KEY(id) DISTRIBUTED BY HASH(id) BUCKETS 1 PROPERTIES ('replication_num'='1')", connection);
+            await create.ExecuteNonQueryAsync(deadline.Token);
+        }
+        // 对象、原生类型、空值和序号共同组成恢复对照，不只检查表名。
+        await using var metadata = new MySqlCommand("SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,ORDINAL_POSITION FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='fixture' AND TABLE_NAME='metadata_sample' ORDER BY ORDINAL_POSITION", connection);
+        await using var reader = await metadata.ExecuteReaderAsync(deadline.Token);
+        // 固定表只有两个字段，异常形态拒绝备份或恢复结论。
+        var fields = new List<string[]>();
+        while (await reader.ReadAsync(deadline.Token)) fields.Add(Enumerable.Range(0, 4).Select(index => Convert.ToString(reader.GetValue(index)) ?? "").ToArray());
+        if (fields.Count != 2 || fields[0][0] != "id" || fields[1][0] != "label") throw new InvalidOperationException();
+        // 比较完整规范化元数据字节，失败不产生PASS。
+        var serialized = JsonSerializer.Serialize(fields);
+        if (mode == "backup-schema")
+        {
+            using var file = new FileStream(backup, FileMode.CreateNew, FileAccess.Write);
+            File.SetUnixFileMode(backup, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+            using var writer = new StreamWriter(file);
+            writer.Write(serialized);
+        }
+        else if (await File.ReadAllTextAsync(backup, deadline.Token) != serialized) throw new InvalidOperationException();
+        Console.WriteLine("{\"status\":\"METADATA_MATCHED\"}");
+    }
+    return 0;
+}
+catch
+{
+    Console.WriteLine("{\"status\":\"FIXTURE_CONTROL_FAILED\"}");
+    return 1;
+}

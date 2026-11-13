@@ -280,7 +280,7 @@ def _wait_http(url, headers=None, timeout=90):
 
 def fixture(root, private, run, task=TASK):
     """每Run独立无业务行fixture；不触碰编译目录或系统信任。"""
-    require(admitted(task,run),'FIXTURE_IDENTITY')
+    require(admitted(task,run) or (task=='G4-M2-DORIS-01' and re.fullmatch('m2-[a-f0-9]{12}',run or '')),'FIXTURE_IDENTITY')
     for name in ('postgres-password','reader-password','platform-password','keycloak-password'):
         private_write(private/name,secrets.token_urlsafe(36))
     openssl=shutil.which('openssl');require(openssl is not None,'OPENSSL_MISSING')
@@ -319,7 +319,7 @@ ALTER ROLE fixture_reader IN DATABASE fixture SET default_transaction_read_only 
 
 def recipe(root, private, run, output, task=TASK):
     """从固定已审配方派生当前任务五服务；不改历史源、不继承历史身份。"""
-    require(admitted(task,run),'RECIPE_IDENTITY')
+    require(admitted(task,run) or (task=='G4-M2-DORIS-01' and re.fullmatch('m2-[a-f0-9]{12}',run or '')),'RECIPE_IDENTITY')
     env=dict(os.environ,G4_RUN_ID=run,G4_PRIVATE_DIR=str(private),G4_ROOT=str(root),
         G4_HOST_UID=str(os.getuid()),G4_HOST_GID=str(os.getgid()),G4_HELPERS=str(private),
         G4_SHARED_WEB_MODULES=str(root/'apps/web/node_modules'),G4_SHARED_ROOT_MODULES=str(root/'node_modules'),

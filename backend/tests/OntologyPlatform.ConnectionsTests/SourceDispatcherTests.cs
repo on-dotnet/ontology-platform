@@ -113,6 +113,21 @@ public sealed class SourceDispatcherTests
         Assert.Throws<SemanticOperationException>(() => ConnectionSourceDispatcher.DemandSameTarget(original, Web()));
     }
 
+    /// <summary>Doris旧凭据的范围只能等值重排，不能转移组织或增减厂区。</summary>
+    [TestMethod]
+    public void DorisCredentialScopeCannotBeRebound()
+    {
+        // 固定Doris配置，不进行网络调用。
+        var config = new DorisConnectionConfig { Profile = new DorisConnectionProfile { FeHost = "localhost", QueryPort = 19030, Catalog = "internal", Database = "fixture", Username = "fixture_reader", Tls = true } };
+        // 比较范围按现有规范排序，不把顺序变化误认为迁移。
+        var scope = Scope() with { SiteIds = ["site-b", "site-a"] };
+        ConnectionSourceDispatcher.DemandSameCredentialScope(config, scope, scope with { SiteIds = ["site-a", "site-b"] });
+        Assert.Throws<SemanticOperationException>(() => ConnectionSourceDispatcher.DemandSameCredentialScope(config, scope, Scope()));
+        Assert.Throws<SemanticOperationException>(() => ConnectionSourceDispatcher.DemandSameCredentialScope(config, scope, scope with { OrganizationId = "other" }));
+        // 既有PG范围编辑合同不由Doris扩展改变。
+        ConnectionSourceDispatcher.DemandSameCredentialScope(Pg(), scope, Scope());
+    }
+
     /// <summary>合成Web operation，不含密钥。</summary>
     private static WebApiConnectionConfig Web() => new() { Profile = new WebApiConnectionProfile { BaseOrigin = "https://web-source:8443", OperationId = "fixture-items", Method = "GET", ApprovedPath = "/v1/items", Authentication = "API_KEY_REF", Pagination = "NONE", HostPolicyRef = "g4-m2-web-01" } };
 

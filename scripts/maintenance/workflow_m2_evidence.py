@@ -99,6 +99,8 @@ def validate_environment(task,prepares):
     import platform
     packages,projects,files=environment.locks(build.ROOT)
     approved={item['package']:item for item in environment.git_json(build.ROOT,environment.ARCHIVE_COMMIT,environment.ARCHIVES)['packages']}
+    if task == 'G4-M2-DORIS-01':
+        approved['mysqlconnector/2.6.2'] = dict(package='mysqlconnector/2.6.2', archiveSha256='3d8758d29d2b19a5efa9f78cfac9cae824a870aaf88e2e3adc40bce3cddac748', contentHash='dlTc/tsBa42szdvpj4nrHvQVUb0gsMwR9HT6J0Zz2OSqfP0CdYlGw+qQPqCpbnO97idfvclSjKYtM6y5QaBQaQ==')
     identity=environment.identities(dict(platform=platform.system()+'-'+platform.machine(),osVersion=platform.mac_ver()[0],files=files,tools=admission['files'],sdk=environment.SDK_ARCHIVES,archives={key:value['archiveSha256'] for key,value in approved.items()}),build.ROOT)
     require(all(row['contentKey']==identity['contentKey'] and row['workspaceKey']==identity['workspaceKey'] for row in prepares),'ENV_IDENTITY_DRIFT')
     home=build.ROOT/'artifacts/workflow'/task/'environment'/identity['contentKey']
@@ -107,6 +109,64 @@ def validate_environment(task,prepares):
     rows,shims,links=web.inspect(build.ROOT,Path(admission['playwrightAndAjv']['store']),prepares[0]['node'],environment)
     marker=json.loads(environment.web_marker(build.ROOT,home,admission).read_text())
     require(marker['binding']==web.binding(build.ROOT,rows,shims,links,environment),'ENV_WEB_DRIFT')
+
+
+def doris_audit(dump, browser):
+    """只在内存解析私有pg_dump；公开输出仅关联断言与数量，不复制记录或认证材料。"""
+    escapes = {'b': '\b', 'f': '\f', 'n': '\n', 'r': '\r', 't': '\t', 'v': '\v', '\\': '\\'}
+    def unescape(value):
+        if value == r'\N':
+            return None
+        return re.sub(r'\\([bfnrtv\\]|[0-7]{1,3})', lambda match: escapes[match[1]] if match[1] in escapes else chr(int(match[1], 8)), value)
+    tables = {}
+    for table, columns, data in re.findall(r'COPY ([^\n]+?) \(([^\n]+)\) FROM stdin;\n(.*?)\n\\\.', dump.decode(), re.S):
+        if table.startswith('connections.') or table == 'governance.audit_records':
+            names = [name.strip().strip('"') for name in columns.split(',')]
+            rows = []
+            for line in data.splitlines():
+                values = line.split('\t')
+                require(len(values) == len(names), 'DORIS_DUMP_COLUMNS')
+                rows.append(dict(zip(names, map(unescape, values))))
+            tables[table] = rows
+    require(browser.get('taskId') == 'G4-M2-DORIS-01' and browser.get('status') == 'PASS' and browser.get('skipped') == 0 and re.fullmatch('doris-[a-f0-9]{12}', browser.get('runId', '')), 'DORIS_BROWSER_IDENTITY')
+    require(len(browser.get('checks', [])) == browser.get('tests') == 8 and 'SOURCE_REVOKE_PROBE_ENABLE_WORKER_HISTORY' in browser['checks'], 'DORIS_BROWSER_COVERAGE')
+    require(len(browser.get('cancellations', [])) == 2 and {row['mutation'] for row in browser['cancellations']} == {'cancel', 'disable'}, 'DORIS_CANCEL_COVERAGE')
+    audit = tables['governance.audit_records']
+    jobs = tables['connections."CatalogJobs"']
+    probes = tables['connections."ConnectionProbes"']
+    commands = tables['connections."ConnectionCommands"']
+    connections = tables['connections."Connections"']
+    secrets = tables['connections."ConnectionSecrets"']
+    def events(action, resource, trace=None):
+        return [row for row in audit if row['Action'] == action and row['Resource'] == 'connection:' + resource and (trace is None or row['TraceId'] == trace)]
+    require(len(jobs) == 5 and len(probes) == 5 and len(commands) >= 20 and len(secrets) == 7, 'DORIS_PERSISTED_COVERAGE')
+    require(sorted(row['Status'] for row in jobs) == ['CANCELLED', 'CANCELLED', 'FAILED', 'SUCCEEDED', 'SUCCEEDED'], 'DORIS_JOB_COVERAGE')
+    for row in jobs:
+        actor = json.loads(row['ActorJson'])
+        require(row['Status'] in ('SUCCEEDED', 'FAILED', 'CANCELLED'), 'DORIS_JOB_NONTERMINAL')
+        for action in ('connection.catalog.start', 'connection.catalog.finish'):
+            require(len(events(action, row['ConnectionId'], actor['traceId'])) == 1, 'DORIS_JOB_AUDIT_ASSOCIATION')
+        if row['Status'] == 'SUCCEEDED':
+            require(any(snapshot['Id'] == row['SnapshotId'] and snapshot['ConnectionId'] == row['ConnectionId'] for snapshot in tables['connections."CatalogSnapshots"']), 'DORIS_JOB_SNAPSHOT_ASSOCIATION')
+        else:
+            require(row['SnapshotId'] is None, 'DORIS_FAILED_JOB_SNAPSHOT')
+    for row in probes:
+        actor = json.loads(row['ActorJson'])
+        report = json.loads(row['ReportJson'])
+        require(report['status'] in ('TEST_OK', 'TEST_FAILED', 'CANCELLED'), 'DORIS_PROBE_NONTERMINAL')
+        for action in ('connection.probe.start', 'connection.probe.complete'):
+            require(len(events(action, row['ConnectionId'] or ('new' if action.endswith('.start') else row['Id']), actor['traceId'])) == 1, 'DORIS_PROBE_AUDIT_ASSOCIATION')
+        require(any(command['Id'] == row['CommandKey'] and json.loads(command['ReceiptJson']) == report for command in commands), 'DORIS_PROBE_RECEIPT_ASSOCIATION')
+    for witness in browser['cancellations']:
+        row = next(job for job in jobs if job['Id'] == witness['jobId'])
+        require(row['Status'] == 'CANCELLED' and row['SnapshotId'] is None, 'DORIS_CANCEL_COMMIT')
+        action = 'connection.catalog.cancel' if witness['mutation'] == 'cancel' else 'connection.disable'
+        require(events(action, row['ConnectionId']), 'DORIS_CANCEL_AUDIT')
+    require(len(connections) == 2 and all(row['State'] == 'DISABLED' for row in connections), 'DORIS_FINAL_CONNECTION_STATE')
+    require(sum(row['Action'] == 'connection.create' for row in audit) == len(connections), 'DORIS_CREATE_AUDIT_COUNT')
+    require(sum(row['Action'] == 'connection.secret.intake' for row in audit) == len(secrets), 'DORIS_INTAKE_REPLAY_DUPLICATE_AUDIT')
+    require(all(row['OrganizationId'] == 'org-demo' and row['Outcome'] in ('allowed', 'denied', 'failure') for row in audit), 'DORIS_AUDIT_SCOPE')
+    return dict(status='PASS', jobAssociations=len(jobs), probeAssociations=len(probes), finalConnections=len(connections), intakeAuditCount=len(secrets), exactCancellationAssociations=len(browser['cancellations']), limitation='Persisted transaction associations; failure-rollback atomicity requires separate shared transaction tests', raw='PRIVATE_ONLY')
 
 
 def historical_qualification():
@@ -191,7 +251,94 @@ def qualify_delivery(gate,input_key):
     return dict(status='PASS',executionMode='REUSED',qualificationMode='FRESH',tests=sum(counts.values()),skipped=0,counts=counts,originalEvidence=refs,historicalQualification=history,limitation='Counts overlap between gates; current short runs are not a new natural TTL or full historical browser run')
 
 
+def qualify_doris(gate, input_key):
+    """Doris专属资格复用统一原件/测试解析器，不以接口存在或摘要自报计数放行。"""
+    from workflow_evidence import restore, machine
+    import workflow_execution as execution
+    task = 'G4-M2-DORIS-01'
+    required = {'environment': ['prepare1', 'prepare2'], 'contract': ['unit', 'wire'], 'backend': ['adapter', 'expired', 'pg', 'https', 'lifecycle'], 'web': ['ui', 'lifecycle'], 'interaction': ['lifecycle']}
+    require(gate in required, 'DORIS_GATE')
+    index = json.loads(execution.ordinary(build.ROOT / 'artifacts/workflow' / task / 'product-gates.json').read_text())
+    require(index['taskId'] == task and index['gates'][gate]['inputKey'] == input_key, 'DORIS_GATE_INPUT')
+    def raw(name):
+        record = index['proofs'][name]
+        path = execution.ordinary(build.ROOT / record['path'])
+        require(path.is_relative_to(build.ROOT / 'docs/evidence' / task), 'DORIS_PROOF_BOUNDARY')
+        return restore(build.ROOT, record)
+    def document(name):
+        return json.loads(raw(name))
+    current = {target: build.validate(target, task) for target in ('api', 'web', 'connections', 'wire')}
+    counts = {}
+    for name in required[gate]:
+        row = document(name)
+        if name.startswith('prepare'):
+            require(row['taskId'] == task and row['status'] == 'DEPENDENCIES_READY' and row['worktree'] == str(build.ROOT), 'DORIS_PREPARE')
+            require(all(row[key] == 0 for key in ('downloads', 'sdkDownloads', 'materializedFiles', 'restoreCount', 'runtimeCredentialsCopied')), 'DORIS_PREPARE_MUTATED')
+            counts[name] = 1
+        elif name in ('unit', 'wire', 'adapter'):
+            target = 'wire' if name == 'wire' else 'connections'
+            require(row['exitCode'] == 0 and row['buildBinding'] == current[target], 'DORIS_TEST_BINDING')
+            log = raw(name + 'Log')
+            require(build.sha(log) == row['logSha256'], 'DORIS_TEST_LOG')
+            counts[name] = mtp(log, {'unit': 29, 'wire': 16, 'adapter': 23}[name])
+            require(counts[name] == row['tests'], 'DORIS_TEST_COUNT')
+        elif name == 'ui':
+            execution_row = document('uiExecution')
+            require(execution_row['exitCode'] == 0 and execution_row['inputsUnchanged'] is True and execution_row['inputKey'] == build.inputs('web') and execution_row['reportSha256'] == build.sha(raw('ui')), 'DORIS_UI_BINDING')
+            counts[name] = machine(raw('ui'), 'vitest-json', 120)
+        elif name == 'expired':
+            require(row['status'] == 'PASS' and row['buildBinding'] == current['connections'] and row['restoredOriginalBytes'] and row['restoredFeHealthy'], 'DORIS_TLS_RESTORE')
+            require(row['presentedCertificate']['matchesGenerated'] and row['presentedCertificate']['opensslRejectedExpired'] and row['presentedCertificate']['observerExitCode'] != 0, 'DORIS_TLS_ACTUAL_LEAF')
+            witness = document('expiredInputs')
+            require(execution.sha(execution.encoded(witness['inputs'])) == witness['inputFingerprint'] and witness['inputs']['buildBinding'] == row['buildBinding'] and build.execution_unchanged(witness['inputs']['drivers']), 'DORIS_TLS_EXECUTION_INPUT')
+            counts[name] = 0
+            for part in ('expired-rejection', 'restored-product-probe'):
+                require(witness['executionReceipts'][part]['inputFingerprint'] == witness['inputFingerprint'] and witness['executionReceipts'][part]['exitCode'] == 0 and witness['executionReceipts'][part]['stdout']['sha256'] == build.sha(raw(part)), 'DORIS_TLS_EXECUTED_KEY')
+                require(row[part]['exitCode'] == 0 and build.sha(raw(part)) == row[part]['logSha256'], 'DORIS_TLS_LOG')
+                counts[name] += mtp(raw(part), 1)
+        elif name in ('pg', 'https'):
+            closed(row)
+            require(build.execution_unchanged(row['driverInputs']), 'DORIS_COMPAT_DRIVER_DRIFT')
+            require(row['taskId'] == task and row['buildBinding'] == current['connections'], 'DORIS_COMPAT_BINDING')
+            if name == 'pg':
+                require(row['exitCode'] == 0 and build.sha(raw('pgLog')) == row['logSha256'], 'DORIS_PG_LOG')
+                counts[name] = mtp(raw('pgLog'), 1)
+            else:
+                require({item['category'] for item in row['tests']} == {'RealWebFixture', 'RealWebDnsRejection'}, 'DORIS_WEB_CATEGORIES')
+                counts[name] = 0
+                for item in row['tests']:
+                    log = raw(item['category'])
+                    require(item['exitCode'] == 0 and build.sha(log) == item['logSha256'], 'DORIS_WEB_LOG')
+                    counts[name] += mtp(log, 12 if item['category'] == 'RealWebFixture' else 1)
+        else:
+            require(row['taskId'] == task and row['status'] == 'LIFECYCLE_CHECKS_PASSED' and row['buildBindings'] == {target: current[target] for target in ('api', 'web')}, 'DORIS_LIFECYCLE_BINDING')
+            require(row['browserExecution']['exitCode'] == 0 and row['browserExecution']['classification'] == 'SUCCESS', 'DORIS_BROWSER_EXIT')
+            witness = document('lifecycleInputs')
+            require(execution.sha(execution.encoded(witness['inputs'])) == witness['inputFingerprint'] == row['browserExecution']['inputFingerprint'], 'DORIS_EXECUTED_INPUT_FINGERPRINT')
+            require(witness['inputs']['bindings'] == row['buildBindings'] and build.execution_unchanged(witness['inputs']['drivers']), 'DORIS_EXECUTION_DRIVER_DRIFT')
+            require(witness['inputs']['compose'] == {str(p.relative_to(build.ROOT)): build.sha(p.read_bytes()) for p in sorted((build.ROOT / 'infra/doris').glob('*.yaml'))}, 'DORIS_COMPOSE_DRIFT')
+            report = document('browser')
+            original = raw('browserLog')
+            require(build.sha(original) == row['browserExecution']['stdout']['sha256'] and json.loads(original) == report, 'DORIS_BROWSER_ORIGINAL')
+            expected = {'REAL_OIDC', 'DORIS_INTAKE_REPLAY_PURPOSE_SCOPE', 'UI_INTAKE_CREATE_PROBE_ENABLE_DISCOVER', 'EXPLICIT_CANCEL_AND_DISABLE_TERMINATE_EXACT_SOURCE', 'SOURCE_REVOKE_PROBE_ENABLE_WORKER_HISTORY', 'EMPTY_SYNTHETIC_SCHEMA_RESTORE', 'ROTATE_SINGLE_USE_STALE_PROBE_TARGET_SCOPE', 'DISABLE_BLOCKS_PROBE_AND_HISTORY'}
+            require(report['taskId'] == task and report['runId'] == row['runId'] and report['status'] == 'PASS' and report['skipped'] == 0 and report['tests'] == len(report['checks']) == len(expected) and set(report['checks']) == expected, 'DORIS_BROWSER_COVERAGE')
+            require({w['mutation'] for w in report['cancellations']} == {'cancel', 'disable'} and all(w['observedBefore'] and w['absentAfter'] and type(w['sourceId']) == int for w in report['cancellations']), 'DORIS_SOURCE_TERMINATION')
+            expected_ids = set(row['containers'].values()) | {service['pid'] for service in row['services']}
+            require(expected_ids == {item['id'] for item in row['cleanup']} and all(item['afterAbsent'] for item in row['cleanup']), 'DORIS_LIFECYCLE_CLEANUP')
+            require(0 < row['hostPeakRssBytes'] <= 4 * 1024**3 and row['auditAndSecretScan']['platformDump'] and row['auditAndSecretScan']['hostLogs'], 'DORIS_RESOURCE_OR_LEAK_SCAN')
+            associations = document('audit')
+            require(build.sha(raw('audit')) == row['auditAndSecretScan']['associationsSha256'] and associations['status'] == 'PASS' and associations['runId'] == row['runId'] and associations['jobAssociations'] == associations['probeAssociations'] == 5 and associations['exactCancellationAssociations'] == 2, 'DORIS_AUDIT_ASSOCIATIONS')
+            counts[name] = report['tests']
+    if gate == 'environment':
+        first, second = document('prepare1'), document('prepare2')
+        require(first['contentKey'] == second['contentKey'] and first['workspaceKey'] == second['workspaceKey'] and first['runDirectory'] != second['runDirectory'], 'DORIS_PREPARE_PAIR')
+        validate_environment(task, [first, second])
+    return dict(status='PASS', executionMode='REUSED', qualificationMode='FRESH', tests=sum(counts.values()), skipped=0, counts=counts, originalEvidence=[index['proofs'][name] for name in required[gate]], limitation='Counts overlap between gates; CI, other architectures, production and online revocation are not covered')
+
+
 def verify(task,gate,input_key):
+    if task=='G4-M2-DORIS-01':
+        return qualify_doris(gate,input_key)
     if task=='G4-ENG-DELIVERY-002':
         require(gate in REQUIRED,'PRODUCT_TASK_GATE')
         return qualify_delivery(gate,input_key)

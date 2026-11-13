@@ -1,0 +1,114 @@
+{
+  "environmentFingerprint": null,
+  "productAdmissionTaskId": "G4-M2-WEB-01",
+  "driverInputs": {
+    "scripts/maintenance/workflow_doris_fixture.py": "2e39af479e53b513e1d4df17805e79b620953ab2f1d9166f90984d57c71f99de",
+    "scripts/maintenance/workflow-doris.mjs": "fbf75a9cd00eda2e03a4c1355f3a6c2822b293f4415047dc48fa1e5a8ed2483c",
+    "scripts/maintenance/doris-fixture-control.cs.txt": "353e2a99aee33dc967dd4282a6fc25cba23efc8e185f71d6280a86424df98f19",
+    "scripts/maintenance/workflow_m2_doris.py": "fe35c8e590b9f507e9ce54b2613ff687051de6776f5239f3b1cb3fccd760d8db",
+    "scripts/maintenance/workflow_m2_web.py": "151c75db94eead4787a421bc8b19bf0fdc68ffb89da50af7dbe1659088e47377",
+    "scripts/maintenance/workflow_m2_fixture.py": "043b733082781aa7a7d6762cb712e840bd4148d27ae9d798a5b7b501825af88a",
+    "scripts/maintenance/workflow_m2_smoke.py": "8e486ee8f0a99784c580cbd9f71b2413f0fe4066b8a2e691a066fd27af58bd83",
+    "scripts/maintenance/workflow_m2_build.py": "19a81e7889472792d6ee7285215f42335ef3fda0cb4ed057f1de5da3e5e0d5e7",
+    "scripts/maintenance/workflow_smoke.py": "5ac6b9b230c1f2d4f44b7fc38cfac15a6bfdc7a81d998eb387c37ea554873c68",
+    "scripts/maintenance/workflow_execution.py": "eb21a6e92a3e5dc732d6ff957f184ef9f1236b6291de7ee6adf950399c450fd1",
+    "scripts/maintenance/workflow_environment.py": "7fa77e80de2501e06ed8836544a9e94baadcba71c5640132205f413d5ef8d073",
+    "scripts/maintenance/workflow_web_cache.py": "a090d01ac0373e4449f4abde33803582666582f9a96e4914bcae596724e83389",
+    "scripts/maintenance/workflow.py": "72afde84a56834f77c3d2f86d942dbc37bae7a86954b6cfa0461582f9a55453b",
+    "scripts/maintenance/workflow-m2-web.mjs": "4865a0d755eda53eaf579b2b04a506fb80cf3e941c2573f155389de42f846141",
+    "scripts/maintenance/workflow_m2_evidence.py": "b3f44ecb5bc96ee120bd155d2d64e89ca0e565ba5420566a0733c453393fac4c",
+    "scripts/maintenance/workflow_evidence.py": "270076ea05bc5e1c63c81536325d6544b3250dd94d06cf0bc9729a30188ea328",
+    "experiments/g4-m2-web-01/https-fixture.mjs": "523838ced9f476b053eca72c40ddd57da35f59da6bfd3d7224e00e47ae345562"
+  },
+  "buildBinding": {
+    "receiptSha256": "6726bb388953ad1254970eb468e1004123d7b2af578636de7ddbe01a956ec8ce",
+    "inputKey": "b03be2f7360d9950dc8e02dc25b4fa847c797564d0574a745aae25815bfbb18e",
+    "outputKey": "d2a2e741605ee080174f8ef2431e2534b2fd464d561754b9e816ef29f54d9c9b"
+  },
+  "taskId": "G4-M2-DORIS-01",
+  "runId": "m2-0177fdffb449",
+  "status": "PASS",
+  "containerIds": [
+    "bd280efe9b83c92140be2dd7b821940ed27edc370580331164811c5948e879ba",
+    "e10605d894628e9d46aad7057eb0e270af45c9dccaca3f66a6b33678b3edf59f",
+    "e21d50351c976f55863869a272f2ea73f02a967e1c78b4e23d24d5b468cee2fc"
+  ],
+  "networkId": "f0e8243ffe444e2e73191aaf2d8bb8d77e89e22e24f6f765a051a056a7aff637",
+  "tests": [
+    {
+      "category": "RealWebFixture",
+      "exitCode": 0,
+      "seconds": 0.935124541996629,
+      "minimumExpected": 12,
+      "logSha256": "5ab0451c40fb65bd5b339dd458a9c0725706c5878407bf629ddb9c5f64885d0e"
+    },
+    {
+      "category": "RealWebDnsRejection",
+      "exitCode": 0,
+      "seconds": 0.3085045409970917,
+      "minimumExpected": 1,
+      "logSha256": "afa85e061d98d34688a52987d4881a6263188778772938f33f7a75606a19d97d"
+    }
+  ],
+  "privateRuntime": "/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform/.tools/security/g4-m2-doris-01/m2-0177fdffb449",
+  "cleanup": [
+    {
+      "id": "e21d50351c976f55863869a272f2ea73f02a967e1c78b4e23d24d5b468cee2fc",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "e21d50351c976f55863869a272f2ea73f02a967e1c78b4e23d24d5b468cee2fc",
+      "afterAbsent": true
+    },
+    {
+      "id": "e10605d894628e9d46aad7057eb0e270af45c9dccaca3f66a6b33678b3edf59f",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "e10605d894628e9d46aad7057eb0e270af45c9dccaca3f66a6b33678b3edf59f",
+      "afterAbsent": true
+    },
+    {
+      "id": "bd280efe9b83c92140be2dd7b821940ed27edc370580331164811c5948e879ba",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "bd280efe9b83c92140be2dd7b821940ed27edc370580331164811c5948e879ba",
+      "afterAbsent": true
+    },
+    {
+      "id": "f0e8243ffe444e2e73191aaf2d8bb8d77e89e22e24f6f765a051a056a7aff637",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "sourceStats": {
+    "requests": 11,
+    "authRejected": 1,
+    "aborted": 1,
+    "connections": 13,
+    "closedSockets": 13,
+    "sni": [
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source"
+    ]
+  },
+  "testStatus": "PASS",
+  "cleanupExpected": [
+    "bd280efe9b83c92140be2dd7b821940ed27edc370580331164811c5948e879ba",
+    "e10605d894628e9d46aad7057eb0e270af45c9dccaca3f66a6b33678b3edf59f",
+    "e21d50351c976f55863869a272f2ea73f02a967e1c78b4e23d24d5b468cee2fc",
+    "f0e8243ffe444e2e73191aaf2d8bb8d77e89e22e24f6f765a051a056a7aff637"
+  ],
+  "cleanupComplete": true,
+  "privateRuntimeDisposition": "KEEP: task-owned credentials excluded from ZIP; required until final lifecycle review"
+}

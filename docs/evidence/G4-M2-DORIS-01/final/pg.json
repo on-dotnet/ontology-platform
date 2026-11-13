@@ -1,0 +1,75 @@
+{
+  "environmentFingerprint": "desktop-linux-existing-approved-images",
+  "driverInputs": {
+    "scripts/maintenance/workflow_doris_fixture.py": "2e39af479e53b513e1d4df17805e79b620953ab2f1d9166f90984d57c71f99de",
+    "scripts/maintenance/workflow-doris.mjs": "5986c5d2fc8b6a13165f3ee2a43862983de247402f7c01920b2c0ccc0475310d",
+    "scripts/maintenance/doris-fixture-control.cs.txt": "353e2a99aee33dc967dd4282a6fc25cba23efc8e185f71d6280a86424df98f19",
+    "scripts/maintenance/workflow_m2_doris.py": "fe35c8e590b9f507e9ce54b2613ff687051de6776f5239f3b1cb3fccd760d8db",
+    "scripts/maintenance/workflow_m2_web.py": "151c75db94eead4787a421bc8b19bf0fdc68ffb89da50af7dbe1659088e47377",
+    "scripts/maintenance/workflow_m2_fixture.py": "043b733082781aa7a7d6762cb712e840bd4148d27ae9d798a5b7b501825af88a",
+    "scripts/maintenance/workflow_m2_smoke.py": "8e486ee8f0a99784c580cbd9f71b2413f0fe4066b8a2e691a066fd27af58bd83",
+    "scripts/maintenance/workflow_m2_build.py": "19a81e7889472792d6ee7285215f42335ef3fda0cb4ed057f1de5da3e5e0d5e7",
+    "scripts/maintenance/workflow_smoke.py": "5ac6b9b230c1f2d4f44b7fc38cfac15a6bfdc7a81d998eb387c37ea554873c68",
+    "scripts/maintenance/workflow_execution.py": "eb21a6e92a3e5dc732d6ff957f184ef9f1236b6291de7ee6adf950399c450fd1",
+    "scripts/maintenance/workflow_environment.py": "7fa77e80de2501e06ed8836544a9e94baadcba71c5640132205f413d5ef8d073",
+    "scripts/maintenance/workflow_web_cache.py": "a090d01ac0373e4449f4abde33803582666582f9a96e4914bcae596724e83389",
+    "scripts/maintenance/workflow.py": "72afde84a56834f77c3d2f86d942dbc37bae7a86954b6cfa0461582f9a55453b",
+    "scripts/maintenance/workflow-m2-web.mjs": "4865a0d755eda53eaf579b2b04a506fb80cf3e941c2573f155389de42f846141",
+    "scripts/maintenance/workflow_m2_evidence.py": "087eb9910d08354a5267eeef55b81d97cad4e36b1f534e62e8ed409a93cd6e21",
+    "scripts/maintenance/workflow_evidence.py": "270076ea05bc5e1c63c81536325d6544b3250dd94d06cf0bc9729a30188ea328",
+    "experiments/g4-m2-web-01/https-fixture.mjs": "523838ced9f476b053eca72c40ddd57da35f59da6bfd3d7224e00e47ae345562"
+  },
+  "taskId": "G4-M2-DORIS-01",
+  "runId": "m2-a9db244abbe0",
+  "status": "PASS",
+  "buildBinding": {
+    "receiptSha256": "fa16e6b81c6c806f44fa4bdae2e0b798f957519d09c95d45b5e952b00afc0c9d",
+    "inputKey": "1e944dddde52d1e87909364fdf95e94466e31a26daa7abc14a97571ac4ac1f07",
+    "outputKey": "468265395fd3907f6f38f2a9f772576abe9656e2aad9d9a9e47d69f6e6dcdc93"
+  },
+  "containers": [
+    "316353b584d7acb2393181791d9b7434d290f393260ab8f718063532c98b53de",
+    "ea8972089ade52a5b5a2f1d1c768ee2a257ef708277e3566c3b0e24c10671a78"
+  ],
+  "cleanup": [
+    {
+      "kind": "container",
+      "id": "ea8972089ade52a5b5a2f1d1c768ee2a257ef708277e3566c3b0e24c10671a78",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "316353b584d7acb2393181791d9b7434d290f393260ab8f718063532c98b53de",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-a9db244abbe0_source-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-a9db244abbe0_source",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "exitCode": 0,
+  "logSha256": "1d6ac68e55ba64b20c385579abc267d542c8538bf028119a51d53321f069a66a",
+  "tests": 1,
+  "testStatus": "PASS",
+  "cleanupExpected": [
+    "316353b584d7acb2393181791d9b7434d290f393260ab8f718063532c98b53de",
+    "ea8972089ade52a5b5a2f1d1c768ee2a257ef708277e3566c3b0e24c10671a78",
+    "ontology-workflow-m2-a9db244abbe0_source",
+    "ontology-workflow-m2-a9db244abbe0_source-data"
+  ],
+  "cleanupComplete": true
+}

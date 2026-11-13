@@ -245,7 +245,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     sub=parser.add_subparsers(dest='mode',required=True)
     check=sub.add_parser('check');check.add_argument('--root',type=Path,default=ROOT)
-    check.add_argument('--milestone',choices=['M1','M2','M3','M4','M5','G4-M1'],default='M5')
+    check.add_argument('--milestone',choices=['M1','M2','M3','M4','M5','G4-M1','G4-M2-DORIS-01'],default='M5')
     check.add_argument('--path',action='append',default=[])
     check.add_argument('--phase',choices=['contract','runtime'],default='runtime')
     run=sub.add_parser('run')
@@ -257,6 +257,10 @@ def main():
     try:
         if args.mode=='check':
             check_paths(args.root,args.path)
+            if args.milestone == 'G4-M2-DORIS-01':
+                from workflow_m2_doris import structural
+                print(json.dumps(structural(args.root, args.milestone), ensure_ascii=False))
+                return 0
             if args.milestone == 'G4-M1':
                 from g4_m1_preflight import check as check_g4
                 print(json.dumps(check_g4(args.root,args.phase,source_path,check_cli),ensure_ascii=False))

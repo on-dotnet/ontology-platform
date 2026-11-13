@@ -2,6 +2,7 @@
 # 必须与一个环境覆盖层合用。镜像拉取由准入流程完成。
 services:
   fe:
+    hostname: fe
     image: apache/doris@sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02
     platform: linux/arm64
     pull_policy: never
@@ -43,6 +44,7 @@ services:
       driver: json-file
       options: {max-size: 10m, max-file: "2"}
   be:
+    hostname: be
     image: apache/doris@sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7
     platform: linux/arm64
     pull_policy: never
@@ -51,7 +53,7 @@ services:
     mem_limit: ${DORIS_BE_MEMORY:?Set explicit BE memory limit}
     memswap_limit: ${DORIS_BE_MEMORY:?Set explicit BE memory limit}
     cpus: 2
-    pids_limit: 512
+    pids_limit: 1024
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     ulimits:

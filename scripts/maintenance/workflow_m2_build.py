@@ -35,6 +35,8 @@ def outputs(target):
     for file in sorted(directory.rglob('*')):
         if any(p in ('cache','diagnostics','types') for p in file.relative_to(directory).parts) or file.name in ('trace','trace-build'):continue
         if file.is_symlink():raise ValueError('BUILD_OUTPUT_LINK')
+        # Next.js运行期响应缓存不属于编译输出；仅限该准确web子树，先拒绝链接。
+        if target=='web' and file.is_relative_to(directory/'server/route-cache'):continue
         if file.is_file():rows[str(file.relative_to(ROOT))]=sha(file.read_bytes())
     return rows
 
@@ -54,7 +56,7 @@ def finish_cleanup(state):
 
 def driver_layers():
     """显式登记执行、资格、归档层；新增未映射 M2 模块关闭复用。"""
-    execution=('workflow_m2_web.py','workflow_m2_fixture.py','workflow_m2_smoke.py','workflow_m2_build.py','workflow_smoke.py','workflow_execution.py','workflow_environment.py','workflow_web_cache.py','workflow.py','workflow-m2-web.mjs')
+    execution=('workflow_doris_fixture.py','workflow-doris.mjs','doris-fixture-control.cs.txt','workflow_m2_doris.py','workflow_m2_web.py','workflow_m2_fixture.py','workflow_m2_smoke.py','workflow_m2_build.py','workflow_smoke.py','workflow_execution.py','workflow_environment.py','workflow_web_cache.py','workflow.py','workflow-m2-web.mjs')
     qualification=('workflow_m2_evidence.py','workflow_evidence.py')
     rows={ 'scripts/maintenance/'+name:'execution' for name in execution}
     rows.update({'scripts/maintenance/'+name:'qualification' for name in qualification})
@@ -99,5 +101,5 @@ def build(target,prepared):
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser();parser.add_argument('--task',required=True);parser.add_argument('--target',choices=TARGETS,required=True);parser.add_argument('--prepared',required=True);args=parser.parse_args()
-    if args.task not in (TASK,'G4-ENG-DELIVERY-002'):raise SystemExit(2)
+    if args.task not in (TASK,'G4-ENG-DELIVERY-002','G4-M2-DORIS-01'):raise SystemExit(2)
     result=build(args.target,args.prepared);print(json.dumps(result));raise SystemExit(0 if result['status']=='PASS' else 2)
