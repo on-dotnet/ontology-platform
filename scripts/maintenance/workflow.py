@@ -321,6 +321,9 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
         if mapping_qualification:
             product_qualification=True
             gate={**gate,'command':['python3','-B','scripts/maintenance/workflow_m3_mapping.py','qualify','--task',task,'--run-id','mapping-impl-01','--gate',name,'--input-key',key],'testsRequired':True}
+        if not gate['command'] and task == 'G4-M4-QUERY-001' and name in {'environment','contract','backend','web','interaction'}:
+            product_qualification=True
+            gate={**gate,'command':['python3','-B','scripts/maintenance/workflow_m4_query.py','qualify','--task',task,'--run-id','query-impl-01','--gate',name,'--input-key',key],'testsRequired':True}
         if not gate['command']:
             rows.append(dict(gate=name,status='NOT_RUN',reason='Product gate requires task-specific admitted executor'))
             outcomes[name]='NOT_RUN';continue

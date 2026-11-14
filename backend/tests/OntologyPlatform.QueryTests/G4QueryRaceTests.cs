@@ -380,6 +380,42 @@ public sealed class G4QueryRaceTests
         }
     }
 
+    /// <summary>只有过期Run没有Query时，删除和无值审计仍需同事务；审计失败必须保留原Run。</summary>
+    [TestMethod]
+    public async Task RunExpiryAuditsAndRollsBackOnAuditFailure()
+    {
+        // 运行维护负例必须使用独占数据库，绝不修改当前任务业务库。
+        var connection = Environment.GetEnvironmentVariable("G4_QUERY_TEST_CONNECTION")!;
+        await G4QueryPersistenceTests.DemandIsolatedDatabaseAsync(connection);
+        await using var provider = new ServiceCollection()
+            .AddDbContextFactory<GovernanceDbContext>(options => options.UseNpgsql(connection, postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "governance")))
+            .AddDbContextFactory<G4QueryDbContext>(options => options.UseNpgsql(connection, postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "semantic_query")))
+            .BuildServiceProvider();
+        var factory = provider.GetRequiredService<IDbContextFactory<G4QueryDbContext>>();
+        var governanceFactory = provider.GetRequiredService<IDbContextFactory<GovernanceDbContext>>();
+        await using var db = await factory.CreateDbContextAsync();
+        await using var governance = await governanceFactory.CreateDbContextAsync();
+        await db.Database.MigrateAsync();
+        await governance.Database.MigrateAsync();
+        // 唯一准确ID以及真实过去的时间不影响同测试库其他行。
+        var id = Guid.NewGuid().ToString("N");
+        var created = DateTimeOffset.UtcNow.AddDays(-8);
+        await db.Database.ExecuteSqlInterpolatedAsync($"""
+            INSERT INTO semantic_query."QueryRuns" ("Id","OrganizationId","SubjectId","SessionReference","CreatedAtUtc","DeadlineAtUtc","ToolCalls")
+            VALUES ({id},'expiry-org','expiry-owner',{new string('a',64)},{created},{created.AddSeconds(30)},1)
+            """);
+        // 当前方法不会调用授权或绑定参与者，替身仅隔离无值保留期维护。
+        var audit = new TransactionalAuditWriter(governanceFactory);
+        var failing = new G4QueryResultStore(factory, null!, new FixedBindingReader(), new WriteThenFailAudit(audit), new EphemeralDataProtectionProvider(), TimeProvider.System);
+        await Assert.ThrowsAsync<SemanticOperationException>(() => failing.SweepAsync(CancellationToken.None));
+        Assert.AreEqual(1, await db.Database.SqlQuery<int>($"SELECT count(*)::int AS \"Value\" FROM semantic_query.\"QueryRuns\" WHERE \"Id\" = {id}").SingleAsync());
+        // 成功维护仅删除这条过期引用，并保留同事务提交的真实审计。
+        var store = new G4QueryResultStore(factory, null!, new FixedBindingReader(), audit, new EphemeralDataProtectionProvider(), TimeProvider.System);
+        Assert.AreEqual(1, await store.SweepAsync(CancellationToken.None));
+        Assert.AreEqual(0, await db.Database.SqlQuery<int>($"SELECT count(*)::int AS \"Value\" FROM semantic_query.\"QueryRuns\" WHERE \"Id\" = {id}").SingleAsync());
+        Assert.AreEqual(1, await governance.AuditRecords.CountAsync(item => item.Resource == id && item.Action == "data.query.expire"));
+    }
+
     /// <summary>真实审计写入后注入故障，验证调用方事务确实回滚审计及结果。</summary>
     private sealed class WriteThenFailAudit(ITransactionalAuditWriter actual) : ITransactionalAuditWriter
     {

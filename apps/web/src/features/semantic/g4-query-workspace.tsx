@@ -31,6 +31,10 @@ export function G4QueryWorkspace() {
   const [siteId, setSiteId] = useState("");
   const [sites, setSites] = useState<string[]>([]);
   const [maxRows, setMaxRows] = useState(50);
+  const [depth, setDepth] = useState(1);
+  const [relationships, setRelationships] = useState("");
+  const [validFrom, setValidFrom] = useState("");
+  const [validTo, setValidTo] = useState("");
   const [queryId, setQueryId] = useState("");
   const [delivery, setDelivery] = useState<QueryDelivery | null>(null);
   const [lastPlan, setLastPlan] = useState<G4SemanticQuery | null>(null);
@@ -107,15 +111,16 @@ export function G4QueryWorkspace() {
   }
   const capability = capabilities.find(item => item.id === capabilityId);
   const result: G4QueryResultV1 | null = delivery?.response.kind === "result" ? delivery.response.result : null;
-  const valid = capability && assetId.trim() && ontologyReleaseId.trim() && mappingReleaseId.trim() && Number.isInteger(maxRows) && maxRows >= 2 && maxRows <= 100;
+  const valid = capability && assetId.trim() && ontologyReleaseId.trim() && mappingReleaseId.trim() && Number.isInteger(maxRows) && maxRows >= 2 && maxRows <= 100 && Number.isInteger(depth) && depth >= 1 && depth <= 5 && Boolean(validFrom) === Boolean(validTo);
   return <section className="g2-panel g2-stack" aria-label="业务源查询"><h2>业务源查询</h2><p>选择已发布映射，读取当前授权的业务数据。返回项保留源精度及可回读证据。</p>
     <div className="g2-row"><label>本体资产<input aria-label="源查询本体资产" value={assetId} disabled={busy} onChange={event => setAssetId(event.target.value)} /></label><label>本体发布<input aria-label="源查询本体发布" value={ontologyReleaseId} disabled={busy} onChange={event => setOntologyReleaseId(event.target.value)} /></label><label>映射发布<input aria-label="源查询映射发布" value={mappingReleaseId} disabled={busy} onChange={event => setMappingReleaseId(event.target.value)} /></label></div>
     <div className="g2-row"><label>查询能力<select aria-label="业务源查询能力" value={capabilityId} disabled={busy} onChange={event => setCapabilityId(event.target.value)}>{capabilities.map(item => <option key={item.id} value={item.id}>{item.meaning}</option>)}</select></label><label>业务外部号<input aria-label="源查询外部号" value={externalId} disabled={busy} onChange={event => setExternalId(event.target.value)} /></label><label>厂区<select aria-label="源查询厂区" value={siteId} disabled={busy} onChange={event => setSiteId(event.target.value)}><option value="">当前授权范围</option>{sites.map(site => <option key={site}>{site}</option>)}</select></label><label>最多返回项<input aria-label="源查询最多返回项" type="number" min={2} max={100} value={maxRows} disabled={busy} onChange={event => setMaxRows(Number(event.target.value))} /></label></div>
+    <div className="g2-row"><label>关系路径（每行一个已发布 IRI，可留空）<textarea aria-label="源查询关系路径" value={relationships} disabled={busy} onChange={event => setRelationships(event.target.value)} /></label><label>遍历深度<input aria-label="源查询深度" type="number" min={1} max={5} value={depth} disabled={busy} onChange={event => setDepth(Number(event.target.value))} /></label><label>有效时间起点（UTC）<input aria-label="源查询有效时间起点" placeholder="2026-11-14T00:00:00.000000Z" value={validFrom} disabled={busy} onChange={event => setValidFrom(event.target.value)} /></label><label>有效时间终点（UTC，不包含）<input aria-label="源查询有效时间终点" value={validTo} disabled={busy} onChange={event => setValidTo(event.target.value)} /></label></div>
     <div className="g2-row"><button className="button primary" disabled={busy || !valid} onClick={() => {
       if (!capability) return;
       void execute({ assetId: assetId.trim(), ontologyReleaseId: ontologyReleaseId.trim(), mappingReleaseIds: [mappingReleaseId.trim()],
-        capabilityId: capability.id, capabilityVersion: capability.version, relationshipIris: [], depth: 1, maxRows, timeoutMs: 5000,
-        filters: { ...(siteId ? { siteId } : {}), ...(externalId ? { entityExternalId: externalId } : {}) } });
+        capabilityId: capability.id, capabilityVersion: capability.version, relationshipIris: relationships.split("\n").map(value => value.trim()).filter(Boolean), depth, maxRows, timeoutMs: 5000,
+        filters: { ...(siteId ? { siteId } : {}), ...(externalId ? { entityExternalId: externalId } : {}), ...(validFrom && validTo ? { validFrom, validTo } : {}) } });
     }}>查询业务源</button>{busy && <button className="button" onClick={() => { request.current?.abort(); setBusy(false); setDelivery(null); setEvidence(null); setNotice("已停止等待；尚未确认服务器执行状态。"); }}>停止等待</button>}</div>
     {!busy && capabilities.length === 0 && <p className="g2-notice">当前环境没有开放业务源查询能力。</p>}
     <div className="g2-row"><label>本人查询引用<input aria-label="恢复源查询引用" value={queryId} onChange={event => { setQueryId(event.target.value); setDelivery(null); setEvidence(null); setLastPlan(null); }} disabled={busy} /></label><button className="button" disabled={busy || !queryId} onClick={() => { setLastPlan(null); void operate(signal => client.result(queryId, signal)); }}>恢复查询结果</button><button className="button" disabled={busy || !queryId} onClick={() => void operate(signal => client.cancel(queryId, signal))}>请求取消执行</button></div>

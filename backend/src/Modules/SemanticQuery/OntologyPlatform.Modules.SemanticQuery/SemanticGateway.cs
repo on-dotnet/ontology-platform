@@ -42,6 +42,9 @@ public sealed class SemanticGateway : ISemanticGateway
     /// <summary>返回三个实际能力和完整Schema版本。</summary>
     public SemanticCapability[] GetCapabilities() => registry.Read();
 
+    /// <summary>MCP直接消费当前生成组件，禁止手抄或放松G4输入输出闭包。</summary>
+    public System.Text.Json.JsonElement GetG4Schema(string name) => registry.G4Schema(name);
+
     /// <summary>G4与G2共用正式发布核验；绝对截止包含根读取、源查询、持久和审计。</summary>
     public async Task<G4QueryDelivery> ExecuteG4Async(ActorContext actor, string sessionReference, G4SemanticQuery query,
         string idempotencyKey, string? selectionQueryId, CancellationToken cancellationToken)

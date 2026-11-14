@@ -9,7 +9,7 @@ using OntologyPlatform.Contracts;
 namespace OntologyPlatform.Modules.SemanticQuery;
 
 /// <summary>查询结果的规范字节加密边界；授权与到期检查由调用方在解密前执行。</summary>
-public sealed class G4QueryResultStore
+public sealed class G4QueryResultStore : IG4QueryRunStore
 {
     /// <summary>查询独占模型的短生命周期工厂。</summary>
     private readonly IDbContextFactory<G4QueryDbContext> factory;
@@ -39,6 +39,51 @@ public sealed class G4QueryResultStore
         this.audit = audit;
         this.protection = protection;
         this.clock = clock;
+    }
+
+    /// <summary>PG原子计数限制同运行的并发工具，失败尝试同样占用预算。</summary>
+    public async Task ReserveRunAsync(ActorContext actor, string sessionReference, string runId, DateTimeOffset deadline, CancellationToken token)
+    {
+        DemandIdentity(runId);
+        // 运行引用只接受当前服务器创建的三十秒期限，不能由模型延长。
+        var now = clock.GetUtcNow();
+        if (deadline <= now || deadline > now.AddSeconds(30) || sessionReference.Length != 64)
+            throw new SemanticOperationException(429, "query_run_budget");
+        // 新运行与查询结果共用模块容量锁，不能绕过64MiB元数据额度。
+        await using var database = await factory.CreateDbContextAsync(token);
+        await using var transaction = await database.Database.BeginTransactionAsync(token);
+        await LockCapacityAsync(database, token);
+        await DemandStorageAsync(database, 2048, 0, token);
+        // 同ID只允许同主体、同会话和同期限增加次数，PG条件在行锁内执行。
+        var affected = await database.Database.ExecuteSqlInterpolatedAsync($"""
+            INSERT INTO semantic_query."QueryRuns" ("Id", "OrganizationId", "SubjectId", "SessionReference", "CreatedAtUtc", "DeadlineAtUtc", "ToolCalls")
+            VALUES ({runId}, {actor.OrganizationId}, {actor.SubjectId}, {sessionReference}, {now}, {deadline}, 1)
+            ON CONFLICT ("Id") DO UPDATE SET "ToolCalls" = semantic_query."QueryRuns"."ToolCalls" + 1
+            WHERE semantic_query."QueryRuns"."OrganizationId" = {actor.OrganizationId}
+              AND semantic_query."QueryRuns"."SubjectId" = {actor.SubjectId}
+              AND semantic_query."QueryRuns"."SessionReference" = {sessionReference}
+              AND semantic_query."QueryRuns"."DeadlineAtUtc" = {deadline}
+              AND semantic_query."QueryRuns"."DeadlineAtUtc" > {now}
+              AND semantic_query."QueryRuns"."ToolCalls" < 3
+            """, token);
+        if (affected != 1) throw new SemanticOperationException(429, "query_run_budget");
+        await transaction.CommitAsync(token);
+    }
+
+    /// <summary>真实Query完成或返回运行视图后只保存其标识，不复制结果。</summary>
+    public async Task BindRunQueryAsync(ActorContext actor, string sessionReference, string runId, string queryId, CancellationToken token)
+    {
+        // 同主体与会话检查在参数化更新内完成，不允许引用他人的历史Query。
+        await using var database = await factory.CreateDbContextAsync(token);
+        var affected = await database.Database.ExecuteSqlInterpolatedAsync($"""
+            UPDATE semantic_query."QueryRuns" AS r SET "QueryIds" = array_append(r."QueryIds", {queryId})
+            WHERE r."Id" = {runId} AND r."OrganizationId" = {actor.OrganizationId}
+              AND r."SubjectId" = {actor.SubjectId} AND r."SessionReference" = {sessionReference}
+              AND r."DeadlineAtUtc" > {clock.GetUtcNow()} AND cardinality(r."QueryIds") < r."ToolCalls"
+              AND EXISTS (SELECT 1 FROM semantic_query."Queries" AS q WHERE q."Id" = {queryId}
+                  AND q."OrganizationId" = r."OrganizationId" AND q."SubjectId" = r."SubjectId")
+            """, token);
+        if (affected != 1) throw new SemanticOperationException(503, "query_run_unavailable");
     }
 
     /// <summary>按授权、版本、任务容量的固定锁顺序原子登记执行；源IO在事务外发生。</summary>
@@ -137,7 +182,7 @@ public sealed class G4QueryResultStore
             throw new SemanticOperationException(409, "query_request_mismatch");
         if (current.ExecutionStatus != "RUNNING" || current.CancelRequested || current.Fence != lease.Fence
             || current.OrganizationId != session.Actor.OrganizationId || current.SubjectId != session.Actor.SubjectId
-            || current.RequestHash != lease.RequestHash || !current.BindingBytes.AsSpan().SequenceEqual(G4QueryCanonical.Serialize(state))
+            || current.RequestHash != lease.RequestHash || !PlanStateMatches(ReadState(current), state)
             || current.LeaseOwner != lease.LeaseOwner || current.LeaseUntilUtc <= clock.GetUtcNow()
             || current.DeadlineAtUtc <= clock.GetUtcNow()) throw new SemanticOperationException(409, "query_execution_stale");
         await DemandStorageAsync(database, completedMetadata.Length - current.BindingBytes.Length, encrypted.Size, token);
@@ -342,6 +387,33 @@ public sealed class G4QueryResultStore
             .OrderBy(row => row.CreatedAtUtc).Select(row => row.Id).Take(64).ToArrayAsync(token);
         // 返回真正提交的修改数量，不把扫描到的候选当作删除成功。
         var changed = 0;
+        // Run引用只有组织级所有权而没有业务投影；维护审计只记录该准确所有权范围。
+        var runs = await scan.Database.SqlQuery<G4ExpiredRun>($"""
+            SELECT "Id", "OrganizationId" FROM semantic_query."QueryRuns"
+            WHERE "CreatedAtUtc" <= {retention} ORDER BY "CreatedAtUtc" LIMIT 64
+            """).ToArrayAsync(token);
+        foreach (var run in runs)
+        {
+            // 每个准确Run的删除与无值审计同物理事务，审计异常保留原引用。
+            await using var database = await factory.CreateDbContextAsync(token);
+            await using var transaction = await database.Database.BeginTransactionAsync(token);
+            await LockCapacityAsync(database, token);
+            // 删除前再核真实保留期及组织，不依赖此前扫描副本。
+            var removed = await database.Database.ExecuteSqlInterpolatedAsync($"""
+                DELETE FROM semantic_query."QueryRuns" WHERE "Id" = {run.Id}
+                    AND "OrganizationId" = {run.OrganizationId} AND "CreatedAtUtc" <= {clock.GetUtcNow().AddDays(-7)}
+                """, token);
+            if (removed == 0) continue;
+            // 只记录系统到期事实，不冒充创建者仍已认证，也不读取Query结果。
+            var trace = Guid.NewGuid().ToString("N");
+            var system = new ActorContext { SubjectId = "system.query.expiry", OrganizationId = run.OrganizationId,
+                SiteIds = [], Roles = [], TraceId = trace, CorrelationId = trace };
+            await audit.WriteAsync(system, new AuditCommand { Action = "data.query.expire", Resource = run.Id, Outcome = "allowed",
+                Scope = new ResourceScope { OrganizationId = run.OrganizationId, SiteIds = [] } },
+                database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
+            await transaction.CommitAsync(token);
+            changed += removed;
+        }
         foreach (var id in ids)
         {
             // 单行短事务避免大量到期材料阻断正常准入。
@@ -432,6 +504,12 @@ public sealed class G4QueryResultStore
                 throw new SemanticOperationException(403, "query_forbidden");
     }
 
+    /// <summary>只允许实际投影在准入固定计划内演进；绑定、范围和完整必需字段不可换入。</summary>
+    private static bool PlanStateMatches(G4QueryState admitted, G4QueryState completed) =>
+        G4QueryCanonical.Serialize(admitted with { Projections = completed.Projections }).AsSpan().SequenceEqual(G4QueryCanonical.Serialize(completed))
+        && completed.Projections.All(projection => admitted.RequiredProjections.Concat(admitted.Projections).Any(required =>
+            required.ObjectRefs.SequenceEqual(projection.ObjectRefs) && required.FieldRefs.SequenceEqual(projection.FieldRefs)));
+
     /// <summary>全任务短事务容量锁，跨API进程共享，禁止使用内存信号量代替。</summary>
     private static Task LockCapacityAsync(G4QueryDbContext database, CancellationToken token) =>
         database.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(73442001)", token);
@@ -445,7 +523,9 @@ public sealed class G4QueryResultStore
     private static async Task DemandStorageAsync(G4QueryDbContext database, int metadata, int result, CancellationToken token)
     {
         // 使用long避免数据库大量记录使聚合溢出，bytea长度由PG计算。
-        var metadataSize = await database.Queries.SumAsync(row => (long)row.RequestBytes.Length + row.BindingBytes.Length, token);
+        var runSize = await database.Database.SqlQueryRaw<long>("SELECT COALESCE(sum(pg_column_size(r)), 0)::bigint AS \"Value\" FROM semantic_query.\"QueryRuns\" AS r").SingleAsync(token);
+        // 查询输入与运行引用合计受同一容量约束。
+        var metadataSize = runSize + await database.Queries.SumAsync(row => (long)row.RequestBytes.Length + row.BindingBytes.Length, token);
         // 结果按批准的规范明文总量计费，密文开销由包外资源预算另计。
         var resultSize = await database.Queries.SumAsync(row => (long)row.ResultSize, token);
         if (metadataSize + metadata > 64L * 1024 * 1024 || resultSize + result > 64L * 1024 * 1024)
@@ -507,4 +587,14 @@ public sealed class G4QueryResultStore
         if (string.IsNullOrWhiteSpace(queryId) || queryId.Length > 128)
             throw new SemanticOperationException(503, "query_result_invalid");
     }
+    /// <summary>过期运行扫描只读取维护所需的无值身份。</summary>
+    private sealed class G4ExpiredRun
+    {
+        /// <summary>模块拥有的准确运行标识。</summary>
+        public required string Id { get; init; }
+
+        /// <summary>删除审计使用的原组织所有权，不扩张为源数据授权。</summary>
+        public required string OrganizationId { get; init; }
+    }
+
 }

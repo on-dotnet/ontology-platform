@@ -7,6 +7,23 @@ namespace OntologyPlatform.ConnectionsTests;
 [TestClass]
 public sealed class G4QuerySourceTests
 {
+    /// <summary>登记顶层JSON提取保留空串、false、零与null，缺键及精度损失必须拒绝。</summary>
+    [TestMethod]
+    public void RegisteredJsonScalarDoesNotInventMissingValues()
+    {
+        // 转换来自固定发布参数，不接受自由JSONPath。
+        MappingConversion Conversion(string type) => new() { Id = "extract", RegisteredId = "json-top-level-scalar", Version = "1",
+            Parameters = System.Text.Json.JsonSerializer.SerializeToElement(new { key = "value", valueType = type }) };
+        Assert.AreEqual("", PgQueryReader.JsonScalar("{\"value\":\"\"}", Conversion("STRING")).Lexical);
+        Assert.AreEqual("false", PgQueryReader.JsonScalar("{\"value\":false}", Conversion("BOOLEAN")).Lexical);
+        Assert.AreEqual("0", PgQueryReader.JsonScalar("{\"value\":0}", Conversion("DECIMAL")).Lexical);
+        Assert.AreEqual("9007199254740993.20", PgQueryReader.JsonScalar("{\"value\":9007199254740993.20}", Conversion("DECIMAL")).Lexical);
+        Assert.IsInstanceOfType<G4NullValue>(PgQueryReader.JsonScalar("{\"value\":null}", Conversion("STRING")));
+        Assert.Throws<SemanticOperationException>(() => PgQueryReader.JsonScalar("{}", Conversion("STRING")));
+        Assert.Throws<SemanticOperationException>(() => PgQueryReader.JsonScalar("{\"value\":{}}", Conversion("STRING")));
+        Assert.Throws<SemanticOperationException>(() => PgQueryReader.JsonScalar("{\"value\":0.12345678901234567890123456789}", Conversion("DECIMAL")));
+    }
+
     /// <summary>A切换到B再回到A仍是不同激活；凭据轮换和目录变化同样失效。</summary>
     [TestMethod]
     public void BindingRejectsAbaAndConnectionDrift()

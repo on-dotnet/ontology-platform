@@ -45,6 +45,24 @@ public sealed class ExecutionRunService
         this.clock = clock;
     }
 
+    /// <summary>G4工具循环只持久查询引用，全部调用共享三十秒期限和三次预算。</summary>
+    public static async Task<G4QueryDelivery> ExecuteG4ToolAsync(IG4QueryRunStore store, ActorContext actor, string sessionReference,
+        G4QueryRunReference run, Func<CancellationToken, Task<G4QueryDelivery>> execute, CancellationToken token)
+    {
+        _ = run.Reserve(DateTimeOffset.UtcNow);
+        // 同一运行剩余时间贯穿持久计数、当前授权、源读取和引用保存。
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(token);
+        // 调度暂停可能跨过期限，不能把负延迟传入计时器。
+        var remaining = run.Deadline - DateTimeOffset.UtcNow;
+        if (remaining <= TimeSpan.Zero) throw new SemanticOperationException(429, "query_run_budget");
+        budget.CancelAfter(remaining);
+        await store.ReserveRunAsync(actor, sessionReference, run.RunId, run.Deadline, budget.Token);
+        // 实际执行与恢复仍由唯一Gateway负责，错误不会返还工具次数。
+        var delivery = await execute(budget.Token);
+        await store.BindRunQueryAsync(actor, sessionReference, run.RunId, delivery.View.QueryId, budget.Token);
+        return delivery;
+    }
+
     /// <summary>当前宿主仍为Development且明确启用harness时才允许worker执行。</summary>
     internal bool DeterministicEnabled => deterministicEnabled;
 

@@ -180,6 +180,9 @@ public interface IReleaseArtifactStore
 /// <summary>REST、MCP和MAF共同调用的唯一受控语义网关。</summary>
 public interface ISemanticGateway
 {
+    /// <summary>提供唯一生成G4组件闭包给MCP消费者，不复制第二套输入规格。</summary>
+    System.Text.Json.JsonElement GetG4Schema(string name) => throw new SemanticOperationException(422, "capability_not_supported");
+
     /// <summary>通过同一网关执行已登记G4能力，服务器会话引用不能由客户端提供。</summary>
     Task<G4QueryDelivery> ExecuteG4Async(ActorContext actor, string sessionReference, G4SemanticQuery query,
         string idempotencyKey, string? selectionQueryId, CancellationToken cancellationToken) =>

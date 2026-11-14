@@ -93,7 +93,7 @@ public sealed class PgQueryReader : IG4PgQueryReader
 
     /// <summary>同一分支的目录、ACL和实际行读取共用独立只读快照，绝不复用失败事务。</summary>
     public async Task<G4SourceQueryRead> ReadAsync(PgConnectionProfile profile, string secret, G4QueryBindingContext context,
-        string entityBindingId, G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken)
+        string entityBindingId, G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken, G4QueryBranchFilter? branch = null)
     {
         // 剩余预算扣除平台提交保留区，不把分支超时重置为新五秒。
         var remaining = deadlineAtUtc - clock.GetUtcNow() - TimeSpan.FromMilliseconds(500);
@@ -122,7 +122,13 @@ public sealed class PgQueryReader : IG4PgQueryReader
             var field = table.Fields.SingleOrDefault(item => item.Name == reference.Name && item.Ordinal == reference.Ordinal);
             if (reference.DatasetRef != entity.DatasetRef || entity.DatasetRef.SnapshotId != context.OriginalCatalog.SnapshotId || field is null
                 || original.Fields.SingleOrDefault(item => item.Name == reference.Name && item.Ordinal == reference.Ordinal) != field) throw Invalid();
-            _ = DeclaredType(field);
+            if (field.NativeType == "jsonb")
+            {
+                // 原始JSON仅能作为登记提取的输入，不能用作身份或连接键。
+                var properties = context.Manifest.Mapping.Properties.Where(item => item.EntityBindingId == entity.Id && item.FieldRef == reference).ToArray();
+                if (properties.Length == 0 || properties.Any(item => item.ConversionId is null || !context.Manifest.Mapping.Conversions.Any(conversion => conversion.Id == item.ConversionId && conversion.RegisteredId == "json-top-level-scalar"))) throw Invalid();
+            }
+            else _ = DeclaredType(field);
             return field;
         }).OrderBy(item => item.Ordinal).ToArray();
         if (fields.Length is < 1 or > 64) throw new SemanticOperationException(422, "query_projection_budget");
@@ -167,8 +173,9 @@ public sealed class PgQueryReader : IG4PgQueryReader
                 || fields.Single(item => item.Name == entity.ScopeFields.Site.Name).NativeType != "text") throw Invalid();
             using var quoting = new NpgsqlCommandBuilder();
             // 每个字段先在源端检查长度/有限时刻，超限原文不会跨网络物化。
-            var bad = fields.Select(field => DeclaredType(field) switch
+            var bad = fields.Select(field => ReadType(field) switch
             {
+                "json" => "COALESCE(octet_length(" + quoting.QuoteIdentifier(field.Name) + "::text) > 65536, false)",
                 "string" => "COALESCE(octet_length(" + quoting.QuoteIdentifier(field.Name) + ") > 4096, false)",
                 "date" or "timestampUtc" or "timestampLocal" => "COALESCE(NOT pg_catalog.isfinite(" + quoting.QuoteIdentifier(field.Name) + "), false)",
                 _ => "false"
@@ -180,7 +187,7 @@ public sealed class PgQueryReader : IG4PgQueryReader
             // 完整计划只含固定引用和参数化谓词，没有用户SQL或任意函数。
             var predicate = " WHERE " + quoting.QuoteIdentifier(entity.ScopeFields.Organization.Name) + " = @organization AND "
                 + quoting.QuoteIdentifier(entity.ScopeFields.Site.Name) + " = ANY(@sites)";
-            if (query.Filters.EntityExternalId is not null) predicate += " AND " + quoting.QuoteIdentifier(identity.ExternalIdFieldRefs[0].Name) + "::text = @external";
+            if (branch is null && query.Filters.EntityExternalId is not null) predicate += " AND " + quoting.QuoteIdentifier(identity.ExternalIdFieldRefs[0].Name) + "::text = @external";
             if (query.Filters.ValidFrom is not null)
             {
                 if (identity.ValidFromFieldRef is null || identity.ValidToFieldRef is null
@@ -192,14 +199,62 @@ public sealed class PgQueryReader : IG4PgQueryReader
                 predicate += " AND (" + unknownTime + " OR (EXTRACT(EPOCH FROM " + quoting.QuoteIdentifier(identity.ValidFromFieldRef.Name)
                     + ") < @until AND EXTRACT(EPOCH FROM " + quoting.QuoteIdentifier(identity.ValidToFieldRef.Name) + ") > @from))";
             }
+            // 子分支只接受发布关系和真实父行，参数始终由服务器已有投影产生。
+            var joinValues = new List<(string Name, G4QueryValue Value)>();
+            if (branch is not null)
+            {
+                // 发布关系必须准确连接当前目标及已完成的父绑定。
+                var relation = context.Manifest.Mapping.Relations.SingleOrDefault(item => item.Id == branch.RelationId
+                    && item.ToBindingId == entity.Id && item.FromBindingId == branch.Parents.EntityBindingId) ?? throw Invalid();
+                if (relation.TemporalJoinPolicy != "HALF_OPEN_OVERLAP" || branch.Parents.Rows.Length is < 1 or > 100 || branch.Parents.Indeterminate) throw Invalid();
+                // 完整父身份的有效区间提供显式半开重叠谓词。
+                var parent = context.Manifest.Mapping.Entities.Single(item => item.Id == relation.FromBindingId);
+                // 两端时间规则由正式映射给出，不按列名猜测。
+                var parentIdentity = context.Manifest.Mapping.IdentitySpecs.Single(item => item.Id == parent.IdentitySpecId);
+                if (identity.ValidFromFieldRef is null || identity.ValidToFieldRef is null || parentIdentity.ValidFromFieldRef is null || parentIdentity.ValidToFieldRef is null) throw Invalid();
+                // 任一目标未知端点不能被SQL三值逻辑错误判成确定EMPTY。
+                unknownTime = "(" + unknownTime + " OR " + quoting.QuoteIdentifier(identity.ValidFromFieldRef.Name) + " IS NULL OR " + quoting.QuoteIdentifier(identity.ValidToFieldRef.Name) + " IS NULL)";
+                // 值参数名只有服务器递增计数，任何值都不会拼进SQL。
+                string Parameter(G4QueryValue value)
+                {
+                    if (value is G4NullValue) throw Invalid();
+                    // 有界参数集合按已验证父行顺序建立。
+                    var name = "join" + joinValues.Count.ToString(CultureInfo.InvariantCulture);
+                    joinValues.Add((name, value));
+                    return "@" + name;
+                }
+                // OR集合最多100个父行，每项包含登记键、完整scope及有效区间。
+                var alternatives = new List<string>();
+                foreach (var row in branch.Parents.Rows)
+                {
+                    // 关系键的原生类型在物理参数中保留，不能用文本格式猜等价。
+                    var clauses = relation.JoinFieldPairs.Select(pair => quoting.QuoteIdentifier(pair.To.Name) + " = " + Parameter(row[pair.From.Name])).ToList();
+                    clauses.Add(quoting.QuoteIdentifier(entity.ScopeFields.Organization.Name) + " = " + Parameter(row[parent.ScopeFields.Organization.Name]));
+                    clauses.Add(quoting.QuoteIdentifier(entity.ScopeFields.Site.Name) + " = " + Parameter(row[parent.ScopeFields.Site.Name]));
+                    clauses.Add("(" + unknownTime + " OR (" + quoting.QuoteIdentifier(identity.ValidFromFieldRef.Name) + " < " + Parameter(row[parentIdentity.ValidToFieldRef.Name])
+                        + " AND " + quoting.QuoteIdentifier(identity.ValidToFieldRef.Name) + " > " + Parameter(row[parentIdentity.ValidFromFieldRef.Name]) + "))");
+                    alternatives.Add("(" + string.Join(" AND ", clauses) + ")");
+                }
+                predicate += " AND (" + string.Join(" OR ", alternatives) + ")";
+            }
+            // 在LIMIT之前使用真实事件时间、身份及已登记唯一键排序，不能事后排序冒充完整前缀。
+            var temporal = context.Manifest.Mapping.TemporalSpecs.Single(item => item.Id == entity.TemporalSpecId);
+            // 无唯一键时仍采用稳定值排序，但后续证据明确降低精度。
+            var keys = await RecordKeysAsync(connection, transaction, table, fields, budget.Token);
+            // 同一绑定的实体IRI由身份列决定，剩余列只消除完全并列值的不确定性。
+            var orderNames = new[] { temporal.EventTimeFieldRef?.Name }.Where(name => name is not null)
+                .Concat(identity.ExternalIdFieldRefs.Select(item => item.Name)).Concat(keys).Concat(fields.Select(field => field.Name)).Distinct(StringComparer.Ordinal);
+            // 所有排序标识符仍必须属于刚核验的目录投影。
+            var orderFields = orderNames.Select(name => fields.Single(field => field.Name == name)).ToArray();
             // 未知窗口行保留在有界源结果中，由独立标志使上层不能误报EMPTY。
             var sql = "SELECT (" + string.Join(" OR ", bad) + ")," + unknownTime + "," + string.Join(",", columns)
                 + " FROM " + quoting.QuoteIdentifier(table.Schema) + "." + quoting.QuoteIdentifier(table.Name) + predicate
-                + " ORDER BY " + string.Join(",", fields.Select(field => quoting.QuoteIdentifier(field.Name) + (DeclaredType(field) == "string" ? " COLLATE \"C\"" : "") + " NULLS FIRST")) + " LIMIT 101";
+                + " ORDER BY " + string.Join(",", orderFields.Select(field => quoting.QuoteIdentifier(field.Name) + (ReadType(field) == "string" ? " COLLATE \"C\"" : "") + " NULLS FIRST")) + " LIMIT 101";
             await using var command = new NpgsqlCommand(sql, connection, transaction);
             command.Parameters.AddWithValue("organization", context.Scope.OrganizationId);
             command.Parameters.AddWithValue("sites", context.Scope.SiteIds);
-            if (query.Filters.EntityExternalId is not null) command.Parameters.AddWithValue("external", query.Filters.EntityExternalId);
+            foreach (var parameter in joinValues) command.Parameters.AddWithValue(parameter.Name, ParameterValue(parameter.Value));
+            if (branch is null && query.Filters.EntityExternalId is not null) command.Parameters.AddWithValue("external", query.Filters.EntityExternalId);
             if (query.Filters.ValidFrom is not null)
             {
                 command.Parameters.AddWithValue("from", Epoch(query.Filters.ValidFrom));
@@ -226,6 +281,17 @@ public sealed class PgQueryReader : IG4PgQueryReader
                         // DATE原生取DateOnly，不将其补午夜。
                         var value = reader.IsDBNull(index + 2) ? DBNull.Value : fields[index].NativeType == "date"
                             ? (object)reader.GetFieldValue<DateOnly>(index + 2) : reader.GetValue(index + 2);
+                        if (fields[index].NativeType == "jsonb")
+                        {
+                            foreach (var property in context.Manifest.Mapping.Properties.Where(item => item.EntityBindingId == entity.Id && item.FieldRef.Name == fields[index].Name))
+                            {
+                                // 一列可有多个独立已登记键，不能覆盖或伪造缺失属性。
+                                var extracted = JsonScalar(value is DBNull ? null : (string)value, context.Manifest.Mapping.Conversions.Single(item => item.Id == property.ConversionId));
+                                row.Add("$property:" + property.Id, extracted);
+                                size += Encoding.UTF8.GetByteCount(extracted.Lexical ?? "null") + 256;
+                            }
+                            continue;
+                        }
                         // 精确类型转换保持scale和微秒，不经过double。
                         var scalar = Scalar(value, fields[index]);
                         size += Encoding.UTF8.GetByteCount(scalar.Lexical ?? "null") + Encoding.UTF8.GetByteCount(fields[index].Name) + 256;
@@ -238,7 +304,6 @@ public sealed class PgQueryReader : IG4PgQueryReader
                 }
             }
             // 只把完全投影的真实主键当记录定位依据，无主键时显式降级。
-            var keys = await RecordKeysAsync(connection, transaction, table, fields, budget.Token);
             await using var snapshot = new NpgsqlCommand("SELECT pg_catalog.pg_current_snapshot()::text", connection, transaction);
             // 快照仅作为本次读水位，不充当跨分支全局事务。
             var watermark = (string)(await snapshot.ExecuteScalarAsync(budget.Token))!;
@@ -248,7 +313,7 @@ public sealed class PgQueryReader : IG4PgQueryReader
                 EntityBindingId = entity.Id, Rows = rows.ToArray(), StartedAtUtc = started, CompletedAtUtc = clock.GetUtcNow(),
                 TransactionSnapshot = watermark, Limited = limited, Indeterminate = indeterminate, RecordKeyFields = keys,
                 QueryPlanHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(
-                    new { context.Binding, entity.Id, fields, context.Scope, query.Filters, query.MaxRows, AdapterVersion = "pg-query-v1" }, G4QueryJson.Options)))
+                    new { context.Binding, entity.Id, fields, context.Scope, query.Filters, query.MaxRows, Branch = branch, AdapterVersion = "pg-query-v1" }, G4QueryJson.Options)))
             };
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
@@ -278,6 +343,12 @@ public sealed class PgQueryReader : IG4PgQueryReader
             identity.SiteFieldRef, identity.ValidFromFieldRef, identity.ValidToFieldRef, temporal.EventTimeFieldRef,
             temporal.ObservedAtFieldRef, temporal.ValidFromFieldRef, temporal.ValidToFieldRef }.OfType<MappingFieldRef>()) yield return field;
         foreach (var field in identity.ExternalIdFieldRefs) yield return field;
+        foreach (var relation in mapping.Relations)
+            foreach (var pair in relation.JoinFieldPairs)
+            {
+                if (relation.FromBindingId == entity.Id) yield return pair.From;
+                if (relation.ToBindingId == entity.Id) yield return pair.To;
+            }
         foreach (var property in mapping.Properties.Where(item => item.EntityBindingId == entity.Id))
         {
             yield return property.FieldRef;
@@ -305,6 +376,61 @@ public sealed class PgQueryReader : IG4PgQueryReader
         await using var reader = await command.ExecuteReaderAsync(token);
         while (await reader.ReadAsync(token)) names.Add(reader.GetString(0));
         return names.Count is > 0 and <= 64 && names.All(name => fields.Any(field => field.Name == name)) ? names.ToArray() : [];
+    }
+
+    /// <summary>内部JSON输入不是wire值，只有登记提取后的标量能进入投影。</summary>
+    private static string ReadType(CatalogField field) => field.NativeType == "jsonb" ? "json" : DeclaredType(field);
+
+    /// <summary>受控父行标量映射为原生参数，不经过double或SQL字串拼接。</summary>
+    private static object ParameterValue(G4QueryValue value) => value switch
+    {
+        G4StringValue => value.Lexical!,
+        G4Int64Value => long.Parse(value.Lexical!, CultureInfo.InvariantCulture),
+        G4DecimalValue => decimal.Parse(value.Lexical!, CultureInfo.InvariantCulture),
+        G4BooleanValue => value.Lexical == "true",
+        G4UtcValue => DateTime.Parse(value.Lexical!, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal),
+        G4LocalValue => DateTime.SpecifyKind(DateTime.Parse(value.Lexical!, CultureInfo.InvariantCulture), DateTimeKind.Unspecified),
+        G4DateValue => DateOnly.Parse(value.Lexical!, CultureInfo.InvariantCulture),
+        _ => throw Invalid()
+    };
+
+    /// <summary>只执行已登记的顶层JSON标量提取，拒绝缺键、复杂值和十进制舍入。</summary>
+    public static G4QueryValue JsonScalar(string? json, MappingConversion conversion)
+    {
+        if (conversion.RegisteredId != "json-top-level-scalar" || conversion.Version != "1") throw Invalid();
+        // 声明类型来自发布参数，不从样本值猜测。
+        var type = conversion.Parameters.GetProperty("valueType").GetString() switch
+        { "STRING" => "string", "BOOLEAN" => "boolean", "DECIMAL" => "decimal", _ => throw Invalid() };
+        if (json is null) return new G4NullValue { Lexical = null, DeclaredType = type };
+        if (Encoding.UTF8.GetByteCount(json) > 65536) throw Invalid();
+        // 复用严格重复键与深度解析，但原始JSON永不进入结果或持久化。
+        using var document = G4MappingRules.ReadDocument(json);
+        if (document.RootElement.ValueKind != System.Text.Json.JsonValueKind.Object
+            || !document.RootElement.TryGetProperty(conversion.Parameters.GetProperty("key").GetString()!, out var value)) throw Invalid();
+        if (value.ValueKind == System.Text.Json.JsonValueKind.Null) return new G4NullValue { Lexical = null, DeclaredType = type };
+        // 最终仍经过同一封闭标量合同，字符串字节上限不因JSON提取改变。
+        G4QueryValue scalar;
+        if (type == "string" && value.ValueKind == System.Text.Json.JsonValueKind.String)
+            scalar = new G4StringValue { Lexical = value.GetString()! };
+        else if (type == "boolean" && value.ValueKind is System.Text.Json.JsonValueKind.True or System.Text.Json.JsonValueKind.False)
+            scalar = new G4BooleanValue { Lexical = value.GetBoolean() ? "true" : "false" };
+        else if (type == "decimal" && value.ValueKind == System.Text.Json.JsonValueKind.Number)
+        {
+            // 与既有注册转换一致，不接受指数或decimal解析中的静默舍入。
+            var text = value.GetRawText();
+            if (!Regex.IsMatch(text, @"\A-?(0|[1-9][0-9]*)(\.[0-9]+)?\z")
+                || !decimal.TryParse(text, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var number)) throw Invalid();
+            // 保留源小数位，数值规范化仅用于精确往返验证。
+            var scale = text.Contains('.') ? text.Length - text.IndexOf('.') - 1 : 0;
+            // 负零在wire中规范化为零，不损失数值。
+            var normalized = text.Contains('.') ? text.TrimEnd('0').TrimEnd('.') : text;
+            if (normalized == "-0") normalized = "0";
+            if (scale > 28 || (number == 0 ? "0" : number.ToString("0.############################", CultureInfo.InvariantCulture)) != normalized) throw Invalid();
+            scalar = new G4DecimalValue { Lexical = (number == 0 ? 0m : number).ToString("F" + scale, CultureInfo.InvariantCulture), Precision = 28, Scale = scale };
+        }
+        else throw Invalid();
+        G4QueryRules.Value(scalar);
+        return scalar;
     }
 
     /// <summary>按批准目录类型生成精确wire标量；未知类型即使为null也拒绝。</summary>

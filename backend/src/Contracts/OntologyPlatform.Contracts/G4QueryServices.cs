@@ -153,5 +153,25 @@ public interface IG4SourceQueryReader
 
     /// <summary>重验当前查询授权后读取独立只读源事务，不接受SQL或客户端身份。</summary>
     Task<G4SourceQueryRead> ReadAsync(G4QueryBindingContext context, MappingAuthorizationProof proof,
-        string entityBindingId, G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken);
+        string entityBindingId, G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken, G4QueryBranchFilter? branch = null);
+}
+
+/// <summary>服务器根据已完成父分支构造的关系谓词，不接受客户端表列或SQL。</summary>
+public sealed record G4QueryBranchFilter
+{
+    /// <summary>固定发布关系身份。</summary>
+    public required string RelationId { get; init; }
+
+    /// <summary>当前执行已授权、完整读取的父行，仅在内存用于登记键连接。</summary>
+    public required G4SourceQueryRead Parents { get; init; }
+}
+
+/// <summary>查询模块独占的G4运行引用持久边界，不写旧Agents结果表。</summary>
+public interface IG4QueryRunStore
+{
+    /// <summary>原子预留一次工具调用；当前主体、会话、绝对期限和三次上限不可变。</summary>
+    Task ReserveRunAsync(ActorContext actor, string sessionReference, string runId, DateTimeOffset deadline, CancellationToken token);
+
+    /// <summary>只绑定同一主体的真实queryId，不保存第二份查询结果或源数据。</summary>
+    Task BindRunQueryAsync(ActorContext actor, string sessionReference, string runId, string queryId, CancellationToken token);
 }

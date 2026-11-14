@@ -21,7 +21,7 @@ public sealed class G4QueryTests
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["G4:QueryEnabled"] = "true" }).Build();
         // 相同生成输入跨实例必须产生相同能力版本。
         var capabilities = new CapabilityRegistry(configuration).Read();
-        Assert.AreEqual(4, capabilities.Length);
+        Assert.AreEqual(6, capabilities.Length);
         CollectionAssert.AreEqual(legacy.Select(value => JsonSerializer.Serialize(value)).ToArray(),
             capabilities.Where(value => !value.Id.StartsWith("g4_", StringComparison.Ordinal)).Select(value => JsonSerializer.Serialize(value)).ToArray());
         // 真实输出闭包包含所有正式判别子类，而不是any或G2图数据。
@@ -173,9 +173,42 @@ public sealed class G4QueryTests
         Assert.IsTrue(projected.Evidence.All(item => item.Precision == "ROW_KEY" && item.SourceRecordRef is not null));
         Assert.IsNull(projected.Receipt.Receipt.SourceRecordRef, "多行回执不能伪造一个总行键。");
         Assert.Throws<SemanticOperationException>(() => G4QueryExecution.ProjectEntities("query-2", "trace-1", context, read with { Rows = [row,row] }));
+        // 同一主体多个观测保留各自精确值，不套用根定位的重复身份拒绝规则。
+        var next = new Dictionary<string, G4QueryValue>(row) { ["value"] = new G4DecimalValue { Lexical = "9007199254740993.21", Precision = 20, Scale = 2 } };
+        // 这里明确测试观测投影；根定位上面的负例仍必须拒绝重复身份。
+        var repeated = G4QueryExecution.ProjectEntities("query-observations", "trace-1", context, read with { Rows = [row, next] }, observations: true);
+        // 每行单独来源证据确保相同主体不覆盖后一次值。
+        var observations = G4QueryExecution.Observations(repeated);
+        Assert.HasCount(2, observations);
+        Assert.AreEqual(observations[0].EntityIri, observations[1].EntityIri);
+        Assert.AreEqual("9007199254740993.20", observations[0].Value.Lexical);
+        Assert.AreEqual("9007199254740993.21", observations[1].Value.Lexical);
+        Assert.AreNotEqual(observations[0].EvidenceIds[0], observations[1].EvidenceIds[0]);
+        Assert.AreEqual("asset", G4QueryExecution.RootBinding(mapping).Id);
+        Assert.Throws<SemanticOperationException>(() => G4QueryExecution.RootBinding(mapping with { Entities = [mapping.Entities[0], mapping.Entities[0] with { Id = "another-root" }] }));
         // 缺主键时保留实际数据集证据，不升级为记录定位。
         var degraded = G4QueryExecution.ProjectEntities("query-3", "trace-1", context, read with { RecordKeyFields = [] });
         Assert.IsTrue(degraded.Evidence.All(item => item.Precision == "DATASET" && item.SourceRecordRef is null));
+    }
+
+    /// <summary>合法四千字节字符串经规范转义膨胀时保留可信完整项前缀。</summary>
+    [TestMethod]
+    public void EscapedResponseBudgetKeepsOnlyClosedPrefix()
+    {
+        // 制造源侧合法、JSON编码后超过一MiB的完整观测，不使用非法超长标量。
+        var original = FixtureResult();
+        var value = (G4ObservationDatum)original.Data[0];
+        var result = original with { Data = Enumerable.Range(0, 100).Select(index => (G4QueryDatum)(value with
+            { PropertyIri = "urn:fixture:value:" + index, Value = new G4StringValue { Lexical = new string('\t', 4096) } })).ToArray() };
+        // 原回执按实际完整投影形成，截断后必须重算而不能沿用旧hash。
+        var receipt = ReceiptFixture("query-budget", G4QueryRaceTests.Binding(1), result);
+        var bounded = G4QueryExecution.BoundResponse(result, [receipt]);
+        Assert.AreEqual("PARTIAL", bounded.Result.Status);
+        Assert.IsTrue(bounded.Result.Limited && bounded.Result.Data.Length is > 0 and < 100);
+        Assert.IsTrue(G4QueryCanonical.Result(bounded.Result).Length <= G4QueryRules.MaximumResultBytes);
+        Assert.AreEqual(bounded.Result.Data.Length, bounded.Receipts[0].Receipt.RowCount);
+        Assert.AreEqual(G4QueryCanonical.Hash(G4QueryCanonical.Projection(bounded.Result.Data)), bounded.Receipts[0].Receipt.ResultHash);
+        Assert.IsTrue(bounded.Receipts[0].Receipt.Limited);
     }
 
     /// <summary>事务测试构造闭合回执；来源适配器真实回执必须由执行器按源事实另建。</summary>

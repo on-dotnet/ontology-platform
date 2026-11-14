@@ -32,6 +32,7 @@ public static class SemanticQueryModule
                     provider.GetRequiredService<IG4QueryAuthorizationAuthority>(), provider.GetRequiredService<IG4QueryBindingReader>(),
                     provider.GetRequiredService<ITransactionalAuditWriter>(), protection, provider.GetRequiredService<TimeProvider>());
             });
+            services.AddScoped<IG4QueryRunStore>(provider => provider.GetRequiredService<G4QueryResultStore>());
             services.AddScoped<G4QueryExecution>();
             services.AddHostedService<G4QueryWorker>();
         }

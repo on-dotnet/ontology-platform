@@ -538,9 +538,9 @@ def runtime_configure():
 
 def browser_test(mode):
     """唯一当前任务浏览器入口，真实OIDC与API响应，不运行旧M3验收或下载浏览器。"""
-    if mode not in ['provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race','s2-aba','s2-capacity','s2-connection','replace-disabled-connection']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
+    if mode not in ['provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race','s2-aba','s2-capacity','s2-connection','s2-inflight','s3-provision','s3','ui-s3','replace-disabled-connection']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
     binding=runtime_binding()
-    web=web_binding() if mode=='ui-s1' else None
+    web=web_binding() if mode in ['ui-s1','ui-s3'] else None
     result=runtime_command('query-browser-'+mode,['/opt/homebrew/Cellar/node@24/24.22.1/bin/node',
         'scripts/maintenance/workflow-m4-query.mjs','--task',TASK,'--run-id',RUN,'--mode',mode],timeout=180,
         extra_inputs=dict(api=binding,web=web))
@@ -565,10 +565,10 @@ def synthetic_grants(mode):
     if labels.get('ontology.task-id')!=TASK or labels.get('ontology.run-id')!=RUN: raise ValueError('QUERY_GRANT_CONTAINER_OWNER')
     catalog=state['catalog']
     if catalog['connectionId']!=state['connectionId'] or catalog['status']!='READY': raise ValueError('QUERY_GRANT_CATALOG_INVALID')
-    tables=[item for item in catalog['objects'] if item['schema']=='production' and item['name']=='assets' and item['kind']=='TABLE']
-    if len(tables)!=1 or len(tables[0]['fields'])!=6: raise ValueError('QUERY_GRANT_SOURCE_FIELDS')
-    objects=['production/assets']
-    fields=['production/assets/'+str(item['ordinal'])+'/'+urllib.parse.quote(item['name'],safe='') for item in tables[0]['fields']]
+    tables=[item for item in catalog['objects'] if item['schema']=='production' and item['name'] in (['assets','readings'] if state.get('s3') else ['assets']) and item['kind']=='TABLE']
+    if len(tables)!=(2 if state.get('s3') else 1) or not any(item['name']=='assets' and len(item['fields'])==6 for item in tables): raise ValueError('QUERY_GRANT_SOURCE_FIELDS')
+    objects=['production/'+table['name'] for table in tables]
+    fields=['production/'+table['name']+'/'+str(item['ordinal'])+'/'+urllib.parse.quote(item['name'],safe='') for table in tables for item in table['fields']]
     def literal(value):
         if not isinstance(value,str) or len(value)>512 or any(ord(char)<32 for char in value): raise ValueError('QUERY_GRANT_LITERAL')
         return "'"+value.replace("'","''")+"'"
@@ -580,7 +580,7 @@ def synthetic_grants(mode):
         permissions=(['mapping.read','mapping.source.validate']+(['mapping.edit','mapping.validate','mapping.submit','mapping.activate'] if role=='operator' else ['mapping.review','mapping.approve'])) if mode=='mapping' else (
             ['data.query.execute','data.query.result.read','data.query.evidence.read'] if role=='operator' else [])
         for permission in permissions:
-            ident='m4-fixture-'+sha((state['connectionId']+subject+permission).encode())[:32];ids.append(ident)
+            ident='m4-fixture-'+sha((state['connectionId']+subject+permission+('s3' if state.get('s3') else '')).encode())[:32];ids.append(ident)
             source=permission=='mapping.source.validate' or permission.startswith('data.query.')
             values=[literal(ident),literal(subject),"'org-demo'",array(state['scope']['siteIds']),literal(permission),
                 literal(state['connectionId']) if source else 'NULL',array(objects if source else []),array(fields if source else []),"now()+interval '4 hours'",'NULL']
@@ -620,7 +620,7 @@ def query_fixture_control(action, value=None):
     import re
     from workflow_execution import run,sha
     output=ROOT/'artifacts/workflow'/TASK/RUN
-    source=action in ['source-hold','source-lock-probe','source-deny','source-allow']
+    source=action in ['source-hold','source-lock-probe','source-deny','source-allow','readings-deny','readings-allow','readings-budget-add','readings-budget-remove']
     record=json.loads((output/('source-resources.json' if source else 'platform-resources.json')).read_text())
     container=record['resources'][0]['id'];prefix=['docker','--context','desktop-linux']
     labels=json.loads(subprocess.check_output([*prefix,'inspect','--format','{{json .Config.Labels}}',container],timeout=15))
@@ -631,13 +631,24 @@ def query_fixture_control(action, value=None):
         sql="SELECT count(*) FROM pg_locks WHERE relation='production.assets'::regclass AND mode='AccessExclusiveLock' AND granted;"
     elif action in ['source-deny','source-allow']:
         sql=("REVOKE SELECT ON production.assets FROM fixture_reader;" if action=='source-deny' else "GRANT SELECT ON production.assets TO fixture_reader;")+" SELECT has_table_privilege('fixture_reader','production.assets','SELECT');"
+    elif action in ['readings-deny','readings-allow']:
+        sql=("REVOKE SELECT ON production.readings FROM fixture_reader;" if action=='readings-deny' else "GRANT SELECT ON production.readings TO fixture_reader;")+" SELECT has_table_privilege('fixture_reader','production.readings','SELECT');"
+    elif action in ['readings-budget-add','readings-budget-remove']:
+        # 仅本任务固定99个新增合成行，完整主键和时间限定避免碰到原三行。
+        owned="organization_id='org-demo' AND site_id='site-a' AND asset_id='asset-1' AND reading_id IN (SELECT 'm4-query-impl-01-budget-'||n FROM generate_series(1,99) n) AND valid_from='2026-11-14T00:00:00Z'::timestamptz"
+        if action=='readings-budget-add':
+            sql="BEGIN; DO $$ BEGIN IF EXISTS (SELECT 1 FROM production.readings WHERE "+owned+") THEN RAISE EXCEPTION 'owned budget fixture already exists'; END IF; END $$; "
+            sql+="INSERT INTO production.readings SELECT 'org-demo','site-a','m4-query-impl-01-budget-'||n,'asset-1','2026-11-14T00:00:00Z'::timestamptz,'2026-11-14T00:01:00Z'::timestamptz,'2026-11-14T00:00:01.123456Z'::timestamptz,20.1250,'Cel',jsonb_build_object('quality',repeat(chr(9),4096)) FROM generate_series(1,99) n; COMMIT; "
+        else:
+            sql="DELETE FROM production.readings WHERE "+owned+"; "
+        sql+="SELECT json_build_object('ownedRows',(SELECT count(*) FROM production.readings WHERE "+owned+"),'siteRows',(SELECT count(*) FROM production.readings WHERE organization_id='org-demo' AND site_id='site-a'));"
     elif action=='query-probe':
         if not isinstance(value,str) or not re.fullmatch(r'[0-9a-f-]{36}',value): raise ValueError('QUERY_FIXTURE_KEY_INVALID')
         sql='SELECT json_build_object(\'id\',"Id",\'status\',"ExecutionStatus",\'fence\',"Fence",\'cancel\',"CancelRequested") FROM semantic_query."Queries" WHERE "IdempotencyKey"=\''+value+'\';'
     elif action in ['revoke-execute','restore-execute','revoke-result','restore-result','revoke-evidence','restore-evidence']:
         state=json.loads((output/'runtime-fixture.json').read_text())
         permission={'execute':'data.query.execute','result':'data.query.result.read','evidence':'data.query.evidence.read'}[action.split('-')[1]]
-        ident='m4-fixture-'+sha((state['connectionId']+state['subjects']['operator']+permission).encode())[:32]
+        ident='m4-fixture-'+sha((state['connectionId']+state['subjects']['operator']+permission+('s3' if state.get('s3') else '')).encode())[:32]
         revoked="now()" if action.startswith('revoke-') else 'NULL'
         sql='BEGIN; SET LOCAL statement_timeout=\'5s\'; SELECT "Revision" FROM governance."MappingAuthorizationEpochs" WHERE "OrganizationId"=\'org-demo\' FOR UPDATE; '
         sql+='UPDATE governance."MappingAuthorizationGrants" SET "RevokedAtUtc"='+revoked+' WHERE "Id"=\''+ident+'\' AND "OrganizationId"=\'org-demo\'; '
@@ -677,7 +688,7 @@ def query_source_barrier():
         service.finish()
 
 
-def query_admission_watch(key):
+def query_admission_watch(key, revoke=False):
     """预先建立只读观察连接，在真实提交准入后立即输出ID；不插入或修改产品记录。"""
     import subprocess
     import re
@@ -697,6 +708,15 @@ def query_admission_watch(key):
         sql='DO $$ DECLARE found_id text; stop_at timestamptz := clock_timestamp()+interval \'10 seconds\'; BEGIN LOOP '
         sql+='SELECT "Id" INTO found_id FROM semantic_query."Queries" WHERE "IdempotencyKey"=\''+key+'\'; '
         sql+="IF found_id IS NOT NULL THEN RAISE NOTICE 'QUERY_ID:%',found_id; EXIT; END IF; IF clock_timestamp()>=stop_at THEN RAISE EXCEPTION 'QUERY_WATCH_TIMEOUT'; END IF; PERFORM pg_sleep(0.01); END LOOP; END $$; COMMIT;\n"
+        if revoke:
+            from workflow_execution import sha
+            state=json.loads((output/'runtime-fixture.json').read_text())
+            ident='m4-fixture-'+sha((state['connectionId']+state['subjects']['operator']+'data.query.execute'+('s3' if state.get('s3') else '')).encode())[:32]
+            sql += "BEGIN; SET LOCAL statement_timeout='2s'; SELECT \"Revision\" FROM governance.\"MappingAuthorizationEpochs\" WHERE \"OrganizationId\"='org-demo' FOR UPDATE; "
+            sql += 'UPDATE governance."MappingAuthorizationGrants" SET "RevokedAtUtc"=now() WHERE "Id"=\''+ident+'\'; '
+            sql += 'UPDATE governance."MappingAuthorizationEpochs" SET "Revision"="Revision"+1 WHERE "OrganizationId"=\'org-demo\'; '
+            sql += 'INSERT INTO governance.audit_records ("Id","OccurredAtUtc","Actor","Action","Resource","Outcome","TraceId","CorrelationId","OrganizationId","ScopeSiteIds","SiteId") '
+            sql += "VALUES (md5(random()::text||clock_timestamp()::text),now(),'synthetic-query-fixture','mapping.grant.change','"+ident+"','allowed','query-impl-01','query-impl-01','org-demo',ARRAY['site-a','site-b'],NULL); COMMIT;\n"
         stdout,stderr=service.process.communicate(sql.encode(),timeout=15);service.out.extend(stdout);service.err.extend(stderr)
         match=re.search(rb'QUERY_ID:(query-[0-9a-f]{32})',stderr)
         if service.process.returncode or match is None: raise ValueError('QUERY_WATCH_NO_ADMISSION')
@@ -804,14 +824,19 @@ def contract_build(project="OntologyPlatform.G2ContractTests"):
             running=subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{.State.Running}}',process['id']],timeout=15).strip()
             if running==b'true': raise ValueError('QUERY_API_STOP_REQUIRED_BEFORE_REFERENCE_BUILD')
     _, env = prepared()
-    inputs = {str(p.relative_to(ROOT)): sha(p.read_bytes()) for pattern in
-              ('backend/src/**/*.cs', 'backend/tests/' + project + '/**/*.cs')
-              for p in sorted(ROOT.glob(pattern)) if 'obj' not in p.parts and 'bin' not in p.parts}
+    inputs = {path:digest for path,digest in qualification_inputs().items()
+              if path.startswith('backend/') or '/' not in path}
     result = run(['/usr/bin/sandbox-exec', '-p', '(version 1) (allow default) (deny network*)',
                   '/usr/local/share/dotnet/dotnet', 'build', 'backend/tests/' + project,
                   '--no-restore', '--disable-build-servers', '-m:1', '-v:q'], ROOT,
                  task=TASK, run_id=RUN, stage='query-build-' + project, environment=env,
                  input_key=sha(encoded(inputs)), timeout=180)
+    if result.returncode == 0:
+        directory = ROOT/'backend/tests'/project/'bin/Debug/net10.0'
+        binding = dict(taskId=TASK, runId=RUN, project=project, inputs=inputs,
+                       binaries={str(path.relative_to(ROOT)):sha(path.read_bytes()) for path in sorted(directory.glob('*.dll'))},
+                       receipt=result.receipt)
+        (output/('build-binding-'+project+'.json')).write_text(json.dumps(binding,indent=2)+'\n')
     print(result.stdout.decode(errors='replace')[-8000:])
     print(json.dumps({'exitCode': result.returncode, 'receipt': result.receipt['commandId']}))
     return result.returncode
@@ -825,7 +850,7 @@ def contract_test():
     inputs = {p.name: sha(p.read_bytes()) for p in directory.glob('*.dll')}
     result = run(['/usr/bin/sandbox-exec', '-p', '(version 1) (allow default) (deny network*)',
                   '/usr/local/share/dotnet/dotnet', str(directory / 'OntologyPlatform.G2ContractTests.dll'),
-                  '--filter', 'FullyQualifiedName~G4QueryWireTests', '--timeout', '60s', '--zero-tests-policy', 'strict'], ROOT,
+                  '--filter', 'FullyQualifiedName~G4QueryWireTests|FullyQualifiedName~.WireContractTests', '--timeout', '60s', '--zero-tests-policy', 'strict'], ROOT,
                  task=TASK, run_id=RUN, stage='query-contract-tests', environment=env,
                  input_key=sha(encoded(inputs)), timeout=90)
     print(result.stdout.decode(errors='replace')[-8000:])
@@ -857,7 +882,8 @@ def unit_test(project, filter_name):
     from workflow_execution import run, sha, encoded
     if (project, filter_name) not in (('OntologyPlatform.QueryTests', 'G4QueryTests'),
                                     ('OntologyPlatform.SecurityTests', 'G4QueryAuthorizationTests'),
-                                    ('OntologyPlatform.ConnectionsTests', 'G4QuerySourceTests')):
+                                    ('OntologyPlatform.ConnectionsTests', 'G4QuerySourceTests'),
+                                    ('OntologyPlatform.AgentTests', 'G4QueryMcpTests')):
         raise ValueError('QUERY_TEST_SELECTION_INVALID')
     _, env = prepared()
     directory = ROOT / 'backend/tests' / project / 'bin/Debug/net10.0'
@@ -1212,10 +1238,214 @@ def persistence_test(source=False):
     return result.returncode if result is not None else 2
 
 
+def runtime_agent_test(binding_race=False):
+    """真实MAF只恢复当前精确Query；复用正式API只读挂载，不运行迁移或Sweep。"""
+    import subprocess
+    import uuid
+    from workflow_execution import run, sha, encoded
+    output=ROOT/'artifacts/workflow'/TASK/RUN
+    api=json.loads((output/'runtime-api-start.json').read_text())['id']
+    secondary=json.loads((output/'runtime-secondary-api.json').read_text())['process']['id']
+    prefix=['docker','--context','desktop-linux']
+    if subprocess.check_output([*prefix,'inspect','--format','{{.State.Running}}',secondary],timeout=15).strip()!=b'false':
+        raise ValueError('QUERY_RUNTIME_TEST_SECONDARY_SLOT_REQUIRED')
+    labels=json.loads(subprocess.check_output([*prefix,'inspect','--format','{{json .Config.Labels}}',api],timeout=15))
+    if labels.get('ontology.task-id')!=TASK or labels.get('ontology.run-id')!=RUN: raise ValueError('QUERY_RUNTIME_TEST_OWNER')
+    state=json.loads((output/'runtime-fixture.json').read_text())
+    directory=ROOT/'backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0'
+    image='mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55'
+    name='ontology-g4-m4-query-impl-01-maf-test-'+uuid.uuid4().hex[:12]
+    before=subprocess.run([*prefix,'inspect',name],capture_output=True,timeout=15)
+    if before.returncode==0 or ('no such object: '+name) not in before.stderr.decode().lower(): raise ValueError('QUERY_RUNTIME_TEST_BEFORE_UNKNOWN')
+    lifecycle=dict(taskId=TASK,runId=RUN,name=name,status='CREATING',beforeExists=False,readOnlyRuntimeFrom=api,queryId=state['latestQuery']['queryId'],bindingRace=binding_race)
+    path=output/(name+'.json');path.write_text(json.dumps(lifecycle,indent=2)+'\n')
+    cid=None
+    try:
+        created=runtime_command('query-maf-container-create',[*prefix,'create','--pull=never','--name',name,
+            '--network','ontology-g4-m4-query-impl-01_platform','--label','ontology.task-id='+TASK,'--label','ontology.run-id='+RUN,
+            '--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--user','501:20','--memory=768m','--cpus=0.5','--pids-limit=128',
+            '--tmpfs','/tmp:size=64m,mode=1777','--volumes-from',api+':ro','--mount','type=bind,src='+str(directory)+',dst=/tests,readonly',
+            '--workdir','/private/api','-e','ASPNETCORE_ENVIRONMENT=Development','-e','DOTNET_CLI_HOME=/tmp/dotnet','-e','DOTNET_EnableDiagnostics=0',
+            '-e','DOTNET_CLI_TELEMETRY_OPTOUT=1','-e','TESTINGPLATFORM_TELEMETRY_OPTOUT=1','-e','XDG_DATA_HOME=/tmp/data',
+            '-e','G4_QUERY_BINDING_RACE='+('1' if binding_race else '0'),
+            '-e','G4_QUERY_RUNTIME_ACTOR='+json.dumps(state['latestQuery']['actor'],separators=(',',':')),
+            '-e','G4_QUERY_RUNTIME_TEST='+TASK+':'+RUN,'-e','G4_QUERY_RUNTIME_QUERY_ID='+state['latestQuery']['queryId'],
+            image,'sh','-c',"""dotnet /runtime/QueryLoopback.dll & bridge=$!; trap 'kill "$bridge" 2>/dev/null || true' EXIT; dotnet /tests/OntologyPlatform.AgentTests.dll --filter FullyQualifiedName~G4QueryMafRuntimeTests --timeout 45s --zero-tests-policy strict --results-directory /tmp/TestResults"""])
+        cid=created.stdout.decode().strip();lifecycle.update(id=cid,status='CREATED');path.write_text(json.dumps(lifecycle,indent=2)+'\n')
+        runtime_command('query-maf-container-network',[*prefix,'network','connect','ontology-g4-m4-query-impl-01_edge',cid])
+        inputs={p.name:sha(p.read_bytes()) for p in directory.glob('*.dll')}
+        result=run([*prefix,'start','--attach',cid],ROOT,task=TASK,run_id=RUN,stage='query-real-maf-binding-runtime' if binding_race else 'query-real-maf-runtime',
+            input_key=sha(encoded([inputs,state['latestQuery']['queryId'],binding_race,sha(Path(__file__).read_bytes())])),timeout=60)
+        lifecycle['commandId']=result.receipt['commandId'];lifecycle['exitCode']=result.returncode
+        print(result.stdout.decode(errors='replace')[-5000:]);print(json.dumps({'exitCode':result.returncode,'receipt':result.receipt['commandId']}))
+        return result.returncode
+    finally:
+        try:
+            if cid:
+                actual=json.loads(subprocess.check_output([*prefix,'inspect',cid],timeout=15))[0]
+                if actual['Config']['Labels'].get('ontology.task-id')!=TASK or actual['Config']['Labels'].get('ontology.run-id')!=RUN or actual['State']['Running']:
+                    raise ValueError('QUERY_RUNTIME_TEST_CLEANUP_UNSAFE')
+                removed=runtime_command('query-maf-container-remove',[*prefix,'rm',cid])
+                after=subprocess.run([*prefix,'inspect',cid],capture_output=True,timeout=15)
+                if after.returncode==0 or ('no such object: '+cid) not in after.stderr.decode().lower(): raise ValueError('QUERY_RUNTIME_TEST_CLEANUP_UNVERIFIED')
+                lifecycle.update(status='REMOVED',afterExists=False,cleanupCommandId=removed.receipt['commandId'])
+            else: lifecycle.update(status='KEEP_UNVERIFIED',release='Confirm exact created container ownership and stopped state before removal')
+        finally:
+            if lifecycle['status'] not in ['REMOVED','KEEP_UNVERIFIED']: lifecycle.update(status='KEEP_UNVERIFIED',release='Confirm exact stopped container and retry removal')
+            path.write_text(json.dumps(lifecycle,indent=2)+'\n')
+
+
+def qualification_inputs():
+    """资格只绑定当前产品、测试与执行脚本；证据文档追加不会改变被测输入。"""
+    from workflow_execution import sha
+    import workflow
+    paths = set(workflow.git(ROOT, 'ls-files', '--cached', '--others', '--exclude-standard', '-z').decode().split('\0'))-{''}
+    return {path: sha((ROOT/path).read_bytes()) if (ROOT/path).is_file() else 'DELETED'
+            for path in sorted(paths) if not path.startswith('docs/') or path.startswith('docs/contracts/')
+            if path not in ['AGENTS.md', 'PLANS.md']}
+
+
+
+def attest(name):
+    """在实际执行前后封存输入和原件；失败也保存，不允许手填成功证明。"""
+    import uuid
+    from workflow_execution import sha
+    actions = {
+        'contract': contract_test,
+        'query-unit': lambda: unit_test('OntologyPlatform.QueryTests', 'G4QueryTests'),
+        'source-unit': lambda: unit_test('OntologyPlatform.ConnectionsTests', 'G4QuerySourceTests'),
+        'security-unit': lambda: unit_test('OntologyPlatform.SecurityTests', 'G4QueryAuthorizationTests'),
+        'agent-unit': lambda: unit_test('OntologyPlatform.AgentTests', 'G4QueryMcpTests'),
+        'persistence': persistence_test,
+        'source': lambda: persistence_test(True),
+        'maf-binding': lambda: runtime_agent_test(True),
+        **{mode: (lambda mode=mode: browser_test(mode)) for mode in
+           ['s1', 's1-reopen', 's2-basic', 's2-runtime', 's2-race', 's2-aba', 's2-capacity', 's2-inflight', 's2-connection', 's3', 'ui-s1', 'ui-s3']},
+        **{'web-'+stage: (lambda stage=stage: web_check(stage)) for stage in ['typecheck', 'lint', 'unit']},
+    }
+    if name not in actions: raise ValueError('QUERY_ATTEST_ACTION_INVALID')
+    output = ROOT/'artifacts/workflow'/TASK/RUN
+    commands = output.parent/'commands'/RUN
+    before = set(commands.glob('*/receipt.json'))
+    reports = set(output.glob('browser-*.json'))
+    inputs = qualification_inputs()
+    import workflow
+    keys = {gate:workflow.input_key(ROOT, gate) for gate in ['environment','contract','backend','web','interaction']}
+    row = dict(taskId=TASK, runId=RUN, name=name, inputs=inputs, inputKeys=keys, status='FAIL')
+    projects = {'contract':'G2ContractTests','query-unit':'QueryTests','source-unit':'ConnectionsTests',
+                'security-unit':'SecurityTests','agent-unit':'AgentTests','persistence':'QueryTests',
+                'source':'ConnectionsTests','maf-binding':'AgentTests'}
+    try:
+        if name in projects:
+            build = json.loads((output/('build-binding-OntologyPlatform.'+projects[name]+'.json')).read_text())
+            if not build['binaries'] or any(sha((ROOT/path).read_bytes()) != digest for group in ['inputs','binaries'] for path,digest in build[group].items()):
+                raise ValueError('QUERY_ATTEST_BUILD_DRIFT')
+            row['build'] = build
+        code = actions[name]()
+        row['exitCode'] = code
+        row['inputsUnchanged'] = inputs == qualification_inputs() and all(workflow.input_key(ROOT, gate) == key for gate,key in keys.items())
+        if code == 0 and row['inputsUnchanged']: row['status'] = 'PASS'
+        return code
+    finally:
+        row['commands'] = [dict(path=str(path.relative_to(ROOT)), sha256=sha(path.read_bytes())) for path in sorted(set(commands.glob('*/receipt.json'))-before)]
+        row['reports'] = [dict(path=str(path.relative_to(ROOT)), sha256=sha(path.read_bytes())) for path in sorted(set(output.glob('browser-*.json'))-reports) if json.loads(path.read_text()).get('mode') == name]
+        path = output/('qualification-'+name+'-'+uuid.uuid4().hex+'.json')
+        path.write_text(json.dumps(row, indent=2)+'\n')
+        print(json.dumps(dict(qualification=str(path.relative_to(ROOT)), status=row['status'])))
+
+
+def demand_qualification(row, name, inputs):
+    """先拒绝外任务、失败、漂移与零原件，随后才打开实际命令报告。"""
+    if row.get('taskId') != TASK or row.get('runId') != RUN or row.get('name') != name \
+        or row.get('status') != 'PASS' or row.get('exitCode') != 0 or row.get('inputsUnchanged') is not True \
+        or row.get('inputs') != inputs or not row.get('commands'):
+        raise ValueError('QUERY_QUALIFICATION_INVALID')
+
+
+def qualify(gate, input_key):
+    """当前输入重开实际非零测试和浏览器原件；缺适配证据保持阻断。"""
+    import workflow
+    from workflow_execution import ordinary, sha
+    from workflow_m2_evidence import mtp
+    if gate not in ['environment', 'contract', 'backend', 'web', 'interaction'] or workflow.input_key(ROOT, gate) != input_key:
+        raise ValueError('QUERY_QUALIFICATION_GATE_INVALID')
+    prepared()
+    structural(ROOT, TASK)
+    required = {
+        'environment': [], 'contract': ['contract'],
+        'backend': ['query-unit', 'source-unit', 'security-unit', 'agent-unit', 'persistence', 'source', 'maf-binding'],
+        'web': ['web-typecheck', 'web-lint', 'web-unit', 'ui-s1', 'ui-s3'],
+        'interaction': ['s1', 's1-reopen', 's2-basic', 's2-runtime', 's2-race', 's2-aba', 's2-capacity', 's2-inflight', 's2-connection', 's3'],
+    }[gate]
+    output = ROOT/'artifacts/workflow'/TASK/RUN
+    inputs = qualification_inputs()
+    originals = []
+    count = 1 if gate == 'environment' else 0
+    def read(reference):
+        path = ordinary(ROOT/reference['path'])
+        if not path.is_relative_to(ROOT/'artifacts/workflow'/TASK): raise ValueError('QUERY_QUALIFICATION_PATH')
+        raw = path.read_bytes()
+        if sha(raw) != reference['sha256']: raise ValueError('QUERY_QUALIFICATION_HASH')
+        originals.append(reference)
+        return raw
+    for name in required:
+        candidates = sorted(output.glob('qualification-'+name+'-*.json'), key=lambda path: path.stat().st_mtime)
+        if not candidates: raise ValueError('QUERY_QUALIFICATION_MISSING_'+name)
+        path = candidates[-1]
+        row = json.loads(read(dict(path=str(path.relative_to(ROOT)), sha256=sha(path.read_bytes()))))
+        demand_qualification(row, name, inputs)
+        if row.get('inputKeys', {}).get(gate) != input_key: raise ValueError('QUERY_QUALIFICATION_GATE_DRIFT')
+        test_count = 0
+        if 'build' in row:
+            from workflow_execution import encoded
+            build = row['build']; receipt = build['receipt']
+            original = ROOT/'artifacts/workflow'/TASK/'commands'/RUN/receipt['commandId']/'receipt.json'
+            if json.loads(original.read_text()) != receipt or receipt.get('exitCode') != 0 or receipt.get('stage') != 'query-build-'+build['project'] or receipt.get('inputFingerprint') != sha(encoded(build['inputs'])) or not build['binaries']:
+                raise ValueError('QUERY_QUALIFICATION_BUILD')
+            if any(inputs.get(path) != digest for path,digest in build['inputs'].items()): raise ValueError('QUERY_QUALIFICATION_BUILD_INPUT')
+            read(dict(path=str(original.relative_to(ROOT)),sha256=sha(original.read_bytes())))
+            for stream in ['stdout','stderr']: read(receipt[stream])
+        for reference in row['commands']:
+            command = json.loads(read(reference))
+            if command.get('taskId') != TASK or command.get('runId') != RUN or command.get('exitCode') != 0 or command.get('classification') != 'SUCCESS' or not command.get('started'):
+                raise ValueError('QUERY_QUALIFICATION_COMMAND')
+            raw = b''.join(read(command[key]) for key in ['stdout', 'stderr'])
+            if command['stage'].startswith(('query-unit-', 'query-contract-tests', 'query-real-')):
+                test_count += mtp(raw, 1)
+        if row['reports']:
+            for reference in row['reports']:
+                report = json.loads(read(reference))
+                if report.get('taskId') != TASK or report.get('runId') != RUN or report.get('mode') != name or report.get('status') != 'PASS' or report.get('inputsUnchanged') is not True or not report.get('http') or not report.get('checks') or any(check.get('status') != 'PASS' for check in report['checks']):
+                    raise ValueError('QUERY_QUALIFICATION_BROWSER')
+                test_count += len(report['checks'])
+        elif name.startswith('web-'):
+            stage = name.removeprefix('web-')
+            rows = [json.loads(path.read_text()) for path in output.glob('web-'+stage+'-*/result.json')]
+            matching = [web for web in rows if any(json.loads(read(ref))['commandId'] == web['commandId'] for ref in row['commands'])]
+            if len(matching) != 1 or matching[0]['exitCode'] != 0: raise ValueError('QUERY_QUALIFICATION_WEB')
+            web = matching[0]
+            if any(sha((ROOT/path).read_bytes()) != digest for path, digest in web['inputs'].items()): raise ValueError('QUERY_QUALIFICATION_WEB_INPUT')
+            if stage == 'unit':
+                from workflow_evidence import machine
+                test_count += machine(read(dict(path=web['report'], sha256=web['reportSha256'])), 'vitest-json')
+            else: test_count += 1
+        if test_count <= 0: raise ValueError('QUERY_QUALIFICATION_ZERO_TESTS')
+        count += test_count
+    return dict(taskId=TASK, runId=RUN, gate=gate, status='PASS', executionMode='REUSED', qualificationMode='FRESH', tests=count, skipped=0, originals=originals)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['platform-start', 'persistence-test', 'persistence-build', 'contract-build', 'contract-test', 'host-preflight', 'host-monitor'])
+    parser.add_argument('command', choices=['platform-start', 'persistence-test', 'persistence-build', 'contract-build', 'contract-test', 'host-preflight', 'host-monitor', 'qualify'])
+    parser.add_argument('--task', default=TASK)
+    parser.add_argument('--run-id', default=RUN)
+    parser.add_argument('--gate')
+    parser.add_argument('--input-key')
     args = parser.parse_args()
+    if args.task != TASK or args.run_id != RUN: raise ValueError('QUERY_CLI_IDENTITY')
+    if args.command == 'qualify':
+        print(json.dumps(qualify(args.gate, args.input_key)))
+        return 0
     try:
         return platform_start() if args.command == 'platform-start' else persistence_test() if args.command == 'persistence-test' else contract_build('OntologyPlatform.QueryTests') if args.command == 'persistence-build' else contract_build() if args.command == 'contract-build' else contract_test() if args.command == 'contract-test' else host(args.command.removeprefix('host-'))
     except (ValueError, OSError) as error:

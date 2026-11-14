@@ -159,7 +159,7 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
 
     /// <summary>真实字段授权与当前凭据均在源IO之前核验，平台连接不持长事务。</summary>
     public async Task<G4SourceQueryRead> ReadAsync(G4QueryBindingContext context, MappingAuthorizationProof proof,
-        string entityBindingId, G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken)
+        string entityBindingId, G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken, G4QueryBranchFilter? branch = null)
     {
         // 执行前严格比较实际投影，不接受少字段或其他来源的授权证明。
         var projection = DescribeProjection(context, entityBindingId);
@@ -187,7 +187,7 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
         if (secret is null || secret.ConnectionId != connection.Id || secret.UsedAtUtc is null || secret.Version != connection.SecretVersion
             || secret.OrganizationId != connection.OrganizationId || secret.Purpose != "POSTGRESQL_READONLY" || string.IsNullOrEmpty(secret.Owner)
             || !secret.SiteIds.Order(StringComparer.Ordinal).SequenceEqual(connection.SiteIds.Order(StringComparer.Ordinal))) throw Stale();
-        return await sourceReader.ReadAsync(config.Profile, cipher.Decrypt(secret), context, entityBindingId, query, deadlineAtUtc, cancellationToken);
+        return await sourceReader.ReadAsync(config.Profile, cipher.Decrypt(secret), context, entityBindingId, query, deadlineAtUtc, cancellationToken, branch);
     }
 
     /// <summary>发布ID相同不足以证明一致，完整绑定同时包含激活修订和当前连接身份。</summary>

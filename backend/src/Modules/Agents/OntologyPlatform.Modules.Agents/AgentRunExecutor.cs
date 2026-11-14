@@ -35,6 +35,38 @@ public sealed class AgentRunExecutor
         this.clock = clock;
     }
 
+    /// <summary>显式离线G4验收通过真实MAF循环调用同一工具边界，旧Run事件载荷保持不变。</summary>
+    public async Task<(string RunId, ModelContextProtocol.Protocol.CallToolResult[] Results)> RunG4DeterministicAsync(
+        ActorContext actor, string sessionReference, string toolName, IDictionary<string, System.Text.Json.JsonElement> arguments,
+        IG4QueryRunStore store, int attempts, CancellationToken token)
+    {
+        if (!runs.DeterministicEnabled || attempts is < 1 or > 4 || !toolName.StartsWith("g4_", StringComparison.Ordinal))
+            throw new SemanticOperationException(503, "provider_not_configured");
+        // 引用仅在循环开始创建一次，全部执行与恢复工具共享同一个绝对期限。
+        var reference = new G4QueryRunReference(clock.GetUtcNow());
+        // 传输和MAF都调用同一显式工具服务，实际Gateway不会被替换。
+        var tools = new SemanticMcpTools(gateway, store);
+        // 结果仅供当前受控调用使用，持久运行只保存QueryId及次数。
+        var results = new List<ModelContextProtocol.Protocol.CallToolResult>();
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(token);
+        budget.CancelAfter(reference.Deadline - clock.GetUtcNow());
+        // 参数由已授权服务器计划固定，模型函数Schema不含身份或查询文本。
+        var tool = AIFunctionFactory.Create(async (CancellationToken cancellation) =>
+        {
+            // 每次实际函数调用重新进入当前授权检查，包括历史恢复。
+            var result = await tools.CallAsync(actor, toolName, arguments, cancellation, sessionReference, reference);
+            results.Add(result);
+            return ((ModelContextProtocol.Protocol.TextContentBlock)result.Content.Single()).Text;
+        }, toolName, "执行当前已批准的G4只读计划");
+        using var client = new G4QueryRunClient(toolName, attempts);
+        // 实际MAF标准函数循环不是直接模拟委托调用。
+        var agent = new ChatClientAgent(client, instructions: "仅执行固定只读工具；这是合成离线验收。", tools: [tool]);
+        var session = await agent.CreateSessionAsync(budget.Token);
+        _ = await agent.RunAsync("执行固定G4工具验证", session, cancellationToken: budget.Token);
+        if (results.Count != attempts) throw new SemanticOperationException(503, "query_run_unavailable");
+        return (reference.RunId, results.ToArray());
+    }
+
     /// <summary>处理一个PG候选并运行真实MAF；无候选返回false。</summary>
     public async Task<bool> RunOneAsync(string workerId, CancellationToken stoppingToken)
     {

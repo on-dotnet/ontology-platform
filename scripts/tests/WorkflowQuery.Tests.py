@@ -20,6 +20,17 @@ TASK = 'G4-M4-QUERY-001'
 
 
 class QueryAdmissionTests(unittest.TestCase):
+    def test_qualification_rejects_stale_failed_foreign_and_zero_originals(self):
+        inputs = {'source.cs': 'current'}
+        row = dict(taskId=TASK, runId=query.RUN, name='contract', status='PASS', exitCode=0,
+                   inputsUnchanged=True, inputs=inputs, commands=[{'path': 'actual-receipt'}])
+        query.demand_qualification(row, 'contract', inputs)
+        for key, value in [('taskId', 'G4-M3-MAPPING-001'), ('runId', 'old'), ('name', 'other'),
+                           ('status', 'FAIL'), ('exitCode', 1), ('inputsUnchanged', False),
+                           ('inputs', {'source.cs': 'old'}), ('commands', [])]:
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError, 'QUERY_QUALIFICATION_INVALID'):
+                query.demand_qualification(dict(row, **{key: value}), 'contract', inputs)
+
     def test_persistence_database_cannot_target_live_or_foreign_database(self):
         self.assertEqual('m4_query_test_0123456789ab', query.test_database_name('0123456789ab'))
         for value in ('query', '', 'a' * 11, '0123456789ab;DROP DATABASE query', 'ABCDEF012345'):

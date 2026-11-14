@@ -5,6 +5,9 @@ namespace OntologyPlatform.Modules.SemanticQuery;
 /// <summary>单分支完成后的有界授权投影及真实读取回执，尚未成为对外响应。</summary>
 public sealed record G4QueryBranchProjection
 {
+    /// <summary>逐行已映射来源观察时间；未登记时使用实际读取观察时间，不填补事件时间。</summary>
+    public string[] ObservedTimes { get; init; } = [];
+
     /// <summary>只包含完整可验证的实体断言。</summary>
     public required G4EntityDatum[] Entities { get; init; }
 

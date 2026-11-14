@@ -24,7 +24,7 @@ if (mode === "serve") {
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: 15442,
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-capacity", "s2-connection", "replace-disabled-connection"].includes(mode)) await browserRun(mode);
+} else if (["provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -39,7 +39,7 @@ async function browserRun(mode) {
   const file = resolve(output, "browser-" + mode + "-" + Date.now() + ".json");
   const report = { taskId: task, runId, mode, startedAtUtc: new Date().toISOString(), checks: [], http: [], status: "FAIL" };
   const { execFileSync } = await import("node:child_process");
-  const binding = () => JSON.parse(execFileSync("python3", ["-B", "-c", 'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;print(json.dumps({"api":q.runtime_binding(),"web":q.web_binding() if "ui-s1" in sys.argv else None}))', mode], { cwd: root, timeout: 30000, encoding: "utf8" }));
+  const binding = () => JSON.parse(execFileSync("python3", ["-B", "-c", 'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;print(json.dumps({"api":q.runtime_binding(),"web":q.web_binding() if any(arg.startswith("ui-") for arg in sys.argv) else None}))', mode], { cwd: root, timeout: 30000, encoding: "utf8" }));
   const contexts = [];
   let browser, phase = "launch";
   const command = (expectedRevision = 0) => ({ commandId: randomUUID(), idempotencyKey: randomUUID(), expectedRevision, reason: "M4 isolated query prerequisite" });
@@ -82,6 +82,50 @@ async function browserRun(mode) {
     return actor;
   }
   async function save(state) { await writeFile(resolve(output, "runtime-fixture.json"), JSON.stringify(state, null, 2) + "\n"); }
+  async function heldQuery(actor, query, mutate, revoke = false) {
+    const { spawn, execFileSync } = await import("node:child_process");
+    const key = randomUUID();
+    const launch = (code, args = []) => {
+      const child = spawn("python3", ["-B", "-c", code, ...args], { cwd: root, stdio: ["ignore", "pipe", "pipe"] });
+      let buffer = "", readyResolve, readyReject, endResolve;
+      const events = [];
+      const ready = new Promise((yes, no) => { readyResolve = yes; readyReject = no; });
+      const done = new Promise(yes => { endResolve = yes; });
+      child.stdout.on("data", chunk => {
+        buffer += chunk.toString(); let end;
+        while ((end = buffer.indexOf("\n")) >= 0) {
+          const line = buffer.slice(0, end); buffer = buffer.slice(end + 1);
+          try { const event = JSON.parse(line); events.push(event); if (event.status === "READY") readyResolve(); }
+          catch { readyReject(new Error("race_fixture_protocol_invalid")); }
+        }
+      });
+      child.stderr.resume();
+      child.on("error", () => { readyReject(new Error("race_fixture_start_failed")); endResolve({ code: -1, events }); });
+      child.on("exit", code => { if (code !== 0) readyReject(new Error("race_fixture_failed")); endResolve({ code, events }); });
+      return { ready, done };
+    };
+    const prefix = 'import sys;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;';
+    const watcher = launch(prefix + 'q.query_admission_watch(sys.argv[1],sys.argv[2]=="true")', [key, String(revoke)]);
+    await watcher.ready;
+    const barrier = launch(prefix + 'q.query_source_barrier()');
+    await barrier.ready;
+    try {
+      const running = request({ ...actor, headers: { ...actor.headers, "Idempotency-Key": key } }, "POST", "/api/v1/data/semantic-queries", query, [403, 409, 503])
+        .then(value => ({ value }), error => ({ error }));
+      const watched = await watcher.done;
+      const admitted = watched.events.find(item => item.status === "FOUND");
+      check("inflight_real_admission", watched.code === 0 && /^query-[0-9a-f]{32}$/.test(admitted?.queryId ?? ""));
+      await mutate();
+      const response = await running;
+      if (response.error) throw response.error;
+      check("inflight_current_change_rejects_completion", [403, 409].includes(response.value.status));
+      const probe = JSON.parse(execFileSync("python3", ["-B", "-c", prefix+'import json;print(json.dumps(q.query_fixture_control("query-probe",sys.argv[1])))', key], { cwd: root, encoding: "utf8", timeout: 15000 }));
+      check("inflight_no_completed_record", JSON.parse(probe.output).status !== "COMPLETED");
+    } finally {
+      const released = await barrier.done;
+      check("inflight_barrier_released", released.code === 0 && released.events.some(item => item.status === "RELEASED"));
+    }
+  }
   try {
     report.inputBinding = binding();
     const { chromium } = require("@playwright/test");
@@ -94,6 +138,14 @@ async function browserRun(mode) {
     check("fixture_identity", state.taskId === task && state.runId === runId);
     state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
     await save(state);
+    if (mode === "s3-provision") {
+      if (!state.s3) {
+        const retired = { retiredAtUtc: new Date().toISOString(), reason: "s3_formal_vocabulary_and_two_table_mapping" };
+        for (const key of Object.keys(state)) if (/^(ontology|mapping|s2)/.test(key) || ["firstQuery", "latestQuery"].includes(key)) { retired[key] = state[key]; delete state[key]; }
+        state.retiredFixtures ??= []; state.retiredFixtures.push(retired); state.s3 = true; await save(state);
+      }
+      mode = "provision";
+    }
     if (mode === "replace-disabled-connection") {
       const disabled = await get(operator, `/api/v1/connections/${state.connectionId}`);
       check("replacement_only_for_terminal_disabled_connection", disabled.state === "DISABLED");
@@ -147,6 +199,92 @@ async function browserRun(mode) {
       check("completed_cancel_does_not_destroy_result", (await request(operator, "GET", `/api/v1/data/semantic-queries/${selected.queryId}/result`)).raw === selected.raw);
       state.s2Ambiguous = { queryId: ambiguous.queryId, query, candidates: ambiguous.data.candidates }; await save(state);
       report.status = "PASS"; report.scope = "S2_REAL_PG_AMBIGUITY_SELECTION_EMPTY_INJECTION_COMPLETED_CANCEL";
+    } else if (mode === "s3") {
+      const { execFileSync } = await import("node:child_process");
+      const capabilities = await get(operator, "/api/v1/capabilities");
+      const execute = async (id, overrides = {}) => {
+        const capability = capabilities.find(item => item.id === id);
+        check("s3_registered_" + id, Boolean(capability));
+        const query = { ...state.latestQuery.query, capabilityId: id, capabilityVersion: capability.version, ...overrides };
+        return request({ ...operator, headers: { ...operator.headers, "Idempotency-Key": randomUUID() } }, "POST", "/api/v1/data/semantic-queries", query);
+      };
+      phase = "s3_unknown_path_before_empty";
+      const pathCapability = capabilities.find(item => item.id === "g4_traverse_relationships");
+      await request({ ...operator, headers: { ...operator.headers, "Idempotency-Key": randomUUID() } }, "POST", "/api/v1/data/semantic-queries",
+        { ...state.latestQuery.query, capabilityId: pathCapability.id, capabilityVersion: pathCapability.version,
+          relationshipIris: ["urn:synthetic:mapping:unpublished"], filters: { entityExternalId: "missing-fixture-entity" } }, 422);
+      phase = "s3_real_observations";
+      const observations = await execute("g4_read_observations");
+      await writeFile(file.replace(".json", "-observations.json"), observations.raw);
+      const values = observations.data.data.filter(item => item.kind === "observation");
+      check("s3_exact_kelvin_conversion", values.some(item => item.value.lexical === "293.2750" && item.unit?.unitIri === "urn:synthetic:m3:K-v1"));
+      check("s3_registered_json_scalar", values.filter(item => item.propertyIri === "urn:synthetic:mapping:quality").every(item => item.value.type === "string" && item.value.lexical === "good"));
+      check("s3_source_observed_microseconds", values.some(item => item.observedAtUtc === "2026-11-14T00:00:01.123456Z"));
+      check("s3_independent_table_receipts", observations.data.subSources.length === 2 && new Set(observations.data.evidence.map(item => item.sourceReadReceiptId)).size === 2);
+      check("s3_observations_recover_exact_bytes", (await request(operator, "GET", `/api/v1/data/semantic-queries/${observations.queryId}/result`)).raw === observations.raw);
+      phase = "s3_real_relationships";
+      const edges = await execute("g4_traverse_relationships", { relationshipIris: ["urn:synthetic:mapping:hasReading"] });
+      await writeFile(file.replace(".json", "-relationships.json"), edges.raw);
+      check("s3_published_relationship_endpoints", edges.data.data.filter(item => item.kind === "relationship").length === 2 && edges.data.data.filter(item => item.kind === "relationship").every(item => item.source.identity.siteId === "site-a" && item.target.identity.siteId === "site-a" && item.evidenceIds.length === 2));
+      const rootLimited = await execute("g4_read_observations", { maxRows: 2 });
+      check("s3_root_observations_truncated_branch", rootLimited.data.status === "PARTIAL" && rootLimited.data.subSources[0].limited);
+      const rootEvidence = await request(operator, "GET", "/api/v1/data/source-evidence/" + encodeURIComponent(rootLimited.data.evidence[0].evidenceId));
+      check("s3_root_observations_truncated_receipt", rootEvidence.data.receipt.limited);
+      const limited = await execute("g4_read_observations", { maxRows: 2 });
+      check("s3_shared_row_budget_partial", limited.data.status === "PARTIAL" && limited.data.limited && limited.data.data.length === 2);
+      const control = action => execFileSync("python3", ["-B", "-c", 'import sys;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;import json;print(json.dumps(q.query_fixture_control(sys.argv[1])))', action], { cwd: root, timeout: 15000 });
+      phase = "s3_independent_source_denial";
+      control("readings-deny");
+      try {
+        const partial = await execute("g4_read_observations");
+        check("s3_denied_child_preserves_root_only", partial.data.status === "PARTIAL" && partial.data.data.every(item => item.kind === "entity" || item.identity.sourceNamespace === "query-fixture-v1") && partial.data.subSources.some(item => item.status === "FORBIDDEN"));
+      } finally { control("readings-allow"); }
+      phase = "s3_real_source_and_response_budgets";
+      try {
+        const added = JSON.parse(JSON.parse(control("readings-budget-add").toString()).output);
+        check("s3_source_has_101_rows", added.ownedRows === 99 && added.siteRows === 101);
+        const budgeted = await execute("g4_read_observations");
+        await writeFile(file.replace(".json", "-budget.json"), budgeted.raw);
+        check("s3_real_byte_budget_keeps_prefix", budgeted.data.status === "PARTIAL" && budgeted.data.limited && budgeted.data.data.length > 1 && budgeted.data.data.length < 100 && Buffer.byteLength(budgeted.raw) <= 1024 * 1024);
+        check("s3_real_read_limit_receipt", budgeted.data.subSources.some(item => item.limited && item.sourceReadReceiptId));
+        check("s3_budget_evidence_closed", budgeted.data.data.every(item => item.evidenceIds.every(id => budgeted.data.evidence.some(evidence => evidence.evidenceId === id))));
+        check("s3_budget_recovery_exact", (await request(operator, "GET", `/api/v1/data/semantic-queries/${budgeted.queryId}/result`)).raw === budgeted.raw);
+      } finally {
+        const removed = JSON.parse(JSON.parse(control("readings-budget-remove").toString()).output);
+        check("s3_owned_budget_rows_removed", removed.ownedRows === 0 && removed.siteRows === 2);
+      }
+      phase = "s3_real_mcp";
+      let rpcId = 0;
+      const rpc = async (method, params) => {
+        const reply = await request({ ...operator, headers: { ...operator.headers, Accept: "application/json, text/event-stream", "MCP-Protocol-Version": "2025-11-25" } }, "POST", "/api/v1/mcp", { jsonrpc: "2.0", id: ++rpcId, method, params });
+        const payload = reply.data ?? JSON.parse(reply.raw.split("\n").find(line => line.startsWith("data:")).slice(5));
+        check("s3_mcp_protocol_" + rpcId, !payload.error && payload.id === rpcId);
+        return payload.result;
+      };
+      await rpc("initialize", { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "m4-controlled-query", version: "1" } });
+      const listed = await rpc("tools/list", {});
+      check("s3_mcp_old_and_new_tool_closure", listed.tools.length === 7 && listed.tools.some(item => item.name === "describe_ontology") && listed.tools.some(item => item.name === "g4_query_result"));
+      const legacy = await rpc("tools/call", { name: "describe_ontology", arguments: { assetId: state.ontologyRelease.manifest.assetId, releaseId: state.ontologyRelease.manifest.releaseId, depth: 1, maxRows: 100, timeoutMs: 5000 } });
+      check("s3_legacy_mcp_executes_unchanged_contract", !legacy.isError && legacy.structuredContent.snapshot.releaseId === state.ontologyRelease.manifest.releaseId && !legacy.structuredContent.schemaVersion);
+      const restored = await rpc("tools/call", { name: "g4_query_result", arguments: { queryId: observations.queryId } });
+      check("s3_mcp_same_canonical_result", !restored.isError && restored.content.length === 1 && restored.content[0].text === observations.raw && JSON.stringify(restored.structuredContent) === JSON.stringify(JSON.parse(observations.raw)));
+      const capability = capabilities.find(item => item.id === "g4_traverse_relationships");
+      const called = await rpc("tools/call", { name: capability.id, arguments: { query: { ...state.latestQuery.query, capabilityId: capability.id, capabilityVersion: capability.version }, idempotencyKey: randomUUID(), selectionQueryId: null } });
+      check("s3_mcp_executes_shared_gateway", !called.isError && called.structuredContent.data.some(item => item.kind === "relationship"));
+      const rejected = await rpc("tools/call", { name: "g4_query_result", arguments: { queryId: observations.queryId, actor: operator.me.subjectId } });
+      check("s3_mcp_rejects_client_identity", rejected.isError === true && !rejected.structuredContent && rejected.content.length === 1 && rejected.content[0].text === "semantic_tool_rejected");
+      const duplicated = await request({ ...operator, headers: { ...operator.headers, Accept: "application/json, text/event-stream", "MCP-Protocol-Version": "2025-11-25" } }, "POST", "/api/v1/mcp",
+        '{"jsonrpc":"2.0","id":999,"method":"tools/call","params":{"name":"g4_query_result","arguments":{"queryId":"missing","queryId":' + JSON.stringify(observations.queryId) + '}}}');
+      const duplicatePayload = duplicated.data ?? JSON.parse(duplicated.raw.split("\n").find(line => line.startsWith("data:")).slice(5));
+      check("s3_mcp_raw_duplicate_rejected", duplicatePayload.result.isError === true && !duplicatePayload.result.structuredContent && duplicatePayload.result.content[0].text === "semantic_tool_rejected");
+      state.s3Results = { observationsQueryId: observations.queryId, relationshipsQueryId: edges.queryId }; await save(state);
+      report.status = "PASS"; report.scope = "S3_REAL_PG_OBSERVATIONS_RELATIONSHIPS_PARTIAL_MCP";
+    } else if (mode === "s2-inflight") {
+      const { execFileSync } = await import("node:child_process");
+      try { await heldQuery(operator, state.latestQuery.query, async () => {}, true); }
+      finally { execFileSync("python3", ["-B", "-c", 'import sys;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;q.query_fixture_control("restore-execute")'], { cwd: root, timeout: 15000 }); }
+      check("regrant_preserves_existing_result", createHash("sha256").update((await request(operator, "GET", `/api/v1/data/semantic-queries/${state.latestQuery.queryId}/result`)).raw).digest("hex") === state.latestQuery.resultHash);
+      report.status = "PASS"; report.scope = "S2_REAL_INFLIGHT_GRANT_REVOCATION";
     } else if (mode === "s2-aba") {
       const path = "/api/v1/mappings/" + state.mappingDraft.mappingId;
       const capability = (await get(operator, "/api/v1/capabilities")).find(item => item.id === "g4_resolve_entity");
@@ -362,6 +500,20 @@ async function browserRun(mode) {
         for (const name of ["ontology", "shapes", "vocabulary", "data"]) sources[name + "Turtle"] = await readFile(resolve(root, "samples/g2", name + ".ttl"), "utf8");
         sources.ontologyTurtle += '\n<urn:synthetic:mapping:Asset> a <http://www.w3.org/2002/07/owl#Class> .\n'
           + '<urn:synthetic:mapping:label> a <http://www.w3.org/2002/07/owl#DatatypeProperty>; <http://www.w3.org/2000/01/rdf-schema#domain> <urn:synthetic:mapping:Asset>; <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .\n';
+        if (state.s3) {
+          sources.vocabularyTurtle += "\n" + await readFile(resolve(root, "samples/g3-m3/units.ttl"), "utf8");
+          sources.ontologyTurtle += `
+@prefix m: <urn:synthetic:mapping:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+m:Reading a owl:Class .
+m:label2 a owl:DatatypeProperty; rdfs:domain m:Asset; rdfs:range xsd:string .
+m:quality a owl:DatatypeProperty; rdfs:domain m:Reading; rdfs:range xsd:string .
+<urn:synthetic:m3:reading> rdfs:domain m:Reading; rdfs:range xsd:decimal .
+m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
+`;
+        }
         state.ontologyDraft = await post(operator, "/api/v1/ontology-drafts", { name: "Synthetic M4 query vocabulary", scope: state.scope, sources, baseReleaseId: null, command: command() }); await save(state);
       }
       const draft = state.ontologyDraft;
@@ -447,6 +599,22 @@ async function browserRun(mode) {
           validFromFieldRef: field("valid_from"), validToFieldRef: field("valid_to"), timezonePolicy: { kind: "UTC", zoneId: null }, precision: "MICROSECOND" }],
         properties: [{ id: "label", entityBindingId: "asset", propertyIri: "urn:synthetic:mapping:label", fieldRef: field("label"), conversionId: null, unitSpecId: null, nullPolicy: "REJECT_NULL" }],
         relations: [], conversions: [], unitSpecs: [] };
+      if (state.s3) {
+      definition.properties.push({ id: "label2", entityBindingId: "asset", propertyIri: "urn:synthetic:mapping:label2", fieldRef: field("label"), conversionId: null, unitSpecId: null, nullPolicy: "REJECT_NULL" });
+      const ref = (table, name) => ({ datasetRef: { snapshotId: state.catalog.snapshotId, schema: "production", name: table, kind: "TABLE" },
+        name, ordinal: state.catalog.objects.find(item => item.name === table).fields.find(field => field.name === name).ordinal });
+      definition.entities.push({ id: "reading", entityClassIri: "urn:synthetic:mapping:Reading", datasetRef: ref("readings", "reading_id").datasetRef,
+        identitySpecId: "reading-identity", temporalSpecId: "reading-time", scopeFields: { organization: ref("readings", "organization_id"), site: ref("readings", "site_id") } });
+      definition.identitySpecs.push({ id: "reading-identity", organizationFieldRef: ref("readings", "organization_id"), siteFieldRef: ref("readings", "site_id"), sourceNamespace: "readings",
+        externalIdFieldRefs: [ref("readings", "reading_id")], validFromFieldRef: ref("readings", "valid_from"), validToFieldRef: ref("readings", "valid_to") });
+      definition.temporalSpecs.push({ id: "reading-time", eventTimeFieldRef: ref("readings", "valid_from"), observedAtFieldRef: ref("readings", "observed_at"),
+        validFromFieldRef: ref("readings", "valid_from"), validToFieldRef: ref("readings", "valid_to"), timezonePolicy: { kind: "UTC", zoneId: null }, precision: "MICROSECOND" });
+      definition.properties.push({ id: "temperature", entityBindingId: "reading", propertyIri: "urn:synthetic:m3:reading", fieldRef: ref("readings", "temperature"), conversionId: "kelvin", unitSpecId: "temperature-unit", nullPolicy: "REJECT_NULL" },
+        { id: "quality", entityBindingId: "reading", propertyIri: "urn:synthetic:mapping:quality", fieldRef: ref("readings", "attributes"), conversionId: "quality-json", unitSpecId: null, nullPolicy: "REJECT_NULL" });
+      definition.unitSpecs = [{ id: "temperature-unit", sourceUnitIri: "urn:synthetic:m3:C-v1", targetUnitIri: "urn:synthetic:m3:K-v1", sourceUnitFieldRef: ref("readings", "unit_code"), sourceUnitCode: "Cel", unitRegistryVersion: "1", evidenceKind: "SOURCE_FIELD" }];
+      definition.conversions = [{ id: "kelvin", registeredId: "celsius-to-kelvin", version: "1", parameters: {} }, { id: "quality-json", registeredId: "json-top-level-scalar", version: "1", parameters: { key: "quality", valueType: "STRING" } }];
+      definition.relations = [{ id: "readings", fromBindingId: "asset", toBindingId: "reading", predicateIri: "urn:synthetic:mapping:hasReading", cardinality: "ONE_TO_MANY", temporalJoinPolicy: "HALF_OPEN_OVERLAP", joinFieldPairs: [{ from: ref("assets", "asset_id"), to: ref("readings", "asset_id") }] }];
+      }
       if (!state.mappingDraft) {
         phase = "query_mapping_create";
         state.mappingCreate ??= { scope: state.scope, ontologyReleaseId: state.ontologyRelease.manifest.releaseId,
@@ -494,7 +662,7 @@ async function browserRun(mode) {
         state.mappingReceipt = await post(operator, `/api/v1/mapping-proposals/${proposal.proposalId}/activate`, state.mappingActivation, 200, `"proposal:${proposal.proposalRevision}"`); await save(state);
       }
       state.mappingRelease = await get(operator, "/api/v1/mapping-releases/" + state.mappingReceipt.mappingReleaseId); await save(state);
-      check("query_mapping_original", state.mappingRelease.manifest.mapping.entities.length === 1 && state.mappingRelease.manifest.mapping.entities[0].datasetRef.snapshotId === state.catalog.snapshotId);
+      check("query_mapping_original", state.mappingRelease.manifest.mapping.entities.length === (state.s3 ? 2 : 1) && state.mappingRelease.manifest.mapping.entities[0].datasetRef.snapshotId === state.catalog.snapshotId);
       report.status = "PASS"; report.scope = "M4_QUERY_FIXED_MAPPING_PREREQUISITE_ONLY";
     } else if (mode === "s1") {
       phase = "query_capability";
@@ -529,9 +697,36 @@ async function browserRun(mode) {
         && evidence.receipt.mappingReleaseId === state.mappingReceipt.mappingReleaseId && evidence.receipt.activationId === (state.mappingCurrentReceipt ?? state.mappingReceipt).activationId);
       check("no_internal_binding", !Object.hasOwn(evidence.receipt, "configHash") && !Object.hasOwn(evidence.receipt, "secretVersion") && !Object.hasOwn(evidence.receipt, "binding"));
       await writeFile(file.replace(".json", "-result.json"), first.raw, { flag: "wx" });
-      state.latestQuery = { queryId: first.queryId, query, idempotencyKey: key, resultHash: createHash("sha256").update(first.raw).digest("hex") };
+      state.latestQuery = { actor: { subjectId: operator.me.subjectId, organizationId: operator.me.scopes[0].organizationId,
+        siteIds: operator.me.scopes.map(scope => scope.siteId), roles: operator.me.roles.filter(role => ["platform.viewer", "platform.operator", "platform.auditor"].includes(role)), traceId: randomUUID().replaceAll("-", ""), correlationId: randomUUID().replaceAll("-", "") }, queryId: first.queryId, query, idempotencyKey: key, resultHash: createHash("sha256").update(first.raw).digest("hex") };
       state.firstQuery ??= state.latestQuery; await save(state);
       report.status = "PASS"; report.scope = "S1_REAL_OIDC_FORMAL_MAPPING_PG_QUERY_RESTORE_EVIDENCE_HTTP";
+    } else if (mode === "ui-s3") {
+      phase = "s3_ui_observations";
+      await operator.page.goto(origin + "/analysis");
+      await operator.page.getByRole("button", { name: "查询业务源", exact: true }).waitFor();
+      await operator.page.getByLabel("源查询本体资产", { exact: true }).fill(state.ontologyRelease.manifest.assetId);
+      await operator.page.getByLabel("源查询本体发布", { exact: true }).fill(state.ontologyRelease.manifest.releaseId);
+      await operator.page.getByLabel("源查询映射发布", { exact: true }).fill(state.mappingReceipt.mappingReleaseId);
+      await operator.page.getByLabel("源查询外部号", { exact: true }).fill("asset-1");
+      await operator.page.getByLabel("源查询厂区", { exact: true }).selectOption("site-a");
+      for (const capability of ["g4_read_observations", "g4_traverse_relationships"]) {
+        await operator.page.getByLabel("业务源查询能力", { exact: true }).selectOption(capability);
+        await operator.page.getByLabel("源查询关系路径", { exact: true }).fill("urn:synthetic:mapping:hasReading");
+        const pending = operator.page.waitForResponse(response => response.url() === origin + "/api/v1/data/semantic-queries" && response.request().method() === "POST");
+        await operator.page.getByRole("button", { name: "查询业务源", exact: true }).click();
+        const response = await pending, result = await response.json();
+        check("s3_ui_actual_" + capability, response.status() === 200 && result.status === "FOUND" && result.data.some(item => item.kind === (capability === "g4_read_observations" ? "observation" : "relationship")));
+        const region = operator.page.getByRole("region", { name: "业务源查询结果", exact: true });
+        await region.getByRole("heading", { name: "FOUND · 找到可信结果", exact: true }).waitFor();
+        check("s3_ui_renders_" + capability, (await region.innerText()).includes(capability === "g4_read_observations" ? "293.2750" : "hasReading"));
+        await region.screenshot({ path: file.replace(".json", "-" + capability + ".png") });
+      }
+      await operator.page.setViewportSize({ width: 390, height: 844 });
+      await operator.page.waitForFunction(() => document.querySelector("#platform-navigation")?.getBoundingClientRect().right <= 0);
+      check("s3_mobile_no_overflow", await operator.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+      await operator.page.getByRole("region", { name: "业务源查询", exact: true }).screenshot({ path: file.replace(".json", "-mobile.png") });
+      report.status = "PASS"; report.scope = "S3_REAL_BROWSER_OBSERVATIONS_RELATIONSHIPS";
     } else if (mode === "ui-s1") {
       phase = "query_ui_execute";
       await operator.page.goto(origin + "/analysis");

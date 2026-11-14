@@ -19,6 +19,14 @@ public sealed class CapabilityRegistry
         capabilities = configuration?.GetValue<bool>("G4:QueryEnabled") == true ? [.. Create(), .. CreateG4()] : Create();
     }
 
+    /// <summary>仅暴露三个已冻结G4传输组件，保持生成文档为唯一Schema来源。</summary>
+    public JsonElement G4Schema(string name)
+    {
+        if (!capabilities.Any(item => item.Id == "g4_resolve_entity") || name is not ("G4SemanticQuery" or "G4QueryResultV1" or "G4QueryView"))
+            throw new SemanticOperationException(422, "capability_not_supported");
+        return ComponentSchema("OntologyPlatform.G4OpenApiSchemas.json", name);
+    }
+
     /// <summary>返回防止调用方修改内部数组的能力副本。</summary>
     public SemanticCapability[] Read() => JsonSerializer.Deserialize<SemanticCapability[]>(JsonSerializer.Serialize(capabilities))!;
 
@@ -37,13 +45,16 @@ public sealed class CapabilityRegistry
         // 结果联合必须保留全部判别分支，即使当前能力只产生实体分支。
         var output = ComponentSchema("OntologyPlatform.G4OpenApiSchemas.json", "G4QueryResultV1");
         // 计划身份显式描述必需分支，不以运行时任意选表代替登记。
-        var executor = "g4-query/g4_resolve_entity/s1-single-entity-pg-v1";
-        // 规范hash涵盖完整嵌套输入和输出而非简写能力展示字段。
-        var version = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(new { input, output, executor, requiredBranches = new[] { "single-mapped-entity" } }));
-        return [new SemanticCapability
+        return new[] { "g4_resolve_entity", "g4_read_observations", "g4_traverse_relationships" }.Select(id =>
         {
-            Id = "g4_resolve_entity", Version = version, ExecutorId = executor, Policy = "data.query.execute",
-            Meaning = "按正式映射定位PostgreSQL实体并保留精确来源",
+        // 三能力共享唯一根和发布关系分支计划，版本随实际执行语义推进。
+        var executor = "g4-query/" + id + "/s3-root-published-relations-pg-v2";
+        // 规范hash涵盖完整嵌套输入和输出而非简写能力展示字段。
+        var version = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(new { input, output, executor, requiredBranches = new[] { "unique-mapping-root", "published-directed-relations-within-depth" } }));
+        return new SemanticCapability
+        {
+            Id = id, Version = version, ExecutorId = executor, Policy = "data.query.execute",
+            Meaning = id == "g4_resolve_entity" ? "定位业务实体" : id == "g4_read_observations" ? "读取精确观测" : "追溯已发布关系",
             InputSchema = new CapabilityInputSchema { SchemaVersion = 1, Type = "object", AdditionalProperties = false,
                 Required = ["assetId", "ontologyReleaseId", "mappingReleaseIds", "capabilityId", "capabilityVersion", "relationshipIris", "depth", "maxRows", "timeoutMs", "filters"],
                 Properties = [Parameter("assetId", "string", "正式本体资产"), Parameter("ontologyReleaseId", "string", "固定本体发布"),
@@ -52,7 +63,8 @@ public sealed class CapabilityRegistry
                     Parameter("depth", "integer", "深度", 1, 5), Parameter("maxRows", "integer", "返回项数", 2, 100),
                     Parameter("timeoutMs", "integer", "总毫秒预算", 100, 5000), Parameter("filters", "object", "封闭身份与时间过滤")] },
             OutputSchema = output, Budgets = new CapabilityBudget { MaxDepth = 5, MaxRows = 100, TimeoutMs = 5000, MaxToolCalls = 3 }
-        }];
+        };
+        }).ToArray();
     }
 
     /// <summary>完整输入字段的有限描述保持服务端约束，不接收客户端actor。</summary>

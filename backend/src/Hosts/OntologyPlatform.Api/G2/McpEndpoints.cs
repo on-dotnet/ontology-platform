@@ -29,7 +29,9 @@ public static class McpEndpoints
                 var actor = G2Authorization.CreateActor(context);
                 if (!(await context.RequestServices.GetRequiredService<IAuthorizationService>().AuthorizeAsync(context.User, null, "semantic.read")).Succeeded)
                     throw new SemanticOperationException(403, "authorization_denied");
-                return await context.RequestServices.GetRequiredService<SemanticMcpTools>().CallAsync(actor, request.Params!.Name, request.Params.Arguments, token);
+                if (request.Params!.Name.StartsWith("g4_", StringComparison.Ordinal) && context.Items["G4RawPayloadRejected"] is true)
+                    return new CallToolResult { IsError = true, Content = [new TextContentBlock { Text = "semantic_tool_rejected" }] };
+                return await context.RequestServices.GetRequiredService<SemanticMcpTools>().CallAsync(actor, request.Params!.Name, request.Params.Arguments, token, context.Items["G4SessionReference"] as string);
             });
         return services;
     }
@@ -66,6 +68,26 @@ public static class McpEndpoints
         internal NativeTransportResult(RequestDelegate transport) => this.transport = transport;
 
         /// <summary>通过安全边界后才允许SDK发送响应。</summary>
-        public Task ExecuteAsync(HttpContext httpContext) => transport(httpContext);
+        public async Task ExecuteAsync(HttpContext httpContext)
+        {
+            if (HttpMethods.IsPost(httpContext.Request.Method))
+            {
+                // 只缓存有界前缀；SDK继续读取原流，旧G2工具不应用G4限制。
+                httpContext.Request.EnableBuffering();
+                // 多一个字节用于精确判断超限，不能静默截断成可接受输入。
+                var buffer = new byte[65537];
+                // 有界读取保留原始重复键，随后把流重置交回原SDK。
+                var length = 0;
+                while (length < buffer.Length)
+                {
+                    var read = await httpContext.Request.Body.ReadAsync(buffer.AsMemory(length), httpContext.RequestAborted);
+                    if (read == 0) break;
+                    length += read;
+                }
+                httpContext.Request.Body.Position = 0;
+                httpContext.Items["G4RawPayloadRejected"] = SemanticMcpTools.RawG4PayloadRejected(buffer.AsMemory(0, length));
+            }
+            await transport(httpContext);
+        }
     }
 }

@@ -58,10 +58,10 @@ public sealed class G4QueryExecution
         // 以实际映射scope交集捕获当前会话，初始范围不成为数据授权。
         var session = await authority.CaptureSessionAsync(actor, sessionReference, context.Scope, token);
         if (session.AuthorizationEpoch != initial.AuthorizationEpoch) throw new SemanticOperationException(403, "query_forbidden");
-        if (query.CapabilityId != "g4_resolve_entity" || context.Manifest.Mapping.Entities.Length != 1)
+        if (query.CapabilityId is not ("g4_resolve_entity" or "g4_read_observations" or "g4_traverse_relationships"))
             throw new SemanticOperationException(422, "capability_not_supported");
         // S1仅一个实体分支，后续关系分支必须在同登记器中明确升级执行器版本。
-        var entity = context.Manifest.Mapping.Entities[0];
+        var entity = RootBinding(context.Manifest.Mapping);
         if (!ontology.Description.ClassIris.Contains(entity.EntityClassIri, StringComparer.Ordinal)
             || context.Manifest.Mapping.Properties.Any(property => !ontology.Description.DatatypePropertyIris.Contains(property.PropertyIri, StringComparer.Ordinal)))
             throw new SemanticOperationException(422, "query_path_invalid");
@@ -75,7 +75,7 @@ public sealed class G4QueryExecution
         catch (SemanticOperationException error) when (error.Status == 403) { proofs = []; }
         // 拒绝分支保留计划投影供将来当前授权恢复，不保存原始源行。
         var state = new G4QueryState { Binding = context.Binding, Scope = context.Scope,
-            Projections = proofs.Length == 0 ? [] : [projection], RequiredProjections = [projection] };
+            Projections = proofs.Length == 0 ? [] : [projection], RequiredProjections = context.Manifest.Mapping.Entities.Select(item => source.DescribeProjection(context, item.Id)).ToArray() };
         // 随机实例租约只属于本次执行，不由调用方传入owner。
         var admission = await store.AdmitAsync(session, proofs, query, state, key, selectionQueryId,
             "execution-" + Guid.NewGuid().ToString("N"), deadline, token);
@@ -111,7 +111,7 @@ public sealed class G4QueryExecution
                             Status = selected.Length == 0 && !read.Limited && !read.Indeterminate ? "EMPTY" : "SUCCESS",
                             SourceRecordRef = selectedEvidence.Length == 1 ? selectedEvidence[0].SourceRecordRef : null,
                             ResultHash = G4QueryCanonical.Hash(G4QueryCanonical.Projection(selected.Cast<G4QueryDatum>().ToArray())) };
-                        projected = new G4QueryBranchProjection { Entities = selected, Evidence = selectedEvidence,
+                        projected = new G4QueryBranchProjection { ObservedTimes = projected.Entities.Select((item, index) => (item, index)).Where(pair => selected.Contains(pair.item)).Select(pair => projected.ObservedTimes[pair.index]).ToArray(), Entities = selected, Evidence = selectedEvidence,
                             Receipt = new G4QueryStoredReceipt { Receipt = selectedReceipt, ReceiptHash = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(selectedReceipt)) } };
                     }
                     branchStatus = projected.Receipt.Receipt.Status;
@@ -132,10 +132,25 @@ public sealed class G4QueryExecution
             }
             // 聚合不把运行状态或空数组误判成EMPTY。
             var result = Aggregate(actor, query, context, projected, read, branchStatus);
+            // 所有能力共享准入/版本/租约/最终事务，扩展只增加固定的源分支。
+            var receipts = projected is null ? new List<G4QueryStoredReceipt>() : new List<G4QueryStoredReceipt> { projected.Receipt };
+            if (query.CapabilityId != "g4_resolve_entity" && result.Status is "FOUND" or "PARTIAL" && projected is not null && read is { Limited: false, Indeterminate: false })
+            {
+                // 已完整定位的根是后续分支失败时唯一可信前缀。
+                var expanded = await ExpandAsync(actor, session, query, context, admission.Record.Id, result, projected, read, proofs, deadline, execution.Token);
+                result = expanded.Result;
+                proofs = expanded.Proofs;
+                state = state with { Projections = expanded.Projections };
+                receipts = expanded.Receipts.ToList();
+            }
+            // 规范转义也会扩大合法标量；持久化前保留有来源闭包的完整项前缀。
+            var bounded = BoundResponse(result, receipts.ToArray());
+            result = bounded.Result;
+            receipts = bounded.Receipts.ToList();
             await observation.CancelAsync();
             try { await watching; } catch (OperationCanceledException) when (observation.IsCancellationRequested) { }
             await store.CompleteAsync(admission.Record, session, proofs, query, state, result,
-                projected is null ? [] : [projected.Receipt], execution.Token);
+                receipts.ToArray(), execution.Token);
             if (result.Status is "UNAUTHORIZED" or "UNAVAILABLE")
             {
                 // 无数据结果也重新检查当前会话；本次只披露先前已验证可见的snapshot。
@@ -144,18 +159,8 @@ public sealed class G4QueryExecution
                 var completed = await store.FindOwnedAsync(actor, admission.Record.Id, execution.Token);
                 return new G4QueryDelivery { View = G4QueryResultStore.View(completed), ResultBytes = G4QueryCanonical.Result(result) };
             }
-            // 刚才的真实源读取已经核验当前ACL；回传短事务再次固定同一连接版本。
-            var access = new G4QueryConnectionAccess { ConnectionId = context.Binding.ConnectionId,
-                Revision = long.Parse(context.Binding.ConnectionRevision, CultureInfo.InvariantCulture), ConfigHash = context.Binding.ConfigHash,
-                SecretVersion = long.Parse(context.Binding.SecretVersion, CultureInfo.InvariantCulture), Scope = context.Scope, Projection = projection,
-                CheckedAtUtc = read!.CompletedAtUtc };
-            // 结果披露许可独立于execute，不能因为创建成功就直接回显缓存字节。
-            var currentSession = await authority.CaptureSessionAsync(actor, sessionReference, context.Scope, execution.Token);
-            // 当前execute和result.read分别捕获，撤权先提交即禁止披露。
-            var currentExecute = await CaptureAsync(currentSession, context.Binding.ConnectionId, projection, "data.query.execute", execution.Token);
-            // 查询读取许可仍须覆盖本次实际全部投影字段。
-            var currentRead = await CaptureAsync(currentSession, context.Binding.ConnectionId, projection, "data.query.result.read", execution.Token);
-            return await store.ReadAuthorizedAsync(admission.Record.Id, currentSession, [currentExecute], [currentRead], [], [access], true, false, execution.Token);
+            // 返回和历史恢复复用当前完整授权及来源ACL，不因首次执行绕开result.read。
+            return await ReadAsync(actor, sessionReference, admission.Record.Id, true, false, deadline, verifyRoot, execution.Token);
         }
         finally
         {
@@ -277,6 +282,221 @@ public sealed class G4QueryExecution
             throw new SemanticOperationException(422, "selection_invalid");
     }
 
+    /// <summary>固定有界关系计划串行读取独立源事务；根断言是失败时可保留的可信前缀。</summary>
+    private async Task<(G4QueryResultV1 Result, MappingAuthorizationProof[] Proofs, G4QueryProjection[] Projections, G4QueryStoredReceipt[] Receipts)> ExpandAsync(
+        ActorContext actor, MappingAuthorizationProof session, G4SemanticQuery query, G4QueryBindingContext context, string queryId,
+        G4QueryResultV1 initial, G4QueryBranchProjection root, G4SourceQueryRead rootRead, MappingAuthorizationProof[] rootProofs,
+        DateTimeOffset deadline, CancellationToken token)
+    {
+        // 实际响应最多100个完整断言，已有根身份优先保留。
+        var data = initial.Data.ToList();
+        // 所有来源均来自真实独立事务，不把关系分支伪装为第二连接。
+        var evidence = initial.Evidence.ToList();
+        // 成功分支保留独立回执，未执行或失败分支只保留安全摘要。
+        var branches = initial.SubSources.ToList();
+        // 回执hash与总结果独立，始终覆盖本分支实际授权投影。
+        var receipts = new List<G4QueryStoredReceipt> { root.Receipt };
+        // 每个实际成功输出的完整字段投影独立授权。
+        var proofs = rootProofs.ToList();
+        // 历史恢复只验证实际保存数据涉及的字段，不重读失败分支的业务值。
+        var projections = new List<G4QueryProjection> { source.DescribeProjection(context, rootRead.EntityBindingId) };
+        // 全查询行预算统一累计，任何分支不得重新获得100个输出槽位。
+        var limited = initial.Limited;
+        // 父前沿也占用全查询内存，所有层不能各自重新获得四MiB。
+        var intermediateBytes = G4QueryCanonical.Serialize(rootRead.Rows).Length;
+        // 候选边预算跨关系与层累计，不能每个分支重置为一千。
+        long candidateEdges = 0;
+        // 固定关系IRI必须来自正式发布；不存在的路径不能被当成空结果。
+        var relations = context.Manifest.Mapping.Relations.Where(item => query.RelationshipIris.Length == 0 || query.RelationshipIris.Contains(item.PredicateIri, StringComparer.Ordinal)).OrderBy(item => item.Id, StringComparer.Ordinal).ToArray();
+        if (query.RelationshipIris.Any(iri => !relations.Any(item => item.PredicateIri == iri))) throw new SemanticOperationException(422, "query_path_invalid");
+        // 多次观测可共享身份，但根定位仍必须已完整且唯一。
+        if (query.CapabilityId == "g4_read_observations")
+        {
+            // 根本身的登记属性也可以产生精确观测，不需要虚构下游关系。
+            var observations = Observations(root);
+            data.AddRange(G4QueryCanonical.OrderData(observations).Take(query.MaxRows - data.Count));
+            // 根分支自身丢弃观测时，摘要与回执必须共同声明截断。
+            var rootLimited = observations.Length > query.MaxRows - initial.Data.Length;
+            limited |= rootLimited;
+            branches[0] = branches[0] with { Limited = branches[0].Limited || rootLimited };
+            // 根回执投影同时包括实际返回的根与根观测。
+            var updated = root.Receipt.Receipt with { Limited = root.Receipt.Receipt.Limited || rootLimited, RowCount = data.Count, SourceRecordRef = data.Count == 1 ? root.Receipt.Receipt.SourceRecordRef : null,
+                ResultHash = G4QueryCanonical.Hash(G4QueryCanonical.Projection(data.ToArray())) };
+            receipts[0] = new G4QueryStoredReceipt { Receipt = updated, ReceiptHash = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(updated)) };
+        }
+        // 选择IRI只能缩小可信根行；绝不把候选的第一行当选中行。
+        var selectedRows = rootRead.Rows.Where(row => ProjectEntities(queryId, actor.TraceId, context, rootRead with { Rows = [row] }).Entities[0].EntityIri == root.Entities[0].EntityIri).ToArray();
+        // 每层前沿携带真实父行和对应证据，连接只按已登记键执行。
+        var queue = new Queue<(G4SourceQueryRead Read, G4QueryBranchProjection Projected, int Depth)>();
+        queue.Enqueue((rootRead with { Rows = selectedRows }, root, 0));
+        while (queue.TryDequeue(out var parent))
+        {
+            if (parent.Depth >= query.Depth) continue;
+            foreach (var relation in relations.Where(item => item.FromBindingId == parent.Read.EntityBindingId))
+            {
+                token.ThrowIfCancellationRequested();
+                // 值、时间和源IO都有一个共同绝对期限，剩余不足不发起新事务。
+                var status = "INDETERMINATE";
+                if (data.Count >= query.MaxRows || deadline - clock.GetUtcNow() <= TimeSpan.FromMilliseconds(500))
+                {
+                    limited |= data.Count >= query.MaxRows;
+                }
+                else
+                {
+                    try
+                    {
+                        // 完整目标投影包含关系键、scope、身份、有效时间、属性及单位。
+                        var projection = source.DescribeProjection(context, relation.ToBindingId);
+                        // 单条grant必须覆盖该分支，不合并多个不完整许可。
+                        var proof = await CaptureAsync(session, context.Binding.ConnectionId, projection, "data.query.execute", token);
+                        // 根过滤不传给目标；关系谓词只由已授权父行与正式映射构造。
+                        var child = await source.ReadAsync(context, proof, relation.ToBindingId, query with { Filters = query.Filters with { EntityExternalId = null, EntityIri = null } }, deadline, token,
+                            new G4QueryBranchFilter { RelationId = relation.Id, Parents = parent.Read });
+                        intermediateBytes += G4QueryCanonical.Serialize(child.Rows).Length;
+                        candidateEdges += (long)parent.Read.Rows.Length * child.Rows.Length;
+                        if (intermediateBytes > 4 * 1024 * 1024 || candidateEdges > 1000)
+                        {
+                            limited = true;
+                            throw new SemanticOperationException(503, "query_source_budget_exhausted");
+                        }
+                        if (child.Indeterminate) throw new SemanticOperationException(503, "query_source_indeterminate");
+                        // 同主体多观测保留逐行证据；实体定位的唯一性规则不套到观测集合。
+                        var projected = ProjectEntities(queryId, actor.TraceId, context, child, observations: true);
+                        // 当前关系支撑的完整输出项先在有界内存中形成，再按全查询预算截断。
+                        var output = new List<G4QueryDatum>();
+                        if (query.CapabilityId == "g4_read_observations") output.AddRange(Observations(projected));
+                        else
+                        {
+                            for (var childIndex = 0; childIndex < projected.Entities.Length; childIndex++)
+                            {
+                                for (var parentIndex = 0; parentIndex < parent.Projected.Entities.Length; parentIndex++)
+                                {
+                                    if (output.Count >= 101) break;
+                                    // 两端scope、登记键及真实半开有效时间必须同时匹配。
+                                    var edge = Relationship(relation, parent.Projected.Entities[parentIndex], projected.Entities[childIndex],
+                                        parent.Read.Rows[parentIndex], child.Rows[childIndex]);
+                                    if (edge is not null) output.Add(edge);
+                                }
+                            }
+                        }
+                        // 规范排序与输出一致，时间、身份、记录证据保持可重复定位。
+                        var take = Math.Min(query.MaxRows - data.Count, output.Count);
+                        var accepted = G4QueryCanonical.OrderData(output).Take(take).ToArray();
+                        limited |= child.Limited || take < output.Count;
+                        // 没有属性或匹配边时仍保留真实已完成读取的EMPTY回执。
+                        var receipt = projected.Receipt.Receipt with { Status = accepted.Length == 0 && !child.Limited ? "EMPTY" : "SUCCESS", RowCount = accepted.Length,
+                            SourceRecordRef = accepted.Length == 1 ? projected.Receipt.Receipt.SourceRecordRef : null,
+                            Limited = child.Limited || take < output.Count, ResultHash = G4QueryCanonical.Hash(G4QueryCanonical.Projection(accepted)) };
+                        receipts.Add(new G4QueryStoredReceipt { Receipt = receipt, ReceiptHash = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(receipt)) });
+                        branches.Add(new G4QuerySubSource { ConnectionId = context.Binding.ConnectionId, Status = receipt.Status, ObservedAtUtc = receipt.ReadCompletedAtUtc,
+                            WatermarkKind = receipt.WatermarkKind, SourceReadReceiptId = receipt.ReceiptId, Limited = receipt.Limited });
+                        data.AddRange(accepted);
+                        evidence.AddRange(projected.Evidence);
+                        if (!projections.Any(item => SameProjection(item, projection))) { projections.Add(projection); proofs.Add(proof); }
+                        if (child.Rows.Length > 0 && !child.Limited) queue.Enqueue((child, projected, parent.Depth + 1));
+                        continue;
+                    }
+                    catch (SemanticOperationException error) when (error.Status is 403 or 503)
+                    {
+                        status = error.Status == 403 ? "FORBIDDEN" : error.Code == "query_source_timeout" ? "TIMEOUT" : "UNAVAILABLE";
+                    }
+                }
+                // 同连接的未读取失败只保留一个固定摘要，不伪造读取回执。
+                if (!branches.Any(item => item.SourceReadReceiptId is null)) branches.Add(new G4QuerySubSource
+                { ConnectionId = context.Binding.ConnectionId, Status = status, ObservedAtUtc = Utc(clock.GetUtcNow()), WatermarkKind = "UNKNOWN", SourceReadReceiptId = null, Limited = false });
+            }
+        }
+        // 只保留实际输出引用的来源；关系边递归包含两端来源。
+        var ids = data.SelectMany(item => item.EvidenceIds).ToHashSet(StringComparer.Ordinal);
+        var visible = evidence.Where(item => ids.Contains(item.EvidenceId)).DistinctBy(item => item.EvidenceId).ToArray();
+        // 已有根断言时，失败、截断或来源精度降低统一为PARTIAL。
+        var partial = limited || branches.Any(item => item.Status is not ("SUCCESS" or "EMPTY")) || visible.Any(item => item.Precision is not ("ROW_KEY" or "RECORD"));
+        return (initial with { Data = data.ToArray(), Evidence = visible, SubSources = branches.ToArray(), Limited = limited,
+            Status = partial ? "PARTIAL" : "FOUND", ObservedAtUtc = Utc(clock.GetUtcNow()), Diagnostics = partial
+                ? [new G4QueryDiagnostic { Code = "query_partial", Severity = "warning", Message = "部分来源未完整返回，已保留可验证结果。", FocusNode = null, Path = null }] : [] },
+            proofs.ToArray(), projections.ToArray(), receipts.ToArray());
+    }
+
+    /// <summary>以真实规范UTF8大小约束响应，预算不足只移除完整项并重算相关回执。</summary>
+    public static (G4QueryResultV1 Result, G4QueryStoredReceipt[] Receipts) BoundResponse(G4QueryResultV1 result, G4QueryStoredReceipt[] receipts)
+    {
+        if (G4QueryCanonical.Serialize(result).Length <= G4QueryRules.MaximumResultBytes) return (result, receipts);
+        // 预算选择必须先按最终规范顺序，不能依赖映射数组登记顺序。
+        var items = G4QueryCanonical.OrderData(result.Data).ToList();
+        // 原始证据到实际分支回执的关联用于重算本分支实际输出投影。
+        var evidence = result.Evidence.ToDictionary(item => item.EvidenceId, StringComparer.Ordinal);
+        // 保留原件用于精确识别哪些回执受到截断，不修改任何历史回执。
+        var original = result;
+        do
+        {
+            if (items.Count > 0) items.RemoveAt(items.Count - 1);
+            // 数据移除后不允许孤立来源继续作为结果证据披露。
+            var ids = items.SelectMany(item => item.EvidenceIds).ToHashSet(StringComparer.Ordinal);
+            result = original with { Data = items.ToArray(), Candidates = [], Evidence = original.Evidence.Where(item => ids.Contains(item.EvidenceId)).ToArray(),
+                Status = items.Count > 0 ? "PARTIAL" : "UNAVAILABLE", Limited = true,
+                Diagnostics = [new G4QueryDiagnostic { Code = "query_partial", Severity = "warning", Message = "响应预算不足，已保留可验证完整项。", FocusNode = null, Path = null }] };
+            // 关系由最后一个目标端来源分支产生，父端证据只支撑端点，不重复计入父回执。
+            receipts = receipts.Select(stored =>
+            {
+                // 每个实际成功读取的回执仍保留；零保留项也不伪装成EMPTY。
+                var receipt = stored.Receipt;
+                if (receipt.Status is not ("SUCCESS" or "EMPTY")) return stored;
+                // 一条断言的最后来源指向实际产生该断言的分支。
+                var projection = items.Where(item => evidence[item.EvidenceIds[^1]].SourceReadReceiptId == receipt.ReceiptId).ToArray();
+                // 仅实际丢弃本分支数据时标记limited，不把读取故障改成预算截断。
+                var truncated = original.Data.Count(item => evidence[item.EvidenceIds[^1]].SourceReadReceiptId == receipt.ReceiptId) > projection.Length
+                    || original.Candidates.Any(item => item.EvidenceIds.Any(id => evidence[id].SourceReadReceiptId == receipt.ReceiptId));
+                receipt = receipt with { RowCount = projection.Length, Limited = receipt.Limited || truncated,
+                    Status = projection.Length == 0 && !receipt.Limited && !truncated ? "EMPTY" : "SUCCESS",
+                    SourceRecordRef = projection.Length == 1 ? receipt.SourceRecordRef : null,
+                    ResultHash = G4QueryCanonical.Hash(G4QueryCanonical.Projection(projection)) };
+                return new G4QueryStoredReceipt { Receipt = receipt, ReceiptHash = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(receipt)) };
+            }).ToArray();
+            result = result with { SubSources = result.SubSources.Select(branch => branch.SourceReadReceiptId is null ? branch : branch with
+                { Status = receipts.Single(item => item.Receipt.ReceiptId == branch.SourceReadReceiptId).Receipt.Status,
+                    Limited = receipts.Single(item => item.Receipt.ReceiptId == branch.SourceReadReceiptId).Receipt.Limited }).ToArray() };
+            if (items.Count == 0 && G4QueryCanonical.Serialize(result).Length > G4QueryRules.MaximumResultBytes)
+                throw new SemanticOperationException(503, "query_result_invalid");
+        } while (G4QueryCanonical.Serialize(result).Length > G4QueryRules.MaximumResultBytes);
+        return (result, receipts);
+    }
+
+    /// <summary>关系端点由已授权实体构造，完整身份和半开时间不匹配时不输出边。</summary>
+    private static G4RelationshipDatum? Relationship(MappingRelationBinding relation, G4EntityDatum from, G4EntityDatum to,
+        Dictionary<string, G4QueryValue> fromRow, Dictionary<string, G4QueryValue> toRow)
+    {
+        if (from.Identity.OrganizationId != to.Identity.OrganizationId || from.Identity.SiteId != to.Identity.SiteId
+            || relation.JoinFieldPairs.Any(pair => G4QueryCanonical.Hash(G4QueryCanonical.Serialize(fromRow[pair.From.Name])) != G4QueryCanonical.Hash(G4QueryCanonical.Serialize(toRow[pair.To.Name])))) return null;
+        if (from.ValidTime is not { From.Kind: "UTC", To.Kind: "UTC" } left || to.ValidTime is not { From.Kind: "UTC", To.Kind: "UTC" } right)
+            throw new SemanticOperationException(503, "query_source_indeterminate");
+        // PG时间固定微秒，两个同精度UTC词法可以按Ordinal比较。
+        var start = string.CompareOrdinal(left.From.Lexical, right.From.Lexical) >= 0 ? left.From : right.From;
+        // 半开区间的最早结束决定交集，恰好相接不产生边。
+        var end = string.CompareOrdinal(left.To.Lexical, right.To.Lexical) <= 0 ? left.To : right.To;
+        if (string.CompareOrdinal(start.Lexical, end.Lexical) >= 0) return null;
+        return new G4RelationshipDatum { EntityIri = from.EntityIri, EvidenceIds = from.EvidenceIds.Concat(to.EvidenceIds).Distinct(StringComparer.Ordinal).ToArray(),
+            RelationshipIri = relation.PredicateIri, Cardinality = relation.Cardinality,
+            Source = new G4QueryEndpoint { EntityIri = from.EntityIri!, Identity = from.Identity, TypeIris = from.TypeIris },
+            Target = new G4QueryEndpoint { EntityIri = to.EntityIri!, Identity = to.Identity, TypeIris = to.TypeIris },
+            ValidTime = new G4QueryInterval { From = start, To = end } };
+    }
+
+    /// <summary>固定映射必须存在唯一非目标根实体，不允许按数组第一项猜定位主体。</summary>
+    public static MappingEntityBinding RootBinding(MappingDefinition mapping)
+    {
+        // 所有正式关系方向决定唯一根；环或多根没有无歧义的首期计划。
+        var roots = mapping.Entities.Where(entity => !mapping.Relations.Any(relation => relation.ToBindingId == entity.Id)).ToArray();
+        if (roots.Length != 1) throw new SemanticOperationException(422, "query_path_invalid");
+        return roots[0];
+    }
+
+    /// <summary>精确观测逐源行生成，允许同一完整主体多次观测，不合并或舍入业务值。</summary>
+    public static G4ObservationDatum[] Observations(G4QueryBranchProjection projected) => projected.Entities.SelectMany((entity, index) =>
+        entity.Properties.Select(property => new G4ObservationDatum { EntityIri = entity.EntityIri, EvidenceIds = property.EvidenceIds,
+            Identity = entity.Identity, PropertyIri = property.PropertyIri, Value = property.Value, Unit = property.Unit,
+            EventTime = property.EventTime, ObservedAtUtc = projected.ObservedTimes.Length == projected.Entities.Length ? projected.ObservedTimes[index] : projected.Evidence.Single(item => item.EvidenceId == property.EvidenceIds[0]).ObservedAtUtc,
+            ValidTime = entity.ValidTime })).ToArray();
+
     /// <summary>捕获单一许可对完整投影的当前grant，不构造客户端可伪造proof。</summary>
     private Task<MappingAuthorizationProof> CaptureAsync(MappingAuthorizationProof session, string connectionId, G4QueryProjection projection, string permission, CancellationToken token) =>
         authority.CaptureAsync(session with { ConnectionId = connectionId, Permission = permission, ObjectRefs = projection.ObjectRefs, FieldRefs = projection.FieldRefs }, token);
@@ -361,7 +581,7 @@ public sealed class G4QueryExecution
     }
 
     /// <summary>从真实类型化分支读取构造完整实体与证据；任何未知身份都不能成为确定候选。</summary>
-    public static G4QueryBranchProjection ProjectEntities(string queryId, string traceId, G4QueryBindingContext context, G4SourceQueryRead read)
+    public static G4QueryBranchProjection ProjectEntities(string queryId, string traceId, G4QueryBindingContext context, G4SourceQueryRead read, bool observations = false)
     {
         // 只能使用固定manifest的实体定义，不能从外部字符串推断任意表。
         var mapping = context.Manifest.Mapping;
@@ -403,7 +623,7 @@ public sealed class G4QueryExecution
             // URI仅作为内部标识使用，永不请求这个地址。
             var iri = "urn:ontology-platform:entity:" + G4QueryCanonical.Hash(G4QueryCanonical.Serialize(semanticIdentity));
             // 同一身份出现不同源行不能静默取第一条；查询执行器需报告定位不完整。
-            if (entities.Any(item => item.EntityIri == iri)) throw Invalid();
+            if (!observations && entities.Any(item => item.EntityIri == iri)) throw Invalid();
             // 真实登记且完整读取的主键才能形成可定位记录引用。
             var key = RecordReference(row, read.RecordKeyFields);
             // 数据集级来源明确降级，不能把哈希伪装成不存在的唯一主键。
@@ -423,10 +643,12 @@ public sealed class G4QueryExecution
             var properties = mapping.Properties.Where(item => item.EntityBindingId == entity.Id).Select(property =>
             {
                 // 映射引用精确源字段，缺列不能以null补齐。
-                var value = Cell(row, property.FieldRef);
+                var conversion = property.ConversionId is null ? null : mapping.Conversions.Single(item => item.Id == property.ConversionId);
+                // JSON原文不进入投影，仅消费源适配器已验证的登记键标量。
+                var value = conversion?.RegisteredId == "json-top-level-scalar" ? row["$property:" + property.Id] : Cell(row, property.FieldRef);
                 if (value is G4NullValue && property.NullPolicy == "REJECT_NULL") throw Invalid();
                 // S1无转换属性保持原精度；已登记转换由下方封闭实现处理。
-                value = ConvertValue(value, property.ConversionId is null ? null : mapping.Conversions.Single(item => item.Id == property.ConversionId));
+                value = conversion?.RegisteredId == "json-top-level-scalar" ? value : ConvertValue(value, conversion);
                 // 单位必须逐行证实源代码，不能根据属性名推断。
                 var unit = property.UnitSpecId is null ? null : mapping.UnitSpecs.Single(item => item.Id == property.UnitSpecId);
                 if (unit is not null && RequiredIdentity(row, unit.SourceUnitFieldRef) != unit.SourceUnitCode) throw Invalid();
@@ -453,6 +675,7 @@ public sealed class G4QueryExecution
             Precision = read.RecordKeyFields.Length == 0 ? "DATASET" : "ROW_KEY", ValidTime = null,
             ReadStartedAtUtc = Utc(read.StartedAtUtc), ReadCompletedAtUtc = observed, ResultHash = G4QueryCanonical.Hash(projection), TraceId = traceId };
         return new G4QueryBranchProjection { Entities = entities.ToArray(), Evidence = evidence.ToArray(),
+            ObservedTimes = read.Rows.Select(row => temporal.ObservedAtFieldRef is null ? observed : Time(row, temporal.ObservedAtFieldRef) is { Kind: "UTC" } time ? time.Lexical : throw Invalid()).ToArray(),
             Receipt = new G4QueryStoredReceipt { Receipt = receipt, ReceiptHash = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(receipt)) } };
     }
 

@@ -2,7 +2,7 @@
 
 ## 当前执行与授权
 
-- 唯一状态：**IMPLEMENTING_S2**。用户已批准A–F实施及D的合成环境IdP限制；按S1→S2→S3推进，最终停产品审查关口。
+- 唯一状态：**VERIFYING_S2_S3**。用户已批准A–F实施及D的合成环境IdP限制；按S1→S2→S3推进，最终停产品审查关口。
 - 会话：本M4会话，后续同会话继续；Code/Agent，Local Mac ARM64。实际模型/推理设置未读取，不采用附件建议冒充实际设置。
 - Base：`f0afb730ce92ecbd3a5947d9c6f58faedc8b2138`，2026-11-14普通fetch后origin/main一致；初次fetch沙箱拒绝写FETCH_HEAD，获工具批准重试exit0；没有基线漂移。
 - 分支：`codex/g4-m4-query-001`；Worktree：`/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform`。RunId=`p0-contract-20261114`，托管operationId=`ddb793db-9e28-4040-977d-73af96443916`。首次分支创建因.git锁写权限失败，获工具批准后成功；未回退main写文档。
@@ -117,3 +117,13 @@ S2版本/容量增量：[版本与容量原件索引](../evidence/G4-M4-QUERY-00
 
 
 非作者定向复核关闭隔离P1及异常清理P2；静态复核不冒充重跑。当前8项短测试的真实命令e71b7aa565ce4ea4a4c412f1db386936 exit0及stdout/stderr已通过公开扫描保存于[生命周期短测试原件](../evidence/G4-M4-QUERY-001/query-impl-01/isolation-lifecycle-tests-raw-index.json)。最后diff-check exit0。此提交为S2过程检查点，非最终交付Head。
+
+
+S3持续实施增量：实际双实体映射发布/激活已完成，旧单实体数量断言失败原件81bd23796c384dcbb32f5aec915a8f5a保留；修正任务脚本断言后mapping18、S1 43、S3 57检查通过。S3真实PG证明精确293.2750 K、登记JSON标量、微秒observedAt、同站点半开关系端点、独立分支回执/部分拒绝及MCP原字节恢复；新增未发布关系+空根负例后59检查通过。以上是阶段证据，尚非最终输入资格。
+
+实施裁定：已获批F1要求在semantic_query单独绑定G4 Run引用；原查询迁移已应用，故新增`Q/Migrations/20261114010000_G4QueryRunReferences.cs`作为同一批准范围内的增量迁移，不改旧迁移或Agents Run载荷。表由查询模块参数化SQL拥有，保留7天，计入原64MiB元数据预算；没有新增公共DTO或业务入口。该表不进入EF实体模型，因此无需改模型快照。当前Run引用编译RED原件47e32410437d41e09c092242bb5799fb；随后编译605e19f3454a4210b4311f551573be6c通过，正式运行与独立Review仍待完成。
+
+非作者S3集中审查确认三项P2并直接修复中：规范排序必须在Take前；实际MAF循环必须共享G4 Run引用而不只验证独立MCP请求；Run到期删除必须与无值审计同事务。响应预算新增合法4096字节控制字符转义膨胀负例，RED d4cfa5a74dc44ba8acd0fba59e70fb66，GREEN编译41835b7867774c86b40b5dc8ba32b8ba、Query8/0skip原件8968386c76114db6a74d609cd4fbb9d1。实际MAF及到期审计负例仍在本轮持续验证，不记为完成。当前UI构建K15jlaU5ay01ms_ihYt_5类型/lint/10单测/构建通过，真实观测关系UI19、刷新/迟到响应30通过；源码后续变化仍需按输入重新核验资格。
+
+
+最终输入收敛：非作者已核真实MAF原件49ea3162054e4e349abd03d8fa2578e1（1/0skip）、Run到期审计d0e07f8b8465450b88cdb6e51e73864c（4/0skip）及S3报告browser-s3-1794668619566（77检查），关闭先前排序/共享Run/到期审计三项P2。新增根观测截断分支limited遗漏已修，真实HTTP负例加入当前驱动，尚待当前输入运行。执行中连接变更已真实触发旧绑定失效，随后ABA首查询409 query_binding_stale符合旧绑定语义；失败原件browser-s2-aba-1794669144326保留，需正式重新发布后再验证，不伪造绑定恢复。当前扩展F1任务报告适配，新增qualify从实际执行封存的输入和原件重开，9项Python准入/漂移拒绝检查通过；所有最终资格仍待完整实际运行。

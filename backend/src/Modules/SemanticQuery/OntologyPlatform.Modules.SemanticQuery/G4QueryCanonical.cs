@@ -38,6 +38,12 @@ public static class G4QueryCanonical
         return Value(JsonSerializer.SerializeToElement(node));
     }
 
+    /// <summary>在行预算截断之前按最终规范业务键排序，不用事后排序掩盖错误前缀。</summary>
+    public static G4QueryDatum[] OrderData(IEnumerable<G4QueryDatum> data) => data
+        .Select(item => (Datum: item, Node: JsonSerializer.SerializeToNode(item, G4QueryJson.Options)!))
+        .OrderBy(item => item.Node, Comparer<JsonNode>.Create((left, right) => CompareItem(left, right, "data")))
+        .Select(item => item.Datum).ToArray();
+
     /// <summary>明确保持数组顺序的请求或内部对象规范编码，调用方负责其类型校验。</summary>
     public static byte[] Serialize<T>(T value) => Value(JsonSerializer.SerializeToElement(value, G4QueryJson.Options));
 
