@@ -199,3 +199,10 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 ## 2026-11-13 Oracle最终审查ZIP（最新明确批准）
 
 用户批准基于已提交f6955e272c412c5528e5698b8ce94a99a44985e1生成最终审查ZIP并独立重开验证，排除凭据、私有备份和缓存；不更新main、不恢复TDengine。允许为现行V3 LOCAL合同补充仅文档的已提交证据，testedCommit固定上述提交，产品及构建输入必须逐blob一致；此前禁止ZIP仅保留历史语义。
+
+
+---
+
+# 2026-11-14 G4-M3-MAPPING-001 P0 授权事实追加
+
+本会话用户明确批准附件中的P0依赖核对与合同审查；附件第3节明列本索引仅追加本轮实际授权。本段只记录已经发生的用户请求，不批准任何产品实施。预期且fetch实核main=e07eab20feb3fdef9e24a20dec12d11b15bd7d46；独立托管树、codex/g4-m3-mapping-001，Master单作者与非作者只读Review，文档分支普通提交/push。范围仅[一页任务卡](G4-M3-MAPPING-001.md)、[A–F申请](../evidence/G4-M3-MAPPING-001/contract-admission-request.md)及本索引追加。允许M2总体PARTIAL、TDengine WAIT_FOR_EXTERNAL_INPUT下审查M3设计；PG首条完整映射路径是待批建议，其他连接器不视为等价。禁止下载/安装/prepare/restore/服务、产品/公共DTO/数据库/工程脚本修改、历史全量验收、ZIP、main更新、KEEP清理、TDengine恢复及M4。完成P0停准入，后续明确获批才在同会话/树/分支实施。历史授权原文保留。
