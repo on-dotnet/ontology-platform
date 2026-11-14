@@ -1,0 +1,14 @@
+Unhandled exception. System.IO.IOException: Read-only file system : '/.local'
+   at System.IO.FileSystem.CreateParentsAndDirectory(String fullPath, UnixFileMode unixCreateMode)
+   at System.IO.FileSystem.CreateDirectory(String fullPath, UnixFileMode unixCreateMode)
+   at System.IO.Directory.CreateDirectory(String path)
+   at System.Environment.GetFolderPathCore(SpecialFolder folder, SpecialFolderOption option)
+   at Microsoft.Testing.Platform.Helpers.SystemEnvironment.GetFolderPath(SpecialFolder folder, SpecialFolderOption option)
+   at Microsoft.Testing.Platform.Telemetry.TelemetryManager.ShowTelemetryBannerFirstNoticeAsync(ServiceProvider serviceProvider, ILogger`1 logger, IEnvironment environment)
+   at Microsoft.Testing.Platform.Telemetry.TelemetryManager.BuildTelemetryAsync(ServiceProvider serviceProvider, ILoggerFactory loggerFactory, TestApplicationOptions testApplicationOptions)
+   at Microsoft.Testing.Platform.Hosts.TestHostBuilder.SetupCommonServicesAsync(ApplicationLoggingState loggingState, TestApplicationOptions testApplicationOptions, IUnhandledExceptionsHandler unhandledExceptionsHandler, DateTimeOffset createBuilderStart)
+   at Microsoft.Testing.Platform.Hosts.TestHostBuilder.BuildAsync(ApplicationLoggingState loggingState, TestApplicationOptions testApplicationOptions, IUnhandledExceptionsHandler unhandledExceptionsHandler, DateTimeOffset createBuilderStart)
+   at Microsoft.Testing.Platform.Builder.TestApplicationBuilder.BuildAsync()
+   at OntologyPlatform.AgentTests.MicrosoftTestingPlatformApplication.RunAsync(String[] args) in /Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/obj/Debug/net10.0/MicrosoftTestingPlatformEntryPoint.cs:line 16
+   at OntologyPlatform.AgentTests.MicrosoftTestingPlatformEntryPoint.<Main>(String[] args)
+Aborted

@@ -1,0 +1,16 @@
+MSTest v4.5.1 (UTC 10/07/2026) [linux-arm64 - .NET 10.0.13]
+failed ActualMafUsesCurrentGatewayAndOnePersistentBudget (1s 320ms)
+  Assertion failed.
+  真实Gateway前提失败：403:query_forbidden
+    at OntologyPlatform.AgentTests.G4QueryMafRuntimeTests.ActualMafUsesCurrentGatewayAndOnePersistentBudget() in /Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/G4QueryMcpTests.cs:85
+    at OntologyPlatform.AgentTests.G4QueryMafRuntimeTests.ActualMafUsesCurrentGatewayAndOnePersistentBudget() in /Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/G4QueryMcpTests.cs:106
+    at OntologyPlatform.AgentTests.G4QueryMafRuntimeTests.ActualMafUsesCurrentGatewayAndOnePersistentBudget() in /Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/G4QueryMcpTests.cs:106
+    at OntologyPlatform.AgentTests.G4QueryMafRuntimeTests.ActualMafUsesCurrentGatewayAndOnePersistentBudget() in /Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/G4QueryMcpTests.cs:106
+    at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+Test run summary: Failed! - /tests/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+  total: 1
+  failed: 1
+  succeeded: 0
+  skipped: 0
+  duration: 1s 550ms
