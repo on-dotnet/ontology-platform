@@ -221,3 +221,10 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 ## 2026-11-14 最终 ZIP 交付授权补充
 
 用户最新明确要求生成 ZIP 交 ChatGPT 评审，覆盖本任务此前“不生成 ZIP”的交付限制。按现行 V3 LOCAL 合同补充已提交证据快照、源码完整差异与代表截图，构包后独立重开；testedCommit 仍为 cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c，产品输入不变。包内原始路径通过 docs/evidence/G4-M3-MAPPING-001/package/original-path-map.json 映射，历史原件保留；私有运行时、凭据、缓存不入包。无产品或 Review 阻断；CI/未测平台等既有验证限制不升级为 PASS。最终 ZIP 与散列取构包回执；不更新 main，不进入 M4。
+
+
+## 2026-11-14 M3 收尾规则增量与可恢复性（最新明确批准）
+
+用户明确批准附件《Codex-G4-M3-SDD-Rules-Delta-20261114 (1).md》的M3收尾规则增量，类型RULES_DELTA_AFTER_PRODUCT_FREEZE；沿用当前会话、codex/g4-m3-mapping-001及托管Worktree，不另建任务、Plan或逐补丁审批。仅修改AGENTS、PLANS、效率规则、本地验证政策、阶段构包规范、新SDD任务模板及本授权/当前任务卡；合并替换冲突流程。P0禁包只约束P0，获准产品实施完成默认唯一最终V3、包外回执及非作者独立重开，具体用户例外仍优先。
+
+用户同时明确批准正常提交/push补齐包Head b9dd7eedb7980f8876d1c50c6b826ab096bacff9、既有证据提交与规则增量在远端 on-dotnet/ontology-platform 当前任务分支的可恢复性，覆盖上一轮“仅本地ZIP”的推送限制；不强推、不更新main。冻结产品提交cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c、原ZIP和历史原件不变，只轻量文档检查和一次非作者增量Review，引用原包重开记录，不重跑产品、不build/prepare/restore、不下载/安装依赖或Skills、不清KEEP、不恢复TDengine、不进入M4。规则效果待下一真实任务观察，不回溯伪造早期SDD执行。

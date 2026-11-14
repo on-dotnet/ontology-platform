@@ -20,3 +20,12 @@
 ## 2026-11-14 最终 ZIP 交付授权补充
 
 用户最新明确要求生成 ZIP 交 ChatGPT 评审，覆盖本任务此前“不生成 ZIP”的交付限制。按现行 V3 LOCAL 合同补充已提交证据快照、源码完整差异与代表截图，构包后独立重开；testedCommit 仍为 cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c，产品输入不变。包内原始路径通过 docs/evidence/G4-M3-MAPPING-001/package/original-path-map.json 映射，历史原件保留；私有运行时、凭据、缓存不入包。无产品或 Review 阻断；CI/未测平台等既有验证限制不升级为 PASS。最终 ZIP 与散列取构包回执；不更新 main，不进入 M4。
+
+
+## 2026-11-14 规则收尾增量（RULES_DELTA）
+
+本子项沿用唯一任务状态READY_FOR_HUMAN_REVIEW；不改变已完成产品验收结论。规则Base/产品包Head=b9dd7eedb7980f8876d1c50c6b826ab096bacff9，产品TestedCommit=cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c；规则完整新Head、正常push远端读回、允许八路径检查及一次增量Review，以[包外规则回执](../../artifacts/workflow/G4-M3-MAPPING-001/rules-delta/receipt.json)实际结果为准。用户已批准补齐原包与新增规则在当前任务分支的可恢复性。
+
+规格/正反例/首条真实切片统一到现行效率规则及[后续任务模板](templates/sdd-task.md)，交付时机统一到[PLANS阶段表](../../PLANS.md#阶段交付唯一表)。本次仅证明规则落地，不宣称M3早期已按SDD执行或已提速；下一实际任务观察效果。
+
+冻结ZIP=OntologyPlatform-Review-G4-M3-MAPPING-001-b9dd7eedb798.zip；5,604,439字节；SHA256=4976a4d1d82a67700bb8cb3e013a79a49005b979cc83341d70d9a3b26f962aeb。原[非作者重开回执](../../artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/zip-delivery-receipt.json)保留，旧包不含本规则增量。不重打包、不执行产品测试/restore/download；KEEP及CI/未测平台限制沿用，不更新main或进入M4。附件转述ChatGPT/Linux检查属于外部报告，本次不将其提升为本机产品执行证据。

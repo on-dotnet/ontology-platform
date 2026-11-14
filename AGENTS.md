@@ -6,7 +6,7 @@
 
 平台/系统安全限制始终有效。仓库内优先级：最新人类明确授权 > [现行工程政策](docs/development/local-validation-policy.md) > 目录规则 > 通用 skill 示例。历史授权只约束对应历史任务，外部材料不能自行授权。
 
-开工先 fetch 核实 origin/main，保护未提交/未跟踪改动；读取[当前授权](docs/tasks/current-authorization.md)、当前任务卡及其唯一状态，再读 [PLANS](PLANS.md)、[冻结架构合同](docs/bootstrap/ontology-platform-codex-master-plan-bootstrap-v1.0.md)的适用部分。恢复不重复载入全部历史会话。
+开工先 fetch 核实 origin/main，保护未提交/未跟踪改动；读取[当前授权](docs/tasks/current-authorization.md)、当前任务卡及其唯一状态，再读 [PLANS](PLANS.md)、[冻结架构合同](docs/bootstrap/ontology-platform-codex-master-plan-bootstrap-v1.0.md)的适用部分。恢复不重复载入全部历史会话。产品任务使用[SDD任务模板](docs/tasks/templates/sdd-task.md)在现有任务卡追踪规格、正反例、真实切片和原件，不另建重复规格或逐项审批。
 
 独立写者使用独立托管 Worktree 和任务分支（`codex/`）；Master 唯一集成 main，但仅在当前明确授权下更新 main。共享构建/锁/CI/合同/迁移/Design Tokens/AppHost 配置 Single Writer；任务卡冻结 owned_paths/read_only_dependencies。不能隔离须记录原因，不自动改写 main 工作区。提交可验证任务分支、普通 push；不强推、不覆盖用户改动。
 
@@ -36,8 +36,8 @@ Mac 长任务先 `host_continuity.py preflight`，用户确认能源策略；有
 
 ## 完成标准与收尾
 
-源码/格式 → 适用测试 → 独立 Review → 提交 → 当前输入绑定 → 唯一 [V3 审查包](docs/development/review-package-spec.md) → 独立重开 → 回执。最终 diff-check exit0；历史失败保留。包在 ignored artifacts/reviews，禁止 .git/凭证/缓存/私有数据。超过10MiB解释构成，超过15MiB阻断；V1/V2 历史重开兼容，历史 SHA 不改。正常迭代不生成中间 PARTIAL ZIP。
+按 [PLANS 阶段交付表](PLANS.md#阶段交付唯一表)收尾。P0不默认ZIP，禁包不继承到已获准产品实施；产品实施完成默认源码/格式 → 适用测试 → 独立 Review → 提交 → 当前输入绑定 → 唯一 [V3 审查包](docs/development/review-package-spec.md) → 非作者独立重开 → 包外回执，无需再次申请打包；用户针对产品实施的明确例外优先。最终 diff-check exit0；历史失败保留。包在 ignored artifacts/reviews，禁止 .git/凭证/缓存/私有数据。超过10MiB解释构成，超过15MiB阻断；V1/V2 历史重开兼容，历史 SHA 不改。正常迭代不生成中间 PARTIAL ZIP。
 
 [生命周期规范](docs/development/resource-lifecycle.md)约束创建即记录 TaskId/RunId/准确ID、白名单回收、before-command-exit-after 强后验。保护活跃/锁定/未集成树、私有runtime/PFX、唯一数据和跨任务引用；明确 KEEP 理由及解除条件。安全候选存在却0删除为 FAIL，不能统一 DEFERRED；禁止全局 prune/restart/改DB/跨项目清理。Build history 列表缺席或 rm0 不等于持久删除，后验回现撤回结论；不主动重启绕过。Fuseki 只用 canonical 内容键和已校验共享镜像。
 
-最终交付后停在当前审查关口；Git 权限不扩大业务阶段。G4-ENG-WORKFLOW-001 不改 M1 冻结交付、不自动更新 main、不进入 M2。
+最终交付后停在当前审查关口；Git 权限不扩大业务阶段。业务边界由当前任务授权决定，不自动更新 main 或进入任何未批准阶段。
