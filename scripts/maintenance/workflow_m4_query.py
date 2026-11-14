@@ -270,7 +270,16 @@ def runtime_api_pause():
     import subprocess
     import uuid
     output=ROOT/'artifacts/workflow'/TASK/RUN
-    bound=runtime_binding()
+    # 停止必须依赖准确进程身份，磁盘产物漂移时仍应允许停止该实例进行修复。
+    started=json.loads((output/'runtime-api-start.json').read_text())
+    actual=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format',
+        '{"id":{{json .Id}},"startedAt":{{json .State.StartedAt}},"running":{{json .State.Running}},"labels":{{json .Config.Labels}}}',started['id']],timeout=15))
+    if actual['id']!=started['id'] or actual['startedAt']!=started['startedAt'] or not actual['running'] \
+        or actual['labels'].get('ontology.task-id')!=TASK or actual['labels'].get('ontology.run-id')!=RUN:
+        raise ValueError('QUERY_API_STOP_PROCESS_DRIFT')
+    from workflow_execution import sha
+    expected=json.loads((output/'runtime-build-binding.json').read_text())
+    bound=dict(process=started,binaries=expected,binaryDrift=[path for path,digest in expected.items() if sha((ROOT/path).read_bytes())!=digest])
     tag='api-pause-'+uuid.uuid4().hex[:8]
     runtime_snapshot(tag+'-before')
     result=runtime_command(tag,['docker','--context','desktop-linux','stop','--time','10',bound['process']['id']])
@@ -439,6 +448,29 @@ def runtime_second_api():
     return record
 
 
+def runtime_secondary_state(running):
+    """在同一批准槽位切换短命测试与第二API，保留容器和原始资源身份。"""
+    import subprocess
+    import uuid
+    output=ROOT/'artifacts/workflow'/TASK/RUN
+    path=output/'runtime-secondary-api.json';record=json.loads(path.read_text())
+    tag='secondary-'+('resume-' if running else 'pause-')+uuid.uuid4().hex[:8]
+    before=runtime_snapshot(tag+'-before');cid=record['process']['id']
+    selected=[row for row in before['resources'] if row['id']==cid and row.get('service')=='api-secondary']
+    if len(selected)!=1 or selected[0]['running']==running: raise ValueError('QUERY_SECONDARY_STATE_BOUNDARY')
+    result=runtime_command(tag,['docker','--context','desktop-linux',*(['start'] if running else ['stop','--time','10']),cid])
+    after=runtime_snapshot(tag+'-after')
+    if not any(row['id']==cid and row.get('running')==running for row in after['resources']): raise ValueError('QUERY_SECONDARY_STATE_POSTCHECK')
+    original=record['process']
+    if running:
+        record['process']=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format',
+            '{"id":{{json .Id}},"startedAt":{{json .State.StartedAt}}}',cid],timeout=15))
+        path.write_text(json.dumps(record,indent=2)+'\n')
+    receipt=dict(taskId=TASK,runId=RUN,previous=original,current=record['process'],running=running,commandId=result.receipt['commandId'])
+    (output/(tag+'.json')).write_text(json.dumps(receipt,indent=2)+'\n')
+    return receipt
+
+
 def runtime_health():
     """仅对本任务loopback端口轮询真实依赖，就绪不等同产品测试通过。"""
     import time
@@ -506,7 +538,7 @@ def runtime_configure():
 
 def browser_test(mode):
     """唯一当前任务浏览器入口，真实OIDC与API响应，不运行旧M3验收或下载浏览器。"""
-    if mode not in ['provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
+    if mode not in ['provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race','s2-aba','s2-capacity','s2-connection','replace-disabled-connection']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
     binding=runtime_binding()
     web=web_binding() if mode=='ui-s1' else None
     result=runtime_command('query-browser-'+mode,['/opt/homebrew/Cellar/node@24/24.22.1/bin/node',
@@ -762,6 +794,15 @@ def web_binding():
 def contract_build(project="OntologyPlatform.G2ContractTests"):
     """测试先行的合同编译保留真实失败与退出码，不把编译当测试通过。"""
     from workflow_execution import run, sha, encoded
+    import subprocess
+    output=ROOT/'artifacts/workflow'/TASK/RUN
+    # 提交会改变自动生成程序集元数据；即使只改测试，项目引用构建也可能重写挂载中的API。
+    for name in ['runtime-api-start.json','runtime-secondary-api.json']:
+        path=output/name
+        if path.exists():
+            record=json.loads(path.read_text());process=record.get('process',record)
+            running=subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{.State.Running}}',process['id']],timeout=15).strip()
+            if running==b'true': raise ValueError('QUERY_API_STOP_REQUIRED_BEFORE_REFERENCE_BUILD')
     _, env = prepared()
     inputs = {str(p.relative_to(ROOT)): sha(p.read_bytes()) for pattern in
               ('backend/src/**/*.cs', 'backend/tests/' + project + '/**/*.cs')
@@ -1004,6 +1045,66 @@ def source_start():
     return result.returncode
 
 
+def runtime_query_inventory(container):
+    """只读运行库安全元数据，确认测试没有清除或改变既有查询，不读取结果密文或业务值。"""
+    from workflow_execution import run, sha
+    sql = 'BEGIN READ ONLY; SELECT coalesce(json_agg(x ORDER BY x.id), \'[]\'::json) FROM (SELECT "Id" AS id, "ExecutionStatus" AS status, "ResultHash" AS hash, "ResultSize" AS size, "Fence" AS fence FROM semantic_query."Queries") x; COMMIT;'
+    result = run(['docker', '--context', 'desktop-linux', 'exec', '-i', container, 'psql', '-U', 'postgres', '-d', 'query', '-v', 'ON_ERROR_STOP=1', '-qAt'],
+                 ROOT, task=TASK, run_id=RUN, stage='query-runtime-inventory', stdin=sql.encode(), input_key=sha(sql.encode()), timeout=10)
+    if result.returncode: raise ValueError('QUERY_RUNTIME_INVENTORY_FAILED')
+    return json.loads(result.stdout)
+
+
+def test_database_name(suffix):
+    """测试库只能来自本次随机标识；拒绝运行库与任意SQL标识符。"""
+    import re
+    if not isinstance(suffix, str) or not re.fullmatch('[0-9a-f]{12}', suffix):
+        raise ValueError('QUERY_TEST_DATABASE_ID_INVALID')
+    return 'm4_query_test_' + suffix
+
+
+def test_database_control(container, suffix, create):
+    """只创建或删除本轮准确带所有权注释的空白隔离测试库；原运行库不参与测试。"""
+    import subprocess
+    from workflow_execution import run, sha
+    name = test_database_name(suffix)
+    owner = TASK + ':' + RUN + ':' + suffix
+    prefix = ['docker', '--context', 'desktop-linux']
+    labels = json.loads(subprocess.check_output([*prefix, 'inspect', '--format', '{{json .Config.Labels}}', container], timeout=15))
+    if labels.get('ontology.task-id') != TASK or labels.get('ontology.run-id') != RUN:
+        raise ValueError('QUERY_TEST_DATABASE_CONTAINER_OWNER')
+    def inspect():
+        result = run([*prefix, 'exec', '-i', container, 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-qAt'],
+                     ROOT, task=TASK, run_id=RUN, stage='query-test-database-inspect',
+                     stdin=("SELECT coalesce(shobj_description(oid,'pg_database'),'') FROM pg_database WHERE datname='" + name + "';").encode(),
+                     input_key=sha((container + name + 'inspect').encode()), timeout=10)
+        if result.returncode: raise ValueError('QUERY_TEST_DATABASE_INSPECT_FAILED')
+        return result.stdout.decode().strip()
+    before = inspect()
+    if (create and before) or (not create and before != owner):
+        raise ValueError('QUERY_TEST_DATABASE_OWNER_MISMATCH')
+    sql = ('CREATE DATABASE "' + name + '"; COMMENT ON DATABASE "' + name + '" IS \'' + owner + "';") if create else ('DROP DATABASE "' + name + '";')
+    intent = dict(taskId=TASK, runId=RUN, containerId=container, database=name, before=before, status='CREATING' if create else 'REMOVING')
+    intent_path = ROOT/'artifacts/workflow'/TASK/RUN/(name+('-create.json' if create else '-remove.json'))
+    intent_path.write_text(json.dumps(intent, indent=2)+'\n')
+    try:
+        result = run([*prefix, 'exec', '-i', container, 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-qAt'],
+                     ROOT, task=TASK, run_id=RUN, stage='query-test-database-create' if create else 'query-test-database-remove',
+                     stdin=sql.encode(), input_key=sha((container + sql).encode()), timeout=10, cleanup=not create)
+        after = inspect()
+        receipt = dict(taskId=TASK, runId=RUN, containerId=container, database=name, before=before, after=after,
+                       commandId=result.receipt['commandId'], exitCode=result.returncode,
+                       status=('CREATED' if create else 'REMOVED') if result.returncode == 0 and after == (owner if create else '') else 'KEEP_UNVERIFIED')
+        (ROOT/'artifacts/workflow'/TASK/RUN/(name+('-create.json' if create else '-remove.json'))).write_text(json.dumps(receipt, indent=2)+'\n')
+        if result.returncode or after != (owner if create else ''):
+            raise ValueError('QUERY_TEST_DATABASE_POSTCONDITION_FAILED')
+    except Exception:
+        intent.update(status='KEEP_UNVERIFIED', reason='database_command_or_postcondition_failed',
+                      releaseCondition='inspect_exact_database_task_marker_and_confirm_test_container_absent_before_drop')
+        intent_path.write_text(json.dumps(intent, indent=2)+'\n')
+        raise
+
+
 def persistence_test(source=False):
     """内部网络中执行正式工厂测试，短命容器精确登记并回收。"""
     import os
@@ -1033,7 +1134,7 @@ def persistence_test(source=False):
     if before.returncode == 0 or ('No such container: '+name) not in before.stderr.decode():
         raise ValueError('QUERY_TEST_BEFORE_UNVERIFIED')
     envfile = private / ('test-' + suffix + '.env')
-    connection = 'Host=platform-pg;Port=5432;Database=query;Username=postgres;Password='+ (private / 'password').read_text()+';SSL Mode=VerifyFull;Root Certificate=/run/query-ca.crt;Pooling=false;Include Error Detail=false'
+    connection = 'Host=platform-pg;Port=5432;Database='+test_database_name(suffix)+';Username=postgres;Password='+ (private / 'password').read_text()+';SSL Mode=VerifyFull;Root Certificate=/run/query-ca.crt;Pooling=false;Include Error Detail=false'
     source_private = ROOT / '.tools/security/g4-m4-query-001' / RUN / 'pg-source'
     if source:
         source_record = json.loads((output/'source-resources.json').read_text())
@@ -1057,28 +1158,57 @@ def persistence_test(source=False):
                '--workdir', '/app', image, 'dotnet', project+'.dll',
                '--filter', 'FullyQualifiedName~G4QuerySourceIntegrationTests' if source else 'FullyQualifiedName~G4QueryPersistenceTests|FullyQualifiedName~G4QueryRaceTests', '--timeout', '30s', '--zero-tests-policy', 'strict']
     result = None
+    runtime_before = runtime_query_inventory(record['resources'][0]['id']) if not source else None
+    database_created = False
     try:
+        if not source:
+            test_database_control(record['resources'][0]['id'], suffix, True)
+            database_created = True
         result = run(command, ROOT, task=TASK, run_id=RUN, stage='query-real-source-container' if source else 'query-real-persistence-container',
                      input_key=sha(encoded([inputs, sha(Path(__file__).read_bytes()), inspected['Id']])), timeout=60)
         print(result.stdout.decode(errors='replace')[-5000:])
         print(json.dumps({'exitCode': result.returncode, 'receipt':result.receipt['commandId']}))
     finally:
-        inspection = subprocess.run([*prefix, 'inspect', name], capture_output=True, timeout=10)
-        if inspection.returncode == 0:
-            item = json.loads(inspection.stdout)[0]
-            if item['Config']['Labels'].get('ontology.task-id') != TASK or item['Config']['Labels'].get('ontology.run-id') != RUN:
-                raise ValueError('QUERY_TEST_CLEANUP_OWNER')
-            lifecycle.update(id=item['Id'], exitCode=item['State']['ExitCode'], running=item['State']['Running'])
-            if item['State']['Running']:
-                stopped = run([*prefix, 'stop', '-t', '2', item['Id']], ROOT, task=TASK, run_id=RUN, stage='query-test-stop', cleanup=True, timeout=10)
-                if stopped.returncode: raise ValueError('QUERY_TEST_STOP_FAILED')
-            removed = run([*prefix, 'rm', item['Id']], ROOT, task=TASK, run_id=RUN, stage='query-test-remove', cleanup=True, timeout=10)
-            after = subprocess.run([*prefix, 'container', 'inspect', item['Id']], capture_output=True, timeout=10)
-            verified = removed.returncode == 0 and after.returncode != 0 and ('No such container: '+item['Id']) in after.stderr.decode()
-            lifecycle.update(status='REMOVED' if verified else 'CLEANUP_UNVERIFIED', removeExit=removed.returncode, exactIdAbsent=verified)
-        receipt_path.write_text(json.dumps(lifecycle, indent=2)+'\n')
-        envfile.unlink()
-    if lifecycle.get('status') != 'REMOVED': raise ValueError('QUERY_TEST_CLEANUP_UNVERIFIED')
+        try:
+            inspection = subprocess.run([*prefix, 'inspect', name], capture_output=True, timeout=10)
+            if inspection.returncode == 0:
+                item = json.loads(inspection.stdout)[0]
+                if item['Config']['Labels'].get('ontology.task-id') != TASK or item['Config']['Labels'].get('ontology.run-id') != RUN:
+                    raise ValueError('QUERY_TEST_CLEANUP_OWNER')
+                lifecycle.update(id=item['Id'], exitCode=item['State']['ExitCode'], running=item['State']['Running'])
+                if item['State']['Running']:
+                    stopped = run([*prefix, 'stop', '-t', '2', item['Id']], ROOT, task=TASK, run_id=RUN, stage='query-test-stop', cleanup=True, timeout=10)
+                    if stopped.returncode: raise ValueError('QUERY_TEST_STOP_FAILED')
+                removed = run([*prefix, 'rm', item['Id']], ROOT, task=TASK, run_id=RUN, stage='query-test-remove', cleanup=True, timeout=10)
+                after = subprocess.run([*prefix, 'container', 'inspect', item['Id']], capture_output=True, timeout=10)
+                verified = removed.returncode == 0 and after.returncode != 0 and ('No such container: '+item['Id']) in after.stderr.decode()
+                lifecycle.update(status='REMOVED' if verified else 'CLEANUP_UNVERIFIED', removeExit=removed.returncode, exactIdAbsent=verified)
+            elif ('No such object: '+name) in inspection.stderr.decode() or ('No such container: '+name) in inspection.stderr.decode():
+                lifecycle.update(status='NOT_CREATED', exactNameAbsent=True)
+            else:
+                lifecycle.update(status='KEEP_UNVERIFIED', reason='container_existence_not_confirmed')
+            receipt_path.write_text(json.dumps(lifecycle, indent=2)+'\n')
+            envfile.unlink()
+            if database_created and lifecycle.get('status') in ('REMOVED', 'NOT_CREATED'):
+                test_database_control(record['resources'][0]['id'], suffix, False)
+                runtime_after = runtime_query_inventory(record['resources'][0]['id'])
+                unchanged = runtime_before == runtime_after
+                (output / (test_database_name(suffix)+'-runtime-preservation.json')).write_text(json.dumps(dict(taskId=TASK, runId=RUN, before=runtime_before, after=runtime_after, unchanged=unchanged), indent=2)+'\n')
+                if not unchanged: raise ValueError('QUERY_RUNTIME_CHANGED_DURING_ISOLATED_TEST')
+            elif database_created:
+                (output / (test_database_name(suffix)+'-keep.json')).write_text(json.dumps(dict(taskId=TASK, runId=RUN, database=test_database_name(suffix), status='KEEP_UNVERIFIED', reason='test_container_not_confirmed_absent', releaseCondition='exact_test_container_absent_then_owned_database_drop'), indent=2)+'\n')
+        finally:
+            if lifecycle.get('status') not in ('REMOVED', 'NOT_CREATED'):
+                lifecycle.update(status='KEEP_UNVERIFIED', reason='test_container_cleanup_not_confirmed',
+                                 releaseCondition='verify_exact_container_owner_and_exit_then_remove_exact_id')
+                receipt_path.write_text(json.dumps(lifecycle, indent=2)+'\n')
+                if database_created:
+                    (output / (test_database_name(suffix)+'-keep.json')).write_text(json.dumps(dict(taskId=TASK, runId=RUN,
+                        database=test_database_name(suffix), containerName=name, status='KEEP_UNVERIFIED',
+                        reason='test_container_cleanup_not_confirmed',
+                        releaseCondition='exact_test_container_absent_then_owned_database_drop'), indent=2)+'\n')
+            envfile.unlink(missing_ok=True)
+    if lifecycle.get('status') not in ('REMOVED', 'NOT_CREATED'): raise ValueError('QUERY_TEST_CLEANUP_UNVERIFIED')
     return result.returncode if result is not None else 2
 
 

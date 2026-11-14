@@ -24,7 +24,7 @@ if (mode === "serve") {
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: 15442,
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race"].includes(mode)) await browserRun(mode);
+} else if (["provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-capacity", "s2-connection", "replace-disabled-connection"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -94,6 +94,20 @@ async function browserRun(mode) {
     check("fixture_identity", state.taskId === task && state.runId === runId);
     state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
     await save(state);
+    if (mode === "replace-disabled-connection") {
+      const disabled = await get(operator, `/api/v1/connections/${state.connectionId}`);
+      check("replacement_only_for_terminal_disabled_connection", disabled.state === "DISABLED");
+      const retired = { retiredAtUtc: new Date().toISOString(), reason: "terminal_disabled_and_query_test_isolation_failure" };
+      for (const key of Object.keys(state)) {
+        if (/^(mapping|s2)/.test(key) || ["connectionId", "catalog", "firstQuery", "latestQuery", "connectionDisplayName"].includes(key)) {
+          retired[key] = state[key]; delete state[key];
+        }
+      }
+      state.retiredFixtures ??= []; state.retiredFixtures.push(retired);
+      state.connectionDisplayName = "M4 synthetic PostgreSQL query replacement " + state.retiredFixtures.length;
+      await save(state);
+      mode = "provision";
+    }
     if (mode === "s1-reopen") {
       phase = "query_after_api_restart";
       const original = state.latestQuery ?? state.firstQuery;
@@ -133,7 +147,112 @@ async function browserRun(mode) {
       check("completed_cancel_does_not_destroy_result", (await request(operator, "GET", `/api/v1/data/semantic-queries/${selected.queryId}/result`)).raw === selected.raw);
       state.s2Ambiguous = { queryId: ambiguous.queryId, query, candidates: ambiguous.data.candidates }; await save(state);
       report.status = "PASS"; report.scope = "S2_REAL_PG_AMBIGUITY_SELECTION_EMPTY_INJECTION_COMPLETED_CANCEL";
-    } else if (mode === "s2-runtime" || mode === "s2-race") {
+    } else if (mode === "s2-aba") {
+      const path = "/api/v1/mappings/" + state.mappingDraft.mappingId;
+      const capability = (await get(operator, "/api/v1/capabilities")).find(item => item.id === "g4_resolve_entity");
+      const query = { ...state.latestQuery.query, capabilityVersion: capability.version, filters: { entityExternalId: "asset-1" } };
+      state.s2Aba ??= {}; const aba = state.s2Aba;
+      if (!aba.original) {
+        phase = "query_aba_original";
+        const original = await request({ ...operator, headers: { ...operator.headers, "Idempotency-Key": randomUUID() } }, "POST", "/api/v1/data/semantic-queries", query);
+        check("aba_original_ambiguous", original.data.status === "AMBIGUOUS");
+        aba.original = { queryId: original.queryId, resultHash: createHash("sha256").update(original.raw).digest("hex"), candidate: original.data.candidates[0], query }; await save(state);
+      }
+      const old = aba.original, selected = { ...old.query, filters: { ...old.query.filters, entityIri: old.candidate.entityIri, siteId: old.candidate.siteId } };
+      async function checkHistory(label) {
+        const original = await request(operator, "GET", `/api/v1/data/semantic-queries/${old.queryId}/result`);
+        check(label + "_historical_bytes_unchanged", createHash("sha256").update(original.raw).digest("hex") === old.resultHash);
+        await request({ ...operator, headers: { ...operator.headers, "Idempotency-Key": randomUUID(), "X-Selection-Query-Id": old.queryId } }, "POST", "/api/v1/data/semantic-queries", selected, 409);
+      }
+      async function activateRound(label, target, draft) {
+        const round = aba[label] ??= {}; await save(state);
+        if (!round.job) {
+          phase = "query_aba_" + label + "_validate";
+          round.validation ??= { target, command: command(draft.revision) }; await save(state);
+          round.job = await post(operator, path + "/validate", round.validation, 202, `"mapping:${draft.revision}"`); await save(state);
+        }
+        if (!round.assessment) {
+          for (let attempt = 0; attempt < 60; attempt++) {
+            const job = await get(operator, "/api/v1/mapping-jobs/" + round.job.jobId);
+            if (job.status === "SUCCEEDED") { round.assessment = await get(operator, "/api/v1/mapping-assessments/" + job.assessmentId); break; }
+            check("aba_" + label + "_job_" + attempt, ["QUEUED", "RUNNING"].includes(job.status)); await new Promise(done => setTimeout(done, 300));
+          }
+          check("aba_" + label + "_ready", round.assessment?.status === "READY_FOR_PROPOSAL"); await save(state);
+        }
+        if (!round.proposal) {
+          const assessment = round.assessment;
+          round.proposalCommand ??= { kind: target.kind, schemaVersion: "g4.mapping.v1", scope: draft.scope,
+            binding: assessment.binding, expectedActive: assessment.expectedActive, expiresAtUtc: assessment.expiresAtUtc,
+            ...(target.kind === "PUBLISH" ? { draftId: draft.draftId, draftRevision: draft.revision } : { targetReleaseId: target.targetReleaseId, manifestHash: target.manifestHash }), command: command() }; await save(state);
+          round.proposal = await post(operator, path + "/proposals", round.proposalCommand, 201); await save(state);
+        }
+        if (!round.approved) {
+          const proposal = round.proposal;
+          round.decision ??= { decision: "APPROVE", bindingHash: proposal.bindingHash, command: command(proposal.proposalRevision) }; await save(state);
+          round.approved = await post(auditor, `/api/v1/mapping-proposals/${proposal.proposalId}/decisions`, round.decision, 200, `"proposal:${proposal.proposalRevision}"`); await save(state);
+        }
+        if (!round.receipt) {
+          phase = "query_aba_" + label + "_activate";
+          const proposal = round.approved;
+          round.activation ??= { bindingHash: proposal.bindingHash, expectedActive: proposal.expectedActive, command: command(proposal.proposalRevision) }; await save(state);
+          round.receipt = await post(operator, `/api/v1/mapping-proposals/${proposal.proposalId}/activate`, round.activation, 200, `"proposal:${proposal.proposalRevision}"`); await save(state);
+        }
+        return round.receipt;
+      }
+      if (!aba.draftB) {
+        phase = "query_aba_edit_b";
+        const current = await get(operator, path), mapping = structuredClone(current.mapping);
+        mapping.identitySpecs[0].sourceNamespace = "query-fixture-aba-b";
+        aba.patch ??= { mapping, command: command(current.revision) }; await save(state);
+        aba.draftB = (await request(operator, "PATCH", path, aba.patch, 200, `"mapping:${current.revision}"`)).data; await save(state);
+      }
+      const b = await activateRound("b", { kind: "PUBLISH", draftRevision: aba.draftB.revision }, aba.draftB);
+      check("aba_b_is_distinct_release", b.mappingReleaseId !== state.mappingReceipt.mappingReleaseId);
+      if (!aba.a?.receipt) await checkHistory("while_b_active");
+      const a = await activateRound("a", { kind: "ROLLBACK", targetReleaseId: state.mappingReceipt.mappingReleaseId, manifestHash: state.mappingRelease.manifestHash }, aba.draftB);
+      check("aba_same_release_new_activation", a.mappingReleaseId === state.mappingReceipt.mappingReleaseId
+        && a.activationId !== state.mappingReceipt.activationId && a.activationRevision > b.activationRevision && b.activationRevision > state.mappingReceipt.activationRevision);
+      await checkHistory("after_aba");
+      const fresh = await request({ ...operator, headers: { ...operator.headers, "Idempotency-Key": randomUUID() } }, "POST", "/api/v1/data/semantic-queries", query);
+      check("aba_fresh_query_uses_new_activation", fresh.data.status === "AMBIGUOUS" && fresh.queryId !== old.queryId);
+      const proof = await get(operator, "/api/v1/data/source-evidence/" + encodeURIComponent(fresh.data.evidence[0].evidenceId));
+      check("aba_evidence_binds_new_activation", proof.receipt.activationId === a.activationId && proof.receipt.activationRevision === String(a.activationRevision));
+      state.mappingCurrentReceipt = a; await save(state);
+      report.status = "PASS"; report.scope = "S2_REAL_MAPPING_A_B_A_HISTORY_AND_SELECTION_BINDING";
+    } else if (mode === "s2-connection") {
+      const path = `/api/v1/connections/${state.connectionId}`;
+      const queryPath = `/api/v1/data/semantic-queries/${state.latestQuery.queryId}/result`;
+      let current = await request(operator, "GET", path);
+      state.s2Connection ??= { initial: current.data }; await save(state);
+      const steps = state.s2Connection;
+      phase = "query_connection_baseline";
+      check("rotation_baseline_recoverable", createHash("sha256").update((await request(operator, "GET", queryPath)).raw).digest("hex") === state.latestQuery.resultHash);
+      check("rotation_starts_from_active_connection", current.data.state === "ACTIVE");
+      phase = "query_connection_secret_rotated";
+      const secretValue = await readFile(resolve(privateRoot, "pg-source/reader-password"), "utf8"); secrets.push(secretValue);
+      const secret = await post(operator, "/api/v1/connection-secrets", { secretValue, scopeSelection: state.scope, purpose: "POSTGRESQL_READONLY", command: command() }, 201);
+      secrets.push(secret.secretRef);
+      const rotated = await post(operator, path + "/rotate-secret", { secretRef: secret.secretRef, command: command(current.data.configRevision) }, 200, current.etag);
+      check("secret_version_really_advanced", rotated.secretVersion > steps.initial.secretVersion && rotated.configRevision > steps.initial.configRevision);
+      steps.rotated = rotated; await save(state);
+      await request(operator, "GET", queryPath, undefined, 403);
+      phase = "query_connection_restore_current_access";
+      current = await request(operator, "GET", path);
+      const probe = await post(operator, path + "/test", { command: command(current.data.configRevision) }, 200, current.etag);
+      check("current_secret_real_tls_probe", probe.status === "TEST_OK");
+      current = await request(operator, "GET", path);
+      await post(operator, path + "/enable", { command: command(current.data.configRevision) }, 200, current.etag);
+      const restored = await request(operator, "GET", queryPath);
+      check("history_recovery_checks_new_secret_and_keeps_old_bytes", createHash("sha256").update(restored.raw).digest("hex") === state.latestQuery.resultHash);
+      await request({ ...operator, headers: { ...operator.headers, "Idempotency-Key": randomUUID() } }, "POST", "/api/v1/data/semantic-queries", state.latestQuery.query, 409);
+      phase = "query_connection_terminal_disable";
+      current = await request(operator, "GET", path);
+      await post(operator, path + "/disable", { command: command(current.data.configRevision) }, 200, current.etag);
+      await request(operator, "GET", queryPath, undefined, 403);
+      steps.disabledDenied = true;
+      steps.current = (await request(operator, "GET", path)).data; await save(state);
+      report.status = "PASS"; report.scope = "S2_ROTATED_CURRENT_RECOVERY_NEW_EXECUTION_STALE_AND_TERMINAL_DISABLE";
+    } else if (["s2-runtime", "s2-race", "s2-capacity"].includes(mode)) {
       const { execFile, spawn } = await import("node:child_process");
       const control = (action, value = "") => new Promise((resolveControl, rejectControl) => execFile("python3", ["-B", "-c",
         'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;print(json.dumps(q.query_fixture_control(sys.argv[1],sys.argv[2] or None)))', action, value],
@@ -210,6 +329,12 @@ async function browserRun(mode) {
         if (observed.error) throw observed.error;
         const id = observed.value.queryId;
         check("real_api_execution_admitted_before_cancel", /^query-[0-9a-f]{32}$/.test(id));
+        if (mode === "s2-capacity") {
+          await execute(secondary, randomUUID(), 429);
+          const finished = await running;
+          if (finished.error) throw finished.error;
+          check("capacity_denial_does_not_cancel_first_query", finished.value.status === 200 && finished.value.data.status === "UNAVAILABLE");
+        } else {
         const cancelled = await request(secondary, "POST", `/api/v1/data/semantic-queries/${id}/cancel`);
         check("second_api_commits_cancel", cancelled.data.executionStatus === "CANCELLED");
         const finished = await running;
@@ -218,7 +343,9 @@ async function browserRun(mode) {
         const after = JSON.parse((await control("query-probe", key)).output);
         check("late_worker_cannot_commit_completed", after.status === "CANCELLED" && after.cancel === true);
         await request(operator, "GET", `/api/v1/data/semantic-queries/${id}/result`, undefined, 409);
+        }
       } finally { check("cancel_source_barrier_released", await barrier); await found; }
+      if (mode !== "s2-capacity") {
       phase = "query_source_timeout";
       const { finished: fault } = await sourceBarrier();
       try {
@@ -226,7 +353,8 @@ async function browserRun(mode) {
         check("real_source_lock_timeout_never_empty", unavailable.data.status === "UNAVAILABLE" && unavailable.data.data.length === 0
           && unavailable.data.candidates.length === 0 && unavailable.data.subSources.every(item => item.status !== "EMPTY"));
       } finally { check("timeout_source_barrier_released", await fault); }
-      report.status = "PASS"; report.scope = mode === "s2-race" ? "S2_CROSS_API_CANCEL_SOURCE_FAILURE" : "S2_CURRENT_GRANTS_SOURCE_ACL_CROSS_API_CANCEL_SOURCE_FAILURE";
+      }
+      report.status = "PASS"; report.scope = mode === "s2-capacity" ? "S2_CROSS_API_ACTOR_CAPACITY" : mode === "s2-race" ? "S2_CROSS_API_CANCEL_SOURCE_FAILURE" : "S2_CURRENT_GRANTS_SOURCE_ACL_CROSS_API_CANCEL_SOURCE_FAILURE";
     } else if (mode === "provision") {
       if (!state.ontologyDraft) {
         phase = "g3_create";
@@ -267,7 +395,7 @@ async function browserRun(mode) {
         check("g3_formal_original", state.ontologyRelease.manifest.schemaVersion === 2 && state.ontologyRelease.manifest.artifactObjects.length === 4);
       }
       if (!state.connectionId) {
-        const existing = (await get(operator, "/api/v1/connections")).items.filter(value => value.displayName === "M4 synthetic PostgreSQL query");
+        const existing = (await get(operator, "/api/v1/connections")).items.filter(value => value.displayName === (state.connectionDisplayName ?? "M4 synthetic PostgreSQL query"));
         check("resume_connection_unambiguous", existing.length <= 1);
         if (existing.length === 1) { state.connectionId = existing[0].id; await save(state); }
       }
@@ -277,7 +405,7 @@ async function browserRun(mode) {
         const secret = await post(operator, "/api/v1/connection-secrets", { secretValue: password, scopeSelection: state.scope, purpose: "POSTGRESQL_READONLY", command: command() }, 201);
         secrets.push(secret.secretRef);
         const config = { type: "POSTGRESQL", profile: { host: "pg-source", port: 5432, database: "fixture", username: "fixture_reader", sslMode: "VerifyFull", allowedSchemas: ["production", "public"] } };
-        const connection = await post(operator, "/api/v1/connections", { displayName: "M4 synthetic PostgreSQL query", scopeSelection: state.scope, config, secretRef: secret.secretRef, command: command() }, 201);
+        const connection = await post(operator, "/api/v1/connections", { displayName: state.connectionDisplayName ?? "M4 synthetic PostgreSQL query", scopeSelection: state.scope, config, secretRef: secret.secretRef, command: command() }, 201);
         state.connectionId = connection.id; await save(state);
       }
       const connectionPath = `/api/v1/connections/${state.connectionId}`;
@@ -398,7 +526,7 @@ async function browserRun(mode) {
       phase = "query_source_evidence";
       const evidence = await get(operator, "/api/v1/data/source-evidence/" + encodeURIComponent(first.data.evidence[0].evidenceId));
       check("real_evidence_chain", evidence.schemaVersion === "g4.source-evidence.v1" && evidence.receipt.queryId === first.queryId
-        && evidence.receipt.mappingReleaseId === state.mappingReceipt.mappingReleaseId && evidence.receipt.activationId === state.mappingReceipt.activationId);
+        && evidence.receipt.mappingReleaseId === state.mappingReceipt.mappingReleaseId && evidence.receipt.activationId === (state.mappingCurrentReceipt ?? state.mappingReceipt).activationId);
       check("no_internal_binding", !Object.hasOwn(evidence.receipt, "configHash") && !Object.hasOwn(evidence.receipt, "secretVersion") && !Object.hasOwn(evidence.receipt, "binding"));
       await writeFile(file.replace(".json", "-result.json"), first.raw, { flag: "wx" });
       state.latestQuery = { queryId: first.queryId, query, idempotencyKey: key, resultHash: createHash("sha256").update(first.raw).digest("hex") };

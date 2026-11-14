@@ -92,3 +92,28 @@ S2竞态夹具诊断：第一次后台请求断言未及时接管（ef3ebfae8d29
 资源KEEP补充：本任务私有持久query key ring目录0700、UID当前用户，未读取密钥内容；为24h结果跨进程/实例恢复保留，解除条件为最终审查完成且加密结果到期或获准安全归档。旧tmpfs卷因失败追溯暂KEEP，解除须核无活跃挂载/跨任务引用并执行准确收尾。第二API15448/768MiB/.75CPU实测共同预算通过，准确ID和启动时刻在当前Run runtime-secondary-api.json；只供S2，两者均不进入交付ZIP。
 
 S2双API定向复验：browser-s2-race-1794660672737为34检查PASS，持锁连接实际READY后执行，第二API取消200/CANCELLED，第一API迟到提交409 query_execution_stale，真实PG状态仍CANCELLED且恢复409；源锁故障返回UNAVAILABLE而非EMPTY，两个持锁事务均明确RELEASED。前一次browser-s2-race-1794660544379取消路径通过但后续故障夹具就绪超时，整份仍FAIL；[S2竞态原件索引](../evidence/G4-M4-QUERY-001/query-impl-01/s2-race-raw-index.json)保留失败与成功，不重写原件。当前S2尚欠真实ABA/连接变化、完整容量及审计故障覆盖，S3关系/观测/MCP仍未完成，无最终ZIP。
+
+S2版本/容量增量：[版本与容量原件索引](../evidence/G4-M4-QUERY-001/query-impl-01/s2-version-capacity-raw-index.json)含真实ABA94检查、双API主体容量26检查、真实PG事务3/0skip（ed10b0cde88d49779cb9ebb65fd2daf3）。连接2槽、任务4槽及失联FAILED/fence递增通过；审计实际INSERT后注入固定故障，独立上下文确认状态/密文/回执/审计均回滚，再成功路径通过。此存储测试仍只对Connections使用明确替身；真实ABA和HTTP取消证据独立记录。
+
+构建绑定诊断：提交32fd05e482e25bd251f6d00b43949d84d4d2a860后测试项目引用构建重新生成API依赖程序集，检测到磁盘与运行进程绑定漂移；期间没有继续HTTP验收。已按准确进程身份停止两个API，记录原绑定/漂移文件，重建绑定9e54d2c502e4450e8e0b4e1a01a62b22；contract_build现在拒绝任何已运行API的引用构建，停止入口只核准确进程而不会因磁盘漂移阻止安全停止。旧运行证据不改、不冒充新进程。短命测试复用第二API预算槽位，实际回收后才恢复第二API。
+
+
+测试隔离P1与证据影响：browser-s2-connection-1794661671287整体FAIL；旧查询404不是预期连接禁用403，随后test返回409 connection_disabled，既有DISABLED为终态，禁止为夹具修改产品状态机。根因是G4QueryRaceTests未来+25h/+8d维护使用运行库query，Sweep全库语义清除了既有查询；+6s同样必须隔离。只读审计3c3d5d20da8b424d9e4782f51c4a0e81显示当前queryCount=0及13:03:20对应准确queryId两阶段expire记录。历史HTTP/ABA/新进程恢复原件保留当时观察，但原query不再可作后续恢复基线，不能复造原ID或声称旧结果仍可恢复。未涉及M3库或资源。
+
+隔离修正：每次持久测试使用随机m4_query_test_十二位hex独立数据库，创建标记为TaskId/RunId/suffix；测试迁移前同时核连接串、current_database与服务端所有权注释，运行库拒绝进入。容量测试独立应用正式迁移，不依赖测试顺序。Python名称正反例先缺实现失败后6测试通过；真实隔离库1963cdfc919046b78fb47b8865dc738a为3/0skip通过，准确容器及临时库创建/回收强后验保存。见[隔离缺陷与修正原件](../evidence/G4-M4-QUERY-001/query-impl-01/test-database-isolation-raw-index.json)。尚需建立新正式连接/映射/查询并证明后续测试前后运行查询不变；不能把空库不变当作存在结果保护证据。唯一任务状态仍IMPLEMENTING_S2，无最终ZIP。
+
+
+隔离缺陷纵向复验：新连接正式TLS/目录48检查、正式映射独立审批激活40检查、新查询43检查通过。第二次隔离库测试6e5dec5b0d3b411bbac89b25b3b2c573为3/0skip，m4_query_test_98fb7274da21-runtime-preservation原件显示运行库两条实际COMPLETED查询的ID/status/hash/size/fence前后逐项一致；随后browser-s1-reopen-1794662558981为18PASS、原结果字节相同。临时库和准确容器均真实回收。此证据覆盖非空运行查询保护，不声称恢复已经删除的旧query。
+
+连接状态机真实验证：browser-s2-connection-1794662583894为49PASS，从当前可恢复查询起，ACTIVE连接轮换secret版本/configRevision后读取403；正式TLS Probe与enable后历史原字节恢复；旧Active绑定的新执行409；最后终态disable后历史读取403。旧失败脚本原件保留，不再尝试启用DISABLED连接；后续通过新建合成连接继续，已禁用连接准确KEEP。公开原件见[隔离与当前连接索引](../evidence/G4-M4-QUERY-001/query-impl-01/isolation-current-connection-raw-index.json)。S2仍欠执行中当前授权/绑定变化证据，S3观测/关系/MCP未实施，不能声称本轮完成。
+
+
+非作者隔离复核：准确核两次真实测试原件与非空运行库前后保护/恢复证据，关闭测试串库清除P1；仅关闭此项，不作全M4通过。另指出临时测试库创建在try外的异常收尾缺口，已移入try；创建即写准确状态，命令或后验失败明确KEEP_UNVERIFIED及解除条件；容器确定未创建时NOT_CREATED也回收已创建测试库，存在性不明不删库。注入创建失败用例确认准确KEEP记录，当前Python7测试通过。
+
+继续执行基线：第二个已验证禁用连接终态KEEP后，第三条新合成连接正式TLS/目录45检查、映射46检查、新查询43检查通过（browser-replace-disabled-connection-1794662657060、browser-mapping-1794662667167、browser-s1-1794662679191）。两轮旧状态完整保存在ignored runtime-fixture.retiredFixtures；当前映射/query取runtime-fixture顶层，不恢复已删除原ID、不改旧Active/禁用状态。后续同一会话/树/分支继续S2执行中撤权和绑定变化，再S3；最终完整验收/V3/独立重开/包外回执尚未完成。
+
+
+异常清理增量：非作者继续指出inspect超时/owner校验/stop失败可能跳过KEEP记录，已为整个容器清理增加finally；无法确认容器消失时始终写准确容器及已创建库KEEP_UNVERIFIED与解除条件，并传播原异常，临时env确保移除。新增persistence_test注入inspect TimeoutExpired的用例，确认准确库/容器KEEP及env移除；当前Python8测试通过。该短故障注入不声称重新运行整条真实链路。
+
+
+非作者定向复核关闭隔离P1及异常清理P2；静态复核不冒充重跑。当前8项短测试的真实命令e71b7aa565ce4ea4a4c412f1db386936 exit0及stdout/stderr已通过公开扫描保存于[生命周期短测试原件](../evidence/G4-M4-QUERY-001/query-impl-01/isolation-lifecycle-tests-raw-index.json)。最后diff-check exit0。此提交为S2过程检查点，非最终交付Head。

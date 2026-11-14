@@ -26,6 +26,7 @@ public sealed class G4QueryRaceTests
         // 只接受本轮受控容器传入的合成PG，不跳过真实验证。
         var connection = Environment.GetEnvironmentVariable("G4_QUERY_TEST_CONNECTION");
         Assert.IsFalse(string.IsNullOrWhiteSpace(connection));
+        await G4QueryPersistenceTests.DemandIsolatedDatabaseAsync(connection!);
         // 治理与查询各用自己模型工厂，共享实际物理数据库事务。
         await using var provider = new ServiceCollection()
             .AddDbContextFactory<GovernanceDbContext>(options => options.UseNpgsql(connection, postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "governance")))
@@ -141,6 +142,20 @@ public sealed class G4QueryRaceTests
                 "instance-2", DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
             try
             {
+                // 故障发生在真实审计INSERT之后，必须连同密文和回执一起回滚。
+                var failingAuditStore = new G4QueryResultStore(queryFactory, authority, bindingReader,
+                    new WriteThenFailAudit(new TransactionalAuditWriter(governanceFactory)), protection, TimeProvider.System);
+                // 当前grant、Binding和结果都合法，避免其他拒绝条件遮蔽审计故障。
+                var auditFailure = await Assert.ThrowsAsync<SemanticOperationException>(() => failingAuditStore.CompleteAsync(committed.Record,
+                    restoredSession, [restoredProof], query, restoredState, result,
+                    [G4QueryTests.ReceiptFixture(committed.Record.Id, restoredState.Binding, result)], CancellationToken.None));
+                Assert.AreEqual("synthetic_audit_unavailable", auditFailure.Code);
+                // 独立上下文只看已提交状态，不能读同一跟踪对象假装回滚。
+                var rolledBack = await queryDatabase.Queries.AsNoTracking().SingleAsync(row => row.Id == committed.Record.Id);
+                Assert.AreEqual("RUNNING", rolledBack.ExecutionStatus);
+                Assert.AreEqual(0, rolledBack.ResultCiphertext.Length);
+                Assert.AreEqual(0, G4QueryResultStore.ReadState(rolledBack).Receipts.Length);
+                Assert.IsFalse(await governance.AuditRecords.AnyAsync(row => row.Resource == committed.Record.Id));
                 await store.CompleteAsync(committed.Record, restoredSession, [restoredProof], query, restoredState, result,
                     [G4QueryTests.ReceiptFixture(committed.Record.Id, restoredState.Binding, result)], CancellationToken.None);
                 // 新上下文同时看到COMPLETED、密文、回执及治理成功审计。
@@ -250,6 +265,129 @@ public sealed class G4QueryRaceTests
             // 失败反例同样只回收本测试准确查询身份，避免占用后续任务容量。
             await queryDatabase.Queries.Where(row => row.Id == admission.Record.Id).ExecuteDeleteAsync();
             await tickets.RemoveAsync(sessionId);
+        }
+    }
+
+    /// <summary>真实PG跨上下文执行连接二槽/任务四槽；失联维护仅终结状态，旧fence不能续租。</summary>
+    [TestMethod]
+    public async Task ConnectionAndTaskCapacityAndLostLeaseAreAtomic()
+    {
+        // 仅消费当前任务显式提供的合成平台库。
+        var connection = Environment.GetEnvironmentVariable("G4_QUERY_TEST_CONNECTION");
+        Assert.IsFalse(string.IsNullOrWhiteSpace(connection));
+        await G4QueryPersistenceTests.DemandIsolatedDatabaseAsync(connection!);
+        // 两模块各自保持正式工厂与写表边界。
+        await using var provider = new ServiceCollection()
+            .AddDbContextFactory<GovernanceDbContext>(options => options.UseNpgsql(connection, postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "governance")))
+            .AddDbContextFactory<G4QueryDbContext>(options => options.UseNpgsql(connection, postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "semantic_query")))
+            .BuildServiceProvider();
+        // 查询服务每次调用独立上下文，容量不依赖进程内锁。
+        var queryFactory = provider.GetRequiredService<IDbContextFactory<G4QueryDbContext>>();
+        // 当前票据、grant和审计全部使用真实治理模型。
+        var governanceFactory = provider.GetRequiredService<IDbContextFactory<GovernanceDbContext>>();
+        await using var governance = await governanceFactory.CreateDbContextAsync();
+        await using var database = await queryFactory.CreateDbContextAsync();
+        await governance.Database.MigrateAsync();
+        await database.Database.MigrateAsync();
+        // 随机组织和连接身份防止与本轮其他真实HTTP查询混淆。
+        var suffix = Guid.NewGuid().ToString("N");
+        // 当前测试所有记录都归属于这一明确组织。
+        var organization = "capacity-" + suffix;
+        // 真票据加密只在本测试内存中，不落盘或输出。
+        var protection = new EphemeralDataProtectionProvider();
+        // 五个不同主体用于分别触发连接及任务约束。
+        var actors = Enumerable.Range(0, 5).Select(index => new ActorContext { SubjectId = "actor-" + index,
+            OrganizationId = organization, SiteIds = ["site-1"], Roles = ["platform.viewer"], TraceId = "trace-1", CorrelationId = "correlation-1" }).ToArray();
+        // 会话身份完全由正式票据存储生成。
+        var sessions = new List<(PostgresTicketStore Store, string Id)>();
+        // 精确跟踪本测试实际准入的查询ID，失败时同样执行白名单清理。
+        var admissions = new List<G4QueryAdmission>();
+        // 全部grant先完成，后续捕获固定同一个真实授权epoch。
+        var grants = actors.SelectMany(actor => Enumerable.Range(1, 3).Select(index => new MappingAuthorizationGrant
+        {
+            Id = "capacity-grant-" + suffix + actor.SubjectId + index, SubjectId = actor.SubjectId, OrganizationId = organization,
+            SiteIds = ["site-1"], Permission = "data.query.execute", ConnectionId = "capacity-connection-" + suffix + index,
+            ObjectRefs = ["production/assets"], FieldRefs = ["production/assets/1/id"], ExpiresAtUtc = DateTimeOffset.UtcNow.AddMinutes(15)
+        })).ToArray();
+        governance.MappingAuthorizationGrants.AddRange(grants);
+        await governance.SaveChangesAsync();
+        // 存储测试仍明确替换映射参与者，不将它冒充正式源/映射HTTP证明。
+        var authority = new QueryAuthorizationParticipant(new MappingAuthorizationParticipant(governanceFactory, new MappingSessionAuthority(protection), TimeProvider.System));
+        // 不同实例名共用真实平台PG容量锁。
+        var store = new G4QueryResultStore(queryFactory, authority, new FixedBindingReader(), new TransactionalAuditWriter(governanceFactory), protection, TimeProvider.System);
+        try
+        {
+            foreach (var actor in actors)
+            {
+                // 每主体拥有独立可信认证票据，角色不替代显式grant。
+                var principal = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim("sub", actor.SubjectId),
+                    new Claim("organization_id", organization), new Claim("site_ids", "site-1"), new Claim(ClaimTypes.Role, "platform.viewer") }, "Cookies"));
+                // 正式PostgresTicketStore确保会话检查不使用恒真替身。
+                var tickets = new PostgresTicketStore(governanceFactory, protection,
+                    new HttpContextAccessor { HttpContext = new DefaultHttpContext { User = principal } }, TimeProvider.System);
+                sessions.Add((tickets, await tickets.StoreAsync(new AuthenticationTicket(principal,
+                    new AuthenticationProperties { ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(15) }, "Cookies"))));
+            }
+            // 每次准入重新捕获真实proof，查询本身不访问外部源。
+            async Task<G4QueryAdmission> Admit(int actorIndex, int connectionIndex)
+            {
+                // 本例明确的非空连接身份供grant匹配和固定Binding共同使用。
+                var connectionId = "capacity-connection-" + suffix + connectionIndex;
+                // 连接/字段集合必须由一条完整grant覆盖。
+                var grant = grants.Single(item => item.SubjectId == actors[actorIndex].SubjectId && item.ConnectionId == connectionId);
+                // 请求scope与真实票据相同，不拼多条grant。
+                var scope = new ResourceScope { OrganizationId = organization, SiteIds = ["site-1"] };
+                // session-only与字段许可分开捕获。
+                var session = await authority.CaptureSessionAsync(actors[actorIndex], sessions[actorIndex].Id, scope, CancellationToken.None);
+                // 当前完整执行许可来自真实数据库。
+                var proof = await authority.CaptureAsync(session with { ConnectionId = grant.ConnectionId, ObjectRefs = grant.ObjectRefs, FieldRefs = grant.FieldRefs }, CancellationToken.None);
+                // 每条新查询使用不同键，不能因幂等重放绕过本次容量反例。
+                var query = new G4SemanticQuery { AssetId = "asset-1", OntologyReleaseId = "ontology-1", MappingReleaseIds = ["mapping-1"],
+                    CapabilityId = "g4_resolve_entity", CapabilityVersion = new string('a', 64), RelationshipIris = [], Depth = 1, MaxRows = 10, TimeoutMs = 5000, Filters = new G4QueryFilters() };
+                // 映射仅为明确替身材料，连接身份仍对应实际授权grant。
+                var state = new G4QueryState { Binding = Binding(session.AuthorizationEpoch) with { ConnectionId = connectionId }, Scope = scope,
+                    Projections = [new G4QueryProjection { ObjectRefs = grant.ObjectRefs, FieldRefs = grant.FieldRefs }] };
+                return await store.AdmitAsync(session, [proof], query, state, Guid.NewGuid().ToString("N"), null,
+                    "instance-" + actorIndex, DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
+            }
+            admissions.Add(await Admit(0, 1));
+            admissions.Add(await Admit(1, 1));
+            Assert.AreEqual(429, (await Assert.ThrowsAsync<SemanticOperationException>(() => Admit(2, 1))).Status);
+            admissions.Add(await Admit(2, 2));
+            admissions.Add(await Admit(3, 2));
+            Assert.AreEqual(429, (await Assert.ThrowsAsync<SemanticOperationException>(() => Admit(4, 3))).Status);
+            Assert.AreEqual(4, await database.Queries.CountAsync(row => row.OrganizationId == organization && row.ExecutionStatus == "RUNNING"));
+            // 只推进该维护实例时钟，既有lease到期后不得重新发起任何源查询。
+            var sweeper = new G4QueryResultStore(queryFactory, authority, new FixedBindingReader(), new TransactionalAuditWriter(governanceFactory), protection,
+                new FixedTime(DateTimeOffset.UtcNow.AddSeconds(6)));
+            await sweeper.SweepAsync(CancellationToken.None);
+            foreach (var admission in admissions)
+            {
+                // 跨上下文确认FAILED、无密文以及递增fence；旧执行引用无法续租。
+                var saved = await database.Queries.AsNoTracking().SingleAsync(row => row.Id == admission.Record.Id);
+                Assert.AreEqual("FAILED", saved.ExecutionStatus);
+                Assert.IsTrue(saved.Fence > admission.Record.Fence);
+                Assert.AreEqual(0, saved.ResultCiphertext.Length);
+                Assert.IsFalse(await store.HeartbeatAsync(admission.Record, CancellationToken.None));
+            }
+        }
+        finally
+        {
+            await database.Queries.Where(row => row.OrganizationId == organization).ExecuteDeleteAsync();
+            foreach (var session in sessions) await session.Store.RemoveAsync(session.Id);
+            await governance.MappingAuthorizationGrants.Where(row => row.OrganizationId == organization).ExecuteDeleteAsync();
+            Assert.AreEqual(0, await database.Queries.CountAsync(row => row.OrganizationId == organization));
+        }
+    }
+
+    /// <summary>真实审计写入后注入故障，验证调用方事务确实回滚审计及结果。</summary>
+    private sealed class WriteThenFailAudit(ITransactionalAuditWriter actual) : ITransactionalAuditWriter
+    {
+        /// <summary>先写同一物理PG事务，再在提交前抛出固定合成故障。</summary>
+        public async Task<string> WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken)
+        {
+            await actual.WriteAsync(actor, command, connection, transaction, cancellationToken);
+            throw new SemanticOperationException(503, "synthetic_audit_unavailable");
         }
     }
 

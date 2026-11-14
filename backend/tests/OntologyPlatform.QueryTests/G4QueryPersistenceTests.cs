@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using OntologyPlatform.Modules.SemanticQuery;
 
 namespace OntologyPlatform.QueryTests;
@@ -18,6 +19,7 @@ public sealed class G4QueryPersistenceTests
         // 只有受控M4驱动为本任务合成数据库提供进程内连接配置。
         var connection = Environment.GetEnvironmentVariable("G4_QUERY_TEST_CONNECTION");
         Assert.IsFalse(string.IsNullOrWhiteSpace(connection), "M4真实数据库尚未准入，不能用内存替身通过。");
+        await DemandIsolatedDatabaseAsync(connection!);
         // 正式模块注册路径和生产生命周期保持一致。
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -78,4 +80,22 @@ public sealed class G4QueryPersistenceTests
         // 只删除本测试创建的准确临时目录，宿主及其他任务keyring保持不变。
         keyDirectory.Delete(recursive: true);
     }
+
+    /// <summary>任何迁移或未来时钟维护前，核对真实数据库名称及任务独占标记，拒绝运行库。</summary>
+    internal static async Task DemandIsolatedDatabaseAsync(string connectionString)
+    {
+        // 客户端连接串检查先于连接，避免意外向运行库发送迁移。
+        var builder = new NpgsqlConnectionStringBuilder(connectionString);
+        Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(builder.Database ?? string.Empty, @"\Am4_query_test_[0-9a-f]{12}\z"), "必须使用独立测试库。");
+        // 真实服务端身份与创建时所有权注释必须同时一致，不能只相信传入名称。
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync();
+        // 只读元数据确认该连接确实进入本任务为本次测试新建的数据库。
+        await using var command = new NpgsqlCommand("SELECT current_database(), shobj_description(oid, 'pg_database') FROM pg_database WHERE datname = current_database()", connection);
+        await using var reader = await command.ExecuteReaderAsync();
+        Assert.IsTrue(await reader.ReadAsync());
+        Assert.AreEqual(builder.Database, reader.GetString(0));
+        Assert.AreEqual("G4-M4-QUERY-001:query-impl-01:" + builder.Database![14..], reader.GetString(1));
+    }
+
 }
