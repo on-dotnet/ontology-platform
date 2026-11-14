@@ -72,17 +72,27 @@ public sealed class PostgresTicketStore : ITicketStore
     {
         // 每次更新直接查询PG，双实例共享撤销事实。
         await using var database = await factory.CreateDbContextAsync();
-        // 使用行条件避免撤销或过期票据被续期路径复活。
-        var session = await database.Sessions.SingleOrDefaultAsync(value => value.Id == key);
+        // 更新与映射激活使用相同组织优先锁序，不能跨组织悄然换身份。
+        await using var transaction = await database.Database.BeginTransactionAsync();
+        // 先以已加密服务器记录确定组织，再在组织锁内重读会话。
+        var session = await LockSessionAsync(database, key);
+
         if (session is null || session.RevokedAtUtc is not null || session.ExpiresAtUtc <= clock.GetUtcNow())
         {
             return;
+        }
+        if (ticket.Principal.FindFirstValue("organization_id") != Organization(session.ProtectedTicket))
+        {
+            throw new InvalidOperationException("会话续更不能变更组织，必须重新认证。");
         }
         ticket.Properties.ExpiresUtc = session.ExpiresAtUtc;
         // 条件更新避免并发注销后用旧实体覆盖撤销状态。
         var protectedTicket = protector.Protect(TicketSerializer.Default.Serialize(ticket));
         await database.Sessions.Where(value => value.Id == key && value.RevokedAtUtc == null && value.ExpiresAtUtc > clock.GetUtcNow())
             .ExecuteUpdateAsync(update => update.SetProperty(value => value.ProtectedTicket, protectedTicket));
+        // 续更可能改变角色或厂区，保守递增组织版本使旧审批失效。
+        await AdvanceEpochAsync(database, Organization(session.ProtectedTicket));
+        await transaction.CommitAsync();
     }
 
     /// <summary>仅解密仍有效且未撤销的PG票据。</summary>
@@ -121,6 +131,13 @@ public sealed class PostgresTicketStore : ITicketStore
         await using var database = await factory.CreateDbContextAsync();
         // 同一事务中的条件更新只允许一次有效注销。
         await using var transaction = await database.Database.BeginTransactionAsync();
+        // 先锁组织再重读会话，与映射权限事务使用相同锁域。
+        var session = await LockSessionAsync(database, key);
+        if (session is null)
+        {
+            await transaction.CommitAsync();
+            return;
+        }
         // 从当前认证请求读取审计主体，绝不输出服务器票据。
         var principal = accessor.HttpContext?.User ?? new ClaimsPrincipal();
         // 条件更新防止并发注销生成多个成功审计。
@@ -128,10 +145,63 @@ public sealed class PostgresTicketStore : ITicketStore
             .ExecuteUpdateAsync(update => update.SetProperty(value => value.RevokedAtUtc, clock.GetUtcNow()));
         if (changed > 0)
         {
+            await AdvanceEpochAsync(database, Organization(session.ProtectedTicket));
             database.AuditRecords.Add(AuditService.Create(accessor.HttpContext, principal,
                 "authentication.logout", "session", "allowed"));
             await database.SaveChangesAsync();
         }
         await transaction.CommitAsync();
     }
+
+    /// <summary>从可信加密票据提取组织，损坏或缺失时拒绝无锁降级。</summary>
+    private string Organization(byte[] protectedTicket)
+    {
+        // 解密只在内存，绝不输出票据内容。
+        var ticket = TicketSerializer.Default.Deserialize(protector.Unprotect(protectedTicket));
+        // 组织取自原已签发票据，不接受调用者提供的scope。
+        var organization = ticket?.Principal.FindFirstValue("organization_id");
+        if (ticket?.Principal.Identity?.IsAuthenticated != true || string.IsNullOrWhiteSpace(organization))
+        {
+            throw new InvalidOperationException("服务器会话缺少可信组织。");
+        }
+        return organization;
+    }
+
+    /// <summary>先读取组织提示，再取得组织锁和会话行锁，复核组织未变。</summary>
+    private async Task<ServerSession?> LockSessionAsync(GovernanceDbContext database, string key)
+    {
+        // 第一次读取只用于定位锁，不作为最终授权依据。
+        var hint = await database.Sessions.AsNoTracking().SingleOrDefaultAsync(value => value.Id == key);
+        if (hint is null)
+        {
+            return null;
+        }
+        // 同组织任何厂区范围共享同一行锁。
+        var organization = Organization(hint.ProtectedTicket);
+        await MappingAuthorizationParticipant.LockOrganizationAsync(database, organization, CancellationToken.None);
+        // 组织锁取得后必须重新读当前会话行。
+        var records = await database.Sessions.FromSqlInterpolated($"SELECT * FROM governance.server_sessions WHERE \"Id\" = {key} FOR UPDATE")
+            .AsNoTracking().ToArrayAsync();
+        // 记录可能已删除；不能沿用首次读取的旧票据。
+        var session = records.SingleOrDefault();
+        if (session is not null && Organization(session.ProtectedTicket) != organization)
+        {
+            throw new InvalidOperationException("服务器会话组织发生竞争变化。");
+        }
+        return session;
+    }
+
+    /// <summary>授权变化在同组织锁事务内递增版本，溢出即失败关闭。</summary>
+    private static async Task AdvanceEpochAsync(GovernanceDbContext database, string organization)
+    {
+        // 更新只触及治理自己拥有的组织版本，不跨模块写Active。
+        var changed = await database.MappingAuthorizationEpochs.Where(value => value.OrganizationId == organization
+            && value.Revision < OntologyPlatform.Contracts.G4MappingRules.MaximumRevision)
+            .ExecuteUpdateAsync(update => update.SetProperty(value => value.Revision, value => value.Revision + 1));
+        if (changed != 1)
+        {
+            throw new InvalidOperationException("组织授权版本不可递增。");
+        }
+    }
+
 }

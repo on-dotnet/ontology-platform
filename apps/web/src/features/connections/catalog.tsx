@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { CatalogDiscoveryJobView, OracleColumnMetadata, CatalogSnapshotListPage, CatalogSnapshotView, ConnectionView } from "../../lib/api/g4-generated";
@@ -152,13 +153,13 @@ export function CatalogPanel({ connection, etag, canManage, onDenied, parentBusy
       {replay && !busy && <button disabled={interactionBusy} onClick={() => void run(replay!)}>恢复上次目录操作结果</button>}
       {history && !history.items.length && <p>尚无目录快照。启用连接后可发现可见目录。</p>}
       {history && history.items.length > 0 && <><h3>目录快照历史</h3><ul className="catalog-history">{history.items.map(item => <li key={item.snapshotId}><button disabled={interactionBusy} onClick={() => { void run(() => readSnapshot(item.snapshotId)); }}>{item.capturedAtUtc} · 修订 {item.configRevision} · {item.objects.length} 个对象</button><span className="tag">{stateLabels[item.status] ?? item.status}</span></li>)}</ul>{history.nextCursor && <button disabled={interactionBusy} onClick={() => void run(() => readCatalogs(history.nextCursor!))}>下一页历史</button>}</>}
-      {snapshot && <CatalogSnapshot snapshot={snapshot} stale={!!error || !["SUCCEEDED"].includes(job?.status ?? "SUCCEEDED")} />}
+      {snapshot && <CatalogSnapshot canMap={canManage && connection.config.type === "POSTGRESQL"} snapshot={snapshot} stale={!!error || !["SUCCEEDED"].includes(job?.status ?? "SUCCEEDED")} />}
     </>}
   </section>;
 }
 /** 保真展示类型、空值及精度，不把历史快照状态提升为当前源状态。 */
-export function CatalogSnapshot({ snapshot, stale }: { snapshot: CatalogSnapshotView; stale: boolean }) {
-  return <section aria-label="目录快照详情"><h3>只读目录快照 <span className="tag">{stateLabels[snapshot.status] ?? snapshot.status}</span></h3>{(stale || snapshot.status === "STALE") && <p className="connection-alert">此快照可能已过期；不能用于证明当前目录完整或当前源可访问。</p>}<p className="connection-note">捕获时间：{snapshot.capturedAtUtc}<br />指纹：{snapshot.schemaFingerprint}</p>{snapshot.objects.map(object => <details key={`${object.schema}.${object.name}`} open><summary>{object.schema}.{object.name} · {object.kind === "VIEW" ? "视图" : "表"} · {object.fields.length} 个字段</summary><div className="connection-scroll" tabIndex={0} aria-label={`${object.name}字段，可横向滚动`}><table><thead><tr><th>字段</th><th>原生类型</th><th>可为空</th><th>精度</th><th>小数位</th></tr></thead><tbody>{object.fields.map(field => <tr key={`${field.ordinal}:${field.name}`}><td>{field.name}</td><td>{field.nativeType}{field.oracleMetadata && <OracleTypeDetails metadata={field.oracleMetadata} />}</td><td>{field.nullable ? "是" : "否"}</td><td>{field.precision ?? "—"}</td><td>{field.scale ?? "—"}</td></tr>)}</tbody></table></div></details>)}</section>;
+export function CatalogSnapshot({ snapshot, stale, canMap = false }: { snapshot: CatalogSnapshotView; stale: boolean; canMap?: boolean }) {
+  return <section aria-label="目录快照详情"><h3>只读目录快照 <span className="tag">{stateLabels[snapshot.status] ?? snapshot.status}</span></h3>{(stale || snapshot.status === "STALE") && <p className="connection-alert">此快照可能已过期；不能用于证明当前目录完整或当前源可访问。</p>}{canMap && !stale && snapshot.status === "READY" && <p><Link href={`/data/mappings/new?snapshotId=${encodeURIComponent(snapshot.snapshotId)}`}>从此固定快照创建人工映射</Link></p>}<p className="connection-note">捕获时间：{snapshot.capturedAtUtc}<br />指纹：{snapshot.schemaFingerprint}</p>{snapshot.objects.map(object => <details key={`${object.schema}.${object.name}`} open><summary>{object.schema}.{object.name} · {object.kind === "VIEW" ? "视图" : "表"} · {object.fields.length} 个字段</summary><div className="connection-scroll" tabIndex={0} aria-label={`${object.name}字段，可横向滚动`}><table><thead><tr><th>字段</th><th>原生类型</th><th>可为空</th><th>精度</th><th>小数位</th></tr></thead><tbody>{object.fields.map(field => <tr key={`${field.ordinal}:${field.name}`}><td>{field.name}</td><td>{field.nativeType}{field.oracleMetadata && <OracleTypeDetails metadata={field.oracleMetadata} />}</td><td>{field.nullable ? "是" : "否"}</td><td>{field.precision ?? "—"}</td><td>{field.scale ?? "—"}</td></tr>)}</tbody></table></div></details>)}</section>;
 }
 
 /** Oracle特有类型语义；未知数值保持未知，不把LOB元数据当作正文。 */

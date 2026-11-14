@@ -59,7 +59,15 @@
         "scripts/maintenance/workflow_oracle_fixture.py",
         "scripts/maintenance/workflow_oracle_platform.py",
         "scripts/maintenance/workflow-oracle.mjs",
-        "scripts/maintenance/oracle-fixture-relay.cs.txt"
+        "scripts/maintenance/oracle-fixture-relay.cs.txt",
+        "scripts/maintenance/workflow_m3_mapping.py",
+        "scripts/maintenance/workflow-m3-mapping.mjs",
+        "experiments/g4-m3-mapping-001/**",
+        "samples/g2/ontology.ttl",
+        "samples/g2/shapes.ttl",
+        "samples/g2/vocabulary.ttl",
+        "samples/g2/data.ttl",
+        "samples/g3-m3/units.ttl"
       ],
       "needs": [],
       "command": null
@@ -81,7 +89,15 @@
         "scripts/maintenance/workflow_oracle_fixture.py",
         "scripts/maintenance/workflow_oracle_platform.py",
         "scripts/maintenance/workflow-oracle.mjs",
-        "scripts/maintenance/oracle-fixture-relay.cs.txt"
+        "scripts/maintenance/oracle-fixture-relay.cs.txt",
+        "scripts/maintenance/workflow_m3_mapping.py",
+        "scripts/maintenance/workflow-m3-mapping.mjs",
+        "experiments/g4-m3-mapping-001/**",
+        "samples/g2/ontology.ttl",
+        "samples/g2/shapes.ttl",
+        "samples/g2/vocabulary.ttl",
+        "samples/g2/data.ttl",
+        "samples/g3-m3/units.ttl"
       ],
       "needs": [
         "environment"
@@ -105,7 +121,15 @@
         "scripts/maintenance/workflow_oracle_fixture.py",
         "scripts/maintenance/workflow_oracle_platform.py",
         "scripts/maintenance/workflow-oracle.mjs",
-        "scripts/maintenance/oracle-fixture-relay.cs.txt"
+        "scripts/maintenance/oracle-fixture-relay.cs.txt",
+        "scripts/maintenance/workflow_m3_mapping.py",
+        "scripts/maintenance/workflow-m3-mapping.mjs",
+        "experiments/g4-m3-mapping-001/**",
+        "samples/g2/ontology.ttl",
+        "samples/g2/shapes.ttl",
+        "samples/g2/vocabulary.ttl",
+        "samples/g2/data.ttl",
+        "samples/g3-m3/units.ttl"
       ],
       "needs": [
         "contract",
@@ -127,7 +151,15 @@
         "scripts/maintenance/workflow_oracle_fixture.py",
         "scripts/maintenance/workflow_oracle_platform.py",
         "scripts/maintenance/workflow-oracle.mjs",
-        "scripts/maintenance/oracle-fixture-relay.cs.txt"
+        "scripts/maintenance/oracle-fixture-relay.cs.txt",
+        "scripts/maintenance/workflow_m3_mapping.py",
+        "scripts/maintenance/workflow-m3-mapping.mjs",
+        "experiments/g4-m3-mapping-001/**",
+        "samples/g2/ontology.ttl",
+        "samples/g2/shapes.ttl",
+        "samples/g2/vocabulary.ttl",
+        "samples/g2/data.ttl",
+        "samples/g3-m3/units.ttl"
       ],
       "needs": [
         "contract"
@@ -149,7 +181,15 @@
         "scripts/maintenance/workflow_oracle_fixture.py",
         "scripts/maintenance/workflow_oracle_platform.py",
         "scripts/maintenance/workflow-oracle.mjs",
-        "scripts/maintenance/oracle-fixture-relay.cs.txt"
+        "scripts/maintenance/oracle-fixture-relay.cs.txt",
+        "scripts/maintenance/workflow_m3_mapping.py",
+        "scripts/maintenance/workflow-m3-mapping.mjs",
+        "experiments/g4-m3-mapping-001/**",
+        "samples/g2/ontology.ttl",
+        "samples/g2/shapes.ttl",
+        "samples/g2/vocabulary.ttl",
+        "samples/g2/data.ttl",
+        "samples/g3-m3/units.ttl"
       ],
       "needs": [
         "web",
@@ -447,6 +487,30 @@
       "identityInputs": [
         "scripts/maintenance/workflow_execution.py",
         "scripts/maintenance/workflow_m2_evidence.py"
+      ]
+    },
+    "mapping-task-admission": {
+      "inputs": [
+        "scripts/maintenance/workflow_m3_mapping.py",
+        "scripts/maintenance/workflow-m3-mapping.mjs",
+        "experiments/g4-m3-mapping-001/**",
+        "scripts/tests/WorkflowMapping.Tests.py",
+        "scripts/maintenance/workflow_web_cache.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowMapping.Tests.py"
+      ],
+      "testsRequired": true,
+      "identityInputs": [
+        "scripts/maintenance/workflow_execution.py",
+        "scripts/maintenance/workflow_environment.py",
+        "scripts/maintenance/execution_preflight.py",
+        "backend/src/Hosts/OntologyPlatform.Api/G4/**",
+        "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/Mapping*.cs",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs"
       ]
     }
   }

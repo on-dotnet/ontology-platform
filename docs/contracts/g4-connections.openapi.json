@@ -409,6 +409,548 @@
           }
         }
       }
+    },
+    "/api/v1/mappings": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingPageOfMappingListItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Mappings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingDraftCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingDraftView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mappings/{id}": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingDraftView"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Mappings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingDraftPatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingDraftView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mappings/{id}/revisions/{revision}": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingDraftView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mappings/{id}/diff": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingDiffView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mappings/{id}/release-diff": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingDiffView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mappings/{id}/suggestions": {
+      "post": {
+        "tags": [
+          "Mappings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingSuggestionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingSuggestionView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mappings/{id}/validate": {
+      "post": {
+        "tags": [
+          "Mappings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingValidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingJobView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-jobs/{id}": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingJobView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-jobs/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Mappings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingCommandRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingJobView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mappings/{id}/assessments": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingPageOfMappingAssessmentView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-assessments/{id}": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingAssessmentView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mappings/{id}/proposals": {
+      "post": {
+        "tags": [
+          "Mappings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingProposalCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingProposalView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-proposals": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingPageOfMappingProposalView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-proposals/{id}": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingProposalView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-proposals/{id}/decisions": {
+      "post": {
+        "tags": [
+          "Mappings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingDecisionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingProposalView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-proposals/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Mappings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingCommandRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingProposalView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-proposals/{id}/activate": {
+      "post": {
+        "tags": [
+          "Mappings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingActivationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingActivationReceipt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-proposals/{id}/activation-checks": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingPageOfMappingActivationCheck"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-activation-checks/{id}": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingActivationCheck"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-releases": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingPageOfMappingReleaseView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapping-releases/{id}": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingReleaseView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mappings/{id}/active": {
+      "get": {
+        "tags": [
+          "Mappings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingActiveView"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1232,6 +1774,2502 @@
         "additionalProperties": false,
         "description": "Doris配置预览，本阶段不可连接。"
       },
+      "JsonElement": { },
+      "MappingActivationCheck": {
+        "required": [
+          "checkId",
+          "proposalId",
+          "bindingHash",
+          "assessmentId",
+          "checkedBinding",
+          "checkedAtUtc",
+          "expiresAtUtc",
+          "stages",
+          "semanticResultHash",
+          "evidenceHash"
+        ],
+        "type": "object",
+        "properties": {
+          "checkId": {
+            "type": "string",
+            "description": "本次复核标识。"
+          },
+          "proposalId": {
+            "type": "string",
+            "description": "被复核提案。"
+          },
+          "bindingHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "受审提案散列。"
+          },
+          "assessmentId": {
+            "type": "string",
+            "description": "原受审报告。"
+          },
+          "checkedBinding": {
+            "description": "必须与原受审全部版本逐字段一致。",
+            "$ref": "#/components/schemas/MappingVersionBinding"
+          },
+          "checkedAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "本次复核完成时间。",
+            "format": "date-time"
+          },
+          "expiresAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "不超过复核完成后30秒且不超提案截止。",
+            "format": "date-time"
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingStageResult"
+            },
+            "description": "新七阶段真实实证。"
+          },
+          "semanticResultHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "本次语义不变量散列。"
+          },
+          "evidenceHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "本次观察证据散列。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "激活前独立新鲜复核，不改原Assessment。"
+      },
+      "MappingActivationReceipt": {
+        "required": [
+          "activationId",
+          "mappingId",
+          "proposalId",
+          "kind",
+          "mappingReleaseId",
+          "manifestHash",
+          "previousReleaseId",
+          "activationRevision",
+          "auditId",
+          "outboxEventId",
+          "activatedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "activationId": {
+            "type": "string",
+            "description": "唯一激活标识。"
+          },
+          "mappingId": {
+            "type": "string",
+            "description": "永久映射标识。"
+          },
+          "proposalId": {
+            "type": "string",
+            "description": "批准提案标识。"
+          },
+          "kind": {
+            "enum": [
+              "PUBLISH",
+              "ROLLBACK"
+            ],
+            "type": "string",
+            "description": "PUBLISH或ROLLBACK。"
+          },
+          "mappingReleaseId": {
+            "type": "string",
+            "description": "实际目标发布标识。"
+          },
+          "manifestHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "目标原字节散列。"
+          },
+          "previousReleaseId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "首次激活才为null。"
+          },
+          "activationRevision": {
+            "type": "integer",
+            "description": "包括回滚在内单调递增。",
+            "format": "int64"
+          },
+          "auditId": {
+            "type": "string",
+            "description": "同物理事务的治理审计。"
+          },
+          "outboxEventId": {
+            "type": "string",
+            "description": "同物理事务的事件标识。"
+          },
+          "activatedAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "提交前生成且提交后才公开的时刻。",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "成功原子提交后的可恢复原回执。"
+      },
+      "MappingActivationRequest": {
+        "required": [
+          "bindingHash",
+          "expectedActive",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "bindingHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "不可变提案散列。"
+          },
+          "expectedActive": {
+            "description": "必须等于提案固定CAS基线。",
+            "$ref": "#/components/schemas/MappingExpectedActive"
+          },
+          "command": {
+            "description": "幂等及预期提案修订。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "固定批准目标的CAS激活命令。"
+      },
+      "MappingActiveView": {
+        "required": [
+          "mappingId",
+          "mappingReleaseId",
+          "manifestHash",
+          "activationRevision",
+          "usable",
+          "reasonCodes"
+        ],
+        "type": "object",
+        "properties": {
+          "mappingId": {
+            "type": "string",
+            "description": "永久映射。"
+          },
+          "mappingReleaseId": {
+            "type": "string",
+            "description": "当前正式制品。"
+          },
+          "manifestHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "制品原hash。"
+          },
+          "activationRevision": {
+            "type": "integer",
+            "description": "单调激活修订。",
+            "format": "int64"
+          },
+          "usable": {
+            "type": "boolean",
+            "description": "当前可用性。"
+          },
+          "reasonCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "当前不可用原因。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "当前指针及可用性，无指针以404表示。"
+      },
+      "MappingAssessmentView": {
+        "required": [
+          "schemaVersion",
+          "assessmentId",
+          "mappingId",
+          "target",
+          "binding",
+          "expectedActive",
+          "stages",
+          "issues",
+          "status",
+          "semanticResultHash",
+          "evidenceHash",
+          "startedAtUtc",
+          "finishedAtUtc",
+          "expiresAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "enum": [
+              "g4.mapping.v1"
+            ],
+            "type": "string",
+            "description": "固定g4.mapping.v1。"
+          },
+          "assessmentId": {
+            "type": "string",
+            "description": "不可变报告标识。"
+          },
+          "mappingId": {
+            "type": "string",
+            "description": "报告所属映射。"
+          },
+          "target": {
+            "description": "受评估固定目标。",
+            "$ref": "#/components/schemas/MappingValidationTarget"
+          },
+          "binding": {
+            "description": "完整受审输入及本报告散列。",
+            "$ref": "#/components/schemas/MappingVersionBinding"
+          },
+          "expectedActive": {
+            "description": "受审影响分析的Active基线。",
+            "$ref": "#/components/schemas/MappingExpectedActive"
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingStageResult"
+            },
+            "description": "固定顺序七阶段。"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingIssue"
+            },
+            "description": "脱敏且可定位的问题。"
+          },
+          "status": {
+            "enum": [
+              "READY_FOR_PROPOSAL",
+              "BLOCKED"
+            ],
+            "type": "string",
+            "description": "真实聚合状态。"
+          },
+          "semanticResultHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "稳定语义不变量散列，排除观察时刻与业务数值。"
+          },
+          "evidenceHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "本次真实观察证据散列，用于重算受审validationHash。"
+          },
+          "startedAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "真实评估开始时刻。",
+            "format": "date-time"
+          },
+          "finishedAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "真实评估完成时刻。",
+            "format": "date-time"
+          },
+          "expiresAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "受审报告到期时刻。",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "原受审七阶段报告；新的激活复核不能覆盖它。"
+      },
+      "MappingCommandRequest": {
+        "required": [
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "command": {
+            "description": "幂等与预期对象修订。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "取消等无额外载荷的命令。"
+      },
+      "MappingConversion": {
+        "required": [
+          "id",
+          "registeredId",
+          "version",
+          "parameters"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "转换实例标识。"
+          },
+          "registeredId": {
+            "enum": [
+              "identity",
+              "decimal-scale-exact",
+              "celsius-to-kelvin",
+              "json-top-level-scalar"
+            ],
+            "type": "string",
+            "description": "固定注册转换名。"
+          },
+          "version": {
+            "enum": [
+              "1"
+            ],
+            "type": "string",
+            "description": "转换规则版本。"
+          },
+          "parameters": {
+            "description": "按注册转换校验的封闭参数。",
+            "$ref": "#/components/schemas/JsonElement"
+          }
+        },
+        "additionalProperties": false,
+        "description": "只有注册纯转换及其封闭参数可执行。"
+      },
+      "MappingDatasetRef": {
+        "required": [
+          "snapshotId",
+          "schema",
+          "name",
+          "kind"
+        ],
+        "type": "object",
+        "properties": {
+          "snapshotId": {
+            "type": "string",
+            "description": "不可变目录快照标识。"
+          },
+          "schema": {
+            "type": "string",
+            "description": "保留大小写的源Schema。"
+          },
+          "name": {
+            "type": "string",
+            "description": "保留大小写的表名。"
+          },
+          "kind": {
+            "enum": [
+              "TABLE"
+            ],
+            "type": "string",
+            "description": "首切片仅支持TABLE。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "固定目录中精确的数据集引用。"
+      },
+      "MappingDecision": {
+        "required": [
+          "decidedBy",
+          "decidedAtUtc",
+          "decision",
+          "reason",
+          "bindingHash"
+        ],
+        "type": "object",
+        "properties": {
+          "decidedBy": {
+            "type": "string",
+            "description": "审核主体，不得等提交主体。"
+          },
+          "decidedAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "服务器决定时刻。",
+            "format": "date-time"
+          },
+          "decision": {
+            "enum": [
+              "APPROVE",
+              "REJECT"
+            ],
+            "type": "string",
+            "description": "APPROVE或REJECT。"
+          },
+          "reason": {
+            "type": "string",
+            "description": "审核命令理由。"
+          },
+          "bindingHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "审核时固定提案散列。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "与固定输入散列绑定的独立审核事实。"
+      },
+      "MappingDecisionRequest": {
+        "required": [
+          "decision",
+          "bindingHash",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "decision": {
+            "enum": [
+              "APPROVE",
+              "REJECT"
+            ],
+            "type": "string",
+            "description": "APPROVE或REJECT。"
+          },
+          "bindingHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "已审不可变提案绑定散列。"
+          },
+          "command": {
+            "description": "决定命令及预期提案修订。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "异人对固定提案作决定。"
+      },
+      "MappingDefinition": {
+        "required": [
+          "entities",
+          "properties",
+          "relations",
+          "identitySpecs",
+          "temporalSpecs",
+          "conversions",
+          "unitSpecs"
+        ],
+        "type": "object",
+        "properties": {
+          "entities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingEntityBinding"
+            },
+            "description": "按id规范化的实体集合。"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingPropertyBinding"
+            },
+            "description": "属性集合。"
+          },
+          "relations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingRelationBinding"
+            },
+            "description": "关系集合。"
+          },
+          "identitySpecs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingIdentitySpec"
+            },
+            "description": "身份规则集合。"
+          },
+          "temporalSpecs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingTemporalSpec"
+            },
+            "description": "时间规则集合。"
+          },
+          "conversions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingConversion"
+            },
+            "description": "纯转换集合。"
+          },
+          "unitSpecs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingUnitSpec"
+            },
+            "description": "真实源单位证据集合。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "映射语义内容，不是正式本体事实模型。"
+      },
+      "MappingDifference": {
+        "required": [
+          "path",
+          "beforeExists",
+          "afterExists",
+          "before",
+          "after"
+        ],
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "RFC6901字段位置。"
+          },
+          "beforeExists": {
+            "type": "boolean",
+            "description": "旧原件是否存在该路径。"
+          },
+          "afterExists": {
+            "type": "boolean",
+            "description": "新原件是否存在该路径。"
+          },
+          "before": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "旧值，路径缺席时为null。",
+                "$ref": "#/components/schemas/JsonElement"
+              }
+            ]
+          },
+          "after": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "新值，路径缺席时为null。",
+                "$ref": "#/components/schemas/JsonElement"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "JSON指针上的精确结构变化，exists字段区分缺席和显式null。"
+      },
+      "MappingDiffView": {
+        "required": [
+          "mappingId",
+          "fromHash",
+          "toHash",
+          "changes"
+        ],
+        "type": "object",
+        "properties": {
+          "mappingId": {
+            "type": "string",
+            "description": "永久映射身份。"
+          },
+          "fromHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "起点原件或定义散列。"
+          },
+          "toHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "终点原件或定义散列。"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingDifference"
+            },
+            "description": "按JSON指针排序的准确变化，省略与null明确分开。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "两个已授权固定原件的准确结构差异，不比较最新替代内容。"
+      },
+      "MappingDraftCreateRequest": {
+        "required": [
+          "scope",
+          "ontologyReleaseId",
+          "ontologyManifestHash",
+          "sourceConnectionId",
+          "sourceCatalogSnapshotId",
+          "mapping",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "scope": {
+            "description": "完整组织厂区选择。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "ontologyReleaseId": {
+            "type": "string",
+            "description": "G3固定发布。"
+          },
+          "ontologyManifestHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "原发布散列。"
+          },
+          "sourceConnectionId": {
+            "type": "string",
+            "description": "固定连接。"
+          },
+          "sourceCatalogSnapshotId": {
+            "type": "string",
+            "description": "固定目录。"
+          },
+          "mapping": {
+            "description": "手工或规则采纳的内容。",
+            "$ref": "#/components/schemas/MappingDefinition"
+          },
+          "command": {
+            "description": "创建命令，修订为0。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "创建固定本体与源的映射草稿。"
+      },
+      "MappingDraftPatchRequest": {
+        "required": [
+          "mapping",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "mapping": {
+            "description": "新的完整映射内容。",
+            "$ref": "#/components/schemas/MappingDefinition"
+          },
+          "command": {
+            "description": "草稿预期修订。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "不更换长期身份的CAS内容编辑。"
+      },
+      "MappingDraftView": {
+        "required": [
+          "schemaVersion",
+          "mappingId",
+          "draftId",
+          "scope",
+          "ontologyReleaseId",
+          "ontologyManifestHash",
+          "sourceConnectionId",
+          "sourceCatalogSnapshotId",
+          "revision",
+          "mappingHash",
+          "mapping",
+          "status",
+          "updatedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "enum": [
+              "g4.mapping.v1"
+            ],
+            "type": "string",
+            "description": "固定g4.mapping.v1。"
+          },
+          "mappingId": {
+            "type": "string",
+            "description": "永久映射标识。"
+          },
+          "draftId": {
+            "type": "string",
+            "description": "永久草稿标识。"
+          },
+          "scope": {
+            "description": "不可裁剪的完整范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "ontologyReleaseId": {
+            "type": "string",
+            "description": "固定G3正式发布。"
+          },
+          "ontologyManifestHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "G3原Manifest散列。"
+          },
+          "sourceConnectionId": {
+            "type": "string",
+            "description": "固定源连接。"
+          },
+          "sourceCatalogSnapshotId": {
+            "type": "string",
+            "description": "固定目录快照。"
+          },
+          "revision": {
+            "type": "integer",
+            "description": "保存修订单调CAS。",
+            "format": "int64"
+          },
+          "mappingHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "定义canonical内容散列。"
+          },
+          "mapping": {
+            "description": "固定定义内容。",
+            "$ref": "#/components/schemas/MappingDefinition"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "NEEDS_REVIEW",
+              "VALIDATING",
+              "READY_FOR_PROPOSAL",
+              "BLOCKED"
+            ],
+            "type": "string",
+            "description": "仅Draft状态机。"
+          },
+          "updatedAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "此修订保存时间。",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "映射固定编辑修订及当前评估投影，不混入Proposal状态。"
+      },
+      "MappingEntityBinding": {
+        "required": [
+          "id",
+          "entityClassIri",
+          "datasetRef",
+          "identitySpecId",
+          "temporalSpecId",
+          "scopeFields"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "绑定唯一标识。"
+          },
+          "entityClassIri": {
+            "type": "string",
+            "description": "固定G3发布的类IRI。"
+          },
+          "datasetRef": {
+            "description": "固定源数据集。",
+            "$ref": "#/components/schemas/MappingDatasetRef"
+          },
+          "identitySpecId": {
+            "type": "string",
+            "description": "身份规则引用。"
+          },
+          "temporalSpecId": {
+            "type": "string",
+            "description": "时间规则引用。"
+          },
+          "scopeFields": {
+            "description": "真实组织厂区字段。",
+            "$ref": "#/components/schemas/MappingScopeFields"
+          }
+        },
+        "additionalProperties": false,
+        "description": "绑定现存G3类与源数据集。"
+      },
+      "MappingExpectedActive": {
+        "required": [
+          "releaseId",
+          "activationRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "releaseId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "首次激活为null。"
+          },
+          "activationRevision": {
+            "type": "integer",
+            "description": "首次为0，之后单调增加。",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false,
+        "description": "指针ID与单调修订共同防止ABA。"
+      },
+      "MappingFieldRef": {
+        "required": [
+          "datasetRef",
+          "ordinal",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "datasetRef": {
+            "description": "字段所属固定数据集。",
+            "$ref": "#/components/schemas/MappingDatasetRef"
+          },
+          "ordinal": {
+            "type": "integer",
+            "description": "目录记录的字段序号。",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "目录中的精确字段名。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "固定数据集内的字段引用，不接受SQL片段。"
+      },
+      "MappingIdentitySpec": {
+        "required": [
+          "id",
+          "organizationFieldRef",
+          "siteFieldRef",
+          "sourceNamespace",
+          "externalIdFieldRefs",
+          "validFromFieldRef",
+          "validToFieldRef"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "身份规则标识。"
+          },
+          "organizationFieldRef": {
+            "description": "组织字段。",
+            "$ref": "#/components/schemas/MappingFieldRef"
+          },
+          "siteFieldRef": {
+            "description": "厂区字段。",
+            "$ref": "#/components/schemas/MappingFieldRef"
+          },
+          "sourceNamespace": {
+            "type": "string",
+            "description": "不可省略的来源命名空间。"
+          },
+          "externalIdFieldRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingFieldRef"
+            },
+            "description": "有序复合业务键。"
+          },
+          "validFromFieldRef": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "有效起点，未知为null。",
+                "$ref": "#/components/schemas/MappingFieldRef"
+              }
+            ]
+          },
+          "validToFieldRef": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "有效终点，未知不等于永久有效。",
+                "$ref": "#/components/schemas/MappingFieldRef"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "组织厂区命名空间与时间限定的业务身份。"
+      },
+      "MappingIssue": {
+        "required": [
+          "code",
+          "bindingId",
+          "fieldRef"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "固定错误代码。"
+          },
+          "bindingId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "能明确定位时给出绑定ID。"
+          },
+          "fieldRef": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "能明确定位时给出固定字段。",
+                "$ref": "#/components/schemas/MappingFieldRef"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "可定位的安全问题，不包含源行值。"
+      },
+      "MappingJobView": {
+        "required": [
+          "jobId",
+          "mappingId",
+          "revision",
+          "target",
+          "status",
+          "assessmentId",
+          "issueCodes",
+          "createdAtUtc",
+          "completedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "description": "永久任务标识。"
+          },
+          "mappingId": {
+            "type": "string",
+            "description": "所属映射。"
+          },
+          "revision": {
+            "type": "integer",
+            "description": "任务状态CAS修订。",
+            "format": "int64"
+          },
+          "target": {
+            "description": "固定受评估目标。",
+            "$ref": "#/components/schemas/MappingValidationTarget"
+          },
+          "status": {
+            "enum": [
+              "QUEUED",
+              "RUNNING",
+              "SUCCEEDED",
+              "FAILED",
+              "CANCELLED"
+            ],
+            "type": "string",
+            "description": "QUEUED、RUNNING、SUCCEEDED、FAILED、CANCELLED。"
+          },
+          "assessmentId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "成功报告引用，其余为空。"
+          },
+          "issueCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "脱敏失败代码。"
+          },
+          "createdAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "服务器调度时刻。",
+            "format": "date-time"
+          },
+          "completedAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "未完成时为null。",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "持久任务状态；刷新只读取，不重复调度。"
+      },
+      "MappingJoinFieldPair": {
+        "required": [
+          "from",
+          "to"
+        ],
+        "type": "object",
+        "properties": {
+          "from": {
+            "description": "起点字段。",
+            "$ref": "#/components/schemas/MappingFieldRef"
+          },
+          "to": {
+            "description": "终点字段。",
+            "$ref": "#/components/schemas/MappingFieldRef"
+          }
+        },
+        "additionalProperties": false,
+        "description": "同源关系的有序连接键对。"
+      },
+      "MappingListItem": {
+        "required": [
+          "mappingId",
+          "scope",
+          "revision",
+          "status",
+          "activeReleaseId"
+        ],
+        "type": "object",
+        "properties": {
+          "mappingId": {
+            "type": "string",
+            "description": "永久映射标识。"
+          },
+          "scope": {
+            "description": "完整范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "revision": {
+            "type": "integer",
+            "description": "最新编辑修订。",
+            "format": "int64"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "NEEDS_REVIEW",
+              "VALIDATING",
+              "READY_FOR_PROPOSAL",
+              "BLOCKED"
+            ],
+            "type": "string",
+            "description": "Draft状态。"
+          },
+          "activeReleaseId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "未激活时null。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "列表仅提供当前完整可见对象。"
+      },
+      "MappingPageOfMappingActivationCheck": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingActivationCheck"
+            },
+            "description": "本页当前完整授权的对象。"
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "终页为空；非空绑定主体、scope、epoch、筛选及五分钟期限。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "所有映射列表共用有界keyset分页，游标只能由服务端签发。"
+      },
+      "MappingPageOfMappingAssessmentView": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingAssessmentView"
+            },
+            "description": "本页当前完整授权的对象。"
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "终页为空；非空绑定主体、scope、epoch、筛选及五分钟期限。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "所有映射列表共用有界keyset分页，游标只能由服务端签发。"
+      },
+      "MappingPageOfMappingListItem": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingListItem"
+            },
+            "description": "本页当前完整授权的对象。"
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "终页为空；非空绑定主体、scope、epoch、筛选及五分钟期限。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "所有映射列表共用有界keyset分页，游标只能由服务端签发。"
+      },
+      "MappingPageOfMappingProposalView": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingProposalView"
+            },
+            "description": "本页当前完整授权的对象。"
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "终页为空；非空绑定主体、scope、epoch、筛选及五分钟期限。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "所有映射列表共用有界keyset分页，游标只能由服务端签发。"
+      },
+      "MappingPageOfMappingReleaseView": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingReleaseView"
+            },
+            "description": "本页当前完整授权的对象。"
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "终页为空；非空绑定主体、scope、epoch、筛选及五分钟期限。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "所有映射列表共用有界keyset分页，游标只能由服务端签发。"
+      },
+      "MappingPropertyBinding": {
+        "required": [
+          "id",
+          "entityBindingId",
+          "propertyIri",
+          "fieldRef",
+          "conversionId",
+          "unitSpecId",
+          "nullPolicy"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "属性绑定标识。"
+          },
+          "entityBindingId": {
+            "type": "string",
+            "description": "实体绑定引用。"
+          },
+          "propertyIri": {
+            "type": "string",
+            "description": "固定G3属性IRI。"
+          },
+          "fieldRef": {
+            "description": "固定源字段。",
+            "$ref": "#/components/schemas/MappingFieldRef"
+          },
+          "conversionId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "注册纯转换引用，无转换为null。"
+          },
+          "unitSpecId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "物理量必填的单位证据引用。"
+          },
+          "nullPolicy": {
+            "enum": [
+              "KEEP_NULL",
+              "REJECT_NULL"
+            ],
+            "type": "string",
+            "description": "KEEP_NULL或REJECT_NULL。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "绑定现存属性及可证明的单位和转换。"
+      },
+      "MappingProposalCreateRequest": {
+        "required": [
+          "kind"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/MappingProposalCreateRequestMappingPublishProposalRequest"
+          },
+          {
+            "$ref": "#/components/schemas/MappingProposalCreateRequestMappingRollbackProposalRequest"
+          }
+        ],
+        "description": "通过kind严格区分发布与回滚，回滚不存在草稿字段。",
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "PUBLISH": "#/components/schemas/MappingProposalCreateRequestMappingPublishProposalRequest",
+            "ROLLBACK": "#/components/schemas/MappingProposalCreateRequestMappingRollbackProposalRequest"
+          }
+        }
+      },
+      "MappingProposalCreateRequestMappingPublishProposalRequest": {
+        "required": [
+          "draftId",
+          "draftRevision",
+          "schemaVersion",
+          "scope",
+          "binding",
+          "expectedActive",
+          "expiresAtUtc",
+          "command",
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "PUBLISH"
+            ],
+            "type": "string"
+          },
+          "draftId": {
+            "type": "string",
+            "description": "固定草稿标识。"
+          },
+          "draftRevision": {
+            "type": "integer",
+            "description": "固定且必须仍当前的修订。",
+            "format": "int64"
+          },
+          "schemaVersion": {
+            "enum": [
+              "g4.mapping.v1"
+            ],
+            "type": "string",
+            "description": "固定g4.mapping.v1。"
+          },
+          "scope": {
+            "description": "完整资源范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "binding": {
+            "description": "全部评估输入版本。",
+            "$ref": "#/components/schemas/MappingVersionBinding"
+          },
+          "expectedActive": {
+            "description": "固定指针CAS基线。",
+            "$ref": "#/components/schemas/MappingExpectedActive"
+          },
+          "expiresAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "提案最晚有效时刻。",
+            "format": "date-time"
+          },
+          "command": {
+            "description": "新提案命令，expectedRevision为0。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "发布必须绑定当前不可变草稿修订。"
+      },
+      "MappingProposalCreateRequestMappingRollbackProposalRequest": {
+        "required": [
+          "targetReleaseId",
+          "manifestHash",
+          "schemaVersion",
+          "scope",
+          "binding",
+          "expectedActive",
+          "expiresAtUtc",
+          "command",
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "ROLLBACK"
+            ],
+            "type": "string"
+          },
+          "targetReleaseId": {
+            "type": "string",
+            "description": "同映射和完整scope的历史发布。"
+          },
+          "manifestHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "历史manifest原字节散列。"
+          },
+          "schemaVersion": {
+            "enum": [
+              "g4.mapping.v1"
+            ],
+            "type": "string",
+            "description": "固定g4.mapping.v1。"
+          },
+          "scope": {
+            "description": "完整资源范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "binding": {
+            "description": "全部评估输入版本。",
+            "$ref": "#/components/schemas/MappingVersionBinding"
+          },
+          "expectedActive": {
+            "description": "固定指针CAS基线。",
+            "$ref": "#/components/schemas/MappingExpectedActive"
+          },
+          "expiresAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "提案最晚有效时刻。",
+            "format": "date-time"
+          },
+          "command": {
+            "description": "新提案命令，expectedRevision为0。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "回滚只绑定历史正式制品，不接受当前草稿替代。"
+      },
+      "MappingProposalView": {
+        "required": [
+          "kind"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/MappingProposalViewMappingPublishProposalView"
+          },
+          {
+            "$ref": "#/components/schemas/MappingProposalViewMappingRollbackProposalView"
+          }
+        ],
+        "description": "发布和回滚的封闭独立审核读模型。",
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "PUBLISH": "#/components/schemas/MappingProposalViewMappingPublishProposalView",
+            "ROLLBACK": "#/components/schemas/MappingProposalViewMappingRollbackProposalView"
+          }
+        }
+      },
+      "MappingProposalViewMappingPublishProposalView": {
+        "required": [
+          "draftId",
+          "draftRevision",
+          "schemaVersion",
+          "proposalId",
+          "mappingId",
+          "proposalRevision",
+          "scope",
+          "binding",
+          "expectedActive",
+          "submittedBy",
+          "submittedAtUtc",
+          "expiresAtUtc",
+          "status",
+          "decision",
+          "bindingHash",
+          "activation",
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "PUBLISH"
+            ],
+            "type": "string"
+          },
+          "draftId": {
+            "type": "string",
+            "description": "固定草稿标识。"
+          },
+          "draftRevision": {
+            "type": "integer",
+            "description": "受审精确草稿修订。",
+            "format": "int64"
+          },
+          "schemaVersion": {
+            "enum": [
+              "g4.mapping.v1"
+            ],
+            "type": "string",
+            "description": "固定g4.mapping.v1。"
+          },
+          "proposalId": {
+            "type": "string",
+            "description": "提案永久标识。"
+          },
+          "mappingId": {
+            "type": "string",
+            "description": "所属映射。"
+          },
+          "proposalRevision": {
+            "type": "integer",
+            "description": "提案CAS修订。",
+            "format": "int64"
+          },
+          "scope": {
+            "description": "完整固定范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "binding": {
+            "description": "固定受审输入。",
+            "$ref": "#/components/schemas/MappingVersionBinding"
+          },
+          "expectedActive": {
+            "description": "固定影响和CAS基线。",
+            "$ref": "#/components/schemas/MappingExpectedActive"
+          },
+          "submittedBy": {
+            "type": "string",
+            "description": "原提交主体。"
+          },
+          "submittedAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "原提交时间。",
+            "format": "date-time"
+          },
+          "expiresAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "不可延长的截止时间。",
+            "format": "date-time"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "CANCELLED",
+              "STALE",
+              "EXPIRED"
+            ],
+            "type": "string",
+            "description": "提案状态或当前STALE/EXPIRED投影。"
+          },
+          "decision": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "未决定时为空。",
+                "$ref": "#/components/schemas/MappingDecision"
+              }
+            ]
+          },
+          "bindingHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "不可变提案内容散列。"
+          },
+          "activation": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "未激活时为空。",
+                "$ref": "#/components/schemas/MappingActivationReceipt"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "发布提案携带准确草稿身份。"
+      },
+      "MappingProposalViewMappingRollbackProposalView": {
+        "required": [
+          "targetReleaseId",
+          "manifestHash",
+          "schemaVersion",
+          "proposalId",
+          "mappingId",
+          "proposalRevision",
+          "scope",
+          "binding",
+          "expectedActive",
+          "submittedBy",
+          "submittedAtUtc",
+          "expiresAtUtc",
+          "status",
+          "decision",
+          "bindingHash",
+          "activation",
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "ROLLBACK"
+            ],
+            "type": "string"
+          },
+          "targetReleaseId": {
+            "type": "string",
+            "description": "固定历史发布。"
+          },
+          "manifestHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "历史制品散列。"
+          },
+          "schemaVersion": {
+            "enum": [
+              "g4.mapping.v1"
+            ],
+            "type": "string",
+            "description": "固定g4.mapping.v1。"
+          },
+          "proposalId": {
+            "type": "string",
+            "description": "提案永久标识。"
+          },
+          "mappingId": {
+            "type": "string",
+            "description": "所属映射。"
+          },
+          "proposalRevision": {
+            "type": "integer",
+            "description": "提案CAS修订。",
+            "format": "int64"
+          },
+          "scope": {
+            "description": "完整固定范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "binding": {
+            "description": "固定受审输入。",
+            "$ref": "#/components/schemas/MappingVersionBinding"
+          },
+          "expectedActive": {
+            "description": "固定影响和CAS基线。",
+            "$ref": "#/components/schemas/MappingExpectedActive"
+          },
+          "submittedBy": {
+            "type": "string",
+            "description": "原提交主体。"
+          },
+          "submittedAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "原提交时间。",
+            "format": "date-time"
+          },
+          "expiresAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "不可延长的截止时间。",
+            "format": "date-time"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "CANCELLED",
+              "STALE",
+              "EXPIRED"
+            ],
+            "type": "string",
+            "description": "提案状态或当前STALE/EXPIRED投影。"
+          },
+          "decision": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "未决定时为空。",
+                "$ref": "#/components/schemas/MappingDecision"
+              }
+            ]
+          },
+          "bindingHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "不可变提案内容散列。"
+          },
+          "activation": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "未激活时为空。",
+                "$ref": "#/components/schemas/MappingActivationReceipt"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "回滚提案只指向历史原字节。"
+      },
+      "MappingRelationBinding": {
+        "required": [
+          "id",
+          "fromBindingId",
+          "toBindingId",
+          "predicateIri",
+          "joinFieldPairs",
+          "cardinality",
+          "temporalJoinPolicy"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "关系标识。"
+          },
+          "fromBindingId": {
+            "type": "string",
+            "description": "起点实体。"
+          },
+          "toBindingId": {
+            "type": "string",
+            "description": "终点实体。"
+          },
+          "predicateIri": {
+            "type": "string",
+            "description": "固定G3关系IRI。"
+          },
+          "joinFieldPairs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingJoinFieldPair"
+            },
+            "description": "有序连接键，不可重排。"
+          },
+          "cardinality": {
+            "enum": [
+              "ONE_TO_MANY",
+              "MANY_TO_MANY"
+            ],
+            "type": "string",
+            "description": "ONE_TO_MANY或MANY_TO_MANY。"
+          },
+          "temporalJoinPolicy": {
+            "enum": [
+              "HALF_OPEN_OVERLAP"
+            ],
+            "type": "string",
+            "description": "半开区间重叠规则。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "同源已登记键的有界关系绑定。"
+      },
+      "MappingReleaseManifest": {
+        "required": [
+          "schemaVersion",
+          "mappingReleaseId",
+          "mappingId",
+          "scope",
+          "originDraftId",
+          "originDraftRevision",
+          "binding",
+          "mapping",
+          "reviewReceipt",
+          "createdAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "enum": [
+              "g4.mapping.v1"
+            ],
+            "type": "string",
+            "description": "固定g4.mapping.v1。"
+          },
+          "mappingReleaseId": {
+            "type": "string",
+            "description": "正式发布唯一标识。"
+          },
+          "mappingId": {
+            "type": "string",
+            "description": "永久映射标识。"
+          },
+          "scope": {
+            "description": "完整固定范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "originDraftId": {
+            "type": "string",
+            "description": "原始草稿标识。"
+          },
+          "originDraftRevision": {
+            "type": "integer",
+            "description": "原始受审修订。",
+            "format": "int64"
+          },
+          "binding": {
+            "description": "原发布全部受审输入。",
+            "$ref": "#/components/schemas/MappingVersionBinding"
+          },
+          "mapping": {
+            "description": "原始映射定义。",
+            "$ref": "#/components/schemas/MappingDefinition"
+          },
+          "reviewReceipt": {
+            "description": "不可变的异人审批收据。",
+            "$ref": "#/components/schemas/MappingReviewReceipt"
+          },
+          "createdAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "原发布创建时刻。",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "只追加的正式映射制品，不含Active或当前健康。"
+      },
+      "MappingReleaseProjection": {
+        "required": [
+          "currentDraftRevision",
+          "active",
+          "activationRevision",
+          "usable",
+          "reasonCodes",
+          "observedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "currentDraftRevision": {
+            "type": "integer",
+            "description": "当前编辑头CAS摘要；读取历史原件不要求最新草稿字段可见。",
+            "format": "int64"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "是否当前指针。"
+          },
+          "activationRevision": {
+            "type": "integer",
+            "description": "当前单调激活版本。",
+            "format": "int64"
+          },
+          "usable": {
+            "type": "boolean",
+            "description": "当前版本与授权是否可用。"
+          },
+          "reasonCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "不可用的固定原因。"
+          },
+          "observedAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "当前状态观察时刻。",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "当前使用状态独立于历史原字节。"
+      },
+      "MappingReleaseView": {
+        "required": [
+          "manifest",
+          "manifestHash",
+          "readOnly",
+          "projection"
+        ],
+        "type": "object",
+        "properties": {
+          "manifest": {
+            "description": "完整原始Manifest。",
+            "$ref": "#/components/schemas/MappingReleaseManifest"
+          },
+          "manifestHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "原canonical字节散列。"
+          },
+          "readOnly": {
+            "type": "boolean",
+            "description": "固定真，不支持原地编辑。"
+          },
+          "projection": {
+            "description": "当前状态投影。",
+            "$ref": "#/components/schemas/MappingReleaseProjection"
+          }
+        },
+        "additionalProperties": false,
+        "description": "历史原文和当前状态分离，不裁剪Manifest仍宣称原hash。"
+      },
+      "MappingReviewReceipt": {
+        "required": [
+          "proposalId",
+          "bindingHash",
+          "submittedBy",
+          "decidedBy",
+          "decidedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "proposalId": {
+            "type": "string",
+            "description": "原发布提案。"
+          },
+          "bindingHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "原提案散列。"
+          },
+          "submittedBy": {
+            "type": "string",
+            "description": "原提交主体。"
+          },
+          "decidedBy": {
+            "type": "string",
+            "description": "原异人审核主体。"
+          },
+          "decidedAtUtc": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$",
+            "type": "string",
+            "description": "原决定时刻。",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "正式制品内不可变的原始审核收据。"
+      },
+      "MappingScopeFields": {
+        "required": [
+          "organization",
+          "site"
+        ],
+        "type": "object",
+        "properties": {
+          "organization": {
+            "description": "组织字段引用。",
+            "$ref": "#/components/schemas/MappingFieldRef"
+          },
+          "site": {
+            "description": "厂区字段引用。",
+            "$ref": "#/components/schemas/MappingFieldRef"
+          }
+        },
+        "additionalProperties": false,
+        "description": "源行组织厂区字段，不能由调用者scope替代。"
+      },
+      "MappingStageResult": {
+        "required": [
+          "stage",
+          "status",
+          "issueCodes",
+          "evidenceHash"
+        ],
+        "type": "object",
+        "properties": {
+          "stage": {
+            "enum": [
+              "SCHEMA",
+              "IDENTITY",
+              "TIME_UNIT",
+              "SECURITY",
+              "EXECUTABILITY",
+              "RECONCILIATION",
+              "IMPACT"
+            ],
+            "type": "string",
+            "description": "七个固定阶段之一。"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "INDETERMINATE",
+              "NOT_RUN"
+            ],
+            "type": "string",
+            "description": "PASS、FAIL、INDETERMINATE、NOT_RUN。"
+          },
+          "issueCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "固定脱敏诊断代码。"
+          },
+          "evidenceHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "本次真实阶段证据散列。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "不可变的单阶段实证摘要，不能默认PASS。"
+      },
+      "MappingSuggestionCandidate": {
+        "required": [
+          "fieldRef",
+          "targetIri",
+          "evidence",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "fieldRef": {
+            "description": "固定目录字段。",
+            "$ref": "#/components/schemas/MappingFieldRef"
+          },
+          "targetIri": {
+            "type": "string",
+            "description": "现存正式发布IRI。"
+          },
+          "evidence": {
+            "enum": [
+              "METADATA",
+              "TERM",
+              "USER_ASSERTION",
+              "NO_EVIDENCE"
+            ],
+            "type": "string",
+            "description": "METADATA、TERM、USER_ASSERTION或NO_EVIDENCE。"
+          },
+          "status": {
+            "enum": [
+              "CANDIDATE_ONLY"
+            ],
+            "type": "string",
+            "description": "候选不能直接成为可发布PASS。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "确定性候选引用，仍非批准或正式映射。"
+      },
+      "MappingSuggestionRequest": {
+        "required": [
+          "mode",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "mode": {
+            "enum": [
+              "OFF"
+            ],
+            "type": "string",
+            "description": "唯一允许OFF。"
+          },
+          "command": {
+            "description": "同修订幂等命令。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "首切片仅人工和确定性候选，不调用模型。"
+      },
+      "MappingSuggestionView": {
+        "required": [
+          "revision",
+          "candidates",
+          "issueCodes"
+        ],
+        "type": "object",
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "description": "本次候选依据的固定编辑修订。",
+            "format": "int64"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingSuggestionCandidate"
+            },
+            "description": "首切片人工模式不猜测缺证据的候选。"
+          },
+          "issueCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "固定脱敏提示码。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "人工模式不调用模型、不自动写草稿，候选仍须显式保存及验证。"
+      },
+      "MappingTemporalSpec": {
+        "required": [
+          "id",
+          "eventTimeFieldRef",
+          "observedAtFieldRef",
+          "timezonePolicy",
+          "precision",
+          "validFromFieldRef",
+          "validToFieldRef"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "时间规则标识。"
+          },
+          "eventTimeFieldRef": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "业务事件时间。",
+                "$ref": "#/components/schemas/MappingFieldRef"
+              }
+            ]
+          },
+          "observedAtFieldRef": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "源观察时间。",
+                "$ref": "#/components/schemas/MappingFieldRef"
+              }
+            ]
+          },
+          "timezonePolicy": {
+            "description": "明确时区策略。",
+            "$ref": "#/components/schemas/MappingTimezonePolicy"
+          },
+          "precision": {
+            "enum": [
+              "SECOND",
+              "MILLISECOND",
+              "MICROSECOND"
+            ],
+            "type": "string",
+            "description": "声明的源时间精度。"
+          },
+          "validFromFieldRef": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "半开起点。",
+                "$ref": "#/components/schemas/MappingFieldRef"
+              }
+            ]
+          },
+          "validToFieldRef": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "半开终点。",
+                "$ref": "#/components/schemas/MappingFieldRef"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "业务时间与观察时间分别绑定。"
+      },
+      "MappingTimezonePolicy": {
+        "required": [
+          "kind",
+          "zoneId"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "UTC",
+              "REGISTERED_ZONE"
+            ],
+            "type": "string",
+            "description": "UTC或REGISTERED_ZONE。"
+          },
+          "zoneId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "UTC时为null，否则为已登记时区。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "明确业务时区，不使用服务器本地时区猜测。"
+      },
+      "MappingUnitSpec": {
+        "required": [
+          "id",
+          "sourceUnitIri",
+          "targetUnitIri",
+          "sourceUnitFieldRef",
+          "sourceUnitCode",
+          "unitRegistryVersion",
+          "evidenceKind"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "单位规则标识。"
+          },
+          "sourceUnitIri": {
+            "type": "string",
+            "description": "已发布源单位IRI。"
+          },
+          "targetUnitIri": {
+            "type": "string",
+            "description": "已发布目标单位IRI。"
+          },
+          "sourceUnitFieldRef": {
+            "description": "每行必须匹配的单位证据列。",
+            "$ref": "#/components/schemas/MappingFieldRef"
+          },
+          "sourceUnitCode": {
+            "enum": [
+              "Cel",
+              "K"
+            ],
+            "type": "string",
+            "description": "精确单位代码。"
+          },
+          "unitRegistryVersion": {
+            "enum": [
+              "1"
+            ],
+            "type": "string",
+            "description": "固定单位登记版本。"
+          },
+          "evidenceKind": {
+            "enum": [
+              "SOURCE_FIELD"
+            ],
+            "type": "string",
+            "description": "首切片仅SOURCE_FIELD。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "从实际源列证明单位，不以模型推测代替。"
+      },
+      "MappingValidateRequest": {
+        "required": [
+          "target",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "target": {
+            "description": "严格发布或回滚目标。",
+            "$ref": "#/components/schemas/MappingValidationTarget"
+          },
+          "command": {
+            "description": "调度幂等与最新编辑头修订。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "验证调度仍须核最新编辑头CAS。"
+      },
+      "MappingValidationTarget": {
+        "required": [
+          "kind"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/MappingValidationTargetMappingPublishTarget"
+          },
+          {
+            "$ref": "#/components/schemas/MappingValidationTargetMappingRollbackTarget"
+          }
+        ],
+        "description": "验证目标判别，回滚不要求当前草稿等于历史版本。",
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "PUBLISH": "#/components/schemas/MappingValidationTargetMappingPublishTarget",
+            "ROLLBACK": "#/components/schemas/MappingValidationTargetMappingRollbackTarget"
+          }
+        }
+      },
+      "MappingValidationTargetMappingPublishTarget": {
+        "required": [
+          "draftRevision",
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "PUBLISH"
+            ],
+            "type": "string"
+          },
+          "draftRevision": {
+            "type": "integer",
+            "description": "目标草稿修订。",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false,
+        "description": "发布验证只固定草稿修订。"
+      },
+      "MappingValidationTargetMappingRollbackTarget": {
+        "required": [
+          "targetReleaseId",
+          "manifestHash",
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "ROLLBACK"
+            ],
+            "type": "string"
+          },
+          "targetReleaseId": {
+            "type": "string",
+            "description": "目标正式发布标识。"
+          },
+          "manifestHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "旧制品原字节散列。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "回滚验证只固定历史制品。"
+      },
+      "MappingVersionBinding": {
+        "required": [
+          "sourceConnectionId",
+          "connectionRevision",
+          "configHash",
+          "sourceType",
+          "sourceCatalogSnapshotId",
+          "sourceCatalogFingerprint",
+          "ontologyReleaseId",
+          "ontologyManifestHash",
+          "mappingHash",
+          "validationHash",
+          "impactHash",
+          "assessmentId",
+          "adapterVersion",
+          "executorVersion",
+          "canonicalVersion",
+          "secretVersion",
+          "authorizationEpoch"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceConnectionId": {
+            "type": "string",
+            "description": "连接标识。"
+          },
+          "connectionRevision": {
+            "type": "integer",
+            "description": "固定连接配置修订。",
+            "format": "int64"
+          },
+          "configHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "配置内容散列。"
+          },
+          "sourceType": {
+            "enum": [
+              "POSTGRESQL"
+            ],
+            "type": "string",
+            "description": "首切片POSTGRESQL。"
+          },
+          "sourceCatalogSnapshotId": {
+            "type": "string",
+            "description": "固定目录快照。"
+          },
+          "sourceCatalogFingerprint": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "原目录算法生成的指纹。"
+          },
+          "ontologyReleaseId": {
+            "type": "string",
+            "description": "G3固定发布标识。"
+          },
+          "ontologyManifestHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "G3原Manifest散列。"
+          },
+          "mappingHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "固定映射语义散列。"
+          },
+          "validationHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "不可变受审评估散列。"
+          },
+          "impactHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "固定影响基线散列。"
+          },
+          "assessmentId": {
+            "type": "string",
+            "description": "不可变评估标识。"
+          },
+          "adapterVersion": {
+            "enum": [
+              "pg-mapping-v1"
+            ],
+            "type": "string",
+            "description": "源适配器版本。"
+          },
+          "executorVersion": {
+            "enum": [
+              "mapping-validator-v1"
+            ],
+            "type": "string",
+            "description": "验证执行器版本。"
+          },
+          "canonicalVersion": {
+            "enum": [
+              "mapping-c14n-v1"
+            ],
+            "type": "string",
+            "description": "映射canonical版本。"
+          },
+          "secretVersion": {
+            "type": "integer",
+            "description": "当前凭据版本，不含明文。",
+            "format": "int64"
+          },
+          "authorizationEpoch": {
+            "type": "integer",
+            "description": "组织级授权版本。",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false,
+        "description": "审批必须固定的所有输入版本。"
+      },
       "OracleColumnMetadata": {
         "required": [
           "dataTypeOwner",
@@ -1531,6 +4569,9 @@
   "tags": [
     {
       "name": "Connections"
+    },
+    {
+      "name": "Mappings"
     }
   ]
 }

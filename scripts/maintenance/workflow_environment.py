@@ -357,12 +357,12 @@ ORACLE_ARCHIVES = {'oracle.manageddataaccess.core/23.26.400': {'package': 'oracl
 def approved_archives(root, task, packages):
     """核验当前锁闭包；Oracle只继承已合入基线的Doris精确依赖，不放宽未知包。"""
     approved={p['package']:p for p in git_json(root,ARCHIVE_COMMIT,ARCHIVES)['packages']}
-    if task in ('G4-M2-DORIS-01','G4-M2-ORACLE-01') and 'mysqlconnector/2.6.2' in packages:
+    if task in ('G4-M2-DORIS-01','G4-M2-ORACLE-01','G4-M3-MAPPING-001') and 'mysqlconnector/2.6.2' in packages:
         # 已合入基线的Doris精确包；Oracle继承其归档SHA256与NuGet规范化内容散列。
         approved['mysqlconnector/2.6.2']=dict(package='mysqlconnector/2.6.2',
             archiveSha256='3d8758d29d2b19a5efa9f78cfac9cae824a870aaf88e2e3adc40bce3cddac748',
             contentHash='dlTc/tsBa42szdvpj4nrHvQVUb0gsMwR9HT6J0Zz2OSqfP0CdYlGw+qQPqCpbnO97idfvclSjKYtM6y5QaBQaQ==')
-    if task == 'G4-M2-ORACLE-01':
+    if task in ('G4-M2-ORACLE-01','G4-M3-MAPPING-001'):
         approved.update(ORACLE_ARCHIVES)
     require({k:v['contentHash'] for k,v in approved.items()}==packages,'APPROVED_CURRENT_LOCK_CLOSURE')
     return approved
@@ -396,9 +396,9 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
     raw_archives={}
     for key,row in approved.items():
         name,version=key.split('/');p=ordinary(source/key/(name+'.'+version+'.nupkg'))
-        if task in ('G4-M2-DORIS-01','G4-M2-ORACLE-01') and key=='mysqlconnector/2.6.2':
+        if task in ('G4-M2-DORIS-01','G4-M2-ORACLE-01','G4-M3-MAPPING-001') and key=='mysqlconnector/2.6.2':
             p=ordinary(root/'artifacts/workflow'/task/'artifact-cache/mysqlconnector.2.6.2.nupkg')
-        if task == 'G4-M2-ORACLE-01' and key in ORACLE_ARCHIVES:
+        if task in ('G4-M2-ORACLE-01','G4-M3-MAPPING-001') and key in ORACLE_ARCHIVES:
             p=ordinary(root/'artifacts/workflow'/task/'artifact-cache'/(name+'.'+version+'.nupkg'))
         require(p.is_file(),'LOCKED_ARCHIVE_MISSING_'+key)
         raw=p.read_bytes();require(digest(raw)==row['archiveSha256'],'LOCKED_ARCHIVE_DRIFT_'+key)
@@ -455,7 +455,7 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
     if previous.is_file():
         prior=json.loads(previous.read_text());require(prior['workspaceKey']==identity['workspaceKey'],'WORKSPACE_CHANGED')
         assets=verify_assets(root,home,projects,packages,approved)
-    elif task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002','G4-M2-DORIS-01','G4-M2-ORACLE-01') and any((home/'runs').glob('*/restore.json')) and all((root/Path(p['path']).parent/'obj/project.assets.json').is_file() for p in projects):
+    elif task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002','G4-M2-DORIS-01','G4-M2-ORACLE-01','G4-M3-MAPPING-001') and any((home/'runs').glob('*/restore.json')) and all((root/Path(p['path']).parent/'obj/project.assets.json').is_file() for p in projects):
         # 上次Web失败不使已成功的后端闭包失效；逐项目/包重新核验真实内容和绝对路径。
         assets=verify_assets(root,home,projects,packages,approved)
         require(any(json.loads(p.read_text()).get('exitCode')==0 and
@@ -469,7 +469,7 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
             restores=1;assets=verify_assets(root,home,projects,packages,approved)
         except Exception:
             materialize(failure,canonical(dict(**identity,run=str(run_dir)))+b'\n');raise
-    if task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002','G4-M2-DORIS-01','G4-M2-ORACLE-01'):
+    if task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002','G4-M2-DORIS-01','G4-M2-ORACLE-01','G4-M3-MAPPING-001'):
         spec=importlib.util.spec_from_file_location('workflow_web_cache',root/'scripts/maintenance/workflow_web_cache.py')
         web_adapter=importlib.util.module_from_spec(spec);spec.loader.exec_module(web_adapter)
         web=web_adapter.prepare(root,home,admission,projects,env,run_dir,node,types.SimpleNamespace(**globals()))

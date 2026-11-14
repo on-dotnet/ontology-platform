@@ -59,6 +59,36 @@ public static class G4Composition
         builder.Services.AddSingleton<ConnectionSourceDispatcher>();
         builder.Services.AddSingleton(provider => new ConnectionSecretCipher(builder.Configuration["G4:KeyFile"] ?? string.Empty));
         builder.Services.AddSingleton<IConnectionSessionAuthority, G4SessionAuthority>();
+        builder.Services.AddSingleton<IMappingSessionAuthority, MappingSessionAuthority>();
+        builder.Services.AddScoped<IMappingAuthorizationAuthority, MappingAuthorizationParticipant>();
+        builder.Services.AddSingleton<IMappingSourceValidator, PgMappingSourceValidator>();
+        if (builder.Configuration.GetValue<bool>("G4:Mapping:Enabled"))
+        {
+            if (!builder.Configuration.GetValue<bool>("G2:Enabled"))
+            {
+                throw new InvalidOperationException("映射需要真实G3正式发布读取组合。");
+            }
+            builder.Services.AddAuthorization(options =>
+            {
+                foreach (var permission in new[] { "mapping.read", "mapping.source.validate" })
+                {
+                    options.AddPolicy(permission, rule => rule.RequireAuthenticatedUser().RequireRole("platform.operator", "platform.auditor"));
+                }
+                foreach (var permission in new[] { "mapping.edit", "mapping.validate", "mapping.submit", "mapping.activate" })
+                {
+                    options.AddPolicy(permission, rule => rule.RequireAuthenticatedUser().RequireRole("platform.operator"));
+                }
+                foreach (var permission in new[] { "mapping.review", "mapping.approve" })
+                {
+                    options.AddPolicy(permission, rule => rule.RequireAuthenticatedUser().RequireRole("platform.auditor"));
+                }
+            });
+            builder.Services.AddScoped<MappingValidationService>();
+            builder.Services.AddScoped<MappingApplicationService>();
+            builder.Services.AddScoped<MappingActivationService>();
+            builder.Services.AddHostedService<MappingJobWorker>();
+            builder.Services.AddHostedService<MappingOutboxDispatcher>();
+        }
         builder.Services.AddScoped<ConnectionApplicationService>();
         builder.Services.AddHostedService<CatalogWorker>();
         builder.Services.AddScoped<IConnectionRequestHandler>(provider => provider.GetRequiredService<ConnectionApplicationService>());

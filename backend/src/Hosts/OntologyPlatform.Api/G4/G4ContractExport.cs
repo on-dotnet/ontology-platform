@@ -16,6 +16,7 @@ public static class G4ContractExport
         builder.Services.AddOpenApi("g4", options => options.AddG4Contracts());
         await using var app = builder.Build();
         app.MapG4Endpoints();
+        app.MapMappingEndpoints();
         app.MapOpenApi();
         await app.StartAsync();
         try

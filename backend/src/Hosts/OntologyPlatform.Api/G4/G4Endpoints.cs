@@ -11,6 +11,10 @@ public static class G4Endpoints
     /// <summary>实际产品路由及OpenAPI共用同一映射，不另造Schema生成源。</summary>
     public static void MapG4Endpoints(this WebApplication app)
     {
+        if (app.Configuration.GetValue<bool>("G4:Mapping:Enabled"))
+        {
+            app.MapMappingEndpoints();
+        }
         app.MapGet("/api/v1/connections", (Func<HttpContext, Task<IResult>>)((HttpContext context) => ExecuteAsync(context, "list", "connection.read", null))).Produces<ConnectionListPage>(200).WithTags("Connections").WithGroupName("g4");
         app.MapGet("/api/v1/connections/{id}", (Func<HttpContext, Task<IResult>>)((HttpContext context) => ExecuteAsync(context, "get", "connection.read", null))).Produces<ConnectionView>(200).WithTags("Connections").WithGroupName("g4");
         app.MapPost("/api/v1/connection-secrets", (Func<HttpContext, Task<IResult>>)((HttpContext context) => ExecuteAsync(context, "intake", "connection.secret.manage", typeof(ConnectionSecretIntakeRequest)))).Accepts<ConnectionSecretIntakeRequest>("application/json").Produces<SecretIntakeReceipt>(201).WithTags("Connections").WithGroupName("g4");

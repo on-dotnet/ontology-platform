@@ -80,6 +80,65 @@ namespace OntologyPlatform.Modules.Governance.Migrations
                     b.ToTable("audit_records", "governance");
                 });
 
+            modelBuilder.Entity("OntologyPlatform.Modules.Governance.MappingAuthorizationEpoch", b =>
+                {
+                    b.Property<string>("OrganizationId")
+                        .HasColumnType("text");
+
+                    b.Property<long>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
+                    b.HasKey("OrganizationId");
+
+                    b.ToTable("MappingAuthorizationEpochs", "governance");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Governance.MappingAuthorizationGrant", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConnectionId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("ExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.PrimitiveCollection<string[]>("FieldRefs")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.PrimitiveCollection<string[]>("ObjectRefs")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Permission")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("RevokedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("SubjectId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId", "SubjectId", "Permission");
+
+                    b.ToTable("MappingAuthorizationGrants", "governance");
+                });
+
             modelBuilder.Entity("OntologyPlatform.Modules.Governance.ServerSession", b =>
                 {
                     b.Property<string>("Id")

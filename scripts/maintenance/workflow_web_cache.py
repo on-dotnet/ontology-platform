@@ -156,7 +156,7 @@ def binding(root,rows,shims,links,adapter):
 
 def prepare(root,home,admission,projects,env,run_dir,node,adapter):
     """只允许本任务从两个明确批准的同仓库现存候选迁移。"""
-    require(home.parents[1].name in (TASK,'G4-ENG-DELIVERY-002','G4-M2-DORIS-01','G4-M2-ORACLE-01'),'TASK_ID')
+    require(home.parents[1].name in (TASK,'G4-ENG-DELIVERY-002','G4-M2-DORIS-01','G4-M2-ORACLE-01','G4-M3-MAPPING-001'),'TASK_ID')
     marker=adapter.web_marker(root,home,admission)
     store=adapter.ordinary(admission['playwrightAndAjv']['store'])
     copied=0

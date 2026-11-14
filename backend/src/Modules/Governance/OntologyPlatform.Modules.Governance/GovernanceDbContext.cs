@@ -20,11 +20,29 @@ public sealed class GovernanceDbContext : DbContext
     /// <summary>显式开发初始化的合成平台资源。</summary>
     public DbSet<SyntheticResource> Resources => Set<SyntheticResource>();
 
+    /// <summary>显式映射操作及源字段白名单，不从角色自动赋权。</summary>
+    public DbSet<MappingAuthorizationGrant> MappingAuthorizationGrants => Set<MappingAuthorizationGrant>();
+
+    /// <summary>每组织唯一的授权版本与锁定范围。</summary>
+    public DbSet<MappingAuthorizationEpoch> MappingAuthorizationEpochs => Set<MappingAuthorizationEpoch>();
+
     /// <summary>冻结模块schema、长度及查询索引，不触碰其他模块。</summary>
     /// <param name="modelBuilder">EF模型构建器。</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("governance");
+        modelBuilder.Entity<MappingAuthorizationEpoch>(entity =>
+        {
+            entity.ToTable("MappingAuthorizationEpochs");
+            entity.HasKey(value => value.OrganizationId);
+            entity.Property(value => value.Revision).IsConcurrencyToken();
+        });
+        modelBuilder.Entity<MappingAuthorizationGrant>(entity =>
+        {
+            entity.ToTable("MappingAuthorizationGrants");
+            entity.HasKey(value => value.Id);
+            entity.HasIndex(value => new { value.OrganizationId, value.SubjectId, value.Permission });
+        });
         modelBuilder.Entity<ServerSession>(entity =>
         {
             entity.ToTable("server_sessions");

@@ -206,3 +206,13 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 # 2026-11-14 G4-M3-MAPPING-001 P0 授权事实追加
 
 本会话用户明确批准附件中的P0依赖核对与合同审查；附件第3节明列本索引仅追加本轮实际授权。本段只记录已经发生的用户请求，不批准任何产品实施。预期且fetch实核main=e07eab20feb3fdef9e24a20dec12d11b15bd7d46；独立托管树、codex/g4-m3-mapping-001，Master单作者与非作者只读Review，文档分支普通提交/push。范围仅[一页任务卡](G4-M3-MAPPING-001.md)、[A–F申请](../evidence/G4-M3-MAPPING-001/contract-admission-request.md)及本索引追加。允许M2总体PARTIAL、TDengine WAIT_FOR_EXTERNAL_INPUT下审查M3设计；PG首条完整映射路径是待批建议，其他连接器不视为等价。禁止下载/安装/prepare/restore/服务、产品/公共DTO/数据库/工程脚本修改、历史全量验收、ZIP、main更新、KEEP清理、TDengine恢复及M4。完成P0停准入，后续明确获批才在同会话/树/分支实施。历史授权原文保留。
+
+## 2026-11-14 PostgreSQL首条完整映射路径实施（最新明确批准）
+
+用户明确批准A–F申请中的PostgreSQL首条完整映射路径实施，按申请文件范围、资源预算和验收要求，在同一M3会话、codex/g4-m3-mapping-001分支及托管工作树继续。范围内直接完成、不逐补丁审批；不更新main、不恢复TDengine、不进入M4、不新增未批依赖或下载。此授权覆盖本任务P0仅文档限制，其他历史范围不自动继承。用户另明确确认本次保持Mac接电与“显示器关闭时防止自动睡眠”；仅只读核验与有界monitor，不改全局电源。唯一状态见任务卡，A–F设计及其Review修正为实施依据。
+
+## 2026-11-14 M3 Web缓存最小准入补充（最新明确批准）
+
+用户明确批准 `scripts/maintenance/workflow_web_cache.py` 这一遗漏于F1的文件，仅将 `G4-M3-MAPPING-001` 加入任务白名单，并在已批准 `WorkflowMapping.Tests.py` 加入负例；保持全部缓存散列、路径和零下载检查。未扩大其他文件或依赖范围。
+
+2026-11-14 M3补充授权：用户明确批准仅本任务新建合成Keycloak realm为operator补auditor、auditor补operator角色，用于同主体换会话自批拒绝与双主体CAS竞争；新合成管理密码仅进程内使用，不输出/另存，不涉及旧KEEP或真实账户。自动审批先前拒绝的尝试未执行；本次获得明确授权后执行，准确主体和角色前后证据在当前Run。

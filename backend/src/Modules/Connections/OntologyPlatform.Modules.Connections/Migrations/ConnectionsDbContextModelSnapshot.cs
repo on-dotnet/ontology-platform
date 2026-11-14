@@ -340,6 +340,764 @@ namespace OntologyPlatform.Modules.Connections.Migrations
 
                     b.ToTable("ConnectionSecrets", "connections");
                 });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingActivationCheckRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("BindingHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("CanonicalBytes")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MappingId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProposalId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MappingId");
+
+                    b.HasIndex("OrganizationId", "Id");
+
+                    b.ToTable("MappingActivationChecks", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingActivationRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<long>("ActivationRevision")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BindingJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("CanonicalBytes")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("CheckId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MappingId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProposalId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReleaseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MappingId");
+
+                    b.HasIndex("ProposalId")
+                        .IsUnique();
+
+                    b.HasIndex("OrganizationId", "Id");
+
+                    b.ToTable("MappingActivations", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingActiveRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ActivationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("ActivationRevision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("MappingId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReleaseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MappingId")
+                        .IsUnique();
+
+                    b.HasIndex("OrganizationId", "Id");
+
+                    b.ToTable("MappingActives", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingAssessmentRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("BindingJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("CanonicalBytes")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ImpactHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MappingId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SemanticResultHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TargetId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TargetKind")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("TargetRevision")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MappingId");
+
+                    b.HasIndex("OrganizationId", "Id");
+
+                    b.ToTable("MappingAssessments", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingCommandRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CommandId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MappingId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Operation")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PayloadHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("ResponseBytes")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("SubjectId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MappingId");
+
+                    b.HasIndex("OrganizationId", "CommandId")
+                        .IsUnique();
+
+                    b.HasIndex("OrganizationId", "Id");
+
+                    b.HasIndex("OrganizationId", "MappingId", "Operation", "IdempotencyKey")
+                        .IsUnique();
+
+                    b.ToTable("MappingCommands", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingJobRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AuthorityJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("CompletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ErrorCode")
+                        .HasColumnType("text");
+
+                    b.Property<long>("Fence")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("LeaseUntil")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MappingId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RequestJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ResultId")
+                        .HasColumnType("text");
+
+                    b.Property<long>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubmittedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MappingId");
+
+                    b.HasIndex("OrganizationId", "Id");
+
+                    b.HasIndex("Status", "LeaseUntil");
+
+                    b.ToTable("MappingJobs", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingNotificationRecord", b =>
+                {
+                    b.Property<string>("MappingId")
+                        .HasColumnType("text");
+
+                    b.Property<long>("ActivationRevision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ManifestHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReleaseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("MappingId");
+
+                    b.ToTable("MappingNotifications", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingOutboxReceiptRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<long>("ActivationRevision")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MappingId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MappingId");
+
+                    b.ToTable("MappingOutboxReceipts", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingOutboxRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<long>("ActivationRevision")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Attempts")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DispatchedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ManifestHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MappingId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReleaseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MappingId");
+
+                    b.HasIndex("OrganizationId", "Id");
+
+                    b.ToTable("MappingOutboxs", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingProposalRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ActivationId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("BindingHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DecidedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DecidedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DecisionJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DecisionProofJson")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("ExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MappingId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("RequestBytes")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<long>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubmitProofJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubmittedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MappingId");
+
+                    b.HasIndex("OrganizationId", "Id");
+
+                    b.ToTable("MappingProposals", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CurrentRevisionId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DraftId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("SourceConnectionId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId", "Id");
+
+                    b.ToTable("Mappings", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingReleaseRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("CanonicalBytes")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MappingId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MappingId");
+
+                    b.HasIndex("OrganizationId", "Id");
+
+                    b.ToTable("MappingReleases", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingRevisionRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("CanonicalBytes")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DraftId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MappingId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
+                    b.PrimitiveCollection<string[]>("SiteIds")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MappingId", "Revision")
+                        .IsUnique();
+
+                    b.HasIndex("OrganizationId", "Id");
+
+                    b.ToTable("MappingRevisions", "connections");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingActivationCheckRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingActivationRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingActiveRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingAssessmentRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingCommandRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingJobRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingNotificationRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingOutboxReceiptRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingOutboxRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingProposalRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingReleaseRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Connections.MappingRevisionRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Connections.MappingRecord", null)
+                        .WithMany()
+                        .HasForeignKey("MappingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
 #pragma warning restore 612, 618
         }
     }

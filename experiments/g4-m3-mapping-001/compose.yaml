@@ -1,0 +1,296 @@
+name: ontology-g4-m3-${MAPPING_RUN_ID:?explicit run required}
+services:
+  platform-pg:
+    image: postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437
+    platform: linux/arm64
+    pull_policy: never
+    mem_limit: 768m
+    cpus: 1
+    pids_limit: 128
+    init: true
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
+    labels:
+      ontology.task-id: G4-M3-MAPPING-001
+      ontology.run-id: ${MAPPING_RUN_ID:?explicit run required}
+      ontology.synthetic: 'true'
+    environment:
+      POSTGRES_DB: mapping
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/password
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - >-
+        cp /run/secrets/server.crt /tmp/server.crt;
+        cp /run/secrets/server.key /tmp/server.key;
+        chown postgres:postgres /tmp/server.crt /tmp/server.key;
+        chmod 600 /tmp/server.key;
+        exec /usr/local/bin/docker-entrypoint.sh postgres
+        -c ssl=on -c ssl_cert_file=/tmp/server.crt -c ssl_key_file=/tmp/server.key
+        -c hba_file=/run/secrets/pg_hba.conf
+        -c log_statement=none -c log_min_error_statement=panic
+    ports: ["127.0.0.1:15463:5432"]
+    volumes:
+      - platform-data:/var/lib/postgresql
+      - type: bind
+        source: ${MAPPING_PRIVATE_DIR:?explicit private directory required}
+        target: /run/secrets
+        read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+      - /var/run/postgresql:size=4m,mode=3775,uid=999,gid=999
+    networks: [platform]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U postgres -d mapping]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+  pg-source:
+    image: postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437
+    platform: linux/arm64
+    pull_policy: never
+    mem_limit: 768m
+    cpus: 1
+    pids_limit: 128
+    init: true
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
+    labels:
+      ontology.task-id: G4-M3-MAPPING-001
+      ontology.run-id: ${MAPPING_RUN_ID:?explicit run required}
+      ontology.synthetic: 'true'
+    environment:
+      POSTGRES_DB: fixture
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/password
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - >-
+        cp /run/secrets/server.crt /tmp/server.crt;
+        cp /run/secrets/server.key /tmp/server.key;
+        cp /run/secrets/init.sql /docker-entrypoint-initdb.d/10-fixture.sql;
+        chown postgres:postgres /tmp/server.crt /tmp/server.key /docker-entrypoint-initdb.d/10-fixture.sql;
+        chmod 600 /tmp/server.key /docker-entrypoint-initdb.d/10-fixture.sql;
+        exec /usr/local/bin/docker-entrypoint.sh postgres
+        -c ssl=on -c ssl_cert_file=/tmp/server.crt -c ssl_key_file=/tmp/server.key
+        -c hba_file=/run/secrets/pg_hba.conf
+        -c log_statement=none -c log_min_error_statement=panic
+    volumes:
+      - source-data:/var/lib/postgresql
+      - type: bind
+        source: ${MAPPING_SOURCE_PRIVATE_DIR:-/not-configured}
+        target: /run/secrets
+        read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+      - /var/run/postgresql:size=4m,mode=3775,uid=999,gid=999
+      - /docker-entrypoint-initdb.d:size=4m,mode=0755
+    networks: [platform]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U postgres -d fixture]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+  source-test:
+    profiles: [source-test]
+    image: mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55
+    platform: linux/arm64
+    pull_policy: never
+    mem_limit: 768m
+    cpus: 1
+    pids_limit: 128
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    labels:
+      ontology.task-id: G4-M3-MAPPING-001
+      ontology.run-id: ${MAPPING_RUN_ID:?explicit run required}
+      ontology.synthetic: 'true'
+    environment:
+      MAPPING_SOURCE_CA: /run/mapping/server.crt
+      MAPPING_SOURCE_PASSWORD_FILE: /run/mapping/reader-password
+      DOTNET_EnableDiagnostics: '0'
+      TESTINGPLATFORM_TELEMETRY_OPTOUT: '1'
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      XDG_DATA_HOME: /tmp/data
+      TMPDIR: /tmp
+    working_dir: /tmp
+    ulimits:
+      core: 0
+    entrypoint: [dotnet]
+    command: [/app/OntologyPlatform.ConnectionsTests.dll, --filter, FullyQualifiedName~G4MappingSourceTests, --timeout, 30s, --zero-tests-policy, strict]
+    volumes:
+      - type: bind
+        source: ../../backend/tests/OntologyPlatform.ConnectionsTests/bin/Debug/net10.0
+        target: /app
+        read_only: true
+      - type: bind
+        source: ${MAPPING_SOURCE_PRIVATE_DIR:-/not-configured}/server.crt
+        target: /run/mapping/server.crt
+        read_only: true
+      - type: bind
+        source: ${MAPPING_SOURCE_PRIVATE_DIR:-/not-configured}/reader-password
+        target: /run/mapping/reader-password
+        read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    networks: [platform]
+
+  keycloak-test:
+    image: quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4
+    platform: linux/arm64
+    pull_policy: never
+    mem_limit: 1g
+    cpus: 1
+    pids_limit: 256
+    read_only: true
+    user: ${MAPPING_HOST_UID:-501}:${MAPPING_HOST_GID:-20}
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    labels: &runtime-labels
+      ontology.task-id: G4-M3-MAPPING-001
+      ontology.run-id: ${MAPPING_RUN_ID:?explicit run required}
+      ontology.synthetic: 'true'
+    ports: ["127.0.0.1:15680:8080"]
+    entrypoint: [/bin/bash, -ec]
+    command:
+      - |
+        runtime=/opt/keycloak/data/runtime
+        if [ ! -f "$$runtime/.mapping-built" ]; then
+          mkdir -p "$$runtime"
+          for item in bin conf lib providers themes LICENSE.txt README.md version.txt; do
+            if [ -e "/opt/keycloak/$$item" ]; then cp -R "/opt/keycloak/$$item" "$$runtime/"; fi
+          done
+          chmod -R u+rwX "$$runtime"
+          "$$runtime/bin/kc.sh" build --db=dev-file
+          touch "$$runtime/.mapping-built"
+        fi
+        export KC_BOOTSTRAP_ADMIN_USERNAME=wave2-bootstrap
+        export KC_BOOTSTRAP_ADMIN_PASSWORD="$$(cat /run/secrets/keycloak-password)"
+        exec "$$runtime/bin/kc.sh" start --optimized --http-enabled=true --http-port=8080 --hostname=http://localhost:15680 --hostname-strict=true --http-access-log-enabled=false
+    environment:
+      JAVA_OPTS_KC_HEAP: -Xms128m -Xmx512m
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+      - ${MAPPING_RUNTIME_PRIVATE_DIR:-/not-configured}/keycloak-password:/run/secrets/keycloak-password:ro
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    networks: [platform]
+  fuseki:
+    image: ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab
+    platform: linux/arm64
+    pull_policy: never
+    mem_limit: 1536m
+    cpus: 2
+    pids_limit: 256
+    read_only: true
+    user: 10001:10001
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    labels: *runtime-labels
+    ports: ["127.0.0.1:15603:3030"]
+    entrypoint: [java, -Xms128m, -Xmx640m, -Dlog4j.configurationFile=/opt/fuseki/g2-log4j2.properties, -jar, /opt/fuseki/fuseki-server.jar]
+    command: [--config=/opt/fuseki/g2-config.ttl]
+    volumes: [fuseki-data:/fuseki]
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    networks: [platform]
+  rustfs:
+    image: rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b
+    platform: linux/arm64
+    pull_policy: never
+    mem_limit: 768m
+    cpus: 1
+    pids_limit: 256
+    read_only: true
+    user: ${MAPPING_HOST_UID:-501}:${MAPPING_HOST_GID:-20}
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    labels: *runtime-labels
+    ports: ["127.0.0.1:15690:9000"]
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - |
+        export RUSTFS_ACCESS_KEY="$$(cat /run/secrets/s3-access)"
+        export RUSTFS_SECRET_KEY="$$(cat /run/secrets/s3-secret)"
+        exec /usr/bin/rustfs /data
+    environment:
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ENABLE: 'false'
+      RUSTFS_OBS_LOGGER_LEVEL: warn
+      RUSTFS_OBS_LOG_DIRECTORY: /tmp/logs
+    volumes:
+      - rustfs-data:/data
+      - ${MAPPING_RUNTIME_PRIVATE_DIR:-/not-configured}/s3-access:/run/secrets/s3-access:ro
+      - ${MAPPING_RUNTIME_PRIVATE_DIR:-/not-configured}/s3-secret:/run/secrets/s3-secret:ro
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    networks: [platform]
+  api:
+    image: mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55
+    platform: linux/arm64
+    pull_policy: never
+    mem_limit: 1g
+    cpus: 1
+    pids_limit: 256
+    init: true
+    read_only: true
+    user: ${MAPPING_HOST_UID:-501}:${MAPPING_HOST_GID:-20}
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    labels: *runtime-labels
+    ports: ["127.0.0.1:15600:15600"]
+    working_dir: /private/api
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - |
+        dotnet /runtime/MappingLoopback.dll &
+        proxy=$$!
+        trap 'kill "$$proxy" 2>/dev/null || true' EXIT
+        dotnet /app/OntologyPlatform.Api.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:15600
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_EnableDiagnostics: '0'
+    volumes:
+      - ../../backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0:/app:ro
+      - ${MAPPING_RUNTIME_PRIVATE_DIR:-/not-configured}/api:/private/api:ro
+      - ${MAPPING_RUNTIME_HELPER_DIR:-/not-configured}:/runtime:ro
+      - api-keyring:/keyring
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    networks: [platform]
+
+volumes:
+  keycloak-data:
+    driver: local
+    driver_opts: {type: tmpfs, device: tmpfs, o: "size=768m,mode=0700,uid=${MAPPING_HOST_UID:-501},gid=${MAPPING_HOST_GID:-20}"}
+    labels: *runtime-labels
+  fuseki-data:
+    driver: local
+    driver_opts: {type: tmpfs, device: tmpfs, o: "size=512m,mode=0700,uid=10001,gid=10001"}
+    labels: *runtime-labels
+  rustfs-data:
+    driver: local
+    driver_opts: {type: tmpfs, device: tmpfs, o: "size=512m,mode=0700,uid=${MAPPING_HOST_UID:-501},gid=${MAPPING_HOST_GID:-20}"}
+    labels: *runtime-labels
+  api-keyring:
+    driver: local
+    driver_opts: {type: tmpfs, device: tmpfs, o: "size=16m,mode=0700,uid=${MAPPING_HOST_UID:-501},gid=${MAPPING_HOST_GID:-20}"}
+    labels: *runtime-labels
+  source-data:
+    labels:
+      ontology.task-id: G4-M3-MAPPING-001
+      ontology.run-id: ${MAPPING_RUN_ID:?explicit run required}
+      ontology.synthetic: 'true'
+  platform-data:
+    labels:
+      ontology.task-id: G4-M3-MAPPING-001
+      ontology.run-id: ${MAPPING_RUN_ID:?explicit run required}
+      ontology.synthetic: 'true'
+networks:
+  platform:
+    labels:
+      ontology.task-id: G4-M3-MAPPING-001
+      ontology.run-id: ${MAPPING_RUN_ID:?explicit run required}

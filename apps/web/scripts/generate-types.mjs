@@ -3,6 +3,8 @@ import { declarationsFor } from "./openapi-types.mjs";
 
 /** 只从Master冻结或真实导出的OpenAPI生成类型，业务适配与生成内容分开维护。 */
 for (const [sourceName, targetName] of [["g1-platform.openapi.json", "generated.ts"], ["g2-platform.openapi.json", "g2-generated.ts"], ["g4-connections.openapi.json", "g4-generated.ts"]]) {
+  // M3只生成自己的G4权威产物，冻结G1/G2不因本任务触碰。
+  if (process.argv.includes("--g4-only") && targetName !== "g4-generated.ts") continue;
   const path = new URL(`../../../docs/contracts/${sourceName}`, import.meta.url);
   if (!existsSync(path)) continue;
   const source = JSON.parse(readFileSync(path, "utf8"));
