@@ -1,6 +1,6 @@
 # G4-M3-MAPPING-001｜A–F 合同、已批准实施范围与独立审查结果
 
-**当前：实施已获用户批准，PostgreSQL 首条完整路径已实现，正在完成最终当前输入验收与独立原件重开。** 本文保留下面 P0 时点的申请与事实，不能把历史“待批准/NOT_RUN”误作当前状态；当前实施结果见文末，唯一任务状态见任务卡。禁止更新 main、恢复 TDengine、进入 M4、下载新依赖或生成 ZIP 的边界继续有效。
+**当前：批准的 PostgreSQL 首条完整路径已完成，当前输入验收与独立原件重开通过，停在人工审查关口。** 本文保留下面 P0 时点的申请与事实，不能把历史“待批准/NOT_RUN”误作当前状态；当前实施结果见文末，唯一任务状态见任务卡。禁止更新 main、恢复 TDengine、进入 M4、下载新依赖或生成 ZIP 的边界继续有效。
 
 ## P0 历史申请原文
 
@@ -743,13 +743,13 @@ Global Constraints：F1文件清单不扩大；F2容器/磁盘预算；AI OFF、
 
 Review Focus及所属任务：过期评估与ActivationCheck时间窗口(T3/T4)；组织级epoch与{A,B}→{A}撤权竞争(T2/T4)；缺单位证据/null/时区(T1/T3)；同key响应丢失及ABA(T4)；刷新/用户切换泄漏(T5)。
 
-- [ ] T0 环境与任务准入：先scripts/tests/WorkflowMapping.Tests.py覆盖当前锁闭包、未知包拒绝、错误Task/缺消费者拒绝、准确host Task；再修改workflow_environment.py并新增workflow_m3_mapping.py；仅散列核验本地归档/缓存，零下载；运行该测试组及离线prepare，缺前提即停对应链。
-- [ ] T1 wire/canonical：先G4MappingWireTests.cs覆盖PUBLISH/ROLLBACK必填/混用/未知字段、hash/null/顺序；新增G4MappingModels/Rules/Services与MappingCanonical；生产接口ValidateProposal/CanonicalBytes/Hash提供后续输入；运行G2ContractTests程序集及新增Connections规范化测试。
-- [ ] T2 持久化/授权：先G4MappingAuthorizationTests和G4MappingTests证明自批、grant子集、组织epoch、历史不可改；新增Records/DbContext迁移、Governance participant及Host session参与；CaptureAsync/DemandInTransactionAsync输出事务授权证明；真实PG锁竞争必须通过。
-- [ ] T3 源/评估：先G4MappingSourceTests覆盖完整小集/101行/SQL输入/NULL-MISSING/单位/身份时间/关系超限；实现PgMappingSourceValidator和MappingValidationService、JobWorker；ValidateAsync输出七阶段Assessment及semanticResultHash；真实PG源/TLS/只读/取消不能由mock替代。
-- [ ] T4 提案/激活：先G4MappingTests覆盖固定revision、过期/撤权、回滚不依赖当前Draft、CAS/ABA/同键异体/审计故障；实现MappingApplicationService/ActivationService/OutboxDispatcher与GET恢复；事务故障注入后旧active保持。
-- [ ] T5 Host及UI：先合同与mappings.test.ts覆盖生成判别、冲突/刷新/当前用户；实现MappingEndpoints/DI/OpenAPI→TS及七路由，双主体浏览器从创建至回滚；AI OFF无外联。
-- [ ] T6 完整按影响验收与独立Review：新Task工程消费者/真实audit/DI/证据早预检，静态→相关程序集→最短真实→故障/恢复/浏览器；FRESH/REUSED分列，最终独立Review、提交/push和当前审查关口停止；不自动集成main。
+- [x] T0 环境与任务准入：先scripts/tests/WorkflowMapping.Tests.py覆盖当前锁闭包、未知包拒绝、错误Task/缺消费者拒绝、准确host Task；再修改workflow_environment.py并新增workflow_m3_mapping.py；仅散列核验本地归档/缓存，零下载；运行该测试组及离线prepare，缺前提即停对应链。
+- [x] T1 wire/canonical：先G4MappingWireTests.cs覆盖PUBLISH/ROLLBACK必填/混用/未知字段、hash/null/顺序；新增G4MappingModels/Rules/Services与MappingCanonical；生产接口ValidateProposal/CanonicalBytes/Hash提供后续输入；运行G2ContractTests程序集及新增Connections规范化测试。
+- [x] T2 持久化/授权：先G4MappingAuthorizationTests和G4MappingTests证明自批、grant子集、组织epoch、历史不可改；新增Records/DbContext迁移、Governance participant及Host session参与；CaptureAsync/DemandInTransactionAsync输出事务授权证明；真实PG锁竞争必须通过。
+- [x] T3 源/评估：先G4MappingSourceTests覆盖完整小集/101行/SQL输入/NULL-MISSING/单位/身份时间/关系超限；实现PgMappingSourceValidator和MappingValidationService、JobWorker；ValidateAsync输出七阶段Assessment及semanticResultHash；真实PG源/TLS/只读/取消不能由mock替代。
+- [x] T4 提案/激活：先G4MappingTests覆盖固定revision、过期/撤权、回滚不依赖当前Draft、CAS/ABA/同键异体/审计故障；实现MappingApplicationService/ActivationService/OutboxDispatcher与GET恢复；事务故障注入后旧active保持。
+- [x] T5 Host及UI：先合同与mappings.test.ts覆盖生成判别、冲突/刷新/当前用户；实现MappingEndpoints/DI/OpenAPI→TS及七路由，双主体浏览器从创建至回滚；AI OFF无外联。
+- [x] T6 完整按影响验收与独立Review：新Task工程消费者/真实audit/DI/证据早预检，静态→相关程序集→最短真实→故障/恢复/浏览器；FRESH/REUSED分列，最终独立Review、提交/push和当前审查关口停止；不自动集成main。
 
 每项先观察有意义失败，再实现到相关组通过；缺依赖的执行错误不记成产品RED/PASS。每项结束记录命令、真实退出、测试数/skip及提交，不按纯文档新Head重跑产品。
 
@@ -793,3 +793,71 @@ T5运行：本地canonical Fuseki逐内容身份验证后复用，零下载；�
 T5续记：实际浏览器发布/第二发布/原Manifest回滚和刷新共111检查通过（browser-lifecycle-1794629788068.json）；源字段撤权→403→已加载正文清屏→恢复、审计/Outbox/CAS三项独立故障→业务记录和指针原子回滚→原命令重试一次成功，共79检查通过（browser-faults-1794630478090.json）。故障后的ActivationCheck保留，旧active未被失败覆盖；原驱动把安全503误期望500的失败原件保留。上述均为阶段输入证据，最终当前绑定尚待重核。
 
 独立Review续记：关系缺domain/range校验（P1）、已支持varchar/timestamp精度拼写误拒（P2）、规则候选与页面缺失（P2）已修。真实红例两失败→后端14/14；UI11/11。规则候选v1只使用固定正式词汇和目录；METADATA限定唯一同名直接string/boolean且无单位的低风险项，TERM项须逐项人工；全部CANDIDATE_ONLY且无实样证明。勾选仅写待保存文本，再显式PATCH，不自动验证/批准；真实候选/409保留文本/人工重基/刷新35检查通过（browser-recovery-1794630976321.json）。后续复审发现历史未使用字段撤权后可能重新进入候选，已限制原/当前目录精确交集，并对旧幂等回执独立403拒绝；补负例后等待当前完整复核，不能引用修复前35检查冒充该权限路径已验。
+
+
+## 已批准实施的最终 A–F 交付（2026-11-14）
+
+本节取代前文P0时点的“待批准/产品NOT_RUN”作为当前结论，历史事实和失败原件仍保留。用户批准后实际在同一M3会话、codex/g4-m3-mapping-001及原托管Worktree实施；唯一状态为IMPLEMENTATION_COMPLETE / READY_FOR_HUMAN_REVIEW。已测试源码提交 **cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c**；最终文档提交与该源码输入等价的绑定由schema2预检核实。没有更新main或生成ZIP。
+
+### A｜实际依赖与实施范围
+
+PostgreSQL首切片真实执行；Connections持有Mapping/不可变历史/Active/Outbox，Governance独占授权、票据、审计。正式G3发布服务只读复用；前置G3发布和兼容Run均为本任务合成夹具，不把M3扩展到M4。69个文件的准确清单由候选提交与`implementation-candidate-files.json`固定，沿F1；唯一额外准入文件为用户明确批准的workflow_web_cache.py单项白名单。零新增依赖/下载，21项目179锁包、391 Web包复用核验。其他连接器、TDengine及M2总体状态没有升级。
+
+### B｜最终合同差异与正反例
+
+| 合同面 | 实际实现/相对B0差异 | 当前正例 / 反例 |
+|---|---|---|
+| 判别wire/canonical | 独立PUBLISH与ROLLBACK DTO，未知/混合字段拒绝；固定UTC、规范字节及hash | 两种提案真实闭环 / 混入targetReleaseId、空引用、弱ETag与缺If-Match拒绝 |
+| 不可变MappingRelease | PG canonical bytea+hash、不可变约束；Active及Activation分离 | 发布后读取与回滚保持原Manifest/hash / 原件UPDATE、DELETE、唯一幂等域冲突拒绝 |
+| 目录身份 | Definition保留编写时snapshot；Binding指本次当前目录，两者允许不同；历史恢复从原定义提取唯一原目录 | 显式断言原snapshot≠Binding仍可发布后读取/回滚 / 混合目录fail closed，源列撤权或漂移拒绝 |
+| 精确版本 | 固定G3/hash、draft revision、目录/凭据/授权epoch、assessment/impact/canonical/executor版本 | 兼容新secret下重新评估旧Release / 旧approval经secret轮换、ABA或授权变化失效 |
+| 列表与恢复 | EXPIRED/STALE按当前投影筛选；有界扫描按已扫描候选推进游标 | 过期/漂移筛选可找到目标 / APPROVED队列排除过期、漂移项 |
+
+原目录/Binding分离来自真实红例：发布已提交但读取Release403。修复后全新生命周期含不同目录身份的显式断言通过。微秒PG截断导致提案hash不一致、关系domain/range、varchar/timestamp精度拼写、规则候选旧字段泄露等阶段问题均已修；原失败不删除或改写为PASS。
+
+### C｜真实语义、固定G3与AI边界
+
+七阶段实际执行：SCHEMA、IDENTITY、TIME_UNIT、SECURITY、EXECUTABILITY、RECONCILIATION、IMPACT。受控PG完整小集验证覆盖一对多/多对多、跨厂身份、半开时间、精度/单位、JSON missing/null/空串/零、fanout及101行/4MiB预算反例，未知或缺证不当成功。源IO为独立只读事务，有限截止与跨实例主体1/连接2容量；不提供任意SQL或业务查询入口。
+
+确定性候选只用固定正式词汇及原/当前可见字段交集，全部CANDIDATE_ONLY；低风险勾选只更新页面待保存文本，须显式PATCH，再验证和异人审核。AI ON实际422 mapping_model_not_enabled；源注释中的越权/脚本/外传指令不改变候选或Policy，浏览器外联尝试阻断且计失败，当前十组无外联。
+
+兼容证据分清：公开历史G3 Manifest解码3160B，SHA256=750e626576e22b2eaff8f3abde0304dc44a7df73f60220058e409f2c653e83aa，当前严格DTO读取通过；当前隔离环境内旧Run在新发布/回滚后保持原快照通过。未重新执行历史Run cdb6e16db16843b6b7ec6baf37300d28；历史ontology完整原源未找到，**不宣称四份历史源原字节全部重验**。本任务G3正式Manifest保持原字节/hash的断言独立通过。
+
+### D｜审核、事务、权限与恢复闭环
+
+| 验收路径 | 当前实际结果 |
+|---|---|
+| 异人审核 | 两个真实OIDC合成主体；用户另批两项测试角色后，同主体双角色换会话仍明确403 mapping_self_review_forbidden |
+| 双主体CAS/ABA | 并发一成功一409，release/activation/outbox/成功audit只增1；同release回到更高revision后旧proposal仍409 |
+| 共同事务 | audit/outbox/CAS分别真实PG故障，业务写和指针全部回滚；独立ActivationCheck保留；原命令恢复只成功一次 |
+| 授权失效 | 已批准后A或B会话注销、B的{A,B} grant撤销/过期/缩为B、提案到期，仍有效激活者不能提交，原active与成功audit不变 |
+| 真实源变化 | 审批后实际列改名、源容器短时pause失联，激活失败且失败Check可恢复读取；finally恢复本任务夹具 |
+| 凭据与丢响应 | 实际secretVersion轮换令旧批准失效；新Binding重新评估并回滚旧Manifest；服务端提交后浏览器route.abort丢弃响应，原键重试返回原receipt且审计一份，同键异体409 |
+| 消费者 | 真实PG Outbox重复/倒序不回退；worker取消fence拒绝迟到结果；主API停止至第二实例完成同Job，随后恢复主API，旧会话可读；临时第七API精确删除并独立查无此ID |
+
+测试角色/授权变更只在本任务新合成realm与mapping_v3；生产默认不授予。前次自动审批拒绝读取新合成管理密码的尝试未执行；用户明确补充批准后才进行指定角色操作，密码只在进程内，不输出/保存副本。旧KEEP/真实账户未触碰。
+
+### E｜七页面与当前验收证据
+
+七页面和连接目录入口完成真实纵向：手工创建、固定评估/提案、异人审核、发布与旧原件回滚；深链刷新不重复POST。冲突保留未保存文本并人工重基；撤权清空敏感正文、拒绝迟到响应；切换主体不保留旧正文/未保存内容；取消后刷新同Job。当前过期、失败/证据不足检查与恢复状态有实证；桌面/390px窄屏、深浅主题、基础键盘焦点/导航已实测，不声称完整无障碍认证。
+
+[当前proof-index](../../../artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/product-proof-index.json)是原件入口：15个准确引用，逐项SHA256；browser wrapper→实际命令receipt→stdout报告路径→报告hash→当前输入/进程身份。实际reader的完整DLL集合和实际历史Manifest均重开，不能用当前入口DLL替旧解析依赖背书。
+
+| 当前分组 | 原始结果 |
+|---|---|
+| 本地 | wire6、纯语义14、UI11；typecheck/lint、API/Web构建与29个手写C#格式检查通过 |
+| 真实依赖 | 持久化4、PG源4、兼容2，全部零skip |
+| 浏览器 | lifecycle140、visual19、faults82、recovery35、worker166、semantics391、permissions166、authority403、rotation123、negative159，共1684断言（含轮询/HTTP断言，不冒充1684独立测试用例） |
+| 受影响工程 | environment-prepare7、preflight12、engineering18、M2准入14、M3准入15，共66；policy静态检查不计为测试 |
+| 五产品gate | environment/contract/backend/web/interaction全部PASS；实际执行原件有效REUSED，本轮资格重核FRESH；不是重新运行原产品测试 |
+| 正式计划 | workflow Run ccb1e7d8c1d143a2919d7e4eda3e74db，11受影响gate全部PASS，unknown路径为空；CI/未测原生平台NOT_RUN |
+
+schema2 [review-validation.json](../../../artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/review-validation.json)已通过test-review-evidence.ps1，实际exitCode与测得耗时/资格模式分列。证据创建后早预检与最终预检均通过；预检仅证明schema/输入绑定，不替代产品测试。当前合成连接最后为DISABLED，这是负例终态，未绕过终态重新启用。历史失败、旧数据库mapping/mapping_v2及中间报告保留。
+
+### F｜资源、独立Review与当前关口
+
+[最终资源原件](../../../artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/final-resources.json)：6容器、5.75GiB/7CPU上限；实际数据376508416B；证据9637568B；环境/构建/reader缓存合计约1.78GiB，均低于3GiB数据/1GiB证据/6GiB缓存/10GiB总预算。接管时短命第七API为原F2允许场景，有before/命令/exit/after缺席后验。未清理任何旧KEEP；当前工作树、分支、缓存、私有runtime、PG/Keycloak/Fuseki/RustFS/API/Web保持KEEP，理由为未集成的当前审查及同树后续工作，解除条件为明确收尾授权且成果安全集成或归档。接电/防自动睡眠用户已确认，有界心跳通过；未观察实际锁屏/熄屏事件，列NOT_VERIFIED。
+
+非作者Reviewer **/root/mapping_p0_review** 多轮只读审查并独立重开当前候选：核全部15引用、21命令原件及输出hash；独立qualify五gate全部PASS；实时检查六容器归属和配额，精确临时接管ID查无此对象。最终结论：**未发现阻断问题**。[Review记录](../../../artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/independent-review.json)由Master忠实记录Reviewer消息，不伪称Reviewer写入。已修Review问题包括关系domain/range、源预算/类型、候选可见性竞态、当前源不可核验清屏、跨实例容量、回滚依赖最新草稿、审核筛选状态、证据命令/实际进程/reader依赖绑定、次实例接管证明及原/当前目录分离。中文声明说明与格式专项完成，最终diff-check须exit0。
+
+本轮只交付任务状态与本A–F。原件留ignored artifacts，不生成ZIP；本地PASS不冒充CI/跨平台PASS。M2仍PARTIAL，TDengine暂缓，其他连接器不视为等价；未更新main、未进入M4。当前停在人工审查关口，后续获准工作继续同M3会话、分支和Worktree；Git提交/push不扩大业务或集成授权。
