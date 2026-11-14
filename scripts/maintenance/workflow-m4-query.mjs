@@ -227,8 +227,10 @@ async function browserRun(mode) {
       await writeFile(file.replace(".json", "-relationships.json"), edges.raw);
       check("s3_published_relationship_endpoints", edges.data.data.filter(item => item.kind === "relationship").length === 2 && edges.data.data.filter(item => item.kind === "relationship").every(item => item.source.identity.siteId === "site-a" && item.target.identity.siteId === "site-a" && item.evidenceIds.length === 2));
       const rootLimited = await execute("g4_read_observations", { maxRows: 2 });
-      check("s3_root_observations_truncated_branch", rootLimited.data.status === "PARTIAL" && rootLimited.data.subSources[0].limited);
-      const rootEvidence = await request(operator, "GET", "/api/v1/data/source-evidence/" + encodeURIComponent(rootLimited.data.evidence[0].evidenceId));
+      const rootEvidenceId = rootLimited.data.data.find(item => item.kind === "entity").evidenceIds[0];
+      const rootReceiptId = rootLimited.data.evidence.find(item => item.evidenceId === rootEvidenceId).sourceReadReceiptId;
+      check("s3_root_observations_truncated_branch", rootLimited.data.status === "PARTIAL" && rootLimited.data.subSources.find(item => item.sourceReadReceiptId === rootReceiptId)?.limited);
+      const rootEvidence = await request(operator, "GET", "/api/v1/data/source-evidence/" + encodeURIComponent(rootEvidenceId));
       check("s3_root_observations_truncated_receipt", rootEvidence.data.receipt.limited);
       const limited = await execute("g4_read_observations", { maxRows: 2 });
       check("s3_shared_row_budget_partial", limited.data.status === "PARTIAL" && limited.data.limited && limited.data.data.length === 2);
