@@ -20,6 +20,17 @@ TASK = 'G4-M4-QUERY-001'
 
 
 class QueryAdmissionTests(unittest.TestCase):
+    def test_build_closure_rejects_old_receipt_missing_embedded_schema(self):
+        inputs = {'backend/src/Query.cs': 'source', 'docs/contracts/g4-connections.openapi.json': 'schema',
+                  'Directory.Build.props': 'config', 'apps/web/src/page.tsx': 'web'}
+        expected = {key:value for key,value in inputs.items() if not key.startswith('apps/')}
+        query.demand_build_inputs({'inputs': expected}, inputs)
+        for omitted in expected:
+            with self.subTest(omitted=omitted), self.assertRaisesRegex(ValueError, 'QUERY_BUILD_INPUT_CLOSURE'):
+                query.demand_build_inputs({'inputs': {key:value for key,value in expected.items() if key != omitted}}, inputs)
+        with self.assertRaisesRegex(ValueError, 'QUERY_BUILD_INPUT_CLOSURE'):
+            query.demand_build_inputs({'inputs': dict(expected, obsolete='stale')}, inputs)
+
     def test_qualification_rejects_stale_failed_foreign_and_zero_originals(self):
         inputs = {'source.cs': 'current'}
         row = dict(taskId=TASK, runId=query.RUN, name='contract', status='PASS', exitCode=0,

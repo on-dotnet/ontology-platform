@@ -1306,6 +1306,14 @@ def qualification_inputs():
 
 
 
+def demand_build_inputs(build, inputs):
+    """构建闭包必须完整相等；旧凭据漏掉嵌入合同也不能被新资格包装接受。"""
+    expected = {path:digest for path,digest in inputs.items()
+                if path.startswith(('backend/', 'docs/contracts/')) or '/' not in path}
+    if not expected or build.get('inputs') != expected:
+        raise ValueError('QUERY_BUILD_INPUT_CLOSURE')
+
+
 def attest(name):
     """在实际执行前后封存输入和原件；失败也保存，不允许手填成功证明。"""
     import uuid
@@ -1338,6 +1346,7 @@ def attest(name):
     try:
         if name in projects:
             build = json.loads((output/('build-binding-OntologyPlatform.'+projects[name]+'.json')).read_text())
+            demand_build_inputs(build, inputs)
             if not build['binaries'] or any(sha((ROOT/path).read_bytes()) != digest for group in ['inputs','binaries'] for path,digest in build[group].items()):
                 raise ValueError('QUERY_ATTEST_BUILD_DRIFT')
             row['build'] = build
@@ -1401,6 +1410,7 @@ def qualify(gate, input_key):
         if 'build' in row:
             from workflow_execution import encoded
             build = row['build']; receipt = build['receipt']
+            demand_build_inputs(build, inputs)
             original = ROOT/'artifacts/workflow'/TASK/'commands'/RUN/receipt['commandId']/'receipt.json'
             if json.loads(original.read_text()) != receipt or receipt.get('exitCode') != 0 or receipt.get('stage') != 'query-build-'+build['project'] or receipt.get('inputFingerprint') != sha(encoded(build['inputs'])) or not build['binaries']:
                 raise ValueError('QUERY_QUALIFICATION_BUILD')
