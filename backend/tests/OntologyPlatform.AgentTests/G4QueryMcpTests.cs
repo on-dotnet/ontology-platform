@@ -66,7 +66,9 @@ public sealed class G4QueryMafRuntimeTests
         Assert.IsTrue(app.Environment.EnvironmentName == "Development");
         // 所有factory、provider与消费者保持正式组合，不替换Gateway或查询绑定参与者。
         await using var scope = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.CreateAsyncScope(app.Services);
+        // 正式查询模块工厂保持实际PG配置。
         var factory = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<Microsoft.EntityFrameworkCore.IDbContextFactory<OntologyPlatform.Modules.SemanticQuery.G4QueryDbContext>>(scope.ServiceProvider);
+        // 独立上下文读取精确查询及当前运行计数。
         await using var database = await factory.CreateDbContextAsync();
         // 只读取明确当前合成主体和精确ID，绝不使用未来时钟或全表删除。
         var row = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.SingleAsync(database.Queries, item => item.Id == queryId && item.OrganizationId == "org-demo");
@@ -76,8 +78,11 @@ public sealed class G4QueryMafRuntimeTests
             new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web))!;
         Assert.AreEqual(row.SubjectId, actor.SubjectId);
         Assert.AreEqual(row.OrganizationId, actor.OrganizationId);
+        // 正式MAF执行器复用已注册工具边界。
         var executor = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<AgentRunExecutor>(scope.ServiceProvider);
+        // Run引用与计数由查询模块持久化。
         var store = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IG4QueryRunStore>(scope.ServiceProvider);
+        // 恢复工具只接收已完成查询ID。
         var arguments = new Dictionary<string, System.Text.Json.JsonElement> { ["queryId"] = System.Text.Json.JsonSerializer.SerializeToElement(queryId) };
         // 先用同一正式Gateway短定位当前会话/源前提，错误只报告固定码而不输出安全材料。
         var gateway = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ISemanticGateway>(scope.ServiceProvider);
@@ -97,6 +102,7 @@ public sealed class G4QueryMafRuntimeTests
             Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.SqlQuery<int>(database.Database,
                 $"SELECT \"ToolCalls\" AS \"Value\" FROM semantic_query.\"QueryRuns\" WHERE \"Id\" = {result.RunId}"));
         Assert.AreEqual(3, counts);
+        // 实际PG数组长度验证只保存三个查询引用。
         var references = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.SingleAsync(
             Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.SqlQuery<int>(database.Database,
                 $"SELECT cardinality(\"QueryIds\") AS \"Value\" FROM semantic_query.\"QueryRuns\" WHERE \"Id\" = {result.RunId}"));
@@ -105,24 +111,32 @@ public sealed class G4QueryMafRuntimeTests
         if (Environment.GetEnvironmentVariable("G4_QUERY_BINDING_RACE") == "1")
             await BindingChangeAfterRealReadAsync(scope.ServiceProvider, actor, row, database);
     }
+
     /// <summary>合成源故障包装只在真实PG读取完成后调用正式连接编辑用例，验证最终版本复核。</summary>
     private static async Task BindingChangeAfterRealReadAsync(IServiceProvider services, ActorContext actor, G4QueryRecord original, G4QueryDbContext database)
     {
         // 正式应用服务完成所有CAS、凭据绑定及事务审计，测试不直接修改连接表。
         var connections = services.GetRequiredService<IConnectionRequestHandler>();
+        // 每次正式连接命令共享当前服务器身份与会话。
         var invocation = new ConnectionInvocation { Operation = "get", Actor = actor, Id = original.ConnectionId, ChildId = null,
             Body = null, Etag = null, Cursor = null, Type = null, State = null, SessionReference = original.SessionReference };
+        // 真实连接读取提供CAS修订与ETag。
         var current = await connections.HandleAsync(invocation, CancellationToken.None);
+        // 当前连接视图仅用于构造正式编辑命令。
         var view = (ConnectionView)current.Value;
         Assert.AreEqual("ACTIVE", view.State);
         // 原请求已通过正式持久合同，新的执行仍绑定同一正式映射。
         using var request = System.Text.Json.JsonDocument.Parse(original.RequestBytes);
+        // 从原请求恢复原能力与固定映射计划。
         var query = request.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
+        // 新幂等键区分本次真实在途执行。
         var key = Guid.NewGuid().ToString();
+        // 只有实际完成连接编辑才允许进入恢复流程。
         var changed = false;
         // 包装保留真实查询适配器、TLS、源事务、回执和所有原字段值。
         var source = new AfterReadSource(services.GetRequiredService<IG4SourceQueryReader>(), async token =>
         {
+            // 正式编辑完成后确认配置修订真实推进。
             var reply = await connections.HandleAsync(invocation with { Operation = "patch", Etag = current.Etag,
                 Body = new ConnectionPatchRequest { DisplayName = view.DisplayName, Command = Command(view.ConfigRevision) } }, token);
             changed = true;
@@ -131,11 +145,13 @@ public sealed class G4QueryMafRuntimeTests
         // 唯一替换是合成读取完成后的调度故障；其余依赖取正式DI真实实例。
         var execution = new G4QueryExecution(services.GetRequiredService<IG4QueryBindingReader>(), source,
             services.GetRequiredService<IG4QueryAuthorizationAuthority>(), services.GetRequiredService<G4QueryResultStore>(), TimeProvider.System);
+        // 除读取后调度点外全部依赖仍为正式DI组件。
         var gateway = new SemanticGateway(services.GetRequiredService<IReleaseCatalog>(), services.GetRequiredService<ISemanticRuntime>(),
             services.GetRequiredService<CapabilityRegistry>(), services.GetRequiredService<IAuditTrail>(), TimeProvider.System,
             services.GetRequiredService<VerifiedReleaseSources>(), execution);
         try
         {
+            // 提交复核必须抛出权限或绑定失效，而非成功结果。
             var error = await Assert.ThrowsAsync<SemanticOperationException>(() => gateway.ExecuteG4Async(actor, original.SessionReference, query, key, null, CancellationToken.None));
             Assert.IsTrue(changed && error.Status is 403 or 409);
             // 真正准入过的Query必须保持无成功结果，不能靠入口提前拒绝冒充并发提交保护。
@@ -181,6 +197,7 @@ public sealed class G4QueryMafRuntimeTests
         public async Task<G4SourceQueryRead> ReadAsync(G4QueryBindingContext context, MappingAuthorizationProof proof, string entityBindingId,
             G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken, G4QueryBranchFilter? branch = null)
         {
+            // 真实PG返回值保持原样，故障仅改变返回后的调度。
             var read = await actual.ReadAsync(context, proof, entityBindingId, query, deadlineAtUtc, cancellationToken, branch);
             Assert.IsTrue(read.Rows.Length > 0);
             if (Interlocked.Increment(ref invoked) == 1) await afterRead(cancellationToken);

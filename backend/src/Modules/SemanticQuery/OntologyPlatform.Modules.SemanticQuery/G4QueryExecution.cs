@@ -33,7 +33,7 @@ public sealed class G4QueryExecution
         this.clock = clock;
     }
 
-    /// <summary>S1单实体映射的完整执行；正式本体已经由同Gateway按真实源校验。</summary>
+    /// <summary>正式映射的有界查询执行；本体、根定位和分支读取共用同一Gateway。</summary>
     internal async Task<G4QueryDelivery> ExecuteAsync(ActorContext actor, string sessionReference, G4SemanticQuery query,
         string key, string? selectionQueryId, PublishedGraph ontology, DateTimeOffset deadline,
         Func<G4SemanticQuery, CancellationToken, Task> verifyRoot, CancellationToken token)
@@ -60,7 +60,7 @@ public sealed class G4QueryExecution
         if (session.AuthorizationEpoch != initial.AuthorizationEpoch) throw new SemanticOperationException(403, "query_forbidden");
         if (query.CapabilityId is not ("g4_resolve_entity" or "g4_read_observations" or "g4_traverse_relationships"))
             throw new SemanticOperationException(422, "capability_not_supported");
-        // S1仅一个实体分支，后续关系分支必须在同登记器中明确升级执行器版本。
+        // 固定唯一根实体；后续观测和关系分支只沿正式发布的映射展开。
         var entity = RootBinding(context.Manifest.Mapping);
         if (!ontology.Description.ClassIris.Contains(entity.EntityClassIri, StringComparer.Ordinal)
             || context.Manifest.Mapping.Properties.Any(property => !ontology.Description.DatatypePropertyIris.Contains(property.PropertyIri, StringComparer.Ordinal)))

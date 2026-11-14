@@ -197,11 +197,14 @@ public sealed class G4QueryTests
     {
         // 制造源侧合法、JSON编码后超过一MiB的完整观测，不使用非法超长标量。
         var original = FixtureResult();
+        // 基准观测保留合法来源和精确身份。
         var value = (G4ObservationDatum)original.Data[0];
+        // 每个属性各自完整，只有累计响应超出字节预算。
         var result = original with { Data = Enumerable.Range(0, 100).Select(index => (G4QueryDatum)(value with
             { PropertyIri = "urn:fixture:value:" + index, Value = new G4StringValue { Lexical = new string('\t', 4096) } })).ToArray() };
         // 原回执按实际完整投影形成，截断后必须重算而不能沿用旧hash。
         var receipt = ReceiptFixture("query-budget", G4QueryRaceTests.Binding(1), result);
+        // 正式截断器重算投影回执并保持证据闭合。
         var bounded = G4QueryExecution.BoundResponse(result, [receipt]);
         Assert.AreEqual("PARTIAL", bounded.Result.Status);
         Assert.IsTrue(bounded.Result.Limited && bounded.Result.Data.Length is > 0 and < 100);

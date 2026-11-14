@@ -10,7 +10,7 @@ namespace OntologyPlatform.Modules.SemanticQuery;
 /// <summary>从唯一机器生成DTO组件取得严格输出Schema，并稳定绑定受控执行器版本。</summary>
 public sealed class CapabilityRegistry
 {
-    /// <summary>此实现只登记三项已批准的正式只读能力。</summary>
+    /// <summary>此实现默认登记三项旧能力，G4宿主另启用三项查询能力已批准的正式只读能力。</summary>
     private readonly SemanticCapability[] capabilities;
 
     /// <summary>旧能力默认保持原字节；只有真实G4组合开启后才加载其正式生成Schema。</summary>

@@ -825,7 +825,7 @@ def contract_build(project="OntologyPlatform.G2ContractTests"):
             if running==b'true': raise ValueError('QUERY_API_STOP_REQUIRED_BEFORE_REFERENCE_BUILD')
     _, env = prepared()
     inputs = {path:digest for path,digest in qualification_inputs().items()
-              if path.startswith('backend/') or '/' not in path}
+              if path.startswith(('backend/', 'docs/contracts/')) or '/' not in path}
     result = run(['/usr/bin/sandbox-exec', '-p', '(version 1) (allow default) (deny network*)',
                   '/usr/local/share/dotnet/dotnet', 'build', 'backend/tests/' + project,
                   '--no-restore', '--disable-build-servers', '-m:1', '-v:q'], ROOT,
@@ -1345,7 +1345,7 @@ def attest(name):
         row['exitCode'] = code
         row['inputsUnchanged'] = inputs == qualification_inputs() and all(workflow.input_key(ROOT, gate) == key for gate,key in keys.items())
         if code == 0 and row['inputsUnchanged']: row['status'] = 'PASS'
-        return code
+        return code if code else (0 if row['status'] == 'PASS' else 65)
     finally:
         row['commands'] = [dict(path=str(path.relative_to(ROOT)), sha256=sha(path.read_bytes())) for path in sorted(set(commands.glob('*/receipt.json'))-before)]
         row['reports'] = [dict(path=str(path.relative_to(ROOT)), sha256=sha(path.read_bytes())) for path in sorted(set(output.glob('browser-*.json'))-reports) if json.loads(path.read_text()).get('mode') == name]
@@ -1396,6 +1396,8 @@ def qualify(gate, input_key):
         demand_qualification(row, name, inputs)
         if row.get('inputKeys', {}).get(gate) != input_key: raise ValueError('QUERY_QUALIFICATION_GATE_DRIFT')
         test_count = 0
+        if name in ['contract','query-unit','source-unit','security-unit','agent-unit','persistence','source','maf-binding'] and 'build' not in row:
+            raise ValueError('QUERY_QUALIFICATION_BUILD_MISSING')
         if 'build' in row:
             from workflow_execution import encoded
             build = row['build']; receipt = build['receipt']
