@@ -1,0 +1,94 @@
+{
+  "base": "f0afb730ce92ecbd3a5947d9c6f58faedc8b2138",
+  "failures": [
+    {
+      "Check": "text-format",
+      "Status": "FAIL",
+      "Message": "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/vitest-report.json 需要LF/末尾换行/无尾随空白"
+    },
+    {
+      "Check": "text-format",
+      "Status": "FAIL",
+      "Message": "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/ontology-g4-m3-mapping-impl-01-source-test-14c5f8dc.json 需要LF/末尾换行/无尾随空白"
+    },
+    {
+      "Check": "markdown-links",
+      "Status": "FAIL",
+      "Message": "docs/evidence/G4-M3-MAPPING-001/contract-admission-request.md 存在缺失或越界链接"
+    },
+    {
+      "Check": "markdown-links",
+      "Status": "FAIL",
+      "Message": "docs/evidence/G4-M3-MAPPING-001/contract-admission-request.md 存在缺失或越界链接"
+    },
+    {
+      "Check": "markdown-links",
+      "Status": "FAIL",
+      "Message": "docs/evidence/G4-M3-MAPPING-001/contract-admission-request.md 存在缺失或越界链接"
+    },
+    {
+      "Check": "markdown-links",
+      "Status": "FAIL",
+      "Message": "docs/evidence/G4-M3-MAPPING-001/contract-admission-request.md 存在缺失或越界链接"
+    },
+    {
+      "Check": "markdown-links",
+      "Status": "FAIL",
+      "Message": "docs/tasks/G4-M3-MAPPING-001.md 存在缺失或越界链接"
+    },
+    {
+      "Check": "markdown-links",
+      "Status": "FAIL",
+      "Message": "docs/tasks/G4-M3-MAPPING-001.md 存在缺失或越界链接"
+    }
+  ],
+  "comparison": [
+    {
+      "path": "docs/evidence/G4-M3-MAPPING-001/contract-admission-request.md",
+      "identicalToBase": true,
+      "missingLinks": [
+        {
+          "target": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/product-proof-index.json",
+          "presentAtBase": false
+        },
+        {
+          "target": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/review-validation.json",
+          "presentAtBase": false
+        },
+        {
+          "target": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/final-resources.json",
+          "presentAtBase": false
+        },
+        {
+          "target": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/independent-review.json",
+          "presentAtBase": false
+        }
+      ]
+    },
+    {
+      "path": "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/vitest-report.json",
+      "identicalToBase": true,
+      "missingLinks": []
+    },
+    {
+      "path": "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/ontology-g4-m3-mapping-impl-01-source-test-14c5f8dc.json",
+      "identicalToBase": true,
+      "missingLinks": []
+    },
+    {
+      "path": "docs/tasks/G4-M3-MAPPING-001.md",
+      "identicalToBase": true,
+      "missingLinks": [
+        {
+          "target": "artifacts/workflow/G4-M3-MAPPING-001/rules-delta/receipt.json",
+          "presentAtBase": false
+        },
+        {
+          "target": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/zip-delivery-receipt.json",
+          "presentAtBase": false
+        }
+      ]
+    }
+  ],
+  "scope": "Read-only baseline diagnosis; no historical original or gate changed."
+}

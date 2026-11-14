@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OntologyPlatform.Contracts;
@@ -11,6 +12,11 @@ public static class SemanticQueryModule
     public static IServiceCollection AddSemanticQueryModule(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
+        if (configuration.GetValue<bool>("G4:QueryEnabled"))
+        {
+            services.AddDbContextFactory<G4QueryDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("governance"),
+                postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "semantic_query")));
+        }
         services.AddSingleton<CapabilityRegistry>();
         services.AddScoped<VerifiedReleaseSources>();
         services.AddScoped<ISemanticGateway, SemanticGateway>();

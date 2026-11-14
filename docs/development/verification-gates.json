@@ -67,7 +67,9 @@
         "samples/g2/shapes.ttl",
         "samples/g2/vocabulary.ttl",
         "samples/g2/data.ttl",
-        "samples/g3-m3/units.ttl"
+        "samples/g3-m3/units.ttl",
+        "scripts/maintenance/workflow_m4_query.py",
+        "scripts/maintenance/workflow-m4-query.mjs"
       ],
       "needs": [],
       "command": null
@@ -97,7 +99,9 @@
         "samples/g2/shapes.ttl",
         "samples/g2/vocabulary.ttl",
         "samples/g2/data.ttl",
-        "samples/g3-m3/units.ttl"
+        "samples/g3-m3/units.ttl",
+        "scripts/maintenance/workflow_m4_query.py",
+        "scripts/maintenance/workflow-m4-query.mjs"
       ],
       "needs": [
         "environment"
@@ -129,7 +133,9 @@
         "samples/g2/shapes.ttl",
         "samples/g2/vocabulary.ttl",
         "samples/g2/data.ttl",
-        "samples/g3-m3/units.ttl"
+        "samples/g3-m3/units.ttl",
+        "scripts/maintenance/workflow_m4_query.py",
+        "scripts/maintenance/workflow-m4-query.mjs"
       ],
       "needs": [
         "contract",
@@ -159,7 +165,9 @@
         "samples/g2/shapes.ttl",
         "samples/g2/vocabulary.ttl",
         "samples/g2/data.ttl",
-        "samples/g3-m3/units.ttl"
+        "samples/g3-m3/units.ttl",
+        "scripts/maintenance/workflow_m4_query.py",
+        "scripts/maintenance/workflow-m4-query.mjs"
       ],
       "needs": [
         "contract"
@@ -189,7 +197,9 @@
         "samples/g2/shapes.ttl",
         "samples/g2/vocabulary.ttl",
         "samples/g2/data.ttl",
-        "samples/g3-m3/units.ttl"
+        "samples/g3-m3/units.ttl",
+        "scripts/maintenance/workflow_m4_query.py",
+        "scripts/maintenance/workflow-m4-query.mjs"
       ],
       "needs": [
         "web",
@@ -511,6 +521,28 @@
         "backend/src/Hosts/OntologyPlatform.Api/G4/**",
         "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/Mapping*.cs",
         "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs"
+      ]
+    },
+    "query-task-admission": {
+      "inputs": [
+        "scripts/maintenance/workflow_m4_query.py",
+        "scripts/maintenance/workflow-m4-query.mjs",
+        "scripts/tests/WorkflowQuery.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowQuery.Tests.py"
+      ],
+      "testsRequired": true,
+      "identityInputs": [
+        "scripts/maintenance/workflow_environment.py",
+        "scripts/maintenance/workflow_web_cache.py",
+        "scripts/maintenance/workflow_execution.py",
+        "scripts/maintenance/execution_preflight.py",
+        "backend/src/Hosts/OntologyPlatform.Api/G4/**",
+        "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/**"
       ]
     }
   }

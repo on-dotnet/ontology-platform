@@ -32,7 +32,7 @@ public sealed class MappingAuthorizationParticipant : IMappingAuthorizationAutho
             && proof.Actor.OrganizationId == proof.Scope.OrganizationId && grant.Permission == proof.Permission
             && grant.RevokedAtUtc is null && grant.ExpiresAtUtc > now && proof.Scope.SiteIds.Length > 0
             && proof.Scope.SiteIds.All(site => grant.SiteIds.Contains(site, StringComparer.Ordinal) && proof.Actor.SiteIds.Contains(site, StringComparer.Ordinal))
-            && (proof.Permission == "mapping.source.validate"
+            && (proof.Permission == "mapping.source.validate" || QueryAuthorizationParticipant.IsQueryPermission(proof.Permission)
                 ? proof.ConnectionId is not null && grant.ConnectionId == proof.ConnectionId && proof.ObjectRefs.Length > 0 && proof.FieldRefs.Length > 0
                     && proof.ObjectRefs.All(value => grant.ObjectRefs.Contains(value, StringComparer.Ordinal))
                     && proof.FieldRefs.All(value => grant.FieldRefs.Contains(value, StringComparer.Ordinal))
@@ -47,6 +47,7 @@ public sealed class MappingAuthorizationParticipant : IMappingAuthorizationAutho
         "mapping.review" or "mapping.approve" => actor.Roles.Contains("platform.auditor", StringComparer.Ordinal),
         "mapping.edit" or "mapping.validate" or "mapping.submit" or "mapping.activate" => actor.Roles.Contains("platform.operator", StringComparer.Ordinal),
         "mapping.source.validate" => actor.Roles.Any(role => role is "platform.operator" or "platform.auditor"),
+        "data.query.execute" or "data.query.result.read" or "data.query.evidence.read" => QueryAuthorizationParticipant.RoleAllows(actor, permission),
         _ => false
     };
 

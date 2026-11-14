@@ -1,0 +1,64 @@
+using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using OntologyPlatform.Modules.SemanticQuery;
+
+namespace OntologyPlatform.QueryTests;
+
+/// <summary>真实PG迁移与新作用域回读证明规范字节存储不依赖进程内对象。</summary>
+[TestClass]
+public sealed class G4QueryPersistenceTests
+{
+    /// <summary>缺少当前任务TLS数据库输入必须失败，不能跳过后报告PASS。</summary>
+    [TestMethod]
+    public async Task ExactBytesRoundTripThroughFreshOfficialContext()
+    {
+        // 只有受控M4驱动为本任务合成数据库提供进程内连接配置。
+        var connection = Environment.GetEnvironmentVariable("G4_QUERY_TEST_CONNECTION");
+        Assert.IsFalse(string.IsNullOrWhiteSpace(connection), "M4真实数据库尚未准入，不能用内存替身通过。");
+        // 正式模块注册路径和生产生命周期保持一致。
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["ConnectionStrings:governance"] = connection,
+            ["G4:QueryEnabled"] = "true"
+        }).Build();
+        // 容器仅提供依赖集合，不替换正式DbContext工厂。
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddSemanticQueryModule(configuration);
+        // 验证所有生命周期，禁止测试偷偷把工厂换成单例上下文。
+        await using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+        // 本测试行身份仅属于当前Run，不覆盖其他任务数据。
+        var id = Guid.NewGuid().ToString("N");
+        // bytea原件包含超过JS安全整数的decimal及固定微秒词法。
+        var bytes = Encoding.UTF8.GetBytes("{\"decimal\":\"9007199254740993.20\",\"time\":\"2026-11-14T01:02:03.123456Z\"}");
+        await using (var scope = provider.CreateAsyncScope())
+        {
+            // 使用正式工厂和已提交迁移，不能使用EnsureCreated。
+            var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<G4QueryDbContext>>();
+            await using var db = await factory.CreateDbContextAsync();
+            await db.Database.MigrateAsync();
+            db.Queries.Add(new G4QueryRecord
+            {
+                Id = id, OrganizationId = "org-1", SubjectId = "actor-1", IdempotencyKey = id,
+                RequestHash = new string('a', 64), RequestBytes = bytes, CreatedAtUtc = DateTimeOffset.UtcNow,
+                ExpiresAtUtc = DateTimeOffset.UtcNow.AddHours(24), DeadlineAtUtc = DateTimeOffset.UtcNow.AddSeconds(5)
+            });
+            await db.SaveChangesAsync();
+        }
+        await using (var scope = provider.CreateAsyncScope())
+        {
+            // 新作用域产生新DbContext，读取真实已提交bytea。
+            var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<G4QueryDbContext>>();
+            await using var db = await factory.CreateDbContextAsync();
+            // 准确主键与组织限定避免跨任务取到同名行。
+            var row = await db.Queries.AsNoTracking().SingleAsync(value => value.Id == id && value.OrganizationId == "org-1");
+            CollectionAssert.AreEqual(bytes, row.RequestBytes);
+            Assert.AreEqual("RUNNING", row.ExecutionStatus);
+            Assert.IsTrue((await db.Database.GetAppliedMigrationsAsync()).Contains("20261114000000_G4QueryPersistence"));
+            await db.Queries.Where(value => value.Id == id).ExecuteDeleteAsync();
+            Assert.IsFalse(await db.Queries.AnyAsync(value => value.Id == id));
+        }
+    }
+}

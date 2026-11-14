@@ -60,7 +60,19 @@ public static class G4Composition
         builder.Services.AddSingleton(provider => new ConnectionSecretCipher(builder.Configuration["G4:KeyFile"] ?? string.Empty));
         builder.Services.AddSingleton<IConnectionSessionAuthority, G4SessionAuthority>();
         builder.Services.AddSingleton<IMappingSessionAuthority, MappingSessionAuthority>();
-        builder.Services.AddScoped<IMappingAuthorizationAuthority, MappingAuthorizationParticipant>();
+        builder.Services.AddScoped<MappingAuthorizationParticipant>();
+        builder.Services.AddScoped<IMappingAuthorizationAuthority>(provider => provider.GetRequiredService<MappingAuthorizationParticipant>());
+        if (builder.Configuration.GetValue<bool>("G4:QueryEnabled"))
+        {
+            builder.Services.AddScoped<IG4QueryAuthorizationAuthority, QueryAuthorizationParticipant>();
+            builder.Services.AddAuthorization(options =>
+            {
+                foreach (var permission in new[] { "data.query.execute", "data.query.result.read", "data.query.evidence.read" })
+                {
+                    options.AddPolicy(permission, rule => rule.RequireAuthenticatedUser().RequireRole("platform.viewer", "platform.operator", "platform.auditor"));
+                }
+            });
+        }
         builder.Services.AddSingleton<IMappingSourceValidator, PgMappingSourceValidator>();
         if (builder.Configuration.GetValue<bool>("G4:Mapping:Enabled"))
         {
