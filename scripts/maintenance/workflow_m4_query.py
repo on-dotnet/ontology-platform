@@ -1398,7 +1398,8 @@ def qualify(gate, input_key):
         originals.append(reference)
         return raw
     for name in required:
-        candidates = sorted(output.glob('qualification-'+name+'-*.json'), key=lambda path: path.stat().st_mtime)
+        candidates = sorted((path for path in output.glob('qualification-'+name+'-*.json')
+                             if json.loads(path.read_text()).get('name') == name), key=lambda path: path.stat().st_mtime)
         if not candidates: raise ValueError('QUERY_QUALIFICATION_MISSING_'+name)
         path = candidates[-1]
         row = json.loads(read(dict(path=str(path.relative_to(ROOT)), sha256=sha(path.read_bytes()))))
