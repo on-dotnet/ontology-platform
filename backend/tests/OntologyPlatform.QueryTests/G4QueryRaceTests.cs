@@ -1,0 +1,228 @@
+using System.Data.Common;
+using System.Globalization;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using OntologyPlatform.Api.G4;
+using OntologyPlatform.Api.Security;
+using OntologyPlatform.Contracts;
+using OntologyPlatform.Modules.Governance;
+using OntologyPlatform.Modules.SemanticQuery;
+
+namespace OntologyPlatform.QueryTests;
+
+/// <summary>真实PG、真实票据和治理参与者验证查询提交边界；映射材料校验另由S1真实发布验证。</summary>
+[TestClass]
+public sealed class G4QueryRaceTests
+{
+    /// <summary>当前授权撤销先提交时，旧证明不能写成功结果或成功审计。</summary>
+    [TestMethod]
+    public async Task RevocationBlocksAtomicResultAndAudit()
+    {
+        // 只接受本轮受控容器传入的合成PG，不跳过真实验证。
+        var connection = Environment.GetEnvironmentVariable("G4_QUERY_TEST_CONNECTION");
+        Assert.IsFalse(string.IsNullOrWhiteSpace(connection));
+        // 治理与查询各用自己模型工厂，共享实际物理数据库事务。
+        await using var provider = new ServiceCollection()
+            .AddDbContextFactory<GovernanceDbContext>(options => options.UseNpgsql(connection, postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "governance")))
+            .AddDbContextFactory<G4QueryDbContext>(options => options.UseNpgsql(connection, postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "semantic_query")))
+            .BuildServiceProvider();
+        // 正式治理工厂使授权参与者加入事务时保持模块写表边界。
+        var governanceFactory = provider.GetRequiredService<IDbContextFactory<GovernanceDbContext>>();
+        // 正式查询工厂用于真实状态与密文存储。
+        var queryFactory = provider.GetRequiredService<IDbContextFactory<G4QueryDbContext>>();
+        await using var governance = await governanceFactory.CreateDbContextAsync();
+        await governance.Database.MigrateAsync();
+        await using var queryDatabase = await queryFactory.CreateDbContextAsync();
+        await queryDatabase.Database.MigrateAsync();
+        // 随机组织只属于本测试，不清理或修改历史任务行。
+        var suffix = Guid.NewGuid().ToString("N");
+        // 与真实Cookie票据使用完全一致的服务器声明。
+        var actor = new ActorContext { SubjectId = "query-user", OrganizationId = "query-test-" + suffix, SiteIds = ["site-1"],
+            Roles = ["platform.viewer"], TraceId = "trace-1", CorrelationId = "correlation-1" };
+        // 本测试明确使用合成身份，不声称经过外部IdP登录。
+        var principal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim("sub", actor.SubjectId), new Claim("organization_id", actor.OrganizationId),
+            new Claim("site_ids", "site-1"), new Claim(ClaimTypes.Role, "platform.viewer")
+        }, "Cookies"));
+        // 票据加密仍调用正式存储和正式解密校验，不能用永远返回true的替身。
+        var protection = new EphemeralDataProtectionProvider();
+        // HttpContext只承载合成已认证主体，不接受客户端proof。
+        var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext { User = principal } };
+        // 正式票据存储使测试能覆盖当前PG会话撤销状态。
+        var tickets = new PostgresTicketStore(governanceFactory, protection, accessor, TimeProvider.System);
+        // 服务器返回的是不可逆会话引用，原ticket不输出到证据。
+        var sessionId = await tickets.StoreAsync(new AuthenticationTicket(principal,
+            new AuthenticationProperties { ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(15) }, "Cookies"));
+        // 每个真实源投影都需要单条完整授权，本测试不从viewer自动授予。
+        var grant = new MappingAuthorizationGrant { Id = "query-grant-" + suffix, SubjectId = actor.SubjectId,
+            OrganizationId = actor.OrganizationId, SiteIds = ["site-1"], Permission = "data.query.execute", ConnectionId = "connection-1",
+            ObjectRefs = ["production/assets"], FieldRefs = ["production/assets/1/id"], ExpiresAtUtc = DateTimeOffset.UtcNow.AddMinutes(15) };
+        governance.MappingAuthorizationGrants.Add(grant);
+        await governance.SaveChangesAsync();
+        // 使用实际治理参与者、数据库epoch触发器及宿主票据校验器。
+        var authority = new QueryAuthorizationParticipant(new MappingAuthorizationParticipant(governanceFactory, new MappingSessionAuthority(protection), TimeProvider.System));
+        // 安全范围来自当前服务器主体，不来自自由客户端声明。
+        var scope = new ResourceScope { OrganizationId = actor.OrganizationId, SiteIds = actor.SiteIds };
+        // session-only不授予源读取，只为事务提供当前组织epoch。
+        var session = await authority.CaptureSessionAsync(actor, sessionId, scope, CancellationToken.None);
+        // 完整单条源grant的真实捕获，不能直接伪造epoch。
+        var proof = await authority.CaptureAsync(session with { ConnectionId = grant.ConnectionId, ObjectRefs = grant.ObjectRefs, FieldRefs = grant.FieldRefs }, CancellationToken.None);
+        // 本测试明确隔离映射复核，不能据此证明真实发布或S1端到端通过。
+        var binding = Binding(session.AuthorizationEpoch);
+        // 存储元数据固定真实字段集合，撤权后不能换成空投影。
+        var state = new G4QueryState { Binding = binding, Scope = scope, Projections = [new G4QueryProjection { ObjectRefs = grant.ObjectRefs, FieldRefs = grant.FieldRefs }] };
+        // 共用存储实现与实际事务审计写入器。
+        var bindingReader = new FixedBindingReader();
+        // 事务实现必须区分新执行与原查询幂等恢复。
+        var store = new G4QueryResultStore(queryFactory, authority, bindingReader, new TransactionalAuditWriter(governanceFactory), protection, TimeProvider.System);
+        // 请求形状遵守正式封闭合同，但不在本测试访问源。
+        var query = new G4SemanticQuery { AssetId = "asset-1", OntologyReleaseId = "ontology-1", MappingReleaseIds = ["mapping-1"],
+            CapabilityId = "g4_read_observations", CapabilityVersion = new string('a',64), RelationshipIris = [], Depth = 1, MaxRows = 10, TimeoutMs = 5000, Filters = new G4QueryFilters() };
+        // 准入后只有本实例持有本次fence，数据库真实保存RUNNING。
+        var admission = await store.AdmitAsync(session, [proof], query, state, suffix, null, "instance-1", DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
+        try
+        {
+            Assert.IsTrue(admission.Created);
+            bindingReader.RejectNewExecution = true;
+            // 同键同请求只返回同一已登记执行，不再次占用主体槽位。
+            var repeated = await store.AdmitAsync(session, [proof], query, state, suffix, null, "instance-2", DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
+            Assert.IsFalse(repeated.Created);
+            Assert.AreEqual(admission.Record.Id, repeated.Record.Id);
+            bindingReader.RejectNewExecution = false;
+            // 第二个新键不能绕过每主体一个在途的PG容量约束。
+            var capacity = await Assert.ThrowsAsync<SemanticOperationException>(() => store.AdmitAsync(session, [proof], query, state,
+                suffix + "-other", null, "instance-2", DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None));
+            Assert.AreEqual(429, capacity.Status);
+            // 仅替换测试结果scope与真实测试组织相符，不把wire fixture当源证据。
+            var fixture = G4QueryTests.FixtureResult();
+            // 数据及来源同时使用同一组织，避免被其他形状错误掩盖授权反例。
+            var result = fixture with
+            {
+                Data = [((G4ObservationDatum)fixture.Data[0]) with { Identity = ((G4ObservationDatum)fixture.Data[0]).Identity with { OrganizationId = actor.OrganizationId } }],
+                Evidence = [fixture.Evidence[0] with { Scope = scope }]
+            };
+            // 回执仅为事务测试材料，明确不是源执行证据。
+            var receipts = new[] { G4QueryTests.ReceiptFixture(admission.Record.Id, binding, result) };
+            // 不能只校验lease中的hash：传给提交的实际query也必须与准入原件一致。
+            var changed = query with { Filters = new G4QueryFilters { EntityExternalId = "different-entity" } };
+            // 即使范围、版本和授权全部相同，也必须拒绝换请求后提交到旧queryId。
+            var mismatch = await Assert.ThrowsAsync<SemanticOperationException>(() => store.CompleteAsync(admission.Record, session, [proof], changed, state, result, receipts, CancellationToken.None));
+            Assert.AreEqual(409, mismatch.Status);
+            // 真实数据库撤销触发组织epoch递增，旧证明不可继续提交。
+            grant.RevokedAtUtc = DateTimeOffset.UtcNow;
+            await governance.SaveChangesAsync();
+            // 失败必须来自当前授权，不能仅靠后续租约自然超时。
+            var denied = await Assert.ThrowsAsync<SemanticOperationException>(() => store.CompleteAsync(admission.Record, session, [proof], query, state, result, receipts, CancellationToken.None));
+            Assert.AreEqual(403, denied.Status);
+            // 新上下文检查整笔事务没有残留成功数据或成功审计。
+            var saved = await queryDatabase.Queries.AsNoTracking().SingleAsync(row => row.Id == admission.Record.Id);
+            Assert.AreEqual("RUNNING", saved.ExecutionStatus);
+            Assert.AreEqual(0, saved.ResultCiphertext.Length);
+            Assert.IsNull(saved.ResultHash);
+            Assert.IsFalse(await governance.AuditRecords.AnyAsync(row => row.Resource == admission.Record.Id && row.Action == "data.query.execute"));
+            await queryDatabase.Queries.Where(row => row.Id == admission.Record.Id).ExecuteDeleteAsync();
+            // 重新授权必须产生新epoch及新Query，不允许复活失败执行的旧证明。
+            grant.RevokedAtUtc = null;
+            await governance.SaveChangesAsync();
+            // 新执行重新捕获当前会话和完整grant。
+            var restoredSession = await authority.CaptureSessionAsync(actor, sessionId, scope, CancellationToken.None);
+            // 原字段集合保持一致，但授权版本必须来自真实数据库。
+            var restoredProof = await authority.CaptureAsync(restoredSession with { ConnectionId = grant.ConnectionId, ObjectRefs = grant.ObjectRefs, FieldRefs = grant.FieldRefs }, CancellationToken.None);
+            // 新查询使用新版本绑定；旧历史结果从不被重写。
+            var restoredState = state with { Binding = Binding(restoredSession.AuthorizationEpoch) };
+            // 新键明确发起一次执行，不隐式重跑前一个queryId。
+            var committed = await store.AdmitAsync(restoredSession, [restoredProof], query, restoredState, suffix + "-fresh", null,
+                "instance-2", DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
+            try
+            {
+                await store.CompleteAsync(committed.Record, restoredSession, [restoredProof], query, restoredState, result,
+                    [G4QueryTests.ReceiptFixture(committed.Record.Id, restoredState.Binding, result)], CancellationToken.None);
+                // 新上下文同时看到COMPLETED、密文、回执及治理成功审计。
+                var complete = await queryDatabase.Queries.AsNoTracking().SingleAsync(row => row.Id == committed.Record.Id);
+                Assert.AreEqual("COMPLETED", complete.ExecutionStatus);
+                CollectionAssert.AreEqual(G4QueryCanonical.Result(result), G4QueryResultStore.Unprotect(protection, complete.Id, complete.ResultCiphertext, complete.ResultHash!));
+                Assert.IsTrue(await governance.AuditRecords.AnyAsync(row => row.Resource == complete.Id && row.Action == "data.query.execute" && row.Outcome == "allowed"));
+                // 已完成历史记录恢复不能再要求当前Active回到原发布。
+                bindingReader.RejectNewExecution = true;
+                // 恢复仍使用当前真实完整grant，并保持原queryId与结果hash。
+                var historical = await store.AdmitAsync(restoredSession, [restoredProof], query, restoredState, suffix + "-fresh", null,
+                    "instance-3", DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
+                Assert.IsFalse(historical.Created);
+                Assert.AreEqual(complete.Id, historical.Record.Id);
+                Assert.AreEqual(complete.ResultHash, historical.Record.ResultHash);
+                // 成功先提交时取消不能销毁历史结果。
+                var finished = await Assert.ThrowsAsync<SemanticOperationException>(() => store.CancelAsync(complete.Id, restoredSession, [restoredProof], CancellationToken.None));
+                Assert.AreEqual(409, finished.Status);
+            }
+            finally
+            {
+                // 只回收本测试准确新查询，成功审计按治理规则保留。
+                await queryDatabase.Queries.Where(row => row.Id == committed.Record.Id).ExecuteDeleteAsync();
+            }
+            bindingReader.RejectNewExecution = false;
+            // 新独立查询用于验证相反提交顺序，不重用成功结果的身份。
+            var cancelling = await store.AdmitAsync(restoredSession, [restoredProof], query, restoredState, suffix + "-cancel", null,
+                "instance-2", DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
+            try
+            {
+                // 取消必须提交CANCELLED及审计后才返回。
+                var cancelled = await store.CancelAsync(cancelling.Record.Id, restoredSession, [restoredProof], CancellationToken.None);
+                Assert.AreEqual("CANCELLED", cancelled.ExecutionStatus);
+                Assert.IsTrue(cancelled.Fence > cancelling.Record.Fence);
+                // 原worker即使完成源读取也不能再保存成功结果。
+                var late = await Assert.ThrowsAsync<SemanticOperationException>(() => store.CompleteAsync(cancelling.Record, restoredSession, [restoredProof], query, restoredState, result,
+                    [G4QueryTests.ReceiptFixture(cancelling.Record.Id, restoredState.Binding, result)], CancellationToken.None));
+                Assert.AreEqual(409, late.Status);
+                Assert.IsFalse(await store.HeartbeatAsync(cancelling.Record, CancellationToken.None));
+                Assert.IsTrue(await governance.AuditRecords.AnyAsync(row => row.Resource == cancelling.Record.Id && row.Action == "data.query.cancel"));
+                Assert.IsFalse(await governance.AuditRecords.AnyAsync(row => row.Resource == cancelling.Record.Id && row.Action == "data.query.execute"));
+            }
+            finally
+            {
+                // 准确身份回收，不清空任何共享或历史表。
+                await queryDatabase.Queries.Where(row => row.Id == cancelling.Record.Id).ExecuteDeleteAsync();
+            }
+        }
+        finally
+        {
+            // 失败反例同样只回收本测试准确查询身份，避免占用后续任务容量。
+            await queryDatabase.Queries.Where(row => row.Id == admission.Record.Id).ExecuteDeleteAsync();
+            await tickets.RemoveAsync(sessionId);
+        }
+    }
+
+    /// <summary>只供事务边界测试的固定材料，不声称是真实MappingRelease。</summary>
+    internal static G4QueryBinding Binding(long epoch) => new()
+    {
+        MappingId = "mapping-root", MappingReleaseId = "mapping-1", ManifestHash = new string('b',64),
+        OriginalCatalogSnapshotId = "catalog-original", OriginalCatalogFingerprint = new string('c',64),
+        ActivationId = "activation-1", ActivationRevision = "1", CurrentCatalogSnapshotId = "catalog-current", CurrentCatalogFingerprint = new string('c',64),
+        ConnectionId = "connection-1", ConnectionRevision = "1", ConfigHash = new string('d',64), SecretVersion = "1",
+        OntologyReleaseId = "ontology-1", AuthorizationEpoch = epoch.ToString(CultureInfo.InvariantCulture), CapabilityVersion = new string('a',64)
+    };
+
+    /// <summary>唯一测试替身仅隔离Connections材料，授权与审计始终执行真实实现。</summary>
+    private sealed class FixedBindingReader : IG4QueryBindingReader
+    {
+        /// <summary>模拟Active已经变化，只有新执行应触发此检查。</summary>
+        public bool RejectNewExecution { get; set; }
+
+        /// <summary>该测试不允许捕获映射，防止误称为完整源路径。</summary>
+        public Task<G4QueryBindingContext> CaptureAsync(ActorContext actor, G4SemanticQuery query, long authorizationEpoch, CancellationToken cancellationToken) =>
+            throw new NotSupportedException("此测试只覆盖持久事务。");
+
+        /// <summary>只接受真实同连接平台事务，不读取或修改Connections表。</summary>
+        public Task VerifyInTransactionAsync(ActorContext actor, G4SemanticQuery query, G4QueryBinding expected, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken)
+        {
+            Assert.AreSame(connection, transaction.Connection);
+            cancellationToken.ThrowIfCancellationRequested();
+            if (RejectNewExecution) throw new SemanticOperationException(409, "query_binding_stale");
+            return Task.CompletedTask;
+        }
+    }
+}

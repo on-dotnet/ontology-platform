@@ -27,6 +27,27 @@ public sealed class QueryAuthorizationParticipant : IG4QueryAuthorizationAuthori
         IsQueryPermission(proof.Permission) && RoleAllows(proof.Actor, proof.Permission)
         && MappingAuthorizationParticipant.Covers(grant, proof, now);
 
+    /// <summary>无字段会话证明只用于已授权可见snapshot元数据，不能作为源grant。</summary>
+    public async Task<MappingAuthorizationProof> CaptureSessionAsync(ActorContext actor, string sessionReference, ResourceScope scope, CancellationToken cancellationToken)
+    {
+        // 空投影必须由服务器构造，不从客户端接收proof或epoch。
+        var request = new MappingAuthorizationProof
+        {
+            Actor = actor, SessionReference = sessionReference, Scope = scope, Permission = "data.query.execute",
+            ConnectionId = null, ObjectRefs = [], FieldRefs = [], AuthorizationEpoch = 0, ExpiresAtUtc = default
+        };
+        DemandPermission(request);
+        try { return await participant.CaptureSessionAsync(request, cancellationToken); }
+        catch (SemanticOperationException exception) when (exception.Status is 403 or 409) { throw new SemanticOperationException(403, "query_forbidden"); }
+    }
+
+    /// <summary>源grant另验；当前会话或epoch失效时无数据结果也不得披露。</summary>
+    public async Task DemandSessionInTransactionAsync(MappingAuthorizationProof proof, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken)
+    {
+        try { await participant.DemandSessionInTransactionAsync(proof, connection, transaction, cancellationToken); }
+        catch (SemanticOperationException exception) when (exception.Status is 403 or 409) { throw new SemanticOperationException(403, "query_forbidden"); }
+    }
+
     /// <summary>捕获当前查询权限；历史映射权限不能通过此入口。</summary>
     public async Task<MappingAuthorizationProof> CaptureAsync(MappingAuthorizationProof request, CancellationToken cancellationToken)
     {

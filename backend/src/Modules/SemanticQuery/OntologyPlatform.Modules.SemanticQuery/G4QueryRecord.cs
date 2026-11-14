@@ -1,4 +1,119 @@
+using OntologyPlatform.Contracts;
+
 namespace OntologyPlatform.Modules.SemanticQuery;
+
+/// <summary>原子准入结果；重复键只引用已有执行，不再次访问外部源。</summary>
+public sealed record G4QueryAdmission
+{
+    /// <summary>已提交查询记录。</summary>
+    public required G4QueryRecord Record { get; init; }
+
+    /// <summary>仅新建记录允许本实例执行源读取。</summary>
+    public required bool Created { get; init; }
+}
+
+/// <summary>执行时固定的安全元数据，不包含源原始行或解密凭据。</summary>
+public sealed record G4QueryState
+{
+    /// <summary>完整固定版本链。</summary>
+    public required G4QueryBinding Binding { get; init; }
+
+    /// <summary>已验证的范围交集。</summary>
+    public required ResourceScope Scope { get; init; }
+
+    /// <summary>恢复时必须逐个重新取得当前许可的完整投影。</summary>
+    public required G4QueryProjection[] Projections { get; init; }
+
+    /// <summary>已完成分支的安全回执与外置散列，同结果事务保存，不包含源原始行。</summary>
+    public G4QueryStoredReceipt[] Receipts { get; init; } = [];
+}
+
+/// <summary>回执原件与其独立摘要分列存储，避免hash自包含。</summary>
+public sealed record G4QueryStoredReceipt
+{
+    /// <summary>封闭的分支读取事实。</summary>
+    public required G4SourceReadReceipt Receipt { get; init; }
+
+    /// <summary>仅覆盖Receipt规范字节的SHA256。</summary>
+    public required string ReceiptHash { get; init; }
+}
+
+/// <summary>只在服务端持久化的封闭读取回执，普通HTTP不能输出完整Binding。</summary>
+public sealed record G4SourceReadReceipt
+{
+    /// <summary>冻结内部读取回执版本。</summary>
+    public required string SchemaVersion { get; init; }
+
+    /// <summary>随机不可猜的分支身份。</summary>
+    public required string ReceiptId { get; init; }
+
+    /// <summary>所属查询，禁止跨查询引用回执。</summary>
+    public required string QueryId { get; init; }
+
+    /// <summary>执行时完整不可变版本链。</summary>
+    public required G4QueryBinding Binding { get; init; }
+
+    /// <summary>固定源数据集身份。</summary>
+    public required string SourceDatasetRef { get; init; }
+
+    /// <summary>有界类型计划摘要，不保存SQL或查询秘密。</summary>
+    public required string QueryPlanHash { get; init; }
+
+    /// <summary>实际执行的查询适配器版本。</summary>
+    public required string AdapterVersion { get; init; }
+
+    /// <summary>本分支获准的完整组织厂区范围。</summary>
+    public required ResourceScope Scope { get; init; }
+
+    /// <summary>与subSource一致的六种分支状态。</summary>
+    public required string Status { get; init; }
+
+    /// <summary>本分支授权投影数量，不超过一百。</summary>
+    public required int RowCount { get; init; }
+
+    /// <summary>是否真实超过本分支预算。</summary>
+    public required bool Limited { get; init; }
+
+    /// <summary>真实水位类型，不暗示跨分支原子快照。</summary>
+    public required string WatermarkKind { get; init; }
+
+    /// <summary>实际PG事务快照或明确未知。</summary>
+    public required string? Watermark { get; init; }
+
+    /// <summary>仅确实单行可定位时为非空，多行不得造一个总记录键。</summary>
+    public required string? SourceRecordRef { get; init; }
+
+    /// <summary>记录、数据集、窗口或未知的实际证据精度。</summary>
+    public required string Precision { get; init; }
+
+    /// <summary>可靠UTC半开窗口或未知。</summary>
+    public required G4QueryUtcInterval? ValidTime { get; init; }
+
+    /// <summary>分支真实开始时间。</summary>
+    public required string ReadStartedAtUtc { get; init; }
+
+    /// <summary>真实结束时间，不用结果提交时间冒充。</summary>
+    public required string ReadCompletedAtUtc { get; init; }
+
+    /// <summary>只覆盖分支授权投影规范字节，不包含本回执或总结果。</summary>
+    public required string? ResultHash { get; init; }
+
+    /// <summary>可信服务器关联身份。</summary>
+    public required string TraceId { get; init; }
+}
+
+/// <summary>待事务保存的密文与准确明文摘要，不承载解密后的业务对象。</summary>
+public sealed record G4QueryProtectedResult
+{
+    /// <summary>绑定查询身份的认证密文。</summary>
+    public required byte[] Ciphertext { get; init; }
+
+    /// <summary>规范明文SHA256。</summary>
+    public required string Hash { get; init; }
+
+    /// <summary>规范明文长度，用于总容量约束。</summary>
+    public required int Size { get; init; }
+}
 
 /// <summary>查询模块独占的恢复记录，业务值只保存为有界密文。</summary>
 public sealed class G4QueryRecord

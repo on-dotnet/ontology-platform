@@ -64,8 +64,29 @@ public sealed class MappingAuthorizationParticipant : IMappingAuthorizationAutho
         return proof;
     }
 
+    /// <summary>仅供查询的可见snapshot捕获当前会话，不生成任何源字段授权。</summary>
+    internal async Task<MappingAuthorizationProof> CaptureSessionAsync(MappingAuthorizationProof request, CancellationToken cancellationToken)
+    {
+        // 同一组织锁、服务器会话和固定声明验证，区别只是明确不读取grant。
+        await using var database = await factory.CreateDbContextAsync(cancellationToken);
+        // 当前会话捕获是短平台事务，不执行源读取。
+        await using var transaction = await database.Database.BeginTransactionAsync(cancellationToken);
+        // 空投影会话证明不能通过任何source执行边界的完整字段检查。
+        var proof = await VerifyAsync(database, request, capture: true, cancellationToken, sessionOnly: true);
+        await transaction.CommitAsync(cancellationToken);
+        return proof;
+    }
+
+    /// <summary>查询无数据结果的会话复核仍使用相同组织与会话锁。</summary>
+    internal Task DemandSessionInTransactionAsync(MappingAuthorizationProof proof, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) =>
+        JoinTransactionAsync(proof, connection, transaction, cancellationToken, sessionOnly: true);
+
     /// <summary>在调用方同物理事务中重验授权；失败使整笔事务失效。</summary>
-    public async Task DemandInTransactionAsync(MappingAuthorizationProof proof, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken)
+    public Task DemandInTransactionAsync(MappingAuthorizationProof proof, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) =>
+        JoinTransactionAsync(proof, connection, transaction, cancellationToken, sessionOnly: false);
+
+    /// <summary>会话与完整授权共享同物理事务加入算法，任意失败都回滚调用方事务。</summary>
+    private async Task JoinTransactionAsync(MappingAuthorizationProof proof, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken, bool sessionOnly)
     {
         try
         {
@@ -77,7 +98,7 @@ public sealed class MappingAuthorizationParticipant : IMappingAuthorizationAutho
             await using var database = await factory.CreateDbContextAsync(cancellationToken);
             database.Database.SetDbConnection(connection, contextOwnsConnection: false);
             await database.Database.UseTransactionAsync(transaction, cancellationToken);
-            await VerifyAsync(database, proof, capture: false, cancellationToken);
+            await VerifyAsync(database, proof, capture: false, cancellationToken, sessionOnly);
         }
         catch
         {
@@ -104,10 +125,11 @@ public sealed class MappingAuthorizationParticipant : IMappingAuthorizationAutho
     }
 
     /// <summary>锁顺序为组织、服务器会话、授权行；所有值均参数化。</summary>
-    private async Task<MappingAuthorizationProof> VerifyAsync(GovernanceDbContext database, MappingAuthorizationProof proof, bool capture, CancellationToken cancellationToken)
+    private async Task<MappingAuthorizationProof> VerifyAsync(GovernanceDbContext database, MappingAuthorizationProof proof, bool capture, CancellationToken cancellationToken, bool sessionOnly = false)
     {
         G4MappingRules.Scope(proof.Scope);
         if (!RoleAllows(proof.Actor, proof.Permission) || proof.Actor.OrganizationId != proof.Scope.OrganizationId
+            || !proof.Scope.SiteIds.All(site => proof.Actor.SiteIds.Contains(site, StringComparer.Ordinal))
             || proof.SessionReference.Length != 64 || !proof.SessionReference.All(character => char.IsAsciiHexDigitLower(character)))
         {
             throw new SemanticOperationException(403, "mapping_forbidden");
@@ -129,6 +151,12 @@ public sealed class MappingAuthorizationParticipant : IMappingAuthorizationAutho
         if (!capture && (proof.AuthorizationEpoch != epoch.Revision || proof.ExpiresAtUtc <= now))
         {
             throw new SemanticOperationException(409, "mapping_authorization_stale");
+        }
+        if (sessionOnly)
+        {
+            if (!QueryAuthorizationParticipant.IsQueryPermission(proof.Permission) || proof.ConnectionId is not null
+                || proof.ObjectRefs.Length != 0 || proof.FieldRefs.Length != 0) throw new SemanticOperationException(403, "mapping_forbidden");
+            return proof with { AuthorizationEpoch = epoch.Revision, ExpiresAtUtc = capture ? new[] { session.ExpiresAtUtc, now.AddMinutes(30) }.Min() : proof.ExpiresAtUtc };
         }
         // 一次读取同主体同权限候选，不拼接多个grant的厂区或字段。
         var grants = await database.MappingAuthorizationGrants.FromSqlInterpolated($"SELECT * FROM governance.\"MappingAuthorizationGrants\" WHERE \"OrganizationId\" = {proof.Scope.OrganizationId} AND \"SubjectId\" = {proof.Actor.SubjectId} AND \"Permission\" = {proof.Permission} ORDER BY \"Id\" FOR UPDATE")

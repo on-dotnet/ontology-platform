@@ -592,3 +592,56 @@ public sealed record G4QueryView
     /// <summary>失败固定码或空。</summary>
     public required string? ErrorCode { get; init; }
 }
+
+/// <summary>只在服务器内部保存的完整版本绑定，普通结果不披露其全部字段。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record G4QueryBinding
+{
+    /// <summary>永久映射身份。</summary>
+    public required string MappingId { get; init; }
+
+    /// <summary>不可变发布身份。</summary>
+    public required string MappingReleaseId { get; init; }
+
+    /// <summary>原发布规范字节散列。</summary>
+    public required string ManifestHash { get; init; }
+
+    /// <summary>原发布目录身份。</summary>
+    public required string OriginalCatalogSnapshotId { get; init; }
+
+    /// <summary>原发布目录指纹。</summary>
+    public required string OriginalCatalogFingerprint { get; init; }
+
+    /// <summary>当前激活身份，防止ABA。</summary>
+    public required string ActivationId { get; init; }
+
+    /// <summary>单调激活修订的十进制字符串。</summary>
+    public required string ActivationRevision { get; init; }
+
+    /// <summary>本次校验激活目录身份。</summary>
+    public required string CurrentCatalogSnapshotId { get; init; }
+
+    /// <summary>本次校验目录指纹。</summary>
+    public required string CurrentCatalogFingerprint { get; init; }
+
+    /// <summary>唯一源连接身份。</summary>
+    public required string ConnectionId { get; init; }
+
+    /// <summary>当前连接修订的十进制字符串。</summary>
+    public required string ConnectionRevision { get; init; }
+
+    /// <summary>当前配置身份散列，不含配置秘密。</summary>
+    public required string ConfigHash { get; init; }
+
+    /// <summary>当前凭据版本字符串，不含凭据。</summary>
+    public required string SecretVersion { get; init; }
+
+    /// <summary>固定正式本体发布。</summary>
+    public required string OntologyReleaseId { get; init; }
+
+    /// <summary>固定组织授权版本字符串。</summary>
+    public required string AuthorizationEpoch { get; init; }
+
+    /// <summary>固定执行语义版本。</summary>
+    public required string CapabilityVersion { get; init; }
+}

@@ -34,6 +34,8 @@ def structural(root, task, phase='runtime'):
     texts = {key: uncomment(source_path(root, value).read_text()) for key, value in paths.items()}
     if 'AddDbContextFactory<G4QueryDbContext>' not in texts['composition'] or 'UseNpgsql' not in texts['composition']:
         raise ValueError('QUERY_FACTORY_NOT_REGISTERED')
+    if phase in ('source', 'runtime') and any(token not in texts['source'] for token in ('ReadAsync', 'NpgsqlConnection', 'BeginTransactionAsync')):
+        raise ValueError('QUERY_SOURCE_EXECUTION_NOT_IMPLEMENTED')
     if phase == 'runtime' and any('"'+action+'"' not in texts['audit'] for action in
                                   ('data.query.execute', 'data.query.read', 'data.query.cancel', 'data.query.evidence.read', 'data.query.expire')):
         raise ValueError('QUERY_AUDIT_NOT_REGISTERED')
@@ -100,7 +102,8 @@ def unit_test(project, filter_name):
     """精确选择当前M4非零测试，原件与输入身份交给公共执行器。"""
     from workflow_execution import run, sha, encoded
     if (project, filter_name) not in (('OntologyPlatform.QueryTests', 'G4QueryTests'),
-                                    ('OntologyPlatform.SecurityTests', 'G4QueryAuthorizationTests')):
+                                    ('OntologyPlatform.SecurityTests', 'G4QueryAuthorizationTests'),
+                                    ('OntologyPlatform.ConnectionsTests', 'G4QuerySourceTests')):
         raise ValueError('QUERY_TEST_SELECTION_INVALID')
     _, env = prepared()
     directory = ROOT / 'backend/tests' / project / 'bin/Debug/net10.0'
@@ -213,7 +216,82 @@ def platform_start():
     return result.returncode
 
 
-def persistence_test():
+SOURCE_UNKNOWN_TIME_SQL = """CREATE TABLE production.query_assets_unknown (LIKE production.assets INCLUDING ALL);
+ALTER TABLE production.query_assets_unknown ALTER COLUMN valid_to DROP NOT NULL;
+INSERT INTO production.query_assets_unknown SELECT organization_id,site_id,asset_id,valid_from,NULL,label FROM production.assets WHERE site_id='site-a';
+GRANT SELECT ON production.query_assets_unknown TO fixture_reader;
+"""
+
+
+def source_start():
+    """只创建M4独占合成源，复用本任务内部网络，历史服务保持KEEP。"""
+    import os
+    import secrets
+    import socket
+    import subprocess
+    from workflow_execution import run, sha, encoded
+    structural(ROOT, TASK, 'source')
+    prepared()
+    output = ROOT / 'artifacts/workflow' / TASK / RUN
+    platform = json.loads((output / 'platform-resources.json').read_text())
+    private = ROOT / '.tools/security/g4-m4-query-001' / RUN / 'pg-source'
+    identity = output / 'source-resources.json'
+    if private.exists() or identity.exists(): raise ValueError('QUERY_SOURCE_ALREADY_REGISTERED')
+    prefix = ['docker', '--context', 'desktop-linux']
+    def docker(*args): return subprocess.check_output([*prefix, *args], timeout=15)
+    info = json.loads(docker('info', '--format', '{{json .}}'))
+    if info['ID'] != platform['engineId']: raise ValueError('QUERY_ENGINE_DRIFT')
+    running = []
+    for cid in docker('ps', '-q').decode().split():
+        item = json.loads(docker('inspect', cid))[0]
+        running.append(dict(id=item['Id'], memory=item['HostConfig']['Memory'], nanoCpus=item['HostConfig']['NanoCpus']))
+    if any(not item['memory'] or not item['nanoCpus'] for item in running): raise ValueError('QUERY_CAPACITY_UNKNOWN')
+    if sum(item['memory'] for item in running) + 768*1024**2 > min(info['MemTotal'], 14*1024**3): raise ValueError('QUERY_MEMORY_BUDGET')
+    if sum(item['nanoCpus'] for item in running) + 750000000 > min(info['NCPU'],16)*10**9: raise ValueError('QUERY_CPU_BUDGET')
+    network = json.loads(docker('network','inspect',platform['project']+'_platform'))[0]
+    if not network['Internal'] or network['Labels'].get('ontology.task-id') != TASK: raise ValueError('QUERY_NETWORK_DRIFT')
+    with socket.socket() as probe: probe.bind(('127.0.0.1',15445))
+    inspected = json.loads(docker('image','inspect',platform['imageReference']))[0]
+    if inspected['Id'] != platform['imageId']: raise ValueError('QUERY_IMAGE_DRIFT')
+    private.mkdir(mode=0o700)
+    def put(name, value):
+        with os.fdopen(os.open(private/name,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600),'w') as stream: stream.write(value)
+    put('password',secrets.token_urlsafe(40))
+    reader = secrets.token_urlsafe(40)
+    put('reader-password',reader)
+    put('pg_hba.conf','local all all trust\nhostssl all all 0.0.0.0/0 scram-sha-256\nhostssl all all ::0/0 scram-sha-256\n')
+    put('certificate.cnf','[req]\ndistinguished_name=dn\nx509_extensions=extensions\nprompt=no\n[dn]\nCN=pg-source\n[extensions]\nsubjectAltName=DNS:pg-source,DNS:localhost,IP:127.0.0.1\nbasicConstraints=critical,CA:TRUE\nkeyUsage=critical,digitalSignature,keyEncipherment,keyCertSign\n')
+    fixture = ROOT/'experiments/g4-m3-mapping-001/fixture.sql'
+    baseline = subprocess.check_output(['git','show','f0afb730ce92ecbd3a5947d9c6f58faedc8b2138:experiments/g4-m3-mapping-001/fixture.sql'],cwd=ROOT)
+    if fixture.read_bytes() != baseline: raise ValueError('QUERY_PUBLIC_FIXTURE_DRIFT')
+    put('init.sql',baseline.decode().replace('__MAPPING_READER_PASSWORD__',reader) + SOURCE_UNKNOWN_TIME_SQL)
+    certificate = run(['/usr/bin/openssl','req','-x509','-newkey','rsa:2048','-nodes','-sha256','-days','7','-config',str(private/'certificate.cnf'),'-keyout',str(private/'server.key'),'-out',str(private/'server.crt')],ROOT,task=TASK,run_id=RUN,stage='query-source-new-synthetic-certificate',timeout=20)
+    if certificate.returncode: raise ValueError('QUERY_SOURCE_CERTIFICATE')
+    os.chmod(private/'server.key',0o600)
+    original = json.loads(Path(platform['compose']).read_text())
+    service = original['services']['platform-pg']
+    service['environment']['POSTGRES_DB'] = 'fixture'
+    service['ports'] = ['127.0.0.1:15445:5432']
+    service['volumes'] = ['source-data:/var/lib/postgresql',{'type':'bind','source':str(private),'target':'/run/secrets','read_only':True}, {'type':'bind','source':str(private/'init.sql'),'target':'/docker-entrypoint-initdb.d/01-fixture.sql','read_only':True}]
+    service['healthcheck']['test'] = ['CMD-SHELL','pg_isready -U postgres -d fixture']
+    labels = service['labels']
+    spec = {'name':platform['project'],'services':{'pg-source':service},'volumes':{'source-data':{'labels':labels}},'networks':{'platform':{'external':True,'name':network['Name']}}}
+    compose = output/'source-compose.json'
+    compose.write_text(json.dumps(spec,indent=2)+'\n')
+    record = dict(taskId=TASK,runId=RUN,project=platform['project'],engineId=info['ID'],networkId=network['Id'],imageId=inspected['Id'],fixtureSha256=sha(baseline + SOURCE_UNKNOWN_TIME_SQL.encode()),before=running,status='CREATING',resources=[])
+    identity.write_text(json.dumps(record,indent=2)+'\n')
+    result = run([*prefix,'compose','-f',str(compose),'up','-d','--no-deps','--no-build','--pull','never','--wait','--wait-timeout','60','pg-source'],ROOT,task=TASK,run_id=RUN,stage='query-source-create',input_key=sha(encoded([spec,sha(baseline + SOURCE_UNKNOWN_TIME_SQL.encode())])),timeout=90)
+    ids = docker('ps','-aq','--filter','label=com.docker.compose.project='+platform['project'],'--filter','label=com.docker.compose.service=pg-source').decode().split()
+    for cid in ids:
+        item=json.loads(docker('inspect',cid))[0]
+        record['resources'].append(dict(kind='container',id=item['Id'],name=item['Name'],health=item['State'].get('Health',{}).get('Status'),mounts=[dict(type=m['Type'],name=m.get('Name')) for m in item['Mounts']]))
+    record.update(exitCode=result.returncode,status='HEALTHY' if result.returncode==0 and len(ids)==1 and record['resources'][0]['health']=='healthy' else 'BLOCKED')
+    identity.write_text(json.dumps(record,indent=2)+'\n')
+    print(json.dumps({'status':record['status'],'containerIds':ids,'exitCode':result.returncode}))
+    return result.returncode
+
+
+def persistence_test(source=False):
     """内部网络中执行正式工厂测试，短命容器精确登记并回收。"""
     import os
     import subprocess
@@ -233,14 +311,25 @@ def persistence_test():
     if inspected['Id'] != image.split('@')[1] or inspected['Architecture'] != 'arm64':
         raise ValueError('QUERY_TEST_IMAGE_DRIFT')
     private = ROOT / '.tools/security/g4-m4-query-001' / RUN / 'platform-pg'
-    directory = ROOT / 'backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0'
+    project = 'OntologyPlatform.ConnectionsTests' if source else 'OntologyPlatform.QueryTests'
+    directory = ROOT / 'backend/tests' / project / 'bin/Debug/net10.0'
     inputs = {p.name: sha(p.read_bytes()) for p in directory.glob('*.dll')}
     suffix = uuid.uuid4().hex[:12]
-    name = record['project'] + '-persistence-test-' + suffix
+    name = record['project'] + ('-source-test-' if source else '-persistence-test-') + suffix
+    before = subprocess.run([*prefix, 'container', 'inspect', name], capture_output=True, timeout=10)
+    if before.returncode == 0 or ('No such container: '+name) not in before.stderr.decode():
+        raise ValueError('QUERY_TEST_BEFORE_UNVERIFIED')
     envfile = private / ('test-' + suffix + '.env')
     connection = 'Host=platform-pg;Port=5432;Database=query;Username=postgres;Password='+ (private / 'password').read_text()+';SSL Mode=VerifyFull;Root Certificate=/run/query-ca.crt;Pooling=false;Include Error Detail=false'
+    source_private = ROOT / '.tools/security/g4-m4-query-001' / RUN / 'pg-source'
+    if source:
+        source_record = json.loads((output/'source-resources.json').read_text())
+        source_current = json.loads(subprocess.check_output([*prefix,'inspect',source_record['resources'][0]['id']],timeout=10))[0]
+        if source_current['State']['Health']['Status'] != 'healthy' or source_current['Config']['Labels'].get('ontology.task-id') != TASK:
+            raise ValueError('QUERY_SOURCE_IDENTITY_DRIFT')
     with os.fdopen(os.open(envfile, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600), 'w') as stream:
-        stream.write('G4_QUERY_TEST_CONNECTION='+connection+'\nDOTNET_CLI_HOME=/tmp/dotnet\nDOTNET_CLI_TELEMETRY_OPTOUT=1\nDOTNET_SKIP_FIRST_TIME_EXPERIENCE=1\n')
+        stream.write(('G4_QUERY_SOURCE_PASSWORD_FILE=/run/query-source-password\nG4_QUERY_SOURCE_CA=/run/query-source-ca.crt\n' if source else 'G4_QUERY_TEST_CONNECTION='+connection+'\n')
+                     +'DOTNET_CLI_HOME=/tmp/dotnet\nDOTNET_CLI_TELEMETRY_OPTOUT=1\nDOTNET_SKIP_FIRST_TIME_EXPERIENCE=1\n')
     lifecycle = dict(taskId=TASK, runId=RUN, name=name, imageId=inspected['Id'], status='CREATING', beforeExists=False)
     receipt_path = output / (name + '.json')
     receipt_path.write_text(json.dumps(lifecycle, indent=2)+'\n')
@@ -250,11 +339,13 @@ def persistence_test():
                '--tmpfs', '/tmp:size=64m,mode=1777', '--env-file', str(envfile),
                '--mount', 'type=bind,src='+str(directory)+',dst=/app,readonly',
                '--mount', 'type=bind,src='+str(private/'server.crt')+',dst=/run/query-ca.crt,readonly',
-               '--workdir', '/app', image, 'dotnet', 'OntologyPlatform.QueryTests.dll',
-               '--filter', 'FullyQualifiedName~G4QueryPersistenceTests', '--timeout', '30s', '--zero-tests-policy', 'strict']
+               *(['--mount','type=bind,src='+str(source_private/'reader-password')+',dst=/run/query-source-password,readonly',
+                  '--mount','type=bind,src='+str(source_private/'server.crt')+',dst=/run/query-source-ca.crt,readonly'] if source else []),
+               '--workdir', '/app', image, 'dotnet', project+'.dll',
+               '--filter', 'FullyQualifiedName~G4QuerySourceIntegrationTests' if source else 'FullyQualifiedName~G4QueryPersistenceTests|FullyQualifiedName~G4QueryRaceTests', '--timeout', '30s', '--zero-tests-policy', 'strict']
     result = None
     try:
-        result = run(command, ROOT, task=TASK, run_id=RUN, stage='query-real-persistence-container',
+        result = run(command, ROOT, task=TASK, run_id=RUN, stage='query-real-source-container' if source else 'query-real-persistence-container',
                      input_key=sha(encoded([inputs, sha(Path(__file__).read_bytes()), inspected['Id']])), timeout=60)
         print(result.stdout.decode(errors='replace')[-5000:])
         print(json.dumps({'exitCode': result.returncode, 'receipt':result.receipt['commandId']}))

@@ -65,6 +65,10 @@ public static class G4Composition
         if (builder.Configuration.GetValue<bool>("G4:QueryEnabled"))
         {
             builder.Services.AddScoped<IG4QueryAuthorizationAuthority, QueryAuthorizationParticipant>();
+            builder.Services.AddScoped<QueryBindingReader>();
+            builder.Services.AddScoped<IG4QueryBindingReader>(provider => provider.GetRequiredService<QueryBindingReader>());
+            builder.Services.AddScoped<IG4SourceQueryReader>(provider => provider.GetRequiredService<QueryBindingReader>());
+            builder.Services.AddSingleton<IG4PgQueryReader, PgQueryReader>();
             builder.Services.AddAuthorization(options =>
             {
                 foreach (var permission in new[] { "data.query.execute", "data.query.result.read", "data.query.evidence.read" })

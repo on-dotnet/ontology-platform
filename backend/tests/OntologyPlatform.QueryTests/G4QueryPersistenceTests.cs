@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +32,13 @@ public sealed class G4QueryPersistenceTests
         await using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
         // 本测试行身份仅属于当前Run，不覆盖其他任务数据。
         var id = Guid.NewGuid().ToString("N");
+        // 独占测试目录只在本任务短命容器tmpfs中存活，不借用宿主认证keyring。
+        var keyDirectory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "g4-query-result-" + id));
+        keyDirectory.Create();
+        // 使用文件keyring产生密文；第二个provider必须重新读取文件才能恢复。
+        var encryption = DataProtectionProvider.Create(keyDirectory, options => options.SetApplicationName("G4-M4-QUERY-001"));
+        // 业务结果保留超过JS安全范围的decimal以及固定微秒精度。
+        var protectedResult = G4QueryResultStore.Protect(encryption, id, G4QueryTests.FixtureResult());
         // bytea原件包含超过JS安全整数的decimal及固定微秒词法。
         var bytes = Encoding.UTF8.GetBytes("{\"decimal\":\"9007199254740993.20\",\"time\":\"2026-11-14T01:02:03.123456Z\"}");
         await using (var scope = provider.CreateAsyncScope())
@@ -43,6 +51,7 @@ public sealed class G4QueryPersistenceTests
             {
                 Id = id, OrganizationId = "org-1", SubjectId = "actor-1", IdempotencyKey = id,
                 RequestHash = new string('a', 64), RequestBytes = bytes, CreatedAtUtc = DateTimeOffset.UtcNow,
+                ResultCiphertext = protectedResult.Ciphertext, ResultHash = protectedResult.Hash, ResultSize = protectedResult.Size,
                 ExpiresAtUtc = DateTimeOffset.UtcNow.AddHours(24), DeadlineAtUtc = DateTimeOffset.UtcNow.AddSeconds(5)
             });
             await db.SaveChangesAsync();
@@ -55,10 +64,18 @@ public sealed class G4QueryPersistenceTests
             // 准确主键与组织限定避免跨任务取到同名行。
             var row = await db.Queries.AsNoTracking().SingleAsync(value => value.Id == id && value.OrganizationId == "org-1");
             CollectionAssert.AreEqual(bytes, row.RequestBytes);
+            // 独立provider不共享内存密钥缓存，真实数据库回读后恢复同一规范原件。
+            var decryption = DataProtectionProvider.Create(keyDirectory, options => options.SetApplicationName("G4-M4-QUERY-001"));
+            CollectionAssert.AreEqual(G4QueryCanonical.Result(G4QueryTests.FixtureResult()),
+                G4QueryResultStore.Unprotect(decryption, id, row.ResultCiphertext, row.ResultHash!));
+            Assert.AreEqual(protectedResult.Size, row.ResultSize);
+            Assert.IsFalse(row.ResultCiphertext.AsSpan().SequenceEqual(G4QueryCanonical.Result(G4QueryTests.FixtureResult())));
             Assert.AreEqual("RUNNING", row.ExecutionStatus);
             Assert.IsTrue((await db.Database.GetAppliedMigrationsAsync()).Contains("20261114000000_G4QueryPersistence"));
             await db.Queries.Where(value => value.Id == id).ExecuteDeleteAsync();
             Assert.IsFalse(await db.Queries.AnyAsync(value => value.Id == id));
         }
+        // 只删除本测试创建的准确临时目录，宿主及其他任务keyring保持不变。
+        keyDirectory.Delete(recursive: true);
     }
 }

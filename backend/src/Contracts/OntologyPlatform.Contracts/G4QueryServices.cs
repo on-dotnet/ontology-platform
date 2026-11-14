@@ -5,6 +5,12 @@ namespace OntologyPlatform.Contracts;
 /// <summary>查询专用当前授权边界，不将映射管理许可解释成数据读取许可。</summary>
 public interface IG4QueryAuthorizationAuthority
 {
+    /// <summary>只捕获真实当前会话与组织epoch，用于已可见snapshot的无数据结果，不授予源字段权限。</summary>
+    Task<MappingAuthorizationProof> CaptureSessionAsync(ActorContext actor, string sessionReference, ResourceScope scope, CancellationToken cancellationToken);
+
+    /// <summary>同事务验证当前会话；业务值仍必须另外核验每个完整源投影grant。</summary>
+    Task DemandSessionInTransactionAsync(MappingAuthorizationProof proof, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken);
+
     /// <summary>以真实服务器会话捕获单条覆盖全部投影的当前查询授权。</summary>
     /// <param name="request">服务端身份、范围和查询许可，不能由客户端构造身份。</param>
     /// <param name="cancellationToken">当前操作的有界取消。</param>
@@ -18,4 +24,86 @@ public interface IG4QueryAuthorizationAuthority
     /// <param name="cancellationToken">当前提交期限。</param>
     /// <returns>当前授权验证的异步完成。</returns>
     Task DemandInTransactionAsync(MappingAuthorizationProof proof, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken);
+}
+
+/// <summary>Connections模块提供的已验证不可变材料，不携带连接秘密。</summary>
+public sealed record G4QueryBindingContext
+{
+    /// <summary>查询固定版本链。</summary>
+    public required G4QueryBinding Binding { get; init; }
+
+    /// <summary>原发布已验hash的映射定义。</summary>
+    public required MappingReleaseManifest Manifest { get; init; }
+
+    /// <summary>当前请求获准的范围交集。</summary>
+    public required ResourceScope Scope { get; init; }
+
+    /// <summary>原发布目录，保持历史身份。</summary>
+    public required CatalogSnapshotView OriginalCatalog { get; init; }
+
+    /// <summary>本次激活绑定目录，不覆盖原发布目录。</summary>
+    public required CatalogSnapshotView CurrentCatalog { get; init; }
+}
+
+/// <summary>固定映射读取与同事务版本复核由Connections所有者执行。</summary>
+public interface IG4QueryBindingReader
+{
+    /// <summary>只读取平台不可变材料，不调用M3全映射源可用性检查。</summary>
+    Task<G4QueryBindingContext> CaptureAsync(ActorContext actor, G4SemanticQuery query, long authorizationEpoch, CancellationToken cancellationToken);
+
+    /// <summary>在授权组织锁之后加入同物理事务重验当前激活、连接和目录。</summary>
+    Task VerifyInTransactionAsync(ActorContext actor, G4SemanticQuery query, G4QueryBinding expected,
+        DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken);
+}
+
+/// <summary>仅在服务器内存使用的有界字段投影，不直接作为业务响应或日志。</summary>
+public sealed record G4SourceQueryRead
+{
+    /// <summary>已固定来源实体绑定身份。</summary>
+    public required string EntityBindingId { get; init; }
+
+    /// <summary>只包含批准字段的精确标量，不是原始SELECT星号行。</summary>
+    public required Dictionary<string, G4QueryValue>[] Rows { get; init; }
+
+    /// <summary>实际源读取开始。</summary>
+    public required DateTimeOffset StartedAtUtc { get; init; }
+
+    /// <summary>真实只读事务完成。</summary>
+    public required DateTimeOffset CompletedAtUtc { get; init; }
+
+    /// <summary>实际事务快照水位，不声称与其他分支原子一致。</summary>
+    public required string TransactionSnapshot { get; init; }
+
+    /// <summary>存在无法确定窗口匹配的源时间，不可把空投影解释为EMPTY。</summary>
+    public required bool Indeterminate { get; init; }
+
+    /// <summary>只在真实超过返回预算时为真。</summary>
+    public required bool Limited { get; init; }
+
+    /// <summary>被完整投影且真实登记的源唯一键列；没有则不得声称记录定位。</summary>
+    public required string[] RecordKeyFields { get; init; }
+
+    /// <summary>固定类型计划摘要，不包含SQL或秘密。</summary>
+    public required string QueryPlanHash { get; init; }
+}
+
+/// <summary>查询实际读取的完整权限投影，不把多个grant拼接成一次授权。</summary>
+public sealed record G4QueryProjection
+{
+    /// <summary>固定源数据集权限身份。</summary>
+    public required string[] ObjectRefs { get; init; }
+
+    /// <summary>包含scope、身份、时间、属性和单位的全部读取字段。</summary>
+    public required string[] FieldRefs { get; init; }
+}
+
+/// <summary>跨模块源查询只暴露类型化投影；秘密和连接生命周期由Connections拥有。</summary>
+public interface IG4SourceQueryReader
+{
+    /// <summary>由固定映射计算真实字段依赖，为每个分支取得单条完整grant。</summary>
+    G4QueryProjection DescribeProjection(G4QueryBindingContext context, string entityBindingId);
+
+    /// <summary>重验当前查询授权后读取独立只读源事务，不接受SQL或客户端身份。</summary>
+    Task<G4SourceQueryRead> ReadAsync(G4QueryBindingContext context, MappingAuthorizationProof proof,
+        string entityBindingId, G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken);
 }
