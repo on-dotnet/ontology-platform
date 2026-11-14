@@ -228,3 +228,10 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 用户明确批准附件《Codex-G4-M3-SDD-Rules-Delta-20261114 (1).md》的M3收尾规则增量，类型RULES_DELTA_AFTER_PRODUCT_FREEZE；沿用当前会话、codex/g4-m3-mapping-001及托管Worktree，不另建任务、Plan或逐补丁审批。仅修改AGENTS、PLANS、效率规则、本地验证政策、阶段构包规范、新SDD任务模板及本授权/当前任务卡；合并替换冲突流程。P0禁包只约束P0，获准产品实施完成默认唯一最终V3、包外回执及非作者独立重开，具体用户例外仍优先。
 
 用户同时明确批准正常提交/push补齐包Head b9dd7eedb7980f8876d1c50c6b826ab096bacff9、既有证据提交与规则增量在远端 on-dotnet/ontology-platform 当前任务分支的可恢复性，覆盖上一轮“仅本地ZIP”的推送限制；不强推、不更新main。冻结产品提交cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c、原ZIP和历史原件不变，只轻量文档检查和一次非作者增量Review，引用原包重开记录，不重跑产品、不build/prepare/restore、不下载/安装依赖或Skills、不清KEEP、不恢复TDengine、不进入M4。规则效果待下一真实任务观察，不回溯伪造早期SDD执行。
+
+
+## 2026-11-14 G4-M4-QUERY-001 P0 查询规格授权（最新明确批准）
+
+用户明确批准附件《Codex-G4-M4-QUERY-001-P0-SDD-Contract-20261114 (2).md》的P0查询规格与一次性实施申请文档工作，以main `f0afb730ce92ecbd3a5947d9c6f58faedc8b2138`为预期基线，本轮fetch已核实一致。独立托管Worktree及`codex/g4-m4-query-001`分支，Master单写、一位非作者只读Review；使用已合并SDD模板，唯一状态见[任务卡](G4-M4-QUERY-001.md)，唯一规格见[A–F申请](../evidence/G4-M4-QUERY-001/contract-admission-request.md)。允许三文档内普通修订、轻量检查、正常提交/push，不逐补丁申请。
+
+本轮不修改产品/DTO/数据库/工程脚本，不下载/安装/prepare/restore/build/test，不启停服务、不重跑M3、不清理或移交KEEP、不更新main、不恢复TDengine、不进入M5。P0不默认ZIP；后续明确获准产品实施完成后默认最终唯一V3 ZIP、SHA、包外回执与非作者独立重开，不再申请打包。本段不批准A–F内尚待裁决的产品接口/资源/权限方案；完成停一次性规格与实施裁决关口，后续批准后沿同M4会话、分支和工作树继续。历史授权事实保留。
