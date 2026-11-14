@@ -1,0 +1,125 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "6a308c53f9d76a79a4c6fe2e1f64c29870dac0f8",
+  "checks": [
+    {
+      "name": "gate-environment",
+      "command": "python3 -B scripts/maintenance/workflow_m4_query.py qualify --task G4-M4-QUERY-001 --run-id query-impl-01 --gate environment --input-key 079dc2a2cd01122aed87e269a5a054b895af38d329be0603f52c894affb512e3",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "{\"tests\": 1, \"skipped\": 0, \"executionMode\": \"REUSED\", \"qualificationMode\": \"FRESH\", \"diagnostic\": true, \"original\": \"artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/environment.txt\", \"inputKey\": \"079dc2a2cd01122aed87e269a5a054b895af38d329be0603f52c894affb512e3\"}"
+    },
+    {
+      "name": "gate-contract",
+      "command": "python3 -B scripts/maintenance/workflow_m4_query.py qualify --task G4-M4-QUERY-001 --run-id query-impl-01 --gate contract --input-key 2dd9470dc71a364499b511487783744509a7f3eff279e2cc2a88803217d45ef7",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "{\"tests\": 24, \"skipped\": 0, \"executionMode\": \"REUSED\", \"qualificationMode\": \"FRESH\", \"diagnostic\": true, \"original\": \"artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/contract.txt\", \"inputKey\": \"2dd9470dc71a364499b511487783744509a7f3eff279e2cc2a88803217d45ef7\"}"
+    },
+    {
+      "name": "gate-backend",
+      "command": "python3 -B scripts/maintenance/workflow_m4_query.py qualify --task G4-M4-QUERY-001 --run-id query-impl-01 --gate backend --input-key d764988beb4726b5a80c7377860ae3b892ceebf28dd7ba81661e701c6a96652e",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "{\"tests\": 21, \"skipped\": 0, \"executionMode\": \"REUSED\", \"qualificationMode\": \"FRESH\", \"diagnostic\": true, \"original\": \"artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/backend.txt\", \"inputKey\": \"d764988beb4726b5a80c7377860ae3b892ceebf28dd7ba81661e701c6a96652e\"}"
+    },
+    {
+      "name": "gate-preflight",
+      "command": "python3 -B scripts/tests/ExecutionPreflight.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "{\"tests\": 12, \"skipped\": 0, \"executionMode\": \"FRESH\", \"qualificationMode\": \"FRESH\", \"diagnostic\": true, \"original\": \"artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/preflight.txt\", \"inputKey\": \"76c898792cf8373a315fe37a21212bce1a2d525775d910fcae28637e8e4fbcdf\"}"
+    },
+    {
+      "name": "gate-engineering",
+      "command": "python3 -B scripts/tests/Workflow.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "{\"tests\": 18, \"skipped\": 0, \"executionMode\": \"FRESH\", \"qualificationMode\": \"FRESH\", \"diagnostic\": true, \"original\": \"artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/engineering.txt\", \"inputKey\": \"3e70dea790ae0a3c829342736d02d46437c57757530f8a11296a8e5eeb2a7148\"}"
+    },
+    {
+      "name": "gate-environment-prepare",
+      "command": "python3 -B scripts/tests/WorkflowEnvironment.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "{\"tests\": 7, \"skipped\": 0, \"executionMode\": \"FRESH\", \"qualificationMode\": \"FRESH\", \"diagnostic\": true, \"original\": \"artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/environment-prepare.txt\", \"inputKey\": \"37c6c77777b7b344b605acd3ac0f7b6bb4f4b697a9037edea0177fbd694cd19e\"}"
+    },
+    {
+      "name": "gate-web",
+      "command": "python3 -B scripts/maintenance/workflow_m4_query.py qualify --task G4-M4-QUERY-001 --run-id query-impl-01 --gate web --input-key 65238132821a90f79eab8d10e6264992e7d3449f630f51e24574e80e764fe53c",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "{\"tests\": 61, \"skipped\": 0, \"executionMode\": \"REUSED\", \"qualificationMode\": \"FRESH\", \"diagnostic\": true, \"original\": \"artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/web.txt\", \"inputKey\": \"65238132821a90f79eab8d10e6264992e7d3449f630f51e24574e80e764fe53c\"}"
+    },
+    {
+      "name": "gate-interaction",
+      "command": "python3 -B scripts/maintenance/workflow_m4_query.py qualify --task G4-M4-QUERY-001 --run-id query-impl-01 --gate interaction --input-key cd943fabb5fd0e9a5aa489d6478bfc0a484beb67f7ec700076078be9dc826456",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "{\"tests\": 468, \"skipped\": 0, \"executionMode\": \"REUSED\", \"qualificationMode\": \"FRESH\", \"diagnostic\": true, \"original\": \"artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/interaction.txt\", \"inputKey\": \"cd943fabb5fd0e9a5aa489d6478bfc0a484beb67f7ec700076078be9dc826456\"}"
+    },
+    {
+      "name": "gate-m2-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowM2Web.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "{\"tests\": 14, \"skipped\": 0, \"executionMode\": \"FRESH\", \"qualificationMode\": \"FRESH\", \"diagnostic\": true, \"original\": \"artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/m2-task-admission.txt\", \"inputKey\": \"c50f6ab260610fa640a74d1ea92189d3358b64f2f9c7305077766c89a2659b29\"}"
+    },
+    {
+      "name": "gate-mapping-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowMapping.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "{\"tests\": 16, \"skipped\": 0, \"executionMode\": \"FRESH\", \"qualificationMode\": \"FRESH\", \"diagnostic\": true, \"original\": \"artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/mapping-task-admission.txt\", \"inputKey\": \"118079c3bf0c7fd25703618d6875f4113546ec9d0225a7b3c988cc95e26341e6\"}"
+    },
+    {
+      "name": "gate-policy",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "{\"tests\": 0, \"skipped\": 0, \"executionMode\": \"FRESH\", \"qualificationMode\": \"FRESH\", \"diagnostic\": true, \"original\": \"artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/policy.txt\", \"inputKey\": \"dfc552653cec8f1295c317f09d2183cc8c31cbb1edf899a117fa46850bff7a61\"}"
+    },
+    {
+      "name": "query-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowQuery.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "10 tests, zero skip; actual command receipt a732c99fe564406fa1277309a5ba6eea retained in final originals index."
+    },
+    {
+      "name": "full-engineering-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "Actual command 26954948dc114aefae8baa85c96be1a6 stopped at repository format: eight unchanged baseline M3 errors; full SelfTest cases were not reached. Original retained in final-validation-originals-index.json."
+    },
+    {
+      "name": "source-diff-check",
+      "command": "git diff --check f0afb730ce92ecbd3a5947d9c6f58faedc8b2138 HEAD",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual committed candidate diff-check exit0; final delivery Head is checked again outside the package."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M4-QUERY-001",
+    "runId": "query-impl-01",
+    "overall": "PARTIAL",
+    "timingStatus": "COMMAND_RECEIPTS_OBSERVED_OVERALL_UNKNOWN",
+    "originalsIndex": "docs/evidence/G4-M4-QUERY-001/query-impl-01/final-validation-originals-index.json",
+    "coverage": "S1/S2/S3 local product qualification; no M3 product rerun, no other-platform or CI claim",
+    "acceptedLimitation": "Synthetic environment only: external IdP disable is not propagated immediately; current platform authorization/revocation is verified",
+    "baselineBlocker": "Eight format/link errors in four immutable baseline M3 files; full SelfTest stopped before cases",
+    "incident": "Historical query-test future-clock sweep erased runtime query records; retained originals and incident in task card; isolated owned test databases and nonempty runtime preservation verified; deleted query IDs not recreated",
+    "resourceDisposition": "Seven current task containers and native Web process KEEP for unmerged review and result recovery; zero temporary test containers. Older KEEP untouched. Disabled source connections remain terminal; future review may need a newly authorized fixture connection.",
+    "independentReview": "Code findings closed by /root/m4_p0_review; unique ZIP independent reopen and receipt are post-package external evidence"
+  }
+}

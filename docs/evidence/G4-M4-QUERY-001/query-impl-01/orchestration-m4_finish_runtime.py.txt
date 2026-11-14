@@ -1,0 +1,20 @@
+import sys,json
+sys.path.insert(0,'scripts/maintenance');import workflow_m4_query as q
+output=q.ROOT/'artifacts/workflow'/q.TASK/q.RUN;fixture=output/'runtime-fixture.json'
+state=json.loads(fixture.read_text());assert state['s3'] is True
+original=fixture.read_bytes();legacy=dict(state,s3=False);changes=[]
+try:
+ fixture.write_text(json.dumps(legacy,indent=2)+'\n')
+ for permission in ['execute','result','evidence']:
+  changes.append(q.query_fixture_control('revoke-'+permission))
+finally:fixture.write_bytes(original)
+with (output/'final-legacy-grant-isolation.json').open('x') as stream:
+ json.dump(dict(taskId=q.TASK,runId=q.RUN,connectionId=state['connectionId'],reason='Earlier single-table grants also authorized the root; revoke exact legacy synthetic grants, preserve current full-projection grants',changes=changes),stream,indent=2);stream.write('\n')
+before=q.runtime_binding();q.runtime_api_pause();q.runtime_api_resume();after=q.runtime_binding()
+assert before['process']['id']==after['process']['id'] and before['process']['startedAt']!=after['process']['startedAt']
+assert before['binaries']==after['binaries'] and before['sources']==after['sources']
+with (output/'final-real-api-restart.json').open('x') as stream:
+ json.dump(dict(taskId=q.TASK,runId=q.RUN,queryId=state['latestQuery']['queryId'],expectedResultHash=state['latestQuery']['resultHash'],before=before,after=after),stream,indent=2);stream.write('\n')
+for mode in ['s1-reopen','s2-runtime','s2-race','s2-capacity','s2-inflight','s2-aba','s3','ui-s1','ui-s3','s2-connection']:
+ if q.attest(mode):raise SystemExit(1)
+print('FINAL_RUNTIME_SUITE_COMPLETED')

@@ -1,0 +1,30 @@
+import sys,json,datetime
+sys.path.insert(0,'scripts/maintenance');import workflow_m4_query as q
+output=q.ROOT/'artifacts/workflow'/q.TASK/q.RUN;fixture=output/'runtime-fixture.json'
+q.runtime_secondary_state(False)
+try:
+ for name in ['contract','query-unit','source-unit','security-unit','agent-unit','persistence','source','web-typecheck','web-lint','web-unit']:
+  if q.attest(name):raise SystemExit(1)
+finally:q.runtime_secondary_state(True)
+q.browser_test('replace-disabled-connection');q.synthetic_grants('mapping');q.browser_test('mapping');q.synthetic_grants('query');q.browser_test('s1')
+q.runtime_secondary_state(False)
+try:
+ if q.attest('maf-binding'):raise SystemExit(1)
+finally:q.runtime_secondary_state(True)
+state=json.loads(fixture.read_text());retired={'retiredAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'reason':'formal_catalog_and_mapping_rebind_after_final_real_binding_race'}
+for key in list(state):
+ if key.startswith(('mapping','s2')) or key in ['catalog','firstQuery','latestQuery']:retired[key]=state.pop(key)
+state.setdefault('retiredFixtures',[]).append(retired);fixture.write_text(json.dumps(state,indent=2)+'\n')
+q.browser_test('provision');q.synthetic_grants('mapping')
+state=json.loads(fixture.read_text())
+q.runtime_command('query-browser-mapping',['/opt/homebrew/Cellar/node@24/24.22.1/bin/node','scripts/maintenance/workflow-m4-query.mjs','--task',q.TASK,'--run-id',q.RUN,'--mode','mapping'],timeout=180,
+ extra_inputs=dict(api=q.runtime_binding(),web=None,formalFixture=dict(connectionId=state['connectionId'],catalogSnapshotId=state['catalog']['snapshotId'],catalogConfigRevision=state['catalog']['configRevision'],ontologyReleaseId=state['ontologyRelease']['manifest']['releaseId'])))
+if q.attest('s1'):raise SystemExit(1)
+state=json.loads(fixture.read_text());before=q.runtime_binding();q.runtime_api_pause();q.runtime_api_resume();after=q.runtime_binding()
+assert before['process']['id']==after['process']['id'] and before['process']['startedAt']!=after['process']['startedAt']
+assert before['binaries']==after['binaries'] and before['sources']==after['sources']
+with (output/'final-compatible-admission-api-restart.json').open('x') as stream:
+ json.dump(dict(taskId=q.TASK,runId=q.RUN,queryId=state['latestQuery']['queryId'],expectedResultHash=state['latestQuery']['resultHash'],before=before,after=after),stream,indent=2);stream.write('\n')
+for mode in ['s1-reopen','s2-basic','s2-runtime','s2-race','s2-capacity','s2-inflight','s2-aba','s3','ui-s1','ui-s3','s2-connection']:
+ if q.attest(mode):raise SystemExit(1)
+print('FINAL_CURRENT_INPUT_VALIDATION_COMPLETED')

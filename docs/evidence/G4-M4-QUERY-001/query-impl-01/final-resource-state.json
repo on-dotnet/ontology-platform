@@ -1,0 +1,293 @@
+{
+  "taskId": "G4-M4-QUERY-001",
+  "runId": "query-impl-01",
+  "observedAtUtc": "2026-11-14T16:34:59.227137+00:00",
+  "taskContainers": [
+    {
+      "id": "b4a19ae78d9f5296c94dc3675d97b7f2d666a8820d87d33c9db07820c964cd7f",
+      "name": "/ontology-g4-m4-query-impl-01-api-secondary-1",
+      "state": "running",
+      "running": true,
+      "memory": 805306368,
+      "nanoCpus": 750000000,
+      "labels": {
+        "com.docker.compose.config-hash": "ac2a919af0f3e984c7796f40e55d66a8cbf3c6577bd3712ed3877195e076aebd",
+        "com.docker.compose.container-number": "1",
+        "com.docker.compose.depends_on": "",
+        "com.docker.compose.image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "com.docker.compose.oneoff": "False",
+        "com.docker.compose.project": "ontology-g4-m4-query-impl-01",
+        "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01/runtime-compose.json",
+        "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01",
+        "com.docker.compose.service": "api-secondary",
+        "com.docker.compose.version": "5.6.1",
+        "ontology.run-id": "query-impl-01",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M4-QUERY-001",
+        "org.opencontainers.image.version": "24.04"
+      }
+    },
+    {
+      "id": "0fb8a621821c2133941a245d7e32dc5996f0f7c26f351e7a3289ab7aa40d4bd5",
+      "name": "/ontology-g4-m4-query-impl-01-api-1",
+      "state": "running",
+      "running": true,
+      "memory": 805306368,
+      "nanoCpus": 750000000,
+      "labels": {
+        "com.docker.compose.config-hash": "8c7b0c33eb03bdd3949a8de9456e78c900fb874487a9b9b1f56a6532a893a538",
+        "com.docker.compose.container-number": "1",
+        "com.docker.compose.depends_on": "",
+        "com.docker.compose.image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "com.docker.compose.oneoff": "False",
+        "com.docker.compose.project": "ontology-g4-m4-query-impl-01",
+        "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01/runtime-compose.json",
+        "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01",
+        "com.docker.compose.replace": "api-1",
+        "com.docker.compose.service": "api",
+        "com.docker.compose.version": "5.6.1",
+        "ontology.run-id": "query-impl-01",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M4-QUERY-001",
+        "org.opencontainers.image.version": "24.04"
+      }
+    },
+    {
+      "id": "47686c56bb164ed6577349fe47b20968f83630032d6c3ebd8ed55586a8846bbd",
+      "name": "/ontology-g4-m4-query-impl-01-rustfs-1",
+      "state": "running",
+      "running": true,
+      "memory": 536870912,
+      "nanoCpus": 250000000,
+      "labels": {
+        "build-date": "",
+        "com.docker.compose.config-hash": "e50b6f5ff492c63fd2d49cb695ac1623da138392ddcacecee4923209b2e644d3",
+        "com.docker.compose.container-number": "1",
+        "com.docker.compose.depends_on": "",
+        "com.docker.compose.image": "sha256:a3951370f879374cb89cca3b495e05badab38807cc4cd609c54a35f93f6ccd64",
+        "com.docker.compose.oneoff": "False",
+        "com.docker.compose.project": "ontology-g4-m4-query-impl-01",
+        "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01/runtime-compose.json",
+        "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01",
+        "com.docker.compose.service": "rustfs",
+        "com.docker.compose.version": "5.6.1",
+        "description": "RustFS is a distributed object storage system written in Rust, supporting erasure coding, multi-tenant management, and observability.",
+        "license": "Apache-2.0",
+        "maintainer": "RustFS Team <dev@rustfs.com>",
+        "name": "RustFS",
+        "ontology.run-id": "query-impl-01",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M4-QUERY-001",
+        "org.opencontainers.image.title": "RustFS,org.opencontainers.image.description=RustFS distributed object storage system,org.opencontainers.image.version=1.0.3,org.opencontainers.image.revision=331fb896285a7686f927baf8d9d4dc2d3d3a10a9,org.opencontainers.image.source=https://github.com/rustfs/rustfs,org.opencontainers.image.created=2026-10-17T15:51:03Z,org.opencontainers.image.build-type=release",
+        "release": "1.0.3",
+        "summary": "High-performance distributed object storage system compatible with S3 API",
+        "url": "https://rustfs.com",
+        "vcs-ref": "",
+        "vendor": "RustFS Team",
+        "version": "v1.0.3"
+      }
+    },
+    {
+      "id": "61791a2303a2945b9947824de91e763d22be03b538d1c0b76ee3ce44027a835f",
+      "name": "/ontology-g4-m4-query-impl-01-keycloak-test-1",
+      "state": "running",
+      "running": true,
+      "memory": 1073741824,
+      "nanoCpus": 500000000,
+      "labels": {
+        "architecture": "aarch64",
+        "build-date": "2026-10-13T12:45:57Z",
+        "com.docker.compose.config-hash": "be422dcd244369b1e68b14ca91c8ddd512858ba86bbeda241d4cefd344aa9d67",
+        "com.docker.compose.container-number": "1",
+        "com.docker.compose.depends_on": "",
+        "com.docker.compose.image": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "com.docker.compose.oneoff": "False",
+        "com.docker.compose.project": "ontology-g4-m4-query-impl-01",
+        "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01/runtime-compose.json",
+        "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01",
+        "com.docker.compose.service": "keycloak-test",
+        "com.docker.compose.version": "5.6.1",
+        "com.redhat.build-host": "",
+        "com.redhat.component": "",
+        "com.redhat.license_terms": "",
+        "cpe": "cpe:/a:redhat:enterprise_linux:9::appstream",
+        "description": "Keycloak Server Image",
+        "distribution-scope": "public",
+        "io.buildah.version": "1.45.0",
+        "io.k8s.description": "Keycloak Server Image",
+        "io.k8s.display-name": "Keycloak Server",
+        "io.openshift.expose-services": "",
+        "io.openshift.tags": "keycloak security identity",
+        "maintainer": "https://www.keycloak.org/",
+        "name": "keycloak",
+        "ontology.run-id": "query-impl-01",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M4-QUERY-001",
+        "org.opencontainers.image.created": "2026-10-31T10:43:11.501Z",
+        "org.opencontainers.image.description": "",
+        "org.opencontainers.image.documentation": "https://www.keycloak.org/documentation",
+        "org.opencontainers.image.licenses": "Apache-2.0",
+        "org.opencontainers.image.revision": "26018f2a4c6155cfe2c28f078996390bf5191946",
+        "org.opencontainers.image.source": "https://github.com/keycloak-rel/keycloak-rel",
+        "org.opencontainers.image.title": "keycloak-rel",
+        "org.opencontainers.image.url": "https://github.com/keycloak-rel/keycloak-rel",
+        "org.opencontainers.image.version": "26.8.1",
+        "release": "",
+        "summary": "Keycloak Server Image",
+        "url": "https://www.keycloak.org/",
+        "vcs-ref": "",
+        "vcs-type": "git",
+        "vendor": "https://www.keycloak.org/",
+        "version": "26.8.1"
+      }
+    },
+    {
+      "id": "f1a5f1cb913037f7716a3599bc19c1ed9eed11aa6db79b7f1a57c8dbe1c3943d",
+      "name": "/ontology-g4-m4-query-impl-01-fuseki-1",
+      "state": "running",
+      "running": true,
+      "memory": 1610612736,
+      "nanoCpus": 750000000,
+      "labels": {
+        "com.docker.compose.config-hash": "fbaaf76771561662570fd09dc93b5c88673f5a18ed2fd2f63b793eb20e08a3c6",
+        "com.docker.compose.container-number": "1",
+        "com.docker.compose.depends_on": "",
+        "com.docker.compose.image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "com.docker.compose.oneoff": "False",
+        "com.docker.compose.project": "ontology-g4-m4-query-impl-01",
+        "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01/runtime-compose.json",
+        "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01",
+        "com.docker.compose.service": "fuseki",
+        "com.docker.compose.version": "5.6.1",
+        "io.ontology-platform.context-sha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+        "io.ontology-platform.input-fingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "io.ontology-platform.platform": "linux/arm64",
+        "io.ontology-platform.run-id": "e0-a-real-69e4388fb5bf4923976997ded13f93b9-export",
+        "io.ontology-platform.task-id": "G3-M3-001",
+        "ontology.run-id": "query-impl-01",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M4-QUERY-001",
+        "org.opencontainers.image.source": "https://github.com/on-dotnet/ontology-platform",
+        "org.opencontainers.image.version": "22.04"
+      }
+    },
+    {
+      "id": "c1bbd53e0b335a12c5e50bc860a58e6d3cb01de7d81a354ee87696dd0a941c81",
+      "name": "/ontology-g4-m4-query-impl-01-pg-source-1",
+      "state": "running",
+      "running": true,
+      "memory": 805306368,
+      "nanoCpus": 750000000,
+      "labels": {
+        "com.docker.compose.config-hash": "559ce8c16f8fc4598488c652da75237c8f6568cd26fd8e403456c17a8478e912",
+        "com.docker.compose.container-number": "1",
+        "com.docker.compose.depends_on": "",
+        "com.docker.compose.image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "com.docker.compose.oneoff": "False",
+        "com.docker.compose.project": "ontology-g4-m4-query-impl-01",
+        "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01/source-compose.json",
+        "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01",
+        "com.docker.compose.service": "pg-source",
+        "com.docker.compose.version": "5.6.1",
+        "ontology.run-id": "query-impl-01",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M4-QUERY-001"
+      }
+    },
+    {
+      "id": "d267220f4227b7c92f5d2e37e7e85a4587644488157c10e5f95586613bd08952",
+      "name": "/ontology-g4-m4-query-impl-01-platform-pg-1",
+      "state": "running",
+      "running": true,
+      "memory": 805306368,
+      "nanoCpus": 750000000,
+      "labels": {
+        "com.docker.compose.config-hash": "8ff2a2e851a8a2acf66fd5083c115edb0387b1a06218890d436f78cf3f6513db",
+        "com.docker.compose.container-number": "1",
+        "com.docker.compose.depends_on": "",
+        "com.docker.compose.image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "com.docker.compose.oneoff": "False",
+        "com.docker.compose.project": "ontology-g4-m4-query-impl-01",
+        "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01/platform-compose.json",
+        "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/query-impl-01",
+        "com.docker.compose.service": "platform-pg",
+        "com.docker.compose.version": "5.6.1",
+        "ontology.run-id": "query-impl-01",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M4-QUERY-001"
+      }
+    }
+  ],
+  "sharedRunningBudgets": [
+    {
+      "id": "b4a19ae78d9f5296c94dc3675d97b7f2d666a8820d87d33c9db07820c964cd7f",
+      "memory": 805306368,
+      "nanoCpus": 750000000
+    },
+    {
+      "id": "0fb8a621821c2133941a245d7e32dc5996f0f7c26f351e7a3289ab7aa40d4bd5",
+      "memory": 805306368,
+      "nanoCpus": 750000000
+    },
+    {
+      "id": "47686c56bb164ed6577349fe47b20968f83630032d6c3ebd8ed55586a8846bbd",
+      "memory": 536870912,
+      "nanoCpus": 250000000
+    },
+    {
+      "id": "61791a2303a2945b9947824de91e763d22be03b538d1c0b76ee3ce44027a835f",
+      "memory": 1073741824,
+      "nanoCpus": 500000000
+    },
+    {
+      "id": "f1a5f1cb913037f7716a3599bc19c1ed9eed11aa6db79b7f1a57c8dbe1c3943d",
+      "memory": 1610612736,
+      "nanoCpus": 750000000
+    },
+    {
+      "id": "c1bbd53e0b335a12c5e50bc860a58e6d3cb01de7d81a354ee87696dd0a941c81",
+      "memory": 805306368,
+      "nanoCpus": 750000000
+    },
+    {
+      "id": "d267220f4227b7c92f5d2e37e7e85a4587644488157c10e5f95586613bd08952",
+      "memory": 805306368,
+      "nanoCpus": 750000000
+    },
+    {
+      "id": "bb11e0012988f6f1a7710d7675922593d0c11f2ecc689cec25adcc62b0e3c8ab",
+      "memory": 1073741824,
+      "nanoCpus": 1000000000
+    },
+    {
+      "id": "89a8b1e01773e6b194a74779043ec695c29fcc0c8398d92a5e74f95e7708d90e",
+      "memory": 805306368,
+      "nanoCpus": 1000000000
+    },
+    {
+      "id": "01239887ff8cc63beab918db58ae709bbd1cb8dd8d6cb753d6ec1242259c0a4e",
+      "memory": 1073741824,
+      "nanoCpus": 1000000000
+    },
+    {
+      "id": "a44de0b64364b3fb2363c2e2ed1eb84863302f5af608c65bdc686f88664318b7",
+      "memory": 1610612736,
+      "nanoCpus": 2000000000
+    },
+    {
+      "id": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "memory": 805306368,
+      "nanoCpus": 1000000000
+    },
+    {
+      "id": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "memory": 805306368,
+      "nanoCpus": 1000000000
+    }
+  ],
+  "temporaryTestContainersRemaining": 0,
+  "keptFor": "Current unmerged M4 review, encrypted result recovery and failure investigation; no M3 KEEP resource changes",
+  "releaseCondition": "After explicit review closure and result retention/unique evidence preservation, inspect exact ownership and references before scoped cleanup",
+  "sharedMemoryBytes": 12616466432,
+  "sharedNanoCpus": 11500000000
+}

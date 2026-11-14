@@ -1,0 +1,79 @@
+{
+  "gate": "contract",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "taskId": "G4-M4-QUERY-001",
+    "runId": "query-impl-01",
+    "gate": "contract",
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "tests": 24,
+    "skipped": 0,
+    "originals": [
+      {
+        "path": "artifacts/workflow/G4-M4-QUERY-001/query-impl-01/qualification-contract-1e4aefa9e50441788f0d2bf719c849c5.json",
+        "sha256": "8c0019d317680d1abe5d55867350185550d16fad1e23a38dccfcc23347401d28"
+      },
+      {
+        "path": "artifacts/workflow/G4-M4-QUERY-001/commands/query-impl-01/b3d2b927646d4e4194f18c05255d96df/receipt.json",
+        "sha256": "fd9424e5d95e90be408c2a729df8fac0812fbd8609dc1f5bf60618eeb155dec8"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/commands/query-impl-01/b3d2b927646d4e4194f18c05255d96df/stdout.txt",
+        "sha256": "dd96b5072caab8b453b105f93237111897a18d8d43c72b8f35e451eca6403bfb",
+        "sizeBytes": 60
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/commands/query-impl-01/b3d2b927646d4e4194f18c05255d96df/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M4-QUERY-001/commands/query-impl-01/26987e1510864996abd762e91703dff5/receipt.json",
+        "sha256": "368cb7bd33a2ea06d23ceba7d21fd4dcb5120023e4156ca069048708d0989ff8"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/commands/query-impl-01/26987e1510864996abd762e91703dff5/stdout.txt",
+        "sha256": "bf669c24a2a6c0fbf3d8b5a382b1bae2936a518293b63dca6bdc71f71d05ecd7",
+        "sizeBytes": 349
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/artifacts/workflow/G4-M4-QUERY-001/commands/query-impl-01/26987e1510864996abd762e91703dff5/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    ]
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m4_query.py",
+    "qualify",
+    "--task",
+    "G4-M4-QUERY-001",
+    "--run-id",
+    "query-impl-01",
+    "--gate",
+    "contract",
+    "--input-key",
+    "8b0bf96f1cb298be03c98e04c1df4440ce32597f4440c88b9296398b878b5875"
+  ],
+  "exitCode": 0,
+  "tests": 24,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 3.040291999990586,
+  "inputKey": "8b0bf96f1cb298be03c98e04c1df4440ce32597f4440c88b9296398b878b5875",
+  "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+  "policyKey": "a2327b652acb65eaeca7df6712a8e679b7844aaaad4f3c47429f224246ebedfb",
+  "evidenceSha256": "370f8cc986f5f70713a94ce679f16b641bf9d6292746fb89d3957f2e272eba21",
+  "logPath": "artifacts/workflow/G4-M4-QUERY-001/runs/70a10dcc8b0548aaa3e14c1684161f6f/contract.txt",
+  "sourceRun": "70a10dcc8b0548aaa3e14c1684161f6f",
+  "sourceCommit": "2801d34f5dfbd0e99b5a6d3a44e592df4082421d"
+}

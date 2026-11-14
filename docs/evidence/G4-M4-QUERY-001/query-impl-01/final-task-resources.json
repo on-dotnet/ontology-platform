@@ -1,0 +1,177 @@
+{
+  "taskId": "G4-M4-QUERY-001",
+  "runId": "query-impl-01",
+  "project": "ontology-g4-m4-query-impl-01",
+  "resources": [
+    {
+      "kind": "container",
+      "id": "b4a19ae78d9f5296c94dc3675d97b7f2d666a8820d87d33c9db07820c964cd7f",
+      "name": "/ontology-g4-m4-query-impl-01-api-secondary-1",
+      "service": "api-secondary",
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01",
+      "running": true,
+      "status": "running",
+      "exitCode": 0,
+      "memory": 805306368,
+      "nanoCpus": 750000000,
+      "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+    },
+    {
+      "kind": "container",
+      "id": "0fb8a621821c2133941a245d7e32dc5996f0f7c26f351e7a3289ab7aa40d4bd5",
+      "name": "/ontology-g4-m4-query-impl-01-api-1",
+      "service": "api",
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01",
+      "running": true,
+      "status": "running",
+      "exitCode": 0,
+      "memory": 805306368,
+      "nanoCpus": 750000000,
+      "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+    },
+    {
+      "kind": "container",
+      "id": "47686c56bb164ed6577349fe47b20968f83630032d6c3ebd8ed55586a8846bbd",
+      "name": "/ontology-g4-m4-query-impl-01-rustfs-1",
+      "service": "rustfs",
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01",
+      "running": true,
+      "status": "running",
+      "exitCode": 0,
+      "memory": 536870912,
+      "nanoCpus": 250000000,
+      "imageId": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+    },
+    {
+      "kind": "container",
+      "id": "61791a2303a2945b9947824de91e763d22be03b538d1c0b76ee3ce44027a835f",
+      "name": "/ontology-g4-m4-query-impl-01-keycloak-test-1",
+      "service": "keycloak-test",
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01",
+      "running": true,
+      "status": "running",
+      "exitCode": 0,
+      "memory": 1073741824,
+      "nanoCpus": 500000000,
+      "imageId": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+    },
+    {
+      "kind": "container",
+      "id": "f1a5f1cb913037f7716a3599bc19c1ed9eed11aa6db79b7f1a57c8dbe1c3943d",
+      "name": "/ontology-g4-m4-query-impl-01-fuseki-1",
+      "service": "fuseki",
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01",
+      "running": true,
+      "status": "running",
+      "exitCode": 0,
+      "memory": 1610612736,
+      "nanoCpus": 750000000,
+      "imageId": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"
+    },
+    {
+      "kind": "container",
+      "id": "c1bbd53e0b335a12c5e50bc860a58e6d3cb01de7d81a354ee87696dd0a941c81",
+      "name": "/ontology-g4-m4-query-impl-01-pg-source-1",
+      "service": "pg-source",
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01",
+      "running": true,
+      "status": "running",
+      "exitCode": 0,
+      "memory": 805306368,
+      "nanoCpus": 750000000,
+      "imageId": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+    },
+    {
+      "kind": "container",
+      "id": "d267220f4227b7c92f5d2e37e7e85a4587644488157c10e5f95586613bd08952",
+      "name": "/ontology-g4-m4-query-impl-01-platform-pg-1",
+      "service": "platform-pg",
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01",
+      "running": true,
+      "status": "running",
+      "exitCode": 0,
+      "memory": 805306368,
+      "nanoCpus": 750000000,
+      "imageId": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+    },
+    {
+      "kind": "network",
+      "id": "bf27ee3c1858b58a0939602a39b1c6550bf222b2b569b6e6d40d9ce793875653",
+      "name": "ontology-g4-m4-query-impl-01_edge",
+      "service": null,
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01"
+    },
+    {
+      "kind": "network",
+      "id": "de1e75bc3691274124fd7acfacb407f2c0a88c837b550bb401be697a96aef884",
+      "name": "ontology-g4-m4-query-impl-01_platform",
+      "service": null,
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m4-query-impl-01_api-keyring",
+      "name": "ontology-g4-m4-query-impl-01_api-keyring",
+      "service": null,
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m4-query-impl-01_fuseki-data",
+      "name": "ontology-g4-m4-query-impl-01_fuseki-data",
+      "service": null,
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m4-query-impl-01_keycloak-data",
+      "name": "ontology-g4-m4-query-impl-01_keycloak-data",
+      "service": null,
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m4-query-impl-01_platform-data",
+      "name": "ontology-g4-m4-query-impl-01_platform-data",
+      "service": null,
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m4-query-impl-01_query-keyring",
+      "name": "ontology-g4-m4-query-impl-01_query-keyring",
+      "service": null,
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m4-query-impl-01_rustfs-data",
+      "name": "ontology-g4-m4-query-impl-01_rustfs-data",
+      "service": null,
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m4-query-impl-01_source-data",
+      "name": "ontology-g4-m4-query-impl-01_source-data",
+      "service": null,
+      "taskId": "G4-M4-QUERY-001",
+      "runId": "query-impl-01"
+    }
+  ]
+}

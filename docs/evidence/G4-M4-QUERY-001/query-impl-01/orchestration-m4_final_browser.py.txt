@@ -1,0 +1,28 @@
+import sys,json,datetime
+sys.path.insert(0,'scripts/maintenance');import workflow_m4_query as q
+output=q.ROOT/'artifacts/workflow'/q.TASK/q.RUN
+fixture=output/'runtime-fixture.json'
+def mapping_current():
+ state=json.loads(fixture.read_text())
+ binding=q.runtime_binding()
+ q.runtime_command('query-browser-mapping', ['/opt/homebrew/Cellar/node@24/24.22.1/bin/node',
+  'scripts/maintenance/workflow-m4-query.mjs','--task',q.TASK,'--run-id',q.RUN,'--mode','mapping'], timeout=180,
+  extra_inputs=dict(api=binding,web=None,formalFixture=dict(connectionId=state['connectionId'],
+    catalogSnapshotId=state['catalog']['snapshotId'],catalogConfigRevision=state['catalog']['configRevision'],
+    ontologyReleaseId=state['ontologyRelease']['manifest']['releaseId'])))
+ print('FORMAL_CURRENT_MAPPING_COMPLETED',flush=True)
+mapping_current();q.browser_test('s1')
+q.runtime_secondary_state(False)
+try:
+ if q.attest('maf-binding'):raise SystemExit(1)
+finally:q.runtime_secondary_state(True)
+# 真实在途编辑使旧绑定过期，保留旧材料后通过新正式映射发布重新绑定。
+state=json.loads(fixture.read_text());retired={'retiredAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'reason':'formal_mapping_rebind_after_real_inflight_connection_change'}
+for key in list(state):
+ if key.startswith(('mapping','s2')) or key in ['firstQuery','latestQuery','catalog']:
+  retired[key]=state.pop(key)
+state.setdefault('retiredFixtures',[]).append(retired);fixture.write_text(json.dumps(state,indent=2)+'\n')
+q.browser_test('provision');q.synthetic_grants('mapping');mapping_current()
+for mode in ['s1','s1-reopen','s2-basic','s2-runtime','s2-race','s2-capacity','s2-inflight','s2-aba','s3','ui-s1','ui-s3','s2-connection']:
+ if q.attest(mode):raise SystemExit(1)
+print('FINAL_BROWSER_SUITE_COMPLETED')

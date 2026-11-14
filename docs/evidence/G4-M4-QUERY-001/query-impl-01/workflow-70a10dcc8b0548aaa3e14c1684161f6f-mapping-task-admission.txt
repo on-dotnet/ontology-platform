@@ -1,0 +1,41 @@
+.FFE...........
+======================================================================
+ERROR: test_runtime_requires_registered_real_consumers (__main__.MappingConsumerTests.test_runtime_requires_registered_real_consumers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/scripts/tests/WorkflowMapping.Tests.py", line 63, in test_runtime_requires_registered_real_consumers
+    result = MAPPING.structural(ROOT, TASK)
+  File "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/scripts/maintenance/workflow_m3_mapping.py", line 41, in structural
+    raise ValueError('MAPPING_AUTHORITY_NOT_REGISTERED')
+ValueError: MAPPING_AUTHORITY_NOT_REGISTERED
+
+======================================================================
+FAIL: test_missing_audit_or_endpoint_is_blocked (__main__.MappingConsumerTests.test_missing_audit_or_endpoint_is_blocked)
+----------------------------------------------------------------------
+ValueError: MAPPING_AUTHORITY_NOT_REGISTERED
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/scripts/tests/WorkflowMapping.Tests.py", line 93, in test_missing_audit_or_endpoint_is_blocked
+    with self.assertRaisesRegex(ValueError, error):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: "MAPPING_AUDIT_NOT_REGISTERED" does not match "MAPPING_AUTHORITY_NOT_REGISTERED"
+
+======================================================================
+FAIL: test_missing_worker_or_outbox_registration_is_blocked (__main__.MappingConsumerTests.test_missing_worker_or_outbox_registration_is_blocked)
+----------------------------------------------------------------------
+ValueError: MAPPING_AUTHORITY_NOT_REGISTERED
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/scripts/tests/WorkflowMapping.Tests.py", line 82, in test_missing_worker_or_outbox_registration_is_blocked
+    with self.assertRaisesRegex(ValueError, 'MAPPING_CONSUMER_NOT_REGISTERED'):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "MAPPING_CONSUMER_NOT_REGISTERED" does not match "MAPPING_AUTHORITY_NOT_REGISTERED"
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.050s
+
+FAILED (failures=2, errors=1)

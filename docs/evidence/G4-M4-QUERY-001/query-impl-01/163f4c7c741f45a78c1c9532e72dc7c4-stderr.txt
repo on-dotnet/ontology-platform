@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/scripts/maintenance/workflow_m4_query.py", line 1470, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/scripts/maintenance/workflow_m4_query.py", line 1460, in main
+    print(json.dumps(qualify(args.gate, args.input_key)))
+                     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/scripts/maintenance/workflow_m4_query.py", line 1406, in qualify
+    demand_qualification(row, name, inputs)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/scripts/maintenance/workflow_m4_query.py", line 1371, in demand_qualification
+    raise ValueError('QUERY_QUALIFICATION_INVALID')
+ValueError: QUERY_QUALIFICATION_INVALID

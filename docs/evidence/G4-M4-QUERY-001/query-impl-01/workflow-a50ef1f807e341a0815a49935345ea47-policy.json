@@ -1,0 +1,28 @@
+{
+  "gate": "policy",
+  "status": "FAIL",
+  "executionMode": "FRESH",
+  "qualificationMode": "FRESH",
+  "productProof": {},
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/verify.ps1"
+  ],
+  "exitCode": 1,
+  "tests": 0,
+  "skipped": 0,
+  "diagnostic": true,
+  "hypothesis": "Fresh task evidence replaced stale qualifications; bounded reread of actual originals and short engineering tests, baseline format errors remain",
+  "inputsUnchanged": true,
+  "errorSignature": "a7ef37fb62b9f8d03444f244b8fd23586faf6d6057389a84bd29960e301f5cad",
+  "elapsedSeconds": 8.055474041990237,
+  "inputKey": "dfc552653cec8f1295c317f09d2183cc8c31cbb1edf899a117fa46850bff7a61",
+  "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+  "policyKey": "959a510a38dac4c84403e88134fc9eb439427b41d48a1565754e6d51a3c96a3b",
+  "evidenceSha256": "9f1884a2ee507ea0ef293b8cd08a4d2ee62121ee9faac933ee4732e571e31839",
+  "logPath": "artifacts/workflow/G4-M4-QUERY-001/runs/a50ef1f807e341a0815a49935345ea47/policy.txt",
+  "sourceRun": "a50ef1f807e341a0815a49935345ea47",
+  "sourceCommit": "6a308c53f9d76a79a4c6fe2e1f64c29870dac0f8"
+}

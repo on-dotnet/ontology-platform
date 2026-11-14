@@ -2,10 +2,10 @@
 
 ## 当前执行与授权
 
-- 唯一状态：**VERIFYING_S2_S3**。用户已批准A–F实施及D的合成环境IdP限制；按S1→S2→S3推进，最终停产品审查关口。
+- 唯一状态：**READY_FOR_REVIEW / PARTIAL**。用户已批准A–F实施及D的合成环境IdP限制；S1→S2→S3本地产品验证已完成，停在产品审查关口。
 - 会话：本M4会话，后续同会话继续；Code/Agent，Local Mac ARM64。实际模型/推理设置未读取，不采用附件建议冒充实际设置。
 - Base：`f0afb730ce92ecbd3a5947d9c6f58faedc8b2138`，2026-11-14普通fetch后origin/main一致；初次fetch沙箱拒绝写FETCH_HEAD，获工具批准重试exit0；没有基线漂移。
-- 分支：`codex/g4-m4-query-001`；Worktree：`/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform`。RunId=`p0-contract-20261114`，托管operationId=`ddb793db-9e28-4040-977d-73af96443916`。首次分支创建因.git锁写权限失败，获工具批准后成功；未回退main写文档。
+- 分支：`codex/g4-m4-query-001`；Worktree：`/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform`。当前RunId=`query-impl-01`（P0为`p0-contract-20261114`），托管operationId=`ddb793db-9e28-4040-977d-73af96443916`。首次分支创建因.git锁写权限失败，获工具批准后成功；未回退main写文档。
 - Owner：Master单作者；Reviewer：一位非作者只读审查，`/root/m4_p0_review`，结论见Verify；无产品Worker。
 - 当前授权：本轮用户明确批准A–F实施、范围内修复及最终V3交付；[授权追加](current-authorization.md)。P0不默认ZIP；后续产品实施完成默认最终唯一ZIP、包外回执及非作者独立重开，不再申请打包。
 - P0 owned_paths仅本任务卡、[唯一A–F](../evidence/G4-M4-QUERY-001/contract-admission-request.md)及current-authorization.md追加；合同修订P0.1；当前实施owned_paths扩至A–F F1准确清单、资源预算F2。read_only_dependencies为A–F A1固定Base源码/历史合同、SDD模板与现行规则。
@@ -17,18 +17,18 @@
 
 | AC-ID | 行为/不变量 | Given/When/Then正例和关键反例 | 实现/测试位置 | 最早验证层/依赖 | 结果/原件 |
 |---|---|---|---|---|---|
-| AC-01 | RQ-02判别与精确值，见B | 给定P1–P3；读出并PG往返→decimal/Int64/微秒逐字一致；N1–N6/N10/N12拒绝，不补猜 | C/G4QueryModels.cs、G4QueryRules.cs；OntologyPlatform.G2ContractTests/G4QueryWireTests.cs；OntologyPlatform.QueryTests/G4QueryPersistenceTests.cs | S1正式序列化+真实PG新DbContext；无float中转 | PARTIAL：wire/精确值、真实PG及HTTP/UI刷新通过；当前修复后UI/进程恢复复验中 |
-| AC-02 | 唯一Gateway真实PG链，见A | 给定正式本体和active；HTTP query→实际源值/receipt；只有M3评估可用或未知capability→拒绝 | Q/SemanticGateway.cs、N/Adapters/PgQueryReader.cs；OntologyPlatform.QueryTests/G4QueryHttpTests.cs | S1正式DI/OIDC/TLS只读PG | PARTIAL：正式HTTP首查询43检查通过，当前生命周期修复复验中 |
-| AC-03 | 六态区别，见C1 | 完整零行→EMPTY，有行→FOUND；断源/超时零行→UNAVAILABLE；截断有可信前缀→PARTIAL；可见snapshot全分支拒绝→UNAUTHORIZED；两可见候选→AMBIGUOUS | Q/G4QueryExecution.cs；OntologyPlatform.QueryTests/G4QueryTests.cs；OntologyPlatform.ConnectionsTests/G4QuerySourceTests.cs | S1 FOUND；S2其他状态及真实故障 | PARTIAL：真实HTTP FOUND/UNAUTHORIZED已通过；其他六态与S2真实故障待验；S-50不在范围 |
-| AC-04 | 当前授权/迟到响应，见C/D | 有grant执行与恢复成功；撤权/注销/连接禁用/secret轮换→无成功披露，UI清屏且迟到响应失效；根无权401/403无snapshot；外部IdP直接禁用即时传播按D待裁决限制，不冒充已覆盖 | G/QueryAuthorizationParticipant.cs、H/G4/QueryEndpoints.cs；OntologyPlatform.SecurityTests/G4QueryAuthorizationTests.cs；apps/web/src/features/semantic/g4-query.test.ts | S2真实票据/PG grant+浏览器 | PARTIAL：真实票据/epoch撤权阻止结果与成功审计；浏览器及完整API待验 |
-| AC-05 | 固定发布与ABA，见C2 | active固定执行成功；A→B→A发生于运行中→409无成功结果；已提交历史A在当前有权时仍回读A | N/Application/QueryBindingReader.cs、Q/G4QueryResultStore.cs；OntologyPlatform.QueryTests/G4QueryRaceTests.cs | S2两API独立连接/真实激活 | PARTIAL：存储幂等恢复不重验Active，提交核实际请求原件；真实激活/双API待验 |
-| AC-06 | RQ-01消歧，见C1 | 同scope两候选→选择合法IRI成功；撤权/版本漂移/未知IRI→403/409/422且无候选泄露，不取第一条 | Q/G4QueryExecution.cs；OntologyPlatform.QueryTests/G4QueryTests.cs；apps/web/src/features/semantic/g4-query.test.ts | S2源真实同号及权限变化 | NOT_RUN |
-| AC-07 | 来源闭合与精度，见C2 | 行→evidence→receipt→原发布/原目录/当前目录/连接版本可核；无源键→DATASET/PARTIAL；悬空ID→503，UNKNOWN不当确定事实 | Q/G4SourceEvidenceService.cs、N/Adapters/PgQueryReader.cs；OntologyPlatform.QueryTests/G4QueryPersistenceTests.cs | S1首receipt即验证；S2降级反例 | PARTIAL：正式源→API证据链已核，S2精度降级反例待验 |
-| AC-08 | 结果恢复与保留，见C3/C4 | 新DI回读hash一致、刷新不增加源read计数；24h到期410、错主体404、历史撤权403；不自动重执行 | Q/G4QueryResultStore.cs、G4QueryWorker.cs；OntologyPlatform.QueryTests/G4QueryPersistenceTests.cs；UI g4-query.test.ts | S1存储→新上下文→浏览器；S2可控时钟过期 | PARTIAL：HTTP原字节/幂等与UI刷新无源重放通过；合成key ring临时卷导致进程重启恢复失败，已修复待真实复验 |
-| AC-09 | 预算/取消/原子审计，见D | 两实例租约容量/fence生效；取消先提交或审计故障→无COMPLETED；大值物化前拒绝；SQL/URL不能进入计划 | Q/G4QueryWorker.cs、N/Adapters/PgQueryReader.cs；OntologyPlatform.QueryTests/G4QueryRaceTests.cs；OntologyPlatform.ConnectionsTests/G4QuerySourceTests.cs | S2真实PG事务/两API | NOT_RUN |
-| AC-10 | 关系/观测及共同UI/MCP，见A/B/E | 发布关系两端有权、精确观测按同Gateway返回；无权端点/未开放ontology拒绝；MCP不用LLM | A/SemanticMcpTools.cs、Q/G4QueryExecution.cs；OntologyPlatform.AgentTests/G4QueryMcpTests.cs；UI g4-query.test.ts | S3真实受控MCP/浏览器/源PG | NOT_RUN |
-| AC-11 | G2冻结兼容，见B1 | 旧查询和旧Run按原DTO读取；当前撤权拒绝；G4不转换假图 | A/ExecutionRunService.cs；OntologyPlatform.QueryTests/QueryHttpTests.cs；OntologyPlatform.AgentTests/RunFlowTests.cs；OntologyPlatform.G2ContractTests/WireContractTests.cs | S3影响范围内真实回归，其他证据按输入复用 | NOT_RUN |
-| AC-12 | 当前任务准入/证据/资源，见E/F | 当前TaskId正式消费者有效才执行；未知Task/空流/ANSI/禁入路径/错误报告不得PASS；总占用未知即不启栈 | scripts/maintenance/workflow_m4_query.py；scripts/tests/WorkflowQuery.Tests.py；verification-gates.json | 实施准入及S1第一原件→公开资格→小样预检 | PARTIAL：准入5测试及本任务runtime已运行；公开原件扫描通过，最终当前输入绑定/包门禁未完成 |
+| AC-01 | RQ-02判别与精确值，见B | 给定P1–P3；读出并PG往返→decimal/Int64/微秒逐字一致；N1–N6/N10/N12拒绝，不补猜 | C/G4QueryModels.cs、G4QueryRules.cs；OntologyPlatform.G2ContractTests/G4QueryWireTests.cs；OntologyPlatform.QueryTests/G4QueryPersistenceTests.cs | S1正式序列化+真实PG新DbContext；无float中转 | PASS：24合同、真实PG精确值与规范字节恢复；当前原件见最终索引 |
+| AC-02 | 唯一Gateway真实PG链，见A | 给定正式本体和active；HTTP query→实际源值/receipt；只有M3评估可用或未知capability→拒绝 | Q/SemanticGateway.cs、N/Adapters/PgQueryReader.cs；scripts/maintenance/workflow-m4-query.mjs | S1正式DI/OIDC/TLS只读PG | PASS：正式DI/OIDC/TLS PG与唯一Gateway真实查询43检查 |
+| AC-03 | 六态区别，见C1 | 完整零行→EMPTY，有行→FOUND；断源/超时零行→UNAVAILABLE；截断有可信前缀→PARTIAL；可见snapshot全分支拒绝→UNAUTHORIZED；两可见候选→AMBIGUOUS | Q/G4QueryExecution.cs；OntologyPlatform.QueryTests/G4QueryTests.cs；OntologyPlatform.ConnectionsTests/G4QuerySourceTests.cs | S1 FOUND；S2其他状态及真实故障 | PASS：六态、完整零行、真实源故障、降级与截断见S2/S3报告 |
+| AC-04 | 当前授权/迟到响应，见C/D | 有grant执行与恢复成功；撤权/注销/连接禁用/secret轮换→无成功披露，UI清屏且迟到响应失效；根无权401/403无snapshot；外部IdP直接禁用即时传播按D已接受限制，不冒充已覆盖 | G/QueryAuthorizationParticipant.cs、H/G4/QueryEndpoints.cs；OntologyPlatform.SecurityTests/G4QueryAuthorizationTests.cs；apps/web/src/features/semantic/g4-query.test.ts | S2真实票据/PG grant+浏览器 | PASS（D已接受限制）：当前三种授权、执行中撤权、连接变更及真实浏览器迟到响应；外部IdP即时传播不作通过声明 |
+| AC-05 | 固定发布与ABA，见C2 | active固定执行成功；A→B→A发生于运行中→409无成功结果；已提交历史A在当前有权时仍回读A | N/Application/QueryBindingReader.cs、Q/G4QueryResultStore.cs；OntologyPlatform.QueryTests/G4QueryRaceTests.cs | S2两API独立连接/真实激活 | PASS：真实ABA、双API取消与固定版本历史回读；提交原子绑定拒绝在途漂移 |
+| AC-06 | RQ-01消歧，见C1 | 同scope两候选→选择合法IRI成功；撤权/版本漂移/未知IRI→403/409/422且无候选泄露，不取第一条 | Q/G4QueryExecution.cs；OntologyPlatform.QueryTests/G4QueryTests.cs；apps/web/src/features/semantic/g4-query.test.ts | S2源真实同号及权限变化 | PASS：S2 basic47，真实同号消歧、选择与拒绝 |
+| AC-07 | 来源闭合与精度，见C2 | 行→evidence→receipt→原发布/原目录/当前目录/连接版本可核；无源键→DATASET/PARTIAL；悬空ID→503，UNKNOWN不当确定事实 | Q/G4SourceEvidenceService.cs、N/Adapters/PgQueryReader.cs；OntologyPlatform.QueryTests/G4QueryPersistenceTests.cs | S1首receipt即验证；S2降级反例 | PASS：源键/精确值/证据receipt闭合，S3降级与截断恢复 |
+| AC-08 | 结果恢复与保留，见C3/C4 | 新DI回读hash一致、刷新不增加源read计数；24h到期410、错主体404、历史撤权403；不自动重执行 | Q/G4QueryResultStore.cs、G4QueryWorker.cs；OntologyPlatform.QueryTests/G4QueryPersistenceTests.cs；UI g4-query.test.ts | S1存储→新上下文→浏览器；S2可控时钟过期 | PASS：真实API停启同queryId/hash18检查，UI刷新无源重放；隔离PG保留期与当前权限 |
+| AC-09 | 预算/取消/原子审计，见D | 两实例租约容量/fence生效；取消先提交或审计故障→无COMPLETED；大值物化前拒绝；SQL/URL不能进入计划 | Q/G4QueryWorker.cs、N/Adapters/PgQueryReader.cs；OntologyPlatform.QueryTests/G4QueryRaceTests.cs；OntologyPlatform.ConnectionsTests/G4QuerySourceTests.cs | S2真实PG事务/两API | PASS：真实双API容量/取消、隔离PG事务与审计回滚；源行数/1MiB完整项前缀预算 |
+| AC-10 | 关系/观测及共同UI/MCP，见A/B/E | 发布关系两端有权、精确观测按同Gateway返回；无权端点/未开放ontology拒绝；MCP不用LLM | A/SemanticMcpTools.cs、Q/G4QueryExecution.cs；OntologyPlatform.AgentTests/G4QueryMcpTests.cs；UI g4-query.test.ts | S3真实受控MCP/浏览器/源PG | PASS：S3真实PG/HTTP/MCP84检查，观测/关系浏览器19检查，共同Gateway |
+| AC-11 | G2冻结兼容，见B1 | 旧查询和旧Run按原DTO读取；当前撤权拒绝；G4不转换假图 | A/ExecutionRunService.cs；OntologyPlatform.QueryTests/QueryHttpTests.cs；OntologyPlatform.AgentTests/RunFlowTests.cs；OntologyPlatform.G2ContractTests/WireContractTests.cs | S3影响范围内真实回归，其他证据按输入复用 | PASS（影响范围）：冻结wire和真实旧MCP工具；实际MAF Run与在途绑定测试1/0skip，未声称重跑整个历史G2/M3链 |
+| AC-12 | 当前任务准入/证据/资源，见E/F | 当前TaskId正式消费者有效才执行；未知Task/空流/ANSI/禁入路径/错误报告不得PASS；总占用未知即不启栈 | scripts/maintenance/workflow_m4_query.py；scripts/tests/WorkflowQuery.Tests.py；verification-gates.json | 实施准入及S1第一原件→公开资格→小样预检 | PARTIAL：当前产品输入资格通过；旧基线8格式/链接错误阻断全仓门禁，最终ZIP重开和包外回执为后置原件 |
 
 ## Plan：最早真实风险路径
 
@@ -41,8 +41,8 @@
 | 切片 | 对应AC与可验证成果 | 路径/Owner | 必要正反验证 | 当前状态 |
 |---|---|---|---|---|
 | S1 | AC01/02/07/08/12，真实值→持久→新上下文→刷新 | A–F F1 Master单写 | 精确值/receipt闭合/无源二次执行；首证据归档资格 | PASS：正式源/持久/新上下文/UI刷新及修复后的进程恢复已贯通；原件与失败见Verify |
-| S2 | AC03–09，高风险权限/版本/取消 | 同上；非作者早期只读Review | 六态、消歧、ABA、撤权、审计失败、跨实例fence、保留期 | IMPLEMENTING：真实HTTP消歧/选择/EMPTY/注入参数/完成后取消47检查通过；其他竞态待验 |
-| S3 | AC10/11及剩余覆盖、最终交付 | 同上 | 关系/观测/UI/MCP同服务、G2历史兼容、最终按影响验收 | NOT_RUN |
+| S2 | AC03–09，高风险权限/版本/取消 | 同上；非作者早期只读Review | 六态、消歧、ABA、撤权、审计失败、跨实例fence、保留期 | PASS：当前S2真实授权/六态/ABA/容量/取消/保留期覆盖完成 |
+| S3 | AC10/11及剩余覆盖、最终交付 | 同上 | 关系/观测/UI/MCP同服务、G2历史兼容、最终按影响验收 | PASS：关系/观测/共同UI-MCP完成；总体交付PARTIAL见最终记录 |
 
 ## Verify与恢复
 
@@ -127,3 +127,17 @@ S3持续实施增量：实际双实体映射发布/激活已完成，旧单实�
 
 
 最终输入收敛：非作者已核真实MAF原件49ea3162054e4e349abd03d8fa2578e1（1/0skip）、Run到期审计d0e07f8b8465450b88cdb6e51e73864c（4/0skip）及S3报告browser-s3-1794668619566（77检查），关闭先前排序/共享Run/到期审计三项P2。新增根观测截断分支limited遗漏已修，真实HTTP负例加入当前驱动，尚待当前输入运行。执行中连接变更已真实触发旧绑定失效，随后ABA首查询409 query_binding_stale符合旧绑定语义；失败原件browser-s2-aba-1794669144326保留，需正式重新发布后再验证，不伪造绑定恢复。当前扩展F1任务报告适配，新增qualify从实际执行封存的输入和原件重开，9项Python准入/漂移拒绝检查通过；所有最终资格仍待完整实际运行。
+
+### 最终产品验证与交付裁决（2026-11-15）
+
+上述实施恢复记录按发生时原样保留；其中“待验/未完成/无ZIP”描述对应当时，不替代本卡顶部唯一状态与本段最终结果。S1、S2、S3本地产品覆盖完成。[最终schema2证据](../evidence/G4-M4-QUERY-001/query-impl-01/final-validation.json)、[最终原件索引](../evidence/G4-M4-QUERY-001/query-impl-01/final-validation-originals-index.json)关联每项命令、真实exit、输入资格与报告；[实际截图选择](../evidence/G4-M4-QUERY-001/review-screenshots.json)保留四张暗色桌面/移动画面。HTTP/UI真实用例实现位置为 scripts/maintenance/workflow-m4-query.mjs；表内G4QueryHttpTests为原计划位置，实际驱动以此为准。没有第二套规格。
+
+最终覆盖包括合同24、后端21（含真实隔离PG及MAF）、Web单测10；S1 HTTP43、实际API停启后原结果18，S2 basic47/runtime53/race34/capacity26/inflight23/ABA91/connection49，S3 HTTP/MCP84，UI S1为30、UI S3为19。浏览器检查存在交叠，不合并冒充独立测试总数。最终工程汇总使用正式20秒有界诊断模式读取新原件并运行短工程回归，旧资格失败守卫和失败原件保留；不声称完整SelfTest通过。所有最终产品资格均严格核当前输入与原始回执；中途工程输入变化后重新执行，未改写旧封套。CI、其他平台与历史全链NOT_RUN。
+
+最终受影响工程验收发现M4共享MappingAuthorizationParticipant实例注册与旧结构检查不兼容，Master单写最小修复 workflow_m3_mapping.py 和 WorkflowMapping.Tests.py（纳入本轮兼容修复owned_paths）；16静态正反例通过，不运行M3产品。准入检查仍要求真实concrete注册及精确工厂，拒绝缺注册/错误实现。全仓格式/完整SelfTest仍因Base不变的8项M3格式链接错误阻断，故总体PARTIAL，不修改历史原件、不放宽门禁。
+
+后续定位保留：正式目录版本漂移409需真实重新发现/映射；旧单表合成grant仍授权根节点导致撤权反例失败，已按准确ID隔离旧grant；S3根截断回执用实体evidenceId定位，不能假设subSources[0]。原失败、修正与再验均保留。测试串库事故及删除的旧query不复造；后续所有时钟/清扫测试仅准确所有权临时库，非空运行库前后保护及新结果恢复通过。
+
+非作者已复核并关闭源排序/根截断、实际MAF、过期审计、测试隔离及构建输入闭包问题；唯一最终V3与非作者独立重开在最终提交后生成，准确完整Head、ZIP SHA256和后置命令以包外回执为准。接受的D限制仅合成外部IdP禁用不即时传播，不能扩大为生产保证。
+
+本任务7个长期容器、原生Web进程及结果密钥/数据卷KEEP，原因是未集成审查与加密结果恢复；结束审查、确认唯一数据/证据与引用已保全后方可按准确ID回收。当前短命测试容器0；合计容器预算11.75GiB/11.5CPU，能源策略POLICY_READY；另有30秒有界监测7次锁屏且外接屏熄灭心跳、实测窗口无Sleep事件；完整会话连续性仍NOT_VERIFIED。测试终态禁用连接保持禁用。旧KEEP资源不移交不清理；不更新main、不恢复TDengine、不进入M5。
