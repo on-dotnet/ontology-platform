@@ -180,6 +180,24 @@ public interface IReleaseArtifactStore
 /// <summary>REST、MCP和MAF共同调用的唯一受控语义网关。</summary>
 public interface ISemanticGateway
 {
+    /// <summary>通过同一网关执行已登记G4能力，服务器会话引用不能由客户端提供。</summary>
+    Task<G4QueryDelivery> ExecuteG4Async(ActorContext actor, string sessionReference, G4SemanticQuery query,
+        string idempotencyKey, string? selectionQueryId, CancellationToken cancellationToken) =>
+        throw new SemanticOperationException(422, "capability_not_supported");
+
+    /// <summary>在当前授权下读取本人执行状态或原规范结果，不重放业务源查询。</summary>
+    Task<G4QueryDelivery> ReadG4Async(ActorContext actor, string sessionReference, string queryId,
+        bool includeResult, CancellationToken cancellationToken) =>
+        throw new SemanticOperationException(422, "capability_not_supported");
+
+    /// <summary>以当前权限取消本人尚未终结执行，原子取消成功后才返回。</summary>
+    Task<G4QueryView> CancelG4Async(ActorContext actor, string sessionReference, string queryId,
+        CancellationToken cancellationToken) => throw new SemanticOperationException(422, "capability_not_supported");
+
+    /// <summary>以当前结果及额外证据许可打开真实来源安全视图，不披露内部绑定。</summary>
+    Task<G4SourceEvidenceView> ReadG4EvidenceAsync(ActorContext actor, string sessionReference, string evidenceId,
+        CancellationToken cancellationToken) => throw new SemanticOperationException(422, "capability_not_supported");
+
     /// <summary>按可信身份、固定发布、真实关系及预算执行登记能力。</summary>
     /// <param name="actor">可信服务器身份。</param>
     /// <param name="plan">有限语义计划。</param>

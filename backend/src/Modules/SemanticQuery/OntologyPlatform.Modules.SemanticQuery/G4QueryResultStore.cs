@@ -181,6 +181,32 @@ public sealed class G4QueryResultStore
             ?? throw new SemanticOperationException(404, "query_not_found");
     }
 
+    /// <summary>只在当前主体组织域查幂等引用，识别旧执行后不得重新访问业务源。</summary>
+    public async Task<G4QueryRecord?> FindKeyAsync(ActorContext actor, string key, CancellationToken token)
+    {
+        // 准入事务仍负责最终去重，此查询只是恢复路径的提前分流。
+        await using var database = await factory.CreateDbContextAsync(token);
+        return await database.Queries.AsNoTracking().SingleOrDefaultAsync(row => row.OrganizationId == actor.OrganizationId
+            && row.SubjectId == actor.SubjectId && row.IdempotencyKey == key, token);
+    }
+
+    /// <summary>恢复已保存的原请求；调用方必须先判本人查询与24小时期限。</summary>
+    public static G4SemanticQuery ReadRequest(G4QueryRecord record)
+    {
+        try
+        {
+            if (record.RequestHash != G4QueryCanonical.Hash(record.RequestBytes)) throw new SemanticOperationException(503, "query_result_invalid");
+            // 原件中的选择上下文也参与请求验证，不能拆掉header含义后继续执行。
+            using var document = JsonDocument.Parse(record.RequestBytes);
+            return G4QueryRules.ReadQuery(System.Text.Encoding.UTF8.GetBytes(document.RootElement.GetProperty("query").GetRawText()),
+                document.RootElement.GetProperty("selectionQueryId").GetString());
+        }
+        catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException)
+        {
+            throw new SemanticOperationException(503, "query_result_invalid");
+        }
+    }
+
     /// <summary>取消与成功争同一查询行；当前权限验证失败或审计失败均不提交取消。</summary>
     public async Task<G4QueryRecord> CancelAsync(string queryId, MappingAuthorizationProof session, MappingAuthorizationProof[] proofs, CancellationToken token)
     {
@@ -217,6 +243,75 @@ public sealed class G4QueryResultStore
         return record;
     }
 
+    /// <summary>当前完整execute及读取许可通过后，在同事务记录读取审计并返回原规范字节。</summary>
+    public async Task<G4QueryDelivery> ReadAuthorizedAsync(string queryId, MappingAuthorizationProof session,
+        MappingAuthorizationProof[] executeProofs, MappingAuthorizationProof[] readProofs, MappingAuthorizationProof[] evidenceProofs,
+        G4QueryConnectionAccess[] sourceAccess, bool includeResult, bool evidenceRead, CancellationToken token)
+    {
+        // 当前身份只来自服务器会话，源ACL和正式根快照须由Gateway在此调用前重验。
+        await using var database = await factory.CreateDbContextAsync(token);
+        // 授权检查和读取审计的线性化点在同一个短平台事务中。
+        await using var transaction = await database.Database.BeginTransactionAsync(token);
+        await DemandAsync(database, session, executeProofs, token);
+        // 所有者先过滤，其他用户不会获知查询状态、散列或到期时间。
+        var record = await database.Queries.AsNoTracking().SingleOrDefaultAsync(row => row.Id == queryId
+            && row.OrganizationId == session.Actor.OrganizationId && row.SubjectId == session.Actor.SubjectId, token)
+            ?? throw new SemanticOperationException(404, "query_not_found");
+        // 先验证安全元数据的当前投影，再允许解密任何业务值。
+        var state = ReadState(record);
+        // 零数据拒绝结果在恢复时也不因创建时的session-only获得默认数据许可。
+        var projections = state.Projections.Length == 0 ? state.RequiredProjections : state.Projections;
+        if (projections.Length == 0) throw new SemanticOperationException(403, "query_forbidden");
+        // 历史授权epoch可变化，但保存的连接和完整字段集合不能变化。
+        var current = state with { Projections = projections, Binding = state.Binding with { AuthorizationEpoch = session.AuthorizationEpoch.ToString(CultureInfo.InvariantCulture) } };
+        DemandProofSet(current, session, executeProofs);
+        DemandReadProofSet(current, session, readProofs, "data.query.result.read");
+        if (evidenceRead) DemandReadProofSet(current, session, evidenceProofs, "data.query.evidence.read");
+        foreach (var proof in readProofs.Concat(evidenceRead ? evidenceProofs : []))
+            await authority.DemandInTransactionAsync(proof, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
+        if (sourceAccess.Length != projections.Length || sourceAccess.Any(access => access.ConnectionId != state.Binding.ConnectionId
+            || access.Scope.OrganizationId != state.Scope.OrganizationId || !access.Scope.SiteIds.Order(StringComparer.Ordinal).SequenceEqual(state.Scope.SiteIds.Order(StringComparer.Ordinal))))
+            throw new SemanticOperationException(503, "query_source_access_unverified");
+        foreach (var projection in projections)
+            if (!sourceAccess.Any(access => access.Projection.ObjectRefs.Order(StringComparer.Ordinal).SequenceEqual(projection.ObjectRefs.Order(StringComparer.Ordinal))
+                && access.Projection.FieldRefs.Order(StringComparer.Ordinal).SequenceEqual(projection.FieldRefs.Order(StringComparer.Ordinal))))
+                throw new SemanticOperationException(503, "query_source_access_unverified");
+        foreach (var access in sourceAccess)
+            await bindings.VerifyHistoricalAccessInTransactionAsync(session.Actor, access, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
+        if (record.ExpiresAtUtc <= clock.GetUtcNow()) throw new SemanticOperationException(410, "result_expired");
+        if (includeResult && record.ExecutionStatus is "CANCELLED" or "FAILED") throw new SemanticOperationException(409, "query_already_finished");
+        // 只有COMPLETED才有可恢复结果，RUNNING返回QueryView而不是第七业务态。
+        byte[]? bytes = null;
+        if (includeResult && record.ExecutionStatus == "COMPLETED")
+        {
+            bytes = Unprotect(protection, record.Id, record.ResultCiphertext, record.ResultHash ?? string.Empty);
+            // 恢复时再次校验回执、保存版本及证据闭合，不能只信认证密文本身。
+            var result = G4QueryRules.ReadResult(bytes);
+            G4SourceEvidenceService.BindReceipts(record.Id, state, result, state.Receipts);
+        }
+        await audit.WriteAsync(session.Actor, new AuditCommand { Action = evidenceRead ? "data.query.evidence.read" : "data.query.read",
+            Resource = record.Id, Outcome = "allowed", Scope = state.Scope }, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
+        if (record.ExpiresAtUtc <= clock.GetUtcNow()) throw new SemanticOperationException(410, "result_expired");
+        await transaction.CommitAsync(token);
+        return new G4QueryDelivery { View = View(record) with { ResultHash = record.ResultHash }, ResultBytes = bytes };
+    }
+
+    /// <summary>基础执行视图隐藏结果摘要；仅当前result.read事务通过后才另外填充摘要。</summary>
+    public static G4QueryView View(G4QueryRecord record) => new()
+    {
+        QueryId = record.Id, ExecutionStatus = record.ExecutionStatus, CreatedAtUtc = G4QueryExecution.Utc(record.CreatedAtUtc),
+        CompletedAtUtc = record.CompletedAtUtc is null ? null : G4QueryExecution.Utc(record.CompletedAtUtc.Value),
+        ExpiresAtUtc = G4QueryExecution.Utc(record.ExpiresAtUtc), ResultHash = null, ErrorCode = record.ErrorCode
+    };
+
+    /// <summary>读取许可与execute分别命中完整grant，不跨许可或跨grant拼接字段。</summary>
+    private static void DemandReadProofSet(G4QueryState state, MappingAuthorizationProof session, MappingAuthorizationProof[] proofs, string permission)
+    {
+        if (proofs.Any(proof => proof.Permission != permission)) throw new SemanticOperationException(403, "query_forbidden");
+        // 仅复用集合一致性检查；真实许可仍由原permission逐项参与数据库事务校验。
+        DemandProofSet(state, session, proofs.Select(proof => proof with { Permission = "data.query.execute" }).ToArray());
+    }
+
     /// <summary>拒绝畸形安全元数据，不向上层传出框架异常或部分反序列化对象。</summary>
     public static G4QueryState ReadState(G4QueryRecord record)
     {
@@ -229,6 +324,78 @@ public sealed class G4QueryResultStore
         {
             throw new SemanticOperationException(503, "query_result_invalid");
         }
+    }
+
+    /// <summary>按准确ID终结失联执行与删除到期材料；接管只写FAILED，绝不重新执行源。</summary>
+    public async Task<int> SweepAsync(CancellationToken token)
+    {
+        // 有界候选扫描，不持长事务，不执行任何外部源操作。
+        await using var scan = await factory.CreateDbContextAsync(token);
+        // 记录统一扫描时刻，具体删除前仍在锁内重新比较实际时间。
+        var now = clock.GetUtcNow();
+        // 七天安全元数据保留期独立于二十四小时结果保留期。
+        var retention = now.AddDays(-7);
+        // 只取确实仍有待处理数据的行，已清空结果不占据下一页候选。
+        var ids = await scan.Queries.AsNoTracking().Where(row => row.CreatedAtUtc <= retention
+            || row.ExpiresAtUtc <= now && (row.ResultCiphertext.Length > 0 || row.RequestBytes.Length > 0)
+            || row.ExecutionStatus == "RUNNING" && (row.LeaseUntilUtc == null || row.LeaseUntilUtc <= now || row.DeadlineAtUtc <= now))
+            .OrderBy(row => row.CreatedAtUtc).Select(row => row.Id).Take(64).ToArrayAsync(token);
+        // 返回真正提交的修改数量，不把扫描到的候选当作删除成功。
+        var changed = 0;
+        foreach (var id in ids)
+        {
+            // 单行短事务避免大量到期材料阻断正常准入。
+            await using var database = await factory.CreateDbContextAsync(token);
+            // 只修改查询拥有的行；治理审计通过同物理事务参与者写入。
+            await using var transaction = await database.Database.BeginTransactionAsync(token);
+            await LockCapacityAsync(database, token);
+            // 多worker可能已清除此准确ID，不将不存在视为错误或再次执行。
+            var rows = await database.Queries.FromSqlInterpolated($"SELECT * FROM semantic_query.\"Queries\" WHERE \"Id\" = {id} FOR UPDATE").ToArrayAsync(token);
+            if (rows.Length == 0) continue;
+            // 行锁取得后以当前实际状态判断，拒绝使用旧扫描副本删除。
+            var row = rows[0];
+            // 原scope只用于无值维护审计，不授予读取或解密业务结果。
+            var state = ReadState(row);
+            // 每次维护有独立可信关联身份，不复用已失效会话票据。
+            var trace = Guid.NewGuid().ToString("N");
+            // 后台过期是服务器维护事实，不冒充创建主体仍已登录。
+            var system = new ActorContext { SubjectId = "system.query.expiry", OrganizationId = row.OrganizationId,
+                SiteIds = state.Scope.SiteIds, Roles = [], TraceId = trace, CorrelationId = trace };
+            // 锁等待不能延长结果或执行寿命。
+            var current = clock.GetUtcNow();
+            // 固定审计操作决定是失联失败还是无值过期删除。
+            string action;
+            if (row.CreatedAtUtc <= current.AddDays(-7))
+            {
+                database.Queries.Remove(row);
+                action = "data.query.expire";
+            }
+            else if (row.ExpiresAtUtc <= current && (row.ResultCiphertext.Length > 0 || row.RequestBytes.Length > 0))
+            {
+                row.ResultCiphertext = [];
+                row.ResultSize = 0;
+                row.RequestBytes = [];
+                action = "data.query.expire";
+            }
+            else if (row.ExecutionStatus == "RUNNING" && (row.LeaseUntilUtc is null || row.LeaseUntilUtc <= current || row.DeadlineAtUtc <= current))
+            {
+                row.ExecutionStatus = "FAILED";
+                row.ErrorCode = "query_timeout";
+                row.CompletedAtUtc = current;
+                row.LeaseOwner = null;
+                row.LeaseUntilUtc = null;
+                row.Fence++;
+                action = "data.query.execute";
+            }
+            else continue;
+            await database.SaveChangesAsync(token);
+            await audit.WriteAsync(system, new AuditCommand { Action = action, Resource = row.Id,
+                Outcome = action == "data.query.execute" ? "failure" : "allowed", Scope = state.Scope },
+                database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
+            await transaction.CommitAsync(token);
+            changed++;
+        }
+        return changed;
     }
 
     /// <summary>同物理事务逐个重验完整授权，session-only永远不能代替字段授权。</summary>

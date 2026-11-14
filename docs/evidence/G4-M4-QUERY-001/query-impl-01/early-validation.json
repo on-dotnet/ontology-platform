@@ -35,6 +35,83 @@
       "status": "NOT_RUN",
       "exitCode": null,
       "output": "Query source execution, receipts, current authorization integration and browser recovery pending."
+    },
+    {
+      "name": "result-hash-authorization-red",
+      "command": "workflow_m4_query.unit_test(QueryTests,G4QueryTests)",
+      "status": "FAIL",
+      "exitCode": 2,
+      "output": "693f79cc92744a94b2d557d6e823a099: 6 tests, one precise negative failed; default execution view disclosed saved hash without result.read."
+    },
+    {
+      "name": "result-hash-authorization-green",
+      "command": "workflow_m4_query.unit_test(QueryTests,G4QueryTests)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "e3388d80c9ba489e8d6591d339fded5c: 6 passed, zero skipped. Nonauthor verified original bytes and closed P2; not full S1 review."
+    },
+    {
+      "name": "native-polymorphic-schema-red",
+      "command": "workflow_m4_query.unit_test(QueryTests,G4QueryTests)",
+      "status": "FAIL",
+      "exitCode": 2,
+      "output": "b146e57083f340d9a9b9651c650e3225: 7 tests, one failed. Early anyOf-to-oneOf conversion interrupted native child-schema traversal."
+    },
+    {
+      "name": "native-polymorphic-schema-green",
+      "command": "workflow_m4_query.unit_test(QueryTests,G4QueryTests)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "cf825cf73fad437f8bd286072c4fc443: 7 passed, zero skipped; current generated schema closure and unchanged G2 capability bytes verified."
+    },
+    {
+      "name": "current-result-read-and-retention",
+      "command": "workflow_m4_query.persistence_test",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "6e9570f1ba4f46d2a497c362a3bc2687: real PG 2 passed, zero skipped; forged/missing/revoked read proof denied without successful read audit, successful read exact bytes/hash, 24h/7d retention. Connections participant remains explicit test double; does not prove full historical source ACL."
+    },
+    {
+      "name": "runtime-compose-uid-red",
+      "command": "workflow_m4_query.runtime_start",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "ca519b00ea0f47ada22eaf70d4440ae9: YAML 1.1 interpreted UID:GID as sexagesimal integer. Exact before/after resource sets unchanged. Fixed explicit user string before retry."
+    },
+    {
+      "name": "S1-real-http-and-refresh",
+      "command": "workflow_m4_query.browser_test s1 / ui-s1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "43 HTTP checks and 30 browser checks; s1-http-raw-index.json and s1-review-s2-raw-index.json bind exact originals. Refresh source scan counts unchanged; actual cross-tab logout/switch rejects old response. Development inputs, not final TestedCommit."
+    },
+    {
+      "name": "S1-process-keyring-loss",
+      "command": "workflow_m4_query.browser_test s1-reopen",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "browser-s1-reopen-1794659494097: tmpfs keyring loss prevents old ciphertext recovery. Original query and failure retained."
+    },
+    {
+      "name": "S1-persistent-keyring-reopen",
+      "command": "workflow_m4_query.browser_test s1-reopen",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "browser-s1-reopen-1794659754883: 18 checks, actual restarted API restores a NEW query exact original hash with persistent task-specific private keyring. Does not recover historical lost-key records."
+    },
+    {
+      "name": "S2-selection-and-empty",
+      "command": "workflow_m4_query.browser_test s2-basic",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "47 checks: real PG ambiguity, selection closure, EMPTY, SQL-shaped parameter and completed cancellation. s1-review-s2-raw-index.json."
+    },
+    {
+      "name": "S2-cross-api-cancel-source-failure",
+      "command": "workflow_m4_query.browser_test s2-race",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "34 checks, current actual two API instances, cancel committed then late completion denied, source lock failure is UNAVAILABLE, lock release confirmed. s2-race-raw-index.json retains preceding failures. Remaining S2/S3 and final input binding incomplete."
     }
   ],
   "ci": {

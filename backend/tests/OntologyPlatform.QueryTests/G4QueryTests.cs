@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using OntologyPlatform.Modules.SemanticQuery;
 using OntologyPlatform.Contracts;
@@ -10,6 +11,43 @@ namespace OntologyPlatform.QueryTests;
 [TestClass]
 public sealed class G4QueryTests
 {
+    /// <summary>同一登记器保留旧能力，G4实际输出严格区分四态载荷和精确标量。</summary>
+    [TestMethod]
+    public void RegistryUsesGeneratedClosedG4SchemaWithoutChangingG2()
+    {
+        // 默认旧宿主不因新增查询能力改变能力文档或版本字节。
+        var legacy = new CapabilityRegistry().Read();
+        // 只有显式启用的查询宿主加载当前正式G4生成物。
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["G4:QueryEnabled"] = "true" }).Build();
+        // 相同生成输入跨实例必须产生相同能力版本。
+        var capabilities = new CapabilityRegistry(configuration).Read();
+        Assert.AreEqual(4, capabilities.Length);
+        CollectionAssert.AreEqual(legacy.Select(value => JsonSerializer.Serialize(value)).ToArray(),
+            capabilities.Where(value => !value.Id.StartsWith("g4_", StringComparison.Ordinal)).Select(value => JsonSerializer.Serialize(value)).ToArray());
+        // 真实输出闭包包含所有正式判别子类，而不是any或G2图数据。
+        var query = capabilities.Single(value => value.Id == "g4_resolve_entity");
+        Assert.AreEqual(query.Version, new CapabilityRegistry(configuration).Read().Single(value => value.Id == query.Id).Version);
+        // 组件名由原生OpenAPI导出稳定生成，不能在测试中构造替身Schema。
+        var definitions = query.OutputSchema.GetProperty("$defs");
+        Assert.AreEqual(4, definitions.GetProperty("G4QueryDatum").GetProperty("oneOf").GetArrayLength());
+        Assert.IsTrue(definitions.GetProperty("G4QueryDatumG4EntityDatum").GetProperty("required").EnumerateArray().Any(value => value.GetString() == "kind"));
+        Assert.AreEqual("string", definitions.GetProperty("G4QueryValueG4Int64Value").GetProperty("properties").GetProperty("lexical").GetProperty("type").GetString());
+        Assert.AreEqual("null", definitions.GetProperty("G4QueryValueG4NullValue").GetProperty("properties").GetProperty("lexical").GetProperty("type").GetString());
+        Assert.IsFalse(definitions.GetProperty("G4QueryResultV1").GetProperty("additionalProperties").GetBoolean());
+        Assert.AreEqual(6, definitions.GetProperty("G4QueryResultV1").GetProperty("properties").GetProperty("status").GetProperty("enum").GetArrayLength());
+    }
+
+    /// <summary>无结果读取授权的首次无数据响应不得通过执行视图泄露已保存结果摘要。</summary>
+    [TestMethod]
+    public void ExecutionViewDoesNotDisclosePersistedHash()
+    {
+        // 模拟已持久的无数据六态；仅有执行状态不构成result.read许可。
+        var record = new G4QueryRecord { Id = "query-no-read", ExecutionStatus = "COMPLETED", ResultHash = new string('a', 64),
+            CreatedAtUtc = DateTimeOffset.UtcNow, CompletedAtUtc = DateTimeOffset.UtcNow, ExpiresAtUtc = DateTimeOffset.UtcNow.AddHours(24) };
+        Assert.IsNull(G4QueryResultStore.View(record).ResultHash);
+        Assert.AreEqual(new string('a', 64), record.ResultHash);
+    }
+
     /// <summary>UTF8键顺序、控制符最小规则与精确字符串逐字节稳定。</summary>
     [TestMethod]
     public void CanonicalBytesPreservePreciseValuesAndUnicode()
@@ -84,6 +122,60 @@ public sealed class G4QueryTests
         // 一份完整认证的UNKNOWN回执也不能支撑ROW_KEY断言。
         var stored = new G4QueryStoredReceipt { Receipt = receipt, ReceiptHash = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(receipt)) };
         Assert.Throws<SemanticOperationException>(() => G4SourceEvidenceService.BindReceipts("query-1", state, result, [stored]));
+    }
+
+    /// <summary>同外部号不同厂区必须产生不同完整身份，原精确数值及业务时间不丢失。</summary>
+    [TestMethod]
+    public void TypedProjectionPreservesScopeAndPreciseSourceValues()
+    {
+        // 单元材料仅覆盖映射投影，正式发布身份由真实HTTP切片另证。
+        var dataset = new MappingDatasetRef { SnapshotId = "catalog-original", Schema = "production", Name = "fixture", Kind = "TABLE" };
+        // 此处字段名与序号显式登记，测试不拼自由SQL。
+        MappingFieldRef Field(string name, int ordinal) => new() { DatasetRef = dataset, Name = name, Ordinal = ordinal };
+        // 固定最小映射覆盖源scope、有效时间与精确decimal属性。
+        var mapping = new MappingDefinition
+        {
+            Entities = [new MappingEntityBinding { Id = "asset", EntityClassIri = "urn:fixture:Asset", DatasetRef = dataset,
+                IdentitySpecId = "identity", TemporalSpecId = "time", ScopeFields = new MappingScopeFields { Organization = Field("org",1), Site = Field("site",2) } }],
+            IdentitySpecs = [new MappingIdentitySpec { Id = "identity", OrganizationFieldRef = Field("org",1), SiteFieldRef = Field("site",2),
+                ExternalIdFieldRefs = [Field("id",3)], SourceNamespace = "fixture", ValidFromFieldRef = Field("from",4), ValidToFieldRef = Field("to",5) }],
+            TemporalSpecs = [new MappingTemporalSpec { Id = "time", EventTimeFieldRef = Field("from",4), ObservedAtFieldRef = null,
+                ValidFromFieldRef = Field("from",4), ValidToFieldRef = Field("to",5), TimezonePolicy = new MappingTimezonePolicy { Kind = "UTC", ZoneId = null }, Precision = "MICROSECOND" }],
+            Properties = [new MappingPropertyBinding { Id = "value", EntityBindingId = "asset", PropertyIri = "urn:fixture:value", FieldRef = Field("value",6), ConversionId = null, UnitSpecId = null, NullPolicy = "REJECT_NULL" }],
+            Relations = [], Conversions = [], UnitSpecs = []
+        };
+        // 全范围只用于本单元样本，不构造真实授权证明。
+        var scope = new ResourceScope { OrganizationId = "org-1", SiteIds = ["site-1", "site-2"] };
+        // 上游已验证材料在此明确是投影单元替身，禁止据此宣称真实发布通过。
+        var context = new G4QueryBindingContext { Binding = G4QueryRaceTests.Binding(1), Scope = scope, OriginalCatalog = null!, CurrentCatalog = null!,
+            Manifest = new MappingReleaseManifest { SchemaVersion = "g4.mapping.v1", MappingReleaseId = "mapping-1", MappingId = "mapping-root",
+                Scope = scope, OriginDraftId = "draft", OriginDraftRevision = 1, Binding = null!, Mapping = mapping, ReviewReceipt = null!, CreatedAtUtc = DateTimeOffset.UtcNow } };
+        // 字典中的值均来自正式精确标量类型，不允许任意对象或double混入。
+        var row = new Dictionary<string, G4QueryValue>
+        {
+            ["org"] = new G4StringValue { Lexical = "org-1" }, ["site"] = new G4StringValue { Lexical = "site-1" }, ["id"] = new G4StringValue { Lexical = "same" },
+            ["from"] = new G4UtcValue { Lexical = "2026-11-14T01:02:03.123456Z" },
+            ["to"] = new G4UtcValue { Lexical = "2026-11-15T01:02:03.123456Z" },
+            ["value"] = new G4DecimalValue { Lexical = "9007199254740993.20", Precision = 20, Scale = 2 }
+        };
+        // 第二厂同号是另一个真实身份，不能按externalId合并。
+        var second = new Dictionary<string, G4QueryValue>(row) { ["site"] = new G4StringValue { Lexical = "site-2" } };
+        // 水位明确标记为单元样本，真实PG测试另行提供实际pg_current_snapshot。
+        var read = new G4SourceQueryRead { EntityBindingId = "asset", Rows = [row,second], StartedAtUtc = DateTimeOffset.UtcNow,
+            CompletedAtUtc = DateTimeOffset.UtcNow, TransactionSnapshot = "fixture-only", Limited = false, Indeterminate = false,
+            RecordKeyFields = ["org","site","id","from"], QueryPlanHash = new string('e',64) };
+        // 实际投影代码必须给每个当前有权源行闭合证据。
+        var projected = G4QueryExecution.ProjectEntities("query-1", "trace-1", context, read);
+        Assert.HasCount(2, projected.Entities);
+        Assert.AreNotEqual(projected.Entities[0].EntityIri, projected.Entities[1].EntityIri);
+        Assert.AreEqual("9007199254740993.20", projected.Entities[0].Properties[0].Value.Lexical);
+        Assert.AreEqual("2026-11-14T01:02:03.123456Z", projected.Entities[0].Identity.EffectiveTime!.From.Lexical);
+        Assert.IsTrue(projected.Evidence.All(item => item.Precision == "ROW_KEY" && item.SourceRecordRef is not null));
+        Assert.IsNull(projected.Receipt.Receipt.SourceRecordRef, "多行回执不能伪造一个总行键。");
+        Assert.Throws<SemanticOperationException>(() => G4QueryExecution.ProjectEntities("query-2", "trace-1", context, read with { Rows = [row,row] }));
+        // 缺主键时保留实际数据集证据，不升级为记录定位。
+        var degraded = G4QueryExecution.ProjectEntities("query-3", "trace-1", context, read with { RecordKeyFields = [] });
+        Assert.IsTrue(degraded.Evidence.All(item => item.Precision == "DATASET" && item.SourceRecordRef is null));
     }
 
     /// <summary>事务测试构造闭合回执；来源适配器真实回执必须由执行器按源事实另建。</summary>

@@ -27,6 +27,70 @@ public sealed class PgQueryReader : IG4PgQueryReader
         this.clock = clock;
     }
 
+    /// <summary>历史恢复只读取系统目录和当前ACL，不执行SELECT业务表或产生新readReceipt。</summary>
+    public async Task VerifyAccessAsync(PgConnectionProfile profile, string secret, G4QueryBindingContext context,
+        string entityBindingId, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken)
+    {
+        // 与执行分支同样预留平台授权和回传时间，绝不另起五秒源预算。
+        var remaining = deadlineAtUtc - clock.GetUtcNow() - TimeSpan.FromMilliseconds(500);
+        if (remaining <= TimeSpan.Zero) throw new SemanticOperationException(503, "query_source_budget_exhausted");
+        // 当前ACL检查最多一秒且响应宿主取消。
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        budget.CancelAfter(remaining < TimeSpan.FromSeconds(1) ? remaining : TimeSpan.FromSeconds(1));
+        if (profile.Host != "pg-source" || profile.Port != 5432 || profile.Database != "fixture" || profile.Username != "fixture_reader"
+            || profile.SslMode != "VerifyFull" || !profile.AllowedSchemas.SequenceEqual(schemas) || string.IsNullOrEmpty(secret))
+            throw new SemanticOperationException(403, "query_source_forbidden");
+        // 原保存字段依赖仍从已验manifest产生，不能用自由字段名试探权限。
+        var entity = context.Manifest.Mapping.Entities.SingleOrDefault(item => item.Id == entityBindingId) ?? throw Invalid();
+        // 完整范围、身份、时间和属性列都需要当前SELECT权限。
+        var references = Fields(context.Manifest.Mapping, entity).Distinct().ToArray();
+        // 历史字段类型来自原目录，不要求重新激活历史版本。
+        var original = context.OriginalCatalog.Objects.SingleOrDefault(item => item.Schema == entity.DatasetRef.Schema && item.Name == entity.DatasetRef.Name && item.Kind == "TABLE") ?? throw Invalid();
+        try
+        {
+            // 仅使用当前精确账号及固定TLS根，不把秘密写入计划或日志。
+            var settings = new NpgsqlConnectionStringBuilder { Host = "pg-source", Port = 5432, Database = "fixture", Username = "fixture_reader", Password = secret,
+                SslMode = SslMode.VerifyFull, RootCertificate = certificate, Pooling = false, Timeout = 1, CommandTimeout = 1,
+                CancellationTimeout = 250, SearchPath = "pg_catalog", IncludeErrorDetail = false, LogParameters = false, GssEncryptionMode = GssEncryptionMode.Disable };
+            await using var connection = new NpgsqlConnection(settings.ConnectionString);
+            await connection.OpenAsync(budget.Token);
+            await using var transaction = await connection.BeginTransactionAsync(System.Data.IsolationLevel.RepeatableRead, budget.Token);
+            await using (var readOnly = new NpgsqlCommand("SET TRANSACTION READ ONLY; SET LOCAL statement_timeout = '1s'; SET LOCAL lock_timeout = '500ms'", connection, transaction))
+                await readOnly.ExecuteNonQueryAsync(budget.Token);
+            await using (var security = new NpgsqlCommand(ReadOnlySql, connection, transaction))
+                if (await security.ExecuteScalarAsync(budget.Token) is not true) throw new SemanticOperationException(403, "query_source_forbidden");
+            // 只查系统目录；不以当前业务行重建历史结果。
+            var catalog = await ReadCatalogAsync(connection, transaction, schemas, budget.Token);
+            // 当前字段仍须是原保存类型与序号，移除或换类型时不能披露旧值。
+            var table = catalog.SingleOrDefault(item => item.Schema == original.Schema && item.Name == original.Name && item.Kind == "TABLE") ?? throw Invalid();
+            foreach (var reference in references)
+            {
+                // 原目录已登记的精确列身份，不能只按同名列接受类型替换。
+                var field = original.Fields.SingleOrDefault(item => item.Ordinal == reference.Ordinal && item.Name == reference.Name) ?? throw Invalid();
+                if (reference.DatasetRef != entity.DatasetRef || table.Fields.SingleOrDefault(item => item.Ordinal == reference.Ordinal && item.Name == reference.Name) != field)
+                    throw new SemanticOperationException(503, "query_source_access_unverified");
+            }
+            // 权限函数逐列检查，支持合法列级SELECT；不通过读取业务行来试探ACL。
+            await using var access = new NpgsqlCommand("""
+                SELECT c.relkind = 'r' AND NOT c.relrowsecurity AND NOT c.relforcerowsecurity
+                    AND NOT c.relhassubclass AND NOT c.relhasrules AND has_schema_privilege(n.oid, 'USAGE')
+                    AND NOT EXISTS (SELECT 1 FROM unnest(@columns::text[]) AS requested(name)
+                        WHERE NOT has_column_privilege(c.oid, requested.name, 'SELECT'))
+                FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+                WHERE n.nspname = @schema AND c.relname = @name
+                """, connection, transaction);
+            access.Parameters.AddWithValue("schema", table.Schema);
+            access.Parameters.AddWithValue("name", table.Name);
+            access.Parameters.AddWithValue("columns", references.Select(item => item.Name).Distinct(StringComparer.Ordinal).ToArray());
+            if (await access.ExecuteScalarAsync(budget.Token) is not true) throw new SemanticOperationException(403, "query_source_forbidden");
+            await transaction.CommitAsync(budget.Token);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
+        catch (PostgresException error) when (error.SqlState == "42501") { throw new SemanticOperationException(403, "query_source_forbidden"); }
+        catch (Exception error) when (error is OperationCanceledException or NpgsqlException or PgSourceException)
+        { throw new SemanticOperationException(503, "query_source_access_unverified"); }
+    }
+
     /// <summary>同一分支的目录、ACL和实际行读取共用独立只读快照，绝不复用失败事务。</summary>
     public async Task<G4SourceQueryRead> ReadAsync(PgConnectionProfile profile, string secret, G4QueryBindingContext context,
         string entityBindingId, G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken)

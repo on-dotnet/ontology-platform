@@ -49,6 +49,114 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
         };
     }
 
+    /// <summary>恢复只使用当前账号核权限，旧secretVersion只留作历史身份，不解密旧秘密。</summary>
+    public async Task<G4QueryConnectionAccess> VerifyAccessAsync(G4QueryBindingContext context, MappingAuthorizationProof proof, string entityBindingId,
+        DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken)
+    {
+        // 原保存投影与本次证明必须完整相同，禁止用少字段grant解密完整历史结果。
+        var projection = DescribeProjection(context, entityBindingId);
+        if (proof.Permission != "data.query.execute" || proof.ConnectionId != context.Binding.ConnectionId
+            || proof.Scope.OrganizationId != context.Scope.OrganizationId
+            || !proof.Scope.SiteIds.Order(StringComparer.Ordinal).SequenceEqual(context.Scope.SiteIds.Order(StringComparer.Ordinal))
+            || !proof.ObjectRefs.Order(StringComparer.Ordinal).SequenceEqual(projection.ObjectRefs)
+            || !proof.FieldRefs.Order(StringComparer.Ordinal).SequenceEqual(projection.FieldRefs)) throw Forbidden();
+        await authority.CaptureAsync(proof, cancellationToken);
+        // 当前连接及当前秘密只由Connections模块读取，不把凭据传回查询模块。
+        await using var database = await factory.CreateDbContextAsync(cancellationToken);
+        // 历史Active可变，当前连接仍须开启且完整覆盖保存范围。
+        var connection = await database.Connections.AsNoTracking().SingleOrDefaultAsync(row => row.Id == context.Binding.ConnectionId
+            && row.OrganizationId == context.Scope.OrganizationId, cancellationToken) ?? throw Forbidden();
+        if (connection.State != "ACTIVE" || !context.Scope.SiteIds.All(connection.SiteIds.Contains)) throw Forbidden();
+        // 使用当前配置，不要求历史配置版本被重新启用。
+        var config = ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson) as PgConnectionConfig ?? throw Forbidden();
+        // AAD的完整归属、用途及版本仍必须与当前连接一致。
+        var secret = await database.ConnectionSecrets.AsNoTracking().SingleOrDefaultAsync(row => row.Id == connection.SecretId, cancellationToken);
+        if (secret is null || secret.ConnectionId != connection.Id || secret.Version != connection.SecretVersion || secret.UsedAtUtc is null
+            || secret.OrganizationId != connection.OrganizationId || secret.Purpose != "POSTGRESQL_READONLY" || string.IsNullOrEmpty(secret.Owner)
+            || !secret.SiteIds.Order(StringComparer.Ordinal).SequenceEqual(connection.SiteIds.Order(StringComparer.Ordinal))) throw Forbidden();
+        await sourceReader.VerifyAccessAsync(config.Profile, cipher.Decrypt(secret), context, entityBindingId, deadlineAtUtc, cancellationToken);
+        return new G4QueryConnectionAccess { ConnectionId = connection.Id, Revision = connection.Revision, ConfigHash = connection.ConfigHash,
+            SecretVersion = connection.SecretVersion, Scope = context.Scope, Projection = projection, CheckedAtUtc = clock.GetUtcNow() };
+    }
+
+    /// <summary>当前连接的短事务复核与历史Active无关；授权组织锁必须已由治理先取得。</summary>
+    public async Task VerifyHistoricalAccessInTransactionAsync(ActorContext actor, G4QueryConnectionAccess access,
+        DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (connection.State != ConnectionState.Open || !ReferenceEquals(connection, transaction.Connection))
+                throw new InvalidOperationException("历史源访问复核必须加入同物理事务。");
+            // 当前权限检查只在同请求五秒内有效，不持久缓存许可或把它当永久授权。
+            var now = clock.GetUtcNow();
+            if (access.CheckedAtUtc > now || access.CheckedAtUtc.AddSeconds(5) <= now || actor.OrganizationId != access.Scope.OrganizationId
+                || !access.Scope.SiteIds.All(actor.SiteIds.Contains)) throw Forbidden();
+            // 模块上下文只借用事务，不拥有调用方连接。
+            await using var database = await factory.CreateDbContextAsync(cancellationToken);
+            database.Database.SetDbConnection(connection, contextOwnsConnection: false);
+            await database.Database.UseTransactionAsync(transaction, cancellationToken);
+            await ConnectionApplicationService.LockAsync(database, "connection:" + access.ConnectionId, cancellationToken);
+            // 当前连接禁用或轮换先提交时，历史解密回传必须被阻断。
+            var current = await database.Connections.AsNoTracking().SingleOrDefaultAsync(row => row.Id == access.ConnectionId
+                && row.OrganizationId == actor.OrganizationId, cancellationToken) ?? throw Forbidden();
+            if (current.State != "ACTIVE" || current.Revision != access.Revision || current.ConfigHash != access.ConfigHash
+                || current.SecretVersion != access.SecretVersion || !access.Scope.SiteIds.All(current.SiteIds.Contains)) throw Forbidden();
+        }
+        catch
+        {
+            await transaction.RollbackAsync(CancellationToken.None);
+            throw;
+        }
+    }
+
+    /// <summary>历史回读核验原发布和原激活收据，不使用当前指针重写保存版本。</summary>
+    public async Task<G4QueryBindingContext> ReadHistoricalAsync(ActorContext actor, G4QueryBinding binding, ResourceScope scope, CancellationToken cancellationToken)
+    {
+        if (actor.OrganizationId != scope.OrganizationId || scope.SiteIds.Length == 0 || !scope.SiteIds.All(actor.SiteIds.Contains)) throw Forbidden();
+        // 不共享执行前的跟踪状态，所有材料按准确历史身份重新读取。
+        await using var database = await factory.CreateDbContextAsync(cancellationToken);
+        // 根资源归属先过滤，不能通过未知历史ID探测其他组织。
+        var release = await database.MappingReleases.AsNoTracking().SingleOrDefaultAsync(row => row.Id == binding.MappingReleaseId
+            && row.OrganizationId == actor.OrganizationId && row.MappingId == binding.MappingId, cancellationToken) ?? throw Forbidden();
+        if (release.ContentHash != binding.ManifestHash || !scope.SiteIds.All(release.SiteIds.Contains)) throw Forbidden();
+        // 原manifest继续使用它自己的历史规范与hash，不重新赋予当前版本身份。
+        var manifest = MappingApplicationService.Original<MappingReleaseManifest>(release.CanonicalBytes, release.ContentHash);
+        // 原激活收据仍可独立核验，即使当前Active已切换也不失效。
+        var activation = await database.MappingActivations.AsNoTracking().SingleOrDefaultAsync(row => row.Id == binding.ActivationId
+            && row.OrganizationId == actor.OrganizationId && row.MappingId == binding.MappingId, cancellationToken) ?? throw Stale();
+        // 原件与索引必须一致，不能只信其中一个投影字段。
+        var receipt = MappingApplicationService.Original<MappingActivationReceipt>(activation.CanonicalBytes, activation.ContentHash);
+        // 激活保存的精确连接和目录版本也属于历史Binding，不能只核发布ID。
+        var activationBinding = MappingApplicationService.Decode<MappingVersionBinding>(activation.BindingJson);
+        if (receipt.MappingReleaseId != binding.MappingReleaseId || receipt.ManifestHash != binding.ManifestHash
+            || receipt.ActivationId != binding.ActivationId || receipt.ActivationRevision.ToString(CultureInfo.InvariantCulture) != binding.ActivationRevision
+            || manifest.Binding.SourceConnectionId != binding.ConnectionId || manifest.Binding.OntologyReleaseId != binding.OntologyReleaseId
+            || manifest.Binding.SourceCatalogSnapshotId != binding.OriginalCatalogSnapshotId || manifest.Binding.SourceCatalogFingerprint != binding.OriginalCatalogFingerprint
+            || activationBinding.SourceConnectionId != binding.ConnectionId || activationBinding.SourceType != "POSTGRESQL"
+            || activationBinding.ConnectionRevision.ToString(CultureInfo.InvariantCulture) != binding.ConnectionRevision
+            || activationBinding.SecretVersion.ToString(CultureInfo.InvariantCulture) != binding.SecretVersion || activationBinding.ConfigHash != binding.ConfigHash
+            || activationBinding.SourceCatalogSnapshotId != binding.CurrentCatalogSnapshotId || activationBinding.SourceCatalogFingerprint != binding.CurrentCatalogFingerprint
+            || activationBinding.OntologyReleaseId != binding.OntologyReleaseId || activationBinding.MappingHash != manifest.Binding.MappingHash)
+            throw Stale();
+        // 每份目录按精确ID定位，不能用最新目录替代历史回执引用。
+        var catalogs = await database.CatalogSnapshots.AsNoTracking().Where(row => row.OrganizationId == actor.OrganizationId
+            && row.ConnectionId == binding.ConnectionId && (row.Id == binding.OriginalCatalogSnapshotId || row.Id == binding.CurrentCatalogSnapshotId))
+            .ToArrayAsync(cancellationToken);
+        // 目录缺失或漂移不降级为无来源成功结果。
+        var original = catalogs.SingleOrDefault(row => row.Id == binding.OriginalCatalogSnapshotId) ?? throw Stale();
+        // 原发布与本次激活目录可以是同一个对象，但身份字段仍分别保留。
+        var current = catalogs.SingleOrDefault(row => row.Id == binding.CurrentCatalogSnapshotId) ?? throw Stale();
+        // 目录view属于Connections既有格式，不以G4结果规范器重算。
+        var originalView = ConnectionApplicationService.Decode<CatalogSnapshotView>(original.ViewJson);
+        // 当前一词是历史查询当时的当前目录，不是此刻新Active的目录。
+        var currentView = ConnectionApplicationService.Decode<CatalogSnapshotView>(current.ViewJson);
+        if (originalView.SchemaFingerprint != binding.OriginalCatalogFingerprint || currentView.SchemaFingerprint != binding.CurrentCatalogFingerprint
+            || originalView.Status != "READY" || currentView.Status != "READY") throw Stale();
+        DemandCatalog(originalView, original, manifest.Binding, scope);
+        DemandCatalog(currentView, current, activationBinding, scope);
+        return new G4QueryBindingContext { Binding = binding, Manifest = manifest, Scope = scope, OriginalCatalog = originalView, CurrentCatalog = currentView };
+    }
+
     /// <summary>真实字段授权与当前凭据均在源IO之前核验，平台连接不持长事务。</summary>
     public async Task<G4SourceQueryRead> ReadAsync(G4QueryBindingContext context, MappingAuthorizationProof proof,
         string entityBindingId, G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken)
@@ -179,6 +287,10 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
         if (currentCatalog.Status != "READY" || currentCatalog.SnapshotId != newest.Id || currentCatalog.ConnectionId != source.Id
             || currentCatalog.SchemaFingerprint != current.SourceCatalogFingerprint || originalCatalog.SnapshotId != origin.Id
             || originalCatalog.SchemaFingerprint != manifest.Binding.SourceCatalogFingerprint) throw Stale();
+        // 元数据view、持久索引和版本绑定三者一致，不能只相信自报fingerprint字段。
+        var requestedScope = new ResourceScope { OrganizationId = actor.OrganizationId, SiteIds = sites };
+        DemandCatalog(originalCatalog, origin, manifest.Binding, requestedScope);
+        DemandCatalog(currentCatalog, newest, current, requestedScope);
         return new G4QueryBindingContext
         {
             Binding = new G4QueryBinding
@@ -195,6 +307,24 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
             Manifest = manifest, Scope = new ResourceScope { OrganizationId = actor.OrganizationId, SiteIds = sites },
             OriginalCatalog = originalCatalog, CurrentCatalog = currentCatalog
         };
+    }
+
+    /// <summary>沿原M1算法核实目录内容与捕获身份，不把当前配置覆盖到原发布目录。</summary>
+    private static void DemandCatalog(CatalogSnapshotView view, CatalogSnapshotRecord record, MappingVersionBinding binding, ResourceScope scope)
+    {
+        // 对象和列使用既有确定性顺序，不使用新的G4查询规范改写历史hash。
+        var objects = view.Objects.OrderBy(item => item.Schema, StringComparer.Ordinal).ThenBy(item => item.Name, StringComparer.Ordinal)
+            .ThenBy(item => item.Kind, StringComparer.Ordinal).Select(item => item with
+            { Fields = item.Fields.OrderBy(field => field.Ordinal).ThenBy(field => field.Name, StringComparer.Ordinal).ToArray() }).ToArray();
+        if (view.Status != "READY" || view.SnapshotId != record.Id || view.SnapshotId != binding.SourceCatalogSnapshotId
+            || view.ConnectionId != binding.SourceConnectionId || record.ConnectionId != binding.SourceConnectionId
+            || record.ConfigHash != binding.ConfigHash || record.SecretVersion != binding.SecretVersion
+            || view.ConfigRevision != binding.ConnectionRevision || view.SecretVersion != binding.SecretVersion
+            || record.OrganizationId != scope.OrganizationId || view.Scope.OrganizationId != scope.OrganizationId
+            || !scope.SiteIds.All(record.SiteIds.Contains) || !scope.SiteIds.All(view.Scope.SiteIds.Contains)
+            || view.SchemaFingerprint != binding.SourceCatalogFingerprint
+            || ConnectionApplicationService.Hash(ConnectionApplicationService.Encode(new { AdapterVersion = "pg-m1-v1", Objects = objects })) != binding.SourceCatalogFingerprint)
+            throw Stale();
     }
 
     /// <summary>根范围不可见时只有固定拒绝，不返回映射、目录或连接身份。</summary>

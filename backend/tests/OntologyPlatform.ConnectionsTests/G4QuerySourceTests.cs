@@ -113,6 +113,8 @@ public sealed class G4QuerySourceIntegrationTests
         Assert.IsFalse(found.Limited);
         Assert.HasCount(4, found.RecordKeyFields);
         Assert.IsFalse(string.IsNullOrWhiteSpace(found.TransactionSnapshot));
+        // 历史恢复权限只检查系统目录和ACL，不调用业务ReadAsync来制造新回执。
+        await reader.VerifyAccessAsync(profile, secret, context, "asset", DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
         // SQL样式输入只是不存在的外部号，不能突破范围或改写语句。
         var empty = await reader.ReadAsync(profile, secret, context, "asset", query with { Filters = new G4QueryFilters { EntityExternalId = "' OR true --" } }, DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
         Assert.HasCount(0, empty.Rows);

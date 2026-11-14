@@ -18,6 +18,7 @@ public static class Program
         }
         // 宿主独立于开发InfraAPI，正式提供身份、资源和探针。
         await using var app = PlatformApiHost.CreateApplication(args);
+        if (app.Configuration.GetValue<bool>("G4:QueryEnabled")) app.MapQueryEndpoints();
         await PlatformApiHost.InitializeDevelopmentAsync(app);
         await G2Composition.InitializeG2DevelopmentAsync(app);
         await G4Composition.InitializeG4Async(app);

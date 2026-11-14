@@ -2,6 +2,19 @@ using OntologyPlatform.Contracts;
 
 namespace OntologyPlatform.Modules.SemanticQuery;
 
+/// <summary>单分支完成后的有界授权投影及真实读取回执，尚未成为对外响应。</summary>
+public sealed record G4QueryBranchProjection
+{
+    /// <summary>只包含完整可验证的实体断言。</summary>
+    public required G4EntityDatum[] Entities { get; init; }
+
+    /// <summary>逐行来源，与实体和属性引用严格闭合。</summary>
+    public required G4SourceEvidenceRef[] Evidence { get; init; }
+
+    /// <summary>实际分支读取事实，hash在外列。</summary>
+    public required G4QueryStoredReceipt Receipt { get; init; }
+}
+
 /// <summary>原子准入结果；重复键只引用已有执行，不再次访问外部源。</summary>
 public sealed record G4QueryAdmission
 {
@@ -23,6 +36,9 @@ public sealed record G4QueryState
 
     /// <summary>恢复时必须逐个重新取得当前许可的完整投影。</summary>
     public required G4QueryProjection[] Projections { get; init; }
+
+    /// <summary>零授权分支仍保留原计划字段依赖，用于将来恢复时取得当前完整许可。</summary>
+    public G4QueryProjection[] RequiredProjections { get; init; } = [];
 
     /// <summary>已完成分支的安全回执与外置散列，同结果事务保存，不包含源原始行。</summary>
     public G4QueryStoredReceipt[] Receipts { get; init; } = [];

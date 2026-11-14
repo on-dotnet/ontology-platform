@@ -48,6 +48,74 @@ export type ConnectionView = { "id": string; "displayName": string; "scope": Res
 
 export type DorisConnectionProfile = { "feHost": string; "queryPort": number; "catalog": string; "database": string; "username": string; "tls": boolean };
 
+export type G4QueryCandidate = { "entityIri": string; "entityTypeIris": Array<string>; "externalId": string; "organizationId": string; "siteId": string; "label": string; "evidenceIds": Array<string> };
+
+export type G4QueryClass = { "iri": string; "label": null | string; "evidenceIds": Array<string> };
+
+export type G4QueryDatum = G4QueryDatumG4EntityDatum | G4QueryDatumG4RelationshipDatum | G4QueryDatumG4ObservationDatum | G4QueryDatumG4OntologyDatum;
+
+export type G4QueryDatumG4EntityDatum = { "kind": "entity"; "identity": G4QueryIdentity; "typeIris": Array<string>; "label": null | string; "properties": Array<G4QueryProperty>; "validTime": null | G4QueryInterval; "entityIri": string; "evidenceIds": Array<string> };
+
+export type G4QueryDatumG4ObservationDatum = { "kind": "observation"; "identity": G4QueryIdentity; "propertyIri": string; "value": G4QueryValue; "unit": null | G4QueryUnit; "eventTime": null | G4QueryTime; "observedAtUtc": string; "validTime": null | G4QueryInterval; "entityIri": string; "evidenceIds": Array<string> };
+
+export type G4QueryDatumG4OntologyDatum = { "kind": "ontology"; "ontologyReleaseId": string; "classes": Array<G4QueryClass>; "properties": Array<G4QueryOntologyProperty>; "entityIri": null; "evidenceIds": Array<string> };
+
+export type G4QueryDatumG4RelationshipDatum = { "kind": "relationship"; "relationshipIri": string; "source": G4QueryEndpoint; "target": G4QueryEndpoint; "cardinality": "ONE_TO_ONE" | "ONE_TO_MANY" | "MANY_TO_ONE" | "MANY_TO_MANY"; "validTime": null | G4QueryInterval; "entityIri": string; "evidenceIds": Array<string> };
+
+export type G4QueryDiagnostic = { "code": string; "severity": "info" | "warning" | "error"; "message": string; "focusNode": null | string; "path": null | string };
+
+export type G4QueryEndpoint = { "entityIri": string; "identity": G4QueryIdentity; "typeIris": Array<string> };
+
+export type G4QueryFilters = { "siteId"?: null | string; "entityExternalId"?: null | string; "validFrom"?: null | string; "validTo"?: null | string; "entityIri"?: null | string };
+
+export type G4QueryIdentity = { "organizationId": string; "siteId": string; "sourceNamespace": string; "externalId": string; "effectiveTime": null | G4QueryInterval };
+
+export type G4QueryInterval = { "from": G4QueryTime; "to": null | G4QueryTime };
+
+export type G4QueryOntologyProperty = { "iri": string; "kind": string; "domainIris": Array<string>; "rangeIris": Array<string>; "evidenceIds": Array<string> };
+
+export type G4QueryProperty = { "propertyIri": string; "value": G4QueryValue; "unit": null | G4QueryUnit; "eventTime": null | G4QueryTime; "evidenceIds": Array<string> };
+
+export type G4QueryResultV1 = { "schemaVersion": "g4.query-result.v1"; "status": "FOUND" | "AMBIGUOUS" | "EMPTY" | "UNAUTHORIZED" | "UNAVAILABLE" | "PARTIAL"; "data": Array<G4QueryDatum>; "candidates": Array<G4QueryCandidate>; "evidence": Array<G4SourceEvidenceRef>; "snapshot": G4QuerySnapshot; "subSources": Array<G4QuerySubSource>; "validTime": null | G4QueryUtcInterval; "observedAtUtc": string; "traceId": string; "limited": boolean; "diagnostics": Array<G4QueryDiagnostic> };
+
+export type G4QuerySnapshot = { "ontologyReleaseId": string; "mappingReleaseIds": Array<string>; "sourceCatalogSnapshotIds": Array<string>; "capabilityId": string; "capabilityVersion": string };
+
+export type G4QuerySubSource = { "connectionId": string; "status": "SUCCESS" | "EMPTY" | "TIMEOUT" | "FORBIDDEN" | "UNAVAILABLE" | "INDETERMINATE"; "observedAtUtc": string; "watermarkKind": "TRANSACTION_SNAPSHOT" | "EVENT_TIME" | "OBSERVED_AT" | "OPAQUE" | "UNKNOWN"; "sourceReadReceiptId": null | string; "limited": boolean };
+
+export type G4QueryTime = { "kind": "UTC" | "LOCAL" | "DATE"; "lexical": string; "fractionalDigits": number };
+
+export type G4QueryUnit = { "unitSpecId": string; "unitIri": string; "source": "MAPPING_RELEASE" | "SOURCE_FIELD"; "sourceFieldRef": null | string; "evidenceIds": Array<string> };
+
+export type G4QueryUtcInterval = { "fromUtc": string; "toUtc": null | string };
+
+export type G4QueryValue = G4QueryValueG4StringValue | G4QueryValueG4BooleanValue | G4QueryValueG4Int64Value | G4QueryValueG4DecimalValue | G4QueryValueG4DateValue | G4QueryValueG4UtcValue | G4QueryValueG4LocalValue | G4QueryValueG4NullValue;
+
+export type G4QueryValueG4BooleanValue = { "type": "boolean"; "lexical": string };
+
+export type G4QueryValueG4DateValue = { "type": "date"; "lexical": string };
+
+export type G4QueryValueG4DecimalValue = { "type": "decimal"; "precision": number; "scale": number; "lexical": string };
+
+export type G4QueryValueG4Int64Value = { "type": "int64"; "lexical": string };
+
+export type G4QueryValueG4LocalValue = { "type": "timestampLocal"; "lexical": string };
+
+export type G4QueryValueG4NullValue = { "type": "null"; "declaredType": "string" | "boolean" | "int64" | "decimal" | "date" | "timestampUtc" | "timestampLocal"; "lexical": null };
+
+export type G4QueryValueG4StringValue = { "type": "string"; "lexical": string };
+
+export type G4QueryValueG4UtcValue = { "type": "timestampUtc"; "lexical": string };
+
+export type G4QueryView = { "queryId": string; "executionStatus": "RUNNING" | "COMPLETED" | "CANCELLED" | "FAILED"; "createdAtUtc": string; "completedAtUtc": null | string; "expiresAtUtc": string; "resultHash": null | string; "errorCode": null | string };
+
+export type G4SemanticQuery = { "assetId": string; "ontologyReleaseId": string; "mappingReleaseIds": Array<string>; "capabilityId": string; "capabilityVersion": string; "relationshipIris": Array<string>; "depth": number; "maxRows": number; "timeoutMs": number; "filters": G4QueryFilters };
+
+export type G4SourceEvidenceRef = { "evidenceId": string; "connectionId": string; "mappingReleaseId": string; "sourceCatalogSnapshotId": string; "sourceDatasetRef": string; "sourceReadReceiptId": string; "scope": ResourceScope; "precision": "RECORD" | "ROW_KEY" | "DATASET" | "TIME_WINDOW" | "UNKNOWN"; "sourceRecordRef": null | string; "validTime": null | G4QueryUtcInterval; "observedAtUtc": string };
+
+export type G4SourceEvidenceView = { "schemaVersion": "g4.source-evidence.v1"; "evidence": G4SourceEvidenceRef; "receipt": G4SourceReceiptView };
+
+export type G4SourceReceiptView = { "receiptId": string; "queryId": string; "mappingReleaseId": string; "manifestHash": string; "originalCatalogSnapshotId": string; "currentCatalogSnapshotId": string; "connectionId": string; "connectionRevision": string; "activationId": string; "activationRevision": string; "queryPlanHash": string; "adapterVersion": string; "status": "SUCCESS" | "EMPTY" | "TIMEOUT" | "FORBIDDEN" | "UNAVAILABLE" | "INDETERMINATE"; "rowCount": number; "limited": boolean; "watermarkKind": "TRANSACTION_SNAPSHOT" | "EVENT_TIME" | "OBSERVED_AT" | "OPAQUE" | "UNKNOWN"; "watermark": null | string; "readStartedAtUtc": string; "readCompletedAtUtc": string; "resultHash": null | string; "traceId": string };
+
 export type JsonElement = JsonValue;
 
 export type MappingActivationCheck = { "checkId": string; "proposalId": string; "bindingHash": string; "assessmentId": string; "checkedBinding": MappingVersionBinding; "checkedAtUtc": string; "expiresAtUtc": string; "stages": Array<MappingStageResult>; "semanticResultHash": string; "evidenceHash": string };

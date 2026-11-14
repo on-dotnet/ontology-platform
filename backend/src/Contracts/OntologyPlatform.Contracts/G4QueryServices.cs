@@ -2,6 +2,41 @@ using System.Data.Common;
 
 namespace OntologyPlatform.Contracts;
 
+/// <summary>应用层传输结果；端点只输出View或原规范结果，不将此内部包装导出为业务DTO。</summary>
+public sealed record G4QueryDelivery
+{
+    /// <summary>用于可信Location与X-Query-Id。</summary>
+    public required G4QueryView View { get; init; }
+
+    /// <summary>已完成结果的原规范UTF8字节；运行状态响应时为空。</summary>
+    public required byte[]? ResultBytes { get; init; }
+}
+
+/// <summary>历史恢复期间实际核验源ACL所使用的当前连接身份，不替换历史Binding。</summary>
+public sealed record G4QueryConnectionAccess
+{
+    /// <summary>当前连接永久标识。</summary>
+    public required string ConnectionId { get; init; }
+
+    /// <summary>核验时实际连接修订。</summary>
+    public required long Revision { get; init; }
+
+    /// <summary>当前配置身份摘要，不含秘密。</summary>
+    public required string ConfigHash { get; init; }
+
+    /// <summary>本次实际使用的当前秘密版本。</summary>
+    public required long SecretVersion { get; init; }
+
+    /// <summary>实际核验的完整范围。</summary>
+    public required ResourceScope Scope { get; init; }
+
+    /// <summary>实际逐列检查的投影，不能以同连接另一个表的ACL检查替代。</summary>
+    public required G4QueryProjection Projection { get; init; }
+
+    /// <summary>真实当前源权限检查完成时刻。</summary>
+    public required DateTimeOffset CheckedAtUtc { get; init; }
+}
+
 /// <summary>查询专用当前授权边界，不将映射管理许可解释成数据读取许可。</summary>
 public interface IG4QueryAuthorizationAuthority
 {
@@ -48,6 +83,15 @@ public sealed record G4QueryBindingContext
 /// <summary>固定映射读取与同事务版本复核由Connections所有者执行。</summary>
 public interface IG4QueryBindingReader
 {
+    /// <summary>历史恢复在回传事务中固定当前连接，防止源权限检查后禁用或轮换先提交。</summary>
+    Task VerifyHistoricalAccessInTransactionAsync(ActorContext actor, G4QueryConnectionAccess access,
+        DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken)
+        => Task.FromException(new SemanticOperationException(503, "query_history_unavailable"));
+
+    /// <summary>恢复已提交历史材料，不要求当前Active回到原发布；仍核当前主体完整保存范围。</summary>
+    Task<G4QueryBindingContext> ReadHistoricalAsync(ActorContext actor, G4QueryBinding binding, ResourceScope scope, CancellationToken cancellationToken)
+        => Task.FromException<G4QueryBindingContext>(new SemanticOperationException(503, "query_history_unavailable"));
+
     /// <summary>只读取平台不可变材料，不调用M3全映射源可用性检查。</summary>
     Task<G4QueryBindingContext> CaptureAsync(ActorContext actor, G4SemanticQuery query, long authorizationEpoch, CancellationToken cancellationToken);
 
@@ -100,6 +144,10 @@ public sealed record G4QueryProjection
 /// <summary>跨模块源查询只暴露类型化投影；秘密和连接生命周期由Connections拥有。</summary>
 public interface IG4SourceQueryReader
 {
+    /// <summary>历史恢复只核当前源账号对原投影的权限和类型，不读取业务行或生成新的读取回执。</summary>
+    Task<G4QueryConnectionAccess> VerifyAccessAsync(G4QueryBindingContext context, MappingAuthorizationProof proof, string entityBindingId,
+        DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken);
+
     /// <summary>由固定映射计算真实字段依赖，为每个分支取得单条完整grant。</summary>
     G4QueryProjection DescribeProjection(G4QueryBindingContext context, string entityBindingId);
 

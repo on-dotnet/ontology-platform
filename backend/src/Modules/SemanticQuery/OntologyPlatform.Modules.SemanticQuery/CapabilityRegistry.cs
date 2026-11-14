@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.Configuration;
 using OntologyPlatform.Contracts;
 
 namespace OntologyPlatform.Modules.SemanticQuery;
@@ -10,13 +11,49 @@ namespace OntologyPlatform.Modules.SemanticQuery;
 public sealed class CapabilityRegistry
 {
     /// <summary>此实现只登记三项已批准的正式只读能力。</summary>
-    private readonly SemanticCapability[] capabilities = Create();
+    private readonly SemanticCapability[] capabilities;
+
+    /// <summary>旧能力默认保持原字节；只有真实G4组合开启后才加载其正式生成Schema。</summary>
+    public CapabilityRegistry(IConfiguration? configuration = null)
+    {
+        capabilities = configuration?.GetValue<bool>("G4:QueryEnabled") == true ? [.. Create(), .. CreateG4()] : Create();
+    }
 
     /// <summary>返回防止调用方修改内部数组的能力副本。</summary>
     public SemanticCapability[] Read() => JsonSerializer.Deserialize<SemanticCapability[]>(JsonSerializer.Serialize(capabilities))!;
 
     /// <summary>拒绝未登记或错误版本的工具计划。</summary>
     internal SemanticCapability Resolve(SemanticQueryPlan plan) => capabilities.SingleOrDefault(value => value.Id == plan.CapabilityId && value.Version == plan.CapabilityVersion) ?? throw new SemanticOperationException(422, "capability_invalid");
+
+    /// <summary>G4版本与机器Schema和真实分支计划绑定，未登记能力始终拒绝。</summary>
+    internal SemanticCapability Resolve(G4SemanticQuery query) => capabilities.SingleOrDefault(value => value.Id == query.CapabilityId && value.Version == query.CapabilityVersion)
+        ?? throw new SemanticOperationException(422, "capability_not_supported");
+
+    /// <summary>S1只登记已经贯通的单实体PG计划；S3增加实际执行分支时推进计划身份。</summary>
+    private static SemanticCapability[] CreateG4()
+    {
+        // 输入和输出都来自同一DTO及实际路由生成文档，不能手抄另一套Schema。
+        var input = ComponentSchema("OntologyPlatform.G4OpenApiSchemas.json", "G4SemanticQuery");
+        // 结果联合必须保留全部判别分支，即使当前能力只产生实体分支。
+        var output = ComponentSchema("OntologyPlatform.G4OpenApiSchemas.json", "G4QueryResultV1");
+        // 计划身份显式描述必需分支，不以运行时任意选表代替登记。
+        var executor = "g4-query/g4_resolve_entity/s1-single-entity-pg-v1";
+        // 规范hash涵盖完整嵌套输入和输出而非简写能力展示字段。
+        var version = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(new { input, output, executor, requiredBranches = new[] { "single-mapped-entity" } }));
+        return [new SemanticCapability
+        {
+            Id = "g4_resolve_entity", Version = version, ExecutorId = executor, Policy = "data.query.execute",
+            Meaning = "按正式映射定位PostgreSQL实体并保留精确来源",
+            InputSchema = new CapabilityInputSchema { SchemaVersion = 1, Type = "object", AdditionalProperties = false,
+                Required = ["assetId", "ontologyReleaseId", "mappingReleaseIds", "capabilityId", "capabilityVersion", "relationshipIris", "depth", "maxRows", "timeoutMs", "filters"],
+                Properties = [Parameter("assetId", "string", "正式本体资产"), Parameter("ontologyReleaseId", "string", "固定本体发布"),
+                    Parameter("mappingReleaseIds", "array", "唯一固定映射发布"), Parameter("capabilityId", "string", "登记能力"),
+                    Parameter("capabilityVersion", "string", "完整Schema与执行计划散列"), Parameter("relationshipIris", "array", "正式关系路径"),
+                    Parameter("depth", "integer", "深度", 1, 5), Parameter("maxRows", "integer", "返回项数", 2, 100),
+                    Parameter("timeoutMs", "integer", "总毫秒预算", 100, 5000), Parameter("filters", "object", "封闭身份与时间过滤")] },
+            OutputSchema = output, Budgets = new CapabilityBudget { MaxDepth = 5, MaxRows = 100, TimeoutMs = 5000, MaxToolCalls = 3 }
+        }];
+    }
 
     /// <summary>完整输入字段的有限描述保持服务端约束，不接收客户端actor。</summary>
     private static SemanticCapability[] Create()
@@ -48,14 +85,17 @@ public sealed class CapabilityRegistry
     private static CapabilityParameter Parameter(string name, string type, string description, int? minimum = null, int? maximum = null) => new() { Name = name, Type = type, Description = description, Minimum = minimum, Maximum = maximum, ItemsType = type == "array" ? "string" : null };
 
     /// <summary>读取SemanticQueryResult可达组件，未知引用立即失败，不弱化输出Schema。</summary>
-    private static JsonElement OutputSchema()
+    private static JsonElement OutputSchema() => ComponentSchema("OntologyPlatform.G2OpenApiSchemas.json", "SemanticQueryResult");
+
+    /// <summary>从唯一生成物读取完整可达组件闭包，缺失时失败启动而不是登记空壳能力。</summary>
+    private static JsonElement ComponentSchema(string resource, string root)
     {
         // 该资源是Master维护的机器生成bootstrap组件，不声称其空paths为运行API导出。
-        using var stream = typeof(CapabilityRegistry).Assembly.GetManifestResourceStream("OntologyPlatform.G2OpenApiSchemas.json") ?? throw new InvalidOperationException("缺少唯一输出Schema资源。");
+        using var stream = typeof(CapabilityRegistry).Assembly.GetManifestResourceStream(resource) ?? throw new InvalidOperationException("缺少唯一输出Schema资源。");
         // 解析后仅重写组件引用路径，保留原始Schema全部关键字。
         var components = JsonNode.Parse(stream)!["components"]!["schemas"]!.AsObject();
         // 队列与集合保证递归引用只复制一次。
-        var pending = new Queue<string>(["SemanticQueryResult"]);
+        var pending = new Queue<string>([root]);
         // 定义按名称排序，避免遍历顺序影响hash版本。
         var definitions = new SortedDictionary<string, JsonNode>(StringComparer.Ordinal);
         while (pending.TryDequeue(out var name))
@@ -67,7 +107,7 @@ public sealed class CapabilityRegistry
             Rewrite(schema, pending);
         }
         // 标准JSON Schema 2020-12文档根引用同一唯一结果定义。
-        var document = new JsonObject { ["$schema"] = "https://json-schema.org/draft/2020-12/schema", ["$ref"] = "#/$defs/SemanticQueryResult", ["$defs"] = new JsonObject(definitions.Select(value => new KeyValuePair<string, JsonNode?>(value.Key, value.Value))) };
+        var document = new JsonObject { ["$schema"] = "https://json-schema.org/draft/2020-12/schema", ["$ref"] = "#/$defs/" + root, ["$defs"] = new JsonObject(definitions.Select(value => new KeyValuePair<string, JsonNode?>(value.Key, value.Value))) };
         return JsonSerializer.SerializeToElement(document);
     }
 

@@ -23,6 +23,15 @@ internal static class QueryRules
         if (string.IsNullOrWhiteSpace(actor.SubjectId) || string.IsNullOrWhiteSpace(actor.OrganizationId) || !actor.Roles.Any(role => role is "platform.viewer" or "platform.operator" or "platform.auditor")) throw new SemanticOperationException(403, "role_denied");
     }
 
+    /// <summary>新DTO保留独立预算与候选选择约束，可信主体只能缩小已有厂区范围。</summary>
+    internal static void ValidateG4(ActorContext actor, G4SemanticQuery query, string? selectionQueryId)
+    {
+        DemandActor(actor);
+        G4QueryRules.ValidateQuery(query, selectionQueryId);
+        if (query.Filters.SiteId is not null && !actor.SiteIds.Contains(query.Filters.SiteId, StringComparer.Ordinal))
+            throw new SemanticOperationException(403, "scope_denied");
+    }
+
     /// <summary>授权集合要求组织相同且资源全部厂区可访问。</summary>
     internal static bool Covers(ActorContext actor, ResourceScope scope) => scope.OrganizationId == actor.OrganizationId && scope.SiteIds.Length > 0 && scope.SiteIds.All(site => actor.SiteIds.Contains(site, StringComparer.Ordinal));
 

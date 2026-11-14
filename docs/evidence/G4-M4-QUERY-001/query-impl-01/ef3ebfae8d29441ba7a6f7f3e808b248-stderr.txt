@@ -1,0 +1,11 @@
+file:///Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/scripts/maintenance/workflow-m4-query.mjs:46
+  const check = (name, value) => { report.checks.push({ name, status: value ? "PASS" : "FAIL" }); if (!value) { const error = new Error(); error.safeCode = name; throw error; } };
+                                                                                                                              ^
+
+Error
+    at check (file:///Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/scripts/maintenance/workflow-m4-query.mjs:46:127)
+    at request (file:///Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform/scripts/maintenance/workflow-m4-query.mjs:57:5) {
+  safeCode: 'http_15_409,503'
+}
+
+Node.js v24.22.1

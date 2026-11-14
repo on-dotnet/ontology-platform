@@ -951,6 +951,188 @@
           }
         }
       }
+    },
+    "/api/v1/data/semantic-queries": {
+      "post": {
+        "tags": [
+          "Semantic queries"
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Selection-Query-Id",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/G4SemanticQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/G4QueryResultV1"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/G4QueryView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/data/semantic-queries/{queryId}": {
+      "get": {
+        "tags": [
+          "Semantic queries"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/G4QueryView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/data/semantic-queries/{queryId}/result": {
+      "get": {
+        "tags": [
+          "Semantic queries"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/G4QueryResultV1"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/G4QueryView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/data/semantic-queries/{queryId}/cancel": {
+      "post": {
+        "tags": [
+          "Semantic queries"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/G4QueryView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/data/source-evidence/{id}": {
+      "get": {
+        "tags": [
+          "Semantic queries"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/G4SourceEvidenceView"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1773,6 +1955,1634 @@
         },
         "additionalProperties": false,
         "description": "Doris配置预览，本阶段不可连接。"
+      },
+      "G4QueryCandidate": {
+        "required": [
+          "entityIri",
+          "entityTypeIris",
+          "externalId",
+          "organizationId",
+          "siteId",
+          "label",
+          "evidenceIds"
+        ],
+        "type": "object",
+        "properties": {
+          "entityIri": {
+            "type": "string",
+            "description": "选择标识，不是可访问URL。"
+          },
+          "entityTypeIris": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "正式类型集合。"
+          },
+          "externalId": {
+            "type": "string",
+            "description": "源外部号。"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "组织范围。"
+          },
+          "siteId": {
+            "type": "string",
+            "description": "厂区范围。"
+          },
+          "label": {
+            "type": "string",
+            "description": "当前可见且有依据的显示名。"
+          },
+          "evidenceIds": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "候选身份的真实来源。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "仅包含当前可见实体的选择候选。"
+      },
+      "G4QueryClass": {
+        "required": [
+          "iri",
+          "label",
+          "evidenceIds"
+        ],
+        "type": "object",
+        "properties": {
+          "iri": {
+            "type": "string",
+            "description": "正式类IRI。"
+          },
+          "label": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "显示名或未知。"
+          },
+          "evidenceIds": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "类定义证据。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "正式本体类的封闭说明。"
+      },
+      "G4QueryDatum": {
+        "required": [
+          "kind"
+        ],
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/G4QueryDatumG4EntityDatum"
+          },
+          {
+            "$ref": "#/components/schemas/G4QueryDatumG4RelationshipDatum"
+          },
+          {
+            "$ref": "#/components/schemas/G4QueryDatumG4ObservationDatum"
+          },
+          {
+            "$ref": "#/components/schemas/G4QueryDatumG4OntologyDatum"
+          }
+        ],
+        "description": "G4判别数据只承载已授权语义值，来源与旧G2图模型独立。",
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "entity": "#/components/schemas/G4QueryDatumG4EntityDatum",
+            "relationship": "#/components/schemas/G4QueryDatumG4RelationshipDatum",
+            "observation": "#/components/schemas/G4QueryDatumG4ObservationDatum",
+            "ontology": "#/components/schemas/G4QueryDatumG4OntologyDatum"
+          }
+        }
+      },
+      "G4QueryDatumG4EntityDatum": {
+        "required": [
+          "identity",
+          "typeIris",
+          "label",
+          "properties",
+          "validTime",
+          "entityIri",
+          "evidenceIds",
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "entity"
+            ],
+            "type": "string"
+          },
+          "identity": {
+            "description": "组织厂区及来源命名空间组成的完整身份。",
+            "$ref": "#/components/schemas/G4QueryIdentity"
+          },
+          "typeIris": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "已发布正式类型IRI集合。"
+          },
+          "label": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "来源显示名；未知不补造。"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/G4QueryProperty"
+            },
+            "description": "精确属性集合，不接受任意字典。"
+          },
+          "validTime": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "来源有效半开区间，未知为空。",
+                "$ref": "#/components/schemas/G4QueryInterval"
+              }
+            ]
+          },
+          "entityIri": {
+            "type": "string",
+            "description": "实体标识；仅未开放的本体分支为空。"
+          },
+          "evidenceIds": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "本响应中必须可解引用的来源标识。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "固定身份、类型与精确属性的实体结果。"
+      },
+      "G4QueryDatumG4ObservationDatum": {
+        "required": [
+          "identity",
+          "propertyIri",
+          "value",
+          "unit",
+          "eventTime",
+          "observedAtUtc",
+          "validTime",
+          "entityIri",
+          "evidenceIds",
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "observation"
+            ],
+            "type": "string"
+          },
+          "identity": {
+            "description": "观测主体的完整身份。",
+            "$ref": "#/components/schemas/G4QueryIdentity"
+          },
+          "propertyIri": {
+            "type": "string",
+            "description": "正式属性IRI。"
+          },
+          "value": {
+            "description": "有显式类型的精确源值。",
+            "$ref": "#/components/schemas/G4QueryValue"
+          },
+          "unit": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "经发布映射或源字段证明的单位。",
+                "$ref": "#/components/schemas/G4QueryUnit"
+              }
+            ]
+          },
+          "eventTime": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "源事件时间，未知不以观察时间替代。",
+                "$ref": "#/components/schemas/G4QueryTime"
+              }
+            ]
+          },
+          "observedAtUtc": {
+            "type": "string",
+            "description": "真实读取UTC观察时间。"
+          },
+          "validTime": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "业务有效区间。",
+                "$ref": "#/components/schemas/G4QueryInterval"
+              }
+            ]
+          },
+          "entityIri": {
+            "type": "string",
+            "description": "实体标识；仅未开放的本体分支为空。"
+          },
+          "evidenceIds": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "本响应中必须可解引用的来源标识。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "保留精确数值、单位、事件时间与观察时间的观测。"
+      },
+      "G4QueryDatumG4OntologyDatum": {
+        "required": [
+          "ontologyReleaseId",
+          "classes",
+          "properties",
+          "entityIri",
+          "evidenceIds",
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "ontology"
+            ],
+            "type": "string"
+          },
+          "ontologyReleaseId": {
+            "type": "string",
+            "description": "不可变正式本体发布。"
+          },
+          "classes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/G4QueryClass"
+            },
+            "description": "正式类说明集合。"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/G4QueryOntologyProperty"
+            },
+            "description": "正式属性说明集合。"
+          },
+          "entityIri": {
+            "type": "null",
+            "description": "实体标识；仅未开放的本体分支为空。"
+          },
+          "evidenceIds": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "本响应中必须可解引用的来源标识。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "仅冻结形状的本体分支，当前G4能力不开放。"
+      },
+      "G4QueryDatumG4RelationshipDatum": {
+        "required": [
+          "relationshipIri",
+          "source",
+          "target",
+          "cardinality",
+          "validTime",
+          "entityIri",
+          "evidenceIds",
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "relationship"
+            ],
+            "type": "string"
+          },
+          "relationshipIri": {
+            "type": "string",
+            "description": "正式对象属性IRI。"
+          },
+          "source": {
+            "description": "关系源端完整身份。",
+            "$ref": "#/components/schemas/G4QueryEndpoint"
+          },
+          "target": {
+            "description": "关系目标端完整身份。",
+            "$ref": "#/components/schemas/G4QueryEndpoint"
+          },
+          "cardinality": {
+            "enum": [
+              "ONE_TO_ONE",
+              "ONE_TO_MANY",
+              "MANY_TO_ONE",
+              "MANY_TO_MANY"
+            ],
+            "type": "string",
+            "description": "发布关系声明的四种基数之一。"
+          },
+          "validTime": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "关系有效半开区间。",
+                "$ref": "#/components/schemas/G4QueryInterval"
+              }
+            ]
+          },
+          "entityIri": {
+            "type": "string",
+            "description": "实体标识；仅未开放的本体分支为空。"
+          },
+          "evidenceIds": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "本响应中必须可解引用的来源标识。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "已发布关系的方向、两端与基数，不伪造越权端点。"
+      },
+      "G4QueryDiagnostic": {
+        "required": [
+          "code",
+          "severity",
+          "message",
+          "focusNode",
+          "path"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "固定机器码。"
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "warning",
+              "error"
+            ],
+            "type": "string",
+            "description": "info、warning或error。"
+          },
+          "message": {
+            "type": "string",
+            "description": "固定中文消息。"
+          },
+          "focusNode": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "有权可见焦点或空。"
+          },
+          "path": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "有权可见路径或空。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "客户端只获得固定脱敏诊断。"
+      },
+      "G4QueryEndpoint": {
+        "required": [
+          "entityIri",
+          "identity",
+          "typeIris"
+        ],
+        "type": "object",
+        "properties": {
+          "entityIri": {
+            "type": "string",
+            "description": "端点实体标识。"
+          },
+          "identity": {
+            "description": "端点的完整来源身份。",
+            "$ref": "#/components/schemas/G4QueryIdentity"
+          },
+          "typeIris": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "端点正式类型集合。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "关系端点必须与当前已授权正式实体一致。"
+      },
+      "G4QueryFilters": {
+        "type": "object",
+        "properties": {
+          "siteId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "候选所属厂区；选择IRI时必填。"
+          },
+          "entityExternalId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "原始外部号，不作为全局身份。"
+          },
+          "validFrom": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "半开时间窗UTC起点。"
+          },
+          "validTo": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "半开时间窗UTC终点。"
+          },
+          "entityIri": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "从原消歧查询选择的实体标识。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "可选查询筛选只缩小当前授权范围。"
+      },
+      "G4QueryIdentity": {
+        "required": [
+          "organizationId",
+          "siteId",
+          "sourceNamespace",
+          "externalId",
+          "effectiveTime"
+        ],
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "所属组织标识。"
+          },
+          "siteId": {
+            "type": "string",
+            "description": "所属厂区标识。"
+          },
+          "sourceNamespace": {
+            "type": "string",
+            "description": "已登记来源命名空间。"
+          },
+          "externalId": {
+            "type": "string",
+            "description": "源外部号原值。"
+          },
+          "effectiveTime": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "身份有效区间。",
+                "$ref": "#/components/schemas/G4QueryInterval"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "外部号不构成全局主键，身份保留来源和有效范围。"
+      },
+      "G4QueryInterval": {
+        "required": [
+          "from",
+          "to"
+        ],
+        "type": "object",
+        "properties": {
+          "from": {
+            "description": "包含的起点。",
+            "$ref": "#/components/schemas/G4QueryTime"
+          },
+          "to": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "排除的终点，未知结束为空。",
+                "$ref": "#/components/schemas/G4QueryTime"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "保留时间类型和精度的半开业务区间。"
+      },
+      "G4QueryOntologyProperty": {
+        "required": [
+          "iri",
+          "kind",
+          "domainIris",
+          "rangeIris",
+          "evidenceIds"
+        ],
+        "type": "object",
+        "properties": {
+          "iri": {
+            "type": "string",
+            "description": "正式属性IRI。"
+          },
+          "kind": {
+            "type": "string",
+            "description": "OBJECT或DATATYPE。"
+          },
+          "domainIris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "定义域集合。"
+          },
+          "rangeIris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "值域集合。"
+          },
+          "evidenceIds": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "属性定义证据。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "正式属性保留种类及定义域和值域。"
+      },
+      "G4QueryProperty": {
+        "required": [
+          "propertyIri",
+          "value",
+          "unit",
+          "eventTime",
+          "evidenceIds"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyIri": {
+            "type": "string",
+            "description": "正式属性IRI。"
+          },
+          "value": {
+            "description": "精确标量值。",
+            "$ref": "#/components/schemas/G4QueryValue"
+          },
+          "unit": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "有依据的单位或未知。",
+                "$ref": "#/components/schemas/G4QueryUnit"
+              }
+            ]
+          },
+          "eventTime": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "事件发生时间或未知。",
+                "$ref": "#/components/schemas/G4QueryTime"
+              }
+            ]
+          },
+          "evidenceIds": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "该属性的真实证据引用。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "属性不丢失空值、单位及事件时间。"
+      },
+      "G4QueryResultV1": {
+        "required": [
+          "schemaVersion",
+          "status",
+          "data",
+          "candidates",
+          "evidence",
+          "snapshot",
+          "subSources",
+          "validTime",
+          "observedAtUtc",
+          "traceId",
+          "limited",
+          "diagnostics"
+        ],
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "enum": [
+              "g4.query-result.v1"
+            ],
+            "type": "string",
+            "description": "固定g4.query-result.v1。"
+          },
+          "status": {
+            "enum": [
+              "FOUND",
+              "AMBIGUOUS",
+              "EMPTY",
+              "UNAUTHORIZED",
+              "UNAVAILABLE",
+              "PARTIAL"
+            ],
+            "type": "string",
+            "description": "统一六态之一，不包含执行进度。"
+          },
+          "data": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/G4QueryDatum"
+            },
+            "description": "当前获准的判别数据。"
+          },
+          "candidates": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/G4QueryCandidate"
+            },
+            "description": "已鉴权的歧义候选。"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/G4SourceEvidenceRef"
+            },
+            "description": "真实源证据引用集合。"
+          },
+          "snapshot": {
+            "description": "本次查询固定且获准可见的版本。",
+            "$ref": "#/components/schemas/G4QuerySnapshot"
+          },
+          "subSources": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/G4QuerySubSource"
+            },
+            "description": "各读取分支真实状态，不声称跨源原子快照。"
+          },
+          "validTime": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "已知业务UTC有效区间或未知。",
+                "$ref": "#/components/schemas/G4QueryUtcInterval"
+              }
+            ]
+          },
+          "observedAtUtc": {
+            "type": "string",
+            "description": "实际读取观察时间。"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "服务端本次跟踪标识。"
+          },
+          "limited": {
+            "type": "boolean",
+            "description": "实际预算截断标记。"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/G4QueryDiagnostic"
+            },
+            "description": "固定脱敏诊断，不含源异常。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "真实源查询的独立十二字段结果，不投影成旧G2伪图。"
+      },
+      "G4QuerySnapshot": {
+        "required": [
+          "ontologyReleaseId",
+          "mappingReleaseIds",
+          "sourceCatalogSnapshotIds",
+          "capabilityId",
+          "capabilityVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "ontologyReleaseId": {
+            "type": "string",
+            "description": "固定本体发布。"
+          },
+          "mappingReleaseIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "不可变映射发布集合。"
+          },
+          "sourceCatalogSnapshotIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "本次校验目录，不覆盖原发布目录。"
+          },
+          "capabilityId": {
+            "type": "string",
+            "description": "实际执行登记能力。"
+          },
+          "capabilityVersion": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "固定执行语义版本。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "固定本体、映射、校验目录及能力版本。"
+      },
+      "G4QuerySubSource": {
+        "required": [
+          "connectionId",
+          "status",
+          "observedAtUtc",
+          "watermarkKind",
+          "sourceReadReceiptId",
+          "limited"
+        ],
+        "type": "object",
+        "properties": {
+          "connectionId": {
+            "type": "string",
+            "description": "当前可见连接。"
+          },
+          "status": {
+            "enum": [
+              "SUCCESS",
+              "EMPTY",
+              "TIMEOUT",
+              "FORBIDDEN",
+              "UNAVAILABLE",
+              "INDETERMINATE"
+            ],
+            "type": "string",
+            "description": "SUCCESS、EMPTY、TIMEOUT、FORBIDDEN、UNAVAILABLE或INDETERMINATE。"
+          },
+          "observedAtUtc": {
+            "type": "string",
+            "description": "本次分支完成观察时刻。"
+          },
+          "watermarkKind": {
+            "enum": [
+              "TRANSACTION_SNAPSHOT",
+              "EVENT_TIME",
+              "OBSERVED_AT",
+              "OPAQUE",
+              "UNKNOWN"
+            ],
+            "type": "string",
+            "description": "实际测得水位种类。"
+          },
+          "sourceReadReceiptId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "实际回执；未读取时可空。"
+          },
+          "limited": {
+            "type": "boolean",
+            "description": "分支预算是否截断。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "每个受控读取分支独立记录状态与水位。"
+      },
+      "G4QueryTime": {
+        "required": [
+          "kind",
+          "lexical",
+          "fractionalDigits"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "UTC",
+              "LOCAL",
+              "DATE"
+            ],
+            "type": "string",
+            "description": "UTC、LOCAL或DATE，不自动补猜时区。"
+          },
+          "lexical": {
+            "type": "string",
+            "description": "保持声明精度的时间词法。"
+          },
+          "fractionalDigits": {
+            "maximum": 9,
+            "minimum": 0,
+            "type": "integer",
+            "description": "实际小数秒位数，日期必须为零。",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "UTC、本地无时区时间及日期严格区分。"
+      },
+      "G4QueryUnit": {
+        "required": [
+          "unitSpecId",
+          "unitIri",
+          "source",
+          "sourceFieldRef",
+          "evidenceIds"
+        ],
+        "type": "object",
+        "properties": {
+          "unitSpecId": {
+            "type": "string",
+            "description": "已发布单位规格标识。"
+          },
+          "unitIri": {
+            "type": "string",
+            "description": "正式单位IRI。"
+          },
+          "source": {
+            "enum": [
+              "MAPPING_RELEASE",
+              "SOURCE_FIELD"
+            ],
+            "type": "string",
+            "description": "MAPPING_RELEASE或SOURCE_FIELD。"
+          },
+          "sourceFieldRef": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "源字段来源时必填，映射来源时为空。"
+          },
+          "evidenceIds": {
+            "minItems": 1,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "单位来源证据。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "单位来源必须可核到固定映射或登记字段。"
+      },
+      "G4QueryUtcInterval": {
+        "required": [
+          "fromUtc",
+          "toUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "fromUtc": {
+            "type": "string",
+            "description": "半开区间起点。"
+          },
+          "toUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "排除的终点，未知结束为空。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "旧G4顶层有效区间只表达已知UTC时刻。"
+      },
+      "G4QueryValue": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/G4QueryValueG4StringValue"
+          },
+          {
+            "$ref": "#/components/schemas/G4QueryValueG4BooleanValue"
+          },
+          {
+            "$ref": "#/components/schemas/G4QueryValueG4Int64Value"
+          },
+          {
+            "$ref": "#/components/schemas/G4QueryValueG4DecimalValue"
+          },
+          {
+            "$ref": "#/components/schemas/G4QueryValueG4DateValue"
+          },
+          {
+            "$ref": "#/components/schemas/G4QueryValueG4UtcValue"
+          },
+          {
+            "$ref": "#/components/schemas/G4QueryValueG4LocalValue"
+          },
+          {
+            "$ref": "#/components/schemas/G4QueryValueG4NullValue"
+          }
+        ],
+        "description": "精确标量以类型和词法表示，不经浮点中转。",
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "string": "#/components/schemas/G4QueryValueG4StringValue",
+            "boolean": "#/components/schemas/G4QueryValueG4BooleanValue",
+            "int64": "#/components/schemas/G4QueryValueG4Int64Value",
+            "decimal": "#/components/schemas/G4QueryValueG4DecimalValue",
+            "date": "#/components/schemas/G4QueryValueG4DateValue",
+            "timestampUtc": "#/components/schemas/G4QueryValueG4UtcValue",
+            "timestampLocal": "#/components/schemas/G4QueryValueG4LocalValue",
+            "null": "#/components/schemas/G4QueryValueG4NullValue"
+          }
+        }
+      },
+      "G4QueryValueG4BooleanValue": {
+        "required": [
+          "lexical",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "boolean"
+            ],
+            "type": "string"
+          },
+          "lexical": {
+            "maxLength": 128,
+            "pattern": "^(true|false)$",
+            "type": "string",
+            "description": "非null分支为精确字符串，null分支仅为JSON null。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "布尔词法仅true或false。"
+      },
+      "G4QueryValueG4DateValue": {
+        "required": [
+          "lexical",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "date"
+            ],
+            "type": "string"
+          },
+          "lexical": {
+            "maxLength": 128,
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "type": "string",
+            "description": "非null分支为精确字符串，null分支仅为JSON null。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "不附加午夜的源日期。"
+      },
+      "G4QueryValueG4DecimalValue": {
+        "required": [
+          "precision",
+          "scale",
+          "lexical",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "decimal"
+            ],
+            "type": "string"
+          },
+          "precision": {
+            "maximum": 28,
+            "minimum": 1,
+            "type": "integer",
+            "description": "批准目录声明的十进制精度。",
+            "format": "int32"
+          },
+          "scale": {
+            "maximum": 28,
+            "minimum": 0,
+            "type": "integer",
+            "description": "批准目录声明的小数位数。",
+            "format": "int32"
+          },
+          "lexical": {
+            "maxLength": 128,
+            "pattern": "^-?(0|[1-9][0-9]{0,27})(\\.[0-9]{1,28})?$",
+            "type": "string",
+            "description": "非null分支为精确字符串，null分支仅为JSON null。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "固定precision与scale的精确十进制值。"
+      },
+      "G4QueryValueG4Int64Value": {
+        "required": [
+          "lexical",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "int64"
+            ],
+            "type": "string"
+          },
+          "lexical": {
+            "maxLength": 128,
+            "pattern": "^-?(0|[1-9][0-9]{0,18})$",
+            "type": "string",
+            "description": "非null分支为精确字符串，null分支仅为JSON null。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "有符号64位整数的精确十进制字符串。"
+      },
+      "G4QueryValueG4LocalValue": {
+        "required": [
+          "lexical",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "timestampLocal"
+            ],
+            "type": "string"
+          },
+          "lexical": {
+            "maxLength": 128,
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,9})?$",
+            "type": "string",
+            "description": "非null分支为精确字符串，null分支仅为JSON null。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "不附加时区的本地时间词法。"
+      },
+      "G4QueryValueG4NullValue": {
+        "required": [
+          "declaredType",
+          "lexical",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "null"
+            ],
+            "type": "string"
+          },
+          "declaredType": {
+            "enum": [
+              "string",
+              "boolean",
+              "int64",
+              "decimal",
+              "date",
+              "timestampUtc",
+              "timestampLocal"
+            ],
+            "type": "string",
+            "description": "null原字段的非null类型声明。"
+          },
+          "lexical": {
+            "maxLength": 128,
+            "type": "null",
+            "description": "非null分支为精确字符串，null分支仅为JSON null。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "显式源空值，不代表缺字段。"
+      },
+      "G4QueryValueG4StringValue": {
+        "required": [
+          "lexical",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "string"
+            ],
+            "type": "string"
+          },
+          "lexical": {
+            "maxLength": 4096,
+            "type": "string",
+            "description": "非null分支为精确字符串，null分支仅为JSON null。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "源字符串，空串与null严格区分。"
+      },
+      "G4QueryValueG4UtcValue": {
+        "required": [
+          "lexical",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "timestampUtc"
+            ],
+            "type": "string"
+          },
+          "lexical": {
+            "maxLength": 128,
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,9})?Z$",
+            "type": "string",
+            "description": "非null分支为精确字符串，null分支仅为JSON null。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "精确UTC时间词法。"
+      },
+      "G4QueryView": {
+        "required": [
+          "queryId",
+          "executionStatus",
+          "createdAtUtc",
+          "completedAtUtc",
+          "expiresAtUtc",
+          "resultHash",
+          "errorCode"
+        ],
+        "type": "object",
+        "properties": {
+          "queryId": {
+            "type": "string",
+            "description": "服务器生成查询身份。"
+          },
+          "executionStatus": {
+            "enum": [
+              "RUNNING",
+              "COMPLETED",
+              "CANCELLED",
+              "FAILED"
+            ],
+            "type": "string",
+            "description": "RUNNING、COMPLETED、CANCELLED或FAILED。"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "description": "真实创建时间。"
+          },
+          "completedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "终结时间，执行中为空。"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "description": "不可延长的结果到期时间。"
+          },
+          "resultHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "获准结果读取者可见的规范字节SHA256。"
+          },
+          "errorCode": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "失败固定码或空。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "查询执行状态与业务六态分离的恢复视图。"
+      },
+      "G4SemanticQuery": {
+        "required": [
+          "assetId",
+          "ontologyReleaseId",
+          "mappingReleaseIds",
+          "capabilityId",
+          "capabilityVersion",
+          "relationshipIris",
+          "depth",
+          "maxRows",
+          "timeoutMs",
+          "filters"
+        ],
+        "type": "object",
+        "properties": {
+          "assetId": {
+            "type": "string",
+            "description": "正式本体资产标识。"
+          },
+          "ontologyReleaseId": {
+            "type": "string",
+            "description": "固定正式本体发布。"
+          },
+          "mappingReleaseIds": {
+            "maxItems": 1,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "固定映射发布集合，首期一个源。"
+          },
+          "capabilityId": {
+            "type": "string",
+            "description": "登记查询能力名。"
+          },
+          "capabilityVersion": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "输入输出与执行器共同散列。"
+          },
+          "relationshipIris": {
+            "maxItems": 5,
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "只允许发布关系路径。"
+          },
+          "depth": {
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer",
+            "description": "最大遍历深度，一至五。",
+            "format": "int32"
+          },
+          "maxRows": {
+            "maximum": 100,
+            "minimum": 2,
+            "type": "integer",
+            "description": "最大返回项数，二至一百。",
+            "format": "int32"
+          },
+          "timeoutMs": {
+            "maximum": 5000,
+            "minimum": 100,
+            "type": "integer",
+            "description": "整体截止预算，一百至五千毫秒。",
+            "format": "int32"
+          },
+          "filters": {
+            "description": "仅允许受控身份和时间窗过滤。",
+            "$ref": "#/components/schemas/G4QueryFilters"
+          }
+        },
+        "additionalProperties": false,
+        "description": "登记能力的受控查询请求，不接收SQL或任意URL。"
+      },
+      "G4SourceEvidenceRef": {
+        "required": [
+          "evidenceId",
+          "connectionId",
+          "mappingReleaseId",
+          "sourceCatalogSnapshotId",
+          "sourceDatasetRef",
+          "sourceReadReceiptId",
+          "scope",
+          "precision",
+          "sourceRecordRef",
+          "validTime",
+          "observedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "evidenceId": {
+            "type": "string",
+            "description": "本次证据唯一标识。"
+          },
+          "connectionId": {
+            "type": "string",
+            "description": "获准可见的源连接。"
+          },
+          "mappingReleaseId": {
+            "type": "string",
+            "description": "实际使用的不可变映射。"
+          },
+          "sourceCatalogSnapshotId": {
+            "type": "string",
+            "description": "原发布目录身份。"
+          },
+          "sourceDatasetRef": {
+            "type": "string",
+            "description": "已登记源数据集引用。"
+          },
+          "sourceReadReceiptId": {
+            "type": "string",
+            "description": "实际读取分支回执。"
+          },
+          "scope": {
+            "description": "此证据需要的完整范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "precision": {
+            "enum": [
+              "RECORD",
+              "ROW_KEY",
+              "DATASET",
+              "TIME_WINDOW",
+              "UNKNOWN"
+            ],
+            "type": "string",
+            "description": "RECORD、ROW_KEY、DATASET、TIME_WINDOW或UNKNOWN。"
+          },
+          "sourceRecordRef": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "真实可定位记录引用；未知必须为空。"
+          },
+          "validTime": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "已知UTC业务区间。",
+                "$ref": "#/components/schemas/G4QueryUtcInterval"
+              }
+            ]
+          },
+          "observedAtUtc": {
+            "type": "string",
+            "description": "实际读取观察时刻。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "业务断言可回链的源证据，不包含伪造图身份。"
+      },
+      "G4SourceEvidenceView": {
+        "required": [
+          "schemaVersion",
+          "evidence",
+          "receipt"
+        ],
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "enum": [
+              "g4.source-evidence.v1"
+            ],
+            "type": "string",
+            "description": "固定g4.source-evidence.v1版本。"
+          },
+          "evidence": {
+            "description": "与原结果精确相同且通过当前授权的来源引用。",
+            "$ref": "#/components/schemas/G4SourceEvidenceRef"
+          },
+          "receipt": {
+            "description": "只含获准公共身份，不暴露内部连接配置、会话及授权版本。",
+            "$ref": "#/components/schemas/G4SourceReceiptView"
+          }
+        },
+        "additionalProperties": false,
+        "description": "源证据打开只返回当前授权可见的证据及安全回执视图。"
+      },
+      "G4SourceReceiptView": {
+        "required": [
+          "receiptId",
+          "queryId",
+          "mappingReleaseId",
+          "manifestHash",
+          "originalCatalogSnapshotId",
+          "currentCatalogSnapshotId",
+          "connectionId",
+          "connectionRevision",
+          "activationId",
+          "activationRevision",
+          "queryPlanHash",
+          "adapterVersion",
+          "status",
+          "rowCount",
+          "limited",
+          "watermarkKind",
+          "watermark",
+          "readStartedAtUtc",
+          "readCompletedAtUtc",
+          "resultHash",
+          "traceId"
+        ],
+        "type": "object",
+        "properties": {
+          "receiptId": {
+            "type": "string",
+            "description": "实际分支回执标识。"
+          },
+          "queryId": {
+            "type": "string",
+            "description": "所属本人查询。"
+          },
+          "mappingReleaseId": {
+            "type": "string",
+            "description": "固定映射发布。"
+          },
+          "manifestHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "实际映射原件散列。"
+          },
+          "originalCatalogSnapshotId": {
+            "type": "string",
+            "description": "原发布目录。"
+          },
+          "currentCatalogSnapshotId": {
+            "type": "string",
+            "description": "执行时校验目录。"
+          },
+          "connectionId": {
+            "type": "string",
+            "description": "获准读取的连接身份。"
+          },
+          "connectionRevision": {
+            "type": "string",
+            "description": "执行时连接修订的精确十进制字符串。"
+          },
+          "activationId": {
+            "type": "string",
+            "description": "防止ABA的激活身份。"
+          },
+          "activationRevision": {
+            "type": "string",
+            "description": "执行时单调激活修订。"
+          },
+          "queryPlanHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string",
+            "description": "受控类型计划散列，不返回SQL。"
+          },
+          "adapterVersion": {
+            "type": "string",
+            "description": "实际只读适配器版本。"
+          },
+          "status": {
+            "enum": [
+              "SUCCESS",
+              "EMPTY",
+              "TIMEOUT",
+              "FORBIDDEN",
+              "UNAVAILABLE",
+              "INDETERMINATE"
+            ],
+            "type": "string",
+            "description": "真实读取分支状态。"
+          },
+          "rowCount": {
+            "maximum": 100,
+            "minimum": 0,
+            "type": "integer",
+            "description": "该回执实际授权投影项数。",
+            "format": "int32"
+          },
+          "limited": {
+            "type": "boolean",
+            "description": "实际发生的预算截断。"
+          },
+          "watermarkKind": {
+            "enum": [
+              "TRANSACTION_SNAPSHOT",
+              "EVENT_TIME",
+              "OBSERVED_AT",
+              "OPAQUE",
+              "UNKNOWN"
+            ],
+            "type": "string",
+            "description": "实际水位类型，不声称跨分支原子快照。"
+          },
+          "watermark": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "实际测得水位；未知为空。"
+          },
+          "readStartedAtUtc": {
+            "type": "string",
+            "description": "真实源读取开始时刻。"
+          },
+          "readCompletedAtUtc": {
+            "type": "string",
+            "description": "真实源读取结束时刻。"
+          },
+          "resultHash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "仅该分支授权投影的规范字节散列。"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "原查询服务端跟踪标识。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "实际读取回执的封闭公共投影，不返回内部完整Binding。"
       },
       "JsonElement": { },
       "MappingActivationCheck": {
@@ -4572,6 +6382,9 @@
     },
     {
       "name": "Mappings"
+    },
+    {
+      "name": "Semantic queries"
     }
   ]
 }

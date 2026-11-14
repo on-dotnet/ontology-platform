@@ -567,6 +567,88 @@ public sealed record G4QueryDiagnostic
     public required string? Path { get; init; }
 }
 
+/// <summary>源证据打开只返回当前授权可见的证据及安全回执视图。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record G4SourceEvidenceView
+{
+    /// <summary>固定g4.source-evidence.v1版本。</summary>
+    public required string SchemaVersion { get; init; }
+
+    /// <summary>与原结果精确相同且通过当前授权的来源引用。</summary>
+    public required G4SourceEvidenceRef Evidence { get; init; }
+
+    /// <summary>只含获准公共身份，不暴露内部连接配置、会话及授权版本。</summary>
+    public required G4SourceReceiptView Receipt { get; init; }
+}
+
+/// <summary>实际读取回执的封闭公共投影，不返回内部完整Binding。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record G4SourceReceiptView
+{
+    /// <summary>实际分支回执标识。</summary>
+    public required string ReceiptId { get; init; }
+
+    /// <summary>所属本人查询。</summary>
+    public required string QueryId { get; init; }
+
+    /// <summary>固定映射发布。</summary>
+    public required string MappingReleaseId { get; init; }
+
+    /// <summary>实际映射原件散列。</summary>
+    public required string ManifestHash { get; init; }
+
+    /// <summary>原发布目录。</summary>
+    public required string OriginalCatalogSnapshotId { get; init; }
+
+    /// <summary>执行时校验目录。</summary>
+    public required string CurrentCatalogSnapshotId { get; init; }
+
+    /// <summary>获准读取的连接身份。</summary>
+    public required string ConnectionId { get; init; }
+
+    /// <summary>执行时连接修订的精确十进制字符串。</summary>
+    public required string ConnectionRevision { get; init; }
+
+    /// <summary>防止ABA的激活身份。</summary>
+    public required string ActivationId { get; init; }
+
+    /// <summary>执行时单调激活修订。</summary>
+    public required string ActivationRevision { get; init; }
+
+    /// <summary>受控类型计划散列，不返回SQL。</summary>
+    public required string QueryPlanHash { get; init; }
+
+    /// <summary>实际只读适配器版本。</summary>
+    public required string AdapterVersion { get; init; }
+
+    /// <summary>真实读取分支状态。</summary>
+    public required string Status { get; init; }
+
+    /// <summary>该回执实际授权投影项数。</summary>
+    public required int RowCount { get; init; }
+
+    /// <summary>实际发生的预算截断。</summary>
+    public required bool Limited { get; init; }
+
+    /// <summary>实际水位类型，不声称跨分支原子快照。</summary>
+    public required string WatermarkKind { get; init; }
+
+    /// <summary>实际测得水位；未知为空。</summary>
+    public required string? Watermark { get; init; }
+
+    /// <summary>真实源读取开始时刻。</summary>
+    public required string ReadStartedAtUtc { get; init; }
+
+    /// <summary>真实源读取结束时刻。</summary>
+    public required string ReadCompletedAtUtc { get; init; }
+
+    /// <summary>仅该分支授权投影的规范字节散列。</summary>
+    public required string? ResultHash { get; init; }
+
+    /// <summary>原查询服务端跟踪标识。</summary>
+    public required string TraceId { get; init; }
+}
+
 /// <summary>查询执行状态与业务六态分离的恢复视图。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed record G4QueryView

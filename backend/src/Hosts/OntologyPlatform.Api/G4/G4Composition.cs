@@ -6,6 +6,7 @@ using OntologyPlatform.Api.Security;
 using OntologyPlatform.Contracts;
 using OntologyPlatform.Modules.Connections;
 using OntologyPlatform.Modules.Governance;
+using OntologyPlatform.Modules.SemanticQuery;
 
 namespace OntologyPlatform.Api.G4;
 
@@ -64,6 +65,8 @@ public static class G4Composition
         builder.Services.AddScoped<IMappingAuthorizationAuthority>(provider => provider.GetRequiredService<MappingAuthorizationParticipant>());
         if (builder.Configuration.GetValue<bool>("G4:QueryEnabled"))
         {
+            if (!builder.Configuration.GetValue<bool>("G2:Enabled") || !builder.Configuration.GetValue<bool>("G4:Mapping:Enabled"))
+                throw new InvalidOperationException("查询需要正式语义网关与映射模块。");
             builder.Services.AddScoped<IG4QueryAuthorizationAuthority, QueryAuthorizationParticipant>();
             builder.Services.AddScoped<QueryBindingReader>();
             builder.Services.AddScoped<IG4QueryBindingReader>(provider => provider.GetRequiredService<QueryBindingReader>());
@@ -123,6 +126,13 @@ public static class G4Composition
         // 模块上下文只连接隔离平台PG。
         await using var db = await factory.CreateDbContextAsync();
         await db.Database.MigrateAsync();
+        if (app.Configuration.GetValue<bool>("G4:QueryEnabled"))
+        {
+            // 查询模块只迁移自己schema，使用相同平台PG不会扩大其他模块表写权限。
+            var queryFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<G4QueryDbContext>>();
+            await using var queries = await queryFactory.CreateDbContextAsync();
+            await queries.Database.MigrateAsync();
+        }
     }
 }
 

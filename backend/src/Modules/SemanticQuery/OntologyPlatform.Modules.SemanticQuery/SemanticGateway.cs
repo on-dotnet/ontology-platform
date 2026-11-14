@@ -24,8 +24,11 @@ public sealed class SemanticGateway : ISemanticGateway
     /// <summary>服务端UTC观察时间。</summary>
     private readonly TimeProvider clock;
 
+    /// <summary>仅显式开启G4后组合的源查询执行器，旧G2不需要此依赖。</summary>
+    private readonly G4QueryExecution? queryExecution;
+
     /// <summary>消费其他模块公共合同，不直接读写其表。</summary>
-    public SemanticGateway(IReleaseCatalog catalog, ISemanticRuntime runtime, CapabilityRegistry registry, IAuditTrail audit, TimeProvider clock, VerifiedReleaseSources sources)
+    public SemanticGateway(IReleaseCatalog catalog, ISemanticRuntime runtime, CapabilityRegistry registry, IAuditTrail audit, TimeProvider clock, VerifiedReleaseSources sources, G4QueryExecution? queryExecution = null)
     {
         this.catalog = catalog;
         this.runtime = runtime;
@@ -33,10 +36,113 @@ public sealed class SemanticGateway : ISemanticGateway
         this.audit = audit;
         this.clock = clock;
         this.sources = sources;
+        this.queryExecution = queryExecution;
     }
 
     /// <summary>返回三个实际能力和完整Schema版本。</summary>
     public SemanticCapability[] GetCapabilities() => registry.Read();
+
+    /// <summary>G4与G2共用正式发布核验；绝对截止包含根读取、源查询、持久和审计。</summary>
+    public async Task<G4QueryDelivery> ExecuteG4Async(ActorContext actor, string sessionReference, G4SemanticQuery query,
+        string idempotencyKey, string? selectionQueryId, CancellationToken cancellationToken)
+    {
+        if (queryExecution is null) throw new SemanticOperationException(422, "capability_not_supported");
+        QueryRules.ValidateG4(actor, query, selectionQueryId);
+        registry.Resolve(query);
+        // 总预算从任何依赖读取之前开始，源分支只能使用剩余时间。
+        var deadline = clock.GetUtcNow().AddMilliseconds(query.TimeoutMs);
+        // 调用方断开与服务器截止同时传播到所有真实依赖。
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        budget.CancelAfter(query.TimeoutMs);
+        try
+        {
+            // 正式图必须与不可变原件精确对账，不能用空图代替本体。
+            var graph = await ReadG4RootAsync(actor, query, budget.Token);
+            return await queryExecution.ExecuteAsync(actor, sessionReference, query, idempotencyKey, selectionQueryId,
+                graph, deadline, async (saved, token) => { await ReadG4RootAsync(actor, saved, token); }, budget.Token);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new SemanticOperationException(503, "query_timeout");
+        }
+    }
+
+    /// <summary>本人恢复通过同一正式根与当前数据权限，不重新执行原查询。</summary>
+    public async Task<G4QueryDelivery> ReadG4Async(ActorContext actor, string sessionReference, string queryId,
+        bool includeResult, CancellationToken cancellationToken)
+    {
+        if (queryExecution is null) throw new SemanticOperationException(422, "capability_not_supported");
+        QueryRules.DemandActor(actor);
+        // 恢复单次预算同样覆盖全部当前授权检查和读取审计。
+        var deadline = clock.GetUtcNow().AddSeconds(5);
+        // 恢复不延长原结果到期时间。
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        budget.CancelAfter(TimeSpan.FromSeconds(5));
+        try
+        {
+            return await queryExecution.ReadAsync(actor, sessionReference, queryId, includeResult, false, deadline,
+                async (saved, token) => { await ReadG4RootAsync(actor, saved, token); }, budget.Token);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new SemanticOperationException(503, "query_timeout");
+        }
+    }
+
+    /// <summary>取消复用当前根权限及查询事务，不通过旧G2结果模型传输。</summary>
+    public async Task<G4QueryView> CancelG4Async(ActorContext actor, string sessionReference, string queryId, CancellationToken cancellationToken)
+    {
+        if (queryExecution is null) throw new SemanticOperationException(422, "capability_not_supported");
+        QueryRules.DemandActor(actor);
+        // 取消与其他入口共享五秒上限，不能在审计失败后补一份成功响应。
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        budget.CancelAfter(TimeSpan.FromSeconds(5));
+        try
+        {
+            return await queryExecution.CancelAsync(actor, sessionReference, queryId,
+                async (saved, token) => { await ReadG4RootAsync(actor, saved, token); }, budget.Token);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new SemanticOperationException(503, "query_timeout");
+        }
+    }
+
+    /// <summary>来源打开仍走统一网关与当前根授权，额外evidence.read由执行器核验。</summary>
+    public async Task<G4SourceEvidenceView> ReadG4EvidenceAsync(ActorContext actor, string sessionReference, string evidenceId, CancellationToken cancellationToken)
+    {
+        if (queryExecution is null) throw new SemanticOperationException(422, "capability_not_supported");
+        QueryRules.DemandActor(actor);
+        // 证据恢复共享五秒截止，不重置源权限核验预算。
+        var deadline = clock.GetUtcNow().AddSeconds(5);
+        // 单次读取审计仍需在本次预算中完成。
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        budget.CancelAfter(TimeSpan.FromSeconds(5));
+        try
+        {
+            return await queryExecution.ReadEvidenceAsync(actor, sessionReference, evidenceId, deadline,
+                async (saved, token) => { await ReadG4RootAsync(actor, saved, token); }, budget.Token);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new SemanticOperationException(503, "query_timeout");
+        }
+    }
+
+    /// <summary>明确固定发布、当前完整本体scope和真实原件；不要求G3清单预先登记未来G4能力。</summary>
+    private async Task<PublishedGraph> ReadG4RootAsync(ActorContext actor, G4SemanticQuery query, CancellationToken token)
+    {
+        QueryRules.DemandActor(actor);
+        // 正式目录执行semantic.read资源授权，不能只相信HTTP策略已通过。
+        var manifest = (await catalog.ResolveAsync(actor, query.AssetId, query.OntologyReleaseId, token)).Manifest;
+        if (!QueryRules.Covers(actor, manifest.Scope)) throw new SemanticOperationException(403, "scope_denied");
+        // 每次读取真实原件并与同一发布图核对，不沿用旧会话的可见性。
+        var verified = await sources.ReadAsync(manifest, token);
+        // 发布图唯一来源仍是现有语义运行时。
+        var graph = new PublishedGraph(manifest, await runtime.ReadVerifiedPublishedAsync(manifest, verified, token), token);
+        if (query.RelationshipIris.Any(iri => !graph.Relationships.Contains(iri))) throw new SemanticOperationException(422, "query_path_invalid");
+        return graph;
+    }
 
     /// <summary>前置失败保留HTTP错误；可信快照取得后才可返回业务六态。</summary>
     public async Task<SemanticQueryResult> ExecuteAsync(ActorContext actor, SemanticQueryPlan plan, CancellationToken cancellationToken)
