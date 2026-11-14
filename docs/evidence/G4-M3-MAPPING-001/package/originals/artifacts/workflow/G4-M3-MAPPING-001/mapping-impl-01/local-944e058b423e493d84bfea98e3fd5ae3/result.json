@@ -1,0 +1,365 @@
+{
+  "taskId": "G4-M3-MAPPING-001",
+  "runId": "mapping-impl-01",
+  "status": "PASS",
+  "inputs": {
+    "backend": "763ec9bdcb82b5646f970bb0ea7a1fb954d0e02e91421e4e48bdd173ddebb8ee",
+    "web": "3f0761999dacbcbdd50dc7acbcf519f2399ca5d4e057ea595394790f63551c9a"
+  },
+  "rows": [
+    {
+      "stage": "wire-build",
+      "kind": "build",
+      "exitCode": 0,
+      "tests": 0,
+      "inputKey": "763ec9bdcb82b5646f970bb0ea7a1fb954d0e02e91421e4e48bdd173ddebb8ee",
+      "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/wire-build.txt",
+      "sha256": "07aaf7dbeabd5c48a8eac27c9e30cf109b217e377bbed6b2c7b29529efaa18e6",
+      "receipt": {
+        "schemaVersion": 2,
+        "taskId": "G4-M3-MAPPING-001",
+        "runId": "mapping-impl-01",
+        "stage": "wire-build",
+        "commandId": "805b08c357b8494f88f36b1cb89e524e",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform",
+        "commandSummary": {
+          "executable": "sandbox-exec",
+          "argumentCount": 9,
+          "sha256": "347acdabf64d75720b7b2c8efc1a5e28030d4043269e306e0f8bce3ccbe8333e"
+        },
+        "inputFingerprint": "763ec9bdcb82b5646f970bb0ea7a1fb954d0e02e91421e4e48bdd173ddebb8ee",
+        "environmentFingerprint": "60b1ff5276246e183b4313fc2d99f7c565c3f99bc4948feebe5121cd1cd49089",
+        "identity": "dfb58ae52da0aab1e73fd0243d800bf67a784ea1b81c411ac52b2b4df9d5545b",
+        "deadlineSeconds": 180,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-14T05:47:35.247656+00:00",
+        "endedAtUtc": "2026-11-14T05:47:37.209999+00:00",
+        "elapsedSeconds": 1.9623799169785343,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/805b08c357b8494f88f36b1cb89e524e/stdout.txt",
+          "sha256": "07aaf7dbeabd5c48a8eac27c9e30cf109b217e377bbed6b2c7b29529efaa18e6",
+          "sizeBytes": 60
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/805b08c357b8494f88f36b1cb89e524e/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "wire",
+      "kind": "mtp",
+      "exitCode": 0,
+      "tests": 6,
+      "inputKey": "08e822c7eeab3bf85fe84ad94d89e4876afffc590eb95bf3113e3363cbcebf04",
+      "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/wire.txt",
+      "sha256": "b0c84899f6e0b2e28be25a6be8328dba5a4f656adfc81f074a214fdec45ce5fa",
+      "receipt": {
+        "schemaVersion": 2,
+        "taskId": "G4-M3-MAPPING-001",
+        "runId": "mapping-impl-01",
+        "stage": "wire",
+        "commandId": "3c573a33ed9e4f708bd081c1dafd4d8c",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform",
+        "commandSummary": {
+          "executable": "sandbox-exec",
+          "argumentCount": 10,
+          "sha256": "bfbd225e6577503ebc318b4031c023f672fe6f19a4fdb2dfb6a4c5908f8869b9"
+        },
+        "inputFingerprint": "08e822c7eeab3bf85fe84ad94d89e4876afffc590eb95bf3113e3363cbcebf04",
+        "environmentFingerprint": "60b1ff5276246e183b4313fc2d99f7c565c3f99bc4948feebe5121cd1cd49089",
+        "identity": "90bf785595068e45d99135b759f410c924cd6e41c6c55dc6a4d7e091722b7403",
+        "deadlineSeconds": 30,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-14T05:47:37.215904+00:00",
+        "endedAtUtc": "2026-11-14T05:47:37.467381+00:00",
+        "elapsedSeconds": 0.2515423339791596,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/3c573a33ed9e4f708bd081c1dafd4d8c/stdout.txt",
+          "sha256": "b0c84899f6e0b2e28be25a6be8328dba5a4f656adfc81f074a214fdec45ce5fa",
+          "sizeBytes": 349
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/3c573a33ed9e4f708bd081c1dafd4d8c/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      },
+      "binaries": {
+        "Microsoft.TestPlatform.CoreUtilities.dll": "ca8cd4a0c394af3cc03c8e83b0377ecf14e6a8c68e4b0b50f732b1370950d7df",
+        "Microsoft.Testing.Extensions.Telemetry.dll": "c4f35fc45c100733d6f00f9aba87fe6c96481d3c43c416d32a4722fddd6e79e1",
+        "Microsoft.Testing.Platform.dll": "a3319a6bb4bdfb1df2e531765c5a48c2b48de1fe7cf4dcd932c9b82f114107da",
+        "MSTest.TestFramework.Extensions.dll": "39b4014cd714c704a35e3d690dbddbee209b9b4925db8da2e870686ceb0ec5d1",
+        "MSTest.TestAdapter.dll": "18de8760190a607e903da92c548e976628a9da1cabde1dbec32a773f0f08e99a",
+        "Microsoft.Testing.Extensions.TrxReport.Abstractions.dll": "f57bc3dcd63c0dcd08db8d5e729836d156351a2d18041a5b7978a424e5b37142",
+        "OntologyPlatform.G2ContractTests.dll": "926091157d9ce55024e67fe5dbb7915a4d5025f6ebe8dba440dccc68d80d89e2",
+        "MSTestAdapter.PlatformServices.dll": "74559c1c0fa199dc1ce53324a95b67b3084ca906df9ddac52fdb29bb2043c943",
+        "Microsoft.TestPlatform.PlatformAbstractions.dll": "8bc7faec348a71336af3bfbeecad564ad0f97a8216835ed90cd2ceff621a3697",
+        "OntologyPlatform.Contracts.dll": "3247213c63aedc6bf9ad1d34a66e0b3635aa1cce52edd2ad84efb95a6df281d2",
+        "MSTest.TestFramework.dll": "1ef03e88502ea03be38088bd1e23bfe7fbce516d1e74225acb84b6640cd8b73b",
+        "Microsoft.VisualStudio.TestPlatform.ObjectModel.dll": "ff730c68bebe827f74e2bdcfb571400ab328c00be11c7fe3a1fe01143b483bc6",
+        "Microsoft.ApplicationInsights.dll": "bf9a4b88c7f94267e1cc7ed0700c575d3eb3266ff25bcb76e4f40f1b0fba022d",
+        "Microsoft.Testing.Extensions.MSBuild.dll": "828e7dc4e0206da2a9a58df26651acc2f28b7169509c5c26dcff3c991513fe09"
+      }
+    },
+    {
+      "stage": "semantics-build",
+      "kind": "build",
+      "exitCode": 0,
+      "tests": 0,
+      "inputKey": "763ec9bdcb82b5646f970bb0ea7a1fb954d0e02e91421e4e48bdd173ddebb8ee",
+      "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/semantics-build.txt",
+      "sha256": "58e4bf7cd7f7fdae4ad875af1639d1f44c86f7b79a6cc5d90376fe10d00fd26c",
+      "receipt": {
+        "schemaVersion": 2,
+        "taskId": "G4-M3-MAPPING-001",
+        "runId": "mapping-impl-01",
+        "stage": "semantics-build",
+        "commandId": "d20aaa57bc9744509e881b48ad261a75",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform",
+        "commandSummary": {
+          "executable": "sandbox-exec",
+          "argumentCount": 9,
+          "sha256": "fbaa4ffef5583f04c221fcff0319097724f4bc9f298402b175e780a39a2df510"
+        },
+        "inputFingerprint": "763ec9bdcb82b5646f970bb0ea7a1fb954d0e02e91421e4e48bdd173ddebb8ee",
+        "environmentFingerprint": "60b1ff5276246e183b4313fc2d99f7c565c3f99bc4948feebe5121cd1cd49089",
+        "identity": "3cb890940f8ab28f26a6eedfbb17dc2834c53f3f1ff513a6341b5c36aaf5d8a3",
+        "deadlineSeconds": 180,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-14T05:47:37.468807+00:00",
+        "endedAtUtc": "2026-11-14T05:47:39.570983+00:00",
+        "elapsedSeconds": 2.102623749990016,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/d20aaa57bc9744509e881b48ad261a75/stdout.txt",
+          "sha256": "58e4bf7cd7f7fdae4ad875af1639d1f44c86f7b79a6cc5d90376fe10d00fd26c",
+          "sizeBytes": 2693
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/d20aaa57bc9744509e881b48ad261a75/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "semantics",
+      "kind": "mtp",
+      "exitCode": 0,
+      "tests": 14,
+      "inputKey": "8353929e1465dd4e68cc4de690de9661700f0c0cf333b1b94f79893f734f502d",
+      "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/semantics.txt",
+      "sha256": "03cb3d317cb4074e165e3cfc0c468c5db458b704bbc3c91ad831184f4a24605e",
+      "receipt": {
+        "schemaVersion": 2,
+        "taskId": "G4-M3-MAPPING-001",
+        "runId": "mapping-impl-01",
+        "stage": "semantics",
+        "commandId": "55a36f59d9e4441b97389ccbd3ada135",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform",
+        "commandSummary": {
+          "executable": "sandbox-exec",
+          "argumentCount": 10,
+          "sha256": "e6aee37322c2bf4915f55e66326c5eab864c5fbb02d111a8526d77494b86f81c"
+        },
+        "inputFingerprint": "8353929e1465dd4e68cc4de690de9661700f0c0cf333b1b94f79893f734f502d",
+        "environmentFingerprint": "60b1ff5276246e183b4313fc2d99f7c565c3f99bc4948feebe5121cd1cd49089",
+        "identity": "638b47a8a7a0d80fc6f4c49a325201ea1569242e549fb13d522ad391caa16249",
+        "deadlineSeconds": 30,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-14T05:47:39.581373+00:00",
+        "endedAtUtc": "2026-11-14T05:47:40.026558+00:00",
+        "elapsedSeconds": 0.4452830000082031,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/55a36f59d9e4441b97389ccbd3ada135/stdout.txt",
+          "sha256": "03cb3d317cb4074e165e3cfc0c468c5db458b704bbc3c91ad831184f4a24605e",
+          "sizeBytes": 353
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/55a36f59d9e4441b97389ccbd3ada135/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      },
+      "binaries": {
+        "Microsoft.TestPlatform.CoreUtilities.dll": "ca8cd4a0c394af3cc03c8e83b0377ecf14e6a8c68e4b0b50f732b1370950d7df",
+        "Microsoft.Testing.Extensions.Telemetry.dll": "c4f35fc45c100733d6f00f9aba87fe6c96481d3c43c416d32a4722fddd6e79e1",
+        "OntologyPlatform.ConnectionsTests.dll": "49207f3af1fb3000598006eedb6706822a779f3a4fec6d319ea3ec487e985310",
+        "Npgsql.EntityFrameworkCore.PostgreSQL.dll": "94fcf66e8e953fdb02c40c72ca89821dd5eed5324d4c0f12a7219ea8cd3d5a5e",
+        "Microsoft.EntityFrameworkCore.dll": "87faf0bf54de5f62c7d30eb686018b11c53d4acf6c280adb39965b303c5b2b59",
+        "OntologyPlatform.Modules.Connections.dll": "8e7c7e41dd693c3ea6e6d5f7b3d94d5918e6fa9e2d6ba83ea556a10fca685f87",
+        "System.Diagnostics.PerformanceCounter.dll": "9de39ea627d606c66d0032d48954ffd4d203f1edf3843d059b07c97788841fc4",
+        "Microsoft.Testing.Platform.dll": "a3319a6bb4bdfb1df2e531765c5a48c2b48de1fe7cf4dcd932c9b82f114107da",
+        "Microsoft.EntityFrameworkCore.Abstractions.dll": "24596b62ac0546c641e308a06bb9ea4bb153e9a776ed2311e730832465f34f5d",
+        "MSTest.TestFramework.Extensions.dll": "39b4014cd714c704a35e3d690dbddbee209b9b4925db8da2e870686ceb0ec5d1",
+        "Npgsql.dll": "e2bcafe1660fe4543fe9dfcabed972ec8d32259e5ea8009462ce1de23c7034c2",
+        "Microsoft.EntityFrameworkCore.Relational.dll": "078ad42527c893d858e1c48b7edc5a0ec755c60b28395e996bc438ede3555cf0",
+        "Oracle.ManagedDataAccess.dll": "8ddd05950d7dc80514654a6be95c43fd0014ba058f2e434c026214ce73f73f80",
+        "MSTest.TestAdapter.dll": "18de8760190a607e903da92c548e976628a9da1cabde1dbec32a773f0f08e99a",
+        "Microsoft.Testing.Extensions.TrxReport.Abstractions.dll": "f57bc3dcd63c0dcd08db8d5e729836d156351a2d18041a5b7978a424e5b37142",
+        "System.DirectoryServices.Protocols.dll": "22df39f23a9b8816f6e0ae484f9b983bde0e8baccdb9bcfbe4902977cb0d95de",
+        "MySqlConnector.dll": "e7734ef5db26f5e5626f8ef354831c60adff9a8e88447cc5e865cfe1f9e466bc",
+        "MSTestAdapter.PlatformServices.dll": "74559c1c0fa199dc1ce53324a95b67b3084ca906df9ddac52fdb29bb2043c943",
+        "Microsoft.TestPlatform.PlatformAbstractions.dll": "8bc7faec348a71336af3bfbeecad564ad0f97a8216835ed90cd2ceff621a3697",
+        "System.Security.Cryptography.ProtectedData.dll": "2495a79b01bf74ec3a5d2029fa9b94e0c167ab09b0cba1b9b7e9b89661f3ebe6",
+        "OntologyPlatform.Contracts.dll": "3247213c63aedc6bf9ad1d34a66e0b3635aa1cce52edd2ad84efb95a6df281d2",
+        "MSTest.TestFramework.dll": "1ef03e88502ea03be38088bd1e23bfe7fbce516d1e74225acb84b6640cd8b73b",
+        "Microsoft.VisualStudio.TestPlatform.ObjectModel.dll": "ff730c68bebe827f74e2bdcfb571400ab328c00be11c7fe3a1fe01143b483bc6",
+        "System.Configuration.ConfigurationManager.dll": "0d3d085b58c2bd477a5a0c51932ca455a3f1a8fb3cdc89771aeb9ab2e63c85ba",
+        "Microsoft.ApplicationInsights.dll": "bf9a4b88c7f94267e1cc7ed0700c575d3eb3266ff25bcb76e4f40f1b0fba022d",
+        "Microsoft.Testing.Extensions.MSBuild.dll": "828e7dc4e0206da2a9a58df26651acc2f28b7169509c5c26dcff3c991513fe09"
+      }
+    },
+    {
+      "stage": "typecheck",
+      "kind": "check",
+      "exitCode": 0,
+      "tests": 0,
+      "inputKey": "3f0761999dacbcbdd50dc7acbcf519f2399ca5d4e057ea595394790f63551c9a",
+      "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/typecheck.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "receipt": {
+        "schemaVersion": 2,
+        "taskId": "G4-M3-MAPPING-001",
+        "runId": "mapping-impl-01",
+        "stage": "typecheck",
+        "commandId": "aeb8c632a9234f898db300f0fbefe46f",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/apps/web",
+        "commandSummary": {
+          "executable": "sandbox-exec",
+          "argumentCount": 4,
+          "sha256": "5c9b751069c350d8f13b92c0def9c357b04414dee39270dd4e9807fd99549031"
+        },
+        "inputFingerprint": "3f0761999dacbcbdd50dc7acbcf519f2399ca5d4e057ea595394790f63551c9a",
+        "environmentFingerprint": "60b1ff5276246e183b4313fc2d99f7c565c3f99bc4948feebe5121cd1cd49089",
+        "identity": "284108559e79e9fddf68970b753e0ab7a346e3b1df141e0b5b6191214c3e3862",
+        "deadlineSeconds": 120,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-14T05:47:40.027911+00:00",
+        "endedAtUtc": "2026-11-14T05:47:40.950276+00:00",
+        "elapsedSeconds": 0.9225448330107611,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/aeb8c632a9234f898db300f0fbefe46f/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/aeb8c632a9234f898db300f0fbefe46f/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "lint",
+      "kind": "check",
+      "exitCode": 0,
+      "tests": 0,
+      "inputKey": "3f0761999dacbcbdd50dc7acbcf519f2399ca5d4e057ea595394790f63551c9a",
+      "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/lint.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "receipt": {
+        "schemaVersion": 2,
+        "taskId": "G4-M3-MAPPING-001",
+        "runId": "mapping-impl-01",
+        "stage": "lint",
+        "commandId": "5ee7935751f74284b466580c818d0ee9",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/apps/web",
+        "commandSummary": {
+          "executable": "sandbox-exec",
+          "argumentCount": 8,
+          "sha256": "134b648754b996f32d75f91be5446b2208fe821520bed8d924a244523ec09655"
+        },
+        "inputFingerprint": "3f0761999dacbcbdd50dc7acbcf519f2399ca5d4e057ea595394790f63551c9a",
+        "environmentFingerprint": "60b1ff5276246e183b4313fc2d99f7c565c3f99bc4948feebe5121cd1cd49089",
+        "identity": "02227a976429e17f49bd8db904a04d1eac29f2791a31d50753a1f5a680dd2980",
+        "deadlineSeconds": 120,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-14T05:47:40.951462+00:00",
+        "endedAtUtc": "2026-11-14T05:47:42.200350+00:00",
+        "elapsedSeconds": 1.2491136669996195,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/5ee7935751f74284b466580c818d0ee9/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/5ee7935751f74284b466580c818d0ee9/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "ui",
+      "kind": "vitest",
+      "exitCode": 0,
+      "tests": 11,
+      "inputKey": "3f0761999dacbcbdd50dc7acbcf519f2399ca5d4e057ea595394790f63551c9a",
+      "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/ui.txt",
+      "sha256": "0b70b157d4e6e25dbef93f914979c27645b7fa6a926e612edac4820e1db053f5",
+      "receipt": {
+        "schemaVersion": 2,
+        "taskId": "G4-M3-MAPPING-001",
+        "runId": "mapping-impl-01",
+        "stage": "ui",
+        "commandId": "64462fccdd4641ecad07895da5014c50",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/apps/web",
+        "commandSummary": {
+          "executable": "sandbox-exec",
+          "argumentCount": 8,
+          "sha256": "32bd8406a05ffa82ebd130129a2c4f4cd05907cf60f25b4e2163bca08dba1e12"
+        },
+        "inputFingerprint": "3f0761999dacbcbdd50dc7acbcf519f2399ca5d4e057ea595394790f63551c9a",
+        "environmentFingerprint": "60b1ff5276246e183b4313fc2d99f7c565c3f99bc4948feebe5121cd1cd49089",
+        "identity": "575362e370f7e9ed6646f26d9bfe20f153bd1ef06d596631dcc9e77fd568f49e",
+        "deadlineSeconds": 120,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-14T05:47:42.201517+00:00",
+        "endedAtUtc": "2026-11-14T05:47:42.447148+00:00",
+        "elapsedSeconds": 0.24568358299438842,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/64462fccdd4641ecad07895da5014c50/stdout.txt",
+          "sha256": "0b70b157d4e6e25dbef93f914979c27645b7fa6a926e612edac4820e1db053f5",
+          "sizeBytes": 706
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-m3-mapping-001/ontology-platform/artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/64462fccdd4641ecad07895da5014c50/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      },
+      "machinePath": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/vitest-report.json",
+      "machineSha256": "9e74164345981122a0f54de3b6f022790a5846699b98efe69e552bf7f89329fb"
+    }
+  ]
+}

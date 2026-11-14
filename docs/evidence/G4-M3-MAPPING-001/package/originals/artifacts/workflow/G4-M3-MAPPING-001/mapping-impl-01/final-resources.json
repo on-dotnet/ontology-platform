@@ -1,0 +1,143 @@
+{
+  "taskId": "G4-M3-MAPPING-001",
+  "runId": "mapping-impl-01",
+  "status": "PASS",
+  "runningContainers": 6,
+  "containerMemoryCapBytes": 6174015488,
+  "containerCpuCap": 7.0,
+  "containers": [
+    {
+      "id": "bb11e0012988f6f1a7710d7675922593d0c11f2ecc689cec25adcc62b0e3c8ab",
+      "service": "api",
+      "exitCode": 0,
+      "kib": 4,
+      "disposition": "KEEP",
+      "reason": "当前未集成M3审查/继续实施；用户批准收尾且数据安全归档或集成后解除"
+    },
+    {
+      "id": "89a8b1e01773e6b194a74779043ec695c29fcc0c8398d92a5e74f95e7708d90e",
+      "service": "rustfs",
+      "exitCode": 0,
+      "kib": 864,
+      "disposition": "KEEP",
+      "reason": "当前未集成M3审查/继续实施；用户批准收尾且数据安全归档或集成后解除"
+    },
+    {
+      "id": "01239887ff8cc63beab918db58ae709bbd1cb8dd8d6cb753d6ec1242259c0a4e",
+      "service": "keycloak-test",
+      "exitCode": 0,
+      "kib": 191412,
+      "disposition": "KEEP",
+      "reason": "当前未集成M3审查/继续实施；用户批准收尾且数据安全归档或集成后解除"
+    },
+    {
+      "id": "a44de0b64364b3fb2363c2e2ed1eb84863302f5af608c65bdc686f88664318b7",
+      "service": "fuseki",
+      "exitCode": 0,
+      "kib": 15512,
+      "disposition": "KEEP",
+      "reason": "当前未集成M3审查/继续实施；用户批准收尾且数据安全归档或集成后解除"
+    },
+    {
+      "id": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "service": "pg-source",
+      "exitCode": 0,
+      "kib": 64736,
+      "disposition": "KEEP",
+      "reason": "当前未集成M3审查/继续实施；用户批准收尾且数据安全归档或集成后解除"
+    },
+    {
+      "id": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "service": "platform-pg",
+      "exitCode": 0,
+      "kib": 95156,
+      "disposition": "KEEP",
+      "reason": "当前未集成M3审查/继续实施；用户批准收尾且数据安全归档或集成后解除"
+    }
+  ],
+  "stats": [
+    {
+      "BlockIO": "0B / 0B",
+      "CPUPerc": "4.04%",
+      "Container": "bb11e0012988f6f1a7710d7675922593d0c11f2ecc689cec25adcc62b0e3c8ab",
+      "ID": "bb11e0012988",
+      "MemPerc": "21.13%",
+      "MemUsage": "216.4MiB / 1GiB",
+      "Name": "ontology-g4-m3-mapping-impl-01-api-1",
+      "NetIO": "167MB / 51.1MB",
+      "PIDs": "25"
+    },
+    {
+      "BlockIO": "203MB / 0B",
+      "CPUPerc": "0.57%",
+      "Container": "89a8b1e01773e6b194a74779043ec695c29fcc0c8398d92a5e74f95e7708d90e",
+      "ID": "89a8b1e01773",
+      "MemPerc": "35.57%",
+      "MemUsage": "273.2MiB / 768MiB",
+      "Name": "ontology-g4-m3-mapping-impl-01-rustfs-1",
+      "NetIO": "3.62MB / 49.7MB",
+      "PIDs": "11"
+    },
+    {
+      "BlockIO": "356MB / 0B",
+      "CPUPerc": "0.54%",
+      "Container": "01239887ff8cc63beab918db58ae709bbd1cb8dd8d6cb753d6ec1242259c0a4e",
+      "ID": "01239887ff8c",
+      "MemPerc": "88.30%",
+      "MemUsage": "904.2MiB / 1GiB",
+      "Name": "ontology-g4-m3-mapping-impl-01-keycloak-test-1",
+      "NetIO": "3.2MB / 49.8MB",
+      "PIDs": "52"
+    },
+    {
+      "BlockIO": "157MB / 0B",
+      "CPUPerc": "0.13%",
+      "Container": "a44de0b64364b3fb2363c2e2ed1eb84863302f5af608c65bdc686f88664318b7",
+      "ID": "a44de0b64364",
+      "MemPerc": "32.15%",
+      "MemUsage": "493.8MiB / 1.5GiB",
+      "Name": "ontology-g4-m3-mapping-impl-01-fuseki-1",
+      "NetIO": "154MB / 416MB",
+      "PIDs": "21"
+    },
+    {
+      "BlockIO": "0B / 76.8MB",
+      "CPUPerc": "0.00%",
+      "Container": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "ID": "fb8500b78663",
+      "MemPerc": "4.78%",
+      "MemUsage": "36.75MiB / 768MiB",
+      "Name": "ontology-g4-m3-mapping-impl-01-pg-source-1",
+      "NetIO": "23.7MB / 27.9MB",
+      "PIDs": "10"
+    },
+    {
+      "BlockIO": "61.4kB / 147MB",
+      "CPUPerc": "4.75%",
+      "Container": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "ID": "5ec1ae82b66e",
+      "MemPerc": "12.39%",
+      "MemUsage": "95.13MiB / 768MiB",
+      "Name": "ontology-g4-m3-mapping-impl-01-platform-pg-1",
+      "NetIO": "130MB / 516MB",
+      "PIDs": "17"
+    }
+  ],
+  "bytes": {
+    "environment": 1524935851,
+    "backendBuild": 171548275,
+    "webBuild": 187808965,
+    "compatibilityReaders": 24320537,
+    "evidence": 9637568,
+    "otherCache": 168077,
+    "privateRuntime": 16266
+  },
+  "budgets": {
+    "buildCache": 6442450944,
+    "evidence": 1073741824,
+    "data": 3221225472,
+    "total": 10737418240
+  },
+  "oldKeepTouched": false,
+  "zipCreated": false
+}

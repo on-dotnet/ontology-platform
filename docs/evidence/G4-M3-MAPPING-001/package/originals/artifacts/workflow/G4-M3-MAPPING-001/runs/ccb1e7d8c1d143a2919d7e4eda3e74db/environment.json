@@ -1,0 +1,53 @@
+{
+  "gate": "environment",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "taskId": "G4-M3-MAPPING-001",
+    "runId": "mapping-impl-01",
+    "gate": "environment",
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "inputKey": "72711935bbabfc1ca841316b69ccb673ddad5ad8f3497630351e815d218b830b",
+    "tests": 1,
+    "skipped": 0,
+    "originals": [
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/environment/6c8f4a758218eefe50dc8efa1a3793854725ec6ac759603f6f008ffbf30dd7ee/runs/142a5e503b3e48c78dab48907f8824d5/receipt.json",
+        "sha256": "4c78cbe9c6551f9a54182581cf7917e157f1d35e2effc1d51b88687bb0464209"
+      }
+    ],
+    "ci": "NOT_RUN"
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m3_mapping.py",
+    "qualify",
+    "--task",
+    "G4-M3-MAPPING-001",
+    "--run-id",
+    "mapping-impl-01",
+    "--gate",
+    "environment",
+    "--input-key",
+    "72711935bbabfc1ca841316b69ccb673ddad5ad8f3497630351e815d218b830b"
+  ],
+  "exitCode": 0,
+  "tests": 1,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 8.384127625002293,
+  "inputKey": "72711935bbabfc1ca841316b69ccb673ddad5ad8f3497630351e815d218b830b",
+  "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+  "policyKey": "312b9a73737fbdb69b198dd3981dc4af22b3be845c38bb02ca8e46b5e7e22712",
+  "evidenceSha256": "dfa74908e4bfe1880fc34a3814f8b6bb323f8e3fed53e611796478f62020c796",
+  "logPath": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/environment.txt",
+  "sourceRun": "ccb1e7d8c1d143a2919d7e4eda3e74db",
+  "sourceCommit": "cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c"
+}

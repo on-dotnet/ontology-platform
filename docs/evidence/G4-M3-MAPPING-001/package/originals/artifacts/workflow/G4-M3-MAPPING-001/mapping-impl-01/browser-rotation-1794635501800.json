@@ -1,0 +1,856 @@
+{
+  "taskId": "G4-M3-MAPPING-001",
+  "runId": "mapping-impl-01",
+  "mode": "rotation",
+  "startedAtUtc": "2026-11-14T05:51:41.800Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_9",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_10",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_11",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_11",
+      "status": "PASS"
+    },
+    {
+      "name": "http_12_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_12",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_12",
+      "status": "PASS"
+    },
+    {
+      "name": "http_13_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_13",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_13",
+      "status": "PASS"
+    },
+    {
+      "name": "http_14_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_14",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_14",
+      "status": "PASS"
+    },
+    {
+      "name": "http_15_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_15",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_15",
+      "status": "PASS"
+    },
+    {
+      "name": "http_16_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_16",
+      "status": "PASS"
+    },
+    {
+      "name": "http_17_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_seven_pass_PUBLISH",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_17",
+      "status": "PASS"
+    },
+    {
+      "name": "http_18_201",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_18",
+      "status": "PASS"
+    },
+    {
+      "name": "http_19_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_19",
+      "status": "PASS"
+    },
+    {
+      "name": "http_20_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_20",
+      "status": "PASS"
+    },
+    {
+      "name": "http_21_201",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_21",
+      "status": "PASS"
+    },
+    {
+      "name": "http_22_200",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_new_secret_version",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_22",
+      "status": "PASS"
+    },
+    {
+      "name": "http_23_403,409",
+      "status": "PASS"
+    },
+    {
+      "name": "rotated_approval_no_commit",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_23",
+      "status": "PASS"
+    },
+    {
+      "name": "http_24_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_24",
+      "status": "PASS"
+    },
+    {
+      "name": "http_25_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotated_actual_probe",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_25",
+      "status": "PASS"
+    },
+    {
+      "name": "http_26_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_26",
+      "status": "PASS"
+    },
+    {
+      "name": "http_27_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_27",
+      "status": "PASS"
+    },
+    {
+      "name": "http_28_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_28",
+      "status": "PASS"
+    },
+    {
+      "name": "http_29_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_29",
+      "status": "PASS"
+    },
+    {
+      "name": "http_30_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotated_discovery_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_30",
+      "status": "PASS"
+    },
+    {
+      "name": "http_31_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_31",
+      "status": "PASS"
+    },
+    {
+      "name": "http_32_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_32",
+      "status": "PASS"
+    },
+    {
+      "name": "http_33_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_33",
+      "status": "PASS"
+    },
+    {
+      "name": "http_34_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_34",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_34",
+      "status": "PASS"
+    },
+    {
+      "name": "http_35_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_35",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_35",
+      "status": "PASS"
+    },
+    {
+      "name": "http_36_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_36",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_36",
+      "status": "PASS"
+    },
+    {
+      "name": "http_37_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_37",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_37",
+      "status": "PASS"
+    },
+    {
+      "name": "http_38_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_pending_38",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_38",
+      "status": "PASS"
+    },
+    {
+      "name": "http_39_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_39",
+      "status": "PASS"
+    },
+    {
+      "name": "http_40_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rotation_seven_pass_ROLLBACK",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_40",
+      "status": "PASS"
+    },
+    {
+      "name": "http_41_201",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_41",
+      "status": "PASS"
+    },
+    {
+      "name": "http_42_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_new_secret_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "commit_succeeded_before_response_drop",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_response_discarded",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_42",
+      "status": "PASS"
+    },
+    {
+      "name": "http_43_200",
+      "status": "PASS"
+    },
+    {
+      "name": "lost_response_original_receipt",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_43",
+      "status": "PASS"
+    },
+    {
+      "name": "http_44_409",
+      "status": "PASS"
+    },
+    {
+      "name": "lost_response_single_commit_audit",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_44",
+      "status": "PASS"
+    },
+    {
+      "name": "http_45_200",
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_immutable_old_manifest",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_45",
+      "status": "PASS"
+    },
+    {
+      "name": "http_46_200",
+      "status": "PASS"
+    },
+    {
+      "name": "g3_fixed_original_manifest_preserved",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 8.846333999999842,
+      "sha256": "5bb35ea478a2b26c690420c69c06aec07dd8189d4d1ce9b8d74c1253a492f9e0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 2.0420420000000377,
+      "sha256": "0abf73714eebb9f4819209448071e92a4fa5fc711803c7e56356b105d543bc6a"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 7.829332999999906,
+      "sha256": "da3ff0b2ba57c67cab96011829af8aab77a927cbac050e456da9484c0d47d9ae"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 2.2806249999998727,
+      "sha256": "b95cd0267250ce591a268429ff2cdd8ac69a752ae1711ef9823c9c8b6bee32da"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "status": 200,
+      "elapsedMs": 22.79341599999998,
+      "sha256": "45538be5f4503433b0b59e0f892163fe72ae99b6f11fa773a3dd96d4468d3a03"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-a9adc96a9c02613f5ef9c5510f9c3c4d/active",
+      "status": 200,
+      "elapsedMs": 25.98041699999999,
+      "sha256": "0e6ea545d1971ecadab9f15a5ec0e4cfc89886f99cc404b5daf0d1936d69fee4"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-releases/release-d5ec038599404038a270ea67554ff8e3",
+      "status": 200,
+      "elapsedMs": 24.44704200000001,
+      "sha256": "cdd8081bd95a62243e0f7ac02c307efe909cf9b78e1507e4224183637df1e6c3"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-a9adc96a9c02613f5ef9c5510f9c3c4d/validate",
+      "status": 202,
+      "elapsedMs": 10.071042000000034,
+      "sha256": "59c93555d7fbcd371e5ce3aed66dbdb4a9a01d22e1aace7928479840b389c38b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-5edf53a4e00b42eead412a35585ef9f6",
+      "status": 200,
+      "elapsedMs": 16.74866699999984,
+      "sha256": "2ac42b683a845f0f2c0a4fa8a894015c2a1d8b5b6b6b375c4f780b592d87f33d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-5edf53a4e00b42eead412a35585ef9f6",
+      "status": 200,
+      "elapsedMs": 16.469250000000102,
+      "sha256": "2ac42b683a845f0f2c0a4fa8a894015c2a1d8b5b6b6b375c4f780b592d87f33d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-5edf53a4e00b42eead412a35585ef9f6",
+      "status": 200,
+      "elapsedMs": 45.19687500000009,
+      "sha256": "2ac42b683a845f0f2c0a4fa8a894015c2a1d8b5b6b6b375c4f780b592d87f33d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-5edf53a4e00b42eead412a35585ef9f6",
+      "status": 200,
+      "elapsedMs": 49.77395800000022,
+      "sha256": "2ac42b683a845f0f2c0a4fa8a894015c2a1d8b5b6b6b375c4f780b592d87f33d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-5edf53a4e00b42eead412a35585ef9f6",
+      "status": 200,
+      "elapsedMs": 48.75583400000005,
+      "sha256": "2ac42b683a845f0f2c0a4fa8a894015c2a1d8b5b6b6b375c4f780b592d87f33d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-5edf53a4e00b42eead412a35585ef9f6",
+      "status": 200,
+      "elapsedMs": 17.71487500000012,
+      "sha256": "2ac42b683a845f0f2c0a4fa8a894015c2a1d8b5b6b6b375c4f780b592d87f33d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-5edf53a4e00b42eead412a35585ef9f6",
+      "status": 200,
+      "elapsedMs": 21.00295899999992,
+      "sha256": "65289afe21b8bb8a36eac9bec09fa527cba788a4db7936c133418da25dd17aa8"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-5edf53a4e00b42eead412a35585ef9f6",
+      "status": 200,
+      "elapsedMs": 21.39716700000008,
+      "sha256": "0cd21d888ba1549b00b4a8a65a84b767ab72f627144953e6cd39697b93d34d9d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-810b534d31e04c5bb704f31ef7c170cb",
+      "status": 200,
+      "elapsedMs": 17.244500000000244,
+      "sha256": "7c28090adce59173128b0cdec27b1cbe533e4e8164904f59f30a9b06f9b9194e"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-a9adc96a9c02613f5ef9c5510f9c3c4d/proposals",
+      "status": 201,
+      "elapsedMs": 7.846332999999959,
+      "sha256": "cfb459a70776ece406a0b4fbee68077feac390b83eb81b1f417f78594da57139"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-b20512a96273425499461923b41f91fb/decisions",
+      "status": 200,
+      "elapsedMs": 8.224583000000166,
+      "sha256": "335b435510ce5ab7e0edb743452d62bbe0e7201bce2d67e2caa5891c22a37c62"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connections/b05db1c4c8574e5eb36ed896b06e09d6",
+      "status": 200,
+      "elapsedMs": 2.851958000000195,
+      "sha256": "a5bf44a3750e51aa86b8ba8a86f180d27bf0de71514293b21f72e5c9ae3b866b"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/connection-secrets",
+      "status": 201,
+      "elapsedMs": 5.104542000000038,
+      "sha256": "d38d46399764cd9fd25f3e4c11b489940107335feb70b0289f2c0042f823b956"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/connections/b05db1c4c8574e5eb36ed896b06e09d6/rotate-secret",
+      "status": 200,
+      "elapsedMs": 8.41295799999989,
+      "sha256": "9e732db5cc10b013bac7d114bb24b46757715e584852c0e23e31bb1a97ba5217"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-b20512a96273425499461923b41f91fb/activate",
+      "status": 409,
+      "elapsedMs": 4.386417000000165,
+      "code": "mapping_connection_unusable",
+      "sha256": "46106ffdf96108f05ae42855f50c0018fbcdb11c80e730ba1dc0f0681ab6ca84"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connections/b05db1c4c8574e5eb36ed896b06e09d6",
+      "status": 200,
+      "elapsedMs": 2.4255419999999503,
+      "sha256": "9e732db5cc10b013bac7d114bb24b46757715e584852c0e23e31bb1a97ba5217"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/connections/b05db1c4c8574e5eb36ed896b06e09d6/test",
+      "status": 200,
+      "elapsedMs": 16.619583000000148,
+      "sha256": "29af883c84a85b67a51ea412abbc0489f94bf4cc0a29b920db1bf72a18260356"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connections/b05db1c4c8574e5eb36ed896b06e09d6",
+      "status": 200,
+      "elapsedMs": 1.5688749999999345,
+      "sha256": "9c502cf73e3cad75a378515d271a864e2926bef2fe60d5c7db5e6861d93662f5"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/connections/b05db1c4c8574e5eb36ed896b06e09d6/enable",
+      "status": 200,
+      "elapsedMs": 17.3042089999999,
+      "sha256": "db9ea7ff015f78cd21e4aa7939142b4902f7dbb3ded3d93666624b12385999c1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connections/b05db1c4c8574e5eb36ed896b06e09d6",
+      "status": 200,
+      "elapsedMs": 1.4759579999999914,
+      "sha256": "3f2caee416a25c7b68885aae6fe39143d5c191bfc6bd75a91bf9a18ca0db6f30"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/connections/b05db1c4c8574e5eb36ed896b06e09d6/discoveries",
+      "status": 202,
+      "elapsedMs": 2.627958000000035,
+      "sha256": "3e3ee81c8dadc0ac3bf988476398c6e4dbd9b9e0ac686c6465ee4b556788c58d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connections/b05db1c4c8574e5eb36ed896b06e09d6/discoveries/22b7e3bd11f24b089b1e6ff3618b6e76",
+      "status": 200,
+      "elapsedMs": 1.359958000000006,
+      "sha256": "6d238054d6c9fa71673f9e979566402b154731c58424ee25c44409774ceac3b3"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connections/b05db1c4c8574e5eb36ed896b06e09d6/discoveries/22b7e3bd11f24b089b1e6ff3618b6e76",
+      "status": 200,
+      "elapsedMs": 5.403207999999722,
+      "sha256": "ac7ba6d2a8549d18a501f657b2d3fc1006c4600b61f39696c3f2f6b4958754ee"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/catalogs/a2768c87ac0b4ce0a6e653f89ec483e0",
+      "status": 200,
+      "elapsedMs": 20.228708000000097,
+      "sha256": "2b6d511973ae30579a8fda7272e92448674b17f0670003cfa3ea8e3e302957e2"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-a9adc96a9c02613f5ef9c5510f9c3c4d/validate",
+      "status": 202,
+      "elapsedMs": 8.848708000000443,
+      "sha256": "da9fe69657b7915b755b19c1c5b5c99fc6e99d66cc91e070176933fc17f74a7e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-6955477227e8463786cadc0ddd5d82b9",
+      "status": 200,
+      "elapsedMs": 18.765625,
+      "sha256": "307dcaebc6f2cdcb5af85c60930700f3ebe967859eb4e868421add3903518009"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-6955477227e8463786cadc0ddd5d82b9",
+      "status": 200,
+      "elapsedMs": 50.07541600000059,
+      "sha256": "307dcaebc6f2cdcb5af85c60930700f3ebe967859eb4e868421add3903518009"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-6955477227e8463786cadc0ddd5d82b9",
+      "status": 200,
+      "elapsedMs": 47.120583999999326,
+      "sha256": "307dcaebc6f2cdcb5af85c60930700f3ebe967859eb4e868421add3903518009"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-6955477227e8463786cadc0ddd5d82b9",
+      "status": 200,
+      "elapsedMs": 20.803917000000183,
+      "sha256": "307dcaebc6f2cdcb5af85c60930700f3ebe967859eb4e868421add3903518009"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-6955477227e8463786cadc0ddd5d82b9",
+      "status": 200,
+      "elapsedMs": 47.91166700000031,
+      "sha256": "307dcaebc6f2cdcb5af85c60930700f3ebe967859eb4e868421add3903518009"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-6955477227e8463786cadc0ddd5d82b9",
+      "status": 200,
+      "elapsedMs": 17.043916999999965,
+      "sha256": "5a6ed468b453cf69c95b5095a4f6f0a2540113c31bfa9f2467237049dfb5b1c0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-3eb5d233dc114b56b843334300e04243",
+      "status": 200,
+      "elapsedMs": 14.710500000000138,
+      "sha256": "695a3c2bd621c52de3f7351a6e5b23fc45cbe38e2d72292df3f3696dc53eb058"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-a9adc96a9c02613f5ef9c5510f9c3c4d/proposals",
+      "status": 201,
+      "elapsedMs": 7.636167000000569,
+      "sha256": "f9ed27e6ce8c73960f32e936db783d1a638d4a4fc0c62243029e1795c4989eef"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-ee278defb0f64afb893016dd20ce256f/decisions",
+      "status": 200,
+      "elapsedMs": 7.484000000000378,
+      "sha256": "2c00e0d472e18b03c5c7b38bed0913cd94cadfab729da1c5d6b772a62b66d31d"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-ee278defb0f64afb893016dd20ce256f/activate",
+      "status": 200,
+      "elapsedMs": 7.1340000000000146,
+      "sha256": "a3569d643f2db9c1aafc50f029fdffaf12cf7050a52f457e84589ab9d0f533b7"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-ee278defb0f64afb893016dd20ce256f/activate",
+      "status": 409,
+      "elapsedMs": 5.105540999999903,
+      "code": "mapping_idempotency_conflict",
+      "sha256": "c4ae8cdb08f19dde6207774d6f8b3bb2dfcde8f519779f504477a31baf8355ae"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-releases/release-d5ec038599404038a270ea67554ff8e3",
+      "status": 200,
+      "elapsedMs": 26.376874999999927,
+      "sha256": "99935fd6eee8274177c0c9ec6624e4774e6c4818cddb8885e92e5a6b3f39bf0f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/releases/c835bc7e00104e5aa40576453b185d4d",
+      "status": 200,
+      "elapsedMs": 91.6996250000002,
+      "sha256": "da84243a7b814e835dc6922f43e8ef4e5a4658eefe9d56d615550cb6a2304af3"
+    }
+  ],
+  "status": "PASS",
+  "inputBinding": {
+    "taskId": "G4-M3-MAPPING-001",
+    "runId": "mapping-impl-01",
+    "status": "BOUND",
+    "backend": "763ec9bdcb82b5646f970bb0ea7a1fb954d0e02e91421e4e48bdd173ddebb8ee",
+    "platformDatabase": "mapping_v3",
+    "apiOutput": "3fb714138f5a43c96733a899c823ded796406ff41ad3b6a04553712e1a45ab57",
+    "web": {
+      "receiptSha256": "527a55b36aff0e57e75ccfda1edd076e5c26111835acc7e52b03aab7bd519363",
+      "inputKey": "3f0761999dacbcbdd50dc7acbcf519f2399ca5d4e057ea595394790f63551c9a",
+      "outputKey": "64c3030be8a838a4d405eea580fb994a1560a56c17c40b8600c9200dd923c7dd"
+    },
+    "processesVerified": true,
+    "drivers": {
+      "scripts/maintenance/workflow_m3_mapping.py": "0f4af827c9d40064f5055ef8fb50ff834dd7e68bb7563ab155fc0b774257b2e6",
+      "scripts/maintenance/workflow-m3-mapping.mjs": "a72bf8bf3f487ef918a81d1f833f0f9110fa7503fa05b3234b42493c4b045486",
+      "experiments/g4-m3-mapping-001/grant-fixture.py": "68abf1fcf42fd9cf92c84d81bb34e23dd10ae18da1700ed3834c3f2b593a5694",
+      "experiments/g4-m3-mapping-001/fixture.sql": "d8ab557a8133a0a569accb317a029fb4de65a610277f7d9e70952476a5da5759",
+      "experiments/g4-m3-mapping-001/compose.yaml": "ba1f11c98f81dbea43acf6536ac740e8d7007a7bc9d1aad9d71a451b565e4146",
+      "samples/g2/ontology.ttl": "52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73",
+      "samples/g2/shapes.ttl": "78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270",
+      "samples/g2/vocabulary.ttl": "aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b",
+      "samples/g2/data.ttl": "349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e",
+      "samples/g3-m3/units.ttl": "a7bc90509e79273a900d4a632e9e633a201da6ce200348f263bf834f3053d852"
+    }
+  },
+  "scope": "REAL_SECRET_ROTATION_CURRENT_BINDING_OLD_RELEASE_AND_COMMIT_RESPONSE_LOSS",
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-14T05:51:49.253Z"
+}

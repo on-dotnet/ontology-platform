@@ -1,0 +1,784 @@
+{
+  "taskId": "G4-M3-MAPPING-001",
+  "runId": "mapping-impl-01",
+  "mode": "faults",
+  "startedAtUtc": "2026-11-14T05:49:05.351Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_source-deny",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_403",
+      "status": "PASS"
+    },
+    {
+      "name": "revoked_manifest_removed",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "committed_replay_without_source_select",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_source-restore",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_11",
+      "status": "PASS"
+    },
+    {
+      "name": "http_12_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_12",
+      "status": "PASS"
+    },
+    {
+      "name": "http_13_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_13",
+      "status": "PASS"
+    },
+    {
+      "name": "http_14_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_14",
+      "status": "PASS"
+    },
+    {
+      "name": "http_15_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_seven_pass",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_15",
+      "status": "PASS"
+    },
+    {
+      "name": "http_16_201",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_16",
+      "status": "PASS"
+    },
+    {
+      "name": "http_17_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_observe",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_audit-on",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_17",
+      "status": "PASS"
+    },
+    {
+      "name": "http_18_503",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_audit-off",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_observe",
+      "status": "PASS"
+    },
+    {
+      "name": "audit_atomic_rollback",
+      "status": "PASS"
+    },
+    {
+      "name": "audit_check_retained",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_observe",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_outbox-on",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_18",
+      "status": "PASS"
+    },
+    {
+      "name": "http_19_503",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_outbox-off",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_observe",
+      "status": "PASS"
+    },
+    {
+      "name": "outbox_atomic_rollback",
+      "status": "PASS"
+    },
+    {
+      "name": "outbox_check_retained",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_observe",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_cas-on",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_19",
+      "status": "PASS"
+    },
+    {
+      "name": "http_20_409",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_cas-off",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_observe",
+      "status": "PASS"
+    },
+    {
+      "name": "cas_atomic_rollback",
+      "status": "PASS"
+    },
+    {
+      "name": "cas_check_retained",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_20",
+      "status": "PASS"
+    },
+    {
+      "name": "http_21_200",
+      "status": "PASS"
+    },
+    {
+      "name": "one_commit_after_three_failures",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_21",
+      "status": "PASS"
+    },
+    {
+      "name": "http_22_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_retry_original_receipt",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_observe",
+      "status": "PASS"
+    },
+    {
+      "name": "all_faults_removed",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 9.365999999999985,
+      "sha256": "6201b800ed195e9402a9a58e42dfb19f839dc14c799a0effd3ce92b4739da3da"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.8921669999999722,
+      "sha256": "0abf73714eebb9f4819209448071e92a4fa5fc711803c7e56356b105d543bc6a"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 6.733042000000069,
+      "sha256": "bafdcda566fef13525bff01be624eea47e1a2dc5f097b714431b8408ea8a5475"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 2.74995899999999,
+      "sha256": "b95cd0267250ce591a268429ff2cdd8ac69a752ae1711ef9823c9c8b6bee32da"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-releases/release-9ed36484c79f48be87ffd435f39cadd1",
+      "status": 403,
+      "elapsedMs": 24.69854200000009,
+      "code": "mapping_source_access_unverified",
+      "sha256": "1ee2ef17a24f4aa034d442d3b9f17fe61098a39a3f1d78d402468227b5dd727e"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-f3ae830f6ceb43e4957545ee47a258bc/activate",
+      "status": 200,
+      "elapsedMs": 7.446249999999964,
+      "sha256": "26d0fbcb1212cb861ce74afb21e02d7f864ede57ea600cc8bfe7c99ea56a5520"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "status": 200,
+      "elapsedMs": 22.14529100000027,
+      "sha256": "a4af13e4fe768fa5f7c738354e2658fb814325398a373bc76346f5945f3bd737"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-a9adc96a9c02613f5ef9c5510f9c3c4d/validate",
+      "status": 202,
+      "elapsedMs": 8.094666999999845,
+      "sha256": "8c81d3ddcfeb02ab5f1c4b91e425592bab62459a26bfdeca18d4a2f16cedbf22"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-323a2d136113499b8ddb79b5930c87bd",
+      "status": 200,
+      "elapsedMs": 15.57024999999976,
+      "sha256": "8c81d3ddcfeb02ab5f1c4b91e425592bab62459a26bfdeca18d4a2f16cedbf22"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-323a2d136113499b8ddb79b5930c87bd",
+      "status": 200,
+      "elapsedMs": 56.35454200000004,
+      "sha256": "8c81d3ddcfeb02ab5f1c4b91e425592bab62459a26bfdeca18d4a2f16cedbf22"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-323a2d136113499b8ddb79b5930c87bd",
+      "status": 200,
+      "elapsedMs": 36.28012499999977,
+      "sha256": "8c81d3ddcfeb02ab5f1c4b91e425592bab62459a26bfdeca18d4a2f16cedbf22"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-323a2d136113499b8ddb79b5930c87bd",
+      "status": 200,
+      "elapsedMs": 39.73099999999977,
+      "sha256": "8c81d3ddcfeb02ab5f1c4b91e425592bab62459a26bfdeca18d4a2f16cedbf22"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-323a2d136113499b8ddb79b5930c87bd",
+      "status": 200,
+      "elapsedMs": 20.871540999999525,
+      "sha256": "a0d183e490efe5424109d204b782fdc6a03753e038ae1b8b2c12b6f8c96a6bea"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-323a2d136113499b8ddb79b5930c87bd",
+      "status": 200,
+      "elapsedMs": 37.65087499999936,
+      "sha256": "5343babccb7fe5f4ea29cb9bac19e37292078d2b8faf43b78324eb663b366694"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-5d10c2c50792471d823ddc0502d2a2f6",
+      "status": 200,
+      "elapsedMs": 16.92358400000012,
+      "sha256": "0ff7bed8895dbac06d91a96e1914202507809ae3cd484848258683be387e13cd"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-a9adc96a9c02613f5ef9c5510f9c3c4d/proposals",
+      "status": 201,
+      "elapsedMs": 8.885083000000122,
+      "sha256": "6db437d78632b5c728aefef9db19168683f75631d7e9cdacd9857621e779eb1f"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-933db1dc23fe4436851a9f70a96678c0/decisions",
+      "status": 200,
+      "elapsedMs": 8.912374999999884,
+      "sha256": "2bbb351e3718d7ff4671e2146627d6b15418b17e33efb7f4f93a12c24136bbdd"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-933db1dc23fe4436851a9f70a96678c0/activate",
+      "status": 503,
+      "elapsedMs": 297.1130000000003,
+      "code": "dependency_unavailable",
+      "sha256": "82540d91353c4aa2c5506c5439f99ac3912d2a55a2622642679eb87d8e6742c8"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-933db1dc23fe4436851a9f70a96678c0/activate",
+      "status": 503,
+      "elapsedMs": 207.8909160000003,
+      "code": "dependency_unavailable",
+      "sha256": "523bc36a4945305a00109445bfd88137e5eeb4326c5a54ea954fbc19d0d996af"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-933db1dc23fe4436851a9f70a96678c0/activate",
+      "status": 409,
+      "elapsedMs": 295.5770419999999,
+      "code": "mapping_version_conflict",
+      "sha256": "0108763926981a4d8e8e8b48cf6c69cb0f63a58ae205ab6f53fca4647a88d3d5"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-933db1dc23fe4436851a9f70a96678c0/activate",
+      "status": 200,
+      "elapsedMs": 247.5704169999999,
+      "sha256": "8ce35a692c5a1903dd978e31c58de795ec676f17457fa939aa37ddcc1217dfe4"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-933db1dc23fe4436851a9f70a96678c0/activate",
+      "status": 200,
+      "elapsedMs": 7.040708999999879,
+      "sha256": "8ce35a692c5a1903dd978e31c58de795ec676f17457fa939aa37ddcc1217dfe4"
+    }
+  ],
+  "status": "PASS",
+  "inputBinding": {
+    "taskId": "G4-M3-MAPPING-001",
+    "runId": "mapping-impl-01",
+    "status": "BOUND",
+    "backend": "763ec9bdcb82b5646f970bb0ea7a1fb954d0e02e91421e4e48bdd173ddebb8ee",
+    "platformDatabase": "mapping_v3",
+    "apiOutput": "3fb714138f5a43c96733a899c823ded796406ff41ad3b6a04553712e1a45ab57",
+    "web": {
+      "receiptSha256": "527a55b36aff0e57e75ccfda1edd076e5c26111835acc7e52b03aab7bd519363",
+      "inputKey": "3f0761999dacbcbdd50dc7acbcf519f2399ca5d4e057ea595394790f63551c9a",
+      "outputKey": "64c3030be8a838a4d405eea580fb994a1560a56c17c40b8600c9200dd923c7dd"
+    },
+    "processesVerified": true,
+    "drivers": {
+      "scripts/maintenance/workflow_m3_mapping.py": "0f4af827c9d40064f5055ef8fb50ff834dd7e68bb7563ab155fc0b774257b2e6",
+      "scripts/maintenance/workflow-m3-mapping.mjs": "a72bf8bf3f487ef918a81d1f833f0f9110fa7503fa05b3234b42493c4b045486",
+      "experiments/g4-m3-mapping-001/grant-fixture.py": "68abf1fcf42fd9cf92c84d81bb34e23dd10ae18da1700ed3834c3f2b593a5694",
+      "experiments/g4-m3-mapping-001/fixture.sql": "d8ab557a8133a0a569accb317a029fb4de65a610277f7d9e70952476a5da5759",
+      "experiments/g4-m3-mapping-001/compose.yaml": "ba1f11c98f81dbea43acf6536ac740e8d7007a7bc9d1aad9d71a451b565e4146",
+      "samples/g2/ontology.ttl": "52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73",
+      "samples/g2/shapes.ttl": "78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270",
+      "samples/g2/vocabulary.ttl": "aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b",
+      "samples/g2/data.ttl": "349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e",
+      "samples/g3-m3/units.ttl": "a7bc90509e79273a900d4a632e9e633a201da6ce200348f263bf834f3053d852"
+    }
+  },
+  "faultOperations": [
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "source-deny",
+      "containerId": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "d71b7bdb940711e8b75cb1f700b7ee94ba9bc66ab8b3fd68ac28d8a248e4c54f",
+      "observation": "f",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "source-restore",
+      "containerId": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "4d18ffa9091307df3dd8c97c61278cc329317bd9e21beb1900d0194edce84403",
+      "observation": "t",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "observe",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "f11c6507adba04d9070a97f87d56d5da5f0e3a52d64d59ab4e599132dc2c12a6",
+      "observation": {
+        "active": {
+          "releaseId": "release-d5ec038599404038a270ea67554ff8e3",
+          "revision": 3,
+          "activationId": "activation-c2284c69662c4ce8bae9aa6d4600189a"
+        },
+        "releases": 2,
+        "activations": 3,
+        "outbox": 3,
+        "commands": 17,
+        "audits": 3,
+        "checks": 3,
+        "faults": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "audit-on",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "9b1782e8fca00900992d0c57d4e96bd0e43b94c5e4f93133a45c5be94a00bfb2",
+      "observation": "1",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "audit-off",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "5abd45a8a038c96eb6f8c6e490d0edfdea6c19887baa07e29edf3feb5136a10b",
+      "observation": "0",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "observe",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "f11c6507adba04d9070a97f87d56d5da5f0e3a52d64d59ab4e599132dc2c12a6",
+      "observation": {
+        "active": {
+          "releaseId": "release-d5ec038599404038a270ea67554ff8e3",
+          "revision": 3,
+          "activationId": "activation-c2284c69662c4ce8bae9aa6d4600189a"
+        },
+        "releases": 2,
+        "activations": 3,
+        "outbox": 3,
+        "commands": 17,
+        "audits": 3,
+        "checks": 4,
+        "faults": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "observe",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "f11c6507adba04d9070a97f87d56d5da5f0e3a52d64d59ab4e599132dc2c12a6",
+      "observation": {
+        "active": {
+          "releaseId": "release-d5ec038599404038a270ea67554ff8e3",
+          "revision": 3,
+          "activationId": "activation-c2284c69662c4ce8bae9aa6d4600189a"
+        },
+        "releases": 2,
+        "activations": 3,
+        "outbox": 3,
+        "commands": 17,
+        "audits": 3,
+        "checks": 4,
+        "faults": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "outbox-on",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "509f5963dfd2fadb043800d91aec16349c919af12ea47d9f141565db52a52325",
+      "observation": "1",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "outbox-off",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "06930c4dce9416f1ba72a49e487932491f36fbd2885ea2e313a7fa5fe5570d51",
+      "observation": "0",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "observe",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "f11c6507adba04d9070a97f87d56d5da5f0e3a52d64d59ab4e599132dc2c12a6",
+      "observation": {
+        "active": {
+          "releaseId": "release-d5ec038599404038a270ea67554ff8e3",
+          "revision": 3,
+          "activationId": "activation-c2284c69662c4ce8bae9aa6d4600189a"
+        },
+        "releases": 2,
+        "activations": 3,
+        "outbox": 3,
+        "commands": 17,
+        "audits": 3,
+        "checks": 5,
+        "faults": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "observe",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "f11c6507adba04d9070a97f87d56d5da5f0e3a52d64d59ab4e599132dc2c12a6",
+      "observation": {
+        "active": {
+          "releaseId": "release-d5ec038599404038a270ea67554ff8e3",
+          "revision": 3,
+          "activationId": "activation-c2284c69662c4ce8bae9aa6d4600189a"
+        },
+        "releases": 2,
+        "activations": 3,
+        "outbox": 3,
+        "commands": 17,
+        "audits": 3,
+        "checks": 5,
+        "faults": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "cas-on",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "8bfabdfddd3c869cd798e387bc2ea4d7f3b6d886b0b6d77e8858e320eb352768",
+      "observation": "1",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "cas-off",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "408a73cacb9046106072781a5a89a95c32978a29afd92a2d6db5cf7249cdb4f3",
+      "observation": "0",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "observe",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "f11c6507adba04d9070a97f87d56d5da5f0e3a52d64d59ab4e599132dc2c12a6",
+      "observation": {
+        "active": {
+          "releaseId": "release-d5ec038599404038a270ea67554ff8e3",
+          "revision": 3,
+          "activationId": "activation-c2284c69662c4ce8bae9aa6d4600189a"
+        },
+        "releases": 2,
+        "activations": 3,
+        "outbox": 3,
+        "commands": 17,
+        "audits": 3,
+        "checks": 6,
+        "faults": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "observe",
+      "containerId": "5ec1ae82b66ec932762596820291675621d81fbdccd4f3d9962ff215d70a56e3",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "f11c6507adba04d9070a97f87d56d5da5f0e3a52d64d59ab4e599132dc2c12a6",
+      "observation": {
+        "active": {
+          "releaseId": "release-6fa9e38369e04bb88aa8c9926266c863",
+          "revision": 4,
+          "activationId": "activation-79b7af7171cf431697a8af67323f065d"
+        },
+        "releases": 3,
+        "activations": 4,
+        "outbox": 4,
+        "commands": 18,
+        "audits": 4,
+        "checks": 7,
+        "faults": 0
+      },
+      "status": "PASS"
+    }
+  ],
+  "scope": "REAL_SOURCE_REVOKE_CLEAR_RECOVER_AND_AUDIT_OUTBOX_CAS_ROLLBACK",
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-14T05:49:12.770Z"
+}

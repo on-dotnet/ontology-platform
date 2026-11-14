@@ -1,0 +1,105 @@
+{
+  "gate": "interaction",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "taskId": "G4-M3-MAPPING-001",
+    "runId": "mapping-impl-01",
+    "gate": "interaction",
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "inputKey": "5662ba8e15c780c26d264def72654b2de12c1c92a55b94ab762abc7b8b4bd311",
+    "tests": 1725,
+    "skipped": 0,
+    "originals": [
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/result.json",
+        "sha256": "80b22feb6a230a443923415e24603f155604cd9d28c200be162a03d2d8a6ded1"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/compatibility-3292e7494e964da981f1d3e7d4f31cb7/result.json",
+        "sha256": "c57f63a37b489a160fb9b054e148156a1a64e1c53f8a1494b8bdaeaf24e3da51"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/persistence-result.json",
+        "sha256": "bae0369dfcea0882472f9666ff89203481064370ffe79f05f3f09ea7c638c553"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/ontology-g4-m3-mapping-impl-01-source-test-14c5f8dc.json",
+        "sha256": "e25bbedf93d7973167fe57e8fbb68ea99f90bed53718f333bfae881e4f770fd5"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/browser-command-233ac168ddec4da7a2ad277bd77c20b0.json",
+        "sha256": "47694806d878c05cd0db4a6a88ecf1b0b7b182f4139d5d85510bcaf9947af1e3"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/browser-command-df527f3e30d840adb3eab8c27e54319e.json",
+        "sha256": "48e59bb05c47ce0ccaab84ed67c635f2fa5ce2cc53e1adda4bd3d9bf5ecf4da0"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/browser-command-59fb5b4d6d06467a99a6981db04c9de8.json",
+        "sha256": "c4dfee022ac30d3e6114970215a924dac127188a5ac759e8dd82975fd979a808"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/browser-command-74a2b3b0d110487b8ad3593dc9e90b04.json",
+        "sha256": "6cc1f6fa1d1b2a599a776c2cce275efbffe3f34354ed25ac8a9d7a6441e06a18"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/browser-command-f8f0af1b91b945b68e6eb91cb627825a.json",
+        "sha256": "266e2c1a034b1ebf5bb741a86177e1d403217062953b30799fb446c5d16c444b"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/browser-command-03f1475af45b4c39af6a2847b415542f.json",
+        "sha256": "1bdad13ec6f286e84760d57820bfc848b0d62e39f8e35b7ca08217c1b4dc0e5c"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/browser-command-b8f5dfe1bc2d4bb18959ae3fab0b3681.json",
+        "sha256": "6de782d8220e505f304dbb090e484feb1536edc6cfdcac0a1f704bec221d77d1"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/browser-command-f684009cb1bd4c7583144d0d1767a45a.json",
+        "sha256": "968c69985bf3ae772729b33a6e91be8d88af765052eff0bcc5807b676d3d4a58"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/browser-command-1da81487a3754d4281daee3d1640d69f.json",
+        "sha256": "c41c9d8b0a3ebdee2ba6e7838a64639c0d8a255c1a24f7cdef326cd196466df9"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/browser-command-0a43bf0eb1a04161ba3b9fdd98973c68.json",
+        "sha256": "4455e55accd135b81d65244ba30bbc237baeaaa0395f2b085e497cad647db534"
+      }
+    ],
+    "ci": "NOT_RUN"
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m3_mapping.py",
+    "qualify",
+    "--task",
+    "G4-M3-MAPPING-001",
+    "--run-id",
+    "mapping-impl-01",
+    "--gate",
+    "interaction",
+    "--input-key",
+    "5662ba8e15c780c26d264def72654b2de12c1c92a55b94ab762abc7b8b4bd311"
+  ],
+  "exitCode": 0,
+  "tests": 1725,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 3.541082665993599,
+  "inputKey": "5662ba8e15c780c26d264def72654b2de12c1c92a55b94ab762abc7b8b4bd311",
+  "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+  "policyKey": "b433e42e563e8c1398333a3fd6cc856c9e7661cdd2a10bf33b4be4c987317166",
+  "evidenceSha256": "653ca8f278c111dd654ef2b851a67f6e1e1fdd19ca1dc806c91ee27329bc3d63",
+  "logPath": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/interaction.txt",
+  "sourceRun": "ccb1e7d8c1d143a2919d7e4eda3e74db",
+  "sourceCommit": "cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c"
+}

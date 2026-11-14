@@ -1,0 +1,244 @@
+{
+  "taskId": "G4-M3-MAPPING-001",
+  "runId": "mapping-impl-01",
+  "mode": "recovery",
+  "startedAtUtc": "2026-11-14T05:49:12.994Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_201",
+      "status": "PASS"
+    },
+    {
+      "name": "candidate_actual_endpoint",
+      "status": "PASS"
+    },
+    {
+      "name": "candidate_metadata_only",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "candidate_adoption_not_persisted",
+      "status": "PASS"
+    },
+    {
+      "name": "candidate_explicit_patch",
+      "status": "PASS"
+    },
+    {
+      "name": "candidate_not_approval",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_422",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_conflict_409",
+      "status": "PASS"
+    },
+    {
+      "name": "unsaved_text_retained",
+      "status": "PASS"
+    },
+    {
+      "name": "compare_does_not_overwrite",
+      "status": "PASS"
+    },
+    {
+      "name": "explicit_rebase_saved",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "local_intent_revision4",
+      "status": "PASS"
+    },
+    {
+      "name": "saved_reload_restored",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 9.300875000000019,
+      "sha256": "215c5eb7f69e11a50217c8022773910b4929852ed273939305037c55c1bc56cc"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 3.502707999999984,
+      "sha256": "0abf73714eebb9f4819209448071e92a4fa5fc711803c7e56356b105d543bc6a"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.279167000000143,
+      "sha256": "6a1701bbf59b6d5ebc7a3cabb98a606160b76d898a2a88ce856b9cd35aa13450"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 3.7251659999999447,
+      "sha256": "b95cd0267250ce591a268429ff2cdd8ac69a752ae1711ef9823c9c8b6bee32da"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings",
+      "status": 201,
+      "elapsedMs": 11.777207999999973,
+      "sha256": "2fbb6f43611ee47f638671894bed5b0bc46ea7927139bef73ca4c78edfa14107"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-1de1101bca16d39fe84b1ba252f33b72",
+      "status": 200,
+      "elapsedMs": 18.837166000000025,
+      "sha256": "2fbb6f43611ee47f638671894bed5b0bc46ea7927139bef73ca4c78edfa14107"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-1de1101bca16d39fe84b1ba252f33b72/suggestions",
+      "status": 422,
+      "elapsedMs": 1.9964169999998376,
+      "code": "mapping_model_not_enabled",
+      "sha256": "a6c8abc7ae01674ca3342b0c26b438475c378f9848a90337e55edca1e7e1baa5"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-1de1101bca16d39fe84b1ba252f33b72",
+      "status": 200,
+      "elapsedMs": 10.359749999999849,
+      "sha256": "d7d57d7c859cf8f1e3d847f8929dbc1b089393cd1cafa013ea707a69e5304326"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-1de1101bca16d39fe84b1ba252f33b72",
+      "status": 200,
+      "elapsedMs": 21.60241700000006,
+      "sha256": "a54d1a9ac2cb3482c5a7f7093b245d39d15053180e2fc329a87c1934176c9bf6"
+    }
+  ],
+  "status": "PASS",
+  "inputBinding": {
+    "taskId": "G4-M3-MAPPING-001",
+    "runId": "mapping-impl-01",
+    "status": "BOUND",
+    "backend": "763ec9bdcb82b5646f970bb0ea7a1fb954d0e02e91421e4e48bdd173ddebb8ee",
+    "platformDatabase": "mapping_v3",
+    "apiOutput": "3fb714138f5a43c96733a899c823ded796406ff41ad3b6a04553712e1a45ab57",
+    "web": {
+      "receiptSha256": "527a55b36aff0e57e75ccfda1edd076e5c26111835acc7e52b03aab7bd519363",
+      "inputKey": "3f0761999dacbcbdd50dc7acbcf519f2399ca5d4e057ea595394790f63551c9a",
+      "outputKey": "64c3030be8a838a4d405eea580fb994a1560a56c17c40b8600c9200dd923c7dd"
+    },
+    "processesVerified": true,
+    "drivers": {
+      "scripts/maintenance/workflow_m3_mapping.py": "0f4af827c9d40064f5055ef8fb50ff834dd7e68bb7563ab155fc0b774257b2e6",
+      "scripts/maintenance/workflow-m3-mapping.mjs": "a72bf8bf3f487ef918a81d1f833f0f9110fa7503fa05b3234b42493c4b045486",
+      "experiments/g4-m3-mapping-001/grant-fixture.py": "68abf1fcf42fd9cf92c84d81bb34e23dd10ae18da1700ed3834c3f2b593a5694",
+      "experiments/g4-m3-mapping-001/fixture.sql": "d8ab557a8133a0a569accb317a029fb4de65a610277f7d9e70952476a5da5759",
+      "experiments/g4-m3-mapping-001/compose.yaml": "ba1f11c98f81dbea43acf6536ac740e8d7007a7bc9d1aad9d71a451b565e4146",
+      "samples/g2/ontology.ttl": "52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73",
+      "samples/g2/shapes.ttl": "78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270",
+      "samples/g2/vocabulary.ttl": "aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b",
+      "samples/g2/data.ttl": "349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e",
+      "samples/g3-m3/units.ttl": "a7bc90509e79273a900d4a632e9e633a201da6ce200348f263bf834f3053d852"
+    }
+  },
+  "scope": "REAL_RULE_CANDIDATE_EXPLICIT_ADOPTION_AND_CONFLICT_RECOVERY",
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-14T05:49:16.341Z"
+}

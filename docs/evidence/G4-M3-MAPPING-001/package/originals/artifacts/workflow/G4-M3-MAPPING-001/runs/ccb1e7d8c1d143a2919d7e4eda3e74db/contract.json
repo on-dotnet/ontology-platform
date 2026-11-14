@@ -1,0 +1,57 @@
+{
+  "gate": "contract",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "taskId": "G4-M3-MAPPING-001",
+    "runId": "mapping-impl-01",
+    "gate": "contract",
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "inputKey": "aa4a44a68b74aca264a078dc322f2aed087dd640defeff5e5df364124f3269e6",
+    "tests": 33,
+    "skipped": 0,
+    "originals": [
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/result.json",
+        "sha256": "80b22feb6a230a443923415e24603f155604cd9d28c200be162a03d2d8a6ded1"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/compatibility-3292e7494e964da981f1d3e7d4f31cb7/result.json",
+        "sha256": "c57f63a37b489a160fb9b054e148156a1a64e1c53f8a1494b8bdaeaf24e3da51"
+      }
+    ],
+    "ci": "NOT_RUN"
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m3_mapping.py",
+    "qualify",
+    "--task",
+    "G4-M3-MAPPING-001",
+    "--run-id",
+    "mapping-impl-01",
+    "--gate",
+    "contract",
+    "--input-key",
+    "aa4a44a68b74aca264a078dc322f2aed087dd640defeff5e5df364124f3269e6"
+  ],
+  "exitCode": 0,
+  "tests": 33,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 1.5676571250078268,
+  "inputKey": "aa4a44a68b74aca264a078dc322f2aed087dd640defeff5e5df364124f3269e6",
+  "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+  "policyKey": "9148d40be73a5f97c6da4c850186cf895a4dbd176a6b66eadf49cd16ecdfc8ed",
+  "evidenceSha256": "a380bde9b87c6e090e98b57a95dc77a843e74e6343547e6bdea3b23fb628deac",
+  "logPath": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/contract.txt",
+  "sourceRun": "ccb1e7d8c1d143a2919d7e4eda3e74db",
+  "sourceCommit": "cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c"
+}

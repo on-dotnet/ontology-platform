@@ -1,0 +1,4071 @@
+{
+  "taskId": "G4-M3-MAPPING-001",
+  "runId": "mapping-impl-01",
+  "mode": "semantics",
+  "startedAtUtc": "2026-11-14T05:50:33.035Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_201",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "one_to_many_exact_units_json_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "one_to_many_exact_units_json_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200",
+      "status": "PASS"
+    },
+    {
+      "name": "one_to_many_exact_units_json_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200",
+      "status": "PASS"
+    },
+    {
+      "name": "one_to_many_exact_units_json_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_11",
+      "status": "PASS"
+    },
+    {
+      "name": "http_12_200",
+      "status": "PASS"
+    },
+    {
+      "name": "one_to_many_exact_units_json_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_12",
+      "status": "PASS"
+    },
+    {
+      "name": "http_13_200",
+      "status": "PASS"
+    },
+    {
+      "name": "one_to_many_exact_units_json_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_13",
+      "status": "PASS"
+    },
+    {
+      "name": "http_14_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_14",
+      "status": "PASS"
+    },
+    {
+      "name": "http_15_200",
+      "status": "PASS"
+    },
+    {
+      "name": "one_to_many_exact_units_json_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_15",
+      "status": "PASS"
+    },
+    {
+      "name": "http_16_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_16",
+      "status": "PASS"
+    },
+    {
+      "name": "http_17_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_17",
+      "status": "PASS"
+    },
+    {
+      "name": "http_18_200",
+      "status": "PASS"
+    },
+    {
+      "name": "many_to_many_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_18",
+      "status": "PASS"
+    },
+    {
+      "name": "http_19_200",
+      "status": "PASS"
+    },
+    {
+      "name": "many_to_many_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_19",
+      "status": "PASS"
+    },
+    {
+      "name": "http_20_200",
+      "status": "PASS"
+    },
+    {
+      "name": "many_to_many_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_20",
+      "status": "PASS"
+    },
+    {
+      "name": "http_21_200",
+      "status": "PASS"
+    },
+    {
+      "name": "many_to_many_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_21",
+      "status": "PASS"
+    },
+    {
+      "name": "http_22_200",
+      "status": "PASS"
+    },
+    {
+      "name": "many_to_many_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_22",
+      "status": "PASS"
+    },
+    {
+      "name": "http_23_200",
+      "status": "PASS"
+    },
+    {
+      "name": "many_to_many_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_23",
+      "status": "PASS"
+    },
+    {
+      "name": "http_24_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_24",
+      "status": "PASS"
+    },
+    {
+      "name": "http_25_200",
+      "status": "PASS"
+    },
+    {
+      "name": "many_to_many_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_25",
+      "status": "PASS"
+    },
+    {
+      "name": "http_26_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_26",
+      "status": "PASS"
+    },
+    {
+      "name": "http_27_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_27",
+      "status": "PASS"
+    },
+    {
+      "name": "http_28_200",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong_formal_endpoints_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_28",
+      "status": "PASS"
+    },
+    {
+      "name": "http_29_200",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong_formal_endpoints_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_29",
+      "status": "PASS"
+    },
+    {
+      "name": "http_30_200",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong_formal_endpoints_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_30",
+      "status": "PASS"
+    },
+    {
+      "name": "http_31_200",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong_formal_endpoints_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_31",
+      "status": "PASS"
+    },
+    {
+      "name": "http_32_200",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong_formal_endpoints_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_32",
+      "status": "PASS"
+    },
+    {
+      "name": "http_33_200",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong_formal_endpoints_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_33",
+      "status": "PASS"
+    },
+    {
+      "name": "http_34_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_34",
+      "status": "PASS"
+    },
+    {
+      "name": "http_35_200",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong_formal_endpoints_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong_formal_endpoints_exact_diagnostic",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_35",
+      "status": "PASS"
+    },
+    {
+      "name": "http_36_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_36",
+      "status": "PASS"
+    },
+    {
+      "name": "http_37_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_37",
+      "status": "PASS"
+    },
+    {
+      "name": "http_38_200",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown_actual_unit_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_38",
+      "status": "PASS"
+    },
+    {
+      "name": "http_39_200",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown_actual_unit_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_39",
+      "status": "PASS"
+    },
+    {
+      "name": "http_40_200",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown_actual_unit_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_40",
+      "status": "PASS"
+    },
+    {
+      "name": "http_41_200",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown_actual_unit_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_41",
+      "status": "PASS"
+    },
+    {
+      "name": "http_42_200",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown_actual_unit_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_42",
+      "status": "PASS"
+    },
+    {
+      "name": "http_43_200",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown_actual_unit_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_43",
+      "status": "PASS"
+    },
+    {
+      "name": "http_44_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_44",
+      "status": "PASS"
+    },
+    {
+      "name": "http_45_200",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown_actual_unit_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown_actual_unit_exact_diagnostic",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_45",
+      "status": "PASS"
+    },
+    {
+      "name": "http_46_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_46",
+      "status": "PASS"
+    },
+    {
+      "name": "http_47_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_47",
+      "status": "PASS"
+    },
+    {
+      "name": "http_48_200",
+      "status": "PASS"
+    },
+    {
+      "name": "precision_loss_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_48",
+      "status": "PASS"
+    },
+    {
+      "name": "http_49_200",
+      "status": "PASS"
+    },
+    {
+      "name": "precision_loss_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_49",
+      "status": "PASS"
+    },
+    {
+      "name": "http_50_200",
+      "status": "PASS"
+    },
+    {
+      "name": "precision_loss_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_50",
+      "status": "PASS"
+    },
+    {
+      "name": "http_51_200",
+      "status": "PASS"
+    },
+    {
+      "name": "precision_loss_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_51",
+      "status": "PASS"
+    },
+    {
+      "name": "http_52_200",
+      "status": "PASS"
+    },
+    {
+      "name": "precision_loss_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_52",
+      "status": "PASS"
+    },
+    {
+      "name": "http_53_200",
+      "status": "PASS"
+    },
+    {
+      "name": "precision_loss_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_53",
+      "status": "PASS"
+    },
+    {
+      "name": "http_54_200",
+      "status": "PASS"
+    },
+    {
+      "name": "precision_loss_job_pending_6",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_54",
+      "status": "PASS"
+    },
+    {
+      "name": "http_55_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_55",
+      "status": "PASS"
+    },
+    {
+      "name": "http_56_200",
+      "status": "PASS"
+    },
+    {
+      "name": "precision_loss_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "precision_loss_exact_diagnostic",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_56",
+      "status": "PASS"
+    },
+    {
+      "name": "http_57_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_57",
+      "status": "PASS"
+    },
+    {
+      "name": "http_58_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_58",
+      "status": "PASS"
+    },
+    {
+      "name": "http_59_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_59",
+      "status": "PASS"
+    },
+    {
+      "name": "http_60_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_60",
+      "status": "PASS"
+    },
+    {
+      "name": "http_61_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_61",
+      "status": "PASS"
+    },
+    {
+      "name": "http_62_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_62",
+      "status": "PASS"
+    },
+    {
+      "name": "http_63_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_63",
+      "status": "PASS"
+    },
+    {
+      "name": "http_64_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_64",
+      "status": "PASS"
+    },
+    {
+      "name": "http_65_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_job_pending_6",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_65",
+      "status": "PASS"
+    },
+    {
+      "name": "http_66_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_66",
+      "status": "PASS"
+    },
+    {
+      "name": "http_67_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_exact_diagnostic",
+      "status": "PASS"
+    },
+    {
+      "name": "source-json-empty",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_67",
+      "status": "PASS"
+    },
+    {
+      "name": "http_68_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_68",
+      "status": "PASS"
+    },
+    {
+      "name": "http_69_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_69",
+      "status": "PASS"
+    },
+    {
+      "name": "http_70_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_empty_preserved_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_70",
+      "status": "PASS"
+    },
+    {
+      "name": "http_71_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_empty_preserved_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_71",
+      "status": "PASS"
+    },
+    {
+      "name": "http_72_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_empty_preserved_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_72",
+      "status": "PASS"
+    },
+    {
+      "name": "http_73_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_empty_preserved_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_73",
+      "status": "PASS"
+    },
+    {
+      "name": "http_74_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_empty_preserved_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_74",
+      "status": "PASS"
+    },
+    {
+      "name": "http_75_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_empty_preserved_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_75",
+      "status": "PASS"
+    },
+    {
+      "name": "http_76_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_76",
+      "status": "PASS"
+    },
+    {
+      "name": "http_77_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_empty_preserved_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "source-json-null",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_77",
+      "status": "PASS"
+    },
+    {
+      "name": "http_78_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_78",
+      "status": "PASS"
+    },
+    {
+      "name": "http_79_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_79",
+      "status": "PASS"
+    },
+    {
+      "name": "http_80_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_rejected_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_80",
+      "status": "PASS"
+    },
+    {
+      "name": "http_81_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_rejected_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_81",
+      "status": "PASS"
+    },
+    {
+      "name": "http_82_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_rejected_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_82",
+      "status": "PASS"
+    },
+    {
+      "name": "http_83_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_rejected_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_83",
+      "status": "PASS"
+    },
+    {
+      "name": "http_84_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_rejected_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_84",
+      "status": "PASS"
+    },
+    {
+      "name": "http_85_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_rejected_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_85",
+      "status": "PASS"
+    },
+    {
+      "name": "http_86_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_86",
+      "status": "PASS"
+    },
+    {
+      "name": "http_87_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_rejected_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_rejected_exact_diagnostic",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_87",
+      "status": "PASS"
+    },
+    {
+      "name": "http_88_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_88",
+      "status": "PASS"
+    },
+    {
+      "name": "http_89_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_89",
+      "status": "PASS"
+    },
+    {
+      "name": "http_90_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_preserved_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_90",
+      "status": "PASS"
+    },
+    {
+      "name": "http_91_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_preserved_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_91",
+      "status": "PASS"
+    },
+    {
+      "name": "http_92_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_preserved_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_92",
+      "status": "PASS"
+    },
+    {
+      "name": "http_93_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_preserved_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_93",
+      "status": "PASS"
+    },
+    {
+      "name": "http_94_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_preserved_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_94",
+      "status": "PASS"
+    },
+    {
+      "name": "http_95_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_preserved_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_95",
+      "status": "PASS"
+    },
+    {
+      "name": "http_96_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_96",
+      "status": "PASS"
+    },
+    {
+      "name": "http_97_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_null_preserved_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "source-json-zero",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_97",
+      "status": "PASS"
+    },
+    {
+      "name": "http_98_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_98",
+      "status": "PASS"
+    },
+    {
+      "name": "http_99_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_99",
+      "status": "PASS"
+    },
+    {
+      "name": "http_100_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_zero_not_string_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_100",
+      "status": "PASS"
+    },
+    {
+      "name": "http_101_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_zero_not_string_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_101",
+      "status": "PASS"
+    },
+    {
+      "name": "http_102_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_zero_not_string_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_102",
+      "status": "PASS"
+    },
+    {
+      "name": "http_103_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_zero_not_string_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_103",
+      "status": "PASS"
+    },
+    {
+      "name": "http_104_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_zero_not_string_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_104",
+      "status": "PASS"
+    },
+    {
+      "name": "http_105_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_zero_not_string_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_105",
+      "status": "PASS"
+    },
+    {
+      "name": "http_106_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_106",
+      "status": "PASS"
+    },
+    {
+      "name": "http_107_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_zero_not_string_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "json_zero_not_string_exact_diagnostic",
+      "status": "PASS"
+    },
+    {
+      "name": "source-json-missing",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_107",
+      "status": "PASS"
+    },
+    {
+      "name": "http_108_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_108",
+      "status": "PASS"
+    },
+    {
+      "name": "http_109_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_109",
+      "status": "PASS"
+    },
+    {
+      "name": "http_110_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_not_null_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_110",
+      "status": "PASS"
+    },
+    {
+      "name": "http_111_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_not_null_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_111",
+      "status": "PASS"
+    },
+    {
+      "name": "http_112_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_not_null_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_112",
+      "status": "PASS"
+    },
+    {
+      "name": "http_113_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_not_null_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_113",
+      "status": "PASS"
+    },
+    {
+      "name": "http_114_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_not_null_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_114",
+      "status": "PASS"
+    },
+    {
+      "name": "http_115_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_not_null_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_115",
+      "status": "PASS"
+    },
+    {
+      "name": "http_116_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_116",
+      "status": "PASS"
+    },
+    {
+      "name": "http_117_200",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_not_null_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "json_missing_not_null_exact_diagnostic",
+      "status": "PASS"
+    },
+    {
+      "name": "source-json-restore",
+      "status": "PASS"
+    },
+    {
+      "name": "source-fanout-on",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_117",
+      "status": "PASS"
+    },
+    {
+      "name": "http_118_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_118",
+      "status": "PASS"
+    },
+    {
+      "name": "http_119_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_119",
+      "status": "PASS"
+    },
+    {
+      "name": "http_120_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fanout_no_truncation_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_120",
+      "status": "PASS"
+    },
+    {
+      "name": "http_121_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fanout_no_truncation_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_121",
+      "status": "PASS"
+    },
+    {
+      "name": "http_122_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fanout_no_truncation_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_122",
+      "status": "PASS"
+    },
+    {
+      "name": "http_123_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fanout_no_truncation_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_123",
+      "status": "PASS"
+    },
+    {
+      "name": "http_124_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fanout_no_truncation_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_124",
+      "status": "PASS"
+    },
+    {
+      "name": "http_125_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fanout_no_truncation_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_125",
+      "status": "PASS"
+    },
+    {
+      "name": "http_126_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_126",
+      "status": "PASS"
+    },
+    {
+      "name": "http_127_200",
+      "status": "PASS"
+    },
+    {
+      "name": "fanout_no_truncation_seven_stage_result",
+      "status": "PASS"
+    },
+    {
+      "name": "fanout_no_truncation_exact_diagnostic",
+      "status": "PASS"
+    },
+    {
+      "name": "source-fanout-off",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_127",
+      "status": "PASS"
+    },
+    {
+      "name": "http_128_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_128",
+      "status": "PASS"
+    },
+    {
+      "name": "http_129_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_129",
+      "status": "PASS"
+    },
+    {
+      "name": "http_130_200",
+      "status": "PASS"
+    },
+    {
+      "name": "restored_valid_job_pending_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_130",
+      "status": "PASS"
+    },
+    {
+      "name": "http_131_200",
+      "status": "PASS"
+    },
+    {
+      "name": "restored_valid_job_pending_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_131",
+      "status": "PASS"
+    },
+    {
+      "name": "http_132_200",
+      "status": "PASS"
+    },
+    {
+      "name": "restored_valid_job_pending_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_132",
+      "status": "PASS"
+    },
+    {
+      "name": "http_133_200",
+      "status": "PASS"
+    },
+    {
+      "name": "restored_valid_job_pending_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_133",
+      "status": "PASS"
+    },
+    {
+      "name": "http_134_200",
+      "status": "PASS"
+    },
+    {
+      "name": "restored_valid_job_pending_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_134",
+      "status": "PASS"
+    },
+    {
+      "name": "http_135_200",
+      "status": "PASS"
+    },
+    {
+      "name": "restored_valid_job_pending_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_135",
+      "status": "PASS"
+    },
+    {
+      "name": "http_136_200",
+      "status": "PASS"
+    },
+    {
+      "name": "restored_valid_job_pending_6",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_136",
+      "status": "PASS"
+    },
+    {
+      "name": "http_137_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_137",
+      "status": "PASS"
+    },
+    {
+      "name": "http_138_200",
+      "status": "PASS"
+    },
+    {
+      "name": "restored_valid_seven_stage_result",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 25.026791000000003,
+      "sha256": "95e14abb88a9a6ad306e839022b680ac4296c56accb66459ce9f4349448f9786"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 24.432875000000195,
+      "sha256": "0abf73714eebb9f4819209448071e92a4fa5fc711803c7e56356b105d543bc6a"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.546083000000181,
+      "sha256": "2286717d60e1e691ece647d9cd55e1909fd26f077cd5e950a630d4b7f62d16a1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 4.094624999999951,
+      "sha256": "b95cd0267250ce591a268429ff2cdd8ac69a752ae1711ef9823c9c8b6bee32da"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings",
+      "status": 201,
+      "elapsedMs": 70.81958299999997,
+      "sha256": "1f05728d8b04f3853e5c2743f28a523930a32209b2db495a68b620f5bb812649"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 29.09091699999999,
+      "sha256": "79f0ac4975e983e8e4813757b19214b2d66ffb79cb01f53543688bb103207b3a"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 26.344709000000194,
+      "sha256": "f3f7b44960676a275b1826cbd166bda46b616babd6d2eb11fde193b86be3a756"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4e19099bc12c44e7b31c9a1bc2e111b1",
+      "status": 200,
+      "elapsedMs": 30.463208000000122,
+      "sha256": "f3f7b44960676a275b1826cbd166bda46b616babd6d2eb11fde193b86be3a756"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4e19099bc12c44e7b31c9a1bc2e111b1",
+      "status": 200,
+      "elapsedMs": 23.236667000000125,
+      "sha256": "f3f7b44960676a275b1826cbd166bda46b616babd6d2eb11fde193b86be3a756"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4e19099bc12c44e7b31c9a1bc2e111b1",
+      "status": 200,
+      "elapsedMs": 56.94750000000022,
+      "sha256": "f3f7b44960676a275b1826cbd166bda46b616babd6d2eb11fde193b86be3a756"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4e19099bc12c44e7b31c9a1bc2e111b1",
+      "status": 200,
+      "elapsedMs": 56.60612499999979,
+      "sha256": "f3f7b44960676a275b1826cbd166bda46b616babd6d2eb11fde193b86be3a756"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4e19099bc12c44e7b31c9a1bc2e111b1",
+      "status": 200,
+      "elapsedMs": 54.31487500000003,
+      "sha256": "f3f7b44960676a275b1826cbd166bda46b616babd6d2eb11fde193b86be3a756"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4e19099bc12c44e7b31c9a1bc2e111b1",
+      "status": 200,
+      "elapsedMs": 36.888124999999945,
+      "sha256": "35f5c5ff806a3e284864a315f9b179d08098ebc0c05008d3746ac236f5e50902"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4e19099bc12c44e7b31c9a1bc2e111b1",
+      "status": 200,
+      "elapsedMs": 36.07395799999995,
+      "sha256": "cc2d76f57d9647b3e05900cce49439605562d33ca661f2d532b3a609f282716d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-64f83b2a08d745338ec9d5a89416169d",
+      "status": 200,
+      "elapsedMs": 23.657416999999896,
+      "sha256": "b2315a5b805022fbf2684b9dc535a69845337acf87fba8ffc689848ccb1ce7be"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 13.509584000000359,
+      "sha256": "b88f09c2e34032c05eb51a6d13af580d66588545eddc26806e18332e76ba4a9b"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 10.93079200000011,
+      "sha256": "0d064e8db0350f4b8f1cd764547254ea2cdcf77af3f3369122ad90bfcd4d2c40"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-95fa56ec0b034853b581fc7ed56eb0d7",
+      "status": 200,
+      "elapsedMs": 18.09137499999997,
+      "sha256": "f3a11dc5d23852c48ea0ced999c12458d57706e1d54de709f99c2ad176336745"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-95fa56ec0b034853b581fc7ed56eb0d7",
+      "status": 200,
+      "elapsedMs": 55.805083000000195,
+      "sha256": "f3a11dc5d23852c48ea0ced999c12458d57706e1d54de709f99c2ad176336745"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-95fa56ec0b034853b581fc7ed56eb0d7",
+      "status": 200,
+      "elapsedMs": 54.83887500000037,
+      "sha256": "f3a11dc5d23852c48ea0ced999c12458d57706e1d54de709f99c2ad176336745"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-95fa56ec0b034853b581fc7ed56eb0d7",
+      "status": 200,
+      "elapsedMs": 55.458332999999584,
+      "sha256": "f3a11dc5d23852c48ea0ced999c12458d57706e1d54de709f99c2ad176336745"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-95fa56ec0b034853b581fc7ed56eb0d7",
+      "status": 200,
+      "elapsedMs": 55.00658399999975,
+      "sha256": "f3a11dc5d23852c48ea0ced999c12458d57706e1d54de709f99c2ad176336745"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-95fa56ec0b034853b581fc7ed56eb0d7",
+      "status": 200,
+      "elapsedMs": 27.91112499999963,
+      "sha256": "32b51a99ff050ecaf5f57b90d418d04e02744b5ecba0e56be1e810ea9350a8e3"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-95fa56ec0b034853b581fc7ed56eb0d7",
+      "status": 200,
+      "elapsedMs": 52.00758299999961,
+      "sha256": "20768784e7e06b91de38d051aa1e003839f07012a994fe2ccc5fdb9736fc0682"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-88d658e835774c29b36aebfa4364328f",
+      "status": 200,
+      "elapsedMs": 26.66991700000017,
+      "sha256": "138f2d104de0c6de43b73dd9c4c5a01acda2ca18afc223e5e69c66436362f84c"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 15.32445800000005,
+      "sha256": "fcfdad017d4e27383793f09d88c150789714a756758045419fb7bc03b0d9f0e8"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 10.871082999999999,
+      "sha256": "ff7d8a68efb42468de28e41741b20e3edf615c339b25a533a19e517dd1842a98"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-3ca682d781064d5aa002c3c6546bc1e7",
+      "status": 200,
+      "elapsedMs": 20.062666999999237,
+      "sha256": "ff7d8a68efb42468de28e41741b20e3edf615c339b25a533a19e517dd1842a98"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-3ca682d781064d5aa002c3c6546bc1e7",
+      "status": 200,
+      "elapsedMs": 59.78279199999997,
+      "sha256": "ff7d8a68efb42468de28e41741b20e3edf615c339b25a533a19e517dd1842a98"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-3ca682d781064d5aa002c3c6546bc1e7",
+      "status": 200,
+      "elapsedMs": 58.8589579999998,
+      "sha256": "ff7d8a68efb42468de28e41741b20e3edf615c339b25a533a19e517dd1842a98"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-3ca682d781064d5aa002c3c6546bc1e7",
+      "status": 200,
+      "elapsedMs": 60.48704199999975,
+      "sha256": "ff7d8a68efb42468de28e41741b20e3edf615c339b25a533a19e517dd1842a98"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-3ca682d781064d5aa002c3c6546bc1e7",
+      "status": 200,
+      "elapsedMs": 61.361415999999736,
+      "sha256": "ff7d8a68efb42468de28e41741b20e3edf615c339b25a533a19e517dd1842a98"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-3ca682d781064d5aa002c3c6546bc1e7",
+      "status": 200,
+      "elapsedMs": 40.39216699999997,
+      "sha256": "5062286e630d1ab7133fd139edbad02f714fbe656b57385d7b7fab599a848dac"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-3ca682d781064d5aa002c3c6546bc1e7",
+      "status": 200,
+      "elapsedMs": 26.7779589999991,
+      "sha256": "d36562cdffcea2a6e7bfe35b6525d8c1d18bace95365de726e6fa9b42edc6cbb"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-f3c32e8ad9bb4bf48a67108dcd0737ff",
+      "status": 200,
+      "elapsedMs": 22.806083999999828,
+      "sha256": "bbb2013f2331976c5cea2e8d1a07973839d632d66d6b867082a809112225da61"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 13.545082999999067,
+      "sha256": "5f9e9008d30366897ae304d36b7e271c7720083d0f619b34916b2473e2a49b15"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 11.987208000000464,
+      "sha256": "c433e0c9713359ca2c69d57061fe6bc3d2909f3c28040e7519c2bcc95691111c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-df6c28a275d54f7b890d3bc8ab4c0f36",
+      "status": 200,
+      "elapsedMs": 20.441624999999476,
+      "sha256": "6750e5ac44b22d4081649d9cf1da2d2718f42bb98b3f3e27a82b627f67eb6017"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-df6c28a275d54f7b890d3bc8ab4c0f36",
+      "status": 200,
+      "elapsedMs": 59.85491700000057,
+      "sha256": "6750e5ac44b22d4081649d9cf1da2d2718f42bb98b3f3e27a82b627f67eb6017"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-df6c28a275d54f7b890d3bc8ab4c0f36",
+      "status": 200,
+      "elapsedMs": 66.90637500000048,
+      "sha256": "6750e5ac44b22d4081649d9cf1da2d2718f42bb98b3f3e27a82b627f67eb6017"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-df6c28a275d54f7b890d3bc8ab4c0f36",
+      "status": 200,
+      "elapsedMs": 31.820292000000336,
+      "sha256": "6750e5ac44b22d4081649d9cf1da2d2718f42bb98b3f3e27a82b627f67eb6017"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-df6c28a275d54f7b890d3bc8ab4c0f36",
+      "status": 200,
+      "elapsedMs": 59.14104200000111,
+      "sha256": "6750e5ac44b22d4081649d9cf1da2d2718f42bb98b3f3e27a82b627f67eb6017"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-df6c28a275d54f7b890d3bc8ab4c0f36",
+      "status": 200,
+      "elapsedMs": 61.60833300000013,
+      "sha256": "6750e5ac44b22d4081649d9cf1da2d2718f42bb98b3f3e27a82b627f67eb6017"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-df6c28a275d54f7b890d3bc8ab4c0f36",
+      "status": 200,
+      "elapsedMs": 21.91095900000073,
+      "sha256": "45c42e8db4858e6d488995e7db2e9631dd2d9076b37e3bf2bb35d8958c3238a9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-f5b28d2b8b9e4282b23d37f3ab357362",
+      "status": 200,
+      "elapsedMs": 21.302750000000742,
+      "sha256": "6ed07267a9c0b3ffc9084021009a1ce90a825e13fac28fa732bdaa3182b8660d"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 13.116749999999229,
+      "sha256": "b5bf3e7f10b9a31aae84d43a4b83338f642e16e7ca63d80db6e0120bb0bb645c"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 11.52470799999901,
+      "sha256": "f21788ba376f8a7cd11eff2111155f1de7e425cae3b0654979aeb0e6f2142e5b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-92b0114c7d4c4d20b9171d3abf26623c",
+      "status": 200,
+      "elapsedMs": 19.40208299999904,
+      "sha256": "ed594d8e649daad7324c152ce1919c56c1781d0f3e0c447cfdd3f74ced74207f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-92b0114c7d4c4d20b9171d3abf26623c",
+      "status": 200,
+      "elapsedMs": 59.23725000000013,
+      "sha256": "ed594d8e649daad7324c152ce1919c56c1781d0f3e0c447cfdd3f74ced74207f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-92b0114c7d4c4d20b9171d3abf26623c",
+      "status": 200,
+      "elapsedMs": 57.99304099999972,
+      "sha256": "ed594d8e649daad7324c152ce1919c56c1781d0f3e0c447cfdd3f74ced74207f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-92b0114c7d4c4d20b9171d3abf26623c",
+      "status": 200,
+      "elapsedMs": 56.25166700000045,
+      "sha256": "ed594d8e649daad7324c152ce1919c56c1781d0f3e0c447cfdd3f74ced74207f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-92b0114c7d4c4d20b9171d3abf26623c",
+      "status": 200,
+      "elapsedMs": 58.44416699999965,
+      "sha256": "ed594d8e649daad7324c152ce1919c56c1781d0f3e0c447cfdd3f74ced74207f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-92b0114c7d4c4d20b9171d3abf26623c",
+      "status": 200,
+      "elapsedMs": 54.97233299999971,
+      "sha256": "ed594d8e649daad7324c152ce1919c56c1781d0f3e0c447cfdd3f74ced74207f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-92b0114c7d4c4d20b9171d3abf26623c",
+      "status": 200,
+      "elapsedMs": 36.12420899999961,
+      "sha256": "94f1976b38c425e2eeb8bd823c5857d0348061f3dcff7f1c38bd1988009a7309"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-92b0114c7d4c4d20b9171d3abf26623c",
+      "status": 200,
+      "elapsedMs": 25.19329199999993,
+      "sha256": "89457003def0a35d87817676bb109749f006b6d95beb5d13d47b9f66f1b25e1f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-2adb22f6002241e5bd39faf1d82a0b22",
+      "status": 200,
+      "elapsedMs": 21.03375000000051,
+      "sha256": "ab8996e8b003c8bc09f790131d63637aa5f911ff5a2e7e3924867cc6987ea79c"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 12.922708000000057,
+      "sha256": "2da2666f03fc313838d2e3f9efc7429929490a6928b8ea920743a54d45b06c04"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 10.197750000001179,
+      "sha256": "f1e9a1468116492e134a1287f16b6841d942dc8cb94ba9cbc267ca53fac40666"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-0f8cc593630c47d2b799461773daa864",
+      "status": 200,
+      "elapsedMs": 18.61791699999958,
+      "sha256": "b48bd1bfa7d26abdcf6036370ac81e65599d9172e32d177389c7e4c1735dc284"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-0f8cc593630c47d2b799461773daa864",
+      "status": 200,
+      "elapsedMs": 58.066417,
+      "sha256": "b48bd1bfa7d26abdcf6036370ac81e65599d9172e32d177389c7e4c1735dc284"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-0f8cc593630c47d2b799461773daa864",
+      "status": 200,
+      "elapsedMs": 57.19154200000048,
+      "sha256": "b48bd1bfa7d26abdcf6036370ac81e65599d9172e32d177389c7e4c1735dc284"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-0f8cc593630c47d2b799461773daa864",
+      "status": 200,
+      "elapsedMs": 49.90045900000041,
+      "sha256": "b48bd1bfa7d26abdcf6036370ac81e65599d9172e32d177389c7e4c1735dc284"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-0f8cc593630c47d2b799461773daa864",
+      "status": 200,
+      "elapsedMs": 56.576875000000655,
+      "sha256": "b48bd1bfa7d26abdcf6036370ac81e65599d9172e32d177389c7e4c1735dc284"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-0f8cc593630c47d2b799461773daa864",
+      "status": 200,
+      "elapsedMs": 31.1618750000016,
+      "sha256": "b48bd1bfa7d26abdcf6036370ac81e65599d9172e32d177389c7e4c1735dc284"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-0f8cc593630c47d2b799461773daa864",
+      "status": 200,
+      "elapsedMs": 30.924291999999696,
+      "sha256": "1089e0f5653e8ff3c4db4e0d58bdca1328699ca499627650b1c5655512957542"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-0f8cc593630c47d2b799461773daa864",
+      "status": 200,
+      "elapsedMs": 59.25862500000039,
+      "sha256": "258d04461e132ced4e29dcd61cf1966155100ff26822841dae1479f900d3d7b2"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-e29644bb877f43b5a8d5be9a658a01ce",
+      "status": 200,
+      "elapsedMs": 29.55412499999875,
+      "sha256": "4423a8426a4f00c589f649189e2582e75e4bae40917654610d342ec2a9b4f4cb"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 18.130083000000013,
+      "sha256": "bf709b23301c73ea97838b073125a40db197945adc87e597a39da1ed5f14d1fd"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 11.530249999999796,
+      "sha256": "cb52ac97a81e39dbfb1567307355e56384a39abf50d7a3c7afab41e717884fac"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-f065d697080543e0ada530319a6dd4de",
+      "status": 200,
+      "elapsedMs": 23.630165999999008,
+      "sha256": "6557da621f296d2397354aeaace9c3a29a6c6aee556c5c7c054d06eeaca66d4b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-f065d697080543e0ada530319a6dd4de",
+      "status": 200,
+      "elapsedMs": 40.62937500000044,
+      "sha256": "6557da621f296d2397354aeaace9c3a29a6c6aee556c5c7c054d06eeaca66d4b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-f065d697080543e0ada530319a6dd4de",
+      "status": 200,
+      "elapsedMs": 59.2513340000005,
+      "sha256": "6557da621f296d2397354aeaace9c3a29a6c6aee556c5c7c054d06eeaca66d4b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-f065d697080543e0ada530319a6dd4de",
+      "status": 200,
+      "elapsedMs": 57.88820900000064,
+      "sha256": "6557da621f296d2397354aeaace9c3a29a6c6aee556c5c7c054d06eeaca66d4b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-f065d697080543e0ada530319a6dd4de",
+      "status": 200,
+      "elapsedMs": 59.255708000000595,
+      "sha256": "6557da621f296d2397354aeaace9c3a29a6c6aee556c5c7c054d06eeaca66d4b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-f065d697080543e0ada530319a6dd4de",
+      "status": 200,
+      "elapsedMs": 23.457792000001064,
+      "sha256": "46501bca7c69e548a6d1e02eb3c72cf4641837d6927af448cb9f6450ad165cda"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-f065d697080543e0ada530319a6dd4de",
+      "status": 200,
+      "elapsedMs": 31.782624999999825,
+      "sha256": "bf5508f68cec0c49fc6934a7e8cc20d0a1a3cccd55ddd86f1398e8af19480f8f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-59baf0521e7c4fe7b56dc9542406593e",
+      "status": 200,
+      "elapsedMs": 23.51458300000013,
+      "sha256": "ffffc61de40b745c83b7b6ca6873c13cd27c5bae5ff800d81a6f3aceca8e2e1f"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 15.974333999998635,
+      "sha256": "7bb61d5ed7774acd553dbab53c989f09ca864fdcafb5b12e3c97f2f6cdd5d3d7"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 9.533458999998402,
+      "sha256": "9bc09d0818bee5c2fd9229d3ba6847f2403370ddac8228a2fa5592eb5f76d1f5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-b5ad9e33bdba41ffaa42ce4d5aaa54da",
+      "status": 200,
+      "elapsedMs": 19.931040999999823,
+      "sha256": "fda471657ef2e5cd621e90b17f306912d1f92c9f1e1d160574675926c6b2d11e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-b5ad9e33bdba41ffaa42ce4d5aaa54da",
+      "status": 200,
+      "elapsedMs": 47.837625000000116,
+      "sha256": "fda471657ef2e5cd621e90b17f306912d1f92c9f1e1d160574675926c6b2d11e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-b5ad9e33bdba41ffaa42ce4d5aaa54da",
+      "status": 200,
+      "elapsedMs": 58.80820799999856,
+      "sha256": "fda471657ef2e5cd621e90b17f306912d1f92c9f1e1d160574675926c6b2d11e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-b5ad9e33bdba41ffaa42ce4d5aaa54da",
+      "status": 200,
+      "elapsedMs": 31.309792000000016,
+      "sha256": "fda471657ef2e5cd621e90b17f306912d1f92c9f1e1d160574675926c6b2d11e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-b5ad9e33bdba41ffaa42ce4d5aaa54da",
+      "status": 200,
+      "elapsedMs": 60.36700000000201,
+      "sha256": "fda471657ef2e5cd621e90b17f306912d1f92c9f1e1d160574675926c6b2d11e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-b5ad9e33bdba41ffaa42ce4d5aaa54da",
+      "status": 200,
+      "elapsedMs": 32.903707999998005,
+      "sha256": "adf57f881ae1c298077cca19f5fdcdc1a9467cbaa5e2de4dfe2bfc74f2a2b6ff"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-b5ad9e33bdba41ffaa42ce4d5aaa54da",
+      "status": 200,
+      "elapsedMs": 61.712625000000116,
+      "sha256": "1a28db4ef14b7331cbe10831786af0a465760c2cae471dd013a568db679b4a2f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-55b4a7ef6ef044df8cb4572f74fdcdd2",
+      "status": 200,
+      "elapsedMs": 27.14191700000083,
+      "sha256": "1efaddaf416c3e53308296c1ee9d29dfdfd2e416255281c06022ae2940ffb6eb"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 14.747833000001265,
+      "sha256": "0cb1d7c3b2bb21366ed233e1341744b8d4efdf0ce2f852fc1f25cbc727b8e205"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 11.520666000000347,
+      "sha256": "a9c52d171a4f843e4c252e277c9bbffe2311f4584788549941ab34fae85a78ea"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4a5c1a0c2813405d9903cf5b9b4fe0e0",
+      "status": 200,
+      "elapsedMs": 18.944875000001048,
+      "sha256": "fda26a7fd9fa67fa6d5e89372a655930bcf9438cd7bd640d02af5b781573b2e0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4a5c1a0c2813405d9903cf5b9b4fe0e0",
+      "status": 200,
+      "elapsedMs": 58.97533399999884,
+      "sha256": "fda26a7fd9fa67fa6d5e89372a655930bcf9438cd7bd640d02af5b781573b2e0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4a5c1a0c2813405d9903cf5b9b4fe0e0",
+      "status": 200,
+      "elapsedMs": 28.5279589999991,
+      "sha256": "fda26a7fd9fa67fa6d5e89372a655930bcf9438cd7bd640d02af5b781573b2e0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4a5c1a0c2813405d9903cf5b9b4fe0e0",
+      "status": 200,
+      "elapsedMs": 58.338833999998315,
+      "sha256": "fda26a7fd9fa67fa6d5e89372a655930bcf9438cd7bd640d02af5b781573b2e0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4a5c1a0c2813405d9903cf5b9b4fe0e0",
+      "status": 200,
+      "elapsedMs": 58.219583000001876,
+      "sha256": "fda26a7fd9fa67fa6d5e89372a655930bcf9438cd7bd640d02af5b781573b2e0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4a5c1a0c2813405d9903cf5b9b4fe0e0",
+      "status": 200,
+      "elapsedMs": 42.31187499999942,
+      "sha256": "42ad5d8940e0928bde3b1ec30ab2e0b97102111562c1cd103fa1eacb2bfa371d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-4a5c1a0c2813405d9903cf5b9b4fe0e0",
+      "status": 200,
+      "elapsedMs": 27.97320799999943,
+      "sha256": "98ae40f76110728a2db19b4d55c3e99b92061938f82a006a6bf3fa1002437150"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-2baa311ab8e14ada9984182e735996d4",
+      "status": 200,
+      "elapsedMs": 22.47454199999993,
+      "sha256": "e3dc2236db606c31c8cd305216881315901ec1baa11f61c2a3c6b1abb946b60d"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 14.631375000000844,
+      "sha256": "3369342f91843b37e6106c015cef5538dda157f3ee85d1baf2e336a98d2642d7"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 9.355083999998897,
+      "sha256": "d4b94a2341a235d5fee549d3f1cd268024c79901e299f89e18ccfa33837ca26b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-7f36d66f41a640489b2d5edd16fe829f",
+      "status": 200,
+      "elapsedMs": 19.278332999998383,
+      "sha256": "779e10a335874fe421a9eedf937c401a63b66742f22addae463b30b50eda1e74"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-7f36d66f41a640489b2d5edd16fe829f",
+      "status": 200,
+      "elapsedMs": 57.77595800000199,
+      "sha256": "779e10a335874fe421a9eedf937c401a63b66742f22addae463b30b50eda1e74"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-7f36d66f41a640489b2d5edd16fe829f",
+      "status": 200,
+      "elapsedMs": 54.661166000001685,
+      "sha256": "779e10a335874fe421a9eedf937c401a63b66742f22addae463b30b50eda1e74"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-7f36d66f41a640489b2d5edd16fe829f",
+      "status": 200,
+      "elapsedMs": 61.60795800000051,
+      "sha256": "779e10a335874fe421a9eedf937c401a63b66742f22addae463b30b50eda1e74"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-7f36d66f41a640489b2d5edd16fe829f",
+      "status": 200,
+      "elapsedMs": 56.91362500000105,
+      "sha256": "779e10a335874fe421a9eedf937c401a63b66742f22addae463b30b50eda1e74"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-7f36d66f41a640489b2d5edd16fe829f",
+      "status": 200,
+      "elapsedMs": 32.05033299999923,
+      "sha256": "c1d7b45462fedf5eb71a2ca88b502a80620d3c3b1a18cc1678f22b9c0ba63d11"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-7f36d66f41a640489b2d5edd16fe829f",
+      "status": 200,
+      "elapsedMs": 30.648832999999286,
+      "sha256": "c08fe156dab2374936942a0da865d31cd1fcb5d7b21bb8c338aa76e180fe3b3f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-27db9f8db79943acae26487163919174",
+      "status": 200,
+      "elapsedMs": 22.474834000000556,
+      "sha256": "9252978a2386abb2573b07c126696d7439eb53eeec512f725ee646ccd65cda51"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 15.071291999996902,
+      "sha256": "2ce0dad3f51b8faa20d310dbd266f643a32d49fa55fcb4768b87ca54267c2862"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 9.041832999999315,
+      "sha256": "75816f5b864b4127f02b9130b8638272c16a8961c5b6f8e0f57acb9137279bc9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-8b23f8e9608b424f9c996157617cf2de",
+      "status": 200,
+      "elapsedMs": 18.676542000001064,
+      "sha256": "7ff37f0013c8d1c4f34c15eae263293e61ea41aa01ccb245b7f27327b426f760"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-8b23f8e9608b424f9c996157617cf2de",
+      "status": 200,
+      "elapsedMs": 60.07041599999866,
+      "sha256": "7ff37f0013c8d1c4f34c15eae263293e61ea41aa01ccb245b7f27327b426f760"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-8b23f8e9608b424f9c996157617cf2de",
+      "status": 200,
+      "elapsedMs": 55.46858300000167,
+      "sha256": "7ff37f0013c8d1c4f34c15eae263293e61ea41aa01ccb245b7f27327b426f760"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-8b23f8e9608b424f9c996157617cf2de",
+      "status": 200,
+      "elapsedMs": 58.941249999999854,
+      "sha256": "7ff37f0013c8d1c4f34c15eae263293e61ea41aa01ccb245b7f27327b426f760"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-8b23f8e9608b424f9c996157617cf2de",
+      "status": 200,
+      "elapsedMs": 21.852999999999156,
+      "sha256": "7ff37f0013c8d1c4f34c15eae263293e61ea41aa01ccb245b7f27327b426f760"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-8b23f8e9608b424f9c996157617cf2de",
+      "status": 200,
+      "elapsedMs": 42.51679099999819,
+      "sha256": "7ff37f0013c8d1c4f34c15eae263293e61ea41aa01ccb245b7f27327b426f760"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-8b23f8e9608b424f9c996157617cf2de",
+      "status": 200,
+      "elapsedMs": 20.42070800000147,
+      "sha256": "b5c04867d53310975521c61f3819ab80c85c964fa526243f64b42f0445e6c73f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-d06bef8cd6954e73b44e28c2d9d0180c",
+      "status": 200,
+      "elapsedMs": 19.853792000001704,
+      "sha256": "e0a6477fd65fb6747e30b2952c8234589aeaee81d6a7b22b20adfff9d00aac1b"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 13.725916999999754,
+      "sha256": "afdec25bebba1a460a0b8c4e125640ed9a234232a66fb1df4e2eb9717fb4130b"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 9.605790999998135,
+      "sha256": "aae80900f44b4fd0108bfab40c9d8204d75bc5232a91adfa1f8566c35ddf5871"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-139c5ba5568c4d4dbf52e840dc0a4641",
+      "status": 200,
+      "elapsedMs": 18.130457999999635,
+      "sha256": "f5186a177d9f25a9298c3b9fb042573d4a54600d7f6fe6db5ab395045ea8f60c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-139c5ba5568c4d4dbf52e840dc0a4641",
+      "status": 200,
+      "elapsedMs": 58.23029200000019,
+      "sha256": "f5186a177d9f25a9298c3b9fb042573d4a54600d7f6fe6db5ab395045ea8f60c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-139c5ba5568c4d4dbf52e840dc0a4641",
+      "status": 200,
+      "elapsedMs": 28.69012499999735,
+      "sha256": "f5186a177d9f25a9298c3b9fb042573d4a54600d7f6fe6db5ab395045ea8f60c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-139c5ba5568c4d4dbf52e840dc0a4641",
+      "status": 200,
+      "elapsedMs": 53.594082999999955,
+      "sha256": "f5186a177d9f25a9298c3b9fb042573d4a54600d7f6fe6db5ab395045ea8f60c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-139c5ba5568c4d4dbf52e840dc0a4641",
+      "status": 200,
+      "elapsedMs": 31.382125000000087,
+      "sha256": "f5186a177d9f25a9298c3b9fb042573d4a54600d7f6fe6db5ab395045ea8f60c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-139c5ba5568c4d4dbf52e840dc0a4641",
+      "status": 200,
+      "elapsedMs": 60.10337499999878,
+      "sha256": "f5186a177d9f25a9298c3b9fb042573d4a54600d7f6fe6db5ab395045ea8f60c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-139c5ba5568c4d4dbf52e840dc0a4641",
+      "status": 200,
+      "elapsedMs": 20.150582999998733,
+      "sha256": "76ab85916360f47a3a4e73c993173cd3a78609de0a84cfb307a2cfa0b4f56460"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-b2e5674491c94817bdbcc10e4568d988",
+      "status": 200,
+      "elapsedMs": 20.360250000001543,
+      "sha256": "b5f2cefefee30d57f36212a7d6d97667f01ff9812d54fb84f7afcddac2d6c8a1"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd",
+      "status": 200,
+      "elapsedMs": 14.949125000002823,
+      "sha256": "12bcb0f09887e9896a648d6a08e101fed7640218577151257edc93ac7b6711e8"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-62062441a9b47413ce1a796e5d3f84fd/validate",
+      "status": 202,
+      "elapsedMs": 10.06445900000108,
+      "sha256": "63aaa854811d25f695f374323ab75f858e3e4503b530c5bf2509e5ae8d160b7c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-37fc09b190154254b8755cbb8789b12a",
+      "status": 200,
+      "elapsedMs": 18.165625000001455,
+      "sha256": "f344dae7e4238cfc5cd24c06e777995332c8efa2141051008066c5729b9c20f1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-37fc09b190154254b8755cbb8789b12a",
+      "status": 200,
+      "elapsedMs": 57.81533300000228,
+      "sha256": "f344dae7e4238cfc5cd24c06e777995332c8efa2141051008066c5729b9c20f1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-37fc09b190154254b8755cbb8789b12a",
+      "status": 200,
+      "elapsedMs": 58.07066599999962,
+      "sha256": "f344dae7e4238cfc5cd24c06e777995332c8efa2141051008066c5729b9c20f1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-37fc09b190154254b8755cbb8789b12a",
+      "status": 200,
+      "elapsedMs": 56.53299999999945,
+      "sha256": "f344dae7e4238cfc5cd24c06e777995332c8efa2141051008066c5729b9c20f1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-37fc09b190154254b8755cbb8789b12a",
+      "status": 200,
+      "elapsedMs": 58.69929200000115,
+      "sha256": "f344dae7e4238cfc5cd24c06e777995332c8efa2141051008066c5729b9c20f1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-37fc09b190154254b8755cbb8789b12a",
+      "status": 200,
+      "elapsedMs": 63.40774999999849,
+      "sha256": "f344dae7e4238cfc5cd24c06e777995332c8efa2141051008066c5729b9c20f1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-37fc09b190154254b8755cbb8789b12a",
+      "status": 200,
+      "elapsedMs": 27.66570899999715,
+      "sha256": "55d5bd4770aa44d0677c98ec24b85a5cc33a415bf523f769c154022fcbd9d7b1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-37fc09b190154254b8755cbb8789b12a",
+      "status": 200,
+      "elapsedMs": 59.7142500000009,
+      "sha256": "de715d1eaed3bd7e91527f103121d37dd446e54b9973978feca944326ca7f760"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-750a19164d8c45639dacc327fa49ca84",
+      "status": 200,
+      "elapsedMs": 30.034041999999317,
+      "sha256": "470a6b0a75d3dad3159bb10d4ad7b6fa6c5b327a8f5f204a3ba32d042825be2c"
+    }
+  ],
+  "status": "PASS",
+  "inputBinding": {
+    "taskId": "G4-M3-MAPPING-001",
+    "runId": "mapping-impl-01",
+    "status": "BOUND",
+    "backend": "763ec9bdcb82b5646f970bb0ea7a1fb954d0e02e91421e4e48bdd173ddebb8ee",
+    "platformDatabase": "mapping_v3",
+    "apiOutput": "3fb714138f5a43c96733a899c823ded796406ff41ad3b6a04553712e1a45ab57",
+    "web": {
+      "receiptSha256": "527a55b36aff0e57e75ccfda1edd076e5c26111835acc7e52b03aab7bd519363",
+      "inputKey": "3f0761999dacbcbdd50dc7acbcf519f2399ca5d4e057ea595394790f63551c9a",
+      "outputKey": "64c3030be8a838a4d405eea580fb994a1560a56c17c40b8600c9200dd923c7dd"
+    },
+    "processesVerified": true,
+    "drivers": {
+      "scripts/maintenance/workflow_m3_mapping.py": "0f4af827c9d40064f5055ef8fb50ff834dd7e68bb7563ab155fc0b774257b2e6",
+      "scripts/maintenance/workflow-m3-mapping.mjs": "a72bf8bf3f487ef918a81d1f833f0f9110fa7503fa05b3234b42493c4b045486",
+      "experiments/g4-m3-mapping-001/grant-fixture.py": "68abf1fcf42fd9cf92c84d81bb34e23dd10ae18da1700ed3834c3f2b593a5694",
+      "experiments/g4-m3-mapping-001/fixture.sql": "d8ab557a8133a0a569accb317a029fb4de65a610277f7d9e70952476a5da5759",
+      "experiments/g4-m3-mapping-001/compose.yaml": "ba1f11c98f81dbea43acf6536ac740e8d7007a7bc9d1aad9d71a451b565e4146",
+      "samples/g2/ontology.ttl": "52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73",
+      "samples/g2/shapes.ttl": "78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270",
+      "samples/g2/vocabulary.ttl": "aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b",
+      "samples/g2/data.ttl": "349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e",
+      "samples/g3-m3/units.ttl": "a7bc90509e79273a900d4a632e9e633a201da6ce200348f263bf834f3053d852"
+    }
+  },
+  "semanticCases": [
+    {
+      "label": "one_to_many_exact_units_json",
+      "jobId": "job-4e19099bc12c44e7b31c9a1bc2e111b1",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-64f83b2a08d745338ec9d5a89416169d",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 2
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "ecf82f2b8720f9c60ffba3bf82ce8ea96602a16ad999b4cb0eb8584d32e6afb3",
+          "validationHash": "f14309dafedd8ca4587b8998902bb9938a8fff22130a36cab120a7c9971f1c92",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-64f83b2a08d745338ec9d5a89416169d",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "c1233333e5fd4b507205f3d7843980eb04c98d63221db88635381aa93ed24e72"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "fbba653ceed3460c2e70f5833e5020e03c513d05f9b734ef1e2d7923c3c774be"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "4992e7d78468132f2e80212c844cf8aa3f43db85cb9b87764f4550abc59dae0e"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "ef2d77e89755cb9f9c16581a9a6167f47eab065580466d28e1c55bdbd4892ca3"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "1d950d94a5138487e984139f49ebcbda66e5b6c6c8e4d306807cc291c031dbc4"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "e30659002ad06f150b30e31f5a65696c58ecffdd15bdb61644a2ffe02502d5de"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "d0f641351d04bd62ec5c57280cf177b18f858ba07ce4e18b67659eff7ef8641f"
+          }
+        ],
+        "issues": [],
+        "status": "READY_FOR_PROPOSAL",
+        "semanticResultHash": "2d702b7b3850ef253b72f6a471a739d7e8db936d750adcddf55d3d34b98151dd",
+        "evidenceHash": "70460707efe17097635423a8299d76f5d87a5c0c6030bebb327ce3fba220e338",
+        "startedAtUtc": "2026-11-14T05:50:36.2178006Z",
+        "finishedAtUtc": "2026-11-14T05:50:36.5235145Z",
+        "expiresAtUtc": "2026-11-14T06:05:36.5235145Z"
+      }
+    },
+    {
+      "label": "many_to_many",
+      "jobId": "job-95fa56ec0b034853b581fc7ed56eb0d7",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-88d658e835774c29b36aebfa4364328f",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 3
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "f437452028275e006205e8f57b2c4b96cc04896ec0abc9715d6136f11d4175af",
+          "validationHash": "e18e504161a0ac2419f7066064fcfb7cdc854f336a6a1a2350e53e36d3b1d488",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-88d658e835774c29b36aebfa4364328f",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "a686d6fc2b3c7ddd5abd6e338b18569d181b63e01e4668c780ba851208561fd5"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "d509b1597cbff69a45ccd921ac253fb75f3a366571ca261963c9e761a0abd7a8"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "91fdaa1426060b3870f9b7a630705749fa9b4fe8bbdd522b1cefde3619c90601"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "dfbf6f2fa90f4a9e8fa3757ee6da05d9cef66208600e84d3116ecc437d3ff4c4"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "6e1dace1e31481b6db8909c554de5620f976076ade0c0f65cd78740fa2bdc03d"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "360e1b71e236e562f3f1c438bb7d5349b5203839cdb99deec40a2ebe858fd5d9"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "82335f4ee50e86f0464b4e8a2fb07879f4546c6e11600f87f1e180fa6a6b21ae"
+          }
+        ],
+        "issues": [],
+        "status": "READY_FOR_PROPOSAL",
+        "semanticResultHash": "2d702b7b3850ef253b72f6a471a739d7e8db936d750adcddf55d3d34b98151dd",
+        "evidenceHash": "8a40184666e77806d99c9eb0ebfd39857059a00fc2704bb471de07c3f392698a",
+        "startedAtUtc": "2026-11-14T05:50:38.5624570Z",
+        "finishedAtUtc": "2026-11-14T05:50:38.7606941Z",
+        "expiresAtUtc": "2026-11-14T06:05:38.7606941Z"
+      }
+    },
+    {
+      "label": "wrong_formal_endpoints",
+      "jobId": "job-3ca682d781064d5aa002c3c6546bc1e7",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-f3c32e8ad9bb4bf48a67108dcd0737ff",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 4
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "47f1e080745cf5617996551c6ded1b50874ee33c903b0ebf54470f2ee6c6d58a",
+          "validationHash": "92764d4962c2767848b2f4c93174a28419b12a0504632f099c955f9ea6e182d7",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-f3c32e8ad9bb4bf48a67108dcd0737ff",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "INDETERMINATE",
+            "issueCodes": [
+              "mapping_relation_domain_unknown",
+              "mapping_relation_range_unknown"
+            ],
+            "evidenceHash": "c668f2ca857eddd67c3a1506c1507fc8c0e23d09ef1b90ce453af46094a3af43"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "6a6678382aea035d998b55c9457df29ff8ef73b5cc6470d28eb746932f3cc51e"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "f0111418d0bf5364323e00e140d51994f39ba70abb9a06c3678cb9269c1f0224"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "24816e1515b600dd7c88c869e95d9e78b2d8d573d47b50f4d4482a2bbd663bbd"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "f27abd4c8e849391a721883b2d9782fc89af3fd1f54bada7d8ba68ac93050bbd"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "6766aa66f5a5cc82e4494d0417ba275cd458b7ee9cd493958f18843b08c9dae1"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "276d5d3adceb49efbbcdc6fa236164a0b14ca9baea71002a35e78283812336c7"
+          }
+        ],
+        "issues": [
+          {
+            "code": "mapping_relation_domain_unknown",
+            "bindingId": "readings",
+            "fieldRef": null
+          },
+          {
+            "code": "mapping_relation_range_unknown",
+            "bindingId": "readings",
+            "fieldRef": null
+          }
+        ],
+        "status": "BLOCKED",
+        "semanticResultHash": "6576318ad831a7242a2bade3e5e1cce4f2a4443eed416ed83f856792a30e6b4e",
+        "evidenceHash": "53c6589e9640078bbc42285e2258c33c0526a0bb2d312b7aa142ae371d8935a2",
+        "startedAtUtc": "2026-11-14T05:50:40.8036170Z",
+        "finishedAtUtc": "2026-11-14T05:50:41.1096056Z",
+        "expiresAtUtc": "2026-11-14T06:05:41.1096056Z"
+      }
+    },
+    {
+      "label": "unknown_actual_unit",
+      "jobId": "job-df6c28a275d54f7b890d3bc8ab4c0f36",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-f5b28d2b8b9e4282b23d37f3ab357362",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 5
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "0863015c1c6bc23f52ac6f7b0a2899d137af9fe124dcbe4ecb4893250f602e24",
+          "validationHash": "6ba2cd51b98aa6eb7692d2f7e6c2fdbde0b8148e61a50bead8c9a1446148af6c",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-f5b28d2b8b9e4282b23d37f3ab357362",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "1b74227e3fb7e6d8305f22cdd19d90ac81d13e25575db054da7c60dba51590bc"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "99e2f278c7c41992f9bb969ac71ff6c90a13166a3d184948409e6560eb3814df"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_unit_evidence_invalid"
+            ],
+            "evidenceHash": "7456729658edccc70c8202d363ac40040ddfa85aa1724732afbec8d95a111230"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "7b2ea10e6a8199dd18795025396d2b7db65f1dcc09483ab850e172db40a49f21"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_transform_failed"
+            ],
+            "evidenceHash": "07e258c2d2292aa82ef99c750973cc1113557fa3e04583ed33b8f91f90a31d38"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_property_count_mismatch"
+            ],
+            "evidenceHash": "786dcc57ed5f5f474a1d978f072c53583733e840fc2a70975c04dc946e622ec3"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "ba45bc5bc840ee869374aaadbe9cdf6d1430986cb32c205f32afdc9cb610c699"
+          }
+        ],
+        "issues": [
+          {
+            "code": "mapping_unit_evidence_invalid",
+            "bindingId": "temperature",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 8,
+              "name": "temperature"
+            }
+          },
+          {
+            "code": "mapping_transform_failed",
+            "bindingId": "temperature",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 8,
+              "name": "temperature"
+            }
+          },
+          {
+            "code": "mapping_property_count_mismatch",
+            "bindingId": "temperature",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 8,
+              "name": "temperature"
+            }
+          }
+        ],
+        "status": "BLOCKED",
+        "semanticResultHash": "5b08598d5f82d4ee04166d090254cda162f81c39a2a73a041874fbb304520567",
+        "evidenceHash": "4b82a7323d09c1010d6528392519ea76bfa69c11f8cf6c18cd29d4377555052f",
+        "startedAtUtc": "2026-11-14T05:50:43.1299205Z",
+        "finishedAtUtc": "2026-11-14T05:50:43.3723362Z",
+        "expiresAtUtc": "2026-11-14T06:05:43.3723362Z"
+      }
+    },
+    {
+      "label": "precision_loss",
+      "jobId": "job-92b0114c7d4c4d20b9171d3abf26623c",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-2adb22f6002241e5bd39faf1d82a0b22",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 6
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "91e828b0408bf58dd48735d3146defec6eb403cbaf9a6dc00f9ba85625e72163",
+          "validationHash": "cafb1e7e57c491faee89694cf3c06783a2405a7ddea658da70a4c30e940e6cf7",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-2adb22f6002241e5bd39faf1d82a0b22",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "4ad79fd1169a5975bd009edf7e11362ce79469d1da9287b92047431b125dfe5d"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "INDETERMINATE",
+            "issueCodes": [
+              "mapping_identity_time_unknown"
+            ],
+            "evidenceHash": "3d166546c5c2318be9e7142f2dc4a2c4f300fd00c54db10765bb6a3e42106d4c"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_time_precision_loss"
+            ],
+            "evidenceHash": "654fd328a530834d00f50abf9b784c5049c40ddde65c7f317069b44075e9fac6"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "8653a57ab071f3a5598b2e52e219110277127418ae89da11022962adc1e40374"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "811d0a7bc8b039958f162eeea9c1840a36c0abbb2bb52b7ee2284dd864a4db28"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_entity_count_mismatch"
+            ],
+            "evidenceHash": "7bb0162382f8475713402b5ede857d5e888e0e8b942af49bd7098a913309e9e0"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "a8dbc82a67ed796fd7b53958271003d88ac0a5a45111b83de2ae83cd2d8d3edd"
+          }
+        ],
+        "issues": [
+          {
+            "code": "mapping_identity_time_unknown",
+            "bindingId": "reading",
+            "fieldRef": null
+          },
+          {
+            "code": "mapping_time_precision_loss",
+            "bindingId": "reading",
+            "fieldRef": null
+          },
+          {
+            "code": "mapping_entity_count_mismatch",
+            "bindingId": "reading",
+            "fieldRef": null
+          }
+        ],
+        "status": "BLOCKED",
+        "semanticResultHash": "1231e43f77f38507a27daa67f1b388c0f900e5937cbf8558c2108d8e0d5cca7c",
+        "evidenceHash": "18951b07d5505fc0e3f04910feb000306d3117660f2c905e15c79be7842c3b76",
+        "startedAtUtc": "2026-11-14T05:50:45.4080349Z",
+        "finishedAtUtc": "2026-11-14T05:50:45.8459376Z",
+        "expiresAtUtc": "2026-11-14T06:05:45.8459376Z"
+      }
+    },
+    {
+      "label": "json_missing",
+      "jobId": "job-0f8cc593630c47d2b799461773daa864",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-e29644bb877f43b5a8d5be9a658a01ce",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 7
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "e6e53ea28656c512703c1efab53201da3bd217bc69dbbe13056a512631e0a443",
+          "validationHash": "3c29c03747831973b61a59afce835471378e8e558151a124fbef96e3705ff6e1",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-e29644bb877f43b5a8d5be9a658a01ce",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "286893b2fd440a5635848958667a3816cc6297913c13fd1c67f8340c1a6aeeca"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "1abf71885fdc0229e4d5a5246efb6ae69a5cc33db53053c73618e315b2865007"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_json_key_missing"
+            ],
+            "evidenceHash": "01bd01814854d426a7c041fa8023cc4b9f10419214fa82af226ef84330d06a33"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "3a83ba6dac2e1b4d385cf0828d29cf7eede9108f2568c920539e1a516fc570dc"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_transform_failed"
+            ],
+            "evidenceHash": "b4ed14d927e2d1c0685614f77904d0ed2b027f01d335bb1e7d0811ec7559359a"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_property_count_mismatch"
+            ],
+            "evidenceHash": "77a97b17a04ce488e9ad814e548a823098cbf9e8189df9b2b04d86836f1e5e29"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "6db707e97998af22e9826e3f8bd4b232bca20a6bb33fc4ea154d70d19dc05ef8"
+          }
+        ],
+        "issues": [
+          {
+            "code": "mapping_json_key_missing",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          },
+          {
+            "code": "mapping_transform_failed",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          },
+          {
+            "code": "mapping_property_count_mismatch",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          }
+        ],
+        "status": "BLOCKED",
+        "semanticResultHash": "0d5c0878f3527ac686ddd3efa5ac128fc3638c720af7a5a3df4f89fe78c56971",
+        "evidenceHash": "0bf490c96d7b5e116eff23168ed1c6e6e9c1a0d02105a70164ba3168c0d8f23f",
+        "startedAtUtc": "2026-11-14T05:50:47.8804570Z",
+        "finishedAtUtc": "2026-11-14T05:50:48.1445656Z",
+        "expiresAtUtc": "2026-11-14T06:05:48.1445656Z"
+      }
+    },
+    {
+      "label": "json_empty_preserved",
+      "jobId": "job-f065d697080543e0ada530319a6dd4de",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-59baf0521e7c4fe7b56dc9542406593e",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 8
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "ecf82f2b8720f9c60ffba3bf82ce8ea96602a16ad999b4cb0eb8584d32e6afb3",
+          "validationHash": "8e425b92024122b48452a8656536eedb6a834828b6351d3ad3b6db82476f166e",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-59baf0521e7c4fe7b56dc9542406593e",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "62e99a20fae0b32f42bf4c9c8e05b2b94c270445f531a14065b1bdeae9661672"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "4bbd01a46902651c01ba9345d0e7820eab5307949533cc4506e90ebe8d729b89"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "f017a819344431674000a737c858cd2dbe669ca6023aa92076f4e5035ac7a6d8"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "a56d4599483304701b167ddd475b73483b0faffb51ac646d4ecefbf54df5d420"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "569c39e036b44aa03936cc8d346a1828c8e8c5c809526913cca610ba1452bf0a"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "dd4eec34cd7a10983143e7d5f97c04f64c4936195c6d211a05de9fca874284b7"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "ddb40bd0d08b9222113a5ffdc80492c53b908b1ea39e7cbecd22fa86835374ff"
+          }
+        ],
+        "issues": [],
+        "status": "READY_FOR_PROPOSAL",
+        "semanticResultHash": "2d702b7b3850ef253b72f6a471a739d7e8db936d750adcddf55d3d34b98151dd",
+        "evidenceHash": "73145657499a2c1d2d1d05af4578bfab9300ebf14b38c8bd1795d495e2659dca",
+        "startedAtUtc": "2026-11-14T05:50:50.1676740Z",
+        "finishedAtUtc": "2026-11-14T05:50:50.4241450Z",
+        "expiresAtUtc": "2026-11-14T06:05:50.4241450Z"
+      }
+    },
+    {
+      "label": "json_null_rejected",
+      "jobId": "job-b5ad9e33bdba41ffaa42ce4d5aaa54da",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-55b4a7ef6ef044df8cb4572f74fdcdd2",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 9
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "ecf82f2b8720f9c60ffba3bf82ce8ea96602a16ad999b4cb0eb8584d32e6afb3",
+          "validationHash": "6a3bbb529d45c0d3b97a8dee3f8d0632c82a4b9149f04c81827c782370ed47d8",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-55b4a7ef6ef044df8cb4572f74fdcdd2",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "1ff423064523e2d0d4ede665e4cf9201dffe88daeff43e9fe1ba0c9ac4d6f7a4"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "c297bbf5c2c7c69bb1824f480247d9620fc62eefc1dae23a28ba349fa87556d7"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_null_rejected"
+            ],
+            "evidenceHash": "41ea69879bac3e8de3930694242bc7b38e3cbb511f22cbb19f97afdbc07d6d29"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "673467f7e0a1a66341ea07a2941904efe6c908bcc675eb61a1a86b2c3e034cdd"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_transform_failed"
+            ],
+            "evidenceHash": "20e9302f96ede4f420fecc2d59d3442dfd15b31291100a1c352e9d55bbd93731"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_property_count_mismatch"
+            ],
+            "evidenceHash": "957f54ada745208cf65ec3e72174dca32145589417beb1a1227da837f1ed49e1"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "e00f2b859b51d9d69550edef683cc2fcadc13b824f7f75f5caeb066d98b2ad93"
+          }
+        ],
+        "issues": [
+          {
+            "code": "mapping_null_rejected",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          },
+          {
+            "code": "mapping_transform_failed",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          },
+          {
+            "code": "mapping_property_count_mismatch",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          }
+        ],
+        "status": "BLOCKED",
+        "semanticResultHash": "e56ccf46b19305d6f68f5a8c41d4de4959abc9ab7a61b46de5287461e2fe66d7",
+        "evidenceHash": "ba74d41710f59f039aa91f4967cd9e3780ffceb9f587df823e9c5de1d4bbea0a",
+        "startedAtUtc": "2026-11-14T05:50:52.4503672Z",
+        "finishedAtUtc": "2026-11-14T05:50:52.7149013Z",
+        "expiresAtUtc": "2026-11-14T06:05:52.7149013Z"
+      }
+    },
+    {
+      "label": "json_null_preserved",
+      "jobId": "job-4a5c1a0c2813405d9903cf5b9b4fe0e0",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-2baa311ab8e14ada9984182e735996d4",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 10
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "4cb50a25c296f0623ad6eb29d33a44d85d924beae902c8934abee063c5d60a61",
+          "validationHash": "1dcbd970ab316d1b426294b39dcbdad49f4b6587edaaf014e8ece6433fe182e1",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-2baa311ab8e14ada9984182e735996d4",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "a81e03e0b88dbd5fed2dea15000dda6c6ee89f670248894f910b47d755ad96d5"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "fa11b22f8a50f176939e286d33f8387d382fcc310bf49f072f69e6c9d174cc5d"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "51db4f7c7fbdd219848d8f44ac876de26a3ce7e4ef8f490cb98ef0ef004fca9c"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "87fb92a050158962e70944dae431760664f5595efe3b7bdb2e4f0c238fd89a68"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "9b3bca0e568906cecfc2a51cf9ed63a8738649b8bfb3c9fa0294cf05f21e7249"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "913ebe5a8f32f5b08944ce2623a1b987376ef4816b31f4116b6383032c8d39e4"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "1a6bcc603a88bb7f03731bf28a852bef7976cbd4d143b3c79d3ff073e05af2ea"
+          }
+        ],
+        "issues": [],
+        "status": "READY_FOR_PROPOSAL",
+        "semanticResultHash": "2d702b7b3850ef253b72f6a471a739d7e8db936d750adcddf55d3d34b98151dd",
+        "evidenceHash": "0a27b176758bb6f6f399ec5214bd247b419d0243e87ceddd2878ea0c4c4635bb",
+        "startedAtUtc": "2026-11-14T05:50:54.7515118Z",
+        "finishedAtUtc": "2026-11-14T05:50:55.1053017Z",
+        "expiresAtUtc": "2026-11-14T06:05:55.1053017Z"
+      }
+    },
+    {
+      "label": "json_zero_not_string",
+      "jobId": "job-7f36d66f41a640489b2d5edd16fe829f",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-27db9f8db79943acae26487163919174",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 11
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "ecf82f2b8720f9c60ffba3bf82ce8ea96602a16ad999b4cb0eb8584d32e6afb3",
+          "validationHash": "b1abcfb8ed00454d1f46227ed2bf34a57ebaeaf43669b728fed085821daa0c5b",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-27db9f8db79943acae26487163919174",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "a15f34ceb407cad4888197bdc53f3b0c54b89d005be0ba38db30e1d2888af468"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "96c9daec07e32b2e1e9a795e680ef02f55a886b9c214dea830dd52f785255b40"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_json_type_invalid"
+            ],
+            "evidenceHash": "7c7b8669c903477117175f830de96b6ebd7945dcc95a417aff22dac0ba0850b3"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "8354b1f7a1b35b6d44b2ed1c2b767e629dd8c4ef2e4aa3586dd33b677424882a"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_transform_failed"
+            ],
+            "evidenceHash": "12de22165a5f6fa8bd73ffd0cedb5e91564b5ab5f1ec71bf03c4ad0483d42b2d"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_property_count_mismatch"
+            ],
+            "evidenceHash": "51f73fb5da9ea11d108884de9d392a4aaadbe7954f939660e88f895df80b850a"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "a093dd3894519dd608484f636d7b9c0beb0adffb235a98b67ab62ef678071247"
+          }
+        ],
+        "issues": [
+          {
+            "code": "mapping_json_type_invalid",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          },
+          {
+            "code": "mapping_transform_failed",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          },
+          {
+            "code": "mapping_property_count_mismatch",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          }
+        ],
+        "status": "BLOCKED",
+        "semanticResultHash": "5a95ef32a05435f0ca8d0a5f97e2254907e099f9ee19a6d6c99d2762eddb3c78",
+        "evidenceHash": "1e9b15ce05ac1e2cd38d344197dd6a9f440c44ff090fbf06bbfdaa3d9dd40faa",
+        "startedAtUtc": "2026-11-14T05:50:57.1361387Z",
+        "finishedAtUtc": "2026-11-14T05:50:57.4078851Z",
+        "expiresAtUtc": "2026-11-14T06:05:57.4078851Z"
+      }
+    },
+    {
+      "label": "json_missing_not_null",
+      "jobId": "job-8b23f8e9608b424f9c996157617cf2de",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-d06bef8cd6954e73b44e28c2d9d0180c",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 12
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "4cb50a25c296f0623ad6eb29d33a44d85d924beae902c8934abee063c5d60a61",
+          "validationHash": "5c643091f3ecb21c82a22701fb32ee7b8f5c7953eca34731fea07efc4a34ab3c",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-d06bef8cd6954e73b44e28c2d9d0180c",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "bfd008b19d33b56911373bd97da3e4c51359fc224beeb9bfa079bdca0d76160a"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "a08a56393c047fa9f8c440e7a01a242f2ee51ebf93226dad18f37798b8aa1b1a"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_json_key_missing"
+            ],
+            "evidenceHash": "c36aa84f5043030446aeab235d3abe43926321a8d5b98fac1768ea2795976b73"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "ad4edae3f13d714fbba6ba2d53ee25a90c6c0ded77ce1056f101aad27c59413d"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_transform_failed"
+            ],
+            "evidenceHash": "e989d67b1a6666c5bcaf1764d04025e630250cbfa79cdfb5a0b6dc8e58bca730"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_property_count_mismatch"
+            ],
+            "evidenceHash": "88289f4ea6a841b74ce015488290e1e080a9f82e293b879371370f89a60f3a97"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "13c6823eb3c222dead81bb36a2e367a6093d52926ea30946b284c2c3eca3e682"
+          }
+        ],
+        "issues": [
+          {
+            "code": "mapping_json_key_missing",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          },
+          {
+            "code": "mapping_transform_failed",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          },
+          {
+            "code": "mapping_property_count_mismatch",
+            "bindingId": "quality",
+            "fieldRef": {
+              "datasetRef": {
+                "snapshotId": "8101705324cb42a39917f46a6482949c",
+                "schema": "production",
+                "name": "readings",
+                "kind": "TABLE"
+              },
+              "ordinal": 10,
+              "name": "attributes"
+            }
+          }
+        ],
+        "status": "BLOCKED",
+        "semanticResultHash": "0d5c0878f3527ac686ddd3efa5ac128fc3638c720af7a5a3df4f89fe78c56971",
+        "evidenceHash": "f0e2f6f18edd61255b033b9b301762c0a1d31e45d07b846e1d3f6cee4fa718a4",
+        "startedAtUtc": "2026-11-14T05:50:59.4589095Z",
+        "finishedAtUtc": "2026-11-14T05:50:59.7616663Z",
+        "expiresAtUtc": "2026-11-14T06:05:59.7616663Z"
+      }
+    },
+    {
+      "label": "fanout_no_truncation",
+      "jobId": "job-139c5ba5568c4d4dbf52e840dc0a4641",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-b2e5674491c94817bdbcc10e4568d988",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 13
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "ecf82f2b8720f9c60ffba3bf82ce8ea96602a16ad999b4cb0eb8584d32e6afb3",
+          "validationHash": "78fdc20f97a74a6a19986c966540078f566eb478064e57ca17c69fe19b64e95d",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-b2e5674491c94817bdbcc10e4568d988",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "cb89e3b85614c16d124db0d286ce4a081da0f881d23a924d950a0ce74afdb04e"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "3ca002ecd9536b723b20edfa24962b1297427133c1ddf24b91d0d63ce05fe743"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "23d996a6f6c85599bbf608f9c36e2f3e40f0f6ca70a79bf9d944c98c7720db19"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "a610fd0ba6d2a8dd548066e289aa75d6f1d85228a053d442bb81e96e911e38f3"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "FAIL",
+            "issueCodes": [
+              "mapping_fanout_exceeded"
+            ],
+            "evidenceHash": "23b84611229b17ae4a85bfaee6a5fd364d3279f99ceee403a412003e1e5d1483"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "1412351bd64c1921bfcd6791b3b3ff1625bbee24628f5fc240fb2d9f38726bac"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "8e5e4282da2ce4751a7d1a826c3d1a8a668af771de7116f98e301c4d488e09b5"
+          }
+        ],
+        "issues": [
+          {
+            "code": "mapping_fanout_exceeded",
+            "bindingId": "readings",
+            "fieldRef": null
+          }
+        ],
+        "status": "BLOCKED",
+        "semanticResultHash": "cec6fc8cc367ee00e9dacbd70e7137a1a9b7e0c97e5a5181fb67965bf3db20cf",
+        "evidenceHash": "fc89fc6f188fde8bf878459c1a240e4200a8e6858c0489ca469d5fac28ff76a5",
+        "startedAtUtc": "2026-11-14T05:51:01.8091937Z",
+        "finishedAtUtc": "2026-11-14T05:51:02.1113650Z",
+        "expiresAtUtc": "2026-11-14T06:06:02.1113650Z"
+      }
+    },
+    {
+      "label": "restored_valid",
+      "jobId": "job-37fc09b190154254b8755cbb8789b12a",
+      "assessment": {
+        "schemaVersion": "g4.mapping.v1",
+        "assessmentId": "ma-750a19164d8c45639dacc327fa49ca84",
+        "mappingId": "mapping-62062441a9b47413ce1a796e5d3f84fd",
+        "target": {
+          "kind": "PUBLISH",
+          "draftRevision": 14
+        },
+        "binding": {
+          "sourceConnectionId": "b05db1c4c8574e5eb36ed896b06e09d6",
+          "connectionRevision": 10,
+          "configHash": "278a352284a90e606c421eacf39b3c62f2a48ad971f17cb8bfbd84720dfde2ac",
+          "sourceType": "POSTGRESQL",
+          "sourceCatalogSnapshotId": "ff97d9900ef544e7822db0141bce607b",
+          "sourceCatalogFingerprint": "b89bee2f2a159751810ebf42ba03a2e2d721033f1399465ed4d7f21b75ab222e",
+          "ontologyReleaseId": "7f837e56b13a48819c655f8514ca23d2",
+          "ontologyManifestHash": "454c719492521ceb62c404181092e8a59cdd45c307379039f622028fc4e84c75",
+          "mappingHash": "ecf82f2b8720f9c60ffba3bf82ce8ea96602a16ad999b4cb0eb8584d32e6afb3",
+          "validationHash": "06c0be747e0c0202ec97d013125c0f5a0c1b32655fbf6114f8b05165652cb21e",
+          "impactHash": "2d7f8473e630fb546b176e91dd176a5a242b8bbd063011ca42ad59f9de283b42",
+          "assessmentId": "ma-750a19164d8c45639dacc327fa49ca84",
+          "adapterVersion": "pg-mapping-v1",
+          "executorVersion": "mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 5,
+          "authorizationEpoch": 46
+        },
+        "expectedActive": {
+          "releaseId": null,
+          "activationRevision": 0
+        },
+        "stages": [
+          {
+            "stage": "SCHEMA",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "444732654ec58bd7812044542ea14537495f27135cd1a727f47e9ab51d2252ec"
+          },
+          {
+            "stage": "IDENTITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "f4407bfacbeeb520b5c7791d4bda8e85d8a2d32bce06691a9c2b132302cb8066"
+          },
+          {
+            "stage": "TIME_UNIT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "1ec25b63f25a3d71bf0f38b6717ae6776c0fc625164de03e8fe49cb1b1f86a33"
+          },
+          {
+            "stage": "SECURITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "43d4e9ad3796e7a2499928e3e512ac03a5f4a2dff376b774e4028ff14391c198"
+          },
+          {
+            "stage": "EXECUTABILITY",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "305ef1f7ebcedd7b91982051a79f64848d80ade522209d6f3915bfd7d47bb889"
+          },
+          {
+            "stage": "RECONCILIATION",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "86539310ed5e728dd76610d1ca5fca0588f6a21728d7e3416ea958865e0d3e9b"
+          },
+          {
+            "stage": "IMPACT",
+            "status": "PASS",
+            "issueCodes": [],
+            "evidenceHash": "f9fbfff74e7c69fdd351bb3785e44656122479fd05873a61b1c9ae0cda49f3ef"
+          }
+        ],
+        "issues": [],
+        "status": "READY_FOR_PROPOSAL",
+        "semanticResultHash": "2d702b7b3850ef253b72f6a471a739d7e8db936d750adcddf55d3d34b98151dd",
+        "evidenceHash": "9a899152b999e8ae7ff3a9fcfa2cb267c581db8908e8e5e9dbdebc341e9e059a",
+        "startedAtUtc": "2026-11-14T05:51:04.1429340Z",
+        "finishedAtUtc": "2026-11-14T05:51:04.4857780Z",
+        "expiresAtUtc": "2026-11-14T06:06:04.4857780Z"
+      }
+    }
+  ],
+  "sourceMutations": [
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "source-json-empty",
+      "containerId": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "1f6a86298d5b891b1443ace61cabc81b380ffcd875a858dee453533a1fd6a930",
+      "observation": "3",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "source-json-null",
+      "containerId": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "d8f293ef871996627da59e82adff20994134ecdc01c1fe42afbc5622256c7f3d",
+      "observation": "3",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "source-json-zero",
+      "containerId": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "db86949854f5639763cccbe8ff70abd95f19df5f9b6fa672d1f97350f3ebda2d",
+      "observation": "3",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "source-json-missing",
+      "containerId": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "edacd33925d005b09080d21c1f00d1aba5c19722267228b4490e5e31f4c57220",
+      "observation": "3",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "source-json-restore",
+      "containerId": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "864c8a728b34a1dd544d839973935ca055f0ae73082a543450f86a889d15d7e0",
+      "observation": "3",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "source-fanout-on",
+      "containerId": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "9437e73549d3c3cbd12a1987161018bbb78282c8d9a58b14844f629af1b48f46",
+      "observation": "13",
+      "status": "PASS"
+    },
+    {
+      "taskId": "G4-M3-MAPPING-001",
+      "runId": "mapping-impl-01",
+      "operation": "source-fanout-off",
+      "containerId": "fb8500b78663a7ef0eab5ccb2dff921c355ef00668494b755990f2d0d3c1e82a",
+      "mappingId": "mapping-a9adc96a9c02613f5ef9c5510f9c3c4d",
+      "exitCode": 0,
+      "sqlSha256": "81250e9d83449503724ce3d3a2c97d2cb874a181daa329f3c4051899872191e4",
+      "observation": "2",
+      "status": "PASS"
+    }
+  ],
+  "scope": "REAL_G3_PG_TWO_TABLE_RELATIONS_UNITS_MICROSECONDS_JSON",
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-14T05:51:05.346Z"
+}
