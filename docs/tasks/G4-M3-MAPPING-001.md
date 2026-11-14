@@ -15,3 +15,8 @@
 - 资源：6容器5.75GiB/7CPU；数据约359MiB，证据约9.2MiB，缓存约1.78GiB，均在预算内。临时测试/接管容器精确回收；本任务树/分支/缓存/私有runtime/数据KEEP，解除条件为获准收尾且成果安全集成或归档。旧KEEP未动。
 - 边界：M2总体PARTIAL、TDengine暂缓；其他连接器不等价。CI与未测原生平台NOT_RUN；锁屏/熄屏事件NOT_VERIFIED；历史四源原件未宣称全验。无下载、新依赖、ZIP、main更新或M4进入。
 - 交付仅本页与A–F；原始成功/失败、输入绑定和资源后验留在ignored任务artifacts。继续工作仍使用同分支/树，集成main须另有明确授权。
+
+
+## 2026-11-14 最终 ZIP 交付授权补充
+
+用户最新明确要求生成 ZIP 交 ChatGPT 评审，覆盖本任务此前“不生成 ZIP”的交付限制。按现行 V3 LOCAL 合同补充已提交证据快照、源码完整差异与代表截图，构包后独立重开；testedCommit 仍为 cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c，产品输入不变。包内原始路径通过 docs/evidence/G4-M3-MAPPING-001/package/original-path-map.json 映射，历史原件保留；私有运行时、凭据、缓存不入包。无产品或 Review 阻断；CI/未测平台等既有验证限制不升级为 PASS。最终 ZIP 与散列取构包回执；不更新 main，不进入 M4。

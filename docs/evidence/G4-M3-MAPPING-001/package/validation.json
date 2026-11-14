@@ -1,0 +1,225 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c",
+  "checks": [
+    {
+      "name": "backend",
+      "command": "python3 -B scripts/maintenance/workflow_m3_mapping.py qualify --task G4-M3-MAPPING-001 --run-id mapping-impl-01 --gate backend --input-key 09d5834b8a3b309c40f03cc3b2a6d2382c5ffddde3418602416ad6090c195853",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/backend.txt"
+    },
+    {
+      "name": "contract",
+      "command": "python3 -B scripts/maintenance/workflow_m3_mapping.py qualify --task G4-M3-MAPPING-001 --run-id mapping-impl-01 --gate contract --input-key aa4a44a68b74aca264a078dc322f2aed087dd640defeff5e5df364124f3269e6",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/contract.txt"
+    },
+    {
+      "name": "engineering",
+      "command": "python3 -B scripts/tests/Workflow.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/engineering.txt"
+    },
+    {
+      "name": "environment",
+      "command": "python3 -B scripts/maintenance/workflow_m3_mapping.py qualify --task G4-M3-MAPPING-001 --run-id mapping-impl-01 --gate environment --input-key 72711935bbabfc1ca841316b69ccb673ddad5ad8f3497630351e815d218b830b",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/environment.txt"
+    },
+    {
+      "name": "environment-prepare",
+      "command": "python3 -B scripts/tests/WorkflowEnvironment.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/environment-prepare.txt"
+    },
+    {
+      "name": "interaction",
+      "command": "python3 -B scripts/maintenance/workflow_m3_mapping.py qualify --task G4-M3-MAPPING-001 --run-id mapping-impl-01 --gate interaction --input-key 5662ba8e15c780c26d264def72654b2de12c1c92a55b94ab762abc7b8b4bd311",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/interaction.txt"
+    },
+    {
+      "name": "m2-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowM2Web.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/m2-task-admission.txt"
+    },
+    {
+      "name": "mapping-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowMapping.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/mapping-task-admission.txt"
+    },
+    {
+      "name": "policy",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/policy.txt"
+    },
+    {
+      "name": "preflight",
+      "command": "python3 -B scripts/tests/ExecutionPreflight.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/preflight.txt"
+    },
+    {
+      "name": "web",
+      "command": "python3 -B scripts/maintenance/workflow_m3_mapping.py qualify --task G4-M3-MAPPING-001 --run-id mapping-impl-01 --gate web --input-key e84964ac2c995dded53eb300fb82a63ecfafe1ab2a15815a0d4de678e7bbb54c",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "artifacts/workflow/G4-M3-MAPPING-001/runs/ccb1e7d8c1d143a2919d7e4eda3e74db/web.txt"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M3-MAPPING-001",
+    "runId": "mapping-impl-01",
+    "workflowRun": "ccb1e7d8c1d143a2919d7e4eda3e74db",
+    "proofIndex": {
+      "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/product-proof-index.json",
+      "sha256": "78cbffba690c4e22e4fcfcd64bc76d01fb8cb9c301f33fb014cedb4cee7bc023"
+    },
+    "counts": {
+      "localTests": 31,
+      "persistenceTests": 4,
+      "sourceTests": 4,
+      "compatibilityTests": 2,
+      "engineeringTests": 66,
+      "browserAssertions": 1684
+    },
+    "timing": [
+      {
+        "gate": "policy",
+        "exitCode": 0,
+        "timingStatus": "MEASURED",
+        "elapsedSeconds": 8.3858036659949,
+        "executionMode": "FRESH",
+        "qualificationMode": "FRESH"
+      },
+      {
+        "gate": "mapping-task-admission",
+        "exitCode": 0,
+        "timingStatus": "MEASURED",
+        "elapsedSeconds": 0.11859791600727476,
+        "executionMode": "FRESH",
+        "qualificationMode": "FRESH"
+      },
+      {
+        "gate": "environment-prepare",
+        "exitCode": 0,
+        "timingStatus": "MEASURED",
+        "elapsedSeconds": 0.06983133300673217,
+        "executionMode": "FRESH",
+        "qualificationMode": "FRESH"
+      },
+      {
+        "gate": "engineering",
+        "exitCode": 0,
+        "timingStatus": "MEASURED",
+        "elapsedSeconds": 2.0042991249938495,
+        "executionMode": "FRESH",
+        "qualificationMode": "FRESH"
+      },
+      {
+        "gate": "interaction",
+        "exitCode": 0,
+        "timingStatus": "MEASURED",
+        "elapsedSeconds": 3.541082665993599,
+        "executionMode": "REUSED",
+        "qualificationMode": "FRESH"
+      },
+      {
+        "gate": "web",
+        "exitCode": 0,
+        "timingStatus": "MEASURED",
+        "elapsedSeconds": 2.099647958006244,
+        "executionMode": "REUSED",
+        "qualificationMode": "FRESH"
+      },
+      {
+        "gate": "preflight",
+        "exitCode": 0,
+        "timingStatus": "MEASURED",
+        "elapsedSeconds": 0.31470912499935366,
+        "executionMode": "FRESH",
+        "qualificationMode": "FRESH"
+      },
+      {
+        "gate": "m2-task-admission",
+        "exitCode": 0,
+        "timingStatus": "MEASURED",
+        "elapsedSeconds": 0.10022091699647717,
+        "executionMode": "FRESH",
+        "qualificationMode": "FRESH"
+      },
+      {
+        "gate": "backend",
+        "exitCode": 0,
+        "timingStatus": "MEASURED",
+        "elapsedSeconds": 2.5095132919959724,
+        "executionMode": "REUSED",
+        "qualificationMode": "FRESH"
+      },
+      {
+        "gate": "environment",
+        "exitCode": 0,
+        "timingStatus": "MEASURED",
+        "elapsedSeconds": 8.384127625002293,
+        "executionMode": "REUSED",
+        "qualificationMode": "FRESH"
+      },
+      {
+        "gate": "contract",
+        "exitCode": 0,
+        "timingStatus": "MEASURED",
+        "elapsedSeconds": 1.5676571250078268,
+        "executionMode": "REUSED",
+        "qualificationMode": "FRESH"
+      }
+    ],
+    "screenshots": [
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/mapping-release-desktop-current.png",
+        "sha256": "a715e133bcbdd3d55fa07800cff2c478d18da7114290087efba75ddaf4facd1c",
+        "theme": "dark",
+        "viewport": "1280x720"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/mapping-release-desktop-alternate-theme.png",
+        "sha256": "3e4e941863c5bc487c1bd4adb036a2044342bc03164ddeafcdb828d6a8c2fa27",
+        "theme": "light",
+        "viewport": "1280x720"
+      },
+      {
+        "path": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/mapping-release-mobile-current.png",
+        "sha256": "e69671eb737445b8c20ef2e5a8688c89f6982208c3a8addab42372608af37950",
+        "theme": "light",
+        "viewport": "390x844"
+      }
+    ],
+    "limitations": [
+      "CI and untested native hosts NOT_RUN",
+      "Historical G3 full four-source originals not claimed revalidated; exact historical manifest and newly created old Run consumer are separately proved",
+      "Lock/display-off event NOT_VERIFIED; user-confirmed AC and sleep policy plus bounded heartbeat only"
+    ],
+    "delivery": "USER_AUTHORIZED_V3_ZIP",
+    "originalPathMap": "docs/evidence/G4-M3-MAPPING-001/package/original-path-map.json"
+  }
+}

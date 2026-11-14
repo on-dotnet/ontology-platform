@@ -216,3 +216,8 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 用户明确批准 `scripts/maintenance/workflow_web_cache.py` 这一遗漏于F1的文件，仅将 `G4-M3-MAPPING-001` 加入任务白名单，并在已批准 `WorkflowMapping.Tests.py` 加入负例；保持全部缓存散列、路径和零下载检查。未扩大其他文件或依赖范围。
 
 2026-11-14 M3补充授权：用户明确批准仅本任务新建合成Keycloak realm为operator补auditor、auditor补operator角色，用于同主体换会话自批拒绝与双主体CAS竞争；新合成管理密码仅进程内使用，不输出/另存，不涉及旧KEEP或真实账户。自动审批先前拒绝的尝试未执行；本次获得明确授权后执行，准确主体和角色前后证据在当前Run。
+
+
+## 2026-11-14 最终 ZIP 交付授权补充
+
+用户最新明确要求生成 ZIP 交 ChatGPT 评审，覆盖本任务此前“不生成 ZIP”的交付限制。按现行 V3 LOCAL 合同补充已提交证据快照、源码完整差异与代表截图，构包后独立重开；testedCommit 仍为 cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c，产品输入不变。包内原始路径通过 docs/evidence/G4-M3-MAPPING-001/package/original-path-map.json 映射，历史原件保留；私有运行时、凭据、缓存不入包。无产品或 Review 阻断；CI/未测平台等既有验证限制不升级为 PASS。最终 ZIP 与散列取构包回执；不更新 main，不进入 M4。

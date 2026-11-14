@@ -861,3 +861,8 @@ schema2 [review-validation.json](../../../artifacts/workflow/G4-M3-MAPPING-001/m
 非作者Reviewer **/root/mapping_p0_review** 多轮只读审查并独立重开当前候选：核全部15引用、21命令原件及输出hash；独立qualify五gate全部PASS；实时检查六容器归属和配额，精确临时接管ID查无此对象。最终结论：**未发现阻断问题**。[Review记录](../../../artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/independent-review.json)由Master忠实记录Reviewer消息，不伪称Reviewer写入。已修Review问题包括关系domain/range、源预算/类型、候选可见性竞态、当前源不可核验清屏、跨实例容量、回滚依赖最新草稿、审核筛选状态、证据命令/实际进程/reader依赖绑定、次实例接管证明及原/当前目录分离。中文声明说明与格式专项完成，最终diff-check须exit0。
 
 本轮只交付任务状态与本A–F。原件留ignored artifacts，不生成ZIP；本地PASS不冒充CI/跨平台PASS。M2仍PARTIAL，TDengine暂缓，其他连接器不视为等价；未更新main、未进入M4。当前停在人工审查关口，后续获准工作继续同M3会话、分支和Worktree；Git提交/push不扩大业务或集成授权。
+
+
+## 2026-11-14 最终 ZIP 交付授权补充
+
+用户最新明确要求生成 ZIP 交 ChatGPT 评审，覆盖本任务此前“不生成 ZIP”的交付限制。按现行 V3 LOCAL 合同补充已提交证据快照、源码完整差异与代表截图，构包后独立重开；testedCommit 仍为 cfbdddc905e6e15546d7ec8f8c3aee144fe90e6c，产品输入不变。包内原始路径通过 docs/evidence/G4-M3-MAPPING-001/package/original-path-map.json 映射，历史原件保留；私有运行时、凭据、缓存不入包。无产品或 Review 阻断；CI/未测平台等既有验证限制不升级为 PASS。最终 ZIP 与散列取构包回执；不更新 main，不进入 M4。
