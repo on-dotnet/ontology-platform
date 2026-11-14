@@ -37,7 +37,11 @@ def structural(root, task, phase='runtime'):
                      outbox='backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/MappingOutboxDispatcher.cs')
     texts = {key: uncomment(source_path(root, path).read_text()) for key, path in paths.items()}
     registrations = re.findall(r'\.Add(?:Scoped|Singleton|Transient)<([^>]+)>', texts['composition'])
-    if not any('IMappingAuthorizationAuthority, MappingAuthorizationParticipant' == value for value in registrations):
+    direct_authority = 'IMappingAuthorizationAuthority, MappingAuthorizationParticipant' in registrations
+    shared_authority = 'MappingAuthorizationParticipant' in registrations and re.search(
+        r'\.AddScoped<IMappingAuthorizationAuthority>\(provider\s*=>\s*provider\.GetRequiredService<MappingAuthorizationParticipant>\(\)\)',
+        texts['composition']) is not None
+    if not (direct_authority or shared_authority):
         raise ValueError('MAPPING_AUTHORITY_NOT_REGISTERED')
     if not any('IMappingSessionAuthority, MappingSessionAuthority' == value for value in registrations):
         raise ValueError('MAPPING_SESSION_NOT_REGISTERED')

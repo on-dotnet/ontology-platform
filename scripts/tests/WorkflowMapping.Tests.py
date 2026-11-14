@@ -65,6 +65,19 @@ class MappingConsumerTests(unittest.TestCase):
         self.assertEqual('NOT_RUN', result['lifecycle'])
         self.assertIn('worker', result['consumers'])
 
+    def test_shared_authority_requires_concrete_registration_and_exact_factory(self):
+        from execution_preflight import source_path
+        for old, new in [
+            ('builder.Services.AddScoped<MappingAuthorizationParticipant>();', ''),
+            ('provider.GetRequiredService<MappingAuthorizationParticipant>()', 'provider.GetRequiredService<OtherParticipant>()'),
+        ]:
+            def changed(root, path):
+                original = source_path(root, path)
+                return Mock(read_text=lambda: original.read_text().replace(old, new)) if path.endswith('G4Composition.cs') else original
+            with patch('execution_preflight.source_path', side_effect=changed):
+                with self.assertRaisesRegex(ValueError, 'MAPPING_AUTHORITY_NOT_REGISTERED'):
+                    MAPPING.structural(ROOT, TASK)
+
     def test_foreign_task_or_phase_cannot_borrow_admission(self):
         for task, phase in [('G3', 'runtime'), (TASK, 'M4')]:
             with self.assertRaisesRegex(ValueError, 'MAPPING_TASK_PHASE_INVALID'):
