@@ -9,11 +9,18 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts/maintenance'))
 import workflow_environment as environment
 import workflow_web_cache as web
+import workflow
 
 TASK = 'G4-M4-QUERY-001'
 
 
 class QueryAdmissionTests(unittest.TestCase):
+    def test_public_m4_originals_have_exact_policy_gate(self):
+        current = workflow.select_gates(['docs/evidence/G4-M4-QUERY-001/query-impl-01/stdout.txt.raw.json'])
+        self.assertEqual('PLANNED', current['status'])
+        self.assertIn('policy', current['affected'])
+        self.assertEqual('BLOCKED', workflow.select_gates(['docs/evidence/G4-M4-UNKNOWN/raw.json'])['status'])
+
     def test_exact_baseline_archives_are_accepted(self):
         packages, _, _ = environment.locks(ROOT)
         actual = environment.approved_archives(ROOT, TASK, packages)
