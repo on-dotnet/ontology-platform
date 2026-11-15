@@ -20,6 +20,36 @@ TASK = 'G4-M4-QUERY-001'
 
 
 class QueryAdmissionTests(unittest.TestCase):
+    def test_aba_qualification_requires_actual_case_not_just_maf_pass(self):
+        row = dict(taskId=TASK, case='AC-05_INFLIGHT_ABA', status='PASS', abaCompleted=True,
+                   queryId='query-'+'a'*32, errorStatus=409, errorCode='query_binding_stale', executionStatus='FAILED',
+                   resultHash=None, ciphertextBytes=0, resultSize=0, committedReadReceipts=0, successfulQueryAudits=0,
+                   elapsedMs=1500, capturedA=dict(mappingReleaseId='release-'+'a'*32, activationId='activation-'+'a'*32, activationRevision='1'),
+                   activatedB=dict(mappingReleaseId='release-'+'b'*32, activationId='activation-'+'b'*32, activationRevision=2),
+                   activatedA=dict(mappingReleaseId='release-'+'a'*32, activationId='activation-'+'c'*32, activationRevision=3))
+        query.demand_aba_original(json.dumps(row).encode(), 'query-real-aba-inflight-runtime')
+        for key in ['executionStatus', 'queryId', 'resultHash', 'capturedA', 'activatedB', 'activatedA']:
+            incomplete = {name:value for name,value in row.items() if name != key}
+            with self.subTest(missing=key), self.assertRaises(ValueError):
+                query.demand_aba_original(json.dumps(incomplete).encode(), 'query-real-aba-inflight-runtime')
+        for part in ['capturedA','activatedB','activatedA']:
+            for key in ['mappingReleaseId','activationId','activationRevision']:
+                incomplete = dict(row, **{part:{name:value for name,value in row[part].items() if name != key}})
+                with self.subTest(part=part, missing=key), self.assertRaises(ValueError):
+                    query.demand_aba_original(json.dumps(incomplete).encode(), 'query-real-aba-inflight-runtime')
+        with self.assertRaisesRegex(ValueError, 'QUERY_ABA_STAGE_INVALID'):
+            query.demand_aba_original(json.dumps(row).encode(), 'query-real-maf-runtime')
+        with self.assertRaisesRegex(ValueError, 'QUERY_ABA_ORIGINAL_REQUIRED'):
+            query.demand_aba_original(b'Test run summary: Passed! Total: 1', 'query-real-aba-inflight-runtime')
+        for key, value in [('status', 'FAIL'), ('abaCompleted', False), ('errorCode', 'mapping_conflict'),
+                           ('errorStatus', 503), ('elapsedMs', 5001), ('successfulQueryAudits', 1),
+                           ('committedReadReceipts', 1), ('ciphertextBytes', 10), ('resultHash', 'hash'),
+                           ('executionStatus', 'COMPLETED'), ('executionStatus', 'UNKNOWN'), ('activatedA', row['capturedA'])]:
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                query.demand_aba_original(json.dumps(dict(row, **{key:value})).encode(), 'query-real-aba-inflight-runtime')
+        with self.assertRaisesRegex(ValueError, 'QUERY_ABA_ORIGINAL_REQUIRED'):
+            query.demand_aba_original((json.dumps(row)+'\n'+json.dumps(row)).encode(), 'query-real-aba-inflight-runtime')
+
     def test_build_closure_rejects_old_receipt_missing_embedded_schema(self):
         inputs = {'backend/src/Query.cs': 'source', 'docs/contracts/g4-connections.openapi.json': 'schema',
                   'Directory.Build.props': 'config', 'apps/web/src/page.tsx': 'web'}

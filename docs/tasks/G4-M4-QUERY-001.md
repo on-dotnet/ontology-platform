@@ -2,7 +2,7 @@
 
 ## 当前执行与授权
 
-- 唯一状态：**READY_FOR_REVIEW / PASS（本地）**。用户已批准A–F实施及D的合成环境IdP限制；S1→S2→S3本地产品验证已完成，停在产品审查关口。
+- 唯一状态：**VERIFYING_AC05 / NOT_READY_FOR_MERGE**。更新V3独立复审发现AC-05原ABA案例只覆盖完成后恢复/选择，未覆盖在途提交；本轮按新增授权补真实在途证据，历史PASS不替代此项。
 - 会话：本M4会话，后续同会话继续；Code/Agent，Local Mac ARM64。实际模型/推理设置未读取，不采用附件建议冒充实际设置。
 - Base：`f0afb730ce92ecbd3a5947d9c6f58faedc8b2138`，2026-11-14普通fetch后origin/main一致；初次fetch沙箱拒绝写FETCH_HEAD，获工具批准重试exit0；没有基线漂移。
 - 分支：`codex/g4-m4-query-001`；Worktree：`/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform`。当前RunId=`query-impl-01`（P0为`p0-contract-20261114`），托管operationId=`ddb793db-9e28-4040-977d-73af96443916`。首次分支创建因.git锁写权限失败，获工具批准后成功；未回退main写文档。

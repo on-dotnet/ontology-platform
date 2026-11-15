@@ -44,7 +44,7 @@ public sealed class G4QueryMcpTests
 
 /// <summary>只在当前任务受控容器读取既有正式查询；不迁移、清扫或修改运行库旧记录。</summary>
 [TestClass]
-public sealed class G4QueryMafRuntimeTests
+public sealed partial class G4QueryMafRuntimeTests
 {
     /// <summary>实际MAF恢复三次后拒绝第四次，真实PG只保存三个引用。</summary>
     [TestMethod]
@@ -107,6 +107,9 @@ public sealed class G4QueryMafRuntimeTests
             Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.SqlQuery<int>(database.Database,
                 $"SELECT cardinality(\"QueryIds\") AS \"Value\" FROM semantic_query.\"QueryRuns\" WHERE \"Id\" = {result.RunId}"));
         Assert.AreEqual(3, references);
+        // 仅显式准备的精确提案触发在途ABA，独立资格还要求实际案例原件。
+        if (Environment.GetEnvironmentVariable("G4_QUERY_ABA_PROPOSAL") is { Length: > 0 } proposalId)
+            await MappingAbaAfterRealReadAsync(scope.ServiceProvider, actor, row, database, proposalId);
         // 当前绑定变化在真实源读取之后、最终结果提交之前发生；不替换真实绑定参与者。
         if (Environment.GetEnvironmentVariable("G4_QUERY_BINDING_RACE") == "1")
             await BindingChangeAfterRealReadAsync(scope.ServiceProvider, actor, row, database);

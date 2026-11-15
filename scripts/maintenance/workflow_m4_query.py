@@ -538,7 +538,7 @@ def runtime_configure():
 
 def browser_test(mode):
     """唯一当前任务浏览器入口，真实OIDC与API响应，不运行旧M3验收或下载浏览器。"""
-    if mode not in ['provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race','s2-aba','s2-capacity','s2-connection','s2-inflight','s3-provision','s3','ui-s3','replace-disabled-connection']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
+    if mode not in ['provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race','s2-aba','s2-aba-prepare','s2-capacity','s2-connection','s2-inflight','s3-provision','s3','ui-s3','replace-disabled-connection']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
     binding=runtime_binding()
     web=web_binding() if mode in ['ui-s1','ui-s3'] else None
     result=runtime_command('query-browser-'+mode,['/opt/homebrew/Cellar/node@24/24.22.1/bin/node',
@@ -1238,7 +1238,7 @@ def persistence_test(source=False):
     return result.returncode if result is not None else 2
 
 
-def runtime_agent_test(binding_race=False):
+def runtime_agent_test(binding_race=False, aba_inflight=False):
     """真实MAF只恢复当前精确Query；复用正式API只读挂载，不运行迁移或Sweep。"""
     import subprocess
     import uuid
@@ -1257,7 +1257,7 @@ def runtime_agent_test(binding_race=False):
     name='ontology-g4-m4-query-impl-01-maf-test-'+uuid.uuid4().hex[:12]
     before=subprocess.run([*prefix,'inspect',name],capture_output=True,timeout=15)
     if before.returncode==0 or ('no such object: '+name) not in before.stderr.decode().lower(): raise ValueError('QUERY_RUNTIME_TEST_BEFORE_UNKNOWN')
-    lifecycle=dict(taskId=TASK,runId=RUN,name=name,status='CREATING',beforeExists=False,readOnlyRuntimeFrom=api,queryId=state['latestQuery']['queryId'],bindingRace=binding_race)
+    lifecycle=dict(taskId=TASK,runId=RUN,name=name,status='CREATING',beforeExists=False,readOnlyRuntimeFrom=api,queryId=state['latestQuery']['queryId'],bindingRace=binding_race,abaInFlight=aba_inflight)
     path=output/(name+'.json');path.write_text(json.dumps(lifecycle,indent=2)+'\n')
     cid=None
     try:
@@ -1267,15 +1267,16 @@ def runtime_agent_test(binding_race=False):
             '--tmpfs','/tmp:size=64m,mode=1777','--volumes-from',api+':ro','--mount','type=bind,src='+str(directory)+',dst=/tests,readonly',
             '--workdir','/private/api','-e','ASPNETCORE_ENVIRONMENT=Development','-e','DOTNET_CLI_HOME=/tmp/dotnet','-e','DOTNET_EnableDiagnostics=0',
             '-e','DOTNET_CLI_TELEMETRY_OPTOUT=1','-e','TESTINGPLATFORM_TELEMETRY_OPTOUT=1','-e','XDG_DATA_HOME=/tmp/data',
+            '-e','G4_QUERY_ABA_PROPOSAL='+(state['s2AbaInFlight']['b']['approved']['proposalId'] if aba_inflight else ''),
             '-e','G4_QUERY_BINDING_RACE='+('1' if binding_race else '0'),
             '-e','G4_QUERY_RUNTIME_ACTOR='+json.dumps(state['latestQuery']['actor'],separators=(',',':')),
             '-e','G4_QUERY_RUNTIME_TEST='+TASK+':'+RUN,'-e','G4_QUERY_RUNTIME_QUERY_ID='+state['latestQuery']['queryId'],
-            image,'sh','-c',"""dotnet /runtime/QueryLoopback.dll & bridge=$!; trap 'kill "$bridge" 2>/dev/null || true' EXIT; dotnet /tests/OntologyPlatform.AgentTests.dll --filter FullyQualifiedName~G4QueryMafRuntimeTests --timeout 45s --zero-tests-policy strict --results-directory /tmp/TestResults"""])
+            image,'sh','-c',"""dotnet /runtime/QueryLoopback.dll & bridge=$!; trap 'kill "$bridge" 2>/dev/null || true' EXIT; dotnet /tests/OntologyPlatform.AgentTests.dll --filter FullyQualifiedName~G4QueryMafRuntimeTests --timeout 45s --zero-tests-policy strict --results-directory /tmp/TestResults; result=$?; if [ -f /tmp/aba-inflight.json ]; then cat /tmp/aba-inflight.json; fi; exit "$result";"""])
         cid=created.stdout.decode().strip();lifecycle.update(id=cid,status='CREATED');path.write_text(json.dumps(lifecycle,indent=2)+'\n')
         runtime_command('query-maf-container-network',[*prefix,'network','connect','ontology-g4-m4-query-impl-01_edge',cid])
         inputs={p.name:sha(p.read_bytes()) for p in directory.glob('*.dll')}
-        result=run([*prefix,'start','--attach',cid],ROOT,task=TASK,run_id=RUN,stage='query-real-maf-binding-runtime' if binding_race else 'query-real-maf-runtime',
-            input_key=sha(encoded([inputs,state['latestQuery']['queryId'],binding_race,sha(Path(__file__).read_bytes())])),timeout=60)
+        result=run([*prefix,'start','--attach',cid],ROOT,task=TASK,run_id=RUN,stage='query-real-aba-inflight-runtime' if aba_inflight else ('query-real-maf-binding-runtime' if binding_race else 'query-real-maf-runtime'),
+            input_key=sha(encoded([inputs,state['latestQuery']['queryId'],binding_race,aba_inflight,state.get('s2AbaInFlight',{}).get('b',{}).get('approved',{}).get('proposalId'),sha(Path(__file__).read_bytes())])),timeout=60)
         lifecycle['commandId']=result.receipt['commandId'];lifecycle['exitCode']=result.returncode
         print(result.stdout.decode(errors='replace')[-5000:]);print(json.dumps({'exitCode':result.returncode,'receipt':result.receipt['commandId']}))
         return result.returncode
@@ -1327,6 +1328,7 @@ def attest(name):
         'persistence': persistence_test,
         'source': lambda: persistence_test(True),
         'maf-binding': lambda: runtime_agent_test(True),
+        'aba-inflight': lambda: runtime_agent_test(aba_inflight=True),
         **{mode: (lambda mode=mode: browser_test(mode)) for mode in
            ['s1', 's1-reopen', 's2-basic', 's2-runtime', 's2-race', 's2-aba', 's2-capacity', 's2-inflight', 's2-connection', 's3', 'ui-s1', 'ui-s3']},
         **{'web-'+stage: (lambda stage=stage: web_check(stage)) for stage in ['typecheck', 'lint', 'unit']},
@@ -1342,7 +1344,7 @@ def attest(name):
     row = dict(taskId=TASK, runId=RUN, name=name, inputs=inputs, inputKeys=keys, status='FAIL')
     projects = {'contract':'G2ContractTests','query-unit':'QueryTests','source-unit':'ConnectionsTests',
                 'security-unit':'SecurityTests','agent-unit':'AgentTests','persistence':'QueryTests',
-                'source':'ConnectionsTests','maf-binding':'AgentTests'}
+                'source':'ConnectionsTests','maf-binding':'AgentTests','aba-inflight':'AgentTests'}
     try:
         if name in projects:
             build = json.loads((output/('build-binding-OntologyPlatform.'+projects[name]+'.json')).read_text())
@@ -1361,6 +1363,38 @@ def attest(name):
         path = output/('qualification-'+name+'-'+uuid.uuid4().hex+'.json')
         path.write_text(json.dumps(row, indent=2)+'\n')
         print(json.dumps(dict(qualification=str(path.relative_to(ROOT)), status=row['status'])))
+
+
+
+def demand_aba_original(raw, stage):
+    """独立重开真实在途ABA原件，单纯MAF测试通过不能充当本项验收。"""
+    import re
+    if stage != 'query-real-aba-inflight-runtime': raise ValueError('QUERY_ABA_STAGE_INVALID')
+    reports = []
+    for line in raw.decode(errors='replace').splitlines():
+        try: value = json.loads(line)
+        except json.JSONDecodeError: continue
+        if isinstance(value, dict) and value.get('case') == 'AC-05_INFLIGHT_ABA': reports.append(value)
+    if len(reports) != 1: raise ValueError('QUERY_ABA_ORIGINAL_REQUIRED')
+    row = reports[0]
+    if row.get('taskId') != TASK or row.get('status') != 'PASS' or row.get('abaCompleted') is not True \
+        or row.get('errorStatus') != 409 or row.get('errorCode') != 'query_binding_stale' \
+        or not re.fullmatch(r'query-[0-9a-f]{32}', row.get('queryId', '')) or row.get('executionStatus') not in ['RUNNING','FAILED','CANCELLED'] \
+        or row.get('resultHash', 'missing') is not None \
+        or any(row.get(key) != 0 for key in ['ciphertextBytes','resultSize','committedReadReceipts','successfulQueryAudits']) \
+        or not 0 < row.get('elapsedMs', 0) < 5000:
+        raise ValueError('QUERY_ABA_ORIGINAL_INVALID')
+    captured, b, a = (row.get(key, {}) for key in ['capturedA','activatedB','activatedA'])
+    if any(not isinstance(item, dict) or not re.fullmatch(r'activation-[0-9a-f]{32}', item.get('activationId', ''))
+           or not re.fullmatch(r'release-[0-9a-f]{32}', item.get('mappingReleaseId', '')) for item in [captured,b,a]) \
+        or not isinstance(captured.get('activationRevision'), str) or not re.fullmatch(r'[1-9][0-9]*', captured['activationRevision']) \
+        or any(type(item.get('activationRevision')) is not int or item['activationRevision'] <= 0 for item in [b,a]) \
+        or captured.get('mappingReleaseId') != a.get('mappingReleaseId') \
+        or captured.get('mappingReleaseId') == b.get('mappingReleaseId') \
+        or len({captured.get('activationId'),b.get('activationId'),a.get('activationId')}) != 3 \
+        or not int(captured.get('activationRevision', 0)) < b.get('activationRevision', 0) < a.get('activationRevision', 0):
+        raise ValueError('QUERY_ABA_IDENTITY_INVALID')
+    return row
 
 
 def demand_qualification(row, name, inputs):
@@ -1382,9 +1416,9 @@ def qualify(gate, input_key):
     structural(ROOT, TASK)
     required = {
         'environment': [], 'contract': ['contract'],
-        'backend': ['query-unit', 'source-unit', 'security-unit', 'agent-unit', 'persistence', 'source', 'maf-binding'],
+        'backend': ['query-unit', 'source-unit', 'security-unit', 'agent-unit', 'persistence', 'source', 'maf-binding', 'aba-inflight'],
         'web': ['web-typecheck', 'web-lint', 'web-unit', 'ui-s1', 'ui-s3'],
-        'interaction': ['s1', 's1-reopen', 's2-basic', 's2-runtime', 's2-race', 's2-aba', 's2-capacity', 's2-inflight', 's2-connection', 's3'],
+        'interaction': ['s1', 's1-reopen', 's2-basic', 's2-runtime', 's2-race', 's2-aba', 's2-capacity', 's2-inflight', 's2-connection', 's3', 'aba-inflight'],
     }[gate]
     output = ROOT/'artifacts/workflow'/TASK/RUN
     inputs = qualification_inputs()
@@ -1406,7 +1440,8 @@ def qualify(gate, input_key):
         demand_qualification(row, name, inputs)
         if row.get('inputKeys', {}).get(gate) != input_key: raise ValueError('QUERY_QUALIFICATION_GATE_DRIFT')
         test_count = 0
-        if name in ['contract','query-unit','source-unit','security-unit','agent-unit','persistence','source','maf-binding'] and 'build' not in row:
+        aba_originals = 0
+        if name in ['contract','query-unit','source-unit','security-unit','agent-unit','persistence','source','maf-binding','aba-inflight'] and 'build' not in row:
             raise ValueError('QUERY_QUALIFICATION_BUILD_MISSING')
         if 'build' in row:
             from workflow_execution import encoded
@@ -1423,6 +1458,9 @@ def qualify(gate, input_key):
             if command.get('taskId') != TASK or command.get('runId') != RUN or command.get('exitCode') != 0 or command.get('classification') != 'SUCCESS' or not command.get('started'):
                 raise ValueError('QUERY_QUALIFICATION_COMMAND')
             raw = b''.join(read(command[key]) for key in ['stdout', 'stderr'])
+            if name == 'aba-inflight' and command['stage'] == 'query-real-aba-inflight-runtime':
+                demand_aba_original(raw, command['stage'])
+                aba_originals += 1
             if command['stage'].startswith(('query-unit-', 'query-contract-tests', 'query-real-')):
                 test_count += mtp(raw, 1)
         if row['reports']:
@@ -1442,6 +1480,7 @@ def qualify(gate, input_key):
                 from workflow_evidence import machine
                 test_count += machine(read(dict(path=web['report'], sha256=web['reportSha256'])), 'vitest-json')
             else: test_count += 1
+        if name == 'aba-inflight' and aba_originals != 1: raise ValueError('QUERY_ABA_ORIGINAL_REQUIRED')
         if test_count <= 0: raise ValueError('QUERY_QUALIFICATION_ZERO_TESTS')
         count += test_count
     return dict(taskId=TASK, runId=RUN, gate=gate, status='PASS', executionMode='REUSED', qualificationMode='FRESH', tests=count, skipped=0, originals=originals)

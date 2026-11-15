@@ -24,7 +24,7 @@ if (mode === "serve") {
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: 15442,
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection"].includes(mode)) await browserRun(mode);
+} else if (["provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -287,11 +287,12 @@ async function browserRun(mode) {
       finally { execFileSync("python3", ["-B", "-c", 'import sys;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;q.query_fixture_control("restore-execute")'], { cwd: root, timeout: 15000 }); }
       check("regrant_preserves_existing_result", createHash("sha256").update((await request(operator, "GET", `/api/v1/data/semantic-queries/${state.latestQuery.queryId}/result`)).raw).digest("hex") === state.latestQuery.resultHash);
       report.status = "PASS"; report.scope = "S2_REAL_INFLIGHT_GRANT_REVOCATION";
-    } else if (mode === "s2-aba") {
+    } else if (["s2-aba", "s2-aba-prepare"].includes(mode)) {
       const path = "/api/v1/mappings/" + state.mappingDraft.mappingId;
       const capability = (await get(operator, "/api/v1/capabilities")).find(item => item.id === "g4_resolve_entity");
       const query = { ...state.latestQuery.query, capabilityVersion: capability.version, filters: { entityExternalId: "asset-1" } };
-      state.s2Aba ??= {}; const aba = state.s2Aba;
+      const prepareOnly = mode === "s2-aba-prepare";
+      const aba = prepareOnly ? (state.s2AbaInFlight ??= {}) : (state.s2Aba ??= {});
       if (!aba.original) {
         phase = "query_aba_original";
         const original = await request({ ...operator, headers: { ...operator.headers, "Idempotency-Key": randomUUID() } }, "POST", "/api/v1/data/semantic-queries", query);
@@ -331,6 +332,7 @@ async function browserRun(mode) {
           round.decision ??= { decision: "APPROVE", bindingHash: proposal.bindingHash, command: command(proposal.proposalRevision) }; await save(state);
           round.approved = await post(auditor, `/api/v1/mapping-proposals/${proposal.proposalId}/decisions`, round.decision, 200, `"proposal:${proposal.proposalRevision}"`); await save(state);
         }
+        if (prepareOnly) return round.approved;
         if (!round.receipt) {
           phase = "query_aba_" + label + "_activate";
           const proposal = round.approved;
@@ -347,6 +349,11 @@ async function browserRun(mode) {
         aba.draftB = (await request(operator, "PATCH", path, aba.patch, 200, `"mapping:${current.revision}"`)).data; await save(state);
       }
       const b = await activateRound("b", { kind: "PUBLISH", draftRevision: aba.draftB.revision }, aba.draftB);
+      if (prepareOnly) {
+        check("inflight_b_approved_without_activation", b.status === "APPROVED" && !aba.b.receipt);
+        report.status = "PASS"; report.scope = "S2_INFLIGHT_ABA_PREPARATION_ONLY";
+        return;
+      }
       check("aba_b_is_distinct_release", b.mappingReleaseId !== state.mappingReceipt.mappingReleaseId);
       if (!aba.a?.receipt) await checkHistory("while_b_active");
       const a = await activateRound("a", { kind: "ROLLBACK", targetReleaseId: state.mappingReceipt.mappingReleaseId, manifestHash: state.mappingRelease.manifestHash }, aba.draftB);
