@@ -1278,6 +1278,14 @@ def runtime_agent_test(binding_race=False, aba_inflight=False):
         result=run([*prefix,'start','--attach',cid],ROOT,task=TASK,run_id=RUN,stage='query-real-aba-inflight-runtime' if aba_inflight else ('query-real-maf-binding-runtime' if binding_race else 'query-real-maf-runtime'),
             input_key=sha(encoded([inputs,state['latestQuery']['queryId'],binding_race,aba_inflight,state.get('s2AbaInFlight',{}).get('b',{}).get('approved',{}).get('proposalId'),sha(Path(__file__).read_bytes())])),timeout=60)
         lifecycle['commandId']=result.receipt['commandId'];lifecycle['exitCode']=result.returncode
+        if aba_inflight and result.returncode == 0:
+            # 夹具仅接受实际已完成案例的正式A回执；不能把旧activation预期留给后续S1。
+            aba = demand_aba_original(result.stdout + b'\n' + result.stderr, result.receipt['stage'])
+            current = json.loads((output/'runtime-fixture.json').read_text())
+            if current['latestQuery']['queryId'] != state['latestQuery']['queryId']: raise ValueError('QUERY_ABA_FIXTURE_DRIFT')
+            current['mappingCurrentReceipt'] = aba['activatedA']
+            current['s2AbaInFlight']['execution'] = dict(commandId=result.receipt['commandId'], queryId=aba['queryId'], status='PASS')
+            (output/'runtime-fixture.json').write_text(json.dumps(current,indent=2)+'\n')
         print(result.stdout.decode(errors='replace')[-5000:]);print(json.dumps({'exitCode':result.returncode,'receipt':result.receipt['commandId']}))
         return result.returncode
     finally:
