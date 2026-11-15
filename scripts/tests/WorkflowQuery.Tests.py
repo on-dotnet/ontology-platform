@@ -113,6 +113,7 @@ class QueryAdmissionTests(unittest.TestCase):
                 ('docs/contracts/g4-connections.openapi.json','EXECUTE')]:
             self.assertEqual(expected,qualification_change({path:'old'},{path:'new'}))
         with self.assertRaisesRegex(ValueError,'UNCLASSIFIED'): qualification_change({}, {'unknown/new.dat':'new'})
+        self.assertEqual([],workflow.select_gates(['docs/tasks/templates/sdd-task.md'])['unknown'])
         inputs=query.qualification_inputs()
         chosen=select(ROOT,'query-unit',inputs)
         self.assertIn('backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/G4QueryKeyEquality.cs',chosen)
