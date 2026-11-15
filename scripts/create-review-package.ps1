@@ -73,6 +73,9 @@ function Invoke-ReviewGit {
 function Test-ReviewArgvApproval {
     param([string]$Repository, [string]$Base, [string]$Head, [int]$Version, [string]$WorkItem)
     # 仅信任工具固定策略和已提交批准原文；ZIP字段不提供额外权限。
+    if ($Version -eq 3 -and $WorkItem -ceq 'G4-M4-QUERY-001' -and $Base -ceq 'f0afb730ce92ecbd3a5947d9c6f58faedc8b2138') {
+        return $null -ne (Get-ReviewReductionPolicy $Repository $Base $Head $Version $WorkItem)
+    }
     if ($Version -ne 3 -or $WorkItem -cne 'G4-M1-MAIN-INTEGRATION-001' -or $Base -cne 'd1a61daffe844475b07705797e3ad325cc3f2945') { return $false }
     $record = 'docs/tasks/G4-M1-MAIN-INTEGRATION-001/ARGV-APPROVAL.md'
     $exists = Invoke-ReviewGit $Repository @('cat-file', '-e', ($Head + ':' + $record)) -AllowFailure
@@ -98,13 +101,47 @@ function Test-ReviewGitArgvBudget {
 
 function Get-ReviewReductionPolicy {
     param([string]$Repository, [string]$Base, [string]$Head, [int]$Version, [string]$WorkItem)
-    if ($Version -ne 3 -or $WorkItem -cne 'G4-M1-MAIN-INTEGRATION-001' -or $Base -cne 'd1a61daffe844475b07705797e3ad325cc3f2945') { return $null }
-    $approvalPath = 'docs/tasks/G4-M1-MAIN-INTEGRATION-001/REDUCTION-APPROVAL.md'
-    $approvalHash = 'a877177b0da6056fdfc3f9c607b70afea71fec0c677a998cf3a7ecdf56e49a64'
+    if ($Version -ne 3) { return $null }
+    $m4 = $WorkItem -ceq 'G4-M4-QUERY-001' -and $Base -ceq 'f0afb730ce92ecbd3a5947d9c6f58faedc8b2138'
+    if ($m4) {
+        # 仅本轮人类已批准附件的原字节及准确祖先；不能借M1授权扩展一般任务。
+        $approvalPath = 'docs/evidence/G4-M4-QUERY-001/review-fix-01/authorization-original.md'
+        $approvalHash = '6189d29810237a82378d1027b3b6d2c3a368c07105196275ab18e37d3fed020d'
+        $approvalAncestor = '116469305cb89c3e3bc3f5dfcfb177a502a5ad2d'
+        $runPattern = '^review-fix-01$'
+        $policyId = 'G4-M4-REVIEW-FIX-EVIDENCE-1'
+        $requiredHistory = @(
+            'contract-admission-request.md',
+            'aba-fix-01/historical-qualifications.json',
+            'aba-fix-01/originals-index.json',
+            'aba-fix-01/scope-and-preservation.json',
+            'aba-fix-01/fixture-root-cause.json',
+            'aba-fix-01/review.md',
+            'format-fix-01/root-cause-and-preserved-originals.json',
+            'query-impl-01/final-failures-raw-index.json',
+            'query-impl-01/test-database-isolation-raw-index.json',
+            'query-impl-01/isolation-lifecycle-tests-raw-index.json',
+            'query-impl-01/isolation-current-connection-raw-index.json',
+            'query-impl-01/qualification-s3-6f01c276c3934421b25f77da76296014.json',
+            'query-impl-01/qualification-s2-runtime-7bf2cec470aa477d8e0e5b6ff90c6bac.json',
+            'query-impl-01/qualification-web-lint-50607e23aef748b4bc4b55a97dafeb34.json',
+            'query-impl-01/qualification-security-unit-c22b4cac86d54f5db217b091db33fdb5.json',
+            'query-impl-01/qualification-web-typecheck-8d02c72de4cb4f4bae9d28ffc65f6edd.json'
+        )
+    } elseif ($WorkItem -ceq 'G4-M1-MAIN-INTEGRATION-001' -and $Base -ceq 'd1a61daffe844475b07705797e3ad325cc3f2945') {
+        $approvalPath = 'docs/tasks/G4-M1-MAIN-INTEGRATION-001/REDUCTION-APPROVAL.md'
+        $approvalHash = 'a877177b0da6056fdfc3f9c607b70afea71fec0c677a998cf3a7ecdf56e49a64'
+        $approvalAncestor = '9ed3b9283acc81805737fb19efd3123281010103'
+        $runPattern = '^b-continue-[0-9]{8}-[0-9]{2}$'
+        $policyId = 'G4-M1-15M-EVIDENCE-1'
+        $requiredHistory = @('b-continue-20261104-32/gate-I06.json', 'b-continue-20261104-33/gate-I07.json',
+            'b-continue-20261104-23/archive-migration-applied.json', 'packaging-a-20261106-01/PACKAGING-SIZE-ANALYSIS.md',
+            'packaging-reduction-20261106-01/IMPLEMENTATION-PLAN.md')
+    } else { return $null }
     if ((Invoke-ReviewGit $Repository @('cat-file', '-e', ($Head + ':' + $approvalPath)) -AllowFailure).ExitCode -ne 0) { return $null }
     $approval = (Invoke-ReviewGit $Repository @('cat-file', 'blob', ($Head + ':' + $approvalPath))).Bytes
     if ((Get-ReviewHash $approval) -cne $approvalHash -or
-        (Invoke-ReviewGit $Repository @('merge-base', '--is-ancestor', '9ed3b9283acc81805737fb19efd3123281010103', $Head) -AllowFailure).ExitCode -ne 0) {
+        (Invoke-ReviewGit $Repository @('merge-base', '--is-ancestor', $approvalAncestor, $Head) -AllowFailure).ExitCode -ne 0) {
         throw 'REDUCTION_APPROVAL: committed approval or ancestry differs'
     }
     $prefix = "docs/evidence/$WorkItem/"
@@ -114,7 +151,7 @@ function Get-ReviewReductionPolicy {
     try { $selection = $script:utf8.GetString($bytes) | ConvertFrom-Json -AsHashtable } catch { throw 'REDUCTION_SELECTION: invalid JSON' }
     if ($selection -isnot [Collections.IDictionary] -or $selection.Count -ne 4 -or
         @('schemaVersion', 'finalRun', 'validationPath', 'retainedPaths').Where({ -not $selection.ContainsKey($_) }).Count -gt 0 -or
-        $selection.schemaVersion -ne 1 -or $selection.finalRun -isnot [string] -or $selection.finalRun -cnotmatch '^b-continue-[0-9]{8}-[0-9]{2}$' -or
+        $selection.schemaVersion -ne 1 -or $selection.finalRun -isnot [string] -or $selection.finalRun -cnotmatch $runPattern -or
         $selection.validationPath -isnot [string] -or $selection.retainedPaths -isnot [array]) { throw 'REDUCTION_SELECTION: closed schema1 required' }
     $runPrefix = $prefix + $selection.finalRun + '/'
     $treePaths = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
@@ -130,10 +167,26 @@ function Get-ReviewReductionPolicy {
         $null = $selected.Add($path)
     }
     # 固定最低历史见证；额外关键链须由独立Reviewer核实，不把名称当测试PASS。
-    foreach ($relative in @('b-continue-20261104-32/gate-I06.json', 'b-continue-20261104-33/gate-I07.json',
-        'b-continue-20261104-23/archive-migration-applied.json', 'packaging-a-20261106-01/PACKAGING-SIZE-ANALYSIS.md',
-        'packaging-reduction-20261106-01/IMPLEMENTATION-PLAN.md')) {
+    foreach ($relative in $requiredHistory) {
         if (-not $retained.Contains($prefix + $relative)) { throw 'REDUCTION_SELECTION: required historical failure/recovery/contract witness absent' }
+    }
+    if ($m4) {
+        # 本轮无损索引可指向旧批次去重载荷；这些直接恢复依赖必须实际入包。
+        $closureIndexes = @('review-fix-01/originals-index.json', 'query-impl-01/final-failures-raw-index.json',
+            'query-impl-01/test-database-isolation-raw-index.json', 'query-impl-01/isolation-lifecycle-tests-raw-index.json',
+            'query-impl-01/isolation-current-connection-raw-index.json')
+        foreach ($relative in $closureIndexes) {
+            $indexPath = $prefix + $relative
+            if (-not $treePaths.Contains($indexPath)) { throw 'REDUCTION_REFERENCE: required original index absent' }
+            $records = (Invoke-ReviewGit $Repository @('cat-file', 'blob', ($Head + ':' + $indexPath))).Text | ConvertFrom-Json -AsHashtable -NoEnumerate
+            if ($records -isnot [array]) { throw 'REDUCTION_REFERENCE: original index must be an array' }
+            foreach ($record in $records) {
+                $path = $record.path
+                if ($path -isnot [string] -or -not $path.StartsWith($prefix, [StringComparison]::Ordinal) -or -not $treePaths.Contains($path)) { throw 'REDUCTION_REFERENCE: original payload unavailable or foreign' }
+                Assert-ReviewPath $path
+                if (-not $path.StartsWith($runPrefix, [StringComparison]::Ordinal) -and -not $path.EndsWith('.png', [StringComparison]::OrdinalIgnoreCase) -and -not $retained.Contains($path)) { throw 'REDUCTION_REFERENCE: original payload missing from retained closure' }
+            }
+        }
     }
     foreach ($path in $treePaths) {
         if ($path.StartsWith($runPrefix, [StringComparison]::Ordinal) -and -not $path.EndsWith('.png', [StringComparison]::OrdinalIgnoreCase)) { $null = $selected.Add($path) }
@@ -142,7 +195,7 @@ function Get-ReviewReductionPolicy {
         throw 'REDUCTION_SELECTION: validation must be committed non-PNG evidence in the complete final run'
     }
     $null = $selected.Add($selectionPath)
-    $binding = [ordered]@{ policyId = 'G4-M1-15M-EVIDENCE-1'; approvalPath = $approvalPath; approvalSha256 = $approvalHash
+    $binding = [ordered]@{ policyId = $policyId; approvalPath = $approvalPath; approvalSha256 = $approvalHash
         selectionPath = $selectionPath; selectionSha256 = Get-ReviewHash $bytes; finalRun = $selection.finalRun; validationPath = $selection.validationPath
         diffScope = 'Full non-evidence text changes including cross-boundary renames; pure evidence and binary changes recoverable from complete Base/Head blob index.' }
     return @{ policyId = $binding.policyId; Binding = $binding; SelectedPaths = $selected }

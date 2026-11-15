@@ -1075,7 +1075,9 @@ for i in range(53):
         Assert-True ($null -eq (Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 'OTHER')) 'Foreign task granted policy'
         Assert-True ($null -eq (Get-ReviewReductionPolicy $script:repo ('f' * 40) $script:head 3 $script:reductionTask)) 'Foreign base granted policy'
         $source = [IO.File]::ReadAllText($script:reductionTool)
-        [IO.File]::WriteAllText($script:reductionTool, $source.Replace("'--is-ancestor', '$($script:base)'", "'--is-ancestor', '$('f' * 40)'"))
+        $mutated = $source.Replace("`$approvalAncestor = '$script:base'", "`$approvalAncestor = '$('f' * 40)'")
+        Assert-True ($mutated -cne $source) 'Ancestor negative fixture failed to mutate the actual guard'
+        [IO.File]::WriteAllText($script:reductionTool, $mutated)
         . $script:reductionTool -Library
         $rejected = $false
         try { $null = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask } catch { $rejected = $_.Exception.Message.Contains('REDUCTION_APPROVAL') }
@@ -1223,6 +1225,97 @@ for i in range(53):
             $bad = Invoke-ReductionPackage -VerifyPath $zip
             Assert-True ($bad.Exit -ne 0 -and ($bad.Output.Contains('REDUCTION_POLICY') -or $bad.Output.Contains('HEAD_MISMATCH'))) "Rehashed mutation accepted or unrelated failure: $($bad.Output)"
         }
+    }
+    function New-M4ReductionFixture {
+        $script:reductionTask = 'G4-M4-QUERY-001'
+        $script:reductionRoot = "docs/evidence/$script:reductionTask/"
+        $script:reductionRun = 'review-fix-01'
+        $script:reductionValidation = $script:reductionRoot + $script:reductionRun + '/validation.json'
+        $script:reductionSelectionPath = $script:reductionRoot + 'review-evidence-selection.json'
+        $script:reductionRequired = @(
+            'contract-admission-request.md',
+            'aba-fix-01/historical-qualifications.json',
+            'aba-fix-01/originals-index.json',
+            'aba-fix-01/scope-and-preservation.json',
+            'aba-fix-01/fixture-root-cause.json',
+            'aba-fix-01/review.md',
+            'format-fix-01/root-cause-and-preserved-originals.json',
+            'query-impl-01/final-failures-raw-index.json',
+            'query-impl-01/test-database-isolation-raw-index.json',
+            'query-impl-01/isolation-lifecycle-tests-raw-index.json',
+            'query-impl-01/isolation-current-connection-raw-index.json',
+            'query-impl-01/qualification-s3-6f01c276c3934421b25f77da76296014.json',
+            'query-impl-01/qualification-s2-runtime-7bf2cec470aa477d8e0e5b6ff90c6bac.json',
+            'query-impl-01/qualification-web-lint-50607e23aef748b4bc4b55a97dafeb34.json',
+            'query-impl-01/qualification-security-unit-c22b4cac86d54f5db217b091db33fdb5.json',
+            'query-impl-01/qualification-web-typecheck-8d02c72de4cb4f4bae9d28ffc65f6edd.json'
+        ) | ForEach-Object { $script:reductionRoot + $_ }
+        foreach ($path in $script:reductionRequired) { Write-Fixture $path "[]`n" }
+        Write-Fixture ($script:reductionRoot + 'review-fix-01/causal-original.txt') "current exact causal fixture`n"
+        Write-Fixture ($script:reductionRoot + 'old/shared.txt') "exact referenced historical original`n"
+        Write-Fixture ($script:reductionRoot + 'old/omitted.txt') "unrelated history stays in Git`n"
+        Write-Fixture ($script:reductionRoot + 'review-fix-01/originals-index.json') (@(@{path=($script:reductionRoot + 'old/shared.txt')}) | ConvertTo-Json -AsArray)
+        $script:reductionRequired += $script:reductionRoot + 'old/shared.txt'
+        $approval = $script:reductionRoot + 'review-fix-01/authorization-original.md'
+        Write-Fixture $approval ([IO.File]::ReadAllText((Join-Path (Split-Path (Split-Path $PackageScript -Parent) -Parent) $approval)))
+        $script:reductionTested = Commit-Fixture
+        Write-LocalFixture $script:reductionValidation (@{ evidenceSchemaVersion = 2; validationSource = 'LOCAL'; testedCommit = $script:reductionTested; checks = @(@{ name = 'fixture-local'; command = 'fixture only'; status = 'PASS'; exitCode = 0; output = 'not a product claim' }); ci = @{ status = 'NOT_RUN'; runId = $null; url = $null; commit = $null; conclusion = $null } } | ConvertTo-Json -Depth 6)
+        $script:reductionSelection = @{ schemaVersion = 1; finalRun = $script:reductionRun; validationPath = $script:reductionValidation; retainedPaths = @($script:reductionRequired) }
+        Write-Fixture $script:reductionSelectionPath ($script:reductionSelection | ConvertTo-Json -Depth 6)
+        $script:head = Commit-Fixture
+        $script:reductionTool = Join-Path $fixtureRoot ([guid]::NewGuid().ToString('N') + '.ps1')
+        # 只改隔离fixture的准确提交身份；生产入口不存在参数化批准旁路。
+        $source = [IO.File]::ReadAllText($PackageScript).Replace('f0afb730ce92ecbd3a5947d9c6f58faedc8b2138', $script:base).Replace('116469305cb89c3e3bc3f5dfcfb177a502a5ad2d', $script:base)
+        [IO.File]::WriteAllText($script:reductionTool, $source)
+    }
+    Case 'm4 reduction binds approval and restores full current original closure' {
+        if ($IsWindows) { Assert-ReductionWindowsRefusal }
+        New-M4ReductionFixture
+        . $script:reductionTool -Library
+        $policy = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask
+        Assert-True ($null -ne $policy -and $policy.policyId -ceq 'G4-M4-REVIEW-FIX-EVIDENCE-1') 'M4 exact approved policy absent'
+        foreach ($wrong in @(@{base=('f'*40);task=$script:reductionTask;version=3},@{base=$script:base;task='OTHER';version=3},@{base=$script:base;task=$script:reductionTask;version=2})) {
+            Assert-True ($null -eq (Get-ReviewReductionPolicy $script:repo $wrong.base $script:head $wrong.version $wrong.task)) 'M4 policy escaped identity'
+        }
+        $badAncestorTool = Join-Path $fixtureRoot ([guid]::NewGuid().ToString('N') + '.ps1')
+        $wrongAncestor = 'f' * 40
+        [IO.File]::WriteAllText($badAncestorTool, [IO.File]::ReadAllText($script:reductionTool).Replace("`$approvalAncestor = '$script:base'", "`$approvalAncestor = '$wrongAncestor'"))
+        . $badAncestorTool -Library
+        $rejected = $false
+        try { $null = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask } catch { $rejected = $_.Exception.Message.Contains('REDUCTION_APPROVAL') }
+        Assert-True $rejected 'M4 wrong ancestor accepted'
+        . $script:reductionTool -Library
+        $memberPlan = Get-ReviewMemberPlan (Get-ReviewSnapshot $script:repo $script:base $script:head 3 $script:reductionTask $true)
+        $actual = Invoke-ReductionPackage
+        Assert-True ($actual.Exit -eq 0) "M4 create failed: $($actual.Output)"
+        $zip = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
+        $archive = [IO.Compression.ZipFile]::OpenRead($zip)
+        try {
+            $manifest = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json
+            Assert-True ($manifest.evidenceReduction.policyId -ceq 'G4-M4-REVIEW-FIX-EVIDENCE-1') 'M4 binding absent'
+            foreach ($member in $memberPlan.members) { Assert-True ($null -ne $archive.GetEntry($member.path)) 'M4 precheck member differs from final package' }
+            $paths = @($manifest.sourceMembers.gitPath)
+            foreach ($path in $script:reductionRequired + @($script:reductionValidation,($script:reductionRoot+'review-fix-01/originals-index.json'),($script:reductionRoot+'review-fix-01/causal-original.txt'))) { Assert-True ($paths -ccontains $path) 'Current closure omitted' }
+            Assert-True ($paths -cnotcontains ($script:reductionRoot+'old/omitted.txt')) 'Historical payload duplicated'
+            $index = Read-ZipText $archive 'evidence-index.json' | ConvertFrom-Json
+            Assert-True (@($index | Where-Object gitPath -CEQ ($script:reductionRoot+'old/omitted.txt'))[0].commit -ceq $script:head) 'Exact historical recovery absent'
+        } finally { $archive.Dispose() }
+        $verified = Invoke-ReductionPackage -VerifyPath $zip
+        Assert-True ($verified.Exit -eq 0) "M4 reopen failed: $($verified.Output)"
+        foreach ($missing in @($script:reductionRequired[1],$script:reductionRequired[-1])) {
+            $saved = $script:reductionSelection.retainedPaths
+            $script:reductionSelection.retainedPaths = @($saved | Where-Object { $_ -cne $missing })
+            Write-Fixture $script:reductionSelectionPath ($script:reductionSelection | ConvertTo-Json -Depth 6); $script:head = Commit-Fixture
+            $rejected = $false
+            try { $null = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask } catch { $rejected = $true }
+            Assert-True $rejected 'Missing historical index or original closure accepted'
+            $script:reductionSelection.retainedPaths = $saved
+        }
+        Write-Fixture $script:reductionSelectionPath ($script:reductionSelection | ConvertTo-Json -Depth 6)
+        Write-Fixture ($script:reductionRoot+'review-fix-01/authorization-original.md') "forged approval`n"; $script:head = Commit-Fixture
+        $rejected = $false
+        try { $null = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask } catch { $rejected = $_.Exception.Message.Contains('REDUCTION_APPROVAL') }
+        Assert-True $rejected 'M4 wrong approval accepted'
     }
     Case 'member plan and exact candidate share production V3 bytes without publishing ZIP' {
         Write-LocalFixture 'docs/evidence/TEST-001/local.json' (@{ evidenceSchemaVersion = 2; validationSource = 'LOCAL'; testedCommit = $script:head; checks = @(@{ name = 'fixture'; command = 'fixture only'; status = 'PASS'; exitCode = 0; output = 'not product evidence' }); ci = @{ status = 'NOT_RUN'; runId = $null; url = $null; commit = $null; conclusion = $null } } | ConvertTo-Json -Depth 6)
