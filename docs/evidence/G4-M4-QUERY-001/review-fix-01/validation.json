@@ -1,7 +1,7 @@
 {
   "evidenceSchemaVersion": 2,
   "validationSource": "LOCAL",
-  "testedCommit": "116469305cb89c3e3bc3f5dfcfb177a502a5ad2d",
+  "testedCommit": "0c2e8ec21e913627ff756e0088b7abc5fe2c4df0",
   "checks": [
     {
       "name": "current-environment",
@@ -65,6 +65,13 @@
       "status": "PASS",
       "exitCode": 0,
       "output": "Actual command completed; immutable original f6ed483c78ac49529b83219667614b5f"
+    },
+    {
+      "name": "final-package-regressions",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual full regression: 131 tests, 0 failures, 0 platform cases NOT_RUN; original dd022ef12fc7457ea99e3573b4de9b5e. Execution Head fb54fb6eb4fde6e3738aba326d5ede43e9680bf2; identical tested files now committed, no execution relabel."
     }
   ],
   "ci": {
