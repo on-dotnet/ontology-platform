@@ -234,3 +234,7 @@ P0创建记录：TaskId=G4-M4-QUERY-001，RunId=p0-contract-20261114；托管树
 ## 实施裁决与追踪增量
 
 2026-11-14：用户明确批准上述A–F，接受D仅合成环境的外部IdP禁用不即时传播限制；本文历史PROPOSED/P0措辞保留为原申请记录，当前执行权限见任务卡及current-authorization最新追加。沿同一树/分支，Master单写，S1先贯通，S2早审，S3完整覆盖及最终唯一V3/非作者重开/包外回执；不更新main/TDengine/M5。普通范围内修复不逐补丁审批。
+
+## 已批准复审修复增量（review-fix-01）
+
+2026-11-15用户明确批准从 `0ab9658ae7873fe98a927a0202d6f51f391a2371` 沿本分支/工作树实施，原A–F业务、安全、五秒预算和D已接受限制不变。B/C中的numeric关系键按精确数值相等判断；输出仍保留原lexical/precision/scale与canonical，不能以表示元数据差异丢掉源SQL已匹配的边。F实施范围增加本任务内部比较helper、因果资格、隔离库守卫、只读运行快照、分层输入及共用V3成员预检；不扩DTO、数据库业务迁移或下一阶段。准确路径、正反例、原件和验收由[同一任务卡](../../tasks/G4-M4-QUERY-001.md)与[本轮修复矩阵](review-fix-01/review-fix-report.md)关联，不另建规格。
