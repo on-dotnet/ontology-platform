@@ -72,6 +72,13 @@
       "status": "PASS",
       "exitCode": 0,
       "output": "Actual full regression: 131 tests, 0 failures, 0 platform cases NOT_RUN; original dd022ef12fc7457ea99e3573b4de9b5e. Execution Head fb54fb6eb4fde6e3738aba326d5ede43e9680bf2; identical tested files now committed, no execution relabel."
+    },
+    {
+      "name": "final-controlled-engineering",
+      "command": "python3 -B scripts/maintenance/workflow.py verify --task G4-M4-QUERY-001 --plan artifacts/workflow/G4-M4-QUERY-001/review-fix-01/delivery-engineering-plan.json",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Current committed input and environment bound; engineering/package/policy PASS; original delivery-engineering-result.json and logs. Earlier nine-gate result retained."
     }
   ],
   "ci": {
