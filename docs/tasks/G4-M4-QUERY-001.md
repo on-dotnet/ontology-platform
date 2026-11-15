@@ -2,7 +2,7 @@
 
 ## 当前执行与授权
 
-- 唯一状态：**READY_FOR_REVIEW / PARTIAL**。用户已批准A–F实施及D的合成环境IdP限制；S1→S2→S3本地产品验证已完成，停在产品审查关口。
+- 唯一状态：**READY_FOR_REVIEW / PASS（本地）**。用户已批准A–F实施及D的合成环境IdP限制；S1→S2→S3本地产品验证已完成，停在产品审查关口。
 - 会话：本M4会话，后续同会话继续；Code/Agent，Local Mac ARM64。实际模型/推理设置未读取，不采用附件建议冒充实际设置。
 - Base：`f0afb730ce92ecbd3a5947d9c6f58faedc8b2138`，2026-11-14普通fetch后origin/main一致；初次fetch沙箱拒绝写FETCH_HEAD，获工具批准重试exit0；没有基线漂移。
 - 分支：`codex/g4-m4-query-001`；Worktree：`/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform`。当前RunId=`query-impl-01`（P0为`p0-contract-20261114`），托管operationId=`ddb793db-9e28-4040-977d-73af96443916`。首次分支创建因.git锁写权限失败，获工具批准后成功；未回退main写文档。
@@ -28,7 +28,7 @@
 | AC-09 | 预算/取消/原子审计，见D | 两实例租约容量/fence生效；取消先提交或审计故障→无COMPLETED；大值物化前拒绝；SQL/URL不能进入计划 | Q/G4QueryWorker.cs、N/Adapters/PgQueryReader.cs；OntologyPlatform.QueryTests/G4QueryRaceTests.cs；OntologyPlatform.ConnectionsTests/G4QuerySourceTests.cs | S2真实PG事务/两API | PASS：真实双API容量/取消、隔离PG事务与审计回滚；源行数/1MiB完整项前缀预算 |
 | AC-10 | 关系/观测及共同UI/MCP，见A/B/E | 发布关系两端有权、精确观测按同Gateway返回；无权端点/未开放ontology拒绝；MCP不用LLM | A/SemanticMcpTools.cs、Q/G4QueryExecution.cs；OntologyPlatform.AgentTests/G4QueryMcpTests.cs；UI g4-query.test.ts | S3真实受控MCP/浏览器/源PG | PASS：S3真实PG/HTTP/MCP84检查，观测/关系浏览器19检查，共同Gateway |
 | AC-11 | G2冻结兼容，见B1 | 旧查询和旧Run按原DTO读取；当前撤权拒绝；G4不转换假图 | A/ExecutionRunService.cs；OntologyPlatform.QueryTests/QueryHttpTests.cs；OntologyPlatform.AgentTests/RunFlowTests.cs；OntologyPlatform.G2ContractTests/WireContractTests.cs | S3影响范围内真实回归，其他证据按输入复用 | PASS（影响范围）：冻结wire和真实旧MCP工具；实际MAF Run与在途绑定测试1/0skip，未声称重跑整个历史G2/M3链 |
-| AC-12 | 当前任务准入/证据/资源，见E/F | 当前TaskId正式消费者有效才执行；未知Task/空流/ANSI/禁入路径/错误报告不得PASS；总占用未知即不启栈 | scripts/maintenance/workflow_m4_query.py；scripts/tests/WorkflowQuery.Tests.py；verification-gates.json | 实施准入及S1第一原件→公开资格→小样预检 | PARTIAL：当前产品输入资格通过；旧基线8格式/链接错误阻断全仓门禁，最终ZIP重开和包外回执为后置原件 |
+| AC-12 | 当前任务准入/证据/资源，见E/F | 当前TaskId正式消费者有效才执行；未知Task/空流/ANSI/禁入路径/错误报告不得PASS；总占用未知即不启栈 | scripts/maintenance/workflow_m4_query.py；scripts/tests/WorkflowQuery.Tests.py；verification-gates.json | 实施准入及S1第一原件→公开资格→小样预检 | PASS（本地）：8项基线修复、完整SelfTest通过；当前产品资格复核通过；更新ZIP与非作者重开见包外回执 |
 
 ## Plan：最早真实风险路径
 
@@ -141,3 +141,9 @@ S3持续实施增量：实际双实体映射发布/激活已完成，旧单实�
 非作者已复核并关闭源排序/根截断、实际MAF、过期审计、测试隔离及构建输入闭包问题；唯一最终V3与非作者独立重开在最终提交后生成，准确完整Head、ZIP SHA256和后置命令以包外回执为准。接受的D限制仅合成外部IdP禁用不即时传播，不能扩大为生产保证。
 
 本任务7个长期容器、原生Web进程及结果密钥/数据卷KEEP，原因是未集成审查与加密结果恢复；结束审查、确认唯一数据/证据与引用已保全后方可按准确ID回收。当前短命测试容器0；合计容器预算11.75GiB/11.5CPU，能源策略POLICY_READY；另有30秒有界监测7次锁屏且外接屏熄灭心跳、实测窗口无Sleep事件；完整会话连续性仍NOT_VERIFIED。测试终态禁用连接保持禁用。旧KEEP资源不移交不清理；不更新main、不恢复TDengine、不进入M5。
+
+### 2026-11-15 基线格式／链接修复增量
+
+按用户新授权扩展owned_paths至诊断所列4个M3文件及其original-path-map；两份JSON采用已有可逆content封套，原路径身份、原SHA及长度保持，全部五份修订前原件保存在[根因及原件](../evidence/G4-M4-QUERY-001/format-fix-01/root-cause-and-preserved-originals.json)。四处引用改指已提交归档；两处未提交后置回执明确当前不可重开，不伪造历史证明。旧失败和上一版PARTIAL包保持历史原状；本段后的修复验证与更新交付见包外回执。产品/DTO/数据库/脚本不变。
+
+修复增量最终验证：完整 `verify.ps1 -SelfTest` 实际exit0；此前180秒超时exit124及旧规则标题术语缺失导致的exit1原件均保留，不计为通过；规则标题仅补“顺序”二字，正文和测试逻辑不变，定向4测试通过。全部161条历史原件还原保真，五产品gate为当前重新核验PASS（产品执行REUSED），产品输入不变，未重跑M3产品。五个精确归档路径已登记policy.inputs。见[本轮验证](../evidence/G4-M4-QUERY-001/format-fix-01/validation.json)与[原件索引](../evidence/G4-M4-QUERY-001/format-fix-01/originals-index.json)。本段取代旧8项未解决的当前结论，旧段落/失败/上一版PARTIAL包仍为历史事实；CI及其他平台NOT_RUN，D已接受限制保持。更新后的最终Head/唯一当前V3/非作者重开为包外后置回执。

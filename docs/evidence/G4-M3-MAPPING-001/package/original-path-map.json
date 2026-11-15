@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "note": "Original references resolve via map. JSON originals retain exact bytes; text logs use reversible JSON content envelopes to preserve whitespace. Hash sha256 always describes reconstructed original bytes. Private/runtime/build material excluded; selected historical red logs retained, full history local.",
+  "note": "Original references resolve via map. Originals are stored either raw or as reversible JSON content envelopes according to encoding; reconstructed bytes preserve all whitespace. Hash sha256 always describes reconstructed original bytes. Private/runtime/build material excluded; selected historical red logs retained, full history local. 2026-11-15 M4 authorized format repair: two non-LF JSON originals now use the same reversible content envelope; originalPath, original hash and byte count remain unchanged.",
   "files": [
     {
       "originalPath": "artifacts/workflow/G4-M3-MAPPING-001/commands/mapping-impl-01/03f1475af45b4c39af6a2847b415542f/receipt.json",
@@ -808,9 +808,11 @@
     },
     {
       "originalPath": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/vitest-report.json",
-      "gitPath": "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/vitest-report.json",
+      "gitPath": "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/vitest-report.json.payload.json",
       "sha256": "9e74164345981122a0f54de3b6f022790a5846699b98efe69e552bf7f89329fb",
-      "sizeBytes": 4018
+      "sizeBytes": 4018,
+      "encoding": "JSON content string encoded as UTF-8 reconstructs exact original bytes",
+      "storedSha256": "b51e69a638d0e5169ec052df5683b4cc0792b36c4e034928c5ebaa8579a4d367"
     },
     {
       "originalPath": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/wire-build.txt",
@@ -862,9 +864,11 @@
     },
     {
       "originalPath": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/ontology-g4-m3-mapping-impl-01-source-test-14c5f8dc.json",
-      "gitPath": "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/ontology-g4-m3-mapping-impl-01-source-test-14c5f8dc.json",
+      "gitPath": "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/ontology-g4-m3-mapping-impl-01-source-test-14c5f8dc.json.payload.json",
       "sha256": "e25bbedf93d7973167fe57e8fbb68ea99f90bed53718f333bfae881e4f770fd5",
-      "sizeBytes": 5624
+      "sizeBytes": 5624,
+      "encoding": "JSON content string encoded as UTF-8 reconstructs exact original bytes",
+      "storedSha256": "5130d9e84dcf3708d321bb72eea261acb4eaee16f0f3fcd43f2a50025f1b2a90"
     },
     {
       "originalPath": "artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/persistence-red-build.txt",

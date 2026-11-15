@@ -841,7 +841,7 @@ PostgreSQL首切片真实执行；Connections持有Mapping/不可变历史/Activ
 
 七页面和连接目录入口完成真实纵向：手工创建、固定评估/提案、异人审核、发布与旧原件回滚；深链刷新不重复POST。冲突保留未保存文本并人工重基；撤权清空敏感正文、拒绝迟到响应；切换主体不保留旧正文/未保存内容；取消后刷新同Job。当前过期、失败/证据不足检查与恢复状态有实证；桌面/390px窄屏、深浅主题、基础键盘焦点/导航已实测，不声称完整无障碍认证。
 
-[当前proof-index](../../../artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/product-proof-index.json)是原件入口：15个准确引用，逐项SHA256；browser wrapper→实际命令receipt→stdout报告路径→报告hash→当前输入/进程身份。实际reader的完整DLL集合和实际历史Manifest均重开，不能用当前入口DLL替旧解析依赖背书。
+[当前proof-index](package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/product-proof-index.json)是原件入口：15个准确引用，逐项SHA256；browser wrapper→实际命令receipt→stdout报告路径→报告hash→当前输入/进程身份。实际reader的完整DLL集合和实际历史Manifest均重开，不能用当前入口DLL替旧解析依赖背书。
 
 | 当前分组 | 原始结果 |
 |---|---|
@@ -852,13 +852,13 @@ PostgreSQL首切片真实执行；Connections持有Mapping/不可变历史/Activ
 | 五产品gate | environment/contract/backend/web/interaction全部PASS；实际执行原件有效REUSED，本轮资格重核FRESH；不是重新运行原产品测试 |
 | 正式计划 | workflow Run ccb1e7d8c1d143a2919d7e4eda3e74db，11受影响gate全部PASS，unknown路径为空；CI/未测原生平台NOT_RUN |
 
-schema2 [review-validation.json](../../../artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/review-validation.json)已通过test-review-evidence.ps1，实际exitCode与测得耗时/资格模式分列。证据创建后早预检与最终预检均通过；预检仅证明schema/输入绑定，不替代产品测试。当前合成连接最后为DISABLED，这是负例终态，未绕过终态重新启用。历史失败、旧数据库mapping/mapping_v2及中间报告保留。
+schema2 [review-validation.json](package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/review-validation.json)已通过test-review-evidence.ps1，实际exitCode与测得耗时/资格模式分列。证据创建后早预检与最终预检均通过；预检仅证明schema/输入绑定，不替代产品测试。当前合成连接最后为DISABLED，这是负例终态，未绕过终态重新启用。历史失败、旧数据库mapping/mapping_v2及中间报告保留。
 
 ### F｜资源、独立Review与当前关口
 
-[最终资源原件](../../../artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/final-resources.json)：6容器、5.75GiB/7CPU上限；实际数据376508416B；证据9637568B；环境/构建/reader缓存合计约1.78GiB，均低于3GiB数据/1GiB证据/6GiB缓存/10GiB总预算。接管时短命第七API为原F2允许场景，有before/命令/exit/after缺席后验。未清理任何旧KEEP；当前工作树、分支、缓存、私有runtime、PG/Keycloak/Fuseki/RustFS/API/Web保持KEEP，理由为未集成的当前审查及同树后续工作，解除条件为明确收尾授权且成果安全集成或归档。接电/防自动睡眠用户已确认，有界心跳通过；未观察实际锁屏/熄屏事件，列NOT_VERIFIED。
+[最终资源原件](package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/final-resources.json)：6容器、5.75GiB/7CPU上限；实际数据376508416B；证据9637568B；环境/构建/reader缓存合计约1.78GiB，均低于3GiB数据/1GiB证据/6GiB缓存/10GiB总预算。接管时短命第七API为原F2允许场景，有before/命令/exit/after缺席后验。未清理任何旧KEEP；当前工作树、分支、缓存、私有runtime、PG/Keycloak/Fuseki/RustFS/API/Web保持KEEP，理由为未集成的当前审查及同树后续工作，解除条件为明确收尾授权且成果安全集成或归档。接电/防自动睡眠用户已确认，有界心跳通过；未观察实际锁屏/熄屏事件，列NOT_VERIFIED。
 
-非作者Reviewer **/root/mapping_p0_review** 多轮只读审查并独立重开当前候选：核全部15引用、21命令原件及输出hash；独立qualify五gate全部PASS；实时检查六容器归属和配额，精确临时接管ID查无此对象。最终结论：**未发现阻断问题**。[Review记录](../../../artifacts/workflow/G4-M3-MAPPING-001/mapping-impl-01/independent-review.json)由Master忠实记录Reviewer消息，不伪称Reviewer写入。已修Review问题包括关系domain/range、源预算/类型、候选可见性竞态、当前源不可核验清屏、跨实例容量、回滚依赖最新草稿、审核筛选状态、证据命令/实际进程/reader依赖绑定、次实例接管证明及原/当前目录分离。中文声明说明与格式专项完成，最终diff-check须exit0。
+非作者Reviewer **/root/mapping_p0_review** 多轮只读审查并独立重开当前候选：核全部15引用、21命令原件及输出hash；独立qualify五gate全部PASS；实时检查六容器归属和配额，精确临时接管ID查无此对象。最终结论：**未发现阻断问题**。[Review记录](package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/independent-review.json)由Master忠实记录Reviewer消息，不伪称Reviewer写入。已修Review问题包括关系domain/range、源预算/类型、候选可见性竞态、当前源不可核验清屏、跨实例容量、回滚依赖最新草稿、审核筛选状态、证据命令/实际进程/reader依赖绑定、次实例接管证明及原/当前目录分离。中文声明说明与格式专项完成，最终diff-check须exit0。
 
 本轮只交付任务状态与本A–F。原件留ignored artifacts，不生成ZIP；本地PASS不冒充CI/跨平台PASS。M2仍PARTIAL，TDengine暂缓，其他连接器不视为等价；未更新main、未进入M4。当前停在人工审查关口，后续获准工作继续同M3会话、分支和Worktree；Git提交/push不扩大业务或集成授权。
 
