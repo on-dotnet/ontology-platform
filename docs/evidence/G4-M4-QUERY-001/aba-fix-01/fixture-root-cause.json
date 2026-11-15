@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M4-QUERY-001",
+  "rootCause": "Early ABA advanced actual activation but runner did not update the expected fixture receipt.",
+  "originalFailureCommandId": "d3bc732c6c5049a9a1b06875b26730d5",
+  "queryId": "query-d3550199d1ba420fa114b07227541630",
+  "expectedBefore": {
+    "activationId": "activation-d1b4162706e0435a87d31d0402d387bc",
+    "mappingId": "mapping-47197c810bba3f6c4de39a344de81d17",
+    "proposalId": "proposal-2028c25362f1488e84ad690d930a43ec",
+    "kind": "PUBLISH",
+    "mappingReleaseId": "release-8caf2e7aff624df9bd646518def3bbd6",
+    "manifestHash": "ba0d37b6ade71410ed248bfa50b0328940e45dbbd1c0499d5d47f48e9fb341d0",
+    "previousReleaseId": null,
+    "activationRevision": 1,
+    "auditId": "4127e9d70219476fbca5738f2015db28",
+    "outboxEventId": "event-caecd9adac164d579697df2d2038e92e",
+    "activatedAtUtc": "2026-11-15T01:57:20.6239023Z"
+  },
+  "actualConfirmedBySql": {
+    "activationId": "activation-6e30b10ab164433a9260834b97481052",
+    "activationRevision": 3
+  },
+  "actualReceipt": {
+    "activationId": "activation-6e30b10ab164433a9260834b97481052",
+    "mappingId": "mapping-47197c810bba3f6c4de39a344de81d17",
+    "proposalId": "proposal-fd7e7324ef7d4e79a791d1879598c8de",
+    "kind": "ROLLBACK",
+    "mappingReleaseId": "release-8caf2e7aff624df9bd646518def3bbd6",
+    "manifestHash": "ba0d37b6ade71410ed248bfa50b0328940e45dbbd1c0499d5d47f48e9fb341d0",
+    "previousReleaseId": "release-5537d189216c4b12a5259fb25f2f4f6c",
+    "activationRevision": 3,
+    "auditId": "a5aa2522b31b4213babb3ad59233c120",
+    "outboxEventId": "event-dd08d89084ec44f7912d3cb786b46f6a",
+    "activatedAtUtc": "2026-11-15T01:58:07.9239372+00:00"
+  },
+  "sourceCommandId": "13a28a05b129495da62ee22c8be9772f",
+  "repair": "Fixture only derived from strict validated actual original; runtime_agent_test now performs this after every successful ABA."
+}

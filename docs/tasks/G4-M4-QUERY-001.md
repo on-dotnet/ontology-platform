@@ -2,7 +2,7 @@
 
 ## 当前执行与授权
 
-- 唯一状态：**VERIFYING_AC05 / NOT_READY_FOR_MERGE**。更新V3独立复审发现AC-05原ABA案例只覆盖完成后恢复/选择，未覆盖在途提交；本轮按新增授权补真实在途证据，历史PASS不替代此项。
+- 唯一状态：**READY_FOR_REVIEW / PASS（本地）**。AC-05真实在途ABA及当前输入复验通过，非作者已关闭验收与资格P2；最终ZIP和独立重开由包外后置回执记录，停在M4审查关口。
 - 会话：本M4会话，后续同会话继续；Code/Agent，Local Mac ARM64。实际模型/推理设置未读取，不采用附件建议冒充实际设置。
 - Base：`f0afb730ce92ecbd3a5947d9c6f58faedc8b2138`，2026-11-14普通fetch后origin/main一致；初次fetch沙箱拒绝写FETCH_HEAD，获工具批准重试exit0；没有基线漂移。
 - 分支：`codex/g4-m4-query-001`；Worktree：`/Users/chasen/.codex/worktrees/g4-m4-query-001/ontology-platform`。当前RunId=`query-impl-01`（P0为`p0-contract-20261114`），托管operationId=`ddb793db-9e28-4040-977d-73af96443916`。首次分支创建因.git锁写权限失败，获工具批准后成功；未回退main写文档。
@@ -21,7 +21,7 @@
 | AC-02 | 唯一Gateway真实PG链，见A | 给定正式本体和active；HTTP query→实际源值/receipt；只有M3评估可用或未知capability→拒绝 | Q/SemanticGateway.cs、N/Adapters/PgQueryReader.cs；scripts/maintenance/workflow-m4-query.mjs | S1正式DI/OIDC/TLS只读PG | PASS：正式DI/OIDC/TLS PG与唯一Gateway真实查询43检查 |
 | AC-03 | 六态区别，见C1 | 完整零行→EMPTY，有行→FOUND；断源/超时零行→UNAVAILABLE；截断有可信前缀→PARTIAL；可见snapshot全分支拒绝→UNAUTHORIZED；两可见候选→AMBIGUOUS | Q/G4QueryExecution.cs；OntologyPlatform.QueryTests/G4QueryTests.cs；OntologyPlatform.ConnectionsTests/G4QuerySourceTests.cs | S1 FOUND；S2其他状态及真实故障 | PASS：六态、完整零行、真实源故障、降级与截断见S2/S3报告 |
 | AC-04 | 当前授权/迟到响应，见C/D | 有grant执行与恢复成功；撤权/注销/连接禁用/secret轮换→无成功披露，UI清屏且迟到响应失效；根无权401/403无snapshot；外部IdP直接禁用即时传播按D已接受限制，不冒充已覆盖 | G/QueryAuthorizationParticipant.cs、H/G4/QueryEndpoints.cs；OntologyPlatform.SecurityTests/G4QueryAuthorizationTests.cs；apps/web/src/features/semantic/g4-query.test.ts | S2真实票据/PG grant+浏览器 | PASS（D已接受限制）：当前三种授权、执行中撤权、连接变更及真实浏览器迟到响应；外部IdP即时传播不作通过声明 |
-| AC-05 | 固定发布与ABA，见C2 | active固定执行成功；A→B→A发生于运行中→409无成功结果；已提交历史A在当前有权时仍回读A | N/Application/QueryBindingReader.cs、Q/G4QueryResultStore.cs；OntologyPlatform.QueryTests/G4QueryRaceTests.cs | S2两API独立连接/真实激活 | PASS：真实ABA、双API取消与固定版本历史回读；提交原子绑定拒绝在途漂移 |
+| AC-05 | 固定发布与ABA，见C2 | active固定执行成功；A→B→A发生于运行中→409无成功结果；已提交历史A在当前有权时仍回读A | N/Application/QueryBindingReader.cs、Q/G4QueryResultStore.cs；OntologyPlatform.QueryTests/G4QueryRaceTests.cs、OntologyPlatform.AgentTests/G4QueryAbaRuntimeTests.cs | S2真实PG读取后正式激活/提交复核 | PASS：真实A3→B4→A5，1176ms内409/query_binding_stale，无成功结果/读取回执/成功审计；ABA后S1 43检查通过 |
 | AC-06 | RQ-01消歧，见C1 | 同scope两候选→选择合法IRI成功；撤权/版本漂移/未知IRI→403/409/422且无候选泄露，不取第一条 | Q/G4QueryExecution.cs；OntologyPlatform.QueryTests/G4QueryTests.cs；apps/web/src/features/semantic/g4-query.test.ts | S2源真实同号及权限变化 | PASS：S2 basic47，真实同号消歧、选择与拒绝 |
 | AC-07 | 来源闭合与精度，见C2 | 行→evidence→receipt→原发布/原目录/当前目录/连接版本可核；无源键→DATASET/PARTIAL；悬空ID→503，UNKNOWN不当确定事实 | Q/G4SourceEvidenceService.cs、N/Adapters/PgQueryReader.cs；OntologyPlatform.QueryTests/G4QueryPersistenceTests.cs | S1首receipt即验证；S2降级反例 | PASS：源键/精确值/证据receipt闭合，S3降级与截断恢复 |
 | AC-08 | 结果恢复与保留，见C3/C4 | 新DI回读hash一致、刷新不增加源read计数；24h到期410、错主体404、历史撤权403；不自动重执行 | Q/G4QueryResultStore.cs、G4QueryWorker.cs；OntologyPlatform.QueryTests/G4QueryPersistenceTests.cs；UI g4-query.test.ts | S1存储→新上下文→浏览器；S2可控时钟过期 | PASS：真实API停启同queryId/hash18检查，UI刷新无源重放；隔离PG保留期与当前权限 |
@@ -147,3 +147,9 @@ S3持续实施增量：实际双实体映射发布/激活已完成，旧单实�
 按用户新授权扩展owned_paths至诊断所列4个M3文件及其original-path-map；两份JSON采用已有可逆content封套，原路径身份、原SHA及长度保持，全部五份修订前原件保存在[根因及原件](../evidence/G4-M4-QUERY-001/format-fix-01/root-cause-and-preserved-originals.json)。四处引用改指已提交归档；两处未提交后置回执明确当前不可重开，不伪造历史证明。旧失败和上一版PARTIAL包保持历史原状；本段后的修复验证与更新交付见包外回执。产品/DTO/数据库/脚本不变。
 
 修复增量最终验证：完整 `verify.ps1 -SelfTest` 实际exit0；此前180秒超时exit124及旧规则标题术语缺失导致的exit1原件均保留，不计为通过；规则标题仅补“顺序”二字，正文和测试逻辑不变，定向4测试通过。全部161条历史原件还原保真，五产品gate为当前重新核验PASS（产品执行REUSED），产品输入不变，未重跑M3产品。五个精确归档路径已登记policy.inputs。见[本轮验证](../evidence/G4-M4-QUERY-001/format-fix-01/validation.json)与[原件索引](../evidence/G4-M4-QUERY-001/format-fix-01/originals-index.json)。本段取代旧8项未解决的当前结论，旧段落/失败/上一版PARTIAL包仍为历史事实；CI及其他平台NOT_RUN，D已接受限制保持。更新后的最终Head/唯一当前V3/非作者重开为包外后置回执。
+
+### 2026-11-15 AC-05 在途ABA闭合
+
+当前被测提交`127c7650194761a2c1324340c9cb45708847ff31`。新增验收保持真实PG、正式七阶段验证/异人当前授权审批/激活、正式绑定参与者及五秒预算；修复仅涉及验收资格与实际A回执的夹具同步，产品/DTO/数据库合同未变。24项当前输入资格通过，五门禁计数为环境1、合同24、后端22、Web61、交互466；完整SelfTest exit0（552.88秒，ReviewPackage129/0）。独立非作者已核对源码/构建/原件并关闭此前P2。见[本轮复审](../evidence/G4-M4-QUERY-001/aba-fix-01/review.md)、[验证](../evidence/G4-M4-QUERY-001/aba-fix-01/validation.json)及[原件索引](../evidence/G4-M4-QUERY-001/aba-fix-01/originals-index.json)。
+
+原S1夹具失败、早期验收缺口及历史事故/ZIP均保留；不以首条旧输入案例替代最终资格。D已接受的合成IdP限制保持，CI/其他平台NOT_RUN。七个本任务容器KEEP，临时测试容器准确回收；不更新main、不恢复TDengine、不进入M5。最终完整Head、唯一当前ZIP、SHA与非作者独立重开见包外回执。
