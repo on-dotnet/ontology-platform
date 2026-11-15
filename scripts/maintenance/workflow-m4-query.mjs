@@ -24,7 +24,7 @@ if (mode === "serve") {
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: 15442,
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection"].includes(mode)) await browserRun(mode);
+} else if (["provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -138,6 +138,23 @@ async function browserRun(mode) {
     check("fixture_identity", state.taskId === task && state.runId === runId);
     state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
     await save(state);
+    if (mode === "standard-provision") {
+      check("standard_follows_numeric_proof", Boolean(state.numeric && state.numericResult));
+      const retired = { retiredAtUtc: new Date().toISOString(), reason: "numeric-proof-preserved-standard-safety-regression" };
+      for (const key of Object.keys(state)) if (/^(mapping|s2)/.test(key) || ["connectionId", "catalog", "firstQuery", "latestQuery", "connectionDisplayName", "numericResult"].includes(key)) { retired[key] = state[key]; delete state[key]; }
+      state.retiredFixtures ??= []; state.retiredFixtures.push(retired); state.numeric = false;
+      state.connectionDisplayName = "M4 review-fix standard safety regression"; await save(state); mode = "provision";
+    }
+    if (mode === "numeric-provision") {
+      if (!state.numeric) {
+        const retired = { retiredAtUtc: new Date().toISOString(), reason: "review-fix-numeric-independent-fixture" };
+        for (const key of Object.keys(state)) if (/^(mapping|s2)/.test(key) || ["connectionId", "catalog", "firstQuery", "latestQuery", "connectionDisplayName"].includes(key)) { retired[key] = state[key]; delete state[key]; }
+        state.retiredFixtures ??= []; state.retiredFixtures.push(retired);
+        state.numeric = true; state.s3 = true;
+        state.connectionDisplayName = "M4 numeric review-fix synthetic connection"; await save(state);
+      }
+      mode = "provision";
+    }
     if (mode === "s3-provision") {
       if (!state.s3) {
         const retired = { retiredAtUtc: new Date().toISOString(), reason: "s3_formal_vocabulary_and_two_table_mapping" };
@@ -160,12 +177,40 @@ async function browserRun(mode) {
       await save(state);
       mode = "provision";
     }
-    if (mode === "s1-reopen") {
+    if (mode === "numeric") {
+      phase = "numeric_formal_gateway";
+      const capability = (await get(operator, "/api/v1/capabilities")).find(item => item.id === "g4_traverse_relationships");
+      const query = { ...state.latestQuery.query, capabilityId: capability.id, capabilityVersion: capability.version,
+        relationshipIris: ["urn:synthetic:mapping:hasReading"] };
+      const result = await request({ ...operator, headers: { ...operator.headers, "Idempotency-Key": randomUUID() } }, "POST", "/api/v1/data/semantic-queries", query);
+      await writeFile(file.replace(".json", "-relationships.json"), result.raw);
+      const edges = result.data.data.filter(item => item.kind === "relationship");
+      check("numeric_found_complete", result.data.status === "FOUND" && !result.data.limited);
+      check("numeric_independent_expected_endpoints", JSON.stringify(edges.map(item => item.target.identity.externalId).sort()) === JSON.stringify(["numeric-target-1", "numeric-target-2"]));
+      check("numeric_correct_source_and_scope", edges.every(item => item.source.identity.externalId === "asset-1" && item.source.identity.siteId === "site-a" && item.target.identity.siteId === "site-a"));
+      for (const edge of edges) for (const id of edge.evidenceIds) {
+        const evidence = await get(operator, "/api/v1/data/source-evidence/" + encodeURIComponent(id));
+        check("numeric_evidence_resolvable_" + id, evidence.receipt.queryId === result.queryId && evidence.receipt.mappingReleaseId === state.mappingReceipt.mappingReleaseId);
+      }
+      const recovered = await request(operator, "GET", `/api/v1/data/semantic-queries/${result.queryId}/result`);
+      check("numeric_canonical_recovery", recovered.raw === result.raw);
+      state.numericResult = { queryId: result.queryId, resultHash: createHash("sha256").update(result.raw).digest("hex"), query };
+      await save(state); report.status = "PASS"; report.scope = "RF01_RF03_REAL_PG_FORMAL_MAPPING_GATEWAY";
+    } else if (mode === "s1-reopen") {
       phase = "query_after_api_restart";
-      const original = state.latestQuery ?? state.firstQuery;
+      const original = state.numericResult ?? state.latestQuery ?? state.firstQuery;
       check("original_query_exists", Boolean(original));
+      const observed = () => JSON.parse(execFileSync("python3", ["-B", "-c", 'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;print(json.dumps(q.source_scan_snapshot()))'], { cwd: root, timeout: 30000, encoding: "utf8" }));
+      const count = row => row.seqScan + row.idxScan;
+      await new Promise(done => setTimeout(done, 2100)); const before = observed();
+      await new Promise(done => setTimeout(done, 1100)); const settled = observed();
+      check("reopen_source_statistics_settled", count(before) === count(settled) && count(before) > 0);
       const restored = await request(operator, "GET", `/api/v1/data/semantic-queries/${original.queryId}/result`);
       check("new_api_process_decrypts_original_result", createHash("sha256").update(restored.raw).digest("hex") === original.resultHash);
+      await new Promise(done => setTimeout(done, 2100)); const after = observed();
+      await new Promise(done => setTimeout(done, 1100)); const confirmed = observed();
+      report.sourceScans = { before, settled, after, confirmed };
+      check("restart_recovery_no_business_reread", count(before) === count(after) && count(after) === count(confirmed));
       report.status = "PASS"; report.scope = "S1_NEW_API_PROCESS_ORIGINAL_RESULT_HASH";
     } else if (mode === "s2-basic") {
       phase = "query_s2_ambiguity";
@@ -597,8 +642,9 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
 
     } else if (mode === "mapping") {
       check("formal_prerequisites", Boolean(state.catalog && state.ontologyRelease));
-      const dataset = { snapshotId: state.catalog.snapshotId, schema: "production", name: "assets", kind: "TABLE" };
-      const table = state.catalog.objects.find(value => value.schema === "production" && value.name === "assets");
+      const sourceTable = name => state.numeric ? "numeric_" + name : name;
+      const dataset = { snapshotId: state.catalog.snapshotId, schema: "production", name: sourceTable("assets"), kind: "TABLE" };
+      const table = state.catalog.objects.find(value => value.schema === "production" && value.name === sourceTable("assets"));
       const field = name => ({ datasetRef: dataset, name, ordinal: table.fields.find(value => value.name === name).ordinal });
       const definition = { entities: [{ id: "asset", entityClassIri: "urn:synthetic:mapping:Asset", datasetRef: dataset,
         identitySpecId: "asset-identity", temporalSpecId: "asset-time", scopeFields: { organization: field("organization_id"), site: field("site_id") } }],
@@ -610,8 +656,8 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
         relations: [], conversions: [], unitSpecs: [] };
       if (state.s3) {
       definition.properties.push({ id: "label2", entityBindingId: "asset", propertyIri: "urn:synthetic:mapping:label2", fieldRef: field("label"), conversionId: null, unitSpecId: null, nullPolicy: "REJECT_NULL" });
-      const ref = (table, name) => ({ datasetRef: { snapshotId: state.catalog.snapshotId, schema: "production", name: table, kind: "TABLE" },
-        name, ordinal: state.catalog.objects.find(item => item.name === table).fields.find(field => field.name === name).ordinal });
+      const ref = (table, name) => ({ datasetRef: { snapshotId: state.catalog.snapshotId, schema: "production", name: sourceTable(table), kind: "TABLE" },
+        name, ordinal: state.catalog.objects.find(item => item.name === sourceTable(table)).fields.find(field => field.name === name).ordinal });
       definition.entities.push({ id: "reading", entityClassIri: "urn:synthetic:mapping:Reading", datasetRef: ref("readings", "reading_id").datasetRef,
         identitySpecId: "reading-identity", temporalSpecId: "reading-time", scopeFields: { organization: ref("readings", "organization_id"), site: ref("readings", "site_id") } });
       definition.identitySpecs.push({ id: "reading-identity", organizationFieldRef: ref("readings", "organization_id"), siteFieldRef: ref("readings", "site_id"), sourceNamespace: "readings",
@@ -622,7 +668,7 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
         { id: "quality", entityBindingId: "reading", propertyIri: "urn:synthetic:mapping:quality", fieldRef: ref("readings", "attributes"), conversionId: "quality-json", unitSpecId: null, nullPolicy: "REJECT_NULL" });
       definition.unitSpecs = [{ id: "temperature-unit", sourceUnitIri: "urn:synthetic:m3:C-v1", targetUnitIri: "urn:synthetic:m3:K-v1", sourceUnitFieldRef: ref("readings", "unit_code"), sourceUnitCode: "Cel", unitRegistryVersion: "1", evidenceKind: "SOURCE_FIELD" }];
       definition.conversions = [{ id: "kelvin", registeredId: "celsius-to-kelvin", version: "1", parameters: {} }, { id: "quality-json", registeredId: "json-top-level-scalar", version: "1", parameters: { key: "quality", valueType: "STRING" } }];
-      definition.relations = [{ id: "readings", fromBindingId: "asset", toBindingId: "reading", predicateIri: "urn:synthetic:mapping:hasReading", cardinality: "ONE_TO_MANY", temporalJoinPolicy: "HALF_OPEN_OVERLAP", joinFieldPairs: [{ from: ref("assets", "asset_id"), to: ref("readings", "asset_id") }] }];
+      definition.relations = [{ id: "readings", fromBindingId: "asset", toBindingId: "reading", predicateIri: "urn:synthetic:mapping:hasReading", cardinality: "ONE_TO_MANY", temporalJoinPolicy: "HALF_OPEN_OVERLAP", joinFieldPairs: [{ from: ref("assets", state.numeric ? "numeric_key" : "asset_id"), to: ref("readings", state.numeric ? "numeric_key" : "asset_id") }] }];
       }
       if (!state.mappingDraft) {
         phase = "query_mapping_create";

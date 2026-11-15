@@ -87,6 +87,9 @@ public sealed class G4QueryPersistenceTests
         // 客户端连接串检查先于连接，避免意外向运行库发送迁移。
         var builder = new NpgsqlConnectionStringBuilder(connectionString);
         Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(builder.Database ?? string.Empty, @"\Am4_query_test_[0-9a-f]{12}\z"), "必须使用独立测试库。");
+        // 驱动提供的随机Owner必须与目标一致，拒绝手工同名或另一次Run的连接串。
+        var expectedOwner = "G4-M4-QUERY-001:query-impl-01:" + builder.Database![14..];
+        Assert.AreEqual(expectedOwner, Environment.GetEnvironmentVariable("G4_QUERY_TEST_OWNER"), "缺少当前驱动独占nonce。");
         // 真实服务端身份与创建时所有权注释必须同时一致，不能只相信传入名称。
         await using var connection = new NpgsqlConnection(connectionString);
         await connection.OpenAsync();
@@ -95,7 +98,8 @@ public sealed class G4QueryPersistenceTests
         await using var reader = await command.ExecuteReaderAsync();
         Assert.IsTrue(await reader.ReadAsync());
         Assert.AreEqual(builder.Database, reader.GetString(0));
-        Assert.AreEqual("G4-M4-QUERY-001:query-impl-01:" + builder.Database![14..], reader.GetString(1));
+        Assert.IsFalse(reader.IsDBNull(1), "服务端所有权标记缺失。");
+        Assert.AreEqual(expectedOwner, reader.GetString(1));
     }
 
 }

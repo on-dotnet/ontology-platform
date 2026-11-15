@@ -20,6 +20,8 @@ param(
     [ValidateSet('success', 'failure', 'cancelled', 'timed_out', 'action_required')][string]$CiConclusion,
     [ValidateSet(1, 2, 3)][int]$SchemaVersion = 3,
     [switch]$Library,
+    [switch]$MemberPlan,
+    [switch]$MeasureOnly,
     [switch]$VerifyOnly,
     [string]$PackagePath
 )
@@ -356,6 +358,20 @@ function Get-ReviewSizeReport {
     $payloadSize = [long]0
     foreach ($category in $categories.Values) { $payloadSize += $category.compressedBytes }
     return [ordered]@{ sizeBytes = $size; softTargetBytes = 10MB; hardLimitBytes = 15MB; aboveSoftTarget = ($size -gt 10MB); categories = @($categories.Keys | Sort-Object | ForEach-Object { $categories[$_] }); zipOverheadBytes = $size - $payloadSize }
+}
+
+function Get-ReviewMemberPlan {
+    param($Snapshot)
+    # 复用生产选择和字节，绝不重写PNG/去重/diff逻辑；这里只测量已选成员。
+    $rows = foreach ($name in @($Snapshot.Members.Keys | Sort-Object -CaseSensitive)) {
+        Assert-ReviewPath $name
+        Assert-ReviewContent $Snapshot.Members[$name] 'planned member'
+        [ordered]@{ path = $name; sha256 = Get-ReviewHash $Snapshot.Members[$name]; sizeBytes = $Snapshot.Members[$name].Length; deflatedBytes = Get-ReviewDeflatedSize $Snapshot.Members[$name] }
+    }
+    $payload = [long]0
+    foreach ($row in $rows) { $payload += $row.deflatedBytes + 256 + 2 * $script:utf8.GetByteCount($row.path) }
+    $estimate = $payload + 1MB
+    return [ordered]@{ measurement = 'ESTIMATE_SELECTED_MEMBERS'; members = @($rows); selectedCompressedBytes = $payload; metadataReserveBytes = 1MB; estimatedZipBytes = $estimate; diffCheckExitCode = $Snapshot.DiffCheckExit; status = $(if ($Snapshot.DiffCheckExit -ne 0) { 'BLOCKED' } elseif ($estimate -gt 15MB) { 'NEEDS_EXACT_MEASUREMENT' } else { 'PASS' }); limitation = 'Production snapshot selection; 1MiB metadata reserve is an estimate, not actual ZIP size.' }
 }
 
 function Get-ReviewSnapshot {
@@ -712,6 +728,10 @@ try {
     }
     if (-not $Status -or $TaskId -notmatch '^[A-Z0-9][A-Z0-9-]{0,79}$') { throw 'PARAMETERS_REQUIRED: explicit TaskId and Status required' }
     $snapshot = Get-ReviewSnapshot $Root $BaseSha $HeadSha $SchemaVersion $TaskId ($SchemaVersion -eq 3)
+    if ($MemberPlan) {
+        Write-Output ((Get-ReviewMemberPlan $snapshot) | ConvertTo-Json -Depth 8 -Compress)
+        exit 0
+    }
     $localValidation = $SchemaVersion -eq 3 -and $ValidationSource -ceq 'LOCAL'
     if ($localValidation -and ($CiRunId -or $CiRunUrl -or $CiCommit -or $CiConclusion -or -not $EvidencePath)) { throw 'LOCAL_EVIDENCE: local V3 requires committed EvidencePath and no remote CI override' }
     $runtimeCi = $null
@@ -777,6 +797,21 @@ try {
     $members.Add('REVIEW_SUMMARY.md', $script:utf8.GetBytes($summary))
     $lines = foreach ($name in @($members.Keys | Sort-Object -CaseSensitive)) { Assert-ReviewPath $name; Assert-ReviewContent $members[$name] 'generated member'; (Get-ReviewHash $members[$name]) + '  ' + $name }
     $members.Add('SHA256SUMS.txt', $script:utf8.GetBytes(($lines -join "`n") + "`n"))
+    if ($MeasureOnly) {
+        # 精确候选只写内存，全部正式metadata/扫描已完成，不生成中间ZIP。
+        $memory = [IO.MemoryStream]::new()
+        $measure = [IO.Compression.ZipArchive]::new($memory, [IO.Compression.ZipArchiveMode]::Create, $true)
+        try {
+            foreach ($name in @($members.Keys | Sort-Object -CaseSensitive)) {
+                $entry = $measure.CreateEntry($name, [IO.Compression.CompressionLevel]::Optimal)
+                $stream = $entry.Open()
+                try { $stream.Write($members[$name], 0, $members[$name].Length) } finally { $stream.Dispose() }
+            }
+        } finally { $measure.Dispose() }
+        $size = $memory.Length; $memory.Dispose()
+        Write-Output ([ordered]@{ measurement = 'EXACT_CANDIDATE'; sizeBytes = $size; limitation = 'Exact in-memory candidate only; subsequent package timestamps and ignored inventory metadata can differ, so final actual 15MiB enforcement remains mandatory.'; members = @($members.Keys | Sort-Object -CaseSensitive); status = $(if ($size -gt 15MB) { 'BLOCKED' } else { 'PASS' }) } | ConvertTo-Json -Depth 8 -Compress)
+        exit $(if ($size -gt 15MB) { 1 } else { 0 })
+    }
     $outputDirectory = Join-Path $Root 'artifacts/reviews'
     foreach ($candidate in @((Join-Path $Root 'artifacts'), $outputDirectory)) {
         if ((Test-Path -LiteralPath $candidate) -and ((Get-Item -LiteralPath $candidate -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'UNSAFE_OUTPUT: linked output directory rejected before creating children' }

@@ -388,29 +388,27 @@ def package_budget(root, base, head, task):
     if not re.fullmatch('[A-Z0-9][A-Z0-9-]{1,79}',task): raise ValueError('TASK_INVALID')
     for ref in (base,head):
         if not re.fullmatch('[0-9a-f]{40}',ref): raise ValueError('FULL_COMMIT_REQUIRED')
-    subprocess.run(['git','merge-base','--is-ancestor',base,head],cwd=root,check=True)
-    records=git(root,'ls-tree','-r','-z',head).split(b'\0')
-    counts={'source':0,'currentEvidence':0};sizes=dict(counts);compressed=dict(counts)
-    for entry in records:
-        if not entry: continue
-        metadata,name=entry.split(b'\t',1);mode,kind,oid=metadata.decode().split();path=name.decode()
-        if kind!='blob' or mode not in ('100644','100755'): raise ValueError('PACKAGE_SPECIAL_PATH: '+path)
-        if path.startswith('docs/evidence/') and not path.startswith('docs/evidence/'+task+'/'): continue
-        category='currentEvidence' if path.startswith('docs/evidence/') else 'source'
-        data=git(root,'cat-file','blob',oid)
-        sizes[category]+=len(data);compressed[category]+=len(zlib.compress(data))+len(name)*2+256;counts[category]+=1
-    patch=git(root,'diff','--binary',base,head)
-    diffcheck=subprocess.run(['git','diff','--check',base,head],cwd=root,capture_output=True)
-    estimate=sum(compressed.values())+len(zlib.compress(patch))+1024*1024
-    return dict(status='PASS' if estimate<=15*1024*1024 and diffcheck.returncode==0 else 'BLOCKED',
-        base=base,head=head,taskId=task,counts=counts,rawBytes=sizes,compressedEstimateBytes=compressed,
-        estimatedZipBytes=estimate,explainComposition=estimate>10*1024*1024,diffCheckExitCode=diffcheck.returncode,
-        argvPolicy='fixed small argv; blob IDs read individually; final packer retains exact safety checks',
-        limitation='Estimate includes 1MiB metadata reserve; final V3 and independent VerifyOnly remain required')
+    result=subprocess.run(['pwsh','-NoProfile','-File',str(root/'scripts/create-review-package.ps1'),
+                           '-Root',str(root),'-BaseSha',base,'-HeadSha',head,'-TaskId',task,
+                           '-Status','NOT_RUN','-MemberPlan'],cwd=root,capture_output=True,timeout=180)
+    if result.returncode: raise ValueError('PACKAGE_MEMBER_PLAN_REJECTED: '+result.stderr.decode(errors='replace')[-1000:])
+    plan=json.loads(result.stdout)
+    plan.update(base=base,head=head,taskId=task,explainComposition=plan['estimatedZipBytes']>10*1024*1024,
+                selector='production Get-ReviewSnapshot')
+    return plan
 
 
 def package_check(task, base, head, evidence):
     result=package_budget(ROOT,base,head,task)
+    if result['status']=='NEEDS_EXACT_MEASUREMENT' and evidence:
+        measured=subprocess.run(['pwsh','-NoProfile','-File','scripts/create-review-package.ps1','-Root',str(ROOT),
+            '-BaseSha',base,'-HeadSha',head,'-TaskId',task,'-Status','PASS','-EvidencePath',str(evidence),'-MeasureOnly'],
+            cwd=ROOT,capture_output=True,timeout=180)
+        if measured.returncode: result['status']='BLOCKED'
+        else:
+            result['exactCandidate']=json.loads(measured.stdout)
+            result['status']=result['exactCandidate']['status']
+
     paths=set(git(ROOT,'ls-tree','-r','--name-only','-z',head).decode().split('\0'))
     paths.update(git(ROOT,'diff','--name-only','-z','--no-renames',base,head,'--').decode().split('\0'))
     validate_package_paths(ROOT,sorted(paths-{''}))

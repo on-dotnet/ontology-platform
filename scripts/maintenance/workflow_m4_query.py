@@ -292,6 +292,23 @@ def runtime_api_pause():
     return dict(status=record['status'],commandId=record['commandId'])
 
 
+def runtime_source_inputs():
+    """完整实际API项目闭包含新增源、内容、嵌入合同及祖先构建配置。"""
+    from workflow_m4_query_inputs import project_paths
+    all_inputs=qualification_inputs()
+    paths=project_paths(ROOT,'backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj',set(all_inputs))
+    return {path:all_inputs[path] for path in sorted(paths) if not path.endswith('.md')}
+
+
+def runtime_environment_identity():
+    """现有核验缓存和实际dotnet宿主内容绑定平台，不下载或升级工具。"""
+    from workflow_execution import sha
+    home,_=prepared()
+    return dict(cacheKey=home.name,platform=platform.system(),architecture=platform.machine(),osVersion=platform.mac_ver()[0],
+                dotnetSha256=sha(Path('/usr/local/share/dotnet/dotnet').read_bytes()),
+                sdkCompilerSha256=sha(Path('/usr/local/share/dotnet/sdk/10.0.402/Roslyn/bincore/csc.dll').read_bytes()))
+
+
 def runtime_api_rebuild():
     """本任务API停止后离线构建，将前后相同的源文件集合与实际程序集绑定。"""
     import subprocess
@@ -301,17 +318,15 @@ def runtime_api_rebuild():
     cid=paused['previous']['process']['id']
     if subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{.State.Running}}',cid],timeout=15).strip()!=b'false':
         raise ValueError('QUERY_API_MUST_BE_STOPPED_BEFORE_BUILD')
-    def inputs():
-        return {str(path.relative_to(ROOT)):sha(path.read_bytes()) for pattern in ['backend/src/**/*.cs','backend/src/**/*.csproj','backend/src/**/packages.lock.json','docs/contracts/g4-connections.openapi.json']
-                for path in sorted(ROOT.glob(pattern)) if 'obj' not in path.parts and 'bin' not in path.parts}
+    inputs=runtime_source_inputs
     before=inputs()
     result=runtime_command('query-api-bound-build',['/usr/local/share/dotnet/dotnet','build','backend/src/Hosts/OntologyPlatform.Api',
         '--no-restore','--disable-build-servers','-m:1','-v:q'],timeout=180,offline=True)
     if before!=inputs(): raise ValueError('QUERY_API_SOURCE_CHANGED_DURING_BUILD')
-    original=json.loads((output/'runtime-build-binding.json').read_text())
-    binaries={path:sha((ROOT/path).read_bytes()) for path in original}
-    for path in (ROOT/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0').iterdir():
-        if path.is_file(): binaries[str(path.relative_to(ROOT))]=sha(path.read_bytes())
+    from workflow_m4_query_runtime import freeze,verify
+    snapshot=freeze(ROOT,ROOT/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0',output/'runtime-snapshots',before,result.receipt['commandId'],runtime_environment_identity())
+    binaries=verify(ROOT,snapshot)
+    (output/'runtime-snapshot-current.json').write_text(json.dumps(snapshot,indent=2)+'\n')
     record=dict(taskId=TASK,runId=RUN,commandId=result.receipt['commandId'],inputs=before,binaries=binaries,inputHash=sha(encoded(before)))
     (output/('api-build-'+result.receipt['commandId']+'.json')).write_text(json.dumps(record,indent=2)+'\n')
     (output/'runtime-api-build.json').write_text(json.dumps(record,indent=2)+'\n')
@@ -320,29 +335,42 @@ def runtime_api_rebuild():
 
 
 def runtime_api_resume():
-    """只恢复同一准确容器，启动后记录新的进程身份并核验当前构建绑定。"""
+    """只替换准确且已停止的M4双API挂载；持久配置、网络和keyring保持原值。"""
     import subprocess
     import uuid
+    from workflow_m4_query_runtime import verify,demand_mount
     from workflow_execution import sha
     output=ROOT/'artifacts/workflow'/TASK/RUN
-    built=json.loads((output/'runtime-api-build.json').read_text())
-    for group in ['inputs','binaries']:
-        if any(not (ROOT/path).is_file() or sha((ROOT/path).read_bytes())!=digest for path,digest in built[group].items()):
-            raise ValueError('QUERY_API_BUILD_DRIFT')
-    paused=json.loads((output/'runtime-api-paused.json').read_text())
-    cid=paused['previous']['process']['id'];tag='api-resume-'+uuid.uuid4().hex[:8]
+    snapshot=json.loads((output/'runtime-snapshot-current.json').read_text());verify(ROOT,snapshot)
+    if any(not (ROOT/path).is_file() or sha((ROOT/path).read_bytes())!=digest for path,digest in snapshot['inputs'].items()):
+        raise ValueError('QUERY_API_SOURCE_BUILD_DRIFT')
+    tag='snapshot-switch-'+uuid.uuid4().hex[:8]
     before=runtime_snapshot(tag+'-before')
-    target=[row for row in before['resources'] if row['id']==cid and row.get('service')=='api']
-    if len(target)!=1 or target[0]['running']: raise ValueError('QUERY_API_RESUME_BOUNDARY')
-    result=runtime_command(tag,['docker','--context','desktop-linux','start',cid])
+    identities={'api':json.loads((output/'runtime-api-start.json').read_text())['id'],
+                'api-secondary':json.loads((output/'runtime-secondary-api.json').read_text())['process']['id']}
+    if any(len([row for row in before['resources'] if row['id']==cid and row.get('service')==service and not row.get('running')])!=1 for service,cid in identities.items()):
+        raise ValueError('QUERY_API_SWITCH_STOP_REQUIRED')
+    path=output/'runtime-compose.json';spec=json.loads(path.read_text())
+    # 保存旧配方只在ignored目录中，不输出私有配置或复制keyring。
+    (output/(tag+'-compose-before.json')).write_text(json.dumps(spec,indent=2)+'\n')
+    for service in identities:
+        mounts=spec['services'][service]['volumes']
+        if len([value for value in mounts if value.endswith(':/app:ro')])!=1: raise ValueError('QUERY_API_APP_MOUNT_REQUIRED')
+        spec['services'][service]['volumes']=[str(ROOT/snapshot['directory'])+':/app:ro' if value.endswith(':/app:ro') else value for value in mounts]
+    path.write_text(json.dumps(spec,indent=2)+'\n')
+    result=runtime_command(tag,['docker','--context','desktop-linux','compose','-f',str(path),'up','-d','--no-deps','--no-build','--pull','never',*identities],timeout=120)
     after=runtime_snapshot(tag+'-after')
-    if not any(row['id']==cid and row.get('running') for row in after['resources']): raise ValueError('QUERY_API_RESUME_POSTCHECK')
-    process=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format',
-        '{"id":{{json .Id}},"startedAt":{{json .State.StartedAt}}}',cid],timeout=15))
-    (output/(tag+'.json')).write_text(json.dumps(dict(process=process,buildCommandId=built['commandId'],commandId=result.receipt['commandId']),indent=2)+'\n')
-    (output/'runtime-api-start.json').write_text(json.dumps(process,indent=2)+'\n')
+    for service in identities:
+        selected=[row for row in after['resources'] if row.get('service')==service and row.get('running')]
+        if len(selected)!=1: raise ValueError('QUERY_API_SWITCH_POSTCHECK')
+        actual=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect',selected[0]['id']],timeout=15))[0]
+        demand_mount(ROOT,snapshot,actual['Mounts'])
+        process=dict(id=actual['Id'],startedAt=actual['State']['StartedAt'])
+        record=process if service=='api' else dict(process=process,taskId=TASK,runId=RUN,commandId=result.receipt['commandId'],decision='KEEP',reason='M4 review')
+        target='runtime-api-start.json' if service=='api' else 'runtime-secondary-api.json'
+        (output/target).write_text(json.dumps(record,indent=2)+'\n')
     runtime_binding()
-    return dict(status='RESUMED_NOT_HEALTH_VERIFIED',commandId=result.receipt['commandId'])
+    return dict(status='SNAPSHOT_STARTED_NOT_HEALTH_VERIFIED',commandId=result.receipt['commandId'],snapshotId=snapshot['snapshotId'])
 
 
 def runtime_persist_query_keyring():
@@ -390,6 +418,9 @@ def runtime_binding():
     from workflow_execution import sha
     output=ROOT/'artifacts/workflow'/TASK/RUN
     binaries=json.loads((output/'runtime-build-binding.json').read_text())
+    from workflow_m4_query_runtime import demand_mount
+    snapshot_path=output/'runtime-snapshot-current.json'
+    snapshot=json.loads(snapshot_path.read_text()) if snapshot_path.exists() else None
     if any(sha((ROOT/path).read_bytes())!=digest for path,digest in binaries.items()): raise ValueError('QUERY_RUNTIME_BINARY_DRIFT')
     started=json.loads((output/'runtime-api-start.json').read_text())
     actual=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format',
@@ -397,6 +428,10 @@ def runtime_binding():
     if actual['id']!=started['id'] or actual['startedAt']!=started['startedAt'] or not actual['running'] \
         or actual['labels'].get('ontology.task-id')!=TASK or actual['labels'].get('ontology.run-id')!=RUN:
         raise ValueError('QUERY_RUNTIME_PROCESS_DRIFT')
+    if snapshot:
+        if snapshot['inputs']!=runtime_source_inputs() or snapshot.get('environment')!=runtime_environment_identity(): raise ValueError('QUERY_RUNTIME_CLOSURE_DRIFT')
+        mounts=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{json .Mounts}}',started['id']],timeout=15))
+        demand_mount(ROOT,snapshot,mounts)
     sources={str(path.relative_to(ROOT)):sha(path.read_bytes()) for path in ROOT.glob('backend/src/**/*.cs') if 'obj' not in path.parts and 'bin' not in path.parts}
     built_path=output/'runtime-api-build.json'
     if built_path.exists():
@@ -411,6 +446,9 @@ def runtime_binding():
         current=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format',
             '{"id":{{json .Id}},"startedAt":{{json .State.StartedAt}},"running":{{json .State.Running}}}',secondary['id']],timeout=15))
         if not current.pop('running') or current!=secondary: raise ValueError('QUERY_SECONDARY_PROCESS_DRIFT')
+        if snapshot:
+            mounts=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{json .Mounts}}',secondary['id']],timeout=15))
+            demand_mount(ROOT,snapshot,mounts)
     return dict(taskId=TASK,runId=RUN,process=started,secondary=secondary,binaries=binaries,sources=sources)
 
 
@@ -538,7 +576,7 @@ def runtime_configure():
 
 def browser_test(mode):
     """唯一当前任务浏览器入口，真实OIDC与API响应，不运行旧M3验收或下载浏览器。"""
-    if mode not in ['provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race','s2-aba','s2-aba-prepare','s2-capacity','s2-connection','s2-inflight','s3-provision','s3','ui-s3','replace-disabled-connection']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
+    if mode not in ['provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race','s2-aba','s2-aba-prepare','s2-capacity','s2-connection','s2-inflight','s3-provision','s3','ui-s3','replace-disabled-connection','numeric-provision','numeric','standard-provision']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
     binding=runtime_binding()
     web=web_binding() if mode in ['ui-s1','ui-s3'] else None
     result=runtime_command('query-browser-'+mode,['/opt/homebrew/Cellar/node@24/24.22.1/bin/node',
@@ -565,8 +603,9 @@ def synthetic_grants(mode):
     if labels.get('ontology.task-id')!=TASK or labels.get('ontology.run-id')!=RUN: raise ValueError('QUERY_GRANT_CONTAINER_OWNER')
     catalog=state['catalog']
     if catalog['connectionId']!=state['connectionId'] or catalog['status']!='READY': raise ValueError('QUERY_GRANT_CATALOG_INVALID')
-    tables=[item for item in catalog['objects'] if item['schema']=='production' and item['name'] in (['assets','readings'] if state.get('s3') else ['assets']) and item['kind']=='TABLE']
-    if len(tables)!=(2 if state.get('s3') else 1) or not any(item['name']=='assets' and len(item['fields'])==6 for item in tables): raise ValueError('QUERY_GRANT_SOURCE_FIELDS')
+    table_names=['numeric_assets','numeric_readings'] if state.get('numeric') else (['assets','readings'] if state.get('s3') else ['assets'])
+    tables=[item for item in catalog['objects'] if item['schema']=='production' and item['name'] in table_names and item['kind']=='TABLE']
+    if len(tables)!=len(table_names) or not any(item['name']==table_names[0] and len(item['fields'])==(7 if state.get('numeric') else 6) for item in tables): raise ValueError('QUERY_GRANT_SOURCE_FIELDS')
     objects=['production/'+table['name'] for table in tables]
     fields=['production/'+table['name']+'/'+str(item['ordinal'])+'/'+urllib.parse.quote(item['name'],safe='') for table in tables for item in table['fields']]
     def literal(value):
@@ -596,6 +635,32 @@ def synthetic_grants(mode):
     return dict(taskId=TASK,mode=mode,status='EXPLICIT_SYNTHETIC_GRANTS_CREATED',count=len(ids),commandId=result.receipt['commandId'])
 
 
+def numeric_source_fixture():
+    """只创建本轮两张新合成表，旧业务夹具和旧查询保持；重复调用拒绝覆盖。"""
+    import subprocess
+    from workflow_execution import run,sha
+    output=ROOT/'artifacts/workflow'/TASK/RUN
+    resource=json.loads((output/'source-resources.json').read_text());cid=resource['resources'][0]['id']
+    labels=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{json .Config.Labels}}',cid],timeout=15))
+    if labels.get('ontology.task-id')!=TASK or labels.get('ontology.run-id')!=RUN: raise ValueError('QUERY_NUMERIC_SOURCE_OWNER')
+    sql=b"""BEGIN; SET LOCAL statement_timeout='5s';
+CREATE TABLE production.numeric_assets (LIKE production.assets INCLUDING ALL);
+ALTER TABLE production.numeric_assets ADD COLUMN numeric_key numeric(10,2) NOT NULL DEFAULT 1.00;
+INSERT INTO production.numeric_assets SELECT a.*,1.00 FROM production.assets a;
+CREATE TABLE production.numeric_readings (LIKE production.readings INCLUDING ALL);
+ALTER TABLE production.numeric_readings ADD COLUMN numeric_key numeric(12,3) NOT NULL DEFAULT 1.000;
+INSERT INTO production.numeric_readings SELECT organization_id,site_id,'numeric-target-'||n,asset_id,valid_from,valid_to,observed_at,temperature,unit_code,attributes,CASE WHEN n=3 THEN 1.010 ELSE 1.000 END FROM (SELECT * FROM production.readings WHERE site_id='site-a' ORDER BY reading_id LIMIT 1) r CROSS JOIN generate_series(1,3) n;
+GRANT SELECT ON production.numeric_assets,production.numeric_readings TO fixture_reader;
+COMMIT;
+SELECT json_build_object('rootType','numeric(10,2)','targetType','numeric(12,3)','matchingTargets',(SELECT json_agg(r.reading_id ORDER BY r.reading_id) FROM production.numeric_assets a JOIN production.numeric_readings r ON a.numeric_key=r.numeric_key AND a.organization_id=r.organization_id AND a.site_id=r.site_id WHERE a.asset_id='asset-1' AND a.site_id='site-a'));
+"""
+    result=run(['docker','--context','desktop-linux','exec','-i',cid,'psql','-U','postgres','-d','fixture','-v','ON_ERROR_STOP=1','-qAt'],ROOT,task=TASK,run_id='review-fix-01',stage='numeric-source-fixture',stdin=sql,input_key=sha(sql),timeout=20)
+    if result.returncode: raise ValueError('QUERY_NUMERIC_FIXTURE_FAILED')
+    actual=json.loads(result.stdout.decode().strip().splitlines()[-1])
+    if actual['matchingTargets']!=['numeric-target-1','numeric-target-2']: raise ValueError('QUERY_NUMERIC_SOURCE_EXPECTATION')
+    return actual
+
+
 def source_scan_snapshot():
     """只观察本任务assets业务表累计扫描，不重置统计或读取业务行。"""
     import subprocess
@@ -605,12 +670,12 @@ def source_scan_snapshot():
     container=record['resources'][0]['id'];prefix=['docker','--context','desktop-linux']
     labels=json.loads(subprocess.check_output([*prefix,'inspect','--format','{{json .Config.Labels}}',container],timeout=15))
     if labels.get('ontology.task-id')!=TASK or labels.get('ontology.run-id')!=RUN: raise ValueError('QUERY_STATS_CONTAINER_OWNER')
-    sql=b'''SELECT json_build_object('database',current_database(),'table','production.assets','seqScan',seq_scan,'idxScan',coalesce(idx_scan,0),'observedAtUtc',clock_timestamp()) FROM pg_stat_user_tables WHERE schemaname='production' AND relname='assets';'''
+    sql=b'''SELECT json_build_object('database',current_database(),'table','production.query-fixtures','seqScan',sum(seq_scan),'idxScan',coalesce(sum(idx_scan),0),'observedAtUtc',clock_timestamp()) FROM pg_stat_user_tables WHERE schemaname='production' AND relname IN ('assets','readings','numeric_assets','numeric_readings');'''
     result=run([*prefix,'exec','-i',container,'psql','-U','postgres','-d','fixture','-v','ON_ERROR_STOP=1','-qAt'],ROOT,
         task=TASK,run_id=RUN,stage='query-source-scan-observe',stdin=sql,input_key=sha(sql+container.encode()),timeout=15)
     if result.returncode: raise ValueError('QUERY_STATS_READ_FAILED')
     value=json.loads(result.stdout)
-    if value['database']!='fixture' or value['table']!='production.assets': raise ValueError('QUERY_STATS_SCOPE_INVALID')
+    if value['database']!='fixture' or value['table']!='production.query-fixtures': raise ValueError('QUERY_STATS_SCOPE_INVALID')
     return dict(taskId=TASK,runId=RUN,containerId=container,commandId=result.receipt['commandId'],**value)
 
 
@@ -822,10 +887,15 @@ def contract_build(project="OntologyPlatform.G2ContractTests"):
         if path.exists():
             record=json.loads(path.read_text());process=record.get('process',record)
             running=subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{.State.Running}}',process['id']],timeout=15).strip()
-            if running==b'true': raise ValueError('QUERY_API_STOP_REQUIRED_BEFORE_REFERENCE_BUILD')
+            if running==b'true':
+                from workflow_m4_query_runtime import demand_mount
+                snapshot_path=output/'runtime-snapshot-current.json'
+                if not snapshot_path.is_file(): raise ValueError('QUERY_API_STOP_REQUIRED_BEFORE_REFERENCE_BUILD')
+                mounts=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{json .Mounts}}',process['id']],timeout=15))
+                demand_mount(ROOT,json.loads(snapshot_path.read_text()),mounts)
     _, env = prepared()
-    inputs = {path:digest for path,digest in qualification_inputs().items()
-              if path.startswith(('backend/', 'docs/contracts/')) or '/' not in path}
+    from workflow_m4_query_inputs import build_inputs
+    inputs = build_inputs(ROOT,project,qualification_inputs())
     result = run(['/usr/bin/sandbox-exec', '-p', '(version 1) (allow default) (deny network*)',
                   '/usr/local/share/dotnet/dotnet', 'build', 'backend/tests/' + project,
                   '--no-restore', '--disable-build-servers', '-m:1', '-v:q'], ROOT,
@@ -1102,12 +1172,14 @@ def test_database_control(container, suffix, create):
     def inspect():
         result = run([*prefix, 'exec', '-i', container, 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-qAt'],
                      ROOT, task=TASK, run_id=RUN, stage='query-test-database-inspect',
-                     stdin=("SELECT coalesce(shobj_description(oid,'pg_database'),'') FROM pg_database WHERE datname='" + name + "';").encode(),
+                     stdin=("SELECT json_build_object('exists',count(*)=1,'owner',max(shobj_description(oid,'pg_database'))) FROM pg_database WHERE datname='" + name + "';").encode(),
                      input_key=sha((container + name + 'inspect').encode()), timeout=10)
         if result.returncode: raise ValueError('QUERY_TEST_DATABASE_INSPECT_FAILED')
-        return result.stdout.decode().strip()
+        value=json.loads(result.stdout)
+        if set(value)!={'exists','owner'} or type(value['exists']) is not bool: raise ValueError('QUERY_TEST_DATABASE_METADATA_INVALID')
+        return value
     before = inspect()
-    if (create and before) or (not create and before != owner):
+    if (create and before['exists']) or (not create and (not before['exists'] or before['owner'] != owner)):
         raise ValueError('QUERY_TEST_DATABASE_OWNER_MISMATCH')
     sql = ('CREATE DATABASE "' + name + '"; COMMENT ON DATABASE "' + name + '" IS \'' + owner + "';") if create else ('DROP DATABASE "' + name + '";')
     intent = dict(taskId=TASK, runId=RUN, containerId=container, database=name, before=before, status='CREATING' if create else 'REMOVING')
@@ -1120,9 +1192,9 @@ def test_database_control(container, suffix, create):
         after = inspect()
         receipt = dict(taskId=TASK, runId=RUN, containerId=container, database=name, before=before, after=after,
                        commandId=result.receipt['commandId'], exitCode=result.returncode,
-                       status=('CREATED' if create else 'REMOVED') if result.returncode == 0 and after == (owner if create else '') else 'KEEP_UNVERIFIED')
+                       status=('CREATED' if create else 'REMOVED') if result.returncode == 0 and after == (dict(exists=True,owner=owner) if create else dict(exists=False,owner=None)) else 'KEEP_UNVERIFIED')
         (ROOT/'artifacts/workflow'/TASK/RUN/(name+('-create.json' if create else '-remove.json'))).write_text(json.dumps(receipt, indent=2)+'\n')
-        if result.returncode or after != (owner if create else ''):
+        if result.returncode or after != (dict(exists=True,owner=owner) if create else dict(exists=False,owner=None)):
             raise ValueError('QUERY_TEST_DATABASE_POSTCONDITION_FAILED')
     except Exception:
         intent.update(status='KEEP_UNVERIFIED', reason='database_command_or_postcondition_failed',
@@ -1144,7 +1216,7 @@ def persistence_test(source=False):
         raise ValueError('QUERY_PLATFORM_NOT_READY')
     prefix = ['docker', '--context', 'desktop-linux']
     current = json.loads(subprocess.check_output([*prefix, 'inspect', record['resources'][0]['id']], timeout=10))[0]
-    if current['Config']['Labels'].get('ontology.task-id') != TASK or current['State']['Health']['Status'] != 'healthy':
+    if current['Config']['Labels'].get('ontology.task-id') != TASK or current['Config']['Labels'].get('ontology.run-id') != RUN or current['State']['Health']['Status'] != 'healthy':
         raise ValueError('QUERY_PLATFORM_IDENTITY_DRIFT')
     image = 'mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55'
     inspected = json.loads(subprocess.check_output([*prefix, 'image', 'inspect', image], timeout=10))[0]
@@ -1181,7 +1253,7 @@ def persistence_test(source=False):
                '--mount', 'type=bind,src='+str(private/'server.crt')+',dst=/run/query-ca.crt,readonly',
                *(['--mount','type=bind,src='+str(source_private/'reader-password')+',dst=/run/query-source-password,readonly',
                   '--mount','type=bind,src='+str(source_private/'server.crt')+',dst=/run/query-source-ca.crt,readonly'] if source else []),
-               '--workdir', '/app', image, 'dotnet', project+'.dll',
+               '-e', 'G4_QUERY_TEST_OWNER='+TASK+':'+RUN+':'+suffix, '--workdir', '/app', image, 'dotnet', project+'.dll',
                '--filter', 'FullyQualifiedName~G4QuerySourceIntegrationTests' if source else 'FullyQualifiedName~G4QueryPersistenceTests|FullyQualifiedName~G4QueryRaceTests', '--timeout', '30s', '--zero-tests-policy', 'strict']
     result = None
     runtime_before = runtime_query_inventory(record['resources'][0]['id']) if not source else None
@@ -1304,23 +1376,18 @@ def runtime_agent_test(binding_race=False, aba_inflight=False):
             path.write_text(json.dumps(lifecycle,indent=2)+'\n')
 
 
-def qualification_inputs():
+def qualification_inputs(name=None):
     """资格只绑定当前产品、测试与执行脚本；证据文档追加不会改变被测输入。"""
     from workflow_execution import sha
     import workflow
     paths = set(workflow.git(ROOT, 'ls-files', '--cached', '--others', '--exclude-standard', '-z').decode().split('\0'))-{''}
-    return {path: sha((ROOT/path).read_bytes()) if (ROOT/path).is_file() else 'DELETED'
+    inputs = {path: sha((ROOT/path).read_bytes()) if (ROOT/path).is_file() else 'DELETED'
             for path in sorted(paths) if not path.startswith('docs/') or path.startswith('docs/contracts/')
             if path not in ['AGENTS.md', 'PLANS.md']}
+    if name is None: return inputs
+    from workflow_m4_query_inputs import select
+    return select(ROOT,name,inputs)
 
-
-
-def demand_build_inputs(build, inputs):
-    """构建闭包必须完整相等；旧凭据漏掉嵌入合同也不能被新资格包装接受。"""
-    expected = {path:digest for path,digest in inputs.items()
-                if path.startswith(('backend/', 'docs/contracts/')) or '/' not in path}
-    if not expected or build.get('inputs') != expected:
-        raise ValueError('QUERY_BUILD_INPUT_CLOSURE')
 
 
 def attest(name):
@@ -1338,7 +1405,7 @@ def attest(name):
         'maf-binding': lambda: runtime_agent_test(True),
         'aba-inflight': lambda: runtime_agent_test(aba_inflight=True),
         **{mode: (lambda mode=mode: browser_test(mode)) for mode in
-           ['s1', 's1-reopen', 's2-basic', 's2-runtime', 's2-race', 's2-aba', 's2-capacity', 's2-inflight', 's2-connection', 's3', 'ui-s1', 'ui-s3']},
+           ['numeric', 's1', 's1-reopen', 's2-basic', 's2-runtime', 's2-race', 's2-aba', 's2-capacity', 's2-inflight', 's2-connection', 's3', 'ui-s1', 'ui-s3']},
         **{'web-'+stage: (lambda stage=stage: web_check(stage)) for stage in ['typecheck', 'lint', 'unit']},
     }
     if name not in actions: raise ValueError('QUERY_ATTEST_ACTION_INVALID')
@@ -1346,23 +1413,23 @@ def attest(name):
     commands = output.parent/'commands'/RUN
     before = set(commands.glob('*/receipt.json'))
     reports = set(output.glob('browser-*.json'))
-    inputs = qualification_inputs()
+    inputs = qualification_inputs(name)
     import workflow
     keys = {gate:workflow.input_key(ROOT, gate) for gate in ['environment','contract','backend','web','interaction']}
-    row = dict(taskId=TASK, runId=RUN, name=name, inputs=inputs, inputKeys=keys, status='FAIL')
+    row = dict(taskId=TASK, runId=RUN, name=name, inputPolicyVersion=2, allInputs=qualification_inputs(), inputs=inputs, inputKeys=keys, status='FAIL')
     projects = {'contract':'G2ContractTests','query-unit':'QueryTests','source-unit':'ConnectionsTests',
                 'security-unit':'SecurityTests','agent-unit':'AgentTests','persistence':'QueryTests',
                 'source':'ConnectionsTests','maf-binding':'AgentTests','aba-inflight':'AgentTests'}
     try:
         if name in projects:
             build = json.loads((output/('build-binding-OntologyPlatform.'+projects[name]+'.json')).read_text())
-            demand_build_inputs(build, inputs)
+            demand_build_inputs(build, qualification_inputs())
             if not build['binaries'] or any(sha((ROOT/path).read_bytes()) != digest for group in ['inputs','binaries'] for path,digest in build[group].items()):
                 raise ValueError('QUERY_ATTEST_BUILD_DRIFT')
             row['build'] = build
         code = actions[name]()
         row['exitCode'] = code
-        row['inputsUnchanged'] = inputs == qualification_inputs() and all(workflow.input_key(ROOT, gate) == key for gate,key in keys.items())
+        row['inputsUnchanged'] = inputs == qualification_inputs(name)
         if code == 0 and row['inputsUnchanged']: row['status'] = 'PASS'
         return code if code else (0 if row['status'] == 'PASS' else 65)
     finally:
@@ -1374,124 +1441,7 @@ def attest(name):
 
 
 
-def demand_aba_original(raw, stage):
-    """独立重开真实在途ABA原件，单纯MAF测试通过不能充当本项验收。"""
-    import re
-    if stage != 'query-real-aba-inflight-runtime': raise ValueError('QUERY_ABA_STAGE_INVALID')
-    reports = []
-    for line in raw.decode(errors='replace').splitlines():
-        try: value = json.loads(line)
-        except json.JSONDecodeError: continue
-        if isinstance(value, dict) and value.get('case') == 'AC-05_INFLIGHT_ABA': reports.append(value)
-    if len(reports) != 1: raise ValueError('QUERY_ABA_ORIGINAL_REQUIRED')
-    row = reports[0]
-    if row.get('taskId') != TASK or row.get('status') != 'PASS' or row.get('abaCompleted') is not True \
-        or row.get('errorStatus') != 409 or row.get('errorCode') != 'query_binding_stale' \
-        or not re.fullmatch(r'query-[0-9a-f]{32}', row.get('queryId', '')) or row.get('executionStatus') not in ['RUNNING','FAILED','CANCELLED'] \
-        or row.get('resultHash', 'missing') is not None \
-        or any(row.get(key) != 0 for key in ['ciphertextBytes','resultSize','committedReadReceipts','successfulQueryAudits']) \
-        or not 0 < row.get('elapsedMs', 0) < 5000:
-        raise ValueError('QUERY_ABA_ORIGINAL_INVALID')
-    captured, b, a = (row.get(key, {}) for key in ['capturedA','activatedB','activatedA'])
-    if any(not isinstance(item, dict) or not re.fullmatch(r'activation-[0-9a-f]{32}', item.get('activationId', ''))
-           or not re.fullmatch(r'release-[0-9a-f]{32}', item.get('mappingReleaseId', '')) for item in [captured,b,a]) \
-        or not isinstance(captured.get('activationRevision'), str) or not re.fullmatch(r'[1-9][0-9]*', captured['activationRevision']) \
-        or any(type(item.get('activationRevision')) is not int or item['activationRevision'] <= 0 for item in [b,a]) \
-        or captured.get('mappingReleaseId') != a.get('mappingReleaseId') \
-        or captured.get('mappingReleaseId') == b.get('mappingReleaseId') \
-        or len({captured.get('activationId'),b.get('activationId'),a.get('activationId')}) != 3 \
-        or not int(captured.get('activationRevision', 0)) < b.get('activationRevision', 0) < a.get('activationRevision', 0):
-        raise ValueError('QUERY_ABA_IDENTITY_INVALID')
-    return row
-
-
-def demand_qualification(row, name, inputs):
-    """先拒绝外任务、失败、漂移与零原件，随后才打开实际命令报告。"""
-    if row.get('taskId') != TASK or row.get('runId') != RUN or row.get('name') != name \
-        or row.get('status') != 'PASS' or row.get('exitCode') != 0 or row.get('inputsUnchanged') is not True \
-        or row.get('inputs') != inputs or not row.get('commands'):
-        raise ValueError('QUERY_QUALIFICATION_INVALID')
-
-
-def qualify(gate, input_key):
-    """当前输入重开实际非零测试和浏览器原件；缺适配证据保持阻断。"""
-    import workflow
-    from workflow_execution import ordinary, sha
-    from workflow_m2_evidence import mtp
-    if gate not in ['environment', 'contract', 'backend', 'web', 'interaction'] or workflow.input_key(ROOT, gate) != input_key:
-        raise ValueError('QUERY_QUALIFICATION_GATE_INVALID')
-    prepared()
-    structural(ROOT, TASK)
-    required = {
-        'environment': [], 'contract': ['contract'],
-        'backend': ['query-unit', 'source-unit', 'security-unit', 'agent-unit', 'persistence', 'source', 'maf-binding', 'aba-inflight'],
-        'web': ['web-typecheck', 'web-lint', 'web-unit', 'ui-s1', 'ui-s3'],
-        'interaction': ['s1', 's1-reopen', 's2-basic', 's2-runtime', 's2-race', 's2-aba', 's2-capacity', 's2-inflight', 's2-connection', 's3', 'aba-inflight'],
-    }[gate]
-    output = ROOT/'artifacts/workflow'/TASK/RUN
-    inputs = qualification_inputs()
-    originals = []
-    count = 1 if gate == 'environment' else 0
-    def read(reference):
-        path = ordinary(ROOT/reference['path'])
-        if not path.is_relative_to(ROOT/'artifacts/workflow'/TASK): raise ValueError('QUERY_QUALIFICATION_PATH')
-        raw = path.read_bytes()
-        if sha(raw) != reference['sha256']: raise ValueError('QUERY_QUALIFICATION_HASH')
-        originals.append(reference)
-        return raw
-    for name in required:
-        candidates = sorted((path for path in output.glob('qualification-'+name+'-*.json')
-                             if json.loads(path.read_text()).get('name') == name), key=lambda path: path.stat().st_mtime)
-        if not candidates: raise ValueError('QUERY_QUALIFICATION_MISSING_'+name)
-        path = candidates[-1]
-        row = json.loads(read(dict(path=str(path.relative_to(ROOT)), sha256=sha(path.read_bytes()))))
-        demand_qualification(row, name, inputs)
-        if row.get('inputKeys', {}).get(gate) != input_key: raise ValueError('QUERY_QUALIFICATION_GATE_DRIFT')
-        test_count = 0
-        aba_originals = 0
-        if name in ['contract','query-unit','source-unit','security-unit','agent-unit','persistence','source','maf-binding','aba-inflight'] and 'build' not in row:
-            raise ValueError('QUERY_QUALIFICATION_BUILD_MISSING')
-        if 'build' in row:
-            from workflow_execution import encoded
-            build = row['build']; receipt = build['receipt']
-            demand_build_inputs(build, inputs)
-            original = ROOT/'artifacts/workflow'/TASK/'commands'/RUN/receipt['commandId']/'receipt.json'
-            if json.loads(original.read_text()) != receipt or receipt.get('exitCode') != 0 or receipt.get('stage') != 'query-build-'+build['project'] or receipt.get('inputFingerprint') != sha(encoded(build['inputs'])) or not build['binaries']:
-                raise ValueError('QUERY_QUALIFICATION_BUILD')
-            if any(inputs.get(path) != digest for path,digest in build['inputs'].items()): raise ValueError('QUERY_QUALIFICATION_BUILD_INPUT')
-            read(dict(path=str(original.relative_to(ROOT)),sha256=sha(original.read_bytes())))
-            for stream in ['stdout','stderr']: read(receipt[stream])
-        for reference in row['commands']:
-            command = json.loads(read(reference))
-            if command.get('taskId') != TASK or command.get('runId') != RUN or command.get('exitCode') != 0 or command.get('classification') != 'SUCCESS' or not command.get('started'):
-                raise ValueError('QUERY_QUALIFICATION_COMMAND')
-            raw = b''.join(read(command[key]) for key in ['stdout', 'stderr'])
-            if name == 'aba-inflight' and command['stage'] == 'query-real-aba-inflight-runtime':
-                demand_aba_original(raw, command['stage'])
-                aba_originals += 1
-            if command['stage'].startswith(('query-unit-', 'query-contract-tests', 'query-real-')):
-                test_count += mtp(raw, 1)
-        if row['reports']:
-            for reference in row['reports']:
-                report = json.loads(read(reference))
-                if report.get('taskId') != TASK or report.get('runId') != RUN or report.get('mode') != name or report.get('status') != 'PASS' or report.get('inputsUnchanged') is not True or not report.get('http') or not report.get('checks') or any(check.get('status') != 'PASS' for check in report['checks']):
-                    raise ValueError('QUERY_QUALIFICATION_BROWSER')
-                test_count += len(report['checks'])
-        elif name.startswith('web-'):
-            stage = name.removeprefix('web-')
-            rows = [json.loads(path.read_text()) for path in output.glob('web-'+stage+'-*/result.json')]
-            matching = [web for web in rows if any(json.loads(read(ref))['commandId'] == web['commandId'] for ref in row['commands'])]
-            if len(matching) != 1 or matching[0]['exitCode'] != 0: raise ValueError('QUERY_QUALIFICATION_WEB')
-            web = matching[0]
-            if any(sha((ROOT/path).read_bytes()) != digest for path, digest in web['inputs'].items()): raise ValueError('QUERY_QUALIFICATION_WEB_INPUT')
-            if stage == 'unit':
-                from workflow_evidence import machine
-                test_count += machine(read(dict(path=web['report'], sha256=web['reportSha256'])), 'vitest-json')
-            else: test_count += 1
-        if name == 'aba-inflight' and aba_originals != 1: raise ValueError('QUERY_ABA_ORIGINAL_REQUIRED')
-        if test_count <= 0: raise ValueError('QUERY_QUALIFICATION_ZERO_TESTS')
-        count += test_count
-    return dict(taskId=TASK, runId=RUN, gate=gate, status='PASS', executionMode='REUSED', qualificationMode='FRESH', tests=count, skipped=0, originals=originals)
+from workflow_m4_query_evidence import demand_aba_original, demand_build_inputs, demand_qualification, qualify
 
 
 def main():

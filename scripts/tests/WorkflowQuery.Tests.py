@@ -27,7 +27,29 @@ class QueryAdmissionTests(unittest.TestCase):
                    elapsedMs=1500, capturedA=dict(mappingReleaseId='release-'+'a'*32, activationId='activation-'+'a'*32, activationRevision='1'),
                    activatedB=dict(mappingReleaseId='release-'+'b'*32, activationId='activation-'+'b'*32, activationRevision=2),
                    activatedA=dict(mappingReleaseId='release-'+'a'*32, activationId='activation-'+'c'*32, activationRevision=3))
+        # 明确标记合成资格器夹具，时间/顺序不是产品运行证据。
+        row.update(resourceRun=query.RUN, mappingId='mapping-'+'d'*32,
+                   admittedAtUtc='2026-11-15T00:00:00Z', deadlineAtUtc='2026-11-15T00:00:05Z')
+        for part in ['capturedA', 'activatedB', 'activatedA']:
+            row[part]['mappingId'] = row['mappingId']
+        row['activatedB']['previousReleaseId'] = row['capturedA']['mappingReleaseId']
+        row['activatedA']['previousReleaseId'] = row['activatedB']['mappingReleaseId']
+        row['events'] = [dict(phase=phase, sequence=i+1, monotonicMs=100*(i+1),
+                              utc=f'2026-11-15T00:00:00.{i+1}00Z', queryId=row['queryId'], mappingId=row['mappingId'])
+                         for i, phase in enumerate(['SOURCE_READ_COMPLETED', 'B_ACTIVATED', 'A_ACTIVATED', 'COMMIT_REJECTED'])]
         query.demand_aba_original(json.dumps(row).encode(), 'query-real-aba-inflight-runtime')
+        import copy
+        mutations = [lambda r: r.pop('events'), lambda r: r.update(deadlineAtUtc='2026-11-15T00:00:06Z'),
+            lambda r: r['activatedB'].update(mappingId='foreign'), lambda r: r['activatedA'].update(previousReleaseId='foreign'),
+            lambda r: r['events'][2].update(queryId='query-'+'f'*32), lambda r: r['events'][1].update(mappingId='foreign'),
+            lambda r: r['events'][1].update(utc='2026-11-15T00:00:06Z'), lambda r: r['events'][2].update(monotonicMs=50),
+            lambda r: r['events'].reverse(), lambda r: r['events'].pop(), lambda r: r['events'][1].update(sequence=1),
+            lambda r: r['activatedA'].update(activationRevision=2)]
+        for mutation in mutations:
+            changed = copy.deepcopy(row); mutation(changed)
+            with self.subTest(causal=changed), self.assertRaises(ValueError):
+                query.demand_aba_original(json.dumps(changed).encode(), 'query-real-aba-inflight-runtime')
+
         for key in ['executionStatus', 'queryId', 'resultHash', 'capturedA', 'activatedB', 'activatedA']:
             incomplete = {name:value for name,value in row.items() if name != key}
             with self.subTest(missing=key), self.assertRaises(ValueError):
@@ -49,6 +71,83 @@ class QueryAdmissionTests(unittest.TestCase):
                 query.demand_aba_original(json.dumps(dict(row, **{key:value})).encode(), 'query-real-aba-inflight-runtime')
         with self.assertRaisesRegex(ValueError, 'QUERY_ABA_ORIGINAL_REQUIRED'):
             query.demand_aba_original((json.dumps(row)+'\n'+json.dumps(row)).encode(), 'query-real-aba-inflight-runtime')
+
+    def test_aba_causal_fields_cannot_be_omitted(self):
+        # 旧报告有身份与零残留但无因果顺序，不能通过新资格。
+        row = dict(taskId=TASK, case='AC-05_INFLIGHT_ABA', status='PASS', abaCompleted=True,
+                   queryId='query-'+'a'*32, errorStatus=409, errorCode='query_binding_stale', executionStatus='FAILED',
+                   resultHash=None, ciphertextBytes=0, resultSize=0, committedReadReceipts=0, successfulQueryAudits=0,
+                   elapsedMs=1500, capturedA=dict(mappingReleaseId='release-'+'a'*32, activationId='activation-'+'a'*32, activationRevision='1'),
+                   activatedB=dict(mappingReleaseId='release-'+'b'*32, activationId='activation-'+'b'*32, activationRevision=2),
+                   activatedA=dict(mappingReleaseId='release-'+'a'*32, activationId='activation-'+'c'*32, activationRevision=3))
+        with self.assertRaises(ValueError):
+            query.demand_aba_original(json.dumps(row).encode(), 'query-real-aba-inflight-runtime')
+
+    def test_runtime_snapshot_is_complete_immutable_and_mount_bound(self):
+        from workflow_m4_query_runtime import freeze, verify, demand_mount
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); source = root/'bin'; source.mkdir()
+            for name in ['Api.dll', 'Api.deps.json', 'Api.runtimeconfig.json']:
+                (source/name).write_text(name)
+            (source/'nested').mkdir(); (source/'nested/content.json').write_text('original')
+            frozen = freeze(root, source, root/'snapshots', {'source.cs':'hash'}, 'build-command')
+            (source/'nested/content.json').write_text('test-build-overwrite')
+            verify(root, frozen)
+            mount = dict(Destination='/app', Source=str(root/frozen['directory']), RW=False)
+            demand_mount(root, frozen, [mount])
+            with patch('platform.system',return_value='Darwin'): demand_mount(root, frozen, [dict(mount,Source='/host_mnt'+mount['Source'])])
+            with self.assertRaises(ValueError): demand_mount(root, frozen, [mount,dict(mount,Destination='/app/Api.dll')])
+            with self.assertRaises(ValueError): demand_mount(root, frozen, [dict(mount, RW=True)])
+            with self.assertRaises(ValueError): demand_mount(root, frozen, [dict(mount, Source=str(source))])
+            (root/frozen['directory']/'nested/content.json').chmod(0o644)
+            (root/frozen['directory']/'nested/content.json').write_text('drift')
+            with self.assertRaises(ValueError): verify(root, frozen)
+
+    def test_layered_inputs_fail_closed_without_replaying_archive_changes(self):
+        from workflow_m4_query_inputs import qualification_change, select
+        for path, expected in [('docs/evidence/G4-M4-QUERY-001/display.md','ARCHIVE'),
+                ('scripts/maintenance/workflow_m4_query_evidence.py','REPARSE'),
+                ('backend/src/Modules/SemanticQuery/Key.cs','EXECUTE'),
+                ('scripts/maintenance/workflow-m4-query.mjs','EXECUTE'),
+                ('backend/tests/OntologyPlatform.QueryTests/G4QueryTests.cs','EXECUTE'),
+                ('docs/contracts/g4-connections.openapi.json','EXECUTE')]:
+            self.assertEqual(expected,qualification_change({path:'old'},{path:'new'}))
+        with self.assertRaisesRegex(ValueError,'UNCLASSIFIED'): qualification_change({}, {'unknown/new.dat':'new'})
+        inputs=query.qualification_inputs()
+        chosen=select(ROOT,'query-unit',inputs)
+        self.assertIn('backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/G4QueryKeyEquality.cs',chosen)
+        self.assertNotIn('scripts/maintenance/workflow_m4_query_evidence.py',chosen)
+        self.assertNotIn('scripts/create-review-package.ps1',chosen)
+        self.assertIn('experiments/g4-m3-mapping-001/fixture.sql',chosen)
+        changed=dict(inputs); changed['experiments/g4-m3-mapping-001/fixture.sql']='mutation'
+        self.assertNotEqual(chosen,select(ROOT,'query-unit',changed))
+        row=dict(taskId=TASK,runId=query.RUN,name='query-unit',status='PASS',exitCode=0,inputsUnchanged=True,inputs=chosen,allInputs=inputs,commands=[{'path':'original'}])
+        with self.assertRaisesRegex(ValueError,'QUALIFICATION_INVALID'): query.demand_qualification(row,'query-unit',select(ROOT,'query-unit',changed),changed)
+        unknown=dict(inputs,**{'scripts/maintenance/unclassified_new.py':'mutation'})
+        with self.assertRaisesRegex(ValueError,'ENGINEERING_DRIFT'): query.demand_qualification(row,'query-unit',chosen,unknown)
+        parser=dict(inputs,**{'scripts/maintenance/workflow_m4_query_evidence.py':'new-parser'})
+        query.demand_qualification(row,'query-unit',select(ROOT,'query-unit',parser),parser)
+
+        self.assertEqual(chosen,select(ROOT,'query-unit',dict(inputs,**{'docs/development/unrelated-connector.md':'changed'})))
+
+    def test_interpreter_split_preserves_execution_and_rejects_assertion_or_top_level_change(self):
+        from workflow_m4_query_inputs import execution_driver_hash, project_original
+        source="TASK='G4-M4-QUERY-001'\ndef prepared(): return 1\ndef web_check(stage): assert stage=='unit'\ndef qualify(): return 1\n"
+        self.assertEqual(execution_driver_hash(source,'web-unit'),execution_driver_hash(source.replace('def qualify(): return 1','def qualify(): return 2'),'web-unit'))
+        for changed in [source.replace("assert stage=='unit'","assert stage=='other'"),source+"raise RuntimeError()\n"]:
+            self.assertNotEqual(execution_driver_hash(source,'web-unit'),execution_driver_hash(changed,'web-unit'))
+        inputs=query.qualification_inputs();driver=(ROOT/'scripts/maintenance/workflow_m4_query.py').read_text()
+        row=dict(inputs=inputs, taskId=TASK, runId=query.RUN, name='web-unit', inputsUnchanged=True,status='PASS',exitCode=0)
+        project_original(ROOT,row,'web-unit',inputs,driver)
+        for key,value in [('taskId','foreign'),('runId','foreign'),('name','query-unit'),('inputsUnchanged',False)]:
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError,'ORIGINAL_QUALIFICATION_IDENTITY'):
+                project_original(ROOT,dict(row,**{key:value}),'web-unit',inputs,driver)
+        for changed in [source.replace('def qualify():',"def qualify(x=__import__('os').environ.update({'MODE':'Changed'})):"), source.replace('def qualify():','@dangerous\ndef qualify():'), source.replace('def qualify():','def qualify(x: dangerous()):')]:
+            with self.assertRaisesRegex(ValueError,'IMPORT_SIDE_EFFECT'):
+                execution_driver_hash(changed,'web-unit')
+        altered=dict(inputs);altered['apps/web/src/features/semantic/g4-query.test.ts']='changed-assertions'
+        with self.assertRaisesRegex(ValueError,'EXECUTION_CHANGED'): project_original(ROOT,row,'web-unit',altered,driver)
+        with self.assertRaisesRegex(ValueError,'DRIVER_HASH'): project_original(ROOT,row,'web-unit',inputs,driver+'# forged')
 
     def test_build_closure_rejects_old_receipt_missing_embedded_schema(self):
         inputs = {'backend/src/Query.cs': 'source', 'docs/contracts/g4-connections.openapi.json': 'schema',
@@ -78,13 +177,25 @@ class QueryAdmissionTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'QUERY_TEST_DATABASE_ID_INVALID'):
                 query.test_database_name(value)
 
+    def test_database_guard_rejects_existing_unmarked_and_foreign_before_destructive_sql(self):
+        labels = json.dumps({'ontology.task-id':TASK,'ontology.run-id':query.RUN}).encode()
+        for create, owner in [(True,None),(False,None),(False,TASK+':other:0123456789ab')]:
+            inspected=SimpleNamespace(returncode=0,stdout=json.dumps(dict(exists=True,owner=owner)).encode(),receipt={})
+            with patch('subprocess.check_output',return_value=labels),patch('workflow_execution.run',return_value=inspected) as run:
+                with self.assertRaisesRegex(ValueError,'OWNER_MISMATCH'): query.test_database_control('owned','0123456789ab',create)
+                self.assertEqual(1,run.call_count)
+                self.assertTrue(run.call_args.kwargs['stdin'].startswith(b'SELECT'))
+        with patch('subprocess.check_output',return_value=b'{}'),patch('workflow_execution.run') as run:
+            with self.assertRaisesRegex(ValueError,'CONTAINER_OWNER'): query.test_database_control('foreign','0123456789ab',True)
+            run.assert_not_called()
+
     def test_partial_database_creation_has_explicit_keep_record(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             output = root / 'artifacts/workflow' / TASK / query.RUN
             output.mkdir(parents=True)
             labels = json.dumps({'ontology.task-id': TASK, 'ontology.run-id': query.RUN}).encode()
-            inspected = SimpleNamespace(returncode=0, stdout=b'', receipt={'commandId': 'inspection'})
+            inspected = SimpleNamespace(returncode=0, stdout=b'{"exists":false,"owner":null}', receipt={'commandId': 'inspection'})
             with patch.object(query, 'ROOT', root), patch('subprocess.check_output', return_value=labels), patch('workflow_execution.run', side_effect=[inspected, OSError('injected')]):
                 with self.assertRaises(OSError):
                     query.test_database_control('exact-owned-container', '0123456789ab', True)

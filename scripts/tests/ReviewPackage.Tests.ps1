@@ -1224,6 +1224,30 @@ for i in range(53):
             Assert-True ($bad.Exit -ne 0 -and ($bad.Output.Contains('REDUCTION_POLICY') -or $bad.Output.Contains('HEAD_MISMATCH'))) "Rehashed mutation accepted or unrelated failure: $($bad.Output)"
         }
     }
+    Case 'member plan and exact candidate share production V3 bytes without publishing ZIP' {
+        Write-LocalFixture 'docs/evidence/TEST-001/local.json' (@{ evidenceSchemaVersion = 2; validationSource = 'LOCAL'; testedCommit = $script:head; checks = @(@{ name = 'fixture'; command = 'fixture only'; status = 'PASS'; exitCode = 0; output = 'not product evidence' }); ci = @{ status = 'NOT_RUN'; runId = $null; url = $null; commit = $null; conclusion = $null } } | ConvertTo-Json -Depth 6)
+        $script:head = Commit-Fixture
+        $plan = Invoke-Package -Local -Extra @('-MemberPlan')
+        Assert-True ($plan.Exit -eq 0) "Plan rejected: $($plan.Output)"
+        $p = $plan.Output | ConvertFrom-Json -AsHashtable
+        Assert-True ($p.measurement -ceq 'ESTIMATE_SELECTED_MEMBERS' -and $p.metadataReserveBytes -eq 1MB) 'Estimate not distinguished'
+        $measured = Invoke-Package -Local -DeclaredStatus PASS -Extra @('-EvidencePath', 'docs/evidence/TEST-001/local.json', '-MeasureOnly')
+        Assert-True ($measured.Exit -eq 0) "Measurement rejected: $($measured.Output)"
+        $m = $measured.Output | ConvertFrom-Json -AsHashtable
+        Assert-True (-not (Test-Path (Join-Path $script:repo 'artifacts/reviews'))) 'Precheck published output'
+        $built = Invoke-Package -Local -DeclaredStatus PASS -Extra @('-EvidencePath', 'docs/evidence/TEST-001/local.json')
+        Assert-True ($built.Exit -eq 0) "Build rejected: $($built.Output)"
+        $zip = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0]
+        Assert-True ([Math]::Abs($zip.Length - $m.sizeBytes) -lt 4096 -and $m.limitation.Contains('timestamps')) 'Candidate metadata variance unexplained'
+        $archive = [IO.Compression.ZipFile]::OpenRead($zip.FullName)
+        try {
+            foreach ($row in $p.members) {
+                $entry = $archive.GetEntry($row.path)
+                Assert-True ($null -ne $entry -and $entry.Length -eq $row.sizeBytes) 'Plan member missing or different'
+            }
+            Assert-True ($archive.Entries.Count -eq $m.members.Count) 'Final member set differs'
+        } finally { $archive.Dispose() }
+    }
     Case 'valid committed evidence preserves command and status' {
         Write-Fixture 'docs/evidence/TEST-001/checks.json' (@{ checks = @(@{ name = 'fixture'; command = 'pwsh fixture.ps1'; status = 'PASS'; exitCode = 0; output = '1 assertion passed' }); ci = @{ status = 'NOT_VERIFIED' } } | ConvertTo-Json -Depth 6)
         $script:head = Commit-Fixture

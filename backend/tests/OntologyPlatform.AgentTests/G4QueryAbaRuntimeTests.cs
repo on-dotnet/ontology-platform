@@ -41,11 +41,26 @@ public sealed partial class G4QueryMafRuntimeTests
         // 正式固定查询合同没有自造版本或身份字段。
         var query = request.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
         // 公开记录仅包括合成标识、时间、计数及状态，绝不包含会话证明。
-        var evidence = new Dictionary<string, object?> { ["taskId"] = "G4-M4-QUERY-001", ["case"] = "AC-05_INFLIGHT_ABA", ["status"] = "FAIL" };
+        var evidence = new Dictionary<string, object?> { ["taskId"] = "G4-M4-QUERY-001", ["case"] = "AC-05_INFLIGHT_ABA", ["status"] = "FAIL", ["resourceRun"] = "query-impl-01" };
         // 完整两次激活完成后才能把409归因于查询提交。
         var abaCompleted = false;
         // 真实墙钟预算从正式Gateway调用之前开始。
         var elapsed = new Stopwatch();
+        // 事件序列由唯一查询进程产生，UTC关联数据库，单调时钟证明原五秒内顺序。
+        var events = new List<object>();
+        // 捕获后每个阶段都绑定同一query和mapping，不借其他请求的成功回执。
+        void RecordEvent(string phase)
+        {
+            events.Add(new
+            {
+                phase,
+                sequence = events.Count + 1,
+                monotonicMs = elapsed.Elapsed.TotalMilliseconds,
+                utc = DateTimeOffset.UtcNow,
+                queryId = evidence["queryId"],
+                mappingId = evidence["mappingId"]
+            });
+        }
         // 唯一注入点在真实PG读取之后，不替换版本读取器、结果存储或审计参与者。
         var source = new AfterReadSource(services.GetRequiredService<IG4SourceQueryReader>(), async token =>
         {
@@ -56,15 +71,18 @@ public sealed partial class G4QueryMafRuntimeTests
             // 固定A取自实际准入原件，后续不以当前Active替换它。
             var captured = G4QueryResultStore.ReadState(running).Binding;
             evidence["queryId"] = running.Id;
-            evidence["capturedA"] = new { captured.MappingReleaseId, captured.ActivationId, captured.ActivationRevision };
+            evidence["mappingId"] = captured.MappingId;
+            evidence["capturedA"] = new { captured.MappingId, captured.MappingReleaseId, captured.ActivationId, captured.ActivationRevision };
             evidence["admittedAtUtc"] = running.CreatedAtUtc;
             evidence["deadlineAtUtc"] = running.DeadlineAtUtc;
             evidence["afterRealReadAtUtc"] = DateTimeOffset.UtcNow;
+            RecordEvent("SOURCE_READ_COMPLETED");
             // B提交使用当前operator及先前真实异人批准的提案。
             var b = await activations.ActivateAsync(actor, original.SessionReference, proposalId,
                 new MappingActivationRequest { BindingHash = approvedB.BindingHash, ExpectedActive = approvedB.ExpectedActive,
                     Command = Command(approvedB.ProposalRevision) }, $"\"proposal:{approvedB.ProposalRevision}\"", token);
             evidence["activatedB"] = b;
+            RecordEvent("B_ACTIVATED");
             Assert.AreNotEqual(captured.MappingReleaseId, b.MappingReleaseId);
             Assert.IsTrue(b.ActivationRevision > long.Parse(captured.ActivationRevision, CultureInfo.InvariantCulture));
             // 回滚目标是原查询捕获的真实历史A原字节散列。
@@ -100,6 +118,7 @@ public sealed partial class G4QueryMafRuntimeTests
                 new MappingActivationRequest { BindingHash = approvedA.BindingHash, ExpectedActive = approvedA.ExpectedActive,
                     Command = Command(approvedA.ProposalRevision) }, $"\"proposal:{approvedA.ProposalRevision}\"", token);
             evidence["activatedA"] = a;
+            RecordEvent("A_ACTIVATED");
             Assert.AreEqual(captured.MappingReleaseId, a.MappingReleaseId);
             Assert.AreNotEqual(captured.ActivationId, a.ActivationId);
             Assert.IsTrue(a.ActivationRevision > b.ActivationRevision);
@@ -118,6 +137,7 @@ public sealed partial class G4QueryMafRuntimeTests
             elapsed.Start();
             // 必须是两次激活完成之后的确切绑定拒绝，不能接受超时或映射命令失败。
             var error = await Assert.ThrowsAsync<SemanticOperationException>(() => gateway.ExecuteG4Async(actor, original.SessionReference, query, key, null, CancellationToken.None));
+            RecordEvent("COMMIT_REJECTED");
             elapsed.Stop();
             evidence["errorStatus"] = error.Status;
             evidence["errorCode"] = error.Code;
@@ -149,7 +169,8 @@ public sealed partial class G4QueryMafRuntimeTests
         }
         finally
         {
-            evidence["elapsedMs"] = elapsed.ElapsedMilliseconds;
+            evidence["elapsedMs"] = elapsed.Elapsed.TotalMilliseconds;
+            evidence["events"] = events;
             evidence["abaCompleted"] = abaCompleted;
             // 临时容器退出前由执行器回收公开原件；失败原件也保留。
             await File.WriteAllTextAsync("/tmp/aba-inflight.json", JsonSerializer.Serialize(evidence, new JsonSerializerOptions(JsonSerializerDefaults.Web)) + "\n");

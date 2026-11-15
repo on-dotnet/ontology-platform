@@ -86,6 +86,58 @@ public sealed partial class G4QueryMafRuntimeTests
         var arguments = new Dictionary<string, System.Text.Json.JsonElement> { ["queryId"] = System.Text.Json.JsonSerializer.SerializeToElement(queryId) };
         // 先用同一正式Gateway短定位当前会话/源前提，错误只报告固定码而不输出安全材料。
         var gateway = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ISemanticGateway>(scope.ServiceProvider);
+        // 只输出布尔资格，不输出会话引用、保护票据或密钥，供真实前提失败的短定位。
+        await using var governance = await scope.ServiceProvider.GetRequiredService<Microsoft.EntityFrameworkCore.IDbContextFactory<OntologyPlatform.Modules.Governance.GovernanceDbContext>>().CreateDbContextAsync();
+        // 精确关联当前查询的服务器记录，禁止用另一条活跃会话替换旧票据。
+        var session = await governance.Sessions.SingleAsync(item => item.Id == row.SessionReference);
+        // 在测试进程内复核正式purpose，仅打印各条件布尔值，不返回或保存票据正文。
+        var readable = false;
+        // 失败原因分开，不能以重新登录覆盖原失败。
+        var claimsMatch = new Dictionary<string, bool>();
+        try
+        {
+            // 与正式MappingSessionAuthority使用相同provider/purpose，不构造新的认证材料。
+            var protector = Microsoft.AspNetCore.DataProtection.DataProtectionCommonExtensions.CreateProtector(scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>(), "OntologyPlatform.Governance.ServerTicket.v1");
+            // 临时内存反序列化只用于确定正式匹配失败的具体条件。
+            var ticket = Microsoft.AspNetCore.Authentication.TicketSerializer.Default.Deserialize(protector.Unprotect(session.ProtectedTicket))!;
+            readable = true;
+            claimsMatch["authenticated"] = ticket.Principal.Identity?.IsAuthenticated == true;
+            claimsMatch["ticketLive"] = ticket.Properties.ExpiresUtc > DateTimeOffset.UtcNow;
+            claimsMatch["subject"] = ticket.Principal.FindFirst("sub")?.Value == actor.SubjectId;
+            claimsMatch["organization"] = ticket.Principal.FindFirst("organization_id")?.Value == actor.OrganizationId;
+            claimsMatch["sites"] = ticket.Principal.FindAll("site_ids").Select(claim => claim.Value).Distinct().Order().SequenceEqual(actor.SiteIds.Order());
+            claimsMatch["roles"] = new[] { "platform.viewer", "platform.operator", "platform.auditor" }.Where(ticket.Principal.IsInRole).Order().SequenceEqual(actor.Roles.Order());
+        }
+        catch (System.Security.Cryptography.CryptographicException) { }
+        Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new
+        {
+            @case = "M4_RUNTIME_AUTH_DIAGNOSTIC",
+            readable,
+            claimsMatch,
+            sessionLive = session.RevokedAtUtc is null && session.ExpiresAtUtc > DateTimeOffset.UtcNow,
+            ticketMatches = scope.ServiceProvider.GetRequiredService<IMappingSessionAuthority>().Matches(session.ProtectedTicket, actor, DateTimeOffset.UtcNow)
+        }));
+        if (Environment.GetEnvironmentVariable("G4_QUERY_AUTH_DIAGNOSTIC") == "1")
+        {
+            // 只读正式key元数据并在内存创建解密器，绝不输出ID、XML或秘密内容。
+            var keys = scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.DataProtection.KeyManagement.IKeyManager>().GetAllKeys();
+            // 标准DataProtection封套的key标识只用于内部查找，输出仅为是否存在。
+            var keyId = new Guid(session.ProtectedTicket.AsSpan(4, 16));
+            // 精确引用可区分挂载缺失与密钥无法解封；诊断模式永远不充当PASS。
+            var matching = keys.SingleOrDefault(item => item.KeyId == keyId);
+            // 不记录异常正文，防止无意输出密钥材料。
+            var encryptorReady = false;
+            try { encryptorReady = matching?.CreateEncryptor() is not null; } catch (System.Security.Cryptography.CryptographicException) { }
+            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new
+            {
+                @case = "M4_KEY_METADATA_DIAGNOSTIC",
+                discriminatorMatches = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<Microsoft.AspNetCore.DataProtection.DataProtectionOptions>>().Value.ApplicationDiscriminator == "OntologyPlatform.PlatformBff.v1",
+                keysAvailable = keys.Count > 0,
+                referencedKeyAvailable = matching is not null,
+                encryptorReady
+            }));
+            Assert.Fail("DIAGNOSTIC_ONLY_NOT_ACCEPTANCE");
+        }
         try { _ = await gateway.ReadG4Async(actor, row.SessionReference, queryId!, true, CancellationToken.None); }
         catch (SemanticOperationException error) { Assert.Fail("真实Gateway前提失败：" + error.Status + ":" + error.Code); }
         // 真正进入MAF函数调用循环，四次均由相同服务器引用计数。

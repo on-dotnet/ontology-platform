@@ -465,8 +465,10 @@ public sealed class G4QueryExecution
     private static G4RelationshipDatum? Relationship(MappingRelationBinding relation, G4EntityDatum from, G4EntityDatum to,
         Dictionary<string, G4QueryValue> fromRow, Dictionary<string, G4QueryValue> toRow)
     {
-        if (from.Identity.OrganizationId != to.Identity.OrganizationId || from.Identity.SiteId != to.Identity.SiteId
-            || relation.JoinFieldPairs.Any(pair => G4QueryCanonical.Hash(G4QueryCanonical.Serialize(fromRow[pair.From.Name])) != G4QueryCanonical.Hash(G4QueryCanonical.Serialize(toRow[pair.To.Name])))) return null;
+        if (from.Identity.OrganizationId != to.Identity.OrganizationId || from.Identity.SiteId != to.Identity.SiteId) return null;
+        // 完整校验每个登记键，不能因前一列不等而把后一列未知类型静默当成零匹配。
+        var matches = relation.JoinFieldPairs.Select(pair => G4QueryKeyEquality.Equal(Cell(fromRow, pair.From), Cell(toRow, pair.To))).ToArray();
+        if (matches.Any(match => !match)) return null;
         if (from.ValidTime is not { From.Kind: "UTC", To.Kind: "UTC" } left || to.ValidTime is not { From.Kind: "UTC", To.Kind: "UTC" } right)
             throw new SemanticOperationException(503, "query_source_indeterminate");
         // PG时间固定微秒，两个同精度UTC词法可以按Ordinal比较。

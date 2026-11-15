@@ -11,6 +11,139 @@ namespace OntologyPlatform.QueryTests;
 [TestClass]
 public sealed class G4QueryTests
 {
+    /// <summary>数据库等值numeric键不能因声明精度不同而静默丢弃关系；预期端点集合独立固定。</summary>
+    [TestMethod]
+    public void NumericRelationshipPreservesExpectedEdgesAcrossRepresentations()
+    {
+        // 反射仅定位原生产关系函数，避免为了旧实现RED先改产品可见性；真实Gateway另行验收。
+        var relationship = typeof(G4QueryExecution).GetMethod("Relationship", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!;
+        // 固定数据集与键登记；预期不调用待修相等逻辑生成。
+        var dataset = new MappingDatasetRef { SnapshotId = "fixture", Schema = "production", Name = "numeric", Kind = "TABLE" };
+        // 单字段连接精确指向登记列。
+        var field = new MappingFieldRef { DatasetRef = dataset, Name = "key", Ordinal = 1 };
+        // 半开时间区间在两个端点之间严格交叠。
+        var interval = new G4QueryInterval
+        {
+            From = new G4QueryTime { Kind = "UTC", Lexical = "2026-11-14T00:00:00.000000Z", FractionalDigits = 6 },
+            To = new G4QueryTime { Kind = "UTC", Lexical = "2026-11-15T00:00:00.000000Z", FractionalDigits = 6 }
+        };
+        // 根和目标仅身份号不同，组织厂区一致。
+        var root = new G4EntityDatum
+        {
+            EntityIri = "urn:fixture:R",
+            Label = null,
+            EvidenceIds = ["e-root"],
+            TypeIris = ["urn:fixture:Asset"],
+            Properties = [],
+            Identity = new G4QueryIdentity { OrganizationId = "org", SiteId = "site", SourceNamespace = "fixture", ExternalId = "R", EffectiveTime = interval },
+            ValidTime = interval
+        };
+        // 正式关系合同保留有序连接键及时间规则。
+        var relation = new MappingRelationBinding
+        {
+            Id = "relation",
+            FromBindingId = "root",
+            ToBindingId = "target",
+            PredicateIri = "urn:fixture:links",
+            JoinFieldPairs = [new MappingJoinFieldPair { From = field, To = field }],
+            Cardinality = "ONE_TO_MANY",
+            TemporalJoinPolicy = "HALF_OPEN_OVERLAP"
+        };
+        // 1.00和1.000应匹配，1.01不能匹配。
+        var targets = new[] { new G4DecimalValue { Lexical = "1.00", Precision = 12, Scale = 2 },
+            new G4DecimalValue { Lexical = "1.000", Precision = 12, Scale = 3 }, new G4DecimalValue { Lexical = "1.01", Precision = 12, Scale = 2 } };
+        // 完整关系输出集合是断言对象，不是比较器返回布尔值。
+        var edges = new List<string>();
+        for (var index = 0; index < targets.Length; index++)
+        {
+            // 每个目标有独立身份和证据。
+            var target = root with { EntityIri = "urn:fixture:T" + (index + 1), EvidenceIds = ["e-target-" + index], Identity = root.Identity with { ExternalId = "T" + (index + 1) } };
+            // 旧函数直接执行真实生产关系匹配，之后真实源切片验证端到端。
+            var edge = (G4RelationshipDatum?)relationship.Invoke(null, [relation, root, target,
+                new Dictionary<string, G4QueryValue> { ["key"] = new G4DecimalValue { Lexical = "1.00", Precision = 10, Scale = 2 } },
+                new Dictionary<string, G4QueryValue> { ["key"] = targets[index] }]);
+            if (edge is not null) edges.Add(edge.Source.EntityIri + "→" + edge.Target.EntityIri);
+        }
+        CollectionAssert.AreEquivalent(new[] { "urn:fixture:R→urn:fixture:T1", "urn:fixture:R→urn:fixture:T2" }, edges.ToArray());
+        // 使用同一生产关系入口验证多列顺序、作用域和半开时间，不把布尔helper当完整关系验收。
+        G4RelationshipDatum? Match(G4EntityDatum target, string[] left, string[] right)
+        {
+            // 每列单独登记，避免简单拼接造成a/bc与ab/c碰撞。
+            var pairs = left.Select((_, index) => new MappingJoinFieldPair { From = field with { Name = "k" + index }, To = field with { Name = "k" + index } }).ToArray();
+            return (G4RelationshipDatum?)relationship.Invoke(null, [relation with { JoinFieldPairs = pairs }, root, target,
+                left.Select((value, index) => (value, index)).ToDictionary(item => "k" + item.index, item => (G4QueryValue)new G4StringValue { Lexical = item.value }),
+                right.Select((value, index) => (value, index)).ToDictionary(item => "k" + item.index, item => (G4QueryValue)new G4StringValue { Lexical = item.value })]);
+        }
+        Assert.IsNull(Match(root, ["a", "bc"], ["ab", "c"]));
+        Assert.IsNull(Match(root, ["a", "bc"], ["a", "bd"]));
+        Assert.IsNotNull(Match(root, ["a", "bc"], ["a", "bc"]));
+        Assert.IsNull(Match(root with { Identity = root.Identity with { OrganizationId = "other" } }, ["a"], ["a"]));
+        Assert.IsNull(Match(root with { Identity = root.Identity with { SiteId = "other" } }, ["a"], ["a"]));
+        Assert.IsNull(Match(root with { ValidTime = interval with { From = interval.To, To = interval.To with { Lexical = "2026-11-16T00:00:00.000000Z" } } }, ["a"], ["a"]));
+        // 严格交叠输出两端的精确交集，不扩大到任一原区间。
+        var overlap = Match(root with { ValidTime = interval with { From = interval.From with { Lexical = "2026-11-14T12:00:00.000000Z" } } }, ["a"], ["a"]);
+        Assert.AreEqual("2026-11-14T12:00:00.000000Z", overlap!.ValidTime!.From.Lexical);
+        Assert.AreEqual(interval.To.Lexical, overlap.ValidTime!.To!.Lexical);
+    }
+
+    /// <summary>固定精确数值反例覆盖28位边界、最小小数、零和负值，预期由显式常量给出。</summary>
+    [TestMethod]
+    [DataRow("1.00", 10, 2, "1.000", 12, 3, true)]
+    [DataRow("0.00", 10, 2, "0", 1, 0, true)]
+    [DataRow("-1.00", 10, 2, "-1.000", 12, 3, true)]
+    [DataRow("9007199254740993.20", 20, 2, "9007199254740993.200", 21, 3, true)]
+    [DataRow("9007199254740993.20", 20, 2, "9007199254740993.21", 20, 2, false)]
+    [DataRow("9999999999999999999999999999", 28, 0, "9999999999999999999999999998", 28, 0, false)]
+    [DataRow("0.0000000000000000000000000001", 28, 28, "0.0000000000000000000000000000", 28, 28, false)]
+    [DataRow("999999999999999999999999999.0", 28, 1, "999999999999999999999999999", 27, 0, true)]
+    public void NumericKeyEqualityUsesExactApprovedRange(string left, int precision, int scale, string right, int otherPrecision, int otherScale, bool expected)
+    {
+        // 直接定位内部比较器供边界反例，完整边集合和Gateway另有独立验收。
+        var method = typeof(G4QueryExecution).Assembly.GetType("OntologyPlatform.Modules.SemanticQuery.G4QueryKeyEquality")!.GetMethod("Equal", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!;
+        // 两端仍保留各自声明，比较不得修改其序列化原件。
+        var first = new G4DecimalValue { Lexical = left, Precision = precision, Scale = scale };
+        // 第二端可以有不同精度与scale。
+        var second = new G4DecimalValue { Lexical = right, Precision = otherPrecision, Scale = otherScale };
+        // 规范原件见证比较没有污染输出表示。
+        var bytes = G4QueryCanonical.Serialize(new[] { first, second });
+        Assert.AreEqual(expected, (bool)method.Invoke(null, [first, second])!);
+        CollectionAssert.AreEqual(bytes, G4QueryCanonical.Serialize(new[] { first, second }));
+    }
+
+    /// <summary>空值不成边，跨类型和非法源值必须拒绝，不能默默当零匹配。</summary>
+    [TestMethod]
+    public void RelationshipKeysRejectUnknownAndIncompatibleTypes()
+    {
+        // 内部比较入口与生产Relationship完全相同。
+        var method = typeof(G4QueryExecution).Assembly.GetType("OntologyPlatform.Modules.SemanticQuery.G4QueryKeyEquality")!.GetMethod("Equal", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!;
+        // 明确的源空值没有关系相等语义。
+        var missing = new G4NullValue { Lexical = null, DeclaredType = "decimal" };
+        foreach (var other in new G4QueryValue[] { missing, new G4DecimalValue { Lexical = "0", Precision = 1, Scale = 0 }, new G4StringValue { Lexical = "" } })
+        {
+            Assert.AreEqual(false, (bool)method.Invoke(null, [missing, other])!);
+        }
+        foreach (var other in new G4QueryValue[] { new G4StringValue { Lexical = "1" }, new G4Int64Value { Lexical = "1" },
+            new G4DecimalValue { Lexical = "1.00", Precision = 1, Scale = 2 }, new G4DecimalValue { Lexical = "-0.00", Precision = 4, Scale = 2 } })
+        {
+            // 反射仅包装真实产品异常，断言内层准确错误而非任意失败。
+            var error = Assert.Throws<System.Reflection.TargetInvocationException>(() => method.Invoke(null, [new G4DecimalValue { Lexical = "1", Precision = 1, Scale = 0 }, other]));
+            Assert.IsInstanceOfType<SemanticOperationException>(error.InnerException);
+            Assert.AreEqual("query_source_indeterminate", ((SemanticOperationException)error.InnerException!).Code);
+        }
+    }
+
+    /// <summary>破坏性测试准入先拒绝运行库或不属于当前nonce的同名库，不发送任何SQL。</summary>
+    [TestMethod]
+    public async Task DestructiveTestGuardRejectsRuntimeAndUnownedTargetBeforeConnecting()
+    {
+        // 无效端点不能影响预连接拒绝；若守卫错误放行，会得到连接异常而非准确断言异常。
+        foreach (var database in new[] { "query", "postgres", "m4_query_test_ffffffffffff" })
+        {
+            await Assert.ThrowsAsync<AssertFailedException>(() => G4QueryPersistenceTests.DemandIsolatedDatabaseAsync(
+                "Host=unreachable.invalid;Database=" + database + ";Username=fixture;Timeout=1"));
+        }
+    }
+
     /// <summary>同一登记器保留旧能力，G4实际输出严格区分四态载荷和精确标量。</summary>
     [TestMethod]
     public void RegistryUsesGeneratedClosedG4SchemaWithoutChangingG2()
