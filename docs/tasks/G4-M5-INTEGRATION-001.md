@@ -6,7 +6,7 @@
 人类已批准[一次性A/B/C批次](../evidence/G4-M5-INTEGRATION-001/authorization.md)，以及[精确M3暂停和M4双网络拓扑](../evidence/G4-M5-INTEGRATION-001/additional-authorization.json)。没有普通helper、修复、构包待批事项。
 
 - Base：`a6716b11c3795e5670c07f1ca37057e5649bed89`；分支`codex/g4-m5-integration-001`；一次创建并持续复用独立托管树。
-- PG与完整工程SelfTest资格TestedCommit：`4e20be50c1023b9bcd9f97e02dac92e35f20d130`；后续M5构包消费者候选`ef04666cd4a52495014da51b4600215b75e0eaac`，其受影响构包/工程验收单列；PG资格按实际输入重开。
+- PG与完整工程SelfTest资格TestedCommit：`4e20be50c1023b9bcd9f97e02dac92e35f20d130`；后续M5构包消费者候选`ef04666cd4a52495014da51b4600215b75e0eaac`，其受影响构包/工程验收单列，后续精确旧PASS包装策略候选`6453f8b1455430fce91eedec16a3496bcaf45ddc`；PG资格按实际输入重开。
 - Master唯一作者；Explorer与Reviewer只读，非作者审查消息由Master如实转录，独立执行身份不伪造。
 - owned_paths：本任务卡/证据、当前授权/规划/Web规则、workflow/context/M5薄消费者及直接相关PG/环境/缓存/前置检查helper，verify/structured-validator/gate登记及直接回归，三个既有C#测试的M5身份/前置检查。最终邻接修复包括StructuredFiles.Tests.ps1预期负例输出标记。
 - read_only_dependencies：冻结M3/M4产品合同/实现、历史证据/ZIP、其它KEEP；无产品DTO/持久语义/权限/5秒预算变化。
@@ -36,6 +36,8 @@ M5运行7容器、6GiB/4.5CPU；含M4共同12GiB/9CPU；最终实测明细与宿
 
 恢复从本卡、当前授权、acceptance/validation与最终包外回执开始；不要重载历史会话或重跑无关M1–M4全链。包外回执记录最终Head、普通push读回、唯一ZIP的大小/SHA及非作者重开，作为本卡FINALIZING到交付状态的唯一最终观测。
 
-构包成员计划实测默认重复payload+diff超过15MiB；依附件第10节接入既有V3机制，归档分组package-final-01不改变执行RunId integration-01。所有本任务非PNG原件必须入包，唯一可索引恢复的是精确UUID命名的历史累计save(state)副本；全量文件名/内容哈希闭包扫描保留standard-907aa290真实引用，其余237份仍在Git且已逐字节核验。当前命令、报告、失败、反例、资格和最终四场景文件均随包，15MiB不放宽。
+构包成员计划实测默认重复payload+diff超过15MiB；依附件第10节接入既有V3机制，归档分组package-final-01不改变执行RunId integration-01。当前资格、全部失败及所有实际命令/报告必须入包；精确UUID命名的历史累计save(state)副本可索引恢复；全量文件名/内容哈希闭包扫描保留standard-907aa290真实引用，其余237份仍在Git且已逐字节核验。当前命令、报告、失败、反例、资格和最终四场景文件均随包，15MiB不放宽。
 
 最终构包增量按影响验收通过，当前统一结果`f3ddedfe750f4199b0615ebf19426651`：engineering/package/policy实际成功；原PG五层再次只读重开全部PASS。完整SelfTest 486项发生在4e20，之后仅构包消费者/证据登记由当前受影响门禁覆盖，不把旧full输入冒称完全相同。
+
+3fb候选精确测量16,077,589bytes超15MiB，未生成ZIP。非作者核实八份固定path+SHA旧PASS资格包装已不被当前消费者引用，其45项实际命令/报告继续随包，旧包装原字节保留Git；新增守卫拒绝内容变化或重新成为当前引用，不能泛化为PASS通配。毛节省614,240bytes（0.5858MiB），最后实际大小继续严格测量。
