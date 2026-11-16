@@ -1332,6 +1332,14 @@ for i in range(53):
         $checkpoint = $script:reductionRoot + 'integration-01/originals/integration-01/prerequisite-safety-aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.json'
         Write-Fixture $current "original current failure remains included`n"
         Write-Fixture $checkpoint "historical cumulative state; exact Git recovery`n"
+        $supersededName = 'qualification-security-unit-9895c18f7dae4ddcb2a7840aac2b3e09.json'
+        $superseded = $script:reductionRoot + 'integration-01/originals/integration-01/' + $supersededName
+        $supersededBytes = '{"taskId":"G4-M5-INTEGRATION-001","runId":"integration-01","status":"PASS","exitCode":0,"inputsUnchanged":true}' + "`n"
+        Write-Fixture $superseded $supersededBytes
+        $supersededHash = (Get-FileHash -LiteralPath (Join-Path $script:repo $superseded) -Algorithm SHA256).Hash.ToLowerInvariant()
+        $closurePath = $script:reductionRoot + 'package-final-01/final-impact-originals/integration-01/product-qualification-after-package-admission.json'
+        $closure = @{ taskId = $script:reductionTask; status = 'PASS'; results = @(@{ originals = @(@{ path = 'current-qualification.json' }) }) }
+        Write-Fixture $closurePath ($closure | ConvertTo-Json -Depth 8)
         $tested = Commit-Fixture
         Write-LocalFixture $script:reductionValidation (@{ evidenceSchemaVersion = 2; validationSource = 'LOCAL'; testedCommit = $tested; checks = @(@{ name = 'fixture-local'; command = 'fixture only'; status = 'PASS'; exitCode = 0; output = 'not a product claim' }); ci = @{ status = 'NOT_RUN'; runId = $null; url = $null; commit = $null; conclusion = $null } } | ConvertTo-Json -Depth 6)
         $kept = @($required | ForEach-Object { $script:reductionRoot + $_ }) + @($current)
@@ -1340,7 +1348,7 @@ for i in range(53):
         $script:head = Commit-Fixture
         $script:reductionTool = Join-Path $fixtureRoot ([guid]::NewGuid().ToString('N') + '.ps1')
         # 仅隔离Git夹具替换准确提交；生产入口没有批准参数旁路。
-        $source = [IO.File]::ReadAllText($PackageScript).Replace('a6716b11c3795e5670c07f1ca37057e5649bed89', $script:base).Replace('237c831166783deb3f3c68ec11e79824cd485540', $script:base)
+        $source = [IO.File]::ReadAllText($PackageScript).Replace('a6716b11c3795e5670c07f1ca37057e5649bed89', $script:base).Replace('237c831166783deb3f3c68ec11e79824cd485540', $script:base).Replace('a14bfc634d1245f5f84a3bd44c72fcdc2d7971c0a7d5f129909f4d36bf4b15c0', $supersededHash)
         [IO.File]::WriteAllText($script:reductionTool, $source)
         . $script:reductionTool -Library
         $policy = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask
@@ -1370,6 +1378,16 @@ for i in range(53):
         }
         $selection.retainedPaths = $kept
         Write-Fixture $script:reductionSelectionPath ($selection | ConvertTo-Json -Depth 6)
+        foreach ($mutation in @('current-reference', 'changed-bytes')) {
+            if ($mutation -ceq 'current-reference') { $closure.results[0].originals[0].path = $supersededName; Write-Fixture $closurePath ($closure | ConvertTo-Json -Depth 8) }
+            else { Write-Fixture $superseded "changed historical qualification`n" }
+            $script:head = Commit-Fixture
+            $rejected = $false
+            try { $null = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask } catch { $rejected = $_.Exception.Message.Contains('REDUCTION_REFERENCE') }
+            Assert-True $rejected 'Current referenced or changed qualification silently omitted'
+            $closure.results[0].originals[0].path = 'current-qualification.json'; Write-Fixture $closurePath ($closure | ConvertTo-Json -Depth 8)
+            Write-Fixture $superseded $supersededBytes
+        }
         Write-Fixture $approval "forged approval`n"; $script:head = Commit-Fixture
         $rejected = $false
         try { $null = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask } catch { $rejected = $_.Exception.Message.Contains('REDUCTION_APPROVAL') }

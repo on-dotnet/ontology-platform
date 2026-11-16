@@ -184,9 +184,33 @@ function Get-ReviewReductionPolicy {
         if (-not $retained.Contains($prefix + $relative)) { throw 'REDUCTION_SELECTION: required historical failure/recovery/contract witness absent' }
     }
     if ($m5) {
-        # 仅已审查累计状态副本可索引恢复；其它本任务非PNG原件一项也不能省略。
+        # 精确旧PASS包装经非作者核实已被替代；实际命令/报告/失败仍完整保留。
+        $superseded = @{
+            'qualification-security-unit-9895c18f7dae4ddcb2a7840aac2b3e09.json' = 'a14bfc634d1245f5f84a3bd44c72fcdc2d7971c0a7d5f129909f4d36bf4b15c0'
+            'qualification-aba-inflight-a81d4ea4b07a4299975c64b4dc11de22.json' = '5bcce40468c81ed28fdca93b870ca6318637e772bd60f70da2cf5941d3ee5bb3'
+            'qualification-maf-binding-c96d150a80c04aa99fdd58ee958e0bdd.json' = 'ff782f3562e8aa2b16119fd7dbb535d3f210efa5c9d262844109c3806e987e37'
+            'qualification-persistence-e4e7af389aae4eb6879266851687664a.json' = 'dd97a3801abdd7e738529e808e58e4da4af9c9135ca2b083778244cddb8ba462'
+            'qualification-query-unit-63a2466e54ee4ad39f4cae7b99a2c8b1.json' = '9922e9aa78cc0d13ed326e55a25602c55c6b0e4c373cf1a736a6e5dd23188e87'
+            'qualification-query-unit-3b3165bca64c44e9b0678e78afcd7c1f.json' = '8d59d581a285203367638bf3f0572374ffe4899e11c43a4a44e01dab90197553'
+            'qualification-agent-unit-9a505e89f9744a40b2260fe1cf62c962.json' = '81689c8efa4284cea3bb696fd6a7f6769b6136abd2ed842d2cd75dfae79c0a2e'
+            'qualification-agent-unit-a4c7109f97044d979df3fa63e210034c.json' = '2480aac7ae3c9d23a126bd3967a1679985c6cecbbfb8023fa21c367684fdf386'
+        }
+        $closurePath = $prefix + 'package-final-01/final-impact-originals/integration-01/product-qualification-after-package-admission.json'
+        if (-not $treePaths.Contains($closurePath)) { throw 'REDUCTION_REFERENCE: current product qualification closure required' }
+        $closure = (Invoke-ReviewGit $Repository @('cat-file', 'blob', ($Head + ':' + $closurePath))).Text | ConvertFrom-Json -AsHashtable
+        if ($closure.taskId -cne $WorkItem -or $closure.status -cne 'PASS' -or $closure.results -isnot [array] -or $closure.results.Count -eq 0) { throw 'REDUCTION_REFERENCE: valid current qualification closure required' }
+        $currentQualifications = @($closure.results | ForEach-Object { $_.originals | ForEach-Object { [IO.Path]::GetFileName($_.path) } })
+        # 其余仅已审查累计状态副本可索引恢复；所有当前原件和FAIL包装必须入包。
         $checkpointPattern = '^' + [regex]::Escape($prefix) + 'integration-01/originals/integration-01/prerequisite-(standard|numeric|safety|aba)-[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}\.json$'
         foreach ($path in $treePaths) {
+            $name = [IO.Path]::GetFileName($path)
+            if ($path -ceq ($prefix + 'integration-01/originals/integration-01/' + $name) -and $superseded.ContainsKey($name) -and -not $retained.Contains($path)) {
+                $raw = (Invoke-ReviewGit $Repository @('cat-file', 'blob', ($Head + ':' + $path))).Bytes
+                if ((Get-ReviewHash $raw) -cne $superseded[$name] -or $currentQualifications -ccontains $name) { throw 'REDUCTION_REFERENCE: superseded qualification changed or is currently referenced' }
+                $qualification = $script:utf8.GetString($raw) | ConvertFrom-Json -AsHashtable
+                if ($qualification.status -cne 'PASS' -or $qualification.exitCode -ne 0 -or $qualification.inputsUnchanged -ne $true -or $qualification.taskId -cne $WorkItem -or $qualification.runId -cne 'integration-01') { throw 'REDUCTION_REFERENCE: only exact superseded successful qualification metadata may be indexed' }
+                continue
+            }
             if (-not $path.EndsWith('.png', [StringComparison]::OrdinalIgnoreCase) -and $path -cne $selectionPath -and
                 -not $path.StartsWith($runPrefix, [StringComparison]::Ordinal) -and $path -cnotmatch $checkpointPattern -and -not $retained.Contains($path)) {
                 throw 'REDUCTION_REFERENCE: current M5 non-checkpoint evidence must be retained'
