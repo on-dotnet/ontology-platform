@@ -1,7 +1,7 @@
 {
   "evidenceSchemaVersion": 2,
   "validationSource": "LOCAL",
-  "testedCommit": "4e20be50c1023b9bcd9f97e02dac92e35f20d130",
+  "testedCommit": "ef04666cd4a52495014da51b4600215b75e0eaac",
   "checks": [
     {
       "name": "environment",
@@ -162,6 +162,11 @@
     "format": "PASS_CHANGED_SCOPE; raw native exit2 retained",
     "timingStatus": "RECORDED_COMMAND_INTERVAL_UNION; agent active time UNKNOWN",
     "finalReceipt": "External receipt closes package/push/non-author same-ZIP reopen without recursive package rewrite",
-    "actualAgentActiveTime": "UNKNOWN"
+    "actualAgentActiveTime": "UNKNOWN",
+    "productTestedCommit": "4e20be50c1023b9bcd9f97e02dac92e35f20d130",
+    "engineeringFullTestedCommit": "4e20be50c1023b9bcd9f97e02dac92e35f20d130",
+    "packageSourceCommit": "ef04666cd4a52495014da51b4600215b75e0eaac",
+    "latePackagingAdmission": "PENDING_CURRENT_AFFECTED_TESTS",
+    "engineeringCoverage": "Full engineering successful at4e20; later exact M5 package admission is covered by affected package/engineering gates, not claimed as identical full-SelfTest input."
   }
 }
