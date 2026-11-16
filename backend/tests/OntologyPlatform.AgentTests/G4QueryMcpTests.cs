@@ -170,8 +170,13 @@ public sealed partial class G4QueryMafRuntimeTests
                 // 当前执行者的管理权限仍通过正式治理服务捕获，不能沿用提交者角色。
                 _ = await scope.ServiceProvider.GetRequiredService<IMappingAuthorizationAuthority>().CaptureAsync(submit with
                 {
-                    Actor = actor, SessionReference = row.SessionReference, Permission = "mapping.activate",
-                    ConnectionId = null, ObjectRefs = [], FieldRefs = [], AuthorizationEpoch = 0
+                    Actor = actor,
+                    SessionReference = row.SessionReference,
+                    Permission = "mapping.activate",
+                    ConnectionId = null,
+                    ObjectRefs = [],
+                    FieldRefs = [],
+                    AuthorizationEpoch = 0
                 }, CancellationToken.None);
                 // 与正式激活一致的物理事务，结束即回滚，只检查原证明。
                 await using var transaction = await connections.Database.BeginTransactionAsync();
