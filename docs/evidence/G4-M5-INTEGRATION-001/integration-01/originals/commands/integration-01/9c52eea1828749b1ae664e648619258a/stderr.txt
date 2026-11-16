@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import sys;sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as q;q.scenario('numeric');sys.exit(q.attest('maf-binding'))
+                                                                                                                           ~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/scripts/maintenance/workflow_m4_query.py", line 1451, in attest
+    code = actions[name]()
+  File "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/scripts/maintenance/workflow_m4_query.py", line 1426, in <lambda>
+    'maf-binding': lambda: runtime_agent_test(True),
+                           ~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/scripts/maintenance/workflow_m5_integration.py", line 296, in runtime_agent_test
+    if original_runtime_agent_test(binding_race,aba_inflight,preflight=True):raise ValueError('PREREQUISITE_STALE:runtime_session_or_proposal')
+                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: PREREQUISITE_STALE:runtime_session_or_proposal

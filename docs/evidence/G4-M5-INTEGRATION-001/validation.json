@@ -1,0 +1,167 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "4e20be50c1023b9bcd9f97e02dac92e35f20d130",
+  "checks": [
+    {
+      "name": "environment",
+      "command": "python3 -B -c import sys,json;sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as consumer;print(json.dumps(consumer.qualify(sys.argv[1],sys.argv[2]))) environment ff32597277c1886034d8baf90c6ac737eb4dde0c100982b4e73297e2569f6dec",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 framework tests/checks; skipped=0; execution=REUSED; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/environment.txt; SHA256=e750a76eda7d7136ed0b8f11df30b93a96182a95b28281a88673d0a1dcdfc3c6"
+    },
+    {
+      "name": "contract",
+      "command": "python3 -B -c import sys,json;sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as consumer;print(json.dumps(consumer.qualify(sys.argv[1],sys.argv[2]))) contract ceb57daf503108f255ec78c8c46f82c204aadf9860b25340b51c6153627e9aad",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "24 framework tests/checks; skipped=0; execution=REUSED; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/contract.txt; SHA256=c135b57aedde16e1a1e7de73ec484f8927cf2b6a2fc198cd1d7ffd231221cad8"
+    },
+    {
+      "name": "backend",
+      "command": "python3 -B -c import sys,json;sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as consumer;print(json.dumps(consumer.qualify(sys.argv[1],sys.argv[2]))) backend d35366dfcc0444d55b2bfb28b592220e56dda8a6e2cd8a050cf5d8d5860b9346",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "33 framework tests/checks; skipped=0; execution=REUSED; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/backend.txt; SHA256=0dc22a64a0010e2e8c22cf388bbe25c56e2ab043bccef2c7705beb4544bb3287"
+    },
+    {
+      "name": "context-selection",
+      "command": "python3 -B scripts/tests/WorkflowContext.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "7 framework tests/checks; skipped=0; execution=FRESH; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/context-selection.txt; SHA256=9f1a72f4de73e17b2b1e5d0f139c03a0972402e549f3fd5f0b29b07c16f15888"
+    },
+    {
+      "name": "preflight",
+      "command": "python3 -B scripts/tests/ExecutionPreflight.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "12 framework tests/checks; skipped=0; execution=FRESH; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/preflight.txt; SHA256=975bebd03894fcd33de965e67e67a5e6120b1988f4d8e2be0477876a3edc1993"
+    },
+    {
+      "name": "engineering",
+      "command": "python3 -B scripts/tests/Workflow.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "19 framework tests/checks; skipped=0; execution=FRESH; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/engineering.txt; SHA256=96dd5e658de668bf402910a3aecdf72671763cb09133d881b5aceb327c8ff573"
+    },
+    {
+      "name": "engineering-full",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "486 framework tests/checks; skipped=0; execution=FRESH; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/engineering-full.txt; SHA256=ad3efe5c310b8ca325ce333c1611cc326e65d0146d493313cee75adf25265598"
+    },
+    {
+      "name": "environment-prepare",
+      "command": "python3 -B scripts/tests/WorkflowEnvironment.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "7 framework tests/checks; skipped=0; execution=FRESH; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/environment-prepare.txt; SHA256=a6cb0728948845635de1de2d20e8f5a408449e5fdad3d5d27fcb6080be33ad9f"
+    },
+    {
+      "name": "integration-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowIntegration.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "10 framework tests/checks; skipped=0; execution=FRESH; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/integration-task-admission.txt; SHA256=d0f4cb4453a92a69d5dd26c24dffc24abb841b09c300bd1df43f899fc1976ff5"
+    },
+    {
+      "name": "web",
+      "command": "python3 -B -c import sys,json;sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as consumer;print(json.dumps(consumer.qualify(sys.argv[1],sys.argv[2]))) web f80a1aabb352a4bb84d42e58b65be522c7ced91e0b8082131fdda9ccff76d222",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "69 framework tests/checks; skipped=0; execution=REUSED; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/web.txt; SHA256=f3a6bbe551c1801e5c8b86c566ea1042b04f1f7e380e8c3dcbb3f84c4861b359"
+    },
+    {
+      "name": "interaction",
+      "command": "python3 -B -c import sys,json;sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as consumer;print(json.dumps(consumer.qualify(sys.argv[1],sys.argv[2]))) interaction 77c37c5d238757ca69b8a6f6f3cb8eea3570ebfe7004bfe7113b5d4901e040cb",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "560 framework tests/checks; skipped=0; execution=REUSED; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/interaction.txt; SHA256=78bb4cc66ebb4b8b0f57972f511acfe9b6f2a3d60b20c1b3a17c4175cc2e1808"
+    },
+    {
+      "name": "m2-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowM2Web.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "14 framework tests/checks; skipped=0; execution=FRESH; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/m2-task-admission.txt; SHA256=6013cbcc3da1a27d58e892526d896f1015c9244839eb984dc31c488a1fefe881"
+    },
+    {
+      "name": "mapping-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowMapping.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "16 framework tests/checks; skipped=0; execution=FRESH; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/mapping-task-admission.txt; SHA256=8165b0d3d37c6a3e82a71b7c90652fc8c9a7f5da334589ba6860fd104c96c33b"
+    },
+    {
+      "name": "policy",
+      "command": "python3 -B scripts/maintenance/workflow_context.py --root /Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform --check --task G4-M5-INTEGRATION-001 --base a6716b11c3795e5670c07f1ca37057e5649bed89 --head 4e20be50c1023b9bcd9f97e02dac92e35f20d130",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "0 framework tests/checks; skipped=0; execution=FRESH; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/policy.txt; SHA256=d38ee578c74f6907a0595e176407c951f9e0fa0cb05290238bdee1bbbd562f8a"
+    },
+    {
+      "name": "query-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowQuery.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "16 framework tests/checks; skipped=0; execution=FRESH; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/query-task-admission.txt; SHA256=8080526ae98aa31aa192e69c4c6f60cc3b68d313f8955458e3f5abc741ecb201"
+    },
+    {
+      "name": "native-format-inherited-baseline",
+      "command": "dotnet format whitespace --folder --include <three changed C# files> --verify-no-changes --verbosity quiet",
+      "status": "FAIL",
+      "exitCode": 2,
+      "output": "Actual command 36794f9d696e40109b1066d2b1ae4faa exited2 with52 exact inherited diagnostics; current changed scope adds0. Historical debt is retained, not whole-format PASS."
+    },
+    {
+      "name": "changed-scope-format",
+      "command": "python3 -B /tmp/m5_validate_format_evidence.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "format-baseline-comparison.json independently reviewed:52 inherited and0 new; historical full baseline318. This check does not change native exit2."
+    },
+    {
+      "name": "counterexamples-before-long-run",
+      "command": "python3 /tmp/m5_counterexample_closeout.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual aggregate1ade33d7efab47a3b03ca423e61f380b:wrong database and real foreign Owner rejected before SQL; actual expired session rejected before long run; exact expiry restored; numeric independent SQL targets1/2."
+    },
+    {
+      "name": "host-lock-display-continuity",
+      "command": "host_continuity.py bounded monitor",
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Policy ready and600-second heartbeat monitoring observed; actual lock/display trial NOT_VERIFIED."
+    },
+    {
+      "name": "other-platforms-production-and-full-G4",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "No WindowsAMD64/LinuxAMD64 dual-architecture qualification, nonPG mapping/query, five-source metallurgy, production, TDengine or G5/G6/G7 acceptance. G4Overall PARTIAL."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M5-INTEGRATION-001",
+    "G4Overall": "PARTIAL",
+    "approvedSlice": "PG integration only",
+    "batchAcceptance": "PENDING_EXTERNAL_DELIVERY_FINALIZATION",
+    "engineeringRun": "8ddcb683822d46638e5bbca09484dc51",
+    "productExecution": "FRESH M5 commands; current unified gate execution REUSED after revalidating exact inputs and originals",
+    "qualificationMode": "FRESH",
+    "format": "PASS_CHANGED_SCOPE; raw native exit2 retained",
+    "timingStatus": "RECORDED_COMMAND_INTERVAL_UNION; agent active time UNKNOWN",
+    "finalReceipt": "External receipt closes package/push/non-author same-ZIP reopen without recursive package rewrite",
+    "actualAgentActiveTime": "UNKNOWN"
+  }
+}

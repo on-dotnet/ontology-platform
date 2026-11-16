@@ -1,0 +1,18 @@
+import json,hashlib,subprocess,re
+from pathlib import Path
+root=Path.cwd();task='G4-M5-INTEGRATION-001';rr=root/'artifacts/workflow'/task/'integration-01';p=rr/'format-baseline-comparison.json';d=json.loads(p.read_text());assert d['status']=='PASS_CHANGED_SCOPE' and d['nativeExitCode']==2 and d['newDiagnostics']==[]
+sha=lambda b:hashlib.sha256(b).hexdigest();rawroot=root/'artifacts/workflow'/task/'commands'/'integration-01'/d['commandId'];receipt=json.loads((rawroot/'receipt.json').read_text());assert receipt['exitCode']==2
+raw=b''
+for stream in ['stdout','stderr']:
+ b=(rawroot/(stream+'.txt')).read_bytes();assert sha(b)==receipt[stream]['sha256'];raw+=b
+parsed=[(m[0],int(m[1]),int(m[2]),m[3]) for m in re.findall(r'([^/\n]+\.cs)\((\d+),(\d+)\): error WHITESPACE: (.*?) \[',raw.decode())]
+assert len(parsed)==52==d['currentDiagnostics']==len(d['legacyDiagnostics'])
+h=root/d['historicalComparison']['path'];assert sha(h.read_bytes())==d['historicalComparison']['sha256'];hd=json.loads(h.read_text());known={(x['file'],x['line'],x['column'],x['message']) for x in hd['legacyDiagnostics']}
+for path,identity in d['files'].items():
+ b=subprocess.check_output(['git','show',d['baseline']+':'+path]);c=(root/path).read_bytes();assert sha(b)==identity['baseSha256']==hd['files'][path]['currentSha256'];assert sha(c)==identity['currentSha256']
+ for row in d['legacyDiagnostics']:
+  if row['file']==Path(path).name:
+   assert b.decode().splitlines()[row['baseLine']-1]==c.decode().splitlines()[row['line']-1]
+   assert (row['file'],row['baseLine'],row['column'],row['message']) in known
+assert set(parsed)=={(x['file'],x['line'],x['column'],x['message']) for x in d['legacyDiagnostics']}
+print(json.dumps(dict(status='PASS_CHANGED_SCOPE',nativeExitCode=2,inherited=52,new=0,sourceCommandId=d['commandId'],comparisonSha256=sha(p.read_bytes()))))

@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import sys;sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as q;sys.exit(q.attest('ui-s1'))
+                                                                                                     ~~~~~~~~^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/scripts/maintenance/workflow_m4_query.py", line 1451, in attest
+    code = actions[name]()
+  File "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/scripts/maintenance/workflow_m4_query.py", line 1428, in <lambda>
+    **{mode: (lambda mode=mode: browser_test(mode)) for mode in
+                                ~~~~~~~~~~~~^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/scripts/maintenance/workflow_m4_query.py", line 595, in browser_test
+    result=runtime_command('query-browser-'+mode,['/opt/homebrew/Cellar/node@24/24.22.1/bin/node',
+        'scripts/maintenance/workflow-m4-query.mjs','--task',TASK,'--run-id',RUN,'--mode',mode,*(['--scenario',SCENARIO] if SCENARIO else [])],timeout=180,
+        extra_inputs=dict(api=binding,web=web,prerequisites=prerequisites))
+  File "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/scripts/maintenance/workflow_m4_query.py", line 119, in runtime_command
+    raise ValueError('QUERY_RUNTIME_COMMAND_FAILED_'+result.receipt['commandId'])
+ValueError: QUERY_RUNTIME_COMMAND_FAILED_9ca20268500d4569b3cdea6b9ffaf217

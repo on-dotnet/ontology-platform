@@ -1,0 +1,40 @@
+{
+  "gate": "environment",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "taskId": "G4-M5-INTEGRATION-001",
+    "runId": "integration-01",
+    "gate": "environment",
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "tests": 1,
+    "skipped": 0,
+    "originals": []
+  },
+  "command": [
+    "python3",
+    "-B",
+    "-c",
+    "import sys,json;sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as consumer;print(json.dumps(consumer.qualify(sys.argv[1],sys.argv[2])))",
+    "environment",
+    "ff32597277c1886034d8baf90c6ac737eb4dde0c100982b4e73297e2569f6dec"
+  ],
+  "exitCode": 0,
+  "tests": 1,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 2.6507191249984317,
+  "inputKey": "ff32597277c1886034d8baf90c6ac737eb4dde0c100982b4e73297e2569f6dec",
+  "environmentKey": "c66d9e26b219748d1ef396fce5d1e28c562299a67a7f7ddc6e060abfcda6163c",
+  "policyKey": "bb5f147ac93c3206a24fe34f3d873e0f2e6bfd74ec06f41e9a70d2b0cbef7a3e",
+  "evidenceSha256": "e750a76eda7d7136ed0b8f11df30b93a96182a95b28281a88673d0a1dcdfc3c6",
+  "logPath": "artifacts/workflow/G4-M5-INTEGRATION-001/runs/866f13d1254e490d8b7718bf327d8d57/environment.txt",
+  "sourceRun": "866f13d1254e490d8b7718bf327d8d57",
+  "sourceCommit": "c57742a951117beb1c5959dfceb56423ce9ef764"
+}

@@ -1,0 +1,26 @@
+import sys,json,subprocess,uuid
+from pathlib import Path
+sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as q
+from workflow_execution import run,sha
+root=Path.cwd();out=root/'artifacts/workflow'/q.TASK/q.RUN;q.scenario('aba');state=json.loads((out/'scenario-aba.json').read_text());query=state['latestQuery']['queryId'];assert query.startswith('query-') and len(query)==38
+cid=json.loads((out/'platform-resources.json').read_text())['resources'][0]['id'];prefix=['docker','--context','desktop-linux'];labels=json.loads(subprocess.check_output([*prefix,'inspect','--format','{{json .Config.Labels}}',cid]));assert labels['ontology.task-id']==q.TASK and labels['ontology.run-id']==q.RUN
+where='"Id"=(SELECT "SessionReference" FROM semantic_query."Queries" WHERE "Id"=\''+query+'\' AND "OrganizationId"=\'org-demo\')'
+def sql(stage,text):
+ r=run([*prefix,'exec','-i',cid,'psql','-U','postgres','-d','query','-v','ON_ERROR_STOP=1','-qAt'],root,task=q.TASK,run_id=q.RUN,stage=stage,stdin=text.encode(),input_key=sha(text.encode()),timeout=10);assert not r.returncode;return r
+before=sql('m5-session-expiry-before','SELECT json_build_object(\'expires\',"ExpiresAtUtc",\'live\',"RevokedAtUtc" IS NULL AND "ExpiresAtUtc">now()) FROM governance.server_sessions WHERE '+where+';');old=json.loads(before.stdout);assert old['live']
+changed=sql('m5-session-expiry-fixture',"BEGIN; SET LOCAL statement_timeout='5s'; UPDATE governance.server_sessions SET \"ExpiresAtUtc\"=now()-interval '1 minute' WHERE "+where+' AND "RevokedAtUtc" IS NULL RETURNING \'EXPIRED\'; COMMIT;');assert changed.stdout.strip()==b'EXPIRED'
+start=set((out.parent/'commands'/q.RUN).glob('*/receipt.json'));record=dict(taskId=q.TASK,runId=q.RUN,scenario='aba',queryId=query,beforeCommandId=before.receipt['commandId'],fixtureCommandId=changed.receipt['commandId'],status='FAIL')
+try:
+ try:q.runtime_agent_test()
+ except ValueError as e:
+  assert str(e)=='PREREQUISITE_STALE:runtime_session_or_proposal',str(e);record['rejection']=str(e)
+ else:raise AssertionError('expired session allowed')
+ receipts=[json.loads(p.read_text()) for p in set((out.parent/'commands'/q.RUN).glob('*/receipt.json'))-start]
+ short=[r for r in receipts if r['stage']=='query-runtime-ready'];assert len(short)==1 and short[0]['exitCode']!=0
+ raw=(Path(short[0]['stdout']['path']).read_text()+Path(short[0]['stderr']['path']).read_text());assert '"sessionLive":false' in raw
+ assert not any(r['stage'].startswith('query-real-') for r in receipts)
+ record.update(status='EXPECTED_REJECTION',shortCommandId=short[0]['commandId'],longRunStarted=False)
+finally:
+ expiry=old['expires'];assert "'" not in expiry
+ restored=sql('m5-session-expiry-restore','BEGIN; SET LOCAL statement_timeout=\'5s\'; UPDATE governance.server_sessions SET "ExpiresAtUtc"=\''+expiry+'\'::timestamptz WHERE '+where+'; SELECT json_build_object(\'expires\',"ExpiresAtUtc",\'live\',"RevokedAtUtc" IS NULL AND "ExpiresAtUtc">now()) FROM governance.server_sessions WHERE '+where+'; COMMIT;');assert json.loads(restored.stdout)==old
+ record.update(restoredExactly=True,restoreCommandId=restored.receipt['commandId']);p=out/('ready-expired-session-'+uuid.uuid4().hex+'.json');p.write_text(json.dumps(record,indent=2)+'\n');print(json.dumps(record),flush=True)

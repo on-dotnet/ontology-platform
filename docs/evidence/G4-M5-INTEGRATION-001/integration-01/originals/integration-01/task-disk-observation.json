@@ -1,0 +1,17 @@
+{
+  "taskId": "G4-M5-INTEGRATION-001",
+  "runId": "integration-01",
+  "observedAtUtc": "2026-11-16T13:46:45.478796+00:00",
+  "method": "read-only docker system df -v; only exact task project rows retained",
+  "rows": [
+    "cd563c910aa9   3a05e37c371f                                                                                        \"/bin/sh -ec 'dotnet\u2026\"   1               41kB      22 minutes ago   Up 22 minutes               ontology-g4-m5-integration-01-api-secondary-1",
+    "22837b2b2702   3a05e37c371f                                                                                        \"/bin/sh -ec 'dotnet\u2026\"   1               41kB      12 hours ago     Up 51 minutes               ontology-g4-m5-integration-01-api-1",
+    "5e0f45ecaf9e   9ca9559533b5                                                                                        \"/bin/sh -ec 'export\u2026\"   1               12.3kB    12 hours ago     Up 12 hours                 ontology-g4-m5-integration-01-rustfs-1",
+    "4a5dacfa92d7   e1c1331f4a3e                                                                                        \"/bin/bash -ec 'runt\u2026\"   1               12.3kB    12 hours ago     Up 12 hours                 ontology-g4-m5-integration-01-keycloak-test-1",
+    "0edb069b759a   ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab   \"java -Xms128m -Xmx6\u2026\"   1               4.1kB     12 hours ago     Up 12 hours                 ontology-g4-m5-integration-01-fuseki-1",
+    "19f76154598a   9a74990a5c77                                                                                        \"/bin/sh -ec 'cp /ru\u2026\"   1               28.7kB    12 hours ago     Up 12 hours (healthy)       ontology-g4-m5-integration-01-pg-source-1",
+    "b71ef14e5e48   9a74990a5c77                                                                                        \"/bin/sh -ec 'cp /ru\u2026\"   1               24.6kB    12 hours ago     Up 12 hours (healthy)       ontology-g4-m5-integration-01-platform-pg-1",
+    "ontology-g4-m5-integration-01_source-data      1         66.23MB",
+    "ontology-g4-m5-integration-01_platform-data    1         73.93MB"
+  ]
+}

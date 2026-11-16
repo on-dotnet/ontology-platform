@@ -1,0 +1,32 @@
+import sys,json,subprocess
+from pathlib import Path
+sys.path.insert(0,'scripts/maintenance')
+import workflow_m5_integration as q
+root=Path.cwd();out=root/'artifacts/workflow'/q.TASK/q.RUN;p=out/'authorized-edge-restoration.json';j=json.loads(p.read_text());prefix=['docker','--context','desktop-linux']
+def read(args):return subprocess.check_output(prefix+args,timeout=15)
+def inspect(cid):
+ d=json.loads(read(['inspect',cid]))[0]
+ return dict(id=d['Id'],labels=d['Config']['Labels'],mounts=[dict(type=m['Type'],name=m.get('Name'),source=m['Source'],destination=m['Destination']) for m in d['Mounts']],ports=d['NetworkSettings']['Ports'],running=d['State']['Running'])
+after=[inspect(r['id']) for r in j['start']['resources']]
+def normalized(rows):
+ result={}
+ for r in rows:
+  mounts=[]
+  for m in r['mounts']:
+   m=dict(m)
+   if m['type']=='bind' and m['source'].startswith('/host_mnt/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/'):
+    m['source']=m['source'][len('/host_mnt'):]
+   mounts.append(m)
+  result[r['labels']['com.docker.compose.service']]=sorted(mounts,key=lambda m:m['destination'])
+ return result
+assert normalized(j['before'])==normalized(after)
+for old in [*[r['id'] for r in j['before']],j['networkBefore']['id']]:
+ r=subprocess.run(prefix+(['network','inspect',old] if old==j['networkBefore']['id'] else ['inspect',old]),capture_output=True,timeout=10)
+ assert r.returncode!=0 and (b'no such object' in r.stderr.lower() or (old==j['networkBefore']['id'] and ('network '+old+' not found').encode() in r.stderr.lower()))
+n=json.loads(read(['network','inspect',j['networkBefore']['name']]))[0];assert not n['Internal']
+platform=json.loads(read(['network','inspect','ontology-g4-m5-integration-01_platform']))[0];assert platform['Internal']
+assert all(all(b['HostIp']=='127.0.0.1' for b in binds) for row in after for binds in row['ports'].values() if binds)
+j.update(after=after,postcheckFailure='Initial exact bind-source comparison failed: Docker Desktop aliases /host_mnt/Users and /Users. Only exact current-worktree prefix normalized; volume name/source/destination remain exact.',networkAfter=dict(id=n['Id'],internal=n['Internal']),platformInternal=True,volumesPreserved=True,oldIdsAbsent=True,status='RESTORED_APPROVED_DUAL_NETWORK');p.write_text(json.dumps(j,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(dict(status=j['status'],count=len(after))),flush=True)
+print(json.dumps(q.runtime_health()),flush=True)
+print(json.dumps(q.runtime_start(api=True)),flush=True)

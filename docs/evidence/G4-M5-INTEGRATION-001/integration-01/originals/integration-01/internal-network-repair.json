@@ -1,0 +1,257 @@
+{
+  "taskId": "G4-M5-INTEGRATION-001",
+  "runId": "integration-01",
+  "reason": "M5 requires internal isolated network before first business scenario",
+  "before": [
+    {
+      "id": "04d6000d7e112b78afe1d9d525d45519f96d45c7296c23cbeda8f28efc330613",
+      "labels": {
+        "build-date": "",
+        "com.docker.compose.config-hash": "54184dff5f698af5bc34e4f7b5ec7c249a81e54b7e11e743848db7f373adc640",
+        "com.docker.compose.container-number": "1",
+        "com.docker.compose.depends_on": "",
+        "com.docker.compose.image": "sha256:a3951370f879374cb89cca3b495e05badab38807cc4cd609c54a35f93f6ccd64",
+        "com.docker.compose.oneoff": "False",
+        "com.docker.compose.project": "ontology-g4-m5-integration-01",
+        "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/runtime-compose.json",
+        "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/integration-01",
+        "com.docker.compose.service": "rustfs",
+        "com.docker.compose.version": "5.6.1",
+        "description": "RustFS is a distributed object storage system written in Rust, supporting erasure coding, multi-tenant management, and observability.",
+        "license": "Apache-2.0",
+        "maintainer": "RustFS Team <dev@rustfs.com>",
+        "name": "RustFS",
+        "ontology.run-id": "integration-01",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M5-INTEGRATION-001",
+        "org.opencontainers.image.title": "RustFS,org.opencontainers.image.description=RustFS distributed object storage system,org.opencontainers.image.version=1.0.3,org.opencontainers.image.revision=331fb896285a7686f927baf8d9d4dc2d3d3a10a9,org.opencontainers.image.source=https://github.com/rustfs/rustfs,org.opencontainers.image.created=2026-10-17T15:51:03Z,org.opencontainers.image.build-type=release",
+        "release": "1.0.3",
+        "summary": "High-performance distributed object storage system compatible with S3 API",
+        "url": "https://rustfs.com",
+        "vcs-ref": "",
+        "vendor": "RustFS Team",
+        "version": "v1.0.3"
+      },
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "ontology-g4-m5-integration-01_rustfs-data",
+          "destination": "/data"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/run/secrets/s3-access"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/run/secrets/s3-secret"
+        }
+      ],
+      "running": true
+    },
+    {
+      "id": "e77fe567142e3b10063cb26d470342dba2b34afd52b37fe98bdc59e46f191bf9",
+      "labels": {
+        "architecture": "aarch64",
+        "build-date": "2026-10-13T12:45:57Z",
+        "com.docker.compose.config-hash": "fd36121bb391e1542b8d80d562b90a749cabeb09ad5b821334bfedcd0e2ac565",
+        "com.docker.compose.container-number": "1",
+        "com.docker.compose.depends_on": "",
+        "com.docker.compose.image": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "com.docker.compose.oneoff": "False",
+        "com.docker.compose.project": "ontology-g4-m5-integration-01",
+        "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/runtime-compose.json",
+        "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/integration-01",
+        "com.docker.compose.service": "keycloak-test",
+        "com.docker.compose.version": "5.6.1",
+        "com.redhat.build-host": "",
+        "com.redhat.component": "",
+        "com.redhat.license_terms": "",
+        "cpe": "cpe:/a:redhat:enterprise_linux:9::appstream",
+        "description": "Keycloak Server Image",
+        "distribution-scope": "public",
+        "io.buildah.version": "1.45.0",
+        "io.k8s.description": "Keycloak Server Image",
+        "io.k8s.display-name": "Keycloak Server",
+        "io.openshift.expose-services": "",
+        "io.openshift.tags": "keycloak security identity",
+        "maintainer": "https://www.keycloak.org/",
+        "name": "keycloak",
+        "ontology.run-id": "integration-01",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M5-INTEGRATION-001",
+        "org.opencontainers.image.created": "2026-10-31T10:43:11.501Z",
+        "org.opencontainers.image.description": "",
+        "org.opencontainers.image.documentation": "https://www.keycloak.org/documentation",
+        "org.opencontainers.image.licenses": "Apache-2.0",
+        "org.opencontainers.image.revision": "26018f2a4c6155cfe2c28f078996390bf5191946",
+        "org.opencontainers.image.source": "https://github.com/keycloak-rel/keycloak-rel",
+        "org.opencontainers.image.title": "keycloak-rel",
+        "org.opencontainers.image.url": "https://github.com/keycloak-rel/keycloak-rel",
+        "org.opencontainers.image.version": "26.8.1",
+        "release": "",
+        "summary": "Keycloak Server Image",
+        "url": "https://www.keycloak.org/",
+        "vcs-ref": "",
+        "vcs-type": "git",
+        "vendor": "https://www.keycloak.org/",
+        "version": "26.8.1"
+      },
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "ontology-g4-m5-integration-01_keycloak-data",
+          "destination": "/opt/keycloak/data"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/run/secrets/keycloak-password"
+        }
+      ],
+      "running": true
+    },
+    {
+      "id": "4f67c0f342dbc0941af3d35d1813fe967e4871927ae121e94357731825d42d46",
+      "labels": {
+        "com.docker.compose.config-hash": "f17bfae677efa9b66abb073115d30495997c581f8caa488fe87225687da82a99",
+        "com.docker.compose.container-number": "1",
+        "com.docker.compose.depends_on": "",
+        "com.docker.compose.image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "com.docker.compose.oneoff": "False",
+        "com.docker.compose.project": "ontology-g4-m5-integration-01",
+        "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/runtime-compose.json",
+        "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/integration-01",
+        "com.docker.compose.service": "fuseki",
+        "com.docker.compose.version": "5.6.1",
+        "io.ontology-platform.context-sha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+        "io.ontology-platform.input-fingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "io.ontology-platform.platform": "linux/arm64",
+        "io.ontology-platform.run-id": "e0-a-real-69e4388fb5bf4923976997ded13f93b9-export",
+        "io.ontology-platform.task-id": "G3-M3-001",
+        "ontology.run-id": "integration-01",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M5-INTEGRATION-001",
+        "org.opencontainers.image.source": "https://github.com/on-dotnet/ontology-platform",
+        "org.opencontainers.image.version": "22.04"
+      },
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "ontology-g4-m5-integration-01_fuseki-data",
+          "destination": "/fuseki"
+        }
+      ],
+      "running": true
+    }
+  ],
+  "networkBefore": {
+    "id": "05632f70ff99a5a2bfddad9f5d768042cfb644635c148b43d60cd12b714fb1a4",
+    "internal": false
+  },
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "stop",
+        "--time",
+        "20",
+        "04d6000d7e112b78afe1d9d525d45519f96d45c7296c23cbeda8f28efc330613",
+        "e77fe567142e3b10063cb26d470342dba2b34afd52b37fe98bdc59e46f191bf9",
+        "4f67c0f342dbc0941af3d35d1813fe967e4871927ae121e94357731825d42d46"
+      ],
+      "commandId": "fcaa96f073094d53931cb27e4dc145ee",
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "rm",
+        "04d6000d7e112b78afe1d9d525d45519f96d45c7296c23cbeda8f28efc330613",
+        "e77fe567142e3b10063cb26d470342dba2b34afd52b37fe98bdc59e46f191bf9",
+        "4f67c0f342dbc0941af3d35d1813fe967e4871927ae121e94357731825d42d46"
+      ],
+      "commandId": "806726d6fc394affbae857661b058795",
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "network",
+        "rm",
+        "05632f70ff99a5a2bfddad9f5d768042cfb644635c148b43d60cd12b714fb1a4"
+      ],
+      "commandId": "e3755f64e51f46d0b58755b57c8a7054",
+      "exitCode": 0
+    }
+  ],
+  "status": "INTERNAL_REPLACED_VOLUMES_PRESERVED",
+  "preservedFailure": {
+    "classification": "HARNESS",
+    "step": "absence_postcheck",
+    "reason": "case-sensitive Docker absence message assertion",
+    "exitCode": 1
+  },
+  "removedIdsAbsent": true,
+  "replacement": {
+    "taskId": "G4-M5-INTEGRATION-001",
+    "status": "STARTED_NOT_YET_HEALTH_VERIFIED",
+    "resources": [
+      {
+        "kind": "container",
+        "id": "402768782f8661bee311a1d66be93b5b575d817a309a435b08726f5e6ce32b4a",
+        "name": "/ontology-g4-m5-integration-01-rustfs-1",
+        "service": "rustfs",
+        "taskId": "G4-M5-INTEGRATION-001",
+        "runId": "integration-01",
+        "running": true,
+        "status": "running",
+        "exitCode": 0,
+        "memory": 536870912,
+        "nanoCpus": 250000000,
+        "imageId": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+      },
+      {
+        "kind": "container",
+        "id": "9ef89b63877386c83d9d5ef579a855b657ba06e28df3024330c2895254b390fb",
+        "name": "/ontology-g4-m5-integration-01-keycloak-test-1",
+        "service": "keycloak-test",
+        "taskId": "G4-M5-INTEGRATION-001",
+        "runId": "integration-01",
+        "running": true,
+        "status": "running",
+        "exitCode": 0,
+        "memory": 1073741824,
+        "nanoCpus": 500000000,
+        "imageId": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+      },
+      {
+        "kind": "container",
+        "id": "152ccf8f83e4ff1b3fe63081dcd88d3eb8789f314f49010ff8800224bdf4cd19",
+        "name": "/ontology-g4-m5-integration-01-fuseki-1",
+        "service": "fuseki",
+        "taskId": "G4-M5-INTEGRATION-001",
+        "runId": "integration-01",
+        "running": true,
+        "status": "running",
+        "exitCode": 0,
+        "memory": 1610612736,
+        "nanoCpus": 750000000,
+        "imageId": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"
+      }
+    ],
+    "commandId": "c341bf3e813f4fb2989dbb2553bfe223"
+  },
+  "networkAfter": {
+    "id": "2d27ac432c5e1226840422d61e53436ae7d73a052173eece1e60a61347a38217",
+    "internal": true
+  }
+}

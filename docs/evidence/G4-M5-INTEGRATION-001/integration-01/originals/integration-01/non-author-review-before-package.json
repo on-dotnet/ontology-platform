@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M5-INTEGRATION-001",
+  "reviewer": "/root/m5_final_review",
+  "role": "NON_AUTHOR_READ_ONLY",
+  "recordedBy": "Master transcription of non-author review messages; reviewer role cannot write files",
+  "reviewStatus": "NO_OPEN_BLOCKING_FINDINGS_IN_REVIEWED_SCOPE",
+  "batchAcceptance": "PENDING_FINAL_UNIFIED_VERIFICATION_AND_PACKAGE",
+  "g4Overall": "PARTIAL",
+  "method": ["读取授权、任务卡、Git差异与相关实现", "重算所列资格引用、命令stdout/stderr的SHA256", "核对真实exitCode、测试数量、skip及当前资格输入", "核对独立预期、测试断言、变异失败与恢复原件", "未修改代码、启动服务或执行产品测试"],
+  "requirements": [
+    {"ids": ["BI-01", "BI-02", "BI-03", "BI-04"], "status": "PRIOR_INDEPENDENT_REVIEW_REFERENCED", "assessment": "当前授权限定单PG整合、G4 PARTIAL及A/B/C一次授权；历史索引、上下文、按影响门禁由前任非作者早审支持。本次未重新执行全部A线验证。"},
+    {"id": "BI-05", "status": "REVIEWED_WITH_EXPLICIT_TEST_LAYERS", "numeric": {"expected": "仅numeric-target-1/2成边；1.010与NULL不成边", "formalReport": "browser-numeric-1794832894553.json", "independentSqlCommandId": "4d5dd28606c64666b7afd3cd9ceb3085", "matchingTargets": ["numeric-target-1", "numeric-target-2"], "nullTargets": 1}, "aba": {"qualification": "qualification-aba-inflight-82cfcfbe7655442c97d9105d1e7184f8.json", "commandId": "b3a86d66ecea4a0eaaea7f340ae493ba", "activationRevisions": [3,4,5], "elapsedMs": 1004.5732, "causalOrder": ["SOURCE_READ_COMPLETED", "B_ACTIVATED", "A_ACTIVATED", "COMMIT_REJECTED"], "observed": "同query原五秒内409 query_binding_stale；ciphertext、resultSize、提交receipts、成功audit均零，resultHash null"}, "mutations": {"classification": "UNIT_MUTATION_NOT_REAL_DB", "cases": [{"name": "numeric-lexical", "commandId": "03a4ca9f466b451598068adbc876cba3", "actualExitCode": 2}, {"name": "numeric-all-equal", "commandId": "441544ee12824161baa595e5729030f7", "actualExitCode": 2}, {"name": "aba-identity-ignored", "commandId": "5bddfd0f75cd4deb91e187a5a7d7b223", "actualExitCode": 2}], "assessment": "已核原件SHA及预期失败测试名；不能称真实DB变异"}},
+    {"ids": ["BI-06", "BI-07"], "status": "REVIEWED", "counterexamples": [
+      {"case": "EXPIRED_PERSISTED_SESSION", "commandId": "03d1b97262c8405ab668e42d6cf20c48", "actualExitCode": 2, "observed": "sessionLive=false，票据可读、claimsMatch和ticketMatches仍true；短检查拒绝，长测试未启动", "restoreCommandId": "0cf920c1ddbc49b0a8c3ede82db6b09a", "restoration": "before/restore原件ExpiresAtUtc精确相同"},
+      {"case": "DISABLED_CONNECTION", "commandId": "e31f8446734a4e1591d0b16e60e74a64", "actualExitCode": 1, "observed": "scenario_ready阶段PREREQUISITE_STALE:connection"},
+      {"case": "WEB_NOT_LISTENING", "commandId": "9ca20268500d4569b3cdea6b9ffaf217", "actualExitCode": 1, "observed": "真实ConnectionRefused、PREREQUISITE_STALE:web，未进入长UI"},
+      {"case": "OLD_EXPECTED_ACTIVATION", "reference": "ready-old-activation-9dc547de093c4f0bb424e4bff8f520c7.json", "classification": "REAL_CURRENT_DB_WITH_STALE_EXPECTED_ACTIVATION", "observed": "PREREQUISITE_STALE:activation；长链未启动，原场景字节恢复"},
+      {"case": "WRONG_DATABASE_AND_REAL_FOREIGN_OWNER", "commandId": "1ade33d7efab47a3b03ca423e61f380b", "actualExitCode": 0, "observed": "正式守卫在SQL前拒绝错误测试库标识及真实M3容器Owner"}], "qualificationLimit": "ready-fixture-negatives错schema/同数量错行/scope漂移是实际探针结果的内存变异，不冒充新增真实DB执行"},
+    {"ids": ["BI-08", "BI-09"], "status": "SELECTED_REAL_SLICES_VERIFIED_FINAL_AGGREGATION_PENDING", "maf": {"qualification": "qualification-maf-binding-9d682eee360a4d8c8086a2f60418b9b0.json", "commandId": "3013bf9ddb02442c84f7927f858ee4be", "status": "CURRENT_INPUT_PASS", "condition": "M5临时测试容器CPU2；产品五秒预算不变"}, "recovery": {"qualification": "qualification-s1-reopen-fe5a423a50e74616be8fb0fe78f1afa8.json", "restartJournal": "canonical-api-restart-4dbc820bb97e4ea8bd2a627a81951a4f.json", "observed": "API新启动时间、相同二进制，新OIDC恢复原canonical；四次源扫描129/61"}, "uiAndMcp": {"qualifications": ["qualification-ui-s1-88f846d045ef49b28f0e68a023d1f3d1.json", "qualification-s3-fd90d0d0050d491f9ce48955e2059b21.json", "qualification-ui-s3-fd7a510bb0de45b2ab74ec1bf8e39681.json"], "assertions": [34,88,23]}},
+    {"id": "BI-10", "status": "REVIEW_FINDINGS_CLOSED_WITH_FINAL_GATE_PENDING"},
+    {"ids": ["BI-11", "BI-12"], "status": "PENDING", "reason": "唯一ZIP、非作者VerifyOnly及包外机器回执未执行"}
+  ],
+  "findings": [
+    {"id": "M5-REVIEW-RESOURCE-P2", "severity": "P2", "status": "CLOSED", "problem": "原ready未核新增后配额、停止容器漏计", "fix": "demand_budget核新增768MiB/2CPU/1槽及ps-aq总数", "verificationCommandId": "a5e4fc08915a451cb06122281cf56f30", "verification": "exit0、10tests、原件SHA核对"},
+    {"id": "M5-REVIEW-CATALOG-READINESS", "status": "CLOSED", "problem": "numeric建表使standard旧目录失效，原ready仅核选中表", "fix": "独立比整个production对象/列/原生类型/空值性/序号/种类，正式重发现与新映射", "limit": "旧query_catalog_stale保留"},
+    {"id": "M5-REVIEW-FORMAT", "status": "CLOSED_CHANGED_SCOPE", "commandId": "36794f9d696e40109b1066d2b1ae4faa", "actualExitCode": 2, "currentDiagnostics": 52, "newDiagnostics": 0, "assessment": "52项对应Base完全相同代码行，五项新增换行已修复；不宣称全量format exit0"},
+    {"id": "M5-REVIEW-DISPATCH", "status": "CODE_REVIEW_CLOSED_EXECUTION_PENDING", "assessment": "固定M5任务与五gate复用严格解释器，核Task/Run/input/nonzero/zero-skip/stability"},
+    {"id": "M5-REVIEW-NESTED-NEGATIVE-OUTPUT", "status": "TARGETED_FIX_VERIFIED", "originalCommandId": "cfffc9b6d6054a66817cedf944eb9470", "originalActualExitCode": 0, "problem": "SelfTest预期invalid.yml/toml原FAIL输出被严格parser误判", "fix": "精确exit1及对应拒绝文本确认后加EXPECTED-REJECTION，通用parser不变", "verificationCommandIds": ["622d515b995240f1a8d7c630e6980d6d", "e2cfea07b71e4aa89ae6e8a057cac826"], "verification": "Workflow19tests与结构fixture真实exit0，原件SHA已核"}
+  ],
+  "dispatchUpdate": {"status": "REGISTRATION_DIFF_REVIEWED_EXECUTION_PENDING", "previousPlan": "19c0计划因StructuredFiles.Tests.ps1未注册而BLOCKED", "longRerunStartedByPreviousPlan": false, "fix": "engineering-full.inputs新增该文件及selection回归", "remainingAtReviewTime": "提交后统一verify"},
+  "retainedLimitations": ["初次MAF query_timeout真实失败，不算绑定保护或ABA通过", "numeric初始NULL顺序、过期grant、旧目录及输入漂移失败保留", "旧realm discovery404原因未建立", "宿主锁屏/熄屏连续性NOT_VERIFIED", "bridge具出站能力，不声明网络层断网", "有限内容扫描不是所有形式机密不存在的证明", "CI/其它平台/双架构/非PG Mapping-Query/生产未通过", "不更新main、不部署、不恢复TDengine、不进入G5/G6/G7"]
+}

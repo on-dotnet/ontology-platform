@@ -1,0 +1,22 @@
+import sys,json,re,difflib,subprocess
+from pathlib import Path
+sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as q
+from workflow_execution import run,sha,encoded
+root=Path.cwd();base='a6716b11c3795e5670c07f1ca37057e5649bed89';out=root/'artifacts/workflow'/q.TASK/q.RUN
+files=subprocess.check_output(['git','diff','--name-only',base,'HEAD','--','*.cs'],text=True).splitlines();assert len(files)==3
+historical=root/'docs/evidence/G4-M4-QUERY-001/review-fix-01/format-baseline-comparison.json';h=json.loads(historical.read_text());old={(r['file'],r['line'],r['column'],r['message']) for r in h['legacyDiagnostics']}
+_,env=q.prepared()
+r=run(['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network*)','/usr/local/share/dotnet/dotnet','format','whitespace','--folder','--include',*files,'--verify-no-changes','--verbosity','quiet'],root,task=q.TASK,run_id=q.RUN,stage='m5-native-format-modified-files',environment=env,input_key=sha(encoded({p:sha((root/p).read_bytes()) for p in files})),timeout=60)
+current=[(m[0],int(m[1]),int(m[2]),m[3]) for m in re.findall(r'([^/\n]+\.cs)\((\d+),(\d+)\): error WHITESPACE: (.*?) \[',(r.stdout+r.stderr).decode())];mapping={};identities={}
+for path in files:
+ raw=subprocess.check_output(['git','show',base+':'+path]);assert sha(raw)==h['files'][path]['currentSha256'];a=raw.decode().splitlines();b=(root/path).read_text().splitlines();name=Path(path).name
+ for tag,i,j,x,y in difflib.SequenceMatcher(None,a,b,autojunk=False).get_opcodes():
+  if tag=='equal':
+   for k in range(y-x):mapping[(name,x+k+1)]=i+k+1
+ identities[path]=dict(baseSha256=sha(raw),currentSha256=sha((root/path).read_bytes()))
+legacy=[];new=[]
+for name,line,col,msg in current:
+ oldline=mapping.get((name,line));item=dict(file=name,line=line,column=col,message=msg,baseLine=oldline)
+ (legacy if (name,oldline,col,msg) in old else new).append(item)
+proof=dict(taskId=q.TASK,runId=q.RUN,baseline=base,nativeExitCode=r.returncode,commandId=r.receipt['commandId'],status='PASS_CHANGED_SCOPE' if not new and r.returncode in [0,2] else 'FAIL',historicalDebtTotal=318,inheritedScopeBaseline=52,currentDiagnostics=len(current),newDiagnostics=new,legacyDiagnostics=legacy,files=identities,historicalComparison=dict(path=str(historical.relative_to(root)),sha256=sha(historical.read_bytes())))
+(out/'format-baseline-comparison.json').write_text(json.dumps(proof,indent=2,ensure_ascii=False)+'\n');print(json.dumps({k:v for k,v in proof.items() if k not in ['legacyDiagnostics','files']},ensure_ascii=False));assert proof['status']=='PASS_CHANGED_SCOPE'

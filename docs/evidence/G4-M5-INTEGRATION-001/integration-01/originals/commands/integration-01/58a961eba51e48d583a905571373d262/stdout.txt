@@ -1,0 +1,86 @@
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查20004个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: clean baseline accepted
+PASS: wrong package name rejected
+PASS: broken relative link rejected
+PASS: synthetic token rejected without printing value
+PASS: synthetic token in TypeScript rejected
+PASS: credential assignment in dot-env rejected
+PASS: unpinned action rejected
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查19997个文件：语法/格式/相对链接/有限机密模式/基线…
+
+NOT_RUN: .NET test：须显式追加-RunTests执行已批准测试项目。
+NOT_RUN: Web独立检查需真实目标及显式-RunNative。
+NOT_RUN: Web检查被显式-SkipWeb跳过，仅用于隔离工程检查器fixture或独立验收。
+NOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。
+PASS: native commands resolve SDK and config from selected Root
+Checker tests: 8 passed; application tests: NOT_RUN.
+PASS: Doctor handles existing pnpm without Node as BLOCKED/2.
+PASS: Doctor discovers real macOS ARM64 Node from isolated path with spaces.
+PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.
+FAIL: structured syntax invalid.yml (ParserError)
+FAIL: structured syntax invalid.toml (TOMLDecodeError)
+PASS: structured parser 4 real positive/negative cases.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查20004个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: verification preserves unset environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查20004个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: verification preserves empty environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查20004个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: verification preserves value environment state for five process variables.
+Environment regression: 3 state groups and structured-suite cleanup passed; native calls are synthetic, product tests NOT_RUN.
+PASS: toolchain archives accept two exact digests and reject two tampered byte cases.
+{"status": "FAIL", "runId": "b0cc66360cc44ef0bd6da25c51f84ba3", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/b0cc66360cc44ef0bd6da25c51f84ba3"}
+{"status": "PASS", "runId": "e123671a0b3b48348d9a5ad15850d697", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/e123671a0b3b48348d9a5ad15850d697"}
+{"status": "FAIL", "runId": "b8baf3a0e2f04067825a8a8752f923db", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/b8baf3a0e2f04067825a8a8752f923db"}
+{"status": "FAIL", "runId": "543367df20c647aba4efaee3cf370af6", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/543367df20c647aba4efaee3cf370af6"}
+{"status": "FAIL", "runId": "f0dec99b3ed048fcb6acb2fc9198e2f3", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/f0dec99b3ed048fcb6acb2fc9198e2f3"}
+{"status": "FAIL", "runId": "d56654c5d8d04dd8aef244c7330b6a80", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/d56654c5d8d04dd8aef244c7330b6a80"}
+{"status": "FAIL", "runId": "0dcf8fffe72246d8a6ef9aca2ee45dc6", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/0dcf8fffe72246d8a6ef9aca2ee45dc6"}
+{"status": "FAIL", "runId": "d8ab6e686b364b4ebe3aa3b3f2b2a32a", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/d8ab6e686b364b4ebe3aa3b3f2b2a32a"}
+{"status": "FAIL", "runId": "a11e7a7dd6e64feda888c19b7bc9b089", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/a11e7a7dd6e64feda888c19b7bc9b089"}
+{"status": "FAIL", "runId": "68f2df1aa9744d06a4af07046f04009b", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/68f2df1aa9744d06a4af07046f04009b"}
+{"status": "PASS", "runId": "8883f1d7eb024fea89331b5e7d342c47", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/8883f1d7eb024fea89331b5e7d342c47"}
+{"status": "PASS", "runId": "03facfadad034230817edae2bf27df85", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/03facfadad034230817edae2bf27df85"}
+{"status": "PASS", "runId": "d62e37476daf4276b208393b9e8dec4d", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-fault-control/d62e37476daf4276b208393b9e8dec4d"}
+{"status": "PASS", "runId": "757d9db031f14e68bfa69faf957111d5", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/757d9db031f14e68bfa69faf957111d5"}
+{"status": "PASS", "runId": "7f1b06a5d76548b9a7646275715159ec", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/7f1b06a5d76548b9a7646275715159ec"}
+{"status": "PASS", "runId": "b8542cd996424aa9884426c988ac5ef9", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/b8542cd996424aa9884426c988ac5ef9"}
+{"status": "PASS", "runId": "7ce716967ea7485eb796f4b98bfdc015", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/7ce716967ea7485eb796f4b98bfdc015"}
+{"status": "PASS", "runId": "56cab73875e44d32a08e22fd1e32fc6f", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/56cab73875e44d32a08e22fd1e32fc6f"}
+{"status": "PASS", "runId": "0a98bb0dc06e4921a4e6abb438f2dc28", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/0a98bb0dc06e4921a4e6abb438f2dc28"}
+{"status": "PASS", "runId": "f553272816c549599ab0d857c833d908", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/f553272816c549599ab0d857c833d908"}
+{"status": "PASS", "runId": "ff1079076952402c8c91509c1df273c0", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/ff1079076952402c8c91509c1df273c0"}
+{"status": "PASS", "runId": "286ef5823a2349a1bda281a6a263bbf9", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/286ef5823a2349a1bda281a6a263bbf9"}
+{"status": "FAIL", "runId": "32aeebc40bdc42ae9a2970865bb88c1d", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/32aeebc40bdc42ae9a2970865bb88c1d"}
+{"status": "PASS", "runId": "5711e6f63cf240e8a1025b94a84e154d", "evidenceDirectory": "docs/evidence/G3-M5-001/runtime/g3-m5-control/5711e6f63cf240e8a1025b94a84e154d"}
+{"status": "PASS", "runId": "e0e0408708444264bbe25b8fcf6154a2", "evidenceDirectory": "docs/evidence/G3-M5-001/runtime/g3-m5-control/e0e0408708444264bbe25b8fcf6154a2"}
+{"status": "PASS", "runId": "490af3709c3142e2ab9e0813ef372d1e", "evidenceDirectory": "docs/evidence/G3-M5-001/runtime/g3-m5-control/490af3709c3142e2ab9e0813ef372d1e"}
+{"status": "PASS", "runId": "d44a6e3ee958412e868c646ce6ffbb33", "evidenceDirectory": "docs/evidence/G3-M5-001/runtime/g3-m5-control/d44a6e3ee958412e868c646ce6ffbb33"}
+{"status": "PASS", "runId": "f8a93d7b87ea44039b1a94886b71c439", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-smoke-control/f8a93d7b87ea44039b1a94886b71c439"}
+{"status": "PASS", "runId": "c73f359adfa94cd6b7c60b98a9556d69", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-timing-control/c73f359adfa94cd6b7c60b98a9556d69"}
+{"status": "FAIL", "runId": "17d1811dbaca4ecea1d645b757b070ac", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-timing-control/17d1811dbaca4ecea1d645b757b070ac"}
+{"status": "FAIL", "runId": "c11f0497fc2c4eb7a5d8a0ae0bb6105a", "evidenceDirectory": "docs/evidence/G3-M5-001/runtime/g3-m5-control/c11f0497fc2c4eb7a5d8a0ae0bb6105a"}
+{"status": "FAIL", "runId": "0217b23482314881a348215a163b88a8", "evidenceDirectory": "docs/evidence/G3-M5-001/runtime/g3-m5-control/0217b23482314881a348215a163b88a8"}
+{"status": "PASS", "runId": "2d66a85522ed42ffbce990181f460ec4", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/2d66a85522ed42ffbce990181f460ec4"}
+{"status": "FAIL", "runId": "4bf9333c46984563a61d1684d5a34887", "evidenceDirectory": "docs/evidence/G3-M5-001/runtime/g3-m5-control/4bf9333c46984563a61d1684d5a34887"}
+{"status": "BLOCKED", "runId": "0a33ff54ff5d4a06ae27000ab3a12b15", "evidenceDirectory": "docs/evidence/G3-M5-001/runtime/g3-m5-control/0a33ff54ff5d4a06ae27000ab3a12b15"}
+FAIL: 工程检查异常：Maintenance regression failed: CloseoutGovernance.Tests.py

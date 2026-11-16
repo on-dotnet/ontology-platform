@@ -1,0 +1,30 @@
+import sys,json,subprocess,uuid
+from pathlib import Path
+sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as q
+from workflow_execution import sha,run
+root=Path.cwd();out=root/'artifacts/workflow'/q.TASK/q.RUN;commands=out.parent/'commands'/q.RUN
+# 错库及真实其它任务容器的Owner均在任何SQL执行前拒绝。
+before=set(commands.glob('*/receipt.json'));errors={}
+for name,call in [('database',lambda:q.test_database_control('b71ef14e5e484253c0b435332c4480fc071268f634c0b049d5d4aff57c383912','query',False)),('owner',lambda:q.test_database_control('fb8500b78663','a'*12,False))]:
+ try:call()
+ except ValueError as e:errors[name]=str(e)
+ else:raise AssertionError(name+' allowed')
+assert 'NONCE' in errors['database'] or 'DATABASE' in errors['database'];assert 'OWNER' in errors['owner'];assert set(commands.glob('*/receipt.json'))==before
+rows=[]
+for file in out.glob('ready-expired-session-*.json'):
+ r=json.loads(file.read_text());assert r['status']=='EXPECTED_REJECTION' and r['longRunStarted'] is False and r['restoredExactly'] is True
+ receipt=json.loads((commands/r['shortCommandId']/'receipt.json').read_text());assert receipt['exitCode']==2 and receipt['stage']=='query-runtime-ready';rows.append(r)
+assert rows
+for ident,code in [('9ca20268500d4569b3cdea6b9ffaf217','PREREQUISITE_STALE:web')]:
+ r=json.loads((commands/ident/'receipt.json').read_text());assert r['exitCode']==1;assert code in Path(r['stderr']['path']).read_text()
+mutation=json.loads((out/'targeted-mutations/results.json').read_text());assert len(mutation['cases'])==3
+for case in mutation['cases']:
+ r=json.loads((commands/case['testCommandId']/'receipt.json').read_text());assert r['exitCode']==2
+ raw=b''.join(Path(r[k]['path']).read_bytes() for k in ['stdout','stderr']);assert case['expectedFailingCase'].encode() in raw
+assert json.loads((out/'targeted-mutations/restoration.json').read_text())['productionSourcesUnchanged']
+# NULL加入后的独立源SQL仍精确只返回两个相等numeric端点。
+cid=json.loads((out/'source-resources.json').read_text())['resources'][0]['id'];labels=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{json .Config.Labels}}',cid]));assert labels['ontology.task-id']==q.TASK and labels['ontology.run-id']==q.RUN
+sql="SELECT json_build_object('matchingTargets',(SELECT json_agg(r.reading_id ORDER BY r.reading_id) FROM production.numeric_assets a JOIN production.numeric_readings r ON a.numeric_key=r.numeric_key AND a.organization_id=r.organization_id AND a.site_id=r.site_id WHERE a.asset_id='asset-1' AND a.site_id='site-a'),'nullTargets',(SELECT count(*) FROM production.numeric_readings WHERE numeric_key IS NULL));"
+r=run(['docker','--context','desktop-linux','exec','-i',cid,'psql','-U','postgres','-d','fixture','-v','ON_ERROR_STOP=1','-qAt'],root,task=q.TASK,run_id=q.RUN,stage='m5-numeric-final-independent-sql',stdin=sql.encode(),input_key=sha(sql.encode()),timeout=10);assert not r.returncode and json.loads(r.stdout)=={'matchingTargets':['numeric-target-1','numeric-target-2'],'nullTargets':1}
+record=dict(taskId=q.TASK,runId=q.RUN,status='PASS',wrongDatabaseAndOwner=errors,noSqlExecutedForWrongIdentity=True,expiredSessionOriginals=rows,numericIndependentSqlCommandId=r.receipt['commandId'],unitMutants='THREE_KILLED_NOT_REAL_DB_MUTANTS',webNotListening='REAL_REJECTED_BEFORE_LONG_UI_RUN')
+(out/'counterexample-closeout.json').write_text(json.dumps(record,indent=2)+'\n');print(json.dumps(record))

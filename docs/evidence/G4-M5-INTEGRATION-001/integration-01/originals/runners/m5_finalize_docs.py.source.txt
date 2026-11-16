@@ -1,0 +1,80 @@
+"""Freeze completed engineering/product observations; delivery completes outside the immutable ZIP."""
+import json,subprocess,hashlib,datetime
+from pathlib import Path
+root=Path.cwd();task='G4-M5-INTEGRATION-001';rr=root/'artifacts/workflow'/task/'integration-01';out=root/'docs/evidence'/task
+run=root/'artifacts/workflow'/task/'runs'/'8ddcb683822d46638e5bbca09484dc51';result=json.loads((run/'receipt.json').read_text());assert result['status']=='PASS'
+head=subprocess.check_output(['git','rev-parse','HEAD']).decode().strip();assert head.startswith('4e20be50')
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+checks=[]
+for row in result['checks']:
+ assert row['status']=='PASS' and row.get('exitCode',0)==0
+ checks.append(dict(name=row['gate'],command=' '.join(row['command']),status='PASS',exitCode=row['exitCode'],output=f"{row['tests']} framework tests/checks; skipped={row['skipped']}; execution={row['executionMode']}; original={row['logPath']}; SHA256={row['evidenceSha256']}"))
+checks.extend([
+ dict(name='native-format-inherited-baseline',command='dotnet format whitespace --folder --include <three changed C# files> --verify-no-changes --verbosity quiet',status='FAIL',exitCode=2,output='Actual command 36794f9d696e40109b1066d2b1ae4faa exited2 with52 exact inherited diagnostics; current changed scope adds0. Historical debt is retained, not whole-format PASS.'),
+ dict(name='changed-scope-format',command='python3 -B /tmp/m5_validate_format_evidence.py',status='PASS',exitCode=0,output='format-baseline-comparison.json independently reviewed:52 inherited and0 new; historical full baseline318. This check does not change native exit2.'),
+ dict(name='counterexamples-before-long-run',command='python3 /tmp/m5_counterexample_closeout.py',status='PASS',exitCode=0,output='Actual aggregate1ade33d7efab47a3b03ca423e61f380b:wrong database and real foreign Owner rejected before SQL; actual expired session rejected before long run; exact expiry restored; numeric independent SQL targets1/2.'),
+ dict(name='non-author-scope-review',command='non-author /root/m5_final_review read-only source and raw evidence review',status='NOT_VERIFIED',exitCode=None,output='Human-style independent code review, not an executable gate: no open blocking findings in reviewed scope; findings/limitations and actual review methods preserved in non-author-review-before-package.json. Not an executed test command.'),
+ dict(name='host-lock-display-continuity',command='host_continuity.py bounded monitor',status='NOT_RUN',exitCode=None,output='Policy ready and600-second heartbeat monitoring observed; actual lock/display trial NOT_VERIFIED.'),
+ dict(name='other-platforms-production-and-full-G4',command=None,status='NOT_RUN',exitCode=None,output='No WindowsAMD64/LinuxAMD64 dual-architecture qualification, nonPG mapping/query, five-source metallurgy, production, TDengine or G5/G6/G7 acceptance. G4Overall PARTIAL.')])
+checks=[c for c in checks if c['name']!='non-author-scope-review']
+# Commands above are display descriptions; exact argv hash, exit and raw bytes remain in originals-index.
+validation=dict(evidenceSchemaVersion=2,validationSource='LOCAL',testedCommit=head,checks=checks,ci=dict(status='NOT_RUN',runId=None,url=None,commit=None,conclusion=None),metadata=dict(taskId=task,G4Overall='PARTIAL',approvedSlice='PG integration only',batchAcceptance='PENDING_EXTERNAL_DELIVERY_FINALIZATION',engineeringRun=run.name,productExecution='FRESH M5 commands; current unified gate execution REUSED after revalidating exact inputs and originals',qualificationMode='FRESH',format='PASS_CHANGED_SCOPE; raw native exit2 retained',timingStatus='RECORDED_COMMAND_INTERVAL_UNION; agent active time UNKNOWN',finalReceipt='External receipt closes package/push/non-author same-ZIP reopen without recursive package rewrite',actualAgentActiveTime='UNKNOWN'))
+vp=out/'validation.json';assert not vp.exists();save(vp,validation)
+a=json.loads((out/'acceptance.json').read_text());a['batchAcceptance']='PENDING_EXTERNAL_DELIVERY_FINALIZATION';a['productAndEngineering']='PASS';a['testedCommit']=head;a['coverageInventory']['PG']['M5Execution']='PASS_APPROVED_PG_SLICE';a['engineeringRun']=run.name
+refs={
+'BI-01':['history-index.json','additional-authorization.json','integration-01/originals-index.json'],
+'BI-02':['acceptance.json','validation.json'],
+'BI-03':['validation.json','integration-01/originals-index.json'],
+'BI-04':['validation.json','integration-01/originals-index.json'],
+'BI-05':['independent-expectations.json','integration-01/originals/integration-01/counterexample-closeout.json','integration-01/originals/integration-01/non-author-review-before-package.json'],
+'BI-06':['integration-01/originals/integration-01/counterexample-closeout.json','integration-01/originals/integration-01/ready-disabled-connection.json'],
+'BI-07':['integration-01/originals/integration-01/counterexample-closeout.json','integration-01/originals-index.json'],
+'BI-08':['validation.json','integration-01/originals-index.json'],
+'BI-09':['validation.json','integration-01/originals-index.json'],
+'BI-10':['integration-01/originals/integration-01/non-author-review-before-package.json'],
+'BI-11':['External unique ZIP and final receipt and non-author same-ZIP reopen JSON'],
+'BI-12':['integration-01/originals/integration-01/efficiency-closeout.json','integration-01/originals/integration-01/resource-closeout.json']}
+a['checks']=[dict(id=f'BI-{i:02d}',status='PENDING_EXTERNAL_FINALIZATION' if i==11 else 'PASS',references=refs[f'BI-{i:02d}']) for i in range(1,13)]
+a['limitations']=['G4Overall PARTIAL; approved PG slice only','Native format exit2:52 inherited/0new','Actual lock/display continuity NOT_VERIFIED','Bridge has egress capability; no claim of network air gap','Historical failures remain; current input qualification supersedes their eligibility, not their existence','Final BI11 status is measured in the external receipt after actual package and non-author reopen'];save(out/'acceptance.json',a)
+summary=dict(taskId=task,sourceTestedCommit=head,base='a6716b11c3795e5670c07f1ca37057e5649bed89',productAndEngineering='PASS',G4Overall='PARTIAL',engineeringRun=run.name,gates=[{k:row[k] for k in ['gate','status','executionMode','qualificationMode','tests','skipped','exitCode','sourceCommit','logPath','evidenceSha256']} for row in result['checks']],currentQualificationReferences=[dict(gate=row['gate'],proof=row.get('productProof',{})) for row in result['checks'] if row.get('productProof')],failureRetention=dict(originalSelfTestExit0InterpretedFail='cfffc9b6d6054a66817cedf944eb9470',fix='Assert exact expected parser rejection before labeling child output; strict aggregate FAIL/ERROR detection unchanged',unregisteredFixturePlan='final-engineering-plan-19c0.json',oldMafTimeout='NOT_SUCCESS',oldRealmDiscovery404='ROOT_CAUSE_UNKNOWN'),finalDelivery='PENDING_EXTERNAL_RECEIPT')
+save(rr/'acceptance-closeout.json',summary)
+card=root/'docs/tasks'/f'{task}.md'
+card.write_text(f'''# {task}｜工程入口收敛与PG整合
+
+## 当前执行与授权
+唯一执行状态：FINALIZING；产品与受影响工程验收PASS；batchAcceptance待包外最终回执闭合BI-11；G4Overall=PARTIAL。最终复审关口为ChatGPT，不更新main。
+
+人类已批准[一次性A/B/C批次](../evidence/{task}/authorization.md)，以及[精确M3暂停和M4双网络拓扑](../evidence/{task}/additional-authorization.json)。没有普通helper、修复、构包待批事项。
+
+- Base：`a6716b11c3795e5670c07f1ca37057e5649bed89`；分支`codex/g4-m5-integration-001`；一次创建并持续复用独立托管树。
+- 当前产品/工程资格TestedCommit：`{head}`；后续仅证据/任务文档收口，资格按实际输入重新核验。
+- Master唯一作者；Explorer与Reviewer只读，非作者审查消息由Master如实转录，独立执行身份不伪造。
+- owned_paths：本任务卡/证据、当前授权/规划/Web规则、workflow/context/M5薄消费者及直接相关PG/环境/缓存/前置检查helper，verify/structured-validator/gate登记及直接回归，三个既有C#测试的M5身份/前置检查。最终邻接修复包括StructuredFiles.Tests.ps1预期负例输出标记。
+- read_only_dependencies：冻结M3/M4产品合同/实现、历史证据/ZIP、其它KEEP；无产品DTO/持久语义/权限/5秒预算变化。
+
+## Specify / Verify
+唯一验收矩阵：[acceptance.json](../evidence/{task}/acceptance.json)；当前机器证据：[validation.json](../evidence/{task}/validation.json)；全部原件路径/散列/封装恢复：[originals-index](../evidence/{task}/integration-01/originals-index.json)。BI-11必须在实际构包、普通push和非作者同包重开后由包外回执关闭，不能预先宣称通过。
+
+| 要求 | 当前结果与边界 |
+|---|---|
+| BI-01/02 | 当前授权/规划/Web事实收敛，历史原文固定blob可恢复，五源及平台缺口保留 |
+| BI-03/04 | 代码/证据上下文分开，机器diff选择；未知路径拒绝，执行依赖显式登记 |
+| BI-05 | numeric独立SQL仅targets1/2，NULL/1.010不成边；ABA同query源读后B→A并在1004.5732ms提交拒绝；三个单元变异被杀死，不冒充DB变异 |
+| BI-06/07 | 真实失效session、disabled连接、未监听Web、旧activation均短拒绝；错库/真实他任务Owner在SQL前拒绝；只读快照与独立测试库保留 |
+| BI-08/09 | 任务自有正式G3→TLS只读PG/目录→Mapping异人审核激活→Gateway/UI/MCP；新OIDC及API重启恢复原canonical，源扫描129/61保持；撤权/并发/容量/取消/秘密轮换/禁用及真实MAF/ABA原件有效 |
+| BI-10 | 非作者独立预期、原件SHA与语义审查；资源P2、目录前提、当前新增格式及汇总输出发现关闭 |
+| BI-11 | 唯一V3及非作者同包VerifyOnly和包外JSON在最后交付步骤实测，不递归重写旧ZIP |
+| BI-12 | 区间并集/失败/重测/构建/路径规模均留原件；实际模型活跃时间与未完整观测项UNKNOWN |
+
+## 失败、限制与恢复
+本轮所有旧失败保留。初次MAF超时不算保护通过；numeric NULL先于Mapping的错误准备顺序已改为正式激活后添NULL；grant过期保留精确续期审计；numeric建表使旧全目录失效后通过正式发现/新映射恢复。旧realm discovery404原因未建立，旧私有材料保留。s2-race前置窗口失败经独立短定位与一次有界复验，不改产品5秒。
+
+原生format真实exit2，三文件52项全部继承Base，本轮新增0；不宣称全量format通过。完整SelfTest的预期子失败输出误判已通过精确exit/拒绝文本标记修复，通用FAIL/ERROR解析不放宽；未登记测试被计划拒绝后已显式登记并验收。
+
+M5运行7容器、6GiB/4.5CPU；含M4共同12GiB/9CPU；最终实测明细与宿主RSS见资源原件。M5服务/卷/私有runtime/快照KEEP至复审后精确授权回收；临时独立测试容器已按白名单删除并后验。仅授权M3六容器暂停，卷/数据保留；其它KEEP不动。bridge有出站能力，不声明网络层断网。宿主策略/600秒监控有原件，锁屏/熄屏实测NOT_VERIFIED；早期进程名筛选漏掉改名Next的RSS不能当完整0，最终以cwd+后代实测纠正。
+
+本轮仅PG整合切片；五源冶金、非PG映射查询、双架构、CI及生产未验收；TDengine WAIT_FOR_EXTERNAL_INPUT。零新增下载/依赖/费用；不更新main、不生产、不进入G5/G6/G7。
+
+恢复从本卡、当前授权、acceptance/validation与最终包外回执开始；不要重载历史会话或重跑无关M1–M4全链。包外回执记录最终Head、普通push读回、唯一ZIP的大小/SHA及非作者重开，作为本卡FINALIZING到交付状态的唯一最终观测。
+''')
+print(json.dumps(dict(status='FROZEN_FOR_PACKAGE',testedCommit=head,gates=len(checks))))

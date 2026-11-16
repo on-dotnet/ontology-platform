@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m5_integration as q;q.scenario("numeric");print(json.dumps(q.local_ready(False,False)))
+                                                                                                                                        ~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/scripts/maintenance/workflow_m5_integration.py", line 245, in local_ready
+    demand_grants(grants,state,mapping=not require_grants)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/scripts/maintenance/workflow_m5_integration.py", line 183, in demand_grants
+    if not any(row['SubjectId']==subject and row['OrganizationId']==state['scope']['organizationId'] and set(state['scope']['siteIds'])<=set(row['SiteIds']) and row['Permission']==permission and ((row['ConnectionId']==state['connectionId'] and set(objects)<=set(row['ObjectRefs']) and set(fields)<=set(row['FieldRefs'])) if source else (row['ConnectionId'] is None and not row['ObjectRefs'] and not row['FieldRefs'])) for row in rows):raise ValueError('PREREQUISITE_STALE:grant:'+permission)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: PREREQUISITE_STALE:grant:mapping.read

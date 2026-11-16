@@ -1,0 +1,30 @@
+import sys,json,subprocess
+from pathlib import Path
+from xml.sax.saxutils import escape
+sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as q
+from workflow_execution import run,sha,encoded
+root=Path.cwd();out=root/'artifacts/workflow'/q.TASK/q.RUN/'targeted-mutations';out.mkdir(exist_ok=True)
+_,env=q.prepared();before=q.runtime_binding();results=[]
+cases=[('numeric-lexical','SemanticQuery','G4QueryKeyEquality.cs','return first == second;','return string.Equals(left.Lexical, right.Lexical, StringComparison.Ordinal);','OntologyPlatform.QueryTests','G4QueryTests','NumericRelationshipPreservesExpectedEdgesAcrossRepresentations'),('numeric-all-equal','SemanticQuery','G4QueryKeyEquality.cs','return first == second;','return true;','OntologyPlatform.QueryTests','G4QueryTests','NumericKeyEqualityUsesExactApprovedRange'),('aba-identity-ignored','Connections','Application/QueryBindingReader.cs','if (captured != current) throw Stale();','if (captured != (current with { ActivationId = captured.ActivationId, ActivationRevision = captured.ActivationRevision })) throw Stale();','OntologyPlatform.ConnectionsTests','G4QuerySourceTests','BindingRejectsAbaAndConnectionDrift')]
+try:
+ for name,module,relative,old,new,project,selection,expected in cases:
+  directory=out/name;directory.mkdir();source=root/'backend/src/Modules'/module/('OntologyPlatform.Modules.'+module)/relative;text=source.read_text();assert text.count(old)==1
+  mutant=directory/source.name;mutant.write_text(text.replace(old,new));target=directory/'mutation.targets'
+  target.write_text('<Project><Target Name="M5MutationCompile" BeforeTargets="CoreCompile" Condition="\'$(MSBuildProjectName)\' == \'OntologyPlatform.Modules.'+module+'\'"><ItemGroup><Compile Remove="'+escape(relative)+'"/><Compile Include="'+escape(str(mutant))+'"/></ItemGroup></Target></Project>\n')
+  cmd=['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network*)','/usr/local/share/dotnet/dotnet','build','backend/tests/'+project,'--no-restore','--no-incremental','--disable-build-servers','-m:1','-v:q','-p:CustomAfterMicrosoftCommonTargets='+str(target)]
+  build=run(cmd,root,task=q.TASK,run_id=q.RUN,stage='m5-mutant-build-'+name,environment=env,input_key=sha(encoded([sha(source.read_bytes()),sha(mutant.read_bytes()),sha(target.read_bytes())])),timeout=180)
+  row=dict(case=name,productionSource=str(source.relative_to(root)),originalSha256=sha(source.read_bytes()),mutantSha256=sha(mutant.read_bytes()),targetSha256=sha(target.read_bytes()),buildCommandId=build.receipt['commandId'],buildExitCode=build.returncode,classification='UNIT_MUTATION_NOT_REAL_DB',status='FAIL')
+  if build.returncode:print(build.stdout.decode()[-1500:],flush=True);results.append(row);raise ValueError('MUTANT_BUILD_FAILED')
+  dll=root/'backend/tests'/project/'bin/Debug/net10.0'/(project+'.dll');module_dll=dll.parent/('OntologyPlatform.Modules.'+module+'.dll');row['moduleDllSha256']=sha(module_dll.read_bytes());row['testDllSha256']=sha(dll.read_bytes())
+  test=run(['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network*)','/usr/local/share/dotnet/dotnet',str(dll),'--filter','FullyQualifiedName~'+selection,'--timeout','30s','--zero-tests-policy','strict'],root,task=q.TASK,run_id=q.RUN,stage='m5-mutant-test-'+name,environment=env,input_key=sha(encoded(row)),timeout=45)
+  raw=(test.stdout+test.stderr).decode();row.update(testCommandId=test.receipt['commandId'],testExitCode=test.returncode,expectedFailingCase=expected)
+  assert test.returncode==2 and expected in raw and ('failed ' in raw or '失败' in raw)
+  row['status']='MUTANT_KILLED';results.append(row);print(json.dumps(row),flush=True)
+finally:
+ (out/'results.json').write_text(json.dumps(dict(taskId=q.TASK,runId=q.RUN,cases=results),indent=2)+'\n')
+ for project in ['OntologyPlatform.QueryTests','OntologyPlatform.ConnectionsTests','OntologyPlatform.AgentTests']:
+  r=run(['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network*)','/usr/local/share/dotnet/dotnet','build','backend/tests/'+project,'--no-restore','--no-incremental','--disable-build-servers','-m:1','-v:q'],root,task=q.TASK,run_id=q.RUN,stage='m5-mutant-restore-'+project,environment=env,timeout=180)
+  assert r.returncode==0
+  assert q.contract_build(project)==0
+ after=q.runtime_binding();assert before['process']==after['process'] and before['binaries']==after['binaries']
+ (out/'restoration.json').write_text(json.dumps(dict(taskId=q.TASK,runId=q.RUN,status='ORIGINAL_TEST_BUILDS_RESTORED',runtimeSnapshotUnchanged=True,productionSourcesUnchanged=all(sha((root/r['productionSource']).read_bytes())==r['originalSha256'] for r in results)),indent=2)+'\n');print('ORIGINAL_TEST_BUILDS_RESTORED',flush=True)

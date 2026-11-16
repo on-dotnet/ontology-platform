@@ -1,0 +1,83 @@
+{
+  "taskId": "G4-M5-INTEGRATION-001",
+  "runId": "integration-01",
+  "project": "ontology-g4-m5-integration-01",
+  "resources": [
+    {
+      "kind": "container",
+      "id": "19f76154598ac31e4a075175aadafc0a2f22591281ecf5db0704fd65e26a502b",
+      "name": "/ontology-g4-m5-integration-01-pg-source-1",
+      "service": "pg-source",
+      "taskId": "G4-M5-INTEGRATION-001",
+      "runId": "integration-01",
+      "running": true,
+      "status": "running",
+      "exitCode": 0,
+      "memory": 805306368,
+      "nanoCpus": 750000000,
+      "imageId": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+    },
+    {
+      "kind": "container",
+      "id": "b71ef14e5e484253c0b435332c4480fc071268f634c0b049d5d4aff57c383912",
+      "name": "/ontology-g4-m5-integration-01-platform-pg-1",
+      "service": "platform-pg",
+      "taskId": "G4-M5-INTEGRATION-001",
+      "runId": "integration-01",
+      "running": true,
+      "status": "running",
+      "exitCode": 0,
+      "memory": 805306368,
+      "nanoCpus": 750000000,
+      "imageId": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+    },
+    {
+      "kind": "network",
+      "id": "9e6cf69cabb3f42e1d3ff062548eeb8f2ef2aa8fa74c82d4a50c6b790054382e",
+      "name": "ontology-g4-m5-integration-01_platform",
+      "service": null,
+      "taskId": "G4-M5-INTEGRATION-001",
+      "runId": "integration-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m5-integration-01_fuseki-data",
+      "name": "ontology-g4-m5-integration-01_fuseki-data",
+      "service": null,
+      "taskId": "G4-M5-INTEGRATION-001",
+      "runId": "integration-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m5-integration-01_keycloak-data",
+      "name": "ontology-g4-m5-integration-01_keycloak-data",
+      "service": null,
+      "taskId": "G4-M5-INTEGRATION-001",
+      "runId": "integration-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m5-integration-01_platform-data",
+      "name": "ontology-g4-m5-integration-01_platform-data",
+      "service": null,
+      "taskId": "G4-M5-INTEGRATION-001",
+      "runId": "integration-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m5-integration-01_rustfs-data",
+      "name": "ontology-g4-m5-integration-01_rustfs-data",
+      "service": null,
+      "taskId": "G4-M5-INTEGRATION-001",
+      "runId": "integration-01"
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-m5-integration-01_source-data",
+      "name": "ontology-g4-m5-integration-01_source-data",
+      "service": null,
+      "taskId": "G4-M5-INTEGRATION-001",
+      "runId": "integration-01"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+from pathlib import Path
+p=Path('scripts/maintenance/workflow_m4_query.py');s=p.read_text().replace('def runtime_agent_test(binding_race=False, aba_inflight=False):','def runtime_agent_test(binding_race=False, aba_inflight=False, preflight=False):')
+s=s.replace("            '-e','G4_QUERY_BINDING_RACE='+('1' if binding_race else '0'),","            '-e','G4_QUERY_PREFLIGHT_ONLY='+('1' if preflight else '0'),\n            '-e','G4_QUERY_BINDING_RACE='+('1' if binding_race else '0'),")
+s=s.replace("--timeout 45s --zero-tests-policy strict --results-directory /tmp/TestResults;", "--timeout ${G4_TEST_TIMEOUT:-45s} --zero-tests-policy strict --results-directory /tmp/TestResults;")
+s=s.replace("'-e','G4_QUERY_PREFLIGHT_ONLY='+('1' if preflight else '0'),","'-e','G4_QUERY_PREFLIGHT_ONLY='+('1' if preflight else '0'),\n            '-e','G4_TEST_TIMEOUT='+('10s' if preflight else '45s'),")
+s=s.replace("stage='query-real-aba-inflight-runtime' if aba_inflight else", "stage='query-runtime-ready' if preflight else 'query-real-aba-inflight-runtime' if aba_inflight else")
+s=s.replace("sha(Path(__file__).read_bytes())])),timeout=60)","sha(Path(__file__).read_bytes()),preflight])),timeout=20 if preflight else 60)")
+s=s.replace('if aba_inflight and result.returncode == 0:','if aba_inflight and not preflight and result.returncode == 0:')
+p.write_text(s)
+p=Path('scripts/maintenance/workflow_m5_integration.py');s=p.read_text();at=s.index('\ndef main():');s=s[:at]+'''
+def runtime_agent_test(binding_race=False,aba_inflight=False):
+    """正式DI短验证精确持久会话/提案后才准入MAF/ABA长链，短验证不计产品PASS。"""
+    local_ready(require_web=False)
+    if consumer.runtime_agent_test(binding_race,aba_inflight,preflight=True):raise ValueError('PREREQUISITE_STALE:runtime_session_or_proposal')
+    return consumer.runtime_agent_test(binding_race,aba_inflight)
+
+'''+s[at:];p.write_text(s)
+p=Path('backend/tests/OntologyPlatform.AgentTests/G4QueryMcpTests.cs');s=p.read_text();before='''        // 真正进入MAF函数调用循环，四次均由相同服务器引用计数。''';insert='''        // 短前提使用同一精确查询服务器会话，不能用刚登录的新会话替代旧引用。
+        if (Environment.GetEnvironmentVariable("G4_QUERY_PREFLIGHT_ONLY") == "1")
+        {
+            Assert.IsTrue(readable && claimsMatch.Values.All(value => value));
+            Assert.IsTrue(session.RevokedAtUtc is null && session.ExpiresAtUtc > DateTimeOffset.UtcNow);
+            Assert.IsTrue(scope.ServiceProvider.GetRequiredService<IMappingSessionAuthority>().Matches(session.ProtectedTicket, actor, DateTimeOffset.UtcNow));
+            if (Environment.GetEnvironmentVariable("G4_QUERY_ABA_PROPOSAL") is { Length: > 0 } readyProposalId)
+            {
+                // 正式服务读取已批准B及准确审核证明，不执行激活或改写审核会话。
+                var mappings = scope.ServiceProvider.GetRequiredService<MappingApplicationService>();
+                // 必须仍为待激活的正式批准提案。
+                var approved = await mappings.ReadProposalAsync(actor, row.SessionReference, readyProposalId, CancellationToken.None);
+                Assert.AreEqual("APPROVED", approved.Status);
+                // 同一模块上下文只读精确提案保存的原证明。
+                await using var connections = await scope.ServiceProvider.GetRequiredService<IDbContextFactory<ConnectionsDbContext>>().CreateDbContextAsync();
+                // 真实异人审核会话来自已保存决策，禁止伪造角色。
+                var proposal = await connections.MappingProposals.AsNoTracking().SingleAsync(item => item.Id == readyProposalId);
+                // 授权服务重新检查原审核会话和当前完整权限。
+                var approval = JsonSerializer.Deserialize<MappingAuthorizationProof>(proposal.DecisionProofJson!, G4MappingJson.Options)!;
+                Assert.AreNotEqual(actor.SubjectId, approval.Actor.SubjectId);
+                _ = await scope.ServiceProvider.GetRequiredService<IMappingAuthorizationAuthority>().CaptureAsync(approval, CancellationToken.None);
+            }
+            Console.WriteLine("M5_RUNTIME_PREREQUISITE_READY_NOT_PRODUCT_ACCEPTANCE");
+            return;
+        }
+''';assert before in s;s=s.replace(before,insert+before);p.write_text(s)

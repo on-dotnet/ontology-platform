@@ -1,0 +1,22 @@
+{
+  "taskId": "G4-M5-INTEGRATION-001",
+  "runId": "integration-01",
+  "reason": "Original synthetic realm discovery returned 404 after infrastructure recreation; first login failed before product scenario. Cause of missing realm not established; preserve private original config and all volumes.",
+  "productScenarioExecuted": false,
+  "status": "NEW_SYNTHETIC_REALM_CONFIGURED",
+  "pause": {
+    "status": "STOPPED_FOR_AUTHORIZED_REBUILD",
+    "commandId": "46a8d1deef5840d8a2fe2fd047fe3316"
+  },
+  "configure": {
+    "taskId": "G4-M5-INTEGRATION-001",
+    "status": "RUNTIME_CONFIGURED",
+    "secrets": "PRIVATE_ONLY",
+    "commandId": "0af5e3e172dd47209f96e2955ef192a5"
+  },
+  "restartCommandId": "747b0bdde93246c5a0641061a03dee7f",
+  "api": {
+    "id": "22837b2b2702a851ca4553b6d0ff0ce09ac3d5f65f67b911f39598cbf1f804d8",
+    "startedAt": "2026-11-16T02:02:23.826451462Z"
+  }
+}

@@ -1,0 +1,10 @@
+import sys,json
+from pathlib import Path
+sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as q
+from workflow_execution import run
+scenario=sys.argv[1]
+for mode in sys.argv[2:]:
+ action='browser_test' if mode in ['provision','mapping','ready','s2-aba-prepare'] else 'attest'
+ r=run(['python3','-B','-c',f"import sys;sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as q;q.scenario({scenario!r});sys.exit(q.{action}({mode!r}))"],Path.cwd(),task=q.TASK,run_id=q.RUN,stage='m5-'+scenario+'-'+mode,timeout=210)
+ print(json.dumps(dict(scenario=scenario,mode=mode,exitCode=r.returncode,commandId=r.receipt['commandId'])),flush=True);print(r.stdout.decode()[-1800:],flush=True)
+ if r.returncode:print(r.stderr.decode()[-1600:],flush=True);sys.exit(1)

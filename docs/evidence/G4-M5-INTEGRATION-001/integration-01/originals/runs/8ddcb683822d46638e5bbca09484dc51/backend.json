@@ -1,0 +1,829 @@
+{
+  "gate": "backend",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "taskId": "G4-M5-INTEGRATION-001",
+    "runId": "integration-01",
+    "gate": "backend",
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "tests": 33,
+    "skipped": 0,
+    "originals": [
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/qualification-query-unit-7eef8f560ab04160bd5d66ea73a82aab.json",
+        "sha256": "7badf27fe27b260ef195e0e64e77eacb5ffb12c7810ae635df2d18e4410e244d"
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/2d620caa2bc242c187898ad8879e7f6e/receipt.json",
+        "sha256": "377b0cba34d969023ce14eec5f8f9728a4571b3ad971017c043d8a94baf8378b"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/2d620caa2bc242c187898ad8879e7f6e/stdout.txt",
+        "sha256": "8dc07f174635796f63312d902de26dd5c071aaf21db0a49603adb5d19a053f22",
+        "sizeBytes": 2725
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/2d620caa2bc242c187898ad8879e7f6e/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3d3791cf6cba4d508880095ae9a0c212/receipt.json",
+        "sha256": "62ec49720ff7f5d7e27c4cc55e492efc8e33e686b80e15aeb27dbf9097cdc3ae"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3d3791cf6cba4d508880095ae9a0c212/stdout.txt",
+        "sha256": "d9540113574ffa62cc0875690beda96fceed33ec5e45148ba9819786a9347f2f",
+        "sizeBytes": 348
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3d3791cf6cba4d508880095ae9a0c212/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/qualification-source-unit-76bfb6b9bd464a0e99ea2c9c5537f503.json",
+        "sha256": "404b00a96ba92d538a61a12b90f7fb1c2b9f075810535893c348853ce5fe8e5e"
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b9d5c9df62864cb5af0a063f82da05eb/receipt.json",
+        "sha256": "914f2ee8b31684828b7c475c0e5974bd89bf8819fd80932e59d8d48723e9967c"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b9d5c9df62864cb5af0a063f82da05eb/stdout.txt",
+        "sha256": "4460e84ab350bced2b03587d0b4f7a3721aed5b26a83939c5ad0442c5c69a193",
+        "sizeBytes": 2725
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b9d5c9df62864cb5af0a063f82da05eb/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c2ad03b99cdb49fe9f8bcfb66f4d4d70/receipt.json",
+        "sha256": "e559912e27a71a4f8442d564a42aaa3dc133562317644685b628f8becd240fc7"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c2ad03b99cdb49fe9f8bcfb66f4d4d70/stdout.txt",
+        "sha256": "7d44c485b9dcb44b56e289435b127af36a8dad9ca322d6f3f376fcb12272eca6",
+        "sizeBytes": 355
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c2ad03b99cdb49fe9f8bcfb66f4d4d70/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/qualification-security-unit-ded630384532498a9bab12a5128386e0.json",
+        "sha256": "58df15966dccfa807c5a002a72052a32ac92b535d4a991bd80207853e08d653b"
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c2eacb7b865c406c9d080f454a5e82ee/receipt.json",
+        "sha256": "c0c4eaed1cd3a36a079fc8fbd2ab3ea1a8779eb1622638523254412d1492be4b"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c2eacb7b865c406c9d080f454a5e82ee/stdout.txt",
+        "sha256": "8663c354a2b49ff31df698e153a4e903926a292479d38454fd0143f9082628d4",
+        "sizeBytes": 2725
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c2eacb7b865c406c9d080f454a5e82ee/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/beaf6f89724048279b44383d61a64bb0/receipt.json",
+        "sha256": "0233b57b32d69b1b45860f77ce09b561c4f87f641d89fc0877ac1b722d973799"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/beaf6f89724048279b44383d61a64bb0/stdout.txt",
+        "sha256": "54e1b890a5dc6154f24acd77b181ca36e3c3b5138a0f3b05d45a3eebcdc5aa67",
+        "sizeBytes": 349
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/beaf6f89724048279b44383d61a64bb0/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/qualification-agent-unit-c1ed0d6697f9408c9da75fe200e6d655.json",
+        "sha256": "884607ff5aae37e9a05b8aca1835251cf59772a4e5f6bc2d81d2554f8e0fa167"
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7be535ab36504c66a467a439817b0efb/receipt.json",
+        "sha256": "7f660059093a21601ba4e9e61e7b7d16f9223146c477f15b784e32117c6a7668"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7be535ab36504c66a467a439817b0efb/stdout.txt",
+        "sha256": "8db93443a8fed89a0224ffc39577826fa0d8f34857ca30efac341db8c531d52d",
+        "sizeBytes": 2725
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7be535ab36504c66a467a439817b0efb/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/86ce15109cf24101889095819d5ec8e7/receipt.json",
+        "sha256": "ab886ec028377b44dd054f5629a541e6fa34d70e8c239398221497ca6b7fcf9f"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/86ce15109cf24101889095819d5ec8e7/stdout.txt",
+        "sha256": "d5851043a6f3b6394b7f43c869df84f8951cfaca0d2a0ff63a87f3e4ecb09db8",
+        "sizeBytes": 343
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/86ce15109cf24101889095819d5ec8e7/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/qualification-persistence-3876ffd79858466692424db430014daf.json",
+        "sha256": "659ae197f6a1d8b16a2d5e1be320fa2d19d74126b7bb7c5a2713a5dba2dfe3e1"
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/2d620caa2bc242c187898ad8879e7f6e/receipt.json",
+        "sha256": "377b0cba34d969023ce14eec5f8f9728a4571b3ad971017c043d8a94baf8378b"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/2d620caa2bc242c187898ad8879e7f6e/stdout.txt",
+        "sha256": "8dc07f174635796f63312d902de26dd5c071aaf21db0a49603adb5d19a053f22",
+        "sizeBytes": 2725
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/2d620caa2bc242c187898ad8879e7f6e/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/10f8437fb2084a7394fb0c246bbe2258/receipt.json",
+        "sha256": "8231da73243affb5591816efdfebc0f9e947e03a8fd0ce6d7d133e5bcb18044e"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/10f8437fb2084a7394fb0c246bbe2258/stdout.txt",
+        "sha256": "e3bd1181203a786ab709e143efec46b4ca14911bef08e84ae307c08fdd1d9cf0",
+        "sizeBytes": 81
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/10f8437fb2084a7394fb0c246bbe2258/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/26150ef46e864a349d3c71e135ae8806/receipt.json",
+        "sha256": "9090a1269039906587c75181765da68e84edde5ee7f56d5d5ed59ed1c2f85653"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/26150ef46e864a349d3c71e135ae8806/stdout.txt",
+        "sha256": "140b9dbf087dad8da1231ef3a31d4fb334d0112a2e007cb59a2aac43e819f3e4",
+        "sizeBytes": 35
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/26150ef46e864a349d3c71e135ae8806/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/373639016c8a42849b9b176fdef57766/receipt.json",
+        "sha256": "133d477768adbc4e9a2922c7ff7510f7cbe7fc96f6c06ad27b1869b12b01a235"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/373639016c8a42849b9b176fdef57766/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/373639016c8a42849b9b176fdef57766/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/4a5b7a6d247749d79e3855c9f55481da/receipt.json",
+        "sha256": "330ed8875d944cf3d5d58c62dcb27512f9e4aafff685039072797c299ad19797"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/4a5b7a6d247749d79e3855c9f55481da/stdout.txt",
+        "sha256": "1ee20aa01ce877ab3204ddd5f688ca3a8e7261dee2746e9ae840592b75cee4f2",
+        "sizeBytes": 214
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/4a5b7a6d247749d79e3855c9f55481da/stderr.txt",
+        "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+        "sizeBytes": 127
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/80b48ccacca74552b513d1790519fad3/receipt.json",
+        "sha256": "90de1505589ca957da090be0443c9963459802af4c1c5189913ad94f86b7a4b2"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/80b48ccacca74552b513d1790519fad3/stdout.txt",
+        "sha256": "e63b1fa216083a90d7814eea5a64a37e67641f909dd78bf5f03f52b5c54c8381",
+        "sizeBytes": 5947
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/80b48ccacca74552b513d1790519fad3/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/91ec1346e9744e549ddfb606c0ae59c1/receipt.json",
+        "sha256": "75e5e11e57994d3e9b1fcec508b5c8623d0cebada9239adce50fb0a0a111d42c"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/91ec1346e9744e549ddfb606c0ae59c1/stdout.txt",
+        "sha256": "e63b1fa216083a90d7814eea5a64a37e67641f909dd78bf5f03f52b5c54c8381",
+        "sizeBytes": 5947
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/91ec1346e9744e549ddfb606c0ae59c1/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b6ca4b3a4ca0447a8fcb1657f80aa781/receipt.json",
+        "sha256": "9f74d587dd0d4c61003a3add9495423eacd6e1072749cf09d809dc631755bd5f"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b6ca4b3a4ca0447a8fcb1657f80aa781/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b6ca4b3a4ca0447a8fcb1657f80aa781/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c0717dd97aff4a9ebd390149ae157332/receipt.json",
+        "sha256": "4911888ef33f784597afbcbac3bc80a74cbb709a70577b49cc9e85dbcdab5d43"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c0717dd97aff4a9ebd390149ae157332/stdout.txt",
+        "sha256": "e3bd1181203a786ab709e143efec46b4ca14911bef08e84ae307c08fdd1d9cf0",
+        "sizeBytes": 81
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c0717dd97aff4a9ebd390149ae157332/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c21ac626f66a4dfc8d23c89a40dd6ad0/receipt.json",
+        "sha256": "28f8b999c0989799a1e45a37c2b5e0e813ae7872bd256f5fbba3186f41feb2d2"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c21ac626f66a4dfc8d23c89a40dd6ad0/stdout.txt",
+        "sha256": "cbfd0ede94493a3d5d534ae238516742d6b08c4afb2da01359daa3af0250d8ed",
+        "sizeBytes": 65
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c21ac626f66a4dfc8d23c89a40dd6ad0/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f572e4d37f3043c7b80a54bf0f3f54fd/receipt.json",
+        "sha256": "c0fe9dc9ae1fcdd6aa8d721bbec2e02e9e5df2e22c38fae81d73970d61f3c618"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f572e4d37f3043c7b80a54bf0f3f54fd/stdout.txt",
+        "sha256": "140b9dbf087dad8da1231ef3a31d4fb334d0112a2e007cb59a2aac43e819f3e4",
+        "sizeBytes": 35
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f572e4d37f3043c7b80a54bf0f3f54fd/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/qualification-source-97837938a2a54f9abf9549a952cc0d3a.json",
+        "sha256": "cdb0b2ae5147e412e8f7b1a2b6046144f56badd079e2afd9826a848cc52e1ef0"
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b9d5c9df62864cb5af0a063f82da05eb/receipt.json",
+        "sha256": "914f2ee8b31684828b7c475c0e5974bd89bf8819fd80932e59d8d48723e9967c"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b9d5c9df62864cb5af0a063f82da05eb/stdout.txt",
+        "sha256": "4460e84ab350bced2b03587d0b4f7a3721aed5b26a83939c5ad0442c5c69a193",
+        "sizeBytes": 2725
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b9d5c9df62864cb5af0a063f82da05eb/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/326f9de7a89842b7adf1013af32c46f9/receipt.json",
+        "sha256": "51c1e17e3814aa032b76aa5e0703f2e1383d7592369a4adb5758f84ad49649de"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/326f9de7a89842b7adf1013af32c46f9/stdout.txt",
+        "sha256": "b1f4276e384d3793aa3a26893c96a2f66e194e300b8621e20d0a39724760685d",
+        "sizeBytes": 217
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/326f9de7a89842b7adf1013af32c46f9/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c45e7a2fd99a40e18679c9764d7941ed/receipt.json",
+        "sha256": "4fa9c7bdf7bcfbcad6aaa2f71f54202be9c5aa3f11f9836c337b8c73a5f5a481"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c45e7a2fd99a40e18679c9764d7941ed/stdout.txt",
+        "sha256": "57fb0b9bee92fc6e0994e68248fef0b91807282b9c642c9ecf25a0f2fcf8d14f",
+        "sizeBytes": 65
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/c45e7a2fd99a40e18679c9764d7941ed/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/qualification-maf-binding-9d682eee360a4d8c8086a2f60418b9b0.json",
+        "sha256": "80227ef7f50368e2055965cda8e662bb016f9fb0e833aabfd6007d8cd00667ee"
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7be535ab36504c66a467a439817b0efb/receipt.json",
+        "sha256": "7f660059093a21601ba4e9e61e7b7d16f9223146c477f15b784e32117c6a7668"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7be535ab36504c66a467a439817b0efb/stdout.txt",
+        "sha256": "8db93443a8fed89a0224ffc39577826fa0d8f34857ca30efac341db8c531d52d",
+        "sizeBytes": 2725
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7be535ab36504c66a467a439817b0efb/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/05721ddc7ed7491cbbb3ad2014255597/receipt.json",
+        "sha256": "88a29c3824254f987be4b66a447f1a7cff6bae2072a03562736f2f3c18021d03"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/05721ddc7ed7491cbbb3ad2014255597/stdout.txt",
+        "sha256": "cd1710b52d4c659655757a8f66d091460a2eec03652c4f9355e84ea2d2989f9d",
+        "sizeBytes": 23670
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/05721ddc7ed7491cbbb3ad2014255597/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3013bf9ddb02442c84f7927f858ee4be/receipt.json",
+        "sha256": "20a5ac9deb2cb665c5d9ce4af0019501ee11bcdbb7cc5b3bb4ebe8290d59e100"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3013bf9ddb02442c84f7927f858ee4be/stdout.txt",
+        "sha256": "2b18d9a7a1e34519014ec8b6a86f961f12537e1aaf054a7cf81d9a6d0028c242",
+        "sizeBytes": 216
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3013bf9ddb02442c84f7927f858ee4be/stderr.txt",
+        "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+        "sizeBytes": 127
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/53fd1c52eebc41f889299ae1da03fd52/receipt.json",
+        "sha256": "92b1a2bd9b1a582059d18a38b8f9ba2e3fb2dd3e5a828f2c9af7942dd4e2ebc0"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/53fd1c52eebc41f889299ae1da03fd52/stdout.txt",
+        "sha256": "79f29fe7707e4aff6dc6bafa4979fb8cbb7b304747579fd595c932339d4ea900",
+        "sizeBytes": 62
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/53fd1c52eebc41f889299ae1da03fd52/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/6dc63dbb893e4cf6b6b07f02166f8a75/receipt.json",
+        "sha256": "7c5014512dd2b7e63322f7db0a076a5491489c43ef696c31464e6fea7164e448"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/6dc63dbb893e4cf6b6b07f02166f8a75/stdout.txt",
+        "sha256": "267014753d274a0941797f3d7c52ef3bd8da607d48fc9845af98ab9d047d9cc0",
+        "sizeBytes": 4419
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/6dc63dbb893e4cf6b6b07f02166f8a75/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7368cebbbdf9447c8257dcd5f410883b/receipt.json",
+        "sha256": "7080119d6b12e698bf3b1b00c222b3a2d7374ecdb4861668b8de97ce53bc1870"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7368cebbbdf9447c8257dcd5f410883b/stdout.txt",
+        "sha256": "6bd21015f680b81c917f37eacb1e41b4501ef0eacbac8a75ac86646c9f9852fb",
+        "sizeBytes": 65
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7368cebbbdf9447c8257dcd5f410883b/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/874a71282cd0430f9b4b55a7c5a62714/receipt.json",
+        "sha256": "d7c564485cf395f4095ae07ba0574cbe4610974edae557a003ddab87f66ea8d8"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/874a71282cd0430f9b4b55a7c5a62714/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/874a71282cd0430f9b4b55a7c5a62714/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/8e3ae4bc908a46c3a00f0037f12ea83c/receipt.json",
+        "sha256": "a562ef169d5cd69d34120f54ee51bf5eaf272558ef0bdf8efa3c287a1e1c59c4"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/8e3ae4bc908a46c3a00f0037f12ea83c/stdout.txt",
+        "sha256": "7822c31c4b840ae06e8f967aa9a738578c4dedf67bbe6a08fd189c1c13a75abe",
+        "sizeBytes": 65
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/8e3ae4bc908a46c3a00f0037f12ea83c/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/915bc9595f644a90aefdf4df30d1aeab/receipt.json",
+        "sha256": "5bf7aa0d2d98b2f227f22f948fa049977d8d21c66febfc0807cae62ac8357953"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/915bc9595f644a90aefdf4df30d1aeab/stdout.txt",
+        "sha256": "691628a234c99fd7d407bbc6a249df8c971d65af8ac3f3d434a904b2b03bc6e5",
+        "sizeBytes": 9769
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/915bc9595f644a90aefdf4df30d1aeab/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/9c82611055744120adb096a5dbd3836f/receipt.json",
+        "sha256": "738dd3e913c93cb774ab775175ee43763548fb4856313c75bb5d4df25f6aa4cd"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/9c82611055744120adb096a5dbd3836f/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/9c82611055744120adb096a5dbd3836f/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b242e8a9ee704af5b17b709a55e9ff7c/receipt.json",
+        "sha256": "839721adf23963d6ccc195739cd22582efa64795d69873629133e2e3a3bf3976"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b242e8a9ee704af5b17b709a55e9ff7c/stdout.txt",
+        "sha256": "6bd21015f680b81c917f37eacb1e41b4501ef0eacbac8a75ac86646c9f9852fb",
+        "sizeBytes": 65
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b242e8a9ee704af5b17b709a55e9ff7c/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b3b8237c00704ba8a8d9f79721d65946/receipt.json",
+        "sha256": "8757ef5dc535fe705608370957056c04735aaed2b567be82d6592a200493b679"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b3b8237c00704ba8a8d9f79721d65946/stdout.txt",
+        "sha256": "7822c31c4b840ae06e8f967aa9a738578c4dedf67bbe6a08fd189c1c13a75abe",
+        "sizeBytes": 65
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b3b8237c00704ba8a8d9f79721d65946/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/dcac276643db4fe492536e9c33e6d20d/receipt.json",
+        "sha256": "5cb99e45bd9e6b8d08e5fb1551bbfd90b994d015ea678156180efe13182ba0bf"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/dcac276643db4fe492536e9c33e6d20d/stdout.txt",
+        "sha256": "9c8bc446f192217b3728d8ceb68953928a0e2b598ed776ec1dee4f99430f19c8",
+        "sizeBytes": 28841
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/dcac276643db4fe492536e9c33e6d20d/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f4ea2e39bf354aa49aa0f939a9f62bf5/receipt.json",
+        "sha256": "2daa6cfd35555093121a6860bee7386381aeed6836dec4d71b505c7043723fe1"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f4ea2e39bf354aa49aa0f939a9f62bf5/stdout.txt",
+        "sha256": "a1264ada415842ca8367e8eca53af49438a28e2667c2b7a67b6c9185de29a5a5",
+        "sizeBytes": 213
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f4ea2e39bf354aa49aa0f939a9f62bf5/stderr.txt",
+        "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+        "sizeBytes": 127
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/qualification-aba-inflight-82cfcfbe7655442c97d9105d1e7184f8.json",
+        "sha256": "f202fc7e43dadf9d132abacec05ffda5b3c8c63abccb0fb34eb9d8e1813b281e"
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7be535ab36504c66a467a439817b0efb/receipt.json",
+        "sha256": "7f660059093a21601ba4e9e61e7b7d16f9223146c477f15b784e32117c6a7668"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7be535ab36504c66a467a439817b0efb/stdout.txt",
+        "sha256": "8db93443a8fed89a0224ffc39577826fa0d8f34857ca30efac341db8c531d52d",
+        "sizeBytes": 2725
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/7be535ab36504c66a467a439817b0efb/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/02e7762436da44c5a75b843c8b906b5a/receipt.json",
+        "sha256": "cbd3d2dea72fdef94f8c7a5921089f56b3af94bd65ba76596e717491830f8199"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/02e7762436da44c5a75b843c8b906b5a/stdout.txt",
+        "sha256": "cd1710b52d4c659655757a8f66d091460a2eec03652c4f9355e84ea2d2989f9d",
+        "sizeBytes": 23670
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/02e7762436da44c5a75b843c8b906b5a/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/1db4f566d67649189edca6b4f3998f9f/receipt.json",
+        "sha256": "4c1434048c319b7974f742e303f7abdf0e70fa4d7452875a8f0bd7f774d85183"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/1db4f566d67649189edca6b4f3998f9f/stdout.txt",
+        "sha256": "79f29fe7707e4aff6dc6bafa4979fb8cbb7b304747579fd595c932339d4ea900",
+        "sizeBytes": 62
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/1db4f566d67649189edca6b4f3998f9f/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/30c55d4e4c51417ab117d93970120ef1/receipt.json",
+        "sha256": "da2c9e03b6c4117649a0419758ba5e642b812ae3b1888411a8e7fa9a5096439d"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/30c55d4e4c51417ab117d93970120ef1/stdout.txt",
+        "sha256": "174003026931bc52351fe507a9b871ecfb6e2adf38d7de217e1ff1c4d69d68aa",
+        "sizeBytes": 65
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/30c55d4e4c51417ab117d93970120ef1/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/35f352168007406f931ea19c0753249b/receipt.json",
+        "sha256": "09b83073e6a2ba7bd3be3a14d0b15fecd48306f070be76fdcf28dfdda3a05b61"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/35f352168007406f931ea19c0753249b/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/35f352168007406f931ea19c0753249b/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3686129a3ee242bd9315ccfc96bff91d/receipt.json",
+        "sha256": "7f19cbc37d68864fe87187a2977140cd665c8c9aa907b773214c12294117e10c"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3686129a3ee242bd9315ccfc96bff91d/stdout.txt",
+        "sha256": "4b361ec6aa7572ddd1c1af1fc2309c76b5a4cd7658159b6f4dc88b94046c6341",
+        "sizeBytes": 65
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3686129a3ee242bd9315ccfc96bff91d/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3ff13baff4964b3f97dcba68ee3bcde2/receipt.json",
+        "sha256": "418101286140dacf110d875a749fba00aeba16a1bccc8074f64862e1e3f789d9"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3ff13baff4964b3f97dcba68ee3bcde2/stdout.txt",
+        "sha256": "7c128ffa719f8b684ba053da34973e6d77fd3ac2e62b73b7f6ca8485fdaa10ae",
+        "sizeBytes": 216
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/3ff13baff4964b3f97dcba68ee3bcde2/stderr.txt",
+        "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+        "sizeBytes": 127
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/413d8449b1f94f08ae93f781728625c0/receipt.json",
+        "sha256": "6033701e60bf5e2fac558973a7bef257cd99a475a9af196fa309db4c08c40259"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/413d8449b1f94f08ae93f781728625c0/stdout.txt",
+        "sha256": "76b3a88ee61f3b087543fa2ce51cf206e98589ec44fd727b14c8fcb77ed6d35c",
+        "sizeBytes": 28409
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/413d8449b1f94f08ae93f781728625c0/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/6570d170731a4588a9a7e9dfbadff0c4/receipt.json",
+        "sha256": "ab404d3a0f56d298917c899a4b45bb3553a3ae6493ea152b366458d5412ebb3c"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/6570d170731a4588a9a7e9dfbadff0c4/stdout.txt",
+        "sha256": "0bc1a912170343d6545b93aa8bba0df0e0ad016dfe69f9b9647d5dec75864621",
+        "sizeBytes": 3542
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/6570d170731a4588a9a7e9dfbadff0c4/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/79a745aa772f4180b7fbbcc52c3c09a7/receipt.json",
+        "sha256": "4dc6f9060f62cb133eaa696fd310078095e00b87320ba43f1b519330d2980221"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/79a745aa772f4180b7fbbcc52c3c09a7/stdout.txt",
+        "sha256": "0bc1a912170343d6545b93aa8bba0df0e0ad016dfe69f9b9647d5dec75864621",
+        "sizeBytes": 3542
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/79a745aa772f4180b7fbbcc52c3c09a7/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/9b2aa0f689034164a3eb80853ee8d9ce/receipt.json",
+        "sha256": "1bd4c4fddf7c05bc2f6038a1ceb9b3cd469fbd22df1d83592ddc6f0f7c9e244d"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/9b2aa0f689034164a3eb80853ee8d9ce/stdout.txt",
+        "sha256": "174003026931bc52351fe507a9b871ecfb6e2adf38d7de217e1ff1c4d69d68aa",
+        "sizeBytes": 65
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/9b2aa0f689034164a3eb80853ee8d9ce/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/ac899d286bec4f36a4c16f53ba261c72/receipt.json",
+        "sha256": "741eb4d001c69faae60f0acf16e83ef3067f5d38e9804fd0d3945560eb4690f9"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/ac899d286bec4f36a4c16f53ba261c72/stdout.txt",
+        "sha256": "79f29fe7707e4aff6dc6bafa4979fb8cbb7b304747579fd595c932339d4ea900",
+        "sizeBytes": 62
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/ac899d286bec4f36a4c16f53ba261c72/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b0a6d7f8756e49e2a5e041615b72e522/receipt.json",
+        "sha256": "2fbd9351be6a1e4918953f85d284919af344cf2c214fbbecdbd46492c557be8f"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b0a6d7f8756e49e2a5e041615b72e522/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b0a6d7f8756e49e2a5e041615b72e522/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b3a86d66ecea4a0eaaea7f340ae493ba/receipt.json",
+        "sha256": "f26b229ef08386bf0786f2b78a85c4136ed26912838fa948e902b7fe65ba8a08"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b3a86d66ecea4a0eaaea7f340ae493ba/stdout.txt",
+        "sha256": "7e989ef8143fd0c6a2df2b7a0fe7752e573bf441459d5b0b967f02c4b5be734d",
+        "sizeBytes": 3073
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/b3a86d66ecea4a0eaaea7f340ae493ba/stderr.txt",
+        "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+        "sizeBytes": 127
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/bfdd3bee27a144b5b65c810c3dafc7ca/receipt.json",
+        "sha256": "365bc29d22642adb48750a7512c51a457d3f885e27189a6e0d09edc856a9fcee"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/bfdd3bee27a144b5b65c810c3dafc7ca/stdout.txt",
+        "sha256": "691628a234c99fd7d407bbc6a249df8c971d65af8ac3f3d434a904b2b03bc6e5",
+        "sizeBytes": 9769
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/bfdd3bee27a144b5b65c810c3dafc7ca/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/e56253fce1be450e98c6f03c583dbd3e/receipt.json",
+        "sha256": "06d66f665b71eb4acc5d05ba4783c6710736d0281e87cead498bb0c6a1be870e"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/e56253fce1be450e98c6f03c583dbd3e/stdout.txt",
+        "sha256": "691628a234c99fd7d407bbc6a249df8c971d65af8ac3f3d434a904b2b03bc6e5",
+        "sizeBytes": 9769
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/e56253fce1be450e98c6f03c583dbd3e/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f392f4441c8449e896fdbb10123a25cb/receipt.json",
+        "sha256": "8d991caac30a06dbc73ea877ad8221577093856c651d55239fd5b02872bda86c"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f392f4441c8449e896fdbb10123a25cb/stdout.txt",
+        "sha256": "4b361ec6aa7572ddd1c1af1fc2309c76b5a4cd7658159b6f4dc88b94046c6341",
+        "sizeBytes": 65
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f392f4441c8449e896fdbb10123a25cb/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      {
+        "path": "artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f66fc94c46de46b98187ee2624923e2f/receipt.json",
+        "sha256": "62bb3c78388868a6c535ec96017a72176662cc7b5159675b78cd5d6519d5d6ab"
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f66fc94c46de46b98187ee2624923e2f/stdout.txt",
+        "sha256": "cd1710b52d4c659655757a8f66d091460a2eec03652c4f9355e84ea2d2989f9d",
+        "sizeBytes": 23670
+      },
+      {
+        "path": "/Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform/artifacts/workflow/G4-M5-INTEGRATION-001/commands/integration-01/f66fc94c46de46b98187ee2624923e2f/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    ]
+  },
+  "command": [
+    "python3",
+    "-B",
+    "-c",
+    "import sys,json;sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as consumer;print(json.dumps(consumer.qualify(sys.argv[1],sys.argv[2])))",
+    "backend",
+    "d35366dfcc0444d55b2bfb28b592220e56dda8a6e2cd8a050cf5d8d5860b9346"
+  ],
+  "exitCode": 0,
+  "tests": 33,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 4.687462374975439,
+  "inputKey": "d35366dfcc0444d55b2bfb28b592220e56dda8a6e2cd8a050cf5d8d5860b9346",
+  "environmentKey": "c66d9e26b219748d1ef396fce5d1e28c562299a67a7f7ddc6e060abfcda6163c",
+  "policyKey": "e7d56b54be514b470fbfeed24a5d2c9a37177ff490a169a022e8ca3058b6f0df",
+  "evidenceSha256": "0dc22a64a0010e2e8c22cf388bbe25c56e2ab043bccef2c7705beb4544bb3287",
+  "logPath": "artifacts/workflow/G4-M5-INTEGRATION-001/runs/8ddcb683822d46638e5bbca09484dc51/backend.txt",
+  "sourceRun": "8ddcb683822d46638e5bbca09484dc51",
+  "sourceCommit": "4e20be50c1023b9bcd9f97e02dac92e35f20d130"
+}
