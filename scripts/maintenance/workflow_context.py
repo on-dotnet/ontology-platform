@@ -69,7 +69,7 @@ def scope(root, base, head):
                 executionMode='FRESH' if full else 'FRESH_AND_REUSED',
                 reusedBase=None if full else qualification,
                 reason='policy/markdown change or missing trustworthy Base qualification' if full else 'exact Base blobs and unchanged validator qualification',
-                omissions='Unchanged files are outside incremental scope; no full-repository PASS is claimed.',
+                omissions='No tracked files omitted; ignored/private data remains excluded by the original policy.' if full else 'Unchanged files use the exact Base qualification; ignored/private data excluded.',
                 productGates=sorted(set(classification['affected']) & {'environment','backend','web','contract','interaction'}))
 
 

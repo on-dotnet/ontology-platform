@@ -83,7 +83,7 @@ function Test-Repository {
         $results.Add([pscustomobject]@{ Check = $Check; Status = $Status; Message = $Message })
     }
     $base = [IO.Path]::GetFullPath($RepositoryRoot)
-    $files = if ($null -ne $SelectedPaths -and $SelectedPaths.Count -gt 0) { @($SelectedPaths | ForEach-Object { Get-Item -LiteralPath (Join-Path $base $_) }) } else { @(Get-SourceFiles -Directory $base) }
+    $files = if ($null -ne $SelectedPaths -and $SelectedPaths.Count -gt 0) { @($SelectedPaths | ForEach-Object { Get-Item -Force -LiteralPath (Join-Path $base $_) }) } else { @(Get-SourceFiles -Directory $base) }
     $jsonValues = @{}
     foreach ($file in $files) {
         $relative = [IO.Path]::GetRelativePath($base, $file.FullName).Replace('\', '/')
