@@ -73,7 +73,8 @@ function Invoke-ReviewGit {
 function Test-ReviewArgvApproval {
     param([string]$Repository, [string]$Base, [string]$Head, [int]$Version, [string]$WorkItem)
     # 仅信任工具固定策略和已提交批准原文；ZIP字段不提供额外权限。
-    if ($Version -eq 3 -and $WorkItem -ceq 'G4-M4-QUERY-001' -and $Base -ceq 'f0afb730ce92ecbd3a5947d9c6f58faedc8b2138') {
+    if ($Version -eq 3 -and (($WorkItem -ceq 'G4-M4-QUERY-001' -and $Base -ceq 'f0afb730ce92ecbd3a5947d9c6f58faedc8b2138') -or
+        ($WorkItem -ceq 'G4-M5-INTEGRATION-001' -and $Base -ceq 'a6716b11c3795e5670c07f1ca37057e5649bed89'))) {
         return $null -ne (Get-ReviewReductionPolicy $Repository $Base $Head $Version $WorkItem)
     }
     if ($Version -ne 3 -or $WorkItem -cne 'G4-M1-MAIN-INTEGRATION-001' -or $Base -cne 'd1a61daffe844475b07705797e3ad325cc3f2945') { return $false }
@@ -103,6 +104,7 @@ function Get-ReviewReductionPolicy {
     param([string]$Repository, [string]$Base, [string]$Head, [int]$Version, [string]$WorkItem)
     if ($Version -ne 3) { return $null }
     $m4 = $WorkItem -ceq 'G4-M4-QUERY-001' -and $Base -ceq 'f0afb730ce92ecbd3a5947d9c6f58faedc8b2138'
+    $m5 = $WorkItem -ceq 'G4-M5-INTEGRATION-001' -and $Base -ceq 'a6716b11c3795e5670c07f1ca37057e5649bed89'
     if ($m4) {
         # 仅本轮人类已批准附件的原字节及准确祖先；不能借M1授权扩展一般任务。
         $approvalPath = 'docs/evidence/G4-M4-QUERY-001/review-fix-01/authorization-original.md'
@@ -128,6 +130,17 @@ function Get-ReviewReductionPolicy {
             'query-impl-01/qualification-security-unit-c22b4cac86d54f5db217b091db33fdb5.json',
             'query-impl-01/qualification-web-typecheck-8d02c72de4cb4f4bae9d28ffc65f6edd.json'
         )
+    } elseif ($m5) {
+        # 附件第10节批准继承既有机制；归档分组不改变真实执行RunId。
+        $approvalPath = 'docs/evidence/G4-M5-INTEGRATION-001/authorization.md'
+        $approvalHash = '75db7b29ce197f2698241f7f930a676a35cdab8b764c68d2b82ccc5f2ec6342b'
+        $approvalAncestor = '237c831166783deb3f3c68ec11e79824cd485540'
+        $runPattern = '^package-final-01$'
+        $policyId = 'G4-M5-PG-INTEGRATION-EVIDENCE-1'
+        $requiredHistory = @('authorization.md', 'acceptance.json', 'additional-authorization.json', 'independent-expectations.json',
+            'non-author-final-source-review.json', 'validation.json', 'integration-01/originals-index.json',
+            'integration-01/originals/integration-01/counterexample-closeout.json', 'integration-01/originals/integration-01/resource-closeout.json',
+            'integration-01/originals/integration-01/prerequisite-standard-907aa290-8f3c-4e9b-b1cf-89e8d6051803.json')
     } elseif ($WorkItem -ceq 'G4-M1-MAIN-INTEGRATION-001' -and $Base -ceq 'd1a61daffe844475b07705797e3ad325cc3f2945') {
         $approvalPath = 'docs/tasks/G4-M1-MAIN-INTEGRATION-001/REDUCTION-APPROVAL.md'
         $approvalHash = 'a877177b0da6056fdfc3f9c607b70afea71fec0c677a998cf3a7ecdf56e49a64'
@@ -169,6 +182,16 @@ function Get-ReviewReductionPolicy {
     # 固定最低历史见证；额外关键链须由独立Reviewer核实，不把名称当测试PASS。
     foreach ($relative in $requiredHistory) {
         if (-not $retained.Contains($prefix + $relative)) { throw 'REDUCTION_SELECTION: required historical failure/recovery/contract witness absent' }
+    }
+    if ($m5) {
+        # 仅已审查累计状态副本可索引恢复；其它本任务非PNG原件一项也不能省略。
+        $checkpointPattern = '^' + [regex]::Escape($prefix) + 'integration-01/originals/integration-01/prerequisite-(standard|numeric|safety|aba)-[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}\.json$'
+        foreach ($path in $treePaths) {
+            if (-not $path.EndsWith('.png', [StringComparison]::OrdinalIgnoreCase) -and $path -cne $selectionPath -and
+                -not $path.StartsWith($runPrefix, [StringComparison]::Ordinal) -and $path -cnotmatch $checkpointPattern -and -not $retained.Contains($path)) {
+                throw 'REDUCTION_REFERENCE: current M5 non-checkpoint evidence must be retained'
+            }
+        }
     }
     if ($m4) {
         # 本轮无损索引可指向旧批次去重载荷；这些直接恢复依赖必须实际入包。
