@@ -88,6 +88,14 @@ class WorkflowTests(unittest.TestCase):
     def test_unknown_maintenance_never_claims_workflow_coverage(self):
         self.assertEqual(self.w.select_gates(['scripts/maintenance/new_runner.py'])['status'],'BLOCKED')
 
+    def test_expected_fixture_rejection_does_not_hide_real_failure(self):
+        summary='Ran 4 tests in 0.001s\nOK\n'
+        expected='EXPECTED-REJECTION: FAIL: structured syntax invalid.yml (ParserError)\n'
+        self.assertEqual(self.w.test_counts(expected+summary,'auto'),(4,0))
+        for failure in ('FAIL: genuine failure\n','ERROR: genuine failure\n','FAILED (failures=1)\n'):
+            self.assertEqual(self.w.test_counts(expected+failure+summary,'auto'),(0,0))
+        self.assertEqual(self.w.test_counts(expected,'auto'),(0,0))
+
     def test_dependency_order(self):
         order=self.w.ordered(['interaction','web','backend','environment','contract'])
         self.assertLess(order.index('environment'),order.index('backend'))

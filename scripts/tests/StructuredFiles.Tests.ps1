@@ -12,12 +12,16 @@ try {
     & $python $parser $temporary
     if ($LASTEXITCODE -ne 0) { throw 'Valid YAML rejected' }
     [IO.File]::WriteAllText((Join-Path $temporary 'invalid.yml'), "items: [unterminated`n")
-    & $python $parser $temporary
+    $rejectionOutput = @(& $python $parser $temporary)
     if ($LASTEXITCODE -ne 1) { throw 'Invalid YAML not rejected' }
+    if ($rejectionOutput -notcontains 'FAIL: structured syntax invalid.yml (ParserError)') { throw 'Expected YAML parser rejection missing' }
+    $rejectionOutput | ForEach-Object { Write-Output ('EXPECTED-REJECTION: ' + $_) }
     [IO.File]::WriteAllText((Join-Path $temporary 'invalid.yml'), "name: repaired`n")
     [IO.File]::WriteAllText((Join-Path $temporary 'invalid.toml'), "[unterminated`n")
-    & $python $parser $temporary
+    $rejectionOutput = @(& $python $parser $temporary)
     if ($LASTEXITCODE -ne 1) { throw 'Invalid TOML not rejected' }
+    if ($rejectionOutput -notcontains 'FAIL: structured syntax invalid.toml (TOMLDecodeError)') { throw 'Expected TOML parser rejection missing' }
+    $rejectionOutput | ForEach-Object { Write-Output ('EXPECTED-REJECTION: ' + $_) }
     # 在独立作用域仅隐藏解析器，验证普通检查不会静默跳过必要门禁。
     & {
         . (Join-Path $root 'scripts/verify.ps1') -Library
