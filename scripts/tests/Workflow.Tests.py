@@ -102,6 +102,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertLess(order.index('backend'),order.index('interaction'))
 
     def test_full_identity_tracks_tests_without_default_full_schedule(self):
+        self.assertIn('engineering-full',self.w.select_gates(['scripts/tests/StructuredFiles.Tests.ps1'])['affected'])
         paths=['scripts/tests/WorkflowEnvironment.Tests.py']
         self.assertNotIn('engineering-full',self.w.select_gates(paths)['affected'])
         self.assertTrue(self.w.matches(paths[0],self.w.input_patterns('engineering-full')))
