@@ -13,7 +13,9 @@ param(
     [switch]$RunTests,
     [switch]$SkipWeb,
     [string]$ToolRoot = $Root,
-    [switch]$Library
+    [switch]$Library,
+    [string]$BaseSha,
+    [string]$HeadSha
 )
 $ErrorActionPreference = 'Stop'
 
@@ -73,7 +75,7 @@ function Test-FrozenJsonlEvidence {
 }
 
 function Test-Repository {
-    param([string]$RepositoryRoot)
+    param([string]$RepositoryRoot, [string[]]$SelectedPaths)
     # 每项结果只打印位置和原因，不打印疑似机密内容。
     $results = [Collections.Generic.List[object]]::new()
     function Record {
@@ -81,7 +83,7 @@ function Test-Repository {
         $results.Add([pscustomobject]@{ Check = $Check; Status = $Status; Message = $Message })
     }
     $base = [IO.Path]::GetFullPath($RepositoryRoot)
-    $files = @(Get-SourceFiles -Directory $base)
+    $files = if ($null -ne $SelectedPaths -and $SelectedPaths.Count -gt 0) { @($SelectedPaths | ForEach-Object { Get-Item -LiteralPath (Join-Path $base $_) }) } else { @(Get-SourceFiles -Directory $base) }
     $jsonValues = @{}
     foreach ($file in $files) {
         $relative = [IO.Path]::GetRelativePath($base, $file.FullName).Replace('\', '/')
@@ -165,7 +167,7 @@ function Test-Repository {
         try {
             $env:PYTHONPATH = Join-Path (Split-Path $PSScriptRoot -Parent) '.tools/pythonlibs'
             $python = if ($IsWindows) { (Get-Command python -ErrorAction Stop).Source } else { (Get-Command python3 -ErrorAction Stop).Source }
-            $structuredOutput = @(& $python $parser $base 2>&1)
+            $structuredOutput = if ($null -ne $SelectedPaths -and $SelectedPaths.Count -gt 0) { @((ConvertTo-Json -InputObject @($SelectedPaths) -Compress) | & $python $parser $base --paths-stdin 2>&1) } else { @(& $python $parser $base 2>&1) }
             if ($LASTEXITCODE -ne 0) { Record 'structured-syntax' 'FAIL' 'YAML/TOML解析失败或项目解析器不可用；请按requirements隔离恢复并在允许上下文运行。' }
         } catch { Record 'structured-syntax' 'FAIL' '缺少可运行Python3.11+解析环境。' }
         finally { [Environment]::SetEnvironmentVariable('PYTHONPATH', ($previousPythonPath ?? [NullString]::Value), 'Process') }
@@ -208,7 +210,18 @@ function Test-Repository {
 if ($Library) { return }
 try {
     if ($RunTests -and -not $RunNative) { throw 'RunTests必须同时显式指定RunNative。' }
-    $checks = @(Test-Repository -RepositoryRoot $Root)
+    $selectedPaths = $null
+    if ($BaseSha -or $HeadSha) {
+        if (-not $BaseSha -or -not $HeadSha -or $SelfTest -or $RunNative -or $RunTests) { throw '增量必须同时指定BaseSha/HeadSha，不能缩减SelfTest或原生检查。' }
+        $scopePython = if ($IsWindows) { 'python' } else { 'python3' }
+        $scopeRaw = & $scopePython -B (Join-Path $PSScriptRoot 'maintenance/workflow_context.py') --root $Root --base $BaseSha --head $HeadSha
+        if ($LASTEXITCODE -ne 0) { throw '机器差异范围核验失败。' }
+        $scope = $scopeRaw | ConvertFrom-Json
+        $selectedPaths = @($scope.paths)
+        Write-Output ('SCOPE: ' + $scope.scope + '; changed=' + $scope.changed.Count + '; deleted=' + $scope.deleted.Count)
+        Write-Output $scope.omissions
+    }
+    $checks = @(Test-Repository -RepositoryRoot $Root -SelectedPaths $selectedPaths)
     $checks | Format-Table -AutoSize | Out-Host
     if (@($checks | Where-Object Status -eq 'FAIL').Count -gt 0) { exit 1 }
     if ($SelfTest) {

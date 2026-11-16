@@ -3,26 +3,37 @@ import { createRequire } from "node:module";
 import { readFile, realpath } from "node:fs/promises";
 import { resolve } from "node:path";
 const root = resolve(import.meta.dirname, "../..");
-const args = process.argv.slice(2), task = "G4-M4-QUERY-001", runId = "query-impl-01";
+const args = process.argv.slice(2);
 /** 参数只接受当前已批准任务与阶段，不能通过CLI切换旧任务私有目录。 */
 function argument(name) {
   const flag = "--" + name, index = args.indexOf(flag);
   if (index < 0 || args.lastIndexOf(flag) !== index || index + 1 >= args.length) throw new Error("QUERY_ARGUMENT_REQUIRED");
   return args[index + 1];
 }
+const task = argument("task");
+if (!["G4-M4-QUERY-001", "G4-M5-INTEGRATION-001"].includes(task)) throw new Error("QUERY_TASK_NOT_ADMITTED");
+const integration = task === "G4-M5-INTEGRATION-001", runId = integration ? "integration-01" : "query-impl-01";
+const scenario = integration ? argument("scenario") : null;
+if (integration && !["standard", "numeric", "safety", "aba"].includes(scenario)) throw new Error("INTEGRATION_SCENARIO_INVALID");
+const moduleName = integration ? "workflow_m5_integration" : "workflow_m4_query";
+const scenarioCode = integration ? `q.scenario("${scenario}");` : "";
+const privateName = integration ? ".tools/security/g4-m5-integration-001" : ".tools/security/g4-m4-query-001";
+const stateName = integration ? `scenario-${scenario}.json` : "runtime-fixture.json";
+const port = value => integration ? value + 100 : value;
 if (argument("task") !== task || argument("run-id") !== runId || await realpath(process.cwd()) !== root) throw new Error("QUERY_CONSUMER_BOUNDARY");
 const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/package.json"));
+if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
 if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
   const { writeFile } = await import("node:fs/promises");
-  const build = JSON.parse(execFileSync("python3", ["-B", "-c", 'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;print(json.dumps(q.web_binding()))'], { cwd: root, timeout: 30000, encoding: "utf8" }));
-  process.env.PLATFORM_API_ORIGIN = "http://localhost:15441";
+  const build = JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.web_binding()))`], { cwd: root, timeout: 30000, encoding: "utf8" }));
+  process.env.PLATFORM_API_ORIGIN = `http://localhost:${port(15441)}`;
   process.env.NEXT_TELEMETRY_DISABLED = "1"; process.env.NODE_ENV = "production";
-  const record = { taskId: task, runId, pid: process.pid, worktree: root, port: 15442, build,
+  const record = { taskId: task, runId, pid: process.pid, worktree: root, port: port(15442), build,
     processStartedAt: execFileSync("ps", ["-p", String(process.pid), "-o", "lstart="], { encoding: "utf8", env: { ...process.env, LC_ALL: "C" } }).trim(),
     startedAtUtc: new Date().toISOString(), decision: "KEEP", release: "M4 review and safe closeout" };
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
-  await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: 15442,
+  await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: port(15442),
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
 } else if (["provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
@@ -32,14 +43,14 @@ async function browserRun(mode) {
   const { randomUUID, createHash } = await import("node:crypto");
   const { writeFile, mkdir } = await import("node:fs/promises");
   const output = resolve(root, "artifacts/workflow", task, runId);
-  const privateRoot = resolve(root, ".tools/security/g4-m4-query-001", runId);
+  const privateRoot = resolve(root, privateName, runId);
   const realm = JSON.parse(await readFile(resolve(privateRoot, "runtime/realm.json"), "utf8"));
-  if (!realm.authority.startsWith("http://localhost:15443/realms/g2-")) throw new Error("QUERY_REALM_BOUNDARY");
-  const origin = "http://localhost:15441";
+  if (!realm.authority.startsWith(`http://localhost:${port(15443)}/realms/g2-`)) throw new Error("QUERY_REALM_BOUNDARY");
+  const origin = `http://localhost:${port(15441)}`;
   const file = resolve(output, "browser-" + mode + "-" + Date.now() + ".json");
   const report = { taskId: task, runId, mode, startedAtUtc: new Date().toISOString(), checks: [], http: [], status: "FAIL" };
   const { execFileSync } = await import("node:child_process");
-  const binding = () => JSON.parse(execFileSync("python3", ["-B", "-c", 'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;print(json.dumps({"api":q.runtime_binding(),"web":q.web_binding() if any(arg.startswith("ui-") for arg in sys.argv) else None}))', mode], { cwd: root, timeout: 30000, encoding: "utf8" }));
+  const binding = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps({"api":q.runtime_binding(),"web":q.web_binding() if any(arg.startswith("ui-") for arg in sys.argv) else None}))`, mode], { cwd: root, timeout: 30000, encoding: "utf8" }));
   const contexts = [];
   let browser, phase = "launch";
   const command = (expectedRevision = 0) => ({ commandId: randomUUID(), idempotencyKey: randomUUID(), expectedRevision, reason: "M4 isolated query prerequisite" });
@@ -63,7 +74,7 @@ async function browserRun(mode) {
     phase = "oidc_" + label;
     const context = await browser.newContext({ serviceWorkers: "block" }); contexts.push(context);
     await context.route("**/*", route => {
-      if ([origin, "http://localhost:15443"].includes(new URL(route.request().url()).origin)) return route.continue();
+      if ([origin, `http://localhost:${port(15443)}`].includes(new URL(route.request().url()).origin)) return route.continue();
       report.externalRequests ??= []; report.externalRequests.push(new URL(route.request().url()).origin); return route.abort();
     });
     context.setDefaultTimeout(15000);
@@ -81,7 +92,11 @@ async function browserRun(mode) {
     actor.me = await get(actor, "/api/v1/platform/me");
     return actor;
   }
-  async function save(state) { await writeFile(resolve(output, "runtime-fixture.json"), JSON.stringify(state, null, 2) + "\n"); }
+  async function save(state) {
+    const bytes = JSON.stringify(state, null, 2) + "\n";
+    if (integration) await writeFile(resolve(output, `prerequisite-${scenario}-${randomUUID()}.json`), bytes, { flag: "wx" });
+    await writeFile(resolve(output, stateName), bytes);
+  }
   async function heldQuery(actor, query, mutate, revoke = false) {
     const { spawn, execFileSync } = await import("node:child_process");
     const key = randomUUID();
@@ -104,7 +119,7 @@ async function browserRun(mode) {
       child.on("exit", code => { if (code !== 0) readyReject(new Error("race_fixture_failed")); endResolve({ code, events }); });
       return { ready, done };
     };
-    const prefix = 'import sys;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;';
+    const prefix = `import sys;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}`;
     const watcher = launch(prefix + 'q.query_admission_watch(sys.argv[1],sys.argv[2]=="true")', [key, String(revoke)]);
     await watcher.ready;
     const barrier = launch(prefix + 'q.query_source_barrier()');
@@ -133,8 +148,8 @@ async function browserRun(mode) {
     const operator = await identity("operator-ab"), auditor = await identity("auditor-ab");
     check("distinct_oidc_subjects", operator.me.subjectId !== auditor.me.subjectId);
     let state;
-    try { state = JSON.parse(await readFile(resolve(output, "runtime-fixture.json"), "utf8")); }
-    catch { state = { taskId: task, runId, scope: { organizationId: "org-demo", siteIds: ["site-a", "site-b"] } }; }
+    try { state = JSON.parse(await readFile(resolve(output, stateName), "utf8")); }
+    catch { state = { taskId: task, runId, ...(integration ? { scenario, s3: true, numeric: scenario === "numeric" } : {}), scope: { organizationId: "org-demo", siteIds: ["site-a", "site-b"] } }; }
     check("fixture_identity", state.taskId === task && state.runId === runId);
     state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
     await save(state);
@@ -200,7 +215,7 @@ async function browserRun(mode) {
       phase = "query_after_api_restart";
       const original = state.numericResult ?? state.latestQuery ?? state.firstQuery;
       check("original_query_exists", Boolean(original));
-      const observed = () => JSON.parse(execFileSync("python3", ["-B", "-c", 'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;print(json.dumps(q.source_scan_snapshot()))'], { cwd: root, timeout: 30000, encoding: "utf8" }));
+      const observed = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.source_scan_snapshot()))`], { cwd: root, timeout: 30000, encoding: "utf8" }));
       const count = row => row.seqScan + row.idxScan;
       await new Promise(done => setTimeout(done, 2100)); const before = observed();
       await new Promise(done => setTimeout(done, 1100)); const settled = observed();
@@ -279,7 +294,7 @@ async function browserRun(mode) {
       check("s3_root_observations_truncated_receipt", rootEvidence.data.receipt.limited);
       const limited = await execute("g4_read_observations", { maxRows: 2 });
       check("s3_shared_row_budget_partial", limited.data.status === "PARTIAL" && limited.data.limited && limited.data.data.length === 2);
-      const control = action => execFileSync("python3", ["-B", "-c", 'import sys;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;import json;print(json.dumps(q.query_fixture_control(sys.argv[1])))', action], { cwd: root, timeout: 15000 });
+      const control = action => execFileSync("python3", ["-B", "-c", `import sys;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}import json;print(json.dumps(q.query_fixture_control(sys.argv[1])))`, action], { cwd: root, timeout: 15000 });
       phase = "s3_independent_source_denial";
       control("readings-deny");
       try {
@@ -329,7 +344,7 @@ async function browserRun(mode) {
     } else if (mode === "s2-inflight") {
       const { execFileSync } = await import("node:child_process");
       try { await heldQuery(operator, state.latestQuery.query, async () => {}, true); }
-      finally { execFileSync("python3", ["-B", "-c", 'import sys;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;q.query_fixture_control("restore-execute")'], { cwd: root, timeout: 15000 }); }
+      finally { execFileSync("python3", ["-B", "-c", `import sys;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}q.query_fixture_control("restore-execute")`], { cwd: root, timeout: 15000 }); }
       check("regrant_preserves_existing_result", createHash("sha256").update((await request(operator, "GET", `/api/v1/data/semantic-queries/${state.latestQuery.queryId}/result`)).raw).digest("hex") === state.latestQuery.resultHash);
       report.status = "PASS"; report.scope = "S2_REAL_INFLIGHT_GRANT_REVOCATION";
     } else if (["s2-aba", "s2-aba-prepare"].includes(mode)) {
@@ -447,10 +462,10 @@ async function browserRun(mode) {
     } else if (["s2-runtime", "s2-race", "s2-capacity"].includes(mode)) {
       const { execFile, spawn } = await import("node:child_process");
       const control = (action, value = "") => new Promise((resolveControl, rejectControl) => execFile("python3", ["-B", "-c",
-        'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;print(json.dumps(q.query_fixture_control(sys.argv[1],sys.argv[2] or None)))', action, value],
+        `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.query_fixture_control(sys.argv[1],sys.argv[2] or None)))`, action, value],
         { cwd: root, timeout: 15000, encoding: "utf8" }, (error, stdout) => error ? rejectControl(new Error("query_fixture_control_failed")) : resolveControl(JSON.parse(stdout))));
       const sourceBarrier = async () => {
-        const child = spawn("python3", ["-B", "-c", 'import sys;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;q.query_source_barrier()'], { cwd: root, stdio: ["ignore", "pipe", "pipe"] });
+        const child = spawn("python3", ["-B", "-c", `import sys;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}q.query_source_barrier()`], { cwd: root, stdio: ["ignore", "pipe", "pipe"] });
         let readyResolve, readyReject, finishResolve, buffer = "", released = false;
         const ready = new Promise((resolveReady, rejectReady) => { readyResolve = resolveReady; readyReject = rejectReady; });
         const finished = new Promise(resolveFinish => { finishResolve = resolveFinish; });
@@ -468,7 +483,7 @@ async function browserRun(mode) {
         await ready; return { finished };
       };
       const query = state.latestQuery.query, queryId = state.latestQuery.queryId;
-      const secondary = { ...operator, apiOrigin: "http://localhost:15448" };
+      const secondary = { ...operator, apiOrigin: `http://localhost:${port(15448)}` };
       check("second_api_same_current_identity", (await get(secondary, "/api/v1/platform/me")).subjectId === operator.me.subjectId);
       await get(secondary, "/api/v1/capabilities");
       const execute = (actor = operator, key = randomUUID(), expected = 200) => request({ ...actor, headers: { ...actor.headers, "Idempotency-Key": key } },
@@ -497,7 +512,7 @@ async function browserRun(mode) {
       }
       phase = "query_cross_api_cancel";
       const key = randomUUID();
-      const watcher = spawn("python3", ["-B", "-c", 'import sys;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;q.query_admission_watch(sys.argv[1])', key], { cwd: root, stdio: ["ignore", "pipe", "pipe"] });
+      const watcher = spawn("python3", ["-B", "-c", `import sys;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}q.query_admission_watch(sys.argv[1])`, key], { cwd: root, stdio: ["ignore", "pipe", "pipe"] });
       let markReady, rejectReady, markFound, rejectFound, buffer = "";
       const ready = new Promise((resolveWatch, rejectWatch) => { markReady = resolveWatch; rejectReady = rejectWatch; });
       const found = new Promise((resolveWatch, rejectWatch) => { markFound = resolveWatch; rejectFound = rejectWatch; }).then(value => ({ value }), error => ({ error }));
@@ -798,7 +813,7 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       await operator.page.getByRole("region", { name: "业务源查询结果" }).getByRole("heading", { name: "FOUND · 找到可信结果", exact: true }).waitFor();
       const queryId = response.headers()["x-query-id"];
       check("ui_recoverable_url_only_id", new URL(operator.page.url()).searchParams.get("query") === queryId);
-      const observed = () => JSON.parse(execFileSync("python3", ["-B", "-c", 'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m4_query as q;print(json.dumps(q.source_scan_snapshot()))'], { cwd: root, timeout: 30000, encoding: "utf8" }));
+      const observed = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.source_scan_snapshot()))`], { cwd: root, timeout: 30000, encoding: "utf8" }));
       const count = row => row.seqScan + row.idxScan;
       await new Promise(done => setTimeout(done, 2100)); const before = observed();
       await new Promise(done => setTimeout(done, 1100)); const settled = observed();

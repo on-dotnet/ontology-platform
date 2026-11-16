@@ -1,34 +1,26 @@
-状态：PROPOSED_G4_CONTRACT / NOT_IMPLEMENTED。TaskId：G4-00-CONTRACT-001；Master 单写。基线 d1a61daffe844475b07705797e3ad325cc3f2945。
+# G4当前能力与规划入口
 
-本文件为 V1.1 输入的仓库合同入口。下列引用章节为仅EOF规范化的阅读视图，属于本合同的详细定义；原05/Manifest/SHA256SUMS字节保存在任务Evidence的input-original-bytes.json，restore-input.py可恢复原24文件，派生清单不冒充上游原清单；当前裁决优先于输入中的建议，G2/G3 冻结合同优先于 G4。输入包历史“未授权”描述保留，2026-11-01 用户明确批准本任务仅合同归档、验证、独立 Review；不是产品实施许可。
+当前基线：`a6716b11c3795e5670c07f1ca37057e5649bed89`；G4总体 **PARTIAL**。当前执行为[G4-M5-INTEGRATION-001](../tasks/G4-M5-INTEGRATION-001.md)，人类批准只整合既有PG能力，不表示原M5五源/全冶金流程/双架构完成。
 
-## 依赖与授权
+## 已合并能力与缺口
 
-G3冻结→G4-00合同复审→另行批准M1 PG连接闭环→M2四类Adapter→M3 Mapping治理→M4查询六态与受控能力→M5整合。G5/G7依赖G4；G6 Docling支线锁未完成且不并main，不阻断本合同，不默许其集成。完整 C-01..20/S-01..70 见[验收矩阵](../evidence/G4-00-CONTRACT-001/input-v1.1/docs/08-STAGES-ACCEPTANCE.md)。所有S项仍NOT_RUN。
-
-## 下一G4-M1授权申请（尚未获批）
-
-申请仅PG合成隔离环境：五类型动态配置UI、PG真实创建/测试/编辑/停用/审计与受控metadata，连接管理权限/Secret策略先冻结。Master独占Contracts/Host/迁移/锁/生成链，Adapter与UI在独立树非交叠写入，非作者安全/UX Review。需先批准精确依赖/镜像/许可、Secret存储方式、网络与资源白名单；G4 E0消费者支持需单独列公共脚本变更。不得以该申请进入M2–M5、真实生产、收费模型或G6集成。
-
-最短正反：真实PG TLS与只读账号、跨schema/scope拒绝、Secret不回显、旧probe失效、同key异payload409、CAS冲突、真实OIDC/HTTP/浏览器恢复。稳定输入完成适用本地完整验收、独立Review、提交绑定、V3和资源收尾；CI按需NOT_RUN。缺环境不以mock代真源。
-
-## ADR与风险裁决
-
-| ADR | 提议 | 状态/解锁证据 |
+| 来源/阶段 | 已合并实现与历史验收范围 | 当前未完成范围 |
 |---|---|---|
-| G4-ADR-01 | 独立元数据schema与SecretRef | PROPOSED；实施前确定secret store/生命周期/审计原子性 |
-| G4-ADR-02 | typed SPI与独立方言 | PROPOSED；逐驱动精确版本/许可/只读类型负例 |
-| G4-ADR-03 | Web GET与网络白名单 | PROPOSED；实际socket/重定向/DNS/OAuth/代理拒绝 |
-| G4-ADR-04 | Ontop PG/Oracle对照 | PROPOSED；另批环境后比较正确性/权限/性能/运维 |
-| G4-ADR-05 | 独立MappingRelease | PROPOSED；canonical字节、异人/CAS/审计/回滚故障 |
-| G4-ADR-06 | G4QueryResultV1/ReadReceipt | PROPOSED；六态、时间/证据精度及G2兼容真实回归 |
-| G4-ADR-07 | 新权限与审计action | PROPOSED；明确角色映射/白名单/拒绝审计，默认不授予 |
-| G4-ADR-08 | 双架构与资源 | PROPOSED；批准镜像/许可/平台实际测试及精确回收 |
+| M1 PG | 连接/TLS/只读探测/目录/权限及UI；见[M1任务](../tasks/G4-M1-CONNECTION-001.md) | 生产、未实测平台 |
+| M2 Web | API_KEY_REF、HTTPS GET、Pagination=NONE连接/目录；见[Web任务](../tasks/G4-M2-WEB-01.md) | NONE/OAuth/其他分页、Mapping/Query |
+| M2 Doris | 本机合成FE/BE、TLS连接/目录/生命周期；见[Doris任务](../tasks/G4-M2-DORIS-01.md) | Mapping/Query、生产 |
+| M2 Oracle | 本机ARM64 Free/TCPS连接/目录/API/UI；见[Oracle任务](../tasks/G4-M2-ORACLE-01.md) | Mapping/Query、其他edition/RU、整库灾备/生产 |
+| M2 TDengine | WAIT_FOR_EXTERNAL_INPUT；该源任务未并入当前基线 | 本轮不恢复 |
+| M3 Mapping | 单PG连接、≤2显式TABLE、每表≤12字段/≤100合成行、有限numeric、异人审核/发布/激活/回滚；见[M3任务](../tasks/G4-M3-MAPPING-001.md) | 非PG/跨源/自由表达式 |
+| M4 Query | 单PG三受控G4能力、固定5秒、六态/UI/MCP/canonical恢复、numeric/ABA；见[M4任务](../tasks/G4-M4-QUERY-001.md) | 三独立源失败组合、cursor分页、跨源、生产 |
+| M5当前 | PG纵向组合及工程入口收敛进行中 | 证据以当前任务为准，不把历史PASS当本次FRESH |
 
-八ADR均 BLOCKED_FOR_IMPLEMENTATION，设计归档不等于依赖或实现批准。新增错误码/权限/API/DTO仍PROPOSED。现有G3合同胜出：旧DTO/Manifest/SourceBundle/Identity/Run不改；G4无图证据不投射成G2伪图；query预算不扩大。需改变以上边界即REQUIRES_USER_DECISION并停对应项。
+当前实际平台为Mac ARM64及Linux ARM64合成容器；Windows/AMD64、CI未运行项和真实模型/生产保持NOT_RUN。AI OFF；合成IdP直接禁用传播限制继续单列。
 
-## 非作者 Review 提前发现的实施阻断
+## 冻结合同与历史恢复
 
-- G4-ADR-06 / M4：G4SemanticDatum仅来源链子集，完整值/单位/时序/关系端点判别Schema和字节回归待ChatGPT裁决；必须在M4实现授权前冻结。
-- G4-ADR-05 / M3：MappingProposalView仅PUBLISH子集，ROLLBACK固定targetReleaseId/manifestHash的判别读写合同待裁决；不能借M3实现自行补字段。
-- RQ-01实体选择断链已在本任务补充PROPOSED设计Schema及合成正反例修正；原V1.1输入原字节保持。状态词层次RM-01、授权拒绝RQ-03已澄清。以上不是产品测试，也不自动批准M1。
+原M5及S-01..S-70定义见[原阶段验收](../evidence/G4-00-CONTRACT-001/input-v1.1/docs/08-STAGES-ACCEPTANCE.md)。M3/M4经明确批准的限定范围分别见[Mapping合同](../evidence/G4-M3-MAPPING-001/contract-admission-request.md)与[Query合同](../evidence/G4-M4-QUERY-001/contract-admission-request.md)及各任务批准原件。
+
+G4-00原设计/Schema/原批准字节不改。旧规划的PROPOSED、M1尚待批准及ADR阻断属于当时事实，按[历史索引](../evidence/G4-M5-INTEGRATION-001/history-index.json)从固定Base恢复；不据这些历史状态否定后续已批准实施，也不把未知条目升级PASS。
+
+G5/G7仍依赖完整G4；G6独立支线不默认集成。当前授权和唯一状态仅由[授权入口](../tasks/current-authorization.md)及当前任务卡维护。

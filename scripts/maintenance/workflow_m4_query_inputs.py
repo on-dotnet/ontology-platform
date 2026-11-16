@@ -10,7 +10,7 @@ INTERPRETERS = {'scripts/maintenance/workflow.py', 'scripts/maintenance/workflow
                 'scripts/tests/WorkflowQuery.Tests.py', 'docs/development/verification-gates.json'}
 ARCHIVE = {'scripts/create-review-package.ps1','scripts/maintenance/workflow_evidence.py',
            'scripts/tests/ReviewPackage.Tests.ps1','scripts/tests/WorkflowDelivery.Tests.py'}
-DRIVERS = {'scripts/maintenance/workflow_m4_query.py','scripts/maintenance/workflow-m4-query.mjs',
+DRIVERS = {'scripts/maintenance/workflow_pg_profile.py','scripts/maintenance/workflow_m5_integration.py','scripts/maintenance/workflow_m4_query.py','scripts/maintenance/workflow-m4-query.mjs',
            'scripts/maintenance/workflow_m4_query_runtime.py','scripts/maintenance/workflow_execution.py',
            'scripts/maintenance/workflow_environment.py','scripts/maintenance/workflow_web_cache.py'}
 

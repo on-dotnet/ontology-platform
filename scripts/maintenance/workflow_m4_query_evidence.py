@@ -6,7 +6,7 @@ TASK = 'G4-M4-QUERY-001'
 RUN = 'query-impl-01'
 
 
-def demand_causality(row):
+def demand_causality(row, run_id=RUN):
     """UTC关联加同进程单调顺序证明源读取、两次激活、提交拒绝属于同一在途查询。"""
     def utc(value):
         if not isinstance(value, str): raise ValueError('QUERY_ABA_TIME_REQUIRED')
@@ -15,7 +15,7 @@ def demand_causality(row):
             raise ValueError('QUERY_ABA_UTC_REQUIRED')
         return result
     mapping = row.get('mappingId')
-    if not isinstance(mapping, str) or not mapping or row.get('resourceRun') != 'query-impl-01':
+    if not isinstance(mapping, str) or not mapping or row.get('resourceRun') != run_id:
         raise ValueError('QUERY_ABA_RUN_MAPPING_REQUIRED')
     captured, b, a = [row[key] for key in ['capturedA', 'activatedB', 'activatedA']]
     if any(item.get('mappingId') != mapping for item in [captured, b, a]) or b.get('previousReleaseId') != captured['mappingReleaseId'] or a.get('previousReleaseId') != b['mappingReleaseId']:
@@ -36,7 +36,7 @@ def demand_causality(row):
         previous_utc, previous_mono = observed, monotonic
 
 
-def demand_aba_original(raw, stage):
+def demand_aba_original(raw, stage, task=TASK, run_id=RUN):
     """独立重开真实在途ABA原件，单纯MAF测试通过不能充当本项验收。"""
     import re
     if stage != 'query-real-aba-inflight-runtime': raise ValueError('QUERY_ABA_STAGE_INVALID')
@@ -47,7 +47,7 @@ def demand_aba_original(raw, stage):
         if isinstance(value, dict) and value.get('case') == 'AC-05_INFLIGHT_ABA': reports.append(value)
     if len(reports) != 1: raise ValueError('QUERY_ABA_ORIGINAL_REQUIRED')
     row = reports[0]
-    if row.get('taskId') != TASK or row.get('status') != 'PASS' or row.get('abaCompleted') is not True \
+    if row.get('taskId') != task or row.get('status') != 'PASS' or row.get('abaCompleted') is not True \
         or row.get('errorStatus') != 409 or row.get('errorCode') != 'query_binding_stale' \
         or not re.fullmatch(r'query-[0-9a-f]{32}', row.get('queryId', '')) or row.get('executionStatus') not in ['RUNNING','FAILED','CANCELLED'] \
         or row.get('resultHash', 'missing') is not None \
@@ -64,7 +64,7 @@ def demand_aba_original(raw, stage):
         or len({captured.get('activationId'),b.get('activationId'),a.get('activationId')}) != 3 \
         or not int(captured.get('activationRevision', 0)) < b.get('activationRevision', 0) < a.get('activationRevision', 0):
         raise ValueError('QUERY_ABA_IDENTITY_INVALID')
-    demand_causality(row)
+    demand_causality(row, run_id)
     return row
 
 
@@ -78,13 +78,13 @@ def demand_build_inputs(build, inputs):
         raise ValueError('QUERY_BUILD_INPUT_CLOSURE')
 
 
-def demand_qualification(row, name, inputs, all_inputs=None):
+def demand_qualification(row, name, inputs, all_inputs=None, task=TASK, run_id=RUN):
     """先拒绝外任务、失败、漂移与零原件，随后才打开实际命令报告。"""
     if all_inputs is not None:
         from workflow_m4_query_inputs import demand_scope
         if not isinstance(row.get('allInputs'),dict): raise ValueError('QUERY_INPUT_CLASSIFICATION_MISSING')
         demand_scope(row['allInputs'],all_inputs,inputs)
-    if row.get('taskId') != TASK or row.get('runId') != RUN or row.get('name') != name \
+    if row.get('taskId') != task or row.get('runId') != run_id or row.get('name') != name \
         or row.get('status') != 'PASS' or row.get('exitCode') != 0 or row.get('inputsUnchanged') is not True \
         or row.get('inputs') != inputs or not row.get('commands'):
         raise ValueError('QUERY_QUALIFICATION_INVALID')

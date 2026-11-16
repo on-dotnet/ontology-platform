@@ -33,7 +33,16 @@
         "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/vitest-report.json",
         "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/local-944e058b423e493d84bfea98e3fd5ae3/vitest-report.json.payload.json",
         "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/ontology-g4-m3-mapping-impl-01-source-test-14c5f8dc.json",
-        "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/ontology-g4-m3-mapping-impl-01-source-test-14c5f8dc.json.payload.json"
+        "docs/evidence/G4-M3-MAPPING-001/package/originals/command-evidence/G4-M3-MAPPING-001/mapping-impl-01/ontology-g4-m3-mapping-impl-01-source-test-14c5f8dc.json.payload.json",
+        "apps/web/AGENTS.md",
+        "backend/AGENTS.md",
+        "docs/planning/**",
+        "docs/evidence/G4-M5-INTEGRATION-001/**/*.json",
+        "scripts/verify.ps1",
+        "scripts/validate-structured-files.py",
+        "scripts/maintenance/workflow_context.py",
+        "scripts/maintenance/workflow.py",
+        "docs/development/verification-gates.json"
       ],
       "needs": [],
       "command": [
@@ -42,7 +51,12 @@
         "-File",
         "scripts/verify.ps1"
       ],
-      "testsRequired": false
+      "testsRequired": false,
+      "identityInputs": [
+        "scripts/verify.ps1",
+        "scripts/validate-structured-files.py",
+        "scripts/maintenance/workflow_context.py"
+      ]
     },
     "environment": {
       "inputs": [
@@ -78,7 +92,9 @@
         "samples/g3-m3/units.ttl",
         "scripts/maintenance/workflow_m4_query.py",
         "scripts/maintenance/workflow_m4_query_*.py",
-        "scripts/maintenance/workflow-m4-query.mjs"
+        "scripts/maintenance/workflow-m4-query.mjs",
+        "scripts/maintenance/workflow_m5_integration.py",
+        "scripts/maintenance/workflow_pg_profile.py"
       ],
       "needs": [],
       "command": null
@@ -111,7 +127,9 @@
         "samples/g3-m3/units.ttl",
         "scripts/maintenance/workflow_m4_query.py",
         "scripts/maintenance/workflow_m4_query_*.py",
-        "scripts/maintenance/workflow-m4-query.mjs"
+        "scripts/maintenance/workflow-m4-query.mjs",
+        "scripts/maintenance/workflow_m5_integration.py",
+        "scripts/maintenance/workflow_pg_profile.py"
       ],
       "needs": [
         "environment"
@@ -146,7 +164,9 @@
         "samples/g3-m3/units.ttl",
         "scripts/maintenance/workflow_m4_query.py",
         "scripts/maintenance/workflow_m4_query_*.py",
-        "scripts/maintenance/workflow-m4-query.mjs"
+        "scripts/maintenance/workflow-m4-query.mjs",
+        "scripts/maintenance/workflow_m5_integration.py",
+        "scripts/maintenance/workflow_pg_profile.py"
       ],
       "needs": [
         "contract",
@@ -179,7 +199,9 @@
         "samples/g3-m3/units.ttl",
         "scripts/maintenance/workflow_m4_query.py",
         "scripts/maintenance/workflow_m4_query_*.py",
-        "scripts/maintenance/workflow-m4-query.mjs"
+        "scripts/maintenance/workflow-m4-query.mjs",
+        "scripts/maintenance/workflow_m5_integration.py",
+        "scripts/maintenance/workflow_pg_profile.py"
       ],
       "needs": [
         "contract"
@@ -212,7 +234,9 @@
         "samples/g3-m3/units.ttl",
         "scripts/maintenance/workflow_m4_query.py",
         "scripts/maintenance/workflow_m4_query_*.py",
-        "scripts/maintenance/workflow-m4-query.mjs"
+        "scripts/maintenance/workflow-m4-query.mjs",
+        "scripts/maintenance/workflow_m5_integration.py",
+        "scripts/maintenance/workflow_pg_profile.py"
       ],
       "needs": [
         "web",
@@ -276,7 +300,8 @@
     },
     "engineering-full": {
       "inputs": [
-        "scripts/verify.ps1"
+        "scripts/verify.ps1",
+        "docs/evidence/G1-ENG-001/verify.tests.ps1"
       ],
       "needs": [],
       "command": [
@@ -559,6 +584,34 @@
         "backend/src/Hosts/OntologyPlatform.Api/G4/**",
         "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/**"
       ]
+    },
+    "context-selection": {
+      "inputs": [
+        "scripts/maintenance/workflow_context.py",
+        "scripts/tests/WorkflowContext.Tests.py",
+        "scripts/validate-structured-files.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowContext.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "integration-task-admission": {
+      "inputs": [
+        "scripts/maintenance/workflow_m5_integration.py",
+        "scripts/maintenance/workflow_pg_profile.py",
+        "scripts/tests/WorkflowIntegration.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowIntegration.Tests.py"
+      ],
+      "testsRequired": true
     }
   }
 }

@@ -9,6 +9,13 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 TASK = 'G4-M4-QUERY-001'
 RUN = 'query-impl-01'
+from workflow_pg_profile import profile
+PROFILE = profile(TASK)
+SCENARIO = None
+
+
+def fixture_file():
+    return 'runtime-fixture.json' if SCENARIO is None else 'scenario-'+SCENARIO+'.json'
 
 
 def structural(root, task, phase='runtime'):
@@ -77,7 +84,7 @@ def runtime_snapshot(label):
     """只采集本任务准确资源与配额，不读取或输出其他任务的环境凭据。"""
     import subprocess
     prefix = ['docker', '--context', 'desktop-linux']
-    project = 'ontology-g4-m4-query-impl-01'
+    project = PROFILE.text('ontology-g4-m4-query-impl-01')
     rows = []
     for kind, listing in [('container', ['ps', '-aq']), ('network', ['network', 'ls', '-q']), ('volume', ['volume', 'ls', '-q'])]:
         ids = subprocess.check_output([*prefix, *listing, '--filter', 'label=com.docker.compose.project='+project], timeout=15).decode().split()
@@ -127,7 +134,7 @@ def runtime_prepare():
     prepared()
     structural(ROOT, TASK, 'runtime')
     output = ROOT/'artifacts/workflow'/TASK/RUN
-    private = ROOT/'.tools/security/g4-m4-query-001'/RUN
+    private = ROOT/PROFILE.text('.tools/security/g4-m4-query-001')/RUN
     runtime = private/'runtime'
     if runtime.exists(): raise ValueError('QUERY_RUNTIME_PRESERVE_EXISTING')
     policy = host_continuity.inspect(task_id=TASK)
@@ -148,7 +155,7 @@ def runtime_prepare():
         or sum(row['cpu'] for row in existing)+added_cpu > min(16, info['NCPU'])*1_000_000_000:
         raise ValueError('QUERY_SHARED_RESOURCE_BUDGET_EXCEEDED')
     if shutil.disk_usage(ROOT).free < 20*1024**3: raise ValueError('QUERY_DISK_BUDGET_BLOCKED')
-    for port in [15441,15442,15443,15446,15447,15448]:
+    for port in [PROFILE.ports[n] for n in ('api','web','idp','fuseki','s3','secondary')]:
         with socket.socket() as probe: probe.bind(('127.0.0.1', port))
     expected = canonical_fuseki.identity(ROOT/'infra/development/fuseki', 'linux/arm64')
     actual = canonical_fuseki.inspect_image(expected)
@@ -170,8 +177,8 @@ def runtime_prepare():
     module=ast.parse((ROOT/'scripts/maintenance/workflow_m3_mapping.py').read_text())
     source=next(ast.literal_eval(node.value) for node in module.body if isinstance(node,ast.Assign)
                 and any(isinstance(target,ast.Name) and target.id=='LOOPBACK_SOURCE' for target in node.targets))
-    for old,new in [('15680','15443'),('15603','15446'),('15690','15447'),('15630','15442')]: source=source.replace(old,new)
-    source=source.replace('本任务隔离运行夹具','G4-M4-QUERY-001 隔离运行夹具')
+    for old,new in [('15680',PROFILE.text('15443')),('15603',PROFILE.text('15446')),('15690',PROFILE.text('15447')),('15630',PROFILE.text('15442'))]: source=source.replace(old,new)
+    source=source.replace('本任务隔离运行夹具',PROFILE.text('G4-M4-QUERY-001 隔离运行夹具'))
     (helper/'QueryLoopback.cs').write_text(source)
     references=sorted(Path('/usr/local/share/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.13/ref/net10.0').glob('*.dll'))
     if not references: raise ValueError('QUERY_REFERENCE_PACK_MISSING')
@@ -186,7 +193,7 @@ def runtime_prepare():
     put(runtime/'api/g4-key',secrets.token_bytes(32))
     put(runtime/'api/ca.crt',(private/'pg-source/server.crt').read_bytes())
     put(runtime/'api/platform-ca.crt',(private/'platform-pg/server.crt').read_bytes())
-    put(runtime/'runtime.json',json.dumps(dict(taskId=TASK,runId=RUN,publicOrigin='http://localhost:15441',
+    put(runtime/'runtime.json',json.dumps(dict(taskId=TASK,runId=RUN,publicOrigin=PROFILE.text('http://localhost:15441'),
         certificatePath=str(runtime/'api/keyring.pfx'),certificatePassword=secrets.token_urlsafe(40),healthKey=secrets.token_urlsafe(32),realmFile=str(runtime/'realm.json'))))
     runtime_command('query-keyring-create',['pwsh','-NoProfile','-File','scripts/acceptance/new-wave2-certificate.ps1','-RuntimeFile',str(runtime/'runtime.json')],offline=True)
     # 只读取已审查的公开compose结构，所有实例身份/私有路径/配额/端口由M4明确替换。
@@ -198,7 +205,7 @@ def runtime_prepare():
         '${MAPPING_RUNTIME_HELPER_DIR:-/not-configured}':str(helper)}
     for old,new in replacements.items(): template=template.replace(old,new)
     template=template.replace('G4-M3-MAPPING-001',TASK).replace('.mapping-built','.query-built').replace('MappingLoopback.dll','QueryLoopback.dll')
-    for old,new in [('15680','15443'),('15603','15446'),('15690','15447'),('15600','15441')]: template=template.replace(old,new)
+    for old,new in [('15680',PROFILE.text('15443')),('15603',PROFILE.text('15446')),('15690',PROFILE.text('15447')),('15600',PROFILE.text('15441'))]: template=template.replace(old,new)
     parsed=yaml.safe_load(template)
     services={name:parsed['services'][name] for name in ['keycloak-test','fuseki','rustfs','api']}
     for name,service in services.items():
@@ -214,8 +221,8 @@ def runtime_prepare():
     services['api']['volumes'].append(str(query_keyring)+':/query-keyring')
     labels={'ontology.task-id':TASK,'ontology.run-id':RUN,'ontology.synthetic':'true'}
     volumes={name:parsed['volumes'][name] for name in ['keycloak-data','fuseki-data','rustfs-data','api-keyring']}
-    compose=dict(name='ontology-g4-m4-query-impl-01',services=services,volumes=volumes,
-        networks={'platform':{'external':True,'name':'ontology-g4-m4-query-impl-01_platform'},'edge':{'labels':labels}})
+    compose=dict(name=PROFILE.text('ontology-g4-m4-query-impl-01'),services=services,volumes=volumes,
+        networks={'platform':{'external':True,'name':PROFILE.text('ontology-g4-m4-query-impl-01_platform')},'edge':{'labels':labels}})
     (output/'runtime-compose.json').write_text(json.dumps(compose,indent=2)+'\n')
     (output/'runtime-build-binding.json').write_text(json.dumps({str(path.relative_to(ROOT)):sha(path.read_bytes())
         for directory in [binaries,helper] for path in directory.iterdir() if path.is_file()},indent=2)+'\n')
@@ -235,7 +242,7 @@ def runtime_start(api=False):
     tag='runtime-'+('api' if api else 'infrastructure')+'-'+uuid.uuid4().hex[:8]
     before=runtime_snapshot(tag+'-before')
     if any(row.get('service') in services for row in before['resources']): raise ValueError('QUERY_RUNTIME_PRESERVE_EXISTING')
-    if api and not (ROOT/'.tools/security/g4-m4-query-001'/RUN/'runtime/api/appsettings.json').is_file():
+    if api and not (ROOT/PROFILE.text('.tools/security/g4-m4-query-001')/RUN/'runtime/api/appsettings.json').is_file():
         raise ValueError('QUERY_RUNTIME_CONFIG_MISSING')
     prefix=['docker','--context','desktop-linux']
     info=json.loads(subprocess.check_output([*prefix,'info','--format','{{json .}}'],timeout=15))
@@ -324,8 +331,8 @@ def runtime_api_rebuild():
         '--no-restore','--disable-build-servers','-m:1','-v:q'],timeout=180,offline=True)
     if before!=inputs(): raise ValueError('QUERY_API_SOURCE_CHANGED_DURING_BUILD')
     from workflow_m4_query_runtime import freeze,verify
-    snapshot=freeze(ROOT,ROOT/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0',output/'runtime-snapshots',before,result.receipt['commandId'],runtime_environment_identity())
-    binaries=verify(ROOT,snapshot)
+    snapshot=freeze(ROOT,ROOT/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0',output/'runtime-snapshots',before,result.receipt['commandId'],runtime_environment_identity(),task=TASK,run_id=RUN)
+    binaries=verify(ROOT,snapshot,task=TASK,run_id=RUN)
     (output/'runtime-snapshot-current.json').write_text(json.dumps(snapshot,indent=2)+'\n')
     record=dict(taskId=TASK,runId=RUN,commandId=result.receipt['commandId'],inputs=before,binaries=binaries,inputHash=sha(encoded(before)))
     (output/('api-build-'+result.receipt['commandId']+'.json')).write_text(json.dumps(record,indent=2)+'\n')
@@ -341,7 +348,7 @@ def runtime_api_resume():
     from workflow_m4_query_runtime import verify,demand_mount
     from workflow_execution import sha
     output=ROOT/'artifacts/workflow'/TASK/RUN
-    snapshot=json.loads((output/'runtime-snapshot-current.json').read_text());verify(ROOT,snapshot)
+    snapshot=json.loads((output/'runtime-snapshot-current.json').read_text());verify(ROOT,snapshot,task=TASK,run_id=RUN)
     if any(not (ROOT/path).is_file() or sha((ROOT/path).read_bytes())!=digest for path,digest in snapshot['inputs'].items()):
         raise ValueError('QUERY_API_SOURCE_BUILD_DRIFT')
     tag='snapshot-switch-'+uuid.uuid4().hex[:8]
@@ -364,7 +371,7 @@ def runtime_api_resume():
         selected=[row for row in after['resources'] if row.get('service')==service and row.get('running')]
         if len(selected)!=1: raise ValueError('QUERY_API_SWITCH_POSTCHECK')
         actual=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect',selected[0]['id']],timeout=15))[0]
-        demand_mount(ROOT,snapshot,actual['Mounts'])
+        demand_mount(ROOT,snapshot,actual['Mounts'],task=TASK,run_id=RUN)
         process=dict(id=actual['Id'],startedAt=actual['State']['StartedAt'])
         record=process if service=='api' else dict(process=process,taskId=TASK,runId=RUN,commandId=result.receipt['commandId'],decision='KEEP',reason='M4 review')
         target='runtime-api-start.json' if service=='api' else 'runtime-secondary-api.json'
@@ -381,7 +388,7 @@ def runtime_persist_query_keyring():
     from workflow_execution import sha
     output=ROOT/'artifacts/workflow'/TASK/RUN
     previous=runtime_binding()
-    directory=ROOT/'.tools/security/g4-m4-query-001'/RUN/'runtime/query-keyring'
+    directory=ROOT/PROFILE.text('.tools/security/g4-m4-query-001')/RUN/'runtime/query-keyring'
     if directory.exists(): raise ValueError('QUERY_PERSISTENT_KEYRING_ALREADY_EXISTS')
     spec_path=output/'runtime-compose.json';spec=json.loads(spec_path.read_text())
     mounts=spec['services']['api']['volumes']
@@ -431,7 +438,7 @@ def runtime_binding():
     if snapshot:
         if snapshot['inputs']!=runtime_source_inputs() or snapshot.get('environment')!=runtime_environment_identity(): raise ValueError('QUERY_RUNTIME_CLOSURE_DRIFT')
         mounts=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{json .Mounts}}',started['id']],timeout=15))
-        demand_mount(ROOT,snapshot,mounts)
+        demand_mount(ROOT,snapshot,mounts,task=TASK,run_id=RUN)
     sources={str(path.relative_to(ROOT)):sha(path.read_bytes()) for path in ROOT.glob('backend/src/**/*.cs') if 'obj' not in path.parts and 'bin' not in path.parts}
     built_path=output/'runtime-api-build.json'
     if built_path.exists():
@@ -448,7 +455,7 @@ def runtime_binding():
         if not current.pop('running') or current!=secondary: raise ValueError('QUERY_SECONDARY_PROCESS_DRIFT')
         if snapshot:
             mounts=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{json .Mounts}}',secondary['id']],timeout=15))
-            demand_mount(ROOT,snapshot,mounts)
+            demand_mount(ROOT,snapshot,mounts,task=TASK,run_id=RUN)
     return dict(taskId=TASK,runId=RUN,process=started,secondary=secondary,binaries=binaries,sources=sources)
 
 
@@ -463,7 +470,7 @@ def runtime_second_api():
     tag='secondary-api-'+uuid.uuid4().hex[:8]
     before=runtime_snapshot(tag+'-before')
     if any(row.get('service')=='api-secondary' for row in before['resources']): raise ValueError('QUERY_SECONDARY_ALREADY_EXISTS')
-    with socket.socket() as probe: probe.bind(('127.0.0.1',15448))
+    with socket.socket() as probe: probe.bind(('127.0.0.1',PROFILE.ports['secondary']))
     prefix=['docker','--context','desktop-linux'];memory=0;cpu=0
     info=json.loads(subprocess.check_output([*prefix,'info','--format','{{json .}}'],timeout=15))
     for cid in subprocess.check_output([*prefix,'ps','-q'],timeout=15).decode().split():
@@ -473,7 +480,7 @@ def runtime_second_api():
     if memory+768*1024**2>min(14*1024**3,info['MemTotal']) or cpu+750_000_000>min(16,info['NCPU'])*1_000_000_000:
         raise ValueError('QUERY_SECONDARY_BUDGET_EXCEEDED')
     path=output/'runtime-compose.json';spec=json.loads(path.read_text())
-    service=copy.deepcopy(spec['services']['api']);service['ports']=['127.0.0.1:15448:15441']
+    service=copy.deepcopy(spec['services']['api']);service['ports']=[PROFILE.text('127.0.0.1:15448:15441')]
     spec['services']['api-secondary']=service;path.write_text(json.dumps(spec,indent=2)+'\n')
     result=runtime_command(tag,[*prefix,'compose','-f',str(path),'up','-d','--no-deps','--no-build','--pull','never','api-secondary'],timeout=120)
     after=runtime_snapshot(tag+'-after')
@@ -520,7 +527,7 @@ def runtime_health():
     for service in ['keycloak-test','fuseki','rustfs']:
         if not any(row.get('service')==service and row.get('running') for row in snapshot['resources']):
             raise ValueError('QUERY_RUNTIME_SERVICE_NOT_RUNNING_'+service)
-    urls={'keycloak':'http://127.0.0.1:15443/realms/master','fuseki':'http://127.0.0.1:15446/$/ping','rustfs':'http://127.0.0.1:15447/health'}
+    urls={'keycloak':PROFILE.text('http://127.0.0.1:15443/realms/master'),'fuseki':PROFILE.text('http://127.0.0.1:15446/$/ping'),'rustfs':PROFILE.text('http://127.0.0.1:15447/health')}
     pending=dict(urls);rows={};deadline=time.monotonic()+150
     while pending and time.monotonic()<deadline:
         for name,url in list(pending.items()):
@@ -541,7 +548,7 @@ def runtime_configure():
     from workflow_execution import run,sha
     _,env=prepared()
     output=ROOT/'artifacts/workflow'/TASK/RUN
-    private=ROOT/'.tools/security/g4-m4-query-001'/RUN
+    private=ROOT/PROFILE.text('.tools/security/g4-m4-query-001')/RUN
     runtime=private/'runtime'
     if json.loads((output/'runtime-health.json').read_text())['status']!='DEPENDENCIES_HEALTHY':
         raise ValueError('QUERY_DEPENDENCIES_NOT_HEALTHY')
@@ -550,24 +557,24 @@ def runtime_configure():
     identity=json.loads((runtime/'runtime.json').read_text())
     env['WAVE2_KEYCLOAK_ADMIN_PASSWORD']=(runtime/'keycloak-password').read_text()
     result=run(['python3','-B','infra/security/bootstrap-keycloak.py','--profile','g2',
-        '--keycloak-origin','http://localhost:15443','--public-origin',identity['publicOrigin'],
+        '--keycloak-origin',PROFILE.text('http://localhost:15443'),'--public-origin',identity['publicOrigin'],
         '--runtime-output',str(runtime/'realm.json')],ROOT,task=TASK,run_id=RUN,stage='query-realm-bootstrap',environment=env,
         timeout=90,input_key=sha(Path(__file__).read_bytes()))
     if result.returncode: raise ValueError('QUERY_REALM_BOOTSTRAP_FAILED_'+result.receipt['commandId'])
     realm=json.loads((runtime/'realm.json').read_text())
-    if not realm['authority'].startswith('http://localhost:15443/realms/g2-'): raise ValueError('QUERY_REALM_ORIGIN_INVALID')
+    if not realm['authority'].startswith(PROFILE.text('http://localhost:15443/realms/g2-')): raise ValueError('QUERY_REALM_ORIGIN_INVALID')
     config={'ConnectionStrings':{'governance':'Host=platform-pg;Database=query;Username=postgres;Password='+(private/'platform-pg/password').read_text()
         +';SSL Mode=VerifyFull;Root Certificate=/private/api/platform-ca.crt;Timeout=5;Command Timeout=5'},
         'Security':{'Authority':realm['authority'],'ClientId':realm['clientId'],'ClientSecret':realm['clientSecret'],
             'PublicOrigin':identity['publicOrigin'],'KeyRingPath':'/keyring','CertificatePath':'/private/api/keyring.pfx',
             'CertificatePassword':identity['certificatePassword'],'HealthKey':identity['healthKey']},
-        'Web':{'Origin':'http://127.0.0.1:15442'},'G2':{'Enabled':True,'ApplyMigrations':True},
+        'Web':{'Origin':PROFILE.text('http://127.0.0.1:15442')},'G2':{'Enabled':True,'ApplyMigrations':True},
         'G4':{'Enabled':True,'ApplyMigrations':True,'KeyFile':'/private/api/g4-key','SourceCaPath':'/private/api/ca.crt',
             'AllowEmptyPublicSchema':True,'Mapping':{'Enabled':True},'QueryEnabled':True,'QueryKeyRingPath':'/query-keyring'},
         'Governance':{'ApplyMigrations':True,'SeedDevelopmentResources':True},
-        'Semantics':{'ValidationOrigin':'http://127.0.0.1:15446/validation','PublishedOrigin':'http://127.0.0.1:15446/ontology'},
-        'Publishing':{'S3Endpoint':'http://127.0.0.1:15447','AccessKey':(runtime/'s3-access').read_text(),
-            'SecretKey':(runtime/'s3-secret').read_text(),'Bucket':'g4-m4-query-synthetic'},
+        'Semantics':{'ValidationOrigin':PROFILE.text('http://127.0.0.1:15446/validation'),'PublishedOrigin':PROFILE.text('http://127.0.0.1:15446/ontology')},
+        'Publishing':{'S3Endpoint':PROFILE.text('http://127.0.0.1:15447'),'AccessKey':(runtime/'s3-access').read_text(),
+            'SecretKey':(runtime/'s3-secret').read_text(),'Bucket':PROFILE.text('g4-m4-query-synthetic')},
         'Logging':{'LogLevel':{'Default':'Warning'}}}
     with os.fdopen(os.open(runtime/'api/appsettings.json',os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600),'w') as stream:
         json.dump(config,stream)
@@ -580,7 +587,7 @@ def browser_test(mode):
     binding=runtime_binding()
     web=web_binding() if mode in ['ui-s1','ui-s3'] else None
     result=runtime_command('query-browser-'+mode,['/opt/homebrew/Cellar/node@24/24.22.1/bin/node',
-        'scripts/maintenance/workflow-m4-query.mjs','--task',TASK,'--run-id',RUN,'--mode',mode],timeout=180,
+        'scripts/maintenance/workflow-m4-query.mjs','--task',TASK,'--run-id',RUN,'--mode',mode,*(['--scenario',SCENARIO] if SCENARIO else [])],timeout=180,
         extra_inputs=dict(api=binding,web=web))
     print(result.stdout.decode(errors='replace')[-2000:])
     return result.returncode
@@ -593,7 +600,7 @@ def synthetic_grants(mode):
     from workflow_execution import run,sha
     if mode not in ['mapping','query']: raise ValueError('QUERY_GRANT_MODE_INVALID')
     output=ROOT/'artifacts/workflow'/TASK/RUN
-    state=json.loads((output/'runtime-fixture.json').read_text())
+    state=json.loads((output/fixture_file()).read_text())
     resource=json.loads((output/'platform-resources.json').read_text())
     if state['taskId']!=TASK or state['runId']!=RUN or state['scope']!={'organizationId':'org-demo','siteIds':['site-a','site-b']}:
         raise ValueError('QUERY_SYNTHETIC_SCOPE_INVALID')
@@ -626,7 +633,7 @@ def synthetic_grants(mode):
             statements.append('WITH inserted AS (INSERT INTO governance."MappingAuthorizationGrants" '
                 '("Id","SubjectId","OrganizationId","SiteIds","Permission","ConnectionId","ObjectRefs","FieldRefs","ExpiresAtUtc","RevokedAtUtc") VALUES ('+','.join(values)+') ON CONFLICT ("Id") DO NOTHING RETURNING "Id") '
                 'INSERT INTO governance.audit_records ("Id","OccurredAtUtc","Actor","Action","Resource","Outcome","TraceId","CorrelationId","OrganizationId","ScopeSiteIds","SiteId") '
-                'SELECT md5("Id"),now(),\'synthetic-query-fixture\',\'mapping.grant.change\',"Id",\'allowed\',\'query-impl-01\',\'query-impl-01\',\'org-demo\','+array(state['scope']['siteIds'])+',NULL FROM inserted;')
+                + PROFILE.text('SELECT md5("Id"),now(),\'synthetic-query-fixture\',\'mapping.grant.change\',"Id",\'allowed\',\'query-impl-01\',\'query-impl-01\',\'org-demo\',')+array(state['scope']['siteIds'])+',NULL FROM inserted;')
     statements+=['COMMIT;','SELECT count(*) FROM governance."MappingAuthorizationGrants" WHERE "Id"=ANY('+array(ids)+') AND "RevokedAtUtc" IS NULL AND "ExpiresAtUtc">now();']
     sql='\n'.join(statements).encode()
     result=run([*prefix,'exec','-i',container,'psql','-U','postgres','-d','query','-v','ON_ERROR_STOP=1','-qAt'],ROOT,
@@ -654,7 +661,7 @@ GRANT SELECT ON production.numeric_assets,production.numeric_readings TO fixture
 COMMIT;
 SELECT json_build_object('rootType','numeric(10,2)','targetType','numeric(12,3)','matchingTargets',(SELECT json_agg(r.reading_id ORDER BY r.reading_id) FROM production.numeric_assets a JOIN production.numeric_readings r ON a.numeric_key=r.numeric_key AND a.organization_id=r.organization_id AND a.site_id=r.site_id WHERE a.asset_id='asset-1' AND a.site_id='site-a'));
 """
-    result=run(['docker','--context','desktop-linux','exec','-i',cid,'psql','-U','postgres','-d','fixture','-v','ON_ERROR_STOP=1','-qAt'],ROOT,task=TASK,run_id='review-fix-01',stage='numeric-source-fixture',stdin=sql,input_key=sha(sql),timeout=20)
+    result=run(['docker','--context','desktop-linux','exec','-i',cid,'psql','-U','postgres','-d','fixture','-v','ON_ERROR_STOP=1','-qAt'],ROOT,task=TASK,run_id=PROFILE.text('review-fix-01'),stage='numeric-source-fixture',stdin=sql,input_key=sha(sql),timeout=20)
     if result.returncode: raise ValueError('QUERY_NUMERIC_FIXTURE_FAILED')
     actual=json.loads(result.stdout.decode().strip().splitlines()[-1])
     if actual['matchingTargets']!=['numeric-target-1','numeric-target-2']: raise ValueError('QUERY_NUMERIC_SOURCE_EXPECTATION')
@@ -700,10 +707,10 @@ def query_fixture_control(action, value=None):
         sql=("REVOKE SELECT ON production.readings FROM fixture_reader;" if action=='readings-deny' else "GRANT SELECT ON production.readings TO fixture_reader;")+" SELECT has_table_privilege('fixture_reader','production.readings','SELECT');"
     elif action in ['readings-budget-add','readings-budget-remove']:
         # 仅本任务固定99个新增合成行，完整主键和时间限定避免碰到原三行。
-        owned="organization_id='org-demo' AND site_id='site-a' AND asset_id='asset-1' AND reading_id IN (SELECT 'm4-query-impl-01-budget-'||n FROM generate_series(1,99) n) AND valid_from='2026-11-14T00:00:00Z'::timestamptz"
+        owned=PROFILE.text("organization_id='org-demo' AND site_id='site-a' AND asset_id='asset-1' AND reading_id IN (SELECT 'm4-query-impl-01-budget-'||n FROM generate_series(1,99) n) AND valid_from='2026-11-14T00:00:00Z'::timestamptz")
         if action=='readings-budget-add':
             sql="BEGIN; DO $$ BEGIN IF EXISTS (SELECT 1 FROM production.readings WHERE "+owned+") THEN RAISE EXCEPTION 'owned budget fixture already exists'; END IF; END $$; "
-            sql+="INSERT INTO production.readings SELECT 'org-demo','site-a','m4-query-impl-01-budget-'||n,'asset-1','2026-11-14T00:00:00Z'::timestamptz,'2026-11-14T00:01:00Z'::timestamptz,'2026-11-14T00:00:01.123456Z'::timestamptz,20.1250,'Cel',jsonb_build_object('quality',repeat(chr(9),4096)) FROM generate_series(1,99) n; COMMIT; "
+            sql+=PROFILE.text("INSERT INTO production.readings SELECT 'org-demo','site-a','m4-query-impl-01-budget-'||n,'asset-1','2026-11-14T00:00:00Z'::timestamptz,'2026-11-14T00:01:00Z'::timestamptz,'2026-11-14T00:00:01.123456Z'::timestamptz,20.1250,'Cel',jsonb_build_object('quality',repeat(chr(9),4096)) FROM generate_series(1,99) n; COMMIT; ")
         else:
             sql="DELETE FROM production.readings WHERE "+owned+"; "
         sql+="SELECT json_build_object('ownedRows',(SELECT count(*) FROM production.readings WHERE "+owned+"),'siteRows',(SELECT count(*) FROM production.readings WHERE organization_id='org-demo' AND site_id='site-a'));"
@@ -711,7 +718,7 @@ def query_fixture_control(action, value=None):
         if not isinstance(value,str) or not re.fullmatch(r'[0-9a-f-]{36}',value): raise ValueError('QUERY_FIXTURE_KEY_INVALID')
         sql='SELECT json_build_object(\'id\',"Id",\'status\',"ExecutionStatus",\'fence\',"Fence",\'cancel\',"CancelRequested") FROM semantic_query."Queries" WHERE "IdempotencyKey"=\''+value+'\';'
     elif action in ['revoke-execute','restore-execute','revoke-result','restore-result','revoke-evidence','restore-evidence']:
-        state=json.loads((output/'runtime-fixture.json').read_text())
+        state=json.loads((output/fixture_file()).read_text())
         permission={'execute':'data.query.execute','result':'data.query.result.read','evidence':'data.query.evidence.read'}[action.split('-')[1]]
         ident='m4-fixture-'+sha((state['connectionId']+state['subjects']['operator']+permission+('s3' if state.get('s3') else '')).encode())[:32]
         revoked="now()" if action.startswith('revoke-') else 'NULL'
@@ -719,7 +726,7 @@ def query_fixture_control(action, value=None):
         sql+='UPDATE governance."MappingAuthorizationGrants" SET "RevokedAtUtc"='+revoked+' WHERE "Id"=\''+ident+'\' AND "OrganizationId"=\'org-demo\'; '
         sql+='UPDATE governance."MappingAuthorizationEpochs" SET "Revision"="Revision"+1 WHERE "OrganizationId"=\'org-demo\'; '
         sql+='INSERT INTO governance.audit_records ("Id","OccurredAtUtc","Actor","Action","Resource","Outcome","TraceId","CorrelationId","OrganizationId","ScopeSiteIds","SiteId") '
-        sql+="VALUES (md5(random()::text||clock_timestamp()::text),now(),'synthetic-query-fixture','mapping.grant.change','"+ident+"','allowed','query-impl-01','query-impl-01','org-demo',ARRAY['site-a','site-b'],NULL); COMMIT; "
+        sql+="VALUES (md5(random()::text||clock_timestamp()::text),now(),'synthetic-query-fixture','mapping.grant.change','"+ident+PROFILE.text("','allowed','query-impl-01','query-impl-01','org-demo',ARRAY['site-a','site-b'],NULL); COMMIT; ")
         sql+='SELECT "RevokedAtUtc" IS NOT NULL FROM governance."MappingAuthorizationGrants" WHERE "Id"=\''+ident+'\';'
     else: raise ValueError('QUERY_FIXTURE_ACTION_INVALID')
     result=run([*prefix,'exec','-i',container,'psql','-U','postgres','-d','fixture' if source else 'query','-v','ON_ERROR_STOP=1','-qAt'],ROOT,
@@ -775,13 +782,13 @@ def query_admission_watch(key, revoke=False):
         sql+="IF found_id IS NOT NULL THEN RAISE NOTICE 'QUERY_ID:%',found_id; EXIT; END IF; IF clock_timestamp()>=stop_at THEN RAISE EXCEPTION 'QUERY_WATCH_TIMEOUT'; END IF; PERFORM pg_sleep(0.01); END LOOP; END $$; COMMIT;\n"
         if revoke:
             from workflow_execution import sha
-            state=json.loads((output/'runtime-fixture.json').read_text())
+            state=json.loads((output/fixture_file()).read_text())
             ident='m4-fixture-'+sha((state['connectionId']+state['subjects']['operator']+'data.query.execute'+('s3' if state.get('s3') else '')).encode())[:32]
             sql += "BEGIN; SET LOCAL statement_timeout='2s'; SELECT \"Revision\" FROM governance.\"MappingAuthorizationEpochs\" WHERE \"OrganizationId\"='org-demo' FOR UPDATE; "
             sql += 'UPDATE governance."MappingAuthorizationGrants" SET "RevokedAtUtc"=now() WHERE "Id"=\''+ident+'\'; '
             sql += 'UPDATE governance."MappingAuthorizationEpochs" SET "Revision"="Revision"+1 WHERE "OrganizationId"=\'org-demo\'; '
             sql += 'INSERT INTO governance.audit_records ("Id","OccurredAtUtc","Actor","Action","Resource","Outcome","TraceId","CorrelationId","OrganizationId","ScopeSiteIds","SiteId") '
-            sql += "VALUES (md5(random()::text||clock_timestamp()::text),now(),'synthetic-query-fixture','mapping.grant.change','"+ident+"','allowed','query-impl-01','query-impl-01','org-demo',ARRAY['site-a','site-b'],NULL); COMMIT;\n"
+            sql += "VALUES (md5(random()::text||clock_timestamp()::text),now(),'synthetic-query-fixture','mapping.grant.change','"+ident+PROFILE.text("','allowed','query-impl-01','query-impl-01','org-demo',ARRAY['site-a','site-b'],NULL); COMMIT;\n")
         stdout,stderr=service.process.communicate(sql.encode(),timeout=15);service.out.extend(stdout);service.err.extend(stderr)
         match=re.search(rb'QUERY_ID:(query-[0-9a-f]{32})',stderr)
         if service.process.returncode or match is None: raise ValueError('QUERY_WATCH_NO_ADMISSION')
@@ -892,7 +899,7 @@ def contract_build(project="OntologyPlatform.G2ContractTests"):
                 snapshot_path=output/'runtime-snapshot-current.json'
                 if not snapshot_path.is_file(): raise ValueError('QUERY_API_STOP_REQUIRED_BEFORE_REFERENCE_BUILD')
                 mounts=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','--format','{{json .Mounts}}',process['id']],timeout=15))
-                demand_mount(ROOT,json.loads(snapshot_path.read_text()),mounts)
+                demand_mount(ROOT,json.loads(snapshot_path.read_text()),mounts,task=TASK,run_id=RUN)
     _, env = prepared()
     from workflow_m4_query_inputs import build_inputs
     inputs = build_inputs(ROOT,project,qualification_inputs())
@@ -994,7 +1001,7 @@ def platform_start():
     structural(ROOT, TASK, 'persistence')
     prepared()
     output = ROOT / 'artifacts/workflow' / TASK / RUN
-    private = ROOT / '.tools/security/g4-m4-query-001' / RUN / 'platform-pg'
+    private = ROOT / PROFILE.text('.tools/security/g4-m4-query-001') / RUN / 'platform-pg'
     identity = output / 'platform-resources.json'
     if identity.exists() or private.exists():
         raise ValueError('QUERY_PLATFORM_ALREADY_REGISTERED')
@@ -1013,7 +1020,7 @@ def platform_start():
     if sum(item['nanoCpus'] for item in running) + 5 * 10**9 > min(info['NCPU'], 16) * 10**9:
         raise ValueError('QUERY_COMBINED_CPU_BUDGET')
     with socket.socket() as probe:
-        probe.bind(('127.0.0.1', 15444))
+        probe.bind(('127.0.0.1', PROFILE.ports['platform']))
     image = 'postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437'
     inspected = json.loads(docker('image', 'inspect', image))[0]
     if inspected['Architecture'] != 'arm64' or inspected['Os'] != 'linux':
@@ -1033,7 +1040,7 @@ def platform_start():
     if cert.returncode:
         raise ValueError('QUERY_PLATFORM_CERTIFICATE_FAILED')
     os.chmod(private / 'server.key', 0o600)
-    project = 'ontology-g4-m4-query-impl-01'
+    project = PROFILE.text('ontology-g4-m4-query-impl-01')
     labels = {'ontology.task-id': TASK, 'ontology.run-id': RUN, 'ontology.synthetic': 'true'}
     spec = {'name': project, 'services': {'platform-pg': {
         'image': image, 'platform': 'linux/arm64', 'pull_policy': 'never', 'mem_limit': '768m', 'cpus': 0.75,
@@ -1042,7 +1049,7 @@ def platform_start():
         'environment': {'POSTGRES_DB': 'query', 'POSTGRES_USER': 'postgres', 'POSTGRES_PASSWORD_FILE': '/run/secrets/password'},
         'entrypoint': ['/bin/sh', '-ec'],
         'command': ['cp /run/secrets/server.crt /tmp/server.crt; cp /run/secrets/server.key /tmp/server.key; chown postgres:postgres /tmp/server.crt /tmp/server.key; chmod 600 /tmp/server.key; exec /usr/local/bin/docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/tmp/server.crt -c ssl_key_file=/tmp/server.key -c hba_file=/run/secrets/pg_hba.conf -c log_statement=none -c log_min_error_statement=panic'],
-        'ports': ['127.0.0.1:15444:5432'],
+        'ports': [PROFILE.text('127.0.0.1:15444:5432')],
         'volumes': ['platform-data:/var/lib/postgresql', {'type': 'bind', 'source': str(private), 'target': '/run/secrets', 'read_only': True}],
         'tmpfs': ['/tmp:size=16m,mode=1777', '/var/run/postgresql:size=4m,mode=3775,uid=999,gid=999'],
         'networks': ['platform'], 'healthcheck': {'test': ['CMD-SHELL', 'pg_isready -U postgres -d query'], 'interval': '2s', 'timeout': '2s', 'retries': 15}
@@ -1084,7 +1091,7 @@ def source_start():
     prepared()
     output = ROOT / 'artifacts/workflow' / TASK / RUN
     platform = json.loads((output / 'platform-resources.json').read_text())
-    private = ROOT / '.tools/security/g4-m4-query-001' / RUN / 'pg-source'
+    private = ROOT / PROFILE.text('.tools/security/g4-m4-query-001') / RUN / 'pg-source'
     identity = output / 'source-resources.json'
     if private.exists() or identity.exists(): raise ValueError('QUERY_SOURCE_ALREADY_REGISTERED')
     prefix = ['docker', '--context', 'desktop-linux']
@@ -1100,7 +1107,7 @@ def source_start():
     if sum(item['nanoCpus'] for item in running) + 750000000 > min(info['NCPU'],16)*10**9: raise ValueError('QUERY_CPU_BUDGET')
     network = json.loads(docker('network','inspect',platform['project']+'_platform'))[0]
     if not network['Internal'] or network['Labels'].get('ontology.task-id') != TASK: raise ValueError('QUERY_NETWORK_DRIFT')
-    with socket.socket() as probe: probe.bind(('127.0.0.1',15445))
+    with socket.socket() as probe: probe.bind(('127.0.0.1',PROFILE.ports['source']))
     inspected = json.loads(docker('image','inspect',platform['imageReference']))[0]
     if inspected['Id'] != platform['imageId']: raise ValueError('QUERY_IMAGE_DRIFT')
     private.mkdir(mode=0o700)
@@ -1121,7 +1128,7 @@ def source_start():
     original = json.loads(Path(platform['compose']).read_text())
     service = original['services']['platform-pg']
     service['environment']['POSTGRES_DB'] = 'fixture'
-    service['ports'] = ['127.0.0.1:15445:5432']
+    service['ports'] = [PROFILE.text('127.0.0.1:15445:5432')]
     service['volumes'] = ['source-data:/var/lib/postgresql',{'type':'bind','source':str(private),'target':'/run/secrets','read_only':True}, {'type':'bind','source':str(private/'init.sql'),'target':'/docker-entrypoint-initdb.d/01-fixture.sql','read_only':True}]
     service['healthcheck']['test'] = ['CMD-SHELL','pg_isready -U postgres -d fixture']
     labels = service['labels']
@@ -1156,7 +1163,7 @@ def test_database_name(suffix):
     import re
     if not isinstance(suffix, str) or not re.fullmatch('[0-9a-f]{12}', suffix):
         raise ValueError('QUERY_TEST_DATABASE_ID_INVALID')
-    return 'm4_query_test_' + suffix
+    return ('m5_query_test_' if TASK == 'G4-M5-INTEGRATION-001' else 'm4_query_test_') + suffix
 
 
 def test_database_control(container, suffix, create):
@@ -1222,7 +1229,7 @@ def persistence_test(source=False):
     inspected = json.loads(subprocess.check_output([*prefix, 'image', 'inspect', image], timeout=10))[0]
     if inspected['Id'] != image.split('@')[1] or inspected['Architecture'] != 'arm64':
         raise ValueError('QUERY_TEST_IMAGE_DRIFT')
-    private = ROOT / '.tools/security/g4-m4-query-001' / RUN / 'platform-pg'
+    private = ROOT / PROFILE.text('.tools/security/g4-m4-query-001') / RUN / 'platform-pg'
     project = 'OntologyPlatform.ConnectionsTests' if source else 'OntologyPlatform.QueryTests'
     directory = ROOT / 'backend/tests' / project / 'bin/Debug/net10.0'
     inputs = {p.name: sha(p.read_bytes()) for p in directory.glob('*.dll')}
@@ -1233,7 +1240,7 @@ def persistence_test(source=False):
         raise ValueError('QUERY_TEST_BEFORE_UNVERIFIED')
     envfile = private / ('test-' + suffix + '.env')
     connection = 'Host=platform-pg;Port=5432;Database='+test_database_name(suffix)+';Username=postgres;Password='+ (private / 'password').read_text()+';SSL Mode=VerifyFull;Root Certificate=/run/query-ca.crt;Pooling=false;Include Error Detail=false'
-    source_private = ROOT / '.tools/security/g4-m4-query-001' / RUN / 'pg-source'
+    source_private = ROOT / PROFILE.text('.tools/security/g4-m4-query-001') / RUN / 'pg-source'
     if source:
         source_record = json.loads((output/'source-resources.json').read_text())
         source_current = json.loads(subprocess.check_output([*prefix,'inspect',source_record['resources'][0]['id']],timeout=10))[0]
@@ -1323,10 +1330,10 @@ def runtime_agent_test(binding_race=False, aba_inflight=False):
         raise ValueError('QUERY_RUNTIME_TEST_SECONDARY_SLOT_REQUIRED')
     labels=json.loads(subprocess.check_output([*prefix,'inspect','--format','{{json .Config.Labels}}',api],timeout=15))
     if labels.get('ontology.task-id')!=TASK or labels.get('ontology.run-id')!=RUN: raise ValueError('QUERY_RUNTIME_TEST_OWNER')
-    state=json.loads((output/'runtime-fixture.json').read_text())
+    state=json.loads((output/fixture_file()).read_text())
     directory=ROOT/'backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0'
     image='mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55'
-    name='ontology-g4-m4-query-impl-01-maf-test-'+uuid.uuid4().hex[:12]
+    name=PROFILE.text('ontology-g4-m4-query-impl-01-maf-test-')+uuid.uuid4().hex[:12]
     before=subprocess.run([*prefix,'inspect',name],capture_output=True,timeout=15)
     if before.returncode==0 or ('no such object: '+name) not in before.stderr.decode().lower(): raise ValueError('QUERY_RUNTIME_TEST_BEFORE_UNKNOWN')
     lifecycle=dict(taskId=TASK,runId=RUN,name=name,status='CREATING',beforeExists=False,readOnlyRuntimeFrom=api,queryId=state['latestQuery']['queryId'],bindingRace=binding_race,abaInFlight=aba_inflight)
@@ -1334,7 +1341,7 @@ def runtime_agent_test(binding_race=False, aba_inflight=False):
     cid=None
     try:
         created=runtime_command('query-maf-container-create',[*prefix,'create','--pull=never','--name',name,
-            '--network','ontology-g4-m4-query-impl-01_platform','--label','ontology.task-id='+TASK,'--label','ontology.run-id='+RUN,
+            '--network',PROFILE.text('ontology-g4-m4-query-impl-01_platform'),'--label','ontology.task-id='+TASK,'--label','ontology.run-id='+RUN,
             '--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--user','501:20','--memory=768m','--cpus=0.5','--pids-limit=128',
             '--tmpfs','/tmp:size=64m,mode=1777','--volumes-from',api+':ro','--mount','type=bind,src='+str(directory)+',dst=/tests,readonly',
             '--workdir','/private/api','-e','ASPNETCORE_ENVIRONMENT=Development','-e','DOTNET_CLI_HOME=/tmp/dotnet','-e','DOTNET_EnableDiagnostics=0',
@@ -1345,7 +1352,7 @@ def runtime_agent_test(binding_race=False, aba_inflight=False):
             '-e','G4_QUERY_RUNTIME_TEST='+TASK+':'+RUN,'-e','G4_QUERY_RUNTIME_QUERY_ID='+state['latestQuery']['queryId'],
             image,'sh','-c',"""dotnet /runtime/QueryLoopback.dll & bridge=$!; trap 'kill "$bridge" 2>/dev/null || true' EXIT; dotnet /tests/OntologyPlatform.AgentTests.dll --filter FullyQualifiedName~G4QueryMafRuntimeTests --timeout 45s --zero-tests-policy strict --results-directory /tmp/TestResults; result=$?; if [ -f /tmp/aba-inflight.json ]; then cat /tmp/aba-inflight.json; fi; exit "$result";"""])
         cid=created.stdout.decode().strip();lifecycle.update(id=cid,status='CREATED');path.write_text(json.dumps(lifecycle,indent=2)+'\n')
-        runtime_command('query-maf-container-network',[*prefix,'network','connect','ontology-g4-m4-query-impl-01_edge',cid])
+        runtime_command('query-maf-container-network',[*prefix,'network','connect',PROFILE.text('ontology-g4-m4-query-impl-01_edge'),cid])
         inputs={p.name:sha(p.read_bytes()) for p in directory.glob('*.dll')}
         result=run([*prefix,'start','--attach',cid],ROOT,task=TASK,run_id=RUN,stage='query-real-aba-inflight-runtime' if aba_inflight else ('query-real-maf-binding-runtime' if binding_race else 'query-real-maf-runtime'),
             input_key=sha(encoded([inputs,state['latestQuery']['queryId'],binding_race,aba_inflight,state.get('s2AbaInFlight',{}).get('b',{}).get('approved',{}).get('proposalId'),sha(Path(__file__).read_bytes())])),timeout=60)
@@ -1353,11 +1360,11 @@ def runtime_agent_test(binding_race=False, aba_inflight=False):
         if aba_inflight and result.returncode == 0:
             # 夹具仅接受实际已完成案例的正式A回执；不能把旧activation预期留给后续S1。
             aba = demand_aba_original(result.stdout + b'\n' + result.stderr, result.receipt['stage'])
-            current = json.loads((output/'runtime-fixture.json').read_text())
+            current = json.loads((output/fixture_file()).read_text())
             if current['latestQuery']['queryId'] != state['latestQuery']['queryId']: raise ValueError('QUERY_ABA_FIXTURE_DRIFT')
             current['mappingCurrentReceipt'] = aba['activatedA']
             current['s2AbaInFlight']['execution'] = dict(commandId=result.receipt['commandId'], queryId=aba['queryId'], status='PASS')
-            (output/'runtime-fixture.json').write_text(json.dumps(current,indent=2)+'\n')
+            (output/fixture_file()).write_text(json.dumps(current,indent=2)+'\n')
         print(result.stdout.decode(errors='replace')[-5000:]);print(json.dumps({'exitCode':result.returncode,'receipt':result.receipt['commandId']}))
         return result.returncode
     finally:

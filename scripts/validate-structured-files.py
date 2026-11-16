@@ -1,6 +1,7 @@
 """解析仓库YAML/TOML；不执行YAML对象构造、不读取忽略的凭证和工具缓存。"""
 
 import argparse
+import json
 import os
 import pathlib
 import sys
@@ -12,7 +13,7 @@ import yaml
 SKIPPED = {".git", ".tools", ".worktrees", "artifacts", "node_modules", "bin", "obj", ".next", ".turbo"}
 
 
-def validate(root: pathlib.Path) -> int:
+def validate(root: pathlib.Path, selected=None) -> int:
     """仅语法检查，不将合法配置视为运行兼容或全面安全保证。"""
     count = 0
     for directory, subdirs, files in os.walk(root, followlinks=False):
@@ -22,6 +23,8 @@ def validate(root: pathlib.Path) -> int:
             if path.suffix not in {".toml", ".yaml", ".yml"} or path.is_symlink():
                 continue
             relative = path.relative_to(root)
+            if selected is not None and relative.as_posix() not in selected:
+                continue
             try:
                 if path.stat().st_size > 2 * 1024 * 1024:
                     raise ValueError("configuration too large")
@@ -42,5 +45,6 @@ def validate(root: pathlib.Path) -> int:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("root", type=pathlib.Path)
+    parser.add_argument("--paths-stdin", action="store_true")
     arguments = parser.parse_args()
-    sys.exit(validate(arguments.root.resolve()))
+    sys.exit(validate(arguments.root.resolve(), set(json.load(sys.stdin)) if arguments.paths_stdin else None))

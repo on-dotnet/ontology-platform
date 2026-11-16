@@ -40,8 +40,11 @@ public sealed partial class G4QueryMafRuntimeTests
         using var request = JsonDocument.Parse(original.RequestBytes);
         // 正式固定查询合同没有自造版本或身份字段。
         var query = request.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
+        // 仅接受已批准驱动的精确任务和Run，原件不得沿用其它任务标签。
+        var runtimeIdentity = Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST");
+        Assert.IsTrue(runtimeIdentity is "G4-M4-QUERY-001:query-impl-01" or "G4-M5-INTEGRATION-001:integration-01");
         // 公开记录仅包括合成标识、时间、计数及状态，绝不包含会话证明。
-        var evidence = new Dictionary<string, object?> { ["taskId"] = "G4-M4-QUERY-001", ["case"] = "AC-05_INFLIGHT_ABA", ["status"] = "FAIL", ["resourceRun"] = "query-impl-01" };
+        var evidence = new Dictionary<string, object?> { ["taskId"] = runtimeIdentity!.Split(':')[0], ["case"] = "AC-05_INFLIGHT_ABA", ["status"] = "FAIL", ["resourceRun"] = runtimeIdentity!.Split(':')[1] };
         // 完整两次激活完成后才能把409归因于查询提交。
         var abaCompleted = false;
         // 真实墙钟预算从正式Gateway调用之前开始。

@@ -50,7 +50,7 @@ public sealed partial class G4QueryMafRuntimeTests
     [TestMethod]
     public async Task ActualMafUsesCurrentGatewayAndOnePersistentBudget()
     {
-        Assert.AreEqual("G4-M4-QUERY-001:query-impl-01", Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST"));
+        Assert.IsTrue(Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST") is "G4-M4-QUERY-001:query-impl-01" or "G4-M5-INTEGRATION-001:integration-01");
         // 准确查询ID来自本任务刚完成的真实OIDC查询，不导出Cookie或票据。
         var queryId = Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_QUERY_ID");
         Assert.IsFalse(string.IsNullOrWhiteSpace(queryId));

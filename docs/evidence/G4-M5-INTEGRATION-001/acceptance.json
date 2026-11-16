@@ -1,0 +1,87 @@
+{
+  "taskId": "G4-M5-INTEGRATION-001",
+  "batchAcceptance": "NOT_RUN",
+  "G4Overall": "PARTIAL",
+  "coverageInventory": {
+    "author": "/root/m5_inventory",
+    "sourceBase": "a6716b11c3795e5670c07f1ca37057e5649bed89",
+    "CRequiresNewContract": false,
+    "PG": {
+      "connectionCatalog": "HISTORICAL_IMPLEMENTED",
+      "mapping": "HISTORICAL_SINGLE_CONNECTION_TWO_TABLES",
+      "query": "HISTORICAL_THREE_CAPABILITIES_FIVE_SECONDS",
+      "uiMcpRecovery": "HISTORICAL_IMPLEMENTED",
+      "M5Execution": "NOT_RUN"
+    },
+    "OracleDorisWeb": {
+      "connectionCatalog": "HISTORICAL_LIMITED_ACCEPTANCE",
+      "mappingQuery": "NOT_RUN"
+    },
+    "TDengine": "WAIT_FOR_EXTERNAL_INPUT",
+    "platforms": {
+      "MacARM64": "CURRENT_HOST",
+      "LinuxARM64": "SYNTHETIC_CONTAINER_ONLY",
+      "WindowsAMD64": "NOT_RUN",
+      "LinuxAMD64": "NOT_RUN",
+      "production": "NOT_RUN",
+      "CI": "NOT_RUN"
+    },
+    "uncovered": [
+      "S-50 three independent sources",
+      "S-56 full cursor pagination",
+      "S-64 five-source metallurgical end-to-end",
+      "S-62 dual architecture",
+      "AI ON real provider"
+    ]
+  },
+  "checks": [
+    {
+      "id": "BI-01",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "BI-02",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "BI-03",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "BI-04",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "BI-05",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "BI-06",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "BI-07",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "BI-08",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "BI-09",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "BI-10",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "BI-11",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "BI-12",
+      "status": "NOT_RUN"
+    }
+  ]
+}

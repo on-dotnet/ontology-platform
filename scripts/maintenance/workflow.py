@@ -50,7 +50,7 @@ def matches(path, patterns):
 
 def select_gates(paths):
     gates = registry()
-    direct = {name for name, gate in gates.items() if any(matches(p, gate['inputs']) for p in paths)}
+    direct = {name for name, gate in gates.items() if any(matches(p, gate['inputs']) and not (p in ('apps/web/AGENTS.md','backend/AGENTS.md') and name in ('backend','web','contract','environment','interaction')) for p in paths)}
     unknown = [p for p in paths if not any(matches(p, g['inputs']) for g in gates.values())]
     affected = set(direct)
     while True:
@@ -312,6 +312,8 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
     for name in ordered(set(actual['affected']) | set(index)):
         if digest(REGISTRY.read_bytes())!=actual['registrySha256']: raise ValueError('REGISTRY_CHANGED_DURING_RUN')
         gate=registry()[name];key=actual['inputKeys'][name];policy=policy_key(name)
+        if name=='policy':
+            gate={**gate,'command':['python3','-B','scripts/maintenance/workflow_context.py','--root',str(ROOT),'--check','--task',task,'--base',actual['base'],'--head',actual['head']]}
         if any(outcomes.get(dep) not in (None,'PASS') for dep in gate['needs']):
             rows.append(dict(gate=name,status='NOT_RUN',reason='Upstream failed or unavailable'));outcomes[name]='NOT_RUN';continue
         mapping_qualification=not gate['command'] and task == 'G4-M3-MAPPING-001' and name in {'environment','contract','backend','web','interaction'}
@@ -429,6 +431,7 @@ def package_check(task, base, head, evidence):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     sub=p.add_subparsers(dest='action',required=True)
+    ctx=sub.add_parser('context');ctx.add_argument('--mode',choices=['code','evidence'],default='code');ctx.add_argument('--task');ctx.add_argument('--query')
     prep=sub.add_parser('prepare');prep.add_argument('--task',required=True);prep.add_argument('--inventory')
     smoke=sub.add_parser('smoke');smoke.add_argument('--task',required=True)
     pl=sub.add_parser('plan');pl.add_argument('--base',required=True);pl.add_argument('--head',required=True);pl.add_argument('--output',required=True)
@@ -437,7 +440,10 @@ def main():
     cl=sub.add_parser('closeout');cl.add_argument('--task',required=True);cl.add_argument('--dry-run',action='store_true',required=True)
     args=p.parse_args()
     try:
-        if args.action=='prepare': result=prepare(args.task,args.inventory)
+        if args.action=='context':
+            from workflow_context import context
+            result=context(ROOT,args.mode,args.task,args.query)
+        elif args.action=='prepare': result=prepare(args.task,args.inventory)
         elif args.action=='plan':
             result=plan(args.base,args.head);write(Path(args.output),result)
         elif args.action=='verify': result=verify(args.task,args.plan,args.reuse,args.publish_evidence,args.diagnostic,args.hypothesis)
