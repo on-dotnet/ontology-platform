@@ -35,7 +35,7 @@ if (mode === "serve") {
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: port(15442),
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
+} else if (["ready", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -151,9 +151,35 @@ async function browserRun(mode) {
     try { state = JSON.parse(await readFile(resolve(output, stateName), "utf8")); }
     catch { state = { taskId: task, runId, ...(integration ? { scenario, s3: true, numeric: scenario === "numeric" } : {}), scope: { organizationId: "org-demo", siteIds: ["site-a", "site-b"] } }; }
     check("fixture_identity", state.taskId === task && state.runId === runId);
+    if (integration) { state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId }; await save(state); }
+    if (integration && mode !== "provision") {
+      phase = "scenario_ready";
+      const prerequisite = (key, value) => {
+        if (!value) { const error = new Error(); error.safeCode = "PREREQUISITE_STALE:" + key; throw error; }
+      };
+      prerequisite("session", Boolean(operator.me.subjectId && auditor.me.subjectId));
+      prerequisite("scenario", state.scenario === scenario);
+      prerequisite("connection", Boolean(state.connectionId));
+      const connection = await get(operator, `/api/v1/connections/${state.connectionId}`);
+      prerequisite("connection", connection.state === "ACTIVE");
+      const local = JSON.parse(execFileSync("python3", ["-B", "-c",
+        `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.local_ready(${mode.startsWith("ui-") ? "True" : "False"},${mode === "mapping" ? "False" : "True"})))`],
+        { cwd: root, encoding: "utf8", timeout: 30000 }));
+      if (mode !== "mapping") {
+        prerequisite("activation", Boolean(state.mappingReceipt));
+        const active = await get(operator, `/api/v1/mappings/${state.mappingDraft.mappingId}/active`);
+        const expected = state.mappingCurrentReceipt ?? state.mappingReceipt;
+        report.activationPreflight = { active, expected: { mappingId: expected.mappingId, mappingReleaseId: expected.mappingReleaseId, activationRevision: expected.activationRevision } };
+        prerequisite("activation", active.mappingId === expected.mappingId && active.mappingReleaseId === expected.mappingReleaseId && active.manifestHash === expected.manifestHash && active.activationRevision === expected.activationRevision);
+      }
+      report.scenarioReady = { status: "SCENARIO_READY", scenario, taskId: task, resourceOwner: task, runId, localReceipt: local.receipt,
+        subjects: state.subjects, fixedRelease: state.mappingReceipt?.mappingReleaseId, observedAtUtc: new Date().toISOString() };
+    }
     state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
     await save(state);
-    if (mode === "standard-provision") {
+    if (mode === "ready") {
+      report.status = "PASS"; report.scope = "SCENARIO_PREREQUISITE_ONLY";
+    } else if (mode === "standard-provision") {
       check("standard_follows_numeric_proof", Boolean(state.numeric && state.numericResult));
       const retired = { retiredAtUtc: new Date().toISOString(), reason: "numeric-proof-preserved-standard-safety-regression" };
       for (const key of Object.keys(state)) if (/^(mapping|s2)/.test(key) || ["connectionId", "catalog", "firstQuery", "latestQuery", "connectionDisplayName", "numericResult"].includes(key)) { retired[key] = state[key]; delete state[key]; }

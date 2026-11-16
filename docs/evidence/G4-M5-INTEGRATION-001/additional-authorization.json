@@ -1,0 +1,19 @@
+{
+  "taskId": "G4-M5-INTEGRATION-001",
+  "source": "Current chat explicit human replies",
+  "approvals": [
+    {
+      "question": "精确暂停G4-M3六个已列ID容器，保留容器/卷/数据",
+      "reply": "批准精确暂停这 6 个 M3 容器",
+      "actualReleasedGiB": 5.75,
+      "actualReleasedCpu": 7,
+      "evidence": "m3-authorized-pause.json"
+    },
+    {
+      "question": "仅恢复M5 edge为bridge，平台/源PG继续internal，loopback端口，保留卷，无新增外部请求/端口/容器",
+      "reply": "批准沿用 M4 双网络拓扑",
+      "limitation": "bridge本身具备出站能力，不能宣称网络层完全断网",
+      "runtimeEvidence": "artifacts/workflow/G4-M5-INTEGRATION-001/integration-01/authorized-edge-restoration.json"
+    }
+  ]
+}

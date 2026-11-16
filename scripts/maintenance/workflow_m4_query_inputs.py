@@ -65,7 +65,7 @@ def select(root, name, all_inputs, driver_source=None):
     else:
         selected=project_paths(root,'backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj',paths)
         if name.startswith('ui-'): selected.update(path for path in paths if path.startswith('apps/web/'))
-    selected.update(path for path in DRIVERS if path in paths and (not name.startswith('web-') or path in {'scripts/maintenance/workflow_m4_query.py','scripts/maintenance/workflow_execution.py','scripts/maintenance/workflow_environment.py','scripts/maintenance/workflow_web_cache.py'}))
+    selected.update(path for path in DRIVERS if path in paths and (not name.startswith('web-') or path in {'scripts/maintenance/workflow_pg_profile.py','scripts/maintenance/workflow_m5_integration.py','scripts/maintenance/workflow_m4_query.py','scripts/maintenance/workflow_execution.py','scripts/maintenance/workflow_environment.py','scripts/maintenance/workflow_web_cache.py'}))
     # 当前M4真实源准备明确消费此冻结SQL，不能因属于历史目录而漏掉。
     selected.update(path for path in paths if path == 'experiments/g4-m3-mapping-001/fixture.sql' or path.startswith('infra/development/'))
     result={path:all_inputs[path] for path in sorted(selected) if layer(path) not in ('interpretation','archive')}

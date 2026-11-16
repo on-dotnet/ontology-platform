@@ -37,6 +37,12 @@
 
 恢复从本卡、[当前授权](current-authorization.md)、本任务证据与当前分支diff开始；不重复读历史会话。所有创建资源KEEP至本轮复审/准确回收，其他任务KEEP不删除。
 
-B线盘点与本轮唯一矩阵：[acceptance.json](../evidence/G4-M5-INTEGRATION-001/acceptance.json)。B静态确认限定PG路径无需新合同；原S-50/56/62/64等缺口保留。A早审R1调度、R2反向链接已关闭；R3已改为实际命令来源资格，等待非作者核验。M5首次prepare下载0、依赖就绪；M3实际暂停释放5.75GiB/7CPU，M4保持运行。
+B线盘点与本轮唯一矩阵：[acceptance.json](../evidence/G4-M5-INTEGRATION-001/acceptance.json)。B静态确认限定PG路径无需新合同；原S-50/56/62/64等缺口保留。A早审R1调度、R2反向链接已关闭；R3实际命令来源资格已由非作者独立重开和六项篡改反例关闭，A/B准入已通过，C进行中。M5首次prepare下载0、依赖就绪；M3实际暂停释放5.75GiB/7CPU，M4保持运行。
 
 本轮具体新增/调整邻接路径：workflow_context.py、workflow_pg_profile.py、workflow_m5_integration.py、WorkflowContext.Tests.py、WorkflowIntegration.Tests.py；M4执行/输入/证据/快照最小第二消费者参数；G4QueryPersistenceTests/G4QueryMcpTests/G4QueryAbaRuntimeTests只增加精确M5测试身份。无产品DTO或生产代码修改。
+
+C进展：任务自有G3发布、PG TLS只读探测/目录、正式Mapping验证/异人审核/激活已产生FRESH原件；产品Gateway/UI/MCP尚在验收。新增[两项人类授权](../evidence/G4-M5-INTEGRATION-001/additional-authorization.json)精确限定M3暂停与M5双网络；bridge具出站能力，不能声明完全断网。基础服务卷均保留；旧realm在重建后discovery 404，原因未建立，旧私有材料保留后创建新合成realm，原OIDC失败不删除。
+
+场景检查已加强单条完整grant、当前OIDC主体、逐列及固定行预期、真实Web PID/start/cwd/served BuildId；真实MAF/ABA入口先同DI检查精确旧会话和原提交/审核证明。M4查询合同不以M3 Usability旧epoch作为整查询前提，管理投影原样记录，当前激活/连接/目录/授权/源SELECT独立核验。最初过强ready及输入执行中变更失败保留，不能计产品PASS。首次600秒宿主monitor策略持续就绪，锁屏/熄屏连续性NOT_VERIFIED。
+
+恢复进展（2026-11-16）：完整工程 SelfTest 原件 `e6c1d3c1320f4d89a2ef9de583bccde5` exit0；numeric 字符串比较、全部相等、ABA忽略身份三项单元变异均被预期断言杀死并恢复原构建，明确不冒充真实DB变异。numeric正式Mapping→后加NULL→Gateway固定双端点及canonical恢复已通过，最终资格仍按当前helper输入核验。合成grant四小时到期续期保留前后审计；numeric建表导致标准旧全目录失效，旧失败保留后正式重新发现与新映射。Web原进程未监听在长UI链前被拒绝，恢复相同BuildId后UI S1通过。资源P2经预计增量配额/含停止容器总数修复、10项定向测试与非作者原件复核关闭。真实MAF/ABA、重启恢复、剩余安全组合及最终交付继续执行；不能据这些中间结果提升总体状态。

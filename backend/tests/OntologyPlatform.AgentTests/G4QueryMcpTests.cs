@@ -140,6 +140,52 @@ public sealed partial class G4QueryMafRuntimeTests
         }
         try { _ = await gateway.ReadG4Async(actor, row.SessionReference, queryId!, true, CancellationToken.None); }
         catch (SemanticOperationException error) { Assert.Fail("真实Gateway前提失败：" + error.Status + ":" + error.Code); }
+        // 短前提使用同一精确查询服务器会话，不能用刚登录的新会话替代旧引用。
+        if (Environment.GetEnvironmentVariable("G4_QUERY_PREFLIGHT_ONLY") == "1")
+        {
+            Assert.IsTrue(readable && claimsMatch.Values.All(value => value));
+            Assert.IsTrue(session.RevokedAtUtc is null && session.ExpiresAtUtc > DateTimeOffset.UtcNow);
+            Assert.IsTrue(scope.ServiceProvider.GetRequiredService<IMappingSessionAuthority>().Matches(session.ProtectedTicket, actor, DateTimeOffset.UtcNow));
+            if (Environment.GetEnvironmentVariable("G4_QUERY_ABA_PROPOSAL") is { Length: > 0 } readyProposalId)
+            {
+                // 正式服务读取已批准B及准确审核证明，不执行激活或改写审核会话。
+                var mappings = scope.ServiceProvider.GetRequiredService<MappingApplicationService>();
+                // 必须仍为待激活的正式批准提案。
+                var approved = await mappings.ReadProposalAsync(actor, row.SessionReference, readyProposalId, CancellationToken.None);
+                Assert.AreEqual("APPROVED", approved.Status);
+                Assert.IsTrue(approved.ExpiresAtUtc > DateTimeOffset.UtcNow);
+                // 当前指针与B的原批准基线完全相同，旧activation不得进入长链。
+                var active = await mappings.ReadActiveAsync(actor, row.SessionReference, approved.MappingId, CancellationToken.None);
+                Assert.AreEqual(approved.ExpectedActive.ReleaseId, active.MappingReleaseId);
+                Assert.AreEqual(approved.ExpectedActive.ActivationRevision, active.ActivationRevision);
+                // 同一模块上下文只读精确提案保存的原证明。
+                await using var connections = await scope.ServiceProvider.GetRequiredService<IDbContextFactory<ConnectionsDbContext>>().CreateDbContextAsync();
+                // 真实异人审核会话来自已保存决策，禁止伪造角色。
+                var proposal = await connections.MappingProposals.AsNoTracking().SingleAsync(item => item.Id == readyProposalId);
+                // 授权服务重新检查原审核会话和当前完整权限。
+                var approval = JsonSerializer.Deserialize<MappingAuthorizationProof>(proposal.DecisionProofJson!, G4MappingJson.Options)!;
+                Assert.AreNotEqual(actor.SubjectId, approval.Actor.SubjectId);
+                // 原提交证明与审核证明一起复核，不能重捕获刷新其期限或epoch。
+                var submit = JsonSerializer.Deserialize<MappingAuthorizationProof>(proposal.SubmitProofJson, G4MappingJson.Options)!;
+                // 当前执行者的管理权限仍通过正式治理服务捕获，不能沿用提交者角色。
+                _ = await scope.ServiceProvider.GetRequiredService<IMappingAuthorizationAuthority>().CaptureAsync(submit with
+                {
+                    Actor = actor, SessionReference = row.SessionReference, Permission = "mapping.activate",
+                    ConnectionId = null, ObjectRefs = [], FieldRefs = [], AuthorizationEpoch = 0
+                }, CancellationToken.None);
+                // 与正式激活一致的物理事务，结束即回滚，只检查原证明。
+                await using var transaction = await connections.Database.BeginTransactionAsync();
+                // 正式治理参与者保持组织锁、会话票据和完整当前grant语义。
+                var authority = scope.ServiceProvider.GetRequiredService<IMappingAuthorizationAuthority>();
+                // 按主体、会话及权限排序复核原证明，保持正式组织锁顺序。
+                foreach (var proof in new[] { submit, approval }.OrderBy(item => item.Actor.SubjectId, StringComparer.Ordinal).ThenBy(item => item.SessionReference, StringComparer.Ordinal).ThenBy(item => item.Permission, StringComparer.Ordinal))
+                {
+                    await authority.DemandInTransactionAsync(proof, connections.Database.GetDbConnection(), Microsoft.EntityFrameworkCore.Storage.DbContextTransactionExtensions.GetDbTransaction(transaction), CancellationToken.None);
+                }
+            }
+            Console.WriteLine("M5_RUNTIME_PREREQUISITE_READY_NOT_PRODUCT_ACCEPTANCE");
+            return;
+        }
         // 真正进入MAF函数调用循环，四次均由相同服务器引用计数。
         var result = await executor.RunG4DeterministicAsync(actor, row.SessionReference, "g4_query_result", arguments, store, 4, CancellationToken.None);
         Assert.AreEqual(4, result.Results.Length);
@@ -208,6 +254,7 @@ public sealed partial class G4QueryMafRuntimeTests
         {
             // 提交复核必须抛出权限或绑定失效，而非成功结果。
             var error = await Assert.ThrowsAsync<SemanticOperationException>(() => gateway.ExecuteG4Async(actor, original.SessionReference, query, key, null, CancellationToken.None));
+            Console.WriteLine(JsonSerializer.Serialize(new { @case = "BINDING_AFTER_READ_DIAGNOSTIC", changed, error.Status, error.Code }));
             Assert.IsTrue(changed && error.Status is 403 or 409);
             // 真正准入过的Query必须保持无成功结果，不能靠入口提前拒绝冒充并发提交保护。
             var rejected = await database.Queries.AsNoTracking().SingleAsync(item => item.IdempotencyKey == key);

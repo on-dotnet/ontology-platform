@@ -90,10 +90,14 @@ def demand_qualification(row, name, inputs, all_inputs=None, task=TASK, run_id=R
         raise ValueError('QUERY_QUALIFICATION_INVALID')
 
 
-def qualify(gate, input_key):
+def qualify(gate, input_key, consumer=None):
     """当前输入重开实际非零测试和浏览器原件；缺适配证据保持阻断。"""
     import workflow
-    from workflow_m4_query import ROOT, prepared, structural, qualification_inputs
+    if consumer is None:
+        import workflow_m4_query as consumer
+    ROOT, TASK, RUN = consumer.ROOT, consumer.TASK, consumer.RUN
+    if (TASK,RUN) not in [('G4-M4-QUERY-001','query-impl-01'),('G4-M5-INTEGRATION-001','integration-01')]:raise ValueError('QUERY_TASK_NOT_ADMITTED')
+    prepared, structural, qualification_inputs = consumer.prepared, consumer.structural, consumer.qualification_inputs
     from workflow_execution import ordinary, sha
     from workflow_m2_evidence import mtp
     if gate not in ['environment', 'contract', 'backend', 'web', 'interaction'] or workflow.input_key(ROOT, gate) != input_key:
@@ -132,7 +136,7 @@ def qualify(gate, input_key):
             projected=project_original(ROOT,original,name,all_inputs,driver)
             if row['inputs']!=projected or any(row.get(key)!=original.get(key) for key in ['taskId','runId','name','inputsUnchanged','commands','reports','build','exitCode','status']):
                 raise ValueError('QUERY_PROJECTED_ORIGINAL_CHANGED')
-        demand_qualification(row, name, inputs, all_inputs)
+        demand_qualification(row, name, inputs, all_inputs, task=TASK, run_id=RUN)
         if row.get('inputPolicyVersion') != 2: raise ValueError('QUERY_LEGACY_INPUT_PROJECTION_REQUIRES_PROOF')
         test_count = 0
         aba_originals = 0
@@ -154,7 +158,7 @@ def qualify(gate, input_key):
                 raise ValueError('QUERY_QUALIFICATION_COMMAND')
             raw = b''.join(read(command[key]) for key in ['stdout', 'stderr'])
             if name == 'aba-inflight' and command['stage'] == 'query-real-aba-inflight-runtime':
-                demand_aba_original(raw, command['stage'])
+                demand_aba_original(raw, command['stage'], task=TASK, run_id=RUN)
                 aba_originals += 1
             if command['stage'].startswith(('query-unit-', 'query-contract-tests', 'query-real-')):
                 test_count += mtp(raw, 1)

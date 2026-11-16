@@ -583,12 +583,18 @@ def runtime_configure():
 
 def browser_test(mode):
     """唯一当前任务浏览器入口，真实OIDC与API响应，不运行旧M3验收或下载浏览器。"""
-    if mode not in ['provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race','s2-aba','s2-aba-prepare','s2-capacity','s2-connection','s2-inflight','s3-provision','s3','ui-s3','replace-disabled-connection','numeric-provision','numeric','standard-provision']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
+    if mode not in ['ready','provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race','s2-aba','s2-aba-prepare','s2-capacity','s2-connection','s2-inflight','s3-provision','s3','ui-s3','replace-disabled-connection','numeric-provision','numeric','standard-provision']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
     binding=runtime_binding()
     web=web_binding() if mode in ['ui-s1','ui-s3'] else None
+    prerequisites=None
+    if SCENARIO:
+        # 场景准备与明确续期是运行输入；只绑定公开状态哈希，不把会话材料输出。
+        from workflow_execution import sha
+        state_path=ROOT/'artifacts/workflow'/TASK/RUN/fixture_file()
+        prerequisites=sha(state_path.read_bytes()) if state_path.is_file() else None
     result=runtime_command('query-browser-'+mode,['/opt/homebrew/Cellar/node@24/24.22.1/bin/node',
         'scripts/maintenance/workflow-m4-query.mjs','--task',TASK,'--run-id',RUN,'--mode',mode,*(['--scenario',SCENARIO] if SCENARIO else [])],timeout=180,
-        extra_inputs=dict(api=binding,web=web))
+        extra_inputs=dict(api=binding,web=web,prerequisites=prerequisites))
     print(result.stdout.decode(errors='replace')[-2000:])
     return result.returncode
 
@@ -1317,17 +1323,23 @@ def persistence_test(source=False):
     return result.returncode if result is not None else 2
 
 
-def runtime_agent_test(binding_race=False, aba_inflight=False):
+def runtime_agent_test(binding_race=False, aba_inflight=False, preflight=False):
     """真实MAF只恢复当前精确Query；复用正式API只读挂载，不运行迁移或Sweep。"""
     import subprocess
     import uuid
     from workflow_execution import run, sha, encoded
     output=ROOT/'artifacts/workflow'/TASK/RUN
     api=json.loads((output/'runtime-api-start.json').read_text())['id']
-    secondary=json.loads((output/'runtime-secondary-api.json').read_text())['process']['id']
     prefix=['docker','--context','desktop-linux']
-    if subprocess.check_output([*prefix,'inspect','--format','{{.State.Running}}',secondary],timeout=15).strip()!=b'false':
-        raise ValueError('QUERY_RUNTIME_TEST_SECONDARY_SLOT_REQUIRED')
+    secondary_path=output/'runtime-secondary-api.json'
+    if TASK=='G4-M5-INTEGRATION-001':
+        # M5最多七个容器含停止实例；先使用尚未创建secondary的第七槽，不偷增第八容器。
+        owned=subprocess.check_output([*prefix,'ps','-aq','--filter','label=ontology.task-id='+TASK],timeout=10).decode().split()
+        if len(owned)>=7 or secondary_path.exists():raise ValueError('INTEGRATION_TEST_EXACT_FREE_SLOT_REQUIRED')
+    else:
+        secondary=json.loads(secondary_path.read_text())['process']['id']
+        if subprocess.check_output([*prefix,'inspect','--format','{{.State.Running}}',secondary],timeout=15).strip()!=b'false':
+            raise ValueError('QUERY_RUNTIME_TEST_SECONDARY_SLOT_REQUIRED')
     labels=json.loads(subprocess.check_output([*prefix,'inspect','--format','{{json .Config.Labels}}',api],timeout=15))
     if labels.get('ontology.task-id')!=TASK or labels.get('ontology.run-id')!=RUN: raise ValueError('QUERY_RUNTIME_TEST_OWNER')
     state=json.loads((output/fixture_file()).read_text())
@@ -1342,22 +1354,24 @@ def runtime_agent_test(binding_race=False, aba_inflight=False):
     try:
         created=runtime_command('query-maf-container-create',[*prefix,'create','--pull=never','--name',name,
             '--network',PROFILE.text('ontology-g4-m4-query-impl-01_platform'),'--label','ontology.task-id='+TASK,'--label','ontology.run-id='+RUN,
-            '--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--user','501:20','--memory=768m','--cpus=0.5','--pids-limit=128',
+            '--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--user','501:20','--memory=768m','--cpus='+('2' if TASK=='G4-M5-INTEGRATION-001' else '0.5'),'--pids-limit=128',
             '--tmpfs','/tmp:size=64m,mode=1777','--volumes-from',api+':ro','--mount','type=bind,src='+str(directory)+',dst=/tests,readonly',
             '--workdir','/private/api','-e','ASPNETCORE_ENVIRONMENT=Development','-e','DOTNET_CLI_HOME=/tmp/dotnet','-e','DOTNET_EnableDiagnostics=0',
             '-e','DOTNET_CLI_TELEMETRY_OPTOUT=1','-e','TESTINGPLATFORM_TELEMETRY_OPTOUT=1','-e','XDG_DATA_HOME=/tmp/data',
             '-e','G4_QUERY_ABA_PROPOSAL='+(state['s2AbaInFlight']['b']['approved']['proposalId'] if aba_inflight else ''),
+            '-e','G4_QUERY_PREFLIGHT_ONLY='+('1' if preflight else '0'),
+            '-e','G4_TEST_TIMEOUT='+('10s' if preflight else '45s'),
             '-e','G4_QUERY_BINDING_RACE='+('1' if binding_race else '0'),
             '-e','G4_QUERY_RUNTIME_ACTOR='+json.dumps(state['latestQuery']['actor'],separators=(',',':')),
             '-e','G4_QUERY_RUNTIME_TEST='+TASK+':'+RUN,'-e','G4_QUERY_RUNTIME_QUERY_ID='+state['latestQuery']['queryId'],
-            image,'sh','-c',"""dotnet /runtime/QueryLoopback.dll & bridge=$!; trap 'kill "$bridge" 2>/dev/null || true' EXIT; dotnet /tests/OntologyPlatform.AgentTests.dll --filter FullyQualifiedName~G4QueryMafRuntimeTests --timeout 45s --zero-tests-policy strict --results-directory /tmp/TestResults; result=$?; if [ -f /tmp/aba-inflight.json ]; then cat /tmp/aba-inflight.json; fi; exit "$result";"""])
+            image,'sh','-c',"""dotnet /runtime/QueryLoopback.dll & bridge=$!; trap 'kill "$bridge" 2>/dev/null || true' EXIT; dotnet /tests/OntologyPlatform.AgentTests.dll --filter FullyQualifiedName~G4QueryMafRuntimeTests --timeout ${G4_TEST_TIMEOUT:-45s} --zero-tests-policy strict --results-directory /tmp/TestResults; result=$?; if [ -f /tmp/aba-inflight.json ]; then cat /tmp/aba-inflight.json; fi; exit "$result";"""])
         cid=created.stdout.decode().strip();lifecycle.update(id=cid,status='CREATED');path.write_text(json.dumps(lifecycle,indent=2)+'\n')
         runtime_command('query-maf-container-network',[*prefix,'network','connect',PROFILE.text('ontology-g4-m4-query-impl-01_edge'),cid])
         inputs={p.name:sha(p.read_bytes()) for p in directory.glob('*.dll')}
-        result=run([*prefix,'start','--attach',cid],ROOT,task=TASK,run_id=RUN,stage='query-real-aba-inflight-runtime' if aba_inflight else ('query-real-maf-binding-runtime' if binding_race else 'query-real-maf-runtime'),
-            input_key=sha(encoded([inputs,state['latestQuery']['queryId'],binding_race,aba_inflight,state.get('s2AbaInFlight',{}).get('b',{}).get('approved',{}).get('proposalId'),sha(Path(__file__).read_bytes())])),timeout=60)
+        result=run([*prefix,'start','--attach',cid],ROOT,task=TASK,run_id=RUN,stage='query-runtime-ready' if preflight else 'query-real-aba-inflight-runtime' if aba_inflight else ('query-real-maf-binding-runtime' if binding_race else 'query-real-maf-runtime'),
+            input_key=sha(encoded([inputs,state['latestQuery']['queryId'],binding_race,aba_inflight,state.get('s2AbaInFlight',{}).get('b',{}).get('approved',{}).get('proposalId'),sha(Path(__file__).read_bytes()),preflight])),timeout=20 if preflight else 60)
         lifecycle['commandId']=result.receipt['commandId'];lifecycle['exitCode']=result.returncode
-        if aba_inflight and result.returncode == 0:
+        if aba_inflight and not preflight and result.returncode == 0:
             # 夹具仅接受实际已完成案例的正式A回执；不能把旧activation预期留给后续S1。
             aba = demand_aba_original(result.stdout + b'\n' + result.stderr, result.receipt['stage'])
             current = json.loads((output/fixture_file()).read_text())
