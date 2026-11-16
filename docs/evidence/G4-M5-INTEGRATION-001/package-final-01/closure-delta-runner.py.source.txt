@@ -1,0 +1,24 @@
+import json,re,hashlib,base64,datetime
+from pathlib import Path
+root=Path.cwd();er=root/'docs/evidence/G4-M5-INTEGRATION-001';group=er/'package-final-01';oldpath=group/'checkpoint-selection.json';old=json.loads(oldpath.read_text());sha=lambda b:hashlib.sha256(b).hexdigest();prior={x['path']:x['sha256'] for x in old['scannedNonCheckpointFiles']}
+source=er/'integration-01/originals/integration-01';candidates={p.name:p for p in source.glob('prerequisite-*.json')};assert len(candidates)==238;byhash={}
+for name,p in candidates.items():byhash.setdefault(sha(p.read_bytes()),[]).append(name)
+new={};refs={};ignored=[]
+for p in er.rglob('*'):
+ if not p.is_file() or p.suffix=='.png' or p.name in candidates:continue
+ rel=str(p.relative_to(root))
+ if p.name in ['originals-index.json','archive-byte-manifest.json','review-evidence-selection.json'] or p.name.startswith('checkpoint-selection') or (p.parent.name=='4d20bb7375ae493182cfd23af0476314' and p.name.startswith('stdout.txt')):
+  ignored.append(rel);continue
+ b=p.read_bytes();new[rel]=sha(b)
+ if p.name.endswith('.raw.json'):
+  d=json.loads(b)
+  if d.get('encoding')=='base64':b=base64.b64decode(d['base64'],validate=True)
+ text=b.decode(errors='replace')
+ for name in set(re.findall(r'prerequisite-(?:standard|numeric|safety|aba)-[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\.json',text)) & set(candidates):refs.setdefault(name,[]).append(dict(path=rel,kind='EXACT_FILENAME'))
+ for h in set(re.findall(r'(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])',text)) & set(byhash):refs.setdefault(sorted(byhash[h])[0],[]).append(dict(path=rel,kind='EXACT_SHA256'))
+selection=json.loads((er/'review-evidence-selection.json').read_text());retained=set(selection['retainedPaths']);assert all(str(candidates[n].relative_to(root)) in retained for n in refs)
+assert set(refs)=={'prerequisite-standard-907aa290-8f3c-4e9b-b1cf-89e8d6051803.json'}
+assert all(p in new or p in ignored for p in prior),'Missing earlier scanned input'
+changed=[dict(path=p,priorSha256=prior.get(p),sha256=h,status='CHANGED' if p in prior else 'ADDED') for p,h in new.items() if prior.get(p)!=h]
+row=dict(taskId='G4-M5-INTEGRATION-001',executionRunId='integration-01',archiveGrouping='package-final-01',observedAtUtc=datetime.datetime.now(datetime.timezone.utc).isoformat(),status='PASS_CURRENT_REFERENCE_CLOSURE',baseScan=dict(path=str(oldpath.relative_to(root)),sha256=sha(oldpath.read_bytes())),actualCurrentScannedFiles=len(new),unchangedScannedFiles=sum(prior.get(p)==h for p,h in new.items()),changedOrAddedFiles=changed,bookkeepingExcluded=ignored,retainedCheckpointReferences=refs,indexOnlyCount=len(old['indexOnly']),indexOnlyOriginalRecovery='237 exact Git/blob/SHA/size records from immutable base scan independently re-opened; bytes unchanged',method='Re-scanned actual current content including decoded envelopes, not only changed files; delta stores only changed/new hashes to avoid duplicating the prior full hash list. Files named checkpoint-selection are bookkeeping. Default MemberPlan enumerates paths as bookkeeping, not runtime dependencies.')
+p=group/'checkpoint-selection-final.json';assert not p.exists();p.write_text(json.dumps(row,indent=2)+'\n');print(json.dumps(dict(status=row['status'],scanned=len(new),changed=len(changed),retainedReferences=len(refs))))

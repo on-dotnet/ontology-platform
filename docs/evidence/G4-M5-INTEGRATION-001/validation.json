@@ -142,6 +142,27 @@
       "status": "NOT_RUN",
       "exitCode": null,
       "output": "No WindowsAMD64/LinuxAMD64 dual-architecture qualification, nonPG mapping/query, five-source metallurgy, production, TDengine or G5/G6/G7 acceptance. G4Overall PARTIAL."
+    },
+    {
+      "name": "final-engineering",
+      "command": "python3 -B scripts/tests/Workflow.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Current package admission and archive impact: tests/checks=19,skipped=0,sourceCommit=e95308290b18525eeb4eca26efe4d88ff6f28ee2; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/f3ddedfe750f4199b0615ebf19426651/engineering.txt; SHA256=1ede4a082d8134b419aaeafd22d3a4eb4c0c83f5eca5482497dfbfff7738ee3a"
+    },
+    {
+      "name": "final-package",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Current package admission and archive impact: tests/checks=132,skipped=0,sourceCommit=e95308290b18525eeb4eca26efe4d88ff6f28ee2; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/f3ddedfe750f4199b0615ebf19426651/package.txt; SHA256=fc331a17b00b10ea498bdd2a0dd646d029987a3c5eb974cb80f9590781f423f4"
+    },
+    {
+      "name": "final-policy",
+      "command": "python3 -B scripts/maintenance/workflow_context.py --root /Users/chasen/.codex/worktrees/g4-m5-integration-001/ontology-platform --check --task G4-M5-INTEGRATION-001 --base 4e20be50c1023b9bcd9f97e02dac92e35f20d130 --head e95308290b18525eeb4eca26efe4d88ff6f28ee2",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Current package admission and archive impact: tests/checks=0,skipped=0,sourceCommit=e95308290b18525eeb4eca26efe4d88ff6f28ee2; original=artifacts/workflow/G4-M5-INTEGRATION-001/runs/f3ddedfe750f4199b0615ebf19426651/policy.txt; SHA256=944b715313554323b52dd89a343d8cca391d6df67e68c11d7f5064cb8413b0f8"
     }
   ],
   "ci": {
@@ -166,7 +187,12 @@
     "productTestedCommit": "4e20be50c1023b9bcd9f97e02dac92e35f20d130",
     "engineeringFullTestedCommit": "4e20be50c1023b9bcd9f97e02dac92e35f20d130",
     "packageSourceCommit": "ef04666cd4a52495014da51b4600215b75e0eaac",
-    "latePackagingAdmission": "PENDING_CURRENT_AFFECTED_TESTS",
-    "engineeringCoverage": "Full engineering successful at4e20; later exact M5 package admission is covered by affected package/engineering gates, not claimed as identical full-SelfTest input."
+    "latePackagingAdmission": "PASS",
+    "engineeringCoverage": "Full engineering successful at4e20; later exact M5 package admission is covered by affected package/engineering gates, not claimed as identical full-SelfTest input.",
+    "packageImpactRun": "f3ddedfe750f4199b0615ebf19426651",
+    "packageQualificationHead": "e95308290b18525eeb4eca26efe4d88ff6f28ee2",
+    "originalExecutionRunId": "integration-01",
+    "archiveGrouping": "package-final-01",
+    "archiveGroupingIsNotNewExecution": true
   }
 }

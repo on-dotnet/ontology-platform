@@ -37,3 +37,5 @@ M5运行7容器、6GiB/4.5CPU；含M4共同12GiB/9CPU；最终实测明细与宿
 恢复从本卡、当前授权、acceptance/validation与最终包外回执开始；不要重载历史会话或重跑无关M1–M4全链。包外回执记录最终Head、普通push读回、唯一ZIP的大小/SHA及非作者重开，作为本卡FINALIZING到交付状态的唯一最终观测。
 
 构包成员计划实测默认重复payload+diff超过15MiB；依附件第10节接入既有V3机制，归档分组package-final-01不改变执行RunId integration-01。所有本任务非PNG原件必须入包，唯一可索引恢复的是精确UUID命名的历史累计save(state)副本；全量文件名/内容哈希闭包扫描保留standard-907aa290真实引用，其余237份仍在Git且已逐字节核验。当前命令、报告、失败、反例、资格和最终四场景文件均随包，15MiB不放宽。
+
+最终构包增量按影响验收通过，当前统一结果`f3ddedfe750f4199b0615ebf19426651`：engineering/package/policy实际成功；原PG五层再次只读重开全部PASS。完整SelfTest 486项发生在4e20，之后仅构包消费者/证据登记由当前受影响门禁覆盖，不把旧full输入冒称完全相同。
