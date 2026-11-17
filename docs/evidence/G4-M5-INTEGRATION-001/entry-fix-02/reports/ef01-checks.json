@@ -1,0 +1,315 @@
+{
+  "taskId": "G4-M5-INTEGRATION-001",
+  "issue": "EF-01",
+  "base": "f620b8917b6bf4e25f6484fd67be5216023ee1dd",
+  "status": "PASS_EF01_TARGETED_AND_COMPATIBILITY",
+  "red": {
+    "commandId": "54695adab24d45eeb63491ba7477ce2c",
+    "exitCode": 1,
+    "reason": "EARLY_REPRESENTATIVE_NOT_INCLUDED",
+    "producerCommandId": "2d9c9518f3c14a4c8e65a26c812f40df",
+    "producerExitCode": 0,
+    "scope": "real PowerShell production dedup output rejected by old Python consumer"
+  },
+  "excludedSetupFailure": {
+    "commandId": "4a056a6091ed49358c2e7f705d64cc6d",
+    "reason": "EXECUTION_LINKED_PATH from macOS temporary path; fixture resolved canonical directory",
+    "isTargetRed": false
+  },
+  "green": {
+    "commandId": "f9e08d94fd92423cb3319ad8257b85a3",
+    "exitCode": 0,
+    "tests": 24,
+    "skipped": 0,
+    "command": [
+      "python3",
+      "-B",
+      "scripts/tests/Workflow.Tests.py"
+    ]
+  },
+  "providerFocused": {
+    "commandId": "414341e2d55347b69b0c22512e3d6899",
+    "exitCode": 0,
+    "tests": 1
+  },
+  "negativeCases": [
+    "missing-mapping",
+    "missing-payload",
+    "missing-member",
+    "source-sha",
+    "source-length",
+    "source-blob",
+    "payload-sha",
+    "payload-length",
+    "duplicate-mapping",
+    "conflict-mapping",
+    "duplicate-payload",
+    "wrong-task",
+    "wrong-head",
+    "wrong-base",
+    "wrong-top-head",
+    "index-only",
+    "same-sha-other-path",
+    "path-case",
+    "old-protocol"
+  ],
+  "cacheChecks": [
+    "parsed cache conclusions ignored; original stdout reparsed",
+    "modified raw stdout with matching rewritten hash still rejected for missing mapping",
+    "old protocol cache preserved but not consumed; producer actually invoked"
+  ],
+  "fixtures": [
+    {
+      "fixture": "stable-fixtures/different-0b286f8a41e7ab850ac7afe94d740b09a98e9d52-59d3b3a9/fixture.json",
+      "identity": {
+        "base": "d79e930b2fd077ebce017a5184a542b4e135825f",
+        "head": "0b286f8a41e7ab850ac7afe94d740b09a98e9d52",
+        "taskId": "G4-M5-INTEGRATION-001",
+        "variant": "different",
+        "producerSha256": "93b2d697404e9a821c2ce147932dea4fa9757e3c69e6bc79fa9c54058a187f8f",
+        "consumerSha256": "8235e1a9d379931b6cceb23663cef02afda6382d926900b4f4b986b23b6fa0b8",
+        "sources": [
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          },
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/b.json",
+            "blobOid": "16b5036e6a2d718b4dccb89e4b537d9b8ecb7ed0",
+            "text": "{\"scope\":\"different synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          }
+        ]
+      },
+      "productionMeasurements": [
+        {
+          "commandId": "18b00a425c3c46ca9e55d796b88704d7",
+          "exitCode": 0,
+          "sourceCount": 2,
+          "payloadCount": 2,
+          "payloadPaths": [
+            "review-evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json",
+            "review-evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/b.json"
+          ],
+          "measurementStatus": "MEASURED_NOT_READY_FOR_ACCEPTANCE",
+          "stdoutSha256": "4777973d9da0971ca473508cc1f9bdd7a7b257bf1803fc965ab4aa93f44d1bce"
+        }
+      ]
+    },
+    {
+      "fixture": "stable-fixtures/identical-468e13806cc292f20e07ddb3864286be2d7404e0-30cd10cf/fixture.json",
+      "identity": {
+        "base": "36dd5ea196ee6f1d74eada19800656ed5d7e3188",
+        "head": "468e13806cc292f20e07ddb3864286be2d7404e0",
+        "taskId": "G4-M5-INTEGRATION-001",
+        "variant": "identical",
+        "producerSha256": "93b2d697404e9a821c2ce147932dea4fa9757e3c69e6bc79fa9c54058a187f8f",
+        "consumerSha256": "8235e1a9d379931b6cceb23663cef02afda6382d926900b4f4b986b23b6fa0b8",
+        "sources": [
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          },
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/b.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          }
+        ]
+      },
+      "productionMeasurements": [
+        {
+          "commandId": "4935ee12dbfc46cda47d8307a53e1fae",
+          "exitCode": 0,
+          "sourceCount": 2,
+          "payloadCount": 1,
+          "payloadPaths": [
+            "review-evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json"
+          ],
+          "measurementStatus": "MEASURED_NOT_READY_FOR_ACCEPTANCE",
+          "stdoutSha256": "c574a416aa311f084d3b38bf594b3825e0053637a8bf978f8ef0ebd93e9666b1"
+        }
+      ]
+    },
+    {
+      "fixture": "stable-fixtures/identical-47bdaad303c529a92304d22f151fb111403ea317-000f7924/fixture.json",
+      "identity": {
+        "base": "b36a453ffde983efb9a73bfbdb59d7cd2ee02654",
+        "head": "47bdaad303c529a92304d22f151fb111403ea317",
+        "taskId": "G4-M5-INTEGRATION-001",
+        "variant": "identical",
+        "producerSha256": "93b2d697404e9a821c2ce147932dea4fa9757e3c69e6bc79fa9c54058a187f8f",
+        "consumerSha256": "8235e1a9d379931b6cceb23663cef02afda6382d926900b4f4b986b23b6fa0b8",
+        "sources": [
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          },
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/b.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          }
+        ]
+      },
+      "productionMeasurements": [
+        {
+          "commandId": "f68d097daf234835943898eee945431f",
+          "exitCode": 0,
+          "sourceCount": 2,
+          "payloadCount": 1,
+          "payloadPaths": [
+            "review-evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json"
+          ],
+          "measurementStatus": "MEASURED_NOT_READY_FOR_ACCEPTANCE",
+          "stdoutSha256": "8d93ef6851f2c36bfcd1efc2c3d168050ee4fd38b264d6e8bc5f1262e85ef2b8"
+        }
+      ]
+    },
+    {
+      "fixture": "stable-fixtures/identical-8e4b8dab300ae2ea89df9743b0471a5b31fef065-07b44fef/fixture.json",
+      "identity": {
+        "base": "e0c17184ce9a2f9eaf3c1518aad5a1cbadb2e696",
+        "head": "8e4b8dab300ae2ea89df9743b0471a5b31fef065",
+        "taskId": "G4-M5-INTEGRATION-001",
+        "variant": "identical",
+        "producerSha256": "93b2d697404e9a821c2ce147932dea4fa9757e3c69e6bc79fa9c54058a187f8f",
+        "consumerSha256": "8235e1a9d379931b6cceb23663cef02afda6382d926900b4f4b986b23b6fa0b8",
+        "sources": [
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          },
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/b.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          }
+        ]
+      },
+      "productionMeasurements": [
+        {
+          "commandId": "0deea6c440174472b2a99c6f5b5ee09a",
+          "exitCode": 0,
+          "sourceCount": 2,
+          "payloadCount": 1,
+          "payloadPaths": [
+            "review-evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json"
+          ],
+          "measurementStatus": "MEASURED_NOT_READY_FOR_ACCEPTANCE",
+          "stdoutSha256": "ee4d7182d4232ee649fa25434bd289e79a38666feb40e5635fb29bd17f73c704"
+        },
+        {
+          "commandId": "a9968cc6eb204fb1bb2dc8a66f00afdc",
+          "exitCode": 0,
+          "sourceCount": 2,
+          "payloadCount": 1,
+          "payloadPaths": [
+            "review-evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json"
+          ],
+          "measurementStatus": "MEASURED_NOT_READY_FOR_ACCEPTANCE",
+          "stdoutSha256": "f824719dc02c3a2f55884928090c866ad9024e3a653a101248ad9d33a0649a22"
+        }
+      ]
+    },
+    {
+      "fixture": "stable-fixtures/identical-ffa148aa861bf76248d4600b0f146611a06ba7af-7c11385d/fixture.json",
+      "identity": {
+        "base": "314916c7ca89d91e7c07a8505fec8bc497061006",
+        "head": "ffa148aa861bf76248d4600b0f146611a06ba7af",
+        "taskId": "G4-M5-INTEGRATION-001",
+        "variant": "identical",
+        "producerSha256": "93b2d697404e9a821c2ce147932dea4fa9757e3c69e6bc79fa9c54058a187f8f",
+        "consumerSha256": "8235e1a9d379931b6cceb23663cef02afda6382d926900b4f4b986b23b6fa0b8",
+        "sources": [
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          },
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/b.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          }
+        ]
+      },
+      "productionMeasurements": [
+        {
+          "commandId": "dcbdb13e994c4f18b8718fd8b3d847b4",
+          "exitCode": 0,
+          "sourceCount": 2,
+          "payloadCount": 1,
+          "payloadPaths": [
+            "review-evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json"
+          ],
+          "measurementStatus": "MEASURED_NOT_READY_FOR_ACCEPTANCE",
+          "stdoutSha256": "2816a28bb4061bb7874f9be05d48a6091eb98e97002c21fd88eed8e48040835c"
+        }
+      ]
+    },
+    {
+      "fixture": "stable-fixtures/shared-source-8296012e649eceb4d844c7d0b3a61a47d3bc5187-47086622/fixture.json",
+      "identity": {
+        "base": "d1f45628079b80e7c63b3a1ceaf87bf8facf13f1",
+        "head": "8296012e649eceb4d844c7d0b3a61a47d3bc5187",
+        "taskId": "G4-M5-INTEGRATION-001",
+        "variant": "shared-source",
+        "producerSha256": "93b2d697404e9a821c2ce147932dea4fa9757e3c69e6bc79fa9c54058a187f8f",
+        "consumerSha256": "8235e1a9d379931b6cceb23663cef02afda6382d926900b4f4b986b23b6fa0b8",
+        "sources": [
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/a.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          },
+          {
+            "gitPath": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-02/reports/b.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          },
+          {
+            "gitPath": "a-shared.json",
+            "blobOid": "af7370f8134bb208376940e1f7853c7f4d04b463",
+            "text": "{\"scope\":\"synthetic EF-01\",\"status\":\"NOT_RUN\"}\n"
+          }
+        ]
+      },
+      "productionMeasurements": [
+        {
+          "commandId": "cce90843fd6f4a5fa5e32d84ae71248f",
+          "exitCode": 0,
+          "sourceCount": 2,
+          "payloadCount": 1,
+          "payloadPaths": [
+            "source/a-shared.json"
+          ],
+          "measurementStatus": "MEASURED_NOT_READY_FOR_ACCEPTANCE",
+          "stdoutSha256": "7ee5b413e3defc3ad642fd3b68111d4a6b2b9d34f6a35aa331f185c3118570cc"
+        }
+      ]
+    }
+  ],
+  "sourceBindings": {
+    "scripts/maintenance/workflow.py": "8235e1a9d379931b6cceb23663cef02afda6382d926900b4f4b986b23b6fa0b8",
+    "scripts/create-review-package.ps1": "93b2d697404e9a821c2ce147932dea4fa9757e3c69e6bc79fa9c54058a187f8f",
+    "scripts/tests/Workflow.Tests.py": "d4a85e87a85b3852d3a927bf2fed5c3eccb411b1c7746a169625083933526ea5",
+    "scripts/tests/ReviewPackage.Tests.ps1": "df8edd14bb57b6286e05830c06e2fc290b12bc5409899c38813dea9b8e4e5445"
+  },
+  "scope": "engineering packaging compatibility only",
+  "productExecution": "NOT_RUN",
+  "resourceScenarioEntryEvidence": "REUSED_FROM_F620_WITH_UNCHANGED_INPUTS",
+  "G4Overall": "PARTIAL",
+  "firstMafTimeoutRootCause": "UNKNOWN",
+  "oldRealm404RootCause": "UNKNOWN",
+  "packageCompatibility": {
+    "report": "compatibility-coverage.json",
+    "uniqueCases": 134,
+    "status": "PASS_COMPLETE_CASE_COVERAGE",
+    "fullInvocationExitCode": -9,
+    "fullInvocationStatus": "TIMEOUT_RETAINED"
+  }
+}

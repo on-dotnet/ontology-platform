@@ -1411,6 +1411,37 @@ for i in range(53):
         Assert-True ($measured.headSha -ceq $script:head) 'Measurement candidate changed'
         Assert-True (-not (Test-Path (Join-Path $script:repo 'artifacts/reviews'))) 'Early measurement published ZIP'
     }
+    Case 'early measurement exposes production logical mapping and actual shared payload' {
+        $bytes = '{"synthetic":"EF-01","status":"NOT_RUN"}'
+        Write-Fixture 'a-shared.json' $bytes
+        Write-Fixture 'docs/evidence/TEST-001/reports/a.json' $bytes
+        Write-Fixture 'docs/evidence/TEST-001/reports/b.json' $bytes
+        $script:head = Commit-Fixture
+        $paths = @('docs/evidence/TEST-001/reports/a.json', 'docs/evidence/TEST-001/reports/b.json')
+        $actual = Invoke-Package -Local -DeclaredStatus NOT_RUN -Extra @('-MeasureOnly', '-MeasurementPathsJson', (ConvertTo-Json -InputObject $paths -Compress))
+        Assert-True ($actual.Exit -eq 0) "Mapped early measurement rejected: $($actual.Output)"
+        $measured = $actual.Output | ConvertFrom-Json -AsHashtable
+        $description = $measured.representativeEvidence
+        Assert-True ($description.protocolVersion -eq 1 -and $description.taskId -ceq 'TEST-001' -and $description.headSha -ceq $script:head -and $description.baseSha -ceq $script:base) 'Description identity differs'
+        Assert-True ($description.sourceMembers.Count -eq 2 -and $description.payloads.Count -eq 1) 'Logical paths or payload dedup lost'
+        . $PackageScript -Library
+        $snapshot = Get-ReviewSnapshot $script:repo $script:base $script:head 3 'TEST-001' $true
+        foreach ($path in $paths) {
+            $mapped = @($description.sourceMembers | Where-Object gitPath -CEQ $path)
+            $expected = @($snapshot.Mapping | Where-Object gitPath -CEQ $path)
+            Assert-True ($mapped.Count -eq 1 -and ($mapped | ConvertTo-Json -Compress) -ceq ($expected | ConvertTo-Json -Compress)) 'Output must use production logical mapping'
+            Assert-True ($mapped[0].archivePath -ceq 'source/a-shared.json') 'Legal source payload sharing rejected'
+        }
+        $payload = $description.payloads[0]
+        Assert-True ($payload.sha256 -ceq (Get-ReviewHash $snapshot.Members[$payload.archivePath]) -and $payload.sizeBytes -eq $snapshot.Members[$payload.archivePath].Length) 'Payload metadata must reflect actual bytes'
+        Assert-True ($measured.members -ccontains $payload.archivePath) 'Payload not in measured members'
+        Assert-True (-not (Test-Path (Join-Path $script:repo 'artifacts/reviews'))) 'Pure measurement published ZIP'
+        $duplicate = ConvertTo-Json -InputObject @($paths[0], $paths[0]) -Compress
+        $bad = Invoke-Package -Local -DeclaredStatus NOT_RUN -Extra @('-MeasureOnly', '-MeasurementPathsJson', $duplicate)
+        Assert-True ($bad.Exit -ne 0 -and $bad.Output.Contains('MEASUREMENT_REQUEST')) 'Duplicate request accepted'
+        $bad = Invoke-Package -Local -Extra @('-MeasurementPathsJson', (ConvertTo-Json -InputObject $paths -Compress))
+        Assert-True ($bad.Exit -ne 0 -and $bad.Output.Contains('MEASUREMENT_REQUEST')) 'Description request altered formal package path'
+    }
     Case 'member plan and exact candidate share production V3 bytes without publishing ZIP' {
         Write-LocalFixture 'docs/evidence/TEST-001/local.json' (@{ evidenceSchemaVersion = 2; validationSource = 'LOCAL'; testedCommit = $script:head; checks = @(@{ name = 'fixture'; command = 'fixture only'; status = 'PASS'; exitCode = 0; output = 'not product evidence' }); ci = @{ status = 'NOT_RUN'; runId = $null; url = $null; commit = $null; conclusion = $null } } | ConvertTo-Json -Depth 6)
         $script:head = Commit-Fixture

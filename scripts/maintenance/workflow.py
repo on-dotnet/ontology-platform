@@ -400,32 +400,84 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
 def measure_committed_evidence(root, base, head, task):
     """归档后首次计划自动精测当前已提交证据；使用生产构包器且不宣称验收。"""
     from workflow_execution import run
+    import inspect
+    from types import SimpleNamespace
+    protocol_version = 1
     candidate_paths = git(root, 'diff', '--name-only', base, head, '--', 'docs/evidence/'+task+'/').decode().splitlines()
     candidate_paths = [path for path in candidate_paths if path.endswith('.json') and any(part in path for part in ('/gates/', '/originals/', '/reports/'))]
     if not candidate_paths:
         return dict(status='NOT_READY', reason='No newly committed representative report or gate output')
     directory = root/'artifacts/workflow'/task/'package-measurements'
     directory.mkdir(parents=True, exist_ok=True)
-    identity = digest(canonical([base, head, candidate_paths, digest((root/'scripts/create-review-package.ps1').read_bytes())]))
+    identity = digest(canonical([base, head, candidate_paths, protocol_version,
+                                digest(inspect.getsource(measure_committed_evidence).encode()),
+                                digest((root/'scripts/create-review-package.ps1').read_bytes())]))
     path = directory/(identity+'.json')
-    if path.exists():
+    cached = path.exists()
+    if cached:
         previous = json.loads(path.read_text())
+        if (previous.get('base'), previous.get('head'), previous.get('measurementProtocolVersion')) != (base, head, protocol_version):
+            raise ValueError('MEASUREMENT_CACHE_IDENTITY')
+        streams = {}
         for stream in ('stdout', 'stderr'):
             original = previous['commandReceipt'][stream]
-            if digest(safe_file(original['path']).read_bytes()) != original['sha256']:
+            streams[stream] = safe_file(original['path']).read_bytes()
+            if digest(streams[stream]) != original['sha256'] or len(streams[stream]) != original['sizeBytes']:
                 raise ValueError('MEASUREMENT_ORIGINAL_DRIFT')
-        return previous
-    result = run(['pwsh', '-NoProfile', '-File', 'scripts/create-review-package.ps1', '-Root', str(root),
-                  '-BaseSha', base, '-HeadSha', head, '-TaskId', task, '-Status', 'NOT_RUN', '-MeasureOnly'],
-                 root, task=task, stage='early-package-measurement', timeout=180)
+        # 缓存只复用已核原始双流；每次重新解释生产协议，不能信任缓存中的解析结论。
+        result = SimpleNamespace(stdout=streams['stdout'], returncode=previous['commandReceipt']['exitCode'], receipt=previous['commandReceipt'])
+    else:
+        result = run(['pwsh', '-NoProfile', '-File', 'scripts/create-review-package.ps1', '-Root', str(root),
+                      '-BaseSha', base, '-HeadSha', head, '-TaskId', task, '-Status', 'NOT_RUN', '-MeasureOnly',
+                      '-MeasurementPathsJson', json.dumps(candidate_paths, separators=(',', ':'))],
+                     root, task=task, stage='early-package-measurement', timeout=180)
     row = dict(status='BLOCKED', base=base, head=head, representativePaths=candidate_paths,
-               commandId=result.receipt['commandId'], exitCode=result.receipt['exitCode'], commandReceipt=result.receipt)
+               commandId=result.receipt['commandId'], exitCode=result.receipt['exitCode'], commandReceipt=result.receipt,
+               measurementProtocolVersion=protocol_version)
+    if not result.stdout and result.returncode == 0:
+        raise ValueError('MEASUREMENT_PROTOCOL_INVALID')
     if result.stdout:
         measurement = json.loads(result.stdout)
+        if measurement.get('measurement') != 'EXACT_CANDIDATE':
+            raise ValueError('MEASUREMENT_PROTOCOL_INVALID')
         if measurement.get('measurement') == 'EXACT_CANDIDATE':
-            expected_members = [path.replace('docs/evidence/', 'review-evidence/', 1) for path in candidate_paths]
-            if not set(expected_members) <= set(measurement['members']):
+            description = measurement.get('representativeEvidence', {})
+            if (measurement.get('baseSha'), measurement.get('headSha'), description.get('protocolVersion'),
+                description.get('taskId'), description.get('baseSha'), description.get('headSha')) != (base, head, protocol_version, task, base, head):
+                raise ValueError('MEASUREMENT_IDENTITY_INVALID')
+            members = measurement.get('members')
+            logical = description.get('sourceMembers')
+            payloads = description.get('payloads')
+            if not isinstance(members, list) or any(not isinstance(name, str) for name in members) or len(set(members)) != len(members) or not isinstance(logical, list) or not isinstance(payloads, list):
+                raise ValueError('MEASUREMENT_MAPPING_INVALID')
+            sources = {}
+            for source in logical:
+                if not isinstance(source, dict) or set(source) != {'gitPath', 'archivePath', 'blobOid', 'sha256', 'sizeBytes'} or not isinstance(source['gitPath'], str) or source['gitPath'] in sources:
+                    raise ValueError('MEASUREMENT_MAPPING_INVALID')
+                sources[source['gitPath']] = source
+            if set(sources) != set(candidate_paths):
                 raise ValueError('EARLY_REPRESENTATIVE_NOT_INCLUDED')
+            actual = {}
+            for payload in payloads:
+                if not isinstance(payload, dict) or set(payload) != {'archivePath', 'sha256', 'sizeBytes'} or not isinstance(payload['archivePath'], str) or payload['archivePath'] in actual:
+                    raise ValueError('MEASUREMENT_PAYLOAD_INVALID')
+                actual[payload['archivePath']] = payload
+            referenced = set()
+            for name in candidate_paths:
+                source = sources[name]
+                raw = git(root, 'cat-file', 'blob', head+':'+name)
+                blob = git(root, 'rev-parse', head+':'+name).decode().strip()
+                if source['blobOid'] != blob or source['sha256'] != digest(raw) or type(source['sizeBytes']) is not int or source['sizeBytes'] != len(raw):
+                    raise ValueError('MEASUREMENT_SOURCE_INVALID')
+                archive = source['archivePath']
+                if not isinstance(archive, str) or archive not in members or archive not in actual:
+                    raise ValueError('MEASUREMENT_PAYLOAD_MISSING')
+                payload = actual[archive]
+                if payload['sha256'] != source['sha256'] or type(payload['sizeBytes']) is not int or payload['sizeBytes'] != len(raw):
+                    raise ValueError('MEASUREMENT_PAYLOAD_INVALID')
+                referenced.add(archive)
+            if set(actual) != referenced:
+                raise ValueError('MEASUREMENT_PAYLOAD_INVALID')
             row['measurement'] = measurement
             budget_path = 'docs/evidence/'+task+'/entry-fix-01/measurement-growth-budget.json'
             budget_exists = git(root, 'ls-tree', '--name-only', head, '--', budget_path).decode().strip()
@@ -448,7 +500,8 @@ def measure_committed_evidence(root, base, head, task):
                 row['sizeAdmission'] = 'UNKNOWN_REMAINING_EVIDENCE_BUDGET'
     if result.returncode == 0:
         row['status'] = 'MEASURED_NOT_READY_FOR_ACCEPTANCE'
-    write(path, row)
+    if not cached:
+        write(path, row)
     return row
 
 

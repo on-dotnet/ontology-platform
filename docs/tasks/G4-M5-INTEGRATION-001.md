@@ -1,7 +1,7 @@
 # G4-M5-INTEGRATION-001｜工程入口收敛与PG整合
 
 ## 当前执行与授权
-唯一执行状态：ENTRY_FIX_IN_PROGRESS；阶段A精确main集成已完成，阶段B工程增量待验收。原批次状态如下：FINALIZING；产品与受影响工程验收PASS；batchAcceptance待包外最终回执闭合BI-11；G4Overall=PARTIAL。最终复审关口为ChatGPT，不更新main。
+唯一执行状态：EF01_VERIFIED_PENDING_DELIVERY。前轮工程增量f620已交付，现按entry-fix-02追加授权修复早期量包逻辑映射去重兼容；main保持已审b5e3，G4Overall=PARTIAL，最终停ChatGPT复审。
 
 人类已批准[一次性A/B/C批次](../evidence/G4-M5-INTEGRATION-001/authorization.md)，以及[精确M3暂停和M4双网络拓扑](../evidence/G4-M5-INTEGRATION-001/additional-authorization.json)。没有普通helper、修复、构包待批事项。
 
@@ -49,3 +49,11 @@ M5运行7容器、6GiB/4.5CPU；含M4共同12GiB/9CPU；最终实测明细与宿
 授权见 entry-fix-01/authorization.md。Master单写，entry_fix_review非作者只读。Base=b5e3b65d1a3359e8fd778700f525321333df61d2，原分支及Worktree。owned_paths严格限附件第3节；产品源码/合同/依赖/历史证据只读。AC-01所有资源创建入口共享冷准入，AC-02同一真实长场景入口即时核前提，AC-03首代表性证据自动纯测量。AC-01/AC-02定向入口验收通过；AC-03实际plan自动精测19836930字节并在15MiB硬限前拒绝，无新正式V3。非作者源码审查PASS_ENGINEERING_SCOPE，源码候选4414963eaff256f3437c167dc493206998661ea9。复用既有测试及账本，证据批次entry-fix-01，运行资源Run仍integration-01。原已审V3＋完整工程patch/实际原件/回执/非作者审查交付，停ChatGPT复审。
 
 阶段B收尾：资源入口17、工作流21、M4兼容16、公共预检12、构包兼容133项定向测试通过；当前构建绑定与同一原查询会话短拒绝已实测。完整MAF/ABA本轮NOT_RUN，原产品只按已审基线复用，首次超时及旧realm404原因UNKNOWN。工程完整差异/原始双流/机器回执/审查原件由普通工程增量资料ZIP承载，非正式V3；Git及最终资料包后验见包外回执。main只到b5e3，阶段B停ChatGPT复审。
+
+## 2026-11-17 EF-01 去重兼容续作
+
+授权：[entry-fix-02/authorization.md](../evidence/G4-M5-INTEGRATION-001/entry-fix-02/authorization.md)。Base=f620b8917b6bf4e25f6484fd67be5216023ee1dd；主写仅workflow.py量包消费/缓存、create-review-package.ps1早期逻辑映射摘要、Workflow.Tests.py、ReviewPackage.Tests.ps1及本卡/授权/新增证据。非作者entry_fix_review只读。资源/场景入口与产品只读；不新增依赖、无服务操作。
+
+EF-01验收：真实生产PowerShell去重输出先复现旧消费者EARLY_REPRESENTATIVE_NOT_INCLUDED；使用snapshot.Mapping和实际成员摘要接受合法共享载荷，当前Head源blob/SHA/长度及Task/Base/Head逐一核对。缺映射/载荷、冲突、错误身份和篡改继续拒绝；缓存协议精准失效并重新解释原始stdout。真实夹具与定向原件归档entry-fix-02，完整工程patch以已审b5e3为Base，另列f620以来窄增量。
+
+EF-01当前定向验证通过：真实旧生产者exit0/旧消费者精确误拒绝RED保留；24项工作流测试、三种真实产消正例、19组真实输出变异及缓存反例通过。公共构包134个唯一用例本轮覆盖完整：整集122项完成后240秒TIMEOUT，保留真实exit-9，仅补11项并复用已过新增1项，不冒称整集进程exit0。非作者协议及兼容审查原文转录见entry-fix-02/reports。最终patch/新增原件/普通ZIP及Git回读由本轮包外回执闭合；原产品及f620工程ZIP不可变。

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """工程按影响计划的行为回归；隔离Git夹具不启动产品或下载。"""
+import contextlib
+import copy
 import importlib.util
 import json
 from pathlib import Path
@@ -173,30 +175,136 @@ class WorkflowTests(unittest.TestCase):
                 self.w.package_budget(Path(d),'main','HEAD','TASK-001')
 
 
+    @contextlib.contextmanager
+    def production_measurement(self, variant='identical'):
+        """真实Git小夹具调用生产PowerShell，再由实际Python消费者解释；不启动产品。"""
+        import shutil
+        import os
+        sys.path.insert(0, str(ROOT/'scripts/maintenance'))
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            def git(*args):
+                return subprocess.check_output(['git', *args], cwd=root).decode().strip()
+            git('init', '-q'); git('config', 'user.name', 'EF01 Fixture'); git('config', 'user.email', 'fixture@example.invalid')
+            (root/'.gitignore').write_text('artifacts/\n')
+            (root/'scripts').mkdir(); shutil.copyfile(ROOT/'scripts/create-review-package.ps1', root/'scripts/create-review-package.ps1')
+            content = '{"scope":"synthetic EF-01","status":"NOT_RUN"}\n'
+            if variant == 'shared-source': (root/'a-shared.json').write_text(content)
+            git('add', '.'); git('commit', '-qm', 'base'); base = git('rev-parse', 'HEAD')
+            task = 'G4-M5-INTEGRATION-001'
+            paths = ['docs/evidence/'+task+'/entry-fix-02/reports/'+name+'.json' for name in ('a', 'b')]
+            for index, name in enumerate(paths):
+                p = root/name; p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_text(content if variant != 'different' or index == 0 else '{"scope":"different synthetic EF-01","status":"NOT_RUN"}\n')
+            git('add', '.'); git('commit', '-qm', 'representatives'); head = git('rev-parse', 'HEAD')
+            try:
+                result = self.w.measure_committed_evidence(root, base, head, task)
+                yield root, base, head, task, paths, result
+            finally:
+                if os.environ.get('WORKFLOW_EF01_EVIDENCE_DIR'):
+                    target = Path(os.environ['WORKFLOW_EF01_EVIDENCE_DIR'])/(variant+'-'+head)
+                    # 相同源码/秒内提交可生成同Head；不同测试仍保持各自实际执行原件。
+                    import uuid
+                    target = target.with_name(target.name+'-'+uuid.uuid4().hex[:8]); target.mkdir(parents=True, exist_ok=False)
+                    shutil.copytree(root/'artifacts', target/'artifacts')
+                    sources = paths + (['a-shared.json'] if variant == 'shared-source' else [])
+                    (target/'fixture.json').write_text(json.dumps(dict(base=base, head=head, taskId=task, variant=variant,
+                        producerSha256=self.w.digest((root/'scripts/create-review-package.ps1').read_bytes()),
+                        consumerSha256=self.w.digest((ROOT/'scripts/maintenance/workflow.py').read_bytes()),
+                        sources=[dict(gitPath=name, blobOid=git('rev-parse', head+':'+name), text=(root/name).read_text()) for name in sources]), indent=2)+'\n')
+
+    def test_production_measurement_accepts_identical_representative_json(self):
+        for variant in ('different', 'identical', 'shared-source'):
+            with self.subTest(variant=variant), self.production_measurement(variant) as (root, base, head, task, paths, result):
+                self.assertEqual(result['status'], 'MEASURED_NOT_READY_FOR_ACCEPTANCE')
+                description = result['measurement']['representativeEvidence']
+                self.assertEqual({row['gitPath'] for row in description['sourceMembers']}, set(paths))
+                self.assertEqual(len(description['payloads']), 2 if variant == 'different' else 1)
+                if variant == 'shared-source': self.assertEqual(description['payloads'][0]['archivePath'], 'source/a-shared.json')
+                self.assertFalse((root/'artifacts/reviews').exists())
+
+    def test_real_producer_output_rejects_missing_conflicting_or_wrong_identity(self):
+        from types import SimpleNamespace
+        import workflow_execution
+        with self.production_measurement() as (root, base, head, task, paths, result):
+            for path in (root/'artifacts/workflow'/task/'package-measurements').glob('*.json'): path.unlink()
+            cases = ['missing-mapping', 'missing-payload', 'missing-member', 'source-sha', 'source-length', 'source-blob',
+                     'payload-sha', 'payload-length', 'duplicate-mapping', 'conflict-mapping', 'duplicate-payload',
+                     'wrong-task', 'wrong-head', 'wrong-base', 'wrong-top-head', 'index-only', 'same-sha-other-path', 'path-case', 'old-protocol']
+            for case in cases:
+                measured = copy.deepcopy(result['measurement']); d = measured['representativeEvidence']
+                if case == 'missing-mapping': d['sourceMembers'].pop()
+                if case == 'missing-payload': d['payloads'] = []
+                if case == 'missing-member': measured['members'].remove(d['payloads'][0]['archivePath'])
+                if case == 'source-sha': d['sourceMembers'][0]['sha256'] = '0'*64
+                if case == 'source-length': d['sourceMembers'][0]['sizeBytes'] += 1
+                if case == 'source-blob': d['sourceMembers'][0]['blobOid'] = '0'*40
+                if case == 'payload-sha': d['payloads'][0]['sha256'] = '0'*64
+                if case == 'payload-length': d['payloads'][0]['sizeBytes'] += 1
+                if case in ('duplicate-mapping', 'conflict-mapping'):
+                    extra = copy.deepcopy(d['sourceMembers'][0])
+                    if case == 'conflict-mapping': extra['archivePath'] = 'source/other.json'
+                    d['sourceMembers'].append(extra)
+                if case == 'duplicate-payload': d['payloads'].append(copy.deepcopy(d['payloads'][0]))
+                if case == 'wrong-task': d['taskId'] = 'OTHER-TASK'
+                if case == 'wrong-head': d['headSha'] = '0'*40
+                if case == 'wrong-base': d['baseSha'] = '0'*40
+                if case == 'wrong-top-head': measured['headSha'] = '0'*40
+                if case == 'index-only': d['sourceMembers'][0]['archivePath'] = None
+                if case == 'same-sha-other-path': d['payloads'][0]['archivePath'] = 'source/.gitignore'
+                if case == 'path-case': d['sourceMembers'][0]['gitPath'] = paths[0].upper()
+                if case == 'old-protocol': measured.pop('representativeEvidence')
+                mutated = SimpleNamespace(returncode=0, stdout=json.dumps(measured).encode(), receipt=result['commandReceipt'])
+                with self.subTest(case=case), patch.object(workflow_execution, 'run', return_value=mutated):
+                    with self.assertRaisesRegex(ValueError, 'MEASUREMENT_|EARLY_REPRESENTATIVE_NOT_INCLUDED'):
+                        self.w.measure_committed_evidence(root, base, head, task)
+                self.assertFalse(list((root/'artifacts/workflow'/task/'package-measurements').glob('*.json')))
+
+    def test_measurement_cache_reinterprets_original_and_invalidates_old_protocol(self):
+        import workflow_execution
+        with self.production_measurement() as (root, base, head, task, paths, result):
+            directory = root/'artifacts/workflow'/task/'package-measurements'; cache = next(directory.glob('*.json'))
+            damaged = copy.deepcopy(result); damaged['measurement']['representativeEvidence']['sourceMembers'] = []; damaged['status'] = 'PASS'
+            cache.write_text(json.dumps(damaged))
+            with patch.object(workflow_execution, 'run') as execute:
+                current = self.w.measure_committed_evidence(root, base, head, task); execute.assert_not_called()
+            self.assertEqual(current['status'], 'MEASURED_NOT_READY_FOR_ACCEPTANCE')
+            self.assertEqual(len(current['measurement']['representativeEvidence']['sourceMembers']), 2)
+            # 即使缓存中的原流散列同步变更，缺逻辑映射仍必须由协议校验拒绝。
+            altered = copy.deepcopy(result['measurement']); altered['representativeEvidence']['sourceMembers'] = []
+            stdout = directory/'tampered-stdout.txt'; stdout.write_text(json.dumps(altered))
+            damaged['commandReceipt']['stdout'] = dict(path=str(stdout), sha256=self.w.digest(stdout.read_bytes()), sizeBytes=stdout.stat().st_size)
+            cache.write_text(json.dumps(damaged))
+            with self.assertRaisesRegex(ValueError, 'EARLY_REPRESENTATIVE_NOT_INCLUDED'):
+                self.w.measure_committed_evidence(root, base, head, task)
+            cache.unlink()
+            old_key = self.w.digest(self.w.canonical([base, head, paths, self.w.digest((root/'scripts/create-review-package.ps1').read_bytes())]))
+            old = directory/(old_key+'.json'); old.write_text('{"status":"PASS","legacyProtocol":true}')
+            with patch.object(workflow_execution, 'run', wraps=workflow_execution.run) as execute:
+                refreshed = self.w.measure_committed_evidence(root, base, head, task); execute.assert_called_once()
+            self.assertEqual(refreshed['measurementProtocolVersion'], 1)
+            self.assertEqual(old.read_text(), '{"status":"PASS","legacyProtocol":true}')
+
     def test_measurement_rejects_negative_growth_fields(self):
         from types import SimpleNamespace
-        sys.path.insert(0, str(ROOT/'scripts/maintenance'))
         import workflow_execution
-        w = self.w; task = 'G4-M5-INTEGRATION-001'; base = 'a'*40; head = 'b'*40
-        report = 'docs/evidence/'+task+'/entry-fix-01/reports/first.json'
-        member = report.replace('docs/evidence/', 'review-evidence/', 1)
-        for change in ('double_negative', 'negative_metadata', 'negative_safety', 'missing_basis'):
-            budget = dict(taskId=task, base=base, categories=[dict(remainingCount=1, reservedBytesEach=100, basis='observed maximum')], metadataReserveBytes=100, safetyReserveBytes=100)
-            if change == 'double_negative': budget['categories'][0].update(remainingCount=-1, reservedBytesEach=-100)
-            if change == 'negative_metadata': budget['metadataReserveBytes'] = -1
-            if change == 'negative_safety': budget['safetyReserveBytes'] = -1
-            if change == 'missing_basis': budget['categories'][0]['basis'] = ''
-            def git(root, *args):
-                if args[0] == 'diff': return report.encode()
-                if args[0] == 'ls-tree': return b'budget'
-                if args[0] == 'show': return json.dumps(budget).encode()
-                raise AssertionError(args)
-            result = SimpleNamespace(returncode=0, stdout=json.dumps(dict(measurement='EXACT_CANDIDATE', members=[member], sizeBytes=10)).encode(), receipt=dict(commandId='test', exitCode=0))
-            with tempfile.TemporaryDirectory() as directory, self.subTest(change=change):
-                root = Path(directory); (root/'scripts').mkdir(); (root/'scripts/create-review-package.ps1').write_text('fixture')
-                with patch.object(w, 'git', side_effect=git), patch.object(workflow_execution, 'run', return_value=result):
+        with self.production_measurement() as (root, base, head, task, paths, result):
+            for path in (root/'artifacts/workflow'/task/'package-measurements').glob('*.json'): path.unlink()
+            original_git = self.w.git
+            for change in ('double_negative', 'negative_metadata', 'negative_safety', 'missing_basis'):
+                budget = dict(taskId=task, base=base, categories=[dict(remainingCount=1, reservedBytesEach=100, basis='observed maximum')], metadataReserveBytes=100, safetyReserveBytes=100)
+                if change == 'double_negative': budget['categories'][0].update(remainingCount=-1, reservedBytesEach=-100)
+                if change == 'negative_metadata': budget['metadataReserveBytes'] = -1
+                if change == 'negative_safety': budget['safetyReserveBytes'] = -1
+                if change == 'missing_basis': budget['categories'][0]['basis'] = ''
+                def git(directory, *args):
+                    if args[0] == 'ls-tree': return b'budget'
+                    if args[0] == 'show': return json.dumps(budget).encode()
+                    return original_git(directory, *args)
+                measured = SimpleNamespace(returncode=0, stdout=json.dumps(result['measurement']).encode(), receipt=result['commandReceipt'])
+                with self.subTest(change=change), patch.object(self.w, 'git', side_effect=git), patch.object(workflow_execution, 'run', return_value=measured):
                     with self.assertRaisesRegex(ValueError, 'MEASUREMENT_GROWTH_INVALID'):
-                        w.measure_committed_evidence(root, base, head, task)
+                        self.w.measure_committed_evidence(root, base, head, task)
 
     def test_committed_plan_automatically_measures_new_report(self):
         w = self.w

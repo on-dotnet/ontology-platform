@@ -22,6 +22,7 @@ param(
     [switch]$Library,
     [switch]$MemberPlan,
     [switch]$MeasureOnly,
+    [string]$MeasurementPathsJson,
     [switch]$VerifyOnly,
     [string]$PackagePath
 )
@@ -820,6 +821,7 @@ if ($Library) { return }
 
 try {
     $Root = [IO.Path]::GetFullPath($Root)
+    if ($MeasurementPathsJson -and (-not $MeasureOnly -or $MemberPlan -or $VerifyOnly -or $SchemaVersion -ne 3 -or $Status -cne 'NOT_RUN' -or $ValidationSource -cne 'LOCAL')) { throw 'MEASUREMENT_REQUEST: representative descriptions require early LOCAL V3 MeasureOnly' }
     if ($VerifyOnly) {
         if (-not $PackagePath) { throw 'PACKAGE_REQUIRED: VerifyOnly requires PackagePath' }
         $result = Test-ReviewArchive ([IO.Path]::GetFullPath($PackagePath)) $Root
@@ -916,7 +918,31 @@ try {
             }
         } finally { $measure.Dispose() }
         $size = $memory.Length; $memory.Dispose()
-        Write-Output ([ordered]@{ measurement = 'EXACT_CANDIDATE'; sizeBytes = $size; limitation = 'Exact in-memory candidate only; subsequent package timestamps and ignored inventory metadata can differ, so final actual 15MiB enforcement remains mandatory.'; members = @($members.Keys | Sort-Object -CaseSensitive); status = $(if ($size -gt 15MB) { 'BLOCKED' } elseif ($earlyMeasurement) { 'MEASURED_NOT_READY_FOR_ACCEPTANCE' } else { 'PASS' }); baseSha = $BaseSha; headSha = $HeadSha; uncollected = @('Evidence generated after HeadSha', 'Final acceptance metadata'); remainingGrowthBytes = $null } | ConvertTo-Json -Depth 8 -Compress)
+        $measurement = [ordered]@{ measurement = 'EXACT_CANDIDATE'; sizeBytes = $size; limitation = 'Exact in-memory candidate only; subsequent package timestamps and ignored inventory metadata can differ, so final actual 15MiB enforcement remains mandatory.'; members = @($members.Keys | Sort-Object -CaseSensitive); status = $(if ($size -gt 15MB) { 'BLOCKED' } elseif ($earlyMeasurement) { 'MEASURED_NOT_READY_FOR_ACCEPTANCE' } else { 'PASS' }); baseSha = $BaseSha; headSha = $HeadSha; uncollected = @('Evidence generated after HeadSha', 'Final acceptance metadata'); remainingGrowthBytes = $null }
+        if ($MeasurementPathsJson) {
+            # 只描述生产选择结果；请求不参与选择，不改变正式ZIP或历史保留策略。
+            if ($MeasurementPathsJson.Length -gt 262144) { throw 'MEASUREMENT_REQUEST: bounded representative request required' }
+            $requested = ConvertFrom-Json -InputObject $MeasurementPathsJson -NoEnumerate
+            if ($requested -isnot [array] -or $requested.Count -eq 0 -or $requested.Count -gt 1024) { throw 'MEASUREMENT_REQUEST: 1 to 1024 paths required' }
+            $wanted = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+            foreach ($path in $requested) {
+                if ($path -isnot [string] -or -not $path.StartsWith("docs/evidence/$TaskId/", [StringComparison]::Ordinal) -or -not $wanted.Add($path)) { throw 'MEASUREMENT_REQUEST: exact unique task evidence paths required' }
+                Assert-ReviewPath $path
+            }
+            $logical = @($snapshot.Mapping | Where-Object { $wanted.Contains($_.gitPath) })
+            $payloadPaths = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+            $descriptions = @(
+                foreach ($mapping in $logical) {
+                    if ($members.ContainsKey($mapping.archivePath) -and $payloadPaths.Add($mapping.archivePath)) {
+                        # 对实际成员字节独立取值，不能从逻辑源摘要复制以掩盖缺载荷或错误载荷。
+                        $bytes = $members[$mapping.archivePath]
+                        [ordered]@{ archivePath = $mapping.archivePath; sha256 = Get-ReviewHash $bytes; sizeBytes = $bytes.Length }
+                    }
+                }
+            )
+            $measurement.representativeEvidence = [ordered]@{ protocolVersion = 1; taskId = $TaskId; baseSha = $BaseSha; headSha = $HeadSha; sourceMembers = $logical; payloads = $descriptions }
+        }
+        Write-Output ($measurement | ConvertTo-Json -Depth 8 -Compress)
         exit $(if ($size -gt 15MB) { 1 } else { 0 })
     }
     $outputDirectory = Join-Path $Root 'artifacts/reviews'

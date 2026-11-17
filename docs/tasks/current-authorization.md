@@ -1,5 +1,7 @@
 # 当前授权：G4-M5-INTEGRATION-001
 
+2026-11-17追加EF-01窄范围续作已获用户明确批准，见[授权原文](../evidence/G4-M5-INTEGRATION-001/entry-fix-02/authorization.md)。从f620b8917b6bf4e25f6484fd67be5216023ee1dd继续原分支/Worktree，仅量包映射消费/缓存及生产测量摘要和对应测试；main保持b5e3。原V3＋普通工程增量交付，旧ZIP/entry-fix-01原件保留，不启动服务、不重跑产品链，普通push后停ChatGPT复审。
+
 2026-11-17追加授权已审切片收尾与三个入口修正，见[精确附件](../evidence/G4-M5-INTEGRATION-001/entry-fix-01/authorization.md)。阶段A仅将main从a6716b11c3795e5670c07f1ca37057e5649bed89快进到b5e3b65d1a3359e8fd778700f525321333df61d2，已完成回读。阶段B沿用原分支/Worktree，工程增量普通push后停ChatGPT复审；main授权不扩展至新Head。采用原已审V3＋工程增量交付例外。以下2026-11-16授权为前序范围，冲突处以本追加授权为准。
 
 2026-11-16用户明确批准[一次性批次附件](../evidence/G4-M5-INTEGRATION-001/authorization.md)的A/B/C；唯一执行状态、路径所有权、准入与恢复见[任务卡](G4-M5-INTEGRATION-001.md)。基线`a6716b11c3795e5670c07f1ca37057e5649bed89`，任务分支`codex/g4-m5-integration-001`，独立托管树，Master单写＋只读Explorer/非作者Reviewer。

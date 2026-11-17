@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M5-INTEGRATION-001",
+  "evidenceBatch": "entry-fix-02",
+  "issue": "EF-01",
+  "reviewer": "/root/entry_fix_review",
+  "independentNonAuthor": true,
+  "reviewMode": "READ_ONLY",
+  "observedAtUtc": "2026-11-17T01:32:51.929824+00:00",
+  "status": "SOURCE_AND_TARGETED_EVIDENCE_PASS_FULL_COMPATIBILITY_PENDING",
+  "sourceHashes": {
+    "scripts/maintenance/workflow.py": "8235e1a9d379931b6cceb23663cef02afda6382d926900b4f4b986b23b6fa0b8",
+    "scripts/create-review-package.ps1": "93b2d697404e9a821c2ce147932dea4fa9757e3c69e6bc79fa9c54058a187f8f",
+    "scripts/tests/Workflow.Tests.py": "d4a85e87a85b3852d3a927bf2fed5c3eccb411b1c7746a169625083933526ea5",
+    "scripts/tests/ReviewPackage.Tests.ps1": "df8edd14bb57b6286e05830c06e2fc290b12bc5409899c38813dea9b8e4e5445"
+  },
+  "diffCheckExitCode": 0,
+  "findings": [],
+  "issueAssessment": {
+    "oldConsumerDefectConfirmed": true,
+    "defect": "The former consumer required same-name physical archive members, while production content deduplication legally maps multiple logical evidence paths to one selected payload.",
+    "fix": "The provider describes production Mapping and actual Members payload metadata. The consumer checks exact source identities against current Head blobs and validates the referenced physical payload.",
+    "priorReviewGap": "The previous engineering review did not exercise production deduplication together with the Python consumer. The current real fixture closes that missing combination."
+  },
+  "protocolChecks": {
+    "requestDoesNotAffectProductionSelection": true,
+    "descriptionRestrictedToEarlyLocalV3MeasureOnly": true,
+    "boundedRequest": true,
+    "exactUniqueLogicalPaths": true,
+    "sourceBlobShaLengthBoundToCurrentHead": true,
+    "payloadMetadataComputedFromActualMemberBytes": true,
+    "manyLogicalPathsMayShareOnePayload": true,
+    "sharedPayloadMayBelongToAnotherSelectedSourcePath": true,
+    "indexOnlyCurrentRepresentativeRejected": true,
+    "taskBaseHeadAndProtocolVerified": true,
+    "cacheKeyIncludesProtocolAndConsumerImplementation": true,
+    "cacheHitReparsesAndRevalidatesOriginalStdout": true,
+    "oldCachePreservedAndNotReused": true,
+    "formalZipSelectionLayoutAndAcceptanceUnchanged": true
+  },
+  "observedEvidence": {
+    "red": {"consumerCommandId": "54695adab24d45eeb63491ba7477ce2c", "actualExitCode": 1, "exactFailure": "EARLY_REPRESENTATIVE_NOT_INCLUDED", "producerCommandId": "2d9c9518f3c14a4c8e65a26c812f40df", "producerActualExitCode": 0, "originalStreamHashesVerified": true, "environmentFailureCountedAsTargetRed": false},
+    "workflowGreen": {"commandId": "f9e08d94fd92423cb3319ad8257b85a3", "actualExitCode": 0, "frameworkTests": 24, "originalStreamHashesVerified": true},
+    "providerFocused": {"commandId": "414341e2d55347b69b0c22512e3d6899", "actualExitCode": 0, "frameworkTests": 1, "originalStreamHashesVerified": true},
+    "realProductionFixtures": {"measurementsIndependentlyRead": 7, "producerAndConsumerHashesMatchReviewedSources": true, "fixtureTextsIndependentlyReconstructBlobOidShaAndLength": true, "differentContent": {"logicalMappings": 2, "payloads": 2}, "identicalRepresentatives": {"logicalMappings": 2, "payloads": 1}, "representativesShareAnotherSelectedSource": {"logicalMappings": 2, "payloads": 1, "archivePath": "source/a-shared.json"}, "directedMutationsOfRealOutput": 19, "cacheReinterpretationAndLegacyInvalidationCovered": true, "productServicesStarted": false}
+  },
+  "pending": ["Stable complete PowerShell compatibility suite result and its original streams", "Final committed input and normal branch push readback", "Independent reopening of the final ordinary engineering increment ZIP"],
+  "limits": {"earlyMeasurementIsProductAcceptance": false, "formalV3VerifyOnlyClaimed": false, "resourceAndScenarioEvidence": "REUSED_WITH_UNCHANGED_IMPLEMENTATION", "currentFullMafAbaBusiness": "NOT_RUN", "firstMafTimeoutRootCause": "UNKNOWN", "oldRealm404RootCause": "UNKNOWN", "G4Overall": "PARTIAL", "mainUpdateAuthorizedByEF01": false},
+  "recordingInstruction": "Master may transcribe this JSON verbatim. Final compatibility and archive results require an addendum before complete EF-01 delivery."
+}
