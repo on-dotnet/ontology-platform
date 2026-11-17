@@ -103,6 +103,9 @@ def numeric_source_fixture():
     """建立可空列但初始非空的numeric夹具；正式Mapping后另加NULL反例。"""
     import subprocess
     from workflow_execution import run,sha
+    output = ROOT/'artifacts/workflow'/TASK/RUN
+    if any(json.loads(path.read_text()).get('catalog') for path in output.glob('scenario-*.json')):
+        raise ValueError('PREREQUISITE_STALE:batch_schema_after_discovery')
     result=consumer.numeric_source_fixture()
     output=ROOT/'artifacts/workflow'/TASK/RUN
     cid=json.loads((output/'source-resources.json').read_text())['resources'][0]['id']
@@ -138,6 +141,185 @@ def numeric_add_null():
     return dict(status='NUMERIC_POST_ACTIVATION_NULL_READY',commandId=result.receipt['commandId'])
 
 
+def demand_agent_build():
+    """复用既有测试构建绑定，逐项核当前源码、实际DLL及真实成功命令原件。"""
+    from workflow_execution import sha
+    path = ROOT/'artifacts/workflow'/TASK/RUN/'build-binding-OntologyPlatform.AgentTests.json'
+    binding = json.loads(path.read_text())
+    if binding['taskId'] != TASK or binding['runId'] != RUN or binding['receipt']['exitCode'] != 0:
+        raise ValueError('PREREQUISITE_STALE:test_build')
+    for group in ('inputs', 'binaries'):
+        if not binding[group] or any(not (ROOT/name).is_file() or sha((ROOT/name).read_bytes()) != value for name, value in binding[group].items()):
+            raise ValueError('PREREQUISITE_STALE:test_build_'+group)
+    for stream in ('stdout', 'stderr'):
+        original = binding['receipt'][stream]
+        if sha(Path(original['path']).read_bytes()) != original['sha256']:
+            raise ValueError('PREREQUISITE_STALE:test_build_original')
+    return binding
+
+
+def browser_session_ready(actors):
+    """同一API容器内短检内存Cookie；临时测试程序集精确登记和回收。"""
+    import subprocess
+    import uuid
+    from workflow_execution import run, sha, encoded
+    runtime_probe = actors is None
+    if not runtime_probe and (len(actors) != 2 or any(set(actor) != {'cookie', 'subjectId'} for actor in actors)):
+        raise ValueError('PREREQUISITE_STALE:session_input')
+    build = demand_agent_build()
+    binding = consumer.runtime_binding()
+    cid = binding['process']['id']
+    directory = ROOT/'backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0'
+    binaries = {path.name: sha(path.read_bytes()) for path in directory.iterdir() if path.is_file()}
+    if 'OntologyPlatform.AgentTests.dll' not in binaries:
+        raise ValueError('PREREQUISITE_STALE:session_probe_build')
+    # 既有API容器/tmp承载有界测试文件，无第八容器或运行挂载变更。
+    size = sum(path.stat().st_size for path in directory.rglob('*') if path.is_file())
+    if size > 96*1024**2:
+        raise ValueError('PREREQUISITE_STALE:session_probe_size')
+    prefix = ['docker', '--context', 'desktop-linux']
+    target = '/tmp/m5-session-probe-'+uuid.uuid4().hex
+    output = ROOT/'artifacts/workflow'/TASK/RUN
+    path = output/(target.rsplit('/', 1)[1]+'.json')
+    record = dict(taskId=TASK, runId=RUN, containerId=cid, path=target, binaries=binaries, sizeBytes=size, buildCommandId=build['receipt']['commandId'], buildInputs=build['inputs'], status='PREPARING')
+    path.write_text(json.dumps(record, indent=2)+'\n')
+    try:
+        import io
+        import tarfile
+        archive = io.BytesIO()
+        with tarfile.open(fileobj=archive, mode='w') as bundle:
+            for source in sorted(directory.rglob('*')):
+                if source.is_symlink():
+                    raise ValueError('PREREQUISITE_STALE:session_probe_link')
+                if source.is_file():
+                    bundle.add(source, arcname=str(source.relative_to(directory)), recursive=False)
+        copied = run([*prefix, 'exec', '-i', cid, 'sh', '-c', 'mkdir "$1" && tar -xf - -C "$1"', 'm5-probe', target],
+                     ROOT, task=TASK, run_id=RUN, stage='browser-session-probe-copy', timeout=15,
+                     stdin=archive.getvalue(), input_key=sha(encoded(binaries)))
+        if copied.returncode:
+            raise ValueError('PREREQUISITE_STALE:session_probe_copy')
+        runtime_environment = []
+        method = 'BrowserSessionsCoverRegisteredExecutionDeadline'
+        if runtime_probe:
+            state = json.loads((output/consumer.fixture_file()).read_text())
+            runtime_environment = ['-e', 'G4_QUERY_PREFLIGHT_ONLY=1', '-e', 'G4_QUERY_RUNTIME_QUERY_ID='+state['latestQuery']['queryId'],
+                                   '-e', 'G4_QUERY_RUNTIME_ACTOR='+json.dumps(state['latestQuery']['actor'], separators=(',', ':'))]
+            if consumer.SCENARIO == 'aba':
+                runtime_environment += ['-e', 'G4_QUERY_ABA_PROPOSAL='+state['s2AbaInFlight']['b']['approved']['proposalId']]
+            method = 'ActualMafUsesCurrentGatewayAndOnePersistentBudget'
+        result = run([*prefix, 'exec', '-i', '-e', 'G4_BROWSER_PREFLIGHT=1', '-e', 'G4_BROWSER_REPORT='+target+'/session-ready.json', '-e', 'G4_QUERY_RUNTIME_TEST='+TASK+':'+RUN,
+                      '-e', 'ASPNETCORE_ENVIRONMENT=Development', *runtime_environment, '-w', '/private/api', cid, 'dotnet', target+'/OntologyPlatform.AgentTests.dll',
+                      '--filter', 'FullyQualifiedName~'+method, '--timeout', '20s', '--zero-tests-policy', 'strict', '--results-directory', target+'/results'],
+                     ROOT, task=TASK, run_id=RUN, stage='browser-current-session-preflight', timeout=25,
+                     stdin=encoded(actors), input_key=sha(encoded(binaries)))
+        record.update(commandId=result.receipt['commandId'], exitCode=result.receipt['exitCode'])
+        if runtime_probe:
+            return dict(status='READY' if result.returncode == 0 else 'REJECTED', exitCode=result.receipt['exitCode'], commandId=result.receipt['commandId'])
+        if result.returncode:
+            raise ValueError('PREREQUISITE_STALE:session_deadline')
+        report = consumer.runtime_command('browser-session-probe-report', [*prefix, 'exec', cid, 'cat', target+'/session-ready.json'], timeout=5)
+        observations = json.loads(report.stdout)
+        if len(observations) != 2:
+            raise ValueError('PREREQUISITE_STALE:session_observations')
+        return dict(status='READY', commandId=result.receipt['commandId'], observations=observations)
+    finally:
+        removed = consumer.runtime_command('browser-session-probe-remove', [*prefix, 'exec', cid, 'rm', '-rf', '--', target], timeout=10)
+        after = subprocess.run([*prefix, 'exec', cid, 'test', '!', '-e', target], capture_output=True, timeout=5)
+        record.update(status='REMOVED' if after.returncode == 0 else 'KEEP_UNVERIFIED', cleanupCommandId=removed.receipt['commandId'])
+        path.write_text(json.dumps(record, indent=2)+'\n')
+        if after.returncode:
+            raise ValueError('PREREQUISITE_STALE:session_probe_cleanup')
+
+
+def session_expiry_control(session_hash, value):
+    """仅操纵本次浏览器短检确认的精确合成会话期限；返回原期限供finally恢复。"""
+    import re
+    import subprocess
+    import datetime
+    from workflow_execution import run, sha
+    if not re.fullmatch('[0-9a-f]{64}', session_hash):
+        raise ValueError('SESSION_FIXTURE_HASH_INVALID')
+    if value in ('expired', 'short'):
+        expiry = "now() + interval '" + ('-1 second' if value == 'expired' else '30 seconds') + "'"
+    else:
+        restored = datetime.datetime.fromisoformat(value.replace('Z', '+00:00'))
+        expiry = "'"+restored.isoformat()+"'::timestamptz"
+    output = ROOT/'artifacts/workflow'/TASK/RUN
+    cid = json.loads((output/'platform-resources.json').read_text())['resources'][0]['id']
+    prefix = ['docker', '--context', 'desktop-linux']
+    labels = json.loads(subprocess.check_output([*prefix, 'inspect', '--format', '{{json .Config.Labels}}', cid], timeout=10))
+    if labels.get('ontology.task-id') != TASK or labels.get('ontology.run-id') != RUN:
+        raise ValueError('PREREQUISITE_STALE:owner')
+    where = "encode(sha256(convert_to(\"Id\",'UTF8')),'hex')='"+session_hash+"'"
+    sql = """BEGIN; SET LOCAL statement_timeout='5s';
+SELECT json_build_object('expires',"ExpiresAtUtc") FROM governance.server_sessions WHERE """+where+""" FOR UPDATE;
+UPDATE governance.server_sessions SET "ExpiresAtUtc"="""+expiry+' WHERE '+where+""" AND "RevokedAtUtc" IS NULL RETURNING json_build_object('expires',"ExpiresAtUtc"); COMMIT;"""
+    result = run([*prefix, 'exec', '-i', cid, 'psql', '-U', 'postgres', '-d', 'query', '-qAt', '-v', 'ON_ERROR_STOP=1'], ROOT,
+                 task=TASK, run_id=RUN, stage='browser-session-expiry-fixture', timeout=10, stdin=sql.encode(), input_key=sha(sql.encode()))
+    if result.returncode:
+        raise ValueError('SESSION_FIXTURE_FAILED')
+    rows = [json.loads(line) for line in result.stdout.decode().splitlines() if line.startswith('{')]
+    if len(rows) != 2:
+        raise ValueError('SESSION_FIXTURE_NOT_EXACT')
+    return dict(before=rows[0]['expires'], after=rows[1]['expires'], commandId=result.receipt['commandId'])
+
+
+def prepare_batch_schema():
+    """首次发现目录前统一建立已知numeric表，保留激活后的NULL数据阶段。"""
+    import subprocess
+    from workflow_execution import run
+    output = ROOT/'artifacts/workflow'/TASK/RUN
+    resource = json.loads((output/'source-resources.json').read_text())
+    cid = resource['resources'][0]['id']
+    prefix = ['docker', '--context', 'desktop-linux']
+    labels = json.loads(subprocess.check_output([*prefix, 'inspect', '--format', '{{json .Config.Labels}}', cid], timeout=10))
+    if labels.get('ontology.task-id') != TASK or labels.get('ontology.run-id') != RUN:
+        raise ValueError('PREREQUISITE_STALE:owner')
+    result = run([*prefix, 'exec', '-i', cid, 'psql', '-U', 'postgres', '-d', 'fixture', '-qAt', '-v', 'ON_ERROR_STOP=1'],
+                 ROOT, task=TASK, run_id=RUN, stage='batch-schema-probe', timeout=10,
+                 stdin=b"SELECT count(*) FROM information_schema.tables WHERE table_schema='production' AND table_name IN ('numeric_assets','numeric_readings');")
+    if result.returncode:
+        raise ValueError('PREREQUISITE_STALE:schema_probe')
+    count = int(result.stdout.strip())
+    if count == 0:
+        if any(json.loads(path.read_text()).get('catalog') for path in output.glob('scenario-*.json')):
+            raise ValueError('PREREQUISITE_STALE:batch_schema_after_discovery')
+        numeric_source_fixture()
+    elif count != 2:
+        raise ValueError('PREREQUISITE_STALE:partial_batch_schema')
+    from workflow_execution import sha, encoded
+    schema_sql = "SELECT coalesce(json_agg(c ORDER BY table_name,ordinal_position),'[]'::json) FROM information_schema.columns c WHERE table_schema='production';"
+    schema = run([*prefix, 'exec', '-i', cid, 'psql', '-U', 'postgres', '-d', 'fixture', '-qAt', '-v', 'ON_ERROR_STOP=1'],
+                 ROOT, task=TASK, run_id=RUN, stage='batch-schema-fingerprint', timeout=10, stdin=schema_sql.encode(), diagnostic=True)
+    if schema.returncode:
+        raise ValueError('PREREQUISITE_STALE:schema_probe')
+    columns = json.loads(schema.stdout)
+    numeric_columns = {row['table_name']: (row['numeric_precision'], row['numeric_scale'], row['is_nullable'])
+                       for row in columns if row['column_name'] == 'numeric_key' and row['table_name'] in ('numeric_assets', 'numeric_readings')}
+    if numeric_columns != {'numeric_assets': (10, 2, 'NO'), 'numeric_readings': (12, 3, 'YES')}:
+        raise ValueError('PREREQUISITE_STALE:batch_schema_shape')
+    preparation = dict(status='BATCH_SCHEMA_PRESENT', probeCommandId=result.receipt['commandId'],
+                       fingerprintCommandId=schema.receipt['commandId'], independentSchemaSha256=sha(encoded(json.loads(schema.stdout))))
+    state_path = output/consumer.fixture_file()
+    state = json.loads(state_path.read_text()) if state_path.exists() else dict(taskId=TASK, runId=RUN, scenario=consumer.SCENARIO,
+        s3=True, numeric=consumer.SCENARIO == 'numeric', scope=dict(organizationId='org-demo', siteIds=['site-a', 'site-b']))
+    state['schemaPreparation'] = preparation
+    state_path.write_text(json.dumps(state, indent=2)+'\n')
+    return preparation
+
+
+original_browser_test = consumer.browser_test
+
+def browser_test(mode):
+    """实际首次provision入口先完成本批DDL，再调用既有正式浏览器发现。"""
+    if mode == 'provision':
+        prepare_batch_schema()
+    return original_browser_test(mode)
+
+
+consumer.browser_test = browser_test
+
+
 def demand_fixture(fixture, numeric, include_null=True):
     """独立固定表/列/行预期；不调用产品映射、numeric比较器或结果canonical。"""
     import datetime
@@ -169,9 +351,13 @@ def demand_fixture(fixture, numeric, include_null=True):
     if fixture['rows']!=[len(assets),len(readings)] or normalize(fixture['data'][0])!=normalize(assets) or normalize(fixture['data'][1])!=normalize(readings):raise ValueError('PREREQUISITE_STALE:fixture_data')
 
 
-def demand_grants(rows,state,mapping=False):
+def demand_grants(rows,state,mapping=False, required_seconds=0):
     """同一grant须完整覆盖本场景，不把多个残缺grant拼接成授权。"""
     import urllib.parse
+    import datetime
+    deadline = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(seconds=required_seconds)
+    if required_seconds:
+        rows = [row for row in rows if row.get('ExpiresAtUtc') and datetime.datetime.fromisoformat(row['ExpiresAtUtc'].replace('Z', '+00:00')) >= deadline]
     tables=['numeric_assets','numeric_readings'] if state.get('numeric') else ['assets','readings']
     objects=['production/'+name for name in tables]
     fields=['production/'+table['name']+'/'+str(field['ordinal'])+'/'+urllib.parse.quote(field['name'],safe='') for table in state['catalog']['objects'] if table['schema']=='production' and table['name'] in tables for field in table['fields']]
@@ -210,15 +396,146 @@ def demand_catalog(rows,objects):
     if sorted(rows,key=key)!=sorted(expected,key=key):raise ValueError('PREREQUISITE_STALE:source_catalog')
 
 
-def demand_budget(containers, owned_count, pending_memory=0, pending_cpu=0, pending_count=0):
-    """总容器数含停止实例；创建前按新增资源核本任务及12核VM共同上限。"""
-    owned=[row for row in containers if row['task']==TASK]
-    if owned_count+pending_count>7 or any(row['memory']<=0 or row['cpu']<=0 for row in containers):raise ValueError('PREREQUISITE_STALE:budget')
-    if sum(row['memory'] for row in owned)+pending_memory>6.5*1024**3 or sum(row['cpu'] for row in owned)+pending_cpu>8e9 or sum(row['memory'] for row in containers)+pending_memory>14*1024**3 or sum(row['cpu'] for row in containers)+pending_cpu>12e9:raise ValueError('PREREQUISITE_STALE:budget')
-    return dict(ownedCount=owned_count+pending_count,ownedMemory=sum(row['memory'] for row in owned)+pending_memory,ownedCpu=sum(row['cpu'] for row in owned)+pending_cpu,sharedMemory=sum(row['memory'] for row in containers)+pending_memory,sharedCpu=sum(row['cpu'] for row in containers)+pending_cpu)
+def demand_budget(containers, owned_count, pending_memory=0, pending_cpu=0, pending_count=0,
+                  engine_memory=14*1024**3, engine_cpu=12):
+    """同一算法核当前运行配额及拟分配峰值；停止实例仅占槽位。"""
+    running = [row for row in containers if row.get('running', True)]
+    owned = [row for row in running if row['task'] == TASK]
+    if engine_memory <= 0 or engine_cpu <= 0 or owned_count + pending_count > 7:
+        raise ValueError('PREREQUISITE_STALE:budget')
+    if any(row['memory'] <= 0 or row['cpu'] <= 0 for row in running):
+        raise ValueError('PREREQUISITE_STALE:budget')
+    result = dict(ownedCount=owned_count + pending_count,
+                  ownedMemory=sum(row['memory'] for row in owned) + pending_memory,
+                  ownedCpu=sum(row['cpu'] for row in owned) + pending_cpu,
+                  sharedMemory=sum(row['memory'] for row in running) + pending_memory,
+                  sharedCpu=sum(row['cpu'] for row in running) + pending_cpu)
+    if (result['ownedMemory'] > 6.5*1024**3 or result['ownedCpu'] > 8e9
+            or result['sharedMemory'] > min(14*1024**3, engine_memory)
+            or result['sharedCpu'] > min(12, engine_cpu)*1e9):
+        raise ValueError('PREREQUISITE_STALE:budget')
+    return result
 
 
-def local_ready(require_web=True, require_grants=True, pending_memory=0, pending_cpu=0, pending_count=0):
+def resource_inventory(full=True):
+    """冷库存仅读取Docker身份和配额，完全不依赖API或数据库运行。"""
+    import subprocess
+    prefix = ['docker', '--context', 'desktop-linux']
+    info = json.loads(subprocess.check_output([*prefix, 'info', '--format', '{{json .}}'], timeout=15))
+    ids = subprocess.check_output([*prefix, 'ps', '-aq'], timeout=15).decode().split()
+    rows = []
+    if ids:
+        raw = subprocess.check_output([*prefix, 'inspect', '--format',
+            '{"id":{{json .Id}},"running":{{.State.Running}},"memory":{{.HostConfig.Memory}},"cpu":{{.HostConfig.NanoCpus}},"task":{{json (index .Config.Labels "ontology.task-id")}},"run":{{json (index .Config.Labels "ontology.run-id")}},"service":{{json (index .Config.Labels "com.docker.compose.service")}}}', *ids], timeout=15)
+        rows = [json.loads(line) for line in raw.decode().splitlines()]
+    if not full:
+        return dict(containers=rows, engineMemory=info['MemTotal'], engineCpu=info['NCPU'])
+    # 复用M5收尾的cwd与后代选择，覆盖会改进程标题的Next服务。
+    processes = [list(map(int, line.split())) for line in subprocess.check_output(
+        ['ps', '-axo', 'pid=,ppid=,rss='], timeout=10).decode().splitlines()]
+    cwd = subprocess.run(['lsof', '-d', 'cwd', '-Fn'], capture_output=True, timeout=15)
+    if cwd.returncode not in (0, 1):
+        raise ValueError('PREREQUISITE_STALE:host_inventory')
+    selected = set()
+    pid = None
+    for line in cwd.stdout.decode().splitlines():
+        if line.startswith('p') and line[1:].isdigit():
+            pid = int(line[1:])
+        elif line.startswith('n') and pid is not None:
+            path = Path(line[1:])
+            if path == ROOT or path.is_relative_to(ROOT):
+                selected.add(pid)
+    while True:
+        children = {pid for pid, parent, rss in processes if parent in selected}
+        if children <= selected:
+            break
+        selected.update(children)
+    host_rss = sum(rss*1024 for pid, parent, rss in processes if pid in selected)
+    if not selected:
+        raise ValueError('PREREQUISITE_STALE:host_inventory')
+    import re
+    import math
+    workspace_bytes = int(subprocess.check_output(['du', '-sk', str(ROOT)], timeout=30).split()[0])*1024
+    volumes = json.loads(subprocess.check_output([*prefix, 'system', 'df', '-v', '--format', '{{json .Volumes}}'], timeout=30))
+    volume_bytes = 0
+    task_volumes = []
+    for volume in volumes or []:
+        labels = dict(item.split('=', 1) for item in volume.get('Labels', '').split(',') if '=' in item)
+        if labels.get('ontology.task-id') != TASK:
+            continue
+        match = re.fullmatch(r'([0-9.]+)(B|kB|MB|GB|TB)', volume['Size'])
+        if not match:
+            raise ValueError('PREREQUISITE_STALE:volume_size_unknown')
+        unit = 1000**['B', 'kB', 'MB', 'GB', 'TB'].index(match[2])
+        size = math.ceil((float(match[1])+1)*unit)
+        volume_bytes += size
+        task_volumes.append(dict(name=volume['Name'], upperBytes=size))
+    writable_bytes = 0
+    for row in rows:
+        if row['task'] == TASK:
+            writable_bytes += int(subprocess.check_output([*prefix, 'inspect', '--size', '--format', '{{.SizeRw}}', row['id']], timeout=10))
+    return dict(containers=rows, engineMemory=info['MemTotal'], engineCpu=info['NCPU'],
+                hostRssBytes=host_rss, hostPids=sorted(selected), taskDiskUpperBytes=workspace_bytes+volume_bytes+writable_bytes,
+                diskScope='Conservative whole worktree plus task volumes and writable layers; shared image/cache counted zero times', taskVolumes=task_volumes)
+
+
+def resource_admission(services, cold=False):
+    """正式创建入口刷新库存；首次平台PG创建同时核常驻与互斥测试阶段。"""
+    import shutil
+    import subprocess
+    import uuid
+    output = ROOT/'artifacts/workflow'/TASK/RUN
+    output.mkdir(parents=True, exist_ok=True)
+    receipt_path = output/('resource-admission-'+uuid.uuid4().hex+'.json')
+    inventory = None
+    try:
+        inventory = resource_inventory()
+        if inventory['taskDiskUpperBytes'] > 10*1024**3:
+            raise ValueError('PREREQUISITE_STALE:task_disk')
+        if inventory['hostRssBytes'] > 4*1024**3:
+            raise ValueError('PREREQUISITE_STALE:host_rss')
+        rows = inventory['containers']
+        owned = [row for row in rows if row['task'] == TASK]
+        if any(row['run'] != RUN for row in owned):
+            raise ValueError('PREREQUISITE_STALE:owner')
+        # 来自现行配方的精确配额；后续创建配方由同一profile值绑定。
+        limits = PROFILE.resources
+        stages = [services]
+        if cold:
+            steady = ['platform-pg', 'pg-source', 'keycloak-test', 'fuseki', 'rustfs', 'api']
+            stages = [steady + [extra] for extra in ['api-secondary', 'maf-test', 'persistence-test']]
+        plans = []
+        for stage in stages:
+            memory = cpu = count = 0
+            for service in stage:
+                existing = [row for row in owned if row['service'] == service]
+                if len(existing) > 1:
+                    raise ValueError('PREREQUISITE_STALE:duplicate_service')
+                quota = limits[service]
+                if existing and any(existing[0][key] != quota[key] for key in ('memory', 'cpu')):
+                    raise ValueError('PREREQUISITE_STALE:resource_config')
+                if existing and existing[0]['running']:
+                    continue
+                memory += quota['memory']
+                cpu += quota['cpu']
+                count += not existing
+            plans.append(dict(services=stage, budget=demand_budget(rows, len(owned), memory, cpu, count,
+                         inventory['engineMemory'], inventory['engineCpu'])))
+        if shutil.disk_usage(ROOT).free < 20*1024**3:
+            raise ValueError('PREREQUISITE_STALE:disk')
+    except (ValueError, OSError, KeyError, subprocess.SubprocessError) as error:
+        receipt_path.write_text(json.dumps(dict(taskId=TASK, runId=RUN, status='BLOCKED',
+            inventory=inventory, requestedServices=services, cold=cold, reason=str(error)), indent=2)+'\n')
+        raise
+    receipt = dict(taskId=TASK, runId=RUN, inventory=inventory, plans=plans, cold=cold)
+    receipt_path.write_text(json.dumps(receipt, indent=2)+'\n')
+    return receipt
+
+
+consumer.resource_admission = resource_admission
+
+
+def local_ready(require_web=True, require_grants=True, pending_memory=0, pending_cpu=0, pending_count=0, require_mapping=False):
     """短真实探针先核进程/构建/Owner/配额/源夹具与显式grant；会话和激活由正式API续核。"""
     import socket
     import subprocess
@@ -233,15 +550,13 @@ def local_ready(require_web=True, require_grants=True, pending_memory=0, pending
         except OSError:raise ValueError('PREREQUISITE_STALE:'+key)
     web=live_web_binding() if require_web else None
     prefix=['docker','--context','desktop-linux']
-    containers=[]
-    for cid in subprocess.check_output([*prefix,'ps','-q'],timeout=10).decode().split():
-        row=json.loads(subprocess.check_output([*prefix,'inspect','--format',
-            '{"id":{{json .Id}},"memory":{{.HostConfig.Memory}},"cpu":{{.HostConfig.NanoCpus}},"task":{{json (index .Config.Labels "ontology.task-id")}},"run":{{json (index .Config.Labels "ontology.run-id")}}}',cid],timeout=10))
-        containers.append(row)
-    owned=[r for r in containers if r['task']==TASK]
-    facts['owner']=bool(owned) and all(r['run']==RUN for r in owned)
-    owned_count=len(subprocess.check_output([*prefix,'ps','-aq','--filter','label=ontology.task-id='+TASK],timeout=10).decode().split())
-    budget=demand_budget(containers,owned_count,pending_memory,pending_cpu,pending_count)
+    inventory = resource_inventory(full=False)
+    containers = [row for row in inventory['containers'] if row['running']]
+    owned = [row for row in containers if row['task'] == TASK]
+    facts['owner'] = bool(owned) and all(row['run'] == RUN for row in owned)
+    owned_count = sum(row['task'] == TASK for row in inventory['containers'])
+    budget = demand_budget(containers, owned_count, pending_memory, pending_cpu, pending_count,
+                           inventory['engineMemory'], inventory['engineCpu'])
     facts['budget']=True
     state=json.loads((output/consumer.fixture_file()).read_text())
     if state.get('taskId')!=TASK or state.get('runId')!=RUN or state.get('scenario')!=consumer.SCENARIO:raise ValueError('PREREQUISITE_STALE:scenario')
@@ -249,7 +564,7 @@ def local_ready(require_web=True, require_grants=True, pending_memory=0, pending
         record=json.loads((output/resource).read_text());cid=record['resources'][0]['id']
         if not any(r['id']==cid and r['task']==TASK and r['run']==RUN for r in owned):raise ValueError('PREREQUISITE_STALE:owner')
         result=run([*prefix,'exec','-i',cid,'psql','-U','postgres','-d',database,'-v','ON_ERROR_STOP=1','-qAt'],ROOT,
-                   task=TASK,run_id=RUN,stage='scenario-ready-'+consumer.SCENARIO,stdin=sql.encode(),input_key=sha(sql.encode()),timeout=10)
+                   task=TASK,run_id=RUN,stage='scenario-ready-'+consumer.SCENARIO,stdin=sql.encode(),input_key=sha(sql.encode()),timeout=10,diagnostic=True)
         if result.returncode:raise ValueError('PREREQUISITE_STALE:fixture')
         return json.loads(result.stdout)
     catalog_rows=sql_probe('source-resources.json','fixture',"SELECT coalesce(json_agg(x),'[]'::json) FROM (SELECT n.nspname AS schema,c.relname AS table,CASE WHEN c.relkind IN ('v','m') THEN 'VIEW' ELSE 'TABLE' END AS kind,a.attname AS column,a.attnum AS ordinal,pg_catalog.format_type(a.atttypid,a.atttypmod) AS type,NOT (a.attnotnull OR t.typnotnull) AS nullable FROM pg_catalog.pg_namespace n JOIN pg_catalog.pg_class c ON c.relnamespace=n.oid JOIN pg_catalog.pg_attribute a ON a.attrelid=c.oid JOIN pg_catalog.pg_type t ON t.oid=a.atttypid WHERE n.nspname='production' AND c.relkind IN ('r','p','v','m','f') AND a.attnum>0 AND NOT a.attisdropped ORDER BY c.relname,a.attnum LIMIT 2001) x;")
@@ -260,8 +575,10 @@ def local_ready(require_web=True, require_grants=True, pending_memory=0, pending
     demand_fixture(fixture,bool(state.get('numeric')),include_null=state.get('numericFixturePhase')=='POST_ACTIVATION')
     facts['fixture']=True
     # 仅读取未撤销、仍有效的合成授权非秘密字段；匹配当前正式OIDC主体。
-    grants=sql_probe('platform-resources.json','query',"SELECT coalesce(json_agg(g),'[]'::json) FROM (SELECT \"SubjectId\",\"OrganizationId\",\"SiteIds\",\"Permission\",\"ConnectionId\",\"ObjectRefs\",\"FieldRefs\" FROM governance.\"MappingAuthorizationGrants\" WHERE \"RevokedAtUtc\" IS NULL AND \"ExpiresAtUtc\">now()) g;")
-    demand_grants(grants,state,mapping=not require_grants)
+    grants=sql_probe('platform-resources.json','query',"SELECT coalesce(json_agg(g),'[]'::json) FROM (SELECT \"SubjectId\",\"OrganizationId\",\"SiteIds\",\"Permission\",\"ConnectionId\",\"ObjectRefs\",\"FieldRefs\",\"ExpiresAtUtc\" FROM governance.\"MappingAuthorizationGrants\" WHERE \"RevokedAtUtc\" IS NULL AND \"ExpiresAtUtc\">now()) g;")
+    demand_grants(grants,state,mapping=not require_grants,required_seconds=210)
+    if require_mapping and require_grants:
+        demand_grants(grants,state,mapping=True,required_seconds=210)
     facts['grant']=True
     acl=sql_probe('source-resources.json','fixture',"SELECT json_build_object('schema',has_schema_privilege('fixture_reader','production','USAGE'),'tables',json_build_array("+','.join("has_table_privilege('fixture_reader','production."+table+"','SELECT')" for table in tables)+"),'readonly',(SELECT NOT rolsuper AND NOT rolbypassrls AND rolconfig @> ARRAY['default_transaction_read_only=on'] FROM pg_roles WHERE rolname='fixture_reader'));")
     if acl!={'schema':True,'tables':[True,True],'readonly':True}:raise ValueError('PREREQUISITE_STALE:source_acl')
@@ -291,9 +608,10 @@ original_runtime_agent_test=consumer.runtime_agent_test
 
 def runtime_agent_test(binding_race=False,aba_inflight=False):
     """正式DI短验证精确持久会话/提案后才准入MAF/ABA长链，短验证不计产品PASS。"""
-    local_ready(require_web=False,pending_memory=768*1024**2,pending_cpu=2e9,pending_count=1)
-    if aba_inflight:local_ready(require_web=False,require_grants=False)
-    if original_runtime_agent_test(binding_race,aba_inflight,preflight=True):raise ValueError('PREREQUISITE_STALE:runtime_session_or_proposal')
+    demand_agent_build()
+    resource_admission(['maf-test'])
+    local_ready(require_web=False,require_mapping=aba_inflight)
+    # 正式测试进程内部紧邻MAF调用检查原会话与提案，避免跨两次容器生命周期复用READY。
     return original_runtime_agent_test(binding_race,aba_inflight)
 
 

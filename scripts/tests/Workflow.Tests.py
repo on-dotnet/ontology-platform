@@ -173,4 +173,44 @@ class WorkflowTests(unittest.TestCase):
                 self.w.package_budget(Path(d),'main','HEAD','TASK-001')
 
 
+    def test_measurement_rejects_negative_growth_fields(self):
+        from types import SimpleNamespace
+        sys.path.insert(0, str(ROOT/'scripts/maintenance'))
+        import workflow_execution
+        w = self.w; task = 'G4-M5-INTEGRATION-001'; base = 'a'*40; head = 'b'*40
+        report = 'docs/evidence/'+task+'/entry-fix-01/reports/first.json'
+        member = report.replace('docs/evidence/', 'review-evidence/', 1)
+        for change in ('double_negative', 'negative_metadata', 'negative_safety', 'missing_basis'):
+            budget = dict(taskId=task, base=base, categories=[dict(remainingCount=1, reservedBytesEach=100, basis='observed maximum')], metadataReserveBytes=100, safetyReserveBytes=100)
+            if change == 'double_negative': budget['categories'][0].update(remainingCount=-1, reservedBytesEach=-100)
+            if change == 'negative_metadata': budget['metadataReserveBytes'] = -1
+            if change == 'negative_safety': budget['safetyReserveBytes'] = -1
+            if change == 'missing_basis': budget['categories'][0]['basis'] = ''
+            def git(root, *args):
+                if args[0] == 'diff': return report.encode()
+                if args[0] == 'ls-tree': return b'budget'
+                if args[0] == 'show': return json.dumps(budget).encode()
+                raise AssertionError(args)
+            result = SimpleNamespace(returncode=0, stdout=json.dumps(dict(measurement='EXACT_CANDIDATE', members=[member], sizeBytes=10)).encode(), receipt=dict(commandId='test', exitCode=0))
+            with tempfile.TemporaryDirectory() as directory, self.subTest(change=change):
+                root = Path(directory); (root/'scripts').mkdir(); (root/'scripts/create-review-package.ps1').write_text('fixture')
+                with patch.object(w, 'git', side_effect=git), patch.object(workflow_execution, 'run', return_value=result):
+                    with self.assertRaisesRegex(ValueError, 'MEASUREMENT_GROWTH_INVALID'):
+                        w.measure_committed_evidence(root, base, head, task)
+
+    def test_committed_plan_automatically_measures_new_report(self):
+        w = self.w
+        base, head = 'a'*40, 'b'*40
+        report = 'docs/evidence/G4-M5-INTEGRATION-001/entry-fix-01/reports/first.json'
+        def git(root, *args):
+            if args[0] == 'rev-parse':
+                return (base if args[-1].startswith(base) else head).encode()
+            if args[0] == 'status':
+                return b''
+            return (report+'\0').encode()
+        with patch.object(w, 'git', side_effect=git), patch.object(w.subprocess, 'run'), patch.object(w, 'measure_committed_evidence', return_value={'status':'MEASURED_NOT_READY_FOR_ACCEPTANCE'}) as measure, patch.object(w, 'input_key', return_value='input'):
+            result = w.plan(base, head)
+            measure.assert_called_once_with(w.ROOT, base, head, 'G4-M5-INTEGRATION-001')
+            self.assertEqual(result['earlyMeasurements'][0]['status'], 'MEASURED_NOT_READY_FOR_ACCEPTANCE')
+
 if __name__ == '__main__': unittest.main()

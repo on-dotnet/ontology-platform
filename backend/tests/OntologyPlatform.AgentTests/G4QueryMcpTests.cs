@@ -46,6 +46,54 @@ public sealed class G4QueryMcpTests
 [TestClass]
 public sealed partial class G4QueryMafRuntimeTests
 {
+    /// <summary>通过标准Cookie格式和PG票据存储检查浏览器实际会话，输入仅经标准输入传入。</summary>
+    [TestMethod]
+    public async Task BrowserSessionsCoverRegisteredExecutionDeadline()
+    {
+        Assert.AreEqual("1", Environment.GetEnvironmentVariable("G4_BROWSER_PREFLIGHT"));
+        // 仅当前合成M5身份可使用短检查。
+        Assert.AreEqual("G4-M5-INTEGRATION-001:integration-01", Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST"));
+        // 使用既有只读运行配置构建正式DI，不启动宿主或后台任务。
+        await using var app = OntologyPlatform.Api.PlatformApiHost.CreateApplication([], builder =>
+        {
+            builder.Logging.ClearProviders();
+            builder.Configuration.AddJsonFile("/private/api/appsettings.json", optional: false);
+        });
+        // 两个参与者的当前Cookie仅存在进程内存，禁止输出原始输入。
+        using var input = JsonDocument.Parse(await Console.In.ReadToEndAsync());
+        // 使用正式认证scheme的格式和持久票据存储。
+        var options = app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptionsMonitor<Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions>>().Get("Cookies");
+        // 180秒浏览器总命令上限加30秒预检界限，无无限TTL。
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(210);
+        // 精确读取同一服务器会话的失效事实。
+        await using var database = await app.Services.GetRequiredService<IDbContextFactory<OntologyPlatform.Modules.Governance.GovernanceDbContext>>().CreateDbContextAsync();
+        // 仅收集非秘密前提观测，成功测试平台可能不转发Console输出。
+        var observations = new List<object>();
+        foreach (var item in input.RootElement.EnumerateArray())
+        {
+            // 使用与Cookie认证中间件相同的受保护引用解析路径。
+            var reference = options.TicketDataFormat.Unprotect(item.GetProperty("cookie").GetString()!);
+            // 原始会话键只用于内部准确定位。
+            var key = reference?.Principal.FindFirst("Microsoft.AspNetCore.Authentication.Cookies-SessionId")?.Value;
+            Assert.IsFalse(string.IsNullOrWhiteSpace(key));
+            // 正式存储重新验证撤销及过期并解密原票据。
+            var ticket = await options.SessionStore!.RetrieveAsync(key!);
+            Assert.IsNotNull(ticket);
+            Assert.AreEqual(item.GetProperty("subjectId").GetString(), ticket.Principal.FindFirst("sub")?.Value);
+            Assert.IsTrue(ticket.Properties.ExpiresUtc > deadline);
+            // 不读取或输出数据库中的保护票据字段。
+            var session = await database.Sessions.Where(row => row.Id == key).Select(row => new { row.ExpiresAtUtc, row.RevokedAtUtc }).SingleAsync();
+            Assert.IsNull(session.RevokedAtUtc);
+            Assert.IsTrue(session.ExpiresAtUtc > deadline);
+            observations.Add(new { @case = "M5_BROWSER_SESSION_READY", subjectId = item.GetProperty("subjectId").GetString(), session.ExpiresAtUtc, requiredUntilUtc = deadline,
+                sessionHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(key!))) });
+        }
+        // 只允许调用者预先登记的本任务临时目录内的固定报告名。
+        var report = Environment.GetEnvironmentVariable("G4_BROWSER_REPORT")!;
+        Assert.IsTrue(report.StartsWith("/tmp/m5-session-probe-", StringComparison.Ordinal) && Path.GetFileName(report) == "session-ready.json" && !report.Contains("..", StringComparison.Ordinal));
+        await File.WriteAllTextAsync(report, JsonSerializer.Serialize(observations));
+    }
+
     /// <summary>实际MAF恢复三次后拒绝第四次，真实PG只保存三个引用。</summary>
     [TestMethod]
     public async Task ActualMafUsesCurrentGatewayAndOnePersistentBudget()
@@ -103,6 +151,8 @@ public sealed partial class G4QueryMafRuntimeTests
             readable = true;
             claimsMatch["authenticated"] = ticket.Principal.Identity?.IsAuthenticated == true;
             claimsMatch["ticketLive"] = ticket.Properties.ExpiresUtc > DateTimeOffset.UtcNow;
+            claimsMatch["ticketCoversExecution"] = ticket.Properties.ExpiresUtc > DateTimeOffset.UtcNow.AddSeconds(
+                Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST") == "G4-M5-INTEGRATION-001:integration-01" ? 80 : 0);
             claimsMatch["subject"] = ticket.Principal.FindFirst("sub")?.Value == actor.SubjectId;
             claimsMatch["organization"] = ticket.Principal.FindFirst("organization_id")?.Value == actor.OrganizationId;
             claimsMatch["sites"] = ticket.Principal.FindAll("site_ids").Select(claim => claim.Value).Distinct().Order().SequenceEqual(actor.SiteIds.Order());
@@ -138,13 +188,19 @@ public sealed partial class G4QueryMafRuntimeTests
             }));
             Assert.Fail("DIAGNOSTIC_ONLY_NOT_ACCEPTANCE");
         }
+        // 当前M5在正式读取之前明确拒绝原会话期限不足，避免其它权限错误掩盖本反例。
+        var readyUntil = DateTimeOffset.UtcNow.AddSeconds(Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST") == "G4-M5-INTEGRATION-001:integration-01" ? 80 : 0);
+        if (Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST") == "G4-M5-INTEGRATION-001:integration-01")
+        {
+            Assert.IsTrue(session.RevokedAtUtc is null && session.ExpiresAtUtc > readyUntil, "PREREQUISITE_STALE:query_session_deadline");
+        }
         try { _ = await gateway.ReadG4Async(actor, row.SessionReference, queryId!, true, CancellationToken.None); }
         catch (SemanticOperationException error) { Assert.Fail("真实Gateway前提失败：" + error.Status + ":" + error.Code); }
         // 短前提使用同一精确查询服务器会话，不能用刚登录的新会话替代旧引用。
-        if (Environment.GetEnvironmentVariable("G4_QUERY_PREFLIGHT_ONLY") == "1")
+        if (Environment.GetEnvironmentVariable("G4_QUERY_PREFLIGHT_ONLY") == "1" || Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST") == "G4-M5-INTEGRATION-001:integration-01")
         {
             Assert.IsTrue(readable && claimsMatch.Values.All(value => value));
-            Assert.IsTrue(session.RevokedAtUtc is null && session.ExpiresAtUtc > DateTimeOffset.UtcNow);
+            Assert.IsTrue(session.RevokedAtUtc is null && session.ExpiresAtUtc > readyUntil);
             Assert.IsTrue(scope.ServiceProvider.GetRequiredService<IMappingSessionAuthority>().Matches(session.ProtectedTicket, actor, DateTimeOffset.UtcNow));
             if (Environment.GetEnvironmentVariable("G4_QUERY_ABA_PROPOSAL") is { Length: > 0 } readyProposalId)
             {
@@ -153,7 +209,7 @@ public sealed partial class G4QueryMafRuntimeTests
                 // 必须仍为待激活的正式批准提案。
                 var approved = await mappings.ReadProposalAsync(actor, row.SessionReference, readyProposalId, CancellationToken.None);
                 Assert.AreEqual("APPROVED", approved.Status);
-                Assert.IsTrue(approved.ExpiresAtUtc > DateTimeOffset.UtcNow);
+                Assert.IsTrue(approved.ExpiresAtUtc > readyUntil);
                 // 当前指针与B的原批准基线完全相同，旧activation不得进入长链。
                 var active = await mappings.ReadActiveAsync(actor, row.SessionReference, approved.MappingId, CancellationToken.None);
                 Assert.AreEqual(approved.ExpectedActive.ReleaseId, active.MappingReleaseId);
@@ -185,11 +241,17 @@ public sealed partial class G4QueryMafRuntimeTests
                 // 按主体、会话及权限排序复核原证明，保持正式组织锁顺序。
                 foreach (var proof in new[] { submit, approval }.OrderBy(item => item.Actor.SubjectId, StringComparer.Ordinal).ThenBy(item => item.SessionReference, StringComparer.Ordinal).ThenBy(item => item.Permission, StringComparer.Ordinal))
                 {
+                    // 原提交与异人审核会话必须覆盖同一执行界限，保留原会话引用。
+                    var proofSession = await governance.Sessions.AsNoTracking().SingleAsync(item => item.Id == proof.SessionReference);
+                    Assert.IsTrue(proofSession.RevokedAtUtc is null && proofSession.ExpiresAtUtc > readyUntil);
                     await authority.DemandInTransactionAsync(proof, connections.Database.GetDbConnection(), Microsoft.EntityFrameworkCore.Storage.DbContextTransactionExtensions.GetDbTransaction(transaction), CancellationToken.None);
                 }
             }
             Console.WriteLine("M5_RUNTIME_PREREQUISITE_READY_NOT_PRODUCT_ACCEPTANCE");
-            return;
+            if (Environment.GetEnvironmentVariable("G4_QUERY_PREFLIGHT_ONLY") == "1")
+            {
+                return;
+            }
         }
         // 真正进入MAF函数调用循环，四次均由相同服务器引用计数。
         var result = await executor.RunG4DeterministicAsync(actor, row.SessionReference, "g4_query_result", arguments, store, 4, CancellationToken.None);

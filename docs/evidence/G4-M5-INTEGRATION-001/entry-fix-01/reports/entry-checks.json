@@ -1,0 +1,138 @@
+{
+  "taskId": "G4-M5-INTEGRATION-001",
+  "base": "b5e3b65d1a3359e8fd778700f525321333df61d2",
+  "scope": "ENGINEERING_INCREMENT_ONLY",
+  "status": "TARGETED_CHECKS_PASS_MEASUREMENT_PENDING",
+  "checks": [
+    {
+      "name": "integration-entry",
+      "status": "PASS",
+      "freshness": "FRESH",
+      "tests": 17,
+      "skipped": 0,
+      "commandId": "8eb40257c4e84b908587fbaa49b7ebd7",
+      "receiptSha256": "3d2f159e1b887e6fadcfb7466ff74cddff5779e681f8b4914cb80b6476bc0de8",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowIntegration.Tests.py"
+      ],
+      "originals": "originals/commands/8eb40257c4e84b908587fbaa49b7ebd7/"
+    },
+    {
+      "name": "workflow",
+      "status": "PASS",
+      "freshness": "FRESH",
+      "tests": 21,
+      "skipped": 0,
+      "commandId": "5623d5947bee42108b2db0e8fec966f0",
+      "receiptSha256": "46635c5f3f1c5b2a50beb975da6cb026d778aabd06856e1d6fd7ebd0a022e7d1",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/Workflow.Tests.py"
+      ],
+      "originals": "originals/commands/5623d5947bee42108b2db0e8fec966f0/"
+    },
+    {
+      "name": "m4-compatibility",
+      "status": "PASS",
+      "freshness": "FRESH",
+      "tests": 16,
+      "skipped": 0,
+      "commandId": "bc3938f586d8421384c5d0c371c7ffe3",
+      "receiptSha256": "a5041d70efad12c2d7beaca61e37f966855bbe72e6b25f3270e3cc10cf312ee0",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowQuery.Tests.py"
+      ],
+      "originals": "originals/commands/bc3938f586d8421384c5d0c371c7ffe3/"
+    },
+    {
+      "name": "preflight",
+      "status": "PASS",
+      "freshness": "FRESH",
+      "tests": 12,
+      "skipped": 0,
+      "commandId": "3e1369954f5c400ab38aa9c71c78d795",
+      "receiptSha256": "e5785d88abc467faddfa4d354d218eb68ba722aa419739b676efe21538aa429e",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/ExecutionPreflight.Tests.py"
+      ],
+      "originals": "originals/commands/3e1369954f5c400ab38aa9c71c78d795/"
+    },
+    {
+      "name": "package-v1-v2-v3",
+      "status": "PASS",
+      "freshness": "FRESH",
+      "tests": 133,
+      "skipped": 0,
+      "commandId": "10b6f6f7d98145c78b6fa6ad5f29b41a",
+      "receiptSha256": "188dd4ab4827feb0cd285c6a4e50cb43d1a6cb8582c6c1a1694d11e73597c180",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/tests/ReviewPackage.Tests.ps1"
+      ],
+      "originals": "originals/commands/10b6f6f7d98145c78b6fa6ad5f29b41a/"
+    },
+    {
+      "name": "real-original-query-session-rejection",
+      "status": "PASS_EXPECTED_REJECTION",
+      "freshness": "FRESH",
+      "actualTestExitCode": 2,
+      "tests": 1,
+      "skipped": 0,
+      "commandId": "d534b37dc6444512b5e576432973dbee",
+      "reason": "PREREQUISITE_STALE:query_session_deadline",
+      "businessExecutorStarted": false,
+      "proof": "assertion in ActualMafUsesCurrentGatewayAndOnePersistentBudget precedes gateway and executor; actual stack and output retained",
+      "buildCommandId": "33b47f78b2db4ef98d08315af3aad106",
+      "originals": "originals/commands/d534b37dc6444512b5e576432973dbee/"
+    },
+    {
+      "name": "ready-session-expired",
+      "status": "PASS",
+      "freshness": "FRESH",
+      "report": "browser-ready-session-expired-1794873876250.json",
+      "reportSha256": "e2f120c33fe057aaaaeb3fca7737151e4de7da37c8b12ac1c3c051200a46b630",
+      "observedApiPostCount": 0,
+      "httpObservationCount": 4,
+      "scope": "SESSION_PREREQUISITE_COUNTEREXAMPLE_ONLY",
+      "originals": "originals/reports/browser-ready-session-expired-1794873876250.json"
+    },
+    {
+      "name": "ready-session-short",
+      "status": "PASS",
+      "freshness": "FRESH",
+      "report": "browser-ready-session-short-1794874343399.json",
+      "reportSha256": "f2da6cbaa0cc8e42cbd03736309fdc54279b8a168414ca3f488136395dcb402e",
+      "observedApiPostCount": 0,
+      "httpObservationCount": 4,
+      "scope": "SESSION_PREREQUISITE_COUNTEREXAMPLE_ONLY",
+      "originals": "originals/reports/browser-ready-session-short-1794874343399.json"
+    }
+  ],
+  "sourceBindings": {
+    "backend/tests/OntologyPlatform.AgentTests/G4QueryMcpTests.cs": "03e07bbb250dd2f63e9f6747e2c92e5dfff2677d6ae09e79236347416aeba7b8",
+    "scripts/create-review-package.ps1": "4dc86cedc74f31b00512e0a46834fb4f5a24bb7531a9475310b61f795498cb17",
+    "scripts/maintenance/workflow-m4-query.mjs": "45a1f022b62c6d593338658a30ce62bbaf8a4df7bace65354aa2fc2e12802389",
+    "scripts/maintenance/workflow.py": "96c8292a3ad867f947cabe374178f7fc454fc9e89e38bd1729782eb5adeaf895",
+    "scripts/maintenance/workflow_m4_query.py": "3cf316926d94406182437b22395a64cf79f127a7bcc3fa371c2c54f7aa2a72f1",
+    "scripts/maintenance/workflow_m5_integration.py": "e6003e57912a1473a5c24be298393e4f91698f170d56ae78458ffb61a17cab08",
+    "scripts/maintenance/workflow_pg_profile.py": "9a5545d4610996820bc20edff45a9043716f0f3a51fb4ce64246d0cabff6bbfb",
+    "scripts/tests/ReviewPackage.Tests.ps1": "e495678711bb878669b2e83642aff79023ae6c0b7af7608c20061df1a876520a",
+    "scripts/tests/Workflow.Tests.py": "ea498403d2891ae54df3f5a76c35f37c3a9d332f86fcf907a942c8d95d8ba5b6",
+    "scripts/tests/WorkflowIntegration.Tests.py": "3dbdc9ef16724fb125630f0f50fa422d212d0a408b0fb2106dea98af681633e6"
+  },
+  "productBaseline": "REUSED_PRODUCT_BASELINE_ONLY",
+  "currentFullMafAbaBusiness": "NOT_RUN",
+  "firstMafTimeoutRootCause": "UNKNOWN",
+  "oldRealm404RootCause": "UNKNOWN",
+  "G4Overall": "PARTIAL",
+  "independentReview": "PENDING_FINAL"
+}

@@ -1,7 +1,7 @@
 # G4-M5-INTEGRATION-001｜工程入口收敛与PG整合
 
 ## 当前执行与授权
-唯一执行状态：FINALIZING；产品与受影响工程验收PASS；batchAcceptance待包外最终回执闭合BI-11；G4Overall=PARTIAL。最终复审关口为ChatGPT，不更新main。
+唯一执行状态：ENTRY_FIX_IN_PROGRESS；阶段A精确main集成已完成，阶段B工程增量待验收。原批次状态如下：FINALIZING；产品与受影响工程验收PASS；batchAcceptance待包外最终回执闭合BI-11；G4Overall=PARTIAL。最终复审关口为ChatGPT，不更新main。
 
 人类已批准[一次性A/B/C批次](../evidence/G4-M5-INTEGRATION-001/authorization.md)，以及[精确M3暂停和M4双网络拓扑](../evidence/G4-M5-INTEGRATION-001/additional-authorization.json)。没有普通helper、修复、构包待批事项。
 
@@ -43,3 +43,7 @@ M5运行7容器、6GiB/4.5CPU；含M4共同12GiB/9CPU；最终实测明细与宿
 3fb候选精确测量16,077,589bytes超15MiB，未生成ZIP。非作者核实八份固定path+SHA旧PASS资格包装已不被当前消费者引用，其45项实际命令/报告继续随包，旧包装原字节保留Git；新增守卫拒绝内容变化或重新成为当前引用，不能泛化为PASS通配。毛节省614,240bytes（0.5858MiB），最后实际大小继续严格测量。
 
 八份精确旧PASS元数据策略的最终受影响门禁`8032e41c6b604efe9ca6e0b7ebb13b78`已通过：engineering/package/policy均真实exit0、零skip；其原件随包。其余交付后验只写包外JSON，保持最终ZIP不可变。
+
+## 2026-11-17 入口修正
+
+授权见 entry-fix-01/authorization.md。Master单写，entry_fix_review非作者只读。Base=b5e3b65d1a3359e8fd778700f525321333df61d2，原分支及Worktree。owned_paths严格限附件第3节；产品源码/合同/依赖/历史证据只读。AC-01所有资源创建入口共享冷准入，AC-02同一真实长场景入口即时核前提，AC-03首代表性证据自动纯测量。当前均NOT_RUN。复用既有测试及账本，证据批次entry-fix-01，运行资源Run仍integration-01。原已审V3＋完整工程patch/实际原件/回执/非作者审查交付，停ChatGPT复审。

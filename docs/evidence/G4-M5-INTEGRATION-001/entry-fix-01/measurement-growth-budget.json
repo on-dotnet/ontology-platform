@@ -1,0 +1,22 @@
+{
+  "taskId": "G4-M5-INTEGRATION-001",
+  "base": "b5e3b65d1a3359e8fd778700f525321333df61d2",
+  "categories": [
+    {
+      "name": "remaining_review_and_command_summaries",
+      "remainingCount": 8,
+      "reservedBytesEach": 11140,
+      "basis": {
+        "path": "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-01/reports/entry-checks.json",
+        "sha256": "a0aae05c4e58de62949affdf7f2c34d0abfa2aa8682502a88dac3e8de0e7f3ed",
+        "observedBytes": 5570,
+        "multiplier": 2,
+        "reason": "bounded eight remaining summary records; raw command streams delivered once in ordinary increment ZIP"
+      }
+    }
+  ],
+  "metadataReserveBytes": 524288,
+  "safetyReserveBytes": 524288,
+  "meaning": "conservative remaining raw-byte reservation, not a final-size guarantee; actual final measured candidate still required for future formal V3",
+  "metadataBasis": "512 KiB reserve for manifest/readme/zip directory; final exact measurement remains authoritative"
+}

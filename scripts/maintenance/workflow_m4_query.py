@@ -14,6 +14,11 @@ PROFILE = profile(TASK)
 SCENARIO = None
 
 
+def resource_admission(services, cold=False):
+    """M5绑定共享资源准入；M4保留既有批准检查。"""
+    return None
+
+
 def fixture_file():
     return 'runtime-fixture.json' if SCENARIO is None else 'scenario-'+SCENARIO+'.json'
 
@@ -111,8 +116,10 @@ def runtime_command(stage, command, timeout=60, offline=False, extra_inputs=None
     _, env = prepared()
     if offline:
         command = ['/usr/bin/sandbox-exec', '-p', '(version 1) (allow default) (deny network*)', *command]
+    adapter_inputs = {name: sha((ROOT/'scripts/maintenance'/name).read_bytes()) for name in
+                      (['workflow_m5_integration.py', 'workflow_pg_profile.py'] if TASK == 'G4-M5-INTEGRATION-001' else [])}
     result = run(command, ROOT, task=TASK, run_id=RUN, stage=stage, environment=env,
-                 input_key=sha(encoded([sha(Path(__file__).read_bytes()), command, extra_inputs])), timeout=timeout)
+                 input_key=sha(encoded([sha(Path(__file__).read_bytes()), command, extra_inputs, adapter_inputs])), timeout=timeout)
     if result.returncode:
         print(result.stdout.decode(errors='replace')[-1500:])
         print(result.stderr.decode(errors='replace')[-1500:])
@@ -140,20 +147,24 @@ def runtime_prepare():
     policy = host_continuity.inspect(task_id=TASK)
     if policy['assurance'] != 'POLICY_READY': raise ValueError('QUERY_HOST_POLICY_BLOCKED')
     prefix = ['docker', '--context', 'desktop-linux']
-    info = json.loads(subprocess.check_output([*prefix, 'info', '--format', '{{json .}}'], timeout=15))
     existing = []
-    for cid in subprocess.check_output([*prefix, 'ps', '-q'], timeout=15).decode().split():
-        # format只选配额和身份，不读取Config.Env。
-        row = json.loads(subprocess.check_output([*prefix, 'inspect', '--format',
-            '{"id":{{json .Id}},"memory":{{json .HostConfig.Memory}},"cpu":{{json .HostConfig.NanoCpus}},"labels":{{json .Config.Labels}}}', cid], timeout=15))
-        if row['memory'] <= 0 or row['cpu'] <= 0: raise ValueError('QUERY_OTHER_RESOURCE_BUDGET_UNKNOWN')
-        existing.append(row)
-    # 除已有两PG，预留KC/Fuseki/RustFS/API及短命第二API；低于实际12核，不套用纸面16核。
-    added_memory = (1024+1536+512+768+768)*1024*1024
-    added_cpu = 3_000_000_000
-    if sum(row['memory'] for row in existing)+added_memory > min(14*1024**3, info['MemTotal']) \
-        or sum(row['cpu'] for row in existing)+added_cpu > min(16, info['NCPU'])*1_000_000_000:
-        raise ValueError('QUERY_SHARED_RESOURCE_BUDGET_EXCEEDED')
+    added_memory = added_cpu = 0
+    info = json.loads(subprocess.check_output([*prefix, 'info', '--format', '{{json .}}'], timeout=15))
+    if TASK != 'G4-M5-INTEGRATION-001':
+        info = json.loads(subprocess.check_output([*prefix, 'info', '--format', '{{json .}}'], timeout=15))
+        existing = []
+        for cid in subprocess.check_output([*prefix, 'ps', '-q'], timeout=15).decode().split():
+            # format只选配额和身份，不读取Config.Env。
+            row = json.loads(subprocess.check_output([*prefix, 'inspect', '--format',
+                '{"id":{{json .Id}},"memory":{{json .HostConfig.Memory}},"cpu":{{json .HostConfig.NanoCpus}},"labels":{{json .Config.Labels}}}', cid], timeout=15))
+            if row['memory'] <= 0 or row['cpu'] <= 0: raise ValueError('QUERY_OTHER_RESOURCE_BUDGET_UNKNOWN')
+            existing.append(row)
+        # 除已有两PG，预留KC/Fuseki/RustFS/API及短命第二API；低于实际12核，不套用纸面16核。
+        added_memory = (1024+1536+512+768+768)*1024*1024
+        added_cpu = 3_000_000_000
+        if sum(row['memory'] for row in existing)+added_memory > min(14*1024**3, info['MemTotal']) \
+            or sum(row['cpu'] for row in existing)+added_cpu > min(16, info['NCPU'])*1_000_000_000:
+            raise ValueError('QUERY_SHARED_RESOURCE_BUDGET_EXCEEDED')
     if shutil.disk_usage(ROOT).free < 20*1024**3: raise ValueError('QUERY_DISK_BUDGET_BLOCKED')
     for port in [PROFILE.ports[n] for n in ('api','web','idp','fuseki','s3','secondary')]:
         with socket.socket() as probe: probe.bind(('127.0.0.1', port))
@@ -212,8 +223,8 @@ def runtime_prepare():
         # PyYAML 1.1会把未加引号的501:20解释为六十进制整数，运行用户必须明确保留字符串。
         if name != 'fuseki': service['user']=f'{os.getuid()}:{os.getgid()}'
         service['networks']=['platform','edge'] if name=='api' else ['edge']
-        service['cpus']={'keycloak-test':0.5,'fuseki':0.75,'rustfs':0.25,'api':0.75}[name]
-        service['mem_limit']={'keycloak-test':'1g','fuseki':'1536m','rustfs':'512m','api':'768m'}[name]
+        service['cpus']=PROFILE.resources[name]['cpu']/1e9
+        service['mem_limit']=PROFILE.resources[name]['memory']
     binaries=ROOT/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0'
     services['api']['volumes'][0]=str(binaries)+':/app:ro'
     query_keyring=runtime/'query-keyring'
@@ -231,6 +242,7 @@ def runtime_prepare():
 
 def runtime_start(api=False):
     """只创建本任务缺席的准确服务，创建前后登记全部准确资源，不移交旧KEEP。"""
+    resource_admission(['api'] if api else ['keycloak-test', 'fuseki', 'rustfs'])
     import subprocess
     import uuid
     from workflow_execution import sha
@@ -245,17 +257,18 @@ def runtime_start(api=False):
     if api and not (ROOT/PROFILE.text('.tools/security/g4-m4-query-001')/RUN/'runtime/api/appsettings.json').is_file():
         raise ValueError('QUERY_RUNTIME_CONFIG_MISSING')
     prefix=['docker','--context','desktop-linux']
-    info=json.loads(subprocess.check_output([*prefix,'info','--format','{{json .}}'],timeout=15))
-    memory=0;cpu=0
-    for cid in subprocess.check_output([*prefix,'ps','-q'],timeout=15).decode().split():
-        values=subprocess.check_output([*prefix,'inspect','--format','{{.HostConfig.Memory}} {{.HostConfig.NanoCpus}}',cid],timeout=15).decode().split()
-        size,cores=map(int,values)
-        if size <= 0 or cores <= 0: raise ValueError('QUERY_OTHER_RESOURCE_BUDGET_UNKNOWN')
-        memory+=size;cpu+=cores
-    added_memory=(768 if api else 3072)*1024*1024
-    added_cpu=750_000_000 if api else 1_500_000_000
-    if memory+added_memory > min(14*1024**3,info['MemTotal']) or cpu+added_cpu > min(16,info['NCPU'])*1_000_000_000:
-        raise ValueError('QUERY_SHARED_RESOURCE_BUDGET_EXCEEDED')
+    if TASK != 'G4-M5-INTEGRATION-001':
+        info=json.loads(subprocess.check_output([*prefix,'info','--format','{{json .}}'],timeout=15))
+        memory=0;cpu=0
+        for cid in subprocess.check_output([*prefix,'ps','-q'],timeout=15).decode().split():
+            values=subprocess.check_output([*prefix,'inspect','--format','{{.HostConfig.Memory}} {{.HostConfig.NanoCpus}}',cid],timeout=15).decode().split()
+            size,cores=map(int,values)
+            if size <= 0 or cores <= 0: raise ValueError('QUERY_OTHER_RESOURCE_BUDGET_UNKNOWN')
+            memory+=size;cpu+=cores
+        added_memory=(768 if api else 3072)*1024*1024
+        added_cpu=750_000_000 if api else 1_500_000_000
+        if memory+added_memory > min(14*1024**3,info['MemTotal']) or cpu+added_cpu > min(16,info['NCPU'])*1_000_000_000:
+            raise ValueError('QUERY_SHARED_RESOURCE_BUDGET_EXCEEDED')
     try:
         result=runtime_command(tag+'-start',[*prefix,'compose','-f',str(output/'runtime-compose.json'),
             'up','-d','--no-deps','--no-build','--pull','never',*services],timeout=120)
@@ -343,6 +356,7 @@ def runtime_api_rebuild():
 
 def runtime_api_resume():
     """只替换准确且已停止的M4双API挂载；持久配置、网络和keyring保持原值。"""
+    resource_admission(['api', 'api-secondary'])
     import subprocess
     import uuid
     from workflow_m4_query_runtime import verify,demand_mount
@@ -382,6 +396,7 @@ def runtime_api_resume():
 
 def runtime_persist_query_keyring():
     """修复本任务合成key ring的临时卷寿命；旧失败与卷保留，不读或复制密钥。"""
+    resource_admission(['api'])
     import subprocess
     import uuid
     import os
@@ -461,6 +476,7 @@ def runtime_binding():
 
 def runtime_second_api():
     """按批准的15448及768MiB预算创建第二API，复用本任务key ring和平台PG。"""
+    resource_admission(['api-secondary'])
     import subprocess
     import socket
     import copy
@@ -471,14 +487,16 @@ def runtime_second_api():
     before=runtime_snapshot(tag+'-before')
     if any(row.get('service')=='api-secondary' for row in before['resources']): raise ValueError('QUERY_SECONDARY_ALREADY_EXISTS')
     with socket.socket() as probe: probe.bind(('127.0.0.1',PROFILE.ports['secondary']))
-    prefix=['docker','--context','desktop-linux'];memory=0;cpu=0
-    info=json.loads(subprocess.check_output([*prefix,'info','--format','{{json .}}'],timeout=15))
-    for cid in subprocess.check_output([*prefix,'ps','-q'],timeout=15).decode().split():
-        size,cores=map(int,subprocess.check_output([*prefix,'inspect','--format','{{.HostConfig.Memory}} {{.HostConfig.NanoCpus}}',cid],timeout=15).decode().split())
-        if size<=0 or cores<=0: raise ValueError('QUERY_OTHER_RESOURCE_BUDGET_UNKNOWN')
-        memory+=size;cpu+=cores
-    if memory+768*1024**2>min(14*1024**3,info['MemTotal']) or cpu+750_000_000>min(16,info['NCPU'])*1_000_000_000:
-        raise ValueError('QUERY_SECONDARY_BUDGET_EXCEEDED')
+    prefix=['docker','--context','desktop-linux']
+    memory = cpu = 0
+    if TASK != 'G4-M5-INTEGRATION-001':
+        info=json.loads(subprocess.check_output([*prefix,'info','--format','{{json .}}'],timeout=15))
+        for cid in subprocess.check_output([*prefix,'ps','-q'],timeout=15).decode().split():
+            size,cores=map(int,subprocess.check_output([*prefix,'inspect','--format','{{.HostConfig.Memory}} {{.HostConfig.NanoCpus}}',cid],timeout=15).decode().split())
+            if size<=0 or cores<=0: raise ValueError('QUERY_OTHER_RESOURCE_BUDGET_UNKNOWN')
+            memory+=size;cpu+=cores
+        if memory+768*1024**2>min(14*1024**3,info['MemTotal']) or cpu+750_000_000>min(16,info['NCPU'])*1_000_000_000:
+            raise ValueError('QUERY_SECONDARY_BUDGET_EXCEEDED')
     path=output/'runtime-compose.json';spec=json.loads(path.read_text())
     service=copy.deepcopy(spec['services']['api']);service['ports']=[PROFILE.text('127.0.0.1:15448:15441')]
     spec['services']['api-secondary']=service;path.write_text(json.dumps(spec,indent=2)+'\n')
@@ -495,6 +513,7 @@ def runtime_second_api():
 
 def runtime_secondary_state(running):
     """在同一批准槽位切换短命测试与第二API，保留容器和原始资源身份。"""
+    if running: resource_admission(['api-secondary'])
     import subprocess
     import uuid
     output=ROOT/'artifacts/workflow'/TASK/RUN
@@ -583,7 +602,7 @@ def runtime_configure():
 
 def browser_test(mode):
     """唯一当前任务浏览器入口，真实OIDC与API响应，不运行旧M3验收或下载浏览器。"""
-    if mode not in ['ready','provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race','s2-aba','s2-aba-prepare','s2-capacity','s2-connection','s2-inflight','s3-provision','s3','ui-s3','replace-disabled-connection','numeric-provision','numeric','standard-provision']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
+    if mode not in ['ready','ready-session-expired','ready-session-short','provision','mapping','s1','s1-reopen','ui-s1','s2-basic','s2-runtime','s2-race','s2-aba','s2-aba-prepare','s2-capacity','s2-connection','s2-inflight','s3-provision','s3','ui-s3','replace-disabled-connection','numeric-provision','numeric','standard-provision']: raise ValueError('QUERY_BROWSER_MODE_INVALID')
     binding=runtime_binding()
     web=web_binding() if mode in ['ui-s1','ui-s3'] else None
     prerequisites=None
@@ -999,6 +1018,7 @@ def host(mode):
 
 def platform_start():
     """只创建本任务新合成TLS平台PG，原KEEP和共享镜像只读保护。"""
+    resource_admission(['platform-pg'], cold=True)
     import os
     import secrets
     import socket
@@ -1015,16 +1035,18 @@ def platform_start():
         return subprocess.check_output(['docker', '--context', 'desktop-linux', *args], timeout=15)
     info = json.loads(docker('info', '--format', '{{json .}}'))
     running = []
-    for cid in docker('ps', '-q').decode().split():
-        item = json.loads(docker('inspect', cid))[0]
-        running.append(dict(id=item['Id'], memory=item['HostConfig']['Memory'], nanoCpus=item['HostConfig']['NanoCpus'],
-                            taskId=item['Config'].get('Labels', {}).get('ontology.task-id')))
-    if any(not item['memory'] or not item['nanoCpus'] for item in running):
-        raise ValueError('QUERY_EXISTING_CAPACITY_UNKNOWN')
-    if sum(item['memory'] for item in running) + 6500 * 1024**2 > min(info['MemTotal'], 14 * 1024**3):
-        raise ValueError('QUERY_COMBINED_MEMORY_BUDGET')
-    if sum(item['nanoCpus'] for item in running) + 5 * 10**9 > min(info['NCPU'], 16) * 10**9:
-        raise ValueError('QUERY_COMBINED_CPU_BUDGET')
+    if TASK != 'G4-M5-INTEGRATION-001':
+        running = []
+        for cid in docker('ps', '-q').decode().split():
+            item = json.loads(docker('inspect', cid))[0]
+            running.append(dict(id=item['Id'], memory=item['HostConfig']['Memory'], nanoCpus=item['HostConfig']['NanoCpus'],
+                                taskId=item['Config'].get('Labels', {}).get('ontology.task-id')))
+        if any(not item['memory'] or not item['nanoCpus'] for item in running):
+            raise ValueError('QUERY_EXISTING_CAPACITY_UNKNOWN')
+        if sum(item['memory'] for item in running) + 6500 * 1024**2 > min(info['MemTotal'], 14 * 1024**3):
+            raise ValueError('QUERY_COMBINED_MEMORY_BUDGET')
+        if sum(item['nanoCpus'] for item in running) + 5 * 10**9 > min(info['NCPU'], 16) * 10**9:
+            raise ValueError('QUERY_COMBINED_CPU_BUDGET')
     with socket.socket() as probe:
         probe.bind(('127.0.0.1', PROFILE.ports['platform']))
     image = 'postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437'
@@ -1049,7 +1071,7 @@ def platform_start():
     project = PROFILE.text('ontology-g4-m4-query-impl-01')
     labels = {'ontology.task-id': TASK, 'ontology.run-id': RUN, 'ontology.synthetic': 'true'}
     spec = {'name': project, 'services': {'platform-pg': {
-        'image': image, 'platform': 'linux/arm64', 'pull_policy': 'never', 'mem_limit': '768m', 'cpus': 0.75,
+        'image': image, 'platform': 'linux/arm64', 'pull_policy': 'never', 'mem_limit': PROFILE.resources['platform-pg']['memory'], 'cpus': PROFILE.resources['platform-pg']['cpu']/1e9,
         'pids_limit': 128, 'init': True, 'read_only': True, 'security_opt': ['no-new-privileges:true'],
         'cap_drop': ['ALL'], 'cap_add': ['CHOWN', 'SETUID', 'SETGID', 'DAC_OVERRIDE', 'FOWNER'], 'labels': labels,
         'environment': {'POSTGRES_DB': 'query', 'POSTGRES_USER': 'postgres', 'POSTGRES_PASSWORD_FILE': '/run/secrets/password'},
@@ -1088,6 +1110,7 @@ GRANT SELECT ON production.query_assets_unknown TO fixture_reader;
 
 def source_start():
     """只创建M4独占合成源，复用本任务内部网络，历史服务保持KEEP。"""
+    resource_admission(['pg-source'])
     import os
     import secrets
     import socket
@@ -1105,12 +1128,14 @@ def source_start():
     info = json.loads(docker('info', '--format', '{{json .}}'))
     if info['ID'] != platform['engineId']: raise ValueError('QUERY_ENGINE_DRIFT')
     running = []
-    for cid in docker('ps', '-q').decode().split():
-        item = json.loads(docker('inspect', cid))[0]
-        running.append(dict(id=item['Id'], memory=item['HostConfig']['Memory'], nanoCpus=item['HostConfig']['NanoCpus']))
-    if any(not item['memory'] or not item['nanoCpus'] for item in running): raise ValueError('QUERY_CAPACITY_UNKNOWN')
-    if sum(item['memory'] for item in running) + 768*1024**2 > min(info['MemTotal'], 14*1024**3): raise ValueError('QUERY_MEMORY_BUDGET')
-    if sum(item['nanoCpus'] for item in running) + 750000000 > min(info['NCPU'],16)*10**9: raise ValueError('QUERY_CPU_BUDGET')
+    if TASK != 'G4-M5-INTEGRATION-001':
+        running = []
+        for cid in docker('ps', '-q').decode().split():
+            item = json.loads(docker('inspect', cid))[0]
+            running.append(dict(id=item['Id'], memory=item['HostConfig']['Memory'], nanoCpus=item['HostConfig']['NanoCpus']))
+        if any(not item['memory'] or not item['nanoCpus'] for item in running): raise ValueError('QUERY_CAPACITY_UNKNOWN')
+        if sum(item['memory'] for item in running) + 768*1024**2 > min(info['MemTotal'], 14*1024**3): raise ValueError('QUERY_MEMORY_BUDGET')
+        if sum(item['nanoCpus'] for item in running) + 750000000 > min(info['NCPU'],16)*10**9: raise ValueError('QUERY_CPU_BUDGET')
     network = json.loads(docker('network','inspect',platform['project']+'_platform'))[0]
     if not network['Internal'] or network['Labels'].get('ontology.task-id') != TASK: raise ValueError('QUERY_NETWORK_DRIFT')
     with socket.socket() as probe: probe.bind(('127.0.0.1',PROFILE.ports['source']))
@@ -1218,6 +1243,7 @@ def test_database_control(container, suffix, create):
 
 def persistence_test(source=False):
     """内部网络中执行正式工厂测试，短命容器精确登记并回收。"""
+    resource_admission(['persistence-test'])
     import os
     import subprocess
     import uuid
@@ -1260,7 +1286,7 @@ def persistence_test(source=False):
     receipt_path.write_text(json.dumps(lifecycle, indent=2)+'\n')
     command = [*prefix, 'run', '--pull=never', '--name', name, '--network', record['project']+'_platform',
                '--label', 'ontology.task-id='+TASK, '--label', 'ontology.run-id='+RUN,
-               '--read-only', '--cap-drop=ALL', '--security-opt=no-new-privileges', '--memory=768m', '--cpus=0.5', '--pids-limit=128',
+               '--read-only', '--cap-drop=ALL', '--security-opt=no-new-privileges', '--memory='+str(PROFILE.resources['persistence-test']['memory']), '--cpus='+str(PROFILE.resources['persistence-test']['cpu']/1e9), '--pids-limit=128',
                '--tmpfs', '/tmp:size=64m,mode=1777', '--env-file', str(envfile),
                '--mount', 'type=bind,src='+str(directory)+',dst=/app,readonly',
                '--mount', 'type=bind,src='+str(private/'server.crt')+',dst=/run/query-ca.crt,readonly',
@@ -1325,6 +1351,7 @@ def persistence_test(source=False):
 
 def runtime_agent_test(binding_race=False, aba_inflight=False, preflight=False):
     """真实MAF只恢复当前精确Query；复用正式API只读挂载，不运行迁移或Sweep。"""
+    resource_admission(['maf-test'])
     import subprocess
     import uuid
     from workflow_execution import run, sha, encoded
@@ -1354,7 +1381,7 @@ def runtime_agent_test(binding_race=False, aba_inflight=False, preflight=False):
     try:
         created=runtime_command('query-maf-container-create',[*prefix,'create','--pull=never','--name',name,
             '--network',PROFILE.text('ontology-g4-m4-query-impl-01_platform'),'--label','ontology.task-id='+TASK,'--label','ontology.run-id='+RUN,
-            '--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--user','501:20','--memory=768m','--cpus='+('2' if TASK=='G4-M5-INTEGRATION-001' else '0.5'),'--pids-limit=128',
+            '--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--user','501:20','--memory='+str(PROFILE.resources['maf-test']['memory']),'--cpus='+str(PROFILE.resources['maf-test']['cpu']/1e9),'--pids-limit=128',
             '--tmpfs','/tmp:size=64m,mode=1777','--volumes-from',api+':ro','--mount','type=bind,src='+str(directory)+',dst=/tests,readonly',
             '--workdir','/private/api','-e','ASPNETCORE_ENVIRONMENT=Development','-e','DOTNET_CLI_HOME=/tmp/dotnet','-e','DOTNET_EnableDiagnostics=0',
             '-e','DOTNET_CLI_TELEMETRY_OPTOUT=1','-e','TESTINGPLATFORM_TELEMETRY_OPTOUT=1','-e','XDG_DATA_HOME=/tmp/data',
@@ -1364,7 +1391,7 @@ def runtime_agent_test(binding_race=False, aba_inflight=False, preflight=False):
             '-e','G4_QUERY_BINDING_RACE='+('1' if binding_race else '0'),
             '-e','G4_QUERY_RUNTIME_ACTOR='+json.dumps(state['latestQuery']['actor'],separators=(',',':')),
             '-e','G4_QUERY_RUNTIME_TEST='+TASK+':'+RUN,'-e','G4_QUERY_RUNTIME_QUERY_ID='+state['latestQuery']['queryId'],
-            image,'sh','-c',"""dotnet /runtime/QueryLoopback.dll & bridge=$!; trap 'kill "$bridge" 2>/dev/null || true' EXIT; dotnet /tests/OntologyPlatform.AgentTests.dll --filter FullyQualifiedName~G4QueryMafRuntimeTests --timeout ${G4_TEST_TIMEOUT:-45s} --zero-tests-policy strict --results-directory /tmp/TestResults; result=$?; if [ -f /tmp/aba-inflight.json ]; then cat /tmp/aba-inflight.json; fi; exit "$result";"""])
+            image,'sh','-c',"""dotnet /runtime/QueryLoopback.dll & bridge=$!; trap 'kill "$bridge" 2>/dev/null || true' EXIT; dotnet /tests/OntologyPlatform.AgentTests.dll --filter FullyQualifiedName~G4QueryMafRuntimeTests.ActualMafUsesCurrentGatewayAndOnePersistentBudget --timeout ${G4_TEST_TIMEOUT:-45s} --zero-tests-policy strict --results-directory /tmp/TestResults; result=$?; if [ -f /tmp/aba-inflight.json ]; then cat /tmp/aba-inflight.json; fi; exit "$result";"""])
         cid=created.stdout.decode().strip();lifecycle.update(id=cid,status='CREATED');path.write_text(json.dumps(lifecycle,indent=2)+'\n')
         runtime_command('query-maf-container-network',[*prefix,'network','connect',PROFILE.text('ontology-g4-m4-query-impl-01_edge'),cid])
         inputs={p.name:sha(p.read_bytes()) for p in directory.glob('*.dll')}

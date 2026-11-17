@@ -145,11 +145,15 @@ def plan(base, head):
     if git(ROOT,'rev-parse','HEAD').decode().strip()!=head: raise ValueError('PLAN_HEAD_NOT_CHECKED_OUT')
     if git(ROOT,'status','--porcelain').strip(): raise ValueError('PLAN_DIRTY: commit the candidate first')
     paths=sorted(set(git(ROOT,'diff','--name-only','--no-renames','-z',base,head).decode().split('\0'))-{''})
+    evidence_tasks = sorted({path.split('/')[2] for path in paths if path.startswith('docs/evidence/') and len(path.split('/')) > 3})
+    measurements = [measure_committed_evidence(ROOT, base, head, task) for task in evidence_tasks
+                    if task == 'G4-M5-INTEGRATION-001']
+
     result=select_gates(paths)
     keys={name:input_key(ROOT,name) for name in registry()}
     if git(ROOT,'status','--porcelain').strip() or git(ROOT,'rev-parse','HEAD').decode().strip()!=head:
         raise ValueError('PLAN_INPUT_CHANGED_DURING_CHECK')
-    return dict(schemaVersion=1,base=base,head=head,paths=paths,registrySha256=digest(REGISTRY.read_bytes()),inputKeys=keys,**result)
+    return dict(schemaVersion=1,base=base,head=head,paths=paths,registrySha256=digest(REGISTRY.read_bytes()),inputKeys=keys,earlyMeasurements=measurements,**result)
 
 
 def ordered(names):
@@ -387,8 +391,65 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
             row['publishedLog']=record;row['logPath']=record['path']
             write(target/(row['gate']+'.json'),row)
             write(run/(row['gate']+'.state.json'),{k:row[k] for k in ('status','inputKey','environmentKey','errorSignature')})
+    if publish and task == 'G4-M5-INTEGRATION-001':
+        result['earlyMeasurement'] = dict(status='NOT_READY', reason='New evidence awaits candidate commit; workflow plan automatically measures that committed candidate', representativePaths=[row.get('logPath') for row in rows])
     write(run/'receipt.json',result)
     return result
+
+
+def measure_committed_evidence(root, base, head, task):
+    """归档后首次计划自动精测当前已提交证据；使用生产构包器且不宣称验收。"""
+    from workflow_execution import run
+    candidate_paths = git(root, 'diff', '--name-only', base, head, '--', 'docs/evidence/'+task+'/').decode().splitlines()
+    candidate_paths = [path for path in candidate_paths if path.endswith('.json') and any(part in path for part in ('/gates/', '/originals/', '/reports/'))]
+    if not candidate_paths:
+        return dict(status='NOT_READY', reason='No newly committed representative report or gate output')
+    directory = root/'artifacts/workflow'/task/'package-measurements'
+    directory.mkdir(parents=True, exist_ok=True)
+    identity = digest(canonical([base, head, candidate_paths, digest((root/'scripts/create-review-package.ps1').read_bytes())]))
+    path = directory/(identity+'.json')
+    if path.exists():
+        previous = json.loads(path.read_text())
+        for stream in ('stdout', 'stderr'):
+            original = previous['commandReceipt'][stream]
+            if digest(safe_file(original['path']).read_bytes()) != original['sha256']:
+                raise ValueError('MEASUREMENT_ORIGINAL_DRIFT')
+        return previous
+    result = run(['pwsh', '-NoProfile', '-File', 'scripts/create-review-package.ps1', '-Root', str(root),
+                  '-BaseSha', base, '-HeadSha', head, '-TaskId', task, '-Status', 'NOT_RUN', '-MeasureOnly'],
+                 root, task=task, stage='early-package-measurement', timeout=180)
+    row = dict(status='BLOCKED', base=base, head=head, representativePaths=candidate_paths,
+               commandId=result.receipt['commandId'], exitCode=result.receipt['exitCode'], commandReceipt=result.receipt)
+    if result.stdout:
+        measurement = json.loads(result.stdout)
+        if measurement.get('measurement') == 'EXACT_CANDIDATE':
+            expected_members = [path.replace('docs/evidence/', 'review-evidence/', 1) for path in candidate_paths]
+            if not set(expected_members) <= set(measurement['members']):
+                raise ValueError('EARLY_REPRESENTATIVE_NOT_INCLUDED')
+            row['measurement'] = measurement
+            budget_path = 'docs/evidence/'+task+'/entry-fix-01/measurement-growth-budget.json'
+            budget_exists = git(root, 'ls-tree', '--name-only', head, '--', budget_path).decode().strip()
+            if budget_exists:
+                budget = json.loads(git(root, 'show', head+':'+budget_path))
+                if budget['taskId'] != task or budget['base'] != base:
+                    raise ValueError('MEASUREMENT_GROWTH_IDENTITY')
+                categories = budget['categories']
+                if not isinstance(categories, list) or not categories or any(not entry.get('basis') for entry in categories):
+                    raise ValueError('MEASUREMENT_GROWTH_INVALID')
+                values = [budget['metadataReserveBytes'], budget['safetyReserveBytes']]
+                values += [entry[key] for entry in categories for key in ('remainingCount', 'reservedBytesEach')]
+                if any(type(value) is not int or value < 0 for value in values):
+                    raise ValueError('MEASUREMENT_GROWTH_INVALID')
+                reserved = sum(entry['remainingCount'] * entry['reservedBytesEach'] for entry in categories) + sum(values[:2])
+                row['growthBudget'] = budget
+                row['projectedUpperBytes'] = measurement['sizeBytes'] + reserved
+                row['sizeAdmission'] = 'WITHIN_RESERVED_BUDGET' if row['projectedUpperBytes'] <= 15*1024**2 else 'BLOCKED_BY_RESERVED_BUDGET'
+            else:
+                row['sizeAdmission'] = 'UNKNOWN_REMAINING_EVIDENCE_BUDGET'
+    if result.returncode == 0:
+        row['status'] = 'MEASURED_NOT_READY_FOR_ACCEPTANCE'
+    write(path, row)
+    return row
 
 
 def package_budget(root, base, head, task):

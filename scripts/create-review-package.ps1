@@ -832,7 +832,8 @@ try {
         Write-Output ((Get-ReviewMemberPlan $snapshot) | ConvertTo-Json -Depth 8 -Compress)
         exit 0
     }
-    $localValidation = $SchemaVersion -eq 3 -and $ValidationSource -ceq 'LOCAL'
+    $earlyMeasurement = $MeasureOnly -and $Status -ceq 'NOT_RUN' -and $SchemaVersion -eq 3 -and $ValidationSource -ceq 'LOCAL'
+    $localValidation = $SchemaVersion -eq 3 -and $ValidationSource -ceq 'LOCAL' -and -not $earlyMeasurement
     if ($localValidation -and ($CiRunId -or $CiRunUrl -or $CiCommit -or $CiConclusion -or -not $EvidencePath)) { throw 'LOCAL_EVIDENCE: local V3 requires committed EvidencePath and no remote CI override' }
     $runtimeCi = $null
     if ($CiRunId -or $CiRunUrl -or $CiCommit -or $CiConclusion) {
@@ -840,7 +841,7 @@ try {
         $runtimeCi = [ordered]@{ status = $(if ($CiConclusion -eq 'success') { 'PASS' } else { 'FAIL' }); runId = $CiRunId; url = $CiRunUrl; commit = $CiCommit; conclusion = $CiConclusion }
     }
     if ($SchemaVersion -eq 3) {
-        if (-not $localValidation) {
+        if (-not $localValidation -and -not $earlyMeasurement) {
         $declaredCi = $runtimeCi
         if (-not $CiRunId -and $EvidencePath -and $snapshot.GitBytes.ContainsKey($EvidencePath)) { $CiRunId = (($script:utf8.GetString($snapshot.GitBytes[$EvidencePath]) | ConvertFrom-Json -AsHashtable).ci.runId) }
         $runtimeCi = Get-ReviewObservedCi $Root $CiRunId $HeadSha
@@ -849,7 +850,13 @@ try {
         if ($snapshot.DiffCheckExit -ne 0) { throw 'DIFF_CHECK: V3 refuses a failing full Base/Head diff-check' }
     }
     $localBinding = if ($localValidation) { Get-ReviewLocalBinding $Root $snapshot $EvidencePath $HeadSha } else { $null }
+    if ($earlyMeasurement -and -not $EvidencePath -and $null -ne $snapshot.ReductionPolicy) {
+        $EvidencePath = $snapshot.ReductionPolicy.validationPath
+    }
     $evidence = Get-ReviewEvidence $snapshot $EvidencePath $Status $runtimeCi $localValidation
+    if ($earlyMeasurement) {
+        $evidence = @{ checks = @(@{ name = 'candidate-measurement'; command = $null; status = 'NOT_RUN'; exitCode = $null; output = 'Current committed candidate only; acceptance not evaluated.' }); ci = @{ status = 'NOT_RUN'; runId = $null; url = $null; commit = $null; conclusion = $null } }
+    }
     if ((($Status -eq 'PASS' -and -not $localValidation) -or ($SchemaVersion -ge 2 -and $evidence.ci.status -in @('PASS', 'FAIL'))) -and $evidence.ci.commit -cne $HeadSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
     $branch = (Invoke-ReviewGit $Root @('rev-parse', '--abbrev-ref', 'HEAD')).Text.Trim()
     $gitVersion = (Invoke-ReviewGit $Root @('--version')).Text.Trim()
@@ -909,7 +916,7 @@ try {
             }
         } finally { $measure.Dispose() }
         $size = $memory.Length; $memory.Dispose()
-        Write-Output ([ordered]@{ measurement = 'EXACT_CANDIDATE'; sizeBytes = $size; limitation = 'Exact in-memory candidate only; subsequent package timestamps and ignored inventory metadata can differ, so final actual 15MiB enforcement remains mandatory.'; members = @($members.Keys | Sort-Object -CaseSensitive); status = $(if ($size -gt 15MB) { 'BLOCKED' } else { 'PASS' }) } | ConvertTo-Json -Depth 8 -Compress)
+        Write-Output ([ordered]@{ measurement = 'EXACT_CANDIDATE'; sizeBytes = $size; limitation = 'Exact in-memory candidate only; subsequent package timestamps and ignored inventory metadata can differ, so final actual 15MiB enforcement remains mandatory.'; members = @($members.Keys | Sort-Object -CaseSensitive); status = $(if ($size -gt 15MB) { 'BLOCKED' } elseif ($earlyMeasurement) { 'MEASURED_NOT_READY_FOR_ACCEPTANCE' } else { 'PASS' }); baseSha = $BaseSha; headSha = $HeadSha; uncollected = @('Evidence generated after HeadSha', 'Final acceptance metadata'); remainingGrowthBytes = $null } | ConvertTo-Json -Depth 8 -Compress)
         exit $(if ($size -gt 15MB) { 1 } else { 0 })
     }
     $outputDirectory = Join-Path $Root 'artifacts/reviews'

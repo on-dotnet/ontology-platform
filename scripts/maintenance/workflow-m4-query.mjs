@@ -35,7 +35,7 @@ if (mode === "serve") {
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: port(15442),
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["ready", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
+} else if (["ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -90,6 +90,7 @@ async function browserRun(mode) {
     const actor = { context, page, headers: { Origin: origin } };
     actor.headers["X-CSRF-TOKEN"] = (await get(actor, "/auth/csrf")).requestToken;
     actor.me = await get(actor, "/api/v1/platform/me");
+    actor.sessionCookie = cookie.value;
     return actor;
   }
   async function save(state) {
@@ -158,13 +159,38 @@ async function browserRun(mode) {
         if (!value) { const error = new Error(); error.safeCode = "PREREQUISITE_STALE:" + key; throw error; }
       };
       prerequisite("session", Boolean(operator.me.subjectId && auditor.me.subjectId));
+      const probeSession = () => JSON.parse(execFileSync("python3", ["-B", "-c",
+        `import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m5_integration as q;print(json.dumps(q.browser_session_ready(json.load(sys.stdin))))`],
+        { cwd: root, encoding: "utf8", timeout: 60000, input: JSON.stringify([operator, auditor].map(actor => ({ cookie: actor.sessionCookie, subjectId: actor.me.subjectId }))) }));
+      const sessionProbe = probeSession();
+      prerequisite("session", sessionProbe.status === "READY");
+      report.sessionPreflight = sessionProbe;
+      if (["ready-session-expired", "ready-session-short"].includes(mode)) {
+        const sessionHash = sessionProbe.observations[0].sessionHash;
+        const changeExpiry = value => JSON.parse(execFileSync("python3", ["-B", "-c",
+          'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_m5_integration as q;print(json.dumps(q.session_expiry_control(sys.argv[1],sys.argv[2])))', sessionHash, value],
+          { cwd: root, encoding: "utf8", timeout: 15000 }));
+        const changed = changeExpiry(mode === "ready-session-expired" ? "expired" : "short");
+        let rejected = false;
+        try {
+          try { probeSession(); }
+          catch (error) { rejected = error.status !== 0 && String(error.stderr).includes("PREREQUISITE_STALE:session_deadline"); }
+        } finally {
+          const restored = changeExpiry(changed.before);
+          check("original_session_expiry_restored", Date.parse(restored.after) === Date.parse(changed.before));
+          report.sessionNegative = { changed, restored, rejected, businessOperationStarted: false };
+        }
+        check("same_session_deadline_rejected_before_long_operation", rejected);
+        report.status = "PASS"; report.scope = "SESSION_PREREQUISITE_COUNTEREXAMPLE_ONLY";
+        return;
+      }
       prerequisite("scenario", state.scenario === scenario);
       prerequisite("connection", Boolean(state.connectionId));
       const connection = await get(operator, `/api/v1/connections/${state.connectionId}`);
       prerequisite("connection", connection.state === "ACTIVE");
       const local = JSON.parse(execFileSync("python3", ["-B", "-c",
         `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.local_ready(${mode.startsWith("ui-") ? "True" : "False"},${mode === "mapping" ? "False" : "True"})))`],
-        { cwd: root, encoding: "utf8", timeout: 30000 }));
+        { cwd: root, encoding: "utf8", timeout: 60000 }));
       if (mode !== "mapping") {
         prerequisite("activation", Boolean(state.mappingReceipt));
         const active = await get(operator, `/api/v1/mappings/${state.mappingDraft.mappingId}/active`);

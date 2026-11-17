@@ -1,5 +1,7 @@
 # 当前授权：G4-M5-INTEGRATION-001
 
+2026-11-17追加授权已审切片收尾与三个入口修正，见[精确附件](../evidence/G4-M5-INTEGRATION-001/entry-fix-01/authorization.md)。阶段A仅将main从a6716b11c3795e5670c07f1ca37057e5649bed89快进到b5e3b65d1a3359e8fd778700f525321333df61d2，已完成回读。阶段B沿用原分支/Worktree，工程增量普通push后停ChatGPT复审；main授权不扩展至新Head。采用原已审V3＋工程增量交付例外。以下2026-11-16授权为前序范围，冲突处以本追加授权为准。
+
 2026-11-16用户明确批准[一次性批次附件](../evidence/G4-M5-INTEGRATION-001/authorization.md)的A/B/C；唯一执行状态、路径所有权、准入与恢复见[任务卡](G4-M5-INTEGRATION-001.md)。基线`a6716b11c3795e5670c07f1ca37057e5649bed89`，任务分支`codex/g4-m5-integration-001`，独立托管树，Master单写＋只读Explorer/非作者Reviewer。
 
 批准当前入口收敛/上下文降噪/按影响检查、并行M5盘点、既有PG合同真实整合及必要最小修复、离线构建/受影响测试/限定合成设施、普通提交push、唯一最终V3和非作者重开。A/B通过后自动继续C，不另等P0或普通helper/测试/打包审批。2026-11-16用户另行明确批准仅暂停任务卡所列6个M3容器；容器/卷/数据保留。同日另行批准沿用M4双网络：任务edge为bridge，平台/源PG保持internal，端口仅loopback；bridge具出站能力，不声明网络层完全断网，见任务卡追加授权原件。

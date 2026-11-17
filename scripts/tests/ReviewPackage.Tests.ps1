@@ -1400,6 +1400,17 @@ for i in range(53):
         try { $null = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask } catch { $rejected = $_.Exception.Message.Contains('REDUCTION_APPROVAL') }
         Assert-True $rejected 'M5 wrong ancestor accepted'
     }
+    Case 'early committed representative evidence measures without final PASS or ZIP' {
+        Write-Fixture 'docs/evidence/TEST-001/representative.json' '{"taskId":"TEST-001","status":"NOT_RUN","observations":["first real output shape"]}'
+        $script:head = Commit-Fixture
+        $actual = Invoke-Package -Local -DeclaredStatus NOT_RUN -Extra @('-MeasureOnly')
+        Assert-True ($actual.Exit -eq 0) "Early measurement rejected: $($actual.Output)"
+        $measured = $actual.Output | ConvertFrom-Json -AsHashtable
+        Assert-True ($measured.status -ceq 'MEASURED_NOT_READY_FOR_ACCEPTANCE') 'Early size became acceptance'
+        Assert-True ($measured.members -ccontains 'review-evidence/TEST-001/representative.json') 'New representative absent from measured candidate'
+        Assert-True ($measured.headSha -ceq $script:head) 'Measurement candidate changed'
+        Assert-True (-not (Test-Path (Join-Path $script:repo 'artifacts/reviews'))) 'Early measurement published ZIP'
+    }
     Case 'member plan and exact candidate share production V3 bytes without publishing ZIP' {
         Write-LocalFixture 'docs/evidence/TEST-001/local.json' (@{ evidenceSchemaVersion = 2; validationSource = 'LOCAL'; testedCommit = $script:head; checks = @(@{ name = 'fixture'; command = 'fixture only'; status = 'PASS'; exitCode = 0; output = 'not product evidence' }); ci = @{ status = 'NOT_RUN'; runId = $null; url = $null; commit = $null; conclusion = $null } } | ConvertTo-Json -Depth 6)
         $script:head = Commit-Fixture
