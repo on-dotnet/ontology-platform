@@ -1,0 +1,129 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "4a6486e67c9125c690f92ed3a4bf2d664254695c",
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "checks": [
+    {
+      "name": "EF01-workflow",
+      "command": "python3 -B scripts/tests/Workflow.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "24 tests; zero skips; command f9e08d94fd92423cb3319ad8257b85a3; three production fixture positives and 19 mutated-output negatives"
+    },
+    {
+      "name": "package-full-attempt",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1",
+      "status": "FAIL",
+      "exitCode": -9,
+      "output": "TIMEOUT after240s; 122 named cases completed; not a successful whole process; command28e2598f0f6f4a16ad5f3c17f94c0696"
+    },
+    {
+      "name": "reduction-retains-15MiB-creation-and-reopen-hard-limit",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'reduction retains 15MiB creation and reopen hard limit'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 case, zero skips; commandId=b0feb2ea7fb54e00b2b874803807cd92"
+    },
+    {
+      "name": "reduction-VerifyOnly-rejects-rehashed-policy",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'reduction VerifyOnly rejects rehashed policy'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 case, zero skips; commandId=25020ab2166243bfae1996dacf38cc42"
+    },
+    {
+      "name": "reduction-VerifyOnly-rejects-rehashed-missing-policy",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'reduction VerifyOnly rejects rehashed missing-policy'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 case, zero skips; commandId=4012731191334f16b3e5e4ecfa88d5e2"
+    },
+    {
+      "name": "reduction-VerifyOnly-rejects-rehashed-index",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'reduction VerifyOnly rejects rehashed index'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 case, zero skips; commandId=27eb6e9e9e7c4d06b78ca8402faa9dea"
+    },
+    {
+      "name": "reduction-VerifyOnly-rejects-rehashed-diff",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'reduction VerifyOnly rejects rehashed diff'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 case, zero skips; commandId=1967f5b750a54b2c835db8bdf93100ab"
+    },
+    {
+      "name": "reduction-VerifyOnly-rejects-rehashed-changes",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'reduction VerifyOnly rejects rehashed changes'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 case, zero skips; commandId=44c98c02460843dc94db5d3e6306539f"
+    },
+    {
+      "name": "m4-reduction-binds-approval-and-restores-full-current-original-closure",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'm4 reduction binds approval and restores full current original closure'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 case, zero skips; commandId=b86662e934174a8fa1d14d3f111bf3b0"
+    },
+    {
+      "name": "m5-reduction-preserves-current-evidence-and-rejects-identity-or-closure-drift",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'm5 reduction preserves current evidence and rejects identity or closure drift'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 case, zero skips; commandId=5cfb764c31dd462f95e97b7068910ae8"
+    },
+    {
+      "name": "early-committed-representative-evidence-measures-without-final-PASS-or-ZIP",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'early committed representative evidence measures without final PASS or ZIP'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 case, zero skips; commandId=55344c21dd6c436e84e7eb94d6c21290"
+    },
+    {
+      "name": "member-plan-and-exact-candidate-share-production-V3-bytes-without-publishing-ZIP",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'member plan and exact candidate share production V3 bytes without publishing ZIP'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 case, zero skips; commandId=5bdaecb454a148e3910ce311fae8a683"
+    },
+    {
+      "name": "valid-committed-evidence-preserves-command-and-status",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'valid committed evidence preserves command and status'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 case, zero skips; commandId=0ae3eab1eeef49f599bfe6683939452a"
+    },
+    {
+      "name": "EF01-production-map-case",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'early measurement exposes*'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "1 new case; command414341e2d55347b69b0c22512e3d6899"
+    }
+  ],
+  "metadata": {
+    "taskId": "G4-M5-INTEGRATION-001",
+    "scope": "EF01_ENGINEERING_ONLY",
+    "executionHead": "f620b8917b6bf4e25f6484fd67be5216023ee1dd",
+    "commitBinding": "Tests executed against working-tree code; exact four tested source hashes independently reviewed and rebound to testedCommit blobs after commit",
+    "sourceBindings": {
+      "scripts/maintenance/workflow.py": "8235e1a9d379931b6cceb23663cef02afda6382d926900b4f4b986b23b6fa0b8",
+      "scripts/create-review-package.ps1": "93b2d697404e9a821c2ce147932dea4fa9757e3c69e6bc79fa9c54058a187f8f",
+      "scripts/tests/Workflow.Tests.py": "d4a85e87a85b3852d3a927bf2fed5c3eccb411b1c7746a169625083933526ea5",
+      "scripts/tests/ReviewPackage.Tests.ps1": "df8edd14bb57b6286e05830c06e2fc290b12bc5409899c38813dea9b8e4e5445"
+    },
+    "compatibility": "134 unique current-batch cases, not successful whole full-suite invocation",
+    "timingStatus": "ACTUAL_COMMAND_RECEIPTS; timeout and actual exitCode retained separately",
+    "G4Overall": "PARTIAL",
+    "productExecution": "NOT_RUN",
+    "agentActiveTime": "UNKNOWN"
+  }
+}

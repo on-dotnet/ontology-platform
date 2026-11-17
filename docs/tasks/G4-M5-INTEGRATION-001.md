@@ -1,7 +1,7 @@
 # G4-M5-INTEGRATION-001｜工程入口收敛与PG整合
 
 ## 当前执行与授权
-唯一执行状态：EF01_VERIFIED_PENDING_DELIVERY。前轮工程增量f620已交付，现按entry-fix-02追加授权修复早期量包逻辑映射去重兼容；main保持已审b5e3，G4Overall=PARTIAL，最终停ChatGPT复审。
+唯一执行状态：EF01_REVIEW_HANDOFF；工程验证已完成，最终Git/ZIP交付后验以entry-fix-02包外机器回执为准。前轮工程增量f620已交付，现按entry-fix-02追加授权修复早期量包逻辑映射去重兼容；main保持已审b5e3，G4Overall=PARTIAL，最终停ChatGPT复审。
 
 人类已批准[一次性A/B/C批次](../evidence/G4-M5-INTEGRATION-001/authorization.md)，以及[精确M3暂停和M4双网络拓扑](../evidence/G4-M5-INTEGRATION-001/additional-authorization.json)。没有普通helper、修复、构包待批事项。
 
@@ -57,3 +57,5 @@ M5运行7容器、6GiB/4.5CPU；含M4共同12GiB/9CPU；最终实测明细与宿
 EF-01验收：真实生产PowerShell去重输出先复现旧消费者EARLY_REPRESENTATIVE_NOT_INCLUDED；使用snapshot.Mapping和实际成员摘要接受合法共享载荷，当前Head源blob/SHA/长度及Task/Base/Head逐一核对。缺映射/载荷、冲突、错误身份和篡改继续拒绝；缓存协议精准失效并重新解释原始stdout。真实夹具与定向原件归档entry-fix-02，完整工程patch以已审b5e3为Base，另列f620以来窄增量。
 
 EF-01当前定向验证通过：真实旧生产者exit0/旧消费者精确误拒绝RED保留；24项工作流测试、三种真实产消正例、19组真实输出变异及缓存反例通过。公共构包134个唯一用例本轮覆盖完整：整集122项完成后240秒TIMEOUT，保留真实exit-9，仅补11项并复用已过新增1项，不冒称整集进程exit0。非作者协议及兼容审查原文转录见entry-fix-02/reports。最终patch/新增原件/普通ZIP及Git回读由本轮包外回执闭合；原产品及f620工程ZIP不可变。
+
+EF-01源码资格绑定提交4a6486e67c9125c690f92ed3a4bf2d664254695c：四项源码SHA与实际测试输入一致；之后只补本任务证据/状态。仓库静态及schema2证据预检通过。正常push原分支后交ChatGPT复审，main只保持b5e3；本轮未操作服务、未跑numeric/MAF/ABA。
