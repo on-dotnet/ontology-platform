@@ -2,7 +2,7 @@
   "taskId": "G4-M5-INTEGRATION-001",
   "base": "b5e3b65d1a3359e8fd778700f525321333df61d2",
   "scope": "ENGINEERING_INCREMENT_ONLY",
-  "status": "TARGETED_CHECKS_PASS_MEASUREMENT_PENDING",
+  "status": "TARGETED_CHECKS_PASS",
   "checks": [
     {
       "name": "integration-entry",
@@ -87,12 +87,12 @@
       "actualTestExitCode": 2,
       "tests": 1,
       "skipped": 0,
-      "commandId": "d534b37dc6444512b5e576432973dbee",
+      "commandId": "7590b7305c3a4266827f495d95e80f06",
       "reason": "PREREQUISITE_STALE:query_session_deadline",
       "businessExecutorStarted": false,
       "proof": "assertion in ActualMafUsesCurrentGatewayAndOnePersistentBudget precedes gateway and executor; actual stack and output retained",
-      "buildCommandId": "33b47f78b2db4ef98d08315af3aad106",
-      "originals": "originals/commands/d534b37dc6444512b5e576432973dbee/"
+      "buildCommandId": "12f7f7968f964e85b51f58a7a6d6fd53",
+      "originals": "originals/commands/7590b7305c3a4266827f495d95e80f06/"
     },
     {
       "name": "ready-session-expired",
@@ -118,7 +118,7 @@
     }
   ],
   "sourceBindings": {
-    "backend/tests/OntologyPlatform.AgentTests/G4QueryMcpTests.cs": "03e07bbb250dd2f63e9f6747e2c92e5dfff2677d6ae09e79236347416aeba7b8",
+    "backend/tests/OntologyPlatform.AgentTests/G4QueryMcpTests.cs": "1824b9fbcbf116c9281a0edf865c262a427d59130d490dab47a9e8f269b6441d",
     "scripts/create-review-package.ps1": "4dc86cedc74f31b00512e0a46834fb4f5a24bb7531a9475310b61f795498cb17",
     "scripts/maintenance/workflow-m4-query.mjs": "45a1f022b62c6d593338658a30ce62bbaf8a4df7bace65354aa2fc2e12802389",
     "scripts/maintenance/workflow.py": "96c8292a3ad867f947cabe374178f7fc454fc9e89e38bd1729782eb5adeaf895",
@@ -134,5 +134,7 @@
   "firstMafTimeoutRootCause": "UNKNOWN",
   "oldRealm404RootCause": "UNKNOWN",
   "G4Overall": "PARTIAL",
-  "independentReview": "PENDING_FINAL"
+  "independentReview": "PASS_ENGINEERING_SCOPE: non-author-source-review.json; semantic JSON transcribed verbatim by Master from reviewer response",
+  "measurement": "See automatic-measurement.json: actual automatic entry rejects oversize full V3 candidate",
+  "format": "changed-test-format.json: 28 inherited whitespace diagnostics, 0 introduced; full formatter pipe-blocked"
 }

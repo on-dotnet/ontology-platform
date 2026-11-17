@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M5-INTEGRATION-001",
+  "evidenceBatch": "entry-fix-01",
+  "reviewer": "/root/entry_fix_review",
+  "independentNonAuthor": true,
+  "reviewMode": "READ_ONLY",
+  "observedAtUtc": "2026-11-17T00:24:24.415194+00:00",
+  "base": "b5e3b65d1a3359e8fd778700f525321333df61d2",
+  "reviewedHead": "4414963eaff256f3437c167dc493206998661ea9",
+  "status": "PASS_ENGINEERING_SCOPE",
+  "findings": [],
+  "closedFindings": [
+    {"id": "M4_SECONDARY_UNINITIALIZED_COUNTERS", "status": "CLOSED", "evidence": "Current source restores M4 memory/cpu initialization; affected M4 compatibility result is separately recorded."},
+    {"id": "STOPPED_CONTAINER_QUOTA_UNDERESTIMATE", "status": "CLOSED", "evidence": "Current resource admission compares existing target container quotas with the shared profile before resume; stopped instances remain counted as slots."},
+    {"id": "BROWSER_SESSION_EXPIRY_INFERRED", "status": "CLOSED", "evidence": "The actual browser Cookie is passed only through stdin to the existing API container. The test host uses the formal Cookie format and TicketStore, then reads the exact persistent session expiry. Actual expired and short-lived session negatives were observed."},
+    {"id": "TEST_DLL_SOURCE_BINDING", "status": "CLOSED", "evidence": "The current build-binding inputs and binaries match filesystem hashes. Build command 33b47f78b2db4ef98d08315af3aad106 exited 0; its output hashes were independently checked."},
+    {"id": "MAF_CROSS_PROCESS_READY_REUSE", "status": "CLOSED", "evidence": "The exact original query session and proposal prerequisites are checked inside the same actual MAF method before the executor. Original submit and approval session deadlines are also checked."},
+    {"id": "NEGATIVE_GROWTH_RESERVES", "status": "CLOSED", "evidence": "Current code independently requires all original count and reserve values to be nonnegative integers before arithmetic; category basis is required. The stable workflow test command passed 21 tests."}
+  ],
+  "entryCoverage": {
+    "resource": {"status": "PASS_ENGINEERING_SCOPE", "entryPoints": ["platform_start", "source_start", "runtime_start", "runtime_second_api", "runtime_secondary_state(true)", "runtime_api_resume", "runtime_persist_query_keyring", "persistence_test", "runtime_agent_test"], "verifiedBehavior": "Shared admission precedes allocation. Entry tests cover insufficient capacity, occupied stopped-container slots, reduced Engine limits and unknown running quotas, with no allocation commands called. Cold planning does not require a running API or database."},
+    "scenario": {"status": "PASS_ENGINEERING_SCOPE", "verifiedBehavior": "Provision orders known schema preparation before discovery. Actual browser-session negatives use the same Cookie and restore the precise expiry. Runtime entry tests cover service, catalog and activation failures. Original-query session rejection occurs before gateway/executor."},
+    "earlyMeasurement": {"status": "PASS_EXPECTED_OVERSIZE_REJECTION", "verifiedBehavior": "The actual committed plan automatically invoked production MeasureOnly with NOT_RUN, included both new representative reports, and rejected the oversized candidate without producing another persistent product ZIP.", "planHead": "4414963eaff256f3437c167dc493206998661ea9", "measurementCommandId": "d41c9d04c15546c8a880c65647051728", "actualExitCode": 1, "measuredSizeBytes": 19836930, "hardLimitBytes": 15728640, "measurementStatus": "BLOCKED", "projectedUpperBytes": 20974626, "sizeAdmission": "BLOCKED_BY_RESERVED_BUDGET", "representativeMembersVerified": ["review-evidence/G4-M5-INTEGRATION-001/entry-fix-01/reports/entry-checks.json", "review-evidence/G4-M5-INTEGRATION-001/entry-fix-01/reports/entry-review-progress.json"], "persistentProductZipCountObserved": 1, "deliveryInterpretation": "This is successful verification of the early refusal path. The candidate is not approved as a formal V3 package. The explicitly authorized original-V3-plus-engineering-increment delivery remains applicable."}
+  },
+  "executionEvidenceIndependentlyChecked": [
+    {"commandId": "5623d5947bee42108b2db0e8fec966f0", "stage": "entry-stable-Workflow.Tests.py", "actualExitCode": 0, "tests": 21, "streamsSha256Verified": true},
+    {"commandId": "8eb40257c4e84b908587fbaa49b7ebd7", "stage": "entry-stable-WorkflowIntegration.Tests.py", "actualExitCode": 0, "tests": 17, "streamsSha256Verified": true},
+    {"commandId": "3e1369954f5c400ab38aa9c71c78d795", "stage": "entry-stable-ExecutionPreflight.Tests.py", "actualExitCode": 0, "tests": 12, "streamsSha256Verified": true},
+    {"commandId": "10b6f6f7d98145c78b6fa6ad5f29b41a", "stage": "entry-package-compatibility", "actualExitCode": 0, "tests": 133},
+    {"commandId": "33b47f78b2db4ef98d08315af3aad106", "stage": "query-build-OntologyPlatform.AgentTests", "actualExitCode": 0, "streamsSha256Verified": true, "currentSourceAndBinaryHashesVerified": true},
+    {"commandId": "d534b37dc6444512b5e576432973dbee", "stage": "browser-current-session-preflight", "actualExitCode": 2, "tests": 1, "failed": 1, "skipped": 0, "classification": "EXPECTED_REJECTION", "exactObservedReason": "PREREQUISITE_STALE:query_session_deadline", "streamsSha256Verified": true, "executorNotReached": "Verified from exact assertion and current method ordering", "additionalObservedStderr": "Missing libgssapi_krb5.so.2 diagnostic was retained; the required exact session-deadline assertion was independently confirmed."},
+    {"report": "browser-ready-session-expired-1794873876250.json", "reportSha256Verified": true, "observedApiPostCount": 0},
+    {"report": "browser-ready-session-short-1794874343399.json", "reportSha256Verified": true, "observedApiPostCount": 0}
+  ],
+  "scopeChecks": {"productSource": "NO_CHANGE_OBSERVED", "publicDto": "NO_CHANGE_OBSERVED", "databaseSemantics": "NO_PRODUCT_CHANGE_OBSERVED", "fiveSecondBudget": "NO_CHANGE_OBSERVED", "dependencyLocks": "NO_CHANGE_OBSERVED", "baseToReviewedHeadDiffCheckExitCode": 0, "entryChecksSourceBindings": "ALL_CURRENT_HASHES_MATCH"},
+  "acceptanceBoundary": {"originalProductEvidence": "REUSED_PRODUCT_BASELINE_ONLY", "currentDriverFullMafAbaBusiness": "NOT_RUN", "currentEngineeringEntryChecks": "FRESH", "firstMafTimeoutRootCause": "UNKNOWN", "oldRealm404RootCause": "UNKNOWN", "G4Overall": "PARTIAL", "CI": "NOT_RUN", "production": "NOT_RUN", "nonPgMappingQuery": "NOT_RUN", "dualArchitecture": "NOT_RUN"},
+  "remainingDeliveryPostconditions": ["Preserve the complete reviewed-base-to-final-head patch, including full new-file contents.", "Include referenced command receipts, stdout, stderr and reports as directly readable originals in the engineering increment.", "Validate the engineering increment archive member paths and hashes.", "Record final task-branch commit and ordinary push readback.", "Record that main remains at the separately authorized reviewed product commit and does not contain the new engineering head.", "Any later source change beyond reviewedHead requires affected revalidation and review."],
+  "recordingInstruction": "Master may save this JSON verbatim as the nonauthor review original, clearly identifying Master transcription. This approval covers the reviewed engineering implementation and observed evidence. Final archive and Git postconditions are recorded separately."
+}

@@ -85,8 +85,14 @@ public sealed partial class G4QueryMafRuntimeTests
             var session = await database.Sessions.Where(row => row.Id == key).Select(row => new { row.ExpiresAtUtc, row.RevokedAtUtc }).SingleAsync();
             Assert.IsNull(session.RevokedAtUtc);
             Assert.IsTrue(session.ExpiresAtUtc > deadline);
-            observations.Add(new { @case = "M5_BROWSER_SESSION_READY", subjectId = item.GetProperty("subjectId").GetString(), session.ExpiresAtUtc, requiredUntilUtc = deadline,
-                sessionHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(key!))) });
+            observations.Add(new
+            {
+                @case = "M5_BROWSER_SESSION_READY",
+                subjectId = item.GetProperty("subjectId").GetString(),
+                session.ExpiresAtUtc,
+                requiredUntilUtc = deadline,
+                sessionHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(key!)))
+            });
         }
         // 只允许调用者预先登记的本任务临时目录内的固定报告名。
         var report = Environment.GetEnvironmentVariable("G4_BROWSER_REPORT")!;

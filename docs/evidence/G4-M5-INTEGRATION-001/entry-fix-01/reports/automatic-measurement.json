@@ -1,0 +1,37 @@
+{
+  "taskId": "G4-M5-INTEGRATION-001",
+  "base": "b5e3b65d1a3359e8fd778700f525321333df61d2",
+  "measuredHead": "4414963eaff256f3437c167dc493206998661ea9",
+  "entryCommand": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow.py",
+    "plan",
+    "--base",
+    "b5e3b65d1a3359e8fd778700f525321333df61d2",
+    "--head",
+    "4414963eaff256f3437c167dc493206998661ea9",
+    "--output",
+    "artifacts/workflow/G4-M5-INTEGRATION-001/entry-fix-01/candidate-plan.json"
+  ],
+  "entryCommandId": "27f590ab3c794290a545f2acf2c9def6",
+  "entryExitCode": 0,
+  "measurementCommandId": "d41c9d04c15546c8a880c65647051728",
+  "measurementExitCode": 1,
+  "actualSizeBytes": 19836930,
+  "projectedUpperBytes": 20974626,
+  "sizeAdmission": "BLOCKED_BY_RESERVED_BUDGET",
+  "measurementStatus": "BLOCKED",
+  "entryQualification": "PASS_EXPECTED_OVERSIZE_REJECTION",
+  "representativePaths": [
+    "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-01/reports/entry-checks.json",
+    "docs/evidence/G4-M5-INTEGRATION-001/entry-fix-01/reports/entry-review-progress.json"
+  ],
+  "representativeMembersPresent": true,
+  "persistentZipCreated": false,
+  "scope": "FULL_V3_CANDIDATE_MEASUREMENT_ONLY_NOT_INCREMENT_ZIP",
+  "deliveryException": "User explicitly approved original reviewed V3 plus ordinary engineering increment",
+  "reason": "Base b5e3 is outside the narrowly scoped original a671-based historical selection; full source/history candidate is over hard limit. No historical file removed or selection rule broadened.",
+  "original": "originals/entry-fix-01/candidate-plan.json",
+  "originalSha256": "98bf456239ebc13ae650c1b95e613d4e1a27f13d7de8238e8b33b67e5c580649"
+}

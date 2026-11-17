@@ -46,4 +46,6 @@ M5运行7容器、6GiB/4.5CPU；含M4共同12GiB/9CPU；最终实测明细与宿
 
 ## 2026-11-17 入口修正
 
-授权见 entry-fix-01/authorization.md。Master单写，entry_fix_review非作者只读。Base=b5e3b65d1a3359e8fd778700f525321333df61d2，原分支及Worktree。owned_paths严格限附件第3节；产品源码/合同/依赖/历史证据只读。AC-01所有资源创建入口共享冷准入，AC-02同一真实长场景入口即时核前提，AC-03首代表性证据自动纯测量。当前均NOT_RUN。复用既有测试及账本，证据批次entry-fix-01，运行资源Run仍integration-01。原已审V3＋完整工程patch/实际原件/回执/非作者审查交付，停ChatGPT复审。
+授权见 entry-fix-01/authorization.md。Master单写，entry_fix_review非作者只读。Base=b5e3b65d1a3359e8fd778700f525321333df61d2，原分支及Worktree。owned_paths严格限附件第3节；产品源码/合同/依赖/历史证据只读。AC-01所有资源创建入口共享冷准入，AC-02同一真实长场景入口即时核前提，AC-03首代表性证据自动纯测量。AC-01/AC-02定向入口验收通过；AC-03实际plan自动精测19836930字节并在15MiB硬限前拒绝，无新正式V3。非作者源码审查PASS_ENGINEERING_SCOPE，源码候选4414963eaff256f3437c167dc493206998661ea9。复用既有测试及账本，证据批次entry-fix-01，运行资源Run仍integration-01。原已审V3＋完整工程patch/实际原件/回执/非作者审查交付，停ChatGPT复审。
+
+阶段B收尾：资源入口17、工作流21、M4兼容16、公共预检12、构包兼容133项定向测试通过；当前构建绑定与同一原查询会话短拒绝已实测。完整MAF/ABA本轮NOT_RUN，原产品只按已审基线复用，首次超时及旧realm404原因UNKNOWN。工程完整差异/原始双流/机器回执/审查原件由普通工程增量资料ZIP承载，非正式V3；Git及最终资料包后验见包外回执。main只到b5e3，阶段B停ChatGPT复审。
