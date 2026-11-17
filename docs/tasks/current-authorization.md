@@ -1,17 +1,11 @@
-# 当前授权：G4-M5-INTEGRATION-001
+# 当前授权：G4-DORIS-MAPPING-QUERY-001
 
-2026-11-17追加EF-01窄范围续作已获用户明确批准，见[授权原文](../evidence/G4-M5-INTEGRATION-001/entry-fix-02/authorization.md)。从f620b8917b6bf4e25f6484fd67be5216023ee1dd继续原分支/Worktree，仅量包映射消费/缓存及生产测量摘要和对应测试；main保持b5e3。原V3＋普通工程增量交付，旧ZIP/entry-fix-01原件保留，不启动服务、不重跑产品链，普通push后停ChatGPT复审。
+2026-11-17用户明确批准“工程增量合并＋Doris映射/查询规格批次”。唯一执行状态、路径所有权与恢复见[任务卡](G4-DORIS-MAPPING-QUERY-001.md)，唯一实施申请见[A–F](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)。
 
-2026-11-17追加授权已审切片收尾与三个入口修正，见[精确附件](../evidence/G4-M5-INTEGRATION-001/entry-fix-01/authorization.md)。阶段A仅将main从a6716b11c3795e5670c07f1ca37057e5649bed89快进到b5e3b65d1a3359e8fd778700f525321333df61d2，已完成回读。阶段B沿用原分支/Worktree，工程增量普通push后停ChatGPT复审；main授权不扩展至新Head。采用原已审V3＋工程增量交付例外。以下2026-11-16授权为前序范围，冲突处以本追加授权为准。
+阶段A只允许main从`b5e3b65d1a3359e8fd778700f525321333df61d2`精确快进至`606ca2d2c61964e6498dd72d5e9ad960d3593bf7`，已普通push并回读，复用已审工程包/机器回执/非作者重开；134唯一用例并集不替代整集-9/TIMEOUT。包外main回执在主树artifacts/reviews/G4-DORIS-MAPPING-QUERY-001。
 
-2026-11-16用户明确批准[一次性批次附件](../evidence/G4-M5-INTEGRATION-001/authorization.md)的A/B/C；唯一执行状态、路径所有权、准入与恢复见[任务卡](G4-M5-INTEGRATION-001.md)。基线`a6716b11c3795e5670c07f1ca37057e5649bed89`，任务分支`codex/g4-m5-integration-001`，独立托管树，Master单写＋只读Explorer/非作者Reviewer。
+阶段B已批准独立托管树和`codex/g4-doris-mapping-query-001`文档分支；Master单写、只读核对、非作者Review、轻量检查、普通提交push。新文档Head不合main，停ChatGPT规格裁决。当前未授权产品实施、DTO/数据库/锁变更、制品下载、prepare/restore、服务启动停止、KEEP处置、TDengine或G5。本规格阶段不ZIP，未来产品实施完成默认唯一V3规则不变。
 
-批准当前入口收敛/上下文降噪/按影响检查、并行M5盘点、既有PG合同真实整合及必要最小修复、离线构建/受影响测试/限定合成设施、普通提交push、唯一最终V3和非作者重开。A/B通过后自动继续C，不另等P0或普通helper/测试/打包审批。2026-11-16用户另行明确批准仅暂停任务卡所列6个M3容器；容器/卷/数据保留。同日另行批准沿用M4双网络：任务edge为bridge，平台/源PG保持internal，端口仅loopback；bridge具出站能力，不声明网络层完全断网，见任务卡追加授权原件。
+前一授权原字节固定于`606ca2d2c61964e6498dd72d5e9ad960d3593bf7:docs/tasks/current-authorization.md`，可git show恢复；不继续全文堆叠。M3/M4已批PG合同与M2已交付Doris连接器是事实依据，不授权扩大到生产或非PG业务读取。
 
-本轮仅PG整合切片；G4总体PARTIAL。零新增下载/依赖/费用；不改公开DTO/持久语义/权限/5秒预算；不更新main、不生产、不恢复TDengine、不进入G5/G6/G7；其它KEEP与历史原件不删除/覆写。资源上限及真实停止条件以附件与任务卡为准。
-
-优先级：系统/平台安全边界始终有效；最新人类明确授权＞[现行本地政策](../development/local-validation-policy.md)＞目录规则＞通用skill示例。旧阶段停止句仅对应历史任务；不能据历史许可扩张本轮。
-
-历史授权原文由[精确索引](../evidence/G4-M5-INTEGRATION-001/history-index.json)记录Base、路径、blob与SHA256，以`git show <commit>:<path>`恢复。当前能力统一见[G4规划入口](../planning/g4-implementation-plan.md)，不重复全文历史授权。
-
-现行细则：[效率与按影响验收](../development/ai-development-efficiency.md)、[V3交付](../development/review-package-spec.md)、[资源生命周期](../development/resource-lifecycle.md)。
+系统/平台安全边界始终有效；最新人类明确授权＞[现行政策](../development/local-validation-policy.md)＞目录规则＞通用示例。现行[效率](../development/ai-development-efficiency.md)、[V3](../development/review-package-spec.md)、[生命周期](../development/resource-lifecycle.md)继续适用。G4总体PARTIAL。

@@ -1,6 +1,6 @@
 # G4当前能力与规划入口
 
-当前基线：`a6716b11c3795e5670c07f1ca37057e5649bed89`；G4总体 **PARTIAL**。当前执行为[G4-M5-INTEGRATION-001](../tasks/G4-M5-INTEGRATION-001.md)，人类批准只整合既有PG能力，不表示原M5五源/全冶金流程/双架构完成。
+当前主线：`606ca2d2c61964e6498dd72d5e9ad960d3593bf7`，2026-11-17已精确合并工程增量并回读；G4总体 **PARTIAL**。当前执行为[Doris Mapping/Query规格](../tasks/G4-DORIS-MAPPING-QUERY-001.md)，仅文档与只读核对，业务实施待裁决；不表示五源/全冶金流程/双架构完成。
 
 ## 已合并能力与缺口
 
@@ -13,7 +13,7 @@
 | M2 TDengine | WAIT_FOR_EXTERNAL_INPUT；该源任务未并入当前基线 | 本轮不恢复 |
 | M3 Mapping | 单PG连接、≤2显式TABLE、每表≤12字段/≤100合成行、有限numeric、异人审核/发布/激活/回滚；见[M3任务](../tasks/G4-M3-MAPPING-001.md) | 非PG/跨源/自由表达式 |
 | M4 Query | 单PG三受控G4能力、固定5秒、六态/UI/MCP/canonical恢复、numeric/ABA；见[M4任务](../tasks/G4-M4-QUERY-001.md) | 三独立源失败组合、cursor分页、跨源、生产 |
-| M5当前 | PG纵向组合及工程入口收敛进行中 | 证据以当前任务为准，不把历史PASS当本次FRESH |
+| M5已合并 | 既有PG纵向组合＋工程入口收敛；工程Head606ca；整集-9/TIMEOUT保留，134唯一用例并集覆盖 | 非PG映射查询、五源/双架构仍未完成；旧产品资格不冒充本次FRESH |
 
 当前实际平台为Mac ARM64及Linux ARM64合成容器；Windows/AMD64、CI未运行项和真实模型/生产保持NOT_RUN。AI OFF；合成IdP直接禁用传播限制继续单列。
 
