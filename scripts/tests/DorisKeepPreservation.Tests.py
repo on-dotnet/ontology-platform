@@ -13,6 +13,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'maintenance'))
 import doris_keep_preservation as keep
 import doris_keep_drain as drain
 import doris_keep_readmit as readmit
+import doris_keep_cold as cold
+import doris_keep_fuseki as fuseki
 
 
 class RestoreGuards(unittest.TestCase):
@@ -107,6 +109,36 @@ class ReadmissionGuards(unittest.TestCase):
         with patch.object(drain, 'query', return_value=['connections."MappingJobs"']):
             with self.assertRaisesRegex(ValueError, 'PG_FENCE_OWNER_OR_COVERAGE_CHANGED'):
                 drain.verify_fence_owner({}, ['connections."MappingJobs"', 'connections."MappingOutboxs"'], 111)
+
+
+class FusekiAlternative(unittest.TestCase):
+    def test_exit_signal_alone_cannot_qualify(self):
+        event = {'service': 'fuseki', 'project': 'm4', 'id': 'original', 'result': 'FUSEKI_ENGINE_EXIT_PENDING_DATA'}
+        self.assertFalse(cold.qualified_exit(event, {'fusekiAlternative': True, 'coldVolumes': {}}))
+
+    def test_exact_cold_read_and_engine_are_both_required(self):
+        event = {'service': 'fuseki', 'project': 'm4', 'id': 'original', 'result': 'FUSEKI_TERM_AND_TDB2_VERIFIED',
+                 'after': {'FinishedAt': 'end', 'ExitCode': 143}}
+        engine = dict(signal='SIGTERM', engineStopTimeout=-1, finishedAt='end', oomKilled=False,
+                      engineError=False, exitCode=143, observedSeconds=0.4)
+        proof = dict(originalId='original', archiveSha256='aa', sourceBefore='aa', sourceAfter='aa', fullRead=True,
+                     scratchRemoved=True, publishedGraphsVerified=1, graphs=[{'triples': 4}], engine=engine,
+                     shutdownHook='UNKNOWN')
+        state = {'fusekiAlternative': True, 'coldVolumes': {'m4_fuseki-data': {'sha256': 'aa', 'tdb2': proof}}}
+        self.assertTrue(cold.qualified_exit(event, state))
+        proof['sourceAfter'] = 'different'
+        self.assertFalse(cold.qualified_exit(event, state))
+        proof['sourceAfter'] = 'aa'
+        engine['oomKilled'] = True
+        self.assertFalse(cold.qualified_exit(event, state))
+
+    def test_scan_rejects_missing_named_graph_binding(self):
+        import json
+        plain = {'head': {'vars': ['s','p','o']}, 'results': {'bindings': []}}
+        incomplete = {'head': {'vars': ['s','p','o','g']}, 'results': {'bindings': [{'s': {}, 'p': {}, 'o': {}}]}}
+        with patch.object(fuseki, 'request', side_effect=[json.dumps(plain), json.dumps(incomplete)]):
+            with self.assertRaisesRegex(ValueError, 'TDB2_INCOMPLETE_ROW'):
+                fuseki.full_scan('isolated')
 
 
 if __name__ == '__main__':

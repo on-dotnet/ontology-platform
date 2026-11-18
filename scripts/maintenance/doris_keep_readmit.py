@@ -1,5 +1,5 @@
 """从经独立审核的两次退出和一份冷备接续，仅处置余下十二个原 ID。"""
-from contextlib import ExitStack
+from contextlib import ExitStack, contextmanager
 import fcntl
 import json
 import os
@@ -96,32 +96,49 @@ def await_review(state, checkpoint):
     raise ValueError('REVIEW_WINDOW_ENDED')
 
 
+@contextmanager
+def reviewed_fence(state, databases):
+    """在同一组真实 PG 锁内完成连续采样、人审及后续写者处置。"""
+    platforms = [r for r in databases if r['service'] == 'platform-pg']
+    record_round(state, databases, 'before-fence', {})
+    tables = {r['containerId']: drain.product_tables(r) for r in platforms}
+    with ExitStack() as stack:
+        pids = {r['containerId']: stack.enter_context(drain.fence(r, tables[r['containerId']])) for r in platforms}
+        state.update(fencePids=pids, tables=tables)
+        for row in platforms:
+            drain.confirm(row, tables[row['containerId']])
+        def checkpoint(phase):
+            cold.read_pin()
+            for row in platforms:
+                cid = row['containerId']
+                drain.verify_fence_owner(row, tables[cid], pids[cid])
+            record_round(state, databases, phase, pids)
+
+        for i in range(3):
+            if i:
+                time.sleep(1)
+            checkpoint('admission-' + str(i + 1))
+        await_review(state, checkpoint)
+        yield checkpoint
+
+
+def stop_databases(state, originals, databases):
+    """应用全部退出后，逐个复核剩余数据库，最后关闭平台库。"""
+    remaining = sorted(databases, key=lambda r: r['service'] == 'platform-pg')
+    while remaining:
+        row = remaining[0]
+        cold.stop_one(originals[row['containerId']], state,
+                      lambda: record_round(state, remaining, 'before-' + row['containerId'], {}))
+        remaining.pop(0)
+
+
 def execute():
     keep.require(not cold.READMISSION.exists(), 'READMISSION_ALREADY_RECORDED')
     state, rows, originals, directory = previous()
     databases = [r for r in rows if r['service'] in ('pg-source', 'platform-pg')]
-    platforms = [r for r in databases if r['service'] == 'platform-pg']
     m4, m5 = keep.PROJECTS
     try:
-        record_round(state, databases, 'before-fence', {})
-        tables = {r['containerId']: drain.product_tables(r) for r in platforms}
-        with ExitStack() as stack:
-            pids = {r['containerId']: stack.enter_context(drain.fence(r, tables[r['containerId']])) for r in platforms}
-            state.update(fencePids=pids, tables=tables)
-            for row in platforms:
-                drain.confirm(row, tables[row['containerId']])
-            def checkpoint(phase):
-                cold.read_pin()
-                for row in platforms:
-                    cid = row['containerId']
-                    drain.verify_fence_owner(row, tables[cid], pids[cid])
-                record_round(state, databases, phase, pids)
-
-            for i in range(3):
-                if i:
-                    time.sleep(1)
-                checkpoint('admission-' + str(i + 1))
-            await_review(state, checkpoint)
+        with reviewed_fence(state, databases) as checkpoint:
             for service in ('api-secondary', 'api'):
                 row = next(r for r in originals.values() if (r['project'], r['service']) == (m5, service))
                 cold.stop_one(row, state, lambda: checkpoint('before-' + row['id']))
@@ -132,13 +149,7 @@ def execute():
                     cold.stop_one(row, state, lambda: checkpoint('before-' + row['id']))
                     cold.capture_cold(project + '_' + suffix, rows, state, directory)
             checkpoint('before-releasing-fences-for-pg')
-        # 全部应用写者已退出，分别在仍运行的准确 PG 上复核，最后关闭平台数据库。
-        remaining = sorted(databases, key=lambda r: r['service'] == 'platform-pg')
-        while remaining:
-            row = remaining[0]
-            cold.stop_one(originals[row['containerId']], state,
-                          lambda: record_round(state, remaining, 'before-' + row['containerId'], {}))
-            remaining.pop(0)
+        stop_databases(state, originals, databases)
         keep.require(len(state['coldVolumes']) == 8 and len(state['stopEvents']) == 14
                      and {e['id'] for e in state['stopEvents'] if e['result'] == 'GRACEFUL_EXIT'} == set(originals),
                      'COLD_SET_INCOMPLETE')

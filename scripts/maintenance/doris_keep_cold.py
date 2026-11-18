@@ -92,10 +92,13 @@ kill -TERM "$pid"
 
 
 READMISSION = keep.BASE / 'readmission-01-stop.json'
+FUSEKI_RESUME = keep.BASE / 'readmission-02-stop.json'
 
 
 def save(state):
     dest = READMISSION if 'readmission' in state else COLD_INDEX
+    if state.get('fusekiAlternative'):
+        dest = FUSEKI_RESUME
     tmp = dest.with_suffix('.pending')
     with tmp.open('w') as stream:
         json.dump(state, stream, indent=2)
@@ -147,7 +150,10 @@ def stop_one(row, state, before_signal=None):
         signal = keep.execute('inspect', '-f', '{{.Config.StopSignal}}', cid) or 'SIGTERM'
         keep.require(signal in ('SIGTERM', 'SIGINT'), 'UNEXPECTED_STOP_SIGNAL')
         event['requestedSignal'] = signal
+        event['stopTimeout'] = -1
+        event['controllerDeadlineSeconds'] = 45
         keep.execute('stop', '--timeout=-1', cid, limit=45)
+        event['engineCommandExit'] = 0
     original(row, 'exited')
     observed = json.loads(keep.execute('inspect', '-f', '{{json .State}}', cid))
     event['after'] = {k: observed[k] for k in ('Status', 'Running', 'ExitCode', 'OOMKilled', 'FinishedAt', 'StartedAt')}
@@ -158,9 +164,10 @@ def stop_one(row, state, before_signal=None):
     errors = bool(re.search(rb'out of memory|fatal (error|exception)|data corruption', raw, re.I))
     event.update(shutdownLogMarker=shutdown, logSha256=hashlib.sha256(raw).hexdigest(), logExit=logs.returncode)
     save(state)
+    alternative = service == 'fuseki' and state.get('fusekiAlternative') and event['requestedSignal'] == 'SIGTERM'
     keep.require(not observed['OOMKilled'] and not observed['Error'] and logs.returncode == 0 and not errors and
-                 (observed['ExitCode'] == 0 or observed['ExitCode'] == 143 and shutdown), 'GRACEFUL_EXIT_NOT_PROVEN')
-    event['result'] = 'GRACEFUL_EXIT'
+                 (observed['ExitCode'] == 0 or observed['ExitCode'] == 143 and (shutdown or alternative)), 'GRACEFUL_EXIT_NOT_PROVEN')
+    event['result'] = 'FUSEKI_ENGINE_EXIT_PENDING_DATA' if alternative else 'GRACEFUL_EXIT'
     read_pin()
     save(state)
 
@@ -235,14 +242,33 @@ def stop_and_capture():
     print(state['outcome'], len(state['coldVolumes']), len(state['stopEvents']), pin['id'])
 
 
+def qualified_exit(event, state):
+    if not state.get('fusekiAlternative') or event['service'] != 'fuseki':
+        return event['result'] == 'GRACEFUL_EXIT'
+    volume = event['project'] + '_fuseki-data'
+    proof = state['coldVolumes'].get(volume, {}).get('tdb2', {})
+    archive = state['coldVolumes'].get(volume, {}).get('sha256')
+    engine = proof.get('engine', {})
+    graphs = proof.get('graphs', [])
+    return (event['result'] == 'FUSEKI_TERM_AND_TDB2_VERIFIED' and proof.get('originalId') == event['id']
+            and archive and proof.get('archiveSha256') == proof.get('sourceBefore') == proof.get('sourceAfter') == archive
+            and proof.get('fullRead') is True and proof.get('scratchRemoved') is True and graphs
+            and proof.get('publishedGraphsVerified') == len(graphs) and proof.get('shutdownHook') == 'UNKNOWN'
+            and engine.get('signal') == 'SIGTERM' and engine.get('engineStopTimeout') == -1
+            and engine.get('finishedAt') == event['after']['FinishedAt'] and engine.get('oomKilled') is False
+            and engine.get('engineError') is False and engine.get('exitCode') == event['after']['ExitCode']
+            and 0 <= engine.get('observedSeconds', -1) <= 45)
+
+
 def release_after_review():
     """仅在非作者核准全部冷原件后调用；先完成最后一次完整回读，再释放最后的挂载。"""
     pin = read_pin()
-    state = json.loads((READMISSION if READMISSION.exists() else COLD_INDEX).read_text())
+    index = FUSEKI_RESUME if FUSEKI_RESUME.exists() else READMISSION if READMISSION.exists() else COLD_INDEX
+    state = json.loads(index.read_text())
     originals = preexisting()
     events = state['stopEvents']
     keep.require(state['outcome'] == 'ALL_STOPPED_COLD_CHECKED_PIN_HELD' and state['pin'] == pin['id'] and
-                 len(events) == 14 and {x['id'] for x in events if x['result'] == 'GRACEFUL_EXIT'} == set(originals)
+                 len(events) == 14 and {x['id'] for x in events if qualified_exit(x, state)} == set(originals)
                  and set(state['coldVolumes']) == set(VOLUMES), 'RELEASE_GATE')
     keep.require(keep.execute('ps', '-q', '--no-trunc').split() == [pin['id']], 'RUNNING_SET')
     for row in originals.values():
