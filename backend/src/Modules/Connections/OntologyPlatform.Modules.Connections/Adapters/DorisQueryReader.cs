@@ -38,6 +38,7 @@ internal static class DorisQueryReader
 
         return adapter.ReadBranchAsync(profile, secret, deadline, TimeProvider.System, async connection =>
         {
+            await DorisMappingSourceValidator.CheckTableAsync(connection, parent.HasValue);
             // 模板只由本次读取实体或目标的固定分支选择。
             var template = parent.HasValue ? TargetSql : EntitySql;
             await using var command = new MySqlCommand(template, connection);
@@ -57,19 +58,22 @@ internal static class DorisQueryReader
             }));
             // 两种模板的字段宽度均受批准的固定目录约束，LIMIT 101 保留超限哨兵。
             var result = new List<Dictionary<string, object?>>();
-            await using var rows = await command.ExecuteReaderAsync(CancellationToken.None);
-            while (await rows.ReadAsync(CancellationToken.None))
+            await using (var rows = await command.ExecuteReaderAsync(CancellationToken.None))
             {
-                if (result.Count >= 100) throw new SemanticOperationException(422, "query_source_row_budget");
-                if (rows.GetString(0) != scope.OrganizationId || rows.GetString(1) != scope.SiteIds[0])
-                    throw new SemanticOperationException(403, "query_source_forbidden");
-                // 保留驱动实际的 decimal、无时区时间及空值，业务映射另行解释。
-                var record = new Dictionary<string, object?>(rows.FieldCount, StringComparer.Ordinal);
-                for (int column = 0; column < rows.FieldCount; column++)
-                    record.Add(rows.GetName(column), rows.IsDBNull(column) ? null : rows.GetValue(column));
-                result.Add(record);
+                while (await rows.ReadAsync(CancellationToken.None))
+                {
+                    if (result.Count >= 100) throw new SemanticOperationException(422, "query_source_row_budget");
+                    if (rows.GetString(0) != scope.OrganizationId || rows.GetString(1) != scope.SiteIds[0])
+                        throw new SemanticOperationException(403, "query_source_forbidden");
+                    // 保留驱动实际的 decimal、无时区时间及空值，业务映射另行解释。
+                    var record = new Dictionary<string, object?>(rows.FieldCount, StringComparer.Ordinal);
+                    for (int column = 0; column < rows.FieldCount; column++)
+                        record.Add(rows.GetName(column), rows.IsDBNull(column) ? null : rows.GetValue(column));
+                    result.Add(record);
+                }
             }
             Activity.Current?.AddEvent(new ActivityEvent("doris.plan.rows_finished"));
+            await DorisMappingSourceValidator.CheckTableAsync(connection, parent.HasValue);
             return result;
         }, cancellationToken);
     }

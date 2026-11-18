@@ -68,6 +68,107 @@ public sealed class DorisMappingQueryTests
         }
     }
 
+    /// <summary>在产品读分支记录独立查询号、源值、会话偏移、业务时区解释及实际读取窗口。</summary>
+    private static async Task<(string Id, string Amount, string Instant, string Zone, DateTimeOffset Start, DateTimeOffset End)> ReadChangingEntity()
+    {
+        // 开始时间包住握手、实际读取及权限后验。
+        var start = DateTimeOffset.UtcNow;
+        // 由同一无池连接在数据查询之后立即读取其查询号。
+        var read = await Branch(async connection =>
+        {
+            await using var cmd = new MySqlCommand("SELECT /*+ SET_VAR(enable_sql_cache=false) */ amount,event_at,@@session.time_zone FROM fixture.dmq_entity WHERE org_id='org-demo' AND site_id='site-a' AND entity_id='E1' LIMIT 2", connection);
+            // 使用固定源精度保留两位定点数和六位微秒。
+            string amount, local, zone;
+            await using (var row = await cmd.ExecuteReaderAsync())
+            {
+                Assert.IsTrue(await row.ReadAsync());
+                amount = row.GetDecimal(0).ToString("F2", CultureInfo.InvariantCulture);
+                local = row.GetDateTime(1).ToString("yyyy-MM-dd HH:mm:ss.ffffff", CultureInfo.InvariantCulture);
+                zone = row.GetString(2);
+                Assert.IsFalse(await row.ReadAsync());
+            }
+            await using var last = new MySqlCommand("SELECT LAST_QUERY_ID()", connection);
+            // 查询号仅用于因果关联合成源，不充当数据水位。
+            var id = Convert.ToString(await last.ExecuteScalarAsync(), CultureInfo.InvariantCulture)!;
+            Assert.IsTrue(Regex.IsMatch(id, @"\A[0-9a-f]{1,16}-[0-9a-f]{1,16}\z", RegexOptions.IgnoreCase));
+            // 业务规则显式声明 UTC 和微秒精度，独立于上面实读的会话偏移。
+            var spec = new MappingTemporalSpec { Id = "time", EventTimeFieldRef = null, ObservedAtFieldRef = null,
+                ValidFromFieldRef = null, ValidToFieldRef = null, Precision = "MICROSECOND",
+                TimezonePolicy = new MappingTimezonePolicy { Kind = "REGISTERED_ZONE", ZoneId = "Etc/UTC" } };
+            // 测试沿用程序集私有方法，结果来自生产时间解释器。
+            var interpret = typeof(DorisSourceAdapter).Assembly.GetType("OntologyPlatform.Modules.Connections.DorisMappingTypeRules", true)!
+                .GetMethod("Instant", BindingFlags.NonPublic | BindingFlags.Static)!;
+            // 显式时区才可获得业务瞬间，过低精度和未登记时区均被拒绝。
+            var instant = (DateTimeOffset)interpret.Invoke(null, [local, spec])!;
+            foreach (var invalid in new[] { spec with { Precision = "SECOND" }, spec with { TimezonePolicy = spec.TimezonePolicy with { ZoneId = "Asia/Shanghai" } } })
+            {
+                var failure = Assert.ThrowsExactly<TargetInvocationException>(() => interpret.Invoke(null, [local, invalid]));
+                Assert.AreEqual("mapping_source_type_invalid", (failure.InnerException as SemanticOperationException)?.Code);
+            }
+            return (id, amount, instant.ToString("yyyy-MM-dd'T'HH:mm:ss.ffffff'Z'", CultureInfo.InvariantCulture), zone);
+        }, start.AddSeconds(5), CancellationToken.None);
+        return (read.id, read.amount, read.Item3, read.zone, start, DateTimeOffset.UtcNow);
+    }
+
+    /// <summary>独立控制面在两次已完成的正式源读取之间提交单键更新，最后复原并再次实读。</summary>
+    [TestMethod]
+    public async Task ControlledWriteBetweenSourceReads()
+    {
+        // 控制面凭据只出现在合成测试，产品实时验证自身只读账号。
+        var options = new MySqlConnectionStringBuilder { Server = "localhost", Port = 19030, UserID = "root",
+            Password = File.ReadAllText(Path.Combine(DirectoryPath, "root.pass")), Pooling = false,
+            SslMode = MySqlSslMode.VerifyFull, SslCa = Path.Combine(DirectoryPath, "tls", "ca.pem"), DefaultCommandTimeout = 2 };
+        await using var writer = new MySqlConnection(options.ConnectionString);
+        await writer.OpenAsync();
+        // 只允许修改原始 E1 的 amount，完整行的其他值冻结在首次建表夹具。
+        async Task Write(bool restore)
+        {
+            await using var cmd = new MySqlCommand("INSERT INTO fixture.dmq_entity VALUES ('org-demo','site-a','E1',1.00,@amount,'K','2026-11-01','2026-12-01','2026-11-17 12:00:00.123456','2026-11-17 12:00:01.123456')", writer);
+            cmd.Parameters.Add("@amount", MySqlDbType.Decimal).Value = restore ? 9007199254740993.20m : 9007199254740993.21m;
+            await cmd.ExecuteNonQueryAsync();
+        }
+        // 各窗口记录无池读连接在同一源提交前后的事实。
+        var observations = new List<object>();
+        async Task<string> Check(string expected)
+        {
+            // 观测值包含当前 SELECT 的准确 QueryId。
+            var actual = await ReadChangingEntity();
+            observations.Add(new { actual.Id, actual.Amount, actual.Instant, actual.Zone, actual.Start, actual.End });
+            Assert.AreEqual(expected, actual.Amount);
+            Assert.AreEqual("+00:00", actual.Zone);
+            Assert.AreEqual("2026-11-17T12:00:00.123456Z", actual.Instant);
+            return actual.Id;
+        }
+        // 初值必须匹配，否则不得向控制面提交写入。
+        var initial = await Check("9007199254740993.20");
+        // 写入开始与提交确认分别记录，第二个读取只能发生在确认后。
+        var writeStart = DateTimeOffset.UtcNow;
+        DateTimeOffset committed;
+        try
+        {
+            await Write(false);
+            committed = DateTimeOffset.UtcNow;
+            Assert.AreNotEqual(initial, await Check("9007199254740993.21"));
+        }
+        finally { await Write(true); }
+        await Check("9007199254740993.20");
+        // 原件只含本任务合成值、源查询号码与真实窗口。
+        var path = Path.Combine(Environment.GetEnvironmentVariable("DMQ_S0_EVIDENCE")!, $"ac11-{Guid.NewGuid():N}.json");
+        await using var file = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+        await JsonSerializer.SerializeAsync(file, new { observations, writeStart, committed, watermarkKind = "UNKNOWN",
+            watermark = (string?)null, fixtureWindow = "CONTROLLED_WRITE" });
+    }
+
+    /// <summary>通过正式关系固定计划验证同名表的模型或原生列类型变化会关闭该能力。</summary>
+    [TestMethod]
+    public async Task FixedTargetRejectsUnsupportedShape()
+    {
+        // 应在投影之前拒绝不兼容形状，不能把空表或驱动错误包装为通过。
+        var error = await Assert.ThrowsExactlyAsync<SemanticOperationException>(() =>
+            FixedPlan(true, DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None));
+        Assert.AreEqual("mapping_source_shape_invalid", error.Code);
+    }
+
     /// <summary>调用产品固定 SQL 生成和执行路径；主连接使用合成只读身份。</summary>
     private static Task<List<Dictionary<string, object?>>> FixedPlan(bool target, DateTimeOffset deadline, CancellationToken token)
     {

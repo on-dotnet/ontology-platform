@@ -15,9 +15,11 @@ def s0_consumers(root, task, phase):
         (directory+'DorisSourceAdapter.cs', ['ReadBranchAsync<T>', 'DorisReadSession.ReadAsync']),
         (directory+'DorisReadSession.cs', ['connection.ServerThread', 'KILL CONNECTION ', 'armed.ExecuteNonQueryAsync']),
         (directory+'DorisQueryReader.cs', ['FROM fixture.dmq_entity','FROM fixture.dmq_target','LIMIT 101','adapter.ReadBranchAsync']),
+        (directory+'DorisMappingSourceValidator.cs', ['SHOW CREATE TABLE fixture.', 'RequireShape','enable_unique_key_merge_on_write']),
         ('backend/tests/OntologyPlatform.ConnectionsTests/DorisMappingQueryTests.cs',
          ['ReadBranchAsync', 'RealDriverReadsFixedSource', 'ActiveBackendMustFinishInsideOriginalWindow', 'backend_active_tasks',
-          'FixedEntityCancellation','FixedTargetCancellation','ACTIVE_CANCELLATION_PRECONDITION_NOT_OBSERVED'])):
+          'FixedEntityCancellation','FixedTargetCancellation','ACTIVE_CANCELLATION_PRECONDITION_NOT_OBSERVED',
+          'ControlledWriteBetweenSourceReads','FixedTargetRejectsUnsupportedShape'])):
         source = source_path(root,relative).read_text()
         if any(term not in source for term in terms):
             raise ValueError('DMQ_S0_CONSUMER_MISSING')

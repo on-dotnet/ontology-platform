@@ -21,6 +21,9 @@ DIRECTORY = vm.ROOT / '.tools/security/g4-doris-mapping-query-001' / 'implementa
 INDEX = vm.OUTPUT / 's0-source-identities.json'
 COMPOSE = ['compose', '-p', PROJECT, '-f', 'infra/doris/compose.yaml', '-f', 'infra/doris/compose.test.yaml',
            '-f', 'infra/doris/compose.mapping-query.yaml']
+STRESS = vm.OUTPUT / 's0-stress-fixture-active.json'
+SHAPE = vm.OUTPUT / 's0-negative-shape-active.json'
+STRESS_TABLES = [('dmq_entity', 'entity_id', ('E1',)), ('dmq_target', 'target_id', ('T1', 'T2', 'T3'))]
 CLIENT = r'''set -eu
 umask 077
 file=$(mktemp /dev/shm/dmq-client.XXXXXXXX)
@@ -217,7 +220,7 @@ def resume():
     print(path.relative_to(vm.ROOT),events['status'])
 
 
-def ready_source(fe):
+def ready_source(fe, scratch=None):
     """端口健康后仍须等固定 FE 接收到准确版本的 BE 心跳。"""
     for group in ('FRONTENDS','BACKENDS'):
         deadline=time.monotonic()+60
@@ -231,7 +234,11 @@ def ready_source(fe):
                 break
             time.sleep(1)
         else: raise ValueError('RESUME_HEARTBEAT_DEADLINE')
-    vm.demand(sql(fe,'reader','SHOW TABLES FROM fixture;').splitlines()==['dmq_entity','dmq_target'],'RESUME_FIXTURE')
+    expected = ['dmq_entity','dmq_target']
+    if scratch is not None:
+        vm.demand(re.fullmatch('dmq_s0_[0-9a-f]{12}',scratch),'SHAPE_SCRATCH_NAME')
+        expected.append(scratch)
+    vm.demand(sql(fe,'reader','SHOW TABLES FROM fixture;').splitlines()==sorted(expected),'RESUME_FIXTURE')
 
 
 def driver(prepared, method):
@@ -250,23 +257,47 @@ def driver(prepared, method):
     for service in state['services'].values():
         vm.demand(docker('driver-identity','inspect','-f','{{.Id}} {{.Image}} {{.State.Status}} {{.State.Health.Status}} {{index .Config.Labels "ontology.task"}}',service['id'])
                   ==' '.join([service['id'],service['image'],'running','healthy',vm.TASK]),'DRIVER_SOURCE_DRIFT')
-    ready_source(state['services']['fe']['id'])
+    fe = state['services']['fe']['id']
+    shape = None
+    if method in ('driver-model-reject','driver-type-reject'):
+        shape = json.loads(SHAPE.read_bytes())
+        vm.demand(shape['phase']=='SWAPPED' and shape['method']==method and shape['services']==state['services'],'NEGATIVE_SHAPE_REQUIRED')
+    else:
+        vm.demand(not SHAPE.exists(),'SHAPE_ISOLATION')
+    ready_source(fe,shape['scratch'] if shape else None)
+    original = None
+    if method=='driver-ac11':
+        vm.demand(not STRESS.exists() and not (vm.OUTPUT/'s0-fixed-fixture-active.json').exists(),'AC11_ISOLATION')
+        original = stress_original(fe,'dmq_entity','entity_id',('E1',))
+        vm.demand(original=='7a7009c1fc43c542746436d44150f02f3e45cc2028fd375a142c03d5beccb34e' and
+                  sql(fe,'reader','SELECT COUNT(*) FROM fixture.dmq_entity;')=='1','AC11_BASELINE')
+    stress = None
+    if method.startswith('driver-stress-'):
+        stress = stress_binding(state)
+    else:
+        vm.demand(not STRESS.exists(),'STRESS_ISOLATION')
     env = dict(environment['environment'],DMQ_S0_SOURCE=str(DIRECTORY),DMQ_S0_EVIDENCE=str(vm.OUTPUT),
                DMQ_S0_BE_ID=state['services']['be']['id'],
                DOTNET_GCHeapHardLimit='0x18000000')
     test = {'driver-types':'RealDriverReadsFixedSource','driver-cancel':'ActiveBackendMustFinishInsideOriginalWindow',
             'driver-fixed-values':'FixedPlansReturnScopedValues','driver-fixed-entity':'FixedEntityCancellation',
-            'driver-fixed-target':'FixedTargetCancellation'}[method]
+            'driver-fixed-target':'FixedTargetCancellation','driver-stress-entity':'FixedEntityCancellation',
+            'driver-stress-target':'FixedTargetCancellation','driver-ac11':'ControlledWriteBetweenSourceReads',
+            'driver-model-reject':'FixedTargetRejectsUnsupportedShape','driver-type-reject':'FixedTargetRejectsUnsupportedShape'}[method]
     key = execution.sha(execution.encoded([binding,hashlib.sha256(INDEX.read_bytes()).hexdigest(),test,
-        hashlib.sha256(Path(__file__).read_bytes()).hexdigest()]))
+        hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),stress,shape]))
     result = execution.run([environment['dotnet'],str(vm.ROOT/'backend/tests/OntologyPlatform.ConnectionsTests/bin/Debug/net10.0/OntologyPlatform.ConnectionsTests.dll'),
               '--filter','FullyQualifiedName=OntologyPlatform.ConnectionsTests.DorisMappingQueryTests.'+test,
               '--minimum-expected-tests','1','--results-directory',str(vm.OUTPUT/'driver-results'),'--no-ansi','--progress','off'],
               vm.ROOT,task=vm.TASK,run_id=vm.RUN,stage=method,input_key=key,environment=env,timeout=20)
     count = mtp(result.stdout+result.stderr,1) if result.returncode==0 else None
-    receipt = dict(method=test,build=binding,command=result.receipt['commandId'],exitCode=result.returncode,passed=count)
+    receipt = dict(method=test,build=binding,stress=stress,shape=shape,command=result.receipt['commandId'],exitCode=result.returncode,passed=count)
+    if original is not None:
+        receipt['before'] = original
+        receipt['after'] = stress_original(fe,'dmq_entity','entity_id',('E1',))
     record(vm.OUTPUT/(method+'-'+receipt['command']+'.json'),receipt)
     print(json.dumps(receipt))
+    if original is not None: vm.demand(receipt['after']==original,'AC11_RESTORE')
     return result.returncode
 
 
@@ -278,6 +309,7 @@ def fixed_fixture(restore=False):
               '{{.Id}} {{index .Config.Labels "ontology.task"}} {{index .Config.Labels "ontology.run"}} {{.State.Status}}',fe)
               ==' '.join([fe,vm.TASK,vm.RUN,'running']),'FIXED_FIXTURE_OWNER')
     ready_source(fe)
+    vm.demand(not STRESS.exists(),'STRESS_ISOLATION')
     plan=[('dmq_entity','entity_id','E',['E1']),('dmq_target','target_id','T',['T1','T2','T3'])]
     pending=vm.OUTPUT/'s0-fixed-fixture-active.json'
     def snapshot(table,key):
@@ -322,7 +354,176 @@ def fixed_fixture(restore=False):
     print(result.relative_to(vm.ROOT))
 
 
+def stress_resources(state):
+    """记录当前用量和容器历史高水位，在卷上独立预留本次短时写入的空间。"""
+    live = docker('stress-live','ps','--no-trunc','-q').splitlines()
+    vm.demand(set(live)=={s['id'] for s in state['services'].values()},'STRESS_EXCLUSIVE_SOURCE')
+    facts = {}
+    for role,svc in state['services'].items():
+        check = docker('stress-owner','inspect','-f','{{.Id}} {{.Image}} {{index .Config.Labels "ontology.task"}} {{index .Config.Labels "ontology.run"}} {{.State.Health.Status}} {{.HostConfig.Memory}}',svc['id']).split()
+        cap = (4 if role=='fe' else 6)*vm.GIB
+        vm.demand(check==[svc['id'],svc['image'],vm.TASK,vm.RUN,'healthy',str(cap)],'STRESS_OWNER_CAP')
+        used,peak = map(int,docker('stress-memory','exec',svc['id'],'cat','/sys/fs/cgroup/memory.current','/sys/fs/cgroup/memory.peak').split())
+        facts[role] = dict(currentBytes=used,cgroupPeakBytes=peak,capBytes=cap)
+    volume = '/opt/apache-doris/be/storage'
+    free = int(docker('stress-disk','exec',state['services']['be']['id'],'df','-Pk',volume).splitlines()[-1].split()[3])*1024
+    facts['storageAvailableBytes'] = free
+    return facts
+
+
+def stress_original(fe,table,key,original):
+    values = ','.join("'"+v+"'" for v in original)
+    rows = sql(fe,'reader',f"SELECT * FROM fixture.{table} WHERE org_id='org-demo' AND site_id='site-a' AND {key} IN ({values}) ORDER BY org_id,site_id,{key};")
+    vm.demand([r.split('\t')[:3] for r in rows.splitlines()]==[['org-demo','site-a',v] for v in original],'STRESS_ORIGINAL_KEYS')
+    return hashlib.sha256(rows.encode()).hexdigest()
+
+
+def stress_counts(fe,table,key,prefix,size):
+    """唯一复合主键和无额外行的计数证明完整序号集合；复原只按列举的键删除。"""
+    vm.demand(re.fullmatch('DQ[0-9a-f]{12}',prefix) and 0<size<65536,'STRESS_NAMESPACE')
+    scope = f"org_id='org-demo' AND site_id='site-a' AND {key} REGEXP '^{prefix}[0-9]{{5}}$' AND {key} BETWEEN '{prefix}00000' AND '{prefix}{size-1:05d}'"
+    return list(map(int,sql(fe,'reader',f"SELECT COUNT(*),COUNT(IF({scope},1,NULL)) FROM fixture.{table};").split()))
+
+
+def stress_binding(state):
+    manifest = json.loads(STRESS.read_bytes())
+    vm.demand(manifest['status']=='SEEDED' and manifest['source']==state['services'] and
+              manifest['run']==vm.RUN,'STRESS_DRIVER_ADMISSION')
+    fe = state['services']['fe']['id']
+    for table,key,original in STRESS_TABLES:
+        count = 65536-len(original)
+        vm.demand(stress_counts(fe,table,key,manifest['prefix'],count)==[65536,count] and
+                  stress_original(fe,table,key,original)==manifest['tables'][table]['before'],'STRESS_DRIVER_DATA')
+    return dict(attempt=manifest['attempt'],manifestSha256=hashlib.sha256(STRESS.read_bytes()).hexdigest(),
+                rowsPerTable=65536,purpose='cancellation_only')
+
+
+def stress_fixture(restore=False):
+    """在唯一台账保护下临时扩充这两张合成表；与正式一百行门禁互斥。"""
+    state = json.loads(INDEX.read_bytes())
+    vm.demand(not SHAPE.exists() and state['project']==PROJECT and state['runId']==vm.RUN and state['taskId']==vm.TASK and
+              not (vm.OUTPUT/'s0-fixed-fixture-active.json').exists(),'STRESS_FIXTURE_SCOPE')
+    resources = stress_resources(state)
+    fe = state['services']['fe']['id']
+    ready_source(fe)
+    if restore:
+        manifest = json.loads(STRESS.read_bytes())
+        vm.demand(manifest['source']==state['services'] and manifest['run']==vm.RUN and
+                  manifest['prefix']=='DQ'+manifest['attempt'] and re.fullmatch('[0-9a-f]{12}',manifest['attempt']),'STRESS_RESTORE_OWNER')
+    else:
+        vm.demand(not STRESS.exists() and resources['storageAvailableBytes']>=2*vm.GIB and
+                  all(resources[r]['capBytes']-resources[r]['currentBytes']>=vm.GIB//2 for r in ('fe','be')),'STRESS_CAPACITY_OR_PENDING')
+        reviewed = json.loads((vm.ROOT/'docs/evidence'/vm.TASK/vm.RUN/'s0-fixed-plan-review.json').read_bytes())['hashes']
+        baseline = vm.OUTPUT/'s0-fixed-fixture-0da9ac2fd127ad4f-restored.json'
+        vm.demand(hashlib.sha256(baseline.read_bytes()).hexdigest()==reviewed[vm.RUN+'/'+baseline.name],'STRESS_REVIEWED_BASELINE')
+        previous = json.loads(baseline.read_bytes())
+        attempt = secrets.token_hex(6)
+        manifest = dict(attempt=attempt,prefix='DQ'+attempt,run=vm.RUN,source=state['services'],status='INTENT',
+                        beforeResources=resources,tables={},purpose='cancellation_only')
+        for table,key,original in STRESS_TABLES:
+            before = stress_original(fe,table,key,original)
+            vm.demand(stress_counts(fe,table,key,manifest['prefix'],65536-len(original))==[len(original),0] and
+                      previous['tables'][table]['before']==before and previous['tables'][table]['restored'],'STRESS_BASELINE')
+            manifest['tables'][table] = dict(before=before,planned=65536-len(original))
+        with STRESS.open('x') as out:
+            json.dump(manifest,out,indent=2)
+            out.flush()
+            os.fsync(out.fileno())
+    for table,key,original in STRESS_TABLES:
+        entry = manifest['tables'][table]
+        count = 65536-len(original)
+        prefix = manifest['prefix']
+        vm.demand(entry['planned']==count and stress_original(fe,table,key,original)==entry['before'],'STRESS_PRIOR_ROWS')
+        if restore:
+            total,owned = stress_counts(fe,table,key,prefix,count)
+            vm.demand(total==len(original)+owned,'STRESS_FOREIGN_ROWS')
+            if owned:
+                for start in range(0,count,2048):
+                    values = ','.join(f"'{prefix}{i:05d}'" for i in range(start,min(start+2048,count)))
+                    sql(fe,'root',f"DELETE FROM fixture.{table} WHERE org_id='org-demo' AND site_id='site-a' AND {key} IN ({values});",limit=40)
+            vm.demand(stress_counts(fe,table,key,prefix,count)==[len(original),0],'STRESS_RESTORE_COUNT')
+            entry['after'] = stress_original(fe,table,key,original)
+            vm.demand(entry['after']==entry['before'],'STRESS_RESTORE_BYTES')
+        else:
+            payload = "1.00,7.20,'K'" if key=='entity_id' else '1.000'
+            event = "CONCAT('2026-11-17 12:00:00.',LPAD(CAST(MOD(number*8191,1000000) AS STRING),6,'0'))"
+            insert = (f"INSERT INTO fixture.{table} SELECT 'org-demo','site-a',CONCAT('{prefix}',LPAD(CAST(number AS STRING),5,'0')),"
+                      f"{payload},'2026-11-01','2026-12-01',{event},'2026-11-17 12:00:01.123456' FROM numbers(\"number\"=\"{count}\");")
+            entry['insertSha256'] = hashlib.sha256(insert.encode()).hexdigest()
+            record(STRESS,manifest)
+            sql(fe,'root',insert,limit=60)
+            vm.demand(stress_counts(fe,table,key,prefix,count)==[65536,count],'STRESS_SEED_COUNT')
+            entry['inserted'] = count
+        record(STRESS,manifest)
+    manifest['status'] = 'RESTORED' if restore else 'SEEDED'
+    manifest[manifest['status'].lower()+'Resources'] = stress_resources(state)
+    record(STRESS,manifest)
+    path = vm.OUTPUT/('s0-stress-fixture-'+manifest['attempt']+'-'+manifest['status'].lower()+'.json')
+    record(path,manifest)
+    if restore: STRESS.unlink()
+    print(path.relative_to(vm.ROOT),manifest['status'])
+
+
+def shape_case(method,prepared):
+    """按 tablet 身份交换同名目标表，真实拒绝后交换回原件，只回收本次创建的空负例。"""
+    state = json.loads(INDEX.read_bytes())
+    vm.demand(not STRESS.exists() and not SHAPE.exists() and not (vm.OUTPUT/'s0-fixed-fixture-active.json').exists(),'SHAPE_FIXTURE_BUSY')
+    stress_resources(state)
+    fe = state['services']['fe']['id']
+    ready_source(fe)
+    def tablet(name):
+        rows = list(csv.DictReader(sql(fe,'root','SHOW TABLETS FROM fixture.'+name+';',True).splitlines(),delimiter='\t'))
+        vm.demand(len(rows)==1 and rows[0]['TabletId'].isdigit(),'SHAPE_TABLET')
+        return rows[0]['TabletId']
+    def digest():
+        return stress_original(fe,'dmq_target','target_id',('T1','T2','T3'))
+    original = tablet('dmq_target')
+    before = digest()
+    vm.demand(before=='4fce66991c1a560ee3acc8de573c1077e5f669f68971ad08d55c06e50364191f' and
+              sql(fe,'reader','SELECT COUNT(*) FROM fixture.dmq_target;')=='3','SHAPE_BASELINE')
+    nonce = secrets.token_hex(6)
+    scratch = 'dmq_s0_'+nonce
+    ddl = fixture_tables()[1].replace('fixture.dmq_target','fixture.'+scratch)
+    if method=='driver-model-reject':
+        ddl = ddl.replace('UNIQUE KEY','DUPLICATE KEY').replace(', "enable_unique_key_merge_on_write"="true"','')
+    else:
+        vm.demand(method=='driver-type-reject','NEGATIVE_METHOD')
+        ddl = ddl.replace('DECIMAL(12,3)','DOUBLE')
+    change = dict(method=method,phase='INTENT',attempt=nonce,original=original,scratch=scratch,before=before,
+                  expectedDdlSha256=hashlib.sha256(ddl.encode()).hexdigest(),services=state['services'])
+    with SHAPE.open('x') as out:
+        json.dump(change,out)
+        out.flush()
+        os.fsync(out.fileno())
+    sql(fe,'root',ddl+';')
+    variant = tablet(scratch)
+    vm.demand(variant!=original and sql(fe,'root','SELECT COUNT(*) FROM fixture.'+scratch+';')=='0','SHAPE_VARIANT')
+    change.update(variant=variant,phase='CREATED')
+    record(SHAPE,change)
+    swap = 'USE fixture; ALTER TABLE dmq_target REPLACE WITH TABLE '+scratch+' PROPERTIES("swap"="true");'
+    try:
+        sql(fe,'root',swap)
+        vm.demand(tablet('dmq_target')==variant and tablet(scratch)==original,'SHAPE_SWAP')
+        change.update(phase='SWAPPED',actualDdlSha256=hashlib.sha256(sql(fe,'root','SHOW CREATE TABLE fixture.dmq_target;').encode()).hexdigest())
+        record(SHAPE,change)
+        code = driver(prepared,method)
+        change['exitCode'] = code
+    finally:
+        current = (tablet('dmq_target'),tablet(scratch))
+        if current==(variant,original):
+            sql(fe,'root',swap)
+        vm.demand((tablet('dmq_target'),tablet(scratch))==(original,variant) and digest()==before and
+                  sql(fe,'root','SELECT COUNT(*) FROM fixture.'+scratch+';')=='0','SHAPE_RESTORE')
+        sql(fe,'root','DROP TABLE fixture.'+scratch+';')
+        ready_source(fe)
+        change.update(phase='RESTORED',after=digest(),restoredTablet=tablet('dmq_target'))
+        record(vm.OUTPUT/('s0-shape-'+nonce+'-restored.json'),change)
+        SHAPE.unlink()
+    return code
+
+
 def capabilities():
+    vm.demand(not STRESS.exists(),'STRESS_ISOLATION')
     state=json.loads(INDEX.read_text())
     vm.demand(state['status']=='BOTH_HEALTHY','REAL_SOURCE_NOT_READY')
     fe=state['services']['fe']['id']
@@ -439,12 +640,17 @@ def stop():
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('stage',choices=['create','resume','capabilities','driver-types','driver-cancel',
+                        'stress-seed','stress-restore','driver-stress-entity','driver-stress-target','driver-ac11',
+                        'driver-model-reject','driver-type-reject',
                         'fixed-seed','fixed-restore','driver-fixed-values','driver-fixed-entity','driver-fixed-target','stop'])
     parser.add_argument('--prepared',type=Path)
     args=parser.parse_args()
     stage=args.stage
     if stage.startswith('driver-'):
         if args.prepared is None: parser.error('--prepared required')
+        if stage in ('driver-model-reject','driver-type-reject'):
+            raise SystemExit(shape_case(stage,args.prepared))
         raise SystemExit(driver(args.prepared,stage))
     {'create':create, 'resume':resume, 'capabilities':capabilities, 'fixed-seed':fixed_fixture,
-     'fixed-restore':lambda:fixed_fixture(True), 'stop':stop}[stage]()
+     'fixed-restore':lambda:fixed_fixture(True), 'stress-seed':stress_fixture,
+     'stress-restore':lambda:stress_fixture(True), 'stop':stop}[stage]()

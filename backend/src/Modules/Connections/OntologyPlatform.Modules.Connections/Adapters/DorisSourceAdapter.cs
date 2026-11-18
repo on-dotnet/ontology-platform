@@ -139,6 +139,10 @@ public sealed class DorisSourceAdapter : IDorisSourceAdapter
             work.ThrowIfCancellationRequested();
             await VerifyReadOnlyAsync(connection);
             work.ThrowIfCancellationRequested();
+            // 只改变本次业务分支的独占会话；DATETIME 列的业务时区仍由 Mapping 声明。
+            await using var zone = new MySqlCommand("SET time_zone = '+00:00'", connection);
+            await zone.ExecuteNonQueryAsync();
+            work.ThrowIfCancellationRequested();
             // 结果仅暂存在本次分支，权限后验与会话清理成功后才可返回。
             var value = await read(connection);
             work.ThrowIfCancellationRequested();
