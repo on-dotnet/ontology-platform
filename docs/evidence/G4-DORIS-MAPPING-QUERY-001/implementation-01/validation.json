@@ -1,0 +1,37 @@
+{
+  "evidenceSchemaVersion": 1,
+  "checks": [
+    {
+      "name": "WorkflowDorisMappingQuery",
+      "command": "python3 -B scripts/tests/WorkflowDorisMappingQuery.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "..\n----------------------------------------------------------------------\nRan 2 tests in 0.004s\n\nOK"
+    },
+    {
+      "name": "HostContinuity",
+      "command": "python3 -B scripts/tests/HostContinuity.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": ".............\n----------------------------------------------------------------------\nRan 13 tests in 0.071s\n\nOK"
+    },
+    {
+      "name": "offline-prepare",
+      "command": "python3 -B scripts/maintenance/workflow.py prepare --task G4-DORIS-MAPPING-QUERY-001",
+      "status": "BLOCKED",
+      "exitCode": 2,
+      "output": "首次 sdk-version 内层sandbox_apply exit71；同输入15秒诊断版本10.0.402/exit0。正式prepare的原180秒失败身份仍拒绝重跑。"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "commit": null,
+    "url": null,
+    "runId": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "scope": "R0 and offline checks only",
+    "product": "NOT_RUN"
+  }
+}

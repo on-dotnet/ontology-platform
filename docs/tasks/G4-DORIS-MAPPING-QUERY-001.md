@@ -1,15 +1,9 @@
 # G4-DORIS-MAPPING-QUERY-001｜Doris Mapping/Query 规格
 
 ## 当前执行与授权
-唯一执行状态：SPEC_READY_FOR_CHATGPT_REVIEW。阶段A已完成；阶段B仅文档，非作者静态审查已通过，交ChatGPT裁决；产品实施NOT_RUN。
+唯一执行状态：R0_BLOCKED。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
 
-- 沿用当前会话，Code/Agent、Local Mac ARM64；不因附件建议另建会话或改模型。Master单写、只读Explorer和非作者Reviewer。
-- Base：`606ca2d2c61964e6498dd72d5e9ad960d3593bf7`；分支 `codex/g4-doris-mapping-query-001`；托管树 `/Users/chasen/.codex/worktrees/g4-doris-mapping-query-001/ontology-platform`。
-- TaskId=G4-DORIS-MAPPING-QUERY-001，RunId=merge-spec-01，创建operationId=`7d52da78-a971-43c1-a3df-de8eb7d0649e`。KEEP本树/分支至裁决和明确收尾；未集成且待后续实施，不能回收。
-- 授权：2026-11-17用户明确批准附件工程增量合并＋规格批次；只允许main b5e3b65d1a3359e8fd778700f525321333df61d2→Base；不扩至新文档Head。本轮禁产品/DTO/DB/锁改动、下载/prepare/restore/服务/KEEP处置、TDengine/G5、产品ZIP。
-- owned_paths：本卡、`docs/evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md`、同目录少量事实/检查索引、`docs/tasks/current-authorization.md`、`docs/planning/g4-implementation-plan.md`。阶段A回执在主树ignored artifacts/reviews包外。
-- read_only_dependencies：其余全部源/合同/脚本/部署/锁/历史证据/ZIP/私有runtime。公共合同Owner仍Master，当前无源码写入权限。
-- 唯一规格：[A–F v1](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)；[只读事实与检查](../evidence/G4-DORIS-MAPPING-QUERY-001/facts.md)。附件作为获准范围来源，不将其所有背景建议当额外操作许可。
+Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)列明的源、测试、最小任务注册和当前文档。历史PG规范字节、旧ZIP与私有设施为只读依赖。R0允许14个准确ID在保全、排空、恢复清单与非作者检查后优雅停止。用户随后手动调VM。当前其他旧KEEP受保护，本分支不合main。
 
 ## Specify：可观察要求
 
@@ -37,12 +31,12 @@
 |---|---|---|---|---|
 | A | 精确工程main更新 | Master，既有主树 | 原件/祖先/握手/回读 | COMPLETE，包外机器回执 |
 | B | 唯一规格和独立审查 | Master，owned_paths | 文档轻量核对 | COMPLETE，静态可交裁决 |
-| S1 | 单表发布/读取/恢复 | Master，规格C2/F2 | AC01/04/06/08/11 | NOT_RUN，待裁决 |
-| S2 | 双表精度/模型/并发 | Master，同上 | AC02/03/05/07/09 | NOT_RUN，待裁决 |
-| S3 | UI/MCP/PG兼容/最终V3 | Master，同上 | AC10/受影响门禁 | NOT_RUN，待裁决 |
+| S1 | 单表发布/读取/恢复 | Master，规格C2/F2 | AC01/04/06/08/11 | NOT_RUN，待R0/S0放行 |
+| S2 | 双表精度/模型/并发 | Master，同上 | AC02/03/05/07/09 | NOT_RUN，待R0/S0放行 |
+| S3 | UI/MCP/PG兼容/最终V3 | Master，同上 | AC10/受影响门禁 | NOT_RUN，待R0/S0放行 |
 
 ## Verify与恢复
 
-当前产品TestedCommit=无；不把Base旧PG测试当新Doris资格。FRESH仅文档/只读检查，REUSED仅M5同包原件，CI与全部产品NOT_RUN。整集历史 -9/TIMEOUT 保留；134是唯一用例并集覆盖。新文档完整Head和远端回读在包外交付回执，不递归写进自身提交。
+自本卡、唯一规格和implementation-01原件恢复。按R0→S0→S1→S2→S3验证；产品资格、最终V3与CI尚无本Run结果。原整集-9/TIMEOUT和134唯一覆盖保留。未跟踪用户文件保持原状。
 
-恢复从本卡/A–F/事实索引；源语义新决定、资源方案和实施授权待集中裁决。禁止自动开始S1、更新main或进入G5。旧KEEP全部不动，原主树六个.DS_Store已保护。实际Agent活跃耗时UNKNOWN；下载/产品运行/构包/服务处置次数均0，不宣称效率提升。
+R0原件及非作者结论见[14个准确ID与保全缺口](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/r0-review.json)。STOPPED_KEEP=0，八个易失卷的私有一致备份/同ID恢复入口待提供或批准新增保全方案，正式投递封闭及排空尚待完成。现VM仍15.63GiB/12CPU，暂缓用户手调。离线准备与定向检查见[当前验证](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/validation.json)。SDK短诊断通过，正式prepare受原失败保护拦截，C#未编译。S0及后续产品链均NOT_RUN。

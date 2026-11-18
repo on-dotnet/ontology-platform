@@ -1,0 +1,46 @@
+"""Doris 合成设施的固定建表输入与独立参考预期，供后续正式消费者使用。"""
+from datetime import datetime, timezone
+from decimal import Decimal
+
+
+# 两张表是同一目录输入，调用者必须完成全部建表和探针复位后才发正式 Discover。
+def fixture_tables():
+    """返回任务专用两表的 DDL；产品只读账号不参与执行。"""
+    tables = []
+    for name, identity, extra in (
+        ('dmq_entity', 'entity_id', 'join_key DECIMAL(10,2) NULL, amount DECIMAL(20,2) NULL, unit_code VARCHAR(8) NOT NULL'),
+        ('dmq_target', 'target_id', 'join_key DECIMAL(12,3) NULL'),
+    ):
+        tables.append(f'''CREATE TABLE fixture.{name} (
+  org_id VARCHAR(32) NOT NULL, site_id VARCHAR(16) NOT NULL, {identity} VARCHAR(32) NOT NULL,
+  {extra},
+  valid_from DATETIMEV2(6) NOT NULL, valid_to DATETIMEV2(6) NOT NULL,
+  event_at DATETIMEV2(6) NOT NULL, observed_at DATETIMEV2(6) NOT NULL
+) UNIQUE KEY(org_id, site_id, {identity})
+DISTRIBUTED BY HASH({identity}) BUCKETS 1
+PROPERTIES ("replication_num"="1", "enable_unique_key_merge_on_write"="true")''')
+    return tuple(tables)
+
+
+REFERENCE_SQL = """SELECT t.target_id
+FROM fixture.dmq_entity e JOIN fixture.dmq_target t
+ON e.org_id=t.org_id AND e.site_id=t.site_id AND e.join_key=t.join_key
+AND e.valid_from<t.valid_to AND t.valid_from<e.valid_to
+WHERE e.org_id='org-demo' AND e.site_id='site-a' AND e.entity_id='E1'
+ORDER BY t.target_id"""
+
+
+def reference_targets(entity, targets):
+    """对独立夹具元组按范围、精确数值和半开区间计算预期；不读产品输出。"""
+    org, site, key, start, end = entity
+    return sorted(identity for identity, target_org, target_site, target_key, first, last in targets
+                  if (org, site) == (target_org, target_site) and key is not None and target_key is not None
+                  and Decimal(key) == Decimal(target_key) and start < last and first < end)
+
+
+def fixture_instant(local):
+    """仅对夹具已明确登记的 Etc/UTC 无时区六位微秒值生成参考 UTC 词法。"""
+    parsed = datetime.strptime(local, '%Y-%m-%d %H:%M:%S.%f')
+    if parsed.strftime('%Y-%m-%d %H:%M:%S.%f') != local:
+        raise ValueError('FIXTURE_DATETIMEV2_PRECISION')
+    return parsed.replace(tzinfo=timezone.utc).isoformat(timespec='microseconds').replace('+00:00', 'Z')
