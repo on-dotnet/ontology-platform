@@ -39,4 +39,10 @@ Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-
 
 自本卡、唯一规格和implementation-01原件恢复。按R0→S0→S1→S2→S3验证；产品资格、最终V3与CI尚无本Run结果。原整集-9/TIMEOUT和134唯一覆盖保留。未跟踪用户文件保持原状。
 
-R0原件及非作者结论见[14个准确ID与保全缺口](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/r0-review.json)。14个原ID中，M4主/次API已请求TERM、自然退出0，其余12个仍运行。8个易失卷热备及隔离同ID恢复通过，两份隔离H2读取原夹具realm通过。用户批准的改序由非作者现场放行后，M4 keyring已取得冷副本并独立核验。准备处置M5前排空检查触发DRAIN_ACTIVITY_DETECTED，剩余处置中止，八卷继续由准确只读容器持有。非作者现场复核结论为NO-GO继续停机或调VM。20轮事后采样及单独补核MappingJobs/MappingOutbox均为零，触发时具体活动UNKNOWN。见[停机与独立复核回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/cold-save-review.json)及[恢复保护反例](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/cold-save-validation.json)。现VM仍15.63GiB/12CPU，暂缓用户手调。离线准备与定向检查见[当前验证](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/validation.json)。SDK短诊断通过，正式prepare受原失败保护拦截，C#未编译。S0及后续产品链均NOT_RUN。
+R0原件及非作者结论见[14个准确ID与保全缺口](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/r0-review.json)。第一次中止时，14个原ID中，M4主/次API已请求TERM、自然退出0，其余12个仍运行。8个易失卷热备及隔离同ID恢复通过，两份隔离H2读取原夹具realm通过。用户批准的改序由非作者现场放行后，M4 keyring已取得冷副本并独立核验。准备处置M5前排空检查触发DRAIN_ACTIVITY_DETECTED，剩余处置中止，八卷继续由准确只读容器持有。非作者现场复核结论为NO-GO继续停机或调VM。20轮事后采样及单独补核MappingJobs/MappingOutbox均为零，触发时具体活动UNKNOWN。见[停机与独立复核回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/cold-save-review.json)及[恢复保护反例](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/cold-save-validation.json)。现VM仍15.63GiB/12CPU，暂缓用户手调。离线准备与定向检查见[当前验证](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/validation.json)。SDK短诊断通过，正式prepare受原失败保护拦截，C#未编译。S0及后续产品链均NOT_RUN。
+
+## 本次剩余12个ID重新准入（2026-11-18）
+
+准入回执 SHA-256 为 `67415b09491a84605a77a7cedfeaf27835b1bfd308182e75859e4a66926cab95`。两个平台库各48张表处于准确栅栏事务内，三轮连续观察四库分项均为零，包含MappingJobs和MappingOutbox；非作者放行同一栅栏内的余12个原ID。
+
+本轮又有4个原容器退出。目前共6个退出、8个仍运行。4个API退出0，M4 Keycloak退出143并有关闭记录。M4 Fuseki退出143、无OOM，其镜像配置关闭了根日志，未取得本次应用关闭完成的证据，处置中止。两套keyring及M4 Keycloak三份冷备已经过独立校验。M4 Fuseki原卷的两次完整摘要与已审热副本完全一致，其关闭钩子完成状态仍为UNKNOWN。原只读持卷容器持续保护八卷；未调整VM。最新独立结论为NO-GO继续停机或调VM，分项结果、退出原件及复核见[再准入回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-01.json)，定向反例见[验证回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-validation.json)。
