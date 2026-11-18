@@ -93,12 +93,15 @@ kill -TERM "$pid"
 
 READMISSION = keep.BASE / 'readmission-01-stop.json'
 FUSEKI_RESUME = keep.BASE / 'readmission-02-stop.json'
+PG_RESUME = keep.BASE / 'readmission-03-stop.json'
 
 
 def save(state):
     dest = READMISSION if 'readmission' in state else COLD_INDEX
     if state.get('fusekiAlternative'):
         dest = FUSEKI_RESUME
+    if 'pgRecoveryReview' in state:
+        dest = PG_RESUME
     tmp = dest.with_suffix('.pending')
     with tmp.open('w') as stream:
         json.dump(state, stream, indent=2)
@@ -260,15 +263,23 @@ def qualified_exit(event, state):
             and 0 <= engine.get('observedSeconds', -1) <= 45)
 
 
-def release_after_review():
+def release_after_review(pg_review_sha=None):
     """仅在非作者核准全部冷原件后调用；先完成最后一次完整回读，再释放最后的挂载。"""
     pin = read_pin()
     index = FUSEKI_RESUME if FUSEKI_RESUME.exists() else READMISSION if READMISSION.exists() else COLD_INDEX
+    if PG_RESUME.exists():
+        import doris_keep_pg_resume as pg
+        index = PG_RESUME
+        keep.require(pg_review_sha == keep.digest(index), 'PG_FINAL_REVIEW_REQUIRED')
     state = json.loads(index.read_text())
     originals = preexisting()
     events = state['stopEvents']
+    accepted = {x['id'] for x in events if qualified_exit(x, state)}
+    if index == PG_RESUME:
+        accepted = pg.accepted(state, originals)
+        state['pinReleaseReview'] = {'reviewer': '/root/spec_review', 'sha256': pg_review_sha}
     keep.require(state['outcome'] == 'ALL_STOPPED_COLD_CHECKED_PIN_HELD' and state['pin'] == pin['id'] and
-                 len(events) == 14 and {x['id'] for x in events if qualified_exit(x, state)} == set(originals)
+                 len(events) == 14 and accepted == set(originals)
                  and set(state['coldVolumes']) == set(VOLUMES), 'RELEASE_GATE')
     keep.require(keep.execute('ps', '-q', '--no-trunc').split() == [pin['id']], 'RUNNING_SET')
     for row in originals.values():

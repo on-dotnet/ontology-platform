@@ -107,12 +107,13 @@ def reviewed_fence(state, databases):
         state.update(fencePids=pids, tables=tables)
         for row in platforms:
             drain.confirm(row, tables[row['containerId']])
-        def checkpoint(phase):
+        def checkpoint(phase, remaining=None):
             cold.read_pin()
-            for row in platforms:
+            live = databases if remaining is None else remaining
+            for row in (r for r in live if r['service'] == 'platform-pg'):
                 cid = row['containerId']
                 drain.verify_fence_owner(row, tables[cid], pids[cid])
-            record_round(state, databases, phase, pids)
+            record_round(state, live, phase, pids)
 
         for i in range(3):
             if i:

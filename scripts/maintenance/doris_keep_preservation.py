@@ -134,13 +134,13 @@ def finish(cid):
 
 
 @contextlib.contextmanager
-def helper(mounts, write=False):
+def helper(mounts, write=False, image=IMAGE):
     flags = ['--cap-add=CHOWN', '--cap-add=FOWNER', '--cap-add=DAC_OVERRIDE'] if write else ['--cap-add=DAC_READ_SEARCH']
     args = ['--pull=never', '--network=none', '--read-only', '--cap-drop=ALL', *flags, '--security-opt=no-new-privileges',
             '--user=0:0', '--memory=512m', '--memory-swap=512m', '--cpus=0.5', '--pids-limit=24', '--log-driver=none',
             '--tmpfs', '/var/lib/postgresql:size=1m', '--tmpfs', '/control:size=1m,mode=0700',
             '--label', 'ontology.task-id=' + TASK, '--label', 'ontology.run-id=' + RUN,
-            '--label', LABEL + '=' + ATTEMPT, *mounts, '--entrypoint=/bin/sh', IMAGE, '-ec', KEEPER]
+            '--label', LABEL + '=' + ATTEMPT, *mounts, '--entrypoint=/bin/sh', image, '-ec', KEEPER]
     cid = execute('create', *args)
     require(bool(re.fullmatch('[0-9a-f]{64}', cid)), 'HELPER_CONTAINER_ID')
     record('created', cid)

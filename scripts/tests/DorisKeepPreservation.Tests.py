@@ -15,6 +15,8 @@ import doris_keep_drain as drain
 import doris_keep_readmit as readmit
 import doris_keep_cold as cold
 import doris_keep_fuseki as fuseki
+import doris_keep_pg_recovery as pg
+import doris_keep_pg_resume as resume
 
 
 class RestoreGuards(unittest.TestCase):
@@ -139,6 +141,27 @@ class FusekiAlternative(unittest.TestCase):
         with patch.object(fuseki, 'request', side_effect=[json.dumps(plain), json.dumps(incomplete)]):
             with self.assertRaisesRegex(ValueError, 'TDB2_INCOMPLETE_ROW'):
                 fuseki.full_scan('isolated')
+
+
+
+class PgRecovery(unittest.TestCase):
+    def test_control_crc_warning_blocks_even_if_pg_controldata_exits_zero(self):
+        from subprocess import CompletedProcess
+        output = b"pg_control version number: 1800\nDatabase cluster state: shut down\n"
+        with patch.object(pg.subprocess, 'run', return_value=CompletedProcess([], 0, output, b'WARNING: checksum mismatch')):
+            with self.assertRaisesRegex(ValueError, 'PG_CONTROL_DIAGNOSTIC'):
+                pg.control('reader', '/source')
+
+    def test_unreviewed_or_modified_recovery_receipt_is_rejected_before_archive_access(self):
+        with patch.object(keep, 'digest', return_value='a' * 64):
+            with self.assertRaisesRegex(ValueError, 'PG_RECOVERY_REVIEW_SHA'):
+                resume.reviewed_copy('b' * 64)
+
+    def test_fast_request_exit_does_not_mask_original_failure(self):
+        failed = {'ExitCode': 1, 'Status': 'exited', 'Error': '', 'OOMKilled': False, 'Dead': False, 'Pid': 0}
+        with patch.object(keep, 'execute', side_effect=['server shutting down', '1']), patch.object(pg, 'engine_state', return_value=failed):
+            with self.assertRaisesRegex(ValueError, 'PG_EXIT_POSTCONDITION'):
+                pg.native_stop('source')
 
 
 if __name__ == '__main__':
