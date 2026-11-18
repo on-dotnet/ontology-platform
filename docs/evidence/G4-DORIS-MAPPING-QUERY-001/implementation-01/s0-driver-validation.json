@@ -1,0 +1,78 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "cf02313240b00cd74704859700128c5f7d1fd390",
+  "checks": [
+    {
+      "name": "WorkflowDorisMappingQuery",
+      "command": "python3 -B scripts/tests/WorkflowDorisMappingQuery.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.005s\n\nOK\n"
+    },
+    {
+      "name": "WorkflowDoris",
+      "command": "python3 -B scripts/tests/WorkflowDoris.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "......\n----------------------------------------------------------------------\nRan 6 tests in 0.016s\n\nOK\n"
+    },
+    {
+      "name": "WorkflowEnvironment",
+      "command": "python3 -B scripts/tests/WorkflowEnvironment.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": ".......\n----------------------------------------------------------------------\nRan 7 tests in 0.074s\n\nOK\n"
+    },
+    {
+      "name": "ExecutionPreflight",
+      "command": "python3 -B scripts/tests/ExecutionPreflight.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "............\n----------------------------------------------------------------------\nRan 12 tests in 0.266s\n\nOK\n"
+    },
+    {
+      "name": "offline-prepare",
+      "command": "python3 -B scripts/maintenance/workflow.py prepare --task G4-DORIS-MAPPING-QUERY-001",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "DEPENDENCIES_READY; 21 projects, 179 backend packages, downloads=0, sdkDownloads=0; receipt 73758334c31f4381853c87d77caca1dd."
+    },
+    {
+      "name": "wire",
+      "command": "OntologyPlatform.G2ContractTests.dll --filter FullyQualifiedName~G4QueryWireTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "6/6 passed, 0 skipped; command 9ed0567a7aa84399a40c8fc2458c893c."
+    },
+    {
+      "name": "MySqlConnector-types",
+      "command": "workflow_doris_s0_fixture.py driver-types --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "RealDriverReadsFixedSource: 1/1 passed, 0 skipped; command 027b5999aca9418b927f05f07c691b8f."
+    },
+    {
+      "name": "MySqlConnector-cancel",
+      "command": "workflow_doris_s0_fixture.py driver-cancel --prepared <bound prepare receipt>",
+      "status": "FAIL",
+      "exitCode": 2,
+      "output": "ActiveBackendMustFinishInsideOriginalWindow: 1 executed, 1 failed, 0 skipped. SOURCE_TERMINATION_NOT_VERIFIED_IN_250MS; command e0e1e2a26b2842e4a41b5800853407f0."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "scope": "S0 source witness; query source gate blocked",
+    "originals": "s0-driver-review.json",
+    "buildInputKey": "18f69838b72f2a80dcc2ce28f319d8fa42a664c586a7984772f1fc02c3f8da71",
+    "S1": "NOT_RUN",
+    "S2": "NOT_RUN",
+    "S3": "NOT_RUN"
+  }
+}

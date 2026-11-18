@@ -72,3 +72,11 @@ Docker 引擎实读 20964958208 字节（19.525 GiB）、12 CPU。旧 14 个原�
 取消见证绑定 reader 自己的连接 60 和源 QueryId ebdb6844fe824e68-8774daafa439a615。同账号 KILL CONNECTION 在请求后 37.133ms 获确认，FE 随后计数为 0。请求后 304.005ms 的独立观测仍有 1 个 BE 活动任务。较晚的单独读回为 FE 0 / BE 0，确切终止时刻未知。250ms 清理门禁未通过，1000ms 分支和 5000ms 总预算保留原值。非作者裁决 S0 BLOCKED。MySqlConnector 正式路径、五秒端到端取消及 S1–S3 均未获验收。正式 prepare 原入口返回 SHORT_REPRO_REQUIRED（exit 2），180 秒失败身份和 15 秒诊断成功身份分列。
 
 本次合成源已按准确进程发送镜像优雅停止信号。BE 退出 0、FE 退出 143，均无 OOM；FE 应用关闭钩子完成情况未知。4 个源数据及日志卷保留，当前运行容器为 0。详见[实测回执与非作者结论](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-source-review.json)和[离线反例回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-validation.json)。
+
+## S0 正式驱动复测（2026-11-18）
+
+正式 prepare 的原 SDK 命令退出 71，原错误为外层沙箱拒绝 sandbox_apply。非作者核对了原错误输出和候选状态副本。现有公共短复现入口按同一 180 秒身份持锁运行原隔离命令，14 秒看门狗内实测 0.220 秒、退出 0。正式 prepare 随后返回 DEPENDENCIES_READY，零下载，验证 21 个项目的资产。早期 15 秒诊断的不同身份保留在原件中。
+
+源码 cf02313240b00cd74704859700128c5f7d1fd390 上的正式 MySqlConnector 2.6.2 测试读到 E1 的唯一逻辑行、精确金额 9007199254740993.20 与 123456 微秒，两表三列有序键和 UNIQUE/MOW 均匹配。取消测试使用同账号、同固定 FE 和本次真实连接 52。独立观察者匹配 QueryId e5f15ab3fbd44503-bafbb4493f6c778c。取消后约 18 毫秒驱动结束，20.683 毫秒后分支返回 query_source_unavailable。250 毫秒截止后仍观测到 BE 任务，耗时随后继续增长。BE 收到取消后约 2.924 秒进入 fragment 析构，统计行的耗时冻结后仍存在；取消后约 4.316 秒首次观测 FE/BE 双零。
+
+非作者复核类型测试一项通过，取消测试一项失败，五秒内的事后观察与源清理分列。S0 继续阻断 S1–S3。待裁决仅涉及取消资格的 SQL 计划范围及代表性证据。单行 SLEEP 在该版本内不能及时中断，若裁定以允许的固定业务计划验证，仍需运行中取消及独立 BE 终结原件，沿用 250ms、1s、5s。此次实测未给普通业务投影作出可取消性结论。两源节点与旧十四个准确容器均已退出，四个本任务卷保留。本轮未构包。[正式回执与非作者裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-driver-review.json)。
