@@ -1,7 +1,7 @@
 # G4-DORIS-MAPPING-QUERY-001｜Doris Mapping/Query 规格
 
 ## 当前执行与授权
-唯一执行状态：R0_STOPPED_KEEP_WAITING_FOR_USER_VM。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
+唯一执行状态：S0_BLOCKED_BE_CANCELLATION。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
 
 Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)列明的源、测试、最小任务注册和当前文档。历史PG规范字节、旧ZIP与私有设施为只读依赖。R0允许14个准确ID在保全、排空、恢复清单与非作者检查后优雅停止。用户随后手动调VM。当前其他旧KEEP受保护，本分支不合main。
 
@@ -62,3 +62,13 @@ R0原件及非作者结论见[14个准确ID与保全缺口](../evidence/G4-DORIS
 14 个原容器已退出并保留。13 个按停止验收通过，包含 8 个常规停止、3 个 PostgreSQL 原生 fast 关库及 2 个 Fuseki 替代验收；另 1 个按已批准的单卷恢复例外通过。非作者复核九份私有归档，共 863528960 字节。最后完整回读八卷通过后释放了准确的临时只读持卷容器。Docker 回读运行容器为 0，调前 VM 内存为 16787419136 字节，CPU 为 12。下次恢复旧栈须按[原 ID 与恢复顺序](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/r0-review.json)先恢复并核验八个易失卷。见[本轮机器回执与非作者结论](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-03.json)和[14 项定向测试](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-03-validation.json)。
 
 用户手动将 VM 调至 20 GiB / 12 CPU 后，按已审公式重新读回 Docker 额度、宿主余量和阶段峰值，满足条件才启动 S0。正式 prepare 仍由现有 SHORT_REPRO_REQUIRED 保护。S0–S3、产品验收与最终 V3 待后续实施。
+
+## S0 真实源观测与取消阻断（2026-11-18）
+
+Docker 引擎实读 20964958208 字节（19.525 GiB）、12 CPU。旧 14 个原容器仍退出。宿主为 32 GiB / 12 核。S0 两节点配额 10 GiB / 4 CPU，保留 2 GiB 后剩余 7.525 GiB。后续六服务的 14.25 GiB / 9 CPU 纸面额度扣除同一预留后剩余 3.275 GiB；后续宿主进程、临时负载及真实延迟仍须按阶段核验。首次内核探针发现 max_map_count 为 262144。按用户追加授权调整后，两次非特权回读均为 2000000，VM 无 swap 设备，nofile 软硬值均为 65536。
+
+任务独立的 FE/BE 均报告 doris-4.0.8-rc02-bc8ea1bac6d。原生 MySQL 客户端严格核验 CA 和 localhost 身份后，证实两表 UNIQUE/MOW 三列键、整行 upsert、精确大额小数、微秒第六位、BIGINT 边界与同站点的 T1/T2 关系。两次 SELECT 之间受控写入可见，已复位并保留 UNKNOWN/null 水位。第一次在 BE 注册前运行 SELECT 的 1105 失败保留。正式目录发现、产品类型拒绝和激活后 NULL 场景尚未运行。
+
+取消见证绑定 reader 自己的连接 60 和源 QueryId ebdb6844fe824e68-8774daafa439a615。同账号 KILL CONNECTION 在请求后 37.133ms 获确认，FE 随后计数为 0。请求后 304.005ms 的独立观测仍有 1 个 BE 活动任务。较晚的单独读回为 FE 0 / BE 0，确切终止时刻未知。250ms 清理门禁未通过，1000ms 分支和 5000ms 总预算保留原值。非作者裁决 S0 BLOCKED。MySqlConnector 正式路径、五秒端到端取消及 S1–S3 均未获验收。正式 prepare 原入口返回 SHORT_REPRO_REQUIRED（exit 2），180 秒失败身份和 15 秒诊断成功身份分列。
+
+本次合成源已按准确进程发送镜像优雅停止信号。BE 退出 0、FE 退出 143，均无 OOM；FE 应用关闭钩子完成情况未知。4 个源数据及日志卷保留，当前运行容器为 0。详见[实测回执与非作者结论](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-source-review.json)和[离线反例回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-validation.json)。

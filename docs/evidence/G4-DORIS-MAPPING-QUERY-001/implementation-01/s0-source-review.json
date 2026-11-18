@@ -1,0 +1,682 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "status": "S0_BLOCKED_BE_CANCELLATION",
+  "scope": {
+    "UniqueKeyMowLogicalCurrent": "OBSERVED",
+    "nativeDecimalMicroseconds": "OBSERVED",
+    "independentCrossScaleJoin": "OBSERVED",
+    "recordKeyInProduct": "NOT_RUN",
+    "formalDiscoveryAndSemanticsHash": "NOT_RUN",
+    "formalDriver": "NOT_RUN",
+    "formalProductCancel": "NOT_RUN",
+    "canonicalReceiptAndAuditEffects": "NOT_RUN",
+    "nativeCleanupWithin250Ms": "NOT_VERIFIED_BE_STILL_ACTIVE",
+    "actualTerminationInstant": "UNKNOWN",
+    "S1": "NOT_RUN",
+    "S2": "NOT_RUN",
+    "S3": "NOT_RUN",
+    "productZip": "NOT_CREATED",
+    "ci": "NOT_RUN"
+  },
+  "resourceReadback": {
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "runId": "implementation-01",
+    "attempt": "43bfa050a6a64fe89836d3d5a2721080",
+    "context": "desktop-linux",
+    "observedAtUtc": "2026-11-18T12:16:18.521524+00:00",
+    "sourceTests": "NOT_RUN",
+    "vm": {
+      "bytes": 20964958208,
+      "cpu": 12,
+      "otherRunningCaps": {}
+    },
+    "oldOriginalsExited": [
+      "cd563c910aa96e9c6eaabf32475d5bfe2ec56e6a9f754ca48b4287de1b8e653b",
+      "22837b2b2702a851ca4553b6d0ff0ce09ac3d5f65f67b911f39598cbf1f804d8",
+      "5e0f45ecaf9e2f227c4290891eeb26e577bfeaaaa8d5a5b0be7a15458656a49a",
+      "4a5dacfa92d7d9a119267365a65ab5037b98b4bb2292b9e47199b0bb14ab50b4",
+      "0edb069b759a2521cb56250f1db0227bd3cc8c81ad06210a1d8a7c7b52866534",
+      "19f76154598ac31e4a075175aadafc0a2f22591281ecf5db0704fd65e26a502b",
+      "b71ef14e5e484253c0b435332c4480fc071268f634c0b049d5d4aff57c383912",
+      "ed281bc42b432a4e20817b00dfbc7b480271f36368a24370414a6e6fb5b62dca",
+      "fc53d2b9b9fc7d67344a79e1abcf107b32b832d762713979a3584da8d9d1c7f5",
+      "47686c56bb164ed6577349fe47b20968f83630032d6c3ebd8ed55586a8846bbd",
+      "61791a2303a2945b9947824de91e763d22be03b538d1c0b76ee3ce44027a835f",
+      "f1a5f1cb913037f7716a3599bc19c1ed9eed11aa6db79b7f1a57c8dbe1c3943d",
+      "c1bbd53e0b335a12c5e50bc860a58e6d3cb01de7d81a354ee87696dd0a941c81",
+      "d267220f4227b7c92f5d2e37e7e85a4587644488157c10e5f95586613bd08952"
+    ],
+    "phaseEnvelope": {
+      "kernelProbe": {
+        "taskCapBytes": 67108864,
+        "taskCpuQuota": 0.25,
+        "hostStageBudgetBytes": 268435456,
+        "vmHeadroomBytes": 20897849344,
+        "vmAfterTwoGiBReserveBytes": 18750365696
+      },
+      "S0_FE_BE": {
+        "taskCapBytes": 10737418240,
+        "taskCpuQuota": 4,
+        "hostStageBudgetBytes": 1073741824,
+        "vmHeadroomBytes": 10227539968,
+        "vmAfterTwoGiBReserveBytes": 8080056320
+      },
+      "S1_S3_services": {
+        "taskCapBytes": 15300820992,
+        "taskCpuQuota": 9,
+        "hostStageBudgetBytes": 5905580032,
+        "vmHeadroomBytes": 5664137216,
+        "vmAfterTwoGiBReserveBytes": 3516653568
+      }
+    },
+    "host": {
+      "physicalBytes": 34359738368,
+      "physicalCpu": 12,
+      "logicalCpu": 12,
+      "memoryPressureFreePercent": 81,
+      "swapUsedMiB": 1.5,
+      "diskAvailableBytes": 239192326144,
+      "nominalRemainderAfter20GiBVMAndPeak": 6979321856
+    },
+    "portsAvailableAtProbe": {
+      "19030": true,
+      "15641": true,
+      "15642": true,
+      "15643": true,
+      "15644": true,
+      "15645": true,
+      "15646": true,
+      "15647": true
+    },
+    "images": {
+      "fe": {
+        "id": "sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02",
+        "ref": "apache/doris@sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02",
+        "os": "linux",
+        "arch": "arm64"
+      },
+      "be": {
+        "id": "sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7",
+        "ref": "apache/doris@sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7",
+        "os": "linux",
+        "arch": "arm64"
+      }
+    },
+    "kernelProbeId": "363b4cc10b62b3c5e14ea5d62420a1552e9e20dd3b9daa9463e2143bc3911313",
+    "kernel": {
+      "maxMapCount": 2000000,
+      "swapDeviceCount": 0,
+      "nofileSoft": 65536,
+      "nofileHard": 65536
+    },
+    "kernelProbeRemoved": true,
+    "s0Checks": {
+      "vmCapacity": true,
+      "fixedSourcePort": true,
+      "mapCount": true,
+      "swapDisabled": true,
+      "nofile": true
+    },
+    "status": "KERNEL_AND_VM_READY"
+  },
+  "resourceAdjustment": {
+    "initialReceiptSha256": "7d8b6303d758c4d4758a39f6385de1ed91229b5b9689b33f0fee394f10eb2d13",
+    "initialMapCount": 262144,
+    "authorizedValue": 2000000,
+    "managementContainerId": "b9700d095b1fccc272c7cb7c016956ca08f50060562f45acab4653318fc1c0e8",
+    "command": [
+      "/usr/sbin/sysctl",
+      "-w",
+      "vm.max_map_count=2000000"
+    ],
+    "result": "vm.max_map_count = 2000000",
+    "exitCode": 0,
+    "oomKilled": false,
+    "finishedAt": "2026-11-18T12:10:50.659818263Z",
+    "removedAndAbsent": true,
+    "scope": "Docker Linux VM runtime",
+    "independentProbeIds": [
+      "8feec4779c15ed4950560d3a95ee512c4eea25b38c4761056531b3cc713abb9d",
+      "836481aebd074415982be1f879015ab9cb22fd42e8bfa7210111dbd314bc692f",
+      "363b4cc10b62b3c5e14ea5d62420a1552e9e20dd3b9daa9463e2143bc3911313"
+    ]
+  },
+  "hostContinuity": {
+    "acPower": true,
+    "architecture": "arm64",
+    "assertions": {
+      "PreventSystemSleep": 0,
+      "PreventUserIdleDisplaySleep": 0,
+      "PreventUserIdleSystemSleep": 1
+    },
+    "assurance": "POLICY_READY",
+    "displays": {
+      "externalDisplayCount": 0,
+      "externalDisplaysAsleep": null,
+      "status": "OBSERVED"
+    },
+    "lockDisplayTrial": "NOT_VERIFIED",
+    "os": "Darwin",
+    "pid": 16604,
+    "policy": {
+      "displaysleep": 10,
+      "sleep": 0
+    },
+    "schemaVersion": 1,
+    "screenLocked": false,
+    "sessionContinuity": "NOT_VERIFIED",
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "utc": "2026-11-18T12:12:09.763947+00:00"
+  },
+  "sourceIdentities": {
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "runId": "implementation-01",
+    "project": "ontology-g4-doris-mapping-query-001",
+    "vmAdmission": "43bfa050a6a64fe89836d3d5a2721080",
+    "services": {
+      "fe": {
+        "id": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+        "image": "sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02",
+        "before": "created"
+      },
+      "be": {
+        "id": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+        "image": "sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7",
+        "before": "created"
+      }
+    },
+    "networks": {
+      "doris": "dbdf51a00f89b6ba3e9ccad603ebff8424852831cf43f42af2f9367bb44356f0",
+      "local-entry": "f8b9b373488d969140348cbe22c0311384e2746b634aed1d6aada4918d331580"
+    },
+    "volumes": {
+      "be-data": "ontology-g4-doris-mapping-query-001_be-data",
+      "be-log": "ontology-g4-doris-mapping-query-001_be-log",
+      "fe-data": "ontology-g4-doris-mapping-query-001_fe-data",
+      "fe-log": "ontology-g4-doris-mapping-query-001_fe-log"
+    },
+    "status": "BOTH_HEALTHY",
+    "runtimePrivate": ".tools/security/g4-doris-mapping-query-001/implementation-01-source"
+  },
+  "memorySample": {
+    "FE": "1.324 GiB / 4 GiB",
+    "BE": "1.139 GiB / 6 GiB",
+    "scope": "instantaneous docker stats, not a measured peak"
+  },
+  "initialNativeProbe": {
+    "original": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "sourceFeId": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "sourceBeId": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+      "origin": "FE-bundled MySQL 8.0.44 with VERIFY_IDENTITY",
+      "formalDriver": "NOT_RUN",
+      "formalCancellation": "NOT_RUN",
+      "checks": {},
+      "status": "BLOCKED",
+      "reason": "SOURCE_SQL_1"
+    },
+    "serverError": 1105,
+    "cause": "first business SELECT before BE registration"
+  },
+  "nativeCapabilities": {
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "sourceFeId": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+    "sourceBeId": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+    "origin": "FE-bundled MySQL 8.0.44 with VERIFY_IDENTITY",
+    "formalDriver": "NOT_RUN",
+    "formalCancellation": "NOT_RUN",
+    "checks": {
+      "build": "doris-4.0.8-rc02-bc8ea1bac6d",
+      "version": "5.7.99",
+      "identity": "'fixture_reader'@'%'",
+      "ddl": {
+        "dmq_entity": {
+          "sha256": "a93eef1050945e1e19f1871deb03f4ea37a466f755f48babca74b40c4f24c624",
+          "model": "UNIQUE",
+          "mow": true,
+          "key": [
+            "org_id",
+            "site_id",
+            "entity_id"
+          ]
+        },
+        "dmq_target": {
+          "sha256": "9050e5391320f77104a46ce33153b4cd71763ea90899401a246ecc51a5653cab",
+          "model": "UNIQUE",
+          "mow": true,
+          "key": [
+            "org_id",
+            "site_id",
+            "target_id"
+          ]
+        }
+      },
+      "columns": [
+        [
+          "dmq_entity",
+          "org_id",
+          "varchar(32)",
+          "NO",
+          "1",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_entity",
+          "site_id",
+          "varchar(16)",
+          "NO",
+          "2",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_entity",
+          "entity_id",
+          "varchar(32)",
+          "NO",
+          "3",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_entity",
+          "join_key",
+          "decimalv3(10, 2)",
+          "YES",
+          "4",
+          "10",
+          "2"
+        ],
+        [
+          "dmq_entity",
+          "amount",
+          "decimalv3(20, 2)",
+          "YES",
+          "5",
+          "20",
+          "2"
+        ],
+        [
+          "dmq_entity",
+          "unit_code",
+          "varchar(8)",
+          "NO",
+          "6",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_entity",
+          "valid_from",
+          "datetime(6)",
+          "NO",
+          "7",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_entity",
+          "valid_to",
+          "datetime(6)",
+          "NO",
+          "8",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_entity",
+          "event_at",
+          "datetime(6)",
+          "NO",
+          "9",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_entity",
+          "observed_at",
+          "datetime(6)",
+          "NO",
+          "10",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_target",
+          "org_id",
+          "varchar(32)",
+          "NO",
+          "1",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_target",
+          "site_id",
+          "varchar(16)",
+          "NO",
+          "2",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_target",
+          "target_id",
+          "varchar(32)",
+          "NO",
+          "3",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_target",
+          "join_key",
+          "decimalv3(12, 3)",
+          "YES",
+          "4",
+          "12",
+          "3"
+        ],
+        [
+          "dmq_target",
+          "valid_from",
+          "datetime(6)",
+          "NO",
+          "5",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_target",
+          "valid_to",
+          "datetime(6)",
+          "NO",
+          "6",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_target",
+          "event_at",
+          "datetime(6)",
+          "NO",
+          "7",
+          "NULL",
+          "NULL"
+        ],
+        [
+          "dmq_target",
+          "observed_at",
+          "datetime(6)",
+          "NO",
+          "8",
+          "NULL",
+          "NULL"
+        ]
+      ],
+      "upsert": {
+        "logicalRows": 1,
+        "amount": "9007199254740993.20",
+        "eventAt": "2026-11-17 12:00:00.123456"
+      },
+      "join": [
+        "T1",
+        "T2"
+      ],
+      "bigint": [
+        "-9223372036854775808",
+        "9223372036854775807"
+      ],
+      "twoReads": {
+        "first": "9007199254740993.20",
+        "second": "9007199254740993.21",
+        "resetVerified": true,
+        "dataWatermark": null,
+        "consistency": "UNKNOWN"
+      }
+    },
+    "status": "NATIVE_FIXTURE_VERIFIED"
+  },
+  "nativeTypes": {
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "origin": "native fixture read and independent registered interpretation",
+    "sessionZone": "Etc/UTC",
+    "localLexical": "2026-11-17 12:00:00.123456",
+    "explicitlyInterpretedUtc": "2026-11-17T12:00:00.123456Z",
+    "microsecondLastDigitLexical": "2026-11-17 12:00:00.123459",
+    "amount": "9007199254740993.20",
+    "entityJoinKey": "1.00",
+    "columnsAndOrdinalsMatched": 18,
+    "formalProductTypeRejection": "NOT_RUN",
+    "nativeTimeZoneInColumn": false,
+    "stdoutSha256": "6b5a9ebebaab97b6a70341e6e160021a3f02bb4363e7d0922120410d644b2f4d"
+  },
+  "nativeCancel": {
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "runId": "implementation-01",
+    "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+    "operation": "dmq_cancel_88ba648b3958b41d",
+    "totalMs": 5000,
+    "branchMs": 1000,
+    "cleanupMs": 250,
+    "instrument": "native mysql 8.0.44 / VERIFY_IDENTITY, independent admin SQL observer",
+    "formalMySqlConnectorResult": "NOT_RUN",
+    "noReconnect": true,
+    "samples": [
+      {
+        "atMs": 139.494,
+        "feActive": 1,
+        "beActive": 1
+      },
+      {
+        "atMs": 224.39,
+        "feActive": 0,
+        "beActive": 1
+      },
+      {
+        "atMs": 276.664,
+        "feActive": 0,
+        "beActive": 1
+      },
+      {
+        "atMs": 334.985,
+        "feActive": 0,
+        "beActive": 1
+      },
+      {
+        "atMs": 389.914,
+        "feActive": 0,
+        "beActive": 1
+      },
+      {
+        "atMs": 443.508,
+        "feActive": 0,
+        "beActive": 1
+      }
+    ],
+    "feBuild": "doris-4.0.8-rc02-bc8ea1bac6d",
+    "beBuild": "doris-4.0.8-rc02-bc8ea1bac6d",
+    "readerTransport": "'fixture_reader'@'%'",
+    "hostHandshake": {
+      "hostname": "localhost",
+      "port": 19030,
+      "chainAndHostnameVerified": true
+    },
+    "serverThread": 60,
+    "readerOpenMs": 31.979,
+    "queryId": "ebdb6844fe824e68-8774daafa439a615",
+    "processObservedAtMs": 70.076,
+    "cancelRequestedAtMs": 139.503,
+    "killAcknowledgedAtMs": 176.636,
+    "outcome": "NATIVE_CANCEL_NOT_VERIFIED",
+    "reason": "NATIVE_BUDGET_EXHAUSTED",
+    "faultAtMs": 395.703,
+    "finalNativeClientExitCode": 1,
+    "unexpectedResultBytes": 0,
+    "postmortemFeBe": [
+      0,
+      1
+    ],
+    "observationEndMs": 443.518
+  },
+  "laterObserver": {
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "readAtUtc": "2026-11-18T12:20:17.082631+00:00",
+    "queryId": "ebdb6844fe824e68-8774daafa439a615",
+    "serverThread": 60,
+    "feBeCounts": [
+      0,
+      0
+    ],
+    "outsideAcceptanceWindow": true
+  },
+  "cleanupClock": {
+    "killAcknowledgementFromRequestMs": 37.133,
+    "deadlineFromBranchStartMs": 389.503,
+    "lastActiveSampleFromRequestMs": 304.005,
+    "lastActiveSampleWasOutsideCleanup": true,
+    "fiveSecondCompletion": "NOT_VERIFIED",
+    "oneSecondCompletion": "NOT_VERIFIED"
+  },
+  "prepare": {
+    "command": "python3 -B scripts/maintenance/workflow.py prepare --task G4-DORIS-MAPPING-QUERY-001",
+    "exitCode": 2,
+    "reason": "SHORT_REPRO_REQUIRED",
+    "sdkEvidence": [
+      {
+        "event": "START",
+        "stage": "sdk-version",
+        "identity": "4b132e21f03a4d98421578c26cd5fba24c56a55d8e2ac4f369429e7d302c92af",
+        "deadlineSeconds": 180,
+        "exitCode": null,
+        "classification": "UNKNOWN",
+        "startedAtUtc": "2026-11-18T08:40:55.612052+00:00"
+      },
+      {
+        "event": "END",
+        "stage": "sdk-version",
+        "identity": "4b132e21f03a4d98421578c26cd5fba24c56a55d8e2ac4f369429e7d302c92af",
+        "deadlineSeconds": 180,
+        "exitCode": 71,
+        "classification": "EXIT_FAILURE",
+        "startedAtUtc": "2026-11-18T08:40:55.612052+00:00"
+      },
+      {
+        "event": "BLOCKED",
+        "stage": "sdk-version",
+        "identity": "4b132e21f03a4d98421578c26cd5fba24c56a55d8e2ac4f369429e7d302c92af",
+        "deadlineSeconds": 180,
+        "exitCode": null,
+        "classification": "UNCHANGED_FAILURE_BLOCKED",
+        "startedAtUtc": "2026-11-18T08:41:52.700464+00:00"
+      },
+      {
+        "event": "START",
+        "stage": "sdk-version",
+        "identity": "c811add90a016af5b939f315908253e32f95424cd19a24c08465061fb7b406b3",
+        "deadlineSeconds": 15,
+        "exitCode": null,
+        "classification": "UNKNOWN",
+        "startedAtUtc": "2026-11-18T08:42:38.226828+00:00"
+      },
+      {
+        "event": "END",
+        "stage": "sdk-version",
+        "identity": "c811add90a016af5b939f315908253e32f95424cd19a24c08465061fb7b406b3",
+        "deadlineSeconds": 15,
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-18T08:42:38.226828+00:00"
+      },
+      {
+        "event": "BLOCKED",
+        "stage": "sdk-version",
+        "identity": "4b132e21f03a4d98421578c26cd5fba24c56a55d8e2ac4f369429e7d302c92af",
+        "deadlineSeconds": 180,
+        "exitCode": null,
+        "classification": "UNCHANGED_FAILURE_BLOCKED",
+        "startedAtUtc": "2026-11-18T08:42:51.114354+00:00"
+      },
+      {
+        "event": "BLOCKED",
+        "stage": "sdk-version",
+        "identity": "4b132e21f03a4d98421578c26cd5fba24c56a55d8e2ac4f369429e7d302c92af",
+        "deadlineSeconds": 180,
+        "exitCode": null,
+        "classification": "UNCHANGED_FAILURE_BLOCKED",
+        "startedAtUtc": "2026-11-18T12:12:14.601915+00:00"
+      }
+    ]
+  },
+  "closeout": {
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "runId": "implementation-01",
+    "events": [
+      {
+        "service": "be",
+        "id": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+        "signal": "SIGTERM",
+        "before": "running",
+        "waitExit": "0",
+        "elapsedSeconds": 30.173090292024426,
+        "after": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false,
+          "FinishedAt": "2026-11-18T12:23:41.070541466Z"
+        }
+      },
+      {
+        "service": "fe",
+        "id": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+        "signal": "SIGTERM",
+        "before": "running",
+        "waitExit": "143",
+        "elapsedSeconds": 0.6219353328924626,
+        "after": {
+          "Status": "exited",
+          "ExitCode": 143,
+          "OOMKilled": false,
+          "FinishedAt": "2026-11-18T12:23:41.660956675Z"
+        }
+      }
+    ],
+    "runningAfter": [],
+    "retainedVolumes": {
+      "be-data": "ontology-g4-doris-mapping-query-001_be-data",
+      "be-log": "ontology-g4-doris-mapping-query-001_be-log",
+      "fe-data": "ontology-g4-doris-mapping-query-001_fe-data",
+      "fe-log": "ontology-g4-doris-mapping-query-001_fe-log"
+    },
+    "status": "STOPPED_KEEP"
+  },
+  "review": {
+    "reviewer": "/root/spec_review",
+    "gate": "NO_GO_S1_S2_S3",
+    "sourceNativeOnly": true,
+    "afterStop": "PASS_STOPPED_KEEP",
+    "stoppedOriginals": 14,
+    "runningContainers": 0,
+    "keptSourceVolumes": 4,
+    "feGracefulHook": "UNKNOWN",
+    "managementAndFiveDiagnosticHelpersAbsent": true,
+    "s1s3ResourceEnvelope": "ARITHMETIC_ONLY; host 5.5 GiB and auxiliary peaks must be admitted at use"
+  },
+  "hashes": {
+    "vm-admission-364eb1b16e3f443891ba909f142daff7.json": "7d8b6303d758c4d4758a39f6385de1ed91229b5b9689b33f0fee394f10eb2d13",
+    "vm-admission-16be4d4b78cd4d27b7a75745cbf7fc44.json": "941602eaf8860041e4f54ad6b1b5bf5a472a077fb1e09153f5d5df1eeb5f6e3a",
+    "vm-admission-43bfa050a6a64fe89836d3d5a2721080.json": "5da2a635ca87c0095ecda92ee95bf204ed1c3804742bfe3bd1ba8789056df2e9",
+    "dmq_cancel_88ba648b3958b41d.json": "61df71574d7b90ab7c1ce59bfdc0ce486411d273b54886e64b871a98f9861d60",
+    "s0-native-source-6fb85a377add.json": "d1d31c4379c6a8524d1cbe7efd3dda32fa06927e7ac04398995ce954abdfd56e",
+    "s0-source-stop-5a0fb7a16939.json": "df4460d773ababd6720f57927b9c4bdc0620ea5c66d85d1a7977f2b7387f4d14",
+    "s0-cancel-postmortem.json": "439ce4c60dae97a506c3a2664831d7f42edc866572cf7588f243730dbd6ab069",
+    "s0-native-types.json": "5b052602585f0a014cb09ea086d68806764ec3f97515d882770bf75e8a939a34",
+    "s0-host-preflight.json": "b7fe06f4797625a9c2da88f7879e17ee7b1aa766a130827b91aee4f1a8a98c07",
+    "s0-native-source.json": "ddb057bf410ec3dc4816f103fa885ca62d18441879c3be37bf70673b9b540569",
+    "s0-source-identities.json": "53e2933c648d53acb98588a842444cc0b4200253edb311959f446fc9a3fd2ee7",
+    "s0-fe-client-flags.cid": "adf4f8427b83ac620d14d13b23ba893575734740b8da368004999ad461d05808",
+    "s0-fe-client-probe.cid": "2c6fff9fa9457947a71709c2c3fe79abd1df0874ddfbd8d3c1fa41a072c59ba7"
+  }
+}
