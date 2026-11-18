@@ -101,5 +101,12 @@ def build(target,prepared):
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser();parser.add_argument('--task',required=True);parser.add_argument('--target',choices=TARGETS,required=True);parser.add_argument('--prepared',required=True);args=parser.parse_args()
-    if args.task not in (TASK,'G4-ENG-DELIVERY-002','G4-M2-DORIS-01','G4-M2-ORACLE-01'):raise SystemExit(2)
+    if args.task == 'G4-DORIS-MAPPING-QUERY-001':
+        prepared=Path(args.prepared).resolve()
+        if args.target not in ('connections','wire') or not prepared.is_relative_to(ROOT/'artifacts/workflow'/args.task/'environment'):
+            raise SystemExit(2)
+        dependency=json.loads(prepared.read_bytes())
+        if (dependency.get('taskId'),dependency.get('status'),dependency.get('worktree'))!=(args.task,'DEPENDENCIES_READY',str(ROOT)):
+            raise SystemExit(2)
+    elif args.task not in (TASK,'G4-ENG-DELIVERY-002','G4-M2-DORIS-01','G4-M2-ORACLE-01'):raise SystemExit(2)
     result=build(args.target,args.prepared);print(json.dumps(result));raise SystemExit(0 if result['status']=='PASS' else 2)

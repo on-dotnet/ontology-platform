@@ -1,5 +1,6 @@
 """仅创建本次两节点源夹具，使用镜像自带的 MySQL 客户端核对源事实。"""
 import argparse
+import csv
 import hashlib
 import json
 import os
@@ -169,6 +170,103 @@ def insert_entity(amount):
             "'2026-11-17 12:00:00.123456','2026-11-17 12:00:01.123456');")
 
 
+def resume():
+    """按已审索引恢复准确的两个源节点，复核资源和原卷后才允许启动。"""
+    from workflow_m2_build import validate
+    validate('connections',vm.TASK)
+    reviewed = json.loads((vm.ROOT/'docs/evidence'/vm.TASK/vm.RUN/'s0-source-review.json').read_bytes())
+    vm.demand(hashlib.sha256(INDEX.read_bytes()).hexdigest() in
+              [v.get(INDEX.name) for v in reviewed.values() if isinstance(v,dict)],'REVIEWED_INDEX')
+    state = json.loads(INDEX.read_bytes())
+    admission = vm.collect()
+    vm.demand(admission['status']=='KERNEL_AND_VM_READY' and admission['host']['physicalBytes'] >=
+              20*vm.GIB + admission['phaseEnvelope']['S0_FE_BE']['hostStageBudgetBytes'],'VM_SOURCE_ADMISSION')
+    vm.demand(state['taskId']==vm.TASK and state['runId']==vm.RUN and state['project']==PROJECT and
+              set(state['services'])=={'fe','be'} and DIRECTORY.resolve()==DIRECTORY,'RESUME_OWNER')
+    path = vm.OUTPUT/('s0-resume-'+secrets.token_hex(6)+'.json')
+    events = {'vmAttempt':admission['attempt'],'services':{},'started':[]}
+    owner = '{{index .Config.Labels "ontology.task"}} {{index .Config.Labels "ontology.run"}} {{index .Config.Labels "com.docker.compose.project"}}'
+    for role,s in state['services'].items():
+        cap = (4 if role=='fe' else 6)*vm.GIB
+        check = docker('resume-owner','inspect','-f','{{.Id}} {{.Image}} '+owner+' {{.State.Status}} {{.HostConfig.Memory}} {{.HostConfig.MemorySwap}} {{.HostConfig.NanoCpus}}',s['id'])
+        vm.demand(check.split()==[s['id'],admission['images'][role]['id'],vm.TASK,vm.RUN,PROJECT,'exited',str(cap),str(cap),'2000000000'],'RESUME_ID_QUOTA')
+        mounts = json.loads(docker('resume-mounts','inspect','-f','{{json .Mounts}}',s['id']))
+        volumes = [m['Name'] for m in mounts if m['Type']=='volume']
+        vm.demand(sorted(volumes)==sorted(state['volumes'][role+'-'+n] for n in ('data','log')),'RESUME_VOLUMES')
+        bindings = [m for m in mounts if m['Type']!='volume']
+        expected = {DIRECTORY/(role+'.conf')} | ({DIRECTORY/'tls'} if role=='fe' else set())
+        vm.demand({Path(m['Source']).resolve() for m in bindings}==expected and
+                  all(m['Type']=='bind' and not m['RW'] for m in bindings),'RESUME_BINDING')
+        events['services'][role] = {'id':s['id'],'image':s['image'],'volumes':volumes,'from':'exited'}
+    record(path,events)
+    for role in ('fe','be'):
+        cid = state['services'][role]['id']
+        vm.demand(docker('resume-'+role,'start',cid)==cid,'RESUME_START')
+        events['started'].append(cid)
+        record(path,events)
+        deadline = time.monotonic()+100
+        while time.monotonic()<deadline:
+            current=docker('resume-health','inspect','-f','{{.State.Status}} {{.State.Health.Status}}',cid)
+            if current=='running healthy':break
+            vm.demand(current=='running starting','RESUME_HEALTH')
+            time.sleep(1)
+        else: raise ValueError('RESUME_HEALTH_DEADLINE')
+    ready_source(state['services']['fe']['id'])
+    events['status']='BOTH_HEALTHY'
+    record(path,events)
+    print(path.relative_to(vm.ROOT),events['status'])
+
+
+def ready_source(fe):
+    """端口健康后仍须等固定 FE 接收到准确版本的 BE 心跳。"""
+    for group in ('FRONTENDS','BACKENDS'):
+        deadline=time.monotonic()+60
+        while time.monotonic()<deadline:
+            table=list(csv.DictReader(sql(fe,'root','SHOW '+group+';',True,limit=3).splitlines(),delimiter='\t'))
+            vm.demand(len(table)==1,'RESUME_NODE_COUNT')
+            version=table[0]['Version']
+            if version and version not in ('NULL','\\N'):
+                vm.demand(version=='doris-4.0.8-rc02-bc8ea1bac6d','RESUME_BUILD')
+            if table[0]['Alive'].lower()=='true' and version=='doris-4.0.8-rc02-bc8ea1bac6d':
+                break
+            time.sleep(1)
+        else: raise ValueError('RESUME_HEARTBEAT_DEADLINE')
+    vm.demand(sql(fe,'reader','SHOW TABLES FROM fixture;').splitlines()==['dmq_entity','dmq_target'],'RESUME_FIXTURE')
+
+
+def driver(prepared, method):
+    """在当前输入绑定的程序集上仅运行一个 S0 源见证，保留 MTP 真实退出码。"""
+    from workflow_m2_build import validate
+    from workflow_m2_evidence import mtp
+    from workflow_doris_mapping_query import s0_consumers
+    s0_consumers(vm.ROOT,vm.TASK,'source')
+    envfile = execution.ordinary(prepared)
+    vm.demand(envfile.is_relative_to(vm.ROOT/'artifacts/workflow'/vm.TASK/'environment'),'PREPARE_OWNER')
+    environment = json.loads(envfile.read_bytes())
+    vm.demand(environment['status']=='DEPENDENCIES_READY' and environment['taskId']==vm.TASK and
+              environment['worktree']==str(vm.ROOT),'PREPARE_RECEIPT')
+    binding = validate('connections',vm.TASK)
+    state = json.loads(INDEX.read_bytes())
+    for service in state['services'].values():
+        vm.demand(docker('driver-identity','inspect','-f','{{.Id}} {{.Image}} {{.State.Status}} {{.State.Health.Status}} {{index .Config.Labels "ontology.task"}}',service['id'])
+                  ==' '.join([service['id'],service['image'],'running','healthy',vm.TASK]),'DRIVER_SOURCE_DRIFT')
+    ready_source(state['services']['fe']['id'])
+    env = dict(environment['environment'],DMQ_S0_SOURCE=str(DIRECTORY),DMQ_S0_EVIDENCE=str(vm.OUTPUT),
+               DOTNET_GCHeapHardLimit='0x18000000')
+    test = {'driver-types':'RealDriverReadsFixedSource','driver-cancel':'ActiveBackendMustFinishInsideOriginalWindow'}[method]
+    key = execution.sha(execution.encoded([binding,hashlib.sha256(INDEX.read_bytes()).hexdigest(),test,
+        hashlib.sha256(Path(__file__).read_bytes()).hexdigest()]))
+    result = execution.run([environment['dotnet'],str(vm.ROOT/'backend/tests/OntologyPlatform.ConnectionsTests/bin/Debug/net10.0/OntologyPlatform.ConnectionsTests.dll'),
+              '--filter','FullyQualifiedName=OntologyPlatform.ConnectionsTests.DorisMappingQueryTests.'+test,
+              '--minimum-expected-tests','1','--results-directory',str(vm.OUTPUT/'driver-results'),'--no-ansi','--progress','off'],
+              vm.ROOT,task=vm.TASK,run_id=vm.RUN,stage=method,input_key=key,environment=env,timeout=20)
+    count = mtp(result.stdout+result.stderr,1) if result.returncode==0 else None
+    receipt = dict(method=test,build=binding,command=result.receipt['commandId'],exitCode=result.returncode,passed=count)
+    record(vm.OUTPUT/(method+'-'+receipt['command']+'.json'),receipt)
+    print(json.dumps(receipt))
+    return result.returncode
+
+
 def capabilities():
     state=json.loads(INDEX.read_text())
     vm.demand(state['status']=='BOTH_HEALTHY','REAL_SOURCE_NOT_READY')
@@ -285,6 +383,11 @@ def stop():
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('stage',choices=['create','capabilities','stop'])
-    stage=parser.parse_args().stage
-    {'create':create, 'capabilities':capabilities, 'stop':stop}[stage]()
+    parser.add_argument('stage',choices=['create','resume','capabilities','driver-types','driver-cancel','stop'])
+    parser.add_argument('--prepared',type=Path)
+    args=parser.parse_args()
+    stage=args.stage
+    if stage.startswith('driver-'):
+        if args.prepared is None: parser.error('--prepared required')
+        raise SystemExit(driver(args.prepared,stage))
+    {'create':create, 'resume':resume, 'capabilities':capabilities, 'stop':stop}[stage]()

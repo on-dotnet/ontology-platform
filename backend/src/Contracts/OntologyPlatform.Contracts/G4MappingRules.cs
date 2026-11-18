@@ -98,8 +98,10 @@ public static class G4MappingRules
         {
             Hash(hash);
         }
-        Require(binding.SourceType == "POSTGRESQL" && binding.AdapterVersion == "pg-mapping-v1"
-            && binding.ExecutorVersion == "mapping-validator-v1" && binding.CanonicalVersion == "mapping-c14n-v1");
+        Require(binding.CanonicalVersion == "mapping-c14n-v1"
+            && (binding.SourceType, binding.AdapterVersion, binding.ExecutorVersion) is
+                ("POSTGRESQL", "pg-mapping-v1", "mapping-validator-v1") or
+                ("DORIS", "doris-mapping-v1", "doris-mapping-validator-v1"));
     }
 
     /// <summary>要求完整非空组织厂区集合，不进行授权裁剪。</summary>

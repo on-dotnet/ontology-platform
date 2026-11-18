@@ -129,6 +129,24 @@ public sealed class DorisSourceAdapter : IDorisSourceAdapter
         };
     }
 
+    /// <summary>在查询分支的原绝对期限内执行内部固定计划，前后重验只读权限。</summary>
+    internal Task<T> ReadBranchAsync<T>(DorisConnectionProfile profile, string secret, DateTimeOffset deadlineAtUtc,
+        TimeProvider clock, Func<MySqlConnection, Task<T>> read, CancellationToken cancellationToken)
+    {
+        Validate(profile, secret);
+        return DorisReadSession.ReadAsync(() => Create(secret), async (connection, work) =>
+        {
+            work.ThrowIfCancellationRequested();
+            await VerifyReadOnlyAsync(connection);
+            work.ThrowIfCancellationRequested();
+            // 结果仅暂存在本次分支，权限后验与会话清理成功后才可返回。
+            var value = await read(connection);
+            work.ThrowIfCancellationRequested();
+            await VerifyReadOnlyAsync(connection);
+            return value;
+        }, clock, deadlineAtUtc, cancellationToken);
+    }
+
     /// <summary>避免驱动软取消的Doris兼容问题；取消后关闭自己的源连接，禁止其继续被复用。</summary>
     private async Task<T> ExecuteAsync<T>(MySqlConnection connection, string secret, Func<MySqlConnection, Task<T>> operation, CancellationToken token)
     {

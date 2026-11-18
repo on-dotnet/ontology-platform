@@ -7,6 +7,31 @@ namespace OntologyPlatform.G2ContractTests;
 [TestClass]
 public sealed class G4QueryWireTests
 {
+    /// <summary>两个源各自绑定准确执行器；独立更换来源、版本或规范协议均须被拒绝。</summary>
+    [TestMethod]
+    public void MappingBindingRejectsMixedSourceVersions()
+    {
+        // 固定摘要只用于版本合同检查，不代表已经取得源读取证据。
+        var hash = new string('a', 64);
+        // 历史 PG 组合保持原规范标识。
+        var pg = new MappingVersionBinding
+        {
+            SourceConnectionId = "conn", SourceCatalogSnapshotId = "snap", OntologyReleaseId = "release",
+            AssessmentId = "assessment", ConnectionRevision = 1, SecretVersion = 1, AuthorizationEpoch = 1,
+            ConfigHash = hash, SourceCatalogFingerprint = hash, OntologyManifestHash = hash, MappingHash = hash,
+            ValidationHash = hash, ImpactHash = hash, SourceType = "POSTGRESQL", AdapterVersion = "pg-mapping-v1",
+            ExecutorVersion = "mapping-validator-v1", CanonicalVersion = "mapping-c14n-v1"
+        };
+        // 新源与 PG 共用字段集合，来源、适配器、执行器必须成组更换。
+        var doris = pg with { SourceType = "DORIS", AdapterVersion = "doris-mapping-v1", ExecutorVersion = "doris-mapping-validator-v1" };
+        G4MappingRules.Binding(pg);
+        G4MappingRules.Binding(doris);
+        Assert.Throws<SemanticOperationException>(() => G4MappingRules.Binding(pg with { SourceType = "DORIS" }));
+        Assert.Throws<SemanticOperationException>(() => G4MappingRules.Binding(doris with { AdapterVersion = pg.AdapterVersion }));
+        Assert.Throws<SemanticOperationException>(() => G4MappingRules.Binding(doris with { ExecutorVersion = pg.ExecutorVersion }));
+        Assert.Throws<SemanticOperationException>(() => G4MappingRules.Binding(doris with { CanonicalVersion = "unknown" }));
+    }
+
     /// <summary>超过JavaScript安全整数的值仍以原始十进制字符串往返。</summary>
     [TestMethod]
     public void ExactObservationSurvivesWireRoundTrip()

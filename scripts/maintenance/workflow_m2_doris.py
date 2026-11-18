@@ -13,6 +13,12 @@ def structural(root, task):
     """核对真实DI、应用、审计和测试入口，生产guard必须保留。"""
     if task != TASK:
         raise ValueError('DORIS_TASK_INVALID')
+    return dict(taskId=task, status='STRUCTURAL_READY', consumers=source_consumers(root),
+                lifecycle='NOT_RUN', interaction='NOT_RUN', production='NOT_AUTHORIZED')
+
+
+def source_consumers(root):
+    """核实现有正式 Doris 适配器、注入、凭据范围和事务审计消费者。"""
     paths = {
         'composition': 'backend/src/Hosts/OntologyPlatform.Api/G4/G4Composition.cs',
         'dispatch': 'backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionSourceDispatcher.cs',
@@ -42,8 +48,7 @@ def structural(root, task):
     for action in ('connection.secret.intake', 'connection.create', 'connection.probe.start', 'connection.probe.complete', 'connection.enable', 'connection.disable', 'connection.catalog.start', 'connection.catalog.finish', 'connection.catalog.cancel'):
         if '"' + action + '"' not in texts['audit']:
             raise ValueError('DORIS_AUDIT_MISSING')
-    return dict(taskId=task, status='STRUCTURAL_READY', consumers=paths,
-                lifecycle='NOT_RUN', interaction='NOT_RUN', production='NOT_AUTHORIZED')
+    return paths
 
 
 def adapter(runtime, prepared):

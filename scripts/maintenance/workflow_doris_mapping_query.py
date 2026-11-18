@@ -3,6 +3,27 @@ from datetime import datetime, timezone
 from decimal import Decimal
 
 
+def s0_consumers(root, task, phase):
+    """只核验本轮 S0 的实际执行器和定向消费者；后续运行阶段单独准入。"""
+    from execution_preflight import source_path
+    from workflow_m2_doris import source_consumers
+    if task != 'G4-DORIS-MAPPING-QUERY-001' or phase != 'source':
+        raise ValueError('DMQ_ONLY_S0_SOURCE_REGISTERED')
+    paths = source_consumers(root)
+    directory = 'backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Adapters/'
+    for relative, terms in (
+        (directory+'DorisSourceAdapter.cs', ['ReadBranchAsync<T>', 'DorisReadSession.ReadAsync']),
+        (directory+'DorisReadSession.cs', ['connection.ServerThread', 'KILL CONNECTION ', 'kill.ExecuteNonQueryAsync']),
+        ('backend/tests/OntologyPlatform.ConnectionsTests/DorisMappingQueryTests.cs',
+         ['ReadBranchAsync', 'RealDriverReadsFixedSource', 'ActiveBackendMustFinishInsideOriginalWindow', 'backend_active_tasks'])):
+        source = source_path(root,relative).read_text()
+        if any(term not in source for term in terms):
+            raise ValueError('DMQ_S0_CONSUMER_MISSING')
+        paths[relative.split('/')[-1]] = relative
+    return dict(taskId=task, phase='S0', status='STRUCTURAL_READY', consumers=paths,
+                sourceCancellation='NOT_VERIFIED', productLifecycle='NOT_RUN')
+
+
 # 两张表是同一目录输入，调用者必须完成全部建表和探针复位后才发正式 Discover。
 def fixture_tables():
     """返回任务专用两表的 DDL；产品只读账号不参与执行。"""
