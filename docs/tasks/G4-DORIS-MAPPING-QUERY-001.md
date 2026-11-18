@@ -1,7 +1,7 @@
 # G4-DORIS-MAPPING-QUERY-001｜Doris Mapping/Query 规格
 
 ## 当前执行与授权
-唯一执行状态：S0_BLOCKED_BE_CANCELLATION。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
+唯一执行状态：S0_BLOCKED_FIXED_PLAN_CANCELLATION。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
 
 Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)列明的源、测试、最小任务注册和当前文档。历史PG规范字节、旧ZIP与私有设施为只读依赖。R0允许14个准确ID在保全、排空、恢复清单与非作者检查后优雅停止。用户随后手动调VM。当前其他旧KEEP受保护，本分支不合main。
 
@@ -80,3 +80,9 @@ Docker 引擎实读 20964958208 字节（19.525 GiB）、12 CPU。旧 14 个原�
 源码 cf02313240b00cd74704859700128c5f7d1fd390 上的正式 MySqlConnector 2.6.2 测试读到 E1 的唯一逻辑行、精确金额 9007199254740993.20 与 123456 微秒，两表三列有序键和 UNIQUE/MOW 均匹配。取消测试使用同账号、同固定 FE 和本次真实连接 52。独立观察者匹配 QueryId e5f15ab3fbd44503-bafbb4493f6c778c。取消后约 18 毫秒驱动结束，20.683 毫秒后分支返回 query_source_unavailable。250 毫秒截止后仍观测到 BE 任务，耗时随后继续增长。BE 收到取消后约 2.924 秒进入 fragment 析构，统计行的耗时冻结后仍存在；取消后约 4.316 秒首次观测 FE/BE 双零。
 
 非作者复核类型测试一项通过，取消测试一项失败，五秒内的事后观察与源清理分列。S0 继续阻断 S1–S3。待裁决仅涉及取消资格的 SQL 计划范围及代表性证据。单行 SLEEP 在该版本内不能及时中断，若裁定以允许的固定业务计划验证，仍需运行中取消及独立 BE 终结原件，沿用 250ms、1s、5s。此次实测未给普通业务投影作出可取消性结论。两源节点与旧十四个准确容器均已退出，四个本任务卷保留。本轮未构包。[正式回执与非作者裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-driver-review.json)。
+
+## 固定 SQL 取消见证（2026-11-18）
+
+用户已将放行范围限定为产品生成的固定 SQL。SLEEP 的历史失败作为版本能力边界保留。本次源码为 f642666c2353fe3c8e7c504be4b6287ff4e65ffe，采用两张原表、每表恰好100个合成逻辑行、独占同账号辅助 TLS 连接；就绪的独立旁路按准确 QueryId 观察 BE。固定 SELECT 的结果缓存仅对本语句关闭。正常测试读回 100 个实体及两条符合精确等值和半开关系的目标 T1、T2。
+
+最终两个计划在 BE 注册到上下文析构之间分别经历 2.200ms、2.339ms。应用在取消后 6.5965ms、3.9266ms 返回不可用。实体缺少同 QueryId 的用户取消到达事件；关系的取消到达比上下文析构晚 0.105ms。两项 MTP 都因缺少运行中源任务被取消的证据而 exit 2。四组构建、各自见证、源事件及四次数据复原见[固定计划机器回执与非作者裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-fixed-plan-review.json)。非作者裁决 S0 BLOCKED，S1–S3 尚未放行。收尾时四个源卷保留，准确 2+14 个容器均退出。此前成功构建的滚动绑定文件已由正常构建更新，原 SLEEP 失败与本次全部失败原件分别保留。

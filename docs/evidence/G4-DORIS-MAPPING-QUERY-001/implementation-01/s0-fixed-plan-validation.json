@@ -1,0 +1,54 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "f642666c2353fe3c8e7c504be4b6287ff4e65ffe",
+  "checks": [
+    {
+      "name": "WorkflowDorisMappingQuery",
+      "command": "python3 -B scripts/tests/WorkflowDorisMappingQuery.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.004s\n\nOK\n"
+    },
+    {
+      "name": "WorkflowDoris",
+      "command": "python3 -B scripts/tests/WorkflowDoris.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "......\n----------------------------------------------------------------------\nRan 6 tests in 0.013s\n\nOK\n"
+    },
+    {
+      "name": "fixed-values",
+      "command": "workflow_doris_s0_fixture.py driver-fixed-values --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Normal projections: 1 executed, 1 passed. Command eff0ece6c8c04042a3f32e501821ffc9."
+    },
+    {
+      "name": "fixed-entity",
+      "command": "workflow_doris_s0_fixture.py driver-fixed-entity --prepared <bound prepare receipt>",
+      "status": "FAIL",
+      "exitCode": 2,
+      "output": "1 executed, 1 failed: FIXED_PLAN_SOURCE_TERMINATION_NOT_VERIFIED. Command c4df089edcc24bcb81f9a0826c1871f1."
+    },
+    {
+      "name": "fixed-target",
+      "command": "workflow_doris_s0_fixture.py driver-fixed-target --prepared <bound prepare receipt>",
+      "status": "FAIL",
+      "exitCode": 2,
+      "output": "1 executed, 1 failed: FIXED_PLAN_SOURCE_TERMINATION_NOT_VERIFIED. Command 174e65518b1a497d9c0b83b3cb2183a0."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "scope": "S0 product fixed plan source qualification only",
+    "inputKey": "0557762462953186eb7b8d8a8de60e3f83d0d75b0e6b0860143646cf70e5a8c5",
+    "originals": "s0-fixed-plan-review.json"
+  }
+}

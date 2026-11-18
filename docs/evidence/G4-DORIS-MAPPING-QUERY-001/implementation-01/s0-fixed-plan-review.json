@@ -1,0 +1,833 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "sourceCommit": "f642666c2353fe3c8e7c504be4b6287ff4e65ffe",
+  "status": "S0_BLOCKED_FIXED_PLAN_CANCELLATION",
+  "scope": "固定实体读取与单父项关系目标读取；SLEEP 原件在 s0-driver-review.json 中。当前两个模板仍处于源能力准入，尚未开放 HTTP。",
+  "budgetsMs": {
+    "cleanup": 250,
+    "branch": 1000,
+    "total": 5000
+  },
+  "candidateBuilds": [
+    {
+      "inputKey": "b87b267748789f1e8c60531b2e7717155671a16cf69051ce2a622e3fb61d7d07",
+      "change": "原辅助握手在取消后，日志接收未先验证就绪",
+      "buildReceiptSha256": "26772037a6684b40b68d831cc69215260781e6da8cec303e271b3ed4bee9c82b",
+      "cases": [
+        {
+          "method": "FixedPlansReturnScopedValues",
+          "command": "c59f763f31be438ca185497b5a3a86ea",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "elapsedSeconds": 0.5276582920923829,
+          "passed": 1
+        },
+        {
+          "method": "FixedEntityCancellation",
+          "command": "a974193123284ce49cfeb178b7482f7a",
+          "exitCode": 2,
+          "classification": "EXIT_FAILURE",
+          "elapsedSeconds": 0.473161333007738,
+          "passed": null,
+          "sourceWitness": {
+            "passed": false,
+            "result": "NATURAL_COMPLETION",
+            "query": "a9da02c706340be-b949c7a4a6784200",
+            "thread": 61,
+            "sourceThread": 61,
+            "templateHash": "cd18ce346b018d418ea7374a594b2973887de9752c746be2c0cfc2d7c2f94b2d",
+            "observedSqlHash": "7512c0b51ff5734987308836ba9784f64fe16c66830d7f38151c7ba414edb28e",
+            "requestedMs": null,
+            "returnedMs": 53.5071,
+            "feGoneMs": null,
+            "endMs": 55.1084,
+            "rowsFinished": true,
+            "sourceEvents": []
+          }
+        },
+        {
+          "method": "FixedTargetCancellation",
+          "command": "f6202795120743bd98a47260861f3502",
+          "exitCode": 2,
+          "classification": "EXIT_FAILURE",
+          "elapsedSeconds": 0.3754427080275491,
+          "passed": null,
+          "sourceWitness": {
+            "passed": false,
+            "result": "query_source_unavailable",
+            "query": "1b57d510533d4895-9220d4f6bae0b7c7",
+            "thread": 66,
+            "sourceThread": 66,
+            "templateHash": "258c64609a86006fce9685b756467bb9fbb31fb50bad4080470ae84226a28c89",
+            "observedSqlHash": "79bf3318e667cc8f8cfe295572a8ab6ff4b34b0e568424ae90332ca520dc1bc2",
+            "requestedMs": 40.3439,
+            "returnedMs": 59.561,
+            "feGoneMs": 55.694,
+            "endMs": 60.9835,
+            "rowsFinished": true,
+            "sourceEvents": [
+              {
+                "Kind": "registered",
+                "Utc": "20261118 14:38:19.879599",
+                "receivedMs": 39.5076
+              },
+              {
+                "Kind": "fragment_end",
+                "Utc": "20261118 14:38:19.881358",
+                "receivedMs": 41.1721
+              },
+              {
+                "Kind": "fragment_end",
+                "Utc": "20261118 14:38:19.882112",
+                "receivedMs": 41.7928
+              },
+              {
+                "Kind": "context_end",
+                "Utc": "20261118 14:38:19.882169",
+                "receivedMs": 41.8424
+              },
+              {
+                "Kind": "cancel_arrived",
+                "Utc": "20261118 14:38:19.886134",
+                "receivedMs": 45.878
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "inputKey": "447512a6bb3c861843531f6ba0756f46813f84d47d8eb97c87dd1445d4755634",
+      "change": "同账号预握手、规范化 QueryId、BE 注册即时通知",
+      "buildReceiptSha256": "61f27f2b7faeb4c4f48ef50cd9bb252c8e2aa18591276d142e656b457c99266b",
+      "cases": [
+        {
+          "method": "FixedPlansReturnScopedValues",
+          "command": "4d4cb5b908774da2b225aae8fa1568c1",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "elapsedSeconds": 0.4787102909758687,
+          "passed": 1
+        },
+        {
+          "method": "FixedEntityCancellation",
+          "command": "42ec438f55ec474687b70121bee0036d",
+          "exitCode": 2,
+          "classification": "EXIT_FAILURE",
+          "elapsedSeconds": 0.3557755829533562,
+          "passed": null,
+          "sourceWitness": {
+            "passed": false,
+            "result": "NATURAL_COMPLETION",
+            "rawQuery": null,
+            "query": null,
+            "thread": 0,
+            "sourceThread": 59,
+            "auxiliary": 60,
+            "templateHash": "cd18ce346b018d418ea7374a594b2973887de9752c746be2c0cfc2d7c2f94b2d",
+            "observedSqlHash": null,
+            "requestedMs": null,
+            "returnedMs": 43.5599,
+            "feGoneMs": null,
+            "endMs": 45.4876,
+            "rowsFinished": true,
+            "sourceEvents": []
+          }
+        },
+        {
+          "method": "FixedTargetCancellation",
+          "command": "1031df3701944551ba537871143d25e9",
+          "exitCode": 2,
+          "classification": "EXIT_FAILURE",
+          "elapsedSeconds": 0.3513271249830723,
+          "passed": null,
+          "sourceWitness": {
+            "passed": false,
+            "result": "NATURAL_COMPLETION",
+            "rawQuery": "c83f3819ee664372-b34d8676b99fc7b2",
+            "query": "c83f3819ee664372-b34d8676b99fc7b2",
+            "thread": 65,
+            "sourceThread": 65,
+            "auxiliary": 66,
+            "templateHash": "258c64609a86006fce9685b756467bb9fbb31fb50bad4080470ae84226a28c89",
+            "observedSqlHash": "79bf3318e667cc8f8cfe295572a8ab6ff4b34b0e568424ae90332ca520dc1bc2",
+            "requestedMs": null,
+            "returnedMs": 41.2054,
+            "feGoneMs": null,
+            "endMs": 42.7782,
+            "rowsFinished": true,
+            "sourceEvents": []
+          }
+        }
+      ]
+    },
+    {
+      "inputKey": "dd504803a73b9b5823b524165a4eea87cc601d4e6cb82024c6cc9bf01470f490",
+      "change": "固定 SELECT 绕过本语句结果缓存、同 QueryId 就绪探针",
+      "buildReceiptSha256": "036005daabecb0ba11d9171d6ccac902db1fb961dc4c60fa484d114acbbaec66",
+      "cases": [
+        {
+          "method": "FixedPlansReturnScopedValues",
+          "command": "ca2cec9b636545aebd22e45d9f08a203",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "elapsedSeconds": 0.42225454200524837,
+          "passed": 1
+        },
+        {
+          "method": "FixedEntityCancellation",
+          "command": "32b23ebaff934258a15ce40e8117a082",
+          "exitCode": 2,
+          "classification": "EXIT_FAILURE",
+          "elapsedSeconds": 0.4067267499631271,
+          "passed": null,
+          "sourceWitness": {
+            "passed": false,
+            "result": "query_source_unavailable",
+            "rawQuery": "e3df530ebf2b4e91-ba4db7c523a6273c",
+            "query": "e3df530ebf2b4e91-ba4db7c523a6273c",
+            "thread": 58,
+            "sourceThread": 58,
+            "auxiliary": 59,
+            "templateHash": "0c11543655f04d90ee24f8ed6cb097e26af358c1bcd778d4e16a0fe1740a93e7",
+            "observedSqlHash": "8651dc114775e20c1e04613f84fbdee9f512dde65ed79229fd18a92052659a45",
+            "requestedMs": 45.3797,
+            "returnedMs": 51.0219,
+            "feGoneMs": 47.9946,
+            "endMs": 52.519,
+            "rowsFinished": false,
+            "sourceEvents": [
+              {
+                "Kind": "registered",
+                "Utc": "20261118 14:47:45.874954",
+                "receivedMs": 45.1119
+              },
+              {
+                "Kind": "fragment_end",
+                "Utc": "20261118 14:47:45.876931",
+                "receivedMs": 46.9572
+              },
+              {
+                "Kind": "fragment_end",
+                "Utc": "20261118 14:47:45.877619",
+                "receivedMs": 47.635
+              },
+              {
+                "Kind": "context_end",
+                "Utc": "20261118 14:47:45.877673",
+                "receivedMs": 47.6883
+              },
+              {
+                "Kind": "cancel_arrived",
+                "Utc": "20261118 14:47:45.878713",
+                "receivedMs": 48.722
+              }
+            ]
+          }
+        },
+        {
+          "method": "FixedTargetCancellation",
+          "command": "f37c146431f741a488e52af82f835789",
+          "exitCode": 2,
+          "classification": "EXIT_FAILURE",
+          "elapsedSeconds": 0.3863944999175146,
+          "passed": null,
+          "sourceWitness": {
+            "passed": false,
+            "result": "query_source_unavailable",
+            "rawQuery": "fef1b51d9e65452f-94fba3eda8c5c79b",
+            "query": "fef1b51d9e65452f-94fba3eda8c5c79b",
+            "thread": 64,
+            "sourceThread": 64,
+            "auxiliary": 65,
+            "templateHash": "0f9b6f5e9a0c21cd2195b2a4470bfbee776d3f0e918561d380b9987d3a4fd11c",
+            "observedSqlHash": "1aa4f85ecd7886210ef1ac23bfe9523787ce4f98147ce9fd1a38b3c093e7db12",
+            "requestedMs": 47.6682,
+            "returnedMs": 51.9023,
+            "feGoneMs": 49.0437,
+            "endMs": 53.3891,
+            "rowsFinished": false,
+            "sourceEvents": [
+              {
+                "Kind": "registered",
+                "Utc": "20261118 14:47:46.473577",
+                "receivedMs": 47.3664
+              },
+              {
+                "Kind": "fragment_end",
+                "Utc": "20261118 14:47:46.475361",
+                "receivedMs": 48.9121
+              },
+              {
+                "Kind": "fragment_end",
+                "Utc": "20261118 14:47:46.475950",
+                "receivedMs": 49.4298
+              },
+              {
+                "Kind": "context_end",
+                "Utc": "20261118 14:47:46.476025",
+                "receivedMs": 49.5613
+              },
+              {
+                "Kind": "cancel_arrived",
+                "Utc": "20261118 14:47:46.476233",
+                "receivedMs": 49.8065
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "inputKey": "0557762462953186eb7b8d8a8de60e3f83d0d75b0e6b0860143646cf70e5a8c5",
+      "change": "预建同账号 KILL 并在产品令牌触发时单发",
+      "buildReceiptSha256": "fba5576196b8d54d947bbbff9a0f4bfc89903631f27e8363d459c68584af3273",
+      "cases": [
+        {
+          "method": "FixedPlansReturnScopedValues",
+          "command": "eff0ece6c8c04042a3f32e501821ffc9",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "elapsedSeconds": 0.40536787500604987,
+          "passed": 1
+        },
+        {
+          "method": "FixedEntityCancellation",
+          "command": "c4df089edcc24bcb81f9a0826c1871f1",
+          "exitCode": 2,
+          "classification": "EXIT_FAILURE",
+          "elapsedSeconds": 0.41202658391557634,
+          "passed": null,
+          "sourceWitness": {
+            "passed": false,
+            "result": "query_source_unavailable",
+            "rawQuery": "aada6f4f1ca64ea1-905e2dd8027b442c",
+            "query": "aada6f4f1ca64ea1-905e2dd8027b442c",
+            "thread": 58,
+            "sourceThread": 58,
+            "auxiliary": 59,
+            "templateHash": "0c11543655f04d90ee24f8ed6cb097e26af358c1bcd778d4e16a0fe1740a93e7",
+            "observedSqlHash": "8651dc114775e20c1e04613f84fbdee9f512dde65ed79229fd18a92052659a45",
+            "requestedMs": 45.1557,
+            "returnedMs": 51.7522,
+            "feGoneMs": 48.5847,
+            "endMs": 53.6767,
+            "rowsFinished": false,
+            "driverEvents": [
+              {
+                "Name": "doris.cancel.ready",
+                "utc": "2026-11-18T14:52:13.204903+00:00"
+              },
+              {
+                "Name": "doris.plan.submitted",
+                "utc": "2026-11-18T14:52:13.210276+00:00"
+              },
+              {
+                "Name": "doris.kill.dispatched",
+                "utc": "2026-11-18T14:52:13.225754+00:00"
+              },
+              {
+                "Name": "doris.kill.acknowledged",
+                "utc": "2026-11-18T14:52:13.229411+00:00"
+              },
+              {
+                "Name": "doris.driver.ended",
+                "utc": "2026-11-18T14:52:13.229469+00:00"
+              },
+              {
+                "Name": "doris.source.termination_unverified",
+                "utc": "2026-11-18T14:52:13.231398+00:00"
+              }
+            ],
+            "sourceEvents": [
+              {
+                "Kind": "registered",
+                "Utc": "20261118 14:52:13.222700",
+                "receivedMs": 44.7988
+              },
+              {
+                "Kind": "fragment_end",
+                "Utc": "20261118 14:52:13.224167",
+                "receivedMs": 46.1765
+              },
+              {
+                "Kind": "fragment_end",
+                "Utc": "20261118 14:52:13.224828",
+                "receivedMs": 46.71
+              },
+              {
+                "Kind": "context_end",
+                "Utc": "20261118 14:52:13.224900",
+                "receivedMs": 46.8375
+              }
+            ]
+          }
+        },
+        {
+          "method": "FixedTargetCancellation",
+          "command": "174e65518b1a497d9c0b83b3cb2183a0",
+          "exitCode": 2,
+          "classification": "EXIT_FAILURE",
+          "elapsedSeconds": 0.3740292090224102,
+          "passed": null,
+          "sourceWitness": {
+            "passed": false,
+            "result": "query_source_unavailable",
+            "rawQuery": "7a3ee650cc4c4cf9-9e5e794bede26210",
+            "query": "7a3ee650cc4c4cf9-9e5e794bede26210",
+            "thread": 64,
+            "sourceThread": 64,
+            "auxiliary": 65,
+            "templateHash": "0f9b6f5e9a0c21cd2195b2a4470bfbee776d3f0e918561d380b9987d3a4fd11c",
+            "observedSqlHash": "1aa4f85ecd7886210ef1ac23bfe9523787ce4f98147ce9fd1a38b3c093e7db12",
+            "requestedMs": 45.129,
+            "returnedMs": 49.0556,
+            "feGoneMs": 46.7731,
+            "endMs": 50.9039,
+            "rowsFinished": false,
+            "driverEvents": [
+              {
+                "Name": "doris.cancel.ready",
+                "utc": "2026-11-18T14:52:13.790508+00:00"
+              },
+              {
+                "Name": "doris.plan.submitted",
+                "utc": "2026-11-18T14:52:13.795158+00:00"
+              },
+              {
+                "Name": "doris.kill.dispatched",
+                "utc": "2026-11-18T14:52:13.812204+00:00"
+              },
+              {
+                "Name": "doris.kill.acknowledged",
+                "utc": "2026-11-18T14:52:13.813157+00:00"
+              },
+              {
+                "Name": "doris.driver.ended",
+                "utc": "2026-11-18T14:52:13.813279+00:00"
+              },
+              {
+                "Name": "doris.source.termination_unverified",
+                "utc": "2026-11-18T14:52:13.815228+00:00"
+              }
+            ],
+            "sourceEvents": [
+              {
+                "Kind": "registered",
+                "Utc": "20261118 14:52:13.809332",
+                "receivedMs": 44.8738
+              },
+              {
+                "Kind": "fragment_end",
+                "Utc": "20261118 14:52:13.811018",
+                "receivedMs": 46.504
+              },
+              {
+                "Kind": "fragment_end",
+                "Utc": "20261118 14:52:13.811566",
+                "receivedMs": 46.9808
+              },
+              {
+                "Kind": "context_end",
+                "Utc": "20261118 14:52:13.811671",
+                "receivedMs": 47.0691
+              },
+              {
+                "Kind": "cancel_arrived",
+                "Utc": "20261118 14:52:13.811776",
+                "receivedMs": 47.193
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "postmortem": [
+    {
+      "witness": "fixed-entity-07cd921800e14ff89bfe0bb5a9933b9a.json",
+      "query": "a9da02c706340be-b949c7a4a6784200",
+      "events": [
+        {
+          "kind": "admitted",
+          "beUtc": "20261118 14:38:19.279893",
+          "originalLineSha256": "1ad868c2686623651f27d0fcd83e091f5a7b19517b8a00fc1c175e17e3115691"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:38:19.282423",
+          "originalLineSha256": "c1143e88dea21d548da3b4a4db238c9ff8de0bfa890d0e7b0f7e2326bf247896"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:38:19.283178",
+          "originalLineSha256": "786ece0735dca1e65d906e696568d4920a02d323ec7ab649ce987a2f1d86d5e4"
+        },
+        {
+          "kind": "contextEnd",
+          "beUtc": "20261118 14:38:19.283255",
+          "originalLineSha256": "ac6ac396ab4bb488b037f1e27154515f9a6ede97464b931f09459b1883b72e04"
+        }
+      ]
+    },
+    {
+      "witness": "fixed-target-f7772b275e114b09838214be9515aeea.json",
+      "query": "1b57d510533d4895-9220d4f6bae0b7c7",
+      "events": [
+        {
+          "kind": "admitted",
+          "beUtc": "20261118 14:38:19.879599",
+          "originalLineSha256": "749c5f110ea69c9295cbd02a3a6d1989dda8a1c785be73102dc2beb7ad906d1d"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:38:19.881358",
+          "originalLineSha256": "9da5c27379a8d04f013666aba24639c6c7d588ab53749f64e99afe18e8763a1c"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:38:19.882112",
+          "originalLineSha256": "8eb0843a3e690ced2e98396bc15d916bc0df59a8d639118da2a0b0fed2a2b593"
+        },
+        {
+          "kind": "contextEnd",
+          "beUtc": "20261118 14:38:19.882169",
+          "originalLineSha256": "890e8c5c8017d529d339147adbecd3b004f7393a894edaa0a9a3a84ead5bb993"
+        }
+      ]
+    },
+    {
+      "witness": "fixed-entity-a0ba77695fc6484295b5cadf0192e5a1.json",
+      "query": null,
+      "events": []
+    },
+    {
+      "witness": "fixed-target-0b40d8c138ec49ffa16511ba49bd2822.json",
+      "query": "c83f3819ee664372-b34d8676b99fc7b2",
+      "events": []
+    },
+    {
+      "witness": "fixed-entity-64024677ae794823af042ec63c047ec2.json",
+      "query": "e3df530ebf2b4e91-ba4db7c523a6273c",
+      "events": [
+        {
+          "kind": "admitted",
+          "beUtc": "20261118 14:47:45.874954",
+          "originalLineSha256": "616253d17e3f633827cf407c2b2c8b93a2cb65f9d38ac546d22b27b0ef44e697"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:47:45.876931",
+          "originalLineSha256": "2367b00a45976422fe1f8f1b1fb82bb5aa0555ce827808386ebf04402441b897"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:47:45.877619",
+          "originalLineSha256": "ea9da76d130e4a968016e915130f3209aa264a4e94bcfb9ca91baaa332fb8852"
+        },
+        {
+          "kind": "contextEnd",
+          "beUtc": "20261118 14:47:45.877673",
+          "originalLineSha256": "01006a13e5a84edbf7fe2598995bd8dedd49366374d9fe727210ee6376b58d22"
+        },
+        {
+          "kind": "cancelArrived",
+          "beUtc": "20261118 14:47:45.878713",
+          "originalLineSha256": "6d82ed4c65dd569ecdc58947f3ec2825824b1835ec8205006f6b7f76970acb4e"
+        }
+      ]
+    },
+    {
+      "witness": "fixed-target-c68f9771c62c4e44ace7838f8e4a0341.json",
+      "query": "fef1b51d9e65452f-94fba3eda8c5c79b",
+      "events": [
+        {
+          "kind": "admitted",
+          "beUtc": "20261118 14:47:46.473577",
+          "originalLineSha256": "d56e672d47acb2da572b9808966bad42f21bddf649d2db8eb91772e7a0f92cd9"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:47:46.475361",
+          "originalLineSha256": "911fd6a2bdb0a1512e2f7a542c2ed8cbcd45e63f2f65021a302d97ef3e330a75"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:47:46.475950",
+          "originalLineSha256": "61483125b451803ac1d69e7be429b0b79846ad4fc5a5526a6e4d9299a31b8c34"
+        },
+        {
+          "kind": "contextEnd",
+          "beUtc": "20261118 14:47:46.476025",
+          "originalLineSha256": "ae07af2c8754740eb44c8085fa7a45c6d5bab1f0c36731bf379fd75d1e92618e"
+        },
+        {
+          "kind": "cancelArrived",
+          "beUtc": "20261118 14:47:46.476233",
+          "originalLineSha256": "b589b1ebe3d9cea3f0d7e82251c59c0b4b888044cf20e058d363c2508b38f295"
+        }
+      ]
+    },
+    {
+      "witness": "fixed-entity-49fbeb26ac264ea686ef8483d67c846a.json",
+      "query": "aada6f4f1ca64ea1-905e2dd8027b442c",
+      "events": [
+        {
+          "kind": "admitted",
+          "beUtc": "20261118 14:52:13.222700",
+          "originalLineSha256": "a665f2cebde3ba419bcb252566bb560f430c00c39d9ce78a2e85bd75c35a8e63"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:52:13.224167",
+          "originalLineSha256": "a0a768af0f0ef4dbd587e0c6f80ed37313e71f5bc9b42d26399c854cf3c324d8"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:52:13.224828",
+          "originalLineSha256": "dbf1cb0f1f5cba1881540c41a8130e5533cabcc4e87456835ad4e1a127ee5520"
+        },
+        {
+          "kind": "contextEnd",
+          "beUtc": "20261118 14:52:13.224900",
+          "originalLineSha256": "6a0813d75e03b459d988ef67cb0bdc57a22b437a6aa20d8df25afcd114888b77"
+        }
+      ]
+    },
+    {
+      "witness": "fixed-target-fbda440b44c043298e65c74521adcfbd.json",
+      "query": "7a3ee650cc4c4cf9-9e5e794bede26210",
+      "events": [
+        {
+          "kind": "admitted",
+          "beUtc": "20261118 14:52:13.809332",
+          "originalLineSha256": "6bc9700dd04ce89923dec77173267b287ff9e40414bf57388f76f89c6b029b92"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:52:13.811018",
+          "originalLineSha256": "adf7d1d820871e5945ab22b16d38cfca97938c7208c1bd6f1f4446492c434414"
+        },
+        {
+          "kind": "fragmentEnd",
+          "beUtc": "20261118 14:52:13.811566",
+          "originalLineSha256": "a36314861682cc2361eabf8f82536ba1ad22fcf97d5202242a12d2d4b2528279"
+        },
+        {
+          "kind": "contextEnd",
+          "beUtc": "20261118 14:52:13.811671",
+          "originalLineSha256": "e586557de50734f0681f383de5159d999973d61aa2f6b56075972392d192ed3e"
+        },
+        {
+          "kind": "cancelArrived",
+          "beUtc": "20261118 14:52:13.811776",
+          "originalLineSha256": "d67e37c6f2251ce6d96f3cb8d4e9357e33dfbeb5b3e855b089cde226a330762e"
+        }
+      ]
+    }
+  ],
+  "fixtureRestores": [
+    {
+      "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "run": "implementation-01",
+      "attempt": "0da9ac2fd127ad4f",
+      "tables": {
+        "dmq_entity": {
+          "before": "7a7009c1fc43c542746436d44150f02f3e45cc2028fd375a142c03d5beccb34e",
+          "seeded": "c30e9f3b0deac34024673ea27d17fdc38b6e847d3d845bab99b1edae0a547a31",
+          "inserted": 99,
+          "restored": true
+        },
+        "dmq_target": {
+          "before": "4fce66991c1a560ee3acc8de573c1077e5f669f68971ad08d55c06e50364191f",
+          "seeded": "8e396e0fa04f213f860f41a2cd587af58cee7431a9f6611d9b006965eadaa349",
+          "inserted": 97,
+          "restored": true
+        }
+      }
+    },
+    {
+      "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "run": "implementation-01",
+      "attempt": "2a3d5069d7ae6b91",
+      "tables": {
+        "dmq_entity": {
+          "before": "7a7009c1fc43c542746436d44150f02f3e45cc2028fd375a142c03d5beccb34e",
+          "seeded": "c30e9f3b0deac34024673ea27d17fdc38b6e847d3d845bab99b1edae0a547a31",
+          "inserted": 99,
+          "restored": true
+        },
+        "dmq_target": {
+          "before": "4fce66991c1a560ee3acc8de573c1077e5f669f68971ad08d55c06e50364191f",
+          "seeded": "8e396e0fa04f213f860f41a2cd587af58cee7431a9f6611d9b006965eadaa349",
+          "inserted": 97,
+          "restored": true
+        }
+      }
+    },
+    {
+      "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "run": "implementation-01",
+      "attempt": "475dc95f4e6ad602",
+      "tables": {
+        "dmq_entity": {
+          "before": "7a7009c1fc43c542746436d44150f02f3e45cc2028fd375a142c03d5beccb34e",
+          "seeded": "c30e9f3b0deac34024673ea27d17fdc38b6e847d3d845bab99b1edae0a547a31",
+          "inserted": 99,
+          "restored": true
+        },
+        "dmq_target": {
+          "before": "4fce66991c1a560ee3acc8de573c1077e5f669f68971ad08d55c06e50364191f",
+          "seeded": "8e396e0fa04f213f860f41a2cd587af58cee7431a9f6611d9b006965eadaa349",
+          "inserted": 97,
+          "restored": true
+        }
+      }
+    },
+    {
+      "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "run": "implementation-01",
+      "attempt": "a84cbc4dae6b0243",
+      "tables": {
+        "dmq_entity": {
+          "before": "7a7009c1fc43c542746436d44150f02f3e45cc2028fd375a142c03d5beccb34e",
+          "seeded": "c30e9f3b0deac34024673ea27d17fdc38b6e847d3d845bab99b1edae0a547a31",
+          "inserted": 99,
+          "restored": true
+        },
+        "dmq_target": {
+          "before": "4fce66991c1a560ee3acc8de573c1077e5f669f68971ad08d55c06e50364191f",
+          "seeded": "8e396e0fa04f213f860f41a2cd587af58cee7431a9f6611d9b006965eadaa349",
+          "inserted": 97,
+          "restored": true
+        }
+      }
+    }
+  ],
+  "closeout": {
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "runId": "implementation-01",
+    "events": [
+      {
+        "service": "be",
+        "id": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+        "signal": "SIGTERM",
+        "before": "running",
+        "waitExit": "0",
+        "elapsedSeconds": 30.144157415954396,
+        "after": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false,
+          "FinishedAt": "2026-11-18T14:54:10.648829668Z"
+        }
+      },
+      {
+        "service": "fe",
+        "id": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+        "signal": "SIGTERM",
+        "before": "running",
+        "waitExit": "143",
+        "elapsedSeconds": 0.6605964170303196,
+        "after": {
+          "Status": "exited",
+          "ExitCode": 143,
+          "OOMKilled": false,
+          "FinishedAt": "2026-11-18T14:54:11.258331376Z"
+        }
+      }
+    ],
+    "runningAfter": [],
+    "retainedVolumes": {
+      "be-data": "ontology-g4-doris-mapping-query-001_be-data",
+      "be-log": "ontology-g4-doris-mapping-query-001_be-log",
+      "fe-data": "ontology-g4-doris-mapping-query-001_fe-data",
+      "fe-log": "ontology-g4-doris-mapping-query-001_fe-log"
+    },
+    "status": "STOPPED_KEEP"
+  },
+  "nonAuthorReview": {
+    "reviewer": "/root/spec_review",
+    "gate": "S0 BLOCKED / S1–S3 NO-GO",
+    "facts": [
+      "各100行，正常实体/关系固定结果通过；最终两个执行中取消用例均失败。",
+      "实体 BE 生命周期 2.200ms，未见同 QueryId 的用户取消接收或调度器取消事件。",
+      "关系 BE 生命周期 2.339ms，用户取消接收比 context_end 晚0.105ms。",
+      "客户端分别在取消后 6.5965ms、3.9266ms 返回不可用；源端强取消尚未验证。",
+      "四次受控扩充后逐行复原散列通过，四个本任务卷保留，2+14 个准确容器退出。"
+    ]
+  },
+  "limitations": [
+    "历史成功的 connections-build-binding.json 为工程滚动路径，原 4504a3bd… 文件在本轮被构建器更新；旧失败 MTP 命令回执、原输出和同 QueryId 源见证保留。后续四组成功构建绑定均单独按原字节封存。",
+    "S1/S2/S3、CI 及最终 V3 尚无通过资格。"
+  ],
+  "hashes": {
+    "implementation-01/fixed-plan-first-connections-build-binding.json": "26772037a6684b40b68d831cc69215260781e6da8cec303e271b3ed4bee9c82b",
+    "implementation-01/driver-fixed-values-c59f763f31be438ca185497b5a3a86ea.json": "e6ce354e15866201b1f73387727e18d3d287dd59f609a01e209b32015b019c77",
+    "commands/implementation-01/c59f763f31be438ca185497b5a3a86ea/receipt.json": "3604cd18e8b5f74b89cfe49de9cc89e9e25da5b209a1e88349fad2d971c2e125",
+    "commands/implementation-01/c59f763f31be438ca185497b5a3a86ea/stdout.txt": "a7f30bad879a59e6d9926d2bc4d005be98711a48d657dcf0cf9dcf22d21172ff",
+    "commands/implementation-01/c59f763f31be438ca185497b5a3a86ea/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/driver-fixed-entity-a974193123284ce49cfeb178b7482f7a.json": "c2fa4b8fdebeabc68e2b078c14b7198086b0818ff12f440172b3a5a27ebd9b22",
+    "commands/implementation-01/a974193123284ce49cfeb178b7482f7a/receipt.json": "07c8da5b6d708e915eaf6cb570c859b77ee0d67920eba4ce95d2de5ce69a819d",
+    "commands/implementation-01/a974193123284ce49cfeb178b7482f7a/stdout.txt": "687de221a887abf53f81cbab1b74a8d653c80f3727b3160612b9312d54c3a75f",
+    "commands/implementation-01/a974193123284ce49cfeb178b7482f7a/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/fixed-entity-07cd921800e14ff89bfe0bb5a9933b9a.json": "293f90b473d798a2597890a0e9ffc72e3071af4bc13a4ed626e4d157e33bd61b",
+    "implementation-01/driver-fixed-target-f6202795120743bd98a47260861f3502.json": "233db55d428917b15aace48138b242d748ba67241334d19b2c48fafba99fb27c",
+    "commands/implementation-01/f6202795120743bd98a47260861f3502/receipt.json": "b510c9bb423ef35e9a48da682860195d0af10e4075ff186ebd1f627559dfe6cb",
+    "commands/implementation-01/f6202795120743bd98a47260861f3502/stdout.txt": "e8fc8925dddf9d94eb003c0437377f5b6bfca91db3d1dd4bc4d986b7fa108a19",
+    "commands/implementation-01/f6202795120743bd98a47260861f3502/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/fixed-target-f7772b275e114b09838214be9515aeea.json": "e6893bf9e0b18f8fdcd7f85690098785ff871d4ca53c54c36d99d5246a2ffafd",
+    "implementation-01/fixed-plan-preopen-connections-build-binding.json": "61f27f2b7faeb4c4f48ef50cd9bb252c8e2aa18591276d142e656b457c99266b",
+    "implementation-01/driver-fixed-values-4d4cb5b908774da2b225aae8fa1568c1.json": "8ac856de9cda56cc25eb30586108453a943c0abb03f09c7de49cf6ce1ad5bf66",
+    "commands/implementation-01/4d4cb5b908774da2b225aae8fa1568c1/receipt.json": "116fc23530dcbd9c6570c0beac5762ddea7fd39463f7645bb7e28a2699448297",
+    "commands/implementation-01/4d4cb5b908774da2b225aae8fa1568c1/stdout.txt": "49f0c9949cd17f01c484933b7148a688ba6d9f229c34bb3f302d96eeb8d47f53",
+    "commands/implementation-01/4d4cb5b908774da2b225aae8fa1568c1/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/driver-fixed-entity-42ec438f55ec474687b70121bee0036d.json": "746a16ceab970ebbe7e97010464f978873bc523337e53225512f7860b29e6600",
+    "commands/implementation-01/42ec438f55ec474687b70121bee0036d/receipt.json": "4866de309475708400e2d790b9a04a20622444eac72c5c9984fe5a7bb93e1333",
+    "commands/implementation-01/42ec438f55ec474687b70121bee0036d/stdout.txt": "e833896e9ac500b590304bd116e0737daa5bbe80d276ad62b26dffa70f01beb1",
+    "commands/implementation-01/42ec438f55ec474687b70121bee0036d/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/fixed-entity-a0ba77695fc6484295b5cadf0192e5a1.json": "97a22ed2b46690eaa2383c044916b51dc02ad92c41c2e9515c3fa44090759583",
+    "implementation-01/driver-fixed-target-1031df3701944551ba537871143d25e9.json": "595904de56e84e76a348433ff0d0de4b572c0dae0634430f4e3f7b3d35ea99e8",
+    "commands/implementation-01/1031df3701944551ba537871143d25e9/receipt.json": "5da3636102922042005c5d25d56180abedcf89ade8deebe4b5cd974c8d287048",
+    "commands/implementation-01/1031df3701944551ba537871143d25e9/stdout.txt": "1300ecf35448fffd6998c50ac39f782cbbf59bb5c49c1ca76b8b7376b4fb6d04",
+    "commands/implementation-01/1031df3701944551ba537871143d25e9/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/fixed-target-0b40d8c138ec49ffa16511ba49bd2822.json": "4302af98706a9de0b5bf8113ae56550fd05a0a471929c8092395b97be4f30bca",
+    "implementation-01/fixed-plan-uncached-connections-build-binding.json": "036005daabecb0ba11d9171d6ccac902db1fb961dc4c60fa484d114acbbaec66",
+    "implementation-01/driver-fixed-values-ca2cec9b636545aebd22e45d9f08a203.json": "3867fc521cb9f9496f3b725bbd7fec03ec7b8db456f054cb8aaa909696e339be",
+    "commands/implementation-01/ca2cec9b636545aebd22e45d9f08a203/receipt.json": "01653a549d3fc2af3bc15c474308b593b19fa067583d9b3bb40982f35710e231",
+    "commands/implementation-01/ca2cec9b636545aebd22e45d9f08a203/stdout.txt": "687e6dabdb5b3fedc7cbaace18d36244cca7e0aafcb2b354791464d85dda3dbb",
+    "commands/implementation-01/ca2cec9b636545aebd22e45d9f08a203/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/driver-fixed-entity-32b23ebaff934258a15ce40e8117a082.json": "3af4cb472fc6cb2ab619efd9df90f71464515b6ac8a7b1f9a1598ba168a728fb",
+    "commands/implementation-01/32b23ebaff934258a15ce40e8117a082/receipt.json": "bd18e22cc374b08c135b835c3a13e80a66536cff68f76a565cf598570749c8d2",
+    "commands/implementation-01/32b23ebaff934258a15ce40e8117a082/stdout.txt": "0fdd499baa01699e682a255a62ed625ed82b6c9350b684e137e01e1672d8adf4",
+    "commands/implementation-01/32b23ebaff934258a15ce40e8117a082/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/fixed-entity-64024677ae794823af042ec63c047ec2.json": "b8e167cf74891f219f7ae2e44caf4884c48c1c4f6d6a8092f9f7014076700f32",
+    "implementation-01/driver-fixed-target-f37c146431f741a488e52af82f835789.json": "6dd42d46453518b5fa56543eb61056ccf8bc0df59a6fd3b0191cd22670a1b8cc",
+    "commands/implementation-01/f37c146431f741a488e52af82f835789/receipt.json": "b2bc289ddd48988802eb6fd50a5a17bc721cc4e0b9f406c96e915d680c0482d3",
+    "commands/implementation-01/f37c146431f741a488e52af82f835789/stdout.txt": "b572a759e35c37cd5d0e35f59a72d6e389d516ec55259e08bc586a6644741134",
+    "commands/implementation-01/f37c146431f741a488e52af82f835789/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/fixed-target-c68f9771c62c4e44ace7838f8e4a0341.json": "6a5fb4249763504dc046e55b86ffff24eb659b5e11b4bb63184b5e8ef57dadf6",
+    "implementation-01/fixed-plan-direct-connections-build-binding.json": "fba5576196b8d54d947bbbff9a0f4bfc89903631f27e8363d459c68584af3273",
+    "implementation-01/driver-fixed-values-eff0ece6c8c04042a3f32e501821ffc9.json": "e2859311d1162e45d3bfc5ccd4635ab3d0cf618857608699e01d12f2c457d0da",
+    "commands/implementation-01/eff0ece6c8c04042a3f32e501821ffc9/receipt.json": "5629687a32765c33b1b50364aefc04c76197a510ad9a6f32c17def8153fd69bd",
+    "commands/implementation-01/eff0ece6c8c04042a3f32e501821ffc9/stdout.txt": "392b1f8ff77f510bb2294070daf7ffb4e301af1e0c4bc8470b9c5fcd09d5c910",
+    "commands/implementation-01/eff0ece6c8c04042a3f32e501821ffc9/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/driver-fixed-entity-c4df089edcc24bcb81f9a0826c1871f1.json": "2627d17361f9de35ff39e85ff09ab253710b6368577d8bbd1c077ee523fd1386",
+    "commands/implementation-01/c4df089edcc24bcb81f9a0826c1871f1/receipt.json": "3b2fa1d254bdbafe29cd0a5437f1846f5dee1ddd104d43cf7ce0e68a459cb308",
+    "commands/implementation-01/c4df089edcc24bcb81f9a0826c1871f1/stdout.txt": "8840db873bdbf46e9912e2883c7945cc0472cad47c4163fae9419a071a3ea51b",
+    "commands/implementation-01/c4df089edcc24bcb81f9a0826c1871f1/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/fixed-entity-49fbeb26ac264ea686ef8483d67c846a.json": "dca671ad239d91a1c0b3261683816c8564ee6e0430128f22c858f8a7822a4dc0",
+    "implementation-01/driver-fixed-target-174e65518b1a497d9c0b83b3cb2183a0.json": "3aa48cb727a89aebbdae55209ae8f8e1e6505c2dd2d60ed8d8580f64a53ccdf8",
+    "commands/implementation-01/174e65518b1a497d9c0b83b3cb2183a0/receipt.json": "d68571ccf981d76f6bc51fc7587bb0520bc7975b46e53f4c4ff88731411c1ead",
+    "commands/implementation-01/174e65518b1a497d9c0b83b3cb2183a0/stdout.txt": "2b7e8f519787827296ca7e4cbde2f9636c8122414239146e3c29e0ef18c57fba",
+    "commands/implementation-01/174e65518b1a497d9c0b83b3cb2183a0/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "implementation-01/fixed-target-fbda440b44c043298e65c74521adcfbd.json": "c6497190cd135d597c35f22846da3e5dbbb407ad2b65ff5eaa4aa7edb25cda44",
+    "implementation-01/s0-source-stop-ac75da69beac.json": "61f21056a82ba08c1844b978617924de9c32279e9d1d706251e8492b9c930bd6",
+    "implementation-01/fixed-plan-be-postmortem-01.json": "ff2221cc59c2c7506c6f70013775db69670575873db2376a9e8263ab1e5d2a12",
+    "implementation-01/s0-fixed-fixture-0da9ac2fd127ad4f-restored.json": "26e8b9c0a8c027183715a4d269ed690e1ea77de20119d869d73080d09d68746c",
+    "implementation-01/s0-fixed-fixture-2a3d5069d7ae6b91-restored.json": "eb2a8ed18b67573a8487080358e51e2a97fe2c87323513935e71618661398cd6",
+    "implementation-01/s0-fixed-fixture-475dc95f4e6ad602-restored.json": "bc04f005f3e6c6e99414e92df8b85e508c2803751e4e35cfc6dc60e57d17d0fa",
+    "implementation-01/s0-fixed-fixture-a84cbc4dae6b0243-restored.json": "12ce58fd8c5f1eedf21fb337d2562a9983d3e7dd4715d98f72f633f25444c6ed"
+  }
+}
