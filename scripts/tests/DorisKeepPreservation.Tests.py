@@ -12,6 +12,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'maintenance'))
 import doris_keep_preservation as keep
 import doris_keep_drain as drain
+import doris_keep_readmit as readmit
 
 
 class RestoreGuards(unittest.TestCase):
@@ -75,6 +76,37 @@ class DrainWitness(unittest.TestCase):
             drain.sample([{'service': 'pg-source', 'containerId': 'source'}], {'source': 531})
         self.assertIn('pid<>531', query.call_args.args[1])
         self.assertNotIn('application_name', query.call_args.args[1])
+
+
+class ReadmissionGuards(unittest.TestCase):
+    def test_first_busy_database_is_persisted_before_any_later_database(self):
+        from copy import deepcopy
+        busy = {'queuedOrRunningMappingJobs': 1, 'nonIdleClients': 0, 'clients': []}
+        state, written = {'samples': []}, []
+        rows = [{'containerId': 'a'}, {'containerId': 'b'}]
+        with (patch.object(drain, 'observed_database', return_value=busy) as observe,
+              patch.object(readmit.cold, 'save', side_effect=lambda data: written.append(deepcopy(data)))):
+            with self.assertRaisesRegex(ValueError, 'DRAIN_ACTIVITY_DETECTED'):
+                readmit.record_round(state, rows, 'before-fence', {})
+        observe.assert_called_once_with(rows[0], None)
+        self.assertEqual(written[-1]['samples'][0]['databases'], {'a': busy})
+        self.assertNotIn('completed', written[-1]['samples'][0])
+
+    def test_active_client_classification_is_bound_to_same_sql_snapshot(self):
+        row = {'containerId': 'platform', 'service': 'platform-pg'}
+        with patch.object(drain, 'query', return_value=['{"clients":[{"category":"OTHER","count":1}]}']) as q:
+            observed = drain.observed_database(row, 123)
+        self.assertEqual(observed['nonIdleClients'], 1)
+        statement = q.call_args.args[1]
+        for name in (*drain.COUNT_NAMES, 'pid<>123', 'pg_stat_activity'):
+            self.assertIn(name, statement)
+        with self.assertRaisesRegex(ValueError, 'DRAIN_ACTIVITY_DETECTED'):
+            drain.demand_zero(observed)
+
+    def test_foreign_or_incomplete_fence_fails_owner_verification(self):
+        with patch.object(drain, 'query', return_value=['connections."MappingJobs"']):
+            with self.assertRaisesRegex(ValueError, 'PG_FENCE_OWNER_OR_COVERAGE_CHANGED'):
+                drain.verify_fence_owner({}, ['connections."MappingJobs"', 'connections."MappingOutboxs"'], 111)
 
 
 if __name__ == '__main__':

@@ -91,13 +91,17 @@ kill -TERM "$pid"
 '''
 
 
+READMISSION = keep.BASE / 'readmission-01-stop.json'
+
+
 def save(state):
-    tmp = COLD_INDEX.with_suffix('.pending')
+    dest = READMISSION if 'readmission' in state else COLD_INDEX
+    tmp = dest.with_suffix('.pending')
     with tmp.open('w') as stream:
         json.dump(state, stream, indent=2)
         stream.flush()
         os.fsync(stream.fileno())
-    os.replace(tmp, COLD_INDEX)
+    os.replace(tmp, dest)
 
 
 def preexisting():
@@ -125,10 +129,12 @@ def original(row, expected):
             keep.require(keep.execute('volume', 'inspect', '-f', '{{.Name}}', m['Name']) == m['Name'], 'ORIGINAL_VOLUME')
 
 
-def stop_one(row, state):
+def stop_one(row, state, before_signal=None):
     cid, service = row['id'], row['service']
     read_pin()
     original(row, 'running')
+    if before_signal is not None:
+        before_signal()
     now = dt.datetime.now(dt.timezone.utc).isoformat()
     event = {'id': cid, 'project': row['project'], 'service': service, 'startedAt': now, 'result': 'REQUESTING'}
     state['stopEvents'].append(event)
@@ -232,7 +238,7 @@ def stop_and_capture():
 def release_after_review():
     """仅在非作者核准全部冷原件后调用；先完成最后一次完整回读，再释放最后的挂载。"""
     pin = read_pin()
-    state = json.loads(COLD_INDEX.read_text())
+    state = json.loads((READMISSION if READMISSION.exists() else COLD_INDEX).read_text())
     originals = preexisting()
     events = state['stopEvents']
     keep.require(state['outcome'] == 'ALL_STOPPED_COLD_CHECKED_PIN_HELD' and state['pin'] == pin['id'] and

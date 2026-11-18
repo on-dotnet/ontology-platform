@@ -61,7 +61,7 @@ def record(action, identity, **facts):
     (BASE / (ATTEMPT + '-lifecycle.json')).write_text(json.dumps(JOURNAL, indent=2) + '\n')
 
 
-def inventory():
+def inventory(stopped=()):
     raw = REVIEW.read_bytes()
     require(hashlib.sha256(raw).hexdigest() == 'a6dd11f647f351dc0025cc2907b20671beb069289fba7108feb756d690c16e87',
             'APPROVED_INVENTORY_CHANGED')
@@ -75,7 +75,7 @@ def inventory():
                '{{index .Config.Labels "ontology.run-id"}} {{index .Config.Labels "com.docker.compose.project"}} '
                '{{index .Config.Labels "com.docker.compose.service"}}')
         require(execute('inspect', '-f', fmt, id_).split() ==
-                [id_, row['imageId'], 'running', *row['taskRunProject'].split(), row['service']], 'OWNER_OR_STATE')
+                [id_, row['imageId'], 'exited' if id_ in stopped else 'running', *row['taskRunProject'].split(), row['service']], 'OWNER_OR_STATE')
         for mount in json.loads(execute('inspect', '-f', '{{json .Mounts}}', id_)):
             if mount['Destination'] in MOUNTS.values():
                 suffix = next(k for k, v in MOUNTS.items() if v == mount['Destination'])

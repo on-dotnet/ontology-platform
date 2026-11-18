@@ -150,3 +150,50 @@ def drained(inventory, on_failed_sample=None):
         if time.monotonic() >= deadline:
             raise ValueError('DRAIN_DEADLINE')
         time.sleep(0.5)
+
+
+COUNT_NAMES = ('runningQueries', 'queuedOrRunningRuns', 'queuedOrRunningCatalogJobs', 'runningProbes',
+               'queuedOrRunningMappingJobs', 'undispatchedMappingOutbox', 'undispatchedPublishingOutbox')
+
+
+def observed_database(row, fence_pid=None):
+    """一次SQL快照取得该库全部队列计数与活跃客户端类别；不返回原始SQL、参数或会话内容。"""
+    import json
+    if fence_pid is not None and (type(fence_pid) is not int or fence_pid <= 0):
+        raise ValueError('PG_FENCE_PID')
+    predicate = ACTIVITY.split('FROM pg_stat_activity ', 1)[1]
+    if fence_pid is not None:
+        predicate += ' AND pid<>' + str(fence_pid)
+    category = """CASE WHEN query ILIKE '%MappingOutboxs%' THEN 'MAPPING_OUTBOX'
+        WHEN query ILIKE '%MappingJobs%' THEN 'MAPPING_JOB' WHEN query ILIKE '%publishing.%Outbox%' THEN 'PUBLISHING_OUTBOX'
+        WHEN query ILIKE '%CatalogJobs%' THEN 'CATALOG_JOB' WHEN query ILIKE '%ConnectionProbes%' THEN 'CONNECTION_PROBE'
+        WHEN query ILIKE '%semantic_query.%Queries%' THEN 'QUERY' WHEN query ILIKE '%agents.%Runs%' THEN 'AGENT_RUN'
+        WHEN lower(trim(query)) IN ('begin','commit','rollback') THEN 'TRANSACTION_CONTROL'
+        WHEN lower(trim(query)) IN ('select 1','select 1;') THEN 'HEALTH' ELSE 'OTHER' END"""
+    activity = ("SELECT coalesce(json_agg(json_build_object('category',category,'state',state,'waitType',waittype,"
+                "'count',n)),'[]'::json) FROM (SELECT category,state,waittype,count(*) AS n FROM "
+                "(SELECT " + category + " AS category,state,coalesce(wait_event_type,'NONE') AS waittype "
+                "FROM pg_stat_activity " + predicate + ") clients GROUP BY category,state,waittype) groups")
+    components = ["'clients',(" + activity + ")"]
+    if row['service'] == 'platform-pg':
+        components.extend("'" + name + "',(" + sql + ")" for name, sql in zip(COUNT_NAMES, COUNTS, strict=True))
+    lines = query(row, 'SELECT json_build_object(' + ','.join(components) + ');')
+    if len(lines) != 1:
+        raise ValueError('DRAIN_SAMPLE_INCOMPLETE')
+    facts = json.loads(lines[0])
+    facts['nonIdleClients'] = sum(v['count'] for v in facts['clients'])
+    return facts
+
+
+def demand_zero(facts):
+    if any(value for key, value in facts.items() if key != 'clients'):
+        raise ValueError('DRAIN_ACTIVITY_DETECTED')
+
+
+def verify_fence_owner(row, tables, pid):
+    actual = query(row, """SELECT n.nspname || '.' || quote_ident(c.relname) FROM pg_locks l
+        JOIN pg_class c ON c.oid=l.relation JOIN pg_namespace n ON n.oid=c.relnamespace
+        WHERE l.database=(SELECT oid FROM pg_database WHERE datname=current_database()) AND
+        l.mode='ShareLock' AND l.granted AND l.locktype='relation' AND l.pid=""" + str(pid) + ' ORDER BY 1;')
+    if set(actual) != set(tables):
+        raise ValueError('PG_FENCE_OWNER_OR_COVERAGE_CHANGED')
