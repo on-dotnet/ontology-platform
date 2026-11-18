@@ -45,4 +45,12 @@ R0原件及非作者结论见[14个准确ID与保全缺口](../evidence/G4-DORIS
 
 准入回执 SHA-256 为 `67415b09491a84605a77a7cedfeaf27835b1bfd308182e75859e4a66926cab95`。两个平台库各48张表处于准确栅栏事务内，三轮连续观察四库分项均为零，包含MappingJobs和MappingOutbox；非作者放行同一栅栏内的余12个原ID。
 
-本轮又有4个原容器退出。目前共6个退出、8个仍运行。4个API退出0，M4 Keycloak退出143并有关闭记录。M4 Fuseki退出143、无OOM，其镜像配置关闭了根日志，未取得本次应用关闭完成的证据，处置中止。两套keyring及M4 Keycloak三份冷备已经过独立校验。M4 Fuseki原卷的两次完整摘要与已审热副本完全一致，其关闭钩子完成状态仍为UNKNOWN。原只读持卷容器持续保护八卷；未调整VM。最新独立结论为NO-GO继续停机或调VM，分项结果、退出原件及复核见[再准入回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-01.json)，定向反例见[验证回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-validation.json)。
+第二次中止时，累计6个原容器退出、8个仍运行。4个API退出0，M4 Keycloak退出143并有关闭记录。M4 Fuseki退出143、无OOM，其镜像配置关闭了根日志，未取得本次应用关闭完成的证据，处置中止。两套keyring及M4 Keycloak三份冷备已经过独立校验。M4 Fuseki原卷的两次完整摘要与已审热副本完全一致，其关闭钩子完成状态仍为UNKNOWN。原只读持卷容器持续保护八卷；未调整VM。当时的独立结论为NO-GO继续停机或调VM，分项结果、退出原件及复核见[再准入回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-01.json)，定向反例见[验证回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-validation.json)。
+
+## 余8个ID接续与M5源库异常退出（2026-11-18）
+
+两套 Fuseki 都通过用户批准的替代验收。原镜像隔离读取最终冷 TDB2，M4 的默认图为 0 行、命名图共 4291 行，6 个已发布图逐图匹配；M5 分别为 0 行、1461 行，2 个已发布图逐图匹配。两套应用关闭钩子均保留 UNKNOWN。非作者先复核替代验收前提，再核对同一批排空事务中两个平台库合计 96 张表的栅栏及四库连续三轮零在途，才放行后续处置。
+
+八个易失卷的最终冷归档共 795217920 字节，已逐份复核长度、全字节 SHA-256、权限及隔离同 ID 恢复。两份 Keycloak 副本均读取到预期 realm。14 个原 ID 中已有 11 个退出，10 个达到本轮停止验收。M5 源 PostgreSQL 使用镜像配置的 SIGINT，Docker 停止命令返回 0，容器退出 1，未触发 OOM。Tini 报告信号转发权限不足。退出后只读解析原卷 pg_control 状态头得到 6（DB_IN_PRODUCTION），未检验全文件 CRC，WAL 恢复能力仍待验证。该退出单独记为失败。
+
+非作者结论为 NO-GO。两套平台 PostgreSQL 和 M4 源 PostgreSQL 仍在运行，原持卷容器继续只读挂载八卷。VM 实读 16787419136 字节、12 CPU，暂缓调整。继续处置需单独裁决 M5 源库持久卷的隔离恢复与余三库的原生有界关库。正式 prepare 仍为 BLOCKED / SHORT_REPRO_REQUIRED，S0–S3 及产品验收未运行。完整 ID、逐轮计数、冷备与停机结果见[第三次中止回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-02.json)和[定向测试回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-02-validation.json)。
