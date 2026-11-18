@@ -16,6 +16,8 @@ COUNTS = (
     '''SELECT count(*) FROM agents."Runs" WHERE "Status" IN ('QUEUED','RUNNING') ''',
     '''SELECT count(*) FROM connections."CatalogJobs" WHERE "Status" IN ('QUEUED','RUNNING') ''',
     '''SELECT count(*) FROM connections."ConnectionProbes" WHERE "ReportJson"::jsonb->>'status'='RUNNING' OR "ReportJson"::jsonb->>'Status'='RUNNING' ''',
+    '''SELECT count(*) FROM connections."MappingJobs" WHERE "Status" IN ('QUEUED','RUNNING')''',
+    '''SELECT count(*) FROM connections."MappingOutboxs" WHERE "DispatchedAtUtc" IS NULL''',
     '''SELECT count(*) FROM publishing."Outbox" WHERE "DispatchedAtUtc" IS NULL''',
 )
 SCHEMAS = ('agents', 'connections', 'governance', 'ontology', 'publishing', 'semantic_query')
