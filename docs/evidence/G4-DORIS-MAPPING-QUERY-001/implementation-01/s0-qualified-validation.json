@@ -1,0 +1,68 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "c6bf882f266afb25f326a990f4ba870ae80bda57",
+  "checks": [
+    {
+      "name": "driver-types",
+      "command": "workflow_doris_s0_fixture.py driver-types --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "RealDriverReadsFixedSource 1/1; command ac1480b879d74d65abb42ae0819ce467"
+    },
+    {
+      "name": "driver-ac11",
+      "command": "workflow_doris_s0_fixture.py driver-ac11 --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "ControlledWriteBetweenSourceReads 1/1; command 946d58fb025548eca728870a45b921c6"
+    },
+    {
+      "name": "driver-model-reject",
+      "command": "workflow_doris_s0_fixture.py driver-model-reject --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FixedTargetRejectsUnsupportedShape 1/1; command 06934d19a3ee4fdcacfcafc3bd503419"
+    },
+    {
+      "name": "driver-type-reject",
+      "command": "workflow_doris_s0_fixture.py driver-type-reject --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FixedTargetRejectsUnsupportedShape 1/1; command 719afe9c84f8477493cb79538b70cf81"
+    },
+    {
+      "name": "driver-fixed-values",
+      "command": "workflow_doris_s0_fixture.py driver-fixed-values --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FixedPlansReturnScopedValues 1/1; command 692326574785403f9075b006d68e7e33"
+    },
+    {
+      "name": "driver-stress-entity",
+      "command": "workflow_doris_s0_fixture.py driver-stress-entity --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FixedEntityCancellation 1/1; command 85607134be6c4c09a8faedc26accbff4"
+    },
+    {
+      "name": "driver-stress-target",
+      "command": "workflow_doris_s0_fixture.py driver-stress-target --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FixedTargetCancellation 1/1; command 60980cb8c07342e7b9749cd507b8dd0c"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "scope": "S0 only",
+    "inputKey": "646e68e374aa21a370831201b2435533ed1a0b02763571b356bb7f7a1426c4f8",
+    "originals": "s0-qualified-review.json"
+  }
+}

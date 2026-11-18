@@ -504,7 +504,13 @@ def shape_case(method,prepared):
     try:
         sql(fe,'root',swap)
         vm.demand(tablet('dmq_target')==variant and tablet(scratch)==original,'SHAPE_SWAP')
-        change.update(phase='SWAPPED',actualDdlSha256=hashlib.sha256(sql(fe,'root','SHOW CREATE TABLE fixture.dmq_target;').encode()).hexdigest())
+        observed = sql(fe,'root','SHOW CREATE TABLE fixture.dmq_target;')
+        key = re.findall(r'^(UNIQUE|DUPLICATE|AGGREGATE) KEY\(`org_id`, `site_id`, `target_id`\)$',observed,re.M)
+        field = re.findall(r'^\s*`join_key` (decimal\(12,3\)|double) NULL,$',observed,re.M)
+        vm.demand((key,field)==((['DUPLICATE'],['decimal(12,3)']) if method=='driver-model-reject'
+                               else (['UNIQUE'],['double'])),'SHAPE_CONTROL_CAUSE')
+        change.update(phase='SWAPPED',actualDdlSha256=hashlib.sha256(observed.encode()).hexdigest(),
+                      keyModel=key[0],keyColumns=['org_id','site_id','target_id'],nativeJoinKey=field[0])
         record(SHAPE,change)
         code = driver(prepared,method)
         change['exitCode'] = code

@@ -1,7 +1,7 @@
 # G4-DORIS-MAPPING-QUERY-001｜Doris Mapping/Query 规格
 
 ## 当前执行与授权
-唯一执行状态：S0_BLOCKED_FIXED_PLAN_CANCELLATION。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
+唯一执行状态：S1_IN_PROGRESS。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
 
 Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)列明的源、测试、最小任务注册和当前文档。历史PG规范字节、旧ZIP与私有设施为只读依赖。R0允许14个准确ID在保全、排空、恢复清单与非作者检查后优雅停止。用户随后手动调VM。当前其他旧KEEP受保护，本分支不合main。
 
@@ -86,3 +86,7 @@ Docker 引擎实读 20964958208 字节（19.525 GiB）、12 CPU。旧 14 个原�
 用户已将放行范围限定为产品生成的固定 SQL。SLEEP 的历史失败作为版本能力边界保留。本次源码为 f642666c2353fe3c8e7c504be4b6287ff4e65ffe，采用两张原表、每表恰好100个合成逻辑行、独占同账号辅助 TLS 连接；就绪的独立旁路按准确 QueryId 观察 BE。固定 SELECT 的结果缓存仅对本语句关闭。正常测试读回 100 个实体及两条符合精确等值和半开关系的目标 T1、T2。
 
 最终两个计划在 BE 注册到上下文析构之间分别经历 2.200ms、2.339ms。应用在取消后 6.5965ms、3.9266ms 返回不可用。实体缺少同 QueryId 的用户取消到达事件；关系的取消到达比上下文析构晚 0.105ms。两项 MTP 都因缺少运行中源任务被取消的证据而 exit 2。四组构建、各自见证、源事件及四次数据复原见[固定计划机器回执与非作者裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-fixed-plan-review.json)。非作者裁决 S0 BLOCKED，S1–S3 尚未放行。收尾时四个源卷保留，准确 2+14 个容器均退出。此前成功构建的滚动绑定文件已由正常构建更新，原 SLEEP 失败与本次全部失败原件分别保留。
+
+## S0 非作者放行与 S1 准入（2026-11-19）
+
+固定计划的独立取消压力验证在两表各 65,536 行时进行，随后恢复原行及散列。最终构建七项定向 MTP 各 1/1，正常成功门禁仍为每表最多 100 行。实体、关系从请求到最晚清理分别为 4.7634、3.7644 ms。实际同名表模型及类型反例被拒绝，两个负例都恢复原 tablet。AC11 在两次正式读之间有独立已提交写入，微秒时区解释明确，水位仍为 UNKNOWN/null。非作者批准进入 S1。源证据不能代替正式产品发布与恢复。[原件索引与独立结论](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-qualified-review.json)及[定向验收](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-qualified-validation.json)。
