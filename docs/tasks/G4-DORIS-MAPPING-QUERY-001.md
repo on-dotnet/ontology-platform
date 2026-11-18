@@ -1,7 +1,7 @@
 # G4-DORIS-MAPPING-QUERY-001｜Doris Mapping/Query 规格
 
 ## 当前执行与授权
-唯一执行状态：R0_HALTED_PIN_HELD。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
+唯一执行状态：R0_STOPPED_KEEP_WAITING_FOR_USER_VM。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
 
 Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)列明的源、测试、最小任务注册和当前文档。历史PG规范字节、旧ZIP与私有设施为只读依赖。R0允许14个准确ID在保全、排空、恢复清单与非作者检查后优雅停止。用户随后手动调VM。当前其他旧KEEP受保护，本分支不合main。
 
@@ -53,4 +53,12 @@ R0原件及非作者结论见[14个准确ID与保全缺口](../evidence/G4-DORIS
 
 八个易失卷的最终冷归档共 795217920 字节，已逐份复核长度、全字节 SHA-256、权限及隔离同 ID 恢复。两份 Keycloak 副本均读取到预期 realm。14 个原 ID 中已有 11 个退出，10 个达到本轮停止验收。M5 源 PostgreSQL 使用镜像配置的 SIGINT，Docker 停止命令返回 0，容器退出 1，未触发 OOM。Tini 报告信号转发权限不足。退出后只读解析原卷 pg_control 状态头得到 6（DB_IN_PRODUCTION），未检验全文件 CRC，WAL 恢复能力仍待验证。该退出单独记为失败。
 
-非作者结论为 NO-GO。两套平台 PostgreSQL 和 M4 源 PostgreSQL 仍在运行，原持卷容器继续只读挂载八卷。VM 实读 16787419136 字节、12 CPU，暂缓调整。继续处置需单独裁决 M5 源库持久卷的隔离恢复与余三库的原生有界关库。正式 prepare 仍为 BLOCKED / SHORT_REPRO_REQUIRED，S0–S3 及产品验收未运行。完整 ID、逐轮计数、冷备与停机结果见[第三次中止回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-02.json)和[定向测试回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-02-validation.json)。
+第三次中止时的非作者结论为 NO-GO。当时两套平台 PostgreSQL 和 M4 源 PostgreSQL 仍在运行，原持卷容器继续只读挂载八卷。VM 实读 16787419136 字节、12 CPU，暂缓调整。当时待裁决事项为 M5 源库持久卷的隔离恢复与余三库的原生有界关库。正式 prepare 仍为 BLOCKED / SHORT_REPRO_REQUIRED，S0–S3 及产品验收未运行。完整 ID、逐轮计数、冷备与停机结果见[第三次中止回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-02.json)和[定向测试回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-02-validation.json)。
+
+## R0 完成，等待用户调整 Docker VM（2026-11-18）
+
+按新增单卷授权，从 M5 源库的只读持久卷制作 68311040 字节私有归档。准确原镜像在隔离副本完成 WAL redo。冻结原件中的标准表 2/3 行和激活后数值表 2/4 行，全部行与 34 个列定义比对通过；同站点数值关联与单个 NULL 匹配符合原预期。副本以 postgres 用户执行 fast 关库，退出 0，原生 pg_controldata 读回 shut down。原 M5 源库的退出码仍为 1，验收依据为副本恢复。非作者复核后，两个平台库各 48 张表持续封闭投递，三库连续三轮零在途并取得同栅栏独立放行。M4 源库、M5 平台库、M4 平台库依次由 UID 999 请求有界 fast 关库，三个当次日志均有关闭完成标志，容器均退出 0，逐卷原生控制文件均为 shut down。
+
+14 个原容器已退出并保留。13 个按停止验收通过，包含 8 个常规停止、3 个 PostgreSQL 原生 fast 关库及 2 个 Fuseki 替代验收；另 1 个按已批准的单卷恢复例外通过。非作者复核九份私有归档，共 863528960 字节。最后完整回读八卷通过后释放了准确的临时只读持卷容器。Docker 回读运行容器为 0，调前 VM 内存为 16787419136 字节，CPU 为 12。下次恢复旧栈须按[原 ID 与恢复顺序](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/r0-review.json)先恢复并核验八个易失卷。见[本轮机器回执与非作者结论](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-03.json)和[14 项定向测试](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/readmission-03-validation.json)。
+
+用户手动将 VM 调至 20 GiB / 12 CPU 后，按已审公式重新读回 Docker 额度、宿主余量和阶段峰值，满足条件才启动 S0。正式 prepare 仍由现有 SHORT_REPRO_REQUIRED 保护。S0–S3、产品验收与最终 V3 待后续实施。

@@ -1,0 +1,26 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "538f716f902f63f7fed6e80ce6d225c63b117ecd",
+  "checks": [
+    {
+      "name": "DorisKeepPreservation",
+      "command": "python3 -B scripts/tests/DorisKeepPreservation.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "..............\n----------------------------------------------------------------------\nRan 14 tests in 0.003s\n\nOK"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "commit": null,
+    "url": null,
+    "runId": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "scope": "R0 only; PostgreSQL isolated recovery and bounded graceful stops",
+    "r0": "STOPPED_KEEP",
+    "product": "NOT_RUN"
+  }
+}
