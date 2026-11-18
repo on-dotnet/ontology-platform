@@ -18,6 +18,9 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
     /// <summary>每个源分支的唯一类型化PG执行器。</summary>
     private readonly IG4PgQueryReader sourceReader;
 
+    /// <summary>匹配当前 Doris 版本组合的正式执行器。</summary>
+    private readonly DorisSourceAdapter? doris;
+
     /// <summary>源读取之前重验真实会话与单条完整字段授权。</summary>
     private readonly IG4QueryAuthorizationAuthority authority;
 
@@ -25,11 +28,12 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
     private readonly TimeProvider clock;
 
     /// <summary>使用正式模块工厂，不持有共享长生命周期DbContext。</summary>
-    public QueryBindingReader(IDbContextFactory<ConnectionsDbContext> factory, ConnectionSecretCipher cipher, IG4PgQueryReader sourceReader, IG4QueryAuthorizationAuthority authority, TimeProvider clock)
+    public QueryBindingReader(IDbContextFactory<ConnectionsDbContext> factory, ConnectionSecretCipher cipher, IG4PgQueryReader sourceReader, IG4QueryAuthorizationAuthority authority, TimeProvider clock, DorisSourceAdapter? doris = null)
     {
         this.factory = factory;
         this.cipher = cipher;
         this.sourceReader = sourceReader;
+        this.doris = doris;
         this.authority = authority;
         this.clock = clock;
     }
@@ -40,7 +44,10 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
         // 绑定只能来自已验证的manifest，不根据客户端字符串选择自由表。
         var entity = context.Manifest.Mapping.Entities.SingleOrDefault(item => item.Id == entityBindingId) ?? throw Stale();
         // 字段依赖包括范围、身份和时间，即使不显示给UI也必须有当前许可。
-        var fields = PgQueryReader.Fields(context.Manifest.Mapping, entity).Distinct().ToArray();
+        var fields = context.Manifest.Binding.SourceType == "DORIS"
+            ? DorisMappingSourceValidator.EntityTable(entity, context.OriginalCatalog, context.CurrentCatalog, context.Manifest.Mapping)
+                .Fields.Select(f => new MappingFieldRef { DatasetRef = entity.DatasetRef, Ordinal = f.Ordinal, Name = f.Name }).ToArray()
+            : PgQueryReader.Fields(context.Manifest.Mapping, entity).Distinct().ToArray();
         return new G4QueryProjection
         {
             ObjectRefs = fields.Select(field => MappingValidationService.ObjectPermission(field.DatasetRef.Schema, field.DatasetRef.Name)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray(),
@@ -68,13 +75,19 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
             && row.OrganizationId == context.Scope.OrganizationId, cancellationToken) ?? throw Forbidden();
         if (connection.State != "ACTIVE" || !context.Scope.SiteIds.All(connection.SiteIds.Contains)) throw Forbidden();
         // 使用当前配置，不要求历史配置版本被重新启用。
-        var config = ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson) as PgConnectionConfig ?? throw Forbidden();
+        var config = ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson);
+        if (!MappingApplicationService.MatchesSource(context.Manifest.Binding, config)) throw Forbidden();
         // AAD的完整归属、用途及版本仍必须与当前连接一致。
         var secret = await database.ConnectionSecrets.AsNoTracking().SingleOrDefaultAsync(row => row.Id == connection.SecretId, cancellationToken);
         if (secret is null || secret.ConnectionId != connection.Id || secret.Version != connection.SecretVersion || secret.UsedAtUtc is null
-            || secret.OrganizationId != connection.OrganizationId || secret.Purpose != "POSTGRESQL_READONLY" || string.IsNullOrEmpty(secret.Owner)
+            || secret.OrganizationId != connection.OrganizationId || secret.Purpose != ConnectionSourceDispatcher.SecretPurpose(config) || string.IsNullOrEmpty(secret.Owner)
             || !secret.SiteIds.Order(StringComparer.Ordinal).SequenceEqual(connection.SiteIds.Order(StringComparer.Ordinal))) throw Forbidden();
-        await sourceReader.VerifyAccessAsync(config.Profile, cipher.Decrypt(secret), context, entityBindingId, deadlineAtUtc, cancellationToken);
+        if (config is PgConnectionConfig pg)
+            await sourceReader.VerifyAccessAsync(pg.Profile, cipher.Decrypt(secret), context, entityBindingId, deadlineAtUtc, cancellationToken);
+        else if (config is DorisConnectionConfig d && doris is not null)
+            await DorisMappingSourceValidator.ObserveAsync(doris, d.Profile, cipher.Decrypt(secret), context.OriginalCatalog, context.CurrentCatalog,
+                context.Manifest.Mapping, context.Scope, false, deadlineAtUtc, cancellationToken);
+        else throw Forbidden();
         return new G4QueryConnectionAccess { ConnectionId = connection.Id, Revision = connection.Revision, ConfigHash = connection.ConfigHash,
             SecretVersion = connection.SecretVersion, Scope = context.Scope, Projection = projection, CheckedAtUtc = clock.GetUtcNow() };
     }
@@ -132,7 +145,8 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
             || receipt.ActivationId != binding.ActivationId || receipt.ActivationRevision.ToString(CultureInfo.InvariantCulture) != binding.ActivationRevision
             || manifest.Binding.SourceConnectionId != binding.ConnectionId || manifest.Binding.OntologyReleaseId != binding.OntologyReleaseId
             || manifest.Binding.SourceCatalogSnapshotId != binding.OriginalCatalogSnapshotId || manifest.Binding.SourceCatalogFingerprint != binding.OriginalCatalogFingerprint
-            || activationBinding.SourceConnectionId != binding.ConnectionId || activationBinding.SourceType != "POSTGRESQL"
+            || activationBinding.SourceConnectionId != binding.ConnectionId || activationBinding.SourceType != manifest.Binding.SourceType || activationBinding.AdapterVersion != manifest.Binding.AdapterVersion
+            || activationBinding.ExecutorVersion != manifest.Binding.ExecutorVersion || activationBinding.CanonicalVersion != manifest.Binding.CanonicalVersion
             || activationBinding.ConnectionRevision.ToString(CultureInfo.InvariantCulture) != binding.ConnectionRevision
             || activationBinding.SecretVersion.ToString(CultureInfo.InvariantCulture) != binding.SecretVersion || activationBinding.ConfigHash != binding.ConfigHash
             || activationBinding.SourceCatalogSnapshotId != binding.CurrentCatalogSnapshotId || activationBinding.SourceCatalogFingerprint != binding.CurrentCatalogFingerprint
@@ -181,13 +195,20 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
             || connection.ConfigHash != context.Binding.ConfigHash || connection.SecretVersion.ToString(CultureInfo.InvariantCulture) != context.Binding.SecretVersion
             || !context.Scope.SiteIds.All(connection.SiteIds.Contains)) throw Stale();
         // 强类型配置不能替换为其他连接器或自由URL。
-        var config = ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson) as PgConnectionConfig ?? throw Stale();
+        var config = ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson);
+        if (!MappingApplicationService.MatchesSource(context.Manifest.Binding, config)) throw Stale();
         // 只解密当前准确版本的已绑定秘密，不回读旧密钥执行历史查询。
         var secret = await database.ConnectionSecrets.AsNoTracking().SingleOrDefaultAsync(row => row.Id == connection.SecretId, cancellationToken);
         if (secret is null || secret.ConnectionId != connection.Id || secret.UsedAtUtc is null || secret.Version != connection.SecretVersion
-            || secret.OrganizationId != connection.OrganizationId || secret.Purpose != "POSTGRESQL_READONLY" || string.IsNullOrEmpty(secret.Owner)
+            || secret.OrganizationId != connection.OrganizationId || secret.Purpose != ConnectionSourceDispatcher.SecretPurpose(config) || string.IsNullOrEmpty(secret.Owner)
             || !secret.SiteIds.Order(StringComparer.Ordinal).SequenceEqual(connection.SiteIds.Order(StringComparer.Ordinal))) throw Stale();
-        return await sourceReader.ReadAsync(config.Profile, cipher.Decrypt(secret), context, entityBindingId, query, deadlineAtUtc, cancellationToken, branch);
+        return config switch
+        {
+            PgConnectionConfig pg => await sourceReader.ReadAsync(pg.Profile, cipher.Decrypt(secret), context, entityBindingId, query, deadlineAtUtc, cancellationToken, branch),
+            DorisConnectionConfig d when doris is not null => await DorisQueryReader.ReadEntityAsync(doris, d.Profile, cipher.Decrypt(secret),
+                context, entityBindingId, query, branch, deadlineAtUtc, cancellationToken),
+            _ => throw Stale()
+        };
     }
 
     /// <summary>发布ID相同不足以证明一致，完整绑定同时包含激活修订和当前连接身份。</summary>
@@ -264,7 +285,9 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
             || receipt.MappingReleaseId != release.Id || receipt.ManifestHash != release.ContentHash) throw Stale();
         // 当前源身份来自激活绑定，原目录仍来自原发布绑定。
         var current = MappingApplicationService.Decode<MappingVersionBinding>(activation.BindingJson);
-        if (current.SourceConnectionId != manifest.Binding.SourceConnectionId || current.SourceType != "POSTGRESQL"
+        if (current.SourceConnectionId != manifest.Binding.SourceConnectionId || current.SourceType != manifest.Binding.SourceType
+            || current.AdapterVersion != manifest.Binding.AdapterVersion || current.ExecutorVersion != manifest.Binding.ExecutorVersion
+            || current.CanonicalVersion != manifest.Binding.CanonicalVersion
             || current.OntologyReleaseId != query.OntologyReleaseId || current.MappingHash != manifest.Binding.MappingHash) throw Stale();
         // 本模块拥有连接表，其他模块只得到不可变版本身份。
         var source = await database.Connections.AsNoTracking().SingleOrDefaultAsync(row => row.Id == current.SourceConnectionId

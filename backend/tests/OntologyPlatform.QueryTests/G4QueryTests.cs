@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using OntologyPlatform.Modules.SemanticQuery;
+using OntologyPlatform.Modules.Connections;
 using OntologyPlatform.Contracts;
 
 namespace OntologyPlatform.QueryTests;
@@ -11,6 +12,46 @@ namespace OntologyPlatform.QueryTests;
 [TestClass]
 public sealed class G4QueryTests
 {
+    /// <summary>从已审 M5 证据读取真实 PG manifest 和原始结果，校验发布时的内容身份及保存字节。</summary>
+    [TestMethod]
+    [DataRow("standard", "53191b9bc282b38a1089e39a51dc4bf11267d915e0154e3a93c3fc1a4ceedc82", "browser-s1-1794832846645-result.json.raw.json", "d5c527a7e538acd4cf8158abc05221a9ef4cb3a1ffee4327316a73226e399184")]
+    [DataRow("numeric", "78e73a16a95f0e8c032d6f00012275e302b58366bbb89a7c1d071aa9dfdcc582", "browser-numeric-1794832894553-relationships.json.raw.json", "9045fa4d6d0fc4947d47076f7c15af7de268fbf3cdcf62d79bf90e88e138a643")]
+    public void HistoricalPgReleaseAndResultKeepCanonicalBytes(string scenario, string manifestHash, string original, string resultHash)
+    {
+        // 从当前测试构建所在树定位版本控制中的既有证据，避免读取机器私有运行目录。
+        var root = new DirectoryInfo(AppContext.BaseDirectory);
+        while (root is not null && !Path.Exists(Path.Combine(root.FullName, ".git"))) root = root.Parent;
+        Assert.IsNotNull(root);
+        // 两个原件由 M5 交付，固定散列来自历史报告且早于本次实现。
+        var directory = Path.Combine(root.FullName, "docs/evidence/G4-M5-INTEGRATION-001/integration-01/originals/integration-01");
+        using var historical = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(directory, $"scenario-{scenario}.json")));
+        // 已发布的 manifestHash 独立验证类型化对象经当前产品合同恢复后的字节身份。
+        var release = historical.RootElement.GetProperty("mappingRelease");
+        Assert.AreEqual(manifestHash, release.GetProperty("manifestHash").GetString());
+        // 使用现行 wire 类型，新增默认字段或集合规范化变化都会反映在散列上。
+        var manifest = release.GetProperty("manifest").Deserialize<MappingReleaseManifest>(G4MappingJson.Options);
+        Assert.IsNotNull(manifest);
+        Assert.AreEqual(manifestHash, G4QueryCanonical.Hash(MappingCanonical.Serialize(manifest)));
+        if (scenario == "standard")
+        {
+            // 2509 字节直接来自历史数据库的 CanonicalBytes 列，散列来自同一行独立的 ContentHash 列。
+            var assessmentBytes = File.ReadAllBytes(Path.Combine(root.FullName,
+                "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/pg-standard-assessment.canonical.json"));
+            Assert.AreEqual("b97c13b97057f7fb5c0c9119aaa0b0a0f3db9525e87dc53e5bbdb263c03e7665", G4QueryCanonical.Hash(assessmentBytes));
+            // 用历史场景的公开对象校验当前类型化规范化结果，比较到每个真实原字节。
+            var assessment = historical.RootElement.GetProperty("mappingAssessment").Deserialize<MappingAssessmentView>(G4MappingJson.Options);
+            Assert.IsNotNull(assessment);
+            Assert.AreEqual("ma-ace12515d7804af2870f2a434c167951", assessment.AssessmentId);
+            CollectionAssert.AreEqual(assessmentBytes, MappingCanonical.Serialize(assessment));
+        }
+        using var envelope = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(directory, original)));
+        // 无损封装内的字节是实际 HTTP 正文，按字节比较包括属性顺序及定点数词法值。
+        var bytes = envelope.RootElement.GetProperty("base64").GetBytesFromBase64();
+        Assert.AreEqual(resultHash, envelope.RootElement.GetProperty("sha256").GetString());
+        Assert.AreEqual(resultHash, G4QueryCanonical.Hash(bytes));
+        CollectionAssert.AreEqual(bytes, G4QueryCanonical.Result(G4QueryRules.ReadResult(bytes)));
+    }
+
     /// <summary>数据库等值numeric键不能因声明精度不同而静默丢弃关系；预期端点集合独立固定。</summary>
     [TestMethod]
     public void NumericRelationshipPreservesExpectedEdgesAcrossRepresentations()
@@ -295,7 +336,7 @@ public sealed class G4QueryTests
         var second = new Dictionary<string, G4QueryValue>(row) { ["site"] = new G4StringValue { Lexical = "site-2" } };
         // 水位明确标记为单元样本，真实PG测试另行提供实际pg_current_snapshot。
         var read = new G4SourceQueryRead { EntityBindingId = "asset", Rows = [row,second], StartedAtUtc = DateTimeOffset.UtcNow,
-            CompletedAtUtc = DateTimeOffset.UtcNow, TransactionSnapshot = "fixture-only", Limited = false, Indeterminate = false,
+            CompletedAtUtc = DateTimeOffset.UtcNow, AdapterVersion = "pg-query-v1", WatermarkKind = "TRANSACTION_SNAPSHOT", Watermark = "fixture-only", Limited = false, Indeterminate = false,
             RecordKeyFields = ["org","site","id","from"], QueryPlanHash = new string('e',64) };
         // 实际投影代码必须给每个当前有权源行闭合证据。
         var projected = G4QueryExecution.ProjectEntities("query-1", "trace-1", context, read);

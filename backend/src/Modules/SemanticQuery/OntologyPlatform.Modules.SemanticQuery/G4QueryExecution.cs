@@ -671,9 +671,9 @@ public sealed class G4QueryExecution
         var status = entities.Count == 0 && !read.Limited && !read.Indeterminate ? "EMPTY" : "SUCCESS";
         // 多行回执不虚构一个总记录定位；逐行位置只出现在各自evidence中。
         var receipt = new G4SourceReadReceipt { SchemaVersion = "g4.read-receipt.v1", ReceiptId = receiptId, QueryId = queryId,
-            Binding = context.Binding, SourceDatasetRef = dataset, QueryPlanHash = read.QueryPlanHash, AdapterVersion = "pg-query-v1",
-            Scope = context.Scope, Status = status, RowCount = entities.Count, Limited = read.Limited, WatermarkKind = "TRANSACTION_SNAPSHOT",
-            Watermark = read.TransactionSnapshot, SourceRecordRef = evidence.Count == 1 ? evidence[0].SourceRecordRef : null,
+            Binding = context.Binding, SourceDatasetRef = dataset, QueryPlanHash = read.QueryPlanHash, AdapterVersion = read.AdapterVersion,
+            Scope = context.Scope, Status = status, RowCount = entities.Count, Limited = read.Limited, WatermarkKind = read.WatermarkKind,
+            Watermark = read.Watermark, SourceRecordRef = evidence.Count == 1 ? evidence[0].SourceRecordRef : null,
             Precision = read.RecordKeyFields.Length == 0 ? "DATASET" : "ROW_KEY", ValidTime = null,
             ReadStartedAtUtc = Utc(read.StartedAtUtc), ReadCompletedAtUtc = observed, ResultHash = G4QueryCanonical.Hash(projection), TraceId = traceId };
         return new G4QueryBranchProjection { Entities = entities.ToArray(), Evidence = evidence.ToArray(),

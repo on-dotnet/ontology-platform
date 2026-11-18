@@ -51,6 +51,7 @@ public static class G4Composition
         builder.Services.AddSingleton<IWebSourceAdapter, WebSourceAdapter>();
         builder.Services.AddSingleton(new DorisAdapterOptions { RootCertificatePath = builder.Configuration["G4:Doris:RootCertificatePath"] ?? string.Empty });
         builder.Services.AddSingleton<IDorisSourceAdapter, DorisSourceAdapter>();
+        builder.Services.AddSingleton(provider => (DorisSourceAdapter)provider.GetRequiredService<IDorisSourceAdapter>());
         builder.Services.AddSingleton(new OracleAdapterOptions
         {
             RootCertificatePath = builder.Configuration["G4:Oracle:RootCertificatePath"] ?? string.Empty,

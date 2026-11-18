@@ -244,7 +244,7 @@ public sealed class PgMappingSourceValidator : IMappingSourceValidator
             {
                 Tables = tables.ToArray(),
                 CatalogFingerprint = fingerprint,
-                TransactionSnapshot = transactionSnapshot,
+                WatermarkKind = "TRANSACTION_SNAPSHOT", Watermark = transactionSnapshot, SourceSemanticsHash = null,
                 StartedAtUtc = started,
                 FinishedAtUtc = DateTimeOffset.UtcNow,
                 SecurityVerified = true

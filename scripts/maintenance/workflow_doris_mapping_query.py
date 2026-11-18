@@ -7,7 +7,7 @@ def s0_consumers(root, task, phase):
     """只核验本轮 S0 的实际执行器和定向消费者；后续运行阶段单独准入。"""
     from execution_preflight import source_path
     from workflow_m2_doris import source_consumers
-    if task != 'G4-DORIS-MAPPING-QUERY-001' or phase != 'source':
+    if task != 'G4-DORIS-MAPPING-QUERY-001' or phase not in ('source','runtime'):
         raise ValueError('DMQ_ONLY_S0_SOURCE_REGISTERED')
     paths = source_consumers(root)
     directory = 'backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Adapters/'
@@ -24,6 +24,21 @@ def s0_consumers(root, task, phase):
         if any(term not in source for term in terms):
             raise ValueError('DMQ_S0_CONSUMER_MISSING')
         paths[relative.split('/')[-1]] = relative
+    if phase=='runtime':
+        import json
+        assurance = json.loads((root/'docs/evidence'/task/'implementation-01/s0-qualified-review.json').read_bytes())
+        if assurance['status']!='S0_GO' or assurance['reviewDecision']!='GO_S1': raise ValueError('DMQ_S0_NOT_QUALIFIED')
+        for name,path,terms in [
+            ('mapping','backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/MappingValidationService.cs',
+             ['DorisMappingSourceValidator.ObserveAsync','CaptureSourceAsync','mapping_authorization_stale']),
+            ('query','backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/QueryBindingReader.cs',
+             ['DorisQueryReader.ReadEntityAsync','authority.CaptureAsync','DemandSameVersion']),
+            ('composition',paths['composition'],['AddScoped<QueryBindingReader>','AddSingleton<IDorisSourceAdapter, DorisSourceAdapter>','MappingValidationService']),
+            ('store','backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/G4QueryResultStore.cs',['BindReceipts','SaveChangesAsync'])]:
+            source=source_path(root,path).read_text()
+            if any(term not in source for term in terms):raise ValueError('DMQ_S1_CONSUMER_MISSING_'+name)
+            paths[name]=path
+        return dict(taskId=task,phase='S1',status='STRUCTURAL_READY',consumers=paths,productLifecycle='NOT_RUN')
     return dict(taskId=task, phase='S0', status='STRUCTURAL_READY', consumers=paths,
                 sourceCancellation='NOT_VERIFIED', productLifecycle='NOT_RUN')
 

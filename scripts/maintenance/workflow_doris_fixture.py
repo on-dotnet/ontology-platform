@@ -29,6 +29,27 @@ def private(path, value):
         stream.write(raw)
 
 
+def host_service(args, env, root, task, budget_failed):
+    """启动仅可访问环回的子进程，按私有输出上限持续排空双流。"""
+    service = execution.Service(['/usr/bin/sandbox-exec', '-p', '(version 1) (allow default) (deny network-outbound (remote ip "*:*")) (allow network-outbound (remote ip "localhost:*"))', '/usr/bin/env', '-i', *[key + '=' + value for key, value in env.items()], *args], root, task)
+    service.reader_threads = []
+    for stream, target in ((service.process.stdout, service.out), (service.process.stderr, service.err)):
+        def drain(source=stream, destination=target):
+            while True:
+                chunk = source.read(4096)
+                if not chunk:
+                    break
+                if len(destination) + len(chunk) > 2 * 1024**2:
+                    budget_failed.set()
+                    os.killpg(service.process.pid, signal.SIGTERM)
+                    break
+                destination.extend(chunk)
+        thread = threading.Thread(target=drain, daemon=True)
+        service.reader_threads.append(thread)
+        thread.start()
+    return service
+
+
 def prepare_control(directory, prepared):
     """已有驱动程序集的离线固定SQL工具，不新增依赖或下载。"""
     from workflow_environment import environment, offline
@@ -140,25 +161,10 @@ def run(prepared, doris_runtime, browser_script):
 
     def host(args, env, name):
         # 常驻进程复用公共START/READY/END；环境只携非敏感路径和预算。
-        service = execution.Service(['/usr/bin/sandbox-exec', '-p', '(version 1) (allow default) (deny network-outbound (remote ip "*:*")) (allow network-outbound (remote ip "localhost:*"))', '/usr/bin/env', '-i', *[key + '=' + value for key, value in env.items()], *args], ROOT, TASK)
+        service = host_service(args, env, ROOT, TASK, budget_failed)
         services.append(service)
         state['services'].append(dict(name=name, pid=service.process.pid, status='STARTED'))
         save()
-        service.reader_threads = []
-        for stream, target in ((service.process.stdout, service.out), (service.process.stderr, service.err)):
-            def drain(source=stream, destination=target):
-                while True:
-                    chunk = source.read(4096)
-                    if not chunk:
-                        break
-                    if len(destination) + len(chunk) > 2 * 1024**2:
-                        budget_failed.set()
-                        os.killpg(service.process.pid, signal.SIGTERM)
-                        break
-                    destination.extend(chunk)
-            thread = threading.Thread(target=drain, daemon=True)
-            service.reader_threads.append(thread)
-            thread.start()
         return service
 
     def monitor():

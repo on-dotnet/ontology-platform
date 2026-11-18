@@ -115,8 +115,14 @@ public sealed record G4SourceQueryRead
     /// <summary>真实只读事务完成。</summary>
     public required DateTimeOffset CompletedAtUtc { get; init; }
 
-    /// <summary>实际事务快照水位，不声称与其他分支原子一致。</summary>
-    public required string TransactionSnapshot { get; init; }
+    /// <summary>本分支实际执行的查询适配器版本。</summary>
+    public required string AdapterVersion { get; init; }
+
+    /// <summary>源能证明的水位类型。</summary>
+    public required string WatermarkKind { get; init; }
+
+    /// <summary>PG 快照实值或 Doris 未知水位的空值。</summary>
+    public required string? Watermark { get; init; }
 
     /// <summary>存在无法确定窗口匹配的源时间，不可把空投影解释为EMPTY。</summary>
     public required bool Indeterminate { get; init; }

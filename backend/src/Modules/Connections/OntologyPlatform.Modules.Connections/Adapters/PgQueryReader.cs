@@ -311,9 +311,9 @@ public sealed class PgQueryReader : IG4PgQueryReader
             return new G4SourceQueryRead
             {
                 EntityBindingId = entity.Id, Rows = rows.ToArray(), StartedAtUtc = started, CompletedAtUtc = clock.GetUtcNow(),
-                TransactionSnapshot = watermark, Limited = limited, Indeterminate = indeterminate, RecordKeyFields = keys,
+                AdapterVersion = "pg-query-v1", WatermarkKind = "TRANSACTION_SNAPSHOT", Watermark = watermark, Limited = limited, Indeterminate = indeterminate, RecordKeyFields = keys,
                 QueryPlanHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(
-                    new { context.Binding, entity.Id, fields, context.Scope, query.Filters, query.MaxRows, Branch = branch, AdapterVersion = "pg-query-v1" }, G4QueryJson.Options)))
+                    new { context.Binding, entity.Id, fields, context.Scope, query.Filters, query.MaxRows, Branch = branch is null ? null : new { branch.RelationId, Parents = new { branch.Parents.EntityBindingId, branch.Parents.Rows, branch.Parents.StartedAtUtc, branch.Parents.CompletedAtUtc, TransactionSnapshot = branch.Parents.Watermark, branch.Parents.Indeterminate, branch.Parents.Limited, branch.Parents.RecordKeyFields, branch.Parents.QueryPlanHash } }, AdapterVersion = "pg-query-v1" }, G4QueryJson.Options)))
             };
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
@@ -325,7 +325,7 @@ public sealed class PgQueryReader : IG4PgQueryReader
     }
 
     /// <summary>UTC窗口转精确numeric秒，避免PG微秒参数舍入纳秒边界。</summary>
-    private static decimal Epoch(string value)
+    internal static decimal Epoch(string value)
     {
         // 请求已由正式守卫验证公历与0至9位小数，这里不猜测偏移。
         var whole = DateTimeOffset.ParseExact(value[..19] + "Z", "yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToUnixTimeSeconds();

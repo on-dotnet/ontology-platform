@@ -825,6 +825,12 @@ public sealed class MappingApplicationService
             }, "mapping.proposal.cancel", token);
     }
 
+    /// <summary>当前配置与源版本三元组必须整组匹配，不能借用另一适配器的验证。</summary>
+    internal static bool MatchesSource(MappingVersionBinding binding, ConnectionConfig config) =>
+        binding.CanonicalVersion == "mapping-c14n-v1" && (config, binding.SourceType, binding.AdapterVersion, binding.ExecutorVersion) is
+            (PgConnectionConfig, "POSTGRESQL", "pg-mapping-v1", "mapping-validator-v1") or
+            (DorisConnectionConfig, "DORIS", "doris-mapping-v1", "doris-mapping-validator-v1");
+
     /// <summary>当前平台输入在组织锁下逐项复核，源网络已在评估阶段完成。</summary>
     internal async Task CurrentAsync(ConnectionsDbContext db, MappingDraftView draft, MappingValidationTarget target, MappingVersionBinding binding,
         MappingExpectedActive expected, long epoch, CancellationToken token)
@@ -841,8 +847,7 @@ public sealed class MappingApplicationService
         // 连接写者使用同一advisory锁，轮换不能与提交交错。
         var connection = await db.Connections.SingleAsync(row => row.Id == binding.SourceConnectionId, token);
         if (connection.State != "ACTIVE" || connection.Revision != binding.ConnectionRevision || connection.ConfigHash != binding.ConfigHash
-            || connection.SecretVersion != binding.SecretVersion || binding.AdapterVersion != "pg-mapping-v1"
-            || binding.ExecutorVersion != "mapping-validator-v1" || binding.CanonicalVersion != "mapping-c14n-v1")
+            || connection.SecretVersion != binding.SecretVersion || !MatchesSource(binding, ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson)))
         {
             throw Conflict();
         }

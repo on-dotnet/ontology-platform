@@ -1,0 +1,91 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "input": "33ac7d8dd33c25438d1e6492157b4e7def6f78c5fdaf1588842d9356255ea311",
+  "originals": {
+    "browser-provision-1795040647960.json": "aa251dbca5c161c182644968cfae269d5cec8b902382fb5d00fceae7d11ebeee",
+    "s1-host-provision-849338b58abe435fa8c9aa3dfa44a955.json": "5cbeda8d89bc802a3c7af3ee3f2cdf318f7deae3a481b881b087f43a452a5d39",
+    "browser-provision-1795040831402.json": "67f9a716a43c2526e0b26bae342e9bdd40025dc3e501dba056efcdb7ed9129d3",
+    "s1-host-provision-ef51982b443c4e569c64193dec9742e6.json": "fad61352e66c0c792bc78a5a8b754eade51368f2864a561c520bf280971c25e0",
+    "browser-s1-current-catalog-1795041436280.json": "135e680062f2e665f52fc462576b4232ce7e123f8018fe7baf02aaf64131b9e5",
+    "s1-host-s1-current-catalog-34958e31d02b490dbf1af030d32e5b0f.json": "2dbac554e9931c84a337a0845fb111bca1b390d82a4ecff2896f49e6642f9b3d",
+    "browser-mapping-1795041466457.json": "46d46fa7c0eb9632e1569d9e295bd92f782ae363d8b996db785249c22cd6caf7",
+    "s1-host-mapping-f99b29c377434430905ad10e3b8b3e55.json": "dea1a3798ffd904abc0b3c117724a197c20d21bf7b52c2d9f1cd332405b488c3",
+    "browser-s1-1795041876710.json": "fd001d5999c199ad97f5b077090ce7fec3535d26133efc59cd4b079643e210af",
+    "s1-host-s1-bc5c99e5ebf04a749f22673583b154cd.json": "a0cd959932147465dab603d041e703524acd496ba860102f1b01a985adc0f023",
+    "browser-s1-1795041876710-result.json": "29dbbfbb1fc4a232477fa47806d53f6a8c1eaa23a2e7516d255a52627ce0e3a0",
+    "browser-s1-reopen-1795041896739.json": "a6442f60ffcdf64b351b5aa5a3162f5891426cfa8ba555cc0f64a096f78a2605",
+    "s1-host-s1-reopen-a4c193c40fee417583605c07ff5f5283.json": "637bd4de3f40c2100e01baa40978dbd065a7adbd67e22078e97e061c64a32d81",
+    "browser-s1-key-negative-1795041932785.json": "f4769a4a010a7a4548717ecfbb73962340c1334a310af4d838fa6337c66f0935",
+    "s1-host-s1-key-negative-3e1995e90a284ffeaa61e6e1eb92006e.json": "50b54dee70287cb36c278ac2bd034c168d8dbaa9f24992937e77240d3c59b7b0",
+    "pg-golden-test-025917c1eb2e4770b45afdfd2b7469ec.json": "6edc4296f7945066de6fef9001dec6e3f330728fc52af2211bb68f3d791bf110",
+    "pg-golden-postcheck-f23591fea356468097da52c352bcfe89.json": "5d1a57d410898e148604da856bcf8378204109c90bc1a86c1ded3251aa3de7a0"
+  },
+  "earlierFailures": [
+    {
+      "file": "browser-mapping-1795040728438.json",
+      "sha256": "8706dd3076dedc10885839d019c79bc7b7b54bc874e3a014056927467f569a26",
+      "failure": {
+        "phase": "query_mapping_wait",
+        "category": "Error",
+        "code": "mapping_prerequisite_ready"
+      }
+    },
+    {
+      "file": "browser-provision-1795040586015.json",
+      "sha256": "e4b2ed11d7aedafc02b44e62c0e5d9b118ff5bf688df41f1a2678570ebb58697",
+      "failure": {
+        "phase": "oidc_auditor-ab",
+        "category": "Error",
+        "code": "query_browser_runtime_failure"
+      }
+    },
+    {
+      "file": "browser-s1-1795041473569.json",
+      "sha256": "ce37cea4344c1c25e3c6e284f021006da1bb618d965a9f6a37bd70c30dc9b08b",
+      "failure": {
+        "phase": "query_source_evidence",
+        "category": "Error",
+        "code": "exactly_one_doris_business_read"
+      }
+    }
+  ],
+  "g3Release": "ee04d4c4b9174cd4802e7365b3c0a769",
+  "catalog": "2c495c3509ec432bb918ecdf730610fc",
+  "catalogShape": [
+    {
+      "table": "dmq_entity",
+      "fields": 10
+    },
+    {
+      "table": "dmq_target",
+      "fields": 8
+    }
+  ],
+  "mappingRelease": "release-5a98cac5fd9f4c69862534cc08c89157",
+  "activation": "activation-5cf6eab3e127444d8b9e7062e7bb3d9b",
+  "binding": {
+    "sourceConnectionId": "675b6bca997f4aa5b0b9e4678964c50b",
+    "connectionRevision": 2,
+    "configHash": "edd653be6d541ef741105b1992812e633dcaf4462faab240da9e80fa84a0d8ae",
+    "sourceType": "DORIS",
+    "sourceCatalogSnapshotId": "2c495c3509ec432bb918ecdf730610fc",
+    "sourceCatalogFingerprint": "b50494aa80825375d87d14183f4dc9fe64fc79b84856faeb1d154791a0745001",
+    "ontologyReleaseId": "ee04d4c4b9174cd4802e7365b3c0a769",
+    "ontologyManifestHash": "8da9bc4f080dbb931e44f1fe2a790603c5bd7ac9a34004e678f27c16631061db",
+    "mappingHash": "ef0d927e02f052634141db320d2ed5a691dc342f16c8cf0b2561a380c617a54d",
+    "validationHash": "5f57fb6a7eeb1bd842136d091c40b4fb31fef6c5d80656293901003cf7edc8a3",
+    "impactHash": "82695e2b81c4e205eb40a7474e563a0ade7c54a6991c39efba8f8c8c16549cc4",
+    "assessmentId": "ma-a77741308dd94252a393281745421189",
+    "adapterVersion": "doris-mapping-v1",
+    "executorVersion": "doris-mapping-validator-v1",
+    "canonicalVersion": "mapping-c14n-v1",
+    "secretVersion": 1,
+    "authorizationEpoch": 40
+  },
+  "resultHash": "29dbbfbb1fc4a232477fa47806d53f6a8c1eaa23a2e7516d255a52627ce0e3a0",
+  "queryId": "query-a59bde9076eb4a7c865da11e109c43b7",
+  "pgGoldenBuildReceipt": "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/query-build-binding.json",
+  "pgGoldenBuildReceiptSha256": "3b5b4a8af16699a15e7f581d8b65302f19e684b6a570ad1c992fe0c47ed7195d",
+  "status": "S1_RUNTIME_VERIFIED"
+}

@@ -1,0 +1,405 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s1-key-negative",
+  "startedAtUtc": "2026-11-18T22:45:32.785Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_201",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200",
+      "status": "PASS"
+    },
+    {
+      "name": "negative_job_advances_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_11",
+      "status": "PASS"
+    },
+    {
+      "name": "http_12_200",
+      "status": "PASS"
+    },
+    {
+      "name": "negative_job_advances_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_12",
+      "status": "PASS"
+    },
+    {
+      "name": "http_13_200",
+      "status": "PASS"
+    },
+    {
+      "name": "negative_job_advances_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_13",
+      "status": "PASS"
+    },
+    {
+      "name": "http_14_200",
+      "status": "PASS"
+    },
+    {
+      "name": "negative_job_advances_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_14",
+      "status": "PASS"
+    },
+    {
+      "name": "http_15_200",
+      "status": "PASS"
+    },
+    {
+      "name": "negative_job_advances_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_15",
+      "status": "PASS"
+    },
+    {
+      "name": "http_16_200",
+      "status": "PASS"
+    },
+    {
+      "name": "negative_job_advances_5",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_16",
+      "status": "PASS"
+    },
+    {
+      "name": "http_17_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_17",
+      "status": "PASS"
+    },
+    {
+      "name": "http_18_200",
+      "status": "PASS"
+    },
+    {
+      "name": "unsupported_identity_never_publishable",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_18",
+      "status": "PASS"
+    },
+    {
+      "name": "http_19_404",
+      "status": "PASS"
+    },
+    {
+      "name": "unsupported_identity_has_no_activation",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 12.221125000000029,
+      "sha256": "ed56f5a16eeeffb9c9bd22d2ff17abe3861f8690985540941d082b188ac0217f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 4.780709000000002,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 8.477791999999909,
+      "sha256": "79907467451060d8a87f0d210a51e0ac19d7ad909d5e4a85c96a540993c7370e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.5064170000000559,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 18.44266700000003,
+      "sha256": "2b47320916b29c395efd64935edbb0e6a6b012a804577c74807605808616e2b9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 2.9000840000001062,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.6974170000000868,
+      "sha256": "bc2cc7033043fe4ef61fea7e1353ceb23b5233163bc4b6c33dd41d99dd41bb4d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.367291000000023,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings",
+      "status": 201,
+      "elapsedMs": 88.50933400000008,
+      "sha256": "ded7d4ae6c70ed782ef7c84d761c43f08d8c0b006910f849d3aa792951ad75cd"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-20d136184245a107f44d5d02a7f82425/validate",
+      "status": 202,
+      "elapsedMs": 32.63212500000009,
+      "sha256": "73b0f86b864be295aee45bf6ff3f7fc36d7a10e912f7ddd8b630933a07ce35e5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-aeb7291d24984d68865987dd05b60c1d",
+      "status": 200,
+      "elapsedMs": 94.75266699999997,
+      "sha256": "73b0f86b864be295aee45bf6ff3f7fc36d7a10e912f7ddd8b630933a07ce35e5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-aeb7291d24984d68865987dd05b60c1d",
+      "status": 200,
+      "elapsedMs": 97.33674999999994,
+      "sha256": "73b0f86b864be295aee45bf6ff3f7fc36d7a10e912f7ddd8b630933a07ce35e5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-aeb7291d24984d68865987dd05b60c1d",
+      "status": 200,
+      "elapsedMs": 101.11441699999978,
+      "sha256": "73b0f86b864be295aee45bf6ff3f7fc36d7a10e912f7ddd8b630933a07ce35e5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-aeb7291d24984d68865987dd05b60c1d",
+      "status": 200,
+      "elapsedMs": 68.52812499999982,
+      "sha256": "73b0f86b864be295aee45bf6ff3f7fc36d7a10e912f7ddd8b630933a07ce35e5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-aeb7291d24984d68865987dd05b60c1d",
+      "status": 200,
+      "elapsedMs": 81.57045900000003,
+      "sha256": "73b0f86b864be295aee45bf6ff3f7fc36d7a10e912f7ddd8b630933a07ce35e5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-aeb7291d24984d68865987dd05b60c1d",
+      "status": 200,
+      "elapsedMs": 64.4536250000001,
+      "sha256": "6bdd5df68dfe49d748b26ec57f61109988a9dd5632995e591a51703b65744c17"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-aeb7291d24984d68865987dd05b60c1d",
+      "status": 200,
+      "elapsedMs": 47.49945899999966,
+      "sha256": "8342f2adb5bba5a9ef0ede9403e0d3a45be495571f509739c24ac7b29f02f0dd"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-60b83c93aec3488f87e96fd4d12d4596",
+      "status": 200,
+      "elapsedMs": 57.8774999999996,
+      "sha256": "03871a925ea8577fa75cdb6cf6a29d3513b8b36b445e50c49eb6abfe3abd9602"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-20d136184245a107f44d5d02a7f82425/active",
+      "status": 404,
+      "elapsedMs": 10.451332999999977,
+      "code": "mapping_active_missing",
+      "sha256": "cb29012dd4c2d08d03276fab455795e9569462a5b6d13ff8082c84e8e8ec36cf"
+    }
+  ],
+  "status": "PASS",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "s1-key-negative",
+      "status": "READY",
+      "pid": 19638,
+      "commandId": "3e1995e90a284ffeaa61e6e1eb92006e",
+      "snapshotId": "21db695b3df16bf17902f5634d1d7e883a35ee5c6080a03cb60d60a738bd656e",
+      "processStart": "Thu Nov 19 06:45:31 2026"
+    },
+    "web": null
+  },
+  "rejected": {
+    "mappingId": "mapping-20d136184245a107f44d5d02a7f82425",
+    "assessmentId": "ma-60b83c93aec3488f87e96fd4d12d4596",
+    "issues": [
+      "mapping_source_shape_invalid"
+    ],
+    "active": {
+      "type": "about:blank",
+      "title": "资源不存在",
+      "status": 404,
+      "detail": "请求无法完成，请使用关联标识联系运维。",
+      "code": "mapping_active_missing",
+      "traceId": "c0bc16d4883efc1ec10563ee80371f9e",
+      "correlationId": "fca3b41e4bbc4794b3b094ccf3142bd8"
+    }
+  },
+  "scope": "DORIS_IDENTITY_NEGATIVE",
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-18T22:45:37.511Z"
+}

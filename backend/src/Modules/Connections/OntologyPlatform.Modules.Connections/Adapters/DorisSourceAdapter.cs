@@ -278,7 +278,7 @@ public sealed class DorisSourceAdapter : IDorisSourceAdapter
     }
 
     /// <summary>固定internal信息表交集，最大一百对象、两千字段、二MiB；不读取业务行。</summary>
-    private static async Task<CatalogObject[]> ReadCatalogAsync(MySqlConnection connection)
+    internal static async Task<CatalogObject[]> ReadCatalogAsync(MySqlConnection connection)
     {
         // 固定schema且不切换catalog；连接默认internal，不访问外部连接器。
         const string sql = "SELECT c.TABLE_NAME,t.TABLE_TYPE,c.COLUMN_NAME,c.COLUMN_TYPE,c.IS_NULLABLE,c.ORDINAL_POSITION,c.NUMERIC_PRECISION,c.NUMERIC_SCALE FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON c.TABLE_SCHEMA=t.TABLE_SCHEMA AND c.TABLE_NAME=t.TABLE_NAME WHERE c.TABLE_SCHEMA='fixture' ORDER BY c.TABLE_NAME,c.ORDINAL_POSITION LIMIT 2001";

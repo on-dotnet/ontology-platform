@@ -618,6 +618,29 @@ def browser_test(mode):
     return result.returncode
 
 
+def grant_transaction(state,objects,fields,subjects,id_for,run_id):
+    """按已核定主体和字段生成同一原子授权、审计及有效计数。"""
+    def literal(value):
+        if not isinstance(value,str) or len(value)>512 or any(ord(char)<32 for char in value): raise ValueError('QUERY_GRANT_LITERAL')
+        return "'"+value.replace("'","''")+"'"
+    def array(values): return 'ARRAY['+','.join(literal(value) for value in values)+']::text[]'
+    statements=["BEGIN; SET LOCAL statement_timeout='5s'; SET LOCAL lock_timeout='2s';"]
+    ids=[]
+    for subject,permissions in subjects:
+        for permission in permissions:
+            ident=id_for(subject,permission)
+            ids.append(ident)
+            source=permission=='mapping.source.validate' or permission.startswith('data.query.')
+            values=[literal(ident),literal(subject),"'org-demo'",array(state['scope']['siteIds']),literal(permission),
+                literal(state['connectionId']) if source else 'NULL',array(objects if source else []),array(fields if source else []),"now()+interval '4 hours'",'NULL']
+            statements.append('WITH inserted AS (INSERT INTO governance."MappingAuthorizationGrants" '
+                '("Id","SubjectId","OrganizationId","SiteIds","Permission","ConnectionId","ObjectRefs","FieldRefs","ExpiresAtUtc","RevokedAtUtc") VALUES ('+','.join(values)+') ON CONFLICT ("Id") DO NOTHING RETURNING "Id") '
+                'INSERT INTO governance.audit_records ("Id","OccurredAtUtc","Actor","Action","Resource","Outcome","TraceId","CorrelationId","OrganizationId","ScopeSiteIds","SiteId") '
+                + ('SELECT md5("Id"),now(),\'synthetic-query-fixture\',\'mapping.grant.change\',"Id",\'allowed\','+literal(run_id)+','+literal(run_id)+',\'org-demo\',')+array(state['scope']['siteIds'])+',NULL FROM inserted;')
+    statements+=['COMMIT;','SELECT count(*) FROM governance."MappingAuthorizationGrants" WHERE "Id"=ANY('+array(ids)+') AND "RevokedAtUtc" IS NULL AND "ExpiresAtUtc">now();']
+    return '\n'.join(statements).encode(), ids
+
+
 def synthetic_grants(mode):
     """仅在本任务合成库授予准确主体和资产字段，不从角色隐式升级查询许可。"""
     import subprocess
@@ -640,27 +663,15 @@ def synthetic_grants(mode):
     if len(tables)!=len(table_names) or not any(item['name']==table_names[0] and len(item['fields'])==(7 if state.get('numeric') else 6) for item in tables): raise ValueError('QUERY_GRANT_SOURCE_FIELDS')
     objects=['production/'+table['name'] for table in tables]
     fields=['production/'+table['name']+'/'+str(item['ordinal'])+'/'+urllib.parse.quote(item['name'],safe='') for table in tables for item in table['fields']]
-    def literal(value):
-        if not isinstance(value,str) or len(value)>512 or any(ord(char)<32 for char in value): raise ValueError('QUERY_GRANT_LITERAL')
-        return "'"+value.replace("'","''")+"'"
-    def array(values): return 'ARRAY['+','.join(literal(value) for value in values)+']::text[]'
-    statements=["BEGIN; SET LOCAL statement_timeout='5s'; SET LOCAL lock_timeout='2s';"]
-    ids=[]
+    subjects=[]
     for role,subject in state['subjects'].items():
         if role not in ['operator','auditor']: raise ValueError('QUERY_GRANT_SUBJECT_INVALID')
         permissions=(['mapping.read','mapping.source.validate']+(['mapping.edit','mapping.validate','mapping.submit','mapping.activate'] if role=='operator' else ['mapping.review','mapping.approve'])) if mode=='mapping' else (
             ['data.query.execute','data.query.result.read','data.query.evidence.read'] if role=='operator' else [])
-        for permission in permissions:
-            ident='m4-fixture-'+sha((state['connectionId']+subject+permission+('s3' if state.get('s3') else '')).encode())[:32];ids.append(ident)
-            source=permission=='mapping.source.validate' or permission.startswith('data.query.')
-            values=[literal(ident),literal(subject),"'org-demo'",array(state['scope']['siteIds']),literal(permission),
-                literal(state['connectionId']) if source else 'NULL',array(objects if source else []),array(fields if source else []),"now()+interval '4 hours'",'NULL']
-            statements.append('WITH inserted AS (INSERT INTO governance."MappingAuthorizationGrants" '
-                '("Id","SubjectId","OrganizationId","SiteIds","Permission","ConnectionId","ObjectRefs","FieldRefs","ExpiresAtUtc","RevokedAtUtc") VALUES ('+','.join(values)+') ON CONFLICT ("Id") DO NOTHING RETURNING "Id") '
-                'INSERT INTO governance.audit_records ("Id","OccurredAtUtc","Actor","Action","Resource","Outcome","TraceId","CorrelationId","OrganizationId","ScopeSiteIds","SiteId") '
-                + PROFILE.text('SELECT md5("Id"),now(),\'synthetic-query-fixture\',\'mapping.grant.change\',"Id",\'allowed\',\'query-impl-01\',\'query-impl-01\',\'org-demo\',')+array(state['scope']['siteIds'])+',NULL FROM inserted;')
-    statements+=['COMMIT;','SELECT count(*) FROM governance."MappingAuthorizationGrants" WHERE "Id"=ANY('+array(ids)+') AND "RevokedAtUtc" IS NULL AND "ExpiresAtUtc">now();']
-    sql='\n'.join(statements).encode()
+        subjects.append((subject,permissions))
+    def id_for(subject,permission):
+        return 'm4-fixture-'+sha((state['connectionId']+subject+permission+('s3' if state.get('s3') else '')).encode())[:32]
+    sql,ids=grant_transaction(state,objects,fields,subjects,id_for,PROFILE.text('query-impl-01'))
     result=run([*prefix,'exec','-i',container,'psql','-U','postgres','-d','query','-v','ON_ERROR_STOP=1','-qAt'],ROOT,
         task=TASK,run_id=RUN,stage='query-synthetic-grant-'+mode,stdin=sql,input_key=sha(sql),timeout=20)
     if result.returncode or result.stdout.decode().strip()!=str(len(ids)): raise ValueError('QUERY_GRANT_FAILED_'+result.receipt['commandId'])

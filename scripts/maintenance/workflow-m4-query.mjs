@@ -11,17 +11,19 @@ function argument(name) {
   return args[index + 1];
 }
 const task = argument("task");
-if (!["G4-M4-QUERY-001", "G4-M5-INTEGRATION-001"].includes(task)) throw new Error("QUERY_TASK_NOT_ADMITTED");
-const integration = task === "G4-M5-INTEGRATION-001", runId = integration ? "integration-01" : "query-impl-01";
+if (!["G4-M4-QUERY-001", "G4-M5-INTEGRATION-001", "G4-DORIS-MAPPING-QUERY-001"].includes(task)) throw new Error("QUERY_TASK_NOT_ADMITTED");
+const doris = task === "G4-DORIS-MAPPING-QUERY-001";
+const integration = task === "G4-M5-INTEGRATION-001", runId = doris ? "implementation-01" : integration ? "integration-01" : "query-impl-01";
 const scenario = integration ? argument("scenario") : null;
 if (integration && !["standard", "numeric", "safety", "aba"].includes(scenario)) throw new Error("INTEGRATION_SCENARIO_INVALID");
-const moduleName = integration ? "workflow_m5_integration" : "workflow_m4_query";
+const moduleName = doris ? "workflow_doris_s1" : integration ? "workflow_m5_integration" : "workflow_m4_query";
 const scenarioCode = integration ? `q.scenario("${scenario}");` : "";
-const privateName = integration ? ".tools/security/g4-m5-integration-001" : ".tools/security/g4-m4-query-001";
+const privateName = doris ? ".tools/security/g4-doris-mapping-query-001" : integration ? ".tools/security/g4-m5-integration-001" : ".tools/security/g4-m4-query-001";
 const stateName = integration ? `scenario-${scenario}.json` : "runtime-fixture.json";
-const port = value => integration ? value + 100 : value;
+const port = value => doris ? ({15441:15641,15442:15642,15443:15643,15444:15644,15445:19030,15446:15645,15447:15646,15448:15647})[value] : integration ? value + 100 : value;
 if (argument("task") !== task || argument("run-id") !== runId || await realpath(process.cwd()) !== root) throw new Error("QUERY_CONSUMER_BOUNDARY");
 const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/package.json"));
+if (doris && !["provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
 if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
@@ -35,7 +37,7 @@ if (mode === "serve") {
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: port(15442),
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
+} else if (["s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -51,6 +53,7 @@ async function browserRun(mode) {
   const report = { taskId: task, runId, mode, startedAtUtc: new Date().toISOString(), checks: [], http: [], status: "FAIL" };
   const { execFileSync } = await import("node:child_process");
   const binding = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps({"api":q.runtime_binding(),"web":q.web_binding() if any(arg.startswith("ui-") for arg in sys.argv) else None}))`, mode], { cwd: root, timeout: 30000, encoding: "utf8" }));
+  const observed = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.source_scan_snapshot()))`], { cwd: root, timeout: 30000, encoding: "utf8" }));
   const contexts = [];
   let browser, phase = "launch";
   const command = (expectedRevision = 0) => ({ commandId: randomUUID(), idempotencyKey: randomUUID(), expectedRevision, reason: "M4 isolated query prerequisite" });
@@ -147,11 +150,19 @@ async function browserRun(mode) {
     const { chromium } = require("@playwright/test");
     browser = await chromium.launch({ channel: "msedge", headless: true, args: ["--disable-background-networking", "--disable-component-update"] });
     const operator = await identity("operator-ab"), auditor = await identity("auditor-ab");
+    const activator = doris ? await identity("operator-a") : operator;
+    const reader = doris ? await identity("viewer-a") : operator;
     check("distinct_oidc_subjects", operator.me.subjectId !== auditor.me.subjectId);
     let state;
     try { state = JSON.parse(await readFile(resolve(output, stateName), "utf8")); }
-    catch { state = { taskId: task, runId, ...(integration ? { scenario, s3: true, numeric: scenario === "numeric" } : {}), scope: { organizationId: "org-demo", siteIds: ["site-a", "site-b"] } }; }
+    catch { state = { taskId: task, runId, ...(integration ? { scenario, s3: true, numeric: scenario === "numeric" } : {}), scope: { organizationId: "org-demo", siteIds: doris ? ["site-a"] : ["site-a", "site-b"] } }; }
     check("fixture_identity", state.taskId === task && state.runId === runId);
+    if (doris) {
+      check("distinct_four_roles", new Set([operator,auditor,activator,reader].map(a => a.me.subjectId)).size === 4);
+      state.connectionDisplayName = "Doris Mapping Query synthetic";
+      state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId, activator: activator.me.subjectId, reader: reader.me.subjectId };
+      await save(state);
+    }
     if (integration) { state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId }; await save(state); }
     if (integration && mode !== "provision") {
       phase = "scenario_ready";
@@ -201,8 +212,13 @@ async function browserRun(mode) {
       report.scenarioReady = { status: "SCENARIO_READY", scenario, taskId: task, resourceOwner: task, runId, localReceipt: local.receipt,
         subjects: state.subjects, fixedRelease: state.mappingReceipt?.mappingReleaseId, observedAtUtc: new Date().toISOString() };
     }
-    state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
+    if (!doris) state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
     await save(state);
+    if (doris && ["mapping", "s1"].includes(mode)) {
+      phase = "explicit_synthetic_grants";
+      report.grants = JSON.parse(execFileSync("python3", ["-B", "scripts/maintenance/workflow_doris_s1.py",
+        mode === "mapping" ? "mapping-grants" : "query-grants"], { cwd: root, timeout: 30000, encoding: "utf8" }));
+    }
     if (mode === "ready") {
       report.status = "PASS"; report.scope = "SCENARIO_PREREQUISITE_ONLY";
     } else if (mode === "standard-provision") {
@@ -244,7 +260,37 @@ async function browserRun(mode) {
       await save(state);
       mode = "provision";
     }
-    if (mode === "numeric") {
+    if (doris && mode === "s1-current-catalog") {
+      phase = "doris_post_release_catalog";
+      check("previous_run_complete", Boolean(state.ontologyRelease && state.latestQuery && state.catalog));
+      await writeFile(resolve(output, "s1-before-discovery-" + state.latestQuery.queryId + ".json"), JSON.stringify(state, null, 2), { flag: "wx" });
+      for (const key of Object.keys(state)) if (key.startsWith("mapping") || ["firstQuery","latestQuery","catalog"].includes(key)) delete state[key];
+      await save(state);
+      mode = "provision";
+    }
+    if (doris && mode === "s1-key-negative") {
+      phase = "unsupported_identity_assessment";
+      const requestBody = structuredClone(state.mappingCreate);
+      const identity = requestBody.mapping.identitySpecs[0];
+      identity.externalIdFieldRefs = [{ ...identity.externalIdFieldRefs[0], name: "join_key", ordinal: 4 }];
+      requestBody.command = command();
+      const draft = await post(operator, "/api/v1/mappings", requestBody, 201);
+      const invalidPath = "/api/v1/mappings/" + draft.mappingId;
+      const startJob = await post(operator, invalidPath + "/validate", {target:{kind:"PUBLISH",draftRevision:draft.revision},command:command(draft.revision)}, 202,
+        `"mapping:${draft.revision}"`);
+      let rejected;
+      for (let i = 0; i < 45; i++) {
+        const job = await get(operator, "/api/v1/mapping-jobs/" + startJob.jobId);
+        if (job.status === "SUCCEEDED") { rejected = await get(operator, "/api/v1/mapping-assessments/" + job.assessmentId); break; }
+        check("negative_job_advances_" + i, ["QUEUED","RUNNING"].includes(job.status));
+        await new Promise(done => setTimeout(done, 300));
+      }
+      check("unsupported_identity_never_publishable", rejected?.status === "BLOCKED" && rejected.issues.some(i => i.code === "mapping_source_shape_invalid"));
+      const active = (await request(operator, "GET", invalidPath + "/active", undefined, 404)).data;
+      check("unsupported_identity_has_no_activation", active.code === "mapping_active_missing");
+      report.rejected = { mappingId:draft.mappingId, assessmentId:rejected.assessmentId, issues:rejected.issues.map(i => i.code), active };
+      report.status="PASS"; report.scope="DORIS_IDENTITY_NEGATIVE";
+    } else if (mode === "numeric") {
       phase = "numeric_formal_gateway";
       const capability = (await get(operator, "/api/v1/capabilities")).find(item => item.id === "g4_traverse_relationships");
       const query = { ...state.latestQuery.query, capabilityId: capability.id, capabilityVersion: capability.version,
@@ -267,16 +313,18 @@ async function browserRun(mode) {
       phase = "query_after_api_restart";
       const original = state.numericResult ?? state.latestQuery ?? state.firstQuery;
       check("original_query_exists", Boolean(original));
-      const observed = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.source_scan_snapshot()))`], { cwd: root, timeout: 30000, encoding: "utf8" }));
-      const count = row => row.seqScan + row.idxScan;
+
+      const count = row => doris ? row.businessQueries : row.seqScan + row.idxScan;
       await new Promise(done => setTimeout(done, 2100)); const before = observed();
       await new Promise(done => setTimeout(done, 1100)); const settled = observed();
       check("reopen_source_statistics_settled", count(before) === count(settled) && count(before) > 0);
-      const restored = await request(operator, "GET", `/api/v1/data/semantic-queries/${original.queryId}/result`);
+      const restored = await request(reader, "GET", `/api/v1/data/semantic-queries/${original.queryId}/result`);
       check("new_api_process_decrypts_original_result", createHash("sha256").update(restored.raw).digest("hex") === original.resultHash);
       await new Promise(done => setTimeout(done, 2100)); const after = observed();
       await new Promise(done => setTimeout(done, 1100)); const confirmed = observed();
       report.sourceScans = { before, settled, after, confirmed };
+      if (doris) check("same_doris_audit_file_and_queries", [settled,after,confirmed].every(value =>
+        value.containerId === before.containerId && value.auditInode === before.auditInode && value.queryIdsSha256 === before.queryIdsSha256));
       check("restart_recovery_no_business_reread", count(before) === count(after) && count(after) === count(confirmed));
       report.status = "PASS"; report.scope = "S1_NEW_API_PROCESS_ORIGINAL_RESULT_HASH";
     } else if (mode === "s2-basic") {
@@ -615,12 +663,36 @@ async function browserRun(mode) {
       }
       report.status = "PASS"; report.scope = mode === "s2-capacity" ? "S2_CROSS_API_ACTOR_CAPACITY" : mode === "s2-race" ? "S2_CROSS_API_CANCEL_SOURCE_FAILURE" : "S2_CURRENT_GRANTS_SOURCE_ACL_CROSS_API_CANCEL_SOURCE_FAILURE";
     } else if (mode === "provision") {
+      if (doris && state.mappingJob && !state.mappingReceipt && !state.dorisUnitFixtureRevision) {
+        const job = await get(operator, "/api/v1/mapping-jobs/" + state.mappingJob.jobId);
+        const rejected = await get(operator, "/api/v1/mapping-assessments/" + job.assessmentId);
+        check("previous_unit_validation_blocked", rejected.status === "BLOCKED" && rejected.issues.some(i => i.code === "mapping_unit_unknown"));
+        await writeFile(resolve(output, "s1-unit-rejection-" + rejected.assessmentId + ".json"), JSON.stringify({ state, rejected }, null, 2), { flag: "wx" });
+        for (const key of Object.keys(state)) if (key.startsWith("ontology") || key.startsWith("mapping")) delete state[key];
+        state.dorisUnitFixtureRevision = 1;
+        await save(state);
+      }
       if (!state.ontologyDraft) {
         phase = "g3_create";
         const sources = {};
         for (const name of ["ontology", "shapes", "vocabulary", "data"]) sources[name + "Turtle"] = await readFile(resolve(root, "samples/g2", name + ".ttl"), "utf8");
         sources.ontologyTurtle += '\n<urn:synthetic:mapping:Asset> a <http://www.w3.org/2002/07/owl#Class> .\n'
           + '<urn:synthetic:mapping:label> a <http://www.w3.org/2002/07/owl#DatatypeProperty>; <http://www.w3.org/2000/01/rdf-schema#domain> <urn:synthetic:mapping:Asset>; <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .\n';
+        if (doris) {
+          sources.vocabularyTurtle += "\n" + await readFile(resolve(root, "samples/g3-m3/units.ttl"), "utf8");
+          sources.ontologyTurtle += `
+@prefix m: <urn:synthetic:mapping:> .
+@prefix u: <urn:synthetic:m3:> .
+@prefix p: <urn:ontology-platform:semantics:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+m:amount a owl:DatatypeProperty; rdfs:domain m:Asset; rdfs:range xsd:decimal;
+  p:nominalUnit u:K-v1; p:dimension u:temperature; p:quantityKind u:Temperature .
+m:Reading a owl:Class .
+m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
+`;
+        }
         if (state.s3) {
           sources.vocabularyTurtle += "\n" + await readFile(resolve(root, "samples/g3-m3/units.ttl"), "utf8");
           sources.ontologyTurtle += `
@@ -635,7 +707,7 @@ m:quality a owl:DatatypeProperty; rdfs:domain m:Reading; rdfs:range xsd:string .
 m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
 `;
         }
-        state.ontologyDraft = await post(operator, "/api/v1/ontology-drafts", { name: "Synthetic M4 query vocabulary", scope: state.scope, sources, baseReleaseId: null, command: command() }); await save(state);
+        state.ontologyDraft = await post(operator, "/api/v1/ontology-drafts", { name: doris ? "Doris 合成温度量与关系词汇" : "Synthetic M4 query vocabulary", scope: state.scope, sources, baseReleaseId: null, command: command() }); await save(state);
       }
       const draft = state.ontologyDraft;
       if (!state.ontologyAssessment) {
@@ -674,45 +746,48 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       }
       if (!state.connectionId) {
         phase = "pg_connection_create";
-        const password = await readFile(resolve(privateRoot, "pg-source/reader-password"), "utf8"); secrets.push(password);
-        const secret = await post(operator, "/api/v1/connection-secrets", { secretValue: password, scopeSelection: state.scope, purpose: "POSTGRESQL_READONLY", command: command() }, 201);
+        const password = await readFile(doris ? resolve(privateRoot, "../implementation-01-source/reader.pass") : resolve(privateRoot, "pg-source/reader-password"), "utf8"); secrets.push(password);
+        const secret = await post(operator, "/api/v1/connection-secrets", { secretValue: password, scopeSelection: state.scope, purpose: doris ? "DORIS_READONLY" : "POSTGRESQL_READONLY", command: command() }, 201);
         secrets.push(secret.secretRef);
-        const config = { type: "POSTGRESQL", profile: { host: "pg-source", port: 5432, database: "fixture", username: "fixture_reader", sslMode: "VerifyFull", allowedSchemas: ["production", "public"] } };
+        const config = doris ? { type: "DORIS", profile: { feHost: "localhost", queryPort: 19030, catalog: "internal", database: "fixture", username: "fixture_reader", tls: true } } : { type: "POSTGRESQL", profile: { host: "pg-source", port: 5432, database: "fixture", username: "fixture_reader", sslMode: "VerifyFull", allowedSchemas: ["production", "public"] } };
         const connection = await post(operator, "/api/v1/connections", { displayName: state.connectionDisplayName ?? "M4 synthetic PostgreSQL query", scopeSelection: state.scope, config, secretRef: secret.secretRef, command: command() }, 201);
         state.connectionId = connection.id; await save(state);
       }
       const connectionPath = `/api/v1/connections/${state.connectionId}`;
       let current = await request(operator, "GET", connectionPath);
       if (!current.data.probeFresh) {
-        phase = "pg_tls_readonly_probe";
+        phase = (doris ? "doris_tls_readonly_probe" : "pg_tls_readonly_probe");
         const probe = await post(operator, connectionPath + "/test", { command: command(current.data.configRevision) }, 200, current.etag);
-        check("pg_real_probe", probe.status === "TEST_OK");
+        check((doris ? "doris_real_probe" : "pg_real_probe"), probe.status === "TEST_OK");
         current = await request(operator, "GET", connectionPath);
       }
       if (current.data.state !== "ACTIVE") {
-        phase = "pg_enable";
+        phase = (doris ? "doris_enable" : "pg_enable");
         await post(operator, connectionPath + "/enable", { command: command(current.data.configRevision) }, 200, current.etag);
       }
       if (!state.catalog) {
-        phase = "pg_catalog"; current = await request(operator, "GET", connectionPath);
+        phase = (doris ? "doris_catalog" : "pg_catalog"); current = await request(operator, "GET", connectionPath);
         const job = await post(operator, connectionPath + "/discoveries", { command: command(current.data.configRevision) }, 202, current.etag);
         for (let attempt = 0; attempt < 30; attempt++) {
           const progress = await get(operator, connectionPath + "/discoveries/" + job.jobId);
           if (progress.status === "SUCCEEDED") { state.catalog = await get(operator, "/api/v1/catalogs/" + progress.snapshotId); break; }
-          check("pg_job_nonfailure_" + attempt, ["QUEUED", "RUNNING"].includes(progress.status));
+          check((doris ? "doris_job_nonfailure_" : "pg_job_nonfailure_") + attempt, ["QUEUED", "RUNNING"].includes(progress.status));
           await new Promise(done => setTimeout(done, 500));
         }
-        check("pg_catalog_ready", state.catalog?.status === "READY"); await save(state);
+        check((doris ? "doris_catalog_ready" : "pg_catalog_ready"), state.catalog?.status === "READY"); await save(state);
       }
       report.status = "PASS";
-      report.scope = "G3_FORMAL_RELEASE_AND_PG_CATALOG_ONLY";
+      report.scope = doris ? "G3_RELEASE_AND_DORIS_DISCOVERY" : "G3_FORMAL_RELEASE_AND_PG_CATALOG_ONLY";
 
     } else if (mode === "mapping") {
       check("formal_prerequisites", Boolean(state.catalog && state.ontologyRelease));
-      const sourceTable = name => state.numeric ? "numeric_" + name : name;
-      const dataset = { snapshotId: state.catalog.snapshotId, schema: "production", name: sourceTable("assets"), kind: "TABLE" };
-      const table = state.catalog.objects.find(value => value.schema === "production" && value.name === sourceTable("assets"));
-      const field = name => ({ datasetRef: dataset, name, ordinal: table.fields.find(value => value.name === name).ordinal });
+      const sourceTable = name => doris ? (name === "assets" ? "dmq_entity" : "dmq_target") : state.numeric ? "numeric_" + name : name;
+      const dataset = { snapshotId: state.catalog.snapshotId, schema: doris ? "fixture" : "production", name: sourceTable("assets"), kind: "TABLE" };
+      const table = state.catalog.objects.find(value => value.schema === dataset.schema && value.name === sourceTable("assets"));
+      const field = input => {
+        const name = doris ? ({organization_id:"org_id",asset_id:"entity_id",label:"amount"}[input] ?? input) : input;
+        return { datasetRef: dataset, name, ordinal: table.fields.find(value => value.name === name).ordinal };
+      };
       const definition = { entities: [{ id: "asset", entityClassIri: "urn:synthetic:mapping:Asset", datasetRef: dataset,
         identitySpecId: "asset-identity", temporalSpecId: "asset-time", scopeFields: { organization: field("organization_id"), site: field("site_id") } }],
         identitySpecs: [{ id: "asset-identity", organizationFieldRef: field("organization_id"), siteFieldRef: field("site_id"), sourceNamespace: "query-fixture-v1",
@@ -721,6 +796,15 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
           validFromFieldRef: field("valid_from"), validToFieldRef: field("valid_to"), timezonePolicy: { kind: "UTC", zoneId: null }, precision: "MICROSECOND" }],
         properties: [{ id: "label", entityBindingId: "asset", propertyIri: "urn:synthetic:mapping:label", fieldRef: field("label"), conversionId: null, unitSpecId: null, nullPolicy: "REJECT_NULL" }],
         relations: [], conversions: [], unitSpecs: [] };
+      if (doris) {
+        definition.properties[0] = { ...definition.properties[0], id: "amount", propertyIri:"urn:synthetic:mapping:amount", unitSpecId:"amount-k", conversionId:"amount-identity" };
+        definition.unitSpecs = [{ id: "amount-k", sourceUnitIri: "urn:synthetic:m3:K-v1", targetUnitIri: "urn:synthetic:m3:K-v1",
+          sourceUnitFieldRef: field("unit_code"), sourceUnitCode: "K", unitRegistryVersion: "1", evidenceKind: "SOURCE_FIELD" }];
+        definition.conversions = [{ id: "amount-identity", registeredId: "identity", version: "1", parameters: {} }];
+        definition.temporalSpecs[0].eventTimeFieldRef = field("event_at");
+        definition.temporalSpecs[0].observedAtFieldRef = field("observed_at");
+        definition.temporalSpecs[0].timezonePolicy = {kind:"REGISTERED_ZONE", zoneId:"Etc/UTC"};
+      }
       if (state.s3) {
       definition.properties.push({ id: "label2", entityBindingId: "asset", propertyIri: "urn:synthetic:mapping:label2", fieldRef: field("label"), conversionId: null, unitSpecId: null, nullPolicy: "REJECT_NULL" });
       const ref = (table, name) => ({ datasetRef: { snapshotId: state.catalog.snapshotId, schema: "production", name: sourceTable(table), kind: "TABLE" },
@@ -781,48 +865,63 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
         phase = "query_mapping_activate";
         const proposal = state.mappingApproved;
         state.mappingActivation ??= { bindingHash: proposal.bindingHash, expectedActive: proposal.expectedActive, command: command(proposal.proposalRevision) }; await save(state);
-        state.mappingReceipt = await post(operator, `/api/v1/mapping-proposals/${proposal.proposalId}/activate`, state.mappingActivation, 200, `"proposal:${proposal.proposalRevision}"`); await save(state);
+        state.mappingReceipt = await post(activator, `/api/v1/mapping-proposals/${proposal.proposalId}/activate`, state.mappingActivation, 200, `"proposal:${proposal.proposalRevision}"`); await save(state);
       }
       state.mappingRelease = await get(operator, "/api/v1/mapping-releases/" + state.mappingReceipt.mappingReleaseId); await save(state);
       check("query_mapping_original", state.mappingRelease.manifest.mapping.entities.length === (state.s3 ? 2 : 1) && state.mappingRelease.manifest.mapping.entities[0].datasetRef.snapshotId === state.catalog.snapshotId);
       report.status = "PASS"; report.scope = "M4_QUERY_FIXED_MAPPING_PREREQUISITE_ONLY";
     } else if (mode === "s1") {
       phase = "query_capability";
-      const capability = (await get(operator, "/api/v1/capabilities")).find(item => item.id === "g4_resolve_entity");
+      const capability = (await get(reader, "/api/v1/capabilities")).find(item => item.id === "g4_resolve_entity");
       check("g4_registered_capability", Boolean(capability && state.mappingRelease));
       const query = { assetId: state.ontologyRelease.manifest.assetId, ontologyReleaseId: state.ontologyRelease.manifest.releaseId,
         mappingReleaseIds: [state.mappingReceipt.mappingReleaseId], capabilityId: capability.id, capabilityVersion: capability.version,
-        relationshipIris: [], depth: 1, maxRows: 100, timeoutMs: 5000, filters: { siteId: "site-a", entityExternalId: "asset-1" } };
+        relationshipIris: [], depth: 1, maxRows: 100, timeoutMs: 5000, filters: { siteId: "site-a", entityExternalId: doris ? "E1" : "asset-1" } };
+      const beforeDoris = doris ? observed() : null;
       phase = "query_default_zero_grant";
       const denied = await request({ ...auditor, headers: { ...auditor.headers, "Idempotency-Key": randomUUID() } }, "POST", "/api/v1/data/semantic-queries", query);
       check("default_zero_data_grant", denied.data?.status === "UNAUTHORIZED" && denied.data.data.length === 0 && denied.data.evidence.length === 0);
       check("denied_no_store", denied.cacheControl === "no-store");
       phase = "query_first_real_pg";
-      const key = randomUUID(), writer = { ...operator, headers: { ...operator.headers, "Idempotency-Key": key } };
+      const key = randomUUID(), writer = { ...reader, headers: { ...reader.headers, "Idempotency-Key": key } };
       const first = await request(writer, "POST", "/api/v1/data/semantic-queries", query);
-      check("real_pg_found", first.data?.status === "FOUND" && first.data.data.length === 1 && first.data.data[0].kind === "entity");
+      check(doris ? "real_doris_found" : "real_pg_found", first.data?.status === "FOUND" && first.data.data.length === 1 && first.data.data[0].kind === "entity");
+      if (doris) {
+        const amount = first.data.data[0].properties.find(p => p.propertyIri === "urn:synthetic:mapping:amount");
+        check("doris_amount_exact", amount?.value.type === "decimal" && amount.value.lexical === "9007199254740993.20" && amount.value.precision === 20 && amount.value.scale === 2);
+        check("doris_kelvin_source_evidence", amount.unit.unitIri === "urn:synthetic:m3:K-v1" && amount.unit.source === "SOURCE_FIELD" && amount.unit.evidenceIds.length > 0);
+        check("doris_event_microseconds", amount.eventTime.lexical === "2026-11-17T12:00:00.123456Z");
+        check("doris_unknown_data_watermark", first.data.subSources[0].watermarkKind === "UNKNOWN");
+      }
       check("actual_query_reference", /^query-[0-9a-f]{32}$/.test(first.queryId));
       check("real_source_receipt", first.data.subSources.length === 1 && first.data.subSources[0].status === "SUCCESS" && first.data.subSources[0].sourceReadReceiptId);
       check("precise_identity_evidence", first.data.evidence.length > 0 && first.data.evidence.every(item => item.precision === "ROW_KEY" && item.sourceRecordRef && !Object.hasOwn(item, "graphIri")));
-      check("real_scope_projection", first.data.data[0].identity.siteId === "site-a" && first.data.data[0].identity.externalId === "asset-1");
+      check("real_scope_projection", first.data.data[0].identity.siteId === "site-a" && first.data.data[0].identity.externalId === (doris ? "E1" : "asset-1"));
       check("completed_no_store", first.cacheControl === "no-store");
       phase = "query_restore_exact_bytes";
-      const restored = await request(operator, "GET", `/api/v1/data/semantic-queries/${first.queryId}/result`);
+      const restored = await request(reader, "GET", `/api/v1/data/semantic-queries/${first.queryId}/result`);
       check("restore_exact_canonical_bytes", restored.raw === first.raw);
       const replay = await request(writer, "POST", "/api/v1/data/semantic-queries", query);
       check("idempotency_same_reference_and_bytes", replay.queryId === first.queryId && replay.raw === first.raw);
       await request(writer, "POST", "/api/v1/data/semantic-queries", { ...query, maxRows: 99 }, 409);
       await request(auditor, "GET", `/api/v1/data/semantic-queries/${first.queryId}/result`, undefined, 404);
       phase = "query_source_evidence";
-      const evidence = await get(operator, "/api/v1/data/source-evidence/" + encodeURIComponent(first.data.evidence[0].evidenceId));
+      const evidence = await get(reader, "/api/v1/data/source-evidence/" + encodeURIComponent(first.data.evidence[0].evidenceId));
       check("real_evidence_chain", evidence.schemaVersion === "g4.source-evidence.v1" && evidence.receipt.queryId === first.queryId
         && evidence.receipt.mappingReleaseId === state.mappingReceipt.mappingReleaseId && evidence.receipt.activationId === (state.mappingCurrentReceipt ?? state.mappingReceipt).activationId);
       check("no_internal_binding", !Object.hasOwn(evidence.receipt, "configHash") && !Object.hasOwn(evidence.receipt, "secretVersion") && !Object.hasOwn(evidence.receipt, "binding"));
       await writeFile(file.replace(".json", "-result.json"), first.raw, { flag: "wx" });
-      state.latestQuery = { actor: { subjectId: operator.me.subjectId, organizationId: operator.me.scopes[0].organizationId,
-        siteIds: operator.me.scopes.map(scope => scope.siteId), roles: operator.me.roles.filter(role => ["platform.viewer", "platform.operator", "platform.auditor"].includes(role)), traceId: randomUUID().replaceAll("-", ""), correlationId: randomUUID().replaceAll("-", "") }, queryId: first.queryId, query, idempotencyKey: key, resultHash: createHash("sha256").update(first.raw).digest("hex") };
+      state.latestQuery = { actor: { subjectId: reader.me.subjectId, organizationId: reader.me.scopes[0].organizationId,
+        siteIds: reader.me.scopes.map(scope => scope.siteId), roles: reader.me.roles.filter(role => ["platform.viewer", "platform.operator", "platform.auditor"].includes(role)), traceId: randomUUID().replaceAll("-", ""), correlationId: randomUUID().replaceAll("-", "") }, queryId: first.queryId, query, idempotencyKey: key, resultHash: createHash("sha256").update(first.raw).digest("hex") };
+      if (doris) {
+        await new Promise(done => setTimeout(done, 1600));
+        const after = observed();
+        report.sourceQueryControl = { before: beforeDoris, after };
+        check("exactly_one_doris_business_read", beforeDoris.auditInode === after.auditInode &&
+          beforeDoris.queryIdsSha256 !== after.queryIdsSha256 && after.businessQueries === beforeDoris.businessQueries + 1);
+      }
       state.firstQuery ??= state.latestQuery; await save(state);
-      report.status = "PASS"; report.scope = "S1_REAL_OIDC_FORMAL_MAPPING_PG_QUERY_RESTORE_EVIDENCE_HTTP";
+      report.status = "PASS"; report.scope = doris ? "S1_DORIS_OIDC_QUERY_PERSISTENCE" : "S1_REAL_OIDC_FORMAL_MAPPING_PG_QUERY_RESTORE_EVIDENCE_HTTP";
     } else if (mode === "ui-s3") {
       phase = "s3_ui_observations";
       await operator.page.goto(origin + "/analysis");
@@ -865,8 +964,8 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       await operator.page.getByRole("region", { name: "业务源查询结果" }).getByRole("heading", { name: "FOUND · 找到可信结果", exact: true }).waitFor();
       const queryId = response.headers()["x-query-id"];
       check("ui_recoverable_url_only_id", new URL(operator.page.url()).searchParams.get("query") === queryId);
-      const observed = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.source_scan_snapshot()))`], { cwd: root, timeout: 30000, encoding: "utf8" }));
-      const count = row => row.seqScan + row.idxScan;
+
+      const count = row => doris ? row.businessQueries : row.seqScan + row.idxScan;
       await new Promise(done => setTimeout(done, 2100)); const before = observed();
       await new Promise(done => setTimeout(done, 1100)); const settled = observed();
       check("source_statistics_settled", count(before) === count(settled) && count(before) > 0);

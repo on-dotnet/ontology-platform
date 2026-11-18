@@ -197,11 +197,11 @@ def volume_digest(cid, directory):
 
 
 @contextlib.contextmanager
-def scratch():
+def scratch(*, retain_between_mounts=False):
     name = 'dmq-rehearsal-' + ATTEMPT + '-' + uuid.uuid4().hex[:8]
     require(not execute('volume', 'ls', '-q', '--filter', 'name=^' + name + '$'), 'SCRATCH_EXISTS')
-    result = execute('volume', 'create', '--driver', 'local', '--opt', 'type=tmpfs', '--opt', 'device=tmpfs',
-                     '--opt', 'o=size=256m', '--label', 'ontology.task-id=' + TASK, '--label',
+    medium = [] if retain_between_mounts else ['--opt','type=tmpfs','--opt','device=tmpfs','--opt','o=size=256m']
+    result = execute('volume', 'create', '--driver', 'local', *medium, '--label', 'ontology.task-id=' + TASK, '--label',
                      'ontology.run-id=' + RUN, '--label', LABEL + '=' + ATTEMPT, name)
     require(result == name, 'SCRATCH_NAME')
     record('created-volume', name)

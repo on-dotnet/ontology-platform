@@ -173,6 +173,29 @@ def insert_entity(amount):
             "'2026-11-17 12:00:00.123456','2026-11-17 12:00:01.123456');")
 
 
+def adjust_map_count(admission):
+    """仅在唯一缺口为内核映射数并且 VM 空闲时，执行已获准的单项临时设置。"""
+    vm.demand([k for k,ok in admission['s0Checks'].items() if not ok]==['mapCount'] and
+              not admission['vm']['otherRunningCaps'] and not docker('kernel-idle','ps','-q'),'VM_KERNEL_ADJUSTMENT_SCOPE')
+    nonce = secrets.token_hex(12)
+    cid = docker('kernel-create','create','--pull=never','--privileged','--network=none','--read-only','--restart=no',
+                 '--memory=64m','--memory-swap=64m','--cpus=.25','--pids-limit=16','--label','ontology.task='+vm.TASK,
+                 '--label','ontology.run='+vm.RUN,'--label','ontology.attempt='+nonce,'--entrypoint=/usr/sbin/sysctl',
+                 vm.IMAGES['be'],'-w','vm.max_map_count=2000000')
+    path = vm.OUTPUT/('kernel-map-count-'+nonce+'.json')
+    result = dict(admission=admission['attempt'],id=cid,before=admission['kernel']['maxMapCount'],target=2000000)
+    record(path,result)
+    fmt = '{{.Id}} {{.Image}} {{index .Config.Labels "ontology.attempt"}} {{len .Mounts}} {{.State.Status}}'
+    vm.demand(docker('kernel-owner','inspect','-f',fmt,cid).split()==[cid,admission['images']['be']['id'],nonce,'0','created'],'VM_KERNEL_OWNER')
+    result['readback'] = docker('kernel-adjust','start','-a',cid)
+    vm.demand(result['readback']=='vm.max_map_count = 2000000' and
+              docker('kernel-exit','inspect','-f','{{.State.Status}} {{.State.ExitCode}} {{.State.OOMKilled}}',cid)=='exited 0 false','VM_KERNEL_RESULT')
+    docker('kernel-remove','rm',cid,cleanup=True)
+    result['absentAfter'] = not docker('kernel-post','ps','--no-trunc','-aq','--filter','id='+cid)
+    record(path,result)
+    vm.demand(result['absentAfter'],'VM_KERNEL_CLEANUP')
+
+
 def resume():
     """按已审索引恢复准确的两个源节点，复核资源和原卷后才允许启动。"""
     from workflow_m2_build import validate
@@ -182,6 +205,9 @@ def resume():
               [v.get(INDEX.name) for v in reviewed.values() if isinstance(v,dict)],'REVIEWED_INDEX')
     state = json.loads(INDEX.read_bytes())
     admission = vm.collect()
+    if admission['status']=='BLOCKED' and not admission['s0Checks']['mapCount']:
+        adjust_map_count(admission)
+        admission = vm.collect()
     vm.demand(admission['status']=='KERNEL_AND_VM_READY' and admission['host']['physicalBytes'] >=
               20*vm.GIB + admission['phaseEnvelope']['S0_FE_BE']['hostStageBudgetBytes'],'VM_SOURCE_ADMISSION')
     vm.demand(state['taskId']==vm.TASK and state['runId']==vm.RUN and state['project']==PROJECT and

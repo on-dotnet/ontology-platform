@@ -129,7 +129,7 @@ public sealed class G4QuerySourceIntegrationTests
         Assert.AreEqual("2026-01-01T00:00:00.000000Z", found.Rows[0]["valid_from"].Lexical);
         Assert.IsFalse(found.Limited);
         Assert.HasCount(4, found.RecordKeyFields);
-        Assert.IsFalse(string.IsNullOrWhiteSpace(found.TransactionSnapshot));
+        Assert.IsFalse(string.IsNullOrWhiteSpace(found.Watermark));
         // 历史恢复权限只检查系统目录和ACL，不调用业务ReadAsync来制造新回执。
         await reader.VerifyAccessAsync(profile, secret, context, "asset", DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
         // SQL样式输入只是不存在的外部号，不能突破范围或改写语句。

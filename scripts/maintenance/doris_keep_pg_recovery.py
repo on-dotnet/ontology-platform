@@ -102,12 +102,15 @@ def native_stop(cid):
 
 
 @contextmanager
-def isolated_server(scratch):
+def isolated_server(scratch, database="fixture"):
     # 新副本仅通过 Unix socket + OS peer 接受 postgres 本人，原服务与凭证不挂入。
-    command = ('umask 077; echo "local fixture postgres peer" > /tmp/peer.conf; '
+    keep.require(database in ('fixture','query'), 'PG_COPY_DATABASE')
+    command = (f'umask 077; echo "local {database} postgres peer" > /tmp/peer.conf; '
                'exec postgres -D "$PGDATA" -c listen_addresses= -c unix_socket_directories=/tmp '
                '-c hba_file=/tmp/peer.conf -c ssl=off -c logging_collector=off -c log_destination=stderr '
                '-c log_statement=none -c log_min_messages=log')
+    if database == 'query':
+        command += ' -c default_transaction_read_only=on -c autovacuum=off'
     cid = keep.execute('create', '--pull=never', '--network=none', '--read-only', '--restart=no', '--user=999:999',
                        '--cap-drop=ALL', '--security-opt=no-new-privileges', '--memory=768m', '--memory-swap=768m',
                        '--cpus=1', '--pids-limit=128', '--tmpfs', '/tmp:size=16m,mode=1777', '--log-driver=local',
@@ -125,7 +128,7 @@ def isolated_server(scratch):
                      == [(scratch, '/var/lib/postgresql', True)], 'PG_COPY_MOUNTS')
         keep.start(cid)
         for _ in range(20):
-            ready = subprocess.run([*keep.DOCKER, 'exec', cid, 'pg_isready', '-t', '1', '-h', '/tmp', '-d', 'fixture'],
+            ready = subprocess.run([*keep.DOCKER, 'exec', cid, 'pg_isready', '-t', '1', '-h', '/tmp', '-d', database],
                                    capture_output=True, timeout=3)
             if ready.returncode == 0:
                 break

@@ -1,0 +1,409 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "mapping",
+  "startedAtUtc": "2026-11-18T22:37:46.457Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "formal_prerequisites",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_201",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200",
+      "status": "PASS"
+    },
+    {
+      "name": "mapping_prerequisite_job_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_11",
+      "status": "PASS"
+    },
+    {
+      "name": "http_12_200",
+      "status": "PASS"
+    },
+    {
+      "name": "mapping_prerequisite_job_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_12",
+      "status": "PASS"
+    },
+    {
+      "name": "http_13_200",
+      "status": "PASS"
+    },
+    {
+      "name": "mapping_prerequisite_job_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_13",
+      "status": "PASS"
+    },
+    {
+      "name": "http_14_200",
+      "status": "PASS"
+    },
+    {
+      "name": "mapping_prerequisite_job_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_14",
+      "status": "PASS"
+    },
+    {
+      "name": "http_15_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_15",
+      "status": "PASS"
+    },
+    {
+      "name": "http_16_200",
+      "status": "PASS"
+    },
+    {
+      "name": "mapping_prerequisite_ready",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_16",
+      "status": "PASS"
+    },
+    {
+      "name": "http_17_201",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_17",
+      "status": "PASS"
+    },
+    {
+      "name": "http_18_200",
+      "status": "PASS"
+    },
+    {
+      "name": "mapping_distinct_review_subject",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_18",
+      "status": "PASS"
+    },
+    {
+      "name": "http_19_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_19",
+      "status": "PASS"
+    },
+    {
+      "name": "http_20_200",
+      "status": "PASS"
+    },
+    {
+      "name": "query_mapping_original",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 13.677791999999954,
+      "sha256": "8fc90138f8ccff9f65fa0a74c2f17a47cf837003ab96146966e42d668661b8ab"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 4.341749999999934,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.461958000000095,
+      "sha256": "bc7894133b4d17205697843cb2a4b2da49033424d3b7858a7b246ebf1bbfc53e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.6894580000000587,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.9836669999999685,
+      "sha256": "bd7d5f70f072a0e6c63923ee0bee5b1bbd94199ae48458d78c5599cf8d80909c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.990041999999903,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 11.610958999999866,
+      "sha256": "bf88ac8638695172751b3cdf3378e12c3402022882dd2adffb0be99fae05847d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.9755409999997937,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings",
+      "status": 201,
+      "elapsedMs": 88.40804200000002,
+      "sha256": "399b5f99ff161fc26fea04a5aa633ac52e8e034015b55f61c97fe402086725fe"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-bc17f026278d73f7fd29ba78337c0147/validate",
+      "status": 202,
+      "elapsedMs": 32.826082999999926,
+      "sha256": "cc15fc69905276da247a4343183b2bb4fabe8f7fcc17077021a9294458534156"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-10064744438e4f44864f6d2b9146e32d",
+      "status": 200,
+      "elapsedMs": 99.06091700000025,
+      "sha256": "cc15fc69905276da247a4343183b2bb4fabe8f7fcc17077021a9294458534156"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-10064744438e4f44864f6d2b9146e32d",
+      "status": 200,
+      "elapsedMs": 86.22175000000016,
+      "sha256": "cc15fc69905276da247a4343183b2bb4fabe8f7fcc17077021a9294458534156"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-10064744438e4f44864f6d2b9146e32d",
+      "status": 200,
+      "elapsedMs": 73.03441599999996,
+      "sha256": "cc15fc69905276da247a4343183b2bb4fabe8f7fcc17077021a9294458534156"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-10064744438e4f44864f6d2b9146e32d",
+      "status": 200,
+      "elapsedMs": 65.23454200000015,
+      "sha256": "0c65dd13b5ec8f6c280e88f8c4fe140f0b431e4b635b901c59e3effabf22cbe9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-10064744438e4f44864f6d2b9146e32d",
+      "status": 200,
+      "elapsedMs": 78.9601249999996,
+      "sha256": "6f9b00f6ce4dc2d15ed0bb43ec0052a839313f586f7144d236d3802c33ab685f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-a77741308dd94252a393281745421189",
+      "status": 200,
+      "elapsedMs": 62.256124999999884,
+      "sha256": "b6ccaa7e7c4b70a5531c030fa97f1921c62ff3387895880b0d770f10bbdc4f09"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-bc17f026278d73f7fd29ba78337c0147/proposals",
+      "status": 201,
+      "elapsedMs": 26.961999999999534,
+      "sha256": "87abc98c55c2683223f2ae51ef5005d1a92580ffe506b4cfc00060d6d6261e14"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-e621e35c36fe470f8e723e60dfce5f2e/decisions",
+      "status": 200,
+      "elapsedMs": 21.959584000000177,
+      "sha256": "91fe0bc0c1784b4c3aa108988d98a20975fe83ae7163ae4eb1bf3eddb0770386"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-e621e35c36fe470f8e723e60dfce5f2e/activate",
+      "status": 200,
+      "elapsedMs": 330.5902079999996,
+      "sha256": "f9d2d434078b393a3c4a84b244bdc92fe487e5cc354b2c643e82ff5fedc48510"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-releases/release-5a98cac5fd9f4c69862534cc08c89157",
+      "status": 200,
+      "elapsedMs": 113.75245899999936,
+      "sha256": "6d87f8b22cc03a143d205efb0b7290a15b72db640c5fdceb7c912d3719a839cc"
+    }
+  ],
+  "status": "PASS",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "mapping",
+      "status": "READY",
+      "pid": 17578,
+      "commandId": "f99b29c377434430905ad10e3b8b3e55",
+      "snapshotId": "21db695b3df16bf17902f5634d1d7e883a35ee5c6080a03cb60d60a738bd656e",
+      "processStart": "Thu Nov 19 06:37:45 2026"
+    },
+    "web": null
+  },
+  "grants": {
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "mode": "mapping",
+    "grantCount": 12,
+    "commandId": "9a87697fd32b4eb5ae8f69ab5abefa92"
+  },
+  "scope": "M4_QUERY_FIXED_MAPPING_PREREQUISITE_ONLY",
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-18T22:37:52.052Z"
+}

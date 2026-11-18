@@ -1,0 +1,256 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s1-reopen",
+  "startedAtUtc": "2026-11-18T22:44:56.739Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "original_query_exists",
+      "status": "PASS"
+    },
+    {
+      "name": "reopen_source_statistics_settled",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "new_api_process_decrypts_original_result",
+      "status": "PASS"
+    },
+    {
+      "name": "same_doris_audit_file_and_queries",
+      "status": "PASS"
+    },
+    {
+      "name": "restart_recovery_no_business_reread",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 16.007957999999917,
+      "sha256": "30a901fa7e7609e2d81ff337a94af24db1c93291f9033e86bb8310a43ff061eb"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 4.447708000000034,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 9.171790999999985,
+      "sha256": "2a790f87cb7648892ed3d829d1b65443bf7e9ea7cff23a826aa70d898f1d6ff5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.9341249999999945,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.624957999999879,
+      "sha256": "e767347ba633f766d4ebe46bfb3b66f1182089fb19cd651b63aa521ba79de50c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.5203329999999369,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.724292000000105,
+      "sha256": "0ebf3db19a9847f96e084b143649b498a4c08dfdcb6107c7379e08d8e5e94501"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.5313329999999041,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/data/semantic-queries/query-a59bde9076eb4a7c865da11e109c43b7/result",
+      "status": 200,
+      "elapsedMs": 345.98412499999904,
+      "sha256": "29dbbfbb1fc4a232477fa47806d53f6a8c1eaa23a2e7516d255a52627ce0e3a0"
+    }
+  ],
+  "status": "PASS",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "s1-reopen",
+      "status": "READY",
+      "pid": 19234,
+      "commandId": "a4c193c40fee417583605c07ff5f5283",
+      "snapshotId": "21db695b3df16bf17902f5634d1d7e883a35ee5c6080a03cb60d60a738bd656e",
+      "processStart": "Thu Nov 19 06:44:55 2026"
+    },
+    "web": null
+  },
+  "sourceScans": {
+    "before": {
+      "containerId": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "auditInode": "219848",
+      "businessQueries": 22,
+      "queryIdsSha256": "462065847377b069f755ebf98b9ac662d9410388c00c98dff63ce3be8ffdc36b",
+      "auditFence": "dmq_audit_fence_8e8e6701cdb638046113ad15"
+    },
+    "settled": {
+      "containerId": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "auditInode": "219848",
+      "businessQueries": 22,
+      "queryIdsSha256": "462065847377b069f755ebf98b9ac662d9410388c00c98dff63ce3be8ffdc36b",
+      "auditFence": "dmq_audit_fence_30566099d9ef985e347062d5"
+    },
+    "after": {
+      "containerId": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "auditInode": "219848",
+      "businessQueries": 22,
+      "queryIdsSha256": "462065847377b069f755ebf98b9ac662d9410388c00c98dff63ce3be8ffdc36b",
+      "auditFence": "dmq_audit_fence_7bd790e501e09f680bec85f5"
+    },
+    "confirmed": {
+      "containerId": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "auditInode": "219848",
+      "businessQueries": 22,
+      "queryIdsSha256": "462065847377b069f755ebf98b9ac662d9410388c00c98dff63ce3be8ffdc36b",
+      "auditFence": "dmq_audit_fence_07fa9833140ca46ba850c917"
+    }
+  },
+  "scope": "S1_NEW_API_PROCESS_ORIGINAL_RESULT_HASH",
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-18T22:45:31.263Z"
+}

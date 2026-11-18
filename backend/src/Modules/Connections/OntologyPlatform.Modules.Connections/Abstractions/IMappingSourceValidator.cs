@@ -51,8 +51,14 @@ public sealed record MappingSourceObservation
     /// <summary>原目录算法生成的当前指纹。</summary>
     public required string CatalogFingerprint { get; init; }
 
-    /// <summary>观察源事务的固定标识，只用于证据散列。</summary>
-    public required string TransactionSnapshot { get; init; }
+    /// <summary>源实际能证明的数据水位类型。</summary>
+    public required string WatermarkKind { get; init; }
+
+    /// <summary>PG 的实际事务快照或 Doris 未知水位的空值。</summary>
+    public required string? Watermark { get; init; }
+
+    /// <summary>Doris 完整目录和物理模型身份；历史 PG 合同没有该值。</summary>
+    public required string? SourceSemanticsHash { get; init; }
 
     /// <summary>实测开始时间。</summary>
     public required DateTimeOffset StartedAtUtc { get; init; }

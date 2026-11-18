@@ -156,7 +156,7 @@ public sealed partial class ConnectionApplicationService
     /// <param name="objects">当前授权范围内由真实适配器返回的有界目录。</param>
     /// <param name="config">当前配置用于区分适配器版本，PG原指纹规则保持。</param>
     /// <returns>排序后的目录与保持历史字节规则的内容指纹。</returns>
-    private static (CatalogObject[] Objects, string Fingerprint) CanonicalCatalog(CatalogObject[] objects, ConnectionConfig config)
+    internal static (CatalogObject[] Objects, string Fingerprint) CanonicalCatalog(CatalogObject[] objects, ConnectionConfig config)
     {
         // 排序只规范化已有目录，不添加字段或改变旧快照内容。
         var canonical = objects.OrderBy(value => value.Schema, StringComparer.Ordinal).ThenBy(value => value.Name, StringComparer.Ordinal)

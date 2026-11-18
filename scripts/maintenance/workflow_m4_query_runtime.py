@@ -20,10 +20,11 @@ def freeze(root, source, destination, inputs, command_id, environment=None, *, t
     before = files(source)
     environment = environment or {}
     from workflow_pg_profile import profile
-    expected = profile(task)
-    if run_id != expected.run: raise ValueError('QUERY_SNAPSHOT_TASK_RUN')
+    expected_run = 'implementation-01' if task=='G4-DORIS-MAPPING-QUERY-001' else profile(task).run
+    if run_id != expected_run: raise ValueError('QUERY_SNAPSHOT_TASK_RUN')
     identity_values = dict(files=before, inputs=inputs, commandId=command_id, environment=environment)
-    if task == 'G4-M5-INTEGRATION-001': identity_values.update(taskId=task, resourceRun=run_id)
+    scoped = task in ('G4-M5-INTEGRATION-001','G4-DORIS-MAPPING-QUERY-001')
+    if scoped: identity_values.update(taskId=task, resourceRun=run_id)
     identity = sha(encoded(identity_values))
     target = destination/identity
     if target.exists(): raise ValueError('QUERY_SNAPSHOT_EXISTS')
@@ -32,7 +33,7 @@ def freeze(root, source, destination, inputs, command_id, environment=None, *, t
     if before != files(source) or before != files(target): raise ValueError('QUERY_SNAPSHOT_BUILD_DRIFT')
     for path in target.rglob('*'):
         if path.is_file(): path.chmod(0o444)
-    row = dict(schemaVersion=2 if task == 'G4-M5-INTEGRATION-001' else 1, taskId=task, resourceRun=run_id, snapshotId=identity,
+    row = dict(schemaVersion=2 if scoped else 1, taskId=task, resourceRun=run_id, snapshotId=identity,
                directory=str(target.relative_to(root)), files=before, inputs=inputs, commandId=command_id, environment=environment)
     with (destination/(identity+'.json')).open('x') as stream: json.dump(row, stream, indent=2); stream.write('\n')
     return row
@@ -43,8 +44,9 @@ def verify(root, row, *, task='G4-M4-QUERY-001', run_id='query-impl-01'):
     if row.get('taskId') != task or row.get('resourceRun') != run_id or not directory.resolve().is_relative_to(root.resolve()) or directory.is_symlink():
         raise ValueError('QUERY_SNAPSHOT_BOUNDARY')
     identity_values = dict(files=row['files'],inputs=row['inputs'],commandId=row['commandId'],environment=row['environment'])
-    if task == 'G4-M5-INTEGRATION-001':
-        if row.get('schemaVersion') != 2 or run_id != 'integration-01': raise ValueError('QUERY_SNAPSHOT_TASK_RUN')
+    if task in ('G4-M5-INTEGRATION-001','G4-DORIS-MAPPING-QUERY-001'):
+        expected_run = 'integration-01' if task=='G4-M5-INTEGRATION-001' else 'implementation-01'
+        if row.get('schemaVersion') != 2 or run_id != expected_run: raise ValueError('QUERY_SNAPSHOT_TASK_RUN')
         expected = root/'artifacts/workflow'/task/run_id/'runtime-snapshots'/row['snapshotId']
         if directory != expected or any(p.is_symlink() for p in [directory,*directory.parents]): raise ValueError('QUERY_SNAPSHOT_BOUNDARY')
         identity_values.update(taskId=task,resourceRun=run_id)

@@ -15,6 +15,9 @@ public sealed class MappingValidationService
     /// <summary>真实只读源执行器，不能用metadata探测代替业务行验证。</summary>
     private readonly IMappingSourceValidator sourceValidator;
 
+    /// <summary>受限 Doris 源读取器，仅处理对应配置和用途。</summary>
+    private readonly DorisSourceAdapter? doris;
+
     /// <summary>沿G3固定发布、对象和图回验的词汇读取服务。</summary>
     private readonly IG3VocabularyService vocabulary;
 
@@ -33,16 +36,27 @@ public sealed class MappingValidationService
     /// <summary>组合既有发布读服务和新受控映射源，不写Publishing或Ontology表。</summary>
     public MappingValidationService(Microsoft.EntityFrameworkCore.IDbContextFactory<ConnectionsDbContext> factory,
         IMappingSourceValidator sourceValidator, IG3VocabularyService vocabulary, IReleaseCatalog releases,
-        IMappingAuthorizationAuthority authority, ConnectionSecretCipher cipher, TimeProvider clock)
+        IMappingAuthorizationAuthority authority, ConnectionSecretCipher cipher, TimeProvider clock, DorisSourceAdapter? doris = null)
     {
         this.factory = factory;
         this.sourceValidator = sourceValidator;
+        this.doris = doris;
         this.vocabulary = vocabulary;
         this.releases = releases;
         this.authority = authority;
         this.cipher = cipher;
         this.clock = clock;
     }
+
+    /// <summary>正式读取前或历史展示时只核当前目录和授权，不查询业务行。</summary>
+    private Task VerifySourceAsync(MappingValidationInput input, MappingDraftView draft, CancellationToken token) => input.Config switch
+    {
+        PgConnectionConfig pg => sourceValidator.VerifyAccessAsync(pg.Profile, cipher.Decrypt(input.Secret), input.Current,
+            draft.Mapping, draft.Scope, token, input.Original),
+        DorisConnectionConfig d when doris is not null => DorisMappingSourceValidator.ObserveAsync(doris, d.Profile, cipher.Decrypt(input.Secret),
+            input.Original, input.Current, draft.Mapping, draft.Scope, false, clock.GetUtcNow().AddSeconds(5), token),
+        _ => throw new SemanticOperationException(422, "mapping_source_unsupported")
+    };
 
     /// <summary>历史正文GET需要当前真实源ACL，不把平台grant当作数据库列SELECT证据。</summary>
     internal async Task VerifyReadAccessAsync(MappingDraftView draft, CancellationToken token)
@@ -51,7 +65,7 @@ public sealed class MappingValidationService
         {
             // 读取绑定秘密前调用者已核完整平台grant与字段许可。
             var input = await InputsAsync(draft, token);
-            await sourceValidator.VerifyAccessAsync(input.Profile, cipher.Decrypt(input.Secret), input.Current, draft.Mapping, draft.Scope, token, input.Original);
+            await VerifySourceAsync(input, draft, token);
         }
         catch (SemanticOperationException error) when (error.Status is 403 or 409 or 422)
         {
@@ -154,7 +168,13 @@ public sealed class MappingValidationService
         // 解密前已完成精确绑定及权限检查，明文不进入报告或异常。
         var password = cipher.Decrypt(input.Secret);
         // 当前源目录与所有原绑定字段类型必须真实兼容。
-        var observation = await sourceValidator.ReadAsync(input.Profile, password, input.Current, draft.Mapping, draft.Scope, cancellationToken, input.Original);
+        var observation = input.Config switch
+        {
+            PgConnectionConfig pg => await sourceValidator.ReadAsync(pg.Profile, password, input.Current, draft.Mapping, draft.Scope, cancellationToken, input.Original),
+            DorisConnectionConfig d when doris is not null => await DorisMappingSourceValidator.ObserveAsync(doris, d.Profile, password, input.Original,
+                input.Current, draft.Mapping, draft.Scope, true, started.AddSeconds(30), cancellationToken),
+            _ => throw new SemanticOperationException(422, "mapping_source_unsupported")
+        };
         // 影响分析只涵盖本产品全部登记映射依赖；M4没有开放消费入口。
         var impact = await ImpactAsync(draft, cancellationToken);
         // 网络返回后重新验证实际权限epoch及会话，避免旧证明跨撤权继续生效。
@@ -187,7 +207,7 @@ public sealed class MappingValidationService
             SourceConnectionId = input.Connection.Id,
             ConnectionRevision = input.Connection.Revision,
             ConfigHash = input.Connection.ConfigHash,
-            SourceType = "POSTGRESQL",
+            SourceType = input.Config is DorisConnectionConfig ? "DORIS" : "POSTGRESQL",
             SourceCatalogSnapshotId = input.Current.SnapshotId,
             SourceCatalogFingerprint = input.Current.SchemaFingerprint,
             OntologyReleaseId = draft.OntologyReleaseId,
@@ -196,8 +216,8 @@ public sealed class MappingValidationService
             ValidationHash = new string('0', 64),
             ImpactHash = impact.Hash,
             AssessmentId = assessmentId,
-            AdapterVersion = "pg-mapping-v1",
-            ExecutorVersion = "mapping-validator-v1",
+            AdapterVersion = input.Config is DorisConnectionConfig ? "doris-mapping-v1" : "pg-mapping-v1",
+            ExecutorVersion = input.Config is DorisConnectionConfig ? "doris-mapping-validator-v1" : "mapping-validator-v1",
             CanonicalVersion = "mapping-c14n-v1",
             SecretVersion = input.Connection.SecretVersion,
             AuthorizationEpoch = proof.AuthorizationEpoch
@@ -310,13 +330,13 @@ public sealed class MappingValidationService
         {
             throw new SemanticOperationException(409, "mapping_connection_unusable");
         }
-        // 仅POSTGRESQL进入本任务，其他连接器不自动视为等价。
-        var config = ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson) as PgConnectionConfig
-            ?? throw new SemanticOperationException(422, "mapping_source_unsupported");
+        // 当前源配置和秘密用途必须属于同一获批分支。
+        var config = ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson);
+        if (config is not (PgConnectionConfig or DorisConnectionConfig)) throw new SemanticOperationException(422, "mapping_source_unsupported");
         // 凭据必须已绑定当前连接及准确版本，完整AAD范围不可裁剪。
         var secret = await db.ConnectionSecrets.AsNoTracking().SingleOrDefaultAsync(row => row.Id == connection.SecretId, token);
         if (secret is null || secret.ConnectionId != connection.Id || secret.UsedAtUtc is null || secret.Version != connection.SecretVersion
-            || secret.OrganizationId != connection.OrganizationId || secret.Purpose != "POSTGRESQL_READONLY" || string.IsNullOrEmpty(secret.Owner)
+            || secret.OrganizationId != connection.OrganizationId || secret.Purpose != ConnectionSourceDispatcher.SecretPurpose(config) || string.IsNullOrEmpty(secret.Owner)
             || !secret.SiteIds.Order(StringComparer.Ordinal).SequenceEqual(connection.SiteIds.Order(StringComparer.Ordinal)))
         {
             throw new SemanticOperationException(409, "mapping_secret_stale");
@@ -338,7 +358,7 @@ public sealed class MappingValidationService
         {
             throw new SemanticOperationException(409, "mapping_catalog_stale");
         }
-        return new MappingValidationInput { Connection = connection, Secret = secret, Profile = config.Profile, Original = original, Current = current };
+        return new MappingValidationInput { Connection = connection, Secret = secret, Config = config, Original = original, Current = current };
     }
 
     /// <summary>固定正式词汇与目录的确定性候选；只读元数据，不读取样本或调用模型。</summary>
@@ -349,7 +369,7 @@ public sealed class MappingValidationService
         try
         {
             // ACL核验必须使用同一input.Current；不能二次取C2成功后仍返回C1字段。
-            await sourceValidator.VerifyAccessAsync(input.Profile, cipher.Decrypt(input.Secret), input.Current, draft.Mapping, draft.Scope, token, input.Original);
+            await VerifySourceAsync(input, draft, token);
         }
         catch (SemanticOperationException error) when (error.Status is 403 or 409 or 422)
         {
@@ -534,6 +554,8 @@ public sealed class MappingValidationService
             var identity = mapping.IdentitySpecs.Single(item => item.Id == entity.IdentitySpecId);
             // 业务时间和观察时间明确分列。
             var time = mapping.TemporalSpecs.Single(item => item.Id == entity.TemporalSpecId);
+            if (source.SourceSemanticsHash is not null && !DorisMappingSourceValidator.SupportsEntityPlan(entity, identity, time))
+                Issue(problems, "EXECUTABILITY", "mapping_source_shape_invalid", entity.Id);
             // 成功输出数不能由原始行数直接代填。
             var before = entities.Count;
             // 完整限定集合逐行检查；任一行未知即阻断，而非跳过后继续判PASS。
@@ -737,10 +759,15 @@ public sealed class MappingValidationService
             Issue(problems, "EXECUTABILITY", "mapping_output_budget_exceeded");
         }
         // 真实源快照、观察时刻和输出hash只进入本次证据，不强迫人工审核30秒内完成。
-        var evidence = Digest(new
+        var evidence = source.WatermarkKind == "UNKNOWN" ? Digest(new
+        {
+            source.CatalogFingerprint, source.WatermarkKind, source.Watermark, source.SourceSemanticsHash,
+            source.StartedAtUtc, source.FinishedAtUtc, ontology.ReleaseId, ontology.ManifestHash,
+            entityCounts, propertyCounts, relationCounts, values, impactHash
+        }) : Digest(new
         {
             source.CatalogFingerprint,
-            source.TransactionSnapshot,
+            TransactionSnapshot = source.Watermark,
             source.StartedAtUtc,
             source.FinishedAtUtc,
             ontology.ReleaseId,
@@ -772,6 +799,10 @@ public sealed class MappingValidationService
             stageResults = stages.Select(stage => new { stage.Stage, stage.Status, stage.IssueCodes }).ToArray(),
             impactHash
         });
+        if (source.SourceSemanticsHash is not null)
+        {
+            semantic = Digest(new { executorVersion = "doris-mapping-validator-v1", source.SourceSemanticsHash, semantic });
+        }
         return new MappingEvaluation { Stages = stages, Issues = problems.Values.SelectMany(items => items).Distinct().ToArray(), SemanticResultHash = semantic, EvidenceHash = evidence };
     }
 
@@ -821,6 +852,7 @@ public sealed class MappingValidationService
         }
         // 有时区源值必须已经由PG驱动证明UTC身份和微秒精度。
         var cell = Cell(row, field);
+        if (cell.NativeType == "datetime(6)") return DorisMappingTypeRules.Instant(value, spec);
         // 明确解析结果承载最终UTC瞬间，不能采用系统本地时区。
         DateTimeOffset instant;
         if (cell.NativeType.EndsWith(" with time zone", StringComparison.Ordinal)
@@ -872,6 +904,8 @@ public sealed class MappingValidationService
             _ => source.NativeType switch
             {
                 "text" => "string",
+                _ when source.NativeType.StartsWith("varchar(", StringComparison.Ordinal) => "string",
+                _ when source.NativeType.StartsWith("decimalv3(", StringComparison.Ordinal) => "decimal",
                 _ when Regex.IsMatch(source.NativeType, @"^(character varying|character)\([1-9][0-9]{0,6}\)$", RegexOptions.CultureInvariant) => "string",
                 _ when Regex.IsMatch(source.NativeType, @"^timestamp(?:\([0-6]\))? with time zone$", RegexOptions.CultureInvariant) => "dateTime",
                 "boolean" => "boolean",
@@ -1153,8 +1187,8 @@ internal sealed record MappingValidationInput
     /// <summary>当前绑定密文，仅密码保险箱可解密。</summary>
     public required ConnectionSecretRecord Secret { get; init; }
 
-    /// <summary>受控PG目标配置。</summary>
-    public required PgConnectionProfile Profile { get; init; }
+    /// <summary>已核对秘密用途的受控强类型配置。</summary>
+    public required ConnectionConfig Config { get; init; }
 
     /// <summary>原定义引用的不可变目录。</summary>
     public required CatalogSnapshotView Original { get; init; }

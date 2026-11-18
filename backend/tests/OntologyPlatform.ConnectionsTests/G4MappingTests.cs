@@ -99,7 +99,7 @@ public sealed class G4MappingTests
         {
             Tables = [],
             CatalogFingerprint = new string('a', 64),
-            TransactionSnapshot = "unobserved",
+            WatermarkKind = "TRANSACTION_SNAPSHOT", Watermark = "unobserved", SourceSemanticsHash = null,
             StartedAtUtc = DateTimeOffset.UtcNow,
             FinishedAtUtc = DateTimeOffset.UtcNow,
             SecurityVerified = false
@@ -126,7 +126,7 @@ public sealed class G4MappingTests
         // 固定身份和声明不变，只换真实观察负载。
         var second = MappingValidationService.Evaluate(definition, source with
         {
-            TransactionSnapshot = "new-transaction",
+            Watermark = "new-transaction",
             Tables = [source.Tables[0] with { Rows = changedRows }]
         }, ontology, scope, true, true, new string('b', 64));
         Assert.IsTrue(second.Passed);
@@ -401,7 +401,7 @@ public sealed class G4MappingTests
         {
             Tables = [new MappingSourceTable { Dataset = dataset, Rows = rows }],
             CatalogFingerprint = new string('a', 64),
-            TransactionSnapshot = "test",
+            WatermarkKind = "TRANSACTION_SNAPSHOT", Watermark = "test", SourceSemanticsHash = null,
             StartedAtUtc = now,
             FinishedAtUtc = now.AddSeconds(1),
             SecurityVerified = true
