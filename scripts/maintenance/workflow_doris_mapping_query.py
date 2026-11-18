@@ -13,9 +13,11 @@ def s0_consumers(root, task, phase):
     directory = 'backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Adapters/'
     for relative, terms in (
         (directory+'DorisSourceAdapter.cs', ['ReadBranchAsync<T>', 'DorisReadSession.ReadAsync']),
-        (directory+'DorisReadSession.cs', ['connection.ServerThread', 'KILL CONNECTION ', 'kill.ExecuteNonQueryAsync']),
+        (directory+'DorisReadSession.cs', ['connection.ServerThread', 'KILL CONNECTION ', 'armed.ExecuteNonQueryAsync']),
+        (directory+'DorisQueryReader.cs', ['FROM fixture.dmq_entity','FROM fixture.dmq_target','LIMIT 101','adapter.ReadBranchAsync']),
         ('backend/tests/OntologyPlatform.ConnectionsTests/DorisMappingQueryTests.cs',
-         ['ReadBranchAsync', 'RealDriverReadsFixedSource', 'ActiveBackendMustFinishInsideOriginalWindow', 'backend_active_tasks'])):
+         ['ReadBranchAsync', 'RealDriverReadsFixedSource', 'ActiveBackendMustFinishInsideOriginalWindow', 'backend_active_tasks',
+          'FixedEntityCancellation','FixedTargetCancellation','ACTIVE_CANCELLATION_PRECONDITION_NOT_OBSERVED'])):
         source = source_path(root,relative).read_text()
         if any(term not in source for term in terms):
             raise ValueError('DMQ_S0_CONSUMER_MISSING')

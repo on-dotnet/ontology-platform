@@ -252,8 +252,11 @@ def driver(prepared, method):
                   ==' '.join([service['id'],service['image'],'running','healthy',vm.TASK]),'DRIVER_SOURCE_DRIFT')
     ready_source(state['services']['fe']['id'])
     env = dict(environment['environment'],DMQ_S0_SOURCE=str(DIRECTORY),DMQ_S0_EVIDENCE=str(vm.OUTPUT),
+               DMQ_S0_BE_ID=state['services']['be']['id'],
                DOTNET_GCHeapHardLimit='0x18000000')
-    test = {'driver-types':'RealDriverReadsFixedSource','driver-cancel':'ActiveBackendMustFinishInsideOriginalWindow'}[method]
+    test = {'driver-types':'RealDriverReadsFixedSource','driver-cancel':'ActiveBackendMustFinishInsideOriginalWindow',
+            'driver-fixed-values':'FixedPlansReturnScopedValues','driver-fixed-entity':'FixedEntityCancellation',
+            'driver-fixed-target':'FixedTargetCancellation'}[method]
     key = execution.sha(execution.encoded([binding,hashlib.sha256(INDEX.read_bytes()).hexdigest(),test,
         hashlib.sha256(Path(__file__).read_bytes()).hexdigest()]))
     result = execution.run([environment['dotnet'],str(vm.ROOT/'backend/tests/OntologyPlatform.ConnectionsTests/bin/Debug/net10.0/OntologyPlatform.ConnectionsTests.dll'),
@@ -265,6 +268,58 @@ def driver(prepared, method):
     record(vm.OUTPUT/(method+'-'+receipt['command']+'.json'),receipt)
     print(json.dumps(receipt))
     return result.returncode
+
+
+def fixed_fixture(restore=False):
+    """在两张原表内各补足至一百行。清理仅匹配本次新建的准确主键，最后核对逐行原字节。"""
+    state=json.loads(INDEX.read_bytes())
+    fe=state['services']['fe']['id']
+    vm.demand(docker('fixed-fixture-owner','inspect','-f',
+              '{{.Id}} {{index .Config.Labels "ontology.task"}} {{index .Config.Labels "ontology.run"}} {{.State.Status}}',fe)
+              ==' '.join([fe,vm.TASK,vm.RUN,'running']),'FIXED_FIXTURE_OWNER')
+    ready_source(fe)
+    plan=[('dmq_entity','entity_id','E',['E1']),('dmq_target','target_id','T',['T1','T2','T3'])]
+    pending=vm.OUTPUT/'s0-fixed-fixture-active.json'
+    def snapshot(table,key):
+        rows=sql(fe,'reader','SELECT * FROM fixture.'+table+' ORDER BY org_id,site_id,'+key+';')
+        return hashlib.sha256(rows.encode()).hexdigest(),[line.split('\t') for line in rows.splitlines()]
+    if restore:
+        record_state=json.loads(pending.read_bytes())
+        vm.demand(record_state['fe']==fe and record_state['run']==vm.RUN,'FIXED_FIXTURE_BINDING')
+    else:
+        vm.demand(not pending.exists(),'FIXED_FIXTURE_ALREADY_OPEN')
+        record_state={'fe':fe,'run':vm.RUN,'attempt':secrets.token_hex(8),'tables':{}}
+        for table,key,_,original in plan:
+            digest,rows=snapshot(table,key)
+            vm.demand([r[:3] for r in rows]==[['org-demo','site-a',v] for v in original],'FIXED_ORIGINAL_KEYS')
+            record_state['tables'][table]={'before':digest}
+        record(pending,record_state)
+    for table,key,prefix,original in plan:
+        keys=['DMQ_S0_'+prefix+format(i,'03d') for i in range(1,101-len(original))]
+        entry=record_state['tables'][table]
+        if restore:
+            digest,rows=snapshot(table,key)
+            if digest!=entry['before']:
+                vm.demand(digest==entry.get('seeded') and len(rows)==100,'FIXED_DATA_DRIFT')
+                # DELETE 只匹配本任务本次插入的完整复合键；保留所有正式夹具行。
+                sql(fe,'root',"DELETE FROM fixture."+table+" WHERE org_id='org-demo' AND site_id='site-a' AND "+
+                    key+" IN ("+','.join("'"+k+"'" for k in keys)+");")
+            vm.demand(snapshot(table,key)[0]==entry['before'],'FIXED_RESTORE_CONTENT')
+            entry['restored']=True
+        else:
+            payload="9.00,7.20,'K'" if table=='dmq_entity' else "8.000"
+            dates="'2026-11-01','2026-12-01','2026-11-17 12:00:00.123456','2026-11-17 12:00:01.123456'"
+            values=["('org-demo','site-a','"+k+"',"+payload+","+dates+")" for k in keys]
+            sql(fe,'root','INSERT INTO fixture.'+table+' VALUES '+','.join(values)+';')
+            digest,rows=snapshot(table,key)
+            vm.demand(len(rows)==100 and all(r[:2]==['org-demo','site-a'] for r in rows)
+                      and {r[2] for r in rows}==set(original+keys),'FIXED_BOUNDED_KEYS')
+            entry.update(seeded=digest,inserted=len(keys))
+        record(pending,record_state)
+    result=vm.OUTPUT/('s0-fixed-fixture-'+record_state['attempt']+('-restored' if restore else '-seeded')+'.json')
+    record(result,record_state)
+    if restore: pending.unlink()
+    print(result.relative_to(vm.ROOT))
 
 
 def capabilities():
@@ -383,11 +438,13 @@ def stop():
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('stage',choices=['create','resume','capabilities','driver-types','driver-cancel','stop'])
+    parser.add_argument('stage',choices=['create','resume','capabilities','driver-types','driver-cancel',
+                        'fixed-seed','fixed-restore','driver-fixed-values','driver-fixed-entity','driver-fixed-target','stop'])
     parser.add_argument('--prepared',type=Path)
     args=parser.parse_args()
     stage=args.stage
     if stage.startswith('driver-'):
         if args.prepared is None: parser.error('--prepared required')
         raise SystemExit(driver(args.prepared,stage))
-    {'create':create, 'resume':resume, 'capabilities':capabilities, 'stop':stop}[stage]()
+    {'create':create, 'resume':resume, 'capabilities':capabilities, 'fixed-seed':fixed_fixture,
+     'fixed-restore':lambda:fixed_fixture(True), 'stop':stop}[stage]()

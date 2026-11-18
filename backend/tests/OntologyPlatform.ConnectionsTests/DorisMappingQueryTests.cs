@@ -1,4 +1,7 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
@@ -62,6 +65,272 @@ public sealed class DorisMappingQueryTests
             }, DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
             StringAssert.Matches(ddl, new Regex(@"UNIQUE KEY\s*\(\s*`org_id`,\s*`site_id`,\s*`" + key + @"`\s*\)", RegexOptions.IgnoreCase));
             StringAssert.Contains(ddl, "\"enable_unique_key_merge_on_write\" = \"true\"");
+        }
+    }
+
+    /// <summary>调用产品固定 SQL 生成和执行路径；主连接使用合成只读身份。</summary>
+    private static Task<List<Dictionary<string, object?>>> FixedPlan(bool target, DateTimeOffset deadline, CancellationToken token)
+    {
+        // 构建与产品一致的固定目标、证书与范围。
+        var adapter = new DorisSourceAdapter(new DorisAdapterOptions { RootCertificatePath = Path.Combine(DirectoryPath, "tls", "ca.pem") });
+        // 配置中没有客户端指定 SQL、线程号或外部地址。
+        var profile = new DorisConnectionProfile { FeHost = "localhost", QueryPort = 19030, Catalog = "internal", Database = "fixture", Username = "fixture_reader", Tls = true };
+        // 标量选择代表已发布的根实体分支以及一个父实体的半开关系过滤。
+        (decimal Key, DateTime Start, DateTime End)? parent = target ? (1.00m, new DateTime(2026, 11, 1), new DateTime(2026, 12, 1)) : null;
+        // 测试不会向产品提交委托或自编 SQL。
+        var read = typeof(DorisSourceAdapter).Assembly.GetType("OntologyPlatform.Modules.Connections.DorisQueryReader", true)!
+            .GetMethod("ReadAsync", BindingFlags.Static | BindingFlags.NonPublic)!;
+        return (Task<List<Dictionary<string, object?>>>)read.Invoke(null, [adapter, profile, File.ReadAllText(Path.Combine(DirectoryPath, "reader.pass")),
+            new ResourceScope { OrganizationId = "org-demo", SiteIds = ["site-a"] }, null, parent, deadline, token])!;
+    }
+
+    /// <summary>独立的夹具期望值验证两份固定投影的正常执行。</summary>
+    [TestMethod]
+    public async Task FixedPlansReturnScopedValues()
+    {
+        // 两张表均在正式目录发现前存在，测试按固定参数运行产品生成器。
+        var entities = await FixedPlan(false, DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
+        Assert.AreEqual(100, entities.Count);
+        // 原始 E1 的值来自固定夹具约定，未由被测输出生成。
+        var first = entities.Single(r => Equals(r["entity_id"], "E1"));
+        Assert.AreEqual(9007199254740993.20m, first["amount"]);
+        // T3 和其余窗口外或键不等的目标不会出现在此关系分支中。
+        var targets = await FixedPlan(true, DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
+        CollectionAssert.AreEqual(new[] { "T1", "T2" }, targets.Select(r => r["target_id"]).ToArray());
+    }
+
+    /// <summary>预先订阅本任务准确 BE 的日志流，只取 QueryId、原始时间及事件种类。</summary>
+    private sealed class BackendEvents : IDisposable
+    {
+        /// <summary>只读追踪进程；不把未过滤的服务日志交给测试输出。</summary>
+        private readonly Process stream;
+
+        /// <summary>同一 QueryId 的源事件及宿主收取时刻，支持注销晚于工作完成的判别。</summary>
+        internal readonly ConcurrentQueue<(string Query, string Kind, string Utc, long Received)> Seen = new();
+
+        /// <summary>订阅动作只用于触发调用方产品令牌；不向源发命令。</summary>
+        internal Action<string>? Registered { get; set; }
+
+        /// <summary>正式计时前用独立观察者的真实查询绑定一次日志注册和结束，避免把未就绪当无活动。</summary>
+        internal async Task DemandReadyAsync(MySqlConnection observer)
+        {
+            using var budget = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            await using var scan = new MySqlCommand("SELECT /*+ SET_VAR(enable_sql_cache=false) */ COUNT(*) FROM fixture.dmq_target WHERE target_id='T3'", observer);
+            Assert.AreEqual(1L, Convert.ToInt64(await scan.ExecuteScalarAsync(budget.Token), CultureInfo.InvariantCulture));
+            await using var previous = new MySqlCommand("SELECT LAST_QUERY_ID()", observer);
+            // QueryId 取自同一控制连接上一条 SQL；不能用时间接近的其他任务证明订阅就绪。
+            var id = CanonicalId((string)(await previous.ExecuteScalarAsync(budget.Token))!);
+            while (!Seen.Any(e => e.Query == id && e.Kind == "registered") || !Seen.Any(e => e.Query == id && e.Kind == "context_end"))
+                await Task.Delay(1, budget.Token);
+        }
+
+        /// <summary>两段各自补足十六位；Doris 打印的无符号标识可省略前导零。</summary>
+        internal static string CanonicalId(string raw)
+        {
+            if (!Regex.IsMatch(raw, @"\A[0-9a-fA-F]{1,16}-[0-9a-fA-F]{1,16}\z"))
+                throw new InvalidDataException("DORIS_QUERY_ID");
+            return string.Join("-", raw.Split('-').Select(part => part.PadLeft(16, '0').ToLowerInvariant()));
+        }
+
+        /// <summary>打开跟踪前核验来自当前任务运行器的准确 BE 身份。</summary>
+        internal BackendEvents()
+        {
+            // 只接受完整 Docker 容器 ID，不能插入其他命令行参数。
+            var id = Environment.GetEnvironmentVariable("DMQ_S0_BE_ID");
+            Assert.IsTrue(id is not null && Regex.IsMatch(id, @"\A[0-9a-f]{64}\z"));
+            // 两个流一律由同一白名单处理，不复制日志正文。
+            var start = new ProcessStartInfo("docker") { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
+            foreach (var arg in new[] { "--context", "desktop-linux", "logs", "--since", DateTimeOffset.UtcNow.AddSeconds(-1).ToString("O"), "--follow", id })
+                start.ArgumentList.Add(arg!);
+            stream = new Process { StartInfo = start };
+            stream.OutputDataReceived += Parse;
+            stream.ErrorDataReceived += Parse;
+            Assert.IsTrue(stream.Start());
+            stream.BeginOutputReadLine();
+            stream.BeginErrorReadLine();
+        }
+
+        /// <summary>匹配固定版本五类源位置及输出字段，其余消息直接丢弃。</summary>
+        private void Parse(object sender, DataReceivedEventArgs args)
+        {
+            if (args.Data is not { } line) return;
+            // 仅匹配精确源码位置与语义，互不替代。
+            var kind = line switch
+            {
+                _ when line.Contains("fragment_mgr.cpp:729]") && line.Contains("total fragment num") => "registered",
+                _ when line.Contains("internal_service.cpp:637]") && line.Contains("cancel query by user") => "cancel_arrived",
+                _ when line.Contains("task_scheduler.cpp:84]") && line.Contains("[CANCELLED]") && line.Contains("cancel query by user") => "task_cancelled",
+                _ when line.Contains("pipeline_fragment_context.cpp:142]") && line.Contains("~PipelineFragmentContext") => "fragment_end",
+                _ when line.Contains("query_context.cpp:262]") && line.Contains("deconstructed") => "context_end",
+                _ => null
+            };
+            if (kind is null) return;
+            // 保留 BE 原时间及宿主读取时间；从不输出原行。
+            var match = Regex.Match(line, @"^[IWE](\d{8} \d{2}:\d{2}:\d{2}\.\d+).*?\b([0-9a-fA-F]{1,16}-[0-9a-fA-F]{1,16})\b",
+                RegexOptions.CultureInvariant);
+            if (!match.Success) return;
+            // 规范化后按完整数值等值匹配，不取 QueryId 前缀。
+            var id = CanonicalId(match.Groups[2].Value);
+            Seen.Enqueue((id, kind, match.Groups[1].Value, Stopwatch.GetTimestamp()));
+            if (kind == "registered") Registered?.Invoke(id);
+        }
+
+        /// <summary>只结束并回收本测试的本机只读日志消费者。</summary>
+        public void Dispose()
+        {
+            if (!stream.HasExited) stream.Kill();
+            stream.WaitForExit(2000);
+            stream.Dispose();
+        }
+    }
+
+    /// <summary>实体读取的取消必须命中运行中的真实 BE 执行。</summary>
+    [TestMethod]
+    public Task FixedEntityCancellation() => ObserveFixedCancellation(false);
+
+    /// <summary>等值和半开关系目标读取使用独立的执行中取消见证。</summary>
+    [TestMethod]
+    public Task FixedTargetCancellation() => ObserveFixedCancellation(true);
+
+    /// <summary>两种固定计划各自尝试一次；自然完成、未捕获运行中及已证实取消分别保留。</summary>
+    private static async Task ObserveFixedCancellation(bool target)
+    {
+        using var be = new BackendEvents();
+        // 管理观察者仅查询 FE PROCESSLIST；产品固定计划和 KILL 使用 reader。
+        var options = new MySqlConnectionStringBuilder { Server = "localhost", Port = 19030, UserID = "root",
+            Password = File.ReadAllText(Path.Combine(DirectoryPath, "root.pass")), Pooling = false, CancellationTimeout = -1,
+            SslMode = MySqlSslMode.VerifyFull, SslCa = Path.Combine(DirectoryPath, "tls", "ca.pem"), ConnectionTimeout = 2, DefaultCommandTimeout = 1 };
+        await using var observer = new MySqlConnection(options.ConnectionString);
+        await observer.OpenAsync();
+        await be.DemandReadyAsync(observer);
+        using var activity = new Activity("dmq.fixed.read").Start();
+        // 单调原点同时约束分支、清理及旁路总见证。
+        var start = Stopwatch.GetTimestamp();
+        double TimeAt(long stamp) => Stopwatch.GetElapsedTime(start, stamp).TotalMilliseconds;
+        using var total = new CancellationTokenSource(TimeSpan.FromSeconds(5) - Stopwatch.GetElapsedTime(start));
+        using var cancel = new CancellationTokenSource();
+        // 正式执行不因观察者错过任务而重跑。
+        var work = FixedPlan(target, DateTimeOffset.UtcNow.AddSeconds(5), cancel.Token);
+        // 跟踪产品实际返回值，不能用停止等待推断源端结束。
+        string? result = null;
+        // 产品分支完成时刻与源端结束分开记录。
+        long returned = 0;
+        async Task ObserveReturn()
+        {
+            try { await work; result = "NATURAL_COMPLETION"; }
+            catch (SemanticOperationException error) { result = error.Code; }
+            catch (OperationCanceledException) { result = "CANCELLED"; }
+            finally { returned = Stopwatch.GetTimestamp(); }
+        }
+        // 在独立监测 SQL 的同时记录原主任务实际结束时间。
+        var completion = ObserveReturn();
+        // 旁路 FE 返回的身份和值参数化后实际 SQL 的摘要。
+        string? query = null, observedSqlHash = null;
+        // 原始 FE 文本随规范标识入证，不能将服务器线程号混作查询身份。
+        string? rawQuery = null;
+        // FE 主连接号必须与本次产品握手号相等。
+        int thread = 0;
+        // 首次取消触发时刻，零表示未观察到运行中的匹配任务。
+        long request = 0;
+        // FE 注册表的消失单独取证。
+        bool feGone = false;
+        // FE 首次缺席的实际采样接收时刻。
+        long feGoneAt = 0;
+        // 唯有这些固定文本才能把 FE 行归于本次正在运行的业务 SQL。
+        var tableClause = target ? "FROM fixture.dmq_target" : "FROM fixture.dmq_entity";
+        void RequestIfActive(string id)
+        {
+            if (id != Volatile.Read(ref query) || completion.IsCompleted ||
+                be.Seen.Any(e => e.Query == id && e.Kind == "context_end")) return;
+            // FE 或 BE 两方中较晚获知身份的一方立刻请求，仍须事后核验实际任务取消。
+            var stamp = Stopwatch.GetTimestamp();
+            if (TimeAt(stamp) < 740 && Interlocked.CompareExchange(ref request, stamp, 0) == 0)
+                cancel.Cancel();
+        }
+        be.Registered = RequestIfActive;
+        try
+        {
+            while (TimeAt(Stopwatch.GetTimestamp()) < 740 && !completion.IsCompleted && request == 0)
+            {
+                await using var cmd = new MySqlCommand("SHOW FULL PROCESSLIST", observer);
+                await using var rows = await cmd.ExecuteReaderAsync(total.Token).WaitAsync(total.Token);
+                while (await rows.ReadAsync(total.Token).WaitAsync(total.Token))
+                {
+                    if (!Equals(rows["User"], "fixture_reader") || rows["Info"] is not string sql ||
+                        !sql.Contains(tableClause, StringComparison.OrdinalIgnoreCase)) continue;
+                    rawQuery = Convert.ToString(rows["QueryId"], CultureInfo.InvariantCulture);
+                    if (string.IsNullOrEmpty(rawQuery) || rawQuery == "N/A") continue;
+                    thread = Convert.ToInt32(rows["Id"], CultureInfo.InvariantCulture);
+                    observedSqlHash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(sql)));
+                    Volatile.Write(ref query, BackendEvents.CanonicalId(rawQuery));
+                    if (be.Seen.Any(e => e.Query == query && e.Kind == "registered")) RequestIfActive(query!);
+                }
+            }
+            if (request != 0)
+            {
+                while (Stopwatch.GetElapsedTime(request).TotalMilliseconds < 250)
+                {
+                    await using var cmd = new MySqlCommand("SHOW FULL PROCESSLIST", observer);
+                    await using var rows = await cmd.ExecuteReaderAsync(total.Token).WaitAsync(total.Token);
+                    // FE 的移除与 BE 任务结束独立记录。
+                    var present = false;
+                    while (await rows.ReadAsync(total.Token).WaitAsync(total.Token))
+                        present |= Equals(rows["QueryId"], rawQuery);
+                    if (!present && !feGone) { feGone = true; feGoneAt = Stopwatch.GetTimestamp(); }
+                    if (feGone && be.Seen.Any(e => e.Query == query && e.Kind == "context_end")) break;
+                }
+            }
+            await completion.WaitAsync(total.Token);
+        }
+        finally
+        {
+            be.Registered = null;
+            if (!completion.IsCompleted) cancel.Cancel();
+            // 封存此时已实际收到的事件；对超窗观测不给通过。
+            var events = be.Seen.Where(e => e.Query == query).ToArray();
+            // 模板摘要和线程号均由产品在提交语句时记录，反向验证观测身份。
+            var submitted = activity.Events.FirstOrDefault(e => e.Name == "doris.plan.submitted");
+            // 区分源工作已经返回与仍可因本次取消终止。
+            var rowsFinished = activity.Events.Any(e => e.Name == "doris.plan.rows_finished");
+            // 分别提取源线程号与模板散列，核对实际消费者。
+            var sourceThread = submitted.Tags?.FirstOrDefault(t => t.Key == "thread").Value as int?;
+            // 模板摘要不携带实参或秘密。
+            var templateHash = submitted.Tags?.FirstOrDefault(t => t.Key == "template.sha256").Value as string;
+            // 两条物理连接须在同一预算内完成握手。
+            var channels = activity.Events.FirstOrDefault(e => e.Name == "doris.cancel.ready");
+            // 从产品自身的握手结果交叉核对身份。
+            var primary = channels.Tags?.FirstOrDefault(t => t.Key == "source.thread").Value as int?;
+            // 辅助连接 ID 必须不同于主连接。
+            var auxiliary = channels.Tags?.FirstOrDefault(t => t.Key == "auxiliary.thread").Value as int?;
+            // 四个事件按同一 BE 时钟排序，证明取消到达早于工作关闭。
+            var cancelled = events.FirstOrDefault(e => e.Kind == "cancel_arrived");
+            // 调度器须明确报告所观测执行任务因取消失败。
+            var taskEnded = events.FirstOrDefault(e => e.Kind == "task_cancelled");
+            // 部分 fragment 可先完成，最后的 fragment 及整查询须在实际取消任务之后关闭。
+            var fragment = events.Where(e => e.Kind == "fragment_end").OrderBy(e => e.Utc, StringComparer.Ordinal).LastOrDefault();
+            // 整查询收尾标记用于核算源终结的上界。
+            var end = events.FirstOrDefault(e => e.Kind == "context_end");
+            // 观察结束时间也必须在原五秒内。
+            var endMs = TimeAt(Stopwatch.GetTimestamp());
+            // 需要正向因果链、双方释放、同一身份及三个独立的时间界限。
+            var passed = request != 0 && primary == thread && auxiliary.HasValue && auxiliary != primary &&
+                sourceThread == thread && !rowsFinished && result == "query_source_unavailable" &&
+                activity.Events.Any(e => e.Name == "doris.kill.acknowledged") && activity.Events.Any(e => e.Name == "doris.driver.ended") &&
+                feGone && feGoneAt >= request && cancelled.Received >= request && taskEnded.Received >= request &&
+                fragment.Received >= request && end.Received >= request && string.CompareOrdinal(cancelled.Utc, taskEnded.Utc) <= 0 &&
+                string.CompareOrdinal(taskEnded.Utc, fragment.Utc) <= 0 && string.CompareOrdinal(fragment.Utc, end.Utc) <= 0 &&
+                Stopwatch.GetElapsedTime(request, Math.Max(Math.Max(end.Received,feGoneAt),returned)).TotalMilliseconds <= 250 &&
+                TimeAt(Math.Max(end.Received,returned)) <= 1000 && endMs <= 5000;
+            // 新原件使用唯一文件名，保存自然结束或采样失败的真实结果。
+            var name = (target ? "fixed-target-" : "fixed-entity-") + Guid.NewGuid().ToString("N") + ".json";
+            await using var file = new FileStream(Path.Combine(Environment.GetEnvironmentVariable("DMQ_S0_EVIDENCE")!, name),
+                FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+            await JsonSerializer.SerializeAsync(file, new { passed, result, rawQuery, query, thread, sourceThread, auxiliary, templateHash, observedSqlHash,
+                requestedMs = request == 0 ? (double?)null : TimeAt(request), returnedMs = returned == 0 ? (double?)null : TimeAt(returned),
+                feGoneMs = feGone ? (double?)TimeAt(feGoneAt) : null, endMs, rowsFinished,
+                driverEvents = activity.Events.Select(e => new { e.Name, utc = e.Timestamp }),
+                sourceEvents = events.Select(e => new { e.Kind, e.Utc, receivedMs = TimeAt(e.Received) }) });
+            Assert.IsTrue(passed, request == 0 ? "ACTIVE_CANCELLATION_PRECONDITION_NOT_OBSERVED" : "FIXED_PLAN_SOURCE_TERMINATION_NOT_VERIFIED");
         }
     }
 

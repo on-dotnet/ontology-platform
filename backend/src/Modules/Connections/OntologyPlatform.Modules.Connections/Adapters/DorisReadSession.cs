@@ -1,4 +1,3 @@
-using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using MySqlConnector;
@@ -26,10 +25,29 @@ internal static class DorisReadSession
         long? cancelAt = null;
         // 串行保护单调取消时刻，防止外部取消和分支计时器同时首次写入。
         var sync = new object();
+        // 只有握手完成、且业务操作开始后，才发布本分支唯一的取消命令。
+        MySqlCommand? armed = null;
+        // 调用者取消与工作计时器争用同一次发送，清理阶段只等待已发出的任务。
+        Task? killing = null;
         using var work = new CancellationTokenSource();
         void Cancel()
         {
-            lock (sync) cancelAt ??= clock.GetTimestamp();
+            // 在同步点之前记时，将可能发生的锁等待也纳入清理预留。
+            var requested = clock.GetTimestamp();
+            lock (sync)
+            {
+                if (cancelAt.HasValue) return;
+                cancelAt = requested;
+                if (armed is not null && clock.GetElapsedTime(start) < branch && clock.GetElapsedTime(requested) < reserve)
+                {
+                    try
+                    {
+                        killing = armed.ExecuteNonQueryAsync(CancellationToken.None);
+                        Activity.Current?.AddEvent(new ActivityEvent("doris.kill.dispatched"));
+                    }
+                    catch (Exception error) { killing = Task.FromException(error); }
+                }
+            }
             work.Cancel();
         }
         using var registration = caller.Register(Cancel);
@@ -40,19 +58,37 @@ internal static class DorisReadSession
         using var timedRegistration = timer.Token.Register(Cancel);
         // 本次连接永不回池，ServerThread 只取自本次真实握手。
         var connection = connect();
-        // 仅在取消已开启的主连接时创建同配置辅助连接。
+        // 每个已有分支租约至多占用两条物理连接，辅助会话只准终止本次主连接。
         MySqlConnection? auxiliary = null;
         // 开启和读取分别跟踪，能区分从未发出 SQL 与正在执行的命令。
         Task<T>? pending = null;
         // 驱动的异步握手同样受外层绝对期限约束。
         Task? opening = null;
+        // 命令对象在回收其唯一发送任务后释放；永不向主连接提交第二次执行。
+        MySqlCommand? kill = null;
         try
         {
             work.Token.ThrowIfCancellationRequested();
             opening = connection.OpenAsync(work.Token);
             await BoundAsync(opening, work.Token);
             work.Token.ThrowIfCancellationRequested();
-            pending = read(connection, work.Token);
+            // 在工作预算内完成第二条同账号 TLS 握手，真实取消到来后不再承担建连延迟。
+            auxiliary = connect();
+            opening = auxiliary.OpenAsync(work.Token);
+            await BoundAsync(opening, work.Token);
+            work.Token.ThrowIfCancellationRequested();
+            Activity.Current?.AddEvent(new ActivityEvent("doris.cancel.ready", tags: new ActivityTagsCollection
+            {
+                { "source.thread", connection.ServerThread }, { "auxiliary.thread", auxiliary.ServerThread }
+            }));
+            kill = auxiliary.CreateCommand();
+            kill.CommandText = "KILL CONNECTION " + connection.ServerThread.ToString(CultureInfo.InvariantCulture);
+            lock (sync)
+            {
+                if (cancelAt.HasValue) throw new OperationCanceledException(work.Token);
+                pending = read(connection, work.Token);
+                armed = kill;
+            }
             // 主命令不调用驱动的软取消；由独立同账号连接显式终止服务端连接。
             var result = await pending.WaitAsync(work.Token);
             work.Token.ThrowIfCancellationRequested();
@@ -69,6 +105,7 @@ internal static class DorisReadSession
             var left = TimeSpan.FromTicks(Math.Min(reserve.Ticks, (branch - clock.GetElapsedTime(start)).Ticks));
             lock (sync)
             {
+                armed = null;
                 if (cancelAt is long at)
                     left = TimeSpan.FromTicks(Math.Min(left.Ticks, (reserve - clock.GetElapsedTime(at)).Ticks));
             }
@@ -77,17 +114,9 @@ internal static class DorisReadSession
             if (left <= TimeSpan.Zero) cleanup.Cancel();
             try
             {
-                if (work.IsCancellationRequested && pending is not null && connection.State == ConnectionState.Open)
+                if (killing is not null)
                 {
-                    cleanup.Token.ThrowIfCancellationRequested();
-                    // 已握手的源端整数 ID 与新建同账号 TLS 会话组成唯一取消目标。
-                    var thread = connection.ServerThread;
-                    auxiliary = connect();
-                    await BoundAsync(auxiliary.OpenAsync(cleanup.Token), cleanup.Token);
-                    cleanup.Token.ThrowIfCancellationRequested();
-                    using var kill = auxiliary.CreateCommand();
-                    kill.CommandText = "KILL CONNECTION " + thread.ToString(CultureInfo.InvariantCulture);
-                    await BoundAsync(kill.ExecuteNonQueryAsync(CancellationToken.None), cleanup.Token);
+                    await BoundAsync(killing, cleanup.Token);
                     Activity.Current?.AddEvent(new ActivityEvent("doris.kill.acknowledged"));
                 }
                 if (pending is not null && work.IsCancellationRequested)
@@ -108,10 +137,14 @@ internal static class DorisReadSession
                 var otherRelease = auxiliary?.DisposeAsync().AsTask() ?? Task.CompletedTask;
                 try { await BoundAsync(Task.WhenAll(primaryRelease, otherRelease), cleanup.Token); }
                 catch (Exception) { throw new SemanticOperationException(503, "query_source_unavailable"); }
+                finally { kill?.Dispose(); }
             }
             if (cleanup.IsCancellationRequested || clock.GetElapsedTime(start) >= branch)
                 throw new SemanticOperationException(503, "query_source_budget_exhausted");
-            if (work.IsCancellationRequested && pending is not null)
+            // 确认取消已开始，即使等待者先于本地令牌回调完成也不披露成功行。
+            bool cancelling;
+            lock (sync) cancelling = cancelAt.HasValue;
+            if (cancelling && pending is not null)
             {
                 // 源任务曾经启动。同账号 KILL 和本机驱动结束仍不能证明 BE 已终止。
                 Activity.Current?.AddEvent(new ActivityEvent("doris.source.termination_unverified"));
