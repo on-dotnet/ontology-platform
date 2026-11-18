@@ -1,0 +1,27 @@
+# 与 compose.yaml、compose.test.yaml 依次合用；源实例、卷及网络均归当前任务所有。
+name: ontology-g4-doris-mapping-query-001
+x-owner: &owner
+  ontology.task: G4-DORIS-MAPPING-QUERY-001
+  ontology.run: ${DORIS_RUN_ID:?Set resource run identity}
+
+services:
+  fe:
+    labels: *owner
+  be:
+    labels: *owner
+
+networks:
+  doris:
+    labels: *owner
+  local-entry:
+    labels: *owner
+
+volumes:
+  fe-data:
+    labels: *owner
+  fe-log:
+    labels: *owner
+  be-data:
+    labels: *owner
+  be-log:
+    labels: *owner
