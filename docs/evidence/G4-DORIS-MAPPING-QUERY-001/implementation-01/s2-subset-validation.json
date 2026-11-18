@@ -1,0 +1,64 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "1e4e8f64f54b3fe512272543ad9dfc94fa901de5",
+  "checks": [
+    {
+      "name": "s2-doris-access",
+      "command": "workflow_doris_s1.py s2-doris-access --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Browser public observations and strong host exit, command 4c7c7a0ef0b24a5f8f7f34d6dbb68fae"
+    },
+    {
+      "name": "s2-doris-fanout",
+      "command": "workflow_doris_s1.py s2-doris-fanout --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Browser public observations and strong host exit, command 8b41e968931e46a1a8e1bb71b2726038"
+    },
+    {
+      "name": "s2-doris-null",
+      "command": "workflow_doris_s1.py s2-doris-null --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Browser public observations and strong host exit, command c477ab9938914f1c89a5f330cd7be9f7"
+    },
+    {
+      "name": "s2-doris-queries",
+      "command": "workflow_doris_s1.py s2-doris-queries --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Browser public observations and strong host exit, command 8feaecf731f645168aa56f27488f55e4"
+    },
+    {
+      "name": "s2-doris-requalify",
+      "command": "workflow_doris_s1.py s2-doris-requalify --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Browser public observations and strong host exit, command f622255b1c784d4f9c3064989e39a87f"
+    },
+    {
+      "name": "pg-golden",
+      "command": "workflow_doris_s1.py pg-golden --prepared <bound prepare receipt>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "2/2 MTP, zero skips, command 151e9a73ee874795933c1aa0d3ca11c2"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "scope": "Corrected S2 subset only, AC06 remains NO_GO",
+    "sourceInput": "81d192c325cac18a461e98bb8aeae5eed71700dd03794712123a48bbfcf035b5",
+    "reviewer": "/root/spec_review",
+    "reviewDecision": "GO_FOR_CORRECTED_RELATION_AND_ACCESS_SUBSET",
+    "fanoutReceiptSha256": "1867146fa12cb2f1c6a50c2ec0b2c71f1f090f24a4eff869e76e7dd66b8f8902",
+    "restoredReceiptSha256": "595035e8c93e94892231ab02d4aa6b1bcb4430c5fb63841951a15452ae7a9710"
+  }
+}

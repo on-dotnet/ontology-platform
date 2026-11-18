@@ -116,9 +116,10 @@ public sealed class DorisMappingQueryTests
     {
         // 控制面凭据只出现在合成测试，产品实时验证自身只读账号。
         var options = new MySqlConnectionStringBuilder { Server = "localhost", Port = 19030, UserID = "root",
-            Password = File.ReadAllText(Path.Combine(DirectoryPath, "root.pass")), Pooling = false,
+            Pooling = false,
             SslMode = MySqlSslMode.VerifyFull, SslCa = Path.Combine(DirectoryPath, "tls", "ca.pem"), DefaultCommandTimeout = 2 };
         await using var writer = new MySqlConnection(options.ConnectionString);
+        writer.ProvidePasswordCallback = _ => File.ReadAllText(Path.Combine(DirectoryPath, "root.pass"));
         await writer.OpenAsync();
         // 只允许修改原始 E1 的 amount，完整行的其他值冻结在首次建表夹具。
         async Task Write(bool restore)
@@ -299,9 +300,10 @@ public sealed class DorisMappingQueryTests
         using var be = new BackendEvents();
         // 管理观察者仅查询 FE PROCESSLIST；产品固定计划和 KILL 使用 reader。
         var options = new MySqlConnectionStringBuilder { Server = "localhost", Port = 19030, UserID = "root",
-            Password = File.ReadAllText(Path.Combine(DirectoryPath, "root.pass")), Pooling = false, CancellationTimeout = -1,
+            Pooling = false, CancellationTimeout = -1,
             SslMode = MySqlSslMode.VerifyFull, SslCa = Path.Combine(DirectoryPath, "tls", "ca.pem"), ConnectionTimeout = 2, DefaultCommandTimeout = 1 };
         await using var observer = new MySqlConnection(options.ConnectionString);
+        observer.ProvidePasswordCallback = _ => File.ReadAllText(Path.Combine(DirectoryPath, "root.pass"));
         await observer.OpenAsync();
         await be.DemandReadyAsync(observer);
         using var activity = new Activity("dmq.fixed.read").Start();
