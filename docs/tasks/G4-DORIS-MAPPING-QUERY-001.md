@@ -1,7 +1,7 @@
 # G4-DORIS-MAPPING-QUERY-001｜Doris Mapping/Query 规格
 
 ## 当前执行与授权
-唯一执行状态：R0_BLOCKED。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
+唯一执行状态：R0_HALTED_PIN_HELD。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
 
 Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)列明的源、测试、最小任务注册和当前文档。历史PG规范字节、旧ZIP与私有设施为只读依赖。R0允许14个准确ID在保全、排空、恢复清单与非作者检查后优雅停止。用户随后手动调VM。当前其他旧KEEP受保护，本分支不合main。
 
@@ -39,4 +39,4 @@ Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-
 
 自本卡、唯一规格和implementation-01原件恢复。按R0→S0→S1→S2→S3验证；产品资格、最终V3与CI尚无本Run结果。原整集-9/TIMEOUT和134唯一覆盖保留。未跟踪用户文件保持原状。
 
-R0原件及非作者结论见[14个准确ID与保全缺口](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/r0-review.json)。STOPPED_KEEP=0，八个易失卷的私有一致备份/同ID恢复入口待提供或批准新增保全方案，正式投递封闭及排空尚待完成。现VM仍15.63GiB/12CPU，暂缓用户手调。离线准备与定向检查见[当前验证](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/validation.json)。SDK短诊断通过，正式prepare受原失败保护拦截，C#未编译。S0及后续产品链均NOT_RUN。
+R0原件及非作者结论见[14个准确ID与保全缺口](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/r0-review.json)。14个原ID中，M4主/次API已请求TERM、自然退出0，其余12个仍运行。8个易失卷热备及隔离同ID恢复通过，两份隔离H2读取原夹具realm通过。用户批准的改序由非作者现场放行后，M4 keyring已取得冷副本并独立核验。准备处置M5前排空检查触发DRAIN_ACTIVITY_DETECTED，剩余处置中止，八卷继续由准确只读容器持有。非作者现场复核结论为NO-GO继续停机或调VM。20轮事后采样及单独补核MappingJobs/MappingOutbox均为零，触发时具体活动UNKNOWN。见[停机与独立复核回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/cold-save-review.json)及[恢复保护反例](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/cold-save-validation.json)。现VM仍15.63GiB/12CPU，暂缓用户手调。离线准备与定向检查见[当前验证](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/validation.json)。SDK短诊断通过，正式prepare受原失败保护拦截，C#未编译。S0及后续产品链均NOT_RUN。

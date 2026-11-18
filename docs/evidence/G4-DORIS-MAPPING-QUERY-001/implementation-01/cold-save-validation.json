@@ -1,0 +1,27 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "50804b7f7875101bf2300effa3a5f82b2f377bac",
+  "checks": [
+    {
+      "name": "private-restore-guards",
+      "status": "PASS",
+      "command": "python3 -B scripts/tests/DorisKeepPreservation.Tests.py",
+      "exitCode": 0,
+      "output": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.002s\n\nOK"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "scope": "Committed restoration safeguards only; runtime attempts are separately qualified in cold-save-review.json.",
+    "product": "NOT_RUN",
+    "controlledStop": "HALTED_PIN_HELD",
+    "timingStatus": "Test process wall timing reported by unittest."
+  }
+}

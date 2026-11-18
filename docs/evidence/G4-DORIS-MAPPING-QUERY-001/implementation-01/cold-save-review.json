@@ -1,0 +1,311 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "evidenceRunId": "implementation-01",
+  "recordedAt": "2026-11-18T09:48:37.474406+00:00",
+  "status": "HALTED_PIN_HELD",
+  "reason": "DRAIN_ACTIVITY_DETECTED",
+  "batchStoppedKeep": false,
+  "vmChangeReady": false,
+  "pin": {
+    "id": "aa3269ced429a06e7815f701fb425ac7505cc5a2d0fb8d3f28d0221a27a4780c",
+    "attempt": "3c86b7062f9b43a5949cd39d17351fd9",
+    "started": "2026-11-18T09:29:13.956432132Z",
+    "volumes": [
+      "ontology-g4-m4-query-impl-01_api-keyring",
+      "ontology-g4-m4-query-impl-01_fuseki-data",
+      "ontology-g4-m4-query-impl-01_keycloak-data",
+      "ontology-g4-m4-query-impl-01_rustfs-data",
+      "ontology-g4-m5-integration-01_api-keyring",
+      "ontology-g4-m5-integration-01_fuseki-data",
+      "ontology-g4-m5-integration-01_keycloak-data",
+      "ontology-g4-m5-integration-01_rustfs-data"
+    ],
+    "oldCaps": 12884901888,
+    "dockerMemory": 16787419136,
+    "cpu": 12,
+    "backups": {
+      "ontology-g4-m4-query-impl-01_api-keyring": "c8c2d5028db51842e43cb4e0ad3f46d4b583961010bef81efc1f48a30738e988",
+      "ontology-g4-m4-query-impl-01_fuseki-data": "ddc305e4c5747e6c7e78ff319d97311754b3e7f8622dfbea9ebecb2aeb251073",
+      "ontology-g4-m4-query-impl-01_keycloak-data": "567536f46e0ea11f5aca51dbf2fefda261aa4a77f59885f2dbea913558b23f63",
+      "ontology-g4-m4-query-impl-01_rustfs-data": "91a7354f0211072aca61d2b0d1f1b15321465ca297de49650a49c78c5bf4548d",
+      "ontology-g4-m5-integration-01_api-keyring": "4d30d77b7f1196bd9eaeb23c9457d7357007cdc2905b23c7306b283c3eaa870b",
+      "ontology-g4-m5-integration-01_fuseki-data": "93b8b03b944dc122abcfd29338eadab8967077412d7dc7f58dac419a59b7098c",
+      "ontology-g4-m5-integration-01_keycloak-data": "4bcac6ccf7e6c00ce88b8063f6db692a7b1f9ee500ba4a55db30612376b6ca43",
+      "ontology-g4-m5-integration-01_rustfs-data": "676f3828fb4df8267b373e6a34c4145f9315c2eb6db368355cb6cbfb88b1e717"
+    }
+  },
+  "actuallyStopped": [
+    {
+      "id": "fc53d2b9b9fc7d67344a79e1abcf107b32b832d762713979a3584da8d9d1c7f5",
+      "project": "ontology-g4-m4-query-impl-01",
+      "service": "api-secondary",
+      "startedAt": "2026-11-18T09:34:07.604573+00:00",
+      "result": "GRACEFUL_EXIT",
+      "requestedSignal": "SIGTERM_TO_VERIFIED_FOREGROUND_API",
+      "after": {
+        "Status": "exited",
+        "Running": false,
+        "ExitCode": 0,
+        "OOMKilled": false,
+        "FinishedAt": "2026-11-18T09:34:07.662380045Z",
+        "StartedAt": "2026-11-15T16:13:06.969901167Z"
+      },
+      "shutdownLogMarker": false,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logExit": 0
+    },
+    {
+      "id": "ed281bc42b432a4e20817b00dfbc7b480271f36368a24370414a6e6fb5b62dca",
+      "project": "ontology-g4-m4-query-impl-01",
+      "service": "api",
+      "startedAt": "2026-11-18T09:34:26.582314+00:00",
+      "result": "GRACEFUL_EXIT",
+      "requestedSignal": "SIGTERM_TO_VERIFIED_FOREGROUND_API",
+      "after": {
+        "Status": "exited",
+        "Running": false,
+        "ExitCode": 0,
+        "OOMKilled": false,
+        "FinishedAt": "2026-11-18T09:34:26.655740013Z",
+        "StartedAt": "2026-11-15T15:39:43.699995753Z"
+      },
+      "shutdownLogMarker": false,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logExit": 0
+    }
+  ],
+  "stillRunningOriginals": 12,
+  "hotVolumes": {
+    "ontology-g4-m4-query-impl-01_api-keyring": {
+      "sha256": "c8c2d5028db51842e43cb4e0ad3f46d4b583961010bef81efc1f48a30738e988",
+      "bytes": 10240,
+      "members": 2,
+      "privatePath": ".tools/security/g4-doris-mapping-query-001/cold-save-01/5907b4c6ad2d4bc18d2f3faa18025759/ontology-g4-m4-query-impl-01_api-keyring.tar",
+      "mode": "0600",
+      "isolatedSameId": "5aae71e679c5b918bc3bfe3e2004ce4591e87bc7dbb64f84b1700fb6eb536fec"
+    },
+    "ontology-g4-m4-query-impl-01_fuseki-data": {
+      "sha256": "ddc305e4c5747e6c7e78ff319d97311754b3e7f8622dfbea9ebecb2aeb251073",
+      "bytes": 201461760,
+      "members": 61,
+      "privatePath": ".tools/security/g4-doris-mapping-query-001/cold-save-01/5907b4c6ad2d4bc18d2f3faa18025759/ontology-g4-m4-query-impl-01_fuseki-data.tar",
+      "mode": "0600",
+      "isolatedSameId": "5aae71e679c5b918bc3bfe3e2004ce4591e87bc7dbb64f84b1700fb6eb536fec"
+    },
+    "ontology-g4-m4-query-impl-01_keycloak-data": {
+      "sha256": "567536f46e0ea11f5aca51dbf2fefda261aa4a77f59885f2dbea913558b23f63",
+      "bytes": 195194880,
+      "members": 556,
+      "privatePath": ".tools/security/g4-doris-mapping-query-001/cold-save-01/5907b4c6ad2d4bc18d2f3faa18025759/ontology-g4-m4-query-impl-01_keycloak-data.tar",
+      "mode": "0600",
+      "isolatedSameId": "5aae71e679c5b918bc3bfe3e2004ce4591e87bc7dbb64f84b1700fb6eb536fec"
+    },
+    "ontology-g4-m4-query-impl-01_rustfs-data": {
+      "sha256": "91a7354f0211072aca61d2b0d1f1b15321465ca297de49650a49c78c5bf4548d",
+      "bytes": 358400,
+      "members": 76,
+      "privatePath": ".tools/security/g4-doris-mapping-query-001/cold-save-01/5907b4c6ad2d4bc18d2f3faa18025759/ontology-g4-m4-query-impl-01_rustfs-data.tar",
+      "mode": "0600",
+      "isolatedSameId": "5aae71e679c5b918bc3bfe3e2004ce4591e87bc7dbb64f84b1700fb6eb536fec"
+    },
+    "ontology-g4-m5-integration-01_api-keyring": {
+      "sha256": "4d30d77b7f1196bd9eaeb23c9457d7357007cdc2905b23c7306b283c3eaa870b",
+      "bytes": 10240,
+      "members": 2,
+      "privatePath": ".tools/security/g4-doris-mapping-query-001/cold-save-01/5907b4c6ad2d4bc18d2f3faa18025759/ontology-g4-m5-integration-01_api-keyring.tar",
+      "mode": "0600",
+      "isolatedSameId": "5aae71e679c5b918bc3bfe3e2004ce4591e87bc7dbb64f84b1700fb6eb536fec"
+    },
+    "ontology-g4-m5-integration-01_fuseki-data": {
+      "sha256": "93b8b03b944dc122abcfd29338eadab8967077412d7dc7f58dac419a59b7098c",
+      "bytes": 201461760,
+      "members": 61,
+      "privatePath": ".tools/security/g4-doris-mapping-query-001/cold-save-01/5907b4c6ad2d4bc18d2f3faa18025759/ontology-g4-m5-integration-01_fuseki-data.tar",
+      "mode": "0600",
+      "isolatedSameId": "5aae71e679c5b918bc3bfe3e2004ce4591e87bc7dbb64f84b1700fb6eb536fec"
+    },
+    "ontology-g4-m5-integration-01_keycloak-data": {
+      "sha256": "4bcac6ccf7e6c00ce88b8063f6db692a7b1f9ee500ba4a55db30612376b6ca43",
+      "bytes": 195287040,
+      "members": 556,
+      "privatePath": ".tools/security/g4-doris-mapping-query-001/cold-save-01/5907b4c6ad2d4bc18d2f3faa18025759/ontology-g4-m5-integration-01_keycloak-data.tar",
+      "mode": "0600",
+      "isolatedSameId": "5aae71e679c5b918bc3bfe3e2004ce4591e87bc7dbb64f84b1700fb6eb536fec"
+    },
+    "ontology-g4-m5-integration-01_rustfs-data": {
+      "sha256": "676f3828fb4df8267b373e6a34c4145f9315c2eb6db368355cb6cbfb88b1e717",
+      "bytes": 184320,
+      "members": 54,
+      "privatePath": ".tools/security/g4-doris-mapping-query-001/cold-save-01/5907b4c6ad2d4bc18d2f3faa18025759/ontology-g4-m5-integration-01_rustfs-data.tar",
+      "mode": "0600",
+      "isolatedSameId": "5aae71e679c5b918bc3bfe3e2004ce4591e87bc7dbb64f84b1700fb6eb536fec"
+    }
+  },
+  "hotBytesTotal": 793968640,
+  "hotQualification": "两次文件系统读取一致，并在最后一个测试挂载释放后恢复至空卷，由同一隔离消费者ID逐卷回读。旧原ID的业务恢复未运行。热抓取不证明事务一致。",
+  "hotKeycloakIsolatedRead": {
+    "checkedAt": 1794993867.6424582,
+    "sourceAttempt": "5907b4c6ad2d4bc18d2f3faa18025759",
+    "isolatedRealmRead": {
+      "ontology-g4-m5-integration-01_keycloak-data": {
+        "status": "PASS",
+        "isolatedProbe": "0ab35fbf3ae3565244eb56976d7682499062af8bc3940935629e078717c514c1"
+      },
+      "ontology-g4-m4-query-impl-01_keycloak-data": {
+        "status": "PASS",
+        "isolatedProbe": "c5ea1c613d34d2136ec60a55f6701f4a6ac8ce236c3107e1bff09343292b6cfc"
+      }
+    },
+    "pointInTimeApplicationConsistency": "NOT_VERIFIED"
+  },
+  "hotKeycloakFirstProbe": {
+    "checkedAt": 1794993701.798076,
+    "sourceAttempt": "5907b4c6ad2d4bc18d2f3faa18025759",
+    "isolatedRealmRead": {
+      "ontology-g4-m5-integration-01_keycloak-data": {
+        "status": "FAIL",
+        "reason": "KEYCLOAK_OFFLINE_EXIT_23"
+      },
+      "ontology-g4-m4-query-impl-01_keycloak-data": {
+        "status": "FAIL",
+        "reason": "KEYCLOAK_OFFLINE_EXIT_23"
+      }
+    },
+    "pointInTimeApplicationConsistency": "NOT_VERIFIED"
+  },
+  "coldVolumes": {
+    "ontology-g4-m4-query-impl-01_api-keyring": {
+      "sha256": "c8c2d5028db51842e43cb4e0ad3f46d4b583961010bef81efc1f48a30738e988",
+      "bytes": 10240,
+      "members": 2,
+      "privatePath": ".tools/security/g4-doris-mapping-query-001/cold-save-01/dbf15d68e2d948e7aefa17aa5bc1eae5/ontology-g4-m4-query-impl-01_api-keyring.tar",
+      "mode": "0600",
+      "isolatedSameId": "06d5435c3ba28786006c6bef79d2efed913da24c2b7e4e44134f58003898e6fa"
+    }
+  },
+  "coldScope": "M4两个API优雅停止后，只有准确只读pin仍挂载M4 api-keyring；冷归档、二次读取及隔离同ID回读通过。",
+  "initialAdmission": {
+    "writeConflictProbes": 96,
+    "schemasPerDatabase": 6,
+    "countsAtFence": {
+      "19f76154598ac31e4a075175aadafc0a2f22591281ecf5db0704fd65e26a502b": [
+        0
+      ],
+      "b71ef14e5e484253c0b435332c4480fc071268f634c0b049d5d4aff57c383912": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "c1bbd53e0b335a12c5e50bc860a58e6d3cb01de7d81a354ee87696dd0a941c81": [
+        0
+      ],
+      "d267220f4227b7c92f5d2e37e7e85a4587644488157c10e5f95586613bd08952": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "countOrderAtFence": [
+      "runningQueries",
+      "queuedOrRunningRuns",
+      "queuedOrRunningCatalogJobs",
+      "runningProbes",
+      "undispatchedPublishingOutbox",
+      "nonIdleClients"
+    ],
+    "sourceDatabaseCountOrder": [
+      "nonIdleClients"
+    ],
+    "postHaltTransactionFence": "ROLLED_BACK"
+  },
+  "postHalt": {
+    "sampleRounds": 20,
+    "allOriginalSampleCountsZero": true,
+    "observedClientCategories": [],
+    "currentExtendedCounts": {
+      "19f76154598ac31e4a075175aadafc0a2f22591281ecf5db0704fd65e26a502b": [
+        0
+      ],
+      "b71ef14e5e484253c0b435332c4480fc071268f634c0b049d5d4aff57c383912": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "c1bbd53e0b335a12c5e50bc860a58e6d3cb01de7d81a354ee87696dd0a941c81": [
+        0
+      ],
+      "d267220f4227b7c92f5d2e37e7e85a4587644488157c10e5f95586613bd08952": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "platformOrderNow": [
+      "runningQueries",
+      "queuedOrRunningRuns",
+      "queuedOrRunningCatalogJobs",
+      "runningProbes",
+      "queuedOrRunningMappingJobs",
+      "undispatchedMappingOutbox",
+      "undispatchedPublishingOutbox",
+      "nonIdleClients"
+    ],
+    "attribution": "触发时的旧检查只保存拒绝码，分库、分项和语句未知。随后零值不能回填当时事实。新检查已在拒绝时持久化分项。"
+  },
+  "independentReview": {
+    "reviewer": "/root/spec_review",
+    "preStop": "GO_WITH_CONTINUOUS_READ_ONLY_PIN",
+    "postHalt": "NO_GO_CONTINUE_OR_RESIZE",
+    "checked": [
+      "八份热归档的独立全字节SHA256、长度、权限0600，私有目录0700，文件nlink=1",
+      "同一隔离临时ID回读的生命周期记录，初次演练未保留每步Docker状态原件",
+      "14原始身份、标签和挂载；两原API退出0无OOM；本次临时设施回收，持续pin仍持有准确8卷",
+      "M4 keyring冷归档10240字节全字节SHA256、长度、权限、属主、链接数"
+    ],
+    "limitation": "两个API已核对精确前台进程并请求TERM，容器自然退出0；没有对应shutdown日志标记。"
+  },
+  "prepareDiagnosis": {
+    "status": "BLOCKED",
+    "formalDeadlineSeconds": 180,
+    "formalIdentity": "4b132e21f03a4d98421578c26cd5fba24c56a55d8e2ac4f369429e7d302c92af",
+    "firstSdkExit": 71,
+    "shortSdkExit": 0,
+    "sdkVersion": "10.0.402",
+    "shortDeadlineSeconds": 15,
+    "shortIdentity": "c811add90a016af5b939f315908253e32f95424cd19a24c08465061fb7b406b3",
+    "formalGate": "SHORT_REPRO_REQUIRED",
+    "reason": "timeout是失败身份输入；短复现上限20s。成功的15s探针无法解除180s原身份。保留失败登记，无prepare重跑。"
+  },
+  "product": "NOT_RUN",
+  "zip": "NOT_CREATED",
+  "inputs": {
+    "cold-pin.json": "4762e7bd771d6e4ed52003093728ca59cb15f216797b4f40a3590cad335488ea",
+    "controlled-stop.json": "7ad4ce74df269dd4e3f4477dff1624b4f6bbdc047b241f50bec7391ec156fb81",
+    "preflight.json": "212749c155c488a1b5239a3814342c4e5b08cc5302756851860bae0b937cc7c9",
+    "5907b4c6ad2d4bc18d2f3faa18025759-capture-rehearse.json": "d98e329ecd5403bbab9ca294facefe7ddd2c24dc1d54535c1b03d992b631cdcb",
+    "5907b4c6ad2d4bc18d2f3faa18025759-lifecycle.json": "ccd7a6fcfaa0671fb59ec6994f728c5fd4f0bcdb902cd15ff8c91ed7b63fcedf",
+    "1f139f99a87b4e8da8384be9ad782e5c-drain-check.json": "2c5a1e4269f2960c6b0f9732d360d7d4c76eb6ab188168edb329ac5a5929e753",
+    "dbf15d68e2d948e7aefa17aa5bc1eae5-lifecycle.json": "f932dafebc1f9a1fa1ea016abd6e52e59788a4341aeb737477f6a6ff47d9a69a",
+    "post-halt-activity.json": "eb8e9f93b2bbf58190a9f84e48b73193302b93dd8e3fe3ea60a23cb9038109b6",
+    "post-halt-mapping-counts.json": "ac5dc0953cb84bf8f4b65e99eeb81700fadc70cc03efb677589bff3230a2e66d",
+    "keycloak-native-availability.json": "1eed3cd5f7c668def00010d6c5c7cd9ea71d789bdc2be8ccaf048c6cc06eb1c0",
+    "7675320692f0484f92b7ce2c8718923a-keycloak-read.json": "f34416767a2a982662da60f94ed6f77995213399112b0229846e9cb2a2e0d2e4",
+    "9dc67b65a35f41ffa198fefcb76f9ea6-keycloak-read.json": "f1f86813460224a9332389f5edd3560abee95cfb170414c0a876a09615c7fde9"
+  }
+}
