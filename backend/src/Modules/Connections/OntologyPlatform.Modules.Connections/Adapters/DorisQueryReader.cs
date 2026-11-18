@@ -26,15 +26,25 @@ internal static class DorisQueryReader
         ORDER BY event_at,target_id,org_id,site_id LIMIT 101
         """;
 
-    /// <summary>单表正式分支核完整目录、当前形状和实体过滤条件，按映射的显式时区解释时间。</summary>
+    /// <summary>Mapping 全量评估的目标行包含不等值与空键，不能用关系候选代替。</summary>
+    private const string TargetSampleSql = """
+        SELECT /*+ SET_VAR(enable_sql_cache=false) */ org_id,site_id,target_id,join_key,valid_from,valid_to,event_at,observed_at
+        FROM fixture.dmq_target
+        WHERE org_id=@org AND site_id=@site
+        ORDER BY event_at,target_id,org_id,site_id LIMIT 101
+        """;
+
+    /// <summary>每个正式分支核完整目录、当前形状和已发布谓词，按映射的显式时区解释时间。</summary>
     internal static async Task<G4SourceQueryRead> ReadEntityAsync(DorisSourceAdapter adapter, DorisConnectionProfile profile,
         string secret, G4QueryBindingContext context, string entityId, G4SemanticQuery query, G4QueryBranchFilter? branch,
         DateTimeOffset deadline, CancellationToken token)
     {
         DorisAdapterOptions.Validate(profile, context.Scope);
-        // S1 的唯一实体必须对应固定表与已经获准的列。
+        // 关系目标只能由已发布关系的父分支进入。
         var mapping = context.Manifest.Mapping;
-        if (mapping.Entities is not [var entity] || entity.Id != entityId || branch is not null) throw Invalid();
+        // 唯一绑定决定读取哪一个固定投影。
+        var entity = mapping.Entities.SingleOrDefault(e => e.Id == entityId) ?? throw Invalid();
+        if (entity.DatasetRef.Name != (branch is null ? "dmq_entity" : "dmq_target")) throw Invalid();
         // 类型、序位和范围列均来自本次正式快照。
         var table = DorisMappingSourceValidator.EntityTable(entity, context.OriginalCatalog, context.CurrentCatalog, mapping);
         // 外部身份参数只可过滤已批准的实体标识列。
@@ -48,14 +58,17 @@ internal static class DorisQueryReader
         // 结果一直保留在受限内存内，完成后验和释放后才返回上层。
         var result = await adapter.ReadBranchAsync(profile, secret, deadline, TimeProvider.System, async connection =>
         {
+            // 源模型必须在数据读取的两端一致。
             var shape = await DorisMappingSourceValidator.CheckCatalogAsync(connection, profile, context.CurrentCatalog);
             // 在源端使用固定查询，下游额外使用 Ordinal 验证字符串身份。
-            var source = await ReadPlanAsync(connection, context.Scope, query.Filters.EntityExternalId, null);
+            var source = branch is null
+                ? await ReadPlanAsync(connection, context.Scope, query.Filters.EntityExternalId, null, allowSentinel: true)
+                : await RelatedAsync(connection, context, entity, branch);
             // 通过完整组装的行才可构成可信前缀。
             var rows = new List<Dictionary<string, G4QueryValue>>();
             foreach (var item in source)
             {
-                if (query.Filters.EntityExternalId is string external && !string.Equals((string?)item["entity_id"], external, StringComparison.Ordinal)) continue;
+                if (branch is null && query.Filters.EntityExternalId is string external && !string.Equals((string?)item["entity_id"], external, StringComparison.Ordinal)) continue;
                 // 实体业务行不向公共结果暴露未映射原值。
                 var row = table.Fields.ToDictionary(f => f.Name, f => Scalar(item[f.Name], f, temporal), StringComparer.Ordinal);
                 if (query.Filters.ValidFrom is string from && query.Filters.ValidTo is string until)
@@ -67,18 +80,63 @@ internal static class DorisQueryReader
                 rows.Add(row);
             }
             if (await DorisMappingSourceValidator.CheckCatalogAsync(connection, profile, context.CurrentCatalog) != shape) throw Invalid();
-            return rows;
+            return (Rows: rows, Sentinel: source.Count > 100);
         }, token);
-        return new G4SourceQueryRead { EntityBindingId = entityId, Rows = result.Take(query.MaxRows).ToArray(), Limited = result.Count > query.MaxRows,
-            RecordKeyFields = ["org_id", "site_id", "entity_id"], Indeterminate = false, StartedAtUtc = started, CompletedAtUtc = DateTimeOffset.UtcNow,
+        return new G4SourceQueryRead { EntityBindingId = entityId, Rows = result.Rows.Take(query.MaxRows).ToArray(), Limited = result.Sentinel || result.Rows.Count > query.MaxRows,
+            RecordKeyFields = ["org_id", "site_id", identity.ExternalIdFieldRefs[0].Name], Indeterminate = result.Sentinel && result.Rows.Count == 0, StartedAtUtc = started, CompletedAtUtc = DateTimeOffset.UtcNow,
             AdapterVersion = "doris-query-v1", WatermarkKind = "UNKNOWN", Watermark = null,
-            QueryPlanHash = G4QueryCanonicalHash(context, entityId, query) };
+            QueryPlanHash = G4QueryCanonicalHash(context, entityId, query, branch) };
     }
 
     /// <summary>登记查询计划的来源与固定参数身份，摘要不包含秘密。</summary>
-    private static string G4QueryCanonicalHash(G4QueryBindingContext context, string entityId, G4SemanticQuery query) =>
+    private static string G4QueryCanonicalHash(G4QueryBindingContext context, string entityId, G4SemanticQuery query, G4QueryBranchFilter? branch) =>
         MappingValidationService.Digest(new { context.Binding, entityId, context.Scope, query.Filters, query.MaxRows,
-            template = EntitySql, adapterVersion = "doris-query-v1" });
+            template = branch is null ? EntitySql : TargetSql, relationId = branch?.RelationId,
+            parentPlan = branch?.Parents.QueryPlanHash, parentRows = branch?.Parents.Rows, adapterVersion = "doris-query-v1" });
+
+    /// <summary>同一分支期限内按父键和半开区间读取目标，相同物理键只保留一致的观测。</summary>
+    private static async Task<List<Dictionary<string, object?>>> RelatedAsync(MySqlConnection connection,
+        G4QueryBindingContext context, MappingEntityBinding target, G4QueryBranchFilter branch)
+    {
+        // 父输入来自已执行的真实分支，不能从客户端注入列名或查询片段。
+        var relation = context.Manifest.Mapping.Relations.SingleOrDefault(r => r.Id == branch.RelationId) ?? throw Invalid();
+        if (!DorisMappingSourceValidator.SupportsRelation(context.Manifest.Mapping, relation)
+            || relation.ToBindingId != target.Id || relation.FromBindingId != branch.Parents.EntityBindingId
+            || branch.Parents.Indeterminate || branch.Parents.AdapterVersion != "doris-query-v1"
+            || branch.Parents.Rows.Length is < 1 or > 100) throw Invalid();
+        // 同一范围下 target_id 唯一，同键的前后语义冲突不能包装成一个结果。
+        var candidates = new Dictionary<string, Dictionary<string, object?>>(StringComparer.Ordinal);
+        // 同一精确键与有效期的多个父结果共享一次固定查询。
+        var windows = new HashSet<(decimal Key, DateTime Start, DateTime End)>();
+        foreach (var row in branch.Parents.Rows)
+        {
+            if (row["join_key"] is G4NullValue) continue;
+            if (row["join_key"] is not G4DecimalValue { Precision: 10, Scale: 2 } key || key.Lexical is null
+                || row["org_id"].Lexical != context.Scope.OrganizationId || row["site_id"].Lexical != context.Scope.SiteIds.Single()) throw Invalid();
+            // UTC 仅来自已发布的 Etc/UTC 解释，向 Doris 的 DATETIME 参数反投影为无时区时间。
+            var window = (decimal.Parse(key.Lexical, CultureInfo.InvariantCulture), Local(row["valid_from"]), Local(row["valid_to"]));
+            if (window.Item2 >= window.Item3) throw Invalid();
+            if (!windows.Add(window)) continue;
+            // 发布后目标集合可能变大，每个实际父窗口在展开第一条边之前重核十条限额。
+            var children = await ReadPlanAsync(connection, context.Scope, null, window, allowSentinel: true);
+            if (children.Count > 10) throw new SemanticOperationException(503, "query_source_budget_exhausted");
+            foreach (var child in children)
+            {
+                // 本任务对象的完整物理键已核实包含固定的 org_id、site_id。
+                var id = (string)child["target_id"]!;
+                if (candidates.TryGetValue(id, out var previous) && !previous.SequenceEqual(child))
+                    throw new SemanticOperationException(503, "query_source_indeterminate");
+                candidates[id] = child;
+                if (candidates.Count > 1000) throw new SemanticOperationException(503, "query_source_budget_exhausted");
+            }
+        }
+        return candidates.Values.OrderBy(row => (DateTime)row["event_at"]!).ThenBy(row => (string)row["target_id"]!, StringComparer.Ordinal).ToList();
+    }
+
+    /// <summary>只反解本版本精确到六位微秒的 UTC 结果。</summary>
+    private static DateTime Local(G4QueryValue value) =>
+        value is G4UtcValue && DateTime.TryParseExact(value.Lexical, "yyyy-MM-dd'T'HH:mm:ss.ffffff'Z'",
+            CultureInfo.InvariantCulture, DateTimeStyles.None, out var local) ? local : throw Invalid();
 
     /// <summary>按精确源类型生成封闭的 G4 标量；空值保留非空类型。</summary>
     private static G4QueryValue Scalar(object? raw, CatalogField field, MappingTemporalSpec temporal)
@@ -122,10 +180,11 @@ internal static class DorisQueryReader
 
     /// <summary>在上层已核准的同一物理连接上执行唯一的参数化数据命令。</summary>
     internal static async Task<List<Dictionary<string, object?>>> ReadPlanAsync(MySqlConnection connection,
-        ResourceScope scope, string? externalId, (decimal Key, DateTime Start, DateTime End)? parent)
+        ResourceScope scope, string? externalId, (decimal Key, DateTime Start, DateTime End)? parent,
+        bool fullTarget = false, bool allowSentinel = false)
     {
         // 模板只由本次读取实体或目标的固定分支选择。
-        var template = parent.HasValue ? TargetSql : EntitySql;
+        var template = fullTarget ? TargetSampleSql : parent.HasValue ? TargetSql : EntitySql;
         await using var command = new MySqlCommand(template, connection);
         command.Parameters.Add("@org", MySqlDbType.VarChar).Value = scope.OrganizationId;
         command.Parameters.Add("@site", MySqlDbType.VarChar).Value = scope.SiteIds.Single();
@@ -135,7 +194,7 @@ internal static class DorisQueryReader
             command.Parameters.Add("@start", MySqlDbType.DateTime).Value = relation.Start;
             command.Parameters.Add("@end", MySqlDbType.DateTime).Value = relation.End;
         }
-        else command.Parameters.Add("@external", MySqlDbType.VarChar).Value = (object?)externalId ?? DBNull.Value;
+        else if (!fullTarget) command.Parameters.Add("@external", MySqlDbType.VarChar).Value = (object?)externalId ?? DBNull.Value;
         Activity.Current?.AddEvent(new ActivityEvent("doris.plan.submitted", tags: new ActivityTagsCollection
         {
             { "thread", connection.ServerThread },
@@ -147,7 +206,7 @@ internal static class DorisQueryReader
         {
             while (await rows.ReadAsync(CancellationToken.None))
             {
-                if (result.Count >= 100) throw new SemanticOperationException(422, "query_source_row_budget");
+                if (!allowSentinel && result.Count >= 100) throw new SemanticOperationException(422, "query_source_row_budget");
                 if (rows.GetString(0) != scope.OrganizationId || rows.GetString(1) != scope.SiteIds[0])
                     throw new SemanticOperationException(403, "query_source_forbidden");
                 // 保留驱动实际的 decimal、无时区时间及空值，业务映射另行解释。

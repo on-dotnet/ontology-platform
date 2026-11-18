@@ -199,7 +199,7 @@ def configure():
 
 
 HOST = OUT/'s1-api-process.json'
-BROWSER = ('provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog')
+BROWSER = ('provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog','s2-doris-mapping','s2-doris-queries','s2-doris-null','s2-doris-cancel','s2-doris-access','s2-doris-fanout','s2-doris-requalify')
 
 
 def runtime_binding():
@@ -231,6 +231,8 @@ def browser_test(mode, prepared):
     vm.demand(dependency_path.is_relative_to(ROOT/'artifacts/workflow'/vm.TASK/'environment'),'S1_ENVIRONMENT_PATH')
     dep=json.loads(dependency_path.read_bytes())
     vm.demand((dep['taskId'],dep['worktree'],dep['status'])==(vm.TASK,str(ROOT),'DEPENDENCIES_READY'),'S1_ENVIRONMENT')
+    from workflow_doris_s0_fixture import STRESS
+    vm.demand(STRESS.exists()==(mode=='s2-doris-cancel'),'PRODUCT_STRESS_ISOLATION')
     live_stack()
     snapshot=freeze_api()
     dll=ROOT/snapshot['directory']/'OntologyPlatform.Api.dll'
@@ -302,26 +304,32 @@ def browser_test(mode, prepared):
             execution.CONTEXT.reset(context)
 
 
-def synthetic_grants(mode):
+def synthetic_grants(mode, two_tables=False):
     from workflow_m4_query import grant_transaction
-    state=json.loads((OUT/'runtime-fixture.json').read_bytes())
+    state=json.loads((OUT/('doris-two-table.json' if two_tables else 'runtime-fixture.json')).read_bytes())
     roles=state['subjects']
     vm.demand(state['taskId']==vm.TASK and state['runId']==vm.RUN and state['scope']==dict(organizationId='org-demo',siteIds=['site-a'])
               and set(roles)=={'operator','auditor','activator','reader'} and len(set(roles.values()))==4,'S1_GRANT_SCOPE')
     catalog=state['catalog']
     vm.demand(catalog['connectionId']==state['connectionId'] and catalog['status']=='READY','S1_GRANT_CATALOG')
-    table=next(t for t in catalog['objects'] if t['schema']=='fixture' and t['name']=='dmq_entity' and t['kind']=='TABLE')
-    fields=sorted(table['fields'],key=lambda f:f['ordinal'])
-    names='org_id site_id entity_id join_key amount unit_code valid_from valid_to event_at observed_at'.split()
-    vm.demand([(f['ordinal'],f['name']) for f in fields]==list(enumerate(names,1)),'S1_GRANT_FIELDS')
-    base='fixture/dmq_entity'
+    tables={'dmq_entity':'org_id site_id entity_id join_key amount unit_code valid_from valid_to event_at observed_at'.split()}
+    if two_tables: tables['dmq_target']='org_id site_id target_id join_key valid_from valid_to event_at observed_at'.split()
+    objects=[]
+    field_refs=[]
+    for name,columns in tables.items():
+        table=next(t for t in catalog['objects'] if t['schema']=='fixture' and t['name']==name and t['kind']=='TABLE')
+        fields=sorted(table['fields'],key=lambda f:f['ordinal'])
+        vm.demand([(f['ordinal'],f['name']) for f in fields]==list(enumerate(columns,1)),'DORIS_GRANT_FIELDS')
+        base='fixture/'+name
+        objects.append(base)
+        field_refs.extend(f"{base}/{f['ordinal']}/{f['name']}" for f in fields)
     perms={'operator':['mapping.read','mapping.source.validate','mapping.edit','mapping.validate','mapping.submit'],
            'auditor':['mapping.read','mapping.source.validate','mapping.review','mapping.approve'],
            'activator':['mapping.read','mapping.source.validate','mapping.activate']} if mode=='mapping' else {
                'reader':['data.query.execute','data.query.result.read','data.query.evidence.read']}
     def id_for(subject,permission):
-        return 'dmq-s1-'+execution.sha(execution.encoded([state['connectionId'],subject,permission]))[:32]
-    sql,ids=grant_transaction(state,[base],[f"{base}/{f['ordinal']}/{f['name']}" for f in fields],
+        return ('dmq-s2-' if two_tables else 'dmq-s1-')+execution.sha(execution.encoded([state['connectionId'],subject,permission]))[:32]
+    sql,ids=grant_transaction(state,objects,field_refs,
                               [(roles[role],permissions) for role,permissions in perms.items()],id_for,vm.RUN)
     cid=live_stack()['platform-pg']
     result=execution.run(['docker','--context','desktop-linux','exec','-i',cid,'psql','-U','postgres','-d','mapping','-v','ON_ERROR_STOP=1','-qAt'],
@@ -355,6 +363,158 @@ def source_scan_snapshot():
 
 
 
+def permission_case(action):
+    import re
+    verb,kind=action.split('-')
+    permission={'execute':'data.query.execute','result':'data.query.result.read','evidence':'data.query.evidence.read'}[kind]
+    state=json.loads((OUT/'doris-two-table.json').read_bytes())
+    subject=state['subjects']['reader']
+    vm.demand(state['taskId']==vm.TASK and state['runId']==vm.RUN and state['scope']==dict(organizationId='org-demo',siteIds=['site-a'])
+              and re.fullmatch('[a-f0-9-]{32,36}',subject) and re.fullmatch('[a-f0-9]{32}',state['connectionId']),'S2_GRANT_IDENTITY')
+    digest=execution.sha(execution.encoded([state['connectionId'],subject,permission]))[:32]
+    ids=[f'dmq-s1-{digest}',f'dmq-s2-{digest}']
+    pred='"Id" IN ('+','.join("'"+id+"'" for id in ids)+') AND "SubjectId"='+repr(subject)+' AND "Permission"='+repr(permission)
+    active=OUT/('s2-grant-active-'+kind+'.json')
+    cid=live_stack()['platform-pg']
+    if verb=='revoke':
+        vm.demand(not active.exists(),'GRANT_CONTROL_ALREADY_ACTIVE')
+        import datetime
+        stamp=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='microseconds')
+        row=dict(platform=cid,permission=permission,ids=ids,stamp=stamp)
+        record(active,row)
+        eligible='"RevokedAtUtc" IS NULL'
+        change="'"+stamp+"'::timestamptz"
+    else:
+        row=json.loads(active.read_bytes())
+        vm.demand(row['platform']==cid and ids==row['ids'] and permission==row['permission']
+                  and re.fullmatch('[0-9T:+.-]{20,35}',row['stamp']),'GRANT_CONTROL_OWNERSHIP')
+        eligible='"RevokedAtUtc"='+repr(row['stamp'])+'::timestamptz'
+        change='NULL'
+    # 同一事务锁定准确的两条本任务授权，状态或到期变化均阻断，保留原始失败凭据。
+    query=f"""BEGIN; SET LOCAL statement_timeout='3s';
+      DO $$ DECLARE total int; BEGIN
+        UPDATE governance."MappingAuthorizationGrants" SET "RevokedAtUtc"={change} WHERE {pred} AND {eligible} AND "ExpiresAtUtc">now();
+        GET DIAGNOSTICS total=ROW_COUNT; IF total<>2 THEN RAISE EXCEPTION 'fixture-grant-count'; END IF;
+      END $$;
+      INSERT INTO governance.audit_records ("Id","OccurredAtUtc","Actor","Action","Resource","Outcome","TraceId","CorrelationId","OrganizationId","ScopeSiteIds","SiteId")
+        SELECT md5("Id"||clock_timestamp()::text),now(),'synthetic-query-fixture','mapping.grant.change',"Id",'allowed','dmq-permission','dmq-permission','org-demo',ARRAY['site-a'],NULL
+        FROM governance."MappingAuthorizationGrants" WHERE {pred};
+      COMMIT;"""
+    result=execution.run(['docker','--context','desktop-linux','exec','-i',cid,'psql','-XwqAt','-U','postgres','-d','mapping','-v','ON_ERROR_STOP=1'],
+                         ROOT,task=vm.TASK,run_id=vm.RUN,stage='dmq-'+action,stdin=query.encode(),input_key=execution.sha(query.encode()),timeout=12)
+    vm.demand(result.returncode==0,'GRANT_CONTROL_'+result.receipt['commandId'])
+    row[verb+'CommandId']=result.receipt['commandId']
+    if verb=='restore':
+        record(OUT/('s2-grant-restored-'+kind+'-'+result.receipt['commandId']+'.json'),row)
+        active.unlink()
+    else: record(active,row)
+    print(json.dumps(dict(action=action,count=2,commandId=result.receipt['commandId'])))
+
+
+def relation_fixture(restore=False):
+    from workflow_doris_mapping_query import REFERENCE_SQL,reference_targets
+    from workflow_doris_s0_fixture import stress_original
+    state=json.loads((OUT/'doris-two-table.json').read_bytes())
+    vm.demand(len(state['mappingRelease']['manifest']['mapping']['entities'])==2 and state['mappingReceipt']['activationId']
+              and json.loads(HOST.read_bytes())['status']=='EXITED','S2_ACTIVATION_REQUIRED')
+    fe=live_stack()['fe']
+    active=OUT/'s2-boundary-active.json'
+    where="org_id='org-demo' AND site_id='site-a'"
+    old_ids=('T1','T2','T3')
+    added=('T4','T5','T6')
+    actual=sql(fe,'reader','SELECT target_id FROM fixture.dmq_target ORDER BY target_id;').splitlines()
+    original=stress_original(fe,'dmq_target','target_id',old_ids)
+    if restore:
+        previous=json.loads(active.read_bytes())
+        vm.demand(previous['fe']==fe and previous['before']==original and actual==list(old_ids+added),'S2_BOUNDARY_RESTORE_INPUT')
+        sql(fe,'root',"DELETE FROM fixture.dmq_target WHERE "+where+" AND target_id IN ('T4','T5','T6');")
+        vm.demand(sql(fe,'reader','SELECT target_id FROM fixture.dmq_target ORDER BY target_id;').splitlines()==list(old_ids)
+                  and stress_original(fe,'dmq_target','target_id',old_ids)==original,'S2_BOUNDARY_RESTORE')
+        previous.update(status='RESTORED',after=original)
+        record(OUT/('s2-boundary-restored-'+secrets.token_hex(6)+'.json'),previous)
+        active.unlink()
+        print('S2_BOUNDARY_RESTORED')
+        return
+    vm.demand(not active.exists() and actual==list(old_ids),'S2_BASELINE')
+    baseline=dict(fe=fe,activation=state['mappingReceipt']['activationId'],before=original,added=added,status='PREPARED')
+    record(active,baseline)
+    # T5 和 T6 与实体区间左右端点恰好相接；NULL 只属于独立的发布后查询与拒绝场景。
+    sql(fe,'root',"""INSERT INTO fixture.dmq_target VALUES
+        ('org-demo','site-a','T4',NULL,'2026-11-01','2026-12-01','2026-11-17 12:00:00.123456','2026-11-17 12:00:01.123456'),
+        ('org-demo','site-a','T5',1.000,'2026-10-01','2026-11-01','2026-10-17 12:00:00.123456','2026-10-17 12:00:01.123456'),
+        ('org-demo','site-a','T6',1.000,'2026-12-01','2027-01-01','2026-12-17 12:00:00.123456','2026-12-17 12:00:01.123456');""")
+    entity=sql(fe,'reader',"SELECT org_id,site_id,join_key,valid_from,valid_to FROM fixture.dmq_entity WHERE "+where+" AND entity_id='E1';").split('\t')
+    targets=[r.split('\t') for r in sql(fe,'reader',"SELECT target_id,org_id,site_id,join_key,valid_from,valid_to FROM fixture.dmq_target ORDER BY target_id;").splitlines()]
+    for r in targets:
+        if r[3]=='NULL': r[3]=None
+    ref=reference_targets(entity,targets)
+    server=sql(fe,'reader',REFERENCE_SQL+';').splitlines()
+    vm.demand(len(targets)==6 and server==ref==['T1','T2'] and original==stress_original(fe,'dmq_target','target_id',old_ids),'S2_INDEPENDENT_TARGETS')
+    baseline.update(status='ACTIVE_VERIFIED',referenceIds=server,coefficientIds=ref,rows=targets,scopeEntity=entity)
+    record(active,baseline)
+    record(OUT/('s2-boundary-reference-'+secrets.token_hex(6)+'.json'),baseline)
+    print('S2_BOUNDARY_REFERENCE',','.join(server))
+
+
+def fanout_fixture(action):
+    """在已发布任务夹具中独立枚举十与十一条边，按准确复合键复原。"""
+    from workflow_doris_mapping_query import REFERENCE_SQL
+    from workflow_doris_s0_fixture import stress_original
+    state = json.loads((OUT/'doris-two-table.json').read_bytes())
+    vm.demand(state['taskId'] == vm.TASK and state['runId'] == vm.RUN and state['mappingReceipt']['activationId'], 'FANOUT_ACTIVATION')
+    fe = live_stack()['fe']
+    current = OUT/'s2-fanout-active.json'
+    original = ['T1', 'T2', 'T3']
+    added = ['Fan' + str(i) for i in range(1, 10)]
+    scope = "org_id='org-demo' AND site_id='site-a'"
+    def current_keys():
+        return sql(fe, 'reader', 'SELECT target_id FROM fixture.dmq_target ORDER BY target_id;').splitlines()
+    before = stress_original(fe, 'dmq_target', 'target_id', original)
+    if action == 'ten':
+        vm.demand(not current.exists() and current_keys() == original, 'FANOUT_BASELINE')
+        ledger = dict(taskId=vm.TASK, runId=vm.RUN, attempt=secrets.token_hex(6), fe=fe,
+                      activation=state['mappingReceipt']['activationId'], before=before, added=added)
+        record(current, ledger)
+    else:
+        ledger = json.loads(current.read_bytes())
+        vm.demand(ledger['fe'] == fe and ledger['added'] == added and ledger['before'] == before
+                  and ledger['activation'] == state['mappingReceipt']['activationId'], 'FANOUT_OWNER')
+    if action == 'restore':
+        keys = current_keys()
+        vm.demand(set(original) <= set(keys) <= set(original + added), 'FANOUT_RESTORE_KEYS')
+        owned = [key for key in added if key in keys]
+        if owned:
+            literals = ','.join(repr(key) for key in owned)
+            sql(fe, 'root', f'DELETE FROM fixture.dmq_target WHERE {scope} AND target_id IN ({literals});')
+        after = stress_original(fe, 'dmq_target', 'target_id', original)
+        vm.demand(current_keys() == original and before == after, 'FANOUT_RESTORE')
+        ledger.update(after=after, status='RESTORED', removed=owned)
+        record(OUT/('s2-fanout-' + ledger['attempt'] + '-restored.json'), ledger)
+        current.unlink()
+        return ledger
+    if action == 'eleven':
+        vm.demand(current_keys() == sorted(original + added[:8]), 'FANOUT_TEN_REQUIRED')
+    new_ids = added[:8] if action == 'ten' else added[8:]
+    values = ','.join("('org-demo','site-a'," + repr(key) + ",1.000,'2026-11-01','2026-12-01','2026-11-17 12:00:00.123456','2026-11-17 12:00:01.123456')" for key in new_ids)
+    sql(fe, 'root', 'INSERT INTO fixture.dmq_target VALUES ' + values + ';')
+    expected = sorted(original[:2] + (added[:8] if action == 'ten' else added))
+    independent = sql(fe, 'reader', REFERENCE_SQL + ';').splitlines()
+    vm.demand(independent == expected and current_keys() == sorted(expected+['T3']), 'FANOUT_SQL_REFERENCE')
+    ledger[action] = independent
+    record(current, ledger)
+    return dict(phase=action, expected=expected)
+
+
+def cancellation_case(prepared):
+    from workflow_doris_s0_fixture import STRESS,stress_fixture
+    vm.demand(not STRESS.exists(),'S2_SEPARATE_STRESS_REQUIRED')
+    try:
+        stress_fixture(platform=True)
+        browser_test('s2-doris-cancel',prepared)
+    finally:
+        if STRESS.exists(): stress_fixture(restore=True,platform=True)
+
+
 def pg_golden(prepared):
     from workflow_m2_evidence import mtp
     path=execution.ordinary(Path(prepared).absolute())
@@ -376,10 +536,22 @@ def pg_golden(prepared):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('stage',choices=['prepare','render','start','configure','freeze','pg-golden','mapping-grants','query-grants',*BROWSER])
+    parser.add_argument('stage',choices=['prepare','render','start','configure','freeze','pg-golden','s2-cancel-case','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
     parser.add_argument('--prepared')
+    parser.add_argument('--permission',choices=[f'{v}-{k}' for v in ('revoke','restore') for k in ('execute','result','evidence')])
+    parser.add_argument('--fanout', choices=['ten','eleven','restore'])
     args=parser.parse_args()
-    if args.stage in BROWSER: browser_test(args.stage,args.prepared)
+    if args.stage == 's2-doris-fanout':
+        vm.demand(not (OUT/'s2-fanout-active.json').exists(), 'FANOUT_ALREADY_ACTIVE')
+        try:
+            browser_test(args.stage, args.prepared)
+        finally:
+            if (OUT/'s2-fanout-active.json').exists(): fanout_fixture('restore')
+    elif args.stage in BROWSER: browser_test(args.stage,args.prepared)
+    elif args.stage in ('s2-boundary','s2-restore'): relation_fixture(args.stage=='s2-restore')
+    elif args.stage=='fanout': print(json.dumps(fanout_fixture(args.fanout)))
+    elif args.stage=='permission': permission_case(args.permission)
+    elif args.stage=='s2-cancel-case': cancellation_case(args.prepared)
     elif args.stage=='pg-golden': pg_golden(args.prepared)
-    elif args.stage.endswith('-grants'): synthetic_grants(args.stage.split('-')[0])
+    elif args.stage.endswith('-grants'): synthetic_grants(args.stage.split('-')[-2],args.stage.startswith('s2-'))
     else: {'prepare':prepare,'render':render,'start':start,'configure':configure,'freeze':freeze_api}[args.stage]()

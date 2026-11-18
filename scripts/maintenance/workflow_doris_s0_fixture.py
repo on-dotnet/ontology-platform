@@ -380,10 +380,21 @@ def fixed_fixture(restore=False):
     print(result.relative_to(vm.ROOT))
 
 
-def stress_resources(state):
+def stress_resources(state, platform=False):
     """记录当前用量和容器历史高水位，在卷上独立预留本次短时写入的空间。"""
     live = docker('stress-live','ps','--no-trunc','-q').splitlines()
-    vm.demand(set(live)=={s['id'] for s in state['services'].values()},'STRESS_EXCLUSIVE_SOURCE')
+    if platform:
+        from workflow_doris_s1 import HOST, live_stack
+        approved=live_stack()
+        vm.demand(json.loads(HOST.read_bytes())['status']=='EXITED' and set(live)==set(approved.values()),'STRESS_PLATFORM_IDLE')
+        capacity=sum(int(docker('stress-quota','inspect','-f','{{.HostConfig.Memory}}',cid)) for cid in live)
+        vm.demand(capacity==int(14.25*vm.GIB) and int(docker('stress-vm','info','-f','{{.MemTotal}}'))>=capacity+2*vm.GIB,'STRESS_PLATFORM_HEADROOM')
+        active=docker('stress-drain','exec',approved['platform-pg'],'psql','-XwqAt','-U','postgres','-d','mapping','-c',
+                      """SELECT (SELECT count(*) FROM connections."MappingJobs" WHERE "Status" IN ('QUEUED','RUNNING'))
+                                   +(SELECT count(*) FROM semantic_query."Queries" WHERE "ExecutionStatus"='RUNNING');""")
+        vm.demand(active=='0','STRESS_INFLIGHT_WORK')
+    else:
+        vm.demand(set(live)=={s['id'] for s in state['services'].values()},'STRESS_EXCLUSIVE_SOURCE')
     facts = {}
     for role,svc in state['services'].items():
         check = docker('stress-owner','inspect','-f','{{.Id}} {{.Image}} {{index .Config.Labels "ontology.task"}} {{index .Config.Labels "ontology.run"}} {{.State.Health.Status}} {{.HostConfig.Memory}}',svc['id']).split()
@@ -424,12 +435,12 @@ def stress_binding(state):
                 rowsPerTable=65536,purpose='cancellation_only')
 
 
-def stress_fixture(restore=False):
+def stress_fixture(restore=False, platform=False):
     """在唯一台账保护下临时扩充这两张合成表；与正式一百行门禁互斥。"""
     state = json.loads(INDEX.read_bytes())
     vm.demand(not SHAPE.exists() and state['project']==PROJECT and state['runId']==vm.RUN and state['taskId']==vm.TASK and
               not (vm.OUTPUT/'s0-fixed-fixture-active.json').exists(),'STRESS_FIXTURE_SCOPE')
-    resources = stress_resources(state)
+    resources = stress_resources(state,platform)
     fe = state['services']['fe']['id']
     ready_source(fe)
     if restore:
@@ -482,7 +493,7 @@ def stress_fixture(restore=False):
             entry['inserted'] = count
         record(STRESS,manifest)
     manifest['status'] = 'RESTORED' if restore else 'SEEDED'
-    manifest[manifest['status'].lower()+'Resources'] = stress_resources(state)
+    manifest[manifest['status'].lower()+'Resources'] = stress_resources(state,platform)
     record(STRESS,manifest)
     path = vm.OUTPUT/('s0-stress-fixture-'+manifest['attempt']+'-'+manifest['status'].lower()+'.json')
     record(path,manifest)
@@ -672,7 +683,7 @@ def stop():
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('stage',choices=['create','resume','capabilities','driver-types','driver-cancel',
-                        'stress-seed','stress-restore','driver-stress-entity','driver-stress-target','driver-ac11',
+                        'stress-seed','stress-restore','s2-stress-seed','s2-stress-restore','driver-stress-entity','driver-stress-target','driver-ac11',
                         'driver-model-reject','driver-type-reject',
                         'fixed-seed','fixed-restore','driver-fixed-values','driver-fixed-entity','driver-fixed-target','stop'])
     parser.add_argument('--prepared',type=Path)
@@ -685,4 +696,4 @@ if __name__=='__main__':
         raise SystemExit(driver(args.prepared,stage))
     {'create':create, 'resume':resume, 'capabilities':capabilities, 'fixed-seed':fixed_fixture,
      'fixed-restore':lambda:fixed_fixture(True), 'stress-seed':stress_fixture,
-     'stress-restore':lambda:stress_fixture(True), 'stop':stop}[stage]()
+     's2-stress-seed':lambda:stress_fixture(platform=True), 's2-stress-restore':lambda:stress_fixture(True,True), 'stress-restore':lambda:stress_fixture(True), 'stop':stop}[stage]()

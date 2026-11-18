@@ -1,7 +1,7 @@
 # G4-DORIS-MAPPING-QUERY-001｜Doris Mapping/Query 规格
 
 ## 当前执行与授权
-唯一执行状态：S1_IN_PROGRESS。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
+唯一执行状态：S2_IN_PROGRESS。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
 
 Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)列明的源、测试、最小任务注册和当前文档。历史PG规范字节、旧ZIP与私有设施为只读依赖。R0允许14个准确ID在保全、排空、恢复清单与非作者检查后优雅停止。用户随后手动调VM。当前其他旧KEEP受保护，本分支不合main。
 
@@ -9,17 +9,17 @@ Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-
 
 | AC-ID | 行为与正反Given/When/Then（完整场景见规格E） | 实现/测试位置 | 最早验证层/结果 |
 |---|---|---|---|
-| AC01 | 已发布且完整授权则查询成功；错用途/未发布拒绝 | MappingValidationService/QueryBindingReader，DorisMappingQueryTests（拟新增） | 正式发布+真实Doris，NOT_RUN |
-| AC02 | decimal同值异scale连边；不等/NULL不连 | DorisQueryReader（拟新增）/G4QueryTests | SQL独立预期，NOT_RUN |
-| AC03 | 全集唯一身份可发布；身份碰撞/未知表模型拒绝 | DorisMappingSourceValidator（拟新增） | 源真实行，NOT_RUN |
-| AC04 | 当前授权有效可提交；撤权/轮换先提交无成功副作用 | G4QueryAuthorizationTests/G4QueryRaceTests | 独立连接因果链，NOT_RUN |
+| AC01 | 已发布且完整授权则查询成功；错用途/未发布拒绝 | MappingValidationService/QueryBindingReader，DorisMappingQueryTests（拟新增） | 正式四角色单表及双表发布均已运行，正例通过 |
+| AC02 | decimal同值异scale连边；不等/NULL不连 | DorisQueryReader（拟新增）/G4QueryTests | 独立 SQL 与整数系数参考、正式关系查询同得 T1/T2 |
+| AC03 | 全集唯一身份可发布；身份碰撞/未知表模型拒绝 | DorisMappingSourceValidator（拟新增） | S0 模型拒绝通过，S1 不支持的外部身份拒绝，余项待验 |
+| AC04 | 当前授权有效可提交；撤权/轮换先提交无成功副作用 | G4QueryAuthorizationTests/G4QueryRaceTests | 正式撤权后拒绝通过，源读后提交前变更待验 |
 | AC05 | 元数据兼容可用；列/模型变化旧批准拒绝 | QueryBindingReader/新Doris测试 | 源目录，NOT_RUN |
-| AC06 | 完成读取正常返回；取消/断开不得EMPTY或迟到成功 | G4QueryHttpTests/新Doris测试 | 源端取消，NOT_RUN |
+| AC06 | 完成读取正常返回；取消/断开不得EMPTY或迟到成功 | G4QueryHttpTests/新Doris测试 | 固定源 SQL 通过；正式 HTTP 取消返回 409，NO-GO |
 | AC07 | 当前activation可提交；同query ABA拒绝 | G4QueryRaceTests | 两正式参与者，NOT_RUN |
-| AC08 | 新会话恢复原字节；撤权/到期拒绝且不业务重查 | G4QueryPersistenceTests | 真实平台PG，NOT_RUN |
+| AC08 | 新会话恢复原字节；撤权/到期拒绝且不业务重查 | G4QueryPersistenceTests | 新会话原字节恢复、执行与读取撤权拒绝通过；到期待验 |
 | AC09 | 六态/可信前缀正确；超预算无COMPLETED | G4QueryTests/G4QueryWireTests | 实际deadline，NOT_RUN |
-| AC10 | HTTP/UI/MCP相同结果；PG旧字节不变 | G4QueryMcpTests/既有Web测试 | 正式消费者，NOT_RUN |
-| AC11 | 分别读取记录真实窗口；不盖虚假snapshot | 新Doris测试 | 最短版本探针，NOT_RUN |
+| AC10 | HTTP/UI/MCP相同结果；PG旧字节不变 | G4QueryMcpTests/既有Web测试 | PG 两组历史 manifest/result 与 standard assessment 通过，UI/MCP 待验 |
+| AC11 | 分别读取记录真实窗口；不盖虚假snapshot | 新Doris测试 | S0 受控写入与 S1 UNKNOWN/null 已核验 |
 
 ## Plan：最早真实风险路径
 
@@ -31,9 +31,9 @@ Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-
 |---|---|---|---|---|
 | A | 精确工程main更新 | Master，既有主树 | 原件/祖先/握手/回读 | COMPLETE，包外机器回执 |
 | B | 唯一规格和独立审查 | Master，owned_paths | 文档轻量核对 | COMPLETE，静态可交裁决 |
-| S1 | 单表发布/读取/恢复 | Master，规格C2/F2 | AC01/04/06/08/11 | NOT_RUN，待R0/S0放行 |
-| S2 | 双表精度/模型/并发 | Master，同上 | AC02/03/05/07/09 | NOT_RUN，待R0/S0放行 |
-| S3 | UI/MCP/PG兼容/最终V3 | Master，同上 | AC10/受影响门禁 | NOT_RUN，待R0/S0放行 |
+| S1 | 单表发布/读取/恢复 | Master，规格C2/F2 | AC01/04/06/08/11 | GO_TO_S2，单表切片已复核，正式在途取消见 AC06 |
+| S2 | 双表精度/模型/并发 | Master，同上 | AC02/03/05/07/09 | 双表发布、关系、NULL、当前权限已有原件；AC06 NO-GO |
+| S3 | UI/MCP/PG兼容/最终V3 | Master，同上 | AC10/受影响门禁 | UI/MCP 待 S2 放行，PG 历史字节已核验 |
 
 ## Verify与恢复
 
@@ -90,3 +90,15 @@ Docker 引擎实读 20964958208 字节（19.525 GiB）、12 CPU。旧 14 个原�
 ## S0 非作者放行与 S1 准入（2026-11-19）
 
 固定计划的独立取消压力验证在两表各 65,536 行时进行，随后恢复原行及散列。最终构建七项定向 MTP 各 1/1，正常成功门禁仍为每表最多 100 行。实体、关系从请求到最晚清理分别为 4.7634、3.7644 ms。实际同名表模型及类型反例被拒绝，两个负例都恢复原 tablet。AC11 在两次正式读之间有独立已提交写入，微秒时区解释明确，水位仍为 UNKNOWN/null。非作者批准进入 S1。源证据不能代替正式产品发布与恢复。[原件索引与独立结论](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-qualified-review.json)及[定向验收](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s0-qualified-validation.json)。
+
+## S1 单表放行与 S2 正式取消复核（2026-11-19）
+
+从 M5 平台 PG 的只读原卷制作私有隔离副本，原镜像只核对指定历史行 `ma-ace12515d7804af2870f2a434c167951`。其 2,509 个规范字节与历史 ContentHash 和 golden 逐字节一致，SHA-256 为 `b97c13b97057f7fb5c0c9119aaa0b0a0f3db9525e87dc53e5bbdb263c03e7665`。standard 与 numeric 两组 manifest/result 的定向 MTP 为 2/2，零跳过。强后验核实两个临时容器与临时卷均已回收，原库保持原停止时间，当前六服务均在运行。[隔离核验与源身份](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/pg-standard-assessment-origin.json)及[资源后验](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s1/pg-golden-postcheck-f23591fea356468097da52c352bcfe89.json)。
+
+正式发布后 Q 读到 E1、9007199254740993.20 K 与六位微秒。重新启动 API、建立新 OIDC 会话，恢复结果 SHA-256 为 `29dbbfbb1fc4a232477fa47806d53f6a8c1eaa23a2e7516d255a52627ce0e3a0`。FE 独立阳性对照增加一次业务读，四个恢复观测均为 22 次并具有相同 QueryId 集合。[S1 非作者放行](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s1-qualified-review.json)。
+
+S2 已通过双表正式发布与激活。SQL 与整数系数参考及 Q 的实读均得到 T1、T2，T3 不等、T4 为 NULL、T5/T6 恰好相接均被排除。另起评估包含 T4 的两表，收到 `mapping_relation_endpoint_unknown`。三项现行授权逐项撤销并准确恢复；拒绝执行前后 FE 业务读数均为 32，历史结果恢复字节相同。[S2 原件索引](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2/index.json)。
+
+正式取消试验的 BE 执行窗口为 7.527 ms，取消接口返回 409 `query_already_finished`，原查询成功提交并留有一次成功审计。两表压力数据随后按准确键及原行散列复原。非作者裁决 AC06 NO-GO。现有两秒心跳晚于一秒源分支期限，持久化 fence 保护和源端及时终止须分别核准。250 ms 清理、1 秒分支、5 秒总预算继续生效。V3 小样测量因两个用户未跟踪文件触发 DIRTY_TREE，待选择测量检出方式。S3 长链与最终打包尚未开始。
+
+第 10→11 个关系目标的真实反例暴露两处缺陷。查询展开增加了逐父检查后，第 10 条仍完整返回，第 11 条使结果变为 PARTIAL，只保留可信的根实体。Mapping 原先用词法比较 1.00 与 1.000，两侧计数都为零，错误返回 READY_FOR_PROPOSAL。旧评估和短定位命令均已保留。限定 Doris 精确十进制比较、独立从目标侧对账后，四个正式主体重新执行双表发布与激活，得到 release-1511432536e64f64b652b5f250661ff1。重验得到 T1/T2、NULL 拒绝、授权拒绝前后业务读数 46→46，以及 11 条时 mapping_fanout_exceeded 和 active 404。两次扇出场景均按九个准确键复原，原行散列相同。[修正前后及复原原件](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2/index.json)。

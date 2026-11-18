@@ -1,6 +1,5 @@
 """Doris 合成设施的固定建表输入与独立参考预期，供后续正式消费者使用。"""
 from datetime import datetime, timezone
-from decimal import Decimal
 
 
 def s0_consumers(root, task, phase):
@@ -72,10 +71,17 @@ ORDER BY t.target_id"""
 
 def reference_targets(entity, targets):
     """对独立夹具元组按范围、精确数值和半开区间计算预期；不读产品输出。"""
+    def coefficient(text):
+        integer,_,fraction=text.partition('.')
+        return int(integer+fraction), len(fraction)
+    def equal(left,right):
+        a,s=coefficient(left)
+        b,t=coefficient(right)
+        return a*10**t==b*10**s
     org, site, key, start, end = entity
     return sorted(identity for identity, target_org, target_site, target_key, first, last in targets
                   if (org, site) == (target_org, target_site) and key is not None and target_key is not None
-                  and Decimal(key) == Decimal(target_key) and start < last and first < end)
+                  and equal(key, target_key) and start < last and first < end)
 
 
 def fixture_instant(local):

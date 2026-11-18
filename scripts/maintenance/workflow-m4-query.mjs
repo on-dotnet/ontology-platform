@@ -19,11 +19,12 @@ if (integration && !["standard", "numeric", "safety", "aba"].includes(scenario))
 const moduleName = doris ? "workflow_doris_s1" : integration ? "workflow_m5_integration" : "workflow_m4_query";
 const scenarioCode = integration ? `q.scenario("${scenario}");` : "";
 const privateName = doris ? ".tools/security/g4-doris-mapping-query-001" : integration ? ".tools/security/g4-m5-integration-001" : ".tools/security/g4-m4-query-001";
-const stateName = integration ? `scenario-${scenario}.json` : "runtime-fixture.json";
+const twoTable = doris && argument("mode").startsWith("s2-doris-");
+const stateName = twoTable ? "doris-two-table.json" : integration ? `scenario-${scenario}.json` : "runtime-fixture.json";
 const port = value => doris ? ({15441:15641,15442:15642,15443:15643,15444:15644,15445:19030,15446:15645,15447:15646,15448:15647})[value] : integration ? value + 100 : value;
 if (argument("task") !== task || argument("run-id") !== runId || await realpath(process.cwd()) !== root) throw new Error("QUERY_CONSUMER_BOUNDARY");
 const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/package.json"));
-if (doris && !["provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
+if (doris && !["provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
 if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
@@ -37,7 +38,7 @@ if (mode === "serve") {
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: port(15442),
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
+} else if (["s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -155,7 +156,14 @@ async function browserRun(mode) {
     check("distinct_oidc_subjects", operator.me.subjectId !== auditor.me.subjectId);
     let state;
     try { state = JSON.parse(await readFile(resolve(output, stateName), "utf8")); }
-    catch { state = { taskId: task, runId, ...(integration ? { scenario, s3: true, numeric: scenario === "numeric" } : {}), scope: { organizationId: "org-demo", siteIds: doris ? ["site-a"] : ["site-a", "site-b"] } }; }
+    catch (error) {
+      if (error.code !== "ENOENT") throw error;
+      if (twoTable) {
+        check("initial_two_table_mapping", mode === "s2-doris-mapping");
+        state = JSON.parse(await readFile(resolve(output, "runtime-fixture.json"), "utf8"));
+        check("single_table_baseline", state.latestQuery?.resultHash && state.mappingRelease?.manifest.mapping.entities.length === 1);
+        for (const key of Object.keys(state)) if (key.startsWith("mapping") || ["firstQuery","latestQuery"].includes(key)) delete state[key];
+      } else state = { taskId: task, runId, ...(integration ? { scenario, s3: true, numeric: scenario === "numeric" } : {}), scope: { organizationId: "org-demo", siteIds: doris ? ["site-a"] : ["site-a", "site-b"] } }; }
     check("fixture_identity", state.taskId === task && state.runId === runId);
     if (doris) {
       check("distinct_four_roles", new Set([operator,auditor,activator,reader].map(a => a.me.subjectId)).size === 4);
@@ -214,10 +222,25 @@ async function browserRun(mode) {
     }
     if (!doris) state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
     await save(state);
-    if (doris && ["mapping", "s1"].includes(mode)) {
+    if (mode === "s2-doris-requalify") {
+      if (!state.replacedDorisMapping) {
+        const previous = state.mappingReceipt;
+        check("known_original_release", previous?.mappingReleaseId === "release-a5f93d1137a04133a3fe1265642abed5" &&
+          state.mappingRelease.manifest.mapping.entities.length === 2 && Boolean(state.latestQuery));
+        const archive = "s2-before-exact-join-" + previous.mappingReleaseId + ".json";
+        await writeFile(resolve(output, archive), JSON.stringify(state, null, 2), { flag: "wx" });
+        state.replacedDorisMapping = { mappingId: previous.mappingId, releaseId: previous.mappingReleaseId, archive };
+        for (const key of Object.keys(state))
+          if (key.startsWith("mapping") || ["firstQuery", "latestQuery"].includes(key)) delete state[key];
+        await save(state);
+      }
+      mode = "s2-doris-mapping";
+    }
+    if (mode === "s2-doris-mapping") mode = "mapping";
+    if (doris && ["mapping", "s1","s2-doris-queries"].includes(mode)) {
       phase = "explicit_synthetic_grants";
       report.grants = JSON.parse(execFileSync("python3", ["-B", "scripts/maintenance/workflow_doris_s1.py",
-        mode === "mapping" ? "mapping-grants" : "query-grants"], { cwd: root, timeout: 30000, encoding: "utf8" }));
+        (twoTable ? "s2-" : "") + (mode === "mapping" ? "mapping-grants" : "query-grants")], { cwd: root, timeout: 30000, encoding: "utf8" }));
     }
     if (mode === "ready") {
       report.status = "PASS"; report.scope = "SCENARIO_PREREQUISITE_ONLY";
@@ -268,11 +291,115 @@ async function browserRun(mode) {
       await save(state);
       mode = "provision";
     }
-    if (doris && mode === "s1-key-negative") {
-      phase = "unsupported_identity_assessment";
+    if (mode === "s2-doris-fanout") {
+      phase = "fanout_after_activation";
+      const change = value => JSON.parse(execFileSync("python3", ["-B", "scripts/maintenance/workflow_doris_s1.py", "fanout", "--fanout", value],
+        { cwd: root, timeout: 40000, encoding: "utf8" }));
+      const traverse = () => request({ ...reader, headers: { ...reader.headers, "Idempotency-Key": randomUUID() } },
+        "POST", "/api/v1/data/semantic-queries", state.latestQuery.query);
+      const edgeIds = result => result.data.data.filter(x => x.kind === "relationship").map(x => x.target.identity.externalId).sort();
+      {
+        const ten = change("ten");
+        const complete = await traverse();
+        check("all_ten_edges_match_independent_sql", complete.data.status === "FOUND" && !complete.data.limited &&
+          JSON.stringify(edgeIds(complete)) === JSON.stringify(ten.expected));
+        const eleven = change("eleven");
+        const partial = await traverse();
+        check("eleventh_edge_rejected_before_expansion", eleven.expected.length === 11 && partial.data.status === "PARTIAL" &&
+          partial.data.data.some(x => x.kind === "entity") && edgeIds(partial).length === 0 &&
+          partial.data.subSources.some(x => x.status === "UNAVAILABLE" && !x.sourceReadReceiptId));
+        report.fanout = { ten: { queryId: complete.queryId, edges: edgeIds(complete) },
+          eleven: { queryId: partial.queryId, status: partial.data.status, expected: eleven.expected, edges: edgeIds(partial) } };
+        mode = "s2-doris-fanout-negative";
+      }
+    }
+    if (mode === "s2-doris-access") {
+      phase="current_authority";
+      const original=state.latestQuery;
+      const path="/api/v1/data/semantic-queries/"+original.queryId+"/result";
+      const read=await request(reader,"GET",path);
+      const evidence=read.data.evidence[0].evidenceId;
+      const change=action=>JSON.parse(execFileSync("python3",["-B","scripts/maintenance/workflow_doris_s1.py","permission","--permission",action],
+        {cwd:root,timeout:20000,encoding:"utf8"}));
+      report.grantEvents=[];
+      for (const kind of ["result","evidence","execute"]) {
+        report.grantEvents.push(change("revoke-"+kind));
+        try {
+          if(kind==="evidence") await request(reader,"GET","/api/v1/data/source-evidence/"+encodeURIComponent(evidence),undefined,403);
+          else await request(reader,"GET",path,undefined,403);
+          if(kind==="execute"){
+            const before=observed();
+            const denied=await request({...reader,headers:{...reader.headers,"Idempotency-Key":randomUUID()}},"POST","/api/v1/data/semantic-queries",original.query);
+            const after=observed();
+            check("no_source_rows_after_revocation",denied.data.status==="UNAUTHORIZED" && denied.data.data.length===0 && denied.data.evidence.length===0 &&
+              before.auditInode===after.auditInode && before.queryIdsSha256===after.queryIdsSha256);
+            report.denyScans={before,after};
+          }
+        } finally { report.grantEvents.push(change("restore-"+kind)); }
+      }
+      check("same_saved_bytes_after_regrant",(await request(reader,"GET",path)).raw===read.raw);
+      report.status="PASS";report.scope="DORIS_CURRENT_AUTHORITY";
+    } else if (mode === "s2-doris-cancel") {
+      phase="formal_cancel";
+      const {spawn}=await import("node:child_process");
+      const {createInterface}=await import("node:readline");
+      const key=randomUUID();
+      const monitor=spawn("python3",["-B","scripts/maintenance/doris_query_cancel_witness.py",key],{cwd:root,stdio:["ignore","pipe","ignore"]});
+      const lines=createInterface({input:monitor.stdout})[Symbol.asyncIterator]();
+      const next=async () => { const entry=await lines.next(); check("witness_event_"+report.checks.length,!entry.done); return JSON.parse(entry.value); };
+      try {
+        check("armed_witness",(await next()).event==="ready");
+        const capability=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");
+        const query={...state.latestQuery.query,capabilityId:capability.id,capabilityVersion:capability.version,relationshipIris:[],filters:{siteId:"site-a"}};
+        const begin=performance.now();
+        const running=request({...reader,headers:{...reader.headers,"Idempotency-Key":key}},"POST","/api/v1/data/semantic-queries",query,[200,403,409,422,503,504]);
+        const active=await next();
+        report.witness=active;
+        if(active.event!=="active"){await running;check("source_was_executing",false);}
+        const issued=Date.now();
+        const cancelled=await request(reader,"POST","/api/v1/data/semantic-queries/"+active.queryId+"/cancel",undefined,[200,409]);
+        const delivery=await running;
+        const elapsed=performance.now()-begin;
+        const final=await next();
+        report.cancel={issuedUtc:new Date(issued).toISOString(),httpStatus:cancelled.status,initialStatus:delivery.status,elapsedMs:elapsed,witness:final};
+        check("cancel_committed_and_no_success",cancelled.status===200 && final.terminal==="CANCELLED" && final.persisted.bytes===0 &&
+          final.persisted.resultHash===null && final.successfulAuditCount===0);
+        const kinds=final.beEvents.map(e=>e.kind);
+        check("server_cancelled_active_query",["registered","cancel_arrived","task_cancelled","fragment_end","context_end"].every(k=>kinds.includes(k)));
+        const when=e=>Date.parse(e.beUtc.replace(/^(\d{4})(\d{2})(\d{2}) /,"$1-$2-$3T")+"Z");
+        const cleanup=Math.max(...final.beEvents.filter(e=>e.kind==="context_end").map(when))-issued;
+        report.cancel.cleanupMs=cleanup;
+        check("source_cleanup_inside_deadline",cleanup>=0 && cleanup<=250 && final.sourceCounts==="0\t0" && elapsed<=5000);
+        report.status="PASS"; report.scope="DORIS_FORMAL_CANCELLATION";
+      } finally { monitor.stdout.destroy(); }
+    } else if (mode === "s2-doris-queries") {
+      phase = "two_table_exact_edges";
+      const capabilities = await get(reader, "/api/v1/capabilities");
+      const capId = "g4_traverse_relationships";
+      const query = { assetId: state.ontologyRelease.manifest.assetId, ontologyReleaseId:state.ontologyRelease.manifest.releaseId,
+        mappingReleaseIds:[state.mappingReceipt.mappingReleaseId], capabilityId:capId, capabilityVersion:capabilities.find(c => c.id === capId).version,
+        relationshipIris:["urn:synthetic:mapping:hasReading"], depth:1,maxRows:100,timeoutMs:5000,filters:{siteId:"site-a",entityExternalId:"E1"} };
+      const result = await request({...reader,headers:{...reader.headers,"Idempotency-Key":randomUUID()}},"POST","/api/v1/data/semantic-queries",query);
+      const edges = result.data.data.filter(item => item.kind === "relationship");
+      check("two_exact_targets", result.data.status === "FOUND" && !result.data.limited &&
+        JSON.stringify(edges.map(edge => edge.target.identity.externalId).sort()) === JSON.stringify(["T1","T2"]));
+      check("only_current_scope", edges.every(edge => edge.source.identity.externalId === "E1" && edge.target.identity.siteId === "site-a"));
+      check("two_source_windows_unknown", result.data.subSources.length === 2 && result.data.subSources.every(b => b.status === "SUCCESS" && b.watermarkKind === "UNKNOWN"));
+      const restored=await request(reader,"GET","/api/v1/data/semantic-queries/"+result.queryId+"/result");
+      check("two_table_canonical_recovery",restored.raw===result.raw);
+      for (const edge of edges) for (const id of edge.evidenceIds) {
+        const evidence = await get(reader,"/api/v1/data/source-evidence/"+encodeURIComponent(id));
+        check("edge_source_evidence_"+id,evidence.receipt.queryId===result.queryId && evidence.receipt.watermark===null && evidence.receipt.watermarkKind==="UNKNOWN");
+      }
+      await writeFile(file.replace(".json","-result.json"),result.raw,{flag:"wx"});
+      state.latestQuery={query,queryId:result.queryId,resultHash:createHash("sha256").update(result.raw).digest("hex")};
+      await save(state); report.status="PASS"; report.scope="DORIS_TWO_TABLE_QUERY";
+    } else if (doris && ["s1-key-negative","s2-doris-null","s2-doris-fanout-negative"].includes(mode)) {
+      const fanout = mode === "s2-doris-fanout-negative";
+      phase = fanout ? "fanout_assessment" : twoTable ? "null_relation_assessment" : "unsupported_identity_assessment";
       const requestBody = structuredClone(state.mappingCreate);
       const identity = requestBody.mapping.identitySpecs[0];
-      identity.externalIdFieldRefs = [{ ...identity.externalIdFieldRefs[0], name: "join_key", ordinal: 4 }];
+      if (!twoTable) identity.externalIdFieldRefs = [{ ...identity.externalIdFieldRefs[0], name: "join_key", ordinal: 4 }];
       requestBody.command = command();
       const draft = await post(operator, "/api/v1/mappings", requestBody, 201);
       const invalidPath = "/api/v1/mappings/" + draft.mappingId;
@@ -285,11 +412,11 @@ async function browserRun(mode) {
         check("negative_job_advances_" + i, ["QUEUED","RUNNING"].includes(job.status));
         await new Promise(done => setTimeout(done, 300));
       }
-      check("unsupported_identity_never_publishable", rejected?.status === "BLOCKED" && rejected.issues.some(i => i.code === "mapping_source_shape_invalid"));
+      check("unsupported_identity_never_publishable", rejected?.status === "BLOCKED" && rejected.issues.some(i => i.code === (fanout ? "mapping_fanout_exceeded" : twoTable ? "mapping_relation_endpoint_unknown" : "mapping_source_shape_invalid")));
       const active = (await request(operator, "GET", invalidPath + "/active", undefined, 404)).data;
       check("unsupported_identity_has_no_activation", active.code === "mapping_active_missing");
       report.rejected = { mappingId:draft.mappingId, assessmentId:rejected.assessmentId, issues:rejected.issues.map(i => i.code), active };
-      report.status="PASS"; report.scope="DORIS_IDENTITY_NEGATIVE";
+      report.status="PASS"; report.scope=fanout ? "DORIS_FANOUT_TEN_ELEVEN" : twoTable ? "DORIS_NULL_RELATION_NEGATIVE" : "DORIS_IDENTITY_NEGATIVE";
     } else if (mode === "numeric") {
       phase = "numeric_formal_gateway";
       const capability = (await get(operator, "/api/v1/capabilities")).find(item => item.id === "g4_traverse_relationships");
@@ -805,6 +932,19 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
         definition.temporalSpecs[0].observedAtFieldRef = field("observed_at");
         definition.temporalSpecs[0].timezonePolicy = {kind:"REGISTERED_ZONE", zoneId:"Etc/UTC"};
       }
+      if (twoTable) {
+        const target = state.catalog.objects.find(t => t.name === "dmq_target" && t.schema === "fixture");
+        const targetRef = { ...dataset, name:"dmq_target" };
+        const col = name => ({datasetRef:targetRef,name,ordinal:target.fields.find(f => f.name === name).ordinal});
+        definition.entities.push({id:"target",entityClassIri:"urn:synthetic:mapping:Reading",datasetRef:targetRef,
+          identitySpecId:"target-key",temporalSpecId:"target-time",scopeFields:{organization:col("org_id"),site:col("site_id")}});
+        definition.identitySpecs.push({id:"target-key",organizationFieldRef:col("org_id"),siteFieldRef:col("site_id"),sourceNamespace:"dmq-target-v1",
+          externalIdFieldRefs:[col("target_id")],validFromFieldRef:col("valid_from"),validToFieldRef:col("valid_to")});
+        definition.temporalSpecs.push({id:"target-time",eventTimeFieldRef:col("event_at"),observedAtFieldRef:col("observed_at"),
+          validFromFieldRef:col("valid_from"),validToFieldRef:col("valid_to"),timezonePolicy:{kind:"REGISTERED_ZONE",zoneId:"Etc/UTC"},precision:"MICROSECOND"});
+        definition.relations=[{id:"targets",fromBindingId:"asset",toBindingId:"target",predicateIri:"urn:synthetic:mapping:hasReading",
+          cardinality:"ONE_TO_MANY",temporalJoinPolicy:"HALF_OPEN_OVERLAP",joinFieldPairs:[{from:field("join_key"),to:col("join_key")}]}];
+      }
       if (state.s3) {
       definition.properties.push({ id: "label2", entityBindingId: "asset", propertyIri: "urn:synthetic:mapping:label2", fieldRef: field("label"), conversionId: null, unitSpecId: null, nullPolicy: "REJECT_NULL" });
       const ref = (table, name) => ({ datasetRef: { snapshotId: state.catalog.snapshotId, schema: "production", name: sourceTable(table), kind: "TABLE" },
@@ -868,7 +1008,7 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
         state.mappingReceipt = await post(activator, `/api/v1/mapping-proposals/${proposal.proposalId}/activate`, state.mappingActivation, 200, `"proposal:${proposal.proposalRevision}"`); await save(state);
       }
       state.mappingRelease = await get(operator, "/api/v1/mapping-releases/" + state.mappingReceipt.mappingReleaseId); await save(state);
-      check("query_mapping_original", state.mappingRelease.manifest.mapping.entities.length === (state.s3 ? 2 : 1) && state.mappingRelease.manifest.mapping.entities[0].datasetRef.snapshotId === state.catalog.snapshotId);
+      check("query_mapping_original", state.mappingRelease.manifest.mapping.entities.length === (state.s3 || twoTable ? 2 : 1) && state.mappingRelease.manifest.mapping.entities[0].datasetRef.snapshotId === state.catalog.snapshotId);
       report.status = "PASS"; report.scope = "M4_QUERY_FIXED_MAPPING_PREREQUISITE_ONLY";
     } else if (mode === "s1") {
       phase = "query_capability";

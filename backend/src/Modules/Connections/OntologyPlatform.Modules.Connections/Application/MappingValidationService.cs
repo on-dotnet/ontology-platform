@@ -697,6 +697,14 @@ public sealed class MappingValidationService
         var relationCounts = new SortedDictionary<string, int>(StringComparer.Ordinal);
         foreach (var relation in mapping.Relations)
         {
+            // 只有 Doris 的已验证固定关系采用两种明确标度的 DECIMALV3 比较。
+            var dorisRelation = source.SourceSemanticsHash is not null;
+            if (dorisRelation && !DorisMappingSourceValidator.SupportsRelation(mapping, relation))
+            {
+                Issue(problems, "EXECUTABILITY", "mapping_source_shape_invalid", relation.Id);
+                relationCounts[relation.Id] = 0;
+                continue;
+            }
             if (!HasType(triples, relation.PredicateIri, Owl + "ObjectProperty"))
             {
                 Issue(problems, "SCHEMA", "mapping_relation_missing", relation.Id);
@@ -730,7 +738,7 @@ public sealed class MappingValidationService
             foreach (var start in from)
             {
                 // fanout最多十个，超过立即阻断整个评估，不截断返回。
-                var matches = to.Where(end => JoinMatches(start, end, relation)).ToArray();
+                var matches = to.Where(end => JoinMatches(start, end, relation, dorisRelation)).ToArray();
                 if (matches.Length > 10)
                 {
                     Issue(problems, "EXECUTABILITY", "mapping_fanout_exceeded", relation.Id);
@@ -746,7 +754,8 @@ public sealed class MappingValidationService
             // 独立参考从目标侧反查；不使用实际pairs作为参考输入。
             var referenceCount = to.Sum(end => from.Count(start => start.Organization == end.Organization && start.Site == end.Site
                 && start.From < end.To && end.From < start.To && relation.JoinFieldPairs.All(pair =>
-                    Cell(start.Row, pair.From).Value is { } value && value == Cell(end.Row, pair.To).Value)));
+                    Cell(start.Row, pair.From).Value is { } left && Cell(end.Row, pair.To).Value is { } right
+                    && (dorisRelation ? left.TrimEnd('0').TrimEnd('.') == right.TrimEnd('0').TrimEnd('.') : left == right))));
             if (referenceCount != pairs.Count)
             {
                 Issue(problems, "RECONCILIATION", "mapping_relation_count_mismatch", relation.Id);
@@ -1002,8 +1011,10 @@ public sealed class MappingValidationService
     }
 
     /// <summary>关系键、完整scope与半开有效区间必须同时匹配。</summary>
-    private static bool JoinMatches(EvaluatedEntity from, EvaluatedEntity to, MappingRelationBinding relation) => from.Organization == to.Organization && from.Site == to.Site
-        && from.From < to.To && to.From < from.To && relation.JoinFieldPairs.All(pair => Cell(from.Row, pair.From).Value is { } value && value == Cell(to.Row, pair.To).Value);
+    private static bool JoinMatches(EvaluatedEntity from, EvaluatedEntity to, MappingRelationBinding relation, bool dorisRelation) =>
+        from.Organization == to.Organization && from.Site == to.Site && from.From < to.To && to.From < from.To
+        && relation.JoinFieldPairs.All(pair => Cell(from.Row, pair.From).Value is { } left && Cell(to.Row, pair.To).Value is { } right
+            && (dorisRelation ? decimal.Parse(left, CultureInfo.InvariantCulture) == decimal.Parse(right, CultureInfo.InvariantCulture) : left == right));
 
     /// <summary>已验证实体仅在当前评估内存存活，不发送到页面或日志。</summary>
     private sealed record EvaluatedEntity

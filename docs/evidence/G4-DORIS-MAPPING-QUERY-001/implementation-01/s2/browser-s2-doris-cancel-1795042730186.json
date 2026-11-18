@@ -1,0 +1,316 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s2-doris-cancel",
+  "startedAtUtc": "2026-11-18T22:58:50.186Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "witness_event_27",
+      "status": "PASS"
+    },
+    {
+      "name": "armed_witness",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "witness_event_31",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200,409",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200,403,409,422,503,504",
+      "status": "PASS"
+    },
+    {
+      "name": "witness_event_36",
+      "status": "PASS"
+    },
+    {
+      "name": "cancel_committed_and_no_success",
+      "status": "FAIL"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 11.63033299999995,
+      "sha256": "ed4621425012d839aa70f065a5fb771d386fda80b227eb575eff2e49299bcc84"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 4.509583999999904,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 8.864874999999984,
+      "sha256": "f771bf780a55a7d67e7e9380bbe336328c2e1ebd30ee5b779b8b33a46a7a3aee"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.734707999999955,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.5335419999998976,
+      "sha256": "75879bbb820108f524c043148e89f7d31e468cadb6446b4a95426d8c2b1fbf20"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.6574999999998,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 7.507166999999981,
+      "sha256": "e81bc6c37041c73298676a54c2a5faa62c3e5b29ada9d79bc7887c2f1c6da38f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.4500000000000455,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/capabilities",
+      "status": 200,
+      "elapsedMs": 15.145457999999962,
+      "sha256": "460a6a7f50ffa63def21a2f9baf961b757dacfed4f9df2dc5a6fbb94feb54579"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries/query-cd4595819202466fa9a8fba2e50aa3e7/cancel",
+      "status": 409,
+      "elapsedMs": 165.53933400000005,
+      "code": "query_already_finished",
+      "sha256": "716be7567c83cdf36c3b5f22c70bb81a3466d8f5a16fde9f876d56921aec9a45"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries",
+      "status": 200,
+      "elapsedMs": 747.7399580000001,
+      "sha256": "e92814fed98b8ade75178b1c0014d71e613423a9cb0a453e85787d08b1292131"
+    }
+  ],
+  "status": "FAIL",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "s2-doris-cancel",
+      "status": "READY",
+      "pid": 22637,
+      "commandId": "400fc49b0b144c66abf2ad248379a0ec",
+      "snapshotId": "8a244b2c5c69aa741c7bdbd10974aaa9532d489f6ee1f25d3baab8098af2eae7",
+      "processStart": "Thu Nov 19 06:58:48 2026"
+    },
+    "web": null
+  },
+  "witness": {
+    "event": "active",
+    "queryId": "query-cd4595819202466fa9a8fba2e50aa3e7",
+    "sourceQueryId": "3b2781a17af5400a-93e36b652db6c240"
+  },
+  "cancel": {
+    "issuedUtc": "2026-11-18T22:58:52.652Z",
+    "httpStatus": 409,
+    "initialStatus": 200,
+    "elapsedMs": 747.8270420000001,
+    "witness": {
+      "event": "finished",
+      "stress": {
+        "attempt": "c941c690f8e4",
+        "manifestSha256": "bea7b79003bad06b83cdaa5612d3172a40393ffa3a5960b69e108bbb172874e1",
+        "rowsPerTable": 65536,
+        "purpose": "cancellation_only"
+      },
+      "idempotencyKey": "f0db0f16-3a8f-4b9c-8b56-9ec86ba46577",
+      "run": "implementation-01",
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+      "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "feActiveObservedAt": "2026-11-18T22:58:52.652221+00:00",
+      "queryId": "query-cd4595819202466fa9a8fba2e50aa3e7",
+      "sourceQueryId": "3b2781a17af5400a-93e36b652db6c240",
+      "terminal": "COMPLETED",
+      "terminalObservedAt": "2026-11-18T22:58:52.754912+00:00",
+      "sourceCounts": "0\t1",
+      "persisted": {
+        "bytes": 131876,
+        "resultHash": "e92814fed98b8ade75178b1c0014d71e613423a9cb0a453e85787d08b1292131",
+        "resultSize": 131791
+      },
+      "successfulAuditCount": 1,
+      "beEvents": [
+        {
+          "kind": "registered",
+          "beUtc": "20261118 22:58:52.647784"
+        },
+        {
+          "kind": "fragment_end",
+          "beUtc": "20261118 22:58:52.653064"
+        },
+        {
+          "kind": "fragment_end",
+          "beUtc": "20261118 22:58:52.655270"
+        },
+        {
+          "kind": "context_end",
+          "beUtc": "20261118 22:58:52.655311"
+        }
+      ]
+    }
+  },
+  "failure": {
+    "phase": "formal_cancel",
+    "category": "Error",
+    "code": "cancel_committed_and_no_success"
+  },
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-18T22:58:53.346Z"
+}

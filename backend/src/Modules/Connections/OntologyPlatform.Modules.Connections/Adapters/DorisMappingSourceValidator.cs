@@ -7,13 +7,13 @@ namespace OntologyPlatform.Modules.Connections;
 /// <summary>用 Doris 4.0.8 的实际建表语句核对合成源的物理模型、列和完整键序。</summary>
 internal static class DorisMappingSourceValidator
 {
-    /// <summary>单表实体切片只接受冻结的组织、厂区、实体键及已发布的目录引用。</summary>
+    /// <summary>实体和关系目标只接受冻结的组织、厂区和已发布的目录引用。</summary>
     internal static CatalogObject EntityTable(MappingEntityBinding entity, CatalogSnapshotView original,
         CatalogSnapshotView current, MappingDefinition mapping)
     {
         // 同名对象没有固定的 schema、种类和列序时不能重新绑定。
         var dataset = entity.DatasetRef;
-        if (dataset.SnapshotId != original.SnapshotId || dataset.Schema != "fixture" || dataset.Name != "dmq_entity"
+        if (dataset.SnapshotId != original.SnapshotId || dataset.Schema != "fixture" || dataset.Name is not ("dmq_entity" or "dmq_target") || dataset.Kind != "TABLE"
             || entity.ScopeFields.Organization.Name != "org_id" || entity.ScopeFields.Site.Name != "site_id") throw InvalidShape();
         // 原目录与当前目录可属于不同的正式作业，但本表的完整字段必须一致。
         var table = current.Objects.SingleOrDefault(t => t.Schema == dataset.Schema && t.Name == dataset.Name && t.Kind == "TABLE") ?? throw InvalidShape();
@@ -31,11 +31,24 @@ internal static class DorisMappingSourceValidator
         // 名称和引用的目录身份同时参与比较，防止把另一个同名字段用于固定谓词。
         bool Bound(MappingFieldRef? field, string name) => field is not null && field.DatasetRef == entity.DatasetRef && field.Name == name;
         return Bound(identity.OrganizationFieldRef, "org_id") && Bound(identity.SiteFieldRef, "site_id")
-            && identity.ExternalIdFieldRefs is [var key] && Bound(key, "entity_id")
+            && identity.ExternalIdFieldRefs is [var key] && Bound(key, entity.DatasetRef.Name == "dmq_entity" ? "entity_id" : "target_id")
             && Bound(identity.ValidFromFieldRef, "valid_from") && Bound(identity.ValidToFieldRef, "valid_to")
             && Bound(temporal.ValidFromFieldRef, "valid_from") && Bound(temporal.ValidToFieldRef, "valid_to")
             && Bound(temporal.EventTimeFieldRef, "event_at") && Bound(temporal.ObservedAtFieldRef, "observed_at")
             && temporal.TimezonePolicy is { Kind: "REGISTERED_ZONE", ZoneId: "Etc/UTC" } && temporal.Precision == "MICROSECOND";
+    }
+
+    /// <summary>关系执行器只实现由实体到目标的同范围精确定点等值及半开时间交叠。</summary>
+    internal static bool SupportsRelation(MappingDefinition mapping, MappingRelationBinding relation)
+    {
+        // 发布关系两端的数据集必须与连接字段的历史目录引用完全相同。
+        var parent = mapping.Entities.SingleOrDefault(e => e.Id == relation.FromBindingId)?.DatasetRef;
+        // 只允许从实体正向遍历到另一张冻结表。
+        var target = mapping.Entities.SingleOrDefault(e => e.Id == relation.ToBindingId)?.DatasetRef;
+        return parent?.Name == "dmq_entity" && target?.Name == "dmq_target"
+            && relation.Cardinality == "ONE_TO_MANY" && relation.TemporalJoinPolicy == "HALF_OPEN_OVERLAP"
+            && relation.JoinFieldPairs is [{ From.Name: "join_key", To.Name: "join_key" } pair]
+            && pair.From.DatasetRef == parent && pair.To.DatasetRef == target;
     }
 
     /// <summary>当前目录与已冻结的物理模型共同决定允许执行的源语义。</summary>
@@ -62,29 +75,35 @@ internal static class DorisMappingSourceValidator
     {
         DorisAdapterOptions.Validate(profile, scope);
         G4MappingRules.Definition(mapping);
-        if (mapping.Entities is not [var entity] || original.Scope.OrganizationId != scope.OrganizationId
+        // 整个数据集集合只能是实体或实体加目标；同一物理表不允许借不同绑定重复计数。
+        var names = mapping.Entities.Select(entity => entity.DatasetRef.Name).Order(StringComparer.Ordinal).ToArray();
+        if (!(names is ["dmq_entity"] or ["dmq_entity", "dmq_target"]) || original.Scope.OrganizationId != scope.OrganizationId
             || current.Scope.OrganizationId != scope.OrganizationId || !scope.SiteIds.All(s => original.Scope.SiteIds.Contains(s) && current.Scope.SiteIds.Contains(s)))
             throw InvalidShape();
-        // 评估期间验证的列包含全固定投影，平台调用端必须给出完整字段授权。
-        var table = EntityTable(entity, original, current, mapping);
+        // 两表的字段授权在调用前逐一捕获；完整目录必须能解释两个投影。
+        var tables = mapping.Entities.Select(entity => (Entity: entity, Table: EntityTable(entity, original, current, mapping))).ToArray();
         // 开始时刻覆盖本次连接、目录和权限检查。
         var start = DateTimeOffset.UtcNow;
         return adapter.ReadBranchAsync(profile, secret, deadline, TimeProvider.System, async connection =>
         {
             // 当前目录与真实模型均经该业务分支的绝对期限约束。
             var shape = await CheckCatalogAsync(connection, profile, current);
-            // 历史授权核验不重放业务 SELECT。
-            var result = new List<Dictionary<string, MappingSourceCell>>();
-            if (readRows)
+            // 全表样本包含不匹配的目标和空键；历史授权检查只读取目录与模型。
+            var samples = new List<MappingSourceTable>();
+            foreach (var (entity, table) in tables)
             {
-                foreach (var raw in await DorisQueryReader.ReadPlanAsync(connection, scope, null, null))
+                // 每表至多一百行，哨兵不能当作完整的 Mapping 样本。
+                var rows = new List<Dictionary<string, MappingSourceCell>>();
+                if (readRows)
                 {
-                    result.Add(table.Fields.ToDictionary(f => f.Name,
-                        f => new MappingSourceCell { NativeType = f.NativeType, Value = Lexical(raw[f.Name], f) }, StringComparer.Ordinal));
+                    foreach (var raw in await DorisQueryReader.ReadPlanAsync(connection, scope, null, null, fullTarget: table.Name == "dmq_target"))
+                        rows.Add(table.Fields.ToDictionary(f => f.Name,
+                            f => new MappingSourceCell { NativeType = f.NativeType, Value = Lexical(raw[f.Name], f) }, StringComparer.Ordinal));
                 }
+                samples.Add(new MappingSourceTable { Dataset = entity.DatasetRef, Rows = rows.ToArray() });
             }
             if (await CheckCatalogAsync(connection, profile, current) != shape) throw InvalidShape();
-            return new MappingSourceObservation { Tables = [new MappingSourceTable { Dataset = entity.DatasetRef, Rows = result.ToArray() }],
+            return new MappingSourceObservation { Tables = samples.ToArray(),
                 CatalogFingerprint = current.SchemaFingerprint, SourceSemanticsHash = shape, WatermarkKind = "UNKNOWN", Watermark = null,
                 StartedAtUtc = start, FinishedAtUtc = DateTimeOffset.UtcNow, SecurityVerified = true };
         }, token);
