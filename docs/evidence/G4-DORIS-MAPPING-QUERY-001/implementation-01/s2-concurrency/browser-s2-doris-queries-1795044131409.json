@@ -1,0 +1,334 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s2-doris-queries",
+  "startedAtUtc": "2026-11-18T23:22:11.409Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200",
+      "status": "PASS"
+    },
+    {
+      "name": "two_exact_targets",
+      "status": "PASS"
+    },
+    {
+      "name": "only_current_scope",
+      "status": "PASS"
+    },
+    {
+      "name": "two_source_windows_unknown",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200",
+      "status": "PASS"
+    },
+    {
+      "name": "two_table_canonical_recovery",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_11",
+      "status": "PASS"
+    },
+    {
+      "name": "http_12_200",
+      "status": "PASS"
+    },
+    {
+      "name": "edge_source_evidence_query-b04a103a2fe64548aff3f0ad6b19302c:e-c4768d5f562f461f920fde7957de5e68",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_12",
+      "status": "PASS"
+    },
+    {
+      "name": "http_13_200",
+      "status": "PASS"
+    },
+    {
+      "name": "edge_source_evidence_query-b04a103a2fe64548aff3f0ad6b19302c:e-f3ddd8f1183b4b5fab84e928247386c6",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_13",
+      "status": "PASS"
+    },
+    {
+      "name": "http_14_200",
+      "status": "PASS"
+    },
+    {
+      "name": "edge_source_evidence_query-b04a103a2fe64548aff3f0ad6b19302c:e-baf721fccb80417cab21117174e512fc",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_14",
+      "status": "PASS"
+    },
+    {
+      "name": "http_15_200",
+      "status": "PASS"
+    },
+    {
+      "name": "edge_source_evidence_query-b04a103a2fe64548aff3f0ad6b19302c:e-f3ddd8f1183b4b5fab84e928247386c6",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 11.66050000000007,
+      "sha256": "7f662f4f277c78fb931eafce2c9a52d83b08beb609274711f578db05522e4ecb"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 3.7765000000000555,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.926332999999886,
+      "sha256": "70eb6e777702699caddc962553f4df92e0bd1695cefd2cd1742ea05697961ed9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.5741669999999885,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.7183330000000296,
+      "sha256": "cfc921e779e14a89bdabb7663f75572e025fd026420ac2ab6eed98f693484831"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.5943749999999,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.3477090000001226,
+      "sha256": "86c8cc6cce4947aef240bf5df360229641af416d03bb0214015656f44dda1d43"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.8492079999998623,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/capabilities",
+      "status": 200,
+      "elapsedMs": 11.112208999999893,
+      "sha256": "460a6a7f50ffa63def21a2f9baf961b757dacfed4f9df2dc5a6fbb94feb54579"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries",
+      "status": 200,
+      "elapsedMs": 643.718208,
+      "sha256": "cfc6fea36d6a5045cda7d92b377c28e5f4ea8d9a2f1cd7ea158072583ed51202"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/data/semantic-queries/query-b04a103a2fe64548aff3f0ad6b19302c/result",
+      "status": 200,
+      "elapsedMs": 187.6592499999997,
+      "sha256": "cfc6fea36d6a5045cda7d92b377c28e5f4ea8d9a2f1cd7ea158072583ed51202"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/data/source-evidence/query-b04a103a2fe64548aff3f0ad6b19302c%3Ae-c4768d5f562f461f920fde7957de5e68",
+      "status": 200,
+      "elapsedMs": 192.2107920000003,
+      "sha256": "48e9a8be0c2721b0df5654285568ba8ae03920656b3d29440bf9236da1ec993e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/data/source-evidence/query-b04a103a2fe64548aff3f0ad6b19302c%3Ae-f3ddd8f1183b4b5fab84e928247386c6",
+      "status": 200,
+      "elapsedMs": 189.51033300000017,
+      "sha256": "c7f7549235478171b16a117fc6578f8c11e3f6ba9404f8b8e10445e49fc67897"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/data/source-evidence/query-b04a103a2fe64548aff3f0ad6b19302c%3Ae-baf721fccb80417cab21117174e512fc",
+      "status": 200,
+      "elapsedMs": 201.51587500000005,
+      "sha256": "4e4ca834de1ecc42fd18421dc2d053a63af8f002284c938ddbc92e3a2031c7df"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/data/source-evidence/query-b04a103a2fe64548aff3f0ad6b19302c%3Ae-f3ddd8f1183b4b5fab84e928247386c6",
+      "status": 200,
+      "elapsedMs": 189.76708299999973,
+      "sha256": "c7f7549235478171b16a117fc6578f8c11e3f6ba9404f8b8e10445e49fc67897"
+    }
+  ],
+  "status": "PASS",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "s2-doris-queries",
+      "status": "READY",
+      "pid": 42027,
+      "commandId": "5db82bfb3bda49dd865811d8f5d6ae8b",
+      "snapshotId": "c4d747feaf057aaf29471e418f0f82c6f88f6f7634ed7917812a53d0b92b89a4",
+      "processStart": "Thu Nov 19 07:22:10 2026"
+    },
+    "web": null
+  },
+  "grants": {
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "mode": "query",
+    "grantCount": 3,
+    "commandId": "535761ecf34f4175947f85e4eff05103"
+  },
+  "scope": "DORIS_TWO_TABLE_QUERY",
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-18T23:22:15.408Z"
+}

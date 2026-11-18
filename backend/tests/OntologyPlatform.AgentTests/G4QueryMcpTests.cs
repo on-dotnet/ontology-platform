@@ -46,6 +46,183 @@ public sealed class G4QueryMcpTests
 [TestClass]
 public sealed partial class G4QueryMafRuntimeTests
 {
+    /// <summary>在本任务真实四主体会话中，测试一条已读取 Doris 实体的查询经历两次正式激活。</summary>
+    [TestMethod]
+    public Task DorisActivationRevisionRejectsInflightQuery() => RunDorisRaceAsync("aba");
+
+    /// <summary>真实 Doris 读取返回后撤执行权限，原查询的提交与审计都须拒绝。</summary>
+    [TestMethod]
+    public Task DorisRevocationRejectsInflightQuery() => RunDorisRaceAsync("grant");
+
+    /// <summary>真实源读取完成后使当前合成 Q 会话到期，提交须拒绝且原期限须准确恢复。</summary>
+    [TestMethod]
+    public Task DorisExpiredSessionRejectsInflightQuery() => RunDorisRaceAsync("session");
+
+    /// <summary>使用正式宿主和服务器票据，仅在受控的竞争阶段切换授权或版本。</summary>
+    private static async Task RunDorisRaceAsync(string scenario)
+    {
+        Assert.AreEqual("G4-DORIS-MAPPING-QUERY-001:implementation-01", Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST"));
+        // 只加载本任务现有受限运行配置，实际源和平台适配器均由正式宿主组合。
+        var root = DorisRuntimeRoot();
+        Assert.IsTrue(File.Exists(Path.Combine(root, "docs/tasks/G4-DORIS-MAPPING-QUERY-001.md")));
+        // 与已准入 API 相同的运行目录、证书和平台地址。
+        var config = Path.Combine(root, ".tools/security/g4-doris-mapping-query-001/implementation-01/runtime/api/appsettings.json");
+        await using var app = OntologyPlatform.Api.PlatformApiHost.CreateApplication([], builder =>
+        {
+            builder.Logging.ClearProviders();
+            builder.Configuration.AddJsonFile(config, optional: false);
+        });
+        Assert.AreEqual("Development", app.Environment.EnvironmentName);
+        // 四个刚登录的浏览器会话只经标准输入传入，不写入回执。
+        using var envelope = JsonDocument.Parse(await Console.In.ReadToEndAsync());
+        // 使用正式 Cookie scheme 的密文解封及平台票据读取。
+        var options = app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptionsMonitor<Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions>>().Get("Cookies");
+        // 角色名称只用于选取合成参与者，真实身份及权限来自已验证服务器票据。
+        var participants = new Dictionary<string, (ActorContext Actor, string Session)>(StringComparer.Ordinal);
+        foreach (var participant in envelope.RootElement.GetProperty("roles").EnumerateArray())
+        {
+            // 根据浏览器密文定位同一条正式服务器会话。
+            var key = options.TicketDataFormat.Unprotect(participant.GetProperty("cookie").GetString()!)?.Principal.FindFirst("Microsoft.AspNetCore.Authentication.Cookies-SessionId")?.Value;
+            Assert.IsFalse(string.IsNullOrWhiteSpace(key));
+            // 正式存储拒绝撤销或到期会话。
+            var ticket = await options.SessionStore!.RetrieveAsync(key!);
+            Assert.IsNotNull(ticket);
+            // 正常 HTTP 授权路径从服务器 Claims 生成实际 ActorContext。
+            var actor = OntologyPlatform.Api.G2.G2Authorization.CreateActor(new Microsoft.AspNetCore.Http.DefaultHttpContext { User = ticket.Principal });
+            Assert.AreEqual(participant.GetProperty("subjectId").GetString(), actor.SubjectId);
+            participants.Add(participant.GetProperty("role").GetString()!, (actor, key!));
+        }
+        Assert.AreEqual(4, participants.Values.Select(p => p.Actor.SubjectId).Distinct(StringComparer.Ordinal).Count());
+        // 读取当前查询引用，和同一次真实 Q 会话直接关联。
+        var queryId = envelope.RootElement.GetProperty("queryId").GetString()!;
+        // B 的真实审批提案由刚完成的浏览器准备流程给出。
+        var proposalId = scenario == "aba" ? envelope.RootElement.GetProperty("proposalId").GetString() : null;
+        // 只启动正式应用服务所需的作用域，没有另起宿主或修改运行结构。
+        await using var scope = app.Services.CreateAsyncScope();
+        // 用单独平台库上下文按准确 queryId 定位受控前件。
+        await using var db = await scope.ServiceProvider.GetRequiredService<IDbContextFactory<G4QueryDbContext>>().CreateDbContextAsync();
+        // Q 必须是先前真实读取的实际主体及会话。
+        var original = await db.Queries.AsNoTracking().SingleAsync(q => q.Id == queryId);
+        Assert.AreEqual("COMPLETED", original.ExecutionStatus);
+        Assert.AreEqual(participants["Q"].Actor.SubjectId, original.SubjectId);
+        Assert.IsTrue(participants["Q"].Session == original.SessionReference, "DORIS_QUERY_SESSION_MISMATCH");
+        if (scenario == "aba")
+            await MappingAbaAfterRealReadAsync(scope.ServiceProvider, participants["Q"].Actor, original, db, proposalId!,
+                participants["A"], participants["C"], participants["B"].Actor.SubjectId);
+        else
+            await DenyDorisCommitAfterReadAsync(scope.ServiceProvider, participants["Q"].Actor, original, db, scenario == "session");
+    }
+
+    /// <summary>精确撤销本任务同一主体的两条合成来源授权，复用独立事务与恢复台账。</summary>
+    private static async Task ChangeDorisGrantAsync(string action, CancellationToken token)
+    {
+        // 准确脚本只接受预注册的撤销与恢复操作，不传递秘密或 SQL。
+        var start = new System.Diagnostics.ProcessStartInfo("python3")
+        {
+            WorkingDirectory = DorisRuntimeRoot(), UseShellExecute = false,
+            RedirectStandardOutput = true, RedirectStandardError = true
+        };
+        foreach (var arg in new[] {"-B", "scripts/maintenance/workflow_doris_s1.py", "permission", "--permission", action})
+            start.ArgumentList.Add(arg);
+        // 只检查退出状态与固定脱敏回执，私有错误流不会打印到测试输出。
+        using var process = System.Diagnostics.Process.Start(start)!;
+        // 同步排空两流，避免子进程阻塞或把环境内容带入公开报告。
+        var output = process.StandardOutput.ReadToEndAsync();
+        // 失败只记录固定断言，保持详细错误原件由原执行器管理。
+        var error = process.StandardError.ReadToEndAsync();
+        await process.WaitForExitAsync(token);
+        await Task.WhenAll(output,error);
+        Assert.AreEqual(0,process.ExitCode,"DORIS_GRANT_CONTROL_FAILED");
+    }
+
+    /// <summary>复用真实 Gateway，在同一已读取查询的结果事务取得锁前，由另一事务撤权。</summary>
+    private static async Task DenyDorisCommitAfterReadAsync(IServiceProvider services, ActorContext actor, G4QueryRecord original, G4QueryDbContext db, bool expireSession)
+    {
+        // 原请求与当前 Q 和已激活根绑定完全相同，随机命令启动一次新的实际读取。
+        using var doc = JsonDocument.Parse(original.RequestBytes);
+        // 持久请求已经过正式 DTO 验证。
+        var query = doc.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
+        // 当前测试唯一路径精确关联在途行与审计。
+        var key = Guid.NewGuid().ToString();
+        // 这两个时刻分别界定已完成真实读取、撤权已提交。
+        DateTimeOffset? afterRead = null;
+        // 撤权返回须早于拒绝，不能以事后观测替代提交顺序。
+        DateTimeOffset? revoked = null;
+        // 这条上下文只在真实测试主体的会话失效及审计读回中使用，不参与产品提交事务。
+        await using var governance = await services.GetRequiredService<IDbContextFactory<OntologyPlatform.Modules.Governance.GovernanceDbContext>>().CreateDbContextAsync();
+        // 用准确主键和原始期限进行比较更新，避免覆盖另一笔撤销或续期。
+        var currentSession = governance.Sessions.Where(row => row.Id == original.SessionReference && row.RevokedAtUtc == null);
+        // 只读取有效期限，不接触保护票据或其他会话。
+        var originalExpiry = await currentSession.Select(row => row.ExpiresAtUtc).SingleAsync();
+        Assert.IsTrue(originalExpiry > DateTimeOffset.UtcNow.AddSeconds(10));
+        // 固定到整秒以和 PG 的微秒精度进行准确比较，恢复时保持原绝对期限。
+        var expiredAt = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 1);
+        // 复用不替换安全参与者的在途调度。
+        var execution = BeforeCommitExecution(services, async token =>
+        {
+            afterRead = DateTimeOffset.UtcNow;
+            if (expireSession)
+            {
+                Assert.AreEqual(1, await currentSession.Where(row => row.ExpiresAtUtc == originalExpiry)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(row => row.ExpiresAtUtc, expiredAt), token));
+            }
+            else
+            {
+                await ChangeDorisGrantAsync("revoke-execute", token);
+            }
+            revoked = DateTimeOffset.UtcNow;
+        });
+        // 正式 Gateway、宿主根语义、源适配器、平台事务和审计全部使用真实实现。
+        var gateway = ActivatorUtilities.CreateInstance<SemanticGateway>(services, execution);
+        try
+        {
+            // 接受合同登记的显式权限或绑定拒绝，不接受容量、超时或普通执行故障。
+            var rejected = await Assert.ThrowsAsync<SemanticOperationException>(() => gateway.ExecuteG4Async(actor, original.SessionReference, query, key, null, CancellationToken.None));
+            Assert.AreEqual(403, rejected.Status);
+            Assert.AreEqual("query_forbidden", rejected.Code);
+            Assert.IsNotNull(revoked);
+            // 只取当前命令和这一笔成功审计计数。
+            var stored = await db.Queries.AsNoTracking().SingleAsync(q => q.IdempotencyKey == key);
+            // 真实数据库状态与成功审计需一起为零。
+            var allowed = await governance.AuditRecords.CountAsync(a => a.Resource == stored.Id && a.Action == "data.query.execute" && a.Outcome == "allowed");
+            Assert.AreNotEqual("COMPLETED",stored.ExecutionStatus);
+            Assert.AreEqual(0,stored.ResultCiphertext.Length);
+            Assert.IsNull(stored.ResultHash);
+            Assert.AreEqual(0,G4QueryResultStore.ReadState(stored).Receipts.Length);
+            Assert.AreEqual(0,allowed);
+            // 记录公开时序与准确失败码，不含来源行与会话引用。
+            var result = new { queryId=stored.Id, stored.CreatedAtUtc, stored.DeadlineAtUtc, afterRead, revoked,
+                rejectedAt=DateTimeOffset.UtcNow, rejected.Code, rejected.Status, stored.ExecutionStatus,
+                resultBytes=stored.ResultCiphertext.Length, stored.ResultHash, receipts=0, successAudits=allowed };
+            Assert.IsTrue(result.rejectedAt < stored.DeadlineAtUtc);
+            await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01",
+                (expireSession ? "session-inflight-" : "grant-inflight-")+key+".json"), JsonSerializer.Serialize(result,new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+        }
+        finally
+        {
+            if (expireSession && revoked.HasValue)
+            {
+                Assert.AreEqual(1, await currentSession.Where(row => row.ExpiresAtUtc == expiredAt)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(row => row.ExpiresAtUtc, originalExpiry)));
+                Assert.AreEqual(originalExpiry, await currentSession.Select(row => row.ExpiresAtUtc).SingleAsync());
+            }
+            else if (revoked.HasValue)
+            {
+                await ChangeDorisGrantAsync("restore-execute", CancellationToken.None);
+            }
+        }
+    }
+
+    /// <summary>从当前受控测试程序集找回实际仓库根目录，兼容 MTP 改变工作目录。</summary>
+    private static string DorisRuntimeRoot()
+    {
+        // 程序集必须位于正式构建所在工作树，在根目录复核任务卡身份。
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "docs/tasks/G4-DORIS-MAPPING-QUERY-001.md")))
+            directory = directory.Parent;
+        return directory?.FullName ?? throw new InvalidOperationException("DORIS_TEST_WORKTREE_MISSING");
+    }
+
     /// <summary>通过标准Cookie格式和PG票据存储检查浏览器实际会话，输入仅经标准输入传入。</summary>
     [TestMethod]
     public async Task BrowserSessionsCoverRegisteredExecutionDeadline()
@@ -355,6 +532,50 @@ public sealed partial class G4QueryMafRuntimeTests
     private static CommandContext Command(long revision) => new() { CommandId = Guid.NewGuid().ToString(), IdempotencyKey = Guid.NewGuid().ToString(),
         ExpectedRevision = revision, Reason = "M4 synthetic in-flight binding verification" };
 
+    /// <summary>只在真实源成功返回后激活一次提交前调度，源分支与观察者正常完成。</summary>
+    private static G4QueryExecution BeforeCommitExecution(IServiceProvider services, Func<CancellationToken, Task> competingCommand)
+    {
+        // 所有授权检查仍由正常的正式实例执行。
+        var authority = services.GetRequiredService<IG4QueryAuthorizationAuthority>();
+        // 每个测试独享标记，避免把其他查询及准入阶段认作目标提交。
+        var ready = 0;
+        // 只切换已登记的调度点，不替换数据库事务、加密、fence 或审计。
+        var scheduled = new ScheduledAuthority(authority, token =>
+            Interlocked.Exchange(ref ready, 0) == 1 ? competingCommand(token) : Task.CompletedTask);
+        // 使用所有正式构造依赖，只在第一次最终授权检查开始前运行并发命令。
+        var store = ActivatorUtilities.CreateInstance<G4QueryResultStore>(services, scheduled);
+        // 真实读取器返回后只记录已完成，耗时的竞争不在这个分支计时内。
+        var source = new AfterReadSource(services.GetRequiredService<IG4SourceQueryReader>(), _ =>
+        {
+            Interlocked.Exchange(ref ready, 1);
+            return Task.CompletedTask;
+        });
+        return new G4QueryExecution(services.GetRequiredService<IG4QueryBindingReader>(), source, authority, store, TimeProvider.System);
+    }
+
+    /// <summary>保留全部正式权限参与者，仅在获取事务授权锁之前提供确定性的竞争调度。</summary>
+    private sealed class ScheduledAuthority(IG4QueryAuthorizationAuthority actual, Func<CancellationToken, Task> beforeCheck) : IG4QueryAuthorizationAuthority
+    {
+        /// <summary>当前会话证明始终来自正式权限实现。</summary>
+        public Task<MappingAuthorizationProof> CaptureSessionAsync(ActorContext actor, string sessionReference, ResourceScope scope, CancellationToken token) =>
+            actual.CaptureSessionAsync(actor, sessionReference, scope, token);
+
+        /// <summary>实际事务中的会话锁与授权检查在竞争提交之后执行。</summary>
+        public async Task DemandSessionInTransactionAsync(MappingAuthorizationProof proof, System.Data.Common.DbConnection connection,
+            System.Data.Common.DbTransaction transaction, CancellationToken token)
+        {
+            await beforeCheck(token);
+            await actual.DemandSessionInTransactionAsync(proof, connection, transaction, token);
+        }
+
+        /// <summary>全部字段授权证明继续由正式服务捕获。</summary>
+        public Task<MappingAuthorizationProof> CaptureAsync(MappingAuthorizationProof request, CancellationToken token) => actual.CaptureAsync(request, token);
+
+        /// <summary>使用相同物理事务验证字段投影和组织授权版本。</summary>
+        public Task DemandInTransactionAsync(MappingAuthorizationProof proof, System.Data.Common.DbConnection connection,
+            System.Data.Common.DbTransaction transaction, CancellationToken token) => actual.DemandInTransactionAsync(proof, connection, transaction, token);
+    }
+
     /// <summary>仅替换真实源返回后的合成调度点，所有读取和历史ACL检查委托正式适配器。</summary>
     private sealed class AfterReadSource(IG4SourceQueryReader actual, Func<CancellationToken, Task> afterRead) : IG4SourceQueryReader
     {
@@ -368,11 +589,11 @@ public sealed partial class G4QueryMafRuntimeTests
         public Task<G4QueryConnectionAccess> VerifyAccessAsync(G4QueryBindingContext context, MappingAuthorizationProof proof, string entityBindingId,
             DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken) => actual.VerifyAccessAsync(context, proof, entityBindingId, deadlineAtUtc, cancellationToken);
 
-        /// <summary>取得真实PG行及回执后才改变当前绑定，随后返回原读取事实。</summary>
+        /// <summary>取得真实源行及回执后才改变当前绑定，随后返回原读取事实。</summary>
         public async Task<G4SourceQueryRead> ReadAsync(G4QueryBindingContext context, MappingAuthorizationProof proof, string entityBindingId,
             G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken, G4QueryBranchFilter? branch = null)
         {
-            // 真实PG返回值保持原样，故障仅改变返回后的调度。
+            // 真实源返回值保持原样，故障仅改变返回后的调度。
             var read = await actual.ReadAsync(context, proof, entityBindingId, query, deadlineAtUtc, cancellationToken, branch);
             Assert.IsTrue(read.Rows.Length > 0);
             if (Interlocked.Increment(ref invoked) == 1) await afterRead(cancellationToken);

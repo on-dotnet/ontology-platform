@@ -24,7 +24,7 @@ const stateName = twoTable ? "doris-two-table.json" : integration ? `scenario-${
 const port = value => doris ? ({15441:15641,15442:15642,15443:15643,15444:15644,15445:19030,15446:15645,15447:15646,15448:15647})[value] : integration ? value + 100 : value;
 if (argument("task") !== task || argument("run-id") !== runId || await realpath(process.cwd()) !== root) throw new Error("QUERY_CONSUMER_BOUNDARY");
 const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/package.json"));
-if (doris && !["provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
+if (doris && !["provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
 if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
@@ -38,7 +38,7 @@ if (mode === "serve") {
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: port(15442),
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
+} else if (["s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cardinality","s2-doris-identity","s2-doris-states","s2-doris-cancel-window","s2-doris-admission-cancel","s2-doris-aba","s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -222,6 +222,8 @@ async function browserRun(mode) {
     }
     if (!doris) state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
     await save(state);
+    const prepareShape = mode === "s2-doris-shape-prepare";
+    if (mode === "s2-doris-aba" || prepareShape) mode = "s2-aba-prepare";
     if (mode === "s2-doris-requalify") {
       if (!state.replacedDorisMapping) {
         const previous = state.mappingReceipt;
@@ -313,7 +315,79 @@ async function browserRun(mode) {
         mode = "s2-doris-fanout-negative";
       }
     }
-    if (mode === "s2-doris-access") {
+    if (["s2-doris-revoke-race", "s2-doris-session-race"].includes(mode)) {
+      const sessionCase = mode === "s2-doris-session-race";
+      phase = sessionCase ? "after_read_session_expiry" : "after_read_revoke";
+      const cap=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");
+      const query={...state.latestQuery.query,capabilityId:cap.id,capabilityVersion:cap.version,relationshipIris:[],filters:{siteId:"site-a",entityExternalId:"E1"}};
+      const original=await request({...reader,headers:{...reader.headers,"Idempotency-Key":randomUUID()}},"POST","/api/v1/data/semantic-queries",query);
+      check("known_real_source_row",original.data.status==="FOUND");
+      const envelope={queryId:original.queryId,roles:[[operator,"A"],[auditor,"B"],[activator,"C"],[reader,"Q"]].map(([a,role])=>({role,subjectId:a.me.subjectId,cookie:a.sessionCookie}))};
+      report.race=JSON.parse(execFileSync("python3",["-B","scripts/maintenance/workflow_doris_s1.py",sessionCase ? "session-test" : "revoke-test"],
+        {cwd:root,input:JSON.stringify(envelope),timeout:40000,encoding:"utf8",stdio:["pipe","pipe","pipe"]}));
+      const recovered=await request(reader,"GET","/api/v1/data/semantic-queries/"+original.queryId+"/result");
+      check("restored_original",recovered.raw===original.raw);
+      report.status="PASS";report.scope=sessionCase ? "DORIS_INFLIGHT_SESSION_EXPIRY" : "DORIS_INFLIGHT_GRANT_REVOCATION";
+    } else if (mode === "s2-doris-shape-reject") {
+      phase = "activate_previously_approved_proposal_with_changed_catalog";
+      const prev = state.shapePreparation;
+      check("shape_proposal_bound", prev?.approved?.status === "APPROVED");
+      const proposal = prev.approved;
+      const baseline = await get(activator,"/api/v1/mappings/"+state.mappingDraft.mappingId+"/active");
+      check("reviewed_activation", baseline.activationId===prev.baseline.activationId);
+      const result = await request(activator,"POST","/api/v1/mapping-proposals/"+proposal.proposalId+"/activate",
+        {bindingHash:proposal.bindingHash,expectedActive:proposal.expectedActive,command:command(proposal.proposalRevision)},
+        409,`"proposal:${proposal.proposalRevision}"`);
+      check("persisted_activation_check",result.data.code==="mapping_activation_check_failed" && Boolean(result.data.checkId));
+      state.shapePreparation.lastCheck = result.data.checkId;
+      await save(state);
+      const denied = await request(activator,"GET","/api/v1/mapping-activation-checks/"+result.data.checkId,undefined,403);
+      check("changed_source_blocks_check_disclosure",denied.data.code==="mapping_source_access_unverified");
+      const after = await get(activator,"/api/v1/mappings/"+state.mappingDraft.mappingId+"/active");
+      check("previous_release_retained",after.mappingReleaseId===baseline.mappingReleaseId &&
+        after.activationId===baseline.activationId && after.activationRevision===baseline.activationRevision);
+      report.shapeCheck={proposalId:proposal.proposalId,checkId:result.data.checkId,before:baseline,after};
+      report.status="PASS"; report.scope="DORIS_ACTIVATION_REFUSES_CHANGED_SOURCE";
+    } else if (mode === "s2-doris-shape-recover") {
+      phase = "read_original_check_after_source_restoration";
+      const prev=state.shapePreparation;
+      const checked=await get(activator,"/api/v1/mapping-activation-checks/"+prev.lastCheck);
+      const codes=checked.stages.flatMap(s=>s.issueCodes);
+      report.shapeCheck={proposalId:checked.proposalId,checkId:checked.checkId,stages:checked.stages};
+      check("original_bound_check",checked.checkId===prev.lastCheck && checked.proposalId===prev.approved.proposalId);
+      check("source_failure_persisted",codes.includes("mapping_source_shape_invalid"));
+      const active=await get(activator,"/api/v1/mappings/"+state.mappingDraft.mappingId+"/active");
+      check("baseline_activation_after_restore",active.mappingReleaseId===prev.baseline.mappingReleaseId &&
+          active.activationId===prev.baseline.activationId && active.activationRevision===prev.baseline.activationRevision);
+      report.status="PASS";report.scope="DORIS_ACTIVATION_CHECK_RECOVERED";
+    } else if (mode === "s2-doris-states") {
+      phase = "normal_states_and_source_acl";
+      const cap = (await get(reader, "/api/v1/capabilities")).find(c => c.id === "g4_resolve_entity");
+      const execute = filters => request({...reader, headers:{...reader.headers,"Idempotency-Key":randomUUID()}}, "POST",
+        "/api/v1/data/semantic-queries", {...state.latestQuery.query, capabilityId:cap.id, capabilityVersion:cap.version, relationshipIris:[], filters});
+      const empty = await execute({siteId:"site-a",entityExternalId:"missing"});
+      check("verified_empty", empty.data.status==="EMPTY" && !empty.data.limited && empty.data.evidence.length===0);
+      const both = await execute({siteId:"site-a"});
+      check("two_true_candidates", both.data.status==="AMBIGUOUS" && both.data.candidates.length===2 && !both.data.limited);
+      const path = "/api/v1/data/semantic-queries/"+state.latestQuery.queryId+"/result";
+      const original = await request(reader,"GET",path);
+      const evidence = "/api/v1/data/source-evidence/"+encodeURIComponent(original.data.evidence[0].evidenceId);
+      const change = action => execFileSync("python3",["-B","scripts/maintenance/workflow_doris_s1.py","state-fixture","--state-operation",action],
+        {cwd:root,encoding:"utf8",timeout:15000});
+      change("deny");
+      try {
+        const old = await request(reader,"GET",path,undefined,403);
+        const denied = await request(reader,"GET",evidence,undefined,403);
+        const before = observed();
+        const fresh = await execute({siteId:"site-a",entityExternalId:"E1"});
+        const after = observed();
+        check("source_acl_denied_without_business_projection", fresh.data.status==="UNAUTHORIZED" && fresh.data.data.length===0 &&
+          fresh.data.evidence.length===0 && before.queryIdsSha256===after.queryIdsSha256 && before.auditInode===after.auditInode);
+        report.sourceAccess={result:old.status,evidence:denied.status,before,after};
+      } finally { change("allow"); }
+      check("source_acl_restored_original_bytes",(await request(reader,"GET",path)).raw===original.raw);
+      report.status="PASS";report.scope="DORIS_EMPTY_AMBIGUOUS_SOURCE_PRIVILEGE";
+    } else if (mode === "s2-doris-access") {
       phase="current_authority";
       const original=state.latestQuery;
       const path="/api/v1/data/semantic-queries/"+original.queryId+"/result";
@@ -339,12 +413,16 @@ async function browserRun(mode) {
       }
       check("same_saved_bytes_after_regrant",(await request(reader,"GET",path)).raw===read.raw);
       report.status="PASS";report.scope="DORIS_CURRENT_AUTHORITY";
-    } else if (mode === "s2-doris-cancel") {
+    } else if (["s2-doris-cancel","s2-doris-admission-cancel","s2-doris-cancel-window"].includes(mode)) {
+      const admission = mode === "s2-doris-admission-cancel";
       phase="formal_cancel";
       const {spawn}=await import("node:child_process");
       const {createInterface}=await import("node:readline");
+      // 真实已完成查询用于预热同一正式取消路由，先检查 409 不改原结果。
+      const warmed = await request(reader, "POST", "/api/v1/data/semantic-queries/"+state.latestQuery.queryId+"/cancel", undefined, 409);
+      check("previous_completed_cancel_warmed", warmed.data.code === "query_already_finished");
       const key=randomUUID();
-      const monitor=spawn("python3",["-B","scripts/maintenance/doris_query_cancel_witness.py",key],{cwd:root,stdio:["ignore","pipe","ignore"]});
+      const monitor=spawn("python3",["-B","scripts/maintenance/doris_query_cancel_witness.py",key,...(admission?["--admit-first"]:[])],{cwd:root,stdio:["ignore","pipe","ignore"]});
       const lines=createInterface({input:monitor.stdout})[Symbol.asyncIterator]();
       const next=async () => { const entry=await lines.next(); check("witness_event_"+report.checks.length,!entry.done); return JSON.parse(entry.value); };
       try {
@@ -355,7 +433,15 @@ async function browserRun(mode) {
         const running=request({...reader,headers:{...reader.headers,"Idempotency-Key":key}},"POST","/api/v1/data/semantic-queries",query,[200,403,409,422,503,504]);
         const active=await next();
         report.witness=active;
-        if(active.event!=="active"){await running;check("source_was_executing",false);}
+        if(active.event!==(admission?"admitted":"active")){await running;check("source_was_executing",false);}
+        if (mode === "s2-doris-cancel-window") {
+          await running;
+          const final = await next();
+          check("natural_source_window", final.beEvents.some(e=>e.kind==="registered") && final.beEvents.some(e=>e.kind==="context_end"));
+          report.naturalWindow = final;
+          report.status="PASS"; report.scope="CANCEL_PRESSURE_WINDOW_MEASUREMENT_ONLY";
+          return;
+        }
         const issued=Date.now();
         const cancelled=await request(reader,"POST","/api/v1/data/semantic-queries/"+active.queryId+"/cancel",undefined,[200,409]);
         const delivery=await running;
@@ -363,13 +449,23 @@ async function browserRun(mode) {
         const final=await next();
         report.cancel={issuedUtc:new Date(issued).toISOString(),httpStatus:cancelled.status,initialStatus:delivery.status,elapsedMs:elapsed,witness:final};
         check("cancel_committed_and_no_success",cancelled.status===200 && final.terminal==="CANCELLED" && final.persisted.bytes===0 &&
-          final.persisted.resultHash===null && final.successfulAuditCount===0);
+          final.persisted.resultHash===null && final.persisted.readReceipts===0 && final.persisted.cancelRequested && final.cancelAuditCount===1 && final.successfulAuditCount===0);
+        if (admission) {
+          report.status="PASS";
+          report.scope="DORIS_CANCEL_WON_AT_PLATFORM";
+          // 此用例只要求真实取消成功和持久化 fence，源在途终止由独立门禁裁决。
+          return;
+        }
         const kinds=final.beEvents.map(e=>e.kind);
-        check("server_cancelled_active_query",["registered","cancel_arrived","task_cancelled","fragment_end","context_end"].every(k=>kinds.includes(k)));
+        check("server_cancelled_active_query",final.cancelVisibleBeforeBeKilled === true && ["registered","cancel_arrived","task_cancelled","fragment_end","context_end"].every(k=>kinds.includes(k)));
         const when=e=>Date.parse(e.beUtc.replace(/^(\d{4})(\d{2})(\d{2}) /,"$1-$2-$3T")+"Z");
-        const cleanup=Math.max(...final.beEvents.filter(e=>e.kind==="context_end").map(when))-issued;
-        report.cancel.cleanupMs=cleanup;
-        check("source_cleanup_inside_deadline",cleanup>=0 && cleanup<=250 && final.sourceCounts==="0\t0" && elapsed<=5000);
+        const firstRegistration = Math.min(...final.beEvents.filter(e=>e.kind==="registered").map(when));
+        const endFloorMs = Math.max(...final.beEvents.filter(e=>e.kind==="context_end").map(when));
+        // 毫秒解析会舍弃小数，用区间上界判定，不把边界舍入成通过。
+        const cleanupUpperMs = endFloorMs + 1 - issued;
+        report.cancel.cleanupUpperMs = cleanupUpperMs;
+        check("source_active_before_request",firstRegistration + 1 <= issued);
+        check("source_cleanup_inside_deadline",cleanupUpperMs>=0 && cleanupUpperMs<=250 && final.sourceCounts==="0\t0" && elapsed<=5000);
         report.status="PASS"; report.scope="DORIS_FORMAL_CANCELLATION";
       } finally { monitor.stdout.destroy(); }
     } else if (mode === "s2-doris-queries") {
@@ -394,12 +490,17 @@ async function browserRun(mode) {
       await writeFile(file.replace(".json","-result.json"),result.raw,{flag:"wx"});
       state.latestQuery={query,queryId:result.queryId,resultHash:createHash("sha256").update(result.raw).digest("hex")};
       await save(state); report.status="PASS"; report.scope="DORIS_TWO_TABLE_QUERY";
-    } else if (doris && ["s1-key-negative","s2-doris-null","s2-doris-fanout-negative"].includes(mode)) {
+    } else if (doris && ["s1-key-negative","s2-doris-null","s2-doris-fanout-negative","s2-doris-identity","s2-doris-cardinality"].includes(mode)) {
+      const expectedIssue = {
+        "s1-key-negative": "mapping_source_shape_invalid", "s2-doris-identity": "mapping_source_shape_invalid",
+        "s2-doris-null": "mapping_relation_endpoint_unknown", "s2-doris-fanout-negative": "mapping_fanout_exceeded",
+        "s2-doris-cardinality": "mapping_cardinality_conflict"
+      }[mode];
       const fanout = mode === "s2-doris-fanout-negative";
       phase = fanout ? "fanout_assessment" : twoTable ? "null_relation_assessment" : "unsupported_identity_assessment";
       const requestBody = structuredClone(state.mappingCreate);
       const identity = requestBody.mapping.identitySpecs[0];
-      if (!twoTable) identity.externalIdFieldRefs = [{ ...identity.externalIdFieldRefs[0], name: "join_key", ordinal: 4 }];
+      if (expectedIssue === "mapping_source_shape_invalid") identity.externalIdFieldRefs = [{ ...identity.externalIdFieldRefs[0], name: "join_key", ordinal: 4 }];
       requestBody.command = command();
       const draft = await post(operator, "/api/v1/mappings", requestBody, 201);
       const invalidPath = "/api/v1/mappings/" + draft.mappingId;
@@ -412,11 +513,11 @@ async function browserRun(mode) {
         check("negative_job_advances_" + i, ["QUEUED","RUNNING"].includes(job.status));
         await new Promise(done => setTimeout(done, 300));
       }
-      check("unsupported_identity_never_publishable", rejected?.status === "BLOCKED" && rejected.issues.some(i => i.code === (fanout ? "mapping_fanout_exceeded" : twoTable ? "mapping_relation_endpoint_unknown" : "mapping_source_shape_invalid")));
+      check("unsupported_identity_never_publishable", rejected?.status === "BLOCKED" && rejected.issues.some(i => i.code === expectedIssue));
       const active = (await request(operator, "GET", invalidPath + "/active", undefined, 404)).data;
       check("unsupported_identity_has_no_activation", active.code === "mapping_active_missing");
       report.rejected = { mappingId:draft.mappingId, assessmentId:rejected.assessmentId, issues:rejected.issues.map(i => i.code), active };
-      report.status="PASS"; report.scope=fanout ? "DORIS_FANOUT_TEN_ELEVEN" : twoTable ? "DORIS_NULL_RELATION_NEGATIVE" : "DORIS_IDENTITY_NEGATIVE";
+      report.status="PASS"; report.scope=mode==="s2-doris-cardinality" ? "OVERLAPPING_PARENTS_REJECTED" : mode==="s2-doris-identity" ? "COLLIDING_IDENTITY_PLAN_REJECTED" : fanout ? "DORIS_FANOUT_TEN_ELEVEN" : twoTable ? "DORIS_NULL_RELATION_NEGATIVE" : "DORIS_IDENTITY_NEGATIVE";
     } else if (mode === "numeric") {
       phase = "numeric_formal_gateway";
       const capability = (await get(operator, "/api/v1/capabilities")).find(item => item.id === "g4_traverse_relationships");
@@ -577,16 +678,29 @@ async function browserRun(mode) {
     } else if (["s2-aba", "s2-aba-prepare"].includes(mode)) {
       const path = "/api/v1/mappings/" + state.mappingDraft.mappingId;
       const capability = (await get(operator, "/api/v1/capabilities")).find(item => item.id === "g4_resolve_entity");
-      const query = { ...state.latestQuery.query, capabilityVersion: capability.version, filters: { entityExternalId: "asset-1" } };
+      const query = { ...state.latestQuery.query, capabilityId: capability.id, capabilityVersion: capability.version,
+        ...(doris ? { relationshipIris: [], filters: { siteId: "site-a", entityExternalId: "E1" } } : { filters: { entityExternalId: "asset-1" } }) };
       const prepareOnly = mode === "s2-aba-prepare";
+      let dorisBaseline;
+      if (doris) {
+        dorisBaseline = await get(activator,path+"/active");
+        check("known_active_A",dorisBaseline.mappingReleaseId===state.mappingReceipt.mappingReleaseId &&
+          dorisBaseline.manifestHash===state.mappingReceipt.manifestHash &&
+          dorisBaseline.activationRevision===(state.mappingCurrentReceipt??state.mappingReceipt).activationRevision);
+        if (state.s2AbaInFlight && (state.s2AbaInFlight.baselineRevision??state.mappingReceipt.activationRevision)!==dorisBaseline.activationRevision) {
+          (state.previousAbaCases??=[]).push(state.s2AbaInFlight);
+          delete state.s2AbaInFlight;
+        }
+        (state.s2AbaInFlight??={}).baselineRevision=dorisBaseline.activationRevision;
+      }
       const aba = prepareOnly ? (state.s2AbaInFlight ??= {}) : (state.s2Aba ??= {});
-      if (!aba.original) {
+      if (doris || !aba.original) {
         phase = "query_aba_original";
-        const original = await request({ ...operator, headers: { ...operator.headers, "Idempotency-Key": randomUUID() } }, "POST", "/api/v1/data/semantic-queries", query);
-        check("aba_original_ambiguous", original.data.status === "AMBIGUOUS");
+        const original = await request({ ...reader, headers: { ...reader.headers, "Idempotency-Key": randomUUID() } }, "POST", "/api/v1/data/semantic-queries", query);
+        check("aba_original_qualified", original.data.status === (doris ? "FOUND" : "AMBIGUOUS"));
         aba.original = { queryId: original.queryId, resultHash: createHash("sha256").update(original.raw).digest("hex"), candidate: original.data.candidates[0], query }; await save(state);
       }
-      const old = aba.original, selected = { ...old.query, filters: { ...old.query.filters, entityIri: old.candidate.entityIri, siteId: old.candidate.siteId } };
+      const old = aba.original, selected = doris ? null : { ...old.query, filters: { ...old.query.filters, entityIri: old.candidate.entityIri, siteId: old.candidate.siteId } };
       async function checkHistory(label) {
         const original = await request(operator, "GET", `/api/v1/data/semantic-queries/${old.queryId}/result`);
         check(label + "_historical_bytes_unchanged", createHash("sha256").update(original.raw).digest("hex") === old.resultHash);
@@ -631,14 +745,37 @@ async function browserRun(mode) {
       if (!aba.draftB) {
         phase = "query_aba_edit_b";
         const current = await get(operator, path), mapping = structuredClone(current.mapping);
-        mapping.identitySpecs[0].sourceNamespace = "query-fixture-aba-b";
+        mapping.identitySpecs[0].sourceNamespace = doris ? "query-fixture-aba-b-" + dorisBaseline.activationRevision : "query-fixture-aba-b";
         aba.patch ??= { mapping, command: command(current.revision) }; await save(state);
         aba.draftB = (await request(operator, "PATCH", path, aba.patch, 200, `"mapping:${current.revision}"`)).data; await save(state);
       }
       const b = await activateRound("b", { kind: "PUBLISH", draftRevision: aba.draftB.revision }, aba.draftB);
       if (prepareOnly) {
         check("inflight_b_approved_without_activation", b.status === "APPROVED" && !aba.b.receipt);
-        report.status = "PASS"; report.scope = "S2_INFLIGHT_ABA_PREPARATION_ONLY";
+        if (doris) {
+          const baseline = await get(activator, path + "/active");
+          check("original_A_still_active", baseline.mappingReleaseId === state.mappingReceipt.mappingReleaseId && baseline.manifestHash === state.mappingReceipt.manifestHash && baseline.activationRevision === dorisBaseline.activationRevision);
+          if (prepareShape) {
+            state.shapePreparation = { approved: b, baseline };
+            await save(state);
+            report.shapePreparation = {proposalId:b.proposalId,baseline};
+            report.status="PASS"; report.scope="DORIS_APPROVED_BEFORE_SHAPE_CHANGE";
+            return;
+          }
+          const envelope = { queryId: aba.original.queryId, proposalId: b.proposalId,
+            roles: [[operator,"A"],[auditor,"B"],[activator,"C"],[reader,"Q"]].map(([actor,role]) => ({ role, subjectId: actor.me.subjectId, cookie: actor.sessionCookie })) };
+          const result = execFileSync("python3", ["-B", "scripts/maintenance/workflow_doris_s1.py", "aba-test"], {
+            cwd: root, input: JSON.stringify(envelope), timeout: 40000, encoding: "utf8", stdio: ["pipe","pipe","pipe"] });
+          report.aba = JSON.parse(result);
+          const active = await get(activator, path + "/active");
+          check("same_release_distinct_new_activation", active.mappingReleaseId === baseline.mappingReleaseId &&
+            active.manifestHash === baseline.manifestHash && active.activationRevision === baseline.activationRevision + 2);
+          state.mappingCurrentReceipt = active;
+          await save(state);
+          report.status = "PASS"; report.scope = "DORIS_INFLIGHT_ABA";
+        } else {
+          report.status = "PASS"; report.scope = "S2_INFLIGHT_ABA_PREPARATION_ONLY";
+        }
         return;
       }
       check("aba_b_is_distinct_release", b.mappingReleaseId !== state.mappingReceipt.mappingReleaseId);

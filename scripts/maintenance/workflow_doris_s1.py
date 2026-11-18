@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import secrets
 import shutil
@@ -33,8 +34,8 @@ QUOTAS = {'platform-pg':(768,1),'keycloak-test':(1024,1),'fuseki':(2048,2),'rust
 FUSEKI_ID = 'sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c'
 
 
-def local(stage,args,env=None,seconds=30):
-    result = execution.run(args,ROOT,task=vm.TASK,run_id=vm.RUN,stage='dmq-s1-'+stage,environment=env,timeout=seconds)
+def local(stage,args,env=None,seconds=30,inputs=None):
+    result = execution.run(args,ROOT,task=vm.TASK,run_id=vm.RUN,stage='dmq-s1-'+stage,environment=env,timeout=seconds,input_key=inputs)
     vm.demand(result.returncode==0,'S1_'+stage.upper()+'_'+result.receipt['commandId'])
     return result
 
@@ -199,7 +200,7 @@ def configure():
 
 
 HOST = OUT/'s1-api-process.json'
-BROWSER = ('provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog','s2-doris-mapping','s2-doris-queries','s2-doris-null','s2-doris-cancel','s2-doris-access','s2-doris-fanout','s2-doris-requalify')
+BROWSER = ('provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog','s2-doris-mapping','s2-doris-queries','s2-doris-null','s2-doris-cancel','s2-doris-access','s2-doris-fanout','s2-doris-requalify','s2-doris-aba','s2-doris-admission-cancel','s2-doris-cancel-window','s2-doris-states','s2-doris-cardinality','s2-doris-identity','s2-doris-revoke-race','s2-doris-session-race','s2-doris-shape-prepare','s2-doris-shape-reject','s2-doris-shape-recover')
 
 
 def runtime_binding():
@@ -232,7 +233,7 @@ def browser_test(mode, prepared):
     dep=json.loads(dependency_path.read_bytes())
     vm.demand((dep['taskId'],dep['worktree'],dep['status'])==(vm.TASK,str(ROOT),'DEPENDENCIES_READY'),'S1_ENVIRONMENT')
     from workflow_doris_s0_fixture import STRESS
-    vm.demand(STRESS.exists()==(mode=='s2-doris-cancel'),'PRODUCT_STRESS_ISOLATION')
+    vm.demand(STRESS.exists()==(mode in ('s2-doris-cancel','s2-doris-admission-cancel','s2-doris-cancel-window')),'PRODUCT_STRESS_ISOLATION')
     live_stack()
     snapshot=freeze_api()
     dll=ROOT/snapshot['directory']/'OntologyPlatform.Api.dll'
@@ -244,6 +245,7 @@ def browser_test(mode, prepared):
     finished=threading.Event()
     env=dict(PATH=os.environ['PATH'],ASPNETCORE_ENVIRONMENT='Development',ASPNETCORE_CONTENTROOT=str(RUNTIME/'api'),
              G4__SourceCaPath=str(DIRECTORY/'tls/ca.pem'),ASPNETCORE_URLS='http://127.0.0.1:15641',DOTNET_GCHeapHardLimit='0x18000000',DOTNET_CLI_TELEMETRY_OPTOUT='1')
+    env['Logging__LogLevel__OntologyPlatform.Modules.SemanticQuery.G4QueryExecution']='Information'
     service=host_service([dep['dotnet'],str(dll)],env,ROOT,vm.TASK,exceeded)
     pid=service.process.pid
     evidence=OUT/('s1-host-'+mode+'-'+service.ident+'.json')
@@ -285,7 +287,13 @@ def browser_test(mode, prepared):
         record(HOST,row)
         service.ready()
         runtime_binding()
-        report=local('browser-'+mode,[dep['node'],'scripts/maintenance/workflow-m4-query.mjs','--task',vm.TASK,'--run-id',vm.RUN,'--mode',mode],seconds=180)
+        # 浏览器实际消费的脚本与程序集进入输入指纹，重验保留前次失败且可区分修正。
+        runner_paths = [Path(__file__), ROOT/'scripts/maintenance/workflow-m4-query.mjs', ROOT/'scripts/maintenance/workflow_doris_s0_fixture.py',
+                        ROOT/'scripts/maintenance/workflow_doris_mapping_query.py', ROOT/'scripts/maintenance/doris_query_cancel_witness.py']
+        components = [snapshot['snapshotId'], mode, [execution.sha(path.read_bytes()) for path in runner_paths]]
+        if STRESS.exists(): components.append(execution.sha(STRESS.read_bytes()))
+        inputs = execution.sha(execution.encoded(components))
+        report=local('browser-'+mode,[dep['node'],'scripts/maintenance/workflow-m4-query.mjs','--task',vm.TASK,'--run-id',vm.RUN,'--mode',mode],seconds=180,inputs=inputs)
         vm.demand(not exceeded.is_set(),'S1_HOST_CAP')
         print(report.stdout.decode().strip())
         row['browserCommand']=report.receipt['commandId']
@@ -297,6 +305,9 @@ def browser_test(mode, prepared):
         finally:
             for thread in service.reader_threads: thread.join(2)
             service.finish()
+            # 只保存固定格式聚合数值与本任务 queryId，不导出任何其他应用日志。
+            matches = re.findall(rb'DorisLeaseObservation query=(query-[0-9a-f]{32}) probes=(\d+) elapsedMs=([0-9.]+) maxReadMs=([0-9.]+) outcome=(closed|lease_changed|observation_failed)', bytes(service.out)+bytes(service.err))
+            row['dorisObservations'] = [dict(queryId=q.decode(), probes=int(n), elapsedMs=float(t), maxReadMs=float(m), outcome=o.decode()) for q,n,t,m,o in matches]
             row.update(status='EXITED' if service.process.poll() is not None else 'STOP_UNKNOWN',hostPeakBytes=peaks,
                        exceeded=exceeded.is_set(),exitCode=service.process.poll())
             record(evidence,row)
@@ -456,6 +467,59 @@ def relation_fixture(restore=False):
     print('S2_BOUNDARY_REFERENCE',','.join(server))
 
 
+def scoped_state_fixture(action, collision=False):
+    """受限正常数据的第二实体，以及源数据库既有单条 SELECT 许可的准确撤销与恢复。"""
+    from workflow_doris_s0_fixture import STRESS, stress_original
+    vm.demand(not STRESS.exists(), 'STATE_CASE_NOT_PRESSURE')
+    fe=live_stack()['fe']
+    path=OUT/'s2-source-states-active.json'
+    scope="org_id='org-demo' AND site_id='site-a'"
+    if action=='seed':
+        vm.demand(not path.exists() and sql(fe,'reader','SELECT entity_id FROM fixture.dmq_entity ORDER BY entity_id;')=='E1','STATES_BASELINE')
+        before=stress_original(fe,'dmq_entity','entity_id',['E1'])
+        grants=execution.sha(sql(fe,'reader','SHOW GRANTS;').encode())
+        row=dict(fe=fe,run=vm.RUN,scope=scope,original=before,grants=grants,attempt=secrets.token_hex(6),acl='original')
+        record(path,row)
+        join = '1.00' if collision else '2.00'
+        sql(fe,'root',f"""INSERT INTO fixture.dmq_entity VALUES ('org-demo','site-a','E2',{join},1.00,'K','2026-11-01','2026-12-01','2026-11-17 12:00:00.123457','2026-11-17 12:00:01.123457');""")
+        vm.demand(sql(fe,'reader','SELECT entity_id FROM fixture.dmq_entity ORDER BY entity_id;').splitlines()==['E1','E2'],'STATES_SEEDED')
+        if collision:
+            row['projectedIds'] = sql(fe,'reader',"SELECT join_key,COUNT(DISTINCT entity_id) FROM fixture.dmq_entity WHERE "+scope+" GROUP BY join_key;")
+            vm.demand(row['projectedIds'].split()==['1.00','2'],'COLLIDING_KEYS_PRECONDITION')
+            row['matchingParents'] = sql(fe,'reader',"SELECT t.target_id,COUNT(DISTINCT e.entity_id) FROM fixture.dmq_target t JOIN fixture.dmq_entity e ON t.org_id=e.org_id AND t.site_id=e.site_id AND t.join_key=e.join_key AND t.valid_from<e.valid_to AND t.valid_to>e.valid_from WHERE t.org_id='org-demo' AND t.site_id='site-a' GROUP BY t.target_id ORDER BY t.target_id;").splitlines()
+            vm.demand(row['matchingParents']==['T1\t2','T2\t2'],'OVERLAPPING_PARENTS_PRECONDITION')
+            record(path,row)
+        return
+    row=json.loads(path.read_bytes())
+    vm.demand(row['fe']==fe and row['run']==vm.RUN and row['scope']==scope,'STATES_OWNER')
+    existing=execution.sha(sql(fe,'reader','SHOW GRANTS;').encode())
+    if action=='deny':
+        vm.demand(existing==row['grants'] and row['acl']=='original','STATES_GRANT_CHANGED')
+        row['acl']='revoking'
+        record(path,row)
+        sql(fe,'root',"REVOKE SELECT_PRIV ON internal.fixture.* FROM 'fixture_reader'@'%';")
+        row['denied']=execution.sha(sql(fe,'reader','SHOW GRANTS;').encode())
+        vm.demand(row['denied']!=row['grants'],'STATES_DENY')
+        row['acl']='denied'
+        record(path,row)
+        return
+    if row['acl']!='original' and existing!=row['grants']:
+        vm.demand(row.get('denied')==existing,'STATES_GRANT_RESTORE_OWNER')
+        sql(fe,'root',"GRANT SELECT_PRIV ON internal.fixture.* TO 'fixture_reader'@'%';")
+    vm.demand(execution.sha(sql(fe,'reader','SHOW GRANTS;').encode())==row['grants'],'STATES_GRANTS_RESTORE')
+    row['acl']='original'
+    record(path,row)
+    if action=='allow': return
+    keys=sql(fe,'reader','SELECT entity_id FROM fixture.dmq_entity ORDER BY entity_id;').splitlines()
+    vm.demand(keys in (['E1'],['E1','E2']) and stress_original(fe,'dmq_entity','entity_id',['E1'])==row['original'],'STATES_RESTORE_OWNER')
+    if 'E2' in keys:
+        sql(fe,'root',"DELETE FROM fixture.dmq_entity WHERE "+scope+" AND entity_id='E2';")
+    vm.demand(sql(fe,'reader','SELECT entity_id FROM fixture.dmq_entity;')=='E1' and stress_original(fe,'dmq_entity','entity_id',['E1'])==row['original'],'STATES_RESTORE')
+    row.update(status='RESTORED',after=row['original'])
+    record(OUT/('s2-source-states-'+row['attempt']+'-restored.json'),row)
+    path.unlink()
+
+
 def fanout_fixture(action):
     """在已发布任务夹具中独立枚举十与十一条边，按准确复合键复原。"""
     from workflow_doris_mapping_query import REFERENCE_SQL
@@ -505,14 +569,91 @@ def fanout_fixture(action):
     return dict(phase=action, expected=expected)
 
 
-def cancellation_case(prepared):
+def cancellation_case(prepared, admission=False):
     from workflow_doris_s0_fixture import STRESS,stress_fixture
     vm.demand(not STRESS.exists(),'S2_SEPARATE_STRESS_REQUIRED')
     try:
         stress_fixture(platform=True)
-        browser_test('s2-doris-cancel',prepared)
+        browser_test('s2-doris-admission-cancel' if admission else 's2-doris-cancel',prepared)
     finally:
         if STRESS.exists(): stress_fixture(restore=True,platform=True)
+
+
+def graduated_cancel(prepared):
+    """每级独立核资源、加载实体、实测固定 SELECT 并准确复原。满足自然窗口即停止扩容。"""
+    import datetime
+    from workflow_doris_s0_fixture import STRESS, ENTITY_TIERS, stress_fixture
+    ledger = dict(taskId=vm.TASK,runId=vm.RUN,attempt=secrets.token_hex(6),stages=[],minimumWindowMs=160)
+    path = OUT/('s2-entity-tiers-'+ledger['attempt']+'.json')
+    record(path,ledger)
+    for tier in ENTITY_TIERS:
+        vm.demand(not STRESS.exists(),'S2_SEPARATE_STRESS_REQUIRED')
+        stage = dict(entityRows=tier,targetRows=3)
+        ledger['stages'].append(stage)
+        record(path,ledger)
+        try:
+            stress_fixture(platform=True,entity_rows=tier)
+            fixture = json.loads(STRESS.read_bytes())
+            stage['fixture']=fixture['attempt']
+            before = set(OUT.glob('browser-s2-doris-cancel-window-*.json'))
+            browser_test('s2-doris-cancel-window',prepared)
+            new = set(OUT.glob('browser-s2-doris-cancel-window-*.json'))-before
+            vm.demand(len(new)==1,'TIER_WITNESS_COUNT')
+            report = new.pop()
+            observed = json.loads(report.read_bytes())['naturalWindow']
+            vm.demand(observed['stress']['attempt']==fixture['attempt'] and observed['stress']['rowsByTable']==
+                      {'dmq_entity':tier,'dmq_target':3},'TIER_WITNESS_BINDING')
+            events = observed['beEvents']
+            start,end = [datetime.datetime.strptime(next(e['beUtc'] for e in events if e['kind']==kind),'%Y%m%d %H:%M:%S.%f')
+                         for kind in ('registered','context_end')]
+            stage.update(windowMs=(end-start).total_seconds()*1000,sourceQueryId=observed['sourceQueryId'],
+                         naturalReport=report.name,queryId=observed['queryId'])
+            vm.demand(stage['windowMs']>0,'TIER_WITNESS_CLOCK')
+            if stage['windowMs']>=ledger['minimumWindowMs']:
+                stage['formalAttempt']=True
+                record(path,ledger)
+                browser_test('s2-doris-cancel',prepared)
+                stage['formalBrowserPassed']=True
+                break
+        finally:
+            if STRESS.exists():
+                attempt=json.loads(STRESS.read_bytes())['attempt']
+                stress_fixture(restore=True,platform=True)
+                stage['restoration']='s0-stress-fixture-'+attempt+'-restored.json'
+            record(path,ledger)
+    ledger['status']='REVIEW_REQUIRED' if ledger['stages'][-1].get('formalBrowserPassed') else 'NO_GO_WINDOW'
+    record(path,ledger)
+    print(path.relative_to(ROOT),ledger['status'])
+
+
+def runtime_race_test(case):
+    """只接收当前合成 Cookie 的内存管道，按已绑定 AgentTests 运行一次已登记的正式在途竞争。"""
+    from workflow_m2_evidence import mtp
+    frozen = json.loads(SNAPSHOT.read_bytes())
+    active = runtime_binding()
+    stage, method = {
+        'aba': ('s2-doris-aba', 'DorisActivationRevisionRejectsInflightQuery'),
+        'revoke': ('s2-doris-revoke-race', 'DorisRevocationRejectsInflightQuery'),
+        'session': ('s2-doris-session-race', 'DorisExpiredSessionRejectsInflightQuery')
+    }[case]
+    vm.demand(active['stage'] == stage and active['snapshotId'] == frozen['snapshotId'], 'ABA_HOST_BINDING')
+    binding = build.validate('agent', vm.TASK)
+    vm.demand(binding['inputKey'] == build.validate('api', vm.TASK)['inputKey'], 'ABA_INPUT_BINDING')
+    dotnet = frozen['environment']['dotnet']
+    dll = ROOT / Path(build.TARGETS['agent']).parent / 'bin/Debug/net10.0/OntologyPlatform.AgentTests.dll'
+    method = 'OntologyPlatform.AgentTests.G4QueryMafRuntimeTests.' + method
+    envelope = sys.stdin.buffer.read(65537)
+    vm.demand(0 < len(envelope) <= 65536, 'ABA_SESSION_INPUT')
+    env = dict(PATH=os.environ['PATH'], ASPNETCORE_ENVIRONMENT='Development', G4__SourceCaPath=str(DIRECTORY/'tls/ca.pem'),
+               G4_QUERY_RUNTIME_TEST=vm.TASK+':'+vm.RUN, DOTNET_GCHeapHardLimit='0x18000000', DOTNET_CLI_TELEMETRY_OPTOUT='1')
+    result = execution.run([dotnet, str(dll), '--filter', 'FullyQualifiedName='+method, '--minimum-expected-tests', '1', '--no-ansi', '--progress', 'off', '--results-directory', str(OUT/'aba-results')],
+                           ROOT, task=vm.TASK, run_id=vm.RUN, stage='dmq-inflight-'+case, environment=env,
+                           input_key=execution.sha(execution.encoded(binding)), stdin=envelope, timeout=25)
+    passed = mtp(result.stdout + result.stderr, 1) if not result.returncode else 0
+    summary = dict(commandId=result.receipt['commandId'], input=binding, exitCode=result.returncode, passed=passed)
+    record(OUT/(('s2-'+case+'-mtp-')+summary['commandId']+'.json'), summary)
+    vm.demand(result.returncode == 0 and passed == 1, 'ABA_MTP_'+summary['commandId'])
+    print(json.dumps(summary))
 
 
 def pg_golden(prepared):
@@ -536,10 +677,11 @@ def pg_golden(prepared):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('stage',choices=['prepare','render','start','configure','freeze','pg-golden','s2-cancel-case','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
+    parser.add_argument('stage',choices=['prepare','render','start','configure','freeze','pg-golden','s2-activation-shape','s2-graduated-cancel','s2-cancel-case','s2-admission-case','state-fixture','session-test','revoke-test','aba-test','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
     parser.add_argument('--prepared')
     parser.add_argument('--permission',choices=[f'{v}-{k}' for v in ('revoke','restore') for k in ('execute','result','evidence')])
     parser.add_argument('--fanout', choices=['ten','eleven','restore'])
+    parser.add_argument('--state-operation',choices=['seed','deny','allow','restore'])
     args=parser.parse_args()
     if args.stage == 's2-doris-fanout':
         vm.demand(not (OUT/'s2-fanout-active.json').exists(), 'FANOUT_ALREADY_ACTIVE')
@@ -547,11 +689,34 @@ if __name__=='__main__':
             browser_test(args.stage, args.prepared)
         finally:
             if (OUT/'s2-fanout-active.json').exists(): fanout_fixture('restore')
+    elif args.stage=='state-fixture': scoped_state_fixture(args.state_operation)
+    elif args.stage in ('s2-doris-states','s2-doris-cardinality'):
+        vm.demand(not (OUT/'s2-source-states-active.json').exists(),'STATES_ALREADY_ACTIVE')
+        try:
+            scoped_state_fixture('seed',collision=args.stage=='s2-doris-cardinality')
+            browser_test(args.stage,args.prepared)
+            if args.stage=='s2-doris-cardinality': browser_test('s2-doris-identity',args.prepared)
+        finally:
+            if (OUT/'s2-source-states-active.json').exists(): scoped_state_fixture('restore')
+    elif args.stage=='s2-doris-revoke-race':
+        ledger=OUT/'s2-grant-active-execute.json'
+        vm.demand(not ledger.exists(),'REVOKE_RACE_ALREADY_ACTIVE')
+        try: browser_test(args.stage,args.prepared)
+        finally:
+            if ledger.exists(): permission_case('restore-execute')
     elif args.stage in BROWSER: browser_test(args.stage,args.prepared)
     elif args.stage in ('s2-boundary','s2-restore'): relation_fixture(args.stage=='s2-restore')
+    elif args.stage in ('aba-test','revoke-test','session-test'): runtime_race_test(args.stage.removesuffix('-test'))
     elif args.stage=='fanout': print(json.dumps(fanout_fixture(args.fanout)))
     elif args.stage=='permission': permission_case(args.permission)
-    elif args.stage=='s2-cancel-case': cancellation_case(args.prepared)
+    elif args.stage in ('s2-cancel-case','s2-admission-case'): cancellation_case(args.prepared,args.stage=='s2-admission-case')
+    elif args.stage=='s2-activation-shape':
+        from workflow_doris_s0_fixture import shape_case
+        browser_test('s2-doris-shape-prepare',args.prepared)
+        for method in ('driver-type-reject','driver-model-reject'):
+            shape_case(method,args.prepared,activation=True)
+            browser_test('s2-doris-shape-recover',args.prepared)
+    elif args.stage=='s2-graduated-cancel': graduated_cancel(args.prepared)
     elif args.stage=='pg-golden': pg_golden(args.prepared)
     elif args.stage.endswith('-grants'): synthetic_grants(args.stage.split('-')[-2],args.stage.startswith('s2-'))
     else: {'prepare':prepare,'render':render,'start':start,'configure':configure,'freeze':freeze_api}[args.stage]()

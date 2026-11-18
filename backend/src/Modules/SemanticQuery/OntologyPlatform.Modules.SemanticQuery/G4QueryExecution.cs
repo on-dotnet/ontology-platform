@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.Extensions.Logging;
 using System.Text;
 using OntologyPlatform.Contracts;
 
@@ -22,15 +23,19 @@ public sealed class G4QueryExecution
     /// <summary>与总预算和租约共用的服务器时钟。</summary>
     private readonly TimeProvider clock;
 
+    /// <summary>记录每个观察窗口的聚合负载和结果，不记录身份票据或源值。</summary>
+    private readonly ILogger<G4QueryExecution>? logger;
+
     /// <summary>正式DI组合现有模块参与者，不绕过公共Gateway或Guard。</summary>
     public G4QueryExecution(IG4QueryBindingReader bindings, IG4SourceQueryReader source, IG4QueryAuthorizationAuthority authority,
-        G4QueryResultStore store, TimeProvider clock)
+        G4QueryResultStore store, TimeProvider clock, ILogger<G4QueryExecution>? logger = null)
     {
         this.bindings = bindings;
         this.source = source;
         this.authority = authority;
         this.store = store;
         this.clock = clock;
+        this.logger = logger;
     }
 
     /// <summary>正式映射的有界查询执行；本体、根定位和分支读取共用同一Gateway。</summary>
@@ -98,7 +103,7 @@ public sealed class G4QueryExecution
             {
                 try
                 {
-                    read = await source.ReadAsync(context, proofs[0], entity.Id, query, deadline, execution.Token);
+                    read = await ReadBranchAsync(admission.Record, context, proofs[0], entity.Id, query, deadline, execution.Token);
                     projected = ProjectEntities(admission.Record.Id, actor.TraceId, context, read);
                     if (query.Filters.EntityIri is not null)
                     {
@@ -137,7 +142,7 @@ public sealed class G4QueryExecution
             if (query.CapabilityId != "g4_resolve_entity" && result.Status is "FOUND" or "PARTIAL" && projected is not null && read is { Limited: false, Indeterminate: false })
             {
                 // 已完整定位的根是后续分支失败时唯一可信前缀。
-                var expanded = await ExpandAsync(actor, session, query, context, admission.Record.Id, result, projected, read, proofs, deadline, execution.Token);
+                var expanded = await ExpandAsync(actor, session, query, context, admission.Record, result, projected, read, proofs, deadline, execution.Token);
                 result = expanded.Result;
                 proofs = expanded.Proofs;
                 state = state with { Projections = expanded.Projections };
@@ -284,10 +289,12 @@ public sealed class G4QueryExecution
 
     /// <summary>固定有界关系计划串行读取独立源事务；根断言是失败时可保留的可信前缀。</summary>
     private async Task<(G4QueryResultV1 Result, MappingAuthorizationProof[] Proofs, G4QueryProjection[] Projections, G4QueryStoredReceipt[] Receipts)> ExpandAsync(
-        ActorContext actor, MappingAuthorizationProof session, G4SemanticQuery query, G4QueryBindingContext context, string queryId,
+        ActorContext actor, MappingAuthorizationProof session, G4SemanticQuery query, G4QueryBindingContext context, G4QueryRecord lease,
         G4QueryResultV1 initial, G4QueryBranchProjection root, G4SourceQueryRead rootRead, MappingAuthorizationProof[] rootProofs,
         DateTimeOffset deadline, CancellationToken token)
     {
+        // 分支的源读取和回执均绑定同一条准入记录。
+        var queryId = lease.Id;
         // 实际响应最多100个完整断言，已有根身份优先保留。
         var data = initial.Data.ToList();
         // 所有来源均来自真实独立事务，不把关系分支伪装为第二连接。
@@ -350,7 +357,7 @@ public sealed class G4QueryExecution
                         // 单条grant必须覆盖该分支，不合并多个不完整许可。
                         var proof = await CaptureAsync(session, context.Binding.ConnectionId, projection, "data.query.execute", token);
                         // 根过滤不传给目标；关系谓词只由已授权父行与正式映射构造。
-                        var child = await source.ReadAsync(context, proof, relation.ToBindingId, query with { Filters = query.Filters with { EntityExternalId = null, EntityIri = null } }, deadline, token,
+                        var child = await ReadBranchAsync(lease, context, proof, relation.ToBindingId, query with { Filters = query.Filters with { EntityExternalId = null, EntityIri = null } }, deadline, token,
                             new G4QueryBranchFilter { RelationId = relation.Id, Parents = parent.Read });
                         intermediateBytes += G4QueryCanonical.Serialize(child.Rows).Length;
                         candidateEdges += (long)parent.Read.Rows.Length * child.Rows.Length;
@@ -506,6 +513,130 @@ public sealed class G4QueryExecution
     /// <summary>仅对完整相同投影复用源ACL检查，不把另一张表的检查当作当前字段许可。</summary>
     private static bool SameProjection(G4QueryProjection left, G4QueryProjection right) => left.ObjectRefs.Order(StringComparer.Ordinal).SequenceEqual(right.ObjectRefs.Order(StringComparer.Ordinal))
         && left.FieldRefs.Order(StringComparer.Ordinal).SequenceEqual(right.FieldRefs.Order(StringComparer.Ordinal));
+
+    /// <summary>只在已准入的 Doris 源分支上附加独立的只读取消观察。</summary>
+    private async Task<G4SourceQueryRead> ReadBranchAsync(G4QueryRecord lease, G4QueryBindingContext context,
+        MappingAuthorizationProof proof, string entityId, G4SemanticQuery query, DateTimeOffset deadline,
+        CancellationToken token, G4QueryBranchFilter? branch = null)
+    {
+        if (context.Manifest.Binding.SourceType != "DORIS")
+            return await source.ReadAsync(context, proof, entityId, query, deadline, token, branch);
+
+        return await ReadWithDorisLeaseAsync(lease.Id, deadline, token,
+            cancellation => source.ReadAsync(context, proof, entityId, query, deadline, cancellation, branch),
+            cancellation => store.DorisLeaseIsCurrentAsync(lease, cancellation));
+    }
+
+    /// <summary>把源读取、租约判断与清理统一到绝对期限，允许定向测试注入迟滞的只读参与者。</summary>
+    private async Task<G4SourceQueryRead> ReadWithDorisLeaseAsync(string queryId, DateTimeOffset deadline, CancellationToken token,
+        Func<CancellationToken, Task<G4SourceQueryRead>> read, Func<CancellationToken, Task<bool>> checkLease)
+    {
+        // 分支使用原始绝对截止扣除平台余量；一次单调计时覆盖探测和释放。
+        var started = clock.GetTimestamp();
+        // 真实业务工作及清理都在同一秒内，尾部最多二百五十毫秒。
+        var budget = TimeSpan.FromMilliseconds(Math.Min(1000, (deadline - clock.GetUtcNow()).TotalMilliseconds - 500));
+        if (budget <= TimeSpan.FromMilliseconds(250)) throw new SemanticOperationException(503, "query_source_budget_exhausted");
+        // 只读观察失效时，同一令牌通知正式驱动执行原有清理。
+        using var work = CancellationTokenSource.CreateLinkedTokenSource(token);
+        // 原有驱动自行约束其实际 I/O；这里独立记录最早的取消时间，用于限制观察器收尾。
+        long cancelledAt = 0;
+        using var onCancel = work.Token.Register(() => Interlocked.CompareExchange(ref cancelledAt, clock.GetTimestamp(), 0));
+        // 源正常返回时，仅停止自己的观察，执行心跳继续由外层维护。
+        using var done = CancellationTokenSource.CreateLinkedTokenSource(token);
+        // 每个分支串行观察，同一次平台读取含上下文释放，无法及时释放时拒绝成功。
+        var observing = ObserveDorisLeaseAsync(queryId, checkLease, work, done.Token, started, budget);
+        try
+        {
+            return await read(work.Token);
+        }
+        finally
+        {
+            // 停止回调本身也在同一截止内；禁止因等待迟到的数据库驱动而延长请求。
+            var stopped = Task.WhenAll(done.CancelAsync(), observing);
+            // 正常读完成或先前取消均只消费尚余的清理时间。
+            var remaining = budget - clock.GetElapsedTime(started);
+            // 用最早取消时刻裁剪，不能在 native KILL 完成后重新获得 250ms。
+            var at = Interlocked.Read(ref cancelledAt);
+            // 收尾始终取两个实际剩余量中的较小值。
+            var cleanup = TimeSpan.FromMilliseconds(250) - (at == 0 ? TimeSpan.Zero : clock.GetElapsedTime(at));
+            try
+            {
+                await stopped.WaitAsync(TimeSpan.FromTicks(Math.Max(0, Math.Min(remaining.Ticks, cleanup.Ticks))), clock);
+            }
+            catch (TimeoutException)
+            {
+                // 延迟退出仍由原任务负责释放上下文并观察异常，当前分支立即停止且不产生成功落库。
+                _ = stopped.ContinueWith(failed => _ = failed.Exception, CancellationToken.None,
+                    TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+                logger?.LogWarning("DorisLeaseCleanupUnconfirmed query={QueryId}", queryId);
+                throw new OperationCanceledException("query_source_timeout");
+            }
+            work.Token.ThrowIfCancellationRequested();
+        }
+    }
+
+    /// <summary>每次平台查询结束后至少十毫秒再观察，任何失败立即取消源分支。</summary>
+    private async Task ObserveDorisLeaseAsync(string queryId, Func<CancellationToken, Task<bool>> checkLease, CancellationTokenSource work, CancellationToken stop,
+        long start, TimeSpan budget)
+    {
+        // 当前分支已发出的平台只读命令数，包含终止时取消的命令。
+        var probes = 0;
+        // 最慢一次平台检查的实际耗时。
+        var longest = TimeSpan.Zero;
+        // 仅固定状态出现在诊断输出中。
+        var outcome = "closed";
+        try
+        {
+            while (true)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(10), clock, stop);
+                // 每次读取包含上下文释放，且在清理预留前结束。超时直接通知驱动，无须等数据库接受取消。
+                var available = budget - clock.GetElapsedTime(start) - TimeSpan.FromMilliseconds(250);
+                if (available <= TimeSpan.Zero)
+                {
+                    outcome = "observation_failed";
+                    if (!stop.IsCancellationRequested) await work.CancelAsync();
+                    return;
+                }
+                using var timeout = new CancellationTokenSource(TimeSpan.FromMilliseconds(Math.Min(100, available.TotalMilliseconds)), clock);
+                using var failClosed = timeout.Token.Register(() =>
+                {
+                    if (!stop.IsCancellationRequested) work.Cancel();
+                });
+                // 结束分支、平台检查超时均能取消本次精确索引查询。
+                using var probe = CancellationTokenSource.CreateLinkedTokenSource(stop, timeout.Token);
+                // 精确计量平台调用，不把十毫秒间隔计入 SQL 延迟。
+                var began = clock.GetTimestamp();
+                probes++;
+                try
+                {
+                    if (!await checkLease(probe.Token) || timeout.IsCancellationRequested)
+                    {
+                        outcome = "lease_changed";
+                        if (!stop.IsCancellationRequested) await work.CancelAsync();
+                        return;
+                    }
+                }
+                finally
+                {
+                    // 最坏的单次延迟覆盖失效或被取消的最后一次平台查询。
+                    var duration = clock.GetElapsedTime(began);
+                    if (duration > longest) longest = duration;
+                }
+            }
+        }
+        catch (OperationCanceledException) when (stop.IsCancellationRequested) { }
+        catch
+        {
+            outcome = "observation_failed";
+            if (!stop.IsCancellationRequested) await work.CancelAsync();
+        }
+        finally
+        {
+            logger?.LogInformation("DorisLeaseObservation query={QueryId} probes={Probes} elapsedMs={Elapsed} maxReadMs={Longest} outcome={Outcome}",
+                queryId, probes, clock.GetElapsedTime(start).TotalMilliseconds, longest.TotalMilliseconds, outcome);
+        }
+    }
 
     /// <summary>两秒心跳观察跨实例取消或失联，源预算仍由原绝对deadline决定。</summary>
     private async Task WatchAsync(G4QueryRecord lease, CancellationTokenSource execution, CancellationToken observation)

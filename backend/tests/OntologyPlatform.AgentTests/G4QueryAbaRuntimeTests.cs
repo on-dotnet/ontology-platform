@@ -16,14 +16,19 @@ public sealed partial class G4QueryMafRuntimeTests
 {
     /// <summary>真实源读取后经正式批准和激活执行A到B再到A，核验提交失败和审计原子性。</summary>
     private static async Task MappingAbaAfterRealReadAsync(IServiceProvider services, ActorContext actor,
-        G4QueryRecord original, G4QueryDbContext database, string proposalId)
+        G4QueryRecord original, G4QueryDbContext database, string proposalId,
+        (ActorContext Actor, string Session)? editing = null, (ActorContext Actor, string Session)? activating = null, string? reviewerId = null)
     {
+        // 当前夹具的编辑者负责草稿、评估与提案；历史 PG 夹具沿用它的原始参与者。
+        var editor = editing ?? (actor, original.SessionReference);
+        // 仅激活者执行两次正式激活，权限仍由各正式应用服务检查。
+        var activator = activating ?? (actor, original.SessionReference);
         // 所有映射变更均进入HTTP端点使用的正式应用服务。
         var mappings = services.GetRequiredService<MappingApplicationService>();
         // 激活仍执行真实七阶段复核、当前授权、CAS和事务审计。
         var activations = services.GetRequiredService<MappingActivationService>();
         // 查询前已批准B，避免把审批等待计入不可延长的查询五秒预算。
-        var approvedB = await mappings.ReadProposalAsync(actor, original.SessionReference, proposalId, CancellationToken.None);
+        var approvedB = await mappings.ReadProposalAsync(editor.Actor, editor.Session, proposalId, CancellationToken.None);
         Assert.AreEqual("APPROVED", approvedB.Status);
         // 只在进程内读取准确提案保存的真实审核会话，不构造角色或导出证明。
         await using var connections = await services.GetRequiredService<IDbContextFactory<ConnectionsDbContext>>().CreateDbContextAsync();
@@ -32,8 +37,9 @@ public sealed partial class G4QueryMafRuntimeTests
         // 后续Decide会重新检查此真实服务器会话及当前授权。
         var auditor = JsonSerializer.Deserialize<MappingAuthorizationProof>(proposal.DecisionProofJson!, G4MappingJson.Options)!;
         Assert.AreNotEqual(actor.SubjectId, auditor.Actor.SubjectId);
+        if (reviewerId is not null) Assert.AreEqual(reviewerId, auditor.Actor.SubjectId);
         // 当前草稿仅用于正式回滚调度CAS，不替换历史A的定义。
-        var draft = await mappings.ReadDraftAsync(actor, original.SessionReference, approvedB.MappingId, null, CancellationToken.None);
+        var draft = await mappings.ReadDraftAsync(editor.Actor, editor.Session, approvedB.MappingId, null, CancellationToken.None);
         // 新命令始终产生新的准入记录，不复用历史结果。
         var key = Guid.NewGuid().ToString();
         // 原查询能力和筛选来自已完成真实查询。
@@ -42,7 +48,7 @@ public sealed partial class G4QueryMafRuntimeTests
         var query = request.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
         // 仅接受已批准驱动的精确任务和Run，原件不得沿用其它任务标签。
         var runtimeIdentity = Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST");
-        Assert.IsTrue(runtimeIdentity is "G4-M4-QUERY-001:query-impl-01" or "G4-M5-INTEGRATION-001:integration-01");
+        Assert.IsTrue(runtimeIdentity is "G4-M4-QUERY-001:query-impl-01" or "G4-M5-INTEGRATION-001:integration-01" or "G4-DORIS-MAPPING-QUERY-001:implementation-01");
         // 公开记录仅包括合成标识、时间、计数及状态，绝不包含会话证明。
         var evidence = new Dictionary<string, object?> { ["taskId"] = runtimeIdentity!.Split(':')[0], ["case"] = "AC-05_INFLIGHT_ABA", ["status"] = "FAIL", ["resourceRun"] = runtimeIdentity!.Split(':')[1] };
         // 完整两次激活完成后才能把409归因于查询提交。
@@ -64,8 +70,8 @@ public sealed partial class G4QueryMafRuntimeTests
                 mappingId = evidence["mappingId"]
             });
         }
-        // 唯一注入点在真实PG读取之后，不替换版本读取器、结果存储或审计参与者。
-        var source = new AfterReadSource(services.GetRequiredService<IG4SourceQueryReader>(), async token =>
+        // 唯一注入点在真实源读取之后，不替换版本读取器、结果存储或审计参与者。
+        async Task SwitchTwice(CancellationToken token)
         {
             // 精确命令已准入且尚未提交，防止入口拒绝冒充在途保护。
             var running = await database.Queries.AsNoTracking().SingleAsync(item => item.IdempotencyKey == key, token);
@@ -81,7 +87,7 @@ public sealed partial class G4QueryMafRuntimeTests
             evidence["afterRealReadAtUtc"] = DateTimeOffset.UtcNow;
             RecordEvent("SOURCE_READ_COMPLETED");
             // B提交使用当前operator及先前真实异人批准的提案。
-            var b = await activations.ActivateAsync(actor, original.SessionReference, proposalId,
+            var b = await activations.ActivateAsync(activator.Actor, activator.Session, proposalId,
                 new MappingActivationRequest { BindingHash = approvedB.BindingHash, ExpectedActive = approvedB.ExpectedActive,
                     Command = Command(approvedB.ProposalRevision) }, $"\"proposal:{approvedB.ProposalRevision}\"", token);
             evidence["activatedB"] = b;
@@ -91,24 +97,24 @@ public sealed partial class G4QueryMafRuntimeTests
             // 回滚目标是原查询捕获的真实历史A原字节散列。
             var target = new MappingRollbackTarget { TargetReleaseId = captured.MappingReleaseId, ManifestHash = captured.ManifestHash };
             // 正式入队并由实际消费者运行，不写伪造assessment或activation行。
-            var job = await mappings.ValidateAsync(actor, original.SessionReference, captured.MappingId,
+            var job = await mappings.ValidateAsync(editor.Actor, editor.Session, captured.MappingId,
                 new MappingValidateRequest { Target = target, Command = Command(draft.Revision) }, $"\"mapping:{draft.Revision}\"", token);
             // 显式调用已注册真实worker省掉后台轮询等待，不启动宿主其他服务。
             var worker = services.GetServices<IHostedService>().OfType<MappingJobWorker>().Single();
             while (job.Status is "QUEUED" or "RUNNING")
             {
                 await worker.RunNextAsync(token);
-                job = await mappings.ReadJobAsync(actor, original.SessionReference, job.JobId, token);
+                job = await mappings.ReadJobAsync(editor.Actor, editor.Session, job.JobId, token);
                 if (job.Status is "QUEUED" or "RUNNING") await Task.Delay(10, token);
             }
             Assert.AreEqual("SUCCEEDED", job.Status);
             // 七阶段结果由真实源、语义和当前授权验证产生。
-            var assessment = await mappings.ReadAssessmentAsync(actor, original.SessionReference, job.AssessmentId!, token);
+            var assessment = await mappings.ReadAssessmentAsync(editor.Actor, editor.Session, job.AssessmentId!, token);
             Assert.AreEqual("READY_FOR_PROPOSAL", assessment.Status);
             Assert.AreEqual(7, assessment.Stages.Length);
             Assert.IsTrue(assessment.Stages.All(stage => stage.Status == "PASS"));
             // 回滚提案绑定B当前激活基线，不预造不可成立的CAS。
-            var proposedA = await mappings.ProposeAsync(actor, original.SessionReference, captured.MappingId,
+            var proposedA = await mappings.ProposeAsync(editor.Actor, editor.Session, captured.MappingId,
                 new MappingRollbackProposalRequest { SchemaVersion = "g4.mapping.v1", Scope = draft.Scope, Binding = assessment.Binding,
                     ExpectedActive = assessment.ExpectedActive, ExpiresAtUtc = assessment.ExpiresAtUtc, Command = Command(0),
                     TargetReleaseId = target.TargetReleaseId, ManifestHash = target.ManifestHash }, token);
@@ -117,7 +123,7 @@ public sealed partial class G4QueryMafRuntimeTests
                 new MappingDecisionRequest { Decision = "APPROVE", BindingHash = proposedA.BindingHash, Command = Command(proposedA.ProposalRevision) },
                 $"\"proposal:{proposedA.ProposalRevision}\"", token);
             // 第二次真实激活回到同一release，但生成新的activation身份和单调修订。
-            var a = await activations.ActivateAsync(actor, original.SessionReference, approvedA.ProposalId,
+            var a = await activations.ActivateAsync(activator.Actor, activator.Session, approvedA.ProposalId,
                 new MappingActivationRequest { BindingHash = approvedA.BindingHash, ExpectedActive = approvedA.ExpectedActive,
                     Command = Command(approvedA.ProposalRevision) }, $"\"proposal:{approvedA.ProposalRevision}\"", token);
             evidence["activatedA"] = a;
@@ -127,10 +133,13 @@ public sealed partial class G4QueryMafRuntimeTests
             Assert.IsTrue(a.ActivationRevision > b.ActivationRevision);
             Assert.IsTrue(DateTimeOffset.UtcNow < running.DeadlineAtUtc);
             abaCompleted = true;
-        });
-        // 查询执行保留正式依赖和系统时钟，仅包装源读取后的调度点。
-        var execution = new G4QueryExecution(services.GetRequiredService<IG4QueryBindingReader>(), source,
-            services.GetRequiredService<IG4QueryAuthorizationAuthority>(), services.GetRequiredService<G4QueryResultStore>(), TimeProvider.System);
+        }
+        // Doris 的切换在源观察器退出后、最终事务取得第一把授权锁前进行，切换不占用源 I/O 预算。
+        var execution = editing is null
+            ? new G4QueryExecution(services.GetRequiredService<IG4QueryBindingReader>(),
+                new AfterReadSource(services.GetRequiredService<IG4SourceQueryReader>(), SwitchTwice),
+                services.GetRequiredService<IG4QueryAuthorizationAuthority>(), services.GetRequiredService<G4QueryResultStore>(), TimeProvider.System)
+            : BeforeCommitExecution(services, SwitchTwice);
         // 与UI/MCP相同的SemanticGateway生成实际五秒截止，不能用测试时钟延长。
         var gateway = new SemanticGateway(services.GetRequiredService<IReleaseCatalog>(), services.GetRequiredService<ISemanticRuntime>(),
             services.GetRequiredService<CapabilityRegistry>(), services.GetRequiredService<IAuditTrail>(), TimeProvider.System,
@@ -176,7 +185,11 @@ public sealed partial class G4QueryMafRuntimeTests
             evidence["events"] = events;
             evidence["abaCompleted"] = abaCompleted;
             // 临时容器退出前由执行器回收公开原件；失败原件也保留。
-            await File.WriteAllTextAsync("/tmp/aba-inflight.json", JsonSerializer.Serialize(evidence, new JsonSerializerOptions(JsonSerializerDefaults.Web)) + "\n");
+            // Doris 宿主只写本任务既有原件目录，其他驱动保留原固定文件入口。
+            var resultFile = runtimeIdentity == "G4-DORIS-MAPPING-QUERY-001:implementation-01"
+                ? Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01", $"aba-inflight-{key}.json")
+                : "/tmp/aba-inflight.json";
+            await File.WriteAllTextAsync(resultFile, JsonSerializer.Serialize(evidence, new JsonSerializerOptions(JsonSerializerDefaults.Web)) + "\n");
         }
     }
 }

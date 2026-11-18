@@ -12,6 +12,53 @@ namespace OntologyPlatform.QueryTests;
 [TestClass]
 public sealed class G4QueryTests
 {
+    /// <summary>真实系统时钟验证只读参与者忽略取消时，原分支及时退出且永不披露迟到结果。</summary>
+    [DataRow(false)]
+    [DataRow(true)]
+    [TestMethod]
+    public async Task DorisLeaseObservationRejectsLateParticipant(bool sourceReturned)
+    {
+        // 只替换有意无限迟滞的平台读，不调用数据库或其他共享服务。
+        var execution = new G4QueryExecution(null!, null!, null!, null!, TimeProvider.System);
+        // 绑定实际运行使用的完整观察与清理方法，与已冻结产品公共 API 无关。
+        var boundary = typeof(G4QueryExecution).GetMethod("ReadWithDorisLeaseAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        // 两个明确事件保证探针确已启动后再模拟读取正常返回或者读取中的取消。
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        // 忽略 CancellationToken 的平台探针模拟连接释放迟滞；测试结尾一定释放它。
+        var release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        // 记录真实轮次，任何迟到或并发重试都违反此反例。
+        var calls = 0;
+        Task<bool> Check(CancellationToken unused)
+        {
+            Interlocked.Increment(ref calls);
+            started.TrySetResult();
+            return release.Task;
+        }
+        async Task<G4SourceQueryRead> Read(CancellationToken token)
+        {
+            await started.Task.WaitAsync(token);
+            if (!sourceReturned) await Task.Delay(Timeout.Infinite, token);
+            return null!;
+        }
+        // 预留五百毫秒提交后本次分支只有四百毫秒，不能从观察器另起计时放宽。
+        var deadline = DateTimeOffset.UtcNow.AddMilliseconds(900);
+        // 真实单调时间只度量被测调用，测试看门狗用于避免整个 MTP 停滞。
+        var elapsed = System.Diagnostics.Stopwatch.StartNew();
+        // 委托签名必须与真实业务调用完全相同。
+        var work = (Task<G4SourceQueryRead>)boundary.Invoke(execution, ["query-lease-test", deadline, CancellationToken.None,
+            (Func<CancellationToken, Task<G4SourceQueryRead>>)Read, (Func<CancellationToken, Task<bool>>)Check])!;
+        try
+        {
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await work.WaitAsync(TimeSpan.FromSeconds(2)));
+            Assert.AreEqual(1, calls);
+            Assert.IsTrue(elapsed.ElapsedMilliseconds < 400);
+        }
+        finally
+        {
+            release.TrySetResult(true);
+        }
+    }
+
     /// <summary>从已审 M5 证据读取真实 PG manifest 和原始结果，校验发布时的内容身份及保存字节。</summary>
     [TestMethod]
     [DataRow("standard", "53191b9bc282b38a1089e39a51dc4bf11267d915e0154e3a93c3fc1a4ceedc82", "browser-s1-1794832846645-result.json.raw.json", "d5c527a7e538acd4cf8158abc05221a9ef4cb3a1ffee4327316a73226e399184")]

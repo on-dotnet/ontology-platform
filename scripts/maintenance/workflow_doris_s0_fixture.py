@@ -22,6 +22,7 @@ INDEX = vm.OUTPUT / 's0-source-identities.json'
 COMPOSE = ['compose', '-p', PROJECT, '-f', 'infra/doris/compose.yaml', '-f', 'infra/doris/compose.test.yaml',
            '-f', 'infra/doris/compose.mapping-query.yaml']
 STRESS = vm.OUTPUT / 's0-stress-fixture-active.json'
+ENTITY_TIERS = (262144, 1048576, 4194304)
 SHAPE = vm.OUTPUT / 's0-negative-shape-active.json'
 STRESS_TABLES = [('dmq_entity', 'entity_id', ('E1',)), ('dmq_target', 'target_id', ('T1', 'T2', 'T3'))]
 CLIENT = r'''set -eu
@@ -43,10 +44,22 @@ def docker(stage, *args, env=None, timeout=15, cleanup=False):
     return proc.stdout.decode().strip()
 
 
+def sync_directory(path):
+    descriptor = os.open(path, os.O_RDONLY)
+    try: os.fsync(descriptor)
+    finally: os.close(descriptor)
+
+
 def record(path, state):
     pending = path.with_suffix('.pending')
-    pending.write_text(json.dumps(state,indent=2)+'\n')
+    durable = path == STRESS or path.name.startswith('s0-stress-fixture-')
+    with pending.open('w') as out:
+        out.write(json.dumps(state,indent=2)+'\n')
+        if durable:
+            out.flush()
+            os.fsync(out.fileno())
     os.replace(pending,path)
+    if durable: sync_directory(path.parent)
 
 
 def tls_files():
@@ -299,6 +312,7 @@ def driver(prepared, method):
                   sql(fe,'reader','SELECT COUNT(*) FROM fixture.dmq_entity;')=='1','AC11_BASELINE')
     stress = None
     if method.startswith('driver-stress-'):
+        vm.demand(not json.loads(STRESS.read_bytes()).get('entityTier'), 'S0_STRESS_BOUNDARY')
         stress = stress_binding(state)
     else:
         vm.demand(not STRESS.exists(),'STRESS_ISOLATION')
@@ -415,10 +429,20 @@ def stress_original(fe,table,key,original):
     return hashlib.sha256(rows.encode()).hexdigest()
 
 
-def stress_counts(fe,table,key,prefix,size):
-    """唯一复合主键和无额外行的计数证明完整序号集合；复原只按列举的键删除。"""
-    vm.demand(re.fullmatch('DQ[0-9a-f]{12}',prefix) and 0<size<65536,'STRESS_NAMESPACE')
-    scope = f"org_id='org-demo' AND site_id='site-a' AND {key} REGEXP '^{prefix}[0-9]{{5}}$' AND {key} BETWEEN '{prefix}00000' AND '{prefix}{size-1:05d}'"
+def stress_dimensions(table, original, entity_rows):
+    if entity_rows is None:
+        return 65536-len(original), 5
+    vm.demand(entity_rows in ENTITY_TIERS, 'STRESS_ENTITY_TIER')
+    return (entity_rows-len(original) if table == 'dmq_entity' else 0), 7
+
+
+def stress_counts(fe,table,key,prefix,size,width=5):
+    """计数仅承认本任务准确复合键、固定位数和序号区间；原行另行核对。"""
+    vm.demand(re.fullmatch('DQ[0-9a-f]{12}',prefix) and width in (5,7)
+              and 0<=size<(65536 if width==5 else max(ENTITY_TIERS)), 'STRESS_NAMESPACE')
+    if not size:
+        return [int(sql(fe,'reader',f'SELECT COUNT(*) FROM fixture.{table};')),0]
+    scope = f"org_id='org-demo' AND site_id='site-a' AND {key} REGEXP '^{prefix}[0-9]{{{width}}}$' AND {key} BETWEEN '{prefix}{0:0{width}d}' AND '{prefix}{size-1:0{width}d}'"
     return list(map(int,sql(fe,'reader',f"SELECT COUNT(*),COUNT(IF({scope},1,NULL)) FROM fixture.{table};").split()))
 
 
@@ -427,16 +451,56 @@ def stress_binding(state):
     vm.demand(manifest['status']=='SEEDED' and manifest['source']==state['services'] and
               manifest['run']==vm.RUN,'STRESS_DRIVER_ADMISSION')
     fe = state['services']['fe']['id']
+    counts = {}
     for table,key,original in STRESS_TABLES:
-        count = 65536-len(original)
-        vm.demand(stress_counts(fe,table,key,manifest['prefix'],count)==[65536,count] and
+        count,width = stress_dimensions(table,original,manifest.get('entityTier'))
+        counts[table] = count+len(original)
+        vm.demand(manifest['tables'][table]['planned']==count and
+                  stress_counts(fe,table,key,manifest['prefix'],count,width)==[counts[table],count] and
                   stress_original(fe,table,key,original)==manifest['tables'][table]['before'],'STRESS_DRIVER_DATA')
-    return dict(attempt=manifest['attempt'],manifestSha256=hashlib.sha256(STRESS.read_bytes()).hexdigest(),
-                rowsPerTable=65536,purpose='cancellation_only')
+    result = dict(attempt=manifest['attempt'],manifestSha256=hashlib.sha256(STRESS.read_bytes()).hexdigest(),
+                  rowsByTable=counts,purpose='cancellation_only')
+    if 'entityTier' not in manifest: result['rowsPerTable']=65536
+    return result
 
 
-def stress_fixture(restore=False, platform=False):
+def tier_capacity(state):
+    """实际六容器内存及 CPU 配额、命名卷使用量、源盘与宿主内存余量，只记录数值。"""
+    import shutil
+    from workflow_doris_s1 import live_stack
+    ids = live_stack()
+    memory,cpu = map(int,docker('tier-vm','info','-f','{{.MemTotal}} {{.NCPU}}').split())
+    fmt = '{{.HostConfig.Memory}} {{.HostConfig.NanoCpus}} {{range .Mounts}}{{if eq .Type "volume"}}{{.Name}}={{.Destination}} {{end}}{{end}}'
+    caps = cores = disk = 0
+    for cid in ids.values():
+        cap,nanos,*mounts = docker('tier-mount-caps','inspect','-f',fmt,cid).split()
+        caps += int(cap)
+        cores += int(nanos)
+        persistent = []
+        for mounted in mounts:
+            name,destination = mounted.split('=',1)
+            kind = docker('tier-vol-type','volume','inspect','-f','{{index .Options "type"}}',name)
+            vm.demand(kind in ('','tmpfs'),'TIER_VOLUME_TYPE')
+            if not kind: persistent.append(destination)
+        if persistent:
+            sizes = docker('tier-disk-usage','exec','-u','0',cid,'du','-sk',*persistent)
+            disk += sum(int(row.split()[0])*1024 for row in sizes.splitlines())
+    used = int(docker('tier-be-storage','exec',state['services']['be']['id'],'du','-sk','/opt/apache-doris/be/storage').split()[0])*1024
+    host_disk = shutil.disk_usage(vm.ROOT).free
+    host_pressure = int(re.search(r'free percentage:\s*(\d+)%',vm.host('memory_pressure','-Q')).group(1))
+    host_memory = int(vm.host('sysctl','-n','hw.memsize'))
+    vm.demand(caps==int(14.25*vm.GIB) and memory-caps>=2*vm.GIB and cores==9*10**9 and cpu>=12
+              and host_disk>=12*vm.GIB and host_memory>=20*vm.GIB+int(5.5*vm.GIB)
+              and host_pressure>0 and disk<4*vm.GIB,'TIER_RESOURCE_BUDGET')
+    return dict(vmBytes=memory,vmCpus=cpu,containerCapBytes=caps,containerNanoCpus=cores,
+                afterReserveBytes=memory-caps-2*vm.GIB,persistentVolumeBytes=disk,beStorageBytes=used,
+                hostFreeBytes=host_disk,hostPhysicalBytes=host_memory,hostMemoryFreePercent=host_pressure)
+
+
+def stress_fixture(restore=False, platform=False, batches=1, entity_rows=None):
     """在唯一台账保护下临时扩充这两张合成表；与正式一百行门禁互斥。"""
+    vm.demand(batches in (1,8) and (batches==1 or platform),'STRESS_BATCH_BOUNDARY')
+    vm.demand(entity_rows is None or (entity_rows in ENTITY_TIERS and platform and batches==1),'STRESS_TIER_SCOPE')
     state = json.loads(INDEX.read_bytes())
     vm.demand(not SHAPE.exists() and state['project']==PROJECT and state['runId']==vm.RUN and state['taskId']==vm.TASK and
               not (vm.OUTPUT/'s0-fixed-fixture-active.json').exists(),'STRESS_FIXTURE_SCOPE')
@@ -457,55 +521,92 @@ def stress_fixture(restore=False, platform=False):
         attempt = secrets.token_hex(6)
         manifest = dict(attempt=attempt,prefix='DQ'+attempt,run=vm.RUN,source=state['services'],status='INTENT',
                         beforeResources=resources,tables={},purpose='cancellation_only')
+        if entity_rows is not None:
+            manifest.update(entityTier=entity_rows,tierCapacity=tier_capacity(state))
         for table,key,original in STRESS_TABLES:
+            count,width = stress_dimensions(table,original,entity_rows)
             before = stress_original(fe,table,key,original)
-            vm.demand(stress_counts(fe,table,key,manifest['prefix'],65536-len(original))==[len(original),0] and
+            vm.demand(stress_counts(fe,table,key,manifest['prefix'],count,width)==[len(original),0] and
                       previous['tables'][table]['before']==before and previous['tables'][table]['restored'],'STRESS_BASELINE')
-            manifest['tables'][table] = dict(before=before,planned=65536-len(original))
+            manifest['tables'][table] = dict(before=before,planned=count)
         with STRESS.open('x') as out:
             json.dump(manifest,out,indent=2)
             out.flush()
             os.fsync(out.fileno())
+        sync_directory(STRESS.parent)
     for table,key,original in STRESS_TABLES:
         entry = manifest['tables'][table]
-        count = 65536-len(original)
+        tier = manifest.get('entityTier')
+        count,width = stress_dimensions(table,original,tier)
         prefix = manifest['prefix']
         vm.demand(entry['planned']==count and stress_original(fe,table,key,original)==entry['before'],'STRESS_PRIOR_ROWS')
         if restore:
-            total,owned = stress_counts(fe,table,key,prefix,count)
+            total,owned = stress_counts(fe,table,key,prefix,count,width)
             vm.demand(total==len(original)+owned,'STRESS_FOREIGN_ROWS')
-            if owned:
+            if owned and tier:
+                # 从最初独占登记的准确键域生成三列主键，中断在批次落盘前也能恢复。
+                for offset in range(0,count,65536):
+                    n = min(65536,count-offset)
+                    expected = (f"SELECT CONCAT('{prefix}',LPAD(CAST(number+{offset} AS STRING),{width},'0')) AS owned_key "
+                                f'FROM numbers("number"="{n}")')
+                    sql(fe,'root',f"DELETE FROM fixture.{table} USING ({expected}) owned WHERE "
+                        f"{table}.org_id='org-demo' AND {table}.site_id='site-a' AND {table}.{key}=owned.owned_key;",limit=60)
+            elif owned:
                 for start in range(0,count,2048):
                     values = ','.join(f"'{prefix}{i:05d}'" for i in range(start,min(start+2048,count)))
                     sql(fe,'root',f"DELETE FROM fixture.{table} WHERE org_id='org-demo' AND site_id='site-a' AND {key} IN ({values});",limit=40)
-            vm.demand(stress_counts(fe,table,key,prefix,count)==[len(original),0],'STRESS_RESTORE_COUNT')
+            vm.demand(stress_counts(fe,table,key,prefix,count,width)==[len(original),0],'STRESS_RESTORE_COUNT')
             entry['after'] = stress_original(fe,table,key,original)
             vm.demand(entry['after']==entry['before'],'STRESS_RESTORE_BYTES')
         else:
             payload = "1.00,7.20,'K'" if key=='entity_id' else '1.000'
             event = "CONCAT('2026-11-17 12:00:00.',LPAD(CAST(MOD(number*8191,1000000) AS STRING),6,'0'))"
-            insert = (f"INSERT INTO fixture.{table} SELECT 'org-demo','site-a',CONCAT('{prefix}',LPAD(CAST(number AS STRING),5,'0')),"
-                      f"{payload},'2026-11-01','2026-12-01',{event},'2026-11-17 12:00:01.123456' FROM numbers(\"number\"=\"{count}\");")
-            entry['insertSha256'] = hashlib.sha256(insert.encode()).hexdigest()
-            record(STRESS,manifest)
-            sql(fe,'root',insert,limit=60)
-            vm.demand(stress_counts(fe,table,key,prefix,count)==[65536,count],'STRESS_SEED_COUNT')
+            size = 65536 if tier else (count if batches == 1 else 8192)
+            entry['batches'] = []
+            for offset in range(0, count, size):
+                n = min(size, count-offset)
+                insert = (f"INSERT INTO fixture.{table} SELECT 'org-demo','site-a',CONCAT('{prefix}',LPAD(CAST(number AS STRING),{width},'0')),"
+                          f"{payload},'2026-11-01','2026-12-01',{event},'2026-11-17 12:00:01.123456' "
+                          f'FROM (SELECT number+{offset} AS number FROM numbers("number"="{n}")) fixture_keys;')
+                entry['batches'].append(dict(offset=offset, count=n, sha256=hashlib.sha256(insert.encode()).hexdigest()))
+                record(STRESS,manifest)
+                sql(fe,'root',insert,limit=60)
+                vm.demand(stress_counts(fe,table,key,prefix,count,width)==[len(original)+offset+n,offset+n],'STRESS_SEED_COUNT')
+                if (batches > 1 or tier) and (not tier or offset+n == count or offset % (4*size)==0):
+                    facts = stress_resources(state,platform)
+                    vm.demand(facts['storageAvailableBytes']>=2*vm.GIB and all(facts[r]['capBytes']-facts[r]['currentBytes']>=vm.GIB//2 for r in ('be','fe'))
+                              and stress_original(fe,table,key,original)==entry['before'],'STRESS_BATCH_RESOURCES')
+                    if tier:
+                        used = int(docker('tier-growth','exec',state['services']['be']['id'],'du','-sk','/opt/apache-doris/be/storage').split()[0])*1024
+                        baseline = manifest['tierCapacity']
+                        vm.demand(baseline['persistentVolumeBytes']+max(0,used-baseline['beStorageBytes'])<4*vm.GIB,'TIER_DISK_GROWTH')
+                        facts['beStorageBytes']=used
+                    entry['batches'][-1]['resources']=facts
+            if batches > 1 or tier:
+                tablets = [int(row.split('\t')[0]) for row in sql(fe,'root',f'SHOW TABLETS FROM fixture.{table};').splitlines()]
+                vm.demand(bool(tablets) and all(t>0 for t in tablets),'STRESS_TABLETS')
+                ids=','.join(map(str,tablets))
+                entry['rowsetSample'] = sql(fe,'root',f'SELECT TABLET_ID,COUNT(*),SUM(NUM_SEGMENTS) FROM information_schema.rowsets WHERE TABLET_ID IN ({ids}) GROUP BY TABLET_ID ORDER BY TABLET_ID;')
             entry['inserted'] = count
         record(STRESS,manifest)
     manifest['status'] = 'RESTORED' if restore else 'SEEDED'
     manifest[manifest['status'].lower()+'Resources'] = stress_resources(state,platform)
+    if manifest.get('entityTier'):
+        manifest[manifest['status'].lower()+'Capacity'] = tier_capacity(state)
     record(STRESS,manifest)
     path = vm.OUTPUT/('s0-stress-fixture-'+manifest['attempt']+'-'+manifest['status'].lower()+'.json')
     record(path,manifest)
-    if restore: STRESS.unlink()
+    if restore:
+        STRESS.unlink()
+        sync_directory(STRESS.parent)
     print(path.relative_to(vm.ROOT),manifest['status'])
 
 
-def shape_case(method,prepared):
+def shape_case(method,prepared,activation=False):
     """按 tablet 身份交换同名目标表，真实拒绝后交换回原件，只回收本次创建的空负例。"""
     state = json.loads(INDEX.read_bytes())
     vm.demand(not STRESS.exists() and not SHAPE.exists() and not (vm.OUTPUT/'s0-fixed-fixture-active.json').exists(),'SHAPE_FIXTURE_BUSY')
-    stress_resources(state)
+    stress_resources(state,platform=activation)
     fe = state['services']['fe']['id']
     ready_source(fe)
     def tablet(name):
@@ -549,7 +650,13 @@ def shape_case(method,prepared):
         change.update(phase='SWAPPED',actualDdlSha256=hashlib.sha256(observed.encode()).hexdigest(),
                       keyModel=key[0],keyColumns=['org_id','site_id','target_id'],nativeJoinKey=field[0])
         record(SHAPE,change)
-        code = driver(prepared,method)
+        if activation:
+            from workflow_doris_s1 import browser_test
+            browser_test('s2-doris-shape-reject',prepared)
+            code = 0
+            change['case'] = 'activation_after_approved_assessment'
+        else:
+            code = driver(prepared,method)
         change['exitCode'] = code
     finally:
         current = (tablet('dmq_target'),tablet(scratch))

@@ -1,0 +1,162 @@
+{
+  "attempt": "a37d959a21ef",
+  "prefix": "DQa37d959a21ef",
+  "run": "implementation-01",
+  "source": {
+    "fe": {
+      "id": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "image": "sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02",
+      "before": "created"
+    },
+    "be": {
+      "id": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+      "image": "sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7",
+      "before": "created"
+    }
+  },
+  "status": "RESTORED",
+  "beforeResources": {
+    "fe": {
+      "currentBytes": 1954390016,
+      "cgroupPeakBytes": 1957109760,
+      "capBytes": 4294967296
+    },
+    "be": {
+      "currentBytes": 1690550272,
+      "cgroupPeakBytes": 1972547584,
+      "capBytes": 6442450944
+    },
+    "storageAvailableBytes": 420313001984
+  },
+  "tables": {
+    "dmq_entity": {
+      "before": "7a7009c1fc43c542746436d44150f02f3e45cc2028fd375a142c03d5beccb34e",
+      "planned": 262143,
+      "batches": [
+        {
+          "offset": 0,
+          "count": 65536,
+          "sha256": "d5b7734fd6902ea15dbd0e9f51afea97a354e6082566e9996b5dd9dd35c324a4",
+          "resources": {
+            "fe": {
+              "currentBytes": 1955065856,
+              "cgroupPeakBytes": 1959739392,
+              "capBytes": 4294967296
+            },
+            "be": {
+              "currentBytes": 1744187392,
+              "cgroupPeakBytes": 1972547584,
+              "capBytes": 6442450944
+            },
+            "storageAvailableBytes": 420312506368,
+            "beStorageBytes": 102428672
+          }
+        },
+        {
+          "offset": 65536,
+          "count": 65536,
+          "sha256": "273ccffdbc67c39377db2a0c848418321b3238e4e87efd2ec48c462f5b4512fb"
+        },
+        {
+          "offset": 131072,
+          "count": 65536,
+          "sha256": "8200c568147748c23cce5873501daa03ecc980243949d900fd5e4c67491328e5"
+        },
+        {
+          "offset": 196608,
+          "count": 65535,
+          "sha256": "c37b8b670d7f7221233d01666c07a33c411db4fe663bcca255114a48bb790d13",
+          "resources": {
+            "fe": {
+              "currentBytes": 1952825344,
+              "cgroupPeakBytes": 1959739392,
+              "capBytes": 4294967296
+            },
+            "be": {
+              "currentBytes": 1837318144,
+              "cgroupPeakBytes": 1972547584,
+              "capBytes": 6442450944
+            },
+            "storageAvailableBytes": 420311089152,
+            "beStorageBytes": 103718912
+          }
+        }
+      ],
+      "rowsetSample": "1795004181218\t8\t7",
+      "inserted": 262143,
+      "after": "7a7009c1fc43c542746436d44150f02f3e45cc2028fd375a142c03d5beccb34e"
+    },
+    "dmq_target": {
+      "before": "4fce66991c1a560ee3acc8de573c1077e5f669f68971ad08d55c06e50364191f",
+      "planned": 0,
+      "batches": [],
+      "rowsetSample": "1795004181223\t2\t1",
+      "inserted": 0,
+      "after": "4fce66991c1a560ee3acc8de573c1077e5f669f68971ad08d55c06e50364191f"
+    }
+  },
+  "purpose": "cancellation_only",
+  "entityTier": 262144,
+  "tierCapacity": {
+    "vmBytes": 20964958208,
+    "vmCpus": 12,
+    "containerCapBytes": 15300820992,
+    "containerNanoCpus": 9000000000,
+    "afterReserveBytes": 3516653568,
+    "persistentVolumeBytes": 234184704,
+    "beStorageBytes": 101998592,
+    "hostFreeBytes": 235828809728,
+    "hostPhysicalBytes": 34359738368,
+    "hostMemoryFreePercent": 69
+  },
+  "seededResources": {
+    "fe": {
+      "currentBytes": 1954631680,
+      "cgroupPeakBytes": 1959739392,
+      "capBytes": 4294967296
+    },
+    "be": {
+      "currentBytes": 1839566848,
+      "cgroupPeakBytes": 1972547584,
+      "capBytes": 6442450944
+    },
+    "storageAvailableBytes": 420311068672
+  },
+  "seededCapacity": {
+    "vmBytes": 20964958208,
+    "vmCpus": 12,
+    "containerCapBytes": 15300820992,
+    "containerNanoCpus": 9000000000,
+    "afterReserveBytes": 3516653568,
+    "persistentVolumeBytes": 236003328,
+    "beStorageBytes": 103718912,
+    "hostFreeBytes": 235826507776,
+    "hostPhysicalBytes": 34359738368,
+    "hostMemoryFreePercent": 68
+  },
+  "restoredResources": {
+    "fe": {
+      "currentBytes": 1952866304,
+      "cgroupPeakBytes": 1959739392,
+      "capBytes": 4294967296
+    },
+    "be": {
+      "currentBytes": 1955094528,
+      "cgroupPeakBytes": 1972547584,
+      "capBytes": 6442450944
+    },
+    "storageAvailableBytes": 420307034112
+  },
+  "restoredCapacity": {
+    "vmBytes": 20964958208,
+    "vmCpus": 12,
+    "containerCapBytes": 15300820992,
+    "containerNanoCpus": 9000000000,
+    "afterReserveBytes": 3516653568,
+    "persistentVolumeBytes": 239751168,
+    "beStorageBytes": 107048960,
+    "hostFreeBytes": 235820957696,
+    "hostPhysicalBytes": 34359738368,
+    "hostMemoryFreePercent": 68
+  }
+}

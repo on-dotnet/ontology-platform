@@ -202,6 +202,18 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         await transaction.CommitAsync(token);
     }
 
+    /// <summary>独立读取准确 Doris 查询的租约、fence、取消与到期状态，不续租或写表。</summary>
+    internal async Task<bool> DorisLeaseIsCurrentAsync(G4QueryRecord lease, CancellationToken token)
+    {
+        // 与控制事务分开创建上下文，每次读已提交状态且不参加长事务。
+        await using var database = await factory.CreateDbContextAsync(token);
+        // 同一服务器时刻约束租约和实际查询截止。
+        var now = clock.GetUtcNow();
+        return await database.Queries.AsNoTracking().AnyAsync(row => row.Id == lease.Id && row.LeaseOwner == lease.LeaseOwner
+            && row.Fence == lease.Fence && row.ExecutionStatus == "RUNNING" && !row.CancelRequested
+            && row.LeaseUntilUtc > now && row.DeadlineAtUtc > now, token);
+    }
+
     /// <summary>运行中的原实例只能续租自己的fence，续租不能突破总deadline。</summary>
     public async Task<bool> HeartbeatAsync(G4QueryRecord lease, CancellationToken token)
     {

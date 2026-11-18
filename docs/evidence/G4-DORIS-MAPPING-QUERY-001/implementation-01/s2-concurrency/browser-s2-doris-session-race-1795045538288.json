@@ -1,0 +1,254 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s2-doris-session-race",
+  "startedAtUtc": "2026-11-18T23:45:38.288Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200",
+      "status": "PASS"
+    },
+    {
+      "name": "known_real_source_row",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200",
+      "status": "PASS"
+    },
+    {
+      "name": "restored_original",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 13.617583999999965,
+      "sha256": "a4c559f1071e8234d380381a1ae0e17cfed1dd25d306dbd087e6c398b83b4653"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 4.097209000000021,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 5.246916000000056,
+      "sha256": "557fdb52dc3f1b6725dc94feccdb33049d0d29794f70dcff4fbe8e9d3720d10b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 2.021833000000015,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.7063329999998587,
+      "sha256": "943c44ae9c27a9e2d41a166c62b0b19296963c7a031a4b1e09504b9f1accb7c5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.7816669999999704,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 7.102791000000025,
+      "sha256": "1edb7e5b7caf55aa8cea8934d49dc218aa4945d6f2380861710c353304722e18"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.3707500000000437,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/capabilities",
+      "status": 200,
+      "elapsedMs": 10.035333000000037,
+      "sha256": "460a6a7f50ffa63def21a2f9baf961b757dacfed4f9df2dc5a6fbb94feb54579"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries",
+      "status": 200,
+      "elapsedMs": 556.8249159999998,
+      "sha256": "5d447083c75b12c4720c487762ed20b6049547ff1afdd0e5192220959baac724"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/data/semantic-queries/query-0c17a38dd73c4991ac577d235122718f/result",
+      "status": 200,
+      "elapsedMs": 178.38691599999947,
+      "sha256": "5d447083c75b12c4720c487762ed20b6049547ff1afdd0e5192220959baac724"
+    }
+  ],
+  "status": "PASS",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "s2-doris-session-race",
+      "status": "READY",
+      "pid": 49300,
+      "commandId": "adac669c244e474c8738cfe288ebee4a",
+      "snapshotId": "a39cca6b6568387688b0bdea4ce898e565d1c08a2696938474137dc14784b9b5",
+      "processStart": "Thu Nov 19 07:45:37 2026"
+    },
+    "web": null
+  },
+  "race": {
+    "commandId": "67b16edcab44468f96e61562c3d15093",
+    "input": {
+      "receiptSha256": "f4edf74b7486e3bfffd56e41234155017380294bc81ca4f033f140bc6e744aff",
+      "inputKey": "1c86cfbd3490e7c5e733629c15a662d241980b75a645fec66c96f3bdd9a6e14d",
+      "outputKey": "633de4a91457b99056a8e6c81cb286f02db2e3b789abc2c9807e57fbdec2fb1a"
+    },
+    "exitCode": 0,
+    "passed": 1
+  },
+  "scope": "DORIS_INFLIGHT_SESSION_EXPIRY",
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-18T23:45:42.931Z"
+}

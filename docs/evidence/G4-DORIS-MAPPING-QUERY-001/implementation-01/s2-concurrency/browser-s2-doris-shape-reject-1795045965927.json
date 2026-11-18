@@ -1,0 +1,254 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s2-doris-shape-reject",
+  "startedAtUtc": "2026-11-18T23:52:45.927Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "shape_proposal_bound",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "reviewed_activation",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_409",
+      "status": "PASS"
+    },
+    {
+      "name": "persisted_activation_check",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200",
+      "status": "FAIL"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 11.88316599999996,
+      "sha256": "a8f97664c7d6604856014e4e890708ab0802af735ebe231c20a97fba16154bbf"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 4.62845799999991,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.6024170000000595,
+      "sha256": "50a87be2fca35ce012bf9ae77302cf625b79ce488e2f2fbfde972f6df83b4fbe"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.5222919999998794,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.536957999999913,
+      "sha256": "360b891fc2fba32b85cc9a8ca21ed3aeb5e7313e54fe8583795ec443dd4ed7ee"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.6992079999999987,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 6.861541999999872,
+      "sha256": "b685564f70b93aff9cc0db2464de2d4549a88342b94d68d49cdcacf54e5a4776"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.7905000000000655,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-e0af091b4c23dc9817fbbda2abc5278b/active",
+      "status": 200,
+      "elapsedMs": 136.40466700000002,
+      "sha256": "d0f3c732c212efa5620efa38308c19ea039cba5474898ce2641e398abb846ac5"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-6776fd12d17641698a405786ff5d1df7/activate",
+      "status": 409,
+      "elapsedMs": 345.9313339999999,
+      "code": "mapping_activation_check_failed",
+      "sha256": "3a3874cdd010ea9bb1e237b80ffc51b4c4df1a974a73671d5d44fac7d51f566f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-activation-checks/check-50836e53f3554593bef8fe47c9310415",
+      "status": 403,
+      "elapsedMs": 40.44066699999985,
+      "code": "mapping_source_access_unverified",
+      "sha256": "1bf4e2f749d6308341be2dd60e2f3e4702a7a1d4764c2525df2e8281da81d652"
+    }
+  ],
+  "status": "FAIL",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "s2-doris-shape-reject",
+      "status": "READY",
+      "pid": 53451,
+      "commandId": "c6166d189996465098cf60b112a72f75",
+      "snapshotId": "a39cca6b6568387688b0bdea4ce898e565d1c08a2696938474137dc14784b9b5",
+      "processStart": "Thu Nov 19 07:52:44 2026"
+    },
+    "web": null
+  },
+  "failure": {
+    "phase": "activate_previously_approved_proposal_with_changed_catalog",
+    "category": "Error",
+    "code": "http_11_200"
+  },
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-18T23:52:48.517Z"
+}

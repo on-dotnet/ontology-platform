@@ -1,0 +1,295 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s2-doris-shape-recover",
+  "startedAtUtc": "2026-11-18T23:54:00.725Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "original_bound_check",
+      "status": "PASS"
+    },
+    {
+      "name": "source_failure_persisted",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200",
+      "status": "PASS"
+    },
+    {
+      "name": "baseline_activation_after_restore",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 13.244750000000067,
+      "sha256": "dbe768851628b1bea47ae7fe64630b6657ac62b6a3a058490d93dc66371ca369"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 5.274999999999977,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.301625000000058,
+      "sha256": "7af2efcd98ee6cbd2e4859e32f84c333d9edfea3579ea4326ee1355c51c95ded"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.504084000000148,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 5.555749999999989,
+      "sha256": "e551d6c1b80067def806b31d4e8cbd09675717490347abef903b587d1bbc4a59"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.5237079999999423,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.308582999999999,
+      "sha256": "85ee180c2c95e9f3c72b31454657e86898d9c10411bc64d881ac416941f6855d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.8772500000000036,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-activation-checks/check-4be0a7456b204185afffff8f922fc6f4",
+      "status": 200,
+      "elapsedMs": 184.97604100000012,
+      "sha256": "28c5bb47c8f9ae3149d953e806a598c5e4f4f602bd06f210421ae1d40dd92177"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-e0af091b4c23dc9817fbbda2abc5278b/active",
+      "status": 200,
+      "elapsedMs": 64.59958300000017,
+      "sha256": "d0f3c732c212efa5620efa38308c19ea039cba5474898ce2641e398abb846ac5"
+    }
+  ],
+  "status": "PASS",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "s2-doris-shape-recover",
+      "status": "READY",
+      "pid": 53965,
+      "commandId": "22bd1fdae37746de8c64ebdc92bc7653",
+      "snapshotId": "a39cca6b6568387688b0bdea4ce898e565d1c08a2696938474137dc14784b9b5",
+      "processStart": "Thu Nov 19 07:53:59 2026"
+    },
+    "web": null
+  },
+  "shapeCheck": {
+    "proposalId": "proposal-6776fd12d17641698a405786ff5d1df7",
+    "checkId": "check-4be0a7456b204185afffff8f922fc6f4",
+    "stages": [
+      {
+        "stage": "SCHEMA",
+        "status": "NOT_RUN",
+        "issueCodes": [
+          "mapping_source_shape_invalid"
+        ],
+        "evidenceHash": "f47c3945daafcb09880c0573923dd4a1b10fb65c5c304c5da60fe996c1d7dfcf"
+      },
+      {
+        "stage": "IDENTITY",
+        "status": "NOT_RUN",
+        "issueCodes": [
+          "mapping_source_shape_invalid"
+        ],
+        "evidenceHash": "410a3f0d7e44f7f2c9bed55954670f3415d1341c226ca836f736a57d32324e7e"
+      },
+      {
+        "stage": "TIME_UNIT",
+        "status": "NOT_RUN",
+        "issueCodes": [
+          "mapping_source_shape_invalid"
+        ],
+        "evidenceHash": "8f011db2328527e9e246f772a611ba644724001d02e0a406dd634aa8e0e0bb74"
+      },
+      {
+        "stage": "SECURITY",
+        "status": "NOT_RUN",
+        "issueCodes": [
+          "mapping_source_shape_invalid"
+        ],
+        "evidenceHash": "5acbc62c779ea494b7ecf59b7b87c7b023292fcf8e22a5f067d033c733463317"
+      },
+      {
+        "stage": "EXECUTABILITY",
+        "status": "NOT_RUN",
+        "issueCodes": [
+          "mapping_source_shape_invalid"
+        ],
+        "evidenceHash": "878f0a1c270358c3da1ae862f81948de7b982a02b7f8cda5f0f67b8a73a99694"
+      },
+      {
+        "stage": "RECONCILIATION",
+        "status": "NOT_RUN",
+        "issueCodes": [
+          "mapping_source_shape_invalid"
+        ],
+        "evidenceHash": "0716a48e64a0270d5553d4022de68e6573e56203a3e500ccdb2aa980f03543ad"
+      },
+      {
+        "stage": "IMPACT",
+        "status": "NOT_RUN",
+        "issueCodes": [
+          "mapping_source_shape_invalid"
+        ],
+        "evidenceHash": "d6475849404a6635c5cf60902f7e5a1e58e71ede4a69904914e7a5470f441031"
+      }
+    ]
+  },
+  "scope": "DORIS_ACTIVATION_CHECK_RECOVERED",
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-18T23:54:03.117Z"
+}

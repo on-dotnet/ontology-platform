@@ -1,0 +1,73 @@
+{
+  "stress": {
+    "attempt": "a37d959a21ef",
+    "manifestSha256": "1fa6450fd3f825301ed2b4aa121cf78b9c938fb03e213f9ad3c3c12f835ef077",
+    "rowsByTable": {
+      "dmq_entity": 262144,
+      "dmq_target": 3
+    },
+    "purpose": "cancellation_only"
+  },
+  "idempotencyKey": "8643f4ee-136c-4cbf-9c7c-2f74d4e09110",
+  "run": "implementation-01",
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+  "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+  "loadBefore": {
+    "clock": "2026-11-18T23:49:11.806236+00:00",
+    "serverStarted": "2026-11-18T22:35:13.532904+00:00",
+    "since": null,
+    "commits": 21600,
+    "rollbacks": 1923,
+    "reads": 1149,
+    "hits": 708789,
+    "queryTableIndexScans": 761,
+    "queryTableSequentialScans": 241
+  },
+  "admissionObservedAt": "2026-11-18T23:49:12.040411+00:00",
+  "feActiveObservedAt": "2026-11-18T23:49:12.132155+00:00",
+  "queryId": "query-cc3a29bbb6374492b3e9377017b8b0e0",
+  "sourceQueryId": "e13ca8e5e4b24cb7-870813de2de6e6fa",
+  "terminal": "COMPLETED",
+  "terminalObservedAt": "2026-11-18T23:49:12.221660+00:00",
+  "sourceCounts": "0\t1",
+  "persisted": {
+    "bytes": 132676,
+    "resultHash": "f813c0a084425156b053e729d72b47f6ad3319e967e1ab12294cb3d2afa886ce",
+    "resultSize": 132591,
+    "readReceipts": 1,
+    "completedAtUtc": "2026-11-18T23:49:12.210386+00:00",
+    "cancelRequested": false
+  },
+  "successfulAuditCount": 1,
+  "cancelAuditCount": 0,
+  "loadAfter": {
+    "clock": "2026-11-18T23:49:12.227455+00:00",
+    "serverStarted": "2026-11-18T22:35:13.532904+00:00",
+    "since": null,
+    "commits": 21659,
+    "rollbacks": 1930,
+    "reads": 1149,
+    "hits": 710569,
+    "queryTableIndexScans": 771,
+    "queryTableSequentialScans": 242
+  },
+  "beEvents": [
+    {
+      "kind": "registered",
+      "beUtc": "20261118 23:49:12.127828"
+    },
+    {
+      "kind": "fragment_end",
+      "beUtc": "20261118 23:49:12.137300"
+    },
+    {
+      "kind": "fragment_end",
+      "beUtc": "20261118 23:49:12.141362"
+    },
+    {
+      "kind": "context_end",
+      "beUtc": "20261118 23:49:12.141402"
+    }
+  ]
+}

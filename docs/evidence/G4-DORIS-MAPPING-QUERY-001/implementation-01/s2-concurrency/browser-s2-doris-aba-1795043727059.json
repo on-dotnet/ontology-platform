@@ -1,0 +1,456 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s2-doris-aba",
+  "startedAtUtc": "2026-11-18T23:15:27.059Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200",
+      "status": "PASS"
+    },
+    {
+      "name": "aba_original_qualified",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_11",
+      "status": "PASS"
+    },
+    {
+      "name": "http_12_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_12",
+      "status": "PASS"
+    },
+    {
+      "name": "http_13_202",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_13",
+      "status": "PASS"
+    },
+    {
+      "name": "http_14_200",
+      "status": "PASS"
+    },
+    {
+      "name": "aba_b_job_0",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_14",
+      "status": "PASS"
+    },
+    {
+      "name": "http_15_200",
+      "status": "PASS"
+    },
+    {
+      "name": "aba_b_job_1",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_15",
+      "status": "PASS"
+    },
+    {
+      "name": "http_16_200",
+      "status": "PASS"
+    },
+    {
+      "name": "aba_b_job_2",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_16",
+      "status": "PASS"
+    },
+    {
+      "name": "http_17_200",
+      "status": "PASS"
+    },
+    {
+      "name": "aba_b_job_3",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_17",
+      "status": "PASS"
+    },
+    {
+      "name": "http_18_200",
+      "status": "PASS"
+    },
+    {
+      "name": "aba_b_job_4",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_18",
+      "status": "PASS"
+    },
+    {
+      "name": "http_19_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_19",
+      "status": "PASS"
+    },
+    {
+      "name": "http_20_200",
+      "status": "PASS"
+    },
+    {
+      "name": "aba_b_ready",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_20",
+      "status": "PASS"
+    },
+    {
+      "name": "http_21_201",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_21",
+      "status": "PASS"
+    },
+    {
+      "name": "http_22_200",
+      "status": "PASS"
+    },
+    {
+      "name": "inflight_b_approved_without_activation",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_22",
+      "status": "PASS"
+    },
+    {
+      "name": "http_23_200",
+      "status": "PASS"
+    },
+    {
+      "name": "original_A_still_active",
+      "status": "FAIL"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 14.173082999999906,
+      "sha256": "91c22e0c6bb3842627f41611d2b33e8b2878b985b8a18384ce08f7af78051bd3"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 3.9398749999999154,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 8.110167000000047,
+      "sha256": "2682cbee49d9922e704a860557945febf93cb81abfc162093c14aaeb09071218"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.6258749999999509,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 9.121458000000075,
+      "sha256": "0ec6ebeec1473a5a123ed349220c63987314d582f235c630945f799ac17742e2"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.5417919999999867,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.6589580000002115,
+      "sha256": "0a837b2001c2ff2aafb78470e09124457cca3dc858e21788f8e99a1bc6572b29"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.6932500000000346,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/capabilities",
+      "status": 200,
+      "elapsedMs": 11.943917000000056,
+      "sha256": "460a6a7f50ffa63def21a2f9baf961b757dacfed4f9df2dc5a6fbb94feb54579"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries",
+      "status": 200,
+      "elapsedMs": 563.4585000000002,
+      "sha256": "0d7349f2d4241df5c0e7816fb7c2d28dd0bb886811676956244349aea54ce75e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-e0af091b4c23dc9817fbbda2abc5278b",
+      "status": 200,
+      "elapsedMs": 89.21520899999996,
+      "sha256": "4a8dc275d904c28b4d01a69f6e24a3a226434a43f796f200b14fe8836344f1c7"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/mappings/mapping-e0af091b4c23dc9817fbbda2abc5278b",
+      "status": 200,
+      "elapsedMs": 35.81962499999963,
+      "sha256": "40ba77b1a075ba4c21263af2eb5af9a35517505fc05db313b06e9d1e5cacc73e"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-e0af091b4c23dc9817fbbda2abc5278b/validate",
+      "status": 202,
+      "elapsedMs": 24.28820900000028,
+      "sha256": "70038fbde68c3e6216c66f081225e569b7591a9963ce60c17129a3875a02f9cf"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-16f98307dc3d41c7a03f6049e0086fb5",
+      "status": 200,
+      "elapsedMs": 48.65616600000021,
+      "sha256": "70038fbde68c3e6216c66f081225e569b7591a9963ce60c17129a3875a02f9cf"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-16f98307dc3d41c7a03f6049e0086fb5",
+      "status": 200,
+      "elapsedMs": 74.66637499999979,
+      "sha256": "70038fbde68c3e6216c66f081225e569b7591a9963ce60c17129a3875a02f9cf"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-16f98307dc3d41c7a03f6049e0086fb5",
+      "status": 200,
+      "elapsedMs": 66.864916,
+      "sha256": "70038fbde68c3e6216c66f081225e569b7591a9963ce60c17129a3875a02f9cf"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-16f98307dc3d41c7a03f6049e0086fb5",
+      "status": 200,
+      "elapsedMs": 45.68383300000005,
+      "sha256": "70038fbde68c3e6216c66f081225e569b7591a9963ce60c17129a3875a02f9cf"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-16f98307dc3d41c7a03f6049e0086fb5",
+      "status": 200,
+      "elapsedMs": 47.33075000000008,
+      "sha256": "415bff6c6592534e9c65c7cefa991579158bbca5fbb7b550a89539161011f290"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-jobs/job-16f98307dc3d41c7a03f6049e0086fb5",
+      "status": 200,
+      "elapsedMs": 50.18866700000035,
+      "sha256": "d731e21940d5507e66303365161860564116bc1017e68c0903feafcbb6b2d837"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mapping-assessments/ma-7d3529c223f048439c587869c84dc570",
+      "status": 200,
+      "elapsedMs": 46.45912500000031,
+      "sha256": "cbd5b966d4c493425552d4b3fb33c95c081bbd4e4a52f5cd7bb7a43356527996"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mappings/mapping-e0af091b4c23dc9817fbbda2abc5278b/proposals",
+      "status": 201,
+      "elapsedMs": 27.799208000000363,
+      "sha256": "8111f91a9203608d7fb3bc59d19384ba5204127b86b418cbbb73f5d95cc70772"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mapping-proposals/proposal-9d0b5d041f09420bbde81f2008ebd80a/decisions",
+      "status": 200,
+      "elapsedMs": 23.033834000000752,
+      "sha256": "9eaf7df4fc20dc91c16ae775ce8979336ba547db3ce4f13ddd99370ba4aa8695"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-e0af091b4c23dc9817fbbda2abc5278b/active",
+      "status": 200,
+      "elapsedMs": 49.09308300000066,
+      "sha256": "d3d9a63e7b6804c34044577e3b6ca6f3440043abccfd3b7af5f965a2fb4a3a34"
+    }
+  ],
+  "status": "FAIL",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "s2-doris-aba",
+      "status": "READY",
+      "pid": 27216,
+      "commandId": "fa86179fe2d54602b2c1b92749cc6e57",
+      "snapshotId": "0673834c83c5505bba08c3bd64772d17188d95428b04fdfc28fce98ce0d156c8",
+      "processStart": "Thu Nov 19 07:15:25 2026"
+    },
+    "web": null
+  },
+  "failure": {
+    "phase": "query_aba_b_validate",
+    "category": "Error",
+    "code": "original_A_still_active"
+  },
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-18T23:15:31.847Z"
+}
