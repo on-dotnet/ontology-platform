@@ -63,6 +63,8 @@ public sealed class G4RequestDeadline : IDisposable
     public void Tighten(int timeoutMs)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(timeoutMs);
+        // MCP 绑定位于 Gateway 外层；内层退出后仍须沿用同一次工具调用收紧的截止。
+        previous?.Tighten(timeoutMs);
         lock (timer)
         {
             // 只允许缩短，外层约束或已经发生的取消持续有效。
