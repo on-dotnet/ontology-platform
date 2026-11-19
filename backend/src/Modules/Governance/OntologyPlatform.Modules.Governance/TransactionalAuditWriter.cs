@@ -15,6 +15,7 @@ public sealed class TransactionalAuditWriter : ITransactionalAuditWriter, IAudit
     private static readonly HashSet<string> Actions = new(StringComparer.Ordinal)
     {
         "data.query.execute", "data.query.read", "data.query.cancel", "data.query.evidence.read", "data.query.expire",
+        "data.query.cleanup.recover",
         "mapping.create", "mapping.update", "mapping.validate.start", "mapping.validate.finish", "mapping.validate.cancel",
         "mapping.proposal.create", "mapping.proposal.cancel", "mapping.decision", "mapping.activate", "mapping.rollback", "mapping.grant.change",
         "connection.secret.intake", "connection.create", "connection.update", "connection.secret.rotate", "connection.probe.start", "connection.probe.complete",
