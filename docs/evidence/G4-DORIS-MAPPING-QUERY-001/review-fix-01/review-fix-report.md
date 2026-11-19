@@ -18,3 +18,7 @@
 原 implementation-01 及其固定 HEAP 验收沿用原 Head。数值、NULL、ABA 和历史恢复见证保留原执行身份。此前 M5 工程整集进程超时 -9，同输入 122+11+1 覆盖 134 个唯一用例。本批只执行受影响路径。原生格式扫描基线与候选均 exit 2，既有诊断由 273 降至 271，本批变更行新增 0。CI 和其他平台 NOT_RUN。[格式对照](originals/native-format-scope.json)
 
 最终压力夹具按准确键恢复至实体 1 行、目标 3 行，两表前后散列一致。早先内存拒绝及对照日志不可见的运行均保留。三次零在途回读后，FE、BE 和平台 PG 优雅退回 STOPPED_KEEP。PG 的 exec 通道返回 137，容器本身退出 0、无 OOM，原生日志确认干净关库。旧 14 个容器仍已退出，三个易失服务按原 ID 持卷运行。其持久保全与隔离恢复待另批集中裁决。[实测后态](closeout-members.json) · [保全与恢复卡](resource-retention.md)
+
+工作流实测提交为 `544c134f2db913a5392605f53726ae67e7c4d72e`。10 个受影响门禁通过，其中 5 项重新执行，5 项重开既有执行原件；全部重新核验资格。产品定向重跑及原件身份见上表。[工作流回执](final/workflow-receipt.json) · [准确候选双人复审](final/candidate-reviews.json) · [schema 2 验证](final/validation.json)
+
+四次中间正式浏览器失败按准确命令、退出码、双流、宿主及相关源端证据留存，重开见[失败原件索引](final/diagnostics/index.json)。

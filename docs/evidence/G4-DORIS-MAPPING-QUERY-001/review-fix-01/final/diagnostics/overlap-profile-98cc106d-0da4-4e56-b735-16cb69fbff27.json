@@ -1,0 +1,97 @@
+{
+  "query": "792b86304f584ba0-963f51639ee6d45b",
+  "state": "OK",
+  "bytes": 42028,
+  "profileSha256": "e9ddf510cf237ad6abd72b0f2cb9deb8110548ac4d180e63a8a846d73c5ac790",
+  "tasks": [
+    {
+      "fragment": 0,
+      "pipeline": 0,
+      "task": 0,
+      "operators": {
+        "MATERIALIZATION_OPERATOR": {
+          "rows": 0
+        },
+        "EXCHANGE_OPERATOR": {
+          "rows": 0
+        }
+      },
+      "planOperators": [
+        "RESULT_SINK_OPERATOR",
+        "MATERIALIZATION_OPERATOR",
+        "EXCHANGE_OPERATOR"
+      ],
+      "planNodes": [
+        {
+          "name": "RESULT_SINK_OPERATOR",
+          "nodeId": 2147483647
+        },
+        {
+          "name": "MATERIALIZATION_OPERATOR",
+          "nodeId": 3
+        },
+        {
+          "name": "EXCHANGE_OPERATOR",
+          "nodeId": 2
+        }
+      ],
+      "state": "FINALIZED",
+      "wakeEarly": 0
+    },
+    {
+      "fragment": 1,
+      "pipeline": 0,
+      "task": 0,
+      "operators": {
+        "LOCAL_MERGE_SORT_SOURCE_OPERATOR": {
+          "rows": 0
+        }
+      },
+      "planOperators": [
+        "DATA_STREAM_SINK_OPERATOR",
+        "LOCAL_MERGE_SORT_SOURCE_OPERATOR"
+      ],
+      "planNodes": [
+        {
+          "name": "DATA_STREAM_SINK_OPERATOR",
+          "nodeId": 2
+        },
+        {
+          "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+          "nodeId": 1
+        }
+      ],
+      "state": "FINALIZED",
+      "wakeEarly": 0
+    },
+    {
+      "fragment": 1,
+      "pipeline": 1,
+      "task": 1,
+      "operators": {
+        "OLAP_SCAN_OPERATOR": {
+          "rows": 1369569,
+          "scannerPresent": true,
+          "SegmentIterator": true,
+          "IndexFilter": true
+        }
+      },
+      "planOperators": [
+        "SORT_SINK_OPERATOR",
+        "OLAP_SCAN_OPERATOR"
+      ],
+      "planNodes": [
+        {
+          "name": "SORT_SINK_OPERATOR",
+          "nodeId": 1
+        },
+        {
+          "name": "OLAP_SCAN_OPERATOR",
+          "nodeId": 0
+        }
+      ],
+      "state": "FINALIZED",
+      "wakeEarly": 1
+    }
+  ]
+}

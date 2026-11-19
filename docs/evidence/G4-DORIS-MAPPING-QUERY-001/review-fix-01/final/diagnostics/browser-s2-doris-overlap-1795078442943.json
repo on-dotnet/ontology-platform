@@ -1,0 +1,588 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s2-doris-overlap",
+  "startedAtUtc": "2026-11-19T08:54:02.943Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_operator",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_auditor",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_activator",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_reader",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200",
+      "status": "PASS"
+    },
+    {
+      "name": "all_current_prerequisites",
+      "status": "PASS"
+    },
+    {
+      "name": "normal_current_authority_before_pressure",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_409",
+      "status": "PASS"
+    },
+    {
+      "name": "formal_route_ready",
+      "status": "PASS"
+    },
+    {
+      "name": "overlap_witness_40",
+      "status": "PASS"
+    },
+    {
+      "name": "independent_observer_armed",
+      "status": "PASS"
+    },
+    {
+      "name": "overlap_witness_42",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_query_row_locked",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_11",
+      "status": "PASS"
+    },
+    {
+      "name": "http_12_200,409,503",
+      "status": "PASS"
+    },
+    {
+      "name": "overlap_witness_46",
+      "status": "PASS"
+    },
+    {
+      "name": "same_be_cancelled_after_committed_state",
+      "status": "FAIL"
+    },
+    {
+      "name": "owned_permit_released",
+      "status": "PASS"
+    },
+    {
+      "name": "independent_observer_exited",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 13.73129199999994,
+      "sha256": "99a398a4652dd3044f5a6eaace7057fa7b8fa5df8b0e2ce1308ee53c60172949"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 5.3960000000001855,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 5.465332999999873,
+      "sha256": "40605b431fef2252aaacc28b8411ad4fa5218cfca4d75cb6bc915a2394f9a79b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 2.027832999999873,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 16.075291000000107,
+      "sha256": "79757cb0a78a4a75cc04bbcae5087d4e51ca60010bd7117bc786ffb6bb9d8b18"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.6766250000000582,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 10.822624999999789,
+      "sha256": "0fdadec39002c128cfa7c5608679dc621aca1ae9e72affb0fa9c405e4c5bc216"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.9545830000001843,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connections/675b6bca997f4aa5b0b9e4678964c50b",
+      "status": 200,
+      "elapsedMs": 22.174165999999786,
+      "sha256": "859b7174c069e71d4c664215733b34cd201e77ca977cca52dd4c4cf3c01f2ff1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-14f8a2f5d57158d41df6d5c3eaffef7a/active",
+      "status": 200,
+      "elapsedMs": 56.91100000000006,
+      "sha256": "f545c09dc95256e2c0248cfbc49ad3f00f885e44636a7f0cdde18c2c28b0bf9a"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries/query-6762dfc7f2be46feaaab122bf3b305a1/cancel",
+      "status": 409,
+      "elapsedMs": 167.7589579999999,
+      "code": "query_already_finished",
+      "sha256": "a9289b87e40b7e457098ec2c4ab51cb54a8e0681989b4b6ee6a1f18de2c02503"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries/query-387905d3e3114d5584320df72f5e3289/cancel",
+      "status": 200,
+      "elapsedMs": 139.14495799999895,
+      "sha256": "82e81287ba8a597a963b978e1df876b15224a1a50248fa55fd9902d6cf1b3032"
+    }
+  ],
+  "status": "FAIL",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "s2-doris-overlap",
+      "status": "READY",
+      "pid": 75069,
+      "commandId": "ed9834efb8534064b89174474046252a",
+      "snapshotId": "75e886f15bfbe8d7bb776495afa60de4cb39efa23163a8ce9c07e44be63cb11e",
+      "processStart": "Thu Nov 19 16:54:01 2026"
+    },
+    "web": null
+  },
+  "scenarioReady": {
+    "status": "READY",
+    "stage": "pressure-running",
+    "budgetSeconds": {
+      "load": 0,
+      "execute": 180,
+      "restore": 5760
+    },
+    "grantRequiredSeconds": 5940,
+    "sessionRequiredSeconds": 180,
+    "sessionCommand": "ab9778f8a89546f8a5c3ee64fdea39c1",
+    "snapshot": "75e886f15bfbe8d7bb776495afa60de4cb39efa23163a8ce9c07e44be63cb11e",
+    "resourceIds": {
+      "platform-pg": "34a947835a8949be5fb34bdc813e87ff812dca1d3381ccea7ce610754448367f",
+      "keycloak-test": "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f",
+      "fuseki": "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04",
+      "rustfs": "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9",
+      "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2"
+    },
+    "fieldCount": 18,
+    "connectionId": "675b6bca997f4aa5b0b9e4678964c50b",
+    "secretVersion": 2,
+    "catalog": "c985c3e603f940628cb3665710e85d79",
+    "activation": "activation-79ac8f33b3e541b19862170714884d2a"
+  },
+  "cancel": {
+    "key": "98cc106d-0da4-4e56-b735-16cb69fbff27",
+    "queryId": "query-387905d3e3114d5584320df72f5e3289",
+    "httpStatus": 200,
+    "execution": {
+      "exit": 0,
+      "mtp": {
+        "commandId": "6506faa2be37492ab2073191f5e061fb",
+        "input": {
+          "receiptSha256": "25e65f1c62fefe5b6da8fcbe918dd813dc74da03b64d131a317b537c04cd71b7",
+          "inputKey": "6f0bd749f1fa6f27a33cba73c03b0ddbe7921c29f19d25b84f214c5b27a5719b",
+          "outputKey": "7cbb43cfcf5d8fb34231717b494c62fe34dd8bfe35d93b79f38ccf7ec0d559c6"
+        },
+        "exitCode": 0,
+        "passed": 1
+      }
+    },
+    "witness": {
+      "event": "finished",
+      "stress": {
+        "attempt": "6513fcf954bc",
+        "manifestSha256": "419d016ad2124007755fed00e15d3ad2210e2b380f7399402305f02e9305cfd7",
+        "rowsByTable": {
+          "dmq_entity": 4194304,
+          "dmq_target": 3
+        },
+        "purpose": "cancellation_only"
+      },
+      "idempotencyKey": "98cc106d-0da4-4e56-b735-16cb69fbff27",
+      "run": "implementation-01",
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+      "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "observerControlQueryId": "d9a094c9b8a24f86-97acbb2724403e84",
+      "feClockControl": {
+        "passed": true,
+        "pgBefore": "2026-11-19 08:54:07.441432+00",
+        "pgAfter": "2026-11-19 08:54:07.453758+00",
+        "audit": {
+          "complete": true,
+          "query": "d9a094c9b8a24f86-97acbb2724403e84",
+          "state": "EOF",
+          "errorCode": "0",
+          "userCancel": false,
+          "timeout": false,
+          "reader": false,
+          "statementSha256": "220392ee9d68a81b0a2f29405ad5d5d9b35d75579a0195bf818184d1e2772527",
+          "auditInode": "219380",
+          "fixedEntity": false,
+          "isSelect": true,
+          "returnRows": 1,
+          "startUtc": "2026-11-19T08:54:07.442000+00:00",
+          "durationMs": 7,
+          "endUtc": "2026-11-19T08:54:07.449000+00:00",
+          "endExclusiveUpperUtc": "2026-11-19T08:54:07.450000+00:00",
+          "lineSha256": "f4296a8c626ae12f41409acf006e3908effedaba319b35675fcb3a8999fc6a6c",
+          "sqlHash": "bbbc3e0a843760f1fc2c73c872dc7f39"
+        }
+      },
+      "vmClocks": {
+        "be": {
+          "timeNamespace": "time:[4026532831]",
+          "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+          "utcOffset": "+0000"
+        },
+        "fe": {
+          "timeNamespace": "time:[4026532693]",
+          "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+          "utcOffset": "+0000"
+        },
+        "platform-pg": {
+          "timeNamespace": "time:[4026532969]",
+          "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+          "utcOffset": "+0000"
+        }
+      },
+      "nativeStart": {
+        "inode": 219836,
+        "endOffset": 33605720,
+        "fileSize": 33605746,
+        "trailingBytes": 26,
+        "trailingSha256": "2491d27d3824ba47e4a927a822c41a5a3d5fc151e19b51f2e3f05d18dd48be9f"
+      },
+      "loadBefore": {
+        "clock": "2026-11-19T08:54:13.272213+00:00",
+        "serverStarted": "2026-11-19T08:37:02.237255+00:00",
+        "since": null,
+        "commits": 58545,
+        "rollbacks": 6352,
+        "reads": 5778,
+        "hits": 1987181,
+        "queryTableIndexScans": 5348,
+        "queryTableSequentialScans": 983
+      },
+      "profileResourcesBefore": {
+        "fe": {
+          "currentBytes": 1549250560,
+          "peakBytes": 1554874368,
+          "usageUsec": 316654427
+        },
+        "be": {
+          "currentBytes": 1631211520,
+          "peakBytes": 2790510592,
+          "usageUsec": 95147746
+        }
+      },
+      "admissionObservedAt": "2026-11-19T08:54:15.115658+00:00",
+      "lockerPid": 4547,
+      "lockedQueryId": "query-387905d3e3114d5584320df72f5e3289",
+      "sourceReadyBeforeCancel": "2026-11-19 08:54:15.321348+00",
+      "waiterPid": 4486,
+      "verifiedWaitPgUtc": "2026-11-19 08:54:15.421348+00",
+      "sourceThread": 310,
+      "feActiveObservedAt": "2026-11-19T08:54:15.443555+00:00",
+      "liveWitness": "registered_log",
+      "unlockTrigger": "FIXED_ACTIVE_FE",
+      "beforeUnlockPgUtc": "2026-11-19 08:54:15.443283+00",
+      "afterUnlockPgUtc": "2026-11-19 08:54:15.443922+00",
+      "queryId": "query-387905d3e3114d5584320df72f5e3289",
+      "sourceQueryId": "792b86304f584ba0-963f51639ee6d45b",
+      "platformStates": [
+        {
+          "query": "query-387905d3e3114d5584320df72f5e3289",
+          "state": "RUNNING",
+          "statement": "2026-11-19T08:54:15.44547+00:00",
+          "isolation": "read committed",
+          "observed": "2026-11-19T08:54:15.44565+00:00"
+        },
+        {
+          "query": "query-387905d3e3114d5584320df72f5e3289",
+          "state": "RUNNING",
+          "statement": "2026-11-19T08:54:15.453832+00:00",
+          "isolation": "read committed",
+          "observed": "2026-11-19T08:54:15.45395+00:00"
+        },
+        {
+          "query": "query-387905d3e3114d5584320df72f5e3289",
+          "state": "CANCELLED",
+          "statement": "2026-11-19T08:54:15.459859+00:00",
+          "isolation": "read committed",
+          "observed": "2026-11-19T08:54:15.460044+00:00"
+        }
+      ],
+      "cancelVisiblePgUtc": "2026-11-19T08:54:15.460044+00:00",
+      "terminal": "CANCELLED",
+      "terminalObservedAt": "2026-11-19T08:54:15.461060+00:00",
+      "sourceCounts": "0\t0",
+      "feInactiveUpperMs": 60.556042,
+      "persisted": {
+        "bytes": 0,
+        "resultHash": null,
+        "resultSize": 0,
+        "readReceipts": 0,
+        "completedAtUtc": "2026-11-19T08:54:15.445308+00:00",
+        "cancelRequested": true
+      },
+      "successfulAuditCount": 0,
+      "cancelAuditCount": 1,
+      "loadAfter": {
+        "clock": "2026-11-19T08:54:15.505763+00:00",
+        "serverStarted": "2026-11-19T08:37:02.237255+00:00",
+        "since": null,
+        "commits": 58730,
+        "rollbacks": 6369,
+        "reads": 5802,
+        "hits": 1989894,
+        "queryTableIndexScans": 5795,
+        "queryTableSequentialScans": 984
+      },
+      "sourceCountsObservedAt": "2026-11-19T08:54:15.564378+00:00",
+      "dualZeroUpperMs": 120.801292,
+      "beEvents": [
+        {
+          "kind": "registered",
+          "beUtc": "20261119 08:54:15.442389"
+        },
+        {
+          "kind": "cancel_arrived",
+          "beUtc": "20261119 08:54:15.471854"
+        },
+        {
+          "kind": "task_cancelled",
+          "beUtc": "20261119 08:54:15.472092"
+        },
+        {
+          "kind": "task_cancelled",
+          "beUtc": "20261119 08:54:15.472121"
+        },
+        {
+          "kind": "task_cancelled",
+          "beUtc": "20261119 08:54:15.472162"
+        },
+        {
+          "kind": "fragment_end",
+          "beUtc": "20261119 08:54:15.472635"
+        },
+        {
+          "kind": "fragment_end",
+          "beUtc": "20261119 08:54:15.473110"
+        },
+        {
+          "kind": "context_end",
+          "beUtc": "20261119 08:54:15.473279"
+        }
+      ],
+      "cancelVisibleBeforeBeKilled": true,
+      "activeBeforeUnlock": true,
+      "cleanupUpperMs": 29.996,
+      "pipelineStreamIssues": [],
+      "equivalent": {
+        "status": "NO_GO",
+        "checks": {
+          "clockContinuity": true,
+          "fullActivePopulation": true,
+          "platformBeforeSource": true,
+          "allLiveInstancesCancelled": true,
+          "allTasksCausallyClosed": false,
+          "allFragmentsAccounted": true,
+          "endOfExecution": true,
+          "feUserCancelInWindow": true
+        },
+        "pipelineZeroUpperMs": 32.648795,
+        "sha256": "178ace21f1bca20dc3f685fa77711f09f3b1df9f7a463a4da58f0a529c015f88"
+      },
+      "profileResourcesAfter": {
+        "fe": {
+          "currentBytes": 1565577216,
+          "peakBytes": 1574580224,
+          "usageUsec": 321978395
+        },
+        "be": {
+          "currentBytes": 1672671232,
+          "peakBytes": 2790510592,
+          "usageUsec": 96370608
+        }
+      }
+    }
+  },
+  "workerExit": {
+    "code": 0,
+    "signal": null
+  },
+  "witnessExit": {
+    "code": 0,
+    "signal": null
+  },
+  "failure": {
+    "phase": "formal_cancel_after_verified_row_wait",
+    "category": "Error",
+    "code": "same_be_cancelled_after_committed_state"
+  },
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-19T08:54:21.699Z"
+}
