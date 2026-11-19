@@ -47,9 +47,18 @@ public sealed class SemanticMcpTools
                 if (runs is null || string.IsNullOrWhiteSpace(sessionReference)) throw new SemanticOperationException(503, "query_run_unavailable");
                 // 单次MCP请求也是一个服务器运行；MAF循环显式共用同一引用。
                 var reference = run ?? new G4QueryRunReference(clock.GetUtcNow());
+                // 已知合法查询时长从最早入口起算；完整载荷仍在预留后校验，失败尝试照常计数。
+                if (name is "g4_resolve_entity" or "g4_read_observations" or "g4_traverse_relationships"
+                    && arguments is not null && arguments.TryGetValue("query", out var request) && request.ValueKind == JsonValueKind.Object
+                    && request.TryGetProperty("timeoutMs", out var timeoutValue) && timeoutValue.ValueKind == JsonValueKind.Number
+                    && timeoutValue.TryGetInt32(out var timeoutMs) && timeoutMs is >= 100 and <= 5000)
+                {
+                    invocation.Tighten(timeoutMs);
+                }
                 // 每次进入都先计数，参数拒绝与恢复调用不能绕过工具预算。
                 var delivery = await ExecutionRunService.ExecuteG4ToolAsync(runs, actor, sessionReference, reference,
                     budget => CallG4Async(actor, sessionReference, name, arguments, budget), invocation.Token, clock);
+                invocation.ThrowIfExpired();
                 // 文本与结构化内容只解码同一组规范字节。
                 var text = delivery.ResultBytes is not null ? System.Text.Encoding.UTF8.GetString(delivery.ResultBytes) : JsonSerializer.Serialize(delivery.View, G4QueryJson.Options);
                 // 正式网关保留六态业务结果，MCP 对整次无权限调用只返回固定拒绝文案。
@@ -58,8 +67,10 @@ public sealed class SemanticMcpTools
                 {
                     throw new SemanticOperationException(403, "query_forbidden");
                 }
-                invocation.Token.ThrowIfCancellationRequested();
-                return new CallToolResult { StructuredContent = structured, Content = [new TextContentBlock { Text = text }] };
+                // 整个 MCP 成功载荷完成构造后，仍按原单调时钟决定是否允许交付。
+                var output = new CallToolResult { StructuredContent = structured, Content = [new TextContentBlock { Text = text }] };
+                invocation.ThrowIfExpired();
+                return output;
             }
             // 能力名与版本只来自服务器白名单，调用方不能注入发布或任意查询工具。
             var capability = gateway.GetCapabilities().SingleOrDefault(value => value.Id == name && Allowed(value.Id))

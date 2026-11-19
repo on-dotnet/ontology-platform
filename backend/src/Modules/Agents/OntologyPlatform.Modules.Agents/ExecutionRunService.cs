@@ -52,18 +52,16 @@ public sealed class ExecutionRunService
         // 直接 Run 调用也在预留之前建立五秒上限；已进入 MCP 时复用更早的起点。
         var callClock = timeProvider ?? TimeProvider.System;
         using var invocation = new G4RequestDeadline(callClock, token);
+        invocation.Tighten(run.Deadline);
         _ = run.Reserve(callClock.GetUtcNow());
-        // 同一运行剩余时间贯穿持久计数、当前授权、源读取和引用保存。
-        using var budget = CancellationTokenSource.CreateLinkedTokenSource(invocation.Token);
-        // 调度暂停可能跨过期限，不能把负延迟传入计时器。
-        var remaining = run.Deadline - callClock.GetUtcNow();
-        if (remaining <= TimeSpan.Zero) throw new SemanticOperationException(429, "query_run_budget");
-        budget.CancelAfter(remaining);
-        await store.ReserveRunAsync(actor, sessionReference, run.RunId, run.Deadline, budget.Token);
-        // 实际执行与恢复仍由唯一Gateway负责，错误不会返还工具次数。
-        var delivery = await execute(budget.Token);
-        await store.BindRunQueryAsync(actor, sessionReference, run.RunId, delivery.View.QueryId, budget.Token);
-        budget.Token.ThrowIfCancellationRequested();
+        invocation.ThrowIfExpired();
+        await store.ReserveRunAsync(actor, sessionReference, run.RunId, run.Deadline, invocation.Token);
+        invocation.ThrowIfExpired();
+        // 实际执行与恢复仍由唯一 Gateway 负责；运行身份的持久截止不因单次更短的查询而改变。
+        var delivery = await execute(invocation.Token);
+        invocation.ThrowIfExpired();
+        await store.BindRunQueryAsync(actor, sessionReference, run.RunId, delivery.View.QueryId, invocation.Token);
+        invocation.ThrowIfExpired();
         return delivery;
     }
 

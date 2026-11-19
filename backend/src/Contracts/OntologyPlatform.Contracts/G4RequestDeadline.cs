@@ -39,7 +39,8 @@ public sealed class G4RequestDeadline : IDisposable
         // 初始上限始终从最早的入口起算。
         var maximum = previous?.DeadlineUtc ?? enteredUtc.AddSeconds(5);
         if (SemanticReadDeadline.Current is { } outer && outer < maximum) maximum = outer;
-        limitTicks = Math.Max(0, (maximum - enteredUtc).Ticks);
+        previous?.Tighten(maximum);
+        limitTicks = (maximum - enteredUtc).Ticks;
         timer = new CancellationTokenSource(Remaining, this.clock);
         linked = CancellationTokenSource.CreateLinkedTokenSource(token, previous?.Token ?? CancellationToken.None, timer.Token);
         Scope.Value = this;
@@ -63,12 +64,18 @@ public sealed class G4RequestDeadline : IDisposable
     public void Tighten(int timeoutMs)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(timeoutMs);
-        // MCP 绑定位于 Gateway 外层；内层退出后仍须沿用同一次工具调用收紧的截止。
-        previous?.Tighten(timeoutMs);
+        Tighten(enteredUtc.AddMilliseconds(timeoutMs));
+    }
+
+    /// <summary>将已有 Run 或外层的绝对截止映射到最早入口的单调起点，并收紧全部父范围。</summary>
+    /// <param name="deadline">同次调用已知的 UTC 截止；过去的时刻保持原值。</param>
+    public void Tighten(DateTimeOffset deadline)
+    {
+        previous?.Tighten(deadline);
         lock (timer)
         {
             // 只允许缩短，外层约束或已经发生的取消持续有效。
-            var ticks = TimeSpan.FromMilliseconds(timeoutMs).Ticks;
+            var ticks = (deadline - enteredUtc).Ticks;
             if (ticks >= Interlocked.Read(ref limitTicks)) return;
             Interlocked.Exchange(ref limitTicks, ticks);
             // 已过截止同步传播，尚未到期则缩短原计时器。
@@ -76,6 +83,13 @@ public sealed class G4RequestDeadline : IDisposable
             if (left == TimeSpan.Zero) timer.Cancel();
             else timer.CancelAfter(left);
         }
+    }
+
+    /// <summary>在同步编码等边界读取原单调时钟，计时器尚未调度也不能交付逾期结果。</summary>
+    public void ThrowIfExpired()
+    {
+        if (Remaining == TimeSpan.Zero) timer.Cancel();
+        Token.ThrowIfCancellationRequested();
     }
 
     /// <summary>在整个调用链完成后恢复父范围并释放计时器。</summary>
