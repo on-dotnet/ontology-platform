@@ -1,0 +1,192 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "3790ead2dd8ce33db432c5b7cb345786a2e697cc",
+  "checks": [
+    {
+      "name": "environment",
+      "command": "python3 -B scripts/maintenance/workflow_doris_mapping_evidence.py --gate environment --input-key 88b02cc742f15c74e31cf65a13728c43e9278ea74d766c36e447fc563930f0d4",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "REUSED execution; FRESH qualification; checks=21, skipped=0; output SHA-256 16cca3257b985f1934f45ed4fcc6b76c37859d15d1011317987c6fed0e80385d"
+    },
+    {
+      "name": "contract",
+      "command": "python3 -B scripts/maintenance/workflow_doris_mapping_evidence.py --gate contract --input-key 7545c8d56cc3872dadea2f9e9fd2415cf732786e7256595e34b9765401ba4160",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "REUSED execution; FRESH qualification; checks=8, skipped=0; output SHA-256 57bbbb9f14e4bd08dcc2dcdcde6af25dbc1d32dd52b5bd4a7f8942415baaeb6b"
+    },
+    {
+      "name": "backend",
+      "command": "python3 -B scripts/maintenance/workflow_doris_mapping_evidence.py --gate backend --input-key 81a03456efab28adfff65568c240b749443638bc0450bc5bb365202dfe396315",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "REUSED execution; FRESH qualification; checks=76, skipped=0; output SHA-256 b6896c56f3829608ba01a4f603bc8efcb49791ed41f28cea82944e6f9e24ab6d"
+    },
+    {
+      "name": "doris-keep-preservation",
+      "command": "python3 -B scripts/tests/DorisKeepPreservation.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FRESH execution; FRESH qualification; checks=14, skipped=0; output SHA-256 4c36b42d0c0aac9cb059f13f02b307b6ea5e30373f1e16b77ebbe954a54cc573"
+    },
+    {
+      "name": "preflight",
+      "command": "python3 -B scripts/tests/ExecutionPreflight.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FRESH execution; FRESH qualification; checks=12, skipped=0; output SHA-256 6d2c191879f52e3bd14f9ead26795c1427e44554c745a12ea166d9ba3a5c5a94"
+    },
+    {
+      "name": "doris-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowDoris.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FRESH execution; FRESH qualification; checks=6, skipped=0; output SHA-256 3b276704f3e563f93455088f7ce46c6323f4b89f61012ff8ddd99bba729ec60f"
+    },
+    {
+      "name": "m2-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowM2Web.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FRESH execution; FRESH qualification; checks=14, skipped=0; output SHA-256 c5389f0cb32a80ff45c90f24fc3fbf1bc6b9a5617cab52b463e77c761b2a7e4d"
+    },
+    {
+      "name": "query-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowQuery.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FRESH execution; FRESH qualification; checks=16, skipped=0; output SHA-256 9edc84bcc62b13f41ba494039e785a61d1045fd6d525e17fb9fea5cb4653c9ec"
+    },
+    {
+      "name": "doris-mapping-query-admission",
+      "command": "python3 -B scripts/tests/WorkflowDorisMappingQuery.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FRESH execution; FRESH qualification; checks=10, skipped=0; output SHA-256 2d407504d003cfe404f23be48347e686ae1f67393860d4067d9a0bf06b1ddd60"
+    },
+    {
+      "name": "engineering",
+      "command": "python3 -B scripts/tests/Workflow.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FRESH execution; FRESH qualification; checks=24, skipped=0; output SHA-256 9713acdce2dec1378f7e172720b61427d756850fc00e4f6c946893c77c882219"
+    },
+    {
+      "name": "environment-prepare",
+      "command": "python3 -B scripts/tests/WorkflowEnvironment.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FRESH execution; FRESH qualification; checks=7, skipped=0; output SHA-256 df3fed384cac67d52cee63c88989bfbd434c1c8298f05e0cbf12e192bb4074a1"
+    },
+    {
+      "name": "host_continuity",
+      "command": "python3 -B scripts/tests/HostContinuity.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FRESH execution; FRESH qualification; checks=13, skipped=0; output SHA-256 3dbb5e15531ba07b0f16b303fa56bddabe72f6656ce3cece3948d2305480332d"
+    },
+    {
+      "name": "web",
+      "command": "python3 -B scripts/maintenance/workflow_doris_mapping_evidence.py --gate web --input-key 036dcfc5b04e0e942858c6ac307681a6e951325c365e0786548be0a7aafb4921",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "REUSED execution; FRESH qualification; checks=66, skipped=0; output SHA-256 1bbdc33f2f6ced2b8f4d094ac6860ee7892be3f8dc316c640ed4054f32355a39"
+    },
+    {
+      "name": "interaction",
+      "command": "python3 -B scripts/maintenance/workflow_doris_mapping_evidence.py --gate interaction --input-key c3b9bbea98b82f762274d9949f79e5ca77cb1832cdc469fd11b329505da49fec",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "REUSED execution; FRESH qualification; checks=216, skipped=0; output SHA-256 ce3a75bbff5db746097dc9c81ad4d7ba7545a7090b9c900fd3adbecddb243a66"
+    },
+    {
+      "name": "mapping-task-admission",
+      "command": "python3 -B scripts/tests/WorkflowMapping.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FRESH execution; FRESH qualification; checks=16, skipped=0; output SHA-256 029f0579c18a4af28202bf8627d2baac53095a9f7587b1963728327f461ce610"
+    },
+    {
+      "name": "policy",
+      "command": "python3 -B scripts/maintenance/workflow_context.py --root /private/tmp/dmq-measure-dbvhp1j8/ontology-platform --check --task G4-DORIS-MAPPING-QUERY-001 --base 606ca2d2c61964e6498dd72d5e9ad960d3593bf7 --head 3790ead2dd8ce33db432c5b7cb345786a2e697cc",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "FRESH execution; FRESH qualification; checks=0, skipped=0; output SHA-256 5a2d95c1894fc3cf16a562e4513a86aa431952742bb7c0f0e618627dbb0d8e9a"
+    },
+    {
+      "name": "scoped-csharp-format",
+      "command": "dotnet format whitespace --verify-no-changes --no-restore (33 changed C# files; exact command digest in format-command.json)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Roslyn formatted-document report was empty. 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-DORIS-MAPPING-QUERY-001",
+    "runId": "implementation-01",
+    "scope": "Doris Mapping/Query A–F, fixed product SQL, S0–S3",
+    "taskOutcome": "PASS",
+    "overallG4": "PARTIAL",
+    "otherPlatforms": "NOT_RUN",
+    "plannedPaths": 556,
+    "qualifiedGates": 16,
+    "qualifications": "All 16 FRESH; five requalify previously measured product results.",
+    "execution": {
+      "FRESH": [
+        "doris-keep-preservation",
+        "preflight",
+        "doris-task-admission",
+        "m2-task-admission",
+        "query-task-admission",
+        "doris-mapping-query-admission",
+        "engineering",
+        "environment-prepare",
+        "host_continuity",
+        "mapping-task-admission",
+        "policy"
+      ],
+      "REUSED": [
+        "environment",
+        "contract",
+        "backend",
+        "web",
+        "interaction"
+      ]
+    },
+    "workflowReceiptSha256": "3221d481e9a6f01ff55a8850d9b57012fd50cf7876c2f7f1fd3de2cd2ee5ee67",
+    "gateOriginalsSha256": "786ef43a228fd87e088be16bbb7eb8d8b1e9532bf6049d8639027750fe1ab9f1",
+    "impactPlanSha256": "955d8d87e12d6974c993d10f3585fce715bff0d30d2af0715a96dedabf48637d",
+    "productProofs": {
+      "s2-equivalent/ac06-dependency-proof.json": "e83a3fb07b09390f7d82966e66e80da2448257dbc72371bc1f2f7174f7b1e4e2",
+      "s2-equivalent/ac06-non-author-review.json": "536e12213f0c46e9a3d61c9f4b0f5a91cfa6331d904d86900ffd44ceff7ebeb3",
+      "s3/product-inputs.json": "64a9f20e7d0170321722f925abe9e24516c8126e5a6b53bd70b7c1959d0601e8",
+      "s3/non-author-product-review.json": "22618248e0a93d8a666f8a00a997278d5494c8679ce2a97b8099509edf2dbda9",
+      "s3-requalification/product-inputs.json": "92d6ede8723140e645771481f9e3cd847517ae878d8bb19742b799f05fa09b6c",
+      "historical-byte-mapping.json": "5f32faf4edb153c19594fc3cb26bb6c9cccb6ca702dc125af827fd0c09cc1d8c"
+    },
+    "nonAuthorReviewSha256": "d2417bb6f45320c451727452101bc79dfad9a050ebf33b27161aaaf7cf6b15ff",
+    "formatTiming": {
+      "exitCode": 0,
+      "timingStatus": "WITHIN_DEADLINE",
+      "elapsedSeconds": 3.0869329170091078,
+      "deadlineSeconds": 120
+    },
+    "testedMemberEstimate": {
+      "status": "PASS",
+      "estimatedZipBytes": 8580136,
+      "memberPlanSha256": "46042b55ea2fcf9884af61cf842f6e0286cad25ed661eb5ad5871147a01d08f5"
+    },
+    "historicalEngineering": "Whole run signal -9 / TIMEOUT. Same-input groups 122+11+1 cover 134 unique cases.",
+    "resources": "14 original STOPPED_KEEP. Task FE, BE and platform PG stopped. Keycloak, Fuseki and RustFS keep volatile volumes.",
+    "counterexamples": "SLEEP outside fixed SQL scope. Original AC06 browser FAIL and earlier NO-GO retained."
+  }
+}

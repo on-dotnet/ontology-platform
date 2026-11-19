@@ -370,3 +370,5 @@ FRESH：main祖先/归档SHA/精确patch、普通push握手与回读、受保护
 ### S3 验收记录
 
 正式 UI、HTTP 与四个 MCP 工具共用网关。三种执行能力与结果恢复的规范字节、拒绝文案、撤权清屏、身份切换和未重放的历史恢复均已有实测。PG 历史 manifest、result 和 standard assessment 的原件资格沿用原有边界。S2 与 S3 的运行快照各 99 项，仅 MCP 所在 Agents 程序集及其 PDB 改变。原 AC06 按影响重新核对。原始无末尾换行的 JSON 使用既有无损封装；资格入口先恢复准确字节并核对签署散列，再重放源端证明。[S3 原件与命令散列](implementation-01/s3/product-inputs.json) · [AC06 原件无损映射](implementation-01/s2-equivalent/lossless-originals.json)
+
+正式产品实测、非作者结论及 16 项受影响门禁均已绑定本地实测提交。当前切片进入 ChatGPT 复审。G4 整体仍为 PARTIAL，CI 及其他平台属于 NOT_RUN。最终 ZIP 与远端分支的准确身份以包外机器回执和同包独立重开回执核验。[最终验收及执行分类](implementation-01/final/validation.json)

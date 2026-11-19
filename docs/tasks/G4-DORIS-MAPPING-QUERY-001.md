@@ -1,7 +1,7 @@
 # G4-DORIS-MAPPING-QUERY-001｜Doris Mapping/Query 规格
 
 ## 当前执行与授权
-唯一执行状态：S3_PRODUCT_GO。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
+唯一执行状态：WAITING_CHATGPT_REVIEW。S0–S3 已通过本地切片验收。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
 
 Master单写。2026-11-19 追加同请求核验的 PublishingCatalog、ReleaseVerifier、JenaSemanticRuntime 及对应内部合同与回归。原 owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)列明的源、测试、最小任务注册和当前文档。历史PG规范字节、旧ZIP与私有设施为只读依赖。R0允许14个准确ID在保全、排空、恢复清单与非作者检查后优雅停止。用户随后手动调VM。当前其他旧KEEP受保护，本分支不合main。
 
@@ -33,11 +33,11 @@ Master单写。2026-11-19 追加同请求核验的 PublishingCatalog、ReleaseVe
 | B | 唯一规格和独立审查 | Master，owned_paths | 文档轻量核对 | COMPLETE，静态可交裁决 |
 | S1 | 单表发布/读取/恢复 | Master，规格C2/F2 | AC01/04/06/08/11 | GO_TO_S2，单表切片已复核，正式在途取消见 AC06 |
 | S2 | 双表精度/模型/并发 | Master，同上 | AC02/03/05/07/09 | 双表、边界、当前权限和 AC06 均已复核通过 |
-| S3 | UI/MCP/PG兼容/最终V3 | Master，同上 | AC10/受影响门禁 | UI/MCP 与 PG 历史字节通过，工程资格与最终包核验在后续收口 |
+| S3 | UI/MCP/PG兼容/最终V3 | Master，同上 | AC10/受影响门禁 | UI/MCP、PG 历史字节与 16 项受影响门禁通过。最终 V3 的散列、同包重开和远端回读见包外回执 |
 
 ## Verify与恢复
 
-自本卡、唯一规格和implementation-01原件恢复。按R0→S0→S1→S2→S3验证；产品资格、最终V3与CI尚无本Run结果。原整集-9/TIMEOUT和134唯一覆盖保留。未跟踪用户文件保持原状。
+自本卡、唯一规格和implementation-01原件恢复。本 Run 已完成 R0、S0–S3 及受影响工程门禁。CI 为 NOT_RUN，G4 整体为 PARTIAL。原整集-9/TIMEOUT和134唯一覆盖保留。未跟踪用户文件保持原状。
 
 R0原件及非作者结论见[14个准确ID与保全缺口](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/r0-review.json)。第一次中止时，14个原ID中，M4主/次API已请求TERM、自然退出0，其余12个仍运行。8个易失卷热备及隔离同ID恢复通过，两份隔离H2读取原夹具realm通过。用户批准的改序由非作者现场放行后，M4 keyring已取得冷副本并独立核验。准备处置M5前排空检查触发DRAIN_ACTIVITY_DETECTED，剩余处置中止，八卷继续由准确只读容器持有。非作者现场复核结论为NO-GO继续停机或调VM。20轮事后采样及单独补核MappingJobs/MappingOutbox均为零，触发时具体活动UNKNOWN。见[停机与独立复核回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/cold-save-review.json)及[恢复保护反例](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/cold-save-validation.json)。现VM仍15.63GiB/12CPU，暂缓用户手调。离线准备与定向检查见[当前验证](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/validation.json)。SDK短诊断通过，正式prepare受原失败保护拦截，C#未编译。S0及后续产品链均NOT_RUN。
 
@@ -165,3 +165,7 @@ MCP 三项执行及一项恢复共 125 条检查。查询页和映射编辑器 4
 受影响回归包括 PG/Doris 适配和分发 42 项、实际 Doris 认证及 TLS 与固定源读 4 项、Query 23 项、wire 6 项、发布批次 4 项，另行重开 PG 两组黄金字节。Web 的类型、lint、22 项单元和生产构建均通过。第一个 MCP 拒绝、刷新失败、Web 宿主退出超时和误选 100 行夹具的回归继续保留。旧十四个容器为 STOPPED_KEEP，本任务的三个持久服务已停，Keycloak、Fuseki、RustFS 继续持有易失卷。[收口回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3/continued-platform-keep-8a6e2624592041c194d3cf372dadca26.json)
 
 工程静态检查首次在 17 份历史 JSON 的末尾换行和夹具的一处凭据读取表达式处失败。17 份历史原件已按仓库标准恢复并与原 Git 对象逐字节核对。PG 黄金用例读取无损封装，保留数据库原始 2509 字节与独立 ContentHash。夹具改动前后 Python 语法树完全相同。生产代码和 Web 输入均未改变，更新后的 QueryTests 独立重验。[原件恢复映射](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/historical-byte-mapping.json) · [定向重验](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3-requalification/product-inputs.json)
+
+### 本地交付绑定与复审关口
+
+实测提交为 `3790ead2dd8ce33db432c5b7cb345786a2e697cc`。干净检出上 556 个变更路径全部归入受影响计划。11 项工程门禁重新执行，5 项产品门禁重新核验实测原件，16 项均通过。另对本批 33 份 C# 文件核验 Roslyn 空白格式。AC06 和 S3 的独立复核以及随后 17 份历史原件的字节复核均已签收。最终 V3、分支实际交付 Head、同包独立重开与普通推送后回读由包外回执绑定。当前决定仅涉及本任务的 Doris 切片。[本地验收](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/final/validation.json) · [工程执行回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/final/workflow-receipt.json) · [最后一次非作者变更复核](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/final/non-author-review.json)

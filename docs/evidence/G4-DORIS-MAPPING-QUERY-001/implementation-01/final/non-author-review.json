@@ -1,0 +1,20 @@
+{
+  "reviewer": "/root/spec_review",
+  "scope": "historical evidence and current qualification change",
+  "decision": "S3_PRODUCT_GO_RECONFIRMED",
+  "observations": [
+    "All 17 decoded originals match the committed historical bytes in 413d7363fa544ee9dbf780a9a2707b880af96ec8.",
+    "The independent golden still checks the old canonical hash. Updated QueryTests passed 23/23 and PG goldens passed 2/2, with zero skipped.",
+    "Original backend qualification input was recomputed. Only QueryTests changed. Production source and member set matched. Seven browser inputs were qualified including equivalent fixture AST.",
+    "The qualifier verifies command identity, actual test count and input/output hashes. Original AC06 and product failures are retained."
+  ],
+  "reviewedInputs": {
+    "s2-equivalent/ac06-dependency-proof.json": "e83a3fb07b09390f7d82966e66e80da2448257dbc72371bc1f2f7174f7b1e4e2",
+    "s2-equivalent/ac06-non-author-review.json": "536e12213f0c46e9a3d61c9f4b0f5a91cfa6331d904d86900ffd44ceff7ebeb3",
+    "s3/product-inputs.json": "64a9f20e7d0170321722f925abe9e24516c8126e5a6b53bd70b7c1959d0601e8",
+    "s3/non-author-product-review.json": "22618248e0a93d8a666f8a00a997278d5494c8679ce2a97b8099509edf2dbda9",
+    "s3-requalification/product-inputs.json": "92d6ede8723140e645771481f9e3cd847517ae878d8bb19742b799f05fa09b6c",
+    "historical-byte-mapping.json": "5f32faf4edb153c19594fc3cb26bb6c9cccb6ca702dc125af827fd0c09cc1d8c"
+  },
+  "packageReopen": "Separate independent VerifyOnly on the final delivered ZIP is recorded outside the package."
+}
