@@ -75,6 +75,12 @@ public sealed class OracleMappingCancelProbeTests
             {
                 rows = (await OracleSourceAdapter.ConsumeMappingAsync(command, work.Token)).Count;
             }
+            catch (OperationCanceledException error) when (error.InnerException is OracleException { Number: 1013 }
+                && !work.IsCancellationRequested && cancelStart is not null)
+            {
+                // 当前驱动可在工作令牌仍有效时将定向 Cancel 的原生 1013 包装为取消异常。
+                sourceError = 1013;
+            }
             catch (OracleException error)
             {
                 sourceError = error.Number;

@@ -142,13 +142,15 @@ def observe(root, task, attempt, count, directed=False):
                 (sync/'release').write_text(execution)
             trace=watching.result(); result=product.result()
         record['sourceSamples']=trace.splitlines()
-        metric=next(json.loads(line.strip()) for line in result.stdout.decode().splitlines() if line.strip().startswith('{"execution":'))
-        require(metric['execution']==execution and (directed or metric['count']==count),'WINDOW_SAMPLE_ID')
-        record['directed' if directed else 'natural']=metric
+        metrics=[json.loads(line.strip()) for line in result.stdout.decode().splitlines() if line.strip().startswith('{"execution":')]
+        record['driverExitCode']=result.returncode
+        if len(metrics)==1:
+            record['directed' if directed else 'natural']=metrics[0]
         record['cursorStats']=sql('window-real-cursor-stats',"select sql_id||'|'||child_number||'|'||plan_hash_value||'|'||executions||'|'||end_of_fetch_count||'|'||rows_processed||'|'||elapsed_time||'|'||px_servers_executions from G4_CONTROL.OMQ_CURSOR_STATS order by sql_id,child_number;",True).splitlines()
         record['plan']=sql('window-real-plan',"select sql_id||'|'||child_number||'|'||id||'|'||operation||'|'||options from G4_CONTROL.OMQ_PLAN order by sql_id,child_number,id;",True).splitlines()
         record['audit']=sql('window-real-audit',"select instance_id||'|'||sessionid||'|'||entry_id||'|'||statement_id||'|'||execution_id||'|'||object_schema||'|'||object_name||'|'||return_code||'|'||to_char(event_timestamp_utc,'YYYY-MM-DD HH24:MI:SS.FF6') from G4_CONTROL.OMQ_READ_AUDIT where client_identifier='"+execution+"' order by entry_id;",True).splitlines()
         require(build.validate('connections',task)==binding,'WINDOW_BUILD_DRIFT')
+        require(len(metrics)==1 and metrics[0]['execution']==execution and (directed or metrics[0]['count']==count),'WINDOW_SAMPLE_ID')
         require(result.returncode==0 and mtp(result.stdout+result.stderr,1)==1,'WINDOW_DRIVER')
         record['status']='DIRECTED_ATTEMPT_OBSERVED' if directed else 'NATURAL_OBSERVED'
     except BaseException as error:
