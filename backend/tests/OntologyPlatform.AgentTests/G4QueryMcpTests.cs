@@ -458,7 +458,7 @@ public sealed partial class G4QueryMafRuntimeTests
         // 明确区分产品截止、取消传播耗时及调用返回时间。
         var result = new { queryId = row.Id, key, nearDeadline, scheduledRemainingMs = nearDeadline ? 800 : (int?)null, started, blocked, row.DeadlineAtUtc, deniedAt, elapsedMs = measurement.Elapsed.TotalMilliseconds,
             denial.Status, denial.Code, row.ExecutionStatus, resultBytes=row.ResultCiphertext.Length, receipts=0, successAudits=allowed };
-        await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(),"artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun(),
+        await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun(),
             "contended-deadline-"+key+".json"),JsonSerializer.Serialize(result,new JsonSerializerOptions(JsonSerializerDefaults.Web)));
     }
 
@@ -617,7 +617,7 @@ public sealed partial class G4QueryMafRuntimeTests
             var observed = new { queryId=stored.Id, key, sourceReadDone=trace.Events.Single(e=>e.Name=="doris.plan.rows_finished").Timestamp,
                 sourceThread=trace.Events.Single(e=>e.Name=="doris.plan.submitted").Tags.Single(t=>t.Key=="thread").Value,
                 changedAt,finishedAt,stored.DeadlineAtUtc,stored.ExecutionStatus,semanticStatus=body.GetProperty("status").GetString(),rows=0,evidence=0,receipts=0 };
-            await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(),"artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun(),
+            await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun(),
                 "disconnected-"+key+".json"),JsonSerializer.Serialize(observed,new JsonSerializerOptions(JsonSerializerDefaults.Web)));
             return;
         }
@@ -827,7 +827,11 @@ public sealed partial class G4QueryMafRuntimeTests
         }
         // 只允许调用者预先登记的本任务临时目录内的固定报告名。
         var report = Environment.GetEnvironmentVariable("G4_BROWSER_REPORT")!;
-        if (doris) Assert.AreEqual(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun()), Path.GetDirectoryName(report));
+        if (doris)
+        {
+            Assert.AreEqual(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun()), Path.GetDirectoryName(report));
+            Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(Path.GetFileName(report), "^session-ready-[0-9a-f]{32}\\.json$"));
+        }
         else Assert.IsTrue(report.StartsWith("/tmp/m5-session-probe-", StringComparison.Ordinal) && Path.GetFileName(report) == "session-ready.json" && !report.Contains("..", StringComparison.Ordinal));
         await File.WriteAllTextAsync(report, JsonSerializer.Serialize(observations));
     }

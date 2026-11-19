@@ -321,7 +321,7 @@ def run_browser(mode, prepared, readiness_stage, run_key, validation_url, counte
                 check.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
                 check.bind(('127.0.0.1',15642))
             web_service=host_service([dep['node'],'scripts/maintenance/workflow-m4-query.mjs','--task',vm.TASK,
-                                      '--run-id',vm.RUN,'--mode','serve'],{'PATH':os.environ['PATH']},ROOT,vm.TASK,exceeded)
+                                      '--run-id',vm.RUN,'--mode','serve'],{'PATH':os.environ['PATH'],'G4_DORIS_EVIDENCE_RUN':vm.EVIDENCE_RUN},ROOT,vm.TASK,exceeded)
             row['webPid']=web_service.process.pid
             row['webCommandId']=web_service.ident
             row['webProcessStart']=vm.host('ps','-p',str(web_service.process.pid),'-o','lstart=')
@@ -339,7 +339,19 @@ def run_browser(mode, prepared, readiness_stage, run_key, validation_url, counte
         from workflow_doris_mapping_query import BROWSER_SOURCES
         runner_paths = [ROOT/name for name in BROWSER_SOURCES]
         components = [snapshot['snapshotId'], mode, [execution.sha(path.read_bytes()) for path in runner_paths]]
-        if STRESS.exists(): components.append(execution.sha(STRESS.read_bytes()))
+        if vm.EVIDENCE_RUN!=vm.RUN:
+            row['stageInputs']=dict(readinessStage=readiness_stage,expectedStale=counterexample)
+            components.append(row['stageInputs'])
+        if STRESS.exists():
+            data=STRESS.read_bytes()
+            fingerprint=execution.sha(data)
+            if vm.EVIDENCE_RUN!=vm.RUN:
+                archive=OUT/('stress-input-'+fingerprint+'.json')
+                if not archive.exists():
+                    with archive.open('xb') as stream: stream.write(data)
+                vm.demand(archive.read_bytes()==data,'STRESS_INPUT_DRIFT')
+                row['stressInput']=fingerprint
+            components.append(fingerprint)
         inputs = execution.sha(execution.encoded(components))
         report=local('browser-'+mode,[dep['node'],'scripts/maintenance/workflow-m4-query.mjs','--task',vm.TASK,'--run-id',vm.RUN,'--mode',mode],seconds=180,inputs=inputs,env=dict(os.environ,DMQ_READINESS_STAGE=readiness_stage,DMQ_ROOT_WITNESS=run_key or '',DMQ_STALE_EXPECTATION=counterexample or ''))
         vm.demand(not exceeded.is_set(),'S1_HOST_CAP')
@@ -394,10 +406,10 @@ def grant_fields(catalog,two_tables):
 def readiness_budget(stage):
     """授权覆盖装载、正式分支及恢复；短命浏览器会话在每次接续重新登录及核验。"""
     # 每批 INSERT / DELETE 最多 60 秒，两次读取各 15 秒；最大 64 批。
-    fixture_seconds = {'baseline':0, 'sentinel':60, 'stress':64*(60+2*15), 'pressure-running':0}
+    fixture_seconds = {'baseline':0, 'staged':60, 'sentinel-running':0, 'sentinel':60, 'stress':64*(60+2*15), 'pressure-running':0}
     if stage not in fixture_seconds:
         raise ValueError('DORIS_PREREQUISITE_STAGE')
-    restore = fixture_seconds['stress'] if stage=='pressure-running' else fixture_seconds[stage]
+    restore = {'pressure-running':fixture_seconds['stress'],'sentinel-running':60}.get(stage,fixture_seconds[stage])
     return dict(load=fixture_seconds[stage], execute=180, restore=restore)
 
 
@@ -462,13 +474,29 @@ def scenario_ready(state, stage, connection, active, actors):
     fe=resources['fe']
     pressure=json.loads(STRESS.read_bytes()) if STRESS.exists() else None
     vm.demand((pressure is not None)==(stage=='pressure-running'),'PREREQUISITE_STALE:fixture_stage')
+    staged_counts = {}
+    if stage=='sentinel-running':
+        ledger=json.loads((OUT/'s2-sentinel-active.json').read_bytes())
+        vm.demand(ledger['fe']==fe and ledger['runId']==vm.RUN and ledger['taskId']==vm.TASK and len(set(ledger['keys']))==100,'PREREQUISITE_STALE:sentinel')
+        staged_counts['dmq_entity']=100
     for table,key,original in STRESS_TABLES:
         vm.demand(stress_original(fe,table,key,original)==baseline['tables'][table]['before'],'PREREQUISITE_STALE:fixture_bytes')
-        expected_count=len(original)+(pressure['tables'][table]['planned'] if pressure else 0)
+        expected_count=len(original)+(pressure['tables'][table]['planned'] if pressure else staged_counts.get(table,0))
         vm.demand(int(sql(fe,'reader',f'SELECT COUNT(*) FROM fixture.{table}'))==expected_count,'PREREQUISITE_STALE:fixture_count')
-    return dict(status='READY',stage=stage,budgetSeconds=window,grantRequiredSeconds=seconds,sessionRequiredSeconds=window['execute'],
+    qualified = dict(status='READY',stage=stage,budgetSeconds=window,grantRequiredSeconds=seconds,sessionRequiredSeconds=window['execute'],
                 sessionCommand=result.receipt['commandId'],snapshot=host['snapshotId'],resourceIds=resources,fieldCount=len(fields),
                 connectionId=connection['id'],secretVersion=connection['secretVersion'],catalog=current['snapshotId'],activation=expected['activationId'])
+    qualified.update(command=host['commandId'],mode=host['stage'],observedAt=time.time(),validUntil=time.time()+window['execute'])
+    record(OUT/('ready-'+host['commandId']+'.json'),qualified)
+    return qualified
+
+
+def nested_control(modes):
+    """嵌套的变更必须属于当前正式运行及其已检查的前态，恢复独立可达。"""
+    host=runtime_binding()
+    receipt=json.loads((OUT/('ready-'+host['commandId']+'.json')).read_bytes())
+    vm.demand(receipt['command']==host['commandId'] and receipt['snapshot']==host['snapshotId'] and
+              receipt['mode'] in modes and time.time()<receipt['validUntil'],'PREREQUISITE_STALE:control')
 
 
 def root_query_state(query_id, failed_key):
@@ -602,11 +630,12 @@ def permission_case(action, renewed=False):
     ids=[f'dmq-s1-{digest}',f'dmq-s2-{digest}']
     if renewed:
         vm.demand(kind=='result' and runtime_binding()['stage']=='ui-s1','S3_REVOKE_SCOPE')
-        ids=['renew-20261119-'+ids[1]]
+        ids=[('renew-20261119-' if vm.EVIDENCE_RUN==vm.RUN else vm.EVIDENCE_RUN+'-')+ids[1]]
     pred='"Id" IN ('+','.join("'"+id+"'" for id in ids)+') AND "SubjectId"='+repr(subject)+' AND "Permission"='+repr(permission)
     active=OUT/('s2-grant-active-'+kind+'.json')
     cid=live_stack()['platform-pg']
     if verb=='revoke':
+        nested_control({'s2-doris-access','s2-doris-revoke-race','ui-s1','s3'})
         vm.demand(not active.exists(),'GRANT_CONTROL_ALREADY_ACTIVE')
         import datetime
         stamp=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='microseconds')
@@ -753,6 +782,7 @@ def fanout_fixture(action):
     def current_keys():
         return sql(fe, 'reader', 'SELECT target_id FROM fixture.dmq_target ORDER BY target_id;').splitlines()
     before = stress_original(fe, 'dmq_target', 'target_id', original)
+    if action not in ('restore',): nested_control({'s2-doris-fanout'})
     if action == 'ten':
         vm.demand(not current.exists() and current_keys() == original, 'FANOUT_BASELINE')
         ledger = dict(taskId=vm.TASK, runId=vm.RUN, attempt=secrets.token_hex(6), fe=fe,
@@ -835,9 +865,10 @@ def sentinel_fixture(restore=False, renewed=False):
 def cancellation_case(prepared, admission=False):
     from workflow_doris_s0_fixture import STRESS,stress_fixture
     vm.demand(not STRESS.exists(),'S2_SEPARATE_STRESS_REQUIRED')
+    browser_test('s2-doris-ready',prepared,'stress')
     try:
         stress_fixture(platform=True)
-        browser_test('s2-doris-admission-cancel' if admission else 's2-doris-cancel',prepared)
+        browser_test('s2-doris-admission-cancel' if admission else 's2-doris-cancel',prepared,'pressure-running')
     finally:
         if STRESS.exists(): stress_fixture(restore=True,platform=True)
 
@@ -854,12 +885,13 @@ def graduated_cancel(prepared):
         stage = dict(entityRows=tier,targetRows=3)
         ledger['stages'].append(stage)
         record(path,ledger)
+        browser_test('s2-doris-ready',prepared,'stress')
         try:
             stress_fixture(platform=True,entity_rows=tier)
             fixture = json.loads(STRESS.read_bytes())
             stage['fixture']=fixture['attempt']
             before = set(OUT.glob('browser-s2-doris-cancel-window-*.json'))
-            browser_test('s2-doris-cancel-window',prepared)
+            browser_test('s2-doris-cancel-window',prepared,'pressure-running')
             new = set(OUT.glob('browser-s2-doris-cancel-window-*.json'))-before
             vm.demand(len(new)==1,'TIER_WITNESS_COUNT')
             report = new.pop()
@@ -875,7 +907,7 @@ def graduated_cancel(prepared):
             if stage['windowMs']>=ledger['minimumWindowMs']:
                 stage['formalAttempt']=True
                 record(path,ledger)
-                browser_test('s2-doris-cancel',prepared)
+                browser_test('s2-doris-cancel',prepared,'pressure-running')
                 stage['formalBrowserPassed']=True
                 break
         finally:
@@ -1104,7 +1136,7 @@ if __name__=='__main__':
         browser_test('s2-doris-authority-control',args.prepared,'sentinel')
         try:
             sentinel_fixture(renewed=renewed)
-            browser_test('s2-doris-sentinel',args.prepared)
+            browser_test('s2-doris-sentinel',args.prepared,'sentinel-running')
         finally:
             if (OUT/'s2-sentinel-active.json').exists(): sentinel_fixture(restore=True,renewed=renewed)
     elif args.stage=='s2-overlap-case':
@@ -1127,9 +1159,12 @@ if __name__=='__main__':
                 finally:
                     stress_fixture(restore=True,platform=True)
     elif args.stage=='expire-disposable': expire_disposable_query(*args.query_identity)
-    elif args.stage=='state-fixture': scoped_state_fixture(args.state_operation)
+    elif args.stage=='state-fixture':
+        if args.state_operation=='seed': browser_test('s2-doris-ready',args.prepared,'staged')
+        scoped_state_fixture(args.state_operation)
     elif args.stage in ('s2-doris-states','s2-doris-cardinality'):
         vm.demand(not (OUT/'s2-source-states-active.json').exists(),'STATES_ALREADY_ACTIVE')
+        browser_test('s2-doris-ready',args.prepared,'staged')
         try:
             scoped_state_fixture('seed',collision=args.stage=='s2-doris-cardinality')
             browser_test(args.stage,args.prepared)
@@ -1142,15 +1177,20 @@ if __name__=='__main__':
         try: browser_test(args.stage,args.prepared)
         finally:
             if ledger.exists(): permission_case('restore-execute')
-    elif args.stage=='ddl-fixture': ddl_race_fixture(args.ddl_action)
+    elif args.stage=='ddl-fixture':
+        if args.ddl_action=='arm': browser_test('s2-doris-ready',args.prepared,'staged')
+        ddl_race_fixture(args.ddl_action)
     elif args.stage=='s2-doris-ddl-race':
+        browser_test('s2-doris-ready',args.prepared,'staged')
         ddl_race_fixture('arm')
         try: browser_test(args.stage,args.prepared)
         finally:
             if (OUT/'s2-ddl-race-active.json').exists(): ddl_race_fixture('restore')
     elif args.stage=='s3-compat': s3_compatibility(args.prepared)
     elif args.stage in BROWSER: browser_test(args.stage,args.prepared,counterexample=args.stale_expectation)
-    elif args.stage in ('s2-boundary','s2-restore'): relation_fixture(args.stage=='s2-restore')
+    elif args.stage in ('s2-boundary','s2-restore'):
+        if args.stage=='s2-boundary': browser_test('s2-doris-ready',args.prepared,'staged')
+        relation_fixture(args.stage=='s2-restore')
     elif args.stage in ('aba-test','revoke-test','session-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test'): runtime_race_test(args.stage.removesuffix('-test'))
     elif args.stage=='fanout': print(json.dumps(fanout_fixture(args.fanout)))
     elif args.stage=='permission': permission_case(args.permission)

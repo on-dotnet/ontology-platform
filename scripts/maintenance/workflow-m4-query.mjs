@@ -246,7 +246,9 @@ async function browserRun(mode) {
       report.scenarioReady = { status: "SCENARIO_READY", scenario, taskId: task, resourceOwner: task, runId, localReceipt: local.receipt,
         subjects: state.subjects, fixedRelease: state.mappingReceipt?.mappingReleaseId, observedAtUtc: new Date().toISOString() };
     }
-    if (doris && ["s2-doris-authority-control","s2-doris-overlap","s2-doris-root-deadline","s2-doris-ready"].includes(mode)) {
+    if (doris && ["s2-doris-authority-control","s2-doris-overlap","s2-doris-root-deadline","s2-doris-ready","s2-doris-sentinel","s2-doris-cancel","s2-doris-admission-cancel","s2-doris-cancel-window",
+      "s2-doris-fanout","s2-doris-access","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-aba","s2-doris-expiry",
+      "s2-doris-rotate-race","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding","ui-s1","ui-s3","s3"].includes(mode)) {
       phase="scenario_ready";
       const connection=await get(operator,"/api/v1/connections/"+state.connectionId);
       const active=await get(operator,"/api/v1/mappings/"+state.mappingDraft.mappingId+"/active");
@@ -435,6 +437,9 @@ async function browserRun(mode) {
       const {unlink} = await import("node:fs/promises");
       const capability=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");
       const query={...state.latestQuery.query,capabilityId:capability.id,capabilityVersion:capability.version,timeoutMs:5000,relationshipIris:[],filters:{siteId:"site-a",entityExternalId:"E1"}};
+      const ontology=state.ontologyRelease.manifest;
+      const g2=await request(reader,"GET","/api/v1/semantic/discover?"+new URLSearchParams({assetId:ontology.assetId,releaseId:ontology.releaseId}));
+      check("g2_reads_same_signed_release",g2.data.status==="FOUND" && g2.data.snapshot.releaseId===ontology.releaseId);
       const key=randomUUID(), failedKey=randomUUID();
       const asKey=k=>({...reader,headers:{...reader.headers,"Idempotency-Key":k}});
       const api="/api/v1/data/semantic-queries";
