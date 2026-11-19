@@ -25,6 +25,7 @@ HOME_DIR=ROOT/'.tools/security/g4-oracle-mapping-query-001'/RUN
 RUNTIME=HOME_DIR/'platform'
 PG=RUNTIME/'postgres'
 PROJECT='ontology-g4-omq-platform-01'
+MEASURE_TREE=Path('/private/tmp/omq-implementation-01-measure-7d113e3c')
 COMPOSE=AREA/'formal-compose.json'
 OWNERS=AREA/'formal-resources.json'
 PORTS={'api':15741,'secondary':15742,'oidc':15743,'web':15744}
@@ -66,7 +67,7 @@ def verify_owned_platform(area,docker):
     return running,memory,ports
 
 
-def current_storage(area):
+def current_storage(area, replacement=None):
     """只回传已登记的准确容器可写字节及卷大小。读取本机引擎元数据，不挂载卷。"""
     import http.client
     import socket
@@ -91,7 +92,17 @@ def current_storage(area):
         services=owned['volumes']
         volumes.update(services.values())
         ids.update(owned['ids'].values());ids.update(owned.get('archivedApiIds',{}).values())
+    replacement_services = {}
+    if replacement:
+        replacement_services = replacement['volumes']
+        volumes.update(replacement_services.values())
+        ids.update(replacement['ids'].values())
     all_volumes=get('system/df?type=volume')['Volumes']
+    if replacement is not None:
+        from urllib.parse import urlencode
+        require({v['Name'] for v in all_volumes if (v.get('Labels') or {}).get('ontology.task')==TASK}==volumes,'UNACCOUNTED_TASK_VOLUME')
+        query=urlencode({'all':'1','filters':json.dumps({'label':['ontology.task='+TASK]})})
+        require({v['Id'] for v in get('containers/json?'+query)}==ids,'UNACCOUNTED_TASK_CONTAINER')
     sizes={v['Name']:v['UsageData']['Size'] for v in all_volumes if v['Name'] in volumes}
     require(set(sizes)==volumes and all(type(x)==int and x>=0 for x in sizes.values()),'VOLUME_SIZE_MISSING')
     layer_sizes={}
@@ -99,12 +110,49 @@ def current_storage(area):
         require(re.fullmatch('[a-f0-9]{64}',cid),'STORAGE_CID')
         val=get('containers/'+cid+'/json?size=1')
         require(val['Id']==cid and val['Config']['Labels'].get('ontology.task')==TASK and val['Config']['Labels'].get('ontology.run')==RUN,'SIZE_OWNER')
+        require(type(val['SizeRw']) is int and val['SizeRw'] >= 0, 'CONTAINER_SIZE_MISSING')
         layer_sizes[cid]=val['SizeRw']
     return dict(volumesLogicalBytes={k:sizes[k] for k in old['volumesLogicalBytes']},containerWritableBytes=layer_sizes,
-                platformVolumes={k:sizes[v] for k,v in services.items()})
+                platformVolumes={k:sizes[v] for k,v in services.items()},
+                replacementVolumes={k:sizes[v] for k,v in replacement_services.items()})
 
 
-def disk_admission(root,area,command):
+def backup_allocation(root, area, group):
+    """只从任务私有固定目录抵扣同一个未来副本。未完成文件占用留在主机实际量内。"""
+    import stat
+    private = root/'.tools/security/g4-oracle-mapping-query-001'/RUN/'s0-recovery-01'
+    approved = {'source': ('database.tar', 'trust-and-auth.tar'), 'platform': tuple(n+'.tar' for n in VOLUMES)}
+    require(group in approved, 'ARCHIVE_CLASS')
+    directory = private/group
+    if not directory.exists():
+        return 0
+    require(directory.resolve() == directory and directory.is_dir() and directory.stat().st_uid==os.getuid()
+            and not directory.stat().st_mode & 0o077, 'ARCHIVE_OWNER')
+    ledger_path=area.parent/'s0-recovery-01/archive-ledger.json'
+    ledger=json.loads(ledger_path.read_bytes()) if ledger_path.exists() else {}
+    if ledger:
+        require((ledger.get('taskId'),ledger.get('operation'))==(TASK,'s0-recovery-01'), 'ARCHIVE_LEDGER_ID')
+    credited = 0
+    for name in approved[group]:
+        path = directory/name
+        if not path.exists() and not path.is_symlink():
+            continue
+        info = path.lstat()
+        require(stat.S_ISREG(info.st_mode) and info.st_nlink==1 and info.st_uid==os.getuid()
+                and not info.st_mode & 0o077, 'ARCHIVE_IDENTITY')
+        entry=ledger.get('archives',{}).get(group+'/'+name)
+        if entry is None:
+            continue
+        from workflow_oracle_mapping_platform_recovery import ORIGINAL_IDS
+        role='oracle' if group=='source' else name.removesuffix('.tar')
+        require(entry['sourceId']==ORIGINAL_IDS[role] and entry['privatePath']==str(path.relative_to(private))
+                and entry['identity']==[info.st_dev,info.st_ino,info.st_size,info.st_ctime_ns]
+                and re.fullmatch('[a-f0-9]{64}',entry['sha256']), 'ARCHIVE_LEDGER_OWNER')
+        credited += info.st_blocks*512
+    return credited
+
+
+def disk_admission(root,area,command,*,phase=None,replacement=None):
     """统计所有当期工作树、镜像及三份源数据，替代恢复的原盘、备份和副本同时保留。"""
     layer=json.loads((area/'platform-image-layer-closure-01.json').read_bytes())
     require(layer['taskId']==TASK and len(layer['imageSizes'])==6 and len(layer['sharedEmptyLayers'])==3,'IMAGE_CLOSURE')
@@ -113,16 +161,20 @@ def disk_admission(root,area,command):
     require(images==sum(layer['imageSizes'])-layer['duplicateCompressedBytes'],'IMAGE_BYTES')
     rec=json.loads((area/'recovery-01.json').read_bytes());reopened=json.loads((area/'recovery-01-final.json').read_bytes())
     require(reopened['status']=='EARLY_SOURCE_RECOVERY_PASS','EARLY_RECOVERY')
-    source=rec['allocatedSourceBytes'];host_dirs=[root,Path('/private/tmp/omq-implementation-01-measure-7d113e3c')]
+    source=rec['allocatedSourceBytes'];host_dirs=[root,MEASURE_TREE]
     all_trees=command('formal-worktrees',['git','worktree','list','--porcelain'])
     for block in all_trees.split('\n\n'):
         lines=block.splitlines()
-        if any(line in ['branch refs/heads/codex/omq-source-bindings','branch refs/heads/codex/omq-deadline-store'] for line in lines):
+        if any(line in ['branch refs/heads/codex/omq-source-bindings','branch refs/heads/codex/omq-deadline-store'] for line in lines) or Path(lines[0].removeprefix('worktree ')).parent.name in ('omq-source-bindings','omq-deadline-store'):
             host_dirs.append(Path(lines[0].removeprefix('worktree ')))
-    host=sum(int(line.split()[0])*1024 for line in command('formal-host-bytes',['du','-sk',*[str(p) for p in host_dirs if p.is_dir()]]).splitlines())
+    host_roots=[p for p in host_dirs if p.is_dir()]
+    measurements=[line.split(None,1) for line in command('formal-host-bytes',['du','-sk',*[str(p) for p in host_roots]]).splitlines()]
+    require([row[1] for row in measurements]==[str(p) for p in host_roots], 'HOST_MEASUREMENT_SET')
+    host=sum(int(row[0])*1024 for row in measurements)
     # 初次完整准入的主机字节已经包含首份备份。之后的构建消费已登记的增长余量。
     initial_record=area/'formal-planned.json'
     host_start=host
+    require(not phase or initial_record.is_file(), 'RECOVERY_BASELINE_MISSING')
     if initial_record.exists():
         attempt=json.loads(initial_record.read_bytes())['resourceAttempt']
         previous=json.loads((area/('source-admission-'+attempt+'.json')).read_bytes())['platformDisk']
@@ -133,11 +185,11 @@ def disk_admission(root,area,command):
         require(reduced['checkout']==str(host_dirs[1]) and reduced['beforeBytes']-reduced['afterBytes']==reduced['releasedBytes'],'SPARSE_BASIS')
         host_start-=reduced['releasedBytes']
     # 保留两个卷、两次冷备和已验证的替代卷。最终恢复只写已复核可重建的本任务替代卷。
-    usage = current_storage(area)
+    usage = current_storage(area, replacement) if phase else current_storage(area)
     basis = json.loads((area/'formal-platform-size-basis.json').read_bytes())
     source_caps = {key: int(4.25*GIB) for key in usage['volumesLogicalBytes']}
     require(len(source_caps)==2 and source<=min(source_caps.values()) and all(
-        size<=source_caps[name] for name,size in usage['volumesLogicalBytes'].items()),'OBSERVED_SOURCE_SIZE')
+        type(size) is int and size>=0 and (phase or size<=source_caps[name]) for name,size in usage['volumesLogicalBytes'].items()),'OBSERVED_SOURCE_SIZE')
     # 两份同构历史样本各含四项服务数据；另外以三份平台 PG 中的最大值计费。
     samples=[row['bytes'] for row in basis['sourceRawVolumeFacts']]
     require(len(samples)==8 and len(basis['pgVolumeMetadataOnly'])==3,'PLATFORM_SIZE_BASIS')
@@ -149,6 +201,26 @@ def disk_admission(root,area,command):
               'secondColdSourceCopy':int(4.25*GIB),'platformOriginalFirstBackupFinalBackupAndReplacement':platform_copy*4,
               'boundedContainerLogs':16*20*1024**2,'boundedProbeAndStreamingTemporary':64*1024**2,
               'newBuildEvidenceAndLogs':max(64*1024**2,host_start+int(.75*GIB)-host)}
+    if phase:
+        require(phase in ('preserve','restore','closed'), 'RECOVERY_PHASE')
+        require(len(set(host_dirs))==len(host_dirs) and all(p.is_dir() for p in host_dirs), 'RECOVERY_HOST_MEASUREMENT')
+        sizes = usage['volumesLogicalBytes']
+        original = json.loads((area/'source-create-01.json').read_bytes())['volume']
+        require(original in sizes and set(usage['platformVolumes'])==set(VOLUMES), 'RECOVERY_VOLUME_ID')
+        # 两个 Oracle 卷均保留。当前原卷大小及归档头部/增长余量同时约束还原卷与新冷备。
+        source_limit = max(int(4.25*GIB), sizes[original]+64*1024**2)
+        reserved['sourceAndReplacement'] = sum(max(size,source_limit) for size in sizes.values())
+        source_credited = backup_allocation(root,area,'source')
+        platform_credited = backup_allocation(root,area,'platform')
+        require(source_credited+platform_credited<=host, 'ARCHIVES_OUTSIDE_HOST_MEASUREMENT')
+        reserved['secondColdSourceCopy'] = max(0,source_limit-source_credited)
+        # 原卷、当前检查点和替代卷各有一项。备份实际落盘量已在 host 当中。
+        del reserved['platformOriginalFirstBackupFinalBackupAndReplacement']
+        reserved['platformOriginal'] = platform_copy
+        reserved['platformCheckpointRemaining'] = max(0,platform_copy-platform_credited)
+        reserved['platformReplacement'] = max(platform_copy,sum(usage['replacementVolumes'].values()))
+        reserved['newBuildEvidenceAndLogs'] = max(64*1024**2,host_start+int(.75*GIB)-(host-source_credited-platform_credited))
+        source_caps = {name:max(source_limit,size) for name,size in sizes.items()}
     total=sum(reserved.values())
     require(total<=40*GIB,'FORMAL_TOTAL_DISK_'+str(total))
     return dict(allocations=reserved,totalBytes=total,ceilingBytes=40*GIB,hostPaths=[str(p) for p in host_dirs],

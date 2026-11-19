@@ -22,18 +22,20 @@ def require(ok, code):
         raise ValueError('ORACLE_ADMISSION_' + code)
 
 
-def before_source(root, task, source_id=None, *, platform_stage=False):
+def before_source(root, task, source_id=None, *, platform_stage=False, phase=None, running_roles=(), planned_roles=None):
     """创建前及运行时核对当前准入；运行时只容许已记录的准确源 ID。"""
     require(task == TASK, 'TASK')
     area = ordinary(root/'artifacts/workflow'/task)
+    stage_run='s0-recovery-01' if phase else RUN
+    require(not phase or (platform_stage and source_id is None), 'RECOVERY_STAGE')
     stamp = uuid.uuid4().hex
-    record = dict(taskId=task, runId=RUN, attempt=stamp, status='STARTED', commands=[],
+    record = dict(taskId=task, runId=stage_run, resourceRunId=RUN, phase=phase, attempt=stamp, status='STARTED', commands=[],
                   startedUtc=dt.datetime.now(dt.timezone.utc).isoformat())
-    path = area/RUN/('source-admission-' + stamp + '.json')
+    path = area/stage_run/('source-admission-' + stamp + '.json')
     path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
 
     def command(stage, argv, cleanup=False):
-        result = run(argv, root, task=task, run_id=RUN, stage='oracle-admission-' + stage,
+        result = run(argv, root, task=task, run_id=stage_run, stage='oracle-admission-' + stage,
                      timeout=18, diagnostic=True, cleanup=cleanup)
         record['commands'].append(dict(stage=stage, commandId=result.receipt['commandId'],
                                        exitCode=result.returncode, stdout=result.receipt['stdout'], stderr=result.receipt['stderr']))
@@ -68,7 +70,21 @@ def before_source(root, task, source_id=None, *, platform_stage=False):
             accounted.add(source_id)
         platform_memory = 0
         held_ports = set()
-        if platform_stage:
+        if phase:
+            from workflow_oracle_mapping_platform_recovery import phase_inventory
+            known,platform_memory,platform_cpu,held_ports,replacement=phase_inventory(area/RUN,phase,running_roles,docker)
+            accounted.update(known)
+            from workflow_oracle_mapping_platform import QUOTAS
+            from workflow_oracle_mapping_platform_recovery import ORIGINAL_IDS
+            upcoming=set(running_roles if planned_roles is None else planned_roles)
+            require(upcoming<=set(ORIGINAL_IDS) and (phase!='closed' or not upcoming),'PLANNED_ROLE')
+            pending_roles=upcoming-set(running_roles)
+            next_memory=platform_memory+sum((4096 if n=='oracle' else QUOTAS[n][0])*1024**2 for n in pending_roles)
+            next_cpu=platform_cpu+sum(int((2 if n=='oracle' else QUOTAS[n][1])*1e9) for n in pending_roles)
+            record['projectedWithHelper']={'memory':4*GIB+next_memory,'nanoCpus':4_500_000_000+next_cpu}
+            record['expectedRunningRoles']=sorted(running_roles)
+            record['activeQuota']={'memory':int(3.5*GIB)+platform_memory,'nanoCpus':4_000_000_000+platform_cpu}
+        elif platform_stage:
             from workflow_oracle_mapping_platform import verify_owned_platform
             known, platform_memory, held_ports = verify_owned_platform(area/RUN, docker)
             accounted.update(known)
@@ -95,7 +111,7 @@ def before_source(root, task, source_id=None, *, platform_stage=False):
                 except OSError:
                     continue
                 available_ports.append(port)
-        frozen = json.loads((area/RUN/'source-create-01.json').read_bytes())['portMap'] if source_id else None
+        frozen = json.loads((area/RUN/'source-create-01.json').read_bytes())['portMap'] if source_id or phase else None
         if frozen:
             require(set(frozen.values()) <= set(available_ports) | held_ports, 'FROZEN_PORT_COLLISION')
             record['portMap'] = frozen
@@ -116,6 +132,13 @@ def before_source(root, task, source_id=None, *, platform_stage=False):
         require(sum(planned.values()) <= 40*GIB, 'DISK_ENVELOPE')
         record['sourceStageDiskPlanBytes'] = planned
         require(docker('probe-volume-declaration','image','inspect','-f','{{json (index .Config "Volumes")}}',PROBE) in ('{}','null'), 'ANONYMOUS_VOLUME')
+        if phase:
+            from workflow_oracle_mapping_platform import disk_admission
+            record['platformDisk']=disk_admission(root,area/RUN,command,phase=phase,replacement=replacement)
+            require(record['projectedWithHelper']['memory']<=int(12.25*GIB)
+                    and record['projectedWithHelper']['nanoCpus']<=9_500_000_000
+                    and int(total)>=record['projectedWithHelper']['memory']+3*GIB
+                    and int(cpu)*1_000_000_000>=record['projectedWithHelper']['nanoCpus']+1_500_000_000,'RECOVERY_CAPS')
         cid = docker('probe-create','create','--pull=never','--network=none','--read-only','--cap-drop=ALL',
                      '--security-opt=no-new-privileges','--user=65534:65534','--memory=64m','--memory-swap=64m',
                      '--cpus=.25','--pids-limit=16','--label','ontology.task='+task,'--label','ontology.run='+RUN,
@@ -139,8 +162,10 @@ def before_source(root, task, source_id=None, *, platform_stage=False):
                   availableFs=int(raw.splitlines()[-1].split()[-3])*1024,
                   load=next(line for line in raw.splitlines() if re.match(r'^\d+\.\d+ \d+\.\d+',line)))
         record['vm'] = vm
-        require(vm['available'] >= (7 if source_id else 15)*GIB//2 and vm['availableFs'] >= 26*GIB, 'VM_FLOOR')
-        if platform_stage:
+        if phase:
+            require(vm['available']>=3*GIB+record['projectedWithHelper']['memory']-record['activeQuota']['memory'],'PROJECTED_VM_FLOOR')
+        require(vm['available'] >= (7 if source_id or phase else 15)*GIB//2 and vm['availableFs'] >= 26*GIB, 'VM_FLOOR')
+        if platform_stage and not phase:
             from workflow_oracle_mapping_platform import disk_admission
             require(source_id == created['containerId'] and int(total) >= 16.75*GIB and int(cpu) >= 12, 'FORMAL_PEAK_CAPS')
             # 已在运行的硬配额已计入当前可用量，另扣尚未启动的已授权服务与一次探针。

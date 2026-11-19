@@ -19,6 +19,88 @@ SOURCE_FORMAT = ('{{.Id}}|{{.Image}}|{{index .Config.Labels "ontology.task"}}|{{
                  '|{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}')
 
 
+RECOVERY='s0-recovery-01'
+ORIGINAL_IDS={
+    'oracle':'00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09',
+    'platform-pg':'eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5',
+    'keycloak-test':'15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b',
+    'fuseki':'9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb',
+    'rustfs':'f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd'}
+API_IDS={'api':'9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d',
+         'api-secondary':'872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd'}
+ARCHIVED_API_IDS={'api':'f90b7e7b599ffb4e9b298ce3679f9f24b25c762b472487fe09fd52e3f8e378cf',
+                  'api-secondary':'0f04589574f7ace57e784e1bf0525e6c2587819a0c882ebfc15a09f7203e689f'}
+ALT_ORACLE='65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1'
+ALT_PROJECT='ontology-g4-omq-restore-01'
+
+
+def phase_inventory(area,phase,roles,docker):
+    """核对恢复阶段预期运行者、所有原件/替代身份及挂载。返回值仍须与引擎全运行集合对账。"""
+    require(phase in ('preserve','restore','closed') and set(roles)<=set(ORIGINAL_IDS)
+            and (phase!='closed' or not roles), 'PHASE_ID')
+    owned=json.loads((area/'formal-resources.json').read_bytes())
+    require(owned['ids']=={**{k:v for k,v in ORIGINAL_IDS.items() if k!='oracle'},**API_IDS}
+            and owned['archivedApiIds']==ARCHIVED_API_IDS, 'PHASE_ORIGINAL_IDS')
+    source=json.loads((area/'source-create-01.json').read_bytes())
+    early=json.loads((area/'recovery-01-final.json').read_bytes())
+    require(source['containerId']==early['originalId']==ORIGINAL_IDS['oracle'] and early['replacementId']==ALT_ORACLE,
+            'PHASE_SOURCE_IDS')
+    replacement={'ids':{},'volumes':{},'networks':{}}
+    registry=area.parent/RECOVERY/'replacement-resources.json'
+    if registry.exists():
+        replacement=json.loads(registry.read_bytes())
+        require((replacement['taskId'],replacement['runId'],replacement['operation'],replacement['project'])==
+                (TASK,RUN,RECOVERY,ALT_PROJECT) and set(replacement['ids'])<=set(platform.VOLUMES)
+                and set(replacement['volumes'])==set(replacement['ids'])
+                and all(replacement['volumes'][k]==ALT_PROJECT+'_'+platform.VOLUMES[k] for k in replacement['volumes']),
+                'REPLACEMENT_RECORD')
+    if phase=='closed':
+        require(set(replacement['ids'])==set(platform.VOLUMES),'CLOSED_INCOMPLETE_STACK')
+    primary={**ORIGINAL_IDS,**API_IDS}
+    sources={'oracle':source['volume'],**owned['volumes']}
+    target={'oracle':ALT_ORACLE,**replacement['ids']}
+    target_volumes={'oracle':early['replacementVolume'],**replacement['volumes']}
+    running=set();ports=set();memory=0;cpu=0
+    for group,ids,volumes in [('original',primary,sources),('replacement',target,target_volumes),('archived',ARCHIVED_API_IDS,{})]:
+        for role,cid in ids.items():
+            require(re.fullmatch(CID,cid),'PHASE_CID')
+            fmt='{{.Id}}|{{.Image}}|{{.State.Status}}|{{index .Config.Labels "ontology.task"}}|{{index .Config.Labels "ontology.run"}}|{{.HostConfig.Memory}}|{{.HostConfig.NanoCpus}}|{{json .Mounts}}|{{json .HostConfig.PortBindings}}|{{index .Config.Labels "com.docker.compose.project"}}|{{index .Config.Labels "com.docker.compose.service"}}|{{json .NetworkSettings.Networks}}'
+            loc=docker('phase-'+group+'-'+role,'inspect','-f',fmt,cid).split('|')
+            image=SOURCE.split('@')[1] if role=='oracle' else platform.IMAGES[role]
+            quota=(4096,2) if role=='oracle' else platform.QUOTAS[role]
+            project=('ontology-g4-oracle-mapping-query-001' if group=='original' else 'ontology-g4-omq-replacement-01') if role=='oracle' else (ALT_PROJECT if group=='replacement' else platform.PROJECT)
+            if group=='original' and role in API_IDS:
+                spec=(area/'formal-api-compose.json').read_bytes()
+                require(ex.sha(spec)==json.loads((area/'formal-api-inputs.json').read_bytes())['composeSha256'],'API_COMPOSE_ID')
+                project=json.loads(spec)['name']
+            require(loc[0]==cid and loc[1]==image and loc[3:7]==[TASK,RUN,str(quota[0]*1024**2),str(int(quota[1]*1e9))]
+                    and loc[9:11]==[project,'oracle-source' if role=='oracle' else role],'PHASE_OWNER_'+role)
+            expected=(phase=='preserve' and group=='original' or phase=='restore' and group=='replacement') and role in roles
+            require(loc[2]=='running' if expected else loc[2] in (('exited','created') if group=='replacement' and phase!='closed' else ('exited',)),
+                    'PHASE_STATE_'+group+'_'+role)
+            mounts=[m['Name'] for m in json.loads(loc[7]) if m['Type']=='volume']
+            require(mounts==([volumes[role]] if role in volumes else []),'PHASE_MOUNT_'+role)
+            for vol in mounts:
+                fields=docker('phase-volume','volume','inspect','-f','{{.Driver}}|{{json .Options}}|{{index .Labels "ontology.task"}}|{{index .Labels "ontology.run"}}|{{index .Labels "com.docker.compose.project"}}',vol).split('|')
+                require(fields[0]=='local' and not json.loads(fields[1]) and fields[2:]==[TASK,RUN,project],'PHASE_VOL_OWNER')
+            allowed={'keycloak-test':15743,'api':15741,'api-secondary':15742}.get(role)
+            port_bindings=json.loads(loc[8]) or {}
+            require(port_bindings==({'8080/tcp':[{'HostIp':'127.0.0.1','HostPort':str(allowed)}]} if allowed else {}),'PHASE_PORTS')
+            if expected:
+                network_ids={k:v['NetworkID'] for k,v in json.loads(loc[11]).items()}
+                if role=='oracle':
+                    netname=source['network'] if group=='original' else early['network']
+                    nid=source['networkId'].split()[0] if group=='original' else json.loads((area/'recovery-01.json').read_bytes())['replacementNetworkId'].split()[0]
+                    require(network_ids=={netname:nid}, 'PHASE_SOURCE_NET')
+                else:
+                    nets=owned['networks'] if group=='original' else replacement['networks']
+                    names=['platform-internal']+(['host-entry'] if role=='keycloak-test' else [])
+                    require(network_ids=={project+'_'+n:nets[n] for n in names},'PHASE_NET_'+role)
+                running.add(cid);memory+=int(loc[5]);cpu+=int(loc[6])
+                if allowed:ports.add(allowed)
+    return running,memory,cpu,ports,replacement
+
+
 def record(name):
     path = ex.ordinary(AREA / name)
     row = json.loads(path.read_bytes())
@@ -199,11 +281,360 @@ def status(witness):
                             'Record actual native cold copies and isolated whole-stack recovery before crediting platform or final recovery.'])
 
 
+QUERY='query-18b5ee00b53e4e4eafc43cc4717bd293'
+CLIENT='0e224578b55b4b479d98d3fa4ff1ac46'
+CONNECTION='a7913bb552eb4cd1a3f6eaf5b93cd619'
+OWNER='oracle-execution-004f5b3e04084f1998201939aaeec5e6'
+WITNESS='formal-witness-071127c7-2a34-40d7-9675-7cf967edfdb0.json'
+RECOVERY_AREA=AREA.parent/RECOVERY
+
+
+def proof_before_cas(attempt,operation,running_roles=None):
+    """封闭所有投递，在独立源通道核原执行，再私存单行和原审计。同一证明仅供此次短维护使用。"""
+    import hashlib
+    import os
+    import pwd
+    import subprocess
+    from pathlib import Path
+
+    require(uuid.UUID(attempt).hex==attempt and uuid.UUID(operation).hex==operation,'ATTEMPT')
+    source=ORIGINAL_IDS['oracle']
+    roles=set(ORIGINAL_IDS if running_roles is None else running_roles)
+    require({'oracle','platform-pg'}<=roles,'PROOF_SERVICES')
+    budget=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase='preserve',running_roles=roles)
+    projected={'heldQuery':held_query(WITNESS),'platform':{'seal':ref('s0-blocked-seal-01.json')}}
+    require(record('s0-blocked-seal-01.json')['queryId']==QUERY,'ORIGINAL_SEAL')
+    archived=platform.ROOT/'docs/evidence'/TASK/RUN/'s0-blocked/originals'/WITNESS
+    require(archived.read_bytes()==(AREA/WITNESS).read_bytes(),'FORMAL_ORIGINAL')
+    w=record(WITNESS)
+    require(w['queryId']==QUERY and w['final']['clientId']==CLIENT and w['nativeExecutionIdentity'][:5]==['60','51748','50045','3','16777219']
+            and w['sqlId']=='dum3m3c96vc07' and w['cursorDelta']=={'child':'0','plan':1347626742,'executions':1,'eof':1,'rows':100,'px':0},
+            'ORIGINAL_EXECUTION')
+    hold=projected['heldQuery']
+    require(hold['heldOwner']==OWNER and hold['fence']==2 and hold['status']=='CANCELLED'
+            and hold['successEffects']==[0,0,0] and hold['cancelAudits']==1,'HOLD_TUPLE')
+    started=dt.datetime.now(dt.timezone.utc)
+    with contextlib.closing(observer.source_channel(source)) as channel:
+        rows=channel.run("""select sys_context('USERENV','INSTANCE')||'|'||sys_context('USERENV','CON_ID')||'|'||
+        (select count(*) from G4_CONTROL.OMQ_SESSIONS)||'|'||
+        (select count(*) from G4_CONTROL.OMQ_SESSIONS where client_identifier='0e224578b55b4b479d98d3fa4ff1ac46'
+        or (sid=60 and serial_no=51748 and audsid=50045)) from dual;""")
+    require(rows==['1|3|0|0'],'ORACLE_INDEPENDENT_TERMINATION')
+    ps=subprocess.check_output(['ps','-axo','pid=,command='],text=True,timeout=4)
+    # 仅核本机可能承接本任务投递的可执行入口，命令行可能含私有材料，禁止保存或显示。
+    process_names=('OntologyPlatform.Api.dll','OntologyPlatform.Worker.dll','workflow-m4-query.mjs','next-server')
+    active=[line.split()[0] for line in ps.splitlines()
+            if any(n in line for n in process_names) and ('/g4-oracle-mapping-query-001/' in line or TASK in line)
+            and not any(shell in line for shell in ('-lc ','-c '))]
+    require(not active,'HOST_TASK_CONSUMER')
+    with contextlib.ExitStack() as stack:
+        import socket
+        for port in (15741,15742,15744):
+            sock=stack.enter_context(socket.socket());sock.bind(('127.0.0.1',port))
+    post=record('formal-cancel-postmortem-log-01.json')
+    evidence=post['observations']['api']
+    require(any('action=EOF ' in e and CLIENT in e and QUERY in e for e in evidence)
+            and any('action=PHYSICAL_RELEASE ' in e and CLIENT in e and QUERY in e for e in evidence),'NO_RELEASE_LOG')
+    end=dt.datetime.now(dt.timezone.utc)
+    termination=dict(attemptId=attempt,operationId=operation,taskId=TASK,resourceRunId=RUN,
+                     startedUtc=started.isoformat(),endedUtc=end.isoformat(),observer='OMQ_OBSERVER|TCPS|FREEPDB1',
+                     admission=budget['attempt'],originalWitness=ref(WITNESS),postmortem=ref('formal-cancel-postmortem-log-01.json'),
+                     originalWorkerContainerIds=[*API_IDS.values(),*ARCHIVED_API_IDS.values()],workerState='exited',
+                     hostTaskConsumerCount=len(active),intakePortsFree=[15741,15742,15744],
+                     sourceId=source,clientId=CLIENT,sqlId=w['sqlId'],sourceExecution=w['nativeExecutionIdentity'],
+                     instanceId=1,conId=3,matchingPhysicalSessions=0,currentTaskSourceSessions=0,originalCursor=w['cursorDelta'],
+                     currentWork=hold['currentWork'],seal=projected['platform']['seal'])
+    proof_file=RECOVERY_AREA/('termination-'+attempt+'.json');platform.save(proof_file,termination)
+    secret=platform.HOME_DIR/RECOVERY/'prestate'/attempt
+    oldmask=os.umask(0o077)
+    try:
+        secret.mkdir(parents=True,mode=0o700)
+        sql=f"""BEGIN READ ONLY; SET LOCAL TIME ZONE 'UTC';
+        SELECT jsonb_build_object('rawRow',to_jsonb(q),'rawAudit',to_jsonb(a),'bindingConnectionId',
+          convert_from(q."BindingBytes",'UTF8')::jsonb#>>'{{binding,connectionId}}','platform',current_database(),
+          'systemIdentifier',(select system_identifier::text from pg_control_system()),'org',q."OrganizationId",
+          'databaseUser',current_user,'requestSha256',encode(sha256(q."RequestBytes"),'hex'),
+          'bindingSha256',encode(sha256(q."BindingBytes"),'hex'),
+          'stableRowSha256',encode(sha256(convert_to((to_jsonb(q)-'LeaseOwner'-'LeaseUntilUtc')::text,'UTF8')),'hex'),
+          'cancelAuditSha256',encode(sha256(convert_to(to_jsonb(a)::text,'UTF8')),'hex'))
+        FROM semantic_query."Queries" q JOIN governance.audit_records a ON a."Resource"=q."Id"
+        AND a."Action"='data.query.cancel' AND a."Outcome"='allowed' WHERE q."Id"='{QUERY}'; COMMIT;"""
+        cmd=['docker','--context','desktop-linux','exec','-i','--user','postgres',ORIGINAL_IDS['platform-pg'],'psql','-XwqAt','-d','mapping','-v','ON_ERROR_STOP=1']
+        pre=secret/'row-and-audit.json'
+        with pre.open('xb') as out,(secret/'pg.stderr').open('xb') as errors:
+            r=subprocess.run(cmd,input=sql.encode(),stdout=out,stderr=errors,timeout=10)
+        require(not r.returncode,'PRIVATE_PRESTATE_READ')
+        saved=json.loads(pre.read_bytes())
+        q=saved['rawRow'];audit=saved['rawAudit']
+        require(saved['bindingConnectionId']==q['ConnectionId']==CONNECTION and q['Id']==QUERY and q['LeaseOwner']==OWNER
+                and q['CancelRequested'] and q['ExecutionStatus']=='CANCELLED' and q['Fence']==2
+                and q['RequestHash']==saved['requestSha256'] and saved['org']=='org-demo' and saved['platform']=='mapping','PRIVATE_TUPLE')
+        received=dt.datetime.now(dt.timezone.utc)
+        proof=dict(taskId=TASK,runId=RUN,attemptId=attempt,operationId=operation,operatorId='os-uid-'+str(os.getuid()),
+                   database=saved['platform'],databaseUser=saved['databaseUser'],organizationId=q['OrganizationId'],
+                   systemIdentifier=saved['systemIdentifier'],queryId=QUERY,connectionId=CONNECTION,owner=OWNER,
+                   originalFence=1,terminalFence=2,clientId=CLIENT,instanceId=1,conId=3,sid=60,serial=51748,audsid=50045,
+                   sqlId=w['sqlId'],sqlExecId=16777219,platformContainerId=ORIGINAL_IDS['platform-pg'],sourceContainerId=source,
+                   createdUtc=q['CreatedAtUtc'],deadlineUtc=q['DeadlineAtUtc'],completedUtc=q['CompletedAtUtc'],
+                   leaseUntilUtc=q['LeaseUntilUtc'],cancelAuditId=audit['Id'],sealSha256=projected['platform']['seal']['sha256'],
+                   terminationProofSha256=ex.sha(proof_file.read_bytes()),verifiedUtc=started.isoformat(),
+                   validUntilUtc=(started+dt.timedelta(minutes=4)).isoformat(),
+                   **{k:saved[k] for k in ('requestSha256','bindingSha256','stableRowSha256','cancelAuditSha256')})
+        platform.save(secret/'proof.json',proof)
+        public=dict(proof=proof,phase='PRESTATE_ONLY',osUser=pwd.getpwuid(os.getuid()).pw_name,dbPrivateSnapshotBytes=pre.stat().st_size,
+                    rawPrivateSha256=ex.sha(pre.read_bytes()),privateProofSha256=ex.sha((secret/'proof.json').read_bytes()),
+                    privatePath=str(pre.relative_to(platform.HOME_DIR)),atUtc=received.isoformat())
+        platform.save(RECOVERY_AREA/('prestate-'+attempt+'.json'),public)
+        return public
+    finally:
+        os.umask(oldmask)
+
+
+def engine_step(stage,*args,stdin=None,timeout=45):
+    """记录资源命令真实双流。数据库私有前态和服务日志走专用去密路径。"""
+    args=['docker','--context','desktop-linux',*args]
+    r=ex.run(args,platform.ROOT,task=TASK,run_id=RECOVERY,stage='omq-recovery-'+stage,stdin=stdin,
+             timeout=timeout,input_key=ex.sha(ex.encoded(args)+(stdin or b'')))
+    require(r.returncode==0,stage+'_'+r.receipt['commandId'])
+    return r.stdout.decode().strip()
+
+
+def one_helper(stage,volume,target,script,*,image=None,user='0',bind=None,timeout=45,write=False):
+    """一次只用一个定额 helper。仅替代清单上的卷可被写入，冷备和检查始终只读原卷。"""
+    import os
+    from workflow_oracle_mapping_resources import PROBE
+    original=record('formal-resources.json')['volumes']
+    source=record('source-create-01.json')['volume']
+    alternative=record('recovery-01-final.json')['replacementVolume']
+    manifest=RECOVERY_AREA/'replacement-resources.json'
+    restored=json.loads(manifest.read_bytes())['volumes'] if manifest.exists() else {}
+    require(volume in {source,alternative,*original.values(),*restored.values()} and (not write or volume in {alternative,*restored.values()}),'HELPER_VOLUME')
+    image=image or PROBE
+    require(image in (PROBE,platform.IMAGES['platform-pg']) and target in ('/source','/var/lib/postgresql'),'HELPER_SCOPE')
+    nonce=uuid.uuid4().hex
+    args=['create','--pull=never','--read-only','--network=none','--cap-drop=ALL','--security-opt=no-new-privileges',
+          '--memory=512m','--memory-swap=512m','--cpus=.5','--pids-limit=32','--tmpfs','/tmp:rw,nosuid,nodev,size=16m',
+          '--user',user,'--label','ontology.task='+TASK,'--label','ontology.run='+RECOVERY,'--label','ontology.attempt='+nonce,
+          '--mount',f'type=volume,src={volume},dst={target},volume-nocopy'+('' if write else ',readonly')]
+    if bind:
+        path,readonly=bind
+        require(path.is_dir() and not path.is_symlink() and path.resolve()==path and path.is_relative_to(platform.HOME_DIR/RECOVERY)
+                and path.stat().st_uid==os.getuid() and not path.stat().st_mode & 0o077,'PRIVATE_BIND')
+        args+=['--mount',f'type=bind,src={path},dst=/backup'+(',readonly' if readonly else '')]
+    cid=engine_step(stage+'-create',*args,'--entrypoint=/bin/sh',image,'-ec',script)
+    require(re.fullmatch(CID,cid),'HELPER_ID')
+    registry=RECOVERY_AREA/('helper-'+nonce+'.json')
+    detail=dict(attemptId=nonce,taskId=TASK,runId=RECOVERY,id=cid,volume=volume,write=write,stage=stage,status='CREATED')
+    platform.save(registry,detail)
+    def read_state():
+        info=engine_step('helper-state','inspect','-f','{{.Id}}|{{.Image}}|{{index .Config.Labels "ontology.attempt"}}|{{.State.Status}}|{{.State.ExitCode}}|{{.State.OOMKilled}}|{{json .Mounts}}',cid).split('|')
+        require(info[:3]==[cid,image.split('@')[-1],nonce],'HELPER_IDENTITY')
+        mounts=json.loads(info[6])
+        require([m['Name'] for m in mounts if m['Type']=='volume']==[volume] and
+                [m['RW'] for m in mounts if m['Type']=='volume']==[write],'HELPER_MOUNT')
+        return info[3:6]
+    try:
+        require(read_state()[0]=='created','HELPER_PRE')
+        result=engine_step(stage+'-execute','start','-a',cid,timeout=timeout)
+        require(read_state()==['exited','0','false'],'HELPER_FAILED')
+        detail['status']='PASS'
+        return result
+    finally:
+        state=read_state();detail['after']=state
+        if state[0] in ('exited','created'):
+            engine_step('helper-release','rm',cid)
+            require(not engine_step('helper-absent','ps','-aq','--no-trunc','--filter','id='+cid),'HELPER_REMAINS')
+            detail['removed']=True
+        platform.save(registry,detail,True)
+
+
+def native_stop(group,role,roles,operation):
+    """先核阶段实际配额，用原生停机/有界 TERM；后验不确定即停止序列。"""
+    import subprocess
+    from workflow_oracle_mapping_resources import before_source
+    phase='preserve' if group=='original' else 'restore'
+    check=before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=roles)
+    cid=ORIGINAL_IDS[role] if group=='original' else (ALT_ORACLE if role=='oracle' else json.loads((RECOVERY_AREA/'replacement-resources.json').read_bytes())['ids'][role])
+    step=uuid.uuid4().hex
+    path=RECOVERY_AREA/('stop-'+step+'.json')
+    started=dt.datetime.now(dt.timezone.utc).isoformat()
+    row=dict(role=role,id=cid,group=group,operation=operation,resourceAttempt=check['attempt'],startedUtc=started,status='STARTED')
+    platform.save(path,row)
+    try:
+        if role=='oracle':
+            raw=engine_step('oracle-zero','exec','-i',cid,'sqlplus','-s','/ as sysdba',stdin=b"whenever sqlerror exit failure\nset pages 0 heading off feedback off\nselect count(*) from v$session where username='FIXTURE_READER';\nexit success\n")
+            require(raw=='0','ORACLE_READER_BUSY')
+            msg=engine_step('oracle-shutdown','exec','-i',cid,'sqlplus','-s','/ as sysdba',stdin=b'whenever sqlerror exit failure\nshutdown immediate;\nexit success\n',timeout=90)
+            row['nativeShutdown']=all(m in msg.lower() for m in ('database closed','database dismounted','oracle instance shut down'))
+            require(row['nativeShutdown'],'NATIVE_ORACLE_SHUTDOWN')
+        elif role=='platform-pg':
+            engine_step('pg-fast','exec','--user','postgres',cid,'sh','-ec','test "$(id -u)" = 999 && pg_ctl status -D "$PGDATA" >/dev/null && exec pg_ctl stop -D "$PGDATA" -m fast -W')
+        elif role=='fuseki':
+            row['tdbLocksBefore']=engine_step('tdb-active-locks','exec',cid,'sh','-ec','cd /fuseki; find databases/ontology -name tdb.lock -type f -print | sort').splitlines()
+            require(len(row['tdbLocksBefore'])>=1 and all(re.fullmatch(r'databases/ontology/(?:Data-[0-9]+/)?tdb.lock',n) for n in row['tdbLocksBefore']), 'TDB_LOCK_BASIS')
+        if role=='platform-pg':
+            engine_step('pg-wait','wait',cid,timeout=45)
+        elif engine_step('native-state','inspect','-f','{{.State.Status}}',cid)=='running':
+            engine_step('term','stop','--signal=TERM','--timeout=-1',cid,timeout=45)
+        state=json.loads(engine_step('stopped-state','inspect','-f','{{json .State}}',cid))
+        row['after']={k:state[k] for k in ('Status','ExitCode','OOMKilled','FinishedAt')}
+        require(state['Status']=='exited' and not state['OOMKilled'] and not state['Error'] and state['ExitCode'] in (0,143),'NATIVE_EXIT')
+        logs=subprocess.run(['docker','--context','desktop-linux','logs','--since',started,cid],capture_output=True,timeout=8)
+        raw=logs.stdout+logs.stderr
+        marker=bool(re.search(rb'shut(?:ting)?[ -]?down|\bstopped\b|terminat(?:ing|ion)',raw,re.I))
+        row.update(logExit=logs.returncode,shutdownLogMarker=marker,logSha256=ex.sha(raw))
+        require(logs.returncode==0 and not re.search(rb'out of memory|fatal (?:error|exception)|data corruption',raw,re.I),'NATIVE_LOG_ERROR')
+        remaining=set(roles)-{role}
+        if role in ('platform-pg','fuseki'):
+            before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=remaining)
+            manifest=record('formal-resources.json') if group=='original' else json.loads((RECOVERY_AREA/'replacement-resources.json').read_bytes())
+            if role=='platform-pg':
+                raw=one_helper('pg-control',manifest['volumes'][role],'/var/lib/postgresql',
+                               'export LC_ALL=C; pg_controldata /var/lib/postgresql/18/docker > /tmp/control 2>/tmp/warnings; test ! -s /tmp/warnings; sed -n "s/^Database cluster state: *//p" /tmp/control',
+                               image=platform.IMAGES['platform-pg'],user='999')
+                row['controlState']=raw
+                require(raw=='shut down' and marker,'PG_NOT_CLEAN')
+            else:
+                files=one_helper('tdb-closed',manifest['volumes'][role],'/source',
+                                 'cd /source; test -d databases/ontology; find databases/ontology -type f \\( -name tdb.lock -o -name journal.jrnl \\) -printf "%P|%s\\n" | sort')
+                row['tdbCloseFiles']=files.splitlines()
+                row['allTdbLocksRemoved']=not any(line.split('|')[0].endswith('tdb.lock') for line in files.splitlines())
+                require(row['allTdbLocksRemoved'] and any(re.fullmatch(r'Data-[0-9]+/journal.jrnl\|0',l) for l in files.splitlines()),'TDB_CLOSE_UNCONFIRMED')
+        else:
+            require(state['ExitCode']==0 or marker or row.get('nativeShutdown'),'NATIVE_CLOSE_UNCONFIRMED')
+        row['status']='CLEAN_STOP'
+    except Exception as exc:
+        row['status']='BLOCKED'
+        row['reason']=str(exc) if str(exc).startswith('ORACLE_ADMISSION_') else type(exc).__name__
+        raise
+    finally:
+        row['endedUtc']=dt.datetime.now(dt.timezone.utc).isoformat()
+        platform.save(path,row,True)
+    return row
+
+
+def start_owned(group,role,running):
+    """按创建回执仅启动一个准确已退出实例，并复核新合集、原持久卷及额度。"""
+    import time
+    phase='preserve' if group=='original' else 'restore'
+    current=set(running);after=current|{role}
+    require(role not in current and role in ORIGINAL_IDS,'START_ROLE')
+    pre=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=current,planned_roles=after)
+    if group=='original':
+        cid=ORIGINAL_IDS[role]
+        clean=[json.loads(p.read_bytes()) for p in RECOVERY_AREA.glob('stop-*.json')]
+        require(any(row['id']==cid and row['status']=='CLEAN_STOP' for row in clean),'ORIGINAL_CLEAN_STATE_'+role)
+    else:
+        cid=ALT_ORACLE if role=='oracle' else json.loads((RECOVERY_AREA/'replacement-resources.json').read_bytes())['ids'][role]
+    nonce=uuid.uuid4().hex
+    receipt=dict(attempt=nonce,stage=phase,role=role,id=cid,resourceAttempt=pre['attempt'],status='STARTING')
+    out=RECOVERY_AREA/('start-'+nonce+'.json')
+    platform.save(out,receipt)
+    try:
+        engine_step('start-'+role,'start',cid,timeout=50)
+        if role in ('oracle','platform-pg'):
+            until=time.monotonic()+160
+            while time.monotonic()<until:
+                state=engine_step('wait-health','inspect','-f','{{.State.Status}}|{{.State.Health.Status}}',cid)
+                if state=='running|healthy':break
+                require(state.startswith('running|'),'START_EXITED')
+                time.sleep(2)
+            require(state=='running|healthy','HEALTH_TIMEOUT')
+        post=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=after)
+        receipt.update(status='RUNNING',post=post['attempt'])
+    finally:
+        platform.save(out,receipt,True)
+    return receipt
+
+
+def recover_fixed_row():
+    """在已核隔离 PG 和物理构建上只投递一次。封闭、证据有效期和准确数据库在两端分别核验。"""
+    import os
+    import subprocess
+    nonce=uuid.uuid4().hex;operation=uuid.uuid4().hex
+    build=platform.build.validate('api',TASK)
+    query_build=platform.build.validate('query',TASK)
+    qualified=[json.loads(p.read_bytes()) for p in RECOVERY_AREA.glob('real-pg-*.json')]
+    require(any(r['build']==query_build and r['status']=='PASS' and r['total']>=4 and r['released'] for r in qualified),'CAS_TEST_NOT_QUALIFIED')
+    require(os.getuid()==501 and not (RECOVERY_AREA/'real-maintenance-dispatch.json').exists(),'MAINTENANCE_ONCE')
+    verified=proof_before_cas(nonce,operation,{'oracle','platform-pg'})
+    proof=verified['proof']
+    private=platform.HOME_DIR/RECOVERY/'prestate'/nonce/'proof.json'
+    raw=private.read_bytes()
+    require(ex.sha(raw)==verified['privateProofSha256'] and json.loads(raw)==proof,'CAS_INPUT_REOPEN')
+    api=platform.ROOT/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0'
+    # 采用与隔离 PG 测试相同的私有挂载。连接材料只在验证器不可外读的 tmpfs 中供正式 Npgsql 客户端消费。
+    script=('umask 077; set -eu; test "$(id -u)" = 501; '
+            'printf "Host=platform-pg;Port=5432;Database=mapping;Username=postgres;SSL Mode=VerifyFull;Root Certificate=/ca;Password=%s" '
+            '"$(cat /auth)" > /tmp/maintenance.dsn; exec dotnet /app/OntologyPlatform.Api.dll --recover-omq-s0')
+    args=['create','--pull=never','-i','--network',platform.PROJECT+'_platform-internal','--read-only','--user',str(os.getuid())+':'+str(os.getgid()),
+          '--memory=512m','--memory-swap=512m','--cpus=.5','--pids-limit=128','--security-opt=no-new-privileges','--cap-drop=ALL',
+          '--tmpfs','/tmp:rw,nosuid,nodev,size=32m,mode=1777','--label','ontology.task='+TASK,'--label','ontology.run='+RECOVERY,
+          '--label','ontology.attempt='+nonce,'--mount','type=bind,src='+str(api)+',dst=/app,readonly',
+          '--mount','type=bind,src='+str(platform.PG/'password')+',dst=/auth,readonly','--mount','type=bind,src='+str(platform.PG/'server.crt')+',dst=/ca,readonly']
+    env={'OMQ_RECOVERY_DSN_FILE':'/tmp/maintenance.dsn','OMQ_RECOVERY_OPERATOR':proof['operatorId'],
+         'OMQ_RECOVERY_PROOF_SHA256':verified['privateProofSha256'],'OMQ_RECOVERY_TERMINATION_SHA256':proof['terminationProofSha256'],
+         'OMQ_RECOVERY_SEAL_SHA256':proof['sealSha256'],'HOME':'/tmp','DOTNET_EnableDiagnostics':'0'}
+    for key,value in env.items():args+=['-e',key+'='+value]
+    cid=engine_step('maintenance-create',*args,'--entrypoint=/bin/sh',platform.PROBE,'-ec',script)
+    require(re.fullmatch(CID,cid),'MAINTENANCE_ID')
+    path=RECOVERY_AREA/('maintenance-'+nonce+'.json')
+    receipt=dict(attempt=nonce,operationId=operation,queryId=QUERY,validatorId=cid,build=build,proofSha256=verified['privateProofSha256'],status='CREATED')
+    platform.save(path,receipt)
+    def state():
+        values=engine_step('maintenance-id','inspect','-f','{{.Id}} {{.Image}} {{index .Config.Labels "ontology.attempt"}} {{.State.Status}} {{.State.ExitCode}} {{.State.OOMKilled}}',cid).split()
+        require(values[:3]==[cid,platform.PROBE.split('@')[1],nonce],'MAINTENANCE_OWNER')
+        return values[3:]
+    try:
+        require(state()[0]=='created' and not (RECOVERY_AREA/'real-maintenance-dispatch.json').exists(),'MAINTENANCE_PRE')
+        platform.save(RECOVERY_AREA/'real-maintenance-dispatch.json',dict(operationId=operation,attempt=nonce,queryId=QUERY,cid=cid))
+        start=dt.datetime.now(dt.timezone.utc)
+        res=ex.run(['docker','--context','desktop-linux','start','-a','-i',cid],platform.ROOT,task=TASK,run_id=RECOVERY,
+                   stage='one-real-maintenance-cas',input_key=ex.sha(raw),stdin=raw,timeout=32)
+        receipt.update(startedUtc=start.isoformat(),endedUtc=dt.datetime.now(dt.timezone.utc).isoformat(),
+                       commandId=res.receipt['commandId'],exitCode=res.returncode,after=state())
+        require(not res.returncode and receipt['after']==['exited','0','false'],'MAINTENANCE_OUTCOME')
+        result=json.loads(res.stdout)
+        require(result['status']=='TASK_LEVEL_RECOVERY' and result['operationId']==operation,'MAINTENANCE_OUTPUT')
+        receipt['commitEnvelope']=result
+    finally:
+        after=state()
+        if after[0] in ('exited','created'):
+            engine_step('maintenance-release','rm',cid)
+            receipt['validatorAbsent']=not engine_step('maintenance-post','ps','-aq','--no-trunc','--filter','id='+cid)
+        platform.save(path,receipt,True)
+    # 新连接完整对账两列以外的查询字节，核原取消审计字节、维护主体与其余零成功事实。
+    sql=f"""SET LOCAL TIME ZONE 'UTC';
+        SELECT jsonb_build_object('id',q."Id",'state',q."ExecutionStatus",'fence',q."Fence",'owner',q."LeaseOwner",'lease',q."LeaseUntilUtc",
+        'stable',encode(sha256(convert_to((to_jsonb(q)-'LeaseOwner'-'LeaseUntilUtc')::text,'UTF8')),'hex'),
+        'resultBytes',octet_length(q."ResultCiphertext"),'receiptCount',jsonb_array_length(convert_from(q."BindingBytes",'UTF8')::jsonb->'receipts'),
+        'audits',(SELECT jsonb_agg(jsonb_build_object('id',a."Id",'action',a."Action",'outcome',a."Outcome",'actor',a."Actor",
+            'trace',a."TraceId",'correlation',a."CorrelationId",'sha',encode(sha256(convert_to(to_jsonb(a)::text,'UTF8')),'hex')))
+            FROM governance.audit_records a WHERE a."Resource"=q."Id" AND a."Action" IN ('data.query.execute','data.query.cancel','data.query.cleanup.recover') AND a."Outcome"='allowed'))
+        FROM semantic_query."Queries" q WHERE q."Id"='{QUERY}';"""
+    output,command=platform.read_pg(sql.encode(),'maintenance-postcondition')
+    current=json.loads(output);audits=current['audits']
+    require(current['state']=='CANCELLED' and current['fence']==2 and current['owner'] is None and current['lease'] is None
+            and current['stable']==proof['stableRowSha256'] and current['resultBytes']==current['receiptCount']==0
+            and len(audits)==2 and any(a['id']==proof['cancelAuditId'] and a['sha']==proof['cancelAuditSha256'] for a in audits)
+            and any(a['action']=='data.query.cleanup.recover' and a['actor']==proof['operatorId']
+                    and a['trace']==operation and a['correlation']==nonce for a in audits),'MAINTENANCE_POSTCONDITION')
+    receipt.update(status='TASK_LEVEL_RECOVERY',newConnection=command,post=current,originalCleanup250ms='NOT_QUALIFIED')
+    platform.save(path,receipt,True)
+    return receipt
+
+
 def main():
     cli=argparse.ArgumentParser(description=__doc__)
-    cli.add_argument('operation',choices=('status',))
-    cli.add_argument('--witness',required=True)
+    cli.add_argument('operation',choices=('status','recover-fixed-row'))
+    cli.add_argument('--witness')
     args=cli.parse_args()
+    if args.operation=='recover-fixed-row':
+        require(args.witness is None,'FIXED_MAINTENANCE_INPUT')
+        result=recover_fixed_row()
+        print(json.dumps({'status':result['status'],'attempt':result['attempt'],'operationId':result['operationId']}))
+        return 0
+    require(args.witness is not None,'WITNESS_REQUIRED')
     attempt=uuid.uuid4().hex
     receipt=dict(taskId=TASK,runId=RUN,attempt=attempt,startedUtc=dt.datetime.now(dt.timezone.utc).isoformat(),status='STARTED',productGate='BLOCKED')
     output=AREA/('blocked-resource-status-'+attempt+'.json')
