@@ -416,6 +416,10 @@ def one_helper(stage,volume,target,script,*,image=None,user='0',bind=None,timeou
           '--memory=512m','--memory-swap=512m','--cpus=.5','--pids-limit=32','--tmpfs','/tmp:rw,nosuid,nodev,size=16m',
           '--user',user,'--label','ontology.task='+TASK,'--label','ontology.run='+RECOVERY,'--label','ontology.attempt='+nonce,
           '--mount',f'type=volume,src={volume},dst={target},volume-nocopy'+('' if write else ',readonly')]
+    if bind or write:
+        # 冷读取/还原涉及不同服务的固定 UID；能力仅作用于列明卷，原件挂载一直只读。
+        args+=['--cap-add=DAC_OVERRIDE']
+        if write:args+=['--cap-add=CHOWN','--cap-add=FOWNER','--cap-add=FSETID']
     if bind:
         path,readonly=bind
         require(path.is_dir() and not path.is_symlink() and path.resolve()==path and path.is_relative_to(platform.HOME_DIR/RECOVERY)
@@ -452,6 +456,7 @@ def native_stop(group,role,roles,operation):
     """先核阶段实际配额，用原生停机/有界 TERM；后验不确定即停止序列。"""
     import subprocess
     from workflow_oracle_mapping_resources import before_source
+    require(group in ('original','replacement') and role in ORIGINAL_IDS,'OWNED_GROUP_ROLE')
     phase='preserve' if group=='original' else 'restore'
     check=before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=roles)
     cid=ORIGINAL_IDS[role] if group=='original' else (ALT_ORACLE if role=='oracle' else json.loads((RECOVERY_AREA/'replacement-resources.json').read_bytes())['ids'][role])
@@ -516,6 +521,7 @@ def native_stop(group,role,roles,operation):
 def start_owned(group,role,running):
     """按创建回执仅启动一个准确已退出实例，并复核新合集、原持久卷及额度。"""
     import time
+    require(group in ('original','replacement') and role in ORIGINAL_IDS,'OWNED_GROUP_ROLE')
     phase='preserve' if group=='original' else 'restore'
     current=set(running);after=current|{role}
     require(role not in current and role in ORIGINAL_IDS,'START_ROLE')
@@ -624,11 +630,241 @@ def recover_fixed_row():
     return receipt
 
 
+def archive_identity(path,limit):
+    """完整读取安全归档。内部相对链接可以保留，拒绝越界目标、特殊文件及穿过链接的成员。"""
+    import hashlib,os,posixpath,stat,tarfile
+    from pathlib import PurePosixPath
+    st=path.lstat()
+    require(stat.S_ISREG(st.st_mode) and st.st_nlink==1 and st.st_uid==os.getuid() and stat.S_IMODE(st.st_mode)==0o600
+            and path.resolve()==path and st.st_size<=limit,'PRIVATE_ARCHIVE')
+    with path.open('rb') as f:digest=hashlib.file_digest(f,'sha256').hexdigest()
+    names={};links={};expanded=0
+    with tarfile.open(path,'r:') as archive:
+        for item in archive:
+            name=PurePosixPath(item.name)
+            require(not name.is_absolute() and '..' not in name.parts and name not in names and
+                    (item.isdir() or item.isfile() or item.issym() or item.islnk()),'ARCHIVE_MEMBER')
+            if item.issym() or item.islnk():
+                dest=PurePosixPath(item.linkname)
+                dest=PurePosixPath(posixpath.normpath(str((name.parent/dest) if item.issym() else dest)))
+                require(not dest.is_absolute() and '..' not in dest.parts,'ARCHIVE_LINK')
+                links[name]=dest
+            names[name]=item.type
+            expanded+=item.size
+            require(expanded<=limit and len(names)<=100000,'ARCHIVE_EXPANSION')
+    require(names and all(parent not in links for name in names for parent in name.parents)
+            and all(target in names for target in links.values()),'ARCHIVE_TREE')
+    require([st.st_ino,st.st_size,st.st_ctime_ns]==[path.stat().st_ino,path.stat().st_size,path.stat().st_ctime_ns],'ARCHIVE_CHANGED')
+    return dict(bytes=st.st_size,sha256=digest,members=len(names),expanded=expanded,identity=[st.st_dev,st.st_ino,st.st_size,st.st_ctime_ns])
+
+
+def cold_archive(role):
+    """每个准确原卷只复制一次，登记后重新核算已落盘量。仅 Fuseki 可在独立冷验证前保留待验原件。"""
+    import os
+    require(role in ORIGINAL_IDS,'COLD_ROLE')
+    sample=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase='preserve',running_roles=[])
+    completed=[json.loads(p.read_bytes()) for p in RECOVERY_AREA.glob('maintenance-*.json')]
+    require(len(completed)==1 and completed[0]['status']=='TASK_LEVEL_RECOVERY','MAINTENANCE_REQUIRED')
+    origin=ORIGINAL_IDS[role]
+    stops=sorted((json.loads(p.read_bytes()) for p in RECOVERY_AREA.glob('stop-*.json')),key=lambda x:x['endedUtc'])
+    last=[r for r in stops if r['id']==origin][-1]
+    fuse_pending=role=='fuseki' and last.get('reason')=='ORACLE_ADMISSION_TDB_CLOSE_UNCONFIRMED'
+    require(last['status']=='CLEAN_STOP' or fuse_pending,'COLD_TERMINATION')
+    group='source' if role=='oracle' else 'platform'
+    private=platform.HOME_DIR/RECOVERY
+    directory=private/group;directory.mkdir(mode=0o700,exist_ok=True)
+    source_spec=record('source-create-01.json')
+    vol=source_spec['volume'] if role=='oracle' else record('formal-resources.json')['volumes'][role]
+    ledger_path=RECOVERY_AREA/'archive-ledger.json'
+    ledger=json.loads(ledger_path.read_bytes()) if ledger_path.exists() else dict(taskId=TASK,operation=RECOVERY,archives={})
+    files=('database.tar','trust-and-auth.tar') if role=='oracle' else (role+'.tar',)
+    require(all(not (directory/n).exists() and group+'/'+n not in ledger['archives'] for n in files),'COLD_EXISTS')
+    if role=='oracle':
+        script="""cd /source; umask 077
+test -d g4-tls && test -d dbconfig/FREE/.tls-wallet && test -d clientWallet && test -d dbconfig/FREE/dbs
+tar --sparse --numeric-owner --xattrs --acls --exclude=./g4-tls --exclude=./clientWallet --exclude=./dbconfig/FREE/.tls-wallet --exclude=./dbconfig/FREE/dbs -cpf /backup/database.tar .
+tar --sparse --numeric-owner --xattrs --acls -cpf /backup/trust-and-auth.tar ./g4-tls ./clientWallet ./dbconfig/FREE/.tls-wallet ./dbconfig/FREE/dbs
+sync"""
+    else:
+        script='cd /source; umask 077; tar --sparse --numeric-owner --xattrs --acls -cpf /backup/'+files[0]+' .; sync'
+    one_helper('cold-'+role,vol,'/source',script,bind=(directory,False),timeout=420)
+    total=0;limit=max(sample['platformDisk']['sourceVolumeCaps'].values()) if role=='oracle' else sample['platformDisk']['platformCopyCeiling']
+    for name in files:
+        facts=archive_identity(directory/name,limit)
+        total+=facts['bytes']
+        ledger['archives'][group+'/'+name]=dict(**facts,sourceId=origin,volume=vol,privatePath=group+'/'+name,
+            state='COLD_PENDING_NATIVE_TDB2' if fuse_pending else 'COLD_VERIFIED_ARCHIVE')
+    if role!='oracle':
+        total=sum(v['bytes'] for k,v in ledger['archives'].items() if k.startswith('platform/'))
+    require(total<=limit,'COLD_REALIZED_CAP')
+    platform.save(ledger_path,ledger,ledger_path.exists())
+    post=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase='preserve',running_roles=[])
+    return dict(role=role,bytes=total,post=post['attempt'],archives=files)
+
+
+def host_private_archive():
+    """一次不解析地保全实际 API/PG 配置、PFX/keyring、钱包及源认证材料，只报告归档身份。"""
+    import os,subprocess
+    out=platform.HOME_DIR/RECOVERY/'host'
+    out.mkdir(mode=0o700)
+    path=out/'materials.tar'
+    args=['/usr/bin/tar','-cpf',str(path),'-C',str(platform.HOME_DIR),'platform','reader','oracle.env','reader-password','observer-password']
+    old=os.umask(0o077)
+    try:
+        proc=subprocess.run(args,capture_output=True,timeout=45)
+    finally:
+        os.umask(old)
+    require(proc.returncode==0,'HOST_PRIVATE_BACKUP')
+    row=archive_identity(path,128*1024**2)
+    platform.save(RECOVERY_AREA/'host-materials.json',dict(privatePath='host/materials.tar',**row))
+    return row
+
+
+def create_replacements():
+    """从原任务实际 Compose 和保全的宿主材料建立隔离副本，创建回执逐资源绑定实际 ID。"""
+    import os,subprocess
+    from pathlib import Path
+    pre=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase='preserve',running_roles=[])
+    ledger=json.loads((RECOVERY_AREA/'archive-ledger.json').read_bytes())['archives']
+    require(set(ledger)=={'source/database.tar','source/trust-and-auth.tar',*['platform/'+s+'.tar' for s in platform.VOLUMES]},'INCOMPLETE_CHECKPOINT')
+    private=platform.HOME_DIR/RECOVERY
+    target=private/'restored-host'
+    materials=private/'host/materials.tar';saved=json.loads((RECOVERY_AREA/'host-materials.json').read_bytes())
+    require(archive_identity(materials,128*1024**2)['sha256']==saved['sha256'],'HOST_ARCHIVE_DRIFT')
+    if not target.exists():
+        target.mkdir(mode=0o700)
+        result=subprocess.run(['/usr/bin/tar','-xpf',str(materials),'-C',str(target)],capture_output=True,timeout=45)
+        require(result.returncode==0,'HOST_UNPACK')
+    import hashlib,tarfile
+    require(target.resolve()==target and not target.stat().st_mode & 0o077,'HOST_RESTORE_OWNER')
+    with tarfile.open(materials,'r:') as archive:
+        expected=set()
+        for member in archive:
+            destination=target/member.name
+            if destination.name.startswith('._'):
+                # bsdtar 在 macOS 将 AppleDouble 成员恢复为目标文件的扩展属性。
+                actual=destination.with_name(destination.name[2:])
+                original=platform.HOME_DIR/actual.relative_to(target)
+                require(actual.exists() and original.exists()
+                        and ex.sha(subprocess.check_output(['/usr/bin/xattr','-lx',str(actual)],timeout=5))==
+                            ex.sha(subprocess.check_output(['/usr/bin/xattr','-lx',str(original)],timeout=5)),'HOST_EXTENDED_METADATA')
+                continue
+            original=platform.HOME_DIR/member.name
+            require((destination.stat().st_mode & 0o7777,destination.stat().st_uid,destination.stat().st_gid)==
+                    (original.stat().st_mode & 0o7777,original.stat().st_uid,original.stat().st_gid),'HOST_RESTORE_PERMISSIONS')
+            require(destination.resolve()==destination and destination.exists(),'HOST_RESTORE_PATH')
+            expected.add(destination)
+            if member.isfile():
+                with archive.extractfile(member) as old, destination.open('rb') as copy:
+                    require(hashlib.file_digest(old,'sha256').digest()==hashlib.file_digest(copy,'sha256').digest(),'HOST_RESTORE_BYTES')
+        require(set(target.rglob('*'))==expected,'HOST_RESTORE_SET')
+    specbytes=platform.COMPOSE.read_bytes()
+    require(ex.sha(specbytes)==record('formal-planned.json')['composeSha256'],'ORIGINAL_COMPOSE')
+    spec=json.loads(specbytes);spec['name']=ALT_PROJECT
+    operation=uuid.uuid4().hex
+    for role,service in spec['services'].items():
+        require(role in platform.VOLUMES,'RESTORE_SERVICE')
+        volumes=[]
+        for entry in service['volumes']:
+            if isinstance(entry,dict):
+                require(entry['type']=='bind' and entry['read_only'] is True,'COMPOSE_BIND_ACCESS')
+                parts=[entry['source'],entry['target'],'ro']
+            else:
+                parts=entry.split(':')
+            if parts[0]==platform.VOLUMES[role]:
+                volumes.append({'type':'volume','source':parts[0],'target':parts[1],'volume':{'nocopy':True}})
+            else:
+                host=Path(parts[0])
+                require(host.is_absolute() and host.is_relative_to(platform.RUNTIME) and parts[2:]==['ro'],'RESTORE_BIND_ROOT')
+                copy=target/'platform'/host.relative_to(platform.RUNTIME)
+                require(copy.exists() and not copy.is_symlink() and copy.resolve()==copy,'RESTORED_BIND_FILE')
+                volumes.append(':'.join([str(copy),*parts[1:]]))
+        service['volumes']=volumes
+        service['labels'].update({'ontology.recovery':RECOVERY,'ontology.attempt':operation})
+    for group in (spec['volumes'],spec['networks']):
+        for obj in group.values():obj['labels'].update({'ontology.recovery':RECOVERY,'ontology.attempt':operation})
+    specfile=RECOVERY_AREA/'restore-compose.json';platform.save(specfile,spec)
+    ctx=['compose','-p',ALT_PROJECT,'-f',str(specfile)]
+    require(not engine_step('new-project-pre','ps','-aq','--filter','label=com.docker.compose.project='+ALT_PROJECT),'ALT_PROJECT_EXISTS')
+    for kind in ('volume','network'):
+        existing=engine_step('new-'+kind+'-pre',kind,'ls','--format','{{.Name}}').splitlines()
+        require(not any(v.startswith(ALT_PROJECT+'_') for v in existing),'ALT_NAME_CONFLICT')
+    registry=RECOVERY_AREA/'replacement-resources.json'
+    value=dict(taskId=TASK,runId=RUN,operation=RECOVERY,attempt=operation,project=ALT_PROJECT,ids={},volumes={},networks={},
+               composeSha256=ex.sha(specfile.read_bytes()),baseComposeSha256=ex.sha(specbytes),admission=pre['attempt'],status='CREATING')
+    platform.save(registry,value)
+    try:
+        engine_step('create-alternative',*ctx,'create','--pull','never','--no-build',*platform.VOLUMES,timeout=90)
+    finally:
+        for role,shortname in platform.VOLUMES.items():
+            cid=engine_step('alternative-created-id',*ctx,'ps','-a','-q',role)
+            if not cid:continue
+            require(re.fullmatch(CID,cid),'ALTERNATIVE_ID')
+            volume=ALT_PROJECT+'_'+shortname
+            row=engine_step('alternative-owner','inspect','-f','{{.Id}} {{.Image}} {{index .Config.Labels "ontology.attempt"}} {{range .Mounts}}{{if eq .Type "volume"}}{{.Name}}{{end}}{{end}}',cid).split()
+            require(row==[cid,platform.IMAGES[role],operation,volume],'ALTERNATIVE_SCOPE')
+            value['ids'][role]=cid;value['volumes'][role]=volume
+            platform.save(registry,value,True)
+        for n,internal in [('platform-internal','true'),('host-entry','false')]:
+            facts=engine_step('alternative-network-id','network','inspect','-f','{{.Id}} {{.Internal}} {{index .Labels "ontology.attempt"}}',ALT_PROJECT+'_'+n).split()
+            require(re.fullmatch(CID,facts[0]) and facts[1:]==[internal,operation],'ALTERNATIVE_NETWORK')
+            value['networks'][n]=facts[0]
+        platform.save(registry,value,True)
+    require(set(value['ids'])==set(platform.VOLUMES),'ALTERNATIVE_SET')
+    value['status']='CREATED';platform.save(registry,value,True)
+    post=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase='restore',running_roles=[])
+    return post['attempt']
+
+
+def restore_volume(role):
+    """只在原五服务退出、归档完整且目标身份已登记的情况下写替代卷。"""
+    require(role in ORIGINAL_IDS and not (RECOVERY_AREA/('restored-'+role+'.json')).exists(),'RESTORE_ALREADY_RECORDED')
+    private=platform.HOME_DIR/RECOVERY
+    pre=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase='restore',running_roles=[])
+    ledger=json.loads((RECOVERY_AREA/'archive-ledger.json').read_bytes())['archives']
+    registry=json.loads((RECOVERY_AREA/'replacement-resources.json').read_bytes())
+    if role=='oracle':
+        group='source';files=('database.tar','trust-and-auth.tar');vol=record('recovery-01-final.json')['replacementVolume']
+        review=json.loads((RECOVERY_AREA/'early-alternative-independent-review.json').read_bytes())
+        dossier=(RECOVERY_AREA/'early-alternative-eligibility.json').read_bytes()
+        require(review['status']=='ACCEPT_EXACT_TARGET' and review['containerId']==ALT_ORACLE and
+                review['volume']==vol and review['dossierSha256']==ex.sha(dossier)
+                and all(ex.sha((RECOVERY_AREA/n).read_bytes())==review['reopened'][n] for n in
+                        ('early-source-reread.json','archive-ledger.json','early-alternative-eligibility.json')),'EARLY_ALTERNATIVE_REVIEW')
+        # 这个卷是已获准覆盖的早期替代目标。原卷只进入 cold_archive 并保持只读。
+        require(vol=='ontology-g4-omq-replacement-01_oracle-data' and vol!=record('source-create-01.json')['volume'],'RESTORE_SOURCE_VOLUME')
+    else:
+        group='platform';files=(role+'.tar',);vol=registry['volumes'][role]
+    directory=private/group
+    for n in files:
+        row=ledger[group+'/'+n]
+        require(archive_identity(directory/n,6*platform.GIB)['sha256']==row['sha256'] and row['sourceId']==ORIGINAL_IDS[role],'RESTORE_ARCHIVE')
+    initial='test -z "$(find . -mindepth 1 -print -quit)"' if role!='oracle' else 'test -d FREE && test -d dbconfig && test -f .FREE.created; find . -xdev -mindepth 1 -delete; test -z "$(find . -mindepth 1 -print -quit)"'
+    # GNU tar 从已经逐成员核过的档中还原 UID/GID、权限、稀疏文件和数据。随后在服务启动前逐文件比较。
+    extract='\n'.join('tar --sparse --numeric-owner --acls --xattrs -xpf /backup/'+n for n in files)
+    compare='\n'.join('tar --numeric-owner --acls --xattrs -df /backup/'+n for n in files)
+    platform.save(RECOVERY_AREA/('restore-dispatch-'+role+'.json'),
+                  dict(taskId=TASK,role=role,volume=vol,admission=pre['attempt'],archiveSha256=[ledger[group+'/'+n]['sha256'] for n in files]))
+    result=one_helper('restore-'+role,vol,'/source','cd /source\n'+initial+'\n'+extract+'\nsync\n'+compare,
+                      bind=(directory,True),write=True,timeout=420)
+    require(not result,'COLD_COMPARE_DIFFERENCE')
+    output=dict(role=role,taskId=TASK,sourceId=ORIGINAL_IDS[role],replacementId=ALT_ORACLE if role=='oracle' else registry['ids'][role],volume=vol,
+                archiveHashes=[ledger[group+'/'+n]['sha256'] for n in files],pre=pre['attempt'],status='REPLACEMENT_COLD_BYTES_VERIFIED')
+    platform.save(RECOVERY_AREA/('restored-'+role+'.json'),output)
+    return output
+
+
 def main():
     cli=argparse.ArgumentParser(description=__doc__)
-    cli.add_argument('operation',choices=('status','recover-fixed-row'))
+    cli.add_argument('operation',choices=('status','recover-fixed-row','observe-restored'))
     cli.add_argument('--witness')
     args=cli.parse_args()
+    if args.operation=='observe-restored':
+        from workflow_oracle_mapping_checkpoint import observe_restored
+        require(args.witness is None,'FIXED_VERIFIER_INPUT')
+        observed=observe_restored()
+        print(json.dumps({'status':observed['status'],'attempt':observed['attempt'],'recovery':'BLOCKED'}))
+        return int(observed['status']!='CHECKPOINT_COMPONENTS_OBSERVED')
     if args.operation=='recover-fixed-row':
         require(args.witness is None,'FIXED_MAINTENANCE_INPUT')
         result=recover_fixed_row()

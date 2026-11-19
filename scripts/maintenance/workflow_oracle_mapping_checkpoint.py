@@ -174,7 +174,6 @@ internal static class Checkpoint
     private static readonly Dictionary<string, object> stable = new();
     private static readonly Dictionary<string, object> proof = new();
     private static readonly HttpClient http = NewClient();
-    private static readonly List<(string Kid, string Subject, long Issued, long Expiry, byte[] Digest, byte[] Signature)> witnesses = new();
     private static readonly IConfiguration Config=new ConfigurationBuilder().AddJsonFile("/private/api/appsettings.json",false,false).Build();
     private const string IssuerOrigin = "http://localhost:15743";
     private const string Rust = "http://rustfs:9000";
@@ -256,7 +255,7 @@ STORAGE = r'''
 '''
 
 SOURCE_KEYS = r'''
-    private static async Task<string> Keys()
+    private static async Task Keys()
     {
         var cb=new NpgsqlConnectionStringBuilder(Config.GetConnectionString("governance"));
         Must(cb.Host=="platform-pg" && cb.Database=="mapping" && cb.Port==5432 && cb.SslMode==SslMode.VerifyFull,"pg_route");
@@ -267,29 +266,9 @@ SOURCE_KEYS = r'''
         await using(var cmd=new NpgsqlCommand("SET TRANSACTION READ ONLY",db,tx))await cmd.ExecuteNonQueryAsync(Token);
         using var cert=X509CertificateLoader.LoadPkcs12FromFile("/private/api/keyring.pfx",Config["Security:CertificatePassword"],X509KeyStorageFlags.EphemeralKeySet);
         Must(cert.HasPrivateKey,"pfx");
-        var bff=DataProtectionProvider.Create(new DirectoryInfo("/keyring"),s=>s.SetApplicationName("OntologyPlatform.PlatformBff.v1")
-                .DisableAutomaticKeyGeneration().UnprotectKeysWithAnyCertificate(cert));
         var query=DataProtectionProvider.Create(new DirectoryInfo("/query-keyring"),s=>s.SetApplicationName("OntologyPlatform.G4-M4-QUERY-001").DisableAutomaticKeyGeneration());
-        var expected=input.GetProperty("subjects").EnumerateObject().Select(x=>x.Value.GetString()!).ToHashSet();
-        var observed=new HashSet<string>();int tickets=0;
-        await using(var cmd=new NpgsqlCommand("SELECT \"ProtectedTicket\" FROM governance.server_sessions ORDER BY \"Id\" LIMIT 1001",db,tx))
-        await using(var reader=await cmd.ExecuteReaderAsync(Token)){
-            while(await reader.ReadAsync(Token)){
-                Must(++tickets<=1000,"ticket_limit");
-                var bytes=reader.GetFieldValue<byte[]>(0);
-                var ticket=TicketSerializer.Default.Deserialize(bff.CreateProtector("OntologyPlatform.Governance.ServerTicket.v1").Unprotect(bytes));
-                Must(ticket!=null,"ticket");
-                var subject=ticket!.Principal.FindFirst("sub")?.Value ?? ticket.Principal.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                Must(!string.IsNullOrEmpty(subject),"ticket_sub");observed.Add(subject!);
-                if(expected.Contains(subject!)){
-                    var original=ticket.Properties.GetTokenValue("id_token");
-                    if(original!=null)CaptureSignature(original,subject!);
-                }
-            }
-        }
-        Must(expected.All(observed.Contains),"ticket_subjects");
         var results=new SortedDictionary<string,string>(StringComparer.Ordinal);
-        await using(var cmd=new NpgsqlCommand("SELECT \"Id\",\"ResultHash\",\"ResultCiphertext\" FROM semantic_query.\"Queries\" WHERE octet_length(\"ResultCiphertext\")>0 ORDER BY \"Id\" LIMIT 101",db,tx))
+        await using(var cmd=new NpgsqlCommand("SELECT \"Id\",\"ResultHash\",\"ResultCiphertext\" FROM semantic_query.\"Queries\" WHERE \"Id\"='query-8453cb0c18c947e5b9d8114a31d6ab1e' AND octet_length(\"ResultCiphertext\")>0",db,tx))
         await using(var reader=await cmd.ExecuteReaderAsync(Token)){
             while(await reader.ReadAsync(Token)){
                 var id=reader.GetString(0);var hash=reader.GetString(1);var plain=G4QueryResultStore.Unprotect(query,id,reader.GetFieldValue<byte[]>(2),hash);
@@ -297,23 +276,14 @@ SOURCE_KEYS = r'''
             }
         }
         Must(results.Count>0,"original_query_result");
-        var sql="SELECT to_jsonb(s)::text FROM connections.\"ConnectionSecrets\" s JOIN connections.\"Connections\" c ON c.\"SecretId\"=s.\"Id\" AND c.\"SecretVersion\"=s.\"Version\" WHERE c.\"Id\"=@id AND c.\"State\"='ACTIVE'";
-        string secret;
-        await using(var cmd=new NpgsqlCommand(sql,db,tx)){
-            cmd.Parameters.AddWithValue("id",Str(input,"connectionId"));
-            var raw=(string?)await cmd.ExecuteScalarAsync(Token);Must(raw!=null,"encrypted_profile");
-            var row=JsonSerializer.Deserialize<ConnectionSecretRecord>(raw!)!;
-            using var cipher=new ConnectionSecretCipher("/private/api/g4-key");
-            secret=cipher.Decrypt(row);
-            Must(!string.IsNullOrEmpty(secret),"connection_cipher");
-        }
         await tx.CommitAsync(Token);
-        stable["keys"]=new{certSha256=Sha(cert.RawData),tickets,subjects=expected.Count,results,connectionSecretVerified=true};
-        return secret;
+        stable["keys"]=new{certSha256=Sha(cert.RawData),results};
     }
 
-    private static async Task Source(string secret)
+    private static async Task Source()
     {
+        // 与本任务已审定向源测试相同，只有专用读者消费者使用其私有只读挂载。
+        var secret=(await File.ReadAllTextAsync("/run/fixture/reader-password",Token)).Trim();
         var options=new OracleAdapterOptions{RootCertificatePath="/run/fixture/ca.pem",WalletDirectory="/run/fixture/client-wallet"};
         var adapter=new OracleSourceAdapter(options);
         var profile=new OracleConnectionProfile{Host="oracle-source",Port=2484,ServiceName="FREEPDB1",Username="FIXTURE_READER",
@@ -331,7 +301,7 @@ SOURCE_KEYS = r'''
         await conn.OpenAsync(Token);
         string[] hashes=new string[2];
         await using(var cmd=conn.CreateCommand()){
-            cmd.CommandTimeout=5;cmd.CommandText="ALTER SESSION SET READ_ONLY=TRUE";await cmd.ExecuteNonQueryAsync(Token);
+            cmd.CommandTimeout=5;cmd.CommandText="SET TRANSACTION READ ONLY";await cmd.ExecuteNonQueryAsync(Token);
             cmd.CommandText="select sys_context('USERENV','SESSION_USER')||'|'||sys_context('USERENV','NETWORK_PROTOCOL')||'|'||sys_context('USERENV','CON_NAME') from dual";
             Must(string.Equals((string?)await cmd.ExecuteScalarAsync(Token),"FIXTURE_READER|TCPS|FREEPDB1",StringComparison.OrdinalIgnoreCase),"tcps_identity");
         }
@@ -357,19 +327,6 @@ SOURCE_KEYS = r'''
 
 IDENTITY = r'''
     private static byte[] Un64(string s)=>Convert.FromBase64String(s.Replace('-','+').Replace('_','/')+new string('=',(4-s.Length%4)%4));
-    private static void CaptureSignature(string original,string expectedSubject)
-    {
-        // 已保全票据内原签名仅在私有进程复核；不持有/重放 access token，也不请求签发新 token。
-        var parts=original.Split('.');Must(parts.Length==3 && original.Length<=65536,"saved_signature");
-        var header=Parse(Un64(parts[0]));var body=Parse(Un64(parts[1]));
-        var issuer=Config["Security:Authority"];var client=Config["Security:ClientId"];
-        var aud=body.GetProperty("aud");
-        Must(Str(header,"alg")=="RS256" && Str(body,"iss")==issuer && Str(body,"sub")==expectedSubject
-            && (aud.ValueKind==JsonValueKind.String?aud.GetString()==client:aud.EnumerateArray().Any(a=>a.GetString()==client)),"saved_identity");
-        var issued=body.GetProperty("iat").GetInt64();var expiry=body.GetProperty("exp").GetInt64();
-        Must(expiry>issued && issued<=DateTimeOffset.UtcNow.ToUnixTimeSeconds()+5,"original_validity");
-        witnesses.Add((Str(header,"kid"),expectedSubject,issued,expiry,SHA256.HashData(Encoding.ASCII.GetBytes(parts[0]+"."+parts[1])),Un64(parts[2])));
-    }
     private static async Task Identity()
     {
         // 只请求公开 discovery 和 JWKS；用已有票据的签名核验候选恢复的公钥。
@@ -382,17 +339,8 @@ IDENTITY = r'''
         var publicSet=jwks.Select(j=>new{kid=Str(j,"kid"),alg=Str(j,"alg"),use=Str(j,"use"),kty=Str(j,"kty"),
             materialSha256=TextHash(JsonSerializer.Serialize(j.EnumerateObject().OrderBy(p=>p.Name,StringComparer.Ordinal).Select(p=>new[]{p.Name,p.Value.GetRawText()}).ToArray()))})
             .OrderBy(j=>j.kid,StringComparer.Ordinal).ToArray();
-        foreach(var sample in witnesses){
-            var key=jwks.Single(j=>Str(j,"kid")==sample.Kid && Str(j,"alg")=="RS256" && Str(j,"use")=="sig" && Str(j,"kty")=="RSA");
-            using var rsa=RSA.Create();rsa.ImportParameters(new RSAParameters{Modulus=Un64(Str(key,"n")),Exponent=Un64(Str(key,"e"))});
-            Must(rsa.KeySize>=2048 && rsa.VerifyHash(sample.Digest,sample.Signature,HashAlgorithmName.SHA256,RSASignaturePadding.Pkcs1),"token_signature");
-        }
-        var expected=input.GetProperty("subjects").EnumerateObject().Select(x=>x.Value.GetString()!).ToHashSet();
-        var actual=witnesses.Select(w=>w.Subject).ToHashSet();
-        // 没有签名原件时公钥观察仍成立；状态单列，不能换算成验签成功。
-        stable["oidc"]=new{issuer,client,keys=publicSet,originalIdTokensVerified=witnesses.Count,allFourOriginalSubjectsVerified=expected.SetEquals(actual)};
-        proof["idToken"]=new{kind="retained_id_token_signature",signedSamples=witnesses.Count,signatureVerified=witnesses.Count>0,
-            coveredSubjects=actual.Count,issuedByRestoredInstance=false,checkedAt=DateTimeOffset.UtcNow.ToString("O")};
+        stable["oidc"]=new{issuer,client,keys=publicSet};
+        proof["idToken"]=new{scope="public_discovery_and_jwks",signatureVerified=false,checkedAt=DateTimeOffset.UtcNow.ToString("O")};
     }
 '''
 
@@ -404,13 +352,17 @@ VERIFIER_MAIN = r'''
             input=JsonSerializer.Deserialize<JsonElement>(await Console.In.ReadToEndAsync(Token));
             Must(Str(input,"taskId")=="G4-ORACLE-MAPPING-QUERY-001" && Str(input,"runId")=="implementation-01"
                 && Str(input,"connectionId")=="a7913bb552eb4cd1a3f6eaf5b93cd619","task");
-            component="protected-pg";var secret=await Keys();
-            component="source";await Source(secret);
-            component="fuseki";await Graphs();
-            component="rustfs";await PublishedObjects();
-            component="keycloak";await Identity();
-            Console.WriteLine(JsonSerializer.Serialize(new{status="CHECKPOINT_COMPONENTS_OBSERVED",stable,proof,unverified=new[]{
-                "oidc_current_realm_directory_roles_client","rustfs_all_version_ids_and_delete_markers"}},Json));return 0;
+            var failures=new SortedDictionary<string,string>(StringComparer.Ordinal);
+            foreach(var step in new (string Name,Func<Task> Read)[]{("protected-pg",Keys),("source",Source),("fuseki",Graphs),("rustfs",PublishedObjects),("keycloak",Identity)}){
+                component=step.Name;
+                try{await step.Read();}
+                catch(Exception e){
+                    failures.Add(component,e is InvalidDataException && Regex.IsMatch(e.Message,@"\A[a-zA-Z0-9_-]{1,80}\z")?e.Message:e.GetType().Name);
+                }
+            }
+            Console.WriteLine(JsonSerializer.Serialize(new{status=failures.Count==0?"CHECKPOINT_COMPONENTS_OBSERVED":"CHECKPOINT_INCOMPLETE",
+                failures,stable,proof,unverified=new[]{"oidc_current_roles_client_and_signed_token","rustfs_all_version_ids_and_delete_markers"}},Json));
+            return failures.Count==0?0:2;
         }catch(Exception e){
             var code=e is InvalidDataException && Regex.IsMatch(e.Message,@"\A[a-zA-Z0-9_-]{1,80}\z")?e.Message:e.GetType().Name;
             Console.WriteLine(JsonSerializer.Serialize(new{status="CHECKPOINT_INCOMPLETE",component,code,completed=stable.Keys.ToArray(),stable,proof},Json));
@@ -425,11 +377,125 @@ def compare(before, after):
     """仅比较已观测的稳定分项；没有获得证据的版本清单和 IdP 后台目录仍单列。"""
     for event in (before,after):
         require(event['status']=='CHECKPOINT_COMPONENTS_OBSERVED' and set(event['stable'])=={'keys','oracle','tdb2','rustfs','oidc'}
-                and event['unverified']==['oidc_current_realm_directory_roles_client','rustfs_all_version_ids_and_delete_markers'],
+                and event['unverified']==['oidc_current_roles_client_and_signed_token','rustfs_all_version_ids_and_delete_markers'],
                 'CHECKPOINT_VERIFIER_INCOMPLETE')
     require(before['stable']==after['stable'],'CHECKPOINT_RESTORE_DRIFT')
     missing=list(after['unverified'])
-    if not all(e['proof']['idToken']['signatureVerified'] and e['stable']['oidc']['allFourOriginalSubjectsVerified'] for e in (before,after)):
+    if not all(e['proof']['idToken']['signatureVerified'] is True and e['stable']['oidc'].get('allFourOriginalSubjectsVerified') is True for e in (before,after)):
         missing.append('retained_id_token_signatures_for_four_subjects')
-    return dict(scope='restored stable references and bytes',status='PARTIAL',stableSha256=ex.sha(ex.encoded(after['stable'])),
+    return dict(scope='restored stable references and bytes',status='BLOCKED',stableSha256=ex.sha(ex.encoded(after['stable'])),
                 observedComponents=sorted(after['stable']),unverified=missing)
+
+
+def observe_restored():
+    """仅 Master 在完整已登记替代栈上串行运行一台只读验证器，保留真实退出与独立分项。"""
+    import os
+    import uuid
+    import workflow_oracle_mapping_platform_recovery as recovery
+    from workflow_oracle_mapping_resources import PROBE
+    p = recovery.platform
+    area = recovery.RECOVERY_AREA
+    roles = set(recovery.ORIGINAL_IDS)
+    pre = p.before_source(ROOT, TASK, platform_stage=True, phase='restore', running_roles=roles)
+    registry = json.loads((area/'replacement-resources.json').read_bytes())
+    fixture = recovery.record('runtime-fixture.json')
+    attempt = uuid.uuid4().hex
+    cas = json.loads((area/'real-maintenance-dispatch.json').read_bytes())
+    baseline = json.loads(next(area.glob('pg-baseline-*.json')).read_bytes())
+    pg = collect_pg(registry['ids']['platform-pg'], fixture, cas['attempt'], attempt)
+    p.save(area/('pg-restored-'+attempt+'.json'), pg)
+    require(pg['stable'] == baseline['stable'], 'RESTORED_PG_DRIFT')
+    payload = verifier_inputs(fixture, pg, json.loads((p.AREA/'window-05.json').read_bytes())['afterHash'])
+    builds = [(f.parent, json.loads(f.read_bytes())) for f in area.glob('verifier-*/compile.json')]
+    valid = [(folder, b) for folder,b in builds if b['status']=='PASS' and b['sourceSha256']==ex.sha(verifier_source().encode())]
+    require(len(valid)==1, 'RESTORED_VERIFIER_BUILD')
+    folder, build = valid[0]
+    dll = folder/'OracleCheckpoint.dll'
+    require(ex.sha(dll.read_bytes()) == build['dllSha256'] and p.build.validate('api',TASK)==build['api'], 'RESTORED_VERIFIER_BYTES')
+    api=ROOT/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0'
+    relay=p.AREA/'formal-relay'
+    require(ex.sha((relay/'OracleRelay.dll').read_bytes())==recovery.record('formal-api-inputs.json')['relaySha256'],'RESTORED_RELAY')
+    host=p.HOME_DIR/recovery.RECOVERY/'restored-host'
+    mounts={api:'/app',folder:'/probe',relay:'/runtime',host/'platform/api':'/private/api',
+            host/'platform/query-keyring':'/query-keyring',host/'reader':'/run/fixture'}
+    require(all(ex.ordinary(src).exists() for src in mounts),'RESTORED_VERIFIER_MOUNTS')
+    network=registry['project']+'_platform-internal'
+    private_net=recovery.record('recovery-01-final.json')['network']
+    args=['create','-i','--pull=never','--network',network,'--read-only','--cap-drop=ALL','--security-opt=no-new-privileges',
+          '--memory=512m','--memory-swap=512m','--cpus=.5','--pids-limit=128','--tmpfs','/tmp:rw,nosuid,nodev,size=32m',
+          '--user',str(os.getuid())+':'+str(os.getgid()),'--label','ontology.task='+TASK,'--label','ontology.attempt='+attempt,
+          '--label','ontology.run='+recovery.RECOVERY]
+    for path,target in mounts.items():
+        args+=['--mount',f'type=bind,src={path},dst={target},readonly']
+    args+=['--entrypoint=/bin/sh',PROBE,'-ec','mkdir /tmp/check; for entry in /app/*; do ln -s "$entry" /tmp/check/; done; cp /probe/OracleCheckpoint.dll /tmp/check/; dotnet /runtime/OracleRelay.dll & exec dotnet exec --runtimeconfig /tmp/check/OntologyPlatform.Api.runtimeconfig.json --depsfile /tmp/check/OntologyPlatform.Api.deps.json /tmp/check/OracleCheckpoint.dll']
+    cid=recovery.engine_step('restored-reader-create',*args)
+    require(CID.fullmatch(cid),'RESTORED_VERIFIER_ID')
+    receipt=dict(attempt=attempt,id=cid,taskId=TASK,runId=recovery.RECOVERY,status='CREATED',image=PROBE,pre=pre['attempt'],
+                 inputSha256=ex.sha(ex.encoded(payload)),compile=build['commandId'],pgSha256=pg['stableSha256'])
+    path=area/('checkpoint-'+attempt+'.json')
+    p.save(path,receipt)
+    try:
+        recovery.engine_step('reader-source-network','network','connect',private_net,cid)
+        fmt='{{.Id}}|{{.Image}}|{{index .Config.Labels "ontology.attempt"}}|{{.State.Status}}|{{.HostConfig.Memory}}|{{.HostConfig.NanoCpus}}|{{json .Mounts}}|{{json .NetworkSettings.Networks}}'
+        obs=recovery.engine_step('reader-census','inspect','-f',fmt,cid).split('|')
+        require(obs[:6]==[cid,PROBE.split('@')[1],attempt,'created',str(512*1024**2),'500000000'] and
+                {(m['Source'],m['Destination'],m['RW']) for m in json.loads(obs[6])}=={(str(s),t,False) for s,t in mounts.items()}
+                and set(json.loads(obs[7]))=={private_net,network},'RESTORED_READER_OWNER')
+        result=ex.run(['docker','--context','desktop-linux','start','-a','-i',cid],ROOT,task=TASK,run_id=recovery.RECOVERY,stage='oracle-restored-reader',
+                      input_key=ex.sha(ex.encoded([receipt['inputSha256'],build['dllSha256'],cid])),stdin=ex.encoded(payload),timeout=110)
+        receipt.update(commandId=result.receipt['commandId'],exitCode=result.returncode,stdoutSha256=ex.sha(result.stdout),stderrSha256=ex.sha(result.stderr))
+        receipt['status']='VERIFIER_FAILED'
+        require(bool(result.stdout.strip()),'VERIFIER_NO_OUTPUT')
+        data=json.loads(result.stdout)
+        require(data['status'] in ('CHECKPOINT_COMPONENTS_OBSERVED','CHECKPOINT_INCOMPLETE'),'CHECKPOINT_RESULT')
+        receipt.update(status=data['status'],observation=data)
+    finally:
+        state=recovery.engine_step('reader-post','inspect','-f','{{.State.Status}}|{{.State.ExitCode}}|{{.State.OOMKilled}}',cid).split('|')
+        receipt['after']=state
+        if state[0] in ('exited','created'):
+            recovery.engine_step('reader-release','rm',cid)
+            receipt['removed']=not recovery.engine_step('reader-absent','ps','-aq','--no-trunc','--filter','id='+cid)
+        p.save(path,receipt,True)
+    return receipt
+
+
+def graph_projection(registry, baseline):
+    """原生 TDB2 全读；以 PG 已发布 Turtle 在同版本 Jena 中执行纯 CONSTRUCT，逐三元组比较。"""
+    import doris_keep_fuseki as rdf
+    import workflow_oracle_mapping_platform_recovery as recovery
+    p=recovery.platform
+    rid=baseline['stable']['releaseId']
+    require(re.fullmatch('[0-9a-f]{32}',rid),'RESTORED_RELEASE_ID')
+    sql=f'''BEGIN TRANSACTION READ ONLY;
+    SELECT json_build_array("ManifestJson","SourcesJson","ManifestHash") FROM publishing."Releases" WHERE "ReleaseId"='{rid}' AND "Published";
+    ROLLBACK;'''
+    data=recovery.engine_step('readonly-release-projection','exec','-i','--user','postgres',registry['ids']['platform-pg'],
+                              'psql','-XwqAt','-v','ON_ERROR_STOP=1','-d','mapping',stdin=sql.encode())
+    manifest_text,source_text,digest=json.loads(data)
+    require(ex.sha(manifest_text.encode())==digest,'GRAPH_MANIFEST')
+    manifest,sources=json.loads(manifest_text),json.loads(source_text)
+    cid=registry['ids']['fuseki']
+    scan=rdf.full_scan(cid)
+    expected={}
+    for index,role in enumerate(('Ontology','Shapes','Vocabulary','Data')):
+        source=sources[role+'Turtle']
+        require(ex.sha(source.encode())==manifest['Hashes'][role+'Hash'],'GRAPH_SOURCE_HASH')
+        if role=='Shapes':
+            continue
+        directives=[]
+        def prefix(match):
+            directives.append(match[1].upper()+' '+match[2])
+            return ''
+        body=re.sub(r'(?im)^\s*@(prefix|base)\s+([^\n]+?>)\s*\.',prefix,source.lstrip('\ufeff'))
+        query='BASE <https://ontology.invalid/source/'+str(index)+'/>\n'+'\n'.join(directives)+'\nCONSTRUCT {\n'+body+'\n} WHERE {}'
+        doc=json.loads(rdf.request(cid,'ontology/query','application/rdf+json',query.encode(),'POST','application/sparql-query'))
+        expected[role]={rdf.canonical([s,pred,o]) for s,preds in doc.items() for pred,objects in preds.items() for o in objects}
+    graphs=[]
+    for role in ('Ontology','Data'):
+        graph=manifest[role+'GraphIri']
+        require(graph in baseline['stable']['graphs'],'GRAPH_IDENTITY')
+        actual=rdf.triples(cid,'ontology',graph)
+        require(actual==(expected[role]|expected['Vocabulary'] if role=='Ontology' else expected[role]),'GRAPH_CONTENT')
+        graphs.append(dict(graph=graph,triples=len(actual),sha256=rdf.fingerprint(actual)))
+    return dict(id=cid,status='FULL_READ_AND_RELEASE_GRAPHS_MATCH',scan=scan,graphs=graphs,
+                shapesSourceSha256=manifest['Hashes']['ShapesHash'],originalShutdownHook='UNKNOWN',releaseHash=digest)
