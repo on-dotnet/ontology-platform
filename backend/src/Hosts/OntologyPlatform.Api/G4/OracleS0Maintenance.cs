@@ -42,7 +42,7 @@ internal static class OracleS0Maintenance
                     | UnixFileMode.OtherRead | UnixFileMode.OtherWrite | UnixFileMode.OtherExecute)) == 0);
             // 验证专属网络端点、TLS 证书、数据库和时限，仅创建必要的连接池外连接。
             var settings = new NpgsqlConnectionStringBuilder((await File.ReadAllTextAsync(path, limit.Token)).Trim())
-                { Pooling = false, Timeout = 5, CommandTimeout = 5, IncludeErrorDetail = false };
+            { Pooling = false, Timeout = 5, CommandTimeout = 5, IncludeErrorDetail = false };
             G4OracleMaintenanceProof.Check(settings.Host == "platform-pg" && settings.Port == 5432 && settings.Database == "mapping"
                 && settings.Username == proof["databaseUser"] && settings.SslMode == SslMode.VerifyFull && !string.IsNullOrWhiteSpace(settings.RootCertificate));
             // 维护宿主不注册业务授权、发布、Oracle 连接器、监听端口或 HostedService。

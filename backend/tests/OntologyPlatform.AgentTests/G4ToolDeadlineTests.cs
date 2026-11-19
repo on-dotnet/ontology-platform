@@ -160,12 +160,24 @@ public sealed class G4ToolDeadlineTests
                 }, default, new string('0', 64), run);
             }
             // 测试必须经过正式 Query.TimeoutMs 读取；不能直接把时长送给替身。
-            var query = JsonSerializer.SerializeToElement(new { assetId = "asset", ontologyReleaseId = "release", mappingReleaseIds = new[] { "mapping" },
-                capabilityId = "g4_resolve_entity", capabilityVersion = new string('a', 64), relationshipIris = Array.Empty<string>(),
-                depth = 1, maxRows = 2, timeoutMs, filters = new { siteId = "s", entityExternalId = "entity" } });
+            var query = JsonSerializer.SerializeToElement(new
+            {
+                assetId = "asset",
+                ontologyReleaseId = "release",
+                mappingReleaseIds = new[] { "mapping" },
+                capabilityId = "g4_resolve_entity",
+                capabilityVersion = new string('a', 64),
+                relationshipIris = Array.Empty<string>(),
+                depth = 1,
+                maxRows = 2,
+                timeoutMs,
+                filters = new { siteId = "s", entityExternalId = "entity" }
+            });
             return tools.CallAsync(actor, "g4_resolve_entity", new Dictionary<string, JsonElement>
             {
-                ["query"] = query, ["idempotencyKey"] = JsonSerializer.SerializeToElement("key"), ["selectionQueryId"] = JsonSerializer.SerializeToElement<string?>(null)
+                ["query"] = query,
+                ["idempotencyKey"] = JsonSerializer.SerializeToElement("key"),
+                ["selectionQueryId"] = JsonSerializer.SerializeToElement<string?>(null)
             }, default, new string('0', 64), run);
         }
 
@@ -204,8 +216,16 @@ public sealed class G4ToolDeadlineTests
             CleanupConfirmed = physical.CleanupConfirmed;
             return Task.FromResult(new G4QueryDelivery
             {
-                View = new G4QueryView { QueryId = "query-fixture", ExecutionStatus = "COMPLETED", CreatedAtUtc = "1970-01-01T00:00:00Z",
-                    CompletedAtUtc = "1970-01-01T00:00:01Z", ExpiresAtUtc = "1970-01-02T00:00:00Z", ResultHash = null, ErrorCode = null },
+                View = new G4QueryView
+                {
+                    QueryId = "query-fixture",
+                    ExecutionStatus = "COMPLETED",
+                    CreatedAtUtc = "1970-01-01T00:00:00Z",
+                    CompletedAtUtc = "1970-01-01T00:00:01Z",
+                    ExpiresAtUtc = "1970-01-02T00:00:00Z",
+                    ResultHash = null,
+                    ErrorCode = null
+                },
                 ResultBytes = System.Text.Encoding.UTF8.GetBytes(Wire)
             });
         }

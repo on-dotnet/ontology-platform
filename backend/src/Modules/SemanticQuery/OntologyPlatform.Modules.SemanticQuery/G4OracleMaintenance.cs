@@ -171,8 +171,15 @@ internal static class G4OracleMaintenance
                 update.SetProperty(q => q.LeaseOwner, (string?)null).SetProperty(q => q.LeaseUntilUtc, (DateTimeOffset?)null), token);
         G4OracleMaintenanceProof.Check(count == 1);
         // 受信身份来自维护进程的实际 OS 操作者；绝不借用原业务主体。
-        var actor = new ActorContext { SubjectId = proof["operatorId"], OrganizationId = row.OrganizationId, SiteIds = state.Scope.SiteIds,
-            Roles = [], TraceId = proof["operationId"], CorrelationId = proof["attemptId"] };
+        var actor = new ActorContext
+        {
+            SubjectId = proof["operatorId"],
+            OrganizationId = row.OrganizationId,
+            SiteIds = state.Scope.SiteIds,
+            Roles = [],
+            TraceId = proof["operationId"],
+            CorrelationId = proof["attemptId"]
+        };
         await audit.WriteAsync(actor, new AuditCommand { Action = "data.query.cleanup.recover", Resource = row.Id, Outcome = "allowed", Scope = state.Scope },
             db.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
         proof.DemandFresh(DateTimeOffset.UtcNow);
