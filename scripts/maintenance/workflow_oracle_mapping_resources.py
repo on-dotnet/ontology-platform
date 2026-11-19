@@ -22,8 +22,8 @@ def require(ok, code):
         raise ValueError('ORACLE_ADMISSION_' + code)
 
 
-def before_source(root, task):
-    """真实采样仅适用于首次源创建前；已有源时不能重复占用同一额度。"""
+def before_source(root, task, source_id=None):
+    """创建前及运行时核对当前准入；运行时只容许已记录的准确源 ID。"""
     require(task == TASK, 'TASK')
     area = ordinary(root/'artifacts/workflow'/task)
     stamp = uuid.uuid4().hex
@@ -52,7 +52,21 @@ def before_source(root, task):
         current = docker('old-resources', 'inspect', '-f', KEEP_FORMAT, *[row[0] for row in keep]).splitlines()
         require(current == expected, 'RETAINED_DRIFT')
         running = [row for row in keep if row[2] == 'running']
-        require(set(docker('all-running', 'ps', '-q', '--no-trunc').splitlines()) == {r[0] for r in running}, 'RUNNING_DRIFT')
+        accounted = {r[0] for r in running}
+        if source_id is not None:
+            created = json.loads(ordinary(area/RUN/'source-create-01.json').read_bytes())
+            require(created['taskId'] == task and created['runId'] == RUN, 'SOURCE_OWNER')
+            volume = created['volume']
+            if source_id != created['containerId']:
+                replacement = json.loads(ordinary(area/RUN/'recovery-01-resume.json').read_bytes())
+                require(replacement['taskId'] == task and replacement['runId'] == RUN and replacement['originalId'] == created['containerId']
+                        and replacement['replacementId'] == source_id and replacement['status'] == 'NATIVE_RESTORED_PENDING_DRIVER', 'REPLACEMENT_OWNER')
+                require(docker('offline-original', 'inspect', '-f', '{{.State.Status}}', created['containerId']) == 'exited', 'RECOVERY_OVERLAP')
+                volume = replacement['replacementVolume']
+            row = docker('warm-source','inspect','-f','{{.Id}}|{{.Image}}|{{index .Config.Labels "ontology.task"}}|{{index .Config.Labels "ontology.run"}}|{{.HostConfig.Memory}}|{{.HostConfig.NanoCpus}}|{{range .Mounts}}{{.Name}}{{end}}',source_id).split('|')
+            require(row == [source_id, SOURCE.split('@')[1], task, RUN, str(4*GIB), '2000000000', volume], 'SOURCE_DRIFT')
+            accounted.add(source_id)
+        require(set(docker('all-running', 'ps', '-q', '--no-trunc').splitlines()) == accounted, 'RUNNING_DRIFT')
         require(len(running) == 3 and len(keep) == 20 and sum(int(r[3]) for r in running) == 7*GIB//2
                 and sum(int(r[4]) for r in running) == 4_000_000_000, 'RETAINED_QUOTAS')
         record['protectedOriginalSha256'] = INVENTORY_SHA
@@ -114,7 +128,7 @@ def before_source(root, task):
                   availableFs=int(raw.splitlines()[-1].split()[-3])*1024,
                   load=next(line for line in raw.splitlines() if re.match(r'^\d+\.\d+ \d+\.\d+',line)))
         record['vm'] = vm
-        require(vm['available'] >= 15*GIB//2 and vm['availableFs'] >= 26*GIB, 'VM_FLOOR')
+        require(vm['available'] >= (7 if source_id else 15)*GIB//2 and vm['availableFs'] >= 26*GIB, 'VM_FLOOR')
         record['status'] = 'SOURCE_STAGE_RESOURCE_READY'
         return record
     except Exception as error:

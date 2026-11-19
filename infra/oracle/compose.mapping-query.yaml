@@ -1,0 +1,23 @@
+# Oracle Mapping 的源端子集。继承冻结镜像、配额和 Oracle 配置，独立卷和网络。
+name: ontology-g4-oracle-mapping-query-001
+services:
+  oracle-source:
+    extends:
+      file: compose.yaml
+      service: oracle-source
+    labels:
+      ontology.task: G4-ORACLE-MAPPING-QUERY-001
+      ontology.run: implementation-01
+    networks: !override [source-internal]
+    volumes: !override [oracle-data:/opt/oracle/oradata]
+networks:
+  source-internal:
+    internal: true
+    labels:
+      ontology.task: G4-ORACLE-MAPPING-QUERY-001
+      ontology.run: implementation-01
+volumes:
+  oracle-data:
+    labels:
+      ontology.task: G4-ORACLE-MAPPING-QUERY-001
+      ontology.run: implementation-01
