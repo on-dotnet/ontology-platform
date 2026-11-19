@@ -1,6 +1,6 @@
 # G4当前能力与规划入口
 
-当前 main 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`。2026-11-19，Doris review-fix-02 经 ChatGPT ACCEPT / GO，RF-02 关闭，已精确集成并回读。[Doris 验收与历史恢复](../tasks/G4-DORIS-MAPPING-QUERY-001.md)。当前[Oracle 任务](../tasks/G4-ORACLE-MAPPING-QUERY-001.md)已接受集中裁决，优先核当期资源并实施 S0，通过后连续 S1–S3。G4 总体 **PARTIAL**。
+当前 main 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`。2026-11-19，Doris review-fix-02 经 ChatGPT ACCEPT / GO，RF-02 关闭，已精确集成并回读。[Doris 验收与历史恢复](../tasks/G4-DORIS-MAPPING-QUERY-001.md)。当前[Oracle 任务](../tasks/G4-ORACLE-MAPPING-QUERY-001.md)已实测正式取消晚于固定 SQL 的 EOF，S0 BLOCKED，S1–S3 待裁决。G4 总体 **PARTIAL**。
 
 ## 已合并能力与缺口
 

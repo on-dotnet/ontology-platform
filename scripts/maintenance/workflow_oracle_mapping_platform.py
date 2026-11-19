@@ -785,4 +785,9 @@ if __name__=='__main__':
         observe(args.idempotency_key,args.output,args.query_id)
         raise SystemExit(0)
     actions={'admission':admission,'render':render,'create':create_platform,'init-volumes':init_volumes,'start':start_platform,'prepare-api':prepare_api,'primary':lambda:start_api('api'),'secondary':lambda:start_api('api-secondary'),'pause-apis':pause_unused_apis,'next-snapshot':next_api_snapshot,'browser':lambda:browser_run(args.mode,args.case),'window-pair':fixed_window_pair}
-    print(json.dumps(actions[args.action](),default=str))
+    result=actions[args.action]()
+    print(json.dumps(result,default=str))
+    if args.action=='browser':
+        raise SystemExit(result['exitCode'])
+    if args.action=='window-pair' and result['status']!='PASS':
+        raise SystemExit(1)

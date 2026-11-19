@@ -1,0 +1,1354 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "sourceId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+  "sqlId": "dum3m3c96vc07",
+  "idempotencyKey": "071127c7-2a34-40d7-9675-7cf967edfdb0",
+  "startedUtc": "2026-11-19T16:07:37.723808Z",
+  "platformStates": [
+    {
+      "id": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+      "state": "RUNNING",
+      "cancel": false,
+      "owner": "oracle-execution-004f5b3e04084f1998201939aaeec5e6",
+      "fence": 1,
+      "deadline": "2026-11-19T16:07:42.968585+00:00",
+      "created": "2026-11-19T16:07:38.357892+00:00",
+      "observed": "2026-11-19T16:07:38.360184+00:00",
+      "leaseUntil": "2026-11-19T16:07:42.968585+00:00",
+      "hash": null,
+      "bytes": 0,
+      "receipts": 0,
+      "cancelAudits": 0,
+      "successAudits": 0
+    },
+    {
+      "id": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+      "state": "CANCELLED",
+      "cancel": true,
+      "owner": "oracle-execution-004f5b3e04084f1998201939aaeec5e6",
+      "fence": 2,
+      "deadline": "2026-11-19T16:07:42.968585+00:00",
+      "created": "2026-11-19T16:07:38.357892+00:00",
+      "observed": "2026-11-19T16:07:38.786465+00:00",
+      "leaseUntil": "2026-11-19T16:07:39.035482+00:00",
+      "hash": null,
+      "bytes": 0,
+      "receipts": 0,
+      "cancelAudits": 1,
+      "successAudits": 0
+    },
+    {
+      "id": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+      "state": "CANCELLED",
+      "cancel": true,
+      "owner": "oracle-execution-004f5b3e04084f1998201939aaeec5e6",
+      "fence": 2,
+      "deadline": "2026-11-19T16:07:42.968585+00:00",
+      "created": "2026-11-19T16:07:38.357892+00:00",
+      "observed": "2026-11-19T16:07:39.710135+00:00",
+      "leaseUntil": "2026-11-19T16:07:39.035482+00:00",
+      "hash": null,
+      "bytes": 0,
+      "receipts": 0,
+      "cancelAudits": 1,
+      "successAudits": 0
+    }
+  ],
+  "logs": {
+    "api": [
+      {
+        "name": "OracleBranchBegin",
+        "query": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+        "owner": "oracle-execution-004f5b3e04084f1998201939aaeec5e6",
+        "fence": "1",
+        "execution": "0e224578b55b4b479d98d3fa4ff1ac46",
+        "utc": "2026-11-19T16:07:38.3589113+00:00",
+        "workDeadlineUtc": "2026-11-19T16:07:39.1086331+00:00",
+        "branchDeadlineUtc": "2026-11-19T16:07:39.3586331+00:00"
+      },
+      {
+        "name": "OracleSourceSession",
+        "query": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+        "execution": "0e224578b55b4b479d98d3fa4ff1ac46",
+        "instance": "1",
+        "sid": "60",
+        "audsid": "50045",
+        "unified": "276547227588053260",
+        "con": "3",
+        "utc": "2026-11-19T16:07:38.6094995+00:00"
+      },
+      {
+        "name": "OracleSourceEvent",
+        "action": "EXECUTE",
+        "query": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+        "execution": "0e224578b55b4b479d98d3fa4ff1ac46",
+        "utc": "2026-11-19T16:07:38.6097473+00:00"
+      },
+      {
+        "name": "OracleSourceEvent",
+        "action": "EOF",
+        "query": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+        "execution": "0e224578b55b4b479d98d3fa4ff1ac46",
+        "utc": "2026-11-19T16:07:38.6111068+00:00"
+      },
+      {
+        "name": "OracleCancelDispatch",
+        "query": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+        "owner": "oracle-execution-004f5b3e04084f1998201939aaeec5e6",
+        "fence": "1",
+        "execution": "0e224578b55b4b479d98d3fa4ff1ac46",
+        "utc": "2026-11-19T16:07:38.7940100+00:00",
+        "workDeadlineUtc": "2026-11-19T16:07:39.1086331+00:00",
+        "branchDeadlineUtc": "2026-11-19T16:07:39.3586331+00:00",
+        "cleanupRemainingMs": "240.573"
+      },
+      {
+        "name": "OracleSourceEvent",
+        "action": "PHYSICAL_RELEASE",
+        "query": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+        "execution": "0e224578b55b4b479d98d3fa4ff1ac46",
+        "utc": "2026-11-19T16:07:38.7986804+00:00"
+      },
+      {
+        "name": "OracleBranchRelease",
+        "query": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+        "execution": "0e224578b55b4b479d98d3fa4ff1ac46",
+        "confirmed": "False",
+        "observedUtc": "2026-11-19T16:07:38.7987265+00:00"
+      }
+    ],
+    "api-secondary": []
+  },
+  "clocks": {
+    "api": [
+      {
+        "hostBefore": 1795104457943714000,
+        "hostAfter": 1795104457964226000,
+        "remote": 1795104457962892802,
+        "monoBefore": 662918801540500,
+        "monoAfter": 662918822051500
+      },
+      {
+        "hostBefore": 1795104457964227000,
+        "hostAfter": 1795104457964803000,
+        "remote": 1795104457963585552,
+        "monoBefore": 662918822053041,
+        "monoAfter": 662918822629125
+      },
+      {
+        "hostBefore": 1795104457964803000,
+        "hostAfter": 1795104457965381000,
+        "remote": 1795104457964072052,
+        "monoBefore": 662918822629875,
+        "monoAfter": 662918823207458
+      },
+      {
+        "hostBefore": 1795104457965382000,
+        "hostAfter": 1795104457965775000,
+        "remote": 1795104457964638261,
+        "monoBefore": 662918823208250,
+        "monoAfter": 662918823600916
+      },
+      {
+        "hostBefore": 1795104457965776000,
+        "hostAfter": 1795104457966213000,
+        "remote": 1795104457965034011,
+        "monoBefore": 662918823602166,
+        "monoAfter": 662918824038916
+      },
+      {
+        "hostBefore": 1795104459712530000,
+        "hostAfter": 1795104459714111000,
+        "remote": 1795104459712182345,
+        "monoBefore": 662920570369250,
+        "monoAfter": 662920571949666
+      },
+      {
+        "hostBefore": 1795104459714111000,
+        "hostAfter": 1795104459715252000,
+        "remote": 1795104459713476512,
+        "monoBefore": 662920571950541,
+        "monoAfter": 662920573090708
+      },
+      {
+        "hostBefore": 1795104459715252000,
+        "hostAfter": 1795104459715953000,
+        "remote": 1795104459714692553,
+        "monoBefore": 662920573091583,
+        "monoAfter": 662920573791791
+      },
+      {
+        "hostBefore": 1795104459715954000,
+        "hostAfter": 1795104459716521000,
+        "remote": 1795104459715309053,
+        "monoBefore": 662920573792791,
+        "monoAfter": 662920574359833
+      },
+      {
+        "hostBefore": 1795104459716521000,
+        "hostAfter": 1795104459716994000,
+        "remote": 1795104459715843845,
+        "monoBefore": 662920574360541,
+        "monoAfter": 662920574833083
+      }
+    ],
+    "api-secondary": [
+      {
+        "hostBefore": 1795104457943790000,
+        "hostAfter": 1795104457964297000,
+        "remote": 1795104457962817052,
+        "monoBefore": 662918801616083,
+        "monoAfter": 662918822123458
+      },
+      {
+        "hostBefore": 1795104457964298000,
+        "hostAfter": 1795104457964832000,
+        "remote": 1795104457963550136,
+        "monoBefore": 662918822124625,
+        "monoAfter": 662918822658583
+      },
+      {
+        "hostBefore": 1795104457964833000,
+        "hostAfter": 1795104457965415000,
+        "remote": 1795104457964096844,
+        "monoBefore": 662918822659083,
+        "monoAfter": 662918823241291
+      },
+      {
+        "hostBefore": 1795104457965415000,
+        "hostAfter": 1795104457965873000,
+        "remote": 1795104457964690594,
+        "monoBefore": 662918823241708,
+        "monoAfter": 662918823699416
+      },
+      {
+        "hostBefore": 1795104457965874000,
+        "hostAfter": 1795104457966307000,
+        "remote": 1795104457965134177,
+        "monoBefore": 662918823700000,
+        "monoAfter": 662918824133250
+      },
+      {
+        "hostBefore": 1795104459712618000,
+        "hostAfter": 1795104459714030000,
+        "remote": 1795104459712182470,
+        "monoBefore": 662920570457416,
+        "monoAfter": 662920571869041
+      },
+      {
+        "hostBefore": 1795104459714031000,
+        "hostAfter": 1795104459715001000,
+        "remote": 1795104459713442387,
+        "monoBefore": 662920571870041,
+        "monoAfter": 662920572840375
+      },
+      {
+        "hostBefore": 1795104459715002000,
+        "hostAfter": 1795104459715540000,
+        "remote": 1795104459714390262,
+        "monoBefore": 662920572841166,
+        "monoAfter": 662920573379333
+      },
+      {
+        "hostBefore": 1795104459715541000,
+        "hostAfter": 1795104459716095000,
+        "remote": 1795104459714933470,
+        "monoBefore": 662920573380125,
+        "monoAfter": 662920573934041
+      },
+      {
+        "hostBefore": 1795104459716096000,
+        "hostAfter": 1795104459716711000,
+        "remote": 1795104459715477178,
+        "monoBefore": 662920573935000,
+        "monoAfter": 662920574549583
+      }
+    ],
+    "source": [
+      {
+        "hostBefore": 1795104457943825000,
+        "hostAfter": 1795104457945004000,
+        "remote": 1795104457943361000,
+        "monoBefore": 662918801651708,
+        "monoAfter": 662918802830500
+      },
+      {
+        "hostBefore": 1795104457945005000,
+        "hostAfter": 1795104457945834000,
+        "remote": 1795104457944277000,
+        "monoBefore": 662918802831666,
+        "monoAfter": 662918803660458
+      },
+      {
+        "hostBefore": 1795104457945835000,
+        "hostAfter": 1795104457946485000,
+        "remote": 1795104457945050000,
+        "monoBefore": 662918803661250,
+        "monoAfter": 662918804310916
+      },
+      {
+        "hostBefore": 1795104457946485000,
+        "hostAfter": 1795104457947063000,
+        "remote": 1795104457945674000,
+        "monoBefore": 662918804311500,
+        "monoAfter": 662918804888916
+      },
+      {
+        "hostBefore": 1795104457947063000,
+        "hostAfter": 1795104457947619000,
+        "remote": 1795104457946276000,
+        "monoBefore": 662918804889500,
+        "monoAfter": 662918805445083
+      },
+      {
+        "hostBefore": 1795104459712759000,
+        "hostAfter": 1795104459713804000,
+        "remote": 1795104459712020000,
+        "monoBefore": 662920570598000,
+        "monoAfter": 662920571643041
+      },
+      {
+        "hostBefore": 1795104459713805000,
+        "hostAfter": 1795104459714332000,
+        "remote": 1795104459713007000,
+        "monoBefore": 662920571644375,
+        "monoAfter": 662920572170583
+      },
+      {
+        "hostBefore": 1795104459714332000,
+        "hostAfter": 1795104459715360000,
+        "remote": 1795104459713612000,
+        "monoBefore": 662920572171291,
+        "monoAfter": 662920573198750
+      },
+      {
+        "hostBefore": 1795104459715361000,
+        "hostAfter": 1795104459716015000,
+        "remote": 1795104459714632000,
+        "monoBefore": 662920573200125,
+        "monoAfter": 662920573853541
+      },
+      {
+        "hostBefore": 1795104459716016000,
+        "hostAfter": 1795104459716753000,
+        "remote": 1795104459715268000,
+        "monoBefore": 662920573855250,
+        "monoAfter": 662920574592416
+      }
+    ],
+    "pg": [
+      {
+        "hostBefore": 1795104457943900000,
+        "hostAfter": 1795104457944684000,
+        "remote": 1795104457943215000,
+        "monoBefore": 662918801726000,
+        "monoAfter": 662918802509791
+      },
+      {
+        "hostBefore": 1795104457944686000,
+        "hostAfter": 1795104457945113000,
+        "remote": 1795104457943900000,
+        "monoBefore": 662918802511875,
+        "monoAfter": 662918802939208
+      },
+      {
+        "hostBefore": 1795104457945114000,
+        "hostAfter": 1795104457945793000,
+        "remote": 1795104457944443000,
+        "monoBefore": 662918802940125,
+        "monoAfter": 662918803619291
+      },
+      {
+        "hostBefore": 1795104457945794000,
+        "hostAfter": 1795104457946160000,
+        "remote": 1795104457944974000,
+        "monoBefore": 662918803620125,
+        "monoAfter": 662918803986291
+      },
+      {
+        "hostBefore": 1795104457946161000,
+        "hostAfter": 1795104457946544000,
+        "remote": 1795104457945360000,
+        "monoBefore": 662918803986750,
+        "monoAfter": 662918804370416
+      },
+      {
+        "hostBefore": 1795104459712844000,
+        "hostAfter": 1795104459713499000,
+        "remote": 1795104459712097000,
+        "monoBefore": 662920570683708,
+        "monoAfter": 662920571337625
+      },
+      {
+        "hostBefore": 1795104459713500000,
+        "hostAfter": 1795104459714178000,
+        "remote": 1795104459712688000,
+        "monoBefore": 662920571339541,
+        "monoAfter": 662920572016625
+      },
+      {
+        "hostBefore": 1795104459714178000,
+        "hostAfter": 1795104459714804000,
+        "remote": 1795104459713403000,
+        "monoBefore": 662920572017291,
+        "monoAfter": 662920572643333
+      },
+      {
+        "hostBefore": 1795104459714806000,
+        "hostAfter": 1795104459715440000,
+        "remote": 1795104459713996000,
+        "monoBefore": 662920572644750,
+        "monoAfter": 662920573278958
+      },
+      {
+        "hostBefore": 1795104459715441000,
+        "hostAfter": 1795104459715882000,
+        "remote": 1795104459714656000,
+        "monoBefore": 662920573280458,
+        "monoAfter": 662920573720958
+      }
+    ]
+  },
+  "status": "OBSERVED",
+  "hostBefore": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "runId": "implementation-01",
+    "ports": {
+      "api": 15741,
+      "secondary": 15742,
+      "oidc": 15743,
+      "web": 15744
+    },
+    "commandId": "476b56d375474442a1310dc7a552d39e",
+    "snapshotId": "ac3370165c2817682f81e7809ca33c39c7fa9a4d63e543c1d0a5964850c9da3e",
+    "buildInputKey": "fef0098d3d83c5f2b8f73e287ffe9239481f4313b8ab8466a141856a77afe255",
+    "buildOutputKey": "6adef44cd6de46629c889ab323470ef891e43cfda45530f42aeea5ff18b9c973",
+    "runtimeHelperSha256": "e33db34a2c7931a967df9765862f827fb48c6e2432263ddc89f9995077ba55dc",
+    "composeSha256": "3a16fc42154d6d66af8132b1a69d24d605882d949c454426364f607014e230e0",
+    "services": {
+      "api": {
+        "containerId": "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+        "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "pid": 74370,
+        "startedAt": "2026-11-19T15:50:22.809675295Z",
+        "mountSha256": "04ce2db79abe45363162e4449b57bcea9f5ab35067ba7101159ce226f9db358a",
+        "networks": {
+          "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+          "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+        }
+      },
+      "api-secondary": {
+        "containerId": "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+        "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "pid": 74662,
+        "startedAt": "2026-11-19T15:50:26.798344422Z",
+        "mountSha256": "04ce2db79abe45363162e4449b57bcea9f5ab35067ba7101159ce226f9db358a",
+        "networks": {
+          "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+          "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+        }
+      },
+      "fuseki": {
+        "containerId": "9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb",
+        "imageId": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "pid": 63239,
+        "startedAt": "2026-11-19T15:37:01.441168508Z",
+        "mountSha256": "6df1268cfd2a3fe1527bd9ea4148ba78088a32b4f3f9f9ff4b58610c94a70e16",
+        "networks": {
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      },
+      "keycloak-test": {
+        "containerId": "15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b",
+        "imageId": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "pid": 63311,
+        "startedAt": "2026-11-19T15:37:01.497832133Z",
+        "mountSha256": "06889e35f273a8a0f90e66b4c208c301da669fe40833f201718ef33c29e1f8bc",
+        "networks": {
+          "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      },
+      "platform-pg": {
+        "containerId": "eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5",
+        "imageId": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "pid": 63380,
+        "startedAt": "2026-11-19T15:37:01.563379091Z",
+        "mountSha256": "219b9ad971a6dffd0b736653c39e209dc5bb8720a11ca41edd72c7ee159eddc3",
+        "networks": {
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      },
+      "rustfs": {
+        "containerId": "f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd",
+        "imageId": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "pid": 63175,
+        "startedAt": "2026-11-19T15:37:01.382114299Z",
+        "mountSha256": "5a0f32a9985d50de4cb06b57bb645ea0f35441343565888efe7f98f7a9d34d24",
+        "networks": {
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      }
+    },
+    "oracle": {
+      "containerId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+      "imageId": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+      "networkId": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+    }
+  },
+  "cursorBefore": {
+    "0": [
+      1347626742,
+      3,
+      3,
+      102,
+      0
+    ]
+  },
+  "queryId": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+  "source": {
+    "samples": 21288,
+    "events": [
+      {
+        "lo": "2026-11-19T16:07:38.398192Z",
+        "hi": "2026-11-19T16:07:38.401387Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.575711Z",
+        "hi": "2026-11-19T16:07:38.575773Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.575777Z",
+        "hi": "2026-11-19T16:07:38.575841Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.575853Z",
+        "hi": "2026-11-19T16:07:38.575916Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.575921Z",
+        "hi": "2026-11-19T16:07:38.575986Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.576323Z",
+        "hi": "2026-11-19T16:07:38.576385Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.576390Z",
+        "hi": "2026-11-19T16:07:38.576456Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.576390Z",
+        "hi": "2026-11-19T16:07:38.576456Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.576463Z",
+        "hi": "2026-11-19T16:07:38.576527Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.596413Z",
+        "hi": "2026-11-19T16:07:38.596477Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.596482Z",
+        "hi": "2026-11-19T16:07:38.596546Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.596759Z",
+        "hi": "2026-11-19T16:07:38.596825Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.596830Z",
+        "hi": "2026-11-19T16:07:38.596893Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.608594Z",
+        "hi": "2026-11-19T16:07:38.608660Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.608665Z",
+        "hi": "2026-11-19T16:07:38.608730Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.608737Z",
+        "hi": "2026-11-19T16:07:38.608800Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.608804Z",
+        "hi": "2026-11-19T16:07:38.608866Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.608872Z",
+        "hi": "2026-11-19T16:07:38.608935Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.608940Z",
+        "hi": "2026-11-19T16:07:38.609002Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.609554Z",
+        "hi": "2026-11-19T16:07:38.609619Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.609623Z",
+        "hi": "2026-11-19T16:07:38.609687Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.609623Z",
+        "hi": "2026-11-19T16:07:38.609687Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.609693Z",
+        "hi": "2026-11-19T16:07:38.609757Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.609763Z",
+        "hi": "2026-11-19T16:07:38.609825Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.609830Z",
+        "hi": "2026-11-19T16:07:38.609894Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "dum3m3c96vc07",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.609830Z",
+        "hi": "2026-11-19T16:07:38.609894Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "dum3m3c96vc07",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.609900Z",
+        "hi": "2026-11-19T16:07:38.609965Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "dum3m3c96vc07",
+        "execution": "16777219",
+        "start": "20261119160738",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.610728Z",
+        "hi": "2026-11-19T16:07:38.610792Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "dum3m3c96vc07",
+        "execution": "16777219",
+        "start": "20261119160738",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.610797Z",
+        "hi": "2026-11-19T16:07:38.610860Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "dum3m3c96vc07",
+        "execution": "16777219",
+        "start": "20261119160738",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.610866Z",
+        "hi": "2026-11-19T16:07:38.610928Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "dum3m3c96vc07",
+        "execution": "16777219",
+        "start": "20261119160738",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.610933Z",
+        "hi": "2026-11-19T16:07:38.610998Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "dum3m3c96vc07",
+        "execution": "16777219",
+        "start": "20261119160738",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.610933Z",
+        "hi": "2026-11-19T16:07:38.610998Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "dum3m3c96vc07",
+        "execution": "16777219",
+        "start": "20261119160738",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.611006Z",
+        "hi": "2026-11-19T16:07:38.611071Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "dum3m3c96vc07",
+        "previousExecution": "16777219"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.611359Z",
+        "hi": "2026-11-19T16:07:38.611422Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "dum3m3c96vc07",
+        "previousExecution": "16777219"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.611426Z",
+        "hi": "2026-11-19T16:07:38.611489Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.611494Z",
+        "hi": "2026-11-19T16:07:38.611557Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.611561Z",
+        "hi": "2026-11-19T16:07:38.611623Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.615823Z",
+        "hi": "2026-11-19T16:07:38.615886Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.615891Z",
+        "hi": "2026-11-19T16:07:38.615954Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.615961Z",
+        "hi": "2026-11-19T16:07:38.616028Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.616033Z",
+        "hi": "2026-11-19T16:07:38.616096Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.796335Z",
+        "hi": "2026-11-19T16:07:38.796397Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "ACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.796401Z",
+        "hi": "2026-11-19T16:07:38.796466Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.797996Z",
+        "hi": "2026-11-19T16:07:38.798058Z",
+        "sid": "60",
+        "serial": "51748",
+        "audsid": "50045",
+        "con": "3",
+        "state": "INACTIVE",
+        "sql": "-",
+        "execution": "-",
+        "start": "-",
+        "previous": "-",
+        "previousExecution": "-"
+      },
+      {
+        "lo": "2026-11-19T16:07:38.798063Z",
+        "hi": "2026-11-19T16:07:38.798124Z",
+        "absent": true
+      },
+      {
+        "lo": "2026-11-19T16:07:39.698145Z",
+        "hi": "2026-11-19T16:07:39.698198Z",
+        "absent": true
+      }
+    ]
+  },
+  "cursorAfter": {
+    "0": [
+      1347626742,
+      4,
+      4,
+      202,
+      0
+    ]
+  },
+  "terminalReadback": {
+    "commandId": "f6dd2192561840008722af27c0868f19",
+    "state": {
+      "id": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+      "state": "CANCELLED",
+      "cancel": true,
+      "owner": "oracle-execution-004f5b3e04084f1998201939aaeec5e6",
+      "fence": 2,
+      "deadline": "2026-11-19T16:07:42.968585+00:00",
+      "created": "2026-11-19T16:07:38.357892+00:00",
+      "observed": "2026-11-19T16:07:39.779445+00:00",
+      "leaseUntil": "2026-11-19T16:07:39.035482+00:00",
+      "hash": null,
+      "bytes": 0,
+      "receipts": 0,
+      "cancelAudits": 1,
+      "successAudits": 0
+    }
+  },
+  "audit": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "runId": "implementation-01",
+    "startUtc": "2026-11-19T16:07:37.943360Z",
+    "endUtc": "2026-11-19T16:07:39.715269Z",
+    "clientId": "0e224578b55b4b479d98d3fa4ff1ac46",
+    "sourceId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+    "observerId": "OMQ_OBSERVER",
+    "sourceIdentityCommand": "726c165305b941a0a5d1960b7c7376d5",
+    "sourceClock": [
+      "2026-11-19T16:07:39.845958Z",
+      "2026-11-19T16:07:39.853936Z"
+    ],
+    "errorBounds": {
+      "lowerNs": -46557999,
+      "upperNs": 8258000
+    },
+    "sourceAuditCount": 1,
+    "recordsSha256": "d49c75ebc383aaf72fa3a0bb437322f640390b9efb1fff3fd03cd367fa39322f",
+    "records": [
+      {
+        "instance": "1",
+        "session": "276547227588053260",
+        "entry": "1",
+        "statement": "11",
+        "auditExecution": null,
+        "clientId": "0e224578b55b4b479d98d3fa4ff1ac46",
+        "owner": "PRODUCTION",
+        "table": "OMQ_ENTITY",
+        "action": "SELECT",
+        "code": 0,
+        "utc": "2026-11-19T16:07:38.609889Z"
+      }
+    ],
+    "commandId": "89da344b580c4b4fb80866154902d72b"
+  },
+  "clockIntervalsNs": {
+    "api": [
+      662572,
+      1164738
+    ],
+    "api-secondary": [
+      604322,
+      1187323
+    ],
+    "source": [
+      783292,
+      1357708
+    ],
+    "pg": [
+      797042,
+      1240958
+    ]
+  },
+  "nativeExecutionIdentity": [
+    "60",
+    "51748",
+    "50045",
+    "3",
+    "16777219",
+    "20261119160738"
+  ],
+  "auditBridge": {
+    "sameUniqueClientAndObject": true,
+    "sqlExecutionId": "16777219",
+    "unifiedAuditExecutionId": null,
+    "traditionalAuditSession": "50045",
+    "unifiedAuditSession": "276547227588053260"
+  },
+  "cursorDelta": {
+    "child": "0",
+    "plan": 1347626742,
+    "executions": 1,
+    "eof": 1,
+    "rows": 100,
+    "px": 0
+  },
+  "final": {
+    "status": "FINAL",
+    "queryId": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+    "clientId": "0e224578b55b4b479d98d3fa4ff1ac46",
+    "successfulResults": 0,
+    "successReceipts": 0,
+    "successAudits": 0,
+    "formalCancelCommitted": false,
+    "naturalCompletion": false,
+    "nativeCancelCausedTermination": false,
+    "allSourceWorkEnded": false,
+    "nativeErrorCode": null,
+    "deadlineOrDisconnectBeforeCommit": null,
+    "sameExecutionActiveAtCommit": false,
+    "residualSourceWork": 0,
+    "slotReleased": false
+  },
+  "hostAfter": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "runId": "implementation-01",
+    "ports": {
+      "api": 15741,
+      "secondary": 15742,
+      "oidc": 15743,
+      "web": 15744
+    },
+    "commandId": "356a55faecd34c30a530cbbfc50b603b",
+    "snapshotId": "ac3370165c2817682f81e7809ca33c39c7fa9a4d63e543c1d0a5964850c9da3e",
+    "buildInputKey": "fef0098d3d83c5f2b8f73e287ffe9239481f4313b8ab8466a141856a77afe255",
+    "buildOutputKey": "6adef44cd6de46629c889ab323470ef891e43cfda45530f42aeea5ff18b9c973",
+    "runtimeHelperSha256": "e33db34a2c7931a967df9765862f827fb48c6e2432263ddc89f9995077ba55dc",
+    "composeSha256": "3a16fc42154d6d66af8132b1a69d24d605882d949c454426364f607014e230e0",
+    "services": {
+      "api": {
+        "containerId": "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+        "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "pid": 74370,
+        "startedAt": "2026-11-19T15:50:22.809675295Z",
+        "mountSha256": "04ce2db79abe45363162e4449b57bcea9f5ab35067ba7101159ce226f9db358a",
+        "networks": {
+          "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+          "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+        }
+      },
+      "api-secondary": {
+        "containerId": "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+        "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "pid": 74662,
+        "startedAt": "2026-11-19T15:50:26.798344422Z",
+        "mountSha256": "04ce2db79abe45363162e4449b57bcea9f5ab35067ba7101159ce226f9db358a",
+        "networks": {
+          "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+          "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+        }
+      },
+      "fuseki": {
+        "containerId": "9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb",
+        "imageId": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "pid": 63239,
+        "startedAt": "2026-11-19T15:37:01.441168508Z",
+        "mountSha256": "6df1268cfd2a3fe1527bd9ea4148ba78088a32b4f3f9f9ff4b58610c94a70e16",
+        "networks": {
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      },
+      "keycloak-test": {
+        "containerId": "15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b",
+        "imageId": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "pid": 63311,
+        "startedAt": "2026-11-19T15:37:01.497832133Z",
+        "mountSha256": "06889e35f273a8a0f90e66b4c208c301da669fe40833f201718ef33c29e1f8bc",
+        "networks": {
+          "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      },
+      "platform-pg": {
+        "containerId": "eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5",
+        "imageId": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "pid": 63380,
+        "startedAt": "2026-11-19T15:37:01.563379091Z",
+        "mountSha256": "219b9ad971a6dffd0b736653c39e209dc5bb8720a11ca41edd72c7ee159eddc3",
+        "networks": {
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      },
+      "rustfs": {
+        "containerId": "f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd",
+        "imageId": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "pid": 63175,
+        "startedAt": "2026-11-19T15:37:01.382114299Z",
+        "mountSha256": "5a0f32a9985d50de4cb06b57bb645ea0f35441343565888efe7f98f7a9d34d24",
+        "networks": {
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      }
+    },
+    "oracle": {
+      "containerId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+      "imageId": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+      "networkId": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+    }
+  },
+  "endedUtc": "2026-11-19T16:07:40.014223Z"
+}

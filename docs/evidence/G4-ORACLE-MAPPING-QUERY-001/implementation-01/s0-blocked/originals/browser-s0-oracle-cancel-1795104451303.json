@@ -1,0 +1,633 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s0-oracle-cancel",
+  "startedAtUtc": "2026-11-19T16:07:31.303Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_operator",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_auditor",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_activator",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_reader",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_ready_catalog_projection",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_ready_current_connection",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_ready_closed_versions",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_ready_current_activation",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_11",
+      "status": "PASS"
+    },
+    {
+      "name": "http_12_200",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_capability_registered",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_current_source_and_grants",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_readiness_redacted",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_12",
+      "status": "PASS"
+    },
+    {
+      "name": "http_13_200",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_second_api_same_actor",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_observer_armed",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_platform_admission",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_13",
+      "status": "PASS"
+    },
+    {
+      "name": "http_14_200,403,409,503,504",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_14",
+      "status": "PASS"
+    },
+    {
+      "name": "http_15_200,403,409,422,429,503,504",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_witness_finished",
+      "status": "PASS"
+    },
+    {
+      "name": "oracle_native_and_platform_budgets",
+      "status": "FAIL"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 9.159999999999968,
+      "sha256": "29d4f0e68d103c7d66b80af64e3f8b9f5113bdff8f163451b9d8fe766e7aa8e0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.630292000000054,
+      "sha256": "787273187f08c3d267a9b0a1be91ac04ea2b5d5d74d10c14d70642c8a326d3d4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.993832999999995,
+      "sha256": "9a710621e388645185c5f69d8d7022f755279c44f262ca09c6e07823c6e07598"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 2.0965830000000096,
+      "sha256": "bf3ad47f25c2f5ae4eda6e33ad31ec39dc8334dc8a8929476051f2ba0f55dde0"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.611292000000049,
+      "sha256": "3045bb96422d82e000d0c24ff4b9cc3d867ffd42cf57d3ab8a313de956710010"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.2889170000000831,
+      "sha256": "02d57852f18ac64b6e8c9b33f1a19b41a1c82de605c25af2c620d82d3b0ae542"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.53387500000008,
+      "sha256": "5f5946aa2f49c94d3c029d89f03e3d7022fc9ba88433c14a594762976b65c8e9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.4614999999998872,
+      "sha256": "a3795c72c47dad5693b9e03eaa34c2512c8b35f3ed61238ad8a81c617779d6a9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connections/a7913bb552eb4cd1a3f6eaf5b93cd619",
+      "status": 200,
+      "elapsedMs": 3.301875000000109,
+      "sha256": "c33fe51d14ae8b734d9c31b304a4bb2d653b0fc5e9e0d741e04150bb72de66f1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/catalogs/068c3ce7002b4a56a7589152b988ae0b",
+      "status": 200,
+      "elapsedMs": 408.391208,
+      "sha256": "096d884b0020cd9e3ec603d11b038fe77bdf3cb126d20516d127fdffaa711502"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-e43e3b6a4847b2fb39a427799c8fb9f0/active",
+      "status": 200,
+      "elapsedMs": 441.21733300000005,
+      "sha256": "54bb377e9c54e89f54bbcb6ff310e5e2c1c4c6c2b53118094f175bb6657ff73d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/capabilities",
+      "status": 200,
+      "elapsedMs": 6.603625000000193,
+      "sha256": "460a6a7f50ffa63def21a2f9baf961b757dacfed4f9df2dc5a6fbb94feb54579"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 5.397791999999754,
+      "sha256": "a3795c72c47dad5693b9e03eaa34c2512c8b35f3ed61238ad8a81c617779d6a9"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries/query-18b5ee00b53e4e4eafc43cc4717bd293/cancel",
+      "status": 200,
+      "elapsedMs": 427.0050000000001,
+      "sha256": "5e0eb23c263c6028e4468150422cc56cea84cf50ecb17282b1ca50b65604f909"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries",
+      "status": 503,
+      "elapsedMs": 834.9096669999999,
+      "code": "query_source_cleanup_unconfirmed",
+      "sha256": "aaab798359b1a5dcb24b59ece6c7f8886d7bf3bee995f575ebeb3062d8c19f56"
+    }
+  ],
+  "status": "FAIL",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "ports": {
+        "api": 15741,
+        "secondary": 15742,
+        "oidc": 15743,
+        "web": 15744
+      },
+      "commandId": "6d94769eea064afc893c20c415839845",
+      "snapshotId": "ac3370165c2817682f81e7809ca33c39c7fa9a4d63e543c1d0a5964850c9da3e",
+      "buildInputKey": "fef0098d3d83c5f2b8f73e287ffe9239481f4313b8ab8466a141856a77afe255",
+      "buildOutputKey": "6adef44cd6de46629c889ab323470ef891e43cfda45530f42aeea5ff18b9c973",
+      "runtimeHelperSha256": "e33db34a2c7931a967df9765862f827fb48c6e2432263ddc89f9995077ba55dc",
+      "composeSha256": "3a16fc42154d6d66af8132b1a69d24d605882d949c454426364f607014e230e0",
+      "services": {
+        "api": {
+          "containerId": "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+          "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+          "pid": 74370,
+          "startedAt": "2026-11-19T15:50:22.809675295Z",
+          "mountSha256": "04ce2db79abe45363162e4449b57bcea9f5ab35067ba7101159ce226f9db358a",
+          "networks": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+            "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+          }
+        },
+        "api-secondary": {
+          "containerId": "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+          "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+          "pid": 74662,
+          "startedAt": "2026-11-19T15:50:26.798344422Z",
+          "mountSha256": "04ce2db79abe45363162e4449b57bcea9f5ab35067ba7101159ce226f9db358a",
+          "networks": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+            "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+          }
+        },
+        "fuseki": {
+          "containerId": "9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb",
+          "imageId": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+          "pid": 63239,
+          "startedAt": "2026-11-19T15:37:01.441168508Z",
+          "mountSha256": "6df1268cfd2a3fe1527bd9ea4148ba78088a32b4f3f9f9ff4b58610c94a70e16",
+          "networks": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          }
+        },
+        "keycloak-test": {
+          "containerId": "15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b",
+          "imageId": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+          "pid": 63311,
+          "startedAt": "2026-11-19T15:37:01.497832133Z",
+          "mountSha256": "06889e35f273a8a0f90e66b4c208c301da669fe40833f201718ef33c29e1f8bc",
+          "networks": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          }
+        },
+        "platform-pg": {
+          "containerId": "eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5",
+          "imageId": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+          "pid": 63380,
+          "startedAt": "2026-11-19T15:37:01.563379091Z",
+          "mountSha256": "219b9ad971a6dffd0b736653c39e209dc5bb8720a11ca41edd72c7ee159eddc3",
+          "networks": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          }
+        },
+        "rustfs": {
+          "containerId": "f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd",
+          "imageId": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "pid": 63175,
+          "startedAt": "2026-11-19T15:37:01.382114299Z",
+          "mountSha256": "5a0f32a9985d50de4cb06b57bb645ea0f35441343565888efe7f98f7a9d34d24",
+          "networks": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          }
+        }
+      },
+      "oracle": {
+        "containerId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+        "imageId": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+        "networkId": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+      }
+    },
+    "web": null
+  },
+  "scenarioReady": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "runId": "implementation-01",
+    "status": "READY",
+    "remainingSeconds": 14163,
+    "requiredSeconds": 210,
+    "fieldCount": 11,
+    "grantCount": 3,
+    "fixtureBefore": {
+      "counts": [
+        100,
+        1
+      ],
+      "baseHashes": [
+        "b239f629fc0aa5c69e7478b19cbff0b7aa647a5ce2542934a574764a810c72b6",
+        "95cbe188db9e17b2d97b93736d884dd6c5faa17c831e0e8a11e38ad807151667"
+      ],
+      "hashes": [
+        "a5e9350699e0e73f6710d85c9374c465ad762365787f465d0878b3a71608efab",
+        "59b89ac9e0245fe1d9d85345bcf1ee032ec5fe5e1da1ea2ea746fb21d4ba8d0a"
+      ],
+      "commandIds": [
+        "2d92fb74de8b43ed81bdba0fdc94950c",
+        "c89334f8801b4218983613ddfb14353b"
+      ]
+    },
+    "session": {
+      "commandId": "a0e86120dac443f793e66efd0e62b719",
+      "observations": [
+        {
+          "case": "OMQ_BROWSER_SESSION_READY",
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "ExpiresAtUtc": "2026-11-19T16:37:31+00:00",
+          "requiredUntilUtc": "2026-11-19T16:11:04.3028481+00:00",
+          "sessionHash": "61fab2701c96ac7468329454154664d3296449b7332a1be1a54f28e186f7623d"
+        },
+        {
+          "case": "OMQ_BROWSER_SESSION_READY",
+          "subjectId": "650199ae-8bd4-430a-885d-71cd69b6781e",
+          "ExpiresAtUtc": "2026-11-19T16:37:32+00:00",
+          "requiredUntilUtc": "2026-11-19T16:11:04.3028481+00:00",
+          "sessionHash": "78e4610d68cd7e41fc09e2423224b31e3d99b316b7ed455a43eb8bc4225403c6"
+        },
+        {
+          "case": "OMQ_BROWSER_SESSION_READY",
+          "subjectId": "bcf7f7f8-6af0-4f94-a28c-1220461ee62e",
+          "ExpiresAtUtc": "2026-11-19T16:37:32+00:00",
+          "requiredUntilUtc": "2026-11-19T16:11:04.3028481+00:00",
+          "sessionHash": "bc0c1ffaf8d93d8e07b63bb35b8ee630ca86396787c82a69d7038c59c5883d15"
+        },
+        {
+          "case": "OMQ_BROWSER_SESSION_READY",
+          "subjectId": "f902a743-7079-4e22-a643-a51deb027e89",
+          "ExpiresAtUtc": "2026-11-19T16:37:32+00:00",
+          "requiredUntilUtc": "2026-11-19T16:11:04.3028481+00:00",
+          "sessionHash": "b78d81aec4e2956b6293056187d4dccdbf6608c7eebd5de1f36dd659885585c3"
+        }
+      ]
+    },
+    "commandId": "06eda0b804c14697b0cbb71f8bce7662",
+    "activationCommand": "391e842340c0431f88570acd1fe41a57"
+  },
+  "oracleWitness": {
+    "output": "formal-witness-071127c7-2a34-40d7-9675-7cf967edfdb0.json",
+    "idempotencyKey": "071127c7-2a34-40d7-9675-7cf967edfdb0",
+    "events": [
+      {
+        "status": "ADMITTED",
+        "queryId": "query-18b5ee00b53e4e4eafc43cc4717bd293"
+      }
+    ],
+    "cancel": {
+      "issuedUtc": "2026-11-19T16:07:38.362Z",
+      "httpStatus": 200,
+      "executionStatus": "CANCELLED"
+    },
+    "execute": {
+      "status": 503,
+      "queryStatus": 503,
+      "elapsedMs": 834.9941670000007
+    },
+    "final": {
+      "status": "FINAL",
+      "queryId": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+      "clientId": "0e224578b55b4b479d98d3fa4ff1ac46",
+      "naturalCompletion": false,
+      "formalCancelCommitted": false,
+      "sameExecutionActiveAtCommit": false,
+      "nativeCancelCausedTermination": false,
+      "allSourceWorkEnded": false,
+      "nativeErrorCode": null,
+      "deadlineOrDisconnectBeforeCommit": null,
+      "successfulResults": 0,
+      "successReceipts": 0,
+      "successAudits": 0,
+      "residualSourceWork": 0,
+      "slotReleased": false
+    }
+  },
+  "failure": {
+    "phase": "oracle_formal_source_observation",
+    "category": "Error",
+    "code": "oracle_native_and_platform_budgets"
+  },
+  "outputBinding": {
+    "api": {
+      "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "ports": {
+        "api": 15741,
+        "secondary": 15742,
+        "oidc": 15743,
+        "web": 15744
+      },
+      "commandId": "b7cb01d56e484848a4d1e5bbcc0a4189",
+      "snapshotId": "ac3370165c2817682f81e7809ca33c39c7fa9a4d63e543c1d0a5964850c9da3e",
+      "buildInputKey": "fef0098d3d83c5f2b8f73e287ffe9239481f4313b8ab8466a141856a77afe255",
+      "buildOutputKey": "6adef44cd6de46629c889ab323470ef891e43cfda45530f42aeea5ff18b9c973",
+      "runtimeHelperSha256": "e33db34a2c7931a967df9765862f827fb48c6e2432263ddc89f9995077ba55dc",
+      "composeSha256": "3a16fc42154d6d66af8132b1a69d24d605882d949c454426364f607014e230e0",
+      "services": {
+        "api": {
+          "containerId": "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+          "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+          "pid": 74370,
+          "startedAt": "2026-11-19T15:50:22.809675295Z",
+          "mountSha256": "04ce2db79abe45363162e4449b57bcea9f5ab35067ba7101159ce226f9db358a",
+          "networks": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+            "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+          }
+        },
+        "api-secondary": {
+          "containerId": "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+          "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+          "pid": 74662,
+          "startedAt": "2026-11-19T15:50:26.798344422Z",
+          "mountSha256": "04ce2db79abe45363162e4449b57bcea9f5ab35067ba7101159ce226f9db358a",
+          "networks": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+            "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+          }
+        },
+        "fuseki": {
+          "containerId": "9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb",
+          "imageId": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+          "pid": 63239,
+          "startedAt": "2026-11-19T15:37:01.441168508Z",
+          "mountSha256": "6df1268cfd2a3fe1527bd9ea4148ba78088a32b4f3f9f9ff4b58610c94a70e16",
+          "networks": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          }
+        },
+        "keycloak-test": {
+          "containerId": "15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b",
+          "imageId": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+          "pid": 63311,
+          "startedAt": "2026-11-19T15:37:01.497832133Z",
+          "mountSha256": "06889e35f273a8a0f90e66b4c208c301da669fe40833f201718ef33c29e1f8bc",
+          "networks": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          }
+        },
+        "platform-pg": {
+          "containerId": "eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5",
+          "imageId": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+          "pid": 63380,
+          "startedAt": "2026-11-19T15:37:01.563379091Z",
+          "mountSha256": "219b9ad971a6dffd0b736653c39e209dc5bb8720a11ca41edd72c7ee159eddc3",
+          "networks": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          }
+        },
+        "rustfs": {
+          "containerId": "f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd",
+          "imageId": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "pid": 63175,
+          "startedAt": "2026-11-19T15:37:01.382114299Z",
+          "mountSha256": "5a0f32a9985d50de4cb06b57bb645ea0f35441343565888efe7f98f7a9d34d24",
+          "networks": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          }
+        }
+      },
+      "oracle": {
+        "containerId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+        "imageId": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+        "networkId": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+      }
+    },
+    "web": null
+  },
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-19T16:07:40.438Z"
+}

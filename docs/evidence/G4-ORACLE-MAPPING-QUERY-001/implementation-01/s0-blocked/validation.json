@@ -1,0 +1,37 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "dfe38a6c4ca5ab217361136dc2a07e949e70a38a",
+  "checks": [
+    {
+      "name": "s0-oracle-natural",
+      "command": "/opt/homebrew/Cellar/node@24/24.22.1/bin/node scripts/maintenance/workflow-m4-query.mjs --task G4-ORACLE-MAPPING-QUERY-001 --run-id implementation-01 --mode s0-oracle-natural",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "{\"status\":\"PASS\",\"phase\":\"oracle_formal_source_observation\",\"report\":\"/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/implementation-01/browser-s0-oracle-natural-1795104439446.json\",\"checks\":56,\"failure\":null}\n"
+    },
+    {
+      "name": "s0-oracle-cancel",
+      "command": "/opt/homebrew/Cellar/node@24/24.22.1/bin/node scripts/maintenance/workflow-m4-query.mjs --task G4-ORACLE-MAPPING-QUERY-001 --run-id implementation-01 --mode s0-oracle-cancel",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "{\"status\":\"FAIL\",\"phase\":\"oracle_formal_source_observation\",\"report\":\"/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/implementation-01/browser-s0-oracle-cancel-1795104451303.json\",\"checks\":57,\"failure\":{\"phase\":\"oracle_formal_source_observation\",\"category\":\"Error\",\"code\":\"oracle_native_and_platform_budgets\"}}\n"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "scope": "S0 only. Formal cancel failed closed.",
+    "timingStatus": "MEASURED",
+    "elapsedSeconds": {
+      "s0-oracle-natural": 10.30970491701737,
+      "s0-oracle-cancel": 9.34603704197798
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "fixtureOwner": "38c990414dfa4795a0c50a3ac9c2a0fd",
+  "status": "FAIL",
+  "stages": [
+    {
+      "mode": "s0-oracle-natural",
+      "commandId": "458b0096c90c403e8481b1f030341bb6",
+      "exitCode": 0,
+      "reports": [
+        "browser-s0-oracle-natural-1795104439446.json"
+      ],
+      "stageFailure": [
+        null
+      ]
+    },
+    {
+      "mode": "s0-oracle-cancel",
+      "commandId": "b1879ba239ea4344a9db482d1dfd9140",
+      "exitCode": 1,
+      "reports": [
+        "browser-s0-oracle-cancel-1795104451303.json"
+      ],
+      "stageFailure": [
+        {
+          "phase": "oracle_formal_source_observation",
+          "category": "Error",
+          "code": "oracle_native_and_platform_budgets"
+        }
+      ]
+    }
+  ],
+  "before": {
+    "counts": [
+      1,
+      1
+    ],
+    "baseHashes": [
+      "b239f629fc0aa5c69e7478b19cbff0b7aa647a5ce2542934a574764a810c72b6",
+      "95cbe188db9e17b2d97b93736d884dd6c5faa17c831e0e8a11e38ad807151667"
+    ],
+    "hashes": [
+      "d80a9c2e4abe825bb0744619fe5c58d311f556175681184985ab0bedd95d2064",
+      "59b89ac9e0245fe1d9d85345bcf1ee032ec5fe5e1da1ea2ea746fb21d4ba8d0a"
+    ],
+    "commandIds": [
+      "fba64d13348f4aca8262069b47326002",
+      "76c8036095da47a3829ce50559dec64c"
+    ]
+  },
+  "prerequisite": {
+    "ready": "browser-s0-oracle-ready-1795104215090.json",
+    "grants": "b7ceae5f9669452187fb2297938edcb4",
+    "activation": "8916454fc30c44318b1bf1fb253dff36",
+    "minimumTtl": 14179
+  },
+  "loadCommand": "e55a80b875374eaea2cd9e9646f883d7",
+  "expanded": {
+    "counts": [
+      100,
+      1
+    ],
+    "baseHashes": [
+      "b239f629fc0aa5c69e7478b19cbff0b7aa647a5ce2542934a574764a810c72b6",
+      "95cbe188db9e17b2d97b93736d884dd6c5faa17c831e0e8a11e38ad807151667"
+    ],
+    "hashes": [
+      "a5e9350699e0e73f6710d85c9374c465ad762365787f465d0878b3a71608efab",
+      "59b89ac9e0245fe1d9d85345bcf1ee032ec5fe5e1da1ea2ea746fb21d4ba8d0a"
+    ],
+    "commandIds": [
+      "ca1f31e0fd404810adbdcffc0644edd0",
+      "966f01e18c6a4ff389656051dd869946"
+    ]
+  },
+  "restoreCommand": "5bdd6a7f9a644a8fa40e7edc9021f9fc",
+  "after": {
+    "counts": [
+      1,
+      1
+    ],
+    "baseHashes": [
+      "b239f629fc0aa5c69e7478b19cbff0b7aa647a5ce2542934a574764a810c72b6",
+      "95cbe188db9e17b2d97b93736d884dd6c5faa17c831e0e8a11e38ad807151667"
+    ],
+    "hashes": [
+      "d80a9c2e4abe825bb0744619fe5c58d311f556175681184985ab0bedd95d2064",
+      "59b89ac9e0245fe1d9d85345bcf1ee032ec5fe5e1da1ea2ea746fb21d4ba8d0a"
+    ],
+    "commandIds": [
+      "dfab31e191be40e4b7a21c1d8fd3a37a",
+      "08dcbcbbe3454baf97bbb49d0eb144b2"
+    ]
+  }
+}

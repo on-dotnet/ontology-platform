@@ -1,0 +1,129 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "status": "BUSINESS_ENTRY_SEALED_OWNER_RETAINED",
+  "resourceAttempt": "bf8dc7d211fa43c6be07824da997526a",
+  "queryId": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+  "steps": [
+    {
+      "stage": "pre",
+      "counts": {
+        "mappingJobs": 0,
+        "mappingOutbox": 0,
+        "publishingOutbox": 0,
+        "agentRuns": 0,
+        "activeQueries": 0,
+        "owner": "oracle-execution-004f5b3e04084f1998201939aaeec5e6"
+      },
+      "platformCommand": "0a57bc6a045e49cf8260eecbb25eca93",
+      "sourceReaderSessions": 0,
+      "sourceCommand": "19a75ddb8269482e96ef8ce9603940aa"
+    },
+    {
+      "stage": "pre-confirm",
+      "counts": {
+        "mappingJobs": 0,
+        "mappingOutbox": 0,
+        "publishingOutbox": 0,
+        "agentRuns": 0,
+        "activeQueries": 0,
+        "owner": "oracle-execution-004f5b3e04084f1998201939aaeec5e6"
+      },
+      "platformCommand": "71138367b4ca4d028f30edb9f5a8dd9b",
+      "sourceReaderSessions": 0,
+      "sourceCommand": "30d07d6237424b3499902e1ca6616027"
+    },
+    {
+      "service": "api-secondary",
+      "before": [
+        "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+        "G4-ORACLE-MAPPING-QUERY-001",
+        "implementation-01",
+        "running",
+        "0",
+        "false"
+      ],
+      "after": [
+        "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+        "G4-ORACLE-MAPPING-QUERY-001",
+        "implementation-01",
+        "exited",
+        "143",
+        "false"
+      ]
+    },
+    {
+      "stage": "after-api-secondary",
+      "counts": {
+        "mappingJobs": 0,
+        "mappingOutbox": 0,
+        "publishingOutbox": 0,
+        "agentRuns": 0,
+        "activeQueries": 0,
+        "owner": "oracle-execution-004f5b3e04084f1998201939aaeec5e6"
+      },
+      "platformCommand": "8d55e5d00e0c45fdbd2c617a6e146f51",
+      "sourceReaderSessions": 0,
+      "sourceCommand": "412917597dbf4f18a22ddc5b49e68ff1"
+    },
+    {
+      "service": "api",
+      "before": [
+        "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+        "G4-ORACLE-MAPPING-QUERY-001",
+        "implementation-01",
+        "running",
+        "0",
+        "false"
+      ],
+      "after": [
+        "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+        "G4-ORACLE-MAPPING-QUERY-001",
+        "implementation-01",
+        "exited",
+        "143",
+        "false"
+      ]
+    },
+    {
+      "stage": "after-api",
+      "counts": {
+        "mappingJobs": 0,
+        "mappingOutbox": 0,
+        "publishingOutbox": 0,
+        "agentRuns": 0,
+        "activeQueries": 0,
+        "owner": "oracle-execution-004f5b3e04084f1998201939aaeec5e6"
+      },
+      "platformCommand": "45c880b77f1344ad85959ec3f4305d2d",
+      "sourceReaderSessions": 0,
+      "sourceCommand": "b68a8b6fb2fa4887a14d34bff07817b4"
+    }
+  ],
+  "postResourceAttempt": "56eb232f5a334cb69d86502fa157ca11",
+  "currentVolumeBytes": {
+    "volumesLogicalBytes": {
+      "ontology-g4-oracle-mapping-query-001_oracle-data": 4440344135,
+      "ontology-g4-omq-replacement-01_oracle-data": 4398401095
+    },
+    "containerWritableBytes": {
+      "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09": 10407936,
+      "0f04589574f7ace57e784e1bf0525e6c2587819a0c882ebfc15a09f7203e689f": 45056,
+      "15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b": 12288,
+      "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1": 3743744,
+      "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd": 45056,
+      "9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb": 4096,
+      "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d": 45056,
+      "eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5": 24576,
+      "f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd": 12288,
+      "f90b7e7b599ffb4e9b298ce3679f9f24b25c762b472487fe09fd52e3f8e378cf": 45056
+    },
+    "platformVolumes": {
+      "platform-pg": 77820091,
+      "keycloak-test": 193140233,
+      "fuseki": 201344970,
+      "rustfs": 86348
+    }
+  },
+  "oldInventorySha256": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9"
+}

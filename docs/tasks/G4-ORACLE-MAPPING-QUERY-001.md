@@ -1,10 +1,10 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **CONDITIONAL_IMPLEMENTATION**。截至 2026-11-19，Doris 已精确集成；用户接受 P0，批准独立新栈与 S0–S3 的有条件实施。G4 PARTIAL，AI OFF。
+唯一任务状态 **S0_BLOCKED**。2026-11-20，固定 SQL 在正式取消提交前已到 EOF，非作者维持 NO-GO。两个任务 API 已封闭。G4 PARTIAL，AI OFF。
 
 ## 执行身份与所有权
 
-当前项目会话、本机 Code/Agent，Master 单写，非作者 `/root/pg_coupling_facts` 只读。Base 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`，分支 `codex/g4-oracle-mapping-query-001`，托管工作树 `/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform`，operationId `bf751e90-6c75-4102-a34a-7184c735a5c3`。本机 macOS ARM64，Docker VM Linux ARM64。本次使用现行会话配置。实施起点 `8ddaabb90878d5ab72a92908a030b7397c6f2d4d`。本轮为 implementation-01。
+当前项目会话、本机 Code/Agent，Master 集成，P0 非作者为 `/root/pg_coupling_facts`，S0 独立只读审查者为 `/root/spec_review`。P0 Base 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`，分支 `codex/g4-oracle-mapping-query-001`，托管工作树 `/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform`，operationId `bf751e90-6c75-4102-a34a-7184c735a5c3`。本机 macOS ARM64，Docker VM Linux ARM64。本次使用现行会话配置。实施起点 `8ddaabb90878d5ab72a92908a030b7397c6f2d4d`。本轮为 implementation-01。
 
 P0 的文档归属为本任务卡、[唯一 A–F](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md)、[事实索引](../evidence/G4-ORACLE-MAPPING-QUERY-001/facts.md)、[非作者 Review](../evidence/G4-ORACLE-MAPPING-QUERY-001/p0-review.md)、[当前授权](current-authorization.md)、[G4 规划](../planning/g4-implementation-plan.md)与 [Doris 卡末尾的集成追加记录](G4-DORIS-MAPPING-QUERY-001.md)。回执为 ignored。read_only_dependencies 为本轮 owned_paths 以外的产品、合同与门禁，以及锁、迁移、旧证据、既有资源和冻结架构。本轮实施 owned_paths 由唯一合同 C 的精确改动图、现有 preflight/prepare/verify/证据消费者、任务专用夹具与受影响测试确定。Master 单写共享路径；历史证据、旧资源/密钥、锁、迁移只读。
 
@@ -14,7 +14,7 @@ P0 的文档归属为本任务卡、[唯一 A–F](../evidence/G4-ORACLE-MAPPING
 
 | SDD 切片 | 关联 AC 与正式入口 | 当期资格 |
 |---|---|---|
-| S0 源能力及取消 | AC01–03、11。先验证 Oracle 类型、事务、受控固定 SQL、正式取消与独立源终态；不可观察即停。 | 进行中。两表事务、驱动直取消及真实 PG 占位已测。正式取消待测。 |
+| S0 源能力及取消 | AC01–03、11。先验证 Oracle 类型、事务、受控固定 SQL、正式取消与独立源终态；不可观察即停。 | BLOCKED。固定 SQL 在正式取消提交前已读完；两表事务、直取消和 PG 占位子项已测。 |
 | S1 单表 | AC04、05、08、10。沿正式发布、当前 grant、HTTP、真实平台持久化及新会话恢复 | NOT_RUN |
 | S2 双表 | AC03、05–08。等值与半开关系、ABA、撤权、超量、原期限内清理和零成功副作用 | NOT_RUN |
 | S3 消费者及兼容 | AC09–11。UI/HTTP/MCP 同源字节，PG/Doris 与 Oracle M2 的原身份对照 | NOT_RUN |
@@ -27,4 +27,4 @@ P0 的文档归属为本任务卡、[唯一 A–F](../evidence/G4-ORACLE-MAPPING
 
 2026-11-19 非作者核对集中修订。已关闭所有权表述、C 表排版与旧准入时态意见。结论为 GO 进入条件执行，运行资格仍按每阶段当前原件判定。
 
-本次 S0 最小正式根已通过真实 OIDC 登录、G3 发布、正式目录发现、Mapping 异人核准及激活。源业务读者与四个 OIDC 主体相互独立。首批 76、57、46 个检查分别属于 provision、mapping 和当期 ready，均按各自实测提交登记。跨实例取消尚无正式裁决。
+本次 S0 最小正式根已通过真实 OIDC 登录、G3 发布、正式目录发现、Mapping 异人核准及激活。源业务读者与四个 OIDC 主体相互独立。首批 76、57、46 个检查分别属于 provision、mapping 和当期 ready，均按各自实测提交登记。正式取消与资源恢复条件见[阻断交接](../evidence/G4-ORACLE-MAPPING-QUERY-001/implementation-01/s0-blocked/report.md)。

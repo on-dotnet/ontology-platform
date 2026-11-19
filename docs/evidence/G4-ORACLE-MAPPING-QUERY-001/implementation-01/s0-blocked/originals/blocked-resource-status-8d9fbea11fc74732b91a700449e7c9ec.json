@@ -1,0 +1,244 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "attempt": "8d9fbea11fc74732b91a700449e7c9ec",
+  "startedUtc": "2026-11-19T16:17:42.320138+00:00",
+  "status": "READBACK_COMPLETE",
+  "productGate": "BLOCKED",
+  "facts": {
+    "protected": {
+      "inventorySha256": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9",
+      "exactRetainedRows": [
+        "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9|/ontology-g4-doris-mapping-query-001-rustfs-1|running|536870912|1000000000|sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b|volume:ontology-g4-doris-mapping-query-001_rustfs-data:/data bind::/run/secrets/s3-access bind::/run/secrets/s3-secret |{\"9000/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"15646\"}]}",
+        "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f|/ontology-g4-doris-mapping-query-001-keycloak-test-1|running|1073741824|1000000000|sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4|volume:ontology-g4-doris-mapping-query-001_keycloak-data:/opt/keycloak/data bind::/run/secrets/keycloak-password |{\"8080/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"15643\"}]}",
+        "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04|/ontology-g4-doris-mapping-query-001-fuseki-1|running|2147483648|2000000000|sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c|volume:ontology-g4-doris-mapping-query-001_fuseki-data:/fuseki |{\"3030/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"15645\"}]}",
+        "34a947835a8949be5fb34bdc813e87ff812dca1d3381ccea7ce610754448367f|/ontology-g4-doris-mapping-query-001-platform-pg-1|exited|805306368|1000000000|sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437|bind::/run/secrets volume:ontology-g4-doris-mapping-query-001_platform-data:/var/lib/postgresql |{}",
+        "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2|/ontology-g4-doris-mapping-query-001-be-1|exited|6442450944|2000000000|sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7|volume:ontology-g4-doris-mapping-query-001_be-log:/opt/apache-doris/be/log volume:ontology-g4-doris-mapping-query-001_be-data:/opt/apache-doris/be/storage bind::/opt/apache-doris/be/conf/be.conf |{}",
+        "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5|/ontology-g4-doris-mapping-query-001-fe-1|exited|4294967296|2000000000|sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02|bind::/run/doris-tls volume:ontology-g4-doris-mapping-query-001_fe-data:/opt/apache-doris/fe/doris-meta volume:ontology-g4-doris-mapping-query-001_fe-log:/opt/apache-doris/fe/log bind::/opt/apache-doris/fe/conf/fe.conf |{}",
+        "cd563c910aa96e9c6eaabf32475d5bfe2ec56e6a9f754ca48b4287de1b8e653b|/ontology-g4-m5-integration-01-api-secondary-1|exited|805306368|750000000|sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55|bind::/app volume:ontology-g4-m5-integration-01_api-keyring:/keyring bind::/query-keyring bind::/runtime bind::/private/api |{}",
+        "22837b2b2702a851ca4553b6d0ff0ce09ac3d5f65f67b911f39598cbf1f804d8|/ontology-g4-m5-integration-01-api-1|exited|805306368|750000000|sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55|bind::/app volume:ontology-g4-m5-integration-01_api-keyring:/keyring bind::/query-keyring bind::/runtime bind::/private/api |{}",
+        "5e0f45ecaf9e2f227c4290891eeb26e577bfeaaaa8d5a5b0be7a15458656a49a|/ontology-g4-m5-integration-01-rustfs-1|exited|536870912|250000000|sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b|volume:ontology-g4-m5-integration-01_rustfs-data:/data bind::/run/secrets/s3-access bind::/run/secrets/s3-secret |{}",
+        "4a5dacfa92d7d9a119267365a65ab5037b98b4bb2292b9e47199b0bb14ab50b4|/ontology-g4-m5-integration-01-keycloak-test-1|exited|1073741824|500000000|sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4|volume:ontology-g4-m5-integration-01_keycloak-data:/opt/keycloak/data bind::/run/secrets/keycloak-password |{}",
+        "0edb069b759a2521cb56250f1db0227bd3cc8c81ad06210a1d8a7c7b52866534|/ontology-g4-m5-integration-01-fuseki-1|exited|1610612736|750000000|sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c|volume:ontology-g4-m5-integration-01_fuseki-data:/fuseki |{}",
+        "19f76154598ac31e4a075175aadafc0a2f22591281ecf5db0704fd65e26a502b|/ontology-g4-m5-integration-01-pg-source-1|exited|805306368|750000000|sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437|bind::/docker-entrypoint-initdb.d/01-fixture.sql bind::/run/secrets volume:ontology-g4-m5-integration-01_source-data:/var/lib/postgresql |{}",
+        "b71ef14e5e484253c0b435332c4480fc071268f634c0b049d5d4aff57c383912|/ontology-g4-m5-integration-01-platform-pg-1|exited|805306368|750000000|sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437|bind::/run/secrets volume:ontology-g4-m5-integration-01_platform-data:/var/lib/postgresql |{}",
+        "ed281bc42b432a4e20817b00dfbc7b480271f36368a24370414a6e6fb5b62dca|/ontology-g4-m4-query-impl-01-api-1|exited|805306368|750000000|sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55|bind::/app volume:ontology-g4-m4-query-impl-01_api-keyring:/keyring bind::/query-keyring bind::/runtime bind::/private/api |{}",
+        "fc53d2b9b9fc7d67344a79e1abcf107b32b832d762713979a3584da8d9d1c7f5|/ontology-g4-m4-query-impl-01-api-secondary-1|exited|805306368|750000000|sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55|bind::/app volume:ontology-g4-m4-query-impl-01_api-keyring:/keyring bind::/query-keyring bind::/runtime bind::/private/api |{}",
+        "47686c56bb164ed6577349fe47b20968f83630032d6c3ebd8ed55586a8846bbd|/ontology-g4-m4-query-impl-01-rustfs-1|exited|536870912|250000000|sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b|volume:ontology-g4-m4-query-impl-01_rustfs-data:/data bind::/run/secrets/s3-access bind::/run/secrets/s3-secret |{}",
+        "61791a2303a2945b9947824de91e763d22be03b538d1c0b76ee3ce44027a835f|/ontology-g4-m4-query-impl-01-keycloak-test-1|exited|1073741824|500000000|sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4|volume:ontology-g4-m4-query-impl-01_keycloak-data:/opt/keycloak/data bind::/run/secrets/keycloak-password |{}",
+        "f1a5f1cb913037f7716a3599bc19c1ed9eed11aa6db79b7f1a57c8dbe1c3943d|/ontology-g4-m4-query-impl-01-fuseki-1|exited|1610612736|750000000|sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c|volume:ontology-g4-m4-query-impl-01_fuseki-data:/fuseki |{}",
+        "c1bbd53e0b335a12c5e50bc860a58e6d3cb01de7d81a354ee87696dd0a941c81|/ontology-g4-m4-query-impl-01-pg-source-1|exited|805306368|750000000|sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437|bind::/docker-entrypoint-initdb.d/01-fixture.sql bind::/run/secrets volume:ontology-g4-m4-query-impl-01_source-data:/var/lib/postgresql |{}",
+        "d267220f4227b7c92f5d2e37e7e85a4587644488157c10e5f95586613bd08952|/ontology-g4-m4-query-impl-01-platform-pg-1|exited|805306368|750000000|sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437|bind::/run/secrets volume:ontology-g4-m4-query-impl-01_platform-data:/var/lib/postgresql |{}"
+      ]
+    },
+    "source": {
+      "original": {
+        "containerId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+        "volume": "ontology-g4-oracle-mapping-query-001_oracle-data",
+        "networkId": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab",
+        "state": "running"
+      },
+      "alternative": {
+        "containerId": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+        "volume": "ontology-g4-omq-replacement-01_oracle-data",
+        "networkId": "26fd20922335607a74f39db63b00715a116760047f76c9c64b58790b891e91dd",
+        "state": "exited"
+      }
+    },
+    "platform": {
+      "services": {
+        "platform-pg": {
+          "containerId": "eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5",
+          "volumes": [
+            "ontology-g4-omq-platform-01_platform-data"
+          ],
+          "observedNetworkIds": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          },
+          "frozenNetworkIds": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          },
+          "state": "running",
+          "mountsSha256": "d00a4a62abd4705ab4a629fbf1feaa162be3912c7ae0c10bcbc527c2b4f37899"
+        },
+        "keycloak-test": {
+          "containerId": "15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b",
+          "volumes": [
+            "ontology-g4-omq-platform-01_keycloak-data"
+          ],
+          "observedNetworkIds": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          },
+          "frozenNetworkIds": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          },
+          "state": "running",
+          "mountsSha256": "085cee4f43ba733570d43313353fccc0d1f60c58030faa30361ab966ace16c74"
+        },
+        "fuseki": {
+          "containerId": "9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb",
+          "volumes": [
+            "ontology-g4-omq-platform-01_fuseki-data"
+          ],
+          "observedNetworkIds": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          },
+          "frozenNetworkIds": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          },
+          "state": "running",
+          "mountsSha256": "847e6633012b38157aaa6ff72083e42a6e462c2e76a852a9154c1a5368c2d56f"
+        },
+        "rustfs": {
+          "containerId": "f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd",
+          "volumes": [
+            "ontology-g4-omq-platform-01_rustfs-data"
+          ],
+          "observedNetworkIds": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          },
+          "frozenNetworkIds": {
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+          },
+          "state": "running",
+          "mountsSha256": "24fa42d6d94d2641729283cc63d0550262eb69c989cb3e35f01d23aa915379e0"
+        },
+        "api": {
+          "containerId": "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+          "volumes": [],
+          "observedNetworkIds": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+            "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+          },
+          "frozenNetworkIds": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+            "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+          },
+          "state": "exited",
+          "mountsSha256": "9f89a6e961bd3aa9b38ff6c48661a6cc98d929e46354bd3c06eeedd4be147640"
+        },
+        "api-secondary": {
+          "containerId": "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+          "volumes": [],
+          "observedNetworkIds": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+            "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+          },
+          "frozenNetworkIds": {
+            "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+            "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+            "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+          },
+          "state": "exited",
+          "mountsSha256": "9f89a6e961bd3aa9b38ff6c48661a6cc98d929e46354bd3c06eeedd4be147640"
+        }
+      },
+      "archivedStoppedApiIds": {
+        "api": "f90b7e7b599ffb4e9b298ce3679f9f24b25c762b472487fe09fd52e3f8e378cf",
+        "api-secondary": "0f04589574f7ace57e784e1bf0525e6c2587819a0c882ebfc15a09f7203e689f"
+      },
+      "seal": {
+        "path": "s0-blocked-seal-01.json",
+        "bytes": 4277,
+        "sha256": "0c9154adf794b6c7ac190b3aed982b733ee7310bbc182d56c788158d1d824e08"
+      },
+      "activePlatformPorts": [
+        15743
+      ],
+      "privateMaterials": "KEEP_IN_PLACE"
+    },
+    "heldQuery": {
+      "witness": {
+        "path": "formal-witness-071127c7-2a34-40d7-9675-7cf967edfdb0.json",
+        "bytes": 42443,
+        "sha256": "b393b0dc31429cd4dd6e6b91ba2cd1b35a602f03e1dc773d687f67acd0afb589"
+      },
+      "queryId": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+      "clientId": "0e224578b55b4b479d98d3fa4ff1ac46",
+      "platformReadId": "693016efe5d84eb394eadaafe1ad400d",
+      "observedUtc": "2026-11-19T16:17:42.852625+00:00",
+      "heldOwner": "oracle-execution-004f5b3e04084f1998201939aaeec5e6",
+      "fence": 2,
+      "status": "CANCELLED",
+      "cancelAudits": 1,
+      "successEffects": [
+        0,
+        0,
+        0
+      ],
+      "currentWork": {
+        "runningQueries": 0,
+        "queuedOrRunningRuns": 0,
+        "queuedOrRunningCatalogJobs": 0,
+        "runningProbes": 0,
+        "queuedOrRunningMappingJobs": 0,
+        "undispatchedMappingOutbox": 0,
+        "undispatchedPublishingOutbox": 0
+      },
+      "currentWorkReadId": "857224b6116e4a4eb65325cc99f32d3f",
+      "sourceObserver": "OMQ_OBSERVER TCPS FREEPDB1",
+      "currentMatchingSourceSessions": 0,
+      "nativeTerminationAtCommit": "NOT_PROVEN",
+      "cleanup": "UNCONFIRMED_HOLD",
+      "slotReleased": false
+    },
+    "postmortem": {
+      "path": "formal-cancel-postmortem-log-01.json",
+      "bytes": 1862,
+      "sha256": "2b78ca10dacf73e701bd7c509c2500f65370f6bb2191c2ff2bd8127115f7fa27"
+    },
+    "earlyOracleRecovery": {
+      "status": "EARLY_SOURCE_RECOVERY_PASS",
+      "scope": "early Oracle source data and separate trust/auth only",
+      "records": [
+        {
+          "path": "recovery-01.json",
+          "bytes": 26588,
+          "sha256": "5143756e60f571eac94953f428101af036bbde08821f36d776935c99c35b6e61"
+        },
+        {
+          "path": "recovery-01-resume.json",
+          "bytes": 23703,
+          "sha256": "e144ea178b808b7ee6c8341f748f052668f9e478159eb84e4bd07df4e85bcc08"
+        },
+        {
+          "path": "recovery-01-final.json",
+          "bytes": 14214,
+          "sha256": "8d80d0f73bbae996e46d48504c1a7f40ea08ca36d13e9c917d0e6186f418d6b4"
+        }
+      ],
+      "backupFiles": [
+        {
+          "name": "database.tar",
+          "bytes": 4330629120,
+          "sha256": "41a2fc228ebb760087282a48253718e89bb637aa241182b09316fd0f4499dafb"
+        },
+        {
+          "name": "trust-and-auth.tar",
+          "bytes": 67891200,
+          "sha256": "0ceedc75a91fa234066f139093bc9e105c0024b9fc6d9e36687d295f8628a479"
+        }
+      ],
+      "sourceDriverEvidence": "8843c2d9422e99ede8edef77efe35a0ce56aacbaf2bcd94410d02ed5f6fa3bca",
+      "diskBytesAtOriginalBackup": 4398546944,
+      "backupRereadThisCheck": false
+    },
+    "earlyFullPlatformBackup": "NOT_RUN",
+    "earlyIsolatedFullStackRestore": "NOT_RUN",
+    "finalPrivateBackup": "NOT_RUN",
+    "finalIsolatedFullStackRestore": "NOT_RUN",
+    "productIntake": "NO_NEW_DELIVERY_BY_THIS_CHECK",
+    "disposition": "KEEP current source and four platform services running, both current and archived API instances stopped, alternative source volume and private material",
+    "resumption": [
+      "A separate decision must establish a measurable positive using a still-in-flight formal fixed SQL.",
+      "Preserve this QueryId, immutable failed witness and owner/fence. Resolve UNKNOWN by an explicitly reviewed recovery condition.",
+      "Record actual native cold copies and isolated whole-stack recovery before crediting platform or final recovery."
+    ]
+  },
+  "endedUtc": "2026-11-19T16:17:42.975969+00:00"
+}

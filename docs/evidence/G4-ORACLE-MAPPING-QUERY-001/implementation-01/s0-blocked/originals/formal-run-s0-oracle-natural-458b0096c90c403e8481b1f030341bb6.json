@@ -1,0 +1,144 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s0-oracle-natural",
+  "case": "healthy",
+  "stageInputs": {
+    "phase": "s0",
+    "mode": "s0-oracle-natural",
+    "case": "healthy",
+    "prerequisiteSha256": "5f5e12e5ddb269f145bd60f8f47b5ce9991ef51cbe5c84b56e5e9bee276a2a9f",
+    "connectionId": "a7913bb552eb4cd1a3f6eaf5b93cd619",
+    "readerSubjectId": "f902a743-7079-4e22-a643-a51deb027e89",
+    "catalogSnapshotId": "068c3ce7002b4a56a7589152b988ae0b",
+    "catalogFingerprint": "c90c6ec62cb66f1e90c05f8cae86210a24b73cbefb1b776db2697a802e47eb02",
+    "activationRevision": 1,
+    "mappingReleaseId": "release-11a4d557b4f34cf99e23352c70e1d9fb",
+    "fixtureBefore": {
+      "counts": [
+        100,
+        1
+      ],
+      "baseHashes": [
+        "b239f629fc0aa5c69e7478b19cbff0b7aa647a5ce2542934a574764a810c72b6",
+        "95cbe188db9e17b2d97b93736d884dd6c5faa17c831e0e8a11e38ad807151667"
+      ],
+      "hashes": [
+        "a5e9350699e0e73f6710d85c9374c465ad762365787f465d0878b3a71608efab",
+        "59b89ac9e0245fe1d9d85345bcf1ee032ec5fe5e1da1ea2ea746fb21d4ba8d0a"
+      ],
+      "commandIds": [
+        "d087e9eab7b04b50839751a4b6b11c31",
+        "65a60b7586d246c0bd17c2545cf22c35"
+      ]
+    }
+  },
+  "host": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "runId": "implementation-01",
+    "ports": {
+      "api": 15741,
+      "secondary": 15742,
+      "oidc": 15743,
+      "web": 15744
+    },
+    "commandId": "49f150cf17254e959ee509fd1881afa9",
+    "snapshotId": "ac3370165c2817682f81e7809ca33c39c7fa9a4d63e543c1d0a5964850c9da3e",
+    "buildInputKey": "fef0098d3d83c5f2b8f73e287ffe9239481f4313b8ab8466a141856a77afe255",
+    "buildOutputKey": "6adef44cd6de46629c889ab323470ef891e43cfda45530f42aeea5ff18b9c973",
+    "runtimeHelperSha256": "e33db34a2c7931a967df9765862f827fb48c6e2432263ddc89f9995077ba55dc",
+    "composeSha256": "3a16fc42154d6d66af8132b1a69d24d605882d949c454426364f607014e230e0",
+    "services": {
+      "api": {
+        "containerId": "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+        "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "pid": 74370,
+        "startedAt": "2026-11-19T15:50:22.809675295Z",
+        "mountSha256": "04ce2db79abe45363162e4449b57bcea9f5ab35067ba7101159ce226f9db358a",
+        "networks": {
+          "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+          "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+        }
+      },
+      "api-secondary": {
+        "containerId": "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+        "imageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "pid": 74662,
+        "startedAt": "2026-11-19T15:50:26.798344422Z",
+        "mountSha256": "04ce2db79abe45363162e4449b57bcea9f5ab35067ba7101159ce226f9db358a",
+        "networks": {
+          "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd",
+          "ontology-g4-oracle-mapping-query-001_source-internal": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+        }
+      },
+      "fuseki": {
+        "containerId": "9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb",
+        "imageId": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "pid": 63239,
+        "startedAt": "2026-11-19T15:37:01.441168508Z",
+        "mountSha256": "6df1268cfd2a3fe1527bd9ea4148ba78088a32b4f3f9f9ff4b58610c94a70e16",
+        "networks": {
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      },
+      "keycloak-test": {
+        "containerId": "15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b",
+        "imageId": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "pid": 63311,
+        "startedAt": "2026-11-19T15:37:01.497832133Z",
+        "mountSha256": "06889e35f273a8a0f90e66b4c208c301da669fe40833f201718ef33c29e1f8bc",
+        "networks": {
+          "ontology-g4-omq-platform-01_host-entry": "0a4c9e1b170ca866ce0176a485c02e94b7ef1ae87e1c48fe0fdfe5443baff32d",
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      },
+      "platform-pg": {
+        "containerId": "eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5",
+        "imageId": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "pid": 63380,
+        "startedAt": "2026-11-19T15:37:01.563379091Z",
+        "mountSha256": "219b9ad971a6dffd0b736653c39e209dc5bb8720a11ca41edd72c7ee159eddc3",
+        "networks": {
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      },
+      "rustfs": {
+        "containerId": "f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd",
+        "imageId": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "pid": 63175,
+        "startedAt": "2026-11-19T15:37:01.382114299Z",
+        "mountSha256": "5a0f32a9985d50de4cb06b57bb645ea0f35441343565888efe7f98f7a9d34d24",
+        "networks": {
+          "ontology-g4-omq-platform-01_platform-internal": "89184bbd8c1c66fb09b144035d6a42746c8b90b4b5af896cb6f55e915fd99efd"
+        }
+      }
+    },
+    "oracle": {
+      "containerId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+      "imageId": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+      "networkId": "897fa738e0d6f543a481b7b9311ffeb2ec0e713a1ce03d82e3b9aff450620bab"
+    }
+  },
+  "builds": {
+    "api": {
+      "receiptSha256": "049c85693f46fbf1b9a24c75d6a2caea01478922a76e5d0baeb799dfa39c6928",
+      "inputKey": "fef0098d3d83c5f2b8f73e287ffe9239481f4313b8ab8466a141856a77afe255",
+      "outputKey": "6adef44cd6de46629c889ab323470ef891e43cfda45530f42aeea5ff18b9c973"
+    },
+    "agent": {
+      "receiptSha256": "72a8f1306f1fd9dbe276f2141e843742f26395400d57d655386180851b93df5b",
+      "inputKey": "fef0098d3d83c5f2b8f73e287ffe9239481f4313b8ab8466a141856a77afe255",
+      "outputKey": "4c838493a508417a7c561fcf532c667262365bcda49c7bd34e6e890d48e2709c"
+    }
+  },
+  "commandId": "458b0096c90c403e8481b1f030341bb6",
+  "exitCode": 0,
+  "resourceAttempt": "96ea0a34e0594d2897de9c6a5400c68d",
+  "preflightCommandId": "026b86c5642c452ea84093e6892b537e",
+  "reports": [
+    "browser-s0-oracle-natural-1795104439446.json"
+  ],
+  "testedCommit": "dfe38a6c4ca5ab217361136dc2a07e949e70a38a"
+}
