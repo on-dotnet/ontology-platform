@@ -15,7 +15,7 @@ if (!["G4-M4-QUERY-001", "G4-M5-INTEGRATION-001", "G4-DORIS-MAPPING-QUERY-001"].
 const doris = task === "G4-DORIS-MAPPING-QUERY-001";
 const integration = task === "G4-M5-INTEGRATION-001", runId = doris ? "implementation-01" : integration ? "integration-01" : "query-impl-01";
 const evidenceRun = doris ? (process.env.G4_DORIS_EVIDENCE_RUN ?? runId) : runId;
-if (doris && ![runId, "review-fix-01"].includes(evidenceRun)) throw new Error("DORIS_EVIDENCE_RUN");
+if (doris && ![runId, "review-fix-01"].includes(evidenceRun) && !(evidenceRun === "review-fix-02" && argument("mode") === "s2-doris-ready")) throw new Error("DORIS_EVIDENCE_RUN");
 const scenario = integration ? argument("scenario") : null;
 if (integration && !["standard", "numeric", "safety", "aba"].includes(scenario)) throw new Error("INTEGRATION_SCENARIO_INVALID");
 const moduleName = doris ? "workflow_doris_s1" : integration ? "workflow_m5_integration" : "workflow_m4_query";

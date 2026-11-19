@@ -294,6 +294,19 @@ def direct_task_proof(directory, case):
                 timing=shared['timing'],inputs=shared['inputs'])
 
 
+def session_scratch(output, name):
+    """为既有票据探针独占一个新 Owner 临时文件；运行回执归属当前批次。"""
+    import os
+    import re
+    from workflow_execution import ordinary
+    if output.name!='review-fix-02' or not re.fullmatch(r'session-ready-[0-9a-f]{32}\.json',name):
+        raise ValueError('RF02_SESSION_PATH')
+    path=ordinary(output.parent/'implementation-01'/name)
+    fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+    os.close(fd)
+    return path
+
+
 def qualify_review_fix(gate, input_key, public):
     """重开本轮定向运行，按当前构建、驱动、真实命令与原件核定各受影响门禁。"""
     import datetime

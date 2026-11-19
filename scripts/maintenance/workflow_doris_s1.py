@@ -47,6 +47,11 @@ def admit_build():
 
 
 def freeze_api():
+    if vm.EVIDENCE_RUN=='review-fix-02':
+        frozen=json.loads(SNAPSHOT.read_bytes())
+        snapshots.verify(ROOT,frozen,task=vm.TASK,run_id='review-fix-01')
+        vm.demand(frozen['inputs']==admit_build(),'S1_HOST_BINDING')
+        return frozen
     binding = admit_build()
     b = ROOT/'artifacts/workflow'/vm.TASK/'api-build-binding.json'
     candidate = json.loads(b.read_bytes())
@@ -206,7 +211,10 @@ BROWSER = ('s2-doris-ready','s2-doris-root-deadline','s3','ui-s1','ui-s3','s2-do
 def runtime_binding():
     row = json.loads(HOST.read_bytes())
     snapshot = json.loads(SNAPSHOT.read_bytes())
-    snapshots.verify(ROOT,snapshot,task=vm.TASK,run_id=vm.EVIDENCE_RUN)
+    if vm.EVIDENCE_RUN=='review-fix-02':
+        snapshots.verify(ROOT,snapshot,task=vm.TASK,run_id='review-fix-01')
+    else:
+        snapshots.verify(ROOT,snapshot,task=vm.TASK,run_id=vm.EVIDENCE_RUN)
     pid = str(row['pid'])
     dll = ROOT/snapshot['directory']/'OntologyPlatform.Api.dll'
     vm.demand(row['taskId']==vm.TASK and row['runId']==vm.RUN and row['status']=='READY'
@@ -252,6 +260,8 @@ def browser_test(mode, prepared, readiness_stage='baseline', counterexample=None
 
 
 def run_browser(mode, prepared, readiness_stage, run_key, validation_url, counterexample):
+    if vm.EVIDENCE_RUN=='review-fix-02':
+        vm.demand(mode=='s2-doris-ready' and readiness_stage=='baseline','RF02_READY_ONLY')
     dependency_path=execution.ordinary(Path(prepared).absolute())
     vm.demand(dependency_path.is_relative_to(ROOT/'artifacts/workflow'/vm.TASK/'environment'),'S1_ENVIRONMENT_PATH')
     dep=json.loads(dependency_path.read_bytes())
@@ -467,8 +477,14 @@ def scenario_ready(state, stage, connection, active, actors):
     env=dict(PATH=os.environ['PATH'],G4_BROWSER_PREFLIGHT='1',G4_QUERY_RUNTIME_TEST=vm.TASK+':'+vm.RUN,
              G4_DORIS_EVIDENCE_RUN=vm.EVIDENCE_RUN,G4_BROWSER_REPORT=str(session_file),DMQ_SESSION_SECONDS=str(window['execute']),
              ASPNETCORE_ENVIRONMENT='Development',DOTNET_CLI_TELEMETRY_OPTOUT='1')
+    if vm.EVIDENCE_RUN=='review-fix-02':
+        from workflow_doris_mapping_evidence import session_scratch
+        session_source=session_scratch(OUT,session_file.name)
+        env.update(G4_DORIS_EVIDENCE_RUN=vm.RUN,G4_BROWSER_REPORT=str(session_source))
     result=execution.run([dotnet,str(dll),'--filter','FullyQualifiedName=OntologyPlatform.AgentTests.G4QueryMafRuntimeTests.BrowserSessionsCoverRegisteredExecutionDeadline','--minimum-expected-tests','1','--no-ansi','--progress','off','--results-directory',str(OUT/'session-tests')],
         ROOT,task=vm.TASK,run_id=vm.EVIDENCE_RUN,stage='dmq-current-sessions',environment=env,stdin=execution.encoded(actors),input_key=execution.sha(execution.encoded(tested)),timeout=20)
+    if vm.EVIDENCE_RUN=='review-fix-02':
+        session_source.rename(session_file)
     vm.demand(result.returncode==0 and len(json.loads(session_file.read_bytes()))==4,'PREREQUISITE_STALE:session')
     baseline=json.loads((OUT/'s0-fixed-fixture-0da9ac2fd127ad4f-restored.json').read_bytes())
     fe=resources['fe']

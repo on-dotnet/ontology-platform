@@ -17,7 +17,7 @@ TASK = 'G4-DORIS-MAPPING-QUERY-001'
 RUN = 'implementation-01'
 # 资源 Owner 在整个复审期保留原标签；命令与可变回执写入新运行目录。
 EVIDENCE_RUN = os.environ.get('G4_DORIS_EVIDENCE_RUN', RUN)
-if EVIDENCE_RUN not in (RUN, 'review-fix-01'):
+if EVIDENCE_RUN not in (RUN, 'review-fix-01', 'review-fix-02'):
     raise ValueError('DMQ_EVIDENCE_RUN')
 OUTPUT = ROOT / 'artifacts/workflow' / TASK / EVIDENCE_RUN
 GIB = 1 << 30

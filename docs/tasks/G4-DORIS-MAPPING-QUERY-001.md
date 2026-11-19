@@ -2,7 +2,7 @@
 
 ## 当前执行与授权
 
-唯一执行状态为 **WAITING_CHATGPT_REVIEW**。ChatGPT 对 `0c287e45e1c355a00cfd5403d6cb787026b127e1` 的裁决为 REQUEST_CHANGES。RF-01 原阻断 AC09，本轮定向实测、受影响工作流及非作者变更复审均已通过。G4 总体 PARTIAL。分支 `codex/g4-doris-mapping-query-001`，主线 `606ca2d2c61964e6498dd72d5e9ad960d3593bf7`。实现与证据采用同一 TaskId，本次 EvidenceRunId 为 `review-fix-01`。资源 Owner 仍为 `implementation-01`。
+唯一执行状态为 **RF02_IN_PROGRESS**。本轮 Base 为 `a363fbd53d3f2813539534f921f2b21004638eec`。唯一阻断是 E1 命令指纹与执行输入的资格绑定。RF-01、E2、E3 及新 AC06 已获限定接受，G4 总体 PARTIAL。
 
 Master 单写。范围、所有权、数据与期限以[唯一 A–F 合同](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)为准。当前复审修复覆盖共享语义期限、三个既有工程入口及对应定向验证。
 
