@@ -79,11 +79,28 @@ def source_status():
                         diskBytesAtOriginalBackup=cold['allocatedSourceBytes'], backupRereadThisCheck=False)
 
 
-def platform_status():
+def platform_status(witness):
     owned = record('formal-resources.json')
     require(set(owned['ids']) == set(platform.QUOTAS) and set(owned['volumes']) == set(platform.VOLUMES), 'PLATFORM_SET')
     running, _, ports = platform.verify_owned_platform(AREA, docker)
-    require(running == set(owned['ids'].values()) and ports == {15741,15742,15743}, 'PLATFORM_STATE')
+    require(owned['state']=='S0_BLOCKED_SEALED' and running == {owned['ids'][n] for n in platform.VOLUMES}
+            and ports == {15743}, 'PLATFORM_SEALED_STATE')
+    seal=record('s0-blocked-seal-01.json')
+    obs=record(witness)
+    require(seal['status']=='BUSINESS_ENTRY_SEALED_OWNER_RETAINED' and seal['queryId']==obs['queryId']
+            and seal['oldInventorySha256']==INVENTORY_SHA, 'SEAL_ID')
+    stages=seal['steps']
+    require([r.get('stage',r.get('service')) for r in stages]==
+            ['pre','pre-confirm','api-secondary','after-api-secondary','api','after-api'],'SEAL_STAGES')
+    for row in (r for r in stages if 'counts' in r):
+        counts=dict(row['counts'])
+        require(counts.pop('owner')==obs['terminalReadback']['state']['owner'] and
+                set(counts)=={'mappingJobs','mappingOutbox','publishingOutbox','agentRuns','activeQueries'}
+                and not any(counts.values()) and row['sourceReaderSessions']==0, 'SEAL_DRAIN')
+    sealed={r['service']:r for r in stages if 'service' in r}
+    compose=ex.ordinary(AREA/'formal-api-compose.json').read_bytes()
+    require(ex.sha(compose)==obs['hostAfter']['composeSha256']==record('formal-api-inputs.json')['composeSha256'],'SEALED_COMPOSE')
+    config=json.loads(compose)
     original = record('source-create-01.json')
     networks = {platform.PROJECT+'_'+role: value for role,value in owned['networks'].items()}
     networks[original['network']] = original['networkId'].split()[0]
@@ -98,20 +115,37 @@ def platform_status():
             required.add(platform.PROJECT+'_host-entry')
         if name in ('api','api-secondary'):
             required.add(original['network'])
-        require(row_nets == {k:networks[k] for k in required}, 'PLATFORM_NETWORK_'+name)
+        configured={k:networks[k] for k in required}
+        tracking='running'
+        if name in sealed:
+            step=sealed[name]
+            require(step['before']==[cid,TASK,RUN,'running','0','false'] and step['after'][:4]==[cid,TASK,RUN,'exited']
+                    and step['after'][4] in ('0','143') and step['after'][5]=='false', 'SEALED_ID')
+            frozen=obs['hostAfter']['services'][name]
+            require(frozen['containerId']==cid and frozen['imageId']==platform.IMAGES[name] and frozen['networks']==configured
+                    and frozen['mountSha256']==ex.sha(ex.encoded(json.loads(mounts))), 'PRE_SEAL_BINDING')
+            actual=docker('sealed-api-state','inspect','-f','{{.State.Status}}|{{.State.ExitCode}}|{{.State.OOMKilled}}|{{.HostConfig.NetworkMode}}',cid).split('|')
+            require(actual[:3]==step['after'][3:] and actual[3] in configured and
+                    set(config['services'][name]['networks'])=={'source-internal','platform-internal','host-entry'} and
+                    config['networks']['source-internal']['name']==original['network'], 'SEALED_STATE_NETWORK_CONFIG')
+            # Docker 对退出容器清空活动端点。保留当前仍可见的值，按停前冻结网络逐项核验。
+            require(set(row_nets)<=required and all(not v or v==configured[k] for k,v in row_nets.items()),'SEALED_NETWORK_DRIFT')
+            tracking='exited'
+        else:
+            require(row_nets==configured,'PLATFORM_NETWORK_'+name)
         volumes = [r['Name'] for r in json.loads(mounts) if r['Type']=='volume']
         require(volumes == ([owned['volumes'][name]] if name in platform.VOLUMES else []), 'PLATFORM_MOUNT_'+name)
         if volumes:
             identity=docker('volume-identity','volume','inspect','-f','{{.Name}}|{{.Driver}}|{{index .Labels "ontology.task"}}|{{index .Labels "ontology.run"}}|{{index .Labels "com.docker.compose.project"}}',volumes[0])
             require(identity=='|'.join((volumes[0],'local',TASK,RUN,platform.PROJECT)), 'PLATFORM_VOLUME_OWNER')
-        services[name]=dict(containerId=cid,volumes=volumes,networkIds=row_nets,state='running',mountsSha256=ex.sha(mounts.encode()))
+        services[name]=dict(containerId=cid,volumes=volumes,observedNetworkIds=row_nets,frozenNetworkIds=configured,state=tracking,mountsSha256=ex.sha(mounts.encode()))
     archived={}
     for name,cid in owned['archivedApiIds'].items():
         require(name in ('api','api-secondary') and re.fullmatch(CID,cid) and cid not in running, 'ARCHIVED_ID')
         query='{{.Id}} {{.Image}} {{index .Config.Labels "ontology.task"}} {{index .Config.Labels "ontology.run"}} {{.State.Status}} {{.State.OOMKilled}}'
         require(docker('archived','inspect','-f',query,cid).split()==[cid,platform.IMAGES[name],TASK,RUN,'exited','false'], 'ARCHIVED_STATE')
         archived[name]=cid
-    return running, dict(services=services,archivedStoppedApiIds=archived,privateMaterials='KEEP_IN_PLACE')
+    return running, dict(services=services,archivedStoppedApiIds=archived,seal=ref('s0-blocked-seal-01.json'),activePlatformPorts=sorted(ports),privateMaterials='KEEP_IN_PLACE')
 
 
 def held_query(witness):
@@ -149,7 +183,7 @@ def status(witness):
     require(re.fullmatch('formal-witness-[a-f0-9-]{36}\\.json',witness),'WITNESS_PATH')
     running,retained=protected_resources()
     source,backup=source_status()
-    platform_ids,platforms=platform_status()
+    platform_ids,platforms=platform_status(witness)
     require(set(docker('all-running','ps','-q','--no-trunc').splitlines())==running|platform_ids|{source['original']['containerId']},
             'UNACCOUNTED_RUNNING_RESOURCE')
     hold=held_query(witness)
@@ -159,7 +193,7 @@ def status(witness):
                 postmortem=ref('formal-cancel-postmortem-log-01.json'),earlyOracleRecovery=backup,
                 earlyFullPlatformBackup='NOT_RUN',earlyIsolatedFullStackRestore='NOT_RUN',finalPrivateBackup='NOT_RUN',
                 finalIsolatedFullStackRestore='NOT_RUN',productIntake='NO_NEW_DELIVERY_BY_THIS_CHECK',
-                disposition='KEEP current source, four platform services, both API instances, alternative source volume and private material',
+                disposition='KEEP current source and four platform services running, both current and archived API instances stopped, alternative source volume and private material',
                 resumption=['A separate decision must establish a measurable positive using a still-in-flight formal fixed SQL.',
                             'Preserve this QueryId, immutable failed witness and owner/fence. Resolve UNKNOWN by an explicitly reviewed recovery condition.',
                             'Record actual native cold copies and isolated whole-stack recovery before crediting platform or final recovery.'])
