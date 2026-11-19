@@ -124,6 +124,10 @@ public interface ISemanticRuntime
     /// <returns>仅全部实际回验符合时为真。</returns>
     Task<bool> VerifyAsync(ReleaseManifest manifest, SourceBundle sources, CancellationToken cancellationToken);
 
+    /// <summary>完成 VerifyAsync 的全部校验及实际图 SHACL，并返回同次回读的数组；不合格返回空。</summary>
+    Task<PublishedRdfData?> VerifyPublishedBatchAsync(ReleaseManifest manifest, SourceBundle sources, CancellationToken cancellationToken)
+        => Task.FromException<PublishedRdfData?>(new SemanticOperationException(503, "verified_runtime_unavailable"));
+
     /// <summary>只读取服务器确认的正式图，不接受用户SPARQL。</summary>
     /// <param name="snapshot">来自正式发布Catalog的完整快照。</param>
     /// <param name="cancellationToken">取消信号。</param>
@@ -157,6 +161,14 @@ public interface IReleaseCatalog
     /// <param name="cancellationToken">取消信号。</param>
     /// <returns>已授权的正式清单与实际状态。</returns>
     Task<ReleaseSummary> ResolveAsync(ActorContext actor, string assetId, string? releaseId, CancellationToken cancellationToken);
+}
+
+/// <summary>供固定发布的后端消费者在单一请求内消费已授权并完成实际图 SHACL 的批次。</summary>
+public interface IVerifiedReleaseBatchCatalog
+{
+    /// <summary>逐请求重新授权与读回，返回当前 PG 发布、逐槽位对象字节和同次核验的图。</summary>
+    Task<(ReleaseManifest Manifest, byte[][] SourceObjects, PublishedRdfData Graph)> ReadVerifiedBatchAsync(
+        ActorContext actor, string assetId, string releaseId, CancellationToken cancellationToken);
 }
 
 /// <summary>只提供受控不可变发布对象的适配边界。</summary>

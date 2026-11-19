@@ -21,6 +21,84 @@ public sealed class VerifiedReadTests
         Assert.AreEqual("verified_runtime_unavailable", error.Code);
     }
 
+    /// <summary>合并后的独立单次校验须返回同批实际图，拒绝不一致图或不符合的 SHACL，取消时回收临时图。</summary>
+    [TestMethod]
+    [DataRow("valid")]
+    [DataRow("graph")]
+    [DataRow("shacl")]
+    [DataRow("cancel")]
+    public async Task VerifiedBatchRequiresActualComparedGraphsAndShacl(string scenario)
+    {
+        // 每个反例使用本测试新建的唯一发布图，结束后按同一身份移除。
+        var source = Sources();
+        if (scenario == "shacl") source = source with { ShapesTurtle = source.ShapesTurtle +
+            "<urn:verified:shape> a sh:NodeShape ; sh:targetClass <urn:verified:C> ; sh:property [ sh:path <urn:verified:missing> ; sh:minCount 1 ] ." };
+        // 唯一图名及精确哈希从本次源生成。
+        var manifest = Manifest(source);
+        // 实际请求计数区分一次回读、SHACL 与错误短路。
+        var formalReads = 0;
+        // SHACL 必须读取实际正式图所组成的验证图。
+        var validations = 0;
+        // 临时图登记集仅记录随机 IRI，不保留源码。
+        var created = new HashSet<string>();
+        // 清理的图身份须与本次登记集合相等。
+        var deleted = new HashSet<string>();
+        // 验证真实调用者取消仍执行独立临时图收尾。
+        using var cancellation = new CancellationTokenSource();
+        // 测试网关仍将请求转发真实的本任务 Fuseki。
+        var runtime = SemanticFixture.RuntimeWithGate((request, _) =>
+        {
+            // 仅记录本次回环目标的路径与图标识。
+            var uri = request.RequestUri!;
+            if (uri.AbsolutePath == "/ontology/data" && request.Method == HttpMethod.Get) formalReads++;
+            if (uri.AbsolutePath == "/validation/shacl") validations++;
+            if (uri.AbsolutePath == "/validation/data")
+            {
+                if (request.Method == HttpMethod.Put) created.Add(uri.Query);
+                if (request.Method == HttpMethod.Delete) deleted.Add(uri.Query);
+                if (scenario == "cancel" && request.Method == HttpMethod.Get) cancellation.Cancel();
+            }
+            return Task.CompletedTask;
+        });
+        try
+        {
+            await SemanticFixture.Runtime().DeployAsync(manifest,source,default);
+            if (scenario == "graph") await ChangeGraphAsync(manifest.DataGraphIri,"<urn:verified:changed> <urn:verified:p> 1 .",default);
+            if (scenario == "cancel")
+            {
+                await Assert.ThrowsAsync<OperationCanceledException>(() => runtime.VerifyPublishedBatchAsync(manifest,source,cancellation.Token));
+                Assert.IsNotEmpty(created);
+            }
+            else
+            {
+                // 合法对象也不能掩盖图篡改或真实约束不符合。
+                var batch = await runtime.VerifyPublishedBatchAsync(manifest,source,default);
+                Assert.AreEqual(2,formalReads);
+                Assert.AreEqual(scenario == "graph" ? 0 : 1,validations);
+                if (scenario == "valid")
+                {
+                    Assert.IsNotNull(batch);
+                    Assert.IsTrue(batch.OntologyTriples.Any(triple => triple.Subject.Value == "urn:verified:C"));
+                    Assert.IsTrue(batch.DataTriples.Any(triple => triple.Subject.Value == "urn:verified:i"));
+                }
+                else Assert.IsNull(batch);
+            }
+            Assert.IsTrue(created.SetEquals(deleted));
+            // 对每个试验暂存图确认实际服务已返回 404，而非只统计清理请求。
+            using var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect=false, UseProxy=false });
+            foreach (var name in created)
+            {
+                using var missing = await client.GetAsync(Environment.GetEnvironmentVariable("G2_SEM_JENA_ORIGIN") + "/validation/data" + name);
+                Assert.AreEqual(System.Net.HttpStatusCode.NotFound,missing.StatusCode);
+            }
+        }
+        finally
+        {
+            await ChangeGraphAsync(manifest.OntologyGraphIri,null,default);
+            await ChangeGraphAsync(manifest.DataGraphIri,null,default);
+        }
+    }
+
     /// <summary>正式图只读取一次，返回对账过的原数组；两次正式读取之间的变动不能触发二次取数。</summary>
     [TestMethod]
     public async Task VerifiedReadReturnsExactlyTheComparedBatch()

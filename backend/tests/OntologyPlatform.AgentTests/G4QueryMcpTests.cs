@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using MySqlConnector;
+using OntologyPlatform.Modules.Publishing;
 using OntologyPlatform.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
@@ -58,6 +61,30 @@ public sealed partial class G4QueryMafRuntimeTests
     [TestMethod]
     public Task DorisExpiredSessionRejectsInflightQuery() => RunDorisRaceAsync("session");
 
+    /// <summary>固定实体读取返回后、目录后验发出前，对同一合成目录执行真实列改名。</summary>
+    [TestMethod]
+    public Task DorisTableChangeRejectsInflightRows() => RunDorisRaceAsync("ddl");
+
+    /// <summary>在真实实体读取之后用 A 的正式会话轮换该合成连接的秘密版本。</summary>
+    [TestMethod]
+    public Task DorisRotatedCredentialRejectsInflightQuery() => RunDorisRaceAsync("rotate");
+
+    /// <summary>在正常 Doris 读取后只锁本次查询行，实测最终提交对五秒总期限的处理。</summary>
+    [TestMethod]
+    public Task DorisLockedCommitHonorsRealDeadline() => RunDorisRaceAsync("deadline");
+
+    /// <summary>平台库自身的短锁等待先于总期限耗尽时，准确返回登记的拒绝。</summary>
+    [TestMethod]
+    public Task DorisCommitRejectsPlatformLockTimeout() => RunDorisRaceAsync("lock");
+
+    /// <summary>真实数据行已读完时中断本次源连接，后验失败不得交付旧行或 EMPTY。</summary>
+    [TestMethod]
+    public Task DorisDroppedConnectionDiscardsUnverifiedRows() => RunDorisRaceAsync("disconnect");
+
+    /// <summary>在正式取消路径验证真实发布对象受损、槽位或快照错配及当前授权拒绝。</summary>
+    [TestMethod]
+    public Task CancelRequiresSingleVerifiedReleaseBatch() => RunDorisRaceAsync("batch");
+
     /// <summary>使用正式宿主和服务器票据，仅在受控的竞争阶段切换授权或版本。</summary>
     private static async Task RunDorisRaceAsync(string scenario)
     {
@@ -109,8 +136,376 @@ public sealed partial class G4QueryMafRuntimeTests
         if (scenario == "aba")
             await MappingAbaAfterRealReadAsync(scope.ServiceProvider, participants["Q"].Actor, original, db, proposalId!,
                 participants["A"], participants["C"], participants["B"].Actor.SubjectId);
+        else if (scenario == "batch")
+            await VerifyCancelBatchFaultsAsync(scope.ServiceProvider, participants["Q"].Actor, original);
+        else if (scenario is "deadline" or "lock")
+            await VerifyContendedCommitDeadlineAsync(scope.ServiceProvider, participants["Q"].Actor, original, db, scenario == "deadline");
+        else if (scenario == "rotate")
+            await RotateDorisDuringCommitAsync(scope.ServiceProvider, participants["Q"].Actor, participants["A"], original, db, envelope.RootElement.GetProperty("rotation"));
+        else if (scenario is "ddl" or "disconnect")
+            await VerifyDorisPostcheckFailureAsync(scope.ServiceProvider, participants["Q"].Actor, original, db, scenario == "disconnect");
         else
             await DenyDorisCommitAfterReadAsync(scope.ServiceProvider, participants["Q"].Actor, original, db, scenario == "session");
+    }
+
+    /// <summary>在真实 PG、RustFS 与 Fuseki 的只读结果上注入单项故障，各次取消须单独重新核验。</summary>
+    private static async Task VerifyCancelBatchFaultsAsync(IServiceProvider services, ActorContext reader, G4QueryRecord original)
+    {
+        // 准确资产和发布来自该 Q 已成功执行的固定实体查询。
+        using var doc = JsonDocument.Parse(original.RequestBytes);
+        // 不在测试中重建本体或 Mapping 快照。
+        var query = doc.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
+        // 只损坏一次请求中已经真实回读的 Turtle 对象，不改底层不可变字节。
+        var storage = new CorruptSourceRead(services.GetRequiredService<IReleaseArtifactStore>());
+        // 使用原发布目录、正式 DB 上下文、原图核验；只置换故障对象读取边界。
+        var guarded = new PublishingCatalog(services.GetRequiredService<PublishingDbContext>(),
+            new ReleaseVerifier(storage,services.GetRequiredService<ISemanticRuntime>()));
+        // 精确范围缺失时在访问 S3/Jena 前拒绝。
+        var forbidden = await Assert.ThrowsAsync<SemanticOperationException>(() =>
+            guarded.ReadVerifiedBatchAsync(reader with { SiteIds=[] },query.AssetId,query.OntologyReleaseId,default));
+        Assert.AreEqual((403,"scope_denied"),(forbidden.Status,forbidden.Code));
+        Assert.AreEqual(0,storage.Reads);
+        // 当前范围恢复后真正读取 RustFS，原始 PG 字节比较必须捕捉到这次故障。
+        var damaged = await Assert.ThrowsAsync<SemanticOperationException>(() =>
+            guarded.ReadVerifiedBatchAsync(reader,query.AssetId,query.OntologyReleaseId,default));
+        Assert.AreEqual((503,"artifact_binding_mismatch"),(damaged.Status,damaged.Code));
+        Assert.IsGreaterThan(0,storage.Reads);
+        // 每种变异都先重新调用正式目录并验证同批实际图，然后仅改变这次返回给网关的材料。
+        var actual = (IVerifiedReleaseBatchCatalog)services.GetRequiredService<IReleaseCatalog>();
+        foreach (var fault in new[] { "slots", "snapshot", "bytes" })
+        {
+            // 将同一查询交给正式取消服务，故障应早于已完成冲突及持久变更。
+            var gateway = ActivatorUtilities.CreateInstance<SemanticGateway>(services,new AlteredBatchCatalog(actual,fault));
+            // 只接受原槽位/快照/散列绑定错误，不接受 409 来假冒已发现故障。
+            var error = await Assert.ThrowsAsync<SemanticOperationException>(() => gateway.CancelG4Async(reader,original.SessionReference,original.Id,default));
+            Assert.AreEqual((503,"published_source_binding_invalid"),(error.Status,error.Code));
+        }
+        // 未注入故障的下一次请求仍须真实重验，已完成查询应恢复为原 409。
+        var normal = await Assert.ThrowsAsync<SemanticOperationException>(() =>
+            services.GetRequiredService<ISemanticGateway>().CancelG4Async(reader,original.SessionReference,original.Id,default));
+        Assert.AreEqual((409,"query_already_finished"),(normal.Status,normal.Code));
+    }
+
+    /// <summary>测试专属只读适配器，在真实 S3 GET 后仅损坏交给验证器的副本。</summary>
+    private sealed class CorruptSourceRead(IReleaseArtifactStore inner) : IReleaseArtifactStore
+    {
+        /// <summary>核实权限拒绝发生于外部读取之前。</summary>
+        public int Reads { get; private set; }
+
+        /// <summary>此故障入口不提供写操作。</summary>
+        public Task<ArtifactObject> PutImmutableAsync(string key,ReadOnlyMemory<byte> content,string type,CancellationToken token) =>
+            throw new InvalidOperationException("READ_ONLY_FIXTURE");
+
+        /// <summary>从准确对象真实读取，对源码单字节变异，清单原件保留。</summary>
+        public async Task<byte[]> ReadVerifiedAsync(ArtifactObject artifact,CancellationToken token)
+        {
+            Reads++;
+            // 每次取得独立字节数组，避免测试变异影响共享对象。
+            var bytes = (await inner.ReadVerifiedAsync(artifact,token)).ToArray();
+            if (artifact.ContentType == "text/turtle" && bytes.Length > 0) bytes[0] ^= 1;
+            return bytes;
+        }
+    }
+
+    /// <summary>仅在真实的本次已校验批次上修改测试副本，验证消费端仍核对同槽位及快照。</summary>
+    private sealed class AlteredBatchCatalog(IVerifiedReleaseBatchCatalog actual,string fault) : IReleaseCatalog, IVerifiedReleaseBatchCatalog
+    {
+        /// <summary>此反例应直接进入显式固定发布批次入口。</summary>
+        public Task<ReleaseSummary> ReadAsync(ActorContext actor,string releaseId,CancellationToken token) => throw new InvalidOperationException("UNEXPECTED_LEGACY_READ");
+
+        /// <summary>禁止用回退重复读隐藏批次校验故障。</summary>
+        public Task<ReleaseSummary> ResolveAsync(ActorContext actor,string assetId,string? releaseId,CancellationToken token) => throw new InvalidOperationException("UNEXPECTED_LEGACY_READ");
+
+        /// <summary>真实权限、原件和图回读先完成，再构造确定的单项反例。</summary>
+        public async Task<(ReleaseManifest Manifest,byte[][] SourceObjects,PublishedRdfData Graph)> ReadVerifiedBatchAsync(ActorContext actor,string assetId,string releaseId,CancellationToken token)
+        {
+            // 每次从正式目录读取，不复用上一个请求。
+            var batch = await actual.ReadVerifiedBatchAsync(actor,assetId,releaseId,token);
+            if (fault == "slots") (batch.SourceObjects[0],batch.SourceObjects[1]) = (batch.SourceObjects[1],batch.SourceObjects[0]);
+            else if (fault == "snapshot") batch.Manifest = batch.Manifest with { Snapshot = batch.Manifest.Snapshot with { DataHash=new string('0',64) } };
+            else batch.SourceObjects[0][0] ^= 1;
+            return batch;
+        }
+    }
+
+    /// <summary>用独立 PG 事务占住本次租约行，实测真实总期限含最终提交且无成功副作用。</summary>
+    private static async Task VerifyContendedCommitDeadlineAsync(IServiceProvider services, ActorContext actor,
+        G4QueryRecord original, G4QueryDbContext db, bool nearDeadline)
+    {
+        // 新幂等身份只用于原先已成功的固定实体读取。
+        var key = Guid.NewGuid().ToString();
+        // 取浏览器实际输入的同一查询体。
+        using var doc = JsonDocument.Parse(original.RequestBytes);
+        // 合成 Q 的原查询使用完整五秒总期限。
+        var query = doc.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
+        Assert.AreEqual(5000, query.TimeoutMs);
+        // 用与产品事务分离的上下文持有这一个查询行的锁。
+        await using var blocker = await services.GetRequiredService<IDbContextFactory<G4QueryDbContext>>().CreateDbContextAsync();
+        // 此事务绝不写入业务行，测试退出后回滚释放行锁。
+        await using var transaction = await blocker.Database.BeginTransactionAsync();
+        await blocker.Database.ExecuteSqlRawAsync("SET LOCAL idle_in_transaction_session_timeout = '7s'");
+        // 平台只观测由这一准确后端阻塞的活动事务。
+        var pid = await blocker.Database.SqlQuery<int>($"SELECT pg_backend_pid() AS \"Value\"").SingleAsync();
+        // 单个信号携带真实锁定的查询和当时读取的截止时间。
+        var held = new TaskCompletionSource<G4QueryRecord>(TaskCreationOptions.RunContinuationsAsynchronously);
+        // 原读取与授权不替换，仅在正式查询结果事务取得授权锁之前锁定准确租约。
+        var execution = BeforeCommitExecution(services, async token =>
+        {
+            // 仅本次 key、org 和真实 Q 对应的行可被试验占锁。
+            var rows = await blocker.Queries.FromSqlInterpolated(
+                $"SELECT * FROM semantic_query.\"Queries\" WHERE \"IdempotencyKey\"={key} AND \"SubjectId\"={actor.SubjectId} AND \"OrganizationId\"={actor.OrganizationId} FOR UPDATE")
+                .AsNoTracking().ToArrayAsync(token);
+            Assert.HasCount(1, rows);
+            Assert.AreEqual("RUNNING",rows[0].ExecutionStatus);
+            held.SetResult(rows[0]);
+            if (nearDeadline)
+            {
+                // 只在总截止反例调度真实提交，留八百毫秒使总期限先于平台两秒锁超时。
+                var delay = rows[0].DeadlineAtUtc - DateTimeOffset.UtcNow - TimeSpan.FromMilliseconds(800);
+                Assert.IsGreaterThan(TimeSpan.Zero,delay);
+                await Task.Delay(delay,token);
+            }
+        });
+        // Gateway 的真实时钟与取消令牌贯穿提交及审计。
+        var gateway = ActivatorUtilities.CreateInstance<SemanticGateway>(services,execution);
+        // 测量调用起点及实际错误返回时刻。
+        var started = DateTimeOffset.UtcNow;
+        // 单调时钟检查实际调用返回上界，包含取消传播及回滚。
+        var measurement = Stopwatch.StartNew();
+        // 在保持真实五秒限额时，仅在测试层等待独立的持锁证明。
+        var running = gateway.ExecuteG4Async(actor,original.SessionReference,query,key,null,CancellationToken.None);
+        // 精确租约记录载明同一查询的绝对期限。
+        var first = await Task.WhenAny(held.Task, running).WaitAsync(TimeSpan.FromSeconds(5));
+        if (first == running) await running;
+        Assert.IsTrue(held.Task.IsCompletedSuccessfully);
+        // 只有实际持锁后才进入独立等锁观察。
+        var lease = await held.Task;
+        // 实际 PG 等锁证明防止将普通到期误归因于本试验。
+        DateTimeOffset? blocked = null;
+        while (!running.IsCompleted && DateTimeOffset.UtcNow < lease.DeadlineAtUtc)
+        {
+            if (await db.Database.SqlQuery<int>($"SELECT count(*)::int AS \"Value\" FROM pg_stat_activity WHERE {pid}=ANY(pg_blocking_pids(pid)) AND state='active' AND query LIKE '%FOR UPDATE%'").SingleAsync() > 0)
+            {
+                blocked = DateTimeOffset.UtcNow;
+                break;
+            }
+            await Task.Delay(10);
+        }
+        // 看门狗仅约束测试收尾；不改变产品五秒截止。
+        var denial = await Assert.ThrowsAsync<SemanticOperationException>(() => running.WaitAsync(TimeSpan.FromSeconds(2) + (lease.DeadlineAtUtc > DateTimeOffset.UtcNow ? lease.DeadlineAtUtc - DateTimeOffset.UtcNow : TimeSpan.Zero)));
+        // 回滚准确持锁事务后再读取真实持久状态。
+        measurement.Stop();
+        var deniedAt = DateTimeOffset.UtcNow;
+        await transaction.RollbackAsync();
+        Assert.IsNotNull(blocked);
+        Assert.IsTrue(deniedAt < lease.DeadlineAtUtc && measurement.Elapsed.TotalMilliseconds <= query.TimeoutMs);
+        if (nearDeadline) Assert.IsTrue(deniedAt >= lease.DeadlineAtUtc.AddMilliseconds(-125));
+        Assert.AreEqual((503,"query_timeout"),(denial.Status,denial.Code));
+        // 没有晚到结果、来源回执或成功执行审计。
+        var row = await db.Queries.AsNoTracking().SingleAsync(item => item.Id == lease.Id);
+        Assert.AreNotEqual("COMPLETED",row.ExecutionStatus);
+        Assert.AreEqual(0,row.ResultCiphertext.Length);
+        Assert.AreEqual(0,G4QueryResultStore.ReadState(row).Receipts.Length);
+        // 治理库单独读回同一 queryId 的审计。
+        await using var governance = await services.GetRequiredService<IDbContextFactory<OntologyPlatform.Modules.Governance.GovernanceDbContext>>().CreateDbContextAsync();
+        // 只核验成功审计，后台失联收尾可再单独观测。
+        var allowed = await governance.AuditRecords.CountAsync(item => item.Resource == row.Id && item.Action == "data.query.execute" && item.Outcome == "allowed");
+        Assert.AreEqual(0,allowed);
+        // 明确区分产品截止、取消传播耗时及调用返回时间。
+        var result = new { queryId = row.Id, key, nearDeadline, scheduledRemainingMs = nearDeadline ? 800 : (int?)null, started, blocked, row.DeadlineAtUtc, deniedAt, elapsedMs = measurement.Elapsed.TotalMilliseconds,
+            denial.Status, denial.Code, row.ExecutionStatus, resultBytes=row.ResultCiphertext.Length, receipts=0, successAudits=allowed };
+        await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(),"artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01",
+            "contended-deadline-"+key+".json"),JsonSerializer.Serialize(result,new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+    }
+
+    /// <summary>从同一读取的真实绑定取连接 ID，在原租约最终检查之前执行正式轮换事务。</summary>
+    private static async Task RotateDorisDuringCommitAsync(IServiceProvider services, ActorContext reader,
+        (ActorContext Actor, string Session) editor, G4QueryRecord original, G4QueryDbContext db, JsonElement rotation)
+    {
+        // 只对已准入的前件查询所绑定的实际任务连接操作。
+        var binding = G4QueryResultStore.ReadState(original).Binding;
+        Assert.AreEqual(binding.ConnectionId, rotation.GetProperty("connectionId").GetString());
+        // 源连接当前修订与请求中已捕获的修订必须一致。
+        var revision = rotation.GetProperty("revision").GetInt64();
+        Assert.AreEqual(binding.ConnectionRevision, revision.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        // 旧版本与回调提交的新版本分开记录。
+        var version = rotation.GetProperty("version").GetInt64();
+        Assert.AreEqual(binding.SecretVersion, version.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        // 只对这一条独立、正常的实体查询调度一次轮换。
+        var key = Guid.NewGuid().ToString();
+        // 真实浏览器产生的原始查询包含本次作用域。
+        using var doc = JsonDocument.Parse(original.RequestBytes);
+        // 不更改固定计划或原有时间限额。
+        var query = doc.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
+        // 公开证据只记录版本及事务先后，密钥正文与引用仅留在内存。
+        DateTimeOffset? afterRead = null;
+        // 仅在正式连接服务提交后设置，异常路径不匹配门禁。
+        DateTimeOffset? rotatedAt = null;
+        // 成功变更必须来自独立请求、A 的真实会话与强 ETag。
+        var execution = BeforeCommitExecution(services, async token =>
+        {
+            afterRead = DateTimeOffset.UtcNow;
+            // 使用标准绑定、会话权限、一次性引用、版本 CAS、审计和事务。
+            var reply = await services.GetRequiredService<IConnectionRequestHandler>().HandleAsync(new ConnectionInvocation
+            {
+                Id = binding.ConnectionId, Actor = editor.Actor, SessionReference = editor.Session, Operation = "rotate",
+                Etag = rotation.GetProperty("etag").GetString(), ChildId = null, Cursor = null, Type = null, State = null,
+                Body = new ConnectionRotateSecretRequest { SecretRef = rotation.GetProperty("reference").GetString()!, Command = Command(revision) }
+            }, token);
+            rotatedAt = DateTimeOffset.UtcNow;
+            Assert.AreEqual(200, reply.StatusCode);
+            // 版本和修订必须分别增加，不能将编辑显示名称当成轮换。
+            var current = (ConnectionView)reply.Value;
+            Assert.AreEqual(version + 1, current.SecretVersion);
+            Assert.AreEqual(revision + 1, current.ConfigRevision);
+        });
+        // 原查询使用同一正式 Gateway 与真实平台存储。
+        var gateway = ActivatorUtilities.CreateInstance<SemanticGateway>(services, execution);
+        // 未提交的旧绑定须被当前平台权限或绑定检查准确拒绝。
+        var denied = await Assert.ThrowsAsync<SemanticOperationException>(() =>
+            gateway.ExecuteG4Async(reader, original.SessionReference, query, key, null, CancellationToken.None));
+        // 在读取后、轮换后、五秒期限前记录实际拒绝时刻。
+        var deniedAt = DateTimeOffset.UtcNow;
+        Assert.IsTrue((denied.Status, denied.Code) is (409, "query_binding_stale") or (403, "query_forbidden"));
+        // 随机幂等键只定位这一次竞态。
+        var row = await db.Queries.AsNoTracking().SingleAsync(item => item.IdempotencyKey == key);
+        Assert.IsTrue(afterRead <= rotatedAt && rotatedAt <= deniedAt && deniedAt < row.DeadlineAtUtc);
+        Assert.AreNotEqual("COMPLETED", row.ExecutionStatus);
+        Assert.IsNull(row.ResultHash);
+        Assert.AreEqual(0, row.ResultCiphertext.Length);
+        Assert.AreEqual(0, G4QueryResultStore.ReadState(row).Receipts.Length);
+        // 用正式治理库独立读回该查询的成功审计数。
+        await using var governance = await services.GetRequiredService<IDbContextFactory<OntologyPlatform.Modules.Governance.GovernanceDbContext>>().CreateDbContextAsync();
+        // 测试仅接受同一查询没有成功副作用的结果。
+        var allowed = await governance.AuditRecords.CountAsync(item => item.Resource == row.Id && item.Action == "data.query.execute" && item.Outcome == "allowed");
+        Assert.AreEqual(0, allowed);
+        // 摘要不含轮换请求、引用或凭据。
+        var result = new { queryId = row.Id, key, binding.ConnectionId, oldVersion = version, newVersion = version + 1, oldRevision = revision,
+            newRevision = revision + 1, afterRead, rotatedAt, deniedAt, row.DeadlineAtUtc, denied.Status, denied.Code,
+            row.ExecutionStatus, resultBytes = row.ResultCiphertext.Length, receipts = 0, successAudits = allowed };
+        await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01",
+            "rotation-inflight-" + key + ".json"), JsonSerializer.Serialize(result, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+    }
+
+    /// <summary>在同一次分支后验取证，限定真实 DDL 或本次准确连接断开，沿用正式计时与授权。</summary>
+    private static async Task VerifyDorisPostcheckFailureAsync(IServiceProvider services, ActorContext actor,
+        G4QueryRecord original, G4QueryDbContext db, bool disconnect)
+    {
+        // 使用浏览器已成功执行的同一固定实体计划，仅幂等键不同。
+        using var request = JsonDocument.Parse(original.RequestBytes);
+        // 真实服务器存储的请求准确绑定当前合成根。
+        var query = request.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
+        // 随机键关联源读取、拒绝及平台审计。
+        var key = Guid.NewGuid().ToString();
+        // 验证端只使用同一只读账号及固定 TLS 地址，不接受外部服务器或连接号。
+        var sourceDirectory = Path.Combine(DorisRuntimeRoot(), ".tools/security/g4-doris-mapping-query-001/implementation-01-source");
+        // 独立验证端只为传输故障场景创建，严守原 CA 和无池会话。
+        await using var observer = disconnect ? new MySqlConnection(new MySqlConnectionStringBuilder
+        {
+            Server = "localhost", Port = 19030, UserID = "fixture_reader", Password = await File.ReadAllTextAsync(Path.Combine(sourceDirectory, "reader.pass")),
+            SslMode = MySqlSslMode.VerifyFull, SslCa = Path.Combine(sourceDirectory,"tls","ca.pem"), Pooling = false, ConnectionTimeout = 2, DefaultCommandTimeout = 1
+        }.ConnectionString) : null;
+        if (observer is not null) await observer.OpenAsync();
+        // 独占本次测试的诊断范围，生产代码原有事件分别标记提交和读取完成。
+        using var trace = new Activity("dmq.inflight.catalog").Start();
+        // 保留精确竞争时刻及驱动后验的目标身份。
+        DateTimeOffset? changedAt = null;
+        // 只让本测试的一次后续驱动命令触发竞争。
+        var armed = 1;
+        // 限定于同 trace 且产品已读完数据的第一个真实后验命令。
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == "MySqlConnector",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+            ActivityStarted = operation =>
+            {
+                if (operation.TraceId != trace.TraceId || !trace.Events.Any(row => row.Name == "doris.plan.rows_finished")
+                    || Interlocked.Exchange(ref armed, 0) != 1) return;
+                if (observer is not null)
+                {
+                    // 物理线程必须同时与真实握手和此 trace 的固定投影提交事件对应。
+                    var sourceThread = (int)trace.Events.Single(e => e.Name == "doris.plan.submitted").Tags.Single(t => t.Key == "thread").Value!;
+                    // 独立通道不得误中自己、辅助连接或其他测试的源连接。
+                    var handshake = trace.Events.Single(e => e.Name == "doris.cancel.ready");
+                    Assert.AreEqual(sourceThread,handshake.Tags.Single(t => t.Key == "source.thread").Value);
+                    Assert.AreNotEqual(sourceThread,handshake.Tags.Single(t => t.Key == "auxiliary.thread").Value);
+                    Assert.AreNotEqual(sourceThread,observer.ServerThread);
+                    // 故障只发生在本次已读取数据的同账号会话；生产代码没有这条入口。
+                    using var interrupt = observer.CreateCommand();
+                    interrupt.CommandText = "KILL CONNECTION " + sourceThread.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    interrupt.ExecuteNonQuery();
+                    changedAt = DateTimeOffset.UtcNow;
+                    return;
+                }
+                // 控制器只接受固定动作，准确 tablet、fixture 和宿主已在本次试验前绑定。
+                var start = new ProcessStartInfo("python3") { WorkingDirectory = DorisRuntimeRoot(), UseShellExecute = false };
+                foreach (var arg in new[] { "-B", "scripts/maintenance/workflow_doris_s1.py", "ddl-fixture", "--ddl-action", "rename" })
+                    start.ArgumentList.Add(arg);
+                // 有界等待真实竞争命令；分支的原始一秒计时持续运行。
+                using var control = Process.Start(start)!;
+                if (control.WaitForExit(2000) && control.ExitCode == 0) changedAt = DateTimeOffset.UtcNow;
+            }
+        };
+        ActivitySource.AddActivityListener(listener);
+        // 生产注册的 Gateway、源适配器、事务及审计均不替换。
+        var gateway = (SemanticGateway)services.GetRequiredService<ISemanticGateway>();
+        if (disconnect)
+        {
+            // 正式聚合器必须丢弃后验未完成的数据，并保留真实的六态语义。
+            var delivery = await gateway.ExecuteG4Async(actor,original.SessionReference,query,key,null,CancellationToken.None);
+            // 解析正式线形结果，只验状态、数量和公开来源回执。
+            using var wire = JsonDocument.Parse(delivery.ResultBytes!);
+            // 传输中断没有已完成的可信前缀。
+            var body = wire.RootElement;
+            Assert.IsNotNull(changedAt);
+            Assert.AreEqual("UNAVAILABLE",body.GetProperty("status").GetString());
+            Assert.AreEqual(0,body.GetProperty("data").GetArrayLength());
+            Assert.AreEqual(0,body.GetProperty("evidence").GetArrayLength());
+            Assert.IsFalse(body.GetProperty("subSources").EnumerateArray().Any(branch =>
+                branch.TryGetProperty("sourceReadReceiptId",out var id) && id.ValueKind == JsonValueKind.String));
+            // 从实际持久层核对未生成成功来源回执，分列业务与执行状态。
+            var stored = await db.Queries.AsNoTracking().SingleAsync(q => q.IdempotencyKey == key);
+            Assert.AreEqual(0,G4QueryResultStore.ReadState(stored).Receipts.Length);
+            // 查询在真实总期限内返回，并按原始 trace 对账投影已读完。
+            var finishedAt = DateTimeOffset.UtcNow;
+            Assert.IsTrue(finishedAt < stored.DeadlineAtUtc);
+            // 报告不含源值或账号材料。
+            var observed = new { queryId=stored.Id, key, sourceReadDone=trace.Events.Single(e=>e.Name=="doris.plan.rows_finished").Timestamp,
+                sourceThread=trace.Events.Single(e=>e.Name=="doris.plan.submitted").Tags.Single(t=>t.Key=="thread").Value,
+                changedAt,finishedAt,stored.DeadlineAtUtc,stored.ExecutionStatus,semanticStatus=body.GetProperty("status").GetString(),rows=0,evidence=0,receipts=0 };
+            await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(),"artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01",
+                "disconnected-"+key+".json"),JsonSerializer.Serialize(observed,new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+            return;
+        }
+        // 错误要能单独归因于当前目录变化，普通超时和无法连接均不算通过。
+        var denial = await Assert.ThrowsAsync<SemanticOperationException>(() =>
+            gateway.ExecuteG4Async(actor, original.SessionReference, query, key, null, CancellationToken.None));
+        // 查询必须在真实分支和总期限内拒绝，未持久化旧目录下的结果或来源回执。
+        var deniedAt = DateTimeOffset.UtcNow;
+        Assert.IsNotNull(changedAt);
+        Assert.AreEqual(422, denial.Status);
+        Assert.AreEqual("mapping_source_shape_invalid", denial.Code);
+        // 从独立的正式查询记录确认调用身份及结果。
+        var row = await db.Queries.AsNoTracking().SingleAsync(item => item.IdempotencyKey == key);
+        Assert.AreNotEqual("COMPLETED", row.ExecutionStatus);
+        Assert.AreEqual(0, row.ResultCiphertext.Length);
+        Assert.AreEqual(0, G4QueryResultStore.ReadState(row).Receipts.Length);
+        // 独立治理上下文按同一查询标识检查成功副作用。
+        await using var governance = await services.GetRequiredService<IDbContextFactory<OntologyPlatform.Modules.Governance.GovernanceDbContext>>().CreateDbContextAsync();
+        // 统计仅针对当前结果及准确动作。
+        var allowed = await governance.AuditRecords.CountAsync(item => item.Resource == row.Id && item.Action == "data.query.execute" && item.Outcome == "allowed");
+        Assert.AreEqual(0, allowed);
+        // 两个事件来自正式实体读取，准确关联模板、线程及该次原始数据读完时刻。
+        var submitted = trace.Events.Single(item => item.Name == "doris.plan.submitted");
+        // 记录原始数据读完到目录后验的受控竞争，不声称 DDL 与 BE 数据扫描同时运行。
+        var read = trace.Events.Single(item => item.Name == "doris.plan.rows_finished");
+        Assert.IsTrue(submitted.Timestamp <= read.Timestamp && read.Timestamp <= changedAt && changedAt <= deniedAt && deniedAt < row.DeadlineAtUtc);
+        // 只输出源事件、准确标识与计数，参数与原始业务值不进入报告。
+        var result = new { queryId = row.Id, key, submitted = submitted.Timestamp, template = submitted.Tags.Single(item => item.Key == "template.sha256").Value,
+            thread = submitted.Tags.Single(item => item.Key == "thread").Value, read = read.Timestamp, changedAt, deniedAt,
+            row.DeadlineAtUtc, denial.Code, denial.Status, row.ExecutionStatus, resultBytes = row.ResultCiphertext.Length, receipts = 0, successAudits = allowed };
+        await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01",
+            "ddl-inflight-" + key + ".json"), JsonSerializer.Serialize(result, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
     }
 
     /// <summary>精确撤销本任务同一主体的两条合成来源授权，复用独立事务与恢复台账。</summary>

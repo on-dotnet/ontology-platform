@@ -298,7 +298,7 @@ def driver(prepared, method):
                   ==' '.join([service['id'],service['image'],'running','healthy',vm.TASK]),'DRIVER_SOURCE_DRIFT')
     fe = state['services']['fe']['id']
     shape = None
-    if method in ('driver-model-reject','driver-type-reject'):
+    if method in ('driver-model-reject','driver-type-reject','driver-width-reject'):
         shape = json.loads(SHAPE.read_bytes())
         vm.demand(shape['phase']=='SWAPPED' and shape['method']==method and shape['services']==state['services'],'NEGATIVE_SHAPE_REQUIRED')
     else:
@@ -323,7 +323,8 @@ def driver(prepared, method):
             'driver-fixed-values':'FixedPlansReturnScopedValues','driver-fixed-entity':'FixedEntityCancellation',
             'driver-fixed-target':'FixedTargetCancellation','driver-stress-entity':'FixedEntityCancellation',
             'driver-stress-target':'FixedTargetCancellation','driver-ac11':'ControlledWriteBetweenSourceReads',
-            'driver-model-reject':'FixedTargetRejectsUnsupportedShape','driver-type-reject':'FixedTargetRejectsUnsupportedShape'}[method]
+            'driver-model-reject':'FixedTargetRejectsUnsupportedShape','driver-type-reject':'FixedTargetRejectsUnsupportedShape',
+            'driver-width-reject':'FixedTargetRejectsUnsupportedShape'}[method]
     key = execution.sha(execution.encoded([binding,hashlib.sha256(INDEX.read_bytes()).hexdigest(),test,
         hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),stress,shape]))
     result = execution.run([environment['dotnet'],str(vm.ROOT/'backend/tests/OntologyPlatform.ConnectionsTests/bin/Debug/net10.0/OntologyPlatform.ConnectionsTests.dll'),
@@ -606,7 +607,7 @@ def shape_case(method,prepared,activation=False):
     """按 tablet 身份交换同名目标表，真实拒绝后交换回原件，只回收本次创建的空负例。"""
     state = json.loads(INDEX.read_bytes())
     vm.demand(not STRESS.exists() and not SHAPE.exists() and not (vm.OUTPUT/'s0-fixed-fixture-active.json').exists(),'SHAPE_FIXTURE_BUSY')
-    stress_resources(state,platform=activation)
+    stress_resources(state,platform=activation or method=='driver-width-reject')
     fe = state['services']['fe']['id']
     ready_source(fe)
     def tablet(name):
@@ -624,6 +625,8 @@ def shape_case(method,prepared,activation=False):
     ddl = fixture_tables()[1].replace('fixture.dmq_target','fixture.'+scratch)
     if method=='driver-model-reject':
         ddl = ddl.replace('UNIQUE KEY','DUPLICATE KEY').replace(', "enable_unique_key_merge_on_write"="true"','')
+    elif method=='driver-width-reject':
+        ddl = ddl.replace('target_id VARCHAR(32)','target_id VARCHAR(512)')
     else:
         vm.demand(method=='driver-type-reject','NEGATIVE_METHOD')
         ddl = ddl.replace('DECIMAL(12,3)','DOUBLE')
@@ -645,10 +648,13 @@ def shape_case(method,prepared,activation=False):
         observed = sql(fe,'root','SHOW CREATE TABLE fixture.dmq_target;')
         key = re.findall(r'^(UNIQUE|DUPLICATE|AGGREGATE) KEY\(`org_id`, `site_id`, `target_id`\)$',observed,re.M)
         field = re.findall(r'^\s*`join_key` (decimal\(12,3\)|double) NULL,$',observed,re.M)
-        vm.demand((key,field)==((['DUPLICATE'],['decimal(12,3)']) if method=='driver-model-reject'
-                               else (['UNIQUE'],['double'])),'SHAPE_CONTROL_CAUSE')
+        width = re.findall(r'^\s*`target_id` varchar\((\d+)\) NOT NULL,$',observed,re.M)
+        expected = {'driver-model-reject':(['DUPLICATE'],['decimal(12,3)'],['32']),
+                    'driver-type-reject':(['UNIQUE'],['double'],['32']),
+                    'driver-width-reject':(['UNIQUE'],['decimal(12,3)'],['512'])}[method]
+        vm.demand((key,field,width)==expected,'SHAPE_CONTROL_CAUSE')
         change.update(phase='SWAPPED',actualDdlSha256=hashlib.sha256(observed.encode()).hexdigest(),
-                      keyModel=key[0],keyColumns=['org_id','site_id','target_id'],nativeJoinKey=field[0])
+                      keyModel=key[0],keyColumns=['org_id','site_id','target_id'],nativeJoinKey=field[0],targetIdWidth=int(width[0]))
         record(SHAPE,change)
         if activation:
             from workflow_doris_s1 import browser_test
@@ -791,14 +797,14 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('stage',choices=['create','resume','capabilities','driver-types','driver-cancel',
                         'stress-seed','stress-restore','s2-stress-seed','s2-stress-restore','driver-stress-entity','driver-stress-target','driver-ac11',
-                        'driver-model-reject','driver-type-reject',
+                        'driver-model-reject','driver-type-reject','driver-width-reject',
                         'fixed-seed','fixed-restore','driver-fixed-values','driver-fixed-entity','driver-fixed-target','stop'])
     parser.add_argument('--prepared',type=Path)
     args=parser.parse_args()
     stage=args.stage
     if stage.startswith('driver-'):
         if args.prepared is None: parser.error('--prepared required')
-        if stage in ('driver-model-reject','driver-type-reject'):
+        if stage in ('driver-model-reject','driver-type-reject','driver-width-reject'):
             raise SystemExit(shape_case(stage,args.prepared))
         raise SystemExit(driver(args.prepared,stage))
     {'create':create, 'resume':resume, 'capabilities':capabilities, 'fixed-seed':fixed_fixture,

@@ -200,7 +200,7 @@ def configure():
 
 
 HOST = OUT/'s1-api-process.json'
-BROWSER = ('provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog','s2-doris-mapping','s2-doris-queries','s2-doris-null','s2-doris-cancel','s2-doris-access','s2-doris-fanout','s2-doris-requalify','s2-doris-aba','s2-doris-admission-cancel','s2-doris-cancel-window','s2-doris-states','s2-doris-cardinality','s2-doris-identity','s2-doris-revoke-race','s2-doris-session-race','s2-doris-shape-prepare','s2-doris-shape-reject','s2-doris-shape-recover')
+BROWSER = ('provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog','s2-doris-mapping','s2-doris-queries','s2-doris-null','s2-doris-cancel','s2-doris-access','s2-doris-fanout','s2-doris-requalify','s2-doris-aba','s2-doris-admission-cancel','s2-doris-cancel-window','s2-doris-states','s2-doris-cardinality','s2-doris-identity','s2-doris-revoke-race','s2-doris-session-race','s2-doris-shape-prepare','s2-doris-shape-reject','s2-doris-shape-recover','s2-doris-cancel-profile','s2-doris-expiry','s2-doris-ddl-race','s2-doris-rotate-race','s2-doris-current-catalog','s2-doris-deadline','s2-doris-short-lock','s2-doris-disconnect','s2-doris-batch-binding')
 
 
 def runtime_binding():
@@ -245,7 +245,7 @@ def browser_test(mode, prepared):
     finished=threading.Event()
     env=dict(PATH=os.environ['PATH'],ASPNETCORE_ENVIRONMENT='Development',ASPNETCORE_CONTENTROOT=str(RUNTIME/'api'),
              G4__SourceCaPath=str(DIRECTORY/'tls/ca.pem'),ASPNETCORE_URLS='http://127.0.0.1:15641',DOTNET_GCHeapHardLimit='0x18000000',DOTNET_CLI_TELEMETRY_OPTOUT='1')
-    env['Logging__LogLevel__OntologyPlatform.Modules.SemanticQuery.G4QueryExecution']='Information'
+    env['Logging__LogLevel__OntologyPlatform.Modules.SemanticQuery.G4QueryExecution']='Debug' if mode in ('s2-doris-cancel-profile','s2-doris-cancel') else 'Information'
     service=host_service([dep['dotnet'],str(dll)],env,ROOT,vm.TASK,exceeded)
     pid=service.process.pid
     evidence=OUT/('s1-host-'+mode+'-'+service.ident+'.json')
@@ -307,6 +307,8 @@ def browser_test(mode, prepared):
             service.finish()
             # 只保存固定格式聚合数值与本任务 queryId，不导出任何其他应用日志。
             matches = re.findall(rb'DorisLeaseObservation query=(query-[0-9a-f]{32}) probes=(\d+) elapsedMs=([0-9.]+) maxReadMs=([0-9.]+) outcome=(closed|lease_changed|observation_failed)', bytes(service.out)+bytes(service.err))
+            timings = re.findall(rb'QueryCancelPhase query=(query-[0-9a-f]{32}) phase=(owner|catalog|artifacts|graphs|verifiedBatch|sourceBinding|graphIndex|root|session|grants|transaction) elapsedMs=([0-9.]+)', bytes(service.out)+bytes(service.err))
+            row['cancelPhases'] = [dict(queryId=q.decode(),phase=phase.decode(),ms=float(ms)) for q,phase,ms in timings]
             row['dorisObservations'] = [dict(queryId=q.decode(), probes=int(n), elapsedMs=float(t), maxReadMs=float(m), outcome=o.decode()) for q,n,t,m,o in matches]
             row.update(status='EXITED' if service.process.poll() is not None else 'STOP_UNKNOWN',hostPeakBytes=peaks,
                        exceeded=exceeded.is_set(),exitCode=service.process.poll())
@@ -372,6 +374,27 @@ def source_scan_snapshot():
     vm.demand(bool(ids) and all(re.fullmatch('[a-f0-9-]{32,36}',qid) for qid in ids),'S1_AUDIT_FORMAT')
     return dict(containerId=fe,auditInode=inode,businessQueries=len(ids),queryIdsSha256=execution.sha(execution.encoded(ids)),auditFence=marker)
 
+
+
+def expire_disposable_query(query_id,key,result_hash):
+    """仅使本次新建、已读回且字节相符的合成查询到期；不改变任何历史查询或生产 TTL。"""
+    import uuid
+    vm.demand(runtime_binding()['stage']=='s2-doris-expiry' and re.fullmatch('query-[0-9a-f]{32}',query_id)
+              and str(uuid.UUID(key))==key and re.fullmatch('[0-9a-f]{64}',result_hash),'TTL_FIXTURE_IDENTITY')
+    state=json.loads((OUT/'doris-two-table.json').read_bytes())
+    subject=state['subjects']['reader']
+    vm.demand(re.fullmatch('[a-f0-9-]{32,36}',subject) and state['latestQuery']['queryId']!=query_id,'TTL_RETAIN_HISTORY')
+    cid=live_stack()['platform-pg']
+    query=f"""UPDATE semantic_query."Queries" SET "ExpiresAtUtc"=clock_timestamp()-interval '1 second'
+        WHERE "Id"='{query_id}' AND "SubjectId"='{subject}' AND "OrganizationId"='org-demo'
+        AND "IdempotencyKey"='{key}' AND "ResultHash"='{result_hash}' AND "ExecutionStatus"='COMPLETED'
+        AND "CreatedAtUtc">now()-interval '90 seconds' AND "ExpiresAtUtc">now()+interval '23 hours'
+        RETURNING "Id";"""
+    result=execution.run(['docker','--context','desktop-linux','exec','-i',cid,'psql','-XwqAt','-v','ON_ERROR_STOP=1','-U','postgres','-d','mapping'],
+                         ROOT,task=vm.TASK,run_id=vm.RUN,stage='dmq-disposable-query-expiry',stdin=query.encode(),
+                         input_key=execution.sha(query.encode()),timeout=10)
+    vm.demand(result.returncode==0 and result.stdout.decode().strip()==query_id,'TTL_FIXTURE_COUNT')
+    print(json.dumps(dict(queryId=query_id,commandId=result.receipt['commandId'],expires='PAST')))
 
 
 def permission_case(action):
@@ -626,6 +649,68 @@ def graduated_cancel(prepared):
     print(path.relative_to(ROOT),ledger['status'])
 
 
+def ddl_race_fixture(action):
+    """仅对登记的合成目标列作可逆改名，按原 tablet、DDL 及行摘要恢复。"""
+    import csv
+    import fcntl
+    import hashlib
+    from workflow_doris_s0_fixture import SHAPE, STRESS, ready_source, stress_original, sync_directory
+    state = json.loads(INDEX.read_bytes())
+    fe = state['services']['fe']['id']
+    path = OUT/'s2-ddl-race-active.json'
+    def ddl():
+        return sql(fe,'root','SHOW CREATE TABLE fixture.dmq_target;')
+    def tablet():
+        rows = list(csv.DictReader(sql(fe,'root','SHOW TABLETS FROM fixture.dmq_target;',True).splitlines(),delimiter='\t'))
+        vm.demand(len(rows)==1 and rows[0]['TabletId'].isdigit(),'DDL_TARGET_ID')
+        return rows[0]['TabletId']
+    def digest(value):
+        return hashlib.sha256(value.encode()).hexdigest()
+    def rows_hash():
+        return stress_original(fe,'dmq_target','target_id',('T1','T2','T3'))
+    original_name = '`join_key`'
+    changed_name = '`dmq_ac05_join_key`'
+    if action=='arm':
+        vm.demand(not any(p.exists() for p in (path,SHAPE,STRESS,OUT/'s0-fixed-fixture-active.json',OUT/'s2-fanout-active.json',OUT/'s2-source-states-active.json')),'DDL_FIXTURE_BUSY')
+        stress_resources(state,platform=True)
+        ready_source(fe)
+        original = ddl()
+        vm.demand(original.count(original_name)==1 and changed_name not in original,'DDL_BASELINE_COLUMN')
+        baseline = rows_hash()
+        vm.demand(baseline=='4fce66991c1a560ee3acc8de573c1077e5f669f68971ad08d55c06e50364191f','DDL_BASELINE_ROWS')
+        row = dict(taskId=vm.TASK,runId=vm.RUN,attempt=secrets.token_hex(8),fe=fe,tablet=tablet(),
+                   before=digest(original),changed=digest(original.replace(original_name,changed_name)),rows=baseline)
+        with path.open('x') as handle:
+            json.dump(row,handle)
+            handle.flush()
+            os.fsync(handle.fileno())
+        sync_directory(path.parent)
+        return
+    with path.open() as guard:
+        fcntl.flock(guard,fcntl.LOCK_EX)
+        vm.demand(path.exists() and os.path.samestat(path.stat(),os.fstat(guard.fileno())),'DDL_ATTEMPT_CLOSED')
+        row = json.load(guard)
+        vm.demand((row['taskId'],row['runId'],row['fe'],row['tablet'])==(vm.TASK,vm.RUN,fe,tablet()),'DDL_RESOURCE_DRIFT')
+        current = digest(ddl())
+        if action=='rename':
+            host = json.loads(HOST.read_bytes())
+            vm.demand(host['stage']=='s2-doris-ddl-race' and host['taskId']==vm.TASK and host['runId']==vm.RUN
+                      and host['status']=='READY' and vm.host('ps','-p',str(host['pid']),'-o','lstart=')==host['processStart']
+                      and current==row['before'],'DDL_RACE_STAGE')
+            sql(fe,'root','ALTER TABLE fixture.dmq_target RENAME COLUMN join_key dmq_ac05_join_key;')
+            vm.demand(digest(ddl())==row['changed'],'DDL_RENAME_POST')
+            return
+        vm.demand(action=='restore' and current in (row['before'],row['changed']),'DDL_UNKNOWN_SHAPE')
+        if current==row['changed']:
+            sql(fe,'root','ALTER TABLE fixture.dmq_target RENAME COLUMN dmq_ac05_join_key join_key;')
+        vm.demand(digest(ddl())==row['before'] and tablet()==row['tablet'] and rows_hash()==row['rows'],'DDL_RESTORE_POST')
+        row.update(status='RESTORED',observedChanged=current==row['changed'])
+        record(OUT/('s2-ddl-race-'+row['attempt']+'-restored.json'),row)
+        path.unlink()
+        sync_directory(path.parent)
+
+
+
 def runtime_race_test(case):
     """只接收当前合成 Cookie 的内存管道，按已绑定 AgentTests 运行一次已登记的正式在途竞争。"""
     from workflow_m2_evidence import mtp
@@ -634,7 +719,13 @@ def runtime_race_test(case):
     stage, method = {
         'aba': ('s2-doris-aba', 'DorisActivationRevisionRejectsInflightQuery'),
         'revoke': ('s2-doris-revoke-race', 'DorisRevocationRejectsInflightQuery'),
-        'session': ('s2-doris-session-race', 'DorisExpiredSessionRejectsInflightQuery')
+        'session': ('s2-doris-session-race', 'DorisExpiredSessionRejectsInflightQuery'),
+        'ddl': ('s2-doris-ddl-race', 'DorisTableChangeRejectsInflightRows'),
+        'rotate': ('s2-doris-rotate-race', 'DorisRotatedCredentialRejectsInflightQuery'),
+        'deadline': ('s2-doris-deadline', 'DorisLockedCommitHonorsRealDeadline'),
+        'lock': ('s2-doris-short-lock', 'DorisCommitRejectsPlatformLockTimeout'),
+        'disconnect': ('s2-doris-disconnect', 'DorisDroppedConnectionDiscardsUnverifiedRows'),
+        'batch': ('s2-doris-batch-binding', 'CancelRequiresSingleVerifiedReleaseBatch')
     }[case]
     vm.demand(active['stage'] == stage and active['snapshotId'] == frozen['snapshotId'], 'ABA_HOST_BINDING')
     binding = build.validate('agent', vm.TASK)
@@ -654,6 +745,28 @@ def runtime_race_test(case):
     record(OUT/(('s2-'+case+'-mtp-')+summary['commandId']+'.json'), summary)
     vm.demand(result.returncode == 0 and passed == 1, 'ABA_MTP_'+summary['commandId'])
     print(json.dumps(summary))
+
+
+def semantic_batch_regression(prepared):
+    """复用本任务当前六项准确设施与已构建 MTP，只运行新请求内批次的四个反例及正例。"""
+    from workflow_m2_evidence import mtp
+    path = execution.ordinary(Path(prepared).absolute())
+    vm.demand(path.is_relative_to(ROOT/'artifacts/workflow'/vm.TASK/'environment'),'SEM_PREPARE_PATH')
+    dep = json.loads(path.read_bytes())
+    vm.demand((dep['taskId'],dep['worktree'],dep['status'])==(vm.TASK,str(ROOT),'DEPENDENCIES_READY'),'SEM_PREPARE')
+    live_stack()
+    binding = build.validate('semantic',vm.TASK)
+    dll = ROOT/Path(build.TARGETS['semantic']).parent/'bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll'
+    method = 'OntologyPlatform.SemanticTests.VerifiedReadTests.VerifiedBatchRequiresActualComparedGraphsAndShacl'
+    env = dict(dep['environment'],G2_SEM_JENA_ORIGIN='http://127.0.0.1:15645',DOTNET_GCHeapHardLimit='0x18000000')
+    result = execution.run([dep['dotnet'],str(dll),'--filter','FullyQualifiedName='+method,'--minimum-expected-tests','4',
+                            '--no-ansi','--progress','off','--results-directory',str(OUT/'verified-batch-results')],ROOT,
+                           task=vm.TASK,run_id=vm.RUN,stage='dmq-verified-batch-sem',environment=env,input_key=execution.sha(execution.encoded(binding)),timeout=25)
+    count = mtp(result.stdout+result.stderr,4) if not result.returncode else 0
+    row = dict(method=method,input=binding,commandId=result.receipt['commandId'],passed=count,exitCode=result.returncode)
+    record(OUT/('verified-batch-sem-'+row['commandId']+'.json'),row)
+    vm.demand(result.returncode==0 and count==4,'SEM_BATCH_MTP_'+row['commandId'])
+    print(json.dumps(row))
 
 
 def pg_golden(prepared):
@@ -677,8 +790,10 @@ def pg_golden(prepared):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('stage',choices=['prepare','render','start','configure','freeze','pg-golden','s2-activation-shape','s2-graduated-cancel','s2-cancel-case','s2-admission-case','state-fixture','session-test','revoke-test','aba-test','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
+    parser.add_argument('stage',choices=['prepare','render','start','configure','freeze','pg-golden','semantic-batch','s2-activation-shape','s2-graduated-cancel','s2-cancel-case','s2-admission-case','state-fixture','expire-disposable','session-test','revoke-test','aba-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test','ddl-fixture','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
     parser.add_argument('--prepared')
+    parser.add_argument('--ddl-action',choices=['arm','rename','restore'])
+    parser.add_argument('--query-identity',nargs=3,metavar=('QUERY','KEY','HASH'))
     parser.add_argument('--permission',choices=[f'{v}-{k}' for v in ('revoke','restore') for k in ('execute','result','evidence')])
     parser.add_argument('--fanout', choices=['ten','eleven','restore'])
     parser.add_argument('--state-operation',choices=['seed','deny','allow','restore'])
@@ -689,6 +804,7 @@ if __name__=='__main__':
             browser_test(args.stage, args.prepared)
         finally:
             if (OUT/'s2-fanout-active.json').exists(): fanout_fixture('restore')
+    elif args.stage=='expire-disposable': expire_disposable_query(*args.query_identity)
     elif args.stage=='state-fixture': scoped_state_fixture(args.state_operation)
     elif args.stage in ('s2-doris-states','s2-doris-cardinality'):
         vm.demand(not (OUT/'s2-source-states-active.json').exists(),'STATES_ALREADY_ACTIVE')
@@ -704,9 +820,15 @@ if __name__=='__main__':
         try: browser_test(args.stage,args.prepared)
         finally:
             if ledger.exists(): permission_case('restore-execute')
+    elif args.stage=='ddl-fixture': ddl_race_fixture(args.ddl_action)
+    elif args.stage=='s2-doris-ddl-race':
+        ddl_race_fixture('arm')
+        try: browser_test(args.stage,args.prepared)
+        finally:
+            if (OUT/'s2-ddl-race-active.json').exists(): ddl_race_fixture('restore')
     elif args.stage in BROWSER: browser_test(args.stage,args.prepared)
     elif args.stage in ('s2-boundary','s2-restore'): relation_fixture(args.stage=='s2-restore')
-    elif args.stage in ('aba-test','revoke-test','session-test'): runtime_race_test(args.stage.removesuffix('-test'))
+    elif args.stage in ('aba-test','revoke-test','session-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test'): runtime_race_test(args.stage.removesuffix('-test'))
     elif args.stage=='fanout': print(json.dumps(fanout_fixture(args.fanout)))
     elif args.stage=='permission': permission_case(args.permission)
     elif args.stage in ('s2-cancel-case','s2-admission-case'): cancellation_case(args.prepared,args.stage=='s2-admission-case')
@@ -717,6 +839,7 @@ if __name__=='__main__':
             shape_case(method,args.prepared,activation=True)
             browser_test('s2-doris-shape-recover',args.prepared)
     elif args.stage=='s2-graduated-cancel': graduated_cancel(args.prepared)
+    elif args.stage=='semantic-batch': semantic_batch_regression(args.prepared)
     elif args.stage=='pg-golden': pg_golden(args.prepared)
     elif args.stage.endswith('-grants'): synthetic_grants(args.stage.split('-')[-2],args.stage.startswith('s2-'))
     else: {'prepare':prepare,'render':render,'start':start,'configure':configure,'freeze':freeze_api}[args.stage]()

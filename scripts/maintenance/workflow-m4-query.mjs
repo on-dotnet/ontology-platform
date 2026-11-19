@@ -19,12 +19,21 @@ if (integration && !["standard", "numeric", "safety", "aba"].includes(scenario))
 const moduleName = doris ? "workflow_doris_s1" : integration ? "workflow_m5_integration" : "workflow_m4_query";
 const scenarioCode = integration ? `q.scenario("${scenario}");` : "";
 const privateName = doris ? ".tools/security/g4-doris-mapping-query-001" : integration ? ".tools/security/g4-m5-integration-001" : ".tools/security/g4-m4-query-001";
+const dorisReadRaces = {
+  "s2-doris-revoke-race": ["after_read_revoke", "revoke-test", "DORIS_INFLIGHT_GRANT_REVOCATION"],
+  "s2-doris-session-race": ["after_read_session_expiry", "session-test", "DORIS_INFLIGHT_SESSION_EXPIRY"],
+  "s2-doris-ddl-race": ["source_postcheck_after_ddl", "ddl-test", "DORIS_INFLIGHT_CATALOG_DDL"],
+  "s2-doris-deadline": ["platform_commit_deadline", "deadline-test", "DORIS_CONTENDED_COMMIT_DEADLINE"],
+  "s2-doris-short-lock": ["platform_lock_timeout", "lock-test", "DORIS_PLATFORM_LOCK_TIMEOUT"],
+  "s2-doris-disconnect": ["inflight_connection_closed", "disconnect-test", "DORIS_INFLIGHT_SOURCE_DISCONNECTED"],
+  "s2-doris-batch-binding": ["verified_batch_faults", "batch-test", "DORIS_CANCEL_VERIFIED_RELEASE_BATCH"]
+};
 const twoTable = doris && argument("mode").startsWith("s2-doris-");
 const stateName = twoTable ? "doris-two-table.json" : integration ? `scenario-${scenario}.json` : "runtime-fixture.json";
 const port = value => doris ? ({15441:15641,15442:15642,15443:15643,15444:15644,15445:19030,15446:15645,15447:15646,15448:15647})[value] : integration ? value + 100 : value;
 if (argument("task") !== task || argument("run-id") !== runId || await realpath(process.cwd()) !== root) throw new Error("QUERY_CONSUMER_BOUNDARY");
 const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/package.json"));
-if (doris && !["provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
+if (doris && !["provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
 if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
@@ -38,7 +47,7 @@ if (mode === "serve") {
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: port(15442),
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cardinality","s2-doris-identity","s2-doris-states","s2-doris-cancel-window","s2-doris-admission-cancel","s2-doris-aba","s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
+} else if (["s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding","s2-doris-cardinality","s2-doris-identity","s2-doris-states","s2-doris-cancel-window","s2-doris-admission-cancel","s2-doris-aba","s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -285,6 +294,24 @@ async function browserRun(mode) {
       await save(state);
       mode = "provision";
     }
+    if (mode === "s2-doris-current-catalog") {
+      phase = "current_doris_connection_after_rotation";
+      const prior = state.credentialRotation;
+      check("rotation_bound_to_this_connection", prior?.connectionId === state.connectionId && prior.archive === "s2-pre-rotation-"+prior.originalQueryId+".json");
+      const current = await get(operator,"/api/v1/connections/"+state.connectionId);
+      check("rotation_committed_once",current.secretVersion===prior.version+1 && current.configRevision>=prior.revision+1);
+      if (!prior.reset) {
+        const archived = JSON.parse(await readFile(resolve(output,prior.archive),"utf8"));
+        check("restoration_origins",archived.connectionId===state.connectionId && archived.latestQuery.queryId===prior.originalQueryId &&
+          archived.catalog.snapshotId===prior.snapshot && archived.mappingReceipt.mappingReleaseId===prior.release);
+        for (const key of Object.keys(state)) {
+          if (key.startsWith("mapping") || ["catalog","latestQuery","firstQuery","shapePreparation","s2AbaInFlight"].includes(key)) delete state[key];
+        }
+        prior.reset=true;
+        await save(state);
+      }
+      mode = "provision";
+    }
     if (doris && mode === "s1-current-catalog") {
       phase = "doris_post_release_catalog";
       check("previous_run_complete", Boolean(state.ontologyRelease && state.latestQuery && state.catalog));
@@ -315,19 +342,82 @@ async function browserRun(mode) {
         mode = "s2-doris-fanout-negative";
       }
     }
-    if (["s2-doris-revoke-race", "s2-doris-session-race"].includes(mode)) {
-      const sessionCase = mode === "s2-doris-session-race";
-      phase = sessionCase ? "after_read_session_expiry" : "after_read_revoke";
+    if (mode === "s2-doris-rotate-race") {
+      phase = "rotate_doris_after_real_read";
+      const current = await request(operator,"GET","/api/v1/connections/"+state.connectionId);
+      check("one_active_connection_before_rotation",current.data.state==="ACTIVE" && !state.credentialRotation &&
+        state.catalog.connectionId===state.connectionId && state.mappingRelease.manifest.mapping.entities.length===2);
+      const cap=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");
+      const query={...state.latestQuery.query,capabilityId:cap.id,capabilityVersion:cap.version,relationshipIris:[],filters:{siteId:"site-a",entityExternalId:"E1"}};
+      const original=await request({...reader,headers:{...reader.headers,"Idempotency-Key":randomUUID()}},"POST","/api/v1/data/semantic-queries",query);
+      check("known_real_source_row",original.data.status==="FOUND");
+      const prior={connectionId:state.connectionId,revision:current.data.configRevision,version:current.data.secretVersion,
+        snapshot:state.catalog.snapshotId,release:state.mappingReceipt.mappingReleaseId,originalQueryId:state.latestQuery.queryId,
+        originalResultHash:state.latestQuery.resultHash,archive:"s2-pre-rotation-"+state.latestQuery.queryId+".json"};
+      await writeFile(resolve(output,prior.archive),JSON.stringify(state,null,2),{flag:"wx"});
+      state.credentialRotation=prior;
+      await save(state);
+      const password=await readFile(resolve(privateRoot,"../implementation-01-source/reader.pass"),"utf8");
+      secrets.push(password);
+      const secret=await post(operator,"/api/v1/connection-secrets",{secretValue:password,scopeSelection:state.scope,purpose:"DORIS_READONLY",command:command()},201);
+      secrets.push(secret.secretRef);
+      const envelope={queryId:original.queryId,rotation:{connectionId:state.connectionId,revision:prior.revision,version:prior.version,etag:current.etag,reference:secret.secretRef},
+        roles:[[operator,"A"],[auditor,"B"],[activator,"C"],[reader,"Q"]].map(([a,role])=>({role,subjectId:a.me.subjectId,cookie:a.sessionCookie}))};
+      report.race=JSON.parse(execFileSync("python3",["-B","scripts/maintenance/workflow_doris_s1.py","rotate-test"],{
+        cwd:root,input:JSON.stringify(envelope),timeout:40000,encoding:"utf8",stdio:["pipe","pipe","pipe"]}));
+      const advanced=await get(operator,"/api/v1/connections/"+state.connectionId);
+      check("same_connection_new_version",advanced.id===state.connectionId && advanced.secretVersion===prior.version+1 && advanced.configRevision===prior.revision+1);
+      await request(reader,"GET","/api/v1/data/semantic-queries/"+original.queryId+"/result",undefined,403);
+      report.versions={connectionId:prior.connectionId,before:prior.version,after:advanced.secretVersion,revision:advanced.configRevision};
+      report.status="PASS"; report.scope="DORIS_INFLIGHT_CREDENTIAL_VERSION";
+      return;
+    }
+    if (Object.hasOwn(dorisReadRaces, mode)) {
+      const [racePhase, testCommand, raceScope] = dorisReadRaces[mode];
+      phase = racePhase;
       const cap=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");
       const query={...state.latestQuery.query,capabilityId:cap.id,capabilityVersion:cap.version,relationshipIris:[],filters:{siteId:"site-a",entityExternalId:"E1"}};
       const original=await request({...reader,headers:{...reader.headers,"Idempotency-Key":randomUUID()}},"POST","/api/v1/data/semantic-queries",query);
       check("known_real_source_row",original.data.status==="FOUND");
       const envelope={queryId:original.queryId,roles:[[operator,"A"],[auditor,"B"],[activator,"C"],[reader,"Q"]].map(([a,role])=>({role,subjectId:a.me.subjectId,cookie:a.sessionCookie}))};
-      report.race=JSON.parse(execFileSync("python3",["-B","scripts/maintenance/workflow_doris_s1.py",sessionCase ? "session-test" : "revoke-test"],
+      report.race=JSON.parse(execFileSync("python3",["-B","scripts/maintenance/workflow_doris_s1.py",testCommand],
         {cwd:root,input:JSON.stringify(envelope),timeout:40000,encoding:"utf8",stdio:["pipe","pipe","pipe"]}));
+      if (mode === "s2-doris-ddl-race") execFileSync("python3",["-B","scripts/maintenance/workflow_doris_s1.py","ddl-fixture","--ddl-action","restore"],{cwd:root,timeout:10000});
       const recovered=await request(reader,"GET","/api/v1/data/semantic-queries/"+original.queryId+"/result");
       check("restored_original",recovered.raw===original.raw);
-      report.status="PASS";report.scope=sessionCase ? "DORIS_INFLIGHT_SESSION_EXPIRY" : "DORIS_INFLIGHT_GRANT_REVOCATION";
+      report.status="PASS";report.scope=raceScope;
+    } else if (mode === "s2-doris-expiry") {
+      phase = "expire_disposable_completed_query";
+      const cap=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");
+      const query={...state.latestQuery.query,capabilityId:cap.id,capabilityVersion:cap.version,relationshipIris:[],filters:{siteId:"site-a",entityExternalId:"E1"}};
+      const key=randomUUID();
+      const original=await request({...reader,headers:{...reader.headers,"Idempotency-Key":key}},"POST","/api/v1/data/semantic-queries",query);
+      check("disposable_entity",original.data.status==="FOUND" && original.data.evidence.length>0);
+      const resultPath="/api/v1/data/semantic-queries/"+original.queryId+"/result";
+      const evidencePath="/api/v1/data/source-evidence/"+encodeURIComponent(original.data.evidence[0].evidenceId);
+      check("before_expiry_original_bytes",(await request(reader,"GET",resultPath)).raw===original.raw);
+      const hash=createHash("sha256").update(original.raw).digest("hex");
+      report.expiry=JSON.parse(execFileSync("python3",["-B","scripts/maintenance/workflow_doris_s1.py","expire-disposable","--query-identity",original.queryId,key,hash],{cwd:root,encoding:"utf8",timeout:20000}));
+      const before=observed();
+      const expired=await request(reader,"GET",resultPath,undefined,410);
+      const detail=await request(reader,"GET",evidencePath,undefined,410);
+      const after=observed();
+      check("expired_result_and_evidence",expired.data.code==="result_expired" && detail.data.code==="result_expired");
+      check("expired_reads_do_not_execute",before.auditInode===after.auditInode && before.queryIdsSha256===after.queryIdsSha256);
+      report.expiry={...report.expiry,before,after};
+      report.status="PASS";report.scope="DORIS_DISPOSABLE_QUERY_TTL";
+    } else if (mode === "s2-doris-cancel-profile") {
+      phase = "profile_cancel_on_completed_query";
+      const cap=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");
+      const query={...state.latestQuery.query,capabilityId:cap.id,capabilityVersion:cap.version,relationshipIris:[],filters:{siteId:"site-a",entityExternalId:"E1"}};
+      const completed=await request({...reader,headers:{...reader.headers,"Idempotency-Key":randomUUID()}},"POST","/api/v1/data/semantic-queries",query);
+      check("ordinary_entity_read",completed.data.status==="FOUND");
+      for (let sample=0;sample<3;sample++) {
+        const prior=await request(reader,"POST","/api/v1/data/semantic-queries/"+completed.queryId+"/cancel",undefined,409);
+        check("already_completed_"+sample,prior.data.code==="query_already_finished");
+      }
+      report.measuredQueryId=completed.queryId;
+      report.scope="READONLY_COMPLETED_CANCEL_TIMINGS"; report.status="PASS";
     } else if (mode === "s2-doris-shape-reject") {
       phase = "activate_previously_approved_proposal_with_changed_catalog";
       const prev = state.shapePreparation;
@@ -1041,6 +1131,14 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
         check((doris ? "doris_catalog_ready" : "pg_catalog_ready"), state.catalog?.status === "READY"); await save(state);
       }
       report.status = "PASS";
+      if (twoTable && state.credentialRotation?.reset) {
+        const prior=state.credentialRotation;
+        check("new_catalog_bound_to_rotated_version",state.catalog.connectionId===prior.connectionId &&
+          state.catalog.snapshotId!==prior.snapshot && state.catalog.secretVersion===prior.version+1);
+        const historic=await request(reader,"GET","/api/v1/data/semantic-queries/"+prior.originalQueryId+"/result");
+        check("rotated_current_access_restores_original_bytes",createHash("sha256").update(historic.raw).digest("hex")===prior.originalResultHash);
+        report.catalogRecovery={connectionId:prior.connectionId,oldSnapshot:prior.snapshot,newSnapshot:state.catalog.snapshotId,version:state.catalog.secretVersion};
+      }
       report.scope = doris ? "G3_RELEASE_AND_DORIS_DISCOVERY" : "G3_FORMAL_RELEASE_AND_PG_CATALOG_ONLY";
 
     } else if (mode === "mapping") {

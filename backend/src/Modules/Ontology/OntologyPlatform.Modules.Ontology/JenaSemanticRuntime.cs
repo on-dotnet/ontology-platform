@@ -154,24 +154,29 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
         }, cancellationToken);
 
     /// <summary>回读正式图与实际内存解析结果逐项核对，typed literal改写必须失败。</summary>
-    public Task<bool> VerifyAsync(ReleaseManifest manifest, SourceBundle sources, CancellationToken cancellationToken) =>
-        Execute(async (graphs, token) =>
+    public async Task<bool> VerifyAsync(ReleaseManifest manifest, SourceBundle sources, CancellationToken cancellationToken) =>
+        await VerifyPublishedBatchAsync(manifest, sources, cancellationToken) is not null;
+
+    /// <summary>返回实际对账和 SHACL 均通过的同一对图数组，供本次固定发布读取使用。</summary>
+    public Task<PublishedRdfData?> VerifyPublishedBatchAsync(ReleaseManifest manifest, SourceBundle sources, CancellationToken cancellationToken) =>
+        Execute<PublishedRdfData?>(async (graphs, token) =>
         {
             CheckManifest(manifest, sources);
             // 权威源重新解析用于实际图语义对账。
             var parsed = await ParseSourcesAsync(sources, graphs, token);
-            if (PublicationSupport(manifest, parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0 || !PublicationGovernance(manifest, sources, parsed, token)) return false;
+            if (PublicationSupport(manifest, parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0 || !PublicationGovernance(manifest, sources, parsed, token)) return null;
             // 正式图通过固定GSP读取，任何缺失不视为空成功。
             var ontology = await ReadGraphAsync(published, manifest.OntologyGraphIri, token);
             // 数据图与本体图独立对账。
             var data = await ReadGraphAsync(published, manifest.DataGraphIri, token);
-            if (JenaRdfCodec.Canonical(ontology) != JenaRdfCodec.Canonical(parsed[0].Concat(parsed[2]).Distinct().ToArray()) || JenaRdfCodec.Canonical(data) != JenaRdfCodec.Canonical(parsed[3])) return false;
+            if (JenaRdfCodec.Canonical(ontology) != JenaRdfCodec.Canonical(parsed[0].Concat(parsed[2]).Distinct().ToArray()) || JenaRdfCodec.Canonical(data) != JenaRdfCodec.Canonical(parsed[3])) return null;
             // 使用实际回读的正式本体和事实合并验证，避免漏掉subClassOf等父类target。
             var verificationGraph = await LoadAsync(string.Join('\n', ontology.Concat(data).Select(JenaRdfCodec.Triple)), graphs, token);
             // 此图内容来自正式TDB2实际回读，绝不拿原始源替代验证中的事实。
             var raw = await SendAsync(validation, "shacl?graph=" + Uri.EscapeDataString(verificationGraph), HttpMethod.Post, SourceDocument(sources.ShapesTurtle, 1), "application/rdf+json", token);
-            return JenaRdfCodec.Parse(raw).Any(triple => triple.Predicate == ShapePolicy.Sh + "conforms" && triple.Object.Value == "true");
-        }, cancellationToken);
+            return JenaRdfCodec.Parse(raw).Any(triple => triple.Predicate == ShapePolicy.Sh + "conforms" && triple.Object.Value == "true")
+                ? new PublishedRdfData { OntologyTriples = ontology, DataTriples = data } : null;
+        }, cancellationToken, nameof(VerifyAsync));
 
     /// <summary>读取固定发布图，缺失源保持503，不伪造空结果。</summary>
     public Task<PublishedRdfData> ReadPublishedAsync(AssetVersionSnapshot snapshot, CancellationToken cancellationToken) =>

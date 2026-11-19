@@ -8,6 +8,9 @@ namespace OntologyPlatform.Modules.SemanticQuery;
 /// <summary>固定映射到查询判别结果的执行边界，保持源精度且不创建假的RDF图来源。</summary>
 public sealed class G4QueryExecution
 {
+    /// <summary>Doris 最终提交从原五秒内预留的回滚和返回时间，平台 PG 锁取消实测仍需传播。</summary>
+    private static readonly TimeSpan DorisCommitReturnReserve = TimeSpan.FromMilliseconds(100);
+
     /// <summary>固定材料只由Connections模块读取。</summary>
     private readonly IG4QueryBindingReader bindings;
 
@@ -154,8 +157,30 @@ public sealed class G4QueryExecution
             receipts = bounded.Receipts.ToList();
             await observation.CancelAsync();
             try { await watching; } catch (OperationCanceledException) when (observation.IsCancellationRequested) { }
-            await store.CompleteAsync(admission.Record, session, proofs, query, state, result,
-                receipts.ToArray(), execution.Token);
+            // 只在 Doris 最终事务使用内部提前截止，给取消传播、回滚和返回留出原预算内的时间。
+            var isDoris = context.Manifest.Binding.SourceType == "DORIS";
+            // 该期限从 Gateway 的同一绝对截止倒扣，已有源阶段和授权耗时不会被重置。
+            var commitRemaining = deadline - clock.GetUtcNow() - DorisCommitReturnReserve;
+            if (isDoris && commitRemaining <= TimeSpan.Zero) throw new SemanticOperationException(503, "query_timeout");
+            using var rollbackDeadline = isDoris ? new CancellationTokenSource(commitRemaining, clock) : null;
+            using var commitCancellation = rollbackDeadline is null ? null :
+                CancellationTokenSource.CreateLinkedTokenSource(execution.Token, rollbackDeadline.Token);
+            try
+            {
+                await store.CompleteAsync(admission.Record, session, proofs, query, state, result,
+                    receipts.ToArray(), commitCancellation?.Token ?? execution.Token);
+            }
+            catch (OperationCanceledException) when (rollbackDeadline?.IsCancellationRequested == true && !execution.IsCancellationRequested)
+            {
+                throw new SemanticOperationException(503, "query_timeout");
+            }
+            catch (Exception error) when (isDoris
+                && error.GetBaseException() is System.Data.Common.DbException { SqlState: "55P03" })
+            {
+                // 平台 PG 的锁等待上限可先于查询截止生效，事务已经回滚。
+                execution.Token.ThrowIfCancellationRequested();
+                throw new SemanticOperationException(503, "query_timeout");
+            }
             if (result.Status is "UNAUTHORIZED" or "UNAVAILABLE")
             {
                 // 无数据结果也重新检查当前会话；本次只披露先前已验证可见的snapshot。
@@ -249,21 +274,44 @@ public sealed class G4QueryExecution
 
     /// <summary>取消只提交本人执行状态，不读取业务结果或重新执行外源查询。</summary>
     internal async Task<G4QueryView> CancelAsync(ActorContext actor, string sessionReference, string queryId,
-        Func<G4SemanticQuery, CancellationToken, Task> verifyRoot, CancellationToken token)
+        Func<G4SemanticQuery, Action<string>, CancellationToken, Task> verifyRoot, CancellationToken token)
     {
+        // 单调时钟分段，日志仅包含已核归属的查询 ID、固定阶段名和耗时。
+        var previous = clock.GetTimestamp();
         // 所有权优先，未知与异主体统一404。
         var record = await store.FindOwnedAsync(actor, queryId, token);
+        // 采样返回时间，当前主体通过归属检查后才记录固定标识。
+        void Observed(string phase)
+        {
+            // 本次返回时刻也作为下一段计时的起点。
+            var now = clock.GetTimestamp();
+            logger?.LogDebug("QueryCancelPhase query={QueryId} phase={Phase} elapsedMs={Elapsed}",
+                record.Id, phase, clock.GetElapsedTime(previous, now).TotalMilliseconds);
+            previous = now;
+        }
+        Observed("owner");
         if (record.ExpiresAtUtc <= clock.GetUtcNow()) throw new SemanticOperationException(410, "result_expired");
-        await verifyRoot(G4QueryResultStore.ReadRequest(record), token);
+        await verifyRoot(G4QueryResultStore.ReadRequest(record), Observed, token);
+        Observed("root");
         // 使用原执行实际投影，当前Active变更不妨碍取消。
         var state = G4QueryResultStore.ReadState(record);
         // 当前服务器会话及epoch在取消事务中再次复核。
         var session = await authority.CaptureSessionAsync(actor, sessionReference, state.Scope, token);
+        Observed("session");
         // 原执行无授权分支没有数据投影，取消不升级任何源读取权限。
         var proofs = new List<MappingAuthorizationProof>();
         foreach (var projection in state.Projections)
             proofs.Add(await CaptureAsync(session, state.Binding.ConnectionId, projection, "data.query.execute", token));
-        return G4QueryResultStore.View(await store.CancelAsync(queryId, session, proofs.ToArray(), token));
+        Observed("grants");
+        try
+        {
+            return G4QueryResultStore.View(await store.CancelAsync(queryId, session, proofs.ToArray(), token));
+        }
+        finally
+        {
+            // 此段包括事务返回或拒绝；提交与否以持久状态和审计核对。
+            Observed("transaction");
+        }
     }
 
     /// <summary>只接受原本人AMBIGUOUS结果中的精确候选和完整版本，禁止客户端自带IRI绕过。</summary>

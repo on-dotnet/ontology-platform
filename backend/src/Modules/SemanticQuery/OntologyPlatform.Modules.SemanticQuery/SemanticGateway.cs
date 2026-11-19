@@ -103,7 +103,7 @@ public sealed class SemanticGateway : ISemanticGateway
         try
         {
             return await queryExecution.CancelAsync(actor, sessionReference, queryId,
-                async (saved, token) => { await ReadG4RootAsync(actor, saved, token); }, budget.Token);
+                async (saved, observed, token) => { await ReadG4RootAsync(actor, saved, token, useVerifiedBatch: true, observed: observed); }, budget.Token);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
@@ -133,16 +133,35 @@ public sealed class SemanticGateway : ISemanticGateway
     }
 
     /// <summary>明确固定发布、当前完整本体scope和真实原件；不要求G3清单预先登记未来G4能力。</summary>
-    private async Task<PublishedGraph> ReadG4RootAsync(ActorContext actor, G4SemanticQuery query, CancellationToken token)
+    private async Task<PublishedGraph> ReadG4RootAsync(ActorContext actor, G4SemanticQuery query, CancellationToken token, bool useVerifiedBatch = false, Action<string>? observed = null)
     {
         QueryRules.DemandActor(actor);
-        // 正式目录执行semantic.read资源授权，不能只相信HTTP策略已通过。
-        var manifest = (await catalog.ResolveAsync(actor, query.AssetId, query.OntologyReleaseId, token)).Manifest;
-        if (!QueryRules.Covers(actor, manifest.Scope)) throw new SemanticOperationException(403, "scope_denied");
-        // 每次读取真实原件并与同一发布图核对，不沿用旧会话的可见性。
-        var verified = await sources.ReadAsync(manifest, token);
-        // 发布图唯一来源仍是现有语义运行时。
-        var graph = new PublishedGraph(manifest, await runtime.ReadVerifiedPublishedAsync(manifest, verified, token), token);
+        // 正式取消只复用本请求经当前权限核过的对象，以及实际图 SHACL 返回的同批数据。
+        PublishedGraph graph;
+        if (useVerifiedBatch && catalog is IVerifiedReleaseBatchCatalog batchCatalog)
+        {
+            // 固定 G4 版本不能为空，原有目录负责资产归属和发布行范围。
+            var batch = await batchCatalog.ReadVerifiedBatchAsync(actor, query.AssetId, query.OntologyReleaseId, token);
+            if (!QueryRules.Covers(actor, batch.Manifest.Scope)) throw new SemanticOperationException(403, "scope_denied");
+            observed?.Invoke("verifiedBatch");
+            await VerifiedReleaseSources.ReadBatchAsync(batch.Manifest, batch.SourceObjects, token);
+            observed?.Invoke("sourceBinding");
+            graph = new PublishedGraph(batch.Manifest, batch.Graph, token);
+            observed?.Invoke("graphIndex");
+        }
+        else
+        {
+            // 正式目录执行semantic.read资源授权，不能只相信HTTP策略已通过。
+            var manifest = (await catalog.ResolveAsync(actor, query.AssetId, query.OntologyReleaseId, token)).Manifest;
+            if (!QueryRules.Covers(actor, manifest.Scope)) throw new SemanticOperationException(403, "scope_denied");
+            observed?.Invoke("catalog");
+            // 每次读取真实原件并与同一发布图核对，不沿用旧会话的可见性。
+            var verified = await sources.ReadAsync(manifest, token);
+            observed?.Invoke("artifacts");
+            // 发布图唯一来源仍是现有语义运行时。
+            graph = new PublishedGraph(manifest, await runtime.ReadVerifiedPublishedAsync(manifest, verified, token), token);
+            observed?.Invoke("graphs");
+        }
         if (query.RelationshipIris.Any(iri => !graph.Relationships.Contains(iri))) throw new SemanticOperationException(422, "query_path_invalid");
         return graph;
     }

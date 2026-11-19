@@ -6,9 +6,20 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'maintenance'))
 from workflow_doris_mapping_query import fixture_instant, fixture_tables, reference_targets
 import workflow_doris_s0_cancel as cancellation
+from workflow import select_gates
 
 
 class DorisReferenceTests(unittest.TestCase):
+    def test_changed_shared_runtime_selects_the_consuming_doris_gate(self):
+        gate = 'doris-mapping-query-admission'
+        for name in ('workflow_execution.py','execution_preflight.py','workflow_m2_build.py','workflow_m4_query_runtime.py',
+                     'workflow_doris_fixture.py','canonical_fuseki.py','doris_keep_pg_recovery.py'):
+            with self.subTest(name=name):
+                self.assertIn(gate, select_gates(['scripts/maintenance/'+name])['affected'])
+        keep = select_gates(['docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/r0-review.json'])
+        self.assertIn('doris-keep-preservation',keep['affected'])
+        self.assertIn(gate,keep['affected'])
+
     def test_scoped_decimal_join_excludes_null_touching_and_other_scopes(self):
         entity = ('org-demo', 'site-a', '1.00', 10, 20)
         targets = [('T1', 'org-demo', 'site-a', '1.000', 10, 20),

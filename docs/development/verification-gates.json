@@ -22,6 +22,7 @@
         "docs/evidence/G4-M2-WEB-01/recovery/**/*.log",
         "docs/evidence/G4-ENG-DELIVERY-002/**/*.json",
         "docs/evidence/G4-M2-DORIS-01/**/*.json",
+        "docs/evidence/G4-DORIS-MAPPING-QUERY-001/**/*.json",
         "docs/deployment/doris.md",
         "docs/evidence/G4-M2-DORIS-01/metadata/*.nuspec",
         "docs/deployment/oracle.md",
@@ -616,6 +617,55 @@
         "python3",
         "-B",
         "scripts/tests/WorkflowIntegration.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "doris-mapping-query-admission": {
+      "inputs": [
+        "scripts/maintenance/workflow_doris_mapping_query.py",
+        "scripts/maintenance/workflow_doris_s0_cancel.py",
+        "scripts/maintenance/workflow_doris_s0_fixture.py",
+        "scripts/maintenance/workflow_doris_s1.py",
+        "scripts/maintenance/workflow_doris_vm.py",
+        "scripts/maintenance/doris_pg_assessment_golden.py",
+        "scripts/maintenance/doris_query_cancel_witness.py",
+        "scripts/tests/WorkflowDorisMappingQuery.Tests.py",
+        "scripts/maintenance/workflow_execution.py"
+      ],
+      "needs": [
+        "preflight",
+        "canonical_fuseki",
+        "doris-task-admission",
+        "m2-task-admission",
+        "query-task-admission",
+        "doris-keep-preservation"
+      ],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowDorisMappingQuery.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "doris-keep-preservation": {
+      "inputs": [
+        "scripts/maintenance/doris_keep_cold.py",
+        "scripts/maintenance/doris_keep_drain.py",
+        "scripts/maintenance/doris_keep_fuseki.py",
+        "scripts/maintenance/doris_keep_fuseki_resume.py",
+        "scripts/maintenance/doris_keep_keycloak.py",
+        "scripts/maintenance/doris_keep_pg_recovery.py",
+        "scripts/maintenance/doris_keep_pg_resume.py",
+        "scripts/maintenance/doris_keep_preservation.py",
+        "scripts/maintenance/doris_keep_readmit.py",
+        "scripts/tests/DorisKeepPreservation.Tests.py",
+        "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/r0-review.json"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/DorisKeepPreservation.Tests.py"
       ],
       "testsRequired": true
     }

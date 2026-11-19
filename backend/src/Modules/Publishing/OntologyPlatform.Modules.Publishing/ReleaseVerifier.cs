@@ -21,7 +21,11 @@ public sealed class ReleaseVerifier
     }
 
     /// <summary>核实清单自身及全部源对象，失败绝不返回部分快照。</summary>
-    public async Task<ReleaseManifest> VerifyArtifactsAsync(ReleaseRecord row, CancellationToken token)
+    public async Task<ReleaseManifest> VerifyArtifactsAsync(ReleaseRecord row, CancellationToken token) =>
+        (await ReadArtifactsAsync(row, token)).Manifest;
+
+    /// <summary>单次 GET 每份不可变对象后，对账 PG 权威字节；同一调用可继续核验精确槽位。</summary>
+    private async Task<(ReleaseManifest Manifest, SourceBundle Sources, byte[][] SourceObjects)> ReadArtifactsAsync(ReleaseRecord row, CancellationToken token)
     {
         if (PublishingRules.Hash(row.ManifestJson) != row.ManifestHash) throw new SemanticOperationException(503, "manifest_hash_mismatch");
         // 清单引用独立存储，清单不能包含自己的散列。
@@ -37,13 +41,15 @@ public sealed class ReleaseVerifier
         var expected = SourceContents(sources);
         if (manifest.ArtifactObjects.Length != expected.Length) throw new SemanticOperationException(503, "artifact_binding_mismatch");
         // 同位置对象与权威源逐项匹配，不能仅验证各自内部hash。
+        var objects = new byte[expected.Length][];
         for (var index = 0; index < expected.Length; index++)
         {
             // 同位置真实字节必须与固定源完全一致，不仅检查对象自报hash。
             var source = await artifacts.ReadVerifiedAsync(manifest.ArtifactObjects[index], token);
             if (!source.AsSpan().SequenceEqual(Encoding.UTF8.GetBytes(expected[index]))) throw new SemanticOperationException(503, "artifact_binding_mismatch");
+            objects[index] = source;
         }
-        return manifest;
+        return (manifest, sources, objects);
     }
 
     /// <summary>除对象外还执行SEM正式图回读、SHACL及查询对账。</summary>
@@ -53,6 +59,17 @@ public sealed class ReleaseVerifier
         var manifest = await VerifyArtifactsAsync(row, token);
         if (!await runtime.VerifyAsync(manifest, JsonSerializer.Deserialize<SourceBundle>(row.SourcesJson)!, token)) throw new SemanticOperationException(503, "release_graph_mismatch");
         return manifest;
+    }
+
+    /// <summary>对象字节与 PG 权威源对账后，由真实语义运行时返回这次 SHACL 所核验的实际图。</summary>
+    internal async Task<(ReleaseManifest Manifest, byte[][] SourceObjects, PublishedRdfData Graph)> ReadVerifiedBatchAsync(ReleaseRecord row, CancellationToken token)
+    {
+        // 对象与正式图均在本次读取，每个版本及每个请求独立。
+        var input = await ReadArtifactsAsync(row, token);
+        // 不符合沿用正式发布目录的图故障语义。
+        var graph = await runtime.VerifyPublishedBatchAsync(input.Manifest, input.Sources, token)
+            ?? throw new SemanticOperationException(503, "release_graph_mismatch");
+        return (input.Manifest, input.SourceObjects, graph);
     }
 
     /// <summary>严格采用ontology、shapes、可选vocabulary、data固定顺序。</summary>

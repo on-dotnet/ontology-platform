@@ -18,7 +18,19 @@ public sealed class VerifiedReleaseSources
     public VerifiedReleaseSources(IReleaseArtifactStore artifacts) => this.artifacts = artifacts;
 
     /// <summary>调用方必须先完成Catalog授权；返回的完整字节内容与此同版清单精确绑定。</summary>
-    public async Task<SourceBundle> ReadAsync(ReleaseManifest manifest, CancellationToken cancellationToken)
+    public Task<SourceBundle> ReadAsync(ReleaseManifest manifest, CancellationToken cancellationToken) =>
+        ReadCoreAsync(manifest, (_, artifact, token) => artifacts.ReadVerifiedAsync(artifact, token), cancellationToken);
+
+    /// <summary>对本请求已从对象存储回读的权威字节执行相同的槽位、散列和严格 UTF8 核验。</summary>
+    internal static Task<SourceBundle> ReadBatchAsync(ReleaseManifest manifest, byte[][] bytes, CancellationToken token)
+    {
+        if (manifest.ArtifactObjects is null || bytes.Length != manifest.ArtifactObjects.Length) throw InvalidBinding();
+        return ReadCoreAsync(manifest, (index, _, _) => Task.FromResult(bytes[index]), token);
+    }
+
+    /// <summary>共享逐槽位不可变绑定规则，不在不同请求之间保存源或图。</summary>
+    private static async Task<SourceBundle> ReadCoreAsync(ReleaseManifest manifest,
+        Func<int, ArtifactObject, CancellationToken, Task<byte[]>> read, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (manifest is null || manifest.SchemaVersion is not (1 or 2) || !Guid.TryParseExact(manifest.ReleaseId, "N", out _) || manifest.Snapshot is null || manifest.Hashes is null || manifest.ArtifactObjects is null) throw InvalidBinding();
@@ -42,7 +54,7 @@ public sealed class VerifiedReleaseSources
             var artifact = manifest.ArtifactObjects[index];
             if (artifact is null || artifact.Hash != expected[index] || artifact.ObjectKey != "releases/" + manifest.ReleaseId + "/source-" + index + "-" + expected[index] + ".ttl" || artifact.ContentType != "text/turtle" || artifact.SizeBytes is < 0 or > 256 * 1024) throw InvalidBinding();
             // 真实GET回验后仍独立与manifest对应源hash核对，不能只信任适配器自报成功。
-            var bytes = await artifacts.ReadVerifiedAsync(artifact, cancellationToken);
+            var bytes = await read(index, artifact, cancellationToken);
             if (bytes.LongLength != artifact.SizeBytes || Hash(bytes) != expected[index]) throw InvalidBinding();
             try { texts[index] = StrictUtf8.GetString(bytes); }
             catch (DecoderFallbackException) { throw new SemanticOperationException(503, "published_source_encoding_invalid"); }
