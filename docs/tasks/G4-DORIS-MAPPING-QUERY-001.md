@@ -3,7 +3,7 @@
 ## 当前执行与授权
 唯一执行状态：S2_AC06_BLOCKED。用户于2026-11-18批准同一会话/托管树/分支从7810f79227ea2e203fab8bdce60e4c29a1842110实施。分支codex/g4-doris-mapping-query-001，主线基线606ca2d2c61964e6498dd72d5e9ad960d3593bf7。实施EvidenceRunId=implementation-01；既有资源Owner保持原身份。
 
-Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)列明的源、测试、最小任务注册和当前文档。历史PG规范字节、旧ZIP与私有设施为只读依赖。R0允许14个准确ID在保全、排空、恢复清单与非作者检查后优雅停止。用户随后手动调VM。当前其他旧KEEP受保护，本分支不合main。
+Master单写。2026-11-19 追加同请求核验的 PublishingCatalog、ReleaseVerifier、JenaSemanticRuntime 及对应内部合同与回归。原 owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)列明的源、测试、最小任务注册和当前文档。历史PG规范字节、旧ZIP与私有设施为只读依赖。R0允许14个准确ID在保全、排空、恢复清单与非作者检查后优雅停止。用户随后手动调VM。当前其他旧KEEP受保护，本分支不合main。
 
 ## Specify：可观察要求
 
@@ -12,12 +12,12 @@ Master单写。owned_paths 为[唯一合同C2/F2与集中裁决](../evidence/G4-
 | AC01 | 已发布且完整授权则查询成功；错用途/未发布拒绝 | MappingValidationService/QueryBindingReader，DorisMappingQueryTests | 正式四角色单表及双表发布均已运行，正例通过 |
 | AC02 | decimal同值异scale连边；不等/NULL不连 | DorisQueryReader/G4QueryTests | 独立 SQL 与整数系数参考、正式关系查询同得 T1/T2 |
 | AC03 | 全集唯一身份可发布；身份碰撞/未知表模型拒绝 | DorisMappingSourceValidator | S0 模型拒绝，S1 不支持的身份拒绝，S2 多父和危险身份方案被拒 |
-| AC04 | 当前授权有效可提交；撤权/轮换先提交无成功副作用 | G4QueryAuthorizationTests/G4QueryRaceTests | 实测源 SELECT 撤销、源读后撤 execute 和当前会话到期；在途轮换待验 |
-| AC05 | 元数据兼容可用；列/模型变化旧批准拒绝 | QueryBindingReader/新Doris测试 | 原审批后形状变化拒绝激活，复原后读同一失败检查；在途 DDL 待验 |
-| AC06 | 完成读取正常返回；取消/断开不得EMPTY或迟到成功 | G4QueryHttpTests/新Doris测试 | 底层固定 SQL 通过；正式取消有平台胜出，三级最大窗口 31.925 ms，源端因果 NO-GO |
+| AC04 | 当前授权有效可提交；撤权/轮换先提交无成功副作用 | G4QueryAuthorizationTests/G4QueryRaceTests | 源 SELECT 撤销、读后撤 execute、会话失效及在途轮换 1→2 均拒绝；新发布及历史字节已复核 |
+| AC05 | 元数据兼容可用；列/模型变化旧批准拒绝 | QueryBindingReader/新Doris测试 | 审批后形状变化拒绝激活；同查询读行后到目录后验前真实改名返回 422，原 tablet、DDL 与行摘要恢复 |
+| AC06 | 完成读取正常返回；取消/断开不得EMPTY或迟到成功 | G4QueryHttpTests/新Doris测试 | 底层固定 SQL 通过；同请求复用后已完成查询正式取消耗时 65.939–75.329 ms，既有最大 BE 窗口 31.925 ms，源端因果 NO-GO |
 | AC07 | 当前activation可提交；同query ABA拒绝 | G4QueryRaceTests | 两个真实同查询 ABA 时序均在原期限内以 409 拒绝，零成功副作用；拒绝当刻 RUNNING |
-| AC08 | 新会话恢复原字节；撤权/到期拒绝且不业务重查 | G4QueryPersistenceTests | 新会话原字节恢复、执行与读取撤权拒绝通过；到期待验 |
-| AC09 | 六态/可信前缀正确；超预算无COMPLETED | G4QueryTests/G4QueryWireTests | EMPTY、AMBIGUOUS、扇出 10→11 与信任前缀均已实测；其余预算/故障待验 |
+| AC08 | 新会话恢复原字节；撤权/到期拒绝且不业务重查 | G4QueryPersistenceTests | 新会话恢复原字节；撤权 403；一次性查询到期后结果/证据均 410，FE 审计业务查询集合未增加 |
+| AC09 | 六态/可信前缀正确；超预算无COMPLETED | G4QueryTests/G4QueryWireTests | 空集、歧义、扇出、真实断开、超宽列及最终提交截止已测；真实第 101 行哨兵仍待验 |
 | AC10 | HTTP/UI/MCP相同结果；PG旧字节不变 | G4QueryMcpTests/既有Web测试 | PG 两组历史 manifest/result 与 standard assessment 通过，UI/MCP 待验 |
 | AC11 | 分别读取记录真实窗口；不盖虚假snapshot | 新Doris测试 | S0 受控写入与 S1 UNKNOWN/null 已核验 |
 
@@ -122,3 +122,12 @@ S2 已通过双表正式发布与激活。SQL 与整数系数参考及 Q 的实�
 正式审批在原始两表上通过。类型与模型分别变化后，C 两次激活均返回 409 mapping_activation_check_failed，之前的 release、activationId 及修订 5 保持一致。变更期间，当前权限不足以查看失败检查的源细节，读取返回 403。原 tablet 与行散列复原后，按同一 checkId 回读到原先记录的 NOT_RUN 与 mapping_source_shape_invalid。两个场景中目录均可见临时交换表，不能从正式激活拒绝单独归因于模型。源端单独模型拒绝见 S0。首次试验误期望检查在源变化期间可读，其失败原件保留。
 
 收口时原 14 个容器均已按 ID、镜像及退出状态回读。新任务 FE、BE 已用 TERM 优雅停止，保留四个卷。平台 PG 的三项在途计数均为零，执行 pg_ctl fast 后，docker exec 客户端退出码 137，数据库容器退出码 0、无 OOM，且日志含数据库已关闭。其持久卷仍在。Keycloak、Fuseki、RustFS 继续持有本任务的三个易失卷，待复审确定后续保全或处置。没有运行中的本任务 API、编译器或压力夹具。S3、CI、完整产品验收及最终 V3 尚未运行。
+
+
+### 同请求发布核验与 S2 接续
+
+用户批准在同一取消请求中复用已核过的发布对象及同批实际图。正式目录按当前主体核权限，RustFS 字节与 PG 原件逐槽对账，严格 UTF-8、快照绑定、RIOT 和真实图 SHACL 均执行。请求结束时不保存图或验证结果供下一次请求复用。三次完成态正式取消耗时 75.329、66.352、65.939 ms。最近一次发布核验本身仍需约 54 ms。独立复核维持 AC06 NO-GO；现有数据不足以在已审 31.925 ms 窗口重开正式竞态。此前运行中请求先后胜负、三个压力档和 SLEEP 能力边界均保留。
+
+AC04 在途读取后正式轮换凭据版本 1→2、连接修订 2→3，同一查询 409，随后同一连接重新发现、异人审核并激活双表，新结果与历史原字节均已恢复。AC05 同一查询数据行返回后、目录后验前改列名，422，拒绝当下无结果、来源回执或成功审计。AC08 仅使一次性查询到期，结果和证据均 410。AC09 中断准确源连接后结果为 UNAVAILABLE，业务行、证据和来源回执均为零，执行记录为 COMPLETED 并有一条 allowed 审计。准确列宽 512 的负例在源投影前拒绝并恢复原表。早先总截止实际返回 5029.368 ms；最终事务从五秒内部预留 100 ms 后，真实短锁和近截止竞争分别用时 2537.7962 和 4927.9878 ms，两者均返回 503 且无成功副作用。六条定向拒绝记录最终均为 FAILED。独立真实第 101 行仍待取证。
+
+正式受影响计划在干净代码提交上覆盖 243 个路径，未知为零。产品门禁与 S3 准入另行核定。收尾回读确认旧 14 个实例继续 STOPPED_KEEP；本任务 FE、BE、持久平台 PG 已停止，三项易失服务持续持卷。完整验收、最终 V3 与同包重开仍待 AC06 和后续阶段放行。[本轮原件索引及非作者结论](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2-followup/index.json)
