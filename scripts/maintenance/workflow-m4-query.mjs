@@ -11,16 +11,18 @@ function argument(name) {
   return args[index + 1];
 }
 const task = argument("task");
-if (!["G4-M4-QUERY-001", "G4-M5-INTEGRATION-001", "G4-DORIS-MAPPING-QUERY-001"].includes(task)) throw new Error("QUERY_TASK_NOT_ADMITTED");
+if (!["G4-M4-QUERY-001", "G4-M5-INTEGRATION-001", "G4-DORIS-MAPPING-QUERY-001", "G4-ORACLE-MAPPING-QUERY-001"].includes(task)) throw new Error("QUERY_TASK_NOT_ADMITTED");
 const doris = task === "G4-DORIS-MAPPING-QUERY-001";
-const integration = task === "G4-M5-INTEGRATION-001", runId = doris ? "implementation-01" : integration ? "integration-01" : "query-impl-01";
+const oracle = task === "G4-ORACLE-MAPPING-QUERY-001";
+const omq = oracle ? await import("./workflow-oracle-query-fixture.mjs") : null;
+const integration = task === "G4-M5-INTEGRATION-001", runId = doris || oracle ? "implementation-01" : integration ? "integration-01" : "query-impl-01";
 const evidenceRun = doris ? (process.env.G4_DORIS_EVIDENCE_RUN ?? runId) : runId;
 if (doris && ![runId, "review-fix-01"].includes(evidenceRun) && !(evidenceRun === "review-fix-02" && argument("mode") === "s2-doris-ready")) throw new Error("DORIS_EVIDENCE_RUN");
 const scenario = integration ? argument("scenario") : null;
 if (integration && !["standard", "numeric", "safety", "aba"].includes(scenario)) throw new Error("INTEGRATION_SCENARIO_INVALID");
-const moduleName = doris ? "workflow_doris_s1" : integration ? "workflow_m5_integration" : "workflow_m4_query";
+const moduleName = oracle ? "workflow_oracle_mapping_platform" : doris ? "workflow_doris_s1" : integration ? "workflow_m5_integration" : "workflow_m4_query";
 const scenarioCode = integration ? `q.scenario("${scenario}");` : "";
-const privateName = doris ? ".tools/security/g4-doris-mapping-query-001" : integration ? ".tools/security/g4-m5-integration-001" : ".tools/security/g4-m4-query-001";
+const privateName = oracle ? ".tools/security/g4-oracle-mapping-query-001" : doris ? ".tools/security/g4-doris-mapping-query-001" : integration ? ".tools/security/g4-m5-integration-001" : ".tools/security/g4-m4-query-001";
 const dorisReadRaces = {
   "s2-doris-revoke-race": ["after_read_revoke", "revoke-test", "DORIS_INFLIGHT_GRANT_REVOCATION"],
   "s2-doris-session-race": ["after_read_session_expiry", "session-test", "DORIS_INFLIGHT_SESSION_EXPIRY"],
@@ -32,9 +34,10 @@ const dorisReadRaces = {
 };
 const twoTable = doris && (argument("mode").startsWith("s2-doris-") || ["s3","ui-s1","ui-s3"].includes(argument("mode")));
 const stateName = twoTable ? "doris-two-table.json" : integration ? `scenario-${scenario}.json` : "runtime-fixture.json";
-const port = value => doris ? ({15441:15641,15442:15642,15443:15643,15444:15644,15445:19030,15446:15645,15447:15646,15448:15647})[value] : integration ? value + 100 : value;
+const port = value => oracle ? ({15441:omq.ports.api,15442:omq.ports.web,15443:omq.ports.oidc,15448:omq.ports.secondary})[value] : doris ? ({15441:15641,15442:15642,15443:15643,15444:15644,15445:19030,15446:15645,15447:15646,15448:15647})[value] : integration ? value + 100 : value;
 if (argument("task") !== task || argument("run-id") !== runId || await realpath(process.cwd()) !== root) throw new Error("QUERY_CONSUMER_BOUNDARY");
 const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/package.json"));
+if (oracle && !omq.modes.includes(mode)) throw new Error("ORACLE_SCENARIO_NOT_REGISTERED");
 if (doris && !["s3","ui-s1","ui-s3","serve","s2-doris-ready","s2-doris-root-deadline","s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
 if (mode === "serve") {
@@ -51,7 +54,7 @@ if (mode === "serve") {
   }
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: port(15442),
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["s2-doris-ready","s2-doris-root-deadline","s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding","s2-doris-cardinality","s2-doris-identity","s2-doris-states","s2-doris-cancel-window","s2-doris-admission-cancel","s2-doris-aba","s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
+} else if ((oracle && omq.modes.includes(mode)) || ["s2-doris-ready","s2-doris-root-deadline","s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding","s2-doris-cardinality","s2-doris-identity","s2-doris-states","s2-doris-cancel-window","s2-doris-admission-cancel","s2-doris-aba","s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -60,13 +63,16 @@ async function browserRun(mode) {
   const { writeFile, mkdir } = await import("node:fs/promises");
   const output = resolve(root, "artifacts/workflow", task, evidenceRun);
   const privateRoot = resolve(root, privateName, runId);
+  const { execFileSync } = await import("node:child_process");
+  const binding = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps({"api":q.runtime_binding(),"web":q.web_binding() if any(arg.startswith("ui-") for arg in sys.argv) else None}))`, mode], { cwd: root, timeout: 30000, encoding: "utf8" }));
+  // 先绑定准确 Oracle 任务宿主，随后才可打开本次合成 OIDC 材料。
+  const initialOracle = oracle ? binding() : null;
+  if (oracle) omq.checkBinding(initialOracle);
   const realm = JSON.parse(await readFile(resolve(privateRoot, "runtime/realm.json"), "utf8"));
   if (!realm.authority.startsWith(`http://localhost:${port(15443)}/realms/g2-`)) throw new Error("QUERY_REALM_BOUNDARY");
   const origin = `http://localhost:${port(15441)}`;
   const file = resolve(output, "browser-" + mode + "-" + Date.now() + ".json");
   const report = { taskId: task, runId, mode, startedAtUtc: new Date().toISOString(), checks: [], http: [], status: "FAIL" };
-  const { execFileSync } = await import("node:child_process");
-  const binding = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps({"api":q.runtime_binding(),"web":q.web_binding() if any(arg.startswith("ui-") for arg in sys.argv) else None}))`, mode], { cwd: root, timeout: 30000, encoding: "utf8" }));
   const observed = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.source_scan_snapshot()))`], { cwd: root, timeout: 30000, encoding: "utf8" }));
   const contexts = [];
   let browser, phase = "launch";
@@ -169,12 +175,12 @@ async function browserRun(mode) {
     }
   }
   try {
-    report.inputBinding = binding();
+    report.inputBinding = initialOracle ?? binding();
     const { chromium } = require("@playwright/test");
     browser = await chromium.launch({ channel: "msedge", headless: true, args: ["--disable-background-networking", "--disable-component-update"] });
     const operator = await identity("operator-ab"), auditor = await identity("auditor-ab");
-    const activator = doris ? await identity("operator-a") : operator;
-    const reader = doris ? await identity("viewer-a") : operator;
+    const activator = doris || oracle ? await identity("operator-a") : operator;
+    const reader = doris || oracle ? await identity("viewer-a") : operator;
     check("distinct_oidc_subjects", operator.me.subjectId !== auditor.me.subjectId);
     let state;
     try { state = JSON.parse(await readFile(resolve(output, stateName), "utf8")); }
@@ -185,15 +191,15 @@ async function browserRun(mode) {
         state = JSON.parse(await readFile(resolve(output, "runtime-fixture.json"), "utf8"));
         check("single_table_baseline", state.latestQuery?.resultHash && state.mappingRelease?.manifest.mapping.entities.length === 1);
         for (const key of Object.keys(state)) if (key.startsWith("mapping") || ["firstQuery","latestQuery"].includes(key)) delete state[key];
-      } else state = { taskId: task, runId, ...(integration ? { scenario, s3: true, numeric: scenario === "numeric" } : {}), scope: { organizationId: "org-demo", siteIds: doris ? ["site-a"] : ["site-a", "site-b"] } }; }
+      } else state = { taskId: task, runId, ...(integration ? { scenario, s3: true, numeric: scenario === "numeric" } : {}), scope: { organizationId: "org-demo", siteIds: doris || oracle ? ["site-a"] : ["site-a", "site-b"] } }; }
     check("fixture_identity", state.taskId === task && state.runId === runId);
-    if (doris) {
+    if (doris || oracle) {
       check("distinct_four_roles", new Set([operator,auditor,activator,reader].map(a => a.me.subjectId)).size === 4);
-      if (twoTable && state.subjects) {
+      if ((twoTable || oracle) && state.subjects) {
         for (const [role,actor] of Object.entries({operator,auditor,activator,reader}))
           check("current_subject_"+role,state.subjects[role]===actor.me.subjectId);
       }
-      state.connectionDisplayName = "Doris Mapping Query synthetic";
+      state.connectionDisplayName = oracle ? "Oracle Mapping Query synthetic" : "Doris Mapping Query synthetic";
       state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId, activator: activator.me.subjectId, reader: reader.me.subjectId };
       await save(state);
     }
@@ -277,7 +283,7 @@ async function browserRun(mode) {
       check("all_current_prerequisites",report.scenarioReady.status==="READY");
       if (mode==="s2-doris-ready") { report.scope="PREREQUISITES_ONLY";report.status="PASS";return; }
     }
-    if (!doris) state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
+    if (!doris && !oracle) state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
     await save(state);
     const prepareShape = mode === "s2-doris-shape-prepare";
     if (mode === "s2-doris-aba" || prepareShape) mode = "s2-aba-prepare";
@@ -300,6 +306,25 @@ async function browserRun(mode) {
       phase = "explicit_synthetic_grants";
       report.grants = JSON.parse(execFileSync("python3", ["-B", "scripts/maintenance/workflow_doris_s1.py",
         (twoTable ? "s2-" : "") + (mode === "mapping" ? "mapping-grants" : "query-grants")], { cwd: root, timeout: 30000, encoding: "utf8" }));
+    }
+    if (oracle && ["mapping", "s0-oracle-ready"].includes(mode)) {
+      phase = "oracle_current_grants";
+      report.grants = omq.grants(root, state, mode === "mapping" ? "mapping" : "query");
+    }
+    if (oracle && (mode.startsWith("s0-oracle-") || mode === "s1")) {
+      phase = "oracle_scenario_ready";
+      const current = await omq.ready({ root, state, operator, reader, get, check, mode, actors:[operator,auditor,activator,reader] });
+      check("oracle_readiness_redacted", !secrets.some(s => s && JSON.stringify(current.row).includes(s)));
+      report.scenarioReady = current.row;
+      if (mode === "s0-oracle-ready") {
+        report.scope = "ORACLE_FORMAL_ROOT_READY"; report.status = "PASS"; return;
+      }
+      if (mode.startsWith("s0-oracle-")) {
+        phase = "oracle_formal_source_observation";
+        await omq.witness({ root, state, reader, mode, capability:current.capability, get, request, check, report });
+        report.scope = mode === "s0-oracle-cancel" ? "ORACLE_FORMAL_CANCEL" : "ORACLE_NATURAL_CONTROL";
+        report.status = "PASS"; return;
+      }
     }
     if (mode === "ready") {
       report.status = "PASS"; report.scope = "SCENARIO_PREREQUISITE_ONLY";
@@ -1275,7 +1300,7 @@ m:quality a owl:DatatypeProperty; rdfs:domain m:Reading; rdfs:range xsd:string .
 m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
 `;
         }
-        state.ontologyDraft = await post(operator, "/api/v1/ontology-drafts", { name: doris ? "Doris 合成温度量与关系词汇" : "Synthetic M4 query vocabulary", scope: state.scope, sources, baseReleaseId: null, command: command() }); await save(state);
+        state.ontologyDraft = await post(operator, "/api/v1/ontology-drafts", { name: oracle ? "Oracle 合成映射与查询词汇" : doris ? "Doris 合成温度量与关系词汇" : "Synthetic M4 query vocabulary", scope: state.scope, sources, baseReleaseId: null, command: command() }); await save(state);
       }
       const draft = state.ontologyDraft;
       if (!state.ontologyAssessment) {
@@ -1313,36 +1338,36 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
         if (existing.length === 1) { state.connectionId = existing[0].id; await save(state); }
       }
       if (!state.connectionId) {
-        phase = "pg_connection_create";
-        const password = await readFile(doris ? resolve(privateRoot, "../implementation-01-source/reader.pass") : resolve(privateRoot, "pg-source/reader-password"), "utf8"); secrets.push(password);
-        const secret = await post(operator, "/api/v1/connection-secrets", { secretValue: password, scopeSelection: state.scope, purpose: doris ? "DORIS_READONLY" : "POSTGRESQL_READONLY", command: command() }, 201);
+        phase = oracle ? "oracle_connection_create" : "pg_connection_create";
+        const password = await readFile(oracle ? resolve(privateRoot, "reader-password") : doris ? resolve(privateRoot, "../implementation-01-source/reader.pass") : resolve(privateRoot, "pg-source/reader-password"), "utf8"); secrets.push(password);
+        const secret = await post(operator, "/api/v1/connection-secrets", { secretValue: password, scopeSelection: state.scope, purpose: oracle ? "ORACLE_READONLY" : doris ? "DORIS_READONLY" : "POSTGRESQL_READONLY", command: command() }, 201);
         secrets.push(secret.secretRef);
-        const config = doris ? { type: "DORIS", profile: { feHost: "localhost", queryPort: 19030, catalog: "internal", database: "fixture", username: "fixture_reader", tls: true } } : { type: "POSTGRESQL", profile: { host: "pg-source", port: 5432, database: "fixture", username: "fixture_reader", sslMode: "VerifyFull", allowedSchemas: ["production", "public"] } };
+        const config = oracle ? omq.config : doris ? { type: "DORIS", profile: { feHost: "localhost", queryPort: 19030, catalog: "internal", database: "fixture", username: "fixture_reader", tls: true } } : { type: "POSTGRESQL", profile: { host: "pg-source", port: 5432, database: "fixture", username: "fixture_reader", sslMode: "VerifyFull", allowedSchemas: ["production", "public"] } };
         const connection = await post(operator, "/api/v1/connections", { displayName: state.connectionDisplayName ?? "M4 synthetic PostgreSQL query", scopeSelection: state.scope, config, secretRef: secret.secretRef, command: command() }, 201);
         state.connectionId = connection.id; await save(state);
       }
       const connectionPath = `/api/v1/connections/${state.connectionId}`;
       let current = await request(operator, "GET", connectionPath);
       if (!current.data.probeFresh) {
-        phase = (doris ? "doris_tls_readonly_probe" : "pg_tls_readonly_probe");
+        phase = (oracle ? "oracle_tls_readonly_probe" : doris ? "doris_tls_readonly_probe" : "pg_tls_readonly_probe");
         const probe = await post(operator, connectionPath + "/test", { command: command(current.data.configRevision) }, 200, current.etag);
-        check((doris ? "doris_real_probe" : "pg_real_probe"), probe.status === "TEST_OK");
+        check((oracle ? "oracle_real_probe" : doris ? "doris_real_probe" : "pg_real_probe"), probe.status === "TEST_OK");
         current = await request(operator, "GET", connectionPath);
       }
       if (current.data.state !== "ACTIVE") {
-        phase = (doris ? "doris_enable" : "pg_enable");
+        phase = (oracle ? "oracle_enable" : doris ? "doris_enable" : "pg_enable");
         await post(operator, connectionPath + "/enable", { command: command(current.data.configRevision) }, 200, current.etag);
       }
       if (!state.catalog) {
-        phase = (doris ? "doris_catalog" : "pg_catalog"); current = await request(operator, "GET", connectionPath);
+        phase = (oracle ? "oracle_catalog" : doris ? "doris_catalog" : "pg_catalog"); current = await request(operator, "GET", connectionPath);
         const job = await post(operator, connectionPath + "/discoveries", { command: command(current.data.configRevision) }, 202, current.etag);
         for (let attempt = 0; attempt < 30; attempt++) {
           const progress = await get(operator, connectionPath + "/discoveries/" + job.jobId);
           if (progress.status === "SUCCEEDED") { state.catalog = await get(operator, "/api/v1/catalogs/" + progress.snapshotId); break; }
-          check((doris ? "doris_job_nonfailure_" : "pg_job_nonfailure_") + attempt, ["QUEUED", "RUNNING"].includes(progress.status));
+          check((oracle ? "oracle_job_nonfailure_" : doris ? "doris_job_nonfailure_" : "pg_job_nonfailure_") + attempt, ["QUEUED", "RUNNING"].includes(progress.status));
           await new Promise(done => setTimeout(done, 500));
         }
-        check((doris ? "doris_catalog_ready" : "pg_catalog_ready"), state.catalog?.status === "READY"); await save(state);
+        check((oracle ? "oracle_catalog_ready" : doris ? "doris_catalog_ready" : "pg_catalog_ready"), state.catalog?.status === "READY"); await save(state);
       }
       report.status = "PASS";
       if (twoTable && state.credentialRotation?.reset) {
@@ -1353,15 +1378,16 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
         check("rotated_current_access_restores_original_bytes",createHash("sha256").update(historic.raw).digest("hex")===prior.originalResultHash);
         report.catalogRecovery={connectionId:prior.connectionId,oldSnapshot:prior.snapshot,newSnapshot:state.catalog.snapshotId,version:state.catalog.secretVersion};
       }
-      report.scope = doris ? "G3_RELEASE_AND_DORIS_DISCOVERY" : "G3_FORMAL_RELEASE_AND_PG_CATALOG_ONLY";
+      if (oracle) check("oracle_complete_discovered_catalog", omq.projection(state.catalog, state.connectionId).fields.length === 11);
+      report.scope = oracle ? "G3_RELEASE_AND_ORACLE_DISCOVERY" : doris ? "G3_RELEASE_AND_DORIS_DISCOVERY" : "G3_FORMAL_RELEASE_AND_PG_CATALOG_ONLY";
 
     } else if (mode === "mapping") {
       check("formal_prerequisites", Boolean(state.catalog && state.ontologyRelease));
-      const sourceTable = name => doris ? (name === "assets" ? "dmq_entity" : "dmq_target") : state.numeric ? "numeric_" + name : name;
-      const dataset = { snapshotId: state.catalog.snapshotId, schema: doris ? "fixture" : "production", name: sourceTable("assets"), kind: "TABLE" };
+      const sourceTable = name => oracle ? (name === "assets" ? "OMQ_ENTITY" : "OmqTarget") : doris ? (name === "assets" ? "dmq_entity" : "dmq_target") : state.numeric ? "numeric_" + name : name;
+      const dataset = { snapshotId: state.catalog.snapshotId, schema: oracle ? "PRODUCTION" : doris ? "fixture" : "production", name: sourceTable("assets"), kind: "TABLE" };
       const table = state.catalog.objects.find(value => value.schema === dataset.schema && value.name === sourceTable("assets"));
       const field = input => {
-        const name = doris ? ({organization_id:"org_id",asset_id:"entity_id",label:"amount"}[input] ?? input) : input;
+        const name = oracle ? ({organization_id:"ORG_ID",site_id:"SITE_ID",asset_id:"EXT_ID",valid_from:"FROM_TS",valid_to:"TO_TS",label:"LABEL",event_at:"EVENT_TS",observed_at:"OBSERVED_TS"}[input] ?? input) : doris ? ({organization_id:"org_id",asset_id:"entity_id",label:"amount"}[input] ?? input) : input;
         return { datasetRef: dataset, name, ordinal: table.fields.find(value => value.name === name).ordinal };
       };
       const definition = { entities: [{ id: "asset", entityClassIri: "urn:synthetic:mapping:Asset", datasetRef: dataset,
@@ -1372,6 +1398,11 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
           validFromFieldRef: field("valid_from"), validToFieldRef: field("valid_to"), timezonePolicy: { kind: "UTC", zoneId: null }, precision: "MICROSECOND" }],
         properties: [{ id: "label", entityBindingId: "asset", propertyIri: "urn:synthetic:mapping:label", fieldRef: field("label"), conversionId: null, unitSpecId: null, nullPolicy: "REJECT_NULL" }],
         relations: [], conversions: [], unitSpecs: [] };
+      if (oracle) {
+        definition.temporalSpecs[0].eventTimeFieldRef = field("event_at");
+        definition.temporalSpecs[0].observedAtFieldRef = field("observed_at");
+        definition.temporalSpecs[0].timezonePolicy = {kind:"REGISTERED_ZONE", zoneId:"Etc/UTC"};
+      }
       if (doris) {
         definition.properties[0] = { ...definition.properties[0], id: "amount", propertyIri:"urn:synthetic:mapping:amount", unitSpecId:"amount-k", conversionId:"amount-identity" };
         definition.unitSpecs = [{ id: "amount-k", sourceUnitIri: "urn:synthetic:m3:K-v1", targetUnitIri: "urn:synthetic:m3:K-v1",
@@ -1458,23 +1489,23 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       }
       state.mappingRelease = await get(operator, "/api/v1/mapping-releases/" + state.mappingReceipt.mappingReleaseId); await save(state);
       check("query_mapping_original", state.mappingRelease.manifest.mapping.entities.length === (state.s3 || twoTable ? 2 : 1) && state.mappingRelease.manifest.mapping.entities[0].datasetRef.snapshotId === state.catalog.snapshotId);
-      report.status = "PASS"; report.scope = "M4_QUERY_FIXED_MAPPING_PREREQUISITE_ONLY";
+      report.status = "PASS"; report.scope = oracle ? "ORACLE_FORMAL_SINGLE_TABLE_MAPPING" : "M4_QUERY_FIXED_MAPPING_PREREQUISITE_ONLY";
     } else if (mode === "s1") {
       phase = "query_capability";
       const capability = (await get(reader, "/api/v1/capabilities")).find(item => item.id === "g4_resolve_entity");
       check("g4_registered_capability", Boolean(capability && state.mappingRelease));
       const query = { assetId: state.ontologyRelease.manifest.assetId, ontologyReleaseId: state.ontologyRelease.manifest.releaseId,
         mappingReleaseIds: [state.mappingReceipt.mappingReleaseId], capabilityId: capability.id, capabilityVersion: capability.version,
-        relationshipIris: [], depth: 1, maxRows: 100, timeoutMs: 5000, filters: { siteId: "site-a", entityExternalId: doris ? "E1" : "asset-1" } };
+        relationshipIris: [], depth: 1, maxRows: 100, timeoutMs: 5000, filters: { siteId: "site-a", entityExternalId: oracle ? "omq-entity-1" : doris ? "E1" : "asset-1" } };
       const beforeDoris = doris ? observed() : null;
       phase = "query_default_zero_grant";
       const denied = await request({ ...auditor, headers: { ...auditor.headers, "Idempotency-Key": randomUUID() } }, "POST", "/api/v1/data/semantic-queries", query);
       check("default_zero_data_grant", denied.data?.status === "UNAUTHORIZED" && denied.data.data.length === 0 && denied.data.evidence.length === 0);
       check("denied_no_store", denied.cacheControl === "no-store");
-      phase = "query_first_real_pg";
+      phase = oracle ? "query_first_real_oracle" : "query_first_real_pg";
       const key = randomUUID(), writer = { ...reader, headers: { ...reader.headers, "Idempotency-Key": key } };
       const first = await request(writer, "POST", "/api/v1/data/semantic-queries", query);
-      check(doris ? "real_doris_found" : "real_pg_found", first.data?.status === "FOUND" && first.data.data.length === 1 && first.data.data[0].kind === "entity");
+      check(oracle ? "real_oracle_found" : doris ? "real_doris_found" : "real_pg_found", first.data?.status === "FOUND" && first.data.data.length === 1 && first.data.data[0].kind === "entity");
       if (doris) {
         const amount = first.data.data[0].properties.find(p => p.propertyIri === "urn:synthetic:mapping:amount");
         check("doris_amount_exact", amount?.value.type === "decimal" && amount.value.lexical === "9007199254740993.20" && amount.value.precision === 20 && amount.value.scale === 2);
@@ -1482,10 +1513,15 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
         check("doris_event_microseconds", amount.eventTime.lexical === "2026-11-17T12:00:00.123456Z");
         check("doris_unknown_data_watermark", first.data.subSources[0].watermarkKind === "UNKNOWN");
       }
+      if (oracle) {
+        const label = first.data.data[0].properties.find(p => p.propertyIri === "urn:synthetic:mapping:label");
+        check("oracle_label_exact", label?.value.type === "string" && label.value.lexical === "entity");
+        check("oracle_read_unknown_watermark", first.data.subSources[0].watermarkKind === "UNKNOWN" && first.data.subSources[0].watermark == null);
+      }
       check("actual_query_reference", /^query-[0-9a-f]{32}$/.test(first.queryId));
       check("real_source_receipt", first.data.subSources.length === 1 && first.data.subSources[0].status === "SUCCESS" && first.data.subSources[0].sourceReadReceiptId);
       check("precise_identity_evidence", first.data.evidence.length > 0 && first.data.evidence.every(item => item.precision === "ROW_KEY" && item.sourceRecordRef && !Object.hasOwn(item, "graphIri")));
-      check("real_scope_projection", first.data.data[0].identity.siteId === "site-a" && first.data.data[0].identity.externalId === (doris ? "E1" : "asset-1"));
+      check("real_scope_projection", first.data.data[0].identity.siteId === "site-a" && first.data.data[0].identity.externalId === (oracle ? "omq-entity-1" : doris ? "E1" : "asset-1"));
       check("completed_no_store", first.cacheControl === "no-store");
       phase = "query_restore_exact_bytes";
       const restored = await request(reader, "GET", `/api/v1/data/semantic-queries/${first.queryId}/result`);
@@ -1510,7 +1546,7 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
           beforeDoris.queryIdsSha256 !== after.queryIdsSha256 && after.businessQueries === beforeDoris.businessQueries + 1);
       }
       state.firstQuery ??= state.latestQuery; await save(state);
-      report.status = "PASS"; report.scope = doris ? "S1_DORIS_OIDC_QUERY_PERSISTENCE" : "S1_REAL_OIDC_FORMAL_MAPPING_PG_QUERY_RESTORE_EVIDENCE_HTTP";
+      report.status = "PASS"; report.scope = oracle ? "S1_ORACLE_OIDC_QUERY_PERSISTENCE" : doris ? "S1_DORIS_OIDC_QUERY_PERSISTENCE" : "S1_REAL_OIDC_FORMAL_MAPPING_PG_QUERY_RESTORE_EVIDENCE_HTTP";
     } else if (mode === "ui-s3") {
       const actor = doris ? reader : operator;
       if (doris) {
@@ -1526,7 +1562,7 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       await actor.page.getByLabel("源查询本体资产", { exact: true }).fill(state.ontologyRelease.manifest.assetId);
       await actor.page.getByLabel("源查询本体发布", { exact: true }).fill(state.ontologyRelease.manifest.releaseId);
       await actor.page.getByLabel("源查询映射发布", { exact: true }).fill(state.mappingReceipt.mappingReleaseId);
-      await actor.page.getByLabel("源查询外部号", { exact: true }).fill(doris ? "E1" : "asset-1");
+      await actor.page.getByLabel("源查询外部号", { exact: true }).fill(oracle ? "omq-entity-1" : doris ? "E1" : "asset-1");
       await actor.page.getByLabel("源查询厂区", { exact: true }).selectOption("site-a");
       for (const capability of [...(doris ? ["g4_resolve_entity"] : []), "g4_read_observations", "g4_traverse_relationships"]) {
         await actor.page.getByLabel("业务源查询能力", { exact: true }).selectOption(capability);
@@ -1558,7 +1594,7 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       await actor.page.getByLabel("源查询本体资产", { exact: true }).fill(state.ontologyRelease.manifest.assetId);
       await actor.page.getByLabel("源查询本体发布", { exact: true }).fill(state.ontologyRelease.manifest.releaseId);
       await actor.page.getByLabel("源查询映射发布", { exact: true }).fill(state.mappingReceipt.mappingReleaseId);
-      await actor.page.getByLabel("源查询外部号", { exact: true }).fill(doris ? "E1" : "asset-1");
+      await actor.page.getByLabel("源查询外部号", { exact: true }).fill(oracle ? "omq-entity-1" : doris ? "E1" : "asset-1");
       await actor.page.getByLabel("源查询厂区", { exact: true }).selectOption("site-a");
       const queryResponse = actor.page.waitForResponse(response => response.url() === origin + "/api/v1/data/semantic-queries" && response.request().method() === "POST");
       await actor.page.getByRole("button", { name: "查询业务源", exact: true }).click();
@@ -1649,7 +1685,13 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
   } finally {
     for (const context of contexts) await context.close().catch(() => {});
     await browser?.close().catch(() => {});
-    try { report.inputsUnchanged = JSON.stringify(report.inputBinding) === JSON.stringify(binding()); }
+    try {
+      if (oracle) {
+        report.outputBinding = binding();
+        omq.checkBinding(report.outputBinding);
+        report.inputsUnchanged = omq.sameHost(report.inputBinding, report.outputBinding);
+      } else report.inputsUnchanged = JSON.stringify(report.inputBinding) === JSON.stringify(binding());
+    }
     catch { report.inputsUnchanged = false; }
     if (!report.inputsUnchanged) { report.status = "FAIL"; report.bindingFailure = "QUERY_BROWSER_INPUT_DRIFT"; }
     if (report.externalRequests?.length) { report.status = "FAIL"; report.networkFailure = "UNEXPECTED_EXTERNAL_REQUEST"; }
