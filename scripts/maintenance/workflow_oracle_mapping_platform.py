@@ -625,6 +625,12 @@ def session_preflight(actors,seconds):
     return dict(commandId=r.receipt['commandId'],observations=obs)
 
 
+def ready_grants_sql(cid,q):
+    require(re.fullmatch('[a-f0-9]{32}',cid) and re.fullmatch('[A-Za-z0-9:_-]{1,120}',q),'READY_GRANT_ID')
+    return f"""SELECT coalesce(json_agg(g),'[]') FROM (SELECT "Permission","ObjectRefs","FieldRefs","SiteIds","OrganizationId",floor(extract(epoch from ("ExpiresAtUtc"-now())))::int ttl FROM governance."MappingAuthorizationGrants"
+      WHERE "RevokedAtUtc" IS NULL AND "SubjectId"='{q}' AND "ConnectionId"='{cid}' AND "Permission" IN ('data.query.execute','data.query.result.read','data.query.evidence.read')) g;""".encode()
+
+
 def ready_fixture(state):
     cid=state['connectionId'];q=state['subjects']['reader']
     require((state['taskId'],state['runId'])==(TASK,RUN) and re.fullmatch('[a-f0-9]{32}',cid) and re.fullmatch('[A-Za-z0-9:_-]{1,120}',q),'READY_SCOPE')
@@ -633,8 +639,10 @@ def ready_fixture(state):
     current,_=read_pg(('SELECT "ViewJson" FROM connections."CatalogSnapshots" WHERE "ConnectionId"=\''+cid+'\' ORDER BY "CapturedAtUtc" DESC,"Id" DESC LIMIT 1;').encode(),'ready-current-catalog')
     require(json.loads(current)==state['catalog'],'OMQ_READY_CATALOG_STALE')
     mr=state['mappingReceipt'];mid=mr['mappingId'];require(re.fullmatch('[a-zA-Z0-9-]{1,96}',mid),'READY_MAPPING')
-    raw,command=read_pg(f"""SELECT coalesce(json_agg(g),'[]') FROM (SELECT "Permission","ObjectRefs","FieldRefs","SiteIds","OrganizationId",floor(extract(epoch from ("ExpiresAtUtc"-now())))::int ttl FROM governance."MappingAuthorizationGrants"
-      WHERE "RevokedAtUtc" IS NULL AND "SubjectId"='{q}' AND "ConnectionId"='{cid}' AND "Permission" IN ('data.query.execute','data.query.result.read','data.query.evidence.read')) g;""".encode(),'ready-current-grants')
+    raw,command=read_pg(ready_grants_sql(cid,q),'ready-current-grants')
+    pointer_raw,pointer_cmd=read_pg((f'''SELECT to_jsonb(a) FROM connections."MappingActives" a WHERE "MappingId"='{mid}';''').encode(),'ready-activation')
+    pointer=json.loads(pointer_raw)
+    require(pointer['ActivationId']==mr['activationId'] and pointer['ActivationRevision']==mr['activationRevision'],'OMQ_READY_ACTIVATION_STALE')
     wanted={'data.query.execute','data.query.result.read','data.query.evidence.read'}
     rows=[r for r in json.loads(raw) if r['ttl']>0 and r['SiteIds']==['site-a'] and r['OrganizationId']=='org-demo' and r['ObjectRefs']==[obj] and set(r['FieldRefs'])==set(fields)]
     require(len(rows)==3 and {r['Permission'] for r in rows}==wanted,'OMQ_READY_GRANT_EXPIRED')
@@ -644,7 +652,7 @@ def ready_fixture(state):
     session=session_preflight(actors,seconds);fixture=fixture_state()
     require(fixture['counts']==([100,1] if state['mode'] in ('s0-oracle-natural','s0-oracle-cancel') else [1,1]),'READY_SOURCE_ROWS')
     return dict(taskId=TASK,runId=RUN,status='READY',remainingSeconds=remaining,requiredSeconds=seconds,fieldCount=11,grantCount=3,fixtureBefore=fixture,
-                session=session,commandId=command)
+                session=session,commandId=command,activationCommand=pointer_cmd)
 
 
 def web_binding():
@@ -693,9 +701,79 @@ def browser_run(mode,case='healthy'):
             'stageFailure':[json.loads(p.read_bytes()).get('failure') for p in after]}
 
 
+def fixed_window_pair():
+    """两表正常行数界内比较自然结束和正式取消，同一组私有准确键在结束时恢复。"""
+    import uuid
+    token=uuid.uuid4().hex
+    status={'taskId':TASK,'runId':RUN,'fixtureOwner':token,'status':'STARTED','stages':[]}
+    baseline=fixture_state();require(baseline['counts']==[1,1],'WINDOW_PRESTATE')
+    status['before']=baseline
+    path=AREA/('formal-window-fixture-'+token+'.json')
+    save(path,status)
+    admission()
+    # 变更行数前先复核本次签发确已生效且有当前余量，随后每一正式场景仍重核四张票据。
+    import datetime as dt
+    state=json.loads((AREA/'runtime-fixture.json').read_bytes())
+    ready_file=max(AREA.glob('browser-s0-oracle-ready-*.json'),key=lambda f:f.stat().st_mtime_ns)
+    ready=json.loads(ready_file.read_bytes())
+    now=dt.datetime.now(dt.timezone.utc)
+    require(ready['status']=='PASS' and ready['inputsUnchanged'] is True and ready['scenarioReady']['fixtureBefore']['hashes']==baseline['hashes']
+            and all(dt.datetime.fromisoformat(w['ExpiresAtUtc'].replace('Z','+00:00'))>now+dt.timedelta(seconds=210)
+                    for w in ready['scenarioReady']['session']['observations']),'LOAD_SESSION_PRESTATE')
+    gr,gr_cmd=read_pg(ready_grants_sql(state['connectionId'],state['subjects']['reader']),'load-current-grants')
+    current_grants=json.loads(gr)
+    require(len(current_grants)==3 and len({g['Permission'] for g in current_grants})==3
+            and all(g['ttl']>=210 and len(g['FieldRefs'])==11 for g in current_grants),'LOAD_GRANT_PRESTATE')
+    mr=state['mappingReceipt'];mid=mr['mappingId'];require(re.fullmatch('mapping-[a-f0-9]{32}',mid),'LOAD_MAPPING_ID')
+    pointer,ptr_cmd=read_pg((f'''SELECT to_jsonb(a) FROM connections."MappingActives" a WHERE "MappingId"='{mid}';''').encode(),'load-current-activation')
+    pointer=json.loads(pointer)
+    require(pointer['ActivationId']==mr['activationId'] and pointer['ActivationRevision']==mr['activationRevision'],'LOAD_ACTIVATION')
+    status['prerequisite']={'ready':ready_file.name,'grants':gr_cmd,'activation':ptr_cmd,'minimumTtl':min(g['ttl'] for g in current_grants)}
+    body=f"""DECLARE
+      n number;
+      BEGIN
+       select count(*) into n from "PRODUCTION"."OMQ_ENTITY";
+       if n!=1 then raise_application_error(-20004,'normal window prestate'); end if;
+       insert into "PRODUCTION"."OMQ_ENTITY"
+       select 50000+level, JOIN_KEY,VAL,ORG_ID,SITE_ID,'fw-'||substr('{token}',1,12)||'-'||level,LABEL,FROM_TS,TO_TS,EVENT_TS,OBSERVED_TS
+       from "PRODUCTION"."OMQ_ENTITY" where ROW_ID=1 connect by level<=99;
+       if sql%rowcount!=99 then raise_application_error(-20005,'normal window insert'); end if;
+       commit;
+      END;
+      /"""
+    inserted=False
+    try:
+        _,cmd=native_fixture_sql(body,'omq-formal-100-load')
+        inserted=True
+        status['loadCommand']=cmd
+        status['expanded']=fixture_state()
+        require(status['expanded']['counts']==[100,1],'WINDOW_COUNT')
+        for mode in ('s0-oracle-natural','s0-oracle-cancel'):
+            result=browser_run(mode)
+            status['stages'].append(result)
+            save(path,status,True)
+            if result['exitCode']!=0:break
+        status['status']='PASS' if len(status['stages'])==2 and all(r['exitCode']==0 for r in status['stages']) else 'FAIL'
+    except Exception as error:
+        status.update(status='UNCONFIRMED',reason=str(error));raise
+    finally:
+        if inserted:
+            _,cmd=native_fixture_sql(f"""begin
+             delete from "PRODUCTION"."OMQ_ENTITY" where ROW_ID between 50001 and 50099
+             and EXT_ID='fw-'||substr('{token}',1,12)||'-'||(ROW_ID-50000);
+             if sql%rowcount!=99 then raise_application_error(-20006,'exact key restore'); end if;
+             commit;
+             end;
+             /""",'omq-formal-100-restore')
+            status['restoreCommand']=cmd;status['after']=fixture_state()
+            require(status['after']['hashes']==baseline['hashes'] and status['after']['counts']==[1,1],'WINDOW_RESTORE')
+        save(path,status,True)
+    return status
+
+
 if __name__=='__main__':
     cli=argparse.ArgumentParser(description=__doc__)
-    cli.add_argument('action',choices=('admission','render','create','init-volumes','start','prepare-api','primary','secondary','pause-apis','next-snapshot','observe','browser'))
+    cli.add_argument('action',choices=('admission','render','create','init-volumes','start','prepare-api','primary','secondary','pause-apis','next-snapshot','observe','browser','window-pair'))
     cli.add_argument('--mode')
     cli.add_argument('--case',default='healthy')
     cli.add_argument('--idempotency-key')
@@ -706,5 +784,5 @@ if __name__=='__main__':
         from workflow_oracle_mapping_formal_observer import observe
         observe(args.idempotency_key,args.output,args.query_id)
         raise SystemExit(0)
-    actions={'admission':admission,'render':render,'create':create_platform,'init-volumes':init_volumes,'start':start_platform,'prepare-api':prepare_api,'primary':lambda:start_api('api'),'secondary':lambda:start_api('api-secondary'),'pause-apis':pause_unused_apis,'next-snapshot':next_api_snapshot,'browser':lambda:browser_run(args.mode,args.case)}
+    actions={'admission':admission,'render':render,'create':create_platform,'init-volumes':init_volumes,'start':start_platform,'prepare-api':prepare_api,'primary':lambda:start_api('api'),'secondary':lambda:start_api('api-secondary'),'pause-apis':pause_unused_apis,'next-snapshot':next_api_snapshot,'browser':lambda:browser_run(args.mode,args.case),'window-pair':fixed_window_pair}
     print(json.dumps(actions[args.action](),default=str))
