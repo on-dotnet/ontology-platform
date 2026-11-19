@@ -219,7 +219,7 @@ def source_clock(channel):
     return ns(result[0])
 
 
-def pg_state(channel, key, subject):
+def pg_query(key, subject):
     require(str(uuid.UUID(key)) == key and re.fullmatch(r'[A-Za-z0-9._:@/-]{1,160}', subject), 'PLATFORM_SCOPE')
     sql = f"""SELECT json_build_object('id',q."Id",'state',q."ExecutionStatus",'cancel',q."CancelRequested",
       'owner',q."LeaseOwner",'fence',q."Fence",'deadline',q."DeadlineAtUtc",'created',q."CreatedAtUtc",
@@ -229,7 +229,11 @@ def pg_state(channel, key, subject):
       'successAudits',(SELECT count(*) FROM governance.audit_records WHERE "Resource"=q."Id" AND "Action"='data.query.execute' AND "Outcome"='allowed'))
       FROM semantic_query."Queries" q WHERE q."OrganizationId"='org-demo' AND q."IdempotencyKey"='{key}'
       AND q."SubjectId"='{subject}' LIMIT 2;"""
-    rows = channel.run(sql)
+    return sql
+
+
+def pg_state(channel, key, subject):
+    rows = channel.run(pg_query(key,subject))
     require(len(rows) <= 1, 'PLATFORM_ID_AMBIGUOUS')
     return json.loads(rows[0]) if rows else None
 
@@ -490,7 +494,7 @@ def emit(status, **fields):
 
 def observe(idempotency_key, output, query_id=None):
     """正式 API 调用前预开独立只读观察者，一次证据不覆盖、一个原始时钟预算。"""
-    from workflow_oracle_mapping_platform import runtime_binding
+    from workflow_oracle_mapping_platform import runtime_binding, read_pg
     require(str(uuid.UUID(idempotency_key))==idempotency_key and (query_id is None or re.fullmatch(QID,query_id))
             and output=='formal-witness-'+idempotency_key+'.json', 'FORMAL_OBSERVER_ARGUMENT')
     path = ex.ordinary(AREA/output)
@@ -501,7 +505,8 @@ def observe(idempotency_key, output, query_id=None):
     final = None
     try:
         rec['hostBefore'] = runtime_binding()
-        containers = public_json(AREA/'formal-resources.json')['ids']
+        containers = {key:value['containerId'] for key,value in rec['hostBefore']['services'].items()}
+        require(rec['hostBefore']['oracle']['containerId']==source,'FORMAL_SOURCE_HOST_DRIFT')
         # 已核容器声明均以本次准确全 ID 访问；绝不按名称连接其它任务。
         require(all(re.fullmatch('[a-f0-9]{64}',containers[k]) for k in ('api','api-secondary','platform-pg')), 'FORMAL_OBSERVER_HOSTS')
         state = public_json(AREA/'runtime-fixture.json')
@@ -541,7 +546,10 @@ def observe(idempotency_key, output, query_id=None):
             rec['platformStates'].append(row)
             emit('ADMITTED',queryId=row['id'])
             arrivals={k:queue.Queue() for k in clocks}
-            tails={k:log_events(containers[k],row['id'],rec['startedUtc'],arrivals[k],stop) for k in clocks}
+            # Docker --since 采用该容器自己在准入前的 UTC 对时值，避免 Mac 与 VM 的偏移漏掉首事件。
+            log_start={k:dt.datetime.fromtimestamp(rec['clocks'][k][0]['remote']/1e9,ZONE).isoformat(timespec='microseconds')
+                       for k in clocks}
+            tails={k:log_events(containers[k],row['id'],log_start[k],arrivals[k],stop) for k in clocks}
             def close_logs():
                 stop.set()
                 for process,_ in tails.values():
@@ -588,7 +596,17 @@ def observe(idempotency_key, output, query_id=None):
             rec['cursorAfter']=cursor_stats(oracle,sqlid)
             calibrate()
             drain()
-            rec['audit']=audit_window(rec['startedUtc'],now(),client) if client else {'records':[]}
+            # 最终 PG 读走既有机器回执；只核同 Q、同 query 和同 scope 的脱敏计数。
+            replay,command=read_pg(pg_query(idempotency_key,subject).encode(),'formal-terminal-state')
+            saved=json.loads(replay)
+            require(all(saved[k]==actual[k] for k in ('id','state','fence','owner','hash','bytes','receipts','successAudits','cancelAudits')),
+                    'FORMAL_TERMINAL_STATE_DRIFT')
+            rec['terminalReadback']={'commandId':command,'state':saved}
+            # 窗口边界来自源自己的前后校准；不混用网络调用方的时钟。
+            stamp=lambda n:dt.datetime.fromtimestamp(n/1e9,ZONE).isoformat(timespec='microseconds')
+            start=stamp(rec['clocks']['source'][0]['remote']-1000)
+            end=stamp(rec['clocks']['source'][-1]['remote']+1000)
+            rec['audit']=audit_window(start,end,client) if client else {'records':[]}
             if client:
                 final=classify(rec)
             else:
