@@ -116,6 +116,27 @@ class OracleQualificationTests(unittest.TestCase):
                 self.write(entry['report'],altered)
                 with self.assertRaises(ValueError): run()
 
+    def test_measured_observer_only_reuses_the_unchanged_audit_program(self):
+        before=b"FLAG=1\ndef audit_window():\n return FLAG\ndef terminal():\n return 1\n"
+        after=before.replace(b'terminal():\n return 1',b'terminal():\n return 2')
+        self.assertEqual(oracle.audit_program(before),oracle.audit_program(after))
+        self.assertNotEqual(oracle.audit_program(before),oracle.audit_program(after.replace(b'FLAG=1',b'FLAG=2')))
+        with self.assertRaisesRegex(ValueError,'OMQ_AUDIT_PROGRAM_SHADOW'):
+            oracle.audit_program(after+b'def audit_window():\n return False\n')
+        with self.assertRaisesRegex(ValueError,'OMQ_AUDIT_PROGRAM_EFFECT'):
+            oracle.audit_program(after+b'FLAG=3\n')
+
+    def test_setup_cannot_inherit_a_changed_dispatch_or_grant_function(self):
+        original=b"def ready_fixture(args): return 1\ndef grant_fixture(args): return 2\ndef browser_run(args): return 3\n"
+        updated=original.replace(b'return 1',b'return 4')+b'def fixed_window_pair(): return 5\n'
+        for mode in ('provision','mapping'):
+            self.assertEqual(oracle.setup_platform_program(original,mode),oracle.setup_platform_program(updated,mode))
+            for token in (b'return 2',b'return 3'):
+                self.assertNotEqual(oracle.setup_platform_program(original,mode),
+                                    oracle.setup_platform_program(updated.replace(token,b'return 7'),mode))
+        with self.assertRaisesRegex(ValueError,'OMQ_SETUP_SCOPE'):
+            oracle.setup_platform_program(updated,oracle.READY)
+
     def test_true_plan_and_verify_cli_dispatch_fail_closed_without_oracle_originals(self):
         # 最小受控 Git 库只选择 interaction 门禁，不启动后端、Docker 或浏览器。
         root=self.root/'controlled'

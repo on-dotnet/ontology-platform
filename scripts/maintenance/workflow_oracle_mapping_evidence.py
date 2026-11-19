@@ -1,5 +1,6 @@
 """G4 Oracle 当前执行原件的资格分发；预检、构建、命令和无损恢复走既有消费者。"""
 import argparse
+import ast
 import datetime as dt
 import json
 import re
@@ -67,6 +68,10 @@ def stable_host(host):
 
 
 def browser_invocation(root, mode, case, host, api_build, test_build, stage_inputs):
+    return _browser_invocation(mode,case,host,api_build,test_build,stage_inputs,drivers(root,mode))
+
+
+def _browser_invocation(mode, case, host, api_build, test_build, stage_inputs, pinned):
     """供正式调用和独立重开共同推导命令。声明的 stageInputs 必须和实际选择吻合。"""
     require(mode in BROWSER and case in (ERRORS if mode == READY else ('healthy',)), 'OMQ_SCENARIO')
     require(stage_inputs['mode'] == mode and stage_inputs['case'] == case and stage_inputs['phase'] in ('s0', 's1', 's2', 's3'), 'OMQ_STAGE')
@@ -76,7 +81,7 @@ def browser_invocation(root, mode, case, host, api_build, test_build, stage_inpu
     for binding in (api_build, test_build):
         require(set(binding) == {'receiptSha256','inputKey','outputKey'} and all(HEX.fullmatch(v) for v in binding.values()), 'OMQ_BUILD_KEY')
     args = [NODE, DRIVER, '--task', TASK, '--run-id', RUN, '--mode', mode]
-    components = dict(taskId=TASK, runId=RUN, mode=mode, case=case, drivers=drivers(root, mode),
+    components = dict(taskId=TASK, runId=RUN, mode=mode, case=case, drivers=pinned,
                       api=api_build, tests=test_build, host=stable_host(host), stageInputs=stage_inputs)
     return args, digest_value(components), 'omq-browser-'+mode
 
@@ -138,9 +143,54 @@ def build_binding(archive, target, measured_worktree):
     return dict(inputKey=result['inputKey'], outputKey=sha(json.dumps(files,sort_keys=True).encode()), receiptSha256=sha(raw))
 
 
+def setup_platform_program(data, mode):
+    """仅 provision/mapping 未调用就绪夹具或 window-pair。保留其余代码与真实 browser CLI 分发。"""
+    require(mode in ('provision','mapping'),'OMQ_SETUP_SCOPE')
+    module=ast.parse(data)
+    skip={'ready_fixture','ready_grants_sql','fixed_window_pair'}
+    result=[]
+    found=set()
+    for node in module.body:
+        if isinstance(node,ast.FunctionDef) and node.name in skip:
+            require(node.name not in found and not node.decorator_list and not node.args.defaults,
+                    'OMQ_SETUP_EXCLUDED_FUNCTION')
+            found.add(node.name)
+            continue
+        if isinstance(node,ast.If):
+            for child in ast.walk(node):
+                if isinstance(child,ast.keyword) and child.arg=='choices' and isinstance(child.value,ast.Tuple):
+                    child.value.elts=[item for item in child.value.elts if not (isinstance(item,ast.Constant) and item.value=='window-pair')]
+                if isinstance(child,ast.Dict):
+                    selected=[(key,value) for key,value in zip(child.keys,child.values,strict=True) if not (
+                        isinstance(key,ast.Constant) and key.value=='window-pair' and isinstance(value,ast.Name) and value.id=='fixed_window_pair')]
+                    child.keys=[k for k,_ in selected]
+                    child.values=[v for _,v in selected]
+        result.append(ast.dump(node,include_attributes=False))
+    require('ready_fixture' in found,'OMQ_SETUP_ARCHITECTURE')
+    return result
+
+
+def measured_browser(archive, measured, mode, case, host, api, tests, stage):
+    current=drivers(archive.root,mode)
+    original={}
+    for name,digest in current.items():
+        data=git_original(archive.root,measured,name)
+        original[name]=sha(data)
+        if digest!=original[name]:
+            require(name==PLATFORM and mode in ('provision','mapping') and
+                    setup_platform_program(data,mode)==setup_platform_program(ordinary(archive.root/name).read_bytes(),mode),
+                    'OMQ_BROWSER_DRIVER_CHANGED')
+    archive.browserIdentity=dict(measuredCommit=measured,measuredDrivers=original,candidateDrivers=current)
+    return _browser_invocation(mode,case,host,api,tests,stage,original)
+
+
 def browser_report(archive, entry, origin, mode, case, host, api_build, test_build, stage):
     """预期拒绝和健康场景使用相同命令、构建、驱动、宿主、窗口与非零检查门禁。"""
-    argv, key, label = browser_invocation(archive.root, mode, case, host, api_build, test_build, stage)
+    measured=entry.get('measuredCommit')
+    if measured:
+        argv,key,label=measured_browser(archive,measured,mode,case,host,api_build,test_build,stage)
+    else:
+        argv,key,label=browser_invocation(archive.root,mode,case,host,api_build,test_build,stage)
     row, stdout, _ = archive.command(entry['commandId'], argv, label, key, host['commandId'], origin)
     require(row['deadlineSeconds']==180, 'OMQ_BROWSER_DEADLINE')
     name = entry['report']
@@ -212,7 +262,55 @@ def host_observation(archive, host, api_build, origin):
     return row
 
 
-def audit_observation(archive, audit, row, host, origin):
+OBSERVER = 'scripts/maintenance/workflow_oracle_mapping_formal_observer.py'
+AUDIT_IMPORTS = ('scripts/maintenance/workflow_execution.py','scripts/maintenance/workflow_oracle_mapping_resources.py',
+                 'scripts/maintenance/workflow_oracle_mapping_window.py')
+
+
+def git_original(root, commit, name):
+    require(re.fullmatch('[0-9a-f]{40}',commit) and subprocess.run(
+        ['git','merge-base','--is-ancestor',commit,'HEAD'],cwd=root,capture_output=True).returncode==0,'OMQ_MEASURED_ANCESTRY')
+    row=subprocess.run(['git','show',commit+':'+name],cwd=root,capture_output=True)
+    require(row.returncode==0,'OMQ_MEASURED_FILE')
+    return row.stdout
+
+
+def audit_program(data):
+    """审计段包含导入、常量、身份/登录/SQL、解析与真执行；后续定义不得覆盖或更改这些入口。"""
+    module=ast.parse(data)
+    stop=next((i for i,node in enumerate(module.body) if isinstance(node,ast.FunctionDef) and node.name=='audit_window'),None)
+    require(stop is not None,'OMQ_AUDIT_PROGRAM')
+    prefix=module.body[:stop+1]
+    names={node.id for top in prefix for node in ast.walk(top) if isinstance(node,ast.Name)}
+    names.update(node.name for node in prefix if isinstance(node,ast.FunctionDef))
+    for node in module.body[stop+1:]:
+        if isinstance(node,(ast.ClassDef,ast.FunctionDef)):
+            require(node.name not in names and not node.decorator_list,'OMQ_AUDIT_PROGRAM_SHADOW')
+        else:
+            require(isinstance(node,ast.If) and ast.unparse(node.test)=="__name__ == '__main__'" and not node.orelse,
+                    'OMQ_AUDIT_PROGRAM_EFFECT')
+    return [ast.dump(node,include_attributes=False) for node in prefix]
+
+
+def measured_audit_key(archive, call, commit):
+    """还原运行时完整 observer 文件散列，当前窄审计程序、导入与已登记命令均须匹配。"""
+    current=ordinary(archive.root/OBSERVER).read_bytes()
+    measured=git_original(archive.root,commit,OBSERVER)
+    require(call['definition']['parserSha256']==sha(current) and audit_program(measured)==audit_program(current),
+            'OMQ_AUDIT_PROGRAM_CHANGED')
+    dependencies={}
+    for path in AUDIT_IMPORTS:
+        data=git_original(archive.root,commit,path)
+        require(data==ordinary(archive.root/path).read_bytes(),'OMQ_AUDIT_DEPENDENCY_CHANGED')
+        dependencies[path]=sha(data)
+    definition={**call['definition'],'parserSha256':sha(measured)}
+    key=digest_value(definition)
+    archive.auditIdentity=dict(measuredCommit=commit,originalProgramSha256=sha(measured),candidateProgramSha256=sha(current),
+        auditProgramSha256=digest_value(audit_program(current)),dependencies=dependencies,commandInputFingerprint=key)
+    return key
+
+
+def audit_observation(archive, audit, row, host, origin, measured=None):
     """审计重新采用已登记的窄投影 SQL 与解析器；不能把其他窗口的零计数借给当前场景。"""
     require((audit['taskId'],audit['runId'],audit['sourceId']) == (TASK,RUN,host['oracle']['containerId'])
             and utc(audit['startUtc']) == utc(row['startedAtUtc']) and utc(audit['endUtc']) == utc(row['endedAtUtc']), 'OMQ_AUDIT_WINDOW')
@@ -225,7 +323,8 @@ def audit_observation(archive, audit, row, host, origin):
         'oracle-audit-source-identity',digest_value([source,SOURCE,TASK,RUN]),None,origin)
     require(identity['exitCode']==0 and identity['classification']=='SUCCESS' and
             raw.decode().strip()=='|'.join([source,SOURCE.split('@')[1],TASK,RUN,'running']), 'OMQ_AUDIT_SOURCE')
-    command,stdout,_ = archive.command(audit['commandId'],call['argv'],'oracle-formal-audit-window',call['identity'],None,origin)
+    key = measured_audit_key(archive,call,measured)
+    command,stdout,_ = archive.command(audit['commandId'],call['argv'],'oracle-formal-audit-window',key,None,origin)
     records = parse_audit(stdout)
     require(command['exitCode'] == 0 and command['classification'] == 'SUCCESS' and utc(command['startedAtUtc']) >= utc(row['endedAtUtc'])
             and records == audit['records'] and len(records) == audit['sourceAuditCount'] and digest_value(records) == audit['recordsSha256'],
@@ -245,7 +344,10 @@ def audit_observation(archive, audit, row, host, origin):
 def reopen_browser(archive, entry, origin, mode, case):
     api = build_binding(archive, 'api', origin)
     tests = build_binding(archive, 'agent', origin)
-    host = archive.read(entry['host'])
+    stored = archive.read(entry['host'])
+    host = stored['host'] if 'host' in stored else stored
+    measured=stored.get('testedCommit') or entry['measuredCommit']
+    entry={**entry,'measuredCommit':measured}
     report,row = browser_report(archive, entry, origin, mode, case, host, api, tests, entry['stageInputs'])
     before = host_observation(archive, host, api, origin)
     inside = host_observation(archive, report['inputBinding']['api'], api, origin)
@@ -253,7 +355,7 @@ def reopen_browser(archive, entry, origin, mode, case):
     require(len({h['commandId'] for h in (before,inside,after)}) == 3 and
             utc(before['endedAtUtc']) <= utc(row['startedAtUtc']) <= utc(inside['startedAtUtc']) <= utc(inside['endedAtUtc'])
             <= utc(after['startedAtUtc']) <= utc(after['endedAtUtc']) <= utc(row['endedAtUtc']), 'OMQ_HOST_WINDOW')
-    records = audit_observation(archive, archive.read(entry['audit']), row, host, origin)
+    records = audit_observation(archive, archive.read(entry['audit']), row, host, origin, measured)
     if mode in ('s0-oracle-natural','s0-oracle-cancel'):
         from workflow_oracle_mapping_formal_observer import classify
         witness = report['oracleWitness']
@@ -371,12 +473,81 @@ def qualify(root, task, run_id, gate, input_key):
                 qualificationMode='FRESH',executionMode='REUSED',scope='registered affected gate evidence',originals=archive.examined)
 
 
+class RuntimeOriginals(Originals):
+    """首次归档前读取当前 Run 的同组原件。选择精确快照，拒绝被替换的构建或歧义别名。"""
+
+    def __init__(self,root,dispatch):
+        self.root, self.examined = root, {}
+        self.area = root/'artifacts/workflow'/TASK/RUN
+        self.dispatch = dispatch
+        self.paths = {}
+
+    def choose(self,pattern,matches):
+        # 旧同任务快照若仍存在，只有原字节完全相同才可消除重名。
+        candidates = [(p,ordinary(p).read_bytes()) for p in self.area.glob(pattern)]
+        selected = [(p,data) for p,data in candidates if matches(data)]
+        require(selected and len({sha(raw) for _,raw in selected})==1, 'OMQ_RUNTIME_ARTIFACT_MISSING')
+        return selected[0][0]
+
+    def raw(self,name):
+        require(Path(name).name==name and re.fullmatch(r'[A-Za-z0-9_.-]+',name),'OMQ_RUNTIME_MEMBER')
+        command = re.fullmatch('([a-f0-9]{32})-(receipt.json|stdout.txt|stderr.txt)',name)
+        host=self.dispatch['host']
+        if command:
+            path=self.area.parent/'commands'/RUN/command[1]/command[2]
+        elif name in ('api-build-binding.json','agent-build-binding.json','api-bound-build.txt','agent-bound-build.txt','web-build-binding.json'):
+            path=self.area.parent/name
+        elif name=='formal-api-inputs.json':
+            path=self.choose('formal-api-inputs*.json',lambda data: json.loads(data).get('snapshotId')==host['snapshotId'])
+        elif name=='formal-api-compose.json':
+            path=self.choose('formal-api-compose*.json',lambda data: sha(data)==host['composeSha256'])
+        elif name=='api-snapshot.json':
+            path=self.area/'runtime-snapshots'/(host['snapshotId']+'.json')
+        elif name in self.dispatch['reports'] or name in (self.dispatch['file'],'formal-audit-'+self.dispatch['commandId']+'.json') or re.fullmatch(r'formal-witness-[a-f0-9-]{36}\.json',name):
+            path=self.area/name
+        else:
+            raise ValueError('OMQ_RUNTIME_MEMBER_UNKNOWN')
+        raw=ordinary(path).read_bytes()
+        self.paths[name]=str(path.relative_to(self.root))
+        self.examined[name]=sha(raw)
+        return raw
+
+
+def reopen_runtime_case(root,task,run,cid):
+    require(task==TASK and run==RUN and COMMAND.fullmatch(cid),'OMQ_COMMAND_SCOPE')
+    area=ordinary(root/'artifacts/workflow'/TASK/RUN)
+    entries=list(area.glob('formal-run-*-'+cid+'.json'))
+    require(len(entries)==1,'OMQ_RUNTIME_DISPATCH')
+    dispatch=json.loads(ordinary(entries[0]).read_bytes())
+    require(dispatch['taskId']==task and dispatch['runId']==run and dispatch['commandId']==cid and len(dispatch['reports'])==1
+            and re.fullmatch('[0-9a-f]{40}',dispatch['testedCommit']),'OMQ_RUNTIME_DISPATCH_SCOPE')
+    dispatch['file']=entries[0].name
+    archive=RuntimeOriginals(root,dispatch)
+    source=archive.read(dispatch['file'])
+    require(source['builds']['api']==build_binding(archive,'api',root) and source['builds']['agent']==build_binding(archive,'agent',root),
+            'OMQ_DISPATCH_BUILDS')
+    entry=dict(commandId=cid,report=dispatch['reports'][0],host=dispatch['file'],stageInputs=dispatch['stageInputs'],
+               audit='formal-audit-'+cid+'.json')
+    checks=reopen_browser(archive,entry,root,dispatch['mode'],dispatch['case'])
+    return dict(taskId=task,runId=run,commandId=cid,measuredCommit=dispatch['testedCommit'],mode=dispatch['mode'],case=dispatch['case'],
+                status='CASE_QUALIFIED',checks=checks,scope='one measured scenario',executionMode='REUSED',qualificationMode='FRESH',auditIdentity=archive.auditIdentity,browserIdentity=archive.browserIdentity,members={n:dict(path=p,sha256=archive.examined[n],
+                sizeBytes=ordinary(root/p).stat().st_size) for n,p in archive.paths.items()})
+
+
 if __name__=='__main__':
     cli=argparse.ArgumentParser(description=__doc__)
-    for name in ('task','run-id','gate','input-key'):
+    for name in ('task','run-id'):
         cli.add_argument('--'+name,required=True)
+    cli.add_argument('--gate')
+    cli.add_argument('--input-key')
+    cli.add_argument('--case-command')
     args=cli.parse_args()
     try:
-        print(json.dumps(qualify(ROOT,args.task,args.run_id,args.gate,args.input_key)))
+        if args.case_command:
+            require(not args.gate and not args.input_key,'OMQ_QUALIFICATION_ARGUMENTS')
+            result=reopen_runtime_case(ROOT,args.task,args.run_id,args.case_command)
+        else:
+            result=qualify(ROOT,args.task,args.run_id,args.gate,args.input_key)
+        print(json.dumps(result))
     except (ValueError,KeyError,OSError,TypeError) as error:
         raise SystemExit('OMQ_QUALIFICATION_REJECTED '+(str(error) if isinstance(error,ValueError) else type(error).__name__))
