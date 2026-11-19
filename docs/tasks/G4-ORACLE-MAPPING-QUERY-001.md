@@ -8,6 +8,8 @@
 
 P0 的文档归属为本任务卡、[唯一 A–F](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md)、[事实索引](../evidence/G4-ORACLE-MAPPING-QUERY-001/facts.md)、[非作者 Review](../evidence/G4-ORACLE-MAPPING-QUERY-001/p0-review.md)、[当前授权](current-authorization.md)、[G4 规划](../planning/g4-implementation-plan.md)与 [Doris 卡末尾的集成追加记录](G4-DORIS-MAPPING-QUERY-001.md)。回执为 ignored。read_only_dependencies 为本轮 owned_paths 以外的产品、合同与门禁，以及锁、迁移、旧证据、既有资源和冻结架构。本轮实施 owned_paths 由唯一合同 C 的精确改动图、现有 preflight/prepare/verify/证据消费者、任务专用夹具与受影响测试确定。Master 单写共享路径；历史证据、旧资源/密钥、锁、迁移只读。
 
+本轮最小正式根采用附件批准的独立托管写者。Connections 源绑定及其专用测试归 `codex/omq-source-bindings`，SemanticQuery、G4 HTTP/MCP 原期限与占位及其专用测试归 `codex/omq-deadline-store`。Master 独占共享 Contracts、组合根、工程入口、设施与当前任务分支集成。非作者审查者只读。两写者均不操作 Docker。
+
 ## 行为、最早验证与切片
 
 | SDD 切片 | 关联 AC 与正式入口 | 当期资格 |

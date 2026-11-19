@@ -58,6 +58,7 @@ public static class G4Composition
             WalletDirectory = builder.Configuration["G4:Oracle:WalletDirectory"] ?? string.Empty
         });
         builder.Services.AddSingleton<IOracleSourceAdapter, OracleSourceAdapter>();
+        builder.Services.AddSingleton(provider => (OracleSourceAdapter)provider.GetRequiredService<IOracleSourceAdapter>());
         builder.Services.AddSingleton<ConnectionSourceDispatcher>();
         builder.Services.AddSingleton(provider => new ConnectionSecretCipher(builder.Configuration["G4:KeyFile"] ?? string.Empty));
         builder.Services.AddSingleton<IConnectionSessionAuthority, G4SessionAuthority>();

@@ -17,7 +17,15 @@ public sealed class SemanticReadDeadline : IDisposable
     }
 
     /// <summary>取得调用者设定的绝对截止；无外部范围时由语义引擎使用自身五秒预算。</summary>
-    public static DateTimeOffset? Current => Deadline.Value;
+    public static DateTimeOffset? Current
+    {
+        get
+        {
+            // G4 在读完请求后可能进一步收紧原期限，已进入的发布链每次都取较早值。
+            var g4 = G4RequestDeadline.Current?.DeadlineUtc;
+            return g4.HasValue && (!Deadline.Value.HasValue || g4 < Deadline.Value) ? g4 : Deadline.Value;
+        }
+    }
 
     /// <summary>核验收尾后恢复父范围。</summary>
     public void Dispose() => Deadline.Value = previous;
