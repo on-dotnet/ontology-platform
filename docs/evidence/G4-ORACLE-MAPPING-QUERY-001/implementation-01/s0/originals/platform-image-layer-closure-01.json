@@ -1,0 +1,43 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "input": "local linux/arm64 manifests and exact rootfs diff_ids",
+  "observedUtc": "2026-11-19T15:16:27.844767+00:00",
+  "sharedEmptyLayers": [
+    {
+      "image": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+      "diffId": "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+      "payloadBytes": 0,
+      "emptyTarBytes": 1024,
+      "compressed": "sha256:bd9ddc54bea929a22b334e73e026d4136e5b73f5cc29942896c72e4ece69b13d",
+      "compressedBytes": 34
+    },
+    {
+      "image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+      "diffId": "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+      "payloadBytes": 0,
+      "emptyTarBytes": 1024,
+      "compressed": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+      "compressedBytes": 32
+    },
+    {
+      "image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "diffId": "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+      "payloadBytes": 0,
+      "emptyTarBytes": 1024,
+      "compressed": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+      "compressedBytes": 32
+    }
+  ],
+  "imageSizes": [
+    13076125534,
+    665916985,
+    750616770,
+    606140328,
+    370600042,
+    368578206
+  ],
+  "distinctSharedBlobBytes": 66,
+  "duplicateCompressedBytes": 32,
+  "deduplicatedImageUpperBytes": 15837977833,
+  "limitBasis": "Keep other cache and snapshot overhead in the upper bound. The sole intersecting rootfs tar contains two end blocks and zero filesystem payload."
+}

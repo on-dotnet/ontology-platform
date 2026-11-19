@@ -20,10 +20,10 @@ def freeze(root, source, destination, inputs, command_id, environment=None, *, t
     before = files(source)
     environment = environment or {}
     from workflow_pg_profile import profile
-    expected_run = 'implementation-01' if task=='G4-DORIS-MAPPING-QUERY-001' else profile(task).run
+    expected_run = 'implementation-01' if task in ('G4-DORIS-MAPPING-QUERY-001','G4-ORACLE-MAPPING-QUERY-001') else profile(task).run
     if run_id != expected_run and (task,run_id) != ('G4-DORIS-MAPPING-QUERY-001','review-fix-01'): raise ValueError('QUERY_SNAPSHOT_TASK_RUN')
     identity_values = dict(files=before, inputs=inputs, commandId=command_id, environment=environment)
-    scoped = task in ('G4-M5-INTEGRATION-001','G4-DORIS-MAPPING-QUERY-001')
+    scoped = task in ('G4-M5-INTEGRATION-001','G4-DORIS-MAPPING-QUERY-001','G4-ORACLE-MAPPING-QUERY-001')
     if scoped: identity_values.update(taskId=task, resourceRun=run_id)
     identity = sha(encoded(identity_values))
     target = destination/identity
@@ -44,7 +44,7 @@ def verify(root, row, *, task='G4-M4-QUERY-001', run_id='query-impl-01'):
     if row.get('taskId') != task or row.get('resourceRun') != run_id or not directory.resolve().is_relative_to(root.resolve()) or directory.is_symlink():
         raise ValueError('QUERY_SNAPSHOT_BOUNDARY')
     identity_values = dict(files=row['files'],inputs=row['inputs'],commandId=row['commandId'],environment=row['environment'])
-    if task in ('G4-M5-INTEGRATION-001','G4-DORIS-MAPPING-QUERY-001'):
+    if task in ('G4-M5-INTEGRATION-001','G4-DORIS-MAPPING-QUERY-001','G4-ORACLE-MAPPING-QUERY-001'):
         expected_run = 'integration-01' if task=='G4-M5-INTEGRATION-001' else 'implementation-01'
         if row.get('schemaVersion') != 2 or (run_id != expected_run and (task,run_id) != ('G4-DORIS-MAPPING-QUERY-001','review-fix-01')): raise ValueError('QUERY_SNAPSHOT_TASK_RUN')
         expected = root/'artifacts/workflow'/task/run_id/'runtime-snapshots'/row['snapshotId']

@@ -22,7 +22,7 @@ def require(ok, code):
         raise ValueError('ORACLE_ADMISSION_' + code)
 
 
-def before_source(root, task, source_id=None):
+def before_source(root, task, source_id=None, *, platform_stage=False):
     """创建前及运行时核对当前准入；运行时只容许已记录的准确源 ID。"""
     require(task == TASK, 'TASK')
     area = ordinary(root/'artifacts/workflow'/task)
@@ -66,6 +66,12 @@ def before_source(root, task, source_id=None):
             row = docker('warm-source','inspect','-f','{{.Id}}|{{.Image}}|{{index .Config.Labels "ontology.task"}}|{{index .Config.Labels "ontology.run"}}|{{.HostConfig.Memory}}|{{.HostConfig.NanoCpus}}|{{range .Mounts}}{{.Name}}{{end}}',source_id).split('|')
             require(row == [source_id, SOURCE.split('@')[1], task, RUN, str(4*GIB), '2000000000', volume], 'SOURCE_DRIFT')
             accounted.add(source_id)
+        platform_memory = 0
+        held_ports = set()
+        if platform_stage:
+            from workflow_oracle_mapping_platform import verify_owned_platform
+            known, platform_memory, held_ports = verify_owned_platform(area/RUN, docker)
+            accounted.update(known)
         require(set(docker('all-running', 'ps', '-q', '--no-trunc').splitlines()) == accounted, 'RUNNING_DRIFT')
         require(len(running) == 3 and len(keep) == 20 and sum(int(r[3]) for r in running) == 7*GIB//2
                 and sum(int(r[4]) for r in running) == 4_000_000_000, 'RETAINED_QUOTAS')
@@ -89,8 +95,13 @@ def before_source(root, task, source_id=None):
                 except OSError:
                     continue
                 available_ports.append(port)
-        require(len(available_ports) >= 4, 'PORTS')
-        record['portMap'] = dict(zip(('api','secondary','oidc','web'),available_ports[:4],strict=True))
+        frozen = json.loads((area/RUN/'source-create-01.json').read_bytes())['portMap'] if source_id else None
+        if frozen:
+            require(set(frozen.values()) <= set(available_ports) | held_ports, 'FROZEN_PORT_COLLISION')
+            record['portMap'] = frozen
+        else:
+            require(len(available_ports) >= 4, 'PORTS')
+            record['portMap'] = dict(zip(('api','secondary','oidc','web'),available_ports[:4],strict=True))
         facts = []
         for kind, image in (('source', SOURCE),('probe', PROBE)):
             raw = docker(kind+'-image', 'image','inspect','-f','{{.Id}}|{{.Os}}|{{.Architecture}}|{{.Size}}|{{json .RootFS.Layers}}|{{json .RepoDigests}}', image)
@@ -129,7 +140,14 @@ def before_source(root, task, source_id=None):
                   load=next(line for line in raw.splitlines() if re.match(r'^\d+\.\d+ \d+\.\d+',line)))
         record['vm'] = vm
         require(vm['available'] >= (7 if source_id else 15)*GIB//2 and vm['availableFs'] >= 26*GIB, 'VM_FLOOR')
-        record['status'] = 'SOURCE_STAGE_RESOURCE_READY'
+        if platform_stage:
+            from workflow_oracle_mapping_platform import disk_admission
+            require(source_id == created['containerId'] and int(total) >= 16.75*GIB and int(cpu) >= 12, 'FORMAL_PEAK_CAPS')
+            # 已在运行的硬配额已计入当前可用量，另扣尚未启动的已授权服务与一次探针。
+            pending = max(0, int(13.75*GIB) - int(7.5*GIB) - platform_memory)
+            require(vm['available'] >= 3*GIB + pending, 'FORMAL_VM_HEADROOM')
+            record['platformDisk'] = disk_admission(root,area/RUN,command)
+        record['status'] = 'FORMAL_RESOURCE_READY' if platform_stage else 'SOURCE_STAGE_RESOURCE_READY'
         return record
     except Exception as error:
         record.update(status='BLOCKED',reason=str(error))

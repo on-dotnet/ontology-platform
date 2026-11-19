@@ -1,0 +1,449 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "attempt": "snapshot-01",
+  "startedUtc": "2026-11-19T14:14:12.703238+00:00",
+  "sourceId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+  "resourceAttempt": "0237ddc4fbfa4b8882dfe21b09b9373d",
+  "build": {
+    "receiptSha256": "88638ce298e0d488d7eb0a954871b66acc5b55e5b4a825fbc18d72506fb9145d",
+    "inputKey": "2f277756a8051f59a9b9fa396bfa76da124abce6b42e01cc2866cd4ca2882d9d",
+    "outputKey": "ad0097b5a1f360107dc971b8ec51b3998fec1a6b159785dce7a5cb2f7b2b3f4c"
+  },
+  "status": "FAIL",
+  "commands": [
+    {
+      "stage": "snapshot-original-rows",
+      "command": {
+        "schemaVersion": 2,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "implementation-01",
+        "stage": "snapshot-original-rows",
+        "commandId": "c94aa194b3de402aa346fb7969728d22",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 8,
+          "sha256": "d420aca4b1283de05fbe44c103af038a38007c9886ec0897d2caec61920eef16"
+        },
+        "inputFingerprint": "72bf8f2c0111edcd102ddf7746a62135a7a8642a5aac5aea256fb57e26d81cf9",
+        "environmentFingerprint": "fe67883b1f2462739813b350167283321da94e0574ad9accebf33f588c777892",
+        "identity": "4e92aaea88e0ef480c5806972ecb15ac0b7a2bfc3fd3240c9a939dd37c0e5d70",
+        "deadlineSeconds": 20,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-19T14:14:12.704601+00:00",
+        "endedAtUtc": "2026-11-19T14:14:12.754165+00:00",
+        "elapsedSeconds": 0.04957912501413375,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/c94aa194b3de402aa346fb7969728d22/stdout.txt",
+          "sha256": "76c5939f9f5ebe034af6ea582f87532cf363ad10814a98e63a26a82f150feba6",
+          "sizeBytes": 393
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/c94aa194b3de402aa346fb7969728d22/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "snapshot-probe-create",
+      "command": {
+        "schemaVersion": 2,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "implementation-01",
+        "stage": "snapshot-probe-create",
+        "commandId": "52d398e4c95b4bfdae0d2cf986f52fcb",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 56,
+          "sha256": "ed85fba9e3501a3c6f4b93f5ee33ec83bad93b6e82a51b577dae5d2cc0dff8f3"
+        },
+        "inputFingerprint": "72bf8f2c0111edcd102ddf7746a62135a7a8642a5aac5aea256fb57e26d81cf9",
+        "environmentFingerprint": "fe67883b1f2462739813b350167283321da94e0574ad9accebf33f588c777892",
+        "identity": "21d9b3002408ff72e336ce2388b75f064e85062d48d6ab8c45bffdf3e3a86492",
+        "deadlineSeconds": 20,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-19T14:14:12.756492+00:00",
+        "endedAtUtc": "2026-11-19T14:14:12.787489+00:00",
+        "elapsedSeconds": 0.03101679205428809,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/52d398e4c95b4bfdae0d2cf986f52fcb/stdout.txt",
+          "sha256": "50db252f75a3c357e8cafe494368e4d7b3a2f6adc011f70e08ebc8e888a7cbc6",
+          "sizeBytes": 65
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/52d398e4c95b4bfdae0d2cf986f52fcb/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "snapshot-probe-identity",
+      "command": {
+        "schemaVersion": 2,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "implementation-01",
+        "stage": "snapshot-probe-identity",
+        "commandId": "63ce3527e170421e80060c54aaef1ace",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 6,
+          "sha256": "fb4ad6eecc7a8fa63b903a5f83d07c562cd13ec15fe4aa242b246f55c922b626"
+        },
+        "inputFingerprint": "72bf8f2c0111edcd102ddf7746a62135a7a8642a5aac5aea256fb57e26d81cf9",
+        "environmentFingerprint": "fe67883b1f2462739813b350167283321da94e0574ad9accebf33f588c777892",
+        "identity": "47cc47bf621836f1c87e6941ece7b5f6f6cb25d86df6e66fcd5626c8d49acbbe",
+        "deadlineSeconds": 20,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-19T14:14:12.790205+00:00",
+        "endedAtUtc": "2026-11-19T14:14:12.807995+00:00",
+        "elapsedSeconds": 0.017806458054110408,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/63ce3527e170421e80060c54aaef1ace/stdout.txt",
+          "sha256": "c9404885fe3f530170c2fc0f0baa553734efe5f01422f9dc87462ee963dd1397",
+          "sizeBytes": 157
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/63ce3527e170421e80060c54aaef1ace/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "snapshot-independent-commit",
+      "command": {
+        "schemaVersion": 2,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "implementation-01",
+        "stage": "snapshot-independent-commit",
+        "commandId": "a4ed62e26b4b491d9f06ca9c189e604f",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 8,
+          "sha256": "d420aca4b1283de05fbe44c103af038a38007c9886ec0897d2caec61920eef16"
+        },
+        "inputFingerprint": "72bf8f2c0111edcd102ddf7746a62135a7a8642a5aac5aea256fb57e26d81cf9",
+        "environmentFingerprint": "fe67883b1f2462739813b350167283321da94e0574ad9accebf33f588c777892",
+        "identity": "4e92aaea88e0ef480c5806972ecb15ac0b7a2bfc3fd3240c9a939dd37c0e5d70",
+        "deadlineSeconds": 20,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-19T14:14:14.410707+00:00",
+        "endedAtUtc": "2026-11-19T14:14:14.498391+00:00",
+        "elapsedSeconds": 0.08770487492438406,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/a4ed62e26b4b491d9f06ca9c189e604f/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/a4ed62e26b4b491d9f06ca9c189e604f/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "snapshot-real-driver",
+      "command": {
+        "schemaVersion": 2,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "implementation-01",
+        "stage": "snapshot-real-driver",
+        "commandId": "5336cb61bf0b4a42bf6849f52c3c7f04",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 5,
+          "sha256": "a81403d32d081cf2a94bf15562a078a887876f863db05715aee0f1dc6be58fe1"
+        },
+        "inputFingerprint": "72bf8f2c0111edcd102ddf7746a62135a7a8642a5aac5aea256fb57e26d81cf9",
+        "environmentFingerprint": "fe67883b1f2462739813b350167283321da94e0574ad9accebf33f588c777892",
+        "identity": "2b22ad3c4bcfaa43c4e3ee88523d8ee0b1348026614bff692d256cfe49398cbd",
+        "deadlineSeconds": 45,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-19T14:14:12.810808+00:00",
+        "endedAtUtc": "2026-11-19T14:14:14.592884+00:00",
+        "elapsedSeconds": 1.782082249992527,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/5336cb61bf0b4a42bf6849f52c3c7f04/stdout.txt",
+          "sha256": "3b71c7a9587dde76d37a33aeb86e30795f1b75a4aeaf1e066b725c4b63729312",
+          "sizeBytes": 395
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/5336cb61bf0b4a42bf6849f52c3c7f04/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "snapshot-probe-identity",
+      "command": {
+        "schemaVersion": 2,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "implementation-01",
+        "stage": "snapshot-probe-identity",
+        "commandId": "1c8b5fc9313043818188e49bea99ee36",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 6,
+          "sha256": "fb4ad6eecc7a8fa63b903a5f83d07c562cd13ec15fe4aa242b246f55c922b626"
+        },
+        "inputFingerprint": "72bf8f2c0111edcd102ddf7746a62135a7a8642a5aac5aea256fb57e26d81cf9",
+        "environmentFingerprint": "fe67883b1f2462739813b350167283321da94e0574ad9accebf33f588c777892",
+        "identity": "47cc47bf621836f1c87e6941ece7b5f6f6cb25d86df6e66fcd5626c8d49acbbe",
+        "deadlineSeconds": 20,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-19T14:14:14.597343+00:00",
+        "endedAtUtc": "2026-11-19T14:14:14.624387+00:00",
+        "elapsedSeconds": 0.02707079192623496,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/1c8b5fc9313043818188e49bea99ee36/stdout.txt",
+          "sha256": "ec97ca6201b31780ffa6a2d73495f11ce86e401684275016734efafa5212109b",
+          "sizeBytes": 156
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/1c8b5fc9313043818188e49bea99ee36/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "snapshot-restore-exact-key",
+      "command": {
+        "schemaVersion": 2,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "implementation-01",
+        "stage": "snapshot-restore-exact-key",
+        "commandId": "bfe10578bb61481e8edbc8da8a33e36d",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 8,
+          "sha256": "d420aca4b1283de05fbe44c103af038a38007c9886ec0897d2caec61920eef16"
+        },
+        "inputFingerprint": "72bf8f2c0111edcd102ddf7746a62135a7a8642a5aac5aea256fb57e26d81cf9",
+        "environmentFingerprint": "fe67883b1f2462739813b350167283321da94e0574ad9accebf33f588c777892",
+        "identity": "4e92aaea88e0ef480c5806972ecb15ac0b7a2bfc3fd3240c9a939dd37c0e5d70",
+        "deadlineSeconds": 20,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-19T14:14:14.629729+00:00",
+        "endedAtUtc": "2026-11-19T14:14:14.671946+00:00",
+        "elapsedSeconds": 0.042220667004585266,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/bfe10578bb61481e8edbc8da8a33e36d/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/bfe10578bb61481e8edbc8da8a33e36d/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "snapshot-restored-rows",
+      "command": {
+        "schemaVersion": 2,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "implementation-01",
+        "stage": "snapshot-restored-rows",
+        "commandId": "ed90e0a5ce134bcda8c56e5a0dc794b5",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 8,
+          "sha256": "d420aca4b1283de05fbe44c103af038a38007c9886ec0897d2caec61920eef16"
+        },
+        "inputFingerprint": "72bf8f2c0111edcd102ddf7746a62135a7a8642a5aac5aea256fb57e26d81cf9",
+        "environmentFingerprint": "fe67883b1f2462739813b350167283321da94e0574ad9accebf33f588c777892",
+        "identity": "4e92aaea88e0ef480c5806972ecb15ac0b7a2bfc3fd3240c9a939dd37c0e5d70",
+        "deadlineSeconds": 20,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-19T14:14:14.673910+00:00",
+        "endedAtUtc": "2026-11-19T14:14:14.713028+00:00",
+        "elapsedSeconds": 0.0391422079410404,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ed90e0a5ce134bcda8c56e5a0dc794b5/stdout.txt",
+          "sha256": "76c5939f9f5ebe034af6ea582f87532cf363ad10814a98e63a26a82f150feba6",
+          "sizeBytes": 393
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ed90e0a5ce134bcda8c56e5a0dc794b5/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "snapshot-probe-identity",
+      "command": {
+        "schemaVersion": 2,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "implementation-01",
+        "stage": "snapshot-probe-identity",
+        "commandId": "ec43121e918a425386c278ca1c8a09bc",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 6,
+          "sha256": "fb4ad6eecc7a8fa63b903a5f83d07c562cd13ec15fe4aa242b246f55c922b626"
+        },
+        "inputFingerprint": "72bf8f2c0111edcd102ddf7746a62135a7a8642a5aac5aea256fb57e26d81cf9",
+        "environmentFingerprint": "fe67883b1f2462739813b350167283321da94e0574ad9accebf33f588c777892",
+        "identity": "47cc47bf621836f1c87e6941ece7b5f6f6cb25d86df6e66fcd5626c8d49acbbe",
+        "deadlineSeconds": 20,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-19T14:14:14.715815+00:00",
+        "endedAtUtc": "2026-11-19T14:14:14.729906+00:00",
+        "elapsedSeconds": 0.014098624931648374,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ec43121e918a425386c278ca1c8a09bc/stdout.txt",
+          "sha256": "ec97ca6201b31780ffa6a2d73495f11ce86e401684275016734efafa5212109b",
+          "sizeBytes": 156
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ec43121e918a425386c278ca1c8a09bc/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "snapshot-probe-remove",
+      "command": {
+        "schemaVersion": 2,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "implementation-01",
+        "stage": "snapshot-probe-remove",
+        "commandId": "d323685a8c3045d48f3a51277c5709ac",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 4,
+          "sha256": "b83149700a28e13adca8073a566977d06524e788cb4d289c9c8b4116115ec9a6"
+        },
+        "inputFingerprint": "72bf8f2c0111edcd102ddf7746a62135a7a8642a5aac5aea256fb57e26d81cf9",
+        "environmentFingerprint": "fe67883b1f2462739813b350167283321da94e0574ad9accebf33f588c777892",
+        "identity": "fa2e4b11d66813e00f543b4d558dcd9bf5fa20606b4ff5a071c07ec135502bf1",
+        "deadlineSeconds": 20,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-19T14:14:14.731976+00:00",
+        "endedAtUtc": "2026-11-19T14:14:14.751850+00:00",
+        "elapsedSeconds": 0.019896832993254066,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/d323685a8c3045d48f3a51277c5709ac/stdout.txt",
+          "sha256": "50db252f75a3c357e8cafe494368e4d7b3a2f6adc011f70e08ebc8e888a7cbc6",
+          "sizeBytes": 65
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/d323685a8c3045d48f3a51277c5709ac/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    },
+    {
+      "stage": "snapshot-probe-absent",
+      "command": {
+        "schemaVersion": 2,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "implementation-01",
+        "stage": "snapshot-probe-absent",
+        "commandId": "fa80610ee66348998448eaf29c69034f",
+        "parentId": null,
+        "cwd": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 7,
+          "sha256": "4f66cf144c7742006f65ce33f6ba3a8996b9b2334de5f4e0bbb93352e34ea629"
+        },
+        "inputFingerprint": "72bf8f2c0111edcd102ddf7746a62135a7a8642a5aac5aea256fb57e26d81cf9",
+        "environmentFingerprint": "fe67883b1f2462739813b350167283321da94e0574ad9accebf33f588c777892",
+        "identity": "1b70c85b3d547e0fdd6c583d9c2584e8bdf3db6dffea07ca7814245e3a21c84e",
+        "deadlineSeconds": 20,
+        "started": true,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "startedAtUtc": "2026-11-19T14:14:14.753983+00:00",
+        "endedAtUtc": "2026-11-19T14:14:14.768612+00:00",
+        "elapsedSeconds": 0.014643375063315034,
+        "stdout": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/fa80610ee66348998448eaf29c69034f/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        },
+        "stderr": {
+          "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/fa80610ee66348998448eaf29c69034f/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      }
+    }
+  ],
+  "beforeRowHashes": [
+    "b754e4b5003ac2756730cf739f5959a874810d0b5041eb62f8ba60d692dd6436",
+    "39626d4929ae915fa37fb36540be9166ada0709f48cdc12f3c8f3e8a4025b27f"
+  ],
+  "probeId": "b6ed3ad81b9ccee3fc8040b4662c3f7932531aa3da1ab87c1c6b0adc67904409",
+  "argvSha256": "45628491ebe05697611e9a36762c9724bf75952d77302d747fdc8738be0fed8b",
+  "execution": "80e699c33bf0426f84c53d8e85702900",
+  "testExitCode": 0,
+  "reason": "ORACLE_ADMISSION_SNAPSHOT_COUNT",
+  "afterRowHashes": [
+    "b754e4b5003ac2756730cf739f5959a874810d0b5041eb62f8ba60d692dd6436",
+    "39626d4929ae915fa37fb36540be9166ada0709f48cdc12f3c8f3e8a4025b27f"
+  ],
+  "probeRemoved": true,
+  "endedUtc": "2026-11-19T14:14:14.769336+00:00"
+}
