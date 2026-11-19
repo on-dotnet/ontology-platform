@@ -94,4 +94,5 @@ def fixture_instant(local):
 
 BROWSER_SOURCES=tuple('scripts/maintenance/'+name for name in (
     'workflow_doris_s1.py','workflow-m4-query.mjs','workflow_doris_s0_fixture.py','workflow_doris_mapping_query.py',
-    'doris_query_cancel_witness.py','doris_pipeline_observer.py','doris_query_profile_witness.py'))
+    'doris_query_cancel_witness.py','doris_pipeline_observer.py','doris_query_profile_witness.py','doris_semantic_deadline_witness.py',
+    'workflow_m5_integration.py','workflow_m4_query.py','workflow_doris_vm.py','workflow_m4_query_runtime.py'))

@@ -55,6 +55,8 @@ public sealed class SemanticGateway : ISemanticGateway
         // 总预算从任何依赖读取之前开始，源分支只能使用剩余时间。
         var deadline = clock.GetUtcNow().AddMilliseconds(query.TimeoutMs);
         // 调用方断开与服务器截止同时传播到所有真实依赖。
+        using var scope = new SemanticReadDeadline(deadline);
+        // 调用方取消独立传播；依赖可依据上述原截止在剩余时间内收尾。
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         budget.CancelAfter(query.TimeoutMs);
         try
@@ -79,6 +81,8 @@ public sealed class SemanticGateway : ISemanticGateway
         // 恢复单次预算同样覆盖全部当前授权检查和读取审计。
         var deadline = clock.GetUtcNow().AddSeconds(5);
         // 恢复不延长原结果到期时间。
+        using var scope = new SemanticReadDeadline(deadline);
+        // 调用方取消独立传播；依赖可依据上述原截止在剩余时间内收尾。
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         budget.CancelAfter(TimeSpan.FromSeconds(5));
         try
@@ -97,7 +101,11 @@ public sealed class SemanticGateway : ISemanticGateway
     {
         if (queryExecution is null) throw new SemanticOperationException(422, "capability_not_supported");
         QueryRules.DemandActor(actor);
+        // 取消的授权、发布根核验及清理共用从入口确定的时刻。
+        var deadline = clock.GetUtcNow().AddSeconds(5);
         // 取消与其他入口共享五秒上限，不能在审计失败后补一份成功响应。
+        using var scope = new SemanticReadDeadline(deadline);
+        // 调用方取消独立传播；依赖可依据上述原截止在剩余时间内收尾。
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         budget.CancelAfter(TimeSpan.FromSeconds(5));
         try
@@ -119,6 +127,8 @@ public sealed class SemanticGateway : ISemanticGateway
         // 证据恢复共享五秒截止，不重置源权限核验预算。
         var deadline = clock.GetUtcNow().AddSeconds(5);
         // 单次读取审计仍需在本次预算中完成。
+        using var scope = new SemanticReadDeadline(deadline);
+        // 调用方取消独立传播；依赖可依据上述原截止在剩余时间内收尾。
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         budget.CancelAfter(TimeSpan.FromSeconds(5));
         try
@@ -175,7 +185,10 @@ public sealed class SemanticGateway : ISemanticGateway
         ReleaseManifest? manifest = null;
         // 同一deadline覆盖Catalog、源GET、正式图批次验证及成功或失败审计，不额外重置预算。
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        budget.CancelAfter(plan.TimeoutMs is >= 100 and <= 5000 ? plan.TimeoutMs : 1000);
+        // 兼容原超时选择并将同一到期时间传给共享的发布核验。
+        var timeoutMs = plan.TimeoutMs is >= 100 and <= 5000 ? plan.TimeoutMs : 1000;
+        using var scope = new SemanticReadDeadline(clock.GetUtcNow().AddMilliseconds(timeoutMs));
+        budget.CancelAfter(timeoutMs);
         // 成功结果只有完成同一预算内的真实审计后才可以公开。
         SemanticQueryResult result;
         try

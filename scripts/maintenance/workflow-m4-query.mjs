@@ -14,6 +14,8 @@ const task = argument("task");
 if (!["G4-M4-QUERY-001", "G4-M5-INTEGRATION-001", "G4-DORIS-MAPPING-QUERY-001"].includes(task)) throw new Error("QUERY_TASK_NOT_ADMITTED");
 const doris = task === "G4-DORIS-MAPPING-QUERY-001";
 const integration = task === "G4-M5-INTEGRATION-001", runId = doris ? "implementation-01" : integration ? "integration-01" : "query-impl-01";
+const evidenceRun = doris ? (process.env.G4_DORIS_EVIDENCE_RUN ?? runId) : runId;
+if (doris && ![runId, "review-fix-01"].includes(evidenceRun)) throw new Error("DORIS_EVIDENCE_RUN");
 const scenario = integration ? argument("scenario") : null;
 if (integration && !["standard", "numeric", "safety", "aba"].includes(scenario)) throw new Error("INTEGRATION_SCENARIO_INVALID");
 const moduleName = doris ? "workflow_doris_s1" : integration ? "workflow_m5_integration" : "workflow_m4_query";
@@ -33,7 +35,7 @@ const stateName = twoTable ? "doris-two-table.json" : integration ? `scenario-${
 const port = value => doris ? ({15441:15641,15442:15642,15443:15643,15444:15644,15445:19030,15446:15645,15447:15646,15448:15647})[value] : integration ? value + 100 : value;
 if (argument("task") !== task || argument("run-id") !== runId || await realpath(process.cwd()) !== root) throw new Error("QUERY_CONSUMER_BOUNDARY");
 const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/package.json"));
-if (doris && !["s3","ui-s1","ui-s3","serve","s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
+if (doris && !["s3","ui-s1","ui-s3","serve","s2-doris-ready","s2-doris-root-deadline","s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
 if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
@@ -49,14 +51,14 @@ if (mode === "serve") {
   }
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: port(15442),
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding","s2-doris-cardinality","s2-doris-identity","s2-doris-states","s2-doris-cancel-window","s2-doris-admission-cancel","s2-doris-aba","s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
+} else if (["s2-doris-ready","s2-doris-root-deadline","s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding","s2-doris-cardinality","s2-doris-identity","s2-doris-states","s2-doris-cancel-window","s2-doris-admission-cancel","s2-doris-aba","s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
 async function browserRun(mode) {
   const { randomUUID, createHash } = await import("node:crypto");
   const { writeFile, mkdir } = await import("node:fs/promises");
-  const output = resolve(root, "artifacts/workflow", task, runId);
+  const output = resolve(root, "artifacts/workflow", task, evidenceRun);
   const privateRoot = resolve(root, privateName, runId);
   const realm = JSON.parse(await readFile(resolve(privateRoot, "runtime/realm.json"), "utf8"));
   if (!realm.authority.startsWith(`http://localhost:${port(15443)}/realms/g2-`)) throw new Error("QUERY_REALM_BOUNDARY");
@@ -187,6 +189,10 @@ async function browserRun(mode) {
     check("fixture_identity", state.taskId === task && state.runId === runId);
     if (doris) {
       check("distinct_four_roles", new Set([operator,auditor,activator,reader].map(a => a.me.subjectId)).size === 4);
+      if (twoTable && state.subjects) {
+        for (const [role,actor] of Object.entries({operator,auditor,activator,reader}))
+          check("current_subject_"+role,state.subjects[role]===actor.me.subjectId);
+      }
       state.connectionDisplayName = "Doris Mapping Query synthetic";
       state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId, activator: activator.me.subjectId, reader: reader.me.subjectId };
       await save(state);
@@ -239,6 +245,31 @@ async function browserRun(mode) {
       }
       report.scenarioReady = { status: "SCENARIO_READY", scenario, taskId: task, resourceOwner: task, runId, localReceipt: local.receipt,
         subjects: state.subjects, fixedRelease: state.mappingReceipt?.mappingReleaseId, observedAtUtc: new Date().toISOString() };
+    }
+    if (doris && ["s2-doris-authority-control","s2-doris-overlap","s2-doris-root-deadline","s2-doris-ready"].includes(mode)) {
+      phase="scenario_ready";
+      const connection=await get(operator,"/api/v1/connections/"+state.connectionId);
+      const active=await get(operator,"/api/v1/mappings/"+state.mappingDraft.mappingId+"/active");
+      const stage=process.env.DMQ_READINESS_STAGE ?? "baseline";
+      const actors=[operator,auditor,activator,reader].map(actor=>({subjectId:actor.me.subjectId,cookie:actor.sessionCookie}));
+      const expected = structuredClone(state);
+      if (mode==="s2-doris-ready" && process.env.DMQ_STALE_EXPECTATION==="activation") expected.mappingReceipt.mappingReleaseId=state.replacedDorisMapping.releaseId;
+      if (mode==="s2-doris-ready" && process.env.DMQ_STALE_EXPECTATION==="catalog") {
+        const prior=JSON.parse(await readFile(resolve(output,"runtime-fixture.json"),"utf8"));
+        check("distinct_prior_catalog",prior.catalog.snapshotId!==state.catalog.snapshotId);
+        expected.catalog.snapshotId=prior.catalog.snapshotId;
+      }
+      try { report.scenarioReady=JSON.parse(execFileSync("python3",["-B","-c",
+        'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_doris_s1 as q;print(json.dumps(q.scenario_ready(**json.load(sys.stdin))))'],
+        {cwd:root,input:JSON.stringify({state:expected,stage,connection,active,actors}),timeout:45000,encoding:"utf8",stdio:["pipe","pipe","pipe"]})); }
+      catch (error) {
+        const reason = [...String(error.stderr ?? "").matchAll(/ValueError: (PREREQUISITE_STALE:[a-z_]+)/g)].at(-1);
+        const failure = new Error();
+        failure.safeCode = reason?.[1] ?? "DORIS_READINESS_CHECK_FAILED";
+        throw failure;
+      }
+      check("all_current_prerequisites",report.scenarioReady.status==="READY");
+      if (mode==="s2-doris-ready") { report.scope="PREREQUISITES_ONLY";report.status="PASS";return; }
     }
     if (!doris) state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId };
     await save(state);
@@ -397,6 +428,38 @@ async function browserRun(mode) {
       const recovered=await request(reader,"GET","/api/v1/data/semantic-queries/"+original.queryId+"/result");
       check("restored_original",recovered.raw===original.raw);
       report.status="PASS";report.scope=raceScope;
+    } else if (mode === "s2-doris-root-deadline") {
+      const id = process.env.DMQ_ROOT_WITNESS;
+      check("bounded_root_probe",/^[a-f0-9]{32}$/.test(id));
+      const arm = resolve(output,"root-arm-"+id+".json");
+      const {unlink} = await import("node:fs/promises");
+      const capability=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");
+      const query={...state.latestQuery.query,capabilityId:capability.id,capabilityVersion:capability.version,timeoutMs:5000,relationshipIris:[],filters:{siteId:"site-a",entityExternalId:"E1"}};
+      const key=randomUUID(), failedKey=randomUUID();
+      const asKey=k=>({...reader,headers:{...reader.headers,"Idempotency-Key":k}});
+      const api="/api/v1/data/semantic-queries";
+      const healthy=await request(asKey(key),"POST",api,query);
+      check("healthy_formal_query",healthy.data.status==="FOUND" && healthy.data.subSources[0].sourceReadReceiptId);
+      const probe=()=>JSON.parse(execFileSync("python3",["-B","-c",
+        'import json,sys;sys.path.insert(0,"scripts/maintenance");from workflow_doris_s1 import root_query_state;print(json.dumps(root_query_state(*sys.argv[1:])))',healthy.queryId,failedKey],
+        {cwd:root,encoding:"utf8",timeout:5000}));
+      report.witnessId=id;report.baseline=probe();report.deadlineWitness=[];
+      for (const name of ["query","cancel"]) {
+        await writeFile(arm,JSON.stringify(name),{flag:"wx"});
+        try {
+          const start=Date.now();
+          const reply=name==="query"?await request(asKey(failedKey),"POST",api,{...query,timeoutMs:1200},503)
+            :await request(reader,"POST",api+"/"+healthy.queryId+"/cancel",undefined,503);
+          const end=Date.now();
+          report.deadlineWitness.push({name,clientStartUtcMs:start,clientResponseUtcMs:end,elapsedMs:report.http.at(-1).elapsedMs,
+            budgetMs:name==="query"?1200:5000,code:reply.data?.code??null});
+          check(name+"_response_before_original_budget",report.http.at(-1).elapsedMs<(name==="query"?1200:5000));
+        } finally {await unlink(arm);}
+      }
+      report.after=probe();
+      check("root_no_success_side_effect",JSON.stringify(report.baseline)===JSON.stringify(report.after) && report.after.status==="COMPLETED" &&
+        report.after.cancel===false && report.after.cancelAudits===0 && report.after.executeAudits===1 && report.after.failedAdmissions===0);
+      report.status="PASS";report.scope="FORMAL_ROOT_DEADLINES";
     } else if (mode === "s2-doris-authority-control") {
       phase="fresh_current_authority_before_fixture";
       const cap=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");

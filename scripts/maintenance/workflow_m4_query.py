@@ -618,8 +618,10 @@ def browser_test(mode):
     return result.returncode
 
 
-def grant_transaction(state,objects,fields,subjects,id_for,run_id):
+def grant_transaction(state,objects,fields,subjects,id_for,run_id,ttl_seconds=14400):
     """按已核定主体和字段生成同一原子授权、审计及有效计数。"""
+    if type(ttl_seconds) is not int or not 1 <= ttl_seconds <= 14400: raise ValueError("QUERY_GRANT_TTL")
+    expiry = "now()+interval '4 hours'" if ttl_seconds==14400 else f"now()+interval '{ttl_seconds} seconds'"
     def literal(value):
         if not isinstance(value,str) or len(value)>512 or any(ord(char)<32 for char in value): raise ValueError('QUERY_GRANT_LITERAL')
         return "'"+value.replace("'","''")+"'"
@@ -632,7 +634,7 @@ def grant_transaction(state,objects,fields,subjects,id_for,run_id):
             ids.append(ident)
             source=permission=='mapping.source.validate' or permission.startswith('data.query.')
             values=[literal(ident),literal(subject),"'org-demo'",array(state['scope']['siteIds']),literal(permission),
-                literal(state['connectionId']) if source else 'NULL',array(objects if source else []),array(fields if source else []),"now()+interval '4 hours'",'NULL']
+                literal(state['connectionId']) if source else 'NULL',array(objects if source else []),array(fields if source else []),expiry,'NULL']
             statements.append('WITH inserted AS (INSERT INTO governance."MappingAuthorizationGrants" '
                 '("Id","SubjectId","OrganizationId","SiteIds","Permission","ConnectionId","ObjectRefs","FieldRefs","ExpiresAtUtc","RevokedAtUtc") VALUES ('+','.join(values)+') ON CONFLICT ("Id") DO NOTHING RETURNING "Id") '
                 'INSERT INTO governance.audit_records ("Id","OccurredAtUtc","Actor","Action","Resource","Outcome","TraceId","CorrelationId","OrganizationId","ScopeSiteIds","SiteId") '

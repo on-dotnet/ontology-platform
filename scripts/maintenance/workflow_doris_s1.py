@@ -35,7 +35,7 @@ FUSEKI_ID = 'sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a
 
 
 def local(stage,args,env=None,seconds=30,inputs=None):
-    result = execution.run(args,ROOT,task=vm.TASK,run_id=vm.RUN,stage='dmq-s1-'+stage,environment=env,timeout=seconds,input_key=inputs)
+    result = execution.run(args,ROOT,task=vm.TASK,run_id=vm.EVIDENCE_RUN,stage='dmq-s1-'+stage,environment=env,timeout=seconds,input_key=inputs)
     vm.demand(result.returncode==0,'S1_'+stage.upper()+'_'+result.receipt['commandId'])
     return result
 
@@ -57,9 +57,9 @@ def freeze_api():
     target = ROOT/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0'
     if SNAPSHOT.exists():
         previous = json.loads(SNAPSHOT.read_bytes())
-        snapshots.verify(ROOT,previous,task=vm.TASK,run_id=vm.RUN)
+        snapshots.verify(ROOT,previous,task=vm.TASK,run_id=vm.EVIDENCE_RUN)
         if previous['inputs']==binding: return previous
-    row = snapshots.freeze(ROOT,target,OUT/'runtime-snapshots',binding,binding['receiptSha256'],env,task=vm.TASK,run_id=vm.RUN)
+    row = snapshots.freeze(ROOT,target,OUT/'runtime-snapshots',binding,binding['receiptSha256'],env,task=vm.TASK,run_id=vm.EVIDENCE_RUN)
     record(SNAPSHOT,row)
     return row
 
@@ -200,13 +200,13 @@ def configure():
 
 
 HOST = OUT/'s1-api-process.json'
-BROWSER = ('s3','ui-s1','ui-s3','s2-doris-authority-control','s2-doris-sentinel','s2-doris-overlap','provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog','s2-doris-mapping','s2-doris-queries','s2-doris-null','s2-doris-cancel','s2-doris-access','s2-doris-fanout','s2-doris-requalify','s2-doris-aba','s2-doris-admission-cancel','s2-doris-cancel-window','s2-doris-states','s2-doris-cardinality','s2-doris-identity','s2-doris-revoke-race','s2-doris-session-race','s2-doris-shape-prepare','s2-doris-shape-reject','s2-doris-shape-recover','s2-doris-cancel-profile','s2-doris-expiry','s2-doris-ddl-race','s2-doris-rotate-race','s2-doris-current-catalog','s2-doris-deadline','s2-doris-short-lock','s2-doris-disconnect','s2-doris-batch-binding')
+BROWSER = ('s2-doris-ready','s2-doris-root-deadline','s3','ui-s1','ui-s3','s2-doris-authority-control','s2-doris-sentinel','s2-doris-overlap','provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog','s2-doris-mapping','s2-doris-queries','s2-doris-null','s2-doris-cancel','s2-doris-access','s2-doris-fanout','s2-doris-requalify','s2-doris-aba','s2-doris-admission-cancel','s2-doris-cancel-window','s2-doris-states','s2-doris-cardinality','s2-doris-identity','s2-doris-revoke-race','s2-doris-session-race','s2-doris-shape-prepare','s2-doris-shape-reject','s2-doris-shape-recover','s2-doris-cancel-profile','s2-doris-expiry','s2-doris-ddl-race','s2-doris-rotate-race','s2-doris-current-catalog','s2-doris-deadline','s2-doris-short-lock','s2-doris-disconnect','s2-doris-batch-binding')
 
 
 def runtime_binding():
     row = json.loads(HOST.read_bytes())
     snapshot = json.loads(SNAPSHOT.read_bytes())
-    snapshots.verify(ROOT,snapshot,task=vm.TASK,run_id=vm.RUN)
+    snapshots.verify(ROOT,snapshot,task=vm.TASK,run_id=vm.EVIDENCE_RUN)
     pid = str(row['pid'])
     dll = ROOT/snapshot['directory']/'OntologyPlatform.Api.dll'
     vm.demand(row['taskId']==vm.TASK and row['runId']==vm.RUN and row['status']=='READY'
@@ -227,7 +227,7 @@ def s3_web_check(stage, prepared):
     vm.demand(path.is_relative_to(ROOT/'artifacts/workflow'/vm.TASK/'environment'),'S3_PREPARE_PATH')
     dep=json.loads(path.read_bytes())
     vm.demand((dep['taskId'],dep['worktree'],dep['status'])==(vm.TASK,str(ROOT),'DEPENDENCIES_READY'),'S3_ENVIRONMENT')
-    return web_check(stage,task=vm.TASK,run_id=vm.RUN,env=dep['environment'],node=dep['node'])
+    return web_check(stage,task=vm.TASK,run_id=vm.EVIDENCE_RUN,env=dep['environment'],node=dep['node'])
 
 
 def live_stack():
@@ -241,7 +241,17 @@ def live_stack():
     return services
 
 
-def browser_test(mode, prepared):
+def browser_test(mode, prepared, readiness_stage='baseline', counterexample=None):
+    """正式分发。仅期限见证运行一个可释放的本机 HTTP 观察点。"""
+    if mode=='s2-doris-root-deadline':
+        from doris_semantic_deadline_witness import validation_origin
+        run_key=secrets.token_hex(16)
+        with validation_origin(OUT,run_key) as origin:
+            return run_browser(mode,prepared,readiness_stage,run_key,origin,counterexample)
+    return run_browser(mode,prepared,readiness_stage,None,None,counterexample)
+
+
+def run_browser(mode, prepared, readiness_stage, run_key, validation_url, counterexample):
     dependency_path=execution.ordinary(Path(prepared).absolute())
     vm.demand(dependency_path.is_relative_to(ROOT/'artifacts/workflow'/vm.TASK/'environment'),'S1_ENVIRONMENT_PATH')
     dep=json.loads(dependency_path.read_bytes())
@@ -256,13 +266,14 @@ def browser_test(mode, prepared):
         check.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
         check.bind(('127.0.0.1',15641))
     identity=json.loads((RUNTIME/'runtime.json').read_bytes())
-    context=execution.CONTEXT.set(dict(task=vm.TASK,run_id=vm.RUN))
+    context=execution.CONTEXT.set(dict(task=vm.TASK,run_id=vm.EVIDENCE_RUN))
     exceeded=threading.Event()
     finished=threading.Event()
     web_service=None
     env=dict(PATH=os.environ['PATH'],ASPNETCORE_ENVIRONMENT='Development',ASPNETCORE_CONTENTROOT=str(RUNTIME/'api'),
              G4__SourceCaPath=str(DIRECTORY/'tls/ca.pem'),ASPNETCORE_URLS='http://127.0.0.1:15641',DOTNET_GCHeapHardLimit='0x18000000',DOTNET_CLI_TELEMETRY_OPTOUT='1')
     env['Logging__LogLevel__OntologyPlatform.Modules.SemanticQuery.G4QueryExecution']='Debug' if mode in ('s2-doris-cancel-profile','s2-doris-cancel','s2-doris-overlap') else 'Information'
+    if validation_url: env['Semantics__ValidationOrigin']=validation_url
     service=host_service([dep['dotnet'],str(dll)],env,ROOT,vm.TASK,exceeded)
     pid=service.process.pid
     evidence=OUT/('s1-host-'+mode+'-'+service.ident+'.json')
@@ -330,7 +341,7 @@ def browser_test(mode, prepared):
         components = [snapshot['snapshotId'], mode, [execution.sha(path.read_bytes()) for path in runner_paths]]
         if STRESS.exists(): components.append(execution.sha(STRESS.read_bytes()))
         inputs = execution.sha(execution.encoded(components))
-        report=local('browser-'+mode,[dep['node'],'scripts/maintenance/workflow-m4-query.mjs','--task',vm.TASK,'--run-id',vm.RUN,'--mode',mode],seconds=180,inputs=inputs)
+        report=local('browser-'+mode,[dep['node'],'scripts/maintenance/workflow-m4-query.mjs','--task',vm.TASK,'--run-id',vm.RUN,'--mode',mode],seconds=180,inputs=inputs,env=dict(os.environ,DMQ_READINESS_STAGE=readiness_stage,DMQ_ROOT_WITNESS=run_key or '',DMQ_STALE_EXPECTATION=counterexample or ''))
         vm.demand(not exceeded.is_set(),'S1_HOST_CAP')
         print(report.stdout.decode().strip())
         row['browserCommand']=report.receipt['commandId']
@@ -354,6 +365,8 @@ def browser_test(mode, prepared):
             # 只保存固定格式聚合数值与本任务 queryId，不导出任何其他应用日志。
             matches = re.findall(rb'DorisLeaseObservation query=(query-[0-9a-f]{32}) probes=(\d+) elapsedMs=([0-9.]+) maxReadMs=([0-9.]+) outcome=(closed|lease_changed|observation_failed)', bytes(service.out)+bytes(service.err))
             timings = re.findall(rb'QueryCancelPhase query=(query-[0-9a-f]{32}) phase=(owner|catalog|artifacts|graphs|verifiedBatch|sourceBinding|graphIndex|root|session|grants|transaction) elapsedMs=([0-9.]+)', bytes(service.out)+bytes(service.err))
+            deadlines = re.findall(rb'TemporaryGraphCleanupUnconfirmed phase=([A-Za-z]+) graph=(urn:ontology-platform:temporary:[0-9a-f]{32}) cleanupDeadline=(\S+) requestDeadline=(\S+)',bytes(service.out)+bytes(service.err))
+            row['cleanupUnknown'] = [dict(phase=p.decode(),graph=g.decode(),cleanupDeadline=c.decode(),requestDeadline=d.decode()) for p,g,c,d in deadlines]
             row['cancelPhases'] = [dict(queryId=q.decode(),phase=phase.decode(),ms=float(ms)) for q,phase,ms in timings]
             row['dorisObservations'] = [dict(queryId=q.decode(), probes=int(n), elapsedMs=float(t), maxReadMs=float(m), outcome=o.decode()) for q,n,t,m,o in matches]
             row.update(status='EXITED' if service.process.poll() is not None else 'STOP_UNKNOWN',hostPeakBytes=peaks,
@@ -363,14 +376,7 @@ def browser_test(mode, prepared):
             execution.CONTEXT.reset(context)
 
 
-def synthetic_grants(mode, two_tables=False, renewal=False):
-    from workflow_m4_query import grant_transaction
-    state=json.loads((OUT/('doris-two-table.json' if two_tables else 'runtime-fixture.json')).read_bytes())
-    roles=state['subjects']
-    vm.demand(state['taskId']==vm.TASK and state['runId']==vm.RUN and state['scope']==dict(organizationId='org-demo',siteIds=['site-a'])
-              and set(roles)=={'operator','auditor','activator','reader'} and len(set(roles.values()))==4,'S1_GRANT_SCOPE')
-    catalog=state['catalog']
-    vm.demand(catalog['connectionId']==state['connectionId'] and catalog['status']=='READY','S1_GRANT_CATALOG')
+def grant_fields(catalog,two_tables):
     tables={'dmq_entity':'org_id site_id entity_id join_key amount unit_code valid_from valid_to event_at observed_at'.split()}
     if two_tables: tables['dmq_target']='org_id site_id target_id join_key valid_from valid_to event_at observed_at'.split()
     objects=[]
@@ -382,20 +388,130 @@ def synthetic_grants(mode, two_tables=False, renewal=False):
         base='fixture/'+name
         objects.append(base)
         field_refs.extend(f"{base}/{f['ordinal']}/{f['name']}" for f in fields)
+    return objects,field_refs
+
+
+def readiness_budget(stage):
+    """授权覆盖装载、正式分支及恢复；短命浏览器会话在每次接续重新登录及核验。"""
+    # 每批 INSERT / DELETE 最多 60 秒，两次读取各 15 秒；最大 64 批。
+    fixture_seconds = {'baseline':0, 'sentinel':60, 'stress':64*(60+2*15), 'pressure-running':0}
+    if stage not in fixture_seconds:
+        raise ValueError('DORIS_PREREQUISITE_STAGE')
+    restore = fixture_seconds['stress'] if stage=='pressure-running' else fixture_seconds[stage]
+    return dict(load=fixture_seconds[stage], execute=180, restore=restore)
+
+
+def scenario_ready(state, stage, connection, active, actors):
+    """同一正式分发入口在变更前核四角色会话、授权余量、绑定和已知夹具阶段。"""
+    import datetime
+    from workflow_m5_integration import demand_scoped_grants
+    from workflow_doris_s0_fixture import STRESS, STRESS_TABLES, stress_original
+    import uuid
+    resources = live_stack()
+    host = runtime_binding()
+    window = readiness_budget(stage)
+    seconds = sum(window.values())
+    roles = state['subjects']
+    vm.demand(set(roles)=={'operator','auditor','activator','reader'} and len(set(roles.values()))==4
+              and [v['subjectId'] for v in actors]==[roles[k] for k in ('operator','auditor','activator','reader')], 'PREREQUISITE_STALE:subjects')
+    vm.demand(state['scope']=={'organizationId':'org-demo','siteIds':['site-a']} and state['taskId']==vm.TASK and state['runId']==vm.RUN, 'PREREQUISITE_STALE:scope')
+    expected = state.get('mappingCurrentReceipt') or state['mappingReceipt']
+    binding = state['mappingRelease']['manifest']['binding']
+    vm.demand(all(active.get(k)==expected[k] for k in ('mappingId','mappingReleaseId','manifestHash','activationRevision')), 'PREREQUISITE_STALE:activation')
+    vm.demand(connection['state']=='ACTIVE' and connection['id']==state['connectionId']==binding['sourceConnectionId']
+              and connection['configRevision']==binding['connectionRevision'] and connection['secretVersion']==binding['secretVersion'], 'PREREQUISITE_STALE:connection')
+    cid=resources['platform-pg']
+    def read(statement):
+        return json.loads(docker('scenario-readiness','exec',cid,'psql','-XwqAt','-U','postgres','-d','mapping','-v','ON_ERROR_STOP=1','-c',statement))
+    vm.demand(re.fullmatch('[a-f0-9]{32}',state['connectionId']) is not None,'PREREQUISITE_STALE:connection')
+    current = read('SELECT "ViewJson" FROM connections."CatalogSnapshots" WHERE "ConnectionId"=\''+state['connectionId']+'\' ORDER BY "CapturedAtUtc" DESC,"Id" DESC LIMIT 1;')
+    mapping_id = expected['mappingId']
+    vm.demand(re.fullmatch(r'mapping-[0-9a-f]{32}',mapping_id) is not None,'PREREQUISITE_STALE:activation')
+    pointer = read(f"""SELECT to_jsonb(a) FROM connections."MappingActives" a WHERE "MappingId"='{mapping_id}'""")
+    vm.demand(pointer['ActivationId']==expected['activationId'] and pointer['ActivationRevision']==active['activationRevision'],'PREREQUISITE_STALE:activation')
+    catalog = state['catalog']
+    vm.demand(current['status']=='READY' and current['snapshotId']==catalog['snapshotId']==binding['sourceCatalogSnapshotId']
+              and current['schemaFingerprint']==catalog['schemaFingerprint']==binding['sourceCatalogFingerprint']
+              and current['secretVersion']==binding['secretVersion'] and current['configRevision']==binding['connectionRevision'], 'PREREQUISITE_STALE:catalog')
+    config_hash = read(f"""SELECT to_jsonb("ConfigHash") FROM connections."Connections" WHERE "Id"='{state['connectionId']}'""")
+    vm.demand(config_hash==binding['configHash'],'PREREQUISITE_STALE:connection')
+    objects,fields = grant_fields(current,True)
+    vm.demand(len(fields)==18, 'PREREQUISITE_STALE:field_set')
+    rows=read("""SELECT coalesce(json_agg(g),'[]') FROM (SELECT "SubjectId","OrganizationId","SiteIds","Permission","ConnectionId","ObjectRefs","FieldRefs","ExpiresAtUtc"
+                     FROM governance."MappingAuthorizationGrants" WHERE "RevokedAtUtc" IS NULL AND ("ConnectionId" IS NULL OR "ConnectionId"='"""+state['connectionId']+"')) g;")
+    now=datetime.datetime.now(datetime.timezone.utc)
+    def eligible(required):
+        return [r for r in rows if datetime.datetime.fromisoformat(r['ExpiresAtUtc'].replace('Z','+00:00'))>now+datetime.timedelta(seconds=required)]
+    permissions={'operator':['mapping.read'],'reader':['data.query.execute','data.query.result.read','data.query.evidence.read']}
+    for ttl in (0,seconds):
+        try: demand_scoped_grants(eligible(ttl),state,objects,fields,permissions)
+        except ValueError as error: raise ValueError('PREREQUISITE_STALE:'+('grant_ttl' if ttl else 'grant_expired_or_missing')) from error
+    # Cookie 只经内存管道进入原有正式票据核验器，输出只含非秘密期限与会话散列。
+    tested=build.validate('agent',vm.TASK)
+    vm.demand(tested['inputKey']==admit_build()['inputKey'],'PREREQUISITE_STALE:session_build')
+    dotnet=json.loads(SNAPSHOT.read_bytes())['environment']['dotnet']
+    dll=ROOT/Path(build.TARGETS['agent']).parent/'bin/Debug/net10.0/OntologyPlatform.AgentTests.dll'
+    session_file=OUT/('session-ready-'+uuid.uuid4().hex+'.json')
+    env=dict(PATH=os.environ['PATH'],G4_BROWSER_PREFLIGHT='1',G4_QUERY_RUNTIME_TEST=vm.TASK+':'+vm.RUN,
+             G4_DORIS_EVIDENCE_RUN=vm.EVIDENCE_RUN,G4_BROWSER_REPORT=str(session_file),DMQ_SESSION_SECONDS=str(window['execute']),
+             ASPNETCORE_ENVIRONMENT='Development',DOTNET_CLI_TELEMETRY_OPTOUT='1')
+    result=execution.run([dotnet,str(dll),'--filter','FullyQualifiedName=OntologyPlatform.AgentTests.G4QueryMafRuntimeTests.BrowserSessionsCoverRegisteredExecutionDeadline','--minimum-expected-tests','1','--no-ansi','--progress','off','--results-directory',str(OUT/'session-tests')],
+        ROOT,task=vm.TASK,run_id=vm.EVIDENCE_RUN,stage='dmq-current-sessions',environment=env,stdin=execution.encoded(actors),input_key=execution.sha(execution.encoded(tested)),timeout=20)
+    vm.demand(result.returncode==0 and len(json.loads(session_file.read_bytes()))==4,'PREREQUISITE_STALE:session')
+    baseline=json.loads((OUT/'s0-fixed-fixture-0da9ac2fd127ad4f-restored.json').read_bytes())
+    fe=resources['fe']
+    pressure=json.loads(STRESS.read_bytes()) if STRESS.exists() else None
+    vm.demand((pressure is not None)==(stage=='pressure-running'),'PREREQUISITE_STALE:fixture_stage')
+    for table,key,original in STRESS_TABLES:
+        vm.demand(stress_original(fe,table,key,original)==baseline['tables'][table]['before'],'PREREQUISITE_STALE:fixture_bytes')
+        expected_count=len(original)+(pressure['tables'][table]['planned'] if pressure else 0)
+        vm.demand(int(sql(fe,'reader',f'SELECT COUNT(*) FROM fixture.{table}'))==expected_count,'PREREQUISITE_STALE:fixture_count')
+    return dict(status='READY',stage=stage,budgetSeconds=window,grantRequiredSeconds=seconds,sessionRequiredSeconds=window['execute'],
+                sessionCommand=result.receipt['commandId'],snapshot=host['snapshotId'],resourceIds=resources,fieldCount=len(fields),
+                connectionId=connection['id'],secretVersion=connection['secretVersion'],catalog=current['snapshotId'],activation=expected['activationId'])
+
+
+def root_query_state(query_id, failed_key):
+    """只读对账本轮正常提交和失败请求的准确行与审计。"""
+    import uuid
+    vm.demand(re.fullmatch('query-[a-f0-9]{32}',query_id) and str(uuid.UUID(failed_key))==failed_key,'ROOT_WITNESS_IDS')
+    cid=json.loads(PLATFORM.read_bytes())['resources']['platform-pg']
+    statement=f"""SELECT json_build_object('status',"ExecutionStatus",'cancel',"CancelRequested",'resultHash',"ResultHash",'resultSize',"ResultSize",
+        'cancelAudits',(SELECT count(*) FROM governance.audit_records WHERE "Action"='data.query.cancel' AND "Outcome"='allowed' AND "Resource"='{query_id}'),
+        'executeAudits',(SELECT count(*) FROM governance.audit_records WHERE "Action"='data.query.execute' AND "Outcome"='allowed' AND "Resource"='{query_id}'),
+        'failedAdmissions',(SELECT count(*) FROM semantic_query."Queries" WHERE "IdempotencyKey"='{failed_key}'))
+        FROM semantic_query."Queries" WHERE "Id"='{query_id}';"""
+    return json.loads(docker('root-exact-state','exec',cid,'psql','-XwqAt','-U','postgres','-d','mapping','-v','ON_ERROR_STOP=1','-c',statement))
+
+
+def synthetic_grants(mode, two_tables=False, renewal=False, ttl_seconds=14400):
+    from workflow_m4_query import grant_transaction
+    state=json.loads((OUT/('doris-two-table.json' if two_tables else 'runtime-fixture.json')).read_bytes())
+    vm.demand(ttl_seconds==14400 or (ttl_seconds==120 and renewal and two_tables and mode=='query' and vm.EVIDENCE_RUN=='review-fix-01'),'RENEWAL_TTL_SCOPE')
+    roles=state['subjects']
+    vm.demand(state['taskId']==vm.TASK and state['runId']==vm.RUN and state['scope']==dict(organizationId='org-demo',siteIds=['site-a'])
+              and set(roles)=={'operator','auditor','activator','reader'} and len(set(roles.values()))==4,'S1_GRANT_SCOPE')
+    catalog=state['catalog']
+    vm.demand(catalog['connectionId']==state['connectionId'] and catalog['status']=='READY','S1_GRANT_CATALOG')
+    objects,field_refs = grant_fields(catalog,two_tables)
     perms={'operator':['mapping.read','mapping.source.validate','mapping.edit','mapping.validate','mapping.submit'],
            'auditor':['mapping.read','mapping.source.validate','mapping.review','mapping.approve'],
            'activator':['mapping.read','mapping.source.validate','mapping.activate']} if mode=='mapping' else {
                'reader':['data.query.execute','data.query.result.read','data.query.evidence.read']}
+    if mode=='active-read': perms={'operator':['mapping.read']}
     def original_id(subject,permission):
         return ('dmq-s2-' if two_tables else 'dmq-s1-')+execution.sha(execution.encoded([state['connectionId'],subject,permission]))[:32]
     def id_for(subject,permission):
-        return ('renew-20261119-'+original_id(subject,permission)) if renewal else original_id(subject,permission)
+        previous_id = original_id(subject,permission)
+        if not renewal: return previous_id
+        return ('renew-20261119-' if vm.EVIDENCE_RUN == vm.RUN else vm.EVIDENCE_RUN+('-short-' if ttl_seconds==120 else '-'))+previous_id
     sql,ids=grant_transaction(state,objects,field_refs,
-                              [(roles[role],permissions) for role,permissions in perms.items()],id_for,vm.RUN)
+                              [(roles[role],permissions) for role,permissions in perms.items()],id_for,vm.EVIDENCE_RUN,ttl_seconds)
     cid=live_stack()['platform-pg']
     if renewal:
-        vm.demand(mode=='query' and two_tables and len(field_refs)==18 and len(ids)==3,'RENEWAL_18_FIELDS')
-        original_ids=[original_id(roles['reader'],permission) for permission in perms['reader']]
+        vm.demand(mode in ('query','active-read') and two_tables and len(field_refs)==18,'RENEWAL_SCOPE')
+        role,allowed=next(iter(perms.items()))
+        original_ids=[original_id(roles[role],permission) for permission in allowed]
         def values(items): return ','.join("'"+v.replace("'","''")+"'" for v in items)
         def snapshot():
             statement=f"""SELECT json_agg(json_build_object('id',g."Id",'permission',g."Permission",'subject',g."SubjectId",
@@ -410,19 +526,20 @@ def synthetic_grants(mode, two_tables=False, renewal=False):
         before=snapshot()
         prior=[r for r in before if r['id'] in original_ids]
         def same_scope(row):
-            return (row['subject']==roles['reader'] and row['organization']=='org-demo' and row['sites']==['site-a']
-                    and row['connection']==state['connectionId'] and sorted(row['objects'])==sorted(objects)
-                    and sorted(row['fields'])==sorted(field_refs) and row['permission'] in perms['reader'] and row['audit'])
-        vm.demand(len(prior)==3 and all(not r['active'] and not r['revoked'] and same_scope(r) for r in prior),'RENEWAL_PREVIOUS_SCOPE')
+            source = mode=='query'
+            return (row['subject']==roles[role] and row['organization']=='org-demo' and row['sites']==['site-a']
+                    and row['connection']==(state['connectionId'] if source else None) and sorted(row['objects'])==sorted(objects if source else [])
+                    and sorted(row['fields'])==sorted(field_refs if source else []) and row['permission'] in allowed and row['audit'])
+        vm.demand(len(prior)==len(allowed) and all(not r['active'] and not r['revoked'] and same_scope(r) for r in prior),'RENEWAL_PREVIOUS_SCOPE')
     result=execution.run(['docker','--context','desktop-linux','exec','-i',cid,'psql','-U','postgres','-d','mapping','-v','ON_ERROR_STOP=1','-qAt'],
-                         ROOT,task=vm.TASK,run_id=vm.RUN,stage='dmq-'+mode+'-fixture-grants',stdin=sql,input_key=execution.sha(sql),timeout=18)
+                         ROOT,task=vm.TASK,run_id=vm.EVIDENCE_RUN,stage='dmq-'+mode+'-fixture-grants',stdin=sql,input_key=execution.sha(sql),timeout=18)
     vm.demand(result.returncode==0 and result.stdout.decode().strip()==str(len(ids)),'S1_GRANT_INSERT_'+result.receipt['commandId'])
     if renewal:
         after=snapshot()
         current=[r for r in after if r['id'] in ids]
-        vm.demand(len(after)==6 and [r for r in after if r['id'] in original_ids]==prior and len(current)==3
-                  and all(same_scope(r) and r['active'] and r['intervalSeconds']==14400 for r in current),'RENEWAL_AFTER_SCOPE')
-        record(OUT/('q-grant-renewal-'+result.receipt['commandId']+'.json'),dict(taskId=vm.TASK,runId=vm.RUN,status='THREE_CURRENT_FOUR_HOURS',
+        vm.demand(len(after)==2*len(allowed) and [r for r in after if r['id'] in original_ids]==prior and len(current)==len(allowed)
+                  and all(same_scope(r) and r['active'] and r['intervalSeconds']==ttl_seconds for r in current),'RENEWAL_AFTER_SCOPE')
+        record(OUT/('q-grant-renewal-'+result.receipt['commandId']+'.json'),dict(taskId=vm.TASK,runId=vm.RUN,status='CURRENT',ttlSeconds=ttl_seconds,permissions=allowed,
                old=prior,new=current,commandId=result.receipt['commandId']))
     print(json.dumps(dict(taskId=vm.TASK,mode=mode,grantCount=len(ids),commandId=result.receipt['commandId'])))
 
@@ -467,7 +584,7 @@ def expire_disposable_query(query_id,key,result_hash):
         AND "CreatedAtUtc">now()-interval '90 seconds' AND "ExpiresAtUtc">now()+interval '23 hours'
         RETURNING "Id";"""
     result=execution.run(['docker','--context','desktop-linux','exec','-i',cid,'psql','-XwqAt','-v','ON_ERROR_STOP=1','-U','postgres','-d','mapping'],
-                         ROOT,task=vm.TASK,run_id=vm.RUN,stage='dmq-disposable-query-expiry',stdin=query.encode(),
+                         ROOT,task=vm.TASK,run_id=vm.EVIDENCE_RUN,stage='dmq-disposable-query-expiry',stdin=query.encode(),
                          input_key=execution.sha(query.encode()),timeout=10)
     vm.demand(result.returncode==0 and result.stdout.decode().strip()==query_id,'TTL_FIXTURE_COUNT')
     print(json.dumps(dict(queryId=query_id,commandId=result.receipt['commandId'],expires='PAST')))
@@ -514,7 +631,7 @@ def permission_case(action, renewed=False):
         FROM governance."MappingAuthorizationGrants" WHERE {pred};
       COMMIT;"""
     result=execution.run(['docker','--context','desktop-linux','exec','-i',cid,'psql','-XwqAt','-U','postgres','-d','mapping','-v','ON_ERROR_STOP=1'],
-                         ROOT,task=vm.TASK,run_id=vm.RUN,stage='dmq-'+action,stdin=query.encode(),input_key=execution.sha(query.encode()),timeout=12)
+                         ROOT,task=vm.TASK,run_id=vm.EVIDENCE_RUN,stage='dmq-'+action,stdin=query.encode(),input_key=execution.sha(query.encode()),timeout=12)
     vm.demand(result.returncode==0,'GRANT_CONTROL_'+result.receipt['commandId'])
     row[verb+'CommandId']=result.receipt['commandId']
     if verb=='restore':
@@ -860,9 +977,9 @@ def runtime_race_test(case):
     envelope = sys.stdin.buffer.read(65537)
     vm.demand(0 < len(envelope) <= 65536, 'ABA_SESSION_INPUT')
     env = dict(PATH=os.environ['PATH'], ASPNETCORE_ENVIRONMENT='Development', G4__SourceCaPath=str(DIRECTORY/'tls/ca.pem'),
-               G4_QUERY_RUNTIME_TEST=vm.TASK+':'+vm.RUN, DOTNET_GCHeapHardLimit='0x18000000', DOTNET_CLI_TELEMETRY_OPTOUT='1')
+               G4_DORIS_EVIDENCE_RUN=vm.EVIDENCE_RUN,G4_QUERY_RUNTIME_TEST=vm.TASK+':'+vm.RUN, DOTNET_GCHeapHardLimit='0x18000000', DOTNET_CLI_TELEMETRY_OPTOUT='1')
     result = execution.run([dotnet, str(dll), '--filter', 'FullyQualifiedName='+method, '--minimum-expected-tests', '1', '--no-ansi', '--progress', 'off', '--results-directory', str(OUT/'aba-results')],
-                           ROOT, task=vm.TASK, run_id=vm.RUN, stage='dmq-inflight-'+case, environment=env,
+                           ROOT, task=vm.TASK, run_id=vm.EVIDENCE_RUN, stage='dmq-inflight-'+case, environment=env,
                            input_key=execution.sha(execution.encoded(binding)), stdin=envelope, timeout=25)
     passed = mtp(result.stdout + result.stderr, 1) if not result.returncode else 0
     summary = dict(commandId=result.receipt['commandId'], input=binding, exitCode=result.returncode, passed=passed)
@@ -901,7 +1018,7 @@ def s3_compatibility(prepared):
             dll=ROOT/project.parent/'bin/Debug/net10.0'/(project.stem+'.dll')
             env=dict(dep['environment'],G4_DORIS_TEST_RUNTIME=str(layout),DMQ_S0_SOURCE=str(DIRECTORY))
             result=execution.run([dep['dotnet'],str(dll),'--filter',expression,'--minimum-expected-tests',str(minimum),'--no-ansi',
-                                  '--progress','off','--results-directory',str(OUT/'s3-compat-results')],ROOT,task=vm.TASK,run_id=vm.RUN,
+                                  '--progress','off','--results-directory',str(OUT/'s3-compat-results')],ROOT,task=vm.TASK,run_id=vm.EVIDENCE_RUN,
                                  stage='dmq-s3-compat-'+target,environment=env,input_key=execution.sha(execution.encoded(binding)),timeout=45)
             count=mtp(result.stdout+result.stderr,minimum) if result.returncode==0 else 0
             row=dict(target=target,filter=expression,input=binding,commandId=result.receipt['commandId'],exitCode=result.returncode,passed=count)
@@ -924,7 +1041,7 @@ def semantic_batch_regression(prepared):
     env = dict(dep['environment'],G2_SEM_JENA_ORIGIN='http://127.0.0.1:15645',DOTNET_GCHeapHardLimit='0x18000000')
     result = execution.run([dep['dotnet'],str(dll),'--filter','FullyQualifiedName='+method,'--minimum-expected-tests','4',
                             '--no-ansi','--progress','off','--results-directory',str(OUT/'verified-batch-results')],ROOT,
-                           task=vm.TASK,run_id=vm.RUN,stage='dmq-verified-batch-sem',environment=env,input_key=execution.sha(execution.encoded(binding)),timeout=25)
+                           task=vm.TASK,run_id=vm.EVIDENCE_RUN,stage='dmq-verified-batch-sem',environment=env,input_key=execution.sha(execution.encoded(binding)),timeout=25)
     count = mtp(result.stdout+result.stderr,4) if not result.returncode else 0
     row = dict(method=method,input=binding,commandId=result.receipt['commandId'],passed=count,exitCode=result.returncode)
     record(OUT/('verified-batch-sem-'+row['commandId']+'.json'),row)
@@ -943,7 +1060,7 @@ def pg_golden(prepared):
     method='OntologyPlatform.QueryTests.G4QueryTests.HistoricalPgReleaseAndResultKeepCanonicalBytes'
     result=execution.run([dep['dotnet'],str(dll),'--filter','FullyQualifiedName='+method,'--minimum-expected-tests','2',
                          '--no-ansi','--progress','off','--results-directory',str(OUT/'pg-golden-results')],ROOT,
-                         task=vm.TASK,run_id=vm.RUN,stage='dmq-pg-golden',environment=dep['environment'],input_key=execution.sha(execution.encoded(binding)),timeout=25)
+                         task=vm.TASK,run_id=vm.EVIDENCE_RUN,stage='dmq-pg-golden',environment=dep['environment'],input_key=execution.sha(execution.encoded(binding)),timeout=25)
     passed=mtp(result.stdout+result.stderr,2) if not result.returncode else 0
     row=dict(method=method,input=binding,commandId=result.receipt['commandId'],passed=passed,exitCode=result.returncode)
     record(OUT/('pg-golden-test-'+row['commandId']+'.json'),row)
@@ -955,6 +1072,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('stage',choices=['s3-compat','s3-web-typecheck','s3-web-lint','s3-web-unit','s3-web-build','prepare','render','start','configure','freeze','pg-golden','semantic-batch','s2-activation-shape','s2-renew-query-grants','s2-renewed-sentinel','s2-overlap-case','overlap-test','s2-graduated-cancel','s2-cancel-case','s2-admission-case','state-fixture','expire-disposable','session-test','revoke-test','aba-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test','ddl-fixture','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
     parser.add_argument('--prepared')
+    parser.add_argument('--stale-expectation',choices=['activation','catalog'])
     parser.add_argument('--profile-evidence',action='store_true')
     parser.add_argument('--tied-event',action='store_true')
     parser.add_argument('--ddl-action',choices=['arm','rename','restore'])
@@ -964,6 +1082,7 @@ if __name__=='__main__':
     parser.add_argument('--state-operation',choices=['seed','deny','allow','restore'])
     args=parser.parse_args()
     vm.demand(not args.tied_event or args.profile_evidence,'TIED_EVENTS_REQUIRE_PROFILE')
+    vm.demand(not args.stale_expectation or args.stage=='s2-doris-ready','STALE_EXPECTATION_SCOPE')
     vm.demand(not args.profile_evidence or args.stage=='s2-overlap-case','PROFILE_STAGE_SCOPE')
     if args.stage.startswith('s3-web-'):
         raise SystemExit(s3_web_check(args.stage.removeprefix('s3-web-'),args.prepared))
@@ -982,7 +1101,7 @@ if __name__=='__main__':
             vm.demand(reviewed.read_bytes()==original.read_bytes() and any(OUT.glob('q-grant-renewal-*.json')),'SENTINEL_RENEWED_PREREQUISITE')
         done=OUT/'s2-sentinel-101-renewed-restored.json' if renewed else original
         vm.demand(not (OUT/'s2-sentinel-active.json').exists() and not done.exists(),'SENTINEL_ONE_CASE')
-        browser_test('s2-doris-authority-control',args.prepared)
+        browser_test('s2-doris-authority-control',args.prepared,'sentinel')
         try:
             sentinel_fixture(renewed=renewed)
             browser_test('s2-doris-sentinel',args.prepared)
@@ -991,13 +1110,13 @@ if __name__=='__main__':
     elif args.stage=='s2-overlap-case':
         from workflow_doris_s0_fixture import STRESS, stress_fixture
         vm.demand(not STRESS.exists(),'OVERLAP_FIXTURE_IN_USE')
-        browser_test('s2-doris-authority-control',args.prepared)
+        browser_test('s2-doris-authority-control',args.prepared,'stress')
         try:
             stress_fixture(platform=True,entity_rows=4194304,tied_event=args.tied_event)
             if args.profile_evidence:
                 from doris_query_profile_witness import reference
                 reference(minimum_first_fragment_ms=50 if args.tied_event else None)
-            browser_test('s2-doris-overlap',args.prepared)
+            browser_test('s2-doris-overlap',args.prepared,'pressure-running')
         finally:
             if STRESS.exists():
                 try:
@@ -1030,7 +1149,7 @@ if __name__=='__main__':
         finally:
             if (OUT/'s2-ddl-race-active.json').exists(): ddl_race_fixture('restore')
     elif args.stage=='s3-compat': s3_compatibility(args.prepared)
-    elif args.stage in BROWSER: browser_test(args.stage,args.prepared)
+    elif args.stage in BROWSER: browser_test(args.stage,args.prepared,counterexample=args.stale_expectation)
     elif args.stage in ('s2-boundary','s2-restore'): relation_fixture(args.stage=='s2-restore')
     elif args.stage in ('aba-test','revoke-test','session-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test'): runtime_race_test(args.stage.removesuffix('-test'))
     elif args.stage=='fanout': print(json.dumps(fanout_fixture(args.fanout)))

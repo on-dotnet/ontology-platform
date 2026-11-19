@@ -1,6 +1,7 @@
 """从任务实际 Docker 上下文核算阶段峰值，用不启动 BE 的只读进程核验 VM 前提。"""
 import datetime as dt
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -14,7 +15,11 @@ import workflow_execution as execution
 ROOT = Path(__file__).resolve().parents[2]
 TASK = 'G4-DORIS-MAPPING-QUERY-001'
 RUN = 'implementation-01'
-OUTPUT = ROOT / 'artifacts/workflow' / TASK / RUN
+# 资源 Owner 在整个复审期保留原标签；命令与可变回执写入新运行目录。
+EVIDENCE_RUN = os.environ.get('G4_DORIS_EVIDENCE_RUN', RUN)
+if EVIDENCE_RUN not in (RUN, 'review-fix-01'):
+    raise ValueError('DMQ_EVIDENCE_RUN')
+OUTPUT = ROOT / 'artifacts/workflow' / TASK / EVIDENCE_RUN
 GIB = 1 << 30
 IMAGES = {'fe': 'apache/doris@sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02',
           'be': 'apache/doris@sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7'}

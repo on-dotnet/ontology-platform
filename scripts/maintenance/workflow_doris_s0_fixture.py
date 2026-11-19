@@ -38,7 +38,7 @@ mysql --defaults-file="$file" --protocol=TCP --host=localhost --port=9030 --user
 
 
 def docker(stage, *args, env=None, timeout=15, cleanup=False):
-    proc = execution.run(['docker','--context','desktop-linux',*args],vm.ROOT,task=vm.TASK,run_id=vm.RUN,
+    proc = execution.run(['docker','--context','desktop-linux',*args],vm.ROOT,task=vm.TASK,run_id=vm.EVIDENCE_RUN,
                          stage='dmq-source-'+stage,timeout=timeout,environment=env,cleanup=cleanup)
     vm.demand(proc.returncode == 0,'DOCKER_' + stage.upper())
     return proc.stdout.decode().strip()
@@ -334,7 +334,7 @@ def driver(prepared, method):
     result = execution.run([environment['dotnet'],str(vm.ROOT/'backend/tests/OntologyPlatform.ConnectionsTests/bin/Debug/net10.0/OntologyPlatform.ConnectionsTests.dll'),
               '--filter','FullyQualifiedName=OntologyPlatform.ConnectionsTests.DorisMappingQueryTests.'+test,
               '--minimum-expected-tests','1','--results-directory',str(vm.OUTPUT/'driver-results'),'--no-ansi','--progress','off'],
-              vm.ROOT,task=vm.TASK,run_id=vm.RUN,stage=method,input_key=key,environment=env,timeout=20)
+              vm.ROOT,task=vm.TASK,run_id=vm.EVIDENCE_RUN,stage=method,input_key=key,environment=env,timeout=20)
     count = mtp(result.stdout+result.stderr,1) if result.returncode==0 else None
     receipt = dict(method=test,build=binding,stress=stress,shape=shape,command=result.receipt['commandId'],exitCode=result.returncode,passed=count)
     if original is not None:

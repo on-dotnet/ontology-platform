@@ -172,7 +172,7 @@ public sealed partial class G4QueryMafRuntimeTests
         // 只清除外部身份过滤，沿用登记的组织及站点。
         var query = previous with { Filters = new G4QueryFilters { SiteId = "site-a" }, RelationshipIris = [] };
         // 准确键对应只含时序事实的临时许可文件。
-        var directory = Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01");
+        var directory = Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun());
         // 保存同一分支的真实单调时钟，包含等待同步点的时间。
         var branch = new Stopwatch();
         // 驱动输出握手、准确计划和清理事件，独立旁路用真实 FE 连接号对账。
@@ -458,7 +458,7 @@ public sealed partial class G4QueryMafRuntimeTests
         // 明确区分产品截止、取消传播耗时及调用返回时间。
         var result = new { queryId = row.Id, key, nearDeadline, scheduledRemainingMs = nearDeadline ? 800 : (int?)null, started, blocked, row.DeadlineAtUtc, deniedAt, elapsedMs = measurement.Elapsed.TotalMilliseconds,
             denial.Status, denial.Code, row.ExecutionStatus, resultBytes=row.ResultCiphertext.Length, receipts=0, successAudits=allowed };
-        await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(),"artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01",
+        await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(),"artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun(),
             "contended-deadline-"+key+".json"),JsonSerializer.Serialize(result,new JsonSerializerOptions(JsonSerializerDefaults.Web)));
     }
 
@@ -527,7 +527,7 @@ public sealed partial class G4QueryMafRuntimeTests
         var result = new { queryId = row.Id, key, binding.ConnectionId, oldVersion = version, newVersion = version + 1, oldRevision = revision,
             newRevision = revision + 1, afterRead, rotatedAt, deniedAt, row.DeadlineAtUtc, denied.Status, denied.Code,
             row.ExecutionStatus, resultBytes = row.ResultCiphertext.Length, receipts = 0, successAudits = allowed };
-        await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01",
+        await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun(),
             "rotation-inflight-" + key + ".json"), JsonSerializer.Serialize(result, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
     }
 
@@ -617,7 +617,7 @@ public sealed partial class G4QueryMafRuntimeTests
             var observed = new { queryId=stored.Id, key, sourceReadDone=trace.Events.Single(e=>e.Name=="doris.plan.rows_finished").Timestamp,
                 sourceThread=trace.Events.Single(e=>e.Name=="doris.plan.submitted").Tags.Single(t=>t.Key=="thread").Value,
                 changedAt,finishedAt,stored.DeadlineAtUtc,stored.ExecutionStatus,semanticStatus=body.GetProperty("status").GetString(),rows=0,evidence=0,receipts=0 };
-            await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(),"artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01",
+            await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(),"artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun(),
                 "disconnected-"+key+".json"),JsonSerializer.Serialize(observed,new JsonSerializerOptions(JsonSerializerDefaults.Web)));
             return;
         }
@@ -648,7 +648,7 @@ public sealed partial class G4QueryMafRuntimeTests
         var result = new { queryId = row.Id, key, submitted = submitted.Timestamp, template = submitted.Tags.Single(item => item.Key == "template.sha256").Value,
             thread = submitted.Tags.Single(item => item.Key == "thread").Value, read = read.Timestamp, changedAt, deniedAt,
             row.DeadlineAtUtc, denial.Code, denial.Status, row.ExecutionStatus, resultBytes = row.ResultCiphertext.Length, receipts = 0, successAudits = allowed };
-        await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01",
+        await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun(),
             "ddl-inflight-" + key + ".json"), JsonSerializer.Serialize(result, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
     }
 
@@ -734,7 +734,7 @@ public sealed partial class G4QueryMafRuntimeTests
                 rejectedAt=DateTimeOffset.UtcNow, rejected.Code, rejected.Status, stored.ExecutionStatus,
                 resultBytes=stored.ResultCiphertext.Length, stored.ResultHash, receipts=0, successAudits=allowed };
             Assert.IsTrue(result.rejectedAt < stored.DeadlineAtUtc);
-            await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01",
+            await File.WriteAllTextAsync(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun(),
                 (expireSession ? "session-inflight-" : "grant-inflight-")+key+".json"), JsonSerializer.Serialize(result,new JsonSerializerOptions(JsonSerializerDefaults.Web)));
         }
         finally
@@ -752,6 +752,15 @@ public sealed partial class G4QueryMafRuntimeTests
         }
     }
 
+    /// <summary>资源持有者与新证据分开，输出只能进入本任务登记的两次运行。</summary>
+    private static string DorisEvidenceRun()
+    {
+        // 默认保持既有实现运行的目录。
+        var run = Environment.GetEnvironmentVariable("G4_DORIS_EVIDENCE_RUN") ?? "implementation-01";
+        Assert.IsTrue(run is "implementation-01" or "review-fix-01");
+        return run;
+    }
+
     /// <summary>从当前受控测试程序集找回实际仓库根目录，兼容 MTP 改变工作目录。</summary>
     private static string DorisRuntimeRoot()
     {
@@ -767,20 +776,26 @@ public sealed partial class G4QueryMafRuntimeTests
     public async Task BrowserSessionsCoverRegisteredExecutionDeadline()
     {
         Assert.AreEqual("1", Environment.GetEnvironmentVariable("G4_BROWSER_PREFLIGHT"));
-        // 仅当前合成M5身份可使用短检查。
-        Assert.AreEqual("G4-M5-INTEGRATION-001:integration-01", Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST"));
-        // 使用既有只读运行配置构建正式DI，不启动宿主或后台任务。
+        // 两个已登记任务使用各自既有的正式票据存储和运行配置。
+        var doris = Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST") == "G4-DORIS-MAPPING-QUERY-001:implementation-01";
+        Assert.IsTrue(doris || Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST") == "G4-M5-INTEGRATION-001:integration-01");
+        // 宿主夹具固定路径；M5 保留容器内的配置入口。
+        var config = doris ? Path.Combine(DorisRuntimeRoot(), ".tools/security/g4-doris-mapping-query-001/implementation-01/runtime/api/appsettings.json") : "/private/api/appsettings.json";
         await using var app = OntologyPlatform.Api.PlatformApiHost.CreateApplication([], builder =>
         {
             builder.Logging.ClearProviders();
-            builder.Configuration.AddJsonFile("/private/api/appsettings.json", optional: false);
+            builder.Configuration.AddJsonFile(config, optional: false);
         });
-        // 两个参与者的当前Cookie仅存在进程内存，禁止输出原始输入。
+        // 输入只经内存管道传递，四个 Doris 主体须各自独立。
         using var input = JsonDocument.Parse(await Console.In.ReadToEndAsync());
+        Assert.AreEqual(doris ? 4 : 2, input.RootElement.GetArrayLength());
         // 使用正式认证scheme的格式和持久票据存储。
         var options = app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptionsMonitor<Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions>>().Get("Cookies");
         // 180秒浏览器总命令上限加30秒预检界限，无无限TTL。
-        var deadline = DateTimeOffset.UtcNow.AddSeconds(210);
+        var seconds = doris ? int.Parse(Environment.GetEnvironmentVariable("DMQ_SESSION_SECONDS")!, System.Globalization.CultureInfo.InvariantCulture) : 210;
+        Assert.IsTrue(seconds > 0 && seconds <= 14400);
+        // 仅核同一浏览器进程仍需消费这些会话的有界窗口。
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(seconds);
         // 精确读取同一服务器会话的失效事实。
         await using var database = await app.Services.GetRequiredService<IDbContextFactory<OntologyPlatform.Modules.Governance.GovernanceDbContext>>().CreateDbContextAsync();
         // 仅收集非秘密前提观测，成功测试平台可能不转发Console输出。
@@ -803,7 +818,7 @@ public sealed partial class G4QueryMafRuntimeTests
             Assert.IsTrue(session.ExpiresAtUtc > deadline);
             observations.Add(new
             {
-                @case = "M5_BROWSER_SESSION_READY",
+                @case = doris ? "DMQ_BROWSER_SESSION_READY" : "M5_BROWSER_SESSION_READY",
                 subjectId = item.GetProperty("subjectId").GetString(),
                 session.ExpiresAtUtc,
                 requiredUntilUtc = deadline,
@@ -812,7 +827,8 @@ public sealed partial class G4QueryMafRuntimeTests
         }
         // 只允许调用者预先登记的本任务临时目录内的固定报告名。
         var report = Environment.GetEnvironmentVariable("G4_BROWSER_REPORT")!;
-        Assert.IsTrue(report.StartsWith("/tmp/m5-session-probe-", StringComparison.Ordinal) && Path.GetFileName(report) == "session-ready.json" && !report.Contains("..", StringComparison.Ordinal));
+        if (doris) Assert.AreEqual(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun()), Path.GetDirectoryName(report));
+        else Assert.IsTrue(report.StartsWith("/tmp/m5-session-probe-", StringComparison.Ordinal) && Path.GetFileName(report) == "session-ready.json" && !report.Contains("..", StringComparison.Ordinal));
         await File.WriteAllTextAsync(report, JsonSerializer.Serialize(observations));
     }
 

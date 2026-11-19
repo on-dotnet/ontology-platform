@@ -362,9 +362,14 @@ def demand_grants(rows,state,mapping=False, required_seconds=0):
     objects=['production/'+name for name in tables]
     fields=['production/'+table['name']+'/'+str(field['ordinal'])+'/'+urllib.parse.quote(field['name'],safe='') for table in state['catalog']['objects'] if table['schema']=='production' and table['name'] in tables for field in table['fields']]
     if not fields:raise ValueError('PREREQUISITE_STALE:grant')
+    permissions={role:(['mapping.read','mapping.source.validate']+(['mapping.edit','mapping.validate','mapping.submit','mapping.activate'] if role=='operator' else ['mapping.review','mapping.approve'])) if mapping else (['data.query.execute','data.query.result.read','data.query.evidence.read'] if role=='operator' else []) for role in state['subjects']}
+    demand_scoped_grants(rows,state,objects,fields,permissions)
+
+
+def demand_scoped_grants(rows,state,objects,fields,permissions):
+    """逐主体及权限核实一条完整授权，M5 与 Doris 共享相同覆盖判定。"""
     for role,subject in state['subjects'].items():
-        permissions=(['mapping.read','mapping.source.validate']+(['mapping.edit','mapping.validate','mapping.submit','mapping.activate'] if role=='operator' else ['mapping.review','mapping.approve'])) if mapping else (['data.query.execute','data.query.result.read','data.query.evidence.read'] if role=='operator' else [])
-        for permission in permissions:
+        for permission in permissions.get(role, ()):
             source=permission=='mapping.source.validate' or permission.startswith('data.query.')
             if not any(row['SubjectId']==subject and row['OrganizationId']==state['scope']['organizationId'] and set(state['scope']['siteIds'])<=set(row['SiteIds']) and row['Permission']==permission and ((row['ConnectionId']==state['connectionId'] and set(objects)<=set(row['ObjectRefs']) and set(fields)<=set(row['FieldRefs'])) if source else (row['ConnectionId'] is None and not row['ObjectRefs'] and not row['FieldRefs'])) for row in rows):raise ValueError('PREREQUISITE_STALE:grant:'+permission)
 

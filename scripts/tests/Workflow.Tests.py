@@ -176,7 +176,7 @@ class WorkflowTests(unittest.TestCase):
 
 
     @contextlib.contextmanager
-    def production_measurement(self, variant='identical'):
+    def production_measurement(self, variant='identical', task='G4-M5-INTEGRATION-001', through_plan=False):
         """真实Git小夹具调用生产PowerShell，再由实际Python消费者解释；不启动产品。"""
         import shutil
         import os
@@ -191,14 +191,20 @@ class WorkflowTests(unittest.TestCase):
             content = '{"scope":"synthetic EF-01","status":"NOT_RUN"}\n'
             if variant == 'shared-source': (root/'a-shared.json').write_text(content)
             git('add', '.'); git('commit', '-qm', 'base'); base = git('rev-parse', 'HEAD')
-            task = 'G4-M5-INTEGRATION-001'
-            paths = ['docs/evidence/'+task+'/entry-fix-02/reports/'+name+'.json' for name in ('a', 'b')]
+            prefix = 'docs/evidence/'+task+'/'
+            paths = [prefix+'entry-fix-02/reports/'+name+'.json' for name in ('a','b')]
+            if task == 'G4-DORIS-MAPPING-QUERY-001':
+                paths = [prefix+'implementation-01/s0-source-review.json', prefix+'implementation-01/s1/browser-s1-123.json']
             for index, name in enumerate(paths):
                 p = root/name; p.parent.mkdir(parents=True, exist_ok=True)
                 p.write_text(content if variant != 'different' or index == 0 else '{"scope":"different synthetic EF-01","status":"NOT_RUN"}\n')
             git('add', '.'); git('commit', '-qm', 'representatives'); head = git('rev-parse', 'HEAD')
             try:
-                result = self.w.measure_committed_evidence(root, base, head, task)
+                if through_plan:
+                    with patch.object(self.w, 'ROOT', root):
+                        result, = self.w.plan(base, head)['earlyMeasurements']
+                else:
+                    result = self.w.measure_committed_evidence(root, base, head, task)
                 yield root, base, head, task, paths, result
             finally:
                 if os.environ.get('WORKFLOW_EF01_EVIDENCE_DIR'):
@@ -212,6 +218,16 @@ class WorkflowTests(unittest.TestCase):
                         producerSha256=self.w.digest((root/'scripts/create-review-package.ps1').read_bytes()),
                         consumerSha256=self.w.digest((ROOT/'scripts/maintenance/workflow.py').read_bytes()),
                         sources=[dict(gitPath=name, blobOid=git('rev-parse', head+':'+name), text=(root/name).read_text()) for name in sources]), indent=2)+'\n')
+
+    def test_plan_dispatches_both_tasks_to_production_measurement(self):
+        for task in ('G4-M5-INTEGRATION-001','G4-DORIS-MAPPING-QUERY-001'):
+            with self.subTest(task=task), self.production_measurement(task=task, through_plan=True) as (root, base, head, _, paths, result):
+                self.assertEqual(result['status'], 'MEASURED_NOT_READY_FOR_ACCEPTANCE')
+                evidence = result['measurement']['representativeEvidence']
+                self.assertEqual((evidence['taskId'],evidence['baseSha'],evidence['headSha']), (task,base,head))
+                self.assertEqual({row['gitPath'] for row in evidence['sourceMembers']},set(paths))
+                self.assertEqual(len(evidence['payloads']),1)
+                self.assertFalse((root/'artifacts/reviews').exists())
 
     def test_production_measurement_accepts_identical_representative_json(self):
         for variant in ('different', 'identical', 'shared-source'):

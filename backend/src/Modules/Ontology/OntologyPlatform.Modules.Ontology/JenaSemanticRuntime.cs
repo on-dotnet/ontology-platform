@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OntologyPlatform.Contracts;
 using OntologyPlatform.Modules.Ontology.Domain;
 
@@ -37,16 +38,21 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
     /// <summary>可测试的真实时间来源。</summary>
     private readonly TimeProvider clock;
 
+    /// <summary>记录无法确认删除的服务器自建临时图，供精确恢复核对。</summary>
+    private readonly ILogger<JenaSemanticRuntime>? logger;
+
     /// <summary>验证启动配置为固定回环地址，任何请求不能覆盖。</summary>
     /// <param name="clients">受控客户端工厂。</param>
     /// <param name="configuration">仅读取固定dataset配置。</param>
     /// <param name="clock">校验事实时间。</param>
-    public JenaSemanticRuntime(IHttpClientFactory clients, IConfiguration configuration, TimeProvider clock)
+    /// <param name="logger">记录临时图的归属和清理状态。</param>
+    public JenaSemanticRuntime(IHttpClientFactory clients, IConfiguration configuration, TimeProvider clock, ILogger<JenaSemanticRuntime>? logger = null)
     {
         this.clients = clients;
         validation = Origin(configuration["Semantics:ValidationOrigin"]);
         published = Origin(configuration["Semantics:PublishedOrigin"]);
         this.clock = clock;
+        this.logger = logger;
     }
 
     /// <summary>真实解析全部源码并映射本体投影，保留未知结构的完整源码。</summary>
@@ -236,26 +242,54 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
             throw new SemanticOperationException(503, "published_binding_invalid");
     }
 
-    /// <summary>外层并发和总时限预算覆盖完整操作，取消后仍有独立清理预算。</summary>
+    /// <summary>工作、临时图清理及返回共用原绝对截止，槽位在所有已启动的依赖完成后释放。</summary>
     private async Task<T> Execute<T>(Func<List<string>, CancellationToken, Task<T>> operation, CancellationToken cancellationToken, [CallerMemberName] string phase = "")
     {
-        if (!await Slots.WaitAsync(0, cancellationToken)) throw new SemanticOperationException(429, "semantic_busy");
-        // 只有固定公共方法名可成为阶段标签，不接受用户提供的phase。
+        // 合并外部服务器截止与引擎自身五秒上限。
+        var start = clock.GetUtcNow();
+        // 外层可能在 PG、对象库及前序核验上已经花费时间。
+        var deadline = SemanticReadDeadline.Current is { } outer && outer < start.AddSeconds(5) ? outer : start.AddSeconds(5);
+        // 短请求按剩余时间同比预留，长请求的响应余量最多 50 ms。
+        var reserveUnit = Math.Clamp((deadline - start).TotalMilliseconds / 10, 0, 50);
+        // 依赖必须在原截止之前返回，留出服务器完成响应的时间。
+        var cleanupEnd = deadline.AddMilliseconds(-reserveUnit);
+        // 无工作余量时，拒绝占槽或创建图。
+        var available = cleanupEnd.AddMilliseconds(-2 * reserveUnit) - start;
+        cancellationToken.ThrowIfCancellationRequested();
+        if (available <= TimeSpan.Zero) throw new SemanticOperationException(503, "semantic_timeout");
+        // 即使用户提前断开，清理令牌也将在同一个服务器截止前失效。
+        using var cleanup = new CancellationTokenSource(cleanupEnd - start, clock);
+        // 独立工作截止只用于提前开始清理，不延长服务器期限。
+        using var workLimit = new CancellationTokenSource(available, clock);
+        // 执行实际依赖同时服从用户取消和工作截止。
+        using var work = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, workLimit.Token, cleanup.Token);
+        // 只记录运行时生成的临时 IRI，PUT 结果不确定时也保留所有权。
+        var graphs = new List<string>();
+        // 单调时钟只用于实际耗时度量。
+        var started = Stopwatch.GetTimestamp();
         using var activity = Activities.StartActivity("ontology.semantic");
         activity?.SetTag("ontology.phase", phase);
-        // 单调时钟用于真实延迟，不把墙钟跳变算作性能数据。
-        var started = Stopwatch.GetTimestamp();
-        // 默认失败，只有操作真正完成才记录成功状态。
+        // 默认失败，完成工作和清理两者后才记成功。
         var outcome = "failed";
-        // 当前请求独占图只存在本次操作内，finally一定尝试删除。
-        var graphs = new List<string>();
-        // 整个操作最多五秒，不按每个HTTP请求重新给予五秒。
-        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        budget.CancelAfter(TimeSpan.FromSeconds(5));
+        if (!await Slots.WaitAsync(0, cancellationToken)) throw new SemanticOperationException(429, "semantic_busy");
         try
         {
-            // 真实执行结果先完成，后标记成功；清理仍在finally执行。
-            var result = await operation(graphs, budget.Token);
+            // 在内部 finally 正常完成前保留结果；清理未知时不能返回成功。
+            T result;
+            // 每次调用单独记录其清理确认结果。
+            bool confirmed;
+            try
+            {
+                result = await operation(graphs, work.Token);
+                work.Token.ThrowIfCancellationRequested();
+            }
+            finally
+            {
+                confirmed = await CleanupAsync(graphs, phase, cleanupEnd, cleanup.Token);
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+            if (clock.GetUtcNow() >= cleanupEnd || cleanup.IsCancellationRequested) throw new SemanticOperationException(503, "semantic_timeout");
+            if (!confirmed) throw new SemanticOperationException(503, "semantic_unavailable");
             outcome = "completed";
             return result;
         }
@@ -264,21 +298,35 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
         catch (JsonException) { throw new SemanticOperationException(503, "rdf_response_invalid"); }
         finally
         {
-            // 清理不继承用户取消，但自身至多两秒，不无限占用槽位。
-            using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(2));
-            try
-            {
-                foreach (var graph in graphs)
-                    await SendAsync(validation, "data?graph=" + Uri.EscapeDataString(graph), HttpMethod.Delete, null, "text/plain", cleanup.Token);
-            }
-            catch (Exception exception) when (exception is HttpRequestException or OperationCanceledException or SemanticOperationException) { /* 依赖故障时内存暂存图等待运行时重启清理，不能泄露源码到日志。 */ }
-            finally
-            {
-                activity?.SetStatus(outcome == "completed" ? ActivityStatusCode.Ok : ActivityStatusCode.Error);
-                Duration.Record(Stopwatch.GetElapsedTime(started).TotalMilliseconds, new KeyValuePair<string, object?>("operation", phase), new KeyValuePair<string, object?>("outcome", outcome));
-                Slots.Release();
-            }
+            Slots.Release();
+            activity?.SetStatus(outcome == "completed" ? ActivityStatusCode.Ok : ActivityStatusCode.Error);
+            Duration.Record(Stopwatch.GetElapsedTime(started).TotalMilliseconds, new KeyValuePair<string, object?>("operation", phase), new KeyValuePair<string, object?>("outcome", outcome));
         }
+    }
+
+    /// <summary>逐一等待自建图的删除；到期或依赖失败时保留准确 IRI 及未知状态。</summary>
+    private async Task<bool> CleanupAsync(List<string> graphs, string phase, DateTimeOffset expiresAt, CancellationToken token)
+    {
+        // 记录整个已登记集合是否都已确认不存在。
+        var confirmed = true;
+        foreach (var graph in graphs)
+        {
+            if (!token.IsCancellationRequested && clock.GetUtcNow() < expiresAt)
+            {
+                try
+                {
+                    await SendAsync(validation, "data?graph=" + Uri.EscapeDataString(graph), HttpMethod.Delete, null, "text/plain", token);
+                    continue;
+                }
+                catch (Exception exception) when (exception is HttpRequestException or OperationCanceledException or SemanticOperationException)
+                {
+                    // 已发送的请求有可能在远端生效，本地只能报告未确认。
+                }
+            }
+            confirmed = false;
+            logger?.LogWarning("TemporaryGraphCleanupUnconfirmed phase={Phase} graph={Graph} cleanupDeadline={Deadline:O} requestDeadline={RequestDeadline:O}", phase, graph, expiresAt, SemanticReadDeadline.Current);
+        }
+        return confirmed;
     }
 
     /// <summary>分别由RIOT解析四类源并执行Shape安全检查，计算总三元组预算。</summary>

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OntologyPlatform.Contracts;
 using OntologyPlatform.Modules.Ontology;
@@ -43,7 +44,7 @@ internal static class SemanticFixture
     }
 
     /// <summary>保留真实HTTP传输，只在指定阶段注入可取消延迟以验证并发/超时。</summary>
-    internal static JenaSemanticRuntime RuntimeWithGate(Func<HttpRequestMessage, CancellationToken, Task> gate)
+    internal static JenaSemanticRuntime RuntimeWithGate(Func<HttpRequestMessage, CancellationToken, Task> gate, ILogger<JenaSemanticRuntime>? logger = null)
     {
         // 随机回环地址仍由同一临时真实Jena提供。
         var origin = Environment.GetEnvironmentVariable("G2_SEM_JENA_ORIGIN");
@@ -54,7 +55,7 @@ internal static class SemanticFixture
             ["Semantics:ValidationOrigin"] = origin + "/validation/",
             ["Semantics:PublishedOrigin"] = origin + "/ontology/"
         }).Build();
-        return new JenaSemanticRuntime(new TimingFactory(gate), config, TimeProvider.System);
+        return new JenaSemanticRuntime(new TimingFactory(gate), config, TimeProvider.System, logger);
     }
 
     /// <summary>为真实引擎连接增加确定性时序控制，绝不替换业务响应。</summary>
