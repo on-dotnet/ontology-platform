@@ -823,23 +823,36 @@ public sealed partial class G4QueryMafRuntimeTests
     public async Task BrowserSessionsCoverRegisteredExecutionDeadline()
     {
         Assert.AreEqual("1", Environment.GetEnvironmentVariable("G4_BROWSER_PREFLIGHT"));
-        // 两个已登记任务使用各自既有的正式票据存储和运行配置。
-        var doris = Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST") == "G4-DORIS-MAPPING-QUERY-001:implementation-01";
-        Assert.IsTrue(doris || Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST") == "G4-M5-INTEGRATION-001:integration-01");
-        // 宿主夹具固定路径；M5 保留容器内的配置入口。
+        // Oracle 与 Doris 各有四个独立受控主体；M5 沿用原来两个。
+        var runtime = Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST");
+        var oracle = runtime == "G4-ORACLE-MAPPING-QUERY-001:implementation-01";
+        var doris = runtime == "G4-DORIS-MAPPING-QUERY-001:implementation-01";
+        Assert.IsTrue(oracle || doris || runtime == "G4-M5-INTEGRATION-001:integration-01");
+        // Oracle 探针与本任务 API 共用网络命名空间和准确只读挂载，M5 沿用原容器入口。
         var config = doris ? Path.Combine(DorisRuntimeRoot(), ".tools/security/g4-doris-mapping-query-001/implementation-01/runtime/api/appsettings.json") : "/private/api/appsettings.json";
         await using var app = OntologyPlatform.Api.PlatformApiHost.CreateApplication([], builder =>
         {
             builder.Logging.ClearProviders();
             builder.Configuration.AddJsonFile(config, optional: false);
         });
-        // 输入只经内存管道传递，四个 Doris 主体须各自独立。
+        if (oracle)
+        {
+            // 探针只能消费任务内网治理库；配置和密钥环与正式 API 的已核挂载一致。
+            var target = new Npgsql.NpgsqlConnectionStringBuilder(app.Configuration.GetConnectionString("governance"));
+            Assert.IsTrue(target.Host == "platform-pg" && target.Port == 5432 && target.Database == "mapping"
+                && target.SslMode == Npgsql.SslMode.VerifyFull && app.Configuration["Security:KeyRingPath"] == "/keyring");
+        }
+        // 真实 Cookie 只通过 stdin 进入本次内存管道。
+
         using var input = JsonDocument.Parse(await Console.In.ReadToEndAsync());
-        Assert.AreEqual(doris ? 4 : 2, input.RootElement.GetArrayLength());
+        Assert.AreEqual(doris || oracle ? 4 : 2, input.RootElement.GetArrayLength());
+        if (oracle)
+            Assert.AreEqual(4, input.RootElement.EnumerateArray().Select(item => item.GetProperty("subjectId").GetString()).Distinct(StringComparer.Ordinal).Count());
         // 使用正式认证scheme的格式和持久票据存储。
         var options = app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptionsMonitor<Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions>>().Get("Cookies");
         // 180秒浏览器总命令上限加30秒预检界限，无无限TTL。
-        var seconds = doris ? int.Parse(Environment.GetEnvironmentVariable("DMQ_SESSION_SECONDS")!, System.Globalization.CultureInfo.InvariantCulture) : 210;
+        var seconds = oracle || doris ? int.Parse(Environment.GetEnvironmentVariable(oracle ? "OMQ_SESSION_SECONDS" : "DMQ_SESSION_SECONDS")!,
+            System.Globalization.CultureInfo.InvariantCulture) : 210;
         Assert.IsTrue(seconds > 0 && seconds <= 14400);
         // 仅核同一浏览器进程仍需消费这些会话的有界窗口。
         var deadline = DateTimeOffset.UtcNow.AddSeconds(seconds);
@@ -865,7 +878,7 @@ public sealed partial class G4QueryMafRuntimeTests
             Assert.IsTrue(session.ExpiresAtUtc > deadline);
             observations.Add(new
             {
-                @case = doris ? "DMQ_BROWSER_SESSION_READY" : "M5_BROWSER_SESSION_READY",
+                @case = oracle ? "OMQ_BROWSER_SESSION_READY" : doris ? "DMQ_BROWSER_SESSION_READY" : "M5_BROWSER_SESSION_READY",
                 subjectId = item.GetProperty("subjectId").GetString(),
                 session.ExpiresAtUtc,
                 requiredUntilUtc = deadline,
@@ -878,6 +891,14 @@ public sealed partial class G4QueryMafRuntimeTests
         {
             Assert.AreEqual(Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001", DorisEvidenceRun()), Path.GetDirectoryName(report));
             Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(Path.GetFileName(report), "^session-ready-[0-9a-f]{32}\\.json$"));
+        }
+        else if (oracle)
+        {
+            Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(report, @"\A/tmp/omq-session-probe-[0-9a-f]{32}/session-ready\.json\z"));
+            // 同一次试验只能生成一份会话观察，失败或重试不得覆盖原件。
+            await using var output = new FileStream(report, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+            await JsonSerializer.SerializeAsync(output, observations);
+            return;
         }
         else Assert.IsTrue(report.StartsWith("/tmp/m5-session-probe-", StringComparison.Ordinal) && Path.GetFileName(report) == "session-ready.json" && !report.Contains("..", StringComparison.Ordinal));
         await File.WriteAllTextAsync(report, JsonSerializer.Serialize(observations));
