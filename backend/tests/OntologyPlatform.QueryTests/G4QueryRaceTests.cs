@@ -5,7 +5,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using OntologyPlatform.Api.G4;
 using OntologyPlatform.Api.Security;
 using OntologyPlatform.Contracts;
@@ -19,6 +22,55 @@ namespace OntologyPlatform.QueryTests;
 [DoNotParallelize]
 public sealed class G4QueryRaceTests
 {
+    /// <summary>通过正式模块的冷作用域确认取消提交观察使用宿主登记的存储日志。</summary>
+    [TestMethod]
+    public void OracleCancelCommitLoggerComesFromOfficialStoreRegistration()
+    {
+        // 每次使用独占的临时目录，仅为正式工厂验证查询结果保护路径。
+        var directory = Directory.CreateTempSubdirectory("g4-query-di-");
+        try
+        {
+            // 本测试只解析依赖，回环端口不用来发送数据库请求。
+            const string connection = "Host=127.0.0.1;Port=1;Database=unused";
+            // 启用正式手写工厂并为其提供独占密钥目录。
+            var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["G4:QueryEnabled"] = "true",
+                ["G4:QueryKeyRingPath"] = directory.FullName,
+                ["ConnectionStrings:governance"] = connection
+            }).Build();
+            // 只在本测试宿主登记这个确切日志实例，旧注册遗漏参数时实际字段为空。
+            var expected = NullLogger<G4QueryResultStore>.Instance;
+            // 授权、审计与存储均由容器在当前作用域构造；本次不执行查询。
+            var services = new ServiceCollection();
+            services.AddLogging();
+            services.AddSingleton<ILogger<G4QueryResultStore>>(expected);
+            services.AddSingleton(TimeProvider.System);
+            services.AddSingleton<IDataProtectionProvider>(new EphemeralDataProtectionProvider());
+            services.AddDbContextFactory<GovernanceDbContext>(options => options.UseNpgsql(connection));
+            services.AddScoped<IMappingSessionAuthority, MappingSessionAuthority>();
+            services.AddScoped<MappingAuthorizationParticipant>();
+            services.AddScoped<IG4QueryAuthorizationAuthority, QueryAuthorizationParticipant>();
+            services.AddScoped<IG4QueryBindingReader>(_ => new FixedBindingReader());
+            services.AddScoped<ITransactionalAuditWriter, TransactionalAuditWriter>();
+            services.AddSemanticQueryModule(configuration);
+            // 验证作用域规则，仍保持所有数据库连接关闭。
+            using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+            // 由正式 MCP 与 HTTP 共用的模块存储合同解析实例。
+            using var scope = provider.CreateScope();
+            // 读取工厂实际返回的存储对象，验证它持有的具体记录器。
+            var store = scope.ServiceProvider.GetRequiredService<IG4QueryRunStore>();
+            // 直接核对已构造实例的日志，不触发事务，也不伪造一次取消提交事件。
+            var slot = typeof(G4QueryResultStore).GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Single(field => field.FieldType == typeof(ILogger<G4QueryResultStore>));
+            Assert.AreSame(expected, slot.GetValue(store));
+        }
+        finally
+        {
+            directory.Delete(true);
+        }
+    }
+
     /// <summary>当前授权撤销先提交时，旧证明不能写成功结果或成功审计。</summary>
     [TestMethod]
     public async Task RevocationBlocksAtomicResultAndAudit()

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OntologyPlatform.Contracts;
 
 namespace OntologyPlatform.Modules.SemanticQuery;
@@ -30,7 +31,8 @@ public static class SemanticQueryModule
                 var protection = DataProtectionProvider.Create(new DirectoryInfo(path), builder => builder.SetApplicationName("OntologyPlatform.G4-M4-QUERY-001"));
                 return new G4QueryResultStore(provider.GetRequiredService<IDbContextFactory<G4QueryDbContext>>(),
                     provider.GetRequiredService<IG4QueryAuthorizationAuthority>(), provider.GetRequiredService<IG4QueryBindingReader>(),
-                    provider.GetRequiredService<ITransactionalAuditWriter>(), protection, provider.GetRequiredService<TimeProvider>());
+                    provider.GetRequiredService<ITransactionalAuditWriter>(), protection, provider.GetRequiredService<TimeProvider>(),
+                    provider.GetRequiredService<ILogger<G4QueryResultStore>>());
             });
             services.AddScoped<IG4QueryRunStore>(provider => provider.GetRequiredService<G4QueryResultStore>());
             services.AddScoped<G4QueryExecution>();
