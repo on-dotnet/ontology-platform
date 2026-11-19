@@ -76,7 +76,7 @@ internal static class OracleQueryReader
                         using (var command = OracleSourceAdapter.CreateMappingCommand(connection, tx, table.Schema == "CaseOwner"))
                         {
                             // Cancel 只指向这条尚存命令；注册先释放并等待回调，随后才可发出其它 SQL。
-                            using var cancel = work.Token.Register(() => { try { command.Cancel(); } catch (OracleException) { } });
+                            using var cancel = work.Token.Register(() => { try { command.Cancel(); } catch (Exception error) when (error is OracleException or InvalidOperationException) { } });
                             raw = await OracleSourceAdapter.ConsumeMappingAsync(command, work.Token);
                         }
                         await tx.CommitAsync(work.Token);
