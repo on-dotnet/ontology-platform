@@ -19,6 +19,29 @@ public sealed partial class OracleSourceAdapter
             action, lifetime.QueryId, lifetime.ExecutionId, DateTimeOffset.UtcNow);
     }
 
+    /// <summary>在真实读者会话将统一审计身份、传统审计身份及 SID 绑定到本次 ClientId。</summary>
+    internal async Task RecordQuerySessionAsync(OracleConnection connection, G4OracleSourceLifetime lifetime, CancellationToken token)
+    {
+        // SYS_CONTEXT 只返回本会话，不增加业务账号的字典权限。
+        using var identity = connection.CreateCommand();
+        identity.CommandText = """
+            SELECT SYS_CONTEXT('USERENV','CLIENT_IDENTIFIER'),SYS_CONTEXT('USERENV','INSTANCE'),
+                   SYS_CONTEXT('USERENV','SID'),SYS_CONTEXT('USERENV','SESSIONID'),SYS_CONTEXT('USERENV','UNIFIED_AUDIT_SESSIONID'),
+                   SYS_CONTEXT('USERENV','CON_ID') FROM DUAL
+            """;
+        // 原始数字来自自己的物理连接；不同审计体系的编号分别保留。
+        await using var row = await identity.ExecuteReaderAsync(token);
+        if (!await row.ReadAsync(token) || row.GetString(0) != lifetime.ClientId) throw new PgSourceException("connection_readonly_unverified");
+        // 来源标记仅接受无符号数字，不允许其它会话内容写进日志。
+        var ids = new ulong[5];
+        for (var i = 0; i < ids.Length; i++)
+            if (row.IsDBNull(i + 1) || !ulong.TryParse(row.GetString(i + 1), System.Globalization.NumberStyles.None,
+                    System.Globalization.CultureInfo.InvariantCulture, out ids[i]) || ids[i] == 0)
+                throw new PgSourceException("connection_readonly_unverified");
+        logger?.LogInformation("OracleSourceSession query={QueryId} execution={ExecutionId} instance={Instance} sid={Sid} audsid={Audsid} unified={Unified} con={Con} utc={Utc:O}",
+            lifetime.QueryId, lifetime.ExecutionId, ids[0], ids[1], ids[2], ids[3], ids[4], DateTimeOffset.UtcNow);
+    }
+
     /// <summary>在业务事务外验证信任与当前直接读取范围，交给调用者管理同一物理连接。</summary>
     /// <param name="secret">本任务读者的内存口令。</param>
     /// <param name="executionId">独占的源执行身份。</param>

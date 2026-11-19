@@ -67,6 +67,7 @@ internal static class OracleQueryReader
             {
                 // 使用与 M2 发现完全相同的字节口径，再核物理主键与字符语义。
                 var shape = await OracleMappingSourceValidator.CheckCatalogAsync(connection, context.CurrentCatalog, work.Token);
+                await adapter.RecordQuerySessionAsync(connection, lifetime, work.Token);
                 // 已核会话的首条事务内语句是 SET TRANSACTION READ ONLY。
                 var tx = await OracleSourceAdapter.BeginMappingAsync(connection, work.Token);
                 try
