@@ -1,0 +1,30 @@
+{
+  "role": "fuseki",
+  "id": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+  "group": "replacement",
+  "operation": "diagnostic-alternative-reopen",
+  "resourceAttempt": "6fec9f4e48e7408ebd6f1c6b41f3cb17",
+  "startedUtc": "2026-11-19T23:36:08.459094+00:00",
+  "status": "BLOCKED",
+  "tdbLocksBefore": [
+    "databases/ontology/Data-0001/tdb.lock",
+    "databases/ontology/tdb.lock"
+  ],
+  "after": {
+    "Status": "exited",
+    "ExitCode": 143,
+    "OOMKilled": false,
+    "FinishedAt": "2026-11-19T23:36:08.901125342Z"
+  },
+  "logExit": 0,
+  "shutdownLogMarker": false,
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tdbCloseFiles": [
+    "Data-0001/journal.jrnl|0",
+    "Data-0001/tdb.lock|2",
+    "tdb.lock|2"
+  ],
+  "allTdbLocksRemoved": false,
+  "reason": "ORACLE_ADMISSION_TDB_CLOSE_UNCONFIRMED",
+  "endedUtc": "2026-11-19T23:36:10.559746+00:00"
+}

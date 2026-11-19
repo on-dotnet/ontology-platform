@@ -1,0 +1,44 @@
+{
+  "head": "b6372032ab6ce721bcee4b2097d2eb6e820decbf",
+  "resource": "dc5c76dcc44245b7ac05259be25bbc71",
+  "checks": [
+    {
+      "check": "policy",
+      "cmd": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow_context.py",
+        "--root",
+        "/Users/chasen/.codex/worktrees/omq-source-bindings/ontology-platform",
+        "--check",
+        "--task",
+        "G4-ORACLE-MAPPING-QUERY-001",
+        "--base",
+        "9de3b93a0dfddb948b4d68c61ad1b54ce84e0812",
+        "--head",
+        "b6372032ab6ce721bcee4b2097d2eb6e820decbf"
+      ],
+      "exitCode": 1,
+      "commandId": "6b27b81840764b41984d385f291d3fae",
+      "stdoutSha256": "e8ddcc7babded49d1dc74ddc84c7fc6ea293d9316b4206a870bd928380ddb4aa",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "static",
+      "cmd": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/verify.ps1",
+        "-BaseSha",
+        "9de3b93a0dfddb948b4d68c61ad1b54ce84e0812",
+        "-HeadSha",
+        "b6372032ab6ce721bcee4b2097d2eb6e820decbf"
+      ],
+      "exitCode": 1,
+      "commandId": "478e87428e2342dab7e088b5b2949a80",
+      "stdoutSha256": "92a49ceffbce3564a7e73ee5bd733cd48eb8766066a287375336a38bdf025a1f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

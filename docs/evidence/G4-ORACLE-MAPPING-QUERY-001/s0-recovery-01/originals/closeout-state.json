@@ -1,0 +1,188 @@
+{
+  "status": "STOPPED_KEEP_VERIFIED",
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "s0-recovery-01",
+  "attempt": "49556a3aee414145b2192b425a7911da",
+  "activeIds": [
+    "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f",
+    "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9",
+    "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04"
+  ],
+  "protectedOriginalSha256": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9",
+  "resources": {
+    "original": {
+      "oracle": {
+        "id": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+        "status": "exited",
+        "exitCode": 143,
+        "oom": false,
+        "volume": "ontology-g4-oracle-mapping-query-001_oracle-data"
+      },
+      "platform-pg": {
+        "id": "eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5",
+        "status": "exited",
+        "exitCode": 0,
+        "oom": false,
+        "volume": "ontology-g4-omq-platform-01_platform-data"
+      },
+      "keycloak-test": {
+        "id": "15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b",
+        "status": "exited",
+        "exitCode": 143,
+        "oom": false,
+        "volume": "ontology-g4-omq-platform-01_keycloak-data"
+      },
+      "fuseki": {
+        "id": "9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb",
+        "status": "exited",
+        "exitCode": 143,
+        "oom": false,
+        "volume": "ontology-g4-omq-platform-01_fuseki-data"
+      },
+      "rustfs": {
+        "id": "f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd",
+        "status": "exited",
+        "exitCode": 0,
+        "oom": false,
+        "volume": "ontology-g4-omq-platform-01_rustfs-data"
+      }
+    },
+    "replacement": {
+      "oracle": {
+        "id": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+        "status": "exited",
+        "exitCode": 143,
+        "oom": false,
+        "volume": "ontology-g4-omq-replacement-01_oracle-data"
+      },
+      "platform-pg": {
+        "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+        "status": "exited",
+        "exitCode": 0,
+        "oom": false,
+        "volume": "ontology-g4-omq-restore-01_platform-data"
+      },
+      "keycloak-test": {
+        "id": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+        "status": "exited",
+        "exitCode": 143,
+        "oom": false,
+        "volume": "ontology-g4-omq-restore-01_keycloak-data"
+      },
+      "fuseki": {
+        "id": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+        "status": "exited",
+        "exitCode": 143,
+        "oom": false,
+        "volume": "ontology-g4-omq-restore-01_fuseki-data"
+      },
+      "rustfs": {
+        "id": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
+        "status": "exited",
+        "exitCode": 0,
+        "oom": false,
+        "volume": "ontology-g4-omq-restore-01_rustfs-data"
+      }
+    },
+    "apis": {
+      "api": {
+        "id": "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+        "status": "exited",
+        "exitCode": 143,
+        "oom": false,
+        "volume": ""
+      },
+      "api-secondary": {
+        "id": "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+        "status": "exited",
+        "exitCode": 143,
+        "oom": false,
+        "volume": ""
+      }
+    },
+    "archived-apis": {
+      "api": {
+        "id": "f90b7e7b599ffb4e9b298ce3679f9f24b25c762b472487fe09fd52e3f8e378cf",
+        "status": "exited",
+        "exitCode": 143,
+        "oom": false,
+        "volume": ""
+      },
+      "api-secondary": {
+        "id": "0f04589574f7ace57e784e1bf0525e6c2587819a0c882ebfc15a09f7203e689f",
+        "status": "exited",
+        "exitCode": 143,
+        "oom": false,
+        "volume": ""
+      }
+    }
+  },
+  "reread": {
+    "platform/fuseki.tar": {
+      "bytes": 880640,
+      "sha256": "f0a6a3788e2bb92777a2eed9641aea91025cf8bfaa7512ccb70d1d09bf1525c4",
+      "mode": "0600"
+    },
+    "platform/rustfs.tar": {
+      "bytes": 184320,
+      "sha256": "6ff1aa706d27fd31f0c98c95168124d3a0f07a6018aef527f45bdb169e70be3e",
+      "mode": "0600"
+    },
+    "platform/keycloak-test.tar": {
+      "bytes": 193556480,
+      "sha256": "87dd320d0bb8813bf44ffdc149e88298c249fcabc75c663e2e6c387f20a90409",
+      "mode": "0600"
+    },
+    "platform/platform-pg.tar": {
+      "bytes": 99440640,
+      "sha256": "ba0696fcb0257d5f6b022b6dad2ca6bdf938bd81afb0f038e4230f83187c7fc7",
+      "mode": "0600"
+    },
+    "source/database.tar": {
+      "bytes": 4425000960,
+      "sha256": "fc69697238cfe0f2197466c3eaac96994b6200628cf06f6dc29f13d42d633f7c",
+      "mode": "0600"
+    },
+    "source/trust-and-auth.tar": {
+      "bytes": 251074560,
+      "sha256": "060b9206c94adbc98f808fd5b6c8bb78aa7c9a7e02d831f24862acaf3a9a8daa",
+      "mode": "0600"
+    },
+    "host/materials.tar": {
+      "bytes": 105472,
+      "sha256": "898e9652eb4ebff45fd1872eaefa555c97a02cdde918dd9e3054207f8dd43c71",
+      "mode": "0600"
+    },
+    "early/database.tar": {
+      "bytes": 4330629120,
+      "sha256": "41a2fc228ebb760087282a48253718e89bb637aa241182b09316fd0f4499dafb",
+      "mode": "0600"
+    },
+    "early/trust-and-auth.tar": {
+      "bytes": 67891200,
+      "sha256": "0ceedc75a91fa234066f139093bc9e105c0024b9fc6d9e36687d295f8628a479",
+      "mode": "0600"
+    }
+  },
+  "diskBytes": 42629384638,
+  "diskLimit": 42949672960,
+  "vm": {
+    "total": 20964958208,
+    "cpus": 12,
+    "available": 18083172352,
+    "availableFs": 409717477376,
+    "load": "0.42 0.33 0.21 2/437 7"
+  },
+  "host": {
+    "availableEstimate": 9397026816,
+    "estimate": "free + inactive pages",
+    "diskBytes": 208917884928,
+    "pressure": "The system has 34359738368 (2097152 pages with a page size of 16384).\nSystem-wide memory free percentage: 53%",
+    "swap": "total = 2048.00M  used = 945.00M  free = 1103.00M  (encrypted)"
+  },
+  "activeQuota": {
+    "memory": 3758096384,
+    "nanoCpus": 4000000000
+  },
+  "originalFusekiShutdownHook": "UNKNOWN"
+}

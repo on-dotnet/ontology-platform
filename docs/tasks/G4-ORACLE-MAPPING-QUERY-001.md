@@ -30,3 +30,5 @@ P0 的文档归属为本任务卡、[唯一 A–F](../evidence/G4-ORACLE-MAPPING
 本次 S0 最小正式根已通过真实 OIDC 登录、G3 发布、正式目录发现、Mapping 异人核准及激活。源业务读者与四个 OIDC 主体相互独立。首批 76、57、46 个检查分别属于 provision、mapping 和当期 ready，均按各自实测提交登记。正式取消与资源恢复条件见[阻断交接](../evidence/G4-ORACLE-MAPPING-QUERY-001/implementation-01/s0-blocked/report.md)。
 
 2026-11-20，`s0-recovery-01` 起点为 `9de3b93a0dfddb948b4d68c61ad1b54ce84e0812`。实施占位入口封闭、内部维护 CAS 及 Run 较早截止。Master 独占正式资源操作、恢复审计白名单、预算器、备份和最终交接。原任务及操作身份保留，新增维护尝试分别登记。 Oracle S0 BLOCKED，AC03 未通过，S1–S3 未准入，G4 PARTIAL。
+
+本批真实占位已完成 TASK_LEVEL_RECOVERY，替代栈已停止保留。RC05 的 OIDC 签名/角色和对象历史版本缺证，收尾 BLOCKED，S0 BLOCKED，G4 PARTIAL。[恢复报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/report.md)

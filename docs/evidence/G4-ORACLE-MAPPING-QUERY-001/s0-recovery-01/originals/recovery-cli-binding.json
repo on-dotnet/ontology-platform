@@ -1,0 +1,68 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "originalApiSource": "9b71721d84acf4bc4a445adca0454b0ddbbf991f",
+  "maintenanceAdapter": "0dc7aeb22fbd67a378c65ead2dd2afe9d49c713d",
+  "testedBuilds": [
+    {
+      "target": "agent",
+      "commandId": "6adc97f28fb145c1aad5e5feb2b2d98b",
+      "inputKey": "5f9e0c29ed37afcfdaac9d5e6e9c35f3bd9834fddecc46f29f8b069ca141ae28",
+      "head": "9b71721d84acf4bc4a445adca0454b0ddbbf991f",
+      "resourceAttempt": "11f33aea55d949bd81f505025d94a670",
+      "exitCode": 0,
+      "attempt": "dccb2cfdd01749a982dfc86d2c467617",
+      "output": "9e00d3254cf9beabbda716776e926fdb557dbc90f170bb089812fc3610c68c32",
+      "binding": "3bffff36b9bec08737eeffa77b694b05b29d0d8e0270a0bcd6fce9be954a18bc"
+    },
+    {
+      "target": "api",
+      "commandId": "ea67b8b645744ce0aa61c5c870037d81",
+      "inputKey": "5f9e0c29ed37afcfdaac9d5e6e9c35f3bd9834fddecc46f29f8b069ca141ae28",
+      "head": "9b71721d84acf4bc4a445adca0454b0ddbbf991f",
+      "resourceAttempt": "11f33aea55d949bd81f505025d94a670",
+      "exitCode": 0,
+      "attempt": "ef978117931447278a3e82f66fd7d3ae",
+      "output": "47a6099ee578ac70b2e31543aa8057259881e999da7aa9a13b852fa4a9ad3978",
+      "binding": "d25cacbfdf41d00334f75afc4e5fc43f8f53ea92ebebd2ef62cc9f8858a9dd9f"
+    },
+    {
+      "target": "query",
+      "commandId": "27d373bb0e4d490c8ce98643b218cb63",
+      "inputKey": "5f9e0c29ed37afcfdaac9d5e6e9c35f3bd9834fddecc46f29f8b069ca141ae28",
+      "head": "9b71721d84acf4bc4a445adca0454b0ddbbf991f",
+      "resourceAttempt": "11f33aea55d949bd81f505025d94a670",
+      "exitCode": 0,
+      "attempt": "a787e76d38534839ae8244b2bcb5a758",
+      "output": "853ecbc664ed9f071a83fb422fabf205248421816524e4e381fcebe6f9aab784",
+      "binding": "0b73005c4dca085b2020c18c504da15287140fe6a139692575ff1822b2515e13"
+    },
+    {
+      "target": "wire",
+      "commandId": "19a23edaf6154ee2a9060ae1580ee3ab",
+      "inputKey": "5f9e0c29ed37afcfdaac9d5e6e9c35f3bd9834fddecc46f29f8b069ca141ae28",
+      "head": "9b71721d84acf4bc4a445adca0454b0ddbbf991f",
+      "resourceAttempt": "11f33aea55d949bd81f505025d94a670",
+      "exitCode": 0,
+      "attempt": "8df026c171b742aebafa55da9a643c4a",
+      "output": "21d3d98137a615212beb1e3c43cd8baa2a77264505479fd7752dfe926307d873",
+      "binding": "8354fea22d144d78f9fc80a6a65ca6bfa1e02b98c7618266f0973b4beedc2b27"
+    }
+  ],
+  "actualReplacementVerifier": {
+    "attempt": "verifier-ba41fb9e9ea1483a86921d31fcf920e1",
+    "status": "PASS",
+    "commandId": "713c0881814f48e1aeac2e692aedbd59",
+    "resource": "060d5775d56e45599275ffda40166c90",
+    "api": {
+      "receiptSha256": "d25cacbfdf41d00334f75afc4e5fc43f8f53ea92ebebd2ef62cc9f8858a9dd9f",
+      "inputKey": "5f9e0c29ed37afcfdaac9d5e6e9c35f3bd9834fddecc46f29f8b069ca141ae28",
+      "outputKey": "ae3c0ba7eb57535fdea96db4d6e83465d96796cfbadbe52582f6a0b18c3aa547"
+    },
+    "sourceSha256": "fd25a64f70ae5aa3269b4bb2cd5e29b08527a131b4e2b1b44fcf2facd084c2e5",
+    "exitCode": 0,
+    "dllSha256": "ee1c56155d78686d2775ab0c86d191c95048f5d95ad7664516ffb876e0b456a2",
+    "actualVerifierSourceSha": "fd25a64f70ae5aa3269b4bb2cd5e29b08527a131b4e2b1b44fcf2facd084c2e5"
+  },
+  "resourceAdapterFirstCommitted": "5841cf6558dd9a5066573c357f0ba93cc0493ed7",
+  "resourceScriptIdentity": "cold/start/stop/restore actions ran from the working tree; final replay guard and group check were added after those actions; historical actions are not reassigned to that commit"
+}

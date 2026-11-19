@@ -1,0 +1,106 @@
+{
+  "status": "DIAGNOSTICS_PRESERVED",
+  "containerId": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+  "state": [
+    "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+    "exited",
+    "143",
+    "false",
+    "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8"
+  ],
+  "resource": "dc43014a40604dde8ef5d9d8dff3ab25",
+  "privatePath": "s0-recovery-01/early-alternative-diagnostics",
+  "files": {
+    "engine.stdout": {
+      "bytes": 4429,
+      "sha256": "e5f1e00932dad35f7e59385255fc9ebb370d111eceb41e742d5ac744d7a40e92"
+    },
+    "engine.stdout.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "layer.changes": {
+      "bytes": 17259,
+      "sha256": "39dd3e523280a60e11bcf68113db2932e6ac7b5f83c64d7589225f50d32a5437"
+    },
+    "layer.changes.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "diag.tar": {
+      "bytes": 22020096,
+      "sha256": "aff84d78f920969480c909adc9e7eaa525787024dba0727ecb381e52bcad8428",
+      "members": 1498
+    },
+    "diag.tar.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "earlyBackup": {
+    "directoryMode": "0o700",
+    "files": [
+      {
+        "name": "database.tar",
+        "regular": true,
+        "mode": "0o600",
+        "bytes": 4330629120,
+        "sha256": "41a2fc228ebb760087282a48253718e89bb637aa241182b09316fd0f4499dafb",
+        "match": true
+      },
+      {
+        "name": "trust-and-auth.tar",
+        "regular": true,
+        "mode": "0o600",
+        "bytes": 67891200,
+        "sha256": "0ceedc75a91fa234066f139093bc9e105c0024b9fc6d9e36687d295f8628a479",
+        "match": true
+      }
+    ]
+  },
+  "currentOracleArchives": {
+    "source/database.tar": {
+      "bytes": 4425000960,
+      "sha256": "fc69697238cfe0f2197466c3eaac96994b6200628cf06f6dc29f13d42d633f7c",
+      "members": 31,
+      "expanded": 4424945942,
+      "identity": [
+        16777229,
+        22939898,
+        4425000960,
+        1795130503553523770
+      ],
+      "sourceId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+      "volume": "ontology-g4-oracle-mapping-query-001_oracle-data",
+      "privatePath": "source/database.tar",
+      "state": "COLD_VERIFIED_ARCHIVE"
+    },
+    "source/trust-and-auth.tar": {
+      "bytes": 251074560,
+      "sha256": "060b9206c94adbc98f808fd5b6c8bb78aa7c9a7e02d831f24862acaf3a9a8daa",
+      "members": 32,
+      "expanded": 251015985,
+      "identity": [
+        16777229,
+        22939904,
+        251074560,
+        1795130504085500889
+      ],
+      "sourceId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+      "volume": "ontology-g4-oracle-mapping-query-001_oracle-data",
+      "privatePath": "source/trust-and-auth.tar",
+      "state": "COLD_VERIFIED_ARCHIVE"
+    }
+  },
+  "earlyDriver": {
+    "path": "snapshot-02.json",
+    "bytes": 22381,
+    "sha256": "8843c2d9422e99ede8edef77efe35a0ce56aacbaf2bcd94410d02ed5f6fa3bca"
+  },
+  "originalEarlyRestore": {
+    "path": "recovery-01-final.json",
+    "bytes": 14214,
+    "sha256": "8d80d0f73bbae996e46d48504c1a7f40ea08ca36d13e9c917d0e6186f418d6b4"
+  },
+  "layerRetained": true
+}

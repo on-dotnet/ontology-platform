@@ -1,0 +1,61 @@
+{
+  "attempt": "4239ea404d924bbcae5e4ec41ad4cc27",
+  "operationId": "3e494a56c9ef43298d44706850ccad31",
+  "queryId": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+  "validatorId": "4acfa09e568d4eb15fbe5584d75397b037f53ea9f1bbec50c1ec01156253ab17",
+  "build": {
+    "receiptSha256": "d25cacbfdf41d00334f75afc4e5fc43f8f53ea92ebebd2ef62cc9f8858a9dd9f",
+    "inputKey": "5f9e0c29ed37afcfdaac9d5e6e9c35f3bd9834fddecc46f29f8b069ca141ae28",
+    "outputKey": "ae3c0ba7eb57535fdea96db4d6e83465d96796cfbadbe52582f6a0b18c3aa547"
+  },
+  "proofSha256": "80a221d66ac171356dffec33ca3df5701b90f9b581360360dc7d9865b06e2c73",
+  "status": "TASK_LEVEL_RECOVERY",
+  "startedUtc": "2026-11-19T23:17:15.415479+00:00",
+  "endedUtc": "2026-11-19T23:17:16.386156+00:00",
+  "commandId": "2b8b7876cc704b6384b5a27008f06692",
+  "exitCode": 0,
+  "after": [
+    "exited",
+    "0",
+    "false"
+  ],
+  "commitEnvelope": {
+    "status": "TASK_LEVEL_RECOVERY",
+    "operationId": "3e494a56c9ef43298d44706850ccad31",
+    "lowerUtc": "2026-11-19T23:17:15.596652+00:00",
+    "upperUtc": "2026-11-19T23:17:16.3243325+00:00"
+  },
+  "validatorAbsent": true,
+  "newConnection": "31eb0ae2da5f4ab68542c9df99507bf2",
+  "post": {
+    "id": "query-18b5ee00b53e4e4eafc43cc4717bd293",
+    "fence": 2,
+    "lease": null,
+    "owner": null,
+    "state": "CANCELLED",
+    "audits": [
+      {
+        "id": "5f1275a6948b4ea5a33f0dc671ae93a4",
+        "sha": "d39c7404dfc2a222e52feccd74125a574b8456d68d593a3735fd61fdcc1414ad",
+        "actor": "f902a743-7079-4e22-a643-a51deb027e89",
+        "trace": "b5ecdf98f0ee7503bcf579b91fc5dcaa",
+        "action": "data.query.cancel",
+        "outcome": "allowed",
+        "correlation": "931d3a0e044a4fedb6fefcd8d1deec21"
+      },
+      {
+        "id": "a5a6fd94c89e4bc1854f69a11eb78633",
+        "sha": "2b88ac2261cd7c6394e40b830d22b5a80e443f199b22ccbb9d7ea094c7183cde",
+        "actor": "os-uid-501",
+        "trace": "3e494a56c9ef43298d44706850ccad31",
+        "action": "data.query.cleanup.recover",
+        "outcome": "allowed",
+        "correlation": "4239ea404d924bbcae5e4ec41ad4cc27"
+      }
+    ],
+    "stable": "3f49e5938439ddc765b6e5ad9d2a3ea0b37d1132d2d769870d9b8c179ed1066f",
+    "resultBytes": 0,
+    "receiptCount": 0
+  },
+  "originalCleanup250ms": "NOT_QUALIFIED"
+}

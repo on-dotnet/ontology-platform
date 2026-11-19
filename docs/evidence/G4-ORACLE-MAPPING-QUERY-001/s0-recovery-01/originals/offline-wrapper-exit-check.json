@@ -1,0 +1,37 @@
+{
+  "scope": "Source CLI dispatch with in-memory action results; no product or services invoked",
+  "checks": [
+    {
+      "action": "browser",
+      "input": {
+        "exitCode": 1
+      },
+      "expected": 1,
+      "actual": 1
+    },
+    {
+      "action": "browser",
+      "input": {
+        "exitCode": 0
+      },
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "action": "window-pair",
+      "input": {
+        "status": "FAIL"
+      },
+      "expected": 1,
+      "actual": 1
+    },
+    {
+      "action": "window-pair",
+      "input": {
+        "status": "PASS"
+      },
+      "expected": 0,
+      "actual": 0
+    }
+  ]
+}

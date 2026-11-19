@@ -1,0 +1,45 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "9b71721d84acf4bc4a445adca0454b0ddbbf991f",
+  "checks": [
+    {
+      "name": "run-deadline",
+      "command": "OntologyPlatform.AgentTests, G4 deadline filter / 58166a6623b342ba813bf55b46ed14da",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "\u5df2\u901a\u8fc7 G4RunReservationConsumesOriginalQueryDeadline (159ms)\n\u5df2\u901a\u8fc7 EarliestDeadlineCoversReserveCleanupBindAndWire (2200,5000,8000,2200) (29ms)\n\u5df2\u901a\u8fc7 EarliestDeadlineCoversReserveCleanupBindAndWire (30000,700,8000,700) (0ms)\n\u5df2\u901a\u8fc7 EarliestDeadlineCoversReserveCleanupBindAndWire (30000,5000,1400,1400) (0ms)\n\u5df2\u901a\u8fc7 EarliestDeadlineCoversReserveCleanupBindAndWire (30000,5000,8000,5000) (0ms)\n\u5df2\u901a\u8fc7 ExpiredRunClosesParentBeforePersistence (0ms)\n\u5df2\u901a\u8fc7 OverdueSourceCleanupCannotUseTheFiveSecondParent (0ms)\n\u5df2\u901a\u8fc7 ExpiryDuringOuterEncodingRejectsCompletedDelivery (0ms)\n\n\u6d4b\u8bd5\u8fd0\u884c\u6458\u8981: \u5df2\u901a\u8fc7! - /Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)\n  \u603b\u8ba1: 8\n  \u5931\u8d25: 0\n  \u6210\u529f: 8\n  \u5df2\u8df3\u8fc7: 0\n  \u6301\u7eed\u65f6\u95f4: 402ms\n"
+    },
+    {
+      "name": "adjacent-wire",
+      "command": "OntologyPlatform.QueryTests, G2 contracts filter / d8dd447d6f3445ddb42504f34828d183",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "\u5df2\u901a\u8fc7 NestedTighteningSurvivesGatewayExit (3ms)\n\u5df2\u901a\u8fc7 LateConfirmationCannotReleaseNextPhysicalAcquisition (0ms)\n\n\u6d4b\u8bd5\u8fd0\u884c\u6458\u8981: \u5df2\u901a\u8fc7! - /Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)\n  \u603b\u8ba1: 2\n  \u5931\u8d25: 0\n  \u6210\u529f: 2\n  \u5df2\u8df3\u8fc7: 0\n  \u6301\u7eed\u65f6\u95f4: 145ms\n"
+    },
+    {
+      "name": "isolated-pg",
+      "command": "registered one-time PG verifier, Oracle recovery and capacity filters / 5b712024b0f548dab99d73d4f1933529",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "MSTest v4.5.1 (UTC 10/07/2026) [linux-arm64 - .NET 10.0.13]\nTelemetry\n---------\nMicrosoft Testing Platform collects usage data in order to help us improve your experience. The data is collected by Microsoft and are not shared with anyone.\nYou can opt-out of telemetry by setting the TESTINGPLATFORM_TELEMETRY_OPTOUT or DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.\n\nRead more about Microsoft Testing Platform telemetry: https://aka.ms/testingplatform/telemetry\npassed OracleMaintenanceAndClosedSourcePathsInIsolatedPostgres (1s 238ms)\npassed RevocationBlocksAtomicResultAndAudit (278ms)\npassed ConnectionAndTaskCapacityAndLostLeaseAreAtomic (107ms)\npassed OracleTerminalOwnerSurvivesSweepAndRejectsStaleConfirmation (496ms)\n\nTest run summary: Passed! - /app/OntologyPlatform.QueryTests.dll (net10.0|arm64)\n  total: 4\n  failed: 0\n  succeeded: 4\n  skipped: 0\n  duration: 2s 307ms\n"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "scope": "RC01-RC03 directed executions only",
+    "timingStatus": "MEASURED",
+    "elapsedSeconds": {
+      "run-deadline": 1.8620212910464033,
+      "adjacent-wire": 1.8383274589432403,
+      "isolated-pg": 2.6567182920407504
+    }
+  }
+}

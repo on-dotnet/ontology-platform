@@ -1,0 +1,70 @@
+{
+  "attemptId": "4239ea404d924bbcae5e4ec41ad4cc27",
+  "operationId": "3e494a56c9ef43298d44706850ccad31",
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "resourceRunId": "implementation-01",
+  "startedUtc": "2026-11-19T23:17:15.203638+00:00",
+  "endedUtc": "2026-11-19T23:17:15.288937+00:00",
+  "observer": "OMQ_OBSERVER|TCPS|FREEPDB1",
+  "admission": "7017a004604b4fe58e2ed68d28486bb8",
+  "originalWitness": {
+    "path": "formal-witness-071127c7-2a34-40d7-9675-7cf967edfdb0.json",
+    "bytes": 42443,
+    "sha256": "b393b0dc31429cd4dd6e6b91ba2cd1b35a602f03e1dc773d687f67acd0afb589"
+  },
+  "postmortem": {
+    "path": "formal-cancel-postmortem-log-01.json",
+    "bytes": 1862,
+    "sha256": "2b78ca10dacf73e701bd7c509c2500f65370f6bb2191c2ff2bd8127115f7fa27"
+  },
+  "originalWorkerContainerIds": [
+    "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+    "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+    "f90b7e7b599ffb4e9b298ce3679f9f24b25c762b472487fe09fd52e3f8e378cf",
+    "0f04589574f7ace57e784e1bf0525e6c2587819a0c882ebfc15a09f7203e689f"
+  ],
+  "workerState": "exited",
+  "hostTaskConsumerCount": 0,
+  "intakePortsFree": [
+    15741,
+    15742,
+    15744
+  ],
+  "sourceId": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+  "clientId": "0e224578b55b4b479d98d3fa4ff1ac46",
+  "sqlId": "dum3m3c96vc07",
+  "sourceExecution": [
+    "60",
+    "51748",
+    "50045",
+    "3",
+    "16777219",
+    "20261119160738"
+  ],
+  "instanceId": 1,
+  "conId": 3,
+  "matchingPhysicalSessions": 0,
+  "currentTaskSourceSessions": 0,
+  "originalCursor": {
+    "child": "0",
+    "plan": 1347626742,
+    "executions": 1,
+    "eof": 1,
+    "rows": 100,
+    "px": 0
+  },
+  "currentWork": {
+    "runningQueries": 0,
+    "queuedOrRunningRuns": 0,
+    "queuedOrRunningCatalogJobs": 0,
+    "runningProbes": 0,
+    "queuedOrRunningMappingJobs": 0,
+    "undispatchedMappingOutbox": 0,
+    "undispatchedPublishingOutbox": 0
+  },
+  "seal": {
+    "path": "s0-blocked-seal-01.json",
+    "bytes": 4277,
+    "sha256": "0c9154adf794b6c7ac190b3aed982b733ee7310bbc182d56c788158d1d824e08"
+  }
+}

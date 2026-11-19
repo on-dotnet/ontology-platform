@@ -1,0 +1,41 @@
+{
+  "status": "BLOCKED",
+  "coverage": "affected engineering gates only; product coverage requires separate task acceptance",
+  "checks": [
+    {
+      "gate": "contract",
+      "status": "FAIL",
+      "executionMode": "REUSED",
+      "qualificationMode": "FRESH",
+      "productProof": {},
+      "command": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow_oracle_mapping_evidence.py",
+        "--task",
+        "G4-ORACLE-MAPPING-QUERY-001",
+        "--run-id",
+        "implementation-01",
+        "--gate",
+        "contract",
+        "--input-key",
+        "048a8b0f4bb8a3266ebd052a0257b135c2fd7ac96094d6f9b7dd33101a599c2e"
+      ],
+      "exitCode": 1,
+      "tests": 0,
+      "skipped": 0,
+      "diagnostic": false,
+      "hypothesis": null,
+      "inputsUnchanged": true,
+      "errorSignature": "a7ef37fb62b9f8d03444f244b8fd23586faf6d6057389a84bd29960e301f5cad",
+      "elapsedSeconds": 2.402541499934159,
+      "inputKey": "048a8b0f4bb8a3266ebd052a0257b135c2fd7ac96094d6f9b7dd33101a599c2e",
+      "environmentKey": "ba628ce365911e72449a42abbdd50cb2e7f8617eab1f4fe70e48ec8784f1f8ce",
+      "policyKey": "0ee6b4c13c7a7f0bf160bef2253404c0f9ddc57bcdd9b7d53aa95f02678009fc",
+      "evidenceSha256": "14364261fc363dc68419f445cad7bcf930a6d822a9033c179a8138343144a7d9",
+      "logPath": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/runs/16e4db34e2a649bb9eac585bdc97f725/contract.txt",
+      "sourceRun": "16e4db34e2a649bb9eac585bdc97f725",
+      "sourceCommit": "b6372032ab6ce721bcee4b2097d2eb6e820decbf"
+    }
+  ]
+}
