@@ -132,6 +132,75 @@ class DorisReferenceTests(unittest.TestCase):
         rows[0]['userCancel']=False
         self.assertEqual(verdict(),({},set()))
 
+    def test_review_fix_02_rejects_inconsistent_e1_execution_evidence(self):
+        """在修复后的正式入口核验五个真实场景；替换只对本测试读取的证据副本可见。"""
+        import json
+        from unittest.mock import patch
+        import workflow
+        import workflow_doris_mapping_evidence as consumer
+        from workflow_execution import sha
+
+        self.assertEqual(consumer.E1_RUN, 'review-fix-02')
+        root=workflow.ROOT
+        public=root/'docs/evidence/G4-DORIS-MAPPING-QUERY-001'
+        history=public/'review-fix-01/current-inputs.json'
+        selected=public/consumer.E1_RUN/'selected.json'
+        index=json.loads(selected.read_bytes())
+        former=json.loads(history.read_bytes())
+        cases=index['cases']
+        empty_digest='0'*64
+        def receipt(label):
+            return cases[label]['command']+'-receipt.json'
+        def reject(label, manifest_path, members, code, window=False):
+            with self.subTest(case=label):
+                manifest=json.loads(manifest_path.read_bytes())
+                overlays={}
+                for name,field,value in members:
+                    item=manifest['originals'][name]
+                    self.assertEqual(item['encoding'],'raw')
+                    path=root/item['path']
+                    document=json.loads(path.read_bytes())
+                    target=document
+                    for key in field[:-1]:
+                        target=target[key]
+                    target[field[-1]]=value
+                    content=json.dumps(document,ensure_ascii=False).encode()+b'\n'
+                    item.update(sha256=sha(content),sizeBytes=len(content))
+                    overlays[path]=content
+                if window:
+                    manifest['audit']['windows'][cases['expired']['report']][0]-=1000
+                overlays[manifest_path]=json.dumps(manifest).encode()
+                original_read=Path.read_bytes
+                def fixture_bytes(path):
+                    return overlays[path] if path in overlays else original_read(path)
+                with patch.object(Path,'read_bytes',fixture_bytes):
+                    key=workflow.input_key(root,'interaction')
+                    with self.assertRaisesRegex(ValueError,'^'+code+'$'):
+                        consumer.qualify_review_fix('interaction',key,history.parent)
+                print('RF02 rejected '+label+' '+code,flush=True)
+
+        # 沿真实 git、构建、解封、命令及审计链路，旧原件与本批五次选定原件分开核验。
+        valid=consumer.qualify_review_fix('interaction',workflow.input_key(root,'interaction'),history.parent)
+        self.assertEqual((valid['status'],valid['runId']),('PASS',consumer.E1_RUN))
+        for label in ('expired','short'):
+            reject(label+'-fingerprint',selected,[(receipt(label),['inputFingerprint'],empty_digest)],'RF02_FINGERPRINT')
+        reject('wrong-argv',selected,[(receipt('catalog'),['commandSummary','sha256'],empty_digest)],'RF02_ARGV')
+        reject('healthy-command',selected,[(receipt('healthy'),['inputFingerprint'],empty_digest)],'RF02_FINGERPRINT')
+        session=cases['healthy']['events'].removeprefix('service-events-')
+        healthy_receipt=json.loads((selected.parent/'originals'/('ready-'+session)).read_bytes())
+        reject('healthy-session-command',selected,[(healthy_receipt['sessionCommand']+'-receipt.json',['inputFingerprint'],empty_digest)],'RF02_SESSION_COMMAND')
+        reject('driver',selected,[(cases['catalog']['dispatch'],['driverSha256',consumer.BROWSER_SOURCES[0]],empty_digest)],'RF02_DRIVER')
+        reject('stage',selected,[(cases['activation']['host'],['stageInputs','expectedStale'],'catalog')],'RF02_STAGE')
+        reject('unstable-input',selected,[(cases['short']['report'],['inputsUnchanged'],False)],'RF02_REPORT_INPUT')
+        reject('wrong-host',selected,[(cases['healthy']['host'],['commandId'],'0'*32)],'RF02_HOST')
+        reject('wrong-build-on-both',selected,[(cases['healthy']['host'],['snapshotId'],empty_digest),
+                                             (cases['healthy']['report'],['inputBinding','api','snapshotId'],empty_digest)],'RF02_HOST')
+        reject('audit-window',selected,[],'RF02_AUDIT_WINDOW',window=True)
+        for label,cid in [('legacy-expired','8a864f478fd5458e8117ba3299431be5'),('legacy-short','82a33f60da0048698f44a4bcb7750e67')]:
+            self.assertIn(cid,former['readinessCommands'].values())
+            reject(label,history,[(cid+'-receipt.json',['inputFingerprint'],empty_digest)],'RF02_HISTORICAL_ORIGINAL')
+        reject('e2-control',history,[('628055b05b084b2393307ecc8b5029c9-receipt.json',['inputFingerprint'],empty_digest)],'RF_E2_EXECUTION')
+
     def test_last_microsecond_is_preserved(self):
         self.assertEqual(fixture_instant('2026-11-17 12:00:00.123459'), '2026-11-17T12:00:00.123459Z')
         for invalid in ('2026-11-17 12:00:00.12345', '2026-11-17 12:00:00.1234590'):

@@ -1,0 +1,483 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "review-fix-02",
+  "ownerRun": "implementation-01",
+  "revision": "f2673f2c62537b5422f308b99cfb25da464eee35",
+  "reuseProduct": "9780c8f91cd084c1df11c604186d22d7f08f3023",
+  "cases": {
+    "expired": {
+      "report": "browser-s2-doris-ready-1795089122101.json",
+      "command": "0266359b2ff94dda9baf8ba8b7c22f4c",
+      "dispatch": "expired-browser-s2-doris-ready-1795089122101.json",
+      "host": "s1-host-s2-doris-ready-2bc38ffd422040a8803cff3c7092f879.json",
+      "events": "service-events-2bc38ffd422040a8803cff3c7092f879.json"
+    },
+    "short": {
+      "report": "browser-s2-doris-ready-1795089165405.json",
+      "command": "181c11aa9bb8473e9750e1f1b733556e",
+      "dispatch": "short-browser-s2-doris-ready-1795089165405.json",
+      "host": "s1-host-s2-doris-ready-a560d1aec37f4e639926896203c01ed5.json",
+      "events": "service-events-a560d1aec37f4e639926896203c01ed5.json"
+    },
+    "catalog": {
+      "report": "browser-s2-doris-ready-1795089101508.json",
+      "command": "dca87ab5ab3e404a88c60b022e46a739",
+      "dispatch": "catalog-browser-s2-doris-ready-1795089101508.json",
+      "host": "s1-host-s2-doris-ready-77fe1ac5eea5412e89aa8abedb78947a.json",
+      "events": "service-events-77fe1ac5eea5412e89aa8abedb78947a.json"
+    },
+    "activation": {
+      "report": "browser-s2-doris-ready-1795089105787.json",
+      "command": "8024acbdf1db41a699a21ebf0c66ccdd",
+      "dispatch": "activation-browser-s2-doris-ready-1795089105787.json",
+      "host": "s1-host-s2-doris-ready-d464ba2667cd46e1bd243dbcf084fc83.json",
+      "events": "service-events-d464ba2667cd46e1bd243dbcf084fc83.json"
+    },
+    "healthy": {
+      "report": "browser-s2-doris-ready-1795089095239.json",
+      "command": "fcb1fc4cc74e427eb71dd262b9ed705b",
+      "dispatch": "healthy-browser-s2-doris-ready-1795089095239.json",
+      "host": "s1-host-s2-doris-ready-392de03f4e48449a9976373bad303a23.json",
+      "events": "service-events-392de03f4e48449a9976373bad303a23.json"
+    }
+  },
+  "audit": {
+    "command": "2c1629a0435a48098bea95ab16697abc",
+    "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+    "windows": {
+      "positive-pressure-control": [
+        1795078335443.2832,
+        1795078545443.2832
+      ],
+      "browser-s2-doris-ready-1795089122101.json": [
+        1795089122071.755,
+        1795089124859.001
+      ],
+      "browser-s2-doris-ready-1795089165405.json": [
+        1795089165377.368,
+        1795089167996.0051
+      ],
+      "browser-s2-doris-ready-1795089101508.json": [
+        1795089101476.806,
+        1795089104243.227
+      ],
+      "browser-s2-doris-ready-1795089105787.json": [
+        1795089105752.847,
+        1795089108378.4749
+      ],
+      "browser-s2-doris-ready-1795089095239.json": [
+        1795089095100.201,
+        1795089099922.208
+      ]
+    },
+    "parserSha256": "b97ee667bc94d83f0051bf03c1423049319f30283a5d7f4aa1c64ede2bc74adc"
+  },
+  "originals": {
+    "0266359b2ff94dda9baf8ba8b7c22f4c-receipt.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/0266359b2ff94dda9baf8ba8b7c22f4c-receipt.json",
+      "sha256": "5f8d8026383a0a89eda20363f9271911e2c9a482c56e7440f99e3a27f0a6b22b",
+      "sizeBytes": 1488,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/0266359b2ff94dda9baf8ba8b7c22f4c-receipt.json"
+    },
+    "0266359b2ff94dda9baf8ba8b7c22f4c-stdout.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/0266359b2ff94dda9baf8ba8b7c22f4c-stdout.txt",
+      "sha256": "963c737242545b0f3d71fe97cd3c6671c15ffd321eedb980233888581e58d73c",
+      "sizeBytes": 353,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/0266359b2ff94dda9baf8ba8b7c22f4c-stdout.txt"
+    },
+    "0266359b2ff94dda9baf8ba8b7c22f4c-stderr.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/0266359b2ff94dda9baf8ba8b7c22f4c-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/0266359b2ff94dda9baf8ba8b7c22f4c-stderr.txt.raw.json"
+    },
+    "expired-browser-s2-doris-ready-1795089122101.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/expired-browser-s2-doris-ready-1795089122101.json",
+      "sha256": "ccff8b3580ddf739be25cb4cb356a698e4cb65a92189ae90354f96c633c2e508",
+      "sizeBytes": 3042,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/expired-browser-s2-doris-ready-1795089122101.json"
+    },
+    "browser-s2-doris-ready-1795089122101.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/browser-s2-doris-ready-1795089122101.json",
+      "sha256": "957387fc1a600f9e4ac66757553b7f5332912409853c523441c9afb8151d6f8d",
+      "sizeBytes": 5549,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/browser-s2-doris-ready-1795089122101.json"
+    },
+    "s1-host-s2-doris-ready-2bc38ffd422040a8803cff3c7092f879.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/s1-host-s2-doris-ready-2bc38ffd422040a8803cff3c7092f879.json",
+      "sha256": "d2097461347f28c03ce6747ec76d0bef4669889b92182d6e5abdc195cb9a7ec2",
+      "sizeBytes": 592,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/s1-host-s2-doris-ready-2bc38ffd422040a8803cff3c7092f879.json"
+    },
+    "service-events-2bc38ffd422040a8803cff3c7092f879.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/service-events-2bc38ffd422040a8803cff3c7092f879.json",
+      "sha256": "02c4e1bcc73b1503a58c12fffea0ac0a8e569d789f031ae28b32a3e14ee6cfdf",
+      "sizeBytes": 2202,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/service-events-2bc38ffd422040a8803cff3c7092f879.json"
+    },
+    "grant-before-expired.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/grant-before-expired.json",
+      "sha256": "2c3f2900288c83ed3294bf6fe44e28b0b5a7d478a130350c8678fd2bb1d59bef",
+      "sizeBytes": 625,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/grant-before-expired.json"
+    },
+    "b221c75105de45deb66413fcd3e58c1e-receipt.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/b221c75105de45deb66413fcd3e58c1e-receipt.json",
+      "sha256": "bb2ba1b75cc98535767bbc3956d76d55b87a99b8a225a498e03011084da40fb0",
+      "sizeBytes": 1473,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/b221c75105de45deb66413fcd3e58c1e-receipt.json"
+    },
+    "b221c75105de45deb66413fcd3e58c1e-stdout.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/b221c75105de45deb66413fcd3e58c1e-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/b221c75105de45deb66413fcd3e58c1e-stdout.txt.raw.json"
+    },
+    "b221c75105de45deb66413fcd3e58c1e-stderr.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/b221c75105de45deb66413fcd3e58c1e-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/b221c75105de45deb66413fcd3e58c1e-stderr.txt.raw.json"
+    },
+    "grant-restored-expired.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/grant-restored-expired.json",
+      "sha256": "c6b7cf991cdb550e124150d7455c3815343f1be45a60fcc4edab07930813ee40",
+      "sizeBytes": 340,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/grant-restored-expired.json"
+    },
+    "1ce6865b64b842a68873fa6a4ad39c4b-receipt.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/1ce6865b64b842a68873fa6a4ad39c4b-receipt.json",
+      "sha256": "a7322f9c0e0519cb9acf762e9235313efb6063c6e4484a571a97e1d462c0ca57",
+      "sizeBytes": 1482,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/1ce6865b64b842a68873fa6a4ad39c4b-receipt.json"
+    },
+    "1ce6865b64b842a68873fa6a4ad39c4b-stdout.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/1ce6865b64b842a68873fa6a4ad39c4b-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/1ce6865b64b842a68873fa6a4ad39c4b-stdout.txt.raw.json"
+    },
+    "1ce6865b64b842a68873fa6a4ad39c4b-stderr.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/1ce6865b64b842a68873fa6a4ad39c4b-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/1ce6865b64b842a68873fa6a4ad39c4b-stderr.txt.raw.json"
+    },
+    "181c11aa9bb8473e9750e1f1b733556e-receipt.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/181c11aa9bb8473e9750e1f1b733556e-receipt.json",
+      "sha256": "9b74419d9639ea2028d0bbf22862f3eaff1971f76ec4aa7577b6848a6ea7de77",
+      "sizeBytes": 1486,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/181c11aa9bb8473e9750e1f1b733556e-receipt.json"
+    },
+    "181c11aa9bb8473e9750e1f1b733556e-stdout.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/181c11aa9bb8473e9750e1f1b733556e-stdout.txt",
+      "sha256": "23da1afe17b8506e519757277b8e7f73983d37ea31f619c0a9c930515bad3d68",
+      "sizeBytes": 338,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/181c11aa9bb8473e9750e1f1b733556e-stdout.txt"
+    },
+    "181c11aa9bb8473e9750e1f1b733556e-stderr.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/181c11aa9bb8473e9750e1f1b733556e-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/181c11aa9bb8473e9750e1f1b733556e-stderr.txt.raw.json"
+    },
+    "short-browser-s2-doris-ready-1795089165405.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/short-browser-s2-doris-ready-1795089165405.json",
+      "sha256": "9ed8313efbb55731d49f7c956a9514615caf97c79f0f190ecd0faf581a5353a1",
+      "sizeBytes": 3040,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/short-browser-s2-doris-ready-1795089165405.json"
+    },
+    "browser-s2-doris-ready-1795089165405.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/browser-s2-doris-ready-1795089165405.json",
+      "sha256": "f04b49f6f80b358b3eed75c4771750b52a8a2b7cd7fb9a818d11ded71ecbf9a8",
+      "sizeBytes": 5530,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/browser-s2-doris-ready-1795089165405.json"
+    },
+    "s1-host-s2-doris-ready-a560d1aec37f4e639926896203c01ed5.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/s1-host-s2-doris-ready-a560d1aec37f4e639926896203c01ed5.json",
+      "sha256": "fe79ff8a146bfd6d960286acc7a45e3aa731e4e30bdf9abaaac2cdbb98fc2837",
+      "sizeBytes": 592,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/s1-host-s2-doris-ready-a560d1aec37f4e639926896203c01ed5.json"
+    },
+    "service-events-a560d1aec37f4e639926896203c01ed5.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/service-events-a560d1aec37f4e639926896203c01ed5.json",
+      "sha256": "06407323233ed402b3914182ecd5f3c9a7a04992058d7a3ca6505e9448ac1f83",
+      "sizeBytes": 2203,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/service-events-a560d1aec37f4e639926896203c01ed5.json"
+    },
+    "grant-before-short.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/grant-before-short.json",
+      "sha256": "3e477eb83aa9b7c4538c41553fdd8b49ff038f2ca1a27739e981eb65d81587b8",
+      "sizeBytes": 625,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/grant-before-short.json"
+    },
+    "c086dea4c49f463ca0962ef6cb3c8e78-receipt.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/c086dea4c49f463ca0962ef6cb3c8e78-receipt.json",
+      "sha256": "f61108ab675c886f619a668197ca4bda5abdb25d07cd9c8418ed8c81c67be7bf",
+      "sizeBytes": 1471,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/c086dea4c49f463ca0962ef6cb3c8e78-receipt.json"
+    },
+    "c086dea4c49f463ca0962ef6cb3c8e78-stdout.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/c086dea4c49f463ca0962ef6cb3c8e78-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/c086dea4c49f463ca0962ef6cb3c8e78-stdout.txt.raw.json"
+    },
+    "c086dea4c49f463ca0962ef6cb3c8e78-stderr.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/c086dea4c49f463ca0962ef6cb3c8e78-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/c086dea4c49f463ca0962ef6cb3c8e78-stderr.txt.raw.json"
+    },
+    "grant-restored-short.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/grant-restored-short.json",
+      "sha256": "50f265e47b0f9bd1ff6b6c8a82fa5456f677dcc54050857151fd3c30b5230806",
+      "sizeBytes": 340,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/grant-restored-short.json"
+    },
+    "960989eb6f9b4ff880ad77051f2788be-receipt.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/960989eb6f9b4ff880ad77051f2788be-receipt.json",
+      "sha256": "c42a100b3410bf2c6e1727f7b61a2234e185394060278a81dc6292003775a165",
+      "sizeBytes": 1478,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/960989eb6f9b4ff880ad77051f2788be-receipt.json"
+    },
+    "960989eb6f9b4ff880ad77051f2788be-stdout.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/960989eb6f9b4ff880ad77051f2788be-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/960989eb6f9b4ff880ad77051f2788be-stdout.txt.raw.json"
+    },
+    "960989eb6f9b4ff880ad77051f2788be-stderr.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/960989eb6f9b4ff880ad77051f2788be-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/960989eb6f9b4ff880ad77051f2788be-stderr.txt.raw.json"
+    },
+    "dca87ab5ab3e404a88c60b022e46a739-receipt.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/dca87ab5ab3e404a88c60b022e46a739-receipt.json",
+      "sha256": "6cee1a39036f0c149eba97fd76f135a6e1aebc45cd2600fb4fae26f651a02f46",
+      "sizeBytes": 1486,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/dca87ab5ab3e404a88c60b022e46a739-receipt.json"
+    },
+    "dca87ab5ab3e404a88c60b022e46a739-stdout.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/dca87ab5ab3e404a88c60b022e46a739-stdout.txt",
+      "sha256": "2788ac41548e134dcb5ac000a038a718abbcc6e27fcef6f7f86a7bebb6731889",
+      "sizeBytes": 336,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/dca87ab5ab3e404a88c60b022e46a739-stdout.txt"
+    },
+    "dca87ab5ab3e404a88c60b022e46a739-stderr.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/dca87ab5ab3e404a88c60b022e46a739-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/dca87ab5ab3e404a88c60b022e46a739-stderr.txt.raw.json"
+    },
+    "catalog-browser-s2-doris-ready-1795089101508.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/catalog-browser-s2-doris-ready-1795089101508.json",
+      "sha256": "91acfa99f1e8bff8fa4d2d630552fc39424249556e434225f5e80f92658c094d",
+      "sizeBytes": 3047,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/catalog-browser-s2-doris-ready-1795089101508.json"
+    },
+    "browser-s2-doris-ready-1795089101508.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/browser-s2-doris-ready-1795089101508.json",
+      "sha256": "e29bae8f932291deaa93aa896bf149fde2fee4a038ae6d1e1bc5abd64770a840",
+      "sizeBytes": 5604,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/browser-s2-doris-ready-1795089101508.json"
+    },
+    "s1-host-s2-doris-ready-77fe1ac5eea5412e89aa8abedb78947a.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/s1-host-s2-doris-ready-77fe1ac5eea5412e89aa8abedb78947a.json",
+      "sha256": "ff6cf7f060a87476794133a58537d0b41223fbc3b7036061f3bbedc41ec40f93",
+      "sizeBytes": 597,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/s1-host-s2-doris-ready-77fe1ac5eea5412e89aa8abedb78947a.json"
+    },
+    "service-events-77fe1ac5eea5412e89aa8abedb78947a.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/service-events-77fe1ac5eea5412e89aa8abedb78947a.json",
+      "sha256": "21a5a2eee2c529a4ad03a17e138501eaf48525487a75f59255fbbbc51dbd7ede",
+      "sizeBytes": 2203,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/service-events-77fe1ac5eea5412e89aa8abedb78947a.json"
+    },
+    "8024acbdf1db41a699a21ebf0c66ccdd-receipt.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/8024acbdf1db41a699a21ebf0c66ccdd-receipt.json",
+      "sha256": "576af7a34242a9405e697352d342cb8826a6250c3473ed886b139103af9addce",
+      "sizeBytes": 1486,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/8024acbdf1db41a699a21ebf0c66ccdd-receipt.json"
+    },
+    "8024acbdf1db41a699a21ebf0c66ccdd-stdout.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/8024acbdf1db41a699a21ebf0c66ccdd-stdout.txt",
+      "sha256": "0bff9ab2e034daf885eb134daeb4583c5b0b415d7f0cbbd9cf57d0b5c219d04f",
+      "sizeBytes": 339,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/8024acbdf1db41a699a21ebf0c66ccdd-stdout.txt"
+    },
+    "8024acbdf1db41a699a21ebf0c66ccdd-stderr.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/8024acbdf1db41a699a21ebf0c66ccdd-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/8024acbdf1db41a699a21ebf0c66ccdd-stderr.txt.raw.json"
+    },
+    "activation-browser-s2-doris-ready-1795089105787.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/activation-browser-s2-doris-ready-1795089105787.json",
+      "sha256": "154a7fd7d3ab2692f9947c60a72d01f38ff1862c02b204af305510cfceb04a92",
+      "sizeBytes": 3053,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/activation-browser-s2-doris-ready-1795089105787.json"
+    },
+    "browser-s2-doris-ready-1795089105787.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/browser-s2-doris-ready-1795089105787.json",
+      "sha256": "d664b34250912ab6979eb6e3ad88e24eb9aabc658708a2b8df202d227d9463d2",
+      "sizeBytes": 5530,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/browser-s2-doris-ready-1795089105787.json"
+    },
+    "s1-host-s2-doris-ready-d464ba2667cd46e1bd243dbcf084fc83.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/s1-host-s2-doris-ready-d464ba2667cd46e1bd243dbcf084fc83.json",
+      "sha256": "f8cd3304c2a7a3f5cd2958218af31e459cdb6cd16f807906ecae65446be0d5e0",
+      "sizeBytes": 600,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/s1-host-s2-doris-ready-d464ba2667cd46e1bd243dbcf084fc83.json"
+    },
+    "service-events-d464ba2667cd46e1bd243dbcf084fc83.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/service-events-d464ba2667cd46e1bd243dbcf084fc83.json",
+      "sha256": "57d0757114963c2e2d8c9186fe07e4d2114f74f96fc5b0beeeee4f92d40ede79",
+      "sizeBytes": 2203,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/service-events-d464ba2667cd46e1bd243dbcf084fc83.json"
+    },
+    "fcb1fc4cc74e427eb71dd262b9ed705b-receipt.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/fcb1fc4cc74e427eb71dd262b9ed705b-receipt.json",
+      "sha256": "fdb4f2394fc5f358a24635756288a6bad7cc8116da7c56220000e7a9bbf9a468",
+      "sizeBytes": 1482,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/fcb1fc4cc74e427eb71dd262b9ed705b-receipt.json"
+    },
+    "fcb1fc4cc74e427eb71dd262b9ed705b-stdout.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/fcb1fc4cc74e427eb71dd262b9ed705b-stdout.txt",
+      "sha256": "df292d53f15366cbba3b33f2138cc8ef52f605e7b97d491be97a6155aa6846be",
+      "sizeBytes": 259,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/fcb1fc4cc74e427eb71dd262b9ed705b-stdout.txt"
+    },
+    "fcb1fc4cc74e427eb71dd262b9ed705b-stderr.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/fcb1fc4cc74e427eb71dd262b9ed705b-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/fcb1fc4cc74e427eb71dd262b9ed705b-stderr.txt.raw.json"
+    },
+    "healthy-browser-s2-doris-ready-1795089095239.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/healthy-browser-s2-doris-ready-1795089095239.json",
+      "sha256": "a16e1cc8262d6477b744854d8976ea0fbe3d087df68cbcd47ddabe267616863b",
+      "sizeBytes": 3042,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/healthy-browser-s2-doris-ready-1795089095239.json"
+    },
+    "browser-s2-doris-ready-1795089095239.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/browser-s2-doris-ready-1795089095239.json",
+      "sha256": "45c98892b9f4cb6d306225011078f74988253964d64b73b41a360b594245c399",
+      "sizeBytes": 6805,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/browser-s2-doris-ready-1795089095239.json"
+    },
+    "s1-host-s2-doris-ready-392de03f4e48449a9976373bad303a23.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/s1-host-s2-doris-ready-392de03f4e48449a9976373bad303a23.json",
+      "sha256": "7d88b7d1a2470d726259ab2504e388f9c6659fa0711750f1264f77347d12b34c",
+      "sizeBytes": 648,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/s1-host-s2-doris-ready-392de03f4e48449a9976373bad303a23.json"
+    },
+    "service-events-392de03f4e48449a9976373bad303a23.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/service-events-392de03f4e48449a9976373bad303a23.json",
+      "sha256": "6362f0621f2a7d86dfc26940c65130601f8d3c7eae8edc88137de65f60c4af51",
+      "sizeBytes": 2202,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/service-events-392de03f4e48449a9976373bad303a23.json"
+    },
+    "2cf5db0984d341b8b5a624a61b887733-receipt.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2cf5db0984d341b8b5a624a61b887733-receipt.json",
+      "sha256": "0636f0a2508644ca0a55a6f6c98b5e40eb76f67e5762a6c7f1674d59269da211",
+      "sizeBytes": 1476,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2cf5db0984d341b8b5a624a61b887733-receipt.json"
+    },
+    "2cf5db0984d341b8b5a624a61b887733-stdout.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2cf5db0984d341b8b5a624a61b887733-stdout.txt",
+      "sha256": "7233d8946f36a10b9e90580ae6dda59488d145014b0ba5be56db44c2989fd84c",
+      "sizeBytes": 348,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2cf5db0984d341b8b5a624a61b887733-stdout.txt"
+    },
+    "2cf5db0984d341b8b5a624a61b887733-stderr.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2cf5db0984d341b8b5a624a61b887733-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2cf5db0984d341b8b5a624a61b887733-stderr.txt.raw.json"
+    },
+    "ready-392de03f4e48449a9976373bad303a23.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/ready-392de03f4e48449a9976373bad303a23.json",
+      "sha256": "584cc27c304ecdeb8230b945a1ac0eabdbc7358a8e6a767a30c4ab10d0c885bd",
+      "sizeBytes": 1203,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/ready-392de03f4e48449a9976373bad303a23.json"
+    },
+    "2c1629a0435a48098bea95ab16697abc-receipt.json": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2c1629a0435a48098bea95ab16697abc-receipt.json",
+      "sha256": "193d9d10ad4b661b10a74f4835814c52df19b77eb2e5bae7b5a6c4da286378e4",
+      "sizeBytes": 1470,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2c1629a0435a48098bea95ab16697abc-receipt.json"
+    },
+    "2c1629a0435a48098bea95ab16697abc-stdout.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2c1629a0435a48098bea95ab16697abc-stdout.txt",
+      "sha256": "fa60ac304de1fe7b14458a8e1a65c8dfa758fb0f0f0699299de42f43c601ffd9",
+      "sizeBytes": 1384,
+      "encoding": "raw",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2c1629a0435a48098bea95ab16697abc-stdout.txt"
+    },
+    "2c1629a0435a48098bea95ab16697abc-stderr.txt": {
+      "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2c1629a0435a48098bea95ab16697abc-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0,
+      "encoding": "base64",
+      "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/originals/2c1629a0435a48098bea95ab16697abc-stderr.txt.raw.json"
+    }
+  }
+}

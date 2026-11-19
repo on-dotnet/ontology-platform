@@ -78,7 +78,7 @@ def qualify(gate, input_key):
 
     task, run = 'G4-DORIS-MAPPING-QUERY-001', 'implementation-01'
     current = build.ROOT/'docs/evidence'/task/'review-fix-01'
-    if gate!='environment' and (current/'current-inputs.json').is_file():
+    if gate!='environment':
         return qualify_review_fix(gate,input_key,current)
     groups = {'environment': ['prepare'], 'contract': ['wire','pg-golden'],
               'backend': ['adapters','tls','query','semantic-batch','pg-golden','ac06'],
@@ -307,6 +307,229 @@ def session_scratch(output, name):
     return path
 
 
+E1_RUN = 'review-fix-02'
+E1_DRIVER_COMMIT = 'f2673f2c62537b5422f308b99cfb25da464eee35'
+E1_EXPECTED = {'expired':'PREREQUISITE_STALE:grant_expired_or_missing','short':'PREREQUISITE_STALE:grant_ttl',
+               'catalog':'PREREQUISITE_STALE:catalog','activation':'PREREQUISITE_STALE:activation','healthy':None}
+
+
+def previous_profile_drivers(root, product):
+    """核对原运行实际执行的完整旧代码。隔离批次专用分支在旧运行不可达。"""
+    import ast
+    import subprocess
+    from pathlib import Path
+    from workflow_execution import sha
+    from workflow_m2_evidence import require
+
+    class OldRun(ast.NodeTransformer):
+        def visit_If(self, node):
+            node=self.generic_visit(node)
+            if ast.unparse(node.test)=="vm.EVIDENCE_RUN == 'review-fix-02'":
+                return node.orelse
+            return node
+
+    result=[]
+    for name in BROWSER_SOURCES:
+        old=subprocess.check_output(['git','show',product+':'+name],cwd=root)
+        now=(root/name).read_bytes()
+        if now!=old:
+            registered=subprocess.check_output(['git','show',E1_DRIVER_COMMIT+':'+name],cwd=root)
+            require(now==registered,'RF_BROWSER_REGISTERED_REVISION')
+            filename=Path(name).name
+            if filename=='workflow_doris_vm.py':
+                a=b"(RUN, 'review-fix-01', 'review-fix-02')"
+                require(now.count(a)==1 and now.replace(a,b"(RUN, 'review-fix-01')")==old,'RF_OUTPUT_SCOPE')
+            elif filename=='workflow-m4-query.mjs':
+                a=b' && !(evidenceRun === "review-fix-02" && argument("mode") === "s2-doris-ready")'
+                require(now.count(a)==1 and now.replace(a,b'')==old,'RF_OUTPUT_SCOPE')
+            elif filename=='workflow_doris_s1.py':
+                require(ast.dump(OldRun().visit(ast.parse(now)))==ast.dump(OldRun().visit(ast.parse(old))),'RF_OUTPUT_SCOPE')
+            else:
+                raise ValueError('RF_BROWSER_SOURCE_DRIFT')
+        result.append(sha(old))
+    return result
+
+
+def qualify_e1(public, prior_raw, prior_command, snapshot, node, agent_build):
+    """以列明的五次正式执行重算 E1 资格；每个窗口绑定双方真实命令以及原 FE 审计。"""
+    import datetime
+    import json
+    import re
+    import subprocess
+    from pathlib import Path
+    from workflow_evidence import restore
+    from workflow_execution import encoded,sha
+    from workflow_m2_build import ROOT
+    from workflow_m2_evidence import require
+    from workflow_doris_s1 import readiness_budget
+
+    folder=public.parent/E1_RUN
+    index=json.loads((folder/'selected.json').read_bytes())
+    task='G4-DORIS-MAPPING-QUERY-001'
+    owner='implementation-01'
+    mode='s2-doris-ready'
+    require(index['revision']==E1_DRIVER_COMMIT and index['ownerRun']==owner and index['taskId']==task and index['runId']==E1_RUN
+            and set(index['cases'])==set(E1_EXPECTED) and index['reuseProduct']=='9780c8f91cd084c1df11c604186d22d7f08f3023','RF02_SELECTION')
+    require(subprocess.run(['git','merge-base','--is-ancestor',E1_DRIVER_COMMIT,'HEAD'],cwd=ROOT).returncode==0,'RF02_EXECUTION_REVISION')
+    measured={}
+    def data(name):
+        entry=index['originals'][name]
+        target=(folder.relative_to(ROOT)/'originals'/name).as_posix()
+        require(Path(name).name==name and entry['originalPath']==target and entry['encoding'] in ('raw','base64')
+                and entry['path']==target+('.raw.json' if entry['encoding']=='base64' else ''),'RF02_MEMBER')
+        value=restore(ROOT,entry)
+        measured[name]=sha(value)
+        return value
+    def read(name):return json.loads(data(name))
+    def command(cid):
+        require(re.fullmatch('[a-f0-9]{32}',cid) is not None,'RF02_COMMAND_ID')
+        receipt=read(cid+'-receipt.json')
+        require(receipt['schemaVersion']==2 and receipt['started'] is True and receipt['commandId']==cid and
+                receipt['taskId']==task and receipt['runId']==E1_RUN and receipt['signal'] is None,'RF02_COMMAND_ID')
+        streams=[]
+        for stream in ('stdout','stderr'):
+            raw=data(cid+'-'+stream+'.txt')
+            require((sha(raw),len(raw))==(receipt[stream]['sha256'],receipt[stream]['sizeBytes']),'RF02_STREAM')
+            streams.append(raw)
+        return receipt,streams[0],streams[1]
+    def summary(argv):
+        return dict(argumentCount=len(argv)-1,executable=Path(argv[0]).name,sha256=sha(encoded(argv)))
+    def millis(value):
+        return datetime.datetime.fromisoformat(value.replace('Z','+00:00')).timestamp()*1000
+    drivers={n:sha((ROOT/n).read_bytes()) for n in BROWSER_SOURCES}
+    require(all(sha(subprocess.check_output(['git','show',E1_DRIVER_COMMIT+':'+n],cwd=ROOT))==h for n,h in drivers.items()),'RF02_DRIVER_REVISION')
+    import ast
+    import inspect
+    dependency_paths=['scripts/maintenance/'+name for name in ('workflow_doris_fixture.py','workflow_execution.py','workflow_m2_build.py')]
+    require(subprocess.run(['git','diff','--quiet',E1_DRIVER_COMMIT,'--',*dependency_paths],cwd=ROOT).returncode==0,'RF02_RUNTIME_DEPENDENCY')
+    source_file='scripts/maintenance/workflow_doris_mapping_evidence.py'
+    original_module=ast.parse(subprocess.check_output(['git','show',E1_DRIVER_COMMIT+':'+source_file],cwd=ROOT))
+    scratch=next(n for n in original_module.body if isinstance(n,ast.FunctionDef) and n.name=='session_scratch')
+    require(ast.dump(scratch)==ast.dump(ast.parse(inspect.getsource(session_scratch)).body[0]),'RF02_SESSION_HELPER')
+    # 源端注册文件和所有 99 项 API 输出在原构建绑定中逐项核过；这里独立重算快照身份。
+    identity={n:snapshot[n] for n in ('files','inputs','commandId','environment','taskId','resourceRun')}
+    require(sha(encoded(identity))==snapshot['snapshotId'] and snapshot['commandId']==snapshot['inputs']['receiptSha256'] and
+            snapshot['directory']==f"artifacts/workflow/{task}/review-fix-01/runtime-snapshots/{snapshot['snapshotId']}",'RF02_BUILD')
+    # 历史反例只认证为原 Base 的原件。拒绝换过内容并重新登记的旧回执。
+    history_path=(public.relative_to(ROOT)/'current-inputs.json').as_posix()
+    history=json.loads(subprocess.check_output(['git','show','a363fbd53d3f2813539534f921f2b21004638eec:'+history_path],cwd=ROOT))
+    for name,cid in history['readinessCommands'].items():
+        for member in (name,cid+'-receipt.json'):
+            actual=(public.relative_to(ROOT)/'originals'/member).as_posix()
+            original=history['originals'][member]
+            require(original['originalPath']==actual and sha(prior_raw(member))==original['sha256'],'RF02_HISTORICAL_ORIGINAL')
+    oldaudit=json.loads(prior_raw('e1-audit-5a77f112b7c34a65bd2778629e657535.json'))
+    oldrow,oldraw=prior_command(oldaudit['commandId'])
+    oldout=json.loads(oldraw)
+    oldargs,oldkey=e1_audit_identity(oldaudit['fe'],oldaudit['windows'])
+    require(oldrow['exitCode']==0 and oldrow['inputFingerprint']==oldkey and oldrow['commandSummary']==summary(oldargs)
+            and oldaudit['parserSha256']==sha(E1_AUDIT_PARSER.encode()) and sha(oldraw)==oldaudit['resultSha256'],'RF02_CONTROL_INPUT')
+    baseline_api=json.loads(prior_raw('api-build-binding.json'))
+    baseline_grants=json.loads(prior_raw('q-grant-renewal-f7316ae0c11a486a815ff1a60e44fe18.json'))
+    execute_grant,=[g for g in baseline_grants['new'] if g['permission']=='data.query.execute']
+    execution_policy=sha((ROOT/'scripts/maintenance/workflow_execution.py').read_bytes())
+    windows={'positive-pressure-control':oldaudit['windows']['positive-pressure-control']}
+    seen=set()
+    for label,expected_error in E1_EXPECTED.items():
+        entry=index['cases'][label]
+        name=entry['report']
+        require(re.fullmatch(r'browser-s2-doris-ready-[0-9]{13}\.json',name) and name not in windows and
+                entry['dispatch']==label+'-'+name,'RF02_REPORT_ID')
+        report=read(name)
+        dispatch=read(entry['dispatch'])
+        host=read(entry['host'])
+        subject=report['inputBinding']['api']
+        hid=subject['commandId']
+        cid=entry['command']
+        require(cid not in seen and hid not in seen and cid!=hid,'RF02_UNIQUE')
+        seen.update((hid,cid))
+        require(dispatch['case']==label and dispatch['report']==name and dispatch['revision']==E1_DRIVER_COMMIT and dispatch['driverSha256']==drivers,'RF02_DRIVER')
+        stage=dict(readinessStage='baseline',expectedStale=label if label in ('catalog','activation') else None)
+        require(dispatch['stageInputs']==host.get('stageInputs')==stage and 'stressInput' not in host,'RF02_STAGE')
+        receipt,stdout,_=command(cid)
+        argv=[node,'scripts/maintenance/workflow-m4-query.mjs','--task',task,'--run-id',owner,'--mode',mode]
+        require(receipt['stage']=='dmq-s1-browser-'+mode and receipt['commandSummary']==summary(argv),'RF02_ARGV')
+        require(receipt['inputFingerprint']==sha(encoded([snapshot['snapshotId'],mode,list(drivers.values()),stage])),'RF02_FINGERPRINT')
+        require(receipt['cwd']==baseline_api['worktree'] and receipt['deadlineSeconds']==180 and
+                receipt['identity']==sha(encoded([receipt['inputFingerprint'],receipt['environmentFingerprint'],receipt['commandSummary']['sha256'],
+                                                  receipt['cwd'],180,execution_policy])),'RF02_COMMAND_IDENTITY')
+        location=Path(receipt['cwd'])
+        log=json.loads(stdout)
+        require(report['inputsUnchanged'] is True and report['taskId']==task and report['runId']==owner and report['mode']==mode
+                and report['inputBinding']['web'] is None and not report.get('bindingFailure') and not report.get('networkFailure'),'RF02_REPORT_INPUT')
+        require(log['report']==str(location/'artifacts/workflow'/task/E1_RUN/name) and log['status']==report['status']
+                and log['failure']==report.get('failure') and log['checks']==len(report['checks']),'RF02_REPORT_REF')
+        require(entry['host']=='s1-host-'+mode+'-'+hid+'.json' and entry['events']=='service-events-'+hid+'.json' and
+                subject['taskId']==host['taskId']==task and subject['runId']==host['runId']==owner and subject['stage']==host['stage']==mode and
+                subject['status']=='READY' and host['status']=='EXITED' and host['commandId']==hid and subject['pid']==host['pid'] and
+                subject['processStart']==host['processStart'] and subject['snapshotId']==host['snapshotId']==snapshot['snapshotId'] and
+                host['exitCode']==0 and host['exceeded'] is False and 0<host['hostPeakBytes']['api']<=768*1024**2 and
+                0<host['hostPeakBytes']['total']<=int(5.5*1024**3),'RF02_HOST')
+        events=read(entry['events'])
+        private=location/'.tools/security/g4-doris-mapping-query-001'
+        host_args=['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network-outbound (remote ip "*:*")) (allow network-outbound (remote ip "localhost:*"))',
+            '/usr/bin/env','-i','PATH='+dispatch['hostPath'],'ASPNETCORE_ENVIRONMENT=Development',
+            'ASPNETCORE_CONTENTROOT='+str(private/owner/'runtime/api'),'G4__SourceCaPath='+str(private/(owner+'-source')/'tls/ca.pem'),
+            'ASPNETCORE_URLS=http://127.0.0.1:15641','DOTNET_GCHeapHardLimit=0x18000000','DOTNET_CLI_TELEMETRY_OPTOUT=1',
+            'Logging__LogLevel__OntologyPlatform.Modules.SemanticQuery.G4QueryExecution=Information',
+            snapshot['environment']['dotnet'],str(location/snapshot['directory']/'OntologyPlatform.Api.dll')]
+        require([x['event'] for x in events]==['START','READY','END'] and all(x['taskId']==task and x['runId']==E1_RUN and x['stage']=='service'
+                and x['commandId']==hid and x['commandSummary']==dict(executable='sandbox-exec',sha256=sha(encoded(host_args))) for x in events)
+                and events[1]['pid']==host['pid'] and events[2]['exitCode']==host['exitCode'] and events[2]['classification']=='STOPPED','RF02_HOST_COMMAND')
+        begin,end=millis(receipt['startedAtUtc']),millis(receipt['endedAtUtc'])
+        require(millis(dispatch['startedUtc'])<=millis(events[0]['startedAtUtc'])<=begin<=millis(report['startedAtUtc'])<=
+                millis(report['finishedAtUtc'])<=end<=millis(events[2]['endedAtUtc'])<=millis(dispatch['endedUtc']),'RF02_TIMELINE')
+        windows[name]=[begin,end]
+        if expected_error:
+            require(receipt['exitCode']==dispatch['dispatchExit']==1 and receipt['classification']=='EXIT_FAILURE' and report['status']=='FAIL' and
+                    host.get('browserCommand',cid)==cid and log['phase']=='scenario_ready' and report['failure']==dict(phase='scenario_ready',category='Error',code=expected_error),'RF02_REJECTION')
+        else:
+            ready=report['scenarioReady']
+            require(receipt['exitCode']==dispatch['dispatchExit']==0 and receipt['classification']=='SUCCESS' and host['browserCommand']==cid
+                    and report['status']=='PASS' and report['scope']=='PREREQUISITES_ONLY' and all(x['status']=='PASS' for x in report['checks'])
+                    and ready==read('ready-'+hid+'.json') and (ready['status'],ready['stage'],ready['command'],ready['mode'],ready['snapshot'])==
+                    ('READY','baseline',hid,mode,snapshot['snapshotId']) and ready['budgetSeconds']==readiness_budget('baseline') and
+                    ready['fieldCount']==18 and ready['grantRequiredSeconds']==sum(ready['budgetSeconds'].values()),'RF02_HEALTHY')
+            from workflow_m2_build import TARGETS
+            from workflow_m2_evidence import mtp
+            session,session_out,session_err=command(ready['sessionCommand'])
+            project=Path(TARGETS['agent'])
+            dll=location/project.parent/'bin/Debug/net10.0'/(project.stem+'.dll')
+            session_argv=[snapshot['environment']['dotnet'],str(dll),'--filter',
+                          'FullyQualifiedName=OntologyPlatform.AgentTests.G4QueryMafRuntimeTests.BrowserSessionsCoverRegisteredExecutionDeadline',
+                          '--minimum-expected-tests','1','--no-ansi','--progress','off','--results-directory',
+                          str(location/'artifacts/workflow'/task/E1_RUN/'session-tests')]
+            require(session['stage']=='dmq-current-sessions' and session['classification']=='SUCCESS' and session['exitCode']==0 and
+                    session['deadlineSeconds']==20 and session['cwd']==str(location) and session['commandSummary']==summary(session_argv)
+                    and session['inputFingerprint']==sha(encoded(agent_build)) and ready['sessionRequiredSeconds']==180 and
+                    millis(report['startedAtUtc'])<=millis(session['startedAtUtc'])<millis(session['endedAtUtc'])<=millis(report['finishedAtUtc'])
+                    and mtp(session_out+session_err,1)==1,'RF02_SESSION_COMMAND')
+        if label in ('expired','short'):
+            before=read('grant-before-'+label+'.json');after=read('grant-restored-'+label+'.json')
+            orig,applied,restored=before['before'],before['applied'],after['restored']
+            require(orig['id']==execute_grant['id'] and orig['rowHash']==execute_grant['recordHash'] and orig['expiry']==execute_grant['expiry']
+                    and len(execute_grant['fields'])==18 and execute_grant['sites']==['site-a'],'RF02_GRANT_OWNER')
+            left=millis(applied['expiry'])-begin
+            require(orig['id']==applied['id']==restored['id'] and orig['rowHash']==restored['rowHash'] and orig['expiry']==restored['expiry'] and
+                    orig['shapeHash']==applied['shapeHash']==restored['shapeHash'] and applied['rowHash']!=orig['rowHash'] and
+                    (left<0 if label=='expired' else 0<left<=120000),'RF02_GRANT_STATE')
+            for item,stage_name in ((before,label),(after,'restore-'+label)):
+                change,_,_=command(item['command'])
+                require(change['stage']=='rf02-grant-'+stage_name and change['exitCode']==0,'RF02_GRANT_CHANGE')
+            require(millis(command(before['command'])[0]['endedAtUtc'])<=begin<end<=millis(command(after['command'])[0]['startedAtUtc']),'RF02_GRANT_WINDOW')
+    audit=index['audit']
+    require(audit['windows']==windows and audit['fe']==oldaudit['fe'] and audit['parserSha256']==oldaudit['parserSha256'],'RF02_AUDIT_WINDOW')
+    argv,key=e1_audit_identity(audit['fe'],windows)
+    row,stdout,_=command(audit['command'])
+    require(row['stage']=='rf02-e1-audit' and row['commandSummary']==summary(argv) and row['inputFingerprint']==key and row['exitCode']==0,'RF02_AUDIT_ID')
+    counter=json.loads(stdout)
+    control=counter['windows']['positive-pressure-control']
+    require(counter['inode']==oldout['inode'] and control==oldout['windows']['positive-pressure-control'] and control['mutations']==154 and control['fixedReads']==173 and
+            set(counter['windows'])==set(windows) and counter['firstUtcMs']<min(v[0] for v in windows.values()) and
+            counter['lastUtcMs']>max(v[1] for v in windows.values()) and all(v['mutations']==v['fixedReads']==0 for k,v in counter['windows'].items() if k!='positive-pressure-control'),'RF02_AUDIT_COUNTS')
+    return {E1_RUN+'/'+name:value for name,value in measured.items()}
+
+
 def qualify_review_fix(gate, input_key, public):
     """重开本轮定向运行，按当前构建、驱动、真实命令与原件核定各受影响门禁。"""
     import datetime
@@ -328,7 +551,7 @@ def qualify_review_fix(gate, input_key, public):
     require(expected['runId']==run and expected['taskId']==task and workflow.input_key(root,gate)==input_key,'RF_GATE_ID')
     product=expected['productInputCommit']
     require(len(product)==40 and subprocess.run(['git','merge-base','--is-ancestor',product,'HEAD'],cwd=root).returncode==0 and
-            subprocess.run(['git','diff','--quiet',product,'HEAD','--','backend','apps/web',*BROWSER_SOURCES],cwd=root).returncode==0,'RF_PRODUCT_REVISION')
+            subprocess.run(['git','diff','--quiet',product,'HEAD','--','backend','apps/web'],cwd=root).returncode==0,'RF_PRODUCT_REVISION')
     def raw(name):
         entry=members[name]
         require(Path(name).name==name and entry['originalPath']==(public.relative_to(root)/'originals'/name).as_posix(),'RF_MEMBER_PATH')
@@ -358,7 +581,7 @@ def qualify_review_fix(gate, input_key, public):
     api=read('api-build-binding.json')
     for path,value in snapshot['files'].items():
         require(api['outputs']['backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/'+path]==value,'RF_SNAPSHOT_OUTPUT')
-    driver=[execution.sha((root/name).read_bytes()) for name in BROWSER_SOURCES]
+    driver=previous_profile_drivers(root,product)
     checks=0
     def test(label, target, stage, expression, minimum, folder):
         cid=expected['tests'][label]
@@ -463,32 +686,7 @@ def qualify_review_fix(gate, input_key, public):
         for mode in ('ui-s1','ui-s3') if gate=='web' else ('ui-s1','ui-s3','s3'):
             checks+=browser(mode)
     if gate=='interaction':
-        audit=read(expected['prerequisiteAudit'])
-        cmd,output=command(audit['commandId'])
-        counters=json.loads(output)['windows']
-        require(cmd['exitCode']==0 and cmd['stage']=='rf-prerequisite-audit' and execution.sha(output)==audit['resultSha256']
-                and cmd['commandSummary']['sha256']==audit['commandSha256'] and counters['positive-pressure-control']['mutations']>0
-                and counters['positive-pressure-control']['fixedReads']>0,'RF_AUDIT_CONTROL')
-        rejected=set()
-        for name,window in audit['windows'].items():
-            if name=='positive-pressure-control': continue
-            report=read(name)
-            code=report['failure']['code']
-            require(report['status']=='FAIL' and report['mode']=='s2-doris-ready' and
-                    counters[name]['mutations']==counters[name]['fixedReads']==0 and window[0]<window[1],'RF_E1_WINDOW')
-            h=read('s1-host-s2-doris-ready-'+report['inputBinding']['api']['commandId']+'.json')
-            result,streams=command(expected['readinessCommands'][name])
-            recorded=json.loads(streams.splitlines()[0])
-            require(Path(recorded['report']).name==name and recorded['status']=='FAIL' and recorded['failure']==report['failure'],'RF_E1_COMMAND_REPORT')
-            require(result['exitCode']!=0 and result['stage']=='dmq-s1-browser-s2-doris-ready' and
-                    report['inputBinding']['api']['snapshotId']==h['snapshotId'],'RF_E1_REJECTION')
-            rejected.add(code)
-        require(rejected.intersection({'PREREQUISITE_STALE:grant','PREREQUISITE_STALE:grant_expired_or_missing'}) and
-                {'PREREQUISITE_STALE:grant_ttl','PREREQUISITE_STALE:catalog','PREREQUISITE_STALE:activation'}<=rejected,'RF_E1_CASES')
-        short=read(expected['shortGrant'])
-        require(len(short['new'])==3 and all(x['intervalSeconds']==120 for x in short['new']),'RF_E1_SHORT_GRANT')
-        healthy=read(expected['healthy'])
-        require(healthy['status']=='PASS' and healthy['scenarioReady']['fieldCount']==18 and healthy['scenarioReady']['grantRequiredSeconds']>120,'RF_E1_HEALTHY')
+        examined.update(qualify_e1(public,raw,command,snapshot,node,bound('agent')))
         eng=read('e2-production-tests.json')
         for stage in ('rf-ef01-dispatch','rf-ef01-size'):
             row=eng[stage];receipt,output=command(row['commandId'])
@@ -505,7 +703,7 @@ def qualify_review_fix(gate, input_key, public):
         before=restore(root,publication['old-runtime'])
         require(publication['old-runtime']['encoding']=='base64' and not before.endswith(b'\n') and
                 publication['resource-start']['encoding']=='raw' and restore(root,publication['resource-start']).endswith(b'\n'),'RF_E3_FIRST_WRITE')
-        checks+=len(rejected)+5
+        checks+=len(E1_EXPECTED)+4
     if gate=='web':
         for label in ('typecheck','lint','unit'):
             row=read('web-'+label+'-result.json')
@@ -519,8 +717,43 @@ def qualify_review_fix(gate, input_key, public):
                 checks+=machine(report,'vitest-json')
             else: checks+=1
     require(checks>0,'RF_EMPTY_GATE')
-    return dict(taskId=task,runId=run,gate=gate,inputKey=input_key,status='PASS',tests=checks,skipped=0,
+    return dict(taskId=task,runId=E1_RUN,productEvidenceRun=run,gate=gate,inputKey=input_key,status='PASS',tests=checks,skipped=0,
                 executionMode='REUSED',qualificationMode='FRESH',originals=examined)
+
+
+E1_AUDIT_PARSER=r"""import datetime,hashlib,json,os,pathlib,re,sys
+windows=json.loads(sys.argv[1]);states={k:dict(rows=0,mutations=0,fixedReads=0,firstOffset=None,lastOffset=None) for k in windows}
+digests={k:hashlib.sha256() for k in windows};first=last=None
+source=pathlib.Path('/opt/apache-doris/fe/log/fe.audit.log')
+with source.open('rb') as stream:
+ st=os.fstat(stream.fileno());limit=st.st_size;offset=0
+ while offset<limit:
+  raw=stream.readline();end=stream.tell()
+  if not raw.endswith(b'\n') or end>limit:break
+  m=re.search(rb'\|Timestamp=([0-9:. -]+)',raw)
+  if m:
+   stamp=datetime.datetime.fromisoformat(m[1].decode()).replace(tzinfo=datetime.timezone.utc).timestamp()*1000
+   first=stamp if first is None else min(first,stamp);last=stamp if last is None else max(last,stamp)
+   for k,(begin,final) in windows.items():
+    if begin-5<=stamp<=final+5:
+     row=states[k];row['rows']+=1;digests[k].update(raw)
+     if row['firstOffset'] is None:row['firstOffset']=offset
+     row['lastOffset']=end
+     stmt=raw.partition(b'|Stmt=')[2].split(b'|')[0]
+     if re.search(rb'\b(INSERT|UPDATE|DELETE|TRUNCATE|ALTER|DROP|CREATE|LOAD)\b',stmt,re.I) and re.search(rb'dmq_(entity|target)',stmt,re.I):row['mutations']+=1
+     if b'SET_VAR(enable_sql_cache=false)' in stmt and b'fixture.dmq_' in stmt:row['fixedReads']+=1
+  offset=end
+ assert source.stat().st_ino==st.st_ino and first<min(x[0] for x in windows.values()) and last>max(x[1] for x in windows.values())
+for k,v in states.items():v['sha256']=digests[k].hexdigest()
+print(json.dumps(dict(inode=st.st_ino,scannedBytes=offset,firstUtcMs=first,lastUtcMs=last,windows=states)))"""
+
+
+def e1_audit_identity(fe, windows):
+    """按实际 FE、准确命令窗口以及登记的解析器重算审计命令和输入身份。"""
+    import json
+    from workflow_execution import encoded,sha
+    argv=['docker','--context','desktop-linux','exec',fe,'python3','-c',E1_AUDIT_PARSER,json.dumps(windows,sort_keys=True)]
+    return argv,sha(encoded([fe,windows,E1_AUDIT_PARSER]))
 
 
 def audit_prerequisites():
@@ -547,31 +780,7 @@ def audit_prerequisites():
     mid=milliseconds(positive['beforeUnlockPgUtc'])
     windows['positive-pressure-control']=[mid-120000,mid+90000]
     # 同一 FE 留存日志；每窗口保留参与计数的原行数、首末偏移及原字节摘要。
-    parser=r"""import datetime,hashlib,json,os,pathlib,re,sys
-windows=json.loads(sys.argv[1]);states={k:dict(rows=0,mutations=0,fixedReads=0,firstOffset=None,lastOffset=None) for k in windows}
-digests={k:hashlib.sha256() for k in windows};first=last=None
-source=pathlib.Path('/opt/apache-doris/fe/log/fe.audit.log')
-with source.open('rb') as stream:
- st=os.fstat(stream.fileno());limit=st.st_size;offset=0
- while offset<limit:
-  raw=stream.readline();end=stream.tell()
-  if not raw.endswith(b'\n') or end>limit:break
-  m=re.search(rb'\|Timestamp=([0-9:. -]+)',raw)
-  if m:
-   stamp=datetime.datetime.fromisoformat(m[1].decode()).replace(tzinfo=datetime.timezone.utc).timestamp()*1000
-   first=stamp if first is None else min(first,stamp);last=stamp if last is None else max(last,stamp)
-   for k,(begin,final) in windows.items():
-    if begin-5<=stamp<=final+5:
-     row=states[k];row['rows']+=1;digests[k].update(raw)
-     if row['firstOffset'] is None:row['firstOffset']=offset
-     row['lastOffset']=end
-     stmt=raw.partition(b'|Stmt=')[2].split(b'|')[0]
-     if re.search(rb'\b(INSERT|UPDATE|DELETE|TRUNCATE|ALTER|DROP|CREATE|LOAD)\b',stmt,re.I) and re.search(rb'dmq_(entity|target)',stmt,re.I):row['mutations']+=1
-     if b'SET_VAR(enable_sql_cache=false)' in stmt and b'fixture.dmq_' in stmt:row['fixedReads']+=1
-  offset=end
- assert source.stat().st_ino==st.st_ino and first<min(x[0] for x in windows.values()) and last>max(x[1] for x in windows.values())
-for k,v in states.items():v['sha256']=digests[k].hexdigest()
-print(json.dumps(dict(inode=st.st_ino,scannedBytes=offset,firstUtcMs=first,lastUtcMs=last,windows=states)))"""
+    parser=E1_AUDIT_PARSER
     args=['docker','--context','desktop-linux','exec',fe,'python3','-c',parser,json.dumps(windows,sort_keys=True)]
     result=execution.run(args,s.ROOT,task=s.vm.TASK,run_id=s.vm.EVIDENCE_RUN,stage='rf-prerequisite-audit',input_key=execution.sha(execution.encoded([fe,windows,parser])),timeout=20)
     require(result.returncode==0,'RF_AUDIT_SCAN_'+result.receipt['commandId'])
