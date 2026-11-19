@@ -113,13 +113,23 @@ def watch(key, admit_first=False, overlap=False):
             while time.monotonic()<until and not (control in registered and control in ended): time.sleep(.001)
             vm.demand(control in registered and control in ended,'OVERLAP_BE_SUBSCRIBED')
             observed['observerControlQueryId']=control
-            clock_ids=[subprocess.check_output(['docker','--context','desktop-linux','exec',ids[role],'readlink','/proc/1/ns/time'],text=True,timeout=3).strip() for role in ('be','platform-pg')]
-            vm.demand(clock_ids[0]==clock_ids[1] and re.fullmatch(r'time:\[\d+\]',clock_ids[0]),'OVERLAP_VM_CLOCK')
-            observed['vmTimeNamespace']=clock_ids[0]
+            # PG 墙钟和 BE 日志使用同一内核的实时时钟，容器可各自持有单调时钟命名空间。
+            clocks={}
+            for role in ('be','platform-pg'):
+                sample=subprocess.check_output(['docker','--context','desktop-linux','exec',ids[role],'sh','-ec',
+                    'readlink /proc/1/ns/time && cat /proc/1/timens_offsets && cat /proc/sys/kernel/random/boot_id && date +%z'],text=True,timeout=3).splitlines()
+                vm.demand(len(sample)==5 and re.fullmatch(r'time:\[\d+\]',sample[0]) and sample[1].split()==['monotonic','0','0']
+                          and sample[2].split()==['boottime','0','0'] and str(uuid.UUID(sample[3]))==sample[3] and sample[4]=='+0000','OVERLAP_VM_CLOCK_SAMPLE')
+                clocks[role]=dict(timeNamespace=sample[0],bootId=sample[3],utcOffset=sample[4])
+            vm.demand(clocks['be']['bootId']==clocks['platform-pg']['bootId'],'OVERLAP_SHARED_VM')
+            observed['vmClocks']=clocks
             scan="SELECT CONCAT(COUNT(*),'/',IFNULL(MAX(QueryId),'absent'),'/',IFNULL(MAX(Id),0)) FROM information_schema.processlist WHERE User='fixture_reader' AND Info LIKE '%SET_VAR(enable_sql_cache=false)%' AND Info LIKE '%FROM fixture.dmq_entity%';"
             permit=OUT/('overlap-permit-'+key+'.json')
             vm.demand(not permit.exists() and stress['rowsByTable']=={'dmq_entity':4194304,'dmq_target':3},'OVERLAP_SCOPE')
             stack.callback(permit.unlink,missing_ok=True)
+            armed=OUT/('overlap-source-ready-'+key+'.json')
+            vm.demand(not armed.exists(),'OVERLAP_ARMED_EXISTS')
+            stack.callback(armed.unlink,missing_ok=True)
         vm.demand(platform(lookup)=='absent' and source(scan)==('0/absent/0' if overlap else 'absent'),'WITNESS_INITIAL_STATE')
         def load_sample():
             return json.loads(platform("""SELECT json_build_object('clock',clock_timestamp(),'serverStarted',pg_postmaster_start_time(),
@@ -145,9 +155,15 @@ def watch(key, admit_first=False, overlap=False):
                         locked=locker("BEGIN; SET LOCAL idle_in_transaction_session_timeout='2s'; SELECT \"ExecutionStatus\" FROM semantic_query.\"Queries\" WHERE \"Id\"='"+app_id+"' AND \"IdempotencyKey\"='"+key+"' FOR UPDATE;")
                         vm.demand(locked=='RUNNING','OVERLAP_ROW_NOT_RUNNING')
                         observed.update(lockerPid=locker_pid,lockedQueryId=app_id)
-                    if admit_first or overlap:
+                    if admit_first:
                         emit('admitted',queryId=app_id)
                         delivered=True
+            if overlap and app_id and not delivered and armed.exists():
+                vm.demand(json.loads(armed.read_bytes())=={'key':key},'OVERLAP_ARMED_KEY')
+                observed['sourceReadyBeforeCancel']=platform('SELECT clock_timestamp();')
+                record(file,observed)
+                emit('admitted',queryId=app_id)
+                delivered=True
             if overlap and delivered and 'waiterPid' not in observed:
                 count,wait=platform("SELECT count(*)||'/'||coalesce(max(pid),0) FROM pg_stat_activity WHERE "+str(locker_pid)+"=ANY(pg_blocking_pids(pid)) AND wait_event_type='Lock' AND query LIKE '%semantic_query.%Queries%FOR UPDATE%';").split('/')
                 vm.demand(count in ('0','1'),'OVERLAP_MULTIPLE_WAITERS')

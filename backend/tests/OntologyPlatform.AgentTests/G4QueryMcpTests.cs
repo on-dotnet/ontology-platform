@@ -179,15 +179,40 @@ public sealed partial class G4QueryMafRuntimeTests
         using var trace = new Activity("dmq.verified.overlap").Start();
         // 源返回时保存耗时，上层观察器释放和网关返回以更保守的全段上界验证。
         var readMs = 0d;
-        // 唯一允许改变的部分是执行调度，权鉴、租约观察、命令和取消均委托正式实现。
-        var source = new ScheduledSource(services.GetRequiredService<IG4SourceQueryReader>(), async token =>
+        // 源外层仍计入整秒预算，先由正式读取器完成再次授权和真实 TLS 握手。
+        var branchToken = CancellationToken.None;
+        // 测试仅记录真实分支起止，取消完全由原租约观察及驱动处理。
+        var source = new MeasuredSource(services.GetRequiredService<IG4SourceQueryReader>(), token =>
         {
+            branchToken = token;
             branch.Start();
-            // 此文件只能由已确认正式取消事务确在等待该行锁的独立观察者产生。
-            var permit = Path.Combine(directory, "overlap-permit-" + key + ".json");
-            while (!File.Exists(permit) && branch.ElapsedMilliseconds < 550) await Task.Delay(1, token);
-            Assert.IsTrue(File.Exists(permit), "CANCEL_TRANSACTION_DID_NOT_REACH_ROW");
         }, () => readMs = branch.Elapsed.TotalMilliseconds);
+        // 只在本次查询首次正式业务命令开始、驱动尚未发送命令时同步。
+        var firstPlan = 1;
+        // 此同步点在真实源端权限及目录前验之后，避免与取消事务争夺同一治理授权锁。
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = actual => actual.Name == "MySqlConnector",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+            ActivityStarted = operation =>
+            {
+                if (operation.TraceId != trace.TraceId || !trace.Events.Any(e => e.Name == "doris.plan.submitted")
+                    || Interlocked.Exchange(ref firstPlan, 0) != 1) return;
+                // 准确幂等键为独立观察者提供真实源 SQL 已准备的证据。
+                var armed = Path.Combine(directory, "overlap-source-ready-" + key + ".json");
+                File.WriteAllText(armed + ".pending", JsonSerializer.Serialize(new { key }, G4QueryJson.Options));
+                File.Move(armed + ".pending", armed);
+                // 仅确认正式取消事务通过核验并到达准确行锁后，才放行这个真实驱动命令。
+                var permit = Path.Combine(directory, "overlap-permit-" + key + ".json");
+                while (!File.Exists(permit) && branch.ElapsedMilliseconds < 550)
+                {
+                    branchToken.ThrowIfCancellationRequested();
+                    Thread.Sleep(1);
+                }
+                Assert.IsTrue(File.Exists(permit), "CANCEL_TRANSACTION_DID_NOT_REACH_ROW");
+            }
+        };
+        ActivitySource.AddActivityListener(listener);
         // 独立执行实例与 HTTP 宿主各用正式平台服务及同一数据库。
         var execution = ActivatorUtilities.CreateInstance<G4QueryExecution>(services, source, TimeProvider.System);
         // 仍由正式语义网关重新核权限及发布绑定。
@@ -214,8 +239,8 @@ public sealed partial class G4QueryMafRuntimeTests
         }
     }
 
-    /// <summary>在分支的真实期限内调度读取开始，并记录真实读取释放时刻。</summary>
-    private sealed class ScheduledSource(IG4SourceQueryReader actual, Func<CancellationToken, Task> wait, Action finished) : IG4SourceQueryReader
+    /// <summary>在正式读取边界记录原始令牌、开始和退出时刻。</summary>
+    private sealed class MeasuredSource(IG4SourceQueryReader actual, Action<CancellationToken> started, Action finished) : IG4SourceQueryReader
     {
         /// <summary>沿用真实字段投影。</summary>
         public G4QueryProjection DescribeProjection(G4QueryBindingContext context, string entityBindingId) => actual.DescribeProjection(context, entityBindingId);
@@ -230,7 +255,7 @@ public sealed partial class G4QueryMafRuntimeTests
         {
             try
             {
-                await wait(cancellationToken);
+                started(cancellationToken);
                 return await actual.ReadAsync(context, proof, entityBindingId, query, deadlineAtUtc, cancellationToken, branch);
             }
             finally { finished(); }

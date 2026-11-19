@@ -1,0 +1,105 @@
+{
+  "stress": {
+    "attempt": "b358c38ac6ec",
+    "manifestSha256": "33908a48ca0579242e157dfb9ffa16b3e704f3f05c5cc67d1003bfb3fd06191d",
+    "rowsByTable": {
+      "dmq_entity": 4194304,
+      "dmq_target": 3
+    },
+    "purpose": "cancellation_only"
+  },
+  "idempotencyKey": "1ebbd598-9746-4597-8ce2-7702930534e0",
+  "run": "implementation-01",
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+  "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+  "observerControlQueryId": "4562d7db29fd41e0-8b7a8d8571ed8bb5",
+  "vmClocks": {
+    "be": {
+      "timeNamespace": "time:[4026533503]",
+      "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+      "utcOffset": "+0000"
+    },
+    "platform-pg": {
+      "timeNamespace": "time:[4026532708]",
+      "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+      "utcOffset": "+0000"
+    }
+  },
+  "loadBefore": {
+    "clock": "2026-11-19T03:40:26.373873+00:00",
+    "serverStarted": "2026-11-19T03:39:45.103806+00:00",
+    "since": null,
+    "commits": 36138,
+    "rollbacks": 3197,
+    "reads": 3563,
+    "hits": 1282432,
+    "queryTableIndexScans": 2017,
+    "queryTableSequentialScans": 519
+  },
+  "admissionObservedAt": "2026-11-19T03:40:28.237940+00:00",
+  "lockerPid": 376,
+  "lockedQueryId": "query-66dfd106112b424b80dc90c5a214eda8",
+  "sourceReadyBeforeCancel": "2026-11-19 03:40:28.348416+00",
+  "waiterPid": 344,
+  "verifiedWaitPgUtc": "2026-11-19 03:40:28.471106+00",
+  "sourceThread": 212,
+  "feActiveObservedAt": "2026-11-19T03:40:28.492900+00:00",
+  "liveWitness": "registered_log",
+  "beforeUnlockPgUtc": "2026-11-19 03:40:28.492844+00",
+  "afterUnlockPgUtc": "2026-11-19 03:40:28.493565+00",
+  "queryId": "query-66dfd106112b424b80dc90c5a214eda8",
+  "sourceQueryId": "63bc4c50ac254eb3-a8586734e0c65bea",
+  "cancelVisiblePgUtc": "2026-11-19T03:40:28.507705+00:00",
+  "terminal": "CANCELLED",
+  "terminalObservedAt": "2026-11-19T03:40:28.508397+00:00",
+  "sourceCounts": "0\t1",
+  "persisted": {
+    "bytes": 0,
+    "resultHash": null,
+    "resultSize": 0,
+    "readReceipts": 0,
+    "completedAtUtc": "2026-11-19T03:40:28.495144+00:00",
+    "cancelRequested": true
+  },
+  "successfulAuditCount": 0,
+  "cancelAuditCount": 1,
+  "loadAfter": {
+    "clock": "2026-11-19T03:40:28.554086+00:00",
+    "serverStarted": "2026-11-19T03:39:45.103806+00:00",
+    "since": null,
+    "commits": 36336,
+    "rollbacks": 3215,
+    "reads": 3592,
+    "hits": 1285652,
+    "queryTableIndexScans": 2321,
+    "queryTableSequentialScans": 520
+  },
+  "sourceCountsObservedAt": "2026-11-19T03:40:28.743957+00:00",
+  "dualZeroUpperMs": 251.047958,
+  "beEvents": [
+    {
+      "kind": "registered",
+      "beUtc": "20261119 03:40:28.488430"
+    },
+    {
+      "kind": "fragment_end",
+      "beUtc": "20261119 03:40:28.517925"
+    },
+    {
+      "kind": "cancel_arrived",
+      "beUtc": "20261119 03:40:28.521902"
+    },
+    {
+      "kind": "fragment_end",
+      "beUtc": "20261119 03:40:28.535795"
+    },
+    {
+      "kind": "context_end",
+      "beUtc": "20261119 03:40:28.535877"
+    }
+  ],
+  "cancelVisibleBeforeBeKilled": false,
+  "activeBeforeUnlock": true,
+  "cleanupUpperMs": 43.033
+}

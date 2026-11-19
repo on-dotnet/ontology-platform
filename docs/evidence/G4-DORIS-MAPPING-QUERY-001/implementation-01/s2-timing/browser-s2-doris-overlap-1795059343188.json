@@ -1,0 +1,332 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s2-doris-overlap",
+  "startedAtUtc": "2026-11-19T03:35:43.188Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "normal_current_authority_before_pressure",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_409",
+      "status": "PASS"
+    },
+    {
+      "name": "formal_route_ready",
+      "status": "PASS"
+    },
+    {
+      "name": "overlap_witness_31",
+      "status": "PASS"
+    },
+    {
+      "name": "independent_observer_armed",
+      "status": "PASS"
+    },
+    {
+      "name": "overlap_witness_33",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_query_row_locked",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200,409,503",
+      "status": "PASS"
+    },
+    {
+      "name": "overlap_witness_37",
+      "status": "PASS"
+    },
+    {
+      "name": "same_be_cancelled_after_committed_state",
+      "status": "FAIL"
+    },
+    {
+      "name": "owned_permit_released",
+      "status": "PASS"
+    },
+    {
+      "name": "independent_observer_exited",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 16.24891600000001,
+      "sha256": "36b4da7da523ae729f0411e89e8ca687e922cdb3aaede41198c9583b24b20576"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 4.4294579999998405,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.037042000000156,
+      "sha256": "7e6a4238adef7bab99c1d1d52e8d2826242082b88fdb25130585f7e17795ef82"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.6015409999999974,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 5.89083299999993,
+      "sha256": "13ee784d0cac842bd8e574364399bbf152df27ee2dd5a8e436b6064222d377db"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 2.6657090000001062,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 5.3901250000001255,
+      "sha256": "6fd2d6436cc2f442a7c27de9ffe89a55b16fd9d96345525859ab4b5c3686bb85"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.9218329999998787,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries/query-4d64636fe36b468ea9d72941aac66477/cancel",
+      "status": 409,
+      "elapsedMs": 180.59725000000003,
+      "code": "query_already_finished",
+      "sha256": "05a90f148af9f27a5113f953492fb7c7311ca414e3063cd80e8a1067c702bcd0"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries/query-4f0648ed90594e8783eadef34fe08069/cancel",
+      "status": 200,
+      "elapsedMs": 743.4166249999998,
+      "sha256": "89e420a75388f7a177a9b001591ca53979d044c4d1515a3209cc2f30ff24470e"
+    }
+  ],
+  "status": "FAIL",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "s2-doris-overlap",
+      "status": "READY",
+      "pid": 96586,
+      "commandId": "7164a92f4a094124a960884e8a058685",
+      "snapshotId": "327b18b31616aa132879be07e84db0901d3e413762cb7bed9b6b37c9fd12ca7c",
+      "processStart": "Thu Nov 19 11:35:41 2026"
+    },
+    "web": null
+  },
+  "cancel": {
+    "key": "bb45567f-084d-4af9-aca7-2fc4deca9de5",
+    "queryId": "query-4f0648ed90594e8783eadef34fe08069",
+    "httpStatus": 200,
+    "execution": {
+      "exit": 1,
+      "mtp": null
+    },
+    "witness": {
+      "event": "miss",
+      "stress": {
+        "attempt": "eb7fa31591f6",
+        "manifestSha256": "8adacef297962ebefe52abee4fc6a940a84a0c6293530aca5083d496a34572f3",
+        "rowsByTable": {
+          "dmq_entity": 4194304,
+          "dmq_target": 3
+        },
+        "purpose": "cancellation_only"
+      },
+      "idempotencyKey": "bb45567f-084d-4af9-aca7-2fc4deca9de5",
+      "run": "implementation-01",
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+      "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "observerControlQueryId": "73c81044a2a3406f-b3d960de25f58926",
+      "vmClocks": {
+        "be": {
+          "timeNamespace": "time:[4026532831]",
+          "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+          "utcOffset": "+0000"
+        },
+        "platform-pg": {
+          "timeNamespace": "time:[4026532969]",
+          "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+          "utcOffset": "+0000"
+        }
+      },
+      "loadBefore": {
+        "clock": "2026-11-19T03:35:45.899479+00:00",
+        "serverStarted": "2026-11-19T03:32:58.604113+00:00",
+        "since": null,
+        "commits": 35100,
+        "rollbacks": 3125,
+        "reads": 2966,
+        "hits": 1236421,
+        "queryTableIndexScans": 1653,
+        "queryTableSequentialScans": 509
+      },
+      "admissionObservedAt": "2026-11-19T03:35:47.727650+00:00",
+      "lockerPid": 919,
+      "lockedQueryId": "query-4f0648ed90594e8783eadef34fe08069",
+      "waiterPid": 898,
+      "verifiedWaitPgUtc": "2026-11-19 03:35:47.837741+00",
+      "queryId": "query-4f0648ed90594e8783eadef34fe08069",
+      "sourceQueryId": null,
+      "syncStatus": "NO_ACTIVE_BE_AT_UNLOCK"
+    }
+  },
+  "workerExit": {
+    "code": 1,
+    "signal": null
+  },
+  "witnessExit": {
+    "code": 0,
+    "signal": null
+  },
+  "failure": {
+    "phase": "formal_cancel_after_verified_row_wait",
+    "category": "Error",
+    "code": "same_be_cancelled_after_committed_state"
+  },
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-19T03:35:48.925Z"
+}

@@ -501,8 +501,8 @@ async function browserRun(mode) {
           finally {
             watcher.stdout.destroy();
             const permit="overlap-permit-"+key+".json";
-            const present=(await readdir(output)).includes(permit);
-            check("owned_permit_released",!present);
+            const remaining=await readdir(output);
+            check("owned_permit_released",!remaining.includes(permit) && !remaining.includes("overlap-source-ready-"+key+".json"));
           }
         }
         check("independent_observer_exited",report.witnessExit.code===0);

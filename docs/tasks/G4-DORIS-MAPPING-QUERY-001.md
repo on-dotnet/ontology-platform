@@ -14,10 +14,10 @@ Master单写。2026-11-19 追加同请求核验的 PublishingCatalog、ReleaseVe
 | AC03 | 全集唯一身份可发布；身份碰撞/未知表模型拒绝 | DorisMappingSourceValidator | S0 模型拒绝，S1 不支持的身份拒绝，S2 多父和危险身份方案被拒 |
 | AC04 | 当前授权有效可提交；撤权/轮换先提交无成功副作用 | G4QueryAuthorizationTests/G4QueryRaceTests | 源 SELECT 撤销、读后撤 execute、会话失效及在途轮换 1→2 均拒绝；新发布及历史字节已复核 |
 | AC05 | 元数据兼容可用；列/模型变化旧批准拒绝 | QueryBindingReader/新Doris测试 | 审批后形状变化拒绝激活；同查询读行后到目录后验前真实改名返回 422，原 tablet、DDL 与行摘要恢复 |
-| AC06 | 完成读取正常返回；取消/断开不得EMPTY或迟到成功 | G4QueryHttpTests/新Doris测试 | 底层固定 SQL 通过；同请求复用后已完成查询正式取消耗时 65.939–75.329 ms，既有最大 BE 窗口 31.925 ms，源端因果 NO-GO |
+| AC06 | 完成读取正常返回；取消/断开不得EMPTY或迟到成功 | G4QueryHttpTests/新Doris测试 | 平台取消 200、零成功副作用，同一 BE 分片 1 收到用户取消后析构。缺任务级取消事件与 250 ms 内双零，NO-GO |
 | AC07 | 当前activation可提交；同query ABA拒绝 | G4QueryRaceTests | 两个真实同查询 ABA 时序均在原期限内以 409 拒绝，零成功副作用；拒绝当刻 RUNNING |
 | AC08 | 新会话恢复原字节；撤权/到期拒绝且不业务重查 | G4QueryPersistenceTests | 新会话恢复原字节；撤权 403；一次性查询到期后结果/证据均 410，FE 审计业务查询集合未增加 |
-| AC09 | 六态/可信前缀正确；超预算无COMPLETED | G4QueryTests/G4QueryWireTests | 空集、歧义、扇出、真实断开、超宽列及最终提交截止已测；真实第 101 行哨兵仍待验 |
+| AC09 | 六态/可信前缀正确；超预算无COMPLETED | G4QueryTests/G4QueryWireTests | 空集、歧义、扇出、真实断开、超宽列及最终提交截止已测；实体 101 行查询只返回前 100 个可信候选，准确复原已复核 |
 | AC10 | HTTP/UI/MCP相同结果；PG旧字节不变 | G4QueryMcpTests/既有Web测试 | PG 两组历史 manifest/result 与 standard assessment 通过，UI/MCP 待验 |
 | AC11 | 分别读取记录真实窗口；不盖虚假snapshot | 新Doris测试 | S0 受控写入与 S1 UNKNOWN/null 已核验 |
 
@@ -137,3 +137,11 @@ AC04 在途读取后正式轮换凭据版本 1→2、连接修订 2→3，同一
 正式查询 query-48fd26ca6f92465899394df114ff3aa1 使用当前双表绑定、站点过滤和 maxRows 100。实体装载为 101 行，目标保留 3 行。HTTP 200 返回 UNAUTHORIZED，来源 FORBIDDEN，无来源回执。查询时 Q 的三项连接授权均已自然到期。已按 100 个准确复合键恢复，实体 1 行、目标 3 行，两表原行散列均与装载前一致。非作者确认恢复通过，哨兵未获验证。正式取消的新时序仍待具备当前授权的同一主体实测。[哨兵请求、恢复和权限原件](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2-timing/index.json)
 
 补入正常单行 E1 的正式执行、历史结果与证据回读，作为后续装载前件。新取消试验在准确行锁处同步，保留真实核验、事务与驱动。非作者静态同意在有效授权下作有界实测。当前尚无新时序的运行结果。已按零在途收口，旧 14 个与本任务 FE、BE、平台 PG 继续 STOPPED_KEEP，三个本任务易失卷仍由原服务持有。
+
+### 2026-11-19 限定重授及实测
+
+同一 Q、连接及原十八个字段的三项权限重授四小时，旧行与审计保留。单行执行、结果和证据回读全部通过。独立 101 行查询返回 AMBIGUOUS、limited、100 个准确候选和 100 项证据，业务数据为零。准确恢复实体 1 行、目标 3 行，两表原行散列一致。非作者确认本查询哨兵通过。[当次原件及复核](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2-timing/renewed-sentinel-review.json)
+
+首个新时序中，正式取消 HTTP 200，查询终态 CANCELLED。结果、来源回执与成功审计为零，有一条取消审计。测试调度早于源读取的再次治理授权，与已获治理锁的取消事务相遇，业务 SQL 未在 BE 执行。原失败保留。同步已移至正式 MySqlConnector 物理业务命令发出前，源端再次授权、握手和目录前验先完成。[首试原件](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2-timing/overlap-first-review.json)
+
+第二次试验中查询 query-66dfd106112b424b80dc90c5a214eda8 通过真实权限、发布和事务核验。PG 先读见 CANCELLED，随后同一 BE 收到 KILL。分片 0 此前已自然析构，分片 1 收到用户取消、向协调器报告取消错误并析构。全查询上下文于解锁前保守锚点后 43.033 ms 析构，分支上界 304.9061 ms、总耗时 769.7025 ms。无结果、读回执或成功审计，取消审计一条。原门禁缺调度器任务取消事件及 250 ms 内 FE/BE 双零。最后采样为 0/1，后置读回 0/0。独立正常完成对照的统计行在 1529.729 ms 仍存在，2035.838 ms 采样才消失，期间任务时间、CPU 与扫描行数保持不变。非作者维持 AC06 NO-GO。两批压力夹具均按准确键复原。S3、CI、最终 V3 与同包重开仍未运行。[精确查询原件与复核](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2-timing/overlap-command-review.json)

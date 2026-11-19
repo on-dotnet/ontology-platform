@@ -317,7 +317,7 @@ def browser_test(mode, prepared):
             execution.CONTEXT.reset(context)
 
 
-def synthetic_grants(mode, two_tables=False):
+def synthetic_grants(mode, two_tables=False, renewal=False):
     from workflow_m4_query import grant_transaction
     state=json.loads((OUT/('doris-two-table.json' if two_tables else 'runtime-fixture.json')).read_bytes())
     roles=state['subjects']
@@ -340,14 +340,44 @@ def synthetic_grants(mode, two_tables=False):
            'auditor':['mapping.read','mapping.source.validate','mapping.review','mapping.approve'],
            'activator':['mapping.read','mapping.source.validate','mapping.activate']} if mode=='mapping' else {
                'reader':['data.query.execute','data.query.result.read','data.query.evidence.read']}
-    def id_for(subject,permission):
+    def original_id(subject,permission):
         return ('dmq-s2-' if two_tables else 'dmq-s1-')+execution.sha(execution.encoded([state['connectionId'],subject,permission]))[:32]
+    def id_for(subject,permission):
+        return ('renew-20261119-'+original_id(subject,permission)) if renewal else original_id(subject,permission)
     sql,ids=grant_transaction(state,objects,field_refs,
                               [(roles[role],permissions) for role,permissions in perms.items()],id_for,vm.RUN)
     cid=live_stack()['platform-pg']
+    if renewal:
+        vm.demand(mode=='query' and two_tables and len(field_refs)==18 and len(ids)==3,'RENEWAL_18_FIELDS')
+        original_ids=[original_id(roles['reader'],permission) for permission in perms['reader']]
+        def values(items): return ','.join("'"+v.replace("'","''")+"'" for v in items)
+        def snapshot():
+            statement=f"""SELECT json_agg(json_build_object('id',g."Id",'permission',g."Permission",'subject',g."SubjectId",
+                    'connection',g."ConnectionId",'organization',g."OrganizationId",'sites',g."SiteIds",'objects',g."ObjectRefs",'fields',g."FieldRefs",
+                    'expiry',g."ExpiresAtUtc",'revoked',g."RevokedAtUtc",'recordHash',md5(to_jsonb(g)::text),
+                    'audit',a."Id",'issuedAt',a."OccurredAtUtc",'active',g."RevokedAtUtc" IS NULL AND g."ExpiresAtUtc">now(),
+                    'intervalSeconds',extract(epoch from g."ExpiresAtUtc"-a."OccurredAtUtc")) ORDER BY g."Id")
+                FROM governance."MappingAuthorizationGrants" g LEFT JOIN governance.audit_records a ON a."Resource"=g."Id"
+                AND a."Action"='mapping.grant.change' AND a."Outcome"='allowed' AND a."Id"=md5(g."Id")
+                WHERE g."Id" IN ({values([*ids,*original_ids])});"""
+            return json.loads(docker('query-renewal-readback','exec',cid,'psql','-XwqAt','-U','postgres','-d','mapping','-v','ON_ERROR_STOP=1','-c',statement))
+        before=snapshot()
+        prior=[r for r in before if r['id'] in original_ids]
+        def same_scope(row):
+            return (row['subject']==roles['reader'] and row['organization']=='org-demo' and row['sites']==['site-a']
+                    and row['connection']==state['connectionId'] and sorted(row['objects'])==sorted(objects)
+                    and sorted(row['fields'])==sorted(field_refs) and row['permission'] in perms['reader'] and row['audit'])
+        vm.demand(len(prior)==3 and all(not r['active'] and not r['revoked'] and same_scope(r) for r in prior),'RENEWAL_PREVIOUS_SCOPE')
     result=execution.run(['docker','--context','desktop-linux','exec','-i',cid,'psql','-U','postgres','-d','mapping','-v','ON_ERROR_STOP=1','-qAt'],
                          ROOT,task=vm.TASK,run_id=vm.RUN,stage='dmq-'+mode+'-fixture-grants',stdin=sql,input_key=execution.sha(sql),timeout=18)
     vm.demand(result.returncode==0 and result.stdout.decode().strip()==str(len(ids)),'S1_GRANT_INSERT_'+result.receipt['commandId'])
+    if renewal:
+        after=snapshot()
+        current=[r for r in after if r['id'] in ids]
+        vm.demand(len(after)==6 and [r for r in after if r['id'] in original_ids]==prior and len(current)==3
+                  and all(same_scope(r) and r['active'] and r['intervalSeconds']==14400 for r in current),'RENEWAL_AFTER_SCOPE')
+        record(OUT/('q-grant-renewal-'+result.receipt['commandId']+'.json'),dict(taskId=vm.TASK,runId=vm.RUN,status='THREE_CURRENT_FOUR_HOURS',
+               old=prior,new=current,commandId=result.receipt['commandId']))
     print(json.dumps(dict(taskId=vm.TASK,mode=mode,grantCount=len(ids),commandId=result.receipt['commandId'])))
 
 
@@ -593,11 +623,11 @@ def fanout_fixture(action):
 
 
 
-def sentinel_fixture(restore=False):
+def sentinel_fixture(restore=False, renewed=False):
     """一次独立查询哨兵，只写入本次登记的 100 个复合键。"""
     from workflow_doris_s0_fixture import STRESS, STRESS_TABLES, stress_original, tier_capacity
     active = OUT/'s2-sentinel-active.json'
-    done = OUT/'s2-sentinel-101-restored.json'
+    done = OUT/('s2-sentinel-101-renewed-restored.json' if renewed else 's2-sentinel-101-restored.json')
     state = json.loads(INDEX.read_bytes())
     fe = live_stack()['fe']
     vm.demand(not STRESS.exists() and not done.exists(), 'SENTINEL_ONE_CASE')
@@ -835,7 +865,7 @@ def pg_golden(prepared):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('stage',choices=['prepare','render','start','configure','freeze','pg-golden','semantic-batch','s2-activation-shape','s2-overlap-case','overlap-test','s2-graduated-cancel','s2-cancel-case','s2-admission-case','state-fixture','expire-disposable','session-test','revoke-test','aba-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test','ddl-fixture','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
+    parser.add_argument('stage',choices=['prepare','render','start','configure','freeze','pg-golden','semantic-batch','s2-activation-shape','s2-renew-query-grants','s2-renewed-sentinel','s2-overlap-case','overlap-test','s2-graduated-cancel','s2-cancel-case','s2-admission-case','state-fixture','expire-disposable','session-test','revoke-test','aba-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test','ddl-fixture','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
     parser.add_argument('--prepared')
     parser.add_argument('--ddl-action',choices=['arm','rename','restore'])
     parser.add_argument('--query-identity',nargs=3,metavar=('QUERY','KEY','HASH'))
@@ -849,14 +879,21 @@ if __name__=='__main__':
             browser_test(args.stage, args.prepared)
         finally:
             if (OUT/'s2-fanout-active.json').exists(): fanout_fixture('restore')
-    elif args.stage=='s2-doris-sentinel':
-        vm.demand(not (OUT/'s2-sentinel-active.json').exists() and not (OUT/'s2-sentinel-101-restored.json').exists(),'SENTINEL_ONE_CASE')
+    elif args.stage=='s2-renew-query-grants': synthetic_grants('query',True,renewal=True)
+    elif args.stage in ('s2-doris-sentinel','s2-renewed-sentinel'):
+        renewed=args.stage=='s2-renewed-sentinel'
+        original=OUT/'s2-sentinel-101-restored.json'
+        if renewed:
+            reviewed=ROOT/'docs/evidence'/vm.TASK/vm.RUN/'s2-timing'/original.name
+            vm.demand(reviewed.read_bytes()==original.read_bytes() and any(OUT.glob('q-grant-renewal-*.json')),'SENTINEL_RENEWED_PREREQUISITE')
+        done=OUT/'s2-sentinel-101-renewed-restored.json' if renewed else original
+        vm.demand(not (OUT/'s2-sentinel-active.json').exists() and not done.exists(),'SENTINEL_ONE_CASE')
         browser_test('s2-doris-authority-control',args.prepared)
         try:
-            sentinel_fixture()
-            browser_test(args.stage,args.prepared)
+            sentinel_fixture(renewed=renewed)
+            browser_test('s2-doris-sentinel',args.prepared)
         finally:
-            if (OUT/'s2-sentinel-active.json').exists(): sentinel_fixture(restore=True)
+            if (OUT/'s2-sentinel-active.json').exists(): sentinel_fixture(restore=True,renewed=renewed)
     elif args.stage=='s2-overlap-case':
         from workflow_doris_s0_fixture import STRESS, stress_fixture
         vm.demand(not STRESS.exists(),'OVERLAP_FIXTURE_IN_USE')
