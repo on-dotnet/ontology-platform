@@ -20,7 +20,7 @@ namespace OntologyPlatform.QueryTests;
 /// <summary>真实PG、真实票据和治理参与者验证查询提交边界；映射材料校验另由S1真实发布验证。</summary>
 [TestClass]
 [DoNotParallelize]
-public sealed class G4QueryRaceTests
+public sealed partial class G4QueryRaceTests
 {
     /// <summary>通过正式模块的冷作用域确认取消提交观察使用宿主登记的存储日志。</summary>
     [TestMethod]

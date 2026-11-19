@@ -6,6 +6,8 @@ using Npgsql;
 using OntologyPlatform.Modules.Governance;
 using OntologyPlatform.Modules.SemanticQuery;
 
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("OntologyPlatform.QueryTests")]
+
 namespace OntologyPlatform.Api.G4;
 
 /// <summary>已封闭任务栈的单次进程入口。只构造两个模块的数据库工厂，不创建 Web 宿主或后台消费者。</summary>
