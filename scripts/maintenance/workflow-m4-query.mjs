@@ -46,7 +46,7 @@ if (mode === "serve") {
   const build = JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.web_binding()))`], { cwd: root, timeout: 30000, encoding: "utf8" }));
   process.env.PLATFORM_API_ORIGIN = `http://localhost:${port(15441)}`;
   process.env.NEXT_TELEMETRY_DISABLED = "1"; process.env.NODE_ENV = "production";
-  if (!doris) {
+  if (!doris && !oracle) {
     const record = { taskId: task, runId, pid: process.pid, worktree: root, port: port(15442), build,
       processStartedAt: execFileSync("ps", ["-p", String(process.pid), "-o", "lstart="], { encoding: "utf8", env: { ...process.env, LC_ALL: "C" } }).trim(),
       startedAtUtc: new Date().toISOString(), decision: "KEEP", release: "M4 review and safe closeout" };
