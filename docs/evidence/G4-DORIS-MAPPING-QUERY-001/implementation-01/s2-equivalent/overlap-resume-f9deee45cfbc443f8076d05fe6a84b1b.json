@@ -1,0 +1,59 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "prior": {
+    "platform-pg": {
+      "id": "34a947835a8949be5fb34bdc813e87ff812dca1d3381ccea7ce610754448367f",
+      "status": "exited",
+      "capBytes": 805306368,
+      "nanoCpus": 1000000000
+    },
+    "keycloak-test": {
+      "id": "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f",
+      "status": "running",
+      "capBytes": 1073741824,
+      "nanoCpus": 1000000000
+    },
+    "fuseki": {
+      "id": "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04",
+      "status": "running",
+      "capBytes": 2147483648,
+      "nanoCpus": 2000000000
+    },
+    "rustfs": {
+      "id": "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9",
+      "status": "running",
+      "capBytes": 536870912,
+      "nanoCpus": 1000000000
+    },
+    "fe": {
+      "id": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "status": "exited",
+      "capBytes": 4294967296,
+      "nanoCpus": 2000000000
+    },
+    "be": {
+      "id": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+      "status": "exited",
+      "capBytes": 6442450944,
+      "nanoCpus": 2000000000
+    }
+  },
+  "vmBytes": 20964958208,
+  "cpus": 12,
+  "afterReserveBytes": 3516653568,
+  "pgVolume": "ontology-g4-doris-mapping-query-001_platform-data",
+  "status": "SIX_HEALTHY",
+  "after": {
+    "vmBytes": 20964958208,
+    "vmCpus": 12,
+    "containerCapBytes": 15300820992,
+    "containerNanoCpus": 9000000000,
+    "afterReserveBytes": 3516653568,
+    "persistentVolumeBytes": 404168704,
+    "beStorageBytes": 225783808,
+    "hostFreeBytes": 234985385984,
+    "hostPhysicalBytes": 34359738368,
+    "hostMemoryFreePercent": 59
+  }
+}

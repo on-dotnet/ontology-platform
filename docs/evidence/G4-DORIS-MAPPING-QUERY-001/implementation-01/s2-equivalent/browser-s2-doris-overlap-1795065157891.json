@@ -1,0 +1,235 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "s2-doris-overlap",
+  "startedAtUtc": "2026-11-19T05:12:37.891Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "normal_current_authority_before_pressure",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_409",
+      "status": "PASS"
+    },
+    {
+      "name": "formal_route_ready",
+      "status": "PASS"
+    },
+    {
+      "name": "overlap_witness_31",
+      "status": "FAIL"
+    },
+    {
+      "name": "owned_permit_released",
+      "status": "PASS"
+    },
+    {
+      "name": "independent_observer_exited",
+      "status": "FAIL"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 14.885416999999961,
+      "sha256": "0f05d2bd9a2276bc25c0421f83c8f3bc75ab560a1a1b51cb2af9e2569e401da2"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 4.2786660000001575,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.558084000000008,
+      "sha256": "bc2ae10bdac4dcbd31397b5ab0cb2961b30dc582ac9636dab64c3a7257c6b8f4"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.83400000000006,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.419417000000067,
+      "sha256": "931689785b2dedda1436079626f68d12e8637f2b2a81657b29cd588b6bcdc532"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.5676660000001448,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 4.527374999999893,
+      "sha256": "4c445361898b0df77a597747a008d0fb45aaf9c37a47f2fe87232c3e8cf5e2e8"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 2.0246250000000146,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/semantic-queries/query-e4e6794cc3004c1abb44fb8ed9d64124/cancel",
+      "status": 409,
+      "elapsedMs": 178.954291,
+      "code": "query_already_finished",
+      "sha256": "fc2f3db68a484c820ce005e4bb65a0d81b4fe73f0c1b5926b1879687af8fe625"
+    }
+  ],
+  "status": "FAIL",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "s2-doris-overlap",
+      "status": "READY",
+      "pid": 16648,
+      "commandId": "f47f81a51b854e4abe198121c150549d",
+      "snapshotId": "59827f2dbe3c514d0e5dd14c397ef47a99641e5c2f182b69bf8c76b606591bc2",
+      "processStart": "Thu Nov 19 13:12:36 2026"
+    },
+    "web": null
+  },
+  "witnessExit": {
+    "code": 1,
+    "signal": null
+  },
+  "failure": {
+    "phase": "formal_cancel_after_verified_row_wait",
+    "category": "Error",
+    "code": "independent_observer_exited"
+  },
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-19T05:12:44.077Z"
+}

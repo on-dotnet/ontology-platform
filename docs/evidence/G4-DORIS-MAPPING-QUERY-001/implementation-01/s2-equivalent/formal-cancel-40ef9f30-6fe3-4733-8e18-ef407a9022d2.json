@@ -1,0 +1,96 @@
+{
+  "stress": {
+    "attempt": "674488227e6d",
+    "manifestSha256": "761d8717416f9a64b1a41b92cd2d036202a8373045db4cdb5fe45b3439aa2974",
+    "rowsByTable": {
+      "dmq_entity": 4194304,
+      "dmq_target": 3
+    },
+    "purpose": "cancellation_only"
+  },
+  "idempotencyKey": "40ef9f30-6fe3-4733-8e18-ef407a9022d2",
+  "run": "implementation-01",
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+  "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+  "observerControlQueryId": "9844593bbf114908-8295aec26304d641",
+  "feClockControl": {
+    "passed": true,
+    "pgBefore": "2026-11-19 06:10:34.049324+00",
+    "pgAfter": "2026-11-19 06:10:34.057873+00",
+    "audit": {
+      "complete": true,
+      "query": "9844593bbf114908-8295aec26304d641",
+      "state": "EOF",
+      "errorCode": "0",
+      "userCancel": false,
+      "timeout": false,
+      "reader": false,
+      "statementSha256": "220392ee9d68a81b0a2f29405ad5d5d9b35d75579a0195bf818184d1e2772527",
+      "auditInode": "219380",
+      "fixedEntity": false,
+      "isSelect": true,
+      "returnRows": 1,
+      "startUtc": "2026-11-19T06:10:34.050000+00:00",
+      "durationMs": 5,
+      "endUtc": "2026-11-19T06:10:34.055000+00:00",
+      "endExclusiveUpperUtc": "2026-11-19T06:10:34.056000+00:00",
+      "lineSha256": "6c9034ecae296d349d2a70d2967f818e579da754cd8b45ebd2351098910c0bcd",
+      "sqlHash": "bbbc3e0a843760f1fc2c73c872dc7f39"
+    }
+  },
+  "vmClocks": {
+    "be": {
+      "timeNamespace": "time:[4026532831]",
+      "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+      "utcOffset": "+0000"
+    },
+    "fe": {
+      "timeNamespace": "time:[4026532693]",
+      "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+      "utcOffset": "+0000"
+    },
+    "platform-pg": {
+      "timeNamespace": "time:[4026532969]",
+      "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+      "utcOffset": "+0000"
+    }
+  },
+  "loadBefore": {
+    "clock": "2026-11-19T06:10:39.338275+00:00",
+    "serverStarted": "2026-11-19T06:00:07.842787+00:00",
+    "since": null,
+    "commits": 41616,
+    "rollbacks": 3719,
+    "reads": 4859,
+    "hits": 1513658,
+    "queryTableIndexScans": 3256,
+    "queryTableSequentialScans": 575
+  },
+  "profileResourcesBefore": {
+    "fe": {
+      "currentBytes": 1600487424,
+      "peakBytes": 1604120576,
+      "usageUsec": 215457738
+    },
+    "be": {
+      "currentBytes": 1767260160,
+      "peakBytes": 3144036352,
+      "usageUsec": 108737297
+    }
+  },
+  "admissionObservedAt": "2026-11-19T06:10:41.200622+00:00",
+  "lockerPid": 2891,
+  "lockedQueryId": "query-2ad8c0bce64546c3b2bc917ffae9087e",
+  "sourceReadyBeforeCancel": "2026-11-19 06:10:41.424773+00",
+  "waiterPid": 2860,
+  "verifiedWaitPgUtc": "2026-11-19 06:10:41.531153+00",
+  "sourceThread": 535,
+  "feActiveObservedAt": "2026-11-19T06:10:41.553265+00:00",
+  "liveWitness": "registered_log",
+  "unlockTrigger": "FIXED_ACTIVE_FE",
+  "beforeUnlockPgUtc": "2026-11-19 06:10:41.553029+00",
+  "afterUnlockPgUtc": "2026-11-19 06:10:41.5536+00",
+  "queryId": "query-2ad8c0bce64546c3b2bc917ffae9087e",
+  "sourceQueryId": "926a43004813490d-b1bc1257cacb8ab8"
+}

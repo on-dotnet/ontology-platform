@@ -200,7 +200,7 @@ def configure():
 
 
 HOST = OUT/'s1-api-process.json'
-BROWSER = ('s2-doris-authority-control','s2-doris-sentinel','s2-doris-overlap','provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog','s2-doris-mapping','s2-doris-queries','s2-doris-null','s2-doris-cancel','s2-doris-access','s2-doris-fanout','s2-doris-requalify','s2-doris-aba','s2-doris-admission-cancel','s2-doris-cancel-window','s2-doris-states','s2-doris-cardinality','s2-doris-identity','s2-doris-revoke-race','s2-doris-session-race','s2-doris-shape-prepare','s2-doris-shape-reject','s2-doris-shape-recover','s2-doris-cancel-profile','s2-doris-expiry','s2-doris-ddl-race','s2-doris-rotate-race','s2-doris-current-catalog','s2-doris-deadline','s2-doris-short-lock','s2-doris-disconnect','s2-doris-batch-binding')
+BROWSER = ('s3','ui-s1','ui-s3','s2-doris-authority-control','s2-doris-sentinel','s2-doris-overlap','provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog','s2-doris-mapping','s2-doris-queries','s2-doris-null','s2-doris-cancel','s2-doris-access','s2-doris-fanout','s2-doris-requalify','s2-doris-aba','s2-doris-admission-cancel','s2-doris-cancel-window','s2-doris-states','s2-doris-cardinality','s2-doris-identity','s2-doris-revoke-race','s2-doris-session-race','s2-doris-shape-prepare','s2-doris-shape-reject','s2-doris-shape-recover','s2-doris-cancel-profile','s2-doris-expiry','s2-doris-ddl-race','s2-doris-rotate-race','s2-doris-current-catalog','s2-doris-deadline','s2-doris-short-lock','s2-doris-disconnect','s2-doris-batch-binding')
 
 
 def runtime_binding():
@@ -214,6 +214,20 @@ def runtime_binding():
               and vm.host('ps','-p',pid,'-o','lstart=')==row['processStart']
               and vm.host('ps','-p',pid,'-o','command=')==snapshot['environment']['dotnet']+' '+str(dll),'S1_HOST_BINDING')
     return row
+
+
+def web_binding():
+    from workflow_m4_query import web_binding as bound_web
+    return bound_web(vm.TASK,vm.RUN)
+
+
+def s3_web_check(stage, prepared):
+    from workflow_m4_query import web_check
+    path=execution.ordinary(Path(prepared).absolute())
+    vm.demand(path.is_relative_to(ROOT/'artifacts/workflow'/vm.TASK/'environment'),'S3_PREPARE_PATH')
+    dep=json.loads(path.read_bytes())
+    vm.demand((dep['taskId'],dep['worktree'],dep['status'])==(vm.TASK,str(ROOT),'DEPENDENCIES_READY'),'S3_ENVIRONMENT')
+    return web_check(stage,task=vm.TASK,run_id=vm.RUN,env=dep['environment'],node=dep['node'])
 
 
 def live_stack():
@@ -238,11 +252,14 @@ def browser_test(mode, prepared):
     snapshot=freeze_api()
     dll=ROOT/snapshot['directory']/'OntologyPlatform.Api.dll'
     vm.demand(snapshot['environment']['dotnet']==dep['dotnet'],'S1_HOST_RUNTIME')
-    with socket.socket() as check: check.bind(('127.0.0.1',15641))
+    with socket.socket() as check:
+        check.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+        check.bind(('127.0.0.1',15641))
     identity=json.loads((RUNTIME/'runtime.json').read_bytes())
     context=execution.CONTEXT.set(dict(task=vm.TASK,run_id=vm.RUN))
     exceeded=threading.Event()
     finished=threading.Event()
+    web_service=None
     env=dict(PATH=os.environ['PATH'],ASPNETCORE_ENVIRONMENT='Development',ASPNETCORE_CONTENTROOT=str(RUNTIME/'api'),
              G4__SourceCaPath=str(DIRECTORY/'tls/ca.pem'),ASPNETCORE_URLS='http://127.0.0.1:15641',DOTNET_GCHeapHardLimit='0x18000000',DOTNET_CLI_TELEMETRY_OPTOUT='1')
     env['Logging__LogLevel__OntologyPlatform.Modules.SemanticQuery.G4QueryExecution']='Debug' if mode in ('s2-doris-cancel-profile','s2-doris-cancel','s2-doris-overlap') else 'Information'
@@ -287,9 +304,29 @@ def browser_test(mode, prepared):
         record(HOST,row)
         service.ready()
         runtime_binding()
+        if mode.startswith('ui-'):
+            web_binding()
+            with socket.socket() as check:
+                check.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+                check.bind(('127.0.0.1',15642))
+            web_service=host_service([dep['node'],'scripts/maintenance/workflow-m4-query.mjs','--task',vm.TASK,
+                                      '--run-id',vm.RUN,'--mode','serve'],{'PATH':os.environ['PATH']},ROOT,vm.TASK,exceeded)
+            row['webPid']=web_service.process.pid
+            row['webCommandId']=web_service.ident
+            row['webProcessStart']=vm.host('ps','-p',str(web_service.process.pid),'-o','lstart=')
+            row['webBuild']=web_binding()
+            record(evidence,row)
+            deadline=time.monotonic()+25
+            while time.monotonic()<deadline:
+                vm.demand(web_service.process.poll() is None and not exceeded.is_set(),'S3_WEB_EXIT_'+web_service.ident)
+                try:
+                    with socket.create_connection(('127.0.0.1',15642),timeout=.5): break
+                except OSError: time.sleep(.1)
+            else: raise ValueError('S3_WEB_READINESS')
+            web_service.ready()
         # 浏览器实际消费的脚本与程序集进入输入指纹，重验保留前次失败且可区分修正。
-        runner_paths = [Path(__file__), ROOT/'scripts/maintenance/workflow-m4-query.mjs', ROOT/'scripts/maintenance/workflow_doris_s0_fixture.py',
-                        ROOT/'scripts/maintenance/workflow_doris_mapping_query.py', ROOT/'scripts/maintenance/doris_query_cancel_witness.py']
+        from workflow_doris_mapping_query import BROWSER_SOURCES
+        runner_paths = [ROOT/name for name in BROWSER_SOURCES]
         components = [snapshot['snapshotId'], mode, [execution.sha(path.read_bytes()) for path in runner_paths]]
         if STRESS.exists(): components.append(execution.sha(STRESS.read_bytes()))
         inputs = execution.sha(execution.encoded(components))
@@ -298,13 +335,22 @@ def browser_test(mode, prepared):
         print(report.stdout.decode().strip())
         row['browserCommand']=report.receipt['commandId']
     finally:
+        # 反向代理可持有 Web 长连接，两端均收到 TERM 后再等待各自退出。
         finished.set()
         watcher.join(6)
         if service.process.poll() is None: os.killpg(pid,signal.SIGTERM)
+        if web_service is not None and web_service.process.poll() is None:
+            os.killpg(web_service.process.pid,signal.SIGTERM)
         try: service.process.wait(timeout=12)
         finally:
             for thread in service.reader_threads: thread.join(2)
             service.finish()
+            if web_service is not None:
+                try: web_service.process.wait(timeout=15)
+                finally:
+                    for thread in web_service.reader_threads: thread.join(2)
+                    web_service.finish()
+                    row['webExitCode']=web_service.process.poll()
             # 只保存固定格式聚合数值与本任务 queryId，不导出任何其他应用日志。
             matches = re.findall(rb'DorisLeaseObservation query=(query-[0-9a-f]{32}) probes=(\d+) elapsedMs=([0-9.]+) maxReadMs=([0-9.]+) outcome=(closed|lease_changed|observation_failed)', bytes(service.out)+bytes(service.err))
             timings = re.findall(rb'QueryCancelPhase query=(query-[0-9a-f]{32}) phase=(owner|catalog|artifacts|graphs|verifiedBatch|sourceBinding|graphIndex|root|session|grants|transaction) elapsedMs=([0-9.]+)', bytes(service.out)+bytes(service.err))
@@ -427,7 +473,7 @@ def expire_disposable_query(query_id,key,result_hash):
     print(json.dumps(dict(queryId=query_id,commandId=result.receipt['commandId'],expires='PAST')))
 
 
-def permission_case(action):
+def permission_case(action, renewed=False):
     import re
     verb,kind=action.split('-')
     permission={'execute':'data.query.execute','result':'data.query.result.read','evidence':'data.query.evidence.read'}[kind]
@@ -437,6 +483,9 @@ def permission_case(action):
               and re.fullmatch('[a-f0-9-]{32,36}',subject) and re.fullmatch('[a-f0-9]{32}',state['connectionId']),'S2_GRANT_IDENTITY')
     digest=execution.sha(execution.encoded([state['connectionId'],subject,permission]))[:32]
     ids=[f'dmq-s1-{digest}',f'dmq-s2-{digest}']
+    if renewed:
+        vm.demand(kind=='result' and runtime_binding()['stage']=='ui-s1','S3_REVOKE_SCOPE')
+        ids=['renew-20261119-'+ids[1]]
     pred='"Id" IN ('+','.join("'"+id+"'" for id in ids)+') AND "SubjectId"='+repr(subject)+' AND "Permission"='+repr(permission)
     active=OUT/('s2-grant-active-'+kind+'.json')
     cid=live_stack()['platform-pg']
@@ -458,7 +507,7 @@ def permission_case(action):
     query=f"""BEGIN; SET LOCAL statement_timeout='3s';
       DO $$ DECLARE total int; BEGIN
         UPDATE governance."MappingAuthorizationGrants" SET "RevokedAtUtc"={change} WHERE {pred} AND {eligible} AND "ExpiresAtUtc">now();
-        GET DIAGNOSTICS total=ROW_COUNT; IF total<>2 THEN RAISE EXCEPTION 'fixture-grant-count'; END IF;
+        GET DIAGNOSTICS total=ROW_COUNT; IF total<>{len(ids)} THEN RAISE EXCEPTION 'fixture-grant-count'; END IF;
       END $$;
       INSERT INTO governance.audit_records ("Id","OccurredAtUtc","Actor","Action","Resource","Outcome","TraceId","CorrelationId","OrganizationId","ScopeSiteIds","SiteId")
         SELECT md5("Id"||clock_timestamp()::text),now(),'synthetic-query-fixture','mapping.grant.change',"Id",'allowed','dmq-permission','dmq-permission','org-demo',ARRAY['site-a'],NULL
@@ -472,7 +521,7 @@ def permission_case(action):
         record(OUT/('s2-grant-restored-'+kind+'-'+result.receipt['commandId']+'.json'),row)
         active.unlink()
     else: record(active,row)
-    print(json.dumps(dict(action=action,count=2,commandId=result.receipt['commandId'])))
+    print(json.dumps(dict(action=action,count=len(ids),commandId=result.receipt['commandId'])))
 
 
 def relation_fixture(restore=False):
@@ -822,6 +871,45 @@ def runtime_race_test(case):
     print(json.dumps(summary))
 
 
+S3_COMPAT_CASES=[
+    ('connections','(FullyQualifiedName~.PgAdapterTests.&FullyQualifiedName!~RealFixturePreservesAuthorizedMetadata)|FullyQualifiedName~.DorisAdapterTests.|FullyQualifiedName~.SourceDispatcherTests.|FullyQualifiedName~.G4QuerySourceTests.',20),
+    ('connections','FullyQualifiedName~.DorisFixtureSecurityTests.BadAuthenticationAndCaCannotReadCatalog|FullyQualifiedName~.DorisFixtureSecurityTests.WrongSanIsRejectedByActualHandshake|FullyQualifiedName~.DorisMappingQueryTests.RealDriverReadsFixedSource',4),
+    ('query','FullyQualifiedName~.G4QueryTests.',12),
+    ('wire','FullyQualifiedName~.G4QueryWireTests.',6)]
+
+
+def s3_compatibility(prepared):
+    """在已就绪的本任务构建和源上复用 M2/M4 的准确测试；不启动历史栈。"""
+    import tempfile
+    from workflow_m2_evidence import mtp
+    path=execution.ordinary(Path(prepared).absolute())
+    vm.demand(path.is_relative_to(ROOT/'artifacts/workflow'/vm.TASK/'environment'),'S3_COMPAT_ENV_PATH')
+    dep=json.loads(path.read_bytes())
+    vm.demand((dep['taskId'],dep['worktree'],dep['status'])==(vm.TASK,str(ROOT),'DEPENDENCIES_READY'),'S3_COMPAT_PREPARE')
+    live_stack()
+    # 原 M2 测试只认识既有目录布局，三个精确私有链接在用例结束时随专用目录关闭。
+    with tempfile.TemporaryDirectory(prefix='s3-m2-',dir=HOME_DIR) as temporary:
+        layout=Path(temporary)
+        (layout/'tls').mkdir(mode=0o700)
+        (layout/'private').mkdir(mode=0o700)
+        for link,source in [('private/reader.pass',DIRECTORY/'reader.pass'),('tls/ca.pem',DIRECTORY/'tls/ca.pem'),
+                            ('tls/wrong-ca.pem',HOME_DIR/'platform-pg/server.crt')]:
+            (layout/link).symlink_to(execution.ordinary(source))
+        for target,expression,minimum in S3_COMPAT_CASES:
+            binding=build.validate(target,vm.TASK)
+            project=Path(build.TARGETS[target])
+            dll=ROOT/project.parent/'bin/Debug/net10.0'/(project.stem+'.dll')
+            env=dict(dep['environment'],G4_DORIS_TEST_RUNTIME=str(layout),DMQ_S0_SOURCE=str(DIRECTORY))
+            result=execution.run([dep['dotnet'],str(dll),'--filter',expression,'--minimum-expected-tests',str(minimum),'--no-ansi',
+                                  '--progress','off','--results-directory',str(OUT/'s3-compat-results')],ROOT,task=vm.TASK,run_id=vm.RUN,
+                                 stage='dmq-s3-compat-'+target,environment=env,input_key=execution.sha(execution.encoded(binding)),timeout=45)
+            count=mtp(result.stdout+result.stderr,minimum) if result.returncode==0 else 0
+            row=dict(target=target,filter=expression,input=binding,commandId=result.receipt['commandId'],exitCode=result.returncode,passed=count)
+            record(OUT/('s3-compat-'+row['commandId']+'.json'),row)
+            vm.demand(count>=minimum,'S3_COMPAT_'+row['commandId'])
+            print(json.dumps(row))
+
+
 def semantic_batch_regression(prepared):
     """复用本任务当前六项准确设施与已构建 MTP，只运行新请求内批次的四个反例及正例。"""
     from workflow_m2_evidence import mtp
@@ -865,14 +953,20 @@ def pg_golden(prepared):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('stage',choices=['prepare','render','start','configure','freeze','pg-golden','semantic-batch','s2-activation-shape','s2-renew-query-grants','s2-renewed-sentinel','s2-overlap-case','overlap-test','s2-graduated-cancel','s2-cancel-case','s2-admission-case','state-fixture','expire-disposable','session-test','revoke-test','aba-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test','ddl-fixture','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
+    parser.add_argument('stage',choices=['s3-compat','s3-web-typecheck','s3-web-lint','s3-web-unit','s3-web-build','prepare','render','start','configure','freeze','pg-golden','semantic-batch','s2-activation-shape','s2-renew-query-grants','s2-renewed-sentinel','s2-overlap-case','overlap-test','s2-graduated-cancel','s2-cancel-case','s2-admission-case','state-fixture','expire-disposable','session-test','revoke-test','aba-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test','ddl-fixture','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
     parser.add_argument('--prepared')
+    parser.add_argument('--profile-evidence',action='store_true')
+    parser.add_argument('--tied-event',action='store_true')
     parser.add_argument('--ddl-action',choices=['arm','rename','restore'])
     parser.add_argument('--query-identity',nargs=3,metavar=('QUERY','KEY','HASH'))
     parser.add_argument('--permission',choices=[f'{v}-{k}' for v in ('revoke','restore') for k in ('execute','result','evidence')])
     parser.add_argument('--fanout', choices=['ten','eleven','restore'])
     parser.add_argument('--state-operation',choices=['seed','deny','allow','restore'])
     args=parser.parse_args()
+    vm.demand(not args.tied_event or args.profile_evidence,'TIED_EVENTS_REQUIRE_PROFILE')
+    vm.demand(not args.profile_evidence or args.stage=='s2-overlap-case','PROFILE_STAGE_SCOPE')
+    if args.stage.startswith('s3-web-'):
+        raise SystemExit(s3_web_check(args.stage.removeprefix('s3-web-'),args.prepared))
     if args.stage == 's2-doris-fanout':
         vm.demand(not (OUT/'s2-fanout-active.json').exists(), 'FANOUT_ALREADY_ACTIVE')
         try:
@@ -899,10 +993,20 @@ if __name__=='__main__':
         vm.demand(not STRESS.exists(),'OVERLAP_FIXTURE_IN_USE')
         browser_test('s2-doris-authority-control',args.prepared)
         try:
-            stress_fixture(platform=True,entity_rows=4194304)
+            stress_fixture(platform=True,entity_rows=4194304,tied_event=args.tied_event)
+            if args.profile_evidence:
+                from doris_query_profile_witness import reference
+                reference(minimum_first_fragment_ms=50 if args.tied_event else None)
             browser_test('s2-doris-overlap',args.prepared)
         finally:
-            if STRESS.exists(): stress_fixture(restore=True,platform=True)
+            if STRESS.exists():
+                try:
+                    if args.profile_evidence:
+                        from doris_query_profile_witness import recover_window
+                        recover_window(OUT,json.loads(INDEX.read_bytes())['services']['fe']['id'],
+                                       json.loads(STRESS.read_bytes())['attempt'])
+                finally:
+                    stress_fixture(restore=True,platform=True)
     elif args.stage=='expire-disposable': expire_disposable_query(*args.query_identity)
     elif args.stage=='state-fixture': scoped_state_fixture(args.state_operation)
     elif args.stage in ('s2-doris-states','s2-doris-cardinality'):
@@ -925,6 +1029,7 @@ if __name__=='__main__':
         try: browser_test(args.stage,args.prepared)
         finally:
             if (OUT/'s2-ddl-race-active.json').exists(): ddl_race_fixture('restore')
+    elif args.stage=='s3-compat': s3_compatibility(args.prepared)
     elif args.stage in BROWSER: browser_test(args.stage,args.prepared)
     elif args.stage in ('s2-boundary','s2-restore'): relation_fixture(args.stage=='s2-restore')
     elif args.stage in ('aba-test','revoke-test','session-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test'): runtime_race_test(args.stage.removesuffix('-test'))

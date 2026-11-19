@@ -1,0 +1,219 @@
+{
+  "stress": {
+    "attempt": "ce0355846be2",
+    "manifestSha256": "7794b0cc97580db4ca4acb550bc304729eb6aac4400a87a317d997a56c2719c8",
+    "rowsByTable": {
+      "dmq_entity": 4194304,
+      "dmq_target": 3
+    },
+    "purpose": "cancellation_only"
+  },
+  "idempotencyKey": "b676a09b-ac12-4bcd-b764-62fc458d93f3",
+  "run": "implementation-01",
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+  "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+  "observerControlQueryId": "84174cd89e3547cd-bde7528e817ceb4c",
+  "feClockControl": {
+    "passed": true,
+    "pgBefore": "2026-11-19 06:21:12.856172+00",
+    "pgAfter": "2026-11-19 06:21:12.865204+00",
+    "audit": {
+      "complete": true,
+      "query": "84174cd89e3547cd-bde7528e817ceb4c",
+      "state": "EOF",
+      "errorCode": "0",
+      "userCancel": false,
+      "timeout": false,
+      "reader": false,
+      "statementSha256": "220392ee9d68a81b0a2f29405ad5d5d9b35d75579a0195bf818184d1e2772527",
+      "auditInode": "219380",
+      "fixedEntity": false,
+      "isSelect": true,
+      "returnRows": 1,
+      "startUtc": "2026-11-19T06:21:12.857000+00:00",
+      "durationMs": 5,
+      "endUtc": "2026-11-19T06:21:12.862000+00:00",
+      "endExclusiveUpperUtc": "2026-11-19T06:21:12.863000+00:00",
+      "lineSha256": "93b795db3929f8af7be933be276b220a088d320e612ced81657e46aded7ab7d6",
+      "sqlHash": "bbbc3e0a843760f1fc2c73c872dc7f39"
+    }
+  },
+  "vmClocks": {
+    "be": {
+      "timeNamespace": "time:[4026532831]",
+      "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+      "utcOffset": "+0000"
+    },
+    "fe": {
+      "timeNamespace": "time:[4026532693]",
+      "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+      "utcOffset": "+0000"
+    },
+    "platform-pg": {
+      "timeNamespace": "time:[4026532969]",
+      "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+      "utcOffset": "+0000"
+    }
+  },
+  "nativeStart": {
+    "inode": 219836,
+    "endOffset": 30082032,
+    "fileSize": 30082039,
+    "trailingBytes": 7,
+    "trailingSha256": "1093115897879aa3ad9511a1dc2850929cfb60ba45ec741605f69f5d20203472"
+  },
+  "loadBefore": {
+    "clock": "2026-11-19T06:21:19.879314+00:00",
+    "serverStarted": "2026-11-19T06:00:07.842787+00:00",
+    "since": null,
+    "commits": 43856,
+    "rollbacks": 3983,
+    "reads": 4886,
+    "hits": 1606288,
+    "queryTableIndexScans": 4224,
+    "queryTableSequentialScans": 603
+  },
+  "profileResourcesBefore": {
+    "fe": {
+      "currentBytes": 1623650304,
+      "peakBytes": 1629040640,
+      "usageUsec": 395174020
+    },
+    "be": {
+      "currentBytes": 2195349504,
+      "peakBytes": 3399127040,
+      "usageUsec": 220345750
+    }
+  },
+  "admissionObservedAt": "2026-11-19T06:21:21.721081+00:00",
+  "lockerPid": 5816,
+  "lockedQueryId": "query-a13eb0e1edcf4dbf9867d6bd4ebbd95d",
+  "sourceReadyBeforeCancel": "2026-11-19 06:21:21.918068+00",
+  "waiterPid": 5792,
+  "verifiedWaitPgUtc": "2026-11-19 06:21:22.024324+00",
+  "sourceThread": 1112,
+  "feActiveObservedAt": "2026-11-19T06:21:22.044854+00:00",
+  "liveWitness": "registered_log",
+  "unlockTrigger": "FIXED_ACTIVE_FE",
+  "beforeUnlockPgUtc": "2026-11-19 06:21:22.044829+00",
+  "afterUnlockPgUtc": "2026-11-19 06:21:22.045426+00",
+  "queryId": "query-a13eb0e1edcf4dbf9867d6bd4ebbd95d",
+  "sourceQueryId": "fb1b9e2a46114934-9bd8772728eccf1e",
+  "platformStates": [
+    {
+      "query": "query-a13eb0e1edcf4dbf9867d6bd4ebbd95d",
+      "state": "RUNNING",
+      "statement": "2026-11-19T06:21:22.046554+00:00",
+      "isolation": "read committed",
+      "observed": "2026-11-19T06:21:22.046681+00:00"
+    },
+    {
+      "query": "query-a13eb0e1edcf4dbf9867d6bd4ebbd95d",
+      "state": "RUNNING",
+      "statement": "2026-11-19T06:21:22.052228+00:00",
+      "isolation": "read committed",
+      "observed": "2026-11-19T06:21:22.052351+00:00"
+    },
+    {
+      "query": "query-a13eb0e1edcf4dbf9867d6bd4ebbd95d",
+      "state": "CANCELLED",
+      "statement": "2026-11-19T06:21:22.059079+00:00",
+      "isolation": "read committed",
+      "observed": "2026-11-19T06:21:22.059156+00:00"
+    }
+  ],
+  "cancelVisiblePgUtc": "2026-11-19T06:21:22.059156+00:00",
+  "terminal": "CANCELLED",
+  "terminalObservedAt": "2026-11-19T06:21:22.059871+00:00",
+  "sourceCounts": "0\t1",
+  "persisted": {
+    "bytes": 0,
+    "resultHash": null,
+    "resultSize": 0,
+    "readReceipts": 0,
+    "completedAtUtc": "2026-11-19T06:21:22.046684+00:00",
+    "cancelRequested": true
+  },
+  "successfulAuditCount": 0,
+  "cancelAuditCount": 1,
+  "loadAfter": {
+    "clock": "2026-11-19T06:21:22.071363+00:00",
+    "serverStarted": "2026-11-19T06:00:07.842787+00:00",
+    "since": null,
+    "commits": 44088,
+    "rollbacks": 3998,
+    "reads": 4886,
+    "hits": 1608836,
+    "queryTableIndexScans": 4425,
+    "queryTableSequentialScans": 604
+  },
+  "feInactiveUpperMs": 34.370667,
+  "sourceCountsObservedAt": "2026-11-19T06:21:22.296716+00:00",
+  "dualZeroUpperMs": 251.839708,
+  "beEvents": [
+    {
+      "kind": "registered",
+      "beUtc": "20261119 06:21:22.036715"
+    },
+    {
+      "kind": "cancel_arrived",
+      "beUtc": "20261119 06:21:22.069563"
+    },
+    {
+      "kind": "task_cancelled",
+      "beUtc": "20261119 06:21:22.069694"
+    },
+    {
+      "kind": "task_cancelled",
+      "beUtc": "20261119 06:21:22.069762"
+    },
+    {
+      "kind": "task_cancelled",
+      "beUtc": "20261119 06:21:22.070015"
+    },
+    {
+      "kind": "fragment_end",
+      "beUtc": "20261119 06:21:22.070417"
+    },
+    {
+      "kind": "fragment_end",
+      "beUtc": "20261119 06:21:22.070418"
+    },
+    {
+      "kind": "context_end",
+      "beUtc": "20261119 06:21:22.070605"
+    }
+  ],
+  "cancelVisibleBeforeBeKilled": true,
+  "activeBeforeUnlock": true,
+  "cleanupUpperMs": 25.776,
+  "pipelineStreamIssues": [],
+  "equivalent": {
+    "status": "NO_GO",
+    "checks": {
+      "clockContinuity": true,
+      "fullActivePopulation": true,
+      "platformBeforeSource": true,
+      "allLiveInstancesCancelled": true,
+      "allTasksCausallyClosed": false,
+      "allFragmentsAccounted": true,
+      "endOfExecution": true,
+      "feUserCancelInWindow": true
+    },
+    "pipelineZeroUpperMs": 64.52009,
+    "sha256": "2f4df279fd3676963aa2312c705e855bcb0fe89307901db5a51d2109a05e20f3"
+  },
+  "profileResourcesAfter": {
+    "fe": {
+      "currentBytes": 1625620480,
+      "peakBytes": 1631936512,
+      "usageUsec": 398960694
+    },
+    "be": {
+      "currentBytes": 2181779456,
+      "peakBytes": 3399127040,
+      "usageUsec": 221704659
+    }
+  }
+}

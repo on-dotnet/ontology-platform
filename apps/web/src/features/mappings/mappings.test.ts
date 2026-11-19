@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { supportsMappingSource } from "./editor";
 import { createMappingsClient, MappingApiError } from "./api";
 import { parseDefinition, proposalRequest, adoptCandidates } from "./model";
 import type * as G4 from "../../lib/api/g4-generated";
@@ -6,6 +7,17 @@ import type * as G4 from "../../lib/api/g4-generated";
 const definition = { entities: [{ id: "entity" }], properties: [], relations: [], identitySpecs: [], temporalSpecs: [], conversions: [], unitSpecs: [] };
 /** 这里只测试浏览器输入与传输边界，完整语义由真实后端验收。 */
 describe("人工映射输入", () => {
+  it("只有已启用的 PostgreSQL 与 Doris 可作映射来源", () => {
+    const connection = (type: G4.ConnectionConfig["type"], state: string) =>
+      ({ config: { type } as G4.ConnectionConfig, state });
+    for (const type of ["POSTGRESQL", "DORIS"] as const) {
+      expect(supportsMappingSource(connection(type, "ACTIVE"))).toBe(true);
+      expect(supportsMappingSource(connection(type, "DISABLED"))).toBe(false);
+    }
+    for (const type of ["ORACLE", "TDENGINE", "WEB_API"] as const) {
+      expect(supportsMappingSource(connection(type, "ACTIVE"))).toBe(false);
+    }
+  });
   it("拒绝重复键而不是静默用最后一个值", () => {
     expect(() => parseDefinition(JSON.stringify(definition).replace('"id":"entity"', '"id":"one","id":"two"'))).toThrow("重复");
     expect(() => parseDefinition(JSON.stringify(definition).replace('"id":"entity"', '"id":"one","\\u0069d":"two"'))).toThrow("重复");

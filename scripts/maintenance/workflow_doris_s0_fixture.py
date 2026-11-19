@@ -52,7 +52,7 @@ def sync_directory(path):
 
 def record(path, state):
     pending = path.with_suffix('.pending')
-    durable = path == STRESS or path.name.startswith(('s0-stress-fixture-', 's2-sentinel-'))
+    durable = path == STRESS or path.name.startswith(('s0-stress-fixture-', 's2-sentinel-', 'overlap-profile-window-'))
     with pending.open('w') as out:
         out.write(json.dumps(state,indent=2)+'\n')
         if durable:
@@ -498,8 +498,9 @@ def tier_capacity(state):
                 hostFreeBytes=host_disk,hostPhysicalBytes=host_memory,hostMemoryFreePercent=host_pressure)
 
 
-def stress_fixture(restore=False, platform=False, batches=1, entity_rows=None):
+def stress_fixture(restore=False, platform=False, batches=1, entity_rows=None, tied_event=False):
     """在唯一台账保护下临时扩充这两张合成表；与正式一百行门禁互斥。"""
+    vm.demand(not tied_event or (platform and batches==1 and entity_rows==4194304 and not restore),'TIED_FIXTURE_SCOPE')
     vm.demand(batches in (1,8) and (batches==1 or platform),'STRESS_BATCH_BOUNDARY')
     vm.demand(entity_rows is None or (entity_rows in ENTITY_TIERS and platform and batches==1),'STRESS_TIER_SCOPE')
     state = json.loads(INDEX.read_bytes())
@@ -522,6 +523,7 @@ def stress_fixture(restore=False, platform=False, batches=1, entity_rows=None):
         attempt = secrets.token_hex(6)
         manifest = dict(attempt=attempt,prefix='DQ'+attempt,run=vm.RUN,source=state['services'],status='INTENT',
                         beforeResources=resources,tables={},purpose='cancellation_only')
+        if tied_event: manifest['temporaryEntityEventAt']='2026-11-17 12:00:00.123456'
         if entity_rows is not None:
             manifest.update(entityTier=entity_rows,tierCapacity=tier_capacity(state))
         for table,key,original in STRESS_TABLES:
@@ -562,6 +564,8 @@ def stress_fixture(restore=False, platform=False, batches=1, entity_rows=None):
         else:
             payload = "1.00,7.20,'K'" if key=='entity_id' else '1.000'
             event = "CONCAT('2026-11-17 12:00:00.',LPAD(CAST(MOD(number*8191,1000000) AS STRING),6,'0'))"
+            if tied_event and table=='dmq_entity':
+                event="'2026-11-17 12:00:00.123456'"
             size = 65536 if tier else (count if batches == 1 else 8192)
             entry['batches'] = []
             for offset in range(0, count, size):

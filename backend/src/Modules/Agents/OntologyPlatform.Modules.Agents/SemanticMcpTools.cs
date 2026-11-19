@@ -46,7 +46,13 @@ public sealed class SemanticMcpTools
                     budget => CallG4Async(actor, sessionReference, name, arguments, budget), token);
                 // 文本与结构化内容只解码同一组规范字节。
                 var text = delivery.ResultBytes is not null ? System.Text.Encoding.UTF8.GetString(delivery.ResultBytes) : JsonSerializer.Serialize(delivery.View, G4QueryJson.Options);
-                return new CallToolResult { StructuredContent = JsonSerializer.Deserialize<JsonElement>(text), Content = [new TextContentBlock { Text = text }] };
+                // 正式网关保留六态业务结果，MCP 对整次无权限调用只返回固定拒绝文案。
+                var structured = JsonSerializer.Deserialize<JsonElement>(text);
+                if (structured.TryGetProperty("status", out var status) && status.ValueEquals("UNAUTHORIZED"))
+                {
+                    throw new SemanticOperationException(403, "query_forbidden");
+                }
+                return new CallToolResult { StructuredContent = structured, Content = [new TextContentBlock { Text = text }] };
             }
             // 能力名与版本只来自服务器白名单，调用方不能注入发布或任意查询工具。
             var capability = gateway.GetCapabilities().SingleOrDefault(value => value.Id == name && Allowed(value.Id))

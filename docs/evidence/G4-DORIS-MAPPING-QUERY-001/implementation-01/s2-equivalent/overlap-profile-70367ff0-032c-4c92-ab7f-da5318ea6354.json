@@ -1,0 +1,95 @@
+{
+  "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+  "state": "OK",
+  "bytes": 44022,
+  "profileSha256": "b96ecd5f8ccf78b1bc85b43dbb4ca3e3adfbfa479252c34b0eba20303f08126c",
+  "tasks": [
+    {
+      "fragment": 0,
+      "pipeline": 0,
+      "task": 0,
+      "operators": {
+        "MATERIALIZATION_OPERATOR": {
+          "rows": 101
+        },
+        "EXCHANGE_OPERATOR": {
+          "rows": 101
+        }
+      },
+      "planOperators": [
+        "RESULT_SINK_OPERATOR",
+        "MATERIALIZATION_OPERATOR",
+        "EXCHANGE_OPERATOR"
+      ],
+      "planNodes": [
+        {
+          "name": "RESULT_SINK_OPERATOR",
+          "nodeId": 2147483647
+        },
+        {
+          "name": "MATERIALIZATION_OPERATOR",
+          "nodeId": 3
+        },
+        {
+          "name": "EXCHANGE_OPERATOR",
+          "nodeId": 2
+        }
+      ],
+      "state": "FINALIZED",
+      "wakeEarly": 0
+    },
+    {
+      "fragment": 1,
+      "pipeline": 0,
+      "task": 0,
+      "operators": {
+        "LOCAL_MERGE_SORT_SOURCE_OPERATOR": {
+          "rows": 101
+        }
+      },
+      "planOperators": [
+        "DATA_STREAM_SINK_OPERATOR",
+        "LOCAL_MERGE_SORT_SOURCE_OPERATOR"
+      ],
+      "planNodes": [
+        {
+          "name": "DATA_STREAM_SINK_OPERATOR",
+          "nodeId": 2
+        },
+        {
+          "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+          "nodeId": 1
+        }
+      ],
+      "state": "FINALIZED",
+      "wakeEarly": 0
+    },
+    {
+      "fragment": 1,
+      "pipeline": 1,
+      "task": 1,
+      "operators": {
+        "OLAP_SCAN_OPERATOR": {
+          "rows": 129722,
+          "scanEos": true
+        }
+      },
+      "planOperators": [
+        "SORT_SINK_OPERATOR",
+        "OLAP_SCAN_OPERATOR"
+      ],
+      "planNodes": [
+        {
+          "name": "SORT_SINK_OPERATOR",
+          "nodeId": 1
+        },
+        {
+          "name": "OLAP_SCAN_OPERATOR",
+          "nodeId": 0
+        }
+      ],
+      "state": "FINALIZED",
+      "wakeEarly": 0
+    }
+  ]
+}

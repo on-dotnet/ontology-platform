@@ -1,0 +1,967 @@
+{
+  "status": "NO_GO",
+  "checks": {
+    "clockContinuity": true,
+    "fullActivePopulation": true,
+    "platformBeforeSource": true,
+    "allLiveInstancesCancelled": true,
+    "allTasksCausallyClosed": false,
+    "allFragmentsAccounted": true,
+    "endOfExecution": true,
+    "feUserCancelInWindow": true
+  },
+  "anchorNs": 1795065508533255000,
+  "feAudit": {
+    "complete": true,
+    "query": "5d120076dc124651-99c14320eb5fd255",
+    "state": "ERR",
+    "errorCode": "1105",
+    "userCancel": true,
+    "timeout": false,
+    "reader": true,
+    "statementSha256": "779405d77852bb511c189d4b0a404932b51eec629a56ca006debcf4a051ef564",
+    "auditInode": "219380",
+    "fixedEntity": true,
+    "isSelect": true,
+    "returnRows": 0,
+    "startUtc": "2026-11-19T05:18:28.515000+00:00",
+    "durationMs": 46,
+    "endUtc": "2026-11-19T05:18:28.561000+00:00",
+    "endExclusiveUpperUtc": "2026-11-19T05:18:28.562000+00:00",
+    "lineSha256": "e89d491b37ba4eee6f288d83b1d99cc96475d5d18fdb80ac78babfeef499dceb",
+    "sqlHash": "01e9398e1317ed72d2298b4994e9acba"
+  },
+  "clockDriftUpperNs": 9751,
+  "expectedFragments": 2,
+  "samplesRead": 260,
+  "samples": [
+    {
+      "beginNs": 1795065508520560302,
+      "endNs": 1795065508520915552,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "3560c34ab845253c6dd10566cfd8d51194aecc4e02126de345c65f30f74ea233"
+    },
+    {
+      "beginNs": 1795065508523196094,
+      "endNs": 1795065508523593094,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "3560c34ab845253c6dd10566cfd8d51194aecc4e02126de345c65f30f74ea233"
+    },
+    {
+      "beginNs": 1795065508526157094,
+      "endNs": 1795065508526603885,
+      "complete": true,
+      "globalCount": 3,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "e5f69d301fc9cd896bea28c969eaeae7c4501a6a8e19bcb0089ff0dcf16a2feb"
+    },
+    {
+      "beginNs": 1795065508529025594,
+      "endNs": 1795065508529437469,
+      "complete": true,
+      "globalCount": 4,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "RUNNABLE",
+              "wakeEarly": false,
+              "running": true
+            }
+          ]
+        }
+      ],
+      "sha256": "7e9db96156d089248d0fc9decb77222003d6f5eae2afeda0626ae6aea19652c5"
+    },
+    {
+      "beginNs": 1795065508531719552,
+      "endNs": 1795065508532086135,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "RUNNABLE",
+              "wakeEarly": false,
+              "running": true
+            }
+          ]
+        }
+      ],
+      "sha256": "35bd9ba7ffbf8d61435e1897d5952f46dd18ec23d7e0b7142f5b589ef5742663"
+    },
+    {
+      "beginNs": 1795065508534342760,
+      "endNs": 1795065508534703927,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "cb55ce0e091d62e84d2709bbbd311d8071c6cc6bd8078f454b27ceb6a48d36e3"
+    },
+    {
+      "beginNs": 1795065508537038302,
+      "endNs": 1795065508537378594,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "cb55ce0e091d62e84d2709bbbd311d8071c6cc6bd8078f454b27ceb6a48d36e3"
+    },
+    {
+      "beginNs": 1795065508539490302,
+      "endNs": 1795065508539860177,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "cb55ce0e091d62e84d2709bbbd311d8071c6cc6bd8078f454b27ceb6a48d36e3"
+    },
+    {
+      "beginNs": 1795065508542018885,
+      "endNs": 1795065508542306427,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "cb55ce0e091d62e84d2709bbbd311d8071c6cc6bd8078f454b27ceb6a48d36e3"
+    },
+    {
+      "beginNs": 1795065508544492469,
+      "endNs": 1795065508544734636,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "cb55ce0e091d62e84d2709bbbd311d8071c6cc6bd8078f454b27ceb6a48d36e3"
+    },
+    {
+      "beginNs": 1795065508546878844,
+      "endNs": 1795065508547151344,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "cb55ce0e091d62e84d2709bbbd311d8071c6cc6bd8078f454b27ceb6a48d36e3"
+    },
+    {
+      "beginNs": 1795065508549364427,
+      "endNs": 1795065508549692886,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "cb55ce0e091d62e84d2709bbbd311d8071c6cc6bd8078f454b27ceb6a48d36e3"
+    },
+    {
+      "beginNs": 1795065508551868886,
+      "endNs": 1795065508552126802,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "cb55ce0e091d62e84d2709bbbd311d8071c6cc6bd8078f454b27ceb6a48d36e3"
+    },
+    {
+      "beginNs": 1795065508554276386,
+      "endNs": 1795065508554483552,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "RUNNABLE",
+              "wakeEarly": false,
+              "running": true
+            }
+          ]
+        }
+      ],
+      "sha256": "5d36f08de11e47c4acfd1978a4dc46772184a217eb7db84c8e70083081452021"
+    },
+    {
+      "beginNs": 1795065508556700469,
+      "endNs": 1795065508557147552,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "RUNNABLE",
+              "wakeEarly": false,
+              "running": true
+            }
+          ]
+        }
+      ],
+      "sha256": "5d36f08de11e47c4acfd1978a4dc46772184a217eb7db84c8e70083081452021"
+    },
+    {
+      "beginNs": 1795065508559400344,
+      "endNs": 1795065508559651136,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd25a",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        },
+        {
+          "query": "5d120076dc124651-99c14320eb5fd255",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 0,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            },
+            {
+              "instance": "5d120076dc124651-99c14320eb5fd259",
+              "task": 1,
+              "eos": false,
+              "state": "BLOCKED",
+              "wakeEarly": false,
+              "running": false
+            }
+          ]
+        }
+      ],
+      "sha256": "6317dcec2f320cc3d459038042258e6edcb6545da10f6eb8e4d976e356578adc"
+    },
+    {
+      "beginNs": 1795065508562041886,
+      "endNs": 1795065508562216469,
+      "complete": true,
+      "globalCount": 0,
+      "groups": [],
+      "sha256": "80cb9b604a98f4f8fa8453148a0a6c7b95417d115aa7d057db248e3dd5419715"
+    }
+  ],
+  "events": [
+    {
+      "event": "registered",
+      "utc": "2026-11-19T05:18:28.518417+00:00",
+      "lineSha256": "f5c8695b3700e14611bc79078a371ae38306b274c42855ed84edcb10d94dfa62",
+      "expectedFragments": 2
+    },
+    {
+      "event": "user_cancel_rpc",
+      "utc": "2026-11-19T05:18:28.559597+00:00",
+      "lineSha256": "bf644df0dd77509c0b5d11505a44f5d0d7fb9cda6bc8d7adebeaf4ddc4445146"
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T05:18:28.559633+00:00",
+      "lineSha256": "4739da4304770cc8c71b40b0061c7cca6d34a05df5213ac13d18620347e446a1",
+      "fragment": 0
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T05:18:28.559638+00:00",
+      "lineSha256": "70668a5f8c27ff078756ce68d329e7784be4505f895a39a3d8b847277b1f698a",
+      "instance": "5d120076dc124651-99c14320eb5fd259"
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T05:18:28.559667+00:00",
+      "lineSha256": "8e388e9b0ef9e63516c9d6c68f41ea27f640e2972efcf9b9ea3f1998a1c34f5b",
+      "fragment": 1
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T05:18:28.559676+00:00",
+      "lineSha256": "1aeb26fa2c8690ee629f8c0cc180866df023883a2ce69d0cccc122cad4185dc9",
+      "instance": "5d120076dc124651-99c14320eb5fd25a"
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T05:18:28.559685+00:00",
+      "lineSha256": "c6be80385efd9fc91f24c3b5f8cc094c913d5422669b6d5822c33501e62078b3",
+      "fragment": 0
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T05:18:28.559712+00:00",
+      "lineSha256": "5f81479b9150015e587a1ac53b27481fffaa994b258d714e5ba45061d40e3f3b",
+      "fragment": 1
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T05:18:28.559718+00:00",
+      "lineSha256": "6716ac0ef0427447633ef76d1fb203f81ead26a07f8700a9115f9b922083e390",
+      "instance": "5d120076dc124651-99c14320eb5fd259"
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T05:18:28.559728+00:00",
+      "lineSha256": "7b051e3750335b196da13a6268e88ca4efaef2936a55ef871f8bc2c6e3483a51",
+      "instance": "5d120076dc124651-99c14320eb5fd25a"
+    },
+    {
+      "event": "user_cancel_task_close",
+      "utc": "2026-11-19T05:18:28.559754+00:00",
+      "lineSha256": "4a84caabe6bd675fa4906025939ea97bb3d166262b465477a917ab49b31cb537"
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T05:18:28.559679+00:00",
+      "lineSha256": "0a496812065c8648e7e893a3cbb4867616eef43f6349e417eff63c5b907d3056",
+      "fragment": 0
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T05:18:28.559870+00:00",
+      "lineSha256": "3f7a92e6cbce460baf3d07116cbde2ddebeb9a67d4a121aa1a10757dd8c6247b",
+      "instance": "5d120076dc124651-99c14320eb5fd259"
+    },
+    {
+      "event": "user_cancel_task_close",
+      "utc": "2026-11-19T05:18:28.559791+00:00",
+      "lineSha256": "dbcfa909ec493c0dfac70a414277b17ae278e559549788cadc7bcaba0ecfc6e2"
+    },
+    {
+      "event": "cancel_broadcast_returned",
+      "utc": "2026-11-19T05:18:28.559691+00:00",
+      "lineSha256": "21c8ec43c9493ea9075b6e8afe4431ba2bd22b3b79eaabb92d1658218fd440c6"
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T05:18:28.560001+00:00",
+      "lineSha256": "bb39a84c9cebc42a1cf6f85d2f5f41016064fcb4b2c91442abe9a03eaeecaa87",
+      "fragment": 1
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T05:18:28.560014+00:00",
+      "lineSha256": "430edad2c679c25f2cd5ccd6977d78a4f31e6bc90af2d1cd58bb1e2abd428bf8",
+      "instance": "5d120076dc124651-99c14320eb5fd25a"
+    },
+    {
+      "event": "user_cancel_task_close",
+      "utc": "2026-11-19T05:18:28.559902+00:00",
+      "lineSha256": "81677cfd481b19a2c4ab326922f3d299a3922c84e09aa502e93ce5c768e7fe60"
+    },
+    {
+      "event": "coordinator_cancel_error",
+      "utc": "2026-11-19T05:18:28.560091+00:00",
+      "lineSha256": "5c495a1f1df15849a7439107f8721f02c7140ecdcd78aae972f4d4da20ec6280"
+    },
+    {
+      "event": "fragment_end",
+      "utc": "2026-11-19T05:18:28.560500+00:00",
+      "lineSha256": "c9cc8e7613209fc29df0be66769ee83d9e7cf2f0a1f3ee973b9f1bab8a5349b6",
+      "fragment": 1
+    },
+    {
+      "event": "coordinator_cancel_error",
+      "utc": "2026-11-19T05:18:28.560599+00:00",
+      "lineSha256": "9ccc9f974ea456eff0eeaa3c40d1ede7d3da3d005c790baae044a6f5f49f94b6"
+    },
+    {
+      "event": "fragment_end",
+      "utc": "2026-11-19T05:18:28.560717+00:00",
+      "lineSha256": "2dbb180f9923858ce418f8c10c68262912e2224a043e81f0cdd390088e510140",
+      "fragment": 0
+    },
+    {
+      "event": "context_end",
+      "utc": "2026-11-19T05:18:28.560864+00:00",
+      "lineSha256": "0b8c57e4a82dec7c808ecfca21c71b20ea887d7e2a710c73294db47fd7f6bab4"
+    }
+  ],
+  "pendingTasks": 3,
+  "userCancelTaskCloses": 3,
+  "finalizedWithoutEos": 0,
+  "pipelineZeroUpperMs": 28.961469
+}

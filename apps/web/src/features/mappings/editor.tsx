@@ -35,6 +35,25 @@ export function MappingList() {
   </div>;
 }
 
+/** 映射只选择已启用且后端支持发布和查询的两种来源。 */
+export function supportsMappingSource(connection: Pick<G4.ConnectionView, "state" | "config">) {
+  return connection.state === "ACTIVE" && (connection.config.type === "POSTGRESQL" || connection.config.type === "DORIS");
+}
+
+/** 每种连接独立分页，已有完整目录的连接也可能位于后续页。 */
+async function mappingSources(type: "POSTGRESQL" | "DORIS", signal: AbortSignal) {
+  const sources: G4.ConnectionView[] = [];
+  let cursor: string | null = null;
+  do {
+    const query: URLSearchParams = new URLSearchParams({ type });
+    if (cursor) query.set("cursor", cursor);
+    const response = await connections.list(query.toString(), signal);
+    sources.push(...response.data.items.filter(supportsMappingSource));
+    cursor = response.data.nextCursor;
+  } while (cursor);
+  return sources;
+}
+
 /** U07显式选择真实固定目录和G3正式发布，人工确认绑定，不自动猜测字段。 */
 export function MappingCreate({ canEdit, initialSnapshot }: { canEdit: boolean; initialSnapshot?: string }) {
   const router = useRouter();
@@ -51,12 +70,13 @@ export function MappingCreate({ canEdit, initialSnapshot }: { canEdit: boolean; 
   const work = useMappingWork(() => { setSources([]); setReleases([]); setCatalogs([]); setSnapshot(null); setRelease(null); setVocabulary(null); setText(""); setReason(""); });
   useEffect(() => {
     const controller = new AbortController(); const generation = work.generation();
-    void Promise.all([connections.list("type=POSTGRESQL", controller.signal), semantic.releases(controller.signal), initialSnapshot ? connections.catalog(initialSnapshot, controller.signal) : Promise.resolve(null)])
-      .then(([available, formal, selected]) => {
+    void Promise.all([mappingSources("POSTGRESQL", controller.signal), mappingSources("DORIS", controller.signal), semantic.releases(controller.signal), initialSnapshot ? connections.catalog(initialSnapshot, controller.signal) : Promise.resolve(null)])
+      .then(([postgres, doris, formal, selected]) => {
         if (controller.signal.aborted || !work.current(generation)) return;
-        setSources(available.data.items.filter(item => item.config.type === "POSTGRESQL" && item.state === "ACTIVE"));
+        const available = [...postgres, ...doris];
+        setSources(available);
         setReleases(formal.filter(item => item.manifest.schemaVersion === 2));
-        if (selected) { setSnapshot(selected.data); setCatalogs([selected.data]); setConnectionId(selected.data.connectionId); setSites(selected.data.scope.siteIds); }
+        if (selected?.data.status === "READY" && available.some(item => item.id === selected.data.connectionId)) { setSnapshot(selected.data); setCatalogs([selected.data]); setConnectionId(selected.data.connectionId); setSites(selected.data.scope.siteIds); }
       }).catch(cause => { if (!controller.signal.aborted && work.current(generation)) work.fail(cause); });
     return () => controller.abort();
     // 初始固定快照只从URL读取，不在刷新时创建新资源。
@@ -82,7 +102,7 @@ export function MappingCreate({ canEdit, initialSnapshot }: { canEdit: boolean; 
   }
   return <div className="mapping-workspace"><MappingNavigation /><h1>创建人工映射</h1><MappingError error={work.error} retry={work.recoverable ? work.retry : undefined} />
     {!canEdit ? <p role="alert">当前角色不能创建映射。</p> : !work.denied && <>
-      <section className="mapping-card"><h2>1. 固定来源和正式本体</h2><div className="mapping-grid"><label>已启用的 PostgreSQL 连接<select disabled={work.busy} value={connectionId} onChange={event => chooseSource(event.target.value)}><option value="">请选择</option>{sources.map(item => <option key={item.id} value={item.id}>{item.displayName}</option>)}</select></label>
+      <section className="mapping-card"><h2>1. 固定来源和正式本体</h2><div className="mapping-grid"><label>已启用的 PostgreSQL 或 Doris 连接<select disabled={work.busy} value={connectionId} onChange={event => chooseSource(event.target.value)}><option value="">请选择</option>{sources.map(item => <option key={item.id} value={item.id}>{item.displayName}</option>)}</select></label>
         <label>完整目录快照<select disabled={work.busy} value={snapshot?.snapshotId ?? ""} onChange={event => { const item = catalogs.find(value => value.snapshotId === event.target.value) ?? null; setSnapshot(item); setSites(item?.scope.siteIds ?? []); }}><option value="">请选择</option>{catalogs.filter(item => item.status === "READY").map(item => <option key={item.snapshotId} value={item.snapshotId}>{item.capturedAtUtc} · 修订 {item.configRevision}</option>)}</select></label>
         <label>G3 正式发布<select disabled={work.busy} value={release?.manifest.releaseId ?? ""} onChange={event => chooseRelease(event.target.value)}><option value="">请选择</option>{releases.map(item => <option key={item.manifest.releaseId} value={item.manifest.releaseId}>{item.manifest.assetId} · {item.manifest.releaseId}</option>)}</select></label></div>
         {snapshot && <fieldset><legend>完整映射厂区</legend>{snapshot.scope.siteIds.map(site => <label className="mapping-check" key={site}><input type="checkbox" checked={sites.includes(site)} onChange={event => setSites(event.target.checked ? [...sites, site] : sites.filter(value => value !== site))} />{site}</label>)}<p>目录指纹：{snapshot.schemaFingerprint}</p></fieldset>}

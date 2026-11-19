@@ -1,0 +1,191 @@
+{
+  "stress": {
+    "attempt": "db821649cd58",
+    "manifestSha256": "1d14356b0a01e8bd71105c6a9fc5d16aaa06959599a2bee387caa2f24394e3a0",
+    "rowsByTable": {
+      "dmq_entity": 4194304,
+      "dmq_target": 3
+    },
+    "purpose": "cancellation_only"
+  },
+  "idempotencyKey": "12b930eb-15ba-42a9-b5aa-3ee9d28af03e",
+  "run": "implementation-01",
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+  "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+  "observerControlQueryId": "f2b7c7d1af934da9-888f7f4a195ca58b",
+  "feClockControl": {
+    "passed": true,
+    "pgBefore": "2026-11-19 06:15:15.994629+00",
+    "pgAfter": "2026-11-19 06:15:16.002057+00",
+    "audit": {
+      "complete": true,
+      "query": "f2b7c7d1af934da9-888f7f4a195ca58b",
+      "state": "EOF",
+      "errorCode": "0",
+      "userCancel": false,
+      "timeout": false,
+      "reader": false,
+      "statementSha256": "220392ee9d68a81b0a2f29405ad5d5d9b35d75579a0195bf818184d1e2772527",
+      "auditInode": "219380",
+      "fixedEntity": false,
+      "isSelect": true,
+      "returnRows": 1,
+      "startUtc": "2026-11-19T06:15:15.995000+00:00",
+      "durationMs": 4,
+      "endUtc": "2026-11-19T06:15:15.999000+00:00",
+      "endExclusiveUpperUtc": "2026-11-19T06:15:16+00:00",
+      "lineSha256": "381435937470a9a0af4f3591ea741b2298c5d03e55b511c318c27225de4fca7a",
+      "sqlHash": "bbbc3e0a843760f1fc2c73c872dc7f39"
+    }
+  },
+  "vmClocks": {
+    "be": {
+      "timeNamespace": "time:[4026532831]",
+      "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+      "utcOffset": "+0000"
+    },
+    "fe": {
+      "timeNamespace": "time:[4026532693]",
+      "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+      "utcOffset": "+0000"
+    },
+    "platform-pg": {
+      "timeNamespace": "time:[4026532969]",
+      "bootId": "89d068be-8bfe-423f-b8b3-7a4a8c8c4f65",
+      "utcOffset": "+0000"
+    }
+  },
+  "nativeStart": {
+    "inode": 219836,
+    "endOffset": 27918481,
+    "fileSize": 27918615,
+    "trailingBytes": 134,
+    "trailingSha256": "29f3cfd7c8d0759f7e8024365c314935c58c76fb797bfac27f5fd49f6e9feca0"
+  },
+  "loadBefore": {
+    "clock": "2026-11-19T06:15:21.767088+00:00",
+    "serverStarted": "2026-11-19T06:00:07.842787+00:00",
+    "since": null,
+    "commits": 42751,
+    "rollbacks": 3868,
+    "reads": 4885,
+    "hits": 1560078,
+    "queryTableIndexScans": 3735,
+    "queryTableSequentialScans": 590
+  },
+  "profileResourcesBefore": {
+    "fe": {
+      "currentBytes": 1613496320,
+      "peakBytes": 1619619840,
+      "usageUsec": 295834956
+    },
+    "be": {
+      "currentBytes": 2223710208,
+      "peakBytes": 3144036352,
+      "usageUsec": 159292127
+    }
+  },
+  "admissionObservedAt": "2026-11-19T06:15:23.591651+00:00",
+  "lockerPid": 4207,
+  "lockedQueryId": "query-ecb68fd67da24bc6861a8523652ed9ca",
+  "sourceReadyBeforeCancel": "2026-11-19 06:15:23.794156+00",
+  "waiterPid": 4184,
+  "verifiedWaitPgUtc": "2026-11-19 06:15:23.899703+00",
+  "sourceThread": 820,
+  "feActiveObservedAt": "2026-11-19T06:15:23.918354+00:00",
+  "liveWitness": "registered_log",
+  "unlockTrigger": "FIXED_ACTIVE_FE",
+  "beforeUnlockPgUtc": "2026-11-19 06:15:23.918362+00",
+  "afterUnlockPgUtc": "2026-11-19 06:15:23.91895+00",
+  "queryId": "query-ecb68fd67da24bc6861a8523652ed9ca",
+  "sourceQueryId": "ed2bd33ec981435e-a9c0133c23950e5c",
+  "platformStates": [
+    {
+      "query": "query-ecb68fd67da24bc6861a8523652ed9ca",
+      "state": "RUNNING",
+      "statement": "2026-11-19T06:15:23.920013+00:00",
+      "isolation": "read committed",
+      "observed": "2026-11-19T06:15:23.920121+00:00"
+    },
+    {
+      "query": "query-ecb68fd67da24bc6861a8523652ed9ca",
+      "state": "RUNNING",
+      "statement": "2026-11-19T06:15:23.926812+00:00",
+      "isolation": "read committed",
+      "observed": "2026-11-19T06:15:23.926919+00:00"
+    },
+    {
+      "query": "query-ecb68fd67da24bc6861a8523652ed9ca",
+      "state": "CANCELLED",
+      "statement": "2026-11-19T06:15:23.933159+00:00",
+      "isolation": "read committed",
+      "observed": "2026-11-19T06:15:23.93329+00:00"
+    }
+  ],
+  "cancelVisiblePgUtc": "2026-11-19T06:15:23.93329+00:00",
+  "terminal": "CANCELLED",
+  "terminalObservedAt": "2026-11-19T06:15:23.934022+00:00",
+  "sourceCounts": "0\t1",
+  "persisted": {
+    "bytes": 0,
+    "resultHash": null,
+    "resultSize": 0,
+    "readReceipts": 0,
+    "completedAtUtc": "2026-11-19T06:15:23.920304+00:00",
+    "cancelRequested": true
+  },
+  "successfulAuditCount": 0,
+  "cancelAuditCount": 1,
+  "loadAfter": {
+    "clock": "2026-11-19T06:15:23.947255+00:00",
+    "serverStarted": "2026-11-19T06:00:07.842787+00:00",
+    "since": null,
+    "commits": 42975,
+    "rollbacks": 3883,
+    "reads": 4885,
+    "hits": 1562329,
+    "queryTableIndexScans": 4120,
+    "queryTableSequentialScans": 592
+  },
+  "feInactiveUpperMs": 36.651625,
+  "sourceCountsObservedAt": "2026-11-19T06:15:24.173315+00:00",
+  "dualZeroUpperMs": 254.92525,
+  "beEvents": [
+    {
+      "kind": "registered",
+      "beUtc": "20261119 06:15:23.912703"
+    },
+    {
+      "kind": "cancel_arrived",
+      "beUtc": "20261119 06:15:23.944799"
+    },
+    {
+      "kind": "task_cancelled",
+      "beUtc": "20261119 06:15:23.944979"
+    },
+    {
+      "kind": "task_cancelled",
+      "beUtc": "20261119 06:15:23.945004"
+    },
+    {
+      "kind": "task_cancelled",
+      "beUtc": "20261119 06:15:23.945039"
+    },
+    {
+      "kind": "fragment_end",
+      "beUtc": "20261119 06:15:23.945479"
+    },
+    {
+      "kind": "fragment_end",
+      "beUtc": "20261119 06:15:23.946098"
+    },
+    {
+      "kind": "context_end",
+      "beUtc": "20261119 06:15:23.946231"
+    }
+  ],
+  "cancelVisibleBeforeBeKilled": true,
+  "activeBeforeUnlock": true,
+  "cleanupUpperMs": 27.869
+}

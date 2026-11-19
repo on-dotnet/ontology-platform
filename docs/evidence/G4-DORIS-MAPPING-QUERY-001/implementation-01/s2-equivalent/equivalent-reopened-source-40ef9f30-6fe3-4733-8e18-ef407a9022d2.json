@@ -1,0 +1,173 @@
+{
+  "case": "40ef9f30-6fe3-4733-8e18-ef407a9022d2",
+  "sourceQueryId": "926a43004813490d-b1bc1257cacb8ab8",
+  "scope": "READ_ONLY_LATER_REOPEN_FROM_EXACT_REGISTRATION",
+  "native": {
+    "query": "926a43004813490d-b1bc1257cacb8ab8",
+    "start": {
+      "inode": 219836,
+      "endOffset": 26245842
+    },
+    "boundary": {
+      "inode": 219836,
+      "endOffset": 28636860,
+      "fileSize": 28637092,
+      "trailingBytes": 232,
+      "trailingSha256": "a1fad2ce0c60dc0477b45a6725c643fa3eb498b8fae7f135c9c4d45bb6c1344d"
+    },
+    "events": [
+      {
+        "event": "register",
+        "level": "I",
+        "site": "fragment_mgr.cpp:729",
+        "timestamp": "20261119 06:10:41.544874",
+        "tid": 829,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 26245842,
+        "instance": null,
+        "fragment": null,
+        "sha256": "1149b95eef4bd141d025b46b292752762c6d6ae99466b8da4285d27e2ceb3e08"
+      },
+      {
+        "event": "start",
+        "level": "I",
+        "site": "fragment_mgr.cpp:657",
+        "timestamp": "20261119 06:10:41.546353",
+        "tid": 826,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 26246184,
+        "instance": null,
+        "fragment": null,
+        "sha256": "1e24e75486830cd6983cc194004fdd6c7297c5d6b06c35e2041a5989b264a625"
+      },
+      {
+        "event": "fragment_end",
+        "level": "I",
+        "site": "pipeline_fragment_context.cpp:142",
+        "timestamp": "20261119 06:10:41.570123",
+        "tid": 1741,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 26247921,
+        "instance": null,
+        "fragment": 0,
+        "sha256": "259b456d5e160d21c328d385f748978d2b0a6acc2a9871115406f4c32b6ca2cc"
+      },
+      {
+        "event": "user_rpc",
+        "level": "I",
+        "site": "internal_service.cpp:637",
+        "timestamp": "20261119 06:10:41.575807",
+        "tid": 826,
+        "queryField": true,
+        "userCancel": true,
+        "offset": 26248109,
+        "instance": null,
+        "fragment": null,
+        "sha256": "a429acd8ed50b6f8452348568da9db475fdcb75afa6c43d4e3ca537d9b45c6a9"
+      },
+      {
+        "event": "fragment_cancel",
+        "level": "I",
+        "site": "pipeline_fragment_context.cpp:177",
+        "timestamp": "20261119 06:10:41.575853",
+        "tid": 826,
+        "queryField": true,
+        "userCancel": true,
+        "offset": 26248300,
+        "instance": null,
+        "fragment": 1,
+        "sha256": "a843b3bef9b9d36ca8cf31a763c72550af236b8a5b6ae2295fb60ec77e286644"
+      },
+      {
+        "event": "broadcast_return",
+        "level": "I",
+        "site": "fragment_mgr.cpp:941",
+        "timestamp": "20261119 06:10:41.575871",
+        "tid": 826,
+        "queryField": true,
+        "userCancel": true,
+        "offset": 26248696,
+        "instance": null,
+        "fragment": null,
+        "sha256": "ed9d273ddbdf0df12971e8264106590822dba9d98c03c62f99dd74fac1185150"
+      },
+      {
+        "event": "other",
+        "level": "I",
+        "site": "rowid_fetcher.cpp:651",
+        "timestamp": "20261119 06:10:41.592267",
+        "tid": 745,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 26251437,
+        "instance": null,
+        "fragment": null,
+        "sha256": "08762305497c80c7ab667d40f5275fdf0522b007505ec6d75c44645dfa1b1fca"
+      },
+      {
+        "event": "coordinator_error",
+        "level": "W",
+        "site": "fragment_mgr.cpp:571",
+        "timestamp": "20261119 06:10:41.592605",
+        "tid": 1741,
+        "queryField": true,
+        "userCancel": true,
+        "offset": 26252017,
+        "instance": null,
+        "fragment": null,
+        "sha256": "2152215e9300f104997893a0c08479428f3fef83a156405c82e1b1dc3ce8111c"
+      },
+      {
+        "event": "fragment_end",
+        "level": "I",
+        "site": "pipeline_fragment_context.cpp:142",
+        "timestamp": "20261119 06:10:41.592801",
+        "tid": 1741,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 26252259,
+        "instance": null,
+        "fragment": 1,
+        "sha256": "a20e876803f1f36b4ddce1b6d9b522dfc8f8bdc259a8b6a7a0dac9e7189f571e"
+      },
+      {
+        "event": "context_end",
+        "level": "I",
+        "site": "query_context.cpp:262",
+        "timestamp": "20261119 06:10:41.592895",
+        "tid": 1741,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 26252447,
+        "instance": null,
+        "fragment": null,
+        "sha256": "2b2c23047f53c685f8900c6f121fd3a4c079146ca60042bc9dd3610db8a5c1f7"
+      }
+    ]
+  },
+  "feAudit": {
+    "complete": true,
+    "query": "926a43004813490d-b1bc1257cacb8ab8",
+    "state": "ERR",
+    "errorCode": "1105",
+    "userCancel": true,
+    "timeout": false,
+    "reader": true,
+    "statementSha256": "779405d77852bb511c189d4b0a404932b51eec629a56ca006debcf4a051ef564",
+    "auditInode": "219380",
+    "fixedEntity": true,
+    "isSelect": true,
+    "returnRows": 0,
+    "startUtc": "2026-11-19T06:10:41.541000+00:00",
+    "durationMs": 35,
+    "endUtc": "2026-11-19T06:10:41.576000+00:00",
+    "endExclusiveUpperUtc": "2026-11-19T06:10:41.577000+00:00",
+    "lineSha256": "050e122d8370ffb09f5965fa648629bab452160532abd6bf816beaef79f2defa",
+    "sqlHash": "01e9398e1317ed72d2298b4994e9acba"
+  },
+  "originalWitnessExit": 1,
+  "platformCommitOrdering": "NOT_CAPTURED_IN_ORIGINAL"
+}

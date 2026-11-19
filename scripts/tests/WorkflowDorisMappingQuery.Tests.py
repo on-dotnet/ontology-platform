@@ -6,6 +6,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'maintenance'))
 from workflow_doris_mapping_query import fixture_instant, fixture_tables, reference_targets
 import workflow_doris_s0_cancel as cancellation
+import doris_pipeline_observer as pipeline
+import doris_query_profile_witness as profile
+import doris_query_cancel_witness as witness
+from copy import deepcopy
 from workflow import select_gates
 
 
@@ -19,6 +23,13 @@ class DorisReferenceTests(unittest.TestCase):
         keep = select_gates(['docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/r0-review.json'])
         self.assertIn('doris-keep-preservation',keep['affected'])
         self.assertIn(gate,keep['affected'])
+
+    def test_product_qualification_and_frozen_inputs_reach_all_five_gates(self):
+        product={'environment','contract','backend','web','interaction'}
+        for path in ('scripts/maintenance/workflow_doris_mapping_evidence.py',
+                     'docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3/tls/command.json'):
+            with self.subTest(path=path):
+                self.assertTrue(product<=set(select_gates([path])['affected']))
 
     def test_scoped_decimal_join_excludes_null_touching_and_other_scopes(self):
         entity = ('org-demo', 'site-a', '1.00', 10, 20)
@@ -51,6 +62,75 @@ class DorisReferenceTests(unittest.TestCase):
         row, = cancellation.rows('Id\tUser\tQueryId\tInfo\n60\tfixture_reader\tfe-be\tSELECT 1;')
         self.assertEqual((row['Id'], row['QueryId'], row['User']), ('60', 'fe-be', 'fixture_reader'))
         self.assertEqual(cancellation.rows(''), [])
+
+    def test_pipeline_observer_rejects_missing_or_duplicate_members(self):
+        header = '1 pipeline fragment contexts are still running! duration_limit=0\n'
+        context = 'No.0 (elapse_second=0s): PipelineFragmentContext Info: _closed_tasks=0, _total_tasks=2\n'
+        task = ('Task 0: QueryId: aa-bb\nInstanceId: aa-bc\n'
+                'PipelineTask[id = 0, open = false, eos = false, state = BLOCKED, dry run = false, '
+                '_wake_up_early = false, _wake_up_by = 0, is running = false]\n')
+        self.assertFalse(pipeline.decode((header + context + task).encode())['complete'])
+        self.assertFalse(pipeline.decode((header + context + task + task).encode())['complete'])
+        second = task.replace('id = 0','id = 1')
+        self.assertTrue(pipeline.decode((header + context + task + second).encode())['complete'])
+        with self.assertRaisesRegex(ValueError, 'PIPELINE_HEADER'):
+            pipeline.decode(b'Query context not found')
+        with self.assertRaisesRegex(ValueError, 'PIPELINE_ZERO_HAS_PAYLOAD'):
+            pipeline.decode(b'0 pipeline fragment contexts are still running! duration_limit=0\ninvalid')
+
+    def test_profile_count_comparison_preserves_missing_or_ambiguous_evidence(self):
+        roots = [
+            ['RESULT_SINK_OPERATOR','MATERIALIZATION_OPERATOR','EXCHANGE_OPERATOR'],
+            ['DATA_STREAM_SINK_OPERATOR','LOCAL_MERGE_SORT_SOURCE_OPERATOR'],
+            ['SORT_SINK_OPERATOR','OLAP_SCAN_OPERATOR']]
+        names=['MATERIALIZATION_OPERATOR','LOCAL_MERGE_SORT_SOURCE_OPERATOR','OLAP_SCAN_OPERATOR']
+        normal={'tasks':[],'state':'OK','query':'aa-bb'}
+        groups=[]
+        for fragment, indices in enumerate(([0],[1,2])):
+            tasks=[]
+            for task_id,index in enumerate(indices):
+                normal['tasks'].append(dict(fragment=fragment,pipeline=task_id,task=task_id,
+                    planOperators=roots[index],planNodes=[dict(name=n,nodeId=i) for i,n in enumerate(roots[index])],state='FINALIZED',wakeEarly=0,operators={names[index]:{'rows':101}}))
+                tasks.append(dict(task=task_id,instance=str(fragment),opened=True,state='BLOCKED',eos=False,wakeEarly=False,dryRun=False,
+                                  operators=list(reversed(normal['tasks'][-1]['planNodes']))))
+            groups.append(dict(complete=True,total=len(indices),closed=0,tasks=tasks))
+        final=deepcopy(normal)
+        final.update(state='ERR',query='aa-cc')
+        for index,t in enumerate(final['tasks']): t['operators'][names[index]]['rows']=0
+        def verdict():
+            return [t['observedShortfall'] for t in profile.compare_tasks(final,{'profile':normal,'rowCount':101},{'groups':groups},{1:'0',0:'1'})]
+        self.assertEqual(verdict(),[True,True,True])
+        final['tasks'][1]['operators'][names[1]]['rows']=101
+        self.assertEqual(verdict(),[True,False,True])
+        del final['tasks'][2]['operators'][names[2]]['rows']
+        self.assertEqual(verdict(),[True,False,False])
+        final['query']=normal['query']
+        self.assertEqual(verdict(),[])
+        final['query']='aa-cc'
+        groups[0]['tasks'][0]['dryRun']=True
+        self.assertEqual(verdict(),[False,False,False])
+
+    def test_two_anonymous_closes_cannot_identify_two_tasks_in_one_instance(self):
+        groups=[{'tasks':[{'instance':'aa-ab','task':0},{'instance':'aa-ab','task':1}]},
+                {'tasks':[{'instance':'aa-ac','task':0}]}]
+        rows=[]
+        for worker,fragment,instance in [(12,0,'aa-ab'),(13,1,'aa-ac'),(14,0,'aa-ab')]:
+            for event in ('fragment_cancel','instance_cancel','task_close_error'):
+                rows.append(dict(event=event,level='W',timestamp='20261119 05:18:28.559791',tid=worker,
+                                 queryField=event!='instance_cancel',userCancel=True,offset=len(rows),
+                                 fragment=fragment if event=='fragment_cancel' else None,
+                                 instance=instance if event=='instance_cancel' else None))
+        for kind,instant in [('register','20261119 05:18:28.500000'),('user_rpc','20261119 05:18:28.510000'),
+                             ('context_end','20261119 05:18:28.560000')]:
+            rows.append(dict(event=kind,level='I',timestamp=instant,queryField=True,userCancel=kind=='user_rpc',
+                             tid=5,offset=len(rows)))
+        def verdict():
+            return witness.native_task_closes({'events':rows},groups,
+                witness.instant_ns(witness.engine_stamp(rows[-2]['timestamp'])),
+                witness.instant_ns(witness.engine_stamp(rows[-1]['timestamp'])))
+        self.assertEqual(verdict(),({0:'aa-ab',1:'aa-ac'},{(witness.canonical_id('aa-ac'),0)}))
+        rows[0]['userCancel']=False
+        self.assertEqual(verdict(),({},set()))
 
     def test_last_microsecond_is_preserved(self):
         self.assertEqual(fixture_instant('2026-11-17 12:00:00.123459'), '2026-11-17T12:00:00.123459Z')

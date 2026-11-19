@@ -189,6 +189,28 @@ public sealed partial class G4QueryMafRuntimeTests
         }, () => readMs = branch.Elapsed.TotalMilliseconds);
         // 只在本次查询首次正式业务命令开始、驱动尚未发送命令时同步。
         var firstPlan = 1;
+        // 仅在获准的准确幂等键上打开握手同步。正式驱动和连接参数不变。
+        var profileWindow = File.Exists(Path.Combine(directory, "overlap-profile-request-" + key + ".json"));
+        // 保存主连接的原生 Open activity，只拦住这一条物理连接。
+        Activity? observedOpen = null;
+        // 测试所有握手等待都计入正式源分支，文件仅承载已验证的幂等键。
+        void SynchronizeProfileHandshake(string stage, string response)
+        {
+            // 独立 FE 管理会话回读原值、启用或恢复后才发布相应许可。
+            var request = Path.Combine(directory, "overlap-profile-" + stage + "-" + key + ".json");
+            File.WriteAllText(request + ".pending", JsonSerializer.Serialize(new { key }, G4QueryJson.Options));
+            File.Move(request + ".pending", request);
+            // 限制本次等待，保留原分支绝对期限。
+            var limit = Math.Min(branch.ElapsedMilliseconds + 220, 510);
+            // 对应信号只服务本次真实握手，不影响其他执行。
+            var acknowledgement = Path.Combine(directory, "overlap-profile-" + response + "-" + key + ".json");
+            while (!File.Exists(acknowledgement) && branch.ElapsedMilliseconds < limit)
+            {
+                branchToken.ThrowIfCancellationRequested();
+                Thread.Sleep(1);
+            }
+            Assert.IsTrue(File.Exists(acknowledgement), "PROFILE_HANDSHAKE_WINDOW");
+        }
         // 此同步点在真实源端权限及目录前验之后，避免与取消事务争夺同一治理授权锁。
         using var listener = new ActivityListener
         {
@@ -196,6 +218,9 @@ public sealed partial class G4QueryMafRuntimeTests
             Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
             ActivityStarted = operation =>
             {
+                if (profileWindow && branch.IsRunning && operation.TraceId == trace.TraceId && operation.OperationName == "Open"
+                    && Interlocked.CompareExchange(ref observedOpen, operation, null) is null)
+                    SynchronizeProfileHandshake("before-open", "enabled");
                 if (operation.TraceId != trace.TraceId || !trace.Events.Any(e => e.Name == "doris.plan.submitted")
                     || Interlocked.Exchange(ref firstPlan, 0) != 1) return;
                 // 准确幂等键为独立观察者提供真实源 SQL 已准备的证据。
@@ -210,6 +235,11 @@ public sealed partial class G4QueryMafRuntimeTests
                     Thread.Sleep(1);
                 }
                 Assert.IsTrue(File.Exists(permit), "CANCEL_TRANSACTION_DID_NOT_REACH_ROW");
+            },
+            ActivityStopped = operation =>
+            {
+                if (ReferenceEquals(operation, observedOpen))
+                    SynchronizeProfileHandshake("after-open", "restored");
             }
         };
         ActivitySource.AddActivityListener(listener);

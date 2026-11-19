@@ -66,6 +66,8 @@
     },
     "environment": {
       "inputs": [
+        "scripts/maintenance/workflow_doris_mapping_evidence.py",
+        "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3/**/*",
         "global.json",
         "Directory.*",
         "NuGet.Config",
@@ -107,6 +109,8 @@
     },
     "contract": {
       "inputs": [
+        "scripts/maintenance/workflow_doris_mapping_evidence.py",
+        "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3/**/*",
         "backend/src/Contracts/**",
         "docs/contracts/**",
         "apps/web/scripts/**",
@@ -144,6 +148,8 @@
     },
     "backend": {
       "inputs": [
+        "scripts/maintenance/workflow_doris_mapping_evidence.py",
+        "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3/**/*",
         "backend/**",
         "scripts/acceptance/*.py",
         "scripts/acceptance/*.ps1",
@@ -182,6 +188,8 @@
     },
     "web": {
       "inputs": [
+        "scripts/maintenance/workflow_doris_mapping_evidence.py",
+        "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3/**/*",
         "apps/web/**",
         "scripts/tests/*Web*",
         "scripts/maintenance/workflow_m2_*.py",
@@ -216,6 +224,8 @@
     },
     "interaction": {
       "inputs": [
+        "scripts/maintenance/workflow_doris_mapping_evidence.py",
+        "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3/**/*",
         "scripts/acceptance/*.mjs",
         "experiments/g4-m1-main-integration/*.mjs",
         "docs/evidence/**/browser*.mjs",
@@ -623,12 +633,15 @@
     "doris-mapping-query-admission": {
       "inputs": [
         "scripts/maintenance/workflow_doris_mapping_query.py",
+        "scripts/maintenance/workflow_doris_mapping_evidence.py",
         "scripts/maintenance/workflow_doris_s0_cancel.py",
         "scripts/maintenance/workflow_doris_s0_fixture.py",
         "scripts/maintenance/workflow_doris_s1.py",
         "scripts/maintenance/workflow_doris_vm.py",
         "scripts/maintenance/doris_pg_assessment_golden.py",
         "scripts/maintenance/doris_query_cancel_witness.py",
+        "scripts/maintenance/doris_pipeline_observer.py",
+        "scripts/maintenance/doris_query_profile_witness.py",
         "scripts/tests/WorkflowDorisMappingQuery.Tests.py",
         "scripts/maintenance/workflow_execution.py"
       ],

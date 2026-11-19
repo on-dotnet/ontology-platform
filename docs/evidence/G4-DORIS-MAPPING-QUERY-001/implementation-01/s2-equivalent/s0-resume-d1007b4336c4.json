@@ -1,0 +1,28 @@
+{
+  "vmAttempt": "e7db85f8550c4cdf824d4a46f8f253fb",
+  "services": {
+    "fe": {
+      "id": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "image": "sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02",
+      "volumes": [
+        "ontology-g4-doris-mapping-query-001_fe-data",
+        "ontology-g4-doris-mapping-query-001_fe-log"
+      ],
+      "from": "exited"
+    },
+    "be": {
+      "id": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+      "image": "sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7",
+      "volumes": [
+        "ontology-g4-doris-mapping-query-001_be-log",
+        "ontology-g4-doris-mapping-query-001_be-data"
+      ],
+      "from": "exited"
+    }
+  },
+  "started": [
+    "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+    "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2"
+  ],
+  "status": "BOTH_HEALTHY"
+}

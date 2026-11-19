@@ -869,34 +869,52 @@ def web_pause():
     return receipt
 
 
-def web_check(stage):
+def web_source_inputs(task):
+    """绑定源码、API 合同及本任务 Web 工具实际读取的配置。"""
+    from workflow_execution import sha
+    web=ROOT/'apps/web'
+    inputs={str(path.relative_to(ROOT)):sha(path.read_bytes()) for base in [web/'src',web/'scripts'] for path in sorted(base.rglob('*')) if path.is_file()}
+    inputs['docs/contracts/g4-connections.openapi.json']=sha((ROOT/'docs/contracts/g4-connections.openapi.json').read_bytes())
+    if task=='G4-DORIS-MAPPING-QUERY-001':
+        for name in ('package.json','pnpm-lock.yaml','pnpm-workspace.yaml','.node-version','apps/web/package.json',
+                     'apps/web/next.config.ts','apps/web/tsconfig.json','apps/web/eslint.config.mjs','apps/web/postcss.config.mjs'):
+            inputs[name]=sha((ROOT/name).read_bytes())
+    return inputs
+
+
+def web_check(stage, *, task=None, run_id=None, env=None, node=None):
     """使用当前M4输入和独立报告/缓存路径，复用既有本地工具，不调用旧任务配置。"""
     import uuid
     from workflow_execution import run,sha,encoded
     from workflow_evidence import machine
     if stage not in ['typecheck','lint','unit','build']: raise ValueError('QUERY_WEB_STAGE_INVALID')
-    _,env=prepared()
-    web=ROOT/'apps/web';output=ROOT/'artifacts/workflow'/TASK/RUN
+    task,run_id=task or TASK,run_id or RUN
+    if env is None: _,env=prepared()
+    else: env=dict(env)
+    web=ROOT/'apps/web';output=ROOT/'artifacts/workflow'/task/run_id
     directory=output/('web-'+stage+'-'+uuid.uuid4().hex[:8]);directory.mkdir()
-    inputs={str(path.relative_to(ROOT)):sha(path.read_bytes()) for base in [web/'src',web/'scripts'] for path in sorted(base.rglob('*')) if path.is_file()}
-    inputs['docs/contracts/g4-connections.openapi.json']=sha((ROOT/'docs/contracts/g4-connections.openapi.json').read_bytes())
-    node='/opt/homebrew/Cellar/node@24/24.22.1/bin/node'
+    inputs=web_source_inputs(task)
+    node=node or '/opt/homebrew/Cellar/node@24/24.22.1/bin/node'
     commands={'typecheck':[node,'node_modules/typescript/bin/tsc','--noEmit'],
         'lint':[node,'node_modules/eslint/bin/eslint.js','src/features/semantic','src/lib/api/openapi-types.test.ts'],
         'build':[node,'node_modules/next/dist/bin/next','build','--webpack']}
+    files=['src/features/semantic/g4-query.test.ts','src/lib/api/openapi-types.test.ts']
+    if task=='G4-DORIS-MAPPING-QUERY-001':
+        files.append('src/features/mappings/mappings.test.ts')
+        commands['lint'].append('src/features/mappings')
     report=directory/'vitest-report.json'
     if stage=='unit':
         config=directory/'vitest.config.mjs'
         config.write_text('export default '+json.dumps(dict(root=str(web),cacheDir=str(output/'vite-cache'),test=dict(
-            environment='node',include=['src/features/semantic/g4-query.test.ts','src/lib/api/openapi-types.test.ts'],
+            environment='node',include=files,
             reporters=['default','json'],outputFile=dict(json=str(report)),fsModuleCachePath=str(output/'vite-modules'))))+';\n')
         commands['unit']=[node,'node_modules/vitest/vitest.mjs','run','--config',str(config),'--configLoader','native']
     env['NEXT_TELEMETRY_DISABLED']='1';env['NODE_OPTIONS']='--max-old-space-size=4096'
     profile='(version 1) (allow default) (deny network-outbound)' if stage=='build' else '(version 1) (allow default) (deny network*)'
     result=run(['/usr/bin/sandbox-exec','-p',profile,*commands[stage]],web,
-        task=TASK,run_id=RUN,stage='query-web-'+stage,environment=env,input_key=sha(encoded(inputs)),timeout=180 if stage=='build' else 60)
+        task=task,run_id=run_id,stage='query-web-'+stage,environment=env,input_key=sha(encoded(inputs)),timeout=180 if stage=='build' else 60)
     print(result.stdout.decode(errors='replace')[-2500:]);print(result.stderr.decode(errors='replace')[-1500:])
-    row=dict(taskId=TASK,stage=stage,exitCode=result.returncode,commandId=result.receipt['commandId'],inputs=inputs)
+    row=dict(taskId=task,stage=stage,exitCode=result.returncode,commandId=result.receipt['commandId'],inputs=inputs)
     if stage=='unit' and result.returncode==0: row.update(tests=machine(report.read_bytes(),'vitest-json'),report=str(report.relative_to(ROOT)),reportSha256=sha(report.read_bytes()))
     if stage=='build' and result.returncode==0:
         row['buildId']=(web/'.next/BUILD_ID').read_text().strip()
@@ -907,16 +925,17 @@ def web_check(stage):
     return result.returncode
 
 
-def web_binding():
+def web_binding(task=None,run_id=None):
     """实际构建源与每个产品产物仍完全相同时才能启动或验收Web。"""
     from workflow_execution import sha,encoded
-    output=ROOT/'artifacts/workflow'/TASK/RUN
+    task,run_id=task or TASK,run_id or RUN
+    output=ROOT/'artifacts/workflow'/task/run_id
     row=json.loads((output/'web-build-binding.json').read_text())
-    if row['taskId']!=TASK or row['exitCode']!=0: raise ValueError('QUERY_WEB_BUILD_REQUIRED')
+    if row['taskId']!=task or row['exitCode']!=0: raise ValueError('QUERY_WEB_BUILD_REQUIRED')
     for group in ['inputs','files']:
         if any(not (ROOT/path).is_file() or sha((ROOT/path).read_bytes())!=digest for path,digest in row[group].items()):
             raise ValueError('QUERY_WEB_'+group.upper()+'_DRIFT')
-    return dict(taskId=TASK,buildId=row['buildId'],commandId=row['commandId'],inputHash=sha(encoded(row['inputs'])),filesHash=sha(encoded(row['files'])))
+    return dict(taskId=task,buildId=row['buildId'],commandId=row['commandId'],inputHash=sha(encoded(row['inputs'])),filesHash=sha(encoded(row['files'])))
 
 
 def contract_build(project="OntologyPlatform.G2ContractTests"):

@@ -1,0 +1,111 @@
+{
+  "binding": {
+    "attempt": "a83d3e609b39",
+    "manifestSha256": "ecfff06fdea4b4a68e70b5bbfc508eaa51a8cf8a80062784adb119227b5ed291",
+    "rowsByTable": {
+      "dmq_entity": 4194304,
+      "dmq_target": 3
+    },
+    "purpose": "cancellation_only"
+  },
+  "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+  "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+  "statementSha256": "779405d77852bb511c189d4b0a404932b51eec629a56ca006debcf4a051ef564",
+  "rowCount": 101,
+  "rowHash": "8b679ba03cfdfb7499aab0fbd2b361da9fbacb31e9ebaee1e00fc29658b997a7",
+  "profile": {
+    "query": "cf73c0b33f444262-bf7fa4f6c416bcbc",
+    "state": "OK",
+    "bytes": 43944,
+    "profileSha256": "9629dfda0af89ac0decc23ea7dbaf5fab3fa90822aded431dadbbb670117f8ac",
+    "tasks": [
+      {
+        "fragment": 0,
+        "pipeline": 0,
+        "task": 0,
+        "operators": {
+          "MATERIALIZATION_OPERATOR": {
+            "rows": 101
+          },
+          "EXCHANGE_OPERATOR": {
+            "rows": 101
+          }
+        },
+        "planOperators": [
+          "RESULT_SINK_OPERATOR",
+          "MATERIALIZATION_OPERATOR",
+          "EXCHANGE_OPERATOR"
+        ],
+        "planNodes": [
+          {
+            "name": "RESULT_SINK_OPERATOR",
+            "nodeId": 2147483647
+          },
+          {
+            "name": "MATERIALIZATION_OPERATOR",
+            "nodeId": 3
+          },
+          {
+            "name": "EXCHANGE_OPERATOR",
+            "nodeId": 2
+          }
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      },
+      {
+        "fragment": 1,
+        "pipeline": 0,
+        "task": 0,
+        "operators": {
+          "LOCAL_MERGE_SORT_SOURCE_OPERATOR": {
+            "rows": 101
+          }
+        },
+        "planOperators": [
+          "DATA_STREAM_SINK_OPERATOR",
+          "LOCAL_MERGE_SORT_SOURCE_OPERATOR"
+        ],
+        "planNodes": [
+          {
+            "name": "DATA_STREAM_SINK_OPERATOR",
+            "nodeId": 2
+          },
+          {
+            "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+            "nodeId": 1
+          }
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      },
+      {
+        "fragment": 1,
+        "pipeline": 1,
+        "task": 1,
+        "operators": {
+          "OLAP_SCAN_OPERATOR": {
+            "rows": 242915,
+            "scanEos": true
+          }
+        },
+        "planOperators": [
+          "SORT_SINK_OPERATOR",
+          "OLAP_SCAN_OPERATOR"
+        ],
+        "planNodes": [
+          {
+            "name": "SORT_SINK_OPERATOR",
+            "nodeId": 1
+          },
+          {
+            "name": "OLAP_SCAN_OPERATOR",
+            "nodeId": 0
+          }
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      }
+    ]
+  }
+}

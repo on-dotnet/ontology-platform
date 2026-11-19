@@ -90,3 +90,8 @@ def fixture_instant(local):
     if parsed.strftime('%Y-%m-%d %H:%M:%S.%f') != local:
         raise ValueError('FIXTURE_DATETIMEV2_PRECISION')
     return parsed.replace(tzinfo=timezone.utc).isoformat(timespec='microseconds').replace('+00:00', 'Z')
+
+
+BROWSER_SOURCES=tuple('scripts/maintenance/'+name for name in (
+    'workflow_doris_s1.py','workflow-m4-query.mjs','workflow_doris_s0_fixture.py','workflow_doris_mapping_query.py',
+    'doris_query_cancel_witness.py','doris_pipeline_observer.py','doris_query_profile_witness.py'))

@@ -1,0 +1,45 @@
+{
+  "case": "b676a09b-ac12-4bcd-b764-62fc458d93f3",
+  "sourceQuery": "fb1b9e2a46114934-9bd8772728eccf1e",
+  "platformQuery": "query-a13eb0e1edcf4dbf9867d6bd4ebbd95d",
+  "checks": {
+    "originalSevenChecks": true,
+    "exactSourceAndReference": true,
+    "fixedVersion": true,
+    "oneHeapPlan": true,
+    "taskIdentities": true,
+    "cancellationOnly": true,
+    "downstreamCancellation": true,
+    "propagatedScanClosure": true,
+    "actualHandshake": true,
+    "officialOutcome": true,
+    "fixtureRestored": true
+  },
+  "status": "PASS",
+  "originalBrowser": "FAIL",
+  "originalAutomatedCausality": false,
+  "method": "Closed fixed HEAP sort dependency propagates verified merge cancellation to the unique scan.",
+  "scanWakeByObserved": false,
+  "timing": {
+    "beZeroMs": 64.52009,
+    "feInactiveMs": 34.370667,
+    "branchMs": 366.3627,
+    "totalMs": 807.1056
+  },
+  "inputs": {
+    "formal-cancel-b676a09b-ac12-4bcd-b764-62fc458d93f3.json": "66d81112b3b8d03f4dcc57ff7ef3a29da61a4fd40a1947042abbcdf1ec42c0ff",
+    "overlap-equivalent-b676a09b-ac12-4bcd-b764-62fc458d93f3.json": "2f4df279fd3676963aa2312c705e855bcb0fe89307901db5a51d2109a05e20f3",
+    "overlap-execute-b676a09b-ac12-4bcd-b764-62fc458d93f3.json": "2a2e64f74f4541c2c2cda1577c2f66f58f4e5de3a353e5d703fe35cb8b5704c6",
+    "overlap-profile-b676a09b-ac12-4bcd-b764-62fc458d93f3.json": "f3a2e496af5186bd201a0b774e374b6c9b08f267a4d87e5daac12f6d19efdf9f",
+    "overlap-native-events-b676a09b-ac12-4bcd-b764-62fc458d93f3.json": "f0e86c7e84fa69b0091ef204b35d7fc3a13967af201514b53c82055dfff76686",
+    "overlap-pipeline-b676a09b-ac12-4bcd-b764-62fc458d93f3.json": "b054706ee613d452227d6453263883777df60b291ff4b189f01cb8433852cae8",
+    "overlap-profile-window-b676a09b-ac12-4bcd-b764-62fc458d93f3.json": "a48c26a62d30aeddaaefb9966ea67b6b36229e13ade6f174437724b7fd017120",
+    "equivalent-immutable-config-b676a09b-ac12-4bcd-b764-62fc458d93f3.json": "5fdc6c43569a72049a5230919d4521353aae58fc9b395f35a3e3170198f9ba10",
+    "equivalent-physical-plan-b676a09b-ac12-4bcd-b764-62fc458d93f3.json": "95bd66cf4ec9b28c596e73124b0c3bbd244bccbec6103fa9d7438ac70398b824",
+    "equivalent-heap-source-provenance.json": "5e13e83842bbb494b17c7eade376aff007e8d9e254a06d3ed8f8cb653ef835d1",
+    "equivalent-source-provenance.json": "e70ebc5a8a13cb4b64c90826fda1e3cc1a04f242b82da0688de7d1809bdabdc4",
+    "overlap-profile-reference-ce0355846be2.json": "d6c5384d2c9165ed1747ab446546e5b05977fc62ffd6d7e44c86d999614543d9",
+    "s0-stress-fixture-ce0355846be2-restored.json": "bc1df0943511dcc132c22715f279c5ca52b8aa9bdd9ca0522cad2bd2b2c0dfaf",
+    "browser-s2-doris-overlap-1795069270341.json": "3a006c9f0e4eee3d70a86c7e3a885663d26581e3bb446aa8a326241c9e07de9d"
+  }
+}

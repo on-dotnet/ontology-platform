@@ -1,0 +1,184 @@
+{
+  "case": "b676a09b-ac12-4bcd-b764-62fc458d93f3",
+  "binding": {
+    "attempt": "ce0355846be2",
+    "manifestSha256": "7794b0cc97580db4ca4acb550bc304729eb6aac4400a87a317d997a56c2719c8",
+    "rowsByTable": {
+      "dmq_entity": 4194304,
+      "dmq_target": 3
+    },
+    "purpose": "cancellation_only"
+  },
+  "records": {
+    "control": {
+      "sourceQueryId": "85e336ec5eda4552-b3d8403ae1875f22",
+      "nativeProfileSha256": "89f4cc16d22a527145676a98347a6026e2697287d14387bee10d95f693a64636",
+      "summaryTaskState": "OK",
+      "nodes": [
+        {
+          "node": "PhysicalResultSink"
+        },
+        {
+          "node": "PhysicalProject"
+        },
+        {
+          "node": "PhysicalLazyMaterialize"
+        },
+        {
+          "node": "PhysicalTopN",
+          "limit": 101,
+          "offset": 0,
+          "order": [
+            "event_at#8 asc null first",
+            "entity_id#2 asc null first"
+          ],
+          "phase": "MERGE_SORT"
+        },
+        {
+          "node": "PhysicalDistribute"
+        },
+        {
+          "node": "PhysicalTopN",
+          "limit": 101,
+          "offset": 0,
+          "order": [
+            "event_at#8 asc null first",
+            "entity_id#2 asc null first"
+          ],
+          "phase": "LOCAL_SORT"
+        },
+        {
+          "node": "PhysicalProject"
+        },
+        {
+          "node": "PhysicalFilter",
+          "scopeAndDeleteSignOnly": true
+        },
+        {
+          "node": "PhysicalLazyMaterializeOlapScan"
+        },
+        {
+          "node": "PhysicalOlapScan"
+        }
+      ],
+      "flags": {
+        "TOPN filter targets": [
+          "[0:8]"
+        ],
+        "TOPN OPT": [
+          "1"
+        ],
+        "SortAlgorithm": [
+          "HEAP_SORT"
+        ],
+        "TopNFilterSourceNodeIds": [
+          "1,"
+        ]
+      },
+      "counters": {
+        "RowsProduced": [
+          101,
+          101,
+          101
+        ],
+        "RowsKeyRangeFiltered": [
+          0
+        ],
+        "RowsShortCircuitPredFiltered": [
+          0
+        ],
+        "RowsShortCircuitPredInput": [
+          0
+        ],
+        "RowsZoneMapRuntimePredicateFiltered": [
+          0
+        ]
+      }
+    },
+    "cancelled": {
+      "sourceQueryId": "fb1b9e2a46114934-9bd8772728eccf1e",
+      "nativeProfileSha256": "13edad9a1e0082ca2e2b1682cf3774a0734c8819bb444ef5f583b53ade6dd82d",
+      "summaryTaskState": "OK",
+      "nodes": [
+        {
+          "node": "PhysicalResultSink"
+        },
+        {
+          "node": "PhysicalProject"
+        },
+        {
+          "node": "PhysicalLazyMaterialize"
+        },
+        {
+          "node": "PhysicalTopN",
+          "limit": 101,
+          "offset": 0,
+          "order": [
+            "event_at#8 asc null first",
+            "entity_id#2 asc null first"
+          ],
+          "phase": "MERGE_SORT"
+        },
+        {
+          "node": "PhysicalDistribute"
+        },
+        {
+          "node": "PhysicalTopN",
+          "limit": 101,
+          "offset": 0,
+          "order": [
+            "event_at#8 asc null first",
+            "entity_id#2 asc null first"
+          ],
+          "phase": "LOCAL_SORT"
+        },
+        {
+          "node": "PhysicalProject"
+        },
+        {
+          "node": "PhysicalFilter",
+          "scopeAndDeleteSignOnly": true
+        },
+        {
+          "node": "PhysicalLazyMaterializeOlapScan"
+        },
+        {
+          "node": "PhysicalOlapScan"
+        }
+      ],
+      "flags": {
+        "TOPN filter targets": [
+          "[0:8]"
+        ],
+        "TOPN OPT": [
+          "1"
+        ],
+        "SortAlgorithm": [
+          "HEAP_SORT"
+        ],
+        "TopNFilterSourceNodeIds": [
+          "1,"
+        ]
+      },
+      "counters": {
+        "RowsProduced": [
+          0,
+          0,
+          0
+        ],
+        "RowsKeyRangeFiltered": [
+          0
+        ],
+        "RowsShortCircuitPredFiltered": [
+          0
+        ],
+        "RowsShortCircuitPredInput": [
+          0
+        ],
+        "RowsZoneMapRuntimePredicateFiltered": [
+          0
+        ]
+      }
+    }
+  }
+}

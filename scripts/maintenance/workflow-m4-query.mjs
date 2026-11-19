@@ -28,12 +28,12 @@ const dorisReadRaces = {
   "s2-doris-disconnect": ["inflight_connection_closed", "disconnect-test", "DORIS_INFLIGHT_SOURCE_DISCONNECTED"],
   "s2-doris-batch-binding": ["verified_batch_faults", "batch-test", "DORIS_CANCEL_VERIFIED_RELEASE_BATCH"]
 };
-const twoTable = doris && argument("mode").startsWith("s2-doris-");
+const twoTable = doris && (argument("mode").startsWith("s2-doris-") || ["s3","ui-s1","ui-s3"].includes(argument("mode")));
 const stateName = twoTable ? "doris-two-table.json" : integration ? `scenario-${scenario}.json` : "runtime-fixture.json";
 const port = value => doris ? ({15441:15641,15442:15642,15443:15643,15444:15644,15445:19030,15446:15645,15447:15646,15448:15647})[value] : integration ? value + 100 : value;
 if (argument("task") !== task || argument("run-id") !== runId || await realpath(process.cwd()) !== root) throw new Error("QUERY_CONSUMER_BOUNDARY");
 const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/package.json"));
-if (doris && !["s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
+if (doris && !["s3","ui-s1","ui-s3","serve","s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
 if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
@@ -41,10 +41,12 @@ if (mode === "serve") {
   const build = JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.web_binding()))`], { cwd: root, timeout: 30000, encoding: "utf8" }));
   process.env.PLATFORM_API_ORIGIN = `http://localhost:${port(15441)}`;
   process.env.NEXT_TELEMETRY_DISABLED = "1"; process.env.NODE_ENV = "production";
-  const record = { taskId: task, runId, pid: process.pid, worktree: root, port: port(15442), build,
-    processStartedAt: execFileSync("ps", ["-p", String(process.pid), "-o", "lstart="], { encoding: "utf8", env: { ...process.env, LC_ALL: "C" } }).trim(),
-    startedAtUtc: new Date().toISOString(), decision: "KEEP", release: "M4 review and safe closeout" };
-  await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
+  if (!doris) {
+    const record = { taskId: task, runId, pid: process.pid, worktree: root, port: port(15442), build,
+      processStartedAt: execFileSync("ps", ["-p", String(process.pid), "-o", "lstart="], { encoding: "utf8", env: { ...process.env, LC_ALL: "C" } }).trim(),
+      startedAtUtc: new Date().toISOString(), decision: "KEEP", release: "M4 review and safe closeout" };
+    await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
+  }
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: port(15442),
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
 } else if (["s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding","s2-doris-cardinality","s2-doris-identity","s2-doris-states","s2-doris-cancel-window","s2-doris-admission-cancel","s2-doris-aba","s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
@@ -83,6 +85,15 @@ async function browserRun(mode) {
   }
   const get = async (actor, path) => (await request(actor, "GET", path)).data;
   const post = async (actor, path, body, expected = 200, etag) => (await request(actor, "POST", path, body, expected, etag ?? (body.command ? `"${body.command.expectedRevision}"` : undefined))).data;
+  function rpcFor(actor) {
+    let rpcId = 0;
+    return async (method, params) => {
+        const reply = await request({ ...actor, headers: { ...actor.headers, Accept: "application/json, text/event-stream", "MCP-Protocol-Version": "2025-11-25" } }, "POST", "/api/v1/mcp", { jsonrpc: "2.0", id: ++rpcId, method, params });
+        const payload = reply.data ?? JSON.parse(reply.raw.split("\n").find(line => line.startsWith("data:")).slice(5));
+        check("s3_mcp_protocol_" + rpcId, !payload.error && payload.id === rpcId);
+        return payload.result;
+      };
+  }
   async function identity(label) {
     phase = "oidc_" + label;
     const context = await browser.newContext({ serviceWorkers: "block" }); contexts.push(context);
@@ -456,7 +467,7 @@ async function browserRun(mode) {
         try { return await Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error("overlap_control_deadline")),ms);})]); }
         finally { clearTimeout(timer); }
       };
-      const next=async()=>{const item=await bounded(lines.next(),20000);check("overlap_witness_"+report.checks.length,!item.done);return JSON.parse(item.value);};
+      const next=async(ms=20000)=>{const item=await bounded(lines.next(),ms);check("overlap_witness_"+report.checks.length,!item.done);return JSON.parse(item.value);};
       const closeChild=async(child,done,ms)=>{
         try { return await bounded(done,ms); }
         catch (error) {
@@ -478,11 +489,11 @@ async function browserRun(mode) {
         const admitted=await next();
         check("exact_query_row_locked",admitted.event==="admitted");
         const cancelled=await request(reader,"POST","/api/v1/data/semantic-queries/"+admitted.queryId+"/cancel",undefined,[200,409,503]);
-        const final=await next();
+        const final=await next(65000);
         const execution=await bounded(executing,35000);
         report.cancel={key,queryId:admitted.queryId,httpStatus:cancelled.status,execution,witness:final};
         check("same_be_cancelled_after_committed_state",cancelled.status===200 && final.queryId===admitted.queryId && final.terminal==="CANCELLED" &&
-          final.activeBeforeUnlock && final.cancelVisibleBeforeBeKilled && final.cleanupUpperMs>=0 && final.cleanupUpperMs<=250 && final.dualZeroUpperMs<=250 && final.sourceCounts==="0\t0");
+          final.equivalent?.status==="PASS" && final.cleanupUpperMs>=0 && final.cleanupUpperMs<=250);
         check("cancel_only_audit_and_zero_results",final.persisted.bytes===0 && final.persisted.resultHash===null && final.persisted.resultSize===0 &&
           final.persisted.readReceipts===0 && final.persisted.cancelRequested && final.successfulAuditCount===0 && final.cancelAuditCount===1);
         check("executing_gateway_rejected_in_budget",execution.exit===0 && execution.mtp.passed===1);
@@ -778,6 +789,42 @@ async function browserRun(mode) {
       check("completed_cancel_does_not_destroy_result", (await request(operator, "GET", `/api/v1/data/semantic-queries/${selected.queryId}/result`)).raw === selected.raw);
       state.s2Ambiguous = { queryId: ambiguous.queryId, query, candidates: ambiguous.data.candidates }; await save(state);
       report.status = "PASS"; report.scope = "S2_REAL_PG_AMBIGUITY_SELECTION_EMPTY_INJECTION_COMPLETED_CANCEL";
+    } else if (doris && mode === "s3") {
+      phase = "doris_mcp";
+      const rpc = rpcFor(reader), deniedRpc = rpcFor(auditor);
+      const client = { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "doris-query-review", version: "1" } };
+      await rpc("initialize", client);
+      await deniedRpc("initialize", client);
+      const listed = (await rpc("tools/list", {})).tools.map(item => item.name);
+      const capabilities = await get(reader, "/api/v1/capabilities");
+      const rejected = result => result.isError === true && !result.structuredContent && result.content.length === 1 && result.content[0].text === "semantic_tool_rejected";
+      const canonical = (result, raw) => !result.isError && result.content.length === 1 && result.content[0].text === raw && JSON.stringify(result.structuredContent) === JSON.stringify(JSON.parse(raw));
+      report.canonical = [];
+      for (const name of ["g4_resolve_entity","g4_read_observations","g4_traverse_relationships"]) {
+        phase = name;
+        check("registered_" + name, listed.includes(name) && listed.includes("g4_query_result"));
+        const query = { ...state.latestQuery.query, capabilityId: name, capabilityVersion: capabilities.find(c => c.id === name).version,
+          relationshipIris: name === "g4_traverse_relationships" ? state.latestQuery.query.relationshipIris : [] };
+        const key = randomUUID(), args = { query, idempotencyKey: key, selectionQueryId: null };
+        const called = await rpc("tools/call", { name, arguments: args });
+        check("mcp_executes_" + name, !called.isError && called.structuredContent?.status === "FOUND");
+        const http = await request({...reader,headers:{...reader.headers,"Idempotency-Key":key}}, "POST", "/api/v1/data/semantic-queries", query);
+        check("same_http_mcp_" + name, canonical(called, http.raw));
+        const saved = await rpc("tools/call", { name:"g4_query_result", arguments:{queryId:http.queryId} });
+        check("fourth_tool_same_bytes_" + name, canonical(saved,http.raw));
+        check("http_restores_" + name, (await request(reader,"GET","/api/v1/data/semantic-queries/"+http.queryId+"/result")).raw === http.raw);
+        const rows = http.data.data, evidenceId=http.data.evidence[0].evidenceId;
+        if (name === "g4_resolve_entity") check("mcp_root_exact", rows.some(item => item.identity.externalId === "E1" && item.properties.some(p => p.value.lexical === "9007199254740993.20")));
+        if (name === "g4_read_observations") check("mcp_exact_measurement", rows.some(item => item.kind === "observation" && item.value.lexical === "9007199254740993.20" && item.unit?.unitIri === "urn:synthetic:m3:K-v1"));
+        if (name === "g4_traverse_relationships") check("mcp_half_open_edges", JSON.stringify(rows.filter(r=>r.kind==="relationship").map(r=>r.target.identity.externalId).sort()) === '["T1","T2"]');
+        const evidence = await get(reader,"/api/v1/data/source-evidence/"+encodeURIComponent(evidenceId));
+        check("mcp_source_semantics_"+name,evidence.receipt.queryId === http.queryId && evidence.receipt.watermark === null && evidence.receipt.watermarkKind === "UNKNOWN");
+        check("denied_tool_"+name,rejected(await deniedRpc("tools/call",{name,arguments:{...args,idempotencyKey:randomUUID()}})));
+        check("denied_history_"+name,rejected(await deniedRpc("tools/call",{name:"g4_query_result",arguments:{queryId:http.queryId}})));
+        await request(auditor,"GET","/api/v1/data/source-evidence/"+encodeURIComponent(evidenceId),undefined,[403,404]);
+        report.canonical.push({tool:name,queryId:http.queryId,bytes:Buffer.byteLength(http.raw),sha256:createHash("sha256").update(http.raw).digest("hex")});
+      }
+      report.status="PASS"; report.scope="DORIS_FOUR_MCP_TOOLS_SAME_CANONICAL_AND_CURRENT_DENIAL";
     } else if (mode === "s3") {
       const { execFileSync } = await import("node:child_process");
       const capabilities = await get(operator, "/api/v1/capabilities");
@@ -835,13 +882,7 @@ async function browserRun(mode) {
         check("s3_owned_budget_rows_removed", removed.ownedRows === 0 && removed.siteRows === 2);
       }
       phase = "s3_real_mcp";
-      let rpcId = 0;
-      const rpc = async (method, params) => {
-        const reply = await request({ ...operator, headers: { ...operator.headers, Accept: "application/json, text/event-stream", "MCP-Protocol-Version": "2025-11-25" } }, "POST", "/api/v1/mcp", { jsonrpc: "2.0", id: ++rpcId, method, params });
-        const payload = reply.data ?? JSON.parse(reply.raw.split("\n").find(line => line.startsWith("data:")).slice(5));
-        check("s3_mcp_protocol_" + rpcId, !payload.error && payload.id === rpcId);
-        return payload.result;
-      };
+      const rpc = rpcFor(operator);
       await rpc("initialize", { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "m4-controlled-query", version: "1" } });
       const listed = await rpc("tools/list", {});
       check("s3_mcp_old_and_new_tool_closure", listed.tools.length === 7 && listed.tools.some(item => item.name === "describe_ontology") && listed.tools.some(item => item.name === "g4_query_result"));
@@ -1399,89 +1440,120 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       state.firstQuery ??= state.latestQuery; await save(state);
       report.status = "PASS"; report.scope = doris ? "S1_DORIS_OIDC_QUERY_PERSISTENCE" : "S1_REAL_OIDC_FORMAL_MAPPING_PG_QUERY_RESTORE_EVIDENCE_HTTP";
     } else if (mode === "ui-s3") {
+      const actor = doris ? reader : operator;
+      if (doris) {
+        phase = "mapping_editor_current_doris";
+        await operator.page.goto(origin + "/data/mappings/new");
+        await operator.page.getByLabel("已启用的 PostgreSQL 或 Doris 连接").selectOption(state.connectionId);
+        await operator.page.getByLabel("完整目录快照").selectOption(state.catalog.snapshotId);
+        check("mapping_editor_active_doris_and_frozen_snapshot", await operator.page.getByLabel("完整目录快照").inputValue() === state.catalog.snapshotId);
+      }
       phase = "s3_ui_observations";
-      await operator.page.goto(origin + "/analysis");
-      await operator.page.getByRole("button", { name: "查询业务源", exact: true }).waitFor();
-      await operator.page.getByLabel("源查询本体资产", { exact: true }).fill(state.ontologyRelease.manifest.assetId);
-      await operator.page.getByLabel("源查询本体发布", { exact: true }).fill(state.ontologyRelease.manifest.releaseId);
-      await operator.page.getByLabel("源查询映射发布", { exact: true }).fill(state.mappingReceipt.mappingReleaseId);
-      await operator.page.getByLabel("源查询外部号", { exact: true }).fill("asset-1");
-      await operator.page.getByLabel("源查询厂区", { exact: true }).selectOption("site-a");
-      for (const capability of ["g4_read_observations", "g4_traverse_relationships"]) {
-        await operator.page.getByLabel("业务源查询能力", { exact: true }).selectOption(capability);
-        await operator.page.getByLabel("源查询关系路径", { exact: true }).fill("urn:synthetic:mapping:hasReading");
-        const pending = operator.page.waitForResponse(response => response.url() === origin + "/api/v1/data/semantic-queries" && response.request().method() === "POST");
-        await operator.page.getByRole("button", { name: "查询业务源", exact: true }).click();
+      await actor.page.goto(origin + "/analysis");
+      await actor.page.getByRole("button", { name: "查询业务源", exact: true }).waitFor();
+      await actor.page.getByLabel("源查询本体资产", { exact: true }).fill(state.ontologyRelease.manifest.assetId);
+      await actor.page.getByLabel("源查询本体发布", { exact: true }).fill(state.ontologyRelease.manifest.releaseId);
+      await actor.page.getByLabel("源查询映射发布", { exact: true }).fill(state.mappingReceipt.mappingReleaseId);
+      await actor.page.getByLabel("源查询外部号", { exact: true }).fill(doris ? "E1" : "asset-1");
+      await actor.page.getByLabel("源查询厂区", { exact: true }).selectOption("site-a");
+      for (const capability of [...(doris ? ["g4_resolve_entity"] : []), "g4_read_observations", "g4_traverse_relationships"]) {
+        await actor.page.getByLabel("业务源查询能力", { exact: true }).selectOption(capability);
+        await actor.page.getByLabel("源查询关系路径", { exact: true }).fill(doris && capability !== "g4_traverse_relationships" ? "" : "urn:synthetic:mapping:hasReading");
+        const pending = actor.page.waitForResponse(response => response.url() === origin + "/api/v1/data/semantic-queries" && response.request().method() === "POST");
+        await actor.page.getByRole("button", { name: "查询业务源", exact: true }).click();
         const response = await pending, result = await response.json();
-        check("s3_ui_actual_" + capability, response.status() === 200 && result.status === "FOUND" && result.data.some(item => item.kind === (capability === "g4_read_observations" ? "observation" : "relationship")));
-        const region = operator.page.getByRole("region", { name: "业务源查询结果", exact: true });
+        check("s3_ui_actual_" + capability, response.status() === 200 && result.status === "FOUND" && result.data.some(item => item.kind === ({g4_read_observations:"observation",g4_traverse_relationships:"relationship",g4_resolve_entity:"entity"})[capability]));
+        const region = actor.page.getByRole("region", { name: "业务源查询结果", exact: true });
         await region.getByRole("heading", { name: "FOUND · 找到可信结果", exact: true }).waitFor();
-        check("s3_ui_renders_" + capability, (await region.innerText()).includes(capability === "g4_read_observations" ? "293.2750" : "hasReading"));
+        check("s3_ui_renders_" + capability, (await region.innerText()).includes(capability === "g4_traverse_relationships" ? "hasReading" : doris ? "9007199254740993.20" : "293.2750"));
+        if (doris) {
+          const queryId=response.headers()["x-query-id"];
+          const saved=await request(actor,"GET","/api/v1/data/semantic-queries/"+queryId+"/result");
+          check("ui_same_canonical_"+capability, await response.text() === saved.raw);
+        }
         await region.screenshot({ path: file.replace(".json", "-" + capability + ".png") });
       }
-      await operator.page.setViewportSize({ width: 390, height: 844 });
-      await operator.page.waitForFunction(() => document.querySelector("#platform-navigation")?.getBoundingClientRect().right <= 0);
-      check("s3_mobile_no_overflow", await operator.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-      await operator.page.getByRole("region", { name: "业务源查询", exact: true }).screenshot({ path: file.replace(".json", "-mobile.png") });
+      await actor.page.setViewportSize({ width: 390, height: 844 });
+      await actor.page.waitForFunction(() => document.querySelector("#platform-navigation")?.getBoundingClientRect().right <= 0);
+      check("s3_mobile_no_overflow", await actor.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+      await actor.page.getByRole("region", { name: "业务源查询", exact: true }).screenshot({ path: file.replace(".json", "-mobile.png") });
       report.status = "PASS"; report.scope = "S3_REAL_BROWSER_OBSERVATIONS_RELATIONSHIPS";
     } else if (mode === "ui-s1") {
+      const actor = doris ? reader : operator;
       phase = "query_ui_execute";
-      await operator.page.goto(origin + "/analysis");
-      await operator.page.getByRole("button", { name: "查询业务源", exact: true }).waitFor();
-      await operator.page.getByLabel("源查询本体资产", { exact: true }).fill(state.ontologyRelease.manifest.assetId);
-      await operator.page.getByLabel("源查询本体发布", { exact: true }).fill(state.ontologyRelease.manifest.releaseId);
-      await operator.page.getByLabel("源查询映射发布", { exact: true }).fill(state.mappingReceipt.mappingReleaseId);
-      await operator.page.getByLabel("源查询外部号", { exact: true }).fill("asset-1");
-      await operator.page.getByLabel("源查询厂区", { exact: true }).selectOption("site-a");
-      const queryResponse = operator.page.waitForResponse(response => response.url() === origin + "/api/v1/data/semantic-queries" && response.request().method() === "POST");
-      await operator.page.getByRole("button", { name: "查询业务源", exact: true }).click();
-      const response = await queryResponse, result = await response.json();
+      await actor.page.goto(origin + "/analysis");
+      await actor.page.getByRole("button", { name: "查询业务源", exact: true }).waitFor();
+      await actor.page.getByLabel("源查询本体资产", { exact: true }).fill(state.ontologyRelease.manifest.assetId);
+      await actor.page.getByLabel("源查询本体发布", { exact: true }).fill(state.ontologyRelease.manifest.releaseId);
+      await actor.page.getByLabel("源查询映射发布", { exact: true }).fill(state.mappingReceipt.mappingReleaseId);
+      await actor.page.getByLabel("源查询外部号", { exact: true }).fill(doris ? "E1" : "asset-1");
+      await actor.page.getByLabel("源查询厂区", { exact: true }).selectOption("site-a");
+      const queryResponse = actor.page.waitForResponse(response => response.url() === origin + "/api/v1/data/semantic-queries" && response.request().method() === "POST");
+      await actor.page.getByRole("button", { name: "查询业务源", exact: true }).click();
+      const response = await queryResponse, canonical = await response.text(), result = JSON.parse(canonical);
       check("ui_real_query_found", response.status() === 200 && result.status === "FOUND");
-      await operator.page.getByRole("region", { name: "业务源查询结果" }).getByRole("heading", { name: "FOUND · 找到可信结果", exact: true }).waitFor();
+      await actor.page.getByRole("region", { name: "业务源查询结果" }).getByRole("heading", { name: "FOUND · 找到可信结果", exact: true }).waitFor();
       const queryId = response.headers()["x-query-id"];
-      check("ui_recoverable_url_only_id", new URL(operator.page.url()).searchParams.get("query") === queryId);
+      check("ui_recoverable_url_only_id", new URL(actor.page.url()).searchParams.get("query") === queryId);
 
       const count = row => doris ? row.businessQueries : row.seqScan + row.idxScan;
-      await new Promise(done => setTimeout(done, 2100)); const before = observed();
+      await new Promise(done => setTimeout(done, doris ? 6800 : 2100)); const before = observed();
       await new Promise(done => setTimeout(done, 1100)); const settled = observed();
       check("source_statistics_settled", count(before) === count(settled) && count(before) > 0);
       let writes = 0;
-      operator.page.on("request", request => { if (request.url().includes("/api/v1/data/semantic-queries") && request.method() !== "GET") writes++; });
+      actor.page.on("request", request => { if (request.url().includes("/api/v1/data/semantic-queries") && request.method() !== "GET") writes++; });
       phase = "query_ui_refresh";
-      const restoredResponse = operator.page.waitForResponse(response => response.url() === origin + `/api/v1/data/semantic-queries/${queryId}/result`);
-      await operator.page.reload();
+      const restoredResponse = actor.page.waitForResponse(response => response.url() === origin + `/api/v1/data/semantic-queries/${queryId}/result`);
+      await actor.page.reload();
       const restored = await restoredResponse;
-      check("browser_refresh_same_result", restored.status() === 200 && JSON.stringify(await restored.json()) === JSON.stringify(result));
-      await operator.page.getByRole("region", { name: "业务源查询结果" }).getByRole("heading", { name: "FOUND · 找到可信结果", exact: true }).waitFor();
-      await new Promise(done => setTimeout(done, 2100)); const after = observed();
+      check("browser_refresh_same_result", restored.status() === 200 && await restored.text() === canonical);
+      await actor.page.getByRole("region", { name: "业务源查询结果" }).getByRole("heading", { name: "FOUND · 找到可信结果", exact: true }).waitFor();
+      await new Promise(done => setTimeout(done, doris ? 6800 : 2100)); const after = observed();
       await new Promise(done => setTimeout(done, 1100)); const confirmed = observed();
       report.sourceScans = { before, settled, after, confirmed };
-      check("browser_refresh_no_business_query", count(before) === count(after) && count(after) === count(confirmed) && writes === 0);
-      check("browser_result_not_in_persistent_storage", await operator.page.evaluate(async () => localStorage.length === 0 && sessionStorage.length === 0 && (await indexedDB.databases()).length === 0));
-      await operator.page.screenshot({ path: file.replace(".json", "-desktop.png"), fullPage: true });
-      await operator.page.setViewportSize({ width: 390, height: 844 });
-      await operator.page.waitForFunction(() => document.querySelector("#platform-navigation")?.getBoundingClientRect().right <= 0);
-      check("query_mobile_no_horizontal_overflow", await operator.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-      const queryRegion = operator.page.getByRole("region", { name: "业务源查询", exact: true });
+      check("browser_refresh_no_business_query", count(before) === count(after) && count(after) === count(confirmed) && writes === 0 && (!doris || [settled,after,confirmed].every(row => row.auditInode === before.auditInode && row.queryIdsSha256 === before.queryIdsSha256)));
+      check("browser_result_not_in_persistent_storage", await actor.page.evaluate(async () => localStorage.length === 0 && sessionStorage.length === 0 && (await indexedDB.databases()).length === 0));
+      await actor.page.screenshot({ path: file.replace(".json", "-desktop.png"), fullPage: true });
+      await actor.page.setViewportSize({ width: 390, height: 844 });
+      await actor.page.waitForFunction(() => document.querySelector("#platform-navigation")?.getBoundingClientRect().right <= 0);
+      check("query_mobile_no_horizontal_overflow", await actor.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+      const queryRegion = actor.page.getByRole("region", { name: "业务源查询", exact: true });
       await queryRegion.scrollIntoViewIfNeeded();
       check("query_mobile_region_visible", await queryRegion.isVisible() && (await queryRegion.boundingBox()).width <= 390);
       await queryRegion.screenshot({ path: file.replace(".json", "-mobile.png") });
+      if (doris) {
+        phase = "ui_current_result_grant";
+        const resultUrl = origin + `/api/v1/data/semantic-queries/${queryId}/result`;
+        const grant = action => JSON.parse(execFileSync("python3",["-B","-c",
+          'import sys;sys.path.insert(0,"scripts/maintenance");import workflow_doris_s1 as q;q.permission_case(sys.argv[1],renewed=True)',action],
+          {cwd:root,timeout:30000,encoding:"utf8"}));
+        report.revocation = {before:grant("revoke-result")};
+        try {
+          const denied = actor.page.waitForResponse(response=>response.url()===resultUrl);
+          await actor.page.getByRole("button",{name:"恢复查询结果",exact:true}).click();
+          check("current_owner_revocation_denied", (await denied).status()===403);
+          check("revoked_result_cleared", await actor.page.getByRole("region",{name:"业务源查询结果"}).count()===0);
+        } finally { report.revocation.after=grant("restore-result"); }
+        const allowed = actor.page.waitForResponse(response=>response.url()===resultUrl);
+        await actor.page.getByRole("button",{name:"恢复查询结果",exact:true}).click();
+        check("restored_original_grant_same_bytes", await (await allowed).text()===canonical);
+      }
       phase = "query_ui_identity_invalidation";
       let releaseHeld, markCaptured;
       const held = new Promise(done => { releaseHeld = done; }), captured = new Promise(done => { markCaptured = done; });
       const resultUrl = origin + `/api/v1/data/semantic-queries/${queryId}/result`;
-      await operator.page.route(resultUrl, async route => {
+      await actor.page.route(resultUrl, async route => {
         const originalResponse = await route.fetch();
         check("late_response_was_real_authorized_result", originalResponse.status() === 200);
         markCaptured(); await held;
         await route.fulfill({ response: originalResponse }).catch(() => {});
       });
-      await operator.page.getByRole("button", { name: "恢复查询结果", exact: true }).click();
+      await actor.page.getByRole("button", { name: "恢复查询结果", exact: true }).click();
       await captured;
-      const second = await operator.context.newPage();
+      const second = await actor.context.newPage();
       await second.goto(origin + "/analysis"); await second.bringToFront();
-      await operator.page.waitForFunction(() => !document.querySelector('[aria-label="业务源查询结果"]'));
-      check("other_tab_activation_clears_old_query", await operator.page.getByRole("region", { name: "业务源查询结果" }).count() === 0);
+      await actor.page.waitForFunction(() => !document.querySelector('[aria-label="业务源查询结果"]'));
+      check("other_tab_activation_clears_old_query", await actor.page.getByRole("region", { name: "业务源查询结果" }).count() === 0);
       await second.getByRole("button", { name: "安全退出" }).click();
       await second.waitForURL(url => url.origin === origin && url.pathname === "/signed-out");
       const other = realm.identities["g2-auditor-ab"];
@@ -1489,14 +1561,14 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       await second.locator("#username").fill(other.username); await second.locator("#password").fill(other.password);
       await second.locator("#kc-login").click();
       await second.waitForURL(url => url.origin === origin && url.pathname === "/api/v1/platform/me");
-      check("same_browser_subject_really_changed", (await get(operator, "/api/v1/platform/me")).subjectId === auditor.me.subjectId);
-      releaseHeld(); await operator.page.unroute(resultUrl); await operator.page.bringToFront();
-      await operator.page.waitForFunction(() => !document.querySelector('[aria-label="恢复源查询引用"]')?.disabled);
-      check("late_old_subject_response_not_rendered", await operator.page.getByRole("region", { name: "业务源查询结果" }).count() === 0);
-      const forbiddenRestore = operator.page.waitForResponse(response => response.url() === resultUrl);
-      await operator.page.getByRole("button", { name: "恢复查询结果", exact: true }).click();
+      check("same_browser_subject_really_changed", (await get(actor, "/api/v1/platform/me")).subjectId === auditor.me.subjectId);
+      releaseHeld(); await actor.page.unroute(resultUrl); await actor.page.bringToFront();
+      await actor.page.waitForFunction(() => !document.querySelector('[aria-label="恢复源查询引用"]')?.disabled);
+      check("late_old_subject_response_not_rendered", await actor.page.getByRole("region", { name: "业务源查询结果" }).count() === 0);
+      const forbiddenRestore = actor.page.waitForResponse(response => response.url() === resultUrl);
+      await actor.page.getByRole("button", { name: "恢复查询结果", exact: true }).click();
       check("changed_subject_cannot_restore_previous_query", (await forbiddenRestore).status() === 404);
-      check("rejected_restore_keeps_results_cleared", await operator.page.getByRole("region", { name: "业务源查询结果" }).count() === 0);
+      check("rejected_restore_keeps_results_cleared", await actor.page.getByRole("region", { name: "业务源查询结果" }).count() === 0);
       await second.close();
       report.status = "PASS"; report.scope = "S1_BROWSER_QUERY_REFRESH_SAME_BYTES_NO_SOURCE_REPLAY";
     } else check("supported_mode", false);

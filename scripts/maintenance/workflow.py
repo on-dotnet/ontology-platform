@@ -330,6 +330,9 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
         if not gate['command'] and task == 'G4-M4-QUERY-001' and name in {'environment','contract','backend','web','interaction'}:
             product_qualification=True
             gate={**gate,'command':['python3','-B','scripts/maintenance/workflow_m4_query.py','qualify','--task',task,'--run-id','query-impl-01','--gate',name,'--input-key',key],'testsRequired':True}
+        if not gate['command'] and task == 'G4-DORIS-MAPPING-QUERY-001' and name in {'environment','contract','backend','web','interaction'}:
+            product_qualification=True
+            gate={**gate,'command':['python3','-B','scripts/maintenance/workflow_doris_mapping_evidence.py','--gate',name,'--input-key',key],'testsRequired':True}
         if not gate['command'] and task == 'G4-M5-INTEGRATION-001' and name in {'environment','contract','backend','web','interaction'}:
             # M5复用同一原件解释器；固定消费者身份，不把缺适配器的空命令当通过。
             product_qualification=True

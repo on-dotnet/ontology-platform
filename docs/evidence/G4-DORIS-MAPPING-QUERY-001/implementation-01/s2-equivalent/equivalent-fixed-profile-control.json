@@ -1,0 +1,67 @@
+{
+  "scope": "SEPARATE_BASELINE_SESSION",
+  "sourceQueryId": "a601a46fc7f44cc2-a542e9e4a290a44d",
+  "normalRows": 1,
+  "reader": "fixture_reader",
+  "profile": {
+    "query": "a601a46fc7f44cc2-a542e9e4a290a44d",
+    "state": "OK",
+    "bytes": 43069,
+    "profileSha256": "be435d6fa9a80489787a637252b9cf76fa4afd2889de53152f49663b0fd237fe",
+    "tasks": [
+      {
+        "fragment": 0,
+        "pipeline": 0,
+        "task": 0,
+        "operators": {
+          "MATERIALIZATION_OPERATOR": {
+            "rows": 1
+          },
+          "EXCHANGE_OPERATOR": {
+            "rows": 1
+          }
+        },
+        "planOperators": [
+          "RESULT_SINK_OPERATOR",
+          "MATERIALIZATION_OPERATOR",
+          "EXCHANGE_OPERATOR"
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      },
+      {
+        "fragment": 1,
+        "pipeline": 0,
+        "task": 0,
+        "operators": {
+          "LOCAL_MERGE_SORT_SOURCE_OPERATOR": {
+            "rows": 1
+          }
+        },
+        "planOperators": [
+          "DATA_STREAM_SINK_OPERATOR",
+          "LOCAL_MERGE_SORT_SOURCE_OPERATOR"
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      },
+      {
+        "fragment": 1,
+        "pipeline": 1,
+        "task": 1,
+        "operators": {
+          "OLAP_SCAN_OPERATOR": {
+            "rows": 1,
+            "scanEos": true
+          }
+        },
+        "planOperators": [
+          "SORT_SINK_OPERATOR",
+          "OLAP_SCAN_OPERATOR"
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      }
+    ]
+  }
+}

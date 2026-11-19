@@ -1,0 +1,824 @@
+{
+  "status": "NO_GO",
+  "checks": {
+    "clockContinuity": true,
+    "fullActivePopulation": true,
+    "platformBeforeSource": false,
+    "allLiveInstancesCancelled": false,
+    "allTasksCausallyClosed": false,
+    "allFragmentsAccounted": false,
+    "endOfExecution": false,
+    "feUserCancelInWindow": false
+  },
+  "anchorNs": 1795068385575813000,
+  "feAudit": {
+    "complete": true,
+    "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+    "state": "EOF",
+    "errorCode": "0",
+    "userCancel": false,
+    "timeout": false,
+    "reader": true,
+    "statementSha256": "779405d77852bb511c189d4b0a404932b51eec629a56ca006debcf4a051ef564",
+    "auditInode": "219380",
+    "fixedEntity": true,
+    "isSelect": true,
+    "returnRows": 101,
+    "startUtc": "2026-11-19T06:06:25.565000+00:00",
+    "durationMs": 34,
+    "endUtc": "2026-11-19T06:06:25.599000+00:00",
+    "endExclusiveUpperUtc": "2026-11-19T06:06:25.600000+00:00",
+    "lineSha256": "e12366cd3a285f019a24f36a34772331764072605be6acb9d91c3b5ce11ab341",
+    "sqlHash": "01e9398e1317ed72d2298b4994e9acba"
+  },
+  "profileComparisons": [],
+  "identifiedTaskCloses": [],
+  "clockDriftUpperNs": 23669,
+  "expectedFragments": 2,
+  "samplesRead": 260,
+  "samples": [
+    {
+      "beginNs": 1795068385570323092,
+      "endNs": 1795068385570653384,
+      "complete": true,
+      "globalCount": 3,
+      "groups": [
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ed",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2
+                }
+              ]
+            },
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "bd6b3aec45ce951b3ce5ff6f716ab98d795e7c592ca8e93a3e13069e74a0ab79"
+    },
+    {
+      "beginNs": 1795068385573666967,
+      "endNs": 1795068385574117634,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ed",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2
+                }
+              ]
+            },
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "bfeb32f560f8d5b801f113927b0495411ea6fba4784fca067711d2f56a8f0b92"
+    },
+    {
+      "beginNs": 1795068385576338509,
+      "endNs": 1795068385576689009,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ed",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2
+                }
+              ]
+            },
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "08afb60d75048c32ddbcdd75d334868d42497369a8ade88b1669730f4c166637"
+    },
+    {
+      "beginNs": 1795068385579273967,
+      "endNs": 1795068385579552926,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ed",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2
+                }
+              ]
+            },
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "ae852efeae884e17c2769e9e42d00f856cd379a0ed2ba5ee0e9b304eee477512"
+    },
+    {
+      "beginNs": 1795068385581760676,
+      "endNs": 1795068385581957092,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ed",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2
+                }
+              ]
+            },
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "d37a865f120d28c3a5f6577fdb27d3018b8ecea1cce70830482c88799b21eef5"
+    },
+    {
+      "beginNs": 1795068385584726051,
+      "endNs": 1795068385584882759,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ed",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2
+                }
+              ]
+            },
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "15941423635680370fcdd311fc111b637a99eed42ed66f130a86839f956f4819"
+    },
+    {
+      "beginNs": 1795068385587172134,
+      "endNs": 1795068385587343301,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ed",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2
+                }
+              ]
+            },
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ec",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "15941423635680370fcdd311fc111b637a99eed42ed66f130a86839f956f4819"
+    },
+    {
+      "beginNs": 1795068385589833926,
+      "endNs": 1795068385590092467,
+      "complete": true,
+      "globalCount": 1,
+      "groups": [
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ed",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": true,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a4fae4d74ee9464d5cdd6bdea922c38e3d1238283b3f24068ff9d19c87e2444c"
+    },
+    {
+      "beginNs": 1795068385592238842,
+      "endNs": 1795068385592399926,
+      "complete": true,
+      "globalCount": 1,
+      "groups": [
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ed",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": true,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a4fae4d74ee9464d5cdd6bdea922c38e3d1238283b3f24068ff9d19c87e2444c"
+    },
+    {
+      "beginNs": 1795068385594597801,
+      "endNs": 1795068385594801717,
+      "complete": true,
+      "globalCount": 1,
+      "groups": [
+        {
+          "query": "d7b13a19647547af-99e9cdf37ad6c2e8",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "d7b13a19647547af-99e9cdf37ad6c2ed",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "running": true,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a4fae4d74ee9464d5cdd6bdea922c38e3d1238283b3f24068ff9d19c87e2444c"
+    },
+    {
+      "beginNs": 1795068385599302467,
+      "endNs": 1795068385599503467,
+      "complete": true,
+      "globalCount": 0,
+      "groups": [],
+      "sha256": "80cb9b604a98f4f8fa8453148a0a6c7b95417d115aa7d057db248e3dd5419715"
+    }
+  ],
+  "events": [
+    {
+      "event": "registered",
+      "utc": "2026-11-19T06:06:25.569486+00:00",
+      "lineSha256": "2a2169c71ffa954e4fa56edc8911d47ae0ef28c10a137116f5b74459fb170a88",
+      "expectedFragments": 2
+    },
+    {
+      "event": "fragment_end",
+      "utc": "2026-11-19T06:06:25.588918+00:00",
+      "lineSha256": "b9dc626cdf563c58b59176c5778c82cd307216487f8996f25057966f769b9c86",
+      "fragment": 0
+    },
+    {
+      "event": "fragment_end",
+      "utc": "2026-11-19T06:06:25.597187+00:00",
+      "lineSha256": "6095f08bbf0fa92f486976d67f3bb30b6005af66493b2a8f56c2aa683e968e36",
+      "fragment": 1
+    },
+    {
+      "event": "context_end",
+      "utc": "2026-11-19T06:06:25.597282+00:00",
+      "lineSha256": "ab7bede6ceeab5fa8ccbc30130ecd01d2b0b9ebfcb92d039981d03822a342145"
+    }
+  ],
+  "pendingTasks": 3,
+  "userCancelTaskCloses": 0,
+  "finalizedWithoutEos": 0,
+  "pipelineZeroUpperMs": 23.690467
+}
