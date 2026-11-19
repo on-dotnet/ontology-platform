@@ -16,7 +16,7 @@ DRIVER = 'scripts/maintenance/workflow-m4-query.mjs'
 PLATFORM = 'scripts/maintenance/workflow_oracle_mapping_platform.py'
 NODE = '/opt/homebrew/Cellar/node@24/24.22.1/bin/node'
 DRIVERS = (DRIVER, 'scripts/maintenance/workflow-oracle-query-fixture.mjs', PLATFORM,
-           'scripts/maintenance/workflow_oracle_mapping_formal_observer.py', 'scripts/maintenance/workflow_execution.py',
+           'scripts/maintenance/workflow_execution.py',
            'scripts/maintenance/workflow_m2_build.py', 'infra/oracle/config/mapping-observer.sql')
 GATES = {'environment', 'contract', 'backend', 'web', 'interaction'}
 READY = 's0-oracle-ready'
@@ -42,8 +42,11 @@ def summary(argv):
     return dict(executable=Path(argv[0]).name, argumentCount=len(argv)-1, sha256=digest_value(argv))
 
 
-def drivers(root):
-    return {name: sha(ordinary(root/name).read_bytes()) for name in DRIVERS}
+def drivers(root, mode):
+    names = DRIVERS
+    if mode in ('s0-oracle-natural', 's0-oracle-cancel'):
+        names += ('scripts/maintenance/workflow_oracle_mapping_formal_observer.py',)
+    return {name: sha(ordinary(root/name).read_bytes()) for name in names}
 
 
 def stable_host(host):
@@ -73,7 +76,7 @@ def browser_invocation(root, mode, case, host, api_build, test_build, stage_inpu
     for binding in (api_build, test_build):
         require(set(binding) == {'receiptSha256','inputKey','outputKey'} and all(HEX.fullmatch(v) for v in binding.values()), 'OMQ_BUILD_KEY')
     args = [NODE, DRIVER, '--task', TASK, '--run-id', RUN, '--mode', mode]
-    components = dict(taskId=TASK, runId=RUN, mode=mode, case=case, drivers=drivers(root),
+    components = dict(taskId=TASK, runId=RUN, mode=mode, case=case, drivers=drivers(root, mode),
                       api=api_build, tests=test_build, host=stable_host(host), stageInputs=stage_inputs)
     return args, digest_value(components), 'omq-browser-'+mode
 
