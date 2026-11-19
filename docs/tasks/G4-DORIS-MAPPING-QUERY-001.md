@@ -2,13 +2,13 @@
 
 ## 当前执行与授权
 
-唯一执行状态为 **RF02_IN_PROGRESS**。本轮 Base 为 `a363fbd53d3f2813539534f921f2b21004638eec`。唯一阻断是 E1 命令指纹与执行输入的资格绑定。RF-01、E2、E3 及新 AC06 已获限定接受，G4 总体 PARTIAL。
+唯一执行状态为 **WAITING_CHATGPT_REVIEW**。本轮 Base 为 `a363fbd53d3f2813539534f921f2b21004638eec`。RF-02 的命令、执行输入与审计资格已修复，五个定向场景和独立复审通过。RF-01、E2、E3 及新 AC06 已获限定接受，G4 总体 PARTIAL。
 
-Master 单写。范围、所有权、数据与期限以[唯一 A–F 合同](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)为准。当前复审修复覆盖共享语义期限、三个既有工程入口及对应定向验证。
+Master 单写。范围、所有权、数据与期限以[唯一 A–F 合同](../evidence/G4-DORIS-MAPPING-QUERY-001/contract-admission-request.md)为准。本次只修 E1 资格；原实施及上一轮证据沿用原运行身份。见[本轮修复报告](../evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/report.md)。
 
 ## 原实施验收与本轮资格
 
-下表全部记录 implementation-01 当次结果。AC06 固定 HEAP 的取消因果获接受。AC09 原测试未覆盖发布根清理。新候选的定向执行与资格见[复审证据](../evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-01)。
+下表全部记录 implementation-01 当次结果。AC06 固定 HEAP 的取消因果获接受。AC09 原测试未覆盖发布根清理。上一轮定向执行与资格见[review-fix-01 证据](../evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-01)。
 
 | AC-ID | 行为与正反Given/When/Then（完整场景见规格E） | 实现/测试位置 | 最早验证层/结果 |
 |---|---|---|---|

@@ -1,0 +1,36 @@
+{
+  "testedCommit": "698ca0e2e4c5b50659e02637c77473e32bc1a343",
+  "gate": "doris-mapping-query-admission",
+  "command": [
+    "python3",
+    "-B",
+    "scripts/tests/WorkflowDorisMappingQuery.Tests.py"
+  ],
+  "status": "PASS",
+  "actualValidInteractionChecks": 316,
+  "negativeCases": {
+    "expired-fingerprint": "RF02_FINGERPRINT",
+    "short-fingerprint": "RF02_FINGERPRINT",
+    "wrong-argv": "RF02_ARGV",
+    "healthy-command": "RF02_FINGERPRINT",
+    "healthy-session-command": "RF02_SESSION_COMMAND",
+    "driver": "RF02_DRIVER",
+    "stage": "RF02_STAGE",
+    "unstable-input": "RF02_REPORT_INPUT",
+    "wrong-host": "RF02_HOST",
+    "wrong-build-on-both": "RF02_HOST",
+    "audit-window": "RF02_AUDIT_WINDOW",
+    "legacy-expired": "RF02_HISTORICAL_ORIGINAL",
+    "legacy-short": "RF02_HISTORICAL_ORIGINAL",
+    "e2-control": "RF_E2_EXECUTION"
+  },
+  "evidence": {
+    "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/final/gates/doris-mapping-query-admission.txt",
+    "sha256": "51701d34dcae1988eb10be3bec7cea9779ce8f6fea6b1722277f8a86b10426ea",
+    "sizeBytes": 735,
+    "encoding": "raw",
+    "path": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/final/gates/doris-mapping-query-admission.txt"
+  },
+  "priorFieldObservations": "original-field-reads.json",
+  "earlierMalformedPasses": "External reviewer observed PASS/316, not re-executed locally."
+}
