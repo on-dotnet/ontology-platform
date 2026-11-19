@@ -1,0 +1,6055 @@
+{
+  "status": "PASS",
+  "checks": {
+    "clockContinuity": true,
+    "fullActivePopulation": true,
+    "platformBeforeSource": true,
+    "allLiveInstancesCancelled": true,
+    "allTasksCausallyClosed": true,
+    "allFragmentsAccounted": true,
+    "endOfExecution": true,
+    "feUserCancelInWindow": true
+  },
+  "anchorNs": 1795080556683935000,
+  "beforeCommitBoundNs": 1795080556693439000,
+  "liveAfterCommitted": true,
+  "feAudit": {
+    "complete": true,
+    "query": "7225034c45314485-91ca697a7a530809",
+    "state": "ERR",
+    "errorCode": "1105",
+    "userCancel": true,
+    "timeout": false,
+    "reader": true,
+    "statementSha256": "779405d77852bb511c189d4b0a404932b51eec629a56ca006debcf4a051ef564",
+    "auditInode": "219380",
+    "fixedEntity": true,
+    "isSelect": true,
+    "returnRows": 0,
+    "startUtc": "2026-11-19T09:29:16.681000+00:00",
+    "durationMs": 31,
+    "endUtc": "2026-11-19T09:29:16.712000+00:00",
+    "endExclusiveUpperUtc": "2026-11-19T09:29:16.713000+00:00",
+    "lineSha256": "b85057952623c8473d14d7a8cd533b054b29e0da3138b33f85391142277ab967",
+    "sqlHash": "01e9398e1317ed72d2298b4994e9acba"
+  },
+  "profileComparisons": [
+    {
+      "operator": "MATERIALIZATION_OPERATOR",
+      "instance": "7225034c45314485-91ca697a7a53080e",
+      "index": 0,
+      "pipeline": 0,
+      "referenceRows": 101,
+      "cancelledRows": 0,
+      "observedShortfall": true,
+      "nonEosScan": false,
+      "finalWakeEarly": 0,
+      "soleMerge": true,
+      "nativeNodes": [
+        {
+          "name": "EXCHANGE_OPERATOR",
+          "nodeId": 2,
+          "parallelTasks": 1,
+          "serial": false
+        },
+        {
+          "name": "MATERIALIZATION_OPERATOR",
+          "nodeId": 3,
+          "parallelTasks": 1,
+          "serial": false
+        },
+        {
+          "name": "RESULT_SINK_OPERATOR",
+          "nodeId": 2147483647,
+          "parallelTasks": null,
+          "serial": false
+        }
+      ]
+    },
+    {
+      "operator": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+      "instance": "7225034c45314485-91ca697a7a53080d",
+      "index": 0,
+      "pipeline": 0,
+      "referenceRows": 101,
+      "cancelledRows": 0,
+      "observedShortfall": true,
+      "nonEosScan": false,
+      "finalWakeEarly": 0,
+      "soleMerge": true,
+      "nativeNodes": [
+        {
+          "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+          "nodeId": 1,
+          "parallelTasks": 1,
+          "serial": false
+        },
+        {
+          "name": "DATA_STREAM_SINK_OPERATOR",
+          "nodeId": 2,
+          "parallelTasks": null,
+          "serial": false
+        }
+      ]
+    },
+    {
+      "operator": "OLAP_SCAN_OPERATOR",
+      "instance": "7225034c45314485-91ca697a7a53080d",
+      "index": 1,
+      "pipeline": 1,
+      "referenceRows": 4194304,
+      "cancelledRows": 179841,
+      "observedShortfall": false,
+      "nonEosScan": true,
+      "finalWakeEarly": 0,
+      "soleMerge": true,
+      "nativeNodes": [
+        {
+          "name": "OLAP_SCAN_OPERATOR",
+          "nodeId": 0,
+          "parallelTasks": 1,
+          "serial": false
+        },
+        {
+          "name": "SORT_SINK_OPERATOR",
+          "nodeId": 1,
+          "parallelTasks": null,
+          "serial": false
+        }
+      ]
+    }
+  ],
+  "identifiedTaskCloses": [
+    [
+      "7225034c45314485-91ca697a7a53080e",
+      0
+    ]
+  ],
+  "clockDriftUpperNs": 14499,
+  "expectedFragments": 2,
+  "samplesRead": 260,
+  "samples": [
+    {
+      "beginNs": 1795080556687278170,
+      "endNs": 1795080556687547545,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": false,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "94fce743a5b4cb263a8f664c31016b374abdb93450541195ac2bd4e320b7514d"
+    },
+    {
+      "beginNs": 1795080556687724670,
+      "endNs": 1795080556687915712,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556688062628,
+      "endNs": 1795080556688244712,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556688410670,
+      "endNs": 1795080556688780878,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556689095420,
+      "endNs": 1795080556689400295,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556689691128,
+      "endNs": 1795080556690006337,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556690186920,
+      "endNs": 1795080556690492295,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556690860753,
+      "endNs": 1795080556691266253,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556691567795,
+      "endNs": 1795080556691854212,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556692217295,
+      "endNs": 1795080556692993712,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556693276878,
+      "endNs": 1795080556693424337,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "fe6a1e60b4b1383d0234133308bc22df0aca970f6a7e1d6cefc6b57a6dfcdf7d"
+    },
+    {
+      "beginNs": 1795080556693533503,
+      "endNs": 1795080556693616420,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556693715920,
+      "endNs": 1795080556693775795,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556693868545,
+      "endNs": 1795080556693928587,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556694025837,
+      "endNs": 1795080556694096253,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "31a7cbe8bf4bfa5220fafc1ae4c347e170c2d0ab5a4a4b79e33b31e573067c3f"
+    },
+    {
+      "beginNs": 1795080556694191962,
+      "endNs": 1795080556694547128,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556694851295,
+      "endNs": 1795080556695121837,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556695396503,
+      "endNs": 1795080556695679670,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "1cd112f2f0fb81d52cf98e2a46812329f407539130bb982280ffef942cb5dd70"
+    },
+    {
+      "beginNs": 1795080556695881003,
+      "endNs": 1795080556696005462,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "aa04eeca3be48a6e14e6abfbd5ba8157cc927c46801aaa62ef055ad1ab6df5db"
+    },
+    {
+      "beginNs": 1795080556696103212,
+      "endNs": 1795080556696180253,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "dde163a4380c6541aac58b9b3cd3347830f7cedd1547b5620c93d3be9821234d"
+    },
+    {
+      "beginNs": 1795080556696287628,
+      "endNs": 1795080556696531170,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "d8178f404af1343672279b8fe5215d6c6412306942d42998a4845a5d70a70442"
+    },
+    {
+      "beginNs": 1795080556696682878,
+      "endNs": 1795080556696917587,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "d8178f404af1343672279b8fe5215d6c6412306942d42998a4845a5d70a70442"
+    },
+    {
+      "beginNs": 1795080556697047462,
+      "endNs": 1795080556697245462,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "d8178f404af1343672279b8fe5215d6c6412306942d42998a4845a5d70a70442"
+    },
+    {
+      "beginNs": 1795080556697512628,
+      "endNs": 1795080556697674253,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "d8178f404af1343672279b8fe5215d6c6412306942d42998a4845a5d70a70442"
+    },
+    {
+      "beginNs": 1795080556697841837,
+      "endNs": 1795080556697996920,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "aeb715884872fd35777851e0f39abf675a8ac6b0292935d19a50776188fe5998"
+    },
+    {
+      "beginNs": 1795080556698196670,
+      "endNs": 1795080556698395837,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "aeb715884872fd35777851e0f39abf675a8ac6b0292935d19a50776188fe5998"
+    },
+    {
+      "beginNs": 1795080556698530378,
+      "endNs": 1795080556698703295,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "aeb715884872fd35777851e0f39abf675a8ac6b0292935d19a50776188fe5998"
+    },
+    {
+      "beginNs": 1795080556698811670,
+      "endNs": 1795080556699009170,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "5cb086d6d1274d27360d391b71851c92e298b346ec8b15706c8eb56e12ff845e"
+    },
+    {
+      "beginNs": 1795080556699145503,
+      "endNs": 1795080556699303837,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556699451253,
+      "endNs": 1795080556699638878,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556699798420,
+      "endNs": 1795080556699992128,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556700151837,
+      "endNs": 1795080556700411420,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556700589712,
+      "endNs": 1795080556700867795,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556700970837,
+      "endNs": 1795080556701149712,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556701259920,
+      "endNs": 1795080556701453837,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556701554295,
+      "endNs": 1795080556701876295,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556702222253,
+      "endNs": 1795080556702493087,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556702651753,
+      "endNs": 1795080556702933962,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556703044212,
+      "endNs": 1795080556703336462,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556703634337,
+      "endNs": 1795080556703933087,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556704121420,
+      "endNs": 1795080556704365878,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556704516378,
+      "endNs": 1795080556704785462,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556704932503,
+      "endNs": 1795080556705186462,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556705517462,
+      "endNs": 1795080556705772962,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556705950003,
+      "endNs": 1795080556706234712,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556706388628,
+      "endNs": 1795080556706620212,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556706755337,
+      "endNs": 1795080556707330212,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "f805cbaea65943fe1d2110a05feb1455c3f31424a94c1edf6a228f5229ad850e"
+    },
+    {
+      "beginNs": 1795080556707496670,
+      "endNs": 1795080556707815545,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "f805cbaea65943fe1d2110a05feb1455c3f31424a94c1edf6a228f5229ad850e"
+    },
+    {
+      "beginNs": 1795080556707945087,
+      "endNs": 1795080556708135545,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "f805cbaea65943fe1d2110a05feb1455c3f31424a94c1edf6a228f5229ad850e"
+    },
+    {
+      "beginNs": 1795080556708266878,
+      "endNs": 1795080556708696920,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "f805cbaea65943fe1d2110a05feb1455c3f31424a94c1edf6a228f5229ad850e"
+    },
+    {
+      "beginNs": 1795080556708942920,
+      "endNs": 1795080556709239712,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "f805cbaea65943fe1d2110a05feb1455c3f31424a94c1edf6a228f5229ad850e"
+    },
+    {
+      "beginNs": 1795080556709744920,
+      "endNs": 1795080556710390212,
+      "complete": true,
+      "globalCount": 2,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "a38266b3892392a17f860543962cd09e728a8f643113507c101c649781ff2df3"
+    },
+    {
+      "beginNs": 1795080556710561462,
+      "endNs": 1795080556710745587,
+      "complete": true,
+      "globalCount": 7,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "d3dc44e875884414cb64f4019aa04acdefe280ca58d1ab4171fda2f8a9072f68"
+    },
+    {
+      "beginNs": 1795080556711177087,
+      "endNs": 1795080556711301087,
+      "complete": true,
+      "globalCount": 7,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "OLAP_SCAN_OPERATOR",
+                  "nodeId": 0,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "SORT_SINK_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 0,
+          "total": 1,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080e",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "BLOCKED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": [
+                {
+                  "name": "EXCHANGE_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "MATERIALIZATION_OPERATOR",
+                  "nodeId": 3,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "RESULT_SINK_OPERATOR",
+                  "nodeId": 2147483647,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sha256": "740afd71ce301eec051d226267e1186b5b60246c31106265b47569dfe53f8b33"
+    },
+    {
+      "beginNs": 1795080556711735462,
+      "endNs": 1795080556712266712,
+      "complete": true,
+      "globalCount": 6,
+      "groups": [
+        {
+          "query": "7225034c45314485-91ca697a7a530809",
+          "closed": 1,
+          "total": 2,
+          "complete": true,
+          "tasks": [
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 0,
+              "opened": true,
+              "eos": false,
+              "state": "RUNNABLE",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": true,
+              "operators": [
+                {
+                  "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+                  "nodeId": 1,
+                  "parallelTasks": 1,
+                  "serial": false
+                },
+                {
+                  "name": "DATA_STREAM_SINK_OPERATOR",
+                  "nodeId": 2,
+                  "parallelTasks": null,
+                  "serial": false
+                }
+              ]
+            },
+            {
+              "instance": "7225034c45314485-91ca697a7a53080d",
+              "task": 1,
+              "opened": true,
+              "eos": false,
+              "state": "FINALIZED",
+              "dryRun": false,
+              "wakeEarly": false,
+              "wakeBy": -1,
+              "running": false,
+              "operators": []
+            }
+          ]
+        }
+      ],
+      "sha256": "414bcfa464a0e2eb6ea0e29dc69d94544914fa6670d61d8ed4c3d262604a5e1e"
+    },
+    {
+      "beginNs": 1795080556713233795,
+      "endNs": 1795080556713286962,
+      "complete": true,
+      "globalCount": 0,
+      "groups": [],
+      "sha256": "80cb9b604a98f4f8fa8453148a0a6c7b95417d115aa7d057db248e3dd5419715"
+    }
+  ],
+  "events": [
+    {
+      "event": "registered",
+      "utc": "2026-11-19T09:29:16.686267+00:00",
+      "lineSha256": "7307727245fd3a8923bdbac049ec9e3363773a78ecd04b6eb9ae785cf3707e68",
+      "expectedFragments": 2
+    },
+    {
+      "event": "user_cancel_rpc",
+      "utc": "2026-11-19T09:29:16.711066+00:00",
+      "lineSha256": "1b6c71233b4682cdeaa6861825fcbd45fb19bacfadd1b7d2527e008a8780f495"
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T09:29:16.711093+00:00",
+      "lineSha256": "8c60a56ff881f0d5dfd0de57c93d4d2cb22b46afe033a28caa6173c5d1872fef",
+      "fragment": 0
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T09:29:16.711098+00:00",
+      "lineSha256": "1dc98685586cca6d177058d475839f44fc210c496aa237cf201fd6128087e9c3",
+      "instance": "7225034c45314485-91ca697a7a53080d"
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T09:29:16.711165+00:00",
+      "lineSha256": "c9da8dc3983d76334c72c37e57d802d0e9880fcf5a5dc32698272e9761f4d995",
+      "fragment": 0
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T09:29:16.711175+00:00",
+      "lineSha256": "fd1da7582521a96f38cc7cb691c8614b0f058d4eab5f23f40d4b1e5115688f4d",
+      "instance": "7225034c45314485-91ca697a7a53080d"
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T09:29:16.711117+00:00",
+      "lineSha256": "85d0dce3cb4114921aee05fe10e001841868f75b21c18d10d385caeb7f1ae5ce",
+      "fragment": 1
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T09:29:16.711216+00:00",
+      "lineSha256": "9b9419b4147cd8a1189c7419a6303734e1f1951dce0c019ed66db771b1e4c871",
+      "instance": "7225034c45314485-91ca697a7a53080e"
+    },
+    {
+      "event": "cancel_broadcast_returned",
+      "utc": "2026-11-19T09:29:16.711262+00:00",
+      "lineSha256": "a181e1709b5e90a19ee77ced9eeb7c566162c69325ae24efb472b9ce78394b37"
+    },
+    {
+      "event": "user_cancel_task_close",
+      "utc": "2026-11-19T09:29:16.711186+00:00",
+      "lineSha256": "293a9ff82096bf6a9f4a230152ee2445a6d4e3ac9357bef1428b931819a98eba"
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T09:29:16.711408+00:00",
+      "lineSha256": "74f6bb9d82a02f3edf03409cbaa827e7075962d2c19258801a28966403e22076",
+      "fragment": 1
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T09:29:16.711419+00:00",
+      "lineSha256": "dee653d8a2d35754a3764f632da8f070e9cd0da9eec4db0bdbf42a07e8f62873",
+      "instance": "7225034c45314485-91ca697a7a53080e"
+    },
+    {
+      "event": "user_cancel_task_close",
+      "utc": "2026-11-19T09:29:16.711426+00:00",
+      "lineSha256": "c2dae3b08eee1b676f8d4b3f93b6ea9f73bf7c35069ae6df806438b91c48fbb6"
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T09:29:16.711454+00:00",
+      "lineSha256": "35354093477480bea5030afac43719e1ef65f1ac65ae0ad6425f4f76e2f84008",
+      "fragment": 1
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T09:29:16.711457+00:00",
+      "lineSha256": "cb9bd0cef13ebd21e013508dd7f61dac61b308bcb2eccf4cb616bd6b22cc3d38",
+      "instance": "7225034c45314485-91ca697a7a53080e"
+    },
+    {
+      "event": "coordinator_cancel_error",
+      "utc": "2026-11-19T09:29:16.711540+00:00",
+      "lineSha256": "93460d998c3c5f740923d93cf3d4829e4e337a76f1895ccd2bc4494ff0f07087"
+    },
+    {
+      "event": "fragment_end",
+      "utc": "2026-11-19T09:29:16.711870+00:00",
+      "lineSha256": "70443da5463684cb4d5595c32af9d1b269daecadbc6c5517eb257d7e77019041",
+      "fragment": 1
+    },
+    {
+      "event": "fragment_cancel",
+      "utc": "2026-11-19T09:29:16.711192+00:00",
+      "lineSha256": "b908c96e576cf5181d1649b167948d9d116133418a21a68fff839bdd33a2698a",
+      "fragment": 0
+    },
+    {
+      "event": "cancel_instance",
+      "utc": "2026-11-19T09:29:16.711926+00:00",
+      "lineSha256": "1e0885052fd6cdcebdac35df45551cac9fe5600973c771016f1815ab3c2f63b7",
+      "instance": "7225034c45314485-91ca697a7a53080d"
+    },
+    {
+      "event": "user_cancel_task_close",
+      "utc": "2026-11-19T09:29:16.711941+00:00",
+      "lineSha256": "b356c537350dfe4a320e8fb3b2fbed61ae782f39687de93e56f2b7fcbc8bd1e1"
+    },
+    {
+      "event": "coordinator_cancel_error",
+      "utc": "2026-11-19T09:29:16.712085+00:00",
+      "lineSha256": "b77a898d8f45d6e9378732907ec9b68194ebdcdaccac6742d5a7f08fa7476906"
+    },
+    {
+      "event": "fragment_end",
+      "utc": "2026-11-19T09:29:16.712488+00:00",
+      "lineSha256": "314cb69c0cd0571a0a6b4e47129198614360b8ddbabd512b051fd5707248c965",
+      "fragment": 0
+    },
+    {
+      "event": "context_end",
+      "utc": "2026-11-19T09:29:16.712773+00:00",
+      "lineSha256": "f991a2e4d69ce3f8e1b600fd4170dfda7e7a46abda6b72675a06ba670eb5b54e"
+    }
+  ],
+  "pendingTasks": 3,
+  "userCancelTaskCloses": 3,
+  "finalizedWithoutEos": 1,
+  "pipelineZeroUpperMs": 29.351962
+}

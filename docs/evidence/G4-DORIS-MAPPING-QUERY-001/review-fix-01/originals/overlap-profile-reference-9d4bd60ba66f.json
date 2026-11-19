@@ -1,0 +1,256 @@
+{
+  "binding": {
+    "attempt": "9d4bd60ba66f",
+    "manifestSha256": "347b7211975413e2f33b117408673feb6c69eea9b6684e9b2c5fa49f44b7aed5",
+    "rowsByTable": {
+      "dmq_entity": 4194304,
+      "dmq_target": 3
+    },
+    "purpose": "cancellation_only"
+  },
+  "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+  "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+  "statementSha256": "779405d77852bb511c189d4b0a404932b51eec629a56ca006debcf4a051ef564",
+  "rowCount": 101,
+  "rowHash": "0bd022fc45a56ae0409636df3a78f008d1e98c8fac0a1cc9d9625fbe03337eaa",
+  "profile": {
+    "query": "1e807f4941bc48cd-b33af00bd5ea75f2",
+    "state": "OK",
+    "bytes": 44103,
+    "profileSha256": "091f86056ab9bf2760558a77f863a2c39ce7b7c4ea53a9f09a991c6a6a156970",
+    "tasks": [
+      {
+        "fragment": 0,
+        "pipeline": 0,
+        "task": 0,
+        "operators": {
+          "MATERIALIZATION_OPERATOR": {
+            "rows": 101
+          },
+          "EXCHANGE_OPERATOR": {
+            "rows": 101
+          }
+        },
+        "planOperators": [
+          "RESULT_SINK_OPERATOR",
+          "MATERIALIZATION_OPERATOR",
+          "EXCHANGE_OPERATOR"
+        ],
+        "planNodes": [
+          {
+            "name": "RESULT_SINK_OPERATOR",
+            "nodeId": 2147483647
+          },
+          {
+            "name": "MATERIALIZATION_OPERATOR",
+            "nodeId": 3
+          },
+          {
+            "name": "EXCHANGE_OPERATOR",
+            "nodeId": 2
+          }
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      },
+      {
+        "fragment": 1,
+        "pipeline": 0,
+        "task": 0,
+        "operators": {
+          "LOCAL_MERGE_SORT_SOURCE_OPERATOR": {
+            "rows": 101
+          }
+        },
+        "planOperators": [
+          "DATA_STREAM_SINK_OPERATOR",
+          "LOCAL_MERGE_SORT_SOURCE_OPERATOR"
+        ],
+        "planNodes": [
+          {
+            "name": "DATA_STREAM_SINK_OPERATOR",
+            "nodeId": 2
+          },
+          {
+            "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+            "nodeId": 1
+          }
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      },
+      {
+        "fragment": 1,
+        "pipeline": 1,
+        "task": 1,
+        "operators": {
+          "OLAP_SCAN_OPERATOR": {
+            "rows": 4194304,
+            "scannerPresent": true,
+            "scanEos": true,
+            "SegmentIterator": true,
+            "IndexFilter": true
+          }
+        },
+        "planOperators": [
+          "SORT_SINK_OPERATOR",
+          "OLAP_SCAN_OPERATOR"
+        ],
+        "planNodes": [
+          {
+            "name": "SORT_SINK_OPERATOR",
+            "nodeId": 1
+          },
+          {
+            "name": "OLAP_SCAN_OPERATOR",
+            "nodeId": 0
+          }
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      }
+    ]
+  },
+  "nativeReadback": {
+    "attempts": 14,
+    "elapsedMs": 3975.1957500120625
+  },
+  "native": {
+    "query": "1e807f4941bc48cd-b33af00bd5ea75f2",
+    "start": {
+      "inode": 219836,
+      "endOffset": 43691654,
+      "fileSize": 43691744,
+      "trailingBytes": 90,
+      "trailingSha256": "8c5c9bef6822d378dc69af07913331be23e1aaee2deaf005d48e21b50eef2a24"
+    },
+    "boundary": {
+      "inode": 219836,
+      "endOffset": 43699763,
+      "fileSize": 43699936,
+      "trailingBytes": 173,
+      "trailingSha256": "ac92bd1fbca6afa574b2373a030fc4337e61ad271c84120acebb93d9a9f306ba"
+    },
+    "events": [
+      {
+        "event": "register",
+        "level": "I",
+        "site": "fragment_mgr.cpp:729",
+        "timestamp": "20261119 09:28:57.166709",
+        "tid": 827,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 43692636,
+        "instance": null,
+        "fragment": null,
+        "sha256": "8621b7d2b641e585c8322a17fc76ab86baaa95528adb5b45babcd0fab43ac59c"
+      },
+      {
+        "event": "start",
+        "level": "I",
+        "site": "fragment_mgr.cpp:657",
+        "timestamp": "20261119 09:28:57.167317",
+        "tid": 828,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 43692978,
+        "instance": null,
+        "fragment": null,
+        "sha256": "00b54d65ca07b2b3819352124dde50548ff4a475f65fced0ea4d35d09099d2ac"
+      },
+      {
+        "event": "fragment_end",
+        "level": "I",
+        "site": "pipeline_fragment_context.cpp:142",
+        "timestamp": "20261119 09:28:57.325191",
+        "tid": 533,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 43693102,
+        "instance": null,
+        "fragment": 0,
+        "sha256": "6cd9f10a89b26312184fc34fc819ee3474d7018f99368d8673519b99d3af4264"
+      },
+      {
+        "event": "other",
+        "level": "I",
+        "site": "rowid_fetcher.cpp:651",
+        "timestamp": "20261119 09:28:57.325407",
+        "tid": 743,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 43693290,
+        "instance": null,
+        "fragment": null,
+        "sha256": "0497b18a7d074a7593321e0212088c3ba3c92bbc8656bcfab4678ddeb07b8f34"
+      },
+      {
+        "event": "fragment_end",
+        "level": "I",
+        "site": "pipeline_fragment_context.cpp:142",
+        "timestamp": "20261119 09:28:57.325727",
+        "tid": 533,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 43693860,
+        "instance": null,
+        "fragment": 1,
+        "sha256": "ea12165ce748404ca3dc76b89788d69fee29bf4940906dc06432a5a69eac164d"
+      },
+      {
+        "event": "context_end",
+        "level": "I",
+        "site": "query_context.cpp:262",
+        "timestamp": "20261119 09:28:57.325809",
+        "tid": 533,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 43694048,
+        "instance": null,
+        "fragment": null,
+        "sha256": "0a86b71f65975d03bab8154a9e30ca12901e0399ba7500fc8591fb0fa275dcf3"
+      },
+      {
+        "event": "other",
+        "level": "I",
+        "site": "result_block_buffer.cpp:170",
+        "timestamp": "20261119 09:28:57.326086",
+        "tid": 840,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 43694318,
+        "instance": null,
+        "fragment": 1,
+        "sha256": "152cbc366f7e2ac39362265ba9080582178f60335c3a17dff4676c160f072817"
+      },
+      {
+        "event": "user_rpc",
+        "level": "I",
+        "site": "internal_service.cpp:637",
+        "timestamp": "20261119 09:28:57.326320",
+        "tid": 825,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 43694537,
+        "instance": null,
+        "fragment": null,
+        "sha256": "8768c4ab52c2be3819d9a29f33acc7da8c033f1bf9dfa40cbe17c2aed8243129"
+      },
+      {
+        "event": "other",
+        "level": "W",
+        "site": "fragment_mgr.cpp:933",
+        "timestamp": "20261119 09:28:57.326339",
+        "tid": 825,
+        "queryField": true,
+        "userCancel": false,
+        "offset": 43694693,
+        "instance": null,
+        "fragment": null,
+        "sha256": "899a4fad3189398d3b74aa8ad2ba5b145cf0de655be8d5751e5b0f85da528a9f"
+      }
+    ]
+  },
+  "firstFragmentEndMs": 158.482,
+  "minimumFirstFragmentMs": 50
+}

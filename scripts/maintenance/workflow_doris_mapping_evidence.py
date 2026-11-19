@@ -77,6 +77,9 @@ def qualify(gate, input_key):
     from workflow_m2_evidence import mtp, require
 
     task, run = 'G4-DORIS-MAPPING-QUERY-001', 'implementation-01'
+    current = build.ROOT/'docs/evidence'/task/'review-fix-01'
+    if gate!='environment' and (current/'current-inputs.json').is_file():
+        return qualify_review_fix(gate,input_key,current)
     groups = {'environment': ['prepare'], 'contract': ['wire','pg-golden'],
               'backend': ['adapters','tls','query','semantic-batch','pg-golden','ac06'],
               'web': ['typecheck','lint','unit','build','ui-s3'],
@@ -228,6 +231,343 @@ def qualify(gate, input_key):
     return dict(status='PASS',executionMode='REUSED',qualificationMode='FRESH',taskId=task,runId=run,gate=gate,inputKey=input_key,
                 tests=tests,skipped=0,originals=examined)
 
+
+
+def direct_task_proof(directory, case):
+    """重开原八项直接因果，按同一查询的工作实例、完整采样和终态 Profile 重算任务集合。"""
+    import json
+    from doris_query_cancel_witness import canonical_id, instant_ns, native_task_closes
+    from doris_query_profile_witness import compare_tasks, dependency_proof
+
+    def read(prefix, key=case):
+        return json.loads((directory/(prefix+key+'.json')).read_bytes())
+
+    shared = dependency_proof(directory, case)
+    common = ('originalSevenChecks', 'exactSourceAndReference', 'fixedVersion', 'oneHeapPlan',
+              'taskIdentities', 'cancellationOnly', 'actualHandshake', 'officialOutcome', 'fixtureRestored')
+    checks = {name: shared['checks'][name] for name in common}
+    witness = read('formal-cancel-')
+    original = read('overlap-equivalent-')
+    pipeline = read('overlap-pipeline-')
+    native = read('overlap-native-events-')
+    query = canonical_id(witness['sourceQueryId'])
+    anchor = instant_ns(witness['beforeUnlockPgUtc'])
+    committed = instant_ns(witness['cancelVisiblePgUtc'])
+    samples = pipeline['samples']
+    first = samples[0]
+    drift = max(abs((s['beginNs']-first['beginNs'])-(s['beginMonoNs']-first['beginMonoNs']))+
+                abs(s['endNs']-s['beginNs']-s['elapsedNs']) for s in samples)
+    def event_time(name):
+        rows=[e for e in original['events'] if e['event']==name]
+        if len(rows)!=1:
+            raise ValueError('RF_NATIVE_EVENT_'+name)
+        return instant_ns(rows[0]['utc'])
+    arrival, end = event_time('user_cancel_rpc'), event_time('context_end')
+    def active(s):
+        return [g for g in s['groups'] if g['query'] and canonical_id(g['query'])==query]
+    def keys(groups):
+        return {(canonical_id(t['instance']),t['task']) for g in groups if g['complete'] and g['closed']==0
+                for t in g['tasks'] if not t['eos'] and t['state'] not in ('FINISHED','FINALIZED')}
+    before = [s for s in samples if s['complete'] and len(active(s))==2 and s['endNs']+drift<=original['beforeCommitBoundNs']]
+    snapshot = {'groups':active(before[-1])}
+    wanted = keys(snapshot['groups'])
+    instances, named = native_task_closes(native,snapshot['groups'],arrival,end)
+    reference = read('overlap-profile-reference-',witness['stress']['attempt'])
+    compared = compare_tasks(read('overlap-profile-'),reference,snapshot,instances)
+    covered = named | {(canonical_id(t['instance']),t['index']) for t in compared
+                       if (t['observedShortfall'] and t['soleMerge']) or t['nonEosScan']}
+    empty = next((s for s in samples if s['complete'] and s['count']==0 and end<=s['beginNs']),None)
+    audit = original['feAudit']
+    deadline = anchor+250_000_000-drift
+    checks.update(
+        originalDirect=original['status']=='PASS' and all(original['checks'].values()) and shared['originalBrowser']=='PASS',
+        fullPopulation=len(wanted)==3 and len(instances)==2 and drift==original['clockDriftUpperNs']<1_000_000 and
+            any(s['complete'] and committed+drift<=s['beginNs']<=s['endNs']<=arrival-drift and keys(active(s))==wanted for s in samples),
+        directTaskKeys=compared==original['profileComparisons'] and covered==wanted,
+        termination=anchor<=committed<arrival<=end and empty is not None and empty['endNs']<=deadline and
+            (empty['endNs']-anchor)/1e6==original['pipelineZeroUpperMs'] and
+            audit['complete'] and audit['reader'] and audit['isSelect'] and audit['fixedEntity'] and
+            arrival<=instant_ns(audit['endUtc'])<=instant_ns(audit['endExclusiveUpperUtc'])<=deadline and
+            witness['feClockControl']['passed'] and 0<witness['feInactiveUpperMs']<=250)
+    return dict(case=case,sourceQuery=shared['sourceQuery'],platformQuery=shared['platformQuery'],checks=checks,
+                status='PASS' if all(checks.values()) else 'NO_GO',method='ORIGINAL_DIRECT_ALL_TASKS',
+                timing=shared['timing'],inputs=shared['inputs'])
+
+
+def qualify_review_fix(gate, input_key, public):
+    """重开本轮定向运行，按当前构建、驱动、真实命令与原件核定各受影响门禁。"""
+    import datetime
+    import json
+    import subprocess
+    from pathlib import Path
+    import workflow
+    import workflow_execution as execution
+    import workflow_m2_build as build
+    from workflow_evidence import restore, machine
+    from workflow_m2_evidence import require, mtp
+    from workflow_doris_s1 import S3_COMPAT_CASES
+    from workflow_m4_query import web_source_inputs
+
+    root, task, run = build.ROOT, 'G4-DORIS-MAPPING-QUERY-001', 'review-fix-01'
+    expected = json.loads((public/'current-inputs.json').read_bytes())
+    members = expected['originals']
+    examined = {}
+    require(expected['runId']==run and expected['taskId']==task and workflow.input_key(root,gate)==input_key,'RF_GATE_ID')
+    product=expected['productInputCommit']
+    require(len(product)==40 and subprocess.run(['git','merge-base','--is-ancestor',product,'HEAD'],cwd=root).returncode==0 and
+            subprocess.run(['git','diff','--quiet',product,'HEAD','--','backend','apps/web',*BROWSER_SOURCES],cwd=root).returncode==0,'RF_PRODUCT_REVISION')
+    def raw(name):
+        entry=members[name]
+        require(Path(name).name==name and entry['originalPath']==(public.relative_to(root)/'originals'/name).as_posix(),'RF_MEMBER_PATH')
+        require(entry['encoding'] in ('raw','base64') and entry['path']==entry['originalPath']+('.raw.json' if entry['encoding']=='base64' else ''),'RF_ENVELOPE_PATH')
+        data=restore(root,entry)
+        examined[name]=execution.sha(data)
+        return data
+    def read(name): return json.loads(raw(name))
+    def command(cid):
+        row=read(cid+'-receipt.json')
+        require(row['commandId']==cid and row['taskId']==task and row['runId']==run,'RF_COMMAND_ID')
+        streams=[]
+        for key in ('stdout','stderr'):
+            data=raw(cid+'-'+key+'.txt')
+            require(execution.sha(data)==row[key]['sha256'] and len(data)==row[key]['sizeBytes'],'RF_STREAM_ID')
+            streams.append(data)
+        return row, b''.join(streams)
+    node=json.loads((public.parent/'implementation-01/s3/prepare.json').read_bytes())['node']
+    current=build.inputs('query')
+    def bound(target):
+        name=target+'-build-binding.json'
+        row=read(name)
+        require(row['taskId']==task and row['target']==target and row['inputKey']==current and row['status']=='PASS' and row['exitCode']==0,'RF_BUILD_ID')
+        return dict(inputKey=current,outputKey=execution.sha(json.dumps(row['outputs'],sort_keys=True).encode()),receiptSha256=examined[name])
+    snapshot=read('s1-api-snapshot.json')
+    require(snapshot['inputs']==bound('api') and snapshot['resourceRun']==run and snapshot['taskId']==task,'RF_API_BUILD')
+    api=read('api-build-binding.json')
+    for path,value in snapshot['files'].items():
+        require(api['outputs']['backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/'+path]==value,'RF_SNAPSHOT_OUTPUT')
+    driver=[execution.sha((root/name).read_bytes()) for name in BROWSER_SOURCES]
+    checks=0
+    def test(label, target, stage, expression, minimum, folder):
+        cid=expected['tests'][label]
+        row,log=command(cid)
+        binding=bound(target)
+        project=Path(build.TARGETS[target])
+        origin=Path(row['cwd'])
+        dll=origin/project.parent/'bin/Debug/net10.0'/(project.stem+'.dll')
+        argv=[snapshot['environment']['dotnet'],str(dll),'--filter',expression,'--minimum-expected-tests',str(minimum),'--no-ansi',
+              '--progress','off','--results-directory',str(origin/'artifacts/workflow'/task/run/folder)]
+        require(row['exitCode']==0 and row['stage']==stage and row['commandSummary']['sha256']==execution.sha(execution.encoded(argv)) and
+                row['inputFingerprint']==execution.sha(execution.encoded(binding)),'RF_MTP_EXECUTION')
+        return mtp(log,minimum)
+    def browser(mode, equivalent=False):
+        entry=expected['browsers'][mode]
+        host=read(entry['host'])
+        report=read(entry['report'])
+        row,log=command(host['browserCommand'])
+        base=[snapshot['snapshotId'],mode,driver,host['stageInputs']]
+        if 'stressInput' in host:
+            stamp=host['stressInput']
+            require(execution.sha(raw('stress-input-'+stamp+'.json'))==stamp,'RF_STRESS_BINDING')
+            base.append(stamp)
+        require(report['inputBinding']['api']['commandId']==host['commandId'] and host['status']=='EXITED' and
+                report['inputBinding']['api']['snapshotId']==host['snapshotId']==snapshot['snapshotId'] and host['exitCode']==0 and
+                not host['exceeded'] and host['hostPeakBytes']['total']<=int(5.5*1024**3) and host['hostPeakBytes']['api']<=768*1024**2 and report['inputsUnchanged'] and report['mode']==mode and
+                row['stage']=='dmq-s1-browser-'+mode and row['inputFingerprint']==execution.sha(execution.encoded(base)),'RF_BROWSER_INPUT')
+        argv=[node,'scripts/maintenance/workflow-m4-query.mjs','--task',task,'--run-id','implementation-01','--mode',mode]
+        require(row['commandSummary']['sha256']==execution.sha(execution.encoded(argv)) and
+                report['taskId']==task and report['runId']=='implementation-01' and
+                report.get('scenarioReady',{}).get('status')=='READY','RF_BROWSER_PREREQUISITE')
+        if equivalent:
+            case=expected['ac06']
+            proof=read('ac06-direct-'+case+'.json')
+            require(report['cancel']['key']==proof['case']==case and report['status']=='PASS' and row['exitCode']==0 and
+                    all(c['status']=='PASS' for c in report['checks']),'RF_AC06_ORIGINAL_VERDICT')
+            import tempfile
+            with tempfile.TemporaryDirectory(prefix='dmq-rf-ac06-') as directory:
+                location=Path(directory)
+                for name, digest in proof['inputs'].items():
+                    data=raw(name)
+                    require(execution.sha(data)==digest,'RF_AC06_BYTES')
+                    (location/name).write_bytes(data)
+                require(direct_task_proof(location,case)==proof and proof['status']=='PASS','RF_AC06_DIRECT')
+            review=json.loads((public/'non-author-product-review.json').read_bytes())
+            require(review['case']==case and review['proofSha256']==examined['ac06-direct-'+case+'.json'] and
+                    review['productInputCommit']==expected['productInputCommit'] and review['decision']=='NON_AUTHOR_PRODUCT_GO','RF_PRODUCT_REVIEW')
+            return len(proof['checks'])
+        require(row['exitCode']==0 and report['status']=='PASS' and all(c['status']=='PASS' for c in report['checks']),'RF_BROWSER_RESULT')
+        required={'s3':{'mcp_exact_measurement','mcp_half_open_edges','fourth_tool_same_bytes_g4_traverse_relationships'},
+                  'ui-s3':{'ui_same_canonical_g4_resolve_entity','ui_same_canonical_g4_read_observations','ui_same_canonical_g4_traverse_relationships','s3_mobile_no_overflow'},
+                  'ui-s1':{'current_owner_revocation_denied','revoked_result_cleared','restored_original_grant_same_bytes','changed_subject_cannot_restore_previous_query'},
+                  's2-doris-root-deadline':{'g2_reads_same_signed_release','healthy_formal_query','query_response_before_original_budget','cancel_response_before_original_budget','root_no_success_side_effect'}}
+        require(required[mode]<={c['name'] for c in report['checks']},'RF_BROWSER_COVERAGE')
+        if mode.startswith('ui-'):
+            previous=read('web-build-binding.json')
+            require(host['webExitCode'] in (0,143,-15) and previous['inputs']==web_source_inputs(task) and host['webBuild']==report['inputBinding']['web'] and
+                    host['webBuild']['inputHash']==execution.sha(execution.encoded(previous['inputs'])) and
+                    host['webBuild']['filesHash']==execution.sha(execution.encoded(previous['files'])),'RF_WEB_BUILD')
+        if mode=='s2-doris-root-deadline':
+            from urllib.parse import parse_qs,urlsplit
+            events=read('root-dependencies-'+report['witnessId']+'.json')
+            require(report['baseline']==report['after'] and report['after']['failedAdmissions']==report['after']['cancelAudits']==0
+                    and report['after']['executeAudits']==1 and report['after']['status']=='COMPLETED' and not report['after']['cancel'],'RF_TRANSACTION')
+            require([r['name'] for r in report['deadlineWitness']]==['query','cancel'],'RF_DEADLINE_PAIR')
+            for probe in report['deadlineWitness']:
+                phase=probe['name']
+                batch=[r for r in events if r['phase']==phase]
+                closed=[r for r in batch if r['kind']=='client_closed']
+                require(len(closed)==1 and any(r['kind']=='PUT' and r['status'] in (200,201,204) for r in batch) and any(r['kind']=='POST' and r['status']==200 for r in batch) and
+                        not any(r['kind']=='safety_release' for r in batch),'RF_ACTUAL_SHACL_CLEANUP')
+                uri=closed[0]['path']
+                graph=parse_qs(urlsplit(uri).query)['graph'][0]
+                deadlines=[r['requestDeadline'] for r in host['cleanupUnknown'] if r['graph']==graph]
+                require(len(deadlines)==1,'RF_DEADLINE_OWNER')
+                end=datetime.datetime.fromisoformat(deadlines[0]).timestamp()*1000
+                require(probe['budgetMs']=={'query':1200,'cancel':5000}[phase] and probe['code']=='semantic_timeout' and
+                        probe['clientStartUtcMs']-1<=end-probe['budgetMs']<=closed[0]['utcNs']/1e6<=end and
+                        probe['clientResponseUtcMs']<end and probe['elapsedMs']<probe['budgetMs'],'RF_ABSOLUTE_BUDGET')
+            put={r['path'] for r in events if r['kind']=='PUT'}
+            restored={r['path'] for r in events if r['phase']=='restore' and r['kind']=='GET' and r['status']==404}
+            require(put and put<=restored,'RF_GRAPH_RESTORE')
+        return len(report['checks'])
+    if gate in ('backend','contract'):
+        for target,expr,n in S3_COMPAT_CASES:
+            if (target=='wire')==(gate=='contract'):
+                checks+=test(expr,target,'dmq-s3-compat-'+target,expr,n,'s3-compat-results')
+        checks+=test('golden','query','dmq-pg-golden','FullyQualifiedName=OntologyPlatform.QueryTests.G4QueryTests.HistoricalPgReleaseAndResultKeepCanonicalBytes',2,'pg-golden-results')
+    if gate=='contract':
+        historical=json.loads((public.parent/'implementation-01/historical-byte-mapping.json').read_bytes())
+        require(historical['sourceCommit']=='413d7363fa544ee9dbf780a9a2707b880af96ec8' and len(historical['members'])==17,'RF_GOLDEN_HISTORY')
+        for name,member in historical['members'].items():
+            require(member['originalPath']==name and restore(root,member)==subprocess.check_output(['git','show',historical['sourceCommit']+':'+name],cwd=root),'RF_GOLDEN_BYTES')
+    if gate=='backend':
+        checks+=test('semantic-batch','semantic','dmq-verified-batch-sem','FullyQualifiedName=OntologyPlatform.SemanticTests.VerifiedReadTests.VerifiedBatchRequiresActualComparedGraphsAndShacl',4,'verified-batch-results')
+        checks+=test('deadline','semantic','deadline-suite','FullyQualifiedName~SemanticDeadlineTests',8,'mtp')
+        checks+=test('g3','semantic','g3-shared-budget','FullyQualifiedName~G3BoundaryTests.ParsingAcrossAllFourSourcesSharesOneFiveSecondBudget',1,'mtp')
+    if gate in ('backend','interaction'):
+        checks+=browser('s2-doris-root-deadline')
+        checks+=browser('s2-doris-overlap',equivalent=True)
+    if gate in ('interaction','web'):
+        for mode in ('ui-s1','ui-s3') if gate=='web' else ('ui-s1','ui-s3','s3'):
+            checks+=browser(mode)
+    if gate=='interaction':
+        audit=read(expected['prerequisiteAudit'])
+        cmd,output=command(audit['commandId'])
+        counters=json.loads(output)['windows']
+        require(cmd['exitCode']==0 and cmd['stage']=='rf-prerequisite-audit' and execution.sha(output)==audit['resultSha256']
+                and cmd['commandSummary']['sha256']==audit['commandSha256'] and counters['positive-pressure-control']['mutations']>0
+                and counters['positive-pressure-control']['fixedReads']>0,'RF_AUDIT_CONTROL')
+        rejected=set()
+        for name,window in audit['windows'].items():
+            if name=='positive-pressure-control': continue
+            report=read(name)
+            code=report['failure']['code']
+            require(report['status']=='FAIL' and report['mode']=='s2-doris-ready' and
+                    counters[name]['mutations']==counters[name]['fixedReads']==0 and window[0]<window[1],'RF_E1_WINDOW')
+            h=read('s1-host-s2-doris-ready-'+report['inputBinding']['api']['commandId']+'.json')
+            result,streams=command(expected['readinessCommands'][name])
+            recorded=json.loads(streams.splitlines()[0])
+            require(Path(recorded['report']).name==name and recorded['status']=='FAIL' and recorded['failure']==report['failure'],'RF_E1_COMMAND_REPORT')
+            require(result['exitCode']!=0 and result['stage']=='dmq-s1-browser-s2-doris-ready' and
+                    report['inputBinding']['api']['snapshotId']==h['snapshotId'],'RF_E1_REJECTION')
+            rejected.add(code)
+        require(rejected.intersection({'PREREQUISITE_STALE:grant','PREREQUISITE_STALE:grant_expired_or_missing'}) and
+                {'PREREQUISITE_STALE:grant_ttl','PREREQUISITE_STALE:catalog','PREREQUISITE_STALE:activation'}<=rejected,'RF_E1_CASES')
+        short=read(expected['shortGrant'])
+        require(len(short['new'])==3 and all(x['intervalSeconds']==120 for x in short['new']),'RF_E1_SHORT_GRANT')
+        healthy=read(expected['healthy'])
+        require(healthy['status']=='PASS' and healthy['scenarioReady']['fieldCount']==18 and healthy['scenarioReady']['grantRequiredSeconds']>120,'RF_E1_HEALTHY')
+        eng=read('e2-production-tests.json')
+        for stage in ('rf-ef01-dispatch','rf-ef01-size'):
+            row=eng[stage];receipt,output=command(row['commandId'])
+            require(receipt['stage']==stage and receipt['exitCode']==0 and receipt['commandSummary']['sha256']==execution.sha(execution.encoded(row['command']))
+                    and all(execution.sha((root/path).read_bytes())==sha for path,sha in row['inputs'].items()) and
+                    receipt['inputFingerprint']==execution.sha(execution.encoded(row['inputs'])),'RF_E2_EXECUTION')
+            require((b'Ran 4 tests' in output and b'OK' in output) if stage=='rf-ef01-dispatch' else b'1 tests, 0 failures' in output,'RF_E2_CASES')
+        early=read('early-plan.json')['earlyMeasurements'][0]
+        plan=read('early-members.json')
+        require(early['head']=='79d6dc173476ce0166a13a34a309598f1e6da953' and early['exitCode']==0 and early['measurement']['sizeBytes']>0 and
+                early['representativePaths']==[(public.relative_to(root)/'originals/old-runtime.json.raw.json').as_posix()] and
+                plan['status']=='PASS' and plan['diffCheckExitCode']==0,'RF_E2_EARLY')
+        publication=json.loads((public/'initial-publication.json').read_bytes())
+        before=restore(root,publication['old-runtime'])
+        require(publication['old-runtime']['encoding']=='base64' and not before.endswith(b'\n') and
+                publication['resource-start']['encoding']=='raw' and restore(root,publication['resource-start']).endswith(b'\n'),'RF_E3_FIRST_WRITE')
+        checks+=len(rejected)+5
+    if gate=='web':
+        for label in ('typecheck','lint','unit'):
+            row=read('web-'+label+'-result.json')
+            receipt,log=command(row['commandId'])
+            require(receipt['exitCode']==row['exitCode']==0 and row['inputs']==web_source_inputs(task) and
+                    receipt['inputFingerprint']==execution.sha(execution.encoded(row['inputs'])) and
+                    row['stage']==label and row['taskId']==task,'RF_WEB_COMMAND')
+            if label=='unit':
+                report=raw('vitest-report.json')
+                require(row['reportSha256']==execution.sha(report),'RF_WEB_TEST_BYTES')
+                checks+=machine(report,'vitest-json')
+            else: checks+=1
+    require(checks>0,'RF_EMPTY_GATE')
+    return dict(taskId=task,runId=run,gate=gate,inputKey=input_key,status='PASS',tests=checks,skipped=0,
+                executionMode='REUSED',qualificationMode='FRESH',originals=examined)
+
+
+def audit_prerequisites():
+    """只读现有 Doris FE 审计，按登记的真实浏览器窗口投影，不公开 SQL 正文。"""
+    import datetime
+    import json
+    import workflow_execution as execution
+    import workflow_doris_s1 as s
+    from workflow_doris_s0_fixture import INDEX, record
+    from workflow_m2_evidence import require
+    require(s.vm.EVIDENCE_RUN=='review-fix-01','RF_AUDIT_RUN')
+    fe=json.loads(INDEX.read_bytes())['services']['fe']['id']
+    require(s.live_stack()['fe']==fe,'RF_AUDIT_OWNER')
+    def milliseconds(timestamp):
+        return datetime.datetime.fromisoformat(timestamp.replace('Z','+00:00')).timestamp()*1000
+    windows={}
+    for path in sorted(s.OUT.glob('browser-s2-doris-ready-*.json')):
+        row=json.loads(path.read_bytes())
+        if row.get('failure',{}).get('code') in ('PREREQUISITE_STALE:grant','PREREQUISITE_STALE:grant_expired_or_missing','PREREQUISITE_STALE:grant_ttl','PREREQUISITE_STALE:activation','PREREQUISITE_STALE:catalog'):
+            windows[path.name]=[milliseconds(row['startedAtUtc']),milliseconds(row['finishedAtUtc'])]
+    cases=sorted(s.OUT.glob('formal-cancel-*.json'),key=lambda f:f.stat().st_mtime)
+    require(len(windows)>=4 and cases,'RF_AUDIT_CASES')
+    positive=json.loads(cases[0].read_bytes())
+    mid=milliseconds(positive['beforeUnlockPgUtc'])
+    windows['positive-pressure-control']=[mid-120000,mid+90000]
+    # 同一 FE 留存日志；每窗口保留参与计数的原行数、首末偏移及原字节摘要。
+    parser=r"""import datetime,hashlib,json,os,pathlib,re,sys
+windows=json.loads(sys.argv[1]);states={k:dict(rows=0,mutations=0,fixedReads=0,firstOffset=None,lastOffset=None) for k in windows}
+digests={k:hashlib.sha256() for k in windows};first=last=None
+source=pathlib.Path('/opt/apache-doris/fe/log/fe.audit.log')
+with source.open('rb') as stream:
+ st=os.fstat(stream.fileno());limit=st.st_size;offset=0
+ while offset<limit:
+  raw=stream.readline();end=stream.tell()
+  if not raw.endswith(b'\n') or end>limit:break
+  m=re.search(rb'\|Timestamp=([0-9:. -]+)',raw)
+  if m:
+   stamp=datetime.datetime.fromisoformat(m[1].decode()).replace(tzinfo=datetime.timezone.utc).timestamp()*1000
+   first=stamp if first is None else min(first,stamp);last=stamp if last is None else max(last,stamp)
+   for k,(begin,final) in windows.items():
+    if begin-5<=stamp<=final+5:
+     row=states[k];row['rows']+=1;digests[k].update(raw)
+     if row['firstOffset'] is None:row['firstOffset']=offset
+     row['lastOffset']=end
+     stmt=raw.partition(b'|Stmt=')[2].split(b'|')[0]
+     if re.search(rb'\b(INSERT|UPDATE|DELETE|TRUNCATE|ALTER|DROP|CREATE|LOAD)\b',stmt,re.I) and re.search(rb'dmq_(entity|target)',stmt,re.I):row['mutations']+=1
+     if b'SET_VAR(enable_sql_cache=false)' in stmt and b'fixture.dmq_' in stmt:row['fixedReads']+=1
+  offset=end
+ assert source.stat().st_ino==st.st_ino and first<min(x[0] for x in windows.values()) and last>max(x[1] for x in windows.values())
+for k,v in states.items():v['sha256']=digests[k].hexdigest()
+print(json.dumps(dict(inode=st.st_ino,scannedBytes=offset,firstUtcMs=first,lastUtcMs=last,windows=states)))"""
+    args=['docker','--context','desktop-linux','exec',fe,'python3','-c',parser,json.dumps(windows,sort_keys=True)]
+    result=execution.run(args,s.ROOT,task=s.vm.TASK,run_id=s.vm.EVIDENCE_RUN,stage='rf-prerequisite-audit',input_key=execution.sha(execution.encoded([fe,windows,parser])),timeout=20)
+    require(result.returncode==0,'RF_AUDIT_SCAN_'+result.receipt['commandId'])
+    counters=json.loads(result.stdout)['windows']
+    require(all(v['mutations']==v['fixedReads']==0 for k,v in counters.items() if k!='positive-pressure-control') and
+            counters['positive-pressure-control']['mutations']>0 and counters['positive-pressure-control']['fixedReads']>0,'RF_AUDIT_COVERAGE')
+    row=dict(commandId=result.receipt['commandId'],fe=fe,windows=windows,parserSha256=execution.sha(parser.encode()),commandSha256=execution.sha(execution.encoded(args)),resultSha256=execution.sha(result.stdout))
+    record(s.OUT/('e1-audit-'+row['commandId']+'.json'),row)
+    return row
 
 def publish_original(root, run, source):
     """从本任务独立运行目录发布已选的机器原件，保持原字节及恢复身份。"""

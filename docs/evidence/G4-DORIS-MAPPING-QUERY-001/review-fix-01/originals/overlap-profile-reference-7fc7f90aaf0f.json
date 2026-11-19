@@ -1,0 +1,134 @@
+{
+  "binding": {
+    "attempt": "7fc7f90aaf0f",
+    "manifestSha256": "dbfa24d69b9c7ebf67ce5ccb9810bb61e1bf47a1cded329be618d16ce4e9a642",
+    "rowsByTable": {
+      "dmq_entity": 4194304,
+      "dmq_target": 3
+    },
+    "purpose": "cancellation_only"
+  },
+  "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+  "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+  "statementSha256": "779405d77852bb511c189d4b0a404932b51eec629a56ca006debcf4a051ef564",
+  "rowCount": 101,
+  "rowHash": "cd8125c8d008d111204ddb684fa3023c3817f151326ef07a20b1a2980024734c",
+  "profile": {
+    "query": "74f7df1b9eb34a07-9755e9ba563e9a10",
+    "state": "OK",
+    "bytes": 44190,
+    "profileSha256": "1a273c0b859ac0f11302a1974893383232ef63fbeb57fae3eee447f094d3f230",
+    "tasks": [
+      {
+        "fragment": 0,
+        "pipeline": 0,
+        "task": 0,
+        "operators": {
+          "MATERIALIZATION_OPERATOR": {
+            "rows": 101
+          },
+          "EXCHANGE_OPERATOR": {
+            "rows": 101
+          }
+        },
+        "planOperators": [
+          "RESULT_SINK_OPERATOR",
+          "MATERIALIZATION_OPERATOR",
+          "EXCHANGE_OPERATOR"
+        ],
+        "planNodes": [
+          {
+            "name": "RESULT_SINK_OPERATOR",
+            "nodeId": 2147483647
+          },
+          {
+            "name": "MATERIALIZATION_OPERATOR",
+            "nodeId": 3
+          },
+          {
+            "name": "EXCHANGE_OPERATOR",
+            "nodeId": 2
+          }
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      },
+      {
+        "fragment": 1,
+        "pipeline": 0,
+        "task": 0,
+        "operators": {
+          "LOCAL_MERGE_SORT_SOURCE_OPERATOR": {
+            "rows": 101
+          }
+        },
+        "planOperators": [
+          "DATA_STREAM_SINK_OPERATOR",
+          "LOCAL_MERGE_SORT_SOURCE_OPERATOR"
+        ],
+        "planNodes": [
+          {
+            "name": "DATA_STREAM_SINK_OPERATOR",
+            "nodeId": 2
+          },
+          {
+            "name": "LOCAL_MERGE_SORT_SOURCE_OPERATOR",
+            "nodeId": 1
+          }
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      },
+      {
+        "fragment": 1,
+        "pipeline": 1,
+        "task": 1,
+        "operators": {
+          "OLAP_SCAN_OPERATOR": {
+            "rows": 4194304,
+            "scannerPresent": true,
+            "scanEos": true,
+            "SegmentIterator": true,
+            "IndexFilter": true
+          }
+        },
+        "planOperators": [
+          "SORT_SINK_OPERATOR",
+          "OLAP_SCAN_OPERATOR"
+        ],
+        "planNodes": [
+          {
+            "name": "SORT_SINK_OPERATOR",
+            "nodeId": 1
+          },
+          {
+            "name": "OLAP_SCAN_OPERATOR",
+            "nodeId": 0
+          }
+        ],
+        "state": "FINALIZED",
+        "wakeEarly": 0
+      }
+    ]
+  },
+  "native": {
+    "query": "74f7df1b9eb34a07-9755e9ba563e9a10",
+    "start": {
+      "inode": 219836,
+      "endOffset": 36006958,
+      "fileSize": 36007057,
+      "trailingBytes": 99,
+      "trailingSha256": "601fc7d72652f926bf6270d5182047d7f605057f94d05e886efc07827dfcfb6a"
+    },
+    "boundary": {
+      "inode": 219836,
+      "endOffset": 36006958,
+      "fileSize": 36007057,
+      "trailingBytes": 99,
+      "trailingSha256": "601fc7d72652f926bf6270d5182047d7f605057f94d05e886efc07827dfcfb6a"
+    },
+    "events": []
+  },
+  "firstFragmentEndMs": null,
+  "minimumFirstFragmentMs": 50
+}

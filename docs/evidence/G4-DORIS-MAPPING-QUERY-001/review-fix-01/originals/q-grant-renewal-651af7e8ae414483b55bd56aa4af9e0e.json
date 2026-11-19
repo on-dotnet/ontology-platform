@@ -1,0 +1,262 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "status": "CURRENT",
+  "ttlSeconds": 120,
+  "permissions": [
+    "data.query.execute",
+    "data.query.result.read",
+    "data.query.evidence.read"
+  ],
+  "old": [
+    {
+      "id": "dmq-s2-73928775dbe43cb2ed9a7d1aba4afe32",
+      "permission": "data.query.execute",
+      "subject": "b0e3d721-ca94-4f11-9acd-537a96164521",
+      "connection": "675b6bca997f4aa5b0b9e4678964c50b",
+      "organization": "org-demo",
+      "sites": [
+        "site-a"
+      ],
+      "objects": [
+        "fixture/dmq_entity",
+        "fixture/dmq_target"
+      ],
+      "fields": [
+        "fixture/dmq_entity/1/org_id",
+        "fixture/dmq_entity/2/site_id",
+        "fixture/dmq_entity/3/entity_id",
+        "fixture/dmq_entity/4/join_key",
+        "fixture/dmq_entity/5/amount",
+        "fixture/dmq_entity/6/unit_code",
+        "fixture/dmq_entity/7/valid_from",
+        "fixture/dmq_entity/8/valid_to",
+        "fixture/dmq_entity/9/event_at",
+        "fixture/dmq_entity/10/observed_at",
+        "fixture/dmq_target/1/org_id",
+        "fixture/dmq_target/2/site_id",
+        "fixture/dmq_target/3/target_id",
+        "fixture/dmq_target/4/join_key",
+        "fixture/dmq_target/5/valid_from",
+        "fixture/dmq_target/6/valid_to",
+        "fixture/dmq_target/7/event_at",
+        "fixture/dmq_target/8/observed_at"
+      ],
+      "expiry": "2026-11-19T02:53:14.166967+00:00",
+      "revoked": null,
+      "recordHash": "a04ccd545f3ba16d2874c48705a70c08",
+      "audit": "d48e082975fbb3461ede8e3f5cb25ade",
+      "issuedAt": "2026-11-18T22:53:14.166967+00:00",
+      "active": false,
+      "intervalSeconds": 14400.0
+    },
+    {
+      "id": "dmq-s2-8d072aba4cb7205e041fb716e6a16e69",
+      "permission": "data.query.evidence.read",
+      "subject": "b0e3d721-ca94-4f11-9acd-537a96164521",
+      "connection": "675b6bca997f4aa5b0b9e4678964c50b",
+      "organization": "org-demo",
+      "sites": [
+        "site-a"
+      ],
+      "objects": [
+        "fixture/dmq_entity",
+        "fixture/dmq_target"
+      ],
+      "fields": [
+        "fixture/dmq_entity/1/org_id",
+        "fixture/dmq_entity/2/site_id",
+        "fixture/dmq_entity/3/entity_id",
+        "fixture/dmq_entity/4/join_key",
+        "fixture/dmq_entity/5/amount",
+        "fixture/dmq_entity/6/unit_code",
+        "fixture/dmq_entity/7/valid_from",
+        "fixture/dmq_entity/8/valid_to",
+        "fixture/dmq_entity/9/event_at",
+        "fixture/dmq_entity/10/observed_at",
+        "fixture/dmq_target/1/org_id",
+        "fixture/dmq_target/2/site_id",
+        "fixture/dmq_target/3/target_id",
+        "fixture/dmq_target/4/join_key",
+        "fixture/dmq_target/5/valid_from",
+        "fixture/dmq_target/6/valid_to",
+        "fixture/dmq_target/7/event_at",
+        "fixture/dmq_target/8/observed_at"
+      ],
+      "expiry": "2026-11-19T02:53:14.166967+00:00",
+      "revoked": null,
+      "recordHash": "003fc988b8b4944231bd1b4bd3c93d6b",
+      "audit": "6f9d41efea7530c6ae8a9e7e5589b937",
+      "issuedAt": "2026-11-18T22:53:14.166967+00:00",
+      "active": false,
+      "intervalSeconds": 14400.0
+    },
+    {
+      "id": "dmq-s2-cf56aa40a158323337860270fe55f3e8",
+      "permission": "data.query.result.read",
+      "subject": "b0e3d721-ca94-4f11-9acd-537a96164521",
+      "connection": "675b6bca997f4aa5b0b9e4678964c50b",
+      "organization": "org-demo",
+      "sites": [
+        "site-a"
+      ],
+      "objects": [
+        "fixture/dmq_entity",
+        "fixture/dmq_target"
+      ],
+      "fields": [
+        "fixture/dmq_entity/1/org_id",
+        "fixture/dmq_entity/2/site_id",
+        "fixture/dmq_entity/3/entity_id",
+        "fixture/dmq_entity/4/join_key",
+        "fixture/dmq_entity/5/amount",
+        "fixture/dmq_entity/6/unit_code",
+        "fixture/dmq_entity/7/valid_from",
+        "fixture/dmq_entity/8/valid_to",
+        "fixture/dmq_entity/9/event_at",
+        "fixture/dmq_entity/10/observed_at",
+        "fixture/dmq_target/1/org_id",
+        "fixture/dmq_target/2/site_id",
+        "fixture/dmq_target/3/target_id",
+        "fixture/dmq_target/4/join_key",
+        "fixture/dmq_target/5/valid_from",
+        "fixture/dmq_target/6/valid_to",
+        "fixture/dmq_target/7/event_at",
+        "fixture/dmq_target/8/observed_at"
+      ],
+      "expiry": "2026-11-19T02:53:14.166967+00:00",
+      "revoked": null,
+      "recordHash": "451b3f2e6365db55034a0a0960391a5c",
+      "audit": "3800d6e2dd95cf9b3d3cf42b366c2180",
+      "issuedAt": "2026-11-18T22:53:14.166967+00:00",
+      "active": false,
+      "intervalSeconds": 14400.0
+    }
+  ],
+  "new": [
+    {
+      "id": "review-fix-01-short-dmq-s2-73928775dbe43cb2ed9a7d1aba4afe32",
+      "permission": "data.query.execute",
+      "subject": "b0e3d721-ca94-4f11-9acd-537a96164521",
+      "connection": "675b6bca997f4aa5b0b9e4678964c50b",
+      "organization": "org-demo",
+      "sites": [
+        "site-a"
+      ],
+      "objects": [
+        "fixture/dmq_entity",
+        "fixture/dmq_target"
+      ],
+      "fields": [
+        "fixture/dmq_entity/1/org_id",
+        "fixture/dmq_entity/2/site_id",
+        "fixture/dmq_entity/3/entity_id",
+        "fixture/dmq_entity/4/join_key",
+        "fixture/dmq_entity/5/amount",
+        "fixture/dmq_entity/6/unit_code",
+        "fixture/dmq_entity/7/valid_from",
+        "fixture/dmq_entity/8/valid_to",
+        "fixture/dmq_entity/9/event_at",
+        "fixture/dmq_entity/10/observed_at",
+        "fixture/dmq_target/1/org_id",
+        "fixture/dmq_target/2/site_id",
+        "fixture/dmq_target/3/target_id",
+        "fixture/dmq_target/4/join_key",
+        "fixture/dmq_target/5/valid_from",
+        "fixture/dmq_target/6/valid_to",
+        "fixture/dmq_target/7/event_at",
+        "fixture/dmq_target/8/observed_at"
+      ],
+      "expiry": "2026-11-19T08:49:10.488795+00:00",
+      "revoked": null,
+      "recordHash": "1cac301f3d5311da4de9aee4a454c9ce",
+      "audit": "d52754d29403c5a79ba0b4d04298381f",
+      "issuedAt": "2026-11-19T08:47:10.488795+00:00",
+      "active": true,
+      "intervalSeconds": 120.0
+    },
+    {
+      "id": "review-fix-01-short-dmq-s2-8d072aba4cb7205e041fb716e6a16e69",
+      "permission": "data.query.evidence.read",
+      "subject": "b0e3d721-ca94-4f11-9acd-537a96164521",
+      "connection": "675b6bca997f4aa5b0b9e4678964c50b",
+      "organization": "org-demo",
+      "sites": [
+        "site-a"
+      ],
+      "objects": [
+        "fixture/dmq_entity",
+        "fixture/dmq_target"
+      ],
+      "fields": [
+        "fixture/dmq_entity/1/org_id",
+        "fixture/dmq_entity/2/site_id",
+        "fixture/dmq_entity/3/entity_id",
+        "fixture/dmq_entity/4/join_key",
+        "fixture/dmq_entity/5/amount",
+        "fixture/dmq_entity/6/unit_code",
+        "fixture/dmq_entity/7/valid_from",
+        "fixture/dmq_entity/8/valid_to",
+        "fixture/dmq_entity/9/event_at",
+        "fixture/dmq_entity/10/observed_at",
+        "fixture/dmq_target/1/org_id",
+        "fixture/dmq_target/2/site_id",
+        "fixture/dmq_target/3/target_id",
+        "fixture/dmq_target/4/join_key",
+        "fixture/dmq_target/5/valid_from",
+        "fixture/dmq_target/6/valid_to",
+        "fixture/dmq_target/7/event_at",
+        "fixture/dmq_target/8/observed_at"
+      ],
+      "expiry": "2026-11-19T08:49:10.488795+00:00",
+      "revoked": null,
+      "recordHash": "b24105952ae507049eee879db4c31b14",
+      "audit": "16650e79d928eff98502e781b221567e",
+      "issuedAt": "2026-11-19T08:47:10.488795+00:00",
+      "active": true,
+      "intervalSeconds": 120.0
+    },
+    {
+      "id": "review-fix-01-short-dmq-s2-cf56aa40a158323337860270fe55f3e8",
+      "permission": "data.query.result.read",
+      "subject": "b0e3d721-ca94-4f11-9acd-537a96164521",
+      "connection": "675b6bca997f4aa5b0b9e4678964c50b",
+      "organization": "org-demo",
+      "sites": [
+        "site-a"
+      ],
+      "objects": [
+        "fixture/dmq_entity",
+        "fixture/dmq_target"
+      ],
+      "fields": [
+        "fixture/dmq_entity/1/org_id",
+        "fixture/dmq_entity/2/site_id",
+        "fixture/dmq_entity/3/entity_id",
+        "fixture/dmq_entity/4/join_key",
+        "fixture/dmq_entity/5/amount",
+        "fixture/dmq_entity/6/unit_code",
+        "fixture/dmq_entity/7/valid_from",
+        "fixture/dmq_entity/8/valid_to",
+        "fixture/dmq_entity/9/event_at",
+        "fixture/dmq_entity/10/observed_at",
+        "fixture/dmq_target/1/org_id",
+        "fixture/dmq_target/2/site_id",
+        "fixture/dmq_target/3/target_id",
+        "fixture/dmq_target/4/join_key",
+        "fixture/dmq_target/5/valid_from",
+        "fixture/dmq_target/6/valid_to",
+        "fixture/dmq_target/7/event_at",
+        "fixture/dmq_target/8/observed_at"
+      ],
+      "expiry": "2026-11-19T08:49:10.488795+00:00",
+      "revoked": null,
+      "recordHash": "73935751789b91497d6bd14a7abd0d17",
+      "audit": "da3e1affcebd63ec18b7857def1f8eb1",
+      "issuedAt": "2026-11-19T08:47:10.488795+00:00",
+      "active": true,
+      "intervalSeconds": 120.0
+    }
+  ],
+  "commandId": "651af7e8ae414483b55bd56aa4af9e0e"
+}

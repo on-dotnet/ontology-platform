@@ -1,0 +1,36 @@
+{
+  "rf-ef01-dispatch": {
+    "command": [
+      "/opt/homebrew/opt/python@3.13/bin/python3.13",
+      "-B",
+      "scripts/tests/Workflow.Tests.py",
+      "WorkflowTests.test_plan_dispatches_both_tasks_to_production_measurement",
+      "WorkflowTests.test_production_measurement_accepts_identical_representative_json",
+      "WorkflowTests.test_real_producer_output_rejects_missing_conflicting_or_wrong_identity",
+      "WorkflowTests.test_measurement_cache_reinterprets_original_and_invalidates_old_protocol"
+    ],
+    "commandId": "628055b05b084b2393307ecc8b5029c9",
+    "inputs": {
+      "scripts/tests/Workflow.Tests.py": "6b5e6ff789754005944af4b958f9b25e8219ffec1fd7cc920c9190993552fa7c",
+      "scripts/maintenance/workflow.py": "425d462604c9792c812cc4a52f5f1eeacbe25048f98c14b60fc08d80ee01ba70",
+      "scripts/create-review-package.ps1": "93b2d697404e9a821c2ce147932dea4fa9757e3c69e6bc79fa9c54058a187f8f"
+    },
+    "exitCode": 0
+  },
+  "rf-ef01-size": {
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "scripts/tests/ReviewPackage.Tests.ps1",
+      "-CaseFilter",
+      "V3 size over 15MiB*"
+    ],
+    "commandId": "be419a00612f43b7a2c3e5ee7603483b",
+    "inputs": {
+      "scripts/tests/ReviewPackage.Tests.ps1": "df8edd14bb57b6286e05830c06e2fc290b12bc5409899c38813dea9b8e4e5445",
+      "scripts/create-review-package.ps1": "93b2d697404e9a821c2ce147932dea4fa9757e3c69e6bc79fa9c54058a187f8f"
+    },
+    "exitCode": 0
+  }
+}

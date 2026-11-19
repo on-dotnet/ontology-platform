@@ -1,0 +1,402 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "mode": "ui-s1",
+  "startedAtUtc": "2026-11-19T09:27:00.747Z",
+  "checks": [
+    {
+      "name": "identity_exists_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_0",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_1",
+      "status": "PASS"
+    },
+    {
+      "name": "http_2_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_auditor-ab",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_3_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_3",
+      "status": "PASS"
+    },
+    {
+      "name": "http_4_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_operator-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_4",
+      "status": "PASS"
+    },
+    {
+      "name": "http_5_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_5",
+      "status": "PASS"
+    },
+    {
+      "name": "http_6_200",
+      "status": "PASS"
+    },
+    {
+      "name": "identity_exists_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_cookie_viewer-a",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_6",
+      "status": "PASS"
+    },
+    {
+      "name": "http_7_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_7",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8_200",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_oidc_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "fixture_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "distinct_four_roles",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_operator",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_auditor",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_activator",
+      "status": "PASS"
+    },
+    {
+      "name": "current_subject_reader",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_8",
+      "status": "PASS"
+    },
+    {
+      "name": "http_9_200",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_9",
+      "status": "PASS"
+    },
+    {
+      "name": "http_10_200",
+      "status": "PASS"
+    },
+    {
+      "name": "all_current_prerequisites",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_query_found",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_recoverable_url_only_id",
+      "status": "PASS"
+    },
+    {
+      "name": "source_statistics_settled",
+      "status": "PASS"
+    },
+    {
+      "name": "browser_refresh_same_result",
+      "status": "PASS"
+    },
+    {
+      "name": "browser_refresh_no_business_query",
+      "status": "PASS"
+    },
+    {
+      "name": "browser_result_not_in_persistent_storage",
+      "status": "PASS"
+    },
+    {
+      "name": "query_mobile_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "query_mobile_region_visible",
+      "status": "PASS"
+    },
+    {
+      "name": "current_owner_revocation_denied",
+      "status": "PASS"
+    },
+    {
+      "name": "revoked_result_cleared",
+      "status": "PASS"
+    },
+    {
+      "name": "restored_original_grant_same_bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "late_response_was_real_authorized_result",
+      "status": "PASS"
+    },
+    {
+      "name": "other_tab_activation_clears_old_query",
+      "status": "PASS"
+    },
+    {
+      "name": "no_known_secret_10",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11_200",
+      "status": "PASS"
+    },
+    {
+      "name": "same_browser_subject_really_changed",
+      "status": "PASS"
+    },
+    {
+      "name": "late_old_subject_response_not_rendered",
+      "status": "PASS"
+    },
+    {
+      "name": "changed_subject_cannot_restore_previous_query",
+      "status": "PASS"
+    },
+    {
+      "name": "rejected_restore_keeps_results_cleared",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 12.358833000000004,
+      "sha256": "6ff1803328f774702d26a83c523f41692a698b03714cab942bf7dbc4200e8cf5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 4.748125000000073,
+      "sha256": "3b45fddc221423b48defe0051d95ee56695e72f0509f526984ec7497698297c4"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 8.89633300000014,
+      "sha256": "c83415b78585f75223eac015076a5e13a8648d1245199706ba45d1da20bde84b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 2.1019169999999576,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 3.422166000000061,
+      "sha256": "2a4f45a92253d7f52a4f410f8224a98d71c0b4f9a53ced0e15226d01f84c4a69"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.6852080000001024,
+      "sha256": "a48151a3d4ff3f15dadd7cfe166ee55d9d0203d5c9afa62989311dc807448c55"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "elapsedMs": 6.866125000000011,
+      "sha256": "483c6d46d7cbdd0013a5df7b3423b6f11a0d44a8caed0e25c4792be9d724eab4"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 1.740000000000009,
+      "sha256": "0c501e63737e1d249dd5cc7bcb1cb0b0391486b01dbee4ffbe3d240f21f2203f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connections/675b6bca997f4aa5b0b9e4678964c50b",
+      "status": 200,
+      "elapsedMs": 23.31683299999986,
+      "sha256": "859b7174c069e71d4c664215733b34cd201e77ca977cca52dd4c4cf3c01f2ff1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mappings/mapping-14f8a2f5d57158d41df6d5c3eaffef7a/active",
+      "status": 200,
+      "elapsedMs": 65.66225000000009,
+      "sha256": "f545c09dc95256e2c0248cfbc49ad3f00f885e44636a7f0cdde18c2c28b0bf9a"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/platform/me",
+      "status": 200,
+      "elapsedMs": 5.680292000004556,
+      "sha256": "7b25787ec798134b16d6bc4045c371b03391118fb3254f62c4019d9eef0153db"
+    }
+  ],
+  "status": "PASS",
+  "inputBinding": {
+    "api": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "runId": "implementation-01",
+      "stage": "ui-s1",
+      "status": "READY",
+      "pid": 86296,
+      "commandId": "7ac25f55ce844def888927b6bb6ef07c",
+      "snapshotId": "19b36b6dfd13affd131a9e785b4cc32cbb6cb585a7d172b28f1d2c63cc38bb4e",
+      "processStart": "Thu Nov 19 17:26:59 2026"
+    },
+    "web": {
+      "taskId": "G4-DORIS-MAPPING-QUERY-001",
+      "buildId": "tzebO-o7lf8Ss03wmP-qy",
+      "commandId": "41aeae3f2e5c4b529880d802f4a2b11c",
+      "inputHash": "96b838a56225da8a689b8ec4c0d444541465d2c28c6b836421ce94dd5dff831f",
+      "filesHash": "d0f414773a8ed94b0b35bd687251180c014bc45f2d1c36355b323ad34c44630b"
+    }
+  },
+  "scenarioReady": {
+    "status": "READY",
+    "stage": "baseline",
+    "budgetSeconds": {
+      "load": 0,
+      "execute": 180,
+      "restore": 0
+    },
+    "grantRequiredSeconds": 180,
+    "sessionRequiredSeconds": 180,
+    "sessionCommand": "38a283e0835e4ab7b1d4dcafd6a6ba62",
+    "snapshot": "19b36b6dfd13affd131a9e785b4cc32cbb6cb585a7d172b28f1d2c63cc38bb4e",
+    "resourceIds": {
+      "platform-pg": "34a947835a8949be5fb34bdc813e87ff812dca1d3381ccea7ce610754448367f",
+      "keycloak-test": "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f",
+      "fuseki": "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04",
+      "rustfs": "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9",
+      "fe": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "be": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2"
+    },
+    "fieldCount": 18,
+    "connectionId": "675b6bca997f4aa5b0b9e4678964c50b",
+    "secretVersion": 2,
+    "catalog": "c985c3e603f940628cb3665710e85d79",
+    "activation": "activation-79ac8f33b3e541b19862170714884d2a",
+    "command": "7ac25f55ce844def888927b6bb6ef07c",
+    "mode": "ui-s1",
+    "observedAt": 1795080424.2194161,
+    "validUntil": 1795080604.2194161
+  },
+  "sourceScans": {
+    "before": {
+      "containerId": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "auditInode": "219380",
+      "businessQueries": 118,
+      "queryIdsSha256": "9a5347b0cf9c1d024498897d33c2ef1ecfc21ce9505b8acccec3d63b6466e6d3",
+      "auditFence": "dmq_audit_fence_817afc4179e79d7d885f7e16"
+    },
+    "settled": {
+      "containerId": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "auditInode": "219380",
+      "businessQueries": 118,
+      "queryIdsSha256": "9a5347b0cf9c1d024498897d33c2ef1ecfc21ce9505b8acccec3d63b6466e6d3",
+      "auditFence": "dmq_audit_fence_d11d0a9459265e153c068922"
+    },
+    "after": {
+      "containerId": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "auditInode": "219380",
+      "businessQueries": 118,
+      "queryIdsSha256": "9a5347b0cf9c1d024498897d33c2ef1ecfc21ce9505b8acccec3d63b6466e6d3",
+      "auditFence": "dmq_audit_fence_63505a711ebee9f2a6550fba"
+    },
+    "confirmed": {
+      "containerId": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "auditInode": "219380",
+      "businessQueries": 118,
+      "queryIdsSha256": "9a5347b0cf9c1d024498897d33c2ef1ecfc21ce9505b8acccec3d63b6466e6d3",
+      "auditFence": "dmq_audit_fence_11f680fd7f03e80e07019bc7"
+    }
+  },
+  "revocation": {
+    "before": {
+      "action": "revoke-result",
+      "count": 1,
+      "commandId": "8cca4aae32e84612b7e1165d8ace11b4"
+    },
+    "after": {
+      "action": "restore-result",
+      "count": 1,
+      "commandId": "197d2db2d06440c9bcd0179efb6aaf8b"
+    }
+  },
+  "scope": "S1_BROWSER_QUERY_REFRESH_SAME_BYTES_NO_SOURCE_REPLAY",
+  "inputsUnchanged": true,
+  "finishedAtUtc": "2026-11-19T09:27:50.959Z"
+}
