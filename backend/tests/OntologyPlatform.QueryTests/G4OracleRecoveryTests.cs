@@ -154,6 +154,46 @@ public sealed partial class G4QueryRaceTests
         Assert.AreEqual(2L,after.Fence);
         Assert.AreEqual("CANCELLED",after.ExecutionStatus);
         Assert.AreEqual(0,after.ResultSize);
+        // 原 fence1 必须在提交行锁处被拒绝，不能靠构造错误的结果提前短路。
+        var executeProof = await authority.CaptureAsync(session with { ConnectionId = cid, Permission = "data.query.execute",
+            ObjectRefs = projection.ObjectRefs, FieldRefs = projection.FieldRefs }, CancellationToken.None);
+        var fixture = G4QueryTests.FixtureResult();
+        var observed = (G4ObservationDatum)fixture.Data[0];
+        var late = fixture with { Data = [observed with { Identity = observed.Identity with { OrganizationId = actor.OrganizationId, SiteId = "site-a" } }],
+            Evidence = [fixture.Evidence[0] with { ConnectionId = cid, Scope = scope }],
+            SubSources = [fixture.SubSources[0] with { ConnectionId = cid, WatermarkKind = "UNKNOWN" }] };
+        var receipt = G4QueryTests.ReceiptFixture(qid, binding, late).Receipt with { AdapterVersion = "oracle-query-v1", WatermarkKind = "UNKNOWN", Watermark = null };
+        var stale = new G4QueryRecord { Id = qid, LeaseOwner = G4OracleMaintenanceProof.Owner, Fence = 1, RequestHash = row.RequestHash };
+        var lost = await Assert.ThrowsAsync<SemanticOperationException>(() => store.CompleteAsync(stale, session, [executeProof], query, state, late,
+            [new G4QueryStoredReceipt { Receipt = receipt, ReceiptHash = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(receipt)) }], CancellationToken.None));
+        Assert.AreEqual("query_execution_stale",lost.Code);
+        Assert.IsFalse(await store.HeartbeatAsync(stale,CancellationToken.None));
+        Assert.AreEqual(0, await gov.AuditRecords.CountAsync(a => a.Resource == qid && a.Action == "data.query.execute" && a.Outcome == "allowed"));
+        // 在独立平台事务持有写者容量锁并发布已逾期的 RUNNING；共享进入者只能观察其提交后的状态。
+        Task<G4OracleSourceOpen.IPermit> waiting;
+        await using (var changing = await db.Database.BeginTransactionAsync())
+        {
+            await G4QueryResultStore.LockCapacityAsync(db,CancellationToken.None);
+            await db.Queries.Where(q=>q.Id==history.Id).ExecuteUpdateAsync(u=>u.SetProperty(q=>q.ExecutionStatus,"RUNNING")
+                .SetProperty(q=>q.CancelRequested,false).SetProperty(q=>q.LeaseOwner,G4QueryResultStore.OracleOwnerPrefix + "isolated")
+                .SetProperty(q=>q.LeaseUntilUtc,now.AddSeconds(-1)));
+            waiting=second.EnterOracleSourceAsync(cid,CancellationToken.None);
+            await changing.CommitAsync();
+        }
+        Assert.AreEqual("query_capacity_exhausted",(await Assert.ThrowsAsync<SemanticOperationException>(()=>waiting)).Code);
+        Assert.AreEqual(0,source.Opens);
+        // 这条同库测试控制行恢复其建立时的状态。真实目标保持只读后验。
+        await db.Queries.Where(q=>q.Id==history.Id).ExecuteUpdateAsync(u=>u.SetProperty(q=>q.ExecutionStatus,"CANCELLED")
+            .SetProperty(q=>q.CancelRequested,true).SetProperty(q=>q.LeaseOwner,(string?)null).SetProperty(q=>q.LeaseUntilUtc,(DateTimeOffset?)null));
+        // 物理打开完成后仍在源方法内时，独立 writer 就须能获得容量锁。
+        await G4OracleSourceOpen.RunAsync(await store.EnterOracleSourceAsync(cid,CancellationToken.None),async () =>
+        {
+            Assert.IsFalse(await db.Database.SqlQuery<bool>($"SELECT pg_try_advisory_xact_lock(73442001) AS \"Value\"").SingleAsync());
+            await G4OracleSourceOpen.BeforePhysicalOpenAsync(CancellationToken.None);
+            await G4OracleSourceOpen.AfterPhysicalOpenAsync();
+            Assert.IsTrue(await db.Database.SqlQuery<bool>($"SELECT pg_try_advisory_xact_lock(73442001) AS \"Value\"").SingleAsync());
+            return true;
+        });
         // 解封后合法状态读取才到达受控源边界；撤授权后仍须拒绝且不得再打开。
         await Read(actor,qid,false);
         Assert.AreEqual(1,source.Opens);

@@ -50,6 +50,10 @@ public sealed class G4OracleSourceOpen
         await current.permit.CheckAsync(token);
     }
 
+    /// <summary>TLS 端点核验和真正 ODP 会话打开间，再核验在此前耗时中可能自然到期的执行。</summary>
+    public static Task BeforeSessionOpenAsync(CancellationToken token) =>
+        Current.Value?.permit?.CheckAsync(token) ?? Task.CompletedTask;
+
     /// <summary>物理打开完成立即释放平台锁，使正式取消能在源 SQL 仍执行时提交。</summary>
     public static ValueTask AfterPhysicalOpenAsync() => Current.Value?.ReleaseAsync() ?? ValueTask.CompletedTask;
 

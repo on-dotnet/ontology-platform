@@ -33,6 +33,10 @@ internal static class OracleS0Maintenance
             // 凭据只在限权进程内使用。引擎 inspect 及命令行不得含连接口令。
             var path = Trusted("DSN_FILE");
             if (!OperatingSystem.IsLinux()) throw new PlatformNotSupportedException("维护进程仅在准确 Linux 验证器中运行。");
+            // 核 Linux 进程的实际及有效 UID；不凭环境字符串合成维护操作者。
+            var uid = (await File.ReadAllLinesAsync("/proc/self/status", limit.Token)).Single(line => line.StartsWith("Uid:", StringComparison.Ordinal))
+                .Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+            G4OracleMaintenanceProof.Check(uid.Length == 5 && proof["operatorId"] == "os-uid-" + uid[1] && uid[2] == uid[1]);
             G4OracleMaintenanceProof.Check(Path.IsPathFullyQualified(path) && File.Exists(path) && new FileInfo(path).LinkTarget is null
                 && (File.GetUnixFileMode(path) & (UnixFileMode.GroupRead | UnixFileMode.GroupWrite | UnixFileMode.GroupExecute
                     | UnixFileMode.OtherRead | UnixFileMode.OtherWrite | UnixFileMode.OtherExecute)) == 0);

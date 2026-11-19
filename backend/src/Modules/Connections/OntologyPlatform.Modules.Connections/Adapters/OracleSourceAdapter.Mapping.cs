@@ -55,6 +55,7 @@ public sealed partial class OracleSourceAdapter
         var connection = Create(secret);
         try
         {
+            await G4OracleSourceOpen.BeforeSessionOpenAsync(token);
             await connection.OpenAsync(token);
             await G4OracleSourceOpen.AfterPhysicalOpenAsync();
             connection.ModuleName = "G4-ORACLE-MAPPING-QUERY-001";
