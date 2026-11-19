@@ -28,8 +28,33 @@ public static class QueryEndpoints
             .Produces<G4SourceEvidenceView>(200).WithTags("Semantic queries").WithGroupName("g4");
     }
 
+    /// <summary>在身份、防伪和请求体之前建立单次 G4 截止；保留客户端断开的独立语义。</summary>
+    private static async Task<IResult> TransportAsync(HttpContext context, string policy,
+        Func<ActorContext, CancellationToken, Task<IResult>> operation, bool validateCsrf)
+    {
+        // 保留传输提供的真实断开令牌，结束后归还原请求上下文。
+        var disconnected = context.RequestAborted;
+        using var deadline = new G4RequestDeadline(context.RequestServices.GetRequiredService<TimeProvider>(), disconnected);
+        context.RequestAborted = deadline.Token;
+        try
+        {
+            // Guard、实际流读取与网关共同消费这一根预算。
+            var result = await G2EndpointGuard.TransportAsync(context, policy, operation, validateCsrf);
+            deadline.Token.ThrowIfCancellationRequested();
+            return result;
+        }
+        catch (OperationCanceledException) when (!disconnected.IsCancellationRequested && deadline.Token.IsCancellationRequested)
+        {
+            return PlatformProblem.Create(context, 503, "query_timeout");
+        }
+        finally
+        {
+            context.RequestAborted = disconnected;
+        }
+    }
+
     /// <summary>先身份与CSRF，再有界严格JSON；不把客户端header当作会话引用。</summary>
-    private static Task<IResult> ExecuteAsync(HttpContext context) => G2EndpointGuard.TransportAsync(context, "data.query.execute", async (actor, token) =>
+    private static Task<IResult> ExecuteAsync(HttpContext context) => TransportAsync(context, "data.query.execute", async (actor, token) =>
     {
         // 读取额外一字节用于证明超界，而不是截断后执行一个不同请求。
         var bytes = new byte[65537];
@@ -56,7 +81,7 @@ public static class QueryEndpoints
     }, true);
 
     /// <summary>恢复只传查询ID，不接受客户端传回旧结果或授权证明。</summary>
-    private static Task<IResult> ReadAsync(HttpContext context, bool includeResult) => G2EndpointGuard.TransportAsync(context, "data.query.result.read", async (actor, token) =>
+    private static Task<IResult> ReadAsync(HttpContext context, bool includeResult) => TransportAsync(context, "data.query.result.read", async (actor, token) =>
     {
         // ID来自路由；未知与异主体由应用层一致返回404。
         var id = context.Request.RouteValues["queryId"]?.ToString() ?? string.Empty;
@@ -66,7 +91,7 @@ public static class QueryEndpoints
     }, false);
 
     /// <summary>取消复用防伪及当前权限，禁止任何隐藏命令body。</summary>
-    private static Task<IResult> CancelAsync(HttpContext context) => G2EndpointGuard.TransportAsync(context, "data.query.execute", async (actor, token) =>
+    private static Task<IResult> CancelAsync(HttpContext context) => TransportAsync(context, "data.query.execute", async (actor, token) =>
     {
         // 无body协议必须检查实际流，不能信任缺席的Content-Length。
         var probe = new byte[1];
@@ -79,7 +104,7 @@ public static class QueryEndpoints
     }, true);
 
     /// <summary>证据打开额外要求来源读取许可，不让UI把结果读取许可升级成证据许可。</summary>
-    private static Task<IResult> EvidenceAsync(HttpContext context) => G2EndpointGuard.TransportAsync(context, "data.query.evidence.read", async (actor, token) =>
+    private static Task<IResult> EvidenceAsync(HttpContext context) => TransportAsync(context, "data.query.evidence.read", async (actor, token) =>
     {
         // 只使用服务器证据ID，应用层重新找到本人原查询和回执。
         var id = context.Request.RouteValues["id"]?.ToString() ?? string.Empty;

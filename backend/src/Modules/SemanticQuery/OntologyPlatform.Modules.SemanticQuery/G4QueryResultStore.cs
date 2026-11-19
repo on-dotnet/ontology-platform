@@ -4,7 +4,10 @@ using System.Text.Json;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 using OntologyPlatform.Contracts;
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("OntologyPlatform.QueryTests")]
 
 namespace OntologyPlatform.Modules.SemanticQuery;
 
@@ -29,9 +32,15 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
     /// <summary>租约、到期与deadline使用统一UTC时钟。</summary>
     private readonly TimeProvider clock;
 
+    /// <summary>新 Oracle 执行专属的服务端 owner 前缀，用于保留跨进程物理占位。</summary>
+    internal const string OracleOwnerPrefix = "oracle-execution-";
+
+    /// <summary>只记录准确执行标识和提交保守区间，不记录凭证、业务值或 SQL。</summary>
+    private readonly ILogger<G4QueryResultStore>? logger;
+
     /// <summary>只依赖模块公开参与者，不直接写治理或连接表。</summary>
     public G4QueryResultStore(IDbContextFactory<G4QueryDbContext> factory, IG4QueryAuthorizationAuthority authority,
-        IG4QueryBindingReader bindings, ITransactionalAuditWriter audit, IDataProtectionProvider protection, TimeProvider clock)
+        IG4QueryBindingReader bindings, ITransactionalAuditWriter audit, IDataProtectionProvider protection, TimeProvider clock, ILogger<G4QueryResultStore>? logger = null)
     {
         this.factory = factory;
         this.authority = authority;
@@ -39,6 +48,7 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         this.audit = audit;
         this.protection = protection;
         this.clock = clock;
+        this.logger = logger;
     }
 
     /// <summary>PG原子计数限制同运行的并发工具，失败尝试同样占用预算。</summary>
@@ -121,7 +131,15 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         await bindings.VerifyInTransactionAsync(session.Actor, query, state.Binding, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
         await LockCapacityAsync(database, token);
         // 容量计数在跨实例事务锁内执行，过期执行仍占位直到被worker明确终结。
-        var running = database.Queries.Where(row => row.ExecutionStatus == "RUNNING");
+        var running = database.Queries.Where(row => row.ExecutionStatus == "RUNNING"
+            || row.LeaseOwner != null && row.LeaseOwner.StartsWith(OracleOwnerPrefix));
+        // 同连接存在未知物理槽位时全部封闭，逾期 RUNNING 也无需等待后台扫描。
+        var admissionTime = clock.GetUtcNow();
+        if (await running.AnyAsync(row => row.ConnectionId == state.Binding.ConnectionId
+            && row.LeaseOwner != null && row.LeaseOwner.StartsWith(OracleOwnerPrefix)
+            && (row.ExecutionStatus != "RUNNING" || row.CancelRequested || row.LeaseUntilUtc == null
+                || row.LeaseUntilUtc <= admissionTime || row.DeadlineAtUtc <= admissionTime), token))
+            throw new SemanticOperationException(429, "query_capacity_exhausted");
         if (await running.CountAsync(token) >= 4
             || await running.CountAsync(row => row.ConnectionId == state.Binding.ConnectionId, token) >= 2
             || await running.AnyAsync(row => row.OrganizationId == session.Actor.OrganizationId && row.SubjectId == session.Actor.SubjectId, token))
@@ -203,7 +221,7 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
     }
 
     /// <summary>独立读取准确 Doris 查询的租约、fence、取消与到期状态，不续租或写表。</summary>
-    internal async Task<bool> DorisLeaseIsCurrentAsync(G4QueryRecord lease, CancellationToken token)
+    internal async Task<bool> LeaseIsCurrentAsync(G4QueryRecord lease, CancellationToken token)
     {
         // 与控制事务分开创建上下文，每次读已提交状态且不参加长事务。
         await using var database = await factory.CreateDbContextAsync(token);
@@ -284,21 +302,83 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         DemandProofSet(state with { Binding = state.Binding with { AuthorizationEpoch = session.AuthorizationEpoch.ToString(CultureInfo.InvariantCulture) } }, session, proofs);
         if (record.ExpiresAtUtc <= clock.GetUtcNow()) throw new SemanticOperationException(410, "result_expired");
         if (record.ExecutionStatus is "COMPLETED" or "FAILED") throw new SemanticOperationException(409, "query_already_finished");
+        // 只有首次真正改变状态的 Oracle 取消才记录这次提交区间。
+        var oracleCommit = record.ExecutionStatus != "CANCELLED" && IsOracleOwner(record.LeaseOwner);
         if (record.ExecutionStatus != "CANCELLED")
         {
             record.CancelRequested = true;
             record.ExecutionStatus = "CANCELLED";
             record.CompletedAtUtc = clock.GetUtcNow();
-            record.LeaseOwner = null;
-            record.LeaseUntilUtc = null;
+            if (!oracleCommit)
+            {
+                record.LeaseOwner = null;
+                record.LeaseUntilUtc = null;
+            }
             record.Fence++;
             await database.SaveChangesAsync(token);
             await audit.WriteAsync(session.Actor, new AuditCommand { Action = "data.query.cancel", Resource = record.Id, Outcome = "allowed", Scope = state.Scope },
                 database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
         }
+        if (oracleCommit)
+        {
+            // 同库时钟在提交前取样，CAS 后续只采用更早的下界；它与正式提交调用区间分别记录。
+            await database.Database.ExecuteSqlInterpolatedAsync($"""
+                UPDATE semantic_query."Queries" SET "LeaseUntilUtc" = clock_timestamp() + interval '250 milliseconds'
+                WHERE "Id" = {record.Id} AND "LeaseOwner" = {record.LeaseOwner} AND "Fence" = {record.Fence}
+                """, token);
+        }
+        if (!oracleCommit)
+        {
+            await transaction.CommitAsync(token);
+            return record;
+        }
+        // 时钟位于 CommitAsync 的紧邻两侧；只在它成功返回后登记这次事务。
+        var beforeUtc = clock.GetUtcNow();
+        var beforeStamp = clock.GetTimestamp();
         await transaction.CommitAsync(token);
+        var afterStamp = clock.GetTimestamp();
+        var afterUtc = clock.GetUtcNow();
+        logger?.LogInformation("OracleCancelCommit query={QueryId} originalFence={OriginalFence} terminalFence={TerminalFence} lowerUtc={LowerUtc:O} upperUtc={UpperUtc:O} durationMs={DurationMs}",
+                record.Id, record.Fence - 1, record.Fence, beforeUtc, afterUtc, clock.GetElapsedTime(beforeStamp, afterStamp).TotalMilliseconds);
         return record;
     }
+
+    /// <summary>仅真实 Oracle 所有者可原子终结自己的原 fence；与正式取消或 Sweep 抢同一行。</summary>
+    internal async Task FailOracleAsync(G4QueryRecord lease, ResourceScope scope, ActorContext actor, CancellationToken token)
+    {
+        if (!IsOracleOwner(lease.LeaseOwner)) return;
+        // 独立上下文只写本模块准确行，失败审计与 fence 在同物理事务提交。
+        await using var database = await factory.CreateDbContextAsync(token);
+        await using var transaction = await database.Database.BeginTransactionAsync(token);
+        await LockCapacityAsync(database, token);
+        var changed = await database.Database.ExecuteSqlInterpolatedAsync($"""
+            UPDATE semantic_query."Queries" SET "ExecutionStatus" = 'FAILED', "Fence" = "Fence" + 1,
+                "CompletedAtUtc" = clock_timestamp(), "ErrorCode" = 'query_source_unavailable'
+            WHERE "Id" = {lease.Id} AND "LeaseOwner" = {lease.LeaseOwner} AND "Fence" = {lease.Fence}
+                AND "ExecutionStatus" = 'RUNNING'
+            """, token);
+        if (changed == 0) return;
+        await audit.WriteAsync(actor, new AuditCommand { Action = "data.query.execute", Resource = lease.Id,
+            Outcome = "failure", Scope = scope }, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
+        await transaction.CommitAsync(token);
+    }
+
+    /// <summary>仅在原执行已确证无源残余时以原 owner、两代 fence 和终态执行单行 CAS。</summary>
+    internal async Task<bool> ConfirmOracleCleanupAsync(string queryId, string? owner, long originalFence, long terminalFence, CancellationToken token)
+    {
+        if (!IsOracleOwner(owner) || originalFence < 1 || originalFence == long.MaxValue || terminalFence != originalFence + 1) return false;
+        // 单条语句在 PG 取得准确行锁后重核状态和正式取消的保守同库截止。
+        await using var database = await factory.CreateDbContextAsync(token);
+        return await database.Database.ExecuteSqlInterpolatedAsync($"""
+            UPDATE semantic_query."Queries" SET "LeaseOwner" = NULL, "LeaseUntilUtc" = NULL
+            WHERE "Id" = {queryId} AND "LeaseOwner" = {owner} AND "Fence" = {terminalFence}
+                AND "ExecutionStatus" IN ('CANCELLED', 'FAILED') AND "DeadlineAtUtc" > clock_timestamp()
+                AND ("ExecutionStatus" != 'CANCELLED' OR "LeaseUntilUtc" > clock_timestamp())
+            """, token) == 1;
+    }
+
+    /// <summary>仅新 Oracle 准入使用专属前缀，旧 PG、Doris 的终态按原方式释放。</summary>
+    private static bool IsOracleOwner(string? owner) => owner?.StartsWith(OracleOwnerPrefix, StringComparison.Ordinal) == true;
 
     /// <summary>当前完整execute及读取许可通过后，在同事务记录读取审计并返回原规范字节。</summary>
     public async Task<G4QueryDelivery> ReadAuthorizedAsync(string queryId, MappingAuthorizationProof session,
@@ -393,8 +473,9 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         // 七天安全元数据保留期独立于二十四小时结果保留期。
         var retention = now.AddDays(-7);
         // 只取确实仍有待处理数据的行，已清空结果不占据下一页候选。
-        var ids = await scan.Queries.AsNoTracking().Where(row => row.CreatedAtUtc <= retention
-            || row.ExpiresAtUtc <= now && (row.ResultCiphertext.Length > 0 || row.RequestBytes.Length > 0)
+        var ids = await scan.Queries.AsNoTracking().Where(row =>
+            (row.LeaseOwner == null || !row.LeaseOwner.StartsWith(OracleOwnerPrefix)) && (row.CreatedAtUtc <= retention
+                || row.ExpiresAtUtc <= now && (row.ResultCiphertext.Length > 0 || row.RequestBytes.Length > 0))
             || row.ExecutionStatus == "RUNNING" && (row.LeaseUntilUtc == null || row.LeaseUntilUtc <= now || row.DeadlineAtUtc <= now))
             .OrderBy(row => row.CreatedAtUtc).Select(row => row.Id).Take(64).ToArrayAsync(token);
         // 返回真正提交的修改数量，不把扫描到的候选当作删除成功。
@@ -449,12 +530,13 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
             var current = clock.GetUtcNow();
             // 固定审计操作决定是失联失败还是无值过期删除。
             string action;
-            if (row.CreatedAtUtc <= current.AddDays(-7))
+            var oracleHold = IsOracleOwner(row.LeaseOwner);
+            if (!oracleHold && row.CreatedAtUtc <= current.AddDays(-7))
             {
                 database.Queries.Remove(row);
                 action = "data.query.expire";
             }
-            else if (row.ExpiresAtUtc <= current && (row.ResultCiphertext.Length > 0 || row.RequestBytes.Length > 0))
+            else if (!oracleHold && row.ExpiresAtUtc <= current && (row.ResultCiphertext.Length > 0 || row.RequestBytes.Length > 0))
             {
                 row.ResultCiphertext = [];
                 row.ResultSize = 0;
@@ -466,8 +548,11 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
                 row.ExecutionStatus = "FAILED";
                 row.ErrorCode = "query_timeout";
                 row.CompletedAtUtc = current;
-                row.LeaseOwner = null;
-                row.LeaseUntilUtc = null;
+                if (!oracleHold)
+                {
+                    row.LeaseOwner = null;
+                    row.LeaseUntilUtc = null;
+                }
                 row.Fence++;
                 action = "data.query.execute";
             }

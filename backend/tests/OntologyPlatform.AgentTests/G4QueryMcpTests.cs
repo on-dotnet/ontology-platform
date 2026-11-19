@@ -26,6 +26,53 @@ public sealed class G4QueryMcpTests
         Assert.IsTrue(SemanticMcpTools.RawG4PayloadRejected(new byte[65537]));
     }
 
+    /// <summary>经真实 Run 分发让预留先消耗查询限额，网关收紧原起点时不能再进入绑定。</summary>
+    [TestMethod]
+    public async Task G4RunReservationConsumesOriginalQueryDeadline()
+    {
+        // 有界替身只控制持久预留耗时；入口、期限与调用顺序均走正式消费者。
+        var store = new DelayedReservation();
+        var actor = new ActorContext { SubjectId = "subject", OrganizationId = "org", SiteIds = ["site"], Roles = [],
+            TraceId = "trace", CorrelationId = "correlation" };
+        var run = new G4QueryRunReference(DateTimeOffset.UtcNow);
+        await Assert.ThrowsExactlyAsync<OperationCanceledException>(() => ExecutionRunService.ExecuteG4ToolAsync(
+            store, actor, new string('0', 64), run, token =>
+            {
+                // 与正式 Gateway 相同，解析到查询时才知道更短的 Query.TimeoutMs。
+                using var gateway = new G4RequestDeadline(TimeProvider.System, token);
+                gateway.Tighten(100);
+                gateway.Token.ThrowIfCancellationRequested();
+                throw new AssertFailedException("预留前的起点未保留");
+            }, CancellationToken.None));
+        Assert.IsTrue(store.Reserved);
+        Assert.IsFalse(store.Bound);
+    }
+
+    /// <summary>仅对本测试的预留附加可取消延迟，验证实际 Run 不在错误后写绑定。</summary>
+    private sealed class DelayedReservation : IG4QueryRunStore
+    {
+        /// <summary>本次进入了真实 Run 调用的预留阶段。</summary>
+        public bool Reserved { get; private set; }
+
+        /// <summary>只在正式 Run 决定绑定时才置位。</summary>
+        public bool Bound { get; private set; }
+
+        /// <summary>消耗一百五十毫秒，不阻塞测试线程或覆盖调用令牌。</summary>
+        public async Task ReserveRunAsync(ActorContext actor, string sessionReference, string runId, DateTimeOffset deadline, CancellationToken token)
+        {
+            Assert.IsNotNull(G4RequestDeadline.Current);
+            Reserved = true;
+            await Task.Delay(150, token);
+        }
+
+        /// <summary>记录超时后是否产生不应有的引用绑定。</summary>
+        public Task BindRunQueryAsync(ActorContext actor, string sessionReference, string runId, string queryId, CancellationToken token)
+        {
+            Bound = true;
+            return Task.CompletedTask;
+        }
+    }
+
     /// <summary>恢复与执行同样消耗工具次数，第四次及期限后的调用必须拒绝。</summary>
     [TestMethod]
     public void QueryRunCountsEveryAttemptAndUsesOneDeadline()

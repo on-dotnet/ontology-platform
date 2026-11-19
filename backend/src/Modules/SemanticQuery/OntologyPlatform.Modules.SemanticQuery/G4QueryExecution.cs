@@ -85,8 +85,11 @@ public sealed class G4QueryExecution
         var state = new G4QueryState { Binding = context.Binding, Scope = context.Scope,
             Projections = proofs.Length == 0 ? [] : [projection], RequiredProjections = context.Manifest.Mapping.Entities.Select(item => source.DescribeProjection(context, item.Id)).ToArray() };
         // 随机实例租约只属于本次执行，不由调用方传入owner。
+        var oracle = context.Manifest.Binding.SourceType == "ORACLE" ? new OracleExecution() : null;
+        // owner 前缀仅来自已验服务器清单，不能由请求或查询 ID 选择。
+        var owner = (oracle is null ? "execution-" : G4QueryResultStore.OracleOwnerPrefix) + Guid.NewGuid().ToString("N");
         var admission = await store.AdmitAsync(session, proofs, query, state, key, selectionQueryId,
-            "execution-" + Guid.NewGuid().ToString("N"), deadline, token);
+            owner, deadline, token);
         if (!admission.Created) return await ReadAsync(actor, sessionReference, admission.Record.Id, true, false, deadline, verifyRoot, token);
         // 业务读取与租约观察共享取消，取消先提交后旧worker不能继续提交。
         using var execution = CancellationTokenSource.CreateLinkedTokenSource(token);
@@ -106,7 +109,7 @@ public sealed class G4QueryExecution
             {
                 try
                 {
-                    read = await ReadBranchAsync(admission.Record, context, proofs[0], entity.Id, query, deadline, execution.Token);
+                    read = await ReadBranchAsync(admission.Record, context, proofs[0], entity.Id, query, deadline, execution.Token, oracle);
                     projected = ProjectEntities(admission.Record.Id, actor.TraceId, context, read);
                     if (query.Filters.EntityIri is not null)
                     {
@@ -133,7 +136,7 @@ public sealed class G4QueryExecution
                         branchStatus = "INDETERMINATE";
                     }
                 }
-                catch (SemanticOperationException error) when (error.Status is 403 or 503)
+                catch (SemanticOperationException error) when (error.Status is (403 or 503) && error.Code != "query_source_cleanup_unconfirmed")
                 {
                     branchStatus = error.Status == 403 ? "FORBIDDEN" : error.Code == "query_source_timeout" ? "TIMEOUT" : "UNAVAILABLE";
                 }
@@ -145,7 +148,7 @@ public sealed class G4QueryExecution
             if (query.CapabilityId != "g4_resolve_entity" && result.Status is "FOUND" or "PARTIAL" && projected is not null && read is { Limited: false, Indeterminate: false })
             {
                 // 已完整定位的根是后续分支失败时唯一可信前缀。
-                var expanded = await ExpandAsync(actor, session, query, context, admission.Record, result, projected, read, proofs, deadline, execution.Token);
+                var expanded = await ExpandAsync(actor, session, query, context, admission.Record, result, projected, read, proofs, deadline, execution.Token, oracle);
                 result = expanded.Result;
                 proofs = expanded.Proofs;
                 state = state with { Projections = expanded.Projections };
@@ -191,6 +194,12 @@ public sealed class G4QueryExecution
             }
             // 返回和历史恢复复用当前完整授权及来源ACL，不因首次执行绕开result.read。
             return await ReadAsync(actor, sessionReference, admission.Record.Id, true, false, deadline, verifyRoot, execution.Token);
+        }
+        catch when (oracle is not null)
+        {
+            // 只在原请求和物理分支剩余时间内结算，任何迟到/未知均保留占位给独立恢复。
+            await FinishOracleFailureAsync(admission.Record, session, oracle, token);
+            throw;
         }
         finally
         {
@@ -339,7 +348,7 @@ public sealed class G4QueryExecution
     private async Task<(G4QueryResultV1 Result, MappingAuthorizationProof[] Proofs, G4QueryProjection[] Projections, G4QueryStoredReceipt[] Receipts)> ExpandAsync(
         ActorContext actor, MappingAuthorizationProof session, G4SemanticQuery query, G4QueryBindingContext context, G4QueryRecord lease,
         G4QueryResultV1 initial, G4QueryBranchProjection root, G4SourceQueryRead rootRead, MappingAuthorizationProof[] rootProofs,
-        DateTimeOffset deadline, CancellationToken token)
+        DateTimeOffset deadline, CancellationToken token, OracleExecution? oracle)
     {
         // 分支的源读取和回执均绑定同一条准入记录。
         var queryId = lease.Id;
@@ -405,7 +414,7 @@ public sealed class G4QueryExecution
                         // 单条grant必须覆盖该分支，不合并多个不完整许可。
                         var proof = await CaptureAsync(session, context.Binding.ConnectionId, projection, "data.query.execute", token);
                         // 根过滤不传给目标；关系谓词只由已授权父行与正式映射构造。
-                        var child = await ReadBranchAsync(lease, context, proof, relation.ToBindingId, query with { Filters = query.Filters with { EntityExternalId = null, EntityIri = null } }, deadline, token,
+                        var child = await ReadBranchAsync(lease, context, proof, relation.ToBindingId, query with { Filters = query.Filters with { EntityExternalId = null, EntityIri = null } }, deadline, token, oracle,
                             new G4QueryBranchFilter { RelationId = relation.Id, Parents = parent.Read });
                         intermediateBytes += G4QueryCanonical.Serialize(child.Rows).Length;
                         candidateEdges += (long)parent.Read.Rows.Length * child.Rows.Length;
@@ -451,7 +460,7 @@ public sealed class G4QueryExecution
                         if (child.Rows.Length > 0 && !child.Limited) queue.Enqueue((child, projected, parent.Depth + 1));
                         continue;
                     }
-                    catch (SemanticOperationException error) when (error.Status is 403 or 503)
+                    catch (SemanticOperationException error) when (error.Status is (403 or 503) && error.Code != "query_source_cleanup_unconfirmed")
                     {
                         status = error.Status == 403 ? "FORBIDDEN" : error.Code == "query_source_timeout" ? "TIMEOUT" : "UNAVAILABLE";
                     }
@@ -562,17 +571,128 @@ public sealed class G4QueryExecution
     private static bool SameProjection(G4QueryProjection left, G4QueryProjection right) => left.ObjectRefs.Order(StringComparer.Ordinal).SequenceEqual(right.ObjectRefs.Order(StringComparer.Ordinal))
         && left.FieldRefs.Order(StringComparer.Ordinal).SequenceEqual(right.FieldRefs.Order(StringComparer.Ordinal));
 
-    /// <summary>只在已准入的 Doris 源分支上附加独立的只读取消观察。</summary>
+    /// <summary>串行分支的最后物理确认与失败截止；任何一次未确认立即终止本查询。</summary>
+    private sealed class OracleExecution
+    {
+        /// <summary>只在最新的源分支完整释放且观察器退出后为真；首次开源前无残余。</summary>
+        public bool Confirmed { get; set; } = true;
+
+        /// <summary>正在执行或失败分支开始的本地单调时间。</summary>
+        public long Started { get; set; }
+
+        /// <summary>分支失败后的结算继续消费原一秒；健康分支完成即清除该临时约束。</summary>
+        public TimeSpan? BranchLimit { get; set; }
+    }
+
+    /// <summary>在原预算内终结旧执行，再仅凭真实物理确认尝试清除准确终态占位。</summary>
+    private async Task FinishOracleFailureAsync(G4QueryRecord lease, MappingAuthorizationProof session,
+        OracleExecution oracle, CancellationToken token)
+    {
+        // 取消入口与执行入口各自有原始期限；本次结算不能重启其中任何一只时钟。
+        var remaining = G4RequestDeadline.Current?.Remaining ?? lease.DeadlineAtUtc - clock.GetUtcNow();
+        if (oracle.BranchLimit is { } limit)
+            remaining = TimeSpan.FromTicks(Math.Min(remaining.Ticks, (limit - clock.GetElapsedTime(oracle.Started)).Ticks));
+        if (remaining <= TimeSpan.Zero || token.IsCancellationRequested) return;
+        using var expiry = new CancellationTokenSource(remaining, clock);
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(token, expiry.Token);
+        await store.FailOracleAsync(lease, session.Scope, session.Actor, budget.Token);
+        if (oracle.Confirmed)
+        {
+            // 二次提交的成功只能由原 owner 在原 fence 的直接后继完成。
+            var released = await store.ConfirmOracleCleanupAsync(lease.Id, lease.LeaseOwner, lease.Fence, lease.Fence + 1, budget.Token);
+            logger?.LogInformation("OracleCleanupCas query={QueryId} fence={OriginalFence} released={Released} observedUtc={ObservedUtc:O}",
+                lease.Id, lease.Fence, released, clock.GetUtcNow());
+        }
+    }
+
+    /// <summary>仅对已准入的跨实例源分支附加独立的只读取消观察。</summary>
     private async Task<G4SourceQueryRead> ReadBranchAsync(G4QueryRecord lease, G4QueryBindingContext context,
         MappingAuthorizationProof proof, string entityId, G4SemanticQuery query, DateTimeOffset deadline,
-        CancellationToken token, G4QueryBranchFilter? branch = null)
+        CancellationToken token, OracleExecution? oracle, G4QueryBranchFilter? branch = null)
     {
+        if (oracle is not null)
+        {
+            // 仅批准的 Oracle 三元组可以消费这一实际分支，拒绝跨源或未知版本。
+            if ((context.Manifest.Binding.AdapterVersion, context.Manifest.Binding.ExecutorVersion)
+                != ("oracle-mapping-v1", "oracle-mapping-validator-v1")) throw Invalid();
+            var result = await ReadOracleAsync(lease, oracle, deadline, token,
+                cancellation => source.ReadAsync(context, proof, entityId, query, deadline, cancellation, branch));
+            if (result.AdapterVersion != "oracle-query-v1" || result.WatermarkKind != "UNKNOWN" || result.Watermark is not null)
+                throw Invalid();
+            return result;
+        }
         if (context.Manifest.Binding.SourceType != "DORIS")
             return await source.ReadAsync(context, proof, entityId, query, deadline, token, branch);
 
         return await ReadWithDorisLeaseAsync(lease.Id, deadline, token,
             cancellation => source.ReadAsync(context, proof, entityId, query, deadline, cancellation, branch),
-            cancellation => store.DorisLeaseIsCurrentAsync(lease, cancellation));
+            cancellation => store.LeaseIsCurrentAsync(lease, cancellation));
+    }
+
+    /// <summary>工作、指定执行取消、物理释放与观察器退出均使用同一分支的单调时基。</summary>
+    private async Task<G4SourceQueryRead> ReadOracleAsync(G4QueryRecord lease, OracleExecution oracle, DateTimeOffset deadline,
+        CancellationToken token, Func<CancellationToken, Task<G4SourceQueryRead>> read)
+    {
+        // 一秒分支从首次平台观察前起算，扣除原总预算内的提交余量。
+        var remaining = G4RequestDeadline.Current?.Remaining ?? deadline - clock.GetUtcNow();
+        var limit = TimeSpan.FromMilliseconds(Math.Min(1000, remaining.TotalMilliseconds - 500));
+        var reserve = TimeSpan.FromMilliseconds(250);
+        if (limit <= reserve) throw new SemanticOperationException(503, "query_source_budget_exhausted");
+        oracle.Started = clock.GetTimestamp();
+        oracle.BranchLimit = limit;
+        using var lifetime = new G4OracleSourceLifetime(lease.Id);
+        using var stop = CancellationTokenSource.CreateLinkedTokenSource(token);
+        using var cutoff = new CancellationTokenSource(limit - reserve, clock);
+        using var work = CancellationTokenSource.CreateLinkedTokenSource(token, cutoff.Token);
+        // 先核行再发起源工作，随后每次平台读取独立受限并仅绑定原 owner/fence。
+        if (!await store.LeaseIsCurrentAsync(lease, work.Token)) throw new OperationCanceledException(work.Token);
+        oracle.Confirmed = false;
+        var observing = ObserveOracleLeaseAsync(lease, work, stop.Token);
+        try
+        {
+            // 当前分支独占源执行身份，实际驱动负责申请和逐资源证明。
+            var result = await read(work.Token);
+            work.Token.ThrowIfCancellationRequested();
+            if (!lifetime.CleanupConfirmed) throw new SemanticOperationException(503, "query_source_cleanup_unconfirmed");
+            return result;
+        }
+        finally
+        {
+            // 包含原数据库读取退出，禁止分离未完成任务或以晚清理签当期成功。
+            await stop.CancelAsync();
+            await observing;
+            oracle.Confirmed = lifetime.CleanupConfirmed && clock.GetElapsedTime(oracle.Started) < limit;
+            logger?.LogInformation("OracleBranchRelease query={QueryId} execution={ExecutionId} confirmed={Confirmed} observedUtc={ObservedUtc:O}",
+                lease.Id, lifetime.ExecutionId, oracle.Confirmed, clock.GetUtcNow());
+            if (!oracle.Confirmed) throw new SemanticOperationException(503, "query_source_cleanup_unconfirmed");
+            work.Token.ThrowIfCancellationRequested();
+            oracle.BranchLimit = null;
+        }
+    }
+
+    /// <summary>十毫秒串行观察准确平台租约；失败或终态即通知同次 Oracle 驱动。</summary>
+    private async Task ObserveOracleLeaseAsync(G4QueryRecord lease, CancellationTokenSource work, CancellationToken stop)
+    {
+        try
+        {
+            while (!work.IsCancellationRequested)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(10), clock, stop);
+                using var expiry = new CancellationTokenSource(TimeSpan.FromMilliseconds(100), clock);
+                using var probe = CancellationTokenSource.CreateLinkedTokenSource(stop, work.Token, expiry.Token);
+                using var timeout = expiry.Token.Register(work.Cancel);
+                if (!await store.LeaseIsCurrentAsync(lease, probe.Token))
+                {
+                    await work.CancelAsync();
+                    return;
+                }
+            }
+        }
+        catch (OperationCanceledException) when (stop.IsCancellationRequested) { }
+        catch
+        {
+            await work.CancelAsync();
+        }
     }
 
     /// <summary>把源读取、租约判断与清理统一到绝对期限，允许定向测试注入迟滞的只读参与者。</summary>

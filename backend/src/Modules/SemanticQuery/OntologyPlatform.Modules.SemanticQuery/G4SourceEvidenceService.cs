@@ -26,7 +26,7 @@ public static class G4SourceEvidenceService
                 || receipt.Scope.OrganizationId != state.Scope.OrganizationId
                 || !receipt.Scope.SiteIds.Order(StringComparer.Ordinal).SequenceEqual(state.Scope.SiteIds.Order(StringComparer.Ordinal))
                 || receipt.RowCount is < 0 or > 100 || !Hex(receipt.QueryPlanHash) || !((receipt.AdapterVersion == "pg-query-v1" && receipt.WatermarkKind == "TRANSACTION_SNAPSHOT" && !string.IsNullOrWhiteSpace(receipt.Watermark))
-                    || (receipt.AdapterVersion == "doris-query-v1" && receipt.WatermarkKind == "UNKNOWN" && receipt.Watermark is null))
+                    || (receipt.AdapterVersion is ("doris-query-v1" or "oracle-query-v1") && receipt.WatermarkKind == "UNKNOWN" && receipt.Watermark is null))
                 || string.IsNullOrWhiteSpace(receipt.SourceDatasetRef) || receipt.SourceDatasetRef.Length > 4096
                 || receipt.Watermark?.Length > 256 || receipt.Precision is not ("RECORD" or "ROW_KEY" or "DATASET" or "TIME_WINDOW" or "UNKNOWN"))
                 throw Invalid();

@@ -11,11 +11,15 @@ public sealed class SemanticMcpTools
     /// <summary>唯一正式查询网关，不包含第二份查询引擎。</summary>
     private readonly ISemanticGateway gateway;
 
+    /// <summary>单次 G4 工具调用的服务器时钟。</summary>
+    private readonly TimeProvider clock;
+
     /// <summary>接收当前请求的同一个应用Gateway。</summary>
-    public SemanticMcpTools(ISemanticGateway gateway, IG4QueryRunStore? runs = null)
+    public SemanticMcpTools(ISemanticGateway gateway, IG4QueryRunStore? runs = null, TimeProvider? clock = null)
     {
         this.gateway = gateway;
         this.runs = runs;
+        this.clock = clock ?? TimeProvider.System;
     }
 
     /// <summary>G4运行引用由查询模块持久化；未配置时拒绝G4而不影响旧工具。</summary>
@@ -38,12 +42,14 @@ public sealed class SemanticMcpTools
         {
             if (name.StartsWith("g4_", StringComparison.Ordinal))
             {
+                // 长连接中的每次工具调用独立计时，包含持久预留、绑定和结果编码。
+                using var invocation = new G4RequestDeadline(clock, token);
                 if (runs is null || string.IsNullOrWhiteSpace(sessionReference)) throw new SemanticOperationException(503, "query_run_unavailable");
                 // 单次MCP请求也是一个服务器运行；MAF循环显式共用同一引用。
-                var reference = run ?? new G4QueryRunReference(DateTimeOffset.UtcNow);
+                var reference = run ?? new G4QueryRunReference(clock.GetUtcNow());
                 // 每次进入都先计数，参数拒绝与恢复调用不能绕过工具预算。
                 var delivery = await ExecutionRunService.ExecuteG4ToolAsync(runs, actor, sessionReference, reference,
-                    budget => CallG4Async(actor, sessionReference, name, arguments, budget), token);
+                    budget => CallG4Async(actor, sessionReference, name, arguments, budget), invocation.Token, clock);
                 // 文本与结构化内容只解码同一组规范字节。
                 var text = delivery.ResultBytes is not null ? System.Text.Encoding.UTF8.GetString(delivery.ResultBytes) : JsonSerializer.Serialize(delivery.View, G4QueryJson.Options);
                 // 正式网关保留六态业务结果，MCP 对整次无权限调用只返回固定拒绝文案。
@@ -52,6 +58,7 @@ public sealed class SemanticMcpTools
                 {
                     throw new SemanticOperationException(403, "query_forbidden");
                 }
+                invocation.Token.ThrowIfCancellationRequested();
                 return new CallToolResult { StructuredContent = structured, Content = [new TextContentBlock { Text = text }] };
             }
             // 能力名与版本只来自服务器白名单，调用方不能注入发布或任意查询工具。

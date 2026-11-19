@@ -270,7 +270,14 @@ public sealed class G4QueryRaceTests
 
     /// <summary>真实PG跨上下文执行连接二槽/任务四槽；失联维护仅终结状态，旧fence不能续租。</summary>
     [TestMethod]
-    public async Task ConnectionAndTaskCapacityAndLostLeaseAreAtomic()
+    public Task ConnectionAndTaskCapacityAndLostLeaseAreAtomic() => VerifyCapacityAsync(false);
+
+    /// <summary>真实平台 PG 中跨实例核验 Oracle 清理占位、容量、取消、逾期与准确两代 fence。</summary>
+    [TestMethod]
+    public Task OracleTerminalOwnerSurvivesSweepAndRejectsStaleConfirmation() => VerifyCapacityAsync(true);
+
+    /// <summary>复用独立库、真票据和实际准入，测试源物理证明由单独的 Oracle 正式切片提供。</summary>
+    private static async Task VerifyCapacityAsync(bool oracle)
     {
         // 仅消费当前任务显式提供的合成平台库。
         var connection = Environment.GetEnvironmentVariable("G4_QUERY_TEST_CONNECTION");
@@ -329,7 +336,7 @@ public sealed class G4QueryRaceTests
                     new AuthenticationProperties { ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(15) }, "Cookies"))));
             }
             // 每次准入重新捕获真实proof，查询本身不访问外部源。
-            async Task<G4QueryAdmission> Admit(int actorIndex, int connectionIndex)
+            async Task<G4QueryAdmission> Admit(int actorIndex, int connectionIndex, G4QueryResultStore? instance = null)
             {
                 // 本例明确的非空连接身份供grant匹配和固定Binding共同使用。
                 var connectionId = "capacity-connection-" + suffix + connectionIndex;
@@ -347,8 +354,53 @@ public sealed class G4QueryRaceTests
                 // 映射仅为明确替身材料，连接身份仍对应实际授权grant。
                 var state = new G4QueryState { Binding = Binding(session.AuthorizationEpoch) with { ConnectionId = connectionId }, Scope = scope,
                     Projections = [new G4QueryProjection { ObjectRefs = grant.ObjectRefs, FieldRefs = grant.FieldRefs }] };
-                return await store.AdmitAsync(session, [proof], query, state, Guid.NewGuid().ToString("N"), null,
-                    "instance-" + actorIndex, DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
+                return await (instance ?? store).AdmitAsync(session, [proof], query, state, Guid.NewGuid().ToString("N"), null,
+                    (oracle ? G4QueryResultStore.OracleOwnerPrefix : "instance-") + actorIndex, DateTimeOffset.UtcNow.AddSeconds(5), CancellationToken.None);
+            }
+            if (oracle)
+            {
+                // 另一服务实例只共享平台库，所有本地对象重新建立。
+                var second = new G4QueryResultStore(queryFactory, authority, new FixedBindingReader(), new TransactionalAuditWriter(governanceFactory), protection, TimeProvider.System);
+                var scope = new ResourceScope { OrganizationId = organization, SiteIds = ["site-1"] };
+                var session = await authority.CaptureSessionAsync(actors[0], sessions[0].Id, scope, CancellationToken.None);
+                var grant = grants.Single(item => item.SubjectId == actors[0].SubjectId && item.ConnectionId.EndsWith(suffix + "1", StringComparison.Ordinal));
+                var proof = await authority.CaptureAsync(session with { ConnectionId = grant.ConnectionId, ObjectRefs = grant.ObjectRefs, FieldRefs = grant.FieldRefs }, CancellationToken.None);
+                // 第一条只测及时准确确认及幂等，避免负例开销挤占本次 250ms 窗口。
+                var first = (await Admit(0, 1)).Record;
+                var terminal = await second.CancelAsync(first.Id, session, [proof], CancellationToken.None);
+                Assert.AreEqual(first.LeaseOwner, terminal.LeaseOwner);
+                Assert.AreEqual(first.Fence + 1, terminal.Fence);
+                Assert.IsTrue(await store.ConfirmOracleCleanupAsync(first.Id, first.LeaseOwner, first.Fence, terminal.Fence, CancellationToken.None));
+                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(first.Id, first.LeaseOwner, first.Fence, terminal.Fence, CancellationToken.None));
+                // 第二条代表未获物理证明的执行。即使同连接常规两槽未满，其他主体也被拒绝。
+                var held = (await Admit(0, 1)).Record;
+                terminal = await second.CancelAsync(held.Id, session, [proof], CancellationToken.None);
+                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(first.Id, held.LeaseOwner, held.Fence, terminal.Fence, CancellationToken.None));
+                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(held.Id, held.LeaseOwner + "-wrong", held.Fence, terminal.Fence, CancellationToken.None));
+                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(held.Id, held.LeaseOwner, held.Fence + 1, terminal.Fence, CancellationToken.None));
+                Assert.IsFalse(await store.HeartbeatAsync(held, CancellationToken.None));
+                Assert.AreEqual(429, (await Assert.ThrowsAsync<SemanticOperationException>(() => Admit(1, 1, second))).Status);
+                Assert.AreEqual(429, (await Assert.ThrowsAsync<SemanticOperationException>(() => Admit(0, 2, second))).Status);
+                // 在真正失联的第三条 RUNNING 上将这次测试的租约置为逾期，不等 Sweep 即核同连接封闭。
+                var lost = (await Admit(2, 2)).Record;
+                await database.Queries.Where(row => row.Id == lost.Id).ExecuteUpdateAsync(update => update
+                    .SetProperty(row => row.LeaseUntilUtc, DateTimeOffset.UtcNow.AddSeconds(-1)));
+                Assert.AreEqual(429, (await Assert.ThrowsAsync<SemanticOperationException>(() => Admit(3, 2, second))).Status);
+                // 模拟新进程与超过七日的保留窗口。两次 Sweep 均不得删除未知占位。
+                var sweeping = new G4QueryResultStore(queryFactory, authority, new FixedBindingReader(), new TransactionalAuditWriter(governanceFactory), protection,
+                    new FixedTime(DateTimeOffset.UtcNow.AddDays(8)));
+                await sweeping.SweepAsync(CancellationToken.None);
+                await sweeping.SweepAsync(CancellationToken.None);
+                var cancelledRow = await database.Queries.AsNoTracking().SingleAsync(row => row.Id == held.Id);
+                var lostRow = await database.Queries.AsNoTracking().SingleAsync(row => row.Id == lost.Id);
+                Assert.AreEqual("CANCELLED", cancelledRow.ExecutionStatus);
+                Assert.AreEqual(held.LeaseOwner, cancelledRow.LeaseOwner);
+                Assert.AreEqual("FAILED", lostRow.ExecutionStatus);
+                Assert.AreEqual(lost.LeaseOwner, lostRow.LeaseOwner);
+                Assert.AreEqual(lost.Fence + 1, lostRow.Fence);
+                Assert.AreEqual(0, cancelledRow.ResultCiphertext.Length);
+                Assert.IsFalse(await governance.AuditRecords.AnyAsync(row => row.Resource == held.Id && row.Action == "data.query.execute" && row.Outcome == "allowed"));
+                return;
             }
             admissions.Add(await Admit(0, 1));
             admissions.Add(await Admit(1, 1));

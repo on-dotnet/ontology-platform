@@ -49,16 +49,15 @@ public sealed class SemanticGateway : ISemanticGateway
     public async Task<G4QueryDelivery> ExecuteG4Async(ActorContext actor, string sessionReference, G4SemanticQuery query,
         string idempotencyKey, string? selectionQueryId, CancellationToken cancellationToken)
     {
+        // 直接调用也建立期限；HTTP 或 MCP 进入时共享其原始单调起点。
+        using var budget = new G4RequestDeadline(clock, cancellationToken);
         if (queryExecution is null) throw new SemanticOperationException(422, "capability_not_supported");
         QueryRules.ValidateG4(actor, query, selectionQueryId);
         registry.Resolve(query);
-        // 总预算从任何依赖读取之前开始，源分支只能使用剩余时间。
-        var deadline = clock.GetUtcNow().AddMilliseconds(query.TimeoutMs);
-        // 调用方断开与服务器截止同时传播到所有真实依赖。
-        using var scope = new SemanticReadDeadline(deadline);
-        // 调用方取消独立传播；依赖可依据上述原截止在剩余时间内收尾。
-        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        budget.CancelAfter(query.TimeoutMs);
+        budget.Tighten(query.TimeoutMs);
+        var deadline = budget.DeadlineUtc;
+        using var scope = new SemanticReadDeadline(budget.DeadlineUtc);
+        budget.Token.ThrowIfCancellationRequested();
         try
         {
             // 正式图必须与不可变原件精确对账，不能用空图代替本体。
@@ -76,15 +75,13 @@ public sealed class SemanticGateway : ISemanticGateway
     public async Task<G4QueryDelivery> ReadG4Async(ActorContext actor, string sessionReference, string queryId,
         bool includeResult, CancellationToken cancellationToken)
     {
+        // 直接调用也建立期限；HTTP 或 MCP 进入时共享其原始单调起点。
+        using var budget = new G4RequestDeadline(clock, cancellationToken);
         if (queryExecution is null) throw new SemanticOperationException(422, "capability_not_supported");
         QueryRules.DemandActor(actor);
-        // 恢复单次预算同样覆盖全部当前授权检查和读取审计。
-        var deadline = clock.GetUtcNow().AddSeconds(5);
-        // 恢复不延长原结果到期时间。
-        using var scope = new SemanticReadDeadline(deadline);
-        // 调用方取消独立传播；依赖可依据上述原截止在剩余时间内收尾。
-        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        budget.CancelAfter(TimeSpan.FromSeconds(5));
+        var deadline = budget.DeadlineUtc;
+        using var scope = new SemanticReadDeadline(budget.DeadlineUtc);
+        budget.Token.ThrowIfCancellationRequested();
         try
         {
             return await queryExecution.ReadAsync(actor, sessionReference, queryId, includeResult, false, deadline,
@@ -99,15 +96,12 @@ public sealed class SemanticGateway : ISemanticGateway
     /// <summary>取消复用当前根权限及查询事务，不通过旧G2结果模型传输。</summary>
     public async Task<G4QueryView> CancelG4Async(ActorContext actor, string sessionReference, string queryId, CancellationToken cancellationToken)
     {
+        // 直接调用也建立期限；HTTP 或 MCP 进入时共享其原始单调起点。
+        using var budget = new G4RequestDeadline(clock, cancellationToken);
         if (queryExecution is null) throw new SemanticOperationException(422, "capability_not_supported");
         QueryRules.DemandActor(actor);
-        // 取消的授权、发布根核验及清理共用从入口确定的时刻。
-        var deadline = clock.GetUtcNow().AddSeconds(5);
-        // 取消与其他入口共享五秒上限，不能在审计失败后补一份成功响应。
-        using var scope = new SemanticReadDeadline(deadline);
-        // 调用方取消独立传播；依赖可依据上述原截止在剩余时间内收尾。
-        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        budget.CancelAfter(TimeSpan.FromSeconds(5));
+        using var scope = new SemanticReadDeadline(budget.DeadlineUtc);
+        budget.Token.ThrowIfCancellationRequested();
         try
         {
             return await queryExecution.CancelAsync(actor, sessionReference, queryId,
@@ -122,15 +116,13 @@ public sealed class SemanticGateway : ISemanticGateway
     /// <summary>来源打开仍走统一网关与当前根授权，额外evidence.read由执行器核验。</summary>
     public async Task<G4SourceEvidenceView> ReadG4EvidenceAsync(ActorContext actor, string sessionReference, string evidenceId, CancellationToken cancellationToken)
     {
+        // 直接调用也建立期限；HTTP 或 MCP 进入时共享其原始单调起点。
+        using var budget = new G4RequestDeadline(clock, cancellationToken);
         if (queryExecution is null) throw new SemanticOperationException(422, "capability_not_supported");
         QueryRules.DemandActor(actor);
-        // 证据恢复共享五秒截止，不重置源权限核验预算。
-        var deadline = clock.GetUtcNow().AddSeconds(5);
-        // 单次读取审计仍需在本次预算中完成。
-        using var scope = new SemanticReadDeadline(deadline);
-        // 调用方取消独立传播；依赖可依据上述原截止在剩余时间内收尾。
-        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        budget.CancelAfter(TimeSpan.FromSeconds(5));
+        var deadline = budget.DeadlineUtc;
+        using var scope = new SemanticReadDeadline(budget.DeadlineUtc);
+        budget.Token.ThrowIfCancellationRequested();
         try
         {
             return await queryExecution.ReadEvidenceAsync(actor, sessionReference, evidenceId, deadline,
