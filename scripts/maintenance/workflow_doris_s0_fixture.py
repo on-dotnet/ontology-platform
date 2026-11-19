@@ -552,7 +552,19 @@ def stress_fixture(restore=False, platform=False, batches=1, entity_rows=None, t
             vm.demand(total==len(original)+owned,'STRESS_FOREIGN_ROWS')
             if owned and tier:
                 # 从最初独占登记的准确键域生成三列主键，中断在批次落盘前也能恢复。
-                for offset in range(0,count,65536):
+                # 该试验已实测 BE 进程 3 GiB 内存拒绝。每个恢复批次的原 90 秒内先核 RSS。
+                # 仅恢复仍存在的准确键；已落盘的批次不在重新准入后重复投递。
+                first = sql(fe,'reader',f"SELECT MIN({key}) FROM fixture.{table} WHERE org_id='org-demo' AND site_id='site-a' "
+                            f"AND {key} REGEXP '^{prefix}[0-9]{{{width}}}$' AND {key} BETWEEN '{prefix}{0:0{width}d}' AND '{prefix}{count-1:0{width}d}';")
+                vm.demand(re.fullmatch(prefix+'[0-9]{'+str(width)+'}',first) is not None,'STRESS_RESTORE_KEY')
+                for offset in range(int(first[len(prefix):]),count,65536):
+                    stop=time.monotonic()+25
+                    while True:
+                        rss=int(docker('restore-be-rss','exec',state['services']['be']['id'],'bash','-ec',
+                                       """pid=$(pidof doris_be); awk '/^VmRSS:/{print $2}' /proc/$pid/status"""))
+                        if rss*1024 < int(2.30*vm.GIB): break
+                        vm.demand(time.monotonic()<stop,'STRESS_RESTORE_BE_HEADROOM')
+                        time.sleep(.75)
                     n = min(65536,count-offset)
                     expected = (f"SELECT CONCAT('{prefix}',LPAD(CAST(number+{offset} AS STRING),{width},'0')) AS owned_key "
                                 f'FROM numbers("number"="{n}")')

@@ -365,10 +365,17 @@ def reference(minimum_first_fragment_ms=None):
         raise ValueError('PROFILE_REFERENCE_INCOMPLETE')
     artifact=dict(binding=binding,fe=ids['fe'],be=ids['be'],statementSha256=fingerprint,rowCount=101,
                   rowHash=hashlib.sha256('\n'.join(data[:-1]).encode()).hexdigest(),profile=profile)
-    native=be_log(ids['be'],'--native',data[-1],json.dumps(native_start))
-    stages={event:[datetime.datetime.strptime(r['timestamp'],'%Y%m%d %H:%M:%S.%f')
-                   for r in native['events'] if r['event']==event] for event in ('register','fragment_end','context_end')}
-    complete=len(stages['register'])==len(stages['context_end'])==1 and len(stages['fragment_end'])==2
+    # 成功对照的 Profile 和 BE 行日志分别刷新。只读同一 QueryId、inode 和原起点。
+    # 等待发生在正常对照结束后，正式产品分支与取消的计时均不在此处。
+    observed=time.monotonic()
+    for attempt in range(24):
+        native=be_log(ids['be'],'--native',data[-1],json.dumps(native_start))
+        stages={event:[datetime.datetime.strptime(r['timestamp'],'%Y%m%d %H:%M:%S.%f')
+                       for r in native['events'] if r['event']==event] for event in ('register','fragment_end','context_end')}
+        complete=len(stages['register'])==len(stages['context_end'])==1 and len(stages['fragment_end'])==2
+        if complete or time.monotonic()-observed>=5: break
+        time.sleep(.2)
+    artifact['nativeReadback']=dict(attempts=attempt+1,elapsedMs=(time.monotonic()-observed)*1000)
     first_ms=(min(stages['fragment_end'])-stages['register'][0]).total_seconds()*1000 if complete else None
     artifact.update(native=native,firstFragmentEndMs=first_ms,minimumFirstFragmentMs=minimum_first_fragment_ms)
     record(path,artifact)
