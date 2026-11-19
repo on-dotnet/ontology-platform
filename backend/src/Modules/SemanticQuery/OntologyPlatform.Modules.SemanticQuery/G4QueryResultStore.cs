@@ -238,6 +238,9 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         /// <summary>准确 owner 与原 fence 仍能执行，租约与总截止有效。</summary>
         public bool Active { get; set; }
 
+        /// <summary>只有同 owner、原 fence 的后继且准确正式取消已持久提交时为真。</summary>
+        public bool CommittedCancel { get; set; }
+
         /// <summary>正式取消提交前保守时间下界加二百五十毫秒的剩余；未知或过期为零。</summary>
         public int CleanupMs { get; set; }
     }
@@ -249,7 +252,8 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         // 同一准确行区分原运行、后继取消和其他状态，负值与未知均不能产生额外清理时间。
         return await database.Database.SqlQuery<OracleLeaseObservation>($"""
             SELECT ("ExecutionStatus" = 'RUNNING' AND NOT "CancelRequested" AND "Fence" = {lease.Fence}
-                    AND "LeaseUntilUtc" > clock_timestamp() AND "DeadlineAtUtc" > clock_timestamp()) AS "Active",
+                    AND "LeaseUntilUtc" > clock_timestamp() AND "DeadlineAtUtc" > clock_timestamp()) IS TRUE AS "Active",
+                ("ExecutionStatus" = 'CANCELLED' AND "CancelRequested" AND "Fence" = {lease.Fence + 1}) AS "CommittedCancel",
                 CASE WHEN "ExecutionStatus" = 'CANCELLED' AND "Fence" = {lease.Fence + 1}
                     THEN LEAST(250, GREATEST(0, floor(EXTRACT(EPOCH FROM ("LeaseUntilUtc" - clock_timestamp())) * 1000)))::integer
                     ELSE 0 END AS "CleanupMs"
