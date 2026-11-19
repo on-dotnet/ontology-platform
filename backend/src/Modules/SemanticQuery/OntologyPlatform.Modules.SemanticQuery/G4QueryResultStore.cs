@@ -232,6 +232,31 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
             && row.LeaseUntilUtc > now && row.DeadlineAtUtc > now, token);
     }
 
+    /// <summary>准确 Oracle 原执行的跨实例状态，毫秒余量来自平台数据库自身的时钟。</summary>
+    internal sealed class OracleLeaseObservation
+    {
+        /// <summary>准确 owner 与原 fence 仍能执行，租约与总截止有效。</summary>
+        public bool Active { get; set; }
+
+        /// <summary>正式取消提交前保守时间下界加二百五十毫秒的剩余；未知或过期为零。</summary>
+        public int CleanupMs { get; set; }
+    }
+
+    /// <summary>独立读取同库提交后状态与保守清理剩余，不向 Oracle 业务账号增加权限。</summary>
+    internal async Task<OracleLeaseObservation?> ObserveOracleAsync(G4QueryRecord lease, CancellationToken token)
+    {
+        await using var database = await factory.CreateDbContextAsync(token);
+        // 同一准确行区分原运行、后继取消和其他状态，负值与未知均不能产生额外清理时间。
+        return await database.Database.SqlQuery<OracleLeaseObservation>($"""
+            SELECT ("ExecutionStatus" = 'RUNNING' AND NOT "CancelRequested" AND "Fence" = {lease.Fence}
+                    AND "LeaseUntilUtc" > clock_timestamp() AND "DeadlineAtUtc" > clock_timestamp()) AS "Active",
+                CASE WHEN "ExecutionStatus" = 'CANCELLED' AND "Fence" = {lease.Fence + 1}
+                    THEN LEAST(250, GREATEST(0, floor(EXTRACT(EPOCH FROM ("LeaseUntilUtc" - clock_timestamp())) * 1000)))::integer
+                    ELSE 0 END AS "CleanupMs"
+            FROM semantic_query."Queries" WHERE "Id" = {lease.Id} AND "LeaseOwner" = {lease.LeaseOwner}
+            """).SingleOrDefaultAsync(token);
+    }
+
     /// <summary>运行中的原实例只能续租自己的fence，续租不能突破总deadline。</summary>
     public async Task<bool> HeartbeatAsync(G4QueryRecord lease, CancellationToken token)
     {
@@ -370,10 +395,14 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         // 单条语句在 PG 取得准确行锁后重核状态和正式取消的保守同库截止。
         await using var database = await factory.CreateDbContextAsync(token);
         return await database.Database.ExecuteSqlInterpolatedAsync($"""
-            UPDATE semantic_query."Queries" SET "LeaseOwner" = NULL, "LeaseUntilUtc" = NULL
-            WHERE "Id" = {queryId} AND "LeaseOwner" = {owner} AND "Fence" = {terminalFence}
-                AND "ExecutionStatus" IN ('CANCELLED', 'FAILED') AND "DeadlineAtUtc" > clock_timestamp()
-                AND ("ExecutionStatus" != 'CANCELLED' OR "LeaseUntilUtc" > clock_timestamp())
+            WITH locked AS MATERIALIZED (
+                SELECT "Id", "DeadlineAtUtc", "LeaseUntilUtc", "ExecutionStatus"
+                FROM semantic_query."Queries" WHERE "Id" = {queryId} AND "LeaseOwner" = {owner} AND "Fence" = {terminalFence}
+                    AND "ExecutionStatus" IN ('CANCELLED', 'FAILED') FOR UPDATE
+            )
+            UPDATE semantic_query."Queries" AS q SET "LeaseOwner" = NULL, "LeaseUntilUtc" = NULL
+            FROM locked WHERE q."Id" = locked."Id" AND locked."DeadlineAtUtc" > clock_timestamp()
+                AND (locked."ExecutionStatus" != 'CANCELLED' OR locked."LeaseUntilUtc" > clock_timestamp())
             """, token) == 1;
     }
 

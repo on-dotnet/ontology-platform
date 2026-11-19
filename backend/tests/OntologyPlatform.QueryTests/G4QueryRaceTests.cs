@@ -272,6 +272,25 @@ public sealed class G4QueryRaceTests
     [TestMethod]
     public Task ConnectionAndTaskCapacityAndLostLeaseAreAtomic() => VerifyCapacityAsync(false);
 
+    /// <summary>清理预算只收紧，迟到的物理确认不能把未知分支签成已释放。</summary>
+    [TestMethod]
+    public void OraclePhysicalCleanupCannotExtendOrConfirmAnExpiredWindow()
+    {
+        using var scope = new G4OracleSourceLifetime("oracle-test-scope");
+        Assert.IsFalse(scope.HasAcquired);
+        Assert.IsNull(scope.CleanupRemaining);
+        var acquisition = scope.BeginSource();
+        Assert.IsTrue(scope.HasAcquired);
+        scope.TightenCleanup(TimeSpan.FromMilliseconds(250));
+        var original = scope.CleanupRemaining;
+        scope.TightenCleanup(TimeSpan.FromSeconds(1));
+        Assert.IsTrue(scope.CleanupRemaining <= original);
+        scope.TightenCleanup(TimeSpan.FromTicks(-1));
+        Assert.AreEqual(TimeSpan.Zero, scope.CleanupRemaining);
+        Assert.ThrowsExactly<InvalidOperationException>(() => scope.ConfirmReleased(acquisition));
+        Assert.IsFalse(scope.CleanupConfirmed);
+    }
+
     /// <summary>真实平台 PG 中跨实例核验 Oracle 清理占位、容量、取消、逾期与准确两代 fence。</summary>
     [TestMethod]
     public Task OracleTerminalOwnerSurvivesSweepAndRejectsStaleConfirmation() => VerifyCapacityAsync(true);
@@ -367,9 +386,14 @@ public sealed class G4QueryRaceTests
                 var proof = await authority.CaptureAsync(session with { ConnectionId = grant.ConnectionId, ObjectRefs = grant.ObjectRefs, FieldRefs = grant.FieldRefs }, CancellationToken.None);
                 // 第一条只测及时准确确认及幂等，避免负例开销挤占本次 250ms 窗口。
                 var first = (await Admit(0, 1)).Record;
+                Assert.IsTrue((await second.ObserveOracleAsync(first, CancellationToken.None))!.Active);
                 var terminal = await second.CancelAsync(first.Id, session, [proof], CancellationToken.None);
                 Assert.AreEqual(first.LeaseOwner, terminal.LeaseOwner);
                 Assert.AreEqual(first.Fence + 1, terminal.Fence);
+                var remaining = await store.ObserveOracleAsync(first, CancellationToken.None);
+                Assert.IsNotNull(remaining);
+                Assert.IsFalse(remaining.Active);
+                Assert.IsTrue(remaining.CleanupMs is > 0 and <= 250);
                 Assert.IsTrue(await store.ConfirmOracleCleanupAsync(first.Id, first.LeaseOwner, first.Fence, terminal.Fence, CancellationToken.None));
                 Assert.IsFalse(await store.ConfirmOracleCleanupAsync(first.Id, first.LeaseOwner, first.Fence, terminal.Fence, CancellationToken.None));
                 // 第二条代表未获物理证明的执行。即使同连接常规两槽未满，其他主体也被拒绝。
@@ -381,6 +405,18 @@ public sealed class G4QueryRaceTests
                 Assert.IsFalse(await store.HeartbeatAsync(held, CancellationToken.None));
                 Assert.AreEqual(429, (await Assert.ThrowsAsync<SemanticOperationException>(() => Admit(1, 1, second))).Status);
                 Assert.AreEqual(429, (await Assert.ThrowsAsync<SemanticOperationException>(() => Admit(0, 2, second))).Status);
+                // 让准确确认等待同一行锁直到原窗口已过；释放前的旧判断不能清掉占位。
+                Task<bool> delayed;
+                await using (var heldLock = await database.Database.BeginTransactionAsync())
+                {
+                    await database.Database.SqlQuery<int>($"""
+                        SELECT 1 AS "Value" FROM semantic_query."Queries" WHERE "Id" = {held.Id} FOR UPDATE
+                        """).ToArrayAsync();
+                    delayed = store.ConfirmOracleCleanupAsync(held.Id, held.LeaseOwner, held.Fence, terminal.Fence, CancellationToken.None);
+                    await Task.Delay(275);
+                    await heldLock.CommitAsync();
+                }
+                Assert.IsFalse(await delayed);
                 // 在真正失联的第三条 RUNNING 上将这次测试的租约置为逾期，不等 Sweep 即核同连接封闭。
                 var lost = (await Admit(2, 2)).Record;
                 await database.Queries.Where(row => row.Id == lost.Id).ExecuteUpdateAsync(update => update
