@@ -22,6 +22,49 @@ def reopen_ac06(directory):
         return dependency_proof(target,proof['case'])
 
 
+def measured_backend(root, commit):
+    """重算原提交的完整构建投影，仅允许独立 QueryTests 原件读取测试与当前树有差异。"""
+    import io
+    import json
+    import subprocess
+    import tarfile
+    from workflow_execution import sha
+    from workflow_m2_evidence import require
+    def projected(name):
+        return (name.startswith(('backend/','Directory.')) or name in
+                ('global.json','NuGet.Config','package.json','pnpm-lock.yaml','pnpm-workspace.yaml','.node-version'))
+    def listing(command):
+        return {n for n in subprocess.check_output(command,cwd=root).decode().split('\0') if n and projected(n)}
+    old=listing(['git','ls-tree','-rz','--name-only',commit])
+    current=listing(['git','ls-files','--cached','--others','--exclude-standard','-z'])
+    require(old==current,'DMQ_BACKEND_MEMBER_DRIFT')
+    selection=['backend',*sorted(n for n in old if not n.startswith('backend/'))]
+    raw=subprocess.check_output(['git','archive','--format=tar',commit,'--',*selection],cwd=root)
+    with tarfile.open(fileobj=io.BytesIO(raw)) as archive:
+        hashes={f.name:sha(archive.extractfile(f).read()) for f in archive.getmembers() if f.isfile()}
+    require(set(hashes)==old and {p for p,h in hashes.items() if sha((root/p).read_bytes())!=h}<=
+            {'backend/tests/OntologyPlatform.QueryTests/G4QueryTests.cs'},'DMQ_PRODUCT_SOURCE_DRIFT')
+    return sha(json.dumps(hashes,sort_keys=True).encode())
+
+
+def measured_browser_sources(root, commit):
+    """核对实测驱动原字节，源夹具仅允许与原提交产生完全相同的 Python 语法树。"""
+    import ast
+    import subprocess
+    from workflow_execution import sha
+    from workflow_m2_evidence import require
+    result=[]
+    for name in BROWSER_SOURCES:
+        raw=(root/name).read_bytes()
+        if name.endswith('/workflow_doris_s0_fixture.py'):
+            previous=subprocess.check_output(['git','show',commit+':'+name],cwd=root)
+            require(ast.dump(ast.parse(previous),include_attributes=False)==ast.dump(ast.parse(raw),include_attributes=False),
+                    'DMQ_SOURCE_FIXTURE_SEMANTIC_DRIFT')
+            raw=previous
+        result.append(sha(raw))
+    return result
+
+
 def qualify(gate, input_key):
     """用冻结的命令输出重算本任务产品资格，支持从相同提交的干净检出复核。"""
     import json
@@ -39,9 +82,7 @@ def qualify(gate, input_key):
               'web': ['typecheck','lint','unit','build','ui-s3'],
               'interaction': ['s3','ui-s3','ui-s1','ac06']}
     require(gate in groups and workflow.input_key(build.ROOT,gate)==input_key,'DMQ_GATE_INPUT')
-    root=build.ROOT/'docs/evidence'/task/run/'s3'
-    index=json.loads((root/'product-inputs.json').read_bytes())
-    require(index['taskId']==task and index['runId']==run,'DMQ_GATE_IDENTITY')
+    public=build.ROOT/'docs/evidence'/task/run
     tests=0
     examined={}
 
@@ -57,7 +98,20 @@ def qualify(gate, input_key):
         return json.loads(read(relative))
 
     backend_key=build.inputs('query')
+    measured_commit='f5bdc7469a1038d56c7828f0e1222725fbb375ec'
+    unchanged_product_key=measured_backend(build.ROOT,measured_commit) if gate in ('backend','contract','interaction','web') else None
     for label in groups[gate]:
+        root=public/('s3-requalification' if label in ('query','pg-golden') else 's3')
+        index=json.loads((root/'product-inputs.json').read_bytes())
+        require(index['taskId']==task and index['runId']==run,'DMQ_GATE_IDENTITY')
+        if label=='pg-golden':
+            import subprocess
+            mapping=json.loads((public/'historical-byte-mapping.json').read_bytes())
+            require(mapping['sourceCommit']=='413d7363fa544ee9dbf780a9a2707b880af96ec8' and len(mapping['members'])==17,'DMQ_GOLDEN_HISTORY')
+            for name,member in mapping['members'].items():
+                require(name==member['originalPath'] and name.startswith(str(public.relative_to(build.ROOT))+'/') and
+                        restore(build.ROOT,member)==subprocess.check_output(['git','show',mapping['sourceCommit']+':'+name],cwd=build.ROOT),
+                        'DMQ_GOLDEN_HISTORICAL_BYTES')
         if label=='prepare':
             prep=record('prepare.json')
             import platform
@@ -86,7 +140,7 @@ def qualify(gate, input_key):
             previous=record('ac06-snapshot.json')
             current=record('api-snapshot.json')
             witness=json.loads((evidence/'s1-host-s2-doris-overlap-69f7b494a29a4858ab2e9e3c35ba624e.json').read_bytes())
-            require(previous['snapshotId']==witness['snapshotId'] and current['inputs']['inputKey']==backend_key,'DMQ_AC06_SNAPSHOTS')
+            require(previous['snapshotId']==witness['snapshotId'] and current['inputs']['inputKey']==unchanged_product_key,'DMQ_AC06_SNAPSHOTS')
             dlls=set(previous['files'])
             require(dlls==set(current['files']) and
                     {k for k in dlls if previous['files'][k]!=current['files'][k]}<={'OntologyPlatform.Modules.Agents.dll','OntologyPlatform.Modules.Agents.pdb'},
@@ -111,10 +165,9 @@ def qualify(gate, input_key):
                     receipt['stage']=='dmq-s1-browser-'+label and json.loads(stdout)['checks']==len(row['checks']),'DMQ_BROWSER_COMMAND')
             require(row['mode']==label and row['status']=='PASS' and row['inputsUnchanged'] and
                     host['snapshotId']==row['inputBinding']['api']['snapshotId']==snapshot['snapshotId'] and
-                    snapshot['inputs']['inputKey']==backend_key and host['status']=='EXITED' and host['exitCode']==0 and not host['exceeded'] and
+                    snapshot['inputs']['inputKey']==unchanged_product_key and host['status']=='EXITED' and host['exitCode']==0 and not host['exceeded'] and
                     host['browserCommand']==receipt['commandId'] and host['hostPeakBytes']['total']<=int(5.5*1024**3),'DMQ_BROWSER_HOST')
-            paths=BROWSER_SOURCES
-            computed=execution.sha(execution.encoded([snapshot['snapshotId'],label,[execution.sha((build.ROOT/p).read_bytes()) for p in paths]]))
+            computed=execution.sha(execution.encoded([snapshot['snapshotId'],label,measured_browser_sources(build.ROOT,measured_commit)]))
             require(receipt['inputFingerprint']==computed,'DMQ_BROWSER_DRIVER_DRIFT')
             checks={c['name'] for c in row['checks'] if c['status']=='PASS'}
             required={'s3':{'denied_tool_g4_resolve_entity','denied_tool_g4_read_observations','denied_tool_g4_traverse_relationships','mcp_exact_measurement','mcp_half_open_edges','fourth_tool_same_bytes_g4_traverse_relationships'},
@@ -161,10 +214,11 @@ def qualify(gate, input_key):
             dll=origin/project.parent/'bin/Debug/net10.0'/(project.stem+'.dll')
             argv=[built['command'][0],str(dll),'--filter',expression,'--minimum-expected-tests',str(minimum),'--no-ansi','--progress','off',
                   '--results-directory',str(origin/'artifacts/workflow'/task/run/results)]
+            target_key=backend_key if target=='query' else unchanged_product_key
             require(receipt['stage']==stage and receipt['commandSummary']['sha256']==execution.sha(execution.encoded(argv)) and
                     built['taskId']==task and built['target']==target and built['status']=='PASS' and built['exitCode']==0 and
-                    built['inputKey']==backend_key and built['worktree']==str(origin) and str(dll.relative_to(origin)) in built['outputs'] and
-                    row['input']==dict(inputKey=backend_key,receiptSha256=examined['builds/'+target+'.json'],
+                    built['inputKey']==target_key and built['worktree']==str(origin) and str(dll.relative_to(origin)) in built['outputs'] and
+                    row['input']==dict(inputKey=target_key,receiptSha256=examined['builds/'+target+'.json'],
                         outputKey=execution.sha(json.dumps(built['outputs'],sort_keys=True).encode())) and
                     row['exitCode']==0 and row['commandId']==receipt['commandId'] and receipt['inputFingerprint']==execution.sha(execution.encoded(row['input'])),
                     'DMQ_TEST_BUILD_COMMAND')

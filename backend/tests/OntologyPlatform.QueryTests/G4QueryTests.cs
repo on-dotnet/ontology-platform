@@ -82,8 +82,10 @@ public sealed class G4QueryTests
         if (scenario == "standard")
         {
             // 2509 字节直接来自历史数据库的 CanonicalBytes 列，散列来自同一行独立的 ContentHash 列。
-            var assessmentBytes = File.ReadAllBytes(Path.Combine(root.FullName,
-                "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/pg-standard-assessment.canonical.json"));
+            using var assessmentEnvelope = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(root.FullName,
+                "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/pg-standard-assessment.canonical.json.raw.json")));
+            // 从无损封装还原数据库原始字节，并与独立的历史记录散列核对。
+            var assessmentBytes = assessmentEnvelope.RootElement.GetProperty("base64").GetBytesFromBase64();
             Assert.AreEqual("b97c13b97057f7fb5c0c9119aaa0b0a0f3db9525e87dc53e5bbdb263c03e7665", G4QueryCanonical.Hash(assessmentBytes));
             // 用历史场景的公开对象校验当前类型化规范化结果，比较到每个真实原字节。
             var assessment = historical.RootElement.GetProperty("mappingAssessment").Deserialize<MappingAssessmentView>(G4MappingJson.Options);

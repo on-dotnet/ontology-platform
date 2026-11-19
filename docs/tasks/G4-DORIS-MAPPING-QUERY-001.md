@@ -163,3 +163,5 @@ AC06 经非作者重开通过，正式取消提交先于同一查询的源端终
 MCP 三项执行及一项恢复共 125 条检查。查询页和映射编辑器 44 条，恢复及身份失效 46 条。客户端先保留正式响应原字节，再在刷新后比对。刷新前后的 FE 审计 QueryId 集合完全相同。真实撤销同一主体的 result.read 后返回 403 并清屏，恢复原授权后读回同一规范结果。两个标签切换身份时，迟到的原授权响应被丢弃。[最终产品原件](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3/product-inputs.json)
 
 受影响回归包括 PG/Doris 适配和分发 42 项、实际 Doris 认证及 TLS 与固定源读 4 项、Query 23 项、wire 6 项、发布批次 4 项，另行重开 PG 两组黄金字节。Web 的类型、lint、22 项单元和生产构建均通过。第一个 MCP 拒绝、刷新失败、Web 宿主退出超时和误选 100 行夹具的回归继续保留。旧十四个容器为 STOPPED_KEEP，本任务的三个持久服务已停，Keycloak、Fuseki、RustFS 继续持有易失卷。[收口回执](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3/continued-platform-keep-8a6e2624592041c194d3cf372dadca26.json)
+
+工程静态检查首次在 17 份历史 JSON 的末尾换行和夹具的一处凭据读取表达式处失败。17 份历史原件已按仓库标准恢复并与原 Git 对象逐字节核对。PG 黄金用例读取无损封装，保留数据库原始 2509 字节与独立 ContentHash。夹具改动前后 Python 语法树完全相同。生产代码和 Web 输入均未改变，更新后的 QueryTests 独立重验。[原件恢复映射](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/historical-byte-mapping.json) · [定向重验](../evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3-requalification/product-inputs.json)

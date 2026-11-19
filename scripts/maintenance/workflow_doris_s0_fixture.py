@@ -85,7 +85,9 @@ def tls_files():
             '-passout','file:store.pass','-out','tls/server_certificate.p12')
     openssl('pkcs12','-export','-nokeys','-in','tls/ca.pem','-jdktrust','anyExtendedKeyUsage','-name','ca',
             '-passout','file:store.pass','-out','tls/ca_certificate.p12')
-    password = (DIRECTORY/'root.pass').read_bytes()
+    password = (
+        DIRECTORY / 'root.pass'
+    ).read_bytes()
     password_hash = '*' + hashlib.sha1(hashlib.sha1(password).digest()).hexdigest().upper()
     conf = (vm.ROOT/'infra/doris/config/fe.conf.example').read_text().replace('REPLACE_WITH_PRIVATE_DOUBLE_SHA1',password_hash)
     store = (DIRECTORY/'store.pass').read_text()
@@ -102,7 +104,9 @@ def compose_env():
 def sql(fe, account, query, headers=False, limit=15):
     vm.demand(account in ('root','reader'), 'SOURCE_ACCOUNT')
     ident = 'root' if account=='root' else 'fixture_reader'
-    password = (DIRECTORY/(account+'.pass')).read_bytes()
+    password = (
+        DIRECTORY / (account + '.pass')
+    ).read_bytes()
     # 原始凭据仅经私有 stdin；错误文本可能回显 SQL，因此仅保存在私有运行目录。
     proc = subprocess.run(['docker','--context','desktop-linux','exec','-i',fe,'bash','-ec',CLIENT,'source',ident,'--column-names' if headers else '--skip-column-names'],
         input=password+b'\n'+query.encode()+b'\n',stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=limit)
