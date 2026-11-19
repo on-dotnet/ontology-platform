@@ -30,3 +30,9 @@ Master 单写。范围、所有权、数据与期限以[唯一 A–F 合同](../
 - 先核六项任务资源的准确 ID、镜像、卷、所有权、VM 配额、余量及当前构建。仅三项持久服务可恢复，定向验证后依次原生关库或 TERM。三个易失服务继续持卷运行。释放须另行集中裁决，详见[资源保全卡](../evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-01/resource-retention.md)。
 - prepare 失败保留原件。用既有 `execution_preflight.py run --cost short` 对同一原命令身份做有界定位，保存双流、退出码与看门狗状态。原身份恢复后方可继续。
 - 当前关口为 ChatGPT 复审。生产、旧 M4/M5 KEEP、TDengine 与 G5 均在本批之外。
+
+## 2026-11-19 最终复审接受与精确集成
+
+本条是上方 WAITING_CHATGPT_REVIEW 之后的最后状态记录。ChatGPT 对 review-fix-02 给出 ACCEPT / GO，RF-02 关闭。Doris 当前状态 **MAIN_INTEGRATED**。Master 在 main 工作树从 `606ca2d2c61964e6498dd72d5e9ad960d3593bf7` 精确快进至 `5168f2c93ca226caa521a6dc4ac85439335274c4`，普通 push 后远端回读一致。既有同包 VerifyOnly exit 0，共 1819 成员。原 V3、final-machine-receipt.json 与 final-non-author-reopen.json 保存在本任务树的 `artifacts/reviews`（JSON 位于本 TaskId 的 review-fix-02 子目录），全路径及三份原件散列见主树 `artifacts/reviews/G4-ORACLE-MAPPING-QUERY-001/main-update-receipt.json`。
+
+[原 RF-02 报告](../evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02/report.md)保留原字节。审计短重试可核同 argv 和源输入；完整环境身份未核为相同。PG 干净关闭的依据是既有资源回执。本次集成复用原证据，G4 总体 PARTIAL。下一项为[Oracle 文档 P0](G4-ORACLE-MAPPING-QUERY-001.md)。
