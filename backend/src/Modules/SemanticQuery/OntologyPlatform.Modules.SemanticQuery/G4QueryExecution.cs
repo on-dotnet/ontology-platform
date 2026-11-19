@@ -91,6 +91,8 @@ public sealed class G4QueryExecution
         var admission = await store.AdmitAsync(session, proofs, query, state, key, selectionQueryId,
             owner, deadline, token);
         if (!admission.Created) return await ReadAsync(actor, sessionReference, admission.Record.Id, true, false, deadline, verifyRoot, token);
+        // 即便传输随后断开，结算也只能用原期限内、从第一次断开起不超过二百五十毫秒的余量。
+        using var disconnected = oracle is null ? default : token.Register(() => oracle.Interrupt(clock.GetTimestamp()));
         // 业务读取与租约观察共享取消，取消先提交后旧worker不能继续提交。
         using var execution = CancellationTokenSource.CreateLinkedTokenSource(token);
         // 观察器可在进入最终短事务前停止，不能因本实例成功清除租约而误取消回传。
@@ -585,6 +587,16 @@ public sealed class G4QueryExecution
 
         /// <summary>最新物理分支保留同库取消剩余与单调时钟，用于失败结算及准确执行关联。</summary>
         public G4OracleSourceLifetime? Lifetime { get; set; }
+
+        /// <summary>首次请求断开或外层截止的本地时基，负数表示尚未发生。</summary>
+        private long interruptedAt = -1;
+
+        /// <summary>首次中断起算清理，后续通知不能重启这段时限。</summary>
+        public long Interrupt(long stamp)
+        {
+            var prior = Interlocked.CompareExchange(ref interruptedAt, stamp, -1);
+            return prior < 0 ? stamp : prior;
+        }
     }
 
     /// <summary>在原预算内终结旧执行，再仅凭真实物理确认尝试清除准确终态占位。</summary>
@@ -596,16 +608,32 @@ public sealed class G4QueryExecution
         if (oracle.BranchLimit is { } limit)
             remaining = TimeSpan.FromTicks(Math.Min(remaining.Ticks, (limit - clock.GetElapsedTime(oracle.Started)).Ticks));
         if (oracle.Lifetime?.CleanupRemaining is { } cleanup && cleanup < remaining) remaining = cleanup;
-        if (remaining <= TimeSpan.Zero || token.IsCancellationRequested) return;
+        if (remaining <= TimeSpan.Zero) return;
         using var expiry = new CancellationTokenSource(remaining, clock);
-        using var budget = CancellationTokenSource.CreateLinkedTokenSource(token, expiry.Token);
-        await store.FailOracleAsync(lease, session.Scope, session.Actor, budget.Token);
-        if (oracle.Confirmed)
+        using var disconnected = new CancellationTokenSource(Timeout.InfiniteTimeSpan, clock);
+        using var interruption = token.Register(() =>
         {
+            // 传输令牌已取消时仅允许真实失败/释放结算，源工作、业务提交和返回均不复用这只令牌。
+            var since = clock.GetElapsedTime(oracle.Interrupt(clock.GetTimestamp()));
+            var left = TimeSpan.FromMilliseconds(250) - since;
+            if (left <= TimeSpan.Zero) disconnected.Cancel();
+            else disconnected.CancelAfter(left);
+        });
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(disconnected.Token, expiry.Token);
+        if (budget.IsCancellationRequested) return;
+        try
+        {
+            await store.FailOracleAsync(lease, session.Scope, session.Actor, budget.Token);
+            if (!oracle.Confirmed) return;
             // 二次提交的成功只能由原 owner 在原 fence 的直接后继完成。
             var released = await store.ConfirmOracleCleanupAsync(lease.Id, lease.LeaseOwner, lease.Fence, lease.Fence + 1, budget.Token);
             logger?.LogInformation("OracleCleanupCas query={QueryId} execution={ExecutionId} fence={OriginalFence} released={Released} observedUtc={ObservedUtc:O}",
                 lease.Id, oracle.Lifetime?.ExecutionId, lease.Fence, released, clock.GetUtcNow());
+        }
+        catch (OperationCanceledException) when (budget.IsCancellationRequested)
+        {
+            // 短事务未能在原窗口确认，保留原错误与数据库中的真实占位；没有迟到重试。
+            logger?.LogWarning("OracleCleanupWindowExpired query={QueryId} fence={OriginalFence}", lease.Id, lease.Fence);
         }
     }
 
