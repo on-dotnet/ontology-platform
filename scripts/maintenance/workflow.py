@@ -23,6 +23,16 @@ if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0,str(Path(__file__).resolve().parent))
 REGISTRY = ROOT / 'docs/development/verification-gates.json'
 
+# 明确每个已准入任务的代表原件布局；范围相对本任务的证据目录。
+MEASUREMENT_PATHS = {
+    'G4-M5-INTEGRATION-001': ('**/gates/**/*.json', '**/originals/**/*.json', '**/reports/**/*.json'),
+    'G4-DORIS-MAPPING-QUERY-001': (
+        '*/s0-*-review.json', '*/s0-*-validation.json', '*/s1/browser-s1-*.json',
+        '*/s1/index.json', 'review-fix-01/originals/old-runtime.json.raw.json',
+    ),
+}
+
+
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
@@ -147,7 +157,7 @@ def plan(base, head):
     paths=sorted(set(git(ROOT,'diff','--name-only','--no-renames','-z',base,head).decode().split('\0'))-{''})
     evidence_tasks = sorted({path.split('/')[2] for path in paths if path.startswith('docs/evidence/') and len(path.split('/')) > 3})
     measurements = [measure_committed_evidence(ROOT, base, head, task) for task in evidence_tasks
-                    if task == 'G4-M5-INTEGRATION-001']
+                    if task in MEASUREMENT_PATHS]
 
     result=select_gates(paths)
     keys={name:input_key(ROOT,name) for name in registry()}
@@ -394,7 +404,7 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
             row['publishedLog']=record;row['logPath']=record['path']
             write(target/(row['gate']+'.json'),row)
             write(run/(row['gate']+'.state.json'),{k:row[k] for k in ('status','inputKey','environmentKey','errorSignature')})
-    if publish and task == 'G4-M5-INTEGRATION-001':
+    if publish and task in MEASUREMENT_PATHS:
         result['earlyMeasurement'] = dict(status='NOT_READY', reason='New evidence awaits candidate commit; workflow plan automatically measures that committed candidate', representativePaths=[row.get('logPath') for row in rows])
     write(run/'receipt.json',result)
     return result
@@ -406,13 +416,15 @@ def measure_committed_evidence(root, base, head, task):
     import inspect
     from types import SimpleNamespace
     protocol_version = 1
-    candidate_paths = git(root, 'diff', '--name-only', base, head, '--', 'docs/evidence/'+task+'/').decode().splitlines()
-    candidate_paths = [path for path in candidate_paths if path.endswith('.json') and any(part in path for part in ('/gates/', '/originals/', '/reports/'))]
+    patterns = MEASUREMENT_PATHS[task]
+    prefix = 'docs/evidence/' + task + '/'
+    changed = git(root, 'diff', '--name-only', '--diff-filter=ACMRT', '-z', base, head, '--', prefix).decode().split('\0')
+    candidate_paths = sorted(path for path in changed if path.startswith(prefix) and matches(path[len(prefix):], patterns))
     if not candidate_paths:
-        return dict(status='NOT_READY', reason='No newly committed representative report or gate output')
+        return dict(status='NOT_READY', reason='No newly committed representative matched the registered paths', expectedPaths=list(patterns))
     directory = root/'artifacts/workflow'/task/'package-measurements'
     directory.mkdir(parents=True, exist_ok=True)
-    identity = digest(canonical([base, head, candidate_paths, protocol_version,
+    identity = digest(canonical([base, head, candidate_paths, patterns, protocol_version,
                                 digest(inspect.getsource(measure_committed_evidence).encode()),
                                 digest((root/'scripts/create-review-package.ps1').read_bytes())]))
     path = directory/(identity+'.json')

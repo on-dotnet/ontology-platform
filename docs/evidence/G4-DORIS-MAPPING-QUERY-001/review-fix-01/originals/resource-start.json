@@ -1,0 +1,183 @@
+{
+  "vmBytes": 20964958208,
+  "cpu": 12,
+  "services": {
+    "keycloak-test": {
+      "id": "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f",
+      "image": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+      "state": "running",
+      "owner": "G4-DORIS-MAPPING-QUERY-001",
+      "ownerRun": "implementation-01",
+      "memory": 1073741824,
+      "nanoCpu": 1000000000,
+      "volumes": {
+        "ontology-g4-doris-mapping-query-001_keycloak-data": {
+          "target": "/opt/keycloak/data",
+          "driver": "local",
+          "type": "tmpfs",
+          "labels": {
+            "com.docker.compose.config-hash": "fa9bcf8162ceeb6f721f40c2f75acc512fad630d82460d17302b35db0aff6a87",
+            "com.docker.compose.project": "ontology-g4-doris-mapping-query-001",
+            "com.docker.compose.version": "5.6.1",
+            "com.docker.compose.volume": "keycloak-data",
+            "ontology.run": "implementation-01",
+            "ontology.task": "G4-DORIS-MAPPING-QUERY-001"
+          }
+        }
+      }
+    },
+    "fuseki": {
+      "id": "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04",
+      "image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+      "state": "running",
+      "owner": "G4-DORIS-MAPPING-QUERY-001",
+      "ownerRun": "implementation-01",
+      "memory": 2147483648,
+      "nanoCpu": 2000000000,
+      "volumes": {
+        "ontology-g4-doris-mapping-query-001_fuseki-data": {
+          "target": "/fuseki",
+          "driver": "local",
+          "type": "tmpfs",
+          "labels": {
+            "com.docker.compose.config-hash": "c03e63e758b66d1eb6e0201c662430b2f163f48514d9da1fc8e2b5fe388584b2",
+            "com.docker.compose.project": "ontology-g4-doris-mapping-query-001",
+            "com.docker.compose.version": "5.6.1",
+            "com.docker.compose.volume": "fuseki-data",
+            "ontology.run": "implementation-01",
+            "ontology.task": "G4-DORIS-MAPPING-QUERY-001"
+          }
+        }
+      }
+    },
+    "rustfs": {
+      "id": "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9",
+      "image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "state": "running",
+      "owner": "G4-DORIS-MAPPING-QUERY-001",
+      "ownerRun": "implementation-01",
+      "memory": 536870912,
+      "nanoCpu": 1000000000,
+      "volumes": {
+        "ontology-g4-doris-mapping-query-001_rustfs-data": {
+          "target": "/data",
+          "driver": "local",
+          "type": "tmpfs",
+          "labels": {
+            "com.docker.compose.config-hash": "1c3111e1409c45af813910365402bde60626a851189452724e48c194be804dd6",
+            "com.docker.compose.project": "ontology-g4-doris-mapping-query-001",
+            "com.docker.compose.version": "5.6.1",
+            "com.docker.compose.volume": "rustfs-data",
+            "ontology.run": "implementation-01",
+            "ontology.task": "G4-DORIS-MAPPING-QUERY-001"
+          }
+        }
+      }
+    },
+    "platform-pg": {
+      "id": "34a947835a8949be5fb34bdc813e87ff812dca1d3381ccea7ce610754448367f",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "state": "exited",
+      "owner": "G4-DORIS-MAPPING-QUERY-001",
+      "ownerRun": "implementation-01",
+      "memory": 805306368,
+      "nanoCpu": 1000000000,
+      "volumes": {
+        "ontology-g4-doris-mapping-query-001_platform-data": {
+          "target": "/var/lib/postgresql",
+          "driver": "local",
+          "type": null,
+          "labels": {
+            "com.docker.compose.config-hash": "681518ff1b39921b02205ade3179eb2a0ff5c7ea45ff88a318eba6cb3dddef10",
+            "com.docker.compose.project": "ontology-g4-doris-mapping-query-001",
+            "com.docker.compose.version": "5.6.1",
+            "com.docker.compose.volume": "platform-data",
+            "ontology.run": "implementation-01",
+            "ontology.task": "G4-DORIS-MAPPING-QUERY-001"
+          }
+        }
+      }
+    },
+    "be": {
+      "id": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+      "image": "sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7",
+      "state": "exited",
+      "owner": "G4-DORIS-MAPPING-QUERY-001",
+      "ownerRun": "implementation-01",
+      "memory": 6442450944,
+      "nanoCpu": 2000000000,
+      "volumes": {
+        "ontology-g4-doris-mapping-query-001_be-log": {
+          "target": "/opt/apache-doris/be/log",
+          "driver": "local",
+          "type": null,
+          "labels": {
+            "com.docker.compose.config-hash": "0658a18d0414d28b02b1a6b6e532ddbb2c0a0f6dcb54557721dfe39fc71c6b67",
+            "com.docker.compose.project": "ontology-g4-doris-mapping-query-001",
+            "com.docker.compose.version": "5.6.1",
+            "com.docker.compose.volume": "be-log",
+            "ontology.run": "implementation-01",
+            "ontology.task": "G4-DORIS-MAPPING-QUERY-001"
+          }
+        },
+        "ontology-g4-doris-mapping-query-001_be-data": {
+          "target": "/opt/apache-doris/be/storage",
+          "driver": "local",
+          "type": null,
+          "labels": {
+            "com.docker.compose.config-hash": "10388fe6042f3c4e14fab8f753120ba73ddc8615dca7213fa7b92ac28e3c03a8",
+            "com.docker.compose.project": "ontology-g4-doris-mapping-query-001",
+            "com.docker.compose.version": "5.6.1",
+            "com.docker.compose.volume": "be-data",
+            "ontology.run": "implementation-01",
+            "ontology.task": "G4-DORIS-MAPPING-QUERY-001"
+          }
+        }
+      }
+    },
+    "fe": {
+      "id": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "image": "sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02",
+      "state": "exited",
+      "owner": "G4-DORIS-MAPPING-QUERY-001",
+      "ownerRun": "implementation-01",
+      "memory": 4294967296,
+      "nanoCpu": 2000000000,
+      "volumes": {
+        "ontology-g4-doris-mapping-query-001_fe-data": {
+          "target": "/opt/apache-doris/fe/doris-meta",
+          "driver": "local",
+          "type": null,
+          "labels": {
+            "com.docker.compose.config-hash": "14f94c0015dc652304b234753a8b27802cbb8a12d2c0eb238e7e333621d53a6f",
+            "com.docker.compose.project": "ontology-g4-doris-mapping-query-001",
+            "com.docker.compose.version": "5.6.1",
+            "com.docker.compose.volume": "fe-data",
+            "ontology.run": "implementation-01",
+            "ontology.task": "G4-DORIS-MAPPING-QUERY-001"
+          }
+        },
+        "ontology-g4-doris-mapping-query-001_fe-log": {
+          "target": "/opt/apache-doris/fe/log",
+          "driver": "local",
+          "type": null,
+          "labels": {
+            "com.docker.compose.config-hash": "66383ddb88779a8f92f42ab400554be5e2d29ed0e8d6a6f4870d69aabb8ff1db",
+            "com.docker.compose.project": "ontology-g4-doris-mapping-query-001",
+            "com.docker.compose.version": "5.6.1",
+            "com.docker.compose.volume": "fe-log",
+            "ontology.run": "implementation-01",
+            "ontology.task": "G4-DORIS-MAPPING-QUERY-001"
+          }
+        }
+      }
+    }
+  },
+  "oldExited": 14,
+  "activeIds": [
+    "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9",
+    "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f",
+    "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04"
+  ],
+  "freeDisk": 234468605952
+}

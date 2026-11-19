@@ -229,11 +229,40 @@ def qualify(gate, input_key):
                 tests=tests,skipped=0,originals=examined)
 
 
+def publish_original(root, run, source):
+    """从本任务独立运行目录发布已选的机器原件，保持原字节及恢复身份。"""
+    import re
+    from pathlib import Path
+    from workflow_execution import ordinary
+    from workflow_evidence import publish
+    task = 'G4-DORIS-MAPPING-QUERY-001'
+    if not re.fullmatch(r'review-fix-[0-9]{2}', run):
+        raise ValueError('DMQ_ARCHIVE_RUN')
+    directory = root / 'artifacts/workflow' / task / run
+    source = ordinary(Path(source).absolute())
+    if source.parent != directory or not re.fullmatch(r'[a-z0-9][a-z0-9-]*\.(json|txt)', source.name):
+        raise ValueError('DMQ_ARCHIVE_SOURCE')
+    if source.stat().st_size > 1024 * 1024:
+        raise ValueError('DMQ_ARCHIVE_SIZE')
+    relative = Path('docs/evidence') / task / run / 'originals' / source.name
+    return publish(root, relative.as_posix(), source.read_bytes())
+
+
 if __name__=='__main__':
     import argparse
     import json
-    parser=argparse.ArgumentParser(description='重开本任务已提交的正式产品原件')
-    parser.add_argument('--gate',required=True)
-    parser.add_argument('--input-key',required=True)
+    from pathlib import Path
+    parser=argparse.ArgumentParser(description='同一 Doris 任务的公开原件发布及资格重开')
+    action=parser.add_mutually_exclusive_group(required=True)
+    action.add_argument('--gate')
+    action.add_argument('--publish-original')
+    parser.add_argument('--run')
+    parser.add_argument('--input-key')
     args=parser.parse_args()
-    print(json.dumps(qualify(args.gate,args.input_key)))
+    if args.publish_original and args.run and not args.input_key:
+        result = publish_original(Path(__file__).resolve().parents[2], args.run, args.publish_original)
+    elif args.gate and args.input_key and not args.run:
+        result = qualify(args.gate, args.input_key)
+    else:
+        parser.error('发布须提供 run，资格重开须提供 input-key。')
+    print(json.dumps(result))
