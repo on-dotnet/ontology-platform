@@ -23,20 +23,7 @@ public sealed partial class OracleSourceAdapter
             await connection.OpenAsync(token);
             connection.ModuleName = "G4-ORACLE-MAPPING-QUERY-001";
             connection.ClientId = executionId.ToString("N");
-            await VerifyReadOnlyAsync(connection, token);
-            // 直接授予的可读闭包须准确匹配两表和证明视图。
-            using var grants = connection.CreateCommand();
-            grants.CommandText = """
-                SELECT OWNER, TABLE_NAME FROM USER_TAB_PRIVS_RECD
-                WHERE PRIVILEGE='READ' AND GRANTABLE='NO' ORDER BY OWNER,TABLE_NAME
-                """;
-            // 集合采用 Oracle 目录原始标识符，不折叠大小写。
-            var objects = new HashSet<(string, string)>();
-            await using var cursor = await grants.ExecuteReaderAsync(token);
-            while (await cursor.ReadAsync(token))
-                objects.Add((cursor.GetString(0), cursor.GetString(1)));
-            if (!objects.SetEquals([("PRODUCTION", "OMQ_ENTITY"), ("CaseOwner", "OmqTarget"), ("G4_CONTROL", "READONLY_ATTESTATION")]))
-                throw new PgSourceException("connection_readonly_unverified");
+            await VerifyMappingAccessAsync(connection, token);
             return connection;
         }
         catch
@@ -44,6 +31,25 @@ public sealed partial class OracleSourceAdapter
             await connection.DisposeAsync();
             throw;
         }
+    }
+
+    /// <summary>在当前独占物理会话复核只读身份与准确三项直接授权。</summary>
+    internal static async Task VerifyMappingAccessAsync(OracleConnection connection, CancellationToken token)
+    {
+        await VerifyReadOnlyAsync(connection, token);
+        // 直接授予的可读闭包须准确匹配两表和证明视图。
+        using var grants = connection.CreateCommand();
+        grants.CommandText = """
+            SELECT OWNER, TABLE_NAME FROM USER_TAB_PRIVS_RECD
+            WHERE PRIVILEGE='READ' AND GRANTABLE='NO' ORDER BY OWNER,TABLE_NAME
+            """;
+        // 集合采用 Oracle 目录原始标识符，不折叠大小写。
+        var objects = new HashSet<(string, string)>();
+        await using var cursor = await grants.ExecuteReaderAsync(token);
+        while (await cursor.ReadAsync(token))
+            objects.Add((cursor.GetString(0), cursor.GetString(1)));
+        if (!objects.SetEquals([("PRODUCTION", "OMQ_ENTITY"), ("CaseOwner", "OmqTarget"), ("G4_CONTROL", "READONLY_ATTESTATION")]))
+            throw new PgSourceException("connection_readonly_unverified");
     }
 
     /// <summary>所有前置核验已结束，在该连接显式建立本地事务并立即发出只读声明。</summary>

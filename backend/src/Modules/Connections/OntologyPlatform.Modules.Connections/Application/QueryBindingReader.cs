@@ -21,6 +21,9 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
     /// <summary>匹配当前 Doris 版本组合的正式执行器。</summary>
     private readonly DorisSourceAdapter? doris;
 
+    /// <summary>正式 Oracle 会话由已登记的同一受控适配器创建。</summary>
+    private readonly OracleSourceAdapter? oracle;
+
     /// <summary>源读取之前重验真实会话与单条完整字段授权。</summary>
     private readonly IG4QueryAuthorizationAuthority authority;
 
@@ -28,12 +31,13 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
     private readonly TimeProvider clock;
 
     /// <summary>使用正式模块工厂，不持有共享长生命周期DbContext。</summary>
-    public QueryBindingReader(IDbContextFactory<ConnectionsDbContext> factory, ConnectionSecretCipher cipher, IG4PgQueryReader sourceReader, IG4QueryAuthorizationAuthority authority, TimeProvider clock, DorisSourceAdapter? doris = null)
+    public QueryBindingReader(IDbContextFactory<ConnectionsDbContext> factory, ConnectionSecretCipher cipher, IG4PgQueryReader sourceReader, IG4QueryAuthorizationAuthority authority, TimeProvider clock, DorisSourceAdapter? doris = null, IOracleSourceAdapter? oracle = null)
     {
         this.factory = factory;
         this.cipher = cipher;
         this.sourceReader = sourceReader;
         this.doris = doris;
+        this.oracle = oracle as OracleSourceAdapter;
         this.authority = authority;
         this.clock = clock;
     }
@@ -44,10 +48,16 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
         // 绑定只能来自已验证的manifest，不根据客户端字符串选择自由表。
         var entity = context.Manifest.Mapping.Entities.SingleOrDefault(item => item.Id == entityBindingId) ?? throw Stale();
         // 字段依赖包括范围、身份和时间，即使不显示给UI也必须有当前许可。
-        var fields = context.Manifest.Binding.SourceType == "DORIS"
-            ? DorisMappingSourceValidator.EntityTable(entity, context.OriginalCatalog, context.CurrentCatalog, context.Manifest.Mapping)
-                .Fields.Select(f => new MappingFieldRef { DatasetRef = entity.DatasetRef, Ordinal = f.Ordinal, Name = f.Name }).ToArray()
-            : PgQueryReader.Fields(context.Manifest.Mapping, entity).Distinct().ToArray();
+        var table = context.Manifest.Binding.SourceType switch
+        {
+            "DORIS" => DorisMappingSourceValidator.EntityTable(entity, context.OriginalCatalog, context.CurrentCatalog, context.Manifest.Mapping),
+            "ORACLE" => OracleMappingSourceValidator.EntityTable(entity, context.OriginalCatalog, context.CurrentCatalog, context.Manifest.Mapping),
+            "POSTGRESQL" => null,
+            _ => throw Stale()
+        };
+        // Oracle 和 Doris 固定投影即使仅显示一个属性也会读取整行。
+        var fields = table is null ? PgQueryReader.Fields(context.Manifest.Mapping, entity).Distinct().ToArray()
+            : table.Fields.Select(f => new MappingFieldRef { DatasetRef = entity.DatasetRef, Ordinal = f.Ordinal, Name = f.Name }).ToArray();
         return new G4QueryProjection
         {
             ObjectRefs = fields.Select(field => MappingValidationService.ObjectPermission(field.DatasetRef.Schema, field.DatasetRef.Name)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray(),
@@ -76,7 +86,8 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
         if (connection.State != "ACTIVE" || !context.Scope.SiteIds.All(connection.SiteIds.Contains)) throw Forbidden();
         // 使用当前配置，不要求历史配置版本被重新启用。
         var config = ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson);
-        if (!MappingApplicationService.MatchesSource(context.Manifest.Binding, config)) throw Forbidden();
+        if ((config is OracleConnectionConfig && (oracle is null || connection.ConfigHash != ConnectionApplicationService.OracleConfigHash(connection, config, oracle.TrustFingerprint)))
+            || !MappingApplicationService.MatchesSource(context.Manifest.Binding, config)) throw Forbidden();
         // AAD的完整归属、用途及版本仍必须与当前连接一致。
         var secret = await database.ConnectionSecrets.AsNoTracking().SingleOrDefaultAsync(row => row.Id == connection.SecretId, cancellationToken);
         if (secret is null || secret.ConnectionId != connection.Id || secret.Version != connection.SecretVersion || secret.UsedAtUtc is null
@@ -86,6 +97,9 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
             await sourceReader.VerifyAccessAsync(pg.Profile, cipher.Decrypt(secret), context, entityBindingId, deadlineAtUtc, cancellationToken);
         else if (config is DorisConnectionConfig d && doris is not null)
             await DorisMappingSourceValidator.ObserveAsync(doris, d.Profile, cipher.Decrypt(secret), context.OriginalCatalog, context.CurrentCatalog,
+                context.Manifest.Mapping, context.Scope, false, deadlineAtUtc, cancellationToken);
+        else if (config is OracleConnectionConfig o && oracle is not null)
+            await OracleMappingSourceValidator.ObserveAsync(oracle, o.Profile, cipher.Decrypt(secret), context.OriginalCatalog, context.CurrentCatalog,
                 context.Manifest.Mapping, context.Scope, false, deadlineAtUtc, cancellationToken);
         else throw Forbidden();
         return new G4QueryConnectionAccess { ConnectionId = connection.Id, Revision = connection.Revision, ConfigHash = connection.ConfigHash,
@@ -112,6 +126,9 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
             // 当前连接禁用或轮换先提交时，历史解密回传必须被阻断。
             var current = await database.Connections.AsNoTracking().SingleOrDefaultAsync(row => row.Id == access.ConnectionId
                 && row.OrganizationId == actor.OrganizationId, cancellationToken) ?? throw Forbidden();
+            // 历史结果解密前最后一次检查当前 Oracle 信任材料，覆盖源核验完成后的更换。
+            var sourceConfig = ConnectionApplicationService.Decode<ConnectionConfig>(current.ConfigJson);
+            if (sourceConfig is OracleConnectionConfig && (oracle is null || current.ConfigHash != ConnectionApplicationService.OracleConfigHash(current, sourceConfig, oracle.TrustFingerprint))) throw Forbidden();
             if (current.State != "ACTIVE" || current.Revision != access.Revision || current.ConfigHash != access.ConfigHash
                 || current.SecretVersion != access.SecretVersion || !access.Scope.SiteIds.All(current.SiteIds.Contains)) throw Forbidden();
         }
@@ -196,7 +213,8 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
             || !context.Scope.SiteIds.All(connection.SiteIds.Contains)) throw Stale();
         // 强类型配置不能替换为其他连接器或自由URL。
         var config = ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson);
-        if (!MappingApplicationService.MatchesSource(context.Manifest.Binding, config)) throw Stale();
+        if ((config is OracleConnectionConfig && (oracle is null || connection.ConfigHash != ConnectionApplicationService.OracleConfigHash(connection, config, oracle.TrustFingerprint)))
+            || !MappingApplicationService.MatchesSource(context.Manifest.Binding, config)) throw Stale();
         // 只解密当前准确版本的已绑定秘密，不回读旧密钥执行历史查询。
         var secret = await database.ConnectionSecrets.AsNoTracking().SingleOrDefaultAsync(row => row.Id == connection.SecretId, cancellationToken);
         if (secret is null || secret.ConnectionId != connection.Id || secret.UsedAtUtc is null || secret.Version != connection.SecretVersion
@@ -206,6 +224,8 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
         {
             PgConnectionConfig pg => await sourceReader.ReadAsync(pg.Profile, cipher.Decrypt(secret), context, entityBindingId, query, deadlineAtUtc, cancellationToken, branch),
             DorisConnectionConfig d when doris is not null => await DorisQueryReader.ReadEntityAsync(doris, d.Profile, cipher.Decrypt(secret),
+                context, entityBindingId, query, branch, deadlineAtUtc, cancellationToken),
+            OracleConnectionConfig o when oracle is not null => await OracleQueryReader.ReadEntityAsync(oracle, o.Profile, cipher.Decrypt(secret),
                 context, entityBindingId, query, branch, deadlineAtUtc, cancellationToken),
             _ => throw Stale()
         };
@@ -254,7 +274,7 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
     }
 
     /// <summary>原manifest与当前activation绑定分离，任何漂移均不得静默切换版本。</summary>
-    private static async Task<G4QueryBindingContext> CaptureCoreAsync(ConnectionsDbContext database, ActorContext actor,
+    private async Task<G4QueryBindingContext> CaptureCoreAsync(ConnectionsDbContext database, ActorContext actor,
         G4SemanticQuery query, long authorizationEpoch, CancellationToken token)
     {
         if (!actor.Roles.Any(role => role is "platform.viewer" or "platform.operator" or "platform.auditor")
@@ -293,6 +313,10 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
         var source = await database.Connections.AsNoTracking().SingleOrDefaultAsync(row => row.Id == current.SourceConnectionId
             && row.OrganizationId == actor.OrganizationId, token) ?? throw Forbidden();
         if (!sites.All(source.SiteIds.Contains)) throw Forbidden();
+        // 当前受信 CA/wallet 与冻结配置必须在查询提交重验时仍吻合。
+        var sourceConfig = ConnectionApplicationService.Decode<ConnectionConfig>(source.ConfigJson);
+        if (!MappingApplicationService.MatchesSource(current, sourceConfig) || sourceConfig is OracleConnectionConfig
+            && (oracle is null || source.ConfigHash != ConnectionApplicationService.OracleConfigHash(source, sourceConfig, oracle.TrustFingerprint))) throw Stale();
         if (source.State != "ACTIVE" || source.Revision != current.ConnectionRevision || source.ConfigHash != current.ConfigHash
             || source.SecretVersion != current.SecretVersion) throw Stale();
         // 目录更新不得在一次固定查询中静默换成新ID。
@@ -335,10 +359,13 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
     /// <summary>沿原M1算法核实目录内容与捕获身份，不把当前配置覆盖到原发布目录。</summary>
     private static void DemandCatalog(CatalogSnapshotView view, CatalogSnapshotRecord record, MappingVersionBinding binding, ResourceScope scope)
     {
-        // 对象和列使用既有确定性顺序，不使用新的G4查询规范改写历史hash。
-        var objects = view.Objects.OrderBy(item => item.Schema, StringComparer.Ordinal).ThenBy(item => item.Name, StringComparer.Ordinal)
-            .ThenBy(item => item.Kind, StringComparer.Ordinal).Select(item => item with
-            { Fields = item.Fields.OrderBy(field => field.Ordinal).ThenBy(field => field.Name, StringComparer.Ordinal).ToArray() }).ToArray();
+        // 已发布组合决定重放的目录算法，禁止从当前账号重新猜测历史版本。
+        var adapter = (binding.SourceType, binding.AdapterVersion, binding.ExecutorVersion) switch
+        {
+            ("ORACLE", "oracle-mapping-v1", "oracle-mapping-validator-v1") => "oracle-m2-v1",
+            ("DORIS", "doris-mapping-v1", "doris-mapping-validator-v1") or ("POSTGRESQL", "pg-mapping-v1", "mapping-validator-v1") => "pg-m1-v1",
+            _ => throw Stale()
+        };
         if (view.Status != "READY" || view.SnapshotId != record.Id || view.SnapshotId != binding.SourceCatalogSnapshotId
             || view.ConnectionId != binding.SourceConnectionId || record.ConnectionId != binding.SourceConnectionId
             || record.ConfigHash != binding.ConfigHash || record.SecretVersion != binding.SecretVersion
@@ -346,7 +373,7 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
             || record.OrganizationId != scope.OrganizationId || view.Scope.OrganizationId != scope.OrganizationId
             || !scope.SiteIds.All(record.SiteIds.Contains) || !scope.SiteIds.All(view.Scope.SiteIds.Contains)
             || view.SchemaFingerprint != binding.SourceCatalogFingerprint
-            || ConnectionApplicationService.Hash(ConnectionApplicationService.Encode(new { AdapterVersion = "pg-m1-v1", Objects = objects })) != binding.SourceCatalogFingerprint)
+            || ConnectionApplicationService.CanonicalCatalog(view.Objects, adapter).Fingerprint != binding.SourceCatalogFingerprint)
             throw Stale();
     }
 

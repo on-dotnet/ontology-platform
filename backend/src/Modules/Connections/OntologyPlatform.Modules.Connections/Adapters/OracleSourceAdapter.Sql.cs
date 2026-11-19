@@ -70,7 +70,7 @@ public sealed partial class OracleSourceAdapter
     /// <param name="connection">当前已验证权限的连接。</param>
     /// <param name="token">调用方和总期限共同控制的取消令牌。</param>
     /// <returns>完整有界目录。</returns>
-    private static async Task<CatalogObject[]> ReadCatalogAsync(OracleConnection connection, CancellationToken token)
+    internal static async Task<CatalogObject[]> ReadCatalogAsync(OracleConnection connection, CancellationToken token)
     {
         // 固定SQL不插入配置中的标识符或其它用户文本。
         using var command = connection.CreateCommand();

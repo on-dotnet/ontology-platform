@@ -133,9 +133,13 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
         // 类型配置只从经过校验的服务器持久记录恢复。
         var config = Decode<ConnectionConfig>(row.ConfigJson);
         return config is OracleConnectionConfig
-            ? Hash(Encode(new { row.DisplayName, Scope = Normalize(Scope(row)), Config = config, TrustFingerprint = adapter.TrustFingerprint(config) }))
+            ? OracleConfigHash(row, config, adapter.TrustFingerprint(config))
             : Hash(Encode(new { row.DisplayName, Scope = Normalize(Scope(row)), Config = config }));
     }
+
+    /// <summary>目录与 Mapping/Query 复用相同输入重验当前 Oracle 信任材料及配置身份。</summary>
+    internal static string OracleConfigHash(ConnectionRecord row, ConnectionConfig config, string? fingerprint) =>
+        Hash(Encode(new { row.DisplayName, Scope = Normalize(Scope(row)), Config = config, TrustFingerprint = fingerprint }));
 
     /// <summary>缺失或更换信任材料使旧版本失效，不把配置故障显示成新鲜探测。</summary>
     private bool SourceCurrent(ConnectionRecord row)

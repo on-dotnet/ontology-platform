@@ -829,7 +829,8 @@ public sealed class MappingApplicationService
     internal static bool MatchesSource(MappingVersionBinding binding, ConnectionConfig config) =>
         binding.CanonicalVersion == "mapping-c14n-v1" && (config, binding.SourceType, binding.AdapterVersion, binding.ExecutorVersion) is
             (PgConnectionConfig, "POSTGRESQL", "pg-mapping-v1", "mapping-validator-v1") or
-            (DorisConnectionConfig, "DORIS", "doris-mapping-v1", "doris-mapping-validator-v1");
+            (DorisConnectionConfig, "DORIS", "doris-mapping-v1", "doris-mapping-validator-v1") or
+            (OracleConnectionConfig, "ORACLE", "oracle-mapping-v1", "oracle-mapping-validator-v1");
 
     /// <summary>当前平台输入在组织锁下逐项复核，源网络已在评估阶段完成。</summary>
     internal async Task CurrentAsync(ConnectionsDbContext db, MappingDraftView draft, MappingValidationTarget target, MappingVersionBinding binding,
@@ -846,8 +847,10 @@ public sealed class MappingApplicationService
         }
         // 连接写者使用同一advisory锁，轮换不能与提交交错。
         var connection = await db.Connections.SingleAsync(row => row.Id == binding.SourceConnectionId, token);
-        if (connection.State != "ACTIVE" || connection.Revision != binding.ConnectionRevision || connection.ConfigHash != binding.ConfigHash
-            || connection.SecretVersion != binding.SecretVersion || !MatchesSource(binding, ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson)))
+        // 当前物理信任和版本组合在既有提交事务内复核。
+        var config = ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson);
+        if (!validation.TrustCurrent(connection, config) || connection.State != "ACTIVE" || connection.Revision != binding.ConnectionRevision || connection.ConfigHash != binding.ConfigHash
+            || connection.SecretVersion != binding.SecretVersion || !MatchesSource(binding, config))
         {
             throw Conflict();
         }
@@ -860,6 +863,8 @@ public sealed class MappingApplicationService
         {
             throw Conflict();
         }
+        if (config is OracleConnectionConfig)
+            OracleMappingSourceValidator.DemandSnapshot(ConnectionApplicationService.Decode<CatalogSnapshotView>(catalog.ViewJson), catalog, connection.Id, draft.Scope);
         // 当前Active与全产品依赖索引共同决定原影响分析是否仍成立。
         var impact = await validation.ImpactAsync(draft, token);
         if (impact.Hash != binding.ImpactHash || Digest(impact.Active) != Digest(expected))

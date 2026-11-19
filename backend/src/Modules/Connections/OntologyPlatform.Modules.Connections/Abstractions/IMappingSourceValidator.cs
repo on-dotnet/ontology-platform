@@ -45,6 +45,9 @@ public sealed record MappingSourceTable
 /// <summary>一次真实只读源事务的内存证据，不持久化原始业务行。</summary>
 public sealed record MappingSourceObservation
 {
+    /// <summary>由 Oracle 正式读取器标记，用于选择严格 NUMBER 与目录规则。</summary>
+    internal bool IsOracle { get; init; }
+
     /// <summary>实际读取表和完整限定行。</summary>
     public required MappingSourceTable[] Tables { get; init; }
 

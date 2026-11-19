@@ -18,6 +18,9 @@ public sealed class MappingValidationService
     /// <summary>受限 Doris 源读取器，仅处理对应配置和用途。</summary>
     private readonly DorisSourceAdapter? doris;
 
+    /// <summary>正式 Oracle 会话由已登记的同一受控适配器创建。</summary>
+    private readonly OracleSourceAdapter? oracle;
+
     /// <summary>沿G3固定发布、对象和图回验的词汇读取服务。</summary>
     private readonly IG3VocabularyService vocabulary;
 
@@ -36,11 +39,12 @@ public sealed class MappingValidationService
     /// <summary>组合既有发布读服务和新受控映射源，不写Publishing或Ontology表。</summary>
     public MappingValidationService(Microsoft.EntityFrameworkCore.IDbContextFactory<ConnectionsDbContext> factory,
         IMappingSourceValidator sourceValidator, IG3VocabularyService vocabulary, IReleaseCatalog releases,
-        IMappingAuthorizationAuthority authority, ConnectionSecretCipher cipher, TimeProvider clock, DorisSourceAdapter? doris = null)
+        IMappingAuthorizationAuthority authority, ConnectionSecretCipher cipher, TimeProvider clock, DorisSourceAdapter? doris = null, IOracleSourceAdapter? oracle = null)
     {
         this.factory = factory;
         this.sourceValidator = sourceValidator;
         this.doris = doris;
+        this.oracle = oracle as OracleSourceAdapter;
         this.vocabulary = vocabulary;
         this.releases = releases;
         this.authority = authority;
@@ -48,12 +52,18 @@ public sealed class MappingValidationService
         this.clock = clock;
     }
 
+    /// <summary>平台提交复锁后核实际信任材料，使进行中轮换不能借原配置散列提交。</summary>
+    internal bool TrustCurrent(ConnectionRecord connection, ConnectionConfig config) => config is not OracleConnectionConfig ||
+        oracle is not null && connection.ConfigHash == ConnectionApplicationService.OracleConfigHash(connection, config, oracle.TrustFingerprint);
+
     /// <summary>正式读取前或历史展示时只核当前目录和授权，不查询业务行。</summary>
     private Task VerifySourceAsync(MappingValidationInput input, MappingDraftView draft, CancellationToken token) => input.Config switch
     {
         PgConnectionConfig pg => sourceValidator.VerifyAccessAsync(pg.Profile, cipher.Decrypt(input.Secret), input.Current,
             draft.Mapping, draft.Scope, token, input.Original),
         DorisConnectionConfig d when doris is not null => DorisMappingSourceValidator.ObserveAsync(doris, d.Profile, cipher.Decrypt(input.Secret),
+            input.Original, input.Current, draft.Mapping, draft.Scope, false, clock.GetUtcNow().AddSeconds(5), token),
+        OracleConnectionConfig o when oracle is not null => OracleMappingSourceValidator.ObserveAsync(oracle, o.Profile, cipher.Decrypt(input.Secret),
             input.Original, input.Current, draft.Mapping, draft.Scope, false, clock.GetUtcNow().AddSeconds(5), token),
         _ => throw new SemanticOperationException(422, "mapping_source_unsupported")
     };
@@ -173,6 +183,8 @@ public sealed class MappingValidationService
             PgConnectionConfig pg => await sourceValidator.ReadAsync(pg.Profile, password, input.Current, draft.Mapping, draft.Scope, cancellationToken, input.Original),
             DorisConnectionConfig d when doris is not null => await DorisMappingSourceValidator.ObserveAsync(doris, d.Profile, password, input.Original,
                 input.Current, draft.Mapping, draft.Scope, true, started.AddSeconds(30), cancellationToken),
+            OracleConnectionConfig o when oracle is not null => await OracleMappingSourceValidator.ObserveAsync(oracle, o.Profile, password, input.Original,
+                input.Current, draft.Mapping, draft.Scope, true, started.AddSeconds(30), cancellationToken),
             _ => throw new SemanticOperationException(422, "mapping_source_unsupported")
         };
         // 影响分析只涵盖本产品全部登记映射依赖；M4没有开放消费入口。
@@ -207,7 +219,7 @@ public sealed class MappingValidationService
             SourceConnectionId = input.Connection.Id,
             ConnectionRevision = input.Connection.Revision,
             ConfigHash = input.Connection.ConfigHash,
-            SourceType = input.Config is DorisConnectionConfig ? "DORIS" : "POSTGRESQL",
+            SourceType = input.Config switch { OracleConnectionConfig => "ORACLE", DorisConnectionConfig => "DORIS", _ => "POSTGRESQL" },
             SourceCatalogSnapshotId = input.Current.SnapshotId,
             SourceCatalogFingerprint = input.Current.SchemaFingerprint,
             OntologyReleaseId = draft.OntologyReleaseId,
@@ -216,8 +228,8 @@ public sealed class MappingValidationService
             ValidationHash = new string('0', 64),
             ImpactHash = impact.Hash,
             AssessmentId = assessmentId,
-            AdapterVersion = input.Config is DorisConnectionConfig ? "doris-mapping-v1" : "pg-mapping-v1",
-            ExecutorVersion = input.Config is DorisConnectionConfig ? "doris-mapping-validator-v1" : "mapping-validator-v1",
+            AdapterVersion = input.Config switch { OracleConnectionConfig => "oracle-mapping-v1", DorisConnectionConfig => "doris-mapping-v1", _ => "pg-mapping-v1" },
+            ExecutorVersion = input.Config switch { OracleConnectionConfig => "oracle-mapping-validator-v1", DorisConnectionConfig => "doris-mapping-validator-v1", _ => "mapping-validator-v1" },
             CanonicalVersion = "mapping-c14n-v1",
             SecretVersion = input.Connection.SecretVersion,
             AuthorizationEpoch = proof.AuthorizationEpoch
@@ -332,7 +344,9 @@ public sealed class MappingValidationService
         }
         // 当前源配置和秘密用途必须属于同一获批分支。
         var config = ConnectionApplicationService.Decode<ConnectionConfig>(connection.ConfigJson);
-        if (config is not (PgConnectionConfig or DorisConnectionConfig)) throw new SemanticOperationException(422, "mapping_source_unsupported");
+        if (config is not (PgConnectionConfig or DorisConnectionConfig or OracleConnectionConfig)) throw new SemanticOperationException(422, "mapping_source_unsupported");
+        if (!TrustCurrent(connection, config))
+            throw new SemanticOperationException(409, "mapping_connection_unusable");
         // 凭据必须已绑定当前连接及准确版本，完整AAD范围不可裁剪。
         var secret = await db.ConnectionSecrets.AsNoTracking().SingleOrDefaultAsync(row => row.Id == connection.SecretId, token);
         if (secret is null || secret.ConnectionId != connection.Id || secret.UsedAtUtc is null || secret.Version != connection.SecretVersion
@@ -353,6 +367,11 @@ public sealed class MappingValidationService
         var original = ConnectionApplicationService.Decode<CatalogSnapshotView>(originalRow.ViewJson);
         // 当前快照必须是原完整READY，不可拿PARTIAL填当前Binding。
         var current = ConnectionApplicationService.Decode<CatalogSnapshotView>(currentRow.ViewJson);
+        if (config is OracleConnectionConfig)
+        {
+            OracleMappingSourceValidator.DemandSnapshot(original, originalRow, connection.Id, draft.Scope);
+            OracleMappingSourceValidator.DemandSnapshot(current, currentRow, connection.Id, draft.Scope);
+        }
         if (current.Status != "READY" || current.ConfigRevision != connection.Revision || current.SecretVersion != connection.SecretVersion
             || !draft.Scope.SiteIds.All(site => original.Scope.SiteIds.Contains(site, StringComparer.Ordinal) && current.Scope.SiteIds.Contains(site, StringComparer.Ordinal)))
         {
@@ -554,7 +573,8 @@ public sealed class MappingValidationService
             var identity = mapping.IdentitySpecs.Single(item => item.Id == entity.IdentitySpecId);
             // 业务时间和观察时间明确分列。
             var time = mapping.TemporalSpecs.Single(item => item.Id == entity.TemporalSpecId);
-            if (source.SourceSemanticsHash is not null && !DorisMappingSourceValidator.SupportsEntityPlan(entity, identity, time))
+            if (source.SourceSemanticsHash is not null && !(source.IsOracle
+                ? OracleMappingSourceValidator.SupportsEntityPlan(entity, identity, time) : DorisMappingSourceValidator.SupportsEntityPlan(entity, identity, time)))
                 Issue(problems, "EXECUTABILITY", "mapping_source_shape_invalid", entity.Id);
             // 成功输出数不能由原始行数直接代填。
             var before = entities.Count;
@@ -697,9 +717,10 @@ public sealed class MappingValidationService
         var relationCounts = new SortedDictionary<string, int>(StringComparer.Ordinal);
         foreach (var relation in mapping.Relations)
         {
-            // 只有 Doris 的已验证固定关系采用两种明确标度的 DECIMALV3 比较。
-            var dorisRelation = source.SourceSemanticsHash is not null;
-            if (dorisRelation && !DorisMappingSourceValidator.SupportsRelation(mapping, relation))
+            // 已核实的 Oracle NUMBER 与 Doris DECIMALV3 均按精确定点数比较。
+            var numericRelation = source.SourceSemanticsHash is not null;
+            if (numericRelation && !(source.IsOracle ? OracleMappingSourceValidator.SupportsRelation(mapping, relation)
+                : DorisMappingSourceValidator.SupportsRelation(mapping, relation)))
             {
                 Issue(problems, "EXECUTABILITY", "mapping_source_shape_invalid", relation.Id);
                 relationCounts[relation.Id] = 0;
@@ -738,7 +759,7 @@ public sealed class MappingValidationService
             foreach (var start in from)
             {
                 // fanout最多十个，超过立即阻断整个评估，不截断返回。
-                var matches = to.Where(end => JoinMatches(start, end, relation, dorisRelation)).ToArray();
+                var matches = to.Where(end => JoinMatches(start, end, relation, numericRelation)).ToArray();
                 if (matches.Length > 10)
                 {
                     Issue(problems, "EXECUTABILITY", "mapping_fanout_exceeded", relation.Id);
@@ -755,7 +776,7 @@ public sealed class MappingValidationService
             var referenceCount = to.Sum(end => from.Count(start => start.Organization == end.Organization && start.Site == end.Site
                 && start.From < end.To && end.From < start.To && relation.JoinFieldPairs.All(pair =>
                     Cell(start.Row, pair.From).Value is { } left && Cell(end.Row, pair.To).Value is { } right
-                    && (dorisRelation ? left.TrimEnd('0').TrimEnd('.') == right.TrimEnd('0').TrimEnd('.') : left == right))));
+                    && (numericRelation ? left.TrimEnd('0').TrimEnd('.') == right.TrimEnd('0').TrimEnd('.') : left == right))));
             if (referenceCount != pairs.Count)
             {
                 Issue(problems, "RECONCILIATION", "mapping_relation_count_mismatch", relation.Id);
@@ -810,7 +831,7 @@ public sealed class MappingValidationService
         });
         if (source.SourceSemanticsHash is not null)
         {
-            semantic = Digest(new { executorVersion = "doris-mapping-validator-v1", source.SourceSemanticsHash, semantic });
+            semantic = Digest(new { executorVersion = source.IsOracle ? "oracle-mapping-validator-v1" : "doris-mapping-validator-v1", source.SourceSemanticsHash, semantic });
         }
         return new MappingEvaluation { Stages = stages, Issues = problems.Values.SelectMany(items => items).Distinct().ToArray(), SemanticResultHash = semantic, EvidenceHash = evidence };
     }
@@ -861,7 +882,7 @@ public sealed class MappingValidationService
         }
         // 有时区源值必须已经由PG驱动证明UTC身份和微秒精度。
         var cell = Cell(row, field);
-        if (cell.NativeType == "datetime(6)") return DorisMappingTypeRules.Instant(value, spec);
+        if (cell.NativeType is "datetime(6)" or "TIMESTAMP(6)") return DorisMappingTypeRules.Instant(value, spec);
         // 明确解析结果承载最终UTC瞬间，不能采用系统本地时区。
         DateTimeOffset instant;
         if (cell.NativeType.EndsWith(" with time zone", StringComparison.Ordinal)
@@ -912,7 +933,9 @@ public sealed class MappingValidationService
             },
             _ => source.NativeType switch
             {
-                "text" => "string",
+                "text" or "VARCHAR2" => "string",
+                "NUMBER" => "decimal",
+                "NUMBER(18,0)" => "integer",
                 _ when source.NativeType.StartsWith("varchar(", StringComparison.Ordinal) => "string",
                 _ when source.NativeType.StartsWith("decimalv3(", StringComparison.Ordinal) => "decimal",
                 _ when Regex.IsMatch(source.NativeType, @"^(character varying|character)\([1-9][0-9]{0,6}\)$", RegexOptions.CultureInvariant) => "string",
@@ -1011,10 +1034,10 @@ public sealed class MappingValidationService
     }
 
     /// <summary>关系键、完整scope与半开有效区间必须同时匹配。</summary>
-    private static bool JoinMatches(EvaluatedEntity from, EvaluatedEntity to, MappingRelationBinding relation, bool dorisRelation) =>
+    private static bool JoinMatches(EvaluatedEntity from, EvaluatedEntity to, MappingRelationBinding relation, bool numericRelation) =>
         from.Organization == to.Organization && from.Site == to.Site && from.From < to.To && to.From < from.To
         && relation.JoinFieldPairs.All(pair => Cell(from.Row, pair.From).Value is { } left && Cell(to.Row, pair.To).Value is { } right
-            && (dorisRelation ? decimal.Parse(left, CultureInfo.InvariantCulture) == decimal.Parse(right, CultureInfo.InvariantCulture) : left == right));
+            && (numericRelation ? decimal.Parse(left, CultureInfo.InvariantCulture) == decimal.Parse(right, CultureInfo.InvariantCulture) : left == right));
 
     /// <summary>已验证实体仅在当前评估内存存活，不发送到页面或日志。</summary>
     private sealed record EvaluatedEntity
