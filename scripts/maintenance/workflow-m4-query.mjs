@@ -254,7 +254,11 @@ async function browserRun(mode) {
       const active=await get(operator,"/api/v1/mappings/"+state.mappingDraft.mappingId+"/active");
       const stage=process.env.DMQ_READINESS_STAGE ?? "baseline";
       const actors=[operator,auditor,activator,reader].map(actor=>({subjectId:actor.me.subjectId,cookie:actor.sessionCookie}));
-      const expected = structuredClone(state);
+      // 准入只消费原身份和版本。完整草稿、历史结果和 RDF 制品不经过会话管道。
+      const expected = {taskId:state.taskId,runId:state.runId,subjects:state.subjects,scope:state.scope,connectionId:state.connectionId,
+        catalog:{snapshotId:state.catalog.snapshotId,schemaFingerprint:state.catalog.schemaFingerprint},
+        mappingReceipt:{...state.mappingReceipt},mappingCurrentReceipt:state.mappingCurrentReceipt,
+        mappingRelease:{manifest:{binding:state.mappingRelease.manifest.binding}}};
       if (mode==="s2-doris-ready" && process.env.DMQ_STALE_EXPECTATION==="activation") expected.mappingReceipt.mappingReleaseId=state.replacedDorisMapping.releaseId;
       if (mode==="s2-doris-ready" && process.env.DMQ_STALE_EXPECTATION==="catalog") {
         const prior=JSON.parse(await readFile(resolve(output,"runtime-fixture.json"),"utf8"));
@@ -267,7 +271,7 @@ async function browserRun(mode) {
       catch (error) {
         const reason = [...String(error.stderr ?? "").matchAll(/ValueError: (PREREQUISITE_STALE:[a-z_]+)/g)].at(-1);
         const failure = new Error();
-        failure.safeCode = reason?.[1] ?? "DORIS_READINESS_CHECK_FAILED";
+        failure.safeCode = reason?.[1] ?? (error.code==="ETIMEDOUT" ? "DORIS_READINESS_PROCESS_TIMEOUT" : "DORIS_READINESS_CHECK_FAILED");
         throw failure;
       }
       check("all_current_prerequisites",report.scenarioReady.status==="READY");
