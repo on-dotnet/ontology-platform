@@ -142,6 +142,7 @@ def browser_report(archive, entry, origin, mode, case, host, api_build, test_bui
     """预期拒绝和健康场景使用相同命令、构建、驱动、宿主、窗口与非零检查门禁。"""
     argv, key, label = browser_invocation(archive.root, mode, case, host, api_build, test_build, stage)
     row, stdout, _ = archive.command(entry['commandId'], argv, label, key, host['commandId'], origin)
+    require(row['deadlineSeconds']==180, 'OMQ_BROWSER_DEADLINE')
     name = entry['report']
     require(re.fullmatch('browser-'+re.escape(mode)+r'-[0-9]{13}\.json', name), 'OMQ_REPORT_NAME')
     report, result = archive.read(name), json.loads(stdout)
@@ -155,6 +156,8 @@ def browser_report(archive, entry, origin, mode, case, host, api_build, test_bui
             'OMQ_REPORT_TIMELINE')
     for binding in (report['inputBinding'], report['outputBinding']):
         require(stable_host(binding['api']) == stable_host(host), 'OMQ_REPORT_HOST')
+    require(report['inputBinding']['web'] == report['outputBinding']['web'] and
+            (report['inputBinding']['web'] is not None) == mode.startswith('ui-'), 'OMQ_REPORT_WEB')
     require(report['inputBinding']['api']['commandId'] != report['outputBinding']['api']['commandId'], 'OMQ_HOST_PROBE_REUSE')
     expected = ERRORS[case] if mode == READY else None
     if expected:
@@ -211,15 +214,31 @@ def host_observation(archive, host, api_build, origin):
 
 def audit_observation(archive, audit, row, host, origin):
     """审计重新采用已登记的窄投影 SQL 与解析器；不能把其他窗口的零计数借给当前场景。"""
-    from workflow_oracle_mapping_formal_observer import audit_invocation, parse_audit
     require((audit['taskId'],audit['runId'],audit['sourceId']) == (TASK,RUN,host['oracle']['containerId'])
             and utc(audit['startUtc']) == utc(row['startedAtUtc']) and utc(audit['endUtc']) == utc(row['endedAtUtc']), 'OMQ_AUDIT_WINDOW')
+    from workflow_oracle_mapping_formal_observer import audit_invocation, parse_audit, ns
+    from workflow_oracle_mapping_resources import SOURCE
     call = audit_invocation(audit['sourceId'], audit['startUtc'], audit['endUtc'], audit['clientId'])
-    command,stdout,_ = archive.command(audit['commandId'],call['argv'],'omq-audit-window',call['identity'],None,origin)
+    source = host['oracle']['containerId']
+    fmt = '{{.Id}}|{{.Image}}|{{index .Config.Labels "ontology.task"}}|{{index .Config.Labels "ontology.run"}}|{{.State.Status}}'
+    identity,raw,_ = archive.command(audit['sourceIdentityCommand'],['docker','--context','desktop-linux','inspect','-f',fmt,source],
+        'oracle-audit-source-identity',digest_value([source,SOURCE,TASK,RUN]),None,origin)
+    require(identity['exitCode']==0 and identity['classification']=='SUCCESS' and
+            raw.decode().strip()=='|'.join([source,SOURCE.split('@')[1],TASK,RUN,'running']), 'OMQ_AUDIT_SOURCE')
+    command,stdout,_ = archive.command(audit['commandId'],call['argv'],'oracle-formal-audit-window',call['identity'],None,origin)
     records = parse_audit(stdout)
     require(command['exitCode'] == 0 and command['classification'] == 'SUCCESS' and utc(command['startedAtUtc']) >= utc(row['endedAtUtc'])
             and records == audit['records'] and len(records) == audit['sourceAuditCount'] and digest_value(records) == audit['recordsSha256'],
             'OMQ_AUDIT_OUTPUT')
+    clocks = [line.strip()[6:] for line in stdout.decode().splitlines() if line.strip().startswith('CLOCK|')]
+    require(audit['observerId']=='OMQ_OBSERVER' and len(clocks)==2 and clocks==audit['sourceClock'] and ns(clocks[0])<=ns(clocks[1])
+            and all(utc(audit['startUtc']) <= utc(item['utc']) < utc(audit['endUtc'])
+                    and (audit['clientId'] is None or audit['clientId']==item['clientId']) for item in records), 'OMQ_AUDIT_CLOCK')
+    bounds = audit['errorBounds']
+    earliest = ns(clocks[0])+bounds['lowerNs']+999
+    latest = ns(clocks[1])+bounds['upperNs']
+    require(ns(identity['endedAtUtc']) <= earliest+999 and earliest <= ns(command['startedAtUtc'])+999
+            and ns(command['endedAtUtc']) <= latest+999 and bounds['lowerNs']<=bounds['upperNs'], 'OMQ_AUDIT_ERROR_BOUNDS')
     return records
 
 
@@ -235,8 +254,40 @@ def reopen_browser(archive, entry, origin, mode, case):
             utc(before['endedAtUtc']) <= utc(row['startedAtUtc']) <= utc(inside['startedAtUtc']) <= utc(inside['endedAtUtc'])
             <= utc(after['startedAtUtc']) <= utc(after['endedAtUtc']) <= utc(row['endedAtUtc']), 'OMQ_HOST_WINDOW')
     records = audit_observation(archive, archive.read(entry['audit']), row, host, origin)
+    if mode in ('s0-oracle-natural','s0-oracle-cancel'):
+        from workflow_oracle_mapping_formal_observer import classify
+        witness = report['oracleWitness']
+        key = witness['idempotencyKey']
+        require(re.fullmatch('[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}',key)
+                and witness['output']=='formal-witness-'+key+'.json','OMQ_FORMAL_SOURCE_FILE')
+        raw = archive.read(witness['output'])
+        require(raw['idempotencyKey']==key and raw['taskId']==TASK and raw['runId']==RUN and raw['status']=='OBSERVED'
+                and raw['sourceId']==host['oracle']['containerId'] and stable_host(raw['hostBefore'])==stable_host(host)
+                and stable_host(raw['hostAfter'])==stable_host(host),'OMQ_FORMAL_SCOPE')
+        proof = classify(raw)
+        require(proof==raw['final'] and all(proof[k]==v for k,v in witness['final'].items()) and
+                proof['queryId']==raw['queryId'] and proof['clientId'] and proof['slotReleased'] is True
+                and proof['residualSourceWork']==0 and proof['allSourceWorkEnded'] is True and
+                0<=proof['branchUpperMs']<=1000 and 0<=proof['totalUpperMs']<=5000, 'OMQ_FORMAL_BUDGET')
+        require(any(item['clientId']==proof['clientId'] for item in records),'OMQ_FORMAL_SOURCE_AUDIT')
+        if mode=='s0-oracle-natural':
+            require(proof['naturalCompletion'] and proof['nativeErrorCode']==0 and not proof['formalCancelCommitted']
+                    and not proof['nativeCancelCausedTermination'], 'OMQ_NATURAL_CONTROL')
+        else:
+            require(proof['formalCancelCommitted'] and proof['sameExecutionActiveAtCommit'] and
+                    proof['nativeCancelCausedTermination'] and proof['nativeErrorCode']==1013 and
+                    not proof['deadlineOrDisconnectBeforeCommit'] and 0<=proof['cleanupUpperMs']<=250 and
+                    proof['successfulResults']==proof['successReceipts']==proof['successAudits']==0,'OMQ_CANCEL_CAUSE')
+    if mode.startswith('ui-'):
+        wb=archive.read('web-build-binding.json')
+        import workflow_m2_build as build
+        web=report['inputBinding']['web']
+        require(wb['taskId']==TASK and wb['target']=='web' and wb['status']=='PASS' and wb['exitCode']==0 and wb['inputKey']==build.inputs('web')
+                and web['inputKey']==wb['inputKey'] and web['receiptSha256']==sha(archive.raw('web-build-binding.json'))
+                and web['outputKey']==sha(json.dumps(wb['outputs'],sort_keys=True).encode()) and web['taskId']==TASK
+                and web['runId']==RUN and web['buildId'] and wb['outputs'].get('apps/web/.next/BUILD_ID') in {sha(web['buildId'].encode()),sha((web['buildId']+'\n').encode())}, 'OMQ_BROWSER_WEB_BUILD')
     if mode == READY:
-        require(not records, 'OMQ_PREREQUISITE_BUSINESS_READ')
+        require(archive.read(entry['audit'])['clientId'] is None and not records, 'OMQ_PREREQUISITE_BUSINESS_READ')
         if case == 'healthy':
             ready = report['scenarioReady']
             require({'oracle_ready_catalog_projection','oracle_ready_current_connection','oracle_ready_closed_versions',
@@ -311,7 +362,7 @@ def qualify(root, task, run_id, gate, input_key):
         for name in (('wire','binding') if gate=='contract' else ('binding','deadline','mcp-deadline')):
             tests += reopen_test(archive,index['tests'][name],name,origin)
     else:
-        cases = [(READY,case) for case in ERRORS] if gate=='interaction' else [('ui-s1','healthy'),('ui-s3','healthy')]
+        cases = ([(READY,case) for case in ERRORS]+[('s0-oracle-natural','healthy'),('s0-oracle-cancel','healthy')]) if gate=='interaction' else [('ui-s1','healthy'),('ui-s3','healthy')]
         for mode,case in cases:
             entry = index['cases'][mode+'-'+case]
             tests += reopen_browser(archive,entry,origin,mode,case)
