@@ -39,7 +39,12 @@ SELECT json_build_object('kind','server','database',current_database(),'user',cu
 SELECT json_build_object('kind','release','id',r."ReleaseId",'asset',r."AssetId",'active',a."ReleaseId",'revision',a."Revision",
  'manifestHash',r."ManifestHash",'actualManifestHash',encode(sha256(convert_to(r."ManifestJson",'UTF8')),'hex'),
  'manifestObject',r."ManifestObjectJson"::jsonb,'objects',r."ManifestJson"::jsonb->'ArtifactObjects',
- 'ontologyGraph',r."ManifestJson"::jsonb->>'OntologyGraphIri','dataGraph',r."ManifestJson"::jsonb->>'DataGraphIri')
+ 'ontologyGraph',r."ManifestJson"::jsonb->>'OntologyGraphIri','dataGraph',r."ManifestJson"::jsonb->>'DataGraphIri',
+ 'sourceDigests',(SELECT jsonb_agg(jsonb_build_object('bytes',octet_length(convert_to(src,'UTF8')),
+ 'sha256',encode(sha256(convert_to(src,'UTF8')),'hex')) ORDER BY ord) FROM unnest(ARRAY[
+ r."SourcesJson"::jsonb->>'OntologyTurtle',r."SourcesJson"::jsonb->>'ShapesTurtle',
+ r."SourcesJson"::jsonb->>'VocabularyTurtle',r."SourcesJson"::jsonb->>'DataTurtle']) WITH ORDINALITY AS v(src,ord)
+ WHERE src IS NOT NULL))
  FROM publishing."Releases" r JOIN publishing."ActiveReleases" a ON a."AssetId"=r."AssetId"
  WHERE r."AssetId"='{ident['asset']}' AND r."ReleaseId"='{ident['release']}' AND r."OrganizationId"='org-demo';
 SELECT json_build_object('kind','mapping','id',a."MappingId",'active',a."ActivationId",'version',a."ReleaseId",'revision',a."ActivationRevision",
@@ -102,6 +107,8 @@ def collect_pg(pg_id, fixture, recovery_id, attempt):
             and all(p['fields']==11 and p['site']==['site-a'] and p['org']=='org-demo' for p in perms),'CHECKPOINT_PG_GRANTS')
     objects=[{k[0].lower()+k[1:]:v for k,v in obj.items()} for obj in r['objects']]
     manifest={k[0].lower()+k[1:]:v for k,v in r['manifestObject'].items()}
+    require(r['sourceDigests']==[dict(bytes=obj['sizeBytes'],sha256=obj['hash']) for obj in objects],
+            'CHECKPOINT_PG_SOURCE_BYTES')
     require(objects==f['manifest']['artifactObjects'] and manifest['hash']==r['manifestHash'] and all(
         CID.fullmatch(obj['hash']) and re.fullmatch(r'releases/[A-Za-z0-9-]+/[a-z0-9.-]+',obj['objectKey'])
         and 0<obj['sizeBytes']<=4*1024*1024 for obj in [*objects,manifest]),'CHECKPOINT_PG_OBJECTS')
@@ -231,7 +238,7 @@ STORAGE = r'''
     }
     private static async Task Graphs()
     {
-        const string query="SELECT ?g ?s ?p ?o WHERE { { GRAPH ?g { ?s ?p ?o } } UNION { ?s ?p ?o } }";
+        const string query="SELECT ?g ?s ?p ?o WHERE { { GRAPH ?g { ?s ?p ?o } } UNION { ?s ?p ?o } } ORDER BY ?g ?s ?p ?o";
         var raw=await Fetch(Fuseki+"/ontology/query?query="+Escape(query),headers:new(){{"Accept","application/sparql-results+json"}},limit:8*1024*1024);
         var rows=Parse(raw.Body).GetProperty("results").GetProperty("bindings").EnumerateArray().ToArray();
         var graphs=new SortedDictionary<string,List<string>>(StringComparer.Ordinal){{"",new()}};
