@@ -200,7 +200,7 @@ def configure():
 
 
 HOST = OUT/'s1-api-process.json'
-BROWSER = ('provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog','s2-doris-mapping','s2-doris-queries','s2-doris-null','s2-doris-cancel','s2-doris-access','s2-doris-fanout','s2-doris-requalify','s2-doris-aba','s2-doris-admission-cancel','s2-doris-cancel-window','s2-doris-states','s2-doris-cardinality','s2-doris-identity','s2-doris-revoke-race','s2-doris-session-race','s2-doris-shape-prepare','s2-doris-shape-reject','s2-doris-shape-recover','s2-doris-cancel-profile','s2-doris-expiry','s2-doris-ddl-race','s2-doris-rotate-race','s2-doris-current-catalog','s2-doris-deadline','s2-doris-short-lock','s2-doris-disconnect','s2-doris-batch-binding')
+BROWSER = ('s2-doris-authority-control','s2-doris-sentinel','s2-doris-overlap','provision','mapping','s1','s1-reopen','s1-key-negative','s1-current-catalog','s2-doris-mapping','s2-doris-queries','s2-doris-null','s2-doris-cancel','s2-doris-access','s2-doris-fanout','s2-doris-requalify','s2-doris-aba','s2-doris-admission-cancel','s2-doris-cancel-window','s2-doris-states','s2-doris-cardinality','s2-doris-identity','s2-doris-revoke-race','s2-doris-session-race','s2-doris-shape-prepare','s2-doris-shape-reject','s2-doris-shape-recover','s2-doris-cancel-profile','s2-doris-expiry','s2-doris-ddl-race','s2-doris-rotate-race','s2-doris-current-catalog','s2-doris-deadline','s2-doris-short-lock','s2-doris-disconnect','s2-doris-batch-binding')
 
 
 def runtime_binding():
@@ -233,7 +233,7 @@ def browser_test(mode, prepared):
     dep=json.loads(dependency_path.read_bytes())
     vm.demand((dep['taskId'],dep['worktree'],dep['status'])==(vm.TASK,str(ROOT),'DEPENDENCIES_READY'),'S1_ENVIRONMENT')
     from workflow_doris_s0_fixture import STRESS
-    vm.demand(STRESS.exists()==(mode in ('s2-doris-cancel','s2-doris-admission-cancel','s2-doris-cancel-window')),'PRODUCT_STRESS_ISOLATION')
+    vm.demand(STRESS.exists()==(mode in ('s2-doris-overlap','s2-doris-cancel','s2-doris-admission-cancel','s2-doris-cancel-window')),'PRODUCT_STRESS_ISOLATION')
     live_stack()
     snapshot=freeze_api()
     dll=ROOT/snapshot['directory']/'OntologyPlatform.Api.dll'
@@ -245,7 +245,7 @@ def browser_test(mode, prepared):
     finished=threading.Event()
     env=dict(PATH=os.environ['PATH'],ASPNETCORE_ENVIRONMENT='Development',ASPNETCORE_CONTENTROOT=str(RUNTIME/'api'),
              G4__SourceCaPath=str(DIRECTORY/'tls/ca.pem'),ASPNETCORE_URLS='http://127.0.0.1:15641',DOTNET_GCHeapHardLimit='0x18000000',DOTNET_CLI_TELEMETRY_OPTOUT='1')
-    env['Logging__LogLevel__OntologyPlatform.Modules.SemanticQuery.G4QueryExecution']='Debug' if mode in ('s2-doris-cancel-profile','s2-doris-cancel') else 'Information'
+    env['Logging__LogLevel__OntologyPlatform.Modules.SemanticQuery.G4QueryExecution']='Debug' if mode in ('s2-doris-cancel-profile','s2-doris-cancel','s2-doris-overlap') else 'Information'
     service=host_service([dep['dotnet'],str(dll)],env,ROOT,vm.TASK,exceeded)
     pid=service.process.pid
     evidence=OUT/('s1-host-'+mode+'-'+service.ident+'.json')
@@ -592,6 +592,50 @@ def fanout_fixture(action):
     return dict(phase=action, expected=expected)
 
 
+
+def sentinel_fixture(restore=False):
+    """一次独立查询哨兵，只写入本次登记的 100 个复合键。"""
+    from workflow_doris_s0_fixture import STRESS, STRESS_TABLES, stress_original, tier_capacity
+    active = OUT/'s2-sentinel-active.json'
+    done = OUT/'s2-sentinel-101-restored.json'
+    state = json.loads(INDEX.read_bytes())
+    fe = live_stack()['fe']
+    vm.demand(not STRESS.exists() and not done.exists(), 'SENTINEL_ONE_CASE')
+    def hashes():
+        return {table:stress_original(fe,table,key,original) for table,key,original in STRESS_TABLES}
+    def order():
+        return sql(fe,'reader','SELECT org_id,site_id,entity_id FROM fixture.dmq_entity ORDER BY event_at,entity_id,org_id,site_id;').splitlines()
+    scope = 'org-demo\tsite-a\t'
+    if not restore:
+        vm.demand(not active.exists() and order()==[scope+'E1'],'SENTINEL_INITIAL_KEYS')
+        vm.demand(sql(fe,'reader','SELECT COUNT(*) FROM fixture.dmq_target;')=='3','SENTINEL_TARGET_BASELINE')
+        prefix = 'S'+secrets.token_hex(6)
+        keys = [prefix+f'{i:03}' for i in range(100)]
+        row = dict(taskId=vm.TASK,runId=vm.RUN,fe=fe,prefix=prefix,keys=keys,scope=['org-demo','site-a'],
+                   original=hashes(),resources=tier_capacity(state),status='INTENT')
+        record(active,row)
+        values = ','.join("('org-demo','site-a','"+key+"',1.00,7.20,'K','2026-11-01','2026-12-01','2026-11-18','2026-11-18')" for key in keys)
+        sql(fe,'root','INSERT INTO fixture.dmq_entity VALUES '+values+';')
+        actual = order()
+        vm.demand(actual==[scope+k for k in ['E1',*keys]] and hashes()==row['original'],'SENTINEL_101_KEYS')
+        row.update(expectedPrefix=['E1',*keys[:-1]],sentinel=keys[-1],entityRows=101,targetRows=3,status='SEEDED')
+        record(active,row)
+        return
+    row = json.loads(active.read_bytes())
+    keys = row['keys']
+    vm.demand(row['fe']==fe and row['taskId']==vm.TASK and row['runId']==vm.RUN and row['scope']==['org-demo','site-a']
+              and re.fullmatch('S[0-9a-f]{12}',row['prefix']) and keys==[row['prefix']+f'{i:03}' for i in range(100)],'SENTINEL_OWNER')
+    current = set(order())
+    vm.demand(scope+'E1' in current and current<={scope+key for key in ['E1',*keys]} and hashes()==row['original'],'SENTINEL_RESTORE_OWNER')
+    values = ','.join("'"+k+"'" for k in keys)
+    sql(fe,'root',"DELETE FROM fixture.dmq_entity WHERE org_id='org-demo' AND site_id='site-a' AND entity_id IN ("+values+");")
+    row['after'] = hashes()
+    vm.demand(order()==[scope+'E1'] and sql(fe,'reader','SELECT COUNT(*) FROM fixture.dmq_target;')=='3' and row['after']==row['original'],'SENTINEL_RESTORED')
+    row.update(status='RESTORED',entityRowsAfter=1,targetRowsAfter=3)
+    record(done,row)
+    active.unlink()
+
+
 def cancellation_case(prepared, admission=False):
     from workflow_doris_s0_fixture import STRESS,stress_fixture
     vm.demand(not STRESS.exists(),'S2_SEPARATE_STRESS_REQUIRED')
@@ -717,6 +761,7 @@ def runtime_race_test(case):
     frozen = json.loads(SNAPSHOT.read_bytes())
     active = runtime_binding()
     stage, method = {
+        'overlap': ('s2-doris-overlap', 'DorisSourceOverlapsVerifiedCancellation'),
         'aba': ('s2-doris-aba', 'DorisActivationRevisionRejectsInflightQuery'),
         'revoke': ('s2-doris-revoke-race', 'DorisRevocationRejectsInflightQuery'),
         'session': ('s2-doris-session-race', 'DorisExpiredSessionRejectsInflightQuery'),
@@ -790,7 +835,7 @@ def pg_golden(prepared):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('stage',choices=['prepare','render','start','configure','freeze','pg-golden','semantic-batch','s2-activation-shape','s2-graduated-cancel','s2-cancel-case','s2-admission-case','state-fixture','expire-disposable','session-test','revoke-test','aba-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test','ddl-fixture','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
+    parser.add_argument('stage',choices=['prepare','render','start','configure','freeze','pg-golden','semantic-batch','s2-activation-shape','s2-overlap-case','overlap-test','s2-graduated-cancel','s2-cancel-case','s2-admission-case','state-fixture','expire-disposable','session-test','revoke-test','aba-test','ddl-test','rotate-test','deadline-test','lock-test','disconnect-test','batch-test','ddl-fixture','fanout','permission','s2-boundary','s2-restore','mapping-grants','query-grants','s2-mapping-grants','s2-query-grants',*BROWSER])
     parser.add_argument('--prepared')
     parser.add_argument('--ddl-action',choices=['arm','rename','restore'])
     parser.add_argument('--query-identity',nargs=3,metavar=('QUERY','KEY','HASH'))
@@ -804,6 +849,23 @@ if __name__=='__main__':
             browser_test(args.stage, args.prepared)
         finally:
             if (OUT/'s2-fanout-active.json').exists(): fanout_fixture('restore')
+    elif args.stage=='s2-doris-sentinel':
+        vm.demand(not (OUT/'s2-sentinel-active.json').exists() and not (OUT/'s2-sentinel-101-restored.json').exists(),'SENTINEL_ONE_CASE')
+        browser_test('s2-doris-authority-control',args.prepared)
+        try:
+            sentinel_fixture()
+            browser_test(args.stage,args.prepared)
+        finally:
+            if (OUT/'s2-sentinel-active.json').exists(): sentinel_fixture(restore=True)
+    elif args.stage=='s2-overlap-case':
+        from workflow_doris_s0_fixture import STRESS, stress_fixture
+        vm.demand(not STRESS.exists(),'OVERLAP_FIXTURE_IN_USE')
+        browser_test('s2-doris-authority-control',args.prepared)
+        try:
+            stress_fixture(platform=True,entity_rows=4194304)
+            browser_test('s2-doris-overlap',args.prepared)
+        finally:
+            if STRESS.exists(): stress_fixture(restore=True,platform=True)
     elif args.stage=='expire-disposable': expire_disposable_query(*args.query_identity)
     elif args.stage=='state-fixture': scoped_state_fixture(args.state_operation)
     elif args.stage in ('s2-doris-states','s2-doris-cardinality'):
@@ -839,6 +901,7 @@ if __name__=='__main__':
             shape_case(method,args.prepared,activation=True)
             browser_test('s2-doris-shape-recover',args.prepared)
     elif args.stage=='s2-graduated-cancel': graduated_cancel(args.prepared)
+    elif args.stage=='overlap-test': runtime_race_test('overlap')
     elif args.stage=='semantic-batch': semantic_batch_regression(args.prepared)
     elif args.stage=='pg-golden': pg_golden(args.prepared)
     elif args.stage.endswith('-grants'): synthetic_grants(args.stage.split('-')[-2],args.stage.startswith('s2-'))

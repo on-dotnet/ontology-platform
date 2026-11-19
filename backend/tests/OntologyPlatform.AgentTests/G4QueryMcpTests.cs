@@ -85,6 +85,10 @@ public sealed partial class G4QueryMafRuntimeTests
     [TestMethod]
     public Task CancelRequiresSingleVerifiedReleaseBatch() => RunDorisRaceAsync("batch");
 
+    /// <summary>只调度一次真实查询的首个源分支，供另一正式 HTTP 请求在 BE 活动时提交取消。</summary>
+    [TestMethod]
+    public Task DorisSourceOverlapsVerifiedCancellation() => RunDorisRaceAsync("overlap");
+
     /// <summary>使用正式宿主和服务器票据，仅在受控的竞争阶段切换授权或版本。</summary>
     private static async Task RunDorisRaceAsync(string scenario)
     {
@@ -132,6 +136,13 @@ public sealed partial class G4QueryMafRuntimeTests
         var original = await db.Queries.AsNoTracking().SingleAsync(q => q.Id == queryId);
         Assert.AreEqual("COMPLETED", original.ExecutionStatus);
         Assert.AreEqual(participants["Q"].Actor.SubjectId, original.SubjectId);
+        if (scenario == "overlap")
+        {
+            // 原记录仅提供当前 Q 已执行的固定查询模板，新请求始终使用刚核验的当前会话。
+            await RunOverlappingSourceAsync(scope.ServiceProvider, participants["Q"].Actor, participants["Q"].Session,
+                original, envelope.RootElement.GetProperty("key").GetGuid());
+            return;
+        }
         Assert.IsTrue(participants["Q"].Session == original.SessionReference, "DORIS_QUERY_SESSION_MISMATCH");
         if (scenario == "aba")
             await MappingAbaAfterRealReadAsync(scope.ServiceProvider, participants["Q"].Actor, original, db, proposalId!,
@@ -146,6 +157,84 @@ public sealed partial class G4QueryMafRuntimeTests
             await VerifyDorisPostcheckFailureAsync(scope.ServiceProvider, participants["Q"].Actor, original, db, scenario == "disconnect");
         else
             await DenyDorisCommitAfterReadAsync(scope.ServiceProvider, participants["Q"].Actor, original, db, scenario == "session");
+    }
+
+    /// <summary>等待独立观察者确认取消事务已到达准确行锁，然后调用原源读取器。</summary>
+    private static async Task RunOverlappingSourceAsync(IServiceProvider services, ActorContext actor, string session,
+        G4QueryRecord original, Guid key)
+    {
+        // 原发布绑定及五秒请求体来自先前持久化的正式请求。
+        using var document = JsonDocument.Parse(original.RequestBytes);
+        // 压力试验使用已批准的全表有序实体投影，不使用任何人工 SQL 延迟。
+        var previous = document.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
+        Assert.AreEqual("g4_resolve_entity", previous.CapabilityId);
+        Assert.AreEqual(5000, previous.TimeoutMs);
+        // 只清除外部身份过滤，沿用登记的组织及站点。
+        var query = previous with { Filters = new G4QueryFilters { SiteId = "site-a" }, RelationshipIris = [] };
+        // 准确键对应只含时序事实的临时许可文件。
+        var directory = Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01");
+        // 保存同一分支的真实单调时钟，包含等待同步点的时间。
+        var branch = new Stopwatch();
+        // 驱动输出握手、准确计划和清理事件，独立旁路用真实 FE 连接号对账。
+        using var trace = new Activity("dmq.verified.overlap").Start();
+        // 源返回时保存耗时，上层观察器释放和网关返回以更保守的全段上界验证。
+        var readMs = 0d;
+        // 唯一允许改变的部分是执行调度，权鉴、租约观察、命令和取消均委托正式实现。
+        var source = new ScheduledSource(services.GetRequiredService<IG4SourceQueryReader>(), async token =>
+        {
+            branch.Start();
+            // 此文件只能由已确认正式取消事务确在等待该行锁的独立观察者产生。
+            var permit = Path.Combine(directory, "overlap-permit-" + key + ".json");
+            while (!File.Exists(permit) && branch.ElapsedMilliseconds < 550) await Task.Delay(1, token);
+            Assert.IsTrue(File.Exists(permit), "CANCEL_TRANSACTION_DID_NOT_REACH_ROW");
+        }, () => readMs = branch.Elapsed.TotalMilliseconds);
+        // 独立执行实例与 HTTP 宿主各用正式平台服务及同一数据库。
+        var execution = ActivatorUtilities.CreateInstance<G4QueryExecution>(services, source, TimeProvider.System);
+        // 仍由正式语义网关重新核权限及发布绑定。
+        var gateway = ActivatorUtilities.CreateInstance<SemanticGateway>(services, execution);
+        // 度量从完整执行请求开始至错误返回的实际耗时。
+        var elapsed = Stopwatch.StartNew();
+        try
+        {
+            await gateway.ExecuteG4Async(actor, session, query, key.ToString(), null, CancellationToken.None);
+            Assert.Fail("CANCELLED_SOURCE_RETURNED_SUCCESS");
+        }
+        catch (SemanticOperationException error)
+        {
+            // 仅输出绑定、稳定错误和耗时，供跨进程见证核对。
+            var events = trace.Events.Where(e => e.Name.StartsWith("doris.", StringComparison.Ordinal))
+                .Select(e => new { e.Name, e.Timestamp, tags = e.Tags.Where(t => t.Key is "thread" or "source.thread" or "auxiliary.thread" or "template.sha256").ToDictionary(t => t.Key, t => t.Value) }).ToArray();
+            // 原错误按稳定码记录，平台持久状态、同一 BE 取消及清理预算由独立旁路分别判定。
+            var result = new { key, error.Status, error.Code, readMs, branchMs = branch.Elapsed.TotalMilliseconds, elapsedMs = elapsed.Elapsed.TotalMilliseconds, events };
+            await File.WriteAllTextAsync(Path.Combine(directory, "overlap-execute-" + key + ".json"), JsonSerializer.Serialize(result, G4QueryJson.Options));
+            Assert.IsTrue((error.Status, error.Code) is (409, "query_execution_stale") or (503, "query_timeout"));
+            Assert.IsTrue(events.Any(e => e.Name == "doris.plan.submitted") && events.Any(e => e.Name == "doris.kill.acknowledged")
+                && events.Any(e => e.Name == "doris.driver.ended"));
+            Assert.IsTrue(branch.Elapsed.TotalMilliseconds is > 0 and <= 1000 && result.elapsedMs <= 5000);
+        }
+    }
+
+    /// <summary>在分支的真实期限内调度读取开始，并记录真实读取释放时刻。</summary>
+    private sealed class ScheduledSource(IG4SourceQueryReader actual, Func<CancellationToken, Task> wait, Action finished) : IG4SourceQueryReader
+    {
+        /// <summary>沿用真实字段投影。</summary>
+        public G4QueryProjection DescribeProjection(G4QueryBindingContext context, string entityBindingId) => actual.DescribeProjection(context, entityBindingId);
+
+        /// <summary>沿用真实当前字段访问检查。</summary>
+        public Task<G4QueryConnectionAccess> VerifyAccessAsync(G4QueryBindingContext context, MappingAuthorizationProof proof, string entityBindingId,
+            DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken) => actual.VerifyAccessAsync(context, proof, entityBindingId, deadlineAtUtc, cancellationToken);
+
+        /// <summary>调度等待与原源访问共用同一绝对截止及平台产生的令牌。</summary>
+        public async Task<G4SourceQueryRead> ReadAsync(G4QueryBindingContext context, MappingAuthorizationProof proof, string entityBindingId,
+            G4SemanticQuery query, DateTimeOffset deadlineAtUtc, CancellationToken cancellationToken, G4QueryBranchFilter? branch = null)
+        {
+            try
+            {
+                await wait(cancellationToken);
+                return await actual.ReadAsync(context, proof, entityBindingId, query, deadlineAtUtc, cancellationToken, branch);
+            }
+            finally { finished(); }
+        }
     }
 
     /// <summary>在真实 PG、RustFS 与 Fuseki 的只读结果上注入单项故障，各次取消须单独重新核验。</summary>

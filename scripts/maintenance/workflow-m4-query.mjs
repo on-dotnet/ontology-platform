@@ -33,7 +33,7 @@ const stateName = twoTable ? "doris-two-table.json" : integration ? `scenario-${
 const port = value => doris ? ({15441:15641,15442:15642,15443:15643,15444:15644,15445:19030,15446:15645,15447:15646,15448:15647})[value] : integration ? value + 100 : value;
 if (argument("task") !== task || argument("run-id") !== runId || await realpath(process.cwd()) !== root) throw new Error("QUERY_CONSUMER_BOUNDARY");
 const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/package.json"));
-if (doris && !["provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
+if (doris && !["s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
 if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
@@ -47,7 +47,7 @@ if (mode === "serve") {
   await writeFile(resolve(root, "artifacts/workflow", task, runId, "web-process-" + process.pid + ".json"), JSON.stringify(record, null, 2) + "\n", { flag: "wx" });
   await require("next/dist/server/lib/start-server").startServer({ dir: resolve(root, "apps/web"), hostname: "127.0.0.1", port: port(15442),
     isDev: false, allowRetry: false, keepAliveTimeout: 5000 });
-} else if (["s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding","s2-doris-cardinality","s2-doris-identity","s2-doris-states","s2-doris-cancel-window","s2-doris-admission-cancel","s2-doris-aba","s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
+} else if (["s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding","s2-doris-cardinality","s2-doris-identity","s2-doris-states","s2-doris-cancel-window","s2-doris-admission-cancel","s2-doris-aba","s2-doris-requalify","s2-doris-fanout","s2-doris-access","s2-doris-cancel","s2-doris-mapping","s2-doris-queries","s2-doris-null","s1-current-catalog", "s1-key-negative", "ready", "ready-session-expired", "ready-session-short", "provision", "mapping", "s1", "s1-reopen", "ui-s1", "s2-basic", "s2-runtime", "s2-race", "s2-aba", "s2-aba-prepare", "s2-capacity", "s2-connection", "s2-inflight", "s3-provision", "s3", "ui-s3", "replace-disabled-connection", "numeric-provision", "numeric", "standard-provision"].includes(mode)) await browserRun(mode);
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
@@ -386,6 +386,37 @@ async function browserRun(mode) {
       const recovered=await request(reader,"GET","/api/v1/data/semantic-queries/"+original.queryId+"/result");
       check("restored_original",recovered.raw===original.raw);
       report.status="PASS";report.scope=raceScope;
+    } else if (mode === "s2-doris-authority-control") {
+      phase="fresh_current_authority_before_fixture";
+      const cap=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");
+      const query={...state.latestQuery.query,capabilityId:cap.id,capabilityVersion:cap.version,relationshipIris:[],
+        depth:1,maxRows:100,timeoutMs:5000,filters:{siteId:"site-a",entityExternalId:"E1"}};
+      const resp=await request({...reader,headers:{...reader.headers,"Idempotency-Key":randomUUID()}},"POST","/api/v1/data/semantic-queries",query);
+      check("current_execute_and_source",resp.data.status==="FOUND" && resp.data.data[0]?.identity.externalId==="E1" && Boolean(resp.data.subSources[0]?.sourceReadReceiptId));
+      const restored=await request(reader,"GET","/api/v1/data/semantic-queries/"+resp.queryId+"/result");
+      check("current_result_read",restored.raw===resp.raw);
+      const detail=await request(reader,"GET","/api/v1/data/source-evidence/"+encodeURIComponent(resp.data.evidence[0].evidenceId));
+      check("current_evidence_read",detail.status===200);
+      report.queryId=resp.queryId; report.scope="CURRENT_Q_PRECONDITION"; report.status="PASS";
+    } else if (mode === "s2-doris-sentinel") {
+      phase="independent_101_entity_rows";
+      const fixture=JSON.parse(await readFile(resolve(output,"s2-sentinel-active.json"),"utf8"));
+      const cap=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");
+      const query={...state.latestQuery.query,capabilityId:cap.id,capabilityVersion:cap.version,relationshipIris:[],
+        depth:1,maxRows:100,timeoutMs:5000,filters:{siteId:"site-a"}};
+      const key=randomUUID();
+      const response=await request({...reader,headers:{...reader.headers,"Idempotency-Key":key}},"POST","/api/v1/data/semantic-queries",query);
+      const result=response.data;
+      const candidates=result.candidates.map(c=>c.externalId);
+      report.sentinel={key,queryId:response.queryId,query,snapshot:result.snapshot,status:result.status,limited:result.limited,
+        candidates,dataCount:result.data.length,evidenceCount:result.evidence.length,source:result.subSources,excluded:fixture.sentinel};
+      check("101_source_rows",fixture.status==="SEEDED" && fixture.entityRows===101 && fixture.targetRows===3);
+      check("trusted_100_candidates",result.status==="AMBIGUOUS" && result.limited && result.data.length===0 &&
+        JSON.stringify([...candidates].sort())===JSON.stringify([...fixture.expectedPrefix].sort()) && !candidates.includes(fixture.sentinel));
+      const evidence=new Map(result.evidence.map(e=>[e.evidenceId,e]));
+      check("single_limited_receipt",result.subSources.length===1 && result.subSources[0].limited && Boolean(result.subSources[0].sourceReadReceiptId) &&
+        result.candidates.every(c=>c.evidenceIds.length>0 && c.evidenceIds.every(id=>evidence.get(id)?.sourceReadReceiptId===result.subSources[0].sourceReadReceiptId)));
+      report.scope="DORIS_QUERY_SENTINEL_101"; report.status="PASS";
     } else if (mode === "s2-doris-expiry") {
       phase = "expire_disposable_completed_query";
       const cap=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");
@@ -406,6 +437,76 @@ async function browserRun(mode) {
       check("expired_reads_do_not_execute",before.auditInode===after.auditInode && before.queryIdsSha256===after.queryIdsSha256);
       report.expiry={...report.expiry,before,after};
       report.status="PASS";report.scope="DORIS_DISPOSABLE_QUERY_TTL";
+    } else if (mode === "s2-doris-overlap") {
+      phase="formal_cancel_after_verified_row_wait";
+      const {spawn}=await import("node:child_process");
+      const {createInterface}=await import("node:readline");
+      const {readdir}=await import("node:fs/promises");
+      const controls=(await readdir(output)).filter(name=>/^browser-s2-doris-authority-control-\d+\.json$/.test(name)).sort();
+      const control=JSON.parse(await readFile(resolve(output,controls.at(-1)),"utf8"));
+      check("normal_current_authority_before_pressure",control.scope==="CURRENT_Q_PRECONDITION" && control.status==="PASS");
+      const warmed=await request(reader,"POST","/api/v1/data/semantic-queries/"+control.queryId+"/cancel",undefined,409);
+      check("formal_route_ready",warmed.data.code==="query_already_finished");
+      const key=randomUUID();
+      const watcher=spawn("python3",["-B","scripts/maintenance/doris_query_cancel_witness.py",key,"--overlap"],{cwd:root,stdio:["ignore","pipe","ignore"]});
+      const lines=createInterface({input:watcher.stdout})[Symbol.asyncIterator]();
+      const exit=new Promise(resolve=>watcher.once("close",(code,signal)=>resolve({code,signal})));
+      const bounded=async(promise,ms)=>{
+        let timer;
+        try { return await Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error("overlap_control_deadline")),ms);})]); }
+        finally { clearTimeout(timer); }
+      };
+      const next=async()=>{const item=await bounded(lines.next(),20000);check("overlap_witness_"+report.checks.length,!item.done);return JSON.parse(item.value);};
+      const closeChild=async(child,done,ms)=>{
+        try { return await bounded(done,ms); }
+        catch (error) {
+          if (child.exitCode!==null || child.signalCode!==null) throw error;
+          child.kill("SIGTERM");
+          return await bounded(done,5000);
+        }
+      };
+      let executing,worker,workerExit;
+      try {
+        check("independent_observer_armed",(await next()).event==="ready");
+        const proc=spawn("python3",["-B","scripts/maintenance/workflow_doris_s1.py","overlap-test"],{cwd:root,stdio:["pipe","pipe","ignore"]});
+        worker=proc;
+        workerExit=new Promise(resolve=>proc.once("close",(code,signal)=>resolve({code,signal})));
+        let outputText="";
+        proc.stdout.on("data",data=>{outputText+=data;});
+        executing=workerExit.then(({code:exit})=>({exit,mtp:exit===0?JSON.parse(outputText):null}));
+        proc.stdin.end(JSON.stringify({key,queryId:control.queryId,roles:[[operator,"A"],[auditor,"B"],[activator,"C"],[reader,"Q"]].map(([a,role])=>({role,subjectId:a.me.subjectId,cookie:a.sessionCookie}))}));
+        const admitted=await next();
+        check("exact_query_row_locked",admitted.event==="admitted");
+        const cancelled=await request(reader,"POST","/api/v1/data/semantic-queries/"+admitted.queryId+"/cancel",undefined,[200,409,503]);
+        const final=await next();
+        const execution=await bounded(executing,35000);
+        report.cancel={key,queryId:admitted.queryId,httpStatus:cancelled.status,execution,witness:final};
+        check("same_be_cancelled_after_committed_state",cancelled.status===200 && final.queryId===admitted.queryId && final.terminal==="CANCELLED" &&
+          final.activeBeforeUnlock && final.cancelVisibleBeforeBeKilled && final.cleanupUpperMs>=0 && final.cleanupUpperMs<=250 && final.dualZeroUpperMs<=250 && final.sourceCounts==="0\t0");
+        check("cancel_only_audit_and_zero_results",final.persisted.bytes===0 && final.persisted.resultHash===null && final.persisted.resultSize===0 &&
+          final.persisted.readReceipts===0 && final.persisted.cancelRequested && final.successfulAuditCount===0 && final.cancelAuditCount===1);
+        check("executing_gateway_rejected_in_budget",execution.exit===0 && execution.mtp.passed===1);
+        const driver=JSON.parse(await readFile(resolve(output,"overlap-execute-"+key+".json"),"utf8"));
+        const submitted=driver.events.find(e=>e.name==="doris.plan.submitted");
+        const handshake=driver.events.find(e=>e.name==="doris.cancel.ready");
+        check("driver_and_fe_same_physical_connection",submitted?.tags.thread===final.sourceThread &&
+          handshake?.tags["source.thread"]===final.sourceThread && handshake.tags["auxiliary.thread"]!==final.sourceThread);
+        report.cancel.driver=driver;
+        report.scope="DORIS_FORMAL_CANCEL_VERIFIED_OVERLAP";report.status="PASS";
+      } finally {
+        try {
+          if (worker) report.workerExit=await closeChild(worker,workerExit,35000);
+        } finally {
+          try { report.witnessExit=await closeChild(watcher,exit,4000); }
+          finally {
+            watcher.stdout.destroy();
+            const permit="overlap-permit-"+key+".json";
+            const present=(await readdir(output)).includes(permit);
+            check("owned_permit_released",!present);
+          }
+        }
+        check("independent_observer_exited",report.witnessExit.code===0);
+      }
     } else if (mode === "s2-doris-cancel-profile") {
       phase = "profile_cancel_on_completed_query";
       const cap=(await get(reader,"/api/v1/capabilities")).find(c=>c.id==="g4_resolve_entity");

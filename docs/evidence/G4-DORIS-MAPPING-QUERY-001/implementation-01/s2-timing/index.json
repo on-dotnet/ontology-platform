@@ -1,0 +1,90 @@
+{
+  "taskId": "G4-DORIS-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "sentinel": "NOT_VERIFIED",
+  "case": "ONE_FORMAL_QUERY_DENIED_BEFORE_SOURCE",
+  "queryId": "query-48fd26ca6f92465899394df114ff3aa1",
+  "originals": [
+    {
+      "file": "browser-s2-doris-sentinel-1795057318868.json",
+      "bytes": 6792,
+      "sha256": "f9535b92aeefd41c961f285f0493056ed6550bd4f1d22146670ad128a1e3048a"
+    },
+    {
+      "file": "s2-sentinel-101-restored.json",
+      "bytes": 5942,
+      "sha256": "3eeb5421adedbbc74fab00bbfcc96c2ef3013ee73588d319f9aa51215ae84f91"
+    },
+    {
+      "file": "s1-host-s2-doris-sentinel-cafa7941bfd54e9b91824608d3fd8228.json",
+      "bytes": 487,
+      "sha256": "9ec062bceac6723f2cc3d43295b0112446d50a4a8015c3224bbd32506ec4069f"
+    },
+    {
+      "file": "sentinel-authority-e9ad9a07ce2943618adb2043fc01fe70.json",
+      "bytes": 921,
+      "sha256": "cfb0adfb8dccf0d6cbea802d11d09736261444f22cb9b3f50bc360b85a331e03"
+    },
+    {
+      "file": "overlap-resume-f5c431520a7f406ab33561658a2d9ce0.json",
+      "bytes": 1750,
+      "sha256": "09056e33b0bf1f6a34b60c5b2f01b5beedf0b13a32392e3ef1936977fc53d690"
+    },
+    {
+      "file": "s0-source-stop-3833f9b4d4a6.json",
+      "bytes": 1501,
+      "sha256": "285ccfc669ce68a73328d29ff2f64d121cfc7392926600513cb44af502097e1e"
+    },
+    {
+      "file": "continued-platform-keep-93b3d8e695f74a4cae4e79e943645d22.json",
+      "bytes": 1146,
+      "sha256": "3e66802c3264b1ec189ded76ddd4e6ceec4533300b309bfefee12cf6bb361fdc"
+    }
+  ],
+  "restoration": "EXACT_KEYS_AND_ORIGINAL_HASHES_MATCH",
+  "nonAuthorReview": "GO_RESTORATION_ONLY",
+  "AC06": "NOT_RUN_NEW_TIMING",
+  "S3": "NOT_RUN",
+  "productPackage": "NOT_RUN",
+  "retention": "OLD_14_AND_TASK_FE_BE_PG_STOPPED_KEEP_THREE_VOLATILE_OWNERS_RUNNING",
+  "buildBindings": [
+    {
+      "target": "agent",
+      "inputKey": "2a2d93ca401edbcf80ad12dfbb96d1e8c19bec6ca8fc1e5ba9dd3408e5f87369",
+      "status": "PASS",
+      "exitCode": 0,
+      "bindingSha256": "20733e458e67612e504cbd2243edf240c69c364217bd1719f5f71538523ead9c",
+      "logSha256": "a4f62cdd663e874fcbbc5e7ec2b8f3c9d47396e96b2f34bd00b236d0ea2c672c"
+    },
+    {
+      "target": "api",
+      "inputKey": "2a2d93ca401edbcf80ad12dfbb96d1e8c19bec6ca8fc1e5ba9dd3408e5f87369",
+      "status": "PASS",
+      "exitCode": 0,
+      "bindingSha256": "342ab62dda34d8d7fa250f116342c80338671ce1431043a28794d558f37cb0fa",
+      "logSha256": "cfd9911ab0616b31fd2c34d62783be3fd028ccb3b2d6c7f01d1c229f80ec8bc9"
+    },
+    {
+      "target": "connections",
+      "inputKey": "2a2d93ca401edbcf80ad12dfbb96d1e8c19bec6ca8fc1e5ba9dd3408e5f87369",
+      "status": "PASS",
+      "exitCode": 0,
+      "bindingSha256": "073ebb63be01ce3711aeb98f25fb5368b89746d63a5e37cdd977f2a4291cc9f8",
+      "logSha256": "28ded0209a17e297583a82c7deb2544211d93c34e002a88c642b26adad2cf69b"
+    }
+  ],
+  "timingReview": {
+    "decision": "STATIC_GO_FOR_ONE_BOUNDED_TRIAL_AFTER_CURRENT_AUTHORITY",
+    "formalTrial": "NOT_RUN",
+    "prerequisites": [
+      "Normal synthetic E1 execute, replay, evidence and exact current grants.",
+      "Original fixed plan, VM budget, idle state and original hashes."
+    ],
+    "reviewed": [
+      "Single blocked cancel transaction, exact query row, current authority and actual release verification.",
+      "FE physical thread and query ID bound to driver handshake and BE registration.",
+      "Committed PG state and BE user-cancel/end chronology, both zero counts, original timing bounds.",
+      "Separate worker/witness bounded exit and exact permit cleanup."
+    ]
+  }
+}

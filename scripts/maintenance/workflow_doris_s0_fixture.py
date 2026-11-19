@@ -52,7 +52,7 @@ def sync_directory(path):
 
 def record(path, state):
     pending = path.with_suffix('.pending')
-    durable = path == STRESS or path.name.startswith('s0-stress-fixture-')
+    durable = path == STRESS or path.name.startswith(('s0-stress-fixture-', 's2-sentinel-'))
     with pending.open('w') as out:
         out.write(json.dumps(state,indent=2)+'\n')
         if durable:
