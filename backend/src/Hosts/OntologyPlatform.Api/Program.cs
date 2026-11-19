@@ -11,6 +11,12 @@ public static class Program
     /// <returns>服务停止后完成的任务。</returns>
     public static async Task Main(string[] args)
     {
+        if (args.Length > 0 && args[0] == "--recover-omq-s0")
+        {
+            if (args.Length != 1) throw new ArgumentException("维护模式不接受额外参数。");
+            await OracleS0Maintenance.RunAsync();
+            return;
+        }
         if (args is ["--export-g4-openapi", var outputPath])
         {
             await G4ContractExport.WriteAsync(outputPath);

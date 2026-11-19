@@ -245,7 +245,9 @@ public sealed class G4QueryExecution
             executes.Add(execute);
             reads.Add(await CaptureAsync(session, state.Binding.ConnectionId, projection, "data.query.result.read", token));
             if (evidenceRead) evidences.Add(await CaptureAsync(session, state.Binding.ConnectionId, projection, "data.query.evidence.read", token));
-            access.Add(await source.VerifyAccessAsync(context, execute, entity.Id, deadline, token));
+            access.Add(context.Manifest.Binding.SourceType == "ORACLE"
+                ? await WithOracleSourceGateAsync(context.Binding.ConnectionId, token, () => source.VerifyAccessAsync(context, execute, entity.Id, deadline, token))
+                : await source.VerifyAccessAsync(context, execute, entity.Id, deadline, token));
         }
         return await store.ReadAuthorizedAsync(queryId, session, executes.ToArray(), reads.ToArray(), evidences.ToArray(), access.ToArray(), includeResult, evidenceRead, token);
     }
@@ -648,7 +650,8 @@ public sealed class G4QueryExecution
             if ((context.Manifest.Binding.AdapterVersion, context.Manifest.Binding.ExecutorVersion)
                 != ("oracle-mapping-v1", "oracle-mapping-validator-v1")) throw Invalid();
             var result = await ReadOracleAsync(lease, oracle, deadline, token,
-                cancellation => source.ReadAsync(context, proof, entityId, query, deadline, cancellation, branch));
+                cancellation => WithOracleSourceGateAsync(context.Binding.ConnectionId, cancellation,
+                    () => source.ReadAsync(context, proof, entityId, query, deadline, cancellation, branch)));
             if (result.AdapterVersion != "oracle-query-v1" || result.WatermarkKind != "UNKNOWN" || result.Watermark is not null)
                 throw Invalid();
             return result;
@@ -660,6 +663,10 @@ public sealed class G4QueryExecution
             cancellation => source.ReadAsync(context, proof, entityId, query, deadline, cancellation, branch),
             cancellation => store.LeaseIsCurrentAsync(lease, cancellation));
     }
+
+    /// <summary>业务读取和历史来源 ACL 复用同一连接的源打开锁；不改变权限证明或其他源。</summary>
+    private async Task<T> WithOracleSourceGateAsync<T>(string connectionId, CancellationToken token, Func<Task<T>> access) =>
+        await G4OracleSourceOpen.RunAsync(await store.EnterOracleSourceAsync(connectionId, token), access);
 
     /// <summary>工作、指定执行取消、物理释放与观察器退出均使用同一分支的单调时基。</summary>
     private async Task<G4SourceQueryRead> ReadOracleAsync(G4QueryRecord lease, OracleExecution oracle, DateTimeOffset deadline,

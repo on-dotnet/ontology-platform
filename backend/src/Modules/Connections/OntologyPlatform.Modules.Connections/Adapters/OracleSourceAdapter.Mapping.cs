@@ -49,12 +49,14 @@ public sealed partial class OracleSourceAdapter
     /// <returns>完成实际 TCPS、当前权限及对象核验的非池化连接。</returns>
     internal async Task<OracleConnection> OpenMappingAsync(string secret, Guid executionId, CancellationToken token)
     {
+        await G4OracleSourceOpen.BeforePhysicalOpenAsync(token);
         await VerifyTlsAsync(token);
         // 连接配置沿用固定端点、可信钱包及零重试。
         var connection = Create(secret);
         try
         {
             await connection.OpenAsync(token);
+            await G4OracleSourceOpen.AfterPhysicalOpenAsync();
             connection.ModuleName = "G4-ORACLE-MAPPING-QUERY-001";
             connection.ClientId = executionId.ToString("N");
             await VerifyMappingAccessAsync(connection, token);

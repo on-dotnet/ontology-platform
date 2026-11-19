@@ -133,13 +133,7 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         // 容量计数在跨实例事务锁内执行，过期执行仍占位直到被worker明确终结。
         var running = database.Queries.Where(row => row.ExecutionStatus == "RUNNING"
             || row.LeaseOwner != null && row.LeaseOwner.StartsWith(OracleOwnerPrefix));
-        // 同连接存在未知物理槽位时全部封闭，逾期 RUNNING 也无需等待后台扫描。
-        var admissionTime = clock.GetUtcNow();
-        if (await running.AnyAsync(row => row.ConnectionId == state.Binding.ConnectionId
-            && row.LeaseOwner != null && row.LeaseOwner.StartsWith(OracleOwnerPrefix)
-            && (row.ExecutionStatus != "RUNNING" || row.CancelRequested || row.LeaseUntilUtc == null
-                || row.LeaseUntilUtc <= admissionTime || row.DeadlineAtUtc <= admissionTime), token))
-            throw new SemanticOperationException(429, "query_capacity_exhausted");
+        await DemandOracleSourceAvailableAsync(database, state.Binding.ConnectionId, token);
         if (await running.CountAsync(token) >= 4
             || await running.CountAsync(row => row.ConnectionId == state.Binding.ConnectionId, token) >= 2
             || await running.AnyAsync(row => row.OrganizationId == session.Actor.OrganizationId && row.SubjectId == session.Actor.SubjectId, token))
@@ -640,12 +634,53 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         && completed.Projections.All(projection => admitted.RequiredProjections.Concat(admitted.Projections).Any(required =>
             required.ObjectRefs.SequenceEqual(projection.ObjectRefs) && required.FieldRefs.SequenceEqual(projection.FieldRefs)));
 
+    /// <summary>在真实源打开前取得跨实例共享容量锁。调用方将数据库上下文交到物理打开点释放。</summary>
+    internal async Task<G4OracleSourceOpen.IPermit> EnterOracleSourceAsync(string connectionId, CancellationToken token)
+    {
+        // 上下文拥有独立事务；DisposeAsync 会结束只读事务并归还连接。
+        var database = await factory.CreateDbContextAsync(token);
+        try
+        {
+            await database.Database.BeginTransactionAsync(token);
+            await database.Database.ExecuteSqlRawAsync("SET TRANSACTION READ ONLY", token);
+            await database.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock_shared(73442001)", token);
+            await DemandOracleSourceAvailableAsync(database, connectionId, token);
+            return new OracleSourcePermit(this, database, connectionId);
+        }
+        catch
+        {
+            await database.DisposeAsync();
+            throw;
+        }
+    }
+
+    /// <summary>把同一平台数据库事务保持到 Oracle 握手完成，避免之前的授权工作耗尽租约后仍打开源。</summary>
+    private sealed class OracleSourcePermit(G4QueryResultStore store, G4QueryDbContext database, string connectionId) : G4OracleSourceOpen.IPermit
+    {
+        /// <summary>源访问真正开始前再次在锁内观察实际租约和截止。</summary>
+        public Task CheckAsync(CancellationToken token) => store.DemandOracleSourceAvailableAsync(database, connectionId, token);
+
+        /// <summary>关闭平台上下文及其中的只读事务，不持锁等待业务游标。</summary>
+        public ValueTask DisposeAsync() => database.DisposeAsync();
+    }
+
+    /// <summary>新执行和历史源权限检查都在容量锁内拒绝同一连接的未确认物理占位。</summary>
+    private async Task DemandOracleSourceAvailableAsync(G4QueryDbContext database, string connectionId, CancellationToken token)
+    {
+        // 在锁已经取得后读取本次 UTC，计入等待容量锁的时间。
+        var now = clock.GetUtcNow();
+        if (await database.Queries.AnyAsync(row => row.ConnectionId == connectionId && row.LeaseOwner != null
+            && row.LeaseOwner.StartsWith(OracleOwnerPrefix) && (row.ExecutionStatus != "RUNNING" || row.CancelRequested
+                || row.LeaseUntilUtc == null || row.LeaseUntilUtc <= now || row.DeadlineAtUtc <= now), token))
+            throw new SemanticOperationException(429, "query_capacity_exhausted");
+    }
+
     /// <summary>全任务短事务容量锁，跨API进程共享，禁止使用内存信号量代替。</summary>
-    private static Task LockCapacityAsync(G4QueryDbContext database, CancellationToken token) =>
+    internal static Task LockCapacityAsync(G4QueryDbContext database, CancellationToken token) =>
         database.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(73442001)", token);
 
     /// <summary>以参数化准确ID取得行锁，不能按客户端SQL片段定位。</summary>
-    private static async Task<G4QueryRecord> LockedAsync(G4QueryDbContext database, string id, CancellationToken token) =>
+    internal static async Task<G4QueryRecord> LockedAsync(G4QueryDbContext database, string id, CancellationToken token) =>
         await database.Queries.FromSqlInterpolated($"SELECT * FROM semantic_query.\"Queries\" WHERE \"Id\" = {id} FOR UPDATE")
             .SingleOrDefaultAsync(token) ?? throw new SemanticOperationException(404, "query_not_found");
 
