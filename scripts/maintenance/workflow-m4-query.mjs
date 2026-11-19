@@ -68,7 +68,7 @@ async function browserRun(mode) {
   // 先绑定准确 Oracle 任务宿主，随后才可打开本次合成 OIDC 材料。
   const initialOracle = oracle ? binding() : null;
   if (oracle) omq.checkBinding(initialOracle);
-  const realm = JSON.parse(await readFile(resolve(privateRoot, "runtime/realm.json"), "utf8"));
+  const realm = JSON.parse(await readFile(resolve(privateRoot, oracle ? "platform/realm.json" : "runtime/realm.json"), "utf8"));
   if (!realm.authority.startsWith(`http://localhost:${port(15443)}/realms/g2-`)) throw new Error("QUERY_REALM_BOUNDARY");
   const origin = `http://localhost:${port(15441)}`;
   const file = resolve(output, "browser-" + mode + "-" + Date.now() + ".json");

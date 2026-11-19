@@ -76,8 +76,30 @@ internal static class OracleQueryReader
                         using (var command = OracleSourceAdapter.CreateMappingCommand(connection, tx, table.Schema == "CaseOwner"))
                         {
                             // Cancel 只指向这条尚存命令；注册先释放并等待回调，随后才可发出其它 SQL。
-                            using var cancel = work.Token.Register(() => { try { command.Cancel(); } catch (Exception error) when (error is OracleException or InvalidOperationException) { } });
-                            raw = await OracleSourceAdapter.ConsumeMappingAsync(command, work.Token);
+                            using var cancel = work.Token.Register(() =>
+                            {
+                                adapter.QueryEvent("CANCEL_ENTER", lifetime);
+                                try
+                                {
+                                    command.Cancel();
+                                    adapter.QueryEvent("CANCEL_RETURN", lifetime);
+                                }
+                                catch (Exception error) when (error is OracleException or InvalidOperationException)
+                                {
+                                    adapter.QueryEvent("CANCEL_REJECT", lifetime);
+                                }
+                            });
+                            try
+                            {
+                                adapter.QueryEvent("EXECUTE", lifetime);
+                                raw = await OracleSourceAdapter.ConsumeMappingAsync(command, work.Token, () => adapter.QueryEvent("EOF", lifetime));
+                            }
+                            catch (Exception error) when (error is OracleException { Number: 1013 }
+                                or OperationCanceledException { InnerException: OracleException { Number: 1013 } })
+                            {
+                                adapter.QueryEvent("NATIVE_1013", lifetime);
+                                throw;
+                            }
                         }
                         await tx.CommitAsync(work.Token);
                     }
@@ -109,7 +131,7 @@ internal static class OracleQueryReader
             }
             finally
             {
-                try { await connection.DisposeAsync(); }
+                try { await connection.DisposeAsync(); adapter.QueryEvent("PHYSICAL_RELEASE", lifetime); }
                 catch { confirmed = false; throw; }
             }
         }

@@ -1,4 +1,6 @@
 using System.Data;
+using Microsoft.Extensions.Logging;
+using OntologyPlatform.Contracts;
 using Oracle.ManagedDataAccess.Client;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("OntologyPlatform.ConnectionsTests")]
@@ -8,6 +10,15 @@ namespace OntologyPlatform.Modules.Connections;
 /// <summary>Oracle 业务切片使用新物理连接、显式只读事务和固定的有界投影。</summary>
 public sealed partial class OracleSourceAdapter
 {
+    /// <summary>仅记录当前正式源调用的已知事件及身份，避免记录查询正文、行或异常原文。</summary>
+    internal void QueryEvent(string action, G4OracleSourceLifetime lifetime)
+    {
+        if (action is not ("EXECUTE" or "CANCEL_ENTER" or "CANCEL_RETURN" or "CANCEL_REJECT" or "NATIVE_1013" or "EOF" or "PHYSICAL_RELEASE"))
+            throw new ArgumentOutOfRangeException(nameof(action));
+        logger?.LogInformation("OracleSourceEvent action={Action} query={QueryId} execution={ExecutionId} utc={Utc:O}",
+            action, lifetime.QueryId, lifetime.ExecutionId, DateTimeOffset.UtcNow);
+    }
+
     /// <summary>在业务事务外验证信任与当前直接读取范围，交给调用者管理同一物理连接。</summary>
     /// <param name="secret">本任务读者的内存口令。</param>
     /// <param name="executionId">独占的源执行身份。</param>
@@ -110,8 +121,9 @@ public sealed partial class OracleSourceAdapter
     /// <summary>执行准确命令并消费及释放该次游标，保留 Oracle 原生数据类型。</summary>
     /// <param name="command">本次分支独占的固定业务命令。</param>
     /// <param name="token">分支原始预算。</param>
+    /// <param name="completed">仅在驱动游标实际读到末尾后发送的无业务值通知。</param>
     /// <returns>真实读取的有界行集。</returns>
-    internal static async Task<List<OracleMappingRow>> ConsumeMappingAsync(OracleCommand command, CancellationToken token)
+    internal static async Task<List<OracleMappingRow>> ConsumeMappingAsync(OracleCommand command, CancellationToken token, Action? completed = null)
     {
         // 原生驱动游标在离开事务之前释放。
         await using var cursor = await command.ExecuteReaderAsync(token);
@@ -124,6 +136,7 @@ public sealed partial class OracleSourceAdapter
                 cursor.GetString(5), cursor.IsDBNull(6) ? null : cursor.GetString(6), cursor.GetDateTime(7),
                 cursor.GetDateTime(8), cursor.GetDateTime(9), cursor.GetDateTime(10)));
         }
+        completed?.Invoke();
         return rows;
     }
 }

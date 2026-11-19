@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Oracle.ManagedDataAccess.Client;
 using OntologyPlatform.Contracts;
 
@@ -16,14 +17,19 @@ public sealed partial class OracleSourceAdapter : IOracleSourceAdapter
     /// <summary>只由组合根注入的信任配置。</summary>
     private readonly OracleAdapterOptions options;
 
+    /// <summary>正式查询只写固定源动作、查询身份、执行身份和 UTC 时间。</summary>
+    private readonly ILogger<OracleSourceAdapter>? logger;
+
     /// <summary>每次调用都新建阶段数组，未观察阶段不能写PASS。</summary>
     private static readonly string[] StageNames = ["NETWORK", "TLS", "AUTH", "READ_ONLY", "METADATA"];
 
     /// <summary>固定宿主配置，不在构造期间访问网络或读取凭据。</summary>
     /// <param name="options">独立的CA和仅信任用途wallet路径。</param>
-    public OracleSourceAdapter(OracleAdapterOptions options)
+    /// <param name="logger">只接收固定非秘密源标记的应用宿主记录器。</param>
+    public OracleSourceAdapter(OracleAdapterOptions options, ILogger<OracleSourceAdapter>? logger = null)
     {
         this.options = options;
+        this.logger = logger;
     }
 
     /// <summary>每次重新核验当前信任原件，供持久配置绑定和进行中失效检查。</summary>
