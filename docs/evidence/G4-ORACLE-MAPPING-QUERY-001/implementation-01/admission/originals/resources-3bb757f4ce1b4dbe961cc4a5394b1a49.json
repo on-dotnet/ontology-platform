@@ -1,0 +1,725 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "implementation-01",
+  "attempt": "3bb757f4ce1b4dbe961cc4a5394b1a49",
+  "startedUtc": "2026-11-19T13:34:49.690716+00:00",
+  "commands": [
+    {
+      "stage": "context",
+      "commandId": "e8d5eaf51c1540bab1e9e38d4c8a9fa1",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "context",
+        "show"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/e8d5eaf51c1540bab1e9e38d4c8a9fa1/stdout.txt",
+        "sha256": "75270b95abcf0516180e80ce1a2b6f98e42b13765c38de5239be80925439ba63",
+        "sizeBytes": 14
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/e8d5eaf51c1540bab1e9e38d4c8a9fa1/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "engine",
+      "commandId": "35e3a9d60f7746c6bfc5f67e1601d1b5",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "-f",
+        "{{.MemTotal}} {{.NCPU}} {{.OSType}} {{.Architecture}}"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/35e3a9d60f7746c6bfc5f67e1601d1b5/stdout.txt",
+        "sha256": "7e0d90444ce4889680298a3af0dcb9600695169c78616fbbb63e9eaae33951b8",
+        "sizeBytes": 29
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/35e3a9d60f7746c6bfc5f67e1601d1b5/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "keep",
+      "commandId": "82b5105f5e434f47baf7e48860edb123",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "-f",
+        "{{.Id}}|{{.Name}}|{{.State.Status}}|{{.HostConfig.Memory}}|{{.HostConfig.NanoCpus}}|{{.Image}}|{{range .Mounts}}{{.Type}}:{{if eq .Type \"volume\"}}{{.Name}}{{end}}:{{.Destination}} {{end}}|{{json .NetworkSettings.Ports}}",
+        "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9",
+        "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f",
+        "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04",
+        "34a947835a8949be5fb34bdc813e87ff812dca1d3381ccea7ce610754448367f",
+        "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+        "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+        "cd563c910aa96e9c6eaabf32475d5bfe2ec56e6a9f754ca48b4287de1b8e653b",
+        "22837b2b2702a851ca4553b6d0ff0ce09ac3d5f65f67b911f39598cbf1f804d8",
+        "5e0f45ecaf9e2f227c4290891eeb26e577bfeaaaa8d5a5b0be7a15458656a49a",
+        "4a5dacfa92d7d9a119267365a65ab5037b98b4bb2292b9e47199b0bb14ab50b4",
+        "0edb069b759a2521cb56250f1db0227bd3cc8c81ad06210a1d8a7c7b52866534",
+        "19f76154598ac31e4a075175aadafc0a2f22591281ecf5db0704fd65e26a502b",
+        "b71ef14e5e484253c0b435332c4480fc071268f634c0b049d5d4aff57c383912",
+        "ed281bc42b432a4e20817b00dfbc7b480271f36368a24370414a6e6fb5b62dca",
+        "fc53d2b9b9fc7d67344a79e1abcf107b32b832d762713979a3584da8d9d1c7f5",
+        "47686c56bb164ed6577349fe47b20968f83630032d6c3ebd8ed55586a8846bbd",
+        "61791a2303a2945b9947824de91e763d22be03b538d1c0b76ee3ce44027a835f",
+        "f1a5f1cb913037f7716a3599bc19c1ed9eed11aa6db79b7f1a57c8dbe1c3943d",
+        "c1bbd53e0b335a12c5e50bc860a58e6d3cb01de7d81a354ee87696dd0a941c81",
+        "d267220f4227b7c92f5d2e37e7e85a4587644488157c10e5f95586613bd08952"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/82b5105f5e434f47baf7e48860edb123/stdout.txt",
+        "sha256": "9dd8045b6cc2036e83e450cbe8e7ec1040b2857ac0fcfa580c8ffa1804cf5cee",
+        "sizeBytes": 6712
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/82b5105f5e434f47baf7e48860edb123/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "live",
+      "commandId": "3475a564c66442d78442057b2570a890",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "--no-trunc",
+        "-q"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/3475a564c66442d78442057b2570a890/stdout.txt",
+        "sha256": "12b3ee3398486fd906c9b53862310519c791362a095dd2e8cef311c1e7885572",
+        "sizeBytes": 195
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/3475a564c66442d78442057b2570a890/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "host-vm",
+      "commandId": "da2db8c9767c4399af4959c596eea2f5",
+      "exitCode": 0,
+      "argv": [
+        "vm_stat"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/da2db8c9767c4399af4959c596eea2f5/stdout.txt",
+        "sha256": "56c87041f2df6b7bd9014ee1f738de9fa25a968d216b1957e31714b07845748b",
+        "sizeBytes": 1841
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/da2db8c9767c4399af4959c596eea2f5/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "host-ram",
+      "commandId": "7bb0b0a6692b4cd7a6e5df1f39fb5d79",
+      "exitCode": 0,
+      "argv": [
+        "sysctl",
+        "-n",
+        "hw.memsize"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/7bb0b0a6692b4cd7a6e5df1f39fb5d79/stdout.txt",
+        "sha256": "901c81a29f7611d5eeaf6432d3f21c8408a04c14f88f531c68c201db9699d1fa",
+        "sizeBytes": 12
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/7bb0b0a6692b4cd7a6e5df1f39fb5d79/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "host-pressure",
+      "commandId": "89d8d327d31a4fafa219cf9f52f3ca8e",
+      "exitCode": 0,
+      "argv": [
+        "memory_pressure",
+        "-Q"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/89d8d327d31a4fafa219cf9f52f3ca8e/stdout.txt",
+        "sha256": "90a0b0ae4d6a0d8c27c23bf00ed4e1c08df8e85da4d32ce4f465aa46ec2cc19e",
+        "sizeBytes": 110
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/89d8d327d31a4fafa219cf9f52f3ca8e/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "host-load",
+      "commandId": "ccc67016337a4e118f8ca98297acf102",
+      "exitCode": 0,
+      "argv": [
+        "sysctl",
+        "-n",
+        "vm.loadavg"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ccc67016337a4e118f8ca98297acf102/stdout.txt",
+        "sha256": "484d9f1977dbd05d6cb552aa9e0564908f023fc90f0c29b43340efc28786b916",
+        "sizeBytes": 19
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ccc67016337a4e118f8ca98297acf102/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "host-swap",
+      "commandId": "4ccca89eb8164f8987241796dafcd244",
+      "exitCode": 0,
+      "argv": [
+        "sysctl",
+        "-n",
+        "vm.swapusage"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/4ccca89eb8164f8987241796dafcd244/stdout.txt",
+        "sha256": "533b922bc10dfb63bd209adf362e91d26e6c6c4ee1e6b445904b5c8d628d1666",
+        "sizeBytes": 63
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/4ccca89eb8164f8987241796dafcd244/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "images",
+      "commandId": "cd218ef1ab944bc7a77b71f6ea8b2835",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "image",
+        "inspect",
+        "-f",
+        "{{.Id}}|{{.Os}}|{{.Architecture}}|{{.Size}}|{{json .RootFS.Layers}}",
+        "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+        "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/cd218ef1ab944bc7a77b71f6ea8b2835/stdout.txt",
+        "sha256": "a095418ff8af4bbe8671d2e5135b2f238e472ff7f49cbb2001078d3cc9daecc3",
+        "sizeBytes": 5684
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/cd218ef1ab944bc7a77b71f6ea8b2835/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "probe-image-volumes",
+      "commandId": "ccbcfc04871144f38044f4cb5cd089ef",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "image",
+        "inspect",
+        "-f",
+        "{{json (index .Config \"Volumes\")}}",
+        "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ccbcfc04871144f38044f4cb5cd089ef/stdout.txt",
+        "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+        "sizeBytes": 5
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ccbcfc04871144f38044f4cb5cd089ef/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "probe-create",
+      "commandId": "d9364f9ebeff4c9faaff18604e617bbb",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "create",
+        "--pull=never",
+        "--network=none",
+        "--read-only",
+        "--cap-drop=ALL",
+        "--security-opt=no-new-privileges",
+        "--user=65534:65534",
+        "--restart=no",
+        "--memory=64m",
+        "--memory-swap=64m",
+        "--cpus=.25",
+        "--pids-limit=16",
+        "--label",
+        "ontology.task=G4-ORACLE-MAPPING-QUERY-001",
+        "--label",
+        "ontology.run=implementation-01",
+        "--label",
+        "ontology.attempt=3bb757f4ce1b4dbe961cc4a5394b1a49",
+        "--entrypoint=/bin/sh",
+        "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "-ec",
+        "cat /proc/meminfo /proc/loadavg; df -Pk /"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/d9364f9ebeff4c9faaff18604e617bbb/stdout.txt",
+        "sha256": "d70a2c48bedfac999e750506506d8493061b7e11837c779506384b1456b363df",
+        "sizeBytes": 65
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/d9364f9ebeff4c9faaff18604e617bbb/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "probe-before",
+      "commandId": "ee44d135db6748dba6e41115d2426ec5",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "-f",
+        "{{.Id}} {{.Image}} {{index .Config.Labels \"ontology.attempt\"}} {{.State.Status}} {{len .Mounts}}",
+        "d8f030032feae063d885d13da24ba90680bb8933ea38ca67e3966ab2823eaddf"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ee44d135db6748dba6e41115d2426ec5/stdout.txt",
+        "sha256": "56bcc5b7abfce1dde0efc44f37935e0cda622fe8a47c91d5bb9a7ebf71baf53b",
+        "sizeBytes": 180
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ee44d135db6748dba6e41115d2426ec5/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "probe-read",
+      "commandId": "3832443fb3b346a6a9c47a8fb51579eb",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "start",
+        "-a",
+        "d8f030032feae063d885d13da24ba90680bb8933ea38ca67e3966ab2823eaddf"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/3832443fb3b346a6a9c47a8fb51579eb/stdout.txt",
+        "sha256": "c650082f2016c3d297df704e15f1db37220aa5be091b121034c71a32147241b9",
+        "sizeBytes": 1566
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/3832443fb3b346a6a9c47a8fb51579eb/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "probe-ended",
+      "commandId": "ca4cd46c004e477e81b841743c5b35fc",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "-f",
+        "{{.Id}} {{.Image}} {{index .Config.Labels \"ontology.attempt\"}} {{.State.Status}} {{len .Mounts}}",
+        "d8f030032feae063d885d13da24ba90680bb8933ea38ca67e3966ab2823eaddf"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ca4cd46c004e477e81b841743c5b35fc/stdout.txt",
+        "sha256": "934137eb91831d13e4030c8106fb63681f1b983939a42a7f2708128df292f37e",
+        "sizeBytes": 179
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ca4cd46c004e477e81b841743c5b35fc/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "probe-exit",
+      "commandId": "eadecb89546c4050a516a49bead51d24",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "-f",
+        "{{.State.ExitCode}} {{.State.OOMKilled}}",
+        "d8f030032feae063d885d13da24ba90680bb8933ea38ca67e3966ab2823eaddf"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/eadecb89546c4050a516a49bead51d24/stdout.txt",
+        "sha256": "cd0ac96c2b53f260477ac8bab8e1fc21ea0c3b31d0d956292faa6ab570bcdb62",
+        "sizeBytes": 8
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/eadecb89546c4050a516a49bead51d24/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "probe-pre-remove",
+      "commandId": "f2169b84fcb142da884b116436db2e0d",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "-f",
+        "{{.Id}} {{.Image}} {{index .Config.Labels \"ontology.attempt\"}} {{.State.Status}} {{len .Mounts}}",
+        "d8f030032feae063d885d13da24ba90680bb8933ea38ca67e3966ab2823eaddf"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/f2169b84fcb142da884b116436db2e0d/stdout.txt",
+        "sha256": "934137eb91831d13e4030c8106fb63681f1b983939a42a7f2708128df292f37e",
+        "sizeBytes": 179
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/f2169b84fcb142da884b116436db2e0d/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "probe-rm",
+      "commandId": "4015bcb550ea4aec8682265f037332d7",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "rm",
+        "d8f030032feae063d885d13da24ba90680bb8933ea38ca67e3966ab2823eaddf"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/4015bcb550ea4aec8682265f037332d7/stdout.txt",
+        "sha256": "d70a2c48bedfac999e750506506d8493061b7e11837c779506384b1456b363df",
+        "sizeBytes": 65
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/4015bcb550ea4aec8682265f037332d7/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    },
+    {
+      "stage": "probe-absent",
+      "commandId": "ad6fe785f7b541aebf76966f605c32b2",
+      "exitCode": 0,
+      "argv": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-aq",
+        "--no-trunc",
+        "--filter",
+        "id=d8f030032feae063d885d13da24ba90680bb8933ea38ca67e3966ab2823eaddf"
+      ],
+      "stdout": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ad6fe785f7b541aebf76966f605c32b2/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      },
+      "stderr": {
+        "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/implementation-01/ad6fe785f7b541aebf76966f605c32b2/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0
+      }
+    }
+  ],
+  "phase": "before-creation",
+  "status": "S0_RESOURCE_OBSERVATION",
+  "vm": {
+    "total": 20964958208,
+    "cpus": 12,
+    "os": "linux",
+    "arch": "aarch64",
+    "availableBytes": 18511974400,
+    "availableFsBytes": 419685273600,
+    "loadavg": "0.14 0.03 0.01 6/422 7"
+  },
+  "protected": [
+    {
+      "id": "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9",
+      "state": "running",
+      "image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+    },
+    {
+      "id": "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f",
+      "state": "running",
+      "image": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+    },
+    {
+      "id": "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04",
+      "state": "running",
+      "image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"
+    },
+    {
+      "id": "34a947835a8949be5fb34bdc813e87ff812dca1d3381ccea7ce610754448367f",
+      "state": "exited",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+    },
+    {
+      "id": "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2",
+      "state": "exited",
+      "image": "sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7"
+    },
+    {
+      "id": "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5",
+      "state": "exited",
+      "image": "sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02"
+    },
+    {
+      "id": "cd563c910aa96e9c6eaabf32475d5bfe2ec56e6a9f754ca48b4287de1b8e653b",
+      "state": "exited",
+      "image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+    },
+    {
+      "id": "22837b2b2702a851ca4553b6d0ff0ce09ac3d5f65f67b911f39598cbf1f804d8",
+      "state": "exited",
+      "image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+    },
+    {
+      "id": "5e0f45ecaf9e2f227c4290891eeb26e577bfeaaaa8d5a5b0be7a15458656a49a",
+      "state": "exited",
+      "image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+    },
+    {
+      "id": "4a5dacfa92d7d9a119267365a65ab5037b98b4bb2292b9e47199b0bb14ab50b4",
+      "state": "exited",
+      "image": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+    },
+    {
+      "id": "0edb069b759a2521cb56250f1db0227bd3cc8c81ad06210a1d8a7c7b52866534",
+      "state": "exited",
+      "image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"
+    },
+    {
+      "id": "19f76154598ac31e4a075175aadafc0a2f22591281ecf5db0704fd65e26a502b",
+      "state": "exited",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+    },
+    {
+      "id": "b71ef14e5e484253c0b435332c4480fc071268f634c0b049d5d4aff57c383912",
+      "state": "exited",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+    },
+    {
+      "id": "ed281bc42b432a4e20817b00dfbc7b480271f36368a24370414a6e6fb5b62dca",
+      "state": "exited",
+      "image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+    },
+    {
+      "id": "fc53d2b9b9fc7d67344a79e1abcf107b32b832d762713979a3584da8d9d1c7f5",
+      "state": "exited",
+      "image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+    },
+    {
+      "id": "47686c56bb164ed6577349fe47b20968f83630032d6c3ebd8ed55586a8846bbd",
+      "state": "exited",
+      "image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+    },
+    {
+      "id": "61791a2303a2945b9947824de91e763d22be03b538d1c0b76ee3ce44027a835f",
+      "state": "exited",
+      "image": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+    },
+    {
+      "id": "f1a5f1cb913037f7716a3599bc19c1ed9eed11aa6db79b7f1a57c8dbe1c3943d",
+      "state": "exited",
+      "image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"
+    },
+    {
+      "id": "c1bbd53e0b335a12c5e50bc860a58e6d3cb01de7d81a354ee87696dd0a941c81",
+      "state": "exited",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+    },
+    {
+      "id": "d267220f4227b7c92f5d2e37e7e85a4587644488157c10e5f95586613bd08952",
+      "state": "exited",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+    }
+  ],
+  "retainedCaps": [
+    3758096384,
+    4000000000
+  ],
+  "portMap": {
+    "api": 15741,
+    "secondary": 15742,
+    "oidc": 15743,
+    "web": 15744
+  },
+  "host": {
+    "ramBytes": 34359738368,
+    "availableEstimateBytes": 8483471360,
+    "estimateBasis": "free+inactive+speculative VM pages, includes reclaimable pages",
+    "pressure": "The system has 34359738368 (2097152 pages with a page size of 16384).\nSystem-wide memory free percentage: 49%",
+    "load": "{ 2.08 1.78 1.83 }",
+    "swap": "total = 2048.00M  used = 1404.69M  free = 643.31M  (encrypted)",
+    "freeDiskBytes": 231793709056
+  },
+  "imageFacts": [
+    {
+      "id": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+      "reportedBytes": 13076125534,
+      "layers": [
+        "sha256:6aa153a53a3c142a16582067c4497cd3fef05de67dead31ab46b684835464eb4",
+        "sha256:e243cb066a13674677a4702df0b361e506faf75e072fc377dfb1c1928f58b654",
+        "sha256:2e264e42a17f6727bd1d379bd83067419eb07d0c7275a39844e0d4f3ecaf461a",
+        "sha256:1eb624eaddc84763a3fc8bcd1e1873a8eb10937b9c9089a3bf80bf541c0be8ee",
+        "sha256:1245c54a35e6895223fc0f69a6f1ba9cd29f9a1cbba6961b2fc9da5f2edf5e48",
+        "sha256:658cde3367d01cae92739aa5c3c975444a8752415096f8724916e4a2a9b199bb",
+        "sha256:6051f7d952be8c4f40bdf09317ae2b58a2d1838621b38982a8cafa50607ae591",
+        "sha256:c752d77dd2986041669b1889b6b0f8c1b4f05407c9c96e5f2a0676ab6c994748",
+        "sha256:da43e53896cf8e90e7f6a06fdf6ea09d56b6c1e09da65cb436b0f7a25a3719f9",
+        "sha256:45eaa8decd1a432081396a62f78bf8057988b8ae6183ea88249606534770f0ae",
+        "sha256:9ab4f852da99b8adacdc2fa094927232e1070b0dfc33b370e429930fa148342c",
+        "sha256:98310e9501b921c9dcea73808842758c19d7d918a58fb3448a78917e20657a1b",
+        "sha256:fc7f262eaf1604f2a16dd3841a5f0bb565d6fa851c345eab099adea02506fa9e",
+        "sha256:27f113dd1bfe8a6886f8af72acb5714dba53e5573b3963bee93bac89323a9192",
+        "sha256:50ed70e4bbb4f17e767cbd3d0bdc0764edd9cae1323dd8ee9d1df244185e3002",
+        "sha256:8933675b25177437811b6a9a7c06b7b8736daba147cc1ad0eac7e9a36117701f",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+        "sha256:06673abaeb47348f753ead7b73c75b69533ebe2788db484ca5ba9bc8b4a58d9d",
+        "sha256:200cb8b6990f7f1d4a4c991373a68a36cdec501b71be0d5e5e31aab488226558",
+        "sha256:cade0810a4b3397fa4feed273aaaea2ed2a1f27314efed2c36275bcdbf27627e",
+        "sha256:314eee1c9d8e10b11a61e48c2ba88fb5c8b47eef2c9e8260984764ec961ccefb",
+        "sha256:5e05d5510517a31ddb89e8c69885a3db8ebcaa6d52ab398f3bcba0b017d70e79",
+        "sha256:f67aab4e1cf9c32c2b87d4bc581635197b1bca6a2638ebeef49de49d850044fd",
+        "sha256:5a1d0d3f9ab00e201709a2fcd0d1e9271bc005d89931e040c19bcb1089481a6a",
+        "sha256:67df92a4f7dee45ef2e9f886715135043a04b76fe465d587f940a5107daf7057",
+        "sha256:69401100c7342107bccee18a2b85dcf8f0ab5e1f466adee327fdc531b161b781",
+        "sha256:0613c2f06c35863679db4da89eb9698aac9f2d94a667a57380ebe174482b014e",
+        "sha256:d9ff288d9cb2b374d55c53137e104cc08cbd813965c04f3fcefe2648cd299dde",
+        "sha256:d718fa3adcc585d6cb37979838f5283a929883422fed7659103b2989fc7beccc"
+      ]
+    },
+    {
+      "id": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "reportedBytes": 665916985,
+      "layers": [
+        "sha256:685889762157cefb6370119253b3c709f70bb2622402052065c92243e3d9105f",
+        "sha256:c990509778c0c3462ccf6499e10a5f55cbdb6c04a7db15b2842ca40a7885a00d",
+        "sha256:cee2173198b18751780061739ea951fa88e4312ec7942e37f00826d576c55463",
+        "sha256:54139cdd957e9226d7ba0bdf7152a81a777584bab7c4fa50b9f03c11a960717e",
+        "sha256:b5bfdc2eb6e3cdffc6dfedc399307c7cb053c8e7f4651da2610e92b3ba09be29",
+        "sha256:54066f4fbaf70c26640bef2c3bdd3a74714b17e8ca8acf3865aa7bfba08929fb",
+        "sha256:687abb715380fea33b573fa7a5877f81d21aeb009f7498ccdcce6c693f899b27",
+        "sha256:2cad68fc1cd593deca403ca5dc5b4e1fae37b48c4c4f1b6b8fb22b44dcab7cb5",
+        "sha256:bc8398c662a115a49ec5d78e83c2043d116ca97511327de0b56bee03b8179c09",
+        "sha256:6848737d936b129bacbd4956f4bce2e4b6ab65509f27012e2b7be334a7a92a8a",
+        "sha256:0606ef160955d78103b59e0292e2d8ffcb106d9924f4a8263c60009e54cd5faf",
+        "sha256:f123424094c74722ae1c39714c2c5f773bfa584bae8e24c89e74c5ef9059fb7d",
+        "sha256:672ae835349a06cdf8300364da6c6c10c9c0c6c6e19de3e16f414a0b04088697"
+      ]
+    },
+    {
+      "id": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+      "reportedBytes": 750616770,
+      "layers": [
+        "sha256:d590a20cc4d1893f1a0c93a2815f664bb5aba8d4fa18d16f9a5d3196015434e3",
+        "sha256:6590a9eaacd7cf0004c7aa546416d8e499e13cafe4c5a22393d30b0d61a61422",
+        "sha256:ca6a653224c2954dc8749c27a15508e5e80b7a8648f44d8f84b800323f78468e",
+        "sha256:6b02e6daffae1dd2f03ab83a19ce10d89f77f8afa8f5d10a2028d73777a57124"
+      ]
+    },
+    {
+      "id": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+      "reportedBytes": 606140328,
+      "layers": [
+        "sha256:a3979fa7e3e4c597ab5823023a448d917d4ad7ae75204aa6737f4b091d233712",
+        "sha256:805097ee1612484cd5df723f036fbbf7cd6ff8aa75f149aad92628427cd1e6d7",
+        "sha256:de2b846a2d636153db4040c9c3c2879c95d175cd9a859242d7e2e71b13b9f353",
+        "sha256:89ba04cde173f04da36775384d66353f3b42e8683e7a2e5b99335f22ee9ea5ba",
+        "sha256:2302df99c4d0ddb429bb4772d5d7133eb9b00504d452200d5c0ac73f0b8d3001",
+        "sha256:1545edf5d7d21d0bb93ed2c678e5107c5dddaf8202b9da1c476994ece9d16a0e",
+        "sha256:f442272b1a220a65c52b62128be6456c5ab19b2d4dad87a20d46e69c52e850eb",
+        "sha256:e2ff5d56190355b0d631d85a37a3443f9dd5279e4e3ede2e96337dc4cd74f86b",
+        "sha256:033602036b737774d105d21f45b21cc09a70ed4b117538792529d429fd49111b",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+      ]
+    },
+    {
+      "id": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "reportedBytes": 370600042,
+      "layers": [
+        "sha256:b2848c02ac6ff53d265469b5b30f649f335e546a83330cd8916d54e65e640409",
+        "sha256:7aacbbc0b430eabd3080ca8ab2105c011b515a95e3d98af58a6f9b1db9dc31f5",
+        "sha256:c18662852015afb60579e41a21d5eb805f2d2a33a4c35c6edf07d504ccbdc353",
+        "sha256:8da9bbdcda35f04905cc0893f0c230ea20fbacd0a75207f3628fcd9179bf78d8",
+        "sha256:039186895c57e742c616effe9f8fd45edc3c30a58b7326de1fb743cede07741e",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+        "sha256:7f782327f0073a9136fcd08fbd7c2954eb8f6bbed3c8bd16d5ed232eb4e6d98a"
+      ]
+    },
+    {
+      "id": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "reportedBytes": 368578206,
+      "layers": [
+        "sha256:9a354992483c962fa69075527e7a2690fd9103f53d2c10af083fb31f24335256",
+        "sha256:e08394e0f22c1eb71623b46ad65c766cd6d909a093cac2ac2e4544932dd752a8",
+        "sha256:6ca6dc116bb262d7218efb897b1dcf444a47beba58047b5270de1abe15d8aeba",
+        "sha256:fa91a6433479e56f27f9bcd40b23939ca17bfb96e1582e104f0802748ad03688",
+        "sha256:9fb6d02b2896a95d74c2ffc6c2f7c0f638947947e712f5f385d43a25604c2f41",
+        "sha256:526d3370965b20c55b93ea28c9b2d2b6122c5cb0affeab6cb9b04e7880ff077d"
+      ]
+    }
+  ],
+  "repeatedLayerDigests": [
+    "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+  ],
+  "uniqueLayerCount": 67,
+  "S0UniqueImageBytes": 13444703740,
+  "probeId": "d8f030032feae063d885d13da24ba90680bb8933ea38ca67e3966ab2823eaddf",
+  "probeRemoved": true,
+  "next": "Validate actual task disk envelope and preparation/consumer identities before source creation.",
+  "endedUtc": "2026-11-19T13:34:50.188238+00:00"
+}

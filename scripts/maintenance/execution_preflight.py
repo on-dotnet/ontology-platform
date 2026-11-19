@@ -245,7 +245,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     sub=parser.add_subparsers(dest='mode',required=True)
     check=sub.add_parser('check');check.add_argument('--root',type=Path,default=ROOT)
-    check.add_argument('--milestone',choices=['M1','M2','M3','M4','M5','G4-M1','G4-M2-DORIS-01','G4-M2-ORACLE-01','G4-M3-MAPPING-001','G4-M4-QUERY-001','G4-M5-INTEGRATION-001','G4-DORIS-MAPPING-QUERY-001'],default='M5')
+    check.add_argument('--milestone',choices=['M1','M2','M3','M4','M5','G4-M1','G4-M2-DORIS-01','G4-M2-ORACLE-01','G4-M3-MAPPING-001','G4-M4-QUERY-001','G4-M5-INTEGRATION-001','G4-DORIS-MAPPING-QUERY-001','G4-ORACLE-MAPPING-QUERY-001'],default='M5')
     check.add_argument('--path',action='append',default=[])
     check.add_argument('--phase',choices=['contract','runtime','persistence','source'],default='runtime')
     run=sub.add_parser('run')
@@ -257,6 +257,10 @@ def main():
     try:
         if args.mode=='check':
             check_paths(args.root,args.path)
+            if args.milestone == 'G4-ORACLE-MAPPING-QUERY-001':
+                from workflow_oracle_mapping_query import structural
+                print(json.dumps(structural(args.root, args.milestone, args.phase), ensure_ascii=False))
+                return 0
             if args.milestone == 'G4-DORIS-MAPPING-QUERY-001':
                 from workflow_doris_mapping_query import s0_consumers
                 print(json.dumps(s0_consumers(args.root,args.milestone,args.phase), ensure_ascii=False))

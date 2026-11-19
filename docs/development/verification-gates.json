@@ -23,6 +23,7 @@
         "docs/evidence/G4-ENG-DELIVERY-002/**/*.json",
         "docs/evidence/G4-M2-DORIS-01/**/*.json",
         "docs/evidence/G4-DORIS-MAPPING-QUERY-001/**/*.json",
+        "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/**/*.json",
         "docs/deployment/doris.md",
         "docs/evidence/G4-M2-DORIS-01/metadata/*.nuspec",
         "docs/deployment/oracle.md",
@@ -538,6 +539,8 @@
       "inputs": [
         "scripts/tests/WorkflowOracle.Tests.py",
         "scripts/maintenance/workflow_m2_oracle.py",
+        "scripts/maintenance/workflow_oracle_mapping_query.py",
+        "scripts/maintenance/workflow_oracle_mapping_resources.py",
         "scripts/maintenance/workflow_oracle_fixture.py",
         "scripts/maintenance/workflow_oracle_platform.py",
         "scripts/maintenance/workflow-oracle.mjs",

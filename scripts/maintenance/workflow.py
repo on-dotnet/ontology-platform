@@ -25,6 +25,7 @@ REGISTRY = ROOT / 'docs/development/verification-gates.json'
 
 # 明确每个已准入任务的代表原件布局；范围相对本任务的证据目录。
 MEASUREMENT_PATHS = {
+    'G4-ORACLE-MAPPING-QUERY-001': ('implementation-01/admission/originals/*.json', 'implementation-01/s0/originals/*.json'),
     'G4-M5-INTEGRATION-001': ('**/gates/**/*.json', '**/originals/**/*.json', '**/reports/**/*.json'),
     'G4-DORIS-MAPPING-QUERY-001': (
         '*/s0-*-review.json', '*/s0-*-validation.json', '*/s1/browser-s1-*.json',

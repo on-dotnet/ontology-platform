@@ -1,6 +1,6 @@
 # G4当前能力与规划入口
 
-当前 main 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`。2026-11-19，Doris review-fix-02 经 ChatGPT ACCEPT / GO，RF-02 关闭，已精确集成并回读。[Doris 验收与历史恢复](../tasks/G4-DORIS-MAPPING-QUERY-001.md)。当前[Oracle 任务](../tasks/G4-ORACLE-MAPPING-QUERY-001.md)仅完成文档 P0，实施待集中裁决。G4 总体 **PARTIAL**。
+当前 main 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`。2026-11-19，Doris review-fix-02 经 ChatGPT ACCEPT / GO，RF-02 关闭，已精确集成并回读。[Doris 验收与历史恢复](../tasks/G4-DORIS-MAPPING-QUERY-001.md)。当前[Oracle 任务](../tasks/G4-ORACLE-MAPPING-QUERY-001.md)已接受集中裁决，优先核当期资源并实施 S0，通过后连续 S1–S3。G4 总体 **PARTIAL**。
 
 ## 已合并能力与缺口
 
@@ -9,7 +9,7 @@
 | M1 PG | 连接/TLS/只读探测/目录/权限及UI；见[M1任务](../tasks/G4-M1-CONNECTION-001.md) | 生产、未实测平台 |
 | M2 Web | API_KEY_REF、HTTPS GET、Pagination=NONE连接/目录；见[Web任务](../tasks/G4-M2-WEB-01.md) | NONE/OAuth/其他分页、Mapping/Query |
 | Doris M2 与限定 Mapping/Query | 本机 FE/BE、TLS/目录；单源双表、固定三能力与指定取消计划已集成，见[Doris 任务](../tasks/G4-DORIS-MAPPING-QUERY-001.md) | 跨源、其他计划与生产 |
-| M2 Oracle | 本机ARM64 Free/TCPS连接/目录/API/UI；见[Oracle任务](../tasks/G4-M2-ORACLE-01.md) | Mapping/Query 进入文档准入，产品 NOT_RUN；其他 edition/RU、整库灾备/生产 |
+| M2 Oracle | 本机ARM64 Free/TCPS连接/目录/API/UI；见[Oracle任务](../tasks/G4-M2-ORACLE-01.md) | Mapping/Query 已有条件准入，产品 AC 尚待当期实测；其他 edition/RU、整库灾备/生产 |
 | M2 TDengine | WAIT_FOR_EXTERNAL_INPUT；该源任务未并入当前基线 | 本轮不恢复 |
 | M3 Mapping | 单PG连接、≤2显式TABLE、每表≤12字段/≤100合成行、有限numeric、异人审核/发布/激活/回滚；见[M3任务](../tasks/G4-M3-MAPPING-001.md) | Doris 限定双表另见当前集成；其他来源、跨源/自由表达式 |
 | M4 Query | 单PG三受控G4能力、固定5秒、六态/UI/MCP/canonical恢复、numeric/ABA；见[M4任务](../tasks/G4-M4-QUERY-001.md) | 三独立源失败组合、cursor分页、跨源、生产 |

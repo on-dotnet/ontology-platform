@@ -2,4 +2,4 @@
 
 2026-11-19，用户传达 ChatGPT 对 Doris review-fix-02 的 ACCEPT / GO，RF-02 关闭。Master 已将 main 从 `606ca2d2c61964e6498dd72d5e9ad960d3593bf7` 精确快进至 `5168f2c93ca226caa521a6dc4ac85439335274c4`，普通推送并回读。历史验收与原件由[Doris 卡](G4-DORIS-MAPPING-QUERY-001.md)恢复。
 
-当前授权为 [Oracle P0 任务卡](G4-ORACLE-MAPPING-QUERY-001.md)列出的七份 Markdown、只读资源核对、静态验证、非作者 Review 和独立文档分支交付。唯一[实施准入合同](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md)等待一轮集中裁决，当前关口 P0_READY_FOR_ADMISSION_REVIEW。业务实现、产品测试及设施操作 NOT_RUN，旧 KEEP 和三项运行中易失持卷保护继续有效。G4 PARTIAL，AI OFF。
+用户已接受阶段 A 和 Oracle P0。自 `8ddaabb90878d5ab72a92908a030b7397c6f2d4d` 起由 Master 在原工作树实施[唯一 A–F](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md)及[任务卡](G4-ORACLE-MAPPING-QUERY-001.md)。批准本任务独立栈、当前资源准入、零下载准备、替代式恢复与 S0 高风险验证；S0 放行后自动 S1–S3。原 17 个停止资源及三项持卷运行服务保持原状态，旧 Oracle 卷/密钥只保留。main 冻结，G4 PARTIAL，AI OFF。
