@@ -3,6 +3,7 @@ import argparse
 import ast
 import datetime as dt
 import json
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -10,7 +11,11 @@ from pathlib import Path
 from workflow_evidence import restore
 from workflow_execution import encoded, ordinary, sha
 from workflow_m2_evidence import require, mtp
-from workflow_oracle_mapping_resources import TASK, RUN
+from workflow_oracle_mapping_resources import TASK, RUN as RESOURCE_RUN
+
+PRODUCT_RUN = 'product-resume-01'
+RUN = os.environ.get('OMQ_PRODUCT_RUN',RESOURCE_RUN)
+require('OMQ_PRODUCT_RUN' not in os.environ or RUN==PRODUCT_RUN,'OMQ_PRODUCT_RUN_SCOPE')
 
 ROOT = Path(__file__).resolve().parents[2]
 DRIVER = 'scripts/maintenance/workflow-m4-query.mjs'
@@ -210,6 +215,11 @@ def browser_report(archive, entry, origin, mode, case, host, api_build, test_bui
     require(report['inputBinding']['web'] == report['outputBinding']['web'] and
             (report['inputBinding']['web'] is not None) == mode.startswith('ui-'), 'OMQ_REPORT_WEB')
     require(report['inputBinding']['api']['commandId'] != report['outputBinding']['api']['commandId'], 'OMQ_HOST_PROBE_REUSE')
+    if RUN==PRODUCT_RUN:
+        require(report.get('browser',{}).get('authentication')=='INTERACTIVE_OIDC' and report['browser']['channel']=='msedge' and
+                re.fullmatch(r'[0-9]+(?:\.[0-9]+){1,3}',report['browser']['version']) and
+                {'oracle_current_original_subject_'+name for name in ('operator-ab','auditor-ab','operator-a','viewer-a')}
+                <= {c['name'] for c in report['checks'] if c['status']=='PASS'},'OMQ_RESUME_NORMAL_OIDC')
     expected = ERRORS[case] if mode == READY else None
     if expected:
         require(row['exitCode'] == 1 and row['classification'] == 'EXIT_FAILURE' and report['status'] == 'FAIL'
@@ -220,11 +230,38 @@ def browser_report(archive, entry, origin, mode, case, host, api_build, test_bui
     return report, row
 
 
+def verify_product_manifest(host,manifest,manifest_hash):
+    """七个准确身份和三张网络均须与观测一致，旧单 API 栈不能充当替代执行。"""
+    ids = {**{n:r['containerId'] for n,r in host['services'].items()},'oracle':host['oracle']['containerId']}
+    require(manifest_hash==host.get('resourceManifestSha256') and
+            (manifest['taskId'],manifest['runId'],manifest['snapshotId'])==(TASK,PRODUCT_RUN,host['snapshotId']) and
+            set(ids)=={'api','api-secondary','fuseki','platform-pg','keycloak-test','rustfs','oracle'} and
+            ids==manifest['ids'] and len(set(ids.values()))==7,'OMQ_RESUME_MANIFEST')
+    nets=manifest['networks']
+    require(set(nets)=={'platform-internal','host-entry','source-internal'} and
+            all(HEX.fullmatch(value) for value in nets.values()) and len(set(nets.values()))==3 and
+            host['oracle']['networkId']==nets['source-internal'],'OMQ_RESUME_NETWORKS')
+    for role,service in host['services'].items():
+        expected = {'platform-internal'}
+        if role in ('api','api-secondary','keycloak-test'):
+            expected.add('host-entry')
+        if role in ('api','api-secondary'):
+            expected.add('source-internal')
+        actual = list(service['networks'].values())
+        require(len(expected)==len(actual) and {nets[k] for k in expected}==set(actual),'OMQ_RESUME_SERVICE_NETWORKS')
+
+
 def host_observation(archive, host, api_build, origin):
     """重开准确容器安全字段、冻结程序集、只读挂载与原 Docker 命令。"""
     from workflow_oracle_mapping_platform import HOST_FORMAT, IMAGES
     from workflow_oracle_mapping_resources import SOURCE
     inputs = archive.read('formal-api-inputs.json')
+    manifest = None
+    if host['runId']==PRODUCT_RUN:
+        manifest = archive.read('formal-resources.json')
+        verify_product_manifest(host,manifest,sha(archive.raw('formal-resources.json')))
+        require(manifest['apiBuildId']==inputs['buildCommandId'] and manifest['buildOutputKey']==api_build['outputKey'],
+                'OMQ_RESUME_MANIFEST_BUILD')
     snapshot = archive.read('api-snapshot.json')
     require(inputs['taskId'] == TASK and inputs['runId'] == RUN and inputs['build'] == api_build
             and inputs['snapshotId'] == snapshot['snapshotId'] == host['snapshotId']
@@ -247,7 +284,8 @@ def host_observation(archive, host, api_build, origin):
     require(row['classification'] == 'SUCCESS' and row['exitCode'] == 0 and row['deadlineSeconds'] == 12, 'OMQ_HOST_INSPECT')
     for role,line in zip([*roles,'oracle'],stdout.decode().strip().splitlines(),strict=True):
         cid,image,task,run,state,pid,started,raw_mounts,raw_networks = line.split('|')
-        require(task == TASK and run == RUN and state == 'running' and int(pid) > 0, 'OMQ_HOST_OBSERVED')
+        expected_run = RESOURCE_RUN if manifest and role not in ('api','api-secondary') else RUN
+        require(task == TASK and run == expected_run and state == 'running' and int(pid) > 0, 'OMQ_HOST_OBSERVED')
         networks = dict(pair.split('=') for pair in raw_networks.split())
         if role == 'oracle':
             require(cid == source and image == SOURCE.split('@')[1] and list(networks.values()) == [host['oracle']['networkId']], 'OMQ_OBSERVED_ORACLE')
@@ -276,12 +314,29 @@ def git_original(root, commit, name):
     return row.stdout
 
 
-def audit_program(data):
+def audit_program(data, *, historical=True):
     """审计段包含导入、常量、身份/登录/SQL、解析与真执行；后续定义不得覆盖或更改这些入口。"""
     module=ast.parse(data)
     stop=next((i for i,node in enumerate(module.body) if isinstance(node,ast.FunctionDef) and node.name=='audit_window'),None)
     require(stop is not None,'OMQ_AUDIT_PROGRAM')
     prefix=module.body[:stop+1]
+    # 旧命令只调用默认物理 Run。按其确定实参折叠唯一的非默认资源分支，
+    # SQL、解析、身份核验和外部命令的其余 AST 仍逐节点与实测版本相同。
+    audit = prefix[-1]
+    if historical and [arg.arg for arg in audit.args.kwonlyargs]==['operation_run']:
+        require([ast.unparse(value) for value in audit.args.kw_defaults]==['RUN'],'OMQ_AUDIT_SCOPE_DEFAULT')
+        audit.args.kwonlyargs=[]
+        audit.args.kw_defaults=[]
+        class HistoricalRun(ast.NodeTransformer):
+            def visit_If(self,node):
+                if ast.unparse(node.test)=='operation_run != RUN' and not node.orelse:
+                    return None
+                return self.generic_visit(node)
+            def visit_Name(self,node):
+                if node.id=='operation_run':
+                    node.id='RUN'
+                return node
+        HistoricalRun().visit(audit)
     names={node.id for top in prefix for node in ast.walk(top) if isinstance(node,ast.Name)}
     names.update(node.name for node in prefix if isinstance(node,ast.FunctionDef))
     for node in module.body[stop+1:]:
@@ -297,17 +352,19 @@ def measured_audit_key(archive, call, commit):
     """还原运行时完整 observer 文件散列，当前窄审计程序、导入与已登记命令均须匹配。"""
     current=ordinary(archive.root/OBSERVER).read_bytes()
     measured=git_original(archive.root,commit,OBSERVER)
-    require(call['definition']['parserSha256']==sha(current) and audit_program(measured)==audit_program(current),
+    historical = RUN==RESOURCE_RUN
+    require(call['definition']['parserSha256']==sha(current) and
+            audit_program(measured,historical=historical)==audit_program(current,historical=historical),
             'OMQ_AUDIT_PROGRAM_CHANGED')
     dependencies={}
-    for path in AUDIT_IMPORTS:
+    for path in AUDIT_IMPORTS if historical else (*AUDIT_IMPORTS,PLATFORM):
         data=git_original(archive.root,commit,path)
         require(data==ordinary(archive.root/path).read_bytes(),'OMQ_AUDIT_DEPENDENCY_CHANGED')
         dependencies[path]=sha(data)
     definition={**call['definition'],'parserSha256':sha(measured)}
     key=digest_value(definition)
     archive.auditIdentity=dict(measuredCommit=commit,originalProgramSha256=sha(measured),candidateProgramSha256=sha(current),
-        auditProgramSha256=digest_value(audit_program(current)),dependencies=dependencies,commandInputFingerprint=key)
+        auditProgramSha256=digest_value(audit_program(current,historical=historical)),dependencies=dependencies,commandInputFingerprint=key)
     return key
 
 
@@ -321,9 +378,9 @@ def audit_observation(archive, audit, row, host, origin, measured=None):
     source = host['oracle']['containerId']
     fmt = '{{.Id}}|{{.Image}}|{{index .Config.Labels "ontology.task"}}|{{index .Config.Labels "ontology.run"}}|{{.State.Status}}'
     identity,raw,_ = archive.command(audit['sourceIdentityCommand'],['docker','--context','desktop-linux','inspect','-f',fmt,source],
-        'oracle-audit-source-identity',digest_value([source,SOURCE,TASK,RUN]),None,origin)
+        'oracle-audit-source-identity',digest_value([source,SOURCE,TASK,RESOURCE_RUN]),None,origin)
     require(identity['exitCode']==0 and identity['classification']=='SUCCESS' and
-            raw.decode().strip()=='|'.join([source,SOURCE.split('@')[1],TASK,RUN,'running']), 'OMQ_AUDIT_SOURCE')
+            raw.decode().strip()=='|'.join([source,SOURCE.split('@')[1],TASK,RESOURCE_RUN,'running']), 'OMQ_AUDIT_SOURCE')
     key = measured_audit_key(archive,call,measured)
     command,stdout,_ = archive.command(audit['commandId'],call['argv'],'oracle-formal-audit-window',key,None,origin)
     records = parse_audit(stdout)
@@ -554,6 +611,8 @@ class RuntimeOriginals(Originals):
             path=self.area.parent/'commands'/RUN/command[1]/command[2]
         elif name in ('api-build-binding.json','agent-build-binding.json','api-bound-build.txt','agent-bound-build.txt','web-build-binding.json'):
             path=self.area.parent/name
+        elif name=='formal-resources.json' and self.dispatch['runId']==PRODUCT_RUN:
+            path=self.choose('formal-resources*.json',lambda data: sha(data)==host['resourceManifestSha256'])
         elif name=='formal-api-inputs.json':
             path=self.choose('formal-api-inputs*.json',lambda data: json.loads(data).get('snapshotId')==host['snapshotId'])
         elif name=='formal-api-compose.json':

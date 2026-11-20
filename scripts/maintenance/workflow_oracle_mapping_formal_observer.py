@@ -116,17 +116,24 @@ def parse_audit(stdout):
     return rows
 
 
-def audit_window(start_utc, end_utc, client_id=None):
+def audit_window(start_utc, end_utc, client_id=None, *, operation_run=RUN):
     """在可独立重开的真实命令外保存源身份、双时钟界及完整有界审计行。"""
     source, _ = source_ids()
+    if operation_run != RUN:
+        from workflow_oracle_mapping_platform import active_source_record
+        from workflow_oracle_mapping_evidence import RUN as current_run
+        require(operation_run==current_run=='product-resume-01','AUDIT_RUN')
+        replacement = active_source_record()['containerId']
+        require(re.fullmatch('[0-9a-f]{64}',replacement) and replacement!=source,'AUDIT_REPLACEMENT_SOURCE')
+        source = replacement
     inv = audit_invocation(source, start_utc, end_utc, client_id)
     # 独立审计也逐 ID 核对当前运行者的镜像、TaskId、RunId。
     from workflow_oracle_mapping_resources import SOURCE
     check=ex.run([*DOCKER,'inspect','-f','{{.Id}}|{{.Image}}|{{index .Config.Labels "ontology.task"}}|{{index .Config.Labels "ontology.run"}}|{{.State.Status}}',source],
-                 ROOT, task=TASK, run_id=RUN,stage='oracle-audit-source-identity',input_key=ex.sha(ex.encoded([source,SOURCE,TASK,RUN])),timeout=5)
+                 ROOT, task=TASK, run_id=operation_run,stage='oracle-audit-source-identity',input_key=ex.sha(ex.encoded([source,SOURCE,TASK,RUN])),timeout=5)
     require(check.returncode==0 and check.stdout.decode().strip()=='|'.join([source,SOURCE.split('@')[1],TASK,RUN,'running']),'AUDIT_LIVE_SOURCE')
     low = time.time_ns()
-    call = ex.run(inv['argv'], ROOT, task=TASK, run_id=RUN, stage='oracle-formal-audit-window',
+    call = ex.run(inv['argv'], ROOT, task=TASK, run_id=operation_run, stage='oracle-formal-audit-window',
                   input_key=inv['identity'], stdin=(login() + inv['body'] + 'exit success\n').encode(), timeout=12)
     high = time.time_ns()
     require(call.returncode == 0, 'AUDIT_COMMAND')
@@ -134,9 +141,15 @@ def audit_window(start_utc, end_utc, client_id=None):
     require(all(utc(start_utc) <= r['utc'] < utc(end_utc) and (client_id is None or r['clientId'] == client_id) for r in rows), 'AUDIT_OUTSIDE')
     clocks = [r.strip()[6:] for r in call.stdout.decode().splitlines() if r.strip().startswith('CLOCK|')]
     require(len(clocks) == 2 and ns(clocks[0]) <= ns(clocks[1]), 'AUDIT_CLOCK')
-    return dict(taskId=TASK, runId=RUN, startUtc=utc(start_utc), endUtc=utc(end_utc), clientId=client_id, sourceId=source,
+    return dict(taskId=TASK, runId=operation_run, startUtc=utc(start_utc), endUtc=utc(end_utc), clientId=client_id, sourceId=source,
                 observerId='OMQ_OBSERVER', sourceIdentityCommand=check.receipt['commandId'],sourceClock=clocks, errorBounds=dict(lowerNs=low-ns(clocks[0])-999, upperNs=high-ns(clocks[1])),
                 sourceAuditCount=len(rows), recordsSha256=ex.sha(ex.encoded(rows)), records=rows, commandId=call.receipt['commandId'])
+
+
+def scoped_audit_window(start_utc,end_utc,client_id=None):
+    """使用当前命令 Run 的记录目录，替代源仍使用其原物理标签。"""
+    from workflow_oracle_mapping_evidence import RUN as operation_run
+    return audit_window(start_utc,end_utc,client_id,operation_run=operation_run)
 
 
 class Channel:
@@ -640,12 +653,19 @@ def emit(status, **fields):
 def observe(idempotency_key, output, query_id=None):
     """正式 API 调用前预开独立只读观察者，一次证据不覆盖、一个原始时钟预算。"""
     from workflow_oracle_mapping_platform import runtime_binding, read_pg
+    from workflow_oracle_mapping_evidence import RUN as operation_run
     require(str(uuid.UUID(idempotency_key))==idempotency_key and (query_id is None or re.fullmatch(QID,query_id))
             and output=='formal-witness-'+idempotency_key+'.json', 'FORMAL_OBSERVER_ARGUMENT')
-    path = ex.ordinary(AREA/output)
+    area = ROOT / 'artifacts/workflow' / TASK / operation_run
+    path = ex.ordinary(area/output)
     require(not path.exists(), 'FORMAL_WITNESS_EXISTS')
     source, sqlid = source_ids()
-    rec = dict(taskId=TASK,runId=RUN,sourceId=source,sqlId=sqlid,idempotencyKey=idempotency_key,startedUtc=now(),
+    if operation_run!=RUN:
+        from workflow_oracle_mapping_platform import active_source_record
+        replacement=active_source_record()['containerId']
+        require(re.fullmatch('[0-9a-f]{64}',replacement) and replacement!=source,'FORMAL_REPLACEMENT_SOURCE')
+        source=replacement
+    rec = dict(taskId=TASK,runId=operation_run,sourceId=source,sqlId=sqlid,idempotencyKey=idempotency_key,startedUtc=now(),
                platformStates=[],logs={'api':[],'api-secondary':[]},clocks={},status='STARTED')
     final = None
     try:
@@ -654,8 +674,8 @@ def observe(idempotency_key, output, query_id=None):
         require(rec['hostBefore']['oracle']['containerId']==source,'FORMAL_SOURCE_HOST_DRIFT')
         # 已核容器声明均以本次准确全 ID 访问；绝不按名称连接其它任务。
         require(all(re.fullmatch('[a-f0-9]{64}',containers[k]) for k in ('api','api-secondary','platform-pg')), 'FORMAL_OBSERVER_HOSTS')
-        state = public_json(AREA/'runtime-fixture.json')
-        require(state['taskId']==TASK and state['runId']==RUN and state['scope']=={'organizationId':'org-demo','siteIds':['site-a']}, 'FORMAL_READER_STATE')
+        state = public_json(area/'runtime-fixture.json')
+        require(state['taskId']==TASK and state['runId']==operation_run and state['scope']=={'organizationId':'org-demo','siteIds':['site-a']}, 'FORMAL_READER_STATE')
         subject = state['subjects']['reader']
         stop = threading.Event()
         with contextlib.ExitStack() as resources:
@@ -751,7 +771,7 @@ def observe(idempotency_key, output, query_id=None):
             stamp=lambda n:dt.datetime.fromtimestamp(n/1e9,ZONE).isoformat(timespec='microseconds')
             start=stamp(rec['clocks']['source'][0]['remote']-1000)
             end=stamp(rec['clocks']['source'][-1]['remote']+1000)
-            rec['audit']=audit_window(start,end,client) if client else {'records':[]}
+            rec['audit']=scoped_audit_window(start,end,client) if client else {'records':[]}
             if client:
                 final=classify(rec)
             else:

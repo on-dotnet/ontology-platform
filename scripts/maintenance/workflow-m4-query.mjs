@@ -15,7 +15,7 @@ if (!["G4-M4-QUERY-001", "G4-M5-INTEGRATION-001", "G4-DORIS-MAPPING-QUERY-001", 
 const doris = task === "G4-DORIS-MAPPING-QUERY-001";
 const oracle = task === "G4-ORACLE-MAPPING-QUERY-001";
 const omq = oracle ? await import("./workflow-oracle-query-fixture.mjs") : null;
-const integration = task === "G4-M5-INTEGRATION-001", runId = doris || oracle ? "implementation-01" : integration ? "integration-01" : "query-impl-01";
+const integration = task === "G4-M5-INTEGRATION-001", runId = oracle ? omq.runId : doris ? "implementation-01" : integration ? "integration-01" : "query-impl-01";
 const evidenceRun = doris ? (process.env.G4_DORIS_EVIDENCE_RUN ?? runId) : runId;
 if (doris && ![runId, "review-fix-01"].includes(evidenceRun) && !(evidenceRun === "review-fix-02" && argument("mode") === "s2-doris-ready")) throw new Error("DORIS_EVIDENCE_RUN");
 const scenario = integration ? argument("scenario") : null;
@@ -68,8 +68,9 @@ async function browserRun(mode) {
   // 先绑定准确 Oracle 任务宿主，随后才可打开本次合成 OIDC 材料。
   const initialOracle = oracle ? binding() : null;
   if (oracle) omq.checkBinding(initialOracle);
-  const realm = JSON.parse(await readFile(resolve(privateRoot, oracle ? "platform/realm.json" : "runtime/realm.json"), "utf8"));
-  if (!realm.authority.startsWith(`http://localhost:${port(15443)}/realms/g2-`)) throw new Error("QUERY_REALM_BOUNDARY");
+  const resumeLogin = oracle && omq.productResume;
+  const realm = resumeLogin ? null : JSON.parse(await readFile(resolve(privateRoot, oracle ? "platform/realm.json" : "runtime/realm.json"), "utf8"));
+  if (realm && !realm.authority.startsWith(`http://localhost:${port(15443)}/realms/g2-`)) throw new Error("QUERY_REALM_BOUNDARY");
   const origin = `http://localhost:${port(15441)}`;
   const file = resolve(output, "browser-" + mode + "-" + Date.now() + ".json");
   const report = { taskId: task, runId, mode, startedAtUtc: new Date().toISOString(), checks: [], http: [], status: "FAIL" };
@@ -78,7 +79,7 @@ async function browserRun(mode) {
   let browser, phase = "launch";
   const command = (expectedRevision = 0) => ({ commandId: randomUUID(), idempotencyKey: randomUUID(), expectedRevision, reason: "M4 isolated query prerequisite" });
   const check = (name, value) => { report.checks.push({ name, status: value ? "PASS" : "FAIL" }); if (!value) { const error = new Error(); error.safeCode = name; throw error; } };
-  const secrets = [realm.clientSecret, ...Object.values(realm.identities).map(value => value.password)];
+  const secrets = realm ? [realm.clientSecret, ...Object.values(realm.identities).map(value => value.password)] : [];
   async function request(actor, method, path, body, expected = 200, etag) {
     const start = performance.now();
     const response = await actor.context.request.fetch((actor.apiOrigin ?? origin) + path, { method, data: body, timeout: 45000, maxRedirects: 0,
@@ -111,17 +112,23 @@ async function browserRun(mode) {
     });
     context.setDefaultTimeout(15000);
     const page = await context.newPage();
-    const user = realm.identities["g2-" + label]; check("identity_exists_" + label, Boolean(user));
     await page.goto(origin + "/auth/login?returnUrl=%2Fapi%2Fv1%2Fplatform%2Fme");
-    await page.locator("#username").fill(user.username); await page.locator("#password").fill(user.password);
-    await page.locator("#kc-login").click();
-    await page.waitForURL(url => url.origin === origin && url.pathname === "/api/v1/platform/me");
+    const callback = url => url.origin === origin && url.pathname === "/api/v1/platform/me";
+    if (resumeLogin) {
+      await omq.completeCurrentLogin(page, label);
+    } else {
+      const user = realm.identities["g2-" + label]; check("identity_exists_" + label, Boolean(user));
+      await page.locator("#username").fill(user.username); await page.locator("#password").fill(user.password);
+      await page.locator("#kc-login").click();
+      await page.waitForURL(callback);
+    }
     const cookie = (await context.cookies()).find(item => item.name === ".OntologyPlatform.Session");
     check("real_oidc_cookie_" + label, cookie?.httpOnly && cookie.sameSite === "Lax");
     secrets.push(cookie.value);
     const actor = { context, page, headers: { Origin: origin } };
     actor.headers["X-CSRF-TOKEN"] = (await get(actor, "/auth/csrf")).requestToken;
     actor.me = await get(actor, "/api/v1/platform/me");
+    if (resumeLogin) check("oracle_current_original_subject_" + label, actor.me.subjectId === omq.originalSubject(label));
     actor.sessionCookie = cookie.value;
     return actor;
   }
@@ -177,7 +184,8 @@ async function browserRun(mode) {
   try {
     report.inputBinding = initialOracle ?? binding();
     const { chromium } = require("@playwright/test");
-    browser = await chromium.launch({ channel: "msedge", headless: true, args: ["--disable-background-networking", "--disable-component-update"] });
+    browser = await chromium.launch({ channel: "msedge", headless: !resumeLogin, args: ["--disable-background-networking", "--disable-component-update"] });
+    if (resumeLogin) report.browser = { channel: "msedge", version: browser.version(), authentication: "INTERACTIVE_OIDC" };
     const operator = await identity("operator-ab"), auditor = await identity("auditor-ab");
     const activator = doris || oracle ? await identity("operator-a") : operator;
     const reader = doris || oracle ? await identity("viewer-a") : operator;

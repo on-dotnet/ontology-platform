@@ -8,7 +8,32 @@ export const modes = Object.freeze(["serve", "provision", "mapping", "s0-oracle-
 export const config = Object.freeze({ type: "ORACLE", profile: { host: "oracle-source", port: 2484, serviceName: "FREEPDB1",
   username: "FIXTURE_READER", allowedOwners: ["PRODUCTION", "CaseOwner"], tls: true } });
 const task = "G4-ORACLE-MAPPING-QUERY-001";
-const runId = "implementation-01";
+export const productResume = process.env.OMQ_PRODUCT_RUN === "product-resume-01";
+if (process.env.OMQ_PRODUCT_RUN !== undefined && !productResume) throw new Error("ORACLE_PRODUCT_RUN");
+export const runId = productResume ? "product-resume-01" : "implementation-01";
+// 四个已封存的正常登录主体。当前 /me 必须由当前的正式登录重新取得。
+const subjects = Object.freeze({
+  "operator-ab": "5af20722-3900-4de9-b23a-7dcae3ca5927", "auditor-ab": "650199ae-8bd4-430a-885d-71cd69b6781e",
+  "operator-a": "bcf7f7f8-6af0-4f94-a28c-1220461ee62e", "viewer-a": "f902a743-7079-4e22-a643-a51deb027e89",
+});
+export function originalSubject(label) {
+  if (!Object.hasOwn(subjects, label)) throw new Error("ORACLE_OIDC_SUBJECT");
+  return subjects[label];
+}
+/** 替代卷上走正式 OIDC 表单。只传入公开用户名，密码由本机系统或操作者提交。 */
+export async function completeCurrentLogin(page, label) {
+  originalSubject(label);
+  const callback = url => url.origin === "http://localhost:" + ports.api && url.pathname === "/api/v1/platform/me";
+  const address = new URL(page.url());
+  if (!callback(address)) {
+    if (address.origin !== "http://localhost:" + ports.oidc || !address.pathname.startsWith("/realms/g2-180e1435711f03fa/"))
+      throw new Error("ORACLE_RESTORED_REALM");
+    await page.locator("#username").fill("g2-" + label);
+    await page.bringToFront();
+  }
+  await page.waitForURL(callback, { timeout: 40000 });
+}
+
 const columns = ["ROW_ID", "JOIN_KEY", "VAL", "ORG_ID", "SITE_ID", "EXT_ID", "LABEL", "FROM_TS", "TO_TS", "EVENT_TS", "OBSERVED_TS"];
 
 /** 由准确快照确认列序再生成权限范围；本阶段正式根只授权实体表。 */
@@ -76,6 +101,8 @@ export function checkBinding(binding) {
   const api = binding.api;
   if (api?.taskId !== task || api.runId !== runId || !api.commandId || !Object.entries(ports).every(([role, value]) => api.ports?.[role] === value))
     throw new Error("ORACLE_HOST_PORT_BINDING");
+  if (productResume && (!/^[0-9a-f]{64}$/.test(api.resourceManifestSha256) || !api.services?.["api-secondary"]))
+    throw new Error("ORACLE_RESUME_HOST_BINDING");
 }
 
 /** 两次独立 inspect 有各自回执，其他环境字段必须逐一相同。 */

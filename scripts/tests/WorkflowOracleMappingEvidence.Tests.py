@@ -1,6 +1,7 @@
 """以 RF-02 同形的同步登记篡改验证窄 Oracle 资格消费者；不产生产品证据。"""
 import copy
 import json
+import os
 from pathlib import Path
 import sys
 import shutil
@@ -184,6 +185,65 @@ class OracleQualificationTests(unittest.TestCase):
                    sourceId=self.host['oracle']['containerId'])
         with self.assertRaisesRegex(ValueError,'OMQ_AUDIT_WINDOW'):
             oracle.audit_observation(self.archive,audit,row,self.host,self.origin)
+
+
+class ProductResumeBindingTests(unittest.TestCase):
+    def test_manifest_requires_both_exact_api_ids_and_all_approved_networks(self):
+        labels=('api','api-secondary','platform-pg','keycloak-test','fuseki','rustfs','oracle')
+        ids={r:str(i)*64 for i,r in enumerate(labels)}
+        nets={k:c*64 for k,c in [('host-entry','c'),('platform-internal','d'),('source-internal','e')]}
+        observed={}
+        for name in labels[:-1]:
+            connections={'platform-internal':nets['platform-internal']}
+            if name in ('api','api-secondary','keycloak-test'):
+                connections['host-entry']=nets['host-entry']
+            if name in ('api','api-secondary'):
+                connections['oracle']=nets['source-internal']
+            observed[name]=dict(containerId=ids[name],networks=connections)
+        h=dict(snapshotId='8'*64,services=observed,oracle=dict(containerId=ids['oracle'],networkId=nets['source-internal']),
+               resourceManifestSha256='f'*64)
+        m=dict(taskId=oracle.TASK,runId=oracle.PRODUCT_RUN,ids=ids,networks=nets,snapshotId='8'*64)
+        oracle.verify_product_manifest(h,m,'f'*64)
+        for change in (lambda x:x['ids'].update(api='a'*64),lambda x:x['networks'].update(**{'source-internal':'e'*63+'0'}),
+                       lambda x:x.update(runId='implementation-01'),lambda x:x['ids'].pop('api-secondary')):
+            copy_m=copy.deepcopy(m)
+            change(copy_m)
+            with self.assertRaises(ValueError):
+                oracle.verify_product_manifest(h,copy_m,'f'*64)
+        h['services']['platform-pg']['networks']['unapproved']='b'*64
+        with self.assertRaisesRegex(ValueError,'OMQ_RESUME_SERVICE_NETWORKS'):
+            oracle.verify_product_manifest(h,m,'f'*64)
+
+    def test_legacy_audit_projection_keeps_physical_scope_and_source_sql(self):
+        before=b'def audit_window():\n source = original()\n return issue(source,run=RUN)\n'
+        after=(b'def audit_window(*,operation_run=RUN):\n source = original()\n if operation_run != RUN:\n'
+               b'  source=alternative()\n return issue(source,run=operation_run)\n')
+        self.assertEqual(oracle.audit_program(before),oracle.audit_program(after))
+        self.assertNotEqual(oracle.audit_program(before),oracle.audit_program(after.replace(b'original()',b'other()')))
+        self.assertNotEqual(oracle.audit_program(after,historical=False),oracle.audit_program(after.replace(b'alternative()',b'other()'),historical=False))
+
+    def test_interactive_login_accepts_only_public_account_and_exact_realm(self):
+        script = """
+import {completeCurrentLogin,runId,originalSubject} from './scripts/maintenance/workflow-oracle-query-fixture.mjs';
+import assert from 'node:assert/strict';
+assert.equal(runId,'product-resume-01');
+let url='http://localhost:15743/realms/g2-180e1435711f03fa/protocol/openid-connect/auth';
+let filled=[],foreground=0,waited=0;
+const callback=new URL('http://localhost:15741/api/v1/platform/me');
+const page={url:()=>url,locator:s=>{assert.equal(s,'#username');return {fill:async u=>filled.push(u)};},
+  bringToFront:async()=>{foreground++;},waitForURL:async (match,o)=>{assert(match(callback));assert.equal(o.timeout,40000);waited++;}};
+await completeCurrentLogin(page,'viewer-a');
+assert.deepEqual(filled,['g2-viewer-a']);assert.equal(waited,1);assert.equal(foreground,1);
+assert.match(originalSubject('viewer-a'),/^[a-f0-9-]{36}$/);
+url='http://localhost:15743/realms/g2-another/protocol/openid-connect/auth';
+await assert.rejects(completeCurrentLogin(page,'viewer-a'),/ORACLE_RESTORED_REALM/);
+await assert.rejects(completeCurrentLogin(page,'other-subject'),/ORACLE_OIDC_SUBJECT/);
+assert.equal(filled.length,1);assert.equal(waited,1);
+"""
+        node=oracle.NODE if Path(oracle.NODE).is_file() else 'node'
+        result=subprocess.run([node,'--input-type=module','--eval',script],cwd=ROOT,capture_output=True,timeout=6,
+                              env=dict(os.environ,OMQ_PRODUCT_RUN='product-resume-01'))
+        self.assertEqual(0,result.returncode,result.stderr.decode())
 
 
 class OracleSessionRestoreEvidenceTests(unittest.TestCase):
