@@ -146,7 +146,7 @@ public sealed class G4OracleSettlementTests
                 while (Stopwatch.GetElapsedTime(start) < TimeSpan.FromMilliseconds(90))
                 {
                     blocked = (await locker.Database.SqlQuery<bool>($"""
-                        SELECT EXISTS (SELECT 1 FROM pg_stat_activity WHERE {pid}=ANY(pg_blocking_pids(pid))) AS "Value"
+                        SELECT EXISTS (SELECT 1 FROM pg_locks l WHERE NOT l.granted AND {pid}=ANY(pg_blocking_pids(l.pid))) AS "Value"
                         """).SingleAsync());
                     if (blocked) break;
                     await Task.Delay(1);

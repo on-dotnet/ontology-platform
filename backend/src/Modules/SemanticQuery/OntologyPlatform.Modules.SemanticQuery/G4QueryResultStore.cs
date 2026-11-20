@@ -370,6 +370,8 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
     private static async Task<DateTimeOffset?> OracleDatabaseCutoffAsync(G4QueryDbContext database, Func<TimeSpan> remaining, CancellationToken token)
     {
         if (remaining() <= TimeSpan.Zero) return null;
+        // 显式持有同一物理平台连接直到调用方处置上下文，采样与随后的锁内语句不会换服务端会话。
+        await database.Database.OpenConnectionAsync(token);
         // PG 采样早于响应到主机；数据库戳加之后才读取的余量给出保守截止，不要求跨机时钟同步。
         var sample = await database.Database.SqlQueryRaw<DateTimeOffset>("SELECT clock_timestamp() AS \"Value\"").SingleAsync(token);
         // 这里的回调始终重读同次 execution 的原预算，不能在每笔事务重置一段清理时间。
