@@ -444,7 +444,8 @@ def auth_events(cid,attempt):
     events=[]
     for line in res.stdout.splitlines():
         try:row=json.loads(line)
-        except ValueError:continue
+        except ValueError:raise ValueError('AUTH_UNSTRUCTURED_OUTPUT') from None
+        require(row['kind'] in {'ready','census','challenge','ticketOperation','callback','me','failed'},'AUTH_EVENT_KIND')
         require(row['attempt']==attempt and set(row)=={'kind','attempt','utc','details'},'AUTH_LOG_ID')
         events.append(row)
     return events
@@ -618,6 +619,11 @@ def verified_command(cid,argv,key,stage):
     return stdout
 
 
+def qualify_resources(kind,row,driver):
+    import workflow_oracle_mapping_recovery_resource_qualification as resources
+    return resources.validate(kind,row,driver,frozen=frozen,record_bytes=record_bytes,command_bytes=command_bytes)
+
+
 def qualify_build(build,kind):
     import workflow_oracle_mapping_recovery_build_qualification as compiler
     manifest=json.loads(record_bytes('build-qualification-'+kind+'.json'))
@@ -656,6 +662,7 @@ def qualified_object(which,attempt):
             and row['after']==['exited','0','false'] and row['exitCode']==0 and row['qualification']=='OBSERVED'
             and compile_rec['stage']=='compile-objects' and compile_rec['inputFingerprint']==build['inputFingerprint'] and compile_rec['exitCode']==0
             and build['sourceSha256']==ex.sha(objects.DRIVER.read_bytes()),'OBSERVATION_IDENTITY')
+    qualify_resources(which,row,driver)
     qualify_build(build,'objects')
     expected=objects.request(which,service,volume,build['dllSha256'],attempt)
     argv=['docker','--context','desktop-linux','start','-a','-i',driver['id']]
@@ -693,6 +700,7 @@ def qualified_identity(row):
     require(row['taskId']==TASK and row['runId']==BATCH and row['base']==BASE and row['resourceRun']==RUN
             and row['pg']==ALT_IDS['platform-pg'] and row['idp']==ALT_IDS['keycloak-test'] and host['id']==row['id']
             and host['attempt']==row['attempt'] and host['role']=='identity-host' and host['driver']==row['driver'],'AUTH_QUALIFICATION')
+    qualify_resources('identity',row,host)
     qualify_build(host['driver'],'identity')
     fixture=record_bytes('runtime-fixture.json')
     basis=identity.frozen_inputs(ROOT,fixture_bytes=fixture)
