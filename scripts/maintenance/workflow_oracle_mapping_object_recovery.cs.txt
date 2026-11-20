@@ -1,0 +1,261 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
+using Microsoft.Extensions.Configuration;
+
+/// <summary>仅访问冻结任务桶和隔离实例，签名配置始终留在本进程。</summary>
+internal sealed class ObjectRecovery
+{
+    private const string Bucket = "g4-oracle-mapping-synthetic";
+    private const string Host = "rustfs:9000";
+    private const string TaskId = "G4-ORACLE-MAPPING-QUERY-001";
+    private const string Run = "s0-recovery-02";
+    private const string Base = "454d1a2f17581673cbbf44900a5fe241d603f5ef";
+    private const string Image = "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b";
+    private const string Archive = "6ff1aa706d27fd31f0c98c95168124d3a0f07a6018aef527f45bdb169e70be3e";
+    private const int PageCap = 16, EntryCap = 32, XmlCap = 65536, ObjectCap = 1048576, TotalCap = 2097152;
+    private const string Signed = "host;x-amz-content-sha256;x-amz-date";
+    private static readonly string EmptyHash = Sha(Array.Empty<byte>());
+    private static readonly XNamespace Ns = "http://s3.amazonaws.com/doc/2006-03-01/";
+    private readonly HttpClient client = new(new SocketsHttpHandler { AllowAutoRedirect = false, UseProxy = false,
+        UseCookies = false, AutomaticDecompression = DecompressionMethods.None, MaxResponseHeadersLength = 32,
+        ConnectTimeout = TimeSpan.FromSeconds(4) }) { Timeout = Timeout.InfiniteTimeSpan };
+    private readonly string access;
+    private readonly string secret;
+    private int totalBytes;
+    private string operation = "input";
+
+    /// <summary>只采用已恢复的可信配置中发布签名的两个字段。</summary>
+    private ObjectRecovery()
+    {
+        var config = new ConfigurationBuilder().AddJsonFile("/private/api/appsettings.json", false, false).Build();
+        Demand(config["Publishing:S3Endpoint"] == "http://127.0.0.1:15746" && config["Publishing:Bucket"] == Bucket, "trusted_route");
+        access = config["Publishing:AccessKey"] ?? throw Bad("config");
+        secret = config["Publishing:SecretKey"] ?? throw Bad("config");
+        Demand(access.Length > 0 && secret.Length > 0, "config");
+    }
+
+    private static InvalidDataException Bad(string name) => new(name);
+    private static void Demand(bool condition, string code) { if (!condition) throw Bad(code); }
+    private static string Sha(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
+    private static string HashText(string text) => Sha(Encoding.UTF8.GetBytes(text));
+    private static string Escape(string s) => Uri.EscapeDataString(s);
+    private static bool Hex(string text, int size) => Regex.IsMatch(text, @"\A[0-9a-f]{" + size + @"}\z");
+    private static string Query(IEnumerable<KeyValuePair<string,string>> fields) => string.Join("&", fields
+        .Select(p => new KeyValuePair<string,string>(Escape(p.Key), Escape(p.Value)))
+        .OrderBy(p => p.Key, StringComparer.Ordinal).ThenBy(p => p.Value, StringComparer.Ordinal).Select(p => p.Key + "=" + p.Value));
+    private static string PathFor(string key) => "/" + Bucket + (key.Length == 0 ? "" : "/" + string.Join("/", key.Split('/').Select(Escape)));
+    private static byte[] Mac(byte[] key, string text) => HMACSHA256.HashData(key, Encoding.UTF8.GetBytes(text));
+
+    /// <summary>规范请求含按编码后键值排序的真实查询，host 始终等于实际发送值。</summary>
+    private static (string Scope, string Signature) Sign(string path, string query, string utc, string key)
+    {
+        string scope = utc[..8] + "/us-east-1/s3/aws4_request";
+        string headers = "host:" + Host + "\nx-amz-content-sha256:" + EmptyHash + "\nx-amz-date:" + utc + "\n";
+        string canonical = "GET\n" + path + "\n" + query + "\n" + headers + "\n" + Signed + "\n" + EmptyHash;
+        byte[] derived = Encoding.UTF8.GetBytes("AWS4" + key);
+        try {
+            foreach (var part in scope.Split('/')) {
+                byte[] next = Mac(derived,part);
+                CryptographicOperations.ZeroMemory(derived);
+                derived = next;
+            }
+            return (scope, Convert.ToHexStringLower(Mac(derived,"AWS4-HMAC-SHA256\n" + utc + "\n" + scope + "\n" + HashText(canonical))));
+        } finally { CryptographicOperations.ZeroMemory(derived); }
+    }
+
+    /// <summary>页和正文均采用累计受限读取，不输出 S3 原始错误、owner 或认证头。</summary>
+    private sealed record Readback(int Status, byte[] Bytes, string? Version, string? Marker, string? LastModified);
+
+    private async Task<Readback> Get(string component, string key, Dictionary<string,string> fields, bool deleted, CancellationToken total)
+    {
+        operation = component;
+        string path = PathFor(key), query = Query(fields);
+        string utc = DateTime.UtcNow.ToString("yyyyMMdd'T'HHmmss'Z'", CultureInfo.InvariantCulture);
+        var signing = Sign(path,query,utc,secret);
+        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://" + Host + path + "?" + query,
+            new UriCreationOptions { DangerousDisablePathAndQueryCanonicalization = true }));
+        request.Headers.Host = Host;
+        request.Headers.Add("x-amz-content-sha256", EmptyHash);
+        request.Headers.Add("x-amz-date",utc);
+        request.Headers.TryAddWithoutValidation("Authorization","AWS4-HMAC-SHA256 Credential=" + access + "/" + signing.Scope
+            + ", SignedHeaders=" + Signed + ", Signature=" + signing.Signature);
+        using var each = CancellationTokenSource.CreateLinkedTokenSource(total);
+        each.CancelAfter(TimeSpan.FromSeconds(5));
+        using var response = await client.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,each.Token);
+        int status = (int)response.StatusCode;
+        Demand(deleted ? status is 404 or 405 : status == 200, "http_" + status);
+        int limit = key.Length == 0 || deleted ? XmlCap : ObjectCap;
+        Demand(response.Content.Headers.ContentLength is not long length || length <= limit && length <= TotalCap - totalBytes, "content_length_cap");
+        await using var stream = await response.Content.ReadAsStreamAsync(each.Token);
+        var buffer = new byte[8192];
+        using var memory = new MemoryStream();
+        int count;
+        while ((count = await stream.ReadAsync(buffer, each.Token)) != 0) {
+            totalBytes = checked(totalBytes + count);
+            Demand(totalBytes <= TotalCap && memory.Length + count <= limit, "body_cap");
+            memory.Write(buffer, 0, count);
+        }
+        string? Header(string name) => response.Headers.TryGetValues(name,out var values) ? values.Single() : null;
+        return new(status,memory.ToArray(),Header("x-amz-version-id"),Header("x-amz-delete-marker"),response.Content.Headers.LastModified?.ToString("O"));
+    }
+
+    private static XElement Xml(byte[] data, string root)
+    {
+        using var input = new MemoryStream(data);
+        using var reader = XmlReader.Create(input,new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null,
+            MaxCharactersInDocument = XmlCap });
+        var node = XDocument.Load(reader).Root;
+        Demand(node != null && node.Name.LocalName==root && (node.Name.Namespace==Ns || node.Name.Namespace==XNamespace.None),"xml_root");
+        // 锁定 S3 XML 的有/无默认命名空间形式；拒绝混入不同命名空间伪装的条目。
+        var namespaceName=node!.Name.Namespace;
+        Demand(node.Descendants().All(e=>e.Name.Namespace==namespaceName),"xml_namespace");
+        if (namespaceName==XNamespace.None)
+            foreach (var field in node.DescendantsAndSelf()) field.Name=Ns+field.Name.LocalName;
+        return node;
+    }
+
+    private static string? Field(XElement node, string name, bool required = true)
+    {
+        var values = node.Elements(Ns + name).ToList();
+        Demand(values.Count <= 1 && (!required || values.Count == 1) && values.All(x => !x.HasElements), "xml_field");
+        return values.SingleOrDefault()?.Value;
+    }
+
+    private static string Id(string? value, bool key)
+    {
+        Demand(!string.IsNullOrEmpty(value) && Encoding.UTF8.GetByteCount(value) <= 1024
+            && !value.Any(char.IsControl) && (!key || !value.Split('/').Any(p => p is "." or "..")), "version_identity");
+        return value!;
+    }
+
+    private static bool Flag(XElement node, string name) => Field(node,name) switch {
+        "true" => true, "false" => false, _ => throw Bad("xml_boolean") };
+
+    /// <summary>遍历未过滤任务桶，所有正文 GET 均来自本次列表返回的准确版本。</summary>
+    private async Task<object> Inventory(SortedDictionary<string,string> binding, CancellationToken token)
+    {
+        var watch = Stopwatch.StartNew();
+        var versionConfig = await Get("GetBucketVersioning","",new() {["versioning"]=""},false,token);
+        var config = Xml(versionConfig.Bytes, "VersioningConfiguration");
+        string versioning = Field(config,"Status",false) ?? "UNSET";
+        Demand(versioning is "Enabled" or "Suspended" or "UNSET","versioning_response");
+        var pages = new List<object>();
+        var cursors = new HashSet<(string,string)>();
+        var items = new HashSet<(string,string)>();
+        string? keyMarker = null, versionMarker = null;
+        for (;;) {
+            Demand(pages.Count < PageCap,"page_cap");
+            var fields = new Dictionary<string,string>{["versions"]="",["max-keys"]="2"};
+            if (keyMarker != null) { fields.Add("key-marker",keyMarker); fields.Add("version-id-marker",versionMarker!); }
+            var page = await Get("ListObjectVersions","",fields,false,token);
+            var root = Xml(page.Bytes,"ListVersionsResult");
+            Demand(root.Elements().All(e=>e.Name.LocalName is "Name" or "Prefix" or "Delimiter" or "EncodingType" or "KeyMarker" or
+                "VersionIdMarker" or "NextKeyMarker" or "NextVersionIdMarker" or "MaxKeys" or "IsTruncated" or "Version" or
+                "DeleteMarker" or "CommonPrefixes"),"unknown_list_entry");
+            Demand(Field(root,"Name")==Bucket && Field(root,"MaxKeys")=="2" &&
+                string.IsNullOrEmpty(Field(root,"Prefix",false)) && string.IsNullOrEmpty(Field(root,"Delimiter",false)) &&
+                string.IsNullOrEmpty(Field(root,"EncodingType",false)) && !root.Elements(Ns+"CommonPrefixes").Any(),"list_scope");
+            Demand((Field(root,"KeyMarker",false) ?? "")==(keyMarker ?? "") &&
+                (Field(root,"VersionIdMarker",false) ?? "")==(versionMarker ?? ""),"list_echo");
+            bool truncated = Flag(root,"IsTruncated");
+            string? nextKey = Field(root,"NextKeyMarker",false), nextVersion = Field(root,"NextVersionIdMarker",false);
+            var records = root.Elements().Where(n => n.Name==Ns+"Version" || n.Name==Ns+"DeleteMarker").ToArray();
+            Demand(records.Length <= 2 && (!truncated || records.Length > 0),"page_size");
+            var rows = new List<object>();
+            foreach (var r in records) {
+                string key = Id(Field(r,"Key"),true), id = Id(Field(r,"VersionId"),false);
+                Demand(items.Add((key,id)) && items.Count <= EntryCap,"version_duplicate_or_cap");
+                bool latest = Flag(r,"IsLatest"), marker = r.Name==Ns+"DeleteMarker";
+                string time = Field(r,"LastModified")!;
+                Demand(DateTimeOffset.TryParse(time,CultureInfo.InvariantCulture,DateTimeStyles.RoundtripKind,out var stamp),"modified");
+                var read = await Get(marker ? "ReadDeleteMarker" : "GetObjectVersion",key,new(){["versionId"]=id},marker,token);
+                Demand(read.Version==id || !marker && id=="null" && versioning=="UNSET" && read.Version==null,"response_version");
+                int? listedBytes = null;
+                if (marker) {
+                    Demand(read.Marker=="true" && DateTimeOffset.TryParse(read.LastModified,CultureInfo.InvariantCulture,
+                        DateTimeStyles.RoundtripKind,out var headerTime) && headerTime.ToUnixTimeSeconds()==stamp.ToUnixTimeSeconds(),"marker_headers");
+                } else {
+                    Demand(int.TryParse(Field(r,"Size"),NumberStyles.None,CultureInfo.InvariantCulture,out int expected)
+                        && expected==read.Bytes.Length && read.Marker is null or "false","version_length");
+                    listedBytes = expected;
+                }
+                rows.Add(new {key,versionId=id,kind=marker?"DeleteMarker":"Version",isLatest=latest,lastModified=time,listedBytes,
+                    status=read.Status,responseVersionId=read.Version,responseDeleteMarker=read.Marker,responseLastModified=read.LastModified,
+                    responseBytes=read.Bytes.Length,responseSha256=Sha(read.Bytes)});
+            }
+            if (truncated) Demand(cursors.Add((Id(nextKey,true),Id(nextVersion,false))),"continuation_cycle");
+            else Demand(string.IsNullOrEmpty(nextKey) && string.IsNullOrEmpty(nextVersion),"terminal_cursor");
+            pages.Add(new {keyMarker,versionMarker,nextKey=string.IsNullOrEmpty(nextKey)?null:nextKey,
+                nextVersion=string.IsNullOrEmpty(nextVersion)?null:nextVersion,truncated,xmlBytes=page.Bytes.Length,xmlSha256=Sha(page.Bytes),rows});
+            if (!truncated) break;
+            keyMarker=nextKey;versionMarker=nextVersion;
+        }
+        return new {status="OBSERVED",binding,versioning,versioningBytes=versionConfig.Bytes.Length,
+            versioningSha256=Sha(versionConfig.Bytes),pages,totalResponseBytes=totalBytes,elapsedMs=watch.ElapsedMilliseconds};
+    }
+
+    private static SortedDictionary<string,string> Request(string raw)
+    {
+        Demand(raw.Length<8192,"input_size");
+        using var doc=JsonDocument.Parse(raw);
+        var data=new SortedDictionary<string,string>(StringComparer.Ordinal);
+        foreach(var field in doc.RootElement.EnumerateObject()) data.Add(field.Name,field.Value.GetString()!);
+        Demand(data.Count==13 && data["taskId"]==TaskId && data["run"]==Run && data["resourceRun"]=="implementation-01" &&
+            data["base"]==Base && data["image"]==Image && data["archive"]==Archive && Hex(data["attempt"],32) &&
+            Hex(data["sourceSha256"],64) && Hex(data["containerId"],64) &&
+            data["driverSha256"]==Sha(File.ReadAllBytes(Assembly.GetExecutingAssembly().Location)),"input_binding");
+        Demand(data["role"]=="actual" && data["volume"]=="ontology-g4-omq-restore-01_rustfs-data" &&
+            data["containerId"]=="65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be" ||
+            data["role"]=="reference" && data["volume"]=="ontology-g4-omq-recovery-02_rustfs-reference" &&
+            data["containerId"]!="65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be","role_binding");
+        string fp=data["inputFingerprint"];
+        data.Remove("inputFingerprint");
+        Demand(HashText(JsonSerializer.Serialize(data))==fp,"input_fingerprint");
+        data.Add("inputFingerprint",fp);
+        return data;
+    }
+
+    /// <summary>固定公开测试向量由独立 Python HMAC 计算，覆盖路径、查询与签名。</summary>
+    private static void SelfTest()
+    {
+        string path=PathFor("dir/a b+c%/中"), query=Query(new Dictionary<string,string> {
+            ["versions"]="",["version-id-marker"]="v/2",["max-keys"]="2",["key-marker"]="a b+" });
+        Demand(path=="/g4-oracle-mapping-synthetic/dir/a%20b%2Bc%25/%E4%B8%AD" && query=="key-marker=a%20b%2B&max-keys=2&version-id-marker=v%2F2&versions=" &&
+            Sign(path,query,"20130524T000000Z","offline-fixture").Signature=="f52be860b640539f18bdf0a485bfd538355bcbe66e7c46075a29701bcf753c18","signature_vector");
+    }
+
+    public static async Task<int> Main(string[] args)
+    {
+        ObjectRecovery? consumer=null;
+        try {
+            SelfTest();
+            if (args.SequenceEqual(new[]{"--self-test"})) { Console.WriteLine("{\"status\":\"SIGNATURE_VECTOR_VERIFIED\"}"); return 0; }
+            Demand(args.Length==0,"arguments");
+            using var budget=new CancellationTokenSource(TimeSpan.FromSeconds(45));
+            var binding=Request(await Console.In.ReadToEndAsync(budget.Token));
+            consumer=new ObjectRecovery();
+            var observed=await consumer.Inventory(binding,budget.Token);
+            Console.WriteLine(JsonSerializer.Serialize(observed));
+            return 0;
+        } catch(Exception error) {
+            string reason=error is InvalidDataException && Regex.IsMatch(error.Message,@"\A[a-zA-Z0-9_]{1,64}\z")?error.Message:error.GetType().Name;
+            Console.WriteLine(JsonSerializer.Serialize(new{status="BLOCKED",operation=consumer?.operation??"setup",reason}));
+            return 2;
+        } finally { consumer?.client.Dispose(); }
+    }
+}
