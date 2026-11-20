@@ -65,7 +65,8 @@ internal static class OracleQueryReader
                     await adapter.RecordQuerySessionAsync(connection, lifetime, work.Token);
                     return await OracleSourceAdapter.BeginMappingAsync(connection, work.Token);
                 },
-                (connection, tx, native) => ReadCommandAsync(adapter, connection, tx, table.Schema == "CaseOwner", lifetime, work.Token, native),
+                (connection, tx, native, cancelling) => ReadCommandAsync(adapter, connection, tx, table.Schema == "CaseOwner",
+                    lifetime, work.Token, native, cancelling),
                 async connection =>
                 {
                     await OracleSourceAdapter.VerifyMappingAccessAsync(connection, work.Token);
@@ -74,7 +75,8 @@ internal static class OracleQueryReader
                         throw Invalid();
                 },
                 () => adapter.QueryEvent("PHYSICAL_RELEASE", lifetime), work.Token, origin, budget,
-                (phase, acquisition) => adapter.QueryOwnership(phase, lifetime, acquisition));
+                (phase, acquisition) => adapter.QueryOwnership(phase, lifetime, acquisition),
+                point => adapter.QueryCleanup(lifetime, point));
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
         catch (Exception failure) when (failure is OperationCanceledException or OracleException { Number: 1013 })
@@ -115,24 +117,47 @@ internal static class OracleQueryReader
     /// <summary>正式 Oracle reader 独占连接、业务事务和后续核验，确认发生在物理释放返回后。</summary>
     internal static async Task<List<OracleMappingRow>> ReadOwnedAsync<TConnection, TTransaction>(
         G4OracleSourceLifetime lifetime, Func<Task<TConnection>> open, Func<TConnection, Task<TTransaction>> begin,
-        Func<TConnection, TTransaction, Action<Exception>, Task<List<OracleMappingRow>>> read, Func<TConnection, Task> verifyAfter,
-        Action released, CancellationToken work, long origin, TimeSpan budget, Action<string, Guid>? report = null)
+        Func<TConnection, TTransaction, Action<Exception>, Action, Task<List<OracleMappingRow>>> read, Func<TConnection, Task> verifyAfter,
+        Action released, CancellationToken work, long origin, TimeSpan budget, Action<string, Guid>? report = null,
+        Action<CleanupObservation>? reportCleanup = null)
         where TConnection : IAsyncDisposable where TTransaction : DbTransaction
     {
+        // 已取消的工作不能新开源；申请号随下列每个物理观察一同记录。
+        work.ThrowIfCancellationRequested();
+        var acquisition = lifetime.BeginSource();
+        // 捕获正式请求，其他线程上的定向取消也复用该原期限。
+        var request = G4RequestDeadline.Current;
         // 取消信号和工作线程共用最早清理起点，不能从回滚另起预算。
         long cleanupStart = 0;
-        // 同一最早起点同时约束物理释放和外层 PG 结算；后续重复通知只会收紧。
-        void StartCleanup()
+        // 跨线程的 UTC 证据只能向前收紧；真正放行使用原单调时基。
+        long earliestUtc = DateTimeOffset.MaxValue.UtcTicks;
+        TimeSpan Left() => new[] { budget - Stopwatch.GetElapsedTime(origin),
+            CleanupLimit - Stopwatch.GetElapsedTime(Volatile.Read(ref cleanupStart)),
+            request?.Remaining ?? TimeSpan.Zero, lifetime.CleanupRemaining ?? CleanupLimit }.Min();
+        void Record(string trigger)
+        {
+            if (reportCleanup is null) return;
+            // 先读 UTC，再扣实际单调耗时，由此计算跨进程比较可用的保守截止。
+            var utc = DateTimeOffset.UtcNow;
+            var candidate = utc.Add(Left()).UtcTicks;
+            long prior;
+            do
+            {
+                prior = Volatile.Read(ref earliestUtc);
+                candidate = Math.Min(candidate, prior);
+            } while (Interlocked.CompareExchange(ref earliestUtc, candidate, prior) != prior);
+            reportCleanup(new CleanupObservation(trigger, acquisition, utc, new DateTimeOffset(candidate, TimeSpan.Zero), candidate - utc.UtcTicks));
+        }
+        void StartCleanup(string trigger)
         {
             // 先登记本线程看到的单调戳，若另一线程更早进入则沿用其已消耗的时间。
             var stamp = Stopwatch.GetTimestamp();
             var previous = Interlocked.CompareExchange(ref cleanupStart, stamp, 0);
             lifetime.TightenCleanup(CleanupLimit - Stopwatch.GetElapsedTime(previous == 0 ? stamp : previous));
+            Record(trigger);
         }
-        using var observed = work.Register(StartCleanup);
-        // 物理申请在任何连接尝试之前登记。
-        var acquisition = lifetime.BeginSource();
         report?.Invoke("ACQUIRED", acquisition);
+        using var observed = work.Register(() => StartCleanup("WORK_CANCELLED"));
         // 只有业务命令终止、事务结算且无未经确认的后验工作时，才有资格进一步验证物理释放。
         var confirmed = false;
         try
@@ -153,7 +178,7 @@ internal static class OracleQueryReader
                 {
                     try
                     {
-                        rows = await read(connection, tx, error => nativeTermination = error);
+                        rows = await read(connection, tx, error => nativeTermination = error, () => StartCleanup("DIRECTED_CANCEL"));
                         readReturned = true;
                         report?.Invoke("READ_RETURNED", acquisition);
                         work.ThrowIfCancellationRequested();
@@ -162,9 +187,9 @@ internal static class OracleQueryReader
                     }
                     catch (Exception failure)
                     {
-                        StartCleanup();
+                        StartCleanup("WORK_FAILURE");
                         // 回滚使用原分支、请求和首次取消窗口中剩余的最小值。
-                        var left = RemainingCleanup(origin, budget, Volatile.Read(ref cleanupStart));
+                        var left = Left();
                         if (left <= TimeSpan.Zero) throw;
                         using var cleanup = new CancellationTokenSource(left);
                         await tx.RollbackAsync(cleanup.Token);
@@ -199,20 +224,21 @@ internal static class OracleQueryReader
             catch
             {
                 // 包括后验和事务释放异常，物理连接 Dispose 消耗的时间不能从持有人窗口漏掉。
-                StartCleanup();
+                StartCleanup("RESOURCE_FAILURE");
                 throw;
             }
             finally
             {
                 try
                 {
-                    await connection.DisposeAsync();
+                    try { Record("PHYSICAL_DISPOSE"); }
+                    finally { await connection.DisposeAsync(); }
                     released();
                     report?.Invoke("PHYSICAL_DISPOSED", acquisition);
                 }
                 catch
                 {
-                    StartCleanup();
+                    StartCleanup("RESOURCE_FAILURE");
                     confirmed = false;
                     throw;
                 }
@@ -220,7 +246,9 @@ internal static class OracleQueryReader
         }
         finally
         {
-            if (confirmed && RemainingCleanup(origin, budget, Volatile.Read(ref cleanupStart)) > TimeSpan.Zero)
+            // 最终采样在所有源资源返回后；日志输出本身的耗时仍计入正式确认。
+            if (confirmed) Record("FINAL");
+            if (confirmed && Left() > TimeSpan.Zero)
             {
                 lifetime.ConfirmReleased(acquisition);
                 report?.Invoke("CONFIRMED", acquisition);
@@ -230,7 +258,7 @@ internal static class OracleQueryReader
 
     /// <summary>在该次固定命令上注册定向取消并等待游标及命令退出，之后才允许事务结算。</summary>
     private static async Task<List<OracleMappingRow>> ReadCommandAsync(OracleSourceAdapter adapter, OracleConnection connection,
-        OracleTransaction tx, bool target, G4OracleSourceLifetime lifetime, CancellationToken token, Action<Exception> nativeReturned)
+        OracleTransaction tx, bool target, G4OracleSourceLifetime lifetime, CancellationToken token, Action<Exception> nativeReturned, Action cancelling)
     {
         // 只有业务执行或取行本身报告的异常能在游标和命令都释放后用于原生确认。
         Exception? native = null;
@@ -241,7 +269,7 @@ internal static class OracleQueryReader
             using var cancel = token.Register(() =>
             {
                 // 同步驱动 Cancel 也消耗最早 250ms，不能等它返回后才开始计时。
-                lifetime.TightenCleanup(CleanupLimit);
+                cancelling();
                 adapter.QueryEvent("CANCEL_ENTER", lifetime);
                 try
                 {
@@ -265,10 +293,14 @@ internal static class OracleQueryReader
         }
     }
 
-    /// <summary>原分支余量、原请求余量及从首次取消起的绝对清理余量取最小值。</summary>
-    private static TimeSpan RemainingCleanup(long origin, TimeSpan budget, long cleanupStart) =>
-        new[] { budget - Stopwatch.GetElapsedTime(origin), CleanupLimit - Stopwatch.GetElapsedTime(cleanupStart),
-            G4RequestDeadline.Current?.Remaining ?? TimeSpan.Zero, G4OracleSourceLifetime.Current?.CleanupRemaining ?? CleanupLimit }.Min();
+    /// <summary>仅用于关联准确申请的已扣单调耗时；允许零和负余量来说明无法确认。</summary>
+    /// <param name="Trigger">本次采样所属的封闭清理阶段。</param>
+    /// <param name="Acquisition">当前准确申请身份。</param>
+    /// <param name="Utc">读取单调余量之前的 UTC 下界。</param>
+    /// <param name="DeadlineUtc">同申请所有已知期限的最早保守 UTC 上界。</param>
+    /// <param name="RemainingTicks">上界减该次 UTC 值，以一百纳秒刻度记录。</param>
+    internal readonly record struct CleanupObservation(string Trigger, Guid Acquisition, DateTimeOffset Utc,
+        DateTimeOffset DeadlineUtc, long RemainingTicks);
 
     /// <summary>同组织与厂区的精确 NUMBER 等值及半开区间；数据库 NULL 永不组成边。</summary>
     internal static bool Matches(Dictionary<string, G4QueryValue> parent, Dictionary<string, G4QueryValue> target)

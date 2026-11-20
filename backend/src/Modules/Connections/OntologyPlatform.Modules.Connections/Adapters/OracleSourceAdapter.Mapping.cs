@@ -25,6 +25,11 @@ public sealed partial class OracleSourceAdapter
         logger?.LogInformation("OracleSourceOwnership phase={Phase} query={QueryId} execution={ExecutionId} acquisition={Acquisition:N} utc={Utc:O}",
             phase, lifetime.QueryId, lifetime.ExecutionId, acquisition, DateTimeOffset.UtcNow);
 
+    /// <summary>记录源清理的保守 UTC 截止及单调剩余刻度；原始业务数据不参与观察。</summary>
+    internal void QueryCleanup(G4OracleSourceLifetime lifetime, OracleQueryReader.CleanupObservation point) =>
+        logger?.LogInformation("OracleSourceCleanup trigger={Trigger} query={QueryId} execution={ExecutionId} acquisition={Acquisition:N} utc={Utc:O} deadlineUtc={DeadlineUtc:O} remainingTicks={RemainingTicks}",
+            point.Trigger, lifetime.QueryId, lifetime.ExecutionId, point.Acquisition, point.Utc, point.DeadlineUtc, point.RemainingTicks);
+
     /// <summary>原生取消必须来自该次业务 Execute 或 Read，不能将普通请求取消扩大为源端因果。</summary>
     internal static bool IsNativeCancel(Exception failure) => failure is OracleException { Number: 1013 }
         or OperationCanceledException { InnerException: OracleException { Number: 1013 } };

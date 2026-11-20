@@ -23,18 +23,26 @@ public sealed class OracleQueryLifetimeTests
         var order = new List<string>();
         var source = new Physical(() => order.Add("physical-disposed"));
         var tx = new Transaction(order);
+        // 独立消费者需要驱动实际清理起点和最终原截止，两者绑定相同申请。
+        var cleanup = new List<OracleQueryReader.CleanupObservation>();
         await Assert.ThrowsAsync<OperationCanceledException>(() => OracleQueryReader.ReadOwnedAsync(lifetime,
             () => Task.FromResult(source), _ => Task.FromResult(tx),
-            (_, _, _) =>
+            (_, _, _, _) =>
             {
                 order.Add("business-cursor-and-command-returned");
                 work.Cancel();
                 return Task.FromResult(new List<OracleMappingRow>());
             },
             _ => { order.Add("post-read"); return Task.CompletedTask; },
-            () => order.Add("released"), work.Token, Stopwatch.GetTimestamp(), TimeSpan.FromSeconds(1)));
+            () => order.Add("released"), work.Token, Stopwatch.GetTimestamp(), TimeSpan.FromSeconds(1), reportCleanup: cleanup.Add));
         Console.WriteLine(JsonSerializer.Serialize(new { order, lifetime.HasAcquired, lifetime.CleanupConfirmed }));
         Assert.IsTrue(lifetime.HasAcquired);
+        CollectionAssert.AreEqual(new[] { "WORK_CANCELLED", "WORK_FAILURE", "RESOURCE_FAILURE", "PHYSICAL_DISPOSE", "FINAL" },
+            cleanup.Select(point => point.Trigger).ToArray());
+        Assert.AreEqual(1, cleanup.Select(point => point.Acquisition).Distinct().Count());
+        Assert.AreEqual(cleanup.Min(point => point.DeadlineUtc), cleanup[^1].DeadlineUtc);
+        Assert.IsTrue(cleanup.All(point => point.Utc.AddTicks(point.RemainingTicks) == point.DeadlineUtc
+            && point.RemainingTicks > 0 && point.RemainingTicks <= TimeSpan.FromMilliseconds(250).Ticks));
         CollectionAssert.AreEqual(new[] { "business-cursor-and-command-returned", "rollback", "transaction-disposed", "physical-disposed", "released" }, order);
         Assert.IsTrue(lifetime.CleanupConfirmed, "The returned read and complete physical release must clear this acquisition.");
     }
@@ -51,7 +59,7 @@ public sealed class OracleQueryLifetimeTests
         var source = new Physical(() => order.Add("physical"));
         var tx = new Transaction(order);
         var rows = await OracleQueryReader.ReadOwnedAsync(lifetime, () => Task.FromResult(source), _ => Task.FromResult(tx),
-            (_, _, _) => Task.FromResult(new List<OracleMappingRow>()),
+            (_, _, _, _) => Task.FromResult(new List<OracleMappingRow>()),
             _ => { order.Add("post"); return Task.CompletedTask; },
             () => order.Add("released"), CancellationToken.None, Stopwatch.GetTimestamp(), TimeSpan.FromSeconds(1),
             (phase, id) => { acquisition = id; order.Add(phase); });
@@ -93,7 +101,7 @@ public sealed class OracleQueryLifetimeTests
         var transaction = new Transaction(order, Stage);
         var error = await Assert.ThrowsAsync<IOException>(() => OracleQueryReader.ReadOwnedAsync(lifetime,
             () => Task.FromResult(connection), _ => Task.FromResult(transaction),
-            (_, _, _) =>
+            (_, _, _, _) =>
             {
                 Stage("eof");
                 Stage("cursor-dispose");
@@ -125,7 +133,7 @@ public sealed class OracleQueryLifetimeTests
         var connection = new Physical(() => order.Add("physical"));
         var transaction = new Transaction(order);
         await Assert.ThrowsAsync<OperationCanceledException>(() => OracleQueryReader.ReadOwnedAsync(lifetime,
-            () => Task.FromResult(connection), _ => Task.FromResult(transaction), (_, _, _) => Task.FromResult(new List<OracleMappingRow>()),
+            () => Task.FromResult(connection), _ => Task.FromResult(transaction), (_, _, _, _) => Task.FromResult(new List<OracleMappingRow>()),
             _ => { order.Add("metadata"); return Task.CompletedTask; }, () => order.Add("released"), work.Token,
             Stopwatch.GetTimestamp(), TimeSpan.FromSeconds(1), (phase, id) =>
             {
@@ -153,7 +161,7 @@ public sealed class OracleQueryLifetimeTests
         var connection = new Physical(() => order.Add("physical"));
         var tx = new Transaction(order);
         var running = OracleQueryReader.ReadOwnedAsync(lifetime, () => Task.FromResult(connection), _ => Task.FromResult(tx),
-            (_, _, _) => Task.FromResult(new List<OracleMappingRow>()), async _ =>
+            (_, _, _, _) => Task.FromResult(new List<OracleMappingRow>()), async _ =>
             {
                 entered.SetResult();
                 await finish.Task.WaitAsync(TimeSpan.FromSeconds(1));
@@ -196,7 +204,7 @@ public sealed class OracleQueryLifetimeTests
         // 记录真实申请，验证迟到的准确身份也不能把旧时限重新打开。
         var acquisition = Guid.Empty;
         var run = OracleQueryReader.ReadOwnedAsync(lifetime, () => Task.FromResult(connection), _ => Task.FromResult(transaction),
-            (_, _, _) =>
+            (_, _, _, _) =>
             {
                 if (boundary == "cleanup") work.Cancel();
                 return Task.FromResult(new List<OracleMappingRow>());
@@ -226,7 +234,7 @@ public sealed class OracleQueryLifetimeTests
         var tx = new Transaction(order, stage => { if (stage == "rollback") clock.Advance(200); });
         await Assert.ThrowsAsync<IOException>(() => OracleQueryReader.ReadOwnedAsync(lifetime,
             () => Task.FromResult(connection), _ => Task.FromResult(tx),
-            (_, _, _) => throw new IOException("source-failure"), _ => Task.CompletedTask,
+            (_, _, _, _) => throw new IOException("source-failure"), _ => Task.CompletedTask,
             () => order.Add("released"), CancellationToken.None, Stopwatch.GetTimestamp(), TimeSpan.FromSeconds(1)));
         Console.WriteLine($"rollbackMs=200 remainingMs={lifetime.CleanupRemaining?.TotalMilliseconds}");
         Assert.IsTrue(lifetime.CleanupRemaining is { } left && left > TimeSpan.Zero && left <= TimeSpan.FromMilliseconds(50));
