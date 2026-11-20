@@ -78,11 +78,12 @@ class OracleFrozenMetadataTests(unittest.TestCase):
 
 
 def load_tests(loader, tests, pattern):
-    """现有 Oracle 工程准入也运行当前检查点的五项资源预算反例。"""
-    spec = importlib.util.spec_from_file_location('oracle_recovery_tests', Path(__file__).with_name('WorkflowOracleRecovery.Tests.py'))
-    recovery_tests = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(recovery_tests)
-    tests.addTests(loader.loadTestsFromModule(recovery_tests))
+    """原准入统一执行资源检查及正式查询证据消费者的离线反例。"""
+    for suite in ('WorkflowOracleRecovery', 'WorkflowOracleMappingEvidence'):
+        spec = importlib.util.spec_from_file_location(suite, Path(__file__).with_name(suite + '.Tests.py'))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        tests.addTests(loader.loadTestsFromModule(module))
     return tests
 
 
