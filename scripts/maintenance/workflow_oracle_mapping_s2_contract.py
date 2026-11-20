@@ -245,7 +245,7 @@ def demand_connection_original(raw):
 
 
 def qualify(report):
-    require(report['taskId']=='G4-ORACLE-MAPPING-QUERY-001' and report['runId']=='product-resume-01' and report['batch']['planId']=='s2-s3-01','S23_REPORT_OWNER')
+    require(report['taskId']=='G4-ORACLE-MAPPING-QUERY-001' and report['runId']=='product-resume-01' and report['batch']['planId'] in ('s2-s3-01','s2-s3-01-access-01'),'S23_REPORT_OWNER')
     mode=report['mode'];rows=report.get('oracleCases',[])
     require(rows or mode in ('s2-oracle-vocabulary','s2-oracle-mapping','s2-oracle-reopen','s2-oracle-aba'),'S23_CASES_MISSING')
     names=[r['name'] for r in rows];require(len(names)==len(set(names)),'S23_CASE_DUPLICATE')
@@ -262,13 +262,19 @@ def qualify(report):
 
 
 
-def frozen_plan(root):
+def frozen_plan(root,plan_id="s2-s3-01"):
     stages=[('s0-oracle-auth','authentication',600),*[(m,'product',180) for m in ['s2-oracle-vocabulary','s2-oracle-mapping',
         's2-oracle-queries','s2-oracle-relations','s2-oracle-access','s2-oracle-aba','s2-oracle-connection','s2-oracle-versions','s2-oracle-states']],('reader-auth','authentication',180),
         *[(m,'product',180) for m in ['s2-oracle-reopen','s3','ui-s3','ui-s1']]]
     expected=dict(schemaVersion=1,planId='s2-s3-01',mode='s2-s3-oracle',preSeconds=60,postSeconds=60,submissionSeconds=40,
         requiredSessionSeconds=210,stages=[dict(mode=m,kind=k,seconds=t) for m,k,t in stages],deadlineSeconds=120+sum(t for m,k,t in stages))
-    plan=json.loads((root/'scripts/maintenance/workflow-oracle-s2-plan.json').read_bytes())
+    path='scripts/maintenance/workflow-oracle-s2-plan.json'
+    if plan_id=='s2-s3-01-access-01':
+        from workflow_oracle_mapping_continuation import PREFIX
+        expected.update(planId=plan_id,stages=[expected['stages'][0],*expected['stages'][5:]],qualifiedPrefix=PREFIX,deadlineSeconds=2520)
+        path='scripts/maintenance/workflow-oracle-s2-access-plan.json'
+    else:require(plan_id=='s2-s3-01','S23_PLAN_ID')
+    plan=json.loads((root/path).read_bytes())
     require(plan==expected,'S23_FROZEN_PLAN')
     return plan
 

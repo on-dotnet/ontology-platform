@@ -26,3 +26,13 @@ test("formal mapping counts both validation and activation, rejecting interrupte
   for(const name of names)assert.throws(()=>formalMappingReads({...complete,[name]:null}),/ORACLE_S2_MAPPING_INTERRUPTED_PRESTATE/u);
   assert.throws(()=>formalMappingReads({mappingJob:{status:"RUNNING"}}),/ORACLE_S2_MAPPING_INTERRUPTED_PRESTATE/u);
 });
+
+
+test("new suffix dispatches exactly eleven bounded slots and stops on failure",async()=>{
+  const plan=omq.s2AccessPlan(),visited=[],shared={plan};let time=0;
+  assert(await omq.runAuthHandoffPlan(shared,async(mode,ctx)=>{visited.push(mode);assert.equal(ctx.stageDeadline-time,ctx.stageSpec.seconds*1000);time+=1;return {status:"PASS",mode};},()=>time));
+  assert.deepEqual(visited,[omq.s2Plan.stages[0],...omq.s2Plan.stages.slice(5)].map(x=>x.mode));
+  assert.equal(visited.length,11);assert.equal(plan.deadlineSeconds,2520);
+  const failed=[];assert.equal(await omq.runAuthHandoffPlan({plan},async mode=>{failed.push(mode);return {status:mode==="s2-oracle-access"?"FAIL":"PASS"};}),false);
+  assert.deepEqual(failed,["s0-oracle-auth","s2-oracle-access"]);
+});

@@ -166,6 +166,57 @@ class S2PlanTests(unittest.TestCase):
         report['runId']='implementation-01'
         with self.assertRaisesRegex(ValueError,'S23_REPORT_OWNER'):c.qualify(report)
 
+
+class S2ContinuationTests(unittest.TestCase):
+    def test_suffix_preserves_budgets_and_exact_qualified_prefix(self):
+        import workflow_oracle_mapping_continuation as n
+        old=c.frozen_plan(ROOT);new=c.frozen_plan(ROOT,n.PLAN_ID)
+        self.assertEqual(new['stages'],[old['stages'][0],*old['stages'][5:]])
+        self.assertEqual(len(new['stages']),11);self.assertEqual(new['deadlineSeconds'],2520)
+        self.assertEqual(new['qualifiedPrefix'],n.PREFIX)
+        self.assertEqual(ex.sha((ROOT/'scripts/maintenance/workflow-oracle-s2-plan.json').read_bytes()),'d1ee6baf39fb0ea645313769c4da0c0751e4fd11cc2c76958e8e3f0105862ff9')
+        with self.assertRaisesRegex(ValueError,'S23_PLAN_ID'):c.frozen_plan(ROOT,'arbitrary-suffix')
+        area=Path(self.enterContext(tempfile.TemporaryDirectory()));(area/'scripts/maintenance').mkdir(parents=True)
+        bad=copy.deepcopy(new);bad['stages'][1:3]=reversed(bad['stages'][1:3])
+        (area/'scripts/maintenance/workflow-oracle-s2-access-plan.json').write_text(json.dumps(bad))
+        with self.assertRaisesRegex(ValueError,'S23_FROZEN_PLAN'):c.frozen_plan(area,n.PLAN_ID)
+
+    def test_grant_order_does_not_hide_value_or_microsecond_differences(self):
+        row=grant(state(),'reader','data.query.execute','id')
+        row['RevokedAtUtc']='2026-11-20T00:00:00.123450+00:00'
+        reverse=dict(reversed(list(row.items())));reverse['RevokedAtUtc']='2026-11-20T00:00:00.12345Z'
+        self.assertTrue(s.same_grant(row,reverse))
+        for key,value in [('RevokedAtUtc','2026-11-20T00:00:00.123451Z'),('Id','other'),('FieldRefs',s.FIELDS[:11])]:
+            with self.subTest(key=key):self.assertFalse(s.same_grant(row,{**reverse,key:value}))
+
+    def test_prefix_compatibility_rejects_scope_and_executed_code_drift(self):
+        import workflow_oracle_mapping_continuation as n
+        import workflow_oracle_mapping_evidence as e
+        from types import SimpleNamespace
+        area=Path(self.enterContext(tempfile.TemporaryDirectory())).resolve();originals={}
+        for name in e.drivers(ROOT,'s2-s3-oracle'):
+            originals[name]=e.git_original(ROOT,n.PREFIX['measuredCommit'],name)
+            target=area/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/name).read_bytes())
+        frozen=dict(browserIdentity=dict(measuredDrivers={name:ex.sha(raw) for name,raw in originals.items()}))
+        archive=SimpleNamespace(root=area,dispatch=dict(commandId=n.PREFIX['commandId'],mode=n.MODES[-1]))
+        stage=dict(plan=dict(planId='s2-s3-01'))
+        with patch.object(n,'_frozen_qualification',return_value=frozen),patch.object(e,'git_original',side_effect=lambda root,commit,name:originals[name]):
+            self.assertTrue(n.compatible_prefix(archive,n.PREFIX['measuredCommit'],'s2-s3-oracle',stage))
+            for key,value in [('commandId','a'*32),('mode','s2-oracle-access')]:
+                saved=archive.dispatch[key];archive.dispatch[key]=value
+                with self.assertRaisesRegex(ValueError,'S23_PREFIX_COMPAT_SCOPE'):n.compatible_prefix(archive,n.PREFIX['measuredCommit'],'s2-s3-oracle',stage)
+                archive.dispatch[key]=saved
+            changes=[('scripts/maintenance/workflow-oracle-s2.mjs','async function queries(ctx)','async function queries(wrong)'),
+                ('scripts/maintenance/workflow-oracle-query-fixture.mjs','export function currentProjection(','export function wrongCurrentProjection('),
+                ('scripts/maintenance/workflow_oracle_mapping_platform.py','def audit_window(','def wrong_audit_window('),
+                ('scripts/maintenance/workflow_oracle_mapping_s2_contract.py','def result_case(','def wrong_result_case(')]
+            for name,old,new in changes:
+                path=area/name;raw=path.read_text();self.assertTrue(old in raw,name)
+                path.write_text(raw.replace(old,new,1))
+                with self.subTest(name=name),self.assertRaises(ValueError):n.compatible_prefix(archive,n.PREFIX['measuredCommit'],'s2-s3-oracle',stage)
+                path.write_text(raw)
+
+
 class S2ConsumerTests(unittest.TestCase):
     def healthy(self):
         import base64

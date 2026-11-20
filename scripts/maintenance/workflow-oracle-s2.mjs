@@ -18,7 +18,7 @@ export function consume(root, report, deadline) {
 /** 精确模式、Task/Run与完整目录未通过时，不能开始任何业务动作。 */
 export async function run(ctx) {
   const {root,state,shared,report,mode,actors,check,get,post,request,save,file} = ctx;
-  if (!shared || shared.plan.planId !== "s2-s3-01" || state.taskId !== task || state.runId !== runId || state.batch !== "s2-s3-01"
+  if (!shared || !["s2-s3-01","s2-s3-01-access-01"].includes(shared.plan.planId) || state.taskId !== task || state.runId !== runId || state.batch !== "s2-s3-01"
       || !omq.s2Plan.stages.some(s => s.mode === mode)) throw new Error("ORACLE_S2_DISPATCH");
   const deadline=shared.stageDeadline;
   const call=(method,...args)=>omq.s2Call(root,method,args,deadline);
@@ -501,7 +501,7 @@ async function access(ctx) {
       await execute(action+"-execute",q,reader,0);
     }
     finally {restored=call("permission_case",omq.grantState(state),"restore","execute",changed.token);report.permissionCases.push({action,changed,restored});}
-    check("oracle_grant_restored_"+action,JSON.stringify({...restored.after,ExpiresAtUtc:Date.parse(restored.after.ExpiresAtUtc),RevokedAtUtc:restored.after.RevokedAtUtc===null?null:Date.parse(restored.after.RevokedAtUtc)})===JSON.stringify({...changed.before,ExpiresAtUtc:Date.parse(changed.before.ExpiresAtUtc),RevokedAtUtc:changed.before.RevokedAtUtc===null?null:Date.parse(changed.before.RevokedAtUtc)}));
+    check("oracle_grant_restored_"+action,call("same_grant",restored.after,changed.before));
   }
   const short=call("permission_case",omq.grantState(state),"short","execute");
   try {

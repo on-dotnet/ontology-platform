@@ -51,10 +51,10 @@ def summary(argv):
     return dict(executable=Path(argv[0]).name, argumentCount=len(argv)-1, sha256=digest_value(argv))
 
 
-def batch_plan(root, mode="auth-handoff-s1"):
+def batch_plan(root, mode="auth-handoff-s1", plan_id=None):
     if mode=="s2-s3-oracle":
         from workflow_oracle_mapping_s2_contract import frozen_plan
-        return frozen_plan(root)
+        return frozen_plan(root,plan_id or "s2-s3-01")
     require(mode=="auth-handoff-s1", "OMQ_BATCH_MODE")
     plan=json.loads(ordinary(root/'scripts/maintenance/workflow-oracle-auth-plan.json').read_bytes())
     expected=[('s0-oracle-auth','authentication',600),(NATURAL_CANCEL,'product',180),('mapping','product',180),
@@ -65,7 +65,7 @@ def batch_plan(root, mode="auth-handoff-s1"):
     return plan
 
 
-def drivers(root, mode, run=None):
+def drivers(root, mode, run=None, plan_id=None):
     run = RUN if run is None else run
     names = DRIVERS
     if run==PRODUCT_RUN:
@@ -80,6 +80,8 @@ def drivers(root, mode, run=None):
         names += ('scripts/maintenance/workflow-oracle-s2-plan.json','scripts/maintenance/workflow-oracle-s2.mjs',
                   'scripts/maintenance/workflow_oracle_mapping_s2.py','scripts/maintenance/workflow_oracle_mapping_s2_contract.py',
                   'scripts/maintenance/workflow_oracle_mapping_formal_observer.py','scripts/maintenance/workflow_m4_query_evidence.py')
+    if plan_id=='s2-s3-01-access-01':
+        names+=('scripts/maintenance/workflow-oracle-s2-access-plan.json','scripts/maintenance/workflow_oracle_mapping_continuation.py')
     return {name: sha(ordinary(root/name).read_bytes()) for name in names}
 
 
@@ -101,7 +103,7 @@ def stable_host(host):
 
 
 def browser_invocation(root, mode, case, host, api_build, test_build, stage_inputs):
-    return _browser_invocation(mode,case,host,api_build,test_build,stage_inputs,drivers(root,mode))
+    return _browser_invocation(mode,case,host,api_build,test_build,stage_inputs,drivers(root,mode,plan_id=stage_inputs.get("plan",{}).get("planId")))
 
 
 def _browser_invocation(mode, case, host, api_build, test_build, stage_inputs, pinned):
@@ -116,7 +118,7 @@ def _browser_invocation(mode, case, host, api_build, test_build, stage_inputs, p
     args = [NODE, DRIVER, '--task', TASK, '--run-id', RUN, '--mode', mode]
     if mode in ('auth-handoff-s1','s2-s3-oracle'):
         prefix='s2-s3' if mode=='s2-s3-oracle' else 'auth-handoff'
-        require(stage_inputs['plan']==batch_plan(ROOT,mode) and COMMAND.fullmatch(stage_inputs['executionId']) and
+        require(stage_inputs['plan']==batch_plan(ROOT,mode,stage_inputs['plan']['planId']) and COMMAND.fullmatch(stage_inputs['executionId']) and
                 stage_inputs['batchInput']==prefix+'-'+stage_inputs['executionId']+'.json','OMQ_BATCH_INPUT')
         args += ['--batch-input',stage_inputs['batchInput']]
     components = dict(taskId=TASK, runId=RUN, mode=mode, case=case, drivers=pinned,
@@ -209,15 +211,21 @@ def setup_platform_program(data, mode):
 
 
 def measured_browser(archive, measured, mode, case, host, api, tests, stage):
-    current=drivers(archive.root,mode)
+    current=drivers(archive.root,mode,plan_id=stage.get("plan",{}).get("planId"))
     original={}
     for name,digest in current.items():
         data=git_original(archive.root,measured,name)
         original[name]=sha(data)
         if digest!=original[name]:
-            require(name==PLATFORM and mode in ('provision','mapping') and
-                    setup_platform_program(data,mode)==setup_platform_program(ordinary(archive.root/name).read_bytes(),mode),
-                    'OMQ_BROWSER_DRIVER_CHANGED')
+            if measured=='2a2ea74ff72c22860e4927318913eaece9d14f9f' and mode=='s2-s3-oracle' and stage['plan']['planId']=='s2-s3-01':
+                from workflow_oracle_mapping_continuation import compatible_prefix
+                if not getattr(archive,"prefixCompatibilityChecked",False):
+                    compatible_prefix(archive,measured,mode,stage)
+                    archive.prefixCompatibilityChecked=True
+            else:
+                require(name==PLATFORM and mode in ('provision','mapping') and
+                        setup_platform_program(data,mode)==setup_platform_program(ordinary(archive.root/name).read_bytes(),mode),
+                        'OMQ_BROWSER_DRIVER_CHANGED')
     archive.browserIdentity=dict(measuredCommit=measured,measuredDrivers=original,candidateDrivers=current)
     return _browser_invocation(mode,case,host,api,tests,stage,original)
 
@@ -233,7 +241,7 @@ def browser_report(archive, entry, origin, mode, case, host, api_build, test_bui
     else:
         argv,key,label=browser_invocation(archive.root,invocation_mode,case,host,api_build,test_build,invocation_stage)
     row, stdout, _ = archive.command(entry['commandId'], argv, label, key, host['commandId'], origin)
-    require(row['deadlineSeconds']==(batch_plan(archive.root,invocation_mode)['deadlineSeconds'] if batch else 180), 'OMQ_BROWSER_DEADLINE')
+    require(row['deadlineSeconds']==(batch_plan(archive.root,invocation_mode,invocation_stage['plan']['planId'])['deadlineSeconds'] if batch else 180), 'OMQ_BROWSER_DEADLINE')
     name = entry['report']
     require(re.fullmatch('browser-'+re.escape(mode)+r'-[0-9]{13}\.json', name), 'OMQ_REPORT_NAME')
     report, result = archive.read(name), json.loads(stdout)
@@ -278,8 +286,8 @@ def browser_report(archive, entry, origin, mode, case, host, api_build, test_bui
 
 def validate_batch(archive,parent,result,row,stage,origin):
     """真实父命令的固定计划、顺序、时间和原件逐一核对，阶段不是虚构子进程。"""
-    plan=batch_plan(archive.root,stage['mode'])
-    require(stage['plan']==plan and parent['input']==dict(executionId=stage['executionId'],plan=plan)
+    plan=batch_plan(archive.root,stage['mode'],stage['plan']['planId'])
+    require(stage['plan']==plan and parent['input']==dict(executionId=stage['executionId'],plan=plan,**({'qualifiedPrefix':stage['qualifiedPrefix']} if 'qualifiedPrefix' in plan else {}))
             and parent['taskId']==TASK and parent['runId']==PRODUCT_RUN and parent['mode']==plan['mode'],'OMQ_BATCH_PARENT')
     require(result==dict(status=parent['status'],report=str(origin/'artifacts/workflow'/TASK/RUN/Path(result['report']).name),stages=parent['stages'])
             and re.fullmatch('browser-'+plan['mode']+r'-[0-9]{13}\.json',Path(result['report']).name),'OMQ_BATCH_OUTPUT')
@@ -487,7 +495,7 @@ def batch_audit_closure(archive, entry, row, host, origin, measured):
     """正式阶段入口消费父全窗及全部阶段原件，按完整事件和时钟误差拒绝遗漏或歧义。"""
     from workflow_oracle_mapping_formal_observer import ns
     parent = archive.read(entry['batch']['report'])
-    plan = batch_plan(archive.root,entry['batch'].get('stageInputs',{}).get('mode','auth-handoff-s1'))
+    plan = batch_plan(archive.root,entry['batch'].get('stageInputs',{}).get('mode','auth-handoff-s1'),entry['batch'].get('stageInputs',{}).get('plan',{}).get('planId'))
     planned = plan['stages'][:len(parent['stages'])] if plan['mode']=='s2-s3-oracle' else plan['stages']
     require([item['mode'] for item in parent['stages']] == [item['mode'] for item in planned],
             'OMQ_BATCH_AUDIT_STAGES')
@@ -945,6 +953,11 @@ class RuntimeOriginals(Originals):
         elif self.dispatch.get('batch') and self.dispatch['batch']['stageInputs']['mode']=='s2-s3-oracle' and re.fullmatch(
                 r'(?:expiry|grant-plan|source-case|source-command|source-injected|source-restore|permission-case|permission-(?:revoke|field|expired|short|restore)|acl-case|acl-restored)-[a-f0-9]{32}[.]json',name):
             path=self.area/'s2-s3-01'/name
+        elif self.dispatch.get('batch',{}).get('stageInputs',{}).get('plan',{}).get('qualifiedPrefix') and re.fullmatch(r'browser-s2-oracle-queries-[0-9]{13}[.]json',name):
+            from workflow_oracle_mapping_continuation import prefix_result
+            qualified=prefix_result(self.root,self)[0]
+            require(name in qualified['members'],'OMQ_PREFIX_QUERY_MEMBER')
+            path=self.root/qualified['members'][name]['path']
         elif name in self.dispatch['reports'] or name in (self.dispatch['file'],'formal-audit-'+self.dispatch['commandId']+'.json') or re.fullmatch(r'formal-witness-[a-f0-9-]{36}\.json',name):
             path=self.area/name
         else:
@@ -965,7 +978,7 @@ def reopen_runtime_case(root,task,run,cid, *, expected_mode=None, _checked=None)
             and re.fullmatch('[0-9a-f]{40}',dispatch['testedCommit']),'OMQ_RUNTIME_DISPATCH_SCOPE')
     batch=None
     if dispatch['mode'] in ('auth-handoff-s1','s2-s3-oracle'):
-        require(expected_mode in [x['mode'] for x in batch_plan(root,dispatch['mode'])['stages']],'OMQ_BATCH_EXPECTED_MODE')
+        require(expected_mode in [x['mode'] for x in batch_plan(root,dispatch['mode'],dispatch['stageInputs']['plan']['planId'])['stages']],'OMQ_BATCH_EXPECTED_MODE')
         parent=json.loads(ordinary(area/dispatch['reports'][0]).read_bytes())
         matches=[r for r in parent['stages'] if r['mode']==expected_mode]
         require(len(matches)==1,'OMQ_BATCH_STAGE_NOT_RUN')
@@ -997,6 +1010,9 @@ def reopen_runtime_case(root,task,run,cid, *, expected_mode=None, _checked=None)
                 reopen_runtime_case(root,task,run,cid,expected_mode=required,_checked=checked)
         persistence['qualifiedPredecessors']=sorted(k for k in checked if k!=dispatch['mode'])
         persistence['batchAudit']=archive.batchAudit
+        if batch['stageInputs']['plan'].get('qualifiedPrefix'):
+            from workflow_oracle_mapping_continuation import reopen_prefix
+            persistence['qualifiedPrefix']=reopen_prefix(root,batch['stageInputs'],archive)
     if hasattr(archive,'s2Qualification'):persistence['s2Qualification']=archive.s2Qualification
     if dispatch['mode'] in ('s1','s1-reopen'):
         persistence['persistence']=archive.persistence

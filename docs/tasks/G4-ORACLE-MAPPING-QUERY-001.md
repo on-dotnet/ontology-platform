@@ -94,3 +94,5 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 本次受影响短修复仍由Master独占原owned_paths：browserRun异常强制FAIL并阻断后续；Mapping全新验证+激活独立预期4，完整既有链0，中断态拒绝；独立快照显式NULL ON NULL及11列，消费者按明确v1/v2 SQL兼容完整旧原件；Agent构建消费者额外接受准确product-resume-01，其他身份/双流/快照绑定保留。原null-parent token03018836c8e54863a439c2838c07cbfa已以4df9527db7584a87b847141596bcbde3按全值CAS恢复双表原散列。14 Node/16 S2 Python/7认证原件回归通过，原构建键及服务复用。原15槽计划及预算不变；已发布词汇与Mapping只回读，实际快照输入受修复影响的查询短阶段重验，随后继续未执行场景；不重跑旧EC/A/S1、不导出关闭的旧会话。
 
 非作者对当前增量限定GO：真实认证构建/票据32原件短链重开通过；旧父仍拒，源恢复27原件精确闭合。继续原15槽无派生计划，当前词汇/Mapping已发布状态只回读且验0源读；受影响查询阶段及余槽新测。
+
+2026-11-21后缀继续：父命令edd1379b83c246329579075d16ccda58前五槽经a495b4d475404f95b726b8b46d6a3663正式离线资格及非作者重开，546件原件、父窗50次源读、间隙0。权限撤销已按原token恢复，失败仅为JSON对象键顺序比较；改用既有微秒精确same_grant。Master owned_paths追加新workflow-oracle-s2-access-plan.json、workflow_oracle_mapping_continuation.py及既有S2测试/门禁登记。新planId s2-s3-01-access-01保持同批：四角色新认证后从access接余下十槽，总11槽2520秒，各槽预算不变。原15槽计划及其失败原件保留；已资格前五槽以原父命令独立引用，不进入新父时间窗或源审计事件。当前绑定、源基线、未执行代码差异及真实消费者逐项核验后启动，禁止重跑已资格前缀。后缀由任务专用run_access_suffix实际入口执行，原platform与审计依赖保持2a原字节和严格校验。

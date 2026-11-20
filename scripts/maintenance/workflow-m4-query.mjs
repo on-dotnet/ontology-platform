@@ -1867,7 +1867,7 @@ async function authHandoffRun() {
   if (!/^(?:auth-handoff|s2-s3)-[a-f0-9]{32}\.json$/.test(inputName)) throw new Error("ORACLE_BATCH_INPUT");
   const output = resolve(root, "artifacts/workflow", task, runId);
   const input = JSON.parse(await readFile(resolve(output, inputName), "utf8"));
-  const plan = mode === "s2-s3-oracle" ? omq.s2Plan : omq.authPlan;
+  const plan = mode === "s2-s3-oracle" ? (input.plan.planId === "s2-s3-01-access-01" ? omq.s2AccessPlan() : omq.s2Plan) : omq.authPlan;
   if (JSON.stringify(input.plan) !== JSON.stringify(plan)) throw new Error("ORACLE_BATCH_PLAN");
   const abort = new AbortController();
   const stop = () => abort.abort(); process.on("SIGTERM", stop); process.on("SIGINT", stop);

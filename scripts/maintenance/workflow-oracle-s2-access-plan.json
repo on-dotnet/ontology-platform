@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "planId": "s2-s3-01-access-01",
+  "mode": "s2-s3-oracle",
+  "preSeconds": 60,
+  "postSeconds": 60,
+  "submissionSeconds": 40,
+  "requiredSessionSeconds": 210,
+  "stages": [
+    {
+      "mode": "s0-oracle-auth",
+      "kind": "authentication",
+      "seconds": 600
+    },
+    {
+      "mode": "s2-oracle-access",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-aba",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-connection",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-versions",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-states",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "reader-auth",
+      "kind": "authentication",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-reopen",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s3",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "ui-s3",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "ui-s1",
+      "kind": "product",
+      "seconds": 180
+    }
+  ],
+  "deadlineSeconds": 2520,
+  "qualifiedPrefix": {
+    "commandId": "edd1379b83c246329579075d16ccda58",
+    "measuredCommit": "2a2ea74ff72c22860e4927318913eaece9d14f9f",
+    "mode": "s2-oracle-relations",
+    "qualificationCommandId": "a495b4d475404f95b726b8b46d6a3663",
+    "qualificationSha256": "7bb9468c9ed44ae335936a60f3765456b44b125db64cfe05eb1f4e1782172d46",
+    "memberIndexSha256": "91637b9ad1664efc70c8084ec999af10c62bdbca6efb3f885cf13b9366e29b8a"
+  }
+}

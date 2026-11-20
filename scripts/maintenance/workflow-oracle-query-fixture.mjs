@@ -140,6 +140,7 @@ export const authPlan = Object.freeze(JSON.parse(readFileSync(new URL("./workflo
 
 /** 同一个浏览器与内存 actors 串行推进；失败、取消或越期立即阻止下一阶段。 */
 export const s2Plan = Object.freeze(JSON.parse(readFileSync(new URL("./workflow-oracle-s2-plan.json", import.meta.url), "utf8")));
+export function s2AccessPlan() { return Object.freeze(JSON.parse(readFileSync(new URL("./workflow-oracle-s2-access-plan.json", import.meta.url), "utf8"))); }
 
 export async function runAuthHandoffPlan(shared, runStage, now = () => performance.now()) {
   const plan = shared.plan ?? authPlan;
@@ -358,6 +359,6 @@ export function combinedProjection(catalog, connectionId) {
 
 /** 只能调用本任务白名单函数，正文通过私有stdin；执行预算来自当前阶段。 */
 export function s2Call(root, method, values, deadline) {
-  if (!["grants", "ready", "source_case", "source_snapshot", "permission_case", "await_expiry", "access_case", "runtime_case"].includes(method)) throw new Error("ORACLE_S2_CALL");
+  if (!["grants", "ready", "source_case", "source_snapshot", "permission_case", "await_expiry", "access_case", "runtime_case", "same_grant"].includes(method)) throw new Error("ORACLE_S2_CALL");
   return platform(root, "__import__('workflow_oracle_mapping_s2')." + method + "(*json.load(sys.stdin))", values, deadline);
 }

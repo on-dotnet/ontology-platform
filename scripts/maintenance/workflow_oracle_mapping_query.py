@@ -30,7 +30,9 @@ def structural(root, task, phase):
     if phase=='runtime':
         from workflow_oracle_mapping_s2_contract import frozen_plan
         frozen_plan(root)
-        consumers['scripts/maintenance/workflow-m4-query.mjs']=['await s2.run(', 'oracleTwoTable', 'omq.s2Plan']
+        frozen_plan(root,"s2-s3-01-access-01")
+        consumers["scripts/maintenance/workflow_oracle_mapping_continuation.py"]=["def run_access_suffix():", "prepare_prefix(root,stage['plan']['qualifiedPrefix'])", "p.audit_window(", "def reopen_prefix("]
+        consumers['scripts/maintenance/workflow-m4-query.mjs']=['await s2.run(', 'oracleTwoTable', 'omq.s2Plan', 'omq.s2AccessPlan()']
         consumers['scripts/maintenance/workflow-oracle-s2.mjs']=['()=>formalMapping(ctx)', 'async function queries(', 'async function relations(',
             'async function access(', 'async function aba(', 'async function states(', 'async function versions(', 'async function reopen(', 'async function mcp(', 'async function ui(', 'consume(root,report,deadline)']
         consumers['scripts/maintenance/workflow_oracle_mapping_s2.py']=['def grants(', 'def ready(', 'def source_transaction(', 'def permission_case(', 'def runtime_case(', 'def access_case(']
