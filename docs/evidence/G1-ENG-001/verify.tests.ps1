@@ -13,15 +13,29 @@ function Assert-Check {
 }
 try {
     New-Item -ItemType Directory -Path $fixtureRoot | Out-Null
-    $paths = @(& git -C $repoRoot ls-files --cached --others --exclude-standard)
-    if ($LASTEXITCODE -ne 0) { throw 'Cannot enumerate fixture input' }
+    # 这里只构造检查器正反例。外层 verify.ps1 已先对真实仓库执行无 SelectedPaths 的 Test-Repository。
+    $paths = @('global.json', 'Directory.Build.props', 'Directory.Packages.props', 'NuGet.Config', '.config/dotnet-tools.json',
+        'package.json', 'apps/web/package.json', 'pnpm-workspace.yaml', 'turbo.json', '.node-version', '.editorconfig',
+        '.github/workflows/ci.yml', 'scripts/validate-structured-files.py', 'scripts/verification-requirements.txt',
+        'docs/evidence/G4-M1-FINAL-GATES-001/host-monitor.json')
+    $sourceHashes = @{}
     foreach ($path in $paths) {
         $source = Join-Path $repoRoot $path
-        if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { continue }
         $destination = Join-Path $fixtureRoot $path
         New-Item -ItemType Directory -Force -Path (Split-Path $destination) | Out-Null
-        Copy-Item -LiteralPath $source -Destination $destination
+        $bytes = [IO.File]::ReadAllBytes($source)
+        $sourceHashes[$path] = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+        [IO.File]::WriteAllBytes($destination, $bytes)
     }
+    $evidenceDir = Join-Path $fixtureRoot 'docs/evidence/G1-ENG-001'
+    New-Item -ItemType Directory -Force -Path $evidenceDir | Out-Null
+    [IO.File]::WriteAllText((Join-Path $evidenceDir 'fixture.md'), "# Evidence`n")
+    foreach ($path in @('AGENTS.md', 'PLANS.md', 'backend/AGENTS.md', 'apps/web/AGENTS.md')) {
+        $target = Join-Path $fixtureRoot $path
+        New-Item -ItemType Directory -Force -Path (Split-Path $target) | Out-Null
+        [IO.File]::WriteAllText($target, "# Synthetic fixture`n")
+    }
+    [IO.File]::WriteAllText((Join-Path $fixtureRoot 'PLANS.md'), "# Synthetic fixture`n`n[Evidence](docs/evidence/G1-ENG-001/fixture.md)`n")
     $checks = @(Test-Repository -RepositoryRoot $fixtureRoot)
     Assert-Check (@($checks | Where-Object Status -eq 'FAIL').Count -eq 0) 'clean baseline accepted'
     $packagePath = Join-Path $fixtureRoot 'package.json'
@@ -69,6 +83,14 @@ try {
     try { & (Join-Path $repoRoot 'scripts/verify.ps1') -Root $fixtureRoot -RunNative -SkipWeb }
     finally { Pop-Location }
     Assert-Check ($nativeCalls.Count -eq 2 -and @($nativeCalls | Where-Object { $_.Location -ne $expectedNativeLocation }).Count -eq 0) 'native commands resolve SDK and config from selected Root'
+    foreach ($path in $paths) {
+        if ((Get-FileHash -LiteralPath (Join-Path $repoRoot $path) -Algorithm SHA256).Hash -cne $sourceHashes[$path]) {
+            throw "Repository input changed during isolated mutation: $path"
+        }
+    }
+    $fixtureFiles = @(Get-ChildItem -File -Force -Recurse -LiteralPath $fixtureRoot)
+    $fixtureBytes = ($fixtureFiles | Measure-Object -Property Length -Sum).Sum
+    Write-Output "Isolated checker fixture: $($fixtureFiles.Count) files, $fixtureBytes logical bytes, $($paths.Count) source hashes unchanged."
     Write-Output "Checker tests: $testCount passed; application tests: NOT_RUN."
 } finally {
     $resolvedFixture = [IO.Path]::GetFullPath($fixtureRoot)

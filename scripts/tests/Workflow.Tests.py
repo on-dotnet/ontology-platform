@@ -133,6 +133,47 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(code,124)
         self.assertIn(b'started',raw)
 
+    def test_outer_verify_rejects_shorter_deadline_before_spawning_any_gate(self):
+        with tempfile.TemporaryDirectory() as directory:
+            plan = Path(directory).resolve() / 'plan.json'
+            plan.write_text(json.dumps(dict(affected=['engineering','engineering-full'])))
+            command = [sys.executable, '-B', str(ROOT / 'scripts/maintenance/workflow.py'), 'verify', '--plan', str(plan)]
+            with self.assertRaisesRegex(ValueError, 'VERIFY_OUTER_DEADLINE'):
+                self.w.execute_gate(command, ROOT, timeout=230)
+            self.assertEqual(3800, self.w.verification_deadline(['engineering','engineering-full']))
+
+    def test_full_budget_counts_scratch_including_git_and_holds_host_margin(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            prior = root / 'artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01'
+            prior.mkdir(parents=True)
+            nonce = 'b' * 32
+            path = prior / ('source-admission-' + nonce + '.json')
+            gib = 1024**3
+            allocations = dict(other=39*gib,newBuildEvidenceAndLogs=128*1024**2)
+            witness = dict(taskId='G4-ORACLE-MAPPING-QUERY-001',runId='s0-recovery-01',phase='closed',expectedRunningRoles=[],
+                           status='FORMAL_RESOURCE_READY',probeRemoved=True,attempt=nonce,endedUtc='2026-11-20T00:00:00Z',
+                           platformDisk=dict(allocations=allocations,totalBytes=sum(allocations.values()),ceilingBytes=40*gib),
+                           host=dict(diskBytes=20*gib,availableEstimate=12*gib),vm=dict(availableFs=20*gib))
+            file = root / 'policy.json'
+            file.write_text('{}')
+            with patch.object(self.w, 'git', return_value=b'policy.json\0'), patch('shutil.disk_usage', return_value=type('Disk', (), {'free':20*gib})()):
+                path.write_text(json.dumps(witness))
+                budget = self.w.selftest_resources(root,path,root)
+                self.assertGreater(budget['temporaryPeakBytes'], 32*1024**2)
+                self.assertEqual(budget['projectedTaskBytes'],39*gib + budget['temporaryPeakBytes'])
+                self.assertEqual(budget['hostJsonInputBytes'], 2)
+                witness['host']['availableEstimate'] = 4*gib
+                path.write_text(json.dumps(witness))
+                with self.assertRaisesRegex(ValueError, 'SELFTEST_RESOURCE_HEADROOM'):
+                    self.w.selftest_resources(root,path,root)
+                witness['host']['availableEstimate'] = 12*gib
+                allocations['other'] = 40*gib
+                witness['platformDisk']['totalBytes'] = sum(allocations.values())
+                path.write_text(json.dumps(witness))
+                with self.assertRaisesRegex(ValueError, 'SELFTEST_RESOURCE_HEADROOM'):
+                    self.w.selftest_resources(root,path,root)
+
     def test_immutable_reuse_reads_real_git_evidence(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)

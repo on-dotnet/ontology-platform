@@ -81,6 +81,12 @@ function Case {
     catch {
         $status = if ($_.Exception.Message.StartsWith('TEST_NOT_RUN:')) { 'NOT_RUN' } else { 'FAIL' }
         $results.Add([pscustomobject]@{ Name = $Name; Status = $status }); Write-Output "${status}: $Name -- $($_.Exception.Message)"
+    } finally {
+        # 每例已经使用独立 Git 仓库。该例的创建、重开和失败后验完成后即可释放其副本。
+        $caseRoot = [IO.Path]::GetFullPath($script:repo)
+        if ((Split-Path $caseRoot -Parent) -cne [IO.Path]::GetFullPath($fixtureRoot) -or
+            (Split-Path $caseRoot -Leaf) -cnotmatch '^[a-f0-9]{32}$') { throw 'Unexpected package fixture path' }
+        if (Test-Path -LiteralPath $caseRoot) { Remove-Item -LiteralPath $caseRoot -Recurse -Force }
     }
 }
 try {

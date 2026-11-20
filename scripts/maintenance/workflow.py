@@ -15,6 +15,8 @@ import uuid
 import shutil
 import zlib
 import signal
+import tempfile
+import contextlib
 import datetime as dt
 from functools import lru_cache
 
@@ -250,9 +252,74 @@ def load_reuse(index, gate, key, environment, policy):
                 qualificationCommand='workflow.py verify --plan <current controlled plan> --reuse <index>')
 
 
-def execute_gate(command, root, timeout=1800, environment=None, *, task='WORKFLOW', run_id=None, input_key=None, environment_key=None):
+def verification_deadline(affected, diagnostic=False):
+    """串行 gate 各有自己的执行预算和至多 10 秒回收；规划、签收另留有界时间。"""
+    gate_seconds = 20 if diagnostic else 1800
+    return 180 + len(affected) * (gate_seconds + 10)
+
+
+def selftest_resources(root, admission_path, temporary):
+    """从已完成的当前封闭准入重计工程阶段。工作树和压测以外的原账本项目逐项保留。"""
+    task = 'G4-ORACLE-MAPPING-QUERY-001'
+    area = root / 'artifacts/workflow' / task
+    path = safe_file(admission_path)
+    if path.parent != area / 's0-recovery-01' or not re.fullmatch(r'source-admission-[0-9a-f]{32}\.json', path.name):
+        raise ValueError('SELFTEST_RESOURCE_ADMISSION_PATH')
+    raw = path.read_bytes()
+    admission = json.loads(raw)
+    if (admission['taskId'], admission['runId'], admission['phase'], admission['status']) != (
+            task, 's0-recovery-01', 'closed', 'FORMAL_RESOURCE_READY') or admission['expectedRunningRoles'] != [] or (
+            admission['probeRemoved'] is not True or path.stem != 'source-admission-' + admission['attempt']):
+        raise ValueError('SELFTEST_RESOURCE_ADMISSION_SCOPE')
+    disk = admission['platformDisk']
+    allocations = disk['allocations']
+    gib = 1024**3
+    if sum(allocations.values()) != disk['totalBytes'] or disk['ceilingBytes'] != 40 * gib:
+        raise ValueError('SELFTEST_RESOURCE_LEDGER')
+    # 55,256 个真实非空文件不能按三个逻辑字节计。以临时卷的实配单位、五个 PNG 集合
+    # （工作文件、Git blob、V2 归档、V3 归档及暂存）、清单/目录/Git 辅助文件保守计费。
+    temporary = safe_file(temporary)
+    fragment = os.statvfs(temporary).f_frsize
+    ignored = 55256 * fragment
+    image = ((800 * (256 * 3 + 1) + 4096 + fragment - 1) // fragment) * fragment
+    package_copies = 53 * 5 * image
+    overhead = 32 * 1024**2
+    temp_bytes = ignored + package_copies + overhead
+    credit = min(temp_bytes, allocations['newBuildEvidenceAndLogs'])
+    total = disk['totalBytes'] - credit + temp_bytes
+    # 完整静态检查保留 JSON 解析结果。采用本候选实际 JSON 大小估算；采样夹具的父/子进程
+    # RSS 约 243 MiB，再预留一个同体积的 PowerShell 子进程、解压缓冲和 Git 对象。
+    names = git(root, 'ls-files', '--cached', '--others', '--exclude-standard', '-z').split(b'\0')
+    files = [root / name.decode() for name in names if name.endswith(b'.json')]
+    json_bytes = sum(p.stat().st_size for p in files if p.is_file())
+    ram_estimate = 8 * json_bytes + 512 * 1024**2 + 2 * 53 * image
+    host_free = min(admission['host']['diskBytes'], shutil.disk_usage(root).free, shutil.disk_usage(temporary).free)
+    if (total > disk['ceilingBytes'] or host_free < temp_bytes + 10 * gib or admission['vm']['availableFs'] < 10 * gib or
+            admission['host']['availableEstimate'] < ram_estimate + 4 * gib):
+        raise ValueError(f'SELFTEST_RESOURCE_HEADROOM: taskBytes={total} scratchBytes={temp_bytes} hostRssEstimate={ram_estimate}')
+    return dict(admission=admission['attempt'], admissionSha256=digest(raw), measuredUtc=admission['endedUtc'],
+                tempPath=str(temporary), tempDevice=temporary.stat().st_dev, allocationUnit=fragment,
+                ignoredFileAllocation=ignored, pngAndCopyAllowance=package_copies, directoryAndToolAllowance=overhead,
+                temporaryPeakBytes=temp_bytes, existingBuildReserveCredit=credit, projectedTaskBytes=total,
+                taskCeilingBytes=disk['ceilingBytes'], currentHostDiskFree=host_free, hostJsonInputBytes=json_bytes,
+                hostRssEstimateBytes=ram_estimate, hostAvailableAtAdmission=admission['host']['availableEstimate'],
+                additionalVmServices=0, childDeadlineSeconds=1800, commandCleanupSeconds=10)
+
+
+def execute_gate(command, root, timeout=None, environment=None, *, task='WORKFLOW', run_id=None, input_key=None, environment_key=None):
     """一般工程入口复用公共执行器；合并输出仅为兼容展示，原件双流独立保留。"""
     from workflow_execution import run
+    args = [str(part) for part in command]
+    if '--plan' in args and 'verify' in args and any((root / arg).resolve() == Path(__file__).resolve() for arg in args if arg.endswith('workflow.py')):
+        plan_file = root / args[args.index('--plan') + 1]
+        affected = json.loads(safe_file(plan_file).read_bytes())['affected']
+        selected = ['engineering-full'] if '--selftest-only' in args else affected
+        budget = verification_deadline(selected, '--diagnostic' in args)
+        if timeout is not None and timeout < budget:
+            raise ValueError(f'VERIFY_OUTER_DEADLINE: supplied={timeout} required={budget}')
+        timeout = budget if timeout is None else timeout
+        environment = dict(os.environ if environment is None else environment, WORKFLOW_VERIFY_DEADLINE=str(time.monotonic() + timeout))
+    timeout = 1800 if timeout is None else timeout
     result=run(command,root,task=task,run_id=run_id,input_key=input_key,environment_key=environment_key,timeout=timeout,environment=environment)
     return result.returncode,result.stdout+result.stderr
 
@@ -309,8 +376,15 @@ def validate_package_paths(root, paths):
     if result.returncode: raise ValueError('PACKAGE_PATH_REJECTED: existing V3 path policy; values suppressed')
 
 
-def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=None):
+def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=None, engineering_admission=None, selftest_only=False):
     expected=json.loads(safe_file(path).read_text())
+    if selftest_only and ('engineering-full' not in expected['affected'] or diagnostic or reuse):
+        raise ValueError('SELFTEST_ONLY_REQUIRES_AFFECTED_FULL_GATE')
+    selected = ['engineering-full'] if selftest_only else expected['affected']
+    outer_seconds = verification_deadline(selected, diagnostic)
+    deadline = time.monotonic() + outer_seconds
+    if 'WORKFLOW_VERIFY_DEADLINE' in os.environ:
+        deadline = min(deadline, float(os.environ['WORKFLOW_VERIFY_DEADLINE']))
     actual=plan(expected['base'],expected['head'])
     if expected != actual or actual['head'] != git(ROOT,'rev-parse','HEAD').decode().strip():
         raise ValueError('PLAN_STALE_OR_TAMPERED')
@@ -325,7 +399,7 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
     environment=engineering_environment()
     child_environment=engineering_process_environment(task)
     rows=[];outcomes={}
-    for name in ordered(set(actual['affected']) | set(index)):
+    for name in ordered(set(selected) | set(index)):
         if digest(REGISTRY.read_bytes())!=actual['registrySha256']: raise ValueError('REGISTRY_CHANGED_DURING_RUN')
         gate=registry()[name];key=actual['inputKeys'][name];policy=policy_key(name)
         if name=='policy':
@@ -375,7 +449,24 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
                 rows.append(previous);outcomes[name]='PASS';continue
             if name not in actual['affected']: continue
             start=time.monotonic();started=dt.datetime.now(dt.timezone.utc).isoformat()
-            code,raw=execute_gate(gate['command'],ROOT,20 if diagnostic else 1800,child_environment,task=task,run_id=run.name,input_key=key,environment_key=environment)
+            child_seconds = 20 if diagnostic else 1800
+            if deadline - time.monotonic() < child_seconds + 10:
+                raise ValueError('VERIFY_INSUFFICIENT_REMAINING_FOR_CHILD_AND_CLEANUP: ' + name)
+            resource_receipt = None
+            gate_environment = child_environment
+            with contextlib.ExitStack() as temporary_resources:
+                if name == 'engineering-full' and task == 'G4-ORACLE-MAPPING-QUERY-001':
+                    if engineering_admission is None:
+                        raise ValueError('SELFTEST_CURRENT_CLOSED_ADMISSION_REQUIRED: supply --engineering-admission from the current measured window')
+                    # Git 在未初始化的夹具内不得向上发现真实工作树。使用准确 OS 临时卷计费。
+                    temp_base = Path(tempfile.gettempdir()).resolve()
+                    if temp_base.is_relative_to(ROOT):
+                        raise ValueError('SELFTEST_TMP_INSIDE_REPOSITORY')
+                    temporary = Path(temporary_resources.enter_context(tempfile.TemporaryDirectory(prefix='ontology-full-',dir=temp_base)))
+                    resource_receipt = selftest_resources(ROOT, engineering_admission, temporary)
+                    write(run / 'selftest-resource.json', resource_receipt)
+                    gate_environment = {**child_environment, **{k:str(temporary) for k in ('TMPDIR','TMP','TEMP')}}
+                code,raw=execute_gate(gate['command'],ROOT,child_seconds,gate_environment,task=task,run_id=run.name,input_key=key,environment_key=environment)
             elapsed=time.monotonic()-start
             record_timing(directory,task,run.name,name,key,started,elapsed,code)
             tests,skipped=test_counts(raw.decode(errors='replace'),'auto')
@@ -395,11 +486,13 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
                 errorSignature=error_signature(raw,code) if not passed else None,
                 elapsedSeconds=elapsed,inputKey=key,environmentKey=environment,policyKey=policy,
                 evidenceSha256=digest(raw),logPath=str((published_dir/log.name).relative_to(ROOT)),sourceRun=run.name,sourceCommit=actual['head'])
+            if resource_receipt is not None:
+                row['resourceAdmission'] = resource_receipt
             write(evidence_dir/(name+'.json'),row);
             rows.append(row);outcomes[name]=row['status']
             if not passed: break
     result=dict(status='PASS' if rows and all(x['status']=='PASS' for x in rows) else 'BLOCKED',
-                coverage='affected engineering gates only; product coverage requires separate task acceptance',checks=rows)
+                coverage='explicit full engineering SelfTest only' if selftest_only else 'affected engineering gates only; product coverage requires separate task acceptance',checks=rows)
     # 全部命令结束才发布，证据输出不能污染同轮后续gate的输入。
     if publish:
         target=safe_file(ROOT/'docs/evidence'/task/'gates'/run.name);target.mkdir(parents=True)
@@ -576,7 +669,7 @@ def main():
     prep=sub.add_parser('prepare');prep.add_argument('--task',required=True);prep.add_argument('--inventory')
     smoke=sub.add_parser('smoke');smoke.add_argument('--task',required=True)
     pl=sub.add_parser('plan');pl.add_argument('--base',required=True);pl.add_argument('--head',required=True);pl.add_argument('--output',required=True)
-    ve=sub.add_parser('verify');ve.add_argument('--task',required=True);ve.add_argument('--plan',required=True);ve.add_argument('--reuse');ve.add_argument('--publish-evidence',action='store_true');ve.add_argument('--diagnostic',action='store_true');ve.add_argument('--hypothesis')
+    ve=sub.add_parser('verify');ve.add_argument('--task',required=True);ve.add_argument('--plan',required=True);ve.add_argument('--reuse');ve.add_argument('--publish-evidence',action='store_true');ve.add_argument('--diagnostic',action='store_true');ve.add_argument('--hypothesis');ve.add_argument('--engineering-admission');ve.add_argument('--estimate-deadline',action='store_true');ve.add_argument('--selftest-only',action='store_true')
     pc=sub.add_parser('package-check');pc.add_argument('--task',required=True);pc.add_argument('--base',required=True);pc.add_argument('--head',required=True);pc.add_argument('--evidence')
     cl=sub.add_parser('closeout');cl.add_argument('--task',required=True);cl.add_argument('--dry-run',action='store_true',required=True)
     args=p.parse_args()
@@ -587,7 +680,13 @@ def main():
         elif args.action=='prepare': result=prepare(args.task,args.inventory)
         elif args.action=='plan':
             result=plan(args.base,args.head);write(Path(args.output),result)
-        elif args.action=='verify': result=verify(args.task,args.plan,args.reuse,args.publish_evidence,args.diagnostic,args.hypothesis)
+        elif args.action=='verify':
+            if args.estimate_deadline:
+                expected=json.loads(safe_file(args.plan).read_bytes())
+                selected=['engineering-full'] if args.selftest_only else expected['affected']
+                result=dict(status='PLANNED',outerDeadlineSeconds=verification_deadline(selected,args.diagnostic))
+            else:
+                result=verify(args.task,args.plan,args.reuse,args.publish_evidence,args.diagnostic,args.hypothesis,args.engineering_admission,args.selftest_only)
         elif args.action=='smoke':
             path=ROOT/'scripts/maintenance/workflow_smoke.py'
             if not path.is_file(): raise ValueError('IMPLEMENTATION_PENDING: smoke adapter')
