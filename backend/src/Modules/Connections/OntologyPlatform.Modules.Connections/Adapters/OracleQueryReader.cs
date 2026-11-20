@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Diagnostics;
 using System.Globalization;
 using OntologyPlatform.Contracts;
@@ -50,91 +51,28 @@ internal static class OracleQueryReader
         // 单调预算同时约束回滚和物理释放后验。
         var origin = Stopwatch.GetTimestamp();
         work.CancelAfter(budget - CleanupLimit);
-        // 取消信号与工作线程分别记录第一次进入清理的时间。
-        long cleanupStart = 0;
-        using var observed = work.Token.Register(() => Interlocked.CompareExchange(ref cleanupStart, Stopwatch.GetTimestamp(), 0));
-        // 准确占位在任何物理连接/游标申请之前登记。
-        var acquisition = lifetime.BeginSource();
-        // 只在真实事务已结束且所有源命令已应答时才允许确认。
-        var confirmed = false;
-        // 原始行必须在全部后验成功后才能生成业务结果。
+        // 目录前态与后验绑定同一非池化连接和同次真实核验。
+        string? shape = null;
+        // 已发布固定语句的行在所有后验结束前不会用于业务交付。
         List<OracleMappingRow> raw;
         try
         {
-            // 非池化连接只有成功完成 DisposeAsync 才能确认物理释放。
-            var connection = await adapter.OpenMappingAsync(secret, Guid.ParseExact(lifetime.ExecutionId, "N"), work.Token);
-            try
-            {
-                // 使用与 M2 发现完全相同的字节口径，再核物理主键与字符语义。
-                var shape = await OracleMappingSourceValidator.CheckCatalogAsync(connection, context.CurrentCatalog, work.Token);
-                await adapter.RecordQuerySessionAsync(connection, lifetime, work.Token);
-                // 已核会话的首条事务内语句是 SET TRANSACTION READ ONLY。
-                var tx = await OracleSourceAdapter.BeginMappingAsync(connection, work.Token);
-                try
+            raw = await ReadOwnedAsync(lifetime,
+                () => adapter.OpenMappingAsync(secret, Guid.ParseExact(lifetime.ExecutionId, "N"), work.Token),
+                async connection =>
                 {
-                    try
-                    {
-                        using (var command = OracleSourceAdapter.CreateMappingCommand(connection, tx, table.Schema == "CaseOwner"))
-                        {
-                            // Cancel 只指向这条尚存命令；注册先释放并等待回调，随后才可发出其它 SQL。
-                            using var cancel = work.Token.Register(() =>
-                            {
-                                adapter.QueryEvent("CANCEL_ENTER", lifetime);
-                                try
-                                {
-                                    command.Cancel();
-                                    adapter.QueryEvent("CANCEL_RETURN", lifetime);
-                                }
-                                catch (Exception error) when (error is OracleException or InvalidOperationException)
-                                {
-                                    adapter.QueryEvent("CANCEL_REJECT", lifetime);
-                                }
-                            });
-                            try
-                            {
-                                adapter.QueryEvent("EXECUTE", lifetime);
-                                raw = await OracleSourceAdapter.ConsumeMappingAsync(command, work.Token, () => adapter.QueryEvent("EOF", lifetime));
-                            }
-                            catch (Exception error) when (error is OracleException { Number: 1013 }
-                                or OperationCanceledException { InnerException: OracleException { Number: 1013 } })
-                            {
-                                adapter.QueryEvent("NATIVE_1013", lifetime);
-                                throw;
-                            }
-                        }
-                        await tx.CommitAsync(work.Token);
-                    }
-                    catch (Exception failure)
-                    {
-                        // 清理原点取取消和实际异常中最早者；不把无权观察的异常当作源终态。
-                        Interlocked.CompareExchange(ref cleanupStart, Stopwatch.GetTimestamp(), 0);
-                        // 允许已取消的工作归还源事务，绝不超过原分支、请求和首次取消 250ms。
-                        var left = RemainingCleanup(origin, budget, Volatile.Read(ref cleanupStart));
-                        if (left <= TimeSpan.Zero) throw;
-                        using var cleanup = new CancellationTokenSource(left);
-                        await tx.RollbackAsync(cleanup.Token);
-                        confirmed = failure is OracleException { Number: 1013 }
-                            or OperationCanceledException { InnerException: OracleException { Number: 1013 } };
-                        throw;
-                    }
-                }
-                finally
+                    shape = await OracleMappingSourceValidator.CheckCatalogAsync(connection, context.CurrentCatalog, work.Token);
+                    await adapter.RecordQuerySessionAsync(connection, lifetime, work.Token);
+                    return await OracleSourceAdapter.BeginMappingAsync(connection, work.Token);
+                },
+                (connection, tx) => ReadCommandAsync(adapter, connection, tx, table.Schema == "CaseOwner", lifetime, work.Token),
+                async connection =>
                 {
-                    try { await tx.DisposeAsync(); }
-                    catch { confirmed = false; throw; }
-                }
-                // 事务已结束，权限/目录后验不会误用冻结快照。
-                await OracleSourceAdapter.VerifyMappingAccessAsync(connection, work.Token);
-                if (await OracleMappingSourceValidator.CheckCatalogAsync(connection, context.CurrentCatalog, work.Token) != shape) throw Invalid();
-                work.Token.ThrowIfCancellationRequested();
-                Interlocked.CompareExchange(ref cleanupStart, Stopwatch.GetTimestamp(), 0);
-                confirmed = true;
-            }
-            finally
-            {
-                try { await connection.DisposeAsync(); adapter.QueryEvent("PHYSICAL_RELEASE", lifetime); }
-                catch { confirmed = false; throw; }
-            }
+                    await OracleSourceAdapter.VerifyMappingAccessAsync(connection, work.Token);
+                    if (await OracleMappingSourceValidator.CheckCatalogAsync(connection, context.CurrentCatalog, work.Token) != shape)
+                        throw Invalid();
+                },
+                () => adapter.QueryEvent("PHYSICAL_RELEASE", lifetime), work.Token, origin, budget);
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
         catch (Exception failure) when (failure is OperationCanceledException or OracleException { Number: 1013 })
@@ -142,11 +80,6 @@ internal static class OracleQueryReader
         catch (OracleException failure) when (failure.Number == 1031) { throw new SemanticOperationException(403, "query_source_forbidden"); }
         catch (Exception failure) when (failure is OracleException or PgSourceException or InvalidCastException or OverflowException)
         { throw new SemanticOperationException(503, "query_source_unavailable"); }
-        finally
-        {
-            if (confirmed && RemainingCleanup(origin, budget, Volatile.Read(ref cleanupStart)) > TimeSpan.Zero)
-                lifetime.ConfirmReleased(acquisition);
-        }
         if (!lifetime.CleanupConfirmed || work.IsCancellationRequested) throw Timeout();
         // 第 101 行没有全集证明；物理键未进入业务身份，不能暗示完整命中。
         var sentinel = raw.Count > 100;
@@ -175,6 +108,108 @@ internal static class OracleQueryReader
             Indeterminate = sentinel, Limited = sentinel || projected.Count > query.MaxRows, QueryPlanHash = MappingValidationService.Digest(new
             { adapterVersion = "oracle-query-v1", table.Schema, table.Name, table.Fields, entity.Id, context.Binding, context.Scope, query.Filters,
                 query.MaxRows, relation = branch?.RelationId, parentPlan = branch?.Parents.QueryPlanHash, parents = branch?.Parents.Rows }) };
+    }
+
+    /// <summary>正式 Oracle reader 独占连接、业务事务和后续核验，确认发生在物理释放返回后。</summary>
+    internal static async Task<List<OracleMappingRow>> ReadOwnedAsync<TConnection, TTransaction>(
+        G4OracleSourceLifetime lifetime, Func<Task<TConnection>> open, Func<TConnection, Task<TTransaction>> begin,
+        Func<TConnection, TTransaction, Task<List<OracleMappingRow>>> read, Func<TConnection, Task> verifyAfter,
+        Action released, CancellationToken work, long origin, TimeSpan budget)
+        where TConnection : IAsyncDisposable where TTransaction : DbTransaction
+    {
+        // 取消信号和工作线程共用最早清理起点，不能从回滚另起预算。
+        long cleanupStart = 0;
+        using var observed = work.Register(() => Interlocked.CompareExchange(ref cleanupStart, Stopwatch.GetTimestamp(), 0));
+        // 物理申请在任何连接尝试之前登记。
+        var acquisition = lifetime.BeginSource();
+        // 异常路径仅接受驱动本地 1013，最后还须完成物理释放。
+        var confirmed = false;
+        try
+        {
+            // 打开成功后由本方法持有到物理 Dispose 返回。
+            var connection = await open();
+            try
+            {
+                // 业务读取与事务清理由一个顺序执行者负责。
+                var tx = await begin(connection);
+                // 在事务与后验都返回后才可交付这些行。
+                List<OracleMappingRow> rows;
+                try
+                {
+                    try
+                    {
+                        rows = await read(connection, tx);
+                        await tx.CommitAsync(work);
+                    }
+                    catch (Exception failure)
+                    {
+                        Interlocked.CompareExchange(ref cleanupStart, Stopwatch.GetTimestamp(), 0);
+                        // 回滚使用原分支、请求和首次取消窗口中剩余的最小值。
+                        var left = RemainingCleanup(origin, budget, Volatile.Read(ref cleanupStart));
+                        if (left <= TimeSpan.Zero) throw;
+                        using var cleanup = new CancellationTokenSource(left);
+                        await tx.RollbackAsync(cleanup.Token);
+                        confirmed = failure is OracleException { Number: 1013 }
+                            or OperationCanceledException { InnerException: OracleException { Number: 1013 } };
+                        throw;
+                    }
+                }
+                finally
+                {
+                    try { await tx.DisposeAsync(); }
+                    catch { confirmed = false; throw; }
+                }
+                await verifyAfter(connection);
+                work.ThrowIfCancellationRequested();
+                Interlocked.CompareExchange(ref cleanupStart, Stopwatch.GetTimestamp(), 0);
+                confirmed = true;
+                return rows;
+            }
+            finally
+            {
+                try { await connection.DisposeAsync(); released(); }
+                catch { confirmed = false; throw; }
+            }
+        }
+        finally
+        {
+            if (confirmed && RemainingCleanup(origin, budget, Volatile.Read(ref cleanupStart)) > TimeSpan.Zero)
+                lifetime.ConfirmReleased(acquisition);
+        }
+    }
+
+    /// <summary>在该次固定命令上注册定向取消并等待游标及命令退出，之后才允许事务结算。</summary>
+    private static async Task<List<OracleMappingRow>> ReadCommandAsync(OracleSourceAdapter adapter, OracleConnection connection,
+        OracleTransaction tx, bool target, G4OracleSourceLifetime lifetime, CancellationToken token)
+    {
+        using (var command = OracleSourceAdapter.CreateMappingCommand(connection, tx, target))
+        {
+            // Cancel 只指向这条尚存命令；注册先释放并等待回调，随后才可发出其它 SQL。
+            using var cancel = token.Register(() =>
+            {
+                adapter.QueryEvent("CANCEL_ENTER", lifetime);
+                try
+                {
+                    command.Cancel();
+                    adapter.QueryEvent("CANCEL_RETURN", lifetime);
+                }
+                catch (Exception error) when (error is OracleException or InvalidOperationException)
+                {
+                    adapter.QueryEvent("CANCEL_REJECT", lifetime);
+                }
+            });
+            try
+            {
+                adapter.QueryEvent("EXECUTE", lifetime);
+                return await OracleSourceAdapter.ConsumeMappingAsync(command, token, () => adapter.QueryEvent("EOF", lifetime));
+            }
+            catch (Exception error) when (error is OracleException { Number: 1013 }
+                or OperationCanceledException { InnerException: OracleException { Number: 1013 } })
+            {
+                adapter.QueryEvent("NATIVE_1013", lifetime);
+                throw;
+            }
+        }
     }
 
     /// <summary>原分支余量、原请求余量及从首次取消起的绝对清理余量取最小值。</summary>
