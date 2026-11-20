@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **PRODUCT_RESUME_REVIEW_BLOCKED**。源读取及正式结算已修改。当前两台替代 API 已获准并实测，真实 PG 三态锁内截止通过。详见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/report.md)。本批按 [唯一 A–F](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md) 的 AC03-A/C 决定 S1 准入，S1 通过后才进入 S2/S3 功能验证。AC03-B 及 Oracle S0 仍 BLOCKED，G4 PARTIAL，AI OFF。
+唯一任务状态 **PRODUCT_RESUME_REVIEW_BLOCKED**。源读取及正式结算已修改。替代 API 的当前资源窗口已按身份登记，真实 PG 三态锁内截止通过。按用户最终限定，本批另已核实一个重置账号的正式 /me 和登录审计。详见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/report.md)。本批按 [唯一 A–F](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md) 的 AC03-A/C 决定 S1 准入，S1 通过后才进入 S2/S3 功能验证。AC03-B 及 Oracle S0 仍 BLOCKED，G4 PARTIAL，AI OFF。
 
 ## 执行身份与所有权
 

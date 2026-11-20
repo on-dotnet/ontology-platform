@@ -264,6 +264,15 @@ def verify_sessions(actors,seconds):
     return dict(commandId=result.receipt['commandId'],observations=obs)
 
 
+def save_api_observation(event,role,row):
+    """后续登录窗口单独记录其实例 ID，保留首个窗口的入口和回收原件。"""
+    name='api-'+event+'-'+role
+    path=AREA/(name+'.json')
+    if path.exists():
+        path=AREA/(name+'-'+row['pre']+'.json')
+    platform.save(path,row)
+
+
 def start_api(role):
     """按准确 ID 启动，通过本机正式 /me 的匿名拒绝确认路由已监听。"""
     import http.client
@@ -290,7 +299,7 @@ def start_api(role):
     require(status==401,'PRODUCT_ANONYMOUS_ME_'+str(status))
     post=admit()
     row=dict(taskId=TASK,runId=PRODUCT,role=role,id=cid,startCommand=start,pre=pre['attempt'],post=post['attempt'],anonymousMe=status)
-    platform.save(AREA/('api-ready-'+role+'.json'),row)
+    save_api_observation('ready',role,row)
     return row
 
 
@@ -315,4 +324,4 @@ def release_api(role):
     require(not remaining,'PRODUCT_API_STILL_PRESENT')
     row=manifest();del row['ids'][role];save_manifest(row)
     post=admit()
-    platform.save(AREA/('api-removed-'+role+'.json'),dict(id=cid,pre=before['attempt'],post=post['attempt'],commands=actions))
+    save_api_observation('removed',role,dict(id=cid,pre=before['attempt'],post=post['attempt'],commands=actions))
