@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_S3_IMPLEMENTING**。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
+唯一任务状态 **S2_S3_WAITING_FOR_NORMAL_AUTH**。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
 
 ## 执行身份与所有权
 
@@ -66,7 +66,7 @@ Master `/root` 单写现有证据消费者、共享驱动/fixture/platform、当
 | 切片 | 正例与关键反例 | 实现与最早验证 | 本批状态 |
 |---|---|---|---|
 | EC-01 | 无过滤阶段/父全窗完整事件闭包；同步重登记过滤A、缺父原件、错源/窗、同计数不同内容、间隙读、重复事件及边界歧义拒绝 | 正式 reopen_browser/reopen_runtime_case；离线原件重开，不启动服务 | PASS：52项定向、原六阶段递归重开及非作者170件原件复核 |
-| S2 | 六条单grant各自覆盖双表；先健康正式Mapping/查询，再独立整数/时间/关系、NULL、授权、同Q源后正式Mapping ABA、独立连接版本／旧selection、六态与新reader恢复 | fixture/m4/platform/evidence实际分发；先冻结新计划和独立预期 | NOT_RUN |
+| S2 | 六条单grant各自覆盖双表；先健康正式Mapping/查询，再独立整数/时间/关系、NULL、授权、同Q源后正式Mapping ABA、独立连接版本／旧selection、六态与新reader恢复 | fixture/m4/platform/evidence实际分发；先冻结新计划和独立预期 | PARTIAL：六组合grant已签发；前五槽CASE_QUALIFIED，权限槽失败已恢复；后缀认证到期、余槽NOT_RUN |
 | S3 | Oracle正式UI及四MCP工具、同query原字节/恢复零源读/撤权清屏与身份迟到响应；旧源兼容按输入复用 | 正式产品组件和真实消费者；S2前提成立自动推进 | NOT_RUN |
 
 原旧auth-handoff-01计划不改。资源串行使用，不启动未准备的长链；不重试AC03-B抢竞态，不使用慢SQL/压力/新依赖。trust/secret只有可恢复的已登记合成版本才运行，否则准确记录缺项并继续独立范围。集中交付目录 `docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/`；三文件绑定准确Head，公开字段白名单，私有原件仅本机重开。
@@ -96,3 +96,7 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 非作者对当前增量限定GO：真实认证构建/票据32原件短链重开通过；旧父仍拒，源恢复27原件精确闭合。继续原15槽无派生计划，当前词汇/Mapping已发布状态只回读且验0源读；受影响查询阶段及余槽新测。
 
 2026-11-21后缀继续：父命令edd1379b83c246329579075d16ccda58前五槽经a495b4d475404f95b726b8b46d6a3663正式离线资格及非作者重开，546件原件、父窗50次源读、间隙0。权限撤销已按原token恢复，失败仅为JSON对象键顺序比较；改用既有微秒精确same_grant。Master owned_paths追加新workflow-oracle-s2-access-plan.json、workflow_oracle_mapping_continuation.py及既有S2测试/门禁登记。新planId s2-s3-01-access-01保持同批：四角色新认证后从access接余下十槽，总11槽2520秒，各槽预算不变。原15槽计划及其失败原件保留；已资格前五槽以原父命令独立引用，不进入新父时间窗或源审计事件。当前绑定、源基线、未执行代码差异及真实消费者逐项核验后启动，禁止重跑已资格前缀。后缀由任务专用run_access_suffix实际入口执行，原platform与审计依赖保持2a原字节和严格校验。
+
+2026-11-21当前收尾：后缀实测Head2f7b4f5476280c3f8e93d69fc94dbc5d6c55f9f0，父36a4b8abb9de4c46a901778b74fdceb2仅运行认证槽600002.686042ms，operator-ab未提交、0/4，ORACLE_LOGIN_WAITING_FOR_INPUT。结束绑定因期限耗尽未取得；保留inputsUnchanged=false，不声称实际漂移。后十槽NOT_RUN，既有前五槽资格与六组合grant事实保留。收尾operation25241e1baf8c40828442bd29488c9642两次七项排空全0、准确两API移除、五副本进程停止、受保护资源hash不变；Fuseki干净关闭仍未资格。磁盘上限前检曾超9MiB，仅按非作者审查回收本任务SecurityTests/bin 39284736分配字节，绑定与原件保留，未放宽40GiB。
+
+收尾更新当前formal-resources.json后，旧冻结路径失效；既有formal-resources-d0f2f50e09679c3092fe4d23a259e0acc22e618e3c41f386cd4c6f4a22484124.json仍保留准确1384字节。仅对此固定资源清单支持内容键原件定位，重新核原SHA/长度并记录别名；不改旧资格索引、当前资源清单或任何原件。其他文件变更仍拒绝。普通推送与三文件交付后停ChatGPT复审，产品尚未完成，不生成中间PARTIAL ZIP。

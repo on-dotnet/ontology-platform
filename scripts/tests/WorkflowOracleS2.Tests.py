@@ -181,6 +181,20 @@ class S2ContinuationTests(unittest.TestCase):
         (area/'scripts/maintenance/workflow-oracle-s2-access-plan.json').write_text(json.dumps(bad))
         with self.assertRaisesRegex(ValueError,'S23_FROZEN_PLAN'):c.frozen_plan(area,n.PLAN_ID)
 
+    def test_resource_manifest_relocates_only_exact_content_addressed_original(self):
+        import workflow_oracle_mapping_continuation as n
+        root=Path(self.enterContext(tempfile.TemporaryDirectory())).resolve()
+        relative=Path('artifacts/workflow')/n.TASK/n.RUN/'formal-resources.json'
+        current=root/relative;current.parent.mkdir(parents=True);current.write_bytes(b'current')
+        raw=b'original';item=dict(path=str(relative),sha256=ex.sha(raw),sizeBytes=len(raw))
+        with self.assertRaises(FileNotFoundError):n.frozen_member(root,item)
+        backup=current.with_name('formal-resources-'+item['sha256']+'.json');backup.write_bytes(raw)
+        self.assertEqual(n.frozen_member(root,item),raw);self.assertEqual(current.read_bytes(),b'current')
+        backup.write_bytes(b'tampered')
+        with self.assertRaisesRegex(ValueError,'S23_PREFIX_ORIGINAL_CHANGED'):n.frozen_member(root,item)
+        other=current.with_name('report.json');other.write_bytes(b'current')
+        with self.assertRaisesRegex(ValueError,'S23_PREFIX_ORIGINAL_CHANGED'):n.frozen_member(root,{**item,'path':str(other.relative_to(root))})
+
     def test_grant_order_does_not_hide_value_or_microsecond_differences(self):
         row=grant(state(),'reader','data.query.execute','id')
         row['RevokedAtUtc']='2026-11-20T00:00:00.123450+00:00'

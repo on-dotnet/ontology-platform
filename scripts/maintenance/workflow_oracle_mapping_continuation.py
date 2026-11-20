@@ -91,13 +91,23 @@ def compatible_prefix(archive,measured,mode,stage):
     return True
 
 
+
+def frozen_member(root,item,archive=None,name=None):
+    """冻结路径若被正式资源生命周期推进，仅从已有内容键副本取回相同原字节。"""
+    path=Path(item['path']);raw=_read(root,path)
+    if len(raw)!=item['sizeBytes'] or ex.sha(raw)!=item['sha256']:
+        require(path==Path('artifacts/workflow')/TASK/RUN/'formal-resources.json','S23_PREFIX_ORIGINAL_CHANGED')
+        path=path.with_name('formal-resources-'+item['sha256']+'.json');raw=_read(root,path)
+    require(len(raw)==item['sizeBytes'] and ex.sha(raw)==item['sha256'],'S23_PREFIX_ORIGINAL_CHANGED')
+    return _read(root,path,archive,name)
+
+
 def prefix_result(root,archive=None):
     """先核冻结资格及所有引用，再按当前消费者重开五槽；只走上述精确兼容条件。"""
     import workflow_oracle_mapping_evidence as e
     frozen=_frozen_qualification(root,archive)
     for name,item in frozen['members'].items():
-        raw=_read(root,item['path'],archive,'prefix-'+name)
-        require(len(raw)==item['sizeBytes'] and ex.sha(raw)==item['sha256'],'S23_PREFIX_ORIGINAL_CHANGED')
+        frozen_member(root,item,archive,'prefix-'+name)
     checked={};members={};result=None
     for mode in MODES:
         result=e.reopen_runtime_case(root,TASK,RUN,PREFIX['commandId'],expected_mode=mode,_checked=checked)
@@ -105,7 +115,9 @@ def prefix_result(root,archive=None):
             if name in members:require(members[name]==item,'S23_PREFIX_ORIGINAL_ALIAS')
             members[name]=item
             _read(root,item['path'],archive,'prefix-'+name)
-    return {**result,'members':members},frozen
+    relocations=[dict(originalPath=item['path'],resolvedPath=members[name]['path'],sha256=item['sha256'],sizeBytes=item['sizeBytes'])
+        for name,item in frozen['members'].items() if item['path']!=members[name]['path']]
+    return {**result,'members':members,'frozenMemberRelocations':relocations},frozen
 
 
 def _state_projection(state):
