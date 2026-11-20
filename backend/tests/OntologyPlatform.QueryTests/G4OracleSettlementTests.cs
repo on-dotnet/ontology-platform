@@ -13,6 +13,7 @@ public sealed class G4OracleSettlementTests
     [DataRow("past-cleanup")]
     [DataRow("during-first-write")]
     [DataRow("past-branch")]
+    [DataRow("past-request")]
     [DataRow("healthy")]
     public async Task OriginalExecutionDeadlineGovernsSettlement(string scenario)
     {
@@ -33,14 +34,19 @@ public sealed class G4OracleSettlementTests
             var acquired = live.BeginSource();
             if (scenario == "past-branch") clock.Advance(900);
             live.ConfirmReleased(acquired);
-            if (scenario == "healthy") return Task.FromResult<G4SourceQueryRead>(null!);
+            if (scenario == "healthy") return Task.FromResult(new G4SourceQueryRead
+            {
+                EntityBindingId = "entity", Rows = [], StartedAtUtc = clock.GetUtcNow(), CompletedAtUtc = clock.GetUtcNow(),
+                AdapterVersion = "oracle-query-v1", WatermarkKind = "UNKNOWN", Watermark = null, Indeterminate = false,
+                Limited = false, RecordKeyFields = ["ROW_ID"], QueryPlanHash = new string('a', 64)
+            });
             throw new IOException("reader-failed-after-release");
         }
         var branch = execution.ReadOracleAsync(lease, state, request.DeadlineUtc, CancellationToken.None,
             (_, _) => Task.FromResult<G4QueryResultStore.OracleLeaseObservation?>(new() { Active = true }), Read);
         if (scenario == "healthy")
         {
-            await branch;
+            Assert.AreEqual("entity", (await branch).EntityBindingId);
             Assert.IsTrue(state.Confirmed);
             Assert.IsNull(state.BranchLimit);
             Assert.IsNull(state.Lifetime);
@@ -48,6 +54,7 @@ public sealed class G4OracleSettlementTests
         }
         await Assert.ThrowsAsync<IOException>(() => branch);
         // 原截止前/后以及第一笔结算已完成但第二笔已越限分别留有独立见证。
+        if (scenario == "past-request") request.Tighten(0);
         if (scenario == "past-cleanup") clock.Advance(251);
         if (scenario == "past-branch") clock.Advance(101);
         var failed = 0;

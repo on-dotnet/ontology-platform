@@ -121,11 +121,15 @@ internal static class OracleQueryReader
     {
         // 取消信号和工作线程共用最早清理起点，不能从回滚另起预算。
         long cleanupStart = 0;
-        using var observed = work.Register(() =>
+        // 同一最早起点同时约束物理释放和外层 PG 结算；后续重复通知只会收紧。
+        void StartCleanup()
         {
-            Interlocked.CompareExchange(ref cleanupStart, Stopwatch.GetTimestamp(), 0);
-            lifetime.TightenCleanup(CleanupLimit);
-        });
+            // 先登记本线程看到的单调戳，若另一线程更早进入则沿用其已消耗的时间。
+            var stamp = Stopwatch.GetTimestamp();
+            var previous = Interlocked.CompareExchange(ref cleanupStart, stamp, 0);
+            lifetime.TightenCleanup(CleanupLimit - Stopwatch.GetElapsedTime(previous == 0 ? stamp : previous));
+        }
+        using var observed = work.Register(StartCleanup);
         // 物理申请在任何连接尝试之前登记。
         var acquisition = lifetime.BeginSource();
         report?.Invoke("ACQUIRED", acquisition);
@@ -158,7 +162,7 @@ internal static class OracleQueryReader
                     }
                     catch (Exception failure)
                     {
-                        Interlocked.CompareExchange(ref cleanupStart, Stopwatch.GetTimestamp(), 0);
+                        StartCleanup();
                         // 回滚使用原分支、请求和首次取消窗口中剩余的最小值。
                         var left = RemainingCleanup(origin, budget, Volatile.Read(ref cleanupStart));
                         if (left <= TimeSpan.Zero) throw;
@@ -187,9 +191,16 @@ internal static class OracleQueryReader
                 await verifyAfter(connection);
                 report?.Invoke("POST_RETURNED", acquisition);
                 confirmed = true;
+                // 健康读取仍只在本地度量物理释放。若释放本身失败，则向持有人传递这个已用起点。
                 Interlocked.CompareExchange(ref cleanupStart, Stopwatch.GetTimestamp(), 0);
                 work.ThrowIfCancellationRequested();
                 return rows;
+            }
+            catch
+            {
+                // 包括后验和事务释放异常，物理连接 Dispose 消耗的时间不能从持有人窗口漏掉。
+                StartCleanup();
+                throw;
             }
             finally
             {
@@ -199,7 +210,12 @@ internal static class OracleQueryReader
                     released();
                     report?.Invoke("PHYSICAL_DISPOSED", acquisition);
                 }
-                catch { confirmed = false; throw; }
+                catch
+                {
+                    StartCleanup();
+                    confirmed = false;
+                    throw;
+                }
             }
         }
         finally
