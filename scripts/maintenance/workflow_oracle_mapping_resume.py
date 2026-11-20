@@ -303,10 +303,12 @@ def release_api(role):
     if state=='running':
         _,sig=command('resume-api-term',['stop','--signal','TERM','--timeout','-1',cid],timeout=45)
         actions.append(sig)
-        out,_=command('resume-api-exit',['inspect','-f','{{.State.Status}} {{.State.ExitCode}} {{.State.OOMKilled}}',cid])
+    if state in ('running','exited'):
+        out,observed=command('resume-api-exit',['inspect','-f','{{.State.Status}} {{.State.ExitCode}} {{.State.OOMKilled}}',cid])
+        actions.append(observed)
         require(out in ('exited 0 false','exited 143 false'),'PRODUCT_API_SHUTDOWN')
     else:
-        require(state in ('created','exited'),'PRODUCT_API_CLOSED_STATE')
+        require(state=='created','PRODUCT_API_CLOSED_STATE')
     # 复核准确无状态容器后按授权删除，无 force/卷参数。
     _,removed=command('resume-remove-stateless',['rm',cid]);actions.append(removed)
     remaining,_=command('resume-absent',['ps','-a','--no-trunc','--filter','id='+cid,'--format','{{.ID}}'])

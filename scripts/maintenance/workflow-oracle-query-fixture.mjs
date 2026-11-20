@@ -25,13 +25,34 @@ export async function completeCurrentLogin(page, label) {
   originalSubject(label);
   const callback = url => url.origin === "http://localhost:" + ports.api && url.pathname === "/api/v1/platform/me";
   const address = new URL(page.url());
+  const deadline = Date.now() + 40000;
   if (!callback(address)) {
     if (address.origin !== "http://localhost:" + ports.oidc || !address.pathname.startsWith("/realms/g2-180e1435711f03fa/"))
       throw new Error("ORACLE_RESTORED_REALM");
-    await page.locator("#username").fill("g2-" + label);
+    const username = "g2-" + label;
+    await page.locator("#username").fill(username);
     await page.bringToFront();
+    // 仅让浏览器提交它已自动填充的准确账号。脚本不取密码字段的值。
+    await page.locator("#password").focus();
+    const filled = page.locator('input#password[type="password"]:-webkit-autofill');
+    try {
+      await filled.waitFor({ state: "visible", timeout: 2000 });
+    } catch (error) {
+      if (error.name !== "TimeoutError") throw error;
+    }
+    if (await filled.count()) {
+      await filled.evaluate((input, expected) => {
+        const form = input.form;
+        const submit = form?.querySelector("#kc-login");
+        if (!submit || form.querySelector("#username")?.value !== expected.username) return;
+        const action = new URL(form.action);
+        if (location.origin === expected.origin && action.origin === expected.origin &&
+            action.pathname === "/realms/g2-180e1435711f03fa/login-actions/authenticate" &&
+            form.method.toLowerCase() === "post" && input.matches(":-webkit-autofill")) form.requestSubmit(submit);
+      }, { username, origin: address.origin }, { timeout: Math.max(1, deadline - Date.now()) });
+    }
   }
-  await page.waitForURL(callback, { timeout: 40000 });
+  await page.waitForURL(callback, { timeout: Math.max(1, deadline - Date.now()) });
 }
 
 const columns = ["ROW_ID", "JOIN_KEY", "VAL", "ORG_ID", "SITE_ID", "EXT_ID", "LABEL", "FROM_TS", "TO_TS", "EVENT_TS", "OBSERVED_TS"];
