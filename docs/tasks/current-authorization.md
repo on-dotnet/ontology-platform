@@ -17,3 +17,5 @@
 本批认证窗口已关闭，0/4 个原主体完成新登录，OIDC 为 WAITING_FOR_USER_AUTH。RustFS 实际及独立封存参考各遍历三页，5 个版本、0 个删除标记一致。资源停止后态已核对，RC05 仍 BLOCKED。[本批交接](../evidence/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-02/report.md)
 
 **现行批次 product-resume-01。** 用户批准在当前未合并任务分支上从 `4924f44ec1628b156d7e722513405bc13d376d8e` 推进。4/4 补充按既存原件离线核对。正式取消拆分 AC03-A/B/C；A/C 通过并具备一致副本、资源与权限后进入 S1，再按 S1 结果推进 S2/S3 功能验证。B 继续 BLOCKED / NOT_QUALIFIED。原最终资格、历史失败、原卷与九份归档保留。main 固定，停在 ChatGPT 复审。
+
+本批已核实重置后的 4/4 登录；原会话摘要缺逐行主体关联。分支已修正物理清理与 PG 锁后截止，两台替代正式 API 已登记。新增 PG 三态行锁实测通过，正式源端自然完成竞态仍需真实证据。实机结果与资源范围见[产品恢复报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/report.md)。

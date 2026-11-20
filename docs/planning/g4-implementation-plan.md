@@ -1,6 +1,6 @@
 # G4当前能力与规划入口
 
-当前 main 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`。2026-11-19，Doris review-fix-02 经 ChatGPT ACCEPT / GO，RF-02 关闭，已精确集成并回读。[Doris 验收与历史恢复](../tasks/G4-DORIS-MAPPING-QUERY-001.md)。当前[Oracle 任务](../tasks/G4-ORACLE-MAPPING-QUERY-001.md)已实测正式取消晚于固定 SQL 的 EOF，S0 与 AC03-B 保持 BLOCKED。product-resume-01 已批准在未合并分支修正自然完成竞态；AC03-A/C 通过并满足当前运行前提后进入 S1，S1 完成后继续 S2/S3 功能部分。G4 总体 **PARTIAL**。
+当前 main 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`。2026-11-19，Doris review-fix-02 经 ChatGPT ACCEPT / GO，RF-02 关闭，已精确集成并回读。[Doris 验收与历史恢复](../tasks/G4-DORIS-MAPPING-QUERY-001.md)。当前[Oracle 任务](../tasks/G4-ORACLE-MAPPING-QUERY-001.md)已实测正式取消晚于固定 SQL 的 EOF，S0 与 AC03-B 保持 BLOCKED。product-resume-01 已批准在未合并分支修正自然完成竞态；AC03-A/C 通过并满足当前运行前提后进入 S1，S1 完成后继续 S2/S3 功能部分。当前产品运行受 AC03-A 真实见证前置约束，S1–S3 均为 NOT_RUN，见[本批分项报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/report.md)。G4 总体 **PARTIAL**。
 
 ## 已合并能力与缺口
 
