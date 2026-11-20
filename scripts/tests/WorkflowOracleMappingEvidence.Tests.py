@@ -179,6 +179,101 @@ class OracleQualificationTests(unittest.TestCase):
                           '--run-id',oracle.RUN,'--gate','interaction','--input-key',row['inputKey']],row['command'])
         self.assertIn('OMQ_ORIGINALS_NOT_RUN_s2',(root/row['logPath']).read_text())
 
+    def test_resume_case_command_rejects_mismatched_run_command_and_registered_fingerprint(self):
+        # 隔离 Git 目录只提供 CLI 到命令消费者的前半段材料；缺少浏览器原件，任何分支都不能签产品 PASS。
+        root=self.root
+        scripts=root/'scripts/maintenance'
+        modules=('workflow_oracle_mapping_evidence','workflow_execution','workflow_evidence','workflow_oracle_mapping_resources',
+                 'workflow_m2_build','workflow_m2_evidence','execution_preflight','task_run_timeline')
+        for name in modules:
+            shutil.copyfile(ROOT/'scripts/maintenance'/(name+'.py'),scripts/(name+'.py'))
+        for name in oracle.DRIVERS:
+            shutil.copyfile(ROOT/name,root/name)
+        (root/'.gitignore').write_text('artifacts/\n__pycache__/\n')
+        source='backend/fixture.txt'
+        (root/'backend').mkdir()
+        (root/source).write_bytes(b'offline qualification fixture\n')
+        def git(*args):
+            return subprocess.run(['git',*args],cwd=root,check=True,capture_output=True,text=True,timeout=10).stdout.strip()
+        git('init','-q')
+        git('add','.')
+        git('-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','-qm','offline case inputs')
+        head=git('rev-parse','HEAD')
+        run=oracle.PRODUCT_RUN
+        env={**os.environ,'OMQ_PRODUCT_RUN':run}
+        base=root/'artifacts/workflow'/oracle.TASK
+        area=base/run
+        area.mkdir(parents=True)
+        cid='a'*32
+        stage={'phase':'s0','mode':oracle.READY,'case':'expired'}
+        host=copy.deepcopy(self.host)
+        host['runId']=run
+        # fixture.txt 是该仓库唯一构建输入；两个无执行内容的输出标记只用于输入绑定分支。
+        import workflow_m2_build as build
+        input_key=oracle.sha(json.dumps({source:oracle.sha((root/source).read_bytes())},sort_keys=True).encode())
+        builds={}
+        for target in ('api','agent'):
+            project=Path(build.TARGETS[target])
+            marker=project.parent/'bin/Debug/net10.0'/(project.stem+'.dll')
+            output=b'offline marker only: '+target.encode()
+            (root/marker).parent.mkdir(parents=True)
+            (root/marker).write_bytes(output)
+            log=b'offline marker prepared\n'
+            (base/(target+'-bound-build.txt')).write_bytes(log)
+            outputs={str(marker):oracle.sha(output)}
+            raw=oracle.encoded(dict(taskId=oracle.TASK,target=target,worktree=str(root),status='PASS',exitCode=0,
+                                    inputKey=input_key,outputs=outputs,logSha256=oracle.sha(log)))+b'\n'
+            (base/(target+'-build-binding.json')).write_bytes(raw)
+            builds[target]=dict(inputKey=input_key,outputKey=oracle.sha(json.dumps(outputs,sort_keys=True).encode()),receiptSha256=oracle.sha(raw))
+        host.update(buildInputKey=builds['api']['inputKey'],buildOutputKey=builds['api']['outputKey'])
+        dispatch=dict(taskId=oracle.TASK,runId=run,commandId=cid,testedCommit=head,mode=oracle.READY,case='expired',
+                      reports=['offline-sentinel.json'],builds=builds,host=host,stageInputs=stage)
+        path=area/('formal-run-'+oracle.READY+'-'+cid+'.json')
+        path.write_bytes(oracle.encoded(dispatch))
+        args=[oracle.NODE,oracle.DRIVER,'--task',oracle.TASK,'--run-id',run,'--mode',oracle.READY]
+        key=oracle.digest_value(dict(taskId=oracle.TASK,runId=run,mode=oracle.READY,case='expired',drivers=oracle.drivers(root,oracle.READY),
+                                     api=builds['api'],tests=builds['agent'],host={k:v for k,v in host.items() if k!='commandId'},stageInputs=stage))
+        # 收据原件和登记一起变化后先经无损 restore，再让真正 CLI 消费这些字节。
+        receipt=dict(schemaVersion=2,taskId=oracle.TASK,runId=run,commandId=cid,parentId=host['commandId'],stage='omq-browser-'+oracle.READY,
+                     cwd=str(root),commandSummary=oracle.summary(args),inputFingerprint=key,started=True,signal=None,classification='EXIT_FAILURE',
+                     exitCode=1,deadlineSeconds=180,startedAtUtc='2026-11-19T00:00:00Z',endedAtUtc='2026-11-19T00:00:01Z',elapsedSeconds=1,
+                     environmentFingerprint='a'*64)
+        policy=oracle.sha((root/'scripts/maintenance/workflow_execution.py').read_bytes())
+        receipt['identity']=oracle.digest_value([key,receipt['environmentFingerprint'],receipt['commandSummary']['sha256'],str(root),180,policy])
+        command=base/'commands'/run/cid
+        command.mkdir(parents=True)
+        for stream in ('stdout','stderr'):
+            (command/(stream+'.txt')).write_bytes(b'')
+            receipt[stream]=dict(sizeBytes=0,sha256=oracle.sha(b''))
+        member=Path('docs/evidence')/oracle.TASK/run/'offline-case'/'receipt.json'
+        (root/member).parent.mkdir(parents=True)
+        def register(row):
+            raw=oracle.encoded(row)+b'\n'
+            (root/member).write_bytes(raw)
+            entry=dict(path=str(member),originalPath=str(member),encoding='raw',sizeBytes=len(raw),sha256=oracle.sha(raw))
+            recovered=oracle.restore(root,entry)
+            self.assertEqual(raw,recovered)
+            (command/'receipt.json').write_bytes(recovered)
+            return entry['sha256']
+        def refuse(run_id,command_id,reason):
+            argv=[sys.executable,'-B','scripts/maintenance/workflow_oracle_mapping_evidence.py','--task',oracle.TASK,'--run-id',run_id,'--case-command',command_id]
+            proc=subprocess.run(argv,cwd=root,env=env,capture_output=True,text=True,timeout=10)
+            self.assertNotEqual(0,proc.returncode)
+            self.assertEqual('OMQ_QUALIFICATION_REJECTED '+reason,proc.stderr.strip())
+            self.assertEqual('',proc.stdout)
+        original=register(receipt)
+        # 准确控制先经过真实 Git 驱动、构建、stageInputs、argv、双流与命令身份，才由故意无效的报告名拒绝。
+        refuse(run,cid,'OMQ_REPORT_NAME')
+        refuse(oracle.RESOURCE_RUN,cid,'OMQ_COMMAND_SCOPE')
+        refuse(run,'b'*32,'OMQ_RUNTIME_DISPATCH')
+        path.write_bytes(oracle.encoded({**dispatch,'runId':oracle.RESOURCE_RUN}))
+        refuse(run,cid,'OMQ_RUNTIME_DISPATCH_SCOPE')
+        path.write_bytes(oracle.encoded(dispatch))
+        for change in ({'commandId':'b'*32},{'runId':oracle.RESOURCE_RUN},{'inputFingerprint':'0'*64}):
+            with self.subTest(change=change):
+                self.assertNotEqual(original,register({**receipt,**change}))
+                refuse(run,cid,'OMQ_COMMAND_BINDING')
+
     def test_audit_must_cover_the_actual_browser_command(self):
         row=dict(startedAtUtc='2026-11-19T00:00:00Z',endedAtUtc='2026-11-19T00:00:01Z')
         audit=dict(taskId=oracle.TASK,runId=oracle.RUN,startUtc=row['startedAtUtc'],endUtc='2026-11-19T00:00:02Z',
