@@ -627,6 +627,8 @@ public sealed class G4QueryExecution
     internal async Task FinishOracleFailureAsync(G4QueryRecord lease, OracleExecution oracle, CancellationToken token,
         Func<CancellationToken, Task> fail, Func<CancellationToken, Task<bool>> confirm)
     {
+        // 还未发生物理工作的外层失败也只拥有同一段 250ms；更早的断开与源安定窗口均继续优先。
+        oracle.Interrupt(clock.GetTimestamp());
         // 认证和失败结算都不能重置已由源工作、回滚及观察消耗的时间。
         var remaining = OracleSettlementRemaining(lease, oracle);
         if (remaining <= TimeSpan.Zero) return;

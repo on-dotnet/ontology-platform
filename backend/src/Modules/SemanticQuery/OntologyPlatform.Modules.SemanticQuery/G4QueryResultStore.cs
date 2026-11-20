@@ -366,23 +366,43 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         return record;
     }
 
+    /// <summary>先从当前 PG 取得时间，再扣主机原单调余量，把等待和往返都计入同库绝对截止。</summary>
+    private static async Task<DateTimeOffset?> OracleDatabaseCutoffAsync(G4QueryDbContext database, Func<TimeSpan> remaining, CancellationToken token)
+    {
+        if (remaining() <= TimeSpan.Zero) return null;
+        // PG 采样早于响应到主机；数据库戳加之后才读取的余量给出保守截止，不要求跨机时钟同步。
+        var sample = await database.Database.SqlQueryRaw<DateTimeOffset>("SELECT clock_timestamp() AS \"Value\"").SingleAsync(token);
+        // 这里的回调始终重读同次 execution 的原预算，不能在每笔事务重置一段清理时间。
+        var left = remaining();
+        return left > TimeSpan.Zero ? sample.Add(left) : null;
+    }
+
     /// <summary>仅真实 Oracle 所有者可原子终结自己的原 fence；与正式取消或 Sweep 抢同一行。</summary>
     internal async Task FailOracleAsync(G4QueryRecord lease, ResourceScope scope, ActorContext actor, Func<TimeSpan> remaining, CancellationToken token)
     {
         if (!IsOracleOwner(lease.LeaseOwner)) return;
         // 独立上下文只写本模块准确行，失败审计与 fence 在同物理事务提交。
         await using var database = await factory.CreateDbContextAsync(token);
+        // 在容量锁及行锁等待之前确定同库截止，之后不再推延。
+        if (await OracleDatabaseCutoffAsync(database, remaining, token) is not { } cutoff) return;
         await using var transaction = await database.Database.BeginTransactionAsync(token);
         await LockCapacityAsync(database, token);
         var changed = await database.Database.ExecuteSqlInterpolatedAsync($"""
-            UPDATE semantic_query."Queries" SET "ExecutionStatus" = 'FAILED', "Fence" = "Fence" + 1,
+            WITH locked AS MATERIALIZED (
+                SELECT "Id", "DeadlineAtUtc" FROM semantic_query."Queries"
+                WHERE "Id" = {lease.Id} AND "LeaseOwner" = {lease.LeaseOwner} AND "Fence" = {lease.Fence}
+                    AND "ExecutionStatus" = 'RUNNING' FOR UPDATE
+            )
+            UPDATE semantic_query."Queries" AS q SET "ExecutionStatus" = 'FAILED', "Fence" = q."Fence" + 1,
                 "CompletedAtUtc" = clock_timestamp(), "ErrorCode" = 'query_source_unavailable'
-            WHERE "Id" = {lease.Id} AND "LeaseOwner" = {lease.LeaseOwner} AND "Fence" = {lease.Fence}
-                AND "ExecutionStatus" = 'RUNNING'
+            FROM locked WHERE q."Id" = locked."Id" AND clock_timestamp() < LEAST(locked."DeadlineAtUtc", {cutoff})
             """, token);
         if (changed == 0) return;
         await audit.WriteAsync(actor, new AuditCommand { Action = "data.query.execute", Resource = lease.Id,
             Outcome = "failure", Scope = scope }, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
+        // 审计与状态处于同一事务，审计若耗尽原截止则整个失败写回滚，保留准确 owner。
+        if (!await database.Database.SqlQuery<bool>($"SELECT clock_timestamp() < {cutoff} AS \"Value\"").SingleAsync(token)
+            || remaining() <= TimeSpan.Zero) return;
         await transaction.CommitAsync(token);
     }
 
@@ -392,6 +412,7 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         if (!IsOracleOwner(owner) || originalFence < 1 || originalFence == long.MaxValue || terminalFence != originalFence + 1) return false;
         // 单条语句在 PG 取得准确行锁后重核状态和正式取消的保守同库截止。
         await using var database = await factory.CreateDbContextAsync(token);
+        if (await OracleDatabaseCutoffAsync(database, remaining, token) is not { } cutoff) return false;
         return await database.Database.ExecuteSqlInterpolatedAsync($"""
             WITH locked AS MATERIALIZED (
                 SELECT "Id", "DeadlineAtUtc", "LeaseUntilUtc", "ExecutionStatus"
@@ -399,7 +420,7 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
                     AND "ExecutionStatus" IN ('CANCELLED', 'FAILED') FOR UPDATE
             )
             UPDATE semantic_query."Queries" AS q SET "LeaseOwner" = NULL, "LeaseUntilUtc" = NULL
-            FROM locked WHERE q."Id" = locked."Id" AND locked."DeadlineAtUtc" > clock_timestamp()
+            FROM locked WHERE q."Id" = locked."Id" AND clock_timestamp() < LEAST(locked."DeadlineAtUtc", {cutoff})
                 AND (locked."ExecutionStatus" != 'CANCELLED' OR locked."LeaseUntilUtc" > clock_timestamp())
             """, token) == 1;
     }
