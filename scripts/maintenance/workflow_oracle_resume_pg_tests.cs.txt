@@ -1,0 +1,148 @@
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Npgsql;
+
+/// <summary>在既有 API 内用正式配置建立一次隔离测试连接，只向本次 MSTest 子进程传递连接。</summary>
+internal static class IsolatedQueryTests
+{
+    /// <summary>每个方法单独实际分发，三个状态行及两个历史次序不能相互抵扣。</summary>
+    private static readonly (string Method, int Count)[] Cases =
+    [
+        ("G4OracleSettlementTests.OriginalCutoffIsCheckedAfterPostgresRowLock", 3),
+        ("G4QueryRaceTests.OracleTerminalOwnerSurvivesSweepAndRejectsStaleConfirmation", 1),
+        ("G4QueryRaceTests.RevocationBlocksAtomicResultAndAudit", 1)
+    ];
+
+    /// <summary>将独立进程输出限制为公开摘要和原始双流散列，异常正文及认证材料不进入原件。</summary>
+    private static string Digest(string value) => Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(value)));
+
+    /// <summary>提取 MTP 原生摘要的唯一数值；缺失、重复或格式不符均为失败。</summary>
+    private static int Summary(string output, string name)
+    {
+        var localized = name switch { "total" => "总计", "failed" => "失败", "succeeded" => "成功", "skipped" => "已跳过", _ => throw new ArgumentException() };
+        var matches = Regex.Matches(output, @"(?im)^\s*(?:" + name + "|" + localized + @")[:：]\s*(\d+)\s*$");
+        return matches.Count == 1 ? int.Parse(matches[0].Groups[1].Value) : -1;
+    }
+
+    /// <summary>本次配置只允许原 PG 身份及 CA；始终使用新建、已标记的准确随机测试库。</summary>
+    internal static async Task<int> Main(string[] args)
+    {
+        try
+        {
+            if (args.Length != 3 || !Regex.IsMatch(args[0], @"\A[0-9a-f]{12}\z") ||
+                !Regex.IsMatch(args[1], @"\A[0-9A-F]+/[0-9A-F]+\z") || !long.TryParse(args[2], out var capacity) || capacity <= 0) return 2;
+            var nonce = args[0];
+            // 只通过应用自己的配置提供者取命名连接，不单独读取或输出口令。
+            var configuration = new ConfigurationBuilder().AddJsonFile("/private/api/appsettings.json", false, false).Build();
+            var connection = new NpgsqlConnectionStringBuilder(configuration.GetConnectionString("governance"));
+            if (connection.Host != "platform-pg" || connection.Database != "mapping" || connection.Port != 5432
+                || connection.Username != "postgres" || connection.SslMode != SslMode.VerifyFull
+                || connection.RootCertificate != "/private/api/platform-ca.crt") return 3;
+            connection.Database = "omq_query_test_" + nonce;
+            var owner = "G4-ORACLE-MAPPING-QUERY-001:implementation-01:" + nonce;
+            // 在子进程继承凭证之前，以正式 TLS 及相同用户名独立验证服务端准确库名与所有权。
+            await using (var check = new NpgsqlConnection(connection.ConnectionString))
+            {
+                await check.OpenAsync();
+                await using var member = new NpgsqlCommand("SELECT current_database()=$1 AND current_user='postgres' AND shobj_description(oid,'pg_database')=$2 FROM pg_database WHERE datname=current_database()", check);
+                member.Parameters.Add(new NpgsqlParameter { Value = connection.Database });
+                member.Parameters.Add(new NpgsqlParameter { Value = owner });
+                if (!Equals(await member.ExecuteScalarAsync(), true)) return 4;
+            }
+            // 在同一隔离库复用一个有界只读观察连接，计入该组 CPU/内存限额。
+            await using var meter = new NpgsqlConnection(connection.ConnectionString);
+            await meter.OpenAsync();
+            async Task<long> ChargedAsync()
+            {
+                await using var measure = new NpgsqlCommand("SELECT pg_database_size(current_database())+pg_wal_lsn_diff(pg_current_wal_insert_lsn(),$1::text::pg_lsn)::bigint", meter);
+                measure.Parameters.Add(new NpgsqlParameter { Value = args[1] });
+                return Convert.ToInt64(await measure.ExecuteScalarAsync());
+            }
+            var failedGroups = 0;
+            for (var i = 0; i < Cases.Length; i++)
+            {
+                var (method, expected) = Cases[i];
+                var start = new ProcessStartInfo(Environment.ProcessPath ?? throw new InvalidOperationException()) { WorkingDirectory = Environment.CurrentDirectory,
+                    UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
+                // 子进程仅继承所需的常规运行时字段；没有 DSN 命令行、shell 展开或管理员材料。
+                start.Environment.Clear();
+                start.Environment["PATH"] = "/usr/share/dotnet:/usr/bin:/bin";
+                start.Environment["DOTNET_ROOT"] = "/usr/share/dotnet";
+                start.Environment["HOME"] = Environment.CurrentDirectory;
+                start.Environment["DOTNET_CLI_HOME"] = Environment.CurrentDirectory;
+                start.Environment["TMPDIR"] = Environment.CurrentDirectory;
+                start.Environment["DOTNET_CLI_UI_LANGUAGE"] = "en-US";
+                start.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1";
+                start.Environment["DOTNET_NOLOGO"] = "1";
+                start.Environment["DOTNET_EnableDiagnostics"] = "0";
+                start.Environment["G4_QUERY_TEST_CONNECTION"] = connection.ConnectionString;
+                start.Environment["G4_QUERY_TEST_OWNER"] = owner;
+                foreach (var arg in new[] { "/query-tests/OntologyPlatform.QueryTests.dll", "--filter",
+                    "FullyQualifiedName=OntologyPlatform.QueryTests." + method, "--minimum-expected-tests", expected.ToString(),
+                    "--no-ansi", "--progress", "off", "--timeout", "45s", "--results-directory", Path.Combine(Environment.CurrentDirectory, "results-" + i) })
+                    start.ArgumentList.Add(arg);
+                var peak = await ChargedAsync();
+                if (peak >= capacity) return 7;
+                using var child = Process.Start(start) ?? throw new InvalidOperationException();
+                var stdout = child.StandardOutput.ReadToEndAsync();
+                var stderr = child.StandardError.ReadToEndAsync();
+                using var limit = new CancellationTokenSource(TimeSpan.FromSeconds(52));
+                var sampled = 1;
+                var exited = child.WaitForExitAsync();
+                try
+                {
+                    while (await Task.WhenAny(exited, Task.Delay(250, limit.Token)) != exited)
+                    {
+                        limit.Token.ThrowIfCancellationRequested();
+                        peak = Math.Max(peak, await ChargedAsync());
+                        sampled++;
+                        if (peak >= capacity) { limit.Cancel(); limit.Token.ThrowIfCancellationRequested(); }
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // 关闭本次新建的测试进程，使调用方有界检查会话后再处置准确数据库。
+                    if (!child.HasExited) child.Kill(entireProcessTree: true);
+                    await child.WaitForExitAsync();
+                }
+                catch
+                {
+                    if (!child.HasExited) child.Kill(entireProcessTree: true);
+                    await child.WaitForExitAsync();
+                    throw;
+                }
+                peak = Math.Max(peak, await ChargedAsync());
+                var output = await stdout;
+                var errors = await stderr;
+                var text = output + "\n" + errors;
+                var total = Summary(text, "total");
+                var succeeded = Summary(text, "succeeded");
+                var failed = Summary(text, "failed");
+                var skipped = Summary(text, "skipped");
+                Console.WriteLine(JsonSerializer.Serialize(new { method, expected, exitCode = child.ExitCode,
+                    total, succeeded, failed, skipped, sampled, peakDbPlusWalBytes = peak, capacityBytes = capacity, timedOut = limit.IsCancellationRequested,
+                    stdoutSha256 = Digest(output), stderrSha256 = Digest(errors),
+                    stdoutBytes = Encoding.UTF8.GetByteCount(output), stderrBytes = Encoding.UTF8.GetByteCount(errors),
+                    observedExceptionTypes = Regex.Matches(text, @"\b(?:Npgsql\.)?(?:PostgresException|NpgsqlException|TimeoutException|AssertFailedException|InvalidOperationException)\b")
+                        .Select(m => m.Value).Distinct().ToArray() }));
+                if (limit.IsCancellationRequested || peak >= capacity) return 7;
+                if (child.ExitCode != 0 || total != expected || succeeded != expected || failed != 0 || skipped != 0) failedGroups++;
+            }
+            return failedGroups == 0 ? 0 : 5;
+        }
+        catch (Exception failure)
+        {
+            Console.WriteLine(JsonSerializer.Serialize(new { errorType = failure.GetType().Name }));
+            return 6;
+        }
+    }
+}
