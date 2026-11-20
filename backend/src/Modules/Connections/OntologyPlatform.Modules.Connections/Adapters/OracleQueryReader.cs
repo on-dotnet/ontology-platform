@@ -145,7 +145,7 @@ internal static class OracleQueryReader
         if (parents.Count is < 1 or > 100 || targets.Count > 100) throw Invalid();
         if (parents.Count * targets.Count > 1000) throw new SemanticOperationException(503, "query_source_budget_exhausted");
         DemandCompleteIdentity(targets);
-        foreach (var target in targets) // 已按当前请求选中的真实目标。
+        foreach (var target in targets) // 同次有界读取的完整目标集合中的当前行。
         {
             // 完整根集中的候选父项包括被外部号过滤排除的行。
             var matches = parents.Where(parent => Matches(parent, target)).ToArray();
