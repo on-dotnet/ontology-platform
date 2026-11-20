@@ -112,7 +112,7 @@ def current_storage(area, replacement=None):
     for cid in sorted(ids):
         require(re.fullmatch('[a-f0-9]{64}',cid),'STORAGE_CID')
         val=get('containers/'+cid+'/json?size=1')
-        require(val['Id']==cid and val['Config']['Labels'].get('ontology.task')==TASK and val['Config']['Labels'].get('ontology.run')==('s0-recovery-02' if cid in extra_ids else RUN),'SIZE_OWNER')
+        require(val['Id']==cid and val['Config']['Labels'].get('ontology.task')==TASK and val['Config']['Labels'].get('ontology.run')==(replacement.get('extraRun','s0-recovery-02') if cid in extra_ids else RUN),'SIZE_OWNER')
         require(type(val['SizeRw']) is int and val['SizeRw'] >= 0, 'CONTAINER_SIZE_MISSING')
         layer_sizes[cid]=val['SizeRw']
     return dict(volumesLogicalBytes={k:sizes[k] for k in old['volumesLogicalBytes']},containerWritableBytes=layer_sizes,
@@ -171,6 +171,8 @@ def disk_admission(root,area,command,*,phase=None,replacement=None):
         lines=block.splitlines()
         if any(line in ['branch refs/heads/codex/omq-source-bindings','branch refs/heads/codex/omq-deadline-store'] for line in lines) or Path(lines[0].removeprefix('worktree ')).parent.name in ('omq-source-bindings','omq-deadline-store'):
             host_dirs.append(Path(lines[0].removeprefix('worktree ')))
+    if phase == 'product-resume-01':
+        host_dirs.extend(p for p in (Path('/private/tmp/omq-product-resume-observer'), Path('/private/tmp/omq-product-resume-measure-4924')) if p.is_dir())
     host_roots=[p for p in host_dirs if p.is_dir()]
     measurements=[line.split(None,1) for line in command('formal-host-bytes',['du','-sk',*[str(p) for p in host_roots]]).splitlines()]
     require([row[1] for row in measurements]==[str(p) for p in host_roots], 'HOST_MEASUREMENT_SET')
@@ -207,7 +209,7 @@ def disk_admission(root,area,command,*,phase=None,replacement=None):
               'newBuildEvidenceAndLogs':max(64*1024**2,host_start+int(.75*GIB)-host)}
     if phase:
         from workflow_oracle_mapping_recovery_components import BATCH, PHASES
-        require(phase in ('preserve','restore','closed') or phase in PHASES, 'RECOVERY_PHASE')
+        require(phase in ('preserve','restore','closed','product-resume-01') or phase in PHASES, 'RECOVERY_PHASE')
         require(len(set(host_dirs))==len(host_dirs) and all(p.is_dir() for p in host_dirs), 'RECOVERY_HOST_MEASUREMENT')
         sizes = usage['volumesLogicalBytes']
         original = json.loads((area/'source-create-01.json').read_bytes())['volume']
@@ -264,7 +266,30 @@ def source_record():
     return json.loads((AREA/'source-create-01.json').read_bytes())
 
 
+def product_run():
+    value=os.environ.get('OMQ_PRODUCT_RUN','')
+    require(value in ('','product-resume-01'),'PRODUCT_RUN')
+    return value
+
+
+def active_service_ids():
+    if product_run():
+        from workflow_oracle_mapping_resume import manifest
+        return manifest()['ids']
+    return json.loads(OWNERS.read_bytes())['ids']
+
+
+def active_source_record():
+    if product_run():
+        from workflow_oracle_mapping_resume import replacement_source
+        return replacement_source()
+    return source_record()
+
+
 def admission():
+    if product_run():
+        from workflow_oracle_mapping_resume import admit
+        return admit()
     source=source_record()
     require(source['portMap']==PORTS,'FORMAL_FROZEN_PORTS')
     return before_source(ROOT,TASK,source['containerId'],platform_stage=True)
@@ -512,6 +537,9 @@ HOST_FORMAT=('{{.Id}}|{{.Image}}|{{index .Config.Labels "ontology.task"}}|{{inde
 
 
 def runtime_binding():
+    if product_run():
+        from workflow_oracle_mapping_resume import host_binding
+        return host_binding()
     rec=json.loads(OWNERS.read_bytes())
     inp=json.loads((AREA/'formal-api-inputs.json').read_bytes())
     require(build.validate('api',TASK)==inp['build'],'HOST_BUILD')
@@ -549,10 +577,10 @@ def runtime_binding():
 
 def pg_command(sql_bytes,stage):
     require(isinstance(sql_bytes,bytes) and re.fullmatch('[a-z0-9-]+',stage),'PG_INPUT')
-    cid=json.loads(OWNERS.read_bytes())['ids']['platform-pg']
+    cid=active_service_ids()['platform-pg']
     require(docker('pg-exact-owner','inspect','-f','{{.Id}} {{index .Config.Labels "ontology.task"}} {{.State.Status}}',cid)==cid+' '+TASK+' running','PG_OWNERSHIP')
     args=['docker','--context','desktop-linux','exec','-i','--user','postgres',cid,'psql','-XwqAt','-d','mapping','-v','ON_ERROR_STOP=1']
-    r=ex.run(args,ROOT,task=TASK,run_id=RUN,stage='omq-pg-'+stage,stdin=sql_bytes,input_key=ex.sha(sql_bytes),timeout=15)
+    r=ex.run(args,ROOT,task=TASK,run_id=product_run() or RUN,stage='omq-pg-'+stage,stdin=sql_bytes,input_key=ex.sha(sql_bytes),timeout=15)
     require(r.returncode==0,'PG_'+stage+'_'+r.receipt['commandId'])
     return r.stdout.decode().strip(),r.receipt['commandId']
 
@@ -563,7 +591,7 @@ def read_pg(sql_bytes,stage):
 
 def grant_fixture(mode,objects,fields,state):
     from workflow_m4_query import grant_transaction
-    require(mode in ('mapping','query') and (state['taskId'],state['runId'])==(TASK,RUN) and state['scope']=={'organizationId':'org-demo','siteIds':['site-a']},'GRANT_SCOPE')
+    require(mode in ('mapping','query') and (state['taskId'],state['runId'])==(TASK,product_run() or RUN) and state['scope']=={'organizationId':'org-demo','siteIds':['site-a']},'GRANT_SCOPE')
     cid=state['connectionId'];cat=state['catalog']
     require(re.fullmatch('[a-f0-9]{32}',cid) and cat['connectionId']==cid and cat['status']=='READY','GRANT_CATALOG')
     cols=['ROW_ID','JOIN_KEY','VAL','ORG_ID','SITE_ID','EXT_ID','LABEL','FROM_TS','TO_TS','EVENT_TS','OBSERVED_TS']
@@ -574,11 +602,14 @@ def grant_fixture(mode,objects,fields,state):
     perms={'operator':['mapping.read','mapping.source.validate','mapping.edit','mapping.validate','mapping.submit'],
            'auditor':['mapping.read','mapping.source.validate','mapping.review','mapping.approve'],
            'activator':['mapping.read','mapping.source.validate','mapping.activate']} if mode=='mapping' else {'reader':['data.query.execute','data.query.result.read','data.query.evidence.read']}
-    def key(sub,op):return 'omq-s0-'+ex.sha(ex.encoded([cid,sub,op]))[:32]
+    def key(sub,op):
+        if product_run():
+            return 'omq-r1-'+ex.sha(ex.encoded([product_run(),cid,sub,op]))[:32]
+        return 'omq-s0-'+ex.sha(ex.encoded([cid,sub,op]))[:32]
     for sub in state['subjects'].values():
         require(re.fullmatch('[A-Za-z0-9:_-]{1,120}',sub),'GRANT_SUBJECT')
     pairs=[(state['subjects'][k],v) for k,v in perms.items()]
-    sql,ids=grant_transaction(state,objects,fields,pairs,key,RUN)
+    sql,ids=grant_transaction(state,objects,fields,pairs,key,product_run() or RUN)
     count,command=pg_command(sql,'grant-'+mode)
     require(count.splitlines()[-1]==str(len(ids)),'GRANT_WRITTEN')
     keys=','.join("'"+i+"'" for i in ids)
@@ -594,7 +625,7 @@ def grant_fixture(mode,objects,fields,state):
         require(r['Id']==key(sub,op) and any(who==sub and op in allowed for who,allowed in pairs) and r['audit']==1 and r['ttl']>0 and
                 r['OrganizationId']=='org-demo' and r['SiteIds']==['site-a'] and r['ConnectionId']==(cid if scoped else None) and
                 set(r['ObjectRefs'])==set(objects if scoped else []) and set(r['FieldRefs'])==set(fields if scoped else []),'GRANT_READBACK')
-    return dict(taskId=TASK,runId=RUN,mode=mode,commandId=command,verificationId=check,grantCount=len(rows),fieldCount=len(fields),remainingSeconds=min(r['ttl'] for r in rows),inputsUnchanged=True)
+    return dict(taskId=TASK,runId=product_run() or RUN,mode=mode,commandId=command,verificationId=check,grantCount=len(rows),fieldCount=len(fields),remainingSeconds=min(r['ttl'] for r in rows),inputsUnchanged=True)
 
 
 def pause_unused_apis():
@@ -659,11 +690,11 @@ def next_api_snapshot():
 
 
 def native_fixture_sql(body,stage):
-    source=source_record()['containerId']
+    source=active_source_record()['containerId']
     require(docker('fixture-owner','inspect','-f','{{.Id}} {{index .Config.Labels "ontology.task"}} {{.State.Status}}',source)==source+' '+TASK+' running','SOURCE_FIXTURE_OWNER')
     args=['docker','--context','desktop-linux','exec','-i',source,'sqlplus','-L','-s','/ as sysdba']
     head='whenever sqlerror exit failure rollback\nset echo off heading off pages 0 lines 900 feedback off verify off tab off\nalter session set container=FREEPDB1;\n'
-    r=ex.run(args,ROOT,task=TASK,run_id=RUN,stage=stage,stdin=(head+body+'\nexit success\n').encode(),input_key=ex.sha(body.encode()),timeout=12)
+    r=ex.run(args,ROOT,task=TASK,run_id=product_run() or RUN,stage=stage,stdin=(head+body+'\nexit success\n').encode(),input_key=ex.sha(body.encode()),timeout=12)
     require(r.returncode==0,'SOURCE_FIXTURE_'+r.receipt['commandId'])
     return r.stdout.decode().strip(),r.receipt['commandId']
 
@@ -685,6 +716,9 @@ def session_preflight(actors,seconds):
     """复用正式票据解密与治理数据库。探针只用平台内网及必要的只读挂载。"""
     import uuid
     from workflow_m2_evidence import mtp
+    if product_run():
+        from workflow_oracle_mapping_resume import verify_sessions
+        return verify_sessions(actors,seconds)
     binding=build.validate('agent',TASK)
     inputs=json.loads((AREA/'formal-api-inputs.json').read_bytes())['build']
     require(inputs['inputKey']==binding['inputKey'],'SESSION_BUILD')
@@ -743,7 +777,7 @@ def ready_fixture(state):
     actors=state['actors'];require([a['subjectId'] for a in actors]==[state['subjects'][k] for k in ('operator','auditor','activator','reader')],'READY_ROLES')
     session=session_preflight(actors,seconds);fixture=fixture_state()
     require(fixture['counts']==([100,1] if state['mode'] in ('s0-oracle-natural','s0-oracle-cancel') else [1,1]),'READY_SOURCE_ROWS')
-    return dict(taskId=TASK,runId=RUN,status='READY',remainingSeconds=remaining,requiredSeconds=seconds,fieldCount=11,grantCount=3,fixtureBefore=fixture,
+    return dict(taskId=TASK,runId=product_run() or RUN,status='READY',remainingSeconds=remaining,requiredSeconds=seconds,fieldCount=11,grantCount=3,fixtureBefore=fixture,
                 session=session,commandId=command,activationCommand=pointer_cmd)
 
 
@@ -752,7 +786,7 @@ def web_binding():
 
 
 def audit_window(start_utc,end_utc,client_id=None):
-    from workflow_oracle_mapping_formal_observer import audit_window as audit
+    from workflow_oracle_mapping_formal_observer import scoped_audit_window as audit
     return audit(start_utc,end_utc,client_id)
 
 
@@ -760,12 +794,14 @@ def browser_run(mode,case='healthy'):
     import uuid
     from workflow_oracle_mapping_evidence import browser_invocation
     require(mode in ('provision','mapping','s0-oracle-ready','s0-oracle-natural','s0-oracle-cancel','s0-oracle-natural-cancel','s1','s1-reopen'),'FORMAL_MODE')
+    run=product_run() or RUN
+    area=AREA.parent/run
     resource=admission()
     pre=ex.run(['python3','-B','scripts/maintenance/execution_preflight.py','check','--milestone',TASK,'--phase','runtime'],ROOT,
-               task=TASK,run_id=RUN,stage='omq-consumers-'+mode,input_key=ex.sha(Path(__file__).read_bytes()),timeout=18)
+               task=TASK,run_id=run,stage='omq-consumers-'+mode,input_key=ex.sha(Path(__file__).read_bytes()),timeout=18)
     require(pre.returncode==0,'FORMAL_CONSUMERS_'+pre.receipt['commandId'])
     stage={'phase':'s1' if mode in ('s1','s1-reopen') else 's0','mode':mode,'case':case}
-    statefile=AREA/'runtime-fixture.json'
+    statefile=area/'runtime-fixture.json'
     if statefile.exists():
         state=json.loads(statefile.read_bytes());stage['prerequisiteSha256']=ex.sha(statefile.read_bytes())
         stage.update({k:state[k] for k in ('connectionId',) if k in state})
@@ -775,7 +811,7 @@ def browser_run(mode,case='healthy'):
     if mode=='s1-reopen':
         original=state['latestQuery']['oraclePersistence']['reportName']
         require(re.fullmatch(r'browser-s1-[0-9]{13}\.json',original),'S1_ORIGIN_NAME')
-        origins=[json.loads(ex.ordinary(path).read_bytes()) for path in AREA.glob('formal-run-s1-*.json')]
+        origins=[json.loads(ex.ordinary(path).read_bytes()) for path in area.glob('formal-run-s1-*.json')]
         matches=[item for item in origins if item.get('mode')=='s1' and item.get('reports')==[original] and item.get('exitCode')==0]
         require(len(matches)==1,'S1_ORIGIN_AMBIGUOUS')
         stage['originCommandId']=matches[0]['commandId']
@@ -783,19 +819,19 @@ def browser_run(mode,case='healthy'):
     host=runtime_binding();api=build.validate('api',TASK);tests=build.validate('agent',TASK)
     argv,key,label=browser_invocation(ROOT,mode,case,host,api,tests,stage)
     report_pattern='browser-'+mode+'-'+'[0-9]'*13+'.json'
-    before=set(AREA.glob(report_pattern))
-    result=ex.run(argv,ROOT,task=TASK,run_id=RUN,stage=label,input_key=key,parent_id=host['commandId'],timeout=180)
-    after=set(AREA.glob(report_pattern))-before
-    entry=dict(taskId=TASK,runId=RUN,mode=mode,case=case,stageInputs=stage,host=host,builds={'api':api,'agent':tests},
+    before=set(area.glob(report_pattern))
+    result=ex.run(argv,ROOT,task=TASK,run_id=run,stage=label,input_key=key,parent_id=host['commandId'],timeout=180)
+    after=set(area.glob(report_pattern))-before
+    entry=dict(taskId=TASK,runId=run,mode=mode,case=case,stageInputs=stage,host=host,builds={'api':api,'agent':tests},
                commandId=result.receipt['commandId'],exitCode=result.returncode,resourceAttempt=resource['attempt'],preflightCommandId=pre.receipt['commandId'],
                reports=[p.name for p in sorted(after)],testedCommit=local('tested-head',['git','rev-parse','HEAD']))
-    path=AREA/('formal-run-'+mode+'-'+result.receipt['commandId']+'.json')
+    path=area/('formal-run-'+mode+'-'+result.receipt['commandId']+'.json')
     save(path,entry)
     try:
         audit=audit_window(result.receipt['startedAtUtc'],result.receipt['endedAtUtc'])
-        save(AREA/('formal-audit-'+result.receipt['commandId']+'.json'),audit)
+        save(area/('formal-audit-'+result.receipt['commandId']+'.json'),audit)
     except Exception as error:
-        save(AREA/('formal-audit-failure-'+result.receipt['commandId']+'.json'),{'taskId':TASK,'reason':str(error)})
+        save(area/('formal-audit-failure-'+result.receipt['commandId']+'.json'),{'taskId':TASK,'reason':str(error)})
         raise
     return {'mode':mode,'commandId':result.receipt['commandId'],'exitCode':result.returncode,'reports':entry['reports'],
             'stageFailure':[json.loads(p.read_bytes()).get('failure') for p in after]}
@@ -885,6 +921,19 @@ if __name__=='__main__':
         observe(args.idempotency_key,args.output,args.query_id)
         raise SystemExit(0)
     actions={'admission':admission,'render':render,'create':create_platform,'init-volumes':init_volumes,'start':start_platform,'prepare-api':prepare_api,'primary':lambda:start_api('api'),'secondary':lambda:start_api('api-secondary'),'pause-apis':pause_unused_apis,'next-snapshot':next_api_snapshot,'browser':lambda:browser_run(args.mode,args.case),'window-pair':fixed_window_pair}
+    if product_run():
+        import workflow_oracle_mapping_resume as resume
+        def prepare_product_api():
+            info=resume.prepare()
+            resume.bind_session_tests()
+            return info
+        def create_and_start(role):
+            if role not in resume.manifest()['ids']:
+                resume.create(role)
+            return resume.start_api(role)
+        actions={'admission':admission,'prepare-api':prepare_product_api,'primary':lambda:create_and_start('api'),
+                 'secondary':lambda:create_and_start('api-secondary'),'browser':lambda:browser_run(args.mode,args.case)}
+        require(args.action in actions,'PRODUCT_ACTION')
     result=actions[args.action]()
     print(json.dumps(result,default=str))
     if args.action=='browser':

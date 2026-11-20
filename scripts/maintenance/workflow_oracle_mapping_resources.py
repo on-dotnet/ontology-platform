@@ -28,7 +28,8 @@ def before_source(root, task, source_id=None, *, platform_stage=False, phase=Non
     area = ordinary(root/'artifacts/workflow'/task)
     from workflow_oracle_mapping_recovery_components import BATCH, PHASES, EXTRA
     components=phase in PHASES
-    stage_run=BATCH if components else ('s0-recovery-01' if phase else RUN)
+    resume = phase == 'product-resume-01'
+    stage_run=phase if resume else BATCH if components else ('s0-recovery-01' if phase else RUN)
     require(not phase or (platform_stage and source_id is None), 'RECOVERY_STAGE')
     stamp = uuid.uuid4().hex
     record = dict(taskId=task, runId=stage_run, resourceRunId=RUN, phase=phase, attempt=stamp, status='STARTED', commands=[],
@@ -74,7 +75,10 @@ def before_source(root, task, source_id=None, *, platform_stage=False, phase=Non
         held_ports = set()
         if phase:
             from workflow_oracle_mapping_platform_recovery import phase_inventory
-            if components:
+            if resume:
+                from workflow_oracle_mapping_resume import inspect_product_stage
+                known,platform_memory,platform_cpu,held_ports,replacement=inspect_product_stage(area/RUN,running_roles,docker)
+            elif components:
                 from workflow_oracle_mapping_recovery_components import inspect_stage
                 known,platform_memory,platform_cpu,held_ports,replacement=inspect_stage(area/RUN,phase,running_roles,docker)
             else:
@@ -83,7 +87,7 @@ def before_source(root, task, source_id=None, *, platform_stage=False, phase=Non
             from workflow_oracle_mapping_platform import QUOTAS
             from workflow_oracle_mapping_platform_recovery import ORIGINAL_IDS
             upcoming=set(running_roles if planned_roles is None else planned_roles)
-            require(upcoming<=(PHASES[phase] if components else set(ORIGINAL_IDS)) and (phase!='closed' or not upcoming),'PLANNED_ROLE')
+            require(upcoming<=(PHASES[phase] if components else set(ORIGINAL_IDS) | ({'api','api-secondary'} if resume else set())) and (phase!='closed' or not upcoming),'PLANNED_ROLE')
             pending_roles=upcoming-set(running_roles)
             quotas={**QUOTAS,'oracle':(4096,2),**EXTRA}
             next_memory=platform_memory+sum(quotas[n][0]*1024**2 for n in pending_roles)
@@ -142,8 +146,8 @@ def before_source(root, task, source_id=None, *, platform_stage=False, phase=Non
         if phase:
             from workflow_oracle_mapping_platform import disk_admission
             record['platformDisk']=disk_admission(root,area/RUN,command,phase=phase,replacement=replacement)
-            require(record['projectedWithHelper']['memory']<=int(12.25*GIB)
-                    and record['projectedWithHelper']['nanoCpus']<=9_500_000_000
+            require(record['projectedWithHelper']['memory']<=int((13.75 if resume else 12.25)*GIB)
+                    and record['projectedWithHelper']['nanoCpus']<=(10_500_000_000 if resume else 9_500_000_000)
                     and int(total)>=record['projectedWithHelper']['memory']+3*GIB
                     and int(cpu)*1_000_000_000>=record['projectedWithHelper']['nanoCpus']+1_500_000_000,'RECOVERY_CAPS')
         cid = docker('probe-create','create','--pull=never','--network=none','--read-only','--cap-drop=ALL',
