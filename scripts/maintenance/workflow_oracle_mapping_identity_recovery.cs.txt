@@ -104,6 +104,61 @@ internal static class RecoveryIdentity
     private static string? Item(AuthenticationProperties? props, string name)
         => props!=null && props.Items.TryGetValue(name,out var value)?value:null;
 
+    /// <summary>正式回调与纯内存负例共用相同的验签、算法、签发者、受众和寿命策略。</summary>
+    private static Task<TokenValidationResult> ValidateSignature(string raw, SecurityKey key, string issuer, string audience)
+    {
+        var handler=new JsonWebTokenHandler { MapInboundClaims=false };
+        return handler.ValidateTokenAsync(raw,new TokenValidationParameters {
+            RequireSignedTokens=true, ValidateIssuerSigningKey=true, IssuerSigningKey=key, ValidAlgorithms=new[]{"RS256"},
+            ValidateIssuer=true, ValidIssuer=issuer, ValidateAudience=true, ValidAudience=audience, RequireAudience=true,
+            RequireExpirationTime=true, ValidateLifetime=true, ClockSkew=TimeSpan.Zero
+        });
+    }
+
+    /// <summary>用临时测试 RSA 密钥及非业务 issuer 检验真实锁定库；任何测试材料均不输出或持久化。</summary>
+    private static async Task<int> OfflineSignatureCases()
+    {
+        const string origin="https://synthetic.invalid/recovery-tests";
+        const string recipient="offline-only-client";
+        using var privateRsa=RSA.Create(2048);
+        using var publicRsa=RSA.Create();
+        publicRsa.ImportParameters(privateRsa.ExportParameters(false));
+        var signingKey=new RsaSecurityKey(privateRsa){KeyId="offline-test-key"};
+        var verificationKey=new RsaSecurityKey(publicRsa){KeyId=signingKey.KeyId};
+        var now=DateTime.UtcNow;
+        var creator=new JsonWebTokenHandler();
+        string Make(string issuer,string audience,string algorithm,DateTime start,DateTime expiry)
+        {
+            return creator.CreateToken(new SecurityTokenDescriptor {
+                Issuer=issuer, Audience=audience, Subject=new ClaimsIdentity(new[]{new Claim("sub","offline-fixture")}),
+                NotBefore=start, IssuedAt=start, Expires=expiry, SigningCredentials=new SigningCredentials(signingKey,algorithm)
+            });
+        }
+        var fresh=now.AddMinutes(-1);
+        var end=now.AddMinutes(2);
+        var healthy=Make(origin,recipient,"RS256",fresh,end);
+        var parts=healthy.Split('.');
+        var signature=Base64UrlEncoder.DecodeBytes(parts[2]);
+        signature[0]^=1;
+        var cases=new Dictionary<string,string> {
+            ["healthy"]=healthy,
+            ["modified_signature"]=parts[0]+"."+parts[1]+"."+Base64UrlEncoder.Encode(signature),
+            ["expired"]=Make(origin,recipient,"RS256",now.AddMinutes(-3),now.AddMinutes(-1)),
+            ["wrong_issuer"]=Make("https://other.synthetic.invalid",recipient,"RS256",fresh,end),
+            ["wrong_audience"]=Make(origin,"other-offline-client","RS256",fresh,end),
+            ["wrong_algorithm"]=Make(origin,recipient,"RS384",fresh,end)
+        };
+        var observed=new Dictionary<string,bool>();
+        foreach(var pair in cases){
+            var result=await ValidateSignature(pair.Value,verificationKey,origin,recipient);
+            observed.Add(pair.Key,result.IsValid);
+            Require(result.IsValid==(pair.Key=="healthy"),"offline_signature_case");
+        }
+        Console.WriteLine(JsonSerializer.Serialize(new {kind="offline-fixed-cryptographic-tests",issuer=origin,observed,
+            signedLibrary=typeof(JsonWebTokenHandler).Assembly.GetName().FullName},Web));
+        return 0;
+    }
+
     private static void ConfigureAuth(OpenIdConnectOptions options)
     {
         options.BackchannelHttpHandler=IdpTransport();
@@ -129,12 +184,7 @@ internal static class RecoveryIdentity
             Require(Item(ctx.Properties,"omq-attempt")==Attempt && flow!=null && Challenges.ContainsKey(flow),"challenge_binding");
             string? raw=ctx.TokenEndpointResponse?.IdToken;
             Require(raw!=null && raw.Length<=32768 && signer!=null,"missing_new_token");
-            var handler=new JsonWebTokenHandler { MapInboundClaims=false };
-            var result=await handler.ValidateTokenAsync(raw!,new TokenValidationParameters {
-                RequireSignedTokens=true, ValidateIssuerSigningKey=true, IssuerSigningKey=signer, ValidAlgorithms=new[]{"RS256"},
-                ValidateIssuer=true, ValidIssuer=Issuer, ValidateAudience=true, ValidAudience=Client, RequireAudience=true,
-                RequireExpirationTime=true, ValidateLifetime=true, ClockSkew=TimeSpan.Zero
-            });
+            var result=await ValidateSignature(raw!,signer!,Issuer,Client);
             Require(result.IsValid && result.SecurityToken is JsonWebToken,"signature");
             var jwt=(JsonWebToken)result.SecurityToken;
             var now=DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -232,9 +282,11 @@ internal static class RecoveryIdentity
         "Microsoft.Extensions.ServiceDiscovery.ServiceDiscoveryHostedService","Yarp.ReverseProxy.Management.ProxyConfigManager"
     };
 
-    public static async Task<int> Main()
+    public static async Task<int> Main(string[] args)
     {
         try {
+            if(args is ["--self-test"])return await OfflineSignatureCases();
+            Require(args.Length==0,"arguments");
             Require(Regex.IsMatch(Attempt,"\\A[a-f0-9]{32}\\z"),"attempt");
             using var limit=new CancellationTokenSource(TimeSpan.FromMinutes(15));
             await LoadSigner(limit.Token);
