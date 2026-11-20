@@ -15,7 +15,7 @@
 
 ## 本批结论
 
-**R1、R2、R3 的入口修复已验证，AC03-C 的受影响结算用例通过。正式 AC03-A 与 S1 因本次四会话认证缺少交互而阻断。** Oracle S0 继续 BLOCKED，AC03-B 与原 cleanup250ms 继续 NOT_QUALIFIED，G4 为 PARTIAL。此次未形成 Oracle 产品验收包。
+**R1、R2、R3 的入口修复已验证，AC03-C 的受影响结算用例通过。正式 AC03-A 与 S1 因本次四会话认证缺少交互而阻断。** Oracle S0=BLOCKED，AC03-B=BLOCKED，cleanup250ms=NOT_QUALIFIED，G4=PARTIAL。此次未形成 Oracle 产品验收包。
 
 | 项目 | 本次证据与结论 |
 | --- | --- |
