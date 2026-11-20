@@ -44,9 +44,10 @@ def hexid(value, size):
     return isinstance(value, str) and re.fullmatch('[0-9a-f]{'+str(size)+'}', value) is not None
 
 
-def frozen_inputs(root, fixture_path=None):
+def frozen_inputs(root, fixture_path=None, *, fixture_bytes=None):
     """以 Base 的已知源码/原件交叉证明四个不同主体、冻结 client 和唯一 RS256 签名键。"""
     root = Path(root)
+    check(fixture_bytes is None or (isinstance(fixture_bytes,bytes) and fixture_path is None), 'FIXTURE_SOURCE')
     history = root/'docs/evidence'/TASK
     previous = history/'s0-recovery-01/originals'
     files = {
@@ -60,7 +61,7 @@ def frozen_inputs(root, fixture_path=None):
     }
     values = {}
     for key, (path, expected) in files.items():
-        raw = path.read_bytes()
+        raw = fixture_bytes if key == 'fixture' and fixture_bytes is not None else path.read_bytes()
         check(hashlib.sha256(raw).hexdigest() == expected, 'FROZEN_'+key.upper())
         if key != 'bootstrap':
             values[key] = json.loads(raw)
@@ -95,17 +96,35 @@ COMMIT;
 
 
 def qualify(events, attempt, started_ms, ended_ms):
-    """读取真实宿主逐行公开事件；上游另重开该准确宿主构建、命令双流和资源输入。"""
+    """严格四主体完成入口；无认证、部分认证和已写票但缺正式投影均不能通过。"""
+    observed = qualify_partial(events, attempt, started_ms, ended_ms)
+    check(observed['status']=='FOUR_NORMAL_AUTHENTICATIONS_VERIFIED','FOUR_COMPLETED_SUBJECTS')
+    return observed
+
+
+def qualify_partial(events, attempt, started_ms, ended_ms):
+    """验证完整事件前缀。仅无票的孤立挑战可按等待收尾，残缺票据仍保留给 PG 核验。"""
+    try:
+        return _read_events(events, attempt, started_ms, ended_ms)
+    except (KeyError,TypeError,AttributeError) as exc:
+        raise ValueError('OMQ_IDENTITY_EVENT_SCHEMA') from exc
+
+
+def _read_events(events, attempt, started_ms, ended_ms):
     check(hexid(attempt,32) and type(started_ms) is int and type(ended_ms) is int and
-          0 <= ended_ms-started_ms <= 16*60*1000 and 2 <= len(events) <= 120, 'WINDOW')
+          0 <= ended_ms-started_ms <= 16*60*1000 and isinstance(events,list) and 2 <= len(events) <= 120, 'WINDOW')
     rows = {}
     operations = []
     flows = {}
+    stored = {}
+    correlations = set()
+    epoch_windows = []
     ready = False
     census = False
     previous = started_ms
     for event in events:
-        check(set(event) == {'kind','attempt','utc','details'} and event['attempt'] == attempt
+        check(isinstance(event,dict) and set(event) == {'kind','attempt','utc','details'} and event['attempt'] == attempt
+              and isinstance(event['details'],dict)
               and type(event['utc']) is int and previous <= event['utc'] <= ended_ms, 'EVENT_BINDING')
         previous = event['utc']
         d = event['details']
@@ -128,20 +147,31 @@ def qualify(events, attempt, started_ms, ended_ms):
         check(ready and hexid(flow,32), 'FLOW')
         if kind == 'challenge':
             check(flow not in flows and d['pkce']=='S256' and d['responseType']=='code' and
-                  d['statePresent'] is True and d['noncePresent'] is True, 'CHALLENGE')
+                  d['statePresent'] is True and d['noncePresent'] is True and
+                  sum(v['state']!='complete' for v in flows.values())<12, 'CHALLENGE')
             flows[flow] = {'state':'challenge','utc':previous}
         elif kind == 'ticketOperation':
             check(flow in flows and d['action'] in ('Store','Renew','Remove') and hexid(d['rowRef'],64)
                   and isinstance(d['correlation'],str) and 1<=len(d['correlation'])<=64 and
                   type(d['epochBefore']) is int and type(d['epochAfter']) is int and
                   d['epochAfter']-d['epochBefore'] in ((0,) if d['action']=='Store' else (0,1)), 'TICKET_OPERATION')
+            if d['action']=='Store':
+                check(flows[flow]['state']=='challenge' and d['rowRef'] not in stored.values()
+                      and d['correlation'] not in correlations,'DUPLICATE_STORE')
+                stored[flow]=d['rowRef']
+                correlations.add(d['correlation'])
+                flows[flow].update(state='stored',correlation=d['correlation'])
+            else:
+                check(stored.get(flow)==d['rowRef'],'TICKET_FLOW_BINDING')
             operations.append(d)
         elif kind == 'callback':
             stores = [o for o in operations if o['flow']==flow and o['action']=='Store']
-            check(flow in flows and flows[flow]['state']=='challenge' and d['status']==302 and d['returnPath']==ME
+            check(flow in flows and flows[flow]['state']=='stored' and d['status']==302 and d['returnPath']==ME
                   and d['ticketStored'] is True and len(stores)==1 and stores[0]['correlation']==d['correlation']
-                  and type(d['epochBefore']) is int and type(d['epochAfter']) is int and d['epochAfter']>=d['epochBefore'], 'CALLBACK')
+                  and type(d['epochBefore']) is int and type(d['epochAfter']) is int
+                  and d['epochBefore']<=stores[0]['epochBefore']<=stores[0]['epochAfter']<=d['epochAfter'], 'CALLBACK')
             flows[flow].update(state='callback',correlation=d['correlation'])
+            epoch_windows.append([d['epochBefore'],d['epochAfter']])
         elif kind == 'me':
             check(flow in flows and flows[flow]['state']=='callback' and d['status']==200 and d['sub'] in SUBJECTS
                   and d['sub'] not in rows and d['issuer']==ISSUER and d['audience']==CLIENT and d['alg']=='RS256'
@@ -152,18 +182,24 @@ def qualify(events, attempt, started_ms, ended_ms):
             account, sub, role, sites = SUBJECTS[d['sub']]
             check((d['account'],d['roles'],d['org'],d['sites'])==(account,[role],'org-demo',sites),'PLATFORM_PROJECTION')
             flows[flow]['state']='complete'
+            epoch_windows.append([d['epochBefore'],d['epochAfter']])
             rows[sub] = {'flow':flow,'correlation':flows[flow]['correlation'],'sub':sub,'account':account,
                          'roles':[role],'org':'org-demo','sites':sites,'iat':d['iat'],'exp':d['exp']}
         else:
             raise ValueError('OMQ_IDENTITY_EVENT_KIND')
-    check(census and ready and set(rows)==set(SUBJECTS) and len(flows)==4 and all(v['state']=='complete' for v in flows.values()),
-          'FOUR_COMPLETED_SUBJECTS')
-    check(len({v['correlation'] for v in rows.values()})==4,'CALLBACK_CORRELATIONS')
-    return dict(status='FOUR_NORMAL_AUTHENTICATIONS_VERIFIED',attempt=attempt,subjects=rows,operations=operations)
+    check(census and ready,'ENTRY_NOT_READY')
+    pending={flow:v['state'] for flow,v in flows.items() if v['state']!='complete'}
+    if set(rows)==set(SUBJECTS) and len(flows)==4 and not pending:
+        status='FOUR_NORMAL_AUTHENTICATIONS_VERIFIED'
+    elif len(rows)<4 and all(state=='challenge' for state in pending.values()):
+        status='WAITING_FOR_USER_AUTH'
+    else:
+        status='BLOCKED'
+    return dict(status=status,attempt=attempt,subjects=rows,operations=operations,pending=pending,epochWindows=epoch_windows)
 
 
 def qualify_pg(before, after, events, details_before, details_after):
-    """逐一绑定认证允许的写入；保持原行/审计、授权与跨存储引用的稳定投影。"""
+    """按实际 Store 数量逐次对账，零登录与部分登录仍必须保护原行、审计和业务引用。"""
     pre,post=before['stable'],after['stable']
     check(set(pre)==set(post) and all(pre[k]==post[k] for k in pre if k!='tables'),'PG_REFERENCES')
     check(set(pre['tables'])==set(post['tables']) and EPHEMERAL_TABLES<=set(post['tables'])
@@ -172,10 +208,11 @@ def qualify_pg(before, after, events, details_before, details_after):
     sessions=details_before['sessions']; current=details_after['sessions']
     old=details_before['audit']; new=details_after['audit']
     check(set(sessions)<=set(current) and set(old)<=set(new) and all(old[k]==new[k] for k in old),'PG_OLD_RECORDS')
-    created={o['rowRef'] for o in ops if o['action']=='Store'}
+    stores=[o for o in ops if o['action']=='Store']
+    created={o['rowRef'] for o in stores}
     changed={k for k in sessions if sessions[k]!=current[k]}
     updated={o['rowRef'] for o in ops if o['action'] in ('Renew','Remove') and o['epochAfter']>o['epochBefore']}
-    check(len(created)==4 and set(current)-set(sessions)==created and changed==updated & set(sessions)
+    check(len(created)==len(stores) and set(current)-set(sessions)==created and changed==updated & set(sessions)
           and all(o['rowRef'] in current for o in ops), 'PG_SESSION_WRITES')
     epoch=details_before['epoch']
     check(type(epoch) is int and epoch>=0, 'PG_INITIAL_EPOCH')
@@ -183,17 +220,34 @@ def qualify_pg(before, after, events, details_before, details_after):
         check(op['epochBefore']==epoch,'PG_EPOCH_BINDING')
         epoch=op['epochAfter']
     check(epoch==details_after['epoch'], 'PG_FINAL_EPOCH')
-    login={r['correlation']:sub for sub,r in rows.items()}
-    expected=sorted(('authentication.login',sub,c) for c,sub in login.items())
-    for o in ops:
-        if o['action']=='Remove' and o['epochAfter']>o['epochBefore']:
-            subject=next(s for s,v in rows.items() if v['flow']==o['flow'])
-            expected.append(('authentication.logout',subject,o['correlation']))
+    check(all(details_before['epoch']<=start<=end<=epoch for start,end in events['epochWindows']), 'PG_REQUEST_EPOCH')
     additions=[new[k] for k in set(new)-set(old)]
+    logins=[v for v in additions if v['action']=='authentication.login']
+    login={v['correlation']:v['actor'] for v in logins}
+    check(len(logins)==len(login)==len(set(login.values())) and set(login)=={o['correlation'] for o in stores}
+          and set(login.values())<=set(SUBJECTS) and all(login.get(r['correlation'])==sub for sub,r in rows.items()),
+          'PG_LOGIN_BINDING')
+    # 缺失 /me 的新票据仍要和同事务登录审计核对；这条审计本身不证明签名身份已完成。
+    actors={o['flow']:login[o['correlation']] for o in stores}
+    expected=[('authentication.login',subject,correlation) for correlation,subject in login.items()]
+    expected.extend(('authentication.logout',actors[o['flow']],o['correlation']) for o in ops
+                    if o['action']=='Remove' and o['epochAfter']>o['epochBefore'])
     check(all(v['outcome']=='allowed' for v in additions) and sorted((v['action'],v['actor'],v['correlation']) for v in additions)==sorted(expected),'PG_AUDIT_WRITES')
     for stable,detail in ((pre,details_before),(post,details_after)):
         check(stable['tables']['governance.server_sessions']['count']==len(detail['sessions'])
-              and stable['tables']['governance.audit_records']['count']==len(detail['audit']),'PG_COUNTERS')
+              and stable['tables']['governance.audit_records']['count']==len(detail['audit'])
+              and stable['tables']['governance.MappingAuthorizationEpochs']['count']==1,'PG_COUNTERS')
+        digests={'governance.server_sessions':list(detail['sessions'].values()),
+                 'governance.audit_records':[row['sha256'] for row in detail['audit'].values()]}
+        for table,hashes in digests.items():
+            check(all(hexid(value,64) for value in hashes) and
+                  hashlib.sha256(''.join(sorted(hashes)).encode('ascii')).hexdigest()==stable['tables'][table]['sha256'],
+                  'PG_DETAIL_TABLE_DIGEST')
+    expected_changes={'governance.MappingAuthorizationEpochs':epoch!=details_before['epoch'],
+                      'governance.server_sessions':bool(created or changed),'governance.audit_records':bool(additions)}
+    for name,modified in expected_changes.items():
+        first,last=pre['tables'][name]['sha256'],post['tables'][name]['sha256']
+        check(hexid(first,64) and hexid(last,64) and (first!=last)==modified,'PG_TABLE_DIGEST')
     return dict(status='AUTHENTICATION_WRITES_ACCOUNTED',epochBefore=details_before['epoch'],epochAfter=epoch,
                 appendedSessionRows=len(created),appendedAuditRows=len(additions),businessTablesVerified=len(pre['tables'])-3)
 
@@ -230,4 +284,84 @@ def offline_tests():
         try:qualify(subset,attempt,120000,121000)
         except ValueError:results.append(name);continue
         raise AssertionError(name)
+    def observe(subset):
+        return qualify_partial(subset,attempt,120000,121000)
+    def pg_state(detail):
+        def table(hashes):
+            return dict(count=len(hashes),sha256=hashlib.sha256(''.join(sorted(hashes)).encode()).hexdigest())
+        return {'stable':{'tables':{
+            'governance.server_sessions':table(detail['sessions'].values()),
+            'governance.audit_records':table([v['sha256'] for v in detail['audit'].values()]),
+            'governance.MappingAuthorizationEpochs':table([format(detail['epoch'],'064x')]),
+            'test.business':table([])}}}
+    initial=dict(epoch=1,sessions={},audit={})
+    details=copy.deepcopy(initial)
+    def verify(observation,post_detail,post_state=None):
+        return qualify_pg(pg_state(initial),pg_state(post_detail) if post_state is None else post_state,
+                          observation,initial,post_detail)
+    for n in range(5):
+        prefix=rows[:2+4*n]
+        observed=observe(prefix)
+        state='FOUR_NORMAL_AUTHENTICATIONS_VERIFIED' if n==4 else 'WAITING_FOR_USER_AUTH'
+        check(observed['status']==state and len(observed['subjects'])==n,'SELFTEST_PARTIAL')
+        if n:
+            op=prefix[-3]['details']
+            details['sessions'][op['rowRef']]=format(n+20,'064x')
+            details['audit'][str(n)]=dict(action='authentication.login',actor=prefix[-1]['details']['sub'],
+                    correlation=op['correlation'],outcome='allowed',sha256=format(n+30,'064x'))
+        writes=verify(observed,details)
+        check(writes['appendedSessionRows']==writes['appendedAuditRows']==n and writes['epochAfter']==1,
+              'SELFTEST_PARTIAL_PG')
+        results.append('pg_and_identity_'+str(n))
+        if n<4:
+            check(observe(rows[:len(prefix)+1])['status']=='WAITING_FOR_USER_AUTH','SELFTEST_OPEN_CHALLENGE')
+        if n==1:
+            for cut in (1,2):
+                incomplete=observe(prefix[:-cut])
+                check(incomplete['status']=='BLOCKED' and verify(incomplete,details)['appendedSessionRows']==1,'SELFTEST_UNCONFIRMED')
+            results.append('unconfirmed_store_or_callback')
+            wrong=copy.deepcopy(details);wrong['audit']['1']['actor']=ROSTER['reader'][1]
+            try:verify(observed,wrong)
+            except ValueError:results.append('partial_wrong_audit_actor')
+            else:raise AssertionError('partial_wrong_audit_actor')
+            event=copy.deepcopy(prefix[-3]);event['utc']=120999
+            for action in ('Renew','Remove'):
+                event['details'].update(action=action,epochAfter=2,correlation='next-request')
+                renewed=copy.deepcopy(details);renewed['epoch']=2
+                renewed['sessions'][op['rowRef']]='f'*64
+                if action=='Remove':
+                    renewed['audit']['logout']=dict(action='authentication.logout',actor=ROSTER['operator'][1],
+                                                    correlation='next-request',outcome='allowed',sha256='7'*64)
+                writes=verify(observe(prefix+[event]),renewed)
+                check(writes['epochAfter']==2 and writes['appendedAuditRows']==len(renewed['audit']),'SELFTEST_PG_EPOCH')
+                results.append('partial_epoch_'+action.lower())
+        if n==0:
+            drift=pg_state(details);drift['stable']['tables']['test.business']['count']=1
+            try:verify(observed,details,drift)
+            except ValueError:results.append('zero_login_business_drift')
+            else:raise AssertionError('zero_login_business_drift')
+    # 已写但不在事件中的登录、越界 epoch、错误新增表摘要均必须拒绝。
+    for name,observed,after in [
+            ('unobserved_auth_write',observe(rows[:2]),details),
+            ('unaccounted_epoch',valid,dict(details,epoch=2)),
+            ('unaccounted_audit',valid,dict(details,audit={})),
+            ('unaccounted_ticket',valid,dict(details,sessions={}))]:
+        try:verify(observed,after)
+        except ValueError:results.append(name)
+        else:raise AssertionError(name)
+    extra=copy.deepcopy(rows[2]);extra['utc']=120999;extra['details']['flow']='9'*32
+    check(observe(rows+[extra])['status']=='BLOCKED','SELFTEST_EXTRA_FLOW')
+    results.append('four_plus_extra_flow')
+    too_many=rows[:2]
+    for n in range(13):
+        event=copy.deepcopy(extra);event['details']['flow']=format(n,'032x');too_many.append(event)
+    bad_subject=copy.deepcopy(rows[:10]);bad_subject[-1]['details']['sub']=ROSTER['operator'][1]
+    bad_signature=copy.deepcopy(rows[:6]);bad_signature[-1]['details']['signatureVerified']=False
+    bad_role=copy.deepcopy(rows[:6]);bad_role[-1]['details']['roles']=['platform.viewer']
+    bad_event=dict(kind='failed',utc=120999,attempt=attempt,details={'reason':'signature'})
+    for name,cases in [('partial_duplicate_subject',bad_subject),('partial_wrong_signature',bad_signature),
+                       ('partial_wrong_role',bad_role),('too_many_pending',too_many),('explicit_failure',rows[:2]+[bad_event])]:
+        try:observe(cases)
+        except ValueError:results.append(name)
+        else:raise AssertionError(name)
     return results
