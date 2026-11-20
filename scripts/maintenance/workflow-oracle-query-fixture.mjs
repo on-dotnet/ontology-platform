@@ -37,8 +37,8 @@ export function currentProjection(label, me) {
 export function loginOutcome({ issuer, api, realm }) {
   if (location.origin === api && location.pathname === "/api/v1/platform/me") return "CALLBACK";
   if (location.origin === issuer && location.pathname.startsWith(realm + "/")) {
-    const feedback = document.querySelector("#input-error, #kc-feedback-text, .alert-error, [role=alert]");
-    if (/invalid username or password|invalid user credentials|用户名或密码(错误|无效)|无效的用户名或密码/i.test(feedback?.textContent ?? ""))
+    const feedback = document.querySelectorAll('[id^="input-error"], #kc-feedback-text, .alert-error, [role=alert]');
+    if ([...feedback].some(node => /invalid username or password|invalid user credentials|用户名或密码(错误|无效)|无效的用户名或密码/i.test(node.textContent ?? "")))
       return "ORACLE_LOGIN_CREDENTIALS_REJECTED";
     if (document.querySelector("#kc-error-message")) return "ORACLE_LOGIN_CALLBACK_ERROR";
     return false;

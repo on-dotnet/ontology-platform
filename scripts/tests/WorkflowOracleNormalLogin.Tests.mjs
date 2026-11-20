@@ -21,7 +21,8 @@ function fixture(options = {}) {
       waitFor: async () => {}, isEnabled: async () => !options.disabled, focus: async () => events.push("focus") }),
     evaluate: async (fn, args) => {
       globalThis.location = address;
-      globalThis.document = { querySelector: selector => selector === "#username" ? user : selector === "#password" ? password
+      globalThis.document = { querySelectorAll: () => options.rejected && submitted ? [{textContent:""},{textContent:"Invalid username or password."}] : [],
+        querySelector: selector => selector === "#username" ? user : selector === "#password" ? password
         : selector === "#kc-login" ? button : options.rejected && submitted ? { textContent: "Invalid username or password." } : null };
       try { return fn(args); } finally { delete globalThis.location; delete globalThis.document; }
     },
@@ -101,4 +102,15 @@ test("submission during foreground handoff retains forty-second deadline",async(
   const f=fixture({immediate:true,submitAfter:50000});
   await assert.rejects(omq.completeCurrentLogin(f.page,"viewer-a",f.options),{safeCode:"ORACLE_LOGIN_SUBMITTED_TIMEOUT"});
   assert.equal(f.now(),40000);
+});
+
+test("field-specific Keycloak error and earlier empty feedback do not become callback timeout", async()=>{
+  const origins={issuer,api:"http://localhost:15741",realm};
+  globalThis.location=new URL(issuer+realm+"/login-actions/authenticate");
+  globalThis.document={querySelector:()=>null,querySelectorAll:selector=>{
+    assert(selector.includes('[id^="input-error"]'));
+    return [{textContent:""},{id:"input-error-username",textContent:"Invalid username or password."}];
+  }};
+  try {assert.equal(omq.loginOutcome(origins),"ORACLE_LOGIN_CREDENTIALS_REJECTED");}
+  finally {delete globalThis.location;delete globalThis.document;}
 });
