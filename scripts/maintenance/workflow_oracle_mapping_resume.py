@@ -47,6 +47,7 @@ def data():
 
 
 def manifest():
+    require(not (AREA/'formal-api-refresh.json').exists(),'PRODUCT_REFRESH_PENDING')
     row = load(REGISTRY)
     ids, nets = data()
     require(row['taskId'] == TASK and row['runId'] == PRODUCT and row['project'] == PROJECT and row['networks'] == nets
@@ -125,15 +126,86 @@ def bound_build(target):
     return binding,row
 
 
+def _refresh_write(path, payload, replace):
+    import os
+    import tempfile
+    path = ex.ordinary(path)
+    if path.exists() and path.read_bytes() == payload:
+        return
+    require(replace or not path.exists(), 'PRODUCT_BINDING_ARCHIVE')
+    with tempfile.NamedTemporaryFile(dir=AREA, prefix='.refresh-', delete=False) as out:
+        temp = Path(out.name)
+        try:
+            out.write(payload)
+            out.flush()
+            os.fsync(out.fileno())
+            if replace:
+                temp.replace(path)
+            else:
+                os.link(temp,path)
+        finally:
+            temp.unlink(missing_ok=True)
+
+
+def _refresh_projection(files, replacements=None):
+    """清单最后提交。恢复只接受登记的旧/新字节，归档及失败暂存件原样保留。"""
+    journal = ex.ordinary(AREA/'formal-api-refresh.json')
+
+    def archive(path, digest):
+        require(isinstance(digest,str) and re.fullmatch(r'[0-9a-f]{64}',digest), 'PRODUCT_BINDING_ARCHIVE')
+        return ex.ordinary(path.with_name(path.stem+'-'+digest+'.json'))
+
+    def hashes():
+        return [ex.sha(ex.ordinary(path).read_bytes()) if path.exists() else None for path in files]
+
+    if replacements is not None:
+        require(not journal.exists() and len(files)==len(replacements)==3 and files[-1]==REGISTRY, 'PRODUCT_REFRESH_BUSY')
+        before = hashes()
+        after = [ex.sha(raw) for raw in replacements]
+        for path, old, raw in zip(files,before,replacements,strict=True):
+            if old is not None:
+                _refresh_write(archive(path,old),path.read_bytes(),False)
+            _refresh_write(archive(path,ex.sha(raw)),raw,False)
+        tx = dict(taskId=TASK,runId=PRODUCT,files=[p.name for p in files],before=before,after=after)
+        _refresh_write(journal,ex.encoded(tx),False)
+
+    if journal.exists():
+        tx = load(journal)
+        require((tx['taskId'],tx['runId'],tx['files'])==(TASK,PRODUCT,[p.name for p in files])
+                and len(tx['before'])==len(tx['after'])==3 and files[-1]==REGISTRY, 'PRODUCT_REFRESH_IDENTITY')
+        after = []
+        for path,previous,new,actual in zip(files,tx['before'],tx['after'],hashes(),strict=True):
+            require(actual in (previous,new), 'PRODUCT_REFRESH_FOREIGN_BYTES')
+            if previous is not None:
+                require(ex.sha(archive(path,previous).read_bytes())==previous, 'PRODUCT_BINDING_ARCHIVE')
+            raw = archive(path,new).read_bytes()
+            require(ex.sha(raw)==new, 'PRODUCT_BINDING_ARCHIVE')
+            after.append(raw)
+        inputs,recipe,registry = map(json.loads,after)
+        require(inputs['taskId']==registry['taskId']==TASK and inputs['runId']==registry['runId']==PRODUCT
+                and inputs['snapshotId']==registry['snapshotId'] and registry['project']==recipe['name']==PROJECT
+                and inputs['composeSha256']==tx['after'][1] and registry['inputsSha256']==tx['after'][0]
+                and not set(APIS).intersection(registry['ids']), 'PRODUCT_REFRESH_GENERATION')
+        for path,raw in zip(files,after,strict=True):
+            _refresh_write(path,raw,True)
+        require(hashes()==tx['after'], 'PRODUCT_REFRESH_COMMIT')
+        journal.unlink()
+
+
 def prepare():
-    previous=manifest() if REGISTRY.exists() else None
-    require(not previous or not set(APIS).intersection(previous['ids']),'PRODUCT_BIND_BEFORE_CREATE')
     input_path=AREA/'formal-api-inputs.json'
     compose_path=AREA/'formal-api-compose.json'
+    projections=(input_path,compose_path,REGISTRY)
+    _refresh_projection(projections)
+    previous=manifest() if REGISTRY.exists() else None
+    require(not previous or not set(APIS).intersection(previous['ids']),'PRODUCT_BIND_BEFORE_CREATE')
     previous_inputs=load(input_path) if previous else {}
     if previous:
         require(previous_inputs['snapshotId']==previous['snapshotId'] and
-                previous_inputs['composeSha256']==ex.sha(compose_path.read_bytes()),'PRODUCT_PREVIOUS_BINDING')
+                previous_inputs['composeSha256']==ex.sha(compose_path.read_bytes()) and
+                previous.get('inputsSha256',ex.sha(input_path.read_bytes()))==ex.sha(input_path.read_bytes()),'PRODUCT_PREVIOUS_BINDING')
+    else:
+        require(not input_path.exists() and not compose_path.exists(), 'PRODUCT_ORPHAN_BINDING')
     admission=admit(APIS)
     ids,nets=data()
     old=load(BASE/'formal-api-inputs.json')
@@ -143,20 +215,17 @@ def prepare():
     spec=load(specpath)
     require(set(spec['services'])==set(APIS),'PRODUCT_API_RECIPE')
     builds={}
-    for target in ('api','query'):
+    for target in ('api','query','agent'):
         binding,row=bound_build(target)
         output=ROOT/Path(platform.build.TARGETS[target]).parent/'bin/Debug/net10.0'
-        peak=sum(p.stat().st_blocks*512 for p in output.rglob('*') if p.is_file())
-        key='snapshotId' if target=='api' else 'querySnapshotId'
-        snap=load(AREA/'runtime-snapshots'/(previous_inputs[key]+'.json')) if key in previous_inputs else None
-        if snap and snap['inputs']==binding and snap['commandId']==row['commandId']:
-            platform.snapshots.verify(ROOT,snap,task=TASK,run_id=PRODUCT)
-        else:
-            # 刷新每个快照前按实际工作树重计，保留旧快照及其绑定。
-            budget=admit(APIS)['platformDisk'] if previous else admission['platformDisk']
-            require(peak+budget['totalBytes']<=budget['ceilingBytes'],'PRODUCT_SNAPSHOT_BUDGET')
-            snap=platform.snapshots.freeze(ROOT,output,AREA/'runtime-snapshots',binding,row['commandId'],
-                  {'toolEnvironment':row['environmentFingerprint']},task=TASK,run_id=PRODUCT)
+        disk=admit(APIS)['platformDisk'] if builds else admission['platformDisk']
+        snap=platform.snapshots.freeze(ROOT,output,AREA/'runtime-snapshots',binding,row['commandId'],
+              {'toolEnvironment':row['environmentFingerprint']},task=TASK,run_id=PRODUCT,
+              remaining_bytes=disk['ceilingBytes']-disk['totalBytes'])
+        receipt=ex.ordinary(BASE.parent/(target+'-build-binding.json')).read_bytes()
+        prefix=str(output.relative_to(ROOT))+'/'
+        registered={k.removeprefix(prefix):v for k,v in json.loads(receipt)['outputs'].items() if k.startswith(prefix)}
+        require(ex.sha(receipt)==binding['receiptSha256'] and registered==snap['files'],'PRODUCT_BUILD_OUTPUTS')
         builds[target]=(binding,row,snap)
     binding,row,snap=builds['api']
     spec['name']=PROJECT
@@ -168,35 +237,37 @@ def prepare():
                  '/private/oracle-wallet':RESTORED/'reader/client-wallet','/runtime':relay,
                  '/keyring':RESTORED/'platform/keyring','/query-keyring':RESTORED/'platform/query-keyring'}
         require(all(path.is_dir() and not path.is_symlink() for path in targets.values()),'PRODUCT_BIND_MATERIAL')
-        if role=='api-secondary':targets['/query-tests']=ROOT/builds['query'][2]['directory']
+        if role=='api-secondary':
+            targets['/query-tests']=ROOT/builds['query'][2]['directory']
+            targets['/session-tests']=ROOT/builds['agent'][2]['directory']
         service['volumes']=[str(path)+':'+target+':ro' for target,path in targets.items()]
-    if previous:
-        for path in (input_path,compose_path):
-            data_bytes=path.read_bytes()
-            backup=path.with_name(path.stem+'-'+ex.sha(data_bytes)+'.json')
-            if backup.exists():
-                require(backup.read_bytes()==data_bytes,'PRODUCT_BINDING_ARCHIVE')
-            else:
-                with backup.open('xb') as stream:
-                    stream.write(data_bytes)
-        if previous_inputs.get('sessionSnapshotId'):
-            session=load(AREA/'runtime-snapshots'/(previous_inputs['sessionSnapshotId']+'.json'))
-            if session['inputs']==platform.build.validate('agent',TASK):
-                platform.snapshots.verify(ROOT,session,task=TASK,run_id=PRODUCT)
-                spec['services']['api-secondary']['volumes'].append(str(ROOT/session['directory'])+':/session-tests:ro')
-    platform.save(compose_path,spec,replace=bool(previous))
+    compose_bytes=(json.dumps(spec,indent=2)+'\n').encode()
     inp={**old,'runId':PRODUCT,'build':binding,'snapshotId':snap['snapshotId'],'buildCommandId':row['commandId'],
-         'composeSha256':ex.sha((AREA/'formal-api-compose.json').read_bytes()),'querySnapshotId':builds['query'][2]['snapshotId']}
-    if previous_inputs.get('sessionSnapshotId') and any(v.endswith(':/session-tests:ro') for v in spec['services']['api-secondary']['volumes']):
-        inp['sessionSnapshotId']=previous_inputs['sessionSnapshotId']
-    platform.save(input_path,inp,replace=bool(previous))
+         'composeSha256':ex.sha(compose_bytes),'querySnapshotId':builds['query'][2]['snapshotId'],
+         'sessionSnapshotId':builds['agent'][2]['snapshotId']}
+    input_bytes=(json.dumps(inp,indent=2)+'\n').encode()
     registration=dict(taskId=TASK,runId=PRODUCT,project=PROJECT,ids=ids,networks=nets,snapshotId=snap['snapshotId'],
-                      apiBuildId=row['commandId'],buildOutputKey=binding['outputKey'],admission=admission['attempt'])
-    save_manifest(registration)
+                      apiBuildId=row['commandId'],buildOutputKey=binding['outputKey'],inputsSha256=ex.sha(input_bytes))
+    unchanged=previous and all(previous.get(key)==value for key,value in registration.items())
+    registration['admission']=previous['admission'] if unchanged else admission['attempt']
+    registry_bytes=(json.dumps(registration,indent=2)+'\n').encode()
+    if unchanged and previous_inputs==inp and compose_path.read_bytes()==compose_bytes:
+        return previous
+    state_bytes=b''
     if not previous:
         state=load(BASE/'runtime-fixture.json')
         require((state['taskId'],state['runId'])==(TASK,RUN),'PRODUCT_RUNTIME_FIXTURE')
-        platform.save(AREA/'runtime-fixture.json',{**state,'runId':PRODUCT})
+        fixture=AREA/'runtime-fixture.json'
+        expected={**state,'runId':PRODUCT}
+        state_bytes=(json.dumps(expected,indent=2)+'\n').encode()
+    new_bytes=sum(map(len,(input_bytes,compose_bytes,registry_bytes,state_bytes)))
+    old_bytes=sum(p.stat().st_size for p in projections if p.exists())
+    # 预留两代的内容归档、当前投影、原子提交暂存及目录元数据。
+    disk=admit(APIS)['platformDisk']
+    require(3*(new_bytes+old_bytes)+256*1024 <= disk['ceilingBytes']-disk['totalBytes'],'PRODUCT_REFRESH_BUDGET')
+    if state_bytes:
+        _refresh_write(fixture,state_bytes,False)
+    _refresh_projection(projections,[input_bytes,compose_bytes,registry_bytes])
     return registration
 
 

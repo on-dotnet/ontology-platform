@@ -538,7 +538,7 @@ def native_stop(group,role,roles,operation):
     from workflow_oracle_mapping_resources import before_source
     require(group in ('original','replacement') and role in ORIGINAL_IDS,'OWNED_GROUP_ROLE')
     phase='preserve' if group=='original' else 'restore'
-    product=platform.product_run() if role=='fuseki' else ''
+    product=platform.product_run()
     if product:
         require(group=='replacement','TDB_PRODUCT_GROUP')
         phase=product
@@ -615,7 +615,7 @@ def start_owned(group,role,running):
     import time
     require(group in ('original','replacement') and role in ORIGINAL_IDS,'OWNED_GROUP_ROLE')
     phase='preserve' if group=='original' else 'restore'
-    product=platform.product_run() if role=='fuseki' else ''
+    product=platform.product_run()
     if product:
         require(group=='replacement','TDB_PRODUCT_GROUP')
         phase=product
@@ -630,7 +630,7 @@ def start_owned(group,role,running):
     else:
         registry=json.loads((RECOVERY_AREA/'replacement-resources.json').read_bytes()) if role!='oracle' else {}
         cid=ALT_ORACLE if role=='oracle' else registry['ids'][role]
-        if product:basis=fuseki_reuse_basis(cid,registry)
+        if product and role=='fuseki':basis=fuseki_reuse_basis(cid,registry)
     nonce=uuid.uuid4().hex
     receipt=dict(attempt=nonce,stage=phase,role=role,id=cid,resourceAttempt=pre['attempt'],status='STARTING')
     if basis:receipt.update(checkpoint=basis,productUse='NOT_VERIFIED')
