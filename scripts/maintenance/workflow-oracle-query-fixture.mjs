@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 
 /** 只有任务已冻结的主 API、副 API、OIDC 和 Web 可以被正式浏览器场景访问。 */
 export const ports = Object.freeze({ api: 15741, secondary: 15742, oidc: 15743, web: 15744 });
-export const modes = Object.freeze(["auth-handoff-s1", "reader-auth", "serve", "provision", "mapping", "s0-oracle-auth", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s0-oracle-natural-cancel", "s1", "s1-reopen"]);
+export const modes = Object.freeze(["s2-s3-oracle", "s2-oracle-vocabulary", "s2-oracle-mapping", "s2-oracle-queries", "s2-oracle-relations", "s2-oracle-access", "s2-oracle-aba", "s2-oracle-connection", "s2-oracle-versions", "s2-oracle-states", "s2-oracle-reopen", "s3", "ui-s3", "ui-s1", "auth-handoff-s1", "reader-auth", "serve", "provision", "mapping", "s0-oracle-auth", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s0-oracle-natural-cancel", "s1", "s1-reopen"]);
 export const config = Object.freeze({ type: "ORACLE", profile: { host: "oracle-source", port: 2484, serviceName: "FREEPDB1",
   username: "FIXTURE_READER", allowedOwners: ["PRODUCTION", "CaseOwner"], tls: true } });
 const task = "G4-ORACLE-MAPPING-QUERY-001";
@@ -139,10 +139,13 @@ export async function completeCurrentLogin(page, label, options = {}) {
 export const authPlan = Object.freeze(JSON.parse(readFileSync(new URL("./workflow-oracle-auth-plan.json", import.meta.url), "utf8")));
 
 /** 同一个浏览器与内存 actors 串行推进；失败、取消或越期立即阻止下一阶段。 */
+export const s2Plan = Object.freeze(JSON.parse(readFileSync(new URL("./workflow-oracle-s2-plan.json", import.meta.url), "utf8")));
+
 export async function runAuthHandoffPlan(shared, runStage, now = () => performance.now()) {
-  shared.plan = authPlan;
+  const plan = shared.plan ?? authPlan;
+  shared.plan = plan;
   shared.stages = [];
-  for (const [index, spec] of authPlan.stages.entries()) {
+  for (const [index, spec] of plan.stages.entries()) {
     if (shared.signal?.aborted) throw loginFailure("ORACLE_LOGIN_CANCELLED");
     shared.stageSpec = { ...spec, index };
     shared.stageStart = now(); shared.stageDeadline = shared.stageStart + spec.seconds * 1000;
@@ -169,13 +172,13 @@ export function projection(catalog, connectionId) {
 }
 
 /** 仅把授权/就绪检查所需的固定公开身份送给同任务的平台夹具。 */
-function grantState(state) {
+export function grantState(state) {
   return { taskId: task, runId, scope: state.scope, subjects: state.subjects, connectionId: state.connectionId, catalog: state.catalog,
-    mappingReceipt: state.mappingReceipt, mappingRelease: state.mappingRelease && { manifest: { binding: state.mappingRelease.manifest.binding } } };
+    mappingReceipt: state.mappingReceipt, mappingCurrentReceipt: state.mappingCurrentReceipt, combinedGrantIds: state.combinedGrantIds, mappingRelease: state.mappingRelease && { manifest: { binding: state.mappingRelease.manifest.binding } } };
 }
 
 /** 调用平台真实事务与只读采样；Python 异常正文不进入浏览器报告。 */
-function platform(root, call, input, deadline) {
+export function platform(root, call, input, deadline) {
   const code = 'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_oracle_mapping_platform as q;print(json.dumps(' + call + '))';
   return JSON.parse(execFileSync("python3", ["-B", "-c", code], { cwd: root, input: JSON.stringify(input),
     encoding: "utf8", timeout: Math.min(30000, stageRemaining(deadline)), stdio: ["pipe","pipe","pipe"] }));
@@ -344,4 +347,17 @@ export async function witness({ root, state, reader, mode, capability, get, requ
     if (running) await running;
     await exit;
   }
+}
+
+/** 新批次固定双表闭包，旧单表projection仍保留原来的严格十一列。 */
+export function combinedProjection(catalog, connectionId) {
+  projection(catalog, connectionId);
+  const objects = ["PRODUCTION/OMQ_ENTITY", "CaseOwner/OmqTarget"];
+  return { objects, fields: objects.flatMap(object => columns.map((name, i) => object + "/" + (i + 1) + "/" + name)) };
+}
+
+/** 只能调用本任务白名单函数，正文通过私有stdin；执行预算来自当前阶段。 */
+export function s2Call(root, method, values, deadline) {
+  if (!["grants", "ready", "source_case", "source_snapshot", "permission_case", "await_expiry", "access_case", "runtime_case"].includes(method)) throw new Error("ORACLE_S2_CALL");
+  return platform(root, "__import__('workflow_oracle_mapping_s2')." + method + "(*json.load(sys.stdin))", values, deadline);
 }

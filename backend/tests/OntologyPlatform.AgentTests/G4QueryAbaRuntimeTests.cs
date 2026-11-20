@@ -48,7 +48,7 @@ public sealed partial class G4QueryMafRuntimeTests
         var query = request.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
         // 仅接受已批准驱动的精确任务和Run，原件不得沿用其它任务标签。
         var runtimeIdentity = Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST");
-        Assert.IsTrue(runtimeIdentity is "G4-M4-QUERY-001:query-impl-01" or "G4-M5-INTEGRATION-001:integration-01" or "G4-DORIS-MAPPING-QUERY-001:implementation-01");
+        Assert.IsTrue(runtimeIdentity is "G4-M4-QUERY-001:query-impl-01" or "G4-M5-INTEGRATION-001:integration-01" or "G4-DORIS-MAPPING-QUERY-001:implementation-01" or "G4-ORACLE-MAPPING-QUERY-001:product-resume-01");
         // 公开记录仅包括合成标识、时间、计数及状态，绝不包含会话证明。
         var evidence = new Dictionary<string, object?> { ["taskId"] = runtimeIdentity!.Split(':')[0], ["case"] = "AC-05_INFLIGHT_ABA", ["status"] = "FAIL", ["resourceRun"] = runtimeIdentity!.Split(':')[1] };
         // 完整两次激活完成后才能把409归因于查询提交。
@@ -67,7 +67,8 @@ public sealed partial class G4QueryMafRuntimeTests
                 monotonicMs = elapsed.Elapsed.TotalMilliseconds,
                 utc = DateTimeOffset.UtcNow,
                 queryId = evidence["queryId"],
-                mappingId = evidence["mappingId"]
+                mappingId = evidence["mappingId"],
+                connectionId = evidence.GetValueOrDefault("connectionId")
             });
         }
         // 唯一注入点在真实源读取之后，不替换版本读取器、结果存储或审计参与者。
@@ -81,7 +82,15 @@ public sealed partial class G4QueryMafRuntimeTests
             var captured = G4QueryResultStore.ReadState(running).Binding;
             evidence["queryId"] = running.Id;
             evidence["mappingId"] = captured.MappingId;
-            evidence["capturedA"] = new { captured.MappingId, captured.MappingReleaseId, captured.ActivationId, captured.ActivationRevision };
+            evidence["connectionId"] = captured.ConnectionId;
+            evidence["subjectId"] = running.SubjectId;
+            evidence["leaseOwnerHash"] = G4QueryCanonical.Hash(System.Text.Encoding.UTF8.GetBytes(running.LeaseOwner!));
+            evidence["fence"] = running.Fence;
+            Assert.AreEqual(original.ConnectionId, captured.ConnectionId);
+            Assert.AreEqual(actor.SubjectId, running.SubjectId);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(running.LeaseOwner));
+            Assert.IsTrue(running.Fence > 0);
+            evidence["capturedA"] = new { captured.MappingId, captured.MappingReleaseId, captured.ActivationId, captured.ActivationRevision, captured.ConnectionId };
             evidence["admittedAtUtc"] = running.CreatedAtUtc;
             evidence["deadlineAtUtc"] = running.DeadlineAtUtc;
             evidence["afterRealReadAtUtc"] = DateTimeOffset.UtcNow;
@@ -134,7 +143,7 @@ public sealed partial class G4QueryMafRuntimeTests
             Assert.IsTrue(DateTimeOffset.UtcNow < running.DeadlineAtUtc);
             abaCompleted = true;
         }
-        // Doris 的切换在源观察器退出后、最终事务取得第一把授权锁前进行，切换不占用源 I/O 预算。
+        // Doris 和 Oracle 的切换在源观察器退出后、最终事务取得第一把授权锁前进行，切换不占用源 I/O 预算。
         var execution = editing is null
             ? new G4QueryExecution(services.GetRequiredService<IG4QueryBindingReader>(),
                 new AfterReadSource(services.GetRequiredService<IG4SourceQueryReader>(), SwitchTwice),
@@ -188,7 +197,10 @@ public sealed partial class G4QueryMafRuntimeTests
             // Doris 宿主只写本任务既有原件目录，其他驱动保留原固定文件入口。
             var resultFile = runtimeIdentity == "G4-DORIS-MAPPING-QUERY-001:implementation-01"
                 ? Path.Combine(DorisRuntimeRoot(), "artifacts/workflow/G4-DORIS-MAPPING-QUERY-001/implementation-01", $"aba-inflight-{key}.json")
-                : "/tmp/aba-inflight.json";
+                : runtimeIdentity == "G4-ORACLE-MAPPING-QUERY-001:product-resume-01"
+                    ? Environment.GetEnvironmentVariable("OMQ_RUNTIME_REPORT")! : "/tmp/aba-inflight.json";
+            if (runtimeIdentity == "G4-ORACLE-MAPPING-QUERY-001:product-resume-01")
+                Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(resultFile, "^/tmp/omq-s23-[a-f0-9]{32}/aba-inflight[.]json$"));
             await File.WriteAllTextAsync(resultFile, JsonSerializer.Serialize(evidence, new JsonSerializerOptions(JsonSerializerDefaults.Web)) + "\n");
         }
     }

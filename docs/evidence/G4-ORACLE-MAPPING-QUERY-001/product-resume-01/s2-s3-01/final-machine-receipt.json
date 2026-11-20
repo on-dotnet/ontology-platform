@@ -1,0 +1,46 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "1a9361ec6de5fe40bc195a1406f8695b8a616c93",
+  "checks": [
+    {
+      "name": "ec01-original-parent-requalification",
+      "command": "7795d4266f3945c3ba338644aa7d7d81",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Original parent 47f4f5d4e2454a759bd3189a5b37f590: six stages qualified; two unfiltered source events, zero gaps. Consumer-only requalification."
+    },
+    {
+      "name": "s2-s3-product",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Entry preparation and independent review are in progress; no product window has started."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "runId": "product-resume-01",
+    "batch": "s2-s3-01",
+    "deliveryStatus": "IN_PROGRESS",
+    "reviewGate": "CHATGPT_REVIEW_AFTER_UNIFIED_DELIVERY",
+    "originalTestedCommit": "8f857969ad4fe08e43e5644d951bbf7532e3544d",
+    "originalParent": "47f4f5d4e2454a759bd3189a5b37f590",
+    "ec01ConsumerCommit": "1a9361ec6de5fe40bc195a1406f8695b8a616c93",
+    "ec01Status": "PASS",
+    "oracleS0": "BLOCKED",
+    "ac03B": "BLOCKED",
+    "cleanup250ms": "NOT_QUALIFIED",
+    "g4": "PARTIAL",
+    "qualificationExecutionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "main": "5168f2c93ca226caa521a6dc4ac85439335274c4"
+  }
+}

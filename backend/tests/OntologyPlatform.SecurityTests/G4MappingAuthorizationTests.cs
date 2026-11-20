@@ -64,6 +64,38 @@ public sealed class G4MappingAuthorizationTests
         Assert.IsFalse(MappingAuthorizationParticipant.Covers(grant, proof, now));
     }
 
+    /// <summary>双表证明必须由单条完整二十二字段授权覆盖，两个单表许可都不足。</summary>
+    [TestMethod]
+    public void OracleCombinedProofCannotBeAssembledFromSingleTableGrants()
+    {
+        // 固定时钟避免过期边界掩盖字段覆盖错误。
+        var now = DateTimeOffset.Parse("2026-11-20T00:00:00Z");
+        // 字段清单独立照录批准合同，不从生产投影取预期。
+        string[] names = ["ROW_ID", "JOIN_KEY", "VAL", "ORG_ID", "SITE_ID", "EXT_ID", "LABEL", "FROM_TS", "TO_TS", "EVENT_TS", "OBSERVED_TS"];
+        // 两张大小写敏感的物理表形成唯一闭包。
+        string[] objects = ["PRODUCTION/OMQ_ENTITY", "CaseOwner/OmqTarget"];
+        // 每张表的列序是授权身份的一部分。
+        var fields = objects.SelectMany(table => names.Select((name, index) => table + "/" + (index + 1) + "/" + name)).ToArray();
+        foreach (var permission in new[] { "mapping.source.validate", "data.query.execute", "data.query.result.read", "data.query.evidence.read" }) // 四种源数据许可独立使用完整证明。
+        {
+            // 根和目标读取、恢复均要求相同完整闭包。
+            var proof = Proof(["A"]) with { Permission = permission, ConnectionId = "oracle", ObjectRefs = objects, FieldRefs = fields };
+            // 一条许可逐次替换范围，不能求两条单表授权的并集。
+            var grant = Grant(["A"], now.AddHours(4));
+            grant.Permission = permission;
+            grant.ConnectionId = "oracle";
+            grant.ObjectRefs = objects;
+            grant.FieldRefs = fields;
+            Assert.IsTrue(MappingAuthorizationParticipant.Covers(grant, proof, now));
+            grant.FieldRefs = fields.Take(11).ToArray();
+            Assert.IsFalse(MappingAuthorizationParticipant.Covers(grant, proof, now));
+            grant.FieldRefs = fields.Skip(11).ToArray();
+            Assert.IsFalse(MappingAuthorizationParticipant.Covers(grant, proof, now));
+            grant.FieldRefs = fields.Take(21).ToArray();
+            Assert.IsFalse(MappingAuthorizationParticipant.Covers(grant, proof, now));
+        }
+    }
+
     /// <summary>默认查看者不能执行新操作，审核与激活角色不混淆。</summary>
     [TestMethod]
     public void RolesAndPermissionsRemainSeparate()

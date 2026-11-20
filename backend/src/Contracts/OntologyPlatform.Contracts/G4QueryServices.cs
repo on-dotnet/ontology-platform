@@ -109,6 +109,10 @@ public sealed record G4SourceQueryRead
     /// <summary>只包含批准字段的精确标量，不是原始SELECT星号行。</summary>
     public required Dictionary<string, G4QueryValue>[] Rows { get; init; }
 
+    /// <summary>Oracle 同次根读取的完整授权行集，仅供关系基数复核；不序列化、不持久化或作为响应。</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public Dictionary<string, G4QueryValue>[]? OracleIntegrityRows { get; init; }
+
     /// <summary>实际源读取开始。</summary>
     public required DateTimeOffset StartedAtUtc { get; init; }
 

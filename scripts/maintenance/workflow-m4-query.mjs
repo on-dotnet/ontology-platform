@@ -32,15 +32,16 @@ const dorisReadRaces = {
   "s2-doris-disconnect": ["inflight_connection_closed", "disconnect-test", "DORIS_INFLIGHT_SOURCE_DISCONNECTED"],
   "s2-doris-batch-binding": ["verified_batch_faults", "batch-test", "DORIS_CANCEL_VERIFIED_RELEASE_BATCH"]
 };
-const twoTable = doris && (argument("mode").startsWith("s2-doris-") || ["s3","ui-s1","ui-s3"].includes(argument("mode")));
-const stateName = twoTable ? "doris-two-table.json" : integration ? `scenario-${scenario}.json` : "runtime-fixture.json";
+const oracleTwoTable = oracle && (argument("mode").startsWith("s2-") || ["s3", "ui-s1", "ui-s3"].includes(argument("mode")));
+const twoTable = oracleTwoTable || doris && (argument("mode").startsWith("s2-doris-") || ["s3","ui-s1","ui-s3"].includes(argument("mode")));
+const stateName = oracleTwoTable ? "oracle-two-table.json" : twoTable ? "doris-two-table.json" : integration ? `scenario-${scenario}.json` : "runtime-fixture.json";
 const port = value => oracle ? ({15441:omq.ports.api,15442:omq.ports.web,15443:omq.ports.oidc,15448:omq.ports.secondary})[value] : doris ? ({15441:15641,15442:15642,15443:15643,15444:15644,15445:19030,15446:15645,15447:15646,15448:15647})[value] : integration ? value + 100 : value;
 if (argument("task") !== task || argument("run-id") !== runId || await realpath(process.cwd()) !== root) throw new Error("QUERY_CONSUMER_BOUNDARY");
 const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/package.json"));
 if (oracle && !omq.modes.includes(mode)) throw new Error("ORACLE_SCENARIO_NOT_REGISTERED");
 if (doris && !["s3","ui-s1","ui-s3","serve","s2-doris-ready","s2-doris-root-deadline","s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
-if (oracle && mode === "auth-handoff-s1") await authHandoffRun();
+if (oracle && ["auth-handoff-s1", "s2-s3-oracle"].includes(mode)) await authHandoffRun();
 else if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
   const { writeFile } = await import("node:fs/promises");
@@ -81,7 +82,7 @@ async function browserRun(mode, shared = null) {
   let authLease;
   const stageRemaining = () => shared ? omq.stageRemaining(shared.stageDeadline) : 45000;
   if (shared) shared.currentReport = report;
-  if (shared) report.stageInputs = { mode, case: "healthy", phase: mode.startsWith("s1") ? "s1" : "s0" };
+  if (shared) report.stageInputs = { mode, case: "healthy", phase: oracleTwoTable ? (mode.startsWith("s2-") ? "s2" : "s3") : mode.startsWith("s1") ? "s1" : "s0" };
   if (shared) report.batch = { executionId: shared.executionId, planId: shared.plan.planId, ...shared.stageSpec };
   const command = (expectedRevision = 0) => ({ commandId: randomUUID(), idempotencyKey: randomUUID(), expectedRevision, reason: "M4 isolated query prerequisite" });
   const check = (name, value) => { report.checks.push({ name, status: value ? "PASS" : "FAIL" }); if (!value) { const error = new Error(); error.safeCode = name; throw error; } };
@@ -266,18 +267,19 @@ async function browserRun(mode, shared = null) {
     catch (error) {
       if (error.code !== "ENOENT") throw error;
       if (twoTable) {
-        check("initial_two_table_mapping", mode === "s2-doris-mapping");
+        check("initial_two_table_mapping", ["s2-doris-mapping", "s2-oracle-vocabulary"].includes(mode));
         state = JSON.parse(await readFile(resolve(output, "runtime-fixture.json"), "utf8"));
         check("single_table_baseline", state.latestQuery?.resultHash && state.mappingRelease?.manifest.mapping.entities.length === 1);
         for (const key of Object.keys(state)) if (key.startsWith("mapping") || ["firstQuery","latestQuery"].includes(key)) delete state[key];
+        if (oracleTwoTable) { state.batch = "s2-s3-01"; await save(state); }
       } else state = { taskId: task, runId, ...(integration ? { scenario, s3: true, numeric: scenario === "numeric" } : {}), scope: { organizationId: "org-demo", siteIds: doris || oracle ? ["site-a"] : ["site-a", "site-b"] } }; }
     check("fixture_identity", state.taskId === task && state.runId === runId);
     if (shared) {
-      report.stageInputs = { mode, case: "healthy", phase: mode.startsWith("s1") ? "s1" : "s0",
+      report.stageInputs = { mode, case: "healthy", phase: oracleTwoTable ? (mode.startsWith("s2-") ? "s2" : "s3") : mode.startsWith("s1") ? "s1" : "s0",
         prerequisiteSha256: createHash("sha256").update(await readFile(resolve(output, stateName))).digest("hex"),
         connectionId: state.connectionId, readerSubjectId: state.subjects.reader,
         catalogSnapshotId: state.catalog.snapshotId, catalogFingerprint: state.catalog.schemaFingerprint,
-        activationRevision: state.mappingReceipt.activationRevision, mappingReleaseId: state.mappingReceipt.mappingReleaseId };
+        activationRevision: state.mappingReceipt?.activationRevision, mappingReleaseId: state.mappingReceipt?.mappingReleaseId };
       report.sessionBefore = omq.authSessions(root, [operator,auditor,activator,reader], shared?.stageDeadline);
       if (["s0-oracle-natural-cancel", "mapping"].includes(mode)) report.currentGrants = omq.batchGrants(root, state, shared.executionId, shared.stageDeadline);
     }
@@ -290,6 +292,12 @@ async function browserRun(mode, shared = null) {
       state.connectionDisplayName = oracle ? "Oracle Mapping Query synthetic" : "Doris Mapping Query synthetic";
       state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId, activator: activator.me.subjectId, reader: reader.me.subjectId };
       await save(state);
+    }
+    if (oracleTwoTable) {
+      const s2 = await import("./workflow-oracle-s2.mjs");
+      await s2.run({ root, output, file, mode, state, shared, report, actors: { operator, auditor, activator, reader },
+        request, get, post, rpcFor, check, command, save, origin, progress: oracleProgress });
+      return;
     }
     if (integration) { state.subjects = { operator: operator.me.subjectId, auditor: auditor.me.subjectId }; await save(state); }
     if (integration && mode !== "provision") {
@@ -1676,7 +1684,7 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       if (doris) {
         phase = "mapping_editor_current_doris";
         await operator.page.goto(origin + "/data/mappings/new");
-        await operator.page.getByLabel("已启用的 PostgreSQL 或 Doris 连接").selectOption(state.connectionId);
+        await operator.page.getByLabel("已启用的 PostgreSQL、Doris 或 Oracle 连接").selectOption(state.connectionId);
         await operator.page.getByLabel("完整目录快照").selectOption(state.catalog.snapshotId);
         check("mapping_editor_active_doris_and_frozen_snapshot", await operator.page.getByLabel("完整目录快照").inputValue() === state.catalog.snapshotId);
       }
@@ -1846,7 +1854,7 @@ function oracleProgress(event) {
   if (!oracle || !omq.productResume) return;
   const { appendFileSync } = require("node:fs");
   const file = process.env.OMQ_PROGRESS_FILE;
-  if (file && /^auth-handoff-[a-f0-9]{32}\.jsonl$/.test(file))
+  if (file && /^(?:auth-handoff|s2-s3)-[a-f0-9]{32}\.jsonl$/.test(file))
     appendFileSync(resolve(root, "artifacts/workflow", task, runId, file), JSON.stringify({ ...event, utc: new Date().toISOString() }) + "\n", { mode: 0o600 });
 }
 
@@ -1855,21 +1863,22 @@ async function authHandoffRun() {
   if (!omq.productResume) throw new Error("ORACLE_BATCH_RUN");
   const { writeFile } = await import("node:fs/promises");
   const inputName = argument("batch-input");
-  if (!/^auth-handoff-[a-f0-9]{32}\.json$/.test(inputName)) throw new Error("ORACLE_BATCH_INPUT");
+  if (!/^(?:auth-handoff|s2-s3)-[a-f0-9]{32}\.json$/.test(inputName)) throw new Error("ORACLE_BATCH_INPUT");
   const output = resolve(root, "artifacts/workflow", task, runId);
   const input = JSON.parse(await readFile(resolve(output, inputName), "utf8"));
-  if (JSON.stringify(input.plan) !== JSON.stringify(omq.authPlan)) throw new Error("ORACLE_BATCH_PLAN");
+  const plan = mode === "s2-s3-oracle" ? omq.s2Plan : omq.authPlan;
+  if (JSON.stringify(input.plan) !== JSON.stringify(plan)) throw new Error("ORACLE_BATCH_PLAN");
   const abort = new AbortController();
   const stop = () => abort.abort(); process.on("SIGTERM", stop); process.on("SIGINT", stop);
-  const shared = { contexts: [], executionId: input.executionId, signal: abort.signal };
-  const report = { taskId: task, runId, mode: "auth-handoff-s1", input, startedAtUtc: new Date().toISOString(), status: "FAIL" };
+  const shared = { plan, contexts: [], executionId: input.executionId, signal: abort.signal };
+  const report = { taskId: task, runId, mode, input, startedAtUtc: new Date().toISOString(), status: "FAIL" };
   const begin = performance.now();
   try {
     const { chromium } = require("@playwright/test");
     shared.browser = await chromium.launch({ channel: "msedge", headless: false, timeout: 60000,
       args: ["--disable-background-networking", "--disable-component-update"] });
     report.preMs = performance.now() - begin;
-    if (report.preMs > omq.authPlan.preSeconds * 1000) throw new Error("ORACLE_BATCH_PRE_TIMEOUT");
+    if (report.preMs > plan.preSeconds * 1000) throw new Error("ORACLE_BATCH_PRE_TIMEOUT");
     if (await omq.runAuthHandoffPlan(shared, browserRun)) report.status = "PASS";
   } catch (error) { report.failure = { code: error.safeCode ?? "ORACLE_BATCH_RUNTIME", category: error.name }; }
   finally {
@@ -1877,9 +1886,9 @@ async function authHandoffRun() {
     for (const context of shared.contexts) await context.close().catch(() => {});
     await shared.browser?.close().catch(() => {});
     report.postMs = performance.now() - close;
-    if (report.postMs > omq.authPlan.postSeconds * 1000) report.status = "FAIL";
+    if (report.postMs > plan.postSeconds * 1000) report.status = "FAIL";
     report.stages = shared.stages ?? []; report.finishedAtUtc = new Date().toISOString();
-    const file = resolve(output, "browser-auth-handoff-s1-" + Date.now() + ".json");
+    const file = resolve(output, "browser-" + mode + "-" + Date.now() + ".json");
     await writeFile(file, JSON.stringify(report, null, 2) + "\n", { flag: "wx" });
     console.log(JSON.stringify({ status: report.status, report: file, stages: report.stages }));
     process.exitCode = report.status === "PASS" ? 0 : 1;

@@ -66,9 +66,23 @@ Master `/root` 单写现有证据消费者、共享驱动/fixture/platform、当
 | 切片 | 正例与关键反例 | 实现与最早验证 | 本批状态 |
 |---|---|---|---|
 | EC-01 | 无过滤阶段/父全窗完整事件闭包；同步重登记过滤A、缺父原件、错源/窗、同计数不同内容、间隙读、重复事件及边界歧义拒绝 | 正式 reopen_browser/reopen_runtime_case；离线原件重开，不启动服务 | PASS：52项定向、原六阶段递归重开及非作者170件原件复核 |
-| S2 | 六条单grant各自覆盖双表；先健康正式Mapping/查询，再独立整数/时间/关系、NULL、授权/ABA、六态与新reader恢复 | fixture/m4/platform/evidence实际分发；先冻结新计划和独立预期 | NOT_RUN |
+| S2 | 六条单grant各自覆盖双表；先健康正式Mapping/查询，再独立整数/时间/关系、NULL、授权、同Q源后正式Mapping ABA、独立连接版本／旧selection、六态与新reader恢复 | fixture/m4/platform/evidence实际分发；先冻结新计划和独立预期 | NOT_RUN |
 | S3 | Oracle正式UI及四MCP工具、同query原字节/恢复零源读/撤权清屏与身份迟到响应；旧源兼容按输入复用 | 正式产品组件和真实消费者；S2前提成立自动推进 | NOT_RUN |
 
 原旧auth-handoff-01计划不改。资源串行使用，不启动未准备的长链；不重试AC03-B抢竞态，不使用慢SQL/压力/新依赖。trust/secret只有可恢复的已登记合成版本才运行，否则准确记录缺项并继续独立范围。集中交付目录 `docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/`；三文件绑定准确Head，公开字段白名单，私有原件仅本机重开。
 
 EC-01 已关闭：作者回归命令 `0220692f44a143c3867d36a650b228f8` 52/52，离线资格 `7795d4266f3945c3ba338644aa7d7d81` exit0。非作者 `/root/ec01_review` 对准确消费者 SHA718bce2d400afbb31437df66204434364b52e2b054f1a82b88c474d4ead6925c独立重开170件原件与七类真实原件篡改拒绝，限定GO。父全窗两条完整事件=六阶段无重复并集，间隙0；旧TestedCommit与原字节保持。首次包装器丢失环境选系统Python3.9造成纳秒时间解析失败 `4a88fe75c0be47e586c9d9ac3765790b` 原件保留；以原环境Python3.13重开成功，无产品重跑。现在自动继续S2/S3实际入口与独立预期准备。
+
+S2/S3实现owned_paths细化：Master新增任务专用 `scripts/maintenance/workflow_oracle_mapping_s2.py`（六条组合授权和可逆源夹具）与 `workflow-oracle-s2.mjs`（实际双表场景），由现有platform/fixture/m4真实分发调用并登记传递输入；不是通用框架。Web仅 `apps/web/src/features/mappings/editor.tsx` 与 `mappings.test.ts` 的Oracle来源准入。正式实现与负例完成前不启动产品窗口。
+
+S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingReader的双表Oracle分支一次返回22字段闭包；PG/Doris分发不改。Query根过滤丢失完整父集与目标观测路径跳过重复身份，需在OracleQueryReader保留同次有界授权全集、检查交叠身份/多父/扇出。Master独占相应Contracts/G4QueryServices内部JsonIgnore载体及定向ConnectionsTests；不扩公开wire、持久schema或源读取范围。实际资格仍待新回归与真实场景。
+
+本批新增准入路径：`scripts/maintenance/workflow-oracle-s2-plan.json`、`workflow_oracle_mapping_s2_contract.py`、`scripts/tests/WorkflowOracleS2.Tests.py`、`scripts/tests/WorkflowOracleS2.Tests.mjs`；Master 单写并复用现有正式消费者。后端定向测试 owned_paths 追加 `backend/tests/OntologyPlatform.ConnectionsTests/OracleMappingBindingTests.cs`、`backend/tests/OntologyPlatform.SecurityTests/G4MappingAuthorizationTests.cs`。新增契约载体仅进程内 JsonIgnore，不增加 wire 字段。
+
+本批在途验证 owned_paths 追加 `backend/tests/OntologyPlatform.AgentTests/OracleQueryS2RuntimeTests.cs` 和 `G4QueryAbaRuntimeTests.cs`；复用正式五秒Gateway、四角色当前票据与现有单query因果消费者。2026-11-20用户ABA澄清已撤销未定义第二类；不再等待。唯一必验为同Q真实源返回后正式B→原A激活、activationId变化/revision递增、原期限内409及独立零成功副作用。连接版本、历史结果／旧selection按AC05各自验收，不能混计。
+
+新父命令尚未启动。冻结前补入独立 `s2-oracle-versions` 槽（180秒），当前目录单变量变化拒绝后重评发布并恢复正常查询；按最新澄清另设连接版本在途槽180秒；冻结前新计划父预算3240秒，各产品请求5秒、源1秒、清理250ms均不变。旧auth-handoff计划不变。
+
+2026-11-21（原批持续）：ABA澄清已同步唯一AC05及本矩阵，单一在途Mapping ABA与独立连接版本／历史selection均有真实入口与独立消费者。新计划冻结前加入连接版本180秒槽，总3240秒，原auth计划及5s/1s/250ms不变。六组合grant与源/权限反例具备前态计划、全值CAS、真实命令双流及恢复后态；自然到期使用新grant未来5秒及独立PG时钟观察，短TTL仍只签发阶段前检拒绝。trust/secret登记核查仅见本任务version1，无本任务可恢复替代版本，具体轮换链保留NOT_QUALIFIED。产品窗口尚NOT_RUN。
+
+2026-11-21入口候选：67项Python定向（内含原23项Node执行，不重复累计）、新增2项Node、结构前检通过；Connections8、Security4、PG黄金2、OracleM2目录1、Web12及类型/lint和零下载构建通过。非作者关闭SQL时间等价、源记录闭包及属性误引三处消费者问题，六文件冻结，限定GO进入有界窗口，不代表S2/S3已验收。Vitest首次实际12通过，但包装器错误解析默认文件报告且在当前Oracle树写入旧默认任务名目录；保留HARNESS_REPORT_PATH偏差，按现有隔离配置重验12通过。

@@ -33,3 +33,5 @@
 
 
 **现行执行批 s2-s3-01（2026-11-20 最新明确授权）。** 用户执行附件《Codex-G4-ORACLE-MAPPING-QUERY-001-Evidence-Closure-and-S2-S3-20261120.md》，Base `da0046433c87aec3b56a89f15953bfbd4114d9ca`，原分支/工作树、产品 Run `product-resume-01` 与资源 Run `implementation-01` 保持。接受四角色、AC03-A、S1 与新 reader 原事实；先修 EC-01 全窗源审计消费，并离线重开父命令 `47f4f5d4e2454a759bd3189a5b37f590`。非作者确认后自动实施 S2/S3，先补真实入口、独立预期与消费者并冻结新 planId，再启动有界产品窗口。批准六条各自覆盖双表22精确字段的组合 grant，旧15项及历史行保留；不拼接单表授权。正常认证/资源复用及5秒/1秒/250ms合同保持。AC03-B及Oracle S0 BLOCKED，B cleanup250ms NOT_QUALIFIED，G4 PARTIAL；main固定5168f2c93ca226caa521a6dc4ac85439335274c4。完成后普通push回读及本批三份完整公开脱敏文件，停ChatGPT复审，不生成中间PARTIAL ZIP。规格与状态沿唯一任务卡/A–F。
+
+2026-11-20 最新 ABA 澄清：继续当前 s2-s3-01，唯一A–F AC05已更正为一种明确 Mapping 在途顺序（同 Q 源返回后正式 B→原 A，再原截止内409、零成功副作用），撤销未定义“两类全覆盖”数量及等待项。连接版本反例、历史结果与旧 selection 分别保留验收；已有准确有效原件直接复用。无需为措辞更正重跑产品、重开登录或恢复链；其他授权、预算、资源与最终复审关口保持。

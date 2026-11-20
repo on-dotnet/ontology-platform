@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "planId": "s2-s3-01",
+  "mode": "s2-s3-oracle",
+  "preSeconds": 60,
+  "postSeconds": 60,
+  "submissionSeconds": 40,
+  "requiredSessionSeconds": 210,
+  "stages": [
+    {
+      "mode": "s0-oracle-auth",
+      "kind": "authentication",
+      "seconds": 600
+    },
+    {
+      "mode": "s2-oracle-vocabulary",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-mapping",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-queries",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-relations",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-access",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-aba",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-connection",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-versions",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-states",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "reader-auth",
+      "kind": "authentication",
+      "seconds": 180
+    },
+    {
+      "mode": "s2-oracle-reopen",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s3",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "ui-s3",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "ui-s1",
+      "kind": "product",
+      "seconds": 180
+    }
+  ],
+  "deadlineSeconds": 3240
+}

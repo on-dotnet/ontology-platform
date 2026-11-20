@@ -58,6 +58,16 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
         // Oracle 和 Doris 固定投影即使仅显示一个属性也会读取整行。
         var fields = table is null ? PgQueryReader.Fields(context.Manifest.Mapping, entity).Distinct().ToArray()
             : table.Fields.Select(f => new MappingFieldRef { DatasetRef = entity.DatasetRef, Ordinal = f.Ordinal, Name = f.Name }).ToArray();
+        if (context.Manifest.Binding.SourceType == "ORACLE" && context.Manifest.Mapping.Entities.Length == 2)
+        {
+            // Oracle 双表发布的执行和恢复均要求同一条 grant 覆盖完整闭包，不能由两条单表许可分别满足分支。
+            fields = context.Manifest.Mapping.Entities.SelectMany(binding =>
+            {
+                // 每张表仍逐项核原目录、当前目录、大小写和固定十一列，而非按名称扩张范围。
+                var complete = OracleMappingSourceValidator.EntityTable(binding, context.OriginalCatalog, context.CurrentCatalog, context.Manifest.Mapping);
+                return complete.Fields.Select(field => new MappingFieldRef { DatasetRef = binding.DatasetRef, Ordinal = field.Ordinal, Name = field.Name });
+            }).ToArray();
+        }
         return new G4QueryProjection
         {
             ObjectRefs = fields.Select(field => MappingValidationService.ObjectPermission(field.DatasetRef.Schema, field.DatasetRef.Name)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray(),

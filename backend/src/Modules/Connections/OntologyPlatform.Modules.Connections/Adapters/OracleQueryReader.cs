@@ -87,32 +87,84 @@ internal static class OracleQueryReader
         if (!lifetime.CleanupConfirmed || work.IsCancellationRequested) throw Timeout();
         // 第 101 行没有全集证明；物理键未进入业务身份，不能暗示完整命中。
         var sentinel = raw.Count > 100;
-        // 所有范围和业务约束先核再投影，绝不向调用者返回其它范围的行。
-        var projected = new List<Dictionary<string, G4QueryValue>>();
+        // 完整行集先核类型、范围与业务身份，再按请求筛选，防止筛掉另一父项后掩盖基数冲突。
+        var complete = new List<Dictionary<string, G4QueryValue>>();
         foreach (var row in raw.Take(100))
         {
             if (row.Organization != context.Scope.OrganizationId || !context.Scope.SiteIds.Contains(row.Site, StringComparer.Ordinal))
                 throw new SemanticOperationException(403, "query_source_forbidden");
-            // 通用 Query 也使用同一套精确目录解释，不把数值或时间默转字符串。
+            // 正式 Mapping 和 Query 使用相同精确类型转换；所有列均在完整 grant 内。
             var cells = OracleMappingSourceValidator.Cells(row, table);
-            // 每个生产分支返回稳定按非空 PK 排序的有界实际投影。
-            var values = table.Fields.ToDictionary(f => f.Name, f => Scalar(cells[f.Name], f, temporal), StringComparer.Ordinal);
-            if (branch is null && query.Filters.EntityExternalId is string external && !StringComparer.Ordinal.Equals(row.External, external)) continue;
-            if (query.Filters.ValidFrom is string from && query.Filters.ValidTo is string to
-                && (PgQueryReader.Epoch(values["FROM_TS"].Lexical!) >= PgQueryReader.Epoch(to)
-                    || PgQueryReader.Epoch(values["TO_TS"].Lexical!) <= PgQueryReader.Epoch(from))) continue;
-            if (branch is not null && !branch.Parents.Rows.Any(parent => Matches(parent, values))) continue;
-            projected.Add(values);
+            complete.Add(table.Fields.ToDictionary(f => f.Name, f => Scalar(cells[f.Name], f, temporal), StringComparer.Ordinal));
         }
-        if (branch is not null && branch.Parents.Rows.Any(p => projected.Count(v => Matches(p, v)) > 10))
+        DemandCompleteIdentity(complete);
+        // 完整性集合和对外有界投影共用一份行对象，不复制原始业务标量。
+        var projected = complete.Where(values =>
+            (branch is not null || query.Filters.EntityExternalId is not string external || StringComparer.Ordinal.Equals(values["EXT_ID"].Lexical, external))
+            && (query.Filters.ValidFrom is not string from || query.Filters.ValidTo is not string to
+                || PgQueryReader.Epoch(values["FROM_TS"].Lexical!) < PgQueryReader.Epoch(to)
+                && PgQueryReader.Epoch(values["TO_TS"].Lexical!) > PgQueryReader.Epoch(from))
+            && (branch is null || branch.Parents.Rows.Any(parent => Matches(parent, values)))).ToList();
+        if (branch is not null)
+        {
+            // 同次完整根行集由内部载体携带；不可回读另一事务或只使用已筛选的父行猜测唯一性。
+            var parents = branch.Parents.OracleIntegrityRows ?? throw Invalid();
+            DemandCompleteIdentity(parents);
+            if (parents.Length > 100 || branch.Parents.Rows.Any(selected => !parents.Any(parent =>
+                MappingCanonical.Serialize(parent).AsSpan().SequenceEqual(MappingCanonical.Serialize(selected))))) throw Invalid();
+            DemandRelationIntegrity(parents, complete);
+        }
+        // 两个固定表的完整性行均受同一四MiB工作集上限，且未进入公开规范字节。
+        if (MappingCanonical.Serialize(complete).Length + (branch is null ? 0 : MappingCanonical.Serialize(branch.Parents.OracleIntegrityRows).Length) > 4 * 1024 * 1024)
             throw new SemanticOperationException(503, "query_source_budget_exhausted");
         if (Stopwatch.GetElapsedTime(origin) >= budget || work.IsCancellationRequested) throw Timeout();
-        return new G4SourceQueryRead { EntityBindingId = entity.Id, Rows = projected.Take(query.MaxRows).ToArray(), RecordKeyFields = ["ROW_ID"],
+        return new G4SourceQueryRead { EntityBindingId = entity.Id, Rows = projected.Take(query.MaxRows).ToArray(), OracleIntegrityRows = branch is null && !sentinel ? complete.ToArray() : null, RecordKeyFields = ["ROW_ID"],
             StartedAtUtc = start, CompletedAtUtc = DateTimeOffset.UtcNow, AdapterVersion = "oracle-query-v1", WatermarkKind = "UNKNOWN", Watermark = null,
             Indeterminate = sentinel, Limited = sentinel || projected.Count > query.MaxRows, QueryPlanHash = MappingValidationService.Digest(new
             { adapterVersion = "oracle-query-v1", table.Schema, table.Name, table.Fields, entity.Id, context.Binding, context.Scope, query.Filters,
-                query.MaxRows, relation = branch?.RelationId, parentPlan = branch?.Parents.QueryPlanHash, parents = branch?.Parents.Rows }) };
+                query.MaxRows, relation = branch?.RelationId, parentPlan = branch?.Parents.QueryPlanHash, parents = branch?.Parents.Rows, parentIntegrity = branch?.Parents.OracleIntegrityRows, integrity = complete }) };
     }
+
+    /// <summary>完整有界集合中同一业务身份的交叠区间不能被请求过滤隐藏；不相交历史版本仍可用于消歧。</summary>
+    internal static void DemandCompleteIdentity(IReadOnlyList<Dictionary<string, G4QueryValue>> rows)
+    {
+        if (rows.Count > 100) throw Invalid();
+        for (var left = 0; left < rows.Count; left++) // 左侧真实行的序号。
+        {
+            for (var right = left + 1; right < rows.Count; right++) // 仅比较未检查过的另一真实行。
+            {
+                if (new[] { "ORG_ID", "SITE_ID", "EXT_ID" }.All(name => StringComparer.Ordinal.Equals(rows[left][name].Lexical, rows[right][name].Lexical))
+                    && Overlaps(rows[left], rows[right])) throw new SemanticOperationException(503, "query_source_indeterminate");
+            }
+        }
+    }
+
+    /// <summary>目标不能属于两个时间交叠的父项；十条正常扇出允许，十一条不得输出多余边。</summary>
+    internal static void DemandRelationIntegrity(IReadOnlyList<Dictionary<string, G4QueryValue>> parents, IReadOnlyList<Dictionary<string, G4QueryValue>> targets)
+    {
+        if (parents.Count is < 1 or > 100 || targets.Count > 100) throw Invalid();
+        if (parents.Count * targets.Count > 1000) throw new SemanticOperationException(503, "query_source_budget_exhausted");
+        DemandCompleteIdentity(targets);
+        foreach (var target in targets) // 已按当前请求选中的真实目标。
+        {
+            // 完整根集中的候选父项包括被外部号过滤排除的行。
+            var matches = parents.Where(parent => Matches(parent, target)).ToArray();
+            for (var left = 0; left < matches.Length; left++) // 首个候选父项的序号。
+            {
+                for (var right = left + 1; right < matches.Length; right++) // 另一候选父项的序号。
+                {
+                    if (Overlaps(matches[left], matches[right])) throw new SemanticOperationException(503, "query_source_indeterminate");
+                }
+            }
+        }
+        if (parents.Any(parent => targets.Count(target => Matches(parent, target)) > 10))
+            throw new SemanticOperationException(503, "query_source_budget_exhausted");
+    }
+
+    /// <summary>业务时间按整数纳秒比较半开交叠，不能把接壤误作冲突。</summary>
+    private static bool Overlaps(Dictionary<string, G4QueryValue> left, Dictionary<string, G4QueryValue> right) =>
+        PgQueryReader.Epoch(left["FROM_TS"].Lexical!) < PgQueryReader.Epoch(right["TO_TS"].Lexical!)
+        && PgQueryReader.Epoch(right["FROM_TS"].Lexical!) < PgQueryReader.Epoch(left["TO_TS"].Lexical!);
 
     /// <summary>正式 Oracle reader 独占连接、业务事务和后续核验，确认发生在物理释放返回后。</summary>
     internal static async Task<List<OracleMappingRow>> ReadOwnedAsync<TConnection, TTransaction>(

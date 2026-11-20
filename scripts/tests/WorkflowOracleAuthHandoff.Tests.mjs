@@ -13,7 +13,7 @@ const AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
 const load=new AsyncFunction("real","infra","files","require","readFile","resolve","basename","oracleProgress","options",`
   const root="/controlled",task="G4-ORACLE-MAPPING-QUERY-001",runId="product-resume-01",evidenceRun=runId,
     privateName="private",moduleName="q",scenarioCode="",stateName="runtime-fixture.json",port=n=>({15441:15741,15443:15743})[n]??n;
-  const oracle=true,doris=false,integration=false,twoTable=false,scenario=null,dorisReadRaces={};
+  const oracle=true,oracleTwoTable=false,doris=false,integration=false,twoTable=false,scenario=null,dorisReadRaces={};
   const omq=real;
   ${body}
   return browserRun;

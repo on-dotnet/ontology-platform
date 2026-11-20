@@ -7,14 +7,14 @@ import type * as G4 from "../../lib/api/g4-generated";
 const definition = { entities: [{ id: "entity" }], properties: [], relations: [], identitySpecs: [], temporalSpecs: [], conversions: [], unitSpecs: [] };
 /** 这里只测试浏览器输入与传输边界，完整语义由真实后端验收。 */
 describe("人工映射输入", () => {
-  it("只有已启用的 PostgreSQL 与 Doris 可作映射来源", () => {
+  it("只有已启用的 PostgreSQL、Doris 与 Oracle 可作映射来源", () => {
     const connection = (type: G4.ConnectionConfig["type"], state: string) =>
       ({ config: { type } as G4.ConnectionConfig, state });
-    for (const type of ["POSTGRESQL", "DORIS"] as const) {
+    for (const type of ["POSTGRESQL", "DORIS", "ORACLE"] as const) {
       expect(supportsMappingSource(connection(type, "ACTIVE"))).toBe(true);
       expect(supportsMappingSource(connection(type, "DISABLED"))).toBe(false);
     }
-    for (const type of ["ORACLE", "TDENGINE", "WEB_API"] as const) {
+    for (const type of ["TDENGINE", "WEB_API"] as const) {
       expect(supportsMappingSource(connection(type, "ACTIVE"))).toBe(false);
     }
   });

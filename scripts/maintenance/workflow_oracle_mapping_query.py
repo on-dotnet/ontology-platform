@@ -27,11 +27,25 @@ def structural(root, task, phase):
         consumers['infra/oracle/config/mapping-query.sql'] = ['"PRODUCTION"."OMQ_ENTITY"', '"CaseOwner"."OmqTarget"']
     if phase in ('persistence', 'runtime'):
         consumers[query+'G4QueryResultStore.cs'].append('ConfirmOracleCleanupAsync(')
+    if phase=='runtime':
+        from workflow_oracle_mapping_s2_contract import frozen_plan
+        frozen_plan(root)
+        consumers['scripts/maintenance/workflow-m4-query.mjs']=['await s2.run(', 'oracleTwoTable', 'omq.s2Plan']
+        consumers['scripts/maintenance/workflow-oracle-s2.mjs']=['()=>formalMapping(ctx)', 'async function queries(', 'async function relations(',
+            'async function access(', 'async function aba(', 'async function states(', 'async function versions(', 'async function reopen(', 'async function mcp(', 'async function ui(', 'consume(root,report,deadline)']
+        consumers['scripts/maintenance/workflow_oracle_mapping_s2.py']=['def grants(', 'def ready(', 'def source_transaction(', 'def permission_case(', 'def runtime_case(', 'def access_case(']
+        consumers['scripts/maintenance/workflow_oracle_mapping_evidence.py']=['reopen_stage(archive,report,records,host,origin,measured,window)', 'batch_audit_closure(archive,entry,row,host,origin,measured)']
+        consumers['scripts/maintenance/workflow_oracle_mapping_s2_contract.py']=['def result_case(', 'def reopen_stage(', 'def frozen_plan(']
     require(phase in ('contract','source','persistence','runtime'), 'PHASE')
     binding = {}
     for path, tokens in consumers.items():
         data = source_path(root,path).read_bytes()
-        code = re.sub(r'/\*.*?\*/|//[^\n]*','',data.decode(),flags=re.S)
+        if path.endswith('.mjs'):
+            # JS字符串中的路由glob和URL不是注释，不能吞掉真实分发函数。
+            pattern = r'''("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|/\*.*?\*/|//[^\n]*'''
+            code = re.sub(pattern,lambda match:match.group(1) or '',data.decode(),flags=re.S)
+        else:
+            code = re.sub(r'/\*.*?\*/|//[^\n]*','',data.decode(),flags=re.S)
         require(all(token in code for token in tokens), 'CONSUMER_MISSING_'+path)
         binding[path] = digest(data)
     return dict(taskId=task,phase=phase,status='STRUCTURAL_READY',consumers=binding,product='NOT_RUN')

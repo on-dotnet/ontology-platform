@@ -841,7 +841,7 @@ def ready_fixture(state):
 
 
 def web_binding():
-    return dict(taskId=TASK,runId=RUN,buildId=(ROOT/'apps/web/.next/BUILD_ID').read_text().strip(),**build.validate('web',TASK))
+    return dict(taskId=TASK,runId=product_run() or RUN,buildId=(ROOT/'apps/web/.next/BUILD_ID').read_text().strip(),**build.validate('web',TASK))
 
 
 def audit_window(start_utc,end_utc,client_id=None):
@@ -853,14 +853,14 @@ def browser_run(mode,case='healthy'):
     import uuid
     from workflow_oracle_mapping_evidence import browser_invocation, batch_plan
     require(mode in ('provision','mapping','s0-oracle-ready','s0-oracle-natural','s0-oracle-cancel','s0-oracle-natural-cancel','s1','s1-reopen')
-            or (mode in ('s0-oracle-auth','auth-handoff-s1') and product_run()),'FORMAL_MODE')
+            or (mode in ('s0-oracle-auth','auth-handoff-s1','s2-s3-oracle') and product_run()),'FORMAL_MODE')
     run=product_run() or RUN
     area=AREA.parent/run
     resource=admission()
     pre=ex.run(['python3','-B','scripts/maintenance/execution_preflight.py','check','--milestone',TASK,'--phase','runtime'],ROOT,
                task=TASK,run_id=run,stage='omq-consumers-'+mode,input_key=ex.sha(Path(__file__).read_bytes()),timeout=18)
     require(pre.returncode==0,'FORMAL_CONSUMERS_'+pre.receipt['commandId'])
-    stage={'phase':'s1' if mode in ('s1','s1-reopen') else 's0','mode':mode,'case':case}
+    stage={'phase':'s2' if mode=='s2-s3-oracle' else 's1' if mode in ('s1','s1-reopen') else 's0','mode':mode,'case':case}
     statefile=area/'runtime-fixture.json'
     if statefile.exists():
         state=json.loads(statefile.read_bytes());stage['prerequisiteSha256']=ex.sha(statefile.read_bytes())
@@ -875,23 +875,23 @@ def browser_run(mode,case='healthy'):
         matches=[item for item in origins if item.get('mode')=='s1' and item.get('reports')==[original] and item.get('exitCode')==0]
         require(len(matches)==1,'S1_ORIGIN_AMBIGUOUS')
         stage['originCommandId']=matches[0]['commandId']
-    if mode not in ('s0-oracle-auth','auth-handoff-s1','s1-reopen'):
+    if mode not in ('s0-oracle-auth','auth-handoff-s1','s2-s3-oracle','s1-reopen'):
         stage['fixtureBefore']=fixture_state()
-    if mode=='auth-handoff-s1':
+    if mode in ('auth-handoff-s1','s2-s3-oracle'):
         execution=uuid.uuid4().hex
-        stage['plan']=batch_plan(ROOT)
+        stage['plan']=batch_plan(ROOT,mode)
         stage['executionId']=execution
-        stage['batchInput']='auth-handoff-'+execution+'.json'
+        stage['batchInput']=('s2-s3' if mode=='s2-s3-oracle' else 'auth-handoff')+'-'+execution+'.json'
         save(area/stage['batchInput'],dict(executionId=execution,plan=stage['plan']))
     host=runtime_binding();api=build.validate('api',TASK);tests=build.validate('agent',TASK)
     argv,key,label=browser_invocation(ROOT,mode,case,host,api,tests,stage)
     report_pattern='browser-'+mode+'-'+'[0-9]'*13+'.json'
     before=set(area.glob(report_pattern))
     environment=None
-    if mode=='auth-handoff-s1':
-        environment={**os.environ,'OMQ_PROGRESS_FILE':'auth-handoff-'+execution+'.jsonl'}
+    if mode in ('auth-handoff-s1','s2-s3-oracle'):
+        environment={**os.environ,'OMQ_PROGRESS_FILE':('s2-s3' if mode=='s2-s3-oracle' else 'auth-handoff')+'-'+execution+'.jsonl'}
     result=ex.run(argv,ROOT,task=TASK,run_id=run,stage=label,input_key=key,parent_id=host['commandId'],
-                  timeout=stage['plan']['deadlineSeconds'] if mode=='auth-handoff-s1' else 180,environment=environment)
+                  timeout=stage['plan']['deadlineSeconds'] if mode in ('auth-handoff-s1','s2-s3-oracle') else 180,environment=environment)
     after=set(area.glob(report_pattern))-before
     entry=dict(taskId=TASK,runId=run,mode=mode,case=case,stageInputs=stage,host=host,builds={'api':api,'agent':tests},
                commandId=result.receipt['commandId'],exitCode=result.returncode,resourceAttempt=resource['attempt'],preflightCommandId=pre.receipt['commandId'],
@@ -901,7 +901,7 @@ def browser_run(mode,case='healthy'):
     try:
         audit=audit_window(result.receipt['startedAtUtc'],result.receipt['endedAtUtc'])
         save(area/('formal-audit-'+result.receipt['commandId']+'.json'),audit)
-        if mode=='auth-handoff-s1':
+        if mode in ('auth-handoff-s1','s2-s3-oracle'):
             require(len(after)==1,'BATCH_REPORT_COUNT')
             batch=json.loads(next(iter(after)).read_bytes())
             for item in batch['stages']:
