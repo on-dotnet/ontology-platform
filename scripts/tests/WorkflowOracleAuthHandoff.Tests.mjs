@@ -8,12 +8,12 @@ process.env.OMQ_PRODUCT_RUN="product-resume-01";
 const real=await import("../maintenance/workflow-oracle-query-fixture.mjs");
 const text=await readReal(new URL("../maintenance/workflow-m4-query.mjs",import.meta.url),"utf8");
 let body=text.slice(text.indexOf("async function browserRun("),text.indexOf("/** 只向任务事件文件"));
-body=body.replaceAll('await import("node:child_process")','infra').replaceAll('await import("node:fs/promises")','files');
+body=body.replaceAll('await import("node:child_process")','infra').replaceAll('await import("node:fs/promises")','files').replaceAll('await import("./workflow-oracle-s2.mjs")','options.s2Module');
 const AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
 const load=new AsyncFunction("real","infra","files","require","readFile","resolve","basename","oracleProgress","options",`
   const root="/controlled",task="G4-ORACLE-MAPPING-QUERY-001",runId="product-resume-01",evidenceRun=runId,
     privateName="private",moduleName="q",scenarioCode="",stateName="runtime-fixture.json",port=n=>({15441:15741,15443:15743})[n]??n;
-  const oracle=true,oracleTwoTable=false,doris=false,integration=false,twoTable=false,scenario=null,dorisReadRaces={};
+  const oracle=true,oracleTwoTable=!!options.s2Module,doris=false,integration=false,twoTable=oracleTwoTable,scenario=null,dorisReadRaces={};
   const omq=real;
   ${body}
   return browserRun;
@@ -139,4 +139,20 @@ for (const successWon of [false,true]) test("actual A witness waits for natural 
     }});
   assert.equal(report.oracleWitness.final.naturalSuccessWon,successWon);
   assert(report.oracleWitness.cancel.observedUtc);
+});
+
+
+test("actual late S2 failure retracts provisional PASS and stops later stages",async()=>{
+  const f=await fixture({s2Module:{run:async({report})=>{report.status="PASS";throw Object.assign(new Error(),{safeCode:"LATE_SOURCE_AUDIT_FAILED"});}}});
+  f.shared.plan=real.s2Plan;
+  assert.equal(await real.runAuthHandoffPlan(f.shared,f.run),false);
+  assert.deepEqual(f.shared.stages.map(row=>[row.mode,row.status]),[["s0-oracle-auth","PASS"],["s2-oracle-vocabulary","FAIL"]]);
+  const last=f.shared.stages.at(-1);assert.equal(last.failure.code,"LATE_SOURCE_AUDIT_FAILED");
+  assert.equal(f.records.get(basename(last.report)).status,"FAIL");
+});
+
+test("batch rejects contradictory PASS with a reported failure",async()=>{
+  let calls=0;
+  assert.equal(await real.runAuthHandoffPlan({},async()=>{calls++;return {status:"PASS",failure:{code:"LATE_FAILURE"}};}),false);
+  assert.equal(calls,1);
 });

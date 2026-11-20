@@ -319,7 +319,9 @@ def reopen_mutations(archive,report,host,origin):
         actual=[]
         require(len(value['commandIds'])==2,'S23_SOURCE_SNAPSHOT_COMMANDS')
         for cid,table in zip(value['commandIds'],fixture.TABLES,strict=True):
-            sql='select json_array('+columns+' returning varchar2(500)) from '+table+' order by ROW_ID;'
+            version=value.get('projectionVersion',1)
+            require(type(version) is int and version in (1,2) and all(type(row) is list and len(row)==11 for group in value['rows'] for row in group),'S23_SOURCE_PROJECTION')
+            sql='select json_array('+columns+(' null on null' if version==2 else '')+' returning varchar2(500)) from '+table+' order by ROW_ID;'
             raw=command(cid,native,'s23-independent-source-snapshot',sql.encode())
             actual.append([json.loads(line,parse_float=str) for line in raw.splitlines() if line.strip()])
         require(value['rows']==actual and value['hashes']==[sha(ex.encoded(rows)) for rows in actual],'S23_SOURCE_SNAPSHOT_ORIGINAL')

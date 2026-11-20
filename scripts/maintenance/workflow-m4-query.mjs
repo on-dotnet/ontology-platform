@@ -1813,6 +1813,7 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       report.status = "PASS"; report.scope = "S1_BROWSER_QUERY_REFRESH_SAME_BYTES_NO_SOURCE_REPLAY";
     } else check("supported_mode", false);
   } catch (error) {
+    report.status = "FAIL";
     if (error.loginObservation) { report.authentication ??= []; report.authentication.push(error.loginObservation); }
     if (authLease) authLease.finish(error.safeCode ?? "ORACLE_LOGIN_UNKNOWN");
     report.failure = { phase, category: error?.name ?? "Error", code: error.safeCode ?? "query_browser_runtime_failure" };

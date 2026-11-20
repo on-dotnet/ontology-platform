@@ -39,7 +39,7 @@ export async function run(ctx) {
   };
   ctx={...ctx,call,audit};
   if(mode==="s2-oracle-vocabulary") await vocabulary(ctx);
-  else if(mode==="s2-oracle-mapping") await audit("formal-mapping",()=>formalMapping(ctx),state.mappingJob?0:2);
+  else if(mode==="s2-oracle-mapping") await audit("formal-mapping",()=>formalMapping(ctx),formalMappingReads(state));
   else {
     report.oracleBinding={connectionId:state.connectionId,catalogSnapshotId:state.catalog.snapshotId,mappingReleaseId:state.mappingReceipt.mappingReleaseId,activation:state.mappingCurrentReceipt??state.mappingReceipt};
     const caps=await get(actors.reader,"/api/v1/capabilities");
@@ -80,6 +80,7 @@ export async function run(ctx) {
 /** 仅补原正式根所缺的Reading和关系词汇，保存原根；不重建连接或目录。 */
 async function vocabulary(ctx) {
   const {state,actors:{operator,auditor},get,post,request,command,save,report,check}=ctx;
+  const reusedRelease=Boolean(state.s2VocabularyStarted && state.ontologyRelease);
   const original=state.previousOntology??state;
   const currentReply=await request(operator,"GET","/api/v1/releases/"+original.ontologyRelease.manifest.releaseId),current=currentReply.data;
   check("original_g3_release_exact",current.manifestHash===original.ontologyRelease.manifestHash);
@@ -129,8 +130,16 @@ async function vocabulary(ctx) {
       }
 
   const proof=await request(operator,"GET","/api/v1/releases/"+state.ontologyRelease.manifest.releaseId);
-  report.vocabulary={status:"FRESH",releaseId:state.ontologyRelease.manifest.releaseId,manifestHash:state.ontologyRelease.manifestHash,
+  report.vocabulary={status:reusedRelease?"REUSED":"FRESH",releaseId:state.ontologyRelease.manifest.releaseId,manifestHash:state.ontologyRelease.manifestHash,
     draft:state.ontologyDraft,assessment:state.ontologyAssessment,impact:state.ontologyImpact,approved:state.ontologyApproved,releaseRaw:proof.raw};
+}
+
+/** 首次验证与激活重评各读两表；完整已激活链只回读平台。中断态不猜测是否仍有源工作。 */
+export function formalMappingReads(state) {
+  const complete = ["mappingDraft", "mappingJob", "mappingAssessment", "mappingProposal", "mappingApproved", "mappingReceipt", "mappingRelease"];
+  if (complete.every(key => Boolean(state[key]))) return 0;
+  if (!Object.keys(state).some(key => key.startsWith("mapping"))) return 4;
+  throw Object.assign(new Error("ORACLE_S2_MAPPING_INTERRUPTED_PRESTATE"), {safeCode:"ORACLE_S2_MAPPING_INTERRUPTED_PRESTATE"});
 }
 
 /** 沿已有正式提案、异人审核和激活链构建精确双表定义。 */

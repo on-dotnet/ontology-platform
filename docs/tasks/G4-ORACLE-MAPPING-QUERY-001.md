@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_S3_WAITING_FOR_NORMAL_AUTH**。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
+唯一任务状态 **S2_S3_IMPLEMENTING**。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
 
 ## 执行身份与所有权
 
@@ -88,3 +88,9 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 2026-11-21入口候选：67项Python定向（内含原23项Node执行，不重复累计）、新增2项Node、结构前检通过；Connections8、Security4、PG黄金2、OracleM2目录1、Web12及类型/lint和零下载构建通过。非作者关闭SQL时间等价、源记录闭包及属性误引三处消费者问题，六文件冻结，限定GO进入有界窗口，不代表S2/S3已验收。Vitest首次实际12通过，但包装器错误解析默认文件报告且在当前Oracle树写入旧默认任务名目录；保留HARNESS_REPORT_PATH偏差，按现有隔离配置重验12通过。
 
 2026-11-21本批真实窗：代码6d77931685a3d5c8a5a9ac68e9b1cf63df872d4b，父eebde047943f4a7e8e405510131308ea exit1。四角色600秒窗口首角色未提交、0/4，S2/S3及六条新组合grant未执行。最终绑定因阶段期限耗尽未取得，inputsUnchanged=false保留。父/认证阶段无过滤业务读均0。收尾9112c22911f54b27bfacfbd70414c9f4双轮排空全0、五副本进程停止（Fuseki干净关闭未资格）、两API移除、Web退出；旧资源/main不变。唯一状态S2_S3_WAITING_FOR_NORMAL_AUTH，当前交接三文件保留NOT_RUN/NOT_QUALIFIED，不生成中间PARTIAL ZIP。
+
+2026-11-21用户明确正常登录已就绪，从a40753d33e19c70dbf6e3c43c15e895d2d71bce8继续同批。新父e4cf6ad7a0f64bce86ea698f57fdd56f中四角色认证4/4、词汇及8查询内容检查通过；Mapping源读预期漏算激活重评（真实应为4），内层先写PASS被外层异常遗漏撤回；relations在null-parent快照省NULL后恢复校验失败，父exit1。旧报告/失败保持；现消费者拒绝假PASS，不能把已观察内容称完整CASE资格。
+
+本次受影响短修复仍由Master独占原owned_paths：browserRun异常强制FAIL并阻断后续；Mapping全新验证+激活独立预期4，完整既有链0，中断态拒绝；独立快照显式NULL ON NULL及11列，消费者按明确v1/v2 SQL兼容完整旧原件；Agent构建消费者额外接受准确product-resume-01，其他身份/双流/快照绑定保留。原null-parent token03018836c8e54863a439c2838c07cbfa已以4df9527db7584a87b847141596bcbde3按全值CAS恢复双表原散列。14 Node/16 S2 Python/7认证原件回归通过，原构建键及服务复用。原15槽计划及预算不变；已发布词汇与Mapping只回读，实际快照输入受修复影响的查询短阶段重验，随后继续未执行场景；不重跑旧EC/A/S1、不导出关闭的旧会话。
+
+非作者对当前增量限定GO：真实认证构建/票据32原件短链重开通过；旧父仍拒，源恢复27原件精确闭合。继续原15槽无派生计划，当前词汇/Mapping已发布状态只回读且验0源读；受影响查询阶段及余槽新测。

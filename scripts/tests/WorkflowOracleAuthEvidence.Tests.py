@@ -102,6 +102,16 @@ class AuthOriginalsTests(unittest.TestCase):
         self.addCleanup(patcher.stop)
         return patcher.start()
 
+    def test_actual_build_run_supports_exact_product_scope_and_rejects_other_named_runs(self):
+        argv=['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network*)',*self.build_args]
+        for run in ('a'*32,e.PRODUCT_RUN,'implementation-01','other-task-01'):
+            self.a.observed(self.compile,argv,self.tests['inputKey'],'command',0,1,180,None,run,b'BUILD',b'')
+            with self.subTest(run=run):
+                if run in ('a'*32,e.PRODUCT_RUN):
+                    self.assertEqual(e.auth_test_snapshot(self.a,ROOT,self.tests)[0],ROOT/self.directory)
+                else:
+                    with self.assertRaisesRegex(ValueError,'OMQ_AUTH_BUILD_ARGV'):e.auth_test_snapshot(self.a,ROOT,self.tests)
+
     def store_session(self,**options):
         opts=dict(nonce=self.nonce,key=e.digest_value(self.tests),timeout=22,parent=self.parent,
                   out=e.encoded(self.obs)+b'\n',err=b'Total: 1\nFailed: 0\nSucceeded: 1\nSkipped: 0\n')

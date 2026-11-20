@@ -152,7 +152,7 @@ export async function runAuthHandoffPlan(shared, runStage, now = () => performan
     if (spec.kind === "authentication") shared.loginWindow = { deadline: null, durationMs: spec.seconds * 1000, maxDeadline: shared.stageDeadline };
     const result = await runStage(spec.mode, shared);
     shared.stages.push(result);
-    if (result.status !== "PASS" || now() > shared.stageDeadline) return false;
+    if (result.status !== "PASS" || result.failure || now() > shared.stageDeadline) return false;
   }
   return true;
 }

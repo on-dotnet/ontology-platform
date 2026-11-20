@@ -110,6 +110,18 @@ class S2SourceTests(unittest.TestCase):
         self.rows=[[ [1,1,'9999999999999999999999.999999','org-demo','site-a','omq-entity-1','entity','20260101000000000001','20260201000000000001','20260102000000123456','20260102000001654321'] ],
                    [ [2,1,'-9999999999999999999999.999999','org-demo','site-a','omq-target-2','target','20260101000000000001','20260201000000000001','20260103000000123456','20260103000001654321'] ]]
 
+    def test_snapshot_preserves_null_position_and_rejects_missing_column(self):
+        rows=copy.deepcopy(self.rows);rows[0][0][1]=None
+        def query(sql,stage):
+            self.assertIn(' null on null returning varchar2(500)',sql)
+            side=0 if s.TABLES[0] in sql else 1
+            return json.dumps(rows[side][0]),'a'*32
+        with patch.object(s.p,'native_fixture_sql',side_effect=query):
+            observed=s.source_snapshot()
+            self.assertEqual(observed['rows'],rows);self.assertEqual(observed['projectionVersion'],2)
+            rows[0][0].pop(1)
+            with self.assertRaisesRegex(ValueError,'S2_SOURCE_COLUMN_COUNT'):s.source_snapshot()
+
     def test_every_variant_locks_and_checks_exact_rows_in_both_directions(self):
         for action in s.SOURCE_CASES:
             after=s.expected_case(action,self.rows,'a'*32)

@@ -563,7 +563,7 @@ def auth_test_snapshot(archive,origin,tests):
     cid=snapshot['commandId']
     run=archive.read(cid+'-receipt.json')['runId']
     command=build_row['command']
-    require(COMMAND.fullmatch(run) and command[1:]==['build',build.TARGETS['agent'],'--no-restore','--disable-build-servers','-m:1','-v:q']
+    require((COMMAND.fullmatch(run) or RUN==PRODUCT_RUN and run==PRODUCT_RUN) and command[1:]==['build',build.TARGETS['agent'],'--no-restore','--disable-build-servers','-m:1','-v:q']
             and Path(command[0]).is_absolute() and Path(command[0]).name=='dotnet','OMQ_AUTH_BUILD_ARGV')
     argv=['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network*)',*command]
     row,out,err=archive.command(cid,argv,'command',tests['inputKey'],None,origin,command_run=run)

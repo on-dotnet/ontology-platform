@@ -169,10 +169,11 @@ def source_snapshot():
     columns="ROW_ID,JOIN_KEY,VAL,ORG_ID,SITE_ID,EXT_ID,LABEL,"+','.join("to_char("+c+",'YYYYMMDDHH24MISSFF6')" for c in COLUMNS[7:])
     rows=[];commands=[]
     for table in TABLES:
-        raw,command=p.native_fixture_sql('select json_array('+columns+' returning varchar2(500)) from '+table+' order by ROW_ID;','s23-independent-source-snapshot')
+        raw,command=p.native_fixture_sql('select json_array('+columns+' null on null returning varchar2(500)) from '+table+' order by ROW_ID;','s23-independent-source-snapshot')
         rows.append([json.loads(line,parse_float=str) for line in raw.splitlines() if line.strip()]);commands.append(command)
     require(all(len(group)<=101 for group in rows),'S2_SOURCE_ROW_LIMIT')
-    return dict(rows=rows,hashes=[ex.sha(ex.encoded(group)) for group in rows],commandIds=commands)
+    require(all(type(row) is list and len(row)==11 for group in rows for row in group),'S2_SOURCE_COLUMN_COUNT')
+    return dict(projectionVersion=2,rows=rows,hashes=[ex.sha(ex.encoded(group)) for group in rows],commandIds=commands)
 
 
 def source_value(value, ordinal):
