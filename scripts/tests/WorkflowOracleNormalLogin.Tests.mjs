@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { completeCurrentLogin, originalSubject, runId } from "../maintenance/workflow-oracle-query-fixture.mjs";
+
+process.env.OMQ_PRODUCT_RUN ??= "product-resume-01";
+const { completeCurrentLogin, originalSubject, runId } = await import("../maintenance/workflow-oracle-query-fixture.mjs");
 
 const issuer = "http://localhost:15743/realms/g2-180e1435711f03fa";
 const login = issuer + "/protocol/openid-connect/auth";
