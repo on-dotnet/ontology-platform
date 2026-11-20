@@ -200,7 +200,10 @@ public sealed class G4QueryExecution
         catch when (oracle is not null)
         {
             // 只在原请求和物理分支剩余时间内结算，任何迟到/未知均保留占位给独立恢复。
-            await FinishOracleFailureAsync(admission.Record, session, oracle, token);
+            await FinishOracleFailureAsync(admission.Record, oracle, token,
+                cancellation => store.FailOracleAsync(admission.Record, session.Scope, session.Actor, cancellation),
+                cancellation => store.ConfirmOracleCleanupAsync(admission.Record.Id, admission.Record.LeaseOwner,
+                    admission.Record.Fence, admission.Record.Fence + 1, cancellation));
             throw;
         }
         finally
@@ -576,7 +579,7 @@ public sealed class G4QueryExecution
         && left.FieldRefs.Order(StringComparer.Ordinal).SequenceEqual(right.FieldRefs.Order(StringComparer.Ordinal));
 
     /// <summary>串行分支的最后物理确认与失败截止；任何一次未确认立即终止本查询。</summary>
-    private sealed class OracleExecution
+    internal sealed class OracleExecution
     {
         /// <summary>只在最新的源分支完整释放且观察器退出后为真；首次开源前无残余。</summary>
         public bool Confirmed { get; set; } = true;
@@ -602,8 +605,8 @@ public sealed class G4QueryExecution
     }
 
     /// <summary>在原预算内终结旧执行，再仅凭真实物理确认尝试清除准确终态占位。</summary>
-    private async Task FinishOracleFailureAsync(G4QueryRecord lease, MappingAuthorizationProof session,
-        OracleExecution oracle, CancellationToken token)
+    internal async Task FinishOracleFailureAsync(G4QueryRecord lease, OracleExecution oracle, CancellationToken token,
+        Func<CancellationToken, Task> fail, Func<CancellationToken, Task<bool>> confirm)
     {
         // 取消入口与执行入口各自有原始期限；本次结算不能重启其中任何一只时钟。
         var remaining = G4RequestDeadline.Current?.Remaining ?? lease.DeadlineAtUtc - clock.GetUtcNow();
@@ -625,10 +628,10 @@ public sealed class G4QueryExecution
         if (budget.IsCancellationRequested) return;
         try
         {
-            await store.FailOracleAsync(lease, session.Scope, session.Actor, budget.Token);
+            await fail(budget.Token);
             if (!oracle.Confirmed) return;
             // 二次提交的成功只能由原 owner 在原 fence 的直接后继完成。
-            var released = await store.ConfirmOracleCleanupAsync(lease.Id, lease.LeaseOwner, lease.Fence, lease.Fence + 1, budget.Token);
+            var released = await confirm(budget.Token);
             logger?.LogInformation("OracleCleanupCas query={QueryId} execution={ExecutionId} fence={OriginalFence} released={Released} observedUtc={ObservedUtc:O}",
                 lease.Id, oracle.Lifetime?.ExecutionId, lease.Fence, released, clock.GetUtcNow());
         }
@@ -649,7 +652,7 @@ public sealed class G4QueryExecution
             // 仅批准的 Oracle 三元组可以消费这一实际分支，拒绝跨源或未知版本。
             if ((context.Manifest.Binding.AdapterVersion, context.Manifest.Binding.ExecutorVersion)
                 != ("oracle-mapping-v1", "oracle-mapping-validator-v1")) throw Invalid();
-            var result = await ReadOracleAsync(lease, oracle, deadline, token,
+            var result = await ReadOracleAsync(lease, oracle, deadline, token, store.ObserveOracleAsync,
                 cancellation => WithOracleSourceGateAsync(context.Binding.ConnectionId, cancellation,
                     () => source.ReadAsync(context, proof, entityId, query, deadline, cancellation, branch)));
             if (result.AdapterVersion != "oracle-query-v1" || result.WatermarkKind != "UNKNOWN" || result.Watermark is not null)
@@ -669,8 +672,9 @@ public sealed class G4QueryExecution
         await G4OracleSourceOpen.RunAsync(await store.EnterOracleSourceAsync(connectionId, token), access);
 
     /// <summary>工作、指定执行取消、物理释放与观察器退出均使用同一分支的单调时基。</summary>
-    private async Task<G4SourceQueryRead> ReadOracleAsync(G4QueryRecord lease, OracleExecution oracle, DateTimeOffset deadline,
-        CancellationToken token, Func<CancellationToken, Task<G4SourceQueryRead>> read)
+    internal async Task<G4SourceQueryRead> ReadOracleAsync(G4QueryRecord lease, OracleExecution oracle, DateTimeOffset deadline,
+        CancellationToken token, Func<G4QueryRecord, CancellationToken, Task<G4QueryResultStore.OracleLeaseObservation?>> observe,
+        Func<CancellationToken, Task<G4SourceQueryRead>> read)
     {
         // 一秒分支从首次平台观察前起算，扣除原总预算内的提交余量。
         var remaining = G4RequestDeadline.Current?.Remaining ?? deadline - clock.GetUtcNow();
@@ -689,11 +693,11 @@ public sealed class G4QueryExecution
         using var work = CancellationTokenSource.CreateLinkedTokenSource(token, cutoff.Token);
         using var cancelled = work.Token.Register(() => lifetime.TightenCleanup(reserve));
         // 先核行再发起源工作，随后每次平台读取独立受限并仅绑定原 owner/fence。
-        if ((await ReadOracleLeaseAsync(lease, lifetime, work.Token))?.Active != true) throw new OperationCanceledException(work.Token);
+        if ((await ReadOracleLeaseAsync(lease, lifetime, observe, work.Token))?.Active != true) throw new OperationCanceledException(work.Token);
         oracle.Confirmed = false;
         logger?.LogInformation("OracleBranchBegin query={QueryId} owner={Owner} fence={Fence} execution={ExecutionId} utc={Utc:O} workDeadlineUtc={WorkDeadlineUtc:O} branchDeadlineUtc={BranchDeadlineUtc:O}",
             lease.Id, lease.LeaseOwner, lease.Fence, lifetime.ExecutionId, clock.GetUtcNow(), branchDeadline - reserve, branchDeadline);
-        var observing = ObserveOracleLeaseAsync(lease, lifetime, branchDeadline, work, stop.Token);
+        var observing = ObserveOracleLeaseAsync(lease, lifetime, branchDeadline, work, observe, stop.Token);
         // 若适配器返回数据却从未登记物理申请，既无来源证明也无清理证明。
         var missingAcquisition = false;
         try
@@ -722,18 +726,20 @@ public sealed class G4QueryExecution
     }
 
     /// <summary>扣除完整平台往返后再传递取消预算，不把跨主机 UTC 当作本地单调时钟。</summary>
-    private async Task<G4QueryResultStore.OracleLeaseObservation?> ReadOracleLeaseAsync(G4QueryRecord lease, G4OracleSourceLifetime lifetime, CancellationToken token)
+    private async Task<G4QueryResultStore.OracleLeaseObservation?> ReadOracleLeaseAsync(G4QueryRecord lease, G4OracleSourceLifetime lifetime,
+        Func<G4QueryRecord, CancellationToken, Task<G4QueryResultStore.OracleLeaseObservation?>> observe, CancellationToken token)
     {
         // 服务端剩余采样一定发生在调用的两侧之间；从本地起点扣全程给出保守下界。
         var before = clock.GetTimestamp();
-        var observed = await store.ObserveOracleAsync(lease, token);
+        var observed = await observe(lease, token);
         if (observed?.Active != true)
             lifetime.TightenCleanup(TimeSpan.FromMilliseconds(observed?.CleanupMs ?? 0) - clock.GetElapsedTime(before));
         return observed;
     }
 
     /// <summary>十毫秒串行观察准确平台租约；失败或终态即通知同次 Oracle 驱动。</summary>
-    private async Task ObserveOracleLeaseAsync(G4QueryRecord lease, G4OracleSourceLifetime lifetime, DateTimeOffset branchDeadline, CancellationTokenSource work, CancellationToken stop)
+    private async Task ObserveOracleLeaseAsync(G4QueryRecord lease, G4OracleSourceLifetime lifetime, DateTimeOffset branchDeadline, CancellationTokenSource work,
+        Func<G4QueryRecord, CancellationToken, Task<G4QueryResultStore.OracleLeaseObservation?>> observe, CancellationToken stop)
     {
         try
         {
@@ -743,7 +749,7 @@ public sealed class G4QueryExecution
                 using var expiry = new CancellationTokenSource(TimeSpan.FromMilliseconds(100), clock);
                 using var probe = CancellationTokenSource.CreateLinkedTokenSource(stop, work.Token, expiry.Token);
                 using var timeout = expiry.Token.Register(work.Cancel);
-                var observed = await ReadOracleLeaseAsync(lease, lifetime, probe.Token);
+                var observed = await ReadOracleLeaseAsync(lease, lifetime, observe, probe.Token);
                 if (observed?.Active != true)
                 {
                     // 平台信号与驱动原生 Cancel 分列；只登记因准确已提交取消而发出的首次通知。

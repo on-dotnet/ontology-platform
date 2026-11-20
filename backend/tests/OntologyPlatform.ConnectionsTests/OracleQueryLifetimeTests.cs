@@ -212,6 +212,27 @@ public sealed class OracleQueryLifetimeTests
         Assert.ThrowsExactly<InvalidOperationException>(() => lifetime.BeginSource());
     }
 
+    /// <summary>没有外部取消令牌时，工作失败开始的 250ms 也由回滚和持有人结算共同消费。</summary>
+    [TestMethod]
+    public async Task OriginalRollbackWindowSurvivesSourceFailure()
+    {
+        // 让实际回滚步骤消费 200ms；物理释放返回时只能剩下 50ms，不能从执行器重新起算。
+        var clock = new ManualClock();
+        using var request = new G4RequestDeadline(clock, CancellationToken.None);
+        using var lifetime = new G4OracleSourceLifetime("synthetic-oracle-rollback-start", clock);
+        lifetime.TightenCleanup(TimeSpan.FromSeconds(1));
+        var order = new List<string>();
+        var connection = new Physical(() => order.Add("physical"));
+        var tx = new Transaction(order, stage => { if (stage == "rollback") clock.Advance(200); });
+        await Assert.ThrowsAsync<IOException>(() => OracleQueryReader.ReadOwnedAsync(lifetime,
+            () => Task.FromResult(connection), _ => Task.FromResult(tx),
+            (_, _, _) => throw new IOException("source-failure"), _ => Task.CompletedTask,
+            () => order.Add("released"), CancellationToken.None, Stopwatch.GetTimestamp(), TimeSpan.FromSeconds(1)));
+        Console.WriteLine($"rollbackMs=200 remainingMs={lifetime.CleanupRemaining?.TotalMilliseconds}");
+        Assert.IsTrue(lifetime.CleanupRemaining is { } left && left > TimeSpan.Zero && left <= TimeSpan.FromMilliseconds(50));
+        Assert.IsFalse(lifetime.CleanupConfirmed);
+    }
+
     /// <summary>仅为截止反例提供可同步推进的单调时间，不改变宿主时钟。</summary>
     private sealed class ManualClock : TimeProvider
     {
