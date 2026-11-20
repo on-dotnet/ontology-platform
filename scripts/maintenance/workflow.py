@@ -187,6 +187,31 @@ def ordered(names):
 
 def test_counts(text, kind):
     """读取真实测试框架摘要，缺摘要不把exit0解释为测试成功。"""
+    node_tests = node_skips = 0
+    if kind == 'engineering-full':
+        # StructuredFiles.Tests.ps1 在正例之间逐次断言这三个子命令 exit 1。
+        # 只认整段有序实测输出，孤立、重复或位置异常的 FAIL 继续交由通用规则拒绝。
+        valid = 'PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.'
+        bad_compose = 'FAIL: structured syntax infra/oracle/compose.mapping-query.yaml (ConstructorError)'
+        structured = '\n'.join((valid,
+            'EXPECTED-REJECTION: FAIL: structured syntax invalid.yml (ParserError)',
+            'EXPECTED-REJECTION: FAIL: structured syntax invalid.toml (TOMLDecodeError)',
+            valid, valid, bad_compose, bad_compose, 'FAIL: structured syntax valid.yml (ConstructorError)', valid,
+            'PASS: structured parser 10 real positive/negative cases.'))
+        text = '\n'.join(text.splitlines())
+        pattern = r'(?m)^' + re.escape(structured) + '$'
+        if len(re.findall(pattern, text)) == 1:
+            text = re.sub(pattern, 'StructuredFiles: three expected parser rejections checked.', text)
+        # Node 在本机使用 spec 渲染，CI 也可产生 TAP 格式；两者均保留未执行的条目。
+        node = re.findall(r'(?m)^(?:ℹ|#) (tests|suites|pass|fail|cancelled|skipped|todo) (\d+)$', text)
+        if node:
+            summary = {name:int(count) for name,count in node}
+            if len(node) != 7 or set(summary) != {'tests','suites','pass','fail','cancelled','skipped','todo'}:
+                return 0,0
+            node_skips = summary['skipped'] + summary['todo']
+            if summary['fail'] or summary['cancelled'] or summary['tests'] != summary['pass'] + node_skips:
+                return 0,node_skips
+            node_tests = summary['tests']
     if re.search(r'(?m)^(?:FAILED|FAIL:|ERROR:)|(?:failures|errors)=[1-9]',text):return 0,0
     counts=[int(x) for x in re.findall(r'Ran (\d+) tests? in',text)]
     skips=[int(x) for x in re.findall(r'skipped=(\d+)',text)]
@@ -194,7 +219,7 @@ def test_counts(text, kind):
     if package:
         if int(package[2]): return 0,int(package[3])
         counts.append(int(package[1]));skips.append(int(package[3]))
-    return sum(counts),sum(skips)
+    return sum(counts) + node_tests, sum(skips) + node_skips
 
 
 def engineering_environment():
@@ -237,7 +262,7 @@ def load_reuse(index, gate, key, environment, policy):
         import base64
         envelope=json.loads(log);log=base64.b64decode(envelope['base64'],validate=True)
         if digest(log)!=envelope['sha256']:raise ValueError('REUSE_ENVELOPE_HASH')
-    tests,skips=test_counts(log.decode(errors='replace'),'auto')
+    tests,skips=test_counts(log.decode(errors='replace'),gate)
     valid=(row.get('inputsUnchanged') is True and row.get('status')=='PASS' and row.get('exitCode')==0 and tests>0 and skips==0 and
            row.get('tests')==tests and row.get('skipped')==skips and row.get('gate')==gate and
            row.get('inputKey')==key and row.get('environmentKey')==environment and row.get('policyKey')==policy and
@@ -469,7 +494,7 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
                 code,raw=execute_gate(gate['command'],ROOT,child_seconds,gate_environment,task=task,run_id=run.name,input_key=key,environment_key=environment)
             elapsed=time.monotonic()-start
             record_timing(directory,task,run.name,name,key,started,elapsed,code)
-            tests,skipped=test_counts(raw.decode(errors='replace'),'auto')
+            tests,skipped=test_counts(raw.decode(errors='replace'),name)
             product_proof={}
             if product_qualification and code==0:
                 product_proof=json.loads(raw)

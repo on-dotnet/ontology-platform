@@ -98,6 +98,33 @@ class WorkflowTests(unittest.TestCase):
             self.assertEqual(self.w.test_counts(expected+failure+summary,'auto'),(0,0))
         self.assertEqual(self.w.test_counts(expected,'auto'),(0,0))
 
+    def test_only_whole_structured_selftest_witness_accounts_for_expected_failures(self):
+        valid = 'PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.'
+        rejection = 'FAIL: structured syntax infra/oracle/compose.mapping-query.yaml (ConstructorError)'
+        wrong_path = 'FAIL: structured syntax valid.yml (ConstructorError)'
+        witness = '\n'.join([valid, 'EXPECTED-REJECTION: FAIL: structured syntax invalid.yml (ParserError)',
+            'EXPECTED-REJECTION: FAIL: structured syntax invalid.toml (TOMLDecodeError)', valid, valid,
+            rejection, rejection, wrong_path, valid, 'PASS: structured parser 10 real positive/negative cases.'])
+        results = '\nRan 7 tests in 0.4s\nOK\nReviewPackage: 5 tests, 0 failures, 0 platform cases NOT_RUN'
+        self.assertEqual(self.w.test_counts(witness + results, 'engineering-full'), (12,0))
+        self.assertEqual(self.w.test_counts(witness + results, 'auto'), (0,0))
+        for bad in (witness + '\n' + witness, witness.replace(wrong_path, rejection), witness + '\n' + wrong_path,
+                    witness.replace('10 real', '9 real'), witness + '\nFAIL: real failure', witness + '\nERROR: subsequent suite',
+                    witness + '\nFAILED (failures=1)'):
+            self.assertEqual(self.w.test_counts(bad + results, 'engineering-full'), (0,0))
+        self.assertEqual(self.w.test_counts(witness + results.replace('0 platform', '2 platform'), 'engineering-full'), (12,2))
+
+    def test_full_selftest_keeps_node_skip_failure_and_cancelled_counts(self):
+        for prefix in ('ℹ', '#'):
+            lines = [f'{prefix} {name} {value}' for name,value in (
+                ('tests',3),('suites',0),('pass',2),('fail',0),('cancelled',0),('skipped',1),('todo',0))]
+            summary = '\n'.join(lines)
+            self.assertEqual(self.w.test_counts(summary, 'engineering-full'), (3,1))
+            self.assertEqual(self.w.test_counts(summary.replace('pass 2','pass 3'), 'engineering-full'), (0,1))
+            for name in ('fail', 'cancelled'):
+                self.assertEqual(self.w.test_counts(summary.replace(name+' 0',name+' 1'), 'engineering-full'), (0,1))
+            self.assertEqual(self.w.test_counts(summary + '\n' + lines[0], 'engineering-full'), (0,0))
+
     def test_dependency_order(self):
         order=self.w.ordered(['interaction','web','backend','environment','contract'])
         self.assertLess(order.index('environment'),order.index('backend'))
