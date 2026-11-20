@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_S3_ENTRY_IMPLEMENTING**。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
+唯一任务状态 **S2_S3_WAITING_FOR_NORMAL_AUTH**。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
 
 ## 执行身份与所有权
 
@@ -86,3 +86,5 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 2026-11-21（原批持续）：ABA澄清已同步唯一AC05及本矩阵，单一在途Mapping ABA与独立连接版本／历史selection均有真实入口与独立消费者。新计划冻结前加入连接版本180秒槽，总3240秒，原auth计划及5s/1s/250ms不变。六组合grant与源/权限反例具备前态计划、全值CAS、真实命令双流及恢复后态；自然到期使用新grant未来5秒及独立PG时钟观察，短TTL仍只签发阶段前检拒绝。trust/secret登记核查仅见本任务version1，无本任务可恢复替代版本，具体轮换链保留NOT_QUALIFIED。产品窗口尚NOT_RUN。
 
 2026-11-21入口候选：67项Python定向（内含原23项Node执行，不重复累计）、新增2项Node、结构前检通过；Connections8、Security4、PG黄金2、OracleM2目录1、Web12及类型/lint和零下载构建通过。非作者关闭SQL时间等价、源记录闭包及属性误引三处消费者问题，六文件冻结，限定GO进入有界窗口，不代表S2/S3已验收。Vitest首次实际12通过，但包装器错误解析默认文件报告且在当前Oracle树写入旧默认任务名目录；保留HARNESS_REPORT_PATH偏差，按现有隔离配置重验12通过。
+
+2026-11-21本批真实窗：代码6d77931685a3d5c8a5a9ac68e9b1cf63df872d4b，父eebde047943f4a7e8e405510131308ea exit1。四角色600秒窗口首角色未提交、0/4，S2/S3及六条新组合grant未执行。最终绑定因阶段期限耗尽未取得，inputsUnchanged=false保留。父/认证阶段无过滤业务读均0。收尾9112c22911f54b27bfacfbd70414c9f4双轮排空全0、五副本进程停止（Fuseki干净关闭未资格）、两API移除、Web退出；旧资源/main不变。唯一状态S2_S3_WAITING_FOR_NORMAL_AUTH，当前交接三文件保留NOT_RUN/NOT_QUALIFIED，不生成中间PARTIAL ZIP。
