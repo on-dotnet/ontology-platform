@@ -3978,7 +3978,128 @@
         "classification": "EXIT_FAILURE",
         "reason": "Global product Run injected into historical default fixtures; corrected invocation preserves per-case explicit Run"
       },
-      "thirdWindow": "4/4 auth PASS; A actual success-first rejected by old harness; parent FAIL preserved, not upgraded"
+      "thirdWindow": "4/4 auth PASS; A actual success-first rejected by old harness; parent FAIL preserved, not upgraded",
+      "deliveryDiagnostics": [
+        {
+          "command": {
+            "commandId": "f901ad1b26ce4353af39d598130af454",
+            "stage": "delivery-exact-head-plan",
+            "exitCode": 2,
+            "classification": "EXIT_FAILURE",
+            "startedAtUtc": "2026-11-20T14:16:47.984984+00:00",
+            "endedAtUtc": "2026-11-20T14:17:15.537217+00:00",
+            "elapsedSeconds": 27.551971541000057,
+            "deadlineSeconds": 180,
+            "commandSummary": {
+              "argumentCount": 9,
+              "executable": "python3",
+              "sha256": "3d91a6884edd9b59eef70e4460debd674a7d357de3099a5e3ec961c578fc79d7"
+            },
+            "inputFingerprint": "a1019a8bc24d2ab9b3371e9865fe80401346f0887c8b6600d38281854318d6ff",
+            "environmentFingerprint": "466bd5388dc66ddaac0fd1f26b2502686a62ab3c0394a051013560b5ae6aa1e4",
+            "identity": "56924e31ff406c65ee2e342d51e24016f4979bb5cadd95f01bb3dc6e6474688d",
+            "stdout": {
+              "sha256": "1f7f47906aaae61e129b1cc458ff39004a330013cba3d8011985732cce028d06",
+              "sizeBytes": 212
+            },
+            "stderr": {
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "sizeBytes": 0
+            }
+          },
+          "reason": "Output parent directory missing in new clean checkout",
+          "preservedAt": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-validation-final/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/f901ad1b26ce4353af39d598130af454"
+        },
+        {
+          "command": {
+            "commandId": "dae22f75cd3e4bd8a18616babf938cdc",
+            "stage": "delivery-exact-head-plan",
+            "exitCode": 2,
+            "classification": "EXIT_FAILURE",
+            "startedAtUtc": "2026-11-20T14:18:22.946533+00:00",
+            "endedAtUtc": "2026-11-20T14:18:50.654119+00:00",
+            "elapsedSeconds": 27.707459250000284,
+            "deadlineSeconds": 180,
+            "commandSummary": {
+              "argumentCount": 9,
+              "executable": "python3",
+              "sha256": "3d91a6884edd9b59eef70e4460debd674a7d357de3099a5e3ec961c578fc79d7"
+            },
+            "inputFingerprint": "a1019a8bc24d2ab9b3371e9865fe80401346f0887c8b6600d38281854318d6ff",
+            "environmentFingerprint": "70e2770b966617ac66a9af09f65e1729f6eaa941d3b8e5136b714deaab225e6f",
+            "identity": "815c7573313e8c2188135e39de16b8036b71a78c194b1d420f1fe4babc8e8628",
+            "stdout": {
+              "sha256": "c3e0e8d4fddffc59927970a556586231509de2133153abd845f768810c4e3bc7",
+              "sizeBytes": 215
+            },
+            "stderr": {
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "sizeBytes": 0
+            }
+          },
+          "reason": "Attempted temporary-script correction did not match indentation; mkdir was not inserted; same missing output directory",
+          "preservedAt": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-validation-final-02/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/dae22f75cd3e4bd8a18616babf938cdc"
+        },
+        {
+          "command": {
+            "commandId": "5855c52cdbc849dab4e416e889b3d126",
+            "stage": "final-exact-head-package-check",
+            "exitCode": 2,
+            "classification": "EXIT_FAILURE",
+            "startedAtUtc": "2026-11-20T14:18:42.786192+00:00",
+            "endedAtUtc": "2026-11-20T14:18:43.485781+00:00",
+            "elapsedSeconds": 0.6994610419997116,
+            "deadlineSeconds": 180,
+            "commandSummary": {
+              "executable": "python3",
+              "argumentCount": 11,
+              "sha256": "11c1d4821de8821aaccdfe9f196562aa7d580d805400896c584adfa8d4502f05"
+            },
+            "inputFingerprint": "aaefe6949103d7f355e3ad15f7598b9920e3ba654d7073d596b0d8a2fa725d12",
+            "environmentFingerprint": "d7957ed81d4d55e7cb4526f0a8043896d7ee486ad4e287e5589a71983d5296f4",
+            "identity": "d1ccf75c2b145dd32e53cadbbab1080d40432b9c6ea812a24f6d9e47a3fe8376",
+            "stdout": {
+              "sha256": "ed3b9d0913dd1b8f32d4fb75cdc0950d272c34c76e9c444b6e7bd8f4307941c5",
+              "sizeBytes": 66
+            },
+            "stderr": {
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "sizeBytes": 0
+            }
+          },
+          "reason": "Original task tree has four preserved user Finder files; package member plan rejects dirty tracked/untracked delivery"
+        },
+        {
+          "command": {
+            "commandId": "192aecfac997494fb4ab494a04f16bc1",
+            "stage": "delivery-finder-diagnostic",
+            "exitCode": 1,
+            "classification": "EXIT_FAILURE",
+            "startedAtUtc": "2026-11-20T14:20:15.859874+00:00",
+            "endedAtUtc": "2026-11-20T14:20:16.524378+00:00",
+            "elapsedSeconds": 0.6644041669997023,
+            "deadlineSeconds": 20,
+            "commandSummary": {
+              "executable": "pwsh",
+              "argumentCount": 14,
+              "sha256": "fda197d4c472e852798aa3b05a08cc2e449d97670b7e95901654dd3f3e3b941e"
+            },
+            "inputFingerprint": "a1019a8bc24d2ab9b3371e9865fe80401346f0887c8b6600d38281854318d6ff",
+            "environmentFingerprint": "8e4c7a7f77683349f2d93fd9f7eec925020db012063923fb81445b9c8c69b7eb",
+            "identity": "1a7bcd0bf98b42f0c3db7830042255c343966f0884d2a89d5936e1205a6fec79",
+            "stdout": {
+              "sha256": "354979c40adf970215918d823a3b61971a7772f46c0da9cdd90e03ea68352f26",
+              "sizeBytes": 103
+            },
+            "stderr": {
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "sizeBytes": 0
+            }
+          },
+          "reason": "Short diagnostic confirms DIRTY_TREE; no user files removed or hidden"
+        }
+      ],
+      "deliveryDiagnosticResolution": "Explicitly create and assert output parent; clean exact-commit checkout with existing local parser copied without download; preserve original artifacts then remove only that checkout. Product code and six-stage qualification unchanged."
     },
     "hostMonitors": [
       {
@@ -4952,6 +5073,96 @@
         "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
         "sizeBytes": 127,
         "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-validation-final/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/f901ad1b26ce4353af39d598130af454/receipt.json": {
+        "sha256": "d72c080d972ec5c1a7591af8bba19a4322b48aa71eb939987715ef066f9fca01",
+        "sizeBytes": 1435,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-validation-final/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/f901ad1b26ce4353af39d598130af454/stdout.txt": {
+        "sha256": "1f7f47906aaae61e129b1cc458ff39004a330013cba3d8011985732cce028d06",
+        "sizeBytes": 212,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-validation-final/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/f901ad1b26ce4353af39d598130af454/stderr.txt": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-validation-final-02/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/dae22f75cd3e4bd8a18616babf938cdc/receipt.json": {
+        "sha256": "a38ce080327bb6442b69e349875c4c5c84383bb5e67a403d1c3481f9c5e64567",
+        "sizeBytes": 1444,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-validation-final-02/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/dae22f75cd3e4bd8a18616babf938cdc/stdout.txt": {
+        "sha256": "c3e0e8d4fddffc59927970a556586231509de2133153abd845f768810c4e3bc7",
+        "sizeBytes": 215,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-validation-final-02/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/dae22f75cd3e4bd8a18616babf938cdc/stderr.txt": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5855c52cdbc849dab4e416e889b3d126/receipt.json": {
+        "sha256": "70a3e449a9edd6555526c6c68a6b9c0335e3d2ed3200df993846de6bed67deaf",
+        "sizeBytes": 1510,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5855c52cdbc849dab4e416e889b3d126/stdout.txt": {
+        "sha256": "ed3b9d0913dd1b8f32d4fb75cdc0950d272c34c76e9c444b6e7bd8f4307941c5",
+        "sizeBytes": 66,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5855c52cdbc849dab4e416e889b3d126/stderr.txt": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/192aecfac997494fb4ab494a04f16bc1/receipt.json": {
+        "sha256": "30f95249bfbfdc1dcc15be77b342fa32aae9280065fde9bcbb7d51e5a525cf99",
+        "sizeBytes": 1503,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/192aecfac997494fb4ab494a04f16bc1/stdout.txt": {
+        "sha256": "354979c40adf970215918d823a3b61971a7772f46c0da9cdd90e03ea68352f26",
+        "sizeBytes": 103,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/192aecfac997494fb4ab494a04f16bc1/stderr.txt": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-originals-03/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/6bfa93f0b03745a4856ac62e556448d1/receipt.json": {
+        "sha256": "24bb91cbb75f03384c467b2338e3f710de75b4bda53fb7f0a4df1e6a12096f63",
+        "sizeBytes": 1398,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-originals-03/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/6bfa93f0b03745a4856ac62e556448d1/stdout.txt": {
+        "sha256": "47752e031b07256064f4e6661e71471afc2fc154cd9ce17dd204c882b14104b7",
+        "sizeBytes": 4879,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-originals-03/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/6bfa93f0b03745a4856ac62e556448d1/stderr.txt": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-originals-03/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e103325410b24a3e859c9b7080f44054/receipt.json": {
+        "sha256": "da865f2882258526676341f383386787d5bbe9c5cb3b4de07499af096e7619dc",
+        "sizeBytes": 1409,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-originals-03/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e103325410b24a3e859c9b7080f44054/stdout.txt": {
+        "sha256": "24f406eaef9e188c01dc7fd96f26585e1453b0751f873b01e21d16431b549b7a",
+        "sizeBytes": 362028,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/delivery-originals-03/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e103325410b24a3e859c9b7080f44054/stderr.txt": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sizeBytes": 0,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
       }
     },
     "delivery": {
@@ -4962,8 +5173,23 @@
     },
     "report": {
       "file": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/report.md",
-      "sha256": "10979714c76e5c1b52c3d678f1c8f1ffe42bca0b3f67ace1bb2b5c4da43dcb00",
-      "sizeBytes": 10176
+      "sha256": "4e758c2853d6c214ad7e7b138193065b04b879551a3503b6c475359aca472ce7",
+      "sizeBytes": 11245
+    },
+    "deliveryPreflight": {
+      "candidateHead": "09f47624f3edae3ba3dc1c62179a0b52cbca05ad",
+      "planCommand": "6bfa93f0b03745a4856ac62e556448d1",
+      "planStatus": "PLANNED",
+      "packageCommand": "e103325410b24a3e859c9b7080f44054",
+      "packageStatus": "PASS",
+      "estimatedZipBytes": 8406306,
+      "formatExitCode": 0,
+      "evidenceSchemaExitCode": 0,
+      "diffCheckExitCode": 0,
+      "actualZipCreated": false,
+      "temporaryCheckoutStatus": "REMOVED_AND_ABSENCE_VERIFIED",
+      "parserReuse": "Existing exact local files copied without download; temporary copies removed",
+      "scope": "Candidate before adding these diagnostics; final containing Head checked subsequently with outside receipts"
     }
   }
 }

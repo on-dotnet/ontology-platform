@@ -71,12 +71,12 @@
   ],
   "reviewedPublicFiles": {
     "report.md": {
-      "sha256": "10979714c76e5c1b52c3d678f1c8f1ffe42bca0b3f67ace1bb2b5c4da43dcb00",
-      "sizeBytes": 10176
+      "sha256": "4e758c2853d6c214ad7e7b138193065b04b879551a3503b6c475359aca472ce7",
+      "sizeBytes": 11245
     },
     "final-machine-receipt.json": {
-      "sha256": "4bfa7f20c339aa2b4ad16c4cd8addec0424e0ccfc996591e5b8d3719c9574acc",
-      "sizeBytes": 207805
+      "sha256": "2fd6d09acf7c0341c8a842a4c9b70d85db2e66f66c8d4470197194b36d6c5984",
+      "sizeBytes": 221370
     }
   },
   "finalCloseout": {
@@ -99,7 +99,7 @@
     "finalObservedAtUtc": "2026-11-20T14:06:02.447779Z",
     "aggregateProcessExitCode": null
   },
-  "publicOriginalIndexVerified": 187,
+  "publicOriginalIndexVerified": 205,
   "finalCandidateChecks": {
     "v3ContentScanExitCode": 0,
     "evidenceSchemaExitCode": 0,
@@ -107,5 +107,29 @@
     "diffCheckExitCode": 0,
     "onlyDocumentationDeltaFromTestedCommit": true
   },
-  "deliveryScope": "Exact-head plan, package-check and ordinary push/readback are subsequent author steps; independent signature covers the named candidate files, actual product originals and closed resources."
+  "deliveryScope": "Candidate09f47624 plan/package-check and all six delivery diagnostics independently reopened. Final containing Head plan/package-check and ordinary push/readback remain subsequent author steps with outside receipts.",
+  "deliveryDiagnosticIncrement": {
+    "status": "PASS_DELIVERY_DIAGNOSTICS_INCREMENT",
+    "candidateHead": "09f47624f3edae3ba3dc1c62179a0b52cbca05ad",
+    "newCommands": 6,
+    "actualExitCodes": [
+      2,
+      2,
+      2,
+      1,
+      0,
+      0
+    ],
+    "newOriginalIndexEntries": 18,
+    "priorIndexEntriesUnchanged": 187,
+    "receiptIdentityStreamsArgvInputs": "PASS",
+    "candidatePlan": "PLANNED",
+    "candidatePackageCheck": "PASS",
+    "estimatedZipBytes": 8406306,
+    "actualZipCreated": false,
+    "temporaryCheckoutAbsent": true,
+    "publicContentScan": "PASS",
+    "evidenceSchemaChecks": 12,
+    "diffCheckExitCode": 0
+  }
 }
