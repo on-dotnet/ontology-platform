@@ -296,20 +296,14 @@ def start_api(role):
 
 def release_api(role):
     """先向准确 API 进程发 TERM 并观察引擎自然退出，再只移除该无状态实例。"""
-    import time
     require(role in APIS and role in manifest()['ids'],'PRODUCT_RELEASE_ROLE')
     cid=manifest()['ids'][role]
     before=admit(); actions=[]
     state,_=command('resume-close-state',['inspect','-f','{{.State.Status}}',cid])
     if state=='running':
-        # 容器还有固定 relay。只终止载入 /app API 的进程；原入口随后按 trap 收回自己的 relay。
-        script='set -eu; count=0; for f in /proc/[0-9]*/cmdline; do [ -r "$f" ] || continue; cmd=$(tr "\\000" "\\n" < "$f" 2>/dev/null || true); case "$cmd" in "$(printf "dotnet\\n/app/OntologyPlatform.Api.dll")") pid=${f%/cmdline}; pid=${pid##*/}; count=$((count+1)); target=$pid;; esac; done; [ "$count" -eq 1 ]; kill -TERM "$target"'
-        _,sig=command('resume-api-term',['exec',cid,'/bin/sh','-ec',script]);actions.append(sig)
-        until=time.monotonic()+30
-        while time.monotonic()<until:
-            out,_=command('resume-api-exit',['inspect','-f','{{.State.Status}} {{.State.ExitCode}} {{.State.OOMKilled}}',cid])
-            if out.startswith('exited '):break
-            time.sleep(.5)
+        _,sig=command('resume-api-term',['stop','--signal','TERM','--timeout','-1',cid],timeout=45)
+        actions.append(sig)
+        out,_=command('resume-api-exit',['inspect','-f','{{.State.Status}} {{.State.ExitCode}} {{.State.OOMKilled}}',cid])
         require(out in ('exited 0 false','exited 143 false'),'PRODUCT_API_SHUTDOWN')
     else:
         require(state in ('created','exited'),'PRODUCT_API_CLOSED_STATE')
