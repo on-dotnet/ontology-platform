@@ -125,3 +125,8 @@ s0-recovery-02 补充 D/E/F。四个既有主体只经原 BFF 完成 code/PKCE �
 四角色独立context存于同一隔离Edge进程；认证成功即留独立阶段原件，最后统一关闭。恢复新建reader context和正式会话，核新旧sessionHash不同。每阶段保存原mode、实际窗口、预算、输入和检查；同一真实父commandId＋准确mode重开，不伪造子进程。auth、A、S1、reader-auth与恢复分别取无clientId过滤的独立源审计，父全窗另存。认证无业务读写，恢复窗从新reader认证结束后开始，仅取平台原结果。资格重开递归核验实际前置阶段，局部通过不能改通用admission缺口或S0/B最终资格。
 
 同四原主体／同连接／实体表11字段的原15项授权当次回读；自然过期才按原范围追加最长四小时，原行不覆盖；短TTL、撤销等负前态保持阻断。现有构建、R1/R2/R3、PG与旧恢复按输入资格复用。先定向边界回归再一个实际人工窗口；无新事实不重跑相同完整窗口。中间交付不生成ZIP，三份完整公开脱敏文件绑定准确Head，普通push回读，main不变，停ChatGPT复审。
+
+
+**s2-s3-01 当前集中授权（2026-11-20）。** 从 da0046433c87aec3b56a89f15953bfbd4114d9ca，先EC-01离线重新资格原父47f4f5d4e2454a759bd3189a5b37f590及六阶段；非作者确认后自动推进S2/S3。父与阶段审计均clientId=null，以准确半开窗口和源时钟误差核完整事件稳定键/字段、无重复并集及前后/间隙零额外读；定向formal witness仍沿原合同。新批使用独立planId与commandId，旧auth-handoff-01计划/实测不改。六条新增组合grant为三作者角色的mapping.source.validate和原viewer-a的data.query.execute/result.read/evidence.read，各条自身覆盖同连接org-demo/site-a的PRODUCTION/OMQ_ENTITY与CaseOwner/OmqTarget两表及各ordinal1–11全部22字段；最长四小时，保留旧15项与历史，不拼接单表。另九条无对象/字段工作流权限按当前有效原件复用，自然到期才原范围追加。实际目录/完整字段/新ID在签发前冻结，后续精确选择，不按最大ExpiresAtUtc替代范围。
+
+S2/S3真实入口、独立预期和对应消费者先完备，再冻结准确模式序列/分支/父预算并启动有界窗口。正常四角色共600秒、提交后40秒、新reader按需要180秒；每产品槽180秒，当前会话/授权余210秒，5s/1s/250ms产品合同不改。先健康双表，再精确数值/时间/NULL/关系、权限/目录/ABA/六态/100–101及恢复；S2通过自动S3。Oracle UI/MCP查询使用原viewer-a组合grant，Mapping保持三角色，禁止给operator补查询权。trust/secret只用同任务替代实例和已登记可恢复合成版本；缺准确版本如实保留覆盖缺项。复用五持久副本及必要两API，旧17/原3/卷密钥/九归档继续保护。AC03-B BLOCKED、cleanup250ms NOT_QUALIFIED、Oracle S0 BLOCKED/G4 PARTIAL不变。完成本批普通push回读三份公开脱敏完整文件后停ChatGPT复审，无中间PARTIAL ZIP、不更新main。

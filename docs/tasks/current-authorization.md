@@ -30,3 +30,6 @@
 当前认证已在第三实际窗口取得4/4正常主体及票据；任务仍AUTH_HANDOFF_IMPLEMENTING。A因脚本漏实现合同允许的成功先赢分支而停，先修直接驱动/消费者并验证，再在新代码事实下进行固定顺序窗口，自动继续条件S1；历史失败不改判。用户要求全部完成后交付继续有效。
 
 **当前执行结果（auth-handoff-01）：本批A/S1目标已完成，状态AUTH_HANDOFF_S1_REVIEW_READY。** 实测8f857969ad4fe08e43e5644d951bbf7532e3544d；第四父命令47f4f5d4e2454a759bd3189a5b37f590 exit0，原六阶段连续PASS，真实消费者和非作者独立重开通过，reader恢复为真正新正常会话且零业务重读。当前任务2API已移除、5副本退出，保护原3运行/17停止及归档保持。历史失败与B/cleanup250ms未资格、Oracle S0 BLOCKED/G4 PARTIAL不改；S2/S3未执行。普通push并回读三份完整文件，最终停ChatGPT复审，main保持5168f2c93ca226caa521a6dc4ac85439335274c4。
+
+
+**现行执行批 s2-s3-01（2026-11-20 最新明确授权）。** 用户执行附件《Codex-G4-ORACLE-MAPPING-QUERY-001-Evidence-Closure-and-S2-S3-20261120.md》，Base `da0046433c87aec3b56a89f15953bfbd4114d9ca`，原分支/工作树、产品 Run `product-resume-01` 与资源 Run `implementation-01` 保持。接受四角色、AC03-A、S1 与新 reader 原事实；先修 EC-01 全窗源审计消费，并离线重开父命令 `47f4f5d4e2454a759bd3189a5b37f590`。非作者确认后自动实施 S2/S3，先补真实入口、独立预期与消费者并冻结新 planId，再启动有界产品窗口。批准六条各自覆盖双表22精确字段的组合 grant，旧15项及历史行保留；不拼接单表授权。正常认证/资源复用及5秒/1秒/250ms合同保持。AC03-B及Oracle S0 BLOCKED，B cleanup250ms NOT_QUALIFIED，G4 PARTIAL；main固定5168f2c93ca226caa521a6dc4ac85439335274c4。完成后普通push回读及本批三份完整公开脱敏文件，停ChatGPT复审，不生成中间PARTIAL ZIP。规格与状态沿唯一任务卡/A–F。

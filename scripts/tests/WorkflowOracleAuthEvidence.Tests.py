@@ -146,7 +146,7 @@ class AuthOriginalsTests(unittest.TestCase):
 
     def test_unfiltered_audit_and_reconstructed_http(self):
         self.audit['clientId']='a'*32
-        with self.assertRaisesRegex(ValueError,'OMQ_AUTH_SCOPE'):self.reopen()
+        with self.assertRaisesRegex(ValueError,'OMQ_AUDIT_UNFILTERED'):self.reopen()
         self.audit.update(clientId=None,records=[{'action':'SELECT'}])
         with self.assertRaisesRegex(ValueError,'OMQ_AUTH_SCOPE'):self.reopen()
         self.audit['records']=[]

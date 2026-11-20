@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **AUTH_HANDOFF_S1_REVIEW_READY**。本批四角色正常认证、同一隔离浏览器内AC03-A、正式单表Mapping、S1查询/持久化及真正新reader会话恢复已全部通过。实测代码8f857969ad4fe08e43e5644d951bbf7532e3544d，实际父命令47f4f5d4e2454a759bd3189a5b37f590，六阶段原件经真实资格消费者及非作者递归重开。AC03-C当前PG8/8按输入复用；AC03-B及Oracle S0仍BLOCKED，B的cleanup250ms仍NOT_QUALIFIED，G4 PARTIAL，AI OFF。当前两个API已移除、五副本退出、原3运行/17停止保持。交付见[本批完整报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/report.md)，普通push回读后停ChatGPT复审。
+唯一任务状态 **S2_S3_ENTRY_IMPLEMENTING**。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
 
 ## 执行身份与所有权
 
@@ -57,3 +57,18 @@ Base `33e66879a6b48e25580f1623316b88fe5a5e85cc`；Master 单写 `workflow-m4-que
 A触发补充：仅natural-cancel观察者在本次唯一query/execution/acquisition的READ_RETURNED后通知浏览器发正式取消；收到响应后以本进程私有管道确认，独立终态命令必须在该确认之后。所有等待受原观察者和阶段截止约束，不给产品加延时。成功及取消先赢分别严格验收；定向回归88项（内含23项Node）已通过。
 
 2026-11-20 当前批完成：第四窗口六阶段34/52/35/70/9/43项通过，固定业务SELECT各0/1/0/1/0/0，父窗2，均无clientId过滤。新reader主体相同、会话不同、结果字节一致。定向88/88，独立23输入重开、15项Python/23项Node及7类真实反例通过。历史三旧0/4、两窗1/4、第三窗A旧脚本FAIL及所有前检/测试失败保留。关闭操作9850bf57242a4fe88d043240b878b37f双轮排空全0，准确ID后态及最终资源准入PASS。此完成仅覆盖用户本批A/S1目标，不授予B、Oracle总体、S2/S3或main放行。
+
+
+## s2-s3-01 执行追踪
+
+Master `/root` 单写现有证据消费者、共享驱动/fixture/platform、当前准入与门禁登记、受影响测试及本卡/当前授权/唯一A–F/本批三文件。仅确有入口缺口时修改 Oracle UI 支持及其定向测试。只读分析 `/root/s2_s3_readonly`；EC-01/最终非作者独立 Review 后记录准确候选。其余产品、依赖锁、迁移、旧计划/证据、保护资源与秘密为 read_only_dependencies。独立只读角色无需创建写者工作树；Master继续用户指定原工作树，保护四个Finder未跟踪文件。
+
+| 切片 | 正例与关键反例 | 实现与最早验证 | 本批状态 |
+|---|---|---|---|
+| EC-01 | 无过滤阶段/父全窗完整事件闭包；同步重登记过滤A、缺父原件、错源/窗、同计数不同内容、间隙读、重复事件及边界歧义拒绝 | 正式 reopen_browser/reopen_runtime_case；离线原件重开，不启动服务 | PASS：52项定向、原六阶段递归重开及非作者170件原件复核 |
+| S2 | 六条单grant各自覆盖双表；先健康正式Mapping/查询，再独立整数/时间/关系、NULL、授权/ABA、六态与新reader恢复 | fixture/m4/platform/evidence实际分发；先冻结新计划和独立预期 | NOT_RUN |
+| S3 | Oracle正式UI及四MCP工具、同query原字节/恢复零源读/撤权清屏与身份迟到响应；旧源兼容按输入复用 | 正式产品组件和真实消费者；S2前提成立自动推进 | NOT_RUN |
+
+原旧auth-handoff-01计划不改。资源串行使用，不启动未准备的长链；不重试AC03-B抢竞态，不使用慢SQL/压力/新依赖。trust/secret只有可恢复的已登记合成版本才运行，否则准确记录缺项并继续独立范围。集中交付目录 `docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/`；三文件绑定准确Head，公开字段白名单，私有原件仅本机重开。
+
+EC-01 已关闭：作者回归命令 `0220692f44a143c3867d36a650b228f8` 52/52，离线资格 `7795d4266f3945c3ba338644aa7d7d81` exit0。非作者 `/root/ec01_review` 对准确消费者 SHA718bce2d400afbb31437df66204434364b52e2b054f1a82b88c474d4ead6925c独立重开170件原件与七类真实原件篡改拒绝，限定GO。父全窗两条完整事件=六阶段无重复并集，间隙0；旧TestedCommit与原字节保持。首次包装器丢失环境选系统Python3.9造成纳秒时间解析失败 `4a88fe75c0be47e586c9d9ac3765790b` 原件保留；以原环境Python3.13重开成功，无产品重跑。现在自动继续S2/S3实际入口与独立预期准备。

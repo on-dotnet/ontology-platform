@@ -474,6 +474,64 @@ def audit_observation(archive, audit, row, host, origin, measured=None):
     return records
 
 
+def batch_audit_closure(archive, entry, row, host, origin, measured):
+    """正式阶段入口消费父全窗及全部阶段原件，按完整事件和时钟误差拒绝遗漏或歧义。"""
+    from workflow_oracle_mapping_formal_observer import ns
+    parent = archive.read(entry['batch']['report'])
+    plan = batch_plan(archive.root)
+    require([item['mode'] for item in parent['stages']] == [item['mode'] for item in plan['stages']],
+            'OMQ_BATCH_AUDIT_STAGES')
+    prefix = 'formal-audit-' + entry['commandId']
+    parent_audit = archive.read(prefix + '.json')
+    require(parent_audit['clientId'] is None, 'OMQ_BATCH_AUDIT_UNFILTERED')
+    records = audit_observation(archive, parent_audit, row, host, origin, measured)
+    observations = []
+    previous = ns(row['startedAtUtc'])
+    for item in parent['stages']:
+        window = dict(startedAtUtc=item['startedAtUtc'], endedAtUtc=item['finishedAtUtc'])
+        start, end = ns(window['startedAtUtc']), ns(window['endedAtUtc'])
+        require(previous <= start < end <= ns(row['endedAtUtc']), 'OMQ_BATCH_AUDIT_ORDER')
+        audit = archive.read(prefix + '-' + item['mode'] + '.json')
+        require(audit['clientId'] is None, 'OMQ_BATCH_AUDIT_UNFILTERED')
+        stage_records = audit_observation(archive, audit, window, host, origin, measured)
+        observations.append((item['mode'], start, end, audit, stage_records))
+        previous = end
+    # 保守采用全部实测源/宿主偏差区间的包络，另计源时间戳微秒量化误差。
+    # 任一事件可能跨阶段边界即拒绝；不通过平移窗口或删除间隙事件制造零读。
+    audits = [parent_audit, *[item[3] for item in observations]]
+    lower = min(audit['errorBounds']['lowerNs'] for audit in audits)
+    upper = max(audit['errorBounds']['upperNs'] for audit in audits) + 999
+    key_fields = ('instance', 'session', 'entry', 'statement', 'owner', 'table')
+    def events(rows):
+        result = {}
+        for event in rows:
+            key = tuple(event[field] for field in key_fields)
+            require(key not in result, 'OMQ_BATCH_AUDIT_DUPLICATE')
+            result[key] = event
+        return result
+    complete = events(records)
+    union = {}
+    stages = []
+    for mode, start, end, audit, stage_records in observations:
+        expected = {key: event for key, event in complete.items() if start <= ns(event['utc']) < end}
+        actual = events(stage_records)
+        require(actual == expected, 'OMQ_BATCH_AUDIT_EVENT_SET')
+        for key, event in actual.items():
+            instant = ns(event['utc'])
+            require(start <= instant + lower and instant + upper < end, 'OMQ_BATCH_AUDIT_CLOCK_AMBIGUOUS')
+            require(key not in union, 'OMQ_BATCH_AUDIT_DUPLICATE')
+            union[key] = event
+        stages.append(dict(mode=mode, startUtc=audit['startUtc'], endUtc=audit['endUtc'],
+                           commandId=audit['commandId'], sourceAuditCount=len(actual), recordsSha256=digest_value(stage_records)))
+    require(union == complete, 'OMQ_BATCH_AUDIT_GAP_OR_OMISSION')
+    return dict(parentCommandId=entry['commandId'], auditCommandId=parent_audit['commandId'],
+                startUtc=parent_audit['startUtc'], endUtc=parent_audit['endUtc'], sourceId=parent_audit['sourceId'],
+                observerId=parent_audit['observerId'], clientId=None, eventKeyFields=list(key_fields),
+                sourceClockError=dict(lowerNs=lower, upperNs=upper, timestampResolutionNs=1000),
+                records=records, recordsSha256=digest_value(records), sourceAuditCount=len(records),
+                stages=stages, gapReadCount=0, status='COMPLETE_EVENT_PARTITION')
+
+
 def auth_test_snapshot(archive,origin,tests):
     """重开 AgentTests 的实际构建、双流、冻结文件清单及副实例的只读挂载配方。"""
     import workflow_m2_build as build
@@ -635,7 +693,10 @@ def reopen_browser(archive, entry, origin, mode, case):
             <= utc(after['startedAtUtc']) <= utc(after['endedAtUtc']) <= utc(row['endedAtUtc']), 'OMQ_HOST_WINDOW')
     audit = archive.read(entry['audit'])
     window=dict(startedAtUtc=report['startedAtUtc'],endedAtUtc=report['finishedAtUtc']) if entry.get('batch') else row
+    require(audit['clientId'] is None, 'OMQ_AUDIT_UNFILTERED')
     records = audit_observation(archive,audit,window,host,origin,measured)
+    if entry.get('batch'):
+        archive.batchAudit = batch_audit_closure(archive,entry,row,host,origin,measured)
     if mode=='s0-oracle-auth':
         auth_session_case(archive,report,audit,records,entry['stageInputs'],host,api,tests,origin,inside,after)
     if entry.get('batch') and mode=='mapping':
@@ -862,7 +923,9 @@ class RuntimeOriginals(Originals):
             path=self.area/'runtime-snapshots'/(snapshot+'.json')
         elif name=='api-snapshot.json':
             path=self.area/'runtime-snapshots'/(host['snapshotId']+'.json')
-        elif self.dispatch.get('batch') and (name in self.dispatch['batchMembers'] or name=='formal-audit-'+self.dispatch['commandId']+'-'+self.dispatch['mode']+'.json'):
+        elif self.dispatch.get('batch') and (name in self.dispatch['batchMembers'] or name in {
+                'formal-audit-'+self.dispatch['commandId']+'-'+item['mode']+'.json'
+                for item in batch_plan(self.root)['stages']}):
             path=self.area/name
         elif self.dispatch['mode']=='s1' and name==self.dispatch['reports'][0][:-5]+'-result.json':
             path=self.area/name
@@ -914,6 +977,7 @@ def reopen_runtime_case(root,task,run,cid, *, expected_mode=None, _checked=None)
             if required not in checked:
                 reopen_runtime_case(root,task,run,cid,expected_mode=required,_checked=checked)
         persistence['qualifiedPredecessors']=sorted(k for k in checked if k!=dispatch['mode'])
+        persistence['batchAudit']=archive.batchAudit
     if dispatch['mode'] in ('s1','s1-reopen'):
         persistence['persistence']=archive.persistence
         persistence['persistenceWindow']=archive.persistenceWindow
