@@ -13,17 +13,15 @@ public sealed class OracleAdapterTests
     [TestMethod]
     public void CatalogFingerprintSeparatesOracleWithoutChangingExistingConnectors()
     {
-        // 固定空目录仅检查规范化算法，不作为真实发现结果。
-        var method = typeof(ConnectionApplicationService).GetMethod("CanonicalCatalog", BindingFlags.Static | BindingFlags.NonPublic)!;
         // 目标值不参与此纯指纹计算。
         var profile = new OracleConnectionProfile { Host = "oracle-source", Port = 2484, ServiceName = "FREEPDB1", Username = "FIXTURE_READER", Tls = true, AllowedOwners = ["PRODUCTION", "CaseOwner"] };
         // Oracle应使用独立版本，不继承PG的标记。
-        var result = ((CatalogObject[], string))method.Invoke(null, [Array.Empty<CatalogObject>(), new OracleConnectionConfig { Profile = profile }])!;
-        Assert.AreEqual(Digest("{\"adapterVersion\":\"oracle-m2-v1\",\"objects\":[]}"), result.Item2);
+        var result = ConnectionApplicationService.CanonicalCatalog([], new OracleConnectionConfig { Profile = profile });
+        Assert.AreEqual(Digest("{\"adapterVersion\":\"oracle-m2-v1\",\"objects\":[]}"), result.Fingerprint);
         // Doris历史版本标记保持不变，不能随新增Oracle一起重写。
         var doris = new DorisConnectionConfig { Profile = new DorisConnectionProfile { FeHost = "localhost", QueryPort = 19030, Catalog = "internal", Database = "fixture", Username = "fixture_reader", Tls = true } };
-        result = ((CatalogObject[], string))method.Invoke(null, [Array.Empty<CatalogObject>(), doris])!;
-        Assert.AreEqual(Digest("{\"adapterVersion\":\"pg-m1-v1\",\"objects\":[]}"), result.Item2);
+        result = ConnectionApplicationService.CanonicalCatalog([], doris);
+        Assert.AreEqual(Digest("{\"adapterVersion\":\"pg-m1-v1\",\"objects\":[]}"), result.Fingerprint);
     }
 
     /// <summary>对固定黄金字节计算摘要，不复制产品规范化逻辑。</summary>
@@ -69,11 +67,11 @@ public sealed class OracleAdapterTests
     public void ActualConnectionUsesFixedTcpsAndIndependentWallet()
     {
         // 构造仅检查连接参数，不打开网络或读取不存在的信任文件。
-        var type = typeof(IOracleSourceAdapter).Assembly.GetType("OntologyPlatform.Modules.Connections.OracleSourceAdapter")!;
+        var type = typeof(OracleSourceAdapter);
         // 宿主固定的路径不能来自公开DTO。
         var options = new OracleAdapterOptions { WalletDirectory = "/synthetic/wallet", RootCertificatePath = "/synthetic/ca.pem" };
         // 调用真实构造器和连接工厂，避免测试另造连接串。
-        var adapter = Activator.CreateInstance(type, options)!;
+        var adapter = new OracleSourceAdapter(options);
         // 固定私有工厂只接收秘密，目标无法由其参数改变。
         var create = type.GetMethod("Create", BindingFlags.Instance | BindingFlags.NonPublic)!;
         using var connection = (Oracle.ManagedDataAccess.Client.OracleConnection)create.Invoke(adapter, ["p;Data Source=attacker"] )!;
