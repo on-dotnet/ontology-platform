@@ -818,6 +818,35 @@ public sealed partial class G4QueryMafRuntimeTests
         return directory?.FullName ?? throw new InvalidOperationException("DORIS_TEST_WORKTREE_MISSING");
     }
 
+    /// <summary>在四个正式会话的观察中将身份、撤销和期限不足区分为固定公开错误。</summary>
+    /// <param name="expected">本次登录应当恢复的主体。</param>
+    /// <param name="subject">正式票据存储重新解密所得主体。</param>
+    /// <param name="ticketExpires">已解密票据的失效时刻。</param>
+    /// <param name="rowExpires">同一持久会话行的失效时刻。</param>
+    /// <param name="revoked">持久会话是否已撤销。</param>
+    /// <param name="deadline">当前消费者要求覆盖的最晚时刻。</param>
+    /// <returns>满足会话前提时返回空，否则返回可公开的固定原因。</returns>
+    private static string? OracleSessionObservationFailure(string? expected, string? subject, DateTimeOffset? ticketExpires,
+        DateTimeOffset? rowExpires, bool revoked, DateTimeOffset deadline)
+    {
+        if (revoked) return "OMQ_SESSION_REVOKED";
+        if (string.IsNullOrWhiteSpace(expected) || string.IsNullOrWhiteSpace(subject) || rowExpires is null || ticketExpires is null)
+            return "OMQ_SESSION_TICKET_UNAVAILABLE";
+        if (!string.Equals(expected, subject, StringComparison.Ordinal)) return "OMQ_SESSION_SUBJECT_MISMATCH";
+        return ticketExpires <= deadline || rowExpires <= deadline ? "OMQ_SESSION_TTL_INSUFFICIENT" : null;
+    }
+
+    /// <summary>同一份已登记文件只能独占写入一次，成功写观察，失败只写固定错误码。</summary>
+    /// <param name="report">已登记的准确临时报告路径。</param>
+    /// <param name="observations">脱敏观察列表或唯一固定原因。</param>
+    private static async Task WriteOracleSessionReportAsync(string report, object observations)
+    {
+        Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(report, @"\A/tmp/omq-session-probe-[0-9a-f]{32}/session-ready\.json\z"));
+        // 目录由正式宿主独占创建；已有报告不可覆盖。
+        await using var output = new FileStream(report, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+        await JsonSerializer.SerializeAsync(output, observations);
+    }
+
     /// <summary>通过标准Cookie格式和PG票据存储检查浏览器实际会话，输入仅经标准输入传入。</summary>
     [TestMethod]
     public async Task BrowserSessionsCoverRegisteredExecutionDeadline()
@@ -866,14 +895,32 @@ public sealed partial class G4QueryMafRuntimeTests
             var reference = options.TicketDataFormat.Unprotect(item.GetProperty("cookie").GetString()!);
             // 原始会话键只用于内部准确定位。
             var key = reference?.Principal.FindFirst("Microsoft.AspNetCore.Authentication.Cookies-SessionId")?.Value;
+            // 无可验证的引用时只记录固定失败码，不输出引用或输入主体。
+            if (oracle && string.IsNullOrWhiteSpace(key))
+            {
+                await WriteOracleSessionReportAsync(Environment.GetEnvironmentVariable("G4_BROWSER_REPORT")!, new { code = "OMQ_SESSION_TICKET_UNAVAILABLE" });
+                Assert.Fail("OMQ_SESSION_TICKET_UNAVAILABLE");
+            }
             Assert.IsFalse(string.IsNullOrWhiteSpace(key));
             // 正式存储重新验证撤销及过期并解密原票据。
             var ticket = await options.SessionStore!.RetrieveAsync(key!);
+            // 不读取或输出数据库中的保护票据字段。
+            var session = await database.Sessions.Where(row => row.Id == key).Select(row => new { row.ExpiresAtUtc, row.RevokedAtUtc }).SingleOrDefaultAsync();
+            if (oracle)
+            {
+                // 只有准确票据主体及未撤销的持久行均可证时，才将失败归为纯期限不足。
+                var code = OracleSessionObservationFailure(item.GetProperty("subjectId").GetString(), ticket?.Principal.FindFirst("sub")?.Value,
+                    ticket?.Properties.ExpiresUtc, session?.ExpiresAtUtc, session?.RevokedAtUtc is not null, deadline);
+                if (code is not null)
+                {
+                    await WriteOracleSessionReportAsync(Environment.GetEnvironmentVariable("G4_BROWSER_REPORT")!, new { code });
+                    Assert.Fail(code);
+                }
+            }
             Assert.IsNotNull(ticket);
+            Assert.IsNotNull(session);
             Assert.AreEqual(item.GetProperty("subjectId").GetString(), ticket.Principal.FindFirst("sub")?.Value);
             Assert.IsTrue(ticket.Properties.ExpiresUtc > deadline);
-            // 不读取或输出数据库中的保护票据字段。
-            var session = await database.Sessions.Where(row => row.Id == key).Select(row => new { row.ExpiresAtUtc, row.RevokedAtUtc }).SingleAsync();
             Assert.IsNull(session.RevokedAtUtc);
             Assert.IsTrue(session.ExpiresAtUtc > deadline);
             observations.Add(new
@@ -894,10 +941,7 @@ public sealed partial class G4QueryMafRuntimeTests
         }
         else if (oracle)
         {
-            Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(report, @"\A/tmp/omq-session-probe-[0-9a-f]{32}/session-ready\.json\z"));
-            // 同一次试验只能生成一份会话观察，失败或重试不得覆盖原件。
-            await using var output = new FileStream(report, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
-            await JsonSerializer.SerializeAsync(output, observations);
+            await WriteOracleSessionReportAsync(report, observations);
             return;
         }
         else Assert.IsTrue(report.StartsWith("/tmp/m5-session-probe-", StringComparison.Ordinal) && Path.GetFileName(report) == "session-ready.json" && !report.Contains("..", StringComparison.Ordinal));

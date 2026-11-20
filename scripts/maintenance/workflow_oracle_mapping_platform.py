@@ -759,7 +759,7 @@ def ready_grants_sql(cid,q):
 
 def ready_fixture(state):
     cid=state['connectionId'];q=state['subjects']['reader']
-    require((state['taskId'],state['runId'])==(TASK,RUN) and re.fullmatch('[a-f0-9]{32}',cid) and re.fullmatch('[A-Za-z0-9:_-]{1,120}',q),'READY_SCOPE')
+    require((state['taskId'],state['runId'])==(TASK,product_run() or RUN) and re.fullmatch('[a-f0-9]{32}',cid) and re.fullmatch('[A-Za-z0-9:_-]{1,120}',q),'READY_SCOPE')
     cols=['ROW_ID','JOIN_KEY','VAL','ORG_ID','SITE_ID','EXT_ID','LABEL','FROM_TS','TO_TS','EVENT_TS','OBSERVED_TS']
     obj='PRODUCTION/OMQ_ENTITY';fields=[obj+'/'+str(i)+'/'+v for i,v in enumerate(cols,1)]
     current,_=read_pg(('SELECT "ViewJson" FROM connections."CatalogSnapshots" WHERE "ConnectionId"=\''+cid+'\' ORDER BY "CapturedAtUtc" DESC,"Id" DESC LIMIT 1;').encode(),'ready-current-catalog')

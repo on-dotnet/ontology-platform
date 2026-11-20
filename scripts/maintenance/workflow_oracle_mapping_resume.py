@@ -1,6 +1,7 @@
 """正式 Oracle 恢复窗口：原五副本、两个无状态 API 与现有阶段资源核验。"""
 import json
 import re
+import uuid
 from pathlib import Path
 
 import workflow_execution as ex
@@ -204,6 +205,10 @@ def create(role):
     admit([role])
     spec=AREA/'formal-api-compose.json'
     require(ex.sha(spec.read_bytes())==load(AREA/'formal-api-inputs.json')['composeSha256'],'PRODUCT_SPEC')
+    if role=='api-secondary':
+        inp=load(AREA/'formal-api-inputs.json')
+        snapshot=current_session_snapshot(inp)
+        verify_session_recipe(load(spec),snapshot)
     args=['compose','-f',str(spec)]
     command('resume-create-'+role,[*args,'create','--no-build','--pull','never',role])
     cid,_=command('resume-id-'+role,[*args,'ps','--all','-q',role])
@@ -238,6 +243,13 @@ def host_binding():
         require(image==platform.IMAGES[role],'PRODUCT_HOST_IMAGE')
         if role=='fuseki':recovery.require_current_fuseki(cid,started,int(pid))
         if role in APIS:platform.snapshots.demand_mount(ROOT,snap,json.loads(mounts),task=TASK,run_id=PRODUCT)
+        if role=='api-secondary':
+            snapshot_id=inp.get('sessionSnapshotId','')
+            require(re.fullmatch('[0-9a-f]{64}',snapshot_id),'PRODUCT_SESSION_SNAPSHOT_ID')
+            expected=str(AREA/'runtime-snapshots'/snapshot_id)
+            session=[m for m in json.loads(mounts) if m['Destination']=='/session-tests' or m['Destination'].startswith('/session-tests/')]
+            require(len(session)==1 and session[0]['Destination']=='/session-tests' and session[0]['RW'] is False
+                    and session[0]['Source'].removeprefix('/host_mnt')==expected,'PRODUCT_SESSION_LIVE_MOUNT')
         services[role]=dict(containerId=cid,imageId=image,pid=int(pid),startedAt=started,mountSha256=ex.sha(ex.encoded(json.loads(mounts))),networks=networks)
     require(inp['composeSha256']==ex.sha((AREA/'formal-api-compose.json').read_bytes()) and inp['relaySha256']==ex.sha((BASE/'formal-relay/OracleRelay.dll').read_bytes()),'PRODUCT_INPUT_DRIFT')
     return dict(taskId=TASK,runId=PRODUCT,ports=platform.PORTS,commandId=result.receipt['commandId'],snapshotId=inp['snapshotId'],
@@ -246,22 +258,73 @@ def host_binding():
                 oracle=dict(containerId=source['containerId'],imageId=platform.SOURCE.split('@')[1],networkId=rec['networks'][SOURCE_NETWORK]))
 
 
+def current_session_snapshot(inputs):
+    """验证期望目录、冻结字节、当前构建回执与实际程序集输出的一致性。"""
+    snapshot_id=inputs.get('sessionSnapshotId','')
+    require(re.fullmatch('[0-9a-f]{64}',snapshot_id),'PRODUCT_SESSION_SNAPSHOT_ID')
+    snapshot=load(AREA/'runtime-snapshots'/(snapshot_id+'.json'))
+    require(snapshot['snapshotId']==snapshot_id and ROOT/snapshot['directory']==AREA/'runtime-snapshots'/snapshot_id,
+            'PRODUCT_SESSION_SNAPSHOT_DIRECTORY')
+    platform.snapshots.verify(ROOT,snapshot,task=TASK,run_id=PRODUCT)
+    binding,row=bound_build('agent')
+    raw=ex.ordinary(BASE.parent/'agent-build-binding.json').read_bytes()
+    require(ex.sha(raw)==binding['receiptSha256'],'PRODUCT_SESSION_BUILD')
+    receipt=json.loads(raw)
+    prefix=str(Path(platform.build.TARGETS['agent']).parent/'bin/Debug/net10.0')+'/'
+    files={k.removeprefix(prefix):v for k,v in receipt['outputs'].items() if k.startswith(prefix)}
+    require(binding==snapshot['inputs'] and row['commandId']==snapshot['commandId'] and files==snapshot['files']
+            and 'OntologyPlatform.AgentTests.dll' in files,'PRODUCT_SESSION_BUILD')
+    return snapshot
+
+
+def verify_session_recipe(spec,snapshot):
+    """创建容器前只接受一个指向已核目录的只读会话程序集挂载，排除子路径遮盖。"""
+    mounts=spec['services']['api-secondary']['volumes']
+    matching=[m for m in mounts if isinstance(m,str) and len(m.rsplit(':',2))>=2 and
+              (m.split(':')[1]=='/session-tests' or m.split(':')[1].startswith('/session-tests/'))]
+    require(all(isinstance(m,str) for m in mounts) and matching==[str(ROOT/snapshot['directory'])+':/session-tests:ro'],
+            'PRODUCT_SESSION_RECIPE')
+
+
 def bind_session_tests():
     """在创建容器前把既有票据检查装入副实例的只读测试快照。"""
     rec=manifest()
     require(not set(APIS).intersection(rec['ids']),'PRODUCT_BIND_BEFORE_CREATE')
     specpath=AREA/'formal-api-compose.json';inpath=AREA/'formal-api-inputs.json'
     spec=load(specpath);inputs=load(inpath)
-    if 'sessionSnapshotId' in inputs:
-        return inputs['sessionSnapshotId']
-    admission=admit(APIS)
+    require(ex.sha(specpath.read_bytes())==inputs['composeSha256'],'PRODUCT_SPEC')
     binding,row=bound_build('agent')
+    if 'sessionSnapshotId' in inputs:
+        previous_id=inputs['sessionSnapshotId']
+        require(re.fullmatch('[0-9a-f]{64}',previous_id),'PRODUCT_SESSION_SNAPSHOT_ID')
+        previous=load(AREA/'runtime-snapshots'/(previous_id+'.json'))
+        require(previous['snapshotId']==previous_id and ROOT/previous['directory']==AREA/'runtime-snapshots'/previous_id,
+                'PRODUCT_SESSION_SNAPSHOT_DIRECTORY')
+        platform.snapshots.verify(ROOT,previous,task=TASK,run_id=PRODUCT)
+        verify_session_recipe(spec,previous)
+        if binding==previous['inputs'] and row['commandId']==previous['commandId']:
+            return current_session_snapshot(inputs)['snapshotId']
+        spec['services']['api-secondary']['volumes'].remove(str(ROOT/previous['directory'])+':/session-tests:ro')
+    admission=admit(APIS)
     source=ROOT/Path(platform.build.TARGETS['agent']).parent/'bin/Debug/net10.0'
-    size=sum(p.stat().st_blocks*512 for p in source.rglob('*') if p.is_file())
-    require(size+admission['platformDisk']['totalBytes']<=admission['platformDisk']['ceilingBytes'],'PRODUCT_SESSION_SNAPSHOT_COST')
-    snap=platform.snapshots.freeze(ROOT,source,AREA/'runtime-snapshots',binding,row['commandId'],
-                                  {'toolEnvironment':row['environmentFingerprint']},task=TASK,run_id=PRODUCT)
+    # 新 API 输入重建后仍可沿用同一次 Agent 构建的准确已封存快照。
+    retained=[]
+    for path in (AREA/'runtime-snapshots').glob('*.json'):
+        candidate=load(path)
+        if candidate.get('inputs')==binding and candidate.get('commandId')==row['commandId']:
+            require(path.stem==candidate['snapshotId'],'PRODUCT_SESSION_SNAPSHOT_ID')
+            retained.append(candidate)
+    require(len(retained)<=1,'PRODUCT_SESSION_SNAPSHOT_AMBIGUOUS')
+    if retained:
+        snap=current_session_snapshot(dict(sessionSnapshotId=retained[0]['snapshotId']))
+    else:
+        size=sum(p.stat().st_blocks*512 for p in source.rglob('*') if p.is_file())
+        require(size+admission['platformDisk']['totalBytes']<=admission['platformDisk']['ceilingBytes'],'PRODUCT_SESSION_SNAPSHOT_COST')
+        snap=platform.snapshots.freeze(ROOT,source,AREA/'runtime-snapshots',binding,row['commandId'],
+                                      {'toolEnvironment':row['environmentFingerprint']},task=TASK,run_id=PRODUCT)
     spec['services']['api-secondary']['volumes'].append(str(ROOT/snap['directory'])+':/session-tests:ro')
+    verify_session_recipe(spec,snap)
+    current_session_snapshot(dict(sessionSnapshotId=snap['snapshotId']))
     for original in (inpath,specpath):
         (AREA/(original.stem+'-'+ex.sha(original.read_bytes())+'.json')).write_bytes(original.read_bytes())
     platform.save(specpath,spec,True)
@@ -270,29 +333,49 @@ def bind_session_tests():
     return snap['snapshotId']
 
 
+def session_failure_code(output):
+    """只取正常消费者独占报告的末行，未知失败不能进入仅限 TTL 的处理。"""
+    try:
+        row=json.loads(output.splitlines()[-1])
+    except (IndexError,ValueError):
+        return 'PRODUCT_SESSION_REJECTED'
+    known=('OMQ_SESSION_TICKET_UNAVAILABLE','OMQ_SESSION_SUBJECT_MISMATCH','OMQ_SESSION_REVOKED','OMQ_SESSION_TTL_INSUFFICIENT')
+    return row['code'] if isinstance(row,dict) and set(row)=={'code'} and row['code'] in known else 'PRODUCT_SESSION_REJECTED'
+
+
+def session_invocation(cid,nonce,seconds=210):
+    """用公开 nonce 和准确副 API 身份构造真实调用，供资格消费者逐字重算。"""
+    require(re.fullmatch('[0-9a-f]{64}',cid) and re.fullmatch('[0-9a-f]{32}',nonce) and seconds==210,'PRODUCT_SESSION_COMMAND')
+    directory='/tmp/omq-session-probe-'+nonce
+    runner=(f'set -eu; umask 077; d={directory}; mkdir -m 700 -- "$d"; '
+            'trap \'rm -r -- "$d"\' EXIT; export G4_BROWSER_REPORT="$d/session-ready.json"; cd "$d"; '
+            'rc=0; dotnet /session-tests/OntologyPlatform.AgentTests.dll --filter FullyQualifiedName=OntologyPlatform.AgentTests.G4QueryMafRuntimeTests.BrowserSessionsCoverRegisteredExecutionDeadline '
+            '--minimum-expected-tests 1 --no-ansi --progress off --results-directory "$d/results" || rc=$?; if test -f "$G4_BROWSER_REPORT"; then cat "$G4_BROWSER_REPORT"; echo; fi; exit "$rc"')
+    return ['docker','--context','desktop-linux','exec','-i','-e','HOME=/tmp','-e','DOTNET_CLI_HOME=/tmp',
+          '-e','G4_BROWSER_PREFLIGHT=1','-e','G4_QUERY_RUNTIME_TEST='+TASK+':'+RUN,'-e','OMQ_SESSION_SECONDS='+str(seconds),
+          cid,'/bin/sh','-ec',runner]
+
+
 def verify_sessions(actors,seconds):
     """同一已准副 API 内运行既有票据检查。真实 Cookie 只交现有消费者的 stdin。"""
     from workflow_m2_evidence import mtp
     require(seconds==210 and len(actors)==4,'PRODUCT_SESSION_WINDOW')
     inp=load(AREA/'formal-api-inputs.json')
-    snap=load(AREA/'runtime-snapshots'/(inp['sessionSnapshotId']+'.json'))
-    platform.snapshots.verify(ROOT,snap,task=TASK,run_id=PRODUCT)
-    binding=platform.build.validate('agent',TASK)
-    require(binding==snap['inputs'],'PRODUCT_SESSION_BUILD')
+    binding=current_session_snapshot(inp)['inputs']
     host=host_binding()
     cid=host['services']['api-secondary']['containerId']
     # 验证程序在独占临时目录输出不含认证内容的结果，证据正文不记录 stdin。
-    runner='set -eu; d=$(mktemp -d /tmp/omq-session.XXXXXXXX); trap \'rm -r -- "$d"\' EXIT; export G4_BROWSER_REPORT="$d/ready.json"; cd "$d"; dotnet /session-tests/OntologyPlatform.AgentTests.dll --filter FullyQualifiedName=OntologyPlatform.AgentTests.G4QueryMafRuntimeTests.BrowserSessionsCoverRegisteredExecutionDeadline --minimum-expected-tests 1 --no-ansi --progress off --results-directory "$d/results"; cat "$G4_BROWSER_REPORT"; echo'
-    args=['docker','--context','desktop-linux','exec','-i','-e','HOME=/tmp','-e','DOTNET_CLI_HOME=/tmp',
-          '-e','G4_BROWSER_PREFLIGHT=1','-e','G4_QUERY_RUNTIME_TEST='+TASK+':'+RUN,'-e','OMQ_SESSION_SECONDS='+str(seconds),
-          cid,'/bin/sh','-ec',runner]
+    nonce=uuid.uuid4().hex
+    args=session_invocation(cid,nonce,seconds)
     result=ex.run(args,ROOT,task=TASK,run_id=PRODUCT,stage='omq-session-real',stdin=ex.encoded(actors),
                   input_key=ex.sha(ex.encoded(binding)),parent_id=host['commandId'],timeout=22)
-    require(result.returncode==0,'PRODUCT_SESSION_REJECTED_'+result.receipt['commandId'])
+    if result.returncode!=0:
+        reason=session_failure_code(result.stdout)
+        require(False,reason+'_'+result.receipt['commandId'])
     mtp(result.stdout+result.stderr,1)
     obs=json.loads(result.stdout.splitlines()[-1])
     require([v['subjectId'] for v in obs]==[v['subjectId'] for v in actors],'PRODUCT_SESSION_SUBJECT')
-    return dict(commandId=result.receipt['commandId'],observations=obs)
+    return dict(commandId=result.receipt['commandId'],nonce=nonce,observations=obs)
 
 
 def save_api_observation(event,role,row):
