@@ -26,7 +26,9 @@ def before_source(root, task, source_id=None, *, platform_stage=False, phase=Non
     """创建前及运行时核对当前准入；运行时只容许已记录的准确源 ID。"""
     require(task == TASK, 'TASK')
     area = ordinary(root/'artifacts/workflow'/task)
-    stage_run='s0-recovery-01' if phase else RUN
+    from workflow_oracle_mapping_recovery_components import BATCH, PHASES, EXTRA
+    components=phase in PHASES
+    stage_run=BATCH if components else ('s0-recovery-01' if phase else RUN)
     require(not phase or (platform_stage and source_id is None), 'RECOVERY_STAGE')
     stamp = uuid.uuid4().hex
     record = dict(taskId=task, runId=stage_run, resourceRunId=RUN, phase=phase, attempt=stamp, status='STARTED', commands=[],
@@ -72,15 +74,20 @@ def before_source(root, task, source_id=None, *, platform_stage=False, phase=Non
         held_ports = set()
         if phase:
             from workflow_oracle_mapping_platform_recovery import phase_inventory
-            known,platform_memory,platform_cpu,held_ports,replacement=phase_inventory(area/RUN,phase,running_roles,docker)
+            if components:
+                from workflow_oracle_mapping_recovery_components import inspect_stage
+                known,platform_memory,platform_cpu,held_ports,replacement=inspect_stage(area/RUN,phase,running_roles,docker)
+            else:
+                known,platform_memory,platform_cpu,held_ports,replacement=phase_inventory(area/RUN,phase,running_roles,docker)
             accounted.update(known)
             from workflow_oracle_mapping_platform import QUOTAS
             from workflow_oracle_mapping_platform_recovery import ORIGINAL_IDS
             upcoming=set(running_roles if planned_roles is None else planned_roles)
-            require(upcoming<=set(ORIGINAL_IDS) and (phase!='closed' or not upcoming),'PLANNED_ROLE')
+            require(upcoming<=(PHASES[phase] if components else set(ORIGINAL_IDS)) and (phase!='closed' or not upcoming),'PLANNED_ROLE')
             pending_roles=upcoming-set(running_roles)
-            next_memory=platform_memory+sum((4096 if n=='oracle' else QUOTAS[n][0])*1024**2 for n in pending_roles)
-            next_cpu=platform_cpu+sum(int((2 if n=='oracle' else QUOTAS[n][1])*1e9) for n in pending_roles)
+            quotas={**QUOTAS,'oracle':(4096,2),**EXTRA}
+            next_memory=platform_memory+sum(quotas[n][0]*1024**2 for n in pending_roles)
+            next_cpu=platform_cpu+sum(int(quotas[n][1]*1e9) for n in pending_roles)
             record['projectedWithHelper']={'memory':4*GIB+next_memory,'nanoCpus':4_500_000_000+next_cpu}
             record['expectedRunningRoles']=sorted(running_roles)
             record['activeQuota']={'memory':int(3.5*GIB)+platform_memory,'nanoCpus':4_000_000_000+platform_cpu}

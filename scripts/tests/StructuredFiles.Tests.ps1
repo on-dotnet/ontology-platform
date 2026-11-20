@@ -22,6 +22,25 @@ try {
     if ($LASTEXITCODE -ne 1) { throw 'Invalid TOML not rejected' }
     if ($rejectionOutput -notcontains 'FAIL: structured syntax invalid.toml (TOMLDecodeError)') { throw 'Expected TOML parser rejection missing' }
     $rejectionOutput | ForEach-Object { Write-Output ('EXPECTED-REJECTION: ' + $_) }
+    $composeName = 'infra/oracle/compose.mapping-query.yaml'
+    $compose = Join-Path $temporary $composeName
+    New-Item -ItemType Directory -Path (Split-Path $compose -Parent) | Out-Null
+    Copy-Item -LiteralPath (Join-Path $root $composeName) -Destination $compose
+    function Test-Selected([string]$Name, [int]$Expected) {
+        @($Name) | ConvertTo-Json -AsArray -Compress | & $python $parser $temporary --paths-stdin
+        if ($LASTEXITCODE -ne $Expected) { throw "Unexpected parser result for $Name" }
+    }
+    Test-Selected $composeName 0
+    [IO.File]::WriteAllText($compose, "s: !override text`na: !override [one, two]`nm: !override {a: b}`n")
+    Test-Selected $composeName 0
+    foreach ($tag in @('!unknown', '!!python/name:builtins.str')) {
+        [IO.File]::WriteAllText($compose, "x: !override [$tag '']`n")
+        Test-Selected $composeName 1
+    }
+    [IO.File]::WriteAllText((Join-Path $temporary 'valid.yml'), "x: !override []`n")
+    Test-Selected 'valid.yml' 1
+    [IO.File]::WriteAllText((Join-Path $temporary 'valid.toml'), "title = 'valid'`n")
+    Test-Selected 'valid.toml' 0
     # 在独立作用域仅隐藏解析器，验证普通检查不会静默跳过必要门禁。
     & {
         . (Join-Path $root 'scripts/verify.ps1') -Library
@@ -36,7 +55,7 @@ try {
             throw 'Missing structured parser was not rejected'
         }
     }
-    Write-Output 'PASS: structured parser 4 real positive/negative cases.'
+    Write-Output 'PASS: structured parser 10 real positive/negative cases.'
 } finally {
     [Environment]::SetEnvironmentVariable('PYTHONPATH', ($previousPythonPath ?? [NullString]::Value), 'Process')
     if ((Split-Path $temporary -Leaf) -notmatch '^ontology-structured-[a-f0-9]{32}$') { throw 'Unsafe fixture cleanup' }

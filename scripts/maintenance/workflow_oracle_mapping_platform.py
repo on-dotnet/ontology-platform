@@ -97,6 +97,9 @@ def current_storage(area, replacement=None):
         replacement_services = replacement['volumes']
         volumes.update(replacement_services.values())
         ids.update(replacement['ids'].values())
+    extra_ids = set((replacement or {}).get('extraIds',{}).values())
+    extra_volumes = (replacement or {}).get('extraVolumes',{})
+    ids.update(extra_ids);volumes.update(extra_volumes.values())
     all_volumes=get('system/df?type=volume')['Volumes']
     if replacement is not None:
         from urllib.parse import urlencode
@@ -109,12 +112,13 @@ def current_storage(area, replacement=None):
     for cid in sorted(ids):
         require(re.fullmatch('[a-f0-9]{64}',cid),'STORAGE_CID')
         val=get('containers/'+cid+'/json?size=1')
-        require(val['Id']==cid and val['Config']['Labels'].get('ontology.task')==TASK and val['Config']['Labels'].get('ontology.run')==RUN,'SIZE_OWNER')
+        require(val['Id']==cid and val['Config']['Labels'].get('ontology.task')==TASK and val['Config']['Labels'].get('ontology.run')==('s0-recovery-02' if cid in extra_ids else RUN),'SIZE_OWNER')
         require(type(val['SizeRw']) is int and val['SizeRw'] >= 0, 'CONTAINER_SIZE_MISSING')
         layer_sizes[cid]=val['SizeRw']
     return dict(volumesLogicalBytes={k:sizes[k] for k in old['volumesLogicalBytes']},containerWritableBytes=layer_sizes,
                 platformVolumes={k:sizes[v] for k,v in services.items()},
-                replacementVolumes={k:sizes[v] for k,v in replacement_services.items()})
+                replacementVolumes={k:sizes[v] for k,v in replacement_services.items()},
+                componentVolumes={k:sizes[v] for k,v in extra_volumes.items()},componentLayers={k:layer_sizes[k] for k in sorted(extra_ids)})
 
 
 def backup_allocation(root, area, group):
@@ -202,7 +206,8 @@ def disk_admission(root,area,command,*,phase=None,replacement=None):
               'boundedContainerLogs':16*20*1024**2,'boundedProbeAndStreamingTemporary':64*1024**2,
               'newBuildEvidenceAndLogs':max(64*1024**2,host_start+int(.75*GIB)-host)}
     if phase:
-        require(phase in ('preserve','restore','closed'), 'RECOVERY_PHASE')
+        from workflow_oracle_mapping_recovery_components import BATCH, PHASES
+        require(phase in ('preserve','restore','closed') or phase in PHASES, 'RECOVERY_PHASE')
         require(len(set(host_dirs))==len(host_dirs) and all(p.is_dir() for p in host_dirs), 'RECOVERY_HOST_MEASUREMENT')
         sizes = usage['volumesLogicalBytes']
         original = json.loads((area/'source-create-01.json').read_bytes())['volume']
@@ -221,9 +226,24 @@ def disk_admission(root,area,command,*,phase=None,replacement=None):
         reserved['platformReplacement'] = max(platform_copy,sum(usage['replacementVolumes'].values()))
         reserved['newBuildEvidenceAndLogs'] = max(64*1024**2,host_start+int(.75*GIB)-(host-source_credited-platform_credited))
         source_caps = {name:max(source_limit,size) for name,size in sizes.items()}
+    component_budget=None
+    if phase and phase in PHASES:
+        start=json.loads((area.parent/BATCH/'disk-start.json').read_bytes())
+        require(start['limitIncrement']==64*1024**2 and start['diskPaths']==[str(p) for p in host_dirs],'COMPONENT_DISK_BASIS')
+        # 宿主与各容器可写层已经计入原账本，只增加准确参考卷实耗和本批尚未消费的预留。
+        base_host=min(start['hostBytes'],start['previousHostBytes'])
+        growth=max(0,host-base_host);reference=sum(usage['componentVolumes'].values());layers=sum(usage['componentLayers'].values())
+        used=growth+reference+layers
+        require(used<=start['limitIncrement'],'COMPONENT_64M_LIMIT_'+str(used))
+        remaining=start['limitIncrement']-used
+        component_budget=dict(hostGrowth=growth,referenceVolume=reference,componentLayers=layers,used=used,remaining=remaining,limit=start['limitIncrement'])
+        reserved['componentReferenceActual']=reference
+        transfer=min(remaining,reserved['newBuildEvidenceAndLogs'])
+        reserved['newBuildEvidenceAndLogs']-=transfer
+        reserved['componentGrowthRemaining']=remaining
     total=sum(reserved.values())
     require(total<=40*GIB,'FORMAL_TOTAL_DISK_'+str(total))
-    return dict(allocations=reserved,totalBytes=total,ceilingBytes=40*GIB,hostPaths=[str(p) for p in host_dirs],
+    return dict(allocations=reserved,componentBudget=component_budget,totalBytes=total,ceilingBytes=40*GIB,hostPaths=[str(p) for p in host_dirs],
                 representativePlatformBytes=sample,platformCopyCeiling=platform_copy,
                 sourceVolumeCaps=source_caps,initialSourceMeasurement=usage,
                 measuredAgainBeforeExpansionOrRestore=True)

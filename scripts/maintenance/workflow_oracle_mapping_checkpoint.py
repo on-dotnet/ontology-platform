@@ -70,12 +70,12 @@ COMMIT;
 """.encode()
 
 
-def collect_pg(pg_id, fixture, recovery_id, attempt):
+def collect_pg(pg_id, fixture, recovery_id, attempt, *, measurement_run=RUN):
     """Master 已准入原/替代阶段后调用；另外复核容器实例及镜像，在同一只读快照冻结行与交叉引用。"""
-    require(CID.fullmatch(pg_id) and SAFE_ID.fullmatch(attempt), 'CHECKPOINT_PG_ID')
+    require(CID.fullmatch(pg_id) and SAFE_ID.fullmatch(attempt) and measurement_run in (RUN,'s0-recovery-02'), 'CHECKPOINT_PG_ID')
     def run(stage, args, input_bytes=None):
         args=['docker','--context','desktop-linux',*args]
-        result=ex.run(args, ROOT, task=TASK, run_id=RUN, stage='omq-recovery-checkpoint-'+stage,
+        result=ex.run(args, ROOT, task=TASK, run_id=measurement_run, stage='omq-recovery-checkpoint-'+stage,
                       input_key=ex.sha(ex.encoded([pg_id,attempt,args,ex.sha(input_bytes or b''),ex.sha(Path(__file__).read_bytes())])),
                       stdin=input_bytes, timeout=35)
         require(result.returncode==0,'CHECKPOINT_PG_'+stage+'_'+result.receipt['commandId'])

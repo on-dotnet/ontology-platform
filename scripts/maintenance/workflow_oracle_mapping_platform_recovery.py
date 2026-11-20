@@ -858,7 +858,21 @@ def main():
     cli=argparse.ArgumentParser(description=__doc__)
     cli.add_argument('operation',choices=('status','recover-fixed-row','observe-restored'))
     cli.add_argument('--witness')
+    cli.add_argument('--component',choices=('oidc','rustfs','aggregate'))
+    cli.add_argument('--auth-action',choices=('prepare','finish'))
     args=cli.parse_args()
+    require(args.component is None or (args.operation=='observe-restored' and args.witness is None),'COMPONENT_COMMAND')
+    require(args.auth_action is None or args.component=='oidc','AUTH_ACTION')
+    if args.component:
+        import workflow_oracle_mapping_recovery_components as components
+        if args.component=='rustfs':
+            row=components.objects_window()
+        elif args.component=='oidc':
+            row=components.identity_window(args.auth_action or 'prepare')
+        else:
+            row=components.aggregate()
+        print(json.dumps(row,ensure_ascii=False))
+        return int(row['status'] not in ('RUSTFS_FROZEN_VERSIONS_VERIFIED','FOUR_NORMAL_AUTHENTICATIONS_VERIFIED','AUTHENTICATION_ENTRY_READY','PASS_FOR_FROZEN_CHECKPOINT'))
     if args.operation=='observe-restored':
         from workflow_oracle_mapping_checkpoint import observe_restored
         require(args.witness is None,'FIXED_VERIFIER_INPUT')

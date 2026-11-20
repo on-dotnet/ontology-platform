@@ -9,3 +9,5 @@
 2026-11-20，`s0-recovery-01` 起点为 `9de3b93a0dfddb948b4d68c61ad1b54ce84e0812`。用户批准准确占位晚恢复、当前一致检查点及替代恢复；业务入口持续封闭。三项交付与 RC01–RC06 记录在本批报告。 Oracle S0 BLOCKED，AC03 未通过，S1–S3 未准入，G4 PARTIAL。
 
 2026-11-20 当前停止点为 ChatGPT 复审。准确占位已清、原与替代五服务均已退出；RC05 阻断及恢复条件见[当前恢复报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/report.md)。
+
+2026-11-20 的集中授权绑定 s0-recovery-02 和 Base 454d1a2f17581673cbbf44900a5fe241d603f5ef。接受上批 RC01–RC04 限定结论、RC06 停止事实与冻结 Fuseki 的恢复可用性。仅准入正常四账号认证、固定桶版本读取、Compose 安全解析与恢复聚合。Oracle S0 BLOCKED，原清理 NOT_QUALIFIED，G4 PARTIAL。

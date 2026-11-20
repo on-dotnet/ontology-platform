@@ -10,6 +10,10 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'maintenance'))
 import workflow_oracle_mapping_platform as platform
 import workflow_oracle_mapping_platform_recovery as recovery
+import workflow_oracle_mapping_recovery_components as components
+import workflow_oracle_mapping_identity_recovery as identity
+import workflow_oracle_mapping_object_recovery as objects
+import workflow_evidence as evidence
 
 
 class OracleDiskAdmissionTests(unittest.TestCase):
@@ -91,6 +95,57 @@ class OracleDiskAdmissionTests(unittest.TestCase):
         self.disk_copy(recovery.ORIGINAL_IDS['rustfs'])
         with self.assertRaisesRegex(ValueError,'ARCHIVE_LEDGER_OWNER'):
             self.budget()
+
+
+class RecoveryComponentTests(unittest.TestCase):
+    def test_object_version_and_delete_marker_protocol(self):
+        controls=objects.offline_cases()
+        self.assertEqual(controls['positive']['inventoryEntries'],7)
+        self.assertEqual(controls['positive']['deleteMarkers'],1)
+        self.assertEqual(len(controls['rejected']),11)
+
+    def test_fresh_platform_identity_controls(self):
+        controls=identity.offline_tests()
+        self.assertTrue({'healthy','expired','wrong_subject','wrong_issuer','wrong_client','wrong_alg',
+                         'wrong_signature','wrong_role','missing_subject','only_jwks','unbound_callback'}<=set(controls))
+
+    def test_prior_qualification_reopens_frozen_graph_bytes(self):
+        prior=components.prior_qualifications()
+        self.assertEqual(prior['shutdownHook'],'UNKNOWN')
+        self.assertEqual(prior['oracleRows'],[1,1])
+
+    def test_aggregate_rejects_reregistered_task_identity(self):
+        selection=dict(taskId=components.TASK,runId=components.BATCH,base='0'*40)
+        with patch.object(components,'record_bytes',return_value=json.dumps(selection).encode()):
+            with self.assertRaisesRegex(ValueError,'AGGREGATE_ID'):components.aggregate()
+
+    def test_aggregate_rejects_reregistered_reference_archive(self):
+        attempt='2'*32
+        selection=dict(taskId=components.TASK,runId=components.BATCH,base=components.BASE,
+                       actual=attempt,reference=attempt,identity=attempt)
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp).resolve()
+            docs=root/'docs/evidence';docs.mkdir(parents=True)
+            forged=dict(taskId=components.TASK,runId=components.BATCH,attempt=attempt,
+                        volume=components.REFERENCE,archiveSha256='0'*64)
+            raw=json.dumps(forged).encode()
+            target=docs/'reference-created.json';target.write_bytes(raw)
+            record=dict(path='docs/evidence/reference-created.json',sizeBytes=len(raw),
+                        sha256=hashlib.sha256(raw).hexdigest(),encoding='raw')
+            def rows(name):
+                if name=='selected-attempts.json':return json.dumps(selection).encode()
+                if name=='reference-created.json':return evidence.restore(root,record)
+                if name.startswith('reference-plan-'):return json.dumps(dict(
+                    taskId=components.TASK,runId=components.BATCH,archiveScope={},name=components.REFERENCE,
+                    archiveSha256=components.RUST_HASH)).encode()
+                return b'{}'
+            actual=components.qualified_object
+            def qualified(which,stamp):
+                return (None,None) if which=='actual' else actual(which,stamp)
+            with patch.object(components,'record_bytes',side_effect=rows),patch.object(components,'qualified_object',side_effect=qualified):
+                observation=components.aggregate()
+            self.assertEqual(observation['components']['rustfs'],dict(status='BLOCKED',reason='ORACLE_ADMISSION_SEALED_REFERENCE'))
+            self.assertEqual(observation['status'],'BLOCKED')
 
 
 if __name__=='__main__':
