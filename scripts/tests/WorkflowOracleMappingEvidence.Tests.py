@@ -186,6 +186,48 @@ class OracleQualificationTests(unittest.TestCase):
             oracle.audit_observation(self.archive,audit,row,self.host,self.origin)
 
 
+class OracleSessionRestoreEvidenceTests(unittest.TestCase):
+    """真实 S1 证据的离线反例：本人、新会话、GET 及零业务读取缺一不可。"""
+
+    @staticmethod
+    def fixture(mode):
+        payload=b'{"status":"FOUND"}'
+        query='query-'+'a'*32
+        proof=dict(queryId=query,reportName='browser-s1-1790000000000.json',resultHash=oracle.sha(payload),
+                   subjectId='original-q',sessionHash='a'*64)
+        path='/api/v1/data/semantic-queries'
+        http=[dict(method='GET',path=path+'/'+query+'/result',status=200,sha256=proof['resultHash'])]
+        sessions=[dict(subjectId=subject,sessionHash=c*64) for subject,c in [('original-q','a'),('s1','b'),('s2','c'),('s3','d')]]
+        audit=[]
+        scope='S1_ORACLE_NEW_SESSION_RESULT_RESTORE'
+        if mode=='s1':
+            http += [dict(method='POST',path=path,status=200,sha256=proof['resultHash']) for _ in range(2)]
+            audit=[dict(owner='PRODUCTION',table='OMQ_ENTITY',action='SELECT',code=0)]
+            scope='S1_ORACLE_OIDC_QUERY_PERSISTENCE'
+        return dict(mode=mode,scope=scope,oraclePersistence=proof,http=http,scenarioReady={'session':{'observations':sessions}}),audit,{'readerSubjectId':'original-q'},payload
+
+    def test_s1_fresh_and_replay_must_bind_bytes_and_the_single_read(self):
+        report,audit,stage,payload=self.fixture('s1')
+        self.assertEqual(report['oraclePersistence'],oracle.persistence_case(report,audit,stage,payload))
+        for changed_audit,changed_payload in (([],payload),(audit*2,payload),(audit,b'{}')):
+            with self.assertRaises(ValueError):
+                oracle.persistence_case(report,changed_audit,stage,changed_payload)
+        report['http'].pop()
+        with self.assertRaises(ValueError):
+            oracle.persistence_case(report,audit,stage,payload)
+
+    def test_reopen_rejects_other_subject_digest_and_source_reads(self):
+        report,audit,stage,_=self.fixture('s1-reopen')
+        self.assertEqual(report['oraclePersistence'],oracle.persistence_case(report,audit,stage))
+        with self.assertRaises(ValueError):
+            oracle.persistence_case(report,[{'action':'SELECT'}],stage)
+        with self.assertRaises(ValueError):
+            oracle.persistence_case(report,audit,{'readerSubjectId':'other'})
+        report['http'][0]['sha256']='0'*64
+        with self.assertRaises(ValueError):
+            oracle.persistence_case(report,audit,stage)
+
+
 class NaturalCancelEvidenceTests(unittest.TestCase):
     """离线反例只约束机器消费者；该组记录不能作为 Oracle 产品验收原件。"""
 

@@ -1,7 +1,7 @@
 /** M4独立任务的真实OIDC与正式查询前提夹具；不调用M3验收入口。 */
 import { createRequire } from "node:module";
 import { readFile, realpath } from "node:fs/promises";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 const root = resolve(import.meta.dirname, "../..");
 const args = process.argv.slice(2);
 /** 参数只接受当前已批准任务与阶段，不能通过CLI切换旧任务私有目录。 */
@@ -311,7 +311,7 @@ async function browserRun(mode) {
       phase = "oracle_current_grants";
       report.grants = omq.grants(root, state, mode === "mapping" ? "mapping" : "query");
     }
-    if (oracle && (mode.startsWith("s0-oracle-") || mode === "s1")) {
+    if (oracle && (mode.startsWith("s0-oracle-") || mode === "s1" || mode === "s1-reopen")) {
       phase = "oracle_scenario_ready";
       const current = await omq.ready({ root, state, operator, reader, get, check, mode, actors:[operator,auditor,activator,reader] });
       check("oracle_readiness_redacted", !secrets.some(s => s && JSON.stringify(current.row).includes(s)));
@@ -840,9 +840,20 @@ async function browserRun(mode) {
       await save(state); report.status = "PASS"; report.scope = "RF01_RF03_REAL_PG_FORMAL_MAPPING_GATEWAY";
     } else if (mode === "s1-reopen") {
       phase = "query_after_api_restart";
-      const original = state.numericResult ?? state.latestQuery ?? state.firstQuery;
+      const original = oracle ? state.latestQuery : state.numericResult ?? state.latestQuery ?? state.firstQuery;
       check("original_query_exists", Boolean(original));
 
+      if (oracle) {
+        const previous = original.oraclePersistence;
+        const now = report.scenarioReady.session.observations.find(item => item.subjectId === reader.me.subjectId);
+        check("oracle_fresh_owner_session", previous?.subjectId === reader.me.subjectId && /^[a-f0-9]{64}$/.test(now?.sessionHash)
+          && /^[a-f0-9]{64}$/.test(previous.sessionHash) && previous.sessionHash !== now.sessionHash);
+        const restored = await request(reader, "GET", `/api/v1/data/semantic-queries/${original.queryId}/result`);
+        const resultHash = createHash("sha256").update(restored.raw).digest("hex");
+        check("oracle_new_session_original_bytes", resultHash === original.resultHash);
+        report.oraclePersistence = { ...previous, sessionHash: now.sessionHash, queryId: original.queryId, resultHash };
+        report.scope = "S1_ORACLE_NEW_SESSION_RESULT_RESTORE"; report.status = "PASS"; return;
+      }
       const count = row => doris ? row.businessQueries : row.seqScan + row.idxScan;
       await new Promise(done => setTimeout(done, 2100)); const before = observed();
       await new Promise(done => setTimeout(done, 1100)); const settled = observed();
@@ -1546,6 +1557,12 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
         report.sourceQueryControl = { before: beforeDoris, after };
         check("exactly_one_doris_business_read", beforeDoris.auditInode === after.auditInode &&
           beforeDoris.queryIdsSha256 !== after.queryIdsSha256 && after.businessQueries === beforeDoris.businessQueries + 1);
+      }
+      if (oracle) {
+        const session = report.scenarioReady.session.observations.find(item => item.subjectId === reader.me.subjectId);
+        check("oracle_initial_owner_session", /^[a-f0-9]{64}$/.test(session?.sessionHash));
+        state.latestQuery.oraclePersistence = { reportName: basename(file), subjectId: reader.me.subjectId, sessionHash: session.sessionHash };
+        report.oraclePersistence = { ...state.latestQuery.oraclePersistence, queryId: first.queryId, resultHash: state.latestQuery.resultHash };
       }
       state.firstQuery ??= state.latestQuery; await save(state);
       report.status = "PASS"; report.scope = oracle ? "S1_ORACLE_OIDC_QUERY_PERSISTENCE" : doris ? "S1_DORIS_OIDC_QUERY_PERSISTENCE" : "S1_REAL_OIDC_FORMAL_MAPPING_PG_QUERY_RESTORE_EVIDENCE_HTTP";

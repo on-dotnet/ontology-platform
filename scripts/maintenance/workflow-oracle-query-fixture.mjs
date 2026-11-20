@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 
 /** 只有任务已冻结的主 API、副 API、OIDC 和 Web 可以被正式浏览器场景访问。 */
 export const ports = Object.freeze({ api: 15741, secondary: 15742, oidc: 15743, web: 15744 });
-export const modes = Object.freeze(["serve", "provision", "mapping", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s0-oracle-natural-cancel", "s1"]);
+export const modes = Object.freeze(["serve", "provision", "mapping", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s0-oracle-natural-cancel", "s1", "s1-reopen"]);
 export const config = Object.freeze({ type: "ORACLE", profile: { host: "oracle-source", port: 2484, serviceName: "FREEPDB1",
   username: "FIXTURE_READER", allowedOwners: ["PRODUCTION", "CaseOwner"], tls: true } });
 const task = "G4-ORACLE-MAPPING-QUERY-001";

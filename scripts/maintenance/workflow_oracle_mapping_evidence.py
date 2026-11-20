@@ -342,6 +342,34 @@ def audit_observation(archive, audit, row, host, origin, measured=None):
     return records
 
 
+def persistence_case(report, audit_rows, stage, raw_result=None):
+    """重开单表正例与新会话恢复的实际 HTTP、准确主体、原字节及整个浏览器命令读审计。"""
+    proof = report['oraclePersistence']
+    actor = stage['readerSubjectId']
+    require(proof['subjectId']==actor and HEX.fullmatch(proof['resultHash']) and HEX.fullmatch(proof['sessionHash'])
+            and re.fullmatch(r'browser-s1-[0-9]{13}\.json',proof['reportName'])
+            and re.fullmatch(r'query-[a-f0-9]{32}',proof['queryId']), 'OMQ_S1_RESULT_IDENTITY')
+    sessions = report['scenarioReady']['session']['observations']
+    require(len(sessions)==len({s['subjectId'] for s in sessions})==4 and
+            [s['sessionHash'] for s in sessions if s['subjectId']==actor]==[proof['sessionHash']], 'OMQ_S1_OWNER_SESSION')
+    path = '/api/v1/data/semantic-queries/'+proof['queryId']+'/result'
+    gets = [r for r in report['http'] if r['method']=='GET' and r['path']==path and r['status']==200]
+    require(len(gets)==1 and gets[0]['sha256']==proof['resultHash'], 'OMQ_S1_HTTP_BYTES')
+    if report['mode']=='s1':
+        require(raw_result is not None and sha(raw_result)==proof['resultHash'] and len(audit_rows)==1 and
+                (audit_rows[0]['owner'],audit_rows[0]['table'],audit_rows[0]['action'],audit_rows[0]['code'])==
+                ('PRODUCTION','OMQ_ENTITY','SELECT',0), 'OMQ_S1_SOURCE_AND_BYTES')
+        posts=[r for r in report['http'] if r['method']=='POST' and r['path']=='/api/v1/data/semantic-queries'
+               and r['status']==200 and r['sha256']==proof['resultHash']]
+        require(len(posts)==2 and json.loads(raw_result)['status']=='FOUND' and
+                report['scope']=='S1_ORACLE_OIDC_QUERY_PERSISTENCE', 'OMQ_S1_FIRST_AND_REPLAY')
+    else:
+        require(report['mode']=='s1-reopen' and report['scope']=='S1_ORACLE_NEW_SESSION_RESULT_RESTORE' and not audit_rows
+                and not any(r['method']=='POST' and r['path']=='/api/v1/data/semantic-queries' for r in report['http']),
+                'OMQ_S1_RESTORE_REPLAYED')
+    return proof
+
+
 def reopen_browser(archive, entry, origin, mode, case):
     api = build_binding(archive, 'api', origin)
     tests = build_binding(archive, 'agent', origin)
@@ -399,6 +427,13 @@ def reopen_browser(archive, entry, origin, mode, case):
                     proof['nativeCancelCausedTermination'] and proof['nativeErrorCode']==1013 and
                     not proof['deadlineOrDisconnectBeforeCommit'] and 0<=proof['cleanupUpperMs']<=250 and
                     proof['successfulResults']==proof['successReceipts']==proof['successAudits']==0,'OMQ_CANCEL_CAUSE')
+    if mode in ('s1','s1-reopen'):
+        payload = None
+        if mode=='s1':
+            require(report['oraclePersistence']['reportName']==entry['report'],'OMQ_S1_ORIGINAL_REPORT')
+            payload = archive.raw(entry['report'][:-5]+'-result.json')
+        archive.persistence = persistence_case(report,records,entry['stageInputs'],payload)
+        archive.persistenceWindow = {'startedAtUtc':row['startedAtUtc'],'endedAtUtc':row['endedAtUtc']}
     if mode.startswith('ui-'):
         wb=archive.read('web-build-binding.json')
         import workflow_m2_build as build
@@ -522,6 +557,8 @@ class RuntimeOriginals(Originals):
             path=self.choose('formal-api-compose*.json',lambda data: sha(data)==host['composeSha256'])
         elif name=='api-snapshot.json':
             path=self.area/'runtime-snapshots'/(host['snapshotId']+'.json')
+        elif self.dispatch['mode']=='s1' and name==self.dispatch['reports'][0][:-5]+'-result.json':
+            path=self.area/name
         elif name in self.dispatch['reports'] or name in (self.dispatch['file'],'formal-audit-'+self.dispatch['commandId']+'.json') or re.fullmatch(r'formal-witness-[a-f0-9-]{36}\.json',name):
             path=self.area/name
         else:
@@ -532,7 +569,7 @@ class RuntimeOriginals(Originals):
         return raw
 
 
-def reopen_runtime_case(root,task,run,cid):
+def reopen_runtime_case(root,task,run,cid, *, expected_mode=None):
     require(task==TASK and run==RUN and COMMAND.fullmatch(cid),'OMQ_COMMAND_SCOPE')
     area=ordinary(root/'artifacts/workflow'/TASK/RUN)
     entries=list(area.glob('formal-run-*-'+cid+'.json'))
@@ -540,6 +577,7 @@ def reopen_runtime_case(root,task,run,cid):
     dispatch=json.loads(ordinary(entries[0]).read_bytes())
     require(dispatch['taskId']==task and dispatch['runId']==run and dispatch['commandId']==cid and len(dispatch['reports'])==1
             and re.fullmatch('[0-9a-f]{40}',dispatch['testedCommit']),'OMQ_RUNTIME_DISPATCH_SCOPE')
+    require(expected_mode is None or dispatch['mode']==expected_mode,'OMQ_UNEXPECTED_ORIGIN_MODE')
     dispatch['file']=entries[0].name
     archive=RuntimeOriginals(root,dispatch)
     source=archive.read(dispatch['file'])
@@ -548,7 +586,20 @@ def reopen_runtime_case(root,task,run,cid):
     entry=dict(commandId=cid,report=dispatch['reports'][0],host=dispatch['file'],stageInputs=dispatch['stageInputs'],
                audit='formal-audit-'+cid+'.json')
     checks=reopen_browser(archive,entry,root,dispatch['mode'],dispatch['case'])
+    persistence = {}
+    if dispatch['mode'] in ('s1','s1-reopen'):
+        persistence['persistence']=archive.persistence
+        persistence['persistenceWindow']=archive.persistenceWindow
+    if dispatch['mode']=='s1-reopen':
+        prior = reopen_runtime_case(root,task,run,dispatch['stageInputs']['originCommandId'],expected_mode='s1')
+        original = prior['persistence']
+        require(all(original[k]==archive.persistence[k] for k in ('reportName','subjectId','resultHash','queryId')) and
+                original['sessionHash']!=archive.persistence['sessionHash'] and
+                utc(prior['persistenceWindow']['endedAtUtc'])<=utc(archive.persistenceWindow['startedAtUtc']),'OMQ_S1_RESTORE_ORIGIN')
+        persistence['originCommandId']=prior['commandId']
+        persistence['originMembers']=prior['members']
     return dict(taskId=task,runId=run,commandId=cid,measuredCommit=dispatch['testedCommit'],mode=dispatch['mode'],case=dispatch['case'],
+                **persistence,
                 **({'functional':{'AC03-A':'PASS'},'AC03-B':'NOT_QUALIFIED','cleanup250ms':'NOT_QUALIFIED','oracleS0':'BLOCKED'}
                    if dispatch['mode']==NATURAL_CANCEL else {}),
                 status='CASE_QUALIFIED',checks=checks,scope='one measured scenario',executionMode='REUSED',qualificationMode='FRESH',auditIdentity=archive.auditIdentity,browserIdentity=archive.browserIdentity,members={n:dict(path=p,sha256=archive.examined[n],

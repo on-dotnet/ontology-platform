@@ -759,12 +759,12 @@ def audit_window(start_utc,end_utc,client_id=None):
 def browser_run(mode,case='healthy'):
     import uuid
     from workflow_oracle_mapping_evidence import browser_invocation
-    require(mode in ('provision','mapping','s0-oracle-ready','s0-oracle-natural','s0-oracle-cancel','s0-oracle-natural-cancel','s1'),'FORMAL_MODE')
+    require(mode in ('provision','mapping','s0-oracle-ready','s0-oracle-natural','s0-oracle-cancel','s0-oracle-natural-cancel','s1','s1-reopen'),'FORMAL_MODE')
     resource=admission()
     pre=ex.run(['python3','-B','scripts/maintenance/execution_preflight.py','check','--milestone',TASK,'--phase','runtime'],ROOT,
                task=TASK,run_id=RUN,stage='omq-consumers-'+mode,input_key=ex.sha(Path(__file__).read_bytes()),timeout=18)
     require(pre.returncode==0,'FORMAL_CONSUMERS_'+pre.receipt['commandId'])
-    stage={'phase':'s1' if mode=='s1' else 's0','mode':mode,'case':case}
+    stage={'phase':'s1' if mode in ('s1','s1-reopen') else 's0','mode':mode,'case':case}
     statefile=AREA/'runtime-fixture.json'
     if statefile.exists():
         state=json.loads(statefile.read_bytes());stage['prerequisiteSha256']=ex.sha(statefile.read_bytes())
@@ -772,12 +772,20 @@ def browser_run(mode,case='healthy'):
         if 'subjects'in state:stage['readerSubjectId']=state['subjects']['reader']
         if 'catalog'in state:stage['catalogSnapshotId']=state['catalog']['snapshotId'];stage['catalogFingerprint']=state['catalog']['schemaFingerprint']
         if 'mappingReceipt'in state:stage['activationRevision']=state['mappingReceipt']['activationRevision'];stage['mappingReleaseId']=state['mappingReceipt']['mappingReleaseId']
+    if mode=='s1-reopen':
+        original=state['latestQuery']['oraclePersistence']['reportName']
+        require(re.fullmatch(r'browser-s1-[0-9]{13}\.json',original),'S1_ORIGIN_NAME')
+        origins=[json.loads(ex.ordinary(path).read_bytes()) for path in AREA.glob('formal-run-s1-*.json')]
+        matches=[item for item in origins if item.get('mode')=='s1' and item.get('reports')==[original] and item.get('exitCode')==0]
+        require(len(matches)==1,'S1_ORIGIN_AMBIGUOUS')
+        stage['originCommandId']=matches[0]['commandId']
     stage['fixtureBefore']=fixture_state()
     host=runtime_binding();api=build.validate('api',TASK);tests=build.validate('agent',TASK)
     argv,key,label=browser_invocation(ROOT,mode,case,host,api,tests,stage)
-    before=set(AREA.glob('browser-'+mode+'-*.json'))
+    report_pattern='browser-'+mode+'-'+'[0-9]'*13+'.json'
+    before=set(AREA.glob(report_pattern))
     result=ex.run(argv,ROOT,task=TASK,run_id=RUN,stage=label,input_key=key,parent_id=host['commandId'],timeout=180)
-    after=set(AREA.glob('browser-'+mode+'-*.json'))-before
+    after=set(AREA.glob(report_pattern))-before
     entry=dict(taskId=TASK,runId=RUN,mode=mode,case=case,stageInputs=stage,host=host,builds={'api':api,'agent':tests},
                commandId=result.receipt['commandId'],exitCode=result.returncode,resourceAttempt=resource['attempt'],preflightCommandId=pre.receipt['commandId'],
                reports=[p.name for p in sorted(after)],testedCommit=local('tested-head',['git','rev-parse','HEAD']))
