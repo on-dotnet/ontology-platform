@@ -41,3 +41,15 @@
 - 正式测试入口在 `d90fd032676813c48b712be2aadce0f950e4381c` 运行 51/51，命令 `d0315377a78d459abac5e95aebea5153`。其中离线断言不计作正式 Oracle 四会话或产品实测。全工作树实际静态扫描在 `6d2a2976f2d54f54637b6fb364fe2c0444639644` 通过，覆盖 24,566 个文件。四个未跟踪的 Finder 文件保留，已提交范围的计划使用同一候选的干净检出。
 - 当期认证与 PG 实测提交均为 `6d2a2976f2d54f54637b6fb364fe2c0444639644`，后续增量登记工程门禁和交付材料。原 503 项 SelfTest 保留原历史身份。本批完整 SelfTest、CI 与其他平台均为 NOT_RUN。通用 Oracle verify 消费 implementation-01，当前单场景走 product-resume-01 的 --case-command 与准确 mode；通用门禁和单场景的状态分列。
 - 干净检出完整映射后 plan 为 PLANNED。通用 verify 在第一项 environment 返回 BLOCKED，原因为 `OMQ_ORIGINALS_NOT_RUN_admission`；实现阶段的 admission/qualification.json 尚未登记。该原件在任务树和 Git 均缺席。当前 auth 的成功资格消费者也准确拒绝本次失败窗口，返回 `OMQ_REPORT_INPUT`。机器回执单独保存了失败事实的 28 项原件重开，未将其签为成功场景。
+
+## 19:20 用户到场后的正式认证窗口
+
+本次实测提交为 `ee7e3df27d6847c09307526920959f42b4584f4f`。主机预检记录 Mac 已解锁，按原配置建立的两个无状态 API 均通过匿名 `/me` 返回 401 的检查。正式 Edge 窗口可见时已发出提醒。
+
+| 项目 | 当前窗口的证据 |
+| --- | --- |
+| 四主体认证 | FRESH。北京时间 19:20:57 至 19:21:40，命令 `3b9131ecad82459e88b9f2660b285def` 退出 1。首个 `g2-operator-ab` 在表单期限内未返回 `/me`，分类为 `ORACLE_LOGIN_WAITING_FOR_INPUT`。本窗 0/4，其余三个账号和四票据 TTL 均为 NOT_RUN。已接受的历史 1/1 仍归原窗口。 |
+| 源端业务 | FRESH。覆盖完整命令窗口的独立审计 `a65e93a7464c4156adb99cfa9465ac98` 未按 clientId 筛选，FIXTURE_READER 固定业务 SELECT 为 0。正式 AC03-A 与 S1 均为 NOT_RUN，S2–S3 未准入。 |
+| 授权与资源 | FRESH。19:22:13 只读观察到原范围有效授权 15 项，均余至少 210 秒。关窗操作 `ce83cef37f794bd8bc76787a4ee54c59` 的两次七项排空计数均为零，两个无状态 API 已移除，五个持久替代服务已停止保留。Fuseki 退出 143，其关闭钩子仍为 UNKNOWN。 |
+
+前次 18:39 窗口与本次分别留存。AC03-B 仍为 BLOCKED，cleanup250ms 为 NOT_QUALIFIED，Oracle S0 为 BLOCKED，G4 为 PARTIAL。
