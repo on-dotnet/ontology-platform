@@ -452,12 +452,79 @@ def one_helper(stage,volume,target,script,*,image=None,user='0',bind=None,timeou
         platform.save(registry,detail,True)
 
 
+def fuseki_journals(files):
+    """只核停机后可见的文件。Jena 6.2.0 释放的是文件锁，锁路径及其 PID 可以保留。"""
+    observed={}
+    for line in files:
+        match=re.fullmatch(r'((?:Data-[0-9]+/)?tdb[.]lock|Data-[0-9]+/journal[.]jrnl)[|]([0-9]+)',line)
+        require(match and match[1] not in observed,'TDB_FILE_OBSERVATION')
+        observed[match[1]]=int(match[2])
+    journals={name:size for name,size in observed.items() if name.endswith('/journal.jrnl')}
+    require(journals and all(size==0 for size in journals.values()),'TDB_JOURNAL_UNCONFIRMED')
+    return journals
+
+
+def fuseki_termination(row):
+    """接受已观测的有界进程退出；早期因锁路径仍存在而拒绝的原件保留原判。"""
+    observed=row.get('after',{})
+    legacy=row.get('status')=='BLOCKED' and row.get('reason')=='ORACLE_ADMISSION_TDB_CLOSE_UNCONFIRMED'
+    # 已审旧窗口关闭日志禁用；其原进程退出可复用，不能用未知日志放行或补写 clean。
+    if legacy:require(row.get('logSha256')==ex.sha(b'') and row.get('shutdownLogMarker') is False,'TDB_LEGACY_LOG')
+    require(row.get('role')=='fuseki' and observed.get('Status')=='exited' and
+            observed.get('ExitCode') in (0,143) and observed.get('OOMKilled') is False and
+            row.get('logExit')==0 and re.fullmatch(CID,row.get('logSha256','')) and
+            (row.get('status')=='PROCESS_EXITED' and row.get('termSent') is True or legacy),'TDB_PROCESS_EXIT')
+    return fuseki_journals(row.get('tdbCloseFiles',[]))
+
+
+def fuseki_reuse_basis(cid,registry):
+    """将当前引擎退出代次、准确替代卷及已审冻结检查点的两份全读原件绑定在一起。"""
+    import workflow_oracle_mapping_recovery_components as components
+    prior=components.prior_qualifications()
+    restored=components.frozen('restored-fuseki.json')
+    require(prior['fuseki']=='ACCEPTED_FOR_FROZEN_CHECKPOINT' and
+            cid==prior['fusekiId']==restored['replacementId'] and restored['sourceId']==ORIGINAL_IDS['fuseki'] and
+            restored['volume']==registry['volumes']['fuseki']==ALT_PROJECT+'_'+platform.VOLUMES['fuseki'] and
+            restored['status']=='REPLACEMENT_COLD_BYTES_VERIFIED','TDB_CHECKPOINT_OWNER')
+    current=json.loads(engine_step('tdb-stopped-state','inspect','-f','{{json .State}}',cid))
+    require(current['Status']=='exited' and not current['Error'] and not current['OOMKilled'],'TDB_REUSE_EXIT')
+    after={key:current[key] for key in ('Status','ExitCode','OOMKilled','FinishedAt')}
+    records=[json.loads(ex.ordinary(path).read_bytes()) for path in RECOVERY_AREA.glob('stop-*.json')]
+    matches=[r for r in records if r.get('id')==cid and r.get('group')=='replacement' and r.get('after')==after]
+    require(len(matches)==1,'TDB_REUSE_STOP_GENERATION')
+    fuseki_termination(matches[0])
+    frozen=components.frozen('graphs-second-open.json')
+    return dict(archiveSha256=prior['archive'],volume=restored['volume'],finishedAt=after['FinishedAt'],
+                cleanShutdown='UNKNOWN',checkpointRecovery=prior['fuseki'],scan=frozen['scan'],graphs=frozen['graphs'])
+
+
+def current_fuseki_graphs(cid,basis):
+    """业务入口开放前，在本次启动的准确副本重新核读默认图、全部命名图和发布图。"""
+    import doris_keep_fuseki as rdf
+    engine_step('tdb-read-ready','exec',cid,'curl','--noproxy','*','--silent','--fail','--retry','20',
+                '--retry-connrefused','--retry-delay','1','--retry-max-time','20','--max-time','2',
+                'http://127.0.0.1:3030/$/ping',timeout=25)
+    scan=rdf.full_scan(cid)
+    require(scan==basis['scan'],'TDB_CURRENT_SCAN')
+    current=[]
+    for expected in basis['graphs']:
+        triples=rdf.triples(cid,'ontology',expected['graph'])
+        current.append(dict(graph=expected['graph'],triples=len(triples),sha256=rdf.fingerprint(triples)))
+    require(current==basis['graphs'],'TDB_CURRENT_RELEASE_GRAPHS')
+    return dict(status='CURRENT_GRAPHS_VERIFIED',scan=scan,graphs=current)
+
+
 def native_stop(group,role,roles,operation):
     """先核阶段实际配额，用原生停机/有界 TERM；后验不确定即停止序列。"""
     import subprocess
     from workflow_oracle_mapping_resources import before_source
     require(group in ('original','replacement') and role in ORIGINAL_IDS,'OWNED_GROUP_ROLE')
     phase='preserve' if group=='original' else 'restore'
+    product=platform.product_run() if role=='fuseki' else ''
+    if product:
+        require(group=='replacement','TDB_PRODUCT_GROUP')
+        phase=product
+    if role=='fuseki':require(role in roles,'TDB_LIVE_OWNER')
     check=before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=roles)
     cid=ORIGINAL_IDS[role] if group=='original' else (ALT_ORACLE if role=='oracle' else json.loads((RECOVERY_AREA/'replacement-resources.json').read_bytes())['ids'][role])
     step=uuid.uuid4().hex
@@ -475,15 +542,20 @@ def native_stop(group,role,roles,operation):
         elif role=='platform-pg':
             engine_step('pg-fast','exec','--user','postgres',cid,'sh','-ec','test "$(id -u)" = 999 && pg_ctl status -D "$PGDATA" >/dev/null && exec pg_ctl stop -D "$PGDATA" -m fast -W')
         elif role=='fuseki':
+            row.update(cleanShutdown='UNKNOWN',checkpointRecovery='NOT_VERIFIED',productUse='NOT_VERIFIED')
             row['tdbLocksBefore']=engine_step('tdb-active-locks','exec',cid,'sh','-ec','cd /fuseki; find databases/ontology -name tdb.lock -type f -print | sort').splitlines()
-            require(len(row['tdbLocksBefore'])>=1 and all(re.fullmatch(r'databases/ontology/(?:Data-[0-9]+/)?tdb.lock',n) for n in row['tdbLocksBefore']), 'TDB_LOCK_BASIS')
+            require(all(re.fullmatch(r'databases/ontology/(?:Data-[0-9]+/)?tdb.lock',n) for n in row['tdbLocksBefore']), 'TDB_LOCK_BASIS')
         if role=='platform-pg':
             engine_step('pg-wait','wait',cid,timeout=45)
         elif engine_step('native-state','inspect','-f','{{.State.Status}}',cid)=='running':
             engine_step('term','stop','--signal=TERM','--timeout=-1',cid,timeout=45)
+            if role=='fuseki':row['termSent']=True
+        elif role=='fuseki':
+            require(False,'TDB_EXIT_BEFORE_TERM')
         state=json.loads(engine_step('stopped-state','inspect','-f','{{json .State}}',cid))
         row['after']={k:state[k] for k in ('Status','ExitCode','OOMKilled','FinishedAt')}
         require(state['Status']=='exited' and not state['OOMKilled'] and not state['Error'] and state['ExitCode'] in (0,143),'NATIVE_EXIT')
+        if role=='fuseki':row['processExited']=True
         logs=subprocess.run(['docker','--context','desktop-linux','logs','--since',started,cid],capture_output=True,timeout=8)
         raw=logs.stdout+logs.stderr
         marker=bool(re.search(rb'shut(?:ting)?[ -]?down|\bstopped\b|terminat(?:ing|ion)',raw,re.I))
@@ -504,10 +576,12 @@ def native_stop(group,role,roles,operation):
                                  'cd /source; test -d databases/ontology; find databases/ontology -type f \\( -name tdb.lock -o -name journal.jrnl \\) -printf "%P|%s\\n" | sort')
                 row['tdbCloseFiles']=files.splitlines()
                 row['allTdbLocksRemoved']=not any(line.split('|')[0].endswith('tdb.lock') for line in files.splitlines())
-                require(row['allTdbLocksRemoved'] and any(re.fullmatch(r'Data-[0-9]+/journal.jrnl\|0',l) for l in files.splitlines()),'TDB_CLOSE_UNCONFIRMED')
+                require(not re.search(rb"can't expel: active transactions|transactionexception|failed to (?:unlock|close)|recovery failed",raw,re.I),
+                        'TDB_TRANSACTION_OR_CLOSE_ERROR')
+                row['observedJournals']=fuseki_journals(row['tdbCloseFiles'])
         else:
             require(state['ExitCode']==0 or marker or row.get('nativeShutdown'),'NATIVE_CLOSE_UNCONFIRMED')
-        row['status']='CLEAN_STOP'
+        row['status']='PROCESS_EXITED' if role=='fuseki' else 'CLEAN_STOP'
     except Exception as exc:
         row['status']='BLOCKED'
         row['reason']=str(exc) if str(exc).startswith('ORACLE_ADMISSION_') else type(exc).__name__
@@ -523,17 +597,25 @@ def start_owned(group,role,running):
     import time
     require(group in ('original','replacement') and role in ORIGINAL_IDS,'OWNED_GROUP_ROLE')
     phase='preserve' if group=='original' else 'restore'
+    product=platform.product_run() if role=='fuseki' else ''
+    if product:
+        require(group=='replacement','TDB_PRODUCT_GROUP')
+        phase=product
     current=set(running);after=current|{role}
     require(role not in current and role in ORIGINAL_IDS,'START_ROLE')
     pre=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=current,planned_roles=after)
+    basis=None
     if group=='original':
         cid=ORIGINAL_IDS[role]
         clean=[json.loads(p.read_bytes()) for p in RECOVERY_AREA.glob('stop-*.json')]
         require(any(row['id']==cid and row['status']=='CLEAN_STOP' for row in clean),'ORIGINAL_CLEAN_STATE_'+role)
     else:
-        cid=ALT_ORACLE if role=='oracle' else json.loads((RECOVERY_AREA/'replacement-resources.json').read_bytes())['ids'][role]
+        registry=json.loads((RECOVERY_AREA/'replacement-resources.json').read_bytes()) if role!='oracle' else {}
+        cid=ALT_ORACLE if role=='oracle' else registry['ids'][role]
+        if product:basis=fuseki_reuse_basis(cid,registry)
     nonce=uuid.uuid4().hex
     receipt=dict(attempt=nonce,stage=phase,role=role,id=cid,resourceAttempt=pre['attempt'],status='STARTING')
+    if basis:receipt.update(checkpoint=basis,productUse='NOT_VERIFIED')
     out=RECOVERY_AREA/('start-'+nonce+'.json')
     platform.save(out,receipt)
     try:
@@ -548,6 +630,14 @@ def start_owned(group,role,running):
             require(state=='running|healthy','HEALTH_TIMEOUT')
         post=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=after)
         receipt.update(status='RUNNING',post=post['attempt'])
+        if basis:
+            receipt['currentGraphs']=current_fuseki_graphs(cid,basis)
+            receipt['productUse']='CURRENT_GRAPHS_VERIFIED'
+    except Exception as exc:
+        if basis:
+            receipt['productUse']='BLOCKED'
+            receipt['reason']=str(exc) if str(exc).startswith('ORACLE_ADMISSION_') else type(exc).__name__
+        raise
     finally:
         platform.save(out,receipt,True)
     return receipt
@@ -668,8 +758,9 @@ def cold_archive(role):
     origin=ORIGINAL_IDS[role]
     stops=sorted((json.loads(p.read_bytes()) for p in RECOVERY_AREA.glob('stop-*.json')),key=lambda x:x['endedUtc'])
     last=[r for r in stops if r['id']==origin][-1]
-    fuse_pending=role=='fuseki' and last.get('reason')=='ORACLE_ADMISSION_TDB_CLOSE_UNCONFIRMED'
-    require(last['status']=='CLEAN_STOP' or fuse_pending,'COLD_TERMINATION')
+    fuse_pending=role=='fuseki'
+    if fuse_pending:fuseki_termination(last)
+    else:require(last['status']=='CLEAN_STOP','COLD_TERMINATION')
     group='source' if role=='oracle' else 'platform'
     private=platform.HOME_DIR/RECOVERY
     directory=private/group;directory.mkdir(mode=0o700,exist_ok=True)

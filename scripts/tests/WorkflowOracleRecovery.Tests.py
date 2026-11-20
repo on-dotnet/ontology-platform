@@ -97,6 +97,110 @@ class OracleDiskAdmissionTests(unittest.TestCase):
             self.budget()
 
 
+class FusekiLifecycleTests(unittest.TestCase):
+    def setUp(self):
+        temporary=tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.area=Path(temporary.name).resolve()
+        self.change(patch.object(recovery,'RECOVERY_AREA',self.area))
+        registry=components.frozen('replacement-resources.json')
+        (self.area/'replacement-resources.json').write_text(json.dumps(registry))
+        self.cid=registry['ids']['fuseki']
+        self.old=components.frozen('stop-b0da0df44bd6482eb366d29140d3f227.json')
+        self.state={**self.old['after'],'Error':''}
+        self.files=self.old['tdbCloseFiles']
+        self.log=b''
+        self.change(patch.object(platform,'product_run',return_value='product-resume-01'))
+        self.eng=self.change(patch.object(recovery,'engine_step',side_effect=self.engine))
+        self.change(patch.object(recovery,'one_helper',side_effect=lambda *a,**kw:'\n'.join(self.files)))
+        self.change(patch('workflow_oracle_mapping_resources.before_source',return_value={'attempt':'before'}))
+        self.change(patch.object(platform,'before_source',return_value={'attempt':'post'}))
+
+    def change(self,patcher):
+        self.addCleanup(patcher.stop)
+        return patcher.start()
+
+    def engine(self,stage,*args,**options):
+        if stage=='tdb-active-locks':return '\n'.join(self.old['tdbLocksBefore'])
+        if stage in ('stopped-state','tdb-stopped-state'):return json.dumps(self.state)
+        if stage=='native-state':return 'running'
+        if stage in ('term','start-fuseki','tdb-read-ready'):return ''
+        self.fail(stage)
+
+    def stop(self):
+        from subprocess import CompletedProcess
+        with patch('subprocess.run',return_value=CompletedProcess([],0,self.log,b'')):
+            return recovery.native_stop('replacement','fuseki',{'fuseki'},'entry-fix-regression')
+
+    def test_term_and_retained_locks_do_not_claim_clean_or_recovery(self):
+        self.assertEqual(self.old['status'],'BLOCKED')
+        row=self.stop()
+        self.assertEqual((row['status'],row['allTdbLocksRemoved'],row['processExited']),
+                         ('PROCESS_EXITED',False,True))
+        self.assertEqual((row['cleanShutdown'],row['checkpointRecovery'],row['productUse']),
+                         ('UNKNOWN','NOT_VERIFIED','NOT_VERIFIED'))
+        self.assertEqual(recovery.fuseki_termination(self.old),row['observedJournals'])
+        self.assertIn(('term','stop','--signal=TERM','--timeout=-1',self.cid),
+                      [call.args for call in self.eng.call_args_list])
+        self.files=['Data-0001/journal.jrnl|0']
+        self.assertEqual(self.stop()['cleanShutdown'],'UNKNOWN')
+
+    def test_nonempty_journal_activity_log_or_bad_exit_still_block(self):
+        self.files+=['Data-0002/journal.jrnl|5']
+        with self.assertRaisesRegex(ValueError,'TDB_JOURNAL_UNCONFIRMED'):self.stop()
+        self.files=['tdb.lock|2']
+        with self.assertRaisesRegex(ValueError,'TDB_JOURNAL_UNCONFIRMED'):self.stop()
+        self.files=['Data-0001/journal.jrnl|0']
+        self.log=b"TransactionException: Can't expel: Active transactions for location"
+        with self.assertRaisesRegex(ValueError,'TDB_TRANSACTION_OR_CLOSE_ERROR'):self.stop()
+        self.log=b'fatal exception'
+        with self.assertRaisesRegex(ValueError,'NATIVE_LOG_ERROR'):self.stop()
+        self.log=b''
+        for key,value in (('ExitCode',137),('OOMKilled',True),('Error','engine error')):
+            with self.subTest(key=key),patch.dict(self.state,{key:value}):
+                with self.assertRaisesRegex(ValueError,'NATIVE_EXIT'):self.stop()
+
+    def test_actual_product_start_requires_exact_termination_and_checkpoint(self):
+        with self.assertRaisesRegex(ValueError,'TDB_REUSE_STOP_GENERATION'):
+            recovery.start_owned('replacement','fuseki',set())
+        (self.area/'stop-history.json').write_text(json.dumps(self.old))
+        with patch.dict(self.state,{'FinishedAt':'a different engine generation'}):
+            with self.assertRaisesRegex(ValueError,'TDB_REUSE_STOP_GENERATION'):
+                recovery.start_owned('replacement','fuseki',set())
+        registry=self.area/'replacement-resources.json'
+        row=json.loads(registry.read_bytes())
+        row['volumes']['fuseki']+='-other'
+        registry.write_text(json.dumps(row))
+        with self.assertRaisesRegex(ValueError,'TDB_CHECKPOINT_OWNER'):
+            recovery.start_owned('replacement','fuseki',set())
+        with self.assertRaisesRegex(ValueError,'TDB_PRODUCT_GROUP'):
+            recovery.start_owned('original','fuseki',set())
+        self.assertNotIn('start-fuseki',[c.args[0] for c in self.eng.call_args_list])
+
+    def test_current_graph_read_separates_frozen_and_live_qualification(self):
+        import doris_keep_fuseki as rdf
+        (self.area/'stop-history.json').write_text(json.dumps(self.old))
+        frozen=components.frozen('graphs-second-open.json')
+        with patch.object(rdf,'full_scan',return_value={}) as scan:
+            with self.assertRaisesRegex(ValueError,'TDB_CURRENT_SCAN'):
+                recovery.start_owned('replacement','fuseki',set())
+            scan.assert_called_once_with(self.cid)
+        receipt=json.loads(next(self.area.glob('start-*.json')).read_bytes())
+        self.assertEqual((receipt['status'],receipt['productUse']),('RUNNING','BLOCKED'))
+        self.assertEqual(receipt['checkpoint']['cleanShutdown'],'UNKNOWN')
+        with patch.object(rdf,'full_scan',return_value=frozen['scan']),patch.object(rdf,'triples',return_value=set()):
+            with self.assertRaisesRegex(ValueError,'TDB_CURRENT_RELEASE_GRAPHS'):
+                recovery.start_owned('replacement','fuseki',set())
+        sets=[set(map(str,range(g['triples']))) for g in frozen['graphs']]
+        with patch.object(rdf,'full_scan',return_value=frozen['scan']),patch.object(rdf,'triples',side_effect=sets) as reads, \
+             patch.object(rdf,'fingerprint',side_effect=[g['sha256'] for g in frozen['graphs']]):
+            ready=recovery.start_owned('replacement','fuseki',set())
+        self.assertEqual([c.args for c in reads.call_args_list],[(self.cid,'ontology',g['graph']) for g in frozen['graphs']])
+        self.assertEqual(ready['currentGraphs']['graphs'],frozen['graphs'])
+        self.assertEqual(ready['productUse'],'CURRENT_GRAPHS_VERIFIED')
+        self.assertEqual(ready['checkpoint']['checkpointRecovery'],'ACCEPTED_FOR_FROZEN_CHECKPOINT')
+
+
 class RecoveryComponentTests(unittest.TestCase):
     def test_object_version_and_delete_marker_protocol(self):
         controls=objects.offline_cases()
