@@ -121,6 +121,8 @@ class FusekiLifecycleTests(unittest.TestCase):
         return patcher.start()
 
     def engine(self,stage,*args,**options):
+        if stage in ('tdb-generation','tdb-generation-after'):
+            return 'running|2026-11-20T08:00:00Z|'+str(self.pid)
         if stage=='tdb-active-locks':return '\n'.join(self.old['tdbLocksBefore'])
         if stage in ('stopped-state','tdb-stopped-state'):return json.dumps(self.state)
         if stage=='native-state':return 'running'
@@ -179,6 +181,7 @@ class FusekiLifecycleTests(unittest.TestCase):
 
     def test_current_graph_read_separates_frozen_and_live_qualification(self):
         import doris_keep_fuseki as rdf
+        self.pid=100
         (self.area/'stop-history.json').write_text(json.dumps(self.old))
         frozen=components.frozen('graphs-second-open.json')
         with patch.object(rdf,'full_scan',return_value={}) as scan:
@@ -187,17 +190,23 @@ class FusekiLifecycleTests(unittest.TestCase):
             scan.assert_called_once_with(self.cid)
         receipt=json.loads(next(self.area.glob('start-*.json')).read_bytes())
         self.assertEqual((receipt['status'],receipt['productUse']),('RUNNING','BLOCKED'))
+        with self.assertRaisesRegex(ValueError,'TDB_PRODUCT_CURRENT_GRAPHS'):
+            recovery.require_current_fuseki(self.cid,receipt['startedAt'],self.pid)
         self.assertEqual(receipt['checkpoint']['cleanShutdown'],'UNKNOWN')
         with patch.object(rdf,'full_scan',return_value=frozen['scan']),patch.object(rdf,'triples',return_value=set()):
             with self.assertRaisesRegex(ValueError,'TDB_CURRENT_RELEASE_GRAPHS'):
                 recovery.start_owned('replacement','fuseki',set())
         sets=[set(map(str,range(g['triples']))) for g in frozen['graphs']]
+        self.pid+=1
         with patch.object(rdf,'full_scan',return_value=frozen['scan']),patch.object(rdf,'triples',side_effect=sets) as reads, \
              patch.object(rdf,'fingerprint',side_effect=[g['sha256'] for g in frozen['graphs']]):
             ready=recovery.start_owned('replacement','fuseki',set())
         self.assertEqual([c.args for c in reads.call_args_list],[(self.cid,'ontology',g['graph']) for g in frozen['graphs']])
         self.assertEqual(ready['currentGraphs']['graphs'],frozen['graphs'])
         self.assertEqual(ready['productUse'],'CURRENT_GRAPHS_VERIFIED')
+        self.assertEqual(recovery.require_current_fuseki(self.cid,ready['startedAt'],self.pid),ready['attempt'])
+        with self.assertRaisesRegex(ValueError,'TDB_PRODUCT_GENERATION'):
+            recovery.require_current_fuseki(self.cid,ready['startedAt'],self.pid+1)
         self.assertEqual(ready['checkpoint']['checkpointRecovery'],'ACCEPTED_FOR_FROZEN_CHECKPOINT')
 
 

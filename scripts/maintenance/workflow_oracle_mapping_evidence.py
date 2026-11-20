@@ -30,6 +30,8 @@ NATURAL_CANCEL = 's0-oracle-natural-cancel'
 ERRORS = {'healthy': None, 'expired': 'OMQ_READY_GRANT_EXPIRED', 'short': 'OMQ_READY_GRANT_TTL_SHORT',
           'catalog': 'OMQ_READY_CATALOG_STALE', 'activation': 'OMQ_READY_ACTIVATION_STALE'}
 BROWSER = {'provision', 'mapping', READY, 's0-oracle-natural', 's0-oracle-cancel', NATURAL_CANCEL, 's1', 's1-reopen', 's3', 'ui-s1', 'ui-s3'}
+if RUN==PRODUCT_RUN:
+    BROWSER.add('s0-oracle-auth')
 HEX = re.compile(r'[0-9a-f]{64}')
 COMMAND = re.compile(r'[0-9a-f]{32}')
 PUBLIC = Path('docs/evidence') / TASK / RUN
@@ -49,8 +51,11 @@ def summary(argv):
     return dict(executable=Path(argv[0]).name, argumentCount=len(argv)-1, sha256=digest_value(argv))
 
 
-def drivers(root, mode):
+def drivers(root, mode, run=RUN):
     names = DRIVERS
+    if run==PRODUCT_RUN:
+        names += ('scripts/maintenance/workflow_oracle_mapping_resume.py',
+                  'scripts/maintenance/workflow_oracle_mapping_platform_recovery.py','scripts/maintenance/workflow_m4_query_runtime.py')
     if mode in ('s0-oracle-natural', 's0-oracle-cancel', NATURAL_CANCEL):
         names += ('scripts/maintenance/workflow_oracle_mapping_formal_observer.py',)
     return {name: sha(ordinary(root/name).read_bytes()) for name in names}
@@ -680,12 +685,14 @@ if __name__=='__main__':
     cli.add_argument('--gate')
     cli.add_argument('--input-key')
     cli.add_argument('--case-command')
+    cli.add_argument('--expected-mode',choices=sorted(BROWSER))
     args=cli.parse_args()
     try:
         if args.case_command:
             require(not args.gate and not args.input_key,'OMQ_QUALIFICATION_ARGUMENTS')
-            result=reopen_runtime_case(ROOT,args.task,args.run_id,args.case_command)
+            result=reopen_runtime_case(ROOT,args.task,args.run_id,args.case_command,expected_mode=args.expected_mode)
         else:
+            require(not args.expected_mode,'OMQ_QUALIFICATION_ARGUMENTS')
             result=qualify(ROOT,args.task,args.run_id,args.gate,args.input_key)
         print(json.dumps(result))
     except (ValueError,KeyError,OSError,TypeError) as error:

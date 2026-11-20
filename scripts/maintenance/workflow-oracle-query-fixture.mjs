@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 
 /** 只有任务已冻结的主 API、副 API、OIDC 和 Web 可以被正式浏览器场景访问。 */
 export const ports = Object.freeze({ api: 15741, secondary: 15742, oidc: 15743, web: 15744 });
-export const modes = Object.freeze(["serve", "provision", "mapping", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s0-oracle-natural-cancel", "s1", "s1-reopen"]);
+export const modes = Object.freeze(["serve", "provision", "mapping", "s0-oracle-auth", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s0-oracle-natural-cancel", "s1", "s1-reopen"]);
 export const config = Object.freeze({ type: "ORACLE", profile: { host: "oracle-source", port: 2484, serviceName: "FREEPDB1",
   username: "FIXTURE_READER", allowedOwners: ["PRODUCTION", "CaseOwner"], tls: true } });
 const task = "G4-ORACLE-MAPPING-QUERY-001";
@@ -20,6 +20,31 @@ export function originalSubject(label) {
   if (!Object.hasOwn(subjects, label)) throw new Error("ORACLE_OIDC_SUBJECT");
   return subjects[label];
 }
+function loginFailure(code) {
+  return Object.assign(new Error(code), { safeCode: code });
+}
+
+export function currentProjection(label, me) {
+  const role = label === "auditor-ab" ? "platform.auditor" : label === "viewer-a" ? "platform.viewer" : "platform.operator";
+  const sites = label.endsWith("-ab") ? ["site-a", "site-b"] : ["site-a"];
+  return me?.subjectId === originalSubject(label) && me.roles?.length === 1 && me.roles[0] === role
+    && Array.isArray(me.scopes) && me.scopes.length === sites.length
+    && sites.every(site => me.scopes.some(s => s.organizationId === "org-demo" && s.siteId === site));
+}
+
+// 只返回固定分类。浏览器中的授权码、认证表单和页面正文均不离开页面。
+export function loginOutcome({ issuer, api, realm }) {
+  if (location.origin === api && location.pathname === "/api/v1/platform/me") return "CALLBACK";
+  if (location.origin === issuer && location.pathname.startsWith(realm + "/")) {
+    const feedback = document.querySelector("#input-error, #kc-feedback-text, .alert-error, [role=alert]");
+    if (/invalid username or password|invalid user credentials|用户名或密码(错误|无效)|无效的用户名或密码/i.test(feedback?.textContent ?? ""))
+      return "ORACLE_LOGIN_CREDENTIALS_REJECTED";
+    if (document.querySelector("#kc-error-message")) return "ORACLE_LOGIN_CALLBACK_ERROR";
+    return false;
+  }
+  if (location.origin === api && location.pathname === "/signin-oidc" && !new URLSearchParams(location.search).has("error")) return false;
+  return "ORACLE_LOGIN_CALLBACK_ERROR";
+}
 /** 替代卷上走正式 OIDC 表单。只传入公开用户名，密码由本机系统或操作者提交。 */
 export async function completeCurrentLogin(page, label) {
   originalSubject(label);
@@ -28,7 +53,7 @@ export async function completeCurrentLogin(page, label) {
   const deadline = Date.now() + 40000;
   if (!callback(address)) {
     if (address.origin !== "http://localhost:" + ports.oidc || !address.pathname.startsWith("/realms/g2-180e1435711f03fa/"))
-      throw new Error("ORACLE_RESTORED_REALM");
+      throw loginFailure("ORACLE_RESTORED_REALM");
     const username = "g2-" + label;
     await page.locator("#username").fill(username);
     await page.bringToFront();
@@ -54,7 +79,18 @@ export async function completeCurrentLogin(page, label) {
       }, { username, origin: address.origin }, { timeout: Math.max(1, deadline - Date.now()) });
     }
   }
-  await page.waitForURL(callback, { timeout: Math.max(1, deadline - Date.now()) });
+  // 跨导航观察同一正常认证；明确拒绝即结束，未填写只消耗本次短窗口。
+  try {
+    const result = await page.waitForFunction(loginOutcome, { issuer: "http://localhost:" + ports.oidc,
+      api: "http://localhost:" + ports.api, realm: "/realms/g2-180e1435711f03fa" },
+      { polling: 100, timeout: Math.max(1, deadline - Date.now()) });
+    const outcome = await result.jsonValue();
+    if (outcome !== "CALLBACK") throw loginFailure(outcome);
+  } catch (error) {
+    if (error.name !== "TimeoutError") throw error;
+    throw loginFailure(new URL(page.url()).origin === "http://localhost:" + ports.oidc
+      ? "ORACLE_LOGIN_WAITING_FOR_INPUT" : "ORACLE_LOGIN_CALLBACK_ERROR");
+  }
 }
 
 const columns = ["ROW_ID", "JOIN_KEY", "VAL", "ORG_ID", "SITE_ID", "EXT_ID", "LABEL", "FROM_TS", "TO_TS", "EVENT_TS", "OBSERVED_TS"];
@@ -82,6 +118,16 @@ function platform(root, call, input) {
   const code = 'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_oracle_mapping_platform as q;print(json.dumps(' + call + '))';
   return JSON.parse(execFileSync("python3", ["-B", "-c", code], { cwd: root, input: JSON.stringify(input),
     encoding: "utf8", timeout: 30000, stdio: ["pipe","pipe","pipe"] }));
+}
+
+/** 纯认证入口只把已有 Cookie 经私有 stdin 传给正式四票据消费者。 */
+export function authSessions(root, actors) {
+  const input = actors.map(actor => ({ subjectId: actor.me.subjectId, cookie: actor.sessionCookie }));
+  try { return platform(root, "q.session_preflight(json.load(sys.stdin),210)", input); }
+  catch (error) {
+    const allowed = /OMQ_SESSION_(SUBJECT_MISMATCH|TTL_INSUFFICIENT|REVOKED|TICKET_UNAVAILABLE)\b/.exec(String(error.stderr));
+    throw loginFailure(allowed?.[0] ?? "ORACLE_LOGIN_SESSION_PROBE_FAILED");
+  }
 }
 
 /** 沿既有 grant_transaction 真实签发并回读；过期原件不能靠同一 ID 覆盖。 */

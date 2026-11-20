@@ -22,7 +22,7 @@ class OracleQualificationTests(unittest.TestCase):
         self.root = Path(self.tmp.name).resolve()
         self.files = {}
         self.archive = oracle.Originals(self.root,'s0',self.files)
-        for name in oracle.DRIVERS:
+        for name in oracle.drivers(ROOT,oracle.READY,oracle.PRODUCT_RUN):
             path = self.root/name
             path.parent.mkdir(parents=True,exist_ok=True)
             path.write_bytes(('fixture:'+name).encode())
@@ -231,7 +231,7 @@ class OracleQualificationTests(unittest.TestCase):
         path=area/('formal-run-'+oracle.READY+'-'+cid+'.json')
         path.write_bytes(oracle.encoded(dispatch))
         args=[oracle.NODE,oracle.DRIVER,'--task',oracle.TASK,'--run-id',run,'--mode',oracle.READY]
-        key=oracle.digest_value(dict(taskId=oracle.TASK,runId=run,mode=oracle.READY,case='expired',drivers=oracle.drivers(root,oracle.READY),
+        key=oracle.digest_value(dict(taskId=oracle.TASK,runId=run,mode=oracle.READY,case='expired',drivers=oracle.drivers(root,oracle.READY,run),
                                      api=builds['api'],tests=builds['agent'],host={k:v for k,v in host.items() if k!='commandId'},stageInputs=stage))
         # 收据原件和登记一起变化后先经无损 restore，再让真正 CLI 消费这些字节。
         receipt=dict(schemaVersion=2,taskId=oracle.TASK,runId=run,commandId=cid,parentId=host['commandId'],stage='omq-browser-'+oracle.READY,

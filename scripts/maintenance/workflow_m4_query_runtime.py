@@ -1,5 +1,6 @@
 """M4只读运行快照：完整产物清单与来源构建绑定，不共享测试可变bin/obj。"""
 import json
+import os
 import shutil
 import platform
 from pathlib import Path
@@ -27,12 +28,37 @@ def freeze(root, source, destination, inputs, command_id, environment=None, *, t
     if scoped: identity_values.update(taskId=task, resourceRun=run_id)
     identity = sha(encoded(identity_values))
     target = destination/identity
+    resume = (task,run_id)==('G4-ORACLE-MAPPING-QUERY-001','product-resume-01')
+    if resume and (destination/(identity+'.json')).is_file():
+        prior=json.loads((destination/(identity+'.json')).read_bytes())
+        verify(root,prior,task=task,run_id=run_id)
+        if prior['snapshotId']!=identity or any(prior[k]!=v for k,v in identity_values.items()):
+            raise ValueError('QUERY_SNAPSHOT_BUILD_DRIFT')
+        return prior
     if target.exists(): raise ValueError('QUERY_SNAPSHOT_EXISTS')
     target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(source, target, symlinks=False)
+    copy=shutil.copy2
+    if resume:
+        # 只在同轮同一输入的冻结输出之间共享只读相同文件。可写 bin/obj 始终独立。
+        frozen={}
+        for path in sorted(destination.glob('*.json')):
+            prior=json.loads(path.read_bytes())
+            if prior['inputs']['inputKey']!=inputs['inputKey']:continue
+            verify(root,prior,task=task,run_id=run_id)
+            for name,digest in prior['files'].items():
+                candidate=root/prior['directory']/name
+                if candidate.stat().st_mode & 0o222==0:
+                    frozen[name,digest]=candidate
+        def copy(src,dst):
+            name=str(Path(src).relative_to(source))
+            peer=frozen.get((name,before[name]))
+            if peer is None:return shutil.copy2(src,dst)
+            os.link(peer,dst)
+            return dst
+    shutil.copytree(source, target, symlinks=False,copy_function=copy)
     if before != files(source) or before != files(target): raise ValueError('QUERY_SNAPSHOT_BUILD_DRIFT')
     for path in target.rglob('*'):
-        if path.is_file(): path.chmod(0o444)
+        if path.is_file() and path.stat().st_mode & 0o777!=0o444: path.chmod(0o444)
     row = dict(schemaVersion=2 if scoped else 1, taskId=task, resourceRun=run_id, snapshotId=identity,
                directory=str(target.relative_to(root)), files=before, inputs=inputs, commandId=command_id, environment=environment)
     with (destination/(identity+'.json')).open('x') as stream: json.dump(row, stream, indent=2); stream.write('\n')

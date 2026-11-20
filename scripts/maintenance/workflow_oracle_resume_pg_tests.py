@@ -26,6 +26,7 @@ SOURCE = Path(__file__).with_suffix('.cs.txt')
 MIB = 1024**2
 DOCKER = ['docker', '--context', 'desktop-linux']
 CASES = [('G4OracleSettlementTests.OriginalCutoffIsCheckedAfterPostgresRowLock', 3),
+         ('G4QueryRaceTests.HealthyReaderThenPostgresRace', 3),
          ('G4QueryRaceTests.OracleTerminalOwnerSurvivesSweepAndRejectsStaleConfirmation', 1),
          ('G4QueryRaceTests.RevocationBlocksAtomicResultAndAudit', 1)]
 

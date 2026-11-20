@@ -125,7 +125,14 @@ def bound_build(target):
 
 
 def prepare():
-    require(not REGISTRY.exists(),'PRODUCT_ALREADY_PREPARED')
+    previous=manifest() if REGISTRY.exists() else None
+    require(not previous or not set(APIS).intersection(previous['ids']),'PRODUCT_BIND_BEFORE_CREATE')
+    input_path=AREA/'formal-api-inputs.json'
+    compose_path=AREA/'formal-api-compose.json'
+    previous_inputs=load(input_path) if previous else {}
+    if previous:
+        require(previous_inputs['snapshotId']==previous['snapshotId'] and
+                previous_inputs['composeSha256']==ex.sha(compose_path.read_bytes()),'PRODUCT_PREVIOUS_BINDING')
     admission=admit(APIS)
     ids,nets=data()
     old=load(BASE/'formal-api-inputs.json')
@@ -139,10 +146,16 @@ def prepare():
         binding,row=bound_build(target)
         output=ROOT/Path(platform.build.TARGETS[target]).parent/'bin/Debug/net10.0'
         peak=sum(p.stat().st_blocks*512 for p in output.rglob('*') if p.is_file())
-        require(peak*2 < admission['platformDisk']['allocations']['newBuildEvidenceAndLogs'] and
-                peak*2+admission['platformDisk']['totalBytes'] < admission['platformDisk']['ceilingBytes'],'PRODUCT_SNAPSHOT_BUDGET')
-        snap=platform.snapshots.freeze(ROOT,output,AREA/'runtime-snapshots',binding,row['commandId'],
-              {'toolEnvironment':row['environmentFingerprint']},task=TASK,run_id=PRODUCT)
+        key='snapshotId' if target=='api' else 'querySnapshotId'
+        snap=load(AREA/'runtime-snapshots'/(previous_inputs[key]+'.json')) if key in previous_inputs else None
+        if snap and snap['inputs']==binding and snap['commandId']==row['commandId']:
+            platform.snapshots.verify(ROOT,snap,task=TASK,run_id=PRODUCT)
+        else:
+            # 刷新每个快照前按实际工作树重计，保留旧快照及其绑定。
+            budget=admit(APIS)['platformDisk'] if previous else admission['platformDisk']
+            require(peak+budget['totalBytes']<=budget['ceilingBytes'],'PRODUCT_SNAPSHOT_BUDGET')
+            snap=platform.snapshots.freeze(ROOT,output,AREA/'runtime-snapshots',binding,row['commandId'],
+                  {'toolEnvironment':row['environmentFingerprint']},task=TASK,run_id=PRODUCT)
         builds[target]=(binding,row,snap)
     binding,row,snap=builds['api']
     spec['name']=PROJECT
@@ -156,16 +169,33 @@ def prepare():
         require(all(path.is_dir() and not path.is_symlink() for path in targets.values()),'PRODUCT_BIND_MATERIAL')
         if role=='api-secondary':targets['/query-tests']=ROOT/builds['query'][2]['directory']
         service['volumes']=[str(path)+':'+target+':ro' for target,path in targets.items()]
-    platform.save(AREA/'formal-api-compose.json',spec)
+    if previous:
+        for path in (input_path,compose_path):
+            data_bytes=path.read_bytes()
+            backup=path.with_name(path.stem+'-'+ex.sha(data_bytes)+'.json')
+            if backup.exists():
+                require(backup.read_bytes()==data_bytes,'PRODUCT_BINDING_ARCHIVE')
+            else:
+                with backup.open('xb') as stream:
+                    stream.write(data_bytes)
+        if previous_inputs.get('sessionSnapshotId'):
+            session=load(AREA/'runtime-snapshots'/(previous_inputs['sessionSnapshotId']+'.json'))
+            if session['inputs']==platform.build.validate('agent',TASK):
+                platform.snapshots.verify(ROOT,session,task=TASK,run_id=PRODUCT)
+                spec['services']['api-secondary']['volumes'].append(str(ROOT/session['directory'])+':/session-tests:ro')
+    platform.save(compose_path,spec,replace=bool(previous))
     inp={**old,'runId':PRODUCT,'build':binding,'snapshotId':snap['snapshotId'],'buildCommandId':row['commandId'],
          'composeSha256':ex.sha((AREA/'formal-api-compose.json').read_bytes()),'querySnapshotId':builds['query'][2]['snapshotId']}
-    platform.save(AREA/'formal-api-inputs.json',inp)
+    if previous_inputs.get('sessionSnapshotId') and any(v.endswith(':/session-tests:ro') for v in spec['services']['api-secondary']['volumes']):
+        inp['sessionSnapshotId']=previous_inputs['sessionSnapshotId']
+    platform.save(input_path,inp,replace=bool(previous))
     registration=dict(taskId=TASK,runId=PRODUCT,project=PROJECT,ids=ids,networks=nets,snapshotId=snap['snapshotId'],
                       apiBuildId=row['commandId'],buildOutputKey=binding['outputKey'],admission=admission['attempt'])
     save_manifest(registration)
-    state=load(BASE/'runtime-fixture.json')
-    require((state['taskId'],state['runId'])==(TASK,RUN),'PRODUCT_RUNTIME_FIXTURE')
-    platform.save(AREA/'runtime-fixture.json',{**state,'runId':PRODUCT})
+    if not previous:
+        state=load(BASE/'runtime-fixture.json')
+        require((state['taskId'],state['runId'])==(TASK,RUN),'PRODUCT_RUNTIME_FIXTURE')
+        platform.save(AREA/'runtime-fixture.json',{**state,'runId':PRODUCT})
     return registration
 
 
@@ -206,6 +236,7 @@ def host_binding():
             require(image==platform.SOURCE.split('@')[1],'PRODUCT_HOST_SOURCE_IMAGE')
             continue
         require(image==platform.IMAGES[role],'PRODUCT_HOST_IMAGE')
+        if role=='fuseki':recovery.require_current_fuseki(cid,started,int(pid))
         if role in APIS:platform.snapshots.demand_mount(ROOT,snap,json.loads(mounts),task=TASK,run_id=PRODUCT)
         services[role]=dict(containerId=cid,imageId=image,pid=int(pid),startedAt=started,mountSha256=ex.sha(ex.encoded(json.loads(mounts))),networks=networks)
     require(inp['composeSha256']==ex.sha((AREA/'formal-api-compose.json').read_bytes()) and inp['relaySha256']==ex.sha((BASE/'formal-relay/OracleRelay.dll').read_bytes()),'PRODUCT_INPUT_DRIFT')

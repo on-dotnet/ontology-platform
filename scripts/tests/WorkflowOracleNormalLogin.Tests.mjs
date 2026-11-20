@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 process.env.OMQ_PRODUCT_RUN ??= "product-resume-01";
-const { completeCurrentLogin, originalSubject, runId } = await import("../maintenance/workflow-oracle-query-fixture.mjs");
+const { completeCurrentLogin, currentProjection, loginOutcome, originalSubject, runId } = await import("../maintenance/workflow-oracle-query-fixture.mjs");
 
 const issuer = "http://localhost:15743/realms/g2-180e1435711f03fa";
 const login = issuer + "/protocol/openid-connect/auth";
@@ -63,15 +63,43 @@ function fixture(options = {}) {
         },
       };
     },
-    async waitForURL(matches, { timeout }) {
-      assert(matches(callback));
-      assert(!matches(new URL("http://localhost:15742/api/v1/platform/me")));
+    async waitForFunction(classify, origins, { timeout }) {
+      assert.equal(classify, loginOutcome);
+      assert.equal(origins.api, callback.origin);
       assert(timeout > 0 && timeout <= 40000);
       events.push("awaitCallback");
+      if (options.timeout) throw Object.assign(new Error(), { name: "TimeoutError" });
+      return { jsonValue: async () => options.outcome ?? "CALLBACK" };
     },
   };
   return { page, events };
 }
+
+test("formal login reports bounded failure and verifies role and organization/site pairs", async () => {
+  await assert.rejects(completeCurrentLogin(fixture({ timeout: true }).page, "viewer-a"), { safeCode: "ORACLE_LOGIN_WAITING_FOR_INPUT" });
+  for (const outcome of ["ORACLE_LOGIN_CREDENTIALS_REJECTED", "ORACLE_LOGIN_CALLBACK_ERROR"])
+    await assert.rejects(completeCurrentLogin(fixture({ outcome }).page, "viewer-a"), { safeCode: outcome });
+  const me = { subjectId: originalSubject("viewer-a"), roles: ["platform.viewer"], scopes: [{ organizationId: "org-demo", siteId: "site-a" }] };
+  assert(currentProjection("viewer-a", me));
+  assert(!currentProjection("operator-a", me));
+  assert(!currentProjection("viewer-a", { ...me, roles: ["platform.operator"] }));
+  assert(!currentProjection("viewer-a", { ...me, scopes: [{ organizationId: "other", siteId: "site-a" }] }));
+});
+
+test("the registered browser predicate distinguishes issuer errors and the exact callback", () => {
+  const origins = { issuer: new URL(issuer).origin, api: callback.origin, realm: new URL(issuer).pathname };
+  try {
+    globalThis.location = new URL(login);
+    globalThis.document = { querySelector: () => null };
+    assert.equal(loginOutcome(origins), false);
+    globalThis.document.querySelector = () => ({ textContent: "Invalid username or password." });
+    assert.equal(loginOutcome(origins), "ORACLE_LOGIN_CREDENTIALS_REJECTED");
+    globalThis.location = new URL("/signin-oidc?error=access_denied", callback);
+    assert.equal(loginOutcome(origins), "ORACLE_LOGIN_CALLBACK_ERROR");
+    globalThis.location = callback;
+    assert.equal(loginOutcome(origins), "CALLBACK");
+  } finally { delete globalThis.location; delete globalThis.document; }
+});
 
 test("approved public identity and realm", async () => {
   assert.equal(runId, "product-resume-01");

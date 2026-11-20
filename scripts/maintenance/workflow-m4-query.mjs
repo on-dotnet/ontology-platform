@@ -115,7 +115,11 @@ async function browserRun(mode) {
     await page.goto(origin + "/auth/login?returnUrl=%2Fapi%2Fv1%2Fplatform%2Fme");
     const callback = url => url.origin === origin && url.pathname === "/api/v1/platform/me";
     if (resumeLogin) {
-      await omq.completeCurrentLogin(page, label);
+      try { await omq.completeCurrentLogin(page, label); }
+      catch (error) {
+        if (!error.safeCode) error.safeCode = "ORACLE_LOGIN_CALLBACK_ERROR";
+        throw error;
+      }
     } else {
       const user = realm.identities["g2-" + label]; check("identity_exists_" + label, Boolean(user));
       await page.locator("#username").fill(user.username); await page.locator("#password").fill(user.password);
@@ -127,8 +131,21 @@ async function browserRun(mode) {
     secrets.push(cookie.value);
     const actor = { context, page, headers: { Origin: origin } };
     actor.headers["X-CSRF-TOKEN"] = (await get(actor, "/auth/csrf")).requestToken;
-    actor.me = await get(actor, "/api/v1/platform/me");
-    if (resumeLogin) check("oracle_current_original_subject_" + label, actor.me.subjectId === omq.originalSubject(label));
+    const me = await request(actor, "GET", "/api/v1/platform/me");
+    actor.me = me.data;
+    if (resumeLogin) {
+      check("oracle_current_original_subject_" + label, actor.me.subjectId === omq.originalSubject(label));
+      check("oracle_current_role_sites_" + label, omq.currentProjection(label, actor.me));
+      if (mode === "s0-oracle-auth") {
+        check("oracle_synthetic_profile_shape_" + label,
+          Object.keys(actor.me).sort().join() === "displayName,roles,scopes,subjectId"
+          && actor.me.displayName === "合成开发身份 " + label
+          && actor.me.scopes.every(s => Object.keys(s).sort().join() === "organizationId,siteId"));
+        report.authIdentities ??= [];
+        report.authIdentities.push({ label, subjectId: actor.me.subjectId, roles: actor.me.roles, scopes: actor.me.scopes,
+          meSha256: createHash("sha256").update(me.raw).digest("hex"), rawMe: me.raw });
+      }
+    }
     actor.sessionCookie = cookie.value;
     return actor;
   }
@@ -190,6 +207,15 @@ async function browserRun(mode) {
     const activator = doris || oracle ? await identity("operator-a") : operator;
     const reader = doris || oracle ? await identity("viewer-a") : operator;
     check("distinct_oidc_subjects", operator.me.subjectId !== auditor.me.subjectId);
+    if (resumeLogin && mode === "s0-oracle-auth") {
+      phase = "oracle_current_session_tickets";
+      report.session = omq.authSessions(root, [operator, auditor, activator, reader]);
+      check("oracle_four_current_tickets", report.session.observations.length === 4
+        && report.session.observations.every(row => Date.parse(row.ExpiresAtUtc) > Date.parse(row.requiredUntilUtc)));
+      report.scope = "ORACLE_FOUR_CURRENT_SESSIONS";
+      report.status = "PASS";
+      return;
+    }
     let state;
     try { state = JSON.parse(await readFile(resolve(output, stateName), "utf8")); }
     catch (error) {

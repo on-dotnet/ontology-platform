@@ -793,7 +793,8 @@ def audit_window(start_utc,end_utc,client_id=None):
 def browser_run(mode,case='healthy'):
     import uuid
     from workflow_oracle_mapping_evidence import browser_invocation
-    require(mode in ('provision','mapping','s0-oracle-ready','s0-oracle-natural','s0-oracle-cancel','s0-oracle-natural-cancel','s1','s1-reopen'),'FORMAL_MODE')
+    require(mode in ('provision','mapping','s0-oracle-ready','s0-oracle-natural','s0-oracle-cancel','s0-oracle-natural-cancel','s1','s1-reopen')
+            or (mode=='s0-oracle-auth' and product_run()),'FORMAL_MODE')
     run=product_run() or RUN
     area=AREA.parent/run
     resource=admission()
@@ -815,7 +816,8 @@ def browser_run(mode,case='healthy'):
         matches=[item for item in origins if item.get('mode')=='s1' and item.get('reports')==[original] and item.get('exitCode')==0]
         require(len(matches)==1,'S1_ORIGIN_AMBIGUOUS')
         stage['originCommandId']=matches[0]['commandId']
-    stage['fixtureBefore']=fixture_state()
+    if mode!='s0-oracle-auth':
+        stage['fixtureBefore']=fixture_state()
     host=runtime_binding();api=build.validate('api',TASK);tests=build.validate('agent',TASK)
     argv,key,label=browser_invocation(ROOT,mode,case,host,api,tests,stage)
     report_pattern='browser-'+mode+'-'+'[0-9]'*13+'.json'

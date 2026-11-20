@@ -514,6 +514,24 @@ def current_fuseki_graphs(cid,basis):
     return dict(status='CURRENT_GRAPHS_VERIFIED',scan=scan,graphs=current)
 
 
+def require_current_fuseki(cid,started,pid):
+    """每次正式宿主绑定都核同一进程代次的启动与当前全图库原件。"""
+    import workflow_oracle_mapping_recovery_components as components
+    matches=[]
+    for path in RECOVERY_AREA.glob('start-*.json'):
+        row=json.loads(ex.ordinary(path).read_bytes())
+        if (row.get('id'),row.get('startedAt'),row.get('pid'))==(cid,started,pid):
+            matches.append(row)
+    require(len(matches)==1,'TDB_PRODUCT_GENERATION')
+    row=matches[0]
+    frozen=components.frozen('graphs-second-open.json')
+    require(row['stage']=='product-resume-01' and row['role']=='fuseki' and row['status']=='RUNNING'
+            and row.get('productUse')=='CURRENT_GRAPHS_VERIFIED'
+            and row.get('currentGraphs')==dict(status='CURRENT_GRAPHS_VERIFIED',scan=frozen['scan'],graphs=frozen['graphs']),
+            'TDB_PRODUCT_CURRENT_GRAPHS')
+    return row['attempt']
+
+
 def native_stop(group,role,roles,operation):
     """先核阶段实际配额，用原生停机/有界 TERM；后验不确定即停止序列。"""
     import subprocess
@@ -631,7 +649,13 @@ def start_owned(group,role,running):
         post=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=after)
         receipt.update(status='RUNNING',post=post['attempt'])
         if basis:
+            fmt='{{.State.Status}}|{{.State.StartedAt}}|{{.State.Pid}}'
+            generation=engine_step('tdb-generation','inspect','-f',fmt,cid)
+            state,started,pid=generation.split('|')
+            require(state=='running' and int(pid)>0,'TDB_LIVE_OWNER')
+            receipt.update(startedAt=started,pid=int(pid))
             receipt['currentGraphs']=current_fuseki_graphs(cid,basis)
+            require(engine_step('tdb-generation-after','inspect','-f',fmt,cid)==generation,'TDB_PRODUCT_GENERATION')
             receipt['productUse']='CURRENT_GRAPHS_VERIFIED'
     except Exception as exc:
         if basis:
