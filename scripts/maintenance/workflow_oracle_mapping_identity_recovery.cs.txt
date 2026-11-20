@@ -1,0 +1,342 @@
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Sockets;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using Npgsql;
+using OntologyPlatform.Api;
+
+/// <summary>仅供冻结恢复副本正常认证。只输出新回调的公开身份投影。</summary>
+internal static class RecoveryIdentity
+{
+    internal const string Issuer = "http://localhost:15743/realms/g2-180e1435711f03fa";
+    internal const string Client = "g2-180e1435711f03fa-bff";
+    internal const string Kid = "YDFz4TE4iNk_YhJPHaKPFznjrVccyduoMhlSVekbC1c";
+    internal const string Material = "1a7699986838eab6b51f7700ed353bb8d711b13af7f8852939826e9958fb7f75";
+    internal const string Me = "/api/v1/platform/me";
+    internal static readonly string Attempt = Environment.GetEnvironmentVariable("OMQ_ATTEMPT") ?? "";
+    private static readonly long Started = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+    private static readonly JsonSerializerOptions Web = new(JsonSerializerDefaults.Web);
+    private static readonly ConcurrentDictionary<string, Signed> Tokens = new();
+    private static readonly ConcurrentDictionary<string, byte> Challenges = new();
+    private static readonly ConcurrentDictionary<string, byte> Completed = new();
+    private static readonly string[] Switches = { "G2:Enabled", "G4:Enabled", "G4:QueryEnabled", "G4:Mapping:Enabled", "G2:ApplyMigrations", "G4:ApplyMigrations", "Governance:ApplyMigrations", "Governance:SeedDevelopmentResources" };
+    private static readonly HashSet<string> Subjects = new(StringComparer.Ordinal) {
+        "5af20722-3900-4de9-b23a-7dcae3ca5927","650199ae-8bd4-430a-885d-71cd69b6781e",
+        "bcf7f7f8-6af0-4f94-a28c-1220461ee62e","f902a743-7079-4e22-a643-a51deb027e89"
+    };
+    private static JsonWebKey? signer;
+    private sealed record Projected(string Sub, string Account, string[] Roles, string Org, string[] Sites);
+    private sealed record Signed(Projected Principal, long Iat, long Exp);
+
+    internal static void Require(bool condition, string code)
+    {
+        if (!condition) throw new InvalidDataException(code);
+    }
+
+    internal static void Emit(string kind, object details)
+    {
+        Console.WriteLine(JsonSerializer.Serialize(new { kind, attempt = Attempt, utc = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), details }, Web));
+    }
+
+    /// <summary>限制后端传输到替代 IdP。URI、issuer 和 HTTP Host 仍是冻结回环入口。</summary>
+    private static SocketsHttpHandler IdpTransport()
+    {
+        return new SocketsHttpHandler {
+            AllowAutoRedirect=false, UseProxy=false, UseCookies=false, ConnectTimeout=TimeSpan.FromSeconds(4),
+            ConnectCallback=async (ctx, ct) => {
+                Require(ctx.DnsEndPoint.Host=="localhost" && ctx.DnsEndPoint.Port==15743, "idp_target");
+                var socket=new Socket(SocketType.Stream,ProtocolType.Tcp);
+                try {
+                    await socket.ConnectAsync("keycloak-test",8080,ct); return new NetworkStream(socket,true);
+                } catch { socket.Dispose(); throw; }
+            }
+        };
+    }
+
+    private static async Task LoadSigner(CancellationToken ct)
+    {
+        using var client=new HttpClient(IdpTransport()) { Timeout=TimeSpan.FromSeconds(5), MaxResponseContentBufferSize=65536 };
+        var jwks=await client.GetByteArrayAsync(Issuer+"/protocol/openid-connect/certs",ct);
+        using var document=JsonDocument.Parse(jwks);
+        var selected=document.RootElement.GetProperty("keys").EnumerateArray().Single(k=>k.GetProperty("kid").GetString()==Kid);
+        Require(selected.GetProperty("alg").GetString()=="RS256" && selected.GetProperty("use").GetString()=="sig"
+            && selected.GetProperty("kty").GetString()=="RSA" && !selected.TryGetProperty("d",out _),"frozen_signer");
+        var canonical=JsonSerializer.Serialize(selected.EnumerateObject().OrderBy(p=>p.Name,StringComparer.Ordinal)
+            .Select(p=>new[]{p.Name,p.Value.GetRawText()}).ToArray());
+        Require(Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(canonical)))==Material,"signer_material");
+        signer=new JsonWebKey(selected.GetRawText());
+    }
+
+    private static bool Pkce(string? response, string? method, string? challenge, string? state, string? nonce)
+        => response=="code" && method=="S256" && !string.IsNullOrWhiteSpace(challenge)
+            && !string.IsNullOrWhiteSpace(state) && !string.IsNullOrWhiteSpace(nonce);
+
+    private static string[] Ordered(IEnumerable<string> items) => items.Order(StringComparer.Ordinal).ToArray();
+
+    private static string? Item(AuthenticationProperties? props, string name)
+        => props!=null && props.Items.TryGetValue(name,out var value)?value:null;
+
+    private static void ConfigureAuth(OpenIdConnectOptions options)
+    {
+        options.BackchannelHttpHandler=IdpTransport();
+        options.BackchannelTimeout=TimeSpan.FromSeconds(6);
+        var previousRedirect=options.Events.OnRedirectToIdentityProvider;
+        options.Events.OnRedirectToIdentityProvider=async ctx=>{
+            await previousRedirect(ctx);
+            Require(ctx.HttpContext.Items["omq-new"] is string && ctx.ProtocolMessage.RedirectUri=="http://localhost:15741/signin-oidc","challenge_origin");
+            ctx.Properties.Items["omq-flow"]=(string)ctx.HttpContext.Items["omq-new"]!;
+            ctx.Properties.Items["omq-attempt"]=Attempt;
+        };
+        var previousPush=options.Events.OnPushAuthorization;
+        options.Events.OnPushAuthorization=async ctx=>{
+            await previousPush(ctx);
+            var msg=ctx.ProtocolMessage;
+            ctx.HttpContext.Items["omq-pkce"]=Pkce(msg.ResponseType,msg.GetParameter("code_challenge_method"),
+                msg.GetParameter("code_challenge"),msg.State,msg.Nonce);
+        };
+        var previousValidated=options.Events.OnTokenValidated;
+        options.Events.OnTokenValidated=async ctx=>{
+            await previousValidated(ctx);
+            var flow=Item(ctx.Properties,"omq-flow");
+            Require(Item(ctx.Properties,"omq-attempt")==Attempt && flow!=null && Challenges.ContainsKey(flow),"challenge_binding");
+            string? raw=ctx.TokenEndpointResponse?.IdToken;
+            Require(raw!=null && raw.Length<=32768 && signer!=null,"missing_new_token");
+            var handler=new JsonWebTokenHandler { MapInboundClaims=false };
+            var result=await handler.ValidateTokenAsync(raw!,new TokenValidationParameters {
+                RequireSignedTokens=true, ValidateIssuerSigningKey=true, IssuerSigningKey=signer, ValidAlgorithms=new[]{"RS256"},
+                ValidateIssuer=true, ValidIssuer=Issuer, ValidateAudience=true, ValidAudience=Client, RequireAudience=true,
+                RequireExpirationTime=true, ValidateLifetime=true, ClockSkew=TimeSpan.Zero
+            });
+            Require(result.IsValid && result.SecurityToken is JsonWebToken,"signature");
+            var jwt=(JsonWebToken)result.SecurityToken;
+            var now=DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var iat=new DateTimeOffset(jwt.IssuedAt.ToUniversalTime()).ToUnixTimeSeconds();
+            var exp=new DateTimeOffset(jwt.ValidTo.ToUniversalTime()).ToUnixTimeSeconds();
+            var principal=ctx.Principal!;
+            Require(jwt.Alg=="RS256" && jwt.Kid==Kid && jwt.Issuer==Issuer && jwt.Audiences.SequenceEqual(new[]{Client})
+                && iat>=Started && iat<=now && exp>now && Subjects.Contains(jwt.Subject) && jwt.Subject==principal.FindFirstValue("sub"),"new_token_identity");
+            var identity=new Projected(jwt.Subject,principal.FindFirstValue("preferred_username")??"",Ordered(principal.FindAll(ClaimTypes.Role).Select(c=>c.Value)),
+                principal.FindFirstValue("organization_id")??"",Ordered(principal.FindAll("site_ids").Select(c=>c.Value)));
+            Require(Tokens.TryAdd(flow!,new Signed(identity,iat,exp)),"duplicate_validation");
+        };
+        var previousTicket=options.Events.OnTicketReceived;
+        options.Events.OnTicketReceived=async ctx=>{
+            await previousTicket(ctx);
+            var flow=Item(ctx.Properties,"omq-flow");
+            Require(Item(ctx.Properties,"omq-attempt")==Attempt && flow!=null
+                && Tokens.TryGetValue(flow,out var signed) && signed.Principal.Sub==ctx.Principal?.FindFirstValue("sub"),"ticket_subject");
+            ctx.HttpContext.Items["omq-ticket"]=flow;
+        };
+    }
+
+    private static async Task<long> Epoch(HttpContext ctx)
+    {
+        var cfg=ctx.RequestServices.GetRequiredService<IConfiguration>();
+        var settings=new NpgsqlConnectionStringBuilder(cfg.GetConnectionString("governance")) {
+            ApplicationName="omq-auth-epoch", Pooling=false, CommandTimeout=4, Timeout=4
+        };
+        await using var conn=new NpgsqlConnection(settings.ConnectionString);
+        await conn.OpenAsync(ctx.RequestAborted);
+        await using var cmd=new NpgsqlCommand("SELECT \"Revision\" FROM governance.\"MappingAuthorizationEpochs\" WHERE \"OrganizationId\"='org-demo'",conn);
+        return Convert.ToInt64(await cmd.ExecuteScalarAsync(ctx.RequestAborted));
+    }
+
+    /// <summary>将框架的票据操作原样交给正式 PostgreSQL 存储，只记录与同次请求相符的行引用摘要及 epoch。</summary>
+    private sealed class SessionObserver(ITicketStore inner, IHttpContextAccessor accessor) : ITicketStore
+    {
+        internal string InnerType => inner.GetType().FullName!;
+        private HttpContext Context => accessor.HttpContext ?? throw new InvalidOperationException();
+        private static string Ref(string key) => Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(key)));
+        public Task<AuthenticationTicket?> RetrieveAsync(string key) => inner.RetrieveAsync(key);
+        public async Task<string> StoreAsync(AuthenticationTicket ticket)
+        {
+            var ctx=Context;
+            var epoch=await Epoch(ctx);
+            var key=await inner.StoreAsync(ticket);
+            Emit("ticketOperation",new{action="Store",flow=Item(ticket.Properties,"omq-flow"),correlation=ctx.Items["CorrelationId"],
+                rowRef=Ref(key),epochBefore=epoch,epochAfter=await Epoch(ctx)});
+            return key;
+        }
+        public async Task RenewAsync(string key, AuthenticationTicket ticket)
+        {
+            var ctx=Context;
+            var epoch=await Epoch(ctx);
+            await inner.RenewAsync(key,ticket);
+            Emit("ticketOperation",new{action="Renew",flow=Item(ticket.Properties,"omq-flow"),correlation=ctx.Items["CorrelationId"],
+                rowRef=Ref(key),epochBefore=epoch,epochAfter=await Epoch(ctx)});
+        }
+        public async Task RemoveAsync(string key)
+        {
+            var ctx=Context;
+            var epoch=await Epoch(ctx);
+            await inner.RemoveAsync(key);
+            Emit("ticketOperation",new{action="Remove",flow=ctx.Items["omq-ticket"],correlation=ctx.Items["CorrelationId"],
+                rowRef=Ref(key),epochBefore=epoch,epochAfter=await Epoch(ctx)});
+        }
+    }
+
+    private static void Configure(WebApplicationBuilder builder)
+    {
+        Require(builder.Environment.IsDevelopment(),"development");
+        builder.Configuration.AddJsonFile("/private/api/appsettings.json",false,false);
+        builder.Configuration.AddInMemoryCollection(Switches.ToDictionary(s=>s,s=>(string?)"false"));
+        Require(builder.Configuration["Security:Authority"]==Issuer && builder.Configuration["Security:PublicOrigin"]=="http://localhost:15741"
+            && builder.Configuration["Security:ClientId"]==Client && builder.Configuration["Security:KeyRingPath"]=="/keyring"
+            && builder.Configuration["Security:CertificatePath"]=="/private/api/keyring.pfx" && string.IsNullOrEmpty(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]),"host_config");
+        var pg=new NpgsqlConnectionStringBuilder(builder.Configuration.GetConnectionString("governance"));
+        Require(pg.Host=="platform-pg" && pg.Port==5432 && pg.Database=="mapping" && pg.SslMode==SslMode.VerifyFull,"pg_boundary");
+        builder.WebHost.UseUrls("http://0.0.0.0:8080");
+        builder.Services.AddDataProtection().DisableAutomaticKeyGeneration();
+        builder.Services.PostConfigure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme,ConfigureAuth);
+        builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
+            .PostConfigure<IHttpContextAccessor>((opt,accessor)=>{
+                Require(opt.SessionStore?.GetType().FullName=="OntologyPlatform.Api.Security.PostgresTicketStore", "formal_store");
+                opt.SessionStore=new SessionObserver(opt.SessionStore!,accessor);
+            });
+        builder.Services.Insert(0,ServiceDescriptor.Singleton<IStartupFilter>(new RecoveryIngress()));
+        builder.Logging.ClearProviders();
+        builder.Logging.SetMinimumLevel(LogLevel.None);
+    }
+
+    private static readonly string[] PermittedWorkers={
+        "Microsoft.AspNetCore.Hosting.GenericWebHostService","Microsoft.AspNetCore.DataProtection.Internal.DataProtectionHostedService",
+        "OpenTelemetry.Extensions.Hosting.Implementation.TelemetryHostedService","Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckPublisherHostedService",
+        "Microsoft.Extensions.ServiceDiscovery.ServiceDiscoveryHostedService","Yarp.ReverseProxy.Management.ProxyConfigManager"
+    };
+
+    public static async Task<int> Main()
+    {
+        try {
+            Require(Regex.IsMatch(Attempt,"\\A[a-f0-9]{32}\\z"),"attempt");
+            using var limit=new CancellationTokenSource(TimeSpan.FromMinutes(15));
+            await LoadSigner(limit.Token);
+            await using var app=PlatformApiHost.CreateApplication(Array.Empty<string>(),Configure);
+            var workers=Ordered(app.Services.GetServices<IHostedService>().Select(s=>s.GetType().FullName!));
+            var routes=Ordered(((IEndpointRouteBuilder)app).DataSources.SelectMany(s=>s.Endpoints).OfType<RouteEndpoint>().Select(e=>e.RoutePattern.RawText??"").Distinct());
+            var opts=app.Services.GetRequiredService<IOptionsMonitor<OpenIdConnectOptions>>().Get(OpenIdConnectDefaults.AuthenticationScheme);
+            bool automatic=app.Services.GetRequiredService<IOptions<KeyManagementOptions>>().Value.AutoGenerateKeys;
+            var disabled=Switches.All(s=>bool.TryParse(app.Configuration[s],out var b) && !b);
+            var config=opts.TokenValidationParameters;
+            Emit("census",new{workers,routes,disabled,automatic,signingKid=Kid,material=Material});
+            Require(disabled && !automatic && workers.All(w=>PermittedWorkers.Contains(w,StringComparer.Ordinal)),"runtime_workers");
+            Require(new[]{"/auth/login","/signin-oidc",Me}.All(routes.Contains) &&
+                !routes.Any(s=>s.StartsWith("/api/",StringComparison.Ordinal)&&!s.StartsWith("/api/v1/platform/",StringComparison.Ordinal)&&s!="/api/{**reservedPath}"),"runtime_routes");
+            Require(opts.CallbackPath=="/signin-oidc" && opts.ResponseType=="code" && opts.ResponseMode=="query" && opts.UsePkce
+                && opts.Authority==Issuer && opts.ClientId==Client && opts.ProtocolValidator.RequireNonce && config.ValidateIssuer
+                && config.ValidateAudience && config.ValidateLifetime && config.RequireSignedTokens,"formal_options");
+            await app.StartAsync(limit.Token);
+            using var probe=new HttpClient(new SocketsHttpHandler{UseProxy=false,AllowAutoRedirect=false,UseCookies=false}){Timeout=TimeSpan.FromSeconds(4)};
+            foreach(var path in new[]{"/api/v1/platform/resources","/api/v1/queries","/unregistered","/auth/csrf",Me}){
+                using var req=new HttpRequestMessage(HttpMethod.Get,"http://127.0.0.1:8080"+path);
+                req.Headers.Host="localhost:15741";
+                using var response=await probe.SendAsync(req,limit.Token);
+                Require(path==Me ? response.StatusCode==HttpStatusCode.Unauthorized :
+                    response.StatusCode==HttpStatusCode.NotFound && response.Headers.TryGetValues("X-OMQ-Route",out var h) && h.Single()=="closed","ingress_probe");
+            }
+            Emit("ready",new{login="http://localhost:15741/auth/login?returnUrl=%2Fapi%2Fv1%2Fplatform%2Fme",issuer=Issuer,client=Client,
+                noAutomaticKeys=true,deniedBusinessRoutes=true,meWithoutSession=401,ticketStore=((SessionObserver)app.Services.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>()
+                    .Get(CookieAuthenticationDefaults.AuthenticationScheme).SessionStore!).InnerType});
+            await app.WaitForShutdownAsync(limit.Token);return 0;
+        } catch(Exception error){
+            Emit("failed",new{reason=error is InvalidDataException && Regex.IsMatch(error.Message,"^[a-z_]{1,40}$")?error.Message:error.GetType().Name});
+            return 2;
+        }
+    }
+
+    /// <summary>在认证和 YARP 之前限制三个确切 GET，观察正式请求处理完成后的结果。</summary>
+    private sealed class RecoveryIngress : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+        {
+            return app=>{
+                app.Use(async (HttpContext context,RequestDelegate onward)=>{
+                    var path=context.Request.Path.Value;
+                    var login=path=="/auth/login";var callback=path=="/signin-oidc";var me=path==Me;
+                    if(!HttpMethods.IsGet(context.Request.Method) || context.Request.Host.Value!="localhost:15741"
+                        || (!login && !callback && !me) || me && context.Request.Query.Count!=0
+                        || login && (context.Request.Query.Count!=1 || context.Request.Query["returnUrl"].Count!=1 || context.Request.Query["returnUrl"]!=Me)){
+                        context.Response.Headers["X-OMQ-Route"]="closed";context.Response.StatusCode=404;return;
+                    }
+                    if((login || callback) && context.Request.Cookies.ContainsKey(".OntologyPlatform.Session") || login && Challenges.Count>=12){
+                        context.Response.StatusCode=409;return;
+                    }
+                    if(login)context.Items["omq-new"]=Guid.NewGuid().ToString("N");
+                    long? epochBefore=callback || me && context.Request.Cookies.ContainsKey(".OntologyPlatform.Session") ? await Epoch(context) : null;
+                    var oldStream=context.Response.Body;
+                    using var body=me?new MemoryStream():null;
+                    if(me)context.Response.Body=body!;
+                    try{
+                        await onward(context);
+                        if(login && context.Response.StatusCode==302){
+                            var target=new Uri(context.Response.Headers.Location.ToString());
+                            Require(target.GetLeftPart(UriPartial.Path)==Issuer+"/protocol/openid-connect/auth","authorize_endpoint");
+                            var q=QueryHelpers.ParseQuery(target.Query);
+                            bool pkce=context.Items["omq-pkce"] is true && q.ContainsKey("request_uri") ||
+                                Pkce(q.GetValueOrDefault("response_type"),q.GetValueOrDefault("code_challenge_method"),q.GetValueOrDefault("code_challenge"),
+                                    q.GetValueOrDefault("state"),q.GetValueOrDefault("nonce"));
+                            var flow=(string)context.Items["omq-new"]!;
+                            Require(pkce && Challenges.TryAdd(flow,0),"pkce");
+                            Emit("challenge",new{flow,pkce="S256",responseType="code",statePresent=true,noncePresent=true});
+                        }
+                        if(callback && context.Response.StatusCode==302 && context.Items["omq-ticket"] is string callbackFlow){
+                            Require(context.Response.Headers.Location.ToString()==Me && context.Response.Headers.SetCookie
+                                .Any(v=>v?.StartsWith(".OntologyPlatform.Session=",StringComparison.Ordinal)==true) && Completed.TryAdd(callbackFlow,0),"callback_completion");
+                            Emit("callback",new{flow=callbackFlow,status=302,returnPath=Me,ticketStored=true,correlation=context.Items["CorrelationId"],
+                                epochBefore,epochAfter=await Epoch(context)});
+                        }
+                        if(me && context.Response.StatusCode==200){
+                            var ticket=await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                            var f=Item(ticket.Properties,"omq-flow");
+                            if(ticket.Succeeded && f!=null && Item(ticket.Properties,"omq-attempt")==Attempt && Completed.TryRemove(f,out _)){
+                                Require(Tokens.TryRemove(f,out var signed) && signed!=null && Challenges.TryRemove(f,out _),"me_binding");
+                                Require(body!.Length is >0 and <16384,"me_length");
+                                using var response=JsonDocument.Parse(body.ToArray());
+                                var dto=response.RootElement;
+                                var roles=Ordered(dto.GetProperty("roles").EnumerateArray().Select(x=>x.GetString()!));
+                                var scopes=dto.GetProperty("scopes").EnumerateArray().ToArray();
+                                var sites=Ordered(scopes.Select(x=>x.GetProperty("siteId").GetString()!));
+                                var who=signed!.Principal;
+                                Require(dto.GetProperty("subjectId").GetString()==who.Sub && ticket.Principal?.FindFirstValue("sub")==who.Sub
+                                    && roles.SequenceEqual(who.Roles) && sites.SequenceEqual(who.Sites)
+                                    && scopes.All(x=>x.GetProperty("organizationId").GetString()==who.Org) && signed.Exp>DateTimeOffset.UtcNow.ToUnixTimeSeconds(),"me_projection");
+                                Emit("me",new{flow=f,status=200,sub=who.Sub,account=who.Account,roles,org=who.Org,sites,issuer=Issuer,audience=Client,
+                                    epochBefore,epochAfter=await Epoch(context),alg="RS256",kid=Kid,material=Material,iat=signed.Iat,exp=signed.Exp,signatureVerified=true,lifetimeVerified=true});
+                            }
+                        }
+                    } finally {
+                        if(me){context.Response.Body=oldStream;body!.Position=0;await body.CopyToAsync(oldStream,context.RequestAborted);}
+                    }
+                });
+                next(app);
+            };
+        }
+    }
+}
