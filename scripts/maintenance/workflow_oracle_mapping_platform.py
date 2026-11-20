@@ -121,7 +121,7 @@ def current_storage(area, replacement=None):
                 componentVolumes={k:sizes[v] for k,v in extra_volumes.items()},componentLayers={k:layer_sizes[k] for k in sorted(extra_ids)})
 
 
-def backup_allocation(root, area, group):
+def backup_allocation(root, area, group, *, phase=None):
     """只从任务私有固定目录抵扣同一个未来副本。未完成文件占用留在主机实际量内。"""
     import stat
     private = root/'.tools/security/g4-oracle-mapping-query-001'/RUN/'s0-recovery-01'
@@ -150,8 +150,13 @@ def backup_allocation(root, area, group):
         from workflow_oracle_mapping_platform_recovery import ORIGINAL_IDS
         role='oracle' if group=='source' else name.removesuffix('.tar')
         require(entry['sourceId']==ORIGINAL_IDS[role] and entry['privatePath']==str(path.relative_to(private))
-                and entry['identity']==[info.st_dev,info.st_ino,info.st_size,info.st_ctime_ns]
                 and re.fullmatch('[a-f0-9]{64}',entry['sha256']), 'ARCHIVE_LEDGER_OWNER')
+        current_identity=[info.st_dev,info.st_ino,info.st_size,info.st_ctime_ns]
+        if entry['identity']!=current_identity:
+            require(phase=='product-resume-01' and entry['identity'][1:]==current_identity[1:], 'ARCHIVE_LEDGER_OWNER')
+            from workflow_oracle_archive_requalification import qualified
+            proof=qualified(root)
+            require(proof['archives'][group+'/'+name]['currentIdentity']==current_identity, 'ARCHIVE_LEDGER_OWNER')
         credited += info.st_blocks*512
     return credited
 
@@ -217,8 +222,8 @@ def disk_admission(root,area,command,*,phase=None,replacement=None):
         # 两个 Oracle 卷均保留。当前原卷大小及归档头部/增长余量同时约束还原卷与新冷备。
         source_limit = max(int(4.25*GIB), sizes[original]+64*1024**2)
         reserved['sourceAndReplacement'] = sum(max(size,source_limit) for size in sizes.values())
-        source_credited = backup_allocation(root,area,'source')
-        platform_credited = backup_allocation(root,area,'platform')
+        source_credited = backup_allocation(root,area,'source',phase=phase)
+        platform_credited = backup_allocation(root,area,'platform',phase=phase)
         require(source_credited+platform_credited<=host, 'ARCHIVES_OUTSIDE_HOST_MEASUREMENT')
         reserved['secondColdSourceCopy'] = max(0,source_limit-source_credited)
         # 原卷、当前检查点和替代卷各有一项。备份实际落盘量已在 host 当中。

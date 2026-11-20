@@ -61,10 +61,12 @@ def batch_plan(root):
     return plan
 
 
-def drivers(root, mode, run=RUN):
+def drivers(root, mode, run=None):
+    run = RUN if run is None else run
     names = DRIVERS
     if run==PRODUCT_RUN:
-        names += ('scripts/maintenance/workflow_oracle_mapping_resume.py',
+        names += ('scripts/maintenance/workflow_oracle_archive_requalification.py',
+                  'scripts/maintenance/workflow_oracle_mapping_resume.py',
                   'scripts/maintenance/workflow_oracle_mapping_platform_recovery.py','scripts/maintenance/workflow_m4_query_runtime.py')
     if mode in ('s0-oracle-natural', 's0-oracle-cancel', NATURAL_CANCEL, 'auth-handoff-s1'):
         names += ('scripts/maintenance/workflow_oracle_mapping_formal_observer.py',)

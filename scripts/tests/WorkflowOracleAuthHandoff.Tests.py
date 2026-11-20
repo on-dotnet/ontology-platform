@@ -70,6 +70,7 @@ class BatchEvidenceTests(unittest.TestCase):
         self.assertEqual(self.consume()[1]['deadlineSeconds'],1620)
         self.assertEqual(self.argv[-2:],['--batch-input',self.stage['batchInput']])
         self.assertIn('scripts/maintenance/workflow_oracle_mapping_formal_observer.py',e.drivers(ROOT,'auth-handoff-s1'))
+        self.assertIn('scripts/maintenance/workflow_oracle_archive_requalification.py',e.drivers(ROOT,'auth-handoff-s1'))
 
     def test_reregistered_wrong_parent_command_is_rejected(self):
         self.row['parentId']='f'*32

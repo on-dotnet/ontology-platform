@@ -260,6 +260,145 @@ class RecoveryComponentTests(unittest.TestCase):
             self.assertEqual(observation['components']['rustfs'],dict(status='BLOCKED',reason='ORACLE_ADMISSION_SEALED_REFERENCE'))
             self.assertEqual(observation['status'],'BLOCKED')
 
+class ArchiveDeviceRequalificationTests(unittest.TestCase):
+    """当前设备号旁证必须经过真实备份抵扣消费者且保留旧账本。"""
+    def setUp(self):
+        import datetime as dt
+        import os
+        import workflow_execution as ex
+        import workflow_oracle_archive_requalification as q
+        self.q=q;self.ex=ex;self.dt=dt
+        temp=tempfile.TemporaryDirectory();self.addCleanup(temp.cleanup);self.root=Path(temp.name).resolve()
+        self.area=self.root/'artifacts/workflow'/platform.TASK/platform.RUN;self.area.mkdir(parents=True)
+        self.private=self.root/'.tools/security/g4-oracle-mapping-query-001'/platform.RUN/'s0-recovery-01'
+        entries={}
+        for name in q.NAMES:
+            p=self.private/name;p.parent.mkdir(mode=0o700,parents=True,exist_ok=True);p.write_bytes(b'synthetic archive boundary fixture\n');p.chmod(0o600)
+            st=p.stat();old=q.identity(st);old[0]+=1
+            role='oracle' if name.startswith('source/') else Path(name).stem
+            entries[name]=dict(privatePath=name,sourceId=recovery.ORIGINAL_IDS[role],volume='synthetic-'+role,
+                identity=old,bytes=st.st_size,sha256=hashlib.sha256(p.read_bytes()).hexdigest())
+        self.ledger=self.area.parent/'s0-recovery-01/archive-ledger.json';self.ledger.parent.mkdir()
+        self.ledger.write_text(json.dumps(dict(taskId=platform.TASK,operation='s0-recovery-01',archives=entries)))
+        self.original=self.ledger.read_bytes();self.changed(patch.object(q,'LEDGER_SHA',ex.sha(self.original)))
+        helper=self.root/q.HELPER;helper.parent.mkdir(parents=True);helper.write_bytes(Path(q.__file__).read_bytes())
+        self.product=self.area.parent/q.PRODUCT;self.product.mkdir();self.cid='1'*32
+
+    def changed(self,p):
+        self.addCleanup(p.stop);return p.start()
+
+    def proof(self,observation=None):
+        q=self.q;ex=self.ex;observation=observation or q.observe(self.root)
+        raw=json.dumps(observation,sort_keys=True).encode()+b'\n';directory=self.area.parent/'commands'/q.PRODUCT/self.cid;directory.mkdir(parents=True,exist_ok=True)
+        argv,key=q.invocation(self.root)
+        receipt=dict(schemaVersion=2,taskId=platform.TASK,runId=q.PRODUCT,commandId=self.cid,stage='archive-device-requalification',parentId=None,
+            environmentFingerprint='e'*64,identity=ex.sha(ex.encoded([key,'e'*64,ex.sha(ex.encoded(argv)),str(self.root),120,ex.sha(Path(ex.__file__).read_bytes())])),
+            cwd=str(self.root),inputFingerprint=key,commandSummary=dict(executable='python3',argumentCount=len(argv)-1,sha256=ex.sha(ex.encoded(argv))),
+            started=True,exitCode=0,classification='SUCCESS',signal=None,deadlineSeconds=120,elapsedSeconds=2,
+            startedAtUtc=(self.dt.datetime.fromisoformat(observation['startedAtUtc'])-self.dt.timedelta(seconds=1)).isoformat(),
+            endedAtUtc=(self.dt.datetime.fromisoformat(observation['endedAtUtc'])+self.dt.timedelta(seconds=1)).isoformat())
+        for name,data in [('stdout',raw),('stderr',b'')]:
+            p=directory/(name+'.txt');p.write_bytes(data);receipt[name]=dict(path=str(p),sha256=ex.sha(data),sizeBytes=len(data))
+        self.receipt=directory/'receipt.json';self.receipt.write_text(json.dumps(receipt))
+        self.sidecar=self.product/('archive-device-requalification-'+self.cid+'.json')
+        self.sidecar.write_text(json.dumps(dict(schemaVersion=1,commandId=self.cid,observationSha256=ex.sha(raw),observation=observation)))
+        return receipt
+
+    def test_device_only_hash_match_credits_real_blocks_and_preserves_ledger(self):
+        self.proof();actual=platform.backup_allocation(self.root,self.area,'platform',phase=self.q.PRODUCT)
+        expected=sum((self.private/n).stat().st_blocks*512 for n in self.q.NAMES if n.startswith('platform/'))
+        self.assertEqual(actual,expected);self.assertEqual(self.ledger.read_bytes(),self.original)
+
+    def test_nonproduct_phase_and_missing_proof_are_refused(self):
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_LEDGER_OWNER'):
+            platform.backup_allocation(self.root,self.area,'platform',phase='restore')
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_MISSING'):
+            platform.backup_allocation(self.root,self.area,'platform',phase=self.q.PRODUCT)
+
+    def test_changed_ledger_hash_is_refused(self):
+        self.proof();self.ledger.write_bytes(self.original+b' ')
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_LEDGER'):self.q.qualified(self.root)
+
+    def test_wrong_source_and_relative_path_are_refused(self):
+        for field,value in [('sourceId',recovery.ORIGINAL_IDS['rustfs']),('privatePath','platform/other.tar')]:
+            data=json.loads(self.original);data['archives']['platform/fuseki.tar'][field]=value;raw=json.dumps(data).encode();self.ledger.write_bytes(raw)
+            with patch.object(self.q,'LEDGER_SHA',self.ex.sha(raw)),self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_IDENTITY'):
+                self.q.observe(self.root)
+
+    def test_incomplete_or_foreign_observation_is_refused(self):
+        data=self.q.observe(self.root);del data['archives']['source/database.tar'];self.proof(data)
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_OBSERVATION'):self.q.qualified(self.root)
+        data=self.q.observe(self.root);data['runId']='foreign';self.proof(data)
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_OBSERVATION'):self.q.qualified(self.root)
+
+    def test_current_file_or_mode_change_is_refused(self):
+        self.proof();p=self.private/'platform/fuseki.tar';p.chmod(0o644)
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_FILE'):self.q.qualified(self.root)
+        p.chmod(0o600);p.write_bytes(b'changed')
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_IDENTITY'):self.q.qualified(self.root)
+
+    def test_symlink_is_refused(self):
+        p=self.private/'platform/fuseki.tar';p.unlink();p.symlink_to(self.private/'platform/rustfs.tar')
+        with self.assertRaisesRegex(ValueError,'LINKED_PATH'):self.q.observe(self.root)
+
+    def test_hash_mismatch_is_refused_without_sidecar(self):
+        with patch.object(self.q,'stream_digest',return_value='0'*64),self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_HASH'):
+            self.q.observe(self.root)
+        self.assertEqual(list(self.product.glob('archive-device-requalification-*')),[])
+
+    def test_descriptor_change_during_read_is_refused(self):
+        from types import SimpleNamespace
+        p=self.private/'platform/fuseki.tar';info=p.stat();changed=SimpleNamespace(**{k:getattr(info,k) for k in ['st_dev','st_ino','st_size','st_ctime_ns','st_mode','st_nlink','st_uid']});changed.st_ctime_ns+=1
+        with patch.object(self.q.os,'fstat',side_effect=[info,changed]),self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_DURING'):
+            self.q.stream_digest(p,self.q.identity(info))
+
+    def test_command_and_stream_replacement_are_refused(self):
+        receipt=self.proof();receipt['commandSummary']['sha256']='0'*64;self.receipt.write_text(json.dumps(receipt))
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_COMMAND'):self.q.qualified(self.root)
+        receipt=self.proof();Path(receipt['stdout']['path']).write_text('{}')
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_STREAM'):self.q.qualified(self.root)
+
+    def test_late_window_and_failed_command_are_refused(self):
+        receipt=self.proof();receipt['endedAtUtc']=receipt['startedAtUtc'];self.receipt.write_text(json.dumps(receipt))
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_WINDOW'):self.q.qualified(self.root)
+        receipt=self.proof();receipt['exitCode']=1;self.receipt.write_text(json.dumps(receipt))
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_COMMAND'):self.q.qualified(self.root)
+
+    def test_invalid_proof_never_triggers_another_hash_command(self):
+        data=self.q.observe(self.root);del data['archives']['source/database.tar'];self.proof(data)
+        with patch.object(self.q.ex,'run',side_effect=AssertionError('must not retry')):
+            with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_OBSERVATION'):self.q.requalify(self.root)
+
+    def test_missing_schema_environment_and_naive_time_are_refused(self):
+        for key in ['schemaVersion','environmentFingerprint','identity']:
+            receipt=self.proof();del receipt[key];self.receipt.write_text(json.dumps(receipt))
+            with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_COMMAND'):self.q.qualified(self.root)
+        data=self.q.observe(self.root)
+        data['startedAtUtc']=self.dt.datetime.fromisoformat(data['startedAtUtc']).replace(tzinfo=None).isoformat()
+        data['endedAtUtc']=self.dt.datetime.fromisoformat(data['endedAtUtc']).replace(tzinfo=None).isoformat()
+        self.proof(data)
+        with self.assertRaisesRegex(ValueError,'ARCHIVE_REQUAL_WINDOW'):self.q.qualified(self.root)
+
+    def test_real_child_command_produces_consumable_append_only_proof(self):
+        import os
+        helper=self.root/self.q.HELPER
+        text=helper.read_text()
+        text=text.replace("LEDGER_SHA = '270fca4d7f40f2fb1c1fee1ccf5e40bb00ac0509445e07d26f86287573315617'", "LEDGER_SHA = '"+self.q.LEDGER_SHA+"'")
+        helper.write_text(text)
+        with patch.dict(os.environ,{'PYTHONPATH':str(Path(platform.__file__).parent)}):
+            proof=self.q.requalify(self.root)
+        self.assertRegex(proof['commandId'],'^[a-f0-9]{32}$')
+        self.assertEqual(len(proof['archives']),6)
+        self.assertGreater(platform.backup_allocation(self.root,self.area,'source',phase=self.q.PRODUCT),0)
+        self.assertEqual(self.ledger.read_bytes(),self.original)
+        self.assertEqual(len(list(self.product.glob('archive-device-requalification-*'))),1)
+
+    def test_requalification_reuses_valid_proof_without_rehash_or_rewrite(self):
+        self.proof();before=self.sidecar.read_bytes()
+        with patch.object(self.q.ex,'run',side_effect=AssertionError('unnecessary command')):
+            self.assertEqual(self.q.requalify(self.root)['commandId'],self.cid)
+        self.assertEqual(self.sidecar.read_bytes(),before);self.assertEqual(self.ledger.read_bytes(),self.original)
+
 
 if __name__=='__main__':
     unittest.main()
