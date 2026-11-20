@@ -1,0 +1,137 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "run": "product-resume-01",
+  "attempt": "507f7106e8f9414b8845f33804dd8784",
+  "scope": "Offline reconciliation of the existing reset-password window",
+  "execution": "REUSED",
+  "qualification": "FRESH",
+  "applicationLogins": "4/4",
+  "exactSessionToSubject": "NOT_VERIFIED",
+  "individualTokenEvents": "NOT_RETAINED",
+  "earlierConsumer": "BLOCKED",
+  "rows": [
+    {
+      "account": "g2-operator-ab",
+      "subject": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+      "role": "platform.operator",
+      "sites": [
+        "site-a",
+        "site-b"
+      ],
+      "meHttp": 200,
+      "auditCorrelation": "fd4fe68c68c948af9410aa8d4d3c590e",
+      "auditRowSha256": "6fd8dcc3cd3701d671307c3d13c20a5536eaebba527189faf6435deb09e18101",
+      "specificSessionRow": "NOT_VERIFIED"
+    },
+    {
+      "account": "g2-auditor-ab",
+      "subject": "650199ae-8bd4-430a-885d-71cd69b6781e",
+      "role": "platform.auditor",
+      "sites": [
+        "site-a",
+        "site-b"
+      ],
+      "meHttp": 200,
+      "auditCorrelation": "468a7a31f4014ed79d6fcfdaa7013a5d",
+      "auditRowSha256": "b013be1aaba551cb15b39b15d8301be090ebc6bb5f9d371f5e5d03ed07e108e7",
+      "specificSessionRow": "NOT_VERIFIED"
+    },
+    {
+      "account": "g2-operator-a",
+      "subject": "bcf7f7f8-6af0-4f94-a28c-1220461ee62e",
+      "role": "platform.operator",
+      "sites": [
+        "site-a"
+      ],
+      "meHttp": 200,
+      "auditCorrelation": "4398f121690c487cb966861c4b8ce99a",
+      "auditRowSha256": "f84be72d594cf21067fdb8406ccad2e086fe529bb32697b11bd56b93b38049f8",
+      "specificSessionRow": "NOT_VERIFIED"
+    },
+    {
+      "account": "g2-viewer-a",
+      "subject": "f902a743-7079-4e22-a643-a51deb027e89",
+      "role": "platform.viewer",
+      "sites": [
+        "site-a"
+      ],
+      "meHttp": 200,
+      "auditCorrelation": "54b1071ef5484c0cb13de6f84663e9a5",
+      "auditRowSha256": "b1cd1d9a35036668d5b0b742abfb66a3a15578e540f13401f012e65f12e7c9e6",
+      "specificSessionRow": "NOT_VERIFIED"
+    }
+  ],
+  "newSessionRows": 4,
+  "newAudits": 4,
+  "epoch": [
+    16,
+    16
+  ],
+  "unchangedBusinessTables": 45,
+  "archiveIdentities": 9,
+  "runtime": {
+    "assemblySha256": "e07ebe48515a369f8ff1f655653e00b9dcf98a53d9b43bc5d6c8b68fd307c1fe",
+    "sourceSha256": "73db65042ae13a8c85f120d9af9c1811316f3d74a3f19377d9211a548665011b",
+    "host": "1650fbbaee827bb17ad7201de40eb42e4464b09aad2c68e86cebd0d445d2de5a",
+    "startCommand": "61bef180e20b4fbb8f5299737442d644",
+    "admission": "8e8646b997e34359aacd19c2b4178b8a",
+    "config": [
+      {
+        "kind": "census",
+        "attempt": "507f7106e8f9414b8845f33804dd8784",
+        "utc": 1795147702809,
+        "details": {
+          "workers": [
+            "Microsoft.AspNetCore.DataProtection.Internal.DataProtectionHostedService",
+            "Microsoft.AspNetCore.Hosting.GenericWebHostService",
+            "Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckPublisherHostedService",
+            "OpenTelemetry.Extensions.Hosting.Implementation.TelemetryHostedService"
+          ],
+          "routes": [
+            "/api/v1/platform/audit",
+            "/api/v1/platform/me",
+            "/api/v1/platform/resources",
+            "/api/v1/platform/resources/{id}",
+            "/api/{**reservedPath}",
+            "/auth/csrf",
+            "/auth/login",
+            "/auth/logout",
+            "/auth/{**reservedPath}",
+            "/health/live",
+            "/health/ready",
+            "/health/{**reservedPath}",
+            "/openapi/{**reservedPath}",
+            "/openapi/{documentName}.json",
+            "/signin-oidc",
+            "/{**webPath}"
+          ],
+          "disabled": true,
+          "automatic": false,
+          "signingKid": "YDFz4TE4iNk_YhJPHaKPFznjrVccyduoMhlSVekbC1c",
+          "material": "1a7699986838eab6b51f7700ed353bb8d711b13af7f8852939826e9958fb7f75"
+        }
+      },
+      {
+        "kind": "ready",
+        "attempt": "507f7106e8f9414b8845f33804dd8784",
+        "utc": 1795147702934,
+        "details": {
+          "login": "http://localhost:15741/auth/login?returnUrl=%2Fapi%2Fv1%2Fplatform%2Fme",
+          "issuer": "http://localhost:15743/realms/g2-180e1435711f03fa",
+          "client": "g2-180e1435711f03fa-bff",
+          "noAutomaticKeys": true,
+          "deniedBusinessRoutes": true,
+          "meWithoutSession": 401,
+          "ticketStore": "OntologyPlatform.Api.Security.PostgresTicketStore"
+        }
+      }
+    ]
+  },
+  "postgresCommands": [
+    "0e361329488a4e2f91760592e41fa35f",
+    "45101a19667f4aa6b0e046960e334c34"
+  ],
+  "temporaryAdminRemoval": "RECORDED_DELETE_AND_INVALID_CLIENT",
+  "sealedAdmission": "58ce0d364c024ec5a59b51d5077f5b61",
+  "noNewLoginExecuted": true
+}

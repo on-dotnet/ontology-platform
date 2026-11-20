@@ -1,0 +1,69 @@
+{
+  "authenticationAfterReset": "FOUR_NORMAL_LOGINS_CONFIRMED",
+  "attempt": "507f7106e8f9414b8845f33804dd8784",
+  "logins": [
+    {
+      "account": "g2-operator-ab",
+      "subject": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+      "role": "platform.operator",
+      "sites": [
+        "site-a",
+        "site-b"
+      ],
+      "httpStatus": 200
+    },
+    {
+      "account": "g2-auditor-ab",
+      "subject": "650199ae-8bd4-430a-885d-71cd69b6781e",
+      "role": "platform.auditor",
+      "sites": [
+        "site-a",
+        "site-b"
+      ],
+      "httpStatus": 200
+    },
+    {
+      "account": "g2-operator-a",
+      "subject": "bcf7f7f8-6af0-4f94-a28c-1220461ee62e",
+      "role": "platform.operator",
+      "sites": [
+        "site-a"
+      ],
+      "httpStatus": 200
+    },
+    {
+      "account": "g2-viewer-a",
+      "subject": "f902a743-7079-4e22-a643-a51deb027e89",
+      "role": "platform.viewer",
+      "sites": [
+        "site-a"
+      ],
+      "httpStatus": 200
+    }
+  ],
+  "uniqueAuthenticationAudits": 4,
+  "newPlatformSessions": 4,
+  "stableBusinessTables": 45,
+  "epochBefore": 16,
+  "epochAfter": 16,
+  "frozenReferencesMatched": true,
+  "temporaryAdminDeletedAndInvalidClientChecked": true,
+  "recoveryHelperReleased": true,
+  "resourcesAfter": "58ce0d364c024ec5a59b51d5077f5b61",
+  "currentIncrement": {
+    "hostGrowth": 82509824,
+    "referenceVolume": 0,
+    "componentLayers": 0,
+    "used": 82509824,
+    "remaining": 9764864,
+    "limit": 92274688
+  },
+  "totalBytes": 42629384638,
+  "originalShutdownOutcome": "ORACLE_ADMISSION_SEALED_POSTSTATE",
+  "historicalPerTokenEvents": "NOT_RETAINED_FOR_THIS_WINDOW",
+  "signingValidation": "Required by bound OIDC OnTokenValidated before creation of each new platform session; no raw tokens retained",
+  "pgBefore": "0e361329488a4e2f91760592e41fa35f",
+  "pgAfter": "45101a19667f4aa6b0e046960e334c34",
+  "archiveChanges": 0,
+  "onlyReplacementUsed": true
+}

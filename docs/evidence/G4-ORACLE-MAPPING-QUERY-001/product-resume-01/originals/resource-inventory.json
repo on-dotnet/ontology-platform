@@ -1,0 +1,333 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "run": "product-resume-01",
+  "base": "4924f44ec1628b156d7e722513405bc13d376d8e",
+  "measured": "2026-11-20T07:35:34.079873+00:00",
+  "resources": [
+    {
+      "group": "replacement",
+      "service": "platform-pg",
+      "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-restore-01_platform-internal"
+      ],
+      "networkMode": "ontology-g4-omq-restore-01_platform-internal",
+      "volumeMounts": [
+        {
+          "volume": "ontology-g4-omq-restore-01_platform-data",
+          "target": "/var/lib/postgresql",
+          "rw": true
+        }
+      ],
+      "snapshotTargets": [],
+      "memory": 805306368,
+      "nanoCpus": 500000000
+    },
+    {
+      "group": "replacement",
+      "service": "keycloak-test",
+      "id": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+      "image": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-restore-01_host-entry",
+        "ontology-g4-omq-restore-01_platform-internal"
+      ],
+      "networkMode": "ontology-g4-omq-restore-01_host-entry",
+      "volumeMounts": [
+        {
+          "volume": "ontology-g4-omq-restore-01_keycloak-data",
+          "target": "/opt/keycloak/data",
+          "rw": true
+        }
+      ],
+      "snapshotTargets": [],
+      "memory": 1073741824,
+      "nanoCpus": 1000000000
+    },
+    {
+      "group": "replacement",
+      "service": "fuseki",
+      "id": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+      "image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-restore-01_platform-internal"
+      ],
+      "networkMode": "ontology-g4-omq-restore-01_platform-internal",
+      "volumeMounts": [
+        {
+          "volume": "ontology-g4-omq-restore-01_fuseki-data",
+          "target": "/fuseki",
+          "rw": true
+        }
+      ],
+      "snapshotTargets": [],
+      "memory": 2147483648,
+      "nanoCpus": 1000000000
+    },
+    {
+      "group": "replacement",
+      "service": "rustfs",
+      "id": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
+      "image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-restore-01_platform-internal"
+      ],
+      "networkMode": "ontology-g4-omq-restore-01_platform-internal",
+      "volumeMounts": [
+        {
+          "volume": "ontology-g4-omq-restore-01_rustfs-data",
+          "target": "/data",
+          "rw": true
+        }
+      ],
+      "snapshotTargets": [],
+      "memory": 536870912,
+      "nanoCpus": 500000000
+    },
+    {
+      "group": "replacement",
+      "service": "oracle",
+      "id": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+      "image": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-replacement-01_source-internal"
+      ],
+      "networkMode": "ontology-g4-omq-replacement-01_source-internal",
+      "volumeMounts": [
+        {
+          "volume": "ontology-g4-omq-replacement-01_oracle-data",
+          "target": "/opt/oracle/oradata",
+          "rw": true
+        }
+      ],
+      "snapshotTargets": [],
+      "memory": 4294967296,
+      "nanoCpus": 2000000000
+    },
+    {
+      "group": "frozen",
+      "service": "oracle",
+      "id": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+      "image": "sha256:844b2cdb95c4cc120f549ff3b2aa36c191c8c9244bf90e6082971aaa6355f6d8",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-oracle-mapping-query-001_source-internal"
+      ],
+      "networkMode": "ontology-g4-oracle-mapping-query-001_source-internal",
+      "volumeMounts": [
+        {
+          "volume": "ontology-g4-oracle-mapping-query-001_oracle-data",
+          "target": "/opt/oracle/oradata",
+          "rw": true
+        }
+      ],
+      "snapshotTargets": [],
+      "memory": 4294967296,
+      "nanoCpus": 2000000000
+    },
+    {
+      "group": "frozen",
+      "service": "platform-pg",
+      "id": "eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-platform-01_platform-internal"
+      ],
+      "networkMode": "ontology-g4-omq-platform-01_platform-internal",
+      "volumeMounts": [
+        {
+          "volume": "ontology-g4-omq-platform-01_platform-data",
+          "target": "/var/lib/postgresql",
+          "rw": true
+        }
+      ],
+      "snapshotTargets": [],
+      "memory": 805306368,
+      "nanoCpus": 500000000
+    },
+    {
+      "group": "frozen",
+      "service": "keycloak-test",
+      "id": "15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b",
+      "image": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-platform-01_host-entry",
+        "ontology-g4-omq-platform-01_platform-internal"
+      ],
+      "networkMode": "ontology-g4-omq-platform-01_host-entry",
+      "volumeMounts": [
+        {
+          "volume": "ontology-g4-omq-platform-01_keycloak-data",
+          "target": "/opt/keycloak/data",
+          "rw": true
+        }
+      ],
+      "snapshotTargets": [],
+      "memory": 1073741824,
+      "nanoCpus": 1000000000
+    },
+    {
+      "group": "frozen",
+      "service": "fuseki",
+      "id": "9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb",
+      "image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-platform-01_platform-internal"
+      ],
+      "networkMode": "ontology-g4-omq-platform-01_platform-internal",
+      "volumeMounts": [
+        {
+          "volume": "ontology-g4-omq-platform-01_fuseki-data",
+          "target": "/fuseki",
+          "rw": true
+        }
+      ],
+      "snapshotTargets": [],
+      "memory": 2147483648,
+      "nanoCpus": 1000000000
+    },
+    {
+      "group": "frozen",
+      "service": "rustfs",
+      "id": "f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd",
+      "image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-platform-01_platform-internal"
+      ],
+      "networkMode": "ontology-g4-omq-platform-01_platform-internal",
+      "volumeMounts": [
+        {
+          "volume": "ontology-g4-omq-platform-01_rustfs-data",
+          "target": "/data",
+          "rw": true
+        }
+      ],
+      "snapshotTargets": [],
+      "memory": 536870912,
+      "nanoCpus": 500000000
+    },
+    {
+      "group": "formal-api",
+      "service": "api",
+      "id": "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+      "image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-platform-01_host-entry",
+        "ontology-g4-omq-platform-01_platform-internal",
+        "ontology-g4-oracle-mapping-query-001_source-internal"
+      ],
+      "networkMode": "ontology-g4-omq-platform-01_host-entry",
+      "volumeMounts": [],
+      "snapshotTargets": [
+        {
+          "buildId": "ac3370165c2817682f81e7809ca33c39c7fa9a4d63e543c1d0a5964850c9da3e",
+          "target": "/app",
+          "readOnly": true
+        }
+      ],
+      "memory": 805306368,
+      "nanoCpus": 500000000
+    },
+    {
+      "group": "formal-api",
+      "service": "api-secondary",
+      "id": "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+      "image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-platform-01_host-entry",
+        "ontology-g4-omq-platform-01_platform-internal",
+        "ontology-g4-oracle-mapping-query-001_source-internal"
+      ],
+      "networkMode": "ontology-g4-omq-platform-01_host-entry",
+      "volumeMounts": [],
+      "snapshotTargets": [
+        {
+          "buildId": "ac3370165c2817682f81e7809ca33c39c7fa9a4d63e543c1d0a5964850c9da3e",
+          "target": "/app",
+          "readOnly": true
+        }
+      ],
+      "memory": 805306368,
+      "nanoCpus": 500000000
+    },
+    {
+      "group": "old-api",
+      "service": "api",
+      "id": "f90b7e7b599ffb4e9b298ce3679f9f24b25c762b472487fe09fd52e3f8e378cf",
+      "image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-platform-01_host-entry",
+        "ontology-g4-omq-platform-01_platform-internal",
+        "ontology-g4-oracle-mapping-query-001_source-internal"
+      ],
+      "networkMode": "ontology-g4-omq-platform-01_host-entry",
+      "volumeMounts": [],
+      "snapshotTargets": [
+        {
+          "buildId": "20a76ec1a7497b469e5978b33f61713de53fdab8834a965956510388cddb6c89",
+          "target": "/app",
+          "readOnly": true
+        }
+      ],
+      "memory": 805306368,
+      "nanoCpus": 500000000
+    },
+    {
+      "group": "old-api",
+      "service": "api-secondary",
+      "id": "0f04589574f7ace57e784e1bf0525e6c2587819a0c882ebfc15a09f7203e689f",
+      "image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "status": "exited",
+      "networks": [
+        "ontology-g4-omq-platform-01_host-entry",
+        "ontology-g4-omq-platform-01_platform-internal",
+        "ontology-g4-oracle-mapping-query-001_source-internal"
+      ],
+      "networkMode": "ontology-g4-omq-platform-01_host-entry",
+      "volumeMounts": [],
+      "snapshotTargets": [
+        {
+          "buildId": "20a76ec1a7497b469e5978b33f61713de53fdab8834a965956510388cddb6c89",
+          "target": "/app",
+          "readOnly": true
+        }
+      ],
+      "memory": 805306368,
+      "nanoCpus": 500000000
+    }
+  ],
+  "replacementNetworks": {
+    "platform-internal": "d34e4f9438a9343814d3aecceaa90fb46eaa6787bcf79cd14f89edca386e4715",
+    "host-entry": "108368563e923e867d65235981bfb26ab3461f298e8c1939e7f23e4f408038c6"
+  },
+  "running": [
+    "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f",
+    "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9",
+    "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04"
+  ],
+  "admission": "e20bf92f63154435942b0273263ee860",
+  "diskCharge": 42629384638,
+  "diskCap": 42949672960,
+  "hostFree": 208735121408,
+  "hostAvailable": 9194881024,
+  "vm": {
+    "total": 20964958208,
+    "cpus": 12,
+    "available": 18424918016,
+    "availableFs": 409718177792,
+    "load": "0.00 0.01 0.00 3/423 7"
+  }
+}

@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S0_BLOCKED**。2026-11-20，固定 SQL 在正式取消提交前已到 EOF，非作者维持 NO-GO。两个任务 API 已封闭。G4 PARTIAL，AI OFF。
+唯一任务状态 **PRODUCT_RESUME_CONDITIONAL**。本批按 [唯一 A–F](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md) 的 AC03-A/C 决定 S1 准入，S1 通过后才进入 S2/S3 功能验证。AC03-B 及 Oracle S0 仍 BLOCKED，G4 PARTIAL，AI OFF。
 
 ## 执行身份与所有权
 
@@ -36,3 +36,5 @@ P0 的文档归属为本任务卡、[唯一 A–F](../evidence/G4-ORACLE-MAPPING
 s0-recovery-02 以 454d1a2f17581673cbbf44900a5fe241d603f5ef 为 Base。OIDC 与 RustFS 写者分别拥有各自维护 Python/C# 文本，复用已计量的 omq-deadline-store 与 omq-source-bindings 托管工作树。Master 单写实际维护分发、阶段预算、资源、测试汇总和交付。正常认证使用替代 PG 与 IdP，允许会话、审计及由正式票据生命周期引发的 epoch 变化。对象读取在实际及封存参考间串行。原五服务和原业务入口保持封闭。
 
 本批认证窗口已关闭，0/4 个原主体完成新登录，OIDC 为 WAITING_FOR_USER_AUTH。RustFS 实际及独立封存参考各遍历三页，5 个版本、0 个删除标记一致。资源停止后态已核对，RC05 仍 BLOCKED。[本批交接](../evidence/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-02/report.md)
+
+product-resume-01 从 `4924f44ec1628b156d7e722513405bc13d376d8e` 开始。Master 负责证据消费、产品阶段准入、共享文件集成和真实资源。独立写者分别负责 Oracle 生命周期及 Connections/Query 回归、SelfTest 夹具及其执行预算。非作者先复核登录原件和竞态切片，再审实际交付。

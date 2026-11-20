@@ -8,8 +8,10 @@
 
 2026-11-20，`s0-recovery-01` 起点为 `9de3b93a0dfddb948b4d68c61ad1b54ce84e0812`。用户批准准确占位晚恢复、当前一致检查点及替代恢复；业务入口持续封闭。三项交付与 RC01–RC06 记录在本批报告。 Oracle S0 BLOCKED，AC03 未通过，S1–S3 未准入，G4 PARTIAL。
 
-2026-11-20 当前停止点为 ChatGPT 复审。准确占位已清、原与替代五服务均已退出；RC05 阻断及恢复条件见[当前恢复报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/report.md)。
+2026-11-20 上一恢复批次停止点为 ChatGPT 复审。准确占位已清、原与替代五服务均已退出；RC05 阻断及恢复条件见[当前恢复报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/report.md)。
 
 2026-11-20 的集中授权绑定 s0-recovery-02 和 Base 454d1a2f17581673cbbf44900a5fe241d603f5ef。接受上批 RC01–RC04 限定结论、RC06 停止事实与冻结 Fuseki 的恢复可用性。仅准入正常四账号认证、固定桶版本读取、Compose 安全解析与恢复聚合。Oracle S0 BLOCKED，原清理 NOT_QUALIFIED，G4 PARTIAL。
 
 本批认证窗口已关闭，0/4 个原主体完成新登录，OIDC 为 WAITING_FOR_USER_AUTH。RustFS 实际及独立封存参考各遍历三页，5 个版本、0 个删除标记一致。资源停止后态已核对，RC05 仍 BLOCKED。[本批交接](../evidence/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-02/report.md)
+
+**现行批次 product-resume-01。** 用户批准在当前未合并任务分支上从 `4924f44ec1628b156d7e722513405bc13d376d8e` 推进。4/4 补充按既存原件离线核对。正式取消拆分 AC03-A/B/C；A/C 通过并具备一致副本、资源与权限后进入 S1，再按 S1 结果推进 S2/S3 功能验证。B 继续 BLOCKED / NOT_QUALIFIED。原最终资格、历史失败、原卷与九份归档保留。main 固定，停在 ChatGPT 复审。

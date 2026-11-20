@@ -1,0 +1,65 @@
+{
+  "status": "BLOCKED",
+  "reset": [
+    "g2-operator-ab",
+    "g2-auditor-ab",
+    "g2-operator-a",
+    "g2-viewer-a"
+  ],
+  "logins": [
+    {
+      "account": "g2-operator-ab",
+      "subject": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+      "role": "platform.operator",
+      "sites": [
+        "site-a",
+        "site-b"
+      ],
+      "httpStatus": 200
+    },
+    {
+      "account": "g2-auditor-ab",
+      "subject": "650199ae-8bd4-430a-885d-71cd69b6781e",
+      "role": "platform.auditor",
+      "sites": [
+        "site-a",
+        "site-b"
+      ],
+      "httpStatus": 200
+    },
+    {
+      "account": "g2-operator-a",
+      "subject": "bcf7f7f8-6af0-4f94-a28c-1220461ee62e",
+      "role": "platform.operator",
+      "sites": [
+        "site-a"
+      ],
+      "httpStatus": 200
+    },
+    {
+      "account": "g2-viewer-a",
+      "subject": "f902a743-7079-4e22-a643-a51deb027e89",
+      "role": "platform.viewer",
+      "sites": [
+        "site-a"
+      ],
+      "httpStatus": 200
+    }
+  ],
+  "removedTemporaryAdmin": true,
+  "attempt": "507f7106e8f9414b8845f33804dd8784",
+  "closing": "ORACLE_ADMISSION_SEALED_POSTSTATE",
+  "resources": {
+    "attempt": "2321a67285a94e96a1decf036eab3144",
+    "status": "FORMAL_RESOURCE_READY",
+    "disk": {
+      "hostGrowth": 79323136,
+      "referenceVolume": 0,
+      "componentLayers": 0,
+      "used": 79323136,
+      "remaining": 12951552,
+      "limit": 92274688
+    },
+    "total": 42629384638
+  }
+}
