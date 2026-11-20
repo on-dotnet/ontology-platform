@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **AUTH_HANDOFF_IMPLEMENTING**。源读取及正式结算已修改。替代 API 的当前资源窗口已按身份登记，真实 PG 三态锁内截止通过。按用户最终限定，本批另已核实一个重置账号的正式 /me 和登录审计。详见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/report.md)。本批按 [唯一 A–F](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md) 的 AC03-A/C 决定 S1 准入，S1 通过后才进入 S2/S3 功能验证。AC03-B 及 Oracle S0 仍 BLOCKED，G4 PARTIAL，AI OFF。
+唯一任务状态 **AUTH_HANDOFF_REVIEW_BLOCKED**。源读取及正式结算已修改。替代 API 的当前资源窗口已按身份登记，真实 PG 三态锁内截止通过。按用户最终限定，本批另已核实一个重置账号的正式 /me 和登录审计。详见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/report.md)。本批按 [唯一 A–F](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md) 的 AC03-A/C 决定 S1 准入，S1 通过后才进入 S2/S3 功能验证。AC03-B 及 Oracle S0 仍 BLOCKED，G4 PARTIAL，AI OFF。
 
 ## 执行身份与所有权
 
@@ -47,3 +47,5 @@ Base `33e66879a6b48e25580f1623316b88fe5a5e85cc`；Master 单写 `workflow-m4-que
 固定执行顺序：auth → AC03-A natural-cancel → Mapping当前正式链核验／必要补齐 → S1 → reader-auth → s1-reopen。前后处理各60秒，auth600秒，四产品槽各180秒，新reader认证180秒，父截止1620秒。没有可选尾阶段。前置失败或取消不进入后续；产品5秒／源分支1秒／清理250ms不变。每阶段前重核必要会话与授权210秒；新reader会话只替换reader。auth不读源、不续授、不发布；恢复只读平台存储。
 
 正反例由现有Node/Python框架定向回归：超过40秒人工等待后成功、提交后40秒与未提交区分、CSRF/me共用剩余期限、快速提交、取消/失败止步、实际驱动连续A/S1与新reader、真实外层/资格固定计划、替换阶段/父命令及越期拒绝。真实服务只在回归和非作者阻断闭合后开一次窗口。历史三次失败、旧1/1、S0/B阻断与cleanup NOT_QUALIFIED保持。
+
+2026-11-20 auth-handoff-01 收尾：最终代码 `fdadc58f8be175090961c9fcee8af192cf6b790c`，62项定向及非作者21项通过。两次实际窗口各1/4，auditor原件提交后timeout，后续非秘密服务端记录invalid_user_credentials，过期未核实。用户明确授权再次有界登录及仅恢复原3持卷实例；原3已恢复且保护20项匹配，第三窗最终被归档device身份漂移阻断，未启动浏览器。任务5副本停止、2API已移除。唯一状态AUTH_HANDOFF_REVIEW_BLOCKED，历史失败及未资格不变。三份完整公开脱敏文件见 `docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/`；普通push回读后停ChatGPT复审。

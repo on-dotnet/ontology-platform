@@ -1,0 +1,1292 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "fdadc58f8be175090961c9fcee8af192cf6b790c",
+  "checks": [
+    {
+      "name": "final-boundary",
+      "command": "python3 -B scripts/tests/WorkflowOracle.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "62 tests OK; commandId=7761358b693e4c79a2cfc889799de593"
+    },
+    {
+      "name": "non-author-node",
+      "command": "node --test absolute-WorkflowOracleNormalLogin.Tests.mjs absolute-WorkflowOracleAuthHandoff.Tests.mjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Independent outside-repository run21/21, no skipped; Git-history dependency removed"
+    },
+    {
+      "name": "authentication-window-1",
+      "command": "workflow_oracle_mapping_platform.browser_run(auth-handoff-s1); commandId=fd7186a07ec6438289856f8229aa85e7",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "1/4; operator authenticated; auditor submitted; original SUBMITTED_TIMEOUT; no product stages"
+    },
+    {
+      "name": "authentication-window-2",
+      "command": "workflow_oracle_mapping_platform.browser_run(auth-handoff-s1); commandId=2dfa6d5a8e2f443d9e0b3a4664870927",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "1/4; operator authenticated; auditor submitted; original SUBMITTED_TIMEOUT; no product stages"
+    },
+    {
+      "name": "AC03-A",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not executed in this batch; prerequisites or authorized validation scope do not admit it"
+    },
+    {
+      "name": "mapping",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not executed in this batch; prerequisites or authorized validation scope do not admit it"
+    },
+    {
+      "name": "S1",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not executed in this batch; prerequisites or authorized validation scope do not admit it"
+    },
+    {
+      "name": "reader-auth",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not executed in this batch; prerequisites or authorized validation scope do not admit it"
+    },
+    {
+      "name": "s1-reopen",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not executed in this batch; prerequisites or authorized validation scope do not admit it"
+    },
+    {
+      "name": "third-login-window",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not executed in this batch; prerequisites or authorized validation scope do not admit it"
+    },
+    {
+      "name": "full-SelfTest",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not executed in this batch; prerequisites or authorized validation scope do not admit it"
+    },
+    {
+      "name": "other-host-platforms",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not executed in this batch; prerequisites or authorized validation scope do not admit it"
+    },
+    {
+      "name": "login-error-metadata",
+      "command": "python3 -B login-error-metadata.py; commandId=a2be6e708af54f678e99103cd1bfa8ee",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Six auditor invalid_user_credentials records; password expiry NOT_VERIFIED"
+    },
+    {
+      "name": "retry-resource-admission",
+      "command": "workflow_oracle_mapping_resume.admit",
+      "status": "BLOCKED",
+      "exitCode": 1,
+      "output": "RECOVERY_HOST_MEASUREMENT then ARCHIVE_LEDGER_OWNER; no third browser started"
+    },
+    {
+      "name": "final-resource-state",
+      "command": "docker exact-ID ps; commandId=055ece5847a0439c99c97ba1d1981bb7",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Protected3 running/17 exited; task5 exited; prior2 APIs absent; admission remains BLOCKED"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "runId": "product-resume-01",
+    "batch": "auth-handoff-01",
+    "resourceRun": "implementation-01",
+    "base": "33e66879a6b48e25580f1623316b88fe5a5e85cc",
+    "branch": "codex/g4-oracle-mapping-query-001",
+    "main": "5168f2c93ca226caa521a6dc4ac85439335274c4",
+    "codeHead": "fdadc58f8be175090961c9fcee8af192cf6b790c",
+    "measuredCommit": "99235dba7353040531ee176b1dcef33147fcad73",
+    "taskState": "AUTH_HANDOFF_REVIEW_BLOCKED",
+    "plan": {
+      "schemaVersion": 1,
+      "planId": "auth-handoff-01",
+      "mode": "auth-handoff-s1",
+      "preSeconds": 60,
+      "postSeconds": 60,
+      "submissionSeconds": 40,
+      "requiredSessionSeconds": 210,
+      "stages": [
+        {
+          "mode": "s0-oracle-auth",
+          "kind": "authentication",
+          "seconds": 600
+        },
+        {
+          "mode": "s0-oracle-natural-cancel",
+          "kind": "product",
+          "seconds": 180
+        },
+        {
+          "mode": "mapping",
+          "kind": "product",
+          "seconds": 180
+        },
+        {
+          "mode": "s1",
+          "kind": "product",
+          "seconds": 180
+        },
+        {
+          "mode": "reader-auth",
+          "kind": "authentication",
+          "seconds": 180
+        },
+        {
+          "mode": "s1-reopen",
+          "kind": "product",
+          "seconds": 180
+        }
+      ],
+      "deadlineSeconds": 1620
+    },
+    "productBudgets": {
+      "totalMs": 5000,
+      "sourceBranchMs": 1000,
+      "cleanupMs": 250
+    },
+    "windows": [
+      {
+        "window": 1,
+        "authorization": "execution card",
+        "testedCommit": "99235dba7353040531ee176b1dcef33147fcad73",
+        "parent": {
+          "commandId": "fd7186a07ec6438289856f8229aa85e7",
+          "parentId": "95458ff4d2d64d148ff9fbec9327eb95",
+          "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+          "runId": "product-resume-01",
+          "stage": "omq-browser-auth-handoff-s1",
+          "deadlineSeconds": 1620,
+          "startedAtUtc": "2026-11-20T12:46:18.495246+00:00",
+          "endedAtUtc": "2026-11-20T12:47:55.754827+00:00",
+          "elapsedSeconds": 97.25898354197852,
+          "exitCode": 1,
+          "signal": null,
+          "classification": "EXIT_FAILURE",
+          "inputFingerprint": "33318e945149e3e5d50bbe9b2d625a6c75a6ea714086432af038cc42adb34717",
+          "timingStatus": "WITHIN_DEADLINE",
+          "commandSummary": {
+            "executable": "node",
+            "argumentCount": 9,
+            "sha256": "048960ea868e91b4af77688bedb6c9c5508831a79d91dc374b7e14a454b3a1d3"
+          },
+          "stdout": {
+            "sha256": "544741a96ebf0fc9d1d1a6b532a75193bdd9f0287aeecc3921cdbc7b704670b2",
+            "sizeBytes": 798
+          },
+          "stderr": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "batch": {
+          "mode": "auth-handoff-s1",
+          "startedAtUtc": "2026-11-20T12:46:18.587Z",
+          "finishedAtUtc": "2026-11-20T12:47:55.738Z",
+          "preMs": 396.368041,
+          "postMs": 274.4318340000027,
+          "status": "FAIL"
+        },
+        "stage": {
+          "mode": "s0-oracle-auth",
+          "startedAtUtc": "2026-11-20T12:46:19.253Z",
+          "finishedAtUtc": "2026-11-20T12:47:55.463Z",
+          "elapsedMs": 96475.188791,
+          "status": "FAIL"
+        },
+        "stageIdentity": {
+          "executionId": "6fcb651f6275488f8358922642499f7c",
+          "planId": "auth-handoff-01",
+          "mode": "s0-oracle-auth",
+          "kind": "authentication",
+          "seconds": 600,
+          "index": 0
+        },
+        "stageInputs": {
+          "mode": "s0-oracle-auth",
+          "case": "healthy",
+          "phase": "s0"
+        },
+        "stageSha256": "1f53c8f910faa499f7cc3b632cc47d4040fd6434655ca8538e6420de47dab507",
+        "failure": {
+          "phase": "oidc_auditor-ab",
+          "category": "Error",
+          "code": "ORACLE_LOGIN_SUBMITTED_TIMEOUT"
+        },
+        "checksCount": 8,
+        "authentication": [
+          {
+            "label": "operator-ab",
+            "submitted": true,
+            "classification": "AUTHENTICATED",
+            "startedAtUtc": "2026-11-20T12:46:20.319Z",
+            "handoffAtUtc": "2026-11-20T12:46:20.379Z",
+            "windowRemainingMs": 598649.582917,
+            "submittedAtUtc": "2026-11-20T12:46:51.096Z",
+            "finishedAtUtc": "2026-11-20T12:46:51.758Z",
+            "humanWaitMs": 30758.090917,
+            "networkMs": 662.7875000000022
+          },
+          {
+            "label": "auditor-ab",
+            "submitted": true,
+            "classification": "ORACLE_LOGIN_SUBMITTED_TIMEOUT",
+            "startedAtUtc": "2026-11-20T12:46:51.950Z",
+            "handoffAtUtc": "2026-11-20T12:46:51.979Z",
+            "windowRemainingMs": 567021.986375,
+            "submittedAtUtc": "2026-11-20T12:47:14.950Z",
+            "finishedAtUtc": "2026-11-20T12:47:54.951Z",
+            "humanWaitMs": 22985.024665999998,
+            "networkMs": 40001.051959
+          }
+        ],
+        "identities": [
+          {
+            "label": "operator-ab",
+            "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+            "roles": [
+              "platform.operator"
+            ],
+            "scopes": [
+              {
+                "organizationId": "org-demo",
+                "siteId": "site-a"
+              },
+              {
+                "organizationId": "org-demo",
+                "siteId": "site-b"
+              }
+            ],
+            "meSha256": "787273187f08c3d267a9b0a1be91ac04ea2b5d5d74d10c14d70642c8a326d3d4"
+          }
+        ],
+        "authenticated": "1/4",
+        "fourTickets": "NOT_RUN",
+        "laterStages": "NOT_RUN",
+        "audits": [
+          {
+            "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+            "runId": "product-resume-01",
+            "startUtc": "2026-11-20T12:46:18.495246Z",
+            "endUtc": "2026-11-20T12:47:55.754827Z",
+            "clientId": null,
+            "sourceId": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+            "observerId": "OMQ_OBSERVER",
+            "sourceIdentityCommand": "3596d729fd4b4cff9d773b1244390daa",
+            "sourceClock": [
+              "2026-11-20T12:47:55.916862Z",
+              "2026-11-20T12:47:55.954516Z"
+            ],
+            "errorBounds": {
+              "lowerNs": -110893999,
+              "upperNs": 8177000
+            },
+            "sourceAuditCount": 0,
+            "recordsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "commandId": "f4ab164a5a294074aabcf0966792ce38"
+          },
+          {
+            "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+            "runId": "product-resume-01",
+            "startUtc": "2026-11-20T12:46:19.253000Z",
+            "endUtc": "2026-11-20T12:47:55.463000Z",
+            "clientId": null,
+            "sourceId": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+            "observerId": "OMQ_OBSERVER",
+            "sourceIdentityCommand": "de604f0f9f774beabe89e828178a328c",
+            "sourceClock": [
+              "2026-11-20T12:47:56.024816Z",
+              "2026-11-20T12:47:56.032573Z"
+            ],
+            "errorBounds": {
+              "lowerNs": -44710999,
+              "upperNs": 6761000
+            },
+            "sourceAuditCount": 0,
+            "recordsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "commandId": "a51f02bbaa8943c59c92735a8daa1f2b"
+          }
+        ]
+      },
+      {
+        "window": 2,
+        "authorization": "explicit user retry",
+        "testedCommit": "99235dba7353040531ee176b1dcef33147fcad73",
+        "parent": {
+          "commandId": "2dfa6d5a8e2f443d9e0b3a4664870927",
+          "parentId": "d600e30753274294965418a1ba968e41",
+          "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+          "runId": "product-resume-01",
+          "stage": "omq-browser-auth-handoff-s1",
+          "deadlineSeconds": 1620,
+          "startedAtUtc": "2026-11-20T12:49:30.585958+00:00",
+          "endedAtUtc": "2026-11-20T12:50:31.719047+00:00",
+          "elapsedSeconds": 61.13281341700349,
+          "exitCode": 1,
+          "signal": null,
+          "classification": "EXIT_FAILURE",
+          "inputFingerprint": "8d56a822fe1ca75d198361ba19321cc9b62030c65d6db79a4b07479a2c2a5184",
+          "timingStatus": "WITHIN_DEADLINE",
+          "commandSummary": {
+            "executable": "node",
+            "argumentCount": 9,
+            "sha256": "dea29dc5c677d6228528b78fe8d5714ca61fa21234f80e7644d5ddfcd3caa5cd"
+          },
+          "stdout": {
+            "sha256": "43e86266f43a595f467f4037e61293689396c55fe1d5719f678fcde96c870110",
+            "sizeBytes": 798
+          },
+          "stderr": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "batch": {
+          "mode": "auth-handoff-s1",
+          "startedAtUtc": "2026-11-20T12:49:30.721Z",
+          "finishedAtUtc": "2026-11-20T12:50:31.713Z",
+          "preMs": 394.221625,
+          "postMs": 221.9904170000009,
+          "status": "FAIL"
+        },
+        "stage": {
+          "mode": "s0-oracle-auth",
+          "startedAtUtc": "2026-11-20T12:49:31.414Z",
+          "finishedAtUtc": "2026-11-20T12:50:31.490Z",
+          "elapsedMs": 60369.520833,
+          "status": "FAIL"
+        },
+        "stageIdentity": {
+          "executionId": "cc205c4ed39840599be6bae39f12f0a4",
+          "planId": "auth-handoff-01",
+          "mode": "s0-oracle-auth",
+          "kind": "authentication",
+          "seconds": 600,
+          "index": 0
+        },
+        "stageInputs": {
+          "mode": "s0-oracle-auth",
+          "case": "healthy",
+          "phase": "s0"
+        },
+        "stageSha256": "c2ed37bff225c018a8af4249eb078f85a35b0130f93b3edb6a2b6f124b626f11",
+        "failure": {
+          "phase": "oidc_auditor-ab",
+          "category": "Error",
+          "code": "ORACLE_LOGIN_SUBMITTED_TIMEOUT"
+        },
+        "checksCount": 8,
+        "authentication": [
+          {
+            "label": "operator-ab",
+            "submitted": true,
+            "classification": "AUTHENTICATED",
+            "startedAtUtc": "2026-11-20T12:49:31.683Z",
+            "handoffAtUtc": "2026-11-20T12:49:31.735Z",
+            "windowRemainingMs": 599413.210875,
+            "submittedAtUtc": "2026-11-20T12:49:40.581Z",
+            "finishedAtUtc": "2026-11-20T12:49:40.794Z",
+            "humanWaitMs": 8873.267333,
+            "networkMs": 213.88979199999994
+          },
+          {
+            "label": "auditor-ab",
+            "submitted": true,
+            "classification": "ORACLE_LOGIN_SUBMITTED_TIMEOUT",
+            "startedAtUtc": "2026-11-20T12:49:40.975Z",
+            "handoffAtUtc": "2026-11-20T12:49:40.994Z",
+            "windowRemainingMs": 590131.91425,
+            "submittedAtUtc": "2026-11-20T12:49:51.158Z",
+            "finishedAtUtc": "2026-11-20T12:50:31.159Z",
+            "humanWaitMs": 10169.810917,
+            "networkMs": 40000.606333
+          }
+        ],
+        "identities": [
+          {
+            "label": "operator-ab",
+            "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+            "roles": [
+              "platform.operator"
+            ],
+            "scopes": [
+              {
+                "organizationId": "org-demo",
+                "siteId": "site-a"
+              },
+              {
+                "organizationId": "org-demo",
+                "siteId": "site-b"
+              }
+            ],
+            "meSha256": "787273187f08c3d267a9b0a1be91ac04ea2b5d5d74d10c14d70642c8a326d3d4"
+          }
+        ],
+        "authenticated": "1/4",
+        "fourTickets": "NOT_RUN",
+        "laterStages": "NOT_RUN",
+        "audits": [
+          {
+            "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+            "runId": "product-resume-01",
+            "startUtc": "2026-11-20T12:49:30.585958Z",
+            "endUtc": "2026-11-20T12:50:31.719047Z",
+            "clientId": null,
+            "sourceId": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+            "observerId": "OMQ_OBSERVER",
+            "sourceIdentityCommand": "279bb5699b8942afaf2c9a6f7eba7226",
+            "sourceClock": [
+              "2026-11-20T12:50:31.829530Z",
+              "2026-11-20T12:50:31.838539Z"
+            ],
+            "errorBounds": {
+              "lowerNs": -76853999,
+              "upperNs": 8026000
+            },
+            "sourceAuditCount": 0,
+            "recordsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "commandId": "6a5ac39f92654e749018ac94e4295591"
+          },
+          {
+            "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+            "runId": "product-resume-01",
+            "startUtc": "2026-11-20T12:49:31.414000Z",
+            "endUtc": "2026-11-20T12:50:31.490000Z",
+            "clientId": null,
+            "sourceId": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+            "observerId": "OMQ_OBSERVER",
+            "sourceIdentityCommand": "4ebe8eafa37641d38bc517ae858f407b",
+            "sourceClock": [
+              "2026-11-20T12:50:31.908740Z",
+              "2026-11-20T12:50:31.916328Z"
+            ],
+            "errorBounds": {
+              "lowerNs": -45138999,
+              "upperNs": 7072000
+            },
+            "sourceAuditCount": 0,
+            "recordsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "commandId": "1916932ba02f400fafaf58fd56ef92cb"
+          }
+        ]
+      }
+    ],
+    "finalBoundary": {
+      "command": {
+        "commandId": "7761358b693e4c79a2cfc889799de593",
+        "parentId": null,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "product-resume-01",
+        "stage": "auth-handoff-final-boundary",
+        "deadlineSeconds": 60,
+        "startedAtUtc": "2026-11-20T13:04:31.504458+00:00",
+        "endedAtUtc": "2026-11-20T13:04:37.400820+00:00",
+        "elapsedSeconds": 5.8962790419999465,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "inputFingerprint": "e72cd2d2aac5de84bc55fa748cf7072416b7ce10c43334b4f5f16e5296052519",
+        "timingStatus": "WITHIN_DEADLINE",
+        "commandSummary": {
+          "executable": "python3",
+          "argumentCount": 2,
+          "sha256": "a80ebdb6a81f0ff9099d54e23b70e5ef457e93745da8405c0a0c7b6f22d440ea"
+        },
+        "stdout": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        },
+        "stderr": {
+          "sha256": "f8d75b00d2f24e75471b403705c7a72e9e509c435bbac84d35e6f9408d112f4b",
+          "sizeBytes": 161
+        }
+      },
+      "testedCommit": "fdadc58f8be175090961c9fcee8af192cf6b790c",
+      "tests": 62,
+      "inputs": {
+        "docs/development/verification-gates.json": "88e01b29ad3bfc933c4beb5b42c11ec525165884db9fb4e6b7d1a6086e1871a2",
+        "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md": "27ec5a3bd4f834b03d296efe0d365f2f84dc8ecf53a058f3e2aed621cbcf5cef",
+        "docs/tasks/G4-ORACLE-MAPPING-QUERY-001.md": "8fbea95c7c22aca2b09191b7c8dc4d5f2110ef452b2e04e05d907872c60b10cb",
+        "docs/tasks/current-authorization.md": "f2349a7f046ff15fe2128062805f7f57c21199a2fbbd091ec6074df1bdb3ed80",
+        "scripts/maintenance/workflow-m4-query.mjs": "5e752a854115c6fb6f8c6fdc842356beeee6d86ed35b52161dce3801eee4f0b1",
+        "scripts/maintenance/workflow-oracle-auth-plan.json": "826aa393316000c6bc3fe7ce9017eab8f71db21ceb895893e39d5a22cafeecc5",
+        "scripts/maintenance/workflow-oracle-query-fixture.mjs": "42f2beca33982aa5ecdfffdb29fa0797f351e4abfb704cc814c4ae107d5e2504",
+        "scripts/maintenance/workflow_oracle_mapping_evidence.py": "6c07c2a6067bca43805c572edad3cf72d3aa78f1380208601e4d8c3ea0c82c7e",
+        "scripts/maintenance/workflow_oracle_mapping_platform.py": "5b8e9bd36070b999aece0680c09af17fd9d132b273cd2fff58595946adab9079",
+        "scripts/tests/WorkflowOracle.Tests.py": "faa1d978824e8e263527ad2f9ae6b9c3cdd40e440b7c60d470f70f1a4dd6c5dc",
+        "scripts/tests/WorkflowOracleAuthHandoff.Tests.mjs": "1a77d0e5d088500511ccc8ad1269d2f3aa341f35e080ec2588927216bab50256",
+        "scripts/tests/WorkflowOracleAuthHandoff.Tests.py": "659b0c1f31308ea15ad12cd7e9f42d29b1b79c59f647ac3f1249c1d7791806c4",
+        "scripts/tests/WorkflowOracleEntryFix.Tests.py": "6df3264a612abd7e1fa1d86b6062e1fdf8de5d05954fa93cc2aec97b657eb161",
+        "scripts/tests/WorkflowOracleMappingEvidence.Tests.py": "faad6c12ee52f37857d35dad6b1ef9d20642913594e49be055871740988c1dc5",
+        "scripts/tests/WorkflowOracleNormalLogin.Tests.mjs": "15435eda1892d5f1e244514f6a7d68e32953004249f4efc76d3aea33acdda32f",
+        "scripts/tests/WorkflowOracleReadyFixture.mjs": "2e9f8332116faf87847bc9de205e26e9a056a8cf1094bcf1940f566ff147ec7b"
+      }
+    },
+    "loginErrorMetadata": {
+      "command": {
+        "commandId": "a2be6e708af54f678e99103cd1bfa8ee",
+        "parentId": null,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "product-resume-01",
+        "stage": "login-error-metadata",
+        "deadlineSeconds": 40,
+        "startedAtUtc": "2026-11-20T13:05:11.386828+00:00",
+        "endedAtUtc": "2026-11-20T13:05:11.489165+00:00",
+        "elapsedSeconds": 0.10224912499995753,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "inputFingerprint": "ee4f9567141bea1bffc034539a9b88bc44796dcbcb25ab8e12a330d8edfd6f9b",
+        "timingStatus": "WITHIN_DEADLINE",
+        "commandSummary": {
+          "executable": "python3",
+          "argumentCount": 2,
+          "sha256": "1213984c612f12657a9e92b1b129cd5bb269329225daf6445dce301ff8ea6549"
+        },
+        "stdout": {
+          "sha256": "5067cdf360598223ce0a3c13a71c18b04ac63164e02140bc7e4a6ad415e462c5",
+          "sizeBytes": 1073
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      },
+      "result": {
+        "status": "READ_ONLY_METADATA",
+        "observedAtUtc": "2026-11-20T13:05:11.486949+00:00",
+        "sourceId": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+        "containerState": "exited",
+        "startUtc": "2026-11-20T12:46:19Z",
+        "endUtc": "2026-11-20T12:50:34Z",
+        "records": [
+          {
+            "atUtc": "2026-11-20T12:47:15.003212630Z",
+            "account": "g2-auditor-ab",
+            "error": "invalid_user_credentials"
+          },
+          {
+            "atUtc": "2026-11-20T12:47:18.068923965Z",
+            "account": "g2-auditor-ab",
+            "error": "invalid_user_credentials"
+          },
+          {
+            "atUtc": "2026-11-20T12:47:36.072317043Z",
+            "account": "g2-auditor-ab",
+            "error": "invalid_user_credentials"
+          },
+          {
+            "atUtc": "2026-11-20T12:47:37.389406168Z",
+            "account": "g2-auditor-ab",
+            "error": "invalid_user_credentials"
+          },
+          {
+            "atUtc": "2026-11-20T12:49:51.204483467Z",
+            "account": "g2-auditor-ab",
+            "error": "invalid_user_credentials"
+          },
+          {
+            "atUtc": "2026-11-20T12:50:22.802075134Z",
+            "account": "g2-auditor-ab",
+            "error": "invalid_user_credentials"
+          }
+        ],
+        "passwordExpiry": "NOT_VERIFIED"
+      }
+    },
+    "closeout": {
+      "operation": "763de90e6d7f4ef8b0395101da137268",
+      "ids": {
+        "platform-pg": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+        "keycloak-test": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+        "fuseki": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+        "rustfs": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
+        "oracle": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+        "api": "7b8e34a848d4ba4007a4c3eda589e9cf4a627d20fc9ff7b805f82ec0f69e1f1f",
+        "api-secondary": "59c5a80344ca2f7076003090b1e678977ff79a1d2c03ae52dd457747d3a057f2"
+      },
+      "drain": {
+        "initial": {
+          "commandId": "227bb862d01740baadbc525051f4d2ef",
+          "counts": {
+            "runningQueries": 0,
+            "queuedOrRunningRuns": 0,
+            "queuedOrRunningCatalogJobs": 0,
+            "runningProbes": 0,
+            "queuedOrRunningMappingJobs": 0,
+            "undispatchedMappingOutbox": 0,
+            "undispatchedPublishingOutbox": 0
+          }
+        },
+        "closed": {
+          "commandId": "3efa133774ca4227953e8a57a9d65068",
+          "counts": {
+            "runningQueries": 0,
+            "queuedOrRunningRuns": 0,
+            "queuedOrRunningCatalogJobs": 0,
+            "runningProbes": 0,
+            "queuedOrRunningMappingJobs": 0,
+            "undispatchedMappingOutbox": 0,
+            "undispatchedPublishingOutbox": 0
+          }
+        }
+      },
+      "apis": {
+        "api": {
+          "id": "7b8e34a848d4ba4007a4c3eda589e9cf4a627d20fc9ff7b805f82ec0f69e1f1f",
+          "absentCommand": "6cec299fc5fa4fe5b08171ab78535058"
+        },
+        "api-secondary": {
+          "id": "59c5a80344ca2f7076003090b1e678977ff79a1d2c03ae52dd457747d3a057f2",
+          "absentCommand": "5ca80fa87dbb49d2afccca15408ddf2f"
+        }
+      },
+      "data": {
+        "oracle": {
+          "id": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T12:51:51.640337842Z"
+          },
+          "nativeShutdown": true,
+          "resourceAttempt": "d70aa6a0d15f456ab79fda9f45f2916c"
+        },
+        "rustfs": {
+          "id": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T12:51:53.555869093Z"
+          },
+          "resourceAttempt": "37fec733a7b343ff9e145cdc86739327"
+        },
+        "keycloak-test": {
+          "id": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T12:51:56.638739094Z"
+          },
+          "resourceAttempt": "f1a02eb1c04644378df6f5b93a614df6"
+        },
+        "fuseki": {
+          "id": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+          "status": "PROCESS_EXITED",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T12:51:59.234047721Z"
+          },
+          "cleanShutdown": "UNKNOWN",
+          "allTdbLocksRemoved": false,
+          "resourceAttempt": "9de522cccdcc4600b0ec5a870b959c4e"
+        },
+        "platform-pg": {
+          "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T12:52:03.145070916Z"
+          },
+          "controlState": "shut down",
+          "resourceAttempt": "4d343d0d0e2a48439d0f15d34f38e77d"
+        }
+      },
+      "before": "ae0b6483e0b8486a8f8645cafe637665",
+      "status": "PASS",
+      "post": "e97ac08c06f44a3f8e5a97668b69a985",
+      "protectedSha256": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9",
+      "remaining": []
+    },
+    "finalState": {
+      "command": {
+        "commandId": "055ece5847a0439c99c97ba1d1981bb7",
+        "parentId": null,
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "runId": "product-resume-01",
+        "stage": "auth-handoff-final-state",
+        "deadlineSeconds": 18,
+        "startedAtUtc": "2026-11-20T13:12:19.993330+00:00",
+        "endedAtUtc": "2026-11-20T13:12:20.048515+00:00",
+        "elapsedSeconds": 0.055104625000012675,
+        "exitCode": 0,
+        "signal": null,
+        "classification": "SUCCESS",
+        "inputFingerprint": "ee4f9567141bea1bffc034539a9b88bc44796dcbcb25ab8e12a330d8edfd6f9b",
+        "timingStatus": "WITHIN_DEADLINE",
+        "commandSummary": {
+          "executable": "docker",
+          "argumentCount": 61,
+          "sha256": "2e867b50766816278f2c3f78c92cb8d86c4eca915c338382b384029603f74036"
+        },
+        "stdout": {
+          "sha256": "38ebea7496455d84bbbe12d02c583a26d5d714a48f71c40bfb8823134b8dd4db",
+          "sizeBytes": 1803
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sizeBytes": 0
+        }
+      },
+      "states": {
+        "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be": "exited",
+        "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1": "exited",
+        "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545": "exited",
+        "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6": "exited",
+        "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1": "exited",
+        "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9": "running",
+        "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f": "running",
+        "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04": "running",
+        "34a947835a8949be5fb34bdc813e87ff812dca1d3381ccea7ce610754448367f": "exited",
+        "292a8c9e30a5465a9cac32127a65d8db760d366ab45fcf75cf34be4af3fe35f2": "exited",
+        "8b25045bed1fac7df9fa945d636216f2a92c8efb7fce35f0a0edf96a6df888a5": "exited",
+        "cd563c910aa96e9c6eaabf32475d5bfe2ec56e6a9f754ca48b4287de1b8e653b": "exited",
+        "22837b2b2702a851ca4553b6d0ff0ce09ac3d5f65f67b911f39598cbf1f804d8": "exited",
+        "5e0f45ecaf9e2f227c4290891eeb26e577bfeaaaa8d5a5b0be7a15458656a49a": "exited",
+        "4a5dacfa92d7d9a119267365a65ab5037b98b4bb2292b9e47199b0bb14ab50b4": "exited",
+        "0edb069b759a2521cb56250f1db0227bd3cc8c81ad06210a1d8a7c7b52866534": "exited",
+        "19f76154598ac31e4a075175aadafc0a2f22591281ecf5db0704fd65e26a502b": "exited",
+        "b71ef14e5e484253c0b435332c4480fc071268f634c0b049d5d4aff57c383912": "exited",
+        "ed281bc42b432a4e20817b00dfbc7b480271f36368a24370414a6e6fb5b62dca": "exited",
+        "fc53d2b9b9fc7d67344a79e1abcf107b32b832d762713979a3584da8d9d1c7f5": "exited",
+        "47686c56bb164ed6577349fe47b20968f83630032d6c3ebd8ed55586a8846bbd": "exited",
+        "61791a2303a2945b9947824de91e763d22be03b538d1c0b76ee3ce44027a835f": "exited",
+        "f1a5f1cb913037f7716a3599bc19c1ed9eed11aa6db79b7f1a57c8dbe1c3943d": "exited",
+        "c1bbd53e0b335a12c5e50bc860a58e6d3cb01de7d81a354ee87696dd0a941c81": "exited",
+        "d267220f4227b7c92f5d2e37e7e85a4587644488157c10e5f95586613bd08952": "exited"
+      },
+      "protectedMatches": true,
+      "taskPersistentStopped": true,
+      "taskApisAbsent": true,
+      "phaseAdmission": "BLOCKED_ARCHIVE_LEDGER_OWNER"
+    },
+    "protectedRestore": {
+      "ids": [
+        "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9",
+        "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f",
+        "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04"
+      ],
+      "commands": [
+        {
+          "commandId": "d56d099b80974f4dbcff8283d2fbd6ec",
+          "parentId": null,
+          "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+          "runId": "product-resume-01",
+          "stage": "protected-three-before",
+          "deadlineSeconds": 45,
+          "startedAtUtc": "2026-11-20T13:07:53.366530+00:00",
+          "endedAtUtc": "2026-11-20T13:07:53.392841+00:00",
+          "elapsedSeconds": 0.026227374999962194,
+          "exitCode": 0,
+          "signal": null,
+          "classification": "SUCCESS",
+          "inputFingerprint": "ee4f9567141bea1bffc034539a9b88bc44796dcbcb25ab8e12a330d8edfd6f9b",
+          "timingStatus": "WITHIN_DEADLINE",
+          "commandSummary": {
+            "executable": "docker",
+            "argumentCount": 8,
+            "sha256": "9878dea3981ab561163bd811250bd314b2c46be82947ba6bf822007e5128d3f3"
+          },
+          "stdout": {
+            "sha256": "7f53bbb1a1b93ee6328e31fdfb432e24fd38a41066a0f695ad3750e1c8b129c8",
+            "sizeBytes": 949
+          },
+          "stderr": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        {
+          "commandId": "9095ab86ce9e4b9ba4b2b01658a60825",
+          "parentId": null,
+          "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+          "runId": "product-resume-01",
+          "stage": "protected-three-start",
+          "deadlineSeconds": 45,
+          "startedAtUtc": "2026-11-20T13:07:53.395553+00:00",
+          "endedAtUtc": "2026-11-20T13:07:53.494258+00:00",
+          "elapsedSeconds": 0.09871841599999698,
+          "exitCode": 0,
+          "signal": null,
+          "classification": "SUCCESS",
+          "inputFingerprint": "ee4f9567141bea1bffc034539a9b88bc44796dcbcb25ab8e12a330d8edfd6f9b",
+          "timingStatus": "WITHIN_DEADLINE",
+          "commandSummary": {
+            "executable": "docker",
+            "argumentCount": 4,
+            "sha256": "c587aa81c1122e420826e7ab4be615913f60f283a647e87a52d6812b1cab5afe"
+          },
+          "stdout": {
+            "sha256": "ab3f7f6ae2471121b090cd0d07c92a17f9f5debbb7ad82acfbdac73025dfe287",
+            "sizeBytes": 65
+          },
+          "stderr": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        {
+          "commandId": "f4a0014c9fa447cb839574e44af180cf",
+          "parentId": null,
+          "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+          "runId": "product-resume-01",
+          "stage": "protected-three-start",
+          "deadlineSeconds": 45,
+          "startedAtUtc": "2026-11-20T13:07:53.497603+00:00",
+          "endedAtUtc": "2026-11-20T13:07:53.585254+00:00",
+          "elapsedSeconds": 0.08766158299999915,
+          "exitCode": 0,
+          "signal": null,
+          "classification": "SUCCESS",
+          "inputFingerprint": "ee4f9567141bea1bffc034539a9b88bc44796dcbcb25ab8e12a330d8edfd6f9b",
+          "timingStatus": "WITHIN_DEADLINE",
+          "commandSummary": {
+            "executable": "docker",
+            "argumentCount": 4,
+            "sha256": "e0ad6941e9703ac3598e770914d741b34e44c2f458e159c1474aab37e6c78425"
+          },
+          "stdout": {
+            "sha256": "5d464a99f2671e74eea4250fcce0dbd32a9b5a23a5cfad7333a7966814537513",
+            "sizeBytes": 65
+          },
+          "stderr": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        {
+          "commandId": "4df49986c4a64ac1b540de62dac1393b",
+          "parentId": null,
+          "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+          "runId": "product-resume-01",
+          "stage": "protected-three-start",
+          "deadlineSeconds": 45,
+          "startedAtUtc": "2026-11-20T13:07:53.589115+00:00",
+          "endedAtUtc": "2026-11-20T13:07:53.666901+00:00",
+          "elapsedSeconds": 0.07779579200007447,
+          "exitCode": 0,
+          "signal": null,
+          "classification": "SUCCESS",
+          "inputFingerprint": "ee4f9567141bea1bffc034539a9b88bc44796dcbcb25ab8e12a330d8edfd6f9b",
+          "timingStatus": "WITHIN_DEADLINE",
+          "commandSummary": {
+            "executable": "docker",
+            "argumentCount": 4,
+            "sha256": "6fadbca10315e30fd9cb955677d17ab3b85f68ac8540c7237389cbd82c8d9db9"
+          },
+          "stdout": {
+            "sha256": "f5c215cc6492d3184cbd0022b885f474ca85c5dad243887ccf114afa11a2f10e",
+            "sizeBytes": 65
+          },
+          "stderr": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        {
+          "commandId": "1d24319caa784b5b85f346e161c1023f",
+          "parentId": null,
+          "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+          "runId": "product-resume-01",
+          "stage": "protected-three-after",
+          "deadlineSeconds": 45,
+          "startedAtUtc": "2026-11-20T13:07:53.671694+00:00",
+          "endedAtUtc": "2026-11-20T13:07:53.709699+00:00",
+          "elapsedSeconds": 0.038023457999997845,
+          "exitCode": 0,
+          "signal": null,
+          "classification": "SUCCESS",
+          "inputFingerprint": "ee4f9567141bea1bffc034539a9b88bc44796dcbcb25ab8e12a330d8edfd6f9b",
+          "timingStatus": "WITHIN_DEADLINE",
+          "commandSummary": {
+            "executable": "docker",
+            "argumentCount": 25,
+            "sha256": "ff0a1e0fd4277a150f52a84bcfb41402e5a331bb30eaa6be6b25e022f805eba5"
+          },
+          "stdout": {
+            "sha256": "9dd8045b6cc2036e83e450cbe8e7ec1040b2857ac0fcfa580c8ffa1804cf5cee",
+            "sizeBytes": 6712
+          },
+          "stderr": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        }
+      ],
+      "expectedMatch": true,
+      "status": "PASS"
+    },
+    "thirdWindow": {
+      "status": "NOT_RUN",
+      "startupFailures": [
+        "ORACLE_ADMISSION_RECOVERY_HOST_MEASUREMENT",
+        "ORACLE_ADMISSION_ARCHIVE_LEDGER_OWNER"
+      ],
+      "authorization": "User confirmed correct local account item; resource preflight must pass",
+      "archiveStatOnly": {
+        "scope": "stat only; no archive content read",
+        "archives": [
+          {
+            "archive": "platform/fuseki.tar",
+            "changed": {
+              "device": {
+                "before": 16777229,
+                "after": 16777234
+              }
+            },
+            "owned": true,
+            "privatePermissions": true
+          },
+          {
+            "archive": "platform/rustfs.tar",
+            "changed": {
+              "device": {
+                "before": 16777229,
+                "after": 16777234
+              }
+            },
+            "owned": true,
+            "privatePermissions": true
+          },
+          {
+            "archive": "platform/keycloak-test.tar",
+            "changed": {
+              "device": {
+                "before": 16777229,
+                "after": 16777234
+              }
+            },
+            "owned": true,
+            "privatePermissions": true
+          },
+          {
+            "archive": "platform/platform-pg.tar",
+            "changed": {
+              "device": {
+                "before": 16777229,
+                "after": 16777234
+              }
+            },
+            "owned": true,
+            "privatePermissions": true
+          },
+          {
+            "archive": "source/database.tar",
+            "changed": {
+              "device": {
+                "before": 16777229,
+                "after": 16777234
+              }
+            },
+            "owned": true,
+            "privatePermissions": true
+          },
+          {
+            "archive": "source/trust-and-auth.tar",
+            "changed": {
+              "device": {
+                "before": 16777229,
+                "after": 16777234
+              }
+            },
+            "owned": true,
+            "privatePermissions": true
+          }
+        ]
+      },
+      "reconstructedCheckout": {
+        "head": "7d113e3ca9e6dc1b91722fe320c429ae1ace0cce",
+        "actualDiskKiB": 761332,
+        "publicOriginals": 10,
+        "missingPrivateOriginals": 2,
+        "status": "REBUILT_SOURCE_AND_PUBLIC_ORIGINALS",
+        "lifecycle": "KEEP until resource-accounting reference retired"
+      }
+    },
+    "reuse": {
+      "sourceBase": "33e66879a6b48e25580f1623316b88fe5a5e85cc",
+      "currentCommit": "99235dba7353040531ee176b1dcef33147fcad73",
+      "builds": {
+        "api": {
+          "receiptSha256": "d5826b711bdae9d155a91c94c389821f807cc615533146c74960f3a581d4c3ab",
+          "inputKey": "7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f",
+          "outputKey": "a9b16e7d0f8b9388bc787126612748ab9c8f2b9207620f177873c117945f4348"
+        },
+        "query": {
+          "receiptSha256": "5ff280c853992b95c9010910fa3bdb49d9f95430b5827df40763c7084d7c4735",
+          "inputKey": "7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f",
+          "outputKey": "0a538da60517db5340e23f73c03c3d7e341a2098f0e9006a0c498d8e1b412c8c"
+        },
+        "agent": {
+          "receiptSha256": "669b83e79d8000411e7b99488b3ba1d3b1b9f3b689169d82370c117b232c9868",
+          "inputKey": "7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f",
+          "outputKey": "0251317fd5be41c2ea6088222dc5911f9ea93f30a3c122c24aa554c08638f694"
+        }
+      },
+      "backendInfraChanges": [],
+      "qualification": "CURRENT_INPUTS_MATCH_PREVIOUS_BUILDS",
+      "pgRun": "92cd82b7d50d4b8ab7bd86026c4c724c",
+      "historicalQualificationPreserved": true
+    },
+    "hostMonitor": {
+      "startedAtUtc": "2026-11-20T12:46:25.969695+00:00",
+      "endedAtUtc": "2026-11-20T12:52:58.696013+00:00",
+      "heartbeatCount": 40,
+      "measuredElapsedMs": 392724,
+      "policyContinuouslyReady": true,
+      "displayOff": "NOT_VERIFIED",
+      "sessionContinuity": "NOT_VERIFIED"
+    },
+    "results": {
+      "AC03_A": "NOT_RUN",
+      "AC03_C": "REUSED_PG_8_OF_8",
+      "AC03_B": "BLOCKED",
+      "OracleS0": "BLOCKED",
+      "cleanup250ms": "NOT_QUALIFIED",
+      "S1": "NOT_RUN",
+      "S2": "NOT_RUN",
+      "S3": "NOT_RUN",
+      "G4": "PARTIAL",
+      "passwordExpiry": "NOT_VERIFIED"
+    },
+    "history": {
+      "oldThreeWindows": [
+        {
+          "commandId": "ae2ebad4418249cc99d97f722b4d340c",
+          "authenticated": "0/4"
+        },
+        {
+          "commandId": "3b9131ecad82459e88b9f2660b285def",
+          "authenticated": "0/4"
+        },
+        {
+          "commandId": "f2dab63d98bf42fd97f19d3a2dde66c4",
+          "authenticated": "0/4"
+        }
+      ],
+      "priorOperator": "1/1 at historical input preserved",
+      "genericVerify": "BLOCKED: OMQ_ORIGINALS_NOT_RUN_admission",
+      "planDirty": "Cheap plan refused dirty candidate; original Finder files preserved",
+      "testDevelopmentFailures": "Harness omissions and global environment corrected; fixed Git-history test dependency reproduced independently and removed"
+    },
+    "publication": {
+      "policy": "Explicit field allowlist; no raw stdout/stderr, browser body, archive content, user attachment, chat credential, Cookie or token payloads",
+      "originals": "Retained locally and independently reopened; only original hash/size and safe structured facts are public",
+      "autoReview": "Broad raw-payload publication rejected and not executed; replaced with this narrower allowlist"
+    },
+    "originalIndex": [
+      {
+        "file": "formal-audit-fd7186a07ec6438289856f8229aa85e7.json",
+        "sha256": "773b807fc781c8fe5e64d8b8af82ab641c90570759a282126d8d28408aed8079",
+        "sizeBytes": 710,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "formal-audit-fd7186a07ec6438289856f8229aa85e7-s0-oracle-auth.json",
+        "sha256": "84abf6bc3e1c5e3fc55d6bf3522d18aaa7b8484b5bec27bd71009374d85bd5b8",
+        "sizeBytes": 709,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "formal-run-auth-handoff-s1-fd7186a07ec6438289856f8229aa85e7.json",
+        "sha256": "1e99a9823db62752cdf83f2f5da4264eb5f5632e3359234fcf250c41dc15e960",
+        "sizeBytes": 7637,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "browser-auth-handoff-s1-1795178875738.json",
+        "sha256": "4ff381b67aa24afa8e0e62b9276044d6643bc8e60a0f5cca16e54cfb2289fb3e",
+        "sizeBytes": 2023,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "browser-s0-oracle-auth-1795178779253.json",
+        "sha256": "1f53c8f910faa499f7cc3b632cc47d4040fd6434655ca8538e6420de47dab507",
+        "sizeBytes": 13930,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "receipt.json",
+        "sha256": "ddef5f357d1a9a8e9494295d12fa8af95b163c9994bdddf2021ccbdaabfca570",
+        "sizeBytes": 1534,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "formal-audit-2dfa6d5a8e2f443d9e0b3a4664870927.json",
+        "sha256": "4889d5afec02b15d16a6922f96ee4ad95dee8ec3db19a9bb23d1acf8fbc9c7ed",
+        "sizeBytes": 709,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "formal-audit-2dfa6d5a8e2f443d9e0b3a4664870927-s0-oracle-auth.json",
+        "sha256": "c4a8f8e59e442ca5891424b4ff9ac13045493a492061ad85d8891eb6d996d815",
+        "sizeBytes": 709,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "formal-run-auth-handoff-s1-2dfa6d5a8e2f443d9e0b3a4664870927.json",
+        "sha256": "fd5c8fa4b19aca6214c34565a6048f22c7b76bd6e449a48d09f78db0b7a41a7b",
+        "sizeBytes": 7637,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "browser-auth-handoff-s1-1795179031713.json",
+        "sha256": "51a33a83bf9d7eebaf384696e788ebdd5b67bcb2b6fce1fa88f4b3b0f8802471",
+        "sizeBytes": 2023,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "browser-s0-oracle-auth-1795178971414.json",
+        "sha256": "c2ed37bff225c018a8af4249eb078f85a35b0130f93b3edb6a2b6f124b626f11",
+        "sizeBytes": 13922,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "receipt.json",
+        "sha256": "14ee7c67081ecc6e34ffc813280b5169f071868f732b5ceb13e226abae398e04",
+        "sizeBytes": 1534,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "boundary-tests.json",
+        "sha256": "a602c98a4af4250a87b7c3c5b06a7e274fc709548a90bc319681ea1f90fea945",
+        "sizeBytes": 3460,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "final-boundary-tests.json",
+        "sha256": "d29b60ff1f614a2bd3041e9784f5865d669b26ac28b523bd822f1fd128cb74d2",
+        "sizeBytes": 3795,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "input-reuse.json",
+        "sha256": "a1f195b9ac646a7939d3d71888846294036d9f85e1b65d52ca7d137356c94ded",
+        "sizeBytes": 1214,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "startup.json",
+        "sha256": "9e0971cdc1380f7d625d5912f1d8067a100aa3dc34ccf112626b2f2940bf69ef",
+        "sizeBytes": 12192,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "closeout.json",
+        "sha256": "821049a604f34d470bf402b873274b327a24ec66d46adf6d9695e570d03af122",
+        "sizeBytes": 3896,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "login-audit.json",
+        "sha256": "24707850effac1621c113aef11b2ef63b1e11e9ced8ab6fd3aac7c0a76d5c706",
+        "sizeBytes": 678,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "host-monitor.summary.json",
+        "sha256": "b6db46a441460f28ae66c051251c1ccc4615b3a02a9a9139c708a31596246fce",
+        "sizeBytes": 649,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "login-error-metadata.json",
+        "sha256": "a519a54886e776d8dd9fa3d3651f195c7842f4a0a44f3b6963fd6f3b03a081fa",
+        "sizeBytes": 3089,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "protected-restore.json",
+        "sha256": "5a15307676754dd2f6bc1515c05bf58130600838047068fac509df816503fee5",
+        "sizeBytes": 17288,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "archive-identity-diagnostic.json",
+        "sha256": "df45252c79ffd17d82e4e0f1059829e3311275f5527a80e61c43da674ced18cf",
+        "sizeBytes": 1428,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "post-docker-reopen.json",
+        "sha256": "08966379944bbdd9df7652e45ea7c0d60a29fb905dee19c530131327441b8e93",
+        "sizeBytes": 1433,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "measure-checkout-rebuild.json",
+        "sha256": "97a067ee7e391b2dde504581bfee73d55dd96264d57c9031a248db489133abca",
+        "sizeBytes": 4597,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "startup-03.json",
+        "sha256": "0f4df3b1cceb5cbf33ef87ce83bdcd6b533e10b0856d49100042bfd4cd440f4d",
+        "sizeBytes": 1938,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "startup-03b.json",
+        "sha256": "92067fd2fd65a3af92ddb11dedabd9abdcfe2288b68c8a2570f43056c16affb6",
+        "sizeBytes": 1927,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      },
+      {
+        "file": "final-state.json",
+        "sha256": "a6aafd18fe41a4a4da0551e3e983fcb4ca259d64abfd1868716db528799011fe",
+        "sizeBytes": 3944,
+        "storage": "LOCAL_ORIGINAL_RETAINED"
+      }
+    ],
+    "delivery": {
+      "method": "ordinary push",
+      "finalHead": "Exact containing commit supplied by final remote-readback links",
+      "zip": "NOT_CREATED by explicit intermediate-delivery exception",
+      "stop": "CHATGPT_REVIEW"
+    },
+    "report": {
+      "file": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/report.md",
+      "sha256": "55cf6ddde691e0257f83f0833ede5ad5fce7ed1c621d1b5b08ddc8b51869dc11",
+      "sizeBytes": 9223
+    }
+  }
+}

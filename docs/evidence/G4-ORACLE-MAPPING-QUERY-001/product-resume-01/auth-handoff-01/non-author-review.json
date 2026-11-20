@@ -1,0 +1,62 @@
+{
+  "reviewer": "/root/final_review",
+  "reviewedCommit": "fdadc58f8be175090961c9fcee8af192cf6b790c",
+  "scope": "Actual independent classifier/originals review; public candidate re-review pending",
+  "codeVerdict": "PASS",
+  "productVerdict": "BLOCKED",
+  "openFindings": [],
+  "resolvedFindings": [
+    {
+      "severity": "P2",
+      "problem": "Fixed Git-history dependency in new regression",
+      "resolution": "Removed; outside-repository21/21 passes"
+    }
+  ],
+  "boundary": {
+    "commandId": "7761358b693e4c79a2cfc889799de593",
+    "tests": 62,
+    "verifiedInputs": 16,
+    "exitCode": 0
+  },
+  "nodeTests": {
+    "tests": 21,
+    "failed": 0,
+    "skipped": 0,
+    "exitCode": 0
+  },
+  "auditConsumer": {
+    "reopened": 4,
+    "records": 0,
+    "clientId": null
+  },
+  "currentDriverReuse": "REJECTED: OMQ_BROWSER_DRIVER_CHANGED",
+  "closeout": {
+    "operation": "763de90e6d7f4ef8b0395101da137268",
+    "apiCommandsVerified": 6,
+    "nativeStopCommandsVerified": 18,
+    "beforeAdmissionCommandsVerified": 45,
+    "postAdmissionCommandsVerified": 43,
+    "allCheckedStreamHashesAndSizesMatch": true
+  },
+  "protectedRestore": {
+    "commandsVerified": 5,
+    "afterMatchesFrozen20": true
+  },
+  "loginErrorMetadata": {
+    "records": 6,
+    "error": "invalid_user_credentials",
+    "passwordExpiry": "NOT_VERIFIED"
+  },
+  "measureCheckout": {
+    "publicOriginalsVerified": 10,
+    "missingPrivateOriginals": 2,
+    "actualDiskKiB": 761332
+  },
+  "publicCandidateReview": "PENDING",
+  "limitations": [
+    "Third login window not started",
+    "Archive identity drift remains BLOCKED",
+    "No new product qualification",
+    "Final files and push readback require subsequent review"
+  ]
+}
