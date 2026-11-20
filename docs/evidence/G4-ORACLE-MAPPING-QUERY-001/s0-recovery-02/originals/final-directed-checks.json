@@ -1,0 +1,88 @@
+{
+  "testedCommit": "aba08e047f3a4673a6fc255d90db8d5736e1036c",
+  "base": "454d1a2f17581673cbbf44900a5fe241d603f5ef",
+  "tree": "/Users/chasen/.codex/worktrees/omq-source-bindings/ontology-platform",
+  "checks": [
+    {
+      "key": "oracle",
+      "exitCode": 0,
+      "commandId": "950169fa593948f88fc47df793b7efa2",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowOracle.Tests.py"
+      ],
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "9ee2c1a4a23a6c3ad4ce8c1f38a97f53a2c8044599ee6504c2b06718f55b62ff",
+      "elapsedSeconds": 0.766374749946408
+    },
+    {
+      "key": "parser",
+      "exitCode": 0,
+      "commandId": "48c78c4278284fbe9f51355a16911153",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/tests/StructuredFiles.Tests.ps1"
+      ],
+      "stdoutSha256": "5cb4a1d46185aae46f27f47f603544068731ef051e0fce41d126647cde2a5959",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsedSeconds": 9.952546166954562
+    },
+    {
+      "key": "plan",
+      "exitCode": 0,
+      "commandId": "f357ee5744e74f07994002cf089fb0e1",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow.py",
+        "plan",
+        "--base",
+        "454d1a2f17581673cbbf44900a5fe241d603f5ef",
+        "--head",
+        "aba08e047f3a4673a6fc255d90db8d5736e1036c",
+        "--output",
+        "/Users/chasen/.codex/worktrees/omq-source-bindings/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-02/final-directed-plan.json"
+      ],
+      "stdoutSha256": "4ed2f66ca4aa53fa9c872317b0fce98c79a104452c953949d24f8c37cc6e1f4a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsedSeconds": 27.128584167105146,
+      "result": {
+        "status": "PLANNED",
+        "affected": [
+          "context-selection",
+          "engineering",
+          "engineering-full",
+          "oracle-task-admission",
+          "policy"
+        ],
+        "unknown": []
+      }
+    },
+    {
+      "key": "verify",
+      "exitCode": 2,
+      "commandId": "22c30cf60be445d096c28da313cf6450",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow.py",
+        "verify",
+        "--task",
+        "G4-ORACLE-MAPPING-QUERY-001",
+        "--plan",
+        "/Users/chasen/.codex/worktrees/omq-source-bindings/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-02/final-directed-plan.json"
+      ],
+      "stdoutSha256": "6d3b4a3651e98f2576176d2acbc2fdf335b4907abee1d3d398cc7a4f926a4608",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsedSeconds": 28.488782583968714,
+      "result": {
+        "status": "BLOCKED",
+        "reason": "FAILURE_STATE_BUSY: \u5df2\u6709\u8fd0\u884c\u5360\u7528\u8be5\u5931\u8d25\u72b6\u6001\uff0c\u7981\u6b62\u5e76\u53d1\u6602\u8d35\u91cd\u9a8c"
+      },
+      "gates": []
+    }
+  ]
+}

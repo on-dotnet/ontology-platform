@@ -1,0 +1,320 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "s0-recovery-02",
+  "resourceRun": "implementation-01",
+  "status": "VERIFIED",
+  "attempt": "55116a4c4f114b78b902bd1eb417a412",
+  "activeIds": [
+    "3f1502f453da342d8cd57ab6514852d1fa06007baad709156abb7da0e5e2647f",
+    "57ef8d99c6eb37eb4681f9ae707537de93b556218394ad54c8703b2f2b2f5ce9",
+    "d3f2a4b9dd9d06bf3141e35c80b4c96246b47cc81092762f88171bf57dff5e04"
+  ],
+  "oldRetained": {
+    "exited": 17,
+    "running": 3,
+    "inventorySha256": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9"
+  },
+  "resources": {
+    "original": {
+      "oracle": {
+        "id": "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09",
+        "status": "exited",
+        "exitCode": 143,
+        "volume": "ontology-g4-oracle-mapping-query-001_oracle-data",
+        "oom": false
+      },
+      "platform-pg": {
+        "id": "eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5",
+        "status": "exited",
+        "exitCode": 0,
+        "volume": "ontology-g4-omq-platform-01_platform-data",
+        "oom": false
+      },
+      "keycloak-test": {
+        "id": "15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b",
+        "status": "exited",
+        "exitCode": 143,
+        "volume": "ontology-g4-omq-platform-01_keycloak-data",
+        "oom": false
+      },
+      "fuseki": {
+        "id": "9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb",
+        "status": "exited",
+        "exitCode": 143,
+        "volume": "ontology-g4-omq-platform-01_fuseki-data",
+        "oom": false
+      },
+      "rustfs": {
+        "id": "f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd",
+        "status": "exited",
+        "exitCode": 0,
+        "volume": "ontology-g4-omq-platform-01_rustfs-data",
+        "oom": false
+      }
+    },
+    "replacement": {
+      "oracle": {
+        "id": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+        "status": "exited",
+        "exitCode": 143,
+        "volume": "ontology-g4-omq-replacement-01_oracle-data",
+        "oom": false
+      },
+      "platform-pg": {
+        "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+        "status": "exited",
+        "exitCode": 0,
+        "volume": "ontology-g4-omq-restore-01_platform-data",
+        "oom": false
+      },
+      "keycloak-test": {
+        "id": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+        "status": "exited",
+        "exitCode": 143,
+        "volume": "ontology-g4-omq-restore-01_keycloak-data",
+        "oom": false
+      },
+      "fuseki": {
+        "id": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+        "status": "exited",
+        "exitCode": 143,
+        "volume": "ontology-g4-omq-restore-01_fuseki-data",
+        "oom": false
+      },
+      "rustfs": {
+        "id": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
+        "status": "exited",
+        "exitCode": 0,
+        "volume": "ontology-g4-omq-restore-01_rustfs-data",
+        "oom": false
+      }
+    },
+    "apis": {
+      "api": {
+        "id": "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d",
+        "status": "exited",
+        "exitCode": 143,
+        "volume": "",
+        "oom": false
+      },
+      "api-secondary": {
+        "id": "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd",
+        "status": "exited",
+        "exitCode": 143,
+        "volume": "",
+        "oom": false
+      }
+    },
+    "archived-apis": {
+      "api": {
+        "id": "f90b7e7b599ffb4e9b298ce3679f9f24b25c762b472487fe09fd52e3f8e378cf",
+        "status": "exited",
+        "exitCode": 143,
+        "volume": "",
+        "oom": false
+      },
+      "api-secondary": {
+        "id": "0f04589574f7ace57e784e1bf0525e6c2587819a0c882ebfc15a09f7203e689f",
+        "status": "exited",
+        "exitCode": 143,
+        "volume": "",
+        "oom": false
+      }
+    }
+  },
+  "registry": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "runId": "s0-recovery-02",
+    "base": "454d1a2f17581673cbbf44900a5fe241d603f5ef",
+    "ids": {},
+    "volumes": {}
+  },
+  "nineArchives": {
+    "platform/fuseki.tar": {
+      "sha256": "f0a6a3788e2bb92777a2eed9641aea91025cf8bfaa7512ccb70d1d09bf1525c4",
+      "bytes": 880640,
+      "mode": "0600",
+      "identity": [
+        16777229,
+        22938024,
+        1795130484375891403
+      ]
+    },
+    "platform/rustfs.tar": {
+      "sha256": "6ff1aa706d27fd31f0c98c95168124d3a0f07a6018aef527f45bdb169e70be3e",
+      "bytes": 184320,
+      "mode": "0600",
+      "identity": [
+        16777229,
+        22938497,
+        1795130486922136558
+      ]
+    },
+    "platform/keycloak-test.tar": {
+      "sha256": "87dd320d0bb8813bf44ffdc149e88298c249fcabc75c663e2e6c387f20a90409",
+      "bytes": 193556480,
+      "mode": "0600",
+      "identity": [
+        16777229,
+        22938964,
+        1795130489852276024
+      ]
+    },
+    "platform/platform-pg.tar": {
+      "sha256": "ba0696fcb0257d5f6b022b6dad2ca6bdf938bd81afb0f038e4230f83187c7fc7",
+      "bytes": 99440640,
+      "mode": "0600",
+      "identity": [
+        16777229,
+        22939430,
+        1795130492664728128
+      ]
+    },
+    "source/database.tar": {
+      "sha256": "fc69697238cfe0f2197466c3eaac96994b6200628cf06f6dc29f13d42d633f7c",
+      "bytes": 4425000960,
+      "mode": "0600",
+      "identity": [
+        16777229,
+        22939898,
+        1795130503553523770
+      ]
+    },
+    "source/trust-and-auth.tar": {
+      "sha256": "060b9206c94adbc98f808fd5b6c8bb78aa7c9a7e02d831f24862acaf3a9a8daa",
+      "bytes": 251074560,
+      "mode": "0600",
+      "identity": [
+        16777229,
+        22939904,
+        1795130504085500889
+      ]
+    },
+    "host/materials.tar": {
+      "sha256": "898e9652eb4ebff45fd1872eaefa555c97a02cdde918dd9e3054207f8dd43c71",
+      "bytes": 105472,
+      "mode": "0600",
+      "identity": [
+        16777229,
+        22937767,
+        1795130483114807977
+      ]
+    },
+    "early/database.tar": {
+      "sha256": "41a2fc228ebb760087282a48253718e89bb637aa241182b09316fd0f4499dafb",
+      "bytes": 4330629120,
+      "mode": "0600",
+      "identity": [
+        16777229,
+        22774762,
+        1795097892745075921
+      ]
+    },
+    "early/trust-and-auth.tar": {
+      "sha256": "0ceedc75a91fa234066f139093bc9e105c0024b9fc6d9e36687d295f8628a479",
+      "bytes": 67891200,
+      "mode": "0600",
+      "identity": [
+        16777229,
+        22774766,
+        1795097892877918006
+      ]
+    }
+  },
+  "archivePostcondition": "Same mode/dev/inode/ctime/size after full pre-window SHA verification",
+  "referenceRemoved": true,
+  "temporaryContainersRemoved": true,
+  "quota": {
+    "memory": 3758096384,
+    "nanoCpus": 4000000000
+  },
+  "vm": {
+    "total": 20964958208,
+    "cpus": 12,
+    "available": 18342162432,
+    "availableFs": 409717452800,
+    "load": "0.06 0.11 0.08 3/437 7"
+  },
+  "platformDisk": {
+    "allocations": {
+      "images": 15837977833,
+      "sourceAndReplacement": 9486141582,
+      "containerLayers": 32735232,
+      "currentHostIncludingFirstBackup": 14400495616,
+      "secondColdSourceCopy": 56853575,
+      "boundedContainerLogs": 335544320,
+      "boundedProbeAndStreamingTemporary": 67108864,
+      "newBuildEvidenceAndLogs": 275841024,
+      "platformOriginal": 805306368,
+      "platformCheckpointRemaining": 511242240,
+      "platformReplacement": 805306368,
+      "componentReferenceActual": 0,
+      "componentGrowthRemaining": 14831616
+    },
+    "componentBudget": {
+      "hostGrowth": 52277248,
+      "referenceVolume": 0,
+      "componentLayers": 0,
+      "used": 52277248,
+      "remaining": 14831616,
+      "limit": 67108864
+    },
+    "totalBytes": 42629384638,
+    "ceilingBytes": 42949672960,
+    "hostPaths": [
+      "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform",
+      "/private/tmp/omq-implementation-01-measure-7d113e3c",
+      "/Users/chasen/.codex/worktrees/omq-deadline-store/ontology-platform",
+      "/Users/chasen/.codex/worktrees/omq-source-bindings/ontology-platform"
+    ],
+    "representativePlatformBytes": 478053116,
+    "platformCopyCeiling": 805306368,
+    "sourceVolumeCaps": {
+      "ontology-g4-oracle-mapping-query-001_oracle-data": 4743070791,
+      "ontology-g4-omq-replacement-01_oracle-data": 4743070791
+    },
+    "initialSourceMeasurement": {
+      "volumesLogicalBytes": {
+        "ontology-g4-oracle-mapping-query-001_oracle-data": 4675961927,
+        "ontology-g4-omq-replacement-01_oracle-data": 4675961927
+      },
+      "containerWritableBytes": {
+        "00c4f5dabf4a9348adf0f8910f28015f4a84301f56548e4da23642227c223f09": 27410432,
+        "0f04589574f7ace57e784e1bf0525e6c2587819a0c882ebfc15a09f7203e689f": 45056,
+        "15e05cb8e15b7c4e86eb0b9e1efeab79bdbcb620bc863f6e8c5679f7a23d9f5b": 12288,
+        "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1": 12288,
+        "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6": 4096,
+        "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be": 12288,
+        "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1": 5038080,
+        "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545": 24576,
+        "872a44afe819ddcd0c6c9040c97204a9633d5b24e09442df450898e09b05d7fd": 45056,
+        "9300ad957c05e496fec424c34c10b62b368984ce470eb366c4af3a4a473912eb": 4096,
+        "9ebfe02c2d5d4aae584add715eeee938988ae6c53e2a77e4f82f70d52d06a92d": 45056,
+        "eb3c386dbfe423d22f71f638d1be1c62d30d181e6e6decc039ead85b3ea2dbe5": 24576,
+        "f426493417bf179e887c095dd14164d0a3cf3aa71575e01fe1e77bd306c859bd": 12288,
+        "f90b7e7b599ffb4e9b298ce3679f9f24b25c762b472487fe09fd52e3f8e378cf": 45056
+      },
+      "platformVolumes": {
+        "platform-pg": 95448050,
+        "keycloak-test": 192562697,
+        "fuseki": 201344970,
+        "rustfs": 87689
+      },
+      "replacementVolumes": {
+        "platform-pg": 95448050,
+        "keycloak-test": 192562697,
+        "fuseki": 201344970,
+        "rustfs": 93157
+      },
+      "componentVolumes": {},
+      "componentLayers": {}
+    },
+    "measuredAgainBeforeExpansionOrRestore": true
+  },
+  "maxObservedAdmission": {
+    "plannedMemory": 6979321856,
+    "plannedNanoCpus": 6500000000,
+    "chargedBytes": 42629488721,
+    "incrementBytes": 52277248
+  }
+}

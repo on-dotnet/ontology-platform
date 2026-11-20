@@ -1,0 +1,50 @@
+{
+  "exitCode": 0,
+  "commandId": "380bd39df16b4b25be175f9e1be979e0",
+  "stdout": "{\"status\":\"SIGNATURE_VECTOR_VERIFIED\"}\n",
+  "cases": {
+    "status": "PASS",
+    "synthetic": true,
+    "positive": {
+      "status": "RUSTFS_FROZEN_VERSIONS_VERIFIED",
+      "bucket": "g4-oracle-mapping-synthetic",
+      "archive": "6ff1aa706d27fd31f0c98c95168124d3a0f07a6018aef527f45bdb169e70be3e",
+      "versioning": "Enabled",
+      "actualPages": 4,
+      "referencePages": 4,
+      "publishedObjects": 5,
+      "inventoryEntries": 7,
+      "deleteMarkers": 1,
+      "inventorySha256": "7f7b9c07f267bddd8060bfa22cc92580bcfa01d16835588414d8f71cfc3e893c"
+    },
+    "rejected": {
+      "missing_cursor": "RUSTFS_CONTINUATION",
+      "repeated_page": "RUSTFS_PAGE_CHAIN",
+      "missing_terminal": "RUSTFS_PAGE_TERMINATION",
+      "duplicate_tuple": "RUSTFS_VERSION_TUPLE",
+      "missing_literal_null_id": "RUSTFS_VERSION_TUPLE",
+      "wrong_response_version": "RUSTFS_GET_EXACT_VERSION",
+      "unproved_marker": "RUSTFS_GET_MARKER",
+      "different_reference_version_bytes": "RUSTFS_ARCHIVE_COMPARISON",
+      "wrong_published_bytes": "RUSTFS_PG_PUBLISHED_OBJECT",
+      "reference_as_actual": "RUSTFS_COMMAND_BINDING",
+      "counterfeit_fingerprint": "RUSTFS_COMMAND_BINDING"
+    }
+  },
+  "build": {
+    "kind": "objects",
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "runId": "s0-recovery-02",
+    "inputFingerprint": "5810905e9912c84023def3ff17987890d8e892415aa126dfc7837f46f76d32af",
+    "apiOutput": "47a6099ee578ac70b2e31543aa8057259881e999da7aa9a13b852fa4a9ad3978",
+    "apiSource": "9b71721d84acf4bc4a445adca0454b0ddbbf991f",
+    "apiBinding": "d25cacbfdf41d00334f75afc4e5fc43f8f53ea92ebebd2ef62cc9f8858a9dd9f",
+    "admission": "aec32a30b28d4b9ca55bb13f6f6dcd09",
+    "sourceSha256": "37d53c8e646f529c56c61c66a869c72a41bdfbb9172b54b2f56f601e39bf854d",
+    "buildDir": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-02/build-objects-96bd03b39b3a486d8fad18ff7ec254a7",
+    "commandId": "a97c2837ece6466c832f4918f225160a",
+    "exitCode": 0,
+    "dllSha256": "8e4e9408c7203c632f7bc7d26abf75c6abc0be6f52e8b9f24ce972369eff28c1",
+    "dllName": "ObjectRecovery.dll"
+  }
+}

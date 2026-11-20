@@ -1,0 +1,191 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "s0-recovery-02",
+  "resourceRun": "implementation-01",
+  "base": "454d1a2f17581673cbbf44900a5fe241d603f5ef",
+  "role": "reference",
+  "serviceId": "be065cc34a1cc1693079756b161764d477bbd20183ff9b9c2105328140fdf0b3",
+  "volume": "ontology-g4-omq-recovery-02_rustfs-reference",
+  "input": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "run": "s0-recovery-02",
+    "resourceRun": "implementation-01",
+    "base": "454d1a2f17581673cbbf44900a5fe241d603f5ef",
+    "image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+    "archive": "6ff1aa706d27fd31f0c98c95168124d3a0f07a6018aef527f45bdb169e70be3e",
+    "role": "reference",
+    "volume": "ontology-g4-omq-recovery-02_rustfs-reference",
+    "containerId": "be065cc34a1cc1693079756b161764d477bbd20183ff9b9c2105328140fdf0b3",
+    "attempt": "6174f35d67d644e6a4f503d55afd4ef8",
+    "sourceSha256": "00712cc15912054be57a0ac8430f562cc7cff4a879dd5b7e9c682b038df852ea",
+    "driverSha256": "8e4e9408c7203c632f7bc7d26abf75c6abc0be6f52e8b9f24ce972369eff28c1",
+    "inputFingerprint": "deb7ef8c1368da0180b82cffda8baad4a56f7ae2e9b58959f5caab6af46e8ae7"
+  },
+  "verifier": "b174b8cabed66021c7dae65aa2df6e10e214d02998d733ac24a84fb2921c23eb",
+  "driver": {
+    "kind": "objects",
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "runId": "s0-recovery-02",
+    "inputFingerprint": "5810905e9912c84023def3ff17987890d8e892415aa126dfc7837f46f76d32af",
+    "apiOutput": "47a6099ee578ac70b2e31543aa8057259881e999da7aa9a13b852fa4a9ad3978",
+    "apiSource": "9b71721d84acf4bc4a445adca0454b0ddbbf991f",
+    "apiBinding": "d25cacbfdf41d00334f75afc4e5fc43f8f53ea92ebebd2ef62cc9f8858a9dd9f",
+    "admission": "aec32a30b28d4b9ca55bb13f6f6dcd09",
+    "sourceSha256": "37d53c8e646f529c56c61c66a869c72a41bdfbb9172b54b2f56f601e39bf854d",
+    "buildDir": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-02/build-objects-96bd03b39b3a486d8fad18ff7ec254a7",
+    "commandId": "a97c2837ece6466c832f4918f225160a",
+    "exitCode": 0,
+    "dllSha256": "8e4e9408c7203c632f7bc7d26abf75c6abc0be6f52e8b9f24ce972369eff28c1",
+    "dllName": "ObjectRecovery.dll"
+  },
+  "attempt": "6174f35d67d644e6a4f503d55afd4ef8",
+  "argv": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "start",
+    "-a",
+    "-i",
+    "b174b8cabed66021c7dae65aa2df6e10e214d02998d733ac24a84fb2921c23eb"
+  ],
+  "commandId": "13290492f9f64950b613b045a3b389e5",
+  "exitCode": 0,
+  "inputFingerprint": "deb7ef8c1368da0180b82cffda8baad4a56f7ae2e9b58959f5caab6af46e8ae7",
+  "stdinSha256": "01ffef2cfeb1f4cd72d1c30b9afca9c643750a3b975059f88b5a1b29d3ded5b0",
+  "stdoutSha256": "e813a266f0aa326b0292730dd1ccc9ae2e737752ffa39c899382611a906946ea",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "result": {
+    "status": "OBSERVED",
+    "binding": {
+      "archive": "6ff1aa706d27fd31f0c98c95168124d3a0f07a6018aef527f45bdb169e70be3e",
+      "attempt": "6174f35d67d644e6a4f503d55afd4ef8",
+      "base": "454d1a2f17581673cbbf44900a5fe241d603f5ef",
+      "containerId": "be065cc34a1cc1693079756b161764d477bbd20183ff9b9c2105328140fdf0b3",
+      "driverSha256": "8e4e9408c7203c632f7bc7d26abf75c6abc0be6f52e8b9f24ce972369eff28c1",
+      "image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "inputFingerprint": "deb7ef8c1368da0180b82cffda8baad4a56f7ae2e9b58959f5caab6af46e8ae7",
+      "resourceRun": "implementation-01",
+      "role": "reference",
+      "run": "s0-recovery-02",
+      "sourceSha256": "00712cc15912054be57a0ac8430f562cc7cff4a879dd5b7e9c682b038df852ea",
+      "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+      "volume": "ontology-g4-omq-recovery-02_rustfs-reference"
+    },
+    "versioning": "UNSET",
+    "versioningBytes": 137,
+    "versioningSha256": "0604749e98724de0fc4dc26cddc06a8e893755fd6ce9ab4a8142d820bdbf7864",
+    "pages": [
+      {
+        "keyMarker": null,
+        "versionMarker": null,
+        "nextKey": "releases/d60d10638030402c8fcf6254bc782529/source-0-953a903dcb71ef931aaa9f2be006ed5a5872001f57c6bffee4ed0f436658b5dd.ttl[rustfs_cache:v2,id:414f9477-e8b7-481a-9c2c-9c4d6cbf1f89,src:walker,gen:live]",
+        "nextVersion": "null",
+        "truncated": true,
+        "xmlBytes": 1278,
+        "xmlSha256": "3e9bfffb33de7e12487751b907c33b1b79cbeae6821da9553e4dbf214ea2201a",
+        "rows": [
+          {
+            "key": "releases/d60d10638030402c8fcf6254bc782529/manifest-ab3f11b9320448c60f5aa77a28bc1f96505dbdffd063c4e73fc1b80ef4e159ba.json",
+            "versionId": "null",
+            "kind": "Version",
+            "isLatest": true,
+            "lastModified": "2026-11-19T16:01:37.204Z",
+            "listedBytes": 3490,
+            "status": 200,
+            "responseVersionId": null,
+            "responseDeleteMarker": null,
+            "responseLastModified": "2026-11-19T16:01:37.0000000+00:00",
+            "responseBytes": 3490,
+            "responseSha256": "ab3f11b9320448c60f5aa77a28bc1f96505dbdffd063c4e73fc1b80ef4e159ba"
+          },
+          {
+            "key": "releases/d60d10638030402c8fcf6254bc782529/source-0-953a903dcb71ef931aaa9f2be006ed5a5872001f57c6bffee4ed0f436658b5dd.ttl",
+            "versionId": "null",
+            "kind": "Version",
+            "isLatest": true,
+            "lastModified": "2026-11-19T16:01:37.145Z",
+            "listedBytes": 1827,
+            "status": 200,
+            "responseVersionId": null,
+            "responseDeleteMarker": null,
+            "responseLastModified": "2026-11-19T16:01:37.0000000+00:00",
+            "responseBytes": 1827,
+            "responseSha256": "953a903dcb71ef931aaa9f2be006ed5a5872001f57c6bffee4ed0f436658b5dd"
+          }
+        ]
+      },
+      {
+        "keyMarker": "releases/d60d10638030402c8fcf6254bc782529/source-0-953a903dcb71ef931aaa9f2be006ed5a5872001f57c6bffee4ed0f436658b5dd.ttl[rustfs_cache:v2,id:414f9477-e8b7-481a-9c2c-9c4d6cbf1f89,src:walker,gen:live]",
+        "versionMarker": "null",
+        "nextKey": "releases/d60d10638030402c8fcf6254bc782529/source-2-aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b.ttl[rustfs_cache:v2,id:414f9477-e8b7-481a-9c2c-9c4d6cbf1f89,src:walker,gen:live]",
+        "nextVersion": "null",
+        "truncated": true,
+        "xmlBytes": 1476,
+        "xmlSha256": "06fba7cb404c356c619a562c65cc01c9c7bf237bfd103b6cfb775dde066879fb",
+        "rows": [
+          {
+            "key": "releases/d60d10638030402c8fcf6254bc782529/source-1-78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270.ttl",
+            "versionId": "null",
+            "kind": "Version",
+            "isLatest": true,
+            "lastModified": "2026-11-19T16:01:37.151Z",
+            "listedBytes": 3466,
+            "status": 200,
+            "responseVersionId": null,
+            "responseDeleteMarker": null,
+            "responseLastModified": "2026-11-19T16:01:37.0000000+00:00",
+            "responseBytes": 3466,
+            "responseSha256": "78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270"
+          },
+          {
+            "key": "releases/d60d10638030402c8fcf6254bc782529/source-2-aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b.ttl",
+            "versionId": "null",
+            "kind": "Version",
+            "isLatest": true,
+            "lastModified": "2026-11-19T16:01:37.155Z",
+            "listedBytes": 461,
+            "status": 200,
+            "responseVersionId": null,
+            "responseDeleteMarker": null,
+            "responseLastModified": "2026-11-19T16:01:37.0000000+00:00",
+            "responseBytes": 461,
+            "responseSha256": "aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b"
+          }
+        ]
+      },
+      {
+        "keyMarker": "releases/d60d10638030402c8fcf6254bc782529/source-2-aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b.ttl[rustfs_cache:v2,id:414f9477-e8b7-481a-9c2c-9c4d6cbf1f89,src:walker,gen:live]",
+        "versionMarker": "null",
+        "nextKey": null,
+        "nextVersion": null,
+        "truncated": false,
+        "xmlBytes": 850,
+        "xmlSha256": "1b8f782052d6ea0e6eed8ea6c23badfee6aa8eec1d8f626a11b1ac75c15ebd9b",
+        "rows": [
+          {
+            "key": "releases/d60d10638030402c8fcf6254bc782529/source-3-349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e.ttl",
+            "versionId": "null",
+            "kind": "Version",
+            "isLatest": true,
+            "lastModified": "2026-11-19T16:01:37.159Z",
+            "listedBytes": 56984,
+            "status": 200,
+            "responseVersionId": null,
+            "responseDeleteMarker": null,
+            "responseLastModified": "2026-11-19T16:01:37.0000000+00:00",
+            "responseBytes": 56984,
+            "responseSha256": "349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e"
+          }
+        ]
+      }
+    ],
+    "totalResponseBytes": 69969,
+    "elapsedMs": 26
+  },
+  "qualification": "OBSERVED",
+  "after": [
+    "exited",
+    "0",
+    "false"
+  ]
+}

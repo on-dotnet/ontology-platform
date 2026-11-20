@@ -1,0 +1,56 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "s0-recovery-02",
+  "attempt": "adcbbe74e87a495786cf3c2e9c39a2c4",
+  "name": "ontology-g4-omq-recovery-02_rustfs-reference",
+  "image": "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+  "mounts": [
+    [
+      "volume",
+      "ontology-g4-omq-recovery-02_rustfs-reference",
+      "/data",
+      true
+    ],
+    [
+      "bind",
+      "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/.tools/security/g4-oracle-mapping-query-001/implementation-01/s0-recovery-01/restored-host/platform/s3-access",
+      "/run/secrets/s3-access",
+      false
+    ],
+    [
+      "bind",
+      "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/.tools/security/g4-oracle-mapping-query-001/implementation-01/s0-recovery-01/restored-host/platform/s3-secret",
+      "/run/secrets/s3-secret",
+      false
+    ]
+  ],
+  "networkId": "d34e4f9438a9343814d3aecceaa90fb46eaa6787bcf79cd14f89edca386e4715",
+  "quota": [
+    512,
+    0.5
+  ],
+  "pre": "5c567700847a421a82cff1e682114eb5",
+  "archiveSha256": "6ff1aa706d27fd31f0c98c95168124d3a0f07a6018aef527f45bdb169e70be3e",
+  "configurationSha256": "713ab4c2dad1e4145b785ba6c54fb0e5f9aba6069b1b565c16824a13237ac7b6",
+  "archiveScope": {
+    "archive": "6ff1aa706d27fd31f0c98c95168124d3a0f07a6018aef527f45bdb169e70be3e",
+    "sizeBytes": 184320,
+    "members": 56,
+    "expandedBytes": 87689,
+    "roots": [
+      ".rustfs",
+      ".rustfs.sys",
+      "g4-oracle-mapping-synthetic"
+    ],
+    "bucketMetadata": [
+      ".bloomcycle.bin",
+      ".scanner-pause-backlog.json",
+      ".usage-cache.bin",
+      ".usage-cache.bin.bkp",
+      ".usage.v2.json",
+      ".usage.v2.json.bkp",
+      "g4-oracle-mapping-synthetic"
+    ]
+  },
+  "cleanup": "only registered derived container ID then exact volume, verified absent"
+}

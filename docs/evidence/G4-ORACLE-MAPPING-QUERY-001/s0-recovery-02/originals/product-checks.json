@@ -1,0 +1,28 @@
+{
+  "testedCommit": "4433a75b446732446e14a05e4254369ee60873ba",
+  "base": "454d1a2f17581673cbbf44900a5fe241d603f5ef",
+  "tree": "/Users/chasen/.codex/worktrees/omq-source-bindings/ontology-platform",
+  "checks": [
+    {
+      "key": "product",
+      "exitCode": 1,
+      "commandId": "77bc10335e1e425c94f5010313a09c1e",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow_oracle_mapping_evidence.py",
+        "--task",
+        "G4-ORACLE-MAPPING-QUERY-001",
+        "--run-id",
+        "implementation-01",
+        "--gate",
+        "contract",
+        "--input-key",
+        "048a8b0f4bb8a3266ebd052a0257b135c2fd7ac96094d6f9b7dd33101a599c2e"
+      ],
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "14364261fc363dc68419f445cad7bcf930a6d822a9033c179a8138343144a7d9",
+      "elapsedSeconds": 2.5018011250067502
+    }
+  ]
+}

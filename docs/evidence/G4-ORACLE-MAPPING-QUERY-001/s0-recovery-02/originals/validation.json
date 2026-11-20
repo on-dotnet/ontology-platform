@@ -1,0 +1,37 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "aba08e047f3a4673a6fc255d90db8d5736e1036c",
+  "checks": [
+    {
+      "name": "oracle",
+      "command": "python3 -B scripts/tests/WorkflowOracle.Tests.py / 950169fa593948f88fc47df793b7efa2",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": ".................\n----------------------------------------------------------------------\nRan 17 tests in 0.667s\n\nOK\n"
+    },
+    {
+      "name": "parser",
+      "command": "pwsh -NoProfile -File scripts/tests/StructuredFiles.Tests.ps1 / 48c78c4278284fbe9f51355a16911153",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.\nEXPECTED-REJECTION: FAIL: structured syntax invalid.yml (ParserError)\nEXPECTED-REJECTION: FAIL: structured syntax invalid.toml (TOMLDecodeError)\nPASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.\nPASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.\nFAIL: structured syntax infra/oracle/compose.mapping-query.yaml (ConstructorError)\nFAIL: structured syntax infra/oracle/compose.mapping-query.yaml (ConstructorError)\nFAIL: structured syntax valid.yml (ConstructorError)\nPASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.\nPASS: structured parser 10 real positive/negative cases.\n"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "scope": "Directed engineering checks only. Actual restoration and expected product denial are qualified separately.",
+    "timingStatus": "MEASURED",
+    "elapsedSeconds": {
+      "oracle": 0.766374749946408,
+      "parser": 9.952546166954562
+    }
+  }
+}

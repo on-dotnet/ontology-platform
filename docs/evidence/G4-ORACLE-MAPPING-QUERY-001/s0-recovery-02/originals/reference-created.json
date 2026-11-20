@@ -1,0 +1,34 @@
+{
+  "id": "be065cc34a1cc1693079756b161764d477bbd20183ff9b9c2105328140fdf0b3",
+  "attempt": "adcbbe74e87a495786cf3c2e9c39a2c4",
+  "mounts": [
+    [
+      "volume",
+      "ontology-g4-omq-recovery-02_rustfs-reference",
+      "/data",
+      true
+    ],
+    [
+      "bind",
+      "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/.tools/security/g4-oracle-mapping-query-001/implementation-01/s0-recovery-01/restored-host/platform/s3-access",
+      "/run/secrets/s3-access",
+      false
+    ],
+    [
+      "bind",
+      "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/.tools/security/g4-oracle-mapping-query-001/implementation-01/s0-recovery-01/restored-host/platform/s3-secret",
+      "/run/secrets/s3-secret",
+      false
+    ]
+  ],
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "s0-recovery-02",
+  "volume": "ontology-g4-omq-recovery-02_rustfs-reference",
+  "archiveSha256": "6ff1aa706d27fd31f0c98c95168124d3a0f07a6018aef527f45bdb169e70be3e",
+  "image": "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+  "coldVerified": true,
+  "memberCount": 56,
+  "pre": "31126f618b4c49fba7fbaf74f986baf9",
+  "loaderId": "d6dc80e22abf3be6263814a3ecbe68abe26217aa82b7c7932625846020e2b3a1",
+  "extractCommandId": "0ac6125e2c0d402c8c6ab16f004fefe4"
+}

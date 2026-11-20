@@ -1,0 +1,10 @@
+PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.
+EXPECTED-REJECTION: FAIL: structured syntax invalid.yml (ParserError)
+EXPECTED-REJECTION: FAIL: structured syntax invalid.toml (TOMLDecodeError)
+PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.
+PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.
+FAIL: structured syntax infra/oracle/compose.mapping-query.yaml (ConstructorError)
+FAIL: structured syntax infra/oracle/compose.mapping-query.yaml (ConstructorError)
+FAIL: structured syntax valid.yml (ConstructorError)
+PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.
+PASS: structured parser 10 real positive/negative cases.

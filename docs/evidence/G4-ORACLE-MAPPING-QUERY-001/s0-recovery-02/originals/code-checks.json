@@ -1,0 +1,88 @@
+{
+  "testedCommit": "4433a75b446732446e14a05e4254369ee60873ba",
+  "base": "454d1a2f17581673cbbf44900a5fe241d603f5ef",
+  "tree": "/Users/chasen/.codex/worktrees/omq-source-bindings/ontology-platform",
+  "checks": [
+    {
+      "key": "plan",
+      "exitCode": 0,
+      "commandId": "25ad64bc3a1c48f48c68a9c0e52f62aa",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow.py",
+        "plan",
+        "--base",
+        "454d1a2f17581673cbbf44900a5fe241d603f5ef",
+        "--head",
+        "4433a75b446732446e14a05e4254369ee60873ba",
+        "--output",
+        "/Users/chasen/.codex/worktrees/omq-source-bindings/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-02/code-plan.json"
+      ],
+      "stdoutSha256": "f42bf2dde267c46d4f675dd44a7c5029ba94a1ddf89936feaccee9316722a62f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsedSeconds": 26.527812834014185,
+      "result": {
+        "status": "PLANNED",
+        "affected": [
+          "context-selection",
+          "engineering",
+          "engineering-full",
+          "oracle-task-admission",
+          "policy"
+        ],
+        "unknown": []
+      }
+    },
+    {
+      "key": "verify",
+      "exitCode": 124,
+      "commandId": "729eb29f6bf84b79a1834388db29b29b",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/maintenance/workflow.py",
+        "verify",
+        "--task",
+        "G4-ORACLE-MAPPING-QUERY-001",
+        "--plan",
+        "/Users/chasen/.codex/worktrees/omq-source-bindings/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-02/code-plan.json"
+      ],
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsedSeconds": 230.00547004200052
+    },
+    {
+      "key": "static",
+      "exitCode": 0,
+      "commandId": "b5e6b0715ba846b1823ac41b9f0d3ca4",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/verify.ps1",
+        "-BaseSha",
+        "454d1a2f17581673cbbf44900a5fe241d603f5ef",
+        "-HeadSha",
+        "4433a75b446732446e14a05e4254369ee60873ba"
+      ],
+      "stdoutSha256": "45d4c4e2745cbbb65bc1651536f3729b6c723f8f22254f8f574dbfe6200a7bf5",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsedSeconds": 10.346422083908692
+    },
+    {
+      "key": "parser",
+      "exitCode": 0,
+      "commandId": "30b66aa8a63f4059ac4cc4d66efb5c59",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/tests/StructuredFiles.Tests.ps1"
+      ],
+      "stdoutSha256": "5cb4a1d46185aae46f27f47f603544068731ef051e0fce41d126647cde2a5959",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsedSeconds": 10.228783166967332
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "s0-recovery-02",
+  "base": "454d1a2f17581673cbbf44900a5fe241d603f5ef",
+  "currentCode": "aba08e047f3a4673a6fc255d90db8d5736e1036c",
+  "mode": "REUSED",
+  "originals": {
+    "backend-qualified.json": {
+      "sha256": "ba62a6dd8c1bbf69b52fa372d7894e2fbafdded6ca60d2ad08be446d1a93f304",
+      "sizeBytes": 2720
+    },
+    "native-format-attribution.json": {
+      "sha256": "2083d33586e5ee2138dc4bd429cbb0493942abdd4188892945919bbe0820a794",
+      "sizeBytes": 65336
+    },
+    "validation.json": {
+      "sha256": "c97d0439e01203bec466d06b2bd40a4c96ee4d89fbf0cc9428696110926f9524",
+      "sizeBytes": 3721
+    },
+    "archive-ledger.json": {
+      "sha256": "270fca4d7f40f2fb1c1fee1ccf5e40bb00ac0509445e07d26f86287573315617",
+      "sizeBytes": 3363
+    },
+    "checkpoint-ca3d35a7e5f94e539cd24ec39b8f7c0b.json": {
+      "sha256": "abee065e0089abb5bef8881f62719e3de4e48d8ea9bd724f15f66afacb5ed5f2",
+      "sizeBytes": 5656
+    },
+    "restored-fuseki.json": {
+      "sha256": "bac223dfe2623cf8a06fe384e76b35e42ee7d8f9a042a540a47bdef4507bf49c",
+      "sizeBytes": 478
+    },
+    "graphs-restored.json": {
+      "sha256": "4fee7410c5e4f86ce72538a27af77590f7c4e076d39664ae85d5dbd90d2f5a1c",
+      "sizeBytes": 1088
+    },
+    "graphs-second-open.json": {
+      "sha256": "393a597292cfba79d9b772bf7bac9a34d3e7d843bcf0c7e9ed3e97e9fd87c328",
+      "sizeBytes": 1123
+    }
+  },
+  "previousTest": "9b71721d84acf4bc4a445adca0454b0ddbbf991f",
+  "backendTestCount": 14,
+  "previousBackendQualifications": "all backend changes since real measurements; full Roslyn syntax tree and ordered token kind/text/value including structured trivia",
+  "nativeExisting": 344,
+  "comparison": {
+    "mode": "REUSED",
+    "pg": "bc3a0c7014cb66a731f183aff6fae3a792f2cccb89badb23c33a5608b63e844a",
+    "oracleRows": [
+      1,
+      1
+    ],
+    "keyring": "PROTECTED_RESULT_VERIFIED",
+    "fuseki": "ACCEPTED_FOR_FROZEN_CHECKPOINT",
+    "fusekiId": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+    "archive": "f0a6a3788e2bb92777a2eed9641aea91025cf8bfaa7512ccb70d1d09bf1525c4",
+    "shutdownHook": "UNKNOWN"
+  }
+}
