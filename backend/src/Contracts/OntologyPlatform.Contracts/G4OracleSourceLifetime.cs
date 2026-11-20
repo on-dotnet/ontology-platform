@@ -15,6 +15,9 @@ public sealed class G4OracleSourceLifetime : IDisposable
     /// <summary>平台观察与源清理共享的本地单调时钟。</summary>
     private readonly TimeProvider clock;
 
+    /// <summary>实际分支进入时的原请求，最终身份确认也须受其最早绝对截止约束。</summary>
+    private readonly G4RequestDeadline? request;
+
     /// <summary>上次收紧清理预算时的本地单调戳。</summary>
     private long cleanupStarted;
 
@@ -34,6 +37,7 @@ public sealed class G4OracleSourceLifetime : IDisposable
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(queryId);
         this.clock = clock ?? TimeProvider.System;
+        request = G4RequestDeadline.Current;
         QueryId = queryId;
         ExecutionId = Guid.NewGuid().ToString("N");
         previous = Scope.Value;
@@ -100,7 +104,7 @@ public sealed class G4OracleSourceLifetime : IDisposable
         {
             if (outstanding.HasValue) throw new InvalidOperationException("Oracle 源分支仍有未确认的物理申请。");
             // 晚到的确认不能清除后续另一物理申请。
-            if (RemainingLocked() == TimeSpan.Zero) throw new InvalidOperationException("Oracle 源分支期限已到。");
+            if (RemainingLocked() == TimeSpan.Zero || request?.Remaining == TimeSpan.Zero) throw new InvalidOperationException("Oracle 源分支期限已到。");
             var acquisition = Guid.NewGuid();
             acquired = true;
             outstanding = acquisition;
@@ -115,7 +119,7 @@ public sealed class G4OracleSourceLifetime : IDisposable
         lock (gate)
         {
             if (outstanding != acquisition) throw new InvalidOperationException("Oracle 源释放身份不匹配。");
-            if (RemainingLocked() == TimeSpan.Zero) throw new InvalidOperationException("Oracle 源释放已越过本次清理期限。");
+            if (RemainingLocked() == TimeSpan.Zero || request?.Remaining == TimeSpan.Zero) throw new InvalidOperationException("Oracle 源释放已越过本次清理期限。");
             outstanding = null;
         }
     }

@@ -33,6 +33,7 @@ public sealed partial class OracleSourceAdapter
         using var identity = connection.CreateCommand();
         identity.CommandText = "SELECT SYS_CONTEXT('USERENV','SESSION_USER'), SYS_CONTEXT('USERENV','CON_NAME'), SYS_CONTEXT('USERENV','NETWORK_PROTOCOL') FROM DUAL";
         identity.CommandTimeout = 5;
+        token.ThrowIfCancellationRequested();
         await using (var reader = await identity.ExecuteReaderAsync(token))
         {
             if (!await reader.ReadAsync(token) || reader.GetString(0) != "FIXTURE_READER"
@@ -54,12 +55,14 @@ public sealed partial class OracleSourceAdapter
             FROM DUAL
             """;
         privileges.CommandTimeout = 5;
+        token.ThrowIfCancellationRequested();
         if (Convert.ToInt32(await privileges.ExecuteScalarAsync(token), CultureInfo.InvariantCulture) != 0)
             throw new PgSourceException("connection_readonly_unverified");
         // 管理面窄视图检查PUBLIC和无法向reader开放的字典；它只给计数，不授广域字典权。
         using var attestation = connection.CreateCommand();
         attestation.CommandText = "SELECT POLICY_VERSION, BLOCKED_COUNT FROM G4_CONTROL.READONLY_ATTESTATION";
         attestation.CommandTimeout = 5;
+        token.ThrowIfCancellationRequested();
         await using var proof = await attestation.ExecuteReaderAsync(token);
         if (!await proof.ReadAsync(token) || proof.GetString(0) != "oracle-readonly-v1"
             || Convert.ToInt32(proof.GetValue(1), CultureInfo.InvariantCulture) != 0 || await proof.ReadAsync(token))
@@ -76,6 +79,7 @@ public sealed partial class OracleSourceAdapter
         using var command = connection.CreateCommand();
         command.CommandText = CatalogSql;
         command.CommandTimeout = 10;
+        token.ThrowIfCancellationRequested();
         await using var reader = await command.ExecuteReaderAsync(token);
         // 同一reader按预算消费，不先整表物化再截断。
         var result = await ReadCatalogRowsAsync(reader, token);

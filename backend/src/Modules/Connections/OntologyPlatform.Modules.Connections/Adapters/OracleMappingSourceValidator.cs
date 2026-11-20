@@ -99,6 +99,7 @@ internal static class OracleMappingSourceValidator
     internal static async Task<string> CheckCatalogAsync(OracleConnection connection, CatalogSnapshotView snapshot, CancellationToken token)
     {
         // 对业务读者实际可见的原 M2 全量目录重算，而非对预设合成列散列。
+        token.ThrowIfCancellationRequested();
         var catalog = ConnectionApplicationService.CanonicalCatalog(await OracleSourceAdapter.ReadCatalogAsync(connection, token), "oracle-m2-v1");
         if (catalog.Fingerprint != snapshot.SchemaFingerprint || catalog.Objects.Length != 2
             || ConnectionApplicationService.Encode(catalog.Objects) != ConnectionApplicationService.Encode(snapshot.Objects)) throw Shape();
@@ -122,6 +123,7 @@ internal static class OracleMappingSourceValidator
             """;
         // 将物理对象身份绑定到本次观察；同名重建不能伪造相同模型。
         var keys = new List<object>();
+        token.ThrowIfCancellationRequested();
         await using var cursor = await physical.ExecuteReaderAsync(token);
         while (await cursor.ReadAsync(token))
         {
