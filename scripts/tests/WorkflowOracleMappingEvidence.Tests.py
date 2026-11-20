@@ -223,27 +223,11 @@ class ProductResumeBindingTests(unittest.TestCase):
         self.assertNotEqual(oracle.audit_program(after,historical=False),oracle.audit_program(after.replace(b'alternative()',b'other()'),historical=False))
 
     def test_interactive_login_accepts_only_public_account_and_exact_realm(self):
-        script = """
-import {completeCurrentLogin,runId,originalSubject} from './scripts/maintenance/workflow-oracle-query-fixture.mjs';
-import assert from 'node:assert/strict';
-assert.equal(runId,'product-resume-01');
-let url='http://localhost:15743/realms/g2-180e1435711f03fa/protocol/openid-connect/auth';
-let filled=[],foreground=0,waited=0;
-const callback=new URL('http://localhost:15741/api/v1/platform/me');
-const page={url:()=>url,locator:s=>{assert.equal(s,'#username');return {fill:async u=>filled.push(u)};},
-  bringToFront:async()=>{foreground++;},waitForURL:async (match,o)=>{assert(match(callback));assert.equal(o.timeout,40000);waited++;}};
-await completeCurrentLogin(page,'viewer-a');
-assert.deepEqual(filled,['g2-viewer-a']);assert.equal(waited,1);assert.equal(foreground,1);
-assert.match(originalSubject('viewer-a'),/^[a-f0-9-]{36}$/);
-url='http://localhost:15743/realms/g2-another/protocol/openid-connect/auth';
-await assert.rejects(completeCurrentLogin(page,'viewer-a'),/ORACLE_RESTORED_REALM/);
-await assert.rejects(completeCurrentLogin(page,'other-subject'),/ORACLE_OIDC_SUBJECT/);
-assert.equal(filled.length,1);assert.equal(waited,1);
-"""
         node=oracle.NODE if Path(oracle.NODE).is_file() else 'node'
-        result=subprocess.run([node,'--input-type=module','--eval',script],cwd=ROOT,capture_output=True,timeout=6,
+        test=ROOT/'scripts/tests/WorkflowOracleNormalLogin.Tests.mjs'
+        result=subprocess.run([node,'--test',str(test)],cwd=ROOT,capture_output=True,timeout=6,
                               env=dict(os.environ,OMQ_PRODUCT_RUN='product-resume-01'))
-        self.assertEqual(0,result.returncode,result.stderr.decode())
+        self.assertEqual(0,result.returncode,(result.stdout+result.stderr).decode())
 
 
 class OracleSessionRestoreEvidenceTests(unittest.TestCase):

@@ -614,7 +614,12 @@ class RuntimeOriginals(Originals):
         elif name=='formal-resources.json' and self.dispatch['runId']==PRODUCT_RUN:
             path=self.choose('formal-resources*.json',lambda data: sha(data)==host['resourceManifestSha256'])
         elif name=='formal-api-inputs.json':
-            path=self.choose('formal-api-inputs*.json',lambda data: json.loads(data).get('snapshotId')==host['snapshotId'])
+            def bound_inputs(data):
+                entry=json.loads(data)
+                return (entry.get('snapshotId')==host['snapshotId']
+                        and entry.get('composeSha256')==host['composeSha256']
+                        and entry.get('relaySha256')==host['runtimeHelperSha256'])
+            path=self.choose('formal-api-inputs*.json',bound_inputs)
         elif name=='formal-api-compose.json':
             path=self.choose('formal-api-compose*.json',lambda data: sha(data)==host['composeSha256'])
         elif name=='api-snapshot.json':

@@ -44,9 +44,11 @@ export async function completeCurrentLogin(page, label) {
       await filled.evaluate((input, expected) => {
         const form = input.form;
         const submit = form?.querySelector("#kc-login");
-        if (!submit || form.querySelector("#username")?.value !== expected.username) return;
+        if (!submit || submit.form !== form || submit.hasAttribute("formaction") || submit.hasAttribute("formmethod") ||
+            form.querySelector("#username")?.value !== expected.username) return;
         const action = new URL(form.action);
-        if (location.origin === expected.origin && action.origin === expected.origin &&
+        if (location.origin === expected.origin && location.pathname.startsWith("/realms/g2-180e1435711f03fa/") &&
+            action.origin === expected.origin &&
             action.pathname === "/realms/g2-180e1435711f03fa/login-actions/authenticate" &&
             form.method.toLowerCase() === "post" && input.matches(":-webkit-autofill")) form.requestSubmit(submit);
       }, { username, origin: address.origin }, { timeout: Math.max(1, deadline - Date.now()) });
