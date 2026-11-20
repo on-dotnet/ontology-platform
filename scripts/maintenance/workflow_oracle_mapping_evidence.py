@@ -21,9 +21,10 @@ DRIVERS = (DRIVER, 'scripts/maintenance/workflow-oracle-query-fixture.mjs', PLAT
            'scripts/maintenance/workflow_m2_build.py', 'infra/oracle/config/mapping-observer.sql')
 GATES = {'environment', 'contract', 'backend', 'web', 'interaction'}
 READY = 's0-oracle-ready'
+NATURAL_CANCEL = 's0-oracle-natural-cancel'
 ERRORS = {'healthy': None, 'expired': 'OMQ_READY_GRANT_EXPIRED', 'short': 'OMQ_READY_GRANT_TTL_SHORT',
           'catalog': 'OMQ_READY_CATALOG_STALE', 'activation': 'OMQ_READY_ACTIVATION_STALE'}
-BROWSER = {'provision', 'mapping', READY, 's0-oracle-natural', 's0-oracle-cancel', 's1', 's1-reopen', 's3', 'ui-s1', 'ui-s3'}
+BROWSER = {'provision', 'mapping', READY, 's0-oracle-natural', 's0-oracle-cancel', NATURAL_CANCEL, 's1', 's1-reopen', 's3', 'ui-s1', 'ui-s3'}
 HEX = re.compile(r'[0-9a-f]{64}')
 COMMAND = re.compile(r'[0-9a-f]{32}')
 PUBLIC = Path('docs/evidence') / TASK / RUN
@@ -45,7 +46,7 @@ def summary(argv):
 
 def drivers(root, mode):
     names = DRIVERS
-    if mode in ('s0-oracle-natural', 's0-oracle-cancel'):
+    if mode in ('s0-oracle-natural', 's0-oracle-cancel', NATURAL_CANCEL):
         names += ('scripts/maintenance/workflow_oracle_mapping_formal_observer.py',)
     return {name: sha(ordinary(root/name).read_bytes()) for name in names}
 
@@ -356,7 +357,7 @@ def reopen_browser(archive, entry, origin, mode, case):
             utc(before['endedAtUtc']) <= utc(row['startedAtUtc']) <= utc(inside['startedAtUtc']) <= utc(inside['endedAtUtc'])
             <= utc(after['startedAtUtc']) <= utc(after['endedAtUtc']) <= utc(row['endedAtUtc']), 'OMQ_HOST_WINDOW')
     records = audit_observation(archive, archive.read(entry['audit']), row, host, origin, measured)
-    if mode in ('s0-oracle-natural','s0-oracle-cancel'):
+    if mode in ('s0-oracle-natural','s0-oracle-cancel',NATURAL_CANCEL):
         from workflow_oracle_mapping_formal_observer import classify
         witness = report['oracleWitness']
         key = witness['idempotencyKey']
@@ -375,6 +376,24 @@ def reopen_browser(archive, entry, origin, mode, case):
         if mode=='s0-oracle-natural':
             require(proof['naturalCompletion'] and proof['nativeErrorCode']==0 and not proof['formalCancelCommitted']
                     and not proof['nativeCancelCausedTermination'], 'OMQ_NATURAL_CONTROL')
+        elif mode==NATURAL_CANCEL:
+            from workflow_oracle_mapping_formal_observer import pg_query
+            readback = raw['terminalReadback']
+            pg_id = host['services']['platform-pg']['containerId']
+            args = ['docker','--context','desktop-linux','exec','-i','--user','postgres',pg_id,'psql','-XwqAt','-d','mapping','-v','ON_ERROR_STOP=1']
+            sql = b'BEGIN READ ONLY;\n'+pg_query(key,entry['stageInputs']['readerSubjectId']).encode()+b'\nCOMMIT;'
+            command,stdout,_ = archive.command(readback['commandId'],args,'omq-pg-formal-terminal-state',sha(sql),None,origin)
+            require(command['exitCode']==0 and command['classification']=='SUCCESS' and command['deadlineSeconds']==15 and
+                    utc(row['startedAtUtc'])<=utc(command['startedAtUtc'])<=utc(command['endedAtUtc'])<=utc(row['endedAtUtc']) and
+                    json.loads(stdout)==readback['state'] and
+                    [r for r in records if r['clientId']==proof['clientId']]==raw['audit']['records'],'OMQ_NATURAL_TERMINAL_ORIGINAL')
+            require(report['scope']=='ORACLE_NATURAL_COMPLETION_BEFORE_PLATFORM_CANCEL' and
+                    witness['cancel']['httpStatus']==200 and witness['cancel']['executionStatus']=='CANCELLED' and
+                    witness['execute']['status'] in (409,503,504) and 0<=witness['execute']['elapsedMs']<=5000 and
+                    proof.get('naturalCompletionBeforeCancel') is True and proof['formalCancelCommitted'] and
+                    not proof['sameExecutionActiveAtCommit'] and not proof['nativeCancelCausedTermination'] and
+                    0<=proof['naturalCleanupUpperMs']<=250 and proof['successfulResults']==proof['successReceipts']==proof['successAudits']==0,
+                    'OMQ_NATURAL_CANCEL_RACE')
         else:
             require(proof['formalCancelCommitted'] and proof['sameExecutionActiveAtCommit'] and
                     proof['nativeCancelCausedTermination'] and proof['nativeErrorCode']==1013 and
@@ -530,6 +549,8 @@ def reopen_runtime_case(root,task,run,cid):
                audit='formal-audit-'+cid+'.json')
     checks=reopen_browser(archive,entry,root,dispatch['mode'],dispatch['case'])
     return dict(taskId=task,runId=run,commandId=cid,measuredCommit=dispatch['testedCommit'],mode=dispatch['mode'],case=dispatch['case'],
+                **({'functional':{'AC03-A':'PASS'},'AC03-B':'NOT_QUALIFIED','cleanup250ms':'NOT_QUALIFIED','oracleS0':'BLOCKED'}
+                   if dispatch['mode']==NATURAL_CANCEL else {}),
                 status='CASE_QUALIFIED',checks=checks,scope='one measured scenario',executionMode='REUSED',qualificationMode='FRESH',auditIdentity=archive.auditIdentity,browserIdentity=archive.browserIdentity,members={n:dict(path=p,sha256=archive.examined[n],
                 sizeBytes=ordinary(root/p).stat().st_size) for n,p in archive.paths.items()})
 

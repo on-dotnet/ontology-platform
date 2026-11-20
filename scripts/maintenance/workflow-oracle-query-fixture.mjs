@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 
 /** 只有任务已冻结的主 API、副 API、OIDC 和 Web 可以被正式浏览器场景访问。 */
 export const ports = Object.freeze({ api: 15741, secondary: 15742, oidc: 15743, web: 15744 });
-export const modes = Object.freeze(["serve", "provision", "mapping", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s1"]);
+export const modes = Object.freeze(["serve", "provision", "mapping", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s0-oracle-natural-cancel", "s1"]);
 export const config = Object.freeze({ type: "ORACLE", profile: { host: "oracle-source", port: 2484, serviceName: "FREEPDB1",
   username: "FIXTURE_READER", allowedOwners: ["PRODUCTION", "CaseOwner"], tls: true } });
 const task = "G4-ORACLE-MAPPING-QUERY-001";
@@ -90,7 +90,8 @@ export function sameHost(before, after) {
 
 /** 先启动同任务只读观测者，再用相同 Q 从两个正式 API 提交执行与取消。 */
 export async function witness({ root, state, reader, mode, capability, get, request, check, report }) {
-  const cancel = mode === "s0-oracle-cancel";
+  const naturalRace = mode === "s0-oracle-natural-cancel";
+  const cancel = mode === "s0-oracle-cancel" || naturalRace;
   const secondary = { ...reader, apiOrigin: "http://localhost:" + ports.secondary };
   check("oracle_second_api_same_actor", (await get(secondary, "/api/v1/platform/me")).subjectId === reader.me.subjectId);
   const key = randomUUID();
@@ -135,15 +136,21 @@ export async function witness({ root, state, reader, mode, capability, get, requ
     report.oracleWitness.execute = { status: result.value.status, queryStatus: result.value.data?.status, elapsedMs: result.elapsedMs };
     // 完整观测由独立工具保存原件。报告只取受审指标与关联身份。
     const publicFields = ["status","queryId","clientId","naturalCompletion","formalCancelCommitted","sameExecutionActiveAtCommit",
-      "nativeCancelCausedTermination","allSourceWorkEnded","nativeErrorCode","deadlineOrDisconnectBeforeCommit","cleanupUpperMs",
+      "naturalCompletionBeforeCancel","naturalCleanupUpperMs","nativeCancelCausedTermination","allSourceWorkEnded","nativeErrorCode","deadlineOrDisconnectBeforeCommit","cleanupUpperMs",
       "branchUpperMs","totalUpperMs","successfulResults","successReceipts","successAudits","residualSourceWork","slotReleased"];
     report.oracleWitness.final = Object.fromEntries(publicFields.filter(field => final && Object.hasOwn(final, field)).map(field => [field, final[field]]));
     check("oracle_witness_finished", await exit === 0 && final?.queryId === admitted.queryId && /^[0-9a-f]{32}$/.test(final.clientId)
-      && (active ? active.queryId === admitted.queryId && final.clientId === active.clientId : !cancel));
+      && (active ? active.queryId === admitted.queryId && final.clientId === active.clientId : !cancel || naturalRace));
     check("oracle_native_and_platform_budgets", final.allSourceWorkEnded === true && final.residualSourceWork === 0
       && [final.branchUpperMs, final.totalUpperMs].every(ms => Number.isFinite(ms) && ms >= 0)
       && final.branchUpperMs <= 1000 && final.totalUpperMs <= 5000 && result.elapsedMs <= 5000 && final.slotReleased === true);
-    if (cancel) {
+    if (naturalRace) {
+      check("oracle_late_platform_cancel", report.oracleWitness.cancel.httpStatus === 200 && report.oracleWitness.cancel.executionStatus === "CANCELLED"
+        && final.formalCancelCommitted === true && final.sameExecutionActiveAtCommit === false && final.nativeCancelCausedTermination === false);
+      check("oracle_natural_end_before_cancel", final.naturalCompletionBeforeCancel === true && Number.isFinite(final.naturalCleanupUpperMs)
+        && final.naturalCleanupUpperMs >= 0 && final.naturalCleanupUpperMs <= 250);
+      check("oracle_zero_success_side_effects", [409,503,504].includes(result.value.status) && final.successfulResults === 0 && final.successReceipts === 0 && final.successAudits === 0);
+    } else if (cancel) {
       check("oracle_formal_cancel_committed", report.oracleWitness.cancel.httpStatus === 200 && report.oracleWitness.cancel.executionStatus === "CANCELLED"
         && final.formalCancelCommitted === true && final.sameExecutionActiveAtCommit === true);
       check("oracle_native_cancel_causality", final.nativeCancelCausedTermination === true && final.nativeErrorCode === 1013

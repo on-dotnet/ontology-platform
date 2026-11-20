@@ -759,7 +759,7 @@ def audit_window(start_utc,end_utc,client_id=None):
 def browser_run(mode,case='healthy'):
     import uuid
     from workflow_oracle_mapping_evidence import browser_invocation
-    require(mode in ('provision','mapping','s0-oracle-ready','s0-oracle-natural','s0-oracle-cancel','s1'),'FORMAL_MODE')
+    require(mode in ('provision','mapping','s0-oracle-ready','s0-oracle-natural','s0-oracle-cancel','s0-oracle-natural-cancel','s1'),'FORMAL_MODE')
     resource=admission()
     pre=ex.run(['python3','-B','scripts/maintenance/execution_preflight.py','check','--milestone',TASK,'--phase','runtime'],ROOT,
                task=TASK,run_id=RUN,stage='omq-consumers-'+mode,input_key=ex.sha(Path(__file__).read_bytes()),timeout=18)

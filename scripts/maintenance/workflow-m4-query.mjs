@@ -322,7 +322,9 @@ async function browserRun(mode) {
       if (mode.startsWith("s0-oracle-")) {
         phase = "oracle_formal_source_observation";
         await omq.witness({ root, state, reader, mode, capability:current.capability, get, request, check, report });
-        report.scope = mode === "s0-oracle-cancel" ? "ORACLE_FORMAL_CANCEL" : "ORACLE_NATURAL_CONTROL";
+        const scopes = { "s0-oracle-natural": "ORACLE_NATURAL_CONTROL", "s0-oracle-cancel": "ORACLE_FORMAL_CANCEL",
+          "s0-oracle-natural-cancel": "ORACLE_NATURAL_COMPLETION_BEFORE_PLATFORM_CANCEL" };
+        report.scope = scopes[mode];
         report.status = "PASS"; return;
       }
     }

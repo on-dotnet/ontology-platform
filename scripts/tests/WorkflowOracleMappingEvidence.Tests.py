@@ -11,6 +11,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT/'scripts/maintenance'))
 import workflow_oracle_mapping_evidence as oracle
+import workflow_oracle_mapping_formal_observer as observer
 
 
 class OracleQualificationTests(unittest.TestCase):
@@ -183,6 +184,95 @@ class OracleQualificationTests(unittest.TestCase):
                    sourceId=self.host['oracle']['containerId'])
         with self.assertRaisesRegex(ValueError,'OMQ_AUDIT_WINDOW'):
             oracle.audit_observation(self.archive,audit,row,self.host,self.origin)
+
+
+class NaturalCancelEvidenceTests(unittest.TestCase):
+    """离线反例只约束机器消费者；该组记录不能作为 Oracle 产品验收原件。"""
+
+    @staticmethod
+    def record():
+        utc = lambda ms: f'2026-11-20T00:00:{ms//1000:02d}.{ms%1000:03d}Z'
+        query, client, acquisition = 'query-'+'a'*32,'b'*32,'c'*32
+        owner = 'oracle-execution-owner'
+        def event(name,**values):
+            return dict(name=name,query=query,execution=client,**values)
+        begin = event('OracleBranchBegin',owner=owner,fence='1',utc=utc(105),workDeadlineUtc=utc(850),branchDeadlineUtc=utc(1100))
+        session = event('OracleSourceSession',instance='1',sid='21',audsid='53',unified='75',con='3',utc=utc(111))
+        def owned(phase,ms):
+            return event('OracleSourceOwnership',phase=phase,utc=utc(ms),acquisition=acquisition)
+        def native(action,ms):
+            return event('OracleSourceEvent',action=action,utc=utc(ms))
+        api = [begin,owned('ACQUIRED',108),session,native('EXECUTE',120),native('EOF',130),
+               owned('READ_RETURNED',131),owned('ROLLED_BACK',158),owned('TX_DISPOSED',160),
+               native('PHYSICAL_RELEASE',169),owned('PHYSICAL_DISPOSED',170),owned('CONFIRMED',171),
+               event('OracleBranchRelease',confirmed='True',observedUtc=utc(172)),
+               event('OracleCleanupCas',fence='1',released='True',observedUtc=utc(180))]
+        commit = dict(name='OracleCancelCommit',query=query,originalFence='1',terminalFence='2',lowerUtc=utc(148),upperUtc=utc(151))
+        original = dict(id=query,state='RUNNING',owner=owner,fence=1,cancel=False,deadline=utc(5000),observed=utc(104),
+                        hash=None,bytes=None,receipts=0,cancelAudits=0,successAudits=0)
+        terminal = dict(original,state='CANCELLED',owner=None,fence=2,cancel=True,cancelAudits=1,observed=utc(183))
+        sql = 'aaaaaaaaaaaaa'
+        active = dict(lo=utc(123),hi=utc(124),sid='21',serial='31',audsid='53',con='3',state='ACTIVE',sql=sql,
+                      execution='4',start='20261120000000',previous='-',previousExecution='-')
+        previous = dict(active,lo=utc(135),hi=utc(136),sql='-',execution='-',start='-',previous=sql,previousExecution='4')
+        samples = [active,previous,dict(lo=utc(175),hi=utc(176),absent=True)]
+        audit = dict(instance='1',session='75',owner='PRODUCTION',table='OMQ_ENTITY',action='SELECT',code=0,
+                     clientId=client,auditExecution='12')
+        clock = [dict(hostBefore=i,hostAfter=i,monoBefore=i,monoAfter=i,remote=i) for i in range(10)]
+        return dict(queryId=query,sqlId=sql,clocks={k:clock for k in ('api','api-secondary','pg','source')},
+                    logs={'api':api,'api-secondary':[commit]},platformStates=[original,terminal],
+                    source={'events':samples},audit={'records':[audit]},cursorBefore={'0':[55,1,1,1,0]},
+                    cursorAfter={'0':[55,2,2,2,0]},terminalReadback=dict(commandId='d'*32,state=dict(terminal)))
+
+    def test_source_native_and_ownership_path_qualify_only_natural_race(self):
+        for with_post in (True,False):
+            with self.subTest(with_post=with_post):
+                record=self.record()
+                if with_post:
+                    api=record['logs']['api']
+                    api[6].update(phase='COMMITTED',utc='2026-11-20T00:00:00.132Z')
+                    api[7].update(utc='2026-11-20T00:00:00.133Z')
+                    api[8:8]=[dict(api[7],phase='POST_STARTED',utc='2026-11-20T00:00:00.135Z'),
+                              dict(api[7],phase='POST_RETURNED',utc='2026-11-20T00:00:00.151Z')]
+                proof=observer.classify(record)
+                self.assertTrue(proof['naturalCompletionBeforeCancel'])
+                self.assertLessEqual(proof['naturalCleanupUpperMs'],250)
+                self.assertFalse(proof['nativeCancelCausedTermination'])
+                self.assertFalse(proof['sameExecutionActiveAtCommit'])
+
+    def test_missing_or_conflicting_evidence_cannot_confirm_natural_race(self):
+        def late_gone(r):
+            r['source']['events'][-1].update(lo='2026-11-20T00:00:00.420Z',hi='2026-11-20T00:00:00.421Z')
+        def late_read(r):
+            r['logs']['api'][5].update(utc='2026-11-20T00:00:00.153Z')
+        for case,mutate in {
+            'no-independent-end':lambda r:r['source']['events'].pop(1),
+            'only-absence':lambda r:r['source']['events'].__delitem__(slice(0,2)),
+            'no-physical-return':lambda r:r['logs']['api'].pop(9),
+            'wrong-acquisition':lambda r:r['logs']['api'][5].update(acquisition='2'*32),
+            'unclosed-post':lambda r:r['logs']['api'].insert(8,dict(r['logs']['api'][7],phase='POST_STARTED')),
+            'source-session':lambda r:r['source']['events'][1].update(serial='2'),
+            'another-execution':lambda r:r['source']['events'][1].update(previousExecution='29'),
+            'no-cas':lambda r:r['logs']['api'][-1].update(released='False'),
+            'wrong-owner':lambda r:r['platformStates'][0].update(owner='other'),
+            'wrong-fence':lambda r:r['logs']['api'][-1].update(fence='2'),
+            'not-eof':lambda r:r['cursorAfter']['0'].__setitem__(2,1),
+            'lost-readback':lambda r:r['terminalReadback'].update(commandId=''),
+            'wrong-result':lambda r:r['terminalReadback']['state'].update(receipts=1),
+            'late-release':late_gone,'late-read':late_read
+        }.items():
+            with self.subTest(case=case):
+                record=self.record()
+                mutate(record)
+                self.assertFalse(observer.classify(record).get('naturalCompletionBeforeCancel'))
+
+    def test_old_witness_preserves_original_result_fields(self):
+        record=self.record()
+        record['logs']['api']=[ev for ev in record['logs']['api'] if ev['name']!='OracleSourceOwnership']
+        proof=observer.classify(record)
+        self.assertNotIn('naturalCompletionBeforeCancel',proof)
+        self.assertNotIn('naturalCleanupUpperMs',proof)
+        self.assertFalse(proof['nativeCancelCausedTermination'])
 
 
 if __name__=='__main__':

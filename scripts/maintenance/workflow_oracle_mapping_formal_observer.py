@@ -320,6 +320,7 @@ def log_events(container, query, start, arrivals, stop):
         'OracleCancelCommit':['query','originalFence','terminalFence','lowerUtc','upperUtc','durationMs'],
         'OracleSourceSession':['query','execution','instance','sid','audsid','unified','con','utc'],
         'OracleSourceEvent':['action','query','execution','utc'],
+        'OracleSourceOwnership':['phase','query','execution','acquisition','utc'],
         'OracleBranchRelease':['query','execution','confirmed','observedUtc'],
         'OracleCleanupCas':['query','execution','fence','released','observedUtc']}
     process = subprocess.Popen([*DOCKER,'logs','--timestamps','--follow','--since',start,container],
@@ -347,6 +348,8 @@ def log_events(container, query, start, arrivals, stop):
                         continue
                     if 'action' in row and row['action'] not in ('EXECUTE','CANCEL_ENTER','CANCEL_RETURN','CANCEL_REJECT','NATIVE_1013','EOF','PHYSICAL_RELEASE'):
                         continue
+                    if 'phase' in row and not valid_ownership(row):
+                        row['phase'],row['acquisition']='UNKNOWN','UNKNOWN'
                     if 'owner' in row and not re.fullmatch(r'oracle-execution-[a-zA-Z0-9._:-]{1,160}',row['owner']):
                         continue
                     for key in ('utc','workDeadlineUtc','branchDeadlineUtc','observedUtc','lowerUtc','upperUtc'):
@@ -376,6 +379,105 @@ def stream_summary(state, delta):
         if any(values):
             change.append(dict(child=child,plan=row[0],executions=values[0],eof=values[1],rows=values[2],px=values[3]))
     return change[0] if len(change) == 1 and change[0]['executions'] == 1 and change[0]['px'] == 0 else None
+
+
+def valid_ownership(event):
+    return (event['phase'] in ('ACQUIRED','READ_RETURNED','COMMITTED','ROLLED_BACK','TX_DISPOSED','POST_STARTED',
+                               'POST_RETURNED','PHYSICAL_DISPOSED','CONFIRMED') and
+            bool(re.fullmatch(CLIENT,event['acquisition'])))
+
+
+def natural_cancel_evidence(record, info, begin, session, commit, release, cas, settled, stats, audit, low, high):
+    """AC03-A 只接受同次自然结束和真实资源释放；不会产生 AC03-B 的取消因果结论。"""
+    api = record['logs']['api']
+    ownership = [event for event in api if event['name']=='OracleSourceOwnership']
+    phases = [event['phase'] for event in ownership]
+    # 无后核验时只能跳过完整的一对事件；数据库终结动作也必须唯一。
+    expected = ['ACQUIRED','READ_RETURNED','ROLLED_BACK' if 'ROLLED_BACK' in phases else 'COMMITTED','TX_DISPOSED']
+    if 'POST_STARTED' in phases:
+        if 'COMMITTED' not in phases:
+            return False
+        expected += ['POST_STARTED','POST_RETURNED']
+    if phases != expected + ['PHYSICAL_DISPOSED','CONFIRMED']:
+        return False
+    acquisition = ownership[0]['acquisition']
+    if not valid_ownership(ownership[0]) or any(e['acquisition'] != acquisition for e in ownership):
+        return False
+    query = record['queryId']
+    if any(e.get('query') != query for events in record['logs'].values() for e in events):
+        return False
+    phase = {e['phase']: ns(e['utc']) for e in ownership}
+    if list(phase.values()) != sorted(phase.values()):
+        return False
+    native = [e for e in api if e['name']=='OracleSourceEvent']
+    events = {e['action']: e for e in native}
+    if len(events)!=len(native) or set(events)!={'EXECUTE','EOF','PHYSICAL_RELEASE'}:
+        return False
+    if not (ns(begin['utc']) <= phase['ACQUIRED'] <= ns(events['EXECUTE']['utc']) <= ns(events['EOF']['utc'])
+            <= phase['READ_RETURNED'] and phase['CONFIRMED'] <= ns(release['observedUtc'])):
+        return False
+    if (not info['allSourceWorkEnded'] or not info['slotReleased'] or not cas or cas['released'].lower()!='true'
+            or cas['fence']!=begin['fence'] or stats['eof']!=1 or not 1<=stats['rows']<=100 or audit['code']!=0):
+        return False
+    states = record['platformStates']
+    terminal = states[-1]
+    readback = record.get('terminalReadback',{})
+    stable = ('id','state','fence','owner','cancel','hash','bytes','receipts','cancelAudits','successAudits','deadline')
+    if (not re.fullmatch(CLIENT,readback.get('commandId','')) or
+            any(readback.get('state',{}).get(k)!=terminal[k] for k in stable) or
+            any(s['id']!=query or ns(s['deadline'])!=ns(terminal['deadline']) or s['owner'] not in (None,begin['owner'])
+                or s['fence'] not in (int(begin['fence']),terminal['fence']) for s in states) or
+            not any(s['state']=='RUNNING' and s['owner']==begin['owner'] and s['fence']==int(begin['fence']) for s in states) or
+            any(info[k]!=0 for k in ('successfulResults','successReceipts','successAudits'))):
+        return False
+    commit_lo = low(commit['lowerUtc'],'api-secondary')
+    read_stamp = next(e['utc'] for e in ownership if e['phase']=='READ_RETURNED')
+    if (high(read_stamp,'api') >= commit_lo or high(read_stamp,'api') >= low(begin['workDeadlineUtc'],'api') or
+            any(high(e['utc'],'api') >= commit_lo for e in ownership if e['phase']=='POST_STARTED')):
+        return False
+    if (commit_lo > high(commit['upperUtc'],'api-secondary') or
+            high(events['EOF']['utc'],'api') >= commit_lo or
+            high(commit['upperUtc'],'api-secondary') > low(cas['observedUtc'],'api')):
+        return False
+    # 源侧独立观察必须捕捉同会话的当前或上一条固定 SQL 执行号。
+    # 对后继 SQL 或会话消失要求在取消前观察到。最终一次零不能替代时间界。
+    source = record['source']['events']
+    present = [e for e in source if not e.get('absent')]
+    who = (session['sid'],session['audsid'],session['con'])
+    if not present or any((e['sid'],e['audsid'],e['con'])!=who or e['serial']!=present[0]['serial'] for e in present):
+        return False
+    sql_id = record['sqlId']
+    identities = {e[field] for e in present for tag,field in [('sql','execution'),('previous','previousExecution')]
+                  if e[tag]==sql_id and re.fullmatch(DEC,e[field])}
+    if len(identities)!=1:
+        return False
+    identity = identities.pop()
+    if (any(e['state']=='ACTIVE' and e['sql']==sql_id and high(e['hi'],'source')>=commit_lo for e in present)
+            or any(ns(e['lo'])>ns(n['lo']) for e,n in zip(source,source[1:]))):
+        return False
+    observed_current = False
+    ended_before_commit = False
+    last = max(i for i,e in enumerate(source) if not e.get('absent'))
+    for i,e in enumerate(source):
+        if low(e['lo'],'source') < high(events['EXECUTE']['utc'],'api') or high(e['hi'],'source') >= commit_lo:
+            continue
+        if not e.get('absent') and e['sql']==sql_id and e['execution']==identity:
+            observed_current = True
+        elif e.get('absent'):
+            ended_before_commit |= observed_current and i>last
+        elif e['sql']!=sql_id and e['previous']==sql_id and e['previousExecution']==identity:
+            ended_before_commit = True
+    if not ended_before_commit:
+        return False
+    # 最后一次出现之后的首个独立消失上界，及 API 物理资源、平台占位的最迟上界。
+    if last+1 >= len(source):
+        return False
+    first_gone = source[last+1]
+    end = max(high(first_gone['hi'],'source'),high(events['PHYSICAL_RELEASE']['utc'],'api'),
+              high(release['observedUtc'],'api'),high(cas['observedUtc'],'api'),high(settled['observed'],'pg'))
+    earliest = min(low(begin['branchDeadlineUtc'],'api'),low(terminal['deadline'],'api'),commit_lo+250_000_000)
+    info['naturalCleanupUpperMs'] = (end-commit_lo)/1e6
+    return (0 <= end-commit_lo and end <= earliest and 0<=info['branchUpperMs']<=1000 and 0<=info['totalUpperMs']<=5000)
 
 
 def classify(record):
@@ -459,6 +561,9 @@ def classify(record):
     require(commit['originalFence']==begin['fence'] and int(commit['terminalFence'])==terminal['fence']==int(begin['fence'])+1, 'CANCEL_FENCE')
     info['formalCancelCommitted'] = True
     clo, chi = low(commit['lowerUtc'],'api-secondary'), high(commit['upperUtc'],'api-secondary')
+    if any(e['name']=='OracleSourceOwnership' for e in record['logs']['api']):
+        info['naturalCompletionBeforeCancel'] = natural_cancel_evidence(
+            record,info,begin,session,commit,release,cas,settled,stats,audit[0],low,high)
     before = [e for e in current if high(e['hi'],'source') < clo]
     after = [e for e in current if low(e['lo'],'source') > chi]
     info['sameExecutionActiveAtCommit'] = bool(before and after)
