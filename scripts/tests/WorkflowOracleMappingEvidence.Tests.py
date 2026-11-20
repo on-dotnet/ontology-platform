@@ -204,23 +204,36 @@ class OracleSessionRestoreEvidenceTests(unittest.TestCase):
             http += [dict(method='POST',path=path,status=200,sha256=proof['resultHash']) for _ in range(2)]
             audit=[dict(owner='PRODUCTION',table='OMQ_ENTITY',action='SELECT',code=0)]
             scope='S1_ORACLE_OIDC_QUERY_PERSISTENCE'
-        return dict(mode=mode,scope=scope,oraclePersistence=proof,http=http,scenarioReady={'session':{'observations':sessions}}),audit,{'readerSubjectId':'original-q'},payload
+        return dict(mode=mode,scope=scope,oraclePersistence=proof,http=http,scenarioReady={'session':{'observations':sessions}}),dict(clientId=None,records=audit),{'readerSubjectId':'original-q'},payload
 
     def test_s1_fresh_and_replay_must_bind_bytes_and_the_single_read(self):
         report,audit,stage,payload=self.fixture('s1')
         self.assertEqual(report['oraclePersistence'],oracle.persistence_case(report,audit,stage,payload))
-        for changed_audit,changed_payload in (([],payload),(audit*2,payload),(audit,b'{}')):
+        for changed_audit,changed_payload in ((dict(audit,records=[]),payload),(dict(audit,records=audit['records']*2),payload),(audit,b'{}')):
             with self.assertRaises(ValueError):
                 oracle.persistence_case(report,changed_audit,stage,changed_payload)
         report['http'].pop()
         with self.assertRaises(ValueError):
             oracle.persistence_case(report,audit,stage,payload)
 
+    def test_legal_client_filter_cannot_count_reads_across_the_browser_window(self):
+        client='1'*32
+        start,end='2026-11-19T00:00:00Z','2026-11-19T00:00:01Z'
+        scoped=observer.audit_invocation('a'*64,start,end,client)
+        self.assertEqual(client,scoped['definition']['clientId'])
+        self.assertIn("AND client_identifier='"+client+"'",scoped['body'])
+        for mode in ('s1','s1-reopen'):
+            with self.subTest(mode=mode):
+                report,audit,stage,payload=self.fixture(mode)
+                scoped_rows=[dict(row,clientId=client) for row in audit['records']]
+                with self.assertRaisesRegex(ValueError,'OMQ_S1_AUDIT_CLIENT_FILTER'):
+                    oracle.persistence_case(report,dict(clientId=client,records=scoped_rows),stage,payload)
+
     def test_reopen_rejects_other_subject_digest_and_source_reads(self):
         report,audit,stage,_=self.fixture('s1-reopen')
         self.assertEqual(report['oraclePersistence'],oracle.persistence_case(report,audit,stage))
         with self.assertRaises(ValueError):
-            oracle.persistence_case(report,[{'action':'SELECT'}],stage)
+            oracle.persistence_case(report,dict(audit,records=[{'action':'SELECT'}]),stage)
         with self.assertRaises(ValueError):
             oracle.persistence_case(report,audit,{'readerSubjectId':'other'})
         report['http'][0]['sha256']='0'*64

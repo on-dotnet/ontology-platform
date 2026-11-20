@@ -342,8 +342,10 @@ def audit_observation(archive, audit, row, host, origin, measured=None):
     return records
 
 
-def persistence_case(report, audit_rows, stage, raw_result=None):
+def persistence_case(report, audit, stage, raw_result=None):
     """重开单表正例与新会话恢复的实际 HTTP、准确主体、原字节及整个浏览器命令读审计。"""
+    require(audit['clientId'] is None,'OMQ_S1_AUDIT_CLIENT_FILTER')
+    audit_rows = audit['records']
     proof = report['oraclePersistence']
     actor = stage['readerSubjectId']
     require(proof['subjectId']==actor and HEX.fullmatch(proof['resultHash']) and HEX.fullmatch(proof['sessionHash'])
@@ -384,7 +386,8 @@ def reopen_browser(archive, entry, origin, mode, case):
     require(len({h['commandId'] for h in (before,inside,after)}) == 3 and
             utc(before['endedAtUtc']) <= utc(row['startedAtUtc']) <= utc(inside['startedAtUtc']) <= utc(inside['endedAtUtc'])
             <= utc(after['startedAtUtc']) <= utc(after['endedAtUtc']) <= utc(row['endedAtUtc']), 'OMQ_HOST_WINDOW')
-    records = audit_observation(archive, archive.read(entry['audit']), row, host, origin, measured)
+    audit = archive.read(entry['audit'])
+    records = audit_observation(archive,audit,row,host,origin,measured)
     if mode in ('s0-oracle-natural','s0-oracle-cancel',NATURAL_CANCEL):
         from workflow_oracle_mapping_formal_observer import classify
         witness = report['oracleWitness']
@@ -432,7 +435,7 @@ def reopen_browser(archive, entry, origin, mode, case):
         if mode=='s1':
             require(report['oraclePersistence']['reportName']==entry['report'],'OMQ_S1_ORIGINAL_REPORT')
             payload = archive.raw(entry['report'][:-5]+'-result.json')
-        archive.persistence = persistence_case(report,records,entry['stageInputs'],payload)
+        archive.persistence = persistence_case(report,audit,entry['stageInputs'],payload)
         archive.persistenceWindow = {'startedAtUtc':row['startedAtUtc'],'endedAtUtc':row['endedAtUtc']}
     if mode.startswith('ui-'):
         wb=archive.read('web-build-binding.json')
