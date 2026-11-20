@@ -367,7 +367,7 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
     }
 
     /// <summary>仅真实 Oracle 所有者可原子终结自己的原 fence；与正式取消或 Sweep 抢同一行。</summary>
-    internal async Task FailOracleAsync(G4QueryRecord lease, ResourceScope scope, ActorContext actor, CancellationToken token)
+    internal async Task FailOracleAsync(G4QueryRecord lease, ResourceScope scope, ActorContext actor, Func<TimeSpan> remaining, CancellationToken token)
     {
         if (!IsOracleOwner(lease.LeaseOwner)) return;
         // 独立上下文只写本模块准确行，失败审计与 fence 在同物理事务提交。
@@ -387,7 +387,7 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
     }
 
     /// <summary>仅在原执行已确证无源残余时以原 owner、两代 fence 和终态执行单行 CAS。</summary>
-    internal async Task<bool> ConfirmOracleCleanupAsync(string queryId, string? owner, long originalFence, long terminalFence, CancellationToken token)
+    internal async Task<bool> ConfirmOracleCleanupAsync(string queryId, string? owner, long originalFence, long terminalFence, Func<TimeSpan> remaining, CancellationToken token)
     {
         if (!IsOracleOwner(owner) || originalFence < 1 || originalFence == long.MaxValue || terminalFence != originalFence + 1) return false;
         // 单条语句在 PG 取得准确行锁后重核状态和正式取消的保守同库截止。

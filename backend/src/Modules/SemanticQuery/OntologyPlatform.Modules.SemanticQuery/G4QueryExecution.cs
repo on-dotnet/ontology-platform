@@ -201,9 +201,9 @@ public sealed class G4QueryExecution
         {
             // 只在原请求和物理分支剩余时间内结算，任何迟到/未知均保留占位给独立恢复。
             await FinishOracleFailureAsync(admission.Record, oracle, token,
-                cancellation => store.FailOracleAsync(admission.Record, session.Scope, session.Actor, cancellation),
+                cancellation => store.FailOracleAsync(admission.Record, session.Scope, session.Actor, () => OracleSettlementRemaining(admission.Record, oracle), cancellation),
                 cancellation => store.ConfirmOracleCleanupAsync(admission.Record.Id, admission.Record.LeaseOwner,
-                    admission.Record.Fence, admission.Record.Fence + 1, cancellation));
+                    admission.Record.Fence, admission.Record.Fence + 1, () => OracleSettlementRemaining(admission.Record, oracle), cancellation));
             throw;
         }
         finally

@@ -1,4 +1,9 @@
+using System.Diagnostics;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using OntologyPlatform.Contracts;
+using OntologyPlatform.Modules.Governance;
 using OntologyPlatform.Modules.SemanticQuery;
 
 namespace OntologyPlatform.QueryTests;
@@ -70,6 +75,105 @@ public sealed class G4OracleSettlementTests
         Assert.AreEqual(scenario == "timely" ? 1 : 0, confirmed);
         Assert.AreEqual(executionId, state.Lifetime?.ExecutionId);
         Assert.AreEqual(TimeSpan.FromSeconds(1), state.BranchLimit);
+    }
+
+    /// <summary>真实 PG 行锁延迟写者，验证正式失败写与两种终态 CAS 都须在锁内服从更早源截止。</summary>
+    [TestMethod]
+    [DataRow("FAILED")]
+    [DataRow("CANCELLED")]
+    [DataRow("RUNNING")]
+    public async Task OriginalCutoffIsCheckedAfterPostgresRowLock(string status)
+    {
+        // 复用既有临时 PG 所有权准入，拒绝连接正式平台库或任何未标识测试库。
+        var connection = Environment.GetEnvironmentVariable("G4_QUERY_TEST_CONNECTION");
+        Assert.IsFalse(string.IsNullOrWhiteSpace(connection));
+        await G4QueryPersistenceTests.DemandIsolatedDatabaseAsync(connection!);
+        await using var host = new ServiceCollection()
+            .AddDbContextFactory<G4QueryDbContext>(o => o.UseNpgsql(connection, n => n.MigrationsHistoryTable("__EFMigrationsHistory", "semantic_query")))
+            .AddDbContextFactory<GovernanceDbContext>(o => o.UseNpgsql(connection, n => n.MigrationsHistoryTable("__EFMigrationsHistory", "governance")))
+            .BuildServiceProvider();
+        // 仅该独立用例的随机行允许写，锁持有者和产品写者分别建连接。
+        var queries = host.GetRequiredService<IDbContextFactory<G4QueryDbContext>>();
+        var governance = host.GetRequiredService<IDbContextFactory<GovernanceDbContext>>();
+        await using var locker = await queries.CreateDbContextAsync();
+        await using var audits = await governance.CreateDbContextAsync();
+        await locker.Database.MigrateAsync();
+        await audits.Database.MigrateAsync();
+        var id = "query-lock-" + Guid.NewGuid().ToString("N");
+        var owner = G4QueryResultStore.OracleOwnerPrefix + Guid.NewGuid().ToString("N");
+        var actor = new ActorContext { SubjectId = id, OrganizationId = "isolated-oracle", SiteIds = ["a"],
+            Roles = ["platform.viewer"], TraceId = id, CorrelationId = id };
+        var scope = new ResourceScope { OrganizationId = actor.OrganizationId, SiteIds = actor.SiteIds };
+        // 唯一输入的显式状态及 fence 使旧读者绝不能作用于别的申请。
+        var seed = new G4QueryRecord { Id = id, LeaseOwner = owner, Fence = status == "RUNNING" ? 1 : 2,
+            ExecutionStatus = status, CancelRequested = status == "CANCELLED", OrganizationId = actor.OrganizationId,
+            SubjectId = id, IdempotencyKey = id, CreatedAtUtc = DateTimeOffset.UtcNow, DeadlineAtUtc = DateTimeOffset.UtcNow.AddSeconds(5),
+            ExpiresAtUtc = DateTimeOffset.UtcNow.AddMinutes(1), LeaseUntilUtc = DateTimeOffset.UtcNow.AddSeconds(5) };
+        locker.Queries.Add(seed);
+        await locker.SaveChangesAsync();
+        var store = new G4QueryResultStore(queries, null!, null!, new TransactionalAuditWriter(governance),
+            new EphemeralDataProtectionProvider(), TimeProvider.System);
+        try
+        {
+            // 在精确不存在的测试 ID 上准备数据库查询，避免一次性模型/命令编译消耗测量窗口。
+            var missing = new G4QueryRecord { Id = "absent-" + id, LeaseOwner = owner, Fence = 1 };
+            await store.FailOracleAsync(missing, scope, actor, () => TimeSpan.FromMilliseconds(250), CancellationToken.None);
+            Assert.IsFalse(await store.ConfirmOracleCleanupAsync(missing.Id, owner, 1, 2, () => TimeSpan.FromMilliseconds(250), CancellationToken.None));
+            await using var held = await locker.Database.BeginTransactionAsync();
+            var pid = (await locker.Database.SqlQuery<int>($"""
+                SELECT pg_backend_pid() AS "Value" FROM semantic_query."Queries" WHERE "Id" = {id} FOR UPDATE
+                """).ToArrayAsync()).Single();
+            // 正式取消本身给 250ms，同一行的原源分支另只余 100ms。两个量分开独立核验。
+            if (status == "CANCELLED")
+                await locker.Database.ExecuteSqlInterpolatedAsync($"""
+                    UPDATE semantic_query."Queries" SET "LeaseUntilUtc" = clock_timestamp()+interval '250 milliseconds' WHERE "Id"={id}
+                    """);
+            // 锁在发起写操作前已经持有；测试令牌始终有效，排除线程计时器取消代替数据库期限检查。
+            var start = Stopwatch.GetTimestamp();
+            TimeSpan Remaining() => TimeSpan.FromMilliseconds(100) - Stopwatch.GetElapsedTime(start);
+            async Task<bool> Write()
+            {
+                if (status != "RUNNING")
+                    return await store.ConfirmOracleCleanupAsync(id, owner, 1, 2, Remaining, CancellationToken.None);
+                await store.FailOracleAsync(seed, scope, actor, Remaining, CancellationToken.None);
+                return false;
+            }
+            var write = Write();
+            try
+            {
+                // 通过真实等待图绑定持锁者 PID，而不是仅依据任务已调度。
+                var blocked = false;
+                while (Stopwatch.GetElapsedTime(start) < TimeSpan.FromMilliseconds(90))
+                {
+                    blocked = (await locker.Database.SqlQuery<bool>($"""
+                        SELECT EXISTS (SELECT 1 FROM pg_stat_activity WHERE {pid}=ANY(pg_blocking_pids(pid))) AS "Value"
+                        """).SingleAsync());
+                    if (blocked) break;
+                    await Task.Delay(1);
+                }
+                Assert.IsTrue(blocked, "The exact row lock must block the product writer before the source cutoff.");
+                while (Remaining() > TimeSpan.Zero) await Task.Delay(1);
+                if (status == "CANCELLED")
+                    Assert.IsTrue(await locker.Database.SqlQuery<bool>($"""
+                        SELECT "LeaseUntilUtc" > clock_timestamp() AS "Value" FROM semantic_query."Queries" WHERE "Id"={id}
+                        """).SingleAsync());
+            }
+            finally
+            {
+                await held.CommitAsync();
+                await write.WaitAsync(TimeSpan.FromSeconds(2));
+            }
+            Assert.IsFalse(await write);
+            var saved = await locker.Queries.AsNoTracking().SingleAsync(row => row.Id == id);
+            Assert.AreEqual(owner, saved.LeaseOwner);
+            Assert.AreEqual(seed.Fence, saved.Fence);
+            Assert.AreEqual(status, saved.ExecutionStatus);
+            Assert.IsFalse(await audits.AuditRecords.AnyAsync(row => row.Resource == id));
+        }
+        finally
+        {
+            await locker.Queries.Where(row => row.Id == id).ExecuteDeleteAsync();
+        }
     }
 
     /// <summary>同时推进本地 UTC 和单调时基；测试不依赖系统定时器回调调度来发现过期。</summary>

@@ -165,7 +165,7 @@ public sealed partial class G4QueryRaceTests
         }
         Assert.AreEqual(404, (await Assert.ThrowsAsync<SemanticOperationException>(() => Read(actor with { SubjectId = "other" }, qid, false))).Status);
         Assert.AreEqual(0, source.Opens);
-        Assert.IsFalse(await store.ConfirmOracleCleanupAsync(qid, row.LeaseOwner, 1, 2, CancellationToken.None));
+        Assert.IsFalse(await store.ConfirmOracleCleanupAsync(qid, row.LeaseOwner, 1, 2, () => TimeSpan.FromMilliseconds(250), CancellationToken.None));
         Assert.IsFalse(await store.HeartbeatAsync(new G4QueryRecord { Id = qid, LeaseOwner = row.LeaseOwner, Fence = 1 }, CancellationToken.None));
         // 下面从隔离库真实原行生成摘要与数据库物理身份，并沿生产解析器验证同一结构。
         await db.Database.OpenConnectionAsync();

@@ -446,14 +446,14 @@ public sealed partial class G4QueryRaceTests
                 Assert.IsNotNull(remaining);
                 Assert.IsFalse(remaining.Active);
                 Assert.IsTrue(remaining.CleanupMs is > 0 and <= 250);
-                Assert.IsTrue(await store.ConfirmOracleCleanupAsync(first.Id, first.LeaseOwner, first.Fence, terminal.Fence, CancellationToken.None));
-                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(first.Id, first.LeaseOwner, first.Fence, terminal.Fence, CancellationToken.None));
+                Assert.IsTrue(await store.ConfirmOracleCleanupAsync(first.Id, first.LeaseOwner, first.Fence, terminal.Fence, () => TimeSpan.FromMilliseconds(250), CancellationToken.None));
+                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(first.Id, first.LeaseOwner, first.Fence, terminal.Fence, () => TimeSpan.FromMilliseconds(250), CancellationToken.None));
                 // 第二条代表未获物理证明的执行。即使同连接常规两槽未满，其他主体也被拒绝。
                 var held = (await Admit(0, 1)).Record;
                 terminal = await second.CancelAsync(held.Id, session, [proof], CancellationToken.None);
-                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(first.Id, held.LeaseOwner, held.Fence, terminal.Fence, CancellationToken.None));
-                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(held.Id, held.LeaseOwner + "-wrong", held.Fence, terminal.Fence, CancellationToken.None));
-                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(held.Id, held.LeaseOwner, held.Fence + 1, terminal.Fence, CancellationToken.None));
+                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(first.Id, held.LeaseOwner, held.Fence, terminal.Fence, () => TimeSpan.FromMilliseconds(250), CancellationToken.None));
+                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(held.Id, held.LeaseOwner + "-wrong", held.Fence, terminal.Fence, () => TimeSpan.FromMilliseconds(250), CancellationToken.None));
+                Assert.IsFalse(await store.ConfirmOracleCleanupAsync(held.Id, held.LeaseOwner, held.Fence + 1, terminal.Fence, () => TimeSpan.FromMilliseconds(250), CancellationToken.None));
                 Assert.IsFalse(await store.HeartbeatAsync(held, CancellationToken.None));
                 Assert.AreEqual(429, (await Assert.ThrowsAsync<SemanticOperationException>(() => Admit(1, 1, second))).Status);
                 Assert.AreEqual(429, (await Assert.ThrowsAsync<SemanticOperationException>(() => Admit(0, 2, second))).Status);
@@ -464,7 +464,7 @@ public sealed partial class G4QueryRaceTests
                     await database.Database.SqlQuery<int>($"""
                         SELECT 1 AS "Value" FROM semantic_query."Queries" WHERE "Id" = {held.Id} FOR UPDATE
                         """).ToArrayAsync();
-                    delayed = store.ConfirmOracleCleanupAsync(held.Id, held.LeaseOwner, held.Fence, terminal.Fence, CancellationToken.None);
+                    delayed = store.ConfirmOracleCleanupAsync(held.Id, held.LeaseOwner, held.Fence, terminal.Fence, () => TimeSpan.FromMilliseconds(250), CancellationToken.None);
                     await Task.Delay(275);
                     await heldLock.CommitAsync();
                 }
