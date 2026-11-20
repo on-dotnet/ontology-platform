@@ -1,0 +1,2483 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "product-resume-01",
+  "base": "4924f44ec1628b156d7e722513405bc13d376d8e",
+  "branch": "codex/g4-oracle-mapping-query-001",
+  "frozenMain": "5168f2c93ca226caa521a6dc4ac85439335274c4",
+  "finalHead": "20b98127bf0b058b75b91550c721d6b5673b08a6",
+  "pgIntegrationHead": "ef57c790da6878f0002de89e210c1cb0674ba86a",
+  "reviewedEvidenceHead": "20b98127bf0b058b75b91550c721d6b5673b08a6",
+  "deliveryGit": {
+    "observedMain": "5168f2c93ca226caa521a6dc4ac85439335274c4",
+    "observedTask": "20b98127bf0b058b75b91550c721d6b5673b08a6",
+    "push": "NORMAL",
+    "method": "git push of the task branch and post-push git ls-remote of both named refs",
+    "branch": "codex/g4-oracle-mapping-query-001",
+    "publication": "Reviewed report commit. The containing receipt-only publication commit and its observed remote reference are returned independently to avoid a self-referential Git hash."
+  },
+  "report": {
+    "filename": "report.md",
+    "bytes": 12486,
+    "sha256": "8dcca91f4db6407434a3431837f4dcc5f43b6293c8260d3423b54c11af5d11c9"
+  },
+  "verdict": {
+    "productResume": "BLOCKED",
+    "AC03A": "BLOCKED_NO_FORMAL_SOURCE_WITNESS",
+    "AC03B": "BLOCKED",
+    "cleanup250ms": "NOT_QUALIFIED",
+    "AC03C": "PASS_SCOPED_NEGATIVES",
+    "S1": "NOT_RUN",
+    "S2": "NOT_RUN",
+    "S3": "NOT_RUN",
+    "oracleS0": "BLOCKED",
+    "G4": "PARTIAL",
+    "CI": "NOT_RUN",
+    "singleAccountLogin": "PASS_1_OF_1_REQUESTED",
+    "singleAccountWindowClose": "PASS",
+    "earlierFiveServiceCloseQualification": "BLOCKED_FUSEKI_CLEAN_SHUTDOWN_UNKNOWN"
+  },
+  "login": {
+    "run": "isolated-login-20261120T040700Z",
+    "execution": "REUSED",
+    "qualification": "FRESH_OFFLINE",
+    "applicationLogins": "4/4",
+    "exactSessionToSubject": "NOT_VERIFIED",
+    "individualTokenEvents": "NOT_RETAINED",
+    "earlierConsumer": "BLOCKED",
+    "distinctSubjects": 4,
+    "preservedArchives": 9,
+    "epoch": [
+      16,
+      16
+    ],
+    "temporaryAdminRemoved": true,
+    "representative": {
+      "filename": "login-supplement.json",
+      "bytes": 4746,
+      "sha256": "d035334c0b70e024b669128ad8e5622f14032bb13424c5a47a98fc1d246bae2f"
+    }
+  },
+  "targetedFresh": [
+    {
+      "label": "red-lifetime",
+      "testedCommit": "8a3b0809a85817c22a5d8f1488c5fb7f29d1521d",
+      "id": "e394b4f5e724403aa56a6c81c352a405",
+      "stage": "red-lifetime",
+      "recordedRun": "product-resume-01",
+      "exitCode": 2,
+      "classification": "EXIT_FAILURE",
+      "started": "2026-11-20T07:40:20.737378+00:00",
+      "ended": "2026-11-20T07:40:21.020696+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "2b58cdf5ea1b9b4174af54c3ff7e2daa5b1fe84319a26f0217f5ec1d7364c06d",
+      "executionIdentity": "9fab879226f19a66fd4d42630c548243dc61fae7543353ec1ec2f185cf42a1f4",
+      "commandSummary": {
+        "argumentCount": 10,
+        "executable": "dotnet",
+        "sha256": "b404693e1b80453e79db4461c5429f6217439ce5dbe6b296db145deb8fea6d17"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1494,
+        "sha256": "3d6d4f0b99f514bcfc991237b19b3511652f7c65d784081077aa1f8309ee5dbd"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 1248,
+        "sha256": "7e2076b8c64cf748428ac6a182c850e9f1194aba31e89aa60ae6a5984af84c68"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "fixed-lifetime",
+      "testedCommit": "04cbb694ed09462155e2e03d1f072d1d6235427b",
+      "id": "156496cbf1eb4093b7b8036b835be430",
+      "stage": "fixed-lifetime",
+      "recordedRun": "product-resume-01",
+      "exitCode": 0,
+      "classification": "SUCCESS",
+      "started": "2026-11-20T07:48:36.614146+00:00",
+      "ended": "2026-11-20T07:48:36.882687+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "be9c2da5cfd9169fc929fb4af5f90f02ee8ee4ec245af69fba0bdd9f277cd02f",
+      "executionIdentity": "b1a13c755b7a283126ebe8eef5134bdc2cdcf179f4a3f5cae1b1eff1e9ba152e",
+      "commandSummary": {
+        "argumentCount": 10,
+        "executable": "dotnet",
+        "sha256": "181d2a3d06c2d9e21c8b62ff5f42fe66e83eec63b0ba5a5918743b152e673269"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1489,
+        "sha256": "7777a482fcbba16e75ee5b119ef3235328528325958dd27c69df6e8c8eecae36"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 306,
+        "sha256": "45f9aa0a517cf929509fd81973b4aac4586e6b76088a8f8fd6684e28d068ef48"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "settlement-old",
+      "testedCommit": "4ab572e6ef4c81685eecdc75a9250ad6bd735b18",
+      "id": "86ad0a4e76344566911dd2cdc007c89d",
+      "stage": "settlement-old",
+      "recordedRun": "product-resume-01",
+      "exitCode": 2,
+      "classification": "EXIT_FAILURE",
+      "started": "2026-11-20T07:51:59.533884+00:00",
+      "ended": "2026-11-20T07:51:59.918107+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "1c7be94255469c02de43a05fe9ecd433db0d02709cea2088757a20a9a048b74a",
+      "executionIdentity": "0cf674a2ff2f575376dbe71ec2b8dee77dc5425e81b5d30847e3f2d38c5b5964",
+      "commandSummary": {
+        "argumentCount": 8,
+        "executable": "dotnet",
+        "sha256": "69150db91bae537a143b6a2b9b8f0fcfd55a3e95d522e5ffac74159c40c0586a"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1494,
+        "sha256": "fbbdfd67b225341beee4778e040c9f6b31bcba48fe37a2f7c04768202a072922"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 3667,
+        "sha256": "36ac07c6159b374e74376e7e05ba4b98f25060a73c69d8143f3c064148bfbd8c"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "rollback-old",
+      "testedCommit": "4ab572e6ef4c81685eecdc75a9250ad6bd735b18",
+      "id": "cbfde0e0a49344389c4f89d249a6515f",
+      "stage": "rollback-old",
+      "recordedRun": "product-resume-01",
+      "exitCode": 2,
+      "classification": "EXIT_FAILURE",
+      "started": "2026-11-20T07:51:59.540478+00:00",
+      "ended": "2026-11-20T07:51:59.840660+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "4f7fb4c1d2480374fdb335d53dbf217e1f0355d09dea6bd0c858a05d0b876ae3",
+      "executionIdentity": "68f4a6e16146df5056ed0a71ff481fdc871f905d7a66f6c60606c1fe68e05e49",
+      "commandSummary": {
+        "argumentCount": 8,
+        "executable": "dotnet",
+        "sha256": "356bbdd0b381c34513902cfd79009d26037ac666bfbb32cca81dbf9170a9e9ed"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1491,
+        "sha256": "413d56946aee23ab9744abdfe45e0745dfaf29192166fb0de95570af2c32cbe3"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 1124,
+        "sha256": "f760ae8d95d7d6bb7f53e595675dd114cabe558e73ac8beddb9622d91c1d7cbf"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "mid-settlement",
+      "testedCommit": "be69074862027a11df7d602885fb58d94a7adf88",
+      "id": "7ecc40b7c12845f8be3ab491078a948a",
+      "stage": "mid-settlement",
+      "recordedRun": "product-resume-01",
+      "exitCode": 0,
+      "classification": "SUCCESS",
+      "started": "2026-11-20T07:58:14.797384+00:00",
+      "ended": "2026-11-20T07:58:15.119184+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "6a8b532f1b18ba5ef7ba5f390d82529991c3c3eca6ba5f8785f04c8d286e27c5",
+      "executionIdentity": "d547c82f7896d27c48f60738e21462cf339699f2ffd93d1db64f8ea8f263a422",
+      "commandSummary": {
+        "argumentCount": 8,
+        "executable": "dotnet",
+        "sha256": "d43b1ef78c0162452e63aaaa0c1e8338fce01e266a667e8d92f9a0e050ea6896"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1488,
+        "sha256": "8cc3b191b5dfed2eb5e0a5823b77b5c6995b37ee264d0063b26768e42a8d0e60"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 292,
+        "sha256": "ea4d7f2dd1d64b0b96934a7f5d44bbfde9911804798fa6c569d2e5ad0abd8dd8"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-offline",
+      "testedCommit": "6d5cf456bd3f4491d5baea6ba18b5299d96c18ca",
+      "id": "de72c95ff15e465596676646e7aa2956",
+      "stage": "oracle-offline",
+      "recordedRun": "product-resume-01",
+      "exitCode": 2,
+      "classification": "EXIT_FAILURE",
+      "started": "2026-11-20T07:51:01.366006+00:00",
+      "ended": "2026-11-20T07:51:01.744888+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "6e6ef9b6128224cb073ce4556af7e7d9bebcd63d6244c974f24196bb9c987917",
+      "executionIdentity": "3d0cbbb7a07f9bce656f7b502055eaa70b04b93d3cdd7e5e53f61bbb9420c34c",
+      "commandSummary": {
+        "argumentCount": 10,
+        "executable": "dotnet",
+        "sha256": "afa36384841025c7d8fbc767019038e8d63b1655264cd437d3d74337d0f3fb43"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1496,
+        "sha256": "1afbbe9e3bd1dadaa4da637c4076afb3eaaa3e24eb38e2b8e141432de8ee19f8"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 2465,
+        "sha256": "5c3309982787dade760d1955412d26419322dcdd8c76daa04d9b2ef62543b17f"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "observed-reader",
+      "testedCommit": "b690d4db8b0e777117a5ee2b9c4a989dba88a291",
+      "id": "3e4b394f6835451ebf35c4c617542dec",
+      "stage": "observed-reader",
+      "recordedRun": "product-resume-01",
+      "exitCode": 0,
+      "classification": "SUCCESS",
+      "started": "2026-11-20T07:59:38.615848+00:00",
+      "ended": "2026-11-20T07:59:39.026503+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "61f60632c1180d968ff855cca50665f7db2ef4783037db2707e3a556e8acc965",
+      "executionIdentity": "edca8f7ad724b46d7177f373389a5b15d740e21450c9976239cb79acd4a12811",
+      "commandSummary": {
+        "argumentCount": 8,
+        "executable": "dotnet",
+        "sha256": "7d1ff1f50cd22eb3949d05b68a6cb412cdb143498d63fc45e313f0205196919e"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1490,
+        "sha256": "3e6409041a27eff29bc75fe809df62afdeefe751d0caf779cf8f02d5b389519e"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 306,
+        "sha256": "6e222ab205e02ef0d966f1c2ac270eaa0abacfc70a1a40cec9ae3ba36697e4eb"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "store-bound-executor",
+      "testedCommit": "f85622d3dd7c882d22ba2e1061279512ed8dbf43",
+      "id": "95edb4b6281a47ff884086de69558799",
+      "stage": "store-bound-executor",
+      "recordedRun": "product-resume-01",
+      "exitCode": 0,
+      "classification": "SUCCESS",
+      "started": "2026-11-20T08:06:00.360123+00:00",
+      "ended": "2026-11-20T08:06:00.661027+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "955354048d6a8fcbdd0787bb4c630a5a8c666ab0f6b4ae5e960de86e8073d9df",
+      "executionIdentity": "735e155a83da932c5028a6e208f194a8e25c52e4254df22e5506c5d7c10d8b03",
+      "commandSummary": {
+        "argumentCount": 8,
+        "executable": "dotnet",
+        "sha256": "bcc2ef77493e4343d053aae108d423c18a00ede5609cf960b792d10b275de35c"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1495,
+        "sha256": "1c914220cace2caae094bebdd5062ecf3a8e947c81271d1f0d377142a74fe8a7"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 292,
+        "sha256": "690e40379227ef6a125d25a68579d10b6596d1843f336b03c571c6c7b714a613"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "resume-admission",
+      "testedCommit": "ef57c790da6878f0002de89e210c1cb0674ba86a",
+      "id": "cfc6650d5262464d9ccbeeb3b0cff267",
+      "stage": "resume-admission",
+      "recordedRun": "product-resume-01",
+      "exitCode": 0,
+      "classification": "SUCCESS",
+      "started": "2026-11-20T08:37:58.881224+00:00",
+      "ended": "2026-11-20T08:38:00.304661+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "13b75f1120766dc9307d29a1b3fc57d567b87ee39772cac1405607af62dc9e8b",
+      "executionIdentity": "650cf7d6c1e0361e4b6787da66b18b22671a858476032cd4419747ed17641196",
+      "commandSummary": {
+        "argumentCount": 2,
+        "executable": "python3",
+        "sha256": "a80ebdb6a81f0ff9099d54e23b70e5ef457e93745da8405c0a0c7b6f22d440ea"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1491,
+        "sha256": "7fb8a05745977b865c0a50d7f6e2e18da51ec7a130f77f4285b3a958c0400210"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 133,
+        "sha256": "3215994f312faef6a15b0df8cc73044b94ed99aa1ae1808bff9e3add814eed96"
+      }
+    },
+    {
+      "label": "resume-cases",
+      "testedCommit": "ef57c790da6878f0002de89e210c1cb0674ba86a",
+      "id": "7e73e549dc454f11bfe9076e64861852",
+      "stage": "resume-cases",
+      "recordedRun": "product-resume-01",
+      "exitCode": 0,
+      "classification": "SUCCESS",
+      "started": "2026-11-20T08:37:58.881265+00:00",
+      "ended": "2026-11-20T08:37:59.507901+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "87bff056d8c0f2961f9f316358dcdc52562b8629cda735e8365782b36323428c",
+      "executionIdentity": "8d9b0b317dd19f2ac2e0cb3d00d2edb8422f38a3daa84e14d9d513ccfdd51624",
+      "commandSummary": {
+        "argumentCount": 2,
+        "executable": "python3",
+        "sha256": "8d66909e738c6c1e339cace5ed69ec8dc1de8ed34384381fc5a1e9f51ebbbdfc"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1487,
+        "sha256": "2278977b6953b0b5ccd4098364a78eedb7b5510dee82c0d67e83fda98da7459d"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 116,
+        "sha256": "a7361e2395177df855680ba9a9129af224c08ea3754b88095775a131a16ca867"
+      }
+    },
+    {
+      "label": "resume-preflight",
+      "testedCommit": "ef57c790da6878f0002de89e210c1cb0674ba86a",
+      "id": "5751a5c14b4241d094f1ae0332142ed0",
+      "stage": "resume-preflight",
+      "recordedRun": "product-resume-01",
+      "exitCode": 0,
+      "classification": "SUCCESS",
+      "started": "2026-11-20T08:37:58.889116+00:00",
+      "ended": "2026-11-20T08:37:58.952799+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "e5103c81bc3a63d8a8902fddbb709ec69e329ccd114c6697f922e36dff1d6491",
+      "executionIdentity": "17c7fab4d33d9988944fa55c175bd66028b920130296b91a0e8fb903048e283c",
+      "commandSummary": {
+        "argumentCount": 7,
+        "executable": "python3",
+        "sha256": "6de11eac66ddcd4735f5e4f26c3d0f278a13eff3034524e8c57dbe7526c3de14"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1493,
+        "sha256": "1024ae0d8ad87eeba003c8ed52cde5f82b763647eb134d9ac183985a94d85712"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 1475,
+        "sha256": "dd2cdc74208a25b12a6e65ba7d7ca785765bac2d06154fe3711b90927146c0a8"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "evidence-schema",
+      "testedCommit": "cbc8fe4782e298b0387b8d4acdffeb8c38687300",
+      "id": "a8e2fa12474a4bcaa73e1a9afe82f89e",
+      "stage": "evidence-schema",
+      "recordedRun": "product-resume-01",
+      "exitCode": 0,
+      "classification": "SUCCESS",
+      "started": "2026-11-20T08:10:00.126717+00:00",
+      "ended": "2026-11-20T08:10:01.433058+00:00",
+      "deadlineSeconds": 240,
+      "inputFingerprint": "4ae8f7e01944e2a71b0e7c770635b4d4ff87501fc061ef4c7fcbfa53047b8b9e",
+      "executionIdentity": "7104b3583af47f88b8365a482479ef1c3b6df6e0b30dd1c9b7b52cd3bfdefb50",
+      "commandSummary": {
+        "argumentCount": 7,
+        "executable": "pwsh",
+        "sha256": "644ebbbebcce9abbcbc74416026511db7be625f080e68b83b70511d3750aacb5"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1487,
+        "sha256": "5046657e7ea76dc80f106cc03f30cf358d01c4c29c7075667c240ad41fe6b49e"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 156,
+        "sha256": "73d2684ead217e3920c70138f8fdf495c88e262134fe8f66db96cd6b3a2a6297"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "postgres": {
+    "execution": "FRESH",
+    "raw": {
+      "filename": "pg-verification-a6a8e96f5d28.json",
+      "bytes": 6007,
+      "sha256": "3cea868c4dfd1b63cf4954d4679e679450e889f8358d7930702fd1f74cd8d681"
+    },
+    "recordedHead": "53b90d87ce8ac741eb0f0daa41b25fe87a741bbf",
+    "phaseDriverIntegratedIn": "ef57c790da6878f0002de89e210c1cb0674ba86a",
+    "queryBuildId": "5eb5fa8c52e544b1a6bb58c8d14f3b16",
+    "apiBuildId": "b137c67b738b4f1480ca3ca7f0f4a152",
+    "snapshots": {
+      "api": "de8d239be9d269747e60633af1e5288208e5fdc6598d0597102226ad52b4bb9e",
+      "query": "8bf97f6ee9f2e9ab538b48ea8bb2cf8bdb92b976ca2f82e3b007855fd1dffe8e"
+    },
+    "databaseReleased": true,
+    "databaseOid": "17719",
+    "status": "PASS",
+    "caseGroups": [
+      {
+        "method": "G4OracleSettlementTests.OriginalCutoffIsCheckedAfterPostgresRowLock",
+        "expected": 3,
+        "exitCode": 0,
+        "total": 3,
+        "succeeded": 3,
+        "failed": 0,
+        "skipped": 0,
+        "sampled": 6,
+        "peakDbPlusWalBytes": 13029319,
+        "capacityBytes": 104330306,
+        "timedOut": false,
+        "stdoutSha256": "ac0b3e5d2ed29fa96fa904a72ec42f13c95051f7b7d956ce9bd5203966af1c38",
+        "stderrSha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+        "stdoutBytes": 162,
+        "stderrBytes": 127,
+        "observedExceptionTypes": []
+      },
+      {
+        "method": "G4QueryRaceTests.OracleTerminalOwnerSurvivesSweepAndRejectsStaleConfirmation",
+        "expected": 1,
+        "exitCode": 0,
+        "total": 1,
+        "succeeded": 1,
+        "failed": 0,
+        "skipped": 0,
+        "sampled": 9,
+        "peakDbPlusWalBytes": 13214599,
+        "capacityBytes": 104330306,
+        "timedOut": false,
+        "stdoutSha256": "dcdfd9836f88422d7d29b6a967dd704ef442fabdb60402974c5e7be3248468a1",
+        "stderrSha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+        "stdoutBytes": 162,
+        "stderrBytes": 127,
+        "observedExceptionTypes": []
+      },
+      {
+        "method": "G4QueryRaceTests.RevocationBlocksAtomicResultAndAudit",
+        "expected": 1,
+        "exitCode": 0,
+        "total": 1,
+        "succeeded": 1,
+        "failed": 0,
+        "skipped": 0,
+        "sampled": 8,
+        "peakDbPlusWalBytes": 13277239,
+        "capacityBytes": 104330306,
+        "timedOut": false,
+        "stdoutSha256": "30942f898ff6a562d378c4d73a4c6c084c8fc64e51d6952fc27063b19600357a",
+        "stderrSha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+        "stdoutBytes": 162,
+        "stderrBytes": 127,
+        "observedExceptionTypes": []
+      }
+    ],
+    "mappingDigestBefore": "dbecff7a9d60bffedcf8ad8de428781c8366252d447877617cae933002c6b816",
+    "mappingDigestAfter": "dbecff7a9d60bffedcf8ad8de428781c8366252d447877617cae933002c6b816",
+    "limits": "sampled workload allowance; PostgreSQL has no per-database hard volume quota",
+    "commands": [
+      {
+        "id": "e867e68f0ff9477e982b9347acf69008",
+        "stage": "resume-pg-platform-pg-identity",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:41.784640+00:00",
+        "ended": "2026-11-20T08:33:41.798400+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "1b01d8c8c5fe1a0015bf05bf8240a7b37dd0028679924da9a1cbdd183958cae3",
+        "executionIdentity": "492f391671ad789e1bd4d634d008db3c4b17f11261ae6950612fdd0d92b698f3",
+        "commandSummary": {
+          "argumentCount": 6,
+          "executable": "docker",
+          "sha256": "6a7608d8987f1eb5628e39deacb6a51be05229e5a7abfa153d9f33a9c7a8faf1"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1505,
+          "sha256": "30b7f081e033d6ef5192c2b971f9ca414ef44e5c889d0941155fe9532e8acbea"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 311,
+          "sha256": "b060cbd7db1a40adfd49a4e30f04d1814412e07fdd17cd2f3a1d233db1fed20e"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "e43740c0f431467f894e958fdab3f2b5",
+        "stage": "resume-pg-api-secondary-identity",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:41.799734+00:00",
+        "ended": "2026-11-20T08:33:41.812672+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "dea07a89b46016693b3a3c0b26e4a984280e306f1d58e69bf80eb53ddc043427",
+        "executionIdentity": "06f63faf234194ba0bb0bf9eff5940529ab707376a61b6fbbe71ceedaaa3a268",
+        "commandSummary": {
+          "argumentCount": 6,
+          "executable": "docker",
+          "sha256": "1b026fa334c52e798d474af918e30a339dc909ceaf5f8236b9c8be7903c50cd0"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1507,
+          "sha256": "bda6462760b1dc92dac92a0a8cd7c51e2081c3b523fbd9427c905aa3b641660f"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 928,
+          "sha256": "646811a1e4c84b26a6f4013296e2a9fc5c60ae6dd302455b948dc488a6c65931"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "d61a99a681394deea47d609d8e4e4e4e",
+        "stage": "resume-pg-api-free",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:41.815646+00:00",
+        "ended": "2026-11-20T08:33:41.840506+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "327f5284f1f08062593d5705825985cfcdfcd19ab91283be6fe35e9087d0b85e",
+        "executionIdentity": "c0a635663865e7b2d6509d57decae2d030d298b476a66e910b41285bc01121c9",
+        "commandSummary": {
+          "argumentCount": 7,
+          "executable": "docker",
+          "sha256": "a1d29c93e6a5f843299bc0aed52c97c15ae8015b5de160210f1f7b2c508a0e08"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1492,
+          "sha256": "4f4e1bcb33db250c056348178d4124ec76e3764c29000ba4f567b4efb84e4e49"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 10,
+          "sha256": "a550d0af37128de3f669de7b3071bd745897b370e2fccee7ccafbdd4f079bd81"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "b2a36d85d5824e5a856110adbafd3a22",
+        "stage": "resume-pg-mapping-before",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:41.843045+00:00",
+        "ended": "2026-11-20T08:33:41.892831+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "90c7d2a7d45d44c221bedf60370c7f7212285a96766914de78d8f3847668fb2b",
+        "executionIdentity": "33a1d1647f99ac6eedc3edba3bc85ee5753991ef95e423d859586ac2b21be1bb",
+        "commandSummary": {
+          "argumentCount": 13,
+          "executable": "docker",
+          "sha256": "b9a06176cc7c4fefa19b7812d93bffff1d059c801edf6538c9436f26c18264c6"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1501,
+          "sha256": "e1729faebe0c1645bbfaf5e58316f7c5ae32a91d69be39d7310480280cfdfe1e"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 11186,
+          "sha256": "3d2b0ebad0a70975e58044908a38a5130f3640d6d40cd92773872a71d1635b62"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "25078cf447b143e6983d343635de0bfc",
+        "stage": "resume-pg-db-before",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:41.894491+00:00",
+        "ended": "2026-11-20T08:33:41.937866+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "902473caeec341f17cf94064c0423fbffd9580387a82b7ccf8e854ce9d9df9d2",
+        "executionIdentity": "cc47993df3f0630684bfa0fe84ce01297571af5ff3ddc7eb79c1ee1f334cc52c",
+        "commandSummary": {
+          "argumentCount": 13,
+          "executable": "docker",
+          "sha256": "58cd56e79846c86461cc37abf5c859b0b6e68f847146d7ba07dd19d2ad62e349"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1492,
+          "sha256": "b184897457e24a4dc9d9241261903c493e6b66469798080603a2f2a1c602a366"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 5,
+          "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "6d22820af4574b9eb17c5eed9a1bf147",
+        "stage": "resume-pg-database-budget",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:41.939035+00:00",
+        "ended": "2026-11-20T08:33:41.975049+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "2f6ea2993c0781324b40c52cc8d55e96760bcef2efa7791db914bb828dde16ae",
+        "executionIdentity": "6d08f10d6b84efd074a798a1e95100084f9b3c593548fe75e4e3322ec863e1e9",
+        "commandSummary": {
+          "argumentCount": 13,
+          "executable": "docker",
+          "sha256": "58cd56e79846c86461cc37abf5c859b0b6e68f847146d7ba07dd19d2ad62e349"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1499,
+          "sha256": "4cb24ee6f685e6351b367f7c788c7d433b8179903746b3f1a6ddc7aea577de60"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 86,
+          "sha256": "0a6da830bd06d608866181a09368a3ce89f12bb37c53547f61902b76681259d4"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "fe262b5141754ac4bf47968b40712771",
+        "stage": "resume-pg-create-db",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:41.976778+00:00",
+        "ended": "2026-11-20T08:33:42.030974+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "52bfc6a5d058e4244c0e023612b8e3e447112c57812670884155cf6e29a994f8",
+        "executionIdentity": "da4ad3b052236bcbbc194a9ccf00a9c7177f14a2da330fb36c3fe71562852bd5",
+        "commandSummary": {
+          "argumentCount": 13,
+          "executable": "docker",
+          "sha256": "58cd56e79846c86461cc37abf5c859b0b6e68f847146d7ba07dd19d2ad62e349"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1491,
+          "sha256": "05c5c95ffd67701868d13d2ce28b882bab508687be55f09d93e627a690af2ea8"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "52aba70318e744cfa2c9ed11c20597c4",
+        "stage": "resume-pg-bind-db",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:42.032364+00:00",
+        "ended": "2026-11-20T08:33:42.069769+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "c6622f94bf3fd672c7c5340e1c7ac71b7f66d8db38767dc2f16a2836f6dce91c",
+        "executionIdentity": "8f0123e4c0386a3c2a66eadef2ece662df2b87d804d8e76225eccd3026b3c02c",
+        "commandSummary": {
+          "argumentCount": 13,
+          "executable": "docker",
+          "sha256": "58cd56e79846c86461cc37abf5c859b0b6e68f847146d7ba07dd19d2ad62e349"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1490,
+          "sha256": "9653760ce8959dc6e2a10d9433ebdcd1145e69457e7c16d7ed1b791a11227b94"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "950d7908a5734031bc0d72d2fc08cbed",
+        "stage": "resume-pg-db-bound",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:42.072104+00:00",
+        "ended": "2026-11-20T08:33:42.113927+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "902473caeec341f17cf94064c0423fbffd9580387a82b7ccf8e854ce9d9df9d2",
+        "executionIdentity": "cc47993df3f0630684bfa0fe84ce01297571af5ff3ddc7eb79c1ee1f334cc52c",
+        "commandSummary": {
+          "argumentCount": 13,
+          "executable": "docker",
+          "sha256": "58cd56e79846c86461cc37abf5c859b0b6e68f847146d7ba07dd19d2ad62e349"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1493,
+          "sha256": "78623477a33419ad09be7f671871325cb24c3b49f66d721c3c5268856a0840f1"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 148,
+          "sha256": "7f44b729095967c8109d5caacc39ba43f0827e507ede86264d9d90deebc24997"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "51ffde9403e24621a24586627892efd3",
+        "stage": "resume-pg-actual-tests",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:42.115334+00:00",
+        "ended": "2026-11-20T08:33:48.286615+00:00",
+        "deadlineSeconds": 185,
+        "inputFingerprint": "616adf69d2cbebb31098c39b61903cf35fa00960ba8ea7494d589fd35e172da5",
+        "executionIdentity": "68a27b0912b0908c0f4b2a095dd363ce6c5ce2f67119b2d559357d7dcd28a729",
+        "commandSummary": {
+          "argumentCount": 13,
+          "executable": "docker",
+          "sha256": "139ddeb8c509d001bfcbd9049f94d780250a0b945879cb1793926802c6653a24"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1499,
+          "sha256": "bdfb7914155e79d480a2001bf60d6ddd1bda3561bc4e7bf848629d7db387e33c"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 1396,
+          "sha256": "ee3dc0369a3baf6731c53863606ba5e45c816dbb0d11f78b59011abbef354d36"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 127,
+          "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d"
+        }
+      },
+      {
+        "id": "52ba52cb519244ae94246d0183d440bd",
+        "stage": "resume-pg-tmpfs-released",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:48.408931+00:00",
+        "ended": "2026-11-20T08:33:48.435660+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "e6825047b27938ce68e8eea8d4656d0a733c8978a5185ec53f948656c7da2bd1",
+        "executionIdentity": "ce1e426ef8d034e9a94284e63801448573db38e514a1fe57765aed7f718c48f2",
+        "commandSummary": {
+          "argumentCount": 9,
+          "executable": "docker",
+          "sha256": "6e93506ceb3208d246012bb4c2fc57ddb8e01fef53b82b0271c82f9989ddcc3b"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1497,
+          "sha256": "7ce9a3107e62d6cfe2881f9e432227282a295e3a79729209e8cdcc4f1371ca11"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "3705d9f3438e4e7e805209725978159e",
+        "stage": "resume-pg-db-before-release",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:48.436968+00:00",
+        "ended": "2026-11-20T08:33:48.472364+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "902473caeec341f17cf94064c0423fbffd9580387a82b7ccf8e854ce9d9df9d2",
+        "executionIdentity": "cc47993df3f0630684bfa0fe84ce01297571af5ff3ddc7eb79c1ee1f334cc52c",
+        "commandSummary": {
+          "argumentCount": 13,
+          "executable": "docker",
+          "sha256": "58cd56e79846c86461cc37abf5c859b0b6e68f847146d7ba07dd19d2ad62e349"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1501,
+          "sha256": "9233b15cf7f3cc5aaf6af78837d0ba5436443e16c95443e733ea5b27562a6f82"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 148,
+          "sha256": "7e2a2581b8d7c9bd2b8a1cb5edd5b119bdaffa40675746c81370213e37fb1f84"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "83aaeeabbb3d4fae846b1e42fd919007",
+        "stage": "resume-pg-drop-exact-db",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:48.473723+00:00",
+        "ended": "2026-11-20T08:33:48.513985+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "7d12d8c5d3f81657f38043a7f5de34a7d91f70892207f2344d1e1dd45eb0376a",
+        "executionIdentity": "5cbb877b92db08299ef819df6f4ee93cd685aec0a68149732caedd73a362a001",
+        "commandSummary": {
+          "argumentCount": 13,
+          "executable": "docker",
+          "sha256": "58cd56e79846c86461cc37abf5c859b0b6e68f847146d7ba07dd19d2ad62e349"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1495,
+          "sha256": "be6ccdf653181184bd281a8f577d98fdd638f7df649d052446f62027ae39387c"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "9da41d78bd3f4f2bb08525e1d8e1675c",
+        "stage": "resume-pg-db-after",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:48.515229+00:00",
+        "ended": "2026-11-20T08:33:48.554454+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "902473caeec341f17cf94064c0423fbffd9580387a82b7ccf8e854ce9d9df9d2",
+        "executionIdentity": "cc47993df3f0630684bfa0fe84ce01297571af5ff3ddc7eb79c1ee1f334cc52c",
+        "commandSummary": {
+          "argumentCount": 13,
+          "executable": "docker",
+          "sha256": "58cd56e79846c86461cc37abf5c859b0b6e68f847146d7ba07dd19d2ad62e349"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1492,
+          "sha256": "34dd55af967d2d78a3ec0b643fbabf90d8d6119cab8a56d2312ed0f8f61927de"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 5,
+          "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "45fbd71a4c1643e588e41c9b174799c4",
+        "stage": "resume-pg-mapping-after",
+        "recordedRun": "product-resume-01",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:33:48.556471+00:00",
+        "ended": "2026-11-20T08:33:48.604450+00:00",
+        "deadlineSeconds": 24,
+        "inputFingerprint": "90c7d2a7d45d44c221bedf60370c7f7212285a96766914de78d8f3847668fb2b",
+        "executionIdentity": "33a1d1647f99ac6eedc3edba3bc85ee5753991ef95e423d859586ac2b21be1bb",
+        "commandSummary": {
+          "argumentCount": 13,
+          "executable": "docker",
+          "sha256": "b9a06176cc7c4fefa19b7812d93bffff1d059c801edf6538c9436f26c18264c6"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1499,
+          "sha256": "7d967325f9f204d479c352fa95813a8566f2b4c08eddc89a205128fb0ad2239a"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 11186,
+          "sha256": "3d2b0ebad0a70975e58044908a38a5130f3640d6d40cd92773872a71d1635b62"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    ]
+  },
+  "history": {
+    "pg": {
+      "filename": "pg-qualification.json",
+      "bytes": 4391,
+      "sha256": "69fa925192a454bdf2bdb5c32f77b2b31f1947982b81cd224ef0562b4b31980e"
+    },
+    "method": "RevocationBlocksAtomicResultAndAudit",
+    "priorPGExecution": "REUSED_BY_UNCHANGED_METHOD_AND_DEPENDENCIES",
+    "supersededForCurrentPGBy": "FRESH 5/5",
+    "oldOracleCleanupCas": "HISTORICAL_ONLY",
+    "oracleSourceReopen": [
+      {
+        "original": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/implementation-01/s0-blocked/originals/formal-witness-071127c7-2a34-40d7-9675-7cf967edfdb0.json",
+        "sha256": "b393b0dc31429cd4dd6e6b91ba2cd1b35a602f03e1dc773d687f67acd0afb589",
+        "equivalent": true,
+        "natural": false,
+        "nativeCause": null
+      },
+      {
+        "original": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/implementation-01/s0-blocked/originals/formal-witness-cdbd7aa6-5d68-438d-aa3a-530f4189396c.json",
+        "sha256": "33aacec2db1ab77794d9e58f4da12943b998d9c2f1af03371475e94a30fcc05d",
+        "equivalent": true,
+        "natural": true,
+        "nativeCause": null
+      }
+    ]
+  },
+  "engineering": {
+    "first": {
+      "sourceCommit": "6d5cf456bd3f4491d5baea6ba18b5299d96c18ca",
+      "run": "8f212eb30f4b4637b6d6c739cc61bdc6",
+      "gateStatus": "FAIL",
+      "reportedTests": 0,
+      "skipped": 0,
+      "actualChildExit": 1,
+      "inputsUnchanged": true,
+      "inputKey": "1720f3370ba7413ad431ef08bec16b88154471477652a0c4ac4dc50085b3527b",
+      "policyKey": "ed46c1a6b850e25c5767a26272e8c0fc6cf6763e86c32e0ddfabb6742972322e",
+      "environmentKey": "b0ab89a25bdd7e6716268030714c97acec45fbee6e382efe2c3bc841efbb9988",
+      "elapsedSeconds": 183.93619487504475,
+      "rawGate": {
+        "filename": "engineering-full.json",
+        "bytes": 1986,
+        "sha256": "f430c5e0c5d03c2b60f462fbc3faf67963f96e49a01175974d3efc15c2ceda51"
+      },
+      "rawLog": {
+        "filename": "engineering-full.txt",
+        "bytes": 32437,
+        "sha256": "4e8b0b1d6be582059fc4a7ecf6bb2b2020cbca807b665763076eee0ac3e89e51"
+      },
+      "temporaryPeakBytes": 424869888,
+      "hostRssEstimateBytes": 4040228720,
+      "admission": "2c0d051e6191419191869e45504c535e",
+      "command": {
+        "id": "15169d24e4ee49c9bb4aebcb62de7e2e",
+        "stage": "command",
+        "recordedRun": "8f212eb30f4b4637b6d6c739cc61bdc6",
+        "exitCode": 1,
+        "classification": "EXIT_FAILURE",
+        "started": "2026-11-20T07:53:01.478491+00:00",
+        "ended": "2026-11-20T07:56:05.270450+00:00",
+        "deadlineSeconds": 1800,
+        "inputFingerprint": "1720f3370ba7413ad431ef08bec16b88154471477652a0c4ac4dc50085b3527b",
+        "executionIdentity": "d2c81b1721fb0d834e3a83d2e21c1084b9ee5820cc803a66c0ca33adf4492251",
+        "commandSummary": {
+          "argumentCount": 4,
+          "executable": "pwsh",
+          "sha256": "76defcb224f9b4c775d394532d2783d9e2ba2b6a7845c775313e52926241dc5c"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1507,
+          "sha256": "49026cdad2e5da0c77f8528395ced2d0fb8989d17d9dbf6143e193e55c17a9e4"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 9345,
+          "sha256": "507c23e315911de8a41d4a90eb841306f4a3ff5a3c547f2e5007903383ffc569"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 23092,
+          "sha256": "02fc758a39a7c885f5888816f6df7159b4f8a71fcded511c1f5f88c7438c6de5"
+        }
+      }
+    },
+    "completed": {
+      "sourceCommit": "a2f67ba79762a4abe2c4336a82572e5965cc04bb",
+      "run": "f4a3cbe51b024aff9e94b754b2ca5761",
+      "gateStatus": "FAIL",
+      "reportedTests": 0,
+      "skipped": 0,
+      "actualChildExit": 0,
+      "inputsUnchanged": true,
+      "inputKey": "6c7e02940edd871fad048c0da5acb488135b5931f225cbdd3779898512295248",
+      "policyKey": "ed46c1a6b850e25c5767a26272e8c0fc6cf6763e86c32e0ddfabb6742972322e",
+      "environmentKey": "b0ab89a25bdd7e6716268030714c97acec45fbee6e382efe2c3bc841efbb9988",
+      "elapsedSeconds": 504.45085854199715,
+      "rawGate": {
+        "filename": "engineering-full.json",
+        "bytes": 1986,
+        "sha256": "2cd10ec78024197a58c6a1d28d1bfb83f17c8aa2b9caa0a228e5b21974e3ac60"
+      },
+      "rawLog": {
+        "filename": "engineering-full.txt",
+        "bytes": 45110,
+        "sha256": "33ca3a4f6ed0235f0ad02fb197f5faa70445de0c03aa7da5c408cc5c2ffc2767"
+      },
+      "temporaryPeakBytes": 424869888,
+      "hostRssEstimateBytes": 4040230880,
+      "admission": "ff68c92329c046c7a9eb7df1f18419e6",
+      "command": {
+        "id": "f1966d02dd1e451a8de0d891ebc15288",
+        "stage": "command",
+        "recordedRun": "f4a3cbe51b024aff9e94b754b2ca5761",
+        "exitCode": 0,
+        "classification": "SUCCESS",
+        "started": "2026-11-20T08:06:44.864514+00:00",
+        "ended": "2026-11-20T08:15:09.173614+00:00",
+        "deadlineSeconds": 1800,
+        "inputFingerprint": "6c7e02940edd871fad048c0da5acb488135b5931f225cbdd3779898512295248",
+        "executionIdentity": "be96d2effead0667a25cb24a7608ebce445e6a4d3d4dc03eff3d848551ac9b4b",
+        "commandSummary": {
+          "argumentCount": 4,
+          "executable": "pwsh",
+          "sha256": "76defcb224f9b4c775d394532d2783d9e2ba2b6a7845c775313e52926241dc5c"
+        },
+        "receipt": {
+          "filename": "receipt.json",
+          "bytes": 1503,
+          "sha256": "7bcf89b4f4f38eae4c0dd37f696e98c489f8ddacf84038b427765eef2bc0fac3"
+        },
+        "stdout": {
+          "filename": "stdout.txt",
+          "bytes": 22803,
+          "sha256": "8e7c0bb700eaebf7eac3e9e4d132849364230ab63f5edb25168e93aa5114150c"
+        },
+        "stderr": {
+          "filename": "stderr.txt",
+          "bytes": 22307,
+          "sha256": "1fb8914b6cbf885cd3d2c30777e3ff3313fca917c25f21963698c7d622c58d29"
+        }
+      }
+    },
+    "qualifyExactStreams": {
+      "id": "5a6e7e35f76f4b169bb0df88a2ad94fc",
+      "stage": "full-summary-reopen",
+      "recordedRun": "product-resume-01",
+      "exitCode": 0,
+      "classification": "SUCCESS",
+      "started": "2026-11-20T08:21:38.661388+00:00",
+      "ended": "2026-11-20T08:21:38.700574+00:00",
+      "deadlineSeconds": 12,
+      "inputFingerprint": "86933f3dc87de553d6380c06c2e5b2118ddd7599a2d77344177f44b23a832f02",
+      "executionIdentity": "e6f7c9d869b54a4623abe7ca4df470984ab8300578f6ae4e046352790f457a56",
+      "commandSummary": {
+        "argumentCount": 2,
+        "executable": "python3",
+        "sha256": "1f8875858721ccdb3142b3e2e71b46f694c2dfc3be6bfd92d352f256ed91e16b"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1469,
+        "sha256": "cc226a01c8d47ca34ff63f98a6deaff587d62150545a02275e0156b7e3ee92a7"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 1140,
+        "sha256": "f087c69d590b590bbcc1f568256906d5a3ab766580c4a12812e7420c8fbd461a"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "qualifierTests": {
+      "id": "05e7bc8ca3c3480dbf2f59864164be5a",
+      "stage": "full-summary-regressions",
+      "recordedRun": "product-resume-01",
+      "exitCode": 0,
+      "classification": "SUCCESS",
+      "started": "2026-11-20T08:21:38.701712+00:00",
+      "ended": "2026-11-20T08:21:38.751187+00:00",
+      "deadlineSeconds": 15,
+      "inputFingerprint": "62860e090103c1da9d03c66c375e742db0f94719c21161812d8fc605c2e0bd8e",
+      "executionIdentity": "b2100988bf3f2f9fe485062e2a74a498232b58bd5edd51d7cbc29d8cf707b8fc",
+      "commandSummary": {
+        "argumentCount": 6,
+        "executable": "python3",
+        "sha256": "a44bcf43f6c9de87e035cc5dff07c29b3d7e89f260d842d4de650f040e0c08a5"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1473,
+        "sha256": "9d1ce4ab7e9896d348c5f9827e13766e7c332e61614203aadc261ddd477eb58b"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 102,
+        "sha256": "80144f3bf12d071a1497821467ab02765712cb11da3f547a5e2b5cf79f938e9a"
+      }
+    },
+    "qualifiedExecution": "REUSED",
+    "qualification": "FRESH",
+    "qualifiedReportedChecks": 503,
+    "pythonChecks": 363,
+    "packageChecks": 134,
+    "nodeChecks": 6,
+    "skipped": 0,
+    "countingScope": "Framework-reported cases only; independent PowerShell assertions are not added. Complete execution bound to its original commit."
+  },
+  "earlyMeasurement": {
+    "execution": "FRESH",
+    "head": "f894b39ec7a53160a0ea78206890087437ba9d3e",
+    "representativePaths": [
+      "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/originals/login-supplement.json"
+    ],
+    "memberPlan": "PASS",
+    "estimatedZipBytes": 8101445,
+    "measureOnly": "MEASURED_NOT_READY_FOR_ACCEPTANCE",
+    "command": "dc109fd09ec04543a8a5a406d05d278f",
+    "exitCode": 0,
+    "raw": {
+      "filename": "early-measure.json",
+      "bytes": 592593,
+      "sha256": "9e14735c338da6510bfa881cb345b4b95f106846048e3a22a2d30cbcff7cd6e4"
+    },
+    "productZipCreated": false
+  },
+  "fullRuntime": {
+    "primary": "00639ef2bc870abca200c4be934c7f87ae77e7e9b6e6945b781395f4fc3cf31a",
+    "secondary": "5d3c4c706931bc4115ca99293720ea9524d56ff6e9373a17227f65ab29bc9165",
+    "anonymousMe": [
+      401,
+      401
+    ],
+    "projectedWithHelper": {
+      "memory": 14763950080,
+      "nanoCpus": 10500000000
+    },
+    "activeQuota": {
+      "memory": 14227079168,
+      "nanoCpus": 10000000000
+    },
+    "vm": {
+      "total": 20964958208,
+      "cpus": 12,
+      "available": 15147991040,
+      "availableFs": 409501265920
+    },
+    "phaseDiskCharge": 42778233790,
+    "ceiling": 42949672960,
+    "snapshot": "de8d239be9d269747e60633af1e5288208e5fdc6598d0597102226ad52b4bb9e",
+    "grantBefore": {
+      "utc": "2026-11-20T08:19:05.543613+00:00",
+      "registeredRows": 15,
+      "active": 0,
+      "sufficient210s": 0,
+      "lastExpiry": "2026-11-19T20:03:36.745564+00:00",
+      "programmedQueryPermissions": 3,
+      "distinctSubjects": 4
+    },
+    "sourceBaseline": [
+      1,
+      1
+    ],
+    "regrant": {
+      "oldRowsPreserved": true,
+      "oldFingerprint": "15|77c2c54b06f09163db3ced758e1e14b08c1d434fb918ad04f903a1b0901436f2",
+      "scopedFieldCount": 11,
+      "rows": [
+        {
+          "mode": "mapping",
+          "count": 12,
+          "remainingSeconds": 14400,
+          "command": "29cfc68b5bc44e99a3b4fd7b3dea1ddc",
+          "verification": "c36d7c946a7f4274a599ea3219556c4e"
+        },
+        {
+          "mode": "query",
+          "count": 3,
+          "remainingSeconds": 14400,
+          "command": "c289cbc7e106449f897f8a57243974e1",
+          "verification": "69191e1841534fd0a1e186ed73e97414"
+        }
+      ],
+      "productScope": [
+        "AC03-A",
+        "S1"
+      ]
+    },
+    "formalAttempts": [
+      {
+        "testedCommit": "1745e93ee867eefeb785efe9ac8a76a9e88b3a68",
+        "command": {
+          "id": "1350eef5d3824e23b19657a71280c1e5",
+          "stage": "omq-browser-s0-oracle-natural-cancel",
+          "recordedRun": "product-resume-01",
+          "exitCode": 1,
+          "classification": "EXIT_FAILURE",
+          "started": "2026-11-20T08:50:07.436039+00:00",
+          "ended": "2026-11-20T08:50:48.920400+00:00",
+          "deadlineSeconds": 180,
+          "inputFingerprint": "cdc42cfa7c96f7574e31d9bea37ad36626183f5dd09c22ff0bc21206c2be6a6d",
+          "executionIdentity": "45308ec1a25d70248acbea622b8e12cca992c72031e2e23be572184241c242a5",
+          "commandSummary": {
+            "argumentCount": 7,
+            "executable": "node",
+            "sha256": "0711f365f7efa32b3c1be26568af81af8381466b651b1d3c56d2ed35cf7fc848"
+          },
+          "receipt": {
+            "filename": "receipt.json",
+            "bytes": 1542,
+            "sha256": "e6327f02d8989c9c7b46b7f6c452fd039b62af497c7a34422570b6182fc820b4"
+          },
+          "stdout": {
+            "filename": "stdout.txt",
+            "bytes": 365,
+            "sha256": "3c065939fb5e572439b052015c23cc30eff129fcc46caaa9eb81f3a682179db2"
+          },
+          "stderr": {
+            "filename": "stderr.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        "hostSnapshot": "de8d239be9d269747e60633af1e5288208e5fdc6598d0597102226ad52b4bb9e",
+        "hostCommand": "fe6e37f264b3475d859c6eb0f6f76caf",
+        "resourceManifestSha256": "4bd4da65a0d160160ce2695350e66d8d7776af1f21b951e0bddafc0552cc8744",
+        "browserReport": {
+          "filename": "browser-s0-oracle-natural-cancel-1795164607711.json",
+          "bytes": 10906,
+          "sha256": "4251bc00445dbe853d0e101e970a6494437863877d518b9c800aa333576ec029"
+        },
+        "formalReceipt": {
+          "filename": "formal-run-s0-oracle-natural-cancel-1350eef5d3824e23b19657a71280c1e5.json",
+          "bytes": 7141,
+          "sha256": "95d2c0a573fe120b4ae05e129978cc8ccdd39928d6f7c5bcb0dedb51c44d2b25"
+        },
+        "failure": {
+          "phase": "oidc_operator-ab",
+          "category": "TimeoutError",
+          "code": "query_browser_runtime_failure"
+        },
+        "httpRecords": 0,
+        "checks": 0,
+        "inputsUnchanged": true,
+        "sourceAudit": {
+          "filename": "formal-audit-1350eef5d3824e23b19657a71280c1e5.json",
+          "bytes": 709,
+          "sha256": "0d8b2773f578244c4314c28bfe77c003d5652f8c5502e9aa973b8ded28ad7655"
+        },
+        "unfiltered": true,
+        "auditHits": 0,
+        "auditCommand": {
+          "id": "f9960f1080084512afea02cb8b2714ce",
+          "stage": "oracle-formal-audit-window",
+          "recordedRun": "product-resume-01",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "started": "2026-11-20T08:50:48.947406+00:00",
+          "ended": "2026-11-20T08:50:49.066668+00:00",
+          "deadlineSeconds": 12,
+          "inputFingerprint": "5aa477035c5d03235cc4a2e557bbc725719eeb8e0c5d816e50e9d0b84669c79b",
+          "executionIdentity": "9cb9b93da2ba9b89cd2708edf0f10208b844afa8293602bde4f7624a15388d04",
+          "commandSummary": {
+            "argumentCount": 9,
+            "executable": "docker",
+            "sha256": "bc57db1cfc25e90ba09a8c0d1eb9c4f0da9794ff49025161f74c4ded9f2af8b8"
+          },
+          "receipt": {
+            "filename": "receipt.json",
+            "bytes": 1500,
+            "sha256": "aa341b24c9af82337f13937cc2b042d0b3db91b64eeb36bb678d5d1d41e9e2f3"
+          },
+          "stdout": {
+            "filename": "stdout.txt",
+            "bytes": 104,
+            "sha256": "1d089aed84c0fbe766a1b5cae978191a5b4c8b483bf66bca42a18be2a538bbad"
+          },
+          "stderr": {
+            "filename": "stderr.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        }
+      },
+      {
+        "testedCommit": "6db643ad20c9e97cf1b38999438c337f229dddad",
+        "command": {
+          "id": "82b92986be1349fba67549a377878db0",
+          "stage": "omq-browser-s0-oracle-natural-cancel",
+          "recordedRun": "product-resume-01",
+          "exitCode": 1,
+          "classification": "EXIT_FAILURE",
+          "started": "2026-11-20T08:42:03.718913+00:00",
+          "ended": "2026-11-20T08:42:45.245907+00:00",
+          "deadlineSeconds": 180,
+          "inputFingerprint": "9aef1fcc601bca8719abaf812dcf2e65763a16bf5cc2ce270e7d17ef0a82f369",
+          "executionIdentity": "a7a32d01fddb210fe6047782e7f965241e91298e4eca5e4e4fc14dfd59fc305c",
+          "commandSummary": {
+            "argumentCount": 7,
+            "executable": "node",
+            "sha256": "0711f365f7efa32b3c1be26568af81af8381466b651b1d3c56d2ed35cf7fc848"
+          },
+          "receipt": {
+            "filename": "receipt.json",
+            "bytes": 1542,
+            "sha256": "e1168fc56c7364a85e72714018db88131b4f41ce870f34e4ef9965eebbda8f54"
+          },
+          "stdout": {
+            "filename": "stdout.txt",
+            "bytes": 365,
+            "sha256": "b44e8a189dcc4e7569468a034a0b63221c2c1051d3d1d4f79695c909e764f562"
+          },
+          "stderr": {
+            "filename": "stderr.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        "hostSnapshot": "de8d239be9d269747e60633af1e5288208e5fdc6598d0597102226ad52b4bb9e",
+        "hostCommand": "a99a24aeedb14345a06e8fe659a21d94",
+        "resourceManifestSha256": "4bd4da65a0d160160ce2695350e66d8d7776af1f21b951e0bddafc0552cc8744",
+        "browserReport": {
+          "filename": "browser-s0-oracle-natural-cancel-1795164124039.json",
+          "bytes": 10906,
+          "sha256": "54050799b64d443fe45ece0ba48728c554fc64c61d13189dba4bb2ba0703fd54"
+        },
+        "formalReceipt": {
+          "filename": "formal-run-s0-oracle-natural-cancel-82b92986be1349fba67549a377878db0.json",
+          "bytes": 7141,
+          "sha256": "cdffa5b4bbaf3ab3927dbf817c3badf0fabcd5d1c7239a7b0a5910af3d4c8ecd"
+        },
+        "failure": {
+          "phase": "oidc_operator-ab",
+          "category": "TimeoutError",
+          "code": "query_browser_runtime_failure"
+        },
+        "httpRecords": 0,
+        "checks": 0,
+        "inputsUnchanged": true,
+        "sourceAudit": {
+          "filename": "formal-audit-82b92986be1349fba67549a377878db0.json",
+          "bytes": 709,
+          "sha256": "e45df0751752adc1c925ebd8a76cbc01f36eef62a3dae303ab9597e3e8fb3de1"
+        },
+        "unfiltered": true,
+        "auditHits": 0,
+        "auditCommand": {
+          "id": "17183fc7fdd54cfc8b3e337e1b06e37e",
+          "stage": "oracle-formal-audit-window",
+          "recordedRun": "product-resume-01",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "started": "2026-11-20T08:42:45.275743+00:00",
+          "ended": "2026-11-20T08:42:45.406736+00:00",
+          "deadlineSeconds": 12,
+          "inputFingerprint": "1552fe507287f1b958708c780c0e7e59ea54fee3bed8fb735deec23f06e11ca2",
+          "executionIdentity": "872905ebc84df5e52e8fbfc11dfbe6d1a4646825c1a557a73554072960f6e347",
+          "commandSummary": {
+            "argumentCount": 9,
+            "executable": "docker",
+            "sha256": "bc57db1cfc25e90ba09a8c0d1eb9c4f0da9794ff49025161f74c4ded9f2af8b8"
+          },
+          "receipt": {
+            "filename": "receipt.json",
+            "bytes": 1500,
+            "sha256": "617ea57e8ad54a289642ff034cca1ab6ba94ad07bdb114d9bc800b2d3bdd7bba"
+          },
+          "stdout": {
+            "filename": "stdout.txt",
+            "bytes": 104,
+            "sha256": "816b686d20aeeb6fee9f11fc8e78a5ab153520a8f7d4e64c10139a8a7585e958"
+          },
+          "stderr": {
+            "filename": "stderr.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        }
+      },
+      {
+        "testedCommit": "8388ed0b8628b499f7a061001c90a6c25ff44ca7",
+        "command": {
+          "id": "ca250b2fdc044217ab7f1823e3ec0051",
+          "stage": "omq-browser-s0-oracle-natural-cancel",
+          "recordedRun": "product-resume-01",
+          "exitCode": 1,
+          "classification": "EXIT_FAILURE",
+          "started": "2026-11-20T09:00:54.029080+00:00",
+          "ended": "2026-11-20T09:01:35.499330+00:00",
+          "deadlineSeconds": 180,
+          "inputFingerprint": "5e0eb4d7562bf04665a558207e94e5e8f889db237447941c797f1856f4576a6b",
+          "executionIdentity": "dcd883cdc3ff0cb922de07e63009de6a25cde55f33e7222f15bc797f81b758ca",
+          "commandSummary": {
+            "argumentCount": 7,
+            "executable": "node",
+            "sha256": "0711f365f7efa32b3c1be26568af81af8381466b651b1d3c56d2ed35cf7fc848"
+          },
+          "receipt": {
+            "filename": "receipt.json",
+            "bytes": 1542,
+            "sha256": "60a84551097560f86c296669fddce07e8d50b6d762edcb089014c5c92fdb3711"
+          },
+          "stdout": {
+            "filename": "stdout.txt",
+            "bytes": 365,
+            "sha256": "46f6ea2c7cc559257d017d5028d6081291e6526fe3bd0c17b9c01affa02b7e32"
+          },
+          "stderr": {
+            "filename": "stderr.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        "hostSnapshot": "de8d239be9d269747e60633af1e5288208e5fdc6598d0597102226ad52b4bb9e",
+        "hostCommand": "d7ec8326434e47ba9a003b917ef2002e",
+        "resourceManifestSha256": "4bd4da65a0d160160ce2695350e66d8d7776af1f21b951e0bddafc0552cc8744",
+        "browserReport": {
+          "filename": "browser-s0-oracle-natural-cancel-1795165254299.json",
+          "bytes": 10906,
+          "sha256": "90ba751c0f92bc3174cff8670407c496a7e4b422798b9c161ae5da578bae7630"
+        },
+        "formalReceipt": {
+          "filename": "formal-run-s0-oracle-natural-cancel-ca250b2fdc044217ab7f1823e3ec0051.json",
+          "bytes": 7141,
+          "sha256": "dfb073957a603a093f6fd103581a82841089d882a2f645ff2baf4b29d6add2bb"
+        },
+        "failure": {
+          "phase": "oidc_operator-ab",
+          "category": "TimeoutError",
+          "code": "query_browser_runtime_failure"
+        },
+        "httpRecords": 0,
+        "checks": 0,
+        "inputsUnchanged": true,
+        "sourceAudit": {
+          "filename": "formal-audit-ca250b2fdc044217ab7f1823e3ec0051.json",
+          "bytes": 709,
+          "sha256": "127c0adf49a40d220552ec7281e36d600f3317c8c82c263fcddddbd23cae9e17"
+        },
+        "unfiltered": true,
+        "auditHits": 0,
+        "auditCommand": {
+          "id": "f12cfda95b0a4d569d0b35c369e20ad9",
+          "stage": "oracle-formal-audit-window",
+          "recordedRun": "product-resume-01",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "started": "2026-11-20T09:01:35.532928+00:00",
+          "ended": "2026-11-20T09:01:35.623989+00:00",
+          "deadlineSeconds": 12,
+          "inputFingerprint": "5d2a5ea6e09ee99da4e6df9ee440a6d41722452a2cee808ea309cd71dbdd16f7",
+          "executionIdentity": "c4f2e92591218e633090f51b71b3308a0f7f9bad83bb4d3002706c0279b42668",
+          "commandSummary": {
+            "argumentCount": 9,
+            "executable": "docker",
+            "sha256": "bc57db1cfc25e90ba09a8c0d1eb9c4f0da9794ff49025161f74c4ded9f2af8b8"
+          },
+          "receipt": {
+            "filename": "receipt.json",
+            "bytes": 1500,
+            "sha256": "5f07abc24b228319e134372861aa82ec945239b1f1ae730ef7056ebb8db28e91"
+          },
+          "stdout": {
+            "filename": "stdout.txt",
+            "bytes": 104,
+            "sha256": "570f211241bc1ff356063026f3506ab3554f8ea2e3a4296e3614edc27d2cafd0"
+          },
+          "stderr": {
+            "filename": "stderr.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        }
+      },
+      {
+        "testedCommit": "ef57c790da6878f0002de89e210c1cb0674ba86a",
+        "command": {
+          "id": "cd9dc6cbce9b420285c7d2fe5ebc2abf",
+          "stage": "omq-browser-s0-oracle-natural-cancel",
+          "recordedRun": "product-resume-01",
+          "exitCode": 1,
+          "classification": "EXIT_FAILURE",
+          "started": "2026-11-20T08:35:27.573271+00:00",
+          "ended": "2026-11-20T08:36:10.241521+00:00",
+          "deadlineSeconds": 180,
+          "inputFingerprint": "d5ae4d28df8cf4fffe80665cb81044937ed8f3ba2ce54c4683248e566c71e003",
+          "executionIdentity": "8fb90c204f18b89741bcf8d82c58875ca321b2aa2da34f627c91c8d627299048",
+          "commandSummary": {
+            "argumentCount": 7,
+            "executable": "node",
+            "sha256": "0711f365f7efa32b3c1be26568af81af8381466b651b1d3c56d2ed35cf7fc848"
+          },
+          "receipt": {
+            "filename": "receipt.json",
+            "bytes": 1543,
+            "sha256": "c82eec0e4608dfd422226e9f25c42ae1764ca06416b3d6fe81d40ed5a8e31b97"
+          },
+          "stdout": {
+            "filename": "stdout.txt",
+            "bytes": 365,
+            "sha256": "0585c3819cac716fc66c551d59182075955df5ebbe36545b365cfaf54399694c"
+          },
+          "stderr": {
+            "filename": "stderr.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        "hostSnapshot": "de8d239be9d269747e60633af1e5288208e5fdc6598d0597102226ad52b4bb9e",
+        "hostCommand": "1b12f438d23444339ef4ac73934efe1a",
+        "resourceManifestSha256": "4bd4da65a0d160160ce2695350e66d8d7776af1f21b951e0bddafc0552cc8744",
+        "browserReport": {
+          "filename": "browser-s0-oracle-natural-cancel-1795163727891.json",
+          "bytes": 10906,
+          "sha256": "cdd58b07a23f777134a5ea4591ee49c805c1aafa264b2f90b026226e0a7586da"
+        },
+        "formalReceipt": {
+          "filename": "formal-run-s0-oracle-natural-cancel-cd9dc6cbce9b420285c7d2fe5ebc2abf.json",
+          "bytes": 7141,
+          "sha256": "a0ff2b37342869eb782d8344c866768ca93b442fcc9a99bac4b45c3cb63485d8"
+        },
+        "failure": {
+          "phase": "oidc_operator-ab",
+          "category": "TimeoutError",
+          "code": "query_browser_runtime_failure"
+        },
+        "httpRecords": 0,
+        "checks": 0,
+        "inputsUnchanged": true,
+        "sourceAudit": {
+          "filename": "formal-audit-cd9dc6cbce9b420285c7d2fe5ebc2abf.json",
+          "bytes": 710,
+          "sha256": "995a5f937b23f9792bd8fcf3c6046a4b2d36bcce768db68e722d064029a6852f"
+        },
+        "unfiltered": true,
+        "auditHits": 0,
+        "auditCommand": {
+          "id": "3c0243f2b0bb4d808cb28e8d0499fc56",
+          "stage": "oracle-formal-audit-window",
+          "recordedRun": "product-resume-01",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "started": "2026-11-20T08:36:10.270648+00:00",
+          "ended": "2026-11-20T08:36:10.448089+00:00",
+          "deadlineSeconds": 12,
+          "inputFingerprint": "4011e12709708b4f2f23c7df2cc394004c7449ae38b2a11b0744e3e9c15b8b82",
+          "executionIdentity": "750ce2f577bea6ccbddf4bcc461b46e1ffaa319de2514abbd909a07737f98fb6",
+          "commandSummary": {
+            "argumentCount": 9,
+            "executable": "docker",
+            "sha256": "bc57db1cfc25e90ba09a8c0d1eb9c4f0da9794ff49025161f74c4ded9f2af8b8"
+          },
+          "receipt": {
+            "filename": "receipt.json",
+            "bytes": 1499,
+            "sha256": "d6245317188f341633904b60e00755f421b6af011397e5a6829e5d232625e603"
+          },
+          "stdout": {
+            "filename": "stdout.txt",
+            "bytes": 104,
+            "sha256": "fb566f696739ddd8eae9a2e61e115e45c6c0fc024ae936f99d4dd1018aa5f190"
+          },
+          "stderr": {
+            "filename": "stderr.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        }
+      }
+    ],
+    "closeout": {
+      "operation": "ca2485cdf5464c65acaed13f1279b424",
+      "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+      "runId": "product-resume-01",
+      "started": "2026-11-20T09:05:25.812239+00:00",
+      "scope": "two stateless APIs and five replacement services only",
+      "before": "772d1b32431447779b5d126ec4efce22",
+      "idleBefore": {
+        "command": "f1061a57d867457099ad2c16f629c0d2",
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "order": [
+          "query",
+          "run",
+          "catalog",
+          "probe",
+          "mappingJob",
+          "mappingOutbox",
+          "publishingOutbox"
+        ]
+      },
+      "apis": {
+        "api": {
+          "id": "00639ef2bc870abca200c4be934c7f87ae77e7e9b6e6945b781395f4fc3cf31a",
+          "pre": "d005ece63a1d4cd0ab2f5c011003ffd9",
+          "post": "20b62fb1233340cab76cb82913820f97",
+          "commands": [
+            "aca0e20cd4fe4ffe896698c581da40c4",
+            "2171aa2f4d6241d8939907ce0264ca8f",
+            "9548fda47d5f46a899c25d6a5f7277e4"
+          ]
+        },
+        "api-secondary": {
+          "id": "5d3c4c706931bc4115ca99293720ea9524d56ff6e9373a17227f65ab29bc9165",
+          "pre": "538bd6957431425db88b6f5754e13dea",
+          "post": "a288071da1234bb889d566e0687f0fc9",
+          "commands": [
+            "81df81dc1fae42de99c9e221c0e63cd3",
+            "a900ea112e2d4800808e3e214ff5aa12",
+            "a48a8251a4d94706b91749d9773ec1ea"
+          ]
+        }
+      },
+      "idleAfterClosingEntry": {
+        "command": "d4439188b0e54c46b30ce909931cbea9",
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "order": [
+          "query",
+          "run",
+          "catalog",
+          "probe",
+          "mappingJob",
+          "mappingOutbox",
+          "publishingOutbox"
+        ]
+      },
+      "stops": {
+        "keycloak-test": {
+          "id": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T09:05:39.578881921Z"
+          },
+          "resourceAttempt": "8b402a9d138647218c3b7190aa8a678e",
+          "original": {
+            "filename": "stop-18cc494d507f497abf648ec4dcc82b6e.json",
+            "sha256": "f96c6adf7779fb6ce1d2672976b1ea2adfa0da4ed77d3bc9ebd27394d3cf4ac7"
+          }
+        },
+        "platform-pg": {
+          "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T09:05:51.986454969Z"
+          },
+          "controlState": "shut down",
+          "resourceAttempt": "a5691737e2ac41cda55d53cf4dfc7fc7",
+          "original": {
+            "filename": "stop-4cd729c434c0423f9259730b53623ca3.json",
+            "sha256": "f5c3d054b4400fc241efdf49fdd23a274d46fa638ab74613fdc9ff8b17a72f21"
+          }
+        },
+        "fuseki": {
+          "id": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+          "status": "BLOCKED",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T09:05:57.582208388Z"
+          },
+          "reason": "ORACLE_ADMISSION_TDB_CLOSE_UNCONFIRMED",
+          "allTdbLocksRemoved": false,
+          "resourceAttempt": "cab0968f14754f8993edcb00e9925f30",
+          "original": {
+            "filename": "stop-4cba322dfdef4e79809f705dd23b03ff.json",
+            "sha256": "e24d269f1ddb17891121fb03cc2413c47f86a6314d997518359bc4bb9bb60f35"
+          }
+        },
+        "oracle": {
+          "id": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T09:05:48.457245759Z"
+          },
+          "nativeShutdown": true,
+          "resourceAttempt": "28331d46f2b546fb8f62be8675f00cf9",
+          "original": {
+            "filename": "stop-06cfd48093db46a3a2c7a39295df0b2d.json",
+            "sha256": "a9f4131c62f6b965224a1febe54c2e4c00b9ea97632935c000dc29f59c5964f7"
+          }
+        },
+        "rustfs": {
+          "id": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T09:05:43.074511381Z"
+          },
+          "resourceAttempt": "771dae6a00a74aeba70730702c8f6d0b",
+          "original": {
+            "filename": "stop-705f7a99561e41c08b6878e32813a854.json",
+            "sha256": "79a4e15b8ed91f1243b9bcfae38fceb3c23794ce478c227dd4652243b7eb8655"
+          }
+        }
+      },
+      "blockedAt": "fuseki",
+      "engine": {
+        "fuseki": {
+          "container": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+          "state": "exited",
+          "exitCode": 143,
+          "oom": false
+        },
+        "keycloak-test": {
+          "container": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+          "state": "exited",
+          "exitCode": 143,
+          "oom": false
+        },
+        "oracle": {
+          "container": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+          "state": "exited",
+          "exitCode": 143,
+          "oom": false
+        },
+        "platform-pg": {
+          "container": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+          "state": "exited",
+          "exitCode": 0,
+          "oom": false
+        },
+        "rustfs": {
+          "container": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
+          "state": "exited",
+          "exitCode": 0,
+          "oom": false
+        }
+      },
+      "engineCommand": "05d9b0d2ab984516b975853910769247",
+      "finalAdmission": "233485e1a863426b896b0458d13ea1d6",
+      "retainedInventorySha256": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9",
+      "keptRunning": 3,
+      "keptStopped": 17,
+      "remainingReplacementRoles": [],
+      "closeQualification": "BLOCKED",
+      "ended": "2026-11-20T09:06:01.267167+00:00"
+    }
+  },
+  "localReopen": {
+    "scope": "Public receipt supplies redacted identities, true exit codes, raw double-stream hashes and limitations. Local raw material stays outside the delivery commit.",
+    "index": {
+      "filename": "index.json",
+      "bytes": 32297,
+      "sha256": "18518c8f02789097463ad21df11c790eb1aa562692e364b2a07d0b005fecfb4b"
+    }
+  },
+  "normalLoginOffline": {
+    "qualificationHead": "540d6dfa4305553fd55b8e842c0d3d6f874acc3f",
+    "inputs": {
+      "scripts/maintenance/workflow-oracle-query-fixture.mjs": "1b43af5c51700c14c0281ea1bd78662253da198f6e3dd60f56e54a2e15e53339",
+      "scripts/maintenance/workflow_oracle_mapping_evidence.py": "b2e6015d8257e5d17b0067f5afe818cd9a49ffb6fa8ae3a62b268c83fadf3191",
+      "scripts/tests/WorkflowOracleMappingEvidence.Tests.py": "db315417780f3e14c786b28031886383431ebfe457f97d0946bc972bce81d128",
+      "scripts/tests/WorkflowOracleNormalLogin.Tests.mjs": "01bed4ec64aa32c7290b7fd0f1de4d5eb3a2415268c0f639a4afece988c72043"
+    },
+    "cases": [
+      {
+        "reported": 11,
+        "command": {
+          "id": "5ed9d490498c4e92bc775744342d2144",
+          "stage": "normal-login-scope",
+          "recordedRun": "product-resume-01",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "started": "2026-11-20T08:54:52.816621+00:00",
+          "ended": "2026-11-20T08:54:52.887346+00:00",
+          "deadlineSeconds": 15,
+          "inputFingerprint": "9999f7f0014c45fd490e3818987592cd9123b43b7073dc75730f73c4f85bc74e",
+          "executionIdentity": "9187ad7c826a3c8548242e784242c0edacbad40b73c1a11e738e39ba29c4b5ab",
+          "commandSummary": {
+            "argumentCount": 2,
+            "executable": "node",
+            "sha256": "0184eec7b8644cc410d45d63ce338853d585c593ddcd6d6118971d62515e5631"
+          },
+          "receipt": {
+            "filename": "receipt.json",
+            "bytes": 1490,
+            "sha256": "f88996480b5cd1fe108b282e1e11a286cd8cc2f121d2f42c96c393ca11511809"
+          },
+          "stdout": {
+            "filename": "stdout.txt",
+            "bytes": 553,
+            "sha256": "20128f1538d94b17944763e58852a1b68deff5d9928d69d78a8ea97de1e9fd46"
+          },
+          "stderr": {
+            "filename": "stderr.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        }
+      },
+      {
+        "reported": 17,
+        "command": {
+          "id": "b5bfeb21a54748b1a79011d92063bf92",
+          "stage": "oracle-evidence-scope",
+          "recordedRun": "product-resume-01",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "started": "2026-11-20T08:54:52.888498+00:00",
+          "ended": "2026-11-20T08:54:53.355757+00:00",
+          "deadlineSeconds": 15,
+          "inputFingerprint": "9999f7f0014c45fd490e3818987592cd9123b43b7073dc75730f73c4f85bc74e",
+          "executionIdentity": "a4e3a9b9d330f14cfb64f60d422c7df7d9ce152eb0372697fe38818acd25b47f",
+          "commandSummary": {
+            "argumentCount": 2,
+            "executable": "python3",
+            "sha256": "8d66909e738c6c1e339cace5ed69ec8dc1de8ed34384381fc5a1e9f51ebbbdfc"
+          },
+          "receipt": {
+            "filename": "receipt.json",
+            "bytes": 1496,
+            "sha256": "fe7cb9680b884045f166030b1803803458559496d205efe48038abb8b486fe54"
+          },
+          "stdout": {
+            "filename": "stdout.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "filename": "stderr.txt",
+            "bytes": 116,
+            "sha256": "dfca88e5a68697bffcdf97508e41e07537ecde803ec9cc54aeea9b8881da40e5"
+          }
+        }
+      }
+    ],
+    "hostReopen": {
+      "old": {
+        "phase": "old",
+        "driverSha256": "f41ef82294b50955f32fc90cfe508549b575787b4e7d7fce6e27d6315dc4b9d4",
+        "head": "1745e93ee867eefeb785efe9ac8a76a9e88b3a68",
+        "rows": [
+          {
+            "runCommand": "1350eef5d3824e23b19657a71280c1e5",
+            "testedCommit": "1745e93ee867eefeb785efe9ac8a76a9e88b3a68",
+            "hostResults": [
+              {
+                "result": "OMQ_RUNTIME_ARTIFACT_MISSING",
+                "command": "fe6e37f264b3475d859c6eb0f6f76caf"
+              },
+              {
+                "result": "OMQ_RUNTIME_ARTIFACT_MISSING",
+                "command": "b78397074c2e4b6abda45f0f6aaebb16"
+              },
+              {
+                "result": "OMQ_RUNTIME_ARTIFACT_MISSING",
+                "command": "09d24ea204924888a0b157f5e6006bc1"
+              }
+            ]
+          },
+          {
+            "runCommand": "82b92986be1349fba67549a377878db0",
+            "testedCommit": "6db643ad20c9e97cf1b38999438c337f229dddad",
+            "hostResults": [
+              {
+                "result": "OMQ_RUNTIME_ARTIFACT_MISSING",
+                "command": "a99a24aeedb14345a06e8fe659a21d94"
+              },
+              {
+                "result": "OMQ_RUNTIME_ARTIFACT_MISSING",
+                "command": "f99ca1e30ca9495c83e29e0801df2bd6"
+              },
+              {
+                "result": "OMQ_RUNTIME_ARTIFACT_MISSING",
+                "command": "d0169079d3fc4ab2834dff20dfd58474"
+              }
+            ]
+          },
+          {
+            "runCommand": "cd9dc6cbce9b420285c7d2fe5ebc2abf",
+            "testedCommit": "ef57c790da6878f0002de89e210c1cb0674ba86a",
+            "hostResults": [
+              {
+                "result": "OMQ_RUNTIME_ARTIFACT_MISSING",
+                "command": "1b12f438d23444339ef4ac73934efe1a"
+              },
+              {
+                "result": "OMQ_RUNTIME_ARTIFACT_MISSING",
+                "command": "16038cf893ed4533ad4ab1970be64b43"
+              },
+              {
+                "result": "OMQ_RUNTIME_ARTIFACT_MISSING",
+                "command": "a69de8a3ec394572bb322aa66cc7dba1"
+              }
+            ]
+          }
+        ]
+      },
+      "fixed": {
+        "phase": "fixed",
+        "driverSha256": "b2e6015d8257e5d17b0067f5afe818cd9a49ffb6fa8ae3a62b268c83fadf3191",
+        "head": "1745e93ee867eefeb785efe9ac8a76a9e88b3a68",
+        "rows": [
+          {
+            "runCommand": "1350eef5d3824e23b19657a71280c1e5",
+            "testedCommit": "1745e93ee867eefeb785efe9ac8a76a9e88b3a68",
+            "hostResults": [
+              {
+                "result": "PASS",
+                "command": "fe6e37f264b3475d859c6eb0f6f76caf"
+              },
+              {
+                "result": "PASS",
+                "command": "b78397074c2e4b6abda45f0f6aaebb16"
+              },
+              {
+                "result": "PASS",
+                "command": "09d24ea204924888a0b157f5e6006bc1"
+              }
+            ]
+          },
+          {
+            "runCommand": "82b92986be1349fba67549a377878db0",
+            "testedCommit": "6db643ad20c9e97cf1b38999438c337f229dddad",
+            "hostResults": [
+              {
+                "result": "PASS",
+                "command": "a99a24aeedb14345a06e8fe659a21d94"
+              },
+              {
+                "result": "PASS",
+                "command": "f99ca1e30ca9495c83e29e0801df2bd6"
+              },
+              {
+                "result": "PASS",
+                "command": "d0169079d3fc4ab2834dff20dfd58474"
+              }
+            ]
+          },
+          {
+            "runCommand": "cd9dc6cbce9b420285c7d2fe5ebc2abf",
+            "testedCommit": "ef57c790da6878f0002de89e210c1cb0674ba86a",
+            "hostResults": [
+              {
+                "result": "PASS",
+                "command": "1b12f438d23444339ef4ac73934efe1a"
+              },
+              {
+                "result": "PASS",
+                "command": "16038cf893ed4533ad4ab1970be64b43"
+              },
+              {
+                "result": "PASS",
+                "command": "a69de8a3ec394572bb322aa66cc7dba1"
+              }
+            ]
+          }
+        ]
+      },
+      "final-static": {
+        "phase": "final-static",
+        "driverSha256": "b2e6015d8257e5d17b0067f5afe818cd9a49ffb6fa8ae3a62b268c83fadf3191",
+        "head": "8388ed0b8628b499f7a061001c90a6c25ff44ca7",
+        "rows": [
+          {
+            "runCommand": "1350eef5d3824e23b19657a71280c1e5",
+            "testedCommit": "1745e93ee867eefeb785efe9ac8a76a9e88b3a68",
+            "hostResults": [
+              {
+                "result": "PASS",
+                "command": "fe6e37f264b3475d859c6eb0f6f76caf"
+              },
+              {
+                "result": "PASS",
+                "command": "b78397074c2e4b6abda45f0f6aaebb16"
+              },
+              {
+                "result": "PASS",
+                "command": "09d24ea204924888a0b157f5e6006bc1"
+              }
+            ]
+          },
+          {
+            "runCommand": "82b92986be1349fba67549a377878db0",
+            "testedCommit": "6db643ad20c9e97cf1b38999438c337f229dddad",
+            "hostResults": [
+              {
+                "result": "PASS",
+                "command": "a99a24aeedb14345a06e8fe659a21d94"
+              },
+              {
+                "result": "PASS",
+                "command": "f99ca1e30ca9495c83e29e0801df2bd6"
+              },
+              {
+                "result": "PASS",
+                "command": "d0169079d3fc4ab2834dff20dfd58474"
+              }
+            ]
+          },
+          {
+            "runCommand": "ca250b2fdc044217ab7f1823e3ec0051",
+            "testedCommit": "8388ed0b8628b499f7a061001c90a6c25ff44ca7",
+            "hostResults": [
+              {
+                "result": "PASS",
+                "command": "d7ec8326434e47ba9a003b917ef2002e"
+              },
+              {
+                "result": "PASS",
+                "command": "b5585aa6b013458b9fe38c627d248c08"
+              },
+              {
+                "result": "PASS",
+                "command": "a56a423ae9c44ccda50273474180da02"
+              }
+            ]
+          },
+          {
+            "runCommand": "cd9dc6cbce9b420285c7d2fe5ebc2abf",
+            "testedCommit": "ef57c790da6878f0002de89e210c1cb0674ba86a",
+            "hostResults": [
+              {
+                "result": "PASS",
+                "command": "1b12f438d23444339ef4ac73934efe1a"
+              },
+              {
+                "result": "PASS",
+                "command": "16038cf893ed4533ad4ab1970be64b43"
+              },
+              {
+                "result": "PASS",
+                "command": "a69de8a3ec394572bb322aa66cc7dba1"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "overlap": "the 17-case Python suite invokes the 11-case JavaScript suite"
+  },
+  "currentAuthentication": {
+    "checkedFrom": "2026-11-20T08:56:00Z",
+    "checkedUntil": "2026-11-20T09:03:56.279618+00:00",
+    "containerMatchesReset": true,
+    "resetVolumeStillMounted": true,
+    "resetOriginalUserCount": 4,
+    "matchCountsForFirstOriginalAccount": {
+      "invalid_user_credentials": 8
+    },
+    "otherOrUnlabelledEvents": 0,
+    "reasonSource": "sanitized recent Keycloak LOGIN_ERROR events; browser form content and credentials not collected"
+  },
+  "laterSingleAccountReset": {
+    "status": "READY_FOR_LOCAL_LOGIN",
+    "scope": "Only the original g2-operator-ab on the replacement Keycloak. Standard identity provider account console; platform /me and product gates not executed.",
+    "account": "g2-operator-ab",
+    "subject": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+    "container": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+    "resetHttp": 204,
+    "temporaryAdminDeletedAndInvalid": true,
+    "helperAbsent": true,
+    "newCredentialItemPresent": true,
+    "temporaryItemAbsent": true,
+    "accountConsole": "NOT_CONFIRMED_current_username",
+    "sampledAt": "2026-11-20T09:20:08.642595+00:00",
+    "admission": "14df6b1f778a42cfbf415de538c78d3d",
+    "runningAtLocalHandoff": [
+      "keycloak-test"
+    ],
+    "postcondition": {
+      "filename": "postcondition.json",
+      "bytes": 770,
+      "sha256": "1fdb28e71847dc538b2c8b3c90ed1c7e4dc9debf49015a6779ca5826a5493c41"
+    },
+    "attempts": [
+      {
+        "record": {
+          "filename": "operation.json",
+          "bytes": 782,
+          "sha256": "d621c4cf89034d2188a97459568b2cd040bd58c49193053f7cd365fdf85dfef8"
+        },
+        "status": "BLOCKED",
+        "error": "OFFICIAL_RECOVERY_FAILED",
+        "engine": null
+      },
+      {
+        "record": {
+          "filename": "operation-v2.json",
+          "bytes": 1175,
+          "sha256": "b5f1b109abfa1fad034cdaf456093fd93a70353e258a57c38525c220390da8b7"
+        },
+        "status": "BLOCKED",
+        "error": "OFFICIAL_RECOVERY_FAILED",
+        "engine": "created|128|false"
+      },
+      {
+        "record": {
+          "filename": "operation-v3.json",
+          "bytes": 1001,
+          "sha256": "ff08005cdc5d36cb3023fe8a5f7258ef166dd92bcc3d79e39ccf68e1c87d8f3b"
+        },
+        "status": "BLOCKED",
+        "error": "OFFICIAL_RECOVERY_FAILED",
+        "engine": "exited|2|false"
+      },
+      {
+        "record": {
+          "filename": "operation-v4.json",
+          "bytes": 1206,
+          "sha256": "7457c04c80efb87b9e1257e822a18fd95aaa12ade58ed16fe7f5badc6e153364"
+        },
+        "status": "READY_FOR_LOCAL_LOGIN",
+        "error": null,
+        "engine": "exited|0|false"
+      }
+    ]
+  },
+  "finalSingleAccountWindow": {
+    "userScope": "One current account only; other three NOT_RUN",
+    "identity": {
+      "source": "User-provided normal desktop browser screenshot of the platform /me response and independent scoped PG audit",
+      "path": "/api/v1/platform/me",
+      "origin": "http://localhost:15741",
+      "account": "g2-operator-ab",
+      "observedFields": {
+        "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+        "displayName": "合成开发身份 operator-ab",
+        "roles": [
+          "platform.operator"
+        ],
+        "scopes": [
+          {
+            "organizationId": "org-demo",
+            "siteId": "site-a"
+          },
+          {
+            "organizationId": "org-demo",
+            "siteId": "site-b"
+          }
+        ]
+      },
+      "captureSha256": "6838dde7b365aa17d5043a3ef3b95ba6c4a91e72007f8262f2f241b69edf141d",
+      "captureBytes": 351752,
+      "successfulLoginAudit": {
+        "count": 1,
+        "sites": [
+          "{site-a,site-b}"
+        ],
+        "last": "2026-11-20T09:25:02.160317+00:00"
+      },
+      "auditCommand": "bee8df7cb51c446bb5b53b7346e926ab",
+      "httpStatusFromScreenshot": "NOT_RECORDED",
+      "currentVerifiedAccounts": 1,
+      "eligibleAccounts": 4,
+      "formalCaseExecuted": false
+    },
+    "formalPrimary": {
+      "api": "f9549ba904a7b7a6bc7c3df3ed3d8a6c69f9f61964f35aad0ab387f22019726b",
+      "utc": "2026-11-20T09:24:51.094612+00:00",
+      "beforeAuth": 6,
+      "beforeAuthCmd": "65823171467a4becbb901194f1bed947",
+      "before": "860d0ed9dccd4162afc668f728392e85",
+      "after": "741db7144bac464697a6d04db62d8922",
+      "meAnonymous": 401,
+      "purpose": "Existing formal product /auth/login and /api/v1/platform/me; user present at Mac"
+    },
+    "initialAnonymousMeStatus": 401,
+    "postgresAudit": {
+      "id": "bee8df7cb51c446bb5b53b7346e926ab",
+      "stage": "omq-pg-account-auth-observation",
+      "recordedRun": "product-resume-01",
+      "exitCode": 0,
+      "classification": "SUCCESS",
+      "started": "2026-11-20T09:25:29.605979+00:00",
+      "ended": "2026-11-20T09:25:29.668183+00:00",
+      "deadlineSeconds": 15,
+      "inputFingerprint": "c61aabdc38d9a999fdce6e516e19029d82abefce5b5040537a31a5a414d98bdd",
+      "executionIdentity": "d3dcac4a39361c8a9bd747e109ee857480b4030f9e87597d91b6dc7e0479f6a9",
+      "commandSummary": {
+        "argumentCount": 13,
+        "executable": "docker",
+        "sha256": "b9a06176cc7c4fefa19b7812d93bffff1d059c801edf6538c9436f26c18264c6"
+      },
+      "receipt": {
+        "filename": "receipt.json",
+        "bytes": 1505,
+        "sha256": "e00dc9144ada55fd8ce2bf3d070ed6dfd7ab49f7c74f381c6cc699eb598bba23"
+      },
+      "stdout": {
+        "filename": "stdout.txt",
+        "bytes": 90,
+        "sha256": "dbfcc0dbf18b2014db5f3df53cb3a6b7e698d804f887830d502c585054cc6fe7"
+      },
+      "stderr": {
+        "filename": "stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "closeout": {
+      "startUtc": "2026-11-20T09:27:56.364152+00:00",
+      "account": "g2-operator-ab",
+      "confirmation": "USER_CONFIRMED_SINGLE_ACCOUNT_CLOSE",
+      "idleBefore": {
+        "command": "e59a4bd01fb24d34ae2e8435b1aab662",
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "states": {
+        "keycloak-test": {
+          "id": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T09:29:47.265517258Z"
+          }
+        },
+        "platform-pg": {
+          "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T09:30:49.464481676Z"
+          },
+          "controlState": "shut down"
+        }
+      },
+      "portWait15741": 0.0,
+      "apiRelease": {
+        "id": "f9549ba904a7b7a6bc7c3df3ed3d8a6c69f9f61964f35aad0ab387f22019726b",
+        "pre": "ee4bd697df2e4da6b8b684a582bfef19",
+        "post": "e049030677fd44878bbbad84ae94bc83",
+        "commands": [
+          "7ac73d8b70b24c5499b5a36b58dc0d38",
+          "e82d780aed0b4cf991c136e490c7b6ff",
+          "f4456b83e2e3455a9adaf95d4a0d84eb",
+          "9f62dc47cb2444c3825781e2956bfc45"
+        ],
+        "initialPostcheckBlocked": "b9a5bb3854ab4bfd862b5e9b316132bf"
+      },
+      "apiAbsenceCommand": "9f62dc47cb2444c3825781e2956bfc45",
+      "idleAfter": {
+        "command": "81f58076cbe64efd88477759db8a10e8",
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "order": [
+          "query",
+          "run",
+          "catalog",
+          "probe",
+          "mappingJob",
+          "mappingOutbox",
+          "publishingOutbox"
+        ]
+      },
+      "portWait15743": 60.19,
+      "post": "f219cceb61cb4b5b9ebeedcb9d1adcf2",
+      "remaining": [],
+      "legacyInventorySha256": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9",
+      "oldRunning": 3,
+      "oldStopped": 17,
+      "closeStatus": "PASS_SINGLE_ACCOUNT_WINDOW",
+      "previousFuseki": "UNKNOWN",
+      "endUtc": "2026-11-20T09:30:53.029018+00:00"
+    },
+    "receipt": {
+      "filename": "final-single-account-close.json",
+      "bytes": 2145,
+      "sha256": "98af12e7709f081a0556cfdda718ae9a8e07fe343c91c81cb5e4238a2ab7b29f"
+    },
+    "auditInput": {
+      "sqlUtf8": "BEGIN READ ONLY;\nSELECT json_build_object('count',count(*),'sites',array_agg(DISTINCT \"ScopeSiteIds\"::text),'last',max(\"OccurredAtUtc\")) FROM governance.audit_records WHERE \"Action\"='authentication.login' AND \"Outcome\"='allowed' AND \"Actor\"='5af20722-3900-4de9-b23a-7dcae3ca5927' AND \"OccurredAtUtc\">='2026-11-20T09:24:51.094612+00:00'::timestamptz;\nCOMMIT;",
+      "sha256": "c61aabdc38d9a999fdce6e516e19029d82abefce5b5040537a31a5a414d98bdd"
+    }
+  },
+  "finalStatic": {
+    "id": "0642933771c84d7a967e890671803d22",
+    "stage": "single-close-static",
+    "recordedRun": "product-resume-01",
+    "exitCode": 0,
+    "classification": "SUCCESS",
+    "started": "2026-11-20T09:31:50.432507+00:00",
+    "ended": "2026-11-20T09:32:06.703567+00:00",
+    "deadlineSeconds": 240,
+    "inputFingerprint": "20b98127bf0b058b75b91550c721d6b5673b08a6",
+    "executionIdentity": "079e13f2eb0355de3c2c25e61f6e3f2664fc81121db2af4808412878a3159f59",
+    "commandSummary": {
+      "argumentCount": 3,
+      "executable": "pwsh",
+      "sha256": "d4d2f63678da275e888594ae65752793dbc1ee007d286328e4519bff60a0e5a1"
+    },
+    "receipt": {
+      "filename": "receipt.json",
+      "bytes": 1466,
+      "sha256": "4506cf4d5c8de2082922be30f52d2bba808d1efe030f3d4cd02d536ad6661339"
+    },
+    "stdout": {
+      "filename": "stdout.txt",
+      "bytes": 492,
+      "sha256": "5fd8242ef4bffc4668f21a874fd75837a2822c340b017783500167a59102bfb0"
+    },
+    "stderr": {
+      "filename": "stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

@@ -1,0 +1,490 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "product-resume-01",
+  "reviewer": "/root/review02",
+  "conclusion": "ACCEPT_ONE_ACCOUNT_LOGIN_AND_CLOSEOUT_WITH_ORACLE_PRODUCT_BLOCKED",
+  "base": "4924f44ec1628b156d7e722513405bc13d376d8e",
+  "reviewedProductAndReportHead": "20b98127bf0b058b75b91550c721d6b5673b08a6",
+  "mainExpected": "5168f2c93ca226caa521a6dc4ac85439335274c4",
+  "report": {
+    "bytes": 12486,
+    "sha256": "8dcca91f4db6407434a3431837f4dcc5f43b6293c8260d3423b54c11af5d11c9"
+  },
+  "freshLogin": {
+    "requested": 1,
+    "verified": 1,
+    "otherThree": "NOT_RUN_THIS_WINDOW",
+    "account": "g2-operator-ab",
+    "subject": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+    "roles": [
+      "platform.operator"
+    ],
+    "org": "org-demo",
+    "sites": [
+      "site-a",
+      "site-b"
+    ],
+    "screenshot": {
+      "bytes": 351752,
+      "width": 1190,
+      "height": 815,
+      "sha256": "6838dde7b365aa17d5043a3ef3b95ba6c4a91e72007f8262f2f241b69edf141d",
+      "visualReopen": "localhost:15741/api/v1/platform/me; subject, display name, role and both org/site pairs matched",
+      "httpStatus": "NOT_RECORDED"
+    },
+    "redactedSummary": "dc956a1a91b1f0fccd853400b010e25cc214a540c83d063acef70559dfafcad5",
+    "scopedAudit": {
+      "command": "bee8df7cb51c446bb5b53b7346e926ab",
+      "recomputedReadOnlySqlSha256": "c61aabdc38d9a999fdce6e516e19029d82abefce5b5040537a31a5a414d98bdd",
+      "afterUtc": "2026-11-20T09:24:51.094612+00:00",
+      "action": "authentication.login",
+      "outcome": "allowed",
+      "actorMatchesSubject": true,
+      "matchingRecords": 1,
+      "occurredUtc": "2026-11-20T09:25:02.160317+00:00",
+      "sites": [
+        "site-a",
+        "site-b"
+      ]
+    },
+    "anonymousMe": 401,
+    "sessionOrRequestIdFromScreenshot": "NOT_RECORDED"
+  },
+  "freshCloseout": {
+    "result": "PASS_SINGLE_ACCOUNT_WINDOW",
+    "ledgerSha256": "98af12e7709f081a0556cfdda718ae9a8e07fe343c91c81cb5e4238a2ab7b29f",
+    "primaryApi": "f9549ba904a7b7a6bc7c3df3ed3d8a6c69f9f61964f35aad0ab387f22019726b",
+    "apiExit": 143,
+    "apiOOM": false,
+    "apiAbsentCommand": "9f62dc47cb2444c3825781e2956bfc45",
+    "firstPostcheck": {
+      "id": "b9a5bb3854ab4bfd862b5e9b316132bf",
+      "result": "ORACLE_ADMISSION_FROZEN_PORT_COLLISION"
+    },
+    "subsequentSameGate": "e049030677fd44878bbbad84ae94bc83",
+    "drainReadOnlySqlAndStreamsVerified": [
+      "e59a4bd01fb24d34ae2e8435b1aab662",
+      "81f58076cbe64efd88477759db8a10e8"
+    ],
+    "eachSevenCounts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "keycloak": {
+      "id": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+      "exit": 143,
+      "oom": false,
+      "shutdownLogMarker": true
+    },
+    "postgres": {
+      "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+      "exit": 0,
+      "oom": false,
+      "controlState": "shut down",
+      "controlCommand": "ebe4425f3e6943918f436731a6d24649"
+    },
+    "finalAdmission": "f219cceb61cb4b5b9ebeedcb9d1adcf2",
+    "finalRawAllRunning": "622032db611b4f3fbcb1f70613091c1b",
+    "finalLegacyExact": "49983c5c1a8a4c218f59b0e038c18450",
+    "remainingReplacementRoles": 0,
+    "oldStopped": 17,
+    "oldRunning": 3,
+    "endedUtc": "2026-11-20T09:30:53.029018+00:00",
+    "earlierFusekiCleanShutdown": "UNKNOWN"
+  },
+  "engineering": {
+    "saveApiObservation": "Reviewed first and subsequent immutable paths via actual saved instances and an in-memory invocation; existing single-writer exclusive-save path remains active.",
+    "repositoryStatic": "0642933771c84d7a967e890671803d22",
+    "staticExit": 0,
+    "filesScanned": 24559,
+    "priorEvidence": "REUSED_AT_ORIGINAL_MEASURED_HEADS"
+  },
+  "product": {
+    "AC03A": "BLOCKED_NO_FORMAL_SOURCE_WITNESS",
+    "AC03B": "BLOCKED",
+    "cleanup250ms": "NOT_QUALIFIED",
+    "S1": "NOT_RUN",
+    "S2": "NOT_RUN",
+    "S3": "NOT_RUN",
+    "OracleS0": "BLOCKED",
+    "G4": "PARTIAL",
+    "CI": "NOT_RUN"
+  },
+  "qualification": "Fresh independent offline review of the new single-account execution. User scope did not require new four-account admission; four earlier AC03-A attempts remain failed. No product ZIP or same-package VerifyOnly.",
+  "precedingIncrementalReviews": [
+    {
+      "schemaVersion": 1,
+      "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+      "runId": "product-resume-01",
+      "reviewer": "/root/review02",
+      "verdict": "ACCEPT_SCOPED_BLOCKED_CANDIDATE",
+      "base": "4924f44ec1628b156d7e722513405bc13d376d8e",
+      "head": "8388ed0b8628b499f7a061001c90a6c25ff44ca7",
+      "frozenMain": "5168f2c93ca226caa521a6dc4ac85439335274c4",
+      "report": {
+        "bytes": 9193,
+        "sha256": "588b947df42f87308f52b2b3291cfac9ffe56fef30a4227529905e467f5b9d9c"
+      },
+      "publicIndex": {
+        "bytes": 1975,
+        "sha256": "a56fa64684d8a8113fb3c9a74148d368d3a4f0c6991e34ae3eee025747b31ae2",
+        "gitOriginals": 5,
+        "originalBytes": 19786
+      },
+      "form": {
+        "originalExecutionHead": "540d6dfa4305553fd55b8e842c0d3d6f874acc3f",
+        "inputFingerprint": "9999f7f0014c45fd490e3818987592cd9123b43b7073dc75730f73c4f85bc74e",
+        "inputsBoundToBothHeads": 4,
+        "checks": [
+          {
+            "command": "5ed9d490498c4e92bc775744342d2144",
+            "argv": "node --test scripts/tests/WorkflowOracleNormalLogin.Tests.mjs",
+            "exit": 0,
+            "tests": 11,
+            "reopenedStreams": true,
+            "independentOfflineRerun": 11
+          },
+          {
+            "command": "b5bfeb21a54748b1a79011d92063bf92",
+            "argv": "python3 -B scripts/tests/WorkflowOracleMappingEvidence.Tests.py",
+            "exit": 0,
+            "tests": 17,
+            "reopenedStreams": true,
+            "containsNodeSuite": true
+          }
+        ],
+        "scope": "Controlled form accepts the approved current account, origin/realm and native autofill marker with matching POST destination and same-form submitter. Changed account, realm, action, method, submitter overrides, different form and absent marker suppress programmatic submission. Tests use a mock page with a throwing password-value getter."
+      },
+      "hosts": {
+        "selectorBefore": "f41ef82294b50955f32fc90cfe508549b575787b4e7d7fce6e27d6315dc4b9d4",
+        "oldIndependentRejections": 9,
+        "selectorAfter": "b2e6015d8257e5d17b0067f5afe818cd9a49ffb6fa8ae3a62b268c83fadf3191",
+        "currentIndependentReopens": 9,
+        "key": [
+          "snapshotId",
+          "composeSha256",
+          "relaySha256"
+        ],
+        "eachWindowChecked": "Actual command and its two streams, exact measured drivers and input fingerprint, distinct before/during/after host commands, API/test builds, exact Oracle identity and unfiltered window through production audit_observation."
+      },
+      "formalRuns": [
+        {
+          "id": "cd9dc6cbce9b420285c7d2fe5ebc2abf",
+          "head": "ef57c790da6878f0002de89e210c1cb0674ba86a",
+          "input": "d5ae4d28df8cf4fffe80665cb81044937ed8f3ba2ce54c4683248e566c71e003",
+          "audit": "3c0243f2b0bb4d808cb28e8d0499fc56"
+        },
+        {
+          "id": "82b92986be1349fba67549a377878db0",
+          "head": "6db643ad20c9e97cf1b38999438c337f229dddad",
+          "input": "9aef1fcc601bca8719abaf812dcf2e65763a16bf5cc2ce270e7d17ef0a82f369",
+          "audit": "17183fc7fdd54cfc8b3e337e1b06e37e"
+        },
+        {
+          "id": "1350eef5d3824e23b19657a71280c1e5",
+          "head": "1745e93ee867eefeb785efe9ac8a76a9e88b3a68",
+          "input": "cdc42cfa7c96f7574e31d9bea37ad36626183f5dd09c22ff0bc21206c2be6a6d",
+          "audit": "f9960f1080084512afea02cb8b2714ce"
+        }
+      ],
+      "eachWindow": {
+        "exitCode": 1,
+        "oidcPhase": "oidc_operator-ab",
+        "error": "TimeoutError",
+        "authenticatedMe": 0,
+        "requiredMe": 4,
+        "businessHttp": 0,
+        "productChecks": 0,
+        "sourceBusinessSelects": 0,
+        "clientFilter": false,
+        "sourceWitness": false
+      },
+      "previousReview": {
+        "postgresFresh": "5/5 from actual compiled candidate, new DB released",
+        "fullSelfTest": "503 existing reported checks qualified on original completed command",
+        "individualOldLogins": "4 historical /me and login audits, 4 session digests; individual session/token-to-actor proof incomplete"
+      },
+      "finalStates": {
+        "AC03A": "BLOCKED_NO_FORMAL_SOURCE_WITNESS",
+        "AC03B": "BLOCKED",
+        "AC03C": "PASS_SCOPED_NEGATIVES",
+        "S1": "NOT_RUN",
+        "S2": "NOT_RUN",
+        "S3": "NOT_RUN",
+        "OracleS0": "BLOCKED",
+        "cleanup250ms": "NOT_QUALIFIED",
+        "G4": "PARTIAL",
+        "CI": "NOT_RUN",
+        "finalResourcePostconditions": "PENDING_NON_AUTHOR_REOPEN"
+      },
+      "limits": [
+        "Window was measured at the individual heads listed. Third attempt preceded final submitter guards. Login timeout substantiates a phase only.",
+        "Local-only execution streams and retained binary outputs are not a portable evidence package.",
+        "Resource final postconditions and exact final delivery head are outside this candidate review."
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+      "runId": "product-resume-01",
+      "reviewer": "/root/review02",
+      "conclusion": "ACCEPT_BLOCKED_HANDOFF_AT_OBSERVED_CLOSEOUT",
+      "base": "4924f44ec1628b156d7e722513405bc13d376d8e",
+      "reviewedHead": "4d96960efa6a27dcc7f5a55255699971067d3026",
+      "supplements": "8388ed0b8628b499f7a061001c90a6c25ff44ca7",
+      "frozenMain": "5168f2c93ca226caa521a6dc4ac85439335274c4",
+      "report": {
+        "bytes": 10315,
+        "sha256": "4604c90024e48e0df5ff40e7d4e12b98880c296224715f06f73be1ba01f6aaba"
+      },
+      "qualifiedReuse": "Report-only change from preceding reviewed Head; earlier three formal failures, offline suites, compiled-PG and SelfTest qualifications retain their individual execution identities.",
+      "fourthFormal": {
+        "execution": "FRESH_FAILED",
+        "qualification": "FRESH_OFFLINE_REOPEN",
+        "testedHead": "8388ed0b8628b499f7a061001c90a6c25ff44ca7",
+        "command": "ca250b2fdc044217ab7f1823e3ec0051",
+        "input": "5e0eb4d7562bf04665a558207e94e5e8f889db237447941c797f1856f4576a6b",
+        "began": "2026-11-20T09:00:54.029080+00:00",
+        "ended": "2026-11-20T09:01:35.499330+00:00",
+        "exitCode": 1,
+        "phase": "oidc_operator-ab",
+        "category": "TimeoutError",
+        "authenticatedMe": "0/4",
+        "httpBusiness": 0,
+        "checks": 0,
+        "inputsUnchanged": true,
+        "reportSha256": "90ba751c0f92bc3174cff8670407c496a7e4b422798b9c161ae5da578bae7630",
+        "dispatchSha256": "dfb073957a603a093f6fd103581a82841089d882a2f645ff2baf4b29d6add2bb",
+        "hostCommands": [
+          "d7ec8326434e47ba9a003b917ef2002e",
+          "b5585aa6b013458b9fe38c627d248c08",
+          "a56a423ae9c44ccda50273474180da02"
+        ],
+        "independentAudit": {
+          "identity": "02d6444ce0c842858ba965d835cc6094",
+          "command": "f12cfda95b0a4d569d0b35c369e20ad9",
+          "sha256": "127c0adf49a40d220552ec7281e36d600f3317c8c82c263fcddddbd23cae9e17",
+          "sourceBusinessSelects": 0,
+          "unfiltered": true
+        },
+        "independentlyReopenedInputsAndStreams": 28,
+        "sourceWitness": false
+      },
+      "loginDiagnostic": {
+        "sha256": "3a2fcdc9648f042ca6bc32a475ca2163de252c46217acf4509906cbf16700273",
+        "bytes": 427,
+        "evidence": "REOPENED_REDACTED_AGGREGATE",
+        "window": [
+          "2026-11-20T08:56:00Z",
+          "2026-11-20T09:03:56.279618+00:00"
+        ],
+        "firstOriginalAccountInvalidCredentialsReported": 8,
+        "eventToFormalRun": "NOT_VERIFIED",
+        "independentPerEventReplay": "NOT_VERIFIED",
+        "credentialDifference": "UNKNOWN"
+      },
+      "closeout": {
+        "execution": "FRESH",
+        "qualification": "FRESH_OFFLINE_REOPEN",
+        "result": "BLOCKED",
+        "operation": "ca2485cdf5464c65acaed13f1279b424",
+        "ended": "2026-11-20T09:06:01.267167+00:00",
+        "ledger": {
+          "bytes": 5820,
+          "sha256": "b5874f8339bc1525ddd371d00bc60c8f0d22a0bcbff5991ae83c65ffadd09ceb"
+        },
+        "drain": [
+          "f1061a57d867457099ad2c16f629c0d2",
+          "d4439188b0e54c46b30ce909931cbea9"
+        ],
+        "eachDrainSevenCounters": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "removedStateless": [
+          {
+            "role": "api",
+            "id": "00639ef2bc870abca200c4be934c7f87ae77e7e9b6e6945b781395f4fc3cf31a",
+            "preRemovalExit": 143,
+            "oom": false,
+            "absenceCommand": "4af1f8b750914251bcb96fcbd539023a"
+          },
+          {
+            "role": "api-secondary",
+            "id": "5d3c4c706931bc4115ca99293720ea9524d56ff6e9373a17227f65ab29bc9165",
+            "preRemovalExit": 143,
+            "oom": false,
+            "absenceCommand": "afdcc516e66546928ea26ff5bd5017ff"
+          }
+        ],
+        "engineCommand": "05d9b0d2ab984516b975853910769247",
+        "allFiveEngineState": "exited",
+        "allFiveOom": false,
+        "retainedReplacement": [
+          {
+            "role": "oracle",
+            "id": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+            "exitCode": 143,
+            "result": "CLEAN_STOP",
+            "nativeShutdownCommand": "406450016996433ab66189ae4554a540"
+          },
+          {
+            "role": "platform-pg",
+            "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+            "exitCode": 0,
+            "result": "CLEAN_STOP",
+            "controlState": "shut down",
+            "controlCommand": "dce49629093641c7b3a06b8f566c01e8"
+          },
+          {
+            "role": "rustfs",
+            "id": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
+            "exitCode": 0,
+            "result": "CLEAN_STOP"
+          },
+          {
+            "role": "keycloak-test",
+            "id": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+            "exitCode": 143,
+            "result": "CLEAN_STOP",
+            "recordedShutdownMarker": true
+          },
+          {
+            "role": "fuseki",
+            "id": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+            "exitCode": 143,
+            "cleanShutdown": "UNKNOWN",
+            "remainingTdbLocks": 2,
+            "shutdownLogMarker": false,
+            "reason": "ORACLE_ADMISSION_TDB_CLOSE_UNCONFIRMED",
+            "closedFilesCommand": "2294b61a6714497dac2ff8fe3e33e6b2"
+          }
+        ],
+        "finalAdmission": "233485e1a863426b896b0458d13ea1d6",
+        "admissionCommandReceiptsAndBothStreams": 43,
+        "keptInventoryCommand": "b628cf55ba97492ca63c5c46f0235da3",
+        "exactInventoryMatches": 20,
+        "keptRunning": 3,
+        "keptStopped": 17,
+        "remainingActiveReplacementRoles": 0
+      },
+      "productStates": {
+        "AC03A": "BLOCKED_NO_FORMAL_SOURCE_WITNESS",
+        "AC03B": "BLOCKED",
+        "AC03C": "PASS_SCOPED_NEGATIVES",
+        "cleanup250ms": "NOT_QUALIFIED",
+        "S1": "NOT_RUN",
+        "S2": "NOT_RUN",
+        "S3": "NOT_RUN",
+        "OracleS0": "BLOCKED",
+        "G4": "PARTIAL"
+      },
+      "cutoff": "Scope ends at the recorded closeout. A subsequent first-account reset was authorized but had not been exercised in this evidence window. No reauthentication or live resource actions by the reviewer."
+    },
+    {
+      "schemaVersion": 1,
+      "reviewer": "/root/review02",
+      "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+      "runId": "product-resume-01",
+      "scope": "Single replacement-IDP account reset at recorded postcondition only",
+      "verdict": "ACCEPT_SCOPED_RESET_AND_BLOCKED_PRODUCT_HANDOFF",
+      "base": "4924f44ec1628b156d7e722513405bc13d376d8e",
+      "reviewedHead": "9b309ebedaa8b72ddd32507ef0875678439b4a8c",
+      "report": {
+        "bytes": 11350,
+        "sha256": "4b23bfc6f14227a01ecb2a00337de0b74caffff704b82ba4c98922bccb218239"
+      },
+      "previousReviews": [
+        {
+          "head": "8388ed0b8628b499f7a061001c90a6c25ff44ca7",
+          "bytes": 3831,
+          "sha256": "27be74d6bd9c2bbb566b4a987812dec93cc8cb17834c585b9648a3d626b75302"
+        },
+        {
+          "head": "4d96960efa6a27dcc7f5a55255699971067d3026",
+          "bytes": 4700,
+          "sha256": "5c6f683638e590e5fc811753489526e6d186a84884c4b4ae76c3f4f723cf7b50"
+        }
+      ],
+      "freshExecutionReopened": {
+        "account": "g2-operator-ab",
+        "originalSubject": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+        "scope": "one subject, same replacement IDP and data volume",
+        "operations": [
+          [
+            "operation.json",
+            "BLOCKED",
+            "d621c4cf89034d2188a97459568b2cd040bd58c49193053f7cd365fdf85dfef8"
+          ],
+          [
+            "operation-v2.json",
+            "BLOCKED",
+            "b5f1b109abfa1fad034cdaf456093fd93a70353e258a57c38525c220390da8b7"
+          ],
+          [
+            "operation-v3.json",
+            "BLOCKED",
+            "ff08005cdc5d36cb3023fe8a5f7258ef166dd92bcc3d79e39ccf68e1c87d8f3b"
+          ],
+          [
+            "operation-v4.json",
+            "READY_FOR_LOCAL_LOGIN",
+            "7457c04c80efb87b9e1257e822a18fd95aaa12ade58ed16fe7f5badc6e153364"
+          ]
+        ],
+        "postconditionSha256": "1fdb28e71847dc538b2c8b3c90ed1c7e4dc9debf49015a6779ca5826a5493c41",
+        "resetHttp": 204,
+        "subjectUsernameAndAttributesRecheckedByDriver": true,
+        "temporaryAdminDeleteAndFailedReauthenticationRecorded": true,
+        "temporaryKeychainItemAbsence": "POSTCONDITION_RECORDED",
+        "localAccountItemPresence": "POSTCONDITION_RECORDED",
+        "helperCreatedAndExactIdBound": 4,
+        "helperAbsenceCommand": "73421a8eda404bf68c5f0e1f3ab8d840",
+        "helperAbsent": true,
+        "normalAccountForm": "SUBMITTED_RETURNED_TO_ACCOUNT_PAGE",
+        "consoleCurrentUsername": "NOT_CONFIRMED",
+        "authenticatedPlatformMe": "NOT_RUN"
+      },
+      "resourcePostcondition": {
+        "checkedUtc": "2026-11-20T09:20:08.642595+00:00",
+        "admission": "14df6b1f778a42cfbf415de538c78d3d",
+        "reopenedCommandReceiptsAndBothStreams": 43,
+        "allRunningCommand": "41f6688ee06c4976a4952e68b199ee79",
+        "replacementActiveOnly": "keycloak-test",
+        "replacementId": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+        "otherReplacementData": "platform-pg/oracle/rustfs/fuseki exited",
+        "legacyRetainedOriginalCommand": "aae3732a7edb4414b592f8178d815b41",
+        "exactLegacyRunning": 3,
+        "exactLegacyStopped": 17,
+        "dedicatedAuthHostAdmission": "5dc748340af94c5597743e721679b78b",
+        "dedicatedAuthHost": "BLOCKED_COMPONENT_64M_LIMIT",
+        "previousFusekiCleanShutdown": "UNKNOWN"
+      },
+      "limits": [
+        "Reset 204, subject recheck and administrator revocation are supported by retained machine summaries and checked driver control flow; raw authentication HTTP and secrets were not inspected.",
+        "Account-console return does not identify the current user or establish an authenticated platform /me. None of the four earlier formal windows is requalified."
+      ],
+      "status": {
+        "AC03A": "BLOCKED_NO_FORMAL_SOURCE_WITNESS",
+        "AC03B": "BLOCKED",
+        "cleanup250ms": "NOT_QUALIFIED",
+        "S1": "NOT_RUN",
+        "S2": "NOT_RUN",
+        "S3": "NOT_RUN",
+        "OracleS0": "BLOCKED",
+        "G4": "PARTIAL"
+      }
+    }
+  ]
+}
