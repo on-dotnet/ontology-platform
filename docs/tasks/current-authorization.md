@@ -1,6 +1,6 @@
 # 当前授权｜G4-ORACLE-MAPPING-QUERY-001
 
-本批按影响复验、登记临时资源并交三份阻断复审文件。执行依据见[研发效率规则](../development/ai-development-efficiency.md)、[审查交付规格](../development/review-package-spec.md)及[资源生命周期](../development/resource-lifecycle.md)。
+本批按影响复验、登记临时资源并交三份完整公开脱敏复审文件。执行依据见[研发效率规则](../development/ai-development-efficiency.md)、[审查交付规格](../development/review-package-spec.md)及[资源生命周期](../development/resource-lifecycle.md)。
 
 2026-11-19，用户传达 ChatGPT 对 Doris review-fix-02 的 ACCEPT / GO，RF-02 关闭。Master 已将 main 从 `606ca2d2c61964e6498dd72d5e9ad960d3593bf7` 精确快进至 `5168f2c93ca226caa521a6dc4ac85439335274c4`，普通推送并回读。历史验收与原件由[Doris 卡](G4-DORIS-MAPPING-QUERY-001.md)恢复。
 
@@ -28,3 +28,5 @@
 用户最新明确要求先修复设备号漂移导致的前检，尽量自动验证，整个已授权任务完成后才最终交付；正常四角色认证及条件A/S1授权继续，秘密与密码重置边界保持。
 
 当前认证已在第三实际窗口取得4/4正常主体及票据；任务仍AUTH_HANDOFF_IMPLEMENTING。A因脚本漏实现合同允许的成功先赢分支而停，先修直接驱动/消费者并验证，再在新代码事实下进行固定顺序窗口，自动继续条件S1；历史失败不改判。用户要求全部完成后交付继续有效。
+
+**当前执行结果（auth-handoff-01）：本批A/S1目标已完成，状态AUTH_HANDOFF_S1_REVIEW_READY。** 实测8f857969ad4fe08e43e5644d951bbf7532e3544d；第四父命令47f4f5d4e2454a759bd3189a5b37f590 exit0，原六阶段连续PASS，真实消费者和非作者独立重开通过，reader恢复为真正新正常会话且零业务重读。当前任务2API已移除、5副本退出，保护原3运行/17停止及归档保持。历史失败与B/cleanup250ms未资格、Oracle S0 BLOCKED/G4 PARTIAL不改；S2/S3未执行。普通push并回读三份完整文件，最终停ChatGPT复审，main保持5168f2c93ca226caa521a6dc4ac85439335274c4。

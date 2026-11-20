@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **AUTH_HANDOFF_IMPLEMENTING**。源读取及正式结算已修改。替代 API 的当前资源窗口已按身份登记，真实 PG 三态锁内截止通过。按用户最终限定，本批另已核实一个重置账号的正式 /me 和登录审计。详见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/report.md)。本批按 [唯一 A–F](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md) 的 AC03-A/C 决定 S1 准入，S1 通过后才进入 S2/S3 功能验证。AC03-B 及 Oracle S0 仍 BLOCKED，G4 PARTIAL，AI OFF。
+唯一任务状态 **AUTH_HANDOFF_S1_REVIEW_READY**。本批四角色正常认证、同一隔离浏览器内AC03-A、正式单表Mapping、S1查询/持久化及真正新reader会话恢复已全部通过。实测代码8f857969ad4fe08e43e5644d951bbf7532e3544d，实际父命令47f4f5d4e2454a759bd3189a5b37f590，六阶段原件经真实资格消费者及非作者递归重开。AC03-C当前PG8/8按输入复用；AC03-B及Oracle S0仍BLOCKED，B的cleanup250ms仍NOT_QUALIFIED，G4 PARTIAL，AI OFF。当前两个API已移除、五副本退出、原3运行/17停止保持。交付见[本批完整报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/report.md)，普通push回读后停ChatGPT复审。
 
 ## 执行身份与所有权
 
@@ -15,7 +15,7 @@ P0 的文档归属为本任务卡、[唯一 A–F](../evidence/G4-ORACLE-MAPPING
 | SDD 切片 | 关联 AC 与正式入口 | 当期资格 |
 |---|---|---|
 | S0 源能力及取消 | AC01–03、11。先验证 Oracle 类型、事务、受控固定 SQL、正式取消与独立源终态；不可观察即停。 | BLOCKED。固定 SQL 在正式取消提交前已读完；两表事务、直取消和 PG 占位子项已测。 |
-| S1 单表 | AC04、05、08、10。沿正式发布、当前 grant、HTTP、真实平台持久化及新会话恢复 | NOT_RUN |
+| S1 单表 | AC04、05、08、10。沿正式发布、当前 grant、HTTP、真实平台持久化及新会话恢复 | PASS：auth-handoff-01第四实际窗口，准确父命令及六阶段原件见本批报告 |
 | S2 双表 | AC03、05–08。等值与半开关系、ABA、撤权、超量、原期限内清理和零成功副作用 | NOT_RUN |
 | S3 消费者及兼容 | AC09–11。UI/HTTP/MCP 同源字节，PG/Doris 与 Oracle M2 的原身份对照 | NOT_RUN |
 
@@ -55,3 +55,5 @@ Base `33e66879a6b48e25580f1623316b88fe5a5e85cc`；Master 单写 `workflow-m4-que
 2026-11-20 第三实际窗口四角色正常认证34项通过；同浏览器AC03-A执行200 FOUND、取消409 query_already_finished。该分支为唯一合同第76行明示允许，但驱动遗漏导致原父命令265cdf991f8d4725880728767d465711 exit1，历史FAIL保留。现补严格成功先赢原件谓词（同acquisition/query/owner/fence、实际源执行时序、事务/后验/物理释放、稳定终态唯一成功副作用、原最早清理期限），取消先赢及B资格不变。定向正反例和独立审查后，以新代码输入再执行固定1620秒计划；当前七任务实例沿用startup-03d，不重建数据栈。
 
 A触发补充：仅natural-cancel观察者在本次唯一query/execution/acquisition的READ_RETURNED后通知浏览器发正式取消；收到响应后以本进程私有管道确认，独立终态命令必须在该确认之后。所有等待受原观察者和阶段截止约束，不给产品加延时。成功及取消先赢分别严格验收；定向回归88项（内含23项Node）已通过。
+
+2026-11-20 当前批完成：第四窗口六阶段34/52/35/70/9/43项通过，固定业务SELECT各0/1/0/1/0/0，父窗2，均无clientId过滤。新reader主体相同、会话不同、结果字节一致。定向88/88，独立23输入重开、15项Python/23项Node及7类真实反例通过。历史三旧0/4、两窗1/4、第三窗A旧脚本FAIL及所有前检/测试失败保留。关闭操作9850bf57242a4fe88d043240b878b37f双轮排空全0，准确ID后态及最终资源准入PASS。此完成仅覆盖用户本批A/S1目标，不授予B、Oracle总体、S2/S3或main放行。
