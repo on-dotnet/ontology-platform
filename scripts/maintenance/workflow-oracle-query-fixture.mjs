@@ -136,7 +136,7 @@ export async function witness({ root, state, reader, mode, capability, get, requ
     report.oracleWitness.execute = { status: result.value.status, queryStatus: result.value.data?.status, elapsedMs: result.elapsedMs };
     // 完整观测由独立工具保存原件。报告只取受审指标与关联身份。
     const publicFields = ["status","queryId","clientId","naturalCompletion","formalCancelCommitted","sameExecutionActiveAtCommit",
-      "naturalCompletionBeforeCancel","naturalCleanupUpperMs","nativeCancelCausedTermination","allSourceWorkEnded","nativeErrorCode","deadlineOrDisconnectBeforeCommit","cleanupUpperMs",
+      "naturalCompletionBeforeCancel","naturalCleanupUpperMs","earliestCleanupMarginMs","nativeCancelCausedTermination","allSourceWorkEnded","nativeErrorCode","deadlineOrDisconnectBeforeCommit","cleanupUpperMs",
       "branchUpperMs","totalUpperMs","successfulResults","successReceipts","successAudits","residualSourceWork","slotReleased"];
     report.oracleWitness.final = Object.fromEntries(publicFields.filter(field => final && Object.hasOwn(final, field)).map(field => [field, final[field]]));
     check("oracle_witness_finished", await exit === 0 && final?.queryId === admitted.queryId && /^[0-9a-f]{32}$/.test(final.clientId)
@@ -148,7 +148,8 @@ export async function witness({ root, state, reader, mode, capability, get, requ
       check("oracle_late_platform_cancel", report.oracleWitness.cancel.httpStatus === 200 && report.oracleWitness.cancel.executionStatus === "CANCELLED"
         && final.formalCancelCommitted === true && final.sameExecutionActiveAtCommit === false && final.nativeCancelCausedTermination === false);
       check("oracle_natural_end_before_cancel", final.naturalCompletionBeforeCancel === true && Number.isFinite(final.naturalCleanupUpperMs)
-        && final.naturalCleanupUpperMs >= 0 && final.naturalCleanupUpperMs <= 250);
+        && final.naturalCleanupUpperMs >= 0 && final.naturalCleanupUpperMs <= 250
+        && Number.isFinite(final.earliestCleanupMarginMs) && final.earliestCleanupMarginMs >= 0);
       check("oracle_zero_success_side_effects", [409,503,504].includes(result.value.status) && final.successfulResults === 0 && final.successReceipts === 0 && final.successAudits === 0);
     } else if (cancel) {
       check("oracle_formal_cancel_committed", report.oracleWitness.cancel.httpStatus === 200 && report.oracleWitness.cancel.executionStatus === "CANCELLED"

@@ -420,7 +420,7 @@ def reopen_browser(archive, entry, origin, mode, case):
                     witness['execute']['status'] in (409,503,504) and 0<=witness['execute']['elapsedMs']<=5000 and
                     proof.get('naturalCompletionBeforeCancel') is True and proof['formalCancelCommitted'] and
                     not proof['sameExecutionActiveAtCommit'] and not proof['nativeCancelCausedTermination'] and
-                    0<=proof['naturalCleanupUpperMs']<=250 and proof['successfulResults']==proof['successReceipts']==proof['successAudits']==0,
+                    0<=proof['naturalCleanupUpperMs']<=250 and proof['earliestCleanupMarginMs']>=0 and proof['successfulResults']==proof['successReceipts']==proof['successAudits']==0,
                     'OMQ_NATURAL_CANCEL_RACE')
         else:
             require(proof['formalCancelCommitted'] and proof['sameExecutionActiveAtCommit'] and

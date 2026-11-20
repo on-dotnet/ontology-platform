@@ -249,6 +249,10 @@ class NaturalCancelEvidenceTests(unittest.TestCase):
                native('PHYSICAL_RELEASE',169),owned('PHYSICAL_DISPOSED',170),owned('CONFIRMED',171),
                event('OracleBranchRelease',confirmed='True',observedUtc=utc(172)),
                event('OracleCleanupCas',fence='1',released='True',observedUtc=utc(180))]
+        def cleanup(trigger,when,deadline):
+            return event('OracleSourceCleanup',trigger=trigger,utc=utc(when),acquisition=acquisition,
+                         deadlineUtc=utc(deadline),remainingTicks=str((deadline-when)*10000))
+        api.extend([cleanup('WORK_FAILURE',156,405),cleanup('PHYSICAL_DISPOSE',167,405),cleanup('FINAL',170,405)])
         commit = dict(name='OracleCancelCommit',query=query,originalFence='1',terminalFence='2',lowerUtc=utc(148),upperUtc=utc(151))
         original = dict(id=query,state='RUNNING',owner=owner,fence=1,cancel=False,deadline=utc(5000),observed=utc(104),
                         hash=None,bytes=None,receipts=0,cancelAudits=0,successAudits=0)
@@ -272,6 +276,7 @@ class NaturalCancelEvidenceTests(unittest.TestCase):
                 record=self.record()
                 if with_post:
                     api=record['logs']['api']
+                    api[:]=[e for e in api if e.get('trigger')!='WORK_FAILURE']
                     api[6].update(phase='COMMITTED',utc='2026-11-20T00:00:00.132Z')
                     api[7].update(utc='2026-11-20T00:00:00.133Z')
                     api[8:8]=[dict(api[7],phase='POST_STARTED',utc='2026-11-20T00:00:00.135Z'),
@@ -295,9 +300,9 @@ class NaturalCancelEvidenceTests(unittest.TestCase):
             'unclosed-post':lambda r:r['logs']['api'].insert(8,dict(r['logs']['api'][7],phase='POST_STARTED')),
             'source-session':lambda r:r['source']['events'][1].update(serial='2'),
             'another-execution':lambda r:r['source']['events'][1].update(previousExecution='29'),
-            'no-cas':lambda r:r['logs']['api'][-1].update(released='False'),
+            'no-cas':lambda r:next(e for e in r['logs']['api'] if e['name']=='OracleCleanupCas').update(released='False'),
             'wrong-owner':lambda r:r['platformStates'][0].update(owner='other'),
-            'wrong-fence':lambda r:r['logs']['api'][-1].update(fence='2'),
+            'wrong-fence':lambda r:next(e for e in r['logs']['api'] if e['name']=='OracleCleanupCas').update(fence='2'),
             'not-eof':lambda r:r['cursorAfter']['0'].__setitem__(2,1),
             'lost-readback':lambda r:r['terminalReadback'].update(commandId=''),
             'wrong-result':lambda r:r['terminalReadback']['state'].update(receipts=1),
@@ -307,6 +312,39 @@ class NaturalCancelEvidenceTests(unittest.TestCase):
                 record=self.record()
                 mutate(record)
                 self.assertFalse(observer.classify(record).get('naturalCompletionBeforeCancel'))
+
+    def test_earlier_driver_cleanup_and_cross_execution_identity_remain_binding(self):
+        def shift(e,offset_ms):
+            base=observer.ns(e['utc'])
+            when=observer.dt.datetime.fromtimestamp((base+offset_ms*1_000_000)/1e9,observer.ZONE)
+            e.update(deadlineUtc=when.isoformat(timespec='microseconds'),remainingTicks=str(offset_ms*10000))
+        def late_from_local_trigger(r):
+            early=r['logs']['api'][-3]
+            shift(early,22)
+            shift(r['logs']['api'][-1],8)
+        def ambiguous_dispatch(r):
+            begin=r['logs']['api'][0]
+            r['logs']['api'].append(dict(begin,name='OracleCancelDispatch',owner='other',cleanupRemainingMs='25'))
+        for case,mutate in {
+            'earlier-than-platform-250':late_from_local_trigger,
+            'missing-final':lambda r:r['logs']['api'].pop(),
+            'missing-physical':lambda r:r['logs']['api'].pop(-2),
+            'no-first-failure':lambda r:r['logs']['api'].pop(-3),
+            'unknown-trigger':lambda r:r['logs']['api'][-3].update(trigger='UNREGISTERED'),
+            'expiry':lambda r:shift(r['logs']['api'][-1],0),
+            'inconsistent-ticks':lambda r:r['logs']['api'][-1].update(remainingTicks='1'),
+            'cross-acquisition':lambda r:r['logs']['api'][-1].update(acquisition='e'*32),
+            'ignored-earliest':lambda r:shift(r['logs']['api'][-3],25),
+            'dispatch-owner':ambiguous_dispatch,
+        }.items():
+            with self.subTest(case=case):
+                record=self.record()
+                mutate(record)
+                self.assertFalse(observer.classify(record).get('naturalCompletionBeforeCancel'))
+        record=self.record()
+        record['logs']['api'][-1]['execution']='e'*32
+        with self.assertRaisesRegex(ValueError,'MULTIPLE_BRANCH_IDENTITIES'):
+            observer.classify(record)
 
     def test_old_witness_preserves_original_result_fields(self):
         record=self.record()

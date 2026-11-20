@@ -321,6 +321,7 @@ def log_events(container, query, start, arrivals, stop):
         'OracleSourceSession':['query','execution','instance','sid','audsid','unified','con','utc'],
         'OracleSourceEvent':['action','query','execution','utc'],
         'OracleSourceOwnership':['phase','query','execution','acquisition','utc'],
+        'OracleSourceCleanup':['trigger','query','execution','acquisition','utc','deadlineUtc','remainingTicks'],
         'OracleBranchRelease':['query','execution','confirmed','observedUtc'],
         'OracleCleanupCas':['query','execution','fence','released','observedUtc']}
     process = subprocess.Popen([*DOCKER,'logs','--timestamps','--follow','--since',start,container],
@@ -350,9 +351,13 @@ def log_events(container, query, start, arrivals, stop):
                         continue
                     if 'phase' in row and not valid_ownership(row):
                         row['phase'],row['acquisition']='UNKNOWN','UNKNOWN'
+                    if 'trigger' in row and (not re.fullmatch(r'[A-Z_]{1,30}',row['trigger']) or
+                                              not re.fullmatch(r'-?[0-9]{1,19}',row['remainingTicks']) or
+                                              not re.fullmatch(CLIENT,row['acquisition'])):
+                        row['trigger'],row['remainingTicks'],row['acquisition']='UNKNOWN','0','UNKNOWN'
                     if 'owner' in row and not re.fullmatch(r'oracle-execution-[a-zA-Z0-9._:-]{1,160}',row['owner']):
                         continue
-                    for key in ('utc','workDeadlineUtc','branchDeadlineUtc','observedUtc','lowerUtc','upperUtc'):
+                    for key in ('utc','workDeadlineUtc','branchDeadlineUtc','observedUtc','lowerUtc','upperUtc','deadlineUtc'):
                         if key in row:
                             utc(row[key])
                     for key in ('fence','instance','sid','audsid','unified','con','originalFence','terminalFence'):
@@ -385,6 +390,37 @@ def valid_ownership(event):
     return (event['phase'] in ('ACQUIRED','READ_RETURNED','COMMITTED','ROLLED_BACK','TX_DISPOSED','POST_STARTED',
                                'POST_RETURNED','PHYSICAL_DISPOSED','CONFIRMED') and
             bool(re.fullmatch(CLIENT,event['acquisition'])))
+
+
+def source_cleanup_deadline(api, acquisition, begin, phase, low):
+    """采用生产驱动首因与确认前的最紧单调余量；缺终结采样时不可外推清理窗口。"""
+    cleanup = [e for e in api if e['name']=='OracleSourceCleanup']
+    final = [e for e in cleanup if e['trigger']=='FINAL']
+    physical = [e for e in cleanup if e['trigger']=='PHYSICAL_DISPOSE']
+    allowed = {'WORK_CANCELLED','DIRECTED_CANCEL','WORK_FAILURE','RESOURCE_FAILURE','PHYSICAL_DISPOSE','FINAL'}
+    if len(final)!=1 or len(physical)!=1:
+        return None
+    if not ns(physical[0]['utc']) <= phase['PHYSICAL_DISPOSED'] <= ns(final[0]['utc']) <= phase['CONFIRMED']:
+        return None
+    if 'ROLLED_BACK' in phase and not any(e['trigger']=='WORK_FAILURE' and ns(e['utc'])<=phase['ROLLED_BACK'] for e in cleanup):
+        return None
+    deadlines = []
+    for e in cleanup:
+        if (e['acquisition']!=acquisition or not re.fullmatch(r'-?[0-9]{1,19}',e['remainingTicks']) or
+                e['trigger'] not in allowed or not phase['ACQUIRED'] <= ns(e['utc']) <= ns(final[0]['utc'])):
+            return None
+        ticks = int(e['remainingTicks'])
+        if not 0 < ticks <= 2_500_000 or ns(e['deadlineUtc'])!=ns(e['utc'])+100*ticks:
+            return None
+        deadlines.append(low(e['deadlineUtc'],'api'))
+    if low(final[0]['deadlineUtc'],'api')!=min(deadlines):
+        return None
+    dispatch = [e for e in api if e['name']=='OracleCancelDispatch']
+    if len(dispatch)>1 or any(e['fence']!=begin['fence'] or e['owner']!=begin['owner'] or
+                              e['branchDeadlineUtc']!=begin['branchDeadlineUtc'] or e['workDeadlineUtc']!=begin['workDeadlineUtc']
+                              for e in dispatch):
+        return None
+    return min(deadlines)
 
 
 def natural_cancel_evidence(record, info, begin, session, commit, release, cas, settled, stats, audit, low, high):
@@ -473,9 +509,13 @@ def natural_cancel_evidence(record, info, begin, session, commit, release, cas, 
     if last+1 >= len(source):
         return False
     first_gone = source[last+1]
+    source_deadline = source_cleanup_deadline(api,acquisition,begin,phase,low)
+    if source_deadline is None:
+        return False
     end = max(high(first_gone['hi'],'source'),high(events['PHYSICAL_RELEASE']['utc'],'api'),
               high(release['observedUtc'],'api'),high(cas['observedUtc'],'api'),high(settled['observed'],'pg'))
-    earliest = min(low(begin['branchDeadlineUtc'],'api'),low(terminal['deadline'],'api'),commit_lo+250_000_000)
+    earliest = min(source_deadline,low(begin['branchDeadlineUtc'],'api'),low(terminal['deadline'],'api'),commit_lo+250_000_000)
+    info['earliestCleanupMarginMs'] = (earliest-end)/1e6
     info['naturalCleanupUpperMs'] = (end-commit_lo)/1e6
     return (0 <= end-commit_lo and end <= earliest and 0<=info['branchUpperMs']<=1000 and 0<=info['totalUpperMs']<=5000)
 
