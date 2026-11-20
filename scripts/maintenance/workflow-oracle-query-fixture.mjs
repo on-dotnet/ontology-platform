@@ -125,9 +125,13 @@ export function authSessions(root, actors) {
   const input = actors.map(actor => ({ subjectId: actor.me.subjectId, cookie: actor.sessionCookie }));
   try { return platform(root, "q.session_preflight(json.load(sys.stdin),210)", input); }
   catch (error) {
-    const allowed = /OMQ_SESSION_(SUBJECT_MISMATCH|TTL_INSUFFICIENT|REVOKED|TICKET_UNAVAILABLE)\b/.exec(String(error.stderr));
-    throw loginFailure(allowed?.[0] ?? "ORACLE_LOGIN_SESSION_PROBE_FAILED");
+    throw loginFailure(sessionRejection(error.stderr));
   }
+}
+
+export function sessionRejection(stderr) {
+  const match = /^ValueError: ORACLE_ADMISSION_(OMQ_SESSION_(?:SUBJECT_MISMATCH|TTL_INSUFFICIENT|REVOKED|TICKET_UNAVAILABLE))_[a-f0-9]{32}$/m.exec(String(stderr));
+  return match?.[1] ?? "ORACLE_LOGIN_SESSION_PROBE_FAILED";
 }
 
 /** 沿既有 grant_transaction 真实签发并回读；过期原件不能靠同一 ID 覆盖。 */

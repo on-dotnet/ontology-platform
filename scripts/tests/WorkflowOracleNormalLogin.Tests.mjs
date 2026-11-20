@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 process.env.OMQ_PRODUCT_RUN ??= "product-resume-01";
-const { completeCurrentLogin, currentProjection, loginOutcome, originalSubject, runId } = await import("../maintenance/workflow-oracle-query-fixture.mjs");
+const { completeCurrentLogin, currentProjection, loginOutcome, originalSubject, runId, sessionRejection } = await import("../maintenance/workflow-oracle-query-fixture.mjs");
 
 const issuer = "http://localhost:15743/realms/g2-180e1435711f03fa";
 const login = issuer + "/protocol/openid-connect/auth";
@@ -99,6 +99,14 @@ test("the registered browser predicate distinguishes issuer errors and the exact
     globalThis.location = callback;
     assert.equal(loginOutcome(origins), "CALLBACK");
   } finally { delete globalThis.location; delete globalThis.document; }
+});
+
+test("only the backend failure for an identified session command supplies the classification", () => {
+  for (const kind of ["SUBJECT_MISMATCH", "TTL_INSUFFICIENT", "REVOKED", "TICKET_UNAVAILABLE"]) {
+    const message = "ValueError: ORACLE_ADMISSION_OMQ_SESSION_" + kind + "_";
+    assert.equal(sessionRejection(message + "a".repeat(32) + "\n"), "OMQ_SESSION_" + kind);
+    assert.equal(sessionRejection(message + "unexpected"), "ORACLE_LOGIN_SESSION_PROBE_FAILED");
+  }
 });
 
 test("approved public identity and realm", async () => {
