@@ -118,10 +118,10 @@ class Originals:
     def read(self, name):
         return json.loads(self.raw(name))
 
-    def command(self, cid, argv, stage, input_key, parent_id, cwd):
+    def command(self, cid, argv, stage, input_key, parent_id, cwd, *, command_run=None):
         require(COMMAND.fullmatch(cid), 'OMQ_COMMAND_ID')
         row = self.read(cid+'-receipt.json')
-        require(row['schemaVersion'] == 2 and row['commandId'] == cid and row['taskId'] == TASK and row['runId'] == RUN
+        require(row['schemaVersion'] == 2 and row['commandId'] == cid and row['taskId'] == TASK and row['runId'] == (command_run or RUN)
                 and row['stage'] == stage and row['parentId'] == parent_id and row['started'] is True and row['signal'] is None
                 and row['cwd'] == str(cwd) and row['commandSummary'] == summary(argv) and row['inputFingerprint'] == input_key,
                 'OMQ_COMMAND_BINDING')
@@ -256,7 +256,7 @@ def verify_product_manifest(host,manifest,manifest_hash):
         require(len(expected)==len(actual) and {nets[k] for k in expected}==set(actual),'OMQ_RESUME_SERVICE_NETWORKS')
 
 
-def host_observation(archive, host, api_build, origin):
+def host_observation(archive, host, api_build, origin, *, session_directory=None):
     """重开准确容器安全字段、冻结程序集、只读挂载与原 Docker 命令。"""
     from workflow_oracle_mapping_platform import HOST_FORMAT, IMAGES
     from workflow_oracle_mapping_resources import SOURCE
@@ -303,6 +303,11 @@ def host_observation(archive, host, api_build, origin):
             require(len(root_mount)==1 and root_mount[0]['RW'] is False and
                     root_mount[0]['Source'].removeprefix('/host_mnt') == str(origin/snapshot['directory'])
                     and not any(m['Destination'].startswith('/app/') for m in mounts), 'OMQ_OBSERVED_SNAPSHOT')
+        if role=='api-secondary' and session_directory is not None:
+            ticket_mount=[m for m in mounts if m['Destination']=='/session-tests' or m['Destination'].startswith('/session-tests/')]
+            require(len(ticket_mount)==1 and ticket_mount[0]['Type']=='bind' and ticket_mount[0]['Destination']=='/session-tests'
+                    and ticket_mount[0]['RW'] is False and ticket_mount[0]['Source'].removeprefix('/host_mnt')==str(session_directory),
+                    'OMQ_AUTH_SESSION_LIVE_MOUNT')
     return row
 
 
@@ -404,6 +409,98 @@ def audit_observation(archive, audit, row, host, origin, measured=None):
     return records
 
 
+def auth_test_snapshot(archive,origin,tests):
+    """重开 AgentTests 的实际构建、双流、冻结文件清单及副实例的只读挂载配方。"""
+    import workflow_m2_build as build
+    snapshot=archive.read('agent-snapshot.json')
+    inputs=archive.read('formal-api-inputs.json')
+    build_row=archive.read('agent-build-binding.json')
+    prefix=str(Path(build.TARGETS['agent']).parent/'bin/Debug/net10.0')+'/'
+    files={p.removeprefix(prefix):digest for p,digest in build_row['outputs'].items() if p.startswith(prefix)}
+    identity={k:snapshot[k] for k in ('files','inputs','commandId','environment','taskId','resourceRun')}
+    sid=digest_value(identity)
+    require(snapshot['schemaVersion']==2 and (snapshot['taskId'],snapshot['resourceRun'])==(TASK,PRODUCT_RUN)
+            and snapshot['snapshotId']==sid==inputs['sessionSnapshotId'] and snapshot['inputs']==tests
+            and snapshot['files']==files and 'OntologyPlatform.AgentTests.dll' in files
+            and snapshot['directory']==f'artifacts/workflow/{TASK}/{PRODUCT_RUN}/runtime-snapshots/{sid}','OMQ_AUTH_SESSION_SNAPSHOT')
+    directory=origin/snapshot['directory']
+    spec=archive.read('formal-api-compose.json')['services']['api-secondary']['volumes']
+    require([v for v in spec if v.split(':')[1]=='/session-tests' or v.split(':')[1].startswith('/session-tests/')]
+            ==[str(directory)+':/session-tests:ro'],'OMQ_AUTH_SESSION_RECIPE')
+    cid=snapshot['commandId']
+    run=archive.read(cid+'-receipt.json')['runId']
+    command=build_row['command']
+    require(COMMAND.fullmatch(run) and command[1:]==['build',build.TARGETS['agent'],'--no-restore','--disable-build-servers','-m:1','-v:q']
+            and Path(command[0]).is_absolute() and Path(command[0]).name=='dotnet','OMQ_AUTH_BUILD_ARGV')
+    argv=['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network*)',*command]
+    row,out,err=archive.command(cid,argv,'command',tests['inputKey'],None,origin,command_run=run)
+    streams=origin/'artifacts/workflow'/TASK/'commands'/run/cid
+    require(row['classification']=='SUCCESS' and row['exitCode']==0 and row['deadlineSeconds']==180
+            and row['stdout']['path']==str(streams/'stdout.txt') and row['stderr']['path']==str(streams/'stderr.txt')
+            and snapshot['environment']=={'toolEnvironment':row['environmentFingerprint']}
+            and out+err==archive.raw('agent-bound-build.txt'),'OMQ_AUTH_AGENT_COMPILE')
+    return directory,utc(row['endedAtUtc'])
+
+
+def auth_projections(report):
+    """核正式 /me 原始字节及四主体角色站点；只接受认证入口预期的八个只读请求。"""
+    from workflow_oracle_mapping_identity_recovery import ROSTER
+    requests=report['http']
+    require(len(report['authIdentities'])==len(ROSTER)==4 and len(requests)==8,'OMQ_AUTH_HTTP_COUNT')
+    checks={c['name'] for c in report['checks'] if c['status']=='PASS'}
+    require({'distinct_oidc_subjects','oracle_four_current_tickets'}<=checks,'OMQ_AUTH_CHECKS')
+    for i,((user,subject,role,sites),ident) in enumerate(zip(ROSTER.values(),report['authIdentities'],strict=True)):
+        label=user.removeprefix('g2-')
+        csrf,me=requests[2*i:2*i+2]
+        for req,path in ((csrf,'/auth/csrf'),(me,'/api/v1/platform/me')):
+            require(set(req)=={'method','path','status','elapsedMs','sha256'} and
+                    (req['method'],req['path'],req['status'])==('GET',path,200) and
+                    req['elapsedMs']>=0 and HEX.fullmatch(req['sha256']),'OMQ_AUTH_HTTP')
+        require({name+label for name in ('real_oidc_cookie_','oracle_current_original_subject_','oracle_current_role_sites_',
+                                         'oracle_synthetic_profile_shape_')}<=checks,'OMQ_AUTH_IDENTITY_CHECKS')
+        require(set(ident)=={'label','subjectId','roles','scopes','meSha256','rawMe'} and
+                ident['meSha256']==me['sha256']==sha(ident['rawMe'].encode()),'OMQ_AUTH_ME_BYTES')
+        parsed=json.loads(ident['rawMe'])
+        require(ident['label']==label and ident['subjectId']==subject and ident['roles']==[role]
+                and parsed==dict(subjectId=subject,displayName='合成开发身份 '+label,roles=[role],scopes=ident['scopes'])
+                and sorted(ident['scopes'],key=lambda s:s['siteId'])==[dict(organizationId='org-demo',siteId=site) for site in sites],
+                'OMQ_AUTH_PROJECTION')
+    return [item[1] for item in ROSTER.values()]
+
+
+def auth_session_case(archive,report,audit,records,stage,host,api,tests,origin,inside,after):
+    """独立消费认证的当前宿主、票据进程及完整源审计窗口。"""
+    from workflow_oracle_mapping_resume import session_invocation
+    require(RUN==PRODUCT_RUN and report['scope']=='ORACLE_FOUR_CURRENT_SESSIONS' and audit['clientId'] is None
+            and not records and 'fixtureBefore' not in stage,'OMQ_AUTH_SCOPE')
+    subjects=auth_projections(report)
+    session=report['session']
+    nonce=session['nonce']
+    require(set(session)=={'nonce','commandId','observations'} and COMMAND.fullmatch(nonce),'OMQ_AUTH_SESSION_NONCE')
+    directory,built=auth_test_snapshot(archive,origin,tests)
+    cid=session['commandId']
+    parent_id=archive.read(cid+'-receipt.json')['parentId']
+    require(COMMAND.fullmatch(parent_id) and parent_id not in
+            (host['commandId'],inside['commandId'],after['commandId']),'OMQ_AUTH_SESSION_PARENT')
+    observed=host_observation(archive,{**host,'commandId':parent_id},api,origin,session_directory=directory)
+    argv=session_invocation(host['services']['api-secondary']['containerId'],nonce,210)
+    row,out,err=archive.command(cid,argv,'omq-session-real',digest_value(tests),parent_id,origin)
+    begin,end=utc(row['startedAtUtc']),utc(row['endedAtUtc'])
+    require(built<=utc(inside['startedAtUtc']) and utc(inside['endedAtUtc'])<=utc(observed['startedAtUtc']) and
+            utc(report['startedAtUtc'])<=utc(observed['startedAtUtc'])<=utc(observed['endedAtUtc'])<=begin<=end<=utc(after['startedAtUtc'])
+            and end<=utc(report['finishedAtUtc']) and row['deadlineSeconds']==22 and row['classification']=='SUCCESS'
+            and row['exitCode']==0 and mtp(out+err,1)==1,'OMQ_AUTH_SESSION_COMMAND')
+    observations=json.loads(out.splitlines()[-1])
+    require(observations==session['observations'] and len(observations)==4 and
+            [o['subjectId'] for o in observations]==subjects and len({o['sessionHash'] for o in observations})==4
+            and len({o['requiredUntilUtc'] for o in observations})==1,'OMQ_AUTH_TICKETS')
+    for item in observations:
+        require(set(item)=={'case','subjectId','ExpiresAtUtc','requiredUntilUtc','sessionHash'} and
+                item['case']=='OMQ_BROWSER_SESSION_READY' and HEX.fullmatch(item['sessionHash']),'OMQ_AUTH_OBSERVATION')
+        required=utc(item['requiredUntilUtc'])
+        require(begin<=required-dt.timedelta(seconds=210)<=end and utc(item['ExpiresAtUtc'])>required,'OMQ_AUTH_TTL')
+
+
 def persistence_case(report, audit, stage, raw_result=None):
     """重开单表正例与新会话恢复的实际 HTTP、准确主体、原字节及整个浏览器命令读审计。"""
     require(audit['clientId'] is None,'OMQ_S1_AUDIT_CLIENT_FILTER')
@@ -450,6 +547,8 @@ def reopen_browser(archive, entry, origin, mode, case):
             <= utc(after['startedAtUtc']) <= utc(after['endedAtUtc']) <= utc(row['endedAtUtc']), 'OMQ_HOST_WINDOW')
     audit = archive.read(entry['audit'])
     records = audit_observation(archive,audit,row,host,origin,measured)
+    if mode=='s0-oracle-auth':
+        auth_session_case(archive,report,audit,records,entry['stageInputs'],host,api,tests,origin,inside,after)
     if mode in ('s0-oracle-natural','s0-oracle-cancel',NATURAL_CANCEL):
         from workflow_oracle_mapping_formal_observer import classify
         witness = report['oracleWitness']
@@ -614,6 +713,10 @@ class RuntimeOriginals(Originals):
         host=self.dispatch['host']
         if command:
             path=self.area.parent/'commands'/RUN/command[1]/command[2]
+            if self.dispatch['mode']=='s0-oracle-auth' and not path.is_file() and command[1]==self.read('agent-snapshot.json')['commandId']:
+                candidates=list((self.area.parent/'commands').glob('*/'+command[1]+'/'+command[2]))
+                require(len(candidates)==1 and COMMAND.fullmatch(candidates[0].parents[1].name),'OMQ_AUTH_BUILD_ORIGINAL')
+                path=candidates[0]
         elif name in ('api-build-binding.json','agent-build-binding.json','api-bound-build.txt','agent-bound-build.txt','web-build-binding.json'):
             path=self.area.parent/name
         elif name=='formal-resources.json' and self.dispatch['runId']==PRODUCT_RUN:
@@ -627,6 +730,10 @@ class RuntimeOriginals(Originals):
             path=self.choose('formal-api-inputs*.json',bound_inputs)
         elif name=='formal-api-compose.json':
             path=self.choose('formal-api-compose*.json',lambda data: sha(data)==host['composeSha256'])
+        elif name=='agent-snapshot.json' and self.dispatch['mode']=='s0-oracle-auth':
+            snapshot=self.read('formal-api-inputs.json')['sessionSnapshotId']
+            require(HEX.fullmatch(snapshot),'OMQ_AUTH_SESSION_SNAPSHOT_ID')
+            path=self.area/'runtime-snapshots'/(snapshot+'.json')
         elif name=='api-snapshot.json':
             path=self.area/'runtime-snapshots'/(host['snapshotId']+'.json')
         elif self.dispatch['mode']=='s1' and name==self.dispatch['reports'][0][:-5]+'-result.json':
