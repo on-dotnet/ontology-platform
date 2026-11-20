@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **PRODUCT_RESUME_REVIEW_BLOCKED**。源读取及正式结算已修改。替代 API 的当前资源窗口已按身份登记，真实 PG 三态锁内截止通过。按用户最终限定，本批另已核实一个重置账号的正式 /me 和登录审计。详见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/report.md)。本批按 [唯一 A–F](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md) 的 AC03-A/C 决定 S1 准入，S1 通过后才进入 S2/S3 功能验证。AC03-B 及 Oracle S0 仍 BLOCKED，G4 PARTIAL，AI OFF。
+唯一任务状态 **AUTH_HANDOFF_IMPLEMENTING**。源读取及正式结算已修改。替代 API 的当前资源窗口已按身份登记，真实 PG 三态锁内截止通过。按用户最终限定，本批另已核实一个重置账号的正式 /me 和登录审计。详见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/report.md)。本批按 [唯一 A–F](../evidence/G4-ORACLE-MAPPING-QUERY-001/contract-admission-request.md) 的 AC03-A/C 决定 S1 准入，S1 通过后才进入 S2/S3 功能验证。AC03-B 及 Oracle S0 仍 BLOCKED，G4 PARTIAL，AI OFF。
 
 ## 执行身份与所有权
 
@@ -38,3 +38,12 @@ s0-recovery-02 以 454d1a2f17581673cbbf44900a5fe241d603f5ef 为 Base。OIDC 与 
 本批认证窗口已关闭，0/4 个原主体完成新登录，OIDC 为 WAITING_FOR_USER_AUTH。RustFS 实际及独立封存参考各遍历三页，5 个版本、0 个删除标记一致。资源停止后态已核对，RC05 仍 BLOCKED。[本批交接](../evidence/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-02/report.md)
 
 product-resume-01 从 `4924f44ec1628b156d7e722513405bc13d376d8e` 开始。Master 负责证据消费、产品阶段准入、共享文件集成和真实资源。独立写者分别负责 Oracle 生命周期及 Connections/Query 回归、SelfTest 夹具及其执行预算。非作者先复核登录原件和竞态切片，再审实际交付。
+
+
+## auth-handoff-01 执行追踪
+
+Base `33e66879a6b48e25580f1623316b88fe5a5e85cc`；Master 单写 `workflow-m4-query.mjs`、Oracle fixture/plan/platform/evidence、受影响 tests、gate登记、本卡/当前授权/唯一A–F及本批三文件。其它产品、构建、依赖锁、私有材料、旧原件只读。非作者 `/root/auth_review` 只读审查真实调用链和原件。
+
+固定执行顺序：auth → AC03-A natural-cancel → Mapping当前正式链核验／必要补齐 → S1 → reader-auth → s1-reopen。前后处理各60秒，auth600秒，四产品槽各180秒，新reader认证180秒，父截止1620秒。没有可选尾阶段。前置失败或取消不进入后续；产品5秒／源分支1秒／清理250ms不变。每阶段前重核必要会话与授权210秒；新reader会话只替换reader。auth不读源、不续授、不发布；恢复只读平台存储。
+
+正反例由现有Node/Python框架定向回归：超过40秒人工等待后成功、提交后40秒与未提交区分、CSRF/me共用剩余期限、快速提交、取消/失败止步、实际驱动连续A/S1与新reader、真实外层/资格固定计划、替换阶段/父命令及越期拒绝。真实服务只在回归和非作者阻断闭合后开一次窗口。历史三次失败、旧1/1、S0/B阻断与cleanup NOT_QUALIFIED保持。

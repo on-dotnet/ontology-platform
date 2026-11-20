@@ -31,7 +31,7 @@ ERRORS = {'healthy': None, 'expired': 'OMQ_READY_GRANT_EXPIRED', 'short': 'OMQ_R
           'catalog': 'OMQ_READY_CATALOG_STALE', 'activation': 'OMQ_READY_ACTIVATION_STALE'}
 BROWSER = {'provision', 'mapping', READY, 's0-oracle-natural', 's0-oracle-cancel', NATURAL_CANCEL, 's1', 's1-reopen', 's3', 'ui-s1', 'ui-s3'}
 if RUN==PRODUCT_RUN:
-    BROWSER.add('s0-oracle-auth')
+    BROWSER.update(('s0-oracle-auth','auth-handoff-s1','reader-auth'))
 HEX = re.compile(r'[0-9a-f]{64}')
 COMMAND = re.compile(r'[0-9a-f]{32}')
 PUBLIC = Path('docs/evidence') / TASK / RUN
@@ -51,13 +51,25 @@ def summary(argv):
     return dict(executable=Path(argv[0]).name, argumentCount=len(argv)-1, sha256=digest_value(argv))
 
 
+def batch_plan(root):
+    plan=json.loads(ordinary(root/'scripts/maintenance/workflow-oracle-auth-plan.json').read_bytes())
+    expected=[('s0-oracle-auth','authentication',600),(NATURAL_CANCEL,'product',180),('mapping','product',180),
+              ('s1','product',180),('reader-auth','authentication',180),('s1-reopen','product',180)]
+    require(plan==dict(schemaVersion=1,planId='auth-handoff-01',mode='auth-handoff-s1',preSeconds=60,postSeconds=60,
+                      submissionSeconds=40,requiredSessionSeconds=210,stages=[dict(mode=m,kind=k,seconds=s) for m,k,s in expected],
+                      deadlineSeconds=60+600+4*180+180+60),'OMQ_BATCH_PLAN')
+    return plan
+
+
 def drivers(root, mode, run=RUN):
     names = DRIVERS
     if run==PRODUCT_RUN:
         names += ('scripts/maintenance/workflow_oracle_mapping_resume.py',
                   'scripts/maintenance/workflow_oracle_mapping_platform_recovery.py','scripts/maintenance/workflow_m4_query_runtime.py')
-    if mode in ('s0-oracle-natural', 's0-oracle-cancel', NATURAL_CANCEL):
+    if mode in ('s0-oracle-natural', 's0-oracle-cancel', NATURAL_CANCEL, 'auth-handoff-s1'):
         names += ('scripts/maintenance/workflow_oracle_mapping_formal_observer.py',)
+    if mode=='auth-handoff-s1':
+        names += ('scripts/maintenance/workflow-oracle-auth-plan.json',)
     return {name: sha(ordinary(root/name).read_bytes()) for name in names}
 
 
@@ -86,12 +98,16 @@ def _browser_invocation(mode, case, host, api_build, test_build, stage_inputs, p
     """供正式调用和独立重开共同推导命令。声明的 stageInputs 必须和实际选择吻合。"""
     require(mode in BROWSER and case in (ERRORS if mode == READY else ('healthy',)), 'OMQ_SCENARIO')
     require(stage_inputs['mode'] == mode and stage_inputs['case'] == case and stage_inputs['phase'] in ('s0', 's1', 's2', 's3'), 'OMQ_STAGE')
-    require(stage_inputs['phase'] == ('s0' if mode.startswith('s0-') or mode in ('provision', 'mapping')
+    require(stage_inputs['phase'] == ('s0' if mode.startswith('s0-') or mode in ('provision', 'mapping', 'auth-handoff-s1', 'reader-auth')
                                       else 's3' if mode in ('s3', 'ui-s3') else 's1'), 'OMQ_PHASE')
     require(host['buildInputKey'] == api_build['inputKey'] and host['buildOutputKey'] == api_build['outputKey'], 'OMQ_HOST_BUILD')
     for binding in (api_build, test_build):
         require(set(binding) == {'receiptSha256','inputKey','outputKey'} and all(HEX.fullmatch(v) for v in binding.values()), 'OMQ_BUILD_KEY')
     args = [NODE, DRIVER, '--task', TASK, '--run-id', RUN, '--mode', mode]
+    if mode=='auth-handoff-s1':
+        require(stage_inputs['plan']==batch_plan(ROOT) and COMMAND.fullmatch(stage_inputs['executionId']) and
+                stage_inputs['batchInput']=='auth-handoff-'+stage_inputs['executionId']+'.json','OMQ_BATCH_INPUT')
+        args += ['--batch-input',stage_inputs['batchInput']]
     components = dict(taskId=TASK, runId=RUN, mode=mode, case=case, drivers=pinned,
                       api=api_build, tests=test_build, host=stable_host(host), stageInputs=stage_inputs)
     return args, digest_value(components), 'omq-browser-'+mode
@@ -198,18 +214,32 @@ def measured_browser(archive, measured, mode, case, host, api, tests, stage):
 def browser_report(archive, entry, origin, mode, case, host, api_build, test_build, stage):
     """预期拒绝和健康场景使用相同命令、构建、驱动、宿主、窗口与非零检查门禁。"""
     measured=entry.get('measuredCommit')
+    batch=entry.get('batch')
+    invocation_mode='auth-handoff-s1' if batch else mode
+    invocation_stage=batch['stageInputs'] if batch else stage
     if measured:
-        argv,key,label=measured_browser(archive,measured,mode,case,host,api_build,test_build,stage)
+        argv,key,label=measured_browser(archive,measured,invocation_mode,case,host,api_build,test_build,invocation_stage)
     else:
-        argv,key,label=browser_invocation(archive.root,mode,case,host,api_build,test_build,stage)
+        argv,key,label=browser_invocation(archive.root,invocation_mode,case,host,api_build,test_build,invocation_stage)
     row, stdout, _ = archive.command(entry['commandId'], argv, label, key, host['commandId'], origin)
-    require(row['deadlineSeconds']==180, 'OMQ_BROWSER_DEADLINE')
+    require(row['deadlineSeconds']==(batch_plan(archive.root)['deadlineSeconds'] if batch else 180), 'OMQ_BROWSER_DEADLINE')
     name = entry['report']
     require(re.fullmatch('browser-'+re.escape(mode)+r'-[0-9]{13}\.json', name), 'OMQ_REPORT_NAME')
     report, result = archive.read(name), json.loads(stdout)
-    require(result['report'] == str(origin/'artifacts/workflow'/TASK/RUN/name)
-            and result['status'] == report['status'] and result['failure'] == report.get('failure')
-            and result['checks'] == len(report['checks']), 'OMQ_REPORT_OUTPUT')
+    if batch:
+        parent=archive.read(batch['report'])
+        require(result['report']==str(origin/'artifacts/workflow'/TASK/RUN/batch['report']),'OMQ_BATCH_OUTPUT_REPORT')
+        validate_batch(archive,parent,result,row,invocation_stage,origin)
+        matches=[r for r in parent['stages'] if r['mode']==mode and Path(r['report']).name==name]
+        require(len(matches)==1,'OMQ_BATCH_STAGE_SELECTION')
+        item=matches[0];spec=invocation_stage['plan']['stages'][item['index']]
+        require(report['batch']==dict(executionId=invocation_stage['executionId'],planId='auth-handoff-01',index=item['index'],**spec)
+                and report['stageInputs']==stage and item['startedAtUtc']==report['startedAtUtc'] and item['finishedAtUtc']==report['finishedAtUtc']
+                and item['elapsedMs']==report['elapsedMs'] and 0<=report['elapsedMs']<=spec['seconds']*1000,'OMQ_BATCH_STAGE_IDENTITY')
+    else:
+        require(result['report'] == str(origin/'artifacts/workflow'/TASK/RUN/name)
+                and result['status'] == report['status'] and result['failure'] == report.get('failure')
+                and result['checks'] == len(report['checks']), 'OMQ_REPORT_OUTPUT')
     require(report['taskId'] == TASK and report['runId'] == RUN and report['mode'] == mode and report['inputsUnchanged'] is True
             and not report.get('bindingFailure') and not report.get('networkFailure') and not report.get('externalRequests')
             and report['http'] and report['checks'], 'OMQ_REPORT_INPUT')
@@ -223,16 +253,49 @@ def browser_report(archive, entry, origin, mode, case, host, api_build, test_bui
     if RUN==PRODUCT_RUN:
         require(report.get('browser',{}).get('authentication')=='INTERACTIVE_OIDC' and report['browser']['channel']=='msedge' and
                 re.fullmatch(r'[0-9]+(?:\.[0-9]+){1,3}',report['browser']['version']) and
-                {'oracle_current_original_subject_'+name for name in ('operator-ab','auditor-ab','operator-a','viewer-a')}
+                {'oracle_current_original_subject_'+name for name in (('viewer-a',) if mode=='reader-auth' else ('operator-ab','auditor-ab','operator-a','viewer-a'))}
                 <= {c['name'] for c in report['checks'] if c['status']=='PASS'},'OMQ_RESUME_NORMAL_OIDC')
     expected = ERRORS[case] if mode == READY else None
     if expected:
         require(row['exitCode'] == 1 and row['classification'] == 'EXIT_FAILURE' and report['status'] == 'FAIL'
                 and report['failure']['code'] == expected and report['failure']['phase'] == 'oracle_scenario_ready', 'OMQ_EXPECTED_REJECTION')
     else:
-        require(row['exitCode'] == 0 and row['classification'] == 'SUCCESS' and report['status'] == 'PASS'
+        require((batch is not None or row['exitCode'] == 0 and row['classification'] == 'SUCCESS') and report['status'] == 'PASS'
                 and all(check['status'] == 'PASS' for check in report['checks']), 'OMQ_HEALTHY')
     return report, row
+
+
+def validate_batch(archive,parent,result,row,stage,origin):
+    """真实父命令的固定计划、顺序、时间和原件逐一核对，阶段不是虚构子进程。"""
+    plan=batch_plan(archive.root)
+    require(stage['plan']==plan and parent['input']==dict(executionId=stage['executionId'],plan=plan)
+            and parent['taskId']==TASK and parent['runId']==PRODUCT_RUN and parent['mode']=='auth-handoff-s1','OMQ_BATCH_PARENT')
+    require(result==dict(status=parent['status'],report=str(origin/'artifacts/workflow'/TASK/RUN/Path(result['report']).name),stages=parent['stages'])
+            and re.fullmatch(r'browser-auth-handoff-s1-[0-9]{13}\.json',Path(result['report']).name),'OMQ_BATCH_OUTPUT')
+    require(row['classification'] in ('SUCCESS','EXIT_FAILURE') and row['exitCode']==(0 if parent['status']=='PASS' else 1)
+            and 0<=row['elapsedSeconds']<=plan['deadlineSeconds'] and 0<=parent['preMs']<=60000 and 0<=parent['postMs']<=60000,
+            'OMQ_BATCH_DEADLINE')
+    previous=utc(parent['startedAtUtc'])
+    require(utc(row['startedAtUtc'])<=previous<=utc(parent['finishedAtUtc'])<=utc(row['endedAtUtc']),'OMQ_BATCH_WINDOW')
+    require(0<len(parent['stages'])<=len(plan['stages']),'OMQ_BATCH_COUNT')
+    for index,item in enumerate(parent['stages']):
+        spec=plan['stages'][index]
+        require(item['index']==index and item['mode']==spec['mode'] and previous<=utc(item['startedAtUtc'])<=utc(item['finishedAtUtc'])
+                <=utc(parent['finishedAtUtc']) and (index==len(parent['stages'])-1 or item['status']=='PASS'),'OMQ_BATCH_ORDER')
+        name=Path(item['report']).name
+        require(item['report']==str(origin/'artifacts/workflow'/TASK/RUN/name) and re.fullmatch('browser-'+spec['mode']+r'-[0-9]{13}\.json',name),'OMQ_BATCH_MEMBER')
+        original=archive.read(name)
+        require(item==dict(status=original['status'],phase=item['phase'],report=item['report'],checks=len(original['checks']),
+                          failure=original.get('failure'),mode=original['mode'],index=index,reportSha256=sha(archive.raw(name)),startedAtUtc=original['startedAtUtc'],
+                          finishedAtUtc=original['finishedAtUtc'],elapsedMs=original['elapsedMs']),'OMQ_BATCH_MEMBER_BINDING')
+        require(original['batch']==dict(executionId=stage['executionId'],planId=plan['planId'],index=index,**spec),'OMQ_BATCH_MEMBER_PLAN')
+        if item['status']=='PASS':
+            require(0<=item['elapsedMs']<=spec['seconds']*1000 and all(c['status']=='PASS' for c in original['checks']),'OMQ_BATCH_STAGE_DEADLINE')
+        previous=utc(item['finishedAtUtc'])
+    if parent['status']=='PASS':
+        require(len(parent['stages'])==len(plan['stages']) and all(r['status']=='PASS' for r in parent['stages']),'OMQ_BATCH_COMPLETE')
+    else:
+        require(parent.get('failure') or parent['stages'][-1]['status']=='FAIL','OMQ_BATCH_FAILURE')
 
 
 def verify_product_manifest(host,manifest,manifest_hash):
@@ -474,7 +537,11 @@ def auth_session_case(archive,report,audit,records,stage,host,api,tests,origin,i
     require(RUN==PRODUCT_RUN and report['scope']=='ORACLE_FOUR_CURRENT_SESSIONS' and audit['clientId'] is None
             and not records and 'fixtureBefore' not in stage,'OMQ_AUTH_SCOPE')
     subjects=auth_projections(report)
-    session=report['session']
+    ticket_case(archive,report,report['session'],subjects,host,api,tests,origin,inside,after)
+
+
+def ticket_case(archive,report,session,subjects,host,api,tests,origin,inside,after):
+    from workflow_oracle_mapping_resume import session_invocation
     nonce=session['nonce']
     require(set(session)=={'nonce','commandId','observations'} and COMMAND.fullmatch(nonce),'OMQ_AUTH_SESSION_NONCE')
     directory,built=auth_test_snapshot(archive,origin,tests)
@@ -531,6 +598,25 @@ def persistence_case(report, audit, stage, raw_result=None):
     return proof
 
 
+def mapping_case(report,stage):
+    from workflow_oracle_mapping_identity_recovery import ROSTER
+    proof=report['mappingQualification']
+    require(set(proof)=={'proposal','release','active'},'OMQ_MAPPING_PROOF')
+    proposal,release,active=(json.loads(proof[k]) for k in ('proposal','release','active'))
+    for kind,path in [('proposal','/api/v1/mapping-proposals/'+proposal['proposalId']),
+                      ('release','/api/v1/mapping-releases/'+stage['mappingReleaseId']),
+                      ('active','/api/v1/mappings/'+proposal['mappingId']+'/active')]:
+        require(any(r['method']=='GET' and r['path']==path and r['status']==200 and r['sha256']==sha(proof[kind].encode()) for r in report['http']),'OMQ_MAPPING_HTTP')
+    review=release['manifest']['reviewReceipt'];activation=proposal['activation']
+    require(report['scope']=='ORACLE_FORMAL_SINGLE_TABLE_MAPPING' and proposal['status']=='APPROVED'
+            and proposal['submittedBy']==ROSTER['operator'][1] and proposal['decision']['decidedBy']==ROSTER['auditor'][1]
+            and proposal['decision']['decision']=='APPROVE' and proposal['bindingHash']==proposal['decision']['bindingHash']==review['bindingHash']
+            and review['proposalId']==proposal['proposalId']==activation['proposalId']
+            and review['submittedBy']==proposal['submittedBy'] and review['decidedBy']==proposal['decision']['decidedBy']
+            and activation['manifestHash']==release['manifestHash'] and activation['mappingReleaseId']==active['mappingReleaseId']==stage['mappingReleaseId']
+            and activation['activationRevision']==active['activationRevision']==stage['activationRevision'],'OMQ_MAPPING_CHAIN')
+
+
 def reopen_browser(archive, entry, origin, mode, case):
     api = build_binding(archive, 'api', origin)
     tests = build_binding(archive, 'agent', origin)
@@ -546,9 +632,23 @@ def reopen_browser(archive, entry, origin, mode, case):
             utc(before['endedAtUtc']) <= utc(row['startedAtUtc']) <= utc(inside['startedAtUtc']) <= utc(inside['endedAtUtc'])
             <= utc(after['startedAtUtc']) <= utc(after['endedAtUtc']) <= utc(row['endedAtUtc']), 'OMQ_HOST_WINDOW')
     audit = archive.read(entry['audit'])
-    records = audit_observation(archive,audit,row,host,origin,measured)
+    window=dict(startedAtUtc=report['startedAtUtc'],endedAtUtc=report['finishedAtUtc']) if entry.get('batch') else row
+    records = audit_observation(archive,audit,window,host,origin,measured)
     if mode=='s0-oracle-auth':
         auth_session_case(archive,report,audit,records,entry['stageInputs'],host,api,tests,origin,inside,after)
+    if entry.get('batch') and mode=='mapping':
+        mapping_case(report,entry['stageInputs'])
+    if entry.get('batch') and mode!='s0-oracle-auth':
+        from workflow_oracle_mapping_identity_recovery import ROSTER
+        subjects=[v[1] for v in ROSTER.values()]
+        session=report['session'] if mode=='reader-auth' else report['sessionBefore']
+        ticket_case(archive,report,session,subjects,host,api,tests,origin,inside,after)
+        if mode in (NATURAL_CANCEL,'s1','s1-reopen'):
+            ticket_case(archive,report,report['scenarioReady']['session'],subjects,host,api,tests,origin,inside,after)
+        if mode=='reader-auth':
+            require(not records and audit['clientId'] is None and report['scope']=='ORACLE_NEW_READER_AUTHENTICATED'
+                    and len(report['authIdentities'])==1 and report['authIdentities'][0]['subjectId']==subjects[-1]
+                    and any(c==dict(name='oracle_new_reader_context',status='PASS') for c in report['checks']), 'OMQ_READER_AUTH')
     if mode in ('s0-oracle-natural','s0-oracle-cancel',NATURAL_CANCEL):
         from workflow_oracle_mapping_formal_observer import classify
         witness = report['oracleWitness']
@@ -576,7 +676,7 @@ def reopen_browser(archive, entry, origin, mode, case):
             sql = b'BEGIN READ ONLY;\n'+pg_query(key,entry['stageInputs']['readerSubjectId']).encode()+b'\nCOMMIT;'
             command,stdout,_ = archive.command(readback['commandId'],args,'omq-pg-formal-terminal-state',sha(sql),None,origin)
             require(command['exitCode']==0 and command['classification']=='SUCCESS' and command['deadlineSeconds']==15 and
-                    utc(row['startedAtUtc'])<=utc(command['startedAtUtc'])<=utc(command['endedAtUtc'])<=utc(row['endedAtUtc']) and
+                    utc(window['startedAtUtc'])<=utc(command['startedAtUtc'])<=utc(command['endedAtUtc'])<=utc(window['endedAtUtc']) and
                     json.loads(stdout)==readback['state'] and
                     [r for r in records if r['clientId']==proof['clientId']]==raw['audit']['records'],'OMQ_NATURAL_TERMINAL_ORIGINAL')
             require(report['scope']=='ORACLE_NATURAL_COMPLETION_BEFORE_PLATFORM_CANCEL' and
@@ -597,7 +697,7 @@ def reopen_browser(archive, entry, origin, mode, case):
             require(report['oraclePersistence']['reportName']==entry['report'],'OMQ_S1_ORIGINAL_REPORT')
             payload = archive.raw(entry['report'][:-5]+'-result.json')
         archive.persistence = persistence_case(report,audit,entry['stageInputs'],payload)
-        archive.persistenceWindow = {'startedAtUtc':row['startedAtUtc'],'endedAtUtc':row['endedAtUtc']}
+        archive.persistenceWindow = {'startedAtUtc':window['startedAtUtc'],'endedAtUtc':window['endedAtUtc']}
     if mode.startswith('ui-'):
         wb=archive.read('web-build-binding.json')
         import workflow_m2_build as build
@@ -713,7 +813,7 @@ class RuntimeOriginals(Originals):
         host=self.dispatch['host']
         if command:
             path=self.area.parent/'commands'/RUN/command[1]/command[2]
-            if self.dispatch['mode']=='s0-oracle-auth' and not path.is_file() and command[1]==self.read('agent-snapshot.json')['commandId']:
+            if (self.dispatch['mode']=='s0-oracle-auth' or self.dispatch.get('batch')) and not path.is_file() and command[1]==self.read('agent-snapshot.json')['commandId']:
                 candidates=list((self.area.parent/'commands').glob('*/'+command[1]+'/'+command[2]))
                 require(len(candidates)==1 and COMMAND.fullmatch(candidates[0].parents[1].name),'OMQ_AUTH_BUILD_ORIGINAL')
                 path=candidates[0]
@@ -730,12 +830,14 @@ class RuntimeOriginals(Originals):
             path=self.choose('formal-api-inputs*.json',bound_inputs)
         elif name=='formal-api-compose.json':
             path=self.choose('formal-api-compose*.json',lambda data: sha(data)==host['composeSha256'])
-        elif name=='agent-snapshot.json' and self.dispatch['mode']=='s0-oracle-auth':
+        elif name=='agent-snapshot.json' and (self.dispatch['mode']=='s0-oracle-auth' or self.dispatch.get('batch')):
             snapshot=self.read('formal-api-inputs.json')['sessionSnapshotId']
             require(HEX.fullmatch(snapshot),'OMQ_AUTH_SESSION_SNAPSHOT_ID')
             path=self.area/'runtime-snapshots'/(snapshot+'.json')
         elif name=='api-snapshot.json':
             path=self.area/'runtime-snapshots'/(host['snapshotId']+'.json')
+        elif self.dispatch.get('batch') and (name in self.dispatch['batchMembers'] or name=='formal-audit-'+self.dispatch['commandId']+'-'+self.dispatch['mode']+'.json'):
+            path=self.area/name
         elif self.dispatch['mode']=='s1' and name==self.dispatch['reports'][0][:-5]+'-result.json':
             path=self.area/name
         elif name in self.dispatch['reports'] or name in (self.dispatch['file'],'formal-audit-'+self.dispatch['commandId']+'.json') or re.fullmatch(r'formal-witness-[a-f0-9-]{36}\.json',name):
@@ -748,7 +850,7 @@ class RuntimeOriginals(Originals):
         return raw
 
 
-def reopen_runtime_case(root,task,run,cid, *, expected_mode=None):
+def reopen_runtime_case(root,task,run,cid, *, expected_mode=None, _checked=None):
     require(task==TASK and run==RUN and COMMAND.fullmatch(cid),'OMQ_COMMAND_SCOPE')
     area=ordinary(root/'artifacts/workflow'/TASK/RUN)
     entries=list(area.glob('formal-run-*-'+cid+'.json'))
@@ -756,6 +858,17 @@ def reopen_runtime_case(root,task,run,cid, *, expected_mode=None):
     dispatch=json.loads(ordinary(entries[0]).read_bytes())
     require(dispatch['taskId']==task and dispatch['runId']==run and dispatch['commandId']==cid and len(dispatch['reports'])==1
             and re.fullmatch('[0-9a-f]{40}',dispatch['testedCommit']),'OMQ_RUNTIME_DISPATCH_SCOPE')
+    batch=None
+    if dispatch['mode']=='auth-handoff-s1':
+        require(expected_mode in [x['mode'] for x in batch_plan(root)['stages']],'OMQ_BATCH_EXPECTED_MODE')
+        parent=json.loads(ordinary(area/dispatch['reports'][0]).read_bytes())
+        matches=[r for r in parent['stages'] if r['mode']==expected_mode]
+        require(len(matches)==1,'OMQ_BATCH_STAGE_NOT_RUN')
+        name=Path(matches[0]['report']).name
+        report=json.loads(ordinary(area/name).read_bytes())
+        batch=dict(report=dispatch['reports'][0],stageInputs=dispatch['stageInputs'])
+        dispatch={**dispatch,'batch':batch,'batchMembers':[dispatch['reports'][0],*[Path(r['report']).name for r in parent['stages']]],
+                  'mode':expected_mode,'reports':[name],'stageInputs':report['stageInputs']}
     require(expected_mode is None or dispatch['mode']==expected_mode,'OMQ_UNEXPECTED_ORIGIN_MODE')
     dispatch['file']=entries[0].name
     archive=RuntimeOriginals(root,dispatch)
@@ -763,14 +876,23 @@ def reopen_runtime_case(root,task,run,cid, *, expected_mode=None):
     require(source['builds']['api']==build_binding(archive,'api',root) and source['builds']['agent']==build_binding(archive,'agent',root),
             'OMQ_DISPATCH_BUILDS')
     entry=dict(commandId=cid,report=dispatch['reports'][0],host=dispatch['file'],stageInputs=dispatch['stageInputs'],
-               audit='formal-audit-'+cid+'.json')
+               audit='formal-audit-'+cid+('-'+dispatch['mode'] if batch else '')+'.json',**({'batch':batch} if batch else {}))
     checks=reopen_browser(archive,entry,root,dispatch['mode'],dispatch['case'])
     persistence = {}
+    if batch:
+        checked={} if _checked is None else _checked
+        checked[dispatch['mode']]=True
+        prerequisites={'s0-oracle-auth':[],NATURAL_CANCEL:['s0-oracle-auth'],'mapping':[NATURAL_CANCEL],
+                       's1':['mapping'],'reader-auth':['s1'],'s1-reopen':['reader-auth']}
+        for required in prerequisites[dispatch['mode']]:
+            if required not in checked:
+                reopen_runtime_case(root,task,run,cid,expected_mode=required,_checked=checked)
+        persistence['qualifiedPredecessors']=sorted(k for k in checked if k!=dispatch['mode'])
     if dispatch['mode'] in ('s1','s1-reopen'):
         persistence['persistence']=archive.persistence
         persistence['persistenceWindow']=archive.persistenceWindow
     if dispatch['mode']=='s1-reopen':
-        prior = reopen_runtime_case(root,task,run,dispatch['stageInputs']['originCommandId'],expected_mode='s1')
+        prior = reopen_runtime_case(root,task,run,cid if batch else dispatch['stageInputs']['originCommandId'],expected_mode='s1')
         original = prior['persistence']
         require(all(original[k]==archive.persistence[k] for k in ('reportName','subjectId','resultHash','queryId')) and
                 original['sessionHash']!=archive.persistence['sessionHash'] and

@@ -28,7 +28,7 @@ try {
   if(!dispatch)throw new Error("OFFLINE_REAL_DISPATCH_MISSING");
   const AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
   const invoke=new AsyncFunction("oracle","mode","omq","root","state","operator","auditor","activator","reader","get","check",
-    'let phase; '+dispatch[1]+' return current; } throw new Error("OFFLINE_MODE_NOT_DISPATCHED");');
+    'let phase; const shared = null; '+dispatch[1]+' return current; } throw new Error("OFFLINE_MODE_NOT_DISPATCHED");');
   const {row}=await invoke(true,mode,omq,root,state,...actors,get,(name,value)=>{if(!value)throw new Error(name);});
   console.log(JSON.stringify({status:row.status,runId:row.runId,mode}));
 } catch(err) {

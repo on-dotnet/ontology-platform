@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "planId": "auth-handoff-01",
+  "mode": "auth-handoff-s1",
+  "preSeconds": 60,
+  "postSeconds": 60,
+  "submissionSeconds": 40,
+  "requiredSessionSeconds": 210,
+  "stages": [
+    {
+      "mode": "s0-oracle-auth",
+      "kind": "authentication",
+      "seconds": 600
+    },
+    {
+      "mode": "s0-oracle-natural-cancel",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "mapping",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "s1",
+      "kind": "product",
+      "seconds": 180
+    },
+    {
+      "mode": "reader-auth",
+      "kind": "authentication",
+      "seconds": 180
+    },
+    {
+      "mode": "s1-reopen",
+      "kind": "product",
+      "seconds": 180
+    }
+  ],
+  "deadlineSeconds": 1620
+}

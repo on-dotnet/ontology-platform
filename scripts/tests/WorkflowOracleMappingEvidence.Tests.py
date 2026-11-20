@@ -320,7 +320,7 @@ class ProductResumeBindingTests(unittest.TestCase):
     def test_interactive_login_accepts_only_public_account_and_exact_realm(self):
         node=oracle.NODE if Path(oracle.NODE).is_file() else 'node'
         test=ROOT/'scripts/tests/WorkflowOracleNormalLogin.Tests.mjs'
-        result=subprocess.run([node,'--test',str(test)],cwd=ROOT,capture_output=True,timeout=6,
+        result=subprocess.run([node,'--test',str(test),str(test.with_name('WorkflowOracleAuthHandoff.Tests.mjs'))],cwd=ROOT,capture_output=True,timeout=6,
                               env=dict(os.environ,OMQ_PRODUCT_RUN='product-resume-01'))
         self.assertEqual(0,result.returncode,(result.stdout+result.stderr).decode())
 

@@ -113,7 +113,7 @@ class EntryFixTests(unittest.TestCase):
                     expected=resume.PRODUCT if product else platform.RUN
                     self.assertEqual((platform.TASK,expected,mode),(run['payload']['taskId'],run['payload']['runId'],run['payload']['mode']))
                     self.assertEqual({'status':'READY','runId':expected,'mode':mode},run['result'])
-                    self.assertEqual(['ready-current-catalog','ready-current-grants','ready-activation','session','fixture'],run['events'])
+                    self.assertEqual(['ready-current-catalog','ready-current-grants','ready-activation','session']+([] if mode=='s1-reopen' else ['fixture']),run['events'])
 
     def test_scope_refusals_precede_any_external_boundary(self):
         for product in (True,False):

@@ -1,10 +1,11 @@
 import { spawn, execFileSync } from "node:child_process";
 import { createInterface } from "node:readline";
+import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 
 /** 只有任务已冻结的主 API、副 API、OIDC 和 Web 可以被正式浏览器场景访问。 */
 export const ports = Object.freeze({ api: 15741, secondary: 15742, oidc: 15743, web: 15744 });
-export const modes = Object.freeze(["serve", "provision", "mapping", "s0-oracle-auth", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s0-oracle-natural-cancel", "s1", "s1-reopen"]);
+export const modes = Object.freeze(["auth-handoff-s1", "reader-auth", "serve", "provision", "mapping", "s0-oracle-auth", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s0-oracle-natural-cancel", "s1", "s1-reopen"]);
 export const config = Object.freeze({ type: "ORACLE", profile: { host: "oracle-source", port: 2484, serviceName: "FREEPDB1",
   username: "FIXTURE_READER", allowedOwners: ["PRODUCTION", "CaseOwner"], tls: true } });
 const task = "G4-ORACLE-MAPPING-QUERY-001";
@@ -45,52 +46,112 @@ export function loginOutcome({ issuer, api, realm }) {
   if (location.origin === api && location.pathname === "/signin-oidc" && !new URLSearchParams(location.search).has("error")) return false;
   return "ORACLE_LOGIN_CALLBACK_ERROR";
 }
-/** 替代卷上走正式 OIDC 表单。只传入公开用户名，密码由本机系统或操作者提交。 */
-export async function completeCurrentLogin(page, label) {
+/** 当前业务阶段只消费原单调截止，外部调用不能另起完整预算。 */
+export function stageRemaining(deadline = Infinity) {
+  const remaining = deadline - performance.now();
+  if (!(remaining > 0)) throw loginFailure("ORACLE_STAGE_TIMEOUT");
+  return Number.isFinite(remaining) ? Math.max(1, Math.floor(remaining)) : 30000;
+}
+
+/** 单调截止由首次可交互表单建立；提交后网络预算不重新发放。 */
+export function loginRemaining(deadline, now = () => performance.now()) {
+  const remaining = deadline - now();
+  if (!(remaining > 0)) throw loginFailure("ORACLE_LOGIN_SUBMITTED_TIMEOUT");
+  return Math.max(1, Math.floor(remaining));
+}
+
+/** 替代卷只提交公开用户名；只观察核准表单的请求元数据，不读取密码或请求体。 */
+export async function completeCurrentLogin(page, label, options = {}) {
   originalSubject(label);
-  const callback = url => url.origin === "http://localhost:" + ports.api && url.pathname === "/api/v1/platform/me";
+  const now = options.now ?? (() => performance.now());
+  const wait = options.wait ?? (ms => new Promise(done => setTimeout(done, ms)));
+  const window = options.window ?? { deadline: null, durationMs: 600000 };
+  const issuer = "http://localhost:" + ports.oidc, api = "http://localhost:" + ports.api;
+  const realm = "/realms/g2-180e1435711f03fa";
   const address = new URL(page.url());
-  const deadline = Date.now() + 40000;
-  if (!callback(address)) {
-    if (address.origin !== "http://localhost:" + ports.oidc || !address.pathname.startsWith("/realms/g2-180e1435711f03fa/"))
-      throw loginFailure("ORACLE_RESTORED_REALM");
-    const username = "g2-" + label;
-    await page.locator("#username").fill(username);
-    await page.bringToFront();
-    // 仅让浏览器提交它已自动填充的准确账号。脚本不取密码字段的值。
-    await page.locator("#password").focus();
-    const filled = page.locator('input#password[type="password"]:-webkit-autofill');
-    try {
-      await filled.waitFor({ state: "visible", timeout: 2000 });
-    } catch (error) {
-      if (error.name !== "TimeoutError") throw error;
+  if (address.origin !== issuer || !address.pathname.startsWith(realm + "/")) throw loginFailure("ORACLE_RESTORED_REALM");
+  const observation = { label, submitted: false, classification: "UNKNOWN", startedAtUtc: new Date().toISOString() };
+  let submittedAt, handedAt, deadline;
+  const onRequest = request => {
+    const url = new URL(request.url());
+    if (request.method() === "POST" && request.frame() === page.mainFrame()
+        && url.origin === issuer && url.pathname === realm + "/login-actions/authenticate" && submittedAt === undefined) {
+      submittedAt = now(); deadline = Math.min(window.deadline, submittedAt + 40000);
+      observation.submitted = true; observation.submittedAtUtc = new Date().toISOString();
+      options.onProgress?.({ event: "SUBMITTED", label });
     }
-    if (await filled.count()) {
-      await filled.evaluate((input, expected) => {
-        const form = input.form;
-        const submit = form?.querySelector("#kc-login");
-        if (!submit || submit.form !== form || submit.hasAttribute("formaction") || submit.hasAttribute("formmethod") ||
-            form.querySelector("#username")?.value !== expected.username) return;
-        const action = new URL(form.action);
-        if (location.origin === expected.origin && location.pathname.startsWith("/realms/g2-180e1435711f03fa/") &&
-            action.origin === expected.origin &&
-            action.pathname === "/realms/g2-180e1435711f03fa/login-actions/authenticate" &&
-            form.method.toLowerCase() === "post" && input.matches(":-webkit-autofill")) form.requestSubmit(submit);
-      }, { username, origin: address.origin }, { timeout: Math.max(1, deadline - Date.now()) });
-    }
-  }
-  // 跨导航观察同一正常认证；明确拒绝即结束，未填写只消耗本次短窗口。
+  };
+  const finish = classification => {
+    observation.classification = classification;
+    observation.finishedAtUtc = new Date().toISOString();
+    observation.humanWaitMs = Math.max(0, (submittedAt ?? now()) - (handedAt ?? now()));
+    observation.networkMs = submittedAt === undefined ? 0 : Math.max(0, now() - submittedAt);
+    return observation;
+  };
   try {
-    const result = await page.waitForFunction(loginOutcome, { issuer: "http://localhost:" + ports.oidc,
-      api: "http://localhost:" + ports.api, realm: "/realms/g2-180e1435711f03fa" },
-      { polling: 100, timeout: Math.max(1, deadline - Date.now()) });
-    const outcome = await result.jsonValue();
-    if (outcome !== "CALLBACK") throw loginFailure(outcome);
+    await page.locator("#username").fill("g2-" + label);
+    await page.locator("#password").waitFor({ state: "visible", timeout: 15000 });
+    if (!(await page.locator("#password").isEnabled()) || !(await page.locator("#kc-login").isEnabled()))
+      throw loginFailure("ORACLE_LOGIN_FORM_NOT_INTERACTIVE");
+    const valid = await page.evaluate(({ issuer, realm, username }) => {
+      const user = document.querySelector("#username"), password = document.querySelector("#password");
+      const form = user?.form, button = document.querySelector("#kc-login");
+      if (!form || password?.form !== form || button?.form !== form || user.value !== username
+          || button.hasAttribute("formaction") || button.hasAttribute("formmethod")) return false;
+      const action = new URL(form.action);
+      return location.origin === issuer && location.pathname.startsWith(realm + "/")
+        && action.origin === issuer && action.pathname === realm + "/login-actions/authenticate" && form.method.toLowerCase() === "post";
+    }, { issuer, realm, username: "g2-" + label });
+    if (!valid) throw loginFailure("ORACLE_LOGIN_FORM_MISMATCH");
+    handedAt = now();
+    window.deadline ??= Math.min(handedAt + window.durationMs, window.maxDeadline ?? Infinity);
+    deadline = window.deadline;
+    page.on("request", onRequest);
+    await page.bringToFront(); await page.locator("#password").focus();
+    observation.handoffAtUtc = new Date().toISOString();
+    observation.windowRemainingMs = Math.max(0, deadline - handedAt);
+    options.onProgress?.({ event: "FORM_INTERACTIVE", label, remainingSeconds: Math.floor((deadline - now()) / 1000),
+      entry: label === "operator-ab" ? "operator-reset-01-20261120" : "040700Z" });
+    while (true) {
+      if (options.signal?.aborted || page.isClosed()) throw loginFailure("ORACLE_LOGIN_CANCELLED");
+      if (now() >= deadline) throw loginFailure(submittedAt === undefined ? "ORACLE_LOGIN_WAITING_FOR_INPUT" : "ORACLE_LOGIN_SUBMITTED_TIMEOUT");
+      let outcome;
+      try { outcome = await page.evaluate(loginOutcome, { issuer, api, realm }); }
+      catch (error) {
+        if (!String(error.message).includes("Execution context was destroyed")) throw error;
+      }
+      if (outcome === "CALLBACK") {
+        if (submittedAt === undefined) throw loginFailure("ORACLE_LOGIN_SUBMISSION_UNKNOWN");
+        loginRemaining(deadline, now);
+        return { deadline, observation, finish, remaining: () => loginRemaining(deadline, now) };
+      }
+      if (outcome) throw loginFailure(outcome);
+      await wait(Math.min(100, Math.max(1, deadline - now())));
+    }
   } catch (error) {
-    if (error.name !== "TimeoutError") throw error;
-    throw loginFailure(new URL(page.url()).origin === "http://localhost:" + ports.oidc
-      ? "ORACLE_LOGIN_WAITING_FOR_INPUT" : "ORACLE_LOGIN_CALLBACK_ERROR");
+    if (!error.safeCode) error.safeCode = "ORACLE_LOGIN_UNKNOWN";
+    error.loginObservation = finish(error.safeCode);
+    throw error;
+  } finally { page.off("request", onRequest); }
+}
+
+/** 唯一本批固定计划，由 Python 生产者和资格消费者读取同一原件。 */
+export const authPlan = Object.freeze(JSON.parse(readFileSync(new URL("./workflow-oracle-auth-plan.json", import.meta.url), "utf8")));
+
+/** 同一个浏览器与内存 actors 串行推进；失败、取消或越期立即阻止下一阶段。 */
+export async function runAuthHandoffPlan(shared, runStage, now = () => performance.now()) {
+  shared.plan = authPlan;
+  shared.stages = [];
+  for (const [index, spec] of authPlan.stages.entries()) {
+    if (shared.signal?.aborted) throw loginFailure("ORACLE_LOGIN_CANCELLED");
+    shared.stageSpec = { ...spec, index };
+    shared.stageStart = now(); shared.stageDeadline = shared.stageStart + spec.seconds * 1000;
+    if (spec.kind === "authentication") shared.loginWindow = { deadline: null, durationMs: spec.seconds * 1000, maxDeadline: shared.stageDeadline };
+    const result = await runStage(spec.mode, shared);
+    shared.stages.push(result);
+    if (result.status !== "PASS" || now() > shared.stageDeadline) return false;
   }
+  return true;
 }
 
 const columns = ["ROW_ID", "JOIN_KEY", "VAL", "ORG_ID", "SITE_ID", "EXT_ID", "LABEL", "FROM_TS", "TO_TS", "EVENT_TS", "OBSERVED_TS"];
@@ -114,16 +175,16 @@ function grantState(state) {
 }
 
 /** 调用平台真实事务与只读采样；Python 异常正文不进入浏览器报告。 */
-function platform(root, call, input) {
+function platform(root, call, input, deadline) {
   const code = 'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_oracle_mapping_platform as q;print(json.dumps(' + call + '))';
   return JSON.parse(execFileSync("python3", ["-B", "-c", code], { cwd: root, input: JSON.stringify(input),
-    encoding: "utf8", timeout: 30000, stdio: ["pipe","pipe","pipe"] }));
+    encoding: "utf8", timeout: Math.min(30000, stageRemaining(deadline)), stdio: ["pipe","pipe","pipe"] }));
 }
 
 /** 纯认证入口只把已有 Cookie 经私有 stdin 传给正式四票据消费者。 */
-export function authSessions(root, actors) {
+export function authSessions(root, actors, deadline) {
   const input = actors.map(actor => ({ subjectId: actor.me.subjectId, cookie: actor.sessionCookie }));
-  try { return platform(root, "q.session_preflight(json.load(sys.stdin),210)", input); }
+  try { return platform(root, "q.session_preflight(json.load(sys.stdin),210)", input, deadline); }
   catch (error) {
     throw loginFailure(sessionRejection(error.stderr));
   }
@@ -144,8 +205,13 @@ export function grants(root, state, mode) {
   return row;
 }
 
+/** 认证落盘后才检查原15项授权；仅自然到期原范围可追加四小时记录。 */
+export function batchGrants(root, state, executionId, deadline) {
+  return platform(root, "q.batch_grants(*json.load(sys.stdin))", [grantState(state), executionId], deadline);
+}
+
 /** 每一正式长场景在同次登录中重读当前目录、激活和源夹具，而非使用旧缓存。 */
-export async function ready({ root, state, operator, reader, get, check, mode, actors }) {
+export async function ready({ root, state, operator, reader, get, check, mode, actors, deadline }) {
   const connection = await get(operator, "/api/v1/connections/" + state.connectionId);
   const catalog = await get(operator, "/api/v1/catalogs/" + state.catalog.snapshotId);
   const active = await get(operator, "/api/v1/mappings/" + state.mappingDraft.mappingId + "/active");
@@ -163,9 +229,9 @@ export async function ready({ root, state, operator, reader, get, check, mode, a
   check("oracle_capability_registered", Boolean(capability?.version));
   // 原会话只进只读平台检查的私有 stdin；报告仅接收非秘密观察。
   const row = platform(root, "q.ready_fixture(json.load(sys.stdin))", { ...grantState(state), mode, actors:
-    actors.map(a => ({ subjectId: a.me.subjectId, cookie: a.sessionCookie })) });
+    actors.map(a => ({ subjectId: a.me.subjectId, cookie: a.sessionCookie })) }, deadline);
   check("oracle_current_source_and_grants", row.taskId === task && row.runId === runId && row.status === "READY" && row.commandId
-    && row.fieldCount === 11 && row.grantCount === 3 && row.requiredSeconds > 0 && row.remainingSeconds >= row.requiredSeconds && typeof row.fixtureBefore === "object" && row.fixtureBefore !== null);
+    && row.fieldCount === 11 && row.grantCount === 3 && row.requiredSeconds > 0 && row.remainingSeconds >= row.requiredSeconds && (mode === "s1-reopen" ? row.fixtureBefore === null : typeof row.fixtureBefore === "object" && row.fixtureBefore !== null));
   return { capability, row };
 }
 
@@ -189,7 +255,7 @@ export function sameHost(before, after) {
 }
 
 /** 先启动同任务只读观测者，再用相同 Q 从两个正式 API 提交执行与取消。 */
-export async function witness({ root, state, reader, mode, capability, get, request, check, report }) {
+export async function witness({ root, state, reader, mode, capability, get, request, check, report, deadline }) {
   const naturalRace = mode === "s0-oracle-natural-cancel";
   const cancel = mode === "s0-oracle-cancel" || naturalRace;
   const secondary = { ...reader, apiOrigin: "http://localhost:" + ports.secondary };
@@ -200,7 +266,7 @@ export async function witness({ root, state, reader, mode, capability, get, requ
     mappingReleaseIds: [state.mappingReceipt.mappingReleaseId], capabilityId: capability.id, capabilityVersion: capability.version,
     relationshipIris: [], depth: 1, maxRows: 100, timeoutMs: 5000, filters: { siteId: "site-a", entityExternalId: "omq-entity-1" } };
   const process = spawn("python3", ["-B", "scripts/maintenance/workflow_oracle_mapping_platform.py", "observe",
-    "--idempotency-key", key, "--output", output], { cwd: root, timeout: 25000, killSignal: "SIGTERM", stdio: ["ignore","pipe","ignore"] });
+    "--idempotency-key", key, "--output", output], { cwd: root, timeout: Math.min(25000, stageRemaining(deadline)), killSignal: "SIGTERM", stdio: ["ignore","pipe","ignore"] });
   const exit = new Promise(resolve => { process.once("error", () => resolve(-1)); process.once("close", code => resolve(code)); });
   const lines = createInterface({ input: process.stdout })[Symbol.asyncIterator]();
   const next = async () => {

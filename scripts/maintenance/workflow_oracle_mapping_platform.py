@@ -628,6 +628,60 @@ def grant_fixture(mode,objects,fields,state):
     return dict(taskId=TASK,runId=product_run() or RUN,mode=mode,commandId=command,verificationId=check,grantCount=len(rows),fieldCount=len(fields),remainingSeconds=min(r['ttl'] for r in rows),inputsUnchanged=True)
 
 
+def batch_grants(state, execution_id):
+    """核对四主体原15项权限；自然过期才追加原范围记录，保留历史行与审计。"""
+    from workflow_m4_query import grant_transaction
+    require(product_run() and re.fullmatch('[a-f0-9]{32}',execution_id),'BATCH_GRANT_RUN')
+    require((state['taskId'],state['runId'])==(TASK,product_run()) and state['scope']==dict(organizationId='org-demo',siteIds=['site-a']),'BATCH_GRANT_SCOPE')
+    from workflow_oracle_mapping_identity_recovery import ROSTER
+    require(list(state['subjects'].values())==[v[1] for v in ROSTER.values()],'BATCH_GRANT_SUBJECTS')
+    cid=state['connectionId'];require(re.fullmatch('[a-f0-9]{32}',cid),'BATCH_GRANT_CONNECTION')
+    obj='PRODUCTION/OMQ_ENTITY'
+    fields=[obj+'/'+str(i)+'/'+name for i,name in enumerate(['ROW_ID','JOIN_KEY','VAL','ORG_ID','SITE_ID','EXT_ID','LABEL','FROM_TS','TO_TS','EVENT_TS','OBSERVED_TS'],1)]
+    perms=[['mapping.read','mapping.source.validate','mapping.edit','mapping.validate','mapping.submit'],
+           ['mapping.read','mapping.source.validate','mapping.review','mapping.approve'],
+           ['mapping.read','mapping.source.validate','mapping.activate'],
+           ['data.query.execute','data.query.result.read','data.query.evidence.read']]
+    subjects=list(state['subjects'].values())
+    sql=("SELECT coalesce(json_agg(g ORDER BY \"Id\"),'[]') FROM (SELECT * FROM governance.\"MappingAuthorizationGrants\" WHERE \"SubjectId\" IN ("+
+         ','.join("'"+v+"'" for v in subjects)+") AND \"OrganizationId\"='org-demo' AND (\"ConnectionId\" IS NULL OR \"ConnectionId\"='"+cid+"')) g;").encode()
+    raw,before=read_pg(sql,'batch-current-15-grants');rows=json.loads(raw)
+    # 数据库时钟与授权行同属正式平台的只读观察。
+    stamp,clock=read_pg(b'SELECT extract(epoch from clock_timestamp());','batch-grant-clock')
+    current=float(stamp);latest=[]
+    for sub,allowed in zip(subjects,perms,strict=True):
+        for op in allowed:
+            matches=[r for r in rows if r['SubjectId']==sub and r['Permission']==op]
+            require(matches,'BATCH_GRANT_ORIGINAL_MISSING')
+            row=max(matches,key=lambda r:r['ExpiresAtUtc']);scoped=op=='mapping.source.validate' or op.startswith('data.query.')
+            require(row['RevokedAtUtc'] is None and row['SiteIds']==['site-a'] and row['ConnectionId']==(cid if scoped else None)
+                    and row['ObjectRefs']==([obj] if scoped else []) and set(row['FieldRefs'])==set(fields if scoped else []),'BATCH_GRANT_NEGATIVE_PRESTATE')
+            latest.append(row)
+    import datetime as dt
+    ttl=[dt.datetime.fromisoformat(r['ExpiresAtUtc'].replace('Z','+00:00')).timestamp()-current for r in latest]
+    require(all(v>=210 or v<=0 for v in ttl),'BATCH_GRANT_TTL_SHORT')
+    renewed=[]
+    for sub,allowed in zip(subjects,perms,strict=True):
+        expired=[r['Permission'] for r,t in zip(latest,ttl,strict=True) if r['SubjectId']==sub and t<=0]
+        if expired:
+            key=lambda who,op:'omq-ah-'+ex.sha(ex.encoded([execution_id,cid,who,op]))[:32]
+            statement,ids=grant_transaction(state,[obj],fields,[(sub,expired)],key,product_run())
+            count,cmd=pg_command(statement,'batch-renew-expired-grants')
+            require(count.splitlines()[-1]==str(len(ids)),'BATCH_GRANT_RENEW_COUNT')
+            renewed.append(dict(commandId=cmd,ids=ids))
+    after,verified=read_pg(sql,'batch-grants-preserved');new=json.loads(after)
+    require(all(r in new for r in rows),'BATCH_GRANT_HISTORY_CHANGED')
+    finish,finish_clock=read_pg(b'SELECT extract(epoch from clock_timestamp());','batch-grant-final-clock')
+    for old in latest:
+        candidates=[r for r in new if r['SubjectId']==old['SubjectId'] and r['Permission']==old['Permission']]
+        current_row=max(candidates,key=lambda r:r['ExpiresAtUtc'])
+        require(all(current_row[k]==old[k] for k in ('SubjectId','Permission','ConnectionId','ObjectRefs','FieldRefs','SiteIds','OrganizationId','RevokedAtUtc'))
+                and dt.datetime.fromisoformat(current_row['ExpiresAtUtc'].replace('Z','+00:00')).timestamp()-float(finish)>=210,'BATCH_GRANT_CURRENT_READBACK')
+    require(all(ident in {r['Id'] for r in new} for item in renewed for ident in item['ids']),'BATCH_GRANT_NEW_IDS')
+    return dict(finalClockCommand=finish_clock,beforeCommand=before,clockCommand=clock,verificationCommand=verified,originalCount=len(latest),
+                originalRowsSha256=ex.sha(ex.encoded(rows)),historyPreserved=True,renewed=renewed,fieldCount=11)
+
+
 def pause_unused_apis():
     """在正式请求投递前封存旧快照；只有本任务双方平台库完整为空时才能使用此切换。"""
     admission()
@@ -775,8 +829,8 @@ def ready_fixture(state):
     # 实际待执行驱动硬截止为180秒，另留30秒供证据与夹具恢复。
     seconds=210;remaining=min(r['ttl'] for r in rows);require(remaining>=seconds,'OMQ_READY_GRANT_TTL_SHORT')
     actors=state['actors'];require([a['subjectId'] for a in actors]==[state['subjects'][k] for k in ('operator','auditor','activator','reader')],'READY_ROLES')
-    session=session_preflight(actors,seconds);fixture=fixture_state()
-    require(fixture['counts']==([100,1] if state['mode'] in ('s0-oracle-natural','s0-oracle-cancel') else [1,1]),'READY_SOURCE_ROWS')
+    session=session_preflight(actors,seconds);fixture=None if state['mode']=='s1-reopen' else fixture_state()
+    require(fixture is None or fixture['counts']==([100,1] if state['mode'] in ('s0-oracle-natural','s0-oracle-cancel') else [1,1]),'READY_SOURCE_ROWS')
     return dict(taskId=TASK,runId=product_run() or RUN,status='READY',remainingSeconds=remaining,requiredSeconds=seconds,fieldCount=11,grantCount=3,fixtureBefore=fixture,
                 session=session,commandId=command,activationCommand=pointer_cmd)
 
@@ -792,9 +846,9 @@ def audit_window(start_utc,end_utc,client_id=None):
 
 def browser_run(mode,case='healthy'):
     import uuid
-    from workflow_oracle_mapping_evidence import browser_invocation
+    from workflow_oracle_mapping_evidence import browser_invocation, batch_plan
     require(mode in ('provision','mapping','s0-oracle-ready','s0-oracle-natural','s0-oracle-cancel','s0-oracle-natural-cancel','s1','s1-reopen')
-            or (mode=='s0-oracle-auth' and product_run()),'FORMAL_MODE')
+            or (mode in ('s0-oracle-auth','auth-handoff-s1') and product_run()),'FORMAL_MODE')
     run=product_run() or RUN
     area=AREA.parent/run
     resource=admission()
@@ -816,13 +870,23 @@ def browser_run(mode,case='healthy'):
         matches=[item for item in origins if item.get('mode')=='s1' and item.get('reports')==[original] and item.get('exitCode')==0]
         require(len(matches)==1,'S1_ORIGIN_AMBIGUOUS')
         stage['originCommandId']=matches[0]['commandId']
-    if mode!='s0-oracle-auth':
+    if mode not in ('s0-oracle-auth','auth-handoff-s1','s1-reopen'):
         stage['fixtureBefore']=fixture_state()
+    if mode=='auth-handoff-s1':
+        execution=uuid.uuid4().hex
+        stage['plan']=batch_plan(ROOT)
+        stage['executionId']=execution
+        stage['batchInput']='auth-handoff-'+execution+'.json'
+        save(area/stage['batchInput'],dict(executionId=execution,plan=stage['plan']))
     host=runtime_binding();api=build.validate('api',TASK);tests=build.validate('agent',TASK)
     argv,key,label=browser_invocation(ROOT,mode,case,host,api,tests,stage)
     report_pattern='browser-'+mode+'-'+'[0-9]'*13+'.json'
     before=set(area.glob(report_pattern))
-    result=ex.run(argv,ROOT,task=TASK,run_id=run,stage=label,input_key=key,parent_id=host['commandId'],timeout=180)
+    environment=None
+    if mode=='auth-handoff-s1':
+        environment={**os.environ,'OMQ_PROGRESS_FILE':'auth-handoff-'+execution+'.jsonl'}
+    result=ex.run(argv,ROOT,task=TASK,run_id=run,stage=label,input_key=key,parent_id=host['commandId'],
+                  timeout=stage['plan']['deadlineSeconds'] if mode=='auth-handoff-s1' else 180,environment=environment)
     after=set(area.glob(report_pattern))-before
     entry=dict(taskId=TASK,runId=run,mode=mode,case=case,stageInputs=stage,host=host,builds={'api':api,'agent':tests},
                commandId=result.receipt['commandId'],exitCode=result.returncode,resourceAttempt=resource['attempt'],preflightCommandId=pre.receipt['commandId'],
@@ -832,6 +896,15 @@ def browser_run(mode,case='healthy'):
     try:
         audit=audit_window(result.receipt['startedAtUtc'],result.receipt['endedAtUtc'])
         save(area/('formal-audit-'+result.receipt['commandId']+'.json'),audit)
+        if mode=='auth-handoff-s1':
+            require(len(after)==1,'BATCH_REPORT_COUNT')
+            batch=json.loads(next(iter(after)).read_bytes())
+            for item in batch['stages']:
+                name=Path(item['report']).name
+                require(re.fullmatch(r'browser-[a-z0-9-]+-[0-9]{13}\.json',name),'BATCH_STAGE_NAME')
+                phase_audit=audit_window(item['startedAtUtc'],item['finishedAtUtc'])
+                save(area/('formal-audit-'+result.receipt['commandId']+'-'+item['mode']+'.json'),phase_audit)
+
     except Exception as error:
         save(area/('formal-audit-failure-'+result.receipt['commandId']+'.json'),{'taskId':TASK,'reason':str(error)})
         raise

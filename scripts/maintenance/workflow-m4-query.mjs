@@ -40,7 +40,8 @@ const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/p
 if (oracle && !omq.modes.includes(mode)) throw new Error("ORACLE_SCENARIO_NOT_REGISTERED");
 if (doris && !["s3","ui-s1","ui-s3","serve","s2-doris-ready","s2-doris-root-deadline","s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
-if (mode === "serve") {
+if (oracle && mode === "auth-handoff-s1") await authHandoffRun();
+else if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
   const { writeFile } = await import("node:fs/promises");
   const build = JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.web_binding()))`], { cwd: root, timeout: 30000, encoding: "utf8" }));
@@ -58,13 +59,13 @@ if (mode === "serve") {
 else throw new Error("QUERY_MODE_NOT_IMPLEMENTED");
 
 /** 独立浏览器上下文只保留内存会话，不保存Cookie、HAR、trace或storageState。 */
-async function browserRun(mode) {
+async function browserRun(mode, shared = null) {
   const { randomUUID, createHash } = await import("node:crypto");
   const { writeFile, mkdir } = await import("node:fs/promises");
   const output = resolve(root, "artifacts/workflow", task, evidenceRun);
   const privateRoot = resolve(root, privateName, runId);
   const { execFileSync } = await import("node:child_process");
-  const binding = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps({"api":q.runtime_binding(),"web":q.web_binding() if any(arg.startswith("ui-") for arg in sys.argv) else None}))`, mode], { cwd: root, timeout: 30000, encoding: "utf8" }));
+  const binding = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps({"api":q.runtime_binding(),"web":q.web_binding() if any(arg.startswith("ui-") for arg in sys.argv) else None}))`, mode], { cwd: root, timeout: Math.min(30000, shared ? omq.stageRemaining(shared.stageDeadline) : 30000), encoding: "utf8" }));
   // 先绑定准确 Oracle 任务宿主，随后才可打开本次合成 OIDC 材料。
   const initialOracle = oracle ? binding() : null;
   if (oracle) omq.checkBinding(initialOracle);
@@ -75,16 +76,28 @@ async function browserRun(mode) {
   const file = resolve(output, "browser-" + mode + "-" + Date.now() + ".json");
   const report = { taskId: task, runId, mode, startedAtUtc: new Date().toISOString(), checks: [], http: [], status: "FAIL" };
   const observed = () => JSON.parse(execFileSync("python3", ["-B", "-c", `import sys,json;sys.path.insert(0,"scripts/maintenance");import ${moduleName} as q;${scenarioCode}print(json.dumps(q.source_scan_snapshot()))`], { cwd: root, timeout: 30000, encoding: "utf8" }));
-  const contexts = [];
-  let browser, phase = "launch";
+  const contexts = shared?.contexts ?? [];
+  let browser = shared?.browser, phase = "launch";
+  let authLease;
+  const stageRemaining = () => shared ? omq.stageRemaining(shared.stageDeadline) : 45000;
+  if (shared) shared.currentReport = report;
+  if (shared) report.stageInputs = { mode, case: "healthy", phase: mode.startsWith("s1") ? "s1" : "s0" };
+  if (shared) report.batch = { executionId: shared.executionId, planId: shared.plan.planId, ...shared.stageSpec };
   const command = (expectedRevision = 0) => ({ commandId: randomUUID(), idempotencyKey: randomUUID(), expectedRevision, reason: "M4 isolated query prerequisite" });
   const check = (name, value) => { report.checks.push({ name, status: value ? "PASS" : "FAIL" }); if (!value) { const error = new Error(); error.safeCode = name; throw error; } };
   const secrets = realm ? [realm.clientSecret, ...Object.values(realm.identities).map(value => value.password)] : [];
   async function request(actor, method, path, body, expected = 200, etag) {
     const start = performance.now();
-    const response = await actor.context.request.fetch((actor.apiOrigin ?? origin) + path, { method, data: body, timeout: 45000, maxRedirects: 0,
+    let response;
+    try { response = await actor.context.request.fetch((actor.apiOrigin ?? origin) + path, { method, data: body, timeout: Math.min(stageRemaining(), actor.authDeadline ? omq.loginRemaining(actor.authDeadline) : 45000), maxRedirects: 0,
       headers: { ...actor.headers, ...(etag ? { "If-Match": etag } : {}), ...(body ? { "Content-Type": "application/json" } : {}) } });
+    } catch (error) {
+      if (actor.authDeadline && error.name === "TimeoutError") error.safeCode = "ORACLE_LOGIN_SUBMITTED_TIMEOUT";
+      throw error;
+    }
     const raw = await response.text();
+    if (actor.authDeadline) omq.loginRemaining(actor.authDeadline);
+    if (shared) stageRemaining();
     check("no_known_secret_" + report.http.length, !secrets.some(secret => secret && raw.includes(secret)));
     let data; try { data = JSON.parse(raw); } catch { data = null; }
     report.http.push({ method, path, status: response.status(), elapsedMs: performance.now() - start,
@@ -108,14 +121,19 @@ async function browserRun(mode) {
     const context = await browser.newContext({ serviceWorkers: "block" }); contexts.push(context);
     await context.route("**/*", route => {
       if ([origin, `http://localhost:${port(15443)}`].includes(new URL(route.request().url()).origin)) return route.continue();
-      report.externalRequests ??= []; report.externalRequests.push(new URL(route.request().url()).origin); return route.abort();
+      const current = shared?.currentReport ?? report;
+      current.externalRequests ??= []; current.externalRequests.push(new URL(route.request().url()).origin); return route.abort();
     });
     context.setDefaultTimeout(15000);
     const page = await context.newPage();
     await page.goto(origin + "/auth/login?returnUrl=%2Fapi%2Fv1%2Fplatform%2Fme");
     const callback = url => url.origin === origin && url.pathname === "/api/v1/platform/me";
     if (resumeLogin) {
-      try { await omq.completeCurrentLogin(page, label); }
+      try {
+        authLease = await omq.completeCurrentLogin(page, label, { window: shared?.loginWindow, signal: shared?.signal,
+          onProgress: event => oracleProgress({ ...event, mode }) });
+        report.authentication ??= []; report.authentication.push(authLease.observation);
+      }
       catch (error) {
         if (!error.safeCode) error.safeCode = "ORACLE_LOGIN_CALLBACK_ERROR";
         throw error;
@@ -126,17 +144,20 @@ async function browserRun(mode) {
       await page.locator("#kc-login").click();
       await page.waitForURL(callback);
     }
+    phase = "oidc_callback_" + label;
     const cookie = (await context.cookies()).find(item => item.name === ".OntologyPlatform.Session");
     check("real_oidc_cookie_" + label, cookie?.httpOnly && cookie.sameSite === "Lax");
     secrets.push(cookie.value);
-    const actor = { context, page, headers: { Origin: origin } };
+    const actor = { context, page, headers: { Origin: origin }, ...(authLease ? { authDeadline: authLease.deadline } : {}) };
+    phase = "oidc_csrf_" + label;
     actor.headers["X-CSRF-TOKEN"] = (await get(actor, "/auth/csrf")).requestToken;
+    phase = "oidc_me_" + label;
     const me = await request(actor, "GET", "/api/v1/platform/me");
     actor.me = me.data;
     if (resumeLogin) {
       check("oracle_current_original_subject_" + label, actor.me.subjectId === omq.originalSubject(label));
       check("oracle_current_role_sites_" + label, omq.currentProjection(label, actor.me));
-      if (mode === "s0-oracle-auth") {
+      if (["s0-oracle-auth", "reader-auth"].includes(mode)) {
         check("oracle_synthetic_profile_shape_" + label,
           Object.keys(actor.me).sort().join() === "displayName,roles,scopes,subjectId"
           && actor.me.displayName === "合成开发身份 " + label
@@ -147,6 +168,10 @@ async function browserRun(mode) {
       }
     }
     actor.sessionCookie = cookie.value;
+    if (authLease) {
+      authLease.remaining(); authLease.finish("AUTHENTICATED"); delete actor.authDeadline; authLease = null;
+      oracleProgress({ event: "AUTHENTICATED", mode, label, completed: report.authIdentities?.length ?? 1 });
+    }
     return actor;
   }
   async function save(state) {
@@ -200,16 +225,36 @@ async function browserRun(mode) {
   }
   try {
     report.inputBinding = initialOracle ?? binding();
-    const { chromium } = require("@playwright/test");
-    browser = await chromium.launch({ channel: "msedge", headless: !resumeLogin, args: ["--disable-background-networking", "--disable-component-update"] });
+    if (!browser) {
+      const { chromium } = require("@playwright/test");
+      browser = await chromium.launch({ channel: "msedge", headless: !resumeLogin, args: ["--disable-background-networking", "--disable-component-update"] });
+    }
     if (resumeLogin) report.browser = { channel: "msedge", version: browser.version(), authentication: "INTERACTIVE_OIDC" };
-    const operator = await identity("operator-ab"), auditor = await identity("auditor-ab");
-    const activator = doris || oracle ? await identity("operator-a") : operator;
-    const reader = doris || oracle ? await identity("viewer-a") : operator;
+    if (shared && mode === "reader-auth") {
+      const old = shared.actors.reader;
+      const reader = await identity("viewer-a");
+      check("oracle_new_reader_context", old.context !== reader.context && old.sessionCookie !== reader.sessionCookie);
+      shared.actors.reader = reader;
+      report.session = omq.authSessions(root, Object.values(shared.actors), shared.stageDeadline);
+      await old.context.close();
+      report.scope = "ORACLE_NEW_READER_AUTHENTICATED"; report.status = "PASS"; return;
+    }
+    const operator = shared?.actors?.operator ?? await identity("operator-ab");
+    const auditor = shared?.actors?.auditor ?? await identity("auditor-ab");
+    const activator = shared?.actors?.activator ?? (doris || oracle ? await identity("operator-a") : operator);
+    const reader = shared?.actors?.reader ?? (doris || oracle ? await identity("viewer-a") : operator);
+    if (shared) {
+      shared.actors = { operator, auditor, activator, reader };
+      if (mode !== "s0-oracle-auth") for (const [label, actor] of [["operator-ab",operator],["auditor-ab",auditor],["operator-a",activator],["viewer-a",reader]]) {
+        const me = await get(actor, "/api/v1/platform/me");
+        check("oracle_current_original_subject_" + label, me.subjectId === omq.originalSubject(label));
+        check("oracle_current_role_sites_" + label, omq.currentProjection(label, me));
+      }
+    }
     check("distinct_oidc_subjects", operator.me.subjectId !== auditor.me.subjectId);
     if (resumeLogin && mode === "s0-oracle-auth") {
       phase = "oracle_current_session_tickets";
-      report.session = omq.authSessions(root, [operator, auditor, activator, reader]);
+      report.session = omq.authSessions(root, [operator, auditor, activator, reader], shared?.stageDeadline);
       check("oracle_four_current_tickets", report.session.observations.length === 4
         && report.session.observations.every(row => Date.parse(row.ExpiresAtUtc) > Date.parse(row.requiredUntilUtc)));
       report.scope = "ORACLE_FOUR_CURRENT_SESSIONS";
@@ -227,6 +272,15 @@ async function browserRun(mode) {
         for (const key of Object.keys(state)) if (key.startsWith("mapping") || ["firstQuery","latestQuery"].includes(key)) delete state[key];
       } else state = { taskId: task, runId, ...(integration ? { scenario, s3: true, numeric: scenario === "numeric" } : {}), scope: { organizationId: "org-demo", siteIds: doris || oracle ? ["site-a"] : ["site-a", "site-b"] } }; }
     check("fixture_identity", state.taskId === task && state.runId === runId);
+    if (shared) {
+      report.stageInputs = { mode, case: "healthy", phase: mode.startsWith("s1") ? "s1" : "s0",
+        prerequisiteSha256: createHash("sha256").update(await readFile(resolve(output, stateName))).digest("hex"),
+        connectionId: state.connectionId, readerSubjectId: state.subjects.reader,
+        catalogSnapshotId: state.catalog.snapshotId, catalogFingerprint: state.catalog.schemaFingerprint,
+        activationRevision: state.mappingReceipt.activationRevision, mappingReleaseId: state.mappingReceipt.mappingReleaseId };
+      report.sessionBefore = omq.authSessions(root, [operator,auditor,activator,reader], shared?.stageDeadline);
+      if (["s0-oracle-natural-cancel", "mapping"].includes(mode)) report.currentGrants = omq.batchGrants(root, state, shared.executionId, shared.stageDeadline);
+    }
     if (doris || oracle) {
       check("distinct_four_roles", new Set([operator,auditor,activator,reader].map(a => a.me.subjectId)).size === 4);
       if ((twoTable || oracle) && state.subjects) {
@@ -341,13 +395,13 @@ async function browserRun(mode) {
       report.grants = JSON.parse(execFileSync("python3", ["-B", "scripts/maintenance/workflow_doris_s1.py",
         (twoTable ? "s2-" : "") + (mode === "mapping" ? "mapping-grants" : "query-grants")], { cwd: root, timeout: 30000, encoding: "utf8" }));
     }
-    if (oracle && ["mapping", "s0-oracle-ready"].includes(mode)) {
+    if (oracle && !shared && ["mapping", "s0-oracle-ready"].includes(mode)) {
       phase = "oracle_current_grants";
       report.grants = omq.grants(root, state, mode === "mapping" ? "mapping" : "query");
     }
     if (oracle && (mode.startsWith("s0-oracle-") || mode === "s1" || mode === "s1-reopen")) {
       phase = "oracle_scenario_ready";
-      const current = await omq.ready({ root, state, operator, reader, get, check, mode, actors:[operator,auditor,activator,reader] });
+      const current = await omq.ready({ root, state, operator, reader, get, check, mode, actors:[operator,auditor,activator,reader], deadline: shared?.stageDeadline });
       check("oracle_readiness_redacted", !secrets.some(s => s && JSON.stringify(current.row).includes(s)));
       report.scenarioReady = current.row;
       if (mode === "s0-oracle-ready") {
@@ -355,7 +409,7 @@ async function browserRun(mode) {
       }
       if (mode.startsWith("s0-oracle-")) {
         phase = "oracle_formal_source_observation";
-        await omq.witness({ root, state, reader, mode, capability:current.capability, get, request, check, report });
+        await omq.witness({ root, state, reader, mode, capability:current.capability, get, request, check, report, deadline: shared?.stageDeadline });
         const scopes = { "s0-oracle-natural": "ORACLE_NATURAL_CONTROL", "s0-oracle-cancel": "ORACLE_FORMAL_CANCEL",
           "s0-oracle-natural-cancel": "ORACLE_NATURAL_COMPLETION_BEFORE_PLATFORM_CANCEL" };
         report.scope = scopes[mode];
@@ -1496,6 +1550,7 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
         await save(state);
         state.mappingDraft = await post(operator, "/api/v1/mappings", state.mappingCreate, 201); await save(state);
       }
+      if (shared && state.mappingApproved) check("mapping_distinct_review_subject", state.mappingApproved.submittedBy !== state.mappingApproved.decision.decidedBy);
       const draft = state.mappingDraft, path = "/api/v1/mappings/" + draft.mappingId;
       if (!state.mappingJob) {
         phase = "query_mapping_validate";
@@ -1536,6 +1591,21 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       }
       state.mappingRelease = await get(operator, "/api/v1/mapping-releases/" + state.mappingReceipt.mappingReleaseId); await save(state);
       check("query_mapping_original", state.mappingRelease.manifest.mapping.entities.length === (state.s3 || twoTable ? 2 : 1) && state.mappingRelease.manifest.mapping.entities[0].datasetRef.snapshotId === state.catalog.snapshotId);
+      if (shared) {
+        phase = "oracle_mapping_current_chain";
+        const proposal = await request(auditor, "GET", "/api/v1/mapping-proposals/" + state.mappingApproved.proposalId);
+        const currentRelease = await request(operator, "GET", "/api/v1/mapping-releases/" + state.mappingReceipt.mappingReleaseId);
+        const active = await request(operator, "GET", "/api/v1/mappings/" + state.mappingReceipt.mappingId + "/active");
+        const pr = proposal.data, rel = currentRelease.data, ar = active.data;
+        check("oracle_current_mapping_independent_chain", pr.status === "APPROVED" && pr.submittedBy === operator.me.subjectId
+          && pr.decision?.decidedBy === auditor.me.subjectId && pr.decision.decision === "APPROVE"
+          && pr.bindingHash === pr.decision.bindingHash && pr.activation?.mappingReleaseId === state.mappingReceipt.mappingReleaseId
+          && pr.activation.activationId === state.mappingReceipt.activationId && pr.activation.manifestHash === rel.manifestHash
+          && ar.mappingReleaseId === pr.activation.mappingReleaseId && ar.activationRevision === pr.activation.activationRevision
+          && rel.manifest.reviewReceipt.proposalId === pr.proposalId && rel.manifest.reviewReceipt.bindingHash === pr.bindingHash
+          && rel.manifest.reviewReceipt.submittedBy === operator.me.subjectId && rel.manifest.reviewReceipt.decidedBy === auditor.me.subjectId);
+        report.mappingQualification = { proposal: proposal.raw, release: currentRelease.raw, active: active.raw };
+      }
       report.status = "PASS"; report.scope = oracle ? "ORACLE_FORMAL_SINGLE_TABLE_MAPPING" : "M4_QUERY_FIXED_MAPPING_PREREQUISITE_ONLY";
     } else if (mode === "s1") {
       phase = "query_capability";
@@ -1734,10 +1804,14 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
       report.status = "PASS"; report.scope = "S1_BROWSER_QUERY_REFRESH_SAME_BYTES_NO_SOURCE_REPLAY";
     } else check("supported_mode", false);
   } catch (error) {
+    if (error.loginObservation) { report.authentication ??= []; report.authentication.push(error.loginObservation); }
+    if (authLease) authLease.finish(error.safeCode ?? "ORACLE_LOGIN_UNKNOWN");
     report.failure = { phase, category: error?.name ?? "Error", code: error.safeCode ?? "query_browser_runtime_failure" };
   } finally {
-    for (const context of contexts) await context.close().catch(() => {});
-    await browser?.close().catch(() => {});
+    if (!shared) {
+      for (const context of contexts) await context.close().catch(() => {});
+      await browser?.close().catch(() => {});
+    }
     try {
       if (oracle) {
         report.outputBinding = binding();
@@ -1748,9 +1822,66 @@ m:hasReading a owl:ObjectProperty; rdfs:domain m:Asset; rdfs:range m:Reading .
     catch { report.inputsUnchanged = false; }
     if (!report.inputsUnchanged) { report.status = "FAIL"; report.bindingFailure = "QUERY_BROWSER_INPUT_DRIFT"; }
     if (report.externalRequests?.length) { report.status = "FAIL"; report.networkFailure = "UNEXPECTED_EXTERNAL_REQUEST"; }
+    if (shared) {
+      report.elapsedMs = performance.now() - shared.stageStart;
+      if (report.elapsedMs > shared.stageSpec.seconds * 1000 || shared.signal.aborted) {
+        report.status = "FAIL"; report.failure ??= { phase, category: "Deadline", code: shared.signal.aborted ? "ORACLE_LOGIN_CANCELLED" : "ORACLE_STAGE_TIMEOUT" };
+      }
+    }
     report.finishedAtUtc = new Date().toISOString();
     await mkdir(output, { recursive: true }); await writeFile(file, JSON.stringify(report, null, 2) + "\n", { flag: "wx" });
-    console.log(JSON.stringify({ status: report.status, phase, report: file, checks: report.checks.length, failure: report.failure ?? null }));
+    if (shared) {
+      shared.last = { status: report.status, phase, report: file, checks: report.checks.length, failure: report.failure ?? null,
+        mode, index: shared.stageSpec.index, reportSha256: createHash("sha256").update(JSON.stringify(report, null, 2) + "\n").digest("hex"), startedAtUtc: report.startedAtUtc, finishedAtUtc: report.finishedAtUtc, elapsedMs: report.elapsedMs };
+      oracleProgress({ event: "STAGE_FINISHED", mode, status: report.status });
+    } else console.log(JSON.stringify({ status: report.status, phase, report: file, checks: report.checks.length, failure: report.failure ?? null }));
+    if (shared) return shared.last;
     process.exitCode = report.status === "PASS" ? 0 : 1;
+  }
+}
+
+/** 只向任务事件文件写固定公开元数据，主会话可分段读取并响应取消。 */
+function oracleProgress(event) {
+  if (!oracle || !omq.productResume) return;
+  const { appendFileSync } = require("node:fs");
+  const file = process.env.OMQ_PROGRESS_FILE;
+  if (file && /^auth-handoff-[a-f0-9]{32}\.jsonl$/.test(file))
+    appendFileSync(resolve(root, "artifacts/workflow", task, runId, file), JSON.stringify({ ...event, utc: new Date().toISOString() }) + "\n", { mode: 0o600 });
+}
+
+/** 本任务固定批：唯一浏览器进程，认证与业务分别留原件，最后统一回收。 */
+async function authHandoffRun() {
+  if (!omq.productResume) throw new Error("ORACLE_BATCH_RUN");
+  const { writeFile } = await import("node:fs/promises");
+  const inputName = argument("batch-input");
+  if (!/^auth-handoff-[a-f0-9]{32}\.json$/.test(inputName)) throw new Error("ORACLE_BATCH_INPUT");
+  const output = resolve(root, "artifacts/workflow", task, runId);
+  const input = JSON.parse(await readFile(resolve(output, inputName), "utf8"));
+  if (JSON.stringify(input.plan) !== JSON.stringify(omq.authPlan)) throw new Error("ORACLE_BATCH_PLAN");
+  const abort = new AbortController();
+  const stop = () => abort.abort(); process.on("SIGTERM", stop); process.on("SIGINT", stop);
+  const shared = { contexts: [], executionId: input.executionId, signal: abort.signal };
+  const report = { taskId: task, runId, mode: "auth-handoff-s1", input, startedAtUtc: new Date().toISOString(), status: "FAIL" };
+  const begin = performance.now();
+  try {
+    const { chromium } = require("@playwright/test");
+    shared.browser = await chromium.launch({ channel: "msedge", headless: false, timeout: 60000,
+      args: ["--disable-background-networking", "--disable-component-update"] });
+    report.preMs = performance.now() - begin;
+    if (report.preMs > omq.authPlan.preSeconds * 1000) throw new Error("ORACLE_BATCH_PRE_TIMEOUT");
+    if (await omq.runAuthHandoffPlan(shared, browserRun)) report.status = "PASS";
+  } catch (error) { report.failure = { code: error.safeCode ?? "ORACLE_BATCH_RUNTIME", category: error.name }; }
+  finally {
+    const close = performance.now();
+    for (const context of shared.contexts) await context.close().catch(() => {});
+    await shared.browser?.close().catch(() => {});
+    report.postMs = performance.now() - close;
+    if (report.postMs > omq.authPlan.postSeconds * 1000) report.status = "FAIL";
+    report.stages = shared.stages ?? []; report.finishedAtUtc = new Date().toISOString();
+    const file = resolve(output, "browser-auth-handoff-s1-" + Date.now() + ".json");
+    await writeFile(file, JSON.stringify(report, null, 2) + "\n", { flag: "wx" });
+    console.log(JSON.stringify({ status: report.status, report: file, stages: report.stages }));
+    process.exitCode = report.status === "PASS" ? 0 : 1;
+    process.off("SIGTERM", stop); process.off("SIGINT", stop);
   }
 }
