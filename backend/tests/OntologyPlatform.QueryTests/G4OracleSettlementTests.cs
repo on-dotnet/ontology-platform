@@ -53,8 +53,8 @@ public sealed class G4OracleSettlementTests
         {
             Assert.AreEqual("entity", (await branch).EntityBindingId);
             Assert.IsTrue(state.Confirmed);
-            Assert.IsNull(state.BranchLimit);
-            Assert.IsNull(state.Lifetime);
+            Assert.AreEqual(TimeSpan.FromSeconds(1), state.BranchLimit);
+            Assert.AreEqual(executionId, state.Lifetime?.ExecutionId);
             return;
         }
         await Assert.ThrowsAsync<IOException>(() => branch);
@@ -75,6 +75,54 @@ public sealed class G4OracleSettlementTests
         Assert.AreEqual(scenario == "timely" ? 1 : 0, confirmed);
         Assert.AreEqual(executionId, state.Lifetime?.ExecutionId);
         Assert.AreEqual(TimeSpan.FromSeconds(1), state.BranchLimit);
+    }
+
+    /// <summary>成功读取已经真正归还源资源；平台成功尚未提交时正式取消胜出，结算仍消费最后分支的准确原期限。</summary>
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task HealthyReaderThenWinningCancelUsesOriginalBranch(bool crossesBranch)
+    {
+        // 同一单调时基标记源读取完成、平台取消胜出与两笔持久操作。
+        var clock = new ManualClock();
+        using var request = new G4RequestDeadline(clock, CancellationToken.None);
+        // 该用例替换数据库 I/O，保留正式源分支及失败结算的完整调用。
+        var execution = new G4QueryExecution(null!, null!, null!, null!, clock);
+        var branch = new G4QueryExecution.OracleExecution();
+        var lease = new G4QueryRecord { Id = "query-healthy-before-cancel", LeaseOwner = "oracle-execution-test", Fence = 1,
+            DeadlineAtUtc = request.DeadlineUtc };
+        var identity = string.Empty;
+        await execution.ReadOracleAsync(lease, branch, request.DeadlineUtc, CancellationToken.None,
+            (_, _) => Task.FromResult<G4QueryResultStore.OracleLeaseObservation?>(new() { Active = true }), _ =>
+            {
+                // 读者成功并明确归还同一物理申请，随后停止观察器。
+                var lifetime = G4OracleSourceLifetime.Current!;
+                identity = lifetime.ExecutionId;
+                var acquisition = lifetime.BeginSource();
+                clock.Advance(100);
+                lifetime.ConfirmReleased(acquisition);
+                return Task.FromResult(new G4SourceQueryRead { EntityBindingId = "entity", Rows = [],
+                    StartedAtUtc = clock.GetUtcNow(), CompletedAtUtc = clock.GetUtcNow(), AdapterVersion = "oracle-query-v1",
+                    WatermarkKind = "UNKNOWN", Watermark = null, Indeterminate = false, Limited = false,
+                    RecordKeyFields = ["ROW_ID"], QueryPlanHash = new string('a', 64) });
+            });
+        Assert.IsTrue(branch.Confirmed);
+        // 原 1 秒分支还余 75ms 时取消赢得平台提交；5秒总预算仍有充足余量。
+        clock.Advance(825);
+        var fails = 0;
+        var confirms = 0;
+        await execution.FinishOracleFailureAsync(lease, branch, CancellationToken.None, _ =>
+        {
+            fails++;
+            if (crossesBranch) clock.Advance(76);
+            return Task.CompletedTask;
+        }, _ => { confirms++; return Task.FromResult(true); });
+        Console.WriteLine($"healthy-return-ms=100 cancel-ms=925 settled-ms={(crossesBranch ? 1001 : 925)} fail={fails} cas={confirms} " +
+            $"same-execution={identity == branch.Lifetime?.ExecutionId} root-remaining-ms={request.Remaining.TotalMilliseconds}");
+        Assert.AreEqual(1, fails);
+        Assert.AreEqual(crossesBranch ? 0 : 1, confirms);
+        Assert.AreEqual(identity, branch.Lifetime?.ExecutionId);
+        Assert.IsTrue(request.Remaining > TimeSpan.FromSeconds(3));
     }
 
     /// <summary>真实 PG 行锁延迟写者，验证正式失败写与两种终态 CAS 都须在锁内服从更早源截止。</summary>

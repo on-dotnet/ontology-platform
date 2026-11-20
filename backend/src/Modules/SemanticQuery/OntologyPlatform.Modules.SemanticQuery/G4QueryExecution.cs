@@ -200,10 +200,7 @@ public sealed class G4QueryExecution
         catch when (oracle is not null)
         {
             // 只在原请求和物理分支剩余时间内结算，任何迟到/未知均保留占位给独立恢复。
-            await FinishOracleFailureAsync(admission.Record, oracle, token,
-                cancellation => store.FailOracleAsync(admission.Record, session.Scope, session.Actor, () => OracleSettlementRemaining(admission.Record, oracle), cancellation),
-                cancellation => store.ConfirmOracleCleanupAsync(admission.Record.Id, admission.Record.LeaseOwner,
-                    admission.Record.Fence, admission.Record.Fence + 1, () => OracleSettlementRemaining(admission.Record, oracle), cancellation));
+            await SettleOracleOwnerAsync(admission.Record, oracle, session, token);
             throw;
         }
         finally
@@ -587,7 +584,7 @@ public sealed class G4QueryExecution
         /// <summary>正在执行或失败分支开始的本地单调时间。</summary>
         public long Started { get; set; }
 
-        /// <summary>分支失败后的结算继续消费原一秒；健康分支完成即清除该临时约束。</summary>
+        /// <summary>最近一次实际源分支的原上限，后续持有人失败结算仍需消费；成功提交使用请求总期限。</summary>
         public TimeSpan? BranchLimit { get; set; }
 
         /// <summary>最新物理分支保留同库取消剩余与单调时钟，用于失败结算及准确执行关联。</summary>
@@ -622,6 +619,13 @@ public sealed class G4QueryExecution
             remaining = TimeSpan.FromTicks(Math.Min(remaining.Ticks, (TimeSpan.FromMilliseconds(250) - clock.GetElapsedTime(first)).Ticks));
         return remaining;
     }
+
+    /// <summary>平台提交失败或正式取消胜出时，旧持有人将同一分支的原截止传入两次真实存储操作。</summary>
+    internal Task SettleOracleOwnerAsync(G4QueryRecord lease, OracleExecution oracle, MappingAuthorizationProof session, CancellationToken token) =>
+        FinishOracleFailureAsync(lease, oracle, token,
+            cancellation => store.FailOracleAsync(lease, session.Scope, session.Actor, () => OracleSettlementRemaining(lease, oracle), cancellation),
+            cancellation => store.ConfirmOracleCleanupAsync(lease.Id, lease.LeaseOwner, lease.Fence, lease.Fence + 1,
+                () => OracleSettlementRemaining(lease, oracle), cancellation));
 
     /// <summary>在原预算内终结旧执行，再仅凭真实物理确认尝试清除准确终态占位。</summary>
     internal async Task FinishOracleFailureAsync(G4QueryRecord lease, OracleExecution oracle, CancellationToken token,
@@ -760,9 +764,7 @@ public sealed class G4QueryExecution
             if (!oracle.Confirmed) throw new SemanticOperationException(503, "query_source_cleanup_unconfirmed");
             work.Token.ThrowIfCancellationRequested();
         }
-        // 已知异常不会经过这里；准确 execution 和原截止须留给持有人失败结算。
-        oracle.BranchLimit = null;
-        oracle.Lifetime = null;
+        // 物理读取健康返回后平台仍可能先提交取消。保留本次身份及原截止，供之后的失败结算消费。
         return result;
     }
 

@@ -348,7 +348,7 @@ public sealed partial class G4QueryRaceTests
     public Task OracleTerminalOwnerSurvivesSweepAndRejectsStaleConfirmation() => VerifyCapacityAsync(true);
 
     /// <summary>复用独立库、真票据和实际准入，测试源物理证明由单独的 Oracle 正式切片提供。</summary>
-    private static async Task VerifyCapacityAsync(bool oracle)
+    private static async Task VerifyCapacityAsync(bool oracle, string? postRead = null)
     {
         // 仅消费当前任务显式提供的合成平台库。
         var connection = Environment.GetEnvironmentVariable("G4_QUERY_TEST_CONNECTION");
@@ -436,6 +436,12 @@ public sealed partial class G4QueryRaceTests
                 var session = await authority.CaptureSessionAsync(actors[0], sessions[0].Id, scope, CancellationToken.None);
                 var grant = grants.Single(item => item.SubjectId == actors[0].SubjectId && item.ConnectionId.EndsWith(suffix + "1", StringComparison.Ordinal));
                 var proof = await authority.CaptureAsync(session with { ConnectionId = grant.ConnectionId, ObjectRefs = grant.ObjectRefs, FieldRefs = grant.FieldRefs }, CancellationToken.None);
+                if (postRead is not null)
+                {
+                    // 单独数据行变化的只有平台提交先后或锁释放时刻；其余准入、票据和审计复用原夹具。
+                    await VerifyPostReadRaceAsync(postRead, store, second, (await Admit(0, 1)).Record, session, proof, database, governance);
+                    return;
+                }
                 // 第一条只测及时准确确认及幂等，避免负例开销挤占本次 250ms 窗口。
                 var first = (await Admit(0, 1)).Record;
                 Assert.IsTrue((await second.ObserveOracleAsync(first, CancellationToken.None))!.Active);
