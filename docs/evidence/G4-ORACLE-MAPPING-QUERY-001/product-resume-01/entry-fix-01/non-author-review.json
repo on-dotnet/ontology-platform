@@ -1,23 +1,239 @@
 {
-  "taskId":"G4-ORACLE-MAPPING-QUERY-001",
-  "runId":"product-resume-01",
-  "batch":"entry-fix-01",
-  "role":"independent-read-only-quality-reviewer",
-  "decision":"ACCEPT_LIMITED_REPAIRS_AND_BLOCKED_HANDOFF",
-  "base":"326c7e1fd97f2327a25fa510071115d9eee7c5bb",
-  "reviewedHead":"70df3479e162321850c16ce37be9748a1dbef62f",
-  "localMain":"5168f2c93ca226caa521a6dc4ac85439335274c4",
-  "report":{"path":"docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/report.md","bytes":7014,"sha256":"4d6d413a405e0acbd50c746d91fd55831d897fddad77303605649f7fe0cda623","checkedFromGit":true,"findingResolved":"AC03-B=BLOCKED and cleanup250ms=NOT_QUALIFIED now separately stated"},
-  "scope":{"resourceRun":"implementation-01","measuredAuthAndPgCommit":"6d2a2976f2d54f54637b6fb364fe2c0444639644","registeredTestCommit":"d90fd032676813c48b712be2aadce0f950e4381c","registeredTestCommitToReviewedHead":"report only","reviewerServiceActions":0},
-  "fresh":{
-    "r1r2":{"integratedCommand":"93d77b26e380463f8bc318b09947c888","receiptSha256":"808294180296ef3db55d4119606a19123e2c9d0532e12a1c79d20c99eedd7184","cases":"6/6 actual bridge controlled cases; scoped Run, exact ticket path and stale assembly refusal. Four real session tickets not reached","oldRedCommand":"c0e987b7863741e8aed067bc63a9e3bd","independentLoginClassifierTests":"14/14"},
-    "r3":{"file":"s0-recovery-01/start-d8f4bbb99ed642eeaf8a4f5d5af7ee06.json","sha256":"7cb4266edaff6d00ae408761d1cc10a2932ee0958b91079a645851f4e1b0c3bd","pid":64643,"startedAt":"2026-11-20T10:34:20.330708926Z","counts":{"default":0,"named":1372,"publishedGraphs":[46,1326]},"namedSha256":"712f9dfb825772fb4c71a51461e6a09e15657419dd39a8c7463c1d0d95a4884c","hook":"UNKNOWN"},
-    "fourSubjectAuth":{"file":"product-resume-01/entry-fix-01/auth-observed.json","sha256":"895466d67e365e4a826db1a27bfa1cc261e6240ed315b75a752ef789c3fa771d","dispatchSha256":"c31336af422f1cec4722dd0c5d99aca1587e6730a5711b400c8c728e62e2b93d","actualBrowserCommand":"ae2ebad4418249cc99d97f722b4d340c","receiptSha256":"ece94677788a3ea160eb24cfd86eb912878c9d8cc36ac4b91bf885354101ebf5","browserReportSha256":"c8939746131822ea0330ba3db3f799cd72cf7005e0eee8c6b183940986dfb2c3","validatedMembers":28,"checks":"All member digests matched; independently reconstructed argv, measured/current driver bytes, command input and parent. Reopened build bindings, three timed host observations, browser report and source clock window. Success consumer rejected as OMQ_REPORT_INPUT.","exitCode":1,"failure":"ORACLE_LOGIN_WAITING_FOR_INPUT","currentSubjects":"0/4","firstAccount":"g2-operator-ab","otherAccounts":"NOT_ATTEMPTED","ttl":"NOT_RUN","httpEvidenceEntries":0,"sourceAuditCommand":"4456c5bcc8644660a0b971ac3e91ea8e","auditReceiptSha256":"79b3f7a677199576d52704a20c0ae9ab8aacc444d2910b5ea822513f8a5bc9e5","windowUtc":["2026-11-20T10:39:57.338888Z","2026-11-20T10:40:39.575468Z"],"auditClientFilter":null,"fixtureReaderFixedBusinessSelects":0},
-    "postReadSettlement":{"controlled":"8/8, 0 skipped","command":"3ea001fee76448fba6288d253249b86e","receiptSha256":"4a234cd887e36dfb3641d26d1c1759ca21b199f82b0a50f880bd9b41c3648bff","pgFile":"product-resume-01/pg-verification-aa04ee1b2551.json","pgSha256":"bed9f68c68587b02f5e0cbda6fc423314e857804a9041a0837869368dc98c052","pgActualCommand":"92cd82b7d50d4b8ab7bd86026c4c724c","pgActualReceiptSha256":"1c0017bdece060df96a20fa3b3d1dbd30480fc97c780bf34554f7fd3a3e88dcf","pgGroups":[["OriginalCutoffIsCheckedAfterPostgresRowLock",3],["HealthyReaderThenPostgresRace",3],["OracleTerminalOwnerSurvivesSweepAndRejectsStaleConfirmation",1],["RevocationBlocksAtomicResultAndAudit",1]],"passed":8,"failed":0,"skipped":0,"pgCommandRecordsChecked":15,"verification":"Recomputed actual PG command argv and input with runner DLL, verified compiler/source/308 reference inputs, API 99 and QueryTests 222 snapshot files, raw measured output, exact OID before removal and absent afterward, and independent hashes of 48-table checkpoint plus hold observations.","runnerDllSha256":"94dcdac8c8a971ef1b2d3174c0ad515ebb046d0c2da984d77076593fa9458dec","backendInput":"7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f","pgOid":"17853","checkpointBeforeAndAfter":"89ab2b8983c5422bfed600ffe63a74a9fab558db65f93a4a328048b850956f29","databaseReleased":true},
-    "engineering":{"registeredCommand":"d0315377a78d459abac5e95aebea5153","receiptSha256":"423a4eb14aa4bc1aca890f2329e6e057b5233bdfc12fc40f372abad9d22f50f9","stderrSha256":"30f6932e5cabd06de7dcd06806353e30e3e954925f56966626635a42d99d8f1c","result":"51/51 offline, 0 skipped","fullStaticCommand":"caa66c40a36e40a8acdbd7d11baef56b","fullStaticReceiptSha256":"65f355abd2a650083a3a14304a7187e4b2da1088d57d500fda5979ec2e54963e","earlyMeasurement":"MEASURED_NOT_READY_FOR_ACCEPTANCE","genericVerify":"BLOCKED/OMQ_ORIGINALS_NOT_RUN_admission"},
-    "resourceCloseout":{"file":"product-resume-01/entry-fix-01/closeout.json","sha256":"3c2b81b5c360583b6dc0c23a68f7707e1f01ae95cb1d0b3c37b494c7d5952a3d","drainCommands":["678adeb0d82e429d932ebf73348ae2ed","1d2d6f40e96d4032a3830ff1000c76b9"],"bothSetsOfSevenCounts":[0,0,0,0,0,0,0],"apiAbsenceOriginals":["bd86bb4a55814435a10bdddaf602c8a0","0bca28bf4d984341ba42c85839ebda19"],"fiveReplacements":{"oracle":"exited/143 native shutdown confirmed","platform-pg":"exited/0 control state shut down","keycloak-test":"exited/143","rustfs":"exited/0","fuseki":"exited/143 no OOM; hook UNKNOWN; locks retained"},"finalResourceAttempt":"20f1cf41cc194fc5a326e0cf92df9a37","finalAdmissionSha256":"50aba9738d4a303ca2505604ab3859e2b16c342aeaea25a94ecafca6c18c2167","finalReadbackSha256":"77ad227748bd8d09aec4ee8fb6c36cf65cf149284c4a4c6cc84636c54035f600","finalCommandsReopened":43,"protectedInventorySha256":"2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9","originalExited":17,"originalRunning":3,"replacementRunning":0,"checks":"Both seven-counter outputs matched; exact API absence commands empty; independently matched five exited IDs, all 20 original inventory rows, all-running IDs and measured receipts/stdout/stderr."}
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "product-resume-01",
+  "batch": "entry-fix-01",
+  "role": "independent-read-only-quality-reviewer",
+  "decision": "ACCEPT_LIMITED_REPAIRS_AND_BLOCKED_HANDOFF",
+  "base": "326c7e1fd97f2327a25fa510071115d9eee7c5bb",
+  "reviewedHead": "bca93b0baa51dfde8f2ee78f3cfd468ab3f7a58f",
+  "localMain": "5168f2c93ca226caa521a6dc4ac85439335274c4",
+  "report": {
+    "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/report.md",
+    "bytes": 9461,
+    "sha256": "8184f399529eb1c7e5f2bd54c39952c515b32cf2c35eb148b965fba46bda8d9d",
+    "checkedFromGit": true
   },
-  "reused":["Frozen Fuseki checkpoint prior twice-read hashes for comparison","Previously accepted one-account platform login 1/1 remains historical only","503-test SelfTest retains original historical identity"],
-  "finalStates":{"limitedEntryRepairs":"ACCEPT","AC03-C":"PASS_AFFECTED_SETTLEMENT_CASES_ONLY","AC03-A":"BLOCKED/FORMAL_NOT_RUN","AC03-B":"BLOCKED","cleanup250ms":"NOT_QUALIFIED","OracleS0":"BLOCKED","S1":"BLOCKED/FORMAL_NOT_RUN","S2_S3":"NOT_ADMITTED","G4":"PARTIAL","currentFullSelfTest_CI_otherPlatforms":"NOT_RUN","productZip":"NOT_PRODUCED"},
-  "limitations":["New normal authentication must obtain four exact current subjects, roles/sites and minimum 210s TTL; recheck same-scope grants before a new run.","This window did not measure an Oracle business query, cancellation, S1 persistence or fresh-session reread. The zero-read observation covers audited FIXTURE_READER fixed business SELECTs only.","Ignored local raw execution artifacts and retained DLLs were reopened on the measured machine. No claim of portable artifact availability or final same-ZIP verification.","Push and subsequent remote readback are Master delivery steps outside this non-author review."]
+  "scope": {
+    "resourceRun": "implementation-01",
+    "measuredAuthAndPgCommit": "6d2a2976f2d54f54637b6fb364fe2c0444639644",
+    "registeredTestCommit": "d90fd032676813c48b712be2aadce0f950e4381c",
+    "registeredTestCommitToReviewedHead": "Report and evidence only after the previously reviewed code and report Head.",
+    "reviewerServiceActions": 0
+  },
+  "fresh": {
+    "r1r2": {
+      "integratedCommand": "93d77b26e380463f8bc318b09947c888",
+      "receiptSha256": "808294180296ef3db55d4119606a19123e2c9d0532e12a1c79d20c99eedd7184",
+      "cases": "6/6 actual bridge controlled cases; scoped Run, exact ticket path and stale assembly refusal. Four real session tickets not reached",
+      "oldRedCommand": "c0e987b7863741e8aed067bc63a9e3bd",
+      "independentLoginClassifierTests": "14/14"
+    },
+    "r3": {
+      "file": "s0-recovery-01/start-d8f4bbb99ed642eeaf8a4f5d5af7ee06.json",
+      "sha256": "7cb4266edaff6d00ae408761d1cc10a2932ee0958b91079a645851f4e1b0c3bd",
+      "pid": 64643,
+      "startedAt": "2026-11-20T10:34:20.330708926Z",
+      "counts": {
+        "default": 0,
+        "named": 1372,
+        "publishedGraphs": [
+          46,
+          1326
+        ]
+      },
+      "namedSha256": "712f9dfb825772fb4c71a51461e6a09e15657419dd39a8c7463c1d0d95a4884c",
+      "hook": "UNKNOWN"
+    },
+    "fourSubjectAuth": {
+      "file": "product-resume-01/entry-fix-01/auth-observed.json",
+      "sha256": "895466d67e365e4a826db1a27bfa1cc261e6240ed315b75a752ef789c3fa771d",
+      "dispatchSha256": "c31336af422f1cec4722dd0c5d99aca1587e6730a5711b400c8c728e62e2b93d",
+      "actualBrowserCommand": "ae2ebad4418249cc99d97f722b4d340c",
+      "receiptSha256": "ece94677788a3ea160eb24cfd86eb912878c9d8cc36ac4b91bf885354101ebf5",
+      "browserReportSha256": "c8939746131822ea0330ba3db3f799cd72cf7005e0eee8c6b183940986dfb2c3",
+      "validatedMembers": 28,
+      "checks": "All member digests matched; independently reconstructed argv, measured/current driver bytes, command input and parent. Reopened build bindings, three timed host observations, browser report and source clock window. Success consumer rejected as OMQ_REPORT_INPUT.",
+      "exitCode": 1,
+      "failure": "ORACLE_LOGIN_WAITING_FOR_INPUT",
+      "currentSubjects": "0/4",
+      "firstAccount": "g2-operator-ab",
+      "otherAccounts": "NOT_ATTEMPTED",
+      "ttl": "NOT_RUN",
+      "httpEvidenceEntries": 0,
+      "sourceAuditCommand": "4456c5bcc8644660a0b971ac3e91ea8e",
+      "auditReceiptSha256": "79b3f7a677199576d52704a20c0ae9ab8aacc444d2910b5ea822513f8a5bc9e5",
+      "windowUtc": [
+        "2026-11-20T10:39:57.338888Z",
+        "2026-11-20T10:40:39.575468Z"
+      ],
+      "auditClientFilter": null,
+      "fixtureReaderFixedBusinessSelects": 0
+    },
+    "postReadSettlement": {
+      "controlled": "8/8, 0 skipped",
+      "command": "3ea001fee76448fba6288d253249b86e",
+      "receiptSha256": "4a234cd887e36dfb3641d26d1c1759ca21b199f82b0a50f880bd9b41c3648bff",
+      "pgFile": "product-resume-01/pg-verification-aa04ee1b2551.json",
+      "pgSha256": "bed9f68c68587b02f5e0cbda6fc423314e857804a9041a0837869368dc98c052",
+      "pgActualCommand": "92cd82b7d50d4b8ab7bd86026c4c724c",
+      "pgActualReceiptSha256": "1c0017bdece060df96a20fa3b3d1dbd30480fc97c780bf34554f7fd3a3e88dcf",
+      "pgGroups": [
+        [
+          "OriginalCutoffIsCheckedAfterPostgresRowLock",
+          3
+        ],
+        [
+          "HealthyReaderThenPostgresRace",
+          3
+        ],
+        [
+          "OracleTerminalOwnerSurvivesSweepAndRejectsStaleConfirmation",
+          1
+        ],
+        [
+          "RevocationBlocksAtomicResultAndAudit",
+          1
+        ]
+      ],
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "pgCommandRecordsChecked": 15,
+      "verification": "Recomputed actual PG command argv and input with runner DLL, verified compiler/source/308 reference inputs, API 99 and QueryTests 222 snapshot files, raw measured output, exact OID before removal and absent afterward, and independent hashes of 48-table checkpoint plus hold observations.",
+      "runnerDllSha256": "94dcdac8c8a971ef1b2d3174c0ad515ebb046d0c2da984d77076593fa9458dec",
+      "backendInput": "7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f",
+      "pgOid": "17853",
+      "checkpointBeforeAndAfter": "89ab2b8983c5422bfed600ffe63a74a9fab558db65f93a4a328048b850956f29",
+      "databaseReleased": true
+    },
+    "engineering": {
+      "registeredCommand": "d0315377a78d459abac5e95aebea5153",
+      "receiptSha256": "423a4eb14aa4bc1aca890f2329e6e057b5233bdfc12fc40f372abad9d22f50f9",
+      "stderrSha256": "30f6932e5cabd06de7dcd06806353e30e3e954925f56966626635a42d99d8f1c",
+      "result": "51/51 offline, 0 skipped",
+      "fullStaticCommand": "caa66c40a36e40a8acdbd7d11baef56b",
+      "fullStaticReceiptSha256": "65f355abd2a650083a3a14304a7187e4b2da1088d57d500fda5979ec2e54963e",
+      "earlyMeasurement": "MEASURED_NOT_READY_FOR_ACCEPTANCE",
+      "genericVerify": "BLOCKED/OMQ_ORIGINALS_NOT_RUN_admission"
+    },
+    "resourceCloseout": {
+      "file": "product-resume-01/entry-fix-01/closeout.json",
+      "sha256": "3c2b81b5c360583b6dc0c23a68f7707e1f01ae95cb1d0b3c37b494c7d5952a3d",
+      "drainCommands": [
+        "678adeb0d82e429d932ebf73348ae2ed",
+        "1d2d6f40e96d4032a3830ff1000c76b9"
+      ],
+      "bothSetsOfSevenCounts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "apiAbsenceOriginals": [
+        "bd86bb4a55814435a10bdddaf602c8a0",
+        "0bca28bf4d984341ba42c85839ebda19"
+      ],
+      "fiveReplacements": {
+        "oracle": "exited/143 native shutdown confirmed",
+        "platform-pg": "exited/0 control state shut down",
+        "keycloak-test": "exited/143",
+        "rustfs": "exited/0",
+        "fuseki": "exited/143 no OOM; hook UNKNOWN; locks retained"
+      },
+      "finalResourceAttempt": "20f1cf41cc194fc5a326e0cf92df9a37",
+      "finalAdmissionSha256": "50aba9738d4a303ca2505604ab3859e2b16c342aeaea25a94ecafca6c18c2167",
+      "finalReadbackSha256": "77ad227748bd8d09aec4ee8fb6c36cf65cf149284c4a4c6cc84636c54035f600",
+      "finalCommandsReopened": 43,
+      "protectedInventorySha256": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9",
+      "originalExited": 17,
+      "originalRunning": 3,
+      "replacementRunning": 0,
+      "checks": "Both seven-counter outputs matched; exact API absence commands empty; independently matched five exited IDs, all 20 original inventory rows, all-running IDs and measured receipts/stdout/stderr."
+    }
+  },
+  "reused": [
+    "Frozen Fuseki checkpoint prior twice-read hashes for comparison",
+    "Previously accepted one-account platform login 1/1 remains historical only",
+    "503-test SelfTest retains original historical identity"
+  ],
+  "finalStates": {
+    "limitedEntryRepairs": "ACCEPT",
+    "AC03-C": "PASS_AFFECTED_SETTLEMENT_CASES_ONLY",
+    "AC03-A": "BLOCKED/FORMAL_NOT_RUN",
+    "AC03-B": "BLOCKED",
+    "cleanup250ms": "NOT_QUALIFIED",
+    "OracleS0": "BLOCKED",
+    "S1": "BLOCKED/FORMAL_NOT_RUN",
+    "S2_S3": "NOT_ADMITTED",
+    "G4": "PARTIAL",
+    "currentFullSelfTest_CI_otherPlatforms": "NOT_RUN",
+    "productZip": "NOT_PRODUCED"
+  },
+  "limitations": [
+    "New normal authentication must obtain four exact current subjects, roles/sites and minimum 210s TTL; recheck same-scope grants before a new run.",
+    "This window did not measure an Oracle business query, cancellation, S1 persistence or fresh-session reread. The zero-read observation covers audited FIXTURE_READER fixed business SELECTs only.",
+    "Ignored local raw execution artifacts and retained DLLs were reopened on the measured machine. No claim of portable artifact availability or final same-ZIP verification.",
+    "Push and subsequent remote readback are Master delivery steps outside this non-author review."
+  ],
+  "previousDelivery": {
+    "head": "ee7e3df27d6847c09307526920959f42b4584f4f",
+    "reportSha256": "4d6d413a405e0acbd50c746d91fd55831d897fddad77303605649f7fe0cda623",
+    "nonAuthorReviewSha256": "c6c1641b71621406a9a550ba7e62d127113bc0d7fba3eaa218cc6371eda86ee3",
+    "machineReceiptSha256": "4638e83528209847ba793c0aebd7a2ecb560db45630db25c4a48cbdee5b5274e"
+  },
+  "additionalWindows": {
+    "decision": "ACCEPT_BLOCKED_AUTH_AND_CLOSEOUT",
+    "reopened": [
+      {
+        "measuredHead": "ee7e3df27d6847c09307526920959f42b4584f4f",
+        "authCommand": "3b9131ecad82459e88b9f2660b285def",
+        "authReceiptSha256": "61cef6ce4ad2cddd151c9fa19a30925d3c3d290ea9c25b0b9b47dc3f81d6454d",
+        "reportSha256": "309b562513af3de04bf71ffcabb30806dfd061f70689ff5d81be136ad01b2671",
+        "sourceAuditCommand": "a65e93a7464c4156adb99cfa9465ac98",
+        "auditSha256": "23d42a143ad6d459b191497f70ed8cab9fc9c1f225165637ee2d05a2568b82f5",
+        "fixedSelects": 0,
+        "verifiedSubjects": "0/4",
+        "otherThree": "NOT_ATTEMPTED",
+        "ticketTtl": "NOT_RUN",
+        "observedFailure": "ORACLE_LOGIN_WAITING_FOR_INPUT",
+        "reopenedAuthMembers": 28,
+        "successConsumer": "REJECTED/OMQ_REPORT_INPUT",
+        "closeOperation": "ce83cef37f794bd8bc76787a4ee54c59",
+        "closeoutSha256": "50b152f272c22b894392aaf3e89097ef90fe11002c7ab73436040e4743a07f22",
+        "bothDrainsSevenZero": true,
+        "apisAbsent": 2,
+        "replacementExited": 5,
+        "oldStoppedKeep": 17,
+        "oldRunning": 3,
+        "reopenedFinalAdmissionCommands": 43
+      },
+      {
+        "measuredHead": "b0e8d9682efcf4626f221dd3b0cdf68370a6d448",
+        "authCommand": "f2dab63d98bf42fd97f19d3a2dde66c4",
+        "authReceiptSha256": "edac05be9689638035fb8850e5a10a8796e4a13ba3b505fb2556fe4a9edf2c5d",
+        "reportSha256": "5cce798b6686cbe5b93453bb737cec91006aa775abf0522048f399ba03605b37",
+        "sourceAuditCommand": "b9a8361b8d7f4cc8850706bc57fe55b3",
+        "auditSha256": "c41d8d71079c741d88a9581f9d0894138f14baed6c232874a39c37edee5215aa",
+        "fixedSelects": 0,
+        "verifiedSubjects": "0/4",
+        "otherThree": "NOT_ATTEMPTED",
+        "ticketTtl": "NOT_RUN",
+        "observedFailure": "ORACLE_LOGIN_WAITING_FOR_INPUT",
+        "reopenedAuthMembers": 28,
+        "successConsumer": "REJECTED/OMQ_REPORT_INPUT",
+        "closeOperation": "59973b489528459595ca04d0bb5ae2fb",
+        "closeoutSha256": "435c0785c360bab98da95d693c348b46c2cb26ae2bb4acb3f7bee649ff80390d",
+        "bothDrainsSevenZero": true,
+        "apisAbsent": 2,
+        "replacementExited": 5,
+        "oldStoppedKeep": 17,
+        "oldRunning": 3,
+        "reopenedFinalAdmissionCommands": 43
+      }
+    ],
+    "reviewerScope": "Checked formal auth inputs, streams, source audit and closeout. Keychain metadata and the local button are operator context, outside independent observation."
+  }
 }

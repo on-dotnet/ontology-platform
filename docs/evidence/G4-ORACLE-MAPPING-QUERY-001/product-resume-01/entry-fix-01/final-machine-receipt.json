@@ -6,26 +6,26 @@
   "base": "326c7e1fd97f2327a25fa510071115d9eee7c5bb",
   "branch": "codex/g4-oracle-mapping-query-001",
   "main": "5168f2c93ca226caa521a6dc4ac85439335274c4",
-  "reviewedCodeAndReportHead": "70df3479e162321850c16ce37be9748a1dbef62f",
+  "reviewedCodeAndReportHead": "bca93b0baa51dfde8f2ee78f3cfd468ab3f7a58f",
   "report": {
     "file": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/report.md",
-    "sha256": "4d6d413a405e0acbd50c746d91fd55831d897fddad77303605649f7fe0cda623",
-    "sizeBytes": 7014
+    "sizeBytes": 9461,
+    "sha256": "8184f399529eb1c7e5f2bd54c39952c515b32cf2c35eb148b965fba46bda8d9d"
   },
   "review": {
     "file": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/non-author-review.json",
-    "sha256": "c6c1641b71621406a9a550ba7e62d127113bc0d7fba3eaa218cc6371eda86ee3",
-    "sizeBytes": 7268
+    "sizeBytes": 11388,
+    "sha256": "7633e9e4fee5df59d45b39668ba7d7669b6aec0fa32e72e3dfa410a336f5a6f8"
   },
   "deliveryGit": {
     "remote": "origin",
     "branch": "codex/g4-oracle-mapping-query-001",
-    "taskBranchBefore": "326c7e1fd97f2327a25fa510071115d9eee7c5bb",
-    "taskBranchAfter": "70df3479e162321850c16ce37be9748a1dbef62f",
+    "method": "ordinary push",
+    "taskBranchBefore": "ee7e3df27d6847c09307526920959f42b4584f4f",
+    "intermediateReportHead": "b0e8d9682efcf4626f221dd3b0cdf68370a6d448",
+    "taskBranchAfter": "bca93b0baa51dfde8f2ee78f3cfd468ab3f7a58f",
     "mainAfter": "5168f2c93ca226caa521a6dc4ac85439335274c4",
-    "method": "git push origin refs/heads/codex/g4-oracle-mapping-query-001:refs/heads/codex/g4-oracle-mapping-query-001",
-    "readback": "git ls-remote --refs origin refs/heads/codex/g4-oracle-mapping-query-001 refs/heads/main",
-    "readAtUtc": "2026-11-20T10:51:41.750604+00:00"
+    "readback": "git ls-remote --exit-code origin refs/heads/codex/g4-oracle-mapping-query-001 refs/heads/main"
   },
   "receiptCommit": "The direct child of reviewedCodeAndReportHead adds only this receipt and non-author-review.json. Its full commit and remote readback are delivered with the files.",
   "results": {
@@ -555,5 +555,224 @@
       "sha256": "c8939746131822ea0330ba3db3f799cd72cf7005e0eee8c6b183940986dfb2c3",
       "sizeBytes": 10890
     }
-  ]
+  ],
+  "previousDelivery": {
+    "head": "ee7e3df27d6847c09307526920959f42b4584f4f",
+    "reportSha256": "4d6d413a405e0acbd50c746d91fd55831d897fddad77303605649f7fe0cda623",
+    "nonAuthorReviewSha256": "c6c1641b71621406a9a550ba7e62d127113bc0d7fba3eaa218cc6371eda86ee3",
+    "machineReceiptSha256": "4638e83528209847ba793c0aebd7a2ecb560db45630db25c4a48cbdee5b5274e"
+  },
+  "additionalWindows": {
+    "runs": [
+      {
+        "execution": "FRESH",
+        "caseCommand": "3b9131ecad82459e88b9f2660b285def",
+        "testedCommit": "ee7e3df27d6847c09307526920959f42b4584f4f",
+        "sourceWindowUtc": [
+          "2026-11-20T11:20:57.518150Z",
+          "2026-11-20T11:21:40.069645Z"
+        ],
+        "exitCode": 1,
+        "failure": {
+          "phase": "oidc_operator-ab",
+          "category": "Error",
+          "code": "ORACLE_LOGIN_WAITING_FOR_INPUT"
+        },
+        "currentSubjectsVerified": [],
+        "inputsUnchanged": true,
+        "formalHost": {
+          "snapshot": "3cd0b1157476006db2f93beac71d78c97f3890bac01bd662ca3a895335bf69df",
+          "hostManifest": "14e60974dcfcddf752da30edd91f53ffae35a2e8aebcc45c4753aa987fe27b32",
+          "apiIds": {
+            "api": "71adab8e826e3a2faf099a2b391d06178eaf1e57ed0826c6f450bbe49ecb10f9",
+            "api-secondary": "76a74006a8ccb31a4ee45025bd53899217ddc5b3ce9c83612136d4ada0662bdc"
+          }
+        },
+        "builds": {
+          "api": {
+            "receiptSha256": "d5826b711bdae9d155a91c94c389821f807cc615533146c74960f3a581d4c3ab",
+            "inputKey": "7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f",
+            "outputKey": "a9b16e7d0f8b9388bc787126612748ab9c8f2b9207620f177873c117945f4348"
+          },
+          "agent": {
+            "receiptSha256": "669b83e79d8000411e7b99488b3ba1d3b1b9f3b689169d82370c117b232c9868",
+            "inputKey": "7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f",
+            "outputKey": "0251317fd5be41c2ea6088222dc5911f9ea93f30a3c122c24aa554c08638f694"
+          }
+        },
+        "sourceAuditCommand": "a65e93a7464c4156adb99cfa9465ac98",
+        "unfilteredFixedBusinessSelects": 0,
+        "resourceCloseout": {
+          "id": "ce83cef37f794bd8bc76787a4ee54c59",
+          "admission": "4825fd93784a4f74987f999fab06988a",
+          "protectedInventory": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9",
+          "drainCommands": [
+            "559f06e423b0423a8aa1159d1f6ed34b",
+            "28dcf896d3164a3db90f9be1b1c283c0"
+          ],
+          "allSevenZeroBothTimes": true,
+          "apisAbsent": [
+            "api",
+            "api-secondary"
+          ],
+          "replacementExitCodes": {
+            "oracle": 143,
+            "rustfs": 0,
+            "keycloak-test": 143,
+            "fuseki": 143,
+            "platform-pg": 0
+          },
+          "fusekiShutdownHook": "UNKNOWN"
+        },
+        "originals": [
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-run-s0-oracle-auth-3b9131ecad82459e88b9f2660b285def.json",
+            "sha256": "bfc2b83a7b7c3164042999833c409086fd7ccfedbb3613b20e79827a55a5d5f6",
+            "bytes": 6556
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/browser-s0-oracle-auth-1795173657924.json",
+            "sha256": "309b562513af3de04bf71ffcabb30806dfd061f70689ff5d81be136ad01b2671",
+            "bytes": 10890
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/3b9131ecad82459e88b9f2660b285def/receipt.json",
+            "sha256": "61cef6ce4ad2cddd151c9fa19a30925d3c3d290ea9c25b0b9b47dc3f81d6454d",
+            "bytes": 1532
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-audit-3b9131ecad82459e88b9f2660b285def.json",
+            "sha256": "23d42a143ad6d459b191497f70ed8cab9fc9c1f225165637ee2d05a2568b82f5",
+            "bytes": 710
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/login-20261120T111739Z/closeout.json",
+            "sha256": "50b152f272c22b894392aaf3e89097ef90fe11002c7ab73436040e4743a07f22",
+            "bytes": 3895
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-4825fd93784a4f74987f999fab06988a.json",
+            "sha256": "d62fe3e7a70651ff3565edc72a58fb15d13f2fde45be7b74dc9aadd38065460d",
+            "bytes": 43663
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/login-20261120T111739Z/host.json",
+            "sha256": "0cead49361ce7b893dfb22654ba52322864bac4874ffd4dad6d53284efaf2ab8",
+            "bytes": 549
+          }
+        ]
+      },
+      {
+        "execution": "FRESH",
+        "caseCommand": "f2dab63d98bf42fd97f19d3a2dde66c4",
+        "testedCommit": "b0e8d9682efcf4626f221dd3b0cdf68370a6d448",
+        "sourceWindowUtc": [
+          "2026-11-20T11:27:14.780712Z",
+          "2026-11-20T11:27:57.204907Z"
+        ],
+        "exitCode": 1,
+        "failure": {
+          "phase": "oidc_operator-ab",
+          "category": "Error",
+          "code": "ORACLE_LOGIN_WAITING_FOR_INPUT"
+        },
+        "currentSubjectsVerified": [],
+        "inputsUnchanged": true,
+        "formalHost": {
+          "snapshot": "3cd0b1157476006db2f93beac71d78c97f3890bac01bd662ca3a895335bf69df",
+          "hostManifest": "6b646c0a7aacea89739eefbb1e5814815496db3b6260456c2086fdcc0a732091",
+          "apiIds": {
+            "api": "d6d23b90a91c39573c643f95e267e95f0a1ed63a2b79cd29ae68844a8704e8cb",
+            "api-secondary": "742afcd1432353cc6d87ba8a62ec0089ebf60b1f945d07a4ddda1a0297d48fd6"
+          }
+        },
+        "builds": {
+          "api": {
+            "receiptSha256": "d5826b711bdae9d155a91c94c389821f807cc615533146c74960f3a581d4c3ab",
+            "inputKey": "7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f",
+            "outputKey": "a9b16e7d0f8b9388bc787126612748ab9c8f2b9207620f177873c117945f4348"
+          },
+          "agent": {
+            "receiptSha256": "669b83e79d8000411e7b99488b3ba1d3b1b9f3b689169d82370c117b232c9868",
+            "inputKey": "7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f",
+            "outputKey": "0251317fd5be41c2ea6088222dc5911f9ea93f30a3c122c24aa554c08638f694"
+          }
+        },
+        "sourceAuditCommand": "b9a8361b8d7f4cc8850706bc57fe55b3",
+        "unfilteredFixedBusinessSelects": 0,
+        "resourceCloseout": {
+          "id": "59973b489528459595ca04d0bb5ae2fb",
+          "admission": "504964cdee4c45868005cd006f5ed45d",
+          "protectedInventory": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9",
+          "drainCommands": [
+            "b02449fbeca646d78d6491f38b1950f7",
+            "c26b17a28d5b433ea89133992315d1e9"
+          ],
+          "allSevenZeroBothTimes": true,
+          "apisAbsent": [
+            "api",
+            "api-secondary"
+          ],
+          "replacementExitCodes": {
+            "oracle": 143,
+            "rustfs": 0,
+            "keycloak-test": 143,
+            "fuseki": 143,
+            "platform-pg": 0
+          },
+          "fusekiShutdownHook": "UNKNOWN"
+        },
+        "originals": [
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-run-s0-oracle-auth-f2dab63d98bf42fd97f19d3a2dde66c4.json",
+            "sha256": "147cf953f78d278776d7ecfc81c0da812433ba0357e7e648cda3fd70145162b9",
+            "bytes": 6553
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/browser-s0-oracle-auth-1795174035208.json",
+            "sha256": "5cce798b6686cbe5b93453bb737cec91006aa775abf0522048f399ba03605b37",
+            "bytes": 10884
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/f2dab63d98bf42fd97f19d3a2dde66c4/receipt.json",
+            "sha256": "edac05be9689638035fb8850e5a10a8796e4a13ba3b505fb2556fe4a9edf2c5d",
+            "bytes": 1532
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-audit-f2dab63d98bf42fd97f19d3a2dde66c4.json",
+            "sha256": "c41d8d71079c741d88a9581f9d0894138f14baed6c232874a39c37edee5215aa",
+            "bytes": 709
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/login-20261120T112437Z/closeout.json",
+            "sha256": "435c0785c360bab98da95d693c348b46c2cb26ae2bb4acb3f7bee649ff80390d",
+            "bytes": 3896
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-504964cdee4c45868005cd006f5ed45d.json",
+            "sha256": "3c72d6fbe37df37c5d4119153010978d1154937d35173924202f079401f48302",
+            "bytes": 43663
+          },
+          {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/login-20261120T112437Z/host.json",
+            "sha256": "5e60aee45d2a7522ccbc25191ff955b5aae5dff499bd24d7bb5279607e1b001a",
+            "bytes": 550
+          }
+        ]
+      }
+    ],
+    "enrollmentChange": "none",
+    "resourceBudgetChange": "none",
+    "previousSectionsScope": "currentInput and fresh.currentAuthentication describe the original 18:39 trial. Each later trial has its own build, host, commit and command in runs.",
+    "grantReadbackAfter1920": {
+      "utc": "2026-11-20T11:22:13.176213+00:00",
+      "registeredRows": 30,
+      "active": 15,
+      "sufficient210s": 15,
+      "lastExpiry": "2026-11-20T12:24:06.225777+00:00",
+      "programmedQueryPermissions": 6,
+      "distinctSubjects": 4
+    },
+    "additionalQualification": "The two later windows also failed before the first verified /me or the four-ticket check."
+  }
 }
