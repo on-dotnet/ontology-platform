@@ -1,0 +1,559 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "product-resume-01",
+  "batch": "entry-fix-01",
+  "resourceRun": "implementation-01",
+  "base": "326c7e1fd97f2327a25fa510071115d9eee7c5bb",
+  "branch": "codex/g4-oracle-mapping-query-001",
+  "main": "5168f2c93ca226caa521a6dc4ac85439335274c4",
+  "reviewedCodeAndReportHead": "70df3479e162321850c16ce37be9748a1dbef62f",
+  "report": {
+    "file": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/report.md",
+    "sha256": "4d6d413a405e0acbd50c746d91fd55831d897fddad77303605649f7fe0cda623",
+    "sizeBytes": 7014
+  },
+  "review": {
+    "file": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/non-author-review.json",
+    "sha256": "c6c1641b71621406a9a550ba7e62d127113bc0d7fba3eaa218cc6371eda86ee3",
+    "sizeBytes": 7268
+  },
+  "deliveryGit": {
+    "remote": "origin",
+    "branch": "codex/g4-oracle-mapping-query-001",
+    "taskBranchBefore": "326c7e1fd97f2327a25fa510071115d9eee7c5bb",
+    "taskBranchAfter": "70df3479e162321850c16ce37be9748a1dbef62f",
+    "mainAfter": "5168f2c93ca226caa521a6dc4ac85439335274c4",
+    "method": "git push origin refs/heads/codex/g4-oracle-mapping-query-001:refs/heads/codex/g4-oracle-mapping-query-001",
+    "readback": "git ls-remote --refs origin refs/heads/codex/g4-oracle-mapping-query-001 refs/heads/main",
+    "readAtUtc": "2026-11-20T10:51:41.750604+00:00"
+  },
+  "receiptCommit": "The direct child of reviewedCodeAndReportHead adds only this receipt and non-author-review.json. Its full commit and remote readback are delivered with the files.",
+  "results": {
+    "entryFix": "ACCEPTED_FOR_BOUNDED_HANDOFF",
+    "R1": "PASS",
+    "R2Entry": "PASS",
+    "R2RealFourCurrentTickets": "NOT_RUN",
+    "R3CurrentReopen": "PASS",
+    "R3PhysicalSmallDirectoryExperiment": "NOT_RUN",
+    "AC03-A": "BLOCKED",
+    "AC03-A-formalScenario": "NOT_RUN",
+    "AC03-C-pg": "PASS",
+    "AC03-B": "BLOCKED",
+    "cleanup250ms": "NOT_QUALIFIED",
+    "OracleS0": "BLOCKED",
+    "S1": "NOT_RUN",
+    "S2": "NOT_RUN",
+    "S3": "NOT_RUN",
+    "G4": "PARTIAL",
+    "closeout": "PASS"
+  },
+  "currentInput": {
+    "builds": {
+      "api": {
+        "commandId": "7d4887ba680b466fb8b02cc47081b0c4",
+        "receiptSha256": "d5826b711bdae9d155a91c94c389821f807cc615533146c74960f3a581d4c3ab",
+        "inputKey": "7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f",
+        "outputKey": "a9b16e7d0f8b9388bc787126612748ab9c8f2b9207620f177873c117945f4348"
+      },
+      "query": {
+        "commandId": "4a78a1d98d974dcd9e7f3aadc83a8c8a",
+        "receiptSha256": "5ff280c853992b95c9010910fa3bdb49d9f95430b5827df40763c7084d7c4735",
+        "inputKey": "7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f",
+        "outputKey": "0a538da60517db5340e23f73c03c3d7e341a2098f0e9006a0c498d8e1b412c8c"
+      },
+      "agent": {
+        "commandId": "8e88ea0286b44f309f876b05955b2e69",
+        "receiptSha256": "669b83e79d8000411e7b99488b3ba1d3b1b9f3b689169d82370c117b232c9868",
+        "inputKey": "7ff360c3d812256db08c065871ece27b11ca8f1e554bc5c713b2994daa08c52f",
+        "outputKey": "0251317fd5be41c2ea6088222dc5911f9ea93f30a3c122c24aa554c08638f694"
+      }
+    },
+    "testedCommit": "6d2a2976f2d54f54637b6fb364fe2c0444639644",
+    "registeredEngineeringGateCommit": "d90fd032676813c48b712be2aadce0f950e4381c",
+    "testOnlyRegistrationAndDocsAfterRuntime": true,
+    "hostSnapshot": "3cd0b1157476006db2f93beac71d78c97f3890bac01bd662ca3a895335bf69df",
+    "hostManifestSha256": "d8f9cfaa8e325f81bc410877481dc147367e13caaa65ad43db6cd204c6d754a6",
+    "composeSha256": "2217b2920c561e8a10409cc5600ad049b1b987a5450265129e7315228baf8d04",
+    "apiHostIds": {
+      "api": "c793df094bd40e9b4bf4164c7e0362568fd1f41177b5f691efaa2ee12b69dfa5",
+      "api-secondary": "643339df77a9791a4620c04575e3f64cc26c4bce1eea9d048906748f900df624",
+      "fuseki": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+      "keycloak-test": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+      "platform-pg": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+      "rustfs": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be"
+    }
+  },
+  "fresh": {
+    "prepare": {
+      "status": "DEPENDENCIES_READY",
+      "projects": 21,
+      "packages": 179,
+      "downloads": 0,
+      "sdkDownloads": 0,
+      "contentKey": "d6d909b8cad6e0c13389a3323def278aa77870bbca92689ade15af303daafb43",
+      "workspaceKey": "8b951d981c0ddf997960272bfb762ad8ff70a5859ed8470855e0111d9772613b"
+    },
+    "reproductions": {
+      "R1R2": {
+        "oldCommand": "c0e987b7863741e8aed067bc63a9e3bd",
+        "originalSha256": "513136708f9b3bf09ea02816fbf7aad4320dff7821811b84c082e16f9d4d4723"
+      },
+      "oldSettlement": {
+        "command": "f0695c47eb2943e8adac224e3b9a8001",
+        "branchCutoffMs": 1000,
+        "actualCasAtMs": 1001,
+        "rootRemainingMs": 3999
+      }
+    },
+    "integratedOfflineHostChecks": {
+      "entry-consumers": {
+        "commandId": "93d77b26e380463f8bc318b09947c888",
+        "exitCode": 0
+      },
+      "recovery": {
+        "commandId": "9d2f890c85c743c2ae25cede14aaff62",
+        "exitCode": 0
+      },
+      "qualify": {
+        "commandId": "d3554f1492a84eb6950f24a91560935b",
+        "exitCode": 0
+      },
+      "login": {
+        "commandId": "1a06db9cb4ad4a1ab132aeb8f669498f",
+        "exitCode": 0
+      }
+    },
+    "managedSettlement": {
+      "testedCommit": "94901e4dc02fbfd85566688b8ece7cd7806bce27",
+      "commandId": "3ea001fee76448fba6288d253249b86e",
+      "passed": 8
+    },
+    "currentPg": {
+      "testedCommit": "6d2a2976f2d54f54637b6fb364fe2c0444639644",
+      "databaseOid": "17853",
+      "tests": [
+        {
+          "method": "G4OracleSettlementTests.OriginalCutoffIsCheckedAfterPostgresRowLock",
+          "expected": 3,
+          "total": 3,
+          "succeeded": 3,
+          "failed": 0,
+          "skipped": 0,
+          "exitCode": 0
+        },
+        {
+          "method": "G4QueryRaceTests.HealthyReaderThenPostgresRace",
+          "expected": 3,
+          "total": 3,
+          "succeeded": 3,
+          "failed": 0,
+          "skipped": 0,
+          "exitCode": 0
+        },
+        {
+          "method": "G4QueryRaceTests.OracleTerminalOwnerSurvivesSweepAndRejectsStaleConfirmation",
+          "expected": 1,
+          "total": 1,
+          "succeeded": 1,
+          "failed": 0,
+          "skipped": 0,
+          "exitCode": 0
+        },
+        {
+          "method": "G4QueryRaceTests.RevocationBlocksAtomicResultAndAudit",
+          "expected": 1,
+          "total": 1,
+          "succeeded": 1,
+          "failed": 0,
+          "skipped": 0,
+          "exitCode": 0
+        }
+      ],
+      "command": "92cd82b7d50d4b8ab7bd86026c4c724c",
+      "checkpointBefore": "89ab2b8983c5422bfed600ffe63a74a9fab558db65f93a4a328048b850956f29",
+      "checkpointAfter": "89ab2b8983c5422bfed600ffe63a74a9fab558db65f93a4a328048b850956f29",
+      "released": true
+    },
+    "currentAuthentication": {
+      "commandId": "ae2ebad4418249cc99d97f722b4d340c",
+      "testedCommit": "6d2a2976f2d54f54637b6fb364fe2c0444639644",
+      "status": "BLOCKED_AUTHENTICATION",
+      "failure": {
+        "phase": "oidc_operator-ab",
+        "category": "Error",
+        "code": "ORACLE_LOGIN_WAITING_FOR_INPUT"
+      },
+      "mode": "s0-oracle-auth",
+      "sourceAuditCount": 0,
+      "sourceAuditCommand": "4456c5bcc8644660a0b971ac3e91ea8e",
+      "matchedClock": [
+        "2026-11-20T10:39:57.338888Z",
+        "2026-11-20T10:40:39.575468Z"
+      ],
+      "elapsedSeconds": 42.23633758304641,
+      "fourCurrentSubjects": 0,
+      "browserHttp": [],
+      "inputsUnchanged": true,
+      "members": {
+        "browser-s0-oracle-auth-1795171197601.json": "c8939746131822ea0330ba3db3f799cd72cf7005e0eee8c6b183940986dfb2c3",
+        "api-build-binding.json": "d5826b711bdae9d155a91c94c389821f807cc615533146c74960f3a581d4c3ab",
+        "api-bound-build.txt": "4dea0abf615a53e10386e01e4232762bb696c31511f6d35c62f90514aac53cc3",
+        "agent-build-binding.json": "669b83e79d8000411e7b99488b3ba1d3b1b9f3b689169d82370c117b232c9868",
+        "agent-bound-build.txt": "9e00d3254cf9beabbda716776e926fdb557dbc90f170bb089812fc3610c68c32",
+        "ae2ebad4418249cc99d97f722b4d340c-receipt.json": "ece94677788a3ea160eb24cfd86eb912878c9d8cc36ac4b91bf885354101ebf5",
+        "ae2ebad4418249cc99d97f722b4d340c-stdout.txt": "9de6bdf127a21851952d3e4b3bdf804c26ed5ba20a6f6521c3f58d466f5c4d60",
+        "ae2ebad4418249cc99d97f722b4d340c-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "formal-api-inputs.json": "d472ac5c956d3a69948e8d1ea95005e41cd16f97b469e2526220f63d5b182054",
+        "formal-resources.json": "d8f9cfaa8e325f81bc410877481dc147367e13caaa65ad43db6cd204c6d754a6",
+        "api-snapshot.json": "bd315b8cc87f6821fa7342196bddefb470a84c652416da931800173ab0b0111a",
+        "formal-api-compose.json": "2217b2920c561e8a10409cc5600ad049b1b987a5450265129e7315228baf8d04",
+        "873e54820aaa4a599e87adc0044b804b-receipt.json": "97e103f885527214de14fe61876d8fe9111397b6f84d3182f8d0960d1d2d473c",
+        "873e54820aaa4a599e87adc0044b804b-stdout.txt": "0bc71a5277606ce4e7954b54d9247bc6bb1859aa4d7f9a0e192e62a97417ec9e",
+        "873e54820aaa4a599e87adc0044b804b-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "63381b3381134f77bea4c20795f26ef0-receipt.json": "f426cd2de7d2daa7f207f5fb8aaf26ec68c0555b765959ebe1bdb41e9c50ccb1",
+        "63381b3381134f77bea4c20795f26ef0-stdout.txt": "0bc71a5277606ce4e7954b54d9247bc6bb1859aa4d7f9a0e192e62a97417ec9e",
+        "63381b3381134f77bea4c20795f26ef0-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "428d72655eb442de8ab2e6adb2a949f0-receipt.json": "47ee6131cf369bb274a85dc656642e056f02e6a39c95c0e77b78f8a445c9623f",
+        "428d72655eb442de8ab2e6adb2a949f0-stdout.txt": "0bc71a5277606ce4e7954b54d9247bc6bb1859aa4d7f9a0e192e62a97417ec9e",
+        "428d72655eb442de8ab2e6adb2a949f0-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "formal-audit-ae2ebad4418249cc99d97f722b4d340c.json": "6df498e30eb5fb6217932ef201220624cc2885fcd7cb00dcfe1105da1db0919a",
+        "406f411056b347e0b6ab43e5898af6c8-receipt.json": "48cf25d66a21672cb81428ff4c7098ded48b3bd01df6d92eb8bf042c39bced85",
+        "406f411056b347e0b6ab43e5898af6c8-stdout.txt": "91d0f46a693e9e8cdc9e7c30039c9931dd8c792492ab343a9a44930162c372d9",
+        "406f411056b347e0b6ab43e5898af6c8-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "4456c5bcc8644660a0b971ac3e91ea8e-receipt.json": "79b3f7a677199576d52704a20c0ae9ab8aacc444d2910b5ea822513f8a5bc9e5",
+        "4456c5bcc8644660a0b971ac3e91ea8e-stdout.txt": "afa2142fcfdda8850a82d650e63b3f35e59342841d0695ae52714ceb2b25c199",
+        "4456c5bcc8644660a0b971ac3e91ea8e-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "blockedSuccessQualification": {
+      "command": "0d7272e465574d4ab6c7d0f847385ccc",
+      "exitCode": 1,
+      "reason": "OMQ_REPORT_INPUT"
+    },
+    "grantsAtObservation": {
+      "utc": "2026-11-20T10:41:34.648005+00:00",
+      "registeredRows": 30,
+      "active": 15,
+      "sufficient210s": 15,
+      "lastExpiry": "2026-11-20T12:24:06.225777+00:00",
+      "programmedQueryPermissions": 6,
+      "distinctSubjects": 4
+    },
+    "fuseki": {
+      "attempt": "d8f4bbb99ed642eeaf8a4f5d5af7ee06",
+      "id": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+      "status": "RUNNING",
+      "pid": 64643,
+      "startedAt": "2026-11-20T10:34:20.330708926Z",
+      "productUse": "CURRENT_GRAPHS_VERIFIED",
+      "currentGraphs": {
+        "status": "CURRENT_GRAPHS_VERIFIED",
+        "scan": {
+          "default": {
+            "rows": 0,
+            "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+          },
+          "named": {
+            "rows": 1372,
+            "sha256": "712f9dfb825772fb4c71a51461e6a09e15657419dd39a8c7463c1d0d95a4884c"
+          }
+        },
+        "graphs": [
+          {
+            "graph": "urn:ontology-platform:release:d60d10638030402c8fcf6254bc782529:ontology",
+            "triples": 46,
+            "sha256": "ba87dc803335580b837c516577ee64ed907a25345c229ab637aa69a2fc2f1ec1"
+          },
+          {
+            "graph": "urn:ontology-platform:release:d60d10638030402c8fcf6254bc782529:data",
+            "triples": 1326,
+            "sha256": "125735d5c0db46a8a5b164218c95b5fbd04165530a185285c566a8e0201a0309"
+          }
+        ]
+      }
+    },
+    "initialResourceAdmission": {
+      "attempt": "731f083d618348a585ff566d0727d8b8",
+      "projectedWithHelper": {
+        "memory": 14763950080,
+        "nanoCpus": 10500000000
+      },
+      "vm": {
+        "total": 20964958208,
+        "cpus": 12,
+        "available": 18415353856,
+        "availableFs": 409488953344,
+        "load": "0.17 0.06 0.01 2/426 7"
+      },
+      "totalBytes": 42790296510,
+      "ceilingBytes": 42949672960
+    },
+    "resourceCloseout": {
+      "operation": "41d91153a3e94824875cbd27265fc2ed",
+      "ids": {
+        "platform-pg": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+        "keycloak-test": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+        "fuseki": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+        "rustfs": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
+        "oracle": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+        "api": "c793df094bd40e9b4bf4164c7e0362568fd1f41177b5f691efaa2ee12b69dfa5",
+        "api-secondary": "643339df77a9791a4620c04575e3f64cc26c4bce1eea9d048906748f900df624"
+      },
+      "drain": {
+        "initial": {
+          "commandId": "678adeb0d82e429d932ebf73348ae2ed",
+          "counts": {
+            "runningQueries": 0,
+            "queuedOrRunningRuns": 0,
+            "queuedOrRunningCatalogJobs": 0,
+            "runningProbes": 0,
+            "queuedOrRunningMappingJobs": 0,
+            "undispatchedMappingOutbox": 0,
+            "undispatchedPublishingOutbox": 0
+          }
+        },
+        "closed": {
+          "commandId": "1d2d6f40e96d4032a3830ff1000c76b9",
+          "counts": {
+            "runningQueries": 0,
+            "queuedOrRunningRuns": 0,
+            "queuedOrRunningCatalogJobs": 0,
+            "runningProbes": 0,
+            "queuedOrRunningMappingJobs": 0,
+            "undispatchedMappingOutbox": 0,
+            "undispatchedPublishingOutbox": 0
+          }
+        }
+      },
+      "apis": {
+        "api": {
+          "id": "c793df094bd40e9b4bf4164c7e0362568fd1f41177b5f691efaa2ee12b69dfa5",
+          "absentCommand": "bd86bb4a55814435a10bdddaf602c8a0"
+        },
+        "api-secondary": {
+          "id": "643339df77a9791a4620c04575e3f64cc26c4bce1eea9d048906748f900df624",
+          "absentCommand": "0bca28bf4d984341ba42c85839ebda19"
+        }
+      },
+      "data": {
+        "oracle": {
+          "id": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T10:42:26.20591497Z"
+          },
+          "nativeShutdown": true,
+          "resourceAttempt": "a6d9f1de78ec433b97aedfb2b354efbf"
+        },
+        "rustfs": {
+          "id": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T10:42:27.963593346Z"
+          },
+          "resourceAttempt": "d7bf7b3f8e484764b1cc318a220b6d23"
+        },
+        "keycloak-test": {
+          "id": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T10:42:30.755783708Z"
+          },
+          "resourceAttempt": "2fd7d59f51c44b8ebe83085b736e5537"
+        },
+        "fuseki": {
+          "id": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+          "status": "PROCESS_EXITED",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T10:42:33.041925709Z"
+          },
+          "cleanShutdown": "UNKNOWN",
+          "allTdbLocksRemoved": false,
+          "resourceAttempt": "d84d3f9c7bfc48baa2022ef44abaf64f"
+        },
+        "platform-pg": {
+          "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-20T10:42:36.635620002Z"
+          },
+          "controlState": "shut down",
+          "resourceAttempt": "f57e4c6ecd7d40a7a69e909ed8193b9c"
+        }
+      },
+      "before": "40d1f1d6d47b42c592790addf7c44209",
+      "status": "PASS",
+      "post": "81498979145c4c8283eff43066b50beb",
+      "protectedSha256": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9",
+      "remaining": []
+    },
+    "finalResourceReadback": {
+      "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+      "runId": "product-resume-01",
+      "attempt": "20f1cf41cc194fc5a326e0cf92df9a37",
+      "protectedOriginalSha256": "2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9",
+      "expectedRunningRoles": [],
+      "status": "FORMAL_RESOURCE_READY",
+      "diskBytes": 42873265086,
+      "diskCeiling": 42949672960
+    },
+    "engineering": {
+      "formalAdmissionTests": {
+        "testedCommit": "d90fd032676813c48b712be2aadce0f950e4381c",
+        "commandId": "d0315377a78d459abac5e95aebea5153",
+        "passed": 51
+      },
+      "fullTreeStatic": {
+        "testedCommit": "6d2a2976f2d54f54637b6fb364fe2c0444639644",
+        "commandId": "caa66c40a36e40a8acdbd7d11baef56b",
+        "examinedFiles": 24566
+      },
+      "publishedRepresentative": {
+        "testedCommit": "94901e4dc02fbfd85566688b8ece7cd7806bce27",
+        "memberPlanCommand": "f7541d17972744c59b5b6c6549bdf6ad",
+        "measuredCandidateCommand": "1cfb66d46f2242859dbc11974cd13382",
+        "estimatedBytes": 8242426,
+        "measuredBytes": 7122263,
+        "status": "MEASURED_NOT_READY_FOR_ACCEPTANCE",
+        "member": {
+          "path": "review-evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/report.md",
+          "sha256": "4e30fa10c1f256a659727a967076a38d7c12d8c996970680805ecd23ab36f4cc",
+          "sizeBytes": 1341,
+          "deflatedBytes": 1054
+        }
+      },
+      "registeredPlan": {
+        "status": "PLANNED",
+        "head": "d90fd032676813c48b712be2aadce0f950e4381c",
+        "unknown": []
+      },
+      "genericVerify": {
+        "status": "BLOCKED",
+        "firstGate": "environment",
+        "log": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/runs/1610a567e5f64baba3abd45d5e623a82/environment.txt",
+        "reason": "OMQ_ORIGINALS_NOT_RUN_admission"
+      },
+      "finalZip": "NOT_APPLICABLE",
+      "CI": "NOT_RUN",
+      "otherPlatforms": "NOT_RUN"
+    }
+  },
+  "reused": {
+    "previousNormalOperator": "ACCEPTED_1_OF_1_PRIOR_WINDOW",
+    "otherThreeInAcceptedSingleWindow": "NOT_RUN",
+    "frozenFuseki": {
+      "archiveSha256": "f0a6a3788e2bb92777a2eed9641aea91025cf8bfaa7512ccb70d1d09bf1525c4",
+      "volume": "ontology-g4-omq-restore-01_fuseki-data",
+      "finishedAt": "2026-11-20T09:05:57.582208388Z",
+      "cleanShutdown": "UNKNOWN",
+      "checkpointRecovery": "ACCEPTED_FOR_FROZEN_CHECKPOINT",
+      "scan": {
+        "default": {
+          "rows": 0,
+          "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+        },
+        "named": {
+          "rows": 1372,
+          "sha256": "712f9dfb825772fb4c71a51461e6a09e15657419dd39a8c7463c1d0d95a4884c"
+        }
+      },
+      "graphs": [
+        {
+          "graph": "urn:ontology-platform:release:d60d10638030402c8fcf6254bc782529:ontology",
+          "triples": 46,
+          "sha256": "ba87dc803335580b837c516577ee64ed907a25345c229ab637aa69a2fc2f1ec1"
+        },
+        {
+          "graph": "urn:ontology-platform:release:d60d10638030402c8fcf6254bc782529:data",
+          "triples": 1326,
+          "sha256": "125735d5c0db46a8a5b164218c95b5fbd04165530a185285c566a8e0201a0309"
+        }
+      ]
+    },
+    "historical503": "ORIGINAL_HEAD_ONLY",
+    "originalsAndKeep": "RETAINED"
+  },
+  "prerequisites": [
+    "Fresh normal sign-in for the four original subjects, expected sites/roles and 210s valid tickets",
+    "Re-read original fifteen grants; permitted same-entity renewal only on expiry",
+    "Run formal AC03-A with independent source audit and qualify each exact command before S1",
+    "Second-table grants require existing explicit authority before the affected S2/S3 cases"
+  ],
+  "localOriginals": [
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/pg-verification-aa04ee1b2551.json",
+      "sha256": "bed9f68c68587b02f5e0cbda6fc423314e857804a9041a0837869368dc98c052",
+      "sizeBytes": 6587
+    },
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/start-d8f4bbb99ed642eeaf8a4f5d5af7ee06.json",
+      "sha256": "7cb4266edaff6d00ae408761d1cc10a2932ee0958b91079a645851f4e1b0c3bd",
+      "sizeBytes": 2269
+    },
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/closeout.json",
+      "sha256": "3c2b81b5c360583b6dc0c23a68f7707e1f01ae95cb1d0b3c37b494c7d5952a3d",
+      "sizeBytes": 3895
+    },
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/auth-observed.json",
+      "sha256": "895466d67e365e4a826db1a27bfa1cc261e6240ed315b75a752ef789c3fa771d",
+      "sizeBytes": 3792
+    },
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/final-resource-readback.json",
+      "sha256": "77ad227748bd8d09aec4ee8fb6c36cf65cf149284c4a4c6cc84636c54035f600",
+      "sizeBytes": 349
+    },
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/current-grants.json",
+      "sha256": "832921feb76d59d635663d095becdfe1e96b8e392bdd6e1b56a1e1ecc4a97c42",
+      "sizeBytes": 678
+    },
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/prepare-initial.json",
+      "sha256": "cf2413c1fd3145f8e6b12157c4d898f1dff211a061700d5acb3972d02fdf25d7",
+      "sizeBytes": 66
+    },
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/prepare-host.json",
+      "sha256": "044e8a026ba33a3de102314e89bc08c3e37c948c6fb7e00acc802f6171736fd0",
+      "sizeBytes": 76
+    },
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/entry-fix-01/prepare-cache-preservation.json",
+      "sha256": "f0c1c59542597b4f6cf7ff3cf56572fe1d70c18b9f89171ea75a139af6a2e04b",
+      "sizeBytes": 1770
+    },
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-audit-ae2ebad4418249cc99d97f722b4d340c.json",
+      "sha256": "6df498e30eb5fb6217932ef201220624cc2885fcd7cb00dcfe1105da1db0919a",
+      "sizeBytes": 710
+    },
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-run-s0-oracle-auth-ae2ebad4418249cc99d97f722b4d340c.json",
+      "sha256": "c31336af422f1cec4722dd0c5d99aca1587e6730a5711b400c8c728e62e2b93d",
+      "sizeBytes": 6556
+    },
+    {
+      "file": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/browser-s0-oracle-auth-1795171197601.json",
+      "sha256": "c8939746131822ea0330ba3db3f799cd72cf7005e0eee8c6b183940986dfb2c3",
+      "sizeBytes": 10890
+    }
+  ]
+}
