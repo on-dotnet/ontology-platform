@@ -70,7 +70,7 @@ async function fixture(options={}) {
       return {deadline,observation:{label},finish:()=>{},remaining:()=>deadline-performance.now()};
     },authSessions:(_root,actors)=>({observations:observations(actors)}),batchGrants:()=>({}),
     ready:async({actors,mode})=>({capability:{id:"g4_resolve_entity",version:"1"},row:{session:{observations:observations(actors)},mode}}),
-    witness:async()=>{events.push("A");if(options.aFail)throw Object.assign(new Error(),{safeCode:"A_FAILED"});},
+    witness:async({report})=>{report.oracleWitness={final:{naturalSuccessWon:!!options.successWon}};events.push("A");if(options.aFail)throw Object.assign(new Error(),{safeCode:"A_FAILED"});},
   };
   const files={mkdir:async()=>{},writeFile:async(path,bytes)=>{records.set(basename(path),JSON.parse(bytes));if(basename(path)==="runtime-fixture.json")state=JSON.parse(bytes);}};
   const readFile=async()=>Buffer.from(JSON.stringify(state));
@@ -110,4 +110,33 @@ for(const [path,phase] of [["/auth/csrf","oidc_csrf_operator-ab"],["/api/v1/plat
   const f=await fixture({timeoutPath:path});assert.equal(await real.runAuthHandoffPlan(f.shared,f.run),false);
   assert.deepEqual(f.shared.stages[0].failure,{phase,category:"TimeoutError",code:"ORACLE_LOGIN_SUBMITTED_TIMEOUT"});
   assert(!f.events.includes("A"));
+});
+
+
+for (const successWon of [false,true]) test("actual A witness waits for natural return and acknowledges cancel response "+successWon,async()=>{
+  const queryId="query-"+"a".repeat(32),clientId="b".repeat(32),events=[],callbacks={};
+  const final={status:"FINAL",queryId,clientId,allSourceWorkEnded:true,residualSourceWork:0,branchUpperMs:200,totalUpperMs:500,slotReleased:true,
+    formalCancelCommitted:!successWon,sameExecutionActiveAtCommit:false,nativeCancelCausedTermination:false,naturalCompletion:successWon,
+    naturalSuccessWon:successWon,nativeErrorCode:0,naturalCompletionBeforeCancel:!successWon,naturalCleanupUpperMs:25,successCleanupUpperMs:25,
+    earliestCleanupMarginMs:10,successfulResults:+successWon,successReceipts:+successWon,successAudits:+successWon};
+  const stream=[{status:"READY"},{status:"ADMITTED",queryId},{status:"NATURAL_RETURN",queryId},final];
+  const child={stdout:{},once:(name,fn)=>callbacks[name]=fn,stdin:{end:value=>{
+    assert(events.includes("cancel-response"));assert.deepEqual(JSON.parse(value),{status:"CANCEL_OBSERVED",queryId,httpStatus:successWon?409:200});events.push("ack");
+  }}};
+  const spawn=(_cmd,args,options)=>{assert(args.includes("--natural-return"));assert.equal(options.stdio[0],"pipe");return child;};
+  const createInterface=()=>({[Symbol.asyncIterator]:()=>({next:async()=>{
+    const event=stream.shift();events.push(event.status);if(event.status==="FINAL"){assert(events.includes("ack"));callbacks.close(0);}
+    return {done:false,value:JSON.stringify(event)};
+  }})});
+  const loadWitness=new Function("spawn","createInterface","randomUUID","stageRemaining","ports",`return (${real.witness.toString()});`);
+  const witness=loadWitness(spawn,createInterface,()=>"key",()=>10000,{secondary:15742});
+  const report={},reader={me:{subjectId:"reader"},headers:{}};
+  await witness({root:"/controlled",state:{ontologyRelease:{manifest:{assetId:"asset",releaseId:"release"}},mappingReceipt:{mappingReleaseId:"mapping"}},
+    reader,mode:"s0-oracle-natural-cancel",capability:{id:"cap",version:"1"},get:async()=>reader.me,check:(_name,value)=>assert(value),report,
+    request:async(_actor,_method,path)=>{
+      if(path.endsWith("/cancel")){assert(events.includes("NATURAL_RETURN"));events.push("cancel-response");return {status:successWon?409:200,data:successWon?{code:"query_already_finished"}:{executionStatus:"CANCELLED"}};}
+      return {status:successWon?200:409,data:successWon?{status:"FOUND"}:{code:"cancelled"}};
+    }});
+  assert.equal(report.oracleWitness.final.naturalSuccessWon,successWon);
+  assert(report.oracleWitness.cancel.observedUtc);
 });

@@ -51,3 +51,7 @@ Base `33e66879a6b48e25580f1623316b88fe5a5e85cc`；Master 单写 `workflow-m4-que
 2026-11-20 auth-handoff-01 收尾：最终代码 `fdadc58f8be175090961c9fcee8af192cf6b790c`，62项定向及非作者21项通过。两次实际窗口各1/4，auditor原件提交后timeout，后续非秘密服务端记录invalid_user_credentials，过期未核实。用户明确授权再次有界登录及仅恢复原3持卷实例；原3已恢复且保护20项匹配，第三窗最终被归档device身份漂移阻断，未启动浏览器。任务5副本停止、2API已移除。唯一状态AUTH_HANDOFF_REVIEW_BLOCKED，历史失败及未资格不变。三份完整公开脱敏文件见 `docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/auth-handoff-01/`；普通push回读后停ChatGPT复审。
 
 最新用户要求先解决当前资源前检，再完成全部已授权业务后交付。Master追加owned_paths为 `scripts/maintenance/workflow_oracle_archive_requalification.py` 与现有platform/Recovery.Tests；只追加产品批归档设备号资格旁证及真实消费者，不改旧账本、不解析归档秘密、不重做数据恢复。先定向正反回归和非作者审查，再一次已获准真实窗口。af810b3b文档保留为当时过程状态，不代表最终交付。
+
+2026-11-20 第三实际窗口四角色正常认证34项通过；同浏览器AC03-A执行200 FOUND、取消409 query_already_finished。该分支为唯一合同第76行明示允许，但驱动遗漏导致原父命令265cdf991f8d4725880728767d465711 exit1，历史FAIL保留。现补严格成功先赢原件谓词（同acquisition/query/owner/fence、实际源执行时序、事务/后验/物理释放、稳定终态唯一成功副作用、原最早清理期限），取消先赢及B资格不变。定向正反例和独立审查后，以新代码输入再执行固定1620秒计划；当前七任务实例沿用startup-03d，不重建数据栈。
+
+A触发补充：仅natural-cancel观察者在本次唯一query/execution/acquisition的READ_RETURNED后通知浏览器发正式取消；收到响应后以本进程私有管道确认，独立终态命令必须在该确认之后。所有等待受原观察者和阶段截止约束，不给产品加延时。成功及取消先赢分别严格验收；定向回归88项（内含23项Node）已通过。

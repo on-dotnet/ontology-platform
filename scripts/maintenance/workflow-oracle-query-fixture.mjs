@@ -266,7 +266,7 @@ export async function witness({ root, state, reader, mode, capability, get, requ
     mappingReleaseIds: [state.mappingReceipt.mappingReleaseId], capabilityId: capability.id, capabilityVersion: capability.version,
     relationshipIris: [], depth: 1, maxRows: 100, timeoutMs: 5000, filters: { siteId: "site-a", entityExternalId: "omq-entity-1" } };
   const process = spawn("python3", ["-B", "scripts/maintenance/workflow_oracle_mapping_platform.py", "observe",
-    "--idempotency-key", key, "--output", output], { cwd: root, timeout: Math.min(25000, stageRemaining(deadline)), killSignal: "SIGTERM", stdio: ["ignore","pipe","ignore"] });
+    "--idempotency-key", key, "--output", output, ...(naturalRace ? ["--natural-return"] : [])], { cwd: root, timeout: Math.min(25000, stageRemaining(deadline)), killSignal: "SIGTERM", stdio: [naturalRace ? "pipe" : "ignore","pipe","ignore"] });
   const exit = new Promise(resolve => { process.once("error", () => resolve(-1)); process.once("close", code => resolve(code)); });
   const lines = createInterface({ input: process.stdout })[Symbol.asyncIterator]();
   const next = async () => {
@@ -285,10 +285,16 @@ export async function witness({ root, state, reader, mode, capability, get, requ
     const admitted = await next();
     check("oracle_platform_admission", admitted.status === "ADMITTED" && /^query-[0-9a-f]{32}$/.test(admitted.queryId));
     report.oracleWitness.events.push({ status: admitted.status, queryId: admitted.queryId });
+    if (naturalRace) {
+      const returned = await next();
+      check("oracle_natural_return_trigger", returned.status === "NATURAL_RETURN" && returned.queryId === admitted.queryId);
+      report.oracleWitness.events.push(returned);
+    }
     if (cancel) {
       const issued = Date.now();
       const response = await request(secondary, "POST", "/api/v1/data/semantic-queries/" + admitted.queryId + "/cancel", undefined, [200,403,409,503,504]);
-      report.oracleWitness.cancel = { issuedUtc: new Date(issued).toISOString(), httpStatus: response.status, executionStatus: response.data?.executionStatus };
+      report.oracleWitness.cancel = { issuedUtc: new Date(issued).toISOString(), httpStatus: response.status, executionStatus: response.data?.executionStatus, code: response.data?.code, observedUtc: new Date().toISOString() };
+      if (naturalRace) process.stdin.end(JSON.stringify({status: "CANCEL_OBSERVED",queryId: admitted.queryId,httpStatus: response.status}) + "\n");
     }
     let active, final;
     for (let i = 0; i < 2; i++) {
@@ -302,7 +308,7 @@ export async function witness({ root, state, reader, mode, capability, get, requ
     report.oracleWitness.execute = { status: result.value.status, queryStatus: result.value.data?.status, elapsedMs: result.elapsedMs };
     // 完整观测由独立工具保存原件。报告只取受审指标与关联身份。
     const publicFields = ["status","queryId","clientId","naturalCompletion","formalCancelCommitted","sameExecutionActiveAtCommit",
-      "naturalCompletionBeforeCancel","naturalCleanupUpperMs","earliestCleanupMarginMs","nativeCancelCausedTermination","allSourceWorkEnded","nativeErrorCode","deadlineOrDisconnectBeforeCommit","cleanupUpperMs",
+      "naturalSuccessWon","successCleanupUpperMs","naturalCompletionBeforeCancel","naturalCleanupUpperMs","earliestCleanupMarginMs","nativeCancelCausedTermination","allSourceWorkEnded","nativeErrorCode","deadlineOrDisconnectBeforeCommit","cleanupUpperMs",
       "branchUpperMs","totalUpperMs","successfulResults","successReceipts","successAudits","residualSourceWork","slotReleased"];
     report.oracleWitness.final = Object.fromEntries(publicFields.filter(field => final && Object.hasOwn(final, field)).map(field => [field, final[field]]));
     check("oracle_witness_finished", await exit === 0 && final?.queryId === admitted.queryId && /^[0-9a-f]{32}$/.test(final.clientId)
@@ -310,7 +316,14 @@ export async function witness({ root, state, reader, mode, capability, get, requ
     check("oracle_native_and_platform_budgets", final.allSourceWorkEnded === true && final.residualSourceWork === 0
       && [final.branchUpperMs, final.totalUpperMs].every(ms => Number.isFinite(ms) && ms >= 0)
       && final.branchUpperMs <= 1000 && final.totalUpperMs <= 5000 && result.elapsedMs <= 5000 && final.slotReleased === true);
-    if (naturalRace) {
+    if (naturalRace && final.naturalSuccessWon === true) {
+      check("oracle_success_won_cancel_conflict", report.oracleWitness.cancel.httpStatus === 409
+        && report.oracleWitness.cancel.code === "query_already_finished" && result.value.status === 200 && result.value.data?.status === "FOUND"
+        && final.naturalCompletion === true && final.nativeErrorCode === 0 && final.formalCancelCommitted === false
+        && final.nativeCancelCausedTermination === false && final.successfulResults === 1 && final.successReceipts === 1 && final.successAudits === 1);
+      check("oracle_success_owned_cleanup", Number.isFinite(final.successCleanupUpperMs) && final.successCleanupUpperMs >= 0
+        && final.successCleanupUpperMs <= 250 && Number.isFinite(final.earliestCleanupMarginMs) && final.earliestCleanupMarginMs >= 0);
+    } else if (naturalRace) {
       check("oracle_late_platform_cancel", report.oracleWitness.cancel.httpStatus === 200 && report.oracleWitness.cancel.executionStatus === "CANCELLED"
         && final.formalCancelCommitted === true && final.sameExecutionActiveAtCommit === false && final.nativeCancelCausedTermination === false);
       check("oracle_natural_end_before_cancel", final.naturalCompletionBeforeCancel === true && Number.isFinite(final.naturalCleanupUpperMs)

@@ -6,6 +6,7 @@ import json
 import queue
 import re
 import subprocess
+import sys
 import threading
 import time
 import uuid
@@ -533,6 +534,102 @@ def natural_cancel_evidence(record, info, begin, session, commit, release, cas, 
     return (0 <= end-commit_lo and end <= earliest and 0<=info['branchUpperMs']<=1000 and 0<=info['totalUpperMs']<=5000)
 
 
+
+def natural_success_evidence(record, info, begin, session, release, settled, stats, audit, low, high):
+    """AC03-A 成功先赢须独立确认原所有权、完整释放及稳定成功终态，不授予 B 资格。"""
+    api = record['logs']['api']
+    ownership = [e for e in api if e['name']=='OracleSourceOwnership']
+    phases = [e['phase'] for e in ownership]
+    expected = ['ACQUIRED','READ_RETURNED','COMMITTED','TX_DISPOSED']
+    if 'POST_STARTED' in phases:
+        expected += ['POST_STARTED','POST_RETURNED']
+    if phases != expected + ['PHYSICAL_DISPOSED','CONFIRMED']:
+        return False
+    acquisition = ownership[0]['acquisition']
+    if any(not valid_ownership(e) or e['acquisition']!=acquisition for e in ownership):
+        return False
+    if not re.fullmatch(r'oracle-execution-[a-zA-Z0-9._:-]{1,160}',begin.get('owner') or ''):
+        return False
+    if any(e.get('query')!=record['queryId'] or e['name'] in ('OracleCancelCommit','OracleCancelDispatch','OracleCleanupCas')
+           for events in record['logs'].values() for e in events):
+        return False
+    phase = {e['phase']:ns(e['utc']) for e in ownership}
+    native = [e for e in api if e['name']=='OracleSourceEvent']
+    events = {e['action']:e for e in native}
+    if (list(phase.values())!=sorted(phase.values()) or len(events)!=len(native)
+            or set(events)!={'EXECUTE','EOF','PHYSICAL_RELEASE'}):
+        return False
+    if not (ns(begin['utc'])<=phase['ACQUIRED']<=ns(session['utc'])<=ns(events['EXECUTE']['utc'])<=ns(events['EOF']['utc'])
+            <=phase['READ_RETURNED'] and phase.get('POST_RETURNED',phase['TX_DISPOSED'])<=ns(events['PHYSICAL_RELEASE']['utc'])
+            <=phase['PHYSICAL_DISPOSED']<=phase['CONFIRMED']<=ns(release['observedUtc'])):
+        return False
+    if (not info['allSourceWorkEnded'] or not info['slotReleased'] or stats['eof']!=1 or not 1<=stats['rows']<=100
+            or audit['code']!=0 or any(info[k]!=1 for k in ('successfulResults','successReceipts','successAudits'))):
+        return False
+    states = record['platformStates']
+    terminal = states[-1]
+    readback = record.get('terminalReadback',{})
+    stable = ('id','state','fence','owner','cancel','hash','bytes','receipts','cancelAudits','successAudits','deadline','leaseUntil')
+    if (not re.fullmatch(CLIENT,readback.get('commandId','')) or
+            any(readback.get('state',{}).get(k)!=terminal.get(k) for k in stable) or
+            any(s['id']!=record['queryId'] or ns(s['deadline'])!=ns(terminal['deadline']) or s['fence']!=int(begin['fence'])
+                or s['cancel'] or s['cancelAudits']!=0 or s['state'] not in ('RUNNING','COMPLETED') for s in states) or
+            states[0]['state']!='RUNNING' or states[0]['owner']!=begin['owner'] or
+            terminal['state']!='COMPLETED' or terminal['owner'] is not None or terminal.get('leaseUntil') is not None or
+            not re.fullmatch('[0-9a-f]{64}',terminal['hash'] or '') or not isinstance(terminal['bytes'],int) or terminal['bytes']<=0):
+        return False
+    completed = False
+    for state in states:
+        completed |= state['state']=='COMPLETED'
+        if completed:
+            if any(state.get(k)!=terminal.get(k) for k in stable):
+                return False
+        elif (state['owner']!=begin['owner'] or ns(state.get('leaseUntil',state['deadline']))!=ns(terminal['deadline']) or
+              state['hash'] is not None or state['bytes'] not in (None,0) or state['receipts']!=0 or state['successAudits']!=0):
+            return False
+    if any(ns(a['observed'])>ns(b['observed']) for a,b in zip(states,states[1:])) or ns(readback['state']['observed'])<ns(terminal['observed']):
+        return False
+    source = record['source']['events']
+    present = [e for e in source if not e.get('absent')]
+    who = (session['sid'],session['audsid'],session['con'])
+    if (not present or any((e['sid'],e['audsid'],e['con'])!=who or e['serial']!=present[0]['serial'] for e in present)
+            or any(ns(e['lo'])>ns(e['hi']) for e in source)
+            or any(ns(a['lo'])>ns(b['lo']) for a,b in zip(source,source[1:]))):
+        return False
+    sql = record['sqlId']
+    identities = {e[field] for e in present for tag,field in [('sql','execution'),('previous','previousExecution')]
+                  if e[tag]==sql and re.fullmatch(DEC,e[field])}
+    current = [e for e in present if e['sql']==sql and e['state']=='ACTIVE' and re.fullmatch(DEC,e['execution'])]
+    if len(identities)!=1 or not current or any(e['execution'] not in identities for e in current):
+        return False
+    last = max(i for i,e in enumerate(source) if not e.get('absent'))
+    if last+1>=len(source) or high(events['EOF']['utc'],'api')>=low(begin['workDeadlineUtc'],'api'):
+        return False
+    anchored = [e for e in current if low(e['lo'],'source')>=high(events['EXECUTE']['utc'],'api')
+                and high(e['hi'],'source')<=low(events['EOF']['utc'],'api')]
+    first_gone = next((i for i,e in enumerate(source) if e.get('absent') and
+                       low(e['lo'],'source')>=high(events['EXECUTE']['utc'],'api')),None)
+    if (first_gone is None or any(not e.get('absent') for e in source[first_gone:]) or
+            any(high(e['hi'],'source')>low(events['PHYSICAL_RELEASE']['utc'],'api') for e in current)):
+        return False
+    if (not anchored or high(release['observedUtc'],'api')>low(settled['observed'],'pg') or
+            low(source[last+1]['lo'],'source')<high(anchored[-1]['hi'],'source') or
+            any(e['trigger'] not in ('PHYSICAL_DISPOSE','FINAL') for e in api if e['name']=='OracleSourceCleanup')):
+        return False
+    source_deadline = source_cleanup_deadline(api,acquisition,begin,phase,low)
+    physical = [e for e in api if e['name']=='OracleSourceCleanup' and e['trigger']=='PHYSICAL_DISPOSE']
+    if (source_deadline is None or len(physical)!=1 or
+            ns(physical[0]['utc'])<phase.get('POST_RETURNED',phase['TX_DISPOSED'])):
+        return False
+    end = max(high(source[last+1]['hi'],'source'),high(events['PHYSICAL_RELEASE']['utc'],'api'),
+              high(release['observedUtc'],'api'),high(settled['observed'],'pg'))
+    earliest = min(source_deadline,low(begin['branchDeadlineUtc'],'api'),low(terminal['deadline'],'api'))
+    info['earliestCleanupMarginMs'] = (earliest-end)/1e6
+    info['successCleanupUpperMs'] = (end-low(physical[0]['utc'],'api'))/1e6
+    return (0<=info['successCleanupUpperMs']<=250 and end<=earliest and
+            0<=info['branchUpperMs']<=1000 and 0<=info['totalUpperMs']<=5000)
+
+
 def classify(record):
     clocks = {}
     for key, samples in record['clocks'].items():
@@ -608,6 +705,7 @@ def classify(record):
         info['nativeErrorCode']=0 if native('EOF') and not native('NATIVE_1013') else None
         info['naturalCompletion'] = (stats['eof']==1 and stats['rows']>0 and info['nativeErrorCode']==0
                                      and not native('CANCEL_ENTER') and audit[0]['code']==0)
+        info['naturalSuccessWon'] = natural_success_evidence(record,info,begin,session,release,settled,stats,audit[0],low,high)
         return info
     if not commit or terminal['state']!='CANCELLED' or not terminal['cancel'] or terminal['cancelAudits']!=1:
         return info
@@ -650,7 +748,22 @@ def emit(status, **fields):
     print(json.dumps(dict(status=status, **fields),separators=(',',':')),flush=True)
 
 
-def observe(idempotency_key, output, query_id=None):
+def natural_return_event(api, query):
+    """仅本次唯一分支及 acquisition 的真实返回事件可以触发晚取消。"""
+    returned=[e for e in api if e['name']=='OracleSourceOwnership' and e['phase']=='READ_RETURNED']
+    if not returned:
+        return False
+    begin=[e for e in api if e['name']=='OracleBranchBegin']
+    acquired=[e for e in api if e['name']=='OracleSourceOwnership' and e['phase']=='ACQUIRED']
+    require(len(returned)==len(begin)==len(acquired)==1,'FORMAL_NATURAL_RETURN_IDENTITY')
+    first,last=acquired[0],returned[0]
+    require(all(e['query']==query and e['execution']==begin[0]['execution'] for e in (*begin,first,last)) and
+            valid_ownership(first) and valid_ownership(last) and first['acquisition']==last['acquisition'] and
+            ns(begin[0]['utc'])<=ns(first['utc'])<=ns(last['utc']),'FORMAL_NATURAL_RETURN_IDENTITY')
+    return True
+
+
+def observe(idempotency_key, output, query_id=None, natural_return=False):
     """正式 API 调用前预开独立只读观察者，一次证据不覆盖、一个原始时钟预算。"""
     from workflow_oracle_mapping_platform import runtime_binding, read_pg
     from workflow_oracle_mapping_evidence import RUN as operation_run
@@ -730,6 +843,7 @@ def observe(idempotency_key, output, query_id=None):
                         require(len(rec['logs'][role])<=40,'FORMAL_LOG_BUDGET')
             client=None
             sampler=None
+            return_notified=False
             with ThreadPoolExecutor(max_workers=1) as pool:
                 while time.monotonic()<until:
                     drain()
@@ -737,6 +851,10 @@ def observe(idempotency_key, output, query_id=None):
                     if begin and client is None:
                         client=begin['execution']
                         sampler=pool.submit(sample_source,oracle,client,sqlid)
+                    if natural_return and not return_notified and natural_return_event(rec['logs']['api'],row['id']):
+                        rec['naturalReturnNotifiedUtc']=now()
+                        emit('NATURAL_RETURN',queryId=row['id'])
+                        return_notified=True
                     current=pg_state(pg,idempotency_key,subject)
                     require(current is not None and current['id']==row['id'],'FORMAL_QUERY_CHANGED')
                     last=rec['platformStates'][-1]
@@ -752,6 +870,14 @@ def observe(idempotency_key, output, query_id=None):
                     rec['source']=sampler.result()
                 else:
                     rec['source']={'events':[],'samples':0}
+            if natural_return:
+                import select
+                require(return_notified,'FORMAL_NATURAL_RETURN_MISSING')
+                require(select.select([sys.stdin],[],[],max(0,until-time.monotonic()))[0],'FORMAL_CANCEL_ACK_TIMEOUT')
+                ack=json.loads(sys.stdin.readline(1024))
+                require(set(ack)=={'status','queryId','httpStatus'} and ack.get('status')=='CANCEL_OBSERVED' and ack.get('queryId')==row['id'] and
+                        ack.get('httpStatus') in (200,409),'FORMAL_CANCEL_ACK')
+                rec['cancelResponseObserved']={**ack,'utc':now()}
             actual=pg_state(pg,idempotency_key,subject)
             require(actual and actual['id']==row['id'],'FORMAL_QUERY_EVIDENCE')
             rec['platformStates'].append(actual)

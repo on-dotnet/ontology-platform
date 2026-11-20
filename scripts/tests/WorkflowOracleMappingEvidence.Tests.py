@@ -509,3 +509,124 @@ class NaturalCancelEvidenceTests(unittest.TestCase):
 
 if __name__=='__main__':
     unittest.main()
+
+
+class NaturalSuccessEvidenceTests(unittest.TestCase):
+    """成功先赢仍必须提供完整 AC03-A 原件；离线反例不授予产品资格。"""
+    @staticmethod
+    def record():
+        r=NaturalCancelEvidenceTests.record()
+        r['logs']['api-secondary']=[]
+        r['logs']['api']=[e for e in r['logs']['api'] if e['name']!='OracleCleanupCas' and e.get('trigger')!='WORK_FAILURE']
+        for e in r['logs']['api']:
+            if e.get('phase')=='ROLLED_BACK':e['phase']='COMMITTED'
+        first,terminal=r['platformStates']
+        first['leaseUntil']=first['deadline']
+        terminal.update(state='COMPLETED',cancel=False,fence=1,hash='f'*64,bytes=200,receipts=1,successAudits=1,cancelAudits=0,leaseUntil=None)
+        r['terminalReadback']['state']=dict(terminal)
+        return r
+
+    @staticmethod
+    def report(proof):
+        return dict(scope='ORACLE_NATURAL_SUCCESS_BEFORE_CANCEL',http=[dict(method='POST',
+            path='/api/v1/data/semantic-queries/'+proof['queryId']+'/cancel',status=409,code='query_already_finished')],
+            oracleWitness=dict(cancel=dict(httpStatus=409,code='query_already_finished'),execute=dict(status=200,queryStatus='FOUND',elapsedMs=230)))
+
+    def test_actual_success_consumer_and_complete_source_proof_pass_without_b(self):
+        proof=observer.classify(self.record())
+        self.assertTrue(proof['naturalSuccessWon'])
+        self.assertFalse(proof['nativeCancelCausedTermination'])
+        self.assertFalse(proof['sameExecutionActiveAtCommit'])
+        oracle.natural_race_case(self.report(proof),proof)
+
+    def test_every_missing_ownership_or_cleanup_event_is_rejected(self):
+        r=self.record()
+        positions=[i for i,e in enumerate(r['logs']['api']) if e['name'] in ('OracleSourceOwnership','OracleSourceCleanup')]
+        for i in positions:
+            changed=copy.deepcopy(r);changed['logs']['api'].pop(i)
+            with self.subTest(i=i):self.assertFalse(observer.classify(changed).get('naturalSuccessWon'))
+
+    def test_wrong_identity_owner_fence_or_readback_rejected(self):
+        changes=[lambda r:r['logs']['api'][0].update(owner='oracle-execution-other'),
+            lambda r:r['logs']['api'][1].update(acquisition='e'*32),
+            lambda r:r['logs']['api'][1].update(query='query-'+'e'*32),
+            lambda r:r['terminalReadback']['state'].update(fence=2),
+            lambda r:r['source']['events'][1].update(serial='99'),
+            lambda r:r['source']['events'][1].update(previousExecution='99')]
+        for i,change in enumerate(changes):
+            r=self.record();change(r)
+            with self.subTest(i=i):self.assertFalse(observer.classify(r).get('naturalSuccessWon'))
+
+    def test_repeated_effects_wrong_terminal_or_uncleared_lease_rejected(self):
+        for key,value in [('receipts',3),('successAudits',3),('cancelAudits',1),('fence',2),('state','FAILED'),
+                          ('cancel',True),('owner','oracle-execution-other'),('leaseUntil','2026-11-20T00:00:05Z'),('hash',None),('bytes',0)]:
+            r=self.record();r['platformStates'][-1][key]=value;r['terminalReadback']['state'][key]=value
+            with self.subTest(key=key):self.assertFalse(observer.classify(r).get('naturalSuccessWon'))
+
+    def test_residual_source_and_original_deadline_overrun_rejected(self):
+        changes=[lambda r:r['source']['events'].pop(),
+            lambda r:r['source']['events'][-1].update(lo='2026-11-20T00:00:00.420Z',hi='2026-11-20T00:00:00.421Z'),
+            lambda r:r['logs']['api'][0].update(workDeadlineUtc='2026-11-20T00:00:00.125Z'),
+            lambda r:r['logs']['api'][0].update(branchDeadlineUtc='2026-11-20T00:00:00.175Z')]
+        for i,change in enumerate(changes):
+            r=self.record();change(r)
+            with self.subTest(i=i):self.assertFalse(observer.classify(r).get('naturalSuccessWon'))
+
+    def test_unfinished_postcheck_is_rejected(self):
+        r=self.record();event=next(e for e in r['logs']['api'] if e.get('phase')=='TX_DISPOSED')
+        i=r['logs']['api'].index(event)+1
+        r['logs']['api'].insert(i,dict(event,phase='POST_STARTED',utc='2026-11-20T00:00:00.161Z'))
+        self.assertFalse(observer.classify(r).get('naturalSuccessWon'))
+        r['logs']['api'].insert(i+1,dict(event,phase='POST_RETURNED',utc='2026-11-20T00:00:00.162Z'))
+        self.assertTrue(observer.classify(r).get('naturalSuccessWon'))
+
+    def test_unanchored_sample_early_release_and_cancelled_cleanup_are_rejected(self):
+        def old_source(r):
+            for e in r['source']['events'][:-1]:
+                e.update(lo='2026-11-19T23:59:59.123Z',hi='2026-11-19T23:59:59.124Z')
+        def cancelled(r):
+            physical=next(e for e in r['logs']['api'] if e.get('trigger')=='PHYSICAL_DISPOSE')
+            r['logs']['api'].append(dict(physical,trigger='WORK_CANCELLED'))
+        def early_release(r):
+            next(e for e in r['logs']['api'] if e.get('action')=='PHYSICAL_RELEASE')['utc']='2026-11-20T00:00:00.159Z'
+        for change in (old_source,cancelled,early_release,lambda r:r['logs']['api'][2].update(utc='2025-01-01T00:00:00Z'),
+                       lambda r:r['logs']['api'][0].update(owner=''),
+                       lambda r:r['platformStates'][-1].update(observed='2026-11-20T00:00:00.160Z')):
+            r=self.record();change(r)
+            self.assertFalse(observer.classify(r).get('naturalSuccessWon'))
+
+    def test_source_reappearance_after_release_is_rejected(self):
+        r=self.record();active=dict(r['source']['events'][0],lo='2026-11-20T00:00:00.190Z',hi='2026-11-20T00:00:00.191Z')
+        r['source']['events'] += [active,dict(absent=True,lo='2026-11-20T00:00:00.200Z',hi='2026-11-20T00:00:00.201Z')]
+        self.assertFalse(observer.classify(r).get('naturalSuccessWon'))
+
+    def test_natural_trigger_requires_exact_unique_acquisition_and_execution(self):
+        r=self.record();api=r['logs']['api'];query=r['queryId']
+        self.assertTrue(observer.natural_return_event(api,query))
+        for field,value in [('query','query-'+'e'*32),('execution','e'*32),('acquisition','e'*32)]:
+            changed=copy.deepcopy(api);next(e for e in changed if e.get('phase')=='READ_RETURNED')[field]=value
+            with self.subTest(field=field),self.assertRaisesRegex(ValueError,'FORMAL_NATURAL_RETURN_IDENTITY'):
+                observer.natural_return_event(changed,query)
+        self.assertFalse(observer.natural_return_event([e for e in api if e.get('phase')!='READ_RETURNED'],query))
+        with self.assertRaisesRegex(ValueError,'FORMAL_NATURAL_RETURN_IDENTITY'):
+            observer.natural_return_event(api+[next(e for e in api if e.get('phase')=='READ_RETURNED')],query)
+
+    def test_actual_http_code_and_single_cancel_request_are_required(self):
+        proof=observer.classify(self.record())
+        for change in (lambda r:r['http'][0].update(code='other'),lambda r:r['http'].append(dict(r['http'][0])),
+                       lambda r:r['oracleWitness']['cancel'].update(code='other'),lambda r:r['oracleWitness']['execute'].update(status=504)):
+            report=self.report(proof);change(report)
+            with self.assertRaisesRegex(ValueError,'OMQ_NATURAL_SUCCESS_RACE'):oracle.natural_race_case(report,proof)
+
+    def test_cancel_winner_cannot_keep_success_effects(self):
+        proof=observer.classify(NaturalCancelEvidenceTests.record())
+        report=dict(scope='ORACLE_NATURAL_COMPLETION_BEFORE_PLATFORM_CANCEL',oracleWitness=dict(cancel=dict(httpStatus=200,executionStatus='CANCELLED'),
+                    execute=dict(status=409,elapsedMs=230)))
+        oracle.natural_race_case(report,proof)
+        for field in ('successfulResults','successReceipts','successAudits'):
+            with self.subTest(field=field),self.assertRaisesRegex(ValueError,'OMQ_NATURAL_CANCEL_RACE'):
+                oracle.natural_race_case(report,dict(proof,**{field:1}))
+
+
+if __name__ == '__main__':
+    unittest.main()

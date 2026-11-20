@@ -994,11 +994,12 @@ if __name__=='__main__':
     cli.add_argument('--case',default='healthy')
     cli.add_argument('--idempotency-key')
     cli.add_argument('--query-id')
+    cli.add_argument('--natural-return',action='store_true')
     cli.add_argument('--output')
     args=cli.parse_args()
     if args.action=='observe':
         from workflow_oracle_mapping_formal_observer import observe
-        observe(args.idempotency_key,args.output,args.query_id)
+        observe(args.idempotency_key,args.output,args.query_id,args.natural_return)
         raise SystemExit(0)
     actions={'admission':admission,'render':render,'create':create_platform,'init-volumes':init_volumes,'start':start_platform,'prepare-api':prepare_api,'primary':lambda:start_api('api'),'secondary':lambda:start_api('api-secondary'),'pause-apis':pause_unused_apis,'next-snapshot':next_api_snapshot,'browser':lambda:browser_run(args.mode,args.case),'window-pair':fixed_window_pair}
     if product_run():

@@ -412,7 +412,8 @@ async function browserRun(mode, shared = null) {
         await omq.witness({ root, state, reader, mode, capability:current.capability, get, request, check, report, deadline: shared?.stageDeadline });
         const scopes = { "s0-oracle-natural": "ORACLE_NATURAL_CONTROL", "s0-oracle-cancel": "ORACLE_FORMAL_CANCEL",
           "s0-oracle-natural-cancel": "ORACLE_NATURAL_COMPLETION_BEFORE_PLATFORM_CANCEL" };
-        report.scope = scopes[mode];
+        report.scope = mode === "s0-oracle-natural-cancel" && report.oracleWitness.final.naturalSuccessWon === true
+          ? "ORACLE_NATURAL_SUCCESS_BEFORE_CANCEL" : scopes[mode];
         report.status = "PASS"; return;
       }
     }

@@ -672,22 +672,22 @@ def reopen_browser(archive, entry, origin, mode, case):
                     and not proof['nativeCancelCausedTermination'], 'OMQ_NATURAL_CONTROL')
         elif mode==NATURAL_CANCEL:
             from workflow_oracle_mapping_formal_observer import pg_query
+            ack=raw['cancelResponseObserved']
+            require(ack['status']=='CANCEL_OBSERVED' and ack['queryId']==proof['queryId'] and
+                    ack['httpStatus']==witness['cancel']['httpStatus'] and
+                    utc(window['startedAtUtc'])<=utc(raw['naturalReturnNotifiedUtc'])<utc(witness['cancel']['issuedUtc'])+dt.timedelta(milliseconds=1) and
+                    utc(witness['cancel']['issuedUtc'])<=utc(witness['cancel']['observedUtc'])<=utc(ack['utc'])<=utc(window['endedAtUtc']),
+                    'OMQ_NATURAL_CANCEL_HANDOFF')
             readback = raw['terminalReadback']
             pg_id = host['services']['platform-pg']['containerId']
             args = ['docker','--context','desktop-linux','exec','-i','--user','postgres',pg_id,'psql','-XwqAt','-d','mapping','-v','ON_ERROR_STOP=1']
             sql = b'BEGIN READ ONLY;\n'+pg_query(key,entry['stageInputs']['readerSubjectId']).encode()+b'\nCOMMIT;'
             command,stdout,_ = archive.command(readback['commandId'],args,'omq-pg-formal-terminal-state',sha(sql),None,origin)
             require(command['exitCode']==0 and command['classification']=='SUCCESS' and command['deadlineSeconds']==15 and
-                    utc(window['startedAtUtc'])<=utc(command['startedAtUtc'])<=utc(command['endedAtUtc'])<=utc(window['endedAtUtc']) and
+                    utc(ack['utc'])<=utc(command['startedAtUtc'])<=utc(command['endedAtUtc'])<=utc(window['endedAtUtc']) and
                     json.loads(stdout)==readback['state'] and
                     [r for r in records if r['clientId']==proof['clientId']]==raw['audit']['records'],'OMQ_NATURAL_TERMINAL_ORIGINAL')
-            require(report['scope']=='ORACLE_NATURAL_COMPLETION_BEFORE_PLATFORM_CANCEL' and
-                    witness['cancel']['httpStatus']==200 and witness['cancel']['executionStatus']=='CANCELLED' and
-                    witness['execute']['status'] in (409,503,504) and 0<=witness['execute']['elapsedMs']<=5000 and
-                    proof.get('naturalCompletionBeforeCancel') is True and proof['formalCancelCommitted'] and
-                    not proof['sameExecutionActiveAtCommit'] and not proof['nativeCancelCausedTermination'] and
-                    0<=proof['naturalCleanupUpperMs']<=250 and proof['earliestCleanupMarginMs']>=0 and proof['successfulResults']==proof['successReceipts']==proof['successAudits']==0,
-                    'OMQ_NATURAL_CANCEL_RACE')
+            natural_race_case(report,proof)
         else:
             require(proof['formalCancelCommitted'] and proof['sameExecutionActiveAtCommit'] and
                     proof['nativeCancelCausedTermination'] and proof['nativeErrorCode']==1013 and
@@ -717,6 +717,30 @@ def reopen_browser(archive, entry, origin, mode, case):
                     <= {c['name'] for c in report['checks']} and ready['grantCount'] == 3 and ready['fieldCount'] == 11
                     and ready['requiredSeconds'] > 0 and ready['remainingSeconds'] >= ready['requiredSeconds'], 'OMQ_HEALTHY_PREREQUISITES')
     return len(report['checks'])
+
+
+def natural_race_case(report, proof):
+    """真实 AC03-A 消费者分别核验成功先赢与取消先赢，不能混用副作用条件。"""
+    witness = report['oracleWitness']
+    if proof.get('naturalSuccessWon') is True:
+        rows = [r for r in report['http'] if r['method']=='POST' and
+                r['path']=='/api/v1/data/semantic-queries/'+proof['queryId']+'/cancel']
+        require(len(rows)==1 and rows[0]['status']==409 and rows[0].get('code')=='query_already_finished' and
+                witness['cancel']['httpStatus']==409 and witness['cancel'].get('code')=='query_already_finished' and
+                report['scope']=='ORACLE_NATURAL_SUCCESS_BEFORE_CANCEL' and witness['execute']['status']==200 and
+                witness['execute']['queryStatus']=='FOUND' and 0<=witness['execute']['elapsedMs']<=5000 and
+                proof['naturalCompletion'] and proof['nativeErrorCode']==0 and not proof['formalCancelCommitted'] and
+                not proof['nativeCancelCausedTermination'] and not proof['sameExecutionActiveAtCommit'] and
+                proof['successfulResults']==proof['successReceipts']==proof['successAudits']==1 and
+                0<=proof['successCleanupUpperMs']<=250 and proof['earliestCleanupMarginMs']>=0,'OMQ_NATURAL_SUCCESS_RACE')
+        return
+    require(report['scope']=='ORACLE_NATURAL_COMPLETION_BEFORE_PLATFORM_CANCEL' and
+            witness['cancel']['httpStatus']==200 and witness['cancel']['executionStatus']=='CANCELLED' and
+            witness['execute']['status'] in (409,503,504) and 0<=witness['execute']['elapsedMs']<=5000 and
+            proof.get('naturalCompletionBeforeCancel') is True and proof['formalCancelCommitted'] and
+            not proof['sameExecutionActiveAtCommit'] and not proof['nativeCancelCausedTermination'] and
+            0<=proof['naturalCleanupUpperMs']<=250 and proof['earliestCleanupMarginMs']>=0 and proof['successfulResults']==proof['successReceipts']==proof['successAudits']==0,
+            'OMQ_NATURAL_CANCEL_RACE')
 
 
 def environment_checks(archive, origin):
