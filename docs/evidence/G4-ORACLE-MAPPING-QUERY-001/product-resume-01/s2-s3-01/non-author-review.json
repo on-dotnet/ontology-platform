@@ -2,529 +2,139 @@
   "taskId": "G4-ORACLE-MAPPING-QUERY-001",
   "runId": "product-resume-01",
   "batch": "s2-s3-01",
-  "sourceHead": "18b8f73c74cce00ca7a0b1c8479be18f4375e40a",
-  "previousHandoff": "18b8f73c74cce00ca7a0b1c8479be18f4375e40a",
-  "priorProductHead": "b9c55441d8d53b341e0424a746f5bef32950cf37",
-  "author": "Master",
-  "reviewers": [
-    "ec01_review",
-    "s2_s3_readonly"
-  ],
+  "sourceHead": "f809d391f82cdd0470e009a4860209ba1743e446",
+  "author": "/root",
+  "conclusion": "OFFLINE_ENGINEERING_REVIEW_PASS",
   "stop": "CHATGPT_REVIEW",
-  "conclusion": "SCOPED_AC10_HISTORICAL_BYTES_CONFIRMED_S2_PARTIAL_S3_NOT_RUN",
   "productStatus": {
-    "EC01": "PASS_REUSED",
-    "S1": "PASS_REUSED",
-    "AC03_A": "SUCCESS_WON_REUSED",
-    "AC03_B": "BLOCKED",
-    "AC03_C": "8_OF_8_REUSED",
-    "cleanup250ms": "NOT_QUALIFIED",
-    "S2": "PARTIAL_ABA_BLOCKED",
+    "EC01": "REUSED",
+    "S1": "REUSED_PASS",
+    "AC03_A": "REUSED_SUCCESS_WON",
+    "AC03_C": "REUSED_8_OF_8",
+    "access": "REUSED_78_CHECKS",
+    "S2": "PARTIAL",
     "S3": "NOT_RUN",
-    "G4": "PARTIAL",
     "OracleS0": "BLOCKED",
-    "access": "CASE_QUALIFIED",
-    "ABA": "FAILED_BEFORE_INFLIGHT_QUERY",
-    "thisContinuationProduct": "NOT_RUN",
-    "currentRollbackHTTPContract": "PASS_OFFLINE",
-    "currentRollbackProduct": "NOT_RUN",
-    "currentReaderReceiptConsumer": "PASS_OFFLINE",
-    "AC10": "PARTIAL",
-    "dorisResultBytes": "3_OF_3_TYPED_BYTES_MATCH",
-    "dorisReleaseManifests": "2_OF_2_TYPED_CONTENT_HASH_MATCH",
-    "dorisMappingHTTP": "4_OF_4_TYPED_BYTES_MATCH",
-    "dorisAssessmentStorage": "NOT_QUALIFIED"
+    "AC03_B": "BLOCKED",
+    "cleanup250ms": "NOT_QUALIFIED",
+    "G4": "PARTIAL",
+    "AC10": "PARTIAL"
   },
-  "scopes": [
+  "reviewers": [
     {
-      "reviewer": "ec01_review",
-      "result": "PASS",
-      "scope": "Read-only independent invocation of current product query deserialization and canonical result serialization, plus independent git show of the original three payloads.",
-      "members": 3,
-      "bytes": 19230,
-      "sourceCommit": "18b8f73c74cce00ca7a0b1c8479be18f4375e40a",
-      "historicalCommit": "413d7363fa544ee9dbf780a9a2707b880af96ec8",
-      "commandId": "2617a44811bb43e384845348425df35d",
-      "observations": [
-        {
-          "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s1/browser-s1-1795041876710-result.json",
-          "wrapperPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s1/browser-s1-1795041876710-result.json.raw.json",
-          "originalGitBlob": "a34c041d8ab66e2d958df0472f6004f530424af1",
-          "sizeBytes": 3060,
-          "originalSha256": "29dbbfbb1fc4a232477fa47806d53f6a8c1eaa23a2e7516d255a52627ce0e3a0",
-          "typedSha256": "29dbbfbb1fc4a232477fa47806d53f6a8c1eaa23a2e7516d255a52627ce0e3a0",
-          "equal": true
-        },
-        {
-          "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2/browser-s2-doris-queries-1795042392245-result.json",
-          "wrapperPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2/browser-s2-doris-queries-1795042392245-result.json.raw.json",
-          "originalGitBlob": "fac4f26c9f63febc435ca7bc64783691326610c1",
-          "sizeBytes": 8085,
-          "originalSha256": "1987971eec2fb12b80568173139ef4e8bd25785707fe51aaed3da901929b8d30",
-          "typedSha256": "1987971eec2fb12b80568173139ef4e8bd25785707fe51aaed3da901929b8d30",
-          "equal": true
-        },
-        {
-          "originalPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2/browser-s2-doris-queries-1795043449703-result.json",
-          "wrapperPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2/browser-s2-doris-queries-1795043449703-result.json.raw.json",
-          "originalGitBlob": "8e523352baa4a2eeacbd0d3a4068e1e28296aac9",
-          "sizeBytes": 8085,
-          "originalSha256": "b7e7b6f26b1a37ba5335bb8de540bb904d15b886175a6142219b703b429a3c15",
-          "typedSha256": "b7e7b6f26b1a37ba5335bb8de540bb904d15b886175a6142219b703b429a3c15",
-          "equal": true
-        }
-      ]
-    },
-    {
-      "reviewer": "s2_s3_readonly",
-      "result": "PASS",
-      "scope": "Verified both historical browser GET reports against their original Git blobs, exact release and assessment identities, and unique HTTP digests; independently invoked the typed serializer and checked PE/PDB and current sources.",
-      "sourceCommit": "18b8f73c74cce00ca7a0b1c8479be18f4375e40a",
-      "historicalCommit": "413d7363fa544ee9dbf780a9a2707b880af96ec8",
-      "commandId": "e571adb88990482884df737c03de4f02",
-      "observations": [
-        {
-          "archiveMember": "runtime-fixture.json",
-          "reportPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s1/browser-mapping-1795041466457.json",
-          "reportGitBlob": "ef470b0506eddef2793b320c10a4984b244f57b3",
-          "http": [
-            {
-              "path": "/api/v1/mapping-releases/release-5a98cac5fd9f4c69862534cc08c89157",
-              "sizeBytes": 5017,
-              "wireSha256": "6d87f8b22cc03a143d205efb0b7290a15b72db640c5fdceb7c912d3719a839cc",
-              "typedWireSha256": "6d87f8b22cc03a143d205efb0b7290a15b72db640c5fdceb7c912d3719a839cc",
-              "equal": true
-            },
-            {
-              "path": "/api/v1/mapping-assessments/ma-a77741308dd94252a393281745421189",
-              "sizeBytes": 2513,
-              "wireSha256": "b6ccaa7e7c4b70a5531c030fa97f1921c62ff3387895880b0d770f10bbdc4f09",
-              "typedWireSha256": "b6ccaa7e7c4b70a5531c030fa97f1921c62ff3387895880b0d770f10bbdc4f09",
-              "equal": true
-            }
-          ],
-          "manifestSizeBytes": 4751,
-          "manifestHash": "a7b4343b42e2798b2236f1d85dbebe4ad73577fbd8bb23b511e6af6be1237dea",
-          "typedManifestSha256": "a7b4343b42e2798b2236f1d85dbebe4ad73577fbd8bb23b511e6af6be1237dea",
-          "assessmentId": "ma-a77741308dd94252a393281745421189"
-        },
-        {
-          "archiveMember": "s2-before-exact-join-release-a5f93d1137a04133a3fe1265642abed5.json",
-          "reportPath": "docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s2/browser-s2-doris-mapping-1795042301764.json",
-          "reportGitBlob": "c6328e23239382673b0e3547d53fe10ed19a1c2a",
-          "http": [
-            {
-              "path": "/api/v1/mapping-releases/release-a5f93d1137a04133a3fe1265642abed5",
-              "sizeBytes": 7795,
-              "wireSha256": "035a80d7251f2cb4175f8c9c522f74a67afc8f9a7f47669cedcc565e0f566929",
-              "typedWireSha256": "035a80d7251f2cb4175f8c9c522f74a67afc8f9a7f47669cedcc565e0f566929",
-              "equal": true
-            },
-            {
-              "path": "/api/v1/mapping-assessments/ma-99d5dbdfae694e7c83bcc9f865a9932e",
-              "sizeBytes": 2513,
-              "wireSha256": "0aefbb2ed7686f7ee36066253369c1a7c62d6c16de11f455936db9259a2a0f50",
-              "typedWireSha256": "0aefbb2ed7686f7ee36066253369c1a7c62d6c16de11f455936db9259a2a0f50",
-              "equal": true
-            }
-          ],
-          "manifestSizeBytes": 7529,
-          "manifestHash": "e8f7deda22f1fe3923695458af74643c34e27a13013b555ed19761636e588ced",
-          "typedManifestSha256": "e8f7deda22f1fe3923695458af74643c34e27a13013b555ed19761636e588ced",
-          "assessmentId": "ma-99d5dbdfae694e7c83bcc9f865a9932e"
-        }
-      ],
-      "storedAssessmentBytes": "NOT_QUALIFIED"
-    },
-    {
-      "reviewer": "s2_s3_readonly",
-      "scope": "Checked public report and machine receipt and both recorded commands against their receipts and original stdout and stderr.",
+      "reviewer": "/root/review",
+      "scope": "真实入口、身份来源、跨报告 seed、selection 及历史原件",
+      "node": {
+        "passed": 7,
+        "failed": 0
+      },
+      "pythonSelected": {
+        "passed": 5,
+        "failed": 0
+      },
+      "diffCheck": 0,
+      "accessMembers": 1236,
+      "accessSealedBytes": 63430,
+      "closureCommand": "1fca6fd4284a475a95c52b0644e7cc47",
       "files": {
-        "report.md": {
-          "sizeBytes": 16655,
-          "sha256": "9e8393670ae07fb21ba06544d63c149392652643b7a129848c64286cb7481ced"
+        "scripts/maintenance/workflow-oracle-s2.mjs": {
+          "path": "scripts/maintenance/workflow-oracle-s2.mjs",
+          "sizeBytes": 59926,
+          "sha256": "411f687eb522a389a84518094876c57c3b6ddcd57e3e4bf7597276ca5bc29ca4"
         },
-        "final-machine-receipt.json": {
-          "sizeBytes": 453609,
-          "sha256": "1ba73f3c582d16882057b193fc471d1aab35b6a970d740ca1a7f0fdc5e52c753"
+        "scripts/maintenance/workflow_oracle_mapping_s2_contract.py": {
+          "path": "scripts/maintenance/workflow_oracle_mapping_s2_contract.py",
+          "sizeBytes": 56761,
+          "sha256": "d018fbbe50d1c892b49d49ed0982ce3231083ed6f2cb4367efe0adc4d3ff4ed8"
+        },
+        "scripts/maintenance/workflow_oracle_mapping_continuation.py": {
+          "path": "scripts/maintenance/workflow_oracle_mapping_continuation.py",
+          "sizeBytes": 34272,
+          "sha256": "c91e3f8dc54c9b77a9439c2cb2894a8d563919ce98c88247669547430c2f465f"
+        },
+        "scripts/maintenance/workflow-oracle-s2-runtime-plan.json": {
+          "path": "scripts/maintenance/workflow-oracle-s2-runtime-plan.json",
+          "sizeBytes": 1902,
+          "sha256": "044a1509f7bf69b9d000c93267d2b1a28d65d846d0d61db1e03e431ff1c95bb3"
+        },
+        "backend/tests/OntologyPlatform.AgentTests/G4QueryAbaRuntimeTests.cs": {
+          "path": "backend/tests/OntologyPlatform.AgentTests/G4QueryAbaRuntimeTests.cs",
+          "sizeBytes": 17828,
+          "sha256": "3084a28051a97c875847c7d129141e29eb0fba2bcb8f0c6e94ebcc05c95c8f64"
+        },
+        "backend/tests/OntologyPlatform.AgentTests/OracleQueryS2RuntimeTests.cs": {
+          "path": "backend/tests/OntologyPlatform.AgentTests/OracleQueryS2RuntimeTests.cs",
+          "sizeBytes": 17738,
+          "sha256": "8f239ea468804c6d702a79436cf2546f6ba772d4b9bc80daf26e3668e2650c19"
         }
       },
-      "commands": [
-        "2617a44811bb43e384845348425df35d",
-        "e571adb88990482884df737c03de4f02"
+      "closed": [
+        "当前 reader 健康 seed 到两个实际分发入口",
+        "成功及 409 的 selection 上下文和同父 ABA SHA",
+        "当前审批 session 和新 DI 决定绑定",
+        "四动作与无过滤源事件分区",
+        "构建投影四件封存独立重开、终态可空性增量"
+      ],
+      "notIndependentlyRun": [
+        "项目构建",
+        "Oracle 产品或 S3",
+        "新宿主代次准入"
       ]
+    },
+    {
+      "reviewer": "/root/archive",
+      "scope": "既有 Doris 原件及版本、六态、S3 消费者只读检查",
+      "findings": {
+        "ids": [
+          "ma-a77741308dd94252a393281745421189",
+          "ma-99d5dbdfae694e7c83bcc9f865a9932e"
+        ],
+        "status": "NOT_QUALIFIED",
+        "searchMode": "FRESH_READ_ONLY",
+        "zipMemberCounts": [
+          476,
+          649,
+          717
+        ],
+        "finalZipSha256": "a3bc91f2017fefd7b41c28aed3fdc9c7ef947eb8f890b3372879bc6b8563adce",
+        "localCandidatesExamined": 16,
+        "otherStoredAssessment": "ma-ace12515d7804af2870f2a434c167951",
+        "secondAssessmentSnapshot": "s2-before-exact-join-release-a5f93d1137a04133a3fe1265642abed5.json",
+        "snapshotSha256": "29328b9787337cab3e60624a1184f2adcd653bb1c5d654f75cc6e4c7b5a80c4a",
+        "httpHashes": [
+          "b6ccaa7e7c4b70a5531c030fa97f1921c62ff3387895880b0d770f10bbdc4f09",
+          "0aefbb2ed7686f7ee36066253369c1a7c62d6c16de11f455936db9259a2a0f50"
+        ],
+        "foundStoredHashOrBytes": false
+      }
+    },
+    {
+      "reviewer": "/root/admission",
+      "scope": "现行 prepare 内容键、缺件、首份快照、历史回收台账和新后缀",
+      "approvedPackages": 179,
+      "missingFeed": 80,
+      "missingPrivate": 168,
+      "logicalBytes": 524851755,
+      "snapshotMinimumBytes": 32112640
     }
   ],
-  "publicFiles": {
-    "report.md": {
-      "sizeBytes": 16655,
-      "sha256": "9e8393670ae07fb21ba06544d63c149392652643b7a129848c64286cb7481ced"
-    },
-    "final-machine-receipt.json": {
-      "sizeBytes": 453609,
-      "sha256": "1ba73f3c582d16882057b193fc471d1aab35b6a970d740ca1a7f0fdc5e52c753"
-    }
-  },
-  "limitations": [
-    "No qualifying live Oracle ABA original was available. Its single recorded attempt exited 2 before the switch. S2 PARTIAL, S3 NOT_RUN.",
-    "Historical typed release HTTP, manifest, assessment HTTP and query result checks do not certify database canonical bytes for the two Doris assessments.",
-    "Access was reused at its historical measured input, and AC03-B remains BLOCKED."
+  "boundaries": [
+    "实机尚无本轮 seed query、回滚决定、409 或新窗口零成功三项。",
+    "编译由作者使用 Roslyn 与既有引用在内存中执行。",
+    "历史父失败及未资格继续有效。"
   ],
   "priorReview": {
-    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
-    "runId": "product-resume-01",
-    "batch": "s2-s3-01",
-    "sourceHead": "c7a6bcbc4e9b7cc1a8ea6d87fc95854fd5a4a548",
-    "previousHandoff": "6221362aa5f823a071383d59ffa26ebca61f93f4",
-    "priorProductHead": "b9c55441d8d53b341e0424a746f5bef32950cf37",
-    "author": "Master",
-    "reviewers": [
-      "ec01_review",
-      "s2_s3_readonly"
-    ],
-    "stop": "CHATGPT_REVIEW",
-    "conclusion": "SCOPED_OFFLINE_REVIEW_ONLY_S2_PARTIAL_S3_NOT_RUN",
-    "productStatus": {
-      "EC01": "PASS_REUSED",
-      "S1": "PASS_REUSED",
-      "AC03_A": "SUCCESS_WON_REUSED",
-      "AC03_B": "BLOCKED",
-      "AC03_C": "8_OF_8_REUSED",
-      "cleanup250ms": "NOT_QUALIFIED",
-      "S2": "PARTIAL_ABA_BLOCKED",
-      "S3": "NOT_RUN",
-      "G4": "PARTIAL",
-      "OracleS0": "BLOCKED",
-      "access": "CASE_QUALIFIED",
-      "ABA": "FAILED_BEFORE_INFLIGHT_QUERY",
-      "thisContinuationProduct": "NOT_RUN",
-      "currentRollbackHTTPContract": "PASS_OFFLINE",
-      "currentRollbackProduct": "NOT_RUN",
-      "currentReaderReceiptConsumer": "PASS_OFFLINE"
-    },
-    "scopes": [
-      {
-        "reviewer": "ec01_review",
-        "scope": "Independent actual formal access reopen on the continuation base. No new authentication or product execution.",
-        "outcome": "CASE_QUALIFIED_AT_MEASURED_INPUT",
-        "parent": "1afa8fd9ad624134a814126527f7a916",
-        "measuredCommit": "b9c55441d8d53b341e0424a746f5bef32950cf37",
-        "checks": 78,
-        "members": 1236,
-        "memberBytes": 12710185,
-        "oldIndex": "945280d40ddf750bea9fc4ecc6a3660b23b07871a4c1af2a203ec50fbac470ca",
-        "resolvedIndex": "478b7484274c63d2cfde842a256cb1a1d86f65f39cb51e9dff692b7ff2399adb",
-        "relocated": "formal-resources.json",
-        "relocatedOriginal": {
-          "path": "product-resume-01/formal-resources-a94e305ff2e5ad8cec38c370cd06fece9dc9d918995db7a4730373ba0816b531.json",
-          "sha256": "a94e305ff2e5ad8cec38c370cd06fece9dc9d918995db7a4730373ba0816b531",
-          "sizeBytes": 1384
-        },
-        "oldQualificationSizeBytes": 402072,
-        "oldQualificationSha256": "13b3f88a56191dd16cfa4ec71a3393bb0a1798b5db7cbc74531ef6cdf41d4385",
-        "historicalNonzeroExits": {
-          "c9a0458559de4934a530dcbcc9ca74a4": 1,
-          "1afa8fd9ad624134a814126527f7a916": 1,
-          "36606f5b1aa74ac09863d99930578f85": 2
-        }
-      },
-      {
-        "reviewer": "s2_s3_readonly",
-        "scope": "Normal decision HTTP identity and CAS, current reader selection, secret-safe mismatch assertion and historic prefix compatibility. Runtime rollback path inspected but not executed.",
-        "limits": "The ordinary helper is wired to B publish. Browser rollback contract tested offline. Inflight runtime still uses the historical query and old decision proof; no new live ABA or 409 proof."
-      }
-    ],
-    "publicFiles": {
-      "report.md": {
-        "sizeBytes": 14342,
-        "sha256": "08ebbae3d8af6a107e4543d98afe30b93b38443b2fca8f283daee64cbcc7872d"
-      },
-      "final-machine-receipt.json": {
-        "sizeBytes": 444333,
-        "sha256": "31cace752f4187e2c3bd086fd3eef7fd5e7cf1a31a45c904cdd22e4fcaad2345"
-      }
-    },
-    "priorReview": {
-      "taskId": "G4-ORACLE-MAPPING-QUERY-001",
-      "runId": "product-resume-01",
-      "batch": "s2-s3-01",
-      "codeHead": "bd46e04eec2551fcc486df1e3959b1890b3dd29f",
-      "measuredSuffixHead": "b9c55441d8d53b341e0424a746f5bef32950cf37",
-      "continuationBase": "095d2dd8ff957afa64f01fd938f18ffd357d8d5c",
-      "author": "Master",
-      "reviewers": [
-        "ec01_review",
-        "s2_s3_readonly"
-      ],
-      "independence": "Both reviewers used existing originals read-only. Neither ran the product, changed its state or authored these public files. This document records their scoped findings.",
-      "conclusion": "LIMITED_STAGE_QUALIFICATION_S2_PARTIAL_S3_NOT_RUN",
-      "productStatus": {
-        "EC01": "PASS_REUSED",
-        "S1": "PASS_REUSED",
-        "AC03_A": "SUCCESS_WON_REUSED",
-        "AC03_B": "BLOCKED",
-        "AC03_C": "8_OF_8_REUSED",
-        "cleanup250ms": "NOT_QUALIFIED",
-        "S2": "PARTIAL_ABA_BLOCKED",
-        "S3": "NOT_RUN",
-        "G4": "PARTIAL",
-        "OracleS0": "BLOCKED",
-        "access": "CASE_QUALIFIED",
-        "ABA": "FAILED_BEFORE_INFLIGHT_QUERY"
-      },
-      "scopes": [
-        {
-          "name": "EC-01 historical six-stage parent",
-          "reviewer": "ec01_review",
-          "outcome": "QUALIFIED_REUSED",
-          "canonicalMemberIndexSha256": "f5fca1f634c23cb1b8f43d681fe402bab60b8f27a432ef7ac2aaf263c3c9b950",
-          "members": 170,
-          "bytes": 623536,
-          "parent": "47f4f5d4e2454a759bd3189a5b37f590",
-          "parentReads": 2,
-          "stageReads": [
-            0,
-            1,
-            0,
-            1,
-            0,
-            0
-          ],
-          "gap": 0
-        },
-        {
-          "name": "Five historical stage qualifications",
-          "reviewer": "s2_s3_readonly",
-          "outcome": "QUALIFIED_ON_MEASURED_INPUT",
-          "canonicalMemberIndexSha256": "67625aa92426e2a8452e46e367ebc7de9953e095ee9e9848bb99cffdbcfa5445",
-          "parent": "edd1379b83c246329579075d16ccda58",
-          "measuredCommit": "2a2ea74ff72c22860e4927318913eaece9d14f9f",
-          "stageReads": [
-            0,
-            0,
-            0,
-            10,
-            40
-          ],
-          "members": 684
-        },
-        {
-          "name": "Prior handoff originals",
-          "reviewer": "ec01_review",
-          "outcome": "PRESERVED",
-          "canonicalMemberIndexSha256": "ba4909a6edcfb17e36395fcd19ad7580f764b768c2abe4cad0f2fb2dd30b3903",
-          "members": 21425,
-          "bytes": 40021390
-        },
-        {
-          "name": "Single exact lease, live transaction, original row and audit",
-          "reviewer": "ec01_review",
-          "outcome": "TASK_LEVEL_RECOVERY",
-          "canonicalMemberIndexSha256": "e0abff9511a1b45b2e3498fffea417c6c00bf4da903dfe82f53de8cfa75e0424",
-          "commands": 34,
-          "members": 110,
-          "bytes": 296290,
-          "actualCommandId": "67e2eb4d7e4a41cb953f5a0c00a8e31f",
-          "originalCleanup250ms": "NOT_QUALIFIED"
-        },
-        {
-          "name": "Isolated PostgreSQL exact target",
-          "reviewer": "ec01_review",
-          "outcome": "1_TEST_PASSED_NO_SKIP",
-          "canonicalMemberIndexSha256": "cf8d8e96973bedb6dd1247f706eb8a925c6e08726b4a2841e44ea847cf9a996d",
-          "members": 48,
-          "bytes": 155883
-        },
-        {
-          "name": "First fresh source ACL withdrawal and restore window",
-          "reviewer": "ec01_review",
-          "outcome": "SUBCASES_VERIFIED_ACCESS_FAILED",
-          "canonicalMemberIndexSha256": "4fec93cafc948137c4f82635eb4caf06314fd920aee4cc1057f5db1b68577860",
-          "commands": 24,
-          "members": 85,
-          "bytes": 459376,
-          "parent": "c9a0458559de4934a530dcbcc9ca74a4",
-          "testedCommit": "319e7cfe7dc6c9351ced63fbdd7c799640b31411",
-          "historicalRestoreHttp": 500,
-          "omissions": [
-            "fourth request-level audit",
-            "sourceCleanup in stage original"
-          ],
-          "gapReads": 0
-        },
-        {
-          "name": "Last four-role auth",
-          "reviewer": "s2_s3_readonly",
-          "outcome": "CASE_QUALIFIED",
-          "canonicalMemberIndexSha256": "55f7cc6b8145e00976b4c346595577d9b302824b60ef9f102dc4490b3a56e8a1",
-          "members": 966,
-          "checks": 34,
-          "subjectsAuthenticated": 4
-        },
-        {
-          "name": "Last complete access stage",
-          "reviewer": "s2_s3_readonly",
-          "outcome": "CASE_QUALIFIED",
-          "canonicalMemberIndexSha256": "945280d40ddf750bea9fc4ecc6a3660b23b07871a4c1af2a203ec50fbac470ca",
-          "members": 1236,
-          "checks": 78,
-          "submittedSourceCase": "query-dd5638dcdcc84e04a429322d8f8dd153",
-          "causalCleanupMs": 1.5729,
-          "sourceSessions": 0,
-          "leaseFieldsNull": true,
-          "historyRestoreHttp": 503,
-          "sourceReads": 2,
-          "requestAuditWindows": 11,
-          "wholeParentReads": [
-            0,
-            2,
-            4
-          ],
-          "gap": 0
-        },
-        {
-          "name": "ABA incomplete runtime",
-          "reviewer": "s2_s3_readonly",
-          "outcome": "FAIL_BEFORE_QUERY_AND_BOTH_ACTIVATIONS",
-          "commandId": "36606f5b1aa74ac09863d99930578f85",
-          "exitCode": 2,
-          "failedTests": 1,
-          "passedTests": 0,
-          "skippedTests": 0,
-          "approvedProposalObserved": true,
-          "actual409": "NOT_OBSERVED",
-          "preservedOriginal": true
-        },
-        {
-          "name": "Read-only final database and source state",
-          "reviewer": "ec01_review",
-          "outcome": "VERIFIED_AT_OBSERVATION",
-          "canonicalMemberIndexSha256": "c25b980aaf6f0af7104f886faf469ee39c7f853cfba7758ae3ea855d356e746f",
-          "commands": 14,
-          "members": 48,
-          "bytes": 909751,
-          "proposalStatus": "APPROVED",
-          "proposalActivated": false,
-          "activeARevision": 1,
-          "originalFailedFence": 2,
-          "oldFailurePreserved": true,
-          "grantRows": 75,
-          "grantEpoch": 106,
-          "fieldsPerGrant": 22,
-          "restoredDirectReads": 2,
-          "fixtureRowCounts": [
-            1,
-            1
-          ],
-          "sourceSessions": 0
-        },
-        {
-          "name": "Resource closeout in both task runs",
-          "reviewer": "ec01_review",
-          "outcome": "OWNED_PROCESSES_EXITED_PROTECTED_INVENTORY_MATCHED",
-          "canonicalMemberIndexSha256": "8d18d56510a28d27e01287ad83282cde8fd0103d37b164fa73f8010c718371c4",
-          "commands": 621,
-          "members": 1888,
-          "bytes": 2183078,
-          "drainCounters": 7,
-          "drainRounds": 2,
-          "eachValue": 0,
-          "removedApis": 2,
-          "exitedReplicas": 5,
-          "retainedRunning": 3,
-          "retainedExited": 17,
-          "protectedMatchingObservations": 13,
-          "logLimit": "Native stop ledger status is as recorded. Oracle stdout and PostgreSQL control state reopened. RustFS and Keycloak process exit verified. Service logs retained only as hash/marker; Keycloak clean-log marker not independently reopened.",
-          "fusekiCleanShutdown": "UNKNOWN"
-        }
-      ],
-      "prior": {
-        "commit": "095d2dd8ff957afa64f01fd938f18ffd357d8d5c",
-        "files": {
-          "report.md": {
-            "sizeBytes": 9119,
-            "sha256": "02636042e20dc2f632617875c36beb5d5fd96b51f62cafeb2d31434a887eb643"
-          },
-          "final-machine-receipt.json": {
-            "sizeBytes": 879994,
-            "sha256": "3c777b407ebf8c7ebc9d6d95f12ed5c8b7b3d99d39d9abc30c39352a81308021"
-          },
-          "non-author-review.json": {
-            "sizeBytes": 8516,
-            "sha256": "801474acc47b5899ce9a01818334cfe0c4133a7cf031c2edcdb21798a3c15943"
-          }
-        },
-        "scope": "Previous full public files and complete historical evidence index retained at the pinned commit."
-      },
-      "publicFiles": {
-        "report.md": {
-          "sizeBytes": 10704,
-          "sha256": "6d327af0022d175570c5ddbe810111a462dc75cb86d2b226e586d28661c97c72"
-        },
-        "final-machine-receipt.json": {
-          "sizeBytes": 411733,
-          "sha256": "a987e0490df04565b2509baa008774d806f0523c91a36d1174bda29e7ec1104b"
-        }
-      },
-      "stop": "CHATGPT_REVIEW",
-      "limitations": [
-        "AC03-B, cancellation cleanup250ms and Oracle S0 remain unqualified or blocked.",
-        "ABA success conditions, connection version and old selection cases, complete six states and 100/101, current suffix reader reopen, S3 UI/MCP, current typed Doris serialization, trust/secret rotations unqualified.",
-        "Fuseki reported PROCESS_EXITED with cleanShutdown UNKNOWN; retained TDB locks.",
-        "CI, full SelfTest and cross-platform NOT_RUN. G4 PARTIAL. No interim ZIP."
-      ],
-      "independentIndexReview": {
-        "reviewer": "ec01_review",
-        "status": "INDEX_VERIFIED",
-        "commandCount": 3220,
-        "streams": 6440,
-        "receiptAndStreamBytes": 13121046,
-        "nonzeroExits": {
-          "1": 3,
-          "2": 1
-        },
-        "associatedOriginals": 103,
-        "webProcesses": 2,
-        "webEvents": 6,
-        "webStreams": 4,
-        "expandedOriginals": 9763,
-        "expandedBytes": 21832256,
-        "canonicalGroupsSha256": "43595d0c3c24da34a6bf2e1c5d382166ca4dd3abcbbf4b628fd83978448fb222",
-        "expandedOriginalIndexSha256": "9d7ff9ed6b529421521149e489dc6290111065ca199c59bf07fab45f96800e0b",
-        "algorithm": "Repository-root-relative path, sizeBytes and sha256 objects sorted by path; UTF-8 JSON, sorted keys, compact separators, unescaped Unicode. The associated files include the four Web streams.",
-        "priorPinnedThreeBlobs": "VERIFIED"
-      },
-      "publicContentReview": {
-        "reviewer": "s2_s3_readonly",
-        "scope": "Report and machine receipt only. Stated facts and redaction; does not authorize product completion or main integration."
-      }
-    },
-    "offlineCodeReview": {
-      "reviewer": "s2_s3_readonly",
-      "sourceHead": "c7a6bcbc4e9b7cc1a8ea6d87fc95854fd5a4a548",
-      "confirmed": [
-        "current selected result and unique POST content consumer",
-        "exact prefix compatibility and rejection of changed input",
-        "current auditor HTTP decision request and response model",
-        "fixed diagnostic does not print session references"
-      ],
-      "node": {
-        "commandId": "6a9f59a04563476bb901a43b1432a655",
-        "passed": 5,
-        "skipped": 0
-      },
-      "python": {
-        "commandId": "4ef10fbcc3294a3bb7c844da133ff3f8",
-        "passed": 35
-      },
-      "agentBuild": {
-        "commandId": "08c0dbf1ed1042be8308f7184eb63eb0",
-        "exitCode": 0,
-        "errors": 0,
-        "warnings": 4,
-        "backendInput": "db72df830ace3b6804b8b586696074906ef127c2244d9ba29060b6b2cd89ae6f"
-      }
-    },
-    "scopeOfDelivery": "Historical access and fresh offline implementation evidence. No new live rollback, activation, identity handoff, 409 or S2/S3 pass."
+    "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/non-author-review.json",
+    "commit": "7b8fb59093e6f773ce4aea3c06357111c088f19b",
+    "sha256": "53ca4ea991dc8877c828802efabb058468bed92df82e63586096cddc94344deb"
+  },
+  "deliveryReopen": {
+    "reviewer": "/root/review",
+    "verifiedCommandCount": 17,
+    "uniqueCurrentOriginals": 67,
+    "bytes": 451487,
+    "previousGitOriginals": 3,
+    "schemaChecks": 23,
+    "scope": "首轮三文件候选、六项复审问题与最终工程输入。收尾七角色第二次核算的独立复核另见包外回读。"
   }
 }
