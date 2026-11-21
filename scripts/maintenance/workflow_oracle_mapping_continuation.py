@@ -153,6 +153,10 @@ def compatible_prefix(archive,measured,mode,stage):
             require(all(text.count(begin)==text.count(end)==1 for text in (left,right)),'S23_PREFIX_ACCESS_BOUNDARY')
             left=left[:left.index(begin)]+left[left.index(end):];right=right[:right.index(begin)]+right[right.index(end):]
         elif name.endswith('/workflow_oracle_mapping_platform_recovery.py'):
+            start_patch="            from workflow_oracle_runtime_window import policy, published_graphs\n            if policy() is not None:\n                receipt['currentGraphs']=published_graphs(cid,started,int(pid),basis)\n            else:\n                receipt['currentGraphs']=current_fuseki_graphs(cid,basis)"
+            graph_patch="    if row.get('currentGraphs',{}).get('kind')=='s2-s3-01-runtime-01':\n        from workflow_oracle_runtime_window import published_graphs\n        require(row['stage']=='product-resume-01' and row['role']=='fuseki' and row['status']=='RUNNING' and\n                row['productUse']=='CURRENT_GRAPHS_VERIFIED' and\n                published_graphs(cid,started,pid,row['checkpoint'],row['currentGraphs']['commands'])==row['currentGraphs'],\n                'TDB_RUNTIME_GRAPHS')\n        return row['attempt']\n"
+            require(right.count(start_patch)==right.count(graph_patch)==1,'S23_PREFIX_RUNTIME_GRAPH_SCOPE')
+            right=right.replace(start_patch,"            receipt['currentGraphs']=current_fuseki_graphs(cid,basis)",1).replace(graph_patch,'',1)
             from workflow_oracle_mapping_continuity import BRANCH
             require(right.count(BRANCH)==1 and BRANCH not in left,'S23_PREFIX_GENERATION_BRANCH')
             right=right.replace(BRANCH,'',1)
@@ -320,6 +324,8 @@ def prepare_prefix(root,descriptor,plan_id=PLAN_ID):
             and projection['mappingReceipt']==old['activation'] and latest['reportName'] in qualified['members'] and json.loads(_read(root,qualified['members'][latest['reportName']]['path']))==query
             and latest['queryId']==query['oracleCases'][2]['queryId'] and latest['resultHash']==query['oracleCases'][2]['sha256'],'S23_PREFIX_CURRENT_BINDING')
     from workflow_oracle_mapping_acl_host import lifecycle
+    if plan_id==RUNTIME_PLAN:
+        from workflow_oracle_runtime_window import runtime_continuity as lifecycle
     current=p.runtime_binding();continuity=lifecycle(root,host,current)
     snapshot=s.source_snapshot();require(snapshot['rows']==query['independentSource']['rows'] and snapshot['hashes']==query['independentSource']['hashes'],'S23_PREFIX_CURRENT_SOURCE')
     observation=dict(taskId=TASK,runId=RUN,batch='s2-s3-01',planId=plan_id,qualifiedPrefix=PREFIX,state=projection,host=current,source=snapshot,hostContinuity=continuity)
@@ -339,6 +345,8 @@ def reopen_prefix(root,stage,archive):
     require((obs['taskId'],obs['runId'],obs['batch'],obs['planId'])==(TASK,RUN,'s2-s3-01',stage['plan']['planId']) and obs['qualifiedPrefix']==PREFIX
             and stable_host(obs['host'])==stable_host(archive.dispatch['host']),'S23_PREFIX_OBSERVATION_SCOPE')
     from workflow_oracle_mapping_acl_host import lifecycle
+    if stage['plan']['planId']==RUNTIME_PLAN:
+        from workflow_oracle_runtime_window import runtime_continuity as lifecycle
     lifecycle(root,host,obs['host'],obs['hostContinuity'],archive)
     host_observation(archive,obs['host'],build_binding(archive,'api',root),root)
     snapshot=obs['source'];require(snapshot['projectionVersion']==2 and snapshot['rows']==query['independentSource']['rows']
@@ -379,6 +387,9 @@ def _run_suffix(plan_id):
     from workflow_oracle_mapping_evidence import browser_invocation,batch_plan
     require(p.product_run()==RUN,'S23_SUFFIX_RUN')
     root=p.ROOT;area=p.AREA.parent/RUN;mode='s2-s3-oracle';case='healthy'
+    if plan_id == RUNTIME_PLAN:
+        from workflow_oracle_runtime_window import policy, monitored
+        require(policy() is not None, 'WINDOW_DECISION_REQUIRED')
     resource=p.admission()
     pre=ex.run(['python3','-B','scripts/maintenance/execution_preflight.py','check','--milestone',TASK,'--phase','runtime'],root,
         task=TASK,run_id=RUN,stage='omq-consumers-'+mode,input_key=ex.sha(Path(__file__).read_bytes()),timeout=18)
@@ -396,11 +407,37 @@ def _run_suffix(plan_id):
     argv,key,label=browser_invocation(root,mode,case,host,api,tests,stage)
     pattern='browser-'+mode+'-'+'[0-9]'*13+'.json';before=set(area.glob(pattern))
     environment={**os.environ,'OMQ_PROGRESS_FILE':'s2-s3-'+execution+'.jsonl'}
-    result=ex.run(argv,root,task=TASK,run_id=RUN,stage=label,input_key=key,parent_id=host['commandId'],timeout=stage['plan']['deadlineSeconds'],environment=environment)
+    import contextlib
+    events = p.AREA.parent/'command-events.jsonl'
+    offset = events.stat().st_size
+    result = None
+    protection = None
+    try:
+        with monitored(resource['attempt']) if plan_id == RUNTIME_PLAN else contextlib.nullcontext():
+            result=ex.run(argv,root,task=TASK,run_id=RUN,stage=label,input_key=key,parent_id=host['commandId'],timeout=stage['plan']['deadlineSeconds'],environment=environment)
+    except (ValueError, KeyboardInterrupt, OSError, subprocess.SubprocessError) as error:
+        if plan_id != RUNTIME_PLAN:
+            raise
+        protection = type(error).__name__ + ' ' + str(error)[:240]
+        if result is None:
+            with events.open('rb') as stream:
+                stream.seek(offset)
+                ended = [row for line in stream if (row:=json.loads(line)).get('event')=='END'
+                         and row['inputFingerprint']==key and row['parentId']==host['commandId'] and row['stage']==label]
+            if len(ended)!=1:
+                p.save(area/('runtime-prestart-'+execution+'.json'),dict(reason=protection,executionId=execution))
+                raise
+            from types import SimpleNamespace
+            receipt = json.loads((area.parent/'commands'/RUN/ended[0]['commandId']/'receipt.json').read_bytes())
+            code = receipt['exitCode']
+            result = SimpleNamespace(receipt=receipt,returncode=128-code if code is not None and code<0 else code or 70)
     after=set(area.glob(pattern))-before
     entry=dict(taskId=TASK,runId=RUN,mode=mode,case=case,stageInputs=stage,host=host,builds={'api':api,'agent':tests},
         commandId=result.receipt['commandId'],exitCode=result.returncode,resourceAttempt=resource['attempt'],preflightCommandId=pre.receipt['commandId'],
         reports=[path.name for path in sorted(after)],testedCommit=p.local('tested-head',['git','rev-parse','HEAD']))
+    if protection:
+        entry.update(protection=protection,parentExitCode=result.receipt['exitCode'])
+        entry['exitCode']=result.returncode or 70
     p.save(area/('formal-run-'+mode+'-'+result.receipt['commandId']+'.json'),entry)
     try:
         p.save(area/('formal-audit-'+result.receipt['commandId']+'.json'),p.audit_window(result.receipt['startedAtUtc'],result.receipt['endedAtUtc']))
@@ -410,5 +447,6 @@ def _run_suffix(plan_id):
             p.save(area/('formal-audit-'+result.receipt['commandId']+'-'+item['mode']+'.json'),p.audit_window(item['startedAtUtc'],item['finishedAtUtc']))
     except Exception as error:
         p.save(area/('formal-audit-failure-'+result.receipt['commandId']+'.json'),dict(taskId=TASK,reason=str(error)))
-        raise
-    return dict(mode=mode,commandId=result.receipt['commandId'],exitCode=result.returncode,reports=entry['reports'],stageFailure=[json.loads(path.read_bytes()).get('failure') for path in after])
+        if not entry['exitCode']:
+            raise
+    return dict(mode=mode,commandId=result.receipt['commandId'],exitCode=entry['exitCode'],reports=entry['reports'],stageFailure=[json.loads(path.read_bytes()).get('failure') for path in after])

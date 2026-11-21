@@ -559,12 +559,50 @@ class S2CapacityTests(unittest.TestCase):
     def test_capacity_guard_rejects_budget_relaxation_and_double_credit(self):
         import workflow_oracle_mapping_capacity as capacity
         original=Path.read_bytes;path=Path(capacity.__file__);source=original(path)
-        for before,after in [(b'total<=40*GIB',b'total<=41*GIB'),
+        for before,after in [(b'require(total<=limit,',b'require(total<limit+1,'),
                 (b'host_start-=cache_release[',b'host-=cache_release['),
                 (b"reserved['newBuildEvidenceAndLogs'] = max(64*1024**2",b"reserved['newBuildEvidenceAndLogs'] = max(32*1024**2")]:
             bad=source.replace(before,after);self.assertNotEqual(bad,source)
             with self.subTest(change=after),patch.object(Path,'read_bytes',lambda p:bad if p==path else original(p)):
                 with self.assertRaisesRegex(ValueError,'CAPACITY_'):capacity.validate_programs()
+
+    def test_scoped_runtime_budget_and_sample_boundaries(self):
+        import workflow_oracle_runtime_window as window
+        g = window.GIB
+        self.assertEqual(window.ceiling(), 40*g)
+        self.assertEqual(window.choose(32*g), 40*g)
+        self.assertEqual(window.choose(39*g), 48*g)
+        with self.assertRaisesRegex(ValueError,'WINDOW_BUDGET_DEFICIT'):
+            window.choose(42*g)
+        sample = dict(totalBytes=42*g, hostFree=16*g, vmFree=28*g, hostMemory=5*g, vmMemory=4*g)
+        window.allow_sample(sample, 48*g)
+        for field,value in [('totalBytes',44*g),('hostFree',14*g),('vmFree',26*g),('vmMemory',3*g)]:
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                window.allow_sample({**sample,field:value},48*g)
+
+    def test_measured_child_is_stopped_on_future_threshold_or_failed_sample(self):
+        import subprocess
+        import workflow_oracle_runtime_window as window
+        g = window.GIB
+        nominal = dict(totalBytes=41*g,hostFree=16*g,vmFree=28*g,hostMemory=5*g,vmMemory=4*g)
+        ok = subprocess.CompletedProcess([],0,json.dumps(nominal).encode(),b'')
+        limit = subprocess.CompletedProcess([],0,json.dumps({**nominal,'totalBytes':44*g}).encode(),b'')
+        fail = subprocess.CompletedProcess([],2,b'',b'')
+        for after in (limit,fail):
+            with self.subTest(returncode=after.returncode),tempfile.TemporaryDirectory() as directory:
+                root=Path(directory).resolve();(root/window.BATCH).mkdir()
+                decision=dict(id='a'*32,ceiling=48*g)
+                with patch.object(window,'AREA',root),patch.object(window,'policy',return_value=decision), \
+                     patch.object(window.subprocess,'run',side_effect=[ok,after]),self.assertRaisesRegex(ValueError,'WINDOW_PROTECTED'):
+                    with window.monitored('b'*32):
+                        ex.run([sys.executable,'-B','-c','import time; time.sleep(20)'],root,task='WINDOW-TEST',
+                               run_id='bounded',stage='protected-child',input_key='fixture',timeout=25)
+                receipts=list(root.glob('artifacts/workflow/WINDOW-TEST/commands/bounded/*/receipt.json'))
+                self.assertEqual(len(receipts),1)
+                command=json.loads(receipts[0].read_bytes())
+                self.assertEqual((command['classification'],command['signal'],command['processGroupTerminated']),('CANCELLED',9,True))
+                samples=[json.loads(line) for line in next((root/window.BATCH).glob('samples-*')).read_text().splitlines()]
+                self.assertEqual(samples[-1]['status'],'PROTECTIVE_EXIT')
 
     def test_capacity_extension_is_product_only_before_resource_io(self):
         import workflow_oracle_mapping_capacity as capacity

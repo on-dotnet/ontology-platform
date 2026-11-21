@@ -84,7 +84,7 @@ def drivers(root, mode, run=None, plan_id=None):
         names+=('scripts/maintenance/workflow-oracle-s2-access-plan.json','scripts/maintenance/workflow_oracle_mapping_continuation.py','scripts/maintenance/workflow_oracle_mapping_continuity.py','scripts/maintenance/workflow_oracle_mapping_repeat.py','scripts/maintenance/workflow_oracle_mapping_access_refresh.py','scripts/maintenance/workflow_oracle_mapping_capacity.py','scripts/maintenance/workflow_oracle_mapping_readiness.py','scripts/maintenance/workflow_oracle_mapping_preparation_refresh.py','scripts/maintenance/workflow_oracle_mapping_postprobe.py','scripts/maintenance/workflow_oracle_preparation_runner.py','scripts/maintenance/workflow_oracle_preparation_maintenance.py')
     if plan_id in ('s2-s3-01-access-01','s2-s3-01-runtime-01'):
         names+=tuple('scripts/maintenance/workflow_oracle_mapping_'+part+'.py' for part in ('acl_host','acl_lease','acl_observation'))
-    if plan_id=='s2-s3-01-runtime-01':names+=('scripts/maintenance/workflow-oracle-s2-runtime-plan.json',)
+    if plan_id=='s2-s3-01-runtime-01':names+=('scripts/maintenance/workflow-oracle-s2-runtime-plan.json','scripts/maintenance/workflow_oracle_runtime_window.py')
     return {name: sha(ordinary(root/name).read_bytes()) for name in names}
 
 

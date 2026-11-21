@@ -95,6 +95,13 @@ def validate_programs():
             indices=[i for i,n in enumerate(new.body) if ast.dump(n,include_attributes=False)==ast.dump(expected[0],include_attributes=False)]
             require(len(indices)==1,'CAPACITY_CREDIT_LOCATION');index=indices[0]
             require(ast.dump(new.body[index+1],include_attributes=False)==ast.dump(expected[1],include_attributes=False),'CAPACITY_CREDIT_ONCE');del new.body[index:index+2]
+            # 只允许批次决定替换末端比较值与回执上限，其余逐节点和全局绑定继续验证。
+            end = ast.parse("from workflow_oracle_runtime_window import ceiling\nlimit = ceiling(total)\nrequire(total<=limit,'FORMAL_TOTAL_DISK_'+str(total))").body
+            require([ast.dump(n) for n in new.body[-4:-1]] == [ast.dump(n) for n in end], 'CAPACITY_LIMIT_SELECTION')
+            new.body[-4:-1] = ast.parse("require(total<=40*GIB,'FORMAL_TOTAL_DISK_'+str(total))").body
+            kw = [k for k in new.body[-1].value.keywords if k.arg == 'ceilingBytes']
+            require(len(kw) == 1 and ast.unparse(kw[0].value) == 'limit', 'CAPACITY_RECEIPT_LIMIT')
+            kw[0].value = ast.parse('40*GIB', mode='eval').body
             returned=new.body[-1];require(isinstance(returned,ast.Return) and isinstance(returned.value,ast.Call),'CAPACITY_RETURN')
             found=[k for k in returned.value.keywords if k.arg=='releasedBaselineCache'];require(len(found)==1 and ast.unparse(found[0].value)=='cache_release','CAPACITY_RETURN_CREDIT')
             returned.value.keywords.remove(found[0])
@@ -375,8 +382,10 @@ def disk_admission(root,area,command,*,phase=None,replacement=None):
         reserved['newBuildEvidenceAndLogs']-=transfer
         reserved['componentGrowthRemaining']=remaining
     total=sum(reserved.values())
-    require(total<=40*GIB,'FORMAL_TOTAL_DISK_'+str(total))
-    return dict(releasedBaselineCache=cache_release,allocations=reserved,componentBudget=component_budget,totalBytes=total,ceilingBytes=40*GIB,hostPaths=[str(p) for p in host_dirs],
+    from workflow_oracle_runtime_window import ceiling
+    limit = ceiling(total)
+    require(total<=limit,'FORMAL_TOTAL_DISK_'+str(total))
+    return dict(releasedBaselineCache=cache_release,allocations=reserved,componentBudget=component_budget,totalBytes=total,ceilingBytes=limit,hostPaths=[str(p) for p in host_dirs],
                 representativePlatformBytes=sample,platformCopyCeiling=platform_copy,
                 sourceVolumeCaps=source_caps,initialSourceMeasurement=usage,
                 measuredAgainBeforeExpansionOrRestore=True)
