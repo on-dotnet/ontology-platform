@@ -113,8 +113,7 @@ class FusekiLifecycleTests(unittest.TestCase):
         self.change(patch.object(platform,'product_run',return_value='product-resume-01'))
         self.eng=self.change(patch.object(recovery,'engine_step',side_effect=self.engine))
         self.change(patch.object(recovery,'one_helper',side_effect=lambda *a,**kw:'\n'.join(self.files)))
-        self.change(patch('workflow_oracle_mapping_resources.before_source',return_value={'attempt':'before'}))
-        self.change(patch.object(platform,'before_source',return_value={'attempt':'post'}))
+        self.change(patch('workflow_oracle_mapping_capacity.before_product_source',return_value={'attempt':'product'}))
 
     def change(self,patcher):
         self.addCleanup(patcher.stop)
