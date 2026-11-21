@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_PARTIAL_ABA_SESSION_BLOCKED_CHATGPT_REVIEW**。从 6221362a 续行的当前结果为浏览器审核与查询留证短链部分修正，AgentTests 编译和 35 Python / 5 Node 通过；在途驱动仍待替换历史查询与旧审核身份来源。指定旧租约已清，原失败保留。四角色认证与双表 access 已获资格，唯一在途 Mapping ABA 在会话前置处失败，S3 未运行。AC03-B 和 Oracle S0 仍 BLOCKED，G4 PARTIAL。详细原件与资源后态见[当前报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。
+唯一任务状态 **S2_PARTIAL_ABA_SESSION_BLOCKED_CHATGPT_REVIEW**。从 6221362a 续行的当前结果为浏览器审核与查询留证短链部分修正，AgentTests 编译和 35 Python / 5 Node 通过；在途驱动仍待替换历史查询与旧审核身份来源。指定旧租约已清，原失败保留。四角色认证与双表 access 已获资格，唯一在途 Mapping ABA 在会话前置处失败，S3 未运行。AC03-B 和 Oracle S0 仍 BLOCKED，G4 PARTIAL。本轮离线 AC10 已核对三份 Doris 结果、两份发布 manifest 及四份发布/assessment HTTP 正文。两份 assessment 的存储原字节仍未资格。详细原件与资源后态见[当前报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。
 
 ## 执行身份与所有权
 
@@ -16,8 +16,8 @@ P0 的文档归属为本任务卡、[唯一 A–F](../evidence/G4-ORACLE-MAPPING
 |---|---|---|
 | S0 源能力及取消 | AC01–03、11。先验证 Oracle 类型、事务、受控固定 SQL、正式取消与独立源终态；不可观察即停。 | BLOCKED。固定 SQL 在正式取消提交前已读完；两表事务、直取消和 PG 占位子项已测。 |
 | S1 单表 | AC04、05、08、10。沿正式发布、当前 grant、HTTP、真实平台持久化及新会话恢复 | PASS：auth-handoff-01第四实际窗口，准确父命令及六阶段原件见本批报告 |
-| S2 双表 | AC03、05–08。等值与半开关系、ABA、撤权、超量、原期限内清理和零成功副作用 | PARTIAL。五槽已有资格，本次健康双表和四项拒绝通过单项复核；源 ACL 清理阻断完整 access，ABA 等后续槽未运行。 |
-| S3 消费者及兼容 | AC09–11。UI/HTTP/MCP 同源字节，PG/Doris 与 Oracle M2 的原身份对照 | UI/MCP NOT_RUN。PG 及 Oracle M2 的既有兼容原件按输入复用；Doris 现行类型序列化尚未资格。 |
+| S2 双表 | AC03、05–08。等值与半开关系、ABA、撤权、超量、原期限内清理和零成功副作用 | PARTIAL。前五槽与双表 access 已有资格，源 READ 撤权和清理已实测。在途 ABA 在切换前失败，余槽保留未资格。 |
+| S3 消费者及兼容 | AC09–11。UI/HTTP/MCP 同源字节，PG/Doris 与 Oracle M2 的原身份对照 | S3 NOT_RUN。PG 与 Oracle M2 按输入复用。独立离线核对了 Doris 三份结果、两份发布 manifest 和四份历史 HTTP 正文，assessment 存储原字节未资格。 |
 
 每个 AC 的正反 Given/When/Then、真实 DI、独立预期、原件、输入变化及最小重验在唯一规格 E。实施先补当前 TaskId 实际分发，旧 M2 的通过记录仅归原输入。源实例已有原生事务并发对照、固定游标自然完成及 ODP 定向取消原件。首次源冷备已在替代容器通过驱动重开。资源余量按当次准入记录，完整平台恢复仍待验证。
 

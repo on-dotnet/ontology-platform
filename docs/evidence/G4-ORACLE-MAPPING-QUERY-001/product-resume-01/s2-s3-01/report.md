@@ -1,5 +1,26 @@
 # Oracle 双表 Mapping 与 Query 验收交付
 
+**S2 为 PARTIAL，S3 为 NOT_RUN。** 最后一份 Oracle ABA 实机回执在切换前以退出码 2 结束。没有取得同一查询在原期限内返回 409 及成功副作用为零的实机原件。当前驱动需要在真实会话的授权提交前主动制造竞态，本轮只核验可离线重开的证据。四角色正常登录及双表 access 沿用已合格原件。
+
+## 本轮 AC10 历史字节核验
+
+离线实测 Head 为 `18b8f73c74cce00ca7a0b1c8479be18f4375e40a`。历史证据来自 `413d7363fa544ee9dbf780a9a2707b880af96ec8`。最近 Oracle 实机 Head 仍为 `b9c55441d8d53b341e0424a746f5bef32950cf37`。执行沿用 product-resume-01 / s2-s3-01。
+
+| 核验对象 | 独立预期 | 当前产品结果 |
+|---|---|---|
+| Doris 查询结果 3 份 | 历史 Git 正文分别为 3,060、8,085、8,085 字节 | 类型解析与规范序列化后全部逐字节相等 |
+| Doris 历史发布 2 份 | 两次正式 GET 各自绑定发布时的 manifestHash | 规范序列化结果分别为 4,751、7,529 字节，两个 SHA-256 均与发布值相等 |
+| Doris 发布及 assessment 的 HTTP 正文 | 两份历史浏览器报告各有一个对应发布 GET 和一个对应 assessment GET，路径、成功状态和正文摘要均可复核 | 使用现行 HTTP 类型与 JSON 选项，四份正文逐字节相等 |
+| Doris assessment 的存储原字节 | 需要独立保存的 CanonicalBytes 或对应存储 ContentHash | 两个 assessment 均未取得该项独立原件，保留 NOT_QUALIFIED |
+
+历史 17 件清单中有三份查询结果。两次历史发布和两次 assessment 的对照另取自当时的 Mapping GET 记录。两条正式离线校验命令均以 0 退出。首轮 Mapping 诊断因路径表达式分组错误在匹配 GET 时退出，修正后逐条匹配唯一原请求。非作者独立复核了结果字节、发布散列和 HTTP 正文。
+
+本轮没有新增登录、产品查询、授权或服务操作。AC03-B 与 Oracle S0 为 BLOCKED，G4 为 PARTIAL。准确命令、散列和既有未资格项见[完整机器回执](final-machine-receipt.json)。独立复核范围见[非作者审查](non-author-review.json)。
+
+## 上一交付的工程与实机记录
+
+下文保留上一交付时的状态与原验收矩阵。关于 Doris 类型序列化的新增证据以上表为准。
+
 **本轮修正了普通审批 HTTP 回执的身份校验和当前 reader 查询原件登记。在途 ABA 驱动仍未修完。S2 为 PARTIAL，S3 为 NOT_RUN。**
 
 | 本次续行 | 准确绑定 |
