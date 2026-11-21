@@ -58,9 +58,12 @@ internal static class OracleQueryReader
         try
         {
             raw = await ReadOwnedAsync(lifetime,
-                () => adapter.OpenMappingAsync(secret, Guid.ParseExact(lifetime.ExecutionId, "N"), work.Token),
+                () => adapter.OpenMappingAsync(secret, Guid.ParseExact(lifetime.ExecutionId, "N"), work.Token, verifyAccess: false),
                 async connection =>
                 {
+                    // 权限元数据及其游标全部返回后，明确拒绝在已持有连接上进入物理清理。
+                    if (!await OracleSourceAdapter.MappingAccessMatchesAsync(connection, work.Token))
+                        throw new AccessRejectedException();
                     shape = await OracleMappingSourceValidator.CheckCatalogAsync(connection, context.CurrentCatalog, work.Token);
                     await adapter.RecordQuerySessionAsync(connection, lifetime, work.Token);
                     return await OracleSourceAdapter.BeginMappingAsync(connection, work.Token);
@@ -81,6 +84,7 @@ internal static class OracleQueryReader
         catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
         catch (Exception failure) when (failure is OperationCanceledException or OracleException { Number: 1013 })
         { throw Timeout(); }
+        catch (AccessRejectedException) { throw new SemanticOperationException(503, "query_source_unavailable"); }
         catch (OracleException failure) when (failure.Number == 1031) { throw new SemanticOperationException(403, "query_source_forbidden"); }
         catch (Exception failure) when (failure is OracleException or PgSourceException or InvalidCastException or OverflowException)
         { throw new SemanticOperationException(503, "query_source_unavailable"); }
@@ -166,6 +170,11 @@ internal static class OracleQueryReader
         PgQueryReader.Epoch(left["FROM_TS"].Lexical!) < PgQueryReader.Epoch(right["TO_TS"].Lexical!)
         && PgQueryReader.Epoch(right["FROM_TS"].Lexical!) < PgQueryReader.Epoch(left["TO_TS"].Lexical!);
 
+    /// <summary>仅表示前置权限元数据及其资源已完整返回后的明确拒绝，不代表连接已释放。</summary>
+    internal sealed class AccessRejectedException : Exception
+    {
+    }
+
     /// <summary>正式 Oracle reader 独占连接、业务事务和后续核验，确认发生在物理释放返回后。</summary>
     internal static async Task<List<OracleMappingRow>> ReadOwnedAsync<TConnection, TTransaction>(
         G4OracleSourceLifetime lifetime, Func<Task<TConnection>> open, Func<TConnection, Task<TTransaction>> begin,
@@ -219,7 +228,15 @@ internal static class OracleQueryReader
             try
             {
                 // 业务读取与事务清理由一个顺序执行者负责。
-                var tx = await begin(connection);
+                TTransaction tx;
+                try { tx = await begin(connection); }
+                catch (AccessRejectedException)
+                {
+                    // 只有完整前置拒绝且未取消的工作能进入已知终态；尚未建立任何业务事务。
+                    work.ThrowIfCancellationRequested();
+                    confirmed = true;
+                    throw;
+                }
                 // 在事务与后验都返回后才可交付这些行。
                 List<OracleMappingRow> rows;
                 // 只有读取任务返回（含游标和命令 Dispose）才能记录自然结束。

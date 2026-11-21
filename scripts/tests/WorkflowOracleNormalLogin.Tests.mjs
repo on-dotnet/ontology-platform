@@ -114,3 +114,40 @@ test("field-specific Keycloak error and earlier empty feedback do not become cal
   try {assert.equal(omq.loginOutcome(origins),"ORACLE_LOGIN_CREDENTIALS_REJECTED");}
   finally {delete globalThis.location;delete globalThis.document;}
 });
+
+
+test("authorized submit receives only validated form and original remaining budget", async()=>{
+  const f=fixture({submitAfter:100});let calls=0;
+  const lease=await omq.completeCurrentLogin(f.page,"viewer-a",{...f.options,submit:async(page,label,remaining)=>{
+    calls++;assert.equal(page,f.page);assert.equal(label,"viewer-a");assert.equal(remaining(),600000);
+  }});
+  assert.equal(calls,1);assert.equal(lease.observation.submitted,true);
+  const bad=fixture({action:issuer+realm+"/other"});
+  await assert.rejects(omq.completeCurrentLogin(bad.page,"viewer-a",{...bad.options,submit:()=>assert.fail("invalid form reached credential helper")}),{safeCode:"ORACLE_LOGIN_FORM_MISMATCH"});
+});
+
+
+test("system helper selects only four approved account entries",()=>{
+  assert.deepEqual(omq.systemLoginAccount("operator-ab"),{account:"g2-operator-ab",service:"G4 isolated login operator-reset-01-20261120"});
+  for(const label of ["auditor-ab","operator-a","viewer-a"])
+    assert.deepEqual(omq.systemLoginAccount(label),{account:"g2-"+label,service:"G4 isolated login isolated-login-20261120T040700Z"});
+  assert.throws(()=>omq.systemLoginAccount("admin"),/ORACLE_OIDC_SUBJECT/);
+});
+
+
+test("cancelled or already submitted form never calls the system helper",async()=>{
+  const aborted=fixture();
+  await assert.rejects(omq.completeCurrentLogin(aborted.page,"viewer-a",{...aborted.options,signal:{aborted:true},submit:()=>assert.fail("cancelled helper")}),{safeCode:"ORACLE_LOGIN_CANCELLED"});
+  const submitted=fixture({immediate:true,submitAfter:100});
+  await omq.completeCurrentLogin(submitted.page,"viewer-a",{...submitted.options,submit:()=>assert.fail("duplicate helper")});
+});
+
+test("helper cannot submit after cancellation or regain an expired deadline",async()=>{
+  for(const cancel of [false,true]) {
+    const f=fixture();const signal={aborted:false};
+    await assert.rejects(omq.completeCurrentLogin(f.page,"viewer-a",{...f.options,signal,submit:async(page,label,remaining)=>{
+      if(cancel)signal.aborted=true;else f.advance(600000);
+      remaining();assert.fail("late submission");
+    }}),{safeCode:cancel?"ORACLE_LOGIN_CANCELLED":"ORACLE_LOGIN_SUBMITTED_TIMEOUT"});
+  }
+});

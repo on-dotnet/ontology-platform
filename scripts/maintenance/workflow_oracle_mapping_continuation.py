@@ -18,6 +18,49 @@ TASK='G4-ORACLE-MAPPING-QUERY-001'
 RUN='product-resume-01'
 
 
+BUILD_ORIGINALS={
+ 'api-build-binding.json':('b07a092a3010b825532b9872774a912e70a4e3b2af20e4defe8cecbecec2a0ea',17510),
+ 'api-bound-build.txt':('75e6aba04f38e63fd63a116fda5557c4ce5c6996433c815e12d605a3a4b6537d',2773),
+ 'agent-build-binding.json':('adf54273d9c111e75635d7dd8984a68d2366d7b469418e6f34e1b1fe0c0d6d2a',40373),
+ 'agent-bound-build.txt':('e75bf142869458a3b03c3c777c0b4b08753fcc0ba704ba2a4ec92193c874789e',2773)}
+
+
+def historical_backend_input(root):
+    """按原构建算法从冻结Git普通文件重算历史输入，不把当前输入说成未变。"""
+    commit=PREFIX['measuredCommit']
+    require(subprocess.run(['git','merge-base','--is-ancestor',commit,'HEAD'],cwd=root,capture_output=True).returncode==0,'S23_PREFIX_BUILD_ANCESTRY')
+    items=[]
+    for entry in subprocess.check_output(['git','ls-tree','-rz','--full-tree',commit],cwd=root).split(b'\0'):
+        if not entry:continue
+        metadata,name=entry.split(b'\t',1);mode,kind,oid=metadata.decode().split();name=name.decode()
+        if not(name.startswith('backend/') or name in ('global.json','NuGet.Config','package.json','pnpm-lock.yaml','pnpm-workspace.yaml','.node-version') or name.startswith('Directory.')):continue
+        if any(part in ('bin','obj','node_modules','.next') for part in Path(name).parts):continue
+        require(kind=='blob' and mode in ('100644','100755'),'S23_PREFIX_BUILD_FILE');items.append((name,oid))
+    data=subprocess.check_output(['git','cat-file','--batch'],cwd=root,input=''.join(oid+'\n' for _,oid in items).encode())
+    rows={};offset=0
+    for name,oid in items:
+        end=data.index(b'\n',offset);header=data[offset:end].split()
+        require(len(header)==3 and header[0].decode()==oid and header[1]==b'blob','S23_PREFIX_BUILD_BLOB')
+        size=int(header[2]);offset=end+1;blob=data[offset:offset+size]
+        require(len(blob)==size and data[offset+size:offset+size+1]==b'\n','S23_PREFIX_BUILD_BLOB_SIZE')
+        rows[name]=ex.sha(blob);offset+=size+1
+    require(offset==len(data),'S23_PREFIX_BUILD_TRAILING');result=ex.sha(json.dumps(rows,sort_keys=True).encode())
+    require(len(rows)==414 and result=='53bddbec15779aa28ad25dc3082986027dbc6586f289add3326be2342d3d15ea','S23_PREFIX_BUILD_INPUT');return result
+
+
+def frozen_build_context(root,dispatch,archive):
+    """只有固定已资格五槽允许从原提交与冻结成员索引重开历史构建。"""
+    if dispatch.get('commandId')!=PREFIX['commandId']:return None
+    require(dispatch.get('taskId')==TASK and dispatch.get('runId')==RUN and dispatch.get('testedCommit')==PREFIX['measuredCommit']
+        and dispatch.get('mode') in MODES and dispatch.get('case')=='healthy'
+        and dispatch.get('batch',{}).get('stageInputs',{}).get('mode')=='s2-s3-oracle'
+        and dispatch['batch']['stageInputs']['plan']['planId']=='s2-s3-01','S23_PREFIX_BUILD_SCOPE')
+    frozen=_frozen_qualification(root,archive);base=Path('artifacts/workflow')/TASK;members={}
+    for name,(digest,size) in BUILD_ORIGINALS.items():
+        item=frozen['members'][name];require(item==dict(path=str(base/name),sha256=digest,sizeBytes=size),'S23_PREFIX_BUILD_ORIGINAL');members[name]=item
+    return dict(measuredCommit=PREFIX['measuredCommit'],inputKey=historical_backend_input(root),members=members)
+
+
 def _read(root,path,archive=None,label=None):
     relative=Path(path)
     require(not relative.is_absolute() and '..' not in relative.parts and relative.is_relative_to(Path('artifacts/workflow')/TASK),'S23_PREFIX_PATH')
@@ -85,12 +128,21 @@ def compatible_prefix(archive,measured,mode,stage):
             require(right.count(REPEAT_BRANCH)==1,'S23_PREFIX_REPEAT_BRANCH')
             right=right.replace(REPEAT_BRANCH,'',1)
         elif name==e.DRIVER:
+            right=right.replace('onProgress: event => oracleProgress({ ...event, mode }),\n          ...(shared?.plan?.planId === "s2-s3-01-access-01" ? { submit: omq.submitSystemLogin } : {}) });','onProgress: event => oracleProgress({ ...event, mode }) });')
             right=right.replace('(input.plan.planId === "s2-s3-01-access-01" ? omq.s2AccessPlan() : omq.s2Plan)','omq.s2Plan')
         elif name.endswith('/workflow-oracle-query-fixture.mjs'):
+            # 旧plan不传submit；仅剔除准确新helper和未进入的选项分支，原认证逻辑仍全文比较。
+            begin='/** 本批用户明确授权代填：仅四原账号、指定系统条目、已核验的本机正式表单。 */'
+            end='export function currentProjection(label, me) {'
+            require(right.count(begin)==right.count(end)==1,'S23_PREFIX_LOGIN_BOUNDARY')
+            added=right[right.index(begin):right.index(end)]
+            require(ex.sha(added.encode())=='f5d6637496e365a60993ff7f3f31e39b5ec2b3ca1dac32b50a2609195e88b894','S23_PREFIX_LOGIN_HELPER')
+            right=right.replace(added,'',1).replace('    if (options.submit && submittedAt === undefined) {\n      const remaining = () => {\n        if (options.signal?.aborted || page.isClosed()) throw loginFailure("ORACLE_LOGIN_CANCELLED");\n        return loginRemaining(deadline, now);\n      };\n      remaining();\n      await options.submit(page, label, remaining);\n    }\n','')
             right=right.replace('export function s2AccessPlan() { return Object.freeze(JSON.parse(readFileSync(new URL("./workflow-oracle-s2-access-plan.json", import.meta.url), "utf8"))); }\n','')
             right=right.replace('"access_case", "runtime_case", "same_grant"','"access_case", "runtime_case"')
         elif name.endswith('/workflow_oracle_mapping_s2_contract.py'):
             right=right.replace("report['batch']['planId'] in ('s2-s3-01','s2-s3-01-access-01')","report['batch']['planId']=='s2-s3-01'")
+            right=right.replace("    if mode=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':required[mode]=required[mode]|{'healthy-relations'}\n",'')
             require(_program(left,{'frozen_plan'})==_program(right,{'frozen_plan'}),'S23_PREFIX_CONTRACT_CHANGED')
             continue
         else:require(False,'S23_PREFIX_DRIVER_CHANGED')
@@ -101,7 +153,18 @@ def compatible_prefix(archive,measured,mode,stage):
 
 def frozen_member(root,item,archive=None,name=None):
     """冻结路径若被正式资源生命周期推进，仅从已有内容键副本取回相同原字节。"""
-    path=Path(item['path']);raw=_read(root,path)
+    path=Path(item['path'])
+    if path.parent==Path('artifacts/workflow')/TASK and path.name in BUILD_ORIGINALS:
+        digest,size=BUILD_ORIGINALS[path.name]
+        require(item['sha256']==digest and item['sizeBytes']==size,'S23_PREFIX_BUILD_ORIGINAL')
+        path=path.with_name(path.stem+'-'+digest+path.suffix);raw=_read(root,path,archive,name)
+        require(len(raw)==size and ex.sha(raw)==digest,'S23_PREFIX_ORIGINAL_CHANGED');return raw
+    runtime_originals={'formal-api-inputs.json':('2369e985350e0a7b0b38319f0e13823d126fcad73bbd1ef96ddec13ff2cfd63a',845),
+        'formal-api-compose.json':('e08441297488c9c83ed537853df9ba18dd1131fbf1f32e6ec50dbfffb5c6ecff',6885)}
+    if path.parent==Path('artifacts/workflow')/TASK/RUN and path.name in runtime_originals:
+        digest,size=runtime_originals[path.name];require((item['sha256'],item['sizeBytes'])==(digest,size),'S23_PREFIX_RUNTIME_ORIGINAL')
+        path=path.with_name(path.stem+'-'+digest+path.suffix)
+    raw=_read(root,path)
     if len(raw)!=item['sizeBytes'] or ex.sha(raw)!=item['sha256']:
         require(path==Path('artifacts/workflow')/TASK/RUN/'formal-resources.json','S23_PREFIX_ORIGINAL_CHANGED')
         path=path.with_name('formal-resources-'+item['sha256']+'.json');raw=_read(root,path)

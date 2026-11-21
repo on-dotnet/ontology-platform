@@ -17,6 +17,12 @@ public static class Program
             await OracleS0Maintenance.RunAsync();
             return;
         }
+        if (args.Length > 0 && args[0] == "--recover-omq-s23-access")
+        {
+            if (args.Length != 1) throw new ArgumentException("维护模式不接受额外参数。");
+            await OracleAccessMaintenance.RunAsync();
+            return;
+        }
         if (args is ["--export-g4-openapi", var outputPath])
         {
             await G4ContractExport.WriteAsync(outputPath);

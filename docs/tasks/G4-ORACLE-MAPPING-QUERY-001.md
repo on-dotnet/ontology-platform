@@ -106,3 +106,13 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 本次最终认证窗短链 owned_paths 追加 workflow_oracle_mapping_continuity.py、recovery.require_current_fuseki 单个新代次分支及现有 evidence/门禁登记。独立预期验证旧全集和正式发布词汇四声明；冻结检查点与失败启动原件不变。正常停止/新启动、API准确删除/创建及完整Oracle挂载均消费实际命令；不重建数据或放宽源审计。
 
 2026-11-21 10:02用户因仍未在屏幕前，再授权一次600秒正常认证。同批原后缀继续，上一父654eaf461bec4c00b9cf618bf0a93211认证0/4、产品未资格原件保留；关闭补证348c1f...保留原磁盘后验失败与Fuseki clean未知。Master owned_paths追加workflow_oracle_mapping_repeat.py，固定第二段宿主代次边；第一段常量和证据原样保留。只新读本代完整图库、Published源码与真实停启链，不恢复数据。两个同任务公共feed副本已按非作者审查回收，运行四构建/快照不变；完整prepare不再声称当前READY，下次须从现存同hash原件零下载物化。
+
+2026-11-21最新明确授权：用户要求Codex自行填写现有密码完成正常登录，不再要求本人操作。仅后缀s2-s3-01-access-01使用系统钥匙串四个准确账号条目，operator-ab为独立operator-reset-01-20261120，其余为isolated-login-20261120T040700Z；口令只在本机进程内直填已核验本机OIDC表单，不显示、写日志、落盘、导出会话或重置密码。原600秒/新reader180秒/提交40秒与产品预算不变。最新父04f23ea8cfe34868a8500b80164d86fb认证4/4及34checks通过；access因源清理未确认503失败，后9槽NOT_RUN，权限/源ACL准确恢复。继续短链修复和自动S2→S3，当前状态S2_S3_IMPLEMENTING。
+
+本次确证源ACL短链修复owned_paths追加Connections的Adapters/OracleQueryReader.cs、OracleSourceAdapter.Mapping.cs及OracleQueryLifetimeTests.cs；仅区分完整前置拒绝与未知打开/取消/释放，保留原1秒/250ms、旧AC03-B未资格。相应API/Agent/Query/Connections按影响重建，持卷实例保持，原件与旧快照不覆盖。
+
+本次source-acl失败留下准确FAILED占位query-4b9f97e1bbdd45f7a39111c907447f65、owner oracle-execution-8db5f162e634422abf8b94caf509d2c9/fence2。只对本次替代实例执行相关任务收尾，owned_paths追加SemanticQuery/G4OracleAccessMaintenance.cs、Api/G4/OracleAccessMaintenance.cs与Program.cs、QueryTests/G4OracleAccessRecoveryTests.cs及本任务精确执行器。原S0维护常量/入口不变；必须两API封闭、新鲜零源会话、全行和失败审计CAS后同事务只清租约两列。保留原FAILED与250ms未资格，不重启五持卷、不触及旧资源。
+
+2026-11-21 当前源ACL失败短链修复：21项Connections生命周期测试通过；新固定FAILED租约恢复在随机隔离PG实测1/1、0skip且库/helper已删除。两原API 31fc0ef3…/7dac6ce7…正常退出并移除；固定query-4b9f97…经非作者新鲜证明重开后，真实命令56a20ab08e69402e8469f7c8c8362f4c完成仅两租约列TASK_LEVEL_RECOVERY，FAILED/fence2/失败审计保持。新连接37d113…/ba8667…已独立核对，仅新增一次准确维护审计；原250ms仍NOT_QUALIFIED。新API 26e72f80…/c45bfd75…采用新API/Query/Agent快照，五持卷容器与进程代次保持。
+
+当前owned_paths再明确：`workflow_oracle_mapping_access_refresh.py`、`workflow_oracle_access_maintenance.py/.cs.txt`、现有continuation/continuity/repeat/evidence/query准入与verification-gates登记、受影响S2/正常登录测试。历史前五槽仅按原2a2ea74提交的414文件input53bddbec…及原build/log/config字节重开；当前backend inpute8b537ed…不同，必须由新增双表healthy-relations真实短链补证。旧计划/索引不改，正式窗口仍使用原s2-s3-01-access-01后缀，旧latestQuery保持原绑定。回收仅本批公共feed重复副本和已结束构建中间件；原源码/原件/快照/私有材料及受保护资源保持，完整prepare状态不冒称当前READY。

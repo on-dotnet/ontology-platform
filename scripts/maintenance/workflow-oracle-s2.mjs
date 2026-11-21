@@ -491,6 +491,8 @@ async function ui(ctx) {
 /** 当前组合grant拒绝后既不执行业务SQL，也不恢复历史原值；每次恢复核原行。 */
 async function access(ctx) {
   const {actors:{reader,auditor},state,execute,query,call,request,audit,check,report}=ctx;
+  // 当前Reader改动须先用完整双表真实读取补证，保留历史latestQuery锚点。
+  await execute("healthy-relations",query(capabilities[2]),reader,2);
   const q=query(capabilities[0]);
   await execute("no-grant",q,auditor,0);
   report.permissionCases=[];

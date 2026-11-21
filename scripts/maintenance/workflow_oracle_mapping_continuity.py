@@ -163,7 +163,13 @@ def find_command(root,role,resource,kind,lower,upper):
 def observed_oracle(root,host,archive=None):
     """原host完整Docker原件中的Oracle挂载及进程代次，不依赖精简host里的缺省字段。"""
     from workflow_oracle_mapping_platform import HOST_FORMAT
-    inputs=json.loads(raw(root,AREA/'formal-api-inputs.json',archive))
+    from workflow_oracle_mapping_evidence import RuntimeOriginals
+    selector=RuntimeOriginals(root,{'host':host})
+    def matches(data):
+        value=json.loads(data)
+        return value.get('taskId')==TASK and value.get('runId')==RUN and value.get('snapshotId')==host['snapshotId'] and value.get('composeSha256')==host['composeSha256'] and value.get('relaySha256')==host['runtimeHelperSha256']
+    path=selector.choose('formal-api-inputs*.json',matches)
+    inputs=json.loads(raw(root,path.relative_to(root),archive))
     ids={k:v['containerId'] for k,v in host['services'].items()};roles=sorted(ids);source=host['oracle']['containerId']
     args=['docker','--context','desktop-linux','inspect','-f',HOST_FORMAT,*[ids[k] for k in roles],source]
     key=ex.sha(ex.encoded([inputs,ids,source,HOST_FORMAT]))

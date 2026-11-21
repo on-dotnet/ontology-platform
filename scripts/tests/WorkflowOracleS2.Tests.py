@@ -195,6 +195,33 @@ class S2ContinuationTests(unittest.TestCase):
         other=current.with_name('report.json');other.write_bytes(b'current')
         with self.assertRaisesRegex(ValueError,'S23_PREFIX_ORIGINAL_CHANGED'):n.frozen_member(root,{**item,'path':str(other.relative_to(root))})
 
+    def test_frozen_build_files_accept_only_fixed_hash_size_and_task(self):
+        import workflow_oracle_mapping_continuation as n
+        root=Path(self.enterContext(tempfile.TemporaryDirectory())).resolve()
+        raw=b'historical binding';digest=ex.sha(raw);name='api-build-binding.json'
+        base=Path('artifacts/workflow')/n.TASK;path=root/base/name;path.parent.mkdir(parents=True)
+        path.write_bytes(b'current build differs');backup=path.with_name(path.stem+'-'+digest+path.suffix);backup.write_bytes(raw)
+        item=dict(path=str(base/name),sha256=digest,sizeBytes=len(raw))
+        with patch.dict(n.BUILD_ORIGINALS,{name:(digest,len(raw))}):
+            self.assertEqual(n.frozen_member(root,item),raw)
+            for bad in ({**item,'sha256':'0'*64},{**item,'sizeBytes':len(raw)+1}):
+                with self.assertRaisesRegex(ValueError,'S23_PREFIX_BUILD_ORIGINAL'):n.frozen_member(root,bad)
+            backup.write_bytes(b'tampered')
+            with self.assertRaisesRegex(ValueError,'S23_PREFIX_ORIGINAL_CHANGED'):n.frozen_member(root,item)
+        self.assertEqual(path.read_bytes(),b'current build differs')
+
+    def test_history_context_is_closed_to_exact_qualified_parent(self):
+        import workflow_oracle_mapping_continuation as n
+        self.assertIsNone(n.frozen_build_context(ROOT,{'commandId':'0'*32},None))
+        dispatch=dict(commandId=n.PREFIX['commandId'],taskId=n.TASK,runId=n.RUN,testedCommit=n.PREFIX['measuredCommit'],
+            mode=n.MODES[0],case='healthy',batch=dict(stageInputs=dict(mode='s2-s3-oracle',plan=dict(planId='s2-s3-01'))))
+        for key,value in [('taskId','other'),('runId','other'),('testedCommit','0'*40),('mode','s2-oracle-access'),('case','other')]:
+            with self.subTest(key=key),self.assertRaisesRegex(ValueError,'S23_PREFIX_BUILD_SCOPE'):
+                n.frozen_build_context(ROOT,{**dispatch,key:value},None)
+        altered=copy.deepcopy(dispatch);altered['batch']['stageInputs']['plan']['planId']='s2-s3-01-access-01'
+        with self.assertRaisesRegex(ValueError,'S23_PREFIX_BUILD_SCOPE'):n.frozen_build_context(ROOT,altered,None)
+        self.assertEqual(n.historical_backend_input(ROOT),'53bddbec15779aa28ad25dc3082986027dbc6586f289add3326be2342d3d15ea')
+
     def test_restarted_host_keeps_all_persistent_inputs_and_real_ids(self):
         import workflow_oracle_mapping_continuation as n
         import workflow_oracle_mapping_evidence as e
@@ -253,18 +280,68 @@ class S2ContinuationTests(unittest.TestCase):
             for cid,stamp,pid in [('0'*64,*n.GENERATION),(n.FUSEKI,'2026-11-21T01:20:00Z',n.GENERATION[1]),(n.FUSEKI,n.GENERATION[0],1)]:
                 with self.assertRaisesRegex(ValueError,'S23_GRAPH_GENERATION'):n.graph_qualification(ROOT,cid,stamp,pid)
 
+    def test_api_build_refresh_keeps_data_generations_and_private_mounts(self):
+        import workflow_oracle_mapping_access_refresh as n
+        import workflow_oracle_mapping_evidence as e
+        roles=('api','api-secondary','platform-pg','oracle','fuseki','rustfs','keycloak-test')
+        old=dict(resourceManifestSha256='old',snapshotId='old',composeSha256='old',buildInputKey='old',buildOutputKey='old',runtimeHelperSha256='same',
+            services={r:dict(containerId=r,pid=1,startedAt='old',mountSha256='old',imageId='image',networks={'net':'id'}) for r in roles if r!='oracle'},oracle={'containerId':'oracle'})
+        new=copy.deepcopy(old)
+        for field in ('resourceManifestSha256','snapshotId','composeSha256','buildInputKey','buildOutputKey'):new[field]='new'
+        builds=[{t:dict(directory='snapshot/'+side+'/'+t) for t in ('api','agent','query')} for side in ('old','new')]
+        states=[]
+        for side in range(2):
+            rows={}
+            for role in roles:
+                mounts=[dict(Type='bind',RW=False,Destination='/private',Source='/same-private')]
+                if role.startswith('api'):
+                    new['services'][role].update(containerId='new-'+role,pid=2,startedAt='new',mountSha256='new')
+                    for dest,target in {'/app':'api',**({'/session-tests':'agent','/query-tests':'query'} if role=='api-secondary' else {})}.items():
+                        mounts.append(dict(Type='bind',RW=False,Destination=dest,Source=str(ROOT/builds[side][target]['directory'])))
+                rows[role]=dict(containerId=('new-' if side and role.startswith('api') else '')+role,pid=2 if side and role.startswith('api') else 1,
+                    startedAt='new' if side and role.startswith('api') else 'old',imageId='image',networks={'net':'id'},mounts=mounts)
+            states.append(rows)
+        original=copy.deepcopy((old,new))
+        with patch.object(e,'stable_host',side_effect=lambda value:value):
+            self.assertTrue(n.compare_hosts(ROOT,old,new,*states,builds));self.assertEqual((old,new),original)
+            for kind in ('data-pid','data-start','data-mount','data-net','query-writable','query-wrong','query-cover','private'):
+                bad=copy.deepcopy(states[1])
+                if kind.startswith('data-'):
+                    field={'data-pid':'pid','data-start':'startedAt','data-mount':'mounts','data-net':'networks'}[kind];bad['oracle'][field]='drift'
+                else:
+                    mounts=bad['api-secondary']['mounts'];q=next(m for m in mounts if m['Destination']=='/query-tests')
+                    if kind=='query-writable':q['RW']=True
+                    elif kind=='query-wrong':q['Source']='/wrong'
+                    elif kind=='query-cover':mounts.append({**q,'Destination':'/query-tests/child'})
+                    else:mounts[0]['Source']='/different-private'
+                with self.subTest(kind=kind),self.assertRaisesRegex(ValueError,'S23_REFRESH_'):n.compare_hosts(ROOT,old,new,states[0],bad,builds)
+
+    def test_bound_inputs_rejects_ambiguous_and_missing_historical_bytes(self):
+        import workflow_oracle_mapping_access_refresh as n
+        import workflow_oracle_mapping_evidence as e
+        self.enterContext(patch.object(e,'RUN',n.RUN))
+        root=Path(self.enterContext(tempfile.TemporaryDirectory())).resolve();area=root/n.AREA;area.mkdir(parents=True)
+        host=dict(snapshotId='old',composeSha256='compose',runtimeHelperSha256='relay')
+        data=dict(taskId=n.TASK,runId=n.RUN,snapshotId='old',composeSha256='compose',relaySha256='relay',extra='one')
+        old=area/'formal-api-inputs-old.json';old.write_text(json.dumps(data));(area/'formal-api-inputs.json').write_text(json.dumps({**data,'snapshotId':'new'}))
+        self.assertEqual(n.bound_inputs(root,host),data)
+        other=area/'formal-api-inputs-ambiguous.json';other.write_text(json.dumps({**data,'extra':'two'}))
+        with self.assertRaisesRegex(ValueError,'OMQ_RUNTIME_ARTIFACT_MISSING'):n.bound_inputs(root,host)
+        other.unlink();old.unlink()
+        with self.assertRaisesRegex(ValueError,'OMQ_RUNTIME_ARTIFACT_MISSING'):n.bound_inputs(root,host)
+
     def test_repeat_preserves_first_generation_consumer(self):
         import workflow_oracle_mapping_repeat as n
-        previous={'original':'unchanged'};current={'services':{'fuseki':dict(startedAt=n.c.GENERATION[0],pid=n.c.GENERATION[1])}}
+        previous={'original':'unchanged','snapshotId':'same'};current={'snapshotId':'same','services':{'fuseki':dict(startedAt=n.c.GENERATION[0],pid=n.c.GENERATION[1])}}
         with patch.object(n.c,'lifecycle',return_value={'first':'original'}) as original:
             self.assertEqual(n.lifecycle(ROOT,previous,current),{'first':'original'})
             original.assert_called_once_with(ROOT,previous,current,None,None)
 
     def test_repeat_rejects_unknown_generation_before_reading(self):
         import workflow_oracle_mapping_repeat as n
-        current={'services':{'fuseki':dict(startedAt='2099-01-01T00:00:00Z',pid=1)}}
+        current={'snapshotId':'same','services':{'fuseki':dict(startedAt='2099-01-01T00:00:00Z',pid=1)}}
         with patch.object(n,'raw',side_effect=AssertionError('must reject before reading')):
-            with self.assertRaisesRegex(ValueError,'S23_REPEAT_CURRENT_GENERATION'):n.lifecycle(ROOT,{},current)
+            with self.assertRaisesRegex(ValueError,'S23_REPEAT_CURRENT_GENERATION'):n.lifecycle(ROOT,{'snapshotId':'same'},current)
             with self.assertRaisesRegex(ValueError,'S23_REPEAT_GRAPH_GENERATION'):n.graph_qualification(ROOT,n.c.FUSEKI,'2099-01-01T00:00:00Z',1)
 
     def test_grant_order_does_not_hide_value_or_microsecond_differences(self):

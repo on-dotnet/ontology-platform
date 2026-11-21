@@ -81,7 +81,7 @@ def drivers(root, mode, run=None, plan_id=None):
                   'scripts/maintenance/workflow_oracle_mapping_s2.py','scripts/maintenance/workflow_oracle_mapping_s2_contract.py',
                   'scripts/maintenance/workflow_oracle_mapping_formal_observer.py','scripts/maintenance/workflow_m4_query_evidence.py')
     if plan_id=='s2-s3-01-access-01':
-        names+=('scripts/maintenance/workflow-oracle-s2-access-plan.json','scripts/maintenance/workflow_oracle_mapping_continuation.py','scripts/maintenance/workflow_oracle_mapping_continuity.py','scripts/maintenance/workflow_oracle_mapping_repeat.py')
+        names+=('scripts/maintenance/workflow-oracle-s2-access-plan.json','scripts/maintenance/workflow_oracle_mapping_continuation.py','scripts/maintenance/workflow_oracle_mapping_continuity.py','scripts/maintenance/workflow_oracle_mapping_repeat.py','scripts/maintenance/workflow_oracle_mapping_access_refresh.py')
     return {name: sha(ordinary(root/name).read_bytes()) for name in names}
 
 
@@ -173,8 +173,10 @@ def build_binding(archive, target, measured_worktree):
     name = target+'-build-binding.json'
     raw = archive.raw(name)
     result = json.loads(raw)
+    history=getattr(archive,'frozenPrefixBuild',None)
+    expected_input=history['inputKey'] if history is not None and target in ('api','agent') else build.inputs(target)
     require(result['taskId'] == TASK and result['target'] == target and result['worktree'] == str(measured_worktree)
-            and result['status'] == 'PASS' and result['exitCode'] == 0 and result['inputKey'] == build.inputs(target),
+            and result['status'] == 'PASS' and result['exitCode'] == 0 and result['inputKey'] == expected_input,
             'OMQ_BUILD_BINDING')
     marker = str(Path(build.TARGETS[target]).parent/'bin/Debug/net10.0'/(Path(build.TARGETS[target]).stem+'.dll'))
     files = result['outputs']
@@ -907,6 +909,10 @@ class RuntimeOriginals(Originals):
         self.area = root/'artifacts/workflow'/TASK/RUN
         self.dispatch = dispatch
         self.paths = {}
+        self.frozenPrefixBuild=None
+        if dispatch.get('commandId')=='edd1379b83c246329579075d16ccda58':
+            from workflow_oracle_mapping_continuation import frozen_build_context
+            self.frozenPrefixBuild=frozen_build_context(root,dispatch,self)
 
     def choose(self,pattern,matches):
         # 旧同任务快照若仍存在，只有原字节完全相同才可消除重名。
@@ -925,6 +931,9 @@ class RuntimeOriginals(Originals):
                 candidates=list((self.area.parent/'commands').glob('*/'+command[1]+'/'+command[2]))
                 require(len(candidates)==1 and COMMAND.fullmatch(candidates[0].parents[1].name),'OMQ_AUTH_BUILD_ORIGINAL')
                 path=candidates[0]
+        elif self.frozenPrefixBuild is not None and name in self.frozenPrefixBuild['members']:
+            from workflow_oracle_mapping_continuation import frozen_member
+            return frozen_member(self.root,self.frozenPrefixBuild['members'][name],self,name)
         elif name in ('api-build-binding.json','agent-build-binding.json','api-bound-build.txt','agent-bound-build.txt','web-build-binding.json'):
             path=self.area.parent/name
         elif name=='formal-resources.json' and self.dispatch['runId']==PRODUCT_RUN:

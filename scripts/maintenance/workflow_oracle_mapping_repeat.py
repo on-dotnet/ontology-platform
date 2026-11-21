@@ -131,6 +131,9 @@ def prior_host(root,archive=None):
 
 def lifecycle(root,previous,current,proof=None,archive=None):
     """旧代次入口原样保留；新代次明确消费两条连续边而非跳接。"""
+    if current['snapshotId']!=previous['snapshotId']:
+        from workflow_oracle_mapping_access_refresh import lifecycle as refresh
+        return refresh(root,previous,current,proof,archive)
     observed=current['services']['fuseki']
     if (observed['startedAt'],observed['pid'])==c.GENERATION:return c.lifecycle(root,previous,current,proof,archive)
     require(GENERATION is not None and (observed['startedAt'],observed['pid'])==GENERATION,'S23_REPEAT_CURRENT_GENERATION')

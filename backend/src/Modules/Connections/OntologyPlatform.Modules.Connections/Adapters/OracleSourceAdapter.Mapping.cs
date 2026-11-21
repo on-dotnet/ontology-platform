@@ -57,12 +57,13 @@ public sealed partial class OracleSourceAdapter
             lifetime.QueryId, lifetime.ExecutionId, ids[0], ids[1], ids[2], ids[3], ids[4], DateTimeOffset.UtcNow);
     }
 
-    /// <summary>在业务事务外验证信任与当前直接读取范围，交给调用者管理同一物理连接。</summary>
+    /// <summary>在业务事务外验证信任并打开物理连接；Mapping先核直接读取范围，Query取得所有权后核验。</summary>
     /// <param name="secret">本任务读者的内存口令。</param>
     /// <param name="executionId">独占的源执行身份。</param>
     /// <param name="token">调用者原期限令牌。</param>
-    /// <returns>完成实际 TCPS、当前权限及对象核验的非池化连接。</returns>
-    internal async Task<OracleConnection> OpenMappingAsync(string secret, Guid executionId, CancellationToken token)
+    /// <param name="verifyAccess">Mapping默认在返回前核权；Query在取得所有权后单独核验同一连接。</param>
+    /// <returns>完成实际 TCPS的非池化连接；默认还包含当前权限及对象核验。</returns>
+    internal async Task<OracleConnection> OpenMappingAsync(string secret, Guid executionId, CancellationToken token, bool verifyAccess = true)
     {
         await G4OracleSourceOpen.BeforePhysicalOpenAsync(token);
         await VerifyTlsAsync(token);
@@ -75,7 +76,7 @@ public sealed partial class OracleSourceAdapter
             await G4OracleSourceOpen.AfterPhysicalOpenAsync();
             connection.ModuleName = "G4-ORACLE-MAPPING-QUERY-001";
             connection.ClientId = executionId.ToString("N");
-            await VerifyMappingAccessAsync(connection, token);
+            if (verifyAccess) await VerifyMappingAccessAsync(connection, token);
             return connection;
         }
         catch
@@ -87,6 +88,13 @@ public sealed partial class OracleSourceAdapter
 
     /// <summary>在当前独占物理会话复核只读身份与准确三项直接授权。</summary>
     internal static async Task VerifyMappingAccessAsync(OracleConnection connection, CancellationToken token)
+    {
+        if (!await MappingAccessMatchesAsync(connection, token))
+            throw new PgSourceException("connection_readonly_unverified");
+    }
+
+    /// <summary>完整读取并释放权限元数据后才返回匹配结论；取消或资源异常不能伪装成明确拒绝。</summary>
+    internal static async Task<bool> MappingAccessMatchesAsync(OracleConnection connection, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
         await VerifyReadOnlyAsync(connection, token);
@@ -102,8 +110,7 @@ public sealed partial class OracleSourceAdapter
         await using var cursor = await grants.ExecuteReaderAsync(token);
         while (await cursor.ReadAsync(token))
             objects.Add((cursor.GetString(0), cursor.GetString(1)));
-        if (!objects.SetEquals([("PRODUCTION", "OMQ_ENTITY"), ("CaseOwner", "OmqTarget"), ("G4_CONTROL", "READONLY_ATTESTATION")]))
-            throw new PgSourceException("connection_readonly_unverified");
+        return objects.SetEquals([("PRODUCTION", "OMQ_ENTITY"), ("CaseOwner", "OmqTarget"), ("G4_CONTROL", "READONLY_ATTESTATION")]);
     }
 
     /// <summary>所有前置核验已结束，在该连接显式建立本地事务并立即发出只读声明。</summary>

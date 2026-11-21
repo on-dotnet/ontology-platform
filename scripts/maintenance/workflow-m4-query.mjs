@@ -132,7 +132,8 @@ async function browserRun(mode, shared = null) {
     if (resumeLogin) {
       try {
         authLease = await omq.completeCurrentLogin(page, label, { window: shared?.loginWindow, signal: shared?.signal,
-          onProgress: event => oracleProgress({ ...event, mode }) });
+          onProgress: event => oracleProgress({ ...event, mode }),
+          ...(shared?.plan?.planId === "s2-s3-01-access-01" ? { submit: omq.submitSystemLogin } : {}) });
         report.authentication ??= []; report.authentication.push(authLease.observation);
       }
       catch (error) {

@@ -241,6 +241,61 @@ public sealed class OracleQueryLifetimeTests
         Assert.IsFalse(lifetime.CleanupConfirmed);
     }
 
+    /// <summary>完整前置权限拒绝没有启动事务；只有原期限内物理释放完成才能归还准确申请。</summary>
+    [TestMethod]
+    [DataRow("complete")]
+    [DataRow("check-error")]
+    [DataRow("cancelled")]
+    [DataRow("dispose-error")]
+    [DataRow("late-dispose")]
+    [DataRow("open-error")]
+    public async Task PreflightRejectionRequiresCompletePhysicalRelease(string outcome)
+    {
+        // 原请求与清理使用独立可控时钟；不会延长源的一秒预算。
+        var clock = new ManualClock();
+        using var request = new G4RequestDeadline(clock, CancellationToken.None);
+        using var lifetime = new G4OracleSourceLifetime("synthetic-oracle-preflight", clock);
+        using var work = new CancellationTokenSource();
+        // 只替代原生I/O；正式reader决定事务是否开始及申请是否归还。
+        var order = new List<string>();
+        var source = new Physical(() =>
+        {
+            order.Add("physical");
+            if (outcome == "dispose-error") throw new IOException("dispose");
+            if (outcome == "late-dispose") clock.Advance(251);
+        });
+        // 明确拒绝的类型只能由已完整读取并释放元数据的前置检查产生。
+        var rejection = new OracleQueryReader.AccessRejectedException();
+        try
+        {
+            await OracleQueryReader.ReadOwnedAsync<Physical, Transaction>(lifetime,
+                () => outcome == "open-error" ? throw new IOException("open") : Task.FromResult(source),
+                _ =>
+                {
+                    order.Add("preflight");
+                    if (outcome == "check-error") throw new IOException("metadata");
+                    if (outcome == "cancelled") work.Cancel();
+                    throw rejection;
+                },
+                (_, _, _, _) => throw new AssertFailedException("Business SQL must not start after preflight rejection."),
+                _ => throw new AssertFailedException("Postcheck must not start after preflight rejection."),
+                () => order.Add("released"), work.Token, Stopwatch.GetTimestamp(), TimeSpan.FromSeconds(1),
+                (phase, _) => order.Add(phase));
+            Assert.Fail("Preflight rejection must not return rows.");
+        }
+        catch (Exception error) when (error is OracleQueryReader.AccessRejectedException or IOException or OperationCanceledException)
+        {
+            Assert.IsTrue(lifetime.HasAcquired);
+            Assert.AreEqual(outcome == "complete", lifetime.CleanupConfirmed);
+            if (outcome == "complete")
+            {
+                Assert.AreSame(rejection, error);
+                CollectionAssert.AreEqual(new[] { "ACQUIRED", "preflight", "physical", "released", "PHYSICAL_DISPOSED", "CONFIRMED" }, order);
+            }
+            else Assert.IsFalse(order.Contains("CONFIRMED"));
+        }
+    }
+
     /// <summary>仅为截止反例提供可同步推进的单调时间，不改变宿主时钟。</summary>
     private sealed class ManualClock : TimeProvider
     {

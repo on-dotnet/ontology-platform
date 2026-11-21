@@ -1,6 +1,8 @@
 """Oracle Mapping/Query 独立任务的准备与阶段前提。旧 M2 仍沿原入口。"""
 import re
 import subprocess
+import io
+import tokenize
 
 from execution_preflight import source_path
 from workflow_environment import ORACLE_ARCHIVES, digest, materialize, ordinary
@@ -31,6 +33,8 @@ def structural(root, task, phase):
         from workflow_oracle_mapping_s2_contract import frozen_plan
         frozen_plan(root)
         frozen_plan(root,"s2-s3-01-access-01")
+        consumers['scripts/maintenance/workflow_oracle_mapping_access_refresh.py']=['def lifecycle(', 'def snapshot_builds(', 'def maintenance_result(', 'S23_REFRESH_CAS', 'S23_REFRESH_PRIVATE_MOUNT_DRIFT']
+        consumers['scripts/maintenance/workflow_oracle_access_maintenance.py']=['def verify_seal(', 'def verify_prestate(', 'def recover(', 'S23_ACCESS_POST_ROW']
         consumers["scripts/maintenance/workflow_oracle_mapping_repeat.py"]=["def lifecycle(", "def graph_qualification(", "def close_basis(", "def second_segment("]
         consumers["scripts/maintenance/workflow_oracle_mapping_continuity.py"]=["def graph_qualification(", "def lifecycle(", "S23_GRAPH_EXPECTED_SET", "S23_CONTINUITY_ORACLE_MOUNTS"]
         consumers["scripts/maintenance/workflow_oracle_mapping_continuation.py"]=["def run_access_suffix():", "prepare_prefix(root,stage['plan']['qualifiedPrefix'])", "p.audit_window(", "def reopen_prefix("]
@@ -48,6 +52,9 @@ def structural(root, task, phase):
             # JS字符串中的路由glob和URL不是注释，不能吞掉真实分发函数。
             pattern = r'''("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|/\*.*?\*/|//[^\n]*'''
             code = re.sub(pattern,lambda match:match.group(1) or '',data.decode(),flags=re.S)
+        elif path.endswith('.py'):
+            # Python字符串内的路径glob不是C注释；只去掉真正的Python注释token。
+            code=tokenize.untokenize(token for token in tokenize.generate_tokens(io.StringIO(data.decode()).readline) if token.type!=tokenize.COMMENT)
         else:
             code = re.sub(r'/\*.*?\*/|//[^\n]*','',data.decode(),flags=re.S)
         require(all(token in code for token in tokens), 'CONSUMER_MISSING_'+path)

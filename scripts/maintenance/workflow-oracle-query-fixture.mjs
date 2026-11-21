@@ -25,6 +25,66 @@ function loginFailure(code) {
   return Object.assign(new Error(code), { safeCode: code });
 }
 
+/** 本批用户明确授权代填：仅四原账号、指定系统条目、已核验的本机正式表单。 */
+const systemLoginProgram = `import ctypes,sys
+from ctypes import c_void_p,c_uint32,c_char_p,c_int32,POINTER,byref
+if sys.platform != "darwin" or len(sys.argv) != 3:sys.exit(2)
+account,service=(v.encode() for v in sys.argv[1:])
+expected=b"G4 isolated login "+(b"operator-reset-01-20261120" if account==b"g2-operator-ab" else b"isolated-login-20261120T040700Z")
+if account not in (b"g2-operator-ab",b"g2-auditor-ab",b"g2-operator-a",b"g2-viewer-a") or service!=expected:sys.exit(2)
+lib=ctypes.CDLL("/System/Library/Frameworks/Security.framework/Security")
+lib.SecKeychainSetUserInteractionAllowed.argtypes=[ctypes.c_ubyte];lib.SecKeychainSetUserInteractionAllowed.restype=c_int32
+lib.SecKeychainFindGenericPassword.argtypes=[c_void_p,c_uint32,c_char_p,c_uint32,c_char_p,POINTER(c_uint32),POINTER(c_void_p),POINTER(c_void_p)];lib.SecKeychainFindGenericPassword.restype=c_int32
+lib.SecKeychainItemFreeContent.argtypes=[c_void_p,c_void_p];lib.SecKeychainItemFreeContent.restype=c_int32
+if lib.SecKeychainSetUserInteractionAllowed(False)!=0:sys.exit(3)
+length=c_uint32();data=c_void_p()
+status=lib.SecKeychainFindGenericPassword(None,len(service),service,len(account),account,byref(length),byref(data),None)
+try:
+ if status!=0 or not data.value or not 0<length.value<4096:sys.exit(3)
+ sys.stdout.buffer.write(ctypes.string_at(data,length.value));sys.stdout.buffer.flush()
+finally:
+ if data.value:ctypes.memset(data,0,length.value);lib.SecKeychainItemFreeContent(None,data)
+`;
+
+export function systemLoginAccount(label) {
+  originalSubject(label);
+  return { account: "g2-" + label, service: "G4 isolated login " +
+    (label === "operator-ab" ? "operator-reset-01-20261120" : "isolated-login-20261120T040700Z") };
+}
+
+/** 密码仅经系统助手进入当前进程和登录表单；不记录输出、异常正文或认证材料。 */
+export async function submitSystemLogin(page, label, remaining) {
+  const { account, service } = systemLoginAccount(label);
+  if (process.platform !== "darwin" || !productResume) throw loginFailure("ORACLE_LOGIN_HELPER_UNAVAILABLE");
+  const address = new URL(page.url());
+  if (address.origin !== "http://localhost:" + ports.oidc || !address.pathname.startsWith("/realms/g2-180e1435711f03fa/"))
+    throw loginFailure("ORACLE_LOGIN_FORM_MISMATCH");
+  let value;
+  try {
+    value = execFileSync("python3", ["-B", "-c", systemLoginProgram, account, service],
+      { timeout: Math.min(10000, remaining()), maxBuffer: 4096, stdio: ["ignore", "pipe", "pipe"], env: { PATH: process.env.PATH } });
+    // 原生系统助手输出准确口令字节，不裁剪首尾空白或附加行终止符。
+    const end = value.length;
+    if (end < 1) throw loginFailure("ORACLE_LOGIN_HELPER_UNAVAILABLE");
+    remaining();
+    const valid = await page.evaluate(({ account, issuer, realm }) => {
+      const user = document.querySelector("#username"), password = document.querySelector("#password"), button = document.querySelector("#kc-login");
+      const form = user?.form;
+      if (!form || password?.form !== form || button?.form !== form || user.value !== account
+          || button.hasAttribute("formaction") || button.hasAttribute("formmethod")) return false;
+      const action = new URL(form.action);
+      return location.origin === issuer && location.pathname.startsWith(realm + "/") && action.origin === issuer
+        && action.pathname === realm + "/login-actions/authenticate" && form.method.toLowerCase() === "post";
+    }, { account, issuer: "http://localhost:" + ports.oidc, realm: "/realms/g2-180e1435711f03fa" });
+    if (!valid) throw loginFailure("ORACLE_LOGIN_FORM_MISMATCH");
+    await page.locator("#password").fill(value.subarray(0, end).toString("utf8"), { timeout: remaining() });
+    await page.locator("#kc-login").click({ timeout: remaining() });
+  } catch (error) {
+    throw loginFailure(["ORACLE_LOGIN_CANCELLED", "ORACLE_LOGIN_SUBMITTED_TIMEOUT", "ORACLE_LOGIN_FORM_MISMATCH"].includes(error.safeCode)
+      ? error.safeCode : "ORACLE_LOGIN_HELPER_FAILED");
+  } finally { value?.fill(0); }
+}
+
 export function currentProjection(label, me) {
   const role = label === "auditor-ab" ? "platform.auditor" : label === "viewer-a" ? "platform.viewer" : "platform.operator";
   const sites = label.endsWith("-ab") ? ["site-a", "site-b"] : ["site-a"];
@@ -112,6 +172,14 @@ export async function completeCurrentLogin(page, label, options = {}) {
     observation.windowRemainingMs = Math.max(0, deadline - handedAt);
     options.onProgress?.({ event: "FORM_INTERACTIVE", label, remainingSeconds: Math.floor((deadline - now()) / 1000),
       entry: label === "operator-ab" ? "operator-reset-01-20261120" : "040700Z" });
+    if (options.submit && submittedAt === undefined) {
+      const remaining = () => {
+        if (options.signal?.aborted || page.isClosed()) throw loginFailure("ORACLE_LOGIN_CANCELLED");
+        return loginRemaining(deadline, now);
+      };
+      remaining();
+      await options.submit(page, label, remaining);
+    }
     while (true) {
       if (options.signal?.aborted || page.isClosed()) throw loginFailure("ORACLE_LOGIN_CANCELLED");
       if (now() >= deadline) throw loginFailure(submittedAt === undefined ? "ORACLE_LOGIN_WAITING_FOR_INPUT" : "ORACLE_LOGIN_SUBMITTED_TIMEOUT");

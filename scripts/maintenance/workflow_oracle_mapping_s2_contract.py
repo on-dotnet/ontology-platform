@@ -256,6 +256,7 @@ def qualify(report):
       's2-oracle-aba':{'aba-selection-origin','aba-selection-current'},
       's2-oracle-access':{'no-grant','revoke-execute','field-execute','expired-execute','source-acl'},
       's3':{'mcp-'+x for x in CAPABILITIES},'ui-s3':{'ui-'+x for x in CAPABILITIES},'ui-s1':{'ui-refresh'}}
+    if mode=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':required[mode]=required[mode]|{'healthy-relations'}
     require(set(names)==required.get(mode,set()),'S23_CASE_SET')
     statuses=[result_case(row,report['oracleBinding']) for row in rows]
     return dict(status='SEMANTICS_QUALIFIED',mode=mode,cases=len(rows),statuses=statuses,scope='semantic original content; parent command and source audits qualify separately')
