@@ -18,8 +18,8 @@ export function consume(root, report, deadline) {
 /** 精确模式、Task/Run与完整目录未通过时，不能开始任何业务动作。 */
 export async function run(ctx) {
   const {root,state,shared,report,mode,actors,check,get,post,request,save,file} = ctx;
-  if (!shared || !["s2-s3-01","s2-s3-01-access-01"].includes(shared.plan.planId) || state.taskId !== task || state.runId !== runId || state.batch !== "s2-s3-01"
-      || !omq.s2Plan.stages.some(s => s.mode === mode)) throw new Error("ORACLE_S2_DISPATCH");
+  if (!shared || !["s2-s3-01","s2-s3-01-access-01","s2-s3-01-runtime-01"].includes(shared.plan.planId) || state.taskId !== task || state.runId !== runId || state.batch !== "s2-s3-01"
+      || !shared.plan.stages.some(s => s.mode === mode)) throw new Error("ORACLE_S2_DISPATCH");
   const deadline=shared.stageDeadline;
   const call=(method,...args)=>omq.s2Call(root,method,args,deadline);
   const s=()=>omq.grantState(state);
@@ -30,10 +30,13 @@ export async function run(ctx) {
   report.oracleCases=[];report.oracleWindows=[];
   const audit=async(name,action,expectedReads)=>{
     const start=new Date().toISOString();
-    const result=await action();
+    let result, failure;
+    try {result=await action();} catch(error) {failure=error;}
     const end=new Date().toISOString();
-    const observed=omq.platform(root,"q.audit_window(*json.load(sys.stdin))",[start,end,null],deadline);
+    let observed;
+    try {observed=omq.platform(root,"q.audit_window(*json.load(sys.stdin))",[start,end,null],deadline);} catch(error) {throw failure??error;}
     report.oracleWindows.push({name,startedAtUtc:start,finishedAtUtc:end,expectedReads,audit:observed});
+    if(failure)throw failure;
     check("oracle_audit_"+name,observed.clientId===null&&observed.records.length===expectedReads);
     return result;
   };
@@ -71,6 +74,15 @@ export async function run(ctx) {
     else if(mode==="s3") await mcp(ctx);
     else if(mode==="ui-s3"||mode==="ui-s1") await ui(ctx);
     else throw new Error("ORACLE_S2_MODE");
+  }
+  if(mode==="s2-oracle-connection") {
+    const prior=shared.stages.find(stage=>stage.mode==="s2-oracle-aba");
+    check("oracle_runtime_seed_prior_stage",prior?.status==="PASS" && basename(prior.report)===report.runtimeQuery.reportName);
+    const bytes=await readFile(prior.report);
+    check("oracle_runtime_seed_prior_bytes",hash(bytes)===prior.reportSha256);
+    execFileSync("python3",["-B","-c",
+      'import sys,json;sys.path.insert(0,"scripts/maintenance");from workflow_oracle_mapping_s2_contract import runtime_seed;r,s=json.load(sys.stdin);runtime_seed(r,s,r["connectionRuntime"]["original"])'],
+      {cwd:root,input:JSON.stringify([report,JSON.parse(bytes)]),timeout:Math.min(10000,omq.stageRemaining(deadline))});
   }
   report.semanticQualification=consume(root,report,deadline);
   check("oracle_s23_semantics_qualified",report.semanticQualification.status==="SEMANTICS_QUALIFIED");
@@ -352,7 +364,7 @@ async function states(ctx) {
 /** 只用真正新reader会话恢复原query，逐个窗口实测零业务SELECT。 */
 async function reopen(ctx) {
   const {state,actors:{reader,auditor},request,check,report,audit,call}=ctx;
-  const previous=state.latestQuery;
+  const previous=state.reboundQuery??state.latestQuery;
   const session=report.scenarioReady.session.observations.find(r=>r.subjectId===reader.me.subjectId).sessionHash;
   check("s2_restore_new_reader",session!==previous.sessionHash&&reader.me.subjectId===previous.actor);
   report.oracleRestore={queryId:previous.queryId,originalHash:previous.resultHash,oldSessionHash:previous.sessionHash,newSessionHash:session,subjectId:reader.me.subjectId,originalReport:previous.reportName};
@@ -466,7 +478,7 @@ async function ui(ctx) {
         await second.getByRole("button",{name:"安全退出"}).click();await second.waitForURL(url=>url.origin===origin&&url.pathname==="/signed-out");
         await second.goto(origin+"/auth/login?returnUrl=%2Fapi%2Fv1%2Fplatform%2Fme");
         const lease=await omq.completeCurrentLogin(second,"auditor-ab",{window:{deadline:null,durationMs:180000,maxDeadline:shared.stageDeadline},signal:shared.signal,
-          ...(shared.plan.planId==="s2-s3-01-access-01"?{submit:omq.submitSystemLogin}:{}),
+          ...(["s2-s3-01-access-01","s2-s3-01-runtime-01"].includes(shared.plan.planId)?{submit:omq.submitSystemLogin}:{}),
           onProgress:event=>progress({...event,mode})});
         report.authentication??=[];report.authentication.push(lease.observation);
         actor.authDeadline=lease.deadline;
@@ -489,11 +501,9 @@ async function ui(ctx) {
   await actor.page.getByRole("region",{name:"业务源查询",exact:true}).screenshot({path:file.replace(".json","-mobile.png")});
 }
 
-/** 当前组合grant拒绝后既不执行业务SQL，也不恢复历史原值；每次恢复核原行。 */
-async function access(ctx) {
-  const {actors:{reader,auditor,operator},state,execute,query,call,request,audit,check,report,command,root,shared}=ctx;
+async function currentReadiness(ctx) {
+  const {state,actors:{operator,reader},request,command,check,report,audit,root,shared}=ctx;
   // 当前API实例须先实际完成既有十秒连接探测；不作为Query冷启动或清理资格。
-  if(shared.plan.planId==="s2-s3-01-access-01") {
   await audit("oracle-current-api-readiness",async()=>{
     const path="/api/v1/connections/"+state.connectionId, parts=[];
     const capture=async(method,url,body,etag)=>{
@@ -511,15 +521,18 @@ async function access(ctx) {
       snapshot:omq.platform(root,"__import__('workflow_oracle_mapping_readiness').snapshot(*json.load(sys.stdin))",[probe.data.probeId],shared.stageDeadline)};
   },0);
   omq.platform(root,"__import__('workflow_oracle_mapping_readiness').qualify(json.load(sys.stdin))",report,shared.stageDeadline);
-  }
-  if(shared.plan.planId==="s2-s3-01-access-01") {
-    await audit("oracle-current-catalog-readiness",async()=>{
+  await audit("oracle-current-catalog-readiness",async()=>{
       const saved=state.latestQuery;
       const restored=await request(reader,"GET","/api/v1/data/semantic-queries/"+saved.queryId+"/result");
       report.catalogReadiness={queryId:saved.queryId,actor:reader.me.subjectId,raw:restored.raw,sha256:hash(restored.raw)};
     },0);
-    omq.platform(root,"__import__('workflow_oracle_mapping_readiness').qualify_catalog(json.load(sys.stdin))",report,shared.stageDeadline);
-  }
+  omq.platform(root,"__import__('workflow_oracle_mapping_readiness').qualify_catalog(json.load(sys.stdin))",report,shared.stageDeadline);
+}
+
+/** 当前组合grant拒绝后既不执行业务SQL，也不恢复历史原值；每次恢复核原行。 */
+async function access(ctx) {
+  const {actors:{reader,auditor,operator},state,execute,query,call,request,audit,check,report,command,root,shared}=ctx;
+  if(shared.plan.planId==="s2-s3-01-access-01") await currentReadiness(ctx);
   const q=query(capabilities[0]);
   const acl=call("access_case","revoke-read");
   try {
@@ -582,9 +595,36 @@ export async function approveNewMappingProposal(ctx, proposal) {
   return approved;
 }
 
+/** 取本槽正式就绪检查核定的 reader 会话摘要。 */
+function readerSession(ctx) {
+  const sessions=ctx.report.scenarioReady.session.observations.filter(s=>s.subjectId===ctx.actors.reader.me.subjectId);
+  ctx.check("oracle_runtime_seed_session",sessions.length===1&&/^[a-f0-9]{64}$/u.test(sessions[0].sessionHash));
+  return sessions[0].sessionHash;
+}
+
+/** 两个实际分发入口共用同一父执行的健康双表原件。历史结果与实体选择各自保有原用途。 */
+function runtimeEnvelope(ctx) {
+  const {state,report,actors,shared,check}=ctx,seed=state.runtimeQuery;
+  check("oracle_runtime_seed_binding",Boolean(seed && seed.executionId===shared.executionId
+    && seed.queryId!==state.latestQuery.queryId && /^query-[a-f0-9]{32}$/u.test(seed.queryId)
+    && seed.query.capabilityId===capabilities[2] && !seed.query.filters.entityIri
+    && seed.query.relationshipIris?.length===1 && seed.query.relationshipIris[0]===relation
+    && seed.query.filters.siteId==="site-a" && seed.query.filters.entityExternalId==="omq-entity-1" && seed.actor===actors.reader.me.subjectId
+    && seed.sessionHash===readerSession(ctx) && /^[a-f0-9]{64}$/u.test(seed.resultHash)));
+  report.runtimeQuery=seed;
+  return {queryId:seed.queryId,query:seed.query,resultHash:seed.resultHash,
+    roles:["operator","auditor","activator","reader"].map((name,i)=>({role:["A","B","C","Q"][i],
+      subjectId:actors[name].me.subjectId,cookie:actors[name].sessionCookie}))};
+}
+
 /** B先由三角色正式准备；真正同query源读后A-B-A交给已有正式DI在途测试。 */
-async function aba(ctx) {
-  const {state,actors:{operator,auditor,activator,reader},get,post,request,command,save,check,report,call,audit}=ctx;
+export async function aba(ctx) {
+  const {state,actors:{operator,activator,reader},get,post,request,command,save,check,report,call,audit}=ctx;
+  if(ctx.shared.plan?.planId==="s2-s3-01-runtime-01") await currentReadiness(ctx);
+  const seed=await ctx.execute("aba-runtime-seed",ctx.query(capabilities[2]),reader,2);
+  state.runtimeQuery={queryId:seed.queryId,query:seed.query,resultHash:seed.sha256,actor:reader.me.subjectId,
+    sessionHash:readerSession(ctx),executionId:ctx.shared.executionId,reportName:basename(ctx.file)};
+  await save(state);
   const changed=call("source_case","ambiguous");
   let selectionOrigin;report.activeSourceCase={action:"ambiguous",token:changed.token};
   try {selectionOrigin=await ctx.execute("aba-selection-origin",ctx.query(capabilities[0],{entityExternalId:null}));}
@@ -608,9 +648,8 @@ async function aba(ctx) {
     expectedActive:assessment.expectedActive,expiresAtUtc:assessment.expiresAtUtc,draftId:draft.draftId,draftRevision:draft.revision,command:command()},201);
   const approved=await approveNewMappingProposal(ctx,proposal);
   check("oracle_aba_B_approved_distinct",approved.status==="APPROVED"&&approved.submittedBy!==approved.decision.decidedBy);
-  const envelope={queryId:state.latestQuery.queryId,proposalId:approved.proposalId,
-    roles:[[operator,"A"],[auditor,"B"],[activator,"C"],[reader,"Q"]].map(([actor,role])=>({role,subjectId:actor.me.subjectId,cookie:actor.sessionCookie}))};
-  report.aba=await audit("inflight-activation-aba",()=>call("runtime_case", "aba",envelope),4);
+  const envelope={...runtimeEnvelope(ctx),proposalId:approved.proposalId};
+  report.aba=await audit("inflight-activation-aba",()=>call("runtime_case","aba",envelope),8);
   const active=await get(activator,path+"/active");
   check("oracle_aba_same_A_new_revision",active.mappingReleaseId===baseline.mappingReleaseId&&active.activationId!==baseline.activationId
     &&active.activationRevision===baseline.activationRevision+2);
@@ -627,13 +666,12 @@ async function aba(ctx) {
 }
 
 /** 用正式Catalog命令产生新快照；只改变目录身份，旧绑定拒绝后正式重评发布。 */
-async function versions(ctx,connectionCase=false) {
+export async function versions(ctx,connectionCase=false) {
   const {state,actors:{operator,reader},get,post,request,command,check,report,audit,save,query,record}=ctx;
   const path="/api/v1/connections/"+state.connectionId;
   const before=await request(operator,"GET",path);
   if(connectionCase) {
-    const envelope={queryId:state.latestQuery.queryId,roles:[[ctx.actors.operator,"A"],[ctx.actors.auditor,"B"],[ctx.actors.activator,"C"],[reader,"Q"]]
-      .map(([actor,role])=>({role,subjectId:actor.me.subjectId,cookie:actor.sessionCookie}))};
+    const envelope=runtimeEnvelope(ctx);
     report.connectionRuntime=await audit("inflight-connection-revision",()=>ctx.call("runtime_case","connection",envelope),2);
   }
   const oldQuery=query(capabilities[0]),oldCatalog=state.catalog;
@@ -668,7 +706,7 @@ async function versions(ctx,connectionCase=false) {
     const response=await request({...reader,headers:{...reader.headers,"Idempotency-Key":randomUUID()}},"POST","/api/v1/data/semantic-queries",q);
     return record(connectionCase?"connection-rebound":"version-rebound",response,q);
   },2);
-  state.latestQuery={queryId:fresh.queryId,query:q,resultHash:fresh.sha256,raw:fresh.raw,actor:reader.me.subjectId,
+  state.reboundQuery={queryId:fresh.queryId,query:q,resultHash:fresh.sha256,raw:fresh.raw,actor:reader.me.subjectId,
     sessionHash:report.scenarioReady.session.observations.find(r=>r.subjectId===reader.me.subjectId).sessionHash,reportName:basename(ctx.file)};
   report.trustSecret={status:"NOT_QUALIFIED",reason:"Read-only registry review found only secretVersion 1 in this task and no registered reversible replacement trust/secret version or rotation receipt. Old M2 rotation belongs to protected G4-M2-ORACLE-01 and cannot qualify this Mapping/Query chain."};
   await save(state);

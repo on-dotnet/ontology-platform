@@ -1,4 +1,5 @@
 /** 新双表模式在真实分发边界拒绝错误身份；不启动浏览器或外部服务。 */
+import {createHash} from "node:crypto";
 import assert from "node:assert/strict";
 import {test} from "node:test";
 process.env.OMQ_PRODUCT_RUN="product-resume-01";
@@ -56,4 +57,45 @@ test("current auditor approves the exact new proposal using its normal HTTP deci
     {...receipt,decision:{...receipt.decision,decidedBy:"previous-auditor"}},
     {...receipt,decision:{...receipt.decision,bindingHash:"b".repeat(64)}}])
     await assert.rejects(approveNewMappingProposal({...ctx,post:async()=>invalid},proposal),/decision_current_reviewer/u);
+});
+
+
+test("ABA and connection dispatch the current reader's healthy seed, rejecting selection and old sessions",async()=>{
+  const {aba,versions}=await import("../maintenance/workflow-oracle-s2.mjs");
+  const digest=x=>createHash("sha256").update(x).digest("hex");
+  const actor=role=>({me:{subjectId:role},sessionCookie:"fixture-"+role,headers:{}});
+  const actors=Object.fromEntries(["operator","auditor","activator","reader"].map(r=>[r,actor(r)]));
+  const q=(cap="g4_traverse_relationships",f={})=>({capabilityId:cap,relationshipIris:["urn:synthetic:mapping:hasReading"],filters:{entityExternalId:"omq-entity-1",siteId:"site-a",...f}});
+  const historical={queryId:"query-"+"0".repeat(32)},state={latestQuery:historical,mappingDraft:{mappingId:"m"},mappingReceipt:{mappingReleaseId:"a"}};
+  const seedId="query-"+"3".repeat(32), report={scenarioReady:{session:{observations:[{subjectId:"reader",sessionHash:"a".repeat(64)}]}},oracleBinding:{mappingReleaseId:"a"}};
+  const row=(name,query,id)=>{const raw=JSON.stringify({status:name.endsWith("origin")?"AMBIGUOUS":"FOUND"});return {name,query,queryId:id,raw,sha256:digest(raw),httpStatus:200};};
+  const calls=[],windows=[];
+  const proposal={proposalId:"proposal-"+"1".repeat(32),kind:"PUBLISH",proposalRevision:1,mappingId:"m",status:"PENDING",submittedBy:"operator",bindingHash:"b".repeat(64)};
+  const ctx={state,actors,report,query:q,shared:{executionId:"run"},file:"browser-s2-oracle-aba-1000000000000.json",
+    check:(k,ok)=>assert.ok(ok,k),save:async()=>{},command:()=>({}),execute:async(n,query=q())=>row(n,query,n.endsWith("origin")?"query-"+"1".repeat(32):seedId),
+    record:async(n,r,query)=>row(n,query,"query-"+"2".repeat(32)),get:async(a,p)=>p.endsWith("/active")?{mappingReleaseId:"a"}:{mapping:{identitySpecs:[{}]}},
+    post:async(a,p)=>p.endsWith("/validate")?{status:"SUCCEEDED",assessmentId:"ma"}:p.endsWith("/decisions")?{...proposal,proposalRevision:2,status:"APPROVED",decision:{decision:"APPROVE",decidedBy:"auditor",bindingHash:proposal.bindingHash}}:proposal,
+    request:async(a,m,p)=>({data:p.includes("assessments")?{status:"READY_FOR_PROPOSAL"}:{mappingId:"m"}}),
+    audit:async(n,action,count)=>{windows.push([n,count]);return action();},call:(name,...args)=>{if(name==="runtime_case"){calls.push(args);throw Error("dispatch captured");}return {token:"fixture"};}};
+  await assert.rejects(aba(ctx),/dispatch captured/);
+  await assert.rejects(versions(ctx,true),/dispatch captured/);
+  assert.deepEqual(calls.map(([c,e])=>[c,e.queryId]),[["aba",seedId],["connection",seedId]]);
+  assert.ok(windows.some(([n,k])=>n==="inflight-activation-aba"&&k===8));
+  assert.deepEqual(state.latestQuery,historical);
+  for(const seed of [{...state.runtimeQuery,sessionHash:"b".repeat(64)},{...state.runtimeQuery,queryId:historical.queryId},
+    {...state.runtimeQuery,query:q("g4_resolve_entity",{entityIri:"selection"})}]){
+    await assert.rejects(versions({...ctx,state:{...state,runtimeQuery:seed}},true),/runtime_seed/u);
+  }
+  assert.equal(calls.length,2);
+});
+
+
+test("runtime suffix executes ten slots and ends at the first failed S2 gate",async()=>{
+  const plan=omq.s2RuntimePlan(), visited=[];
+  assert.deepEqual(plan.stages,omq.s2AccessPlan().stages.filter(s=>s.mode!=="s2-oracle-access"));
+  assert.equal(plan.deadlineSeconds,2340);
+  assert.equal(await omq.runAuthHandoffPlan({plan},async mode=>{
+    visited.push(mode);return {status:mode==="s2-oracle-reopen"?"FAIL":"PASS"};
+  }),false);
+  assert.deepEqual(visited,plan.stages.slice(0,7).map(s=>s.mode));
 });

@@ -33,6 +33,7 @@ def structural(root, task, phase):
         from workflow_oracle_mapping_s2_contract import frozen_plan
         frozen_plan(root)
         frozen_plan(root,"s2-s3-01-access-01")
+        frozen_plan(root,"s2-s3-01-runtime-01")
         consumers['scripts/maintenance/workflow_oracle_mapping_postprobe.py']=['def maintenance(', 'def lifecycle(', 'POSTPROBE_TEMPLATE']
         consumers['scripts/maintenance/workflow_oracle_mapping_preparation_refresh.py']=['def lifecycle(', 'def maintenance_result(', 'def reopen_isolated(', 'S23_PREPARATION_REFRESH_CAS']
         consumers['scripts/maintenance/workflow_oracle_mapping_acl_host.py']=['def lifecycle(', 'def graph_qualification(', 'ACL_LEASE_STOPPED']
@@ -46,7 +47,8 @@ def structural(root, task, phase):
         consumers['scripts/maintenance/workflow_oracle_access_maintenance.py']=['def verify_seal(', 'def verify_prestate(', 'def recover(', 'S23_ACCESS_POST_ROW']
         consumers["scripts/maintenance/workflow_oracle_mapping_repeat.py"]=["def lifecycle(", "def graph_qualification(", "def close_basis(", "def second_segment("]
         consumers["scripts/maintenance/workflow_oracle_mapping_continuity.py"]=["def graph_qualification(", "def lifecycle(", "S23_GRAPH_EXPECTED_SET", "S23_CONTINUITY_ORACLE_MOUNTS"]
-        consumers["scripts/maintenance/workflow_oracle_mapping_continuation.py"]=["def run_access_suffix():", "prepare_prefix(root,stage['plan']['qualifiedPrefix'])", "p.audit_window(", "def reopen_prefix("]
+        consumers["scripts/maintenance/workflow-oracle-query-fixture.mjs"]=["export function s2RuntimePlan()", "runAuthHandoffPlan("]
+        consumers["scripts/maintenance/workflow_oracle_mapping_continuation.py"]=["def run_access_suffix():", "def run_runtime_suffix():", "prepare_prefix(root,stage['plan']['qualifiedPrefix'],plan_id)", "p.audit_window(", "def reopen_prefix("]
         consumers['scripts/maintenance/workflow-m4-query.mjs']=['await s2.run(', 'oracleTwoTable', 'omq.s2Plan', 'omq.s2AccessPlan()']
         consumers['scripts/maintenance/workflow-oracle-s2.mjs']=['()=>formalMapping(ctx)', 'async function queries(', 'async function relations(',
             'async function access(', 'qualify_catalog(json.load(sys.stdin))', 'async function aba(', 'async function states(', 'async function versions(', 'async function reopen(', 'async function mcp(', 'async function ui(', 'consume(root,report,deadline)']

@@ -71,16 +71,30 @@ public sealed partial class G4QueryMafRuntimeTests
         // 失败输出只能说明归属不符；MSTest 的值比较会将两个服务器会话引用写入双流。
         Assert.IsTrue(string.Equals(participants["Q"].Session, original.SessionReference, StringComparison.Ordinal),
             "Oracle 查询原件与本轮 reader 会话不一致。");
+        // 用正式类型与规范编码闭合当前 HTTP 请求和准确持久行，选择上下文包含在散列内。
+        var seedQuery = envelope.RootElement.GetProperty("query").Deserialize<G4SemanticQuery>(G4QueryJson.Options)!;
+        Assert.AreEqual("g4_traverse_relationships", seedQuery.CapabilityId);
+        Assert.IsNull(seedQuery.Filters.EntityIri);
+        Assert.AreEqual("omq-entity-1", seedQuery.Filters.EntityExternalId);
+        Assert.AreEqual(5000, seedQuery.TimeoutMs);
+        // 健康查询的规范请求独立于存储重新计算，原字节和索引均须匹配。
+        var requestHash = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(new { query = seedQuery, selectionQueryId = (string?)null }));
+        Assert.AreEqual(requestHash, G4QueryCanonical.Hash(original.RequestBytes));
+        Assert.AreEqual(requestHash, original.RequestHash);
+        Assert.AreEqual(envelope.RootElement.GetProperty("resultHash").GetString(), original.ResultHash);
+        // 原件只保留摘要；当前正式会话引用始终留在进程内。
+        var seedReceipt = new { queryId, requestHash, resultHash = original.ResultHash, subjectId = original.SubjectId,
+            sessionHash = G4QueryCanonical.Hash(System.Text.Encoding.UTF8.GetBytes(participants["Q"].Session)) };
         if (mappingAba)
             await MappingAbaAfterRealReadAsync(scope.ServiceProvider, participants["Q"].Actor, original, db,
-                envelope.RootElement.GetProperty("proposalId").GetString()!, participants["A"], participants["C"], participants["B"].Actor.SubjectId);
+                envelope.RootElement.GetProperty("proposalId").GetString()!, participants["A"], participants["C"], participants["B"].Actor.SubjectId, participants["B"], seedReceipt);
         else
-            await OracleConnectionRevisionAsync(scope.ServiceProvider, participants["Q"].Actor, original, participants["A"]);
+            await OracleConnectionRevisionAsync(scope.ServiceProvider, participants["Q"].Actor, original, participants["A"], seedReceipt);
     }
 
     /// <summary>同一查询真实读取后以正式连接编辑推进修订，拒绝旧绑定并在拒绝后正常恢复连接状态。</summary>
     private static async Task OracleConnectionRevisionAsync(IServiceProvider services, ActorContext reader, G4QueryRecord original,
-        (ActorContext Actor, string Session) editor)
+        (ActorContext Actor, string Session) editor, object seedReceipt)
     {
         // 正式连接处理器执行真实权限、ETag、配置修订和审计事务。
         var connections = services.GetRequiredService<IConnectionRequestHandler>();
@@ -101,7 +115,7 @@ public sealed partial class G4QueryMafRuntimeTests
         Assert.AreEqual(5000, query.TimeoutMs);
         // 四个关键事件仅保存合成身份、版本和时钟，不导出票据或配置秘密。
         var evidence = new Dictionary<string, object?> { ["taskId"] = "G4-ORACLE-MAPPING-QUERY-001", ["resourceRun"] = "product-resume-01",
-            ["case"] = "CONNECTION_AFTER_READ", ["status"] = "FAIL", ["connectionId"] = original.ConnectionId, ["subjectId"] = reader.SubjectId };
+            ["runtimeSeed"] = seedReceipt, ["case"] = "CONNECTION_AFTER_READ", ["status"] = "FAIL", ["connectionId"] = original.ConnectionId, ["subjectId"] = reader.SubjectId };
         // 真实单调计时覆盖原Gateway调用及拒绝，恢复连接发生在计时之后。
         var elapsed = new System.Diagnostics.Stopwatch();
         // 正式提交是否已发生决定是否需要执行同一连接的正常test和enable。

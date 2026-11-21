@@ -412,8 +412,9 @@ def runtime_case(case,envelope):
     from workflow_m2_evidence import mtp
     from workflow_m4_query_evidence import demand_aba_original
     require(p.product_run()==RUN and case in ('aba','connection'),'S2_RUNTIME_SCOPE')
-    require(set(envelope)==({'queryId','proposalId','roles'} if case=='aba' else {'queryId','roles'}) and re.fullmatch('query-[a-f0-9]{32}',envelope['queryId'])
-            and (case!='aba' or re.fullmatch('proposal-[a-f0-9]{32}',envelope['proposalId'])),'S2_RUNTIME_INPUT')
+    require(set(envelope)==({'queryId','query','resultHash','roles'} | ({'proposalId'} if case=='aba' else set())) and re.fullmatch('query-[a-f0-9]{32}',envelope['queryId'])
+            and re.fullmatch('[a-f0-9]{64}',envelope['resultHash']) and envelope['query'].get('capabilityId')=='g4_traverse_relationships'
+            and not envelope['query']['filters'].get('entityIri') and (case!='aba' or re.fullmatch('proposal-[a-f0-9]{32}',envelope['proposalId'])),'S2_RUNTIME_INPUT')
     require([r['role'] for r in envelope['roles']]==['A','B','C','Q']
             and [r['subjectId'] for r in envelope['roles']]==[v[1] for v in ROSTER.values()],'S2_RUNTIME_SUBJECTS')
     host=host_binding();binding=current_session_snapshot(load(AREA/'formal-api-inputs.json'))['inputs']

@@ -43,7 +43,7 @@ def result_case(row,state):
     elif name in ('ambiguous','aba-selection-origin','normal-100-all'):expected='AMBIGUOUS';candidates=100 if name=='normal-100-all' else 2
     elif name in ('sentinel-101','source-acl'):expected='UNAVAILABLE'
     elif name in ('no-grant','revoke-execute','field-execute','expired-execute'):expected='UNAUTHORIZED'
-    else:require(name in ('healthy-resolve','healthy-observations','healthy-relations','nano-start','nano-end','normal-100-selected','version-rebound','connection-rebound','aba-selection-current') or name.startswith(('mcp-','ui-')),'S23_CASE_UNKNOWN')
+    else:require(name in ('healthy-resolve','healthy-observations','healthy-relations','nano-start','nano-end','normal-100-selected','version-rebound','connection-rebound','aba-selection-current','aba-runtime-seed') or name.startswith(('mcp-','ui-')),'S23_CASE_UNKNOWN')
     require(data['status']==expected and len(data['candidates'])==candidates,'S23_RESULT_STATUS')
     evidence_closure(row,state,data,expected)
     if expected in ('EMPTY','UNAVAILABLE','UNAUTHORIZED','AMBIGUOUS'):
@@ -257,10 +257,78 @@ def current_selection_receipt(report):
     matches=[row for row in report['http'] if (row['method'],row['path'],row['status'],row['sha256'])
              ==('POST','/api/v1/data/semantic-queries',200,current['sha256'])]
     require(len(matches)==1,'S23_CURRENT_READER_HTTP')
+    if report.get('batch',{}).get('planId')=='s2-s3-01-runtime-01':
+        from workflow_oracle_mapping_identity_recovery import ROSTER
+        rejected=[h for h in report['http'] if h['method']=='POST' and h['path']=='/api/v1/data/semantic-queries' and h['status']==409]
+        require(len(rejected)==1 and rejected[0].get('code')=='query_binding_stale'
+                and rejected[0]['sha256']==hashlib.sha256(history['rejection']['raw'].encode()).hexdigest()
+                and matches[0]['queryId']==current['queryId'],'S23_SELECTION_RESULT_ORIGINAL')
+        for item in [matches[0],rejected[0]]:
+            require(item['selectionQueryId']==history['originQueryId'] and item['subjectId']==ROSTER['reader'][1]
+                    and item['query']==history['selected'],'S23_SELECTION_CONTEXT')
+
+
+def runtime_seed(report, origin, original):
+    """按同一父窗的当前 HTTP 原件核对 .NET 实际读取的持久 seed。"""
+    from workflow_oracle_mapping_identity_recovery import ROSTER
+    seed=report['runtimeQuery']
+    reader=ROSTER['reader'][1]
+    require(origin['mode']=='s2-oracle-aba' and origin['batch']['executionId']==report['batch']['executionId']==seed['executionId']
+            and seed==origin['runtimeQuery'] and seed['actor']==reader,'S23_RUNTIME_SEED_OWNER')
+    rows=[row for row in origin['oracleCases'] if row['name']=='aba-runtime-seed']
+    require(len(rows)==1,'S23_RUNTIME_SEED_COUNT')
+    row=rows[0];query=row['query'];result=row['sha256']
+    require(row['queryId']==seed['queryId']!=original['queryId'] and query==seed['query']
+            and query['capabilityId']==CAPABILITIES[2] and query['relationshipIris']==[RELATION]
+            and query['filters']==dict(siteId='site-a',entityExternalId='omq-entity-1')
+            and result==seed['resultHash']==hashlib.sha256(row['raw'].encode()).hexdigest(),'S23_RUNTIME_SEED_QUERY')
+    matches=[h for h in origin['http'] if h['method']=='POST' and h['path']=='/api/v1/data/semantic-queries'
+             and h.get('queryId')==seed['queryId']]
+    require(len(matches)==1 and matches[0]['status']==200 and matches[0]['subjectId']==reader and matches[0]['query']==query
+            and matches[0]['selectionQueryId'] is None and matches[0]['sha256']==result,'S23_RUNTIME_SEED_HTTP')
+    for stage in (report,origin):
+        sessions=[r['sessionHash'] for r in stage['scenarioReady']['session']['observations'] if r['subjectId']==reader]
+        require(sessions==[seed['sessionHash']],'S23_RUNTIME_SEED_SESSION')
+    require(original['runtimeSeed']==dict(queryId=seed['queryId'],resultHash=result,subjectId=reader,sessionHash=seed['sessionHash'],
+            requestHash=hashlib.sha256(canonical(dict(query=query,selectionQueryId=None))).hexdigest()),'S23_RUNTIME_SEED_STORED')
+
+
+def aba_reads(report, original):
+    """按既有同 VM 的 UTC 动作边界独立核对每一件源事件，不按客户端筛选。"""
+    from workflow_oracle_mapping_formal_observer import ns
+    from workflow_oracle_mapping_identity_recovery import ROSTER
+    names=['aba-runtime-seed','aba-selection-origin','aba-selection-current','mapping-aba-b','inflight-activation-aba','aba-history-and-selection']
+    windows=report['oracleWindows']
+    if report['batch']['planId']=='s2-s3-01-runtime-01':
+        names=['oracle-current-api-readiness','oracle-current-catalog-readiness',*names]
+    require([w['name'] for w in windows]==names,'S23_ABA_WINDOW_SET')
+    seed,inflight=windows[-6],windows[-2]
+    tables=sorted([('PRODUCTION','OMQ_ENTITY'),('CaseOwner','OmqTarget')])
+    def table_pair(events):
+        require(sorted((row['owner'],row['table']) for row in events)==tables
+                and all(row['action']=='SELECT' and row['code']==0 for row in events),'S23_ABA_TABLE_PAIR')
+    require([w['expectedReads'] for w in windows[-6:]]==[2,1,1,2,8,0]
+            and seed['expectedReads']==2 and inflight['expectedReads']==8
+            and all(w['audit']['clientId'] is None for w in windows),'S23_ABA_READ_PLAN')
+    table_pair(seed['audit']['records'])
+    boundaries=[original['admittedAtUtc'],original['events'][0]['utc'],original['events'][1]['utc'],
+                original['rollbackValidatedAtUtc'],original['events'][2]['utc']]
+    limits=list(map(ns,boundaries))
+    require(all(a<b for a,b in zip(limits,limits[1:])),'S23_ABA_READ_ORDER')
+    events=inflight['audit']['records']
+    require(len(events)==8,'S23_ABA_READ_COUNT')
+    for start,end in zip(limits,limits[1:]):
+        table_pair([r for r in events if start<=ns(r['utc']) and ns(r['utc'])+999<end])
+    approval=original['rollbackDecision'];reviewer=ROSTER['auditor'][1]
+    require(approval['path']=='MappingApplicationService.DecideAsync' and approval['submittedBy']==ROSTER['operator'][1]
+            and approval['decidedBy']==reviewer and approval['proposalId']==original['activatedA']['proposalId']
+            and approval['proposalId']!=original['activatedB']['proposalId']
+            and [s['sessionHash'] for s in report['scenarioReady']['session']['observations'] if s['subjectId']==reviewer]==[approval['sessionHash']],
+            'S23_ROLLBACK_CURRENT_DECISION')
 
 
 def qualify(report):
-    require(report['taskId']=='G4-ORACLE-MAPPING-QUERY-001' and report['runId']=='product-resume-01' and report['batch']['planId'] in ('s2-s3-01','s2-s3-01-access-01'),'S23_REPORT_OWNER')
+    require(report['taskId']=='G4-ORACLE-MAPPING-QUERY-001' and report['runId']=='product-resume-01' and report['batch']['planId'] in ('s2-s3-01','s2-s3-01-access-01','s2-s3-01-runtime-01'),'S23_REPORT_OWNER')
     mode=report['mode'];rows=report.get('oracleCases',[])
     if report['mode']=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':__import__('workflow_oracle_mapping_readiness').qualify(report)
     require(rows or mode in ('s2-oracle-vocabulary','s2-oracle-mapping','s2-oracle-reopen','s2-oracle-aba'),'S23_CASES_MISSING')
@@ -269,12 +337,15 @@ def qualify(report):
       's2-oracle-queries':{'healthy-resolve','healthy-observations','healthy-relations','missing','nano-before','nano-start','nano-end','nano-after'},
       's2-oracle-relations':set(RELATIONS), 's2-oracle-states':{'ambiguous','normal-100-selected','normal-100-all','sentinel-101'},
       's2-oracle-versions':{'version-rebound'},'s2-oracle-connection':{'connection-rebound'},
-      's2-oracle-aba':{'aba-selection-origin','aba-selection-current'},
+      's2-oracle-aba':{'aba-selection-origin','aba-selection-current','aba-runtime-seed'},
       's2-oracle-access':{'no-grant','revoke-execute','field-execute','expired-execute','source-acl'},
       's3':{'mcp-'+x for x in CAPABILITIES},'ui-s3':{'ui-'+x for x in CAPABILITIES},'ui-s1':{'ui-refresh'}}
     if mode=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':required[mode]=required[mode]|{'healthy-relations'}
     require(set(names)==required.get(mode,set()),'S23_CASE_SET')
-    if mode=='s2-oracle-aba':current_selection_receipt(report)
+    if mode=='s2-oracle-aba':
+        current_selection_receipt(report)
+        runtime_seed(report,report,report['aba']['original'])
+        aba_reads(report,report['aba']['original'])
     statuses=[result_case(row,report['oracleBinding']) for row in rows]
     return dict(status='SEMANTICS_QUALIFIED',mode=mode,cases=len(rows),statuses=statuses,scope='semantic original content; parent command and source audits qualify separately')
 
@@ -291,6 +362,11 @@ def frozen_plan(root,plan_id="s2-s3-01"):
         from workflow_oracle_mapping_continuation import PREFIX
         expected.update(planId=plan_id,stages=[expected['stages'][0],*expected['stages'][5:]],qualifiedPrefix=PREFIX,deadlineSeconds=2520)
         path='scripts/maintenance/workflow-oracle-s2-access-plan.json'
+    elif plan_id=='s2-s3-01-runtime-01':
+        from workflow_oracle_mapping_continuation import PREFIX, REUSED_ACCESS
+        expected.update(planId=plan_id,stages=[expected['stages'][0],*expected['stages'][6:]],qualifiedPrefix=PREFIX,
+                        reusedAccess=REUSED_ACCESS,deadlineSeconds=2340)
+        path='scripts/maintenance/workflow-oracle-s2-runtime-plan.json'
     else:require(plan_id=='s2-s3-01','S23_PLAN_ID')
     plan=json.loads((root/path).read_bytes())
     require(plan==expected,'S23_FROZEN_PLAN')
@@ -434,7 +510,9 @@ def reopen_stage(archive,report,records,host,origin,measured,window):
     from workflow_oracle_mapping_identity_recovery import ROSTER
     result=qualify(report)
     if report['mode']=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':__import__('workflow_oracle_mapping_readiness').reopen(archive,report,host,origin)
-    if report['batch']['planId']=='s2-s3-01-access-01':
+    if report['batch']['planId']=='s2-s3-01-runtime-01' and report['mode']=='s2-oracle-aba':
+        __import__('workflow_oracle_mapping_readiness').reopen(archive,report,host,origin)
+    if report['batch']['planId'] in ('s2-s3-01-access-01','s2-s3-01-runtime-01'):
         if report['mode']=='s2-oracle-access':
             from workflow_oracle_mapping_acl_observation import reopen
             reopen(archive,report,host,origin)
@@ -543,7 +621,12 @@ def reopen_stage(archive,report,records,host,origin,measured,window):
         require(row['deadlineSeconds']==25 and ns(window['startedAtUtc'])<=ns(row['startedAtUtc'])<ns(row['endedAtUtc'])<=ns(window['endedAtUtc']),'S23_RUNTIME_STAGE_WINDOW')
         original=demand_aba_original(stdout,'query-real-aba-inflight-runtime',report['taskId'],report['runId']) if case=='aba' else demand_connection_original(stdout)
         require(row['exitCode']==0 and row['classification']=='SUCCESS' and summary['original']==original,'S23_RUNTIME_ORIGINAL')
+        seed_name=report['runtimeQuery']['reportName']
+        seed_report=archive.read(seed_name)
+        require((case!='aba' or seed_report==report) and seed_name in archive.dispatch['batchMembers'],'S23_RUNTIME_SEED_REPORT')
+        runtime_seed(report,seed_report,original)
         if case=='aba':
+            aba_reads(report,original)
             import re
             require(original['connectionId']=='a7913bb552eb4cd1a3f6eaf5b93cd619' and original['capturedA']['connectionId']==original['connectionId']
                 and original['subjectId']==ROSTER['reader'][1] and re.fullmatch('[a-f0-9]{64}',original['leaseOwnerHash']) and original['fence']>0,'S23_ABA_CAPTURE')

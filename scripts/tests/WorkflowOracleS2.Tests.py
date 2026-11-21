@@ -396,6 +396,64 @@ class S2ConsumerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'S23_CURRENT_READER_HTTP'):
                 c.current_selection_receipt({**report,'http':http_rows})
 
+    def test_current_plan_requires_original_selection_header_on_success_and_conflict(self):
+        from workflow_oracle_mapping_identity_recovery import ROSTER
+        query={'filters':{'entityIri':'selected'}};raw='{"status":"FOUND"}';denied='{"code":"query_binding_stale"}'
+        row=dict(name='aba-selection-current',queryId='selection',query=query,httpStatus=200,raw=raw,sha256=ex.sha(raw.encode()))
+        history=dict(currentQueryId='selection',originQueryId='original',selected=query,currentQueryHash=row['sha256'],rejection=dict(raw=denied))
+        http=dict(method='POST',path='/api/v1/data/semantic-queries',query=query,queryId='selection',status=200,sha256=row['sha256'],
+                  subjectId=ROSTER['reader'][1],selectionQueryId='original')
+        conflict={**http,'status':409,'queryId':None,'code':'query_binding_stale','sha256':ex.sha(denied.encode())}
+        report=dict(batch=dict(planId='s2-s3-01-runtime-01'),oracleCases=[row],http=[http,conflict],historySelection=history)
+        c.current_selection_receipt(report)
+        for index in (0,1):
+            for field in ('query','subjectId','selectionQueryId'):
+                wrong=copy.deepcopy(report);wrong['http'][index][field]=None
+                with self.assertRaisesRegex(ValueError,'SELECTION_CONTEXT'):c.current_selection_receipt(wrong)
+
+    def test_seed_receipt_requires_current_reader_and_actual_request(self):
+        from workflow_oracle_mapping_identity_recovery import ROSTER
+        reader=ROSTER['reader'][1];query=dict(capabilityId=c.CAPABILITIES[2],relationshipIris=[c.RELATION],filters=dict(siteId='site-a',entityExternalId='omq-entity-1'))
+        seed=dict(queryId='seed',query=query,resultHash=ex.sha(b'raw'),actor=reader,sessionHash='a'*64,executionId='parent')
+        stored=dict(queryId='seed',resultHash=seed['resultHash'],subjectId=reader,sessionHash='a'*64,
+                    requestHash=ex.sha(c.canonical(dict(query=query,selectionQueryId=None))))
+        row=dict(name='aba-runtime-seed',query=query,queryId='seed',raw='raw',sha256=seed['resultHash'])
+        http=dict(method='POST',path='/api/v1/data/semantic-queries',queryId='seed',query=query,status=200,subjectId=reader,selectionQueryId=None,sha256=row['sha256'])
+        origin=dict(mode='s2-oracle-aba',batch=dict(executionId='parent'),runtimeQuery=seed,oracleCases=[row],http=[http],
+                    scenarioReady=dict(session=dict(observations=[dict(subjectId=reader,sessionHash='a'*64)])))
+        for mode in ('s2-oracle-aba','s2-oracle-connection'):
+            report={**origin,'mode':mode};actual=dict(queryId='new',runtimeSeed=stored)
+            c.runtime_seed(report,origin,actual)
+            for field in stored:
+                with self.subTest(mode=mode,field=field),self.assertRaisesRegex(ValueError,'SEED_STORED'):
+                    c.runtime_seed(report,origin,{**actual,'runtimeSeed':{**stored,field:'old'}})
+            for change in (dict(selectionQueryId='origin'),dict(queryId='other'),dict(subjectId='previous')):
+                with self.assertRaisesRegex(ValueError,'SEED_HTTP'):
+                    c.runtime_seed(report,{**origin,'http':[{**http,**change}]},actual)
+
+    def test_four_action_windows_require_each_table_and_current_decider(self):
+        from workflow_oracle_mapping_identity_recovery import ROSTER
+        def at(i):return f'2026-11-21T01:00:00.{i:06}Z'
+        def pair(i):
+            return [dict(owner=o,table=t,utc=at(i+j),action='SELECT',code=0) for j,(o,t) in enumerate([('PRODUCTION','OMQ_ENTITY'),('CaseOwner','OmqTarget')])]
+        counts=[2,1,1,2,8,0]
+        names=['aba-runtime-seed','aba-selection-origin','aba-selection-current','mapping-aba-b','inflight-activation-aba','aba-history-and-selection']
+        windows=[dict(name=n,expectedReads=k,audit=dict(clientId=None,records=[])) for n,k in zip(names,counts,strict=True)]
+        windows[0]['audit']['records']=pair(1);windows[4]['audit']['records']=sum((pair(i) for i in (11,21,31,41)),[])
+        auditor=ROSTER['auditor'][1];report=dict(oracleWindows=windows,batch=dict(planId='s2-s3-01'),scenarioReady=dict(session=dict(observations=[dict(subjectId=auditor,sessionHash='a'*64)])))
+        original=dict(admittedAtUtc=at(10),events=[dict(utc=at(i)) for i in (20,30,50)],rollbackValidatedAtUtc=at(40),
+                      activatedA=dict(proposalId='rollback'),activatedB=dict(proposalId='publish'),rollbackDecision=dict(
+                          proposalId='rollback',submittedBy=ROSTER['operator'][1],decidedBy=auditor,sessionHash='a'*64,path='MappingApplicationService.DecideAsync'))
+        c.aba_reads(report,original)
+        for key in ('proposalId','decidedBy','sessionHash','path'):
+            with self.assertRaisesRegex(ValueError,'CURRENT_DECISION'):
+                c.aba_reads(report,{**original,'rollbackDecision':{**original['rollbackDecision'],key:'previous'}})
+        for field,value in [('table','wrong'),('utc',at(31)),('code',1)]:
+            bad=copy.deepcopy(report);bad['oracleWindows'][4]['audit']['records'][0][field]=value
+            with self.assertRaisesRegex(ValueError,'TABLE_PAIR'):c.aba_reads(bad,original)
+        windows[4]['expectedReads']=4
+        with self.assertRaisesRegex(ValueError,'READ_PLAN'):c.aba_reads(report,original)
+
     def healthy(self):
         import base64
         query_id='query-'+'1'*32;eid=query_id+':e-'+'2'*32;rid='read-'+'3'*32;release='release-'+'4'*32

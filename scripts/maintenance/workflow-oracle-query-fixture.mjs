@@ -210,6 +210,10 @@ export const authPlan = Object.freeze(JSON.parse(readFileSync(new URL("./workflo
 export const s2Plan = Object.freeze(JSON.parse(readFileSync(new URL("./workflow-oracle-s2-plan.json", import.meta.url), "utf8")));
 export function s2AccessPlan() { return Object.freeze(JSON.parse(readFileSync(new URL("./workflow-oracle-s2-access-plan.json", import.meta.url), "utf8"))); }
 
+export function s2RuntimePlan() {
+  return Object.freeze(JSON.parse(readFileSync(new URL("./workflow-oracle-s2-runtime-plan.json", import.meta.url), "utf8")));
+}
+
 export async function runAuthHandoffPlan(shared, runStage, now = () => performance.now()) {
   const plan = shared.plan ?? authPlan;
   shared.plan = plan;

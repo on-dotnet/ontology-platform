@@ -10,9 +10,23 @@ from workflow_oracle_mapping_resources import require
 import workflow_execution as ex
 
 PLAN_ID='s2-s3-01-access-01'
+RUNTIME_PLAN='s2-s3-01-runtime-01'
+REUSED_ACCESS={"commandId":"1afa8fd9ad624134a814126527f7a916","measuredCommit":"b9c55441d8d53b341e0424a746f5bef32950cf37","qualificationSha256":"13b3f88a56191dd16cfa4ec71a3393bb0a1798b5db7cbc74531ef6cdf41d4385","memberIndexSha256":"945280d40ddf750bea9fc4ecc6a3660b23b07871a4c1af2a203ec50fbac470ca"}
 PREFIX=dict(commandId='edd1379b83c246329579075d16ccda58',measuredCommit='2a2ea74ff72c22860e4927318913eaece9d14f9f',mode='s2-oracle-relations',
     qualificationCommandId='a495b4d475404f95b726b8b46d6a3663',qualificationSha256='7bb9468c9ed44ae335936a60f3765456b44b125db64cfe05eb1f4e1782172d46',
     memberIndexSha256='91637b9ad1664efc70c8084ec999af10c62bdbca6efb3f885cf13b9366e29b8a')
+RUNTIME_PREFIX_DRIVERS={
+    'scripts/maintenance/workflow-m4-query.mjs':
+        ('4dbd4e6b432d1b85c87abc7a002148bea7865c4dd1316b011315223ebc631542', '1393755557a0a13ca8500375d4ebf40d4782c3550fa5c486151f577fb65e29fe'),
+    'scripts/maintenance/workflow-oracle-query-fixture.mjs':
+        ('e45fa368dea6721212a138ae533ba979884d950fe0f06cc7f1c15fae34f3ecf2', 'db6a5d802cac31459f5f78eb945df2260d944ab0fc7f938f7a511a2ccd901787'),
+    'scripts/maintenance/workflow-oracle-s2.mjs':
+        ('e7ab33e1bd38429eb2bc1d7aa7071da3a39022fb4329b6c23404bf9757a546e9', '411f687eb522a389a84518094876c57c3b6ddcd57e3e4bf7597276ca5bc29ca4'),
+    'scripts/maintenance/workflow_oracle_mapping_s2.py':
+        ('314fae7820ad26533d2a2e651e271de731ae2983d2b91b224754a8afd2aa392b', '321804566e1792b54babb394d27983c8558a49a7115a31cc0d619ec62579c488'),
+    'scripts/maintenance/workflow_oracle_mapping_s2_contract.py':
+        ('87601573a5b3ea57c6e7f46e96f048262f8eac94fddc76ed2dab7b6424afc8d2', 'd018fbbe50d1c892b49d49ed0982ce3231083ed6f2cb4367efe0adc4d3ff4ed8'),
+}
 MODES=('s0-oracle-auth','s2-oracle-vocabulary','s2-oracle-mapping','s2-oracle-queries','s2-oracle-relations')
 TASK='G4-ORACLE-MAPPING-QUERY-001'
 RUN='product-resume-01'
@@ -112,6 +126,9 @@ def compatible_prefix(archive,measured,mode,stage):
         old=e.git_original(archive.root,measured,name);new=ex.ordinary(archive.root/name).read_bytes()
         require(ex.sha(old)==frozen['browserIdentity']['measuredDrivers'][name],'S23_PREFIX_ORIGINAL_DRIVER')
         if old==new:continue
+        # 此五槽原件已有固定资格。仅接受复核登记的完整驱动字节对，未登记编辑仍走原严格比较。
+        if (ex.sha(old),ex.sha(new))==RUNTIME_PREFIX_DRIVERS.get(name):
+            continue
         left,right=old.decode(),new.decode()
         if name.endswith('/workflow-oracle-s2.mjs'):
             right=right.replace('!["s2-s3-01","s2-s3-01-access-01"].includes(shared.plan.planId)','shared.plan.planId !== "s2-s3-01"')
@@ -268,12 +285,34 @@ def resumed_host(previous,current):
         current={k:after['services'][role][k] for k in ('containerId','pid','startedAt')}) for role in before['services']})
 
 
-def prepare_prefix(root,descriptor):
+def qualified_access(root,archive=None):
+    """按冻结索引逐件核验既有 access 原件，包括唯一发生位置迁移的资源清单。"""
+    ref=REUSED_ACCESS;cid=ref['commandId'];base=Path('artifacts/workflow')/TASK/RUN
+    raw=_read(root,base/'s2-s3-01'/('access-qualification-'+cid+'.json'),archive)
+    require(ex.sha(raw)==ref['qualificationSha256'],'S23_ACCESS_QUALIFICATION_BYTES')
+    proof=json.loads(raw);members=proof['members']
+    require((proof['taskId'],proof['runId'],proof['commandId'],proof['measuredCommit'],proof['mode'],proof['status'],proof['checks'])
+            ==(TASK,RUN,cid,ref['measuredCommit'],'s2-oracle-access','CASE_QUALIFIED',78)
+            and len(members)==1236 and ex.sha(ex.encoded(members))==ref['memberIndexSha256'],'S23_ACCESS_QUALIFICATION_SCOPE')
+    for name,member in members.items():
+        path=Path(member['path'])
+        mutable = ((path.parent==base and path.name in ('formal-resources.json','formal-api-inputs.json','formal-api-compose.json'))
+                   or (path.parent==base.parent and path.name in BUILD_ORIGINALS))
+        if mutable:
+            backup=path.with_name(path.stem+'-'+member['sha256']+path.suffix)
+            if (root/backup).is_file():path=backup
+        value=_read(root,path,archive,'reused-access-'+name)
+        require(len(value)==member['sizeBytes'] and ex.sha(value)==member['sha256'],'S23_ACCESS_MEMBER_BYTES')
+    return ref
+
+
+def prepare_prefix(root,descriptor,plan_id=PLAN_ID):
     """父命令启动前冻结当前基线及原query身份；不读取或移植任何旧会话材料。"""
     import workflow_oracle_mapping_platform as p
     import workflow_oracle_mapping_s2 as s
     from workflow_oracle_mapping_evidence import stable_host
     require(descriptor==PREFIX,'S23_PREFIX_DESCRIPTOR');qualified,_=prefix_result(root)
+    if plan_id==RUNTIME_PLAN:qualified_access(root)
     query,mapping,host=_context(qualified,root);state=json.loads((p.AREA.parent/RUN/'oracle-two-table.json').read_bytes())
     projection=_state_projection(state);old=query['oracleBinding'];latest=projection['latestQuery']
     require(projection['connectionId']==old['connectionId'] and projection['catalogSnapshotId']==old['catalogSnapshotId']
@@ -282,7 +321,7 @@ def prepare_prefix(root,descriptor):
     from workflow_oracle_mapping_acl_host import lifecycle
     current=p.runtime_binding();continuity=lifecycle(root,host,current)
     snapshot=s.source_snapshot();require(snapshot['rows']==query['independentSource']['rows'] and snapshot['hashes']==query['independentSource']['hashes'],'S23_PREFIX_CURRENT_SOURCE')
-    observation=dict(taskId=TASK,runId=RUN,batch='s2-s3-01',planId=PLAN_ID,qualifiedPrefix=PREFIX,state=projection,host=current,source=snapshot,hostContinuity=continuity)
+    observation=dict(taskId=TASK,runId=RUN,batch='s2-s3-01',planId=plan_id,qualifiedPrefix=PREFIX,state=projection,host=current,source=snapshot,hostContinuity=continuity)
     name='prefix-observation-'+uuid.uuid4().hex+'.json';path=p.AREA.parent/RUN/'s2-s3-01'/name;p.save(path,observation)
     return dict(file=name,sha256=ex.sha(path.read_bytes()))
 
@@ -291,12 +330,12 @@ def reopen_prefix(root,stage,archive):
     """新父窗口只消费自己的阶段；历史前缀作为另一个父命令的完整资格引用。"""
     import workflow_oracle_mapping_s2 as s
     from workflow_oracle_mapping_evidence import stable_host,host_observation,build_binding,utc
-    require(stage['plan']['planId']==PLAN_ID and stage['plan']['qualifiedPrefix']==PREFIX,'S23_PREFIX_PLAN')
+    require(stage['plan']['planId'] in (PLAN_ID,RUNTIME_PLAN) and stage['plan']['qualifiedPrefix']==PREFIX,'S23_PREFIX_PLAN')
     qualified,_=prefix_result(root,archive);query,mapping,host=_context(qualified,root)
     ref=stage['qualifiedPrefix'];require(re.fullmatch('prefix-observation-[a-f0-9]{32}[.]json',ref['file']),'S23_PREFIX_OBSERVATION_NAME')
     path=Path('artifacts/workflow')/TASK/RUN/'s2-s3-01'/ref['file'];raw=_read(root,path,archive)
     require(ex.sha(raw)==ref['sha256'],'S23_PREFIX_OBSERVATION_HASH');obs=json.loads(raw)
-    require((obs['taskId'],obs['runId'],obs['batch'],obs['planId'])==(TASK,RUN,'s2-s3-01',PLAN_ID) and obs['qualifiedPrefix']==PREFIX
+    require((obs['taskId'],obs['runId'],obs['batch'],obs['planId'])==(TASK,RUN,'s2-s3-01',stage['plan']['planId']) and obs['qualifiedPrefix']==PREFIX
             and stable_host(obs['host'])==stable_host(archive.dispatch['host']),'S23_PREFIX_OBSERVATION_SCOPE')
     from workflow_oracle_mapping_acl_host import lifecycle
     lifecycle(root,host,obs['host'],obs['hostContinuity'],archive)
@@ -317,11 +356,22 @@ def reopen_prefix(root,stage,archive):
     require(state['connectionId']==binding['connectionId'] and state['catalogSnapshotId']==binding['catalogSnapshotId'] and state['mappingReceipt']==binding['activation']
         and latest['queryId']==query['oracleCases'][2]['queryId'] and latest['resultHash']==query['oracleCases'][2]['sha256']
         and latest['reportName'] in qualified['members'] and json.loads(_read(root,qualified['members'][latest['reportName']]['path']))==query,'S23_PREFIX_QUERY_BINDING')
-    return dict(status='REUSED_QUALIFIED_PREFIX',commandId=PREFIX['commandId'],measuredCommit=PREFIX['measuredCommit'],modes=list(MODES),
+    reuse={'reusedAccess':qualified_access(root,archive)} if stage['plan']['planId']==RUNTIME_PLAN else {}
+    return dict(**reuse,status='REUSED_QUALIFIED_PREFIX',commandId=PREFIX['commandId'],measuredCommit=PREFIX['measuredCommit'],modes=list(MODES),
         memberIndexSha256=ex.sha(ex.encoded(qualified['members'])),memberCount=len(qualified['members']),newAuthenticationRequired=True,scope='Separate old parent; no historical stages or source events included in current parent window')
 
 
 def run_access_suffix():
+    """按原十一槽计划执行，供其既有调用者使用。"""
+    return _run_suffix(PLAN_ID)
+
+
+def run_runtime_suffix():
+    """按冻结的十槽计划执行，access 按准确原件单列。"""
+    return _run_suffix(RUNTIME_PLAN)
+
+
+def _run_suffix(plan_id):
     """固定同批后缀的实际入口；原平台与审计依赖保持完整原字节，不替换或猴补其函数。"""
     import os
     import workflow_oracle_mapping_platform as p
@@ -338,8 +388,8 @@ def run_access_suffix():
     if 'subjects'in state:stage['readerSubjectId']=state['subjects']['reader']
     if 'catalog'in state:stage['catalogSnapshotId']=state['catalog']['snapshotId'];stage['catalogFingerprint']=state['catalog']['schemaFingerprint']
     if 'mappingReceipt'in state:stage['activationRevision']=state['mappingReceipt']['activationRevision'];stage['mappingReleaseId']=state['mappingReceipt']['mappingReleaseId']
-    execution=uuid.uuid4().hex;stage['plan']=batch_plan(root,mode,PLAN_ID);stage['executionId']=execution
-    stage['batchInput']='s2-s3-'+execution+'.json';stage['qualifiedPrefix']=prepare_prefix(root,stage['plan']['qualifiedPrefix'])
+    execution=uuid.uuid4().hex;stage['plan']=batch_plan(root,mode,plan_id);stage['executionId']=execution
+    stage['batchInput']='s2-s3-'+execution+'.json';stage['qualifiedPrefix']=prepare_prefix(root,stage['plan']['qualifiedPrefix'],plan_id)
     p.save(area/stage['batchInput'],dict(executionId=execution,plan=stage['plan'],qualifiedPrefix=stage['qualifiedPrefix']))
     host=p.runtime_binding();api=p.build.validate('api',TASK);tests=p.build.validate('agent',TASK)
     argv,key,label=browser_invocation(root,mode,case,host,api,tests,stage)

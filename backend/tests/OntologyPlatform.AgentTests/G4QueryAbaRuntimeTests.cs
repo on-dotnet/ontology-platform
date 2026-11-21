@@ -14,10 +14,24 @@ namespace OntologyPlatform.AgentTests;
 /// <summary>AC-05真实在途ABA验收，保持正式五秒截止和所有安全参与者。</summary>
 public sealed partial class G4QueryMafRuntimeTests
 {
+    /// <summary>历史 PG 与 Doris 夹具的提案审核身份，只供其既有场景使用。</summary>
+    private static async Task<(ActorContext Actor, string Session)> HistoricalMappingReviewerAsync(IServiceProvider services, string proposalId)
+    {
+        // 精确提案的原证明属于历史夹具，在调用者分支隔离后才读取。
+        await using var connections = await services.GetRequiredService<IDbContextFactory<ConnectionsDbContext>>().CreateDbContextAsync();
+        // 只投影该提案的证明，避免加载其他提案数据。
+        var json = await connections.MappingProposals.AsNoTracking().Where(item => item.Id == proposalId)
+            .Select(item => item.DecisionProofJson).SingleAsync();
+        // 原正式审核证明只在进程内传递。
+        var proof = JsonSerializer.Deserialize<MappingAuthorizationProof>(json!, G4MappingJson.Options)!;
+        return (proof.Actor, proof.SessionReference);
+    }
+
     /// <summary>真实源读取后经正式批准和激活执行A到B再到A，核验提交失败和审计原子性。</summary>
     private static async Task MappingAbaAfterRealReadAsync(IServiceProvider services, ActorContext actor,
         G4QueryRecord original, G4QueryDbContext database, string proposalId,
-        (ActorContext Actor, string Session)? editing = null, (ActorContext Actor, string Session)? activating = null, string? reviewerId = null)
+        (ActorContext Actor, string Session)? editing = null, (ActorContext Actor, string Session)? activating = null, string? reviewerId = null,
+        (ActorContext Actor, string Session)? currentReviewer = null, object? seedReceipt = null)
     {
         // 当前夹具的编辑者负责草稿、评估与提案；历史 PG 夹具沿用它的原始参与者。
         var editor = editing ?? (actor, original.SessionReference);
@@ -30,12 +44,13 @@ public sealed partial class G4QueryMafRuntimeTests
         // 查询前已批准B，避免把审批等待计入不可延长的查询五秒预算。
         var approvedB = await mappings.ReadProposalAsync(editor.Actor, editor.Session, proposalId, CancellationToken.None);
         Assert.AreEqual("APPROVED", approvedB.Status);
-        // 只在进程内读取准确提案保存的真实审核会话，不构造角色或导出证明。
-        await using var connections = await services.GetRequiredService<IDbContextFactory<ConnectionsDbContext>>().CreateDbContextAsync();
-        // 精确提案记录由真实OIDC异人审核创建。
-        var proposal = await connections.MappingProposals.AsNoTracking().SingleAsync(item => item.Id == proposalId);
-        // 后续Decide会重新检查此真实服务器会话及当前授权。
-        var auditor = JsonSerializer.Deserialize<MappingAuthorizationProof>(proposal.DecisionProofJson!, G4MappingJson.Options)!;
+        // Oracle 只接受本轮正式验证的审核会话；旧源继续沿自身夹具合同取参与者。
+        var oracle = Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST") == "G4-ORACLE-MAPPING-QUERY-001:product-resume-01";
+        Assert.IsTrue(!oracle || currentReviewer.HasValue, "Oracle 回滚必须提供当前验证的审核者。");
+        // 原 B 提案仍须由约定的异人审核，当前回滚另行取得其正式决定。
+        if (reviewerId is not null) Assert.AreEqual(reviewerId, approvedB.Decision?.DecidedBy);
+        // 准确审核参与者只在当前操作进程中使用。
+        var auditor = currentReviewer ?? await HistoricalMappingReviewerAsync(services, proposalId);
         Assert.AreNotEqual(actor.SubjectId, auditor.Actor.SubjectId);
         if (reviewerId is not null) Assert.AreEqual(reviewerId, auditor.Actor.SubjectId);
         // 当前草稿仅用于正式回滚调度CAS，不替换历史A的定义。
@@ -51,6 +66,7 @@ public sealed partial class G4QueryMafRuntimeTests
         Assert.IsTrue(runtimeIdentity is "G4-M4-QUERY-001:query-impl-01" or "G4-M5-INTEGRATION-001:integration-01" or "G4-DORIS-MAPPING-QUERY-001:implementation-01" or "G4-ORACLE-MAPPING-QUERY-001:product-resume-01");
         // 公开记录仅包括合成标识、时间、计数及状态，绝不包含会话证明。
         var evidence = new Dictionary<string, object?> { ["taskId"] = runtimeIdentity!.Split(':')[0], ["case"] = "AC-05_INFLIGHT_ABA", ["status"] = "FAIL", ["resourceRun"] = runtimeIdentity!.Split(':')[1] };
+        if (oracle) evidence["runtimeSeed"] = seedReceipt;
         // 完整两次激活完成后才能把409归因于查询提交。
         var abaCompleted = false;
         // 真实墙钟预算从正式Gateway调用之前开始。
@@ -117,6 +133,7 @@ public sealed partial class G4QueryMafRuntimeTests
                 if (job.Status is "QUEUED" or "RUNNING") await Task.Delay(10, token);
             }
             Assert.AreEqual("SUCCEEDED", job.Status);
+            if (oracle) evidence["rollbackValidatedAtUtc"] = DateTimeOffset.UtcNow;
             // 七阶段结果由真实源、语义和当前授权验证产生。
             var assessment = await mappings.ReadAssessmentAsync(editor.Actor, editor.Session, job.AssessmentId!, token);
             Assert.AreEqual("READY_FOR_PROPOSAL", assessment.Status);
@@ -128,9 +145,20 @@ public sealed partial class G4QueryMafRuntimeTests
                     ExpectedActive = assessment.ExpectedActive, ExpiresAtUtc = assessment.ExpiresAtUtc, Command = Command(0),
                     TargetReleaseId = target.TargetReleaseId, ManifestHash = target.ManifestHash }, token);
             // 使用已获正式服务器验证的不同审核主体，当前授权仍由正式服务重核。
-            var approvedA = await mappings.DecideAsync(auditor.Actor, auditor.SessionReference, proposedA.ProposalId,
+            var approvedA = await mappings.DecideAsync(auditor.Actor, auditor.Session, proposedA.ProposalId,
                 new MappingDecisionRequest { Decision = "APPROVE", BindingHash = proposedA.BindingHash, Command = Command(proposedA.ProposalRevision) },
                 $"\"proposal:{proposedA.ProposalRevision}\"", token);
+            if (oracle)
+            {
+                Assert.AreEqual(proposedA.ProposalId, approvedA.ProposalId);
+                Assert.AreEqual("APPROVED", approvedA.Status);
+                Assert.IsNotNull(approvedA.Decision);
+                Assert.AreEqual(auditor.Actor.SubjectId, approvedA.Decision.DecidedBy);
+                Assert.AreEqual(proposedA.BindingHash, approvedA.Decision?.BindingHash);
+                evidence["rollbackDecision"] = new { path = "MappingApplicationService.DecideAsync", proposedA.ProposalId,
+                    proposedA.BindingHash, proposedA.SubmittedBy, approvedA.Decision.DecidedBy,
+                    sessionHash = G4QueryCanonical.Hash(System.Text.Encoding.UTF8.GetBytes(auditor.Session)) };
+            }
             // 第二次真实激活回到同一release，但生成新的activation身份和单调修订。
             var a = await activations.ActivateAsync(activator.Actor, activator.Session, approvedA.ProposalId,
                 new MappingActivationRequest { BindingHash = approvedA.BindingHash, ExpectedActive = approvedA.ExpectedActive,

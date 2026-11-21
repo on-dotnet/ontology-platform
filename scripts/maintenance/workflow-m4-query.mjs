@@ -102,6 +102,8 @@ async function browserRun(mode, shared = null) {
     check("no_known_secret_" + report.http.length, !secrets.some(secret => secret && raw.includes(secret)));
     let data; try { data = JSON.parse(raw); } catch { data = null; }
     report.http.push({ method, path, status: response.status(), elapsedMs: performance.now() - start,
+      ...(oracleTwoTable && mode==="s2-oracle-aba" && path==="/api/v1/data/semantic-queries" && method==="POST"
+        ? {queryId:response.headers()["x-query-id"]??null,query:body,subjectId:actor.me.subjectId,selectionQueryId:actor.headers["X-Selection-Query-Id"]??null} : {}),
       ...(data?.code ? { code: data.code } : {}), sha256: createHash("sha256").update(raw).digest("hex") });
     check("http_" + report.http.length + "_" + expected, (Array.isArray(expected) ? expected.includes(response.status()) : response.status() === expected));
     return { data, raw, status: response.status(), etag: response.headers()["etag"] ?? "", queryId: response.headers()["x-query-id"] ?? "", cacheControl: response.headers()["cache-control"] };
@@ -133,7 +135,7 @@ async function browserRun(mode, shared = null) {
       try {
         authLease = await omq.completeCurrentLogin(page, label, { window: shared?.loginWindow, signal: shared?.signal,
           onProgress: event => oracleProgress({ ...event, mode }),
-          ...(shared?.plan?.planId === "s2-s3-01-access-01" ? { submit: omq.submitSystemLogin } : {}) });
+          ...(["s2-s3-01-access-01","s2-s3-01-runtime-01"].includes(shared?.plan?.planId) ? { submit: omq.submitSystemLogin } : {}) });
         report.authentication ??= []; report.authentication.push(authLease.observation);
       }
       catch (error) {
@@ -1868,7 +1870,7 @@ async function authHandoffRun() {
   if (!/^(?:auth-handoff|s2-s3)-[a-f0-9]{32}\.json$/.test(inputName)) throw new Error("ORACLE_BATCH_INPUT");
   const output = resolve(root, "artifacts/workflow", task, runId);
   const input = JSON.parse(await readFile(resolve(output, inputName), "utf8"));
-  const plan = mode === "s2-s3-oracle" ? (input.plan.planId === "s2-s3-01-access-01" ? omq.s2AccessPlan() : omq.s2Plan) : omq.authPlan;
+  const plan = mode === "s2-s3-oracle" ? (input.plan.planId === "s2-s3-01-runtime-01" ? omq.s2RuntimePlan() : input.plan.planId === "s2-s3-01-access-01" ? omq.s2AccessPlan() : omq.s2Plan) : omq.authPlan;
   if (JSON.stringify(input.plan) !== JSON.stringify(plan)) throw new Error("ORACLE_BATCH_PLAN");
   const abort = new AbortController();
   const stop = () => abort.abort(); process.on("SIGTERM", stop); process.on("SIGINT", stop);
