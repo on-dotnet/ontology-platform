@@ -2,16 +2,16 @@
   "taskId": "G4-ORACLE-MAPPING-QUERY-001",
   "runId": "product-resume-01",
   "batch": "s2-s3-01",
-  "codeHead": "bd46e04eec2551fcc486df1e3959b1890b3dd29f",
-  "measuredSuffixHead": "b9c55441d8d53b341e0424a746f5bef32950cf37",
-  "continuationBase": "095d2dd8ff957afa64f01fd938f18ffd357d8d5c",
+  "sourceHead": "c7a6bcbc4e9b7cc1a8ea6d87fc95854fd5a4a548",
+  "previousHandoff": "6221362aa5f823a071383d59ffa26ebca61f93f4",
+  "priorProductHead": "b9c55441d8d53b341e0424a746f5bef32950cf37",
   "author": "Master",
   "reviewers": [
     "ec01_review",
     "s2_s3_readonly"
   ],
-  "independence": "Both reviewers used existing originals read-only. Neither ran the product, changed its state or authored these public files. This document records their scoped findings.",
-  "conclusion": "LIMITED_STAGE_QUALIFICATION_S2_PARTIAL_S3_NOT_RUN",
+  "stop": "CHATGPT_REVIEW",
+  "conclusion": "SCOPED_OFFLINE_REVIEW_ONLY_S2_PARTIAL_S3_NOT_RUN",
   "productStatus": {
     "EC01": "PASS_REUSED",
     "S1": "PASS_REUSED",
@@ -24,232 +24,334 @@
     "G4": "PARTIAL",
     "OracleS0": "BLOCKED",
     "access": "CASE_QUALIFIED",
-    "ABA": "FAILED_BEFORE_INFLIGHT_QUERY"
+    "ABA": "FAILED_BEFORE_INFLIGHT_QUERY",
+    "thisContinuationProduct": "NOT_RUN",
+    "currentRollbackHTTPContract": "PASS_OFFLINE",
+    "currentRollbackProduct": "NOT_RUN",
+    "currentReaderReceiptConsumer": "PASS_OFFLINE"
   },
   "scopes": [
     {
-      "name": "EC-01 historical six-stage parent",
       "reviewer": "ec01_review",
-      "outcome": "QUALIFIED_REUSED",
-      "canonicalMemberIndexSha256": "f5fca1f634c23cb1b8f43d681fe402bab60b8f27a432ef7ac2aaf263c3c9b950",
-      "members": 170,
-      "bytes": 623536,
-      "parent": "47f4f5d4e2454a759bd3189a5b37f590",
-      "parentReads": 2,
-      "stageReads": [
-        0,
-        1,
-        0,
-        1,
-        0,
-        0
-      ],
-      "gap": 0
-    },
-    {
-      "name": "Five historical stage qualifications",
-      "reviewer": "s2_s3_readonly",
-      "outcome": "QUALIFIED_ON_MEASURED_INPUT",
-      "canonicalMemberIndexSha256": "67625aa92426e2a8452e46e367ebc7de9953e095ee9e9848bb99cffdbcfa5445",
-      "parent": "edd1379b83c246329579075d16ccda58",
-      "measuredCommit": "2a2ea74ff72c22860e4927318913eaece9d14f9f",
-      "stageReads": [
-        0,
-        0,
-        0,
-        10,
-        40
-      ],
-      "members": 684
-    },
-    {
-      "name": "Prior handoff originals",
-      "reviewer": "ec01_review",
-      "outcome": "PRESERVED",
-      "canonicalMemberIndexSha256": "ba4909a6edcfb17e36395fcd19ad7580f764b768c2abe4cad0f2fb2dd30b3903",
-      "members": 21425,
-      "bytes": 40021390
-    },
-    {
-      "name": "Single exact lease, live transaction, original row and audit",
-      "reviewer": "ec01_review",
-      "outcome": "TASK_LEVEL_RECOVERY",
-      "canonicalMemberIndexSha256": "e0abff9511a1b45b2e3498fffea417c6c00bf4da903dfe82f53de8cfa75e0424",
-      "commands": 34,
-      "members": 110,
-      "bytes": 296290,
-      "actualCommandId": "67e2eb4d7e4a41cb953f5a0c00a8e31f",
-      "originalCleanup250ms": "NOT_QUALIFIED"
-    },
-    {
-      "name": "Isolated PostgreSQL exact target",
-      "reviewer": "ec01_review",
-      "outcome": "1_TEST_PASSED_NO_SKIP",
-      "canonicalMemberIndexSha256": "cf8d8e96973bedb6dd1247f706eb8a925c6e08726b4a2841e44ea847cf9a996d",
-      "members": 48,
-      "bytes": 155883
-    },
-    {
-      "name": "First fresh source ACL withdrawal and restore window",
-      "reviewer": "ec01_review",
-      "outcome": "SUBCASES_VERIFIED_ACCESS_FAILED",
-      "canonicalMemberIndexSha256": "4fec93cafc948137c4f82635eb4caf06314fd920aee4cc1057f5db1b68577860",
-      "commands": 24,
-      "members": 85,
-      "bytes": 459376,
-      "parent": "c9a0458559de4934a530dcbcc9ca74a4",
-      "testedCommit": "319e7cfe7dc6c9351ced63fbdd7c799640b31411",
-      "historicalRestoreHttp": 500,
-      "omissions": [
-        "fourth request-level audit",
-        "sourceCleanup in stage original"
-      ],
-      "gapReads": 0
-    },
-    {
-      "name": "Last four-role auth",
-      "reviewer": "s2_s3_readonly",
-      "outcome": "CASE_QUALIFIED",
-      "canonicalMemberIndexSha256": "55f7cc6b8145e00976b4c346595577d9b302824b60ef9f102dc4490b3a56e8a1",
-      "members": 966,
-      "checks": 34,
-      "subjectsAuthenticated": 4
-    },
-    {
-      "name": "Last complete access stage",
-      "reviewer": "s2_s3_readonly",
-      "outcome": "CASE_QUALIFIED",
-      "canonicalMemberIndexSha256": "945280d40ddf750bea9fc4ecc6a3660b23b07871a4c1af2a203ec50fbac470ca",
-      "members": 1236,
+      "scope": "Independent actual formal access reopen on the continuation base. No new authentication or product execution.",
+      "outcome": "CASE_QUALIFIED_AT_MEASURED_INPUT",
+      "parent": "1afa8fd9ad624134a814126527f7a916",
+      "measuredCommit": "b9c55441d8d53b341e0424a746f5bef32950cf37",
       "checks": 78,
-      "submittedSourceCase": "query-dd5638dcdcc84e04a429322d8f8dd153",
-      "causalCleanupMs": 1.5729,
-      "sourceSessions": 0,
-      "leaseFieldsNull": true,
-      "historyRestoreHttp": 503,
-      "sourceReads": 2,
-      "requestAuditWindows": 11,
-      "wholeParentReads": [
-        0,
-        2,
-        4
-      ],
-      "gap": 0
-    },
-    {
-      "name": "ABA incomplete runtime",
-      "reviewer": "s2_s3_readonly",
-      "outcome": "FAIL_BEFORE_QUERY_AND_BOTH_ACTIVATIONS",
-      "commandId": "36606f5b1aa74ac09863d99930578f85",
-      "exitCode": 2,
-      "failedTests": 1,
-      "passedTests": 0,
-      "skippedTests": 0,
-      "approvedProposalObserved": true,
-      "actual409": "NOT_OBSERVED",
-      "preservedOriginal": true
-    },
-    {
-      "name": "Read-only final database and source state",
-      "reviewer": "ec01_review",
-      "outcome": "VERIFIED_AT_OBSERVATION",
-      "canonicalMemberIndexSha256": "c25b980aaf6f0af7104f886faf469ee39c7f853cfba7758ae3ea855d356e746f",
-      "commands": 14,
-      "members": 48,
-      "bytes": 909751,
-      "proposalStatus": "APPROVED",
-      "proposalActivated": false,
-      "activeARevision": 1,
-      "originalFailedFence": 2,
-      "oldFailurePreserved": true,
-      "grantRows": 75,
-      "grantEpoch": 106,
-      "fieldsPerGrant": 22,
-      "restoredDirectReads": 2,
-      "fixtureRowCounts": [
-        1,
-        1
-      ],
-      "sourceSessions": 0
-    },
-    {
-      "name": "Resource closeout in both task runs",
-      "reviewer": "ec01_review",
-      "outcome": "OWNED_PROCESSES_EXITED_PROTECTED_INVENTORY_MATCHED",
-      "canonicalMemberIndexSha256": "8d18d56510a28d27e01287ad83282cde8fd0103d37b164fa73f8010c718371c4",
-      "commands": 621,
-      "members": 1888,
-      "bytes": 2183078,
-      "drainCounters": 7,
-      "drainRounds": 2,
-      "eachValue": 0,
-      "removedApis": 2,
-      "exitedReplicas": 5,
-      "retainedRunning": 3,
-      "retainedExited": 17,
-      "protectedMatchingObservations": 13,
-      "logLimit": "Native stop ledger status is as recorded. Oracle stdout and PostgreSQL control state reopened. RustFS and Keycloak process exit verified. Service logs retained only as hash/marker; Keycloak clean-log marker not independently reopened.",
-      "fusekiCleanShutdown": "UNKNOWN"
-    }
-  ],
-  "prior": {
-    "commit": "095d2dd8ff957afa64f01fd938f18ffd357d8d5c",
-    "files": {
-      "report.md": {
-        "sizeBytes": 9119,
-        "sha256": "02636042e20dc2f632617875c36beb5d5fd96b51f62cafeb2d31434a887eb643"
+      "members": 1236,
+      "memberBytes": 12710185,
+      "oldIndex": "945280d40ddf750bea9fc4ecc6a3660b23b07871a4c1af2a203ec50fbac470ca",
+      "resolvedIndex": "478b7484274c63d2cfde842a256cb1a1d86f65f39cb51e9dff692b7ff2399adb",
+      "relocated": "formal-resources.json",
+      "relocatedOriginal": {
+        "path": "product-resume-01/formal-resources-a94e305ff2e5ad8cec38c370cd06fece9dc9d918995db7a4730373ba0816b531.json",
+        "sha256": "a94e305ff2e5ad8cec38c370cd06fece9dc9d918995db7a4730373ba0816b531",
+        "sizeBytes": 1384
       },
-      "final-machine-receipt.json": {
-        "sizeBytes": 879994,
-        "sha256": "3c777b407ebf8c7ebc9d6d95f12ed5c8b7b3d99d39d9abc30c39352a81308021"
-      },
-      "non-author-review.json": {
-        "sizeBytes": 8516,
-        "sha256": "801474acc47b5899ce9a01818334cfe0c4133a7cf031c2edcdb21798a3c15943"
+      "oldQualificationSizeBytes": 402072,
+      "oldQualificationSha256": "13b3f88a56191dd16cfa4ec71a3393bb0a1798b5db7cbc74531ef6cdf41d4385",
+      "historicalNonzeroExits": {
+        "c9a0458559de4934a530dcbcc9ca74a4": 1,
+        "1afa8fd9ad624134a814126527f7a916": 1,
+        "36606f5b1aa74ac09863d99930578f85": 2
       }
     },
-    "scope": "Previous full public files and complete historical evidence index retained at the pinned commit."
-  },
+    {
+      "reviewer": "s2_s3_readonly",
+      "scope": "Normal decision HTTP identity and CAS, current reader selection, secret-safe mismatch assertion and historic prefix compatibility. Runtime rollback path inspected but not executed.",
+      "limits": "The ordinary helper is wired to B publish. Browser rollback contract tested offline. Inflight runtime still uses the historical query and old decision proof; no new live ABA or 409 proof."
+    }
+  ],
   "publicFiles": {
     "report.md": {
-      "sizeBytes": 10704,
-      "sha256": "6d327af0022d175570c5ddbe810111a462dc75cb86d2b226e586d28661c97c72"
+      "sizeBytes": 14342,
+      "sha256": "08ebbae3d8af6a107e4543d98afe30b93b38443b2fca8f283daee64cbcc7872d"
     },
     "final-machine-receipt.json": {
-      "sizeBytes": 411733,
-      "sha256": "a987e0490df04565b2509baa008774d806f0523c91a36d1174bda29e7ec1104b"
+      "sizeBytes": 444333,
+      "sha256": "31cace752f4187e2c3bd086fd3eef7fd5e7cf1a31a45c904cdd22e4fcaad2345"
     }
   },
-  "stop": "CHATGPT_REVIEW",
-  "limitations": [
-    "AC03-B, cancellation cleanup250ms and Oracle S0 remain unqualified or blocked.",
-    "ABA success conditions, connection version and old selection cases, complete six states and 100/101, current suffix reader reopen, S3 UI/MCP, current typed Doris serialization, trust/secret rotations unqualified.",
-    "Fuseki reported PROCESS_EXITED with cleanShutdown UNKNOWN; retained TDB locks.",
-    "CI, full SelfTest and cross-platform NOT_RUN. G4 PARTIAL. No interim ZIP."
-  ],
-  "independentIndexReview": {
-    "reviewer": "ec01_review",
-    "status": "INDEX_VERIFIED",
-    "commandCount": 3220,
-    "streams": 6440,
-    "receiptAndStreamBytes": 13121046,
-    "nonzeroExits": {
-      "1": 3,
-      "2": 1
+  "priorReview": {
+    "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+    "runId": "product-resume-01",
+    "batch": "s2-s3-01",
+    "codeHead": "bd46e04eec2551fcc486df1e3959b1890b3dd29f",
+    "measuredSuffixHead": "b9c55441d8d53b341e0424a746f5bef32950cf37",
+    "continuationBase": "095d2dd8ff957afa64f01fd938f18ffd357d8d5c",
+    "author": "Master",
+    "reviewers": [
+      "ec01_review",
+      "s2_s3_readonly"
+    ],
+    "independence": "Both reviewers used existing originals read-only. Neither ran the product, changed its state or authored these public files. This document records their scoped findings.",
+    "conclusion": "LIMITED_STAGE_QUALIFICATION_S2_PARTIAL_S3_NOT_RUN",
+    "productStatus": {
+      "EC01": "PASS_REUSED",
+      "S1": "PASS_REUSED",
+      "AC03_A": "SUCCESS_WON_REUSED",
+      "AC03_B": "BLOCKED",
+      "AC03_C": "8_OF_8_REUSED",
+      "cleanup250ms": "NOT_QUALIFIED",
+      "S2": "PARTIAL_ABA_BLOCKED",
+      "S3": "NOT_RUN",
+      "G4": "PARTIAL",
+      "OracleS0": "BLOCKED",
+      "access": "CASE_QUALIFIED",
+      "ABA": "FAILED_BEFORE_INFLIGHT_QUERY"
     },
-    "associatedOriginals": 103,
-    "webProcesses": 2,
-    "webEvents": 6,
-    "webStreams": 4,
-    "expandedOriginals": 9763,
-    "expandedBytes": 21832256,
-    "canonicalGroupsSha256": "43595d0c3c24da34a6bf2e1c5d382166ca4dd3abcbbf4b628fd83978448fb222",
-    "expandedOriginalIndexSha256": "9d7ff9ed6b529421521149e489dc6290111065ca199c59bf07fab45f96800e0b",
-    "algorithm": "Repository-root-relative path, sizeBytes and sha256 objects sorted by path; UTF-8 JSON, sorted keys, compact separators, unescaped Unicode. The associated files include the four Web streams.",
-    "priorPinnedThreeBlobs": "VERIFIED"
+    "scopes": [
+      {
+        "name": "EC-01 historical six-stage parent",
+        "reviewer": "ec01_review",
+        "outcome": "QUALIFIED_REUSED",
+        "canonicalMemberIndexSha256": "f5fca1f634c23cb1b8f43d681fe402bab60b8f27a432ef7ac2aaf263c3c9b950",
+        "members": 170,
+        "bytes": 623536,
+        "parent": "47f4f5d4e2454a759bd3189a5b37f590",
+        "parentReads": 2,
+        "stageReads": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          0
+        ],
+        "gap": 0
+      },
+      {
+        "name": "Five historical stage qualifications",
+        "reviewer": "s2_s3_readonly",
+        "outcome": "QUALIFIED_ON_MEASURED_INPUT",
+        "canonicalMemberIndexSha256": "67625aa92426e2a8452e46e367ebc7de9953e095ee9e9848bb99cffdbcfa5445",
+        "parent": "edd1379b83c246329579075d16ccda58",
+        "measuredCommit": "2a2ea74ff72c22860e4927318913eaece9d14f9f",
+        "stageReads": [
+          0,
+          0,
+          0,
+          10,
+          40
+        ],
+        "members": 684
+      },
+      {
+        "name": "Prior handoff originals",
+        "reviewer": "ec01_review",
+        "outcome": "PRESERVED",
+        "canonicalMemberIndexSha256": "ba4909a6edcfb17e36395fcd19ad7580f764b768c2abe4cad0f2fb2dd30b3903",
+        "members": 21425,
+        "bytes": 40021390
+      },
+      {
+        "name": "Single exact lease, live transaction, original row and audit",
+        "reviewer": "ec01_review",
+        "outcome": "TASK_LEVEL_RECOVERY",
+        "canonicalMemberIndexSha256": "e0abff9511a1b45b2e3498fffea417c6c00bf4da903dfe82f53de8cfa75e0424",
+        "commands": 34,
+        "members": 110,
+        "bytes": 296290,
+        "actualCommandId": "67e2eb4d7e4a41cb953f5a0c00a8e31f",
+        "originalCleanup250ms": "NOT_QUALIFIED"
+      },
+      {
+        "name": "Isolated PostgreSQL exact target",
+        "reviewer": "ec01_review",
+        "outcome": "1_TEST_PASSED_NO_SKIP",
+        "canonicalMemberIndexSha256": "cf8d8e96973bedb6dd1247f706eb8a925c6e08726b4a2841e44ea847cf9a996d",
+        "members": 48,
+        "bytes": 155883
+      },
+      {
+        "name": "First fresh source ACL withdrawal and restore window",
+        "reviewer": "ec01_review",
+        "outcome": "SUBCASES_VERIFIED_ACCESS_FAILED",
+        "canonicalMemberIndexSha256": "4fec93cafc948137c4f82635eb4caf06314fd920aee4cc1057f5db1b68577860",
+        "commands": 24,
+        "members": 85,
+        "bytes": 459376,
+        "parent": "c9a0458559de4934a530dcbcc9ca74a4",
+        "testedCommit": "319e7cfe7dc6c9351ced63fbdd7c799640b31411",
+        "historicalRestoreHttp": 500,
+        "omissions": [
+          "fourth request-level audit",
+          "sourceCleanup in stage original"
+        ],
+        "gapReads": 0
+      },
+      {
+        "name": "Last four-role auth",
+        "reviewer": "s2_s3_readonly",
+        "outcome": "CASE_QUALIFIED",
+        "canonicalMemberIndexSha256": "55f7cc6b8145e00976b4c346595577d9b302824b60ef9f102dc4490b3a56e8a1",
+        "members": 966,
+        "checks": 34,
+        "subjectsAuthenticated": 4
+      },
+      {
+        "name": "Last complete access stage",
+        "reviewer": "s2_s3_readonly",
+        "outcome": "CASE_QUALIFIED",
+        "canonicalMemberIndexSha256": "945280d40ddf750bea9fc4ecc6a3660b23b07871a4c1af2a203ec50fbac470ca",
+        "members": 1236,
+        "checks": 78,
+        "submittedSourceCase": "query-dd5638dcdcc84e04a429322d8f8dd153",
+        "causalCleanupMs": 1.5729,
+        "sourceSessions": 0,
+        "leaseFieldsNull": true,
+        "historyRestoreHttp": 503,
+        "sourceReads": 2,
+        "requestAuditWindows": 11,
+        "wholeParentReads": [
+          0,
+          2,
+          4
+        ],
+        "gap": 0
+      },
+      {
+        "name": "ABA incomplete runtime",
+        "reviewer": "s2_s3_readonly",
+        "outcome": "FAIL_BEFORE_QUERY_AND_BOTH_ACTIVATIONS",
+        "commandId": "36606f5b1aa74ac09863d99930578f85",
+        "exitCode": 2,
+        "failedTests": 1,
+        "passedTests": 0,
+        "skippedTests": 0,
+        "approvedProposalObserved": true,
+        "actual409": "NOT_OBSERVED",
+        "preservedOriginal": true
+      },
+      {
+        "name": "Read-only final database and source state",
+        "reviewer": "ec01_review",
+        "outcome": "VERIFIED_AT_OBSERVATION",
+        "canonicalMemberIndexSha256": "c25b980aaf6f0af7104f886faf469ee39c7f853cfba7758ae3ea855d356e746f",
+        "commands": 14,
+        "members": 48,
+        "bytes": 909751,
+        "proposalStatus": "APPROVED",
+        "proposalActivated": false,
+        "activeARevision": 1,
+        "originalFailedFence": 2,
+        "oldFailurePreserved": true,
+        "grantRows": 75,
+        "grantEpoch": 106,
+        "fieldsPerGrant": 22,
+        "restoredDirectReads": 2,
+        "fixtureRowCounts": [
+          1,
+          1
+        ],
+        "sourceSessions": 0
+      },
+      {
+        "name": "Resource closeout in both task runs",
+        "reviewer": "ec01_review",
+        "outcome": "OWNED_PROCESSES_EXITED_PROTECTED_INVENTORY_MATCHED",
+        "canonicalMemberIndexSha256": "8d18d56510a28d27e01287ad83282cde8fd0103d37b164fa73f8010c718371c4",
+        "commands": 621,
+        "members": 1888,
+        "bytes": 2183078,
+        "drainCounters": 7,
+        "drainRounds": 2,
+        "eachValue": 0,
+        "removedApis": 2,
+        "exitedReplicas": 5,
+        "retainedRunning": 3,
+        "retainedExited": 17,
+        "protectedMatchingObservations": 13,
+        "logLimit": "Native stop ledger status is as recorded. Oracle stdout and PostgreSQL control state reopened. RustFS and Keycloak process exit verified. Service logs retained only as hash/marker; Keycloak clean-log marker not independently reopened.",
+        "fusekiCleanShutdown": "UNKNOWN"
+      }
+    ],
+    "prior": {
+      "commit": "095d2dd8ff957afa64f01fd938f18ffd357d8d5c",
+      "files": {
+        "report.md": {
+          "sizeBytes": 9119,
+          "sha256": "02636042e20dc2f632617875c36beb5d5fd96b51f62cafeb2d31434a887eb643"
+        },
+        "final-machine-receipt.json": {
+          "sizeBytes": 879994,
+          "sha256": "3c777b407ebf8c7ebc9d6d95f12ed5c8b7b3d99d39d9abc30c39352a81308021"
+        },
+        "non-author-review.json": {
+          "sizeBytes": 8516,
+          "sha256": "801474acc47b5899ce9a01818334cfe0c4133a7cf031c2edcdb21798a3c15943"
+        }
+      },
+      "scope": "Previous full public files and complete historical evidence index retained at the pinned commit."
+    },
+    "publicFiles": {
+      "report.md": {
+        "sizeBytes": 10704,
+        "sha256": "6d327af0022d175570c5ddbe810111a462dc75cb86d2b226e586d28661c97c72"
+      },
+      "final-machine-receipt.json": {
+        "sizeBytes": 411733,
+        "sha256": "a987e0490df04565b2509baa008774d806f0523c91a36d1174bda29e7ec1104b"
+      }
+    },
+    "stop": "CHATGPT_REVIEW",
+    "limitations": [
+      "AC03-B, cancellation cleanup250ms and Oracle S0 remain unqualified or blocked.",
+      "ABA success conditions, connection version and old selection cases, complete six states and 100/101, current suffix reader reopen, S3 UI/MCP, current typed Doris serialization, trust/secret rotations unqualified.",
+      "Fuseki reported PROCESS_EXITED with cleanShutdown UNKNOWN; retained TDB locks.",
+      "CI, full SelfTest and cross-platform NOT_RUN. G4 PARTIAL. No interim ZIP."
+    ],
+    "independentIndexReview": {
+      "reviewer": "ec01_review",
+      "status": "INDEX_VERIFIED",
+      "commandCount": 3220,
+      "streams": 6440,
+      "receiptAndStreamBytes": 13121046,
+      "nonzeroExits": {
+        "1": 3,
+        "2": 1
+      },
+      "associatedOriginals": 103,
+      "webProcesses": 2,
+      "webEvents": 6,
+      "webStreams": 4,
+      "expandedOriginals": 9763,
+      "expandedBytes": 21832256,
+      "canonicalGroupsSha256": "43595d0c3c24da34a6bf2e1c5d382166ca4dd3abcbbf4b628fd83978448fb222",
+      "expandedOriginalIndexSha256": "9d7ff9ed6b529421521149e489dc6290111065ca199c59bf07fab45f96800e0b",
+      "algorithm": "Repository-root-relative path, sizeBytes and sha256 objects sorted by path; UTF-8 JSON, sorted keys, compact separators, unescaped Unicode. The associated files include the four Web streams.",
+      "priorPinnedThreeBlobs": "VERIFIED"
+    },
+    "publicContentReview": {
+      "reviewer": "s2_s3_readonly",
+      "scope": "Report and machine receipt only. Stated facts and redaction; does not authorize product completion or main integration."
+    }
   },
-  "publicContentReview": {
+  "offlineCodeReview": {
     "reviewer": "s2_s3_readonly",
-    "scope": "Report and machine receipt only. Stated facts and redaction; does not authorize product completion or main integration."
-  }
+    "sourceHead": "c7a6bcbc4e9b7cc1a8ea6d87fc95854fd5a4a548",
+    "confirmed": [
+      "current selected result and unique POST content consumer",
+      "exact prefix compatibility and rejection of changed input",
+      "current auditor HTTP decision request and response model",
+      "fixed diagnostic does not print session references"
+    ],
+    "node": {
+      "commandId": "6a9f59a04563476bb901a43b1432a655",
+      "passed": 5,
+      "skipped": 0
+    },
+    "python": {
+      "commandId": "4ef10fbcc3294a3bb7c844da133ff3f8",
+      "passed": 35
+    },
+    "agentBuild": {
+      "commandId": "08c0dbf1ed1042be8308f7184eb63eb0",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 4,
+      "backendInput": "db72df830ace3b6804b8b586696074906ef127c2244d9ba29060b6b2cd89ae6f"
+    }
+  },
+  "scopeOfDelivery": "Historical access and fresh offline implementation evidence. No new live rollback, activation, identity handoff, 409 or S2/S3 pass."
 }

@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_PARTIAL_ABA_SESSION_BLOCKED_CHATGPT_REVIEW**。指定旧租约已清，原失败保留。四角色认证与双表 access 已获资格，唯一在途 Mapping ABA 在会话前置处失败，S3 未运行。AC03-B 和 Oracle S0 仍 BLOCKED，G4 PARTIAL。详细原件与资源后态见[当前报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。
+唯一任务状态 **S2_PARTIAL_ABA_SESSION_BLOCKED_CHATGPT_REVIEW**。从 6221362a 续行的当前结果为浏览器审核与查询留证短链部分修正，AgentTests 编译和 35 Python / 5 Node 通过；在途驱动仍待替换历史查询与旧审核身份来源。指定旧租约已清，原失败保留。四角色认证与双表 access 已获资格，唯一在途 Mapping ABA 在会话前置处失败，S3 未运行。AC03-B 和 Oracle S0 仍 BLOCKED，G4 PARTIAL。详细原件与资源后态见[当前报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。
 
 ## 执行身份与所有权
 
@@ -137,3 +137,5 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 源撤权查询在候选 319e7cfe 上实测为 UNAVAILABLE，物理释放得到确认、租约两列为空。原父 c9a0458559de4934a530dcbcc9ca74a4 的旧结果恢复返回 HTTP 500。当前原路径补 QueryBindingReader.cs 对 Oracle 只读证明拒绝的正式错误映射，沿原范围复核随后短链。
 
 2026-11-21 续行收尾。按用户授权仅维护 query-3e6bb50bdffe43feaa09736718b1dcb0 的两列租约，原 FAILED 与失败审计保留。最新 access 实测 78 项，源 READ 撤回下的清理确认 1.5729 ms，旧结果 503，目标 READ 已恢复。原 A 的激活 revision 仍为 1，批准的 B 提案未激活。S3 未准入。门禁登记包括三个新增 ACL 消费模块，生命周期单测改用实际产品资源入口，129/129 通过。两 API 和五副本已收口。当前停点为 ChatGPT 复审。
+
+2026-11-21 从 `6221362aa5f823a071383d59ffa26ebca61f93f4` 续行。Master 单写 Oracle 浏览器新提案回执、当前 reader 选中查询及其独立消费者、会话断言脱敏和历史前缀精确输入登记。工程 Head `c7a6bcbc4e9b7cc1a8ea6d87fc95854fd5a4a548`。access 只重开原件。当前 reader 的新查询和回滚的正常审核合同已有离线检查；旧在途入口尚未接入，S2 PARTIAL，S3 NOT_RUN。资源回读任务运行角色为零。按原授权交三文件，停 ChatGPT 复审。

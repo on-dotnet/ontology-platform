@@ -53,3 +53,5 @@
 2026-11-21 用户从 `095d2dd8ff957afa64f01fd938f18ffd357d8d5c` 明确继续同分支、同批。唯一新维护对象为 `query-3e6bb50bdffe43feaa09736718b1dcb0` 的原租约。保留原 FAILED 和失败审计，先实测源 READ 撤权及清理，再按 S2 资格自动推进 S3。沿既有正常静默认证、单条双表 grant、原预算及受保护资源边界。
 
 2026-11-21 本轮已按续行授权清理唯一指定行的残留租约。最新四角色正常认证和 source READ / access 均获资格，原失败完整保留。S2 的唯一 Mapping ABA 在当前与既存查询的会话一致性检查处失败，B 提案已获批但未激活，S3 未运行。2 个 API 与 5 个任务副本已收口。当前状态为 S2_PARTIAL_ABA_SESSION_BLOCKED_CHATGPT_REVIEW，统一交付后停 ChatGPT 复审。见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。
+
+2026-11-21 用户明确从 6221362a 继续原分支、原批次，以本轮 reader 和当前 auditor 独立审批修正 Oracle ABA，复用 access；S2 通过后自动 S3。本轮收尾的工程候选 c7a6bcbc 已核浏览器正常审核端点合同与当前 reader 查询原件，实机在途入口仍未完成。原 5 秒／1 秒／250 ms、六条双表 grant、AC03-B、Oracle S0、G4 和 main 边界继续有效。三份公开文件汇总至[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)，停 ChatGPT 复审。
