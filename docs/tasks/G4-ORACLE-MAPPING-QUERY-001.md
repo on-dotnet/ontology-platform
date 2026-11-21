@@ -130,4 +130,4 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 
 2026-11-21 本批准确实测父命令 `685e33e9abd749168f6152789677859a`，产品 Head `ee802b487f386417e312d40e84978ab49e78c182`。四角色登录与本人历史结果恢复合格。新关系查询 FOUND，父全窗 2 次业务读，间隙 0。四项 UNAUTHORIZED 已核；撤回目标表 READ 后 HTTP 503，查询 `query-3e6bb50bdffe43feaa09736718b1dcb0` 保留 FAILED、fence 2 及原租约。实际物理释放及事后源会话零已观察。六条组合 grant、变更 grant 与撤回的 READ 后态均已回读。权限恢复原件不替代失败查询资格。
 
-本次 owned_paths 包括既有 OracleSourceAdapter.Sql.cs、OracleSourceAdapter.Mapping.cs、OracleAdapterTests.cs、产品原生停止入口及前缀消费者。只读证明的完整单行阻断结果现能到达明确拒绝路径。修正编译及 33 项 Oracle 定向测试通过；该修正尚无新产品窗实测。两个 API 已移除，五个持久副本进程已停，旧受保护资源及最后失败行 KEEP。原单行维护程序准确绑定到此前查询。另行处置本次失败行及重新实机验收由 ChatGPT 集中复审。三份公开文件见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。
+本次 owned_paths 包括既有 OracleSourceAdapter.Sql.cs、OracleSourceAdapter.Mapping.cs、OracleAdapterTests.cs、产品原生停止入口及前缀消费者。只读证明的完整单行阻断结果现能到达明确拒绝路径。修正编译及 35 项 Oracle 定向测试通过，含非整数计数拒绝；该修正尚无新产品窗实测。两个 API 已移除，五个持久副本进程已停，旧受保护资源及最后失败行 KEEP。原单行维护程序准确绑定到此前查询。另行处置本次失败行及重新实机验收由 ChatGPT 集中复审。三份公开文件见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。

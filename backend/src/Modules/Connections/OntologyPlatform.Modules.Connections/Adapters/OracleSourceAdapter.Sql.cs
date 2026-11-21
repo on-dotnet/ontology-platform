@@ -81,8 +81,8 @@ public sealed partial class OracleSourceAdapter
         if (!await proof.ReadAsync(token) || proof.GetString(0) != "oracle-readonly-v1" || proof.IsDBNull(1))
             throw new PgSourceException("connection_readonly_unverified");
         // 完整性计数大于零表示本次确有权限漂移，负数和多行都不是有效证明。
-        var blocked = Convert.ToInt32(proof.GetValue(1), CultureInfo.InvariantCulture);
-        if (blocked < 0 || await proof.ReadAsync(token))
+        var blocked = Convert.ToDecimal(proof.GetValue(1), CultureInfo.InvariantCulture);
+        if (blocked < 0 || decimal.Truncate(blocked) != blocked || await proof.ReadAsync(token))
             throw new PgSourceException("connection_readonly_unverified");
         return blocked == 0;
     }

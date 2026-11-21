@@ -11,20 +11,22 @@ public sealed class OracleAdapterTests
 {
     /// <summary>目标 READ 被撤回时，单行真实证明格式给出明确拒绝；坏版本、多行和负数不能确认清理。</summary>
     [TestMethod]
-    [DataRow("oracle-readonly-v1", 0, 1, "allow")]
-    [DataRow("oracle-readonly-v1", 1, 1, "deny")]
-    [DataRow("oracle-readonly-v1", 1, 2, "invalid")]
-    [DataRow("oracle-readonly-v1", 1, 0, "invalid")]
-    [DataRow("unknown", 1, 1, "invalid")]
-    [DataRow("oracle-readonly-v1", -1, 1, "invalid")]
-    public async Task AttestationSeparatesPolicyDenialFromIncompleteMetadata(string version, int count, int rows, string expected)
+    [DataRow("oracle-readonly-v1", 0.0, 1, "allow")]
+    [DataRow("oracle-readonly-v1", 1.0, 1, "deny")]
+    [DataRow("oracle-readonly-v1", 1.0, 2, "invalid")]
+    [DataRow("oracle-readonly-v1", 1.0, 0, "invalid")]
+    [DataRow("unknown", 1.0, 1, "invalid")]
+    [DataRow("oracle-readonly-v1", -1.0, 1, "invalid")]
+    [DataRow("oracle-readonly-v1", -0.4, 1, "invalid")]
+    [DataRow("oracle-readonly-v1", 1.4, 1, "invalid")]
+    public async Task AttestationSeparatesPolicyDenialFromIncompleteMetadata(string version, double count, int rows, string expected)
     {
         // 两列顺序与 Oracle 控制视图保持一致。
         using var table = new DataTable();
         table.Columns.Add("POLICY_VERSION", typeof(string));
-        table.Columns.Add("BLOCKED_COUNT", typeof(int));
+        table.Columns.Add("BLOCKED_COUNT", typeof(decimal));
         for (var i = 0; i < rows; i++) // 填入本例指定的证明行数。
-            table.Rows.Add(version, count);
+            table.Rows.Add(version, (decimal)count);
         // 使用顺序游标实际经过产品的读取和末尾检查。
         using var reader = table.CreateDataReader();
         if (expected == "invalid")
