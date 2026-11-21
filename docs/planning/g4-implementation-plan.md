@@ -1,6 +1,6 @@
 # G4当前能力与规划入口
 
-当前 main 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`。2026-11-19，Doris review-fix-02 经 ChatGPT ACCEPT / GO，RF-02 关闭，已精确集成并回读。[Doris 验收与历史恢复](../tasks/G4-DORIS-MAPPING-QUERY-001.md)。当前[Oracle 任务](../tasks/G4-ORACLE-MAPPING-QUERY-001.md)已实测正式取消晚于固定 SQL 的 EOF，S0 与 AC03-B 保持 BLOCKED。任务分支 product-resume-01 已取得 AC03-A/C、S1 和双表 access 的限定资格。本轮在原工作树修正当前查询与审核身份并完成定向回归。S2 为 PARTIAL。官方原包已通过冻结 SRI。原树三次零下载 prepare 成功，API、Agent、Query 已完成正式构建和快照冻结。2026-11-21 的受控十槽在 `851906f140c0defc0201b392e838e191b20afa27` 完成当前四角色认证，十五项授权同事务追加并回读。ABA 已实测同查询源读与激活 B，回滚验证后在原期限超时，HTTP 503 `query_timeout`。回到 A、409 和零成功副作用未取得完整证明。后八槽未运行，S3 为 NOT_RUN。G4 总体 **PARTIAL**。[S2/S3 当前交付](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
+当前 main 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`。2026-11-19，Doris review-fix-02 经 ChatGPT ACCEPT / GO，RF-02 关闭，已精确集成并回读。[Doris 验收与历史恢复](../tasks/G4-DORIS-MAPPING-QUERY-001.md)。当前[Oracle 任务](../tasks/G4-ORACLE-MAPPING-QUERY-001.md)已实测正式取消晚于固定 SQL 的 EOF，S0 与 AC03-B 保持 BLOCKED。任务分支 product-resume-01 已取得 AC03-A/C、S1 和双表 access 的限定资格。本轮在原工作树修正当前查询与审核身份并完成定向回归。S2 为 PARTIAL。官方原包已通过冻结 SRI。原树三次零下载 prepare 成功，API、Agent、Query 已完成正式构建和快照冻结。2026-11-21 的受控十槽在 `851906f140c0defc0201b392e838e191b20afa27` 完成当前四角色认证，十五项授权同事务追加并回读。ABA 已实测同查询源读与激活 B，回滚验证后在原期限超时，正式语义网关报告 503 `query_timeout`。回到 A、409 和零成功副作用未取得完整证明。后八槽未运行，S3 为 NOT_RUN。G4 总体 **PARTIAL**。[S2/S3 当前交付](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
 
 ## 已合并能力与缺口
 

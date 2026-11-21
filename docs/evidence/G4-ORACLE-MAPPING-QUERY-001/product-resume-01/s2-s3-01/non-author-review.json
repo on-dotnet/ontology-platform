@@ -2,56 +2,38 @@
   "taskId": "G4-ORACLE-MAPPING-QUERY-001",
   "runId": "product-resume-01",
   "batch": "s2-s3-01",
-  "baseline": "d6463f63b52d2afa08e7a6779d260e8d4265dfff",
-  "reviewedCode": "54d2493bfa7377855ab5a59b6bc82612d21e9b3d",
-  "engineeringCommit": "32b76a92afe62b30f299e3d4031b75f13840f190",
-  "state": "S2_PARTIAL_RUNTIME_GRANT_EXPIRED_CHATGPT_REVIEW",
-  "conclusion": "PARTIAL。认证首槽独立成立，ABA 在权限准入处失败，S3 未运行。",
+  "baseline": "1e727e46370b2bd597099d56bc271178555fb9d4",
+  "reviewedCode": "851906f140c0defc0201b392e838e191b20afa27",
+  "engineeringCommit": "4f125fd47945fa47afad9c4c207d038b3e832a69",
+  "state": "S2_PARTIAL_ABA_TIMEOUT_CHATGPT_REVIEW",
+  "conclusion": "三处入口增量复核通过。实际权限准备和当前认证通过，ABA 未在原期限内完成，S2 PARTIAL，S3 NOT_RUN。",
   "reviews": [
     {
-      "role": "资源账目只读审查",
-      "finding": "两个历史端点的四项实际差异完全解释 −33,044,992 B。替代平台卷 +16,384 B 落在既计预留，63 个缓存的信用只抵扣一次。",
-      "evidenceIds": [
-        "24ddb2256bcb4bdc95d03103b99b8733",
-        "50bc1f49307f4478bf7103be0f03095f",
-        "0550da43ee07467783dbb6ef746fa8fa"
-      ]
+      "role": "授权及消费者",
+      "finding": "核实最后正常 15 项、15 组历史反例恢复原字节和单次追加。复核后拒绝错代六加九登记、未恢复 token 和同步篡改原件及登记散列。实机命令双流与 ready 独立回读。",
+      "original": "8a0524ef4a8c4f34aadf7a2ec0f75b19",
+      "members": 54
     },
     {
-      "role": "复用资格只读审查",
-      "finding": "三个 prepare 回执、三份构建和 99/222/222 个快照成员逐件相符。重开前五槽的 684 项、冻结 546 项，以及 access 的 78 项检查和 1236 个成员。",
-      "evidence": {
-        "commandId": "1afa8fd9ad624134a814126527f7a916",
-        "measuredCommit": "b9c55441d8d53b341e0424a746f5bef32950cf37",
-        "qualificationSha256": "13b3f88a56191dd16cfa4ec71a3393bb0a1798b5db7cbc74531ef6cdf41d4385",
-        "memberIndexSha256": "945280d40ddf750bea9fc4ecc6a3660b23b07871a4c1af2a203ec50fbac470ca"
-      }
+      "role": "资源与关闭代次",
+      "finding": "旧七角色至新宿主和默认图、2748 行命名图及 Published 核对通过。新 Fuseki PID 94542。新关闭 5 份原生回执、两 API 缺席、两轮排空、20 项保护和 8 次采样复核通过。",
+      "operation": "9b81d52b3b7041ecb7b8530198d77ccd",
+      "windowId": "1f5e1a017b154a71b67b6229f166ac37",
+      "post": "044ea783d35945b2997a8d1c1668b971"
     },
     {
-      "role": "非作者产品及收口审查",
-      "finding": "准确父回执 exit 1，四个当期身份认证通过。目录一致、6 项原单表历史均在、6 条组合授权范围正确且未撤销，准入时已全部过期，9 项工作流授权也已到期。父窗口及两槽业务源读为零。ABA queryId、原期限拒绝、零成功副作用、owner/fence、下一槽均无当期产品资格。",
-      "parent": "1080791aa97546f29c34fd915618ecef",
-      "parentReceiptSha256": "7d6828b3f6f3ad087ec4c52b24cb8d40259e3b953608024be9ba19aab9c630c1",
-      "snapshotSha256": "ceb98b343de2c0ec092911d973d77839ee521a3cd94c39405dbf60368ec5dce3",
-      "resourceEvidence": {
-        "samplesSha256": "585c0eb6272b9906add9b14d4f0136de6463556525e36a4198bcaeb058fafa79",
-        "closeSha256": "35bcf152b788c21a72690c7b3fa2cc7f58355b1c6b66fc54ec4074d2d83be691",
-        "allFiveStartsChecked": true,
-        "apiRemovalsAndAbsenceChecked": 2,
-        "graphCheck": {
-          "defaultRows": 0,
-          "namedRows": 2748,
-          "namedSha256": "4692dc65b7f20ccd3ae05c400e85310769462cbe60968d6ec102878c68ec5ab6"
-        },
-        "finalAdmission": "7f8f4bf28b8640d4a17a2d3d4ae6362b"
-      }
+      "role": "独立产品审查",
+      "finding": "正常认证 CASE_QUALIFIED。按准确查询重开源读、激活 B 与超时拒绝；后态为 FAILED、owner 存在、fence 2、租约过期。断点早于零成功副作用核验。",
+      "auth": "d6e05ec96e04432b80f3a2e5c07803d0",
+      "members": 2320,
+      "aba": "5b90bb8f66fb4ddd9bfeddbe5015133a",
+      "post": "b2e6bcb2dc554a0495b086db67e98c66"
     }
   ],
   "limits": [
-    "独立审查只读重开，实机操作者为 Master。",
-    "采样不提供连续峰值证明。",
-    "Fuseki cleanShutdown UNKNOWN。",
-    "原 AC03-B、Oracle S0、cleanup250ms、Doris 两项 assessment 的未资格继续保留。"
+    "回滚激活 A、原期限内 409、零成功副作用和下一槽准入未获资格。",
+    "锁屏、熄屏、CI、本批 S3 未实证。",
+    "AC03-B、Oracle S0、cleanup250ms 和两项历史 Doris assessment 维持原状态。"
   ],
-  "deliveryReadback": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/controlled-delivery-readback.json"
+  "deliveryReadback": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-delivery-readback-851906f1.json"
 }

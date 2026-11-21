@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_RUNTIME_ENTRY_REVIEW**。本轮从 `1e727e46370b2bd597099d56bc271178555fb9d4` 在原树续行。Master 单写运行入口、授权和证据消费者、定向测试及本批交付；其余产品代码和共享设施为只读依赖。上轮冻结十槽实测 1 PASS、1 FAIL、8 NOT_RUN。四角色正常认证通过，ABA 槽在创建查询前因已登记组合授权过期停止。两 API 已移除，五副本已退出。S2 PARTIAL、S3 NOT_RUN、G4 PARTIAL；AC03-B 与 Oracle S0 保留 BLOCKED。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
+唯一任务状态 **S2_PARTIAL_ABA_TIMEOUT_CHATGPT_REVIEW**。本轮同批十槽实测 1 PASS、1 FAIL、8 NOT_RUN。四角色认证及 6＋9 同范围续授通过，ABA 查询真实源读后激活 B，回滚验证完成后返回 503 query_timeout，未取得 A 恢复、原期限内 409 或零成功副作用证明。后继及 S3 未准入。两 API 已移除，五副本已退出，停 ChatGPT 复审。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
 
 ## 执行身份与所有权
 
