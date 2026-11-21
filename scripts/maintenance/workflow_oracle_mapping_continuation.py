@@ -115,6 +115,9 @@ def compatible_prefix(archive,measured,mode,stage):
         left,right=old.decode(),new.decode()
         if name.endswith('/workflow-oracle-s2.mjs'):
             right=right.replace('!["s2-s3-01","s2-s3-01-access-01"].includes(shared.plan.planId)','shared.plan.planId !== "s2-s3-01"')
+            for added, original in [('          ...(shared.plan.planId==="s2-s3-01-access-01"?{submit:omq.submitSystemLogin}:{}),\n          onProgress:event=>progress({...event,mode})});', '          onProgress:event=>progress({...event,mode})});'), ('await audit("current-catalog-mapping",()=>formalMapping(ctx),formalMappingReads(state));', 'await audit("current-catalog-mapping",()=>formalMapping(ctx),2);')]:
+                require(right.count(added)==1,'S23_PREFIX_UNEXECUTED_SUFFIX')
+                right=right.replace(added,original,1)
             # 未执行的权限测试函数是唯一产品场景差异；上下两个边界必须各唯一出现。
             begin='/** 当前组合grant拒绝后既不执行业务SQL，也不恢复历史原值；每次恢复核原行。 */'
             end='/** B先由三角色正式准备；真正同query源读后A-B-A交给已有正式DI在途测试。 */'
@@ -127,9 +130,18 @@ def compatible_prefix(archive,measured,mode,stage):
             from workflow_oracle_mapping_repeat import BRANCH as REPEAT_BRANCH
             require(right.count(REPEAT_BRANCH)==1,'S23_PREFIX_REPEAT_BRANCH')
             right=right.replace(REPEAT_BRANCH,'',1)
+            from workflow_oracle_mapping_acl_host import BRANCH as ACL_BRANCH
+            require(right.count(ACL_BRANCH)==1,'S23_PREFIX_ACL_GRAPH_BRANCH')
+            right=right.replace(ACL_BRANCH,'',1)
             close_admission='        # 产品收尾与同批开放采用相同的已核基线缓存扣减及40GiB上限。\n        from workflow_oracle_mapping_capacity import before_product_source as before_source\n'
             require(right.count(close_admission)==1 and close_admission not in left,'S23_PREFIX_CLOSE_ADMISSION')
             right=right.replace(close_admission,'',1)
+            start=right.index('def start_owned(');end=right.index('def recover_fixed_row(',start)
+            section=right[start:end]
+            start_guard="    check_resources=platform.before_source\n    if product:\n        require(group=='replacement','TDB_PRODUCT_GROUP')\n        phase=product\n        from workflow_oracle_mapping_capacity import before_product_source\n        check_resources=before_product_source\n"
+            require(section.count(start_guard)==1 and section.count('check_resources(')==2,'S23_PREFIX_START_ADMISSION')
+            section=section.replace(start_guard,"    if product:\n        require(group=='replacement','TDB_PRODUCT_GROUP')\n        phase=product\n",1).replace('check_resources(','platform.before_source(')
+            right=right[:start]+section+right[end:]
         elif name.endswith('/workflow_oracle_mapping_resume.py'):
             from workflow_oracle_mapping_capacity import ORIGINAL_CALL,PRODUCT_CALL
             require(right.count(PRODUCT_CALL)==1 and PRODUCT_CALL not in left,'S23_PREFIX_CAPACITY_BRANCH')
@@ -152,6 +164,9 @@ def compatible_prefix(archive,measured,mode,stage):
             right=right.replace("    if mode=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':required[mode]=required[mode]|{'healthy-relations'}\n",'')
             right=right.replace("    if report['mode']=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':__import__('workflow_oracle_mapping_readiness').qualify(report)\n",'')
             right=right.replace("    if report['mode']=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':__import__('workflow_oracle_mapping_readiness').reopen(archive,report,host,origin)\n",'')
+            row="    if report['batch']['planId']=='s2-s3-01-access-01':\n        if report['mode']=='s2-oracle-access':\n            from workflow_oracle_mapping_acl_observation import reopen\n            reopen(archive,report,host,origin)\n        if report['mode'] in ('s2-oracle-versions','s2-oracle-connection'):\n            require([w['expectedReads'] for w in report['oracleWindows'] if w['name']=='current-catalog-mapping']==[4],'S23_NEW_DOUBLE_TABLE_MAPPING_READS')\n"
+            require(right.count(row)==1,'S23_PREFIX_SUFFIX_CONSUMER')
+            right=right.replace(row,'',1)
             require(_program(left,{'frozen_plan'})==_program(right,{'frozen_plan'}),'S23_PREFIX_CONTRACT_CHANGED')
             continue
         else:require(False,'S23_PREFIX_DRIVER_CHANGED')
@@ -244,7 +259,7 @@ def prepare_prefix(root,descriptor):
     require(projection['connectionId']==old['connectionId'] and projection['catalogSnapshotId']==old['catalogSnapshotId']
             and projection['mappingReceipt']==old['activation'] and latest['reportName'] in qualified['members'] and json.loads(_read(root,qualified['members'][latest['reportName']]['path']))==query
             and latest['queryId']==query['oracleCases'][2]['queryId'] and latest['resultHash']==query['oracleCases'][2]['sha256'],'S23_PREFIX_CURRENT_BINDING')
-    from workflow_oracle_mapping_repeat import lifecycle
+    from workflow_oracle_mapping_acl_host import lifecycle
     current=p.runtime_binding();continuity=lifecycle(root,host,current)
     snapshot=s.source_snapshot();require(snapshot['rows']==query['independentSource']['rows'] and snapshot['hashes']==query['independentSource']['hashes'],'S23_PREFIX_CURRENT_SOURCE')
     observation=dict(taskId=TASK,runId=RUN,batch='s2-s3-01',planId=PLAN_ID,qualifiedPrefix=PREFIX,state=projection,host=current,source=snapshot,hostContinuity=continuity)
@@ -263,7 +278,7 @@ def reopen_prefix(root,stage,archive):
     require(ex.sha(raw)==ref['sha256'],'S23_PREFIX_OBSERVATION_HASH');obs=json.loads(raw)
     require((obs['taskId'],obs['runId'],obs['batch'],obs['planId'])==(TASK,RUN,'s2-s3-01',PLAN_ID) and obs['qualifiedPrefix']==PREFIX
             and stable_host(obs['host'])==stable_host(archive.dispatch['host']),'S23_PREFIX_OBSERVATION_SCOPE')
-    from workflow_oracle_mapping_repeat import lifecycle
+    from workflow_oracle_mapping_acl_host import lifecycle
     lifecycle(root,host,obs['host'],obs['hostContinuity'],archive)
     host_observation(archive,obs['host'],build_binding(archive,'api',root),root)
     snapshot=obs['source'];require(snapshot['projectionVersion']==2 and snapshot['rows']==query['independentSource']['rows']

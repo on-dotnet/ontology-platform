@@ -35,6 +35,9 @@ def structural(root, task, phase):
         frozen_plan(root,"s2-s3-01-access-01")
         consumers['scripts/maintenance/workflow_oracle_mapping_postprobe.py']=['def maintenance(', 'def lifecycle(', 'POSTPROBE_TEMPLATE']
         consumers['scripts/maintenance/workflow_oracle_mapping_preparation_refresh.py']=['def lifecycle(', 'def maintenance_result(', 'def reopen_isolated(', 'S23_PREPARATION_REFRESH_CAS']
+        consumers['scripts/maintenance/workflow_oracle_mapping_acl_host.py']=['def lifecycle(', 'def graph_qualification(', 'ACL_LEASE_STOPPED']
+        consumers['scripts/maintenance/workflow_oracle_mapping_acl_lease.py']=['def maintenance(', 'def verify_closed(', 'SOURCE_ACL_LEASE_SEAL_TARGET']
+        consumers['scripts/maintenance/workflow_oracle_mapping_acl_observation.py']=['def collect(', 'def reopen(', 'ACL_RELEASE_BUDGET']
         consumers['scripts/maintenance/workflow_oracle_mapping_readiness.py']=['def qualify(', 'def qualify_catalog(', 'CURRENT_CATALOG_VERIFIED', 'def reopen(', 'S23_READINESS_NO_VERSION_CHANGE', 'CURRENT_API_CONNECTION_READY']
         consumers['scripts/maintenance/workflow_oracle_preparation_runner.py']=['def verified_runner(', 'PREPARATION_BUILD_ORIGINAL', 'PREPARATION_SOURCE_DERIVATION']
         consumers['scripts/maintenance/workflow_oracle_preparation_maintenance.py']=['def verify_seal(', 'def verify_prestate(', 'def recovery_argv(', 'S23_PREPARATION_POST_ROW']

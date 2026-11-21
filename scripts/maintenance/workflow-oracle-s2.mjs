@@ -466,6 +466,7 @@ async function ui(ctx) {
         await second.getByRole("button",{name:"安全退出"}).click();await second.waitForURL(url=>url.origin===origin&&url.pathname==="/signed-out");
         await second.goto(origin+"/auth/login?returnUrl=%2Fapi%2Fv1%2Fplatform%2Fme");
         const lease=await omq.completeCurrentLogin(second,"auditor-ab",{window:{deadline:null,durationMs:180000,maxDeadline:shared.stageDeadline},signal:shared.signal,
+          ...(shared.plan.planId==="s2-s3-01-access-01"?{submit:omq.submitSystemLogin}:{}),
           onProgress:event=>progress({...event,mode})});
         report.authentication??=[];report.authentication.push(lease.observation);
         actor.authDeadline=lease.deadline;
@@ -519,9 +520,17 @@ async function access(ctx) {
     },0);
     omq.platform(root,"__import__('workflow_oracle_mapping_readiness').qualify_catalog(json.load(sys.stdin))",report,shared.stageDeadline);
   }
+  const q=query(capabilities[0]);
+  const acl=call("access_case","revoke-read");
+  try {
+    await execute("source-acl",q,reader,0);
+    await audit("source-acl-restore-denied",()=>request(reader,"GET","/api/v1/data/semantic-queries/"+state.latestQuery.queryId+"/result",undefined,[403,503]),0);
+  }finally{report.sourceAcl={changed:acl,restored:call("access_case","restore-read",acl.token)};}
+  if(shared.plan.planId==="s2-s3-01-access-01") {
+    report.sourceCleanup=omq.platform(root,"__import__('workflow_oracle_mapping_acl_observation').collect(json.load(sys.stdin))",report,shared.stageDeadline);
+  }
   // 当前Reader改动须先用完整双表真实读取补证，保留历史latestQuery锚点。
   await execute("healthy-relations",query(capabilities[2]),reader,2);
-  const q=query(capabilities[0]);
   await execute("no-grant",q,auditor,0);
   report.permissionCases=[];
   for(const action of ["revoke","field","expired"]) {
@@ -539,11 +548,6 @@ async function access(ctx) {
     try {call("grants",omq.grantState(state),ctx.shared.executionId,false);}catch(error){refused=String(error.stderr).includes("S2_GRANT_TTL");}
     check("oracle_short_ttl_preflight_rejected",refused);
   }finally{report.shortTtl={changed:short,restored:call("permission_case",omq.grantState(state),"restore","execute",short.token)};}
-  const acl=call("access_case","revoke-read");
-  try {
-    await execute("source-acl",q,reader,0);
-    await audit("source-acl-restore-denied",()=>request(reader,"GET","/api/v1/data/semantic-queries/"+state.latestQuery.queryId+"/result",undefined,[403,503]),0);
-  }finally{report.sourceAcl={changed:acl,restored:call("access_case","restore-read",acl.token)};}
   for(const kind of ["result","evidence"]) {
     const changed=call("permission_case",omq.grantState(state),"revoke",kind);
     try {await audit("denied-restore-"+kind,async()=>{
@@ -630,7 +634,7 @@ async function versions(ctx,connectionCase=false) {
   state.versionHistory??=[];state.versionHistory.push({mapping:Object.fromEntries(Object.entries(state).filter(([key])=>key.startsWith("mapping"))),latestQuery:state.latestQuery,catalog:oldCatalog});
   for(const key of Object.keys(state))if(key.startsWith("mapping"))delete state[key];
   state.catalog=catalog;await save(state);
-  await audit("current-catalog-mapping",()=>formalMapping(ctx),2);
+  await audit("current-catalog-mapping",()=>formalMapping(ctx),formalMappingReads(state));
   report.oracleBinding={connectionId:state.connectionId,catalogSnapshotId:catalog.snapshotId,mappingReleaseId:state.mappingReceipt.mappingReleaseId,activation:state.mappingReceipt};
   const capability=(await get(reader,"/api/v1/capabilities")).find(c=>c.id===capabilities[2]);
   const q={...oldQuery,mappingReleaseIds:[state.mappingReceipt.mappingReleaseId],capabilityId:capability.id,capabilityVersion:capability.version,relationshipIris:[relation]};

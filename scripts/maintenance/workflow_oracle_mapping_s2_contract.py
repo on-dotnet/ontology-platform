@@ -418,6 +418,12 @@ def reopen_stage(archive,report,records,host,origin,measured,window):
     from workflow_oracle_mapping_identity_recovery import ROSTER
     result=qualify(report)
     if report['mode']=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':__import__('workflow_oracle_mapping_readiness').reopen(archive,report,host,origin)
+    if report['batch']['planId']=='s2-s3-01-access-01':
+        if report['mode']=='s2-oracle-access':
+            from workflow_oracle_mapping_acl_observation import reopen
+            reopen(archive,report,host,origin)
+        if report['mode'] in ('s2-oracle-versions','s2-oracle-connection'):
+            require([w['expectedReads'] for w in report['oracleWindows'] if w['name']=='current-catalog-mapping']==[4],'S23_NEW_DOUBLE_TABLE_MAPPING_READS')
     ledger=reopen_mutations(archive,report,host,origin)
     grants=report['currentGrants'];require(grants['taskId']==report['taskId'] and grants['runId']==report['runId'] and grants['batch']=='s2-s3-01'
         and grants['fieldCount']==22 and grants['grantCount']==6 and len(grants['rows'])==6 and grants['requiredSeconds']==210

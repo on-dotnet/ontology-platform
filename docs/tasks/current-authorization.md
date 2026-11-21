@@ -49,3 +49,5 @@
 2026-11-21最新明确授权：用户要求Codex自行填写现有密码完成正常登录，不再要求本人操作。仅后缀s2-s3-01-access-01使用系统钥匙串四个准确账号条目，operator-ab为独立operator-reset-01-20261120，其余为isolated-login-20261120T040700Z；口令只在本机进程内直填已核验本机OIDC表单，不显示、写日志、落盘、导出会话或重置密码。原600秒/新reader180秒/提交40秒与产品预算不变。最新父04f23ea8cfe34868a8500b80164d86fb认证4/4及34checks通过；access因源清理未确认503失败，后9槽NOT_RUN，权限/源ACL准确恢复。继续短链修复和自动S2→S3，当前状态S2_S3_IMPLEMENTING。
 
 2026-11-21 本批收尾状态为 **S2_BLOCKED_SOURCE_ACL_CLEANUP**。四角色已经正常认证，产品父命令 685e33e9abd749168f6152789677859a 在源 READ 撤权清理处失败。恢复权限并保留准确失败查询和租约，原资源已收口，S3 为 NOT_RUN。源证明修正通过本地定向测试，实机资格仍待核。当前停点为原分支统一交付及 ChatGPT 复审。详见[任务卡](G4-ORACLE-MAPPING-QUERY-001.md)和[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。
+
+2026-11-21 用户从 `095d2dd8ff957afa64f01fd938f18ffd357d8d5c` 明确继续同分支、同批。唯一新维护对象为 `query-3e6bb50bdffe43feaa09736718b1dcb0` 的原租约。保留原 FAILED 和失败审计，先实测源 READ 撤权及清理，再按 S2 资格自动推进 S3。沿既有正常静默认证、单条双表 grant、原预算及受保护资源边界。

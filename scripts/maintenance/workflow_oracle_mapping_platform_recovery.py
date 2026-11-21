@@ -532,6 +532,10 @@ def require_current_fuseki(cid,started,pid):
         from workflow_oracle_mapping_continuity import graph_qualification
         graph_qualification(platform.ROOT,cid,started,pid)
         return row['attempt']
+    if row.get('priorCloseSha256')=='952094d4182ccac4ea312917b653c1d527674dc9157aa64902e20afd540ccd9e' and row.get('productUse')=='AWAITING_CURRENT_GRAPH_QUALIFICATION':
+        from workflow_oracle_mapping_acl_host import graph_qualification
+        graph_qualification(platform.ROOT,cid,started,pid)
+        return row['attempt']
     frozen=components.frozen('graphs-second-open.json')
     require(row['stage']=='product-resume-01' and row['role']=='fuseki' and row['status']=='RUNNING'
             and row.get('productUse')=='CURRENT_GRAPHS_VERIFIED'
@@ -626,12 +630,15 @@ def start_owned(group,role,running):
     require(group in ('original','replacement') and role in ORIGINAL_IDS,'OWNED_GROUP_ROLE')
     phase='preserve' if group=='original' else 'restore'
     product=platform.product_run()
+    check_resources=platform.before_source
     if product:
         require(group=='replacement','TDB_PRODUCT_GROUP')
         phase=product
+        from workflow_oracle_mapping_capacity import before_product_source
+        check_resources=before_product_source
     current=set(running);after=current|{role}
     require(role not in current and role in ORIGINAL_IDS,'START_ROLE')
-    pre=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=current,planned_roles=after)
+    pre=check_resources(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=current,planned_roles=after)
     basis=None
     if group=='original':
         cid=ORIGINAL_IDS[role]
@@ -656,7 +663,7 @@ def start_owned(group,role,running):
                 require(state.startswith('running|'),'START_EXITED')
                 time.sleep(2)
             require(state=='running|healthy','HEALTH_TIMEOUT')
-        post=platform.before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=after)
+        post=check_resources(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=after)
         receipt.update(status='RUNNING',post=post['attempt'])
         if basis:
             fmt='{{.State.Status}}|{{.State.StartedAt}}|{{.State.Pid}}'
