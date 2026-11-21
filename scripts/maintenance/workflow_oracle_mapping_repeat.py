@@ -131,6 +131,9 @@ def prior_host(root,archive=None):
 
 def lifecycle(root,previous,current,proof=None,archive=None):
     """旧代次入口原样保留；新代次明确消费两条连续边而非跳接。"""
+    if current['snapshotId']=='0b0326525f6e62ca272e243033def2396437265e5a82d1d345d3d94180ef30e6' and current['services']['api']['containerId']=='7f88656c9dc0d2699a5bcddd911d1ba88617c4a4be6354b97cc7d6006d4c0389':
+        from workflow_oracle_mapping_postprobe import lifecycle as postprobe
+        return postprobe(root,previous,current,proof,archive)
     if current['snapshotId']=='0b0326525f6e62ca272e243033def2396437265e5a82d1d345d3d94180ef30e6' and current['services']['api']['containerId']=='4d4b403d37e11d19e5082e0a2ead5235d66f135e52a3f46f22022ec9c333d89e':
         from workflow_oracle_mapping_preparation_refresh import lifecycle as preparation_refresh
         return preparation_refresh(root,previous,current,proof,archive)

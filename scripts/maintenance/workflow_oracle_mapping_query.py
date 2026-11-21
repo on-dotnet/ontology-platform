@@ -33,6 +33,7 @@ def structural(root, task, phase):
         from workflow_oracle_mapping_s2_contract import frozen_plan
         frozen_plan(root)
         frozen_plan(root,"s2-s3-01-access-01")
+        consumers['scripts/maintenance/workflow_oracle_mapping_postprobe.py']=['def maintenance(', 'def lifecycle(', 'POSTPROBE_TEMPLATE']
         consumers['scripts/maintenance/workflow_oracle_mapping_preparation_refresh.py']=['def lifecycle(', 'def maintenance_result(', 'def reopen_isolated(', 'S23_PREPARATION_REFRESH_CAS']
         consumers['scripts/maintenance/workflow_oracle_mapping_readiness.py']=['def qualify(', 'def reopen(', 'S23_READINESS_NO_VERSION_CHANGE', 'CURRENT_API_CONNECTION_READY']
         consumers['scripts/maintenance/workflow_oracle_preparation_runner.py']=['def verified_runner(', 'PREPARATION_BUILD_ORIGINAL', 'PREPARATION_SOURCE_DERIVATION']

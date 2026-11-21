@@ -511,6 +511,14 @@ async function access(ctx) {
   },0);
   omq.platform(root,"__import__('workflow_oracle_mapping_readiness').qualify(json.load(sys.stdin))",report,shared.stageDeadline);
   }
+  if(shared.plan.planId==="s2-s3-01-access-01") {
+    await audit("oracle-current-catalog-readiness",async()=>{
+      const saved=state.latestQuery;
+      const restored=await request(reader,"GET","/api/v1/data/semantic-queries/"+saved.queryId+"/result");
+      report.catalogReadiness={queryId:saved.queryId,actor:reader.me.subjectId,raw:restored.raw,sha256:hash(restored.raw)};
+    },0);
+    omq.platform(root,"__import__('workflow_oracle_mapping_readiness').qualify_catalog(json.load(sys.stdin))",report,shared.stageDeadline);
+  }
   // 当前Reader改动须先用完整双表真实读取补证，保留历史latestQuery锚点。
   await execute("healthy-relations",query(capabilities[2]),reader,2);
   const q=query(capabilities[0]);

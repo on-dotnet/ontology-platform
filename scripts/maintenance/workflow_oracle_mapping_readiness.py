@@ -56,6 +56,7 @@ def qualify(report):
 
 def reopen(archive,report,host,origin):
     from workflow_oracle_mapping_evidence import utc
+    qualify_catalog(report)
     probe=qualify(report);item=report['oracleReadiness'];body=b'BEGIN READ ONLY;\n'+snapshot_sql(probe['probeId'])+b'\nCOMMIT;'
     args=['docker','--context','desktop-linux','exec','-i','--user','postgres',host['services']['platform-pg']['containerId'],'psql','-XwqAt','-d','mapping','-v','ON_ERROR_STOP=1']
     command,out,err=archive.command(item['snapshot']['commandId'],args,'omq-pg-s23-oracle-readiness',ex.sha(body),None,origin)
@@ -63,3 +64,18 @@ def reopen(archive,report,host,origin):
     require(command['classification']=='SUCCESS' and command['exitCode']==0 and command['deadlineSeconds']==15 and not err and json.loads(out)==item['snapshot']['value']
         and utc(probe['completedAtUtc'])<=utc(command['startedAtUtc'])<=utc(command['endedAtUtc'])<=utc(window['finishedAtUtc']),'S23_READINESS_SNAPSHOT_ORIGINAL')
     return dict(status='CURRENT_API_CONNECTION_READY',probeId=probe['probeId'],queryColdStart='NOT_QUALIFIED',sourceBusinessReads=0)
+
+
+def qualify_catalog(report):
+    """当前reader在原五秒恢复期限内取得已资格关系结果原字节，同时完整核当前目录。"""
+    item=report['catalogReadiness']
+    query='query-d293780099754592b3e2a00957e13c8b'
+    digest='fcb551ca11b24fb0a1cec8e38f07fb038d95ba774916c0cafdf2b3ad064c3e66'
+    raw=item['raw'].encode()
+    require(item['queryId']==query and item['actor']==ROSTER['reader'][1] and len(raw)==5056 and item['sha256']==ex.sha(raw)==digest,'S23_CATALOG_READY_ORIGINAL')
+    path='/api/v1/data/semantic-queries/'+query+'/result'
+    window=next(w for w in report['oracleWindows'] if w['name']=='oracle-current-catalog-readiness')
+    require(window['expectedReads']==0 and window['audit']['clientId'] is None and window['audit']['records']==[],'S23_CATALOG_READY_SOURCE')
+    requests=[h for h in report['http'] if h['method']=='GET' and h['path']==path and h['status']==200 and h['sha256']==digest]
+    require(requests and 0<requests[0]['elapsedMs']<=5000,'S23_CATALOG_READY_HTTP')
+    return dict(status='CURRENT_CATALOG_VERIFIED',queryId=query,sha256=digest)
