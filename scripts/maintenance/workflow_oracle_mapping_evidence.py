@@ -81,7 +81,7 @@ def drivers(root, mode, run=None, plan_id=None):
                   'scripts/maintenance/workflow_oracle_mapping_s2.py','scripts/maintenance/workflow_oracle_mapping_s2_contract.py',
                   'scripts/maintenance/workflow_oracle_mapping_formal_observer.py','scripts/maintenance/workflow_m4_query_evidence.py')
     if plan_id=='s2-s3-01-access-01':
-        names+=('scripts/maintenance/workflow-oracle-s2-access-plan.json','scripts/maintenance/workflow_oracle_mapping_continuation.py','scripts/maintenance/workflow_oracle_mapping_continuity.py','scripts/maintenance/workflow_oracle_mapping_repeat.py','scripts/maintenance/workflow_oracle_mapping_access_refresh.py')
+        names+=('scripts/maintenance/workflow-oracle-s2-access-plan.json','scripts/maintenance/workflow_oracle_mapping_continuation.py','scripts/maintenance/workflow_oracle_mapping_continuity.py','scripts/maintenance/workflow_oracle_mapping_repeat.py','scripts/maintenance/workflow_oracle_mapping_access_refresh.py','scripts/maintenance/workflow_oracle_mapping_capacity.py')
     return {name: sha(ordinary(root/name).read_bytes()) for name in names}
 
 

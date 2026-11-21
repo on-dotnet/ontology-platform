@@ -474,4 +474,31 @@ class S2ConsumerTests(unittest.TestCase):
         self.assertIn('COMMIT; SELECT to_jsonb(g)',sql);self.assertEqual(sql.count('UPDATE governance."MappingAuthorizationGrants"'),1)
 
 
+class S2CapacityTests(unittest.TestCase):
+    def test_original_budget_program_and_global_bindings_remain_exact(self):
+        import workflow_oracle_mapping_capacity as capacity
+        capacity.validate_programs()
+        with patch.object(capacity,'GIB',capacity.GIB+1):
+            with self.assertRaisesRegex(ValueError,'CAPACITY_GLOBAL_BINDING_GIB'):capacity.validate_programs()
+        with patch.object(capacity,'run',side_effect=AssertionError('must not execute')):
+            with self.assertRaisesRegex(ValueError,'CAPACITY_GLOBAL_BINDING_run'):capacity.validate_programs()
+
+    def test_capacity_guard_rejects_budget_relaxation_and_double_credit(self):
+        import workflow_oracle_mapping_capacity as capacity
+        original=Path.read_bytes;path=Path(capacity.__file__);source=original(path)
+        for before,after in [(b'total<=40*GIB',b'total<=41*GIB'),
+                (b'host_start-=cache_release[',b'host-=cache_release['),
+                (b"reserved['newBuildEvidenceAndLogs'] = max(64*1024**2",b"reserved['newBuildEvidenceAndLogs'] = max(32*1024**2")]:
+            bad=source.replace(before,after);self.assertNotEqual(bad,source)
+            with self.subTest(change=after),patch.object(Path,'read_bytes',lambda p:bad if p==path else original(p)):
+                with self.assertRaisesRegex(ValueError,'CAPACITY_'):capacity.validate_programs()
+
+    def test_capacity_extension_is_product_only_before_resource_io(self):
+        import workflow_oracle_mapping_capacity as capacity
+        for phase in (None,'closed','s0-recovery-01','s2-s3-02'):
+            with self.subTest(phase=phase):
+                with self.assertRaisesRegex(ValueError,'CAPACITY_PRODUCT_ONLY'):
+                    capacity.before_product_source(ROOT,s.TASK,platform_stage=True,phase=phase)
+
+
 if __name__=='__main__':unittest.main()

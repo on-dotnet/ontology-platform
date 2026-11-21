@@ -116,3 +116,6 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 2026-11-21 当前源ACL失败短链修复：21项Connections生命周期测试通过；新固定FAILED租约恢复在随机隔离PG实测1/1、0skip且库/helper已删除。两原API 31fc0ef3…/7dac6ce7…正常退出并移除；固定query-4b9f97…经非作者新鲜证明重开后，真实命令56a20ab08e69402e8469f7c8c8362f4c完成仅两租约列TASK_LEVEL_RECOVERY，FAILED/fence2/失败审计保持。新连接37d113…/ba8667…已独立核对，仅新增一次准确维护审计；原250ms仍NOT_QUALIFIED。新API 26e72f80…/c45bfd75…采用新API/Query/Agent快照，五持卷容器与进程代次保持。
 
 当前owned_paths再明确：`workflow_oracle_mapping_access_refresh.py`、`workflow_oracle_access_maintenance.py/.cs.txt`、现有continuation/continuity/repeat/evidence/query准入与verification-gates登记、受影响S2/正常登录测试。历史前五槽仅按原2a2ea74提交的414文件input53bddbec…及原build/log/config字节重开；当前backend inpute8b537ed…不同，必须由新增双表healthy-relations真实短链补证。旧计划/索引不改，正式窗口仍使用原s2-s3-01-access-01后缀，旧latestQuery保持原绑定。回收仅本批公共feed重复副本和已结束构建中间件；原源码/原件/快照/私有材料及受保护资源保持，完整prepare状态不冒称当前READY。
+
+
+2026-11-21 当前容量短链：Oracle替代卷真实增长203277824B，原40GiB检查如实阻断在认证前。Master owned_paths追加 `workflow_oracle_mapping_capacity.py` 及当前resume/continuation/evidence/query消费者、S2测试与门禁登记。原resources/platform/window/execution审计依赖保持原字节；产品专用入口逐AST节点及全局绑定核对原算法，只从原host_start核销63个已删除公共feed副本254558208B，重现逐项撤销信用。当前host实测与总量不再重复扣除；40GiB/.75GiB/64MiB保留额不变。额外回收7个已独立复核有全局同hash原档的本树压缩副本160780288B，只影响实际du，展开内容/快照/私有材料保持；完整prepare仍NOT_CURRENT。原失败与资源增长事实保留，正常登录沿用户既有自动填写授权。

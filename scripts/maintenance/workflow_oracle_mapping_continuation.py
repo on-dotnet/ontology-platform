@@ -127,6 +127,10 @@ def compatible_prefix(archive,measured,mode,stage):
             from workflow_oracle_mapping_repeat import BRANCH as REPEAT_BRANCH
             require(right.count(REPEAT_BRANCH)==1,'S23_PREFIX_REPEAT_BRANCH')
             right=right.replace(REPEAT_BRANCH,'',1)
+        elif name.endswith('/workflow_oracle_mapping_resume.py'):
+            from workflow_oracle_mapping_capacity import ORIGINAL_CALL,PRODUCT_CALL
+            require(right.count(PRODUCT_CALL)==1 and PRODUCT_CALL not in left,'S23_PREFIX_CAPACITY_BRANCH')
+            right=right.replace(PRODUCT_CALL,ORIGINAL_CALL,1)
         elif name==e.DRIVER:
             right=right.replace('onProgress: event => oracleProgress({ ...event, mode }),\n          ...(shared?.plan?.planId === "s2-s3-01-access-01" ? { submit: omq.submitSystemLogin } : {}) });','onProgress: event => oracleProgress({ ...event, mode }) });')
             right=right.replace('(input.plan.planId === "s2-s3-01-access-01" ? omq.s2AccessPlan() : omq.s2Plan)','omq.s2Plan')

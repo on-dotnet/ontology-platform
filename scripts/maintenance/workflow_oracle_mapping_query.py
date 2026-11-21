@@ -33,6 +33,7 @@ def structural(root, task, phase):
         from workflow_oracle_mapping_s2_contract import frozen_plan
         frozen_plan(root)
         frozen_plan(root,"s2-s3-01-access-01")
+        consumers['scripts/maintenance/workflow_oracle_mapping_capacity.py']=['def validate_programs(', 'def baseline_cache_release(', 'host_start-=cache_release', 'CAPACITY_PRODUCT_ONLY']
         consumers['scripts/maintenance/workflow_oracle_mapping_access_refresh.py']=['def lifecycle(', 'def snapshot_builds(', 'def maintenance_result(', 'S23_REFRESH_CAS', 'S23_REFRESH_PRIVATE_MOUNT_DRIFT']
         consumers['scripts/maintenance/workflow_oracle_access_maintenance.py']=['def verify_seal(', 'def verify_prestate(', 'def recover(', 'S23_ACCESS_POST_ROW']
         consumers["scripts/maintenance/workflow_oracle_mapping_repeat.py"]=["def lifecycle(", "def graph_qualification(", "def close_basis(", "def second_segment("]

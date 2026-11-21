@@ -113,7 +113,8 @@ def running_roles():
 
 def admit(planned=()):
     active=running_roles()
-    return before_source(ROOT,TASK,platform_stage=True,phase=PRODUCT,running_roles=active,planned_roles=active|set(planned))
+    from workflow_oracle_mapping_capacity import before_product_source
+    return before_product_source(ROOT,TASK,platform_stage=True,phase=PRODUCT,running_roles=active,planned_roles=active|set(planned))
 
 
 def bound_build(target):
