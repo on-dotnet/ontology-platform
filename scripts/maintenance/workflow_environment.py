@@ -154,8 +154,87 @@ def run(command,root,home,projects,env,label,run_dir,timeout=180):
     return raw
 
 
+# 该布局只用于已完成正式 locked restore 的原树和内容键。
+ORACLE_WARM_KEY='d6d909b8cad6e0c13389a3323def278aa77870bbca92689ade15af303daafb43'
+ORACLE_RECLAIMED={
+    "cache-reclamation-161220a07b1d41568c3179577c1d218d.json": "28e905e5b1ee5e2b0d2f846f766b40aa320d68e4339ebb242f8183790cdfedfe",
+    "cache-reclamation-62e1eefafa614f97bfbc2388c53d3140.json": "147b7eeb738305dd61ecdb4b0060831994b6d05f026646258cfb822d1c938f57",
+    "cache-reclamation-b74a692c80d74d13a766334c9586d312.json": "754ec67c28c5392b1b968ff91b94427753bd3d36b32a3adf991bc5594918cc06",
+    "cache-reclamation-c158243e3fc145439b46e6df983316cc.json": "99b33e3f7bdb91975ad06201a601df9d302332963ddc73b64375226642bdac7a",
+    "cache-reclamation-e0a7b7e1510a4e47a4fc606fa35af880.json": "d443c21c3233b3af12f86ed21634d6fad641108ed3aae185dbe33166a848d429",
+    "cache-reclamation-e17ce7cdad82440194820f49d15db372.json": "574614a2fb6795a5f6bca582bfeeb12ae51b926942fc5c8b71d432a14c2bc3ca",
+    "cache-reclamation-e3df85251b2440c0a8d5b3865cc11b93.json": "d4e9f1896e026e2bd00613c863488a47f8ecfff00e68a202ebaec2dc2bcfdc20"
+}
+
+
+def restored_layout(root,home):
+    task='G4-ORACLE-MAPPING-QUERY-001'
+    if (home!=root/'artifacts/workflow'/task/'environment'/ORACLE_WARM_KEY or
+            digest(canonical([home.name,str(root)]))!='8b951d981c0ddf997960272bfb762ad8ff70a5859ed8470855e0111d9772613b'):
+        return {}
+    receipt=ordinary(home/'runs/3463d8ec1a64483989d9f2b531190dbb/receipt.json')
+    require(receipt.is_file(),'WARM_RESTORE_ORIGINAL_MISSING')
+    raw=receipt.read_bytes()
+    require(digest(raw)=='f313171378ae6921744c90136c87f9857856bf708265ce6a337015163b472e43','WARM_RESTORE_ORIGINAL')
+    original=json.loads(raw)
+    require(original['worktree']==str(root) and original['contentKey']==home.name and
+            json.loads(ordinary(home/'ready.json').read_bytes())['workspaceKey']==original['workspaceKey'],'WARM_RESTORE_SCOPE')
+    for project in original['assets']:
+        path=ordinary(root/Path(project['project']).parent/'obj/project.assets.json')
+        require(digest(path.read_bytes())==project['assetsSha256'],'WARM_PROJECT_ASSETS_DRIFT')
+    layout={}
+    for name,sha in ORACLE_RECLAIMED.items():
+        data=ordinary(home.parents[1]/'product-resume-01/s2-s3-01'/name).read_bytes()
+        require(digest(data)==sha,'WARM_RECLAMATION_ORIGINAL')
+        for item in json.loads(data)['before']['files']:
+            path=ordinary(item['path'])
+            require(path.is_relative_to(home) and path.suffix=='.nupkg' and path not in layout,'WARM_RECLAMATION_PATH')
+            layout[path]=item['sha256']
+    require(len(layout)==250,'WARM_RECLAMATION_SET')
+    return layout
+
+
+def reclaimed_archive(path,sha,layout):
+    if path not in layout:
+        return False
+    require(layout[path]==sha,'RECLAIMED_ARCHIVE_ID')
+    return not ordinary(path).exists()
+
+
+def archive_source(home,key,filename):
+    local=home.parents[1]/'artifact-cache'/filename
+    if key in ORACLE_ARCHIVES or key=='mysqlconnector/2.6.2':
+        return ordinary(local)
+    return ordinary(Path.home()/'.nuget/packages'/key/filename)
+
+
+def verify_restored_sdks(home,layout):
+    for name,(version,sha,content_hash) in SDK_ARCHIVES.items():
+        package=name.lower()
+        filename=f'{package}.{version}.nupkg'
+        target=home/'nuget-packages'/package/version
+        raw=ordinary(Path.home()/'.nuget/packages'/package/version/filename).read_bytes()
+        require(digest(raw)==sha,'SDK_ARCHIVE_DRIFT')
+        members=archive_payload(raw)
+        members[filename+'.sha512']=content_hash.encode()
+        members['.nupkg.metadata']=canonical(dict(version=2,contentHash=content_hash,source=str(home/'feed')))
+        if not reclaimed_archive(target/filename,sha,layout):
+            members[filename]=raw
+        require({str(p.relative_to(target)) for p in target.rglob('*') if ordinary(p).is_file()}==set(members),'SDK_MEMBER_SET')
+        require(all(ordinary(target/p).read_bytes()==value for p,value in members.items()),'SDK_MEMBER_DRIFT')
+
+
 def verify_assets(root,home,projects,packages,approved):
     """资产逐项目绑定本树/本缓存，所有实际包成员回绑已批准归档。"""
+    layout=restored_layout(root,home)
+    if layout:
+        verify_restored_sdks(home,layout)
+        expected_feed=set()
+        for key,row in approved.items():
+            filename=key.replace('/','.')+'.nupkg'
+            if not reclaimed_archive(home/'feed'/filename,row['archiveSha256'],layout):
+                expected_feed.add(filename)
+        require({ordinary(p).name for p in (home/'feed').iterdir()}==expected_feed,'WARM_FEED_MEMBER_SET')
     rows=[];checked=set()
     for project in projects:
         path=ordinary(root/Path(project['path']).parent/'obj/project.assets.json')
@@ -173,7 +252,9 @@ def verify_assets(root,home,projects,packages,approved):
             checked.add(key);name,version=key.split('/')
             target=ordinary(home/'nuget-packages'/entry['path'])
             require(target.is_relative_to(home/'nuget-packages'),'PACKAGE_BOUNDARY')
-            archive=home/'feed'/(name+'.'+version+'.nupkg');raw=ordinary(archive).read_bytes()
+            archive=home/'feed'/(name+'.'+version+'.nupkg')
+            source=archive_source(home,key,archive.name) if reclaimed_archive(archive,approved[key]['archiveSha256'],layout) else ordinary(archive)
+            raw=source.read_bytes()
             require(digest(raw)==approved[key]['archiveSha256'],'FEED_DRIFT')
             payload=archive_payload(raw)
             expected={k.casefold():v for k,v in payload.items()}
@@ -187,7 +268,10 @@ def verify_assets(root,home,projects,packages,approved):
                 if rel=='.nupkg.metadata':
                     metadata=json.loads(p.read_text());require(metadata['contentHash']==entry['sha512'] and metadata['source']==str(home/'feed'),'PACKAGE_METADATA');continue
                 require(rel.casefold() in expected and p.read_bytes()==expected[rel.casefold()],'PACKAGE_MEMBER_DRIFT_'+key+'_'+rel)
-            require(members==set(entry['files'])|{archive.name,'.nupkg.metadata'},'PACKAGE_MEMBER_SET')
+            required=set(entry['files'])|{archive.name,'.nupkg.metadata'}
+            if reclaimed_archive(target/archive.name,approved[key]['archiveSha256'],layout):
+                required.discard(archive.name)
+            require(members==required,'PACKAGE_MEMBER_SET')
         rows.append(dict(project=project['path'],assetsSha256=digest(path.read_bytes())))
     require(checked==set(packages),'SOLUTION_CLOSURE')
     return rows
@@ -406,15 +490,22 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
         require(p.is_file(),'LOCKED_ARCHIVE_MISSING_'+key)
         raw=p.read_bytes();require(digest(raw)==row['archiveSha256'],'LOCKED_ARCHIVE_DRIFT_'+key)
         raw_archives[p.name]=raw
+    layout=restored_layout(root,home)
+    if layout:
+        verify_assets(root,home,projects,packages,approved)
     sdk_payloads={}
     for name,(version,sha,content_hash) in SDK_ARCHIVES.items():
         archive=ordinary(source/name.lower()/version/(name.lower()+'.'+version+'.nupkg'))
         raw=archive.read_bytes();require(digest(raw)==sha,'SDK_ARCHIVE_DRIFT')
         payload=archive_payload(raw)
         payload.update({archive.name:raw,archive.name+'.sha512':content_hash.encode(),'.nupkg.metadata':canonical(dict(version=2,contentHash=content_hash,source=str(feed)))})
+        if reclaimed_archive(home/'nuget-packages'/name.lower()/version/archive.name,sha,layout):
+            del payload[archive.name]
         sdk_payloads[name]=(version,payload)
-    for name,raw in raw_archives.items():materialized+=materialize(feed/name,raw)
-    require({p.name for p in feed.iterdir()}==set(raw_archives),'EXTRA_FEED_MEMBER')
+    retained=raw_archives if not layout else {name:raw for name,raw in raw_archives.items()
+              if not reclaimed_archive(feed/name,digest(raw),layout)}
+    for name,raw in retained.items():materialized+=materialize(feed/name,raw)
+    require({p.name for p in feed.iterdir()}==set(retained),'EXTRA_FEED_MEMBER')
     for name,(version,payload) in sdk_payloads.items():
         target=home/'nuget-packages'/name.lower()/version
         for relative,data in payload.items():materialized+=materialize(target/relative,data)
@@ -423,7 +514,12 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
     materialized+=materialize(home/'offline-nuget.config',config)
     materialized+=materialize(home/'cli-home/.nuget/NuGet/NuGet.Config',config)
     # pnpm工具来自批准tar；不复制node_modules/旧路径、也不运行install。
-    pnpm=admission['pnpm'];raw=ordinary(pnpm['archive']).read_bytes()
+    pnpm=admission['pnpm']
+    archive=ordinary(pnpm['archive'])
+    if layout and not archive.is_file():
+        archive=ordinary(home.parents[1]/'artifact-cache'/'pnpm-11.28.8.tgz')
+        require(archive.is_file(),'WARM_PNPM_APPROVED_TARBALL_MISSING')
+    raw=archive.read_bytes()
     require('sha512-'+base64.b64encode(hashlib.sha512(raw).digest()).decode()==pnpm['integrity'],'PNPM_ARCHIVE_DRIFT')
     pnpm_files=set()
     with tarfile.open(fileobj=io.BytesIO(raw),mode='r:gz') as tar:
@@ -442,7 +538,7 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
         materialized+=materialize(root/'.tools/pythonlibs'/row['path'],data)
     require({str(p.relative_to(root/'.tools/pythonlibs')) for p in (root/'.tools/pythonlibs').rglob('*') if ordinary(p).is_file()}=={r['path'] for r in python_rows},'PYYAML_EXTRA_MEMBER')
     env['PYTHONPATH']=str(root/'.tools/pythonlibs')
-    if (home/'ready.json').exists():verify_assets(root,home,projects,packages,approved)
+    if not layout and (home/'ready.json').exists():verify_assets(root,home,projects,packages,approved)
     dotnet='/usr/local/share/dotnet/dotnet';node='/opt/homebrew/Cellar/node@24/24.22.1/bin/node'
     require(run([dotnet,'--version'],root,home,projects,env,'sdk-version',run_dir).decode().strip()=='10.0.402','SDK_VERSION')
     require(run([node,str(home/'pnpm/package/bin/pnpm.cjs'),'--version'],root,home,projects,env,'pnpm-version',run_dir).decode().strip()=='11.28.8','PNPM_VERSION')
@@ -480,7 +576,7 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
         web=prepare_web(root,home,admission,projects,env,run_dir,node)
     result=dict(schemaVersion=1,taskId=task,status='DEPENDENCIES_READY',**identity,worktree=str(root),
                 environmentDirectory=str(home),environment=env,runDirectory=str(run_dir),packages=len(packages),projects=len(projects),
-                downloads=0,sdkDownloads=0,materializedFiles=materialized,restoreCount=restores,assets=assets,sdkResolver=resolver,
+                restoredArchiveLayout=bool(layout),registeredArchiveCopies=len(layout),downloads=0,sdkDownloads=0,materializedFiles=materialized,restoreCount=restores,assets=assets,sdkResolver=resolver,
                 pnpmTool=str(home/'pnpm/package/bin/pnpm.cjs'),node=node,dotnet=dotnet,webDependencies=web,
                 docker='NOT_RUN: prepare performs no service creation',smoke='NOT_RUN',runtimeCredentialsCopied=0)
     materialize(previous,canonical(dict(**identity))+b'\n')

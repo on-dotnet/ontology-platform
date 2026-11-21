@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_PARTIAL_RUNTIME_PREPARE_BLOCKED_CHATGPT_REVIEW**。从 7b8fb590 续行，原树完成当前 reader 双表 seed、正式 DI 回滚审核、逐动作读取核验与十槽分发的离线修正。S1 PASS，S2 PARTIAL，S3 NOT_RUN。上轮父命令与 ABA 会话前置失败保留。七角色资源核算的余额不足以完成当前 prepare 或生成第一份新快照。access、A/C、S1、EC01 和旧源限于其已测输入。两份 Doris assessment 的存储原件仍未资格。AC03-B、Oracle S0 继续 BLOCKED，G4 PARTIAL。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
+唯一任务状态 **S2_PARTIAL_PREPARE_PNPM_ARCHIVE_BLOCKED_CHATGPT_REVIEW**。从 cd130d33 在同一树、同一批次续行。已复核同键 NuGet 闭包和原 Web 依赖绑定，七角色准入恢复到额度内。完整 prepare 在 pnpm 11.28.8 原归档处阻断，新构建后的产品阶段峰值尚待验证。S1 PASS、S2 PARTIAL、S3 NOT_RUN。已合格的 access、A/C、S1、EC01 和旧源限于其原输入。AC03-B、Oracle S0 继续 BLOCKED，G4 PARTIAL。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
 
 ## 执行身份与所有权
 

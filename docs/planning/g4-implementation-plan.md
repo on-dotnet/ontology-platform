@@ -1,6 +1,6 @@
 # G4当前能力与规划入口
 
-当前 main 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`。2026-11-19，Doris review-fix-02 经 ChatGPT ACCEPT / GO，RF-02 关闭，已精确集成并回读。[Doris 验收与历史恢复](../tasks/G4-DORIS-MAPPING-QUERY-001.md)。当前[Oracle 任务](../tasks/G4-ORACLE-MAPPING-QUERY-001.md)已实测正式取消晚于固定 SQL 的 EOF，S0 与 AC03-B 保持 BLOCKED。任务分支 product-resume-01 已取得 AC03-A/C、S1 和双表 access 的限定资格。本轮在原工作树修正当前查询与审核身份并完成定向回归。S2 为 PARTIAL，在途 ABA 尚缺实机证据。当前 prepare 的资源峰值未获准入，S3 为 NOT_RUN。G4 总体 **PARTIAL**。[S2/S3 当前交付](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
+当前 main 为 `5168f2c93ca226caa521a6dc4ac85439335274c4`。2026-11-19，Doris review-fix-02 经 ChatGPT ACCEPT / GO，RF-02 关闭，已精确集成并回读。[Doris 验收与历史恢复](../tasks/G4-DORIS-MAPPING-QUERY-001.md)。当前[Oracle 任务](../tasks/G4-ORACLE-MAPPING-QUERY-001.md)已实测正式取消晚于固定 SQL 的 EOF，S0 与 AC03-B 保持 BLOCKED。任务分支 product-resume-01 已取得 AC03-A/C、S1 和双表 access 的限定资格。本轮在原工作树修正当前查询与审核身份并完成定向回归。S2 为 PARTIAL，在途 ABA 尚缺实机证据。本轮同键缓存布局已给七角色准入腾出余量。完整 prepare 在 pnpm 11.28.8 原包校验处阻断，新构建后的阶段峰值待测，S3 为 NOT_RUN。G4 总体 **PARTIAL**。[S2/S3 当前交付](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
 
 ## 已合并能力与缺口
 

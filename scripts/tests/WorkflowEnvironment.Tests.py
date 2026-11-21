@@ -18,6 +18,44 @@ class EnvironmentTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'APPROVED_CURRENT_LOCK_CLOSURE'):
             m.approved_archives(ROOT, 'G4-M2-ORACLE-01', dict(packages, unexpected='unapproved'))
 
+    def test_pinned_workspace_missing_restore_receipt_fails_before_materializing(self):
+        from unittest.mock import patch
+        m=self.load()
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory).resolve()
+            home=root/'artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/environment'/m.ORACLE_WARM_KEY
+            self.assertEqual(m.restored_layout(root,home),{})
+            with patch.object(m,'digest',return_value='8b951d981c0ddf997960272bfb762ad8ff70a5859ed8470855e0111d9772613b'):
+                with self.assertRaisesRegex(ValueError,'WARM_RESTORE_ORIGINAL_MISSING'):
+                    m.restored_layout(root,home)
+            self.assertFalse(home.exists())
+
+    def test_reclaimed_archive_requires_registered_path_and_digest(self):
+        m=self.load()
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory).resolve()/'missing.nupkg'
+            key=m.digest(b'approved')
+            self.assertTrue(m.reclaimed_archive(path,key,{path:key}))
+            self.assertFalse(m.reclaimed_archive(path,key,{}))
+            with self.assertRaisesRegex(ValueError,'RECLAIMED_ARCHIVE_ID'):
+                m.reclaimed_archive(path,'a'*64,{path:key})
+            path.symlink_to(path.parent/'outside')
+            with self.assertRaisesRegex(ValueError,'LINK'):
+                m.reclaimed_archive(path,key,{path:key})
+
+    def test_relocated_index_only_accepts_the_original_locked_files(self):
+        spec=importlib.util.spec_from_file_location('web_cache',ROOT/'scripts/maintenance/workflow_web_cache.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        original=[dict(package=str(i),storeKey='lock',indexSha256='old',files=['a'],bins=[]) for i in range(391)]
+        current=[dict(row,indexSha256='new') for row in original]
+        pins=dict(versions=['0'],indexBlobHashes=['old'])
+        self.assertEqual(module.restored_index_rows(current,original,pins),original)
+        for field in ('files','bins','package','storeKey'):
+            with self.subTest(field=field),self.assertRaisesRegex(ValueError,'WARM_WEB_INDEX_CONTENT'):
+                module.restored_index_rows([dict(current[0],**{field:'changed'}),*current[1:]],original,pins)
+        with self.assertRaisesRegex(ValueError,'WARM_WEB_ADMISSION_INDEXES'):
+            module.restored_index_rows(current,original,dict(versions=['unknown'],indexBlobHashes=['old']))
+
     def test_environment_module_exists(self):
         self.assertTrue((ROOT/'scripts/maintenance/workflow_environment.py').is_file())
 

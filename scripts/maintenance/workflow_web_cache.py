@@ -154,15 +154,48 @@ def binding(root,rows,shims,links,adapter):
     return adapter.digest(adapter.canonical(dict(rows=rows,shims=shims,links=links,metadata=metadata)))
 
 
+def restored_index_rows(rows,original,admission):
+    """重开原始索引行，替换存储后仅编码摘要可变，更改文件、锁键或二进制声明均拒绝。"""
+    require(len(rows)==len(original)==391,'WARM_WEB_ROW_COUNT')
+    expected={'package','storeKey','indexSha256','files','bins'}
+    for previous,current in zip(original,rows,strict=True):
+        require(set(current)==set(previous)==expected and
+                all(current[k]==previous[k] for k in expected-{'indexSha256'}),'WARM_WEB_INDEX_CONTENT')
+    expected_indexes=dict(zip(admission['versions'],admission['indexBlobHashes'],strict=True))
+    require({item['package']:item['indexSha256'] for item in original if item['package'] in expected_indexes}==expected_indexes,'WARM_WEB_ADMISSION_INDEXES')
+    return original
+
+
 def prepare(root,home,admission,projects,env,run_dir,node,adapter):
     """只允许本任务从两个明确批准的同仓库现存候选迁移。"""
     require(home.parents[1].name in (TASK,'G4-ENG-DELIVERY-002','G4-M2-DORIS-01','G4-M2-ORACLE-01','G4-M3-MAPPING-001','G4-M4-QUERY-001','G4-M5-INTEGRATION-001','G4-DORIS-MAPPING-QUERY-001','G4-ORACLE-MAPPING-QUERY-001'),'TASK_ID')
     marker=adapter.web_marker(root,home,admission)
     store=adapter.ordinary(admission['playwrightAndAjv']['store'])
     copied=0
+    relocated=(not store.exists() and home.name==adapter.ORACLE_WARM_KEY and
+               home.parents[1].name=='G4-ORACLE-MAPPING-QUERY-001' and marker.is_file() and bool(adapter.restored_layout(root,home)))
+    relocation={}
+    if relocated:
+        store=adapter.ordinary(Path.home()/'Library/pnpm/store/v11/index.db')
+        require(store.is_file(),'WARM_WEB_STORE_MISSING')
+        store_digest=adapter.digest(store.read_bytes())
     if marker.exists():
         saved=json.loads(marker.read_text());require(saved['root']==str(root),'WEB_OLD_ROOT')
         rows,shims,links=inspect(root,store,node,adapter)
+        if relocated:
+            path=adapter.ordinary(Path.home()/'.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-26/web-cache-files.json')
+            data=path.read_bytes()
+            require(adapter.digest(data)=='fec5f0dc296535f8510e086370de3e6fbe9ac494715683721cdd24ef64f6beba','WARM_WEB_MANIFEST')
+            actual=adapter.digest(adapter.canonical(rows))
+            rows=restored_index_rows(rows,json.loads(data),admission['playwrightAndAjv'])
+            restored=adapter.ordinary(home/'runs/3463d8ec1a64483989d9f2b531190dbb/receipt.json').read_bytes()
+            require(adapter.digest(restored)=='f313171378ae6921744c90136c87f9857856bf708265ce6a337015163b472e43'
+                    and saved['source']==json.loads(restored)['webDependencies']['source'],'WARM_WEB_ORIGINAL_SOURCE')
+            require(adapter.digest(adapter.canonical(rows))==saved['source']['contentSha256'] and
+                    saved['binding']=='1c5fb6199beb880c263f8a466068c507034627e5bd0bdd1526e832fc5678f842','WARM_WEB_ORIGINAL_BINDING')
+            require(store_digest==adapter.digest(store.read_bytes()),'WARM_WEB_STORE_CHANGED')
+            relocation=dict(indexStore=str(store),indexSha256=store_digest,
+                            currentRowsSha256=actual,originalRowsSha256=saved['source']['contentSha256'])
         require(saved.get('binding')==binding(root,rows,shims,links,adapter),'WEB_TOPOLOGY_DRIFT')
         source_identity=saved['source']
     else:
@@ -211,4 +244,4 @@ def prepare(root,home,admission,projects,env,run_dir,node,adapter):
     adapter.materialize(run_dir/'web-dependency-check.txt',proc.stdout+proc.stderr)
     require(proc.returncode==0,'PNPM_DEPENDENCY_STATE_FAILED')
     adapter.materialize(marker,adapter.canonical(dict(root=str(root),source=source_identity,binding=binding(root,rows,shims,links,adapter)))+b'\n')
-    return dict(status='DEPENDENCIES_READY',packages=len(rows),materializedTrees=copied,download=0,install=0,restore=0,contentFiles=sum(len(row['files']) for row in rows),source=source_identity)
+    return dict(status='DEPENDENCIES_READY',packages=len(rows),materializedTrees=copied,download=0,install=0,restore=0,contentFiles=sum(len(row['files']) for row in rows),source=source_identity,**relocation)
