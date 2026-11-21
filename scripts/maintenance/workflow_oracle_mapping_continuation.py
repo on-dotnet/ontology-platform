@@ -81,6 +81,9 @@ def compatible_prefix(archive,measured,mode,stage):
             from workflow_oracle_mapping_continuity import BRANCH
             require(right.count(BRANCH)==1 and BRANCH not in left,'S23_PREFIX_GENERATION_BRANCH')
             right=right.replace(BRANCH,'',1)
+            from workflow_oracle_mapping_repeat import BRANCH as REPEAT_BRANCH
+            require(right.count(REPEAT_BRANCH)==1,'S23_PREFIX_REPEAT_BRANCH')
+            right=right.replace(REPEAT_BRANCH,'',1)
         elif name==e.DRIVER:
             right=right.replace('(input.plan.planId === "s2-s3-01-access-01" ? omq.s2AccessPlan() : omq.s2Plan)','omq.s2Plan')
         elif name.endswith('/workflow-oracle-query-fixture.mjs'):
@@ -169,7 +172,7 @@ def prepare_prefix(root,descriptor):
     require(projection['connectionId']==old['connectionId'] and projection['catalogSnapshotId']==old['catalogSnapshotId']
             and projection['mappingReceipt']==old['activation'] and latest['reportName'] in qualified['members'] and json.loads(_read(root,qualified['members'][latest['reportName']]['path']))==query
             and latest['queryId']==query['oracleCases'][2]['queryId'] and latest['resultHash']==query['oracleCases'][2]['sha256'],'S23_PREFIX_CURRENT_BINDING')
-    from workflow_oracle_mapping_continuity import lifecycle
+    from workflow_oracle_mapping_repeat import lifecycle
     current=p.runtime_binding();continuity=lifecycle(root,host,current)
     snapshot=s.source_snapshot();require(snapshot['rows']==query['independentSource']['rows'] and snapshot['hashes']==query['independentSource']['hashes'],'S23_PREFIX_CURRENT_SOURCE')
     observation=dict(taskId=TASK,runId=RUN,batch='s2-s3-01',planId=PLAN_ID,qualifiedPrefix=PREFIX,state=projection,host=current,source=snapshot,hostContinuity=continuity)
@@ -188,7 +191,7 @@ def reopen_prefix(root,stage,archive):
     require(ex.sha(raw)==ref['sha256'],'S23_PREFIX_OBSERVATION_HASH');obs=json.loads(raw)
     require((obs['taskId'],obs['runId'],obs['batch'],obs['planId'])==(TASK,RUN,'s2-s3-01',PLAN_ID) and obs['qualifiedPrefix']==PREFIX
             and stable_host(obs['host'])==stable_host(archive.dispatch['host']),'S23_PREFIX_OBSERVATION_SCOPE')
-    from workflow_oracle_mapping_continuity import lifecycle
+    from workflow_oracle_mapping_repeat import lifecycle
     lifecycle(root,host,obs['host'],obs['hostContinuity'],archive)
     host_observation(archive,obs['host'],build_binding(archive,'api',root),root)
     snapshot=obs['source'];require(snapshot['projectionVersion']==2 and snapshot['rows']==query['independentSource']['rows']

@@ -31,6 +31,7 @@ def structural(root, task, phase):
         from workflow_oracle_mapping_s2_contract import frozen_plan
         frozen_plan(root)
         frozen_plan(root,"s2-s3-01-access-01")
+        consumers["scripts/maintenance/workflow_oracle_mapping_repeat.py"]=["def lifecycle(", "def graph_qualification(", "def close_basis(", "def second_segment("]
         consumers["scripts/maintenance/workflow_oracle_mapping_continuity.py"]=["def graph_qualification(", "def lifecycle(", "S23_GRAPH_EXPECTED_SET", "S23_CONTINUITY_ORACLE_MOUNTS"]
         consumers["scripts/maintenance/workflow_oracle_mapping_continuation.py"]=["def run_access_suffix():", "prepare_prefix(root,stage['plan']['qualifiedPrefix'])", "p.audit_window(", "def reopen_prefix("]
         consumers['scripts/maintenance/workflow-m4-query.mjs']=['await s2.run(', 'oracleTwoTable', 'omq.s2Plan', 'omq.s2AccessPlan()']

@@ -104,3 +104,5 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 2026-11-21用户明确刚不在电脑旁，授权从70c94502a2bfbb0a306ccf599403a75fceeb61b1再次600秒正常认证。同批/原后缀计划继续，既有原件复用。上次收尾后同五数据实例启动，按同构建/配方创建两API；前缀衔接只允许真实登记的进程代次及无状态API ID变化，固定数据容器/镜像/卷/网络/端口/快照/构建/relay/compose仍逐项一致。当前宿主继续完整真实检查，观察与新父身份仍严格相等；旧前缀和源审计原件不改。
 
 本次最终认证窗短链 owned_paths 追加 workflow_oracle_mapping_continuity.py、recovery.require_current_fuseki 单个新代次分支及现有 evidence/门禁登记。独立预期验证旧全集和正式发布词汇四声明；冻结检查点与失败启动原件不变。正常停止/新启动、API准确删除/创建及完整Oracle挂载均消费实际命令；不重建数据或放宽源审计。
+
+2026-11-21 10:02用户因仍未在屏幕前，再授权一次600秒正常认证。同批原后缀继续，上一父654eaf461bec4c00b9cf618bf0a93211认证0/4、产品未资格原件保留；关闭补证348c1f...保留原磁盘后验失败与Fuseki clean未知。Master owned_paths追加workflow_oracle_mapping_repeat.py，固定第二段宿主代次边；第一段常量和证据原样保留。只新读本代完整图库、Published源码与真实停启链，不恢复数据。两个同任务公共feed副本已按非作者审查回收，运行四构建/快照不变；完整prepare不再声称当前READY，下次须从现存同hash原件零下载物化。

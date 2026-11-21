@@ -524,6 +524,10 @@ def require_current_fuseki(cid,started,pid):
             matches.append(row)
     require(len(matches)==1,'TDB_PRODUCT_GENERATION')
     row=matches[0]
+    if cid=='52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6' and (started,pid)==('2026-11-21T02:11:57.323985554Z', 27834) and row.get('productUse')=='AWAITING_CURRENT_GRAPH_QUALIFICATION':
+        from workflow_oracle_mapping_repeat import graph_qualification
+        graph_qualification(platform.ROOT,cid,started,pid)
+        return row['attempt']
     if cid=='52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6' and (started,pid)==('2026-11-21T01:19:10.950405047Z',94067) and row.get('productUse')=='BLOCKED' and row.get('reason')=='ORACLE_ADMISSION_TDB_CURRENT_SCAN':
         from workflow_oracle_mapping_continuity import graph_qualification
         graph_qualification(platform.ROOT,cid,started,pid)

@@ -253,6 +253,20 @@ class S2ContinuationTests(unittest.TestCase):
             for cid,stamp,pid in [('0'*64,*n.GENERATION),(n.FUSEKI,'2026-11-21T01:20:00Z',n.GENERATION[1]),(n.FUSEKI,n.GENERATION[0],1)]:
                 with self.assertRaisesRegex(ValueError,'S23_GRAPH_GENERATION'):n.graph_qualification(ROOT,cid,stamp,pid)
 
+    def test_repeat_preserves_first_generation_consumer(self):
+        import workflow_oracle_mapping_repeat as n
+        previous={'original':'unchanged'};current={'services':{'fuseki':dict(startedAt=n.c.GENERATION[0],pid=n.c.GENERATION[1])}}
+        with patch.object(n.c,'lifecycle',return_value={'first':'original'}) as original:
+            self.assertEqual(n.lifecycle(ROOT,previous,current),{'first':'original'})
+            original.assert_called_once_with(ROOT,previous,current,None,None)
+
+    def test_repeat_rejects_unknown_generation_before_reading(self):
+        import workflow_oracle_mapping_repeat as n
+        current={'services':{'fuseki':dict(startedAt='2099-01-01T00:00:00Z',pid=1)}}
+        with patch.object(n,'raw',side_effect=AssertionError('must reject before reading')):
+            with self.assertRaisesRegex(ValueError,'S23_REPEAT_CURRENT_GENERATION'):n.lifecycle(ROOT,{},current)
+            with self.assertRaisesRegex(ValueError,'S23_REPEAT_GRAPH_GENERATION'):n.graph_qualification(ROOT,n.c.FUSEKI,'2099-01-01T00:00:00Z',1)
+
     def test_grant_order_does_not_hide_value_or_microsecond_differences(self):
         row=grant(state(),'reader','data.query.execute','id')
         row['RevokedAtUtc']='2026-11-20T00:00:00.123450+00:00'
