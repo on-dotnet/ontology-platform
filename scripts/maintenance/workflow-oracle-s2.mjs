@@ -524,7 +524,12 @@ async function access(ctx) {
   const acl=call("access_case","revoke-read");
   try {
     await execute("source-acl",q,reader,0);
-    await audit("source-acl-restore-denied",()=>request(reader,"GET","/api/v1/data/semantic-queries/"+state.latestQuery.queryId+"/result",undefined,[403,503]),0);
+    await audit("source-acl-restore-denied",async()=>{
+      const path="/api/v1/data/semantic-queries/"+state.latestQuery.queryId+"/result";
+      const reply=await request(reader,"GET",path,undefined,503);
+      check("oracle_source_acl_restore_error",reply.data?.code==="query_source_unavailable");
+      report.deniedSourceRestore={path,status:reply.status,raw:reply.raw,sha256:hash(reply.raw)};
+    },0);
   }finally{report.sourceAcl={changed:acl,restored:call("access_case","restore-read",acl.token)};}
   if(shared.plan.planId==="s2-s3-01-access-01") {
     report.sourceCleanup=omq.platform(root,"__import__('workflow_oracle_mapping_acl_observation').collect(json.load(sys.stdin))",report,shared.stageDeadline);

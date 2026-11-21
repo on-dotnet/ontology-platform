@@ -77,6 +77,8 @@ def lifecycle(root, previous, current, proof=None, archive=None):
     from workflow_oracle_mapping_continuation import PREFIX
     import copy
     import subprocess
+    if current['snapshotId'] == '9791322703a1b516254694cf93b7346410df012f005287044986ab1fe602ccd7':
+        return restored_access_host(root,previous,current,proof,archive)
     if current['snapshotId'] != CURRENT:
         from workflow_oracle_mapping_repeat import lifecycle as history
         return history(root, previous, current, proof, archive)
@@ -136,31 +138,7 @@ def lifecycle(root, previous, current, proof=None, archive=None):
             comparable_rows[role][key]=newrow[key]
             if role!='oracle':comparable_host['services'][role][key]=newrow[key]
     refresh.compare_hosts(root,comparable_host,current,comparable_rows,newrows,builds)
-    # 原compose必须完整重开，只有三处程序集目录可更替。
-    recipes=[]
-    for side,host in enumerate((middle,current)):
-        path=AREA/('formal-api-compose-'+host['composeSha256']+'.json')
-        if not (root/path).exists():path=AREA/'formal-api-compose.json'
-        recipe_bytes=c.raw(root,path,archive);require(ex.sha(recipe_bytes)==host['composeSha256'],'S23_REFRESH_COMPOSE_HASH');spec=json.loads(recipe_bytes)
-        for role,service in spec['services'].items():
-            expected={'/app':'api',**({'/session-tests':'agent','/query-tests':'query'} if role=='api-secondary' else {})}
-            for destination,target in expected.items():
-                old=str(root/builds[side][target]['directory'])+':'+destination+':ro'
-                require(service['volumes'].count(old)==1,'S23_REFRESH_COMPOSE_MOUNT');service['volumes'][service['volumes'].index(old)]='VERIFIED_'+target+':'+destination+':ro'
-        recipes.append(spec)
-    require(recipes[0]==recipes[1],'S23_REFRESH_COMPOSE_DRIFT')
-    # 精确资源清单除API身份和构建字段外不变。
-    manifests=[]
-    for side,host in enumerate((middle,current)):
-        digest=host['resourceManifestSha256'];manifest_bytes=c.raw(root,AREA/('formal-resources-'+digest+'.json'),archive);require(ex.sha(manifest_bytes)==digest,'S23_REFRESH_MANIFEST_HASH');value=json.loads(manifest_bytes)
-        require(value['ids']=={k:v['containerId'] for k,v in (oldrows if host is middle else newrows).items()},'S23_REFRESH_MANIFEST_IDS')
-        require(value['snapshotId']==host['snapshotId'] and value['apiBuildId']==builds[side]['api']['commandId'] and value['buildOutputKey']==host['buildOutputKey']
-            and value['inputsSha256']==ex.sha(refresh.bound_inputs(root,host,archive,return_bytes=True)),'S23_REFRESH_MANIFEST_BUILD')
-        for key in ('snapshotId','apiBuildId','buildOutputKey','inputsSha256','admission'):value.pop(key)
-        for role in ('api','api-secondary'):value['ids'].pop(role)
-        manifests.append(value)
-    require(manifests[0]==manifests[1],'S23_REFRESH_MANIFEST_DRIFT')
-
+    compare_definitions(root,middle,current,oldrows,newrows,builds,archive)
     recovered=pinned(root,MAINTENANCE,'f8fe5d7f6b318a3ddbc264fbf834bf64b5d8ce5f18b2e8e7847bfa1a862f5aa3',archive)
     require(recovered['status']=='TASK_LEVEL_RECOVERY' and recovered['post']['owner'] is None
             and recovered['post']['leaseUntilUtc'] is None and recovered['post']['status']=='FAILED' and recovered['post']['fence']==2,'ACL_LEASE_CAS')
@@ -192,4 +170,92 @@ COMMANDS = {
     "platform-pg:stopped": "dcc2f03318eb4e8689c00e3e84432837",
     "rustfs:data-start": "5043cf16587642fe960383116d2beb35",
     "rustfs:stopped": "b7d960e6fb1c4e759bef25a1e10fa613"
+}
+
+
+def compare_definitions(root,middle,current,oldrows,newrows,builds,archive):
+    import workflow_oracle_mapping_access_refresh as refresh
+    # 原compose必须完整重开，只有三处程序集目录可更替。
+    recipes=[]
+    for side,host in enumerate((middle,current)):
+        path=AREA/('formal-api-compose-'+host['composeSha256']+'.json')
+        if not (root/path).exists():path=AREA/'formal-api-compose.json'
+        recipe_bytes=c.raw(root,path,archive);require(ex.sha(recipe_bytes)==host['composeSha256'],'S23_REFRESH_COMPOSE_HASH');spec=json.loads(recipe_bytes)
+        for role,service in spec['services'].items():
+            expected={'/app':'api',**({'/session-tests':'agent','/query-tests':'query'} if role=='api-secondary' else {})}
+            for destination,target in expected.items():
+                old=str(root/builds[side][target]['directory'])+':'+destination+':ro'
+                require(service['volumes'].count(old)==1,'S23_REFRESH_COMPOSE_MOUNT');service['volumes'][service['volumes'].index(old)]='VERIFIED_'+target+':'+destination+':ro'
+        recipes.append(spec)
+    require(recipes[0]==recipes[1],'S23_REFRESH_COMPOSE_DRIFT')
+    # 精确资源清单除API身份和构建字段外不变。
+    manifests=[]
+    for side,host in enumerate((middle,current)):
+        digest=host['resourceManifestSha256'];manifest_bytes=c.raw(root,AREA/('formal-resources-'+digest+'.json'),archive);require(ex.sha(manifest_bytes)==digest,'S23_REFRESH_MANIFEST_HASH');value=json.loads(manifest_bytes)
+        require(value['ids']=={k:v['containerId'] for k,v in (oldrows if host is middle else newrows).items()},'S23_REFRESH_MANIFEST_IDS')
+        require(value['snapshotId']==host['snapshotId'] and value['apiBuildId']==builds[side]['api']['commandId'] and value['buildOutputKey']==host['buildOutputKey']
+            and value['inputsSha256']==ex.sha(refresh.bound_inputs(root,host,archive,return_bytes=True)),'S23_REFRESH_MANIFEST_BUILD')
+        for key in ('snapshotId','apiBuildId','buildOutputKey','inputsSha256','admission'):value.pop(key)
+        for role in ('api','api-secondary'):value['ids'].pop(role)
+        manifests.append(value)
+    require(manifests[0]==manifests[1],'S23_REFRESH_MANIFEST_DRIFT')
+
+
+def restored_access_host(root,previous,current,proof=None,archive=None):
+    """保持五个已运行数据进程，核历史恢复错误修正后的两 API 和新的实际构建。"""
+    import workflow_oracle_mapping_access_refresh as refresh
+    from workflow_oracle_mapping_evidence import utc,stable_host
+    cid='c9a0458559de4934a530dcbcc9ca74a4'
+    failed=pinned(root,AREA/('formal-run-s2-s3-oracle-'+cid+'.json'),'dd333f8b651559657177ad6a30cbf69fa4fe310e03efed2ecc11868bc5cc667b',archive)
+    parent=pinned(root,Path('artifacts/workflow')/TASK/'commands'/RUN/cid/'receipt.json','91786c37d3ce97d936e8f89f1c3a21f9894d702466b029090970d691c334e132',archive)
+    middle=failed['host'];ref=failed['stageInputs']['qualifiedPrefix']
+    observed=pinned(root,AREA/'s2-s3-01'/ref['file'],'7dbb2df2d01029c6b7a61e0d16d4b0990701e647a0f58161ccc2c53d14111fb6',archive)
+    require(stable_host(observed['host'])==stable_host(middle) and middle['snapshotId']==CURRENT
+            and parent['exitCode']==failed['exitCode']==1 and failed['testedCommit']=='319e7cfe7dc6c9351ced63fbdd7c799640b31411','ACL_RESTORE_FAILED_PARENT')
+    prior=lifecycle(root,previous,middle,observed['hostContinuity'],archive)
+    oldreceipt,oldrows=refresh.observed_rows(root,middle,archive);newreceipt,newrows=refresh.observed_rows(root,current,archive)
+    builds=[refresh.snapshot_builds(root,host,archive) for host in (middle,current)]
+    require(current['buildInputKey']=='8fed359384cb38c7bebef568109778e76974027d894da821abd59362663582f9','ACL_RESTORE_BUILD')
+    refresh.compare_hosts(root,middle,current,oldrows,newrows,builds)
+    compare_definitions(root,middle,current,oldrows,newrows,builds,archive)
+    lower=utc(parent['endedAtUtc']);upper=utc(newreceipt['startedAtUtc'])
+    require(utc(oldreceipt['endedAtUtc'])<=lower<upper,'ACL_RESTORE_ORDER')
+    reopened={}
+    for role in ('api','api-secondary'):
+        end=lower
+        for kind in ('term','exit','remove','absent','api-create','api-id','api-start'):
+            resource=(oldrows if kind in ('term','exit','remove','absent') else newrows)[role]['containerId']
+            label=role+':'+kind;command_id=REFRESH_COMMANDS[label]
+            if kind in ('term','exit'):
+                args=['stop','--signal','TERM','--timeout','-1',resource] if kind=='term' else ['inspect','-f','{{.State.Status}} {{.State.ExitCode}} {{.State.OOMKilled}}',resource]
+                rec,out,_=c.command(root,command_id,RUN,['docker','--context','desktop-linux',*args],'resume-api-'+kind,ex.sha(ex.encoded(args)),45 if kind=='term' else 30,archive)
+            else:rec,out,_=c.lifecycle_command(root,command_id,role,resource,kind,archive)
+            require(end<=utc(rec['startedAtUtc'])<=utc(rec['endedAtUtc'])<=upper,'ACL_RESTORE_API_ORDER')
+            if kind=='exit':require(out.strip() in (b'exited 0 false',b'exited 143 false'),'ACL_RESTORE_API_EXIT')
+            elif kind=='absent':require(not out.strip(),'ACL_RESTORE_API_ABSENCE')
+            elif kind!='api-create':require(out.decode().strip()==resource,'ACL_RESTORE_API_ID')
+            if kind=='api-start':require(utc(rec['startedAtUtc'])<=utc(newrows[role]['startedAt'])<=utc(rec['endedAtUtc']),'ACL_RESTORE_API_START')
+            end=utc(rec['endedAtUtc']);reopened[label]=command_id
+    diag=pinned(root,AREA/'s2-s3-01/lease-3e6-c9a-window-diagnostic.json','dc34e6897c5fe4c41ffbfb1bd699160b6711bb85cf1a3d4e04e84a92fb6ac805',archive)
+    require(diag['parent']==cid and diag['restoreStatus']==500 and diag['actualRow'][1:4]==['COMPLETED',None,None] and diag['sourceSessions']==0,'ACL_RESTORE_PRIOR_OUTCOME')
+    result=dict(status='SAME_FIVE_DATA_PROCESSES_AND_REBOUND_API',prior=prior,failedParent=cid,commands=reopened,builds=builds)
+    require(proof is None or proof==result,'ACL_RESTORE_PROOF')
+    return result
+
+
+REFRESH_COMMANDS = {
+    "api-secondary:absent": "d39fc36abd4a4a0f89e23d8e3fb2de51",
+    "api-secondary:api-create": "64f577e9382b4f78b0264cfd56afda4d",
+    "api-secondary:api-id": "56d0af39b3ab4cfd97c7622479d8210b",
+    "api-secondary:api-start": "969ec68091f44555b98e6846177023e6",
+    "api-secondary:exit": "8eca68e1eebf4e4fada1753ba709edec",
+    "api-secondary:remove": "6c2d239459ac48a08dcbe41e527c791d",
+    "api-secondary:term": "94c5228dd1eb4d268370497c253db035",
+    "api:absent": "9322a468e2ad49d1b2ad07b5728ca668",
+    "api:api-create": "440caf66ec594a32b119e0aa817cb489",
+    "api:api-id": "8248e6b048e946b782f6e1877120d2f1",
+    "api:api-start": "df9b6c56a4744465bb70d7be869eeca8",
+    "api:exit": "42e7d0eb711a431ab7642e7c37f6e713",
+    "api:remove": "ffea058b611c4671bd650864f5547d6c",
+    "api:term": "f074287b6ec54e609818aa514fa0f119"
 }

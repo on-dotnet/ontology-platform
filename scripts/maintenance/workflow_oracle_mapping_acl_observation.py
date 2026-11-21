@@ -68,6 +68,12 @@ def qualify(report, value):
     windows = [w['name'] for w in report['oracleWindows']]
     require(windows[:4]==['oracle-current-api-readiness','oracle-current-catalog-readiness','source-acl','source-acl-restore-denied']
             and not report['oracleWindows'][2]['audit']['records'],'ACL_CHECK_FIRST')
+    denied=report['deniedSourceRestore']
+    require(denied['path']=='/api/v1/data/semantic-queries/'+report['catalogReadiness']['queryId']+'/result'
+            and denied['status']==503 and json.loads(denied['raw'])['code']=='query_source_unavailable'
+            and denied['sha256']==ex.sha(denied['raw'].encode()) and not report['oracleWindows'][3]['audit']['records']
+            and any(h['method']=='GET' and h['path']==denied['path'] and h['status']==503 and h.get('code')=='query_source_unavailable'
+                    and h['sha256']==denied['sha256'] and 0<h['elapsedMs']<=5000 for h in report['http']), 'ACL_RESTORE_DENIAL')
     pair=report['sourceAcl']
     healthy=[['CaseOwner','OmqTarget','READ','NO'],['PRODUCTION','OMQ_ENTITY','READ','NO']]
     require([pair[action][when]['rows'] for action in ('changed','restored') for when in ('before','after')]==[healthy,healthy[1:],healthy[1:],healthy], 'ACL_EXACT_RESTORATION')

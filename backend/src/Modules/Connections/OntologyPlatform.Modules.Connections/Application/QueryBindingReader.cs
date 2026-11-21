@@ -109,8 +109,18 @@ public sealed class QueryBindingReader : IG4QueryBindingReader, IG4SourceQueryRe
             await DorisMappingSourceValidator.ObserveAsync(doris, d.Profile, cipher.Decrypt(secret), context.OriginalCatalog, context.CurrentCatalog,
                 context.Manifest.Mapping, context.Scope, false, deadlineAtUtc, cancellationToken);
         else if (config is OracleConnectionConfig o && oracle is not null)
-            await OracleMappingSourceValidator.ObserveAsync(oracle, o.Profile, cipher.Decrypt(secret), context.OriginalCatalog, context.CurrentCatalog,
-                context.Manifest.Mapping, context.Scope, false, deadlineAtUtc, cancellationToken);
+        {
+            try
+            {
+                await OracleMappingSourceValidator.ObserveAsync(oracle, o.Profile, cipher.Decrypt(secret), context.OriginalCatalog, context.CurrentCatalog,
+                    context.Manifest.Mapping, context.Scope, false, deadlineAtUtc, cancellationToken);
+            }
+            catch (PgSourceException failure) when (failure.Code == "connection_readonly_unverified")
+            {
+                // 读取历史结果前无法证明当前源权限时，返回查询合同的固定错误并阻止读取结果。
+                throw new SemanticOperationException(503, "query_source_unavailable");
+            }
+        }
         else throw Forbidden();
         return new G4QueryConnectionAccess { ConnectionId = connection.Id, Revision = connection.Revision, ConfigHash = connection.ConfigHash,
             SecretVersion = connection.SecretVersion, Scope = context.Scope, Projection = projection, CheckedAtUtc = clock.GetUtcNow() };

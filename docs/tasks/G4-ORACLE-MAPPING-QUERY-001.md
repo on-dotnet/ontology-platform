@@ -133,3 +133,5 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 本次 owned_paths 包括既有 OracleSourceAdapter.Sql.cs、OracleSourceAdapter.Mapping.cs、OracleAdapterTests.cs、产品原生停止入口及前缀消费者。只读证明的完整单行阻断结果现能到达明确拒绝路径。修正编译及 35 项 Oracle 定向测试通过，含非整数计数拒绝；该修正尚无新产品窗实测。两个 API 已移除，五个持久副本进程已停，旧受保护资源及最后失败行 KEEP。原单行维护程序准确绑定到此前查询。另行处置本次失败行及重新实机验收由 ChatGPT 集中复审。三份公开文件见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。
 
 本次维护目标仅为最后失败窗口的 `query-3e6bb50bdffe43feaa09736718b1dcb0`。沿现有 SemanticQuery 准确行两列 CAS 和治理同事务审计、原生启动/停机、有界平台访问及真实消费者。维护从已核关闭状态起步。原失败与 AC03-B 不得提升。Master 单写此目标的执行入口、原窗口驱动、消费者和三份交付。
+
+源撤权查询在候选 319e7cfe 上实测为 UNAVAILABLE，物理释放得到确认、租约两列为空。原父 c9a0458559de4934a530dcbcc9ca74a4 的旧结果恢复返回 HTTP 500。当前原路径补 QueryBindingReader.cs 对 Oracle 只读证明拒绝的正式错误映射，沿原范围复核随后短链。
