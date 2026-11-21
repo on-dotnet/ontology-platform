@@ -286,7 +286,7 @@ def resumed_host(previous,current):
 
 
 def qualified_access(root,archive=None):
-    """按冻结索引逐件核验既有 access 原件，包括唯一发生位置迁移的资源清单。"""
+    """按冻结索引逐件核验既有 access 原件，包括已迁移至内容键副本的正式资源、构建与日志。"""
     ref=REUSED_ACCESS;cid=ref['commandId'];base=Path('artifacts/workflow')/TASK/RUN
     raw=_read(root,base/'s2-s3-01'/('access-qualification-'+cid+'.json'),archive)
     require(ex.sha(raw)==ref['qualificationSha256'],'S23_ACCESS_QUALIFICATION_BYTES')
@@ -297,7 +297,8 @@ def qualified_access(root,archive=None):
     for name,member in members.items():
         path=Path(member['path'])
         mutable = ((path.parent==base and path.name in ('formal-resources.json','formal-api-inputs.json','formal-api-compose.json'))
-                   or (path.parent==base.parent and path.name in BUILD_ORIGINALS))
+                   or (path.parent==base.parent and (path.name in BUILD_ORIGINALS
+                                                    or path.name in ('query-build-binding.json','query-bound-build.txt'))))
         if mutable:
             backup=path.with_name(path.stem+'-'+member['sha256']+path.suffix)
             if (root/backup).is_file():path=backup
