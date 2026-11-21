@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_PARTIAL_PREPARE_PNPM_ARCHIVE_BLOCKED_CHATGPT_REVIEW**。从 cd130d33 在同一树、同一批次续行。已复核同键 NuGet 闭包和原 Web 依赖绑定，七角色准入恢复到额度内。完整 prepare 在 pnpm 11.28.8 原归档处阻断，新构建后的产品阶段峰值尚待验证。S1 PASS、S2 PARTIAL、S3 NOT_RUN。已合格的 access、A/C、S1、EC01 和旧源限于其原输入。AC03-B、Oracle S0 继续 BLOCKED，G4 PARTIAL。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
+唯一任务状态 **S2_PARTIAL_RUNTIME_DISK_PEAK_UNQUALIFIED_CHATGPT_REVIEW**。从 4be3453b 沿原树、原批次取得唯一批准的 pnpm 原包。同键完整 prepare 三次成功，三构建及快照已核验。十槽热态阶段的 40 GiB 余量仍未获证，实际执行 0/10。S1 PASS、S2 PARTIAL、S3 NOT_RUN、G4 PARTIAL。access、A/C、EC01 与旧源按原输入复用。AC03-B、Oracle S0 继续 BLOCKED。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
 
 ## 执行身份与所有权
 

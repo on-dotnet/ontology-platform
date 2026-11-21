@@ -2,63 +2,93 @@
   "taskId": "G4-ORACLE-MAPPING-QUERY-001",
   "runId": "product-resume-01",
   "batch": "s2-s3-01",
-  "reviewedCode": "95434cdda4c2728bec42924e18710858bb52218c",
-  "baseline": "cd130d337480997a105fe1497dde9e0cdb464fca",
+  "baseline": "4be3453ba9ef8fef5f001d3d2b81268400e63fc7",
+  "reviewedCode": "874b9eccb26eb7c69b13addfc2e9d579af8d6e41",
   "conclusion": "PARTIAL_HANDOFF",
-  "state": "S2_PARTIAL_PREPARE_PNPM_ARCHIVE_BLOCKED_CHATGPT_REVIEW",
+  "state": "S2_PARTIAL_RUNTIME_DISK_PEAK_UNQUALIFIED_CHATGPT_REVIEW",
+  "acceptedPrevious": {
+    "commit": "4be3453ba9ef8fef5f001d3d2b81268400e63fc7",
+    "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/non-author-review.json",
+    "sizeBytes": 3157,
+    "sha256": "6d7f5352c9d088892b5f07c8711c7f579954a1fa31ac38091edaa022fb498567"
+  },
   "reviewers": [
     {
       "reviewer": "/root/review",
-      "result": "工程修正通过，完整 prepare 缺冻结原包。",
+      "conclusion": "官方 tar 与 454 个成员相符，三个实际 build、快照与正式 prepare 均可重开。",
       "verified": [
-        "准确工作区缺历史 restore 回执时在归档物化前终止，其他工作区采用原入口。",
-        "完整 Web 来源五字段篡改及新增字段共六个反例均被拒绝。",
-        "21 项目、179 包、2 SDK、250 登记路径。109 个 XML 的 SHA、模式、时间、单链接及实占均核对。",
-        "原包和标准本地缓存、22 份项目 ZIP 的 27,229 个文件名均未定位批准 tar。454 个展开文件均匹配，独立本机复原尝试未命中冻结 SRI。"
-      ]
-    },
-    {
-      "reviewer": "/root/admission",
-      "result": "只读重开历史 Web 391 行并核当前绑定，七角色峰值须以新实机为准。",
-      "verified": [
-        "Library 中 391 个索引编码摘要不同。锁键、命名、26,176 个文件及 bin 声明逐行相符。",
-        "原四个特定包索引身份、当前 109 个 shim 与 1,283 条链接可重建原绑定。"
+        "原包 SRI、SHA-256，字节总计 5,790,389。首次 prepare 退出 2。两次原始成功命令及 runs/receipt 均为零下载/恢复/物化。",
+        "3 个 build 命令的双流、输入绑定和各自 99/222/222 个快照文件逐字复核。",
+        "在工程 Head 重开 c96331a8 对应的正式 prepare（完整 ID 见下方命令），两端合计 86 个资源命令；7 个离散宿主样本。暖态保留 12 文件、3,301,376 B，最后一次准入余额 73,072,194 B。"
+      ],
+      "proofs": [
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c96331a803fd48e9a8d85e89ceb89294/receipt.json",
+          "sizeBytes": 1488,
+          "sha256": "938a06074ee3f0ee3006db47647c9b589128901211acbc687b2b4c865f0b5787"
+        },
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-3a9b10d7792e42b89373b37d35d23884.json",
+          "sizeBytes": 44611,
+          "sha256": "e5d24c97a9dda589be223fec9e39d634e6f4a41445a9b9cbd38e1134d72acf42"
+        },
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-8d92aed4eb104129a0ce9c7a229aa9dc.json",
+          "sizeBytes": 44611,
+          "sha256": "728c4ec7372fd9d2b8ecd3aaeeb2af006f6f0e0a6876dd72f0415091bdf65a49"
+        }
       ]
     },
     {
       "reviewer": "/root/archive",
-      "result": "离线重开五槽与 access，并核十槽的实际分发和维护条件。",
+      "conclusion": "五槽和 access 均在缓存更新后重开。旧 access 产品资格按原输入 REUSED。",
       "verified": [
-        "旧五槽 CASE_QUALIFIED，当前 684 项，access 1,236 件，prepare 脚本变更不改变两者的旧输入资格。",
-        "新服务代次的发布图、停启证据、组合授权 TTL 仍须实际读取和资格核验。"
+        "刷新后最初两份 Query 历史构建原件在 S23_ACCESS_MEMBER_BYTES 处拒绝；既存两份完整内容键副本均已确认。",
+        "工程修正后实际 qualified_access(root, archive) 共 1,237 条登记，含 1,236 件成员，12,710,185 B。两份各自等长翻转与各自隐藏，四个反例均遭拒。",
+        "旧父宿主的七角色、三快照与前代停启链只读复核通过。当前代次须在正式运行状态另验。"
+      ],
+      "proofs": [
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c90b898d82e6459e937596ca59f64d7b/stdout.txt",
+          "sizeBytes": 436,
+          "sha256": "7bdcb4b312be8912ef9f21d583f87c2b9d99e45f6f6b5cfda90edfe5fcf9526f"
+        },
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/query-build-binding-ea6f2fad9044836de595267d5512a29840a0f3e0db396324a7afba4ad9b148b3.json",
+          "sizeBytes": 40374,
+          "sha256": "ea6f2fad9044836de595267d5512a29840a0f3e0db396324a7afba4ad9b148b3"
+        },
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/query-bound-build-ef1084ff6ad828e66dfd47750844c1f0f5f153529c867dacfb04d8d55c15169a.txt",
+          "sizeBytes": 3481,
+          "sha256": "ef1084ff6ad828e66dfd47750844c1f0f5f153529c867dacfb04d8d55c15169a"
+        }
+      ]
+    },
+    {
+      "reviewer": "/root/admission",
+      "conclusion": "七角色冷态投影通过；十槽热态峰值 NOT_QUALIFIED。",
+      "verified": [
+        "两份历史七角色准入间，替代卷从 4,932,232,775 增至 5,135,510,599 B。窗口结束时正式浏览器父命令尚未启动。其它已观测窗口也有零增长。",
+        "引擎卷 Size、schema 配额和日志限额未界定整个卷的未来增长。现公式仅改变宿主占用时理论最高余额 138,686,018 B。"
+      ],
+      "proofs": [
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-24ddb2256bcb4bdc95d03103b99b8733.json",
+          "sizeBytes": 45665,
+          "sha256": "2855f83a756a221716266f77782559bba5a997ada5682a19f3efa19e6a8dca60"
+        },
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-50bc1f49307f4478bf7103be0f03095f.json",
+          "sizeBytes": 46720,
+          "sha256": "c799a2202af13c450f71da40d1155b5561c179f97c461e6d11c69ed62ab02fb6"
+        }
       ]
     }
   ],
-  "acceptedPrevious": {
-    "commit": "cd130d337480997a105fe1497dde9e0cdb464fca",
-    "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/non-author-review.json",
-    "sizeBytes": 5464,
-    "sha256": "2e43ce1394cf8364a8a095bedb0efc64f7d9c934c5864f8863434f6d46962ed0"
-  },
-  "resourceProofs": [
-    {
-      "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-894e752c658049a294cb0a28f7beb764.json",
-      "sizeBytes": 44611,
-      "sha256": "465329213dd6296ef2c72d461236f89ca7be84a6f5564d2acb0be2b010ae4138"
-    },
-    {
-      "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-afd162bb0af44286acca2743726399eb.json",
-      "sizeBytes": 44611,
-      "sha256": "01deb0d893e2a4f71b4c22a7883094b09de6abce527bb201ea41a32f11c97784"
-    },
-    {
-      "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-b39879c982cf44219eb6273e6877889f.json",
-      "sizeBytes": 44611,
-      "sha256": "0d92b405c148bed5ed6810c3baf72008b15e25d84a47f2057a7cf294f8cb3cfe"
-    }
+  "limits": [
+    "实测为本机 Mac ARM64；没有当前十槽热态或新产品会话。",
+    "文件交付的独立复读和普通推送后的两条远端引用由包外回执定位。"
   ],
-  "limitations": [
-    "当前原包未通过核验；无新构建、容器产品窗口、ABA、S3 或实机阶段峰值。",
-    "最终三文件的非作者重开、普通 push 后远端回读见包外回执。"
-  ]
+  "readback": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/official-pnpm-remote-readback.json"
 }
