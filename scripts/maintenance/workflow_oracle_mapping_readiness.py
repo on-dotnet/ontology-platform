@@ -74,8 +74,18 @@ def qualify_catalog(report):
     raw=item['raw'].encode()
     require(item['queryId']==query and item['actor']==ROSTER['reader'][1] and len(raw)==5056 and item['sha256']==ex.sha(raw)==digest,'S23_CATALOG_READY_ORIGINAL')
     path='/api/v1/data/semantic-queries/'+query+'/result'
-    window=next(w for w in report['oracleWindows'] if w['name']=='oracle-current-catalog-readiness')
+    windows=[w for w in report['oracleWindows'] if w['name']=='oracle-current-catalog-readiness']
+    require(len(windows)==1,'S23_CATALOG_READY_WINDOW')
+    window=windows[0]
     require(window['expectedReads']==0 and window['audit']['clientId'] is None and window['audit']['records']==[],'S23_CATALOG_READY_SOURCE')
-    requests=[h for h in report['http'] if h['method']=='GET' and h['path']==path and h['status']==200 and h['sha256']==digest]
-    require(requests and 0<requests[0]['elapsedMs']<=5000,'S23_CATALOG_READY_HTTP')
+    http=report['http']
+    # 首次正式执行之后的恢复另按各自场景核验。
+    query_start=next((i for i,h in enumerate(http) if h['method']=='POST' and h['path']=='/api/v1/data/semantic-queries'),len(http))
+    prefix=http[:query_start]
+    probe=report['oracleReadiness']['http'][-1]
+    probes=[i for i,h in enumerate(prefix) if all(h[k]==probe[k] for k in ('method','path','status','sha256'))]
+    requests=[i for i,h in enumerate(prefix) if h['method']=='GET' and h['path']==path]
+    require(len(probes)==len(requests)==1 and probes[0]<requests[0],'S23_CATALOG_READY_ORDER')
+    response=prefix[requests[0]]
+    require(response['status']==200 and response['sha256']==digest and 0<response['elapsedMs']<=5000,'S23_CATALOG_READY_HTTP')
     return dict(status='CURRENT_CATALOG_VERIFIED',queryId=query,sha256=digest)
