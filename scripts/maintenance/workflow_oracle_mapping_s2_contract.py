@@ -247,6 +247,7 @@ def demand_connection_original(raw):
 def qualify(report):
     require(report['taskId']=='G4-ORACLE-MAPPING-QUERY-001' and report['runId']=='product-resume-01' and report['batch']['planId'] in ('s2-s3-01','s2-s3-01-access-01'),'S23_REPORT_OWNER')
     mode=report['mode'];rows=report.get('oracleCases',[])
+    if report['mode']=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':__import__('workflow_oracle_mapping_readiness').qualify(report)
     require(rows or mode in ('s2-oracle-vocabulary','s2-oracle-mapping','s2-oracle-reopen','s2-oracle-aba'),'S23_CASES_MISSING')
     names=[r['name'] for r in rows];require(len(names)==len(set(names)),'S23_CASE_DUPLICATE')
     required={
@@ -416,6 +417,7 @@ def reopen_stage(archive,report,records,host,origin,measured,window):
     from workflow_oracle_mapping_s2 import OBJECTS,FIELDS,SCOPED
     from workflow_oracle_mapping_identity_recovery import ROSTER
     result=qualify(report)
+    if report['mode']=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':__import__('workflow_oracle_mapping_readiness').reopen(archive,report,host,origin)
     ledger=reopen_mutations(archive,report,host,origin)
     grants=report['currentGrants'];require(grants['taskId']==report['taskId'] and grants['runId']==report['runId'] and grants['batch']=='s2-s3-01'
         and grants['fieldCount']==22 and grants['grantCount']==6 and len(grants['rows'])==6 and grants['requiredSeconds']==210

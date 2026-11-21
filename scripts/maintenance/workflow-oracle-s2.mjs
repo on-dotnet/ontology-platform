@@ -490,7 +490,27 @@ async function ui(ctx) {
 
 /** 当前组合grant拒绝后既不执行业务SQL，也不恢复历史原值；每次恢复核原行。 */
 async function access(ctx) {
-  const {actors:{reader,auditor},state,execute,query,call,request,audit,check,report}=ctx;
+  const {actors:{reader,auditor,operator},state,execute,query,call,request,audit,check,report,command,root,shared}=ctx;
+  // 当前API实例须先实际完成既有十秒连接探测；不作为Query冷启动或清理资格。
+  if(shared.plan.planId==="s2-s3-01-access-01") {
+  await audit("oracle-current-api-readiness",async()=>{
+    const path="/api/v1/connections/"+state.connectionId, parts=[];
+    const capture=async(method,url,body,etag)=>{
+      const value=await request(operator,method,url,body,200,etag);
+      parts.push({method,path:url,status:value.status,raw:value.raw,sha256:hash(value.raw),etag:value.etag});return value;
+    };
+    const before=await capture("GET",path);
+    check("oracle_readiness_active",before.data.state==="ACTIVE");
+    const result=await capture("POST",path+"/test",{command:command(before.data.configRevision)},before.etag);
+    const after=await capture("GET",path);
+    const probe=await capture("GET",path+"/probes/"+result.data.probeId);
+    check("oracle_readiness_no_version_change",before.data.configRevision===after.data.configRevision&&before.data.secretVersion===after.data.secretVersion&&after.data.state==="ACTIVE");
+    check("oracle_readiness_five_stages",probe.data.status==="TEST_OK"&&!probe.data.stale&&probe.data.stages.length===5&&probe.data.stages.every(s=>s.status==="PASS"));
+    report.oracleReadiness={actor:operator.me.subjectId,api:report.inputBinding.api.services.api,http:parts,
+      snapshot:omq.platform(root,"__import__('workflow_oracle_mapping_readiness').snapshot(*json.load(sys.stdin))",[probe.data.probeId],shared.stageDeadline)};
+  },0);
+  omq.platform(root,"__import__('workflow_oracle_mapping_readiness').qualify(json.load(sys.stdin))",report,shared.stageDeadline);
+  }
   // 当前Reader改动须先用完整双表真实读取补证，保留历史latestQuery锚点。
   await execute("healthy-relations",query(capabilities[2]),reader,2);
   const q=query(capabilities[0]);

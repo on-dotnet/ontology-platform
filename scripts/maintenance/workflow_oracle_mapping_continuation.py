@@ -147,6 +147,8 @@ def compatible_prefix(archive,measured,mode,stage):
         elif name.endswith('/workflow_oracle_mapping_s2_contract.py'):
             right=right.replace("report['batch']['planId'] in ('s2-s3-01','s2-s3-01-access-01')","report['batch']['planId']=='s2-s3-01'")
             right=right.replace("    if mode=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':required[mode]=required[mode]|{'healthy-relations'}\n",'')
+            right=right.replace("    if report['mode']=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':__import__('workflow_oracle_mapping_readiness').qualify(report)\n",'')
+            right=right.replace("    if report['mode']=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':__import__('workflow_oracle_mapping_readiness').reopen(archive,report,host,origin)\n",'')
             require(_program(left,{'frozen_plan'})==_program(right,{'frozen_plan'}),'S23_PREFIX_CONTRACT_CHANGED')
             continue
         else:require(False,'S23_PREFIX_DRIVER_CHANGED')

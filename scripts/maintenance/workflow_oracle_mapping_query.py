@@ -33,6 +33,10 @@ def structural(root, task, phase):
         from workflow_oracle_mapping_s2_contract import frozen_plan
         frozen_plan(root)
         frozen_plan(root,"s2-s3-01-access-01")
+        consumers['scripts/maintenance/workflow_oracle_mapping_preparation_refresh.py']=['def lifecycle(', 'def maintenance_result(', 'def reopen_isolated(', 'S23_PREPARATION_REFRESH_CAS']
+        consumers['scripts/maintenance/workflow_oracle_mapping_readiness.py']=['def qualify(', 'def reopen(', 'S23_READINESS_NO_VERSION_CHANGE', 'CURRENT_API_CONNECTION_READY']
+        consumers['scripts/maintenance/workflow_oracle_preparation_runner.py']=['def verified_runner(', 'PREPARATION_BUILD_ORIGINAL', 'PREPARATION_SOURCE_DERIVATION']
+        consumers['scripts/maintenance/workflow_oracle_preparation_maintenance.py']=['def verify_seal(', 'def verify_prestate(', 'def recovery_argv(', 'S23_PREPARATION_POST_ROW']
         consumers['scripts/maintenance/workflow_oracle_mapping_capacity.py']=['def validate_programs(', 'def baseline_cache_release(', 'host_start-=cache_release', 'CAPACITY_PRODUCT_ONLY']
         consumers['scripts/maintenance/workflow_oracle_mapping_access_refresh.py']=['def lifecycle(', 'def snapshot_builds(', 'def maintenance_result(', 'S23_REFRESH_CAS', 'S23_REFRESH_PRIVATE_MOUNT_DRIFT']
         consumers['scripts/maintenance/workflow_oracle_access_maintenance.py']=['def verify_seal(', 'def verify_prestate(', 'def recover(', 'S23_ACCESS_POST_ROW']

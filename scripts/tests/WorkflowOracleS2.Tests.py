@@ -501,4 +501,52 @@ class S2CapacityTests(unittest.TestCase):
                     capacity.before_product_source(ROOT,s.TASK,platform_stage=True,phase=phase)
 
 
+class S2ReadinessTests(unittest.TestCase):
+    @staticmethod
+    def model():
+        import workflow_oracle_mapping_readiness as r
+        scope=copy.deepcopy(r.SCOPE);cid=r.CONNECTION;probe_id='a'*32;config_hash='f'*64;command_key='c'*64;actor=r.ROSTER['operator'][1]
+        etag='"3-'+config_hash+'"';path='/api/v1/connections/'+cid
+        before=dict(id=cid,displayName='Oracle model fixture',scope=scope,config=dict(type='ORACLE',profile=dict(host='oracle-source',port=2484,
+            serviceName='FREEPDB1',username='FIXTURE_READER',tls=True,allowedOwners=['PRODUCTION','CaseOwner'])),configRevision=3,state='ACTIVE',
+            secretConfigured=True,secretVersion=1,probeFresh=False,lastProbeId='b'*32,updatedAtUtc='2026-11-20T12:00:00+00:00')
+        probe=dict(probeId=probe_id,connectionId=cid,configHash=config_hash,secretVersion=1,scope=scope,status='TEST_OK',
+            stages=[dict(name=n,status='PASS',durationMs=ms,diagnosticCode=None) for n,ms in zip(['NETWORK','TLS','AUTH','READ_ONLY','METADATA'],[5,50,50,90,120])],
+            startedAtUtc='2026-11-21T04:00:00.010000+00:00',completedAtUtc='2026-11-21T04:00:00.150000+00:00',expiresAtUtc='2026-11-21T04:10:00.010000+00:00',traceId='d'*32,stale=False)
+        after={**before,'lastProbeId':probe_id,'probeFresh':True};parts=[]
+        for method,url,data,tag in [('GET',path,before,etag),('POST',path+'/test',probe,etag),('GET',path,after,etag),('GET',path+'/probes/'+probe_id,probe,'')]:
+            raw=json.dumps(data,separators=(',',':'));parts.append(dict(method=method,path=url,status=200,raw=raw,sha256=ex.sha(raw.encode()),etag=tag))
+        db=dict(Id=probe_id,Owner=actor,ConnectionId=cid,OrganizationId='org-demo',SiteIds=['site-a'],Revision=3,ConfigHash=config_hash,SecretVersion=1,
+            CommandKey=command_key,ActorJson=json.dumps(dict(subjectId=actor)),ReportJson=json.dumps(probe),ExpiresAtUtc=probe['expiresAtUtc'],Deadline=probe['completedAtUtc'])
+        command=dict(Id=command_key,RequestHash='e'*64,ScopeJson=json.dumps(scope),ResultScopeJson=json.dumps(scope),ReceiptJson=json.dumps(probe),
+            CreatedAtUtc=probe['startedAtUtc'],Etag=etag,StatusCode=200,ErrorCode=None)
+        snapshot=dict(commandId='MODEL_NOT_A_COMMAND',value=dict(probe=db,connection=dict(Id=cid,Revision=3,ConfigHash=config_hash,SecretVersion=1,State='ACTIVE',LastProbeId=probe_id),
+            commands=[command],audit=[dict(Id=str(i),Action=action,Outcome='allowed',Actor=actor,Resource='connection:'+cid,TraceId=probe['traceId'])
+                for i,action in enumerate(['connection.probe.start','connection.probe.complete'])]))
+        api={'modelOnly':True}
+        return dict(taskId=s.TASK,runId='product-resume-01',mode='s2-oracle-access',batch=dict(planId='s2-s3-01-access-01'),inputBinding=dict(api=dict(services=dict(api=api))),
+            http=[{k:v for k,v in part.items() if k not in ('raw','etag')} for part in parts],oracleReadiness=dict(actor=actor,api=api,http=parts,snapshot=snapshot),
+            oracleWindows=[dict(name='oracle-current-api-readiness',expectedReads=0,startedAtUtc='2026-11-21T04:00:00+00:00',finishedAtUtc='2026-11-21T04:00:01+00:00')])
+
+    def test_formal_model_accepts_cumulative_equal_phase_times(self):
+        import workflow_oracle_mapping_readiness as r
+        self.assertEqual(r.qualify(self.model())['status'],'TEST_OK')
+
+    def test_probe_cannot_change_connection_or_forge_command_link(self):
+        import workflow_oracle_mapping_readiness as r
+        for name in ('etag','command','scope','updated-time','source-read','wrong-api','failed-phase'):
+            bad=self.model();item=bad['oracleReadiness']
+            if name=='etag':item['http'][1]['etag']='"3"'
+            elif name=='command':item['snapshot']['value']['commands'][0]['Id']='d'*64
+            elif name=='scope':item['snapshot']['value']['commands'][0]['ScopeJson']=json.dumps(dict(organizationId='org-demo',siteIds=['site-b']))
+            elif name=='source-read':bad['oracleWindows'][0]['expectedReads']=1
+            elif name=='wrong-api':item['api']={'modelOnly':'another'}
+            else:
+                idx=2 if name=='updated-time' else 1;part=item['http'][idx];data=json.loads(part['raw'])
+                if name=='updated-time':data['updatedAtUtc']='2026-11-21T04:00:00+00:00'
+                else:data['stages'][3]['status']='FAIL'
+                raw=json.dumps(data,separators=(',',':'));part.update(raw=raw,sha256=ex.sha(raw.encode()));bad['http'][idx]['sha256']=part['sha256']
+            with self.subTest(case=name),self.assertRaises(ValueError):r.qualify(bad)
+
+
 if __name__=='__main__':unittest.main()
