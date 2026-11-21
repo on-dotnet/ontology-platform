@@ -40,4 +40,6 @@
 | REUSED | 同键三个零下载 prepare、API／Agent／Query 三构建及 99／222／222 成员。历史前五槽、access 78 项、AC03-A/C、S1、EC01 按原 T/Run 和限定资格复用。 |
 | 未资格 | Oracle S0、AC03-B 为 BLOCKED，cleanup250ms 及两份 Doris assessment 为 NOT_QUALIFIED，G4 PARTIAL。全量 SelfTest 和 CI 为 NOT_RUN。 |
 
+首次交付预检因规划说明更正后的输入绑定差异退出 2，原件保留。在 `a383c66ba4e8a32ba81b249353411413a1ba24d0` 重跑受影响的 policy 门禁通过，Oracle 门禁输入键与工程受测提交相同。交付机器回执据此绑定，产品窗口只运行一次。
+
 四个 Finder 文件原位且指纹相符。普通推送后的交付 Head、远端三文件逐字节回读与候选回收后验写入机器回执登记的批次外部回执。main 固定为 `5168f2c93ca226caa521a6dc4ac85439335274c4`，本批停在 ChatGPT 复审。
