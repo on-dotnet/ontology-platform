@@ -2,139 +2,63 @@
   "taskId": "G4-ORACLE-MAPPING-QUERY-001",
   "runId": "product-resume-01",
   "batch": "s2-s3-01",
-  "sourceHead": "f809d391f82cdd0470e009a4860209ba1743e446",
-  "author": "/root",
-  "conclusion": "OFFLINE_ENGINEERING_REVIEW_PASS",
-  "stop": "CHATGPT_REVIEW",
-  "productStatus": {
-    "EC01": "REUSED",
-    "S1": "REUSED_PASS",
-    "AC03_A": "REUSED_SUCCESS_WON",
-    "AC03_C": "REUSED_8_OF_8",
-    "access": "REUSED_78_CHECKS",
-    "S2": "PARTIAL",
-    "S3": "NOT_RUN",
-    "OracleS0": "BLOCKED",
-    "AC03_B": "BLOCKED",
-    "cleanup250ms": "NOT_QUALIFIED",
-    "G4": "PARTIAL",
-    "AC10": "PARTIAL"
-  },
+  "reviewedCode": "95434cdda4c2728bec42924e18710858bb52218c",
+  "baseline": "cd130d337480997a105fe1497dde9e0cdb464fca",
+  "conclusion": "PARTIAL_HANDOFF",
+  "state": "S2_PARTIAL_PREPARE_PNPM_ARCHIVE_BLOCKED_CHATGPT_REVIEW",
   "reviewers": [
     {
       "reviewer": "/root/review",
-      "scope": "真实入口、身份来源、跨报告 seed、selection 及历史原件",
-      "node": {
-        "passed": 7,
-        "failed": 0
-      },
-      "pythonSelected": {
-        "passed": 5,
-        "failed": 0
-      },
-      "diffCheck": 0,
-      "accessMembers": 1236,
-      "accessSealedBytes": 63430,
-      "closureCommand": "1fca6fd4284a475a95c52b0644e7cc47",
-      "files": {
-        "scripts/maintenance/workflow-oracle-s2.mjs": {
-          "path": "scripts/maintenance/workflow-oracle-s2.mjs",
-          "sizeBytes": 59926,
-          "sha256": "411f687eb522a389a84518094876c57c3b6ddcd57e3e4bf7597276ca5bc29ca4"
-        },
-        "scripts/maintenance/workflow_oracle_mapping_s2_contract.py": {
-          "path": "scripts/maintenance/workflow_oracle_mapping_s2_contract.py",
-          "sizeBytes": 56761,
-          "sha256": "d018fbbe50d1c892b49d49ed0982ce3231083ed6f2cb4367efe0adc4d3ff4ed8"
-        },
-        "scripts/maintenance/workflow_oracle_mapping_continuation.py": {
-          "path": "scripts/maintenance/workflow_oracle_mapping_continuation.py",
-          "sizeBytes": 34272,
-          "sha256": "c91e3f8dc54c9b77a9439c2cb2894a8d563919ce98c88247669547430c2f465f"
-        },
-        "scripts/maintenance/workflow-oracle-s2-runtime-plan.json": {
-          "path": "scripts/maintenance/workflow-oracle-s2-runtime-plan.json",
-          "sizeBytes": 1902,
-          "sha256": "044a1509f7bf69b9d000c93267d2b1a28d65d846d0d61db1e03e431ff1c95bb3"
-        },
-        "backend/tests/OntologyPlatform.AgentTests/G4QueryAbaRuntimeTests.cs": {
-          "path": "backend/tests/OntologyPlatform.AgentTests/G4QueryAbaRuntimeTests.cs",
-          "sizeBytes": 17828,
-          "sha256": "3084a28051a97c875847c7d129141e29eb0fba2bcb8f0c6e94ebcc05c95c8f64"
-        },
-        "backend/tests/OntologyPlatform.AgentTests/OracleQueryS2RuntimeTests.cs": {
-          "path": "backend/tests/OntologyPlatform.AgentTests/OracleQueryS2RuntimeTests.cs",
-          "sizeBytes": 17738,
-          "sha256": "8f239ea468804c6d702a79436cf2546f6ba772d4b9bc80daf26e3668e2650c19"
-        }
-      },
-      "closed": [
-        "当前 reader 健康 seed 到两个实际分发入口",
-        "成功及 409 的 selection 上下文和同父 ABA SHA",
-        "当前审批 session 和新 DI 决定绑定",
-        "四动作与无过滤源事件分区",
-        "构建投影四件封存独立重开、终态可空性增量"
-      ],
-      "notIndependentlyRun": [
-        "项目构建",
-        "Oracle 产品或 S3",
-        "新宿主代次准入"
+      "result": "工程修正通过，完整 prepare 缺冻结原包。",
+      "verified": [
+        "准确工作区缺历史 restore 回执时在归档物化前终止，其他工作区采用原入口。",
+        "完整 Web 来源五字段篡改及新增字段共六个反例均被拒绝。",
+        "21 项目、179 包、2 SDK、250 登记路径。109 个 XML 的 SHA、模式、时间、单链接及实占均核对。",
+        "原包和标准本地缓存、22 份项目 ZIP 的 27,229 个文件名均未定位批准 tar。454 个展开文件均匹配，独立本机复原尝试未命中冻结 SRI。"
+      ]
+    },
+    {
+      "reviewer": "/root/admission",
+      "result": "只读重开历史 Web 391 行并核当前绑定，七角色峰值须以新实机为准。",
+      "verified": [
+        "Library 中 391 个索引编码摘要不同。锁键、命名、26,176 个文件及 bin 声明逐行相符。",
+        "原四个特定包索引身份、当前 109 个 shim 与 1,283 条链接可重建原绑定。"
       ]
     },
     {
       "reviewer": "/root/archive",
-      "scope": "既有 Doris 原件及版本、六态、S3 消费者只读检查",
-      "findings": {
-        "ids": [
-          "ma-a77741308dd94252a393281745421189",
-          "ma-99d5dbdfae694e7c83bcc9f865a9932e"
-        ],
-        "status": "NOT_QUALIFIED",
-        "searchMode": "FRESH_READ_ONLY",
-        "zipMemberCounts": [
-          476,
-          649,
-          717
-        ],
-        "finalZipSha256": "a3bc91f2017fefd7b41c28aed3fdc9c7ef947eb8f890b3372879bc6b8563adce",
-        "localCandidatesExamined": 16,
-        "otherStoredAssessment": "ma-ace12515d7804af2870f2a434c167951",
-        "secondAssessmentSnapshot": "s2-before-exact-join-release-a5f93d1137a04133a3fe1265642abed5.json",
-        "snapshotSha256": "29328b9787337cab3e60624a1184f2adcd653bb1c5d654f75cc6e4c7b5a80c4a",
-        "httpHashes": [
-          "b6ccaa7e7c4b70a5531c030fa97f1921c62ff3387895880b0d770f10bbdc4f09",
-          "0aefbb2ed7686f7ee36066253369c1a7c62d6c16de11f455936db9259a2a0f50"
-        ],
-        "foundStoredHashOrBytes": false
-      }
-    },
-    {
-      "reviewer": "/root/admission",
-      "scope": "现行 prepare 内容键、缺件、首份快照、历史回收台账和新后缀",
-      "approvedPackages": 179,
-      "missingFeed": 80,
-      "missingPrivate": 168,
-      "logicalBytes": 524851755,
-      "snapshotMinimumBytes": 32112640
+      "result": "离线重开五槽与 access，并核十槽的实际分发和维护条件。",
+      "verified": [
+        "旧五槽 CASE_QUALIFIED，当前 684 项，access 1,236 件，prepare 脚本变更不改变两者的旧输入资格。",
+        "新服务代次的发布图、停启证据、组合授权 TTL 仍须实际读取和资格核验。"
+      ]
     }
   ],
-  "boundaries": [
-    "实机尚无本轮 seed query、回滚决定、409 或新窗口零成功三项。",
-    "编译由作者使用 Roslyn 与既有引用在内存中执行。",
-    "历史父失败及未资格继续有效。"
-  ],
-  "priorReview": {
+  "acceptedPrevious": {
+    "commit": "cd130d337480997a105fe1497dde9e0cdb464fca",
     "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/non-author-review.json",
-    "commit": "7b8fb59093e6f773ce4aea3c06357111c088f19b",
-    "sha256": "53ca4ea991dc8877c828802efabb058468bed92df82e63586096cddc94344deb"
+    "sizeBytes": 5464,
+    "sha256": "2e43ce1394cf8364a8a095bedb0efc64f7d9c934c5864f8863434f6d46962ed0"
   },
-  "deliveryReopen": {
-    "reviewer": "/root/review",
-    "verifiedCommandCount": 17,
-    "uniqueCurrentOriginals": 67,
-    "bytes": 451487,
-    "previousGitOriginals": 3,
-    "schemaChecks": 23,
-    "scope": "首轮三文件候选、六项复审问题与最终工程输入。收尾七角色第二次核算的独立复核另见包外回读。"
-  }
+  "resourceProofs": [
+    {
+      "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-894e752c658049a294cb0a28f7beb764.json",
+      "sizeBytes": 44611,
+      "sha256": "465329213dd6296ef2c72d461236f89ca7be84a6f5564d2acb0be2b010ae4138"
+    },
+    {
+      "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-afd162bb0af44286acca2743726399eb.json",
+      "sizeBytes": 44611,
+      "sha256": "01deb0d893e2a4f71b4c22a7883094b09de6abce527bb201ea41a32f11c97784"
+    },
+    {
+      "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-b39879c982cf44219eb6273e6877889f.json",
+      "sizeBytes": 44611,
+      "sha256": "0d92b405c148bed5ed6810c3baf72008b15e25d84a47f2057a7cf294f8cb3cfe"
+    }
+  ],
+  "limitations": [
+    "当前原包未通过核验；无新构建、容器产品窗口、ABA、S3 或实机阶段峰值。",
+    "最终三文件的非作者重开、普通 push 后远端回读见包外回执。"
+  ]
 }
