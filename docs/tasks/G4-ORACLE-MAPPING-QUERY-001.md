@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_S3_IMPLEMENTING**。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
+唯一任务状态 **S2_BLOCKED_SOURCE_ACL_CLEANUP**。本批最后一次正常认证四角色全部通过，S2 在源 READ 撤权查询的清理确认处停止，S3 未启动。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
 
 ## 执行身份与所有权
 
@@ -16,8 +16,8 @@ P0 的文档归属为本任务卡、[唯一 A–F](../evidence/G4-ORACLE-MAPPING
 |---|---|---|
 | S0 源能力及取消 | AC01–03、11。先验证 Oracle 类型、事务、受控固定 SQL、正式取消与独立源终态；不可观察即停。 | BLOCKED。固定 SQL 在正式取消提交前已读完；两表事务、直取消和 PG 占位子项已测。 |
 | S1 单表 | AC04、05、08、10。沿正式发布、当前 grant、HTTP、真实平台持久化及新会话恢复 | PASS：auth-handoff-01第四实际窗口，准确父命令及六阶段原件见本批报告 |
-| S2 双表 | AC03、05–08。等值与半开关系、ABA、撤权、超量、原期限内清理和零成功副作用 | NOT_RUN |
-| S3 消费者及兼容 | AC09–11。UI/HTTP/MCP 同源字节，PG/Doris 与 Oracle M2 的原身份对照 | NOT_RUN |
+| S2 双表 | AC03、05–08。等值与半开关系、ABA、撤权、超量、原期限内清理和零成功副作用 | PARTIAL。五槽已有资格，本次健康双表和四项拒绝通过单项复核；源 ACL 清理阻断完整 access，ABA 等后续槽未运行。 |
+| S3 消费者及兼容 | AC09–11。UI/HTTP/MCP 同源字节，PG/Doris 与 Oracle M2 的原身份对照 | UI/MCP NOT_RUN。PG 及 Oracle M2 的既有兼容原件按输入复用；Doris 现行类型序列化尚未资格。 |
 
 每个 AC 的正反 Given/When/Then、真实 DI、独立预期、原件、输入变化及最小重验在唯一规格 E。实施先补当前 TaskId 实际分发，旧 M2 的通过记录仅归原输入。源实例已有原生事务并发对照、固定游标自然完成及 ODP 定向取消原件。首次源冷备已在替代容器通过驱动重开。资源余量按当次准入记录，完整平台恢复仍待验证。
 
@@ -127,3 +127,7 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 当前短链验证：实际四边重开9135b452e9f74756adcc9ab3598b8fdd、S2 Python34项3417ac22c72c48e1b31257d80f11bf1b、JS入口4项2633e9edd64b48fea25fb82a008d6f6a、runtime前检f1c554cae17d4b5498c3ef7f12681256与格式80700ca1e27d4f28b9d5ced9fb0d36d8通过。此前维护MTP启动/发现失败、消费者路径边界失败及检查包装器漏product环境失败保留，不冒充测试通过。新准确API为4d4b403d37e11d19e5082e0a2ead5235d66f135e52a3f46f22022ec9c333d89e/d6a458aed358e28de1eb254d504ec1a0b24e14282a7f3ae823c92f3c0f84533c；Oracle/PG/IdP/RustFS/Fuseki代次保持。
 
 6c5c6503 实测父60a80687b58546afbd5abb19af3741c1正常认证4/4，当前连接探测五阶段通过。首个双表查询在目录校验阶段超时、503，未执行业务SELECT。04:19源统计显示一次物理主键/NLS目录语句耗时308183微秒。AC03-B仍BLOCKED。追加owned_paths workflow_oracle_mapping_postprobe.py与现行access/就绪消费者，仅对应query-515cf74c1f53415785ff35c89ecd2fbb。原件7053bb4a503847d38997368b92e2bbd7为新准确维护隔离测试1/1。就绪入口用本人历史结果的正式GET在原5秒内核5056字节及零业务读，然后执行原预算新Query。
+
+2026-11-21 本批准确实测父命令 `685e33e9abd749168f6152789677859a`，产品 Head `ee802b487f386417e312d40e84978ab49e78c182`。四角色登录与本人历史结果恢复合格。新关系查询 FOUND，父全窗 2 次业务读，间隙 0。四项 UNAUTHORIZED 已核；撤回目标表 READ 后 HTTP 503，查询 `query-3e6bb50bdffe43feaa09736718b1dcb0` 保留 FAILED、fence 2 及原租约。实际物理释放及事后源会话零已观察。六条组合 grant、变更 grant 与撤回的 READ 后态均已回读。权限恢复原件不替代失败查询资格。
+
+本次 owned_paths 包括既有 OracleSourceAdapter.Sql.cs、OracleSourceAdapter.Mapping.cs、OracleAdapterTests.cs、产品原生停止入口及前缀消费者。只读证明的完整单行阻断结果现能到达明确拒绝路径。修正编译及 33 项 Oracle 定向测试通过；该修正尚无新产品窗实测。两个 API 已移除，五个持久副本进程已停，旧受保护资源及最后失败行 KEEP。原单行维护程序准确绑定到此前查询。另行处置本次失败行及重新实机验收由 ChatGPT 集中复审。三份公开文件见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。

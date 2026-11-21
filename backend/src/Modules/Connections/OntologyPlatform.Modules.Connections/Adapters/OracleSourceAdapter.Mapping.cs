@@ -97,7 +97,7 @@ public sealed partial class OracleSourceAdapter
     internal static async Task<bool> MappingAccessMatchesAsync(OracleConnection connection, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
-        await VerifyReadOnlyAsync(connection, token);
+        if (!await ReadOnlyPolicyMatchesAsync(connection, token)) return false;
         // 直接授予的可读闭包须准确匹配两表和证明视图。
         using var grants = connection.CreateCommand();
         grants.CommandText = """

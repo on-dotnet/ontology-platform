@@ -29,6 +29,13 @@ public sealed partial class OracleSourceAdapter
     /// <param name="token">与整个操作共用的取消令牌。</param>
     private static async Task VerifyReadOnlyAsync(OracleConnection connection, CancellationToken token)
     {
+        if (!await ReadOnlyPolicyMatchesAsync(connection, token))
+            throw new PgSourceException("connection_readonly_unverified");
+    }
+
+    /// <summary>完整的只读证明明确报告阻断数量时返回拒绝；身份、游标或版本无法核实时保留异常。</summary>
+    private static async Task<bool> ReadOnlyPolicyMatchesAsync(OracleConnection connection, CancellationToken token)
+    {
         // 认证身份、PDB和实际协议来自当前会话，不相信连接串自报。
         using var identity = connection.CreateCommand();
         identity.CommandText = "SELECT SYS_CONTEXT('USERENV','SESSION_USER'), SYS_CONTEXT('USERENV','CON_NAME'), SYS_CONTEXT('USERENV','NETWORK_PROTOCOL') FROM DUAL";
@@ -64,9 +71,20 @@ public sealed partial class OracleSourceAdapter
         attestation.CommandTimeout = 5;
         token.ThrowIfCancellationRequested();
         await using var proof = await attestation.ExecuteReaderAsync(token);
-        if (!await proof.ReadAsync(token) || proof.GetString(0) != "oracle-readonly-v1"
-            || Convert.ToInt32(proof.GetValue(1), CultureInfo.InvariantCulture) != 0 || await proof.ReadAsync(token))
+        return await AttestationAllowsReadAsync(proof, token);
+    }
+
+    /// <summary>仅接受现行证明版本的一行非负计数，完整读到末尾才可判定允许或拒绝。</summary>
+    internal static async Task<bool> AttestationAllowsReadAsync(DbDataReader proof, CancellationToken token)
+    {
+        token.ThrowIfCancellationRequested();
+        if (!await proof.ReadAsync(token) || proof.GetString(0) != "oracle-readonly-v1" || proof.IsDBNull(1))
             throw new PgSourceException("connection_readonly_unverified");
+        // 完整性计数大于零表示本次确有权限漂移，负数和多行都不是有效证明。
+        var blocked = Convert.ToInt32(proof.GetValue(1), CultureInfo.InvariantCulture);
+        if (blocked < 0 || await proof.ReadAsync(token))
+            throw new PgSourceException("connection_readonly_unverified");
+        return blocked == 0;
     }
 
     /// <summary>读取固定owner交集，两个批准owner都必须有可见对象。</summary>

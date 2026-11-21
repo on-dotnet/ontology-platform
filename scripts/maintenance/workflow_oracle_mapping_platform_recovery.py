@@ -550,6 +550,8 @@ def native_stop(group,role,roles,operation):
     if product:
         require(group=='replacement','TDB_PRODUCT_GROUP')
         phase=product
+        # 产品收尾与同批开放采用相同的已核基线缓存扣减及40GiB上限。
+        from workflow_oracle_mapping_capacity import before_product_source as before_source
     if role=='fuseki':require(role in roles,'TDB_LIVE_OWNER')
     check=before_source(platform.ROOT,TASK,platform_stage=True,phase=phase,running_roles=roles)
     cid=ORIGINAL_IDS[role] if group=='original' else (ALT_ORACLE if role=='oracle' else json.loads((RECOVERY_AREA/'replacement-resources.json').read_bytes())['ids'][role])

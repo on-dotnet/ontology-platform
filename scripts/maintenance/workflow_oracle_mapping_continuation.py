@@ -127,6 +127,9 @@ def compatible_prefix(archive,measured,mode,stage):
             from workflow_oracle_mapping_repeat import BRANCH as REPEAT_BRANCH
             require(right.count(REPEAT_BRANCH)==1,'S23_PREFIX_REPEAT_BRANCH')
             right=right.replace(REPEAT_BRANCH,'',1)
+            close_admission='        # 产品收尾与同批开放采用相同的已核基线缓存扣减及40GiB上限。\n        from workflow_oracle_mapping_capacity import before_product_source as before_source\n'
+            require(right.count(close_admission)==1 and close_admission not in left,'S23_PREFIX_CLOSE_ADMISSION')
+            right=right.replace(close_admission,'',1)
         elif name.endswith('/workflow_oracle_mapping_resume.py'):
             from workflow_oracle_mapping_capacity import ORIGINAL_CALL,PRODUCT_CALL
             require(right.count(PRODUCT_CALL)==1 and PRODUCT_CALL not in left,'S23_PREFIX_CAPACITY_BRANCH')
