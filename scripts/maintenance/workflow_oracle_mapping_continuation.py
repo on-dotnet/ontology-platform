@@ -118,7 +118,19 @@ def compatible_prefix(archive,measured,mode,stage):
             for added, original in [('          ...(shared.plan.planId==="s2-s3-01-access-01"?{submit:omq.submitSystemLogin}:{}),\n          onProgress:event=>progress({...event,mode})});', '          onProgress:event=>progress({...event,mode})});'), ('await audit("current-catalog-mapping",()=>formalMapping(ctx),formalMappingReads(state));', 'await audit("current-catalog-mapping",()=>formalMapping(ctx),2);')]:
                 require(right.count(added)==1,'S23_PREFIX_UNEXECUTED_SUFFIX')
                 right=right.replace(added,original,1)
-            # 未执行的权限测试函数是唯一产品场景差异；上下两个边界必须各唯一出现。
+            # 五个历史槽在 ABA 之前。只接受逐字节登记的这一对 ABA 实现，其他入口仍全文核对。
+            helper='/** 由当前审核者的正式 HTTP 客户端审批刚创建的 Mapping 提案，并核对同一提案的决定。 */'
+            aba='/** B先由三角色正式准备；真正同query源读后A-B-A交给已有正式DI在途测试。 */'
+            versions='/** 用正式Catalog命令产生新快照；只改变目录身份，旧绑定拒绝后正式重评发布。 */'
+            if helper in right:
+                require(right.count(helper)==right.count(aba)==right.count(versions)==1
+                        and left.count(aba)==left.count(versions)==1 and helper not in left,'S23_PREFIX_ABA_BOUNDARY')
+                previous=left[left.index(aba):left.index(versions)]
+                candidate=right[right.index(helper):right.index(versions)]
+                require(ex.sha(previous.encode())=='eb68e2914f6be6feac9c00e2e1202b954f657607ac1eebab0503fac5bc6664f5'
+                        and ex.sha(candidate.encode())=='65027c49415997b0059d3efa08a7bc15731bf1f7bae7a754b91449a52bf964c6','S23_PREFIX_ABA_CHANGED')
+                right=right.replace(candidate,previous,1)
+            # 前五槽也没有进入权限测试函数；保留既有权限段边界。
             begin='/** 当前组合grant拒绝后既不执行业务SQL，也不恢复历史原值；每次恢复核原行。 */'
             end='/** B先由三角色正式准备；真正同query源读后A-B-A交给已有正式DI在途测试。 */'
             require(all(text.count(begin)==text.count(end)==1 for text in (left,right)),'S23_PREFIX_ACCESS_BOUNDARY')

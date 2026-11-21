@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {test} from "node:test";
 process.env.OMQ_PRODUCT_RUN="product-resume-01";
 const omq=await import("../maintenance/workflow-oracle-query-fixture.mjs");
-const {run,formalMappingReads}=await import("../maintenance/workflow-oracle-s2.mjs");
+const {run,formalMappingReads,approveNewMappingProposal}=await import("../maintenance/workflow-oracle-s2.mjs");
 const names="ROW_ID JOIN_KEY VAL ORG_ID SITE_ID EXT_ID LABEL FROM_TS TO_TS EVENT_TS OBSERVED_TS".split(" ");
 const catalog={status:"READY",connectionId:"connection",objects:[["PRODUCTION","OMQ_ENTITY"],["CaseOwner","OmqTarget"]].map(([schema,name])=>({schema,name,kind:"TABLE",fields:names.map((name,i)=>({name,ordinal:i+1}))}))};
 test("combined projection is exact and does not widen historical projection",()=>{
@@ -35,4 +35,25 @@ test("new suffix dispatches exactly eleven bounded slots and stops on failure",a
   assert.equal(visited.length,11);assert.equal(plan.deadlineSeconds,2520);
   const failed=[];assert.equal(await omq.runAuthHandoffPlan({plan},async mode=>{failed.push(mode);return {status:mode==="s2-oracle-access"?"FAIL":"PASS"};}),false);
   assert.deepEqual(failed,["s0-oracle-auth","s2-oracle-access"]);
+});
+
+test("current auditor approves the exact new proposal using its normal HTTP decision endpoint",async()=>{
+  const operator={me:{subjectId:"operator"}},auditor={me:{subjectId:"auditor"}};
+  const proposal={kind:"ROLLBACK",proposalId:"proposal-"+"1".repeat(32),mappingId:"mapping",bindingHash:"a".repeat(64),
+    proposalRevision:1,submittedBy:"operator",status:"PENDING",decision:null};
+  const receipt={...proposal,proposalRevision:2,status:"APPROVED",
+    decision:{decision:"APPROVE",decidedBy:"auditor",bindingHash:proposal.bindingHash}};
+  const calls=[];
+  const ctx={actors:{operator,auditor},command:revision=>({expectedRevision:revision}),
+    check:(name,ok)=>assert.ok(ok,name),post:async(...args)=>{calls.push(args);return receipt;}};
+  assert.equal(await approveNewMappingProposal(ctx,proposal),receipt);
+  assert.deepEqual(calls,[[auditor,"/api/v1/mapping-proposals/"+proposal.proposalId+"/decisions",
+    {decision:"APPROVE",bindingHash:proposal.bindingHash,command:{expectedRevision:1}},200,'"proposal:1"']]);
+  for(const invalid of [{...proposal,status:"APPROVED"},{...proposal,submittedBy:"auditor"},{...proposal,decision:receipt.decision}])
+    await assert.rejects(approveNewMappingProposal(ctx,invalid),/pending_distinct_reviewer/u);
+  assert.equal(calls.length,1);
+  for(const invalid of [{...receipt,proposalId:"proposal-"+"2".repeat(32)},
+    {...receipt,decision:{...receipt.decision,decidedBy:"previous-auditor"}},
+    {...receipt,decision:{...receipt.decision,bindingHash:"b".repeat(64)}}])
+    await assert.rejects(approveNewMappingProposal({...ctx,post:async()=>invalid},proposal),/decision_current_reviewer/u);
 });

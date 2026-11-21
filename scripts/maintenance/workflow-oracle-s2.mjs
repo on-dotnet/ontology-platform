@@ -563,6 +563,25 @@ async function access(ctx) {
   }
 }
 
+/** 由当前审核者的正式 HTTP 客户端审批刚创建的 Mapping 提案，并核对同一提案的决定。 */
+export async function approveNewMappingProposal(ctx, proposal) {
+  const {operator, auditor} = ctx.actors;
+  const submitter = operator.me.subjectId, reviewer = auditor.me.subjectId;
+  ctx.check("oracle_proposal_pending_distinct_reviewer", Boolean(submitter && reviewer && submitter !== reviewer
+    && proposal.submittedBy === submitter && proposal.status === "PENDING" && !proposal.decision
+    && ["PUBLISH", "ROLLBACK"].includes(proposal.kind) && /^proposal-[a-f0-9]{32}$/u.test(proposal.proposalId)
+    && /^[a-f0-9]{64}$/u.test(proposal.bindingHash) && Number.isSafeInteger(proposal.proposalRevision) && proposal.proposalRevision > 0));
+  const decision = {decision:"APPROVE", bindingHash:proposal.bindingHash, command:ctx.command(proposal.proposalRevision)};
+  const approved = await ctx.post(auditor, "/api/v1/mapping-proposals/"+proposal.proposalId+"/decisions",
+    decision, 200, '"proposal:'+proposal.proposalRevision+'"');
+  ctx.check("oracle_proposal_decision_current_reviewer", approved.kind === proposal.kind && approved.proposalId === proposal.proposalId
+    && approved.mappingId === proposal.mappingId && approved.submittedBy === submitter && approved.status === "APPROVED"
+    && approved.proposalRevision === proposal.proposalRevision + 1 && approved.bindingHash === proposal.bindingHash
+    && approved.decision?.decision === "APPROVE" && approved.decision.decidedBy === reviewer
+    && approved.decision.bindingHash === proposal.bindingHash);
+  return approved;
+}
+
 /** B先由三角色正式准备；真正同query源读后A-B-A交给已有正式DI在途测试。 */
 async function aba(ctx) {
   const {state,actors:{operator,auditor,activator,reader},get,post,request,command,save,check,report,call,audit}=ctx;
@@ -572,8 +591,11 @@ async function aba(ctx) {
   finally {report.sourceCases=[{name:"ambiguous",changed,restored:call("source_case","restore",changed.token)}];delete report.activeSourceCase;}
   const selected={...selectionOrigin.query,filters:{...selectionOrigin.query.filters,entityIri:"urn:ontology-platform:entity:094db4805030e6f0f5038180c180302762dc9eeb602ec313fb6f92642a44231e",siteId:"site-a"}};
   const selectedRequest=()=>({...reader,headers:{...reader.headers,"Idempotency-Key":randomUUID(),"X-Selection-Query-Id":selectionOrigin.queryId}});
-  await audit("aba-selection-current",async()=>ctx.record("aba-selection-current",await request(selectedRequest(),"POST","/api/v1/data/semantic-queries",selected),selected),1);
-  report.historySelection={originQueryId:selectionOrigin.queryId,originHash:selectionOrigin.sha256,selected};
+  const currentSelection=await audit("aba-selection-current",async()=>ctx.record("aba-selection-current",await request(selectedRequest(),"POST","/api/v1/data/semantic-queries",selected),selected),1);
+  check("oracle_aba_current_reader_query", /^query-[a-f0-9]{32}$/u.test(currentSelection.queryId)
+    && currentSelection.queryId!==selectionOrigin.queryId && JSON.parse(currentSelection.raw).status==="FOUND");
+  report.historySelection={originQueryId:selectionOrigin.queryId,originHash:selectionOrigin.sha256,
+    currentQueryId:currentSelection.queryId,currentQueryHash:currentSelection.sha256,selected};
   const path="/api/v1/mappings/"+state.mappingDraft.mappingId;
   const baseline=await get(activator,path+"/active");
   check("oracle_aba_current_A",baseline.mappingReleaseId===state.mappingReceipt.mappingReleaseId);
@@ -584,8 +606,7 @@ async function aba(ctx) {
   const assessment=await assess(ctx,"aba-b",null);
   const proposal=await post(operator,path+"/proposals",{kind:"PUBLISH",schemaVersion:"g4.mapping.v1",scope:draft.scope,binding:assessment.binding,
     expectedActive:assessment.expectedActive,expiresAtUtc:assessment.expiresAtUtc,draftId:draft.draftId,draftRevision:draft.revision,command:command()},201);
-  const approved=await post(auditor,"/api/v1/mapping-proposals/"+proposal.proposalId+"/decisions",
-    {decision:"APPROVE",bindingHash:proposal.bindingHash,command:command(proposal.proposalRevision)},200,'"proposal:'+proposal.proposalRevision+'"');
+  const approved=await approveNewMappingProposal(ctx,proposal);
   check("oracle_aba_B_approved_distinct",approved.status==="APPROVED"&&approved.submittedBy!==approved.decision.decidedBy);
   const envelope={queryId:state.latestQuery.queryId,proposalId:approved.proposalId,
     roles:[[operator,"A"],[auditor,"B"],[activator,"C"],[reader,"Q"]].map(([actor,role])=>({role,subjectId:actor.me.subjectId,cookie:actor.sessionCookie}))};

@@ -370,6 +370,7 @@ class S2ContinuationTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'S23_PREFIX_COMPAT_SCOPE'):n.compatible_prefix(archive,n.PREFIX['measuredCommit'],'s2-s3-oracle',stage)
                 archive.dispatch[key]=saved
             changes=[('scripts/maintenance/workflow-oracle-s2.mjs','async function queries(ctx)','async function queries(wrong)'),
+                ('scripts/maintenance/workflow-oracle-s2.mjs','approved.decision.decidedBy === reviewer','approved.decision.decidedBy !== reviewer'),
                 ('scripts/maintenance/workflow-oracle-query-fixture.mjs','export function currentProjection(','export function wrongCurrentProjection('),
                 ('scripts/maintenance/workflow_oracle_mapping_platform.py','def audit_window(','def wrong_audit_window('),
                 ('scripts/maintenance/workflow_oracle_mapping_s2_contract.py','def result_case(','def wrong_result_case(')]

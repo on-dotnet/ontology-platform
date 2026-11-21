@@ -68,7 +68,9 @@ public sealed partial class G4QueryMafRuntimeTests
         var original = await db.Queries.AsNoTracking().SingleAsync(row => row.Id == queryId);
         Assert.AreEqual("COMPLETED", original.ExecutionStatus);
         Assert.AreEqual(participants["Q"].Actor.SubjectId, original.SubjectId);
-        Assert.AreEqual(participants["Q"].Session, original.SessionReference);
+        // 失败输出只能说明归属不符；MSTest 的值比较会将两个服务器会话引用写入双流。
+        Assert.IsTrue(string.Equals(participants["Q"].Session, original.SessionReference, StringComparison.Ordinal),
+            "Oracle 查询原件与本轮 reader 会话不一致。");
         if (mappingAba)
             await MappingAbaAfterRealReadAsync(scope.ServiceProvider, participants["Q"].Actor, original, db,
                 envelope.RootElement.GetProperty("proposalId").GetString()!, participants["A"], participants["C"], participants["B"].Actor.SubjectId);
