@@ -382,6 +382,20 @@ class S2ContinuationTests(unittest.TestCase):
 
 
 class S2ConsumerTests(unittest.TestCase):
+    def test_current_reader_selection_matches_one_fresh_http_result(self):
+        raw='{"status":"FOUND"}';digest=ex.sha(raw.encode());query={'capabilityId':'g4_resolve_entity'}
+        history=dict(originQueryId='origin',currentQueryId='current',currentQueryHash=digest,selected=query)
+        row=dict(name='aba-selection-current',queryId='current',query=query,httpStatus=200,sha256=digest,raw=raw)
+        http=dict(method='POST',path='/api/v1/data/semantic-queries',status=200,sha256=digest)
+        report=dict(historySelection=history,oracleCases=[row],http=[http])
+        c.current_selection_receipt(report)
+        for changed in ({'currentQueryId':'origin'},{'currentQueryHash':'0'*64},{'selected':{}}):
+            with self.subTest(changed=changed),self.assertRaisesRegex(ValueError,'S23_CURRENT_READER_RESULT'):
+                c.current_selection_receipt({**report,'historySelection':{**history,**changed}})
+        for http_rows in ([],[http,http]):
+            with self.assertRaisesRegex(ValueError,'S23_CURRENT_READER_HTTP'):
+                c.current_selection_receipt({**report,'http':http_rows})
+
     def healthy(self):
         import base64
         query_id='query-'+'1'*32;eid=query_id+':e-'+'2'*32;rid='read-'+'3'*32;release='release-'+'4'*32

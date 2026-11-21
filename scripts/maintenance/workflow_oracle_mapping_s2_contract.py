@@ -244,6 +244,21 @@ def demand_connection_original(raw):
     return row
 
 
+def current_selection_receipt(report):
+    """按本窗真实查询响应核对所登记的新 ID 和结果摘要，不为在途事件签发资格。"""
+    history=report['historySelection']
+    rows=[row for row in report['oracleCases'] if row['name']=='aba-selection-current']
+    require(len(rows)==1,'S23_CURRENT_READER_SELECTION')
+    current=rows[0]
+    require(history['currentQueryId']==current['queryId'] and history['currentQueryId']!=history['originQueryId']
+            and history['selected']==current['query'] and current['httpStatus']==200
+            and history['currentQueryHash']==current['sha256']==hashlib.sha256(current['raw'].encode()).hexdigest()
+            and json.loads(current['raw'])['status']=='FOUND','S23_CURRENT_READER_RESULT')
+    matches=[row for row in report['http'] if (row['method'],row['path'],row['status'],row['sha256'])
+             ==('POST','/api/v1/data/semantic-queries',200,current['sha256'])]
+    require(len(matches)==1,'S23_CURRENT_READER_HTTP')
+
+
 def qualify(report):
     require(report['taskId']=='G4-ORACLE-MAPPING-QUERY-001' and report['runId']=='product-resume-01' and report['batch']['planId'] in ('s2-s3-01','s2-s3-01-access-01'),'S23_REPORT_OWNER')
     mode=report['mode'];rows=report.get('oracleCases',[])
@@ -259,6 +274,7 @@ def qualify(report):
       's3':{'mcp-'+x for x in CAPABILITIES},'ui-s3':{'ui-'+x for x in CAPABILITIES},'ui-s1':{'ui-refresh'}}
     if mode=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':required[mode]=required[mode]|{'healthy-relations'}
     require(set(names)==required.get(mode,set()),'S23_CASE_SET')
+    if mode=='s2-oracle-aba':current_selection_receipt(report)
     statuses=[result_case(row,report['oracleBinding']) for row in rows]
     return dict(status='SEMANTICS_QUALIFIED',mode=mode,cases=len(rows),statuses=statuses,scope='semantic original content; parent command and source audits qualify separately')
 

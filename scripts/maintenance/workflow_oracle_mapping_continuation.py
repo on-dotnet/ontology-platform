@@ -179,6 +179,14 @@ def compatible_prefix(archive,measured,mode,stage):
             row="    if report['batch']['planId']=='s2-s3-01-access-01':\n        if report['mode']=='s2-oracle-access':\n            from workflow_oracle_mapping_acl_observation import reopen\n            reopen(archive,report,host,origin)\n        if report['mode'] in ('s2-oracle-versions','s2-oracle-connection'):\n            require([w['expectedReads'] for w in report['oracleWindows'] if w['name']=='current-catalog-mapping']==[4],'S23_NEW_DOUBLE_TABLE_MAPPING_READS')\n"
             require(right.count(row)==1,'S23_PREFIX_SUFFIX_CONSUMER')
             right=right.replace(row,'',1)
+            # 只有未执行的 ABA 模式调用新增的响应核对，其余消费者语法树逐节点相同。
+            selection_call="    if mode=='s2-oracle-aba':current_selection_receipt(report)\n"
+            selection_start='def current_selection_receipt(report):'
+            if selection_start in right:
+                require(right.count(selection_start)==right.count('def qualify(report):')==right.count(selection_call)==1,'S23_PREFIX_SELECTION_BOUNDARY')
+                selection=right[right.index(selection_start):right.index('def qualify(report):')]
+                require(ex.sha(selection.encode())=='9406565fd1fc216869377bf20511a62e1b10dcd14ed5e98600576b2e42c97f02','S23_PREFIX_SELECTION_CONSUMER')
+                right=right.replace(selection,'',1).replace(selection_call,'',1)
             require(_program(left,{'frozen_plan'})==_program(right,{'frozen_plan'}),'S23_PREFIX_CONTRACT_CHANGED')
             continue
         else:require(False,'S23_PREFIX_DRIVER_CHANGED')
