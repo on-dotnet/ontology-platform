@@ -51,3 +51,5 @@
 2026-11-21 本批收尾状态为 **S2_BLOCKED_SOURCE_ACL_CLEANUP**。四角色已经正常认证，产品父命令 685e33e9abd749168f6152789677859a 在源 READ 撤权清理处失败。恢复权限并保留准确失败查询和租约，原资源已收口，S3 为 NOT_RUN。源证明修正通过本地定向测试，实机资格仍待核。当前停点为原分支统一交付及 ChatGPT 复审。详见[任务卡](G4-ORACLE-MAPPING-QUERY-001.md)和[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。
 
 2026-11-21 用户从 `095d2dd8ff957afa64f01fd938f18ffd357d8d5c` 明确继续同分支、同批。唯一新维护对象为 `query-3e6bb50bdffe43feaa09736718b1dcb0` 的原租约。保留原 FAILED 和失败审计，先实测源 READ 撤权及清理，再按 S2 资格自动推进 S3。沿既有正常静默认证、单条双表 grant、原预算及受保护资源边界。
+
+2026-11-21 本轮已按续行授权清理唯一指定行的残留租约。最新四角色正常认证和 source READ / access 均获资格，原失败完整保留。S2 的唯一 Mapping ABA 在当前与既存查询的会话一致性检查处失败，B 提案已获批但未激活，S3 未运行。2 个 API 与 5 个任务副本已收口。当前状态为 S2_PARTIAL_ABA_SESSION_BLOCKED_CHATGPT_REVIEW，统一交付后停 ChatGPT 复审。见[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。

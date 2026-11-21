@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_S3_IMPLEMENTING**。用户已准入对唯一残留行的任务级租约处置和当前 ACL 复验。本批最后一次正常认证四角色全部通过，S2 在源 READ 撤权查询的清理确认处停止，S3 未启动。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
+唯一任务状态 **S2_PARTIAL_ABA_SESSION_BLOCKED_CHATGPT_REVIEW**。指定旧租约已清，原失败保留。四角色认证与双表 access 已获资格，唯一在途 Mapping ABA 在会话前置处失败，S3 未运行。AC03-B 和 Oracle S0 仍 BLOCKED，G4 PARTIAL。详细原件与资源后态见[当前报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)。
 
 ## 执行身份与所有权
 
@@ -66,7 +66,7 @@ Master `/root` 单写现有证据消费者、共享驱动/fixture/platform、当
 | 切片 | 正例与关键反例 | 实现与最早验证 | 本批状态 |
 |---|---|---|---|
 | EC-01 | 无过滤阶段/父全窗完整事件闭包；同步重登记过滤A、缺父原件、错源/窗、同计数不同内容、间隙读、重复事件及边界歧义拒绝 | 正式 reopen_browser/reopen_runtime_case；离线原件重开，不启动服务 | PASS：52项定向、原六阶段递归重开及非作者170件原件复核 |
-| S2 | 六条单grant各自覆盖双表；先健康正式Mapping/查询，再独立整数/时间/关系、NULL、授权、同Q源后正式Mapping ABA、独立连接版本／旧selection、六态与新reader恢复 | fixture/m4/platform/evidence实际分发；先冻结新计划和独立预期 | PARTIAL：六组合grant已签发；前五槽CASE_QUALIFIED，权限槽失败已恢复；后缀认证到期、余槽NOT_RUN |
+| S2 | 六条单grant各自覆盖双表；先健康正式Mapping/查询，再独立整数/时间/关系、NULL、授权、同Q源后正式Mapping ABA、独立连接版本／旧selection、六态与新reader恢复 | fixture/m4/platform/evidence实际分发；先冻结新计划和独立预期 | PARTIAL：前五槽按原输入复用；四角色认证和 access 已获新资格。唯一 Mapping ABA 前置失败，连接版本、旧 selection 等后续项目 NOT_RUN |
 | S3 | Oracle正式UI及四MCP工具、同query原字节/恢复零源读/撤权清屏与身份迟到响应；旧源兼容按输入复用 | 正式产品组件和真实消费者；S2前提成立自动推进 | NOT_RUN |
 
 原旧auth-handoff-01计划不改。资源串行使用，不启动未准备的长链；不重试AC03-B抢竞态，不使用慢SQL/压力/新依赖。trust/secret只有可恢复的已登记合成版本才运行，否则准确记录缺项并继续独立范围。集中交付目录 `docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/`；三文件绑定准确Head，公开字段白名单，私有原件仅本机重开。
@@ -135,3 +135,5 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 本次维护目标仅为最后失败窗口的 `query-3e6bb50bdffe43feaa09736718b1dcb0`。沿现有 SemanticQuery 准确行两列 CAS 和治理同事务审计、原生启动/停机、有界平台访问及真实消费者。维护从已核关闭状态起步。原失败与 AC03-B 不得提升。Master 单写此目标的执行入口、原窗口驱动、消费者和三份交付。
 
 源撤权查询在候选 319e7cfe 上实测为 UNAVAILABLE，物理释放得到确认、租约两列为空。原父 c9a0458559de4934a530dcbcc9ca74a4 的旧结果恢复返回 HTTP 500。当前原路径补 QueryBindingReader.cs 对 Oracle 只读证明拒绝的正式错误映射，沿原范围复核随后短链。
+
+2026-11-21 续行收尾。按用户授权仅维护 query-3e6bb50bdffe43feaa09736718b1dcb0 的两列租约，原 FAILED 与失败审计保留。最新 access 实测 78 项，源 READ 撤回下的清理确认 1.5729 ms，旧结果 503，目标 READ 已恢复。原 A 的激活 revision 仍为 1，批准的 B 提案未激活。S3 未准入。门禁登记包括三个新增 ACL 消费模块，生命周期单测改用实际产品资源入口，129/129 通过。两 API 和五副本已收口。当前停点为 ChatGPT 复审。
