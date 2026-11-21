@@ -154,7 +154,7 @@ public sealed partial class G4QueryMafRuntimeTests
                 Assert.AreEqual("APPROVED", approvedA.Status);
                 Assert.IsNotNull(approvedA.Decision);
                 Assert.AreEqual(auditor.Actor.SubjectId, approvedA.Decision.DecidedBy);
-                Assert.AreEqual(proposedA.BindingHash, approvedA.Decision?.BindingHash);
+                Assert.AreEqual(proposedA.BindingHash, approvedA.Decision.BindingHash);
                 evidence["rollbackDecision"] = new { path = "MappingApplicationService.DecideAsync", proposedA.ProposalId,
                     proposedA.BindingHash, proposedA.SubmittedBy, approvedA.Decision.DecidedBy,
                     sessionHash = G4QueryCanonical.Hash(System.Text.Encoding.UTF8.GetBytes(auditor.Session)) };
