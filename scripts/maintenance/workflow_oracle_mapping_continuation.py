@@ -23,9 +23,9 @@ RUNTIME_PREFIX_DRIVERS={
     'scripts/maintenance/workflow-oracle-s2.mjs':
         ('e7ab33e1bd38429eb2bc1d7aa7071da3a39022fb4329b6c23404bf9757a546e9', '2b4042e16cfd0b386a185b1d65a9ae3c8e43e6086331a1505068ed002dc90850'),
     'scripts/maintenance/workflow_oracle_mapping_s2.py':
-        ('314fae7820ad26533d2a2e651e271de731ae2983d2b91b224754a8afd2aa392b', '4604767c1b60307271abfc340f53edb3253a1320caabc51fd316e1b4b985f6e7'),
+        ('314fae7820ad26533d2a2e651e271de731ae2983d2b91b224754a8afd2aa392b', '3e8d16b2e6630a49de08553520b110f2bb387520b5d9aa398c574796b861839b'),
     'scripts/maintenance/workflow_oracle_mapping_s2_contract.py':
-        ('87601573a5b3ea57c6e7f46e96f048262f8eac94fddc76ed2dab7b6424afc8d2', '24b9e8c31d6a9b8b311001258ab8dd14852ab635d53c1d22054d25524a750b5c'),
+        ('87601573a5b3ea57c6e7f46e96f048262f8eac94fddc76ed2dab7b6424afc8d2', '0109f016e550b5ae7711b07c969fa8b9d77db6996d3c2f5b9f14e7755b88f7b2'),
 }
 MODES=('s0-oracle-auth','s2-oracle-vocabulary','s2-oracle-mapping','s2-oracle-queries','s2-oracle-relations')
 TASK='G4-ORACLE-MAPPING-QUERY-001'
@@ -153,7 +153,7 @@ def compatible_prefix(archive,measured,mode,stage):
             require(all(text.count(begin)==text.count(end)==1 for text in (left,right)),'S23_PREFIX_ACCESS_BOUNDARY')
             left=left[:left.index(begin)]+left[left.index(end):];right=right[:right.index(begin)]+right[right.index(end):]
         elif name.endswith('/workflow_oracle_mapping_platform_recovery.py'):
-            start_patch="            from workflow_oracle_runtime_window import LAST_CLOSE, policy, published_graphs\n            if policy() is not None:\n                receipt['currentGraphs']=published_graphs(cid,started,int(pid),basis,close_sha=LAST_CLOSE)\n            else:\n                receipt['currentGraphs']=current_fuseki_graphs(cid,basis)"
+            start_patch="            from workflow_oracle_runtime_window import policy, published_graphs\n            if (window := policy()) is not None:\n                receipt['currentGraphs']=published_graphs(cid,started,int(pid),basis,close_sha=window['priorCloseSha256'])\n            else:\n                receipt['currentGraphs']=current_fuseki_graphs(cid,basis)"
             graph_patch="    if row.get('currentGraphs',{}).get('kind')=='s2-s3-01-runtime-01':\n        from workflow_oracle_runtime_window import published_graphs\n        require(row['stage']=='product-resume-01' and row['role']=='fuseki' and row['status']=='RUNNING' and\n                row['productUse']=='CURRENT_GRAPHS_VERIFIED' and\n                published_graphs(cid,started,pid,row['checkpoint'],row['currentGraphs']['commands'],close_sha=row['currentGraphs']['close'])==row['currentGraphs'],\n                'TDB_RUNTIME_GRAPHS')\n        return row['attempt']\n"
             require(right.count(start_patch)==right.count(graph_patch)==1,'S23_PREFIX_RUNTIME_GRAPH_SCOPE')
             right=right.replace(start_patch,"            receipt['currentGraphs']=current_fuseki_graphs(cid,basis)",1).replace(graph_patch,'',1)
@@ -311,6 +311,83 @@ def qualified_access(root,archive=None):
     return ref
 
 
+def activation_chain_sql(mapping_id):
+    """在同一只读快照核对当前行、不可变回执、命令与实际映射范围。"""
+    require(re.fullmatch('mapping-[a-f0-9]{32}', mapping_id), 'S23_PREFIX_MAPPING_ID')
+    return f'''SELECT json_build_object(
+ 'current', json_build_array(v."ActivationId",v."ActivationRevision",v."ReleaseId"),
+ 'receipts', (SELECT json_agg(json_build_object(
+    'receipt', convert_from(a."CanonicalBytes",'UTF8')::json,
+    'connection', a."BindingJson"::json->>'sourceConnectionId',
+    'catalog', a."BindingJson"::json->>'sourceCatalogSnapshotId',
+    'fingerprint', a."BindingJson"::json->>'sourceCatalogFingerprint',
+    'check', a."CheckId", 'command', m."CommandId")
+    ORDER BY a."ActivationRevision")
+ FROM connections."MappingActivations" a
+ JOIN connections."MappingActivationChecks" ck ON ck."Id"=a."CheckId" AND ck."ProposalId"=a."ProposalId"
+ JOIN connections."MappingProposals" p ON p."Id"=a."ProposalId" AND p."ActivationId"=a."Id"
+ JOIN connections."MappingCommands" m ON m."MappingId"=a."MappingId" AND m."ResponseBytes"=a."CanonicalBytes"
+ WHERE a."MappingId"=v."MappingId" AND a."OrganizationId"=v."OrganizationId" AND a."SiteIds"=v."SiteIds"
+ AND ck."MappingId"=a."MappingId" AND p."DecidedBy"<>p."SubmittedBy"
+ AND a."ContentHash"=encode(sha256(a."CanonicalBytes"),'hex')))
+ FROM connections."MappingActives" v WHERE v."MappingId"='{mapping_id}'
+ AND v."OrganizationId"='org-demo' AND v."SiteIds"=ARRAY['site-a']::text[];'''.encode()
+
+
+def check_activation_chain(binding, state, recorded_b, chain):
+    """历史查询继续锚定旧 A。当前投影只能通过同一 Mapping 的连续三笔真实提交。"""
+    old, current = binding['activation'], state['mappingReceipt']
+    receipts = chain['receipts'] or []
+    require(len(receipts) == 3, 'S23_PREFIX_ACTIVATION_COUNT')
+    a, b, restored = [row['receipt'] for row in receipts]
+    def receipt_bytes(value):
+        # 正式 HTTP 和 CanonicalBytes 使用不同 UTC 后缀，保留原有七位小数精度。
+        stamp = value['activatedAtUtc']
+        require(re.fullmatch(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:[.]\d{1,7})?(?:Z|[+]00:00)',stamp),
+                'S23_PREFIX_RECEIPT_TIME')
+        return {**value, 'activatedAtUtc': stamp.removesuffix('+00:00').removesuffix('Z')+'Z'}
+    require(receipt_bytes(a) == receipt_bytes(old) and receipt_bytes(b) == receipt_bytes(recorded_b)
+            and receipt_bytes(restored) == receipt_bytes(current)
+            and len({row['activationId'] for row in (a,b,restored)}) == 3
+            and len({row['proposalId'] for row in (a,b,restored)}) == 3
+            and all(row['mappingId'] == old['mappingId'] for row in (b,restored))
+            and [row['activationRevision'] for row in (b,restored)] ==
+                [old['activationRevision']+1, old['activationRevision']+2]
+            and b['previousReleaseId'] == old['mappingReleaseId'] != b['mappingReleaseId']
+            and restored['previousReleaseId'] == b['mappingReleaseId']
+            and restored['kind'] == 'ROLLBACK' and b['kind'] == 'PUBLISH'
+            and restored['mappingReleaseId'] == old['mappingReleaseId']
+            and restored['manifestHash'] == old['manifestHash']
+            and chain['current'] == [current['activationId'],current['activationRevision'],current['mappingReleaseId']],
+            'S23_PREFIX_ACTIVATION_CHAIN')
+    require(all((row['connection'],row['catalog'],row['fingerprint']) ==
+                (binding['connectionId'],binding['catalogSnapshotId'],state['catalogFingerprint'])
+                for row in receipts) and all(len({row[key] for row in receipts}) == 3
+                and all(row[key] for row in receipts) for key in ('command','check')), 'S23_PREFIX_CHAIN_BINDING')
+
+
+def prefix_activation(root, host, binding, state, command_id=None, archive=None):
+    import workflow_oracle_mapping_platform as p
+    import workflow_oracle_mapping_continuity as c
+    from workflow_oracle_mapping_evidence import utc
+    cid = '5b90bb8f66fb4ddd9bfeddbe5015133a'
+    raw = _read(root, Path('artifacts/workflow')/TASK/'commands'/RUN/cid/'stdout.txt', archive)
+    require(ex.sha(raw) == 'd1fba9b095bec4a31831c598e4bbf7bd043579d923e57efd3403a0dab74efc15', 'S23_PREFIX_ABA_STDOUT')
+    original, = [json.loads(line) for line in raw.splitlines() if line.startswith(b'{"taskId":')]
+    sql = activation_chain_sql(binding['activation']['mappingId'])
+    if command_id is None:
+        _, command_id = p.read_pg(sql,'s23-prefix-activation')
+    require(re.fullmatch('[a-f0-9]{32}',command_id), 'S23_PREFIX_ACTIVATION_COMMAND')
+    pg = host['services']['platform-pg']
+    argv = ['docker','--context','desktop-linux','exec','-i','--user','postgres',pg['containerId'],
+            'psql','-XwqAt','-d','mapping','-v','ON_ERROR_STOP=1']
+    rec,out,err = c.command(root,command_id,RUN,argv,'omq-pg-s23-prefix-activation',
+                            ex.sha(b'BEGIN READ ONLY;\n'+sql+b'\nCOMMIT;'),15,archive)
+    require(not err and utc(pg['startedAt']) < utc(rec['startedAtUtc']), 'S23_PREFIX_ACTIVATION_GENERATION')
+    check_activation_chain(binding,state,original['activatedB'],json.loads(out))
+    return command_id
+
+
 def prepare_prefix(root,descriptor,plan_id=PLAN_ID):
     """父命令启动前冻结当前基线及原query身份；不读取或移植任何旧会话材料。"""
     import workflow_oracle_mapping_platform as p
@@ -321,7 +398,7 @@ def prepare_prefix(root,descriptor,plan_id=PLAN_ID):
     query,mapping,host=_context(qualified,root);state=json.loads((p.AREA.parent/RUN/'oracle-two-table.json').read_bytes())
     projection=_state_projection(state);old=query['oracleBinding'];latest=projection['latestQuery']
     require(projection['connectionId']==old['connectionId'] and projection['catalogSnapshotId']==old['catalogSnapshotId']
-            and projection['mappingReceipt']==old['activation'] and latest['reportName'] in qualified['members'] and json.loads(_read(root,qualified['members'][latest['reportName']]['path']))==query
+            and (plan_id==RUNTIME_PLAN or projection['mappingReceipt']==old['activation']) and latest['reportName'] in qualified['members'] and json.loads(_read(root,qualified['members'][latest['reportName']]['path']))==query
             and latest['queryId']==query['oracleCases'][2]['queryId'] and latest['resultHash']==query['oracleCases'][2]['sha256'],'S23_PREFIX_CURRENT_BINDING')
     from workflow_oracle_mapping_acl_host import lifecycle
     if plan_id==RUNTIME_PLAN:
@@ -329,6 +406,8 @@ def prepare_prefix(root,descriptor,plan_id=PLAN_ID):
     current=p.runtime_binding();continuity=lifecycle(root,host,current)
     snapshot=s.source_snapshot();require(snapshot['rows']==query['independentSource']['rows'] and snapshot['hashes']==query['independentSource']['hashes'],'S23_PREFIX_CURRENT_SOURCE')
     observation=dict(taskId=TASK,runId=RUN,batch='s2-s3-01',planId=plan_id,qualifiedPrefix=PREFIX,state=projection,host=current,source=snapshot,hostContinuity=continuity)
+    if plan_id == RUNTIME_PLAN:
+        observation['activationChainCommand'] = prefix_activation(root,current,old,projection)
     name='prefix-observation-'+uuid.uuid4().hex+'.json';path=p.AREA.parent/RUN/'s2-s3-01'/name;p.save(path,observation)
     return dict(file=name,sha256=ex.sha(path.read_bytes()))
 
@@ -358,11 +437,17 @@ def reopen_prefix(root,stage,archive):
         row,out,err=archive.command(cid,argv,'s23-independent-source-snapshot',ex.sha(sql.encode()),None,root)
         require(row['classification']=='SUCCESS' and row['exitCode']==0 and [json.loads(x,parse_float=str) for x in out.decode().splitlines() if x.strip()]==snapshot['rows'][index],'S23_PREFIX_SOURCE_COMMAND')
     parent=archive.read(archive.dispatch['commandId']+'-receipt.json');previous=archive.read(PREFIX['commandId']+'-receipt.json')
-    for cid in [obs['host']['commandId'],*snapshot['commandIds']]:
+    chain = obs.get('activationChainCommand')
+    if stage['plan']['planId'] == RUNTIME_PLAN and archive.dispatch['commandId'] not in (
+            '1080791aa97546f29c34fd915618ecef','c02e89f8d8f2481f90058606ccf71b29'):
+        require(chain, 'S23_PREFIX_ACTIVATION_MISSING')
+    if chain:
+        prefix_activation(root,obs['host'],query['oracleBinding'],obs['state'],chain,archive)
+    for cid in [obs['host']['commandId'],*snapshot['commandIds'],*([chain] if chain else [])]:
         sample=archive.read(cid+'-receipt.json')
         require(utc(previous['endedAtUtc'])<=utc(sample['startedAtUtc'])<=utc(sample['endedAtUtc'])<=utc(parent['startedAtUtc']),'S23_PREFIX_OBSERVATION_ORDER')
     binding=query['oracleBinding'];state=obs['state'];latest=state['latestQuery']
-    require(state['connectionId']==binding['connectionId'] and state['catalogSnapshotId']==binding['catalogSnapshotId'] and state['mappingReceipt']==binding['activation']
+    require(state['connectionId']==binding['connectionId'] and state['catalogSnapshotId']==binding['catalogSnapshotId'] and (chain or state['mappingReceipt']==binding['activation'])
         and latest['queryId']==query['oracleCases'][2]['queryId'] and latest['resultHash']==query['oracleCases'][2]['sha256']
         and latest['reportName'] in qualified['members'] and json.loads(_read(root,qualified['members'][latest['reportName']]['path']))==query,'S23_PREFIX_QUERY_BINDING')
     reuse={'reusedAccess':qualified_access(root,archive)} if stage['plan']['planId']==RUNTIME_PLAN else {}

@@ -70,6 +70,12 @@ class OraclePlatformBoundaryTests(unittest.TestCase):
 
 
 class OracleFrozenMetadataTests(unittest.TestCase):
+    def test_normal_mapping_restore(self):
+        import subprocess
+        result = subprocess.run(['node', '--test', str(ROOT / 'scripts/tests/WorkflowOracleMappingRestore.Tests.mjs')],
+                                capture_output=True, timeout=20)
+        self.assertEqual(0, result.returncode, (result.stdout + result.stderr).decode())
+
     def test_exact_original_and_changed_variants(self):
         import subprocess
         result = subprocess.run(['pwsh', '-NoProfile', '-File', str(ROOT / 'scripts/tests/OracleFrozenMetadata.Tests.ps1')], capture_output=True, timeout=15)

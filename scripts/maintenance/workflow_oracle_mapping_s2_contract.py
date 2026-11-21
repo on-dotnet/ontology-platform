@@ -327,6 +327,119 @@ def aba_reads(report, original):
             'S23_ROLLBACK_CURRENT_DECISION')
 
 
+def aba_query_post_state(original):
+    """验证同一 Q 的持久租约对、fence 与执行审计，分列及时解占和保留占位。"""
+    import re
+    from workflow_oracle_mapping_formal_observer import ns
+    fields = ('postFence', 'postLeaseOwnerHash', 'postLeaseUntilUtc', 'postErrorCode')
+    require(all(key in original for key in fields), 'S23_ABA_POST_ROW_MISSING')
+    fence, owner, until, code = (original[key] for key in fields)
+    first = original['fence']
+    status = original['executionStatus']
+    hold = owner is not None
+    require(status in ('RUNNING', 'FAILED', 'CANCELLED') and type(first) is int and first > 0
+            and type(fence) is int and fence == first + int(status != 'RUNNING')
+            and (until is not None) == hold and (not hold or
+                isinstance(owner, str) and re.fullmatch('[a-f0-9]{64}', owner) and owner == original['leaseOwnerHash']),
+            'S23_ABA_POST_FENCE_OWNER')
+    if hold:
+        # 正常五秒 Q 的心跳只续至原截止；取消先赢则有独立的 PG 提交清理期限。
+        stamp = ns(until)
+        require(status == 'CANCELLED' or stamp == ns(original['deadlineAtUtc']), 'S23_ABA_POST_LEASE')
+    audits = original['queryAudits']
+    require(len({row['id'] for row in audits}) == len(audits) and all(row['outcome'] == 'failure' for row in audits)
+            and original['successfulQueryAudits'] == 0 and original['failedQueryAudits'] == len(audits),
+            'S23_ABA_POST_AUDITS')
+    if status == 'FAILED':
+        require(len(audits) == 1 and code in ('query_binding_stale', 'query_forbidden', 'query_timeout', 'query_source_unavailable'),
+                'S23_ABA_POST_FAILURE')
+        if code in ('query_binding_stale', 'query_forbidden'):
+            require(not hold and code == original['errorCode'], 'S23_ABA_POST_REJECTION')
+            return 'FINAL_REJECTION_RELEASED'
+    else:
+        # 两个上下文先读查询再读审计。RUNNING 后新增一次失败审计仍无法证明占位已清。
+        require(code is None and (status == 'RUNNING' and hold and len(audits) <= 1
+                or status == 'CANCELLED' and not audits), 'S23_ABA_POST_LIFECYCLE')
+    return 'LEASE_HELD_NOT_QUALIFIED' if hold else 'OTHER_TERMINAL_RELEASE_OBSERVED'
+
+
+def aba_diagnostics(original):
+    """独立校验真实运行 stdout 中的分段、跨调用 ID、精确命令后态，与四个合格事件分开。"""
+    import math
+    from workflow_oracle_mapping_formal_observer import ns
+    phases = original.get('diagnosticPhases', [])
+    require(0 < len(phases) <= 128 and original.get('diagnosticPhasesDropped') == 0, 'S23_ABA_PHASE_CAPTURE')
+    query = original['queryId']
+    deadline = ns(original['deadlineAtUtc'])
+    last = -1
+    for row in phases:
+        point = ns(row['utc'])
+        require(row['queryId'] == query and ns(row['deadlineAtUtc']) == deadline
+                and 0 <= row['monotonicMs'] <= original['elapsedMs'] and row['monotonicMs'] >= last
+                and math.isclose(row['remainingMs'], (deadline-point)/1_000_000, abs_tol=0.001)
+                and row['cancelled'] is False and point < deadline, 'S23_ABA_PHASE_CLOCK')
+        last = row['monotonicMs']
+
+    b, a = original['activatedB'], original['activatedA']
+    cursor = 0
+    def point(name, edge, resource=None):
+        nonlocal cursor
+        require(cursor < len(phases), 'S23_ABA_PHASE_MISSING')
+        row = phases[cursor]
+        cursor += 1
+        require(row['phase'] == name and row['edge'] == edge and (resource is None or row['resourceId'] == resource)
+                and row['errorCode'] == ('query_binding_stale' if edge == 'ERROR' else None), 'S23_ABA_PHASE_PATH')
+        return row
+
+    point('CALLBACK', 'ENTER', b['proposalId'])
+    commands = {}
+    def mutation(name, subject, output, operation):
+        entered = point(name, 'ENTER', subject)
+        command = entered.get('commandId')
+        require(isinstance(command, str) and command and command not in commands, 'S23_ABA_PHASE_COMMAND')
+        commands[command] = operation
+        return point(name, 'RETURN', output)['resourceId']
+
+    mutation('B_ACTIVATE', b['proposalId'], b['activationId'], 'activate:'+b['proposalId'])
+    job = mutation('ROLLBACK_VALIDATE_ENQUEUE', original['mappingId'], None, 'validate')
+    require(isinstance(job, str) and job, 'S23_ABA_PHASE_JOB')
+    claimed = False
+    assessment = None
+    while cursor < len(phases) and phases[cursor]['phase'] == 'WORKER_RUN':
+        point('WORKER_RUN', 'ENTER', job)
+        claim = point('WORKER_RUN', 'RETURN')['resourceId']
+        require(claim is None or claim == job, 'S23_ABA_PHASE_CLAIM')
+        claimed |= claim == job
+        point('ROLLBACK_JOB_READ', 'ENTER', job)
+        assessment = point('ROLLBACK_JOB_READ', 'RETURN')['resourceId']
+    require(claimed and isinstance(assessment, str) and assessment, 'S23_ABA_PHASE_CLAIM')
+    point('ROLLBACK_ASSESSMENT_READ', 'ENTER', assessment)
+    point('ROLLBACK_ASSESSMENT_READ', 'RETURN', assessment)
+    mutation('ROLLBACK_PROPOSE', assessment, a['proposalId'], 'propose')
+    mutation('ROLLBACK_DECIDE', a['proposalId'], a['proposalId'], 'decide:'+a['proposalId'])
+    mutation('A_ACTIVATE', a['proposalId'], a['activationId'], 'activate:'+a['proposalId'])
+    point('CALLBACK', 'RETURN', query)
+    point('FINAL_BINDING_CHECK', 'ENTER', query)
+    point('FINAL_BINDING_CHECK', 'ERROR', query)
+    require(cursor == len(phases), 'S23_ABA_PHASE_EXTRA')
+    post = original['postActive']
+    require(original['postStateStatus'] == 'READ' and original['postStateMissing'] == []
+            and ns(original['events'][-1]['utc']) <= ns(original['postStateStartedAtUtc']) <= ns(original['postStateFinishedAtUtc'])
+            and original['postStateElapsedMs'] >= 0
+            and (post['mappingId'], post['releaseId'], post['activationId'], post['activationRevision'])
+            == (original['mappingId'], a['mappingReleaseId'], a['activationId'], a['activationRevision']), 'S23_ABA_POST_STATE')
+    actual = original['postActivations']
+    require(len(actual) == 2, 'S23_ABA_POST_ACTIVATIONS')
+    for receipt, record in zip((b, a), actual):
+        require((receipt['activationId'], receipt['proposalId'], receipt['mappingReleaseId'], receipt['activationRevision'])
+                == (record['id'], record['proposalId'], record['releaseId'], record['activationRevision'])
+                and sum(check['id'] == record['checkId'] and check['proposalId'] == record['proposalId'] and check['status'] == 'PASS'
+                        for check in original['postChecks']) == 1, 'S23_ABA_POST_ACTIVATIONS')
+    saved = original['postCommands']
+    require(len(saved) == len(commands) and {row['commandId']: row['operation'] for row in saved} == commands, 'S23_ABA_POST_COMMANDS')
+    return aba_query_post_state(original)
+
+
 def qualify(report):
     require(report['taskId']=='G4-ORACLE-MAPPING-QUERY-001' and report['runId']=='product-resume-01' and report['batch']['planId'] in ('s2-s3-01','s2-s3-01-access-01','s2-s3-01-runtime-01'),'S23_REPORT_OWNER')
     mode=report['mode'];rows=report.get('oracleCases',[])
@@ -342,12 +455,15 @@ def qualify(report):
       's3':{'mcp-'+x for x in CAPABILITIES},'ui-s3':{'ui-'+x for x in CAPABILITIES},'ui-s1':{'ui-refresh'}}
     if mode=='s2-oracle-access' and report['batch']['planId']=='s2-s3-01-access-01':required[mode]=required[mode]|{'healthy-relations'}
     require(set(names)==required.get(mode,set()),'S23_CASE_SET')
+    settlement = {}
     if mode=='s2-oracle-aba':
         current_selection_receipt(report)
         runtime_seed(report,report,report['aba']['original'])
         aba_reads(report,report['aba']['original'])
+        if report['batch']['planId'] == 's2-s3-01-runtime-01':
+            settlement['oracleSettlement'] = aba_diagnostics(report['aba']['original'])
     statuses=[result_case(row,report['oracleBinding']) for row in rows]
-    return dict(status='SEMANTICS_QUALIFIED',mode=mode,cases=len(rows),statuses=statuses,scope='semantic original content; parent command and source audits qualify separately')
+    return dict(**settlement,status='SEMANTICS_QUALIFIED',mode=mode,cases=len(rows),statuses=statuses,scope='semantic original content; parent command and source audits qualify separately')
 
 
 
@@ -460,7 +576,7 @@ def reopen_grants(archive,report,host,origin):
         require(len(lookup)==len(items) and all((item['role'],item['operation']) in (fixture.SCOPED if item['kind']=='COMBINED' else fixture.WORKFLOW) for item in items),'S23_ISSUANCE_SCOPE')
         pairs=[(state['subjects'][role],[item['operation'] for item in items if item['role']==role]) for role in state['subjects']]
         if preparing:
-            require(plan['basis'] == fixture.LAST_GRANTS, 'S23_PREPARE_PLAN_BASIS')
+            require(plan['basis'] == grants['renewal']['basis'], 'S23_PREPARE_PLAN_BASIS')
             body,ids=fixture.append_body(state,items,before['epoch'])
         else:
             body,ids=grant_transaction(state,fixture.OBJECTS,fixture.FIELDS,pairs,lambda who,op:lookup[(who,op)],report['runId'])

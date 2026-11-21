@@ -119,6 +119,8 @@ public sealed class MappingJobWorker : BackgroundService
                 revision = job.Revision;
                 await db.SaveChangesAsync(deadline.Token);
                 await transaction.CommitAsync(deadline.Token);
+                // 仅在真实领取提交后标记所在活动；不记候选或未赢得租约的身份。
+                System.Diagnostics.Activity.Current?.SetTag("mapping.worker.claimed_job_id", job.Id);
             }
             // 真正源IO与G3原件检查均受评估器统一30秒预算控制。
             var report = await validator.AssessAsync(proof.Actor, proof.SessionReference, input.Draft, input.Target, "mapping.validate", token);

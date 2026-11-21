@@ -14,12 +14,25 @@ public sealed partial class G4QueryRaceTests
     [DataRow("cancel-timely")]
     [DataRow("cancel-lock-late")]
     [DataRow("success-after-branch")]
+    [DataRow("final-403")]
+    [DataRow("final-409")]
+    [DataRow("final-audit-fault")]
+    [DataRow("final-wrong-owner")]
+    [DataRow("final-wrong-fence")]
+    [DataRow("final-lock-expired")]
+    [DataRow("final-cancel-won")]
+    [DataRow("final-unconfirmed")]
+    [DataRow("final-late")]
+    [DataRow("final-wrong-origin")]
     public Task HealthyReaderThenPostgresRace(string path) => VerifyCapacityAsync(true, path);
 
     /// <summary>使用驱动已核身份的测试库与真实治理会话，受控空读者仅提供源观察的确定顺序。</summary>
     private static async Task VerifyPostReadRaceAsync(string path, G4QueryResultStore store, G4QueryResultStore other,
         G4QueryRecord lease, MappingAuthorizationProof session, MappingAuthorizationProof proof, G4QueryDbContext locker, GovernanceDbContext audits)
     {
+        // 与产品 Gateway 相同的单调根截止，从本次已准入行继续收紧。
+        using var root = new G4RequestDeadline(TimeProvider.System, CancellationToken.None);
+        root.Tighten(lease.DeadlineAtUtc);
         // 在任何结算测时前准备 SQL 模型及数据库路径，避免将其首调成本计入行锁窗口。
         var missing = new G4QueryRecord { Id = "absent-" + lease.Id, LeaseOwner = lease.LeaseOwner, Fence = 1 };
         await store.FailOracleAsync(missing, session.Scope, session.Actor, () => TimeSpan.FromMilliseconds(250), CancellationToken.None);
@@ -61,6 +74,92 @@ public sealed partial class G4QueryRaceTests
             [new G4QueryStoredReceipt { Receipt = receipt, ReceiptHash = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(receipt)) }], CancellationToken.None);
         // 独立计时源和生产分支使用相同的 System 单调时基。
         TimeSpan Elapsed() => Stopwatch.GetElapsedTime(branch.Started);
+        if (path.StartsWith("final-", StringComparison.Ordinal))
+        {
+            // 第二实际源未确认或晚释放时，首个健康分支不能为整次读取背书。
+            if (path is "final-unconfirmed" or "final-late")
+            {
+                await Assert.ThrowsAsync<SemanticOperationException>(() => execution.ReadOracleAsync(lease, branch,
+                    lease.DeadlineAtUtc, CancellationToken.None, store.ObserveOracleAsync, async _ =>
+                    {
+                        // 此分支确实开始，待归还的独立申请与第一个健康范围分离。
+                        var lifetime = G4OracleSourceLifetime.Current!;
+                        var acquisition = lifetime.BeginSource();
+                        if (path == "final-late")
+                        {
+                            await Task.Delay(1010);
+                            Assert.ThrowsExactly<InvalidOperationException>(() => lifetime.ConfirmReleased(acquisition));
+                        }
+                        return read;
+                    }));
+            }
+            // 源截止已经过去，普通最终授权或绑定拒绝的根预算仍然有效。
+            while (Elapsed() <= TimeSpan.FromSeconds(1)) await Task.Delay(4);
+            if (path == "final-403")
+            {
+                // 更新仅属本夹具、该主体与连接的真实 grant，使最终治理复核拒绝。
+                var grant = await audits.MappingAuthorizationGrants.SingleAsync(g => g.SubjectId == session.Actor.SubjectId &&
+                    g.OrganizationId == session.Actor.OrganizationId && g.ConnectionId == state.Binding.ConnectionId);
+                grant.RevokedAtUtc = DateTimeOffset.UtcNow;
+                await audits.SaveChangesAsync();
+            }
+            // 使用生产完成事务的参与者及显式回滚，不能把构造的同名异常冒充最终拒绝。
+            var rejected = await Assert.ThrowsAsync<SemanticOperationException>(() => other.CompleteAsync(lease, session,
+                [proof], query, state, result, [new G4QueryStoredReceipt { Receipt = receipt,
+                    ReceiptHash = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(receipt)) }], root.Token, branch));
+            Assert.AreEqual(path == "final-403" ? (403, "query_forbidden") : (409, "query_binding_stale"), (rejected.Status, rejected.Code));
+            if (path == "final-wrong-owner")
+                await locker.Queries.Where(q => q.Id == lease.Id).ExecuteUpdateAsync(update => update.SetProperty(q => q.LeaseOwner, lease.LeaseOwner + "-other"));
+            if (path == "final-wrong-fence")
+                await locker.Queries.Where(q => q.Id == lease.Id).ExecuteUpdateAsync(update => update.SetProperty(q => q.Fence, lease.Fence + 1));
+            if (path == "final-cancel-won") await store.CancelAsync(lease.Id, session, [proof], CancellationToken.None);
+            // 结算实例也使用本例的审计故障注入；生产入口收到同一个回滚异常对象。
+            var finalExecution = new G4QueryExecution(null!, null!, null!, other, TimeProvider.System);
+            Task Settle() => finalExecution.SettleOracleOwnerAsync(lease, branch, session, root.Token,
+                path == "final-wrong-origin" ? new SemanticOperationException(rejected.Status, rejected.Code) : rejected);
+            if (path == "final-lock-expired")
+            {
+                await using var held = await locker.Database.BeginTransactionAsync();
+                // 先从 PG 取持锁者 PID，再证明生产结算确实在该行锁上等待。
+                var pid = (await locker.Database.SqlQuery<int>($"""
+                    SELECT pg_backend_pid() AS "Value" FROM semantic_query."Queries" WHERE "Id"={lease.Id} FOR UPDATE
+                    """).ToArrayAsync()).Single();
+                var settling = Settle();
+                try
+                {
+                    var waiting = false;
+                    while (!waiting && root.Remaining > TimeSpan.FromMilliseconds(100))
+                    {
+                        waiting = await locker.Database.SqlQuery<bool>($"""
+                            SELECT EXISTS (SELECT 1 FROM pg_locks l WHERE NOT l.granted AND {pid}=ANY(pg_blocking_pids(l.pid))) AS "Value"
+                            """).SingleAsync();
+                        if (!waiting) await Task.Delay(2);
+                    }
+                    Assert.IsTrue(waiting);
+                    await Task.Delay(root.Remaining + TimeSpan.FromMilliseconds(10));
+                }
+                finally
+                {
+                    await held.CommitAsync();
+                    await settling.WaitAsync(TimeSpan.FromSeconds(2));
+                }
+            }
+            else await Settle();
+            // 新数据库读取同时核行、准确 fence、两租约列、成功副作用及一次失败审计。
+            var after = await locker.Queries.AsNoTracking().SingleAsync(q => q.Id == lease.Id);
+            var released = path is "final-403" or "final-409";
+            Assert.AreEqual(released ? "FAILED" : path == "final-cancel-won" ? "CANCELLED" : "RUNNING", after.ExecutionStatus);
+            Assert.AreEqual(released || path is "final-cancel-won" or "final-wrong-fence" ? lease.Fence + 1 : lease.Fence, after.Fence);
+            Assert.AreEqual(released ? null : path == "final-wrong-owner" ? lease.LeaseOwner + "-other" : lease.LeaseOwner, after.LeaseOwner);
+            Assert.AreEqual(released, after.LeaseUntilUtc is null);
+            Assert.AreEqual(0, after.ResultCiphertext.Length);
+            Assert.IsNull(after.ResultHash);
+            Assert.AreEqual(0, after.ResultSize);
+            Assert.AreEqual(0, G4QueryResultStore.ReadState(after).Receipts.Length);
+            Assert.AreEqual(released ? 1 : 0, await audits.AuditRecords.CountAsync(a => a.Resource == lease.Id && a.Action == "data.query.execute" && a.Outcome == "failure"));
+            Assert.IsFalse(await audits.AuditRecords.AnyAsync(a => a.Resource == lease.Id && a.Action == "data.query.execute" && a.Outcome == "allowed"));
+            return;
+        }
         if (path == "success-after-branch")
         {
             // 确认释放完成后，成功提交只受五秒总期限限制。

@@ -431,7 +431,11 @@ public sealed partial class G4QueryRaceTests
             if (oracle)
             {
                 // 另一服务实例只共享平台库，所有本地对象重新建立。
-                var second = new G4QueryResultStore(queryFactory, authority, new FixedBindingReader(), new TransactionalAuditWriter(governanceFactory), protection, TimeProvider.System);
+                var finalBindings = new FixedBindingReader { RejectNewExecution = postRead?.StartsWith("final-", StringComparison.Ordinal) == true && postRead != "final-403" };
+                // 仅指定故障行在真实失败审计写入后抛错，验证整个解占事务回滚。
+                ITransactionalAuditWriter finalAudit = new TransactionalAuditWriter(governanceFactory);
+                if (postRead == "final-audit-fault") finalAudit = new WriteThenFailAudit(finalAudit);
+                var second = new G4QueryResultStore(queryFactory, authority, finalBindings, finalAudit, protection, TimeProvider.System);
                 var scope = new ResourceScope { OrganizationId = organization, SiteIds = ["site-1"] };
                 var session = await authority.CaptureSessionAsync(actors[0], sessions[0].Id, scope, CancellationToken.None);
                 var grant = grants.Single(item => item.SubjectId == actors[0].SubjectId && item.ConnectionId.EndsWith(suffix + "1", StringComparison.Ordinal));

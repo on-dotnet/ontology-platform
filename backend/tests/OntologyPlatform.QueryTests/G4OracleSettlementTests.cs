@@ -55,6 +55,8 @@ public sealed class G4OracleSettlementTests
             Assert.IsTrue(state.Confirmed);
             Assert.AreEqual(TimeSpan.FromSeconds(1), state.BranchLimit);
             Assert.AreEqual(executionId, state.Lifetime?.ExecutionId);
+            // 成功归还及观察器退出后，保留着该范围的代码也不能再申请一次源资源。
+            Assert.ThrowsExactly<InvalidOperationException>(() => state.Lifetime!.BeginSource());
             return;
         }
         await Assert.ThrowsAsync<IOException>(() => branch);

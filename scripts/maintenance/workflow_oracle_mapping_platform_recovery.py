@@ -678,9 +678,9 @@ def start_owned(group,role,running):
             state,started,pid=generation.split('|')
             require(state=='running' and int(pid)>0,'TDB_LIVE_OWNER')
             receipt.update(startedAt=started,pid=int(pid))
-            from workflow_oracle_runtime_window import LAST_CLOSE, policy, published_graphs
-            if policy() is not None:
-                receipt['currentGraphs']=published_graphs(cid,started,int(pid),basis,close_sha=LAST_CLOSE)
+            from workflow_oracle_runtime_window import policy, published_graphs
+            if (window := policy()) is not None:
+                receipt['currentGraphs']=published_graphs(cid,started,int(pid),basis,close_sha=window['priorCloseSha256'])
             else:
                 receipt['currentGraphs']=current_fuseki_graphs(cid,basis)
             require(engine_step('tdb-generation-after','inspect','-f',fmt,cid)==generation,'TDB_PRODUCT_GENERATION')

@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_PARTIAL_ABA_TIMEOUT_CHATGPT_REVIEW**。本轮同批十槽实测 1 PASS、1 FAIL、8 NOT_RUN。四角色认证及 6＋9 同范围续授通过，ABA 查询真实源读后激活 B，回滚验证完成后返回 503 query_timeout，未取得 A 恢复、原期限内 409 或零成功副作用证明。后继及 S3 未准入。两 API 已移除，五副本已退出，停 ChatGPT 复审。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
+唯一任务状态 **S2_PARTIAL_SOURCE_LINK_CHATGPT_REVIEW**。本次正常三角色回滚已恢复原 A release，当前 revision 3。原失败查询 d368 已查实零成功副作用，停机后准确源执行与 Q 的独立归属证据不足，保留 FAILED、fence 2、原期限、占位与原审计。本次准确晚 CAS、诊断 ABA 和修正后正式十槽均为 0。S2 PARTIAL、S3 NOT_RUN，停 ChatGPT 复审。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
 
 ## 执行身份与所有权
 
@@ -143,3 +143,5 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 2026-11-21 本轮分发与资格检查由 Master 单写。实际后缀计划为 `s2-s3-01-runtime-01`，十槽、2340 秒。原十一槽历史计划仍按原件重开。新增路径仅为该后缀的冻结计划，现有 JS 分发、Python 续行与资格消费者、两份 AgentTests 和相应定向测试按影响更新。非作者复核见本批三文件。
 
 2026-11-21 受控续行自 d6463f63 开始。当前任务分支独占受控窗口、容量、续行、已有图库和证据消费者、定向测试与三文件。原五副本及两 API 的动态准入继续有效。实际阈值为 44 GiB（含候选检出预留）；余下 4 GiB 用于采样间隙和收口。三项构建与 99／222／222 个快照、前五槽、access 78 依原输入复用。S2 成立即运行 S3。
+
+本轮从 7047f9cfb33bd46677433a368f19e5614a0f0179 接续。Master 的 owned_paths 包括 runtime_window、platform_recovery、continuation、S2 授权及证据消费者、SemanticQuery 结算、AgentTests 被动诊断与对应定向测试、当前三文件。read_only_dependencies 为历史 stdout/双流、关闭原件、已接受 90 行检查点、冻结 A、原卷/封存和四个 Finder 文件。只对 d368 的真实零成功副作用、源终止、行与审计独立复核后准许一次准确晚 CAS。诊断至多一次，正式十槽至多一次，S2 合格自动 S3。原预算、历史失败与 main 冻结继续有效。

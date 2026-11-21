@@ -173,7 +173,7 @@ public sealed class G4QueryExecution
             try
             {
                 await store.CompleteAsync(admission.Record, session, proofs, query, state, result,
-                    receipts.ToArray(), commitCancellation?.Token ?? execution.Token);
+                    receipts.ToArray(), commitCancellation?.Token ?? execution.Token, oracle);
             }
             catch (OperationCanceledException) when (rollbackDeadline?.IsCancellationRequested == true && !execution.IsCancellationRequested)
             {
@@ -197,10 +197,10 @@ public sealed class G4QueryExecution
             // 返回和历史恢复复用当前完整授权及来源ACL，不因首次执行绕开result.read。
             return await ReadAsync(actor, sessionReference, admission.Record.Id, true, false, deadline, verifyRoot, execution.Token);
         }
-        catch when (oracle is not null)
+        catch (Exception error) when (oracle is not null)
         {
-            // 只在原请求和物理分支剩余时间内结算，任何迟到/未知均保留占位给独立恢复。
-            await SettleOracleOwnerAsync(admission.Record, oracle, session, token);
+            // 只有已回滚的普通最终拒绝和全部健康释放可使用根余量，其余失败沿用源侧截止。
+            await SettleOracleOwnerAsync(admission.Record, oracle, session, token, execution.IsCancellationRequested ? null : error);
             throw;
         }
         finally
@@ -590,6 +590,41 @@ public sealed class G4QueryExecution
         /// <summary>最新物理分支保留同库取消剩余与单调时钟，用于失败结算及准确执行关联。</summary>
         public G4OracleSourceLifetime? Lifetime { get; set; }
 
+        /// <summary>每个实际进入的串行分支只计一次，包括在首次观察或物理释放期间失败的分支。</summary>
+        public int BranchesStarted { get; set; }
+
+        /// <summary>完整退出观察器并封闭申请后逐个登记的真实物理范围。</summary>
+        private readonly List<G4OracleSourceLifetime> released = [];
+
+        /// <summary>封闭最后一次物理申请前采样的单调时刻与原截止余量，取消仍只享有原窗口。</summary>
+        private (long Stamp, TimeSpan Remaining) lastRelease;
+
+        /// <summary>只有最终权限或绑定参与者拒绝且显式回滚成功才保留该准确异常对象。</summary>
+        public SemanticOperationException? RolledBackRejection { get; set; }
+
+        /// <summary>在读取及其观察器均已退出后封闭本分支，后续持有旧范围也不能再申请物理源。</summary>
+        public void SealReleased(G4OracleSourceLifetime lifetime, TimeProvider clock)
+        {
+            // 先取单调戳再读余量，存下的原清理截止只能偏早。
+            var stamp = clock.GetTimestamp();
+            // 用收紧前的值计算后续取消结算余量。
+            var remaining = lifetime.CleanupRemaining;
+            lifetime.TightenCleanup(TimeSpan.Zero);
+            if (!lifetime.HasAcquired || !lifetime.CleanupConfirmed || remaining is null || remaining <= TimeSpan.Zero)
+                throw new SemanticOperationException(503, "query_source_cleanup_unconfirmed");
+            lastRelease = (stamp, remaining.Value);
+            released.Add(lifetime);
+        }
+
+        /// <summary>原分支取消结算读取封闭前的准确截止，未封闭的工作仍消费活动范围的清理时钟。</summary>
+        public TimeSpan? CleanupRemaining(TimeProvider clock) =>
+            released.Count > 0 && ReferenceEquals(released[^1], Lifetime)
+                ? lastRelease.Remaining - clock.GetElapsedTime(lastRelease.Stamp) : Lifetime?.CleanupRemaining;
+
+        /// <summary>同一查询实际进入的所有分支均有独立释放、封闭及观察器退出见证。</summary>
+        public bool AllReleased(string queryId) => released.Count > 0 && released.Count == BranchesStarted
+            && released.All(lifetime => lifetime.QueryId == queryId && lifetime.HasAcquired && lifetime.CleanupConfirmed);
+
         /// <summary>首次请求断开或外层截止的本地时基，负数表示尚未发生。</summary>
         private long interruptedAt = -1;
 
@@ -612,7 +647,7 @@ public sealed class G4QueryExecution
         if (G4RequestDeadline.Current?.Remaining is { } root && root < remaining) remaining = root;
         if (oracle.BranchLimit is { } limit)
             remaining = TimeSpan.FromTicks(Math.Min(remaining.Ticks, (limit - clock.GetElapsedTime(oracle.Started)).Ticks));
-        if (oracle.Lifetime?.CleanupRemaining is { } cleanup && cleanup < remaining) remaining = cleanup;
+        if (oracle.CleanupRemaining(clock) is { } cleanup && cleanup < remaining) remaining = cleanup;
         // 读取一次最早中断戳，负数表示此请求尚未断开。
         var first = oracle.InterruptedAt;
         if (first >= 0)
@@ -621,11 +656,40 @@ public sealed class G4QueryExecution
     }
 
     /// <summary>平台提交失败或正式取消胜出时，旧持有人将同一分支的原截止传入两次真实存储操作。</summary>
-    internal Task SettleOracleOwnerAsync(G4QueryRecord lease, OracleExecution oracle, MappingAuthorizationProof session, CancellationToken token) =>
-        FinishOracleFailureAsync(lease, oracle, token,
+    internal async Task SettleOracleOwnerAsync(G4QueryRecord lease, OracleExecution oracle, MappingAuthorizationProof session,
+        CancellationToken token, Exception? failure = null)
+    {
+        if (failure is SemanticOperationException rejection && ReferenceEquals(rejection, oracle.RolledBackRejection)
+            && oracle.AllReleased(lease.Id) && !token.IsCancellationRequested && oracle.InterruptedAt < 0
+            && G4RequestDeadline.Current is { } root)
+        {
+            // 本次普通拒绝只消费请求最早单调截止及准入行截止；锁内另核数据库租约、取消和原 fence。
+            TimeSpan Remaining() => TimeSpan.FromTicks(Math.Min(root.Remaining.Ticks, (lease.DeadlineAtUtc - clock.GetUtcNow()).Ticks));
+            if (Remaining() <= TimeSpan.Zero) return;
+            // 沿用同一次请求的外层取消和单调根令牌。
+            using var budget = CancellationTokenSource.CreateLinkedTokenSource(token, root.Token);
+            try
+            {
+                if (await store.FailOracleAsync(lease, session.Scope, session.Actor, Remaining, budget.Token, rejection.Code)) return;
+                // 仅取消先赢时仍可按原分支期限确认；其他不匹配的行禁止退回普通失败写。
+                await FinishOracleFailureAsync(lease, oracle, token, _ => Task.CompletedTask,
+                    cancellation => store.ConfirmOracleCleanupAsync(lease.Id, lease.LeaseOwner, lease.Fence, lease.Fence + 1,
+                        () => OracleSettlementRemaining(lease, oracle), cancellation, cancelledOnly: true));
+                return;
+            }
+            catch (Exception settlementError)
+            {
+                // 数据库或审计故障保留原拒绝；提交结果未知时不能再次结算。
+                logger?.LogWarning("OracleFinalRejectionSettlementUnconfirmed query={QueryId} fence={Fence} failure={ErrorType}",
+                    lease.Id, lease.Fence, settlementError.GetType().Name);
+                return;
+            }
+        }
+        await FinishOracleFailureAsync(lease, oracle, token,
             cancellation => store.FailOracleAsync(lease, session.Scope, session.Actor, () => OracleSettlementRemaining(lease, oracle), cancellation),
             cancellation => store.ConfirmOracleCleanupAsync(lease.Id, lease.LeaseOwner, lease.Fence, lease.Fence + 1,
                 () => OracleSettlementRemaining(lease, oracle), cancellation));
+    }
 
     /// <summary>在原预算内终结旧执行，再仅凭真实物理确认尝试清除准确终态占位。</summary>
     internal async Task FinishOracleFailureAsync(G4QueryRecord lease, OracleExecution oracle, CancellationToken token,
@@ -703,6 +767,7 @@ public sealed class G4QueryExecution
         CancellationToken token, Func<G4QueryRecord, CancellationToken, Task<G4QueryResultStore.OracleLeaseObservation?>> observe,
         Func<CancellationToken, Task<G4SourceQueryRead>> read)
     {
+        oracle.BranchesStarted++;
         // 一秒分支从首次平台观察前起算，扣除原总预算内的提交余量。
         var remaining = G4RequestDeadline.Current?.Remaining ?? deadline - clock.GetUtcNow();
         var limit = TimeSpan.FromMilliseconds(Math.Min(1000, remaining.TotalMilliseconds - 500));
@@ -764,6 +829,7 @@ public sealed class G4QueryExecution
             if (!oracle.Confirmed) throw new SemanticOperationException(503, "query_source_cleanup_unconfirmed");
             work.Token.ThrowIfCancellationRequested();
         }
+        oracle.SealReleased(lifetime, clock);
         // 物理读取健康返回后平台仍可能先提交取消。保留本次身份及原截止，供之后的失败结算消费。
         return result;
     }

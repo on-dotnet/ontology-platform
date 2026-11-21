@@ -1,0 +1,217 @@
+{
+  "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+  "runId": "product-resume-01",
+  "batch": "s2-s3-01",
+  "planId": "s2-s3-01-runtime-01",
+  "currentSha256": "21d6d0cff882452f4e810c28e59e82418fbb31a30ea9c40d74849f29dc48776e",
+  "generations": [
+    {
+      "operation": "330c11744f364d1187332e0d93801098",
+      "sha256": "35bcf152b788c21a72690c7b3fa2cc7f58355b1c6b66fc54ec4074d2d83be691",
+      "sizeBytes": 4170,
+      "previousSha256": "285daba082c9b20328d9559cf51d65e6e71df363b3e9e4562025581088ba73d9",
+      "parentId": "1080791aa97546f29c34fd915618ecef",
+      "parentSha256": "a5184fbf9752205389cf5bd12548b40b154186f0920689fb33286c5ec9e3c487",
+      "exitCode": 1,
+      "nativeStops": {
+        "oracle": [
+          "317dd39db1f74a408220e0ef2ff53141",
+          "63e7584705bf443b960047b0b0c83f4d",
+          "a276d949d4ab43158baa1c10930f5a78",
+          "7efc6a326e054c148cd68183eceaf18d"
+        ],
+        "rustfs": [
+          "e06824ffb8db449d83ba078f4006b4ec",
+          "51369c267be84e03b8c9391a82a2d90d",
+          "f2e7ed5d19284e5c8f6639153896b439"
+        ],
+        "keycloak-test": [
+          "81985700e5cd4326b55ba5c41cf25345",
+          "2c82197f24fb4b23a5f5fb851c065239",
+          "86c99ec2c2f04ba087af4c44b5c2c5b2"
+        ],
+        "fuseki": [
+          "df85df6f1f7f4ecf8dd3c252d63f7db7",
+          "af58d6aa7f6d42aba07adbc9db5db2c8",
+          "acd519e2fdb3496b99fa480d5e56a75a",
+          "a0ad86db5e3d43dd9e6749245f8d0195"
+        ],
+        "platform-pg": [
+          "ffa315593e42425bb34777adcdc687a7",
+          "953b33f64ce445c2bc192bdda4260b2e",
+          "cd1f086d8a3d4525af0fa066181ca5bd",
+          "c883e5f461d1441c8f2d886e4b19b047",
+          "e6d6dfbd9d4341dead2dd1a1815bf7e7"
+        ]
+      },
+      "apiStops": {
+        "api": [
+          "9c499e74e63b4c2ea67d687504a6b5ee",
+          "12502f27b42349168b5a017619bc60c1",
+          "03c1bcfb7a5043899bd02b44c44cf312",
+          "d09bf181d8bb4ecba7c2245297079074"
+        ],
+        "api-secondary": [
+          "81b94685d70446eda0c145f3a93baa3d",
+          "7bda3a72823146979629001f6d82793b",
+          "6392e3c4243a4ef89da831b9854b6f9a",
+          "0de9719fea5843e780abfe0532621f59"
+        ]
+      },
+      "memberCount": 91,
+      "memberIndexSha256": "851145a646d08cba58c378d845c21003adb63461faabf2e8dc4bb131693f555c"
+    },
+    {
+      "operation": "9b81d52b3b7041ecb7b8530198d77ccd",
+      "sha256": "d1befd6fdf7cc5b531ab04e6802e460e947a804863d9f99bc9fafa42ba1aaf05",
+      "sizeBytes": 4660,
+      "previousSha256": "35bcf152b788c21a72690c7b3fa2cc7f58355b1c6b66fc54ec4074d2d83be691",
+      "parentId": "c02e89f8d8f2481f90058606ccf71b29",
+      "parentSha256": "fc2eb71f7601a7ad580d47229e3bf1cd8cba0f4acbd87c130432dbff8176b414",
+      "exitCode": 1,
+      "nativeStops": {
+        "keycloak-test": [
+          "0592f6e91d984c6dac0ba65262aded26",
+          "160e931d439048bd957e03d30b32dd69",
+          "0b79ce522b8744c99c79cc8c4ee0bbca"
+        ],
+        "rustfs": [
+          "7bb106f5a0024c0f81e89f253da11d6c",
+          "bb65227e3f134f2bbb755267520f115c",
+          "ae8b32e8c55646bdb03517bb0576e307"
+        ],
+        "oracle": [
+          "b8deb4ac5b2c4e0ba4f05b4c62a5f22f",
+          "94eaf05970dd4f558bbc45577f5ec887",
+          "1fed01a16b5447bfa1ed0efe1229692f",
+          "d717ee1bbe9240e2827a9efc47b468a5",
+          "55363bb8e67f4fed9a899716b1011f3a"
+        ],
+        "platform-pg": [
+          "cc117f2df61c4c46b763b70731d37a52",
+          "8b1ea5dc0c54464c8b26a603c4e54ef4",
+          "080b0198352f4140a537c755943e48cf",
+          "4c4c0a2092dd42e085ff1bc56ee7add2",
+          "3a33d53530a74995aed4312c4e499af2"
+        ],
+        "fuseki": [
+          "fbd1cd5016514ae2a4f78becc8481e27",
+          "4373789a16a048009d991cd6f1966fc1",
+          "ac4172f59f3d40519ba0af85ae080fd0",
+          "0645f75687c0433ca8d303b9e2ac3f15"
+        ]
+      },
+      "apiStops": {
+        "api": [
+          "e88ff496f608473a87faeb491c3bc08a",
+          "8aacab1b914645f589d44482be6e1fb4",
+          "3f08f08c4a3740d8a16350c3be92e6ab",
+          "9f5e15222bf04104b2552528050439da"
+        ],
+        "api-secondary": [
+          "b292c89e3bac45fd8bdbce9553402139",
+          "12820080452149ac8df6eae4c9877f10",
+          "7c4c8402ad944f5da3e3e12267412638",
+          "5f0a03f60e8647f3b995903e185af026"
+        ]
+      },
+      "memberCount": 94,
+      "memberIndexSha256": "387d4175e0197dfc1b2e92c2cafd28a6e9bb348f7f1e61e63f4f7e54901b552d",
+      "grantCheckpoint": {
+        "executionId": "d102288604bb4000b5a04f86d0395e22",
+        "commandId": "7f1df8d7c11f4c25b04e5bc038344969",
+        "before": "96ee38b348c34f7ea61ca8fefecc0d2d",
+        "after": "e930c21a522c4dc8aa19e03e0b5c94d0",
+        "afterSha256": "1789ff8e6a1c056df9552e7b3c2ce7ff05d67603a8ebeeb93900e7b491e61c49",
+        "rows": 90,
+        "epoch": 121
+      },
+      "maintenance": [
+        {
+          "operation": "9386ea708d6842ae9117780bdd4413dd",
+          "sha256": "a04977dfa2d95207e6bf367f34a2f97ffa3b34e43de3a732dbe23dbbd8877f0c",
+          "roles": {
+            "platform-pg": {
+              "start": "1efb10dc3af848da87abbde1fef20e46",
+              "stop": "5b0d1ccefaa64776881a6aefac5a7296",
+              "state": "b660a81a41144d67aa733bf81c0bdd69",
+              "native": {
+                "pg-fast": "05e5e01be5524cf5a68f9c5941ae882d",
+                "pg-wait": "72ffde26b409467ca475fef8f3a06e6b",
+                "pg-control-execute": "15166a91ed894fa0964678b99ebba86b"
+              }
+            },
+            "oracle": {
+              "start": "35626d188f30472388108f29cfd807d5",
+              "stop": "a66d320976bb4cd99f5c7a616795cad7",
+              "state": "16c17ac198d047459b2457cff1fb34f2",
+              "native": {
+                "oracle-zero": "2f2de1f105ba4ba496274228235d4f2a",
+                "oracle-shutdown": "83907abf18554ff39bf770ec71935534",
+                "term": "d82134e3315849bd9ed1151a609d62a2"
+              }
+            }
+          },
+          "memberIndexSha256": "fc062dbaf573884885fb75c2435ff5f8775efedf9806b1c25de37da2c74530a0"
+        }
+      ]
+    },
+    {
+      "kind": "MAPPING_RESTORE",
+      "operation": "05ea4538c0934951b200728ee739ce60",
+      "sha256": "21d6d0cff882452f4e810c28e59e82418fbb31a30ea9c40d74849f29dc48776e",
+      "sizeBytes": 15812,
+      "previousSha256": "d1befd6fdf7cc5b531ab04e6802e460e947a804863d9f99bc9fafa42ba1aaf05",
+      "hostId": "a8c4f2d06f144f0385714fb55e1d9c43",
+      "exitCode": 0,
+      "nativeStops": {
+        "keycloak-test": [
+          "4b7898b6f7c14e77ad96a520a6fb25b4",
+          "4b01c7da58de421ea2e0f0ed92c278ff",
+          "8cba92cd2b084447aa9019cc99f8d1c6"
+        ],
+        "rustfs": [
+          "066aff6687e04790b4f19bbed5715be9",
+          "cda129407aa2457f8d88cbb0063a8ccb",
+          "e5fe48fe0f384d029e970e375b296e21"
+        ],
+        "oracle": [
+          "19f0a3e93e3f4cfeb67eed8faefbf633",
+          "6378711b6ebd47aeacc36d6a570d0911",
+          "eb499b6a2a764278bf608cb8ac6fd7a4",
+          "273a736aafcf4896ac1640a2cce9b2af",
+          "abbed8f5ccf242e2b8ecfbcf21a243ae"
+        ],
+        "platform-pg": [
+          "cef7a5adefbf4db89606da5cce91d200",
+          "43a12df03b6b40fdb99da985e3a6b5a9",
+          "6368075c5b8e44dfaf10138437bc914a",
+          "629c5b9c3ef44a129cd70f83195f2621",
+          "127287f266d549aeb93662fc8825c3ca"
+        ],
+        "fuseki": [
+          "7c66d4a391db4d9d9efb68e21654cee5",
+          "e492740c25fb40abaeabd29561eddc82",
+          "379c4da8a2ad4d2db1e894dbbbf83505",
+          "2e824b95f2324497a26ccb0413d9e248"
+        ]
+      },
+      "apiStops": {
+        "api": [
+          "1d533815308843fb96b19d5e9ca371d4",
+          "4de1301278a247d2b963a94d38d71fb8",
+          "7f35084485354855b1568c50d39b48b6",
+          "f45afbc0430c4f3d827f5eee8276fce4"
+        ],
+        "api-secondary": [
+          "c87bb5032274415d90e5b389ac373d01",
+          "1646d064c4ce45c992a70b8579bbdec7",
+          "b1f80dd81b524447a10474a8ed65cb82",
+          "3a29fb97ef2946f789bcd8d0cd5d79ee"
+        ]
+      },
+      "memberCount": 119,
+      "memberIndexSha256": "b489e3c2d09c3088370ec5466426533082d459d876138dc50f6d905800ab0225"
+    }
+  ]
+}

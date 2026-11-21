@@ -47,6 +47,8 @@ def grant_bridge(directory, method, args):
     single = [{**row,'Id':'single-'+row['Id'],'ObjectRefs':s.OBJECTS[:1],'FieldRefs':s.FIELDS[:11]} for row in originals[:6]]
     initial = dict(epoch=106,clock=dt.datetime(2026,11,20,tzinfo=dt.timezone.utc).timestamp(),rows=single+originals,
                    audit=[dict(Resource=i,n=1,issued=1) for i in ids])
+    # 补齐不参与本轮授权的既有行，结算测试同时核对75→90→105的完整闭集。
+    initial['rows'].extend({**single[0], 'Id':'archived-'+str(i)} for i in range(54))
     if method == 'state':
         plan = 'scripts/maintenance/workflow-oracle-s2-runtime-plan.json'
         (root/plan).parent.mkdir(parents=True,exist_ok=True)
@@ -73,7 +75,9 @@ def grant_bridge(directory, method, args):
         items = json.loads((batch/('grant-plan-'+args[1]+'.json')).read_bytes())['planned']
         assert body == s.append_body(st,items,db['epoch'])[0]
         for item in items:
-            db['rows'].append(grant(st,item['role'],item['operation'],item['id'],item['kind']=='COMBINED'))
+            expiry = dt.datetime.fromtimestamp(db['clock'] + 14400, dt.timezone.utc).isoformat()
+            row = grant(st,item['role'],item['operation'],item['id'],item['kind']=='COMBINED')
+            db['rows'].append({**row, 'ExpiresAtUtc':expiry})
             db['audit'].append(dict(Resource=item['id'],n=1,issued=1))
         db['epoch'] += len(items)
         database.write_text(json.dumps(db))
@@ -90,6 +94,7 @@ def grant_bridge(directory, method, args):
         return json.dumps(dict(ActivationId='activation',ActivationRevision=1)),uuid4().hex
     with contextlib.ExitStack() as stack:
         for change in (patch.object(s.p,'ROOT',root), patch.object(s.p,'AREA',implementation),
+                       patch.object(s,'check_grant_checkpoint',return_value=None),
                        patch.object(s,'accepted_registration',return_value=(initial,ids,ex.sha(ex.encoded({})))),
                        patch.object(s,'grant_rows',side_effect=snapshot),patch.object(s.p,'pg_command',side_effect=append),
                        patch.object(continuity,'command',side_effect=reopen),patch.object(s.p,'read_pg',side_effect=pg),
@@ -156,6 +161,60 @@ class S2GrantTests(unittest.TestCase):
                     grant_bridge(tmp,'grants',[st,'b'*32,True,s.RUNTIME_PLAN])
                 self.assertEqual(original,db.read_bytes())
                 self.assertFalse(list(batch.glob('grant-plan-*.json')))
+
+    def test_durable_accepted_checkpoint_detects_truncation_and_edited_expiry(self):
+        import workflow_oracle_runtime_window as w
+        prev = dict(rows=[],audit=[],epoch=106,clock=1)
+        actual = dict(rows=[dict(Id='signed',ExpiresAtUtc='original')],audit=[dict(Resource='signed',issued=1)],epoch=121,clock=2)
+        after = ex.encoded(actual)
+        checkpoint = dict(before='b'*32,after='a'*32,epoch=121,rows=1,afterSha256=ex.sha(after),
+                          executionId='e'*32,commandId='d'*32)
+        def snapshot(cid):
+            return {'a'*32:after,'b'*32:ex.encoded(prev)}[cid]
+        with patch.object(w,'close_registration',return_value={'grantCheckpoint':checkpoint}):
+            self.assertEqual(s.check_grant_checkpoint(snapshot,actual,'f'*32,None),'d'*32)
+            self.assertIsNone(s.check_grant_checkpoint(snapshot,prev,'e'*32,{}))
+            for value in [prev,{**actual,'rows':[dict(Id='signed',ExpiresAtUtc='different')]}]:
+                with self.assertRaisesRegex(ValueError,'CHECKPOINT_ROLLBACK'):
+                    s.check_grant_checkpoint(snapshot,value,'f'*32,None)
+
+    def test_second_commit_recovers_from_previous_registered_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            original = grant_bridge(directory, 'state', [])
+            first = grant_bridge(directory, 'grants', [original, 'a'*32, True, s.RUNTIME_PLAN])
+            self.assertEqual((len(first['afterSnapshot']['rows']), first['afterEpoch']), (90,121))
+            state_after_first = {**original, 'combinedGrantIds':first['combinedGrantIds'],
+                                 'workflowGrantIds':first['workflowIds']}
+            path = root/'pg.json'
+            db = json.loads(path.read_bytes())
+            db['clock'] += 14401
+            path.write_text(json.dumps(db))
+            second = grant_bridge(directory, 'grants', [state_after_first, 'b'*32, True, s.RUNTIME_PLAN])
+            self.assertEqual((len(second['afterSnapshot']['rows']), second['afterEpoch']), (105,136))
+            self.assertEqual(second['renewal']['basis'], first['grantCommand'])
+            # 第二笔提交完成，但写回状态前退出。仍持第一笔ID时按两笔原事务重建，数据库零写入。
+            committed = path.read_bytes()
+            replay = grant_bridge(directory, 'grants', [state_after_first, 'c'*32, True, s.RUNTIME_PLAN])
+            self.assertEqual(replay['renewal']['basis'], second['grantCommand'])
+            self.assertEqual([t['commandId'] for t in replay['renewal']['transactions']],
+                             [first['grantCommand'], second['grantCommand']])
+            self.assertEqual((replay['combinedGrantIds'],replay['workflowIds'],replay['issued'],replay['grantCommand']),
+                             (second['combinedGrantIds'],second['workflowIds'],[],None))
+            self.assertEqual(path.read_bytes(), committed)
+            with self.assertRaisesRegex(ValueError,'S2_PREPARE_REGISTERED_IDS'):
+                grant_bridge(directory,'grants',[original,'d'*32,True,s.RUNTIME_PLAN])
+            for change in ('epoch','principal','permission','revoked'):
+                with self.subTest(change=change):
+                    bad = json.loads(committed)
+                    if change == 'epoch':
+                        bad['epoch'] += 1
+                    else:
+                        key = {'principal':'SubjectId','permission':'Permission','revoked':'RevokedAtUtc'}[change]
+                        bad['rows'][-1][key] = 'unexpected'
+                    path.write_text(json.dumps(bad))
+                    with self.assertRaises(ValueError):
+                        grant_bridge(directory,'grants',[state_after_first,'d'*32,True,s.RUNTIME_PLAN])
 
     def test_single_grant_covers_all_fields_without_composition(self):
         row=grant(self.st,'reader','data.query.execute','full')
@@ -285,6 +344,27 @@ class S2PlanTests(unittest.TestCase):
 
 
 class S2ContinuationTests(unittest.TestCase):
+    def test_prefix_consumes_formal_chain_and_refuses_missing_or_wrong_identity(self):
+        import workflow_oracle_mapping_continuation as n
+        old = dict(activationId='a1',activationRevision=1,mappingReleaseId='release-a',mappingId='mapping',
+                   previousReleaseId=None,manifestHash='manifest-a',kind='PUBLISH',proposalId='p1',
+                   activatedAtUtc='2026-11-21T13:52:19.4744354+00:00')
+        b = dict(old,activationId='b2',activationRevision=2,previousReleaseId='release-a',mappingReleaseId='release-b',
+                 manifestHash='manifest-b',proposalId='p2')
+        restored = dict(old,activationId='a3',activationRevision=3,previousReleaseId='release-b',kind='ROLLBACK',proposalId='p3')
+        binding = dict(activation=old,connectionId='c',catalogSnapshotId='s')
+        state = dict(mappingReceipt=restored,catalogFingerprint='f')
+        receipts = [dict(receipt=value,connection='c',catalog='s',fingerprint='f',command='command-'+str(i),check='check-'+str(i))
+                    for i,value in enumerate((old,b,restored))]
+        chain = dict(current=['a3',3,'release-a'],receipts=receipts)
+        n.check_activation_chain(binding,state,dict(b,activatedAtUtc='2026-11-21T13:52:19.4744354Z'),chain)
+        invalid = [dict(chain,receipts=receipts[::2]),dict(chain,current=['a1',1,'release-a']),
+                   dict(chain,receipts=[receipts[0],dict(receipts[1],receipt=dict(b,activationId='wrong')),receipts[2]]),
+                   dict(chain,receipts=[receipts[0],receipts[1],dict(receipts[2],connection='other')])]
+        for wrong in invalid:
+            with self.subTest(wrong=wrong), self.assertRaisesRegex(ValueError,'S23_PREFIX_'):
+                n.check_activation_chain(binding,state,b,wrong)
+
     def test_suffix_preserves_budgets_and_exact_qualified_prefix(self):
         import workflow_oracle_mapping_continuation as n
         old=c.frozen_plan(ROOT);new=c.frozen_plan(ROOT,n.PLAN_ID)
@@ -571,6 +651,71 @@ class S2ConsumerTests(unittest.TestCase):
         windows[4]['expectedReads']=4
         with self.assertRaisesRegex(ValueError,'READ_PLAN'):c.aba_reads(report,original)
 
+    def test_aba_phase_original_reopens_exact_claim_decision_binding_and_post_state(self):
+        """纯原件消费者，不启动查询、映射命令、网络或数据库。"""
+        deadline = '2026-11-21T00:00:05Z'
+        b = dict(proposalId='bp', activationId='ba', mappingReleaseId='br', activationRevision=2)
+        a = dict(proposalId='ap', activationId='aa', mappingReleaseId='ar', activationRevision=3)
+        phases = []
+        commands = []
+        def sample(name, edge, resource, operation=None):
+            index = len(phases) + 1
+            phases.append(dict(phase=name, edge=edge, resourceId=resource, cancelled=False, queryId='q',
+                utc='2026-11-21T00:00:00.'+str(index).zfill(3)+'Z', monotonicMs=index, deadlineAtUtc=deadline,
+                remainingMs=5000-index, errorCode='query_binding_stale' if edge == 'ERROR' else None))
+            if operation:
+                phases[-1]['commandId'] = 'command-'+str(index)
+                commands.append(dict(commandId=phases[-1]['commandId'], operation=operation))
+        sample('CALLBACK', 'ENTER', 'bp')
+        for name, begin, end, operation in [
+                ('B_ACTIVATE','bp','ba','activate:bp'), ('ROLLBACK_VALIDATE_ENQUEUE','m','j','validate'),
+                ('WORKER_RUN','j','j',None), ('ROLLBACK_JOB_READ','j','assessment',None),
+                ('ROLLBACK_ASSESSMENT_READ','assessment','assessment',None), ('ROLLBACK_PROPOSE','assessment','ap','propose'),
+                ('ROLLBACK_DECIDE','ap','ap','decide:ap'), ('A_ACTIVATE','ap','aa','activate:ap')]:
+            sample(name, 'ENTER', begin, operation)
+            sample(name, 'RETURN', end)
+        sample('CALLBACK', 'RETURN', 'q')
+        sample('FINAL_BINDING_CHECK', 'ENTER', 'q')
+        sample('FINAL_BINDING_CHECK', 'ERROR', 'q')
+        row = dict(queryId='q', mappingId='m', activatedB=b, activatedA=a, deadlineAtUtc=deadline,
+                   diagnosticPhases=phases, diagnosticPhasesDropped=0, elapsedMs=99, queryAudits=[], successfulQueryAudits=0,
+                   fence=1, leaseOwnerHash='a'*64, errorCode='query_binding_stale', executionStatus='RUNNING',
+                   postFence=1, postLeaseOwnerHash='a'*64, postLeaseUntilUtc=deadline, postErrorCode=None,
+                   failedQueryAudits=0, postStateStatus='READ', postStateMissing=[], postStateStartedAtUtc=deadline,
+                   postStateFinishedAtUtc=deadline, postStateElapsedMs=0, events=[dict(utc=phases[-1]['utc'])], postCommands=commands,
+                   postActive=dict(mappingId='m', releaseId='ar', activationId='aa', activationRevision=3),
+                   postActivations=[dict(id=x['activationId'], proposalId=x['proposalId'], checkId=x['proposalId']+'c',
+                       releaseId=x['mappingReleaseId'], activationRevision=x['activationRevision']) for x in (b, a)],
+                   postChecks=[dict(id=x['proposalId']+'c', proposalId=x['proposalId'], status='PASS') for x in (b, a)])
+        self.assertEqual(c.aba_diagnostics(row),'LEASE_HELD_NOT_QUALIFIED')
+        settled = dict(row,executionStatus='FAILED',postFence=2,postLeaseOwnerHash=None,postLeaseUntilUtc=None,
+                       postErrorCode='query_binding_stale',queryAudits=[dict(id='failure',outcome='failure')],failedQueryAudits=1)
+        self.assertEqual(c.aba_diagnostics(settled),'FINAL_REJECTION_RELEASED')
+        leftover = dict(settled,postErrorCode='query_timeout',postLeaseOwnerHash='a'*64,postLeaseUntilUtc=deadline)
+        self.assertEqual(c.aba_diagnostics(leftover),'LEASE_HELD_NOT_QUALIFIED')
+        for key in ('postFence','postLeaseOwnerHash','postLeaseUntilUtc','postErrorCode'):
+            bad = dict(settled)
+            del bad[key]
+            with self.subTest(missing=key), self.assertRaisesRegex(ValueError,'ROW_MISSING'):
+                c.aba_diagnostics(bad)
+        for bad in (dict(row,postFence=2), dict(row,postLeaseOwnerHash='b'*64),dict(row,postLeaseUntilUtc=None),
+                    dict(row,postLeaseUntilUtc='2026-11-21T00:01:00Z'),dict(settled,postLeaseOwnerHash='a'*64,postLeaseUntilUtc=deadline),
+                    dict(settled,queryAudits=[],failedQueryAudits=0),dict(settled,postErrorCode='query_forbidden')):
+            with self.subTest(post=bad['postErrorCode']), self.assertRaises(ValueError):
+                c.aba_diagnostics(bad)
+        for label, change in [
+                ('missing approval', lambda r: r['diagnosticPhases'].pop(14)),
+                ('other claim', lambda r: r['diagnosticPhases'][6].update(resourceId='other')),
+                ('wrong deadline', lambda r: r['diagnosticPhases'][1].update(remainingMs=5000)),
+                ('wrong final cause', lambda r: r['diagnosticPhases'][-1].update(errorCode='query_timeout')),
+                ('partial post-state', lambda r: r.update(postStateMissing=['query'])),
+                ('wrong activation check', lambda r: r['postChecks'][0].update(proposalId='ap')),
+                ('other command', lambda r: r['postCommands'][0].update(commandId='other'))]:
+            bad = copy.deepcopy(row)
+            change(bad)
+            with self.subTest(label=label), self.assertRaises(ValueError):
+                c.aba_diagnostics(bad)
+
     def healthy(self):
         import base64
         query_id='query-'+'1'*32;eid=query_id+':e-'+'2'*32;rid='read-'+'3'*32;release='release-'+'4'*32
@@ -762,6 +907,33 @@ class S2CapacityTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'FORMAL_TOTAL_DISK'): measure()
                 exercise_window(measure)
 
+    def test_mapping_restore_preserves_historical_host_and_grant(self):
+        import workflow_oracle_runtime_window as w
+        registry = json.loads(Path(w.__file__).with_name('workflow-oracle-runtime-close-registry.json').read_bytes())
+        row, = [r for r in registry['generations'] if r['operation'] == '05ea4538c0934951b200728ee739ce60']
+        restore = w.close_registration(row['sha256'])
+        prior = w.close_registration(restore['previousSha256'])
+        self.assertEqual(restore['kind'], 'MAPPING_RESTORE')
+        self.assertNotIn('parentId', restore)
+        self.assertEqual(prior['nextRestoreHost'], restore['hostId'])
+        self.assertEqual(restore['grantCheckpoint'], prior['grantCheckpoint'])
+        self.assertEqual(prior['grantCheckpoint']['rows'], 90)
+        self.assertEqual(len(prior['maintenance']), 1)
+        with self.assertRaisesRegex(ValueError,'WINDOW_RETIRED_HOST'):
+            w.runtime_continuity(ROOT,{},dict(commandId='0'*32),dict(closeSha256=prior['sha256']))
+
+    def test_mapping_restore_cannot_acquire_formal_parent(self):
+        import workflow_oracle_runtime_window as w
+        source = Path(w.__file__).with_name('workflow-oracle-runtime-close-registry.json')
+        registry = json.loads(source.read_bytes())
+        row = next(r for r in registry['generations'] if r.get('kind') == 'MAPPING_RESTORE')
+        row['parentId'] = '0'*32
+        with tempfile.TemporaryDirectory() as temp:
+            corrupt = Path(temp)/'registry.json'
+            corrupt.write_text(json.dumps(registry))
+            with patch.object(ex,'ordinary',return_value=corrupt), self.assertRaisesRegex(ValueError,'WINDOW_RESTORE_REGISTRY'):
+                w.close_registration(row['sha256'])
+
     def test_close_generation_rejects_wrong_original_resource_and_time(self):
         import workflow_oracle_runtime_window as w
         import workflow_oracle_mapping_continuity as c
@@ -774,7 +946,7 @@ class S2CapacityTests(unittest.TestCase):
         common=dict(ids={'fuseki':c.FUSEKI},data={'fuseki':dict(id=c.FUSEKI,startedAt=first,after=dict(FinishedAt=stop))})
         for update,reason in [({'containerId':'wrong'},'RESTART_ORDER'),({'startedAt':stop},'RESTART_ORDER'),({'pid':0},'PRIOR_PROCESS')]:
             with self.subTest(update=update),patch.object(refresh,'observed_rows',side_effect=[({},dict(fuseki=old)),({},dict(fuseki={**new,**update}))]),patch.object(refresh,'snapshot_builds',return_value={}),self.assertRaisesRegex(ValueError,reason):
-                w.compare_generation(ROOT,{'services':{}},{'services':{}},common,w.LAST_CLOSE,None,None)
+                w.compare_generation(ROOT,{'services':{}},{'services':{}},common,w.close_registration()['sha256'],None,None)
         with self.assertRaisesRegex(ValueError,'GENERATION'):
             w.published_graphs(c.FUSEKI,start,5,{},refs={},close_sha='0'*64)
 

@@ -147,6 +147,27 @@ def accepted_registration(root, snapshot, archive):
     return original, ids, '3aad229d249e2d5b2b12e80afbf17a3ae485ce6c2a1105064411100974864642'
 
 
+def check_grant_checkpoint(snapshot, current, execution_id, recorded):
+    """冻结已接受的签发后原行；历史签发前读回仅供其原命令离线重开。"""
+    from workflow_oracle_runtime_window import close_registration
+    checkpoint = close_registration()['grantCheckpoint']
+    data = snapshot(checkpoint['after'])
+    require(ex.sha(data) == checkpoint['afterSha256'], 'S2_PREPARE_CHECKPOINT_ORIGINAL')
+    accepted = json.loads(data)
+    require(len(accepted['rows']) == checkpoint['rows'] and accepted['epoch'] == checkpoint['epoch'],
+            'S2_PREPARE_CHECKPOINT_ROWS')
+    if recorded is not None and execution_id == checkpoint['executionId']:
+        previous = json.loads(snapshot(checkpoint['before']))
+        if previous == {k:v for k,v in current.items() if k!='commandId'}:
+            return None
+    rows = {row['Id']:row for row in current['rows']}
+    audits = {row['Resource']:row for row in current['audit']}
+    require(current['epoch'] >= accepted['epoch'] and current['clock'] >= accepted['clock'] and
+            all(rows.get(row['Id']) == row for row in accepted['rows']) and
+            all(audits.get(row['Resource']) == row for row in accepted['audit']), 'S2_PREPARE_CHECKPOINT_ROLLBACK')
+    return checkpoint['commandId']
+
+
 def renewal_registration(root, state, current, selected, execution_id, archive=None, recorded=None):
     """从已资格的最后快照推进至本次登记，发现提交后中断时先重开事务原件。"""
     import workflow_oracle_mapping_continuity as c
@@ -159,6 +180,7 @@ def renewal_registration(root, state, current, selected, execution_id, archive=N
         require(not err, 'S2_GRANT_SNAPSHOT_ERROR')
         return out
 
+    checkpoint = check_grant_checkpoint(snapshot, current, execution_id, recorded)
     original, ids, history_hash = accepted_registration(root, snapshot, archive)
     old = {r['Id']: r for r in original['rows']}
     tokens = sorted(path.stem.removeprefix('permission-case-') for path in (root/area).glob('permission-case-*.json')) if recorded is None else recorded['restoredTokens']
@@ -179,18 +201,30 @@ def renewal_registration(root, state, current, selected, execution_id, archive=N
             'S2_PREPARE_RESTORE_ORIGINALS')
     minimum = renewal_seconds(root)
     recovery = None
-    original_ids = ids.copy()
-    extra = {r['Id'] for r in current['rows']} - old.keys()
-    if extra:
-        # 仅接受当前批、同一历史前态的一笔完整已提交准备事务。
-        if recorded is not None:
-            require(isinstance(recorded.get('recovery'), dict) and
-                    re.fullmatch(r'grant-plan-[a-f0-9]{32}[.]json', recorded['recovery']['plan']), 'S2_PREPARE_RECOVERY_PATH')
-        plans = sorted((root/area).glob('grant-plan-*.json')) if recorded is None else [root/area/recorded['recovery']['plan']]
+    prior_ids = ids.copy()
+    chain = []
+    basis = LAST_GRANTS
+    prior_snapshot, prior_items = original, []
+    remaining = {r['Id'] for r in current['rows']} - old.keys()
+    replay = None
+    if recorded is not None:
+        replay = recorded.get('transactions', [recorded['recovery']] if recorded['recovery'] else [])
+        require(isinstance(replay, list), 'S2_PREPARE_RECOVERY_PATH')
+    while remaining:
+        # 同一登记点的下一笔必须完整包含在实读增量内；不同分支或含未知行均拒绝。
+        if replay is None:
+            paths = list((root/area).glob('grant-plan-*.json'))
+        else:
+            require(len(chain) < len(replay), 'S2_PREPARE_RECOVERY_PATH')
+            entry = replay[len(chain)]
+            require(isinstance(entry, dict) and re.fullmatch(r'grant-plan-[a-f0-9]{32}[.]json', entry['plan']),
+                    'S2_PREPARE_RECOVERY_PATH')
+            paths = [root/area/entry['plan']]
         matches = []
-        for path in plans:
+        for path in paths:
             plan = json.loads(ex.ordinary(path).read_bytes())
-            if plan.get('basis') == LAST_GRANTS and {item['id'] for item in plan['planned']} == extra:
+            if plan.get('basis') == basis and {item['id'] for item in plan['planned']} and all(
+                    item['id'] in remaining for item in plan['planned']):
                 matches.append(path)
         require(len(matches) == 1, 'S2_PREPARE_UNREGISTERED_ROWS')
         path = matches[0]
@@ -201,12 +235,12 @@ def renewal_registration(root, state, current, selected, execution_id, archive=N
         require(json.loads(snapshot(before['commandId'])) == {k:v for k,v in before.items() if k!='commandId'}
                 and (plan['taskId'],plan['runId'],plan['batch'],plan['connectionId'],plan['objects'],plan['fields']) ==
                 (TASK,RUN,BATCH,state['connectionId'],OBJECTS,FIELDS), 'S2_PREPARE_RECOVERY_BASIS')
-        grant_delta(state, original, before, [])
+        grant_delta(state, prior_snapshot, before, prior_items)
         items = renewal_plan(state, before, ids, prior_id, minimum)
-        require(plan['planned'] == items, 'S2_PREPARE_RECOVERY_PLAN')
+        require(plan['planned'] == items and items, 'S2_PREPARE_RECOVERY_PLAN')
         body, issued = append_body(state, items, before['epoch'])
         stage = 'omq-pg-s23-append-approved-grants'
-        if recorded is None:
+        if replay is None:
             candidates = []
             for file in (root/c.AREA.parent/'commands'/RUN).glob('*/receipt.json'):
                 row = json.loads(ex.ordinary(file).read_bytes())
@@ -215,22 +249,33 @@ def renewal_registration(root, state, current, selected, execution_id, archive=N
             require(len(candidates) == 1, 'S2_PREPARE_RECOVERY_COMMAND')
             command_id = candidates[0]
         else:
-            command_id = recorded['recovery']['commandId']
+            command_id = replay[len(chain)]['commandId']
         _, out, err = c.command(root, command_id, RUN, pg, stage, ex.sha(body), 15, archive)
         require(not err and out.decode().splitlines()[-1] == str(len(issued)), 'S2_PREPARE_RECOVERY_COUNT')
-        grant_delta(state, before, current, items)
+        prior_ids = ids
         changes = {(item['role'],item['operation']): item['id'] for item in items}
         ids = [changes.get(pair, ident) for pair, ident in zip(SCOPED + WORKFLOW, ids, strict=True)]
+        remaining.difference_update(issued)
+        prior_snapshot, prior_items = before, items
         recovery = dict(plan=path.name, commandId=command_id)
-    else:
-        grant_delta(state, original, current, [])
+        chain.append(recovery)
+        basis = command_id
+    require(checkpoint is None or any(entry['commandId'] == checkpoint for entry in chain), 'S2_PREPARE_CHECKPOINT_COMMAND')
+    grant_delta(state, prior_snapshot, current, prior_items)
     keys = [role+':'+op for role,op in SCOPED]
     flow = state.get('workflowGrantIds') if recorded is None else recorded['inputWorkflowIds']
-    original_selected = selected == dict(zip(keys, original_ids[:6])) and flow in (None, original_ids[6:])
+    prior_selected = selected == dict(zip(keys, prior_ids[:6])) and (
+        flow == prior_ids[6:] or flow is None and len(chain) <= 1)
     recovered_selected = selected == dict(zip(keys, ids[:6])) and flow == ids[6:]
-    require(original_selected or recovered_selected, 'S2_PREPARE_REGISTERED_IDS')
-    proof = dict(basis=LAST_GRANTS, registeredIds=ids, inputCombinedIds=selected,
+    require(prior_selected or recovered_selected, 'S2_PREPARE_REGISTERED_IDS')
+    proof = dict(basis=basis, registeredIds=ids, inputCombinedIds=selected,
                  inputWorkflowIds=flow, restoredTokens=tokens, recovery=recovery, minimumSeconds=minimum)
+    if chain:
+        if recorded is not None and 'transactions' not in recorded:
+            require(len(chain) == 1, 'S2_PREPARE_RECOVERY_LEGACY')
+            proof['basis'] = LAST_GRANTS
+        else:
+            proof['transactions'] = chain
     require(recorded is None or proof == recorded, 'S2_PREPARE_PROOF')
     return proof
 
@@ -307,7 +352,7 @@ def grants(state,execution_id,issue=False,plan_id=None):
     if issued:
         plan=p.AREA.parent/RUN/BATCH/('grant-plan-'+execution_id+'.json')
         p.save(plan,dict(taskId=TASK,runId=RUN,batch=BATCH,connectionId=cid,objects=OBJECTS,fields=FIELDS,before=before,planned=issued,
-                         **({'basis':LAST_GRANTS} if renewal else {})))
+                         **({'basis':renewal['basis']} if renewal else {})))
         sql,ids=append_body(state,issued,before['epoch'] if renewal else None)
         count,command=p.pg_command(sql,'s23-append-approved-grants')
         require(count.splitlines()[-1]==str(len(issued)) and set(ids)=={r['id'] for r in issued},'S2_GRANT_APPEND')

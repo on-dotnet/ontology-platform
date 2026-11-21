@@ -160,8 +160,14 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
     }
 
     /// <summary>来源完成后在短事务中重验当前授权与版本，密文和成功审计共同提交。</summary>
-    public async Task CompleteAsync(G4QueryRecord lease, MappingAuthorizationProof session, MappingAuthorizationProof[] proofs,
-        G4SemanticQuery query, G4QueryState state, G4QueryResultV1 result, G4QueryStoredReceipt[] receipts, CancellationToken token)
+    public Task CompleteAsync(G4QueryRecord lease, MappingAuthorizationProof session, MappingAuthorizationProof[] proofs,
+        G4SemanticQuery query, G4QueryState state, G4QueryResultV1 result, G4QueryStoredReceipt[] receipts, CancellationToken token) =>
+        CompleteAsync(lease, session, proofs, query, state, result, receipts, token, null);
+
+    /// <summary>Oracle 活动执行只在最终参与者普通拒绝、成功事务完成回滚后取得精确结算凭据。</summary>
+    internal async Task CompleteAsync(G4QueryRecord lease, MappingAuthorizationProof session, MappingAuthorizationProof[] proofs,
+        G4SemanticQuery query, G4QueryState state, G4QueryResultV1 result, G4QueryStoredReceipt[] receipts, CancellationToken token,
+        G4QueryExecution.OracleExecution? oracle)
     {
         DemandProofSet(state, session, proofs);
         if (result.Snapshot.OntologyReleaseId != state.Binding.OntologyReleaseId
@@ -182,8 +188,20 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
         await using var database = await factory.CreateDbContextAsync(token);
         // 成功与撤权、取消的线性化点是这笔显式事务提交。
         await using var transaction = await database.Database.BeginTransactionAsync(token);
-        await DemandAsync(database, session, proofs, token);
-        await bindings.VerifyInTransactionAsync(session.Actor, query, state.Binding, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
+        try
+        {
+            await DemandAsync(database, session, proofs, token);
+            await bindings.VerifyInTransactionAsync(session.Actor, query, state.Binding, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
+        }
+        catch (SemanticOperationException rejection) when (oracle is not null &&
+            (rejection.Status, rejection.Code) is (403, "query_forbidden") or (409, "query_binding_stale"))
+        {
+            // 真实治理与绑定参与者已回滚底层事务；若参与者只是拒绝，处置仍会回滚未提交事务。
+            // 只有成功关闭该事务，才记录原异常供外层在新事务中结算。
+            await transaction.DisposeAsync();
+            oracle.RolledBackRejection = rejection;
+            throw;
+        }
         await LockCapacityAsync(database, token);
         // 固定身份行锁与租约条件防止取消后或过期worker的迟到提交。
         var current = await LockedAsync(database, lease.Id, token);
@@ -380,36 +398,46 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
     }
 
     /// <summary>仅真实 Oracle 所有者可原子终结自己的原 fence；与正式取消或 Sweep 抢同一行。</summary>
-    internal async Task FailOracleAsync(G4QueryRecord lease, ResourceScope scope, ActorContext actor, Func<TimeSpan> remaining, CancellationToken token)
+    internal async Task<bool> FailOracleAsync(G4QueryRecord lease, ResourceScope scope, ActorContext actor, Func<TimeSpan> remaining, CancellationToken token, string? finalRejection = null)
     {
-        if (!IsOracleOwner(lease.LeaseOwner)) return;
+        if (!IsOracleOwner(lease.LeaseOwner)) return false;
+        // 只有消费最终事务的真实拒绝才能在同次失败写入中解占。
+        var release = finalRejection is "query_binding_stale" or "query_forbidden";
         // 独立上下文只写本模块准确行，失败审计与 fence 在同物理事务提交。
         await using var database = await factory.CreateDbContextAsync(token);
         // 在容量锁及行锁等待之前确定同库截止，之后不再推延。
-        if (await OracleDatabaseCutoffAsync(database, remaining, token) is not { } cutoff) return;
+        if (await OracleDatabaseCutoffAsync(database, remaining, token) is not { } cutoff) return false;
         await using var transaction = await database.Database.BeginTransactionAsync(token);
         await LockCapacityAsync(database, token);
         var changed = await database.Database.ExecuteSqlInterpolatedAsync($"""
             WITH locked AS MATERIALIZED (
-                SELECT "Id", "DeadlineAtUtc" FROM semantic_query."Queries"
+                SELECT "Id", "DeadlineAtUtc", "LeaseUntilUtc" FROM semantic_query."Queries"
                 WHERE "Id" = {lease.Id} AND "LeaseOwner" = {lease.LeaseOwner} AND "Fence" = {lease.Fence}
-                    AND "ExecutionStatus" = 'RUNNING' FOR UPDATE
+                    AND "ExecutionStatus" = 'RUNNING'
+                    AND (NOT {release} OR (NOT "CancelRequested"
+                        AND "RequestHash" = {lease.RequestHash} AND "BindingBytes" = {lease.BindingBytes}
+                        AND octet_length("ResultCiphertext") = 0 AND "ResultHash" IS NULL AND "ResultSize" = 0))
+                FOR UPDATE
             )
             UPDATE semantic_query."Queries" AS q SET "ExecutionStatus" = 'FAILED', "Fence" = q."Fence" + 1,
-                "CompletedAtUtc" = clock_timestamp(), "ErrorCode" = 'query_source_unavailable'
+                "CompletedAtUtc" = clock_timestamp(), "ErrorCode" = {finalRejection ?? "query_source_unavailable"},
+                "LeaseOwner" = CASE WHEN {release} THEN NULL ELSE q."LeaseOwner" END,
+                "LeaseUntilUtc" = CASE WHEN {release} THEN NULL ELSE q."LeaseUntilUtc" END
             FROM locked WHERE q."Id" = locked."Id" AND clock_timestamp() < LEAST(locked."DeadlineAtUtc", {cutoff})
+                AND (NOT {release} OR locked."LeaseUntilUtc" > clock_timestamp())
             """, token);
-        if (changed == 0) return;
+        if (changed == 0) return false;
         await audit.WriteAsync(actor, new AuditCommand { Action = "data.query.execute", Resource = lease.Id,
             Outcome = "failure", Scope = scope }, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
         // 审计与状态处于同一事务，审计若耗尽原截止则整个失败写回滚，保留准确 owner。
         if (!await database.Database.SqlQuery<bool>($"SELECT clock_timestamp() < {cutoff} AS \"Value\"").SingleAsync(token)
-            || remaining() <= TimeSpan.Zero) return;
+            || remaining() <= TimeSpan.Zero) return false;
         await transaction.CommitAsync(token);
+        return true;
     }
 
     /// <summary>仅在原执行已确证无源残余时以原 owner、两代 fence 和终态执行单行 CAS。</summary>
-    internal async Task<bool> ConfirmOracleCleanupAsync(string queryId, string? owner, long originalFence, long terminalFence, Func<TimeSpan> remaining, CancellationToken token)
+    internal async Task<bool> ConfirmOracleCleanupAsync(string queryId, string? owner, long originalFence, long terminalFence, Func<TimeSpan> remaining, CancellationToken token, bool cancelledOnly = false)
     {
         if (!IsOracleOwner(owner) || originalFence < 1 || originalFence == long.MaxValue || terminalFence != originalFence + 1) return false;
         // 单条语句在 PG 取得准确行锁后重核状态和正式取消的保守同库截止。
@@ -419,7 +447,7 @@ public sealed class G4QueryResultStore : IG4QueryRunStore
             WITH locked AS MATERIALIZED (
                 SELECT "Id", "DeadlineAtUtc", "LeaseUntilUtc", "ExecutionStatus"
                 FROM semantic_query."Queries" WHERE "Id" = {queryId} AND "LeaseOwner" = {owner} AND "Fence" = {terminalFence}
-                    AND "ExecutionStatus" IN ('CANCELLED', 'FAILED') FOR UPDATE
+                    AND "ExecutionStatus" IN ('CANCELLED', 'FAILED') AND (NOT {cancelledOnly} OR "ExecutionStatus" = 'CANCELLED') FOR UPDATE
             )
             UPDATE semantic_query."Queries" AS q SET "LeaseOwner" = NULL, "LeaseUntilUtc" = NULL
             FROM locked WHERE q."Id" = locked."Id" AND clock_timestamp() < LEAST(locked."DeadlineAtUtc", {cutoff})

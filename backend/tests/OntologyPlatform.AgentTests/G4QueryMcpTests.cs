@@ -1204,7 +1204,8 @@ public sealed partial class G4QueryMafRuntimeTests
         ExpectedRevision = revision, Reason = "M4 synthetic in-flight binding verification" };
 
     /// <summary>只在真实源成功返回后激活一次提交前调度，源分支与观察者正常完成。</summary>
-    private static G4QueryExecution BeforeCommitExecution(IServiceProvider services, Func<CancellationToken, Task> competingCommand)
+    private static G4QueryExecution BeforeCommitExecution(IServiceProvider services, Func<CancellationToken, Task> competingCommand,
+        Action<string, CancellationToken, Exception?>? bindingObservation = null)
     {
         // 所有授权检查仍由正常的正式实例执行。
         var authority = services.GetRequiredService<IG4QueryAuthorizationAuthority>();
@@ -1214,14 +1215,17 @@ public sealed partial class G4QueryMafRuntimeTests
         var scheduled = new ScheduledAuthority(authority, token =>
             Interlocked.Exchange(ref ready, 0) == 1 ? competingCommand(token) : Task.CompletedTask);
         // 使用所有正式构造依赖，只在第一次最终授权检查开始前运行并发命令。
-        var store = ActivatorUtilities.CreateInstance<G4QueryResultStore>(services, scheduled);
+        var bindings = services.GetRequiredService<IG4QueryBindingReader>();
+        // 观测仅透传此正式实例，同一物理事务内的实际绑定检查始终执行。
+        var store = bindingObservation is null ? ActivatorUtilities.CreateInstance<G4QueryResultStore>(services, scheduled)
+            : ActivatorUtilities.CreateInstance<G4QueryResultStore>(services, scheduled, new ObservedBindingReader(bindings, bindingObservation));
         // 真实读取器返回后只记录已完成，耗时的竞争不在这个分支计时内。
         var source = new AfterReadSource(services.GetRequiredService<IG4SourceQueryReader>(), _ =>
         {
             Interlocked.Exchange(ref ready, 1);
             return Task.CompletedTask;
         });
-        return new G4QueryExecution(services.GetRequiredService<IG4QueryBindingReader>(), source, authority, store, TimeProvider.System);
+        return new G4QueryExecution(bindings, source, authority, store, TimeProvider.System);
     }
 
     /// <summary>保留全部正式权限参与者，仅在获取事务授权锁之前提供确定性的竞争调度。</summary>
