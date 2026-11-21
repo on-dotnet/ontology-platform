@@ -1,53 +1,76 @@
-# G4-ORACLE-MAPPING-QUERY-001：当前连续执行交付
+# Oracle 双表 Mapping 与 Query 验收交付
 
-本次产品任务仍未完成，停在 **S2_S3_WAITING_FOR_NORMAL_AUTH / ChatGPT 复审**。最新后缀认证窗口600秒未收到提交，0/4；S2余项与S3未运行。已经合格的原件直接保留，不将失败或NOT_RUN写成PASS。
+**S2 部分通过，在源表 READ 撤权反例处阻断。S3 未运行。** 四角色已自动完成正常登录。当前停止点为 ChatGPT 复审。最后实机父命令为 `685e33e9abd749168f6152789677859a`，原始退出码 1。
 
-- 原Base：`da0046433c87aec3b56a89f15953bfbd4114d9ca`；本次继续起点：`a40753d33e19c70dbf6e3c43c15e895d2d71bce8`。
-- 当前代码/离线消费者Head：`8be3a1d8c4a2efe0343e16dc776aa28691fe2473`；最新实际浏览器测量Head：`2f7b4f5476280c3f8e93d69fc94dbc5d6c55f9f0`。最终三文件由交付链接的准确包含提交定位；两种Head不混用。
-- 原分支`codex/g4-oracle-mapping-query-001`、原Oracle工作树、Run`product-resume-01`、批次`s2-s3-01`保持；main及origin/main为`5168f2c93ca226caa521a6dc4ac85439335274c4`。
-- 5秒产品、1秒源分支、250ms清理、原权限与资源上限保持。未加慢SQL、压力、依赖或新恢复工程。四个Finder未跟踪文件保留。
+| 输入 | 准确绑定 |
+|---|---|
+| 任务、产品 Run、资源 Run | G4-ORACLE-MAPPING-QUERY-001 / product-resume-01 / implementation-01 |
+| 分支、批次、后缀计划 | codex/g4-oracle-mapping-query-001 / s2-s3-01 / s2-s3-01-access-01 |
+| 原始 Base、此次续行起点 | `da0046433c87aec3b56a89f15953bfbd4114d9ca`、`a40753d33e19c70dbf6e3c43c15e895d2d71bce8` |
+| 最后浏览器实测 Head | `ee802b487f386417e312d40e84978ab49e78c182` |
+| 源证明修正和本地定向验证 Head | `124dc68ed668b1178d1070cf728894fb489c6097` |
+| 实机后端构建输入，旧前五槽构建输入 | `e8b537ed53b24faac246757d9de6592ae6a03ddeb96c81767f1b4373892d0877`、`53bddbec15779aa28ad25dc3082986027dbc6586f289add3326be2342d3d15ea` |
+| 受保护 main | `5168f2c93ca226caa521a6dc4ac85439335274c4` |
 
-## 已资格与复用
+## EC-01 与既有产品原件
 
-EC-01接受既存父`47f4f5d4e2454a759bd3189a5b37f590`的170件准确原件重开与非作者确认：父全窗2条源事件等于六阶段并集，间隙0。此前四角色、AC03-A成功先赢、S1与真正新reader恢复事实按原资格复用，不再为此登录。
+原父 `47f4f5d4e2454a759bd3189a5b37f590` 在 `8f857969ad4fe08e43e5644d951bbf7532e3544d` 实测。收紧后的消费者离线重开 170 件、623,536 字节。六段按顺序为 0、1、0、1、0、0 次业务 SELECT。无过滤父全窗恰有 2 个真实事件，与各段并集逐事件一致，间隙为 0。非作者核准原件索引 `f5fca1f634c23cb1b8f43d681fe402bab60b8f27a432ef7ac2aaf263c3c9b950`。认证、新 reader 和恢复各自有独立零读窗口。
 
-父`edd1379b83c246329579075d16ccda58`的认证、词汇、Mapping、查询、关系共五槽正式资格。原父仍为FAIL；资格仅覆盖已通过的前缀。父窗50次无过滤源读取，阶段计数0/0/0/10/40/0，间隙0。8条查询及10条关系反例覆盖独立数值/纳秒边界、NULL、身份冲突、多父、10/11扇出等已执行范围。六条新组合grant各自覆盖双表22字段，旧15项历史保留，不拼接单表授权。
+原父 `edd1379b83c246329579075d16ccda58` 的认证、词汇、Mapping、查询和关系五槽，按原输入在 `2a2ea74ff72c22860e4927318913eaece9d14f9f` 单独取得资格。五槽业务读分别为 0、0、0、10、40，间隙为 0。原父失败保留。更早的 e4cf6ad7 父窗曾在 Mapping 审计失败时暂报 PASS，该槽保留原报告状态并明确登记为 NOT_QUALIFIED。四角色、AC03-A 成功先赢、S1、同主体新 reader 原字节恢复和 AC03-C 的 PG 8/8 沿既有实测复用。
 
-关闭资源后，资格命令`417b1dc6f5c447ce86db2a7d3d9bd612`再次重开681件合并原件，CASE_QUALIFIED。旧资源清单原路径随生命周期更新，但已有内容键副本仍为原SHA `d0f2f50e09679c3092fe4d23a259e0acc22e618e3c41f386cd4c6f4a22484124`、1384字节。消费者仅对此固定清单允许精确字节别名，保留旧资格索引，不修改当前资源状态。
+## 最后产品窗口
 
-## 新计划与失败原件
+四账号在共享 600 秒窗内完成正常登录、回调及主体核对，34/34 项检查通过。正式连接 Probe 五阶段通过，末阶段累计 738 ms。reader 在正式 GET 上用 1280.8 ms 恢复本人历史关系查询的 5,056 个原字节，SHA-256 为 `fcb551ca11b24fb0a1cec8e38f07fb038d95ba774916c0cafdf2b3ad064c3e66`，该段业务读为 0。首次新关系查询的两个业务读取均在其准确窗口内。父全窗业务读总数为 2，间隙为 0。全部产品请求仍受 5 秒总期限、1 秒源分支与 250 ms 清理期限约束。
 
-原15槽`s2-s3-01`计划及旧`auth-handoff-01`字节不变。新后缀`s2-s3-01-access-01`为11槽、2520秒：初始认证600秒，其余各180秒，前后各60秒。新父不拼接历史阶段时间或源事件；前五槽作为另一个已资格父命令引用。
+| access 内的实际请求 | 结果 | 源业务读取 |
+|---|---|---:|
+| viewer-a 新双表关系查询 `query-61cd21d6128d453f8b8472c8b38d636d` | HTTP 200、FOUND、两份来源回执 | 2 |
+| 无 grant 的主体、撤销 execute、少一字段、自然到期 | 各自 HTTP 200、UNAUTHORIZED | 0 |
+| 短 TTL | 准入拒绝并回读原 grant | 0 |
+| 目标表 READ 撤回后的查询 `query-3e6bb50bdffe43feaa09736718b1dcb0` | HTTP 503，query_source_cleanup_unconfirmed，883.0 ms | 0 |
 
-| 父命令 | 实测事实 | 保留状态 |
+源表 ACL 在 finally 中经命令 `1724a6c651f34990865fd58c37a6ffa5` 恢复。其后 PostgreSQL 查询行仍为 FAILED、fence 2，原 Oracle 租约保留。执行审计只有一条 failure，没有成功结果。API 先记录 RESOURCE_FAILURE，再记录 PHYSICAL_DISPOSED。独立观察时任务源会话为零。源清理未在原查询获得确认，后续正常 Query 将被同连接门禁拒绝。
+
+已定位到正式证明视图按三条直接授权计数。撤回其中一条，单行 BLOCKED_COUNT 为正。修正前适配器在完整证明返回后抛出通用异常，明确拒绝未进入独占连接的确认路径。修正后，现行版本的单行有效阻断证明返回拒绝，空、多行、负数、小数、错版本和 I/O 异常保留失败路径。修正编译通过，35 项 adapter/资源所有权定向测试通过。新代码在本次保留租约下没有新产品实测。
+
+## 平台与源权限
+
+每项使用一条实际 grant，自身包含同一 connectionId、org-demo、site-a 和 22 个精确 FieldRef。两个 ObjectRef 是 PRODUCTION/OMQ_ENTITY 和 CaseOwner/OmqTarget。每表依 ordinal 1 至 11 为 ROW_ID、JOIN_KEY、VAL、ORG_ID、SITE_ID、EXT_ID、LABEL、FROM_TS、TO_TS、EVENT_TS、OBSERVED_TS。
+
+| 角色与 operation | 最新签发 ID |
+|---|---|
+| operator / mapping.source.validate | `omq-s23-97079e300a66540eb7b53a5f6f3ebf2a` |
+| auditor / mapping.source.validate | `omq-s23-4ded2c11b4226faae7048d8ac391bb56` |
+| activator / mapping.source.validate | `omq-s23-a42ab8e97dc92c8027e702c4a69c1b4b` |
+| reader / data.query.execute | `omq-s23-a3aedb231d0f77c6711156fc8ce4dac2` |
+| reader / data.query.result.read | `omq-s23-ce8f478983910496be13d7b822675356` |
+| reader / data.query.evidence.read | `omq-s23-a39a4cfd7be6689a3dba1ede4be26892` |
+
+03:18:50 UTC 同范围续授后平台从 60 行增为 75 行，原 15 条及其两轮共 30 条续发历史逐字段保留。最新 6 条组合 grant 和 9 条无字段工作流 grant 单列登记。04:39:12 UTC 平台回读 75 行、epoch 94，六条当时有效，记录的到期时间是 07:18:50.397521 UTC。九组 execute 权限变更均有准确恢复后态，两次源表直接 READ 撤回及恢复均已回读。result/evidence 专项撤权场景未运行。
+
+## AC 覆盖与保留项
+
+| 条款 | 实际覆盖 | 当前资格 |
 |---|---|---|
-| eebde047943f4a7e8e405510131308ea | 上次交接的正常认证未提交，0/4 | 历史FAIL保留 |
-| e4cf6ad7a0f64bce86ea698f57fdd56f | 本次4/4认证；Mapping漏算激活重评，暂写PASS未撤回；NULL快照漏列并阻断恢复 | 父FAIL；不升级旧假PASS |
-| edd1379b83c246329579075d16ccda58 | 前五槽合格；权限恢复行相等但JSON键顺序比较失败 | 父FAIL，权限已恢复 |
-| 36a4b8abb9de4c46a901778b74fdceb2 | 最新认证槽600002.686042ms，operator-ab未提交，0/4 | 父FAIL；后十槽NOT_RUN |
+| AC01–02 | 既有 Oracle 固定投影、事务/水位和单表原件，当前双表关系实读 | 保留分项原资格 |
+| AC03 | A 成功先赢，C 既有 PG 8/8，B 没有合格的原期限内取消命中 | B BLOCKED，cleanup250ms NOT_QUALIFIED，Oracle S0 BLOCKED |
+| AC04、AC06 | 既有正式提案、异人审核、激活、双表精确值/时间与关系。已测 NULL、接壤、重复目标、多父、扇出等原前缀范围 | 已执行部分按原输入复用 |
+| AC05 | 当前执行权限四项拒绝已核。唯一在途 ABA 要求同一 Q 完成真实源读后，正式激活 B、回滚激活原 A，在原期限内 409 query_binding_stale，零成功副作用 | 本窗 ABA 及单列的连接/版本反例 NOT_RUN。历史结果恢复单列 |
+| AC07–08 | 新双表 FOUND、四项 UNAUTHORIZED、本人历史关系结果原字节 | 完整六态及 100/101、当期新 reader 恢复和撤回结果/来源读取权限均未资格 |
+| AC09 | HTTP 健康关系及来源回执已实测 | 独立 S3、UI 三能力、MCP 四工具、刷新、撤权清屏及迟到响应 NOT_RUN |
+| AC10 | 既有 PG 黄金字节、Oracle M2 目录合同，17 份 Doris 历史原件散列相符 | 当前 Doris 类型序列化未资格 |
+| AC11 | 原计划、资源和剩余 TTL 核验，父全窗审计、续授与权限恢复 | 新后端与既有产品构建输入不同，完整工程资格未签发 |
 
-第一窗源夹具已按原token及全值CAS恢复，命令`4df9527db7584a87b847141596bcbde3`。修复包括真实Mapping独立读数4/既有链0、异常撤回PASS、显式NULL ON NULL与完整11列、准确构建Run身份、权限行按字段/微秒比较。旧失败原件均保留。最新认证`inputsUnchanged=false`因期限耗尽未取得结束绑定，不能宣称输入确实漂移，也不能签稳定输入PASS。新父与其唯一认证阶段的无过滤源读均0、间隙0。
+trust/secret 没有同任务可逆替代版本。CI、完整 SelfTest 和跨平台验证为 NOT_RUN。G4 为 PARTIAL。
 
-初次后缀启动在登录前因磁盘核算42959166398字节超过40GiB被拦。非作者确认后只回收本任务SecurityTests/bin的39284736分配字节，四项当前运行构建绑定及全部绑定文件原字节不变。重新核算42920520638字节通过。未删原件或受保护旧资源。原启动账本window-orchestration-5898602966e74c979b57e5b45d25ec67.json的STARTING/Web NOT_STARTED/无parent原状态保留，另有准确失败收口回执；它不是成功窗口，也不表示仍有服务。
+## 保留的失败与资源收尾
 
-自动审批曾拒绝拟议的审计字节一致性豁免，该改动未落盘。最终使用独立登记的任务后缀入口；原platform、审计程序与依赖保持严格原字节检查。
+此前无提交的 600 秒窗口及其他早期失败逐窗保存在机器回执。父 04f23ea8 首次在源 ACL 反例失败，7e3085f4 与 60a80687 在健康查询的源前置检查处失败。三次历史维护仅命中各自固定的行，准确 CAS 命令分别为 56a20ab08e69402e8469f7c8c8362f4c、7e9289f17c0740a68a18058360f6a1c4、de30f36b29a44481993c2babfa3969c8。最后窗口查询 `query-3e6bb50bdffe43feaa09736718b1dcb0` 需要单独处置才能释放同连接容量。现有维护入口的目标均与此行不同。
 
-## 验证与资源收尾
+关闭先后两次核对七项队列/工作计数，均为零。两个准确 API 已分别移除并回读缺席。首次原生停止走旧基线计量被拒绝，记录值为 43,051,581,886 字节。同批停止入口接回原产品计量，仍使用 40 GiB 上限。Oracle、RustFS、IdP、PG 原生停止，PG 控制状态为 shut down。Fuseki 进程退出，cleanShutdown 为 UNKNOWN，锁仍可见。关闭账本为 `a2bfcbd13fbb42c8856081845ac002a4`。四个主机端口的服务随本批收口，Web 进程退出并回读端口释放。17 个保留停止项、3 个受保护原运行项及 9 个归档继续保留。最后一次额度实测 42,895,778,238 / 42,949,672,960 字节。
 
-本批短修复14 Node、16 S2 Python、7认证原件测试通过；后缀72 Python、15 Node通过；最终定位修复20 Python通过。各次范围重叠，不累加成独立总测试数。当前源码格式通过；API/Query/Agent/Web按未变输入复用。旧72项等成功保留其原输入身份，未冒充8be新跑72项；当前受影响定位链以20项及真实原件重开覆盖，FRESH/REUSED/旧候选观察在machine中分列。独立审查核真实命令双流和负例；未跑CI、全SelfTest或Windows，不扩大结论。
+最新窗口有 14 条主机心跳。该窗锁屏/熄屏连续性为 NOT_VERIFIED。后端工程定向检查为 35 项，S2 Python 为 34 项，JS 为 4 项，各自按原命令计数。
 
-收尾operation`25241e1baf8c40828442bd29488c9642`：前后两次七项排空全0；准确两API容器移除；五副本进程停止；Web进程退出、15744端口释放；17个受保护停止资源和3个受保护运行资源保持。保护清单SHA `2fda67495da82c7270e16f034efcb246a2fbd226f3dfb647076acea7f987e4c9`。Oracle原生停止、PG control state shut down均有原件。Fuseki仅PROCESS_EXITED，cleanShutdown UNKNOWN、allTdbLocksRemoved=false，保留干净关闭未资格。
+## 原件定位
 
-## 未完成与未资格项
-
-S2权限余项、唯一Mapping在途ABA、独立连接/目录版本反例、状态及S2新reader恢复，和全部S3 UI/MCP仍待实际执行。ABA唯一要求保持：同Q捕获A、真实源读完成且未提交、正式B、正式回滚原release A并产生新activationId/递增revision、同Q原5秒内409 query_binding_stale，零成功结果/已提交来源回执/成功执行审计。不存在第二类数量等待项；连接版本与历史selection分别验收。
-
-AC03-B、Oracle S0继续BLOCKED，B cleanup250ms NOT_QUALIFIED，G4 PARTIAL。trust/secret缺少本任务已登记可恢复替代版本；17件Doris历史原件仅散列匹配，当前typed manifest/assessment序列化未证明。这些均未补记通过。
-
-## 完整公开文件与原件索引
-
-本目录三文件均完整发布。机器回执保持schema2与1MiB上限：当前命令使用列/字典/行的无损JSON，逐字段解码，三件命令原件由同行SHA/长度派生；非命令原件逐件索引。没有gzip、base64、公开白名单字段丢失、时间舍入或只留成功项。timingStatus单独按实际elapsedSeconds与命令deadlineSeconds比较推导，不冒充原receipt字段，不代表产品/阶段预算通过或退出成功。展开计数、集合SHA与本机逐字节检查随回执记录。私有原件保存在ignored工作区，认证材料不公开。
-
-历史完整三文件固定引用[a407准确机器回执](https://github.com/on-dotnet/ontology-platform/blob/a40753d33e19c70dbf6e3c43c15e895d2d71bce8/docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/final-machine-receipt.json)，其Git blob、SHA、长度均在当前machine中；旧版本不改写。普通push后回读准确分支Head，三条交付链接固定该Head。产品尚未完成，不生成中间PARTIAL ZIP。交付后停ChatGPT复审，不更新main或擅自重开登录。
-
-公开草稿首次schema检查9ad050feac8f4a7ab03aff555cbd32bd因测试计数字段放入封闭checks而拒绝；计数移到metadata，原失败保留，schema与1MiB限制未改。
+机器回执列出 7,075 条实跑命令的 Run、commandId、原回执长度与 SHA。每份本机原回执给出实际双流身份、长度、散列和时限。另有 200 个关联原件的相对路径、长度与 SHA。8 个 Web 进程的 START、READY、END 原始事件及双流也已按准确身份登记。审查范围和索引时间截止点在机器回执中。浏览器会话、密码和私有双流留在本机。上一版三份文件精确绑定到提交 `70c94502a2bfbb0a306ccf599403a75fceeb61b1`。本次交付提交由三份文件的同一固定 Git 链接标识。当前没有中间 PARTIAL ZIP。

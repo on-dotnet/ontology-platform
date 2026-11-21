@@ -2,134 +2,218 @@
   "taskId": "G4-ORACLE-MAPPING-QUERY-001",
   "runId": "product-resume-01",
   "batch": "s2-s3-01",
-  "codeHead": "8be3a1d8c4a2efe0343e16dc776aa28691fe2473",
-  "measuredSuffixHead": "2f7b4f5476280c3f8e93d69fc94dbc5d6c55f9f0",
-  "status": "REVIEWED_BLOCKED_NORMAL_AUTH",
-  "reviewer": "/root/ec01_review",
-  "author": "/root",
-  "independence": "Read-only non-author reopens; no product/service/login operations by reviewer",
-  "prefix": {
-    "status": "CASE_QUALIFIED",
-    "commandId": "edd1379b83c246329579075d16ccda58",
-    "members": 681,
-    "originalQualifiedCommand": "a495b4d475404f95b726b8b46d6a3663",
-    "currentQualificationCommand": "417b1dc6f5c447ce86db2a7d3d9bd612",
-    "memberIndexSha256": "185c9d56d7f7057641a3931bc0ddb128584cf5f8c0d308f9d0e02c309640b209",
-    "aliases": [
-      {
-        "originalPath": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-resources.json",
-        "resolvedPath": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-resources-d0f2f50e09679c3092fe4d23a259e0acc22e618e3c41f386cd4c6f4a22484124.json",
-        "sha256": "d0f2f50e09679c3092fe4d23a259e0acc22e618e3c41f386cd4c6f4a22484124",
-        "sizeBytes": 1384
-      }
-    ]
-  },
-  "testedScopes": [
-    "Suffix source/entry limited GO; original platform/audit dependencies exact 2a",
-    "Actual old-host/source timing negative rejected",
-    "72 Python and15 Node real receipts and both streams checked",
-    "20 locator tests and original-hash alias reopen",
-    "Latest failed parent measured2f command/plan/streams and zero-event audit closure",
-    "Final exact resource closeout; Fuseki clean close remains unqualified"
+  "codeHead": "124dc68ed668b1178d1070cf728894fb489c6097",
+  "measuredSuffixHead": "ee802b487f386417e312d40e84978ab49e78c182",
+  "originalBase": "da0046433c87aec3b56a89f15953bfbd4114d9ca",
+  "author": "Master",
+  "reviewers": [
+    "/root/ec01_review",
+    "/root/s2_s3_readonly"
   ],
-  "retainedFailures": [
+  "independence": "Read-only reviewers. No reviewer executed product windows or modified grants, source ACL, leases, runtime or public files.",
+  "conclusion": "LIMITED_VERIFIED_S2_BLOCKED_S3_NOT_RUN",
+  "productStatus": {
+    "EC01": "PASS_REUSED",
+    "S1": "PASS_REUSED",
+    "AC03_A": "SUCCESS_WON_REUSED",
+    "AC03_B": "BLOCKED",
+    "AC03_C": "8_OF_8_REUSED",
+    "cleanup250ms": "NOT_QUALIFIED",
+    "S2": "PARTIAL_BLOCKED_SOURCE_ACL_CLEANUP",
+    "S3": "NOT_RUN",
+    "G4": "PARTIAL",
+    "OracleS0": "BLOCKED"
+  },
+  "scopes": [
     {
-      "parent": "eebde047943f4a7e8e405510131308ea",
-      "head": "6d77931685a3d5c8a5a9ac68e9b1cf63df872d4b",
-      "fact": "Baseline normal authentication expired 0/4; no S2/S3 or grant issuance in that old window."
+      "name": "EC-01 original parent",
+      "reviewer": "/root/ec01_review",
+      "originalParent": "47f4f5d4e2454a759bd3189a5b37f590",
+      "members": 170,
+      "bytes": 623536,
+      "indexSha256": "f5fca1f634c23cb1b8f43d681fe402bab60b8f27a432ef7ac2aaf263c3c9b950",
+      "fullWindowReads": 2,
+      "gap": 0,
+      "status": "PASS_REUSED"
     },
     {
-      "parent": "e4cf6ad7a0f64bce86ea698f57fdd56f",
-      "fact": "4/4 auth; Mapping expected2 versus actual4 and provisional PASS not retracted; NULL projection omitted a field and blocked restore. Old report not upgraded.",
-      "fixCommit": "2a2ea74ff72c22860e4927318913eaece9d14f9f",
-      "exactRestoreCommand": "4df9527db7584a87b847141596bcbde3"
+      "name": "Historical qualified five-slot prefix",
+      "reviewer": "/root/s2_s3_readonly",
+      "originalParent": "edd1379b83c246329579075d16ccda58",
+      "measured": "2a2ea74ff72c22860e4927318913eaece9d14f9f",
+      "members": 684,
+      "relocations": 7,
+      "indexSha256": "67625aa92426e2a8452e46e367ebc7de9953e095ee9e9848bb99cffdbcfa5445",
+      "scope": "Read-only prefix_result, actual historical inputs",
+      "status": "CASE_QUALIFIED",
+      "sourceReads": [
+        0,
+        0,
+        0,
+        10,
+        40
+      ]
     },
     {
-      "parent": "edd1379b83c246329579075d16ccda58",
-      "fact": "First five stages formally qualified; access restore row equal but JSON key order differs. Parent FAIL remains.",
-      "fixCommit": "2f7b4f5476280c3f8e93d69fc94dbc5d6c55f9f0",
-      "grantRestoreToken": "a361687e75ab45148e8e5276a5ae9b81"
+      "name": "Previous 60a806 window original audit and readiness",
+      "reviewer": "/root/s2_s3_readonly",
+      "members": 53,
+      "indexSha256": "e33fa3d2dd99f0893759a152b1a9b0e4cf47b82cc4c0cefe7951aa0683f625e6",
+      "status": "AUTH_AND_PROBE_VERIFIED_ACCESS_FAILED",
+      "queryColdStart": "NOT_QUALIFIED",
+      "sourceReads": 0
     },
     {
-      "parent": "36a4b8abb9de4c46a901778b74fdceb2",
-      "fact": "600002.686042ms auth, operator-ab not submitted, 0/4; ten following stages NOT_RUN."
+      "name": "Five lifecycle edges through fixed earlier maintenance",
+      "reviewer": "/root/ec01_review",
+      "members": 693,
+      "bytes": 5773098,
+      "indexSha256": "944dbae383af63b2314a60e326271ed752aa132715950ee445f82a9cdd417c4c",
+      "status": "QUALIFIED_ON_MEASURED_BUILD",
+      "originalCleanup250ms": "NOT_QUALIFIED"
     },
     {
-      "resourceAttempt": "f068107bfab94ca09030b1c883037ec8",
-      "orchestration": "window-orchestration-5898602966e74c979b57e5b45d25ec67.json",
-      "originalStatus": "STARTING",
-      "webStatus": "NOT_STARTED",
-      "parent": "NOT_STARTED",
-      "closure": "entry-failure-5898602966e74c979b57e5b45d25ec67.json",
-      "fact": "40GiB admission blocked at42959166398 bytes before parent/login; exact task SecurityTests/bin reclaimed39284736 allocated bytes with bindings unchanged.",
-      "command": "d9ccded615974e478b7ceaec297f748f"
+      "name": "Latest product window",
+      "reviewer": "/root/s2_s3_readonly",
+      "parent": "685e33e9abd749168f6152789677859a",
+      "members": 196,
+      "indexSha256": "019c7ed707accd1dddc1eb0f0fecb767192c0ffcc13346f9f7b93aed49ec90de",
+      "authentication": "4/4, 34 checks",
+      "accepted": [
+        "CURRENT_API_CONNECTION_READY",
+        "CURRENT_CATALOG_VERIFIED",
+        "healthy-relations FOUND, two business reads",
+        "four UNAUTHORIZED results, zero business reads"
+      ],
+      "parentReads": 2,
+      "gap": 0,
+      "access": "S23_ACCESS_CASE_CLOSURE_NOT_QUALIFIED",
+      "failingHttp": 18,
+      "failedQuery": "query-3e6bb50bdffe43feaa09736718b1dcb0",
+      "sourceAclRestored": true,
+      "laterModes": [
+        "s2-oracle-aba",
+        "s2-oracle-connection",
+        "s2-oracle-versions",
+        "s2-oracle-states",
+        "reader-auth",
+        "s2-oracle-reopen",
+        "s3",
+        "ui-s3",
+        "ui-s1"
+      ]
     },
     {
-      "fact": "Automatic review rejected a proposed audit byte-equality exception; it was never applied. Original platform/audit bytes retained; separate registered suffix entry used."
+      "name": "Exact platform grants, expiry, source ACL and restoration",
+      "reviewer": "/root/ec01_review",
+      "commands": 100,
+      "members": 337,
+      "bytes": 10833668,
+      "indexSha256": "3654c022d4075d5e8f3627bae9d1523df08e5ab3c43f0ef85247fdb1b6ed68ed",
+      "status": "OBSERVED",
+      "grants": 6,
+      "fieldsPerGrant": 22,
+      "originalAndRenewedHistoricalRows": 45,
+      "totalRowsAtLastSnapshot": 75,
+      "epoch": 94,
+      "asOfUtc": "2026-11-21T04:39:12.951558Z",
+      "executePermissionRestorations": 9,
+      "sourceAclRestorations": 2
     },
     {
-      "command": "242720c25e934fc3ab79e6d47c2b363e",
-      "fact": "Legacy test fixture lacked stageInputs; old auth default restored, then72 Python passed."
+      "name": "Terminal row, audit, physical disposal and closeout",
+      "reviewer": "/root/s2_s3_readonly",
+      "rowCommand": "75de8de852b6435bad6defff146471e0",
+      "auditCommand": "92fa293202c54435a663c092fafd008c",
+      "apiLogCommand": "5446f79edeb443e096cb5ddd6fb7e86a",
+      "queryId": "query-3e6bb50bdffe43feaa09736718b1dcb0",
+      "status": "FAILED_FENCE_2_LEASE_HELD",
+      "productCleanup250ms": "NOT_QUALIFIED",
+      "remainingOwnedRunningRoles": [],
+      "fuseki": "PROCESS_EXITED_CLEAN_SHUTDOWN_UNKNOWN",
+      "priorCloseout": "BLOCKED_RETAINED"
     },
     {
-      "fact": "Closeout moved the mutable resources locator; original content-key copy matched SHA/1384bytes. Only exact original alias is supported; prior frozen index unchanged."
+      "name": "Final attestation fix",
+      "reviewer": "/root/s2_s3_readonly",
+      "build": "40e9e41881174961a6402156e06d34f4",
+      "test": "1e03cacc060140868a47e1e8c6d820eb",
+      "passed": 35,
+      "failed": 0,
+      "skipped": 0,
+      "status": "COMPILED_AND_TESTED_OFFLINE",
+      "actualProductAfterFix": "NOT_RUN",
+      "gate": "Same-connection admission refuses a held terminal Oracle owner. The existing fixed maintenance targets differ."
     }
   ],
   "limitations": [
-    "AC03-B and Oracle S0 remain BLOCKED; B cleanup250ms NOT_QUALIFIED; no natural-success or late-recovery substitution.",
-    "S2 access remainder, in-flight Mapping ABA, separate connection/catalog versions, states, new-reader S2 restore and all S3 slots remain NOT_RUN in the suffix.",
-    "Trust/secret rotation has no registered reversible synthetic replacement version; NOT_QUALIFIED.",
-    "Seventeen Doris historical originals are hash-matched, but current typed manifest/assessment serialization is not proved.",
-    "Final authentication has inputsUnchanged=false because its end binding was not obtained within the stage deadline; actual input drift is not established.",
-    "Fuseki PROCESS_EXITED only; cleanShutdown UNKNOWN/allTdbLocksRemoved false; clean shutdown/recoverability not qualified.",
-    "CI, full SelfTest, Windows and cross-platform verification NOT_RUN; G4 remains PARTIAL; no intermediate PARTIAL ZIP."
+    "New source ACL product case returned 503 query_source_cleanup_unconfirmed. Fixed code has offline tests only. Terminal failed lease retained.",
+    "No eligible same-query Mapping ABA, connection/version, 101/state, current fresh-reader double-table restore, S3/UI/MCP completion.",
+    "No reversible task trust/secret replacement version. Current typed Doris serialization unqualified.",
+    "Native Fuseki process exited; clean shutdown UNKNOWN, TDB locks remain.",
+    "CI, full SelfTest and cross-platform verification NOT_RUN. No interim PARTIAL ZIP."
   ],
-  "baseline": {
-    "commit": "a40753d33e19c70dbf6e3c43c15e895d2d71bce8",
+  "prior": {
+    "commit": "70c94502a2bfbb0a306ccf599403a75fceeb61b1",
     "files": {
-      "report.md": {
-        "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md",
-        "blobOid": "2891d64161937d3b6c15fd97f56242269c4f01a1",
-        "sha256": "99199bdb8c457cf2bef649e4a570276da3960e29a45344a263ffe0d254ae016a",
-        "sizeBytes": 9695,
-        "url": "https://github.com/on-dotnet/ontology-platform/blob/a40753d33e19c70dbf6e3c43c15e895d2d71bce8/docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md"
-      },
       "final-machine-receipt.json": {
         "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/final-machine-receipt.json",
-        "blobOid": "ba78396f25097dcc668b67dedf215fadbab6a120",
-        "sha256": "a1511e9aa2e9d3657a77f54627ab54c155cecfeccf15928ea9611414f5a4ffba",
-        "sizeBytes": 1046867,
-        "url": "https://github.com/on-dotnet/ontology-platform/blob/a40753d33e19c70dbf6e3c43c15e895d2d71bce8/docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/final-machine-receipt.json"
+        "sha256": "d981670fa46a257356bfebb8a0b7547fb341030fdfa5d8ebc44cdea067a775db",
+        "sizeBytes": 888160
       },
       "non-author-review.json": {
         "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/non-author-review.json",
-        "blobOid": "427bba6824282ae9323f76616f74f6befd19e9d2",
-        "sha256": "88e7cee57c5b17b145d7411e0471f127e32bfc6498cffe44e33dc6f45e6c28e8",
-        "sizeBytes": 10192,
-        "url": "https://github.com/on-dotnet/ontology-platform/blob/a40753d33e19c70dbf6e3c43c15e895d2d71bce8/docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/non-author-review.json"
+        "sha256": "8e10044a542f77250e2c060fe39566169595a43fe42ff4fd5a7849f112dc2452",
+        "sizeBytes": 7521
+      },
+      "report.md": {
+        "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md",
+        "sha256": "827f37b30d1b9edc96ba97ca64de56b2c11fb6cdb2876e1cb17c762f57433023",
+        "sizeBytes": 7420
       }
     }
   },
-  "originalIndexReview": {
-    "encoding": "column-dictionary-rows-v1",
-    "commands": 2625,
-    "expandedOriginalCount": 8056,
-    "expandedOriginalIndexSha256": "13309c13b2be3ef5a8927cfca712908daa98882213fd209ca705fe8eeff5e07d",
-    "status": "INDEPENDENTLY_DECODED_AND_REHASHED",
-    "reviewer": "/root/ec01_review",
-    "totalOriginalBytes": 15959573,
-    "commandFields": "All original public fields match; timingStatus separately derived and2625 formulas checked",
-    "canonicalOriginalIndexSha256": "13309c13b2be3ef5a8927cfca712908daa98882213fd209ca705fe8eeff5e07d"
-  },
   "publicFiles": {
     "report.md": {
-      "sha256": "827f37b30d1b9edc96ba97ca64de56b2c11fb6cdb2876e1cb17c762f57433023",
-      "sizeBytes": 7420
+      "sizeBytes": 9119,
+      "sha256": "02636042e20dc2f632617875c36beb5d5fd96b51f62cafeb2d31434a887eb643"
     },
     "final-machine-receipt.json": {
-      "sha256": "d981670fa46a257356bfebb8a0b7547fb341030fdfa5d8ebc44cdea067a775db",
-      "sizeBytes": 888160
+      "sizeBytes": 879994,
+      "sha256": "3c777b407ebf8c7ebc9d6d95f12ed5c8b7b3d99d39d9abc30c39352a81308021"
     }
   },
-  "stop": "CHATGPT_REVIEW; product incomplete; no main integration or intermediate PARTIAL ZIP"
+  "independentIndexReview": {
+    "reviewer": "/root/ec01_review",
+    "status": "INDEX_VERIFIED",
+    "commandCount": 7075,
+    "relatedNonCommandOriginals": 200,
+    "canonicalGroupsSha256": "71ae462a6ceb520c24d33eeb129367e3990f756ee51938a002dd2dc0b81457c0",
+    "streams": 14150,
+    "files": 21425,
+    "totalBytes": 40021390,
+    "windowCommands": 7068,
+    "historicalReferences": 7,
+    "expandedOriginalIndexSha256": "ba4909a6edcfb17e36395fcd19ad7580f764b768c2abe4cad0f2fb2dd30b3903",
+    "nonzeroExits": {
+      "1": 18,
+      "5": 2,
+      "2": 2
+    },
+    "priorThreeGitFiles": "VERIFIED",
+    "serviceCount": 8,
+    "serviceStreams": 16,
+    "streamCountMeaning": "14150 command streams, plus 16 service streams among the 200 associated files.",
+    "expandedIndexEncoding": "Array of path, sizeBytes, sha256 objects. Paths relative to repository root. Sort rows by path. Canonical UTF-8 JSON, keys sorted, no spaces, Unicode unescaped."
+  },
+  "stop": "CHATGPT_REVIEW",
+  "publicContentReview": {
+    "reviewer": "/root/s2_s3_readonly",
+    "status": "REVIEWED",
+    "scope": "Two named public files, nine parent outcomes, historical Mapping false PASS, final code input, 35 test results, resource sample and all 7075 receipt SHA-256/length pairs verified. No private authentication material opened. New code real product NOT_RUN.",
+    "reviewedSha256": {
+      "report.md": "452fd0c8ef3bffc66fa68d50fe84a372b475f463f02277c636584bf83ba67fc9",
+      "final-machine-receipt.json": "8ea559638d52d60010e044dee2c9f6ee5833786ea6117b468985bb996997e028"
+    }
+  }
 }
