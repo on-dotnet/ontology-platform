@@ -21,6 +21,7 @@ PLAN = 's2-s3-01-runtime-01'
 ACTIVE = contextvars.ContextVar('oracle_runtime_window', default=None)
 ROOT = Path(__file__).resolve().parents[2]
 AREA = ROOT / 'artifacts/workflow' / TASK / RUN
+COLD_MEASUREMENT = contextvars.ContextVar('oracle_runtime_cold_measurement', default=False)
 CLOSING = contextvars.ContextVar('oracle_runtime_closing', default=False)
 CHECKOUT = GIB
 EXIT_MARGIN = 4 * GIB
@@ -56,6 +57,9 @@ def close_resources():
 
 
 def ceiling(total=None):
+    if COLD_MEASUREMENT.get():
+        require(total is not None and not ACTIVE.get() and os.environ.get('OMQ_PRODUCT_RUN') == RUN, 'WINDOW_COLD_SCOPE')
+        return choose(total)
     decision = policy()
     if decision and total is not None and not CLOSING.get():
         require(total + CHECKOUT + EXIT_MARGIN <= decision['ceiling'], 'WINDOW_EARLY_DISK_EXIT')
@@ -63,10 +67,20 @@ def ceiling(total=None):
 
 
 @contextlib.contextmanager
-def open_window(cold):
+def open_window():
     """由 Master 的单次冷态准入创建限本树、本批的决定，退出时撤销。"""
     import workflow_oracle_mapping_platform as p
-    require(not ACTIVE.get() and p.product_run() == RUN and
+    import workflow_oracle_mapping_resume as resume
+    from workflow_oracle_mapping_s2_contract import frozen_plan
+    require(not ACTIVE.get() and not COLD_MEASUREMENT.get() and p.product_run() == RUN and
+            ROOT == resume.ROOT and frozen_plan(ROOT, PLAN)['planId'] == PLAN, 'WINDOW_COLD_SCOPE')
+    measuring = COLD_MEASUREMENT.set(True)
+    try:
+        cold = resume.admit(set(resume.recovery.ORIGINAL_IDS) | set(resume.APIS))
+    finally:
+        COLD_MEASUREMENT.reset(measuring)
+    require(cold['phase'] == RUN and cold['resourceRunId'] == 'implementation-01' and
+            cold['platformDisk']['ceilingBytes'] == choose(cold['platformDisk']['totalBytes']) and
             (cold['taskId'], cold['runId'], cold['status']) == (TASK, RUN, 'FORMAL_RESOURCE_READY') and
             not cold['expectedRunningRoles'] and cold['projectedWithHelper'] == dict(memory=14763950080, nanoCpus=10500000000) and
             json.loads((AREA / ('source-admission-' + cold['attempt'] + '.json')).read_bytes()) == cold, 'WINDOW_OPEN_BASIS')
@@ -192,15 +206,126 @@ CLOSE_FILE = 'closeout-ec277a6910354c72884c646d9e3e6df0.json'
 CLOSE_SHA = '285daba082c9b20328d9559cf51d65e6e71df363b3e9e4562025581088ba73d9'
 
 
-def published_graphs(cid, started, pid, basis, refs=None, archive=None):
+LAST_OPERATION = '330c11744f364d1187332e0d93801098'
+LAST_CLOSE = '35bcf152b788c21a72690c7b3fa2cc7f58355b1c6b66fc54ec4074d2d83be691'
+LAST_PARENT = '1080791aa97546f29c34fd915618ecef'
+# 各角色依次绑定原生 stop 文件、退出状态命令和对应的关闭命令。
+NATIVE_STOPS = {
+    'oracle': ('317dd39db1f74a408220e0ef2ff53141',
+            '63e7584705bf443b960047b0b0c83f4d',
+            'a276d949d4ab43158baa1c10930f5a78',
+            '7efc6a326e054c148cd68183eceaf18d'),
+    'rustfs': ('e06824ffb8db449d83ba078f4006b4ec',
+            '51369c267be84e03b8c9391a82a2d90d',
+            'f2e7ed5d19284e5c8f6639153896b439'),
+    'keycloak-test': ('81985700e5cd4326b55ba5c41cf25345',
+            '2c82197f24fb4b23a5f5fb851c065239',
+            '86c99ec2c2f04ba087af4c44b5c2c5b2'),
+    'fuseki': ('df85df6f1f7f4ecf8dd3c252d63f7db7',
+            'af58d6aa7f6d42aba07adbc9db5db2c8',
+            'acd519e2fdb3496b99fa480d5e56a75a',
+            'a0ad86db5e3d43dd9e6749245f8d0195'),
+    'platform-pg': ('ffa315593e42425bb34777adcdc687a7',
+            '953b33f64ce445c2bc192bdda4260b2e',
+            'cd1f086d8a3d4525af0fa066181ca5bd',
+            'c883e5f461d1441c8f2d886e4b19b047',
+            'e6d6dfbd9d4341dead2dd1a1815bf7e7'),
+}
+API_STOPS = {
+    'api': ('9c499e74e63b4c2ea67d687504a6b5ee',
+            '12502f27b42349168b5a017619bc60c1',
+            '03c1bcfb7a5043899bd02b44c44cf312',
+            'd09bf181d8bb4ecba7c2245297079074'),
+    'api-secondary': ('81b94685d70446eda0c145f3a93baa3d',
+            '7bda3a72823146979629001f6d82793b',
+            '6392e3c4243a4ef89da831b9854b6f9a',
+            '0de9719fea5843e780abfe0532621f59'),
+}
+
+
+def last_close(root, archive=None):
+    """重开上一父窗的原生停机、排空、保护清单及准确资源闭集。"""
+    import workflow_execution as ex
+    import workflow_oracle_mapping_continuity as c
+    from workflow_oracle_mapping_evidence import utc
+    area = c.AREA
+    data = c.raw(root, area / BATCH / ('controlled-run-' + LAST_OPERATION + '.json'), archive)
+    require(len(data) == 4170 and ex.sha(data) == LAST_CLOSE, 'WINDOW_LAST_CLOSE_ORIGINAL')
+    close = json.loads(data)
+    require((close['taskId'], close['runId'], close['batch'], close['planId'], close['operation']) ==
+            (TASK, RUN, BATCH, PLAN, LAST_OPERATION) and close['parent']['commandId'] == LAST_PARENT and
+            close['parent']['exitCode'] == close['exitCode'] == 1 and close['status'] == 'BLOCKED' and
+            close['remaining'] == close['errors'] == [] and close['protectedSame'] is True and
+            set(close['closed']) == set(close['starts']) == NATIVE_STOPS.keys() | API_STOPS.keys(), 'WINDOW_LAST_CLOSE_SCOPE')
+    members = {}
+
+    def read(path):
+        value = c.raw(root, path, archive)
+        members[str(path)] = ex.sha(value)
+        return value
+
+    def output(run, cid, stage=None):
+        directory = area.parent / 'commands' / run / cid
+        record = json.loads(read(directory / 'receipt.json'))
+        out = read(directory / 'stdout.txt')
+        err = read(directory / 'stderr.txt')
+        require((record['taskId'], record['runId'], record['commandId'], record['exitCode']) == (TASK, run, cid, 0)
+                and record['classification'] == 'SUCCESS' and (stage is None or record['stage'] == stage)
+                and record['stdout']['sha256'] == ex.sha(out) and record['stderr']['sha256'] == ex.sha(err),
+                'WINDOW_LAST_COMMAND')
+        return out
+
+    normalized = dict(ids={}, data={}, apis={})
+    for role, (stop_id, state_id, *commands) in NATIVE_STOPS.items():
+        stop = json.loads(read(area.parent / c.RECOVERY / ('stop-' + stop_id + '.json')))
+        state = json.loads(output(c.RECOVERY, state_id, 'omq-recovery-stopped-state'))
+        for cid in commands:
+            output(c.RECOVERY, cid)
+        record = close['closed'][role]
+        require(stop['role'] == role and stop['operation'] == LAST_OPERATION and stop['group'] == 'replacement'
+                and {key: stop[key] for key in record} == record and
+                all(state[key] == value for key, value in record['after'].items()) and
+                state['Status'] == 'exited' and state['Pid'] == 0 and not state['OOMKilled'] and
+                utc(state['StartedAt']) < utc(state['FinishedAt']), 'WINDOW_LAST_NATIVE')
+        normalized['ids'][role] = record['id']
+        normalized['data'][role] = {**record, 'startedAt': state['StartedAt']}
+    for role, (term, exited, removed, absent) in API_STOPS.items():
+        cid = close['closed'][role]
+        output(RUN, term, 'resume-api-term')
+        require(output(RUN, exited, 'resume-api-exit').strip() in (b'exited 0 false', b'exited 143 false') and
+                output(RUN, removed, 'resume-remove-stateless').decode().strip() == cid and
+                not output(RUN, absent, 'resume-absent').strip() and cid == close['starts'][role]['id'], 'WINDOW_LAST_API')
+        normalized['ids'][role] = cid
+        normalized['apis'][role] = {'id': cid}
+    for label in ('before', 'after'):
+        row = close['drain'][label]
+        require(json.loads(output(RUN, row['commandId'], 'omq-pg-runtime-drain-' + label)) == row['values'] == [0]*7,
+                'WINDOW_LAST_DRAIN')
+    inventories = []
+    for key in ('cold', 'post'):
+        record = json.loads(read(area / ('source-admission-' + close[key] + '.json')))
+        require(record['expectedRunningRoles'] == [] and record['status'] == 'FORMAL_RESOURCE_READY', 'WINDOW_LAST_ROLES')
+        inventories.append({item['stage']: output(RUN, item['commandId'], 'oracle-admission-' + item['stage'])
+                            for item in record['commands'] if item['stage'] in ('old-resources', 'all-running')})
+    require(inventories[0] == inventories[1] and len(members) == 91 and
+            ex.sha(ex.encoded(dict(sorted(members.items())))) == '851145a646d08cba58c378d845c21003adb63461faabf2e8dc4bb131693f555c',
+            'WINDOW_LAST_RESOURCE_ORIGINALS')
+    return normalized
+
+
+def published_graphs(cid, started, pid, basis, refs=None, archive=None, *, close_sha=CLOSE_SHA):
     import workflow_execution as ex
     import workflow_oracle_mapping_continuity as c
     import workflow_oracle_mapping_evidence as e
     from workflow_oracle_mapping_resume import recovery as r
     require(cid == c.FUSEKI and pid > 0, 'WINDOW_GRAPH_ROLE')
-    close_bytes = c.raw(ROOT, c.AREA / BATCH / CLOSE_FILE, archive)
-    require(ex.sha(close_bytes) == CLOSE_SHA, 'WINDOW_CLOSE_ORIGINAL')
-    closed = json.loads(close_bytes)['data']['fuseki']
+    if close_sha == LAST_CLOSE:
+        closed = last_close(ROOT, archive)['data']['fuseki']
+    else:
+        require(close_sha == CLOSE_SHA and (started, pid) == ('2026-11-21T11:53:49.540115255Z', 87804), 'WINDOW_GRAPH_GENERATION')
+        close_bytes = c.raw(ROOT, c.AREA / BATCH / CLOSE_FILE, archive)
+        require(ex.sha(close_bytes) == CLOSE_SHA, 'WINDOW_CLOSE_ORIGINAL')
+        closed = json.loads(close_bytes)['data']['fuseki']
     require(closed['id'] == cid and closed['after']['FinishedAt'] == basis['finishedAt'] and
             e.utc(basis['finishedAt']) < e.utc(started), 'WINDOW_GRAPH_STOP')
     capture = refs is None
@@ -224,19 +349,32 @@ def published_graphs(cid, started, pid, basis, refs=None, archive=None):
     c.check_publications([json.loads(line) for line in original('published', argv, c.publication_sql()).splitlines() if line.strip()])
     frozen = c.raw(ROOT, c.AREA / BATCH / 'frozen-graphs-second-open.json', archive)
     require(ex.sha(frozen) == '393a597292cfba79d9b772bf7bac9a34d3e7d843bcf0c7e9ed3e97e9fd87c328','WINDOW_GRAPH_FROZEN')
-    return dict(kind=PLAN, close=CLOSE_SHA, startedAt=started, pid=pid,
+    return dict(kind=PLAN, close=close_sha, startedAt=started, pid=pid,
                 observed=c.expected_graphs(*scans, json.loads(frozen)), commands=refs)
 
 
 def runtime_continuity(root, previous, current, proof=None, archive=None):
     """以旧 access 的完整宿主链、确定的关闭和两端实测挂载核定当前新代。"""
-    import copy
     import workflow_execution as ex
     import workflow_oracle_mapping_continuity as c
-    import workflow_oracle_mapping_access_refresh as refresh
     import workflow_oracle_mapping_acl_host as history
     import workflow_oracle_mapping_evidence as e
     from workflow_oracle_mapping_continuation import REUSED_ACCESS
+    if proof is None or proof.get('closeSha256') != CLOSE_SHA:
+        require(proof is None or proof.get('closeSha256') == LAST_CLOSE, 'WINDOW_CONTINUITY_PROOF')
+        data = c.raw(root, c.AREA / ('formal-run-s2-s3-oracle-' + LAST_PARENT + '.json'), archive)
+        require(ex.sha(data) == 'a5184fbf9752205389cf5bd12548b40b154186f0920689fb33286c5ec9e3c487', 'WINDOW_LAST_PARENT')
+        prior = json.loads(data)
+        middle = prior['host']
+        ref = prior['stageInputs']['qualifiedPrefix']
+        observation = c.raw(root, c.AREA / BATCH / ref['file'], archive)
+        require(ex.sha(observation) == ref['sha256'], 'WINDOW_LAST_PREFIX')
+        prior_obs = json.loads(observation)
+        require(e.stable_host(prior_obs['host']) == e.stable_host(middle) and
+                prior_obs['hostContinuity']['closeSha256'] == CLOSE_SHA, 'WINDOW_LAST_HOST')
+        runtime_continuity(root, previous, prior_obs['host'], prior_obs['hostContinuity'], archive)
+        close = last_close(root, archive)
+        return compare_generation(root, middle, current, close, LAST_CLOSE, proof, archive)
     parent = REUSED_ACCESS['commandId']
     data = c.raw(root, c.AREA / ('formal-run-s2-s3-oracle-'+parent+'.json'), archive)
     require(ex.sha(data) == 'b7861c9207dbed9d6018c8581c931b2c64f30c2697a302635a23974263428f2f','WINDOW_ACCESS_PARENT')
@@ -249,18 +387,29 @@ def runtime_continuity(root, previous, current, proof=None, archive=None):
     raw = c.raw(root, c.AREA / BATCH / CLOSE_FILE, archive)
     require(ex.sha(raw)==CLOSE_SHA,'WINDOW_HOST_CLOSE')
     close=json.loads(raw)
+    require(close['remaining'] == [] and close['status'] == 'PASS', 'WINDOW_PRIOR_CLOSE')
+    return compare_generation(root, middle, current, close, CLOSE_SHA, proof, archive)
+
+
+def compare_generation(root, middle, current, close, digest, proof, archive):
+    import copy
+    import workflow_oracle_mapping_access_refresh as refresh
+    import workflow_oracle_mapping_evidence as e
     rows = [refresh.observed_rows(root, host, archive)[1] for host in (middle,current)]
     builds = [refresh.snapshot_builds(root, host, archive) for host in (middle,current)]
-    require(close['remaining']==[] and close['status']=='PASS' and close['ids']=={k:v['containerId'] for k,v in rows[0].items()},'WINDOW_PRIOR_ROLES')
+    require(digest == CLOSE_SHA or builds[0] == builds[1], 'WINDOW_LAST_BUILDS')
+    require(close['ids']=={k:v['containerId'] for k,v in rows[0].items()},'WINDOW_PRIOR_ROLES')
     # 此处只消除已核的进程代次差异，再复用原像、挂载、网络、API快照比较器。
     normalized = [copy.deepcopy(host) for host in (middle,current)]
     normalized_rows = copy.deepcopy(rows)
     for role, old in rows[0].items():
         new=rows[1][role]
         if role in ('api','api-secondary'):
-            require(close['apis'][role]['id']==old['containerId'] and new['containerId']!=old['containerId'],'WINDOW_API_REPLACED')
+            require(close['apis'][role]['id']==old['containerId'] and new['containerId']!=old['containerId'] and
+                    (digest == CLOSE_SHA or e.utc(close['data']['platform-pg']['after']['FinishedAt']) < e.utc(new['startedAt'])), 'WINDOW_API_REPLACED')
             continue
         stop=close['data'][role]
+        require(old['pid'] > 0 and new['pid'] > 0 and stop.get('startedAt', old['startedAt']) == old['startedAt'], 'WINDOW_PRIOR_PROCESS')
         require(old['containerId']==new['containerId']==stop['id'] and
                 e.utc(old['startedAt']) < e.utc(stop['after']['FinishedAt']) < e.utc(new['startedAt']), 'WINDOW_RESTART_ORDER')
         for field in ('pid','startedAt'):
@@ -268,7 +417,7 @@ def runtime_continuity(root, previous, current, proof=None, archive=None):
             if role!='oracle':
                 normalized[1]['services'][role][field]=old[field]
     refresh.compare_hosts(root,*normalized,*normalized_rows,builds)
-    value=dict(status='CURRENT_RUNTIME_GENERATION',closeSha256=CLOSE_SHA,oldHost=middle['commandId'],
+    value=dict(status='CURRENT_RUNTIME_GENERATION',closeSha256=digest,oldHost=middle['commandId'],
                host=current['commandId'], builds=builds[1], stoppedRoles=sorted(close['ids']))
     require(proof is None or proof==value,'WINDOW_CONTINUITY_PROOF')
     return value

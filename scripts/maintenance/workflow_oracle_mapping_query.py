@@ -34,6 +34,8 @@ def structural(root, task, phase):
         frozen_plan(root)
         frozen_plan(root,"s2-s3-01-access-01")
         frozen_plan(root,"s2-s3-01-runtime-01")
+        consumers['scripts/maintenance/workflow_oracle_runtime_window.py']=['def open_window()', 'cold = resume.admit(',
+            'def last_close(', 'def compare_generation(', 'def published_graphs(']
         consumers['scripts/maintenance/workflow_oracle_mapping_postprobe.py']=['def maintenance(', 'def lifecycle(', 'POSTPROBE_TEMPLATE']
         consumers['scripts/maintenance/workflow_oracle_mapping_preparation_refresh.py']=['def lifecycle(', 'def maintenance_result(', 'def reopen_isolated(', 'S23_PREPARATION_REFRESH_CAS']
         consumers['scripts/maintenance/workflow_oracle_mapping_acl_host.py']=['def lifecycle(', 'def graph_qualification(', 'ACL_LEASE_STOPPED']
@@ -52,9 +54,9 @@ def structural(root, task, phase):
         consumers['scripts/maintenance/workflow-m4-query.mjs']=['await s2.run(', 'oracleTwoTable', 'omq.s2Plan', 'omq.s2AccessPlan()']
         consumers['scripts/maintenance/workflow-oracle-s2.mjs']=['()=>formalMapping(ctx)', 'async function queries(', 'async function relations(',
             'async function access(', 'qualify_catalog(json.load(sys.stdin))', 'async function aba(', 'async function states(', 'async function versions(', 'async function reopen(', 'async function mcp(', 'async function ui(', 'consume(root,report,deadline)']
-        consumers['scripts/maintenance/workflow_oracle_mapping_s2.py']=['def grants(', 'def ready(', 'def source_transaction(', 'def permission_case(', 'def runtime_case(', 'def access_case(']
+        consumers['scripts/maintenance/workflow_oracle_mapping_s2.py']=['def grants(', 'renewal_registration(p.ROOT', 'def ready(', 'def source_transaction(', 'def permission_case(', 'def runtime_case(', 'def access_case(']
         consumers['scripts/maintenance/workflow_oracle_mapping_evidence.py']=['reopen_stage(archive,report,records,host,origin,measured,window)', 'batch_audit_closure(archive,entry,row,host,origin,measured)']
-        consumers['scripts/maintenance/workflow_oracle_mapping_s2_contract.py']=['def result_case(', 'def reopen_stage(', 'def frozen_plan(']
+        consumers['scripts/maintenance/workflow_oracle_mapping_s2_contract.py']=['def result_case(', 'def reopen_stage(', 'def frozen_plan(', 'reopen_grants(archive,report,host,origin)', 'prepared_readback(state, report, before, after, snapshot(']
     require(phase in ('contract','source','persistence','runtime'), 'PHASE')
     binding = {}
     for path, tokens in consumers.items():

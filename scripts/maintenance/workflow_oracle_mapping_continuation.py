@@ -19,13 +19,13 @@ RUNTIME_PREFIX_DRIVERS={
     'scripts/maintenance/workflow-m4-query.mjs':
         ('4dbd4e6b432d1b85c87abc7a002148bea7865c4dd1316b011315223ebc631542', '1393755557a0a13ca8500375d4ebf40d4782c3550fa5c486151f577fb65e29fe'),
     'scripts/maintenance/workflow-oracle-query-fixture.mjs':
-        ('e45fa368dea6721212a138ae533ba979884d950fe0f06cc7f1c15fae34f3ecf2', 'db6a5d802cac31459f5f78eb945df2260d944ab0fc7f938f7a511a2ccd901787'),
+        ('e45fa368dea6721212a138ae533ba979884d950fe0f06cc7f1c15fae34f3ecf2', 'a431cda70e1d0b090cce856c5512fc9fa3c2249689a2035622b3e3a1793b0202'),
     'scripts/maintenance/workflow-oracle-s2.mjs':
-        ('e7ab33e1bd38429eb2bc1d7aa7071da3a39022fb4329b6c23404bf9757a546e9', '411f687eb522a389a84518094876c57c3b6ddcd57e3e4bf7597276ca5bc29ca4'),
+        ('e7ab33e1bd38429eb2bc1d7aa7071da3a39022fb4329b6c23404bf9757a546e9', '2b4042e16cfd0b386a185b1d65a9ae3c8e43e6086331a1505068ed002dc90850'),
     'scripts/maintenance/workflow_oracle_mapping_s2.py':
-        ('314fae7820ad26533d2a2e651e271de731ae2983d2b91b224754a8afd2aa392b', '321804566e1792b54babb394d27983c8558a49a7115a31cc0d619ec62579c488'),
+        ('314fae7820ad26533d2a2e651e271de731ae2983d2b91b224754a8afd2aa392b', '4604767c1b60307271abfc340f53edb3253a1320caabc51fd316e1b4b985f6e7'),
     'scripts/maintenance/workflow_oracle_mapping_s2_contract.py':
-        ('87601573a5b3ea57c6e7f46e96f048262f8eac94fddc76ed2dab7b6424afc8d2', 'd018fbbe50d1c892b49d49ed0982ce3231083ed6f2cb4367efe0adc4d3ff4ed8'),
+        ('87601573a5b3ea57c6e7f46e96f048262f8eac94fddc76ed2dab7b6424afc8d2', '24b9e8c31d6a9b8b311001258ab8dd14852ab635d53c1d22054d25524a750b5c'),
 }
 MODES=('s0-oracle-auth','s2-oracle-vocabulary','s2-oracle-mapping','s2-oracle-queries','s2-oracle-relations')
 TASK='G4-ORACLE-MAPPING-QUERY-001'
@@ -153,8 +153,8 @@ def compatible_prefix(archive,measured,mode,stage):
             require(all(text.count(begin)==text.count(end)==1 for text in (left,right)),'S23_PREFIX_ACCESS_BOUNDARY')
             left=left[:left.index(begin)]+left[left.index(end):];right=right[:right.index(begin)]+right[right.index(end):]
         elif name.endswith('/workflow_oracle_mapping_platform_recovery.py'):
-            start_patch="            from workflow_oracle_runtime_window import policy, published_graphs\n            if policy() is not None:\n                receipt['currentGraphs']=published_graphs(cid,started,int(pid),basis)\n            else:\n                receipt['currentGraphs']=current_fuseki_graphs(cid,basis)"
-            graph_patch="    if row.get('currentGraphs',{}).get('kind')=='s2-s3-01-runtime-01':\n        from workflow_oracle_runtime_window import published_graphs\n        require(row['stage']=='product-resume-01' and row['role']=='fuseki' and row['status']=='RUNNING' and\n                row['productUse']=='CURRENT_GRAPHS_VERIFIED' and\n                published_graphs(cid,started,pid,row['checkpoint'],row['currentGraphs']['commands'])==row['currentGraphs'],\n                'TDB_RUNTIME_GRAPHS')\n        return row['attempt']\n"
+            start_patch="            from workflow_oracle_runtime_window import LAST_CLOSE, policy, published_graphs\n            if policy() is not None:\n                receipt['currentGraphs']=published_graphs(cid,started,int(pid),basis,close_sha=LAST_CLOSE)\n            else:\n                receipt['currentGraphs']=current_fuseki_graphs(cid,basis)"
+            graph_patch="    if row.get('currentGraphs',{}).get('kind')=='s2-s3-01-runtime-01':\n        from workflow_oracle_runtime_window import published_graphs\n        require(row['stage']=='product-resume-01' and row['role']=='fuseki' and row['status']=='RUNNING' and\n                row['productUse']=='CURRENT_GRAPHS_VERIFIED' and\n                published_graphs(cid,started,pid,row['checkpoint'],row['currentGraphs']['commands'],close_sha=row['currentGraphs']['close'])==row['currentGraphs'],\n                'TDB_RUNTIME_GRAPHS')\n        return row['attempt']\n"
             require(right.count(start_patch)==right.count(graph_patch)==1,'S23_PREFIX_RUNTIME_GRAPH_SCOPE')
             right=right.replace(start_patch,"            receipt['currentGraphs']=current_fuseki_graphs(cid,basis)",1).replace(graph_patch,'',1)
             from workflow_oracle_mapping_continuity import BRANCH

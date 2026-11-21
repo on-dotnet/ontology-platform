@@ -373,9 +373,43 @@ def frozen_plan(root,plan_id="s2-s3-01"):
     return plan
 
 
-def reopen_mutations(archive,report,host,origin):
-    """按准确平台／源容器重开组合授权与可逆反例的双流，不接受摘要布尔值。"""
-    import re
+def prepared_readback(state, report, before, after, ready_before, ready_after):
+    """将本次准备、ready 和计划登记的每个 ID、epoch、TTL 闭合到同一数据库前后态。"""
+    import workflow_oracle_mapping_s2 as f
+    g = report['currentGrants']
+    ready = report['scenarioReady']
+    proof = g['renewal']
+    minimum = proof['minimumSeconds']
+    execution = report['batch']['executionId']
+    require(execution == g['executionId'] == ready['executionId'] and
+            report['batch']['index'] == 1 and report['mode'] == 's2-oracle-aba' and
+            g['requiredSeconds'] == minimum and ready['requiredSeconds'] == 210 and
+            ready['status'] == 'READY' and ready['issued'] == [] and ready['grantCommand'] is None,
+            'S23_PREPARE_READY_SLOT')
+    items = f.renewal_plan(state, before, proof['registeredIds'], execution, minimum)
+    require(items == g['issued'], 'S23_PREPARE_EXPECTED_ISSUE')
+    f.grant_delta(state, before, after, items)
+    f.grant_delta(state, after, ready_before, [])
+    f.grant_delta(state, ready_before, ready_after, [])
+    changes = {(item['role'],item['operation']):item['id'] for item in items}
+    ids = [changes.get(pair, ident) for pair, ident in zip(f.SCOPED+f.WORKFLOW, proof['registeredIds'], strict=True)]
+    combined = {role+':'+op: ident for (role,op), ident in zip(f.SCOPED,ids[:6],strict=True)}
+    for part, first, last in ((g,before,after),(ready,ready_before,ready_after)):
+        require(part['combinedGrantIds'] == combined and part['workflowIds'] == ids[6:] and
+                part['beforeEpoch'] == first['epoch'] and part['afterEpoch'] == last['epoch'] and
+                part['beforeCommand'] == part['beforeSnapshot']['commandId'] and
+                part['afterCommand'] == part['afterSnapshot']['commandId'], 'S23_PREPARE_READY_BINDING')
+        rows = {r['Id']:r for r in last['rows']}
+        ttl = min(f.ttl(rows[ident],last['clock']) for ident in ids)
+        require(part['rows'] == [rows[ident] for ident in ids[:6]] and
+                ttl >= part['requiredSeconds'] and all(rows[i]['RevokedAtUtc'] is None and
+                f.ttl(rows[i],last['clock']) <= 14400 for i in ids), 'S23_PREPARE_READY_TTL')
+    require(g['remainingSeconds'] == min(f.ttl(r,after['clock']) for r in after['rows'] if r['Id'] in ids),
+            'S23_PREPARE_REMAINING')
+
+
+def reopen_grants(archive,report,host,origin):
+    """重开目录、签发事务与准备前后授权快照，供后续反例使用同一读取规则。"""
     import workflow_execution as ex
     import workflow_oracle_mapping_s2 as fixture
     from workflow_m4_query import grant_transaction
@@ -383,7 +417,6 @@ def reopen_mutations(archive,report,host,origin):
     from workflow_oracle_mapping_evidence import sha
     state=dict(connectionId='a7913bb552eb4cd1a3f6eaf5b93cd619',scope=dict(organizationId='org-demo',siteIds=['site-a']),subjects={k:v[1] for k,v in ROSTER.items()})
     pg=['docker','--context','desktop-linux','exec','-i','--user','postgres',host['services']['platform-pg']['containerId'],'psql','-XwqAt','-d','mapping','-v','ON_ERROR_STOP=1']
-    native=['docker','--context','desktop-linux','exec','-i',host['oracle']['containerId'],'sqlplus','-L','-s','/ as sysdba']
     def command(cid,args,stage,body):
         row,out,err=archive.command(cid,args,stage,sha(body),None,origin)
         require(row['exitCode']==0 and row['classification']=='SUCCESS','S23_MUTATION_COMMAND')
@@ -403,6 +436,22 @@ def reopen_mutations(archive,report,host,origin):
     require(all(210<=fixture.ttl(row,after['clock'])<=14400 for row in grants['rows']) and len(grants['workflowIds'])==9,'S23_GRANT_ACTUAL_TTL')
     require(all(any(row['Id']==ident and fixture.covers(row,state,role,op,False) and row['RevokedAtUtc'] is None and fixture.ttl(row,after['clock'])>=210 for row in after['rows'])
         for ident,(role,op) in zip(grants['workflowIds'],fixture.WORKFLOW,strict=True)),'S23_WORKFLOW_ORIGINAL')
+    preparing = report['batch']['planId'] == fixture.RUNTIME_PLAN and report['mode'] == 's2-oracle-aba'
+    require(('renewal' in grants) == preparing, 'S23_PREPARE_DISPATCH')
+    if preparing:
+        registration = grants['renewal']
+        fixture.renewal_registration(origin, state, before, registration['inputCombinedIds'],
+                                     grants['executionId'], archive, registration)
+        ready = report['scenarioReady']
+        prepared_readback(state, report, before, after, snapshot(ready['beforeSnapshot']), snapshot(ready['afterSnapshot']))
+        from workflow_oracle_mapping_evidence import utc
+        times = [archive.read(cid+'-receipt.json') for cid in
+                 [grants['beforeCommand'], *([grants['grantCommand']] if grants['issued'] else []),
+                  grants['afterCommand'], ready['beforeCommand'], ready['afterCommand']]]
+        require(all(utc(a['endedAtUtc']) <= utc(b['startedAtUtc']) for a,b in zip(times,times[1:])) and
+                utc(report['startedAtUtc']) <= utc(times[0]['startedAtUtc']) and
+                utc(times[-1]['endedAtUtc']) <= min(utc(w['startedAtUtc']) for w in report['oracleWindows']),
+                'S23_PREPARE_ACTION_ORDER')
     if grants['issued']:
         plan=archive.read('grant-plan-'+grants['executionId']+'.json')
         require(plan['taskId']==report['taskId'] and plan['runId']==report['runId'] and plan['batch']=='s2-s3-01' and plan['before']==grants['beforeSnapshot']
@@ -410,10 +459,27 @@ def reopen_mutations(archive,report,host,origin):
         items=plan['planned'];lookup={(state['subjects'][item['role']],item['operation']):item['id'] for item in items}
         require(len(lookup)==len(items) and all((item['role'],item['operation']) in (fixture.SCOPED if item['kind']=='COMBINED' else fixture.WORKFLOW) for item in items),'S23_ISSUANCE_SCOPE')
         pairs=[(state['subjects'][role],[item['operation'] for item in items if item['role']==role]) for role in state['subjects']]
-        body,ids=grant_transaction(state,fixture.OBJECTS,fixture.FIELDS,pairs,lambda who,op:lookup[(who,op)],report['runId'])
+        if preparing:
+            require(plan['basis'] == fixture.LAST_GRANTS, 'S23_PREPARE_PLAN_BASIS')
+            body,ids=fixture.append_body(state,items,before['epoch'])
+        else:
+            body,ids=grant_transaction(state,fixture.OBJECTS,fixture.FIELDS,pairs,lambda who,op:lookup[(who,op)],report['runId'])
         require(command(grants['grantCommand'],pg,'omq-pg-s23-append-approved-grants',body).splitlines()[-1]==str(len(items))
             and after['epoch']==before['epoch']+len(items) and all(any(a['Resource']==ident and a['issued']==1 for a in after['audit']) for ident in ids),'S23_GRANT_ISSUANCE_ORIGINAL')
     else:require(grants['grantCommand'] is None and before['rows']==after['rows'] and before['epoch']==after['epoch'],'S23_GRANT_REUSE_ORIGINAL')
+    return state, pg, command, snapshot
+
+
+def reopen_mutations(archive,report,host,origin):
+    """重开授权后逐项核对源与权限反例。"""
+    import re
+    import workflow_execution as ex
+    import workflow_oracle_mapping_s2 as fixture
+    from workflow_oracle_mapping_evidence import sha
+    from workflow_oracle_mapping_identity_recovery import ROSTER
+    state, pg, command, snapshot = reopen_grants(archive,report,host,origin)
+    grants = report['currentGrants']
+    native=['docker','--context','desktop-linux','exec','-i',host['oracle']['containerId'],'sqlplus','-L','-s','/ as sysdba']
     def source_snapshot(value):
         columns="ROW_ID,JOIN_KEY,VAL,ORG_ID,SITE_ID,EXT_ID,LABEL,"+','.join("to_char("+c+",'YYYYMMDDHH24MISSFF6')" for c in fixture.COLUMNS[7:])
         actual=[]
@@ -519,9 +585,12 @@ def reopen_stage(archive,report,records,host,origin,measured,window):
         if report['mode'] in ('s2-oracle-versions','s2-oracle-connection'):
             require([w['expectedReads'] for w in report['oracleWindows'] if w['name']=='current-catalog-mapping']==[4],'S23_NEW_DOUBLE_TABLE_MAPPING_READS')
     ledger=reopen_mutations(archive,report,host,origin)
+    import workflow_oracle_mapping_s2 as fixture
+    minimum = (fixture.renewal_seconds(origin) if report['mode']=='s2-oracle-aba' and
+               report['batch']['planId']==fixture.RUNTIME_PLAN else 210)
     grants=report['currentGrants'];require(grants['taskId']==report['taskId'] and grants['runId']==report['runId'] and grants['batch']=='s2-s3-01'
-        and grants['fieldCount']==22 and grants['grantCount']==6 and len(grants['rows'])==6 and grants['requiredSeconds']==210
-        and grants['remainingSeconds']>=210 and grants['historyPreserved'] is True,'S23_GRANT_SCOPE')
+        and grants['fieldCount']==22 and grants['grantCount']==6 and len(grants['rows'])==6 and grants['requiredSeconds']==minimum
+        and grants['remainingSeconds']>=minimum and grants['historyPreserved'] is True,'S23_GRANT_SCOPE')
     for role,op in SCOPED:
         ident=grants['combinedGrantIds'][role+':'+op]
         rows=[row for row in grants['rows'] if row['Id']==ident]

@@ -27,6 +27,98 @@ def grant(st,role,op,ident,scoped=True,expired=False):
       ObjectRefs=s.OBJECTS if scoped else [],FieldRefs=s.FIELDS if scoped else [],ExpiresAtUtc='2026-11-20T04:00:00+00:00' if not expired else '2026-11-19T23:59:59+00:00',RevokedAtUtc=None)
 
 
+def grant_bridge(directory, method, args):
+    """离线分发回归仅替换时钟、数据库、登录及历史磁盘原件。"""
+    import contextlib
+    import shutil
+    import workflow_oracle_mapping_continuity as continuity
+    from uuid import uuid4
+    root = Path(directory).resolve()
+    batch = root/continuity.AREA/s.BATCH
+    batch.mkdir(parents=True,exist_ok=True)
+    implementation = batch.parent.parent/'implementation-01'
+    st = state()
+    st['batch'] = s.BATCH
+    st['mappingReceipt'] = dict(mappingId='mapping',activationId='activation',activationRevision=1)
+    ids = ['historical-'+str(i) for i in range(15)]
+    st['combinedGrantIds'] = {role+':'+op:ident for (role,op),ident in zip(s.SCOPED,ids)}
+    originals = [grant(st,role,op,ident,(role,op) in s.SCOPED,True)
+                 for (role,op),ident in zip(s.SCOPED+s.WORKFLOW,ids,strict=True)]
+    single = [{**row,'Id':'single-'+row['Id'],'ObjectRefs':s.OBJECTS[:1],'FieldRefs':s.FIELDS[:11]} for row in originals[:6]]
+    initial = dict(epoch=106,clock=dt.datetime(2026,11,20,tzinfo=dt.timezone.utc).timestamp(),rows=single+originals,
+                   audit=[dict(Resource=i,n=1,issued=1) for i in ids])
+    if method == 'state':
+        plan = 'scripts/maintenance/workflow-oracle-s2-runtime-plan.json'
+        (root/plan).parent.mkdir(parents=True,exist_ok=True)
+        shutil.copyfile(ROOT/plan,root/plan)
+        return st
+    database = root/'pg.json'
+    db = json.loads(database.read_bytes()) if database.exists() else copy.deepcopy(initial)
+    commands = root/continuity.AREA.parent/'commands'/s.RUN
+    def command_record(stage, body, out):
+        ident = uuid4().hex
+        stamp = dt.datetime.now(dt.timezone.utc).isoformat()
+        record = dict(commandId=ident,stage=stage,inputFingerprint=ex.sha(body),exitCode=0,classification='SUCCESS',
+                      startedAtUtc=stamp,endedAtUtc=stamp,stdoutSha256=ex.sha(out.encode()))
+        folder = commands/ident
+        folder.mkdir(parents=True)
+        (folder/'receipt.json').write_text(json.dumps(record))
+        (folder/'stdout.txt').write_text(out)
+        return ident
+    def snapshot(_):
+        body = b'BEGIN READ ONLY;\n'+s.grant_snapshot_sql(st)+b'\nCOMMIT;'
+        ident = command_record('omq-pg-s23-grant-snapshot',body,json.dumps(db))
+        return {**copy.deepcopy(db),'commandId':ident}
+    def append(body,stage):
+        items = json.loads((batch/('grant-plan-'+args[1]+'.json')).read_bytes())['planned']
+        assert body == s.append_body(st,items,db['epoch'])[0]
+        for item in items:
+            db['rows'].append(grant(st,item['role'],item['operation'],item['id'],item['kind']=='COMBINED'))
+            db['audit'].append(dict(Resource=item['id'],n=1,issued=1))
+        db['epoch'] += len(items)
+        database.write_text(json.dumps(db))
+        return str(len(items)),command_record('omq-pg-'+stage,body,str(len(items)))
+    def reopen(_,cid,run,argv,stage,key,seconds,archive):
+        record = json.loads((commands/cid/'receipt.json').read_bytes())
+        assert record['inputFingerprint'] == key and record['stage'] == stage
+        return record,(commands/cid/'stdout.txt').read_bytes(),b''
+    def pg(body,stage):
+        if stage=='s23-current-catalog':
+            out=json.dumps(st['catalog'])
+            return out,command_record('omq-pg-'+stage,b'BEGIN READ ONLY;\n'+body+b'\nCOMMIT;',out)
+        assert stage=='s23-current-activation'
+        return json.dumps(dict(ActivationId='activation',ActivationRevision=1)),uuid4().hex
+    with contextlib.ExitStack() as stack:
+        for change in (patch.object(s.p,'ROOT',root), patch.object(s.p,'AREA',implementation),
+                       patch.object(s,'accepted_registration',return_value=(initial,ids,ex.sha(ex.encoded({})))),
+                       patch.object(s,'grant_rows',side_effect=snapshot),patch.object(s.p,'pg_command',side_effect=append),
+                       patch.object(continuity,'command',side_effect=reopen),patch.object(s.p,'read_pg',side_effect=pg),
+                       patch.object(s.p,'session_preflight',return_value={}),patch.object(s.p,'fixture_state',return_value=dict(counts=[1,1]))):
+            stack.enter_context(change)
+        if method=='consumer':
+            report, = args
+            class Originals:
+                def __init__(self):
+                    self.examined = {}
+                    self.paths = {}
+
+                def read(self,name):
+                    if name.startswith('grant-plan-'): return json.loads((batch/name).read_bytes())
+                    cid,leaf=name.split('-',1)
+                    return json.loads((commands/cid/leaf).read_bytes())
+
+                def command(self,cid,argv,stage,key,parent,origin):
+                    assert origin==root and parent is None and argv[0]=='docker' and argv[-1]=='ON_ERROR_STOP=1'
+                    row=self.read(cid+'-receipt.json');out=(commands/cid/'stdout.txt').read_bytes()
+                    assert (row['stage'],row['inputFingerprint'],row['stdoutSha256']) == (stage,key,ex.sha(out))
+                    return row,out,b''
+
+            host=dict(services={'platform-pg':dict(containerId=continuity.PG)})
+            c.reopen_grants(Originals(),report,host,root)
+            return True
+        return {'grants':s.grants,'ready':s.ready}[method](*args)
+
+
 class S2GrantTests(unittest.TestCase):
     def setUp(self):
         self.enterContext(patch.dict(os.environ,OMQ_PRODUCT_RUN=s.RUN));self.st=state()
@@ -39,6 +131,31 @@ class S2GrantTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'S2_FIELDS'):s.scope(bad)
         with patch.object(s.p,'read_pg',side_effect=AssertionError('I/O must not run')):
             with self.assertRaisesRegex(ValueError,'S2_MODE'):s.ready(self.st,[],'a'*32,'s2-doris-mapping')
+
+    def test_renewal_refuses_counterexample_or_scope_drift_before_any_append(self):
+        for change in ('revoked','field','short','expired-case','workflow','orphan','overlap'):
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp).resolve()
+                st = grant_bridge(tmp,'state',[])
+                ids = list(st['combinedGrantIds'].values())+['historical-'+str(i) for i in range(6,15)]
+                rows = [grant(st,role,op,ident,(role,op) in s.SCOPED,True)
+                        for (role,op),ident in zip(s.SCOPED+s.WORKFLOW,ids,strict=True)]
+                single=[{**r,'Id':'single-'+r['Id'],'ObjectRefs':s.OBJECTS[:1],'FieldRefs':s.FIELDS[:11]} for r in rows[:6]]
+                live = dict(epoch=106,clock=dt.datetime(2026,11,20,tzinfo=dt.timezone.utc).timestamp(),
+                            rows=single+rows,audit=[dict(Resource=i,n=1,issued=1) for i in ids])
+                if change=='revoked': rows[0]['RevokedAtUtc']='2026-11-19T02:00:00+00:00'
+                if change=='field': rows[5]['FieldRefs']=s.FIELDS[:-1]
+                if change=='workflow': rows[-1]['ObjectRefs']=s.OBJECTS
+                if change=='short': rows[8]['ExpiresAtUtc']='2026-11-20T00:10:00+00:00'
+                if change=='expired-case': rows[3]['ExpiresAtUtc']='2026-11-19T23:59:55+00:00'
+                if change=='overlap': live['rows'].append({**rows[1],'Id':'unknown','ExpiresAtUtc':'2026-11-20T04:00:00+00:00'})
+                batch=root/'artifacts/workflow'/s.TASK/s.RUN/s.BATCH
+                if change=='orphan': (batch/('permission-case-'+'a'*32+'.json')).write_text('{}')
+                db=root/'pg.json';db.write_text(json.dumps(live));original=db.read_bytes()
+                with self.assertRaises((ValueError, FileNotFoundError)):
+                    grant_bridge(tmp,'grants',[st,'b'*32,True,s.RUNTIME_PLAN])
+                self.assertEqual(original,db.read_bytes())
+                self.assertFalse(list(batch.glob('grant-plan-*.json')))
 
     def test_single_grant_covers_all_fields_without_composition(self):
         row=grant(self.st,'reader','data.query.execute','full')
@@ -579,6 +696,87 @@ class S2CapacityTests(unittest.TestCase):
         for field,value in [('totalBytes',44*g),('hostFree',14*g),('vmFree',26*g),('vmMemory',3*g)]:
             with self.subTest(field=field), self.assertRaises(ValueError):
                 window.allow_sample({**sample,field:value},48*g)
+
+    def test_cold_window_selects_before_default_cap_and_requires_completed_admission(self):
+        import workflow_oracle_mapping_resume as resume
+        import workflow_oracle_runtime_window as window
+        g = window.GIB
+        total = 41 * g
+        stamp = 'a' * 32
+        with tempfile.TemporaryDirectory() as tmp:
+            area = Path(tmp)
+            (area / window.BATCH).mkdir()
+            def exercise_window(measure):
+                def observe(roles):
+                    self.assertEqual(roles, set(resume.APIS) | set(resume.recovery.ORIGINAL_IDS))
+                    disk = measure()
+                    cold = dict(taskId=s.TASK, runId=s.RUN, status='FORMAL_RESOURCE_READY',
+                                attempt=stamp, expectedRunningRoles=[], resourceRunId='implementation-01',
+                                phase=s.RUN, projectedWithHelper=dict(memory=14763950080, nanoCpus=10500000000),
+                                platformDisk=disk)
+                    (area / ('source-admission-' + stamp + '.json')).write_text(json.dumps(cold))
+                    return cold
+
+                with patch.object(window, 'AREA', area), patch.dict(os.environ, OMQ_PRODUCT_RUN=s.RUN):
+                    with patch.object(resume, 'admit', side_effect=observe):
+                        with window.open_window() as decision:
+                            self.assertEqual((decision['openingBytes'], window.ceiling()), (total, 48*g))
+                    self.assertEqual(window.ceiling(total), 40*g)
+                    usage['containerWritableBytes']['layer'] += 1
+                    with patch.object(resume, 'admit', side_effect=observe), self.assertRaisesRegex(ValueError, 'WINDOW_BUDGET_DEFICIT'):
+                        with window.open_window():
+                            self.fail('window opened above the fully reserved capacity')
+                    with patch.object(resume, 'admit', side_effect=ValueError('HOST_FLOOR')), self.assertRaisesRegex(ValueError, 'HOST_FLOOR'):
+                        with window.open_window():
+                            self.fail('window opened after a physical admission failure')
+                    self.assertEqual(len(list((area/window.BATCH).glob('window-*.json'))), 1)
+                    self.assertEqual(window.ceiling(total), 40*g)
+            import contextlib
+            import workflow_oracle_mapping_capacity as cap
+            data = area/'implementation-01'
+            data.mkdir()
+            files = {
+                'platform-image-layer-closure-01': dict(taskId=s.TASK,imageSizes=[1]*6,sharedEmptyLayers=[1]*3,
+                                                        deduplicatedImageUpperBytes=6,duplicateCompressedBytes=0),
+                'recovery-01': dict(allocatedSourceBytes=1),
+                'recovery-01-final': dict(status='EARLY_SOURCE_RECOVERY_PASS'),
+                'formal-planned': dict(resourceAttempt='base'),
+                'source-admission-base': dict(platformDisk=dict(allocations=dict(currentHostIncludingFirstBackup=0))),
+                'formal-platform-size-basis': dict(sourceRawVolumeFacts=[dict(bytes=1)]*8,pgVolumeMetadataOnly=dict(a=1,b=1,c=1)),
+                'source-create-01': dict(volume='original')}
+            for name,value in files.items(): (data/(name+'.json')).write_text(json.dumps(value))
+            usage = dict(volumesLogicalBytes=dict(original=1,replacement=1),platformVolumes={v:1 for v in cap.VOLUMES},
+                         replacementVolumes={'replacement':1},containerWritableBytes={'layer':0})
+            def measurement(stage, argv):
+                if stage=='formal-worktrees': return 'worktree '+str(area)
+                self.assertEqual(stage,'formal-host-bytes')
+                return '\n'.join('0 '+p for p in argv[2:])
+            with contextlib.ExitStack() as stack:
+                for name,value in [('MEASURE_TREE',data),('current_storage',lambda *args:usage),('backup_allocation',lambda *args,**kw:0)]:
+                    for module in (cap,cap.original_platform):
+                        stack.enter_context(patch.object(module,name,value))
+                stack.enter_context(patch.object(cap,'baseline_cache_release',return_value=dict(releasedBytes=0)))
+                def measure(): return cap.disk_admission(area,data,measurement,phase=s.RUN,replacement={})
+                base = measure()['totalBytes']
+                usage['containerWritableBytes']['layer'] = total-base
+                with self.assertRaisesRegex(ValueError,'FORMAL_TOTAL_DISK'): measure()
+                exercise_window(measure)
+
+    def test_close_generation_rejects_wrong_original_resource_and_time(self):
+        import workflow_oracle_runtime_window as w
+        import workflow_oracle_mapping_continuity as c
+        import workflow_oracle_mapping_access_refresh as refresh
+        with patch.object(c,'raw',return_value=b'{}'), self.assertRaisesRegex(ValueError,'WINDOW_LAST_CLOSE_ORIGINAL'):
+            w.last_close(ROOT)
+        first='2026-11-21T11:52:00Z';stop='2026-11-21T11:55:00Z';start='2026-11-21T12:01:00Z'
+        old=dict(containerId=c.FUSEKI,pid=4,startedAt=first)
+        new={**old,'pid':5,'startedAt':start}
+        common=dict(ids={'fuseki':c.FUSEKI},data={'fuseki':dict(id=c.FUSEKI,startedAt=first,after=dict(FinishedAt=stop))})
+        for update,reason in [({'containerId':'wrong'},'RESTART_ORDER'),({'startedAt':stop},'RESTART_ORDER'),({'pid':0},'PRIOR_PROCESS')]:
+            with self.subTest(update=update),patch.object(refresh,'observed_rows',side_effect=[({},dict(fuseki=old)),({},dict(fuseki={**new,**update}))]),patch.object(refresh,'snapshot_builds',return_value={}),self.assertRaisesRegex(ValueError,reason):
+                w.compare_generation(ROOT,{'services':{}},{'services':{}},common,w.LAST_CLOSE,None,None)
+        with self.assertRaisesRegex(ValueError,'GENERATION'):
+            w.published_graphs(c.FUSEKI,start,5,{},refs={},close_sha='0'*64)
 
     def test_measured_child_is_stopped_on_future_threshold_or_failed_sample(self):
         import subprocess

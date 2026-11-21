@@ -2,6 +2,10 @@
 import {createHash} from "node:crypto";
 import assert from "node:assert/strict";
 import {test} from "node:test";
+import {execFileSync} from "node:child_process";
+import {mkdtemp,rm,readFile,writeFile} from "node:fs/promises";
+import {tmpdir} from "node:os";
+import {join} from "node:path";
 process.env.OMQ_PRODUCT_RUN="product-resume-01";
 const omq=await import("../maintenance/workflow-oracle-query-fixture.mjs");
 const {run,formalMappingReads,approveNewMappingProposal}=await import("../maintenance/workflow-oracle-s2.mjs");
@@ -89,6 +93,58 @@ test("ABA and connection dispatch the current reader's healthy seed, rejecting s
   assert.equal(calls.length,2);
 });
 
+
+test("runtime dispatch prepares all grants after auth and reopens ready before the first product call", async t => {
+  const directory=await mkdtemp(join(tmpdir(),"omq-grants-"));
+  t.after(()=>rm(directory,{recursive:true,force:true}));
+  const bridge=(_,method,args)=>JSON.parse(execFileSync("python3",["-B","-c",
+    "import json,runpy,sys; f=runpy.run_path('scripts/tests/WorkflowOracleS2.Tests.py')['grant_bridge']; print(json.dumps(f(sys.argv[1],sys.argv[2],json.load(sys.stdin))))",
+    directory,method],{input:JSON.stringify(args),encoding:"utf8",stdio:["pipe","pipe","pipe"]}));
+  const st=bridge(null,"state",[]), original=structuredClone(st);
+  const actors=Object.fromEntries(Object.entries(st.subjects).map(([k,v])=>[k,{me:{subjectId:v},sessionCookie:"test"}]));
+  const plan=omq.s2RuntimePlan();
+  const prepare=async(state,executionId)=>{
+    const shared={plan,executionId};
+    const report={taskId:state.taskId,runId:state.runId,mode:"s2-oracle-aba",startedAtUtc:new Date().toISOString(),
+      batch:{index:1,executionId,planId:plan.planId}};
+    await assert.rejects(omq.runAuthHandoffPlan(shared,async(mode,ctx)=>{
+      if (mode==="s0-oracle-auth") return {mode,status:"PASS"};
+      await run({mode,root:".",state,actors,report,shared:ctx,save:async()=>{},
+        check:(name,ok)=>assert.ok(ok,name),get:()=>{throw Error("after ready");}},bridge);
+    }),error=>{
+      if (!String(error).includes("after ready")) throw error;
+      return true;
+    });
+    report.oracleWindows=[{startedAtUtc:new Date(Date.now()+1).toISOString()}];
+    assert.equal(bridge(null,"consumer",[report]),true);
+    return report;
+  };
+  const prepared=await prepare(st,"a".repeat(32));
+  assert.equal(prepared.currentGrants.issued.length,15);
+  assert.equal(prepared.currentGrants.requiredSeconds,1710);
+  assert.equal(prepared.scenarioReady.afterEpoch,121);
+  // 模拟事务提交成功后，调用者仍持旧的状态文件。
+  const wrong=structuredClone(original);
+  wrong.workflowGrantIds=[...prepared.currentGrants.workflowIds].reverse();
+  await assert.rejects(prepare(wrong,"b".repeat(32)),/S2_PREPARE_REGISTERED_IDS/);
+  const replay=await prepare(original,"b".repeat(32));
+  assert.equal(replay.currentGrants.issued.length,0);
+  assert.ok(replay.currentGrants.renewal.recovery.commandId);
+  assert.deepEqual(replay.currentGrants.combinedGrantIds,prepared.currentGrants.combinedGrantIds);
+  for(const change of [r=>r.scenarioReady.workflowIds.reverse(),r=>r.scenarioReady.afterEpoch++,
+    r=>r.currentGrants.issued[0].id="wrong"]){
+    const bad=structuredClone(prepared);change(bad);
+    assert.throws(()=>bridge(null,"consumer",[bad]));
+  }
+  const bad=structuredClone(prepared), snap=bad.scenarioReady.beforeSnapshot;
+  const folder=join(directory,"artifacts","workflow",st.taskId,"commands",st.runId,snap.commandId);
+  const raw=JSON.parse(await readFile(join(folder,"stdout.txt"),"utf8"));
+  raw.epoch++;snap.epoch=raw.epoch;bad.scenarioReady.beforeEpoch=raw.epoch;
+  const altered=JSON.stringify(raw), receipt=JSON.parse(await readFile(join(folder,"receipt.json"),"utf8"));
+  receipt.stdoutSha256=createHash("sha256").update(altered).digest("hex");
+  await writeFile(join(folder,"stdout.txt"),altered);await writeFile(join(folder,"receipt.json"),JSON.stringify(receipt));
+  assert.throws(()=>bridge(null,"consumer",[bad]),/S2_PREPARE_DELTA/);
+});
 
 test("runtime suffix executes ten slots and ends at the first failed S2 gate",async()=>{
   const plan=omq.s2RuntimePlan(), visited=[];

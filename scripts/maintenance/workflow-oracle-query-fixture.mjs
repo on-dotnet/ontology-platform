@@ -247,7 +247,7 @@ export function projection(catalog, connectionId) {
 /** 仅把授权/就绪检查所需的固定公开身份送给同任务的平台夹具。 */
 export function grantState(state) {
   return { taskId: task, runId, scope: state.scope, subjects: state.subjects, connectionId: state.connectionId, catalog: state.catalog,
-    mappingReceipt: state.mappingReceipt, mappingCurrentReceipt: state.mappingCurrentReceipt, combinedGrantIds: state.combinedGrantIds, mappingRelease: state.mappingRelease && { manifest: { binding: state.mappingRelease.manifest.binding } } };
+    mappingReceipt: state.mappingReceipt, mappingCurrentReceipt: state.mappingCurrentReceipt, combinedGrantIds: state.combinedGrantIds, workflowGrantIds: state.workflowGrantIds, mappingRelease: state.mappingRelease && { manifest: { binding: state.mappingRelease.manifest.binding } } };
 }
 
 /** 调用平台真实事务与只读采样；Python 异常正文不进入浏览器报告。 */

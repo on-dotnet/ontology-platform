@@ -16,17 +16,27 @@ export function consume(root, report, deadline) {
 }
 
 /** 精确模式、Task/Run与完整目录未通过时，不能开始任何业务动作。 */
-export async function run(ctx) {
+export async function run(ctx, bridge=omq.s2Call) {
   const {root,state,shared,report,mode,actors,check,get,post,request,save,file} = ctx;
   if (!shared || !["s2-s3-01","s2-s3-01-access-01","s2-s3-01-runtime-01"].includes(shared.plan.planId) || state.taskId !== task || state.runId !== runId || state.batch !== "s2-s3-01"
       || !shared.plan.stages.some(s => s.mode === mode)) throw new Error("ORACLE_S2_DISPATCH");
   const deadline=shared.stageDeadline;
-  const call=(method,...args)=>omq.s2Call(root,method,args,deadline);
+  const call=(method,...args)=>bridge(root,method,args,deadline);
   const s=()=>omq.grantState(state);
-  const grant=call("grants",s(),shared.executionId,mode==="s2-oracle-vocabulary");
+  const prepare = shared.plan.planId==="s2-s3-01-runtime-01" && mode==="s2-oracle-aba";
+  if (prepare && (shared.stageSpec?.index!==1 || shared.stages?.length!==1 ||
+      shared.stages[0].mode!=="s0-oracle-auth" || shared.stages[0].status!=="PASS"))
+    throw new Error("ORACLE_S2_PREPARATION_AUTH");
+  const grant=prepare ? call("grants",s(),shared.executionId,true,shared.plan.planId)
+    : call("grants",s(),shared.executionId,mode==="s2-oracle-vocabulary");
+  if (prepare) state.workflowGrantIds=grant.workflowIds;
   state.combinedGrantIds=grant.combinedGrantIds; report.currentGrants=grant; await save(state);
   check("oracle_combined_grant_closure",grant.grantCount===6&&grant.fieldCount===22&&grant.historyPreserved===true);
   report.scenarioReady=call("ready",s(),Object.values(actors).map(a=>({subjectId:a.me.subjectId,cookie:a.sessionCookie})),shared.executionId,mode);
+  if (prepare) check("oracle_prepared_grants_ready", report.scenarioReady.beforeEpoch===grant.afterEpoch &&
+    report.scenarioReady.afterEpoch===grant.afterEpoch &&
+    JSON.stringify(report.scenarioReady.workflowIds)===JSON.stringify(grant.workflowIds) &&
+    Object.entries(grant.combinedGrantIds).every(([key,id])=>report.scenarioReady.combinedGrantIds[key]===id));
   report.oracleCases=[];report.oracleWindows=[];
   const audit=async(name,action,expectedReads)=>{
     const start=new Date().toISOString();
