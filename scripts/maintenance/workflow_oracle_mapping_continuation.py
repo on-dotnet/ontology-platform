@@ -77,6 +77,10 @@ def compatible_prefix(archive,measured,mode,stage):
             end='/** B先由三角色正式准备；真正同query源读后A-B-A交给已有正式DI在途测试。 */'
             require(all(text.count(begin)==text.count(end)==1 for text in (left,right)),'S23_PREFIX_ACCESS_BOUNDARY')
             left=left[:left.index(begin)]+left[left.index(end):];right=right[:right.index(begin)]+right[right.index(end):]
+        elif name.endswith('/workflow_oracle_mapping_platform_recovery.py'):
+            from workflow_oracle_mapping_continuity import BRANCH
+            require(right.count(BRANCH)==1 and BRANCH not in left,'S23_PREFIX_GENERATION_BRANCH')
+            right=right.replace(BRANCH,'',1)
         elif name==e.DRIVER:
             right=right.replace('(input.plan.planId === "s2-s3-01-access-01" ? omq.s2AccessPlan() : omq.s2Plan)','omq.s2Plan')
         elif name.endswith('/workflow-oracle-query-fixture.mjs'):
@@ -132,7 +136,26 @@ def _context(qualified,root):
     query=json.loads(_read(root,qualified['members'][reports['s2-oracle-queries']]['path']))
     mapping=json.loads(_read(root,qualified['members'][reports['s2-oracle-mapping']]['path']))
     source=json.loads(_read(root,qualified['members']['formal-run-s2-s3-oracle-'+PREFIX['commandId']+'.json']['path']))
-    return query,mapping,stable_host(source['host'])
+    return query,mapping,source['host']
+
+
+
+def resumed_host(previous,current):
+    """同批停止后再启动只允许进程代次及已登记无状态API身份变化；固定资源和构建仍完全一致。"""
+    from workflow_oracle_mapping_evidence import stable_host
+    import copy
+    before=stable_host(previous);after=stable_host(current)
+    normalized=[]
+    for host in (before,after):
+        value=copy.deepcopy(host);value.pop('resourceManifestSha256')
+        for role,service in value['services'].items():
+            service.pop('pid');service.pop('startedAt')
+            if role in ('api','api-secondary'):service.pop('containerId')
+        normalized.append(value)
+    require(normalized[0]==normalized[1],'S23_PREFIX_FIXED_HOST_CHANGED')
+    return dict(status='SAME_PERSISTENT_INPUTS_NEW_PROCESS_GENERATION',previousManifestSha256=before['resourceManifestSha256'],
+        currentManifestSha256=after['resourceManifestSha256'],services={role:dict(previous={k:before['services'][role][k] for k in ('containerId','pid','startedAt')},
+        current={k:after['services'][role][k] for k in ('containerId','pid','startedAt')}) for role in before['services']})
 
 
 def prepare_prefix(root,descriptor):
@@ -146,9 +169,10 @@ def prepare_prefix(root,descriptor):
     require(projection['connectionId']==old['connectionId'] and projection['catalogSnapshotId']==old['catalogSnapshotId']
             and projection['mappingReceipt']==old['activation'] and latest['reportName'] in qualified['members'] and json.loads(_read(root,qualified['members'][latest['reportName']]['path']))==query
             and latest['queryId']==query['oracleCases'][2]['queryId'] and latest['resultHash']==query['oracleCases'][2]['sha256'],'S23_PREFIX_CURRENT_BINDING')
-    current=p.runtime_binding();require(stable_host(current)==host,'S23_PREFIX_CURRENT_HOST')
+    from workflow_oracle_mapping_continuity import lifecycle
+    current=p.runtime_binding();continuity=lifecycle(root,host,current)
     snapshot=s.source_snapshot();require(snapshot['rows']==query['independentSource']['rows'] and snapshot['hashes']==query['independentSource']['hashes'],'S23_PREFIX_CURRENT_SOURCE')
-    observation=dict(taskId=TASK,runId=RUN,batch='s2-s3-01',planId=PLAN_ID,qualifiedPrefix=PREFIX,state=projection,host=current,source=snapshot)
+    observation=dict(taskId=TASK,runId=RUN,batch='s2-s3-01',planId=PLAN_ID,qualifiedPrefix=PREFIX,state=projection,host=current,source=snapshot,hostContinuity=continuity)
     name='prefix-observation-'+uuid.uuid4().hex+'.json';path=p.AREA.parent/RUN/'s2-s3-01'/name;p.save(path,observation)
     return dict(file=name,sha256=ex.sha(path.read_bytes()))
 
@@ -163,7 +187,9 @@ def reopen_prefix(root,stage,archive):
     path=Path('artifacts/workflow')/TASK/RUN/'s2-s3-01'/ref['file'];raw=_read(root,path,archive)
     require(ex.sha(raw)==ref['sha256'],'S23_PREFIX_OBSERVATION_HASH');obs=json.loads(raw)
     require((obs['taskId'],obs['runId'],obs['batch'],obs['planId'])==(TASK,RUN,'s2-s3-01',PLAN_ID) and obs['qualifiedPrefix']==PREFIX
-            and stable_host(obs['host'])==host==stable_host(archive.dispatch['host']),'S23_PREFIX_OBSERVATION_SCOPE')
+            and stable_host(obs['host'])==stable_host(archive.dispatch['host']),'S23_PREFIX_OBSERVATION_SCOPE')
+    from workflow_oracle_mapping_continuity import lifecycle
+    lifecycle(root,host,obs['host'],obs['hostContinuity'],archive)
     host_observation(archive,obs['host'],build_binding(archive,'api',root),root)
     snapshot=obs['source'];require(snapshot['projectionVersion']==2 and snapshot['rows']==query['independentSource']['rows']
             and snapshot['hashes']==query['independentSource']['hashes'] and len(snapshot['commandIds'])==2,'S23_PREFIX_SOURCE')

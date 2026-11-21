@@ -195,6 +195,64 @@ class S2ContinuationTests(unittest.TestCase):
         other=current.with_name('report.json');other.write_bytes(b'current')
         with self.assertRaisesRegex(ValueError,'S23_PREFIX_ORIGINAL_CHANGED'):n.frozen_member(root,{**item,'path':str(other.relative_to(root))})
 
+    def test_restarted_host_keeps_all_persistent_inputs_and_real_ids(self):
+        import workflow_oracle_mapping_continuation as n
+        import workflow_oracle_mapping_evidence as e
+        # 只隔离结构解析器；比较器自身必须保留所有未明确允许的真实宿主字段。
+        old=dict(resourceManifestSha256='a'*64,oracle=dict(containerId='source',imageId='image',networkId='net'),
+            snapshotId='snapshot',composeSha256='compose',buildInputKey='input',buildOutputKey='output',runtimeHelperSha256='relay',ports=dict(api=15741),
+            services={role:dict(containerId=role,pid=1,startedAt='old',imageId='image',mountSha256='mount',networks={'net':'id'}) for role in ('api','api-secondary','platform-pg')})
+        new=copy.deepcopy(old);new['resourceManifestSha256']='b'*64
+        for role,service in new['services'].items():
+            service.update(pid=2,startedAt='new')
+            if role.startswith('api'):service['containerId']='new-'+role
+        with patch.object(e,'stable_host',side_effect=lambda value:value):
+            result=n.resumed_host(old,new);self.assertEqual(result['services']['api']['current']['containerId'],'new-api')
+            for kind in ('source','data-id','image','mount','network','snapshot','compose','input','output','relay','ports','new-field'):
+                bad=copy.deepcopy(new)
+                if kind=='source':bad['oracle']['containerId']='different'
+                elif kind=='data-id':bad['services']['platform-pg']['containerId']='different'
+                elif kind in ('image','mount','network'):bad['services']['api'][{'image':'imageId','mount':'mountSha256','network':'networks'}[kind]]='different'
+                elif kind in ('snapshot','compose','input','output','relay'):bad[{'snapshot':'snapshotId','compose':'composeSha256','input':'buildInputKey','output':'buildOutputKey','relay':'runtimeHelperSha256'}[kind]]='different'
+                elif kind=='ports':bad['ports']['api']=15742
+                else:bad['unexpected']='different'
+                with self.subTest(kind=kind),self.assertRaisesRegex(ValueError,'S23_PREFIX_FIXED_HOST_CHANGED'):n.resumed_host(old,bad)
+
+    def test_published_graph_delta_rejects_missing_extra_modified_and_duplicate_rows(self):
+        import workflow_oracle_mapping_continuity as n
+        import doris_keep_fuseki as rdf
+        from urllib.parse import urlparse
+        old=[]
+        for suffix in ('ontology','data'):
+            old.append({key:dict(type='uri',value=value) for key,value in dict(g='urn:ontology-platform:release:'+n.OLD_RELEASE+':'+suffix,
+                s='urn:subject:'+suffix,p='urn:predicate',o='urn:value').items()})
+        frozen=dict(scan=dict(default=dict(rows=0,sha256=rdf.fingerprint([])),named=dict(rows=len(old),sha256=rdf.fingerprint(map(rdf.canonical,old)))))
+        observed=copy.deepcopy(old)
+        for row in old:
+            new=copy.deepcopy(row);new['g']['value']=new['g']['value'].replace(n.OLD_RELEASE,n.NEW_RELEASE);observed.append(new)
+        triples=[('Reading','http://www.w3.org/1999/02/22-rdf-syntax-ns#type','http://www.w3.org/2002/07/owl#Class'),
+            ('hasReading','http://www.w3.org/1999/02/22-rdf-syntax-ns#type','http://www.w3.org/2002/07/owl#ObjectProperty'),
+            ('hasReading','http://www.w3.org/2000/01/rdf-schema#domain','urn:synthetic:mapping:Asset'),
+            ('hasReading','http://www.w3.org/2000/01/rdf-schema#range','urn:synthetic:mapping:Reading')]
+        for subject,predicate,value in triples:
+            observed.append({key:dict(type='uri',value=item) for key,item in dict(g='urn:ontology-platform:release:'+n.NEW_RELEASE+':ontology',
+                s='urn:synthetic:mapping:'+subject,p=predicate,o=value).items()})
+        self.assertEqual(n.expected_graphs([],observed,frozen)['namedRows'],8)
+        for kind in ('missing','extra','modified','duplicate','old-drift','default'):
+            bad=copy.deepcopy(observed);default=[]
+            if kind=='missing':bad.pop()
+            elif kind=='duplicate':bad.append(copy.deepcopy(bad[-1]))
+            elif kind=='extra':bad.append({**bad[-1],'g':dict(type='uri',value='urn:unknown')})
+            elif kind in ('modified','old-drift'):bad[-1 if kind=='modified' else 0]['o']['value']='urn:wrong'
+            else:default=[{}]
+            with self.subTest(kind=kind),self.assertRaises(ValueError):n.expected_graphs(default,bad,frozen)
+
+    def test_graph_consumer_rejects_wrong_generation_without_reading_any_files(self):
+        import workflow_oracle_mapping_continuity as n
+        with patch.object(n,'raw',side_effect=AssertionError('must reject before reading')):
+            for cid,stamp,pid in [('0'*64,*n.GENERATION),(n.FUSEKI,'2026-11-21T01:20:00Z',n.GENERATION[1]),(n.FUSEKI,n.GENERATION[0],1)]:
+                with self.assertRaisesRegex(ValueError,'S23_GRAPH_GENERATION'):n.graph_qualification(ROOT,cid,stamp,pid)
+
     def test_grant_order_does_not_hide_value_or_microsecond_differences(self):
         row=grant(state(),'reader','data.query.execute','id')
         row['RevokedAtUtc']='2026-11-20T00:00:00.123450+00:00'

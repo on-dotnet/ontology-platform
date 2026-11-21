@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_S3_WAITING_FOR_NORMAL_AUTH**。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
+唯一任务状态 **S2_S3_IMPLEMENTING**。2026-11-20 用户从 Base `da0046433c87aec3b56a89f15953bfbd4114d9ca` 批准 `product-resume-01 / s2-s3-01`。先关闭 EC-01 并由非作者重开既存六阶段；条件成立自动继续双表 S2 和消费者 S3。前批 A/S1/新reader事实接受，历史原件及计划保持原字节；AC03-B/Oracle S0 BLOCKED、B cleanup250ms NOT_QUALIFIED、G4 PARTIAL不变。main保持 `5168f2c93ca226caa521a6dc4ac85439335274c4`。
 
 ## 执行身份与所有权
 
@@ -100,3 +100,7 @@ S2定向产品缺口：Oracle每分支旧投影只有单表，改QueryBindingRea
 2026-11-21当前收尾：后缀实测Head2f7b4f5476280c3f8e93d69fc94dbc5d6c55f9f0，父36a4b8abb9de4c46a901778b74fdceb2仅运行认证槽600002.686042ms，operator-ab未提交、0/4，ORACLE_LOGIN_WAITING_FOR_INPUT。结束绑定因期限耗尽未取得；保留inputsUnchanged=false，不声称实际漂移。后十槽NOT_RUN，既有前五槽资格与六组合grant事实保留。收尾operation25241e1baf8c40828442bd29488c9642两次七项排空全0、准确两API移除、五副本进程停止、受保护资源hash不变；Fuseki干净关闭仍未资格。磁盘上限前检曾超9MiB，仅按非作者审查回收本任务SecurityTests/bin 39284736分配字节，绑定与原件保留，未放宽40GiB。
 
 收尾更新当前formal-resources.json后，旧冻结路径失效；既有formal-resources-d0f2f50e09679c3092fe4d23a259e0acc22e618e3c41f386cd4c6f4a22484124.json仍保留准确1384字节。仅对此固定资源清单支持内容键原件定位，重新核原SHA/长度并记录别名；不改旧资格索引、当前资源清单或任何原件。其他文件变更仍拒绝。普通推送与三文件交付后停ChatGPT复审，产品尚未完成，不生成中间PARTIAL ZIP。
+
+2026-11-21用户明确刚不在电脑旁，授权从70c94502a2bfbb0a306ccf599403a75fceeb61b1再次600秒正常认证。同批/原后缀计划继续，既有原件复用。上次收尾后同五数据实例启动，按同构建/配方创建两API；前缀衔接只允许真实登记的进程代次及无状态API ID变化，固定数据容器/镜像/卷/网络/端口/快照/构建/relay/compose仍逐项一致。当前宿主继续完整真实检查，观察与新父身份仍严格相等；旧前缀和源审计原件不改。
+
+本次最终认证窗短链 owned_paths 追加 workflow_oracle_mapping_continuity.py、recovery.require_current_fuseki 单个新代次分支及现有 evidence/门禁登记。独立预期验证旧全集和正式发布词汇四声明；冻结检查点与失败启动原件不变。正常停止/新启动、API准确删除/创建及完整Oracle挂载均消费实际命令；不重建数据或放宽源审计。
