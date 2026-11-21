@@ -1,7 +1,7 @@
 {
   "evidenceSchemaVersion": 2,
   "validationSource": "LOCAL",
-  "testedCommit": "a383c66ba4e8a32ba81b249353411413a1ba24d0",
+  "testedCommit": "55107958b2e26547dd1f040800c9188d7443601d",
   "ci": {
     "status": "NOT_RUN",
     "runId": null,
@@ -11,310 +11,797 @@
   },
   "checks": [
     {
-      "name": "runtime-suffix",
-      "command": "c02e89f8d8f2481f90058606ccf71b29",
+      "name": "original-aba",
       "status": "FAIL",
-      "exitCode": 1,
-      "output": "十槽实测 1 PASS、1 FAIL、8 NOT_RUN。"
-    },
-    {
-      "name": "s0-oracle-auth",
-      "command": "d6e05ec96e04432b80f3a2e5c07803d0",
-      "status": "PASS",
-      "exitCode": 0,
-      "output": "当前四角色正常认证；34 项检查，2320 个成员。"
-    },
-    {
-      "name": "scoped-renewal",
-      "command": "8a0524ef4a8c4f34aadf7a2ec0f75b19",
-      "status": "PASS",
-      "exitCode": 0,
-      "output": "准备与 ready 的 54 个成员重开，十五项原范围续授，epoch 106 至 121。"
-    },
-    {
-      "name": "inflight-aba",
       "command": "5b90bb8f66fb4ddd9bfeddbe5015133a",
-      "status": "FAIL",
       "exitCode": 2,
-      "output": "源读与 B 激活已观测，回滚验证后返回 503 query_timeout。"
+      "output": "历史正式调用 503 query_timeout，父退出 1。"
     },
     {
-      "name": "query-poststate",
-      "command": "b2e6bcb2dc554a0495b086db67e98c66",
+      "name": "isolated-pg",
       "status": "PASS",
+      "command": "5e5bf4d1a1a545518d884edd21fb329a",
       "exitCode": 0,
-      "output": "查询 FAILED，owner 存在，fence 2，租约到期。"
+      "output": "四组真实 PG 共18/18，零跳过。"
     },
     {
-      "name": "plan",
-      "command": "027d487916ef49abbaea8ae615f0b34d",
+      "name": "mapping-restore",
       "status": "PASS",
+      "command": "889253f46095449488e86338a9042a81",
       "exitCode": 0,
-      "output": "受影响门禁两项。"
+      "output": "正式 B → 原 A release revision 3，前缀及三快照宿主重开。"
     },
     {
-      "name": "verify",
-      "command": "b1b7182725e14903abc8edee8e6e8a17",
-      "status": "PASS",
-      "exitCode": 0,
-      "output": "Oracle 138/138，policy 通过。"
-    },
-    {
-      "name": "format",
-      "command": "2c08965ca0a7429f895fafecefb45f8c",
-      "status": "PASS",
-      "exitCode": 0,
-      "output": "受影响源码及格式核验通过。"
-    },
-    {
-      "name": "frozen-dispatch",
-      "command": "5809901efd5445ec93747b112f26d582",
-      "status": "PASS",
-      "exitCode": 0,
-      "output": "Node 8/8，含准备到 ready 和原件消费者。"
-    },
-    {
-      "name": "s3",
+      "name": "exact-late-cas",
+      "status": "BLOCKED",
+      "output": "同 Q 与准确 Oracle 执行的独立运行原件不足。",
       "command": null,
-      "status": "NOT_RUN",
-      "exitCode": null,
-      "output": "S2 未成立。"
+      "exitCode": null
     },
     {
-      "name": "ci",
+      "name": "S2",
+      "status": "PARTIAL",
+      "output": "沿用旧父窗 1 PASS、1 FAIL、8 NOT_RUN。",
       "command": null,
-      "status": "NOT_RUN",
-      "exitCode": null,
-      "output": "CI 未运行。"
+      "exitCode": null
     },
     {
-      "name": "delivery-policy",
-      "command": "44ced7ac64c34ef2a1a83fc6a3b8f87a",
+      "name": "diagnostic-ABA",
+      "status": "NOT_RUN",
+      "output": "0 个新诊断 Q。",
+      "command": null,
+      "exitCode": null
+    },
+    {
+      "name": "corrected-formal",
+      "status": "NOT_RUN",
+      "output": "0 个新十槽。",
+      "command": null,
+      "exitCode": null
+    },
+    {
+      "name": "S3",
+      "status": "NOT_RUN",
+      "output": "S2 准入不足。",
+      "command": null,
+      "exitCode": null
+    },
+    {
+      "name": "engineering-verify",
+      "status": "BLOCKED",
+      "exitCode": 2,
+      "command": "33382939ecce4e7984fff5761f0c8249",
+      "output": "缺少原 Oracle S0 资格；backend 子进程退出 1。"
+    },
+    {
+      "name": "engineering-policy",
       "status": "PASS",
       "exitCode": 0,
-      "output": "交付文字更正后按影响验证 policy，Oracle 原输入键相同。"
+      "command": "9eecc8df84b546f283aea4beaab2d23d",
+      "output": "本地解析器经哈希核对补齐，政策复验退出 0。"
     }
   ],
   "metadata": {
     "taskId": "G4-ORACLE-MAPPING-QUERY-001",
     "runId": "product-resume-01",
     "batch": "s2-s3-01",
-    "baseline": "1e727e46370b2bd597099d56bc271178555fb9d4",
+    "baseline": "7047f9cfb33bd46677433a368f19e5614a0f0179",
     "main": "5168f2c93ca226caa521a6dc4ac85439335274c4",
     "branch": "codex/g4-oracle-mapping-query-001",
-    "state": "S2_PARTIAL_ABA_TIMEOUT_CHATGPT_REVIEW",
+    "state": "S2_PARTIAL_SOURCE_LINK_CHATGPT_REVIEW",
     "productMeasuredCommit": "851906f140c0defc0201b392e838e191b20afa27",
-    "engineeringMeasuredCommit": "4f125fd47945fa47afad9c4c207d038b3e832a69",
-    "deliveryHeadBinding": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-delivery-readback-851906f1.json",
-    "stop": "CHATGPT_REVIEW",
-    "results": {
-      "EC01": "REUSED",
-      "S1": "REUSED_PASS",
-      "AC03_A": "REUSED_SUCCESS_WON",
-      "AC03_C": "REUSED_8_OF_8",
-      "access": "REUSED_78_CHECKS",
-      "S2": "PARTIAL",
-      "S3": "NOT_RUN",
-      "OracleS0": "BLOCKED",
-      "AC03_B": "BLOCKED",
-      "cleanup250ms": "NOT_QUALIFIED",
-      "G4": "PARTIAL",
-      "AC10": "PARTIAL",
-      "DorisAssessments": {
-        "ma-a77741308dd94252a393281745421189": "NOT_QUALIFIED",
-        "ma-99d5dbdfae694e7c83bcc9f865a9932e": "NOT_QUALIFIED"
-      }
+    "engineeringMeasuredCommit": "55107958b2e26547dd1f040800c9188d7443601d",
+    "maintenanceGitHeadObserved": "7047f9cfb33bd46677433a368f19e5614a0f0179",
+    "maintenanceBackendInputKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243",
+    "deliveryHeadBinding": {
+      "method": "远端读取任务分支后以交付 Git 对象读取三文件；回执在提交外避免自引用。",
+      "readback": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-delivery-readback-7047f9cf.json"
     },
     "acceptedHandoff": {
-      "commit": "1e727e46370b2bd597099d56bc271178555fb9d4",
-      "parent": "1080791aa97546f29c34fd915618ecef",
-      "outcome": "1 PASS / 1 FAIL / 8 NOT_RUN",
-      "abaQueryId": null,
-      "originals": {
-        "report.md": {
-          "commit": "1e727e46370b2bd597099d56bc271178555fb9d4",
-          "gitBlob": "79c191baef3f1ca17c483716ae052befebf34e9c",
-          "sha256": "fd6be6929f6428ce93e4d95aee5a0e28ebae64bfd0dca2fa2c8d88a703bbda8b",
-          "sizeBytes": 5073
+      "commit": "7047f9cfb33bd46677433a368f19e5614a0f0179",
+      "documents": [
+        {
+          "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md",
+          "sha256": "f02c9e226782c9b6980f8be4a15c9e2f2b11b14fbb93e7e7df3da2f2a919f26e",
+          "bytes": 5818
         },
-        "final-machine-receipt.json": {
-          "commit": "1e727e46370b2bd597099d56bc271178555fb9d4",
-          "gitBlob": "d81e9ef413314858a0a3c2cf121e8c42c673baf6",
-          "sha256": "786af0cfc8a54cfaa3d92658732e0f649426dc687bb9f6d6e542ab88acf0609b",
-          "sizeBytes": 23812
+        {
+          "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/final-machine-receipt.json",
+          "sha256": "10660be5c073a216bfe867e31211fc65d1345f15f4114dc37bb37bd644199087",
+          "bytes": 85019
         },
-        "non-author-review.json": {
-          "commit": "1e727e46370b2bd597099d56bc271178555fb9d4",
-          "gitBlob": "8048fcd4f21f47c9b8e16e372db02ab83912dbc9",
-          "sha256": "97328ef67d7ed88843efdf441b4807cccd14da9ab8534f4ef87dc22139384cb5",
-          "sizeBytes": 3085
+        {
+          "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/non-author-review.json",
+          "sha256": "237d706a8599a61c5c2cb270638fd21ac98468e2132bafc9974d120ff060363f",
+          "bytes": 2595
+        }
+      ]
+    },
+    "counts": {
+      "historicalParents": 1,
+      "historicalABA": 1,
+      "diagnosticABA": 0,
+      "correctedFormalTenSlot": 0,
+      "lateCAS": 0,
+      "normalMappingRecovery": 1
+    },
+    "historicalFailure": {
+      "parent": "c02e89f8d8f2481f90058606ccf71b29",
+      "child": "5b90bb8f66fb4ddd9bfeddbe5015133a",
+      "rawStdout": {
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5b90bb8f66fb4ddd9bfeddbe5015133a/stdout.txt",
+        "sha256": "d1fba9b095bec4a31831c598e4bbf7bd043579d923e57efd3403a0dab74efc15",
+        "bytes": 5349
+      },
+      "structuredStdout": {
+        "taskId": "G4-ORACLE-MAPPING-QUERY-001",
+        "case": "AC-05_INFLIGHT_ABA",
+        "status": "FAIL",
+        "resourceRun": "product-resume-01",
+        "runtimeSeed": {
+          "queryId": "query-a3b2eaa370fe4f8193d3d2ac817f6f7b",
+          "requestHash": "e65bb0daa424428e3b4f54f5931973ec7a34edc7b5a11230365cab8524503fbd",
+          "resultHash": "1546bdc00a5565fd9a1ad80f37c9dbec9fba11a8c6b0932082c2cad129cf8897",
+          "subjectId": "f902a743-7079-4e22-a643-a51deb027e89",
+          "sessionHash": "9c8c87592744e78bda0437aeb5e7df97925c7e7c9e5dedaf1b44f255d5669de3"
+        },
+        "queryId": "query-d368ac610c7745889890e1589653af8f",
+        "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+        "connectionId": "a7913bb552eb4cd1a3f6eaf5b93cd619",
+        "subjectId": "f902a743-7079-4e22-a643-a51deb027e89",
+        "leaseOwnerHash": "8fdc75f71c16c2972b1ab468d7a7ee79726888b2b45adc5970255183e569f013",
+        "fence": 1,
+        "capturedA": {
+          "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+          "mappingReleaseId": "release-6d6469e33f744b7c93b8e4d516fca0c4",
+          "activationId": "activation-21dc91af5df24e9aaa7345b46258ad78",
+          "activationRevision": "1",
+          "connectionId": "a7913bb552eb4cd1a3f6eaf5b93cd619"
+        },
+        "admittedAtUtc": "2026-11-21T13:52:17.360623+00:00",
+        "deadlineAtUtc": "2026-11-21T13:52:21.635112+00:00",
+        "afterRealReadAtUtc": "2026-11-21T13:52:18.3722077+00:00",
+        "activatedB": {
+          "activationId": "activation-4baaba317e3d486ca1a9e996ed79e27c",
+          "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+          "proposalId": "proposal-7cbb5f23527547b38987d52f0c32e6f6",
+          "kind": "PUBLISH",
+          "mappingReleaseId": "release-e58fb5ef17374c76bce717eb547f7b86",
+          "manifestHash": "0805494841e5964e3b30ce3895bcbc074801547ff605faa6ca69054ffe8d11ed",
+          "previousReleaseId": "release-6d6469e33f744b7c93b8e4d516fca0c4",
+          "activationRevision": 2,
+          "auditId": "fb8ae998316b459780383770c722eb7a",
+          "outboxEventId": "event-4e389c5adc684f83a444f86e4b1925e0",
+          "activatedAtUtc": "2026-11-21T13:52:19.4744354+00:00"
+        },
+        "rollbackValidatedAtUtc": "2026-11-21T13:52:21.3386383+00:00",
+        "errorStatus": 503,
+        "errorCode": "query_timeout",
+        "elapsedMs": 5008.2652,
+        "events": [
+          {
+            "phase": "SOURCE_READ_COMPLETED",
+            "sequence": 1,
+            "monotonicMs": 1738.2209,
+            "utc": "2026-11-21T13:52:18.37227+00:00",
+            "queryId": "query-d368ac610c7745889890e1589653af8f",
+            "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+            "connectionId": "a7913bb552eb4cd1a3f6eaf5b93cd619"
+          },
+          {
+            "phase": "B_ACTIVATED",
+            "sequence": 2,
+            "monotonicMs": 2866.5528,
+            "utc": "2026-11-21T13:52:19.5006019+00:00",
+            "queryId": "query-d368ac610c7745889890e1589653af8f",
+            "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+            "connectionId": "a7913bb552eb4cd1a3f6eaf5b93cd619"
+          },
+          {
+            "phase": "COMMIT_REJECTED",
+            "sequence": 3,
+            "monotonicMs": 5008.2599,
+            "utc": "2026-11-21T13:52:21.6423091+00:00",
+            "queryId": "query-d368ac610c7745889890e1589653af8f",
+            "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+            "connectionId": "a7913bb552eb4cd1a3f6eaf5b93cd619"
+          }
+        ],
+        "abaCompleted": false
+      },
+      "lastConfirmedClientCall": "ReadJobAsync(SUCCEEDED)",
+      "rollbackDecisionPresent": false,
+      "activatedAPresent": false,
+      "lastCallRemainingMs": 296.4737,
+      "gatewayOverrunMs": 7.1971,
+      "outerDeadlineSeconds": 25,
+      "outerReceipt": {
+        "elapsedSeconds": 7.639083000001847,
+        "exitCode": 2,
+        "classification": "EXIT_FAILURE"
+      },
+      "sourceAudit": {
+        "commandId": "c88fdf4e2b15487c91639a5804536530",
+        "total": 12,
+        "inFlight": [
+          2,
+          2,
+          2,
+          0
+        ]
+      },
+      "pgCommitted": {
+        "jobs": [
+          {
+            "Id": "job-cb148f92ceeb4628a071c1a9a87c4af0",
+            "Kind": "VALIDATE",
+            "Status": "SUCCEEDED",
+            "ResultId": "ma-3867fb5152d5444fb4953f7c47af62b9",
+            "CreatedAtUtc": "2026-11-21T13:52:19.568172+00:00",
+            "CompletedAtUtc": "2026-11-21T13:52:20.873138+00:00"
+          }
+        ],
+        "assessments": [
+          {
+            "Id": "ma-3867fb5152d5444fb4953f7c47af62b9",
+            "Status": "READY_FOR_PROPOSAL",
+            "TargetKind": "ROLLBACK",
+            "TargetId": "release-6d6469e33f744b7c93b8e4d516fca0c4",
+            "CreatedAtUtc": "2026-11-21T13:52:20.858066+00:00"
+          }
+        ],
+        "proposals": [],
+        "checks": [
+          {
+            "Id": "check-80e996c3dd834635b817da4b65bca8c7",
+            "ProposalId": "proposal-7cbb5f23527547b38987d52f0c32e6f6",
+            "Status": "PASS",
+            "CreatedAtUtc": "2026-11-21T13:52:19.40718+00:00"
+          }
+        ],
+        "mapping-commands": [
+          {
+            "CommandId": "8e99ce13-48f3-4969-a58f-cf795d66fadc",
+            "Operation": "activate:proposal-7cbb5f23527547b38987d52f0c32e6f6",
+            "CreatedAtUtc": "2026-11-21T13:52:19.479947+00:00"
+          },
+          {
+            "CommandId": "30336355-cba2-467b-a1de-0554287d28cc",
+            "Operation": "validate",
+            "CreatedAtUtc": "2026-11-21T13:52:19.573165+00:00"
+          }
+        ],
+        "mappingChain": {
+          "current": [
+            "activation-4baaba317e3d486ca1a9e996ed79e27c",
+            2,
+            "release-e58fb5ef17374c76bce717eb547f7b86"
+          ],
+          "receipts": [
+            {
+              "receipt": {
+                "activatedAtUtc": "2026-11-20T22:57:18.9893788Z",
+                "activationId": "activation-21dc91af5df24e9aaa7345b46258ad78",
+                "activationRevision": 1,
+                "auditId": "9019b3a4ea454e298cca1a476fdb22e4",
+                "kind": "PUBLISH",
+                "manifestHash": "d0eb59af9c4edb517829449c6aca5c82eb5ed0c938806439c86c513301135834",
+                "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+                "mappingReleaseId": "release-6d6469e33f744b7c93b8e4d516fca0c4",
+                "outboxEventId": "event-dd348bc9821c481ca59be7dfbb2122db",
+                "previousReleaseId": null,
+                "proposalId": "proposal-d028b01d93c548c987c9ca3c9b2cf916"
+              },
+              "connection": "a7913bb552eb4cd1a3f6eaf5b93cd619",
+              "catalog": "068c3ce7002b4a56a7589152b988ae0b",
+              "fingerprint": "c90c6ec62cb66f1e90c05f8cae86210a24b73cbefb1b776db2697a802e47eb02",
+              "check": "check-ece8e7e355b048bc9595ba5e2b3172ee",
+              "command": "32b9042b-06ec-4de5-8532-04341efc35f4"
+            },
+            {
+              "receipt": {
+                "activatedAtUtc": "2026-11-21T13:52:19.4744354Z",
+                "activationId": "activation-4baaba317e3d486ca1a9e996ed79e27c",
+                "activationRevision": 2,
+                "auditId": "fb8ae998316b459780383770c722eb7a",
+                "kind": "PUBLISH",
+                "manifestHash": "0805494841e5964e3b30ce3895bcbc074801547ff605faa6ca69054ffe8d11ed",
+                "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+                "mappingReleaseId": "release-e58fb5ef17374c76bce717eb547f7b86",
+                "outboxEventId": "event-4e389c5adc684f83a444f86e4b1925e0",
+                "previousReleaseId": "release-6d6469e33f744b7c93b8e4d516fca0c4",
+                "proposalId": "proposal-7cbb5f23527547b38987d52f0c32e6f6"
+              },
+              "connection": "a7913bb552eb4cd1a3f6eaf5b93cd619",
+              "catalog": "068c3ce7002b4a56a7589152b988ae0b",
+              "fingerprint": "c90c6ec62cb66f1e90c05f8cae86210a24b73cbefb1b776db2697a802e47eb02",
+              "check": "check-80e996c3dd834635b817da4b65bca8c7",
+              "command": "8e99ce13-48f3-4969-a58f-cf795d66fadc"
+            }
+          ]
         }
       }
     },
-    "engineering": {
-      "head": "4f125fd47945fa47afad9c4c207d038b3e832a69",
-      "checkoutBytes": 797347840,
-      "gates": [
+    "latePostState": {
+      "queryState": {
+        "systemIdentifier": "7709907053089669168",
+        "database": "mapping",
+        "databaseUser": "postgres",
+        "queryId": "query-d368ac610c7745889890e1589653af8f",
+        "organizationId": "org-demo",
+        "connectionId": "a7913bb552eb4cd1a3f6eaf5b93cd619",
+        "fence": 2,
+        "status": "FAILED",
+        "cancelRequested": false,
+        "createdUtc": "2026-11-21T13:52:17.360623+00:00",
+        "deadlineUtc": "2026-11-21T13:52:21.635112+00:00",
+        "completedUtc": "2026-11-21T13:52:21.897952+00:00",
+        "leaseUntilUtc": "2026-11-21T13:52:21.635112+00:00",
+        "requestSha256": "e65bb0daa424428e3b4f54f5931973ec7a34edc7b5a11230365cab8524503fbd",
+        "bindingSha256": "f9791b46957e72f0240a2bb8861d7cf7d58856136905e151c0c7c6be377b4a0a",
+        "stableRowSha256": "c7e08ef5d06001addd262eb403a8d86cca760efffc172f675d5c4ff9956e3bf6",
+        "resultHash": null,
+        "resultSize": 0,
+        "resultCiphertextLength": 0,
+        "ownerSha256": "8fdc75f71c16c2972b1ab468d7a7ee79726888b2b45adc5970255183e569f013"
+      },
+      "audits": [
         {
-          "gate": "oracle-task-admission",
-          "tests": 138,
-          "skipped": 0,
-          "status": "PASS",
-          "exitCode": 0,
-          "executionMode": "FRESH"
-        },
-        {
-          "gate": "policy",
-          "tests": 0,
-          "skipped": 0,
-          "status": "PASS",
-          "exitCode": 0,
-          "executionMode": "FRESH"
+          "id": "83330a307d7a4583aa44e7c2a6db4fa4",
+          "action": "data.query.execute",
+          "outcome": "failure",
+          "actor": "system.query.expiry",
+          "trace": "3fe6f181fc57476ba6e64febd96769f5",
+          "correlation": "3fe6f181fc57476ba6e64febd96769f5",
+          "organization": "org-demo",
+          "sites": [
+            "site-a"
+          ],
+          "sha256": "ccad5f400813da2d9e641b2a2ba59af8dba87b41a5320e5bd095e40ee975d3c4"
         }
+      ],
+      "receiptCount": 0,
+      "sourceSessions": [
+        0,
+        0
       ],
       "commands": {
-        "plan": {
-          "commandId": "027d487916ef49abbaea8ae615f0b34d",
-          "exitCode": 0,
-          "elapsedSeconds": 27.696631042010267,
-          "stdout": {
-            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/027d487916ef49abbaea8ae615f0b34d/stdout.txt",
-            "sha256": "03b00f10a352fbae693a0e61ff6c44d1d045461d1b1a00177113e6c8e265a779",
-            "sizeBytes": 4323
-          },
-          "stderr": {
-            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/027d487916ef49abbaea8ae615f0b34d/stderr.txt",
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "sizeBytes": 0
-          },
-          "classification": "SUCCESS"
-        },
-        "verify": {
-          "commandId": "b1b7182725e14903abc8edee8e6e8a17",
-          "exitCode": 0,
-          "elapsedSeconds": 65.40483525001036,
-          "stdout": {
-            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b1b7182725e14903abc8edee8e6e8a17/stdout.txt",
-            "sha256": "2e8060f92344e6b72ec0600e06324ed734959133370a3d925be3f40e6456a448",
-            "sizeBytes": 2331
-          },
-          "stderr": {
-            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b1b7182725e14903abc8edee8e6e8a17/stderr.txt",
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "sizeBytes": 0
-          },
-          "classification": "SUCCESS"
-        },
-        "format": {
-          "commandId": "2c08965ca0a7429f895fafecefb45f8c",
-          "exitCode": 0,
-          "elapsedSeconds": 10.070571542004473,
-          "stdout": {
-            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2c08965ca0a7429f895fafecefb45f8c/stdout.txt",
-            "sha256": "b27e69c5e4a00a274656ba72cd18fdee7959823441f7ee40b78401b1b498aaed",
-            "sizeBytes": 622
-          },
-          "stderr": {
-            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2c08965ca0a7429f895fafecefb45f8c/stderr.txt",
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "sizeBytes": 0
-          },
-          "classification": "SUCCESS"
-        },
-        "frozen-dispatch": {
-          "commandId": "5809901efd5445ec93747b112f26d582",
-          "exitCode": 0,
-          "elapsedSeconds": 1.373504375005723,
-          "stdout": {
-            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5809901efd5445ec93747b112f26d582/stdout.txt",
-            "sha256": "ec9bba59eb5548dd553daf8ec1fd15973efea5996921abf30a7d3a5c18243ba3",
-            "sizeBytes": 903
-          },
-          "stderr": {
-            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5809901efd5445ec93747b112f26d582/stderr.txt",
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "sizeBytes": 0
-          },
-          "classification": "SUCCESS"
-        }
-      }
-    },
-    "observed": {
-      "parentCommand": "c02e89f8d8f2481f90058606ccf71b29",
-      "exitCode": 1,
-      "outerExitCode": 1,
-      "executionId": "d102288604bb4000b5a04f86d0395e22",
-      "planId": "s2-s3-01-runtime-01",
-      "parentDeadlineSeconds": 2340,
-      "stages": [
+        "prior-platform-pg": "681d650bad614bac88a788663c2b45ea",
+        "prior-oracle": "454416d9876d463e828c06e2673a7644",
+        "absent-api": "b13d2d32b1924accaa40a849d4329a1e",
+        "absent-api-secondary": "441eb8f293324caebe4fedfa9883e6a1",
+        "grants": "9fce431b487a427692919f40b40a727f",
+        "row": "2ebff1911c1f4f348afc5858bbf42bda",
+        "audit": "2c29461d61d34cafb3b39b1aa3a0abdf",
+        "receipts": "70d2fcb66aad4508b51522134083fbb2",
+        "activation": "f7a0d1bde3d74cdc81d8fcdc1b46f6c7",
+        "jobs": "dfe9cd79d2de4a5ba8c9586ffe85900c",
+        "assessments": "ffc50971379b49c8bc7b8bca8d11f8e5",
+        "proposals": "c916303bc4f64b30b28968bc51bee5df",
+        "checks": "1fc136f9adf04d26aef1cdce4dbfb70b",
+        "mapping-commands": "605883c2c44f43cf8345af2a67d743d2",
+        "source-first": "24b9b9fa3aa44eb2bd45fe1e5c08a8b2",
+        "source-second": "eb7cdc43cb2b458486536cf106f4306b",
+        "before": "46114c9f36324aa2ad86067e10d6f396",
+        "after": "254143a2141f4e628136346f5430fc4d"
+      },
+      "exactQuerySourceIdBinding": "NOT_PROVEN",
+      "timeMatchedSourceRows": [
         {
-          "slot": 1,
-          "mode": "s0-oracle-auth",
-          "status": "PASS"
+          "instance": "1",
+          "session": "383971987522914745",
+          "entry": "1",
+          "statement": "11",
+          "auditExecution": null,
+          "clientId": "eadae820f54a4d35aae6e7aa7f77d5ca",
+          "owner": "PRODUCTION",
+          "table": "OMQ_ENTITY",
+          "action": "SELECT",
+          "code": 0,
+          "utc": "2026-11-21T13:52:17.702706Z"
         },
         {
-          "slot": 2,
-          "mode": "s2-oracle-aba",
-          "status": "FAIL"
-        },
-        {
-          "slot": 3,
-          "mode": "s2-oracle-connection",
-          "status": "NOT_RUN"
-        },
-        {
-          "slot": 4,
-          "mode": "s2-oracle-versions",
-          "status": "NOT_RUN"
-        },
-        {
-          "slot": 5,
-          "mode": "s2-oracle-states",
-          "status": "NOT_RUN"
-        },
-        {
-          "slot": 6,
-          "mode": "reader-auth",
-          "status": "NOT_RUN"
-        },
-        {
-          "slot": 7,
-          "mode": "s2-oracle-reopen",
-          "status": "NOT_RUN"
-        },
-        {
-          "slot": 8,
-          "mode": "s3",
-          "status": "NOT_RUN"
-        },
-        {
-          "slot": 9,
-          "mode": "ui-s3",
-          "status": "NOT_RUN"
-        },
-        {
-          "slot": 10,
-          "mode": "ui-s1",
-          "status": "NOT_RUN"
+          "instance": "1",
+          "session": "383973993272696242",
+          "entry": "1",
+          "statement": "11",
+          "auditExecution": null,
+          "clientId": "eeb5409be307405c92b775d3442ee630",
+          "owner": "CaseOwner",
+          "table": "OmqTarget",
+          "action": "SELECT",
+          "code": 0,
+          "utc": "2026-11-21T13:52:18.158059Z"
         }
       ],
-      "authChecks": 34,
-      "authorization": {
-        "basis": "eec823bb7b554263b9f395da6590f411",
-        "transaction": "7f1df8d7c11f4c25b04e5bc038344969",
-        "prepareBefore": "96ee38b348c34f7ea61ca8fefecc0d2d",
-        "prepareAfter": "e930c21a522c4dc8aa19e03e0b5c94d0",
-        "readyBefore": "ba1722ceb3e04a19912fdadedefe6f42",
-        "readyAfter": "ff52fcc653ca45aca2a9a053a11436f1",
-        "plan": "grant-plan-d102288604bb4000b5a04f86d0395e22.json",
-        "beforeRows": 75,
-        "afterRows": 90,
-        "beforeEpoch": 106,
-        "afterEpoch": 121,
-        "oldRowsPreserved": true,
-        "issuanceAuditsAdded": 15,
+      "decision": "HOLD_FOR_EXACT_QUERY_SOURCE_LINK",
+      "rowObservedAfterOriginalDeadline": true,
+      "sourceTermination": "confirmed after exact old instance shutdown"
+    },
+    "normalMapping": {
+      "currentReceipt": {
+        "activationId": "activation-d2dcec9ef54c4f3bb96d60cab449580b",
+        "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+        "proposalId": "proposal-c7e58b62fe234d7282689ae7b23000d5",
+        "kind": "ROLLBACK",
+        "mappingReleaseId": "release-6d6469e33f744b7c93b8e4d516fca0c4",
+        "manifestHash": "d0eb59af9c4edb517829449c6aca5c82eb5ed0c938806439c86c513301135834",
+        "previousReleaseId": "release-e58fb5ef17374c76bce717eb547f7b86",
+        "activationRevision": 3,
+        "auditId": "79782bd72d4c42e1bc9fcfd25c4f2ea7",
+        "outboxEventId": "event-4f9d6c95409f4a879b2ec48633c98d7c",
+        "activatedAtUtc": "2026-11-21T16:16:52.8198980Z"
+      },
+      "currentActive": {
+        "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+        "mappingReleaseId": "release-6d6469e33f744b7c93b8e4d516fca0c4",
+        "manifestHash": "d0eb59af9c4edb517829449c6aca5c82eb5ed0c938806439c86c513301135834",
+        "activationRevision": 3,
+        "usable": true,
+        "reasonCodes": []
+      },
+      "chainBeforeCommand": "5104e234177043b69ada806583eb3c30",
+      "chainAfterCommand": "e93a6a64de354d7db5da065bd69fa5dd",
+      "phases": [
+        {
+          "method": "GET",
+          "path": "/api/v1/mappings/mapping-1b5ff00c32ff74221a68138edd3d7dc3/active",
+          "startedAtUtc": "2026-11-21T16:16:42.475Z",
+          "monotonicMs": 9920.187417,
+          "subjectId": "bcf7f7f8-6af0-4f94-a28c-1220461ee62e",
+          "commandId": null,
+          "status": 200,
+          "sha256": "d9821e75bde9c944da4d2c5537c4f6cb9085538a02431285870bc160ef0b1496",
+          "finishedAtUtc": "2026-11-21T16:16:44.836Z",
+          "elapsedMs": 2361.4495000000006
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mapping-releases/release-6d6469e33f744b7c93b8e4d516fca0c4",
+          "startedAtUtc": "2026-11-21T16:16:44.839Z",
+          "monotonicMs": 12284.589584,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "3eb87f64bda4031f18befe9163720634c736e486b5da386d406eabc69290e32e",
+          "finishedAtUtc": "2026-11-21T16:16:45.294Z",
+          "elapsedMs": 454.8612499999999
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mapping-proposals/proposal-7cbb5f23527547b38987d52f0c32e6f6",
+          "startedAtUtc": "2026-11-21T16:16:45.297Z",
+          "monotonicMs": 12742.416042,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "2879dc7704d329ff395dc5a6971696e251f86e55ffaaac66897cca958c9533be",
+          "finishedAtUtc": "2026-11-21T16:16:45.757Z",
+          "elapsedMs": 459.359457999999
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mappings/mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+          "startedAtUtc": "2026-11-21T16:16:45.757Z",
+          "monotonicMs": 13202.530417,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "9ecdb16b5c8b54b968e71fbac502a12dca56b3382e5e06aca53a75f12a74302e",
+          "finishedAtUtc": "2026-11-21T16:16:46.221Z",
+          "elapsedMs": 463.4250830000001
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/mappings/mapping-1b5ff00c32ff74221a68138edd3d7dc3/validate",
+          "startedAtUtc": "2026-11-21T16:16:46.224Z",
+          "monotonicMs": 13669.044084,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": "ef2334aa-519c-470c-9e38-d42d2f32271e",
+          "status": 202,
+          "sha256": "a80b798b175d90ff8cd5252356a14d178fd94b6e7483d6fd4999c96e092b8a26",
+          "finishedAtUtc": "2026-11-21T16:16:46.266Z",
+          "elapsedMs": 41.62529100000029
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mapping-jobs/job-7d97836656264481a2040eec6957349e",
+          "startedAtUtc": "2026-11-21T16:16:46.416Z",
+          "monotonicMs": 13861.52525,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "c6200e3071bfa8c7cf0d0f4e0b77c524a88550450580fb2107ac5e69d61a40cb",
+          "finishedAtUtc": "2026-11-21T16:16:46.889Z",
+          "elapsedMs": 472.68325000000004
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mapping-jobs/job-7d97836656264481a2040eec6957349e",
+          "startedAtUtc": "2026-11-21T16:16:47.042Z",
+          "monotonicMs": 14486.915125,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "c6200e3071bfa8c7cf0d0f4e0b77c524a88550450580fb2107ac5e69d61a40cb",
+          "finishedAtUtc": "2026-11-21T16:16:47.538Z",
+          "elapsedMs": 495.8198339999999
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mapping-jobs/job-7d97836656264481a2040eec6957349e",
+          "startedAtUtc": "2026-11-21T16:16:47.690Z",
+          "monotonicMs": 15135.45275,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "0c9c706862e2a54c168ceb44013ca237d71280f2cfc1d1ede513ce9736a702f4",
+          "finishedAtUtc": "2026-11-21T16:16:48.187Z",
+          "elapsedMs": 496.40549999999894
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mapping-jobs/job-7d97836656264481a2040eec6957349e",
+          "startedAtUtc": "2026-11-21T16:16:48.340Z",
+          "monotonicMs": 15784.650667,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "0c9c706862e2a54c168ceb44013ca237d71280f2cfc1d1ede513ce9736a702f4",
+          "finishedAtUtc": "2026-11-21T16:16:48.837Z",
+          "elapsedMs": 497.243292000001
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mapping-jobs/job-7d97836656264481a2040eec6957349e",
+          "startedAtUtc": "2026-11-21T16:16:48.989Z",
+          "monotonicMs": 16433.6875,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "0c9c706862e2a54c168ceb44013ca237d71280f2cfc1d1ede513ce9736a702f4",
+          "finishedAtUtc": "2026-11-21T16:16:49.469Z",
+          "elapsedMs": 480.23966700000165
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mapping-jobs/job-7d97836656264481a2040eec6957349e",
+          "startedAtUtc": "2026-11-21T16:16:49.624Z",
+          "monotonicMs": 17068.926959,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "0c9c706862e2a54c168ceb44013ca237d71280f2cfc1d1ede513ce9736a702f4",
+          "finishedAtUtc": "2026-11-21T16:16:50.071Z",
+          "elapsedMs": 447.61541600000055
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mapping-jobs/job-7d97836656264481a2040eec6957349e",
+          "startedAtUtc": "2026-11-21T16:16:50.225Z",
+          "monotonicMs": 17670.089125,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "04a87447a1698ad9bf79e0248690e4c99886cb2107ce893ac23baf381914a4c9",
+          "finishedAtUtc": "2026-11-21T16:16:50.684Z",
+          "elapsedMs": 459.4704590000001
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mapping-assessments/ma-5374d51b14af4908b0dcfdf87ae18941",
+          "startedAtUtc": "2026-11-21T16:16:50.688Z",
+          "monotonicMs": 18132.793792,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "bd08088eaff6d52879a4a5660fe47833904df2ca9081564fed66e4b53147c0ee",
+          "finishedAtUtc": "2026-11-21T16:16:51.129Z",
+          "elapsedMs": 441.635291999999
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/mappings/mapping-1b5ff00c32ff74221a68138edd3d7dc3/proposals",
+          "startedAtUtc": "2026-11-21T16:16:51.133Z",
+          "monotonicMs": 18577.721209,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": "e65b91e7-1069-46e8-8c63-22ddc38c30c0",
+          "status": 201,
+          "sha256": "5ede83f4ec84870b2a1f053e5a3705cdc35bf087ad7453107e109e56b2b89599",
+          "finishedAtUtc": "2026-11-21T16:16:51.158Z",
+          "elapsedMs": 25.155791000001045
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/mapping-proposals/proposal-c7e58b62fe234d7282689ae7b23000d5/decisions",
+          "startedAtUtc": "2026-11-21T16:16:51.161Z",
+          "monotonicMs": 18606.022542,
+          "subjectId": "650199ae-8bd4-430a-885d-71cd69b6781e",
+          "commandId": "256fddc2-c7a1-4bfa-a8d9-b7c72d64f0fe",
+          "status": 200,
+          "sha256": "49a8225879716878c4c286562202c7bc895896fe3005a5fbce189e3a150ec09a",
+          "finishedAtUtc": "2026-11-21T16:16:51.181Z",
+          "elapsedMs": 19.69929200000115
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/mapping-proposals/proposal-c7e58b62fe234d7282689ae7b23000d5/activate",
+          "startedAtUtc": "2026-11-21T16:16:51.185Z",
+          "monotonicMs": 18630.613834,
+          "subjectId": "bcf7f7f8-6af0-4f94-a28c-1220461ee62e",
+          "commandId": "8dce917f-0e7a-492d-bfd4-967c80babfbd",
+          "status": 200,
+          "sha256": "644f1b86e3beda26c9e01efb6d180809c91d88f136cc54d77fd3c7d28ca787f8",
+          "finishedAtUtc": "2026-11-21T16:16:52.832Z",
+          "elapsedMs": 1646.831083000001
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mapping-proposals/proposal-c7e58b62fe234d7282689ae7b23000d5",
+          "startedAtUtc": "2026-11-21T16:16:52.835Z",
+          "monotonicMs": 20280.110834,
+          "subjectId": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+          "commandId": null,
+          "status": 200,
+          "sha256": "fddb779ca7a6ce90628596e99a07b2398ac1f737d49c93dee279a75878485029",
+          "finishedAtUtc": "2026-11-21T16:16:53.283Z",
+          "elapsedMs": 448.20066600000064
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/mappings/mapping-1b5ff00c32ff74221a68138edd3d7dc3/active",
+          "startedAtUtc": "2026-11-21T16:16:53.286Z",
+          "monotonicMs": 20731.534709,
+          "subjectId": "bcf7f7f8-6af0-4f94-a28c-1220461ee62e",
+          "commandId": null,
+          "status": 200,
+          "sha256": "83a61b00240692170096f1295cbce60a4a3689b99281f6dee76b84d0039fc84b",
+          "finishedAtUtc": "2026-11-21T16:16:53.744Z",
+          "elapsedMs": 457.55162500000006
+        }
+      ],
+      "approved": {
+        "kind": "ROLLBACK",
+        "targetReleaseId": "release-6d6469e33f744b7c93b8e4d516fca0c4",
+        "manifestHash": "d0eb59af9c4edb517829449c6aca5c82eb5ed0c938806439c86c513301135834",
+        "schemaVersion": "g4.mapping.v1",
+        "proposalId": "proposal-c7e58b62fe234d7282689ae7b23000d5",
+        "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+        "proposalRevision": 2,
+        "scope": {
+          "organizationId": "org-demo",
+          "siteIds": [
+            "site-a"
+          ]
+        },
+        "binding": {
+          "sourceConnectionId": "a7913bb552eb4cd1a3f6eaf5b93cd619",
+          "connectionRevision": 2,
+          "configHash": "e047293c85a023a8e77e4f1bf2a19c026e9956720f2af036dd160a8a939fde8f",
+          "sourceType": "ORACLE",
+          "sourceCatalogSnapshotId": "068c3ce7002b4a56a7589152b988ae0b",
+          "sourceCatalogFingerprint": "c90c6ec62cb66f1e90c05f8cae86210a24b73cbefb1b776db2697a802e47eb02",
+          "ontologyReleaseId": "0272acbf10e9422abac7242328420e51",
+          "ontologyManifestHash": "f990c65d09fb75f9e606fbfae66663556b4940b0d892391f0a53973caa5140cb",
+          "mappingHash": "a6d6a03840a805abdaee71212b655c6ff9d92c4a1596ca0f01605c02969b5af8",
+          "validationHash": "6f4e81d1e02ce19a46ebaa633c4b87ebc4518cdcc071fd01888b6cc707097fa8",
+          "impactHash": "2c596e1755d5e1ae5e4a32ecd8d58d45f3d0c1d27fe7bfb26aa07b61dc05fe25",
+          "assessmentId": "ma-5374d51b14af4908b0dcfdf87ae18941",
+          "adapterVersion": "oracle-mapping-v1",
+          "executorVersion": "oracle-mapping-validator-v1",
+          "canonicalVersion": "mapping-c14n-v1",
+          "secretVersion": 1,
+          "authorizationEpoch": 121
+        },
+        "expectedActive": {
+          "releaseId": "release-e58fb5ef17374c76bce717eb547f7b86",
+          "activationRevision": 2
+        },
+        "submittedBy": "5af20722-3900-4de9-b23a-7dcae3ca5927",
+        "submittedAtUtc": "2026-11-21T16:16:51.1445490Z",
+        "expiresAtUtc": "2026-11-21T16:31:49.7399350Z",
+        "status": "APPROVED",
+        "decision": {
+          "decidedBy": "650199ae-8bd4-430a-885d-71cd69b6781e",
+          "decidedAtUtc": "2026-11-21T16:16:51.1765490Z",
+          "decision": "APPROVE",
+          "reason": "Approved d368 normal mapping rollback",
+          "bindingHash": "3b244c1e4cdb2da92634bae820e2a2206544d8cd53161ade74ab7a6d723cb2a2"
+        },
+        "bindingHash": "3b244c1e4cdb2da92634bae820e2a2206544d8cd53161ade74ab7a6d723cb2a2",
+        "activation": null
+      },
+      "operation": "05ea4538c0934951b200728ee739ce60",
+      "chain": {
+        "current": [
+          "activation-d2dcec9ef54c4f3bb96d60cab449580b",
+          3,
+          "release-6d6469e33f744b7c93b8e4d516fca0c4"
+        ],
+        "receipts": [
+          {
+            "receipt": {
+              "activatedAtUtc": "2026-11-20T22:57:18.9893788Z",
+              "activationId": "activation-21dc91af5df24e9aaa7345b46258ad78",
+              "activationRevision": 1,
+              "auditId": "9019b3a4ea454e298cca1a476fdb22e4",
+              "kind": "PUBLISH",
+              "manifestHash": "d0eb59af9c4edb517829449c6aca5c82eb5ed0c938806439c86c513301135834",
+              "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+              "mappingReleaseId": "release-6d6469e33f744b7c93b8e4d516fca0c4",
+              "outboxEventId": "event-dd348bc9821c481ca59be7dfbb2122db",
+              "previousReleaseId": null,
+              "proposalId": "proposal-d028b01d93c548c987c9ca3c9b2cf916"
+            },
+            "connection": "a7913bb552eb4cd1a3f6eaf5b93cd619",
+            "catalog": "068c3ce7002b4a56a7589152b988ae0b",
+            "fingerprint": "c90c6ec62cb66f1e90c05f8cae86210a24b73cbefb1b776db2697a802e47eb02",
+            "check": "check-ece8e7e355b048bc9595ba5e2b3172ee",
+            "command": "32b9042b-06ec-4de5-8532-04341efc35f4"
+          },
+          {
+            "receipt": {
+              "activatedAtUtc": "2026-11-21T13:52:19.4744354Z",
+              "activationId": "activation-4baaba317e3d486ca1a9e996ed79e27c",
+              "activationRevision": 2,
+              "auditId": "fb8ae998316b459780383770c722eb7a",
+              "kind": "PUBLISH",
+              "manifestHash": "0805494841e5964e3b30ce3895bcbc074801547ff605faa6ca69054ffe8d11ed",
+              "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+              "mappingReleaseId": "release-e58fb5ef17374c76bce717eb547f7b86",
+              "outboxEventId": "event-4e389c5adc684f83a444f86e4b1925e0",
+              "previousReleaseId": "release-6d6469e33f744b7c93b8e4d516fca0c4",
+              "proposalId": "proposal-7cbb5f23527547b38987d52f0c32e6f6"
+            },
+            "connection": "a7913bb552eb4cd1a3f6eaf5b93cd619",
+            "catalog": "068c3ce7002b4a56a7589152b988ae0b",
+            "fingerprint": "c90c6ec62cb66f1e90c05f8cae86210a24b73cbefb1b776db2697a802e47eb02",
+            "check": "check-80e996c3dd834635b817da4b65bca8c7",
+            "command": "8e99ce13-48f3-4969-a58f-cf795d66fadc"
+          },
+          {
+            "receipt": {
+              "activatedAtUtc": "2026-11-21T16:16:52.8198980Z",
+              "activationId": "activation-d2dcec9ef54c4f3bb96d60cab449580b",
+              "activationRevision": 3,
+              "auditId": "79782bd72d4c42e1bc9fcfd25c4f2ea7",
+              "kind": "ROLLBACK",
+              "manifestHash": "d0eb59af9c4edb517829449c6aca5c82eb5ed0c938806439c86c513301135834",
+              "mappingId": "mapping-1b5ff00c32ff74221a68138edd3d7dc3",
+              "mappingReleaseId": "release-6d6469e33f744b7c93b8e4d516fca0c4",
+              "outboxEventId": "event-4f9d6c95409f4a879b2ec48633c98d7c",
+              "previousReleaseId": "release-e58fb5ef17374c76bce717eb547f7b86",
+              "proposalId": "proposal-c7e58b62fe234d7282689ae7b23000d5"
+            },
+            "connection": "a7913bb552eb4cd1a3f6eaf5b93cd619",
+            "catalog": "068c3ce7002b4a56a7589152b988ae0b",
+            "fingerprint": "c90c6ec62cb66f1e90c05f8cae86210a24b73cbefb1b776db2697a802e47eb02",
+            "check": "check-1f6a77cff283465ab4143e5e87790d64",
+            "command": "8dce917f-0e7a-492d-bfd4-967c80babfbd"
+          }
+        ]
+      },
+      "entryCommand": "889253f46095449488e86338a9042a81",
+      "currentPrefixCommand": "34de8c4335f94f97b6eac73f32fbf3e3",
+      "sourceReads": "NOT_MEASURED_SEPARATELY; ordinary mapping recovery, excluded from original Q audit count",
+      "freshTimingContext": "ordinary HTTP recovery after the old Q terminated; includes browser request and driver overhead"
+    },
+    "grantCheckpoint": {
+      "firstObservation": {
+        "clock": 1795276763.868002,
+        "epoch": 121,
+        "rows": 90,
+        "minRemainingSeconds": 6743.490462064743
+      },
+      "normalRecovery": {
         "requiredSeconds": 1710,
-        "minRemainingSeconds": 14399.945354938507,
+        "remainingSeconds": 5705.120837926865,
+        "beforeEpoch": 121,
+        "afterEpoch": 121,
+        "beforeRowsSha256": "4250c382f18fa104b5cd9c63b2ee31e76e92b7724436d69dfa4783b0483ea7f3",
+        "afterRowsSha256": "4250c382f18fa104b5cd9c63b2ee31e76e92b7724436d69dfa4783b0483ea7f3",
+        "beforeCommand": "27021cb32f214bd38f1377b0ad880f54",
+        "afterCommand": "e69f8293416349a5ad9e327d835cfe6a",
         "combinedGrantIds": {
           "operator:mapping.source.validate": "omq-s23-7d9e02a723a5fbd46dd66181052e5a2b",
           "auditor:mapping.source.validate": "omq-s23-3fa532f9ce8ed43a2dea2eec10572491",
@@ -334,177 +821,502 @@
           "omq-s23-0950b3c0d5294b6e2c0303f88c29c05d",
           "omq-s23-71b6e7175b0fb42bc902b639c2dee5fb"
         ],
-        "issued": [
-          {
-            "id": "omq-s23-7d9e02a723a5fbd46dd66181052e5a2b",
-            "role": "operator",
-            "operation": "mapping.source.validate",
-            "kind": "COMBINED",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-3fa532f9ce8ed43a2dea2eec10572491",
-            "role": "auditor",
-            "operation": "mapping.source.validate",
-            "kind": "COMBINED",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-0c9f3183a29d8d824424d3a6ebd7ebba",
-            "role": "activator",
-            "operation": "mapping.source.validate",
-            "kind": "COMBINED",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-db0e9654edd48abd5c8925af01f69b30",
-            "role": "reader",
-            "operation": "data.query.execute",
-            "kind": "COMBINED",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-6131600cdf4aaa4e419f750781f0098e",
-            "role": "reader",
-            "operation": "data.query.result.read",
-            "kind": "COMBINED",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-f6d060343b4dce0cf6f3e0df3dfada84",
-            "role": "reader",
-            "operation": "data.query.evidence.read",
-            "kind": "COMBINED",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-7ee998b80d92ab32836df0ae404d1c90",
-            "role": "operator",
-            "operation": "mapping.read",
-            "kind": "WORKFLOW",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-ee7e6c76bb1c9715c568b424ab02dfe6",
-            "role": "operator",
-            "operation": "mapping.edit",
-            "kind": "WORKFLOW",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-c2bd3b20dad72b5b511563152a67f0fe",
-            "role": "operator",
-            "operation": "mapping.validate",
-            "kind": "WORKFLOW",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-f5297d3bd2534dca0d33ecb50a8b9969",
-            "role": "operator",
-            "operation": "mapping.submit",
-            "kind": "WORKFLOW",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-4aee8d6f61ab10d90d60875f787bb56c",
-            "role": "auditor",
-            "operation": "mapping.read",
-            "kind": "WORKFLOW",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-9659ecb7c4425abd3047445f85d68af0",
-            "role": "auditor",
-            "operation": "mapping.review",
-            "kind": "WORKFLOW",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-a0ade748f6848fd59be7215120bd598d",
-            "role": "auditor",
-            "operation": "mapping.approve",
-            "kind": "WORKFLOW",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-0950b3c0d5294b6e2c0303f88c29c05d",
-            "role": "activator",
-            "operation": "mapping.read",
-            "kind": "WORKFLOW",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          },
-          {
-            "id": "omq-s23-71b6e7175b0fb42bc902b639c2dee5fb",
-            "role": "activator",
-            "operation": "mapping.activate",
-            "kind": "WORKFLOW",
-            "expiresAtUtc": "2026-11-21T17:51:47.358464+00:00"
-          }
-        ]
+        "issued": []
       },
-      "aba": {
-        "queryId": "query-d368ac610c7745889890e1589653af8f",
-        "seedQueryId": "query-a3b2eaa370fe4f8193d3d2ac817f6f7b",
-        "command": "5b90bb8f66fb4ddd9bfeddbe5015133a",
-        "exitCode": 2,
-        "status": "FAIL",
-        "afterRealReadAtUtc": "2026-11-21T13:52:18.3722077+00:00",
-        "deadlineAtUtc": "2026-11-21T13:52:21.635112+00:00",
-        "rollbackValidatedAtUtc": "2026-11-21T13:52:21.3386383+00:00",
-        "events": [
+      "oldRows": 75,
+      "acceptedRows": 90,
+      "rowsAfter": 90,
+      "secondAppendCovered": "offline committed-interruption recovery scenarios only"
+    },
+    "engineering": {
+      "measured": "55107958b2e26547dd1f040800c9188d7443601d",
+      "checkoutBytes": 791715840,
+      "commands": {
+        "plan": {
+          "commandId": "90fe7794514d44ff88c65405fb4f8dba",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "elapsedSeconds": 28.11182191700209,
+          "stdout": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/90fe7794514d44ff88c65405fb4f8dba/stdout.txt",
+            "sha256": "e1858fce45dde6c4660c859baa51989d85f46966f0b236c8759e12327c8714fe",
+            "sizeBytes": 4832
+          },
+          "stderr": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/90fe7794514d44ff88c65405fb4f8dba/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          },
+          "selected": [
+            "backend",
+            "engineering",
+            "interaction",
+            "oracle-task-admission",
+            "policy"
+          ],
+          "keys": [
+            "schemaVersion",
+            "base",
+            "head",
+            "paths",
+            "registrySha256",
+            "inputKeys",
+            "earlyMeasurements",
+            "status",
+            "affected",
+            "unknown",
+            "unaffected"
+          ]
+        },
+        "verify": {
+          "commandId": "33382939ecce4e7984fff5761f0c8249",
+          "exitCode": 2,
+          "classification": "EXIT_FAILURE",
+          "elapsedSeconds": 34.79016870800115,
+          "stdout": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/33382939ecce4e7984fff5761f0c8249/stdout.txt",
+            "sha256": "5a294962a37362ccdb99831ba2d6a0fa1a2e9aa1c3f5eb6fc046439aff37b587",
+            "sizeBytes": 1300
+          },
+          "stderr": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/33382939ecce4e7984fff5761f0c8249/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          },
+          "gates": [
+            {
+              "gate": "backend",
+              "tests": 0,
+              "skipped": 0,
+              "status": "FAIL",
+              "exitCode": 1,
+              "executionMode": "REUSED"
+            }
+          ],
+          "status": "BLOCKED",
+          "keys": [
+            "status",
+            "coverage",
+            "checks"
+          ]
+        },
+        "independent-oracle-task-admission": {
+          "commandId": "32a95b8aa28745a3bee48b17063f28ab",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "elapsedSeconds": 16.94801487500081,
+          "stdout": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/32a95b8aa28745a3bee48b17063f28ab/stdout.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          },
+          "stderr": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/32a95b8aa28745a3bee48b17063f28ab/stderr.txt",
+            "sha256": "3f15f94120ac6914b4968cb32f3f58b8f7edc76102acf11d60383d8087055afc",
+            "sizeBytes": 246
+          }
+        },
+        "independent-policy": {
+          "commandId": "5f10f7d5cd1c4b5d994c9bef9da02922",
+          "exitCode": 1,
+          "classification": "EXIT_FAILURE",
+          "elapsedSeconds": 12.629722124998807,
+          "stdout": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5f10f7d5cd1c4b5d994c9bef9da02922/stdout.txt",
+            "sha256": "e8ddcc7babded49d1dc74ddc84c7fc6ea293d9316b4206a870bd928380ddb4aa",
+            "sizeBytes": 362
+          },
+          "stderr": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5f10f7d5cd1c4b5d994c9bef9da02922/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "independent-engineering": {
+          "commandId": "8be2e338e2014ca5a3ec77f121345a94",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "elapsedSeconds": 10.537247666012263,
+          "stdout": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8be2e338e2014ca5a3ec77f121345a94/stdout.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          },
+          "stderr": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8be2e338e2014ca5a3ec77f121345a94/stderr.txt",
+            "sha256": "1140be31b83b485ec8acc2d5be2765b0b4b2e6c973cbeec7acf6b47320bb5017",
+            "sizeBytes": 129
+          }
+        },
+        "policy-with-parser": {
+          "commandId": "9eecc8df84b546f283aea4beaab2d23d",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "elapsedSeconds": 12.605644707989995,
+          "stdout": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/9eecc8df84b546f283aea4beaab2d23d/stdout.txt",
+            "sha256": "cf6cdbab3cd5641d9a449cc7416ef1df2ec294fa458f8c37655a7f246c26d5d1",
+            "sizeBytes": 688
+          },
+          "stderr": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/9eecc8df84b546f283aea4beaab2d23d/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          },
+          "parserFiles": 26
+        }
+      },
+      "targetedChecks": {
+        "structural": {
+          "commandId": "8e77fcf5ef284e19a00fe351ed7c7576",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "elapsedSeconds": 0.13246087500010617,
+          "stdout": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8e77fcf5ef284e19a00fe351ed7c7576/stdout.txt",
+            "sha256": "e3acc255c0e3479518c30f6407f54dada8b6dc99ed9b42a229548fc87d05896d",
+            "sizeBytes": 4150
+          },
+          "stderr": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8e77fcf5ef284e19a00fe351ed7c7576/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "js": {
+          "commandId": "3c15781187c94e4c83c4702f4ca506ac",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "elapsedSeconds": 1.4377213749976363,
+          "stdout": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/3c15781187c94e4c83c4702f4ca506ac/stdout.txt",
+            "sha256": "be1ff5f47532eea0ed3af4e1591e4dddb598ba5f08ee37d322aaf0ba8138024c",
+            "sizeBytes": 1175
+          },
+          "stderr": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/3c15781187c94e4c83c4702f4ca506ac/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "originals": {
+          "commandId": "005fe244f92b4af09795a3008dba8b44",
+          "exitCode": 0,
+          "classification": "SUCCESS",
+          "elapsedSeconds": 12.130731375000323,
+          "stdout": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/005fe244f92b4af09795a3008dba8b44/stdout.txt",
+            "sha256": "171f4b826111d13a132ca98b01feeaf88ba7043e978b2d2fdde296e7342d8a4c",
+            "sizeBytes": 329
+          },
+          "stderr": {
+            "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/005fe244f92b4af09795a3008dba8b44/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        }
+      },
+      "isolatedPG": {
+        "snapshot": "bdfe009b114fa2d356b3c19e4118bb5eaddf8717be88b6b837be4e6a1c0c6afb",
+        "queryBuild": "28b4ef736f3a4b3da47969857b6e3171",
+        "inputKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243",
+        "dispatcherSha256": "f0210e43ec6c91968c20e44ab3d42502ef2271b642025368203e89796fd5547e",
+        "groups": [
           {
-            "phase": "SOURCE_READ_COMPLETED",
-            "sequence": 1,
-            "utc": "2026-11-21T13:52:18.37227+00:00",
-            "monotonicMs": 1738.2209
+            "method": "G4OracleSettlementTests.OriginalCutoffIsCheckedAfterPostgresRowLock",
+            "total": 3,
+            "succeeded": 3,
+            "failed": 0,
+            "skipped": 0,
+            "commandId": "2090eb07171444da99aa26d106712fe3"
           },
           {
-            "phase": "B_ACTIVATED",
-            "sequence": 2,
-            "utc": "2026-11-21T13:52:19.5006019+00:00",
-            "monotonicMs": 2866.5528
+            "method": "G4QueryRaceTests.HealthyReaderThenPostgresRace",
+            "total": 13,
+            "succeeded": 13,
+            "failed": 0,
+            "skipped": 0,
+            "commandId": "5e5bf4d1a1a545518d884edd21fb329a"
           },
           {
-            "phase": "COMMIT_REJECTED",
-            "sequence": 3,
-            "utc": "2026-11-21T13:52:21.6423091+00:00",
-            "monotonicMs": 5008.2599
+            "method": "G4QueryRaceTests.OracleTerminalOwnerSurvivesSweepAndRejectsStaleConfirmation",
+            "total": 1,
+            "succeeded": 1,
+            "failed": 0,
+            "skipped": 0,
+            "commandId": "5baa24247b8546f183d54c00ef4c4320"
+          },
+          {
+            "method": "G4QueryRaceTests.RevocationBlocksAtomicResultAndAudit",
+            "total": 1,
+            "succeeded": 1,
+            "failed": 0,
+            "skipped": 0,
+            "commandId": "eea0f5acde06472781ffe506cf415783"
           }
         ],
-        "abaCompleted": false,
-        "capturedRevision": 1,
-        "activatedRevision": 2,
-        "responseSource": "SemanticGateway / SemanticOperationException.Status",
-        "responseStatus": 503,
-        "responseCode": "query_timeout",
-        "durationMs": 5008.2652,
-        "zeroSuccessfulSideEffects": "NOT_VERIFIED",
-        "successor": "NOT_ADMITTED",
-        "post": {
-          "executionStatus": "FAILED",
-          "ownerPresent": true,
-          "fence": 2,
-          "leaseUntilUtc": "2026-11-21T13:52:21.635112+00:00",
-          "deadlineAtUtc": "2026-11-21T13:52:21.635112+00:00",
-          "observedUtc": "2026-11-21T13:52:25.441351+00:00"
+        "databaseReleased": true,
+        "cleanupErrors": []
+      },
+      "blockedGateReason": "backend → implementation-01/s0/qualification.json → OMQ_ORIGINALS_NOT_RUN_s0 (exit 1); verify exit 2, interaction NOT_RUN"
+    },
+    "builds": {
+      "backendKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243",
+      "prepareCommand": "4cfa51db382b49609a9670cd64e21820",
+      "prepare": {
+        "status": "DEPENDENCIES_READY",
+        "contentKey": "d6d909b8cad6e0c13389a3323def278aa77870bbca92689ade15af303daafb43",
+        "downloads": 0,
+        "sdkDownloads": 0,
+        "restoreCount": 0,
+        "materializedFiles": 0,
+        "runDirectory": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/environment/d6d909b8cad6e0c13389a3323def278aa77870bbca92689ade15af303daafb43/runs/d908ee8d2cc84a15908029e321e43f1d"
+      },
+      "stages": {
+        "api": {
+          "before": "299f5e7730f64cab92bbeaad86d18101",
+          "after": "6201938df1c747e3ba07e72c66e62358",
+          "result": {
+            "target": "api",
+            "status": "PASS",
+            "exitCode": 0,
+            "elapsedSeconds": 10.257094500004314,
+            "inputKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243"
+          },
+          "snapshotId": "f50da68c632307d265d31ca5895f2a97344076f878886e082842d7dd8e4710b6",
+          "commandId": "baf431eb7fb04e3ca790dbbd6b27c22b",
+          "files": 99
         },
-        "postCommand": "b2e6bcb2dc554a0495b086db67e98c66"
-      }
+        "agent": {
+          "before": "ce78a943e5794c14b4cb4b12fac9674b",
+          "after": "cbaa1b764ce844e39efec180bef08950",
+          "result": {
+            "target": "agent",
+            "status": "PASS",
+            "exitCode": 0,
+            "elapsedSeconds": 2.8275905000045896,
+            "inputKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243"
+          },
+          "snapshotId": "d3b47477e17b5e37d956bf22d10cad52d1443282c280ed7f077a68a3979cec36",
+          "commandId": "dc4969af41e544e2aaf81ef6e2007c23",
+          "files": 222
+        },
+        "query": {
+          "before": "d9a77d355c544d04854e50fcdfac926b",
+          "after": "9f118c419bc548b39565b881fc558c12",
+          "result": {
+            "target": "query",
+            "status": "PASS",
+            "exitCode": 0,
+            "elapsedSeconds": 2.9341131250112085,
+            "inputKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243"
+          },
+          "snapshotId": "bdfe009b114fa2d356b3c19e4118bb5eaddf8717be88b6b837be4e6a1c0c6afb",
+          "commandId": "28b4ef736f3a4b3da47969857b6e3171",
+          "files": 222
+        }
+      },
+      "hostTransition": {
+        "status": "CURRENT_RUNTIME_GENERATION",
+        "closeSha256": "d1befd6fdf7cc5b531ab04e6802e460e947a804863d9f99bc9fafa42ba1aaf05",
+        "oldHost": "cba3d44f0e7843d09323b4f83bd5e51b",
+        "host": "a8c4f2d06f144f0385714fb55e1d9c43",
+        "builds": {
+          "api": {
+            "snapshotId": "f50da68c632307d265d31ca5895f2a97344076f878886e082842d7dd8e4710b6",
+            "directory": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/runtime-snapshots/f50da68c632307d265d31ca5895f2a97344076f878886e082842d7dd8e4710b6",
+            "build": {
+              "receiptSha256": "c8d8980552dff7b28db4d64c909a7a03b6a46ea699730b3cc9a030e3d1635ab5",
+              "inputKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243",
+              "outputKey": "a56fcdcd2cfa774d20c8136a9a9e64bacc504de7f147a7de9824694b7ff7d5f5"
+            },
+            "commandId": "baf431eb7fb04e3ca790dbbd6b27c22b"
+          },
+          "agent": {
+            "snapshotId": "d3b47477e17b5e37d956bf22d10cad52d1443282c280ed7f077a68a3979cec36",
+            "directory": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/runtime-snapshots/d3b47477e17b5e37d956bf22d10cad52d1443282c280ed7f077a68a3979cec36",
+            "build": {
+              "receiptSha256": "d8be3fc9fd1b8b70892f9c3f0d4f0ac918afdd588a5adfa79286e4d2047c8d56",
+              "inputKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243",
+              "outputKey": "ac48e99a84cf5e4aeda82fb888e1722a8a6ca2032656639f8389174c0b166ed9"
+            },
+            "commandId": "dc4969af41e544e2aaf81ef6e2007c23"
+          },
+          "query": {
+            "snapshotId": "bdfe009b114fa2d356b3c19e4118bb5eaddf8717be88b6b837be4e6a1c0c6afb",
+            "directory": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/runtime-snapshots/bdfe009b114fa2d356b3c19e4118bb5eaddf8717be88b6b837be4e6a1c0c6afb",
+            "build": {
+              "receiptSha256": "f014c8969cf3fb4ba2eb35027ff1aefc65c79a763a0a706c6a419faeba68fef1",
+              "inputKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243",
+              "outputKey": "b141356b8598f14a786d21b2f5a4b7b8072fca84fd556384e248b49c50cccf5d"
+            },
+            "commandId": "28b4ef736f3a4b3da47969857b6e3171"
+          }
+        },
+        "stoppedRoles": [
+          "api",
+          "api-secondary",
+          "fuseki",
+          "keycloak-test",
+          "oracle",
+          "platform-pg",
+          "rustfs"
+        ],
+        "maintenance": [
+          {
+            "operation": "9386ea708d6842ae9117780bdd4413dd",
+            "finishedAt": {
+              "platform-pg": "2026-11-21T15:59:34.996042011Z",
+              "oracle": "2026-11-21T15:59:31.006915175Z"
+            }
+          }
+        ],
+        "buildTransition": {
+          "status": "REBUILT",
+          "previous": {
+            "api": {
+              "snapshotId": "56622dd7817267cdc53e47afa0751c40073220d07537ac52b34748e42bcfa995",
+              "directory": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/runtime-snapshots/56622dd7817267cdc53e47afa0751c40073220d07537ac52b34748e42bcfa995",
+              "build": {
+                "receiptSha256": "beda539f3d5ead84307aaa3351afdc202e1fb6cbc86879e76d4c2f1987508106",
+                "inputKey": "df12e77a94af917c4d11ecaea1c0786b17904661139a2bae80223d6a66835e74",
+                "outputKey": "4b31784becec0eb27214dcd9ac50e1d603769c0bb8683e65a051a45bb2a27bc5"
+              },
+              "commandId": "ffc5b3955de3412ba3c8e555b43e5fc1"
+            },
+            "agent": {
+              "snapshotId": "aacf1a129297f02cb578c3fc2e9fb8033517407250cb6bf6f518aa6b79b9b302",
+              "directory": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/runtime-snapshots/aacf1a129297f02cb578c3fc2e9fb8033517407250cb6bf6f518aa6b79b9b302",
+              "build": {
+                "receiptSha256": "885b95439f4f27879d60501cfdc934919ef3d9d4a8fbb66f201db1bb2581211c",
+                "inputKey": "df12e77a94af917c4d11ecaea1c0786b17904661139a2bae80223d6a66835e74",
+                "outputKey": "626b5cdfaba4f98e8c78bd3174f665a1a83ad410a250a2acc55a91f3b782557e"
+              },
+              "commandId": "4e984112a99a4a83a31581a65647721b"
+            },
+            "query": {
+              "snapshotId": "e1f8d7ffe780022cac1e0a6030f1c6a8634388e2a8bd6781459ba78002bb36a5",
+              "directory": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/runtime-snapshots/e1f8d7ffe780022cac1e0a6030f1c6a8634388e2a8bd6781459ba78002bb36a5",
+              "build": {
+                "receiptSha256": "e06027b64042f23cc1a6567af15818e8e4b80de5969399efdb408887fca5994c",
+                "inputKey": "df12e77a94af917c4d11ecaea1c0786b17904661139a2bae80223d6a66835e74",
+                "outputKey": "d7471252e51b2d47f232424aa39852bbf30cd8db1e375f4356025da3306d3aec"
+              },
+              "commandId": "842e6fb68241490d9632240870c303f6"
+            }
+          },
+          "current": {
+            "api": {
+              "snapshotId": "f50da68c632307d265d31ca5895f2a97344076f878886e082842d7dd8e4710b6",
+              "directory": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/runtime-snapshots/f50da68c632307d265d31ca5895f2a97344076f878886e082842d7dd8e4710b6",
+              "build": {
+                "receiptSha256": "c8d8980552dff7b28db4d64c909a7a03b6a46ea699730b3cc9a030e3d1635ab5",
+                "inputKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243",
+                "outputKey": "a56fcdcd2cfa774d20c8136a9a9e64bacc504de7f147a7de9824694b7ff7d5f5"
+              },
+              "commandId": "baf431eb7fb04e3ca790dbbd6b27c22b"
+            },
+            "agent": {
+              "snapshotId": "d3b47477e17b5e37d956bf22d10cad52d1443282c280ed7f077a68a3979cec36",
+              "directory": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/runtime-snapshots/d3b47477e17b5e37d956bf22d10cad52d1443282c280ed7f077a68a3979cec36",
+              "build": {
+                "receiptSha256": "d8be3fc9fd1b8b70892f9c3f0d4f0ac918afdd588a5adfa79286e4d2047c8d56",
+                "inputKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243",
+                "outputKey": "ac48e99a84cf5e4aeda82fb888e1722a8a6ca2032656639f8389174c0b166ed9"
+              },
+              "commandId": "dc4969af41e544e2aaf81ef6e2007c23"
+            },
+            "query": {
+              "snapshotId": "bdfe009b114fa2d356b3c19e4118bb5eaddf8717be88b6b837be4e6a1c0c6afb",
+              "directory": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/runtime-snapshots/bdfe009b114fa2d356b3c19e4118bb5eaddf8717be88b6b837be4e6a1c0c6afb",
+              "build": {
+                "receiptSha256": "f014c8969cf3fb4ba2eb35027ff1aefc65c79a763a0a706c6a419faeba68fef1",
+                "inputKey": "fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243",
+                "outputKey": "b141356b8598f14a786d21b2f5a4b7b8072fca84fd556384e248b49c50cccf5d"
+              },
+              "commandId": "28b4ef736f3a4b3da47969857b6e3171"
+            }
+          }
+        }
+      },
+      "observedHost": "a8c4f2d06f144f0385714fb55e1d9c43"
+    },
+    "closureRegistration": {
+      "kind": "MAPPING_RESTORE",
+      "operation": "05ea4538c0934951b200728ee739ce60",
+      "sha256": "21d6d0cff882452f4e810c28e59e82418fbb31a30ea9c40d74849f29dc48776e",
+      "sizeBytes": 15812,
+      "previousSha256": "d1befd6fdf7cc5b531ab04e6802e460e947a804863d9f99bc9fafa42ba1aaf05",
+      "hostId": "a8c4f2d06f144f0385714fb55e1d9c43",
+      "memberCount": 119,
+      "memberIndexSha256": "b489e3c2d09c3088370ec5466426533082d459d876138dc50f6d905800ab0225"
     },
     "resources": {
-      "operation": "9b81d52b3b7041ecb7b8530198d77ccd",
-      "windowId": "1f5e1a017b154a71b67b6229f166ac37",
-      "priorClose": "330c11744f364d1187332e0d93801098",
-      "ceilingBytes": 51539607552,
-      "coldAttempt": "40945a6287f04bcfac3d5fea08440d98",
-      "coldBytes": 42906714558,
-      "postAttempt": "044ea783d35945b2997a8d1c1668b971",
-      "postBytes": 42930794942,
-      "chargedPeakBytes": 42923897278,
-      "sampleCount": 8,
+      "cold": "38bc554fbcb64f669a23d0a9aa909e42",
+      "post": "c373ef49bf644a59a988ca7dba07145a",
+      "closed": {
+        "api": "13334bdff8a1aa12ed0802a4d4347c4313507d27d4b6ea40aef40eb5fad8764e",
+        "api-secondary": "8ddd043569c7c62c07b56f2886b4bc0803e06096f4b3bd214c7a94888e087921",
+        "oracle": {
+          "id": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-21T16:17:21.456065129Z"
+          },
+          "resourceAttempt": "775948d7dc76469f9db86b80228e07ab"
+        },
+        "rustfs": {
+          "id": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-21T16:17:25.519001423Z"
+          },
+          "resourceAttempt": "f5d5035406b74dbc965804f09daeb590"
+        },
+        "keycloak-test": {
+          "id": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-21T16:17:30.597854925Z"
+          },
+          "resourceAttempt": "cbf55506cd51478faa49efcd764083cc"
+        },
+        "fuseki": {
+          "id": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
+          "status": "PROCESS_EXITED",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-21T16:17:35.140404969Z"
+          },
+          "cleanShutdown": "UNKNOWN",
+          "resourceAttempt": "87fe73b81fec4de09512cb0345e35246"
+        },
+        "platform-pg": {
+          "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-21T16:17:43.241198167Z"
+          },
+          "resourceAttempt": "858088d0fd5141a2ba4842fbe24ce274"
+        }
+      },
       "drain": {
         "before": {
-          "commandId": "8eeacc62d40947b195e53815a84ab837",
+          "commandId": "1f0bfd96a5454390ae1c598a6cad673a",
           "values": [
             0,
             0,
@@ -516,7 +1328,7 @@
           ]
         },
         "after": {
-          "commandId": "0486285925cd4d82aeccc68aaf462b29",
+          "commandId": "263b352807da4a998ea67434974f39db",
           "values": [
             0,
             0,
@@ -528,193 +1340,37 @@
           ]
         }
       },
-      "closed": {
-        "api": "812b1453ab91b9b991528166134c29fc52eee29b7517ee6cb6cdffea5487a2b8",
-        "api-secondary": "76b0546d4f4010d7e346e77339f2a659ea4dbc286353b5055314d3d4957c4110",
-        "oracle": {
-          "id": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
-          "status": "CLEAN_STOP",
-          "after": {
-            "Status": "exited",
-            "ExitCode": 143,
-            "OOMKilled": false,
-            "FinishedAt": "2026-11-21T13:52:47.119332336Z"
-          },
-          "resourceAttempt": "bad7eed2b4334b7b8f11db3dc1e57773"
-        },
-        "rustfs": {
-          "id": "65a98692a6340cd29d2680fff981c6c81c764b7af96320a7945725ca5eb650be",
-          "status": "CLEAN_STOP",
-          "after": {
-            "Status": "exited",
-            "ExitCode": 0,
-            "OOMKilled": false,
-            "FinishedAt": "2026-11-21T13:52:51.053424047Z"
-          },
-          "resourceAttempt": "fa7e055123064b8496308dd00dc5de82"
-        },
-        "keycloak-test": {
-          "id": "27d6b6df9ad1ce713cf5943f865beeda86eab1ea8ea2c483bb6f008e35415af1",
-          "status": "CLEAN_STOP",
-          "after": {
-            "Status": "exited",
-            "ExitCode": 143,
-            "OOMKilled": false,
-            "FinishedAt": "2026-11-21T13:52:56.091531716Z"
-          },
-          "resourceAttempt": "3097d4fd2046409a9463add69c82038f"
-        },
-        "fuseki": {
-          "id": "52f84c336a3ade30341a3e20fbda302677fd77ea5a71237b801e3dc5b508d9a6",
-          "status": "PROCESS_EXITED",
-          "after": {
-            "Status": "exited",
-            "ExitCode": 143,
-            "OOMKilled": false,
-            "FinishedAt": "2026-11-21T13:53:00.495433676Z"
-          },
-          "cleanShutdown": "UNKNOWN",
-          "resourceAttempt": "5cd964ee46c6440ba520b435d5a81cdc"
-        },
-        "platform-pg": {
-          "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
-          "status": "CLEAN_STOP",
-          "after": {
-            "Status": "exited",
-            "ExitCode": 0,
-            "OOMKilled": false,
-            "FinishedAt": "2026-11-21T13:53:08.427860263Z"
-          },
-          "resourceAttempt": "3f9b8d83b6ec40239f47db213e8bdc97"
-        }
-      },
-      "remaining": [],
       "protectedSame": true,
-      "heartbeat": {
-        "displayOff": "NOT_VERIFIED",
-        "endedAtUtc": "2026-11-21T13:53:20.002386+00:00",
-        "heartbeatCount": 45,
-        "lockedDisplayOffHeartbeatCount": 0,
-        "lockedHeartbeatCount": 0,
-        "maxHeartbeatGapMs": 5077,
-        "measuredElapsedMs": 221891,
-        "ownerPid": 70887,
-        "policyContinuouslyReady": true,
-        "schemaVersion": 1,
-        "sessionContinuity": "NOT_VERIFIED",
-        "sleep": {
-          "confirmedSleepMs": 0,
-          "events": [],
-          "limitation": "只计日志可确认的Sleep至Wake/DarkWake区间；无事件不证明未知窗口从未睡眠。",
-          "status": "OBSERVED_LOG_WINDOW"
-        },
-        "startedAtUtc": "2026-11-21T13:49:38.110597+00:00",
-        "stoppedBySignal": true,
-        "taskId": "G4-ORACLE-MAPPING-QUERY-001"
+      "remaining": [],
+      "windowId": "072d21b9dd5149abb97a0ed9ac92c6a5",
+      "exitCode": 0,
+      "window": {
+        "state": "CLOSED",
+        "openingBytes": 43004441022,
+        "ceiling": 51539607552,
+        "checkoutReserve": 1073741824,
+        "runReserve": 2147483648,
+        "exitReserve": 4294967296
       },
-      "closureCommands": {
-        "api": {
-          "resume-api-term": "e88ff496f608473a87faeb491c3bc08a",
-          "resume-api-exit": "8aacab1b914645f589d44482be6e1fb4",
-          "resume-remove-stateless": "3f08f08c4a3740d8a16350c3be92e6ab"
-        },
-        "api-secondary": {
-          "resume-api-term": "b292c89e3bac45fd8bdbce9553402139",
-          "resume-api-exit": "12820080452149ac8df6eae4c9877f10",
-          "resume-remove-stateless": "7c4c8402ad944f5da3e3e12267412638"
-        },
-        "oracle": {
-          "omq-recovery-term": "55363bb8e67f4fed9a899716b1011f3a",
-          "omq-recovery-oracle-shutdown": "1fed01a16b5447bfa1ed0efe1229692f",
-          "omq-recovery-oracle-zero": "d717ee1bbe9240e2827a9efc47b468a5",
-          "omq-recovery-stopped-state": "94eaf05970dd4f558bbc45577f5ec887"
-        },
-        "keycloak-test": {
-          "omq-recovery-term": "0b79ce522b8744c99c79cc8c4ee0bbca",
-          "omq-recovery-stopped-state": "160e931d439048bd957e03d30b32dd69"
-        },
-        "fuseki": {
-          "omq-recovery-tdb-closed-execute": "ac4172f59f3d40519ba0af85ae080fd0",
-          "omq-recovery-stopped-state": "4373789a16a048009d991cd6f1966fc1",
-          "omq-recovery-term": "0645f75687c0433ca8d303b9e2ac3f15"
-        },
-        "platform-pg": {
-          "omq-recovery-pg-fast": "4c4c0a2092dd42e085ff1bc56ee7add2",
-          "omq-recovery-pg-control-execute": "080b0198352f4140a537c755943e48cf",
-          "omq-recovery-stopped-state": "8b1ea5dc0c54464c8b26a603c4e54ef4",
-          "omq-recovery-pg-wait": "3a33d53530a74995aed4312c4e499af2"
-        },
-        "rustfs": {
-          "omq-recovery-stopped-state": "bb65227e3f134f2bbb755267520f115c",
-          "omq-recovery-term": "ae8b32e8c55646bdb03517bb0576e307"
-        }
-      },
-      "publishedGraphs": {
-        "kind": "s2-s3-01-runtime-01",
-        "close": "35bcf152b788c21a72690c7b3fa2cc7f58355b1c6b66fc54ec4074d2d83be691",
-        "startedAt": "2026-11-21T13:50:26.285927257Z",
-        "pid": 94542,
-        "observed": {
-          "defaultRows": 0,
-          "namedRows": 2748,
-          "namedSha256": "4692dc65b7f20ccd3ae05c400e85310769462cbe60968d6ec102878c68ec5ab6",
-          "oldRelease": "d60d10638030402c8fcf6254bc782529",
-          "newRelease": "0272acbf10e9422abac7242328420e51"
-        },
-        "commands": {
-          "default": "408c7b9476f9420397c418d0ca376937",
-          "named": "9d8536b9fa97406a9276c4d28d2c59b4",
-          "published": "77c4cee87a914a12a96be5e9e040fb3a"
-        }
+      "sampleCount": 7,
+      "peakBytes": 43019882942,
+      "hostMonitor": {
+        "samples": 41,
+        "lockDisplayTrial": [
+          "NOT_VERIFIED"
+        ],
+        "sampledLockedAsleep": 41
       }
     },
+    "fresh": [
+      "original stdout/audit/row reopen",
+      "ordinary rollback/readback",
+      "isolated PG",
+      "three builds + snapshots + actual changed host",
+      "90-row checkpoint",
+      "same-window close and passive prefix readback"
+    ],
     "reused": {
-      "prepare": [
-        {
-          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/environment/d6d909b8cad6e0c13389a3323def278aa77870bbca92689ade15af303daafb43/runs/f6cf2ce7f959434b80edf477edf5f4ca/receipt.json",
-          "sizeBytes": 10915,
-          "sha256": "ba86b4a2b8d7f456e034b5aeab937aa8e58e88a49fc8b7dbb6d5fa375f6769fb"
-        },
-        {
-          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/environment/d6d909b8cad6e0c13389a3323def278aa77870bbca92689ade15af303daafb43/runs/6bef8402b64446cca9d36adaefcde70d/receipt.json",
-          "sizeBytes": 10915,
-          "sha256": "2312b4ac74af8017f1a2aae6f3905039f7936a24efb7b254e2cf0bcda8d9fdb6"
-        },
-        {
-          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/environment/d6d909b8cad6e0c13389a3323def278aa77870bbca92689ade15af303daafb43/runs/89a99b77d9574c60b1b3b9f34da96b69/receipt.json",
-          "sizeBytes": 10915,
-          "sha256": "e0da1b0440584d35868658a0b20446f58dcb7de3b1856c810d5d54612cf4a8a3"
-        }
-      ],
-      "contentKey": "d6d909b8cad6e0c13389a3323def278aa77870bbca92689ade15af303daafb43",
-      "builds": {
-        "api": {
-          "snapshotId": "56622dd7817267cdc53e47afa0751c40073220d07537ac52b34748e42bcfa995",
-          "members": 99,
-          "inputKey": "df12e77a94af917c4d11ecaea1c0786b17904661139a2bae80223d6a66835e74",
-          "buildCommandId": "ffc5b3955de3412ba3c8e555b43e5fc1"
-        },
-        "agent": {
-          "snapshotId": "aacf1a129297f02cb578c3fc2e9fb8033517407250cb6bf6f518aa6b79b9b302",
-          "members": 222,
-          "inputKey": "df12e77a94af917c4d11ecaea1c0786b17904661139a2bae80223d6a66835e74",
-          "buildCommandId": "4e984112a99a4a83a31581a65647721b"
-        },
-        "query": {
-          "snapshotId": "e1f8d7ffe780022cac1e0a6030f1c6a8634388e2a8bd6781459ba78002bb36a5",
-          "members": 222,
-          "inputKey": "df12e77a94af917c4d11ecaea1c0786b17904661139a2bae80223d6a66835e74",
-          "buildCommandId": "842e6fb68241490d9632240870c303f6"
-        }
-      },
-      "prefix": {
-        "commandId": "edd1379b83c246329579075d16ccda58",
-        "measuredCommit": "2a2ea74ff72c22860e4927318913eaece9d14f9f",
-        "qualificationCommand": "a495b4d475404f95b726b8b46d6a3663",
-        "qualifiedModes": 5,
-        "reopenedMembers": 684,
-        "frozenMembers": 546
-      },
       "access": {
         "ref": {
           "commandId": "1afa8fd9ad624134a814126527f7a916",
@@ -728,8 +1384,30 @@
         "prefixStatus": "CASE_QUALIFIED",
         "prefixMembers": 684,
         "frozenMembers": 546
+      },
+      "prefix": {
+        "commandId": "edd1379b83c246329579075d16ccda58",
+        "measuredCommit": "2a2ea74ff72c22860e4927318913eaece9d14f9f",
+        "qualificationCommand": "a495b4d475404f95b726b8b46d6a3663",
+        "qualifiedModes": 5,
+        "reopenedMembers": 684,
+        "frozenMembers": 546
       }
     },
+    "notRun": [
+      "new diagnostic ABA",
+      "corrected formal ten-slot",
+      "new S0",
+      "S3",
+      "CI"
+    ],
+    "notQualified": [
+      "AC03-B",
+      "Oracle S0",
+      "cleanup250ms",
+      "same-Q in-deadline ABA/409",
+      "old timeout phase attribution"
+    ],
     "finderSha256": {
       "docs/.DS_Store": "0681be917a4644258d037be7c60374bee2c89bd266cdb97435c117e756e8235f",
       "docs/evidence/.DS_Store": "05693a956bd0059af5c88f79494338f9f1d1e9daa0932c71c25890cc2c768f4d",
@@ -738,1013 +1416,714 @@
     },
     "originals": [
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/0486285925cd4d82aeccc68aaf462b29/receipt.json",
-        "sha256": "cf6e859e312519285d1eaba6c64f729b3bd527821484111329605132c23cae56",
-        "sizeBytes": 1499
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-maintenance-observation-9386ea708d6842ae9117780bdd4413dd.json",
+        "sha256": "a04977dfa2d95207e6bf367f34a2f97ffa3b34e43de3a732dbe23dbbd8877f0c",
+        "bytes": 7718
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/0486285925cd4d82aeccc68aaf462b29/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/mapping-recovery-05ea4538c0934951b200728ee739ce60.json",
+        "sha256": "b9e45a1b46c412ce192e84f0c712475354f9fd0651233596f6566d86727d37cb",
+        "bytes": 207760
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/0486285925cd4d82aeccc68aaf462b29/stdout.txt",
-        "sha256": "0e1be0e26be8cce5889ff39bed0ff841f6be1c788f9624453421e22f1a6bba9a",
-        "sizeBytes": 22
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/controlled-mapping-restore-05ea4538c0934951b200728ee739ce60.json",
+        "sha256": "21d6d0cff882452f4e810c28e59e82418fbb31a30ea9c40d74849f29dc48776e",
+        "bytes": 15812
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/0d60b37e8ad34abbabee0aa8e638a6ad/receipt.json",
-        "sha256": "d53c77a8fe253e07530fac35e60be1fffdac3a021d31e728db5696475ad28172",
-        "sizeBytes": 1506
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-build-bcd59f71b5d2448ea3a8a80f460b3b59.json",
+        "sha256": "f7b0c5169acbcf4b63681290a8bf7319a867fbbe950d49b84abb5138568741ba",
+        "bytes": 3649
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/0d60b37e8ad34abbabee0aa8e638a6ad/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/0d60b37e8ad34abbabee0aa8e638a6ad/stdout.txt",
-        "sha256": "9dd8045b6cc2036e83e450cbe8e7ec1040b2857ac0fcfa580c8ffa1804cf5cee",
-        "sizeBytes": 6712
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/12820080452149ac8df6eae4c9877f10/receipt.json",
-        "sha256": "3d531f6c1981c30eb822aa0d0c7d8b7def93bf0d61c117ddf02a8b89f63a011c",
-        "sizeBytes": 1488
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/12820080452149ac8df6eae4c9877f10/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/12820080452149ac8df6eae4c9877f10/stdout.txt",
-        "sha256": "2024e4d6db4920be507413c42c060ac71afcde0ff9fc94cc5ef81a179d143f90",
-        "sizeBytes": 17
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2c406366a5954bad93f2fc636de53961/receipt.json",
-        "sha256": "7582b7856624e801f4b4b41f15cc82c9a4c42407d205c4c355d15e560f7b76ad",
-        "sizeBytes": 1502
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2c406366a5954bad93f2fc636de53961/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2c406366a5954bad93f2fc636de53961/stdout.txt",
-        "sha256": "12b3ee3398486fd906c9b53862310519c791362a095dd2e8cef311c1e7885572",
-        "sizeBytes": 195
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/3f08f08c4a3740d8a16350c3be92e6ab/receipt.json",
-        "sha256": "5e72dd9af3c5c7853ea76d8e702f9cd87643d9253ece5c82cd9f43f4389c55fb",
-        "sizeBytes": 1497
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/3f08f08c4a3740d8a16350c3be92e6ab/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/3f08f08c4a3740d8a16350c3be92e6ab/stdout.txt",
-        "sha256": "543c00db3463c727a66af093497bb5165dcee962d3ff4b26bbcddc568052b346",
-        "sizeBytes": 65
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/408c7b9476f9420397c418d0ca376937/receipt.json",
-        "sha256": "7ec8543ead1b7b3d6c1e108e48e436c62ae9382e03020b1d0d8115bb74e12a08",
-        "sizeBytes": 1501
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/408c7b9476f9420397c418d0ca376937/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/408c7b9476f9420397c418d0ca376937/stdout.txt",
-        "sha256": "7c4d1d860a1a87e20faa156e5aaafec6a9287c633d3e2740de65cbcaecab5f2e",
-        "sizeBytes": 102
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/59a3461b0a5b4121875c322ce0c7f452/receipt.json",
-        "sha256": "311d0d4f155f40d7dc67a81b7656dc4f153f147f53abf4fe58cd10dd6198f137",
-        "sizeBytes": 1505
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/59a3461b0a5b4121875c322ce0c7f452/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/59a3461b0a5b4121875c322ce0c7f452/stdout.txt",
-        "sha256": "9dd8045b6cc2036e83e450cbe8e7ec1040b2857ac0fcfa580c8ffa1804cf5cee",
-        "sizeBytes": 6712
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5b90bb8f66fb4ddd9bfeddbe5015133a/receipt.json",
-        "sha256": "62c6220fff5f98aab43061f5fabba563f368a44cd3e431ce163e96b4bd1b6282",
-        "sizeBytes": 1542
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5b90bb8f66fb4ddd9bfeddbe5015133a/stderr.txt",
-        "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
-        "sizeBytes": 127
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5b90bb8f66fb4ddd9bfeddbe5015133a/stdout.txt",
-        "sha256": "d1fba9b095bec4a31831c598e4bbf7bd043579d923e57efd3403a0dab74efc15",
-        "sizeBytes": 5349
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5f0a03f60e8647f3b995903e185af026/receipt.json",
-        "sha256": "2d1f0ec604b96f38111c785551ebabf6ba3332e77309cdc0476db73abd076e2e",
-        "sizeBytes": 1485
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5f0a03f60e8647f3b995903e185af026/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5f0a03f60e8647f3b995903e185af026/stdout.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/73d26f3a1f234cc9af2b174c57617cac/receipt.json",
-        "sha256": "519735a40ab82056dcb7ed53959971edbbf9bc5721d07202588746758851174d",
-        "sizeBytes": 1502
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/73d26f3a1f234cc9af2b174c57617cac/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/73d26f3a1f234cc9af2b174c57617cac/stdout.txt",
-        "sha256": "12b3ee3398486fd906c9b53862310519c791362a095dd2e8cef311c1e7885572",
-        "sizeBytes": 195
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/77c4cee87a914a12a96be5e9e040fb3a/receipt.json",
-        "sha256": "53f2e0291e0680da584e65356db46dc5115be6ade667c3bd04a2d1e5b39f0639",
-        "sizeBytes": 1506
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/77c4cee87a914a12a96be5e9e040fb3a/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/77c4cee87a914a12a96be5e9e040fb3a/stdout.txt",
-        "sha256": "081230e4e188e333f59739db6806a79d086ef13f656a9497217590de95ed8a85",
-        "sizeBytes": 167844
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/7c4c8402ad944f5da3e3e12267412638/receipt.json",
-        "sha256": "eae713a64263246461b04a3ce34f111c14b95c908e742a4668d8a240b2ec0efa",
-        "sizeBytes": 1497
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/7c4c8402ad944f5da3e3e12267412638/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/7c4c8402ad944f5da3e3e12267412638/stdout.txt",
-        "sha256": "1317684911db1f76dad888e4b1cf4f07b076a48e1a2b26208209a380015cf25f",
-        "sizeBytes": 65
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/7f1df8d7c11f4c25b04e5bc038344969/receipt.json",
-        "sha256": "8e61f5d2d7544f5fff1a786c0fe1bee8b152873790a8e7f3273305ed35de1f16",
-        "sizeBytes": 1505
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/7f1df8d7c11f4c25b04e5bc038344969/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/7f1df8d7c11f4c25b04e5bc038344969/stdout.txt",
-        "sha256": "238903180cc104ec2c5d8b3f20c5bc61b389ec0a967df8cc208cdc7cd454174f",
-        "sizeBytes": 3
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8a0524ef4a8c4f34aadf7a2ec0f75b19/receipt.json",
-        "sha256": "e96c203bc1aa1444eb16fac7c39edf1d3e94893303df6c4316780bcf35ddd2a8",
-        "sizeBytes": 1499
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8a0524ef4a8c4f34aadf7a2ec0f75b19/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8a0524ef4a8c4f34aadf7a2ec0f75b19/stdout.txt",
-        "sha256": "fb5be6cb4df0738e739c20dcdd275de01e8da83453f76eaadea8ac5e994f6700",
-        "sizeBytes": 17657
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8aacab1b914645f589d44482be6e1fb4/receipt.json",
-        "sha256": "7dac0b6b5012ea66b816aa2752843782e5d3bef57759a712c1ae8dd7c8f0f758",
-        "sizeBytes": 1488
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8aacab1b914645f589d44482be6e1fb4/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8aacab1b914645f589d44482be6e1fb4/stdout.txt",
-        "sha256": "2024e4d6db4920be507413c42c060ac71afcde0ff9fc94cc5ef81a179d143f90",
-        "sizeBytes": 17
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8eeacc62d40947b195e53815a84ab837/receipt.json",
-        "sha256": "9650ce5aa704629befcad720a1a933f5e0b8858908cce376fd11d828139823a9",
-        "sizeBytes": 1501
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8eeacc62d40947b195e53815a84ab837/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8eeacc62d40947b195e53815a84ab837/stdout.txt",
-        "sha256": "0e1be0e26be8cce5889ff39bed0ff841f6be1c788f9624453421e22f1a6bba9a",
-        "sizeBytes": 22
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/96ee38b348c34f7ea61ca8fefecc0d2d/receipt.json",
-        "sha256": "bc07a1837f74930694192bc70e1cbbf036c6038e6cb9033b1adae8bbbe7af7b0",
-        "sizeBytes": 1502
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/96ee38b348c34f7ea61ca8fefecc0d2d/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/96ee38b348c34f7ea61ca8fefecc0d2d/stdout.txt",
-        "sha256": "04bd202d814572ee0e04c3ed002a7059a4e12ead27238ca2b1ad3b50d7cc20c4",
-        "sizeBytes": 42458
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/9d8536b9fa97406a9276c4d28d2c59b4/receipt.json",
-        "sha256": "0c6795eb176907894b277aac5cd2cb35ed352436d2d26e995e1e23238c1830c3",
-        "sizeBytes": 1502
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/9d8536b9fa97406a9276c4d28d2c59b4/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/9d8536b9fa97406a9276c4d28d2c59b4/stdout.txt",
-        "sha256": "f04af4ee8aaf7a6bed1d6ef0ab75fb5e59c5429ddbd8a5081c07b7d7e3a18972",
-        "sizeBytes": 1056502
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/9f5e15222bf04104b2552528050439da/receipt.json",
-        "sha256": "6e1a179fffc06e3ad8c3b73e6c92bb08541436ff14d2979afda0cdc2973bd4b4",
-        "sizeBytes": 1486
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/9f5e15222bf04104b2552528050439da/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/9f5e15222bf04104b2552528050439da/stdout.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b292c89e3bac45fd8bdbce9553402139/receipt.json",
-        "sha256": "2bba0434c311bc82d3c102462b9babe1c85f2dd21495ceee26f8d9ea8b592dc6",
-        "sizeBytes": 1488
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b292c89e3bac45fd8bdbce9553402139/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b292c89e3bac45fd8bdbce9553402139/stdout.txt",
-        "sha256": "1317684911db1f76dad888e4b1cf4f07b076a48e1a2b26208209a380015cf25f",
-        "sizeBytes": 65
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b2e6bcb2dc554a0495b086db67e98c66/receipt.json",
-        "sha256": "a87adf722570acb30dcbdde23dceb2b360fd6d2a41451298e3f56c1c6b648e40",
-        "sizeBytes": 1503
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b2e6bcb2dc554a0495b086db67e98c66/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b2e6bcb2dc554a0495b086db67e98c66/stdout.txt",
-        "sha256": "fb2c0b7c1bcd5fcb7e48b156dd2953ba1a9d10f7154b80fc5a5d969bb62de7e6",
-        "sizeBytes": 227
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ba1722ceb3e04a19912fdadedefe6f42/receipt.json",
-        "sha256": "63bf47f108856031c4e32b644eff4990e62a59475626ea59d279e2ea65c890b3",
-        "sizeBytes": 1502
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ba1722ceb3e04a19912fdadedefe6f42/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ba1722ceb3e04a19912fdadedefe6f42/stdout.txt",
-        "sha256": "6c2f863ae142d398fe021d50cd4b221e8e0aa8fe228aea6350d5a927ca640799",
-        "sizeBytes": 52968
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c02e89f8d8f2481f90058606ccf71b29/receipt.json",
-        "sha256": "f917b31671ee1451f05acd2cf9115cd574941ba1936015ff7ff48f9962e20f20",
-        "sizeBytes": 1532
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c02e89f8d8f2481f90058606ccf71b29/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c02e89f8d8f2481f90058606ccf71b29/stdout.txt",
-        "sha256": "188d8076228d3c172c054dd094c28ab17d722c3d16d01e09b14b0087c716fe85",
-        "sizeBytes": 1281
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c2341989d2ca463b8fab511563e27804/receipt.json",
-        "sha256": "9f8a3227cc4a52b6afa4fcdec1804363abd63106027d5534673e72ce630e98e7",
-        "sizeBytes": 1502
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c2341989d2ca463b8fab511563e27804/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c2341989d2ca463b8fab511563e27804/stdout.txt",
-        "sha256": "0dc70e86350123e5ecbbd7d4a0b6a332d555c0cf21b09942ace08c79556ba7b6",
-        "sizeBytes": 6580
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/d6e05ec96e04432b80f3a2e5c07803d0/receipt.json",
-        "sha256": "ce0bf16b2239c3feb0f6e8d0730a94e00cf83f609a9187d87e6dee0a0d058375",
-        "sizeBytes": 1500
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/d6e05ec96e04432b80f3a2e5c07803d0/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/d6e05ec96e04432b80f3a2e5c07803d0/stdout.txt",
-        "sha256": "16aebcb0b74604dd481ad1f6e90dccf749b5e719f1717f93fa61b4c381302bc4",
-        "sizeBytes": 700461
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e88ff496f608473a87faeb491c3bc08a/receipt.json",
-        "sha256": "7176e74588bc03d5a839c7ff06df52b3f40e82b5ed612e30c5aea6cc9be9c831",
-        "sizeBytes": 1486
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e88ff496f608473a87faeb491c3bc08a/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e88ff496f608473a87faeb491c3bc08a/stdout.txt",
-        "sha256": "543c00db3463c727a66af093497bb5165dcee962d3ff4b26bbcddc568052b346",
-        "sizeBytes": 65
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e930c21a522c4dc8aa19e03e0b5c94d0/receipt.json",
-        "sha256": "6718f3f0fce19dff39734808c1c67b63a61412f30dffac7e76f55b2a000f5289",
-        "sizeBytes": 1503
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e930c21a522c4dc8aa19e03e0b5c94d0/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e930c21a522c4dc8aa19e03e0b5c94d0/stdout.txt",
-        "sha256": "1789ff8e6a1c056df9552e7b3c2ce7ff05d67603a8ebeeb93900e7b491e61c49",
-        "sizeBytes": 52968
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ff52fcc653ca45aca2a9a053a11436f1/receipt.json",
-        "sha256": "d5d64869306b08e89957352761c1d6f0329e0d77188edb5334f2ae73e75251aa",
-        "sizeBytes": 1502
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ff52fcc653ca45aca2a9a053a11436f1/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ff52fcc653ca45aca2a9a053a11436f1/stdout.txt",
-        "sha256": "4d53ab2ae66b7f383de66f86e6e6250ce038afea15637ea061316b6f38f09b6e",
-        "sizeBytes": 52968
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/0645f75687c0433ca8d303b9e2ac3f15/receipt.json",
-        "sha256": "f32e41c303f1fc26799cea974080beef0817f07b68c478de40514cd7dba5b542",
-        "sizeBytes": 1481
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/0645f75687c0433ca8d303b9e2ac3f15/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/0645f75687c0433ca8d303b9e2ac3f15/stdout.txt",
-        "sha256": "4a6b37536f5dd33fc3734aaf2e07bf64229352cb0163a5f223e0b8d77b17700c",
-        "sizeBytes": 65
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/080b0198352f4140a537c755943e48cf/receipt.json",
-        "sha256": "5c5177e64ac11bedc57e064836d7358b7057928d065d360497c5db6222b6236d",
-        "sizeBytes": 1495
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/080b0198352f4140a537c755943e48cf/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/080b0198352f4140a537c755943e48cf/stdout.txt",
-        "sha256": "21bd8e7295884f004feaa95a6c2aa194e5c398da823a89e5d8bca5c1c71bb65e",
-        "sizeBytes": 10
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/0b79ce522b8744c99c79cc8c4ee0bbca/receipt.json",
-        "sha256": "c88b638e1c5e551c0a215789c8e0220d239d7902dc7518bc08345f25dff39c97",
-        "sizeBytes": 1479
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/0b79ce522b8744c99c79cc8c4ee0bbca/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/0b79ce522b8744c99c79cc8c4ee0bbca/stdout.txt",
-        "sha256": "c056e8bd2b0875a262d1ba5f67cc44d6cfe3968dc173d2138ff72134ebc892ad",
-        "sizeBytes": 65
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/160e931d439048bd957e03d30b32dd69/receipt.json",
-        "sha256": "3a7dbd4bf1687aa79eede2fbf24d12d2f58bd09a04cac83fc3014ef856bf8290",
-        "sizeBytes": 1492
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/160e931d439048bd957e03d30b32dd69/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/160e931d439048bd957e03d30b32dd69/stdout.txt",
-        "sha256": "0ad233a0745dae0b46edfa818edee262d4ecf0eaf0462bf3a4ebb1a3166f35f7",
-        "sizeBytes": 226
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/1fed01a16b5447bfa1ed0efe1229692f/receipt.json",
-        "sha256": "2a0cea0bf7f5cf4c1d642f4a39e64b647f13958e07c5ffbb3871b11b6d8e558f",
-        "sizeBytes": 1491
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/1fed01a16b5447bfa1ed0efe1229692f/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/1fed01a16b5447bfa1ed0efe1229692f/stdout.txt",
-        "sha256": "867ae70a4e6f0b271d594a4682f9e585b7052a1a707659f82008209d3daa1044",
-        "sizeBytes": 65
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/3a33d53530a74995aed4312c4e499af2/receipt.json",
-        "sha256": "e21e04b946a55c2a9c2a6fa2b322d9fc6267700969698c2f09d43c63495c19a1",
-        "sizeBytes": 1483
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/3a33d53530a74995aed4312c4e499af2/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/3a33d53530a74995aed4312c4e499af2/stdout.txt",
-        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
-        "sizeBytes": 2
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/4373789a16a048009d991cd6f1966fc1/receipt.json",
-        "sha256": "00883044c4db3dad11bef2259883b78adb1b5afdd68739984d28de9eb65a509d",
-        "sizeBytes": 1492
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/4373789a16a048009d991cd6f1966fc1/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/4373789a16a048009d991cd6f1966fc1/stdout.txt",
-        "sha256": "9ed953db880976c6e8bfe6990e1c84f50646dbdd7e14a8bff467e3a30b7f1883",
-        "sizeBytes": 226
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/4c4c0a2092dd42e085ff1bc56ee7add2/receipt.json",
-        "sha256": "1343e5454e35d6515c26d87bc6c4ba7567c54a51688d6d99985dd4fa640e0920",
-        "sizeBytes": 1485
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/4c4c0a2092dd42e085ff1bc56ee7add2/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/4c4c0a2092dd42e085ff1bc56ee7add2/stdout.txt",
-        "sha256": "69105b09642c2b7e8cd677b91ae197568238387713e79396aa2cd34b0672f19c",
-        "sizeBytes": 21
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/55363bb8e67f4fed9a899716b1011f3a/receipt.json",
-        "sha256": "173be575e4a6c2f431797520203af69f20dd8a3d0e84ee238d409ae12de6075c",
-        "sizeBytes": 1481
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/55363bb8e67f4fed9a899716b1011f3a/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/55363bb8e67f4fed9a899716b1011f3a/stdout.txt",
-        "sha256": "4bc2cd35715ff997d4ecd82d5a80ed189edad90f084f2d917c0e8e3b2c4cba30",
-        "sizeBytes": 65
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/8b1ea5dc0c54464c8b26a603c4e54ef4/receipt.json",
-        "sha256": "25f22f50b74c95c5b3f80b9f892521233c59cb5b9e7f581a652c6f91247f1edf",
-        "sizeBytes": 1492
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/8b1ea5dc0c54464c8b26a603c4e54ef4/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/8b1ea5dc0c54464c8b26a603c4e54ef4/stdout.txt",
-        "sha256": "9f0d85f028c61f4f691885e428615d6244f692c9ffed4eff0f8038e35b91a3e2",
-        "sizeBytes": 1065
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/94eaf05970dd4f558bbc45577f5ec887/receipt.json",
-        "sha256": "95af5e02a2107651b7637e1098c2d42ac9b4038994a9a13192de1c596268b87b",
-        "sizeBytes": 1491
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/94eaf05970dd4f558bbc45577f5ec887/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/94eaf05970dd4f558bbc45577f5ec887/stdout.txt",
-        "sha256": "3f93e181eb10e9739d6562fe139f6de10cb339818f3844c11314027833baf8ed",
-        "sizeBytes": 817
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/ac4172f59f3d40519ba0af85ae080fd0/receipt.json",
-        "sha256": "b57e55bedafcac05c553d00b70ff890b2fb62a15bc4877987a59e90da38cd05f",
-        "sizeBytes": 1495
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/ac4172f59f3d40519ba0af85ae080fd0/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/ac4172f59f3d40519ba0af85ae080fd0/stdout.txt",
-        "sha256": "97d38ee7834907ccd5c18910afc255f617c0a37c74f5a19b94de6b05bc8d0ad8",
-        "sizeBytes": 57
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/ae8b32e8c55646bdb03517bb0576e307/receipt.json",
-        "sha256": "52d6ee1ce82fae46993648b124f08e9bc7b9701ef1e3c0c68c11a316b2cf7196",
-        "sizeBytes": 1481
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/ae8b32e8c55646bdb03517bb0576e307/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/ae8b32e8c55646bdb03517bb0576e307/stdout.txt",
-        "sha256": "eb05520eccd879850b9db82f88b94cbb09820d320b6bed1a9d362003fb451f85",
-        "sizeBytes": 65
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/bb65227e3f134f2bbb755267520f115c/receipt.json",
-        "sha256": "ee44800c4c824bbe96e701bd9656ccaa7fcf08e481e15f49f088283f4f04169f",
-        "sizeBytes": 1492
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/bb65227e3f134f2bbb755267520f115c/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/bb65227e3f134f2bbb755267520f115c/stdout.txt",
-        "sha256": "8a814d919e838746f1e30d2d4cca954a9e7ea91407b04ace76d6bed5f5acce4d",
-        "sizeBytes": 224
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/d717ee1bbe9240e2827a9efc47b468a5/receipt.json",
-        "sha256": "01d818a7a76b05e6ab1f444e9f95b706f5684df65c8be2112b00075e3e11da8b",
-        "sizeBytes": 1487
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/d717ee1bbe9240e2827a9efc47b468a5/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/d717ee1bbe9240e2827a9efc47b468a5/stdout.txt",
-        "sha256": "2dd63d0edd5ec9418f9aa45381461a07d46e1446b7a4211ff79811de616c63b2",
-        "sizeBytes": 4
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/api-removed-api-5efb5506dfbb4065a1bf86a3e14eb3d0.json",
-        "sha256": "23592465691bfab6310dca14f88d5bb18165fd1a85abfc2bec5f034ab07fc8d2",
-        "sizeBytes": 310
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/api-removed-api-secondary-d9e8a9bc05f845be84b6f83152236984.json",
-        "sha256": "d23d0972d4c6199b8f367c62e9c09c432edcb59a49f0e4f0572a941173d27c88",
-        "sizeBytes": 310
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/browser-s0-oracle-auth-1795269100162.json",
-        "sha256": "c3797f29347f80c42587999eb3a4412f036345f32df607e12d2755af4484cbcd",
-        "sizeBytes": 21383
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/browser-s2-oracle-aba-1795269105352.json",
-        "sha256": "6defe2d6462b525f7f4499327b328175ce6b7b5ee0526a078f2fd80c1b761dfc",
-        "sizeBytes": 456657
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/browser-s2-s3-oracle-1795269142562.json",
-        "sha256": "f5803c2bfb5044bfd881898d7736e96e7ee64d1d6e61dc516ac44a21667974e1",
-        "sizeBytes": 4058
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-audit-c02e89f8d8f2481f90058606ccf71b29-s0-oracle-auth.json",
-        "sha256": "7227e497090e2a3136d5f15932147df6ab90c7aa2ef7e968f7b442f86c705d0a",
-        "sizeBytes": 709
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-audit-c02e89f8d8f2481f90058606ccf71b29-s2-oracle-aba.json",
-        "sha256": "b36e50fa1964b9227f969b6f6bcf02df70f0d4e0275fa8c4ac513f2b1f0ce812",
-        "sizeBytes": 4878
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-audit-c02e89f8d8f2481f90058606ccf71b29.json",
-        "sha256": "b7712bc2eded195a5975542266491f4e171357a3d1020093ab0e74fcb2126564",
-        "sizeBytes": 4878
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-run-s2-s3-oracle-c02e89f8d8f2481f90058606ccf71b29.json",
-        "sha256": "fc2eb71f7601a7ad580d47229e3bf1cd8cba0f4acbd87c130432dbff8176b414",
-        "sizeBytes": 9074
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/controlled-entry-1e727e46.py",
-        "sha256": "9a973d14ef790de74f5ca31501b5947ff9da366e5f80d1101f91f45d3ae1f353",
-        "sizeBytes": 6033
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/settlement-pg-efb2096dbb474f97ac9ea2c79f99d8ba.json",
+        "sha256": "7e5124330d3400634d7da4aaa77ed2ff01f93df13ecc3e50fc91c81f936a18d8",
+        "bytes": 6449
       },
       {
         "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/controlled-run-9b81d52b3b7041ecb7b8530198d77ccd.json",
         "sha256": "d1befd6fdf7cc5b531ab04e6802e460e947a804863d9f99bc9fafa42ba1aaf05",
-        "sizeBytes": 4660
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-reopen-851906f1.json",
-        "sha256": "c86053e27f11783cfa9b35f9f30bc66e3b4c2466a70d34e9f4539f573a76ce72",
-        "sizeBytes": 1698
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate-created.json",
-        "sha256": "b055e000ff187b141ce5d4b749b83e057ed0da5d52a3e192abf029fa9b57fa6b",
-        "sizeBytes": 438
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/027d487916ef49abbaea8ae615f0b34d/receipt.json",
-        "sha256": "e84d4cae67e342e8599ecaab457bc7e8d3b69e8c8b2fb69e7a1fd397736fc675",
-        "sizeBytes": 1818
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/027d487916ef49abbaea8ae615f0b34d/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/027d487916ef49abbaea8ae615f0b34d/stdout.txt",
-        "sha256": "03b00f10a352fbae693a0e61ff6c44d1d045461d1b1a00177113e6c8e265a779",
-        "sizeBytes": 4323
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/094bef910f714dcc8cb8526c188c121c/receipt.json",
-        "sha256": "280f1d4f4438623e5996d886d549c29bb425fa9b6abc533b9e7e2b822b4c0b3e",
-        "sizeBytes": 1815
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/094bef910f714dcc8cb8526c188c121c/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/094bef910f714dcc8cb8526c188c121c/stdout.txt",
-        "sha256": "bec8150a44301dad32597a4f5ad448fe4db8ea13f2dd66cc48242f27bc619ee0",
-        "sizeBytes": 622
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2c08965ca0a7429f895fafecefb45f8c/receipt.json",
-        "sha256": "e4dc24d0487c806788a5a9791b46afa50f5573fa9314662b7607640952e9b1f9",
-        "sizeBytes": 1816
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2c08965ca0a7429f895fafecefb45f8c/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2c08965ca0a7429f895fafecefb45f8c/stdout.txt",
-        "sha256": "b27e69c5e4a00a274656ba72cd18fdee7959823441f7ee40b78401b1b498aaed",
-        "sizeBytes": 622
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/44ced7ac64c34ef2a1a83fc6a3b8f87a/receipt.json",
-        "sha256": "7002d557f1409d6c3f30d7aa2294192256eb9bb9406124b4978753c0d6b30a0d",
-        "sizeBytes": 1824
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/44ced7ac64c34ef2a1a83fc6a3b8f87a/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/44ced7ac64c34ef2a1a83fc6a3b8f87a/stdout.txt",
-        "sha256": "b02160d7cc9df8a28f706de5d028e3e0fe01fa6d294bcacf87a8fe7ebd9d040d",
-        "sizeBytes": 1394
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5809901efd5445ec93747b112f26d582/receipt.json",
-        "sha256": "487c87f7e08a886a1049689d9b05353cd9e6a34d83a2fb280073da0b51a568e2",
-        "sizeBytes": 1823
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5809901efd5445ec93747b112f26d582/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5809901efd5445ec93747b112f26d582/stdout.txt",
-        "sha256": "ec9bba59eb5548dd553daf8ec1fd15973efea5996921abf30a7d3a5c18243ba3",
-        "sizeBytes": 903
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b1b7182725e14903abc8edee8e6e8a17/receipt.json",
-        "sha256": "11fae3977c00d5a2dbd008b4c9f907b3a9ed1477f558d3fd5144640ff9b4ee14",
-        "sizeBytes": 1819
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b1b7182725e14903abc8edee8e6e8a17/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b1b7182725e14903abc8edee8e6e8a17/stdout.txt",
-        "sha256": "2e8060f92344e6b72ec0600e06324ed734959133370a3d925be3f40e6456a448",
-        "sizeBytes": 2331
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ce0ee700371b4e9a88be9049fca21fa9/receipt.json",
-        "sha256": "c36dbba7b9dd8e4651f3df3ddcc65aad04816bef93b9e703ade19b715034d959",
-        "sizeBytes": 1823
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ce0ee700371b4e9a88be9049fca21fa9/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ce0ee700371b4e9a88be9049fca21fa9/stdout.txt",
-        "sha256": "caaeab429dd5863041e980b164fcc4bf2e396656a2699f848b6510db16d7bb13",
-        "sizeBytes": 3975
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/cf0d4d9a0af54d73ba40b5da29a64b49/receipt.json",
-        "sha256": "09c7cbb2d338c5929802c479f800a0503fc1f2bf20f06a39938f2d1d1075e307",
-        "sizeBytes": 1815
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/cf0d4d9a0af54d73ba40b5da29a64b49/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/cf0d4d9a0af54d73ba40b5da29a64b49/stdout.txt",
-        "sha256": "03c2035c7996c7708a6747417cd8d21165f4891f5ae3fe14dc01a0f1e04f562b",
-        "sizeBytes": 4599
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/d118202ccca946d0b1f5799231eb2785/receipt.json",
-        "sha256": "aaba7962d5da7731b5180b21f7c707a77d45ad0e5a3a5ffa1aa33a55fd8f9c85",
-        "sizeBytes": 1833
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/d118202ccca946d0b1f5799231eb2785/stderr.txt",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sizeBytes": 0
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/d118202ccca946d0b1f5799231eb2785/stdout.txt",
-        "sha256": "65aa3aa421359a4a3039e91fdbbe9e96dbbdf9da6e7e97c9371645d79a55ab60",
-        "sizeBytes": 368511
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/plan-4f125fd47945.json",
-        "sha256": "349f947c7feb49e05a5b696d6ac868d993b666bd5ad4f9d0960d847c19d6221f",
-        "sizeBytes": 4707
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/runs/cc55c8fb03ce4d959147ae1cdb4c34f1/oracle-task-admission.json",
-        "sha256": "ff0ac36316045c103e8fb25fbf8863872510a43bf8a4481d54a6ea368766a6b7",
-        "sizeBytes": 996
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/candidate/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/runs/cc55c8fb03ce4d959147ae1cdb4c34f1/policy.json",
-        "sha256": "a050f98a9d75c3182c3def093224b458136e4b02fe8cf45ce0196b064e9b7b56",
-        "sizeBytes": 1359
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/delivery-inputs.json",
-        "sha256": "1d2800b6b871eafc234f6e2861442f18738cf53c5bf67e33afcb99f66370dafe",
-        "sizeBytes": 2383
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/delivery-precheck.json",
-        "sha256": "25e114e2b3fbae644e67c66a7ac419041f4aa9c962fabc20e443ac7ad00b0999",
-        "sizeBytes": 3390
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-review-851906f1/engineering.json",
-        "sha256": "127ccf38f9542194bef74c0aaeab697835e21d81abed974ad679b0e9b6628a00",
-        "sizeBytes": 4623
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/grant-plan-d102288604bb4000b5a04f86d0395e22.json",
-        "sha256": "04eaf84f728682894f8d565c2007e23bf06c5b7a69df8b9ded13cb6876f55359",
-        "sizeBytes": 63233
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/heartbeat-851906f1.jsonl",
-        "sha256": "16be3cddc01ef5396abd6989ad927501f105f5fd96dcf36f96b8f912a551776d",
-        "sizeBytes": 26381
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/heartbeat-851906f1.summary.json",
-        "sha256": "cc8127b3a09f4f079533e5f360e802e0b257317a8870d7d60b96bd624d2c6f45",
-        "sizeBytes": 648
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/host-preflight-851906f1.json",
-        "sha256": "17ed19b3f860504d2cb179e83526a65deb12be3f6abfa83ad07ae5717f02740b",
-        "sizeBytes": 550
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/prefix-observation-d7008612d2864f5695aed577d9e95f0a.json",
-        "sha256": "e9b9dd90c990f0ac6960f82622819c919c0b77d947e5578899361e27e0b6ac80",
-        "sizeBytes": 10187
+        "bytes": 4660
       },
       {
         "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/runtime-aba-5b90bb8f66fb4ddd9bfeddbe5015133a.json",
         "sha256": "c199b2b59310f875718d6655c5b91e5d089d2ce296f39fd5518f95b91c118de9",
-        "sizeBytes": 5468
+        "bytes": 5468
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/samples-1f5e1a017b154a71b67b6229f166ac37.jsonl",
-        "sha256": "5b0283ba2946c6276b4b18e20959ceff3ffc6555b4f0b765a091d1b344c9bc68",
-        "sizeBytes": 16979
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-audit-c02e89f8d8f2481f90058606ccf71b29-s2-oracle-aba.json",
+        "sha256": "b36e50fa1964b9227f969b6f6bcf02df70f0d4e0275fa8c4ac513f2b1f0ce812",
+        "bytes": 4878
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/window-1f5e1a017b154a71b67b6229f166ac37.json",
-        "sha256": "c0d2f1b1c14a05036de9a1a70794a2e28de8dc19e266acc3ccb8f61e948a73bd",
-        "sizeBytes": 1089
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/formal-run-s2-s3-oracle-c02e89f8d8f2481f90058606ccf71b29.json",
+        "sha256": "fc2eb71f7601a7ad580d47229e3bf1cd8cba0f4acbd87c130432dbff8176b414",
+        "bytes": 9074
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-d102288604bb4000b5a04f86d0395e22.jsonl",
-        "sha256": "29c9ab8733de6bd0596512167e8208632a1edfafb7b5020db0c3f0b415fc6cc5",
-        "sizeBytes": 1679
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/reviewer-generation.json",
+        "sha256": "6f5e42933e2b0be7d723db9001b95f2fe3427a40bfcee49f11965d96fd801397",
+        "bytes": 10364
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-044ea783d35945b2997a8d1c1668b971.json",
-        "sha256": "1fb2233872b5a1f544ec6a4e210b757e84e73241a387a0436dae8a4a40061d0d",
-        "sizeBytes": 44609
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/window-072d21b9dd5149abb97a0ed9ac92c6a5.json",
+        "sha256": "c7ab9725448c1b7b3c472c10578325eeca042d6d653cf670eb13a9c7107c66c3",
+        "bytes": 1179
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-40945a6287f04bcfac3d5fea08440d98.json",
-        "sha256": "296126279066c09afd1decc9379e6781fe1d64739fd1487240c14cdf113bba06",
-        "sizeBytes": 44611
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/samples-072d21b9dd5149abb97a0ed9ac92c6a5.jsonl",
+        "sha256": "82284fbe7a6b7596150580b593e556aa0ad3ad19392bb6c08788038b81b93a09",
+        "bytes": 14818
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/start-05203335d2074acf94b8263e45c7e1da.json",
-        "sha256": "d598f35bc003117ca0c36bf4262c24f1a83994e0ba6ab4abfe891076de12bd77",
-        "sizeBytes": 306
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/host-mapping-restore-05ea4538c0934951b200728ee739ce60.json",
+        "sha256": "5b52ee951dc69e1890ff31f9049214f7400be69dd4d5dcd5d8933b9f50d0a1f7",
+        "bytes": 23951
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/start-554c937b152c4721bc65fcdc22617c84.json",
-        "sha256": "2c091bc69b38eb90df56d47db8af00ef389be6307a85192fe005d3b66a31c525",
-        "sizeBytes": 311
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/temp-lifecycle.json",
+        "sha256": "f9578d4a075ac1a6521b1c7bc51b96e51e618387634db38f6173d661ddb76fab",
+        "bytes": 2362
       },
       {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/start-a2f89e988fd340ab91d05ceee50a78dd.json",
-        "sha256": "bb9092c515d770212c677f58ec32c2beeb243747889ac9d2ce72cba3fbd1600a",
-        "sizeBytes": 313
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/start-d338e1047b364c7a8a540d149705e74b.json",
-        "sha256": "e1a58dd3185ac966590ff294a6b56820d218e560f71ec49a55d75d4d31de4c3d",
-        "sizeBytes": 2131
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/start-d6d7a143c9324b178099ed91f5d3d346.json",
-        "sha256": "f657ca8056d64c9655d381e92413a027bf01b922c968999356e4de8fa70516c3",
-        "sizeBytes": 306
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/stop-0592f6e91d984c6dac0ba65262aded26.json",
-        "sha256": "7947773161c6278b56203948a0aa788b36fff8371b107648dde7228c235a5281",
-        "sizeBytes": 634
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/stop-7bb106f5a0024c0f81e89f253da11d6c.json",
-        "sha256": "5b7f90e0407e366eca1e0fc91964468fcc680d24bd730e39813dd6b85a5868d0",
-        "sizeBytes": 626
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/stop-b8deb4ac5b2c4e0ba4f05b4c62a5f22f.json",
-        "sha256": "51a3ccfbce9c1756bf48c16b8ea28efc5885f3b9f043b6f8e3ac45787ad70cb2",
-        "sizeBytes": 653
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/stop-cc117f2df61c4c46b763b70731d37a52.json",
-        "sha256": "c3007c44243263bdfbfbbe5dd0aff119757c9de8c06e26d7b67f5ef99b7b2462",
-        "sizeBytes": 661
-      },
-      {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/stop-fbd1cd5016514ae2a4f78becc8481e27.json",
-        "sha256": "2f12d23444fe5dcf6d0d34e6f03ba56317dc5f40546ad25a7ad8bc8a4d9b9f9c",
-        "sizeBytes": 1080
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/browser-s2-oracle-aba-1795269105352.json",
+        "sha256": "6defe2d6462b525f7f4499327b328175ce6b7b5ee0526a078f2fd80c1b761dfc",
+        "bytes": 456657
       }
     ],
-    "timing": {
-      "timingStatus": "MEASURED",
-      "parentElapsedSeconds": 46.02771075000055,
-      "runtimeTestElapsedSeconds": 7.639083000001847,
-      "note": "父命令与子命令耗时分别记录。"
+    "commandOriginals": {
+      "1fc136f9adf04d26aef1cdce4dbfb70b": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/1fc136f9adf04d26aef1cdce4dbfb70b/receipt.json",
+          "sha256": "f6d296c7b259576833764c6dfd1f616043b00084a16f1f62f2e8d28ee7970983",
+          "bytes": 1497
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/1fc136f9adf04d26aef1cdce4dbfb70b/stdout.txt",
+          "sha256": "0fab8773ec436ab2d59200ea1ac837d9a67e4bd1fa707e4afa86381ef4832737",
+          "bytes": 172
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/1fc136f9adf04d26aef1cdce4dbfb70b/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "2090eb07171444da99aa26d106712fe3": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2090eb07171444da99aa26d106712fe3/receipt.json",
+          "sha256": "4e6a67e03fef0da949e0054e73438f57458cf697507c9a40817dfaf7888478c0",
+          "bytes": 1506
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2090eb07171444da99aa26d106712fe3/stdout.txt",
+          "sha256": "e952b201ab19d7c3cfc78b5e856d5b38e6262fec82c682bfb597fd10267d02c2",
+          "bytes": 222
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2090eb07171444da99aa26d106712fe3/stderr.txt",
+          "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+          "bytes": 127
+        }
+      },
+      "24b9b9fa3aa44eb2bd45fe1e5c08a8b2": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/24b9b9fa3aa44eb2bd45fe1e5c08a8b2/receipt.json",
+          "sha256": "e7a8cf8373937c11992b7855e0bd8366fb84fc87bcc4fcf654bc74c89e9beb6a",
+          "bytes": 1495
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/24b9b9fa3aa44eb2bd45fe1e5c08a8b2/stdout.txt",
+          "sha256": "67964cc741d4cf9acc09c350963d67e355b79b4d129ac10dbb30113e7325b07a",
+          "bytes": 11
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/24b9b9fa3aa44eb2bd45fe1e5c08a8b2/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "254143a2141f4e628136346f5430fc4d": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/254143a2141f4e628136346f5430fc4d/receipt.json",
+          "sha256": "a7b843909863a76ad19080a61c1ec2010edd518d1e643e2e5ef23182eeef5189",
+          "bytes": 1496
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/254143a2141f4e628136346f5430fc4d/stdout.txt",
+          "sha256": "0e1be0e26be8cce5889ff39bed0ff841f6be1c788f9624453421e22f1a6bba9a",
+          "bytes": 22
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/254143a2141f4e628136346f5430fc4d/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "28b4ef736f3a4b3da47969857b6e3171": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/28b4ef736f3a4b3da47969857b6e3171/receipt.json",
+          "sha256": "ca5e786ff1d4f019cf1bf0ee4cdb6cca8ad4e9181297effd54136b1e60bd971d",
+          "bytes": 1488
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/28b4ef736f3a4b3da47969857b6e3171/stdout.txt",
+          "sha256": "aae2e50c3b9fd762288c39d2b7b9d316b9f9f61bdc87157ca8c8626e9da76b64",
+          "bytes": 3481
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/28b4ef736f3a4b3da47969857b6e3171/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "2c29461d61d34cafb3b39b1aa3a0abdf": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2c29461d61d34cafb3b39b1aa3a0abdf/receipt.json",
+          "sha256": "c16496e5dbbfd5e8f4131cf7735c358785dc72b66941ebe9d5988e201e692c8d",
+          "bytes": 1497
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2c29461d61d34cafb3b39b1aa3a0abdf/stdout.txt",
+          "sha256": "1bb6412db81c8b8daa977163da10154477f04ed4652623229d1387bf526a2352",
+          "bytes": 363
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2c29461d61d34cafb3b39b1aa3a0abdf/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "2ebff1911c1f4f348afc5858bbf42bda": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2ebff1911c1f4f348afc5858bbf42bda/receipt.json",
+          "sha256": "5d22d9a61ddb4351857b67fea5b110c368089da27fcb3790c9ed0c22edaab67c",
+          "bytes": 1495
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2ebff1911c1f4f348afc5858bbf42bda/stdout.txt",
+          "sha256": "b7c89cbb996a58508858155480cd53b7a1092a4d356ce4e2dc400109c0e94f36",
+          "bytes": 899
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/2ebff1911c1f4f348afc5858bbf42bda/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "34de8c4335f94f97b6eac73f32fbf3e3": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/34de8c4335f94f97b6eac73f32fbf3e3/receipt.json",
+          "sha256": "aafa0e0b894f9752ab004868dfa2011a7aa98882e87daad6a57cc5ea2b11dfd8",
+          "bytes": 1504
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/34de8c4335f94f97b6eac73f32fbf3e3/stdout.txt",
+          "sha256": "9d82f180101effb003ee384816117116b6913e205b172ae4a31a6e095c5c55aa",
+          "bytes": 2709
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/34de8c4335f94f97b6eac73f32fbf3e3/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "441eb8f293324caebe4fedfa9883e6a1": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/441eb8f293324caebe4fedfa9883e6a1/receipt.json",
+          "sha256": "64e8f6ff83a5dfc42038b16e61ff9a1ae29015d3d3232233f327319a341d1ae2",
+          "bytes": 1503
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/441eb8f293324caebe4fedfa9883e6a1/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/441eb8f293324caebe4fedfa9883e6a1/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "454416d9876d463e828c06e2673a7644": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/454416d9876d463e828c06e2673a7644/receipt.json",
+          "sha256": "a28f934721aa8f97f4d4ff14e7d89716176125d1a068135d05b95be7cc096699",
+          "bytes": 1498
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/454416d9876d463e828c06e2673a7644/stdout.txt",
+          "sha256": "e3bdec73b1eae01f0d70b84357405122f46ed0ef43e1d647fd70f762579b3a58",
+          "bytes": 40
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/454416d9876d463e828c06e2673a7644/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "46114c9f36324aa2ad86067e10d6f396": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/46114c9f36324aa2ad86067e10d6f396/receipt.json",
+          "sha256": "c974e8df6d6f979d44dc97177795f97dc8211736a872d108ef0087262f614b14",
+          "bytes": 1497
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/46114c9f36324aa2ad86067e10d6f396/stdout.txt",
+          "sha256": "0e1be0e26be8cce5889ff39bed0ff841f6be1c788f9624453421e22f1a6bba9a",
+          "bytes": 22
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/46114c9f36324aa2ad86067e10d6f396/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "4cfa51db382b49609a9670cd64e21820": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/4cfa51db382b49609a9670cd64e21820/receipt.json",
+          "sha256": "4127bc012f7f153b9d990c4708a237a711fd123ecae4f04b3bea8170ccb3d2a8",
+          "bytes": 1501
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/4cfa51db382b49609a9670cd64e21820/stdout.txt",
+          "sha256": "dd08f6a30cf161b4e35378aa393751f9ba576591f70faac071cc8bb5715c9050",
+          "bytes": 11134
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/4cfa51db382b49609a9670cd64e21820/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "5104e234177043b69ada806583eb3c30": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5104e234177043b69ada806583eb3c30/receipt.json",
+          "sha256": "dd7dc8ecf8aca91f28b6a4bb52e09a6598808784f867c0a2caa89f6dcfb61ff1",
+          "bytes": 1506
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5104e234177043b69ada806583eb3c30/stdout.txt",
+          "sha256": "3b9987a34a269f601f2b02c0086b99d2bc4895394fade2c842ae6dcb9718df1b",
+          "bytes": 1834
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5104e234177043b69ada806583eb3c30/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "5b90bb8f66fb4ddd9bfeddbe5015133a": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5b90bb8f66fb4ddd9bfeddbe5015133a/receipt.json",
+          "sha256": "62c6220fff5f98aab43061f5fabba563f368a44cd3e431ce163e96b4bd1b6282",
+          "bytes": 1542
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5b90bb8f66fb4ddd9bfeddbe5015133a/stdout.txt",
+          "sha256": "d1fba9b095bec4a31831c598e4bbf7bd043579d923e57efd3403a0dab74efc15",
+          "bytes": 5349
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5b90bb8f66fb4ddd9bfeddbe5015133a/stderr.txt",
+          "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+          "bytes": 127
+        }
+      },
+      "5baa24247b8546f183d54c00ef4c4320": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5baa24247b8546f183d54c00ef4c4320/receipt.json",
+          "sha256": "88afc39ad7f304f000dc2e966c55aa1fcd12f44f6495c5d905f92345aa8c6fe8",
+          "bytes": 1505
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5baa24247b8546f183d54c00ef4c4320/stdout.txt",
+          "sha256": "38c4b02c1f2d87616a2026769126369d7736a635d70404c944fd00de2c19a7a9",
+          "bytes": 222
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5baa24247b8546f183d54c00ef4c4320/stderr.txt",
+          "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+          "bytes": 127
+        }
+      },
+      "5e5bf4d1a1a545518d884edd21fb329a": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5e5bf4d1a1a545518d884edd21fb329a/receipt.json",
+          "sha256": "2b42ed671bc6086a14170f2e2f97046e074bda8700be5c855af2911b30ac15fc",
+          "bytes": 1504
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5e5bf4d1a1a545518d884edd21fb329a/stdout.txt",
+          "sha256": "f1c0694c6dd5e2ad22c4a92b6e0cd4843116d4bb2df70ce14d079267711ef8be",
+          "bytes": 225
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5e5bf4d1a1a545518d884edd21fb329a/stderr.txt",
+          "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+          "bytes": 127
+        }
+      },
+      "605883c2c44f43cf8345af2a67d743d2": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/605883c2c44f43cf8345af2a67d743d2/receipt.json",
+          "sha256": "2e1342418e064c91b77a534e3575e783bdad01ca38bafc60f15d6fad41919d2a",
+          "bytes": 1508
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/605883c2c44f43cf8345af2a67d743d2/stdout.txt",
+          "sha256": "9a7480444cb00bc6cde035b9a45eb4a15620d27075d59921666d331346b0f0fe",
+          "bytes": 299
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/605883c2c44f43cf8345af2a67d743d2/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "681d650bad614bac88a788663c2b45ea": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/681d650bad614bac88a788663c2b45ea/receipt.json",
+          "sha256": "c24df8e1574df550765e88a9d6ef65c778af10238761c5fa69ae254391eece82",
+          "bytes": 1503
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/681d650bad614bac88a788663c2b45ea/stdout.txt",
+          "sha256": "7b118fc4464cd2480ae766a7c2809d890cfd6943a5b2c6f72ec21637f8396875",
+          "bytes": 40
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/681d650bad614bac88a788663c2b45ea/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "70d2fcb66aad4508b51522134083fbb2": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/70d2fcb66aad4508b51522134083fbb2/receipt.json",
+          "sha256": "c2c2a976300fbe6ccb0a646e53a987ed8529de695be30db4ddf8d36752ec7197",
+          "bytes": 1498
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/70d2fcb66aad4508b51522134083fbb2/stdout.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/70d2fcb66aad4508b51522134083fbb2/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "7f1df8d7c11f4c25b04e5bc038344969": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/7f1df8d7c11f4c25b04e5bc038344969/receipt.json",
+          "sha256": "8e61f5d2d7544f5fff1a786c0fe1bee8b152873790a8e7f3273305ed35de1f16",
+          "bytes": 1505
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/7f1df8d7c11f4c25b04e5bc038344969/stdout.txt",
+          "sha256": "238903180cc104ec2c5d8b3f20c5bc61b389ec0a967df8cc208cdc7cd454174f",
+          "bytes": 3
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/7f1df8d7c11f4c25b04e5bc038344969/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "889253f46095449488e86338a9042a81": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/889253f46095449488e86338a9042a81/receipt.json",
+          "sha256": "b1c0e69d4890ac630f7ebb5b7d2d90cdd8f4cf47404d19437da6089e179ff76f",
+          "bytes": 1495
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/889253f46095449488e86338a9042a81/stdout.txt",
+          "sha256": "2762448b801c977f97136ce55100968feaf6c4f52dfdb4ea278c6bd34777f12d",
+          "bytes": 235
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/889253f46095449488e86338a9042a81/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "9fce431b487a427692919f40b40a727f": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/9fce431b487a427692919f40b40a727f/receipt.json",
+          "sha256": "9b5c2b851ddc5afe9a615c5c3d14fcdd301bff209c9a3a9fffa2f97343e15f3f",
+          "bytes": 1502
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/9fce431b487a427692919f40b40a727f/stdout.txt",
+          "sha256": "631d83d15f68267b7cd05c505978e5c3b336894ad1e7670436f3e45e26a7c91a",
+          "bytes": 52968
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/9fce431b487a427692919f40b40a727f/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "a8c4f2d06f144f0385714fb55e1d9c43": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/a8c4f2d06f144f0385714fb55e1d9c43/receipt.json",
+          "sha256": "e816c8cbfa4766f965790f409ad469e5a4d45dfe6b90fb4ef2e6026408ecb839",
+          "bytes": 1492
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/a8c4f2d06f144f0385714fb55e1d9c43/stdout.txt",
+          "sha256": "598665d639a90c6ef8bb9b86e2867da259343ccf8d2f1497fd4755012af8a182",
+          "bytes": 9451
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/a8c4f2d06f144f0385714fb55e1d9c43/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "b13d2d32b1924accaa40a849d4329a1e": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b13d2d32b1924accaa40a849d4329a1e/receipt.json",
+          "sha256": "4af39a22c1ed36eb840ee21f8de5535d9ff48cf4571b1bb348c310b7e8a3eaad",
+          "bytes": 1493
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b13d2d32b1924accaa40a849d4329a1e/stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b13d2d32b1924accaa40a849d4329a1e/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "b2e6bcb2dc554a0495b086db67e98c66": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b2e6bcb2dc554a0495b086db67e98c66/receipt.json",
+          "sha256": "a87adf722570acb30dcbdde23dceb2b360fd6d2a41451298e3f56c1c6b648e40",
+          "bytes": 1503
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b2e6bcb2dc554a0495b086db67e98c66/stdout.txt",
+          "sha256": "fb2c0b7c1bcd5fcb7e48b156dd2953ba1a9d10f7154b80fc5a5d969bb62de7e6",
+          "bytes": 227
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b2e6bcb2dc554a0495b086db67e98c66/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "baf431eb7fb04e3ca790dbbd6b27c22b": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/baf431eb7fb04e3ca790dbbd6b27c22b/receipt.json",
+          "sha256": "8944de4da907b7c9978bc01a2ea50ee252c8607b9f17c70e8c0c6d33db832905",
+          "bytes": 1488
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/baf431eb7fb04e3ca790dbbd6b27c22b/stdout.txt",
+          "sha256": "82ea0ed67d4c5fc3bf3ae62b9d219a7a94fafe8c74f54ff54b4074ae35f6f148",
+          "bytes": 2773
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/baf431eb7fb04e3ca790dbbd6b27c22b/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "c02e89f8d8f2481f90058606ccf71b29": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c02e89f8d8f2481f90058606ccf71b29/receipt.json",
+          "sha256": "f917b31671ee1451f05acd2cf9115cd574941ba1936015ff7ff48f9962e20f20",
+          "bytes": 1532
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c02e89f8d8f2481f90058606ccf71b29/stdout.txt",
+          "sha256": "188d8076228d3c172c054dd094c28ab17d722c3d16d01e09b14b0087c716fe85",
+          "bytes": 1281
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c02e89f8d8f2481f90058606ccf71b29/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "c88fdf4e2b15487c91639a5804536530": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c88fdf4e2b15487c91639a5804536530/receipt.json",
+          "sha256": "287d805d9224b08161c6ec9b935e911e2f2665308bf7484bcae35b73e3d10e8d",
+          "bytes": 1501
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c88fdf4e2b15487c91639a5804536530/stdout.txt",
+          "sha256": "81891563a994711fef99f1b8081c59d56c69c68f1fc04d624d71019b50cbcb24",
+          "bytes": 3094
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c88fdf4e2b15487c91639a5804536530/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "c916303bc4f64b30b28968bc51bee5df": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c916303bc4f64b30b28968bc51bee5df/receipt.json",
+          "sha256": "86213073d4de561f7eb0d65ce56a238fb52cb283dbe2329576923f545eed08a5",
+          "bytes": 1500
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c916303bc4f64b30b28968bc51bee5df/stdout.txt",
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "bytes": 3
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c916303bc4f64b30b28968bc51bee5df/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "dc4969af41e544e2aaf81ef6e2007c23": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/dc4969af41e544e2aaf81ef6e2007c23/receipt.json",
+          "sha256": "b490b8656783a2ff4419a9ceef8c29a2ed1d98e7f2003878404fa29801c15b44",
+          "bytes": 1487
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/dc4969af41e544e2aaf81ef6e2007c23/stdout.txt",
+          "sha256": "4f2494854e0219ef101fa2ff422170052d2ba10b94512e1c76fee5c9538e73a3",
+          "bytes": 2773
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/dc4969af41e544e2aaf81ef6e2007c23/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "dfe9cd79d2de4a5ba8c9586ffe85900c": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/dfe9cd79d2de4a5ba8c9586ffe85900c/receipt.json",
+          "sha256": "8d6827f31b358a2e96d099b6172fde4d356fb773b21f80812b4c8f51149028df",
+          "bytes": 1497
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/dfe9cd79d2de4a5ba8c9586ffe85900c/stdout.txt",
+          "sha256": "e7d4ceb1533eea05ae7c0ac5e18f771581940c5b56e4826bf2d5b9fa54ff26c9",
+          "bytes": 238
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/dfe9cd79d2de4a5ba8c9586ffe85900c/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "e93a6a64de354d7db5da065bd69fa5dd": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e93a6a64de354d7db5da065bd69fa5dd/receipt.json",
+          "sha256": "5af73890fe4b9080f99717fb6aaaf441f285405575851e719dc6a2b8d038a8bf",
+          "bytes": 1507
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e93a6a64de354d7db5da065bd69fa5dd/stdout.txt",
+          "sha256": "9d82f180101effb003ee384816117116b6913e205b172ae4a31a6e095c5c55aa",
+          "bytes": 2709
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e93a6a64de354d7db5da065bd69fa5dd/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "eb7cdc43cb2b458486536cf106f4306b": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/eb7cdc43cb2b458486536cf106f4306b/receipt.json",
+          "sha256": "4af08a2235ce00081774d9967fb804896688f2986b5067d2a6852881ba93a6df",
+          "bytes": 1496
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/eb7cdc43cb2b458486536cf106f4306b/stdout.txt",
+          "sha256": "67964cc741d4cf9acc09c350963d67e355b79b4d129ac10dbb30113e7325b07a",
+          "bytes": 11
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/eb7cdc43cb2b458486536cf106f4306b/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "eea0f5acde06472781ffe506cf415783": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/eea0f5acde06472781ffe506cf415783/receipt.json",
+          "sha256": "3aefbf6616e7c031885c07d6c0d1ff48eef742a60b3bec38ed63811d7281ad0f",
+          "bytes": 1506
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/eea0f5acde06472781ffe506cf415783/stdout.txt",
+          "sha256": "baacbbb276c8451872e82da628876b742b859f68abbfb9c000174a72834824e0",
+          "bytes": 222
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/eea0f5acde06472781ffe506cf415783/stderr.txt",
+          "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+          "bytes": 127
+        }
+      },
+      "f7a0d1bde3d74cdc81d8fcdc1b46f6c7": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/f7a0d1bde3d74cdc81d8fcdc1b46f6c7/receipt.json",
+          "sha256": "9ea138a8844f2503404b0ffc895e9bca3f5eb929298cf752eb128ad27143c0b9",
+          "bytes": 1503
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/f7a0d1bde3d74cdc81d8fcdc1b46f6c7/stdout.txt",
+          "sha256": "3b9987a34a269f601f2b02c0086b99d2bc4895394fade2c842ae6dcb9718df1b",
+          "bytes": 1834
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/f7a0d1bde3d74cdc81d8fcdc1b46f6c7/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "ffc50971379b49c8bc7b8bca8d11f8e5": {
+        "receipt.json": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ffc50971379b49c8bc7b8bca8d11f8e5/receipt.json",
+          "sha256": "a4baa06f6558912017b105de245168e69424ed0fa18b0e6aa0ee406306de34cd",
+          "bytes": 1504
+        },
+        "stdout.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ffc50971379b49c8bc7b8bca8d11f8e5/stdout.txt",
+          "sha256": "e9941a6589c3d5d98c5969f9c22d39ebfee0025647db124f2b5f0e06c428e1ca",
+          "bytes": 205
+        },
+        "stderr.txt": {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/ffc50971379b49c8bc7b8bca8d11f8e5/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
     },
-    "diagnostics": [
-      "测试临时目录经过真实路径核对后重测。",
-      "离线原件夹具补全成员索引，容量测试双端使用同一外部测量函数。"
-    ],
-    "deliveryInputVerification": {
-      "measuredCommit": "a383c66ba4e8a32ba81b249353411413a1ba24d0",
-      "oracleInputKey": "09350c932dcbe81740f5f6d3ce3f75eca6c1de292b102ce1032f39fe02e5eb4b",
-      "oracleReusedFrom": "4f125fd47945fa47afad9c4c207d038b3e832a69",
-      "affected": [
-        "policy"
-      ],
-      "commands": {
-        "plan": "ce0ee700371b4e9a88be9049fca21fa9",
-        "verify": "44ced7ac64c34ef2a1a83fc6a3b8f87a"
+    "precheckFailures": [
+      {
+        "operation": "2f02a4533acb4dd59bd7095c97238d70",
+        "failure": "PYYAML_EXTRA_MEMBER",
+        "recovery": "保留未登记的 17 个 pyc 后零下载重开"
       },
-      "firstPrecheck": {
-        "commandId": "d118202ccca946d0b1f5799231eb2785",
-        "exitCode": 2,
-        "evidenceSchemaExitCode": 1,
-        "formatExitCode": 0
+      {
+        "operation": "d418c97636f54bec8d425897e6b1bf4f",
+        "failure": "镜像没有可选 Volumes 字段，创建资源前中止"
+      },
+      {
+        "failure": "S23_PREFIX_DRIVER_CHANGED",
+        "recovery": "显式兼容原件和当前输入并重开历史前缀"
+      },
+      {
+        "failure": "EVIDENCE_SCHEMA: exact check fields required",
+        "exitCode": 1,
+        "recovery": "未执行项显式保留空 command 与空 exitCode，重验 schema2。"
       }
-    }
+    ]
   }
 }

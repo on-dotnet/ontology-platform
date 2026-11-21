@@ -2,44 +2,51 @@
   "taskId": "G4-ORACLE-MAPPING-QUERY-001",
   "runId": "product-resume-01",
   "batch": "s2-s3-01",
-  "baseline": "1e727e46370b2bd597099d56bc271178555fb9d4",
-  "reviewedCode": "851906f140c0defc0201b392e838e191b20afa27",
-  "engineeringCommit": "4f125fd47945fa47afad9c4c207d038b3e832a69",
-  "state": "S2_PARTIAL_ABA_TIMEOUT_CHATGPT_REVIEW",
-  "conclusion": "三处入口增量复核通过。实际权限准备和当前认证通过，ABA 未在原期限内完成，S2 PARTIAL，S3 NOT_RUN。",
+  "baseline": "7047f9cfb33bd46677433a368f19e5614a0f0179",
+  "reviewedCode": "55107958b2e26547dd1f040800c9188d7443601d",
+  "engineeringCommit": "55107958b2e26547dd1f040800c9188d7443601d",
+  "state": "S2_PARTIAL_SOURCE_LINK_CHATGPT_REVIEW",
+  "conclusion": "普通 Mapping 归位和 PG 结算有实测。准确源关联不足，保留 d368，后续产品窗停止。",
   "reviews": [
     {
-      "role": "授权及消费者",
-      "finding": "核实最后正常 15 项、15 组历史反例恢复原字节和单次追加。复核后拒绝错代六加九登记、未恢复 token 和同步篡改原件及登记散列。实机命令双流与 ready 独立回读。",
-      "original": "8a0524ef4a8c4f34aadf7a2ec0f75b19",
-      "members": 54
+      "reviewer": "aba",
+      "scope": "三文件非作者重开",
+      "result": "141 个当期原件引用、Base 三个 blob 和四个 Finder 散列一致，完整 stdout JSON 与原字节投影一致。公开交付路径改为仓库相对路径，区分 B 事件与正式激活时刻。"
     },
     {
-      "role": "资源与关闭代次",
-      "finding": "旧七角色至新宿主和默认图、2748 行命名图及 Published 核对通过。新 Fuseki PID 94542。新关闭 5 份原生回执、两 API 缺席、两轮排空、20 项保护和 8 次采样复核通过。",
-      "operation": "9b81d52b3b7041ecb7b8530198d77ccd",
-      "windowId": "1f5e1a017b154a71b67b6229f166ac37",
-      "post": "044ea783d35945b2997a8d1c1668b971"
+      "reviewer": "generation",
+      "scope": "非作者独立核 B、C 与 d368 的 18 份命令双流",
+      "result": "准确源关联 HOLD。PG 共18/18，当前三构建三快照通过。C 初版未核四个行字段，候选已补 fence、owner、leaseUntil、errorCode 的被动核验。",
+      "input": {
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/reviewer-generation.json",
+        "sha256": "6f5e42933e2b0be7d723db9001b95f2fe3427a40bfcee49f11965d96fd801397",
+        "bytes": 10364
+      }
     },
     {
-      "role": "独立产品审查",
-      "finding": "正常认证 CASE_QUALIFIED。按准确查询重开源读、激活 B 与超时拒绝；后态为 FAILED、owner 存在、fence 2、租约过期。断点早于零成功副作用核验。",
-      "auth": "d6e05ec96e04432b80f3a2e5c07803d0",
-      "members": 2320,
-      "aba": "5b90bb8f66fb4ddd9bfeddbe5015133a",
-      "post": "b2e6bcb2dc554a0495b086db67e98c66"
+      "reviewer": "aba",
+      "scope": "非作者复核 B 与 d368 行／审计／收据／源观察",
+      "result": "32 条隔离 PG 操作中的四个测试命令完整；零成功副作用已查清。旧实例停机后终止，按 Q 独立确证原源执行仍有缺口。"
     },
     {
-      "role": "独立产品审查，交付输入复核",
-      "finding": "196 个不同原件的路径、大小和 SHA256 全部匹配。交付输入与工程实测的 Oracle 门禁输入键相同，policy 增量实跑退出 0。首次交付预检退出 2 及双流原件保留。产品实测仍为 851906f1，父退出 1。",
-      "deliveryInput": "a383c66ba4e8a32ba81b249353411413a1ba24d0",
-      "policy": "44ced7ac64c34ef2a1a83fc6a3b8f87a"
+      "reviewer": "aba",
+      "scope": "复核被动后态修正后的四字段与 C# 真实输出及原件消费者",
+      "result": "独立运行 S2ConsumerTests 9/9，通过缺字段拒绝和保留占位分类测试。"
+    },
+    {
+      "reviewer": "generation",
+      "scope": "非作者独立重开 55107958 的七角色维护代次与三角色原始回执",
+      "result": "核准 15812 B 关闭、119 个成员、两次七项零排空、20＋3 项保护；历史宿主至新构建换代、恢复 revision 3、PG 时钟 5705.121 秒和零追加均由原件重开。"
+    },
+    {
+      "reviewer": "settle",
+      "scope": "非作者核 A 正常恢复的三角色 HTTP 协议、DTO、七阶段、原历史 A/B 及真实输入",
+      "result": "独立恢复链由三角色正式回执与 PG 新读确认。旧十槽后置校验从 ActiveView 读取不存在的 activationId。若未来获准恢复正式窗，应在产品响应后用完整激活回执核对。"
     }
   ],
   "limits": [
-    "回滚激活 A、原期限内 409、零成功副作用和下一槽准入未获资格。",
-    "锁屏、熄屏、CI、本批 S3 未实证。",
-    "AC03-B、Oracle S0、cleanup250ms 和两项历史 Doris assessment 维持原状态。"
+    "正式 ABA、AC03-B、Oracle S0、cleanup250ms 资格保留原边界。",
+    "旧失败的最后已证客户端调用是回滚 job 读回。正常恢复的跨请求耗时与旧在途调用上下文不同。"
   ],
-  "deliveryReadback": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/entry-delivery-readback-851906f1.json"
+  "deliveryReadback": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-delivery-readback-7047f9cf.json"
 }
