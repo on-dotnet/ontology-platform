@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_PARTIAL_RUNTIME_DISK_PEAK_UNQUALIFIED_CHATGPT_REVIEW**。从 b620c363 在原树、原批次只读检查。替代 Oracle 卷所在 ext4 实际报告 noquota，同期写入联合上界尚未获证。收尾冷态余额 69,533,250 B，冻结十槽 0/10。prepare、构建、快照与已合格产品输入复用。S1 PASS、S2 PARTIAL、S3 NOT_RUN、G4 PARTIAL。AC03-B、Oracle S0 继续 BLOCKED。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
+唯一任务状态 **S2_PARTIAL_RUNTIME_GRANT_EXPIRED_CHATGPT_REVIEW**。冻结十槽实测 1 PASS、1 FAIL、8 NOT_RUN。四角色正常认证通过，ABA 槽在创建查询前因已登记组合授权过期停止。两 API 已移除，五副本已退出。S2 PARTIAL、S3 NOT_RUN、G4 PARTIAL；AC03-B 与 Oracle S0 保留 BLOCKED。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
 
 ## 执行身份与所有权
 

@@ -2,84 +2,56 @@
   "taskId": "G4-ORACLE-MAPPING-QUERY-001",
   "runId": "product-resume-01",
   "batch": "s2-s3-01",
-  "baseline": "b620c363cba2ad536922d48267e975ae59a21d15",
-  "reviewedCode": "b620c363cba2ad536922d48267e975ae59a21d15",
-  "conclusion": "PARTIAL_HANDOFF",
-  "state": "S2_PARTIAL_RUNTIME_DISK_PEAK_UNQUALIFIED_CHATGPT_REVIEW",
-  "reviewers": [
+  "baseline": "d6463f63b52d2afa08e7a6779d260e8d4265dfff",
+  "reviewedCode": "54d2493bfa7377855ab5a59b6bc82612d21e9b3d",
+  "engineeringCommit": "32b76a92afe62b30f299e3d4031b75f13840f190",
+  "state": "S2_PARTIAL_RUNTIME_GRANT_EXPIRED_CHATGPT_REVIEW",
+  "conclusion": "PARTIAL。认证首槽独立成立，ABA 在权限准入处失败，S3 未运行。",
+  "reviews": [
     {
-      "reviewer": "/root/admission",
-      "scope": "恢复谱系与 Oracle 数据文件",
-      "observations": [
-        "替代源先从 cold-01 建立，随后从 s0-recovery-01/source/database.tar 再装载。第二次恢复回执与当前同一替代卷身份相符。",
-        "第二代冷备 19 个非敏感成员与当前 stat 逐项匹配。两个 SYSAUX 各增 31,457,280 B，其他 17 项相同。引擎整卷差 470,034,432 B，余下 407,119,872 B 无法按文件归因。",
-        "历史卷总量与现在的分文件观测时间范围不同，不能推断旧热窗分文件变化或未来 MAXBYTES。"
-      ],
-      "originals": [
-        {
-          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/restored-oracle.json",
-          "sizeBytes": 554,
-          "sha256": "68fae85ed97dce916c4e13b7348ab2d1a64386461d403a4f7e6f1c00299f1e8f"
-        },
-        {
-          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/source-admission-060d5775d56e45599275ffda40166c90.json",
-          "sizeBytes": 43198,
-          "sha256": "99c152118849b0eab8772ca5a55aba60f2b3e3c78327764c97f6af5a25cb87a7"
-        },
-        {
-          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/growth-inspection-b620c363-v2.json",
-          "sizeBytes": 5470,
-          "sha256": "f89353b1f7e5ed829611c9793fcdb09eca2fe2bb4378a9d6f3959ba136f87be1"
-        }
+      "role": "资源账目只读审查",
+      "finding": "两个历史端点的四项实际差异完全解释 −33,044,992 B。替代平台卷 +16,384 B 落在既计预留，63 个缓存的信用只抵扣一次。",
+      "evidenceIds": [
+        "24ddb2256bcb4bdc95d03103b99b8733",
+        "50bc1f49307f4478bf7103be0f03095f",
+        "0550da43ee07467783dbb6ef746fa8fa"
       ]
     },
     {
-      "reviewer": "/root/review",
-      "scope": "资源入口、并发分项、helper 实际双流与收口",
-      "observations": [
-        "只读挂载来自同一任务替代卷。第二 helper 的七组命令均通过，实际 stdout 报 ext4 noquota、四路径项目号 0、quota 工具缺席；退出后按 ID 核缺席。",
-        "第二 helper 前后两份准入的 86 个底层命令能够从原回执重开。Oracle 未启动，保护清单与卷计量相符。",
-        "收尾 42,880,139,710 B，余额 69,533,250 B。旧同窗口 Oracle 与可写层合计增加 204,293,632 B，平台增量已被预留吸收。无前瞻宿主抵扣时情景缺口 134,760,382 B；宿主有效释放达到极限时仍差 65,607,614 B。",
-        "对照命令实际退出 2，增长上界为空。可以交付 PARTIAL；S2/S3 未新增实机资格。"
-      ],
-      "originals": [
-        {
-          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-5a022daca41c48bf99e1db83ddb94272.json",
-          "sizeBytes": 44611,
-          "sha256": "71ba98d5349dff9d8ec31d6145cb52816a46300abd5cdb1b60d6d074e096eadc"
+      "role": "复用资格只读审查",
+      "finding": "三个 prepare 回执、三份构建和 99/222/222 个快照成员逐件相符。重开前五槽的 684 项、冻结 546 项，以及 access 的 78 项检查和 1236 个成员。",
+      "evidence": {
+        "commandId": "1afa8fd9ad624134a814126527f7a916",
+        "measuredCommit": "b9c55441d8d53b341e0424a746f5bef32950cf37",
+        "qualificationSha256": "13b3f88a56191dd16cfa4ec71a3393bb0a1798b5db7cbc74531ef6cdf41d4385",
+        "memberIndexSha256": "945280d40ddf750bea9fc4ecc6a3660b23b07871a4c1af2a203ec50fbac470ca"
+      }
+    },
+    {
+      "role": "非作者产品及收口审查",
+      "finding": "准确父回执 exit 1，四个当期身份认证通过。目录一致、6 项原单表历史均在、6 条组合授权范围正确且未撤销，准入时已全部过期，9 项工作流授权也已到期。父窗口及两槽业务源读为零。ABA queryId、原期限拒绝、零成功副作用、owner/fence、下一槽均无当期产品资格。",
+      "parent": "1080791aa97546f29c34fd915618ecef",
+      "parentReceiptSha256": "7d6828b3f6f3ad087ec4c52b24cb8d40259e3b953608024be9ba19aab9c630c1",
+      "snapshotSha256": "ceb98b343de2c0ec092911d973d77839ee521a3cd94c39405dbf60368ec5dce3",
+      "resourceEvidence": {
+        "samplesSha256": "585c0eb6272b9906add9b14d4f0136de6463556525e36a4198bcaeb058fafa79",
+        "closeSha256": "35bcf152b788c21a72690c7b3fa2cc7f58355b1c6b66fc54ec4074d2d83be691",
+        "allFiveStartsChecked": true,
+        "apiRemovalsAndAbsenceChecked": 2,
+        "graphCheck": {
+          "defaultRows": 0,
+          "namedRows": 2748,
+          "namedSha256": "4692dc65b7f20ccd3ae05c400e85310769462cbe60968d6ec102878c68ec5ab6"
         },
-        {
-          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/source-admission-0550da43ee07467783dbb6ef746fa8fa.json",
-          "sizeBytes": 44611,
-          "sha256": "ee62c534af961d996262452843447a8c87c701eb944bd1514e2000f034a47325"
-        },
-        {
-          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/s0-recovery-01/helper-05a0c48e3e7d492d89b247c4afe9f48a.json",
-          "sizeBytes": 426,
-          "sha256": "54fbdb198ae941b27044936e886d8a4a22e9c8511ce06adfa62eff209ed67519"
-        },
-        {
-          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/s0-recovery-01/01e448f857d6438d81f45de6b7d1fbb0/stdout.txt",
-          "sizeBytes": 458,
-          "sha256": "dc764f863adc9161e34e6bcad8c48d96646c0abea91dbe801da0490f60f6f733"
-        },
-        {
-          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/fdf57c5d44e84ecdba736c6da2a01b2d/stdout.txt",
-          "sizeBytes": 1405,
-          "sha256": "3df95c25c3d200136b5f8c24918d4cbefefc0d6631562558933b7cec0603d7a4"
-        }
-      ]
+        "finalAdmission": "7f8f4bf28b8640d4a17a2d3d4ae6362b"
+      }
     }
   ],
-  "priorAccepted": {
-    "path": "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/non-author-review.json",
-    "commit": "b620c363cba2ad536922d48267e975ae59a21d15",
-    "sizeBytes": 5178,
-    "sha256": "f7d4b40eafc607c5d63a80769a666207ab1c55916aff3d9a65b96b28a8e19c5d"
-  },
   "limits": [
-    "未查询运行中 Oracle 数据字典；没有当前十槽热态样本。",
-    "本机资源证据独立重开；交付提交及普通 push 后远端引用在包外回执。"
+    "独立审查只读重开，实机操作者为 Master。",
+    "采样不提供连续峰值证明。",
+    "Fuseki cleanShutdown UNKNOWN。",
+    "原 AC03-B、Oracle S0、cleanup250ms、Doris 两项 assessment 的未资格继续保留。"
   ],
-  "readback": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/read-only-growth-remote-readback.json"
+  "deliveryReadback": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/controlled-delivery-readback.json"
 }

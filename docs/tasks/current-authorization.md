@@ -65,3 +65,5 @@
 2026-11-21，用户接受 b620c363 的 PARTIAL 交接，授权只读核实替代 Oracle 卷的实际增长约束及同期未预留增量。沿原树、原分支、原批次复用 prepare、构建与快照。实际挂载 noquota，联合上界未获证，十槽保持 0/10。原 40 GiB、受保护资源及 main 保持原边界，停在 ChatGPT 复审。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
 
 2026-11-21 用户从 d6463f63 继续原任务、原树、原分支。限 product-resume-01 / s2-s3-01，准许一次分项核对后选择最高 48 GiB。保留 14/26 GiB 物理 floor、原 CPU 与内存、5 秒／1 秒／250 ms。Master 单写单操作，按冻结十槽及首槽正常认证连续执行，原件复用、预留、采样、保护退出与三文件收尾按任务卡执行。
+
+本批已按一次受控窗口执行。首槽四角色认证获资格，第二槽因授权到期在创建查询前退出，后续八槽未运行。状态 S2_PARTIAL_RUNTIME_GRANT_EXPIRED_CHATGPT_REVIEW，资源已收口，三文件交付后停 ChatGPT 复审。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
