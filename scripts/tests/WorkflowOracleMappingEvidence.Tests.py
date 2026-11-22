@@ -309,7 +309,8 @@ class OracleQualificationTests(unittest.TestCase):
         root=self.root
         scripts=root/'scripts/maintenance'
         modules=('workflow_oracle_mapping_evidence','workflow_execution','workflow_evidence','workflow_oracle_mapping_resources',
-                 'workflow_m2_build','workflow_m2_evidence','execution_preflight','task_run_timeline')
+                 'workflow_m2_build','workflow_m2_evidence','execution_preflight','task_run_timeline',
+                 'workflow_oracle_mapping_access_refresh','workflow_oracle_mapping_continuity')
         for name in modules:
             shutil.copyfile(ROOT/'scripts/maintenance'/(name+'.py'),scripts/(name+'.py'))
         for name in oracle.DRIVERS:

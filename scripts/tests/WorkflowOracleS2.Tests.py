@@ -653,7 +653,7 @@ class S2ContinuationTests(unittest.TestCase):
         area=Path(self.enterContext(tempfile.TemporaryDirectory())).resolve();originals={}
         for name in e.drivers(ROOT,'s2-s3-oracle'):
             originals[name]=e.git_original(ROOT,n.PREFIX['measuredCommit'],name)
-            target=area/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/name).read_bytes())
+            target=area/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(e.git_original(ROOT,'c44c6294e31ee990b068d2e95bfce9a7476be397',name))
         frozen=dict(browserIdentity=dict(measuredDrivers={name:ex.sha(raw) for name,raw in originals.items()}))
         archive=SimpleNamespace(root=area,dispatch=dict(commandId=n.PREFIX['commandId'],mode=n.MODES[-1]))
         stage=dict(plan=dict(planId='s2-s3-01'))
@@ -990,7 +990,11 @@ class S2CapacityTests(unittest.TestCase):
                     (area / ('source-admission-' + stamp + '.json')).write_text(json.dumps(cold))
                     return cold
 
-                with patch.object(window, 'AREA', area), patch.dict(os.environ, OMQ_PRODUCT_RUN=s.RUN):
+                with patch.dict(os.environ, OMQ_PRODUCT_RUN=s.RUN), self.assertRaisesRegex(ValueError, 'WINDOW_NORMAL_QUERY_BLOCKED'):
+                    with window.open_window():
+                        self.fail('terminal Q1 cannot admit a successor')
+                recovered = window.close_registration('b4a5acc7e4de1d788e666b44e125b642a338024b7d2000c44a8ace4820d4d430')
+                with patch.object(window, 'AREA', area), patch.dict(os.environ, OMQ_PRODUCT_RUN=s.RUN), patch.object(window, 'close_registration', return_value=recovered):
                     with patch.object(resume, 'admit', side_effect=observe):
                         with window.open_window() as decision:
                             self.assertEqual((decision['openingBytes'], window.ceiling()), (total, 48*g))
