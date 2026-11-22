@@ -882,6 +882,15 @@ class CurrentTestOriginals(Originals):
         self.area=root/'artifacts/workflow'/TASK
 
     def raw(self,name):
+        if name=='prepare.json':
+            item=self.index['prepare']
+            require(HEX.fullmatch(item['contentKey']) and COMMAND.fullmatch(item['attempt'])
+                    and HEX.fullmatch(item['sha256']),'OMQ_CURRENT_PREPARE_ID')
+            path=self.area/'environment'/item['contentKey']/'runs'/item['attempt']/'receipt.json'
+            data=ordinary(path).read_bytes()
+            require(sha(data)==item['sha256'],'OMQ_CURRENT_PREPARE_BYTES')
+            self.examined[str(path.relative_to(self.root))]=sha(data)
+            return data
         cid,sep,member=name.partition('-')
         if COMMAND.fullmatch(cid) and member in ('receipt.json','stdout.txt','stderr.txt'):
             require(cid in {item['commandId'] for item in self.index['tests'].values()},'OMQ_TEST_COMMAND_SCOPE')
@@ -900,7 +909,7 @@ class CurrentTestOriginals(Originals):
         return data
 
 
-def record_current_tests(root,prior_sha=None,formal_parent=None):
+def record_current_tests(root,prior_sha=None,formal_parent=None,prepare_command=None):
     """只执行当前输入缺少的选择项；已冻结项须通过同一 reopen_test 才能复用。"""
     import workflow
     import workflow_execution as ex
@@ -921,6 +930,23 @@ def record_current_tests(root,prior_sha=None,formal_parent=None):
     require(not subprocess.check_output(['git','status','--porcelain','--','backend'],cwd=root),'OMQ_TEST_DIRTY_BACKEND')
     index=dict(**route,measuredWorktree=str(root),measuredCommit=commit,buildFiles={},tests={})
     archive=CurrentTestOriginals(root,index)
+    if prepare_command:
+        require(COMMAND.fullmatch(prepare_command),'OMQ_PREPARE_COMMAND')
+        cmd=archive.area/'commands'/RUN/prepare_command
+        receipt=json.loads(ordinary(cmd/'receipt.json').read_bytes())
+        raw=ordinary(cmd/'stdout.txt').read_bytes();err=ordinary(cmd/'stderr.txt').read_bytes()
+        require(receipt['stage']=='s23-current-prepare' and receipt['exitCode']==0 and receipt['commandId']==prepare_command
+                and receipt['runId']==RUN and receipt['taskId']==TASK and receipt['stdout']['sha256']==sha(raw)
+                and receipt['stderr']['sha256']==sha(err) and receipt['commandSummary']==summary(
+                    ['python3','-B','scripts/maintenance/workflow.py','prepare','--task',TASK]),'OMQ_CURRENT_PREPARE_COMMAND')
+        prep=json.loads(raw);attempt=Path(prep['runDirectory']).name
+        path=archive.area/'environment'/prep['contentKey']/'runs'/attempt/'receipt.json'
+        require(Path(prep['runDirectory'])==path.parent and json.loads(ordinary(path).read_bytes())==prep,'OMQ_CURRENT_PREPARE_RECEIPT')
+        index['prepare']=dict(contentKey=prep['contentKey'],attempt=attempt,sha256=sha(path.read_bytes()),commandId=prepare_command)
+        environment_checks(archive,root)
+    elif prior and 'prepare' in prior:
+        index['prepare']=prior['prepare']
+        environment_checks(archive,root)
     for name,(target,expression,minimum) in TESTS.items():
         binding=build.validate(target,TASK)
         for suffix in ('-build-binding.json','-bound-build.txt'):
@@ -977,6 +1003,12 @@ def current_engineering(root,gate,input_key,scope,batch,selection_sha):
     elif gate in ('interaction','web'):
         parent=index.get('formalCommandId')
         require(COMMAND.fullmatch(parent or ''),'OMQ_FORMAL_S2_S3_NOT_RUN')
+        from workflow_oracle_mapping_s2_contract import frozen_plan
+        original=root/'artifacts/workflow'/TASK/RUN/('formal-run-s2-s3-oracle-'+parent+'.json')
+        dispatch=json.loads(ordinary(original).read_bytes())
+        require((dispatch['commandId'],dispatch['taskId'],dispatch['runId'],dispatch['mode'],dispatch['exitCode'])==
+                (parent,TASK,RUN,'s2-s3-oracle',0) and dispatch['stageInputs']['plan']==frozen_plan(root,scope),
+                'OMQ_CURRENT_FORMAL_SCOPE')
         modes=frozen_current_modes(root,scope,gate)
         tests=0
         for mode in modes:
@@ -985,7 +1017,7 @@ def current_engineering(root,gate,input_key,scope,batch,selection_sha):
             tests+=case['checks']
             archive.examined.update({item['path']:item['sha256'] for item in case['members'].values()})
     else:
-        require(False,'OMQ_CURRENT_ENVIRONMENT_ORIGINALS_NOT_RUN')
+        tests=environment_checks(archive,root)
     require(tests>0,'OMQ_ZERO_CHECKS')
     return dict(taskId=TASK,runId=RUN,scope=scope,batch=batch,selectionSha256=selection_sha,gate=gate,
                 inputKey=input_key,status='PASS',tests=tests,skipped=0,executionMode='REUSED',qualificationMode='FRESH',

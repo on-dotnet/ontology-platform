@@ -466,6 +466,42 @@ def diagnostic_command(root, cid, argv, stage, key, parent, archive):
     return row, out, err
 
 
+def diagnostic_observation(original, parent, child, clocks, audit, associate):
+    """父、子、宿主、实测输入、双流和 Q 已经重开。分别报告可得事实，不给缺证项资格。"""
+    missing={}
+    def measured(name,operation):
+        try:
+            return operation()
+        except (ValueError,KeyError,TypeError,IndexError,OSError) as error:
+            # 仅输出固定字段及异常类别，不输出异常字符串或原始日志内容。
+            missing[name]=dict(status='NOT_QUALIFIED',reason='S23_DIAGNOSTIC_'+name.upper(),errorType=type(error).__name__)
+            return None
+    def captured():
+        receipt=original['capturedA']
+        require(receipt['activationId']=='activation-d2dcec9ef54c4f3bb96d60cab449580b'
+                and str(receipt['activationRevision'])=='3','S23_DIAGNOSTIC_A3')
+        return dict(status='OBSERVED_A3',activationId=receipt['activationId'],activationRevision=3)
+
+    a3=measured('capturedA',captured)
+    clock_read=measured('clock',clocks)
+    audit_read=measured('audit',audit)
+    source=None
+    if clock_read is not None and audit_read is not None:
+        source=measured('sourceAssociation',lambda:associate(original,audit_read,clock_read))
+    facts={k:original[k] for k in ('executionStatus','postStateStatus','postStateMissing','postErrorCode','postFence',
+           'postLeaseOwnerHash','postLeaseUntilUtc','failedQueryAudits','successfulQueryAudits','queryAudits','committedReadReceipts',
+           'resultHash','resultSize','ciphertextBytes') if k in original}
+    return dict(queryId=original['queryId'],childCommandId=child['commandId'],parentCommandId=parent['commandId'],
+                parentExit=parent['exitCode'],childExit=child['exitCode'],reportedStatus=original.get('status'),
+                capturedA=a3 or missing['capturedA'],
+                clockStatus='REOPENED' if clock_read is not None else 'NOT_QUALIFIED',
+                auditStatus='REOPENED' if audit_read is not None else 'NOT_QUALIFIED',
+                sourceAssociation={'status':source or 'NOT_QUALIFIED'},missing=missing,
+                elapsedMs=original.get('elapsedMs'),admittedAtUtc=original.get('admittedAtUtc'),
+                deadlineAtUtc=original.get('deadlineAtUtc'),phases=original.get('diagnosticPhases'),
+                dropped=original.get('diagnosticPhasesDropped'),postState=facts)
+
+
 def diagnostic_originals(root, record, archive, *, restore_target=False, observation_only=False):
     """按明确父、子、实测宿主、冻结快照、Q 及可选独立归位回执重开；失败状态原样保存。"""
     from workflow_oracle_mapping_evidence import DRIVER, NODE, stable_host, host_observation, utc
@@ -541,28 +577,25 @@ def diagnostic_originals(root, record, archive, *, restore_target=False, observa
     require(len(originals)==1, 'S23_DIAGNOSTIC_ONE_Q')
     original=originals[0]
     require((original['taskId'],original['resourceRun'],original['case'],original['queryId'])==
-            (TASK,RUN,'AC-05_INFLIGHT_ABA',q) and original['status']==('PASS' if child_row['exitCode']==0 else 'FAIL')
-            and original['capturedA']['activationId']=='activation-d2dcec9ef54c4f3bb96d60cab449580b'
-            and str(original['capturedA']['activationRevision'])=='3', 'S23_DIAGNOSTIC_Q')
+            (TASK,RUN,'AC-05_INFLIGHT_ABA',q), 'S23_DIAGNOSTIC_Q')
     from workflow_oracle_mapping_evidence import audit_observation
     from workflow_oracle_mapping_s2_contract import reopen_source_clocks, source_associations
-    clocks=reopen_source_clocks(frozen,summary,child_row,root)
-    inflight,=[w for w in report['oracleWindows'] if w['name']=='inflight-activation-aba']
-    audit=inflight['audit']
-    require(audit['clientId'] is None,'S23_DIAGNOSTIC_UNFILTERED_SOURCE')
-    audit_observation(frozen,audit,dict(startedAtUtc=inflight['startedAtUtc'],endedAtUtc=inflight['finishedAtUtc']),
-                      host,root,record['measuredCommit'])
+    def clocks():
+        return reopen_source_clocks(frozen,summary,child_row,root)
+    def audit():
+        inflight,=[w for w in report['oracleWindows'] if w['name']=='inflight-activation-aba']
+        source=inflight['audit']
+        require(source['clientId'] is None,'S23_DIAGNOSTIC_UNFILTERED_SOURCE')
+        audit_observation(frozen,source,dict(startedAtUtc=inflight['startedAtUtc'],endedAtUtc=inflight['finishedAtUtc']),
+                          host,root,record['measuredCommit'])
+        return source
     if observation_only:
-        try:
-            source=dict(status=source_associations(original,audit,clocks))
-        except (ValueError,KeyError,TypeError,IndexError) as error:
-            # 诊断保留原始失败与缺失。它的报告不会成为正式源资格。
-            source=dict(status='NOT_QUALIFIED',error=str(error) if isinstance(error,ValueError) else type(error).__name__)
-        return dict(queryId=q,childCommandId=child,parentCommandId=parent,parentExit=parent_row['exitCode'],
-                    childExit=child_row['exitCode'],sourceAssociation=source,elapsedMs=original.get('elapsedMs'),
-                    phases=original.get('diagnosticPhases'),dropped=original.get('diagnosticPhasesDropped'),
-                    postState={k:original.get(k) for k in ('executionStatus','postErrorCode','postFence','postLeaseOwnerHash',
-                    'postLeaseUntilUtc','failedQueryAudits','successfulQueryAudits','committedReadReceipts','resultHash','resultSize')})
+        return diagnostic_observation(original,parent_row,child_row,clocks,audit,source_associations)
+    require(original['status']==('PASS' if child_row['exitCode']==0 else 'FAIL')
+            and original['capturedA']['activationId']=='activation-d2dcec9ef54c4f3bb96d60cab449580b'
+            and str(original['capturedA']['activationRevision'])=='3', 'S23_DIAGNOSTIC_A3')
+    clocks()
+    audit()
     def command_from_phase(name):
         phases=[p for p in original['diagnosticPhases'] if p['phase']==name and p['edge']=='ENTER']
         require(len(phases)==1 and phases[0]['commandId'], 'S23_DIAGNOSTIC_ACTIVATION_COMMAND')

@@ -139,6 +139,116 @@ class OracleQualificationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'OMQ_SETUP_SCOPE'):
             oracle.setup_platform_program(updated,oracle.READY)
 
+    def test_current_plan_and_verify_reopen_test_streams_without_historical_s0_selection(self):
+        """真实 plan/verify CLI 消费隔离的合成原件；夹具不贡献产品或实机测试资格。"""
+        import workflow_m2_build as build
+        root=self.root/'controlled-current'
+        scripts=root/'scripts/maintenance'
+        scripts.mkdir(parents=True)
+        for name in ('workflow','workflow_execution','workflow_evidence','workflow_oracle_mapping_evidence',
+                     'workflow_oracle_mapping_resources','workflow_m2_build','workflow_m2_evidence',
+                     'execution_preflight','task_run_timeline'):
+            shutil.copyfile(ROOT/'scripts/maintenance'/(name+'.py'),scripts/(name+'.py'))
+        config=root/'docs/development'
+        config.mkdir(parents=True)
+        gates={name:dict(needs=needs,inputs=['backend/input.txt'],command=[],testsRequired=True)
+               for name,needs in [('contract',[]),('backend',['contract']),('interaction',['backend'])]}
+        (config/'verification-gates.json').write_text(json.dumps({'gates':gates}))
+        (config/'local-validation-policy.md').write_text('Controlled engineering routing fixture.\n')
+        (root/'.gitignore').write_text('artifacts/\n**/bin/\n')
+        source=root/'backend/input.txt'
+        source.parent.mkdir()
+        source.write_text('before\n')
+        run=oracle.PRODUCT_RUN
+        scope='s2-s3-01-runtime-01'
+        batch='s2-s3-01'
+        env={k:v for k,v in os.environ.items() if k!='OMQ_PRODUCT_RUN'}
+        def execute(args, expected=0, env=env):
+            result=subprocess.run(args,cwd=root,env=env,capture_output=True,text=True,timeout=20)
+            self.assertEqual(expected,result.returncode,result.stderr+result.stdout)
+            return (result.stdout,result.stderr)
+        for args in (['init','-q'],['config','user.name','Fixture'],['config','user.email','fixture@localhost'],
+                     ['add','.'],['commit','-qm','fixture']):
+            execute(['git',*args])
+        base=execute(['git','rev-parse','HEAD'])[0].strip()
+        source.write_text('current\n')
+        execute(['git','commit','-qam','current fixture'])
+        head=execute(['git','rev-parse','HEAD'])[0].strip()
+        area=root/'artifacts/workflow'/oracle.TASK
+        selected=area/run/batch
+        selected.mkdir(parents=True)
+        index=dict(taskId=oracle.TASK,runId=run,scope=scope,batch=batch,measuredWorktree=str(root),
+                   measuredCommit=head,tests={},buildFiles={})
+        input_key=oracle.sha(json.dumps({'backend/input.txt':oracle.sha(source.read_bytes())},sort_keys=True).encode())
+        for number,(name,(target,expression,minimum)) in enumerate(oracle.TESTS.items(),1):
+            project=Path(build.TARGETS[target])
+            marker=project.parent/'bin/Debug/net10.0'/(project.stem+'.dll')
+            log=('Offline build closure fixture for '+target+'\n').encode()
+            outputs={str(marker):oracle.sha(target.encode())}
+            binding=oracle.encoded(dict(taskId=oracle.TASK,target=target,worktree=str(root),inputKey=input_key,
+                                        outputs=outputs,logSha256=oracle.sha(log),status='PASS',exitCode=0))
+            for suffix,data in [('-build-binding.json',binding),('-bound-build.txt',log)]:
+                path=Path(target+suffix)
+                digest=oracle.sha(data)
+                (area/(path.stem+'-'+digest+path.suffix)).write_bytes(data)
+                index['buildFiles'][path.name]=digest
+            argv=['/usr/local/share/dotnet/dotnet',str(root/marker),'--filter',expression,'--minimum-expected-tests',
+                  str(minimum),'--no-ansi','--progress','off','--results-directory',str(area/run/'test-results'/target)]
+            key=oracle.digest_value(dict(inputKey=input_key,outputKey=oracle.sha(json.dumps(outputs,sort_keys=True).encode()),
+                                         receiptSha256=oracle.sha(binding)))
+            cid=format(number,'032x')
+            index['tests'][name]=dict(commandId=cid)
+            directory=area/'commands'/run/cid
+            directory.mkdir(parents=True)
+            receipt=dict(schemaVersion=2,taskId=oracle.TASK,runId=run,commandId=cid,parentId=None,stage='omq-test-'+name,
+                         cwd=str(root),commandSummary=oracle.summary(argv),inputFingerprint=key,environmentFingerprint='a'*64,
+                         deadlineSeconds=120,started=True,signal=None,exitCode=0,classification='SUCCESS',
+                         startedAtUtc='2026-11-22T02:00:00Z',endedAtUtc='2026-11-22T02:00:01Z',elapsedSeconds=1)
+            receipt['identity']=oracle.digest_value([key,receipt['environmentFingerprint'],receipt['commandSummary']['sha256'],
+                                                    str(root),120,oracle.sha((scripts/'workflow_execution.py').read_bytes())])
+            for stream,data in [('stdout',f'total: {minimum}\nfailed: 0\nsucceeded: {minimum}\nskipped: 0\n'.encode()),
+                                ('stderr',b'')]:
+                path=directory/(stream+'.txt')
+                path.write_bytes(data)
+                receipt[stream]=dict(path=str(path),sha256=oracle.sha(data),sizeBytes=len(data))
+            (directory/'receipt.json').write_bytes(oracle.encoded(receipt))
+        raw=oracle.encoded(index)
+        digest=oracle.sha(raw)
+        selection=selected/('engineering-selection-'+digest+'.json')
+        selection.write_bytes(raw)
+        prefix=[sys.executable,'-B','scripts/maintenance/workflow.py']
+        output='artifacts/plan.json'
+        execute([*prefix,'plan','--base',base,'--head',head,'--oracle-selection-sha',digest,'--output',output])
+        plan=json.loads((root/output).read_bytes())
+        execute([*prefix,'verify','--task',oracle.TASK,'--plan',output],2)
+        receipt,=(area/'runs').glob('*/receipt.json')
+        rows=json.loads(receipt.read_bytes())['checks']
+        self.assertEqual(['contract','backend','interaction'],[item['gate'] for item in rows])
+        for item in rows[:2]:
+            self.assertEqual(('PASS',5,0),(item['status'],item['tests'],item['skipped']))
+            proof=item['productProof']
+            self.assertEqual((run,scope,batch,digest,'BLOCKED','NOT_QUALIFIED'),
+                             tuple(proof[k] for k in ('runId','scope','batch','selectionSha256','oracleS0','AC03B')))
+        self.assertEqual('FAIL',rows[-1]['status'])
+        self.assertIn('OMQ_FORMAL_S2_S3_NOT_RUN',(root/rows[-1]['logPath']).read_text())
+        self.assertFalse((root/'docs/evidence'/oracle.TASK/'implementation-01/s0/qualification.json').exists())
+        cli=[sys.executable,'-B','scripts/maintenance/workflow_oracle_mapping_evidence.py','--task',oracle.TASK,
+             '--run-id',run,'--gate','contract','--input-key',plan['inputKeys']['contract'],
+             '--scope',scope,'--batch',batch,'--selection-sha',digest]
+        for flag,value,reason in [('--run-id','implementation-01','OMQ_QUALIFICATION_ID'),
+                                  ('--scope','s0','OMQ_CURRENT_ROUTE'),
+                                  ('--input-key','f'*64,'OMQ_QUALIFICATION_ID'),
+                                  ('--selection-sha','f'*64,'FileNotFoundError')]:
+            with self.subTest(flag=flag):
+                args=cli.copy()
+                args[args.index(flag)+1]=value
+                self.assertIn(reason,execute(args,1,{**env,'OMQ_PRODUCT_RUN':run})[1])
+        selection.write_bytes(raw+b'\n')
+        self.assertIn('OMQ_CURRENT_SELECTION_SHA',execute(cli,1,{**env,'OMQ_PRODUCT_RUN':run})[1])
+        selection.write_bytes(raw)
+        (area/'commands'/run/index['tests']['binding']['commandId']/'stdout.txt').unlink()
+        self.assertIn('FileNotFoundError',execute(cli,1,{**env,'OMQ_PRODUCT_RUN':run})[1])
+
     def test_true_plan_and_verify_cli_dispatch_fail_closed_without_oracle_originals(self):
         # 最小受控 Git 库只选择 interaction 门禁，不启动后端、Docker 或浏览器。
         root=self.root/'controlled'
