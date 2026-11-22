@@ -386,6 +386,24 @@ def grants(state,execution_id,issue=False,plan_id=None):
                 afterRowsSha256=ex.sha(ex.encoded(after['rows'])),requiredSeconds=minimum,remainingSeconds=min(ttl(r,after['clock']) for r in (all_chosen if renewal else chosen)))
 
 
+def normal_fixture_fingerprint():
+    """平台独立夹具账户只返回两项计数与摘要，核验源前态且不打开产品读者会话。"""
+    columns='ROW_ID,JOIN_KEY,VAL,ORG_ID,SITE_ID,EXT_ID,LABEL,'+','.join("to_char("+col+",'YYYYMMDDHH24MISSFF6')" for col in ('FROM_TS','TO_TS','EVENT_TS','OBSERVED_TS'))
+    original_ids=('b384a5183d6041a881bb7ad4606c72cd', '251d5af4350246fe88cc6e43016d9796')
+    original_digests=('3ab02190217d63b24647ac0aeda4f96a6b80e80c1f3236ff507a53fb3740dbad', '0440979ba668a83b2e7ad13b3da15fa6f31395358d0cc8ef9d8d5ed772992b7d')
+    counts,hashes,commands=[],[],[]
+    for table,cid,digest in zip(TABLES,original_ids,original_digests,strict=True):
+        original=ex.ordinary(p.AREA.parent/'commands'/RUN/cid/'stdout.txt').read_bytes().strip()
+        require(ex.sha(original)==digest,'NORMAL_OLD_FIXTURE_BYTES')
+        sql="select count(*)||'|'||min(lower(rawtohex(standard_hash(json_array("+columns+" returning varchar2(500)), 'SHA256')))) from "+table+";"
+        raw,cmd=p.native_fixture_sql(sql,'normal-independent-fixture-fingerprint')
+        require(raw=='1|'+digest,'NORMAL_ORIGINAL_FIXTURE_HASH')
+        counts.append(1)
+        hashes.append(ex.sha(ex.encoded([json.loads(original,parse_float=str)])))
+        commands.append(cmd)
+    return dict(counts=counts,hashes=hashes,commandIds=commands)
+
+
 def ready(state,actors,execution_id,mode):
     """紧前重核正式目录、当前激活、已登记组合授权、会话和正常源前态。"""
     require(mode in ('s2-oracle-vocabulary','s2-oracle-mapping','s2-oracle-queries','s2-oracle-relations','s2-oracle-access',
@@ -401,7 +419,7 @@ def ready(state,actors,execution_id,mode):
         row=json.loads(raw)
         require(row['ActivationId']==active['activationId'] and row['ActivationRevision']==active['activationRevision'],'S2_ACTIVATION_STALE')
         result['activationCommand']=command
-    result['fixtureBefore']=None if mode=='s2-oracle-reopen' else p.fixture_state()
+    result['fixtureBefore']=None if mode=='s2-oracle-reopen' else normal_fixture_fingerprint() if mode=='s2-oracle-normal' else p.fixture_state()
     require(result['fixtureBefore'] is None or result['fixtureBefore']['counts']==[1,1],'S2_NORMAL_PRESTATE')
     result['status']='READY'
     return result

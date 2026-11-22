@@ -39,7 +39,7 @@ def query_facts(http):
     row=read_pg(sql,'row')
     audits=read_pg(maintenance.AUDIT_SQL.replace(maintenance.QUERY,q),'audit')
     data=read_pg(f"""SELECT json_build_object('errorCode',"ErrorCode",'receipts',json_array_length(convert_from("BindingBytes",'UTF8')::json->'receipts')) FROM semantic_query."Queries" WHERE "Id"='{q}';""",'receipts')
-    require(row['value']['connectionId']==CONNECTION and audits['value'][0]['trace']==trace and audits['value'][0]['correlation']==correlation,'NORMAL_POST_SCOPE')
+    require(row['value']['connectionId']==CONNECTION and sum(a['action']=='data.query.execute' and a['trace']==trace and a['correlation']==correlation for a in audits['value'])==1,'NORMAL_POST_SCOPE')
     return dict(ident=ident,row=row,audit=audits,data=data)
 
 
@@ -62,7 +62,7 @@ def consume_observation(row):
     key=row['key']
     facts=row['facts']
     db=facts['row']['value']
-    audit=facts['audit']['value']
+    audit=[a for a in facts['audit']['value'] if a['action']=='data.query.execute']
     require(len(audit)==1 and audit[0]['action']=='data.query.execute' and audit[0]['correlation']==http['correlation']
             and audit[0]['trace']==http['traceId'],'NORMAL_COMMAND_AUDIT')
     exported=r.load(AREA/('normal-export-'+identity['container']+'-'+key+'.json'))
@@ -75,7 +75,7 @@ def consume_observation(row):
         require(row['parentExit']==0 and http['queryId']==db['queryId']==row['get']['queryId'] and http['elapsedMs']<=5000
                 and http['sha256']==db['resultHash']==row['get']['sha256'] and row['get']['sizeBytes']==db['resultSize']
                 and db['resultCiphertextLength']>0 and db['ownerSha256'] is None and db['leaseUntilUtc'] is None
-                and facts['data']['value']['receipts']==2 and audit[0]['outcome']=='success'
+                and facts['data']['value']['receipts']==2 and audit[0]['outcome']=='allowed' and any(a['action']=='data.query.read' and a['outcome']=='allowed' for a in facts['audit']['value'])
                 and len(row['getWindows'])==1 and row['getWindows'][0]['audit']['records']==[],'NORMAL_HEALTHY_POSTSTATE')
     else:
         require(audit[0]['outcome']=='failure' and db['resultSize']==0 and db['resultHash'] is None and
@@ -88,7 +88,11 @@ def run_first():
     slot='Q1'
     fixed=AREA/('normal-window-'+slot+'.json')
     require(not fixed.exists() and not (AREA/'normal-post-Q1.json').exists() and w.close_registration()['sha256']==PG_CLOSE,'NORMAL_FIRST_ONCE')
-    require(w.last_close(r.ROOT,digest=PG_CLOSE)['data']['platform-pg']['after']['Pid']==0,'NORMAL_CLOSED_PG')
+    prior=w.last_close(r.ROOT,digest=PG_CLOSE)
+    pg=prior['data']['platform-pg']['id']
+    end=prior['maintenance'][-1]['finishedAt']['platform-pg']
+    state,_=r.command('normal-pg-closed',['inspect','-f','{{.State.Status}}|{{.State.Pid}}|{{.State.FinishedAt}}',pg])
+    require(state=='exited|0|'+end,'NORMAL_CLOSED_PG')
     key=uuid.uuid4().hex
     os.environ['OMQ_NORMAL_DIAGNOSTIC_KEY']=key
     os.environ['OMQ_NORMAL_SLOT']=slot
