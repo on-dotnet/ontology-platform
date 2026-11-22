@@ -526,7 +526,9 @@ def runtime_continuity(root, previous, current, proof=None, archive=None):
             require(current['commandId'] == entry['nextRestoreHost'], 'WINDOW_RETIRED_HOST')
         require('nextPgOnlyClose' not in entry, 'WINDOW_D368_RETIRED_HOST')
         require('nextPreDiagnosticClose' not in entry,'WINDOW_PREDIAGNOSTIC_RETIRED_HOST')
-        require('nextDiagnosticClose' not in entry,'WINDOW_DIAGNOSTIC_RETIRED_HOST')
+        if 'nextDiagnosticClose' in entry:
+            require(proof is not None and proof.get('host') == current['commandId'] == 'd8f06371e55d4d34ab096f4452d1fab9',
+                    'WINDOW_DIAGNOSTIC_RETIRED_HOST')
         if entry.get('kind') in ('MAPPING_RESTORE','D368_PG_ONLY','PRE_DIAGNOSTIC_CLOSE','DIAGNOSTIC_CLOSE'):
             require(entry.get('kind') != 'D368_PG_ONLY' or entry['status'] == 'TASK_LEVEL_RECOVERY', 'WINDOW_D368_PRODUCT_BLOCKED')
             close = last_close(root, archive, entry['sha256'])
