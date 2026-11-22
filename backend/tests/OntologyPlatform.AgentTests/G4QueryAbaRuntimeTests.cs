@@ -5,6 +5,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using OntologyPlatform.Contracts;
 using OntologyPlatform.Modules.Connections;
 using OntologyPlatform.Modules.Governance;
@@ -32,7 +33,7 @@ public sealed partial class G4QueryMafRuntimeTests
     private static async Task MappingAbaAfterRealReadAsync(IServiceProvider services, ActorContext actor,
         G4QueryRecord original, G4QueryDbContext database, string proposalId,
         (ActorContext Actor, string Session)? editing = null, (ActorContext Actor, string Session)? activating = null, string? reviewerId = null,
-        (ActorContext Actor, string Session)? currentReviewer = null, object? seedReceipt = null)
+        (ActorContext Actor, string Session)? currentReviewer = null, object? seedReceipt = null, OracleRuntimeSourceEvents? sourceEvents = null)
     {
         // 当前夹具的编辑者负责草稿、评估与提案；历史 PG 夹具沿用它的原始参与者。
         var editor = editing ?? (actor, original.SessionReference);
@@ -72,6 +73,7 @@ public sealed partial class G4QueryMafRuntimeTests
         var abaCompleted = false;
         // 真实墙钟预算从正式Gateway调用之前开始。
         var elapsed = new Stopwatch();
+        sourceEvents?.Bind(elapsed);
         // 事件序列由唯一查询进程产生，UTC关联数据库，单调时钟证明原五秒内顺序。
         var events = new List<object>();
         // 分段与固定合格事件使用同一单调表，仅在响应后的 finally 序列化。
@@ -249,7 +251,8 @@ public sealed partial class G4QueryMafRuntimeTests
             ? new G4QueryExecution(services.GetRequiredService<IG4QueryBindingReader>(),
                 new AfterReadSource(services.GetRequiredService<IG4SourceQueryReader>(), SwitchTwice),
                 services.GetRequiredService<IG4QueryAuthorizationAuthority>(), services.GetRequiredService<G4QueryResultStore>(), TimeProvider.System)
-            : BeforeCommitExecution(services, SwitchTwice, oracle ? BindingPoint : null);
+            : BeforeCommitExecution(services, SwitchTwice, oracle ? BindingPoint : null,
+                sourceEvents is null ? null : services.GetRequiredService<ILogger<G4QueryExecution>>());
         // 与UI/MCP相同的SemanticGateway生成实际五秒截止，不能用测试时钟延长。
         var gateway = new SemanticGateway(services.GetRequiredService<IReleaseCatalog>(), services.GetRequiredService<ISemanticRuntime>(),
             services.GetRequiredService<CapabilityRegistry>(), services.GetRequiredService<IAuditTrail>(), TimeProvider.System,
@@ -301,6 +304,7 @@ public sealed partial class G4QueryMafRuntimeTests
             elapsed.Stop();
             evidence["elapsedMs"] = elapsed.Elapsed.TotalMilliseconds;
             evidence["events"] = events;
+            sourceEvents?.Export(evidence);
             evidence["abaCompleted"] = abaCompleted;
             // 后态查询在 Gateway 计时之外，失败保留原异常；资格检查在写出原件后进行。
             if (oracle)

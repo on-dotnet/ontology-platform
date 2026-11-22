@@ -81,7 +81,25 @@ test("ABA and connection dispatch the current reader's healthy seed, rejecting s
     post:async(a,p)=>p.endsWith("/validate")?{status:"SUCCEEDED",assessmentId:"ma"}:p.endsWith("/decisions")?{...proposal,proposalRevision:2,status:"APPROVED",decision:{decision:"APPROVE",decidedBy:"auditor",bindingHash:proposal.bindingHash}}:proposal,
     request:async(a,m,p)=>({data:p.includes("assessments")?{status:"READY_FOR_PROPOSAL"}:{mappingId:"m"}}),
     audit:async(n,action,count)=>{windows.push([n,count]);return action();},call:(name,...args)=>{if(name==="runtime_case"){calls.push(args);throw Error("dispatch captured");}return {token:"fixture"};}};
-  await assert.rejects(aba(ctx),/dispatch captured/);
+  const receipt=(n,kind)=>({mappingId:"m",mappingReleaseId:"a",manifestHash:"f".repeat(64),activationRevision:n,
+    activationId:"activation-"+String(n).repeat(32),proposalId:"proposal-"+String(n).repeat(32),kind,
+    previousReleaseId:"b",auditId:"audit",outboxEventId:"event",activatedAtUtc:"2026-11-22T00:00:00.0000000Z"});
+  const before=receipt(3,"ROLLBACK"),after=receipt(5,"ROLLBACK");
+  state.mappingCurrentReceipt=before;
+  const summary=({mappingId,mappingReleaseId,manifestHash,activationRevision})=>({mappingId,mappingReleaseId,manifestHash,activationRevision,usable:true});
+  const previousGet=ctx.get, previousRequest=ctx.request, previousCall=ctx.call;
+  let completed=false, proposalRead={kind:"ROLLBACK",proposalId:after.proposalId,activation:after};
+  ctx.get=async(a,p)=>p.endsWith("/active")?summary(completed?after:before):p.includes("/mapping-proposals/")?proposalRead:previousGet(a,p);
+  ctx.call=(name,...args)=>{
+    if(name!=="runtime_case"||args[0]!=="aba") return previousCall(name,...args);
+    calls.push(args);completed=true;
+    return {original:{capturedA:{...before,activationRevision:"3"},activatedA:after}};
+  };
+  ctx.request=async(a,m,p,...args)=>p.endsWith("/result")?{raw:'{"status":"AMBIGUOUS"}'}:
+    args[1]===409?{status:409,raw:'{"code":"query_binding_stale"}',data:{code:"query_binding_stale"}}:previousRequest(a,m,p,...args);
+  await aba(ctx);
+  assert.deepEqual(state.mappingCurrentReceipt,after);
+  assert.equal(report.historySelection.rejection.status,409);
   await assert.rejects(versions(ctx,true),/dispatch captured/);
   assert.deepEqual(calls.map(([c,e])=>[c,e.queryId]),[["aba",seedId],["connection",seedId]]);
   assert.ok(windows.some(([n,k])=>n==="inflight-activation-aba"&&k===8));
@@ -91,6 +109,13 @@ test("ABA and connection dispatch the current reader's healthy seed, rejecting s
     await assert.rejects(versions({...ctx,state:{...state,runtimeQuery:seed}},true),/runtime_seed/u);
   }
   assert.equal(calls.length,2);
+  for(const invalid of [{proposalId:before.proposalId,activation:after},{proposalId:after.proposalId},
+    ...[{activationId:before.activationId},{activationRevision:4},{manifestHash:before.activationId}].map(fields=>({
+      proposalId:after.proposalId,activation:{...after,...fields}}))]){
+    completed=false;state.mappingCurrentReceipt=before;proposalRead={kind:"ROLLBACK",...invalid};
+    await assert.rejects(aba(ctx),/oracle_aba_/);
+    assert.equal(state.mappingCurrentReceipt,before);
+  }
 });
 
 

@@ -244,6 +244,41 @@ def demand_connection_original(raw):
     return row
 
 
+def next_connection_admission(report, original):
+    """普通 403/409 后沿同槽已有的正常双表回读，验证同连接的新 Q 有自己的来源回执。"""
+    import re
+    from workflow_oracle_mapping_formal_observer import ns
+    require(aba_query_post_state(original)=='FINAL_REJECTION_RELEASED','S23_CONNECTION_ORDINARY_SETTLEMENT')
+    binding=report['oracleBinding']
+    require(binding['connectionId']==original['connectionId'], 'S23_CONNECTION_NEXT_BINDING')
+    fresh,=[r for r in report['oracleCases'] if r['name']=='connection-rebound']
+    query=fresh['queryId']
+    require(re.fullmatch('query-[0-9a-f]{32}',query) and query!=original['queryId']
+            and fresh['httpStatus']==200 and fresh['sha256']==hashlib.sha256(fresh['raw'].encode()).hexdigest(),
+            'S23_CONNECTION_NEXT_QUERY')
+    body=json.loads(fresh['raw'])
+    refs=body['evidence']
+    require(body['status']=='FOUND' and len(refs)==len(fresh['evidenceProofs'])==2
+            and len({ref['evidenceId'] for ref in refs})==2,'S23_CONNECTION_NEXT_EVIDENCE')
+    for item in fresh['evidenceProofs']:
+        require(item['httpStatus']==200 and item['sha256']==hashlib.sha256(item['raw'].encode()).hexdigest(),
+                'S23_CONNECTION_NEXT_PROOF_BYTES')
+        proof=json.loads(item['raw'])
+        receipt=proof['receipt']
+        require(proof['evidence'] in refs and item['evidenceId']==proof['evidence']['evidenceId']
+                and receipt['queryId']==query and receipt['connectionId']==proof['evidence']['connectionId']==original['connectionId']
+                and receipt['receiptId']==proof['evidence']['sourceReadReceiptId'] and receipt['status']=='SUCCESS'
+                and ns(receipt['readCompletedAtUtc'])>ns(original['restoredAtUtc']), 'S23_CONNECTION_NEXT_SOURCE')
+    require({r['evidenceId'] for r in refs}=={r['evidenceId'] for r in fresh['evidenceProofs']}
+            and {r['sourceReadReceiptId'] for r in refs}=={s['sourceReadReceiptId'] for s in body['subSources']}
+            and len({r['sourceReadReceiptId'] for r in refs})==2,'S23_CONNECTION_NEXT_BRANCHES')
+    matching=[r for r in report['http'] if (r['method'],r['path'],r['status'],r['sha256'])==
+              ('POST','/api/v1/data/semantic-queries',200,fresh['sha256'])]
+    require(len(matching)==1,'S23_CONNECTION_NEXT_HTTP')
+    return dict(status='FINAL_REJECTION_RELEASED',rejectedQueryId=original['queryId'],nextQueryId=query,
+                connectionId=original['connectionId'])
+
+
 def current_selection_receipt(report):
     """按本窗真实查询响应核对所登记的新 ID 和结果摘要，不为在途事件签发资格。"""
     history=report['historySelection']
@@ -275,6 +310,12 @@ def runtime_seed(report, origin, original):
     reader=ROSTER['reader'][1]
     require(origin['mode']=='s2-oracle-aba' and origin['batch']['executionId']==report['batch']['executionId']==seed['executionId']
             and seed==origin['runtimeQuery'] and seed['actor']==reader,'S23_RUNTIME_SEED_OWNER')
+    if report.get('mode')=='s2-oracle-connection' and report['batch'].get('planId')=='s2-s3-01-runtime-01':
+        from workflow_oracle_mapping_formal_observer import ns
+        aba=origin['aba']['original']
+        require(aba_query_post_state(aba)=='FINAL_REJECTION_RELEASED' and aba['connectionId']==original['connectionId']
+                and aba['queryId']!=original['queryId'] and ns(aba['events'][-1]['utc'])<ns(original['admittedAtUtc']),
+                'S23_ABA_NEXT_CONNECTION_ADMISSION')
     rows=[row for row in origin['oracleCases'] if row['name']=='aba-runtime-seed']
     require(len(rows)==1,'S23_RUNTIME_SEED_COUNT')
     row=rows[0];query=row['query'];result=row['sha256']
@@ -325,6 +366,125 @@ def aba_reads(report, original):
             and approval['proposalId']!=original['activatedB']['proposalId']
             and [s['sessionHash'] for s in report['scenarioReady']['session']['observations'] if s['subjectId']==reviewer]==[approval['sessionHash']],
             'S23_ROLLBACK_CURRENT_DECISION')
+
+
+def source_clock_intervals(brackets):
+    """前后两组分别求交，然后用两端包络和单调漂移给出保守宿主减远端偏差。"""
+    from workflow_oracle_mapping_formal_observer import bounds
+    require(len(brackets)==2 and all(set(group)=={'source','api'} for group in brackets),'S23_SOURCE_CLOCK_BRACKET')
+    result={}
+    for role in ('source','api'):
+        samples=[group[role] for group in brackets]
+        require(all(len(batch)==5 for batch in samples),'S23_SOURCE_CLOCK_COUNT')
+        first,last=samples[0][0],samples[1][-1]
+        last_host,last_mono=0,0
+        for sample in samples[0]+samples[1]:
+            require(set(sample)=={'hostBefore','hostAfter','monoBefore','monoAfter','remote'}
+                    and all(type(v) is int and v>0 for v in sample.values())
+                    and last_host<=sample['hostBefore']<=sample['hostAfter']
+                    and last_mono<=sample['monoBefore']<=sample['monoAfter']
+                    and abs((sample['hostAfter']-sample['hostBefore'])-(sample['monoAfter']-sample['monoBefore']))<=1_000_000,
+                    'S23_SOURCE_CLOCK_SAMPLE')
+            last_host,last_mono=sample['hostAfter'],sample['monoAfter']
+        drift=abs((last['hostAfter']-first['hostBefore'])-(last['monoAfter']-first['monoBefore']))
+        require(drift<=1_000_000,'S23_SOURCE_CLOCK_DRIFT')
+        before,after=map(bounds,samples)
+        result[role]=[min(before[0],after[0])-drift-1000,max(before[1],after[1])+drift+1000]
+    return result
+
+
+def reopen_source_clocks(archive, summary, child, origin):
+    """双流与身份来自准确物理子进程前后的两个已登记读钟命令。"""
+    from workflow_oracle_mapping_s2 import source_clock_invocation
+    from workflow_oracle_mapping_formal_observer import ns
+    brackets=[]
+    for edge,cid in zip(('before','after'),summary['sourceClockCommands'],strict=True):
+        argv,stage,key=source_clock_invocation(summary['host'],summary['nonce'],summary['case'],edge)
+        row,out,err=archive.command(cid,argv,stage,key,summary['host']['commandId'],origin)
+        require(not err and row['deadlineSeconds']==15 and row['classification']=='SUCCESS' and row['exitCode']==0,
+                'S23_SOURCE_CLOCK_COMMAND')
+        start,end=ns(row['startedAtUtc']),ns(row['endedAtUtc'])
+        require(end<=ns(child['startedAtUtc']) if edge=='before' else ns(child['endedAtUtc'])<=start,
+                'S23_SOURCE_CLOCK_SUBPROCESS')
+        group=json.loads(out)
+        for samples in group.values():
+            require(all(start<=s['hostBefore']<=s['hostAfter']<=end+999 for s in samples),'S23_SOURCE_CLOCK_COMMAND_TIME')
+        brackets.append(group)
+    return source_clock_intervals(brackets)
+
+
+def source_associations(original, audit, clocks):
+    """以真实子进程的源身份、物理释放及观察器退出，关联未过滤的两条统一审计。"""
+    import re
+    from workflow_oracle_mapping_formal_observer import ns
+    rows = original.get('sourceEvents', [])
+    require(0 < len(rows) <= 128 and original.get('sourceEventsDropped') == 0, 'S23_SOURCE_CAPTURE')
+    query = original['queryId']
+    first = original['events'][0]
+    require(first['phase']=='SOURCE_READ_COMPLETED' and first['queryId']==query, 'S23_SOURCE_FIRST_PHASE')
+    source_lo,source_hi=clocks['source']
+    api_lo,api_hi=clocks['api']
+    coarse=audit['errorBounds']
+    require(source_lo<=source_hi and api_lo<=api_hi and coarse['lowerNs']<=coarse['upperNs']
+            and max(source_lo,coarse['lowerNs'])<=min(source_hi,coarse['upperNs']), 'S23_SOURCE_CLOCK_AGREEMENT')
+    groups = {}
+    previous = -1
+    for row in rows:
+        execution = row['ExecutionId']
+        require(row['QueryId'] == query and re.fullmatch('[a-f0-9]{32}', execution)
+                and previous <= row['monotonicMs'] <= original['elapsedMs'] and row['monotonicMs'] >= 0,
+                'S23_SOURCE_QUERY_EXECUTION')
+        groups.setdefault(execution, []).append(row)
+        previous = row['monotonicMs']
+    require(len(groups) == 2, 'S23_SOURCE_BRANCH_COUNT')
+    tables, acquisitions = set(), set()
+    for execution, branch in groups.items():
+        def label(row):
+            return row.get('Phase') or row.get('Action') or row.get('Trigger') or row['event']
+        expected = [('OracleBranchBegin','OracleBranchBegin'), ('OracleSourceOwnership','ACQUIRED'),
+                    ('OracleSourceSession','OracleSourceSession'), ('OracleSourceEvent','EXECUTE'),
+                    ('OracleSourceEvent','EOF'), ('OracleSourceOwnership','READ_RETURNED'),
+                    ('OracleSourceOwnership','COMMITTED'), ('OracleSourceOwnership','TX_DISPOSED'),
+                    ('OracleSourceOwnership','POST_STARTED'), ('OracleSourceOwnership','POST_RETURNED'),
+                    ('OracleSourceCleanup','PHYSICAL_DISPOSE'), ('OracleSourceEvent','PHYSICAL_RELEASE'),
+                    ('OracleSourceOwnership','PHYSICAL_DISPOSED'), ('OracleSourceCleanup','FINAL'),
+                    ('OracleSourceOwnership','CONFIRMED'), ('OracleBranchRelease','OracleBranchRelease')]
+        require([(r['event'], label(r)) for r in branch] == expected, 'S23_SOURCE_BRANCH_ORDER')
+        start, session, end = branch[0], branch[2], branch[-1]
+        identities = {r['Acquisition'] for r in branch if r['event'] in ('OracleSourceOwnership','OracleSourceCleanup')}
+        require(len(identities) == 1 and re.fullmatch('[a-f0-9]{32}', next(iter(identities)))
+                and not identities & acquisitions and end['Confirmed'] is True and start['Fence'] == original['fence'],
+                'S23_SOURCE_RELEASE')
+        acquisitions |= identities
+        times = [ns(r.get('Utc') or r['ObservedUtc']) for r in branch]
+        require(times == sorted(times) and ns(original['admittedAtUtc']) <= times[0] <= times[-1]
+                <= ns(start['BranchDeadlineUtc']) <= ns(original['deadlineAtUtc'])
+                and ns(start['WorkDeadlineUtc']) < ns(start['BranchDeadlineUtc'])
+                and times[-1] <= ns(original['events'][0]['utc']), 'S23_SOURCE_ORIGINAL_CLOCK')
+        require(all(type(session[k]) is int and session[k] > 0 for k in ('Sid','Audsid','Unified','Instance','Con')),
+                'S23_SOURCE_SESSION')
+        for cleanup in (r for r in branch if r['event']=='OracleSourceCleanup'):
+            ticks=cleanup['RemainingTicks']
+            require(type(ticks) is int and 0<ticks<=2_500_000
+                    and ns(cleanup['DeadlineUtc'])-ns(cleanup['Utc'])==ticks*100, 'S23_SOURCE_CLEANUP_CLOCK')
+        physical,final=branch[10],branch[13]
+        require(ns(final['DeadlineUtc'])<=ns(physical['DeadlineUtc']) and times[14]<=ns(final['DeadlineUtc']),
+                'S23_SOURCE_CLEANUP_ORDER')
+        match = [r for r in audit['records'] if r['clientId'] == execution]
+        require(len(match) == 1 and match[0]['instance'] == str(session['Instance'])
+                and match[0]['session'] == str(session['Unified']) and match[0]['code'] == 0
+                and match[0]['action'] == 'SELECT', 'S23_SOURCE_AUDIT_BRIDGE')
+        audit_ns=ns(match[0]['utc'])
+        source_interval=[audit_ns+source_lo,audit_ns+source_hi+999]
+        # 源 SQL 的量化误差及两台时钟的前后校准界全部进入严格包含判断。
+        require(ns(original['admittedAtUtc'])+api_hi<=source_interval[0]
+                and times[3]+api_hi<=source_interval[0]<=source_interval[1]<=times[4]+api_lo
+                and source_interval[1]<ns(first['utc'])+api_lo
+                and ns(audit['startUtc'])<=audit_ns+coarse['lowerNs']<=audit_ns+coarse['upperNs']+999<ns(audit['endUtc']),
+                'S23_SOURCE_AUDIT_TIME')
+        tables.add((match[0]['owner'],match[0]['table']))
+    require(tables == {('PRODUCTION','OMQ_ENTITY'),('CaseOwner','OmqTarget')}, 'S23_SOURCE_TABLES')
+    return 'TWO_SOURCE_BRANCHES_RELEASED'
 
 
 def aba_query_post_state(original):
@@ -462,6 +622,8 @@ def qualify(report):
         aba_reads(report,report['aba']['original'])
         if report['batch']['planId'] == 's2-s3-01-runtime-01':
             settlement['oracleSettlement'] = aba_diagnostics(report['aba']['original'])
+    if mode=='s2-oracle-connection' and report['batch']['planId']=='s2-s3-01-runtime-01':
+        settlement['ordinaryRejection']=next_connection_admission(report,report['connectionRuntime']['original'])
     statuses=[result_case(row,report['oracleBinding']) for row in rows]
     return dict(**settlement,status='SEMANTICS_QUALIFIED',mode=mode,cases=len(rows),statuses=statuses,scope='semantic original content; parent command and source audits qualify separately')
 
@@ -806,6 +968,10 @@ def reopen_stage(archive,report,records,host,origin,measured,window):
         require(row['deadlineSeconds']==25 and ns(window['startedAtUtc'])<=ns(row['startedAtUtc'])<ns(row['endedAtUtc'])<=ns(window['endedAtUtc']),'S23_RUNTIME_STAGE_WINDOW')
         original=demand_aba_original(stdout,'query-real-aba-inflight-runtime',report['taskId'],report['runId']) if case=='aba' else demand_connection_original(stdout)
         require(row['exitCode']==0 and row['classification']=='SUCCESS' and summary['original']==original,'S23_RUNTIME_ORIGINAL')
+        if report['batch']['planId'] == 's2-s3-01-runtime-01':
+            inflight = 'inflight-activation-aba' if case == 'aba' else 'inflight-connection-revision'
+            current, = [w for w in report['oracleWindows'] if w['name'] == inflight]
+            result['sourceAssociation'] = source_associations(original, current['audit'], reopen_source_clocks(archive,summary,row,origin))
         seed_name=report['runtimeQuery']['reportName']
         seed_report=archive.read(seed_name)
         require((case!='aba' or seed_report==report) and seed_name in archive.dispatch['batchMembers'],'S23_RUNTIME_SEED_REPORT')

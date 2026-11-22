@@ -1205,7 +1205,7 @@ public sealed partial class G4QueryMafRuntimeTests
 
     /// <summary>只在真实源成功返回后激活一次提交前调度，源分支与观察者正常完成。</summary>
     private static G4QueryExecution BeforeCommitExecution(IServiceProvider services, Func<CancellationToken, Task> competingCommand,
-        Action<string, CancellationToken, Exception?>? bindingObservation = null)
+        Action<string, CancellationToken, Exception?>? bindingObservation = null, ILogger<G4QueryExecution>? logger = null)
     {
         // 所有授权检查仍由正常的正式实例执行。
         var authority = services.GetRequiredService<IG4QueryAuthorizationAuthority>();
@@ -1225,7 +1225,7 @@ public sealed partial class G4QueryMafRuntimeTests
             Interlocked.Exchange(ref ready, 1);
             return Task.CompletedTask;
         });
-        return new G4QueryExecution(bindings, source, authority, store, TimeProvider.System);
+        return new G4QueryExecution(bindings, source, authority, store, TimeProvider.System, logger);
     }
 
     /// <summary>保留全部正式权限参与者，仅在获取事务授权锁之前提供确定性的竞争调度。</summary>

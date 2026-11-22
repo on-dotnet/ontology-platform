@@ -152,7 +152,7 @@ def prepare(task, inventory=None):
     return adapter.prepare(ROOT,task)
 
 
-def plan(base, head):
+def plan(base, head, oracle_selection=None):
     base=git(ROOT,'rev-parse','--verify',base+'^{commit}').decode().strip()
     head=git(ROOT,'rev-parse','--verify',head+'^{commit}').decode().strip()
     subprocess.run(['git','merge-base','--is-ancestor',base,head],cwd=ROOT,check=True)
@@ -167,7 +167,13 @@ def plan(base, head):
     keys={name:input_key(ROOT,name) for name in registry()}
     if git(ROOT,'status','--porcelain').strip() or git(ROOT,'rev-parse','HEAD').decode().strip()!=head:
         raise ValueError('PLAN_INPUT_CHANGED_DURING_CHECK')
-    return dict(schemaVersion=1,base=base,head=head,paths=paths,registrySha256=digest(REGISTRY.read_bytes()),inputKeys=keys,earlyMeasurements=measurements,**result)
+    route={}
+    if oracle_selection is not None:
+        if not re.fullmatch('[0-9a-f]{64}',oracle_selection):
+            raise ValueError('ORACLE_TEST_SELECTION_SHA')
+        route['oracleQualification']=dict(taskId='G4-ORACLE-MAPPING-QUERY-001',runId='product-resume-01',
+            batch='s2-s3-01',scope='s2-s3-01-runtime-01',selectionSha256=oracle_selection)
+    return dict(schemaVersion=1,**route,base=base,head=head,paths=paths,registrySha256=digest(REGISTRY.read_bytes()),inputKeys=keys,earlyMeasurements=measurements,**result)
 
 
 def ordered(names):
@@ -376,11 +382,16 @@ def inputs_stable(root, name, key, policy, registry_sha):
     return digest(REGISTRY.read_bytes())==registry_sha and input_key(root,name)==key and policy_key(name)==policy
 
 
-def engineering_process_environment(task):
+def engineering_process_environment(task, oracle_route=None):
     directory=state_dir(task)
     # 工程门禁不触发.NET/Web准备；缺工具由对应命令准确失败。
     child_environment={k:v for k,v in os.environ.items() if k in ('PATH','LANG','LC_ALL','SystemRoot')}
     child_environment.update(PYTHONDONTWRITEBYTECODE='1',NEXT_TELEMETRY_DISABLED='1',PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD='1')
+    if oracle_route:
+        if (task,oracle_route['taskId'],oracle_route['runId'],oracle_route['batch'],oracle_route['scope']) != (
+                'G4-ORACLE-MAPPING-QUERY-001',task,'product-resume-01','s2-s3-01','s2-s3-01-runtime-01'):
+            raise ValueError('ORACLE_ENGINEERING_ROUTE')
+        child_environment['OMQ_PRODUCT_RUN']=oracle_route['runId']
     parser_root=safe_file(ROOT/'.tools/pythonlibs')
     if parser_root.is_dir(): child_environment['PYTHONPATH']=str(parser_root)
     cli=directory/'engineering-cli-home';cli.mkdir(exist_ok=True)
@@ -410,7 +421,7 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
     deadline = time.monotonic() + outer_seconds
     if 'WORKFLOW_VERIFY_DEADLINE' in os.environ:
         deadline = min(deadline, float(os.environ['WORKFLOW_VERIFY_DEADLINE']))
-    actual=plan(expected['base'],expected['head'])
+    actual=plan(expected['base'],expected['head'],expected.get('oracleQualification',{}).get('selectionSha256'))
     if expected != actual or actual['head'] != git(ROOT,'rev-parse','HEAD').decode().strip():
         raise ValueError('PLAN_STALE_OR_TAMPERED')
     if actual['status'] != 'PLANNED': raise ValueError('UNMAPPED_INPUTS: '+','.join(actual['unknown']))
@@ -422,7 +433,12 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
     spec=importlib.util.spec_from_file_location('execution_preflight',ROOT/'scripts/maintenance/execution_preflight.py')
     helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
     environment=engineering_environment()
-    child_environment=engineering_process_environment(task)
+    oracle_route=actual.get('oracleQualification')
+    if task=='G4-ORACLE-MAPPING-QUERY-001' and not oracle_route and subprocess.run(
+            ['git','merge-base','--is-ancestor','11f438423179d1cc64d043eb2483793b7e03f962',actual['head']],
+            cwd=ROOT,capture_output=True).returncode==0:
+        raise ValueError('ORACLE_CURRENT_TEST_SELECTION_REQUIRED')
+    child_environment=engineering_process_environment(task,oracle_route)
     rows=[];outcomes={}
     for name in ordered(set(selected) | set(index)):
         if digest(REGISTRY.read_bytes())!=actual['registrySha256']: raise ValueError('REGISTRY_CHANGED_DURING_RUN')
@@ -447,7 +463,8 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
         if not gate['command'] and task == 'G4-ORACLE-MAPPING-QUERY-001' and name in {'environment','contract','backend','web','interaction'}:
             product_qualification=True
             gate={**gate,'command':['python3','-B','scripts/maintenance/workflow_oracle_mapping_evidence.py',
-                  '--task',task,'--run-id','implementation-01','--gate',name,'--input-key',key],'testsRequired':True}
+                  '--task',task,'--run-id',oracle_route['runId'] if oracle_route else 'implementation-01','--gate',name,'--input-key',key,
+                  *(['--scope',oracle_route['scope'],'--batch',oracle_route['batch'],'--selection-sha',oracle_route['selectionSha256']] if oracle_route else [])],'testsRequired':True}
         if not gate['command'] and task == 'G4-M5-INTEGRATION-001' and name in {'environment','contract','backend','web','interaction'}:
             # M5复用同一原件解释器；固定消费者身份，不把缺适配器的空命令当通过。
             product_qualification=True
@@ -694,6 +711,7 @@ def main():
     prep=sub.add_parser('prepare');prep.add_argument('--task',required=True);prep.add_argument('--inventory')
     smoke=sub.add_parser('smoke');smoke.add_argument('--task',required=True)
     pl=sub.add_parser('plan');pl.add_argument('--base',required=True);pl.add_argument('--head',required=True);pl.add_argument('--output',required=True)
+    pl.add_argument('--oracle-selection-sha')
     ve=sub.add_parser('verify');ve.add_argument('--task',required=True);ve.add_argument('--plan',required=True);ve.add_argument('--reuse');ve.add_argument('--publish-evidence',action='store_true');ve.add_argument('--diagnostic',action='store_true');ve.add_argument('--hypothesis');ve.add_argument('--engineering-admission');ve.add_argument('--estimate-deadline',action='store_true');ve.add_argument('--selftest-only',action='store_true')
     pc=sub.add_parser('package-check');pc.add_argument('--task',required=True);pc.add_argument('--base',required=True);pc.add_argument('--head',required=True);pc.add_argument('--evidence')
     cl=sub.add_parser('closeout');cl.add_argument('--task',required=True);cl.add_argument('--dry-run',action='store_true',required=True)
@@ -704,7 +722,7 @@ def main():
             result=context(ROOT,args.mode,args.task,args.query)
         elif args.action=='prepare': result=prepare(args.task,args.inventory)
         elif args.action=='plan':
-            result=plan(args.base,args.head);write(Path(args.output),result)
+            result=plan(args.base,args.head,args.oracle_selection_sha);write(Path(args.output),result)
         elif args.action=='verify':
             if args.estimate_deadline:
                 expected=json.loads(safe_file(args.plan).read_bytes())

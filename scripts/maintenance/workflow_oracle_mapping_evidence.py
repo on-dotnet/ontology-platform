@@ -874,9 +874,136 @@ def reopen_test(archive, entry, name, origin):
     return mtp(out+err,minimum)
 
 
-def qualify(root, task, run_id, gate, input_key):
+class CurrentTestOriginals(Originals):
+    """按冻结选择的四组构建及命令身份重开私有原件，文件名均由消费者构造。"""
+
+    def __init__(self,root,index):
+        self.root,self.index,self.examined=root,index,{}
+        self.area=root/'artifacts/workflow'/TASK
+
+    def raw(self,name):
+        cid,sep,member=name.partition('-')
+        if COMMAND.fullmatch(cid) and member in ('receipt.json','stdout.txt','stderr.txt'):
+            require(cid in {item['commandId'] for item in self.index['tests'].values()},'OMQ_TEST_COMMAND_SCOPE')
+            path=self.area/'commands'/PRODUCT_RUN/cid/member
+        else:
+            require(name in {target+suffix for target,_,_ in TESTS.values()
+                    for suffix in ('-build-binding.json','-bound-build.txt')},'OMQ_TEST_BUILD_SCOPE')
+            digest=self.index['buildFiles'][name]
+            require(HEX.fullmatch(digest),'OMQ_TEST_BUILD_SHA')
+            original=Path(name)
+            path=self.area/(original.stem+'-'+digest+original.suffix)
+        data=ordinary(path).read_bytes()
+        if not COMMAND.fullmatch(cid):
+            require(sha(data)==digest,'OMQ_TEST_BUILD_BYTES')
+        self.examined[str(path.relative_to(self.root))]=sha(data)
+        return data
+
+
+def record_current_tests(root,prior_sha=None,formal_parent=None):
+    """只执行当前输入缺少的选择项；已冻结项须通过同一 reopen_test 才能复用。"""
+    import workflow
+    import workflow_execution as ex
+    import workflow_m2_build as build
+    require(RUN==PRODUCT_RUN,'OMQ_RECORD_PRODUCT_RUN')
+    route=dict(taskId=TASK,runId=RUN,scope='s2-s3-01-runtime-01',batch='s2-s3-01')
+    directory=root/'artifacts/workflow'/TASK/RUN/route['batch']
+    prior=None
+    if prior_sha:
+        require(HEX.fullmatch(prior_sha),'OMQ_PRIOR_SELECTION')
+        data=ordinary(directory/('engineering-selection-'+prior_sha+'.json')).read_bytes()
+        require(sha(data)==prior_sha,'OMQ_PRIOR_SELECTION_SHA')
+        prior=json.loads(data)
+        require(all(prior[k]==v for k,v in route.items()) and prior['measuredWorktree']==str(root)
+                and re.fullmatch('[0-9a-f]{40}',prior['measuredCommit']) and subprocess.run(
+                    ['git','merge-base','--is-ancestor',prior['measuredCommit'],'HEAD'],cwd=root).returncode==0,'OMQ_PRIOR_SELECTION_SCOPE')
+    commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+    require(not subprocess.check_output(['git','status','--porcelain','--','backend'],cwd=root),'OMQ_TEST_DIRTY_BACKEND')
+    index=dict(**route,measuredWorktree=str(root),measuredCommit=commit,buildFiles={},tests={})
+    archive=CurrentTestOriginals(root,index)
+    for name,(target,expression,minimum) in TESTS.items():
+        binding=build.validate(target,TASK)
+        for suffix in ('-build-binding.json','-bound-build.txt'):
+            path=archive.area/(target+suffix)
+            data=ordinary(path).read_bytes()
+            digest=sha(data)
+            copy=ordinary(path.with_name(path.stem+'-'+digest+path.suffix))
+            if not copy.exists():
+                with copy.open('xb') as stream:
+                    stream.write(data)
+            require(sha(copy.read_bytes())==digest,'OMQ_BUILD_ARCHIVE')
+            index['buildFiles'][path.name]=digest
+        if prior and name in prior['tests'] and all(index['buildFiles'][target+k]==prior['buildFiles'][target+k]
+                for k in ('-build-binding.json','-bound-build.txt')):
+            entry=prior['tests'][name]
+        else:
+            result=ex.run(test_invocation(root,target,expression,minimum),root,task=TASK,run_id=RUN,
+                stage='omq-test-'+name,input_key=digest_value(binding),timeout=120,
+                environment=workflow.engineering_process_environment(TASK,route))
+            entry=dict(commandId=result.receipt['commandId'])
+        index['tests'][name]=entry
+        reopen_test(archive,entry,name,root)
+    if formal_parent is not None:
+        require(COMMAND.fullmatch(formal_parent),'OMQ_FORMAL_PARENT')
+        index['formalCommandId']=formal_parent
+    data=encoded(index)
+    digest=sha(data)
+    selection=directory/('engineering-selection-'+digest+'.json')
+    if not selection.exists():
+        with selection.open('xb') as stream:
+            stream.write(data)
+    require(selection.read_bytes()==data,'OMQ_TEST_SELECTION_PERSISTENCE')
+    return digest
+
+
+def current_engineering(root,gate,input_key,scope,batch,selection_sha):
+    """当前批次工程与产品原件沿同一登记门禁重开，源数据与命令不依赖历史 S0 选择表。"""
+    import workflow
+    require(RUN==PRODUCT_RUN and batch=='s2-s3-01' and scope=='s2-s3-01-runtime-01'
+            and HEX.fullmatch(selection_sha or '') and workflow.input_key(root,gate)==input_key,'OMQ_CURRENT_ROUTE')
+    path=root/'artifacts/workflow'/TASK/RUN/batch/('engineering-selection-'+selection_sha+'.json')
+    raw=ordinary(path).read_bytes()
+    require(sha(raw)==selection_sha,'OMQ_CURRENT_SELECTION_SHA')
+    index=json.loads(raw)
+    require((index['taskId'],index['runId'],index['scope'],index['batch'],index['measuredWorktree'])==
+            (TASK,PRODUCT_RUN,scope,batch,str(root)) and re.fullmatch('[0-9a-f]{40}',index['measuredCommit'])
+            and subprocess.run(['git','merge-base','--is-ancestor',index['measuredCommit'],'HEAD'],cwd=root).returncode==0,
+            'OMQ_CURRENT_SELECTION_ID')
+    require(set(index['tests'])<=set(TESTS),'OMQ_CURRENT_TEST_NAMES')
+    archive=CurrentTestOriginals(root,index)
+    if gate in ('contract','backend'):
+        names=('wire','binding') if gate=='contract' else ('binding','deadline','mcp-deadline')
+        tests=sum(reopen_test(archive,index['tests'][name],name,root) for name in names)
+    elif gate in ('interaction','web'):
+        parent=index.get('formalCommandId')
+        require(COMMAND.fullmatch(parent or ''),'OMQ_FORMAL_S2_S3_NOT_RUN')
+        modes=frozen_current_modes(root,scope,gate)
+        tests=0
+        for mode in modes:
+            case=reopen_runtime_case(root,TASK,PRODUCT_RUN,parent,expected_mode=mode)
+            require(case['status']=='CASE_QUALIFIED','OMQ_CURRENT_PRODUCT_CASE')
+            tests+=case['checks']
+            archive.examined.update({item['path']:item['sha256'] for item in case['members'].values()})
+    else:
+        require(False,'OMQ_CURRENT_ENVIRONMENT_ORIGINALS_NOT_RUN')
+    require(tests>0,'OMQ_ZERO_CHECKS')
+    return dict(taskId=TASK,runId=RUN,scope=scope,batch=batch,selectionSha256=selection_sha,gate=gate,
+                inputKey=input_key,status='PASS',tests=tests,skipped=0,executionMode='REUSED',qualificationMode='FRESH',
+                originals=archive.examined,oracleS0='BLOCKED',AC03B='NOT_QUALIFIED')
+
+
+def frozen_current_modes(root,scope,gate):
+    from workflow_oracle_mapping_s2_contract import frozen_plan
+    modes=[item['mode'] for item in frozen_plan(root,scope)['stages']]
+    return [mode for mode in modes if mode.startswith('ui-')==(gate=='web')]
+
+
+def qualify(root, task, run_id, gate, input_key, scope=None, batch=None, selection_sha=None):
     import workflow
     require(task == TASK and run_id == RUN and gate in GATES and workflow.input_key(root,gate)==input_key, 'OMQ_QUALIFICATION_ID')
+    if run_id==PRODUCT_RUN:
+        return current_engineering(root,gate,input_key,scope,batch,selection_sha)
+    require(scope is None and batch is None and selection_sha is None,'OMQ_HISTORICAL_SCOPE')
     # 一个不可变阶段选择表可被多个受影响门禁引用；每一行均从已公开原字节重新验证。
     group = {'environment':'admission','contract':'s0','backend':'s0','web':'s3','interaction':'s2'}[gate]
     selection = ordinary(root/PUBLIC/group/'qualification.json')
@@ -1051,6 +1178,8 @@ if __name__=='__main__':
         cli.add_argument('--'+name,required=True)
     cli.add_argument('--gate')
     cli.add_argument('--input-key')
+    for name in ('scope','batch','selection-sha'):
+        cli.add_argument('--'+name)
     cli.add_argument('--case-command')
     cli.add_argument('--expected-mode',choices=sorted(BROWSER))
     args=cli.parse_args()
@@ -1060,7 +1189,7 @@ if __name__=='__main__':
             result=reopen_runtime_case(ROOT,args.task,args.run_id,args.case_command,expected_mode=args.expected_mode)
         else:
             require(not args.expected_mode,'OMQ_QUALIFICATION_ARGUMENTS')
-            result=qualify(ROOT,args.task,args.run_id,args.gate,args.input_key)
+            result=qualify(ROOT,args.task,args.run_id,args.gate,args.input_key,args.scope,args.batch,args.selection_sha)
         print(json.dumps(result))
     except (ValueError,KeyError,OSError,TypeError) as error:
         raise SystemExit('OMQ_QUALIFICATION_REJECTED '+(str(error) if isinstance(error,ValueError) else type(error).__name__))

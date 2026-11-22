@@ -251,10 +251,10 @@ export function grantState(state) {
 }
 
 /** 调用平台真实事务与只读采样；Python 异常正文不进入浏览器报告。 */
-export function platform(root, call, input, deadline) {
+export function platform(root, call, input, deadline, limitMs=30000) {
   const code = 'import sys,json;sys.path.insert(0,"scripts/maintenance");import workflow_oracle_mapping_platform as q;print(json.dumps(' + call + '))';
   return JSON.parse(execFileSync("python3", ["-B", "-c", code], { cwd: root, input: JSON.stringify(input),
-    encoding: "utf8", timeout: Math.min(30000, stageRemaining(deadline)), stdio: ["pipe","pipe","pipe"] }));
+    encoding: "utf8", timeout: Math.min(limitMs, stageRemaining(deadline)), stdio: ["pipe","pipe","pipe"] }));
 }
 
 /** 纯认证入口只把已有 Cookie 经私有 stdin 传给正式四票据消费者。 */
@@ -432,5 +432,5 @@ export function combinedProjection(catalog, connectionId) {
 /** 只能调用本任务白名单函数，正文通过私有stdin；执行预算来自当前阶段。 */
 export function s2Call(root, method, values, deadline) {
   if (!["grants", "ready", "source_case", "source_snapshot", "permission_case", "await_expiry", "access_case", "runtime_case", "same_grant"].includes(method)) throw new Error("ORACLE_S2_CALL");
-  return platform(root, "__import__('workflow_oracle_mapping_s2')." + method + "(*json.load(sys.stdin))", values, deadline);
+  return platform(root, "__import__('workflow_oracle_mapping_s2')." + method + "(*json.load(sys.stdin))", values, deadline, method==="runtime_case"?stageRemaining(deadline):30000);
 }

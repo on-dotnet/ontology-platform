@@ -16,7 +16,7 @@ internal static class OracleAccessMaintenance
         ?? throw new InvalidOperationException("oracle_maintenance_environment_missing");
 
     /// <summary>读取并验证私有 stdin 原件，执行成功后只输出操作身份与提交包络。</summary>
-    internal static async Task RunAsync()
+    internal static async Task RunAsync(bool generationClosure = false)
     {
         using var limit = new CancellationTokenSource(TimeSpan.FromSeconds(15));
         try
@@ -27,7 +27,9 @@ internal static class OracleAccessMaintenance
             // 真实执行器关闭 stdin 后，最后一个字节也参与指纹。
             var count = await input.ReadAtLeastAsync(bytes, bytes.Length, false, limit.Token);
             // 独立核验器提供同一准确封闭原件与新鲜源证明的散列。
-            var proof = G4OracleAccessMaintenanceProof.Read(bytes[..count], Trusted("PROOF_SHA256"), Trusted("OPERATOR"), Trusted("SEAL_SHA256"), Trusted("TERMINATION_SHA256"));
+            var proof = generationClosure
+                ? G4OracleAccessMaintenanceProof.ReadGeneration(bytes[..count], Trusted("PROOF_SHA256"), Trusted("OPERATOR"), Trusted("SEAL_SHA256"), Trusted("TERMINATION_SHA256"))
+                : G4OracleAccessMaintenanceProof.Read(bytes[..count], Trusted("PROOF_SHA256"), Trusted("OPERATOR"), Trusted("SEAL_SHA256"), Trusted("TERMINATION_SHA256"));
             // 凭据只在限权进程内使用。引擎 inspect 及命令行不得含连接口令。
             var path = Trusted("DSN_FILE");
             if (!OperatingSystem.IsLinux()) throw new PlatformNotSupportedException("维护进程仅在准确 Linux 验证器中运行。");
@@ -55,7 +57,7 @@ internal static class OracleAccessMaintenance
             var lower = DateTimeOffset.UtcNow;
             // 只处理该私有证明固定的一行。
             var status = await G4OracleAccessMaintenance.RecoverAsync(database, new TransactionalAuditWriter(governance), proof,
-                (connection, transaction, token) => ReadAuditAsync(governance, connection, transaction, token), limit.Token);
+                (connection, transaction, token) => ReadAuditAsync(governance, connection, transaction, token, proof["queryId"]), limit.Token);
             Console.WriteLine(JsonSerializer.Serialize(new { status, operationId = proof["operationId"], lowerUtc = lower, upperUtc = DateTimeOffset.UtcNow }));
         }
         catch
@@ -67,7 +69,7 @@ internal static class OracleAccessMaintenance
 
     /// <summary>通过治理上下文读取准确 query 的本次失败与恢复的全部审计，含 UTF8 jsonb 原行摘要。</summary>
     internal static async Task<JsonElement> ReadAuditAsync(IDbContextFactory<GovernanceDbContext> factory,
-        DbConnection connection, DbTransaction transaction, CancellationToken token)
+        DbConnection connection, DbTransaction transaction, CancellationToken token, string queryId = G4OracleAccessMaintenanceProof.QueryId)
     {
         await using var governance = await factory.CreateDbContextAsync(token);
         governance.Database.SetDbConnection(connection, contextOwnsConnection: false);
@@ -77,7 +79,7 @@ internal static class OracleAccessMaintenance
             SELECT COALESCE(json_agg(json_build_object('id',a."Id",'action',a."Action",'outcome',a."Outcome",
                 'actor',a."Actor",'trace',a."TraceId",'correlation',a."CorrelationId",'organization',a."OrganizationId",
                 'sites',a."ScopeSiteIds",'sha256',encode(sha256(convert_to(to_jsonb(a)::text,'UTF8')),'hex')) ORDER BY a."Id"),'[]')::text AS "Value"
-            FROM governance.audit_records a WHERE a."Resource"={G4OracleAccessMaintenanceProof.QueryId}
+            FROM governance.audit_records a WHERE a."Resource"={queryId}
             """).SingleAsync(token);
         return JsonSerializer.Deserialize<JsonElement>(json);
     }

@@ -41,7 +41,8 @@ const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/p
 if (oracle && !omq.modes.includes(mode)) throw new Error("ORACLE_SCENARIO_NOT_REGISTERED");
 if (doris && !["s3","ui-s1","ui-s3","serve","s2-doris-ready","s2-doris-root-deadline","s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
-if (oracle && ["auth-handoff-s1", "s2-s3-oracle"].includes(mode)) await authHandoffRun();
+if (oracle && mode==="s2-oracle-aba" && args.includes("--diagnostic-id")) await authHandoffRun(true);
+else if (oracle && ["auth-handoff-s1", "s2-s3-oracle"].includes(mode)) await authHandoffRun();
 else if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
   const { writeFile } = await import("node:fs/promises");
@@ -1863,15 +1864,29 @@ function oracleProgress(event) {
 }
 
 /** 本任务固定批：唯一浏览器进程，认证与业务分别留原件，最后统一回收。 */
-async function authHandoffRun() {
+async function authHandoffRun(diagnostic=false) {
   if (!omq.productResume) throw new Error("ORACLE_BATCH_RUN");
   const { writeFile } = await import("node:fs/promises");
-  const inputName = argument("batch-input");
-  if (!/^(?:auth-handoff|s2-s3)-[a-f0-9]{32}\.json$/.test(inputName)) throw new Error("ORACLE_BATCH_INPUT");
   const output = resolve(root, "artifacts/workflow", task, runId);
-  const input = JSON.parse(await readFile(resolve(output, inputName), "utf8"));
-  const plan = mode === "s2-s3-oracle" ? (input.plan.planId === "s2-s3-01-runtime-01" ? omq.s2RuntimePlan() : input.plan.planId === "s2-s3-01-access-01" ? omq.s2AccessPlan() : omq.s2Plan) : omq.authPlan;
-  if (JSON.stringify(input.plan) !== JSON.stringify(plan)) throw new Error("ORACLE_BATCH_PLAN");
+  let plan, input;
+  if(diagnostic) {
+    const id=argument("diagnostic-id");
+    if(args.length!==8 || !/^[a-f0-9]{32}$/u.test(id) || process.env.OMQ_ABA_DIAGNOSTIC!==id) throw Error("ORACLE_DIAGNOSTIC_ID");
+    const charge=JSON.parse(await readFile(resolve(output,"s2-s3-01/diagnostic-aba-start.json"),"utf8"));
+    if (charge.executionId!==id || charge.taskId!==task || charge.runId!==runId || charge.batch!=="s2-s3-01") throw Error("ORACLE_DIAGNOSTIC_START");
+    const win=JSON.parse(await readFile(resolve(output,"s2-s3-01","window-"+charge.windowId+".json"),"utf8"));
+    if(win.id!==charge.windowId || win.state!=="OPEN" || win.plan!=="s2-s3-01-runtime-01") throw Error("ORACLE_DIAGNOSTIC_WINDOW");
+    const full=omq.s2RuntimePlan();
+    if(full.stages[0].mode!=="s0-oracle-auth" || full.stages[1].mode!=="s2-oracle-aba") throw Error("ORACLE_DIAGNOSTIC_STAGES");
+    plan={...full,stages:full.stages.slice(0,2)};
+    input={executionId:id,kind:"ONE_DIAGNOSTIC_ABA"};
+  } else {
+    const inputName = argument("batch-input");
+    if (!/^(?:auth-handoff|s2-s3)-[a-f0-9]{32}\.json$/.test(inputName)) throw new Error("ORACLE_BATCH_INPUT");
+    input = JSON.parse(await readFile(resolve(output, inputName), "utf8"));
+    plan = mode === "s2-s3-oracle" ? (input.plan.planId === "s2-s3-01-runtime-01" ? omq.s2RuntimePlan() : input.plan.planId === "s2-s3-01-access-01" ? omq.s2AccessPlan() : omq.s2Plan) : omq.authPlan;
+    if (JSON.stringify(input.plan) !== JSON.stringify(plan)) throw new Error("ORACLE_BATCH_PLAN");
+  }
   const abort = new AbortController();
   const stop = () => abort.abort(); process.on("SIGTERM", stop); process.on("SIGINT", stop);
   const shared = { plan, contexts: [], executionId: input.executionId, signal: abort.signal };
@@ -1892,7 +1907,15 @@ async function authHandoffRun() {
     report.postMs = performance.now() - close;
     if (report.postMs > plan.postSeconds * 1000) report.status = "FAIL";
     report.stages = shared.stages ?? []; report.finishedAtUtc = new Date().toISOString();
-    const file = resolve(output, "browser-" + mode + "-" + Date.now() + ".json");
+    if(diagnostic) {
+      console.log(JSON.stringify({diagnosticStages:report.stages}));
+      try {
+        const marker=JSON.parse(await readFile(resolve(output,"s2-s3-01","diagnostic-child-"+input.executionId+".json"),"utf8"));
+        console.log(JSON.stringify({diagnosticAba:marker}));
+      } catch(error) { if(error.code!=="ENOENT") throw error; }
+    }
+    const file = diagnostic ? resolve(output,"s2-s3-01","diagnostic-parent-"+input.executionId+".json")
+      : resolve(output, "browser-" + mode + "-" + Date.now() + ".json");
     await writeFile(file, JSON.stringify(report, null, 2) + "\n", { flag: "wx" });
     console.log(JSON.stringify({ status: report.status, report: file, stages: report.stages }));
     process.exitCode = report.status === "PASS" ? 0 : 1;

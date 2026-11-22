@@ -34,9 +34,16 @@ export async function restoreMapping(ctx) {
   const {oldA, oldB, chain, state, actors, report, get, post, command, persist} = ctx;
   const {operator, auditor, activator} = actors;
   const current = chain.receipts.at(-1)?.receipt, id = oldA.mappingId, path = "/api/v1/mappings/" + id;
-  check("RESTORE_EXACT_HISTORY", sameReceipt(oldA, state.mappingReceipt) && sameReceipt(oldA, chain.receipts[0]?.receipt)
-    && sameReceipt(oldB, chain.receipts[1]?.receipt) && [2,3].includes(chain.receipts.length)
-    && oldA.activationRevision===1 && oldB.activationRevision===2 && oldB.previousReleaseId===oldA.mappingReleaseId
+  const diagnostic=ctx.diagnostic ?? null;
+  const baseRevision=diagnostic ? 3 : 1;
+  if (diagnostic) check("RESTORE_DIAGNOSTIC_PREFIX",chain.total===chain.receipts.length && diagnostic.history.length===3
+    && isDeepStrictEqual(chain.receipts.slice(0,3),diagnostic.history) && sameReceipt(state.mappingReceipt,diagnostic.history[0].receipt)
+    && sameReceipt(oldB,diagnostic.activatedB) && oldA.activationId==="activation-d2dcec9ef54c4f3bb96d60cab449580b"
+    && (diagnostic.activatedA ? chain.total===5 && sameReceipt(current,diagnostic.activatedA) : chain.total===4));
+  check("RESTORE_EXACT_HISTORY", sameReceipt(oldA, diagnostic ? diagnostic.history[2].receipt : state.mappingReceipt)
+    && sameReceipt(oldA, chain.receipts[baseRevision-1]?.receipt) && sameReceipt(oldB, chain.receipts[baseRevision]?.receipt)
+    && [baseRevision+1,baseRevision+2].includes(chain.receipts.length)
+    && oldA.activationRevision===baseRevision && oldB.activationRevision===baseRevision+1 && oldB.previousReleaseId===oldA.mappingReleaseId
     && oldA.mappingReleaseId!==oldB.mappingReleaseId && oldB.mappingId===id
     && isDeepStrictEqual(chain.current,[current.activationId,current.activationRevision,current.mappingReleaseId])
     && chain.receipts.every(row => row.connection===state.connectionId && row.catalog===state.catalog.snapshotId
@@ -50,7 +57,7 @@ export async function restoreMapping(ctx) {
   const bProof = await get(operator,"/api/v1/mapping-proposals/"+oldB.proposalId);
   check("RESTORE_B_PROOF",sameReceipt(bProof.activation,oldB));
   let restored = current;
-  if (chain.receipts.length===2) {
+  if (chain.receipts.length===baseRevision+1) {
     await ctx.reserve(); // 首笔映射写前独占准确 Q 的一次归位；异常不自动重跑。
     const draft = await get(operator,path);
     check("RESTORE_DRAFT",draft.mappingId===id && draft.sourceConnectionId===state.connectionId && isDeepStrictEqual(draft.scope,scope));
@@ -100,7 +107,8 @@ export async function restoreMapping(ctx) {
 
 async function main() {
   const [windowId,executionId,...extra] = process.argv.slice(2);
-  check("RESTORE_CALLER",omq.productResume && root===process.cwd() && [windowId,executionId].every(v=>/^[a-f0-9]{32}$/u.test(v)) && !extra.length);
+  const isDiagnostic=extra.length===1 && extra[0]==="--diagnostic";
+  check("RESTORE_CALLER",omq.productResume && root===process.cwd() && [windowId,executionId].every(v=>/^[a-f0-9]{32}$/u.test(v)) && (!extra.length || isDiagnostic));
   const windowFile=resolve(area,batch,"window-"+windowId+".json");
   const requireOpen=async()=>{
     const win=await read(windowFile);
@@ -108,15 +116,18 @@ async function main() {
       && win.batch===batch && win.plan==="s2-s3-01-runtime-01" && [40,48].includes(win.ceiling/2**30));
   };
   await requireOpen();
-  const stdout=await readFile(resolve(area,"../commands",run,sourceCommand,"stdout.txt"));
-  check("RESTORE_ORIGINAL",stdout.length===5349 && sha(stdout)===stdoutHash);
+  const diagnostic=isDiagnostic ? omq.platform(root,"__import__('workflow_oracle_mapping_continuation').diagnostic_recovery_target(q.ROOT)",[],performance.now()+60000) : null;
+  const targetCommand=diagnostic?.sourceCommand ?? sourceCommand, targetQuery=diagnostic?.queryId ?? qid, targetHash=diagnostic?.stdoutHash ?? stdoutHash;
+  const stdout=await readFile(resolve(area,"../commands",run,targetCommand,"stdout.txt"));
+  check("RESTORE_ORIGINAL",(diagnostic || stdout.length===5349) && sha(stdout)===targetHash);
   const rows=stdout.toString().split("\n").filter(line=>line.startsWith('{"taskId":')).map(JSON.parse);
-  check("RESTORE_Q",rows.length===1 && rows[0].queryId===qid && rows[0].abaCompleted===false);
+  check("RESTORE_Q",rows.length===1 && rows[0].queryId===targetQuery && (diagnostic?.activatedA || rows[0].abaCompleted===false));
   const statePath=resolve(area,"oracle-two-table.json"), state=await read(statePath);
+  const captured=diagnostic ? diagnostic.history[2].receipt : state.mappingReceipt;
   check("RESTORE_STATE",state.taskId===task && state.runId===run && state.batch===batch && isDeepStrictEqual(state.scope,scope)
-    && rows[0].capturedA.activationId===state.mappingReceipt.activationId && rows[0].capturedA.mappingReleaseId===state.mappingReceipt.mappingReleaseId);
+    && rows[0].capturedA.activationId===captured.activationId && rows[0].capturedA.mappingReleaseId===captured.mappingReleaseId);
   const reportFile=resolve(area,batch,"mapping-recovery-"+executionId+".json");
-  const report={taskId:task,runId:run,batch,windowId,executionId,queryId:qid,sourceCommand,stdoutHash,status:"STARTED",phases:[]};
+  const report={taskId:task,runId:run,batch,windowId,executionId,queryId:targetQuery,sourceCommand:targetCommand,stdoutHash:targetHash,status:"STARTED",phases:[]};
   await writeFile(reportFile,JSON.stringify(report)+"\n",{flag:"wx",mode:0o600});
   const persist=()=>atomic(reportFile,report);
   const authDeadline=performance.now()+600000;
@@ -126,7 +137,7 @@ async function main() {
   const actors={};
   const contexts=[];
   let browser;
-  const command=(expectedRevision=0)=>({commandId:randomUUID(),idempotencyKey:randomUUID(),expectedRevision,reason:"Approved d368 normal mapping rollback"});
+  const command=(expectedRevision=0)=>({commandId:randomUUID(),idempotencyKey:randomUUID(),expectedRevision,reason:diagnostic?"Approved diagnostic mapping rollback":"Approved d368 normal mapping rollback"});
   const request=async(actor,method,path,body,status=200,etag)=>{
     check("RESTORE_API_PATH",path.startsWith("/api/v1/mapping") && !path.includes("..") && !path.includes("?"));
     const phase={method,path,startedAtUtc:new Date().toISOString(),monotonicMs:performance.now(),
@@ -172,15 +183,15 @@ async function main() {
       && report.grant.workflowIds.length===9 && report.grant.remainingSeconds>=report.grant.requiredSeconds);
     state.combinedGrantIds=report.grant.combinedGrantIds;state.workflowGrantIds=report.grant.workflowIds;
     await atomic(statePath,state);
-    const chainRead=()=>omq.platform(root,"q.read_pg(__import__('workflow_oracle_mapping_continuation').activation_chain_sql(json.load(sys.stdin)),'s23-recovery-activation')",state.mappingReceipt.mappingId,deadline);
+    const chainRead=()=>omq.platform(root,"q.read_pg(__import__('workflow_oracle_mapping_continuation')."+(diagnostic?"extension_sql":"activation_chain_sql")+"(json.load(sys.stdin)),'s23-recovery-activation')",state.mappingReceipt.mappingId,deadline);
     const [before,cmd]=chainRead();report.chainBeforeCommand=cmd;
-    const adapted= {state,oldA:state.mappingReceipt,oldB:rows[0].activatedB,chain:JSON.parse(before),actors,report,deadline,
+    const adapted= {state,diagnostic,oldA:captured,oldB:rows[0].activatedB,chain:JSON.parse(before),actors,report,deadline,
       get:(a,p)=>request(a,"GET",p),post:(a,p,body,status,etag)=>request(a,"POST",p,body,status,etag),
-      command,persist,reserve:()=>writeFile(resolve(area,batch,"mapping-recovery-"+qid+".once"),JSON.stringify({windowId,executionId,qid})+"\n",{flag:"wx",mode:0o600})};
+      command,persist,reserve:()=>writeFile(resolve(area,batch,"mapping-recovery-"+targetQuery+".once"),JSON.stringify({windowId,executionId,qid:targetQuery})+"\n",{flag:"wx",mode:0o600})};
     const receipt=await restoreMapping(adapted);
     const [after,cmdAfter]=chainRead();report.chainAfterCommand=cmdAfter;
     const readback=JSON.parse(after);
-    check("RESTORE_FINAL_CHAIN",readback.receipts.length===3 && sameReceipt(readback.receipts[2].receipt,receipt)
+    check("RESTORE_FINAL_CHAIN",readback.receipts.length===(diagnostic ? 5 : 3) && (!diagnostic || readback.total===5) && sameReceipt(readback.receipts.at(-1).receipt,receipt)
       && isDeepStrictEqual(readback.current,[receipt.activationId,receipt.activationRevision,receipt.mappingReleaseId]));
     state.mappingCurrentReceipt=receipt;await atomic(statePath,state);
     report.hostAfter=binding();omq.checkBinding(report.hostAfter);

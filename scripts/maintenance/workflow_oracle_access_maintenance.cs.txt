@@ -36,7 +36,7 @@ internal static class IsolatedQueryTests
     {
         try
         {
-            if (args.Length != 3 || !Regex.IsMatch(args[0], @"\A[0-9a-f]{12}\z") ||
+            if ((args.Length != 3 && !(args.Length == 4 && args[3] == "generation")) || !Regex.IsMatch(args[0], @"\A[0-9a-f]{12}\z") ||
                 !Regex.IsMatch(args[1], @"\A[0-9A-F]+/[0-9A-F]+\z") || !long.TryParse(args[2], out var capacity) || capacity <= 0) return 2;
             var nonce = args[0];
             // 只通过应用自己的配置提供者取命名连接，不单独读取或输出口令。
@@ -69,6 +69,7 @@ internal static class IsolatedQueryTests
             for (var i = 0; i < Cases.Length; i++)
             {
                 var (method, expected) = Cases[i];
+                if (args.Length == 4) method = "G4QueryRaceTests.OracleGenerationMaintenanceInIsolatedPostgres";
                 var start = new ProcessStartInfo(Environment.ProcessPath ?? throw new InvalidOperationException()) { WorkingDirectory = Environment.CurrentDirectory,
                     UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
                 // 子进程仅继承所需的常规运行时字段；没有 DSN 命令行、shell 展开或管理员材料。

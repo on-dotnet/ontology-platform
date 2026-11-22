@@ -19,7 +19,14 @@ public sealed partial class G4QueryRaceTests
 {
     /// <summary>核FAILED原行、完整证明、审计失败回滚、准确恢复和同操作幂等；不修改原取消维护。</summary>
     [TestMethod]
-    public async Task OracleAccessFailureMaintenanceInIsolatedPostgres()
+    public Task OracleAccessFailureMaintenanceInIsolatedPostgres() => CheckAccessMaintenanceAsync(false);
+
+    /// <summary>专用实例和生产者封闭后，按同一事务检验本次失败占位与拒绝分支。</summary>
+    [TestMethod]
+    public Task OracleGenerationMaintenanceInIsolatedPostgres() => CheckAccessMaintenanceAsync(true);
+
+    /// <summary>在独立库重用真实行锁、行摘要、审计回滚及同操作幂等断言。</summary>
+    private static async Task CheckAccessMaintenanceAsync(bool generation)
     {
         // 原有测试库门禁还会验证服务器端数据库注释，不接受同名替代库。
         var connection = Environment.GetEnvironmentVariable("G4_QUERY_TEST_CONNECTION");
@@ -36,7 +43,10 @@ public sealed partial class G4QueryRaceTests
         await using var gov = await governance.CreateDbContextAsync();
         await gov.Database.MigrateAsync();
         await db.Database.MigrateAsync();
-        const string qid = G4OracleAccessMaintenanceProof.QueryId;
+        // 维护证明只允许与本次测试模式绑定的准确行。
+        var qid = generation ? G4OracleAccessMaintenanceProof.GenerationQueryId : G4OracleAccessMaintenanceProof.QueryId;
+        // 专用代次测试采用另一准确 owner，防止维护代码退回历史常量。
+        var owner = generation ? "oracle-execution-0123456789abcdef0123456789abcdef" : G4OracleAccessMaintenanceProof.Owner;
         const string cid = G4OracleAccessMaintenanceProof.ConnectionId;
         // 固定测试目标不覆盖同库先前未说明的行或审计。
         Assert.IsFalse(await db.Queries.AnyAsync(q => q.Id == qid));
@@ -108,7 +118,7 @@ public sealed partial class G4QueryRaceTests
             ExecutionStatus = "FAILED",
             CancelRequested = false,
             Fence = 2,
-            LeaseOwner = G4OracleAccessMaintenanceProof.Owner,
+            LeaseOwner = owner,
             LeaseUntilUtc = now.AddMinutes(-2),
             CreatedAtUtc = now.AddMinutes(-3),
             CompletedAtUtc = now.AddMinutes(-2),
@@ -210,23 +220,43 @@ public sealed partial class G4QueryRaceTests
             ["sealSha256"] = new string('a', 64),
             ["terminationProofSha256"] = new string('b', 64)
         };
+        if (generation)
+        {
+            fields.Remove("owner");
+            fields.Remove("sourceExecutionId");
+            fields["ownerSha256"] = G4QueryCanonical.Hash(System.Text.Encoding.UTF8.GetBytes(row.LeaseOwner!));
+            fields["proofKind"] = "DEDICATED_GENERATION";
+            fields["parentCommandId"] = "c02e89f8d8f2481f90058606ccf71b29";
+            fields["childCommandId"] = "5b90bb8f66fb4ddd9bfeddbe5015133a";
+            fields["sourceStartedAt"] = "2026-11-21T13:49:57.33078955Z";
+            fields["sourceFinishedAt"] = "2026-11-21T13:52:47.119332336Z";
+            fields["closeSha256"] = "21d6d0cff882452f4e810c28e59e82418fbb31a30ea9c40d74849f29dc48776e";
+        }
         G4OracleAccessMaintenanceProof Proof(Dictionary<string, object> supplied)
         {
             // 仅测试进程可选隔离数据库；正式 CLI 固定原平台内容键。
             var bytes = JsonSerializer.SerializeToUtf8Bytes(supplied);
+            if (generation)
+                return G4OracleAccessMaintenanceProof.ReadGeneration(bytes, G4QueryCanonical.Hash(bytes), "os-uid-501", new string('a', 64), new string('b', 64), isolated: true);
             return G4OracleAccessMaintenanceProof.Read(bytes, G4QueryCanonical.Hash(bytes), "os-uid-501", new string('a', 64), new string('b', 64), isolated: true);
         }
         async Task<string> Recover(G4OracleAccessMaintenanceProof authorized, ITransactionalAuditWriter writer)
         {
             await using var fresh = await queries.CreateDbContextAsync();
             return await G4OracleAccessMaintenance.RecoverAsync(fresh, writer, authorized,
-                (c, t, ct) => OracleAccessMaintenance.ReadAuditAsync(governance, c, t, ct), CancellationToken.None);
+                (c, t, ct) => OracleAccessMaintenance.ReadAuditAsync(governance, c, t, ct, qid), CancellationToken.None);
         }
         foreach (var (field, wrong) in new (string, object)[] { ("queryId", history.Id), ("owner", "other"), ("terminalFence", 3), ("sourceContainerId", new string('0', 64)),
             ("platformContainerId", new string('0', 64)), ("sourceExecutionId", new string('0', 32)),
             ("parentCommandId", new string('0', 32)), ("verifiedUtc", now.AddMinutes(1)),
             ("validUntilUtc", now.AddSeconds(-1)), ("terminationProofSha256", new string('0', 64)) })
             Assert.ThrowsExactly<InvalidOperationException>(() => Proof(new(fields) { [field] = wrong }));
+        if (generation)
+        {
+            foreach (var field in new[] { "childCommandId", "sourceStartedAt", "sourceFinishedAt", "sealSha256", "closeSha256" })
+                Assert.ThrowsExactly<InvalidOperationException>(() => Proof(new(fields) { [field] = "wrong" }));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => Recover(Proof(new(fields) { ["ownerSha256"] = new string('1', 64) }), audit));
+        }
         await Assert.ThrowsAsync<InvalidOperationException>(() => Recover(Proof(new(fields) { ["stableRowSha256"] = new string('0', 64) }), audit));
         await Assert.ThrowsAsync<SemanticOperationException>(() => Recover(Proof(fields), new WriteThenFailAudit(audit)));
         Assert.AreEqual(row.LeaseOwner, (await db.Queries.AsNoTracking().SingleAsync(q => q.Id == qid)).LeaseOwner);
@@ -260,7 +290,7 @@ public sealed partial class G4QueryRaceTests
             SubSources = [fixture.SubSources[0] with { ConnectionId = cid, WatermarkKind = "UNKNOWN" }]
         };
         var receipt = G4QueryTests.ReceiptFixture(qid, binding, late).Receipt with { AdapterVersion = "oracle-query-v1", WatermarkKind = "UNKNOWN", Watermark = null };
-        var stale = new G4QueryRecord { Id = qid, LeaseOwner = G4OracleAccessMaintenanceProof.Owner, Fence = 1, RequestHash = row.RequestHash };
+        var stale = new G4QueryRecord { Id = qid, LeaseOwner = owner, Fence = 1, RequestHash = row.RequestHash };
         var lost = await Assert.ThrowsAsync<SemanticOperationException>(() => store.CompleteAsync(stale, session, [executeProof], query, state, late,
             [new G4QueryStoredReceipt { Receipt = receipt, ReceiptHash = G4QueryCanonical.Hash(G4QueryCanonical.Serialize(receipt)) }], CancellationToken.None));
         Assert.AreEqual("query_execution_stale", lost.Code);

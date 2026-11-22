@@ -645,6 +645,30 @@ def runtime_invocation(cid,nonce,case):
       '-e','G4_QUERY_RUNTIME_TEST='+TASK+':'+RUN,cid,'/bin/sh','-ec',runner]
 
 
+def source_clock_invocation(host, nonce, case, edge):
+    """运行固定读钟采样。父子证据以本次 nonce、准确宿主和阶段绑定。"""
+    require(re.fullmatch('[a-f0-9]{32}',nonce) and case in ('aba','connection') and edge in ('before','after'),
+            'S2_CLOCK_SCOPE')
+    ids=[host['oracle']['containerId'],host['services']['api-secondary']['containerId']]
+    require(all(re.fullmatch('[a-f0-9]{64}',value) for value in ids), 'S2_CLOCK_CONTAINERS')
+    code=("import sys,json; sys.path.insert(0,'scripts/maintenance'); "
+          "from workflow_oracle_mapping_s2 import sample_source_clocks; print(json.dumps(sample_source_clocks(*sys.argv[1:])))")
+    argv=['python3','-B','-c',code,*ids]
+    stage='s23-source-clock-'+edge
+    key=ex.sha(ex.encoded([TASK,RUN,BATCH,case,nonce,edge,argv,host['commandId']]))
+    return argv,stage,key
+
+
+def sample_source_clocks(source_id, api_id):
+    """复用观察器的两个准确通道，只在业务子命令启动之前或已退出后测量时钟。"""
+    from contextlib import ExitStack, closing
+    from workflow_oracle_mapping_formal_observer import source_channel,clock_channel,source_clock,api_clock,sample_clock
+    with ExitStack() as scope:
+        oracle=scope.enter_context(closing(source_channel(source_id)))
+        api=scope.enter_context(closing(clock_channel(api_id)))
+        return dict(source=sample_clock(lambda:source_clock(oracle)),api=sample_clock(lambda:api_clock(api)))
+
+
 def runtime_case(case,envelope):
     """在现有副API配额内执行受控在途验证；凭证仅经stdin，原件由正式消费者重开。"""
     from workflow_oracle_mapping_resume import AREA,host_binding,current_session_snapshot,load
@@ -658,11 +682,34 @@ def runtime_case(case,envelope):
             and [r['subjectId'] for r in envelope['roles']]==[v[1] for v in ROSTER.values()],'S2_RUNTIME_SUBJECTS')
     host=host_binding();binding=current_session_snapshot(load(AREA/'formal-api-inputs.json'))['inputs']
     nonce=uuid.uuid4().hex;args=runtime_invocation(host['services']['api-secondary']['containerId'],nonce,case)
+    def clocks(edge):
+        clock_args,stage,key=source_clock_invocation(host,nonce,case,edge)
+        return ex.run(clock_args,p.ROOT,task=TASK,run_id=RUN,stage=stage,input_key=key,parent_id=host['commandId'],timeout=15)
+    import os
+    diagnostic=os.environ.get('OMQ_ABA_DIAGNOSTIC')
+    if diagnostic is not None:
+        from workflow_oracle_mapping_continuation import START_FILE
+        start=json.loads(ex.ordinary(p.ROOT/START_FILE).read_bytes())
+        require(re.fullmatch('[0-9a-f]{32}',diagnostic) and start['executionId']==diagnostic and case=='aba',
+                'S2_DIAGNOSTIC_CHILD_SCOPE')
+        with ex.ordinary(AREA/BATCH/('diagnostic-child-'+diagnostic+'.once')).open('x') as lock:
+            json.dump(dict(executionId=diagnostic,nonce=nonce,host=host['commandId']),lock)
+    before=clocks('before')
+    require(before.returncode==0,'S2_CLOCK_BEFORE_'+before.receipt['commandId'])
     result=ex.run(args,p.ROOT,task=TASK,run_id=RUN,stage='query-real-'+case+'-inflight-runtime',stdin=ex.encoded(envelope),
                   input_key=ex.sha(ex.encoded(binding)),parent_id=host['commandId'],timeout=25)
+    if diagnostic is not None:
+        values=[json.loads(line) for line in result.stdout.splitlines() if line.startswith(b'{"taskId":')]
+        if len(values)==1 and values[0].get('taskId')==TASK and values[0].get('resourceRun')==RUN and values[0].get('case')=='AC-05_INFLIGHT_ABA':
+            q=values[0].get('queryId')
+            if isinstance(q,str) and re.fullmatch('query-[0-9a-f]{32}',q):
+                p.save(AREA/BATCH/('diagnostic-child-'+diagnostic+'.json'),dict(childCommandId=result.receipt['commandId'],queryId=q))
     passed=mtp(result.stdout+result.stderr,1) if result.returncode==0 else 0
     summary=dict(taskId=TASK,runId=RUN,case=case,nonce=nonce,commandId=result.receipt['commandId'],host=host,input=binding,exitCode=result.returncode,passed=passed)
+    after=clocks('after')
+    summary['sourceClockCommands']=[before.receipt['commandId'],after.receipt['commandId']]
     p.save(AREA/BATCH/('runtime-'+case+'-'+result.receipt['commandId']+'.json'),summary)
+    require(after.returncode==0,'S2_CLOCK_AFTER_'+after.receipt['commandId'])
     require(result.returncode==0 and passed==1,'S2_RUNTIME_FAILED_'+result.receipt['commandId'])
     if case=='aba':summary['original']=demand_aba_original(result.stdout,'query-real-aba-inflight-runtime',TASK,RUN)
     else:

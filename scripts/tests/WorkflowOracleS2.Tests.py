@@ -365,6 +365,103 @@ class S2ContinuationTests(unittest.TestCase):
             with self.subTest(wrong=wrong), self.assertRaisesRegex(ValueError,'S23_PREFIX_'):
                 n.check_activation_chain(binding,state,b,wrong)
 
+    def test_registered_five_only_and_frozen_three_originals(self):
+        import copy
+        import workflow_oracle_mapping_continuation as n
+        rows=[]
+        for revision in range(1,6):
+            a=revision%2==1
+            receipt=dict(activationId=f'a{revision}',proposalId=f'p{revision}',activationRevision=revision,
+                         mappingId='mapping',kind='ROLLBACK' if a and revision>1 else 'PUBLISH',
+                         mappingReleaseId='release-a' if a else f'release-b{revision}',
+                         previousReleaseId=rows[-1]['receipt']['mappingReleaseId'] if rows else None,
+                         manifestHash='hash-a' if a else f'hash-{revision}',activatedAtUtc='2026-11-21T13:52:19.4744354Z')
+            rows.append(dict(receipt=receipt,connection='c',catalog='s',fingerprint='f',command=f'cmd-{revision}',check=f'check-{revision}'))
+        old=rows[0]['receipt']; b=rows[1]['receipt']; history=copy.deepcopy(rows[:3])
+        ref=[dict(receipt=copy.deepcopy(r['receipt']),command=r['command']) for r in rows[3:]]
+        binding=dict(activation=old,connectionId='c',catalogSnapshotId='s')
+        state=dict(mappingReceipt=rows[-1]['receipt'],catalogFingerprint='f')
+        chain=dict(current=['a5',5,'release-a'],receipts=rows,total=5)
+        n.check_activation_chain(binding,state,b,chain,history=history,extension=ref)
+        for mutation in ('unregistered','hidden-sixth','four','six','history','command','check','binding','revision','wrong-a','wrong-b','pointer','old-current'):
+            wrong=copy.deepcopy(chain); registration=ref; observed=state
+            if mutation=='unregistered': registration=None
+            elif mutation=='hidden-sixth':wrong['total']=6
+            elif mutation=='four': wrong['receipts'].pop()
+            elif mutation=='six': wrong['receipts'].append(rows[-1])
+            elif mutation=='history': wrong['receipts'][2]['check']='substitute'
+            elif mutation=='command': wrong['receipts'][3]['command']='substitute'
+            elif mutation=='check': wrong['receipts'][4]['check']=rows[3]['check']
+            elif mutation=='binding': wrong['receipts'][4]['fingerprint']='other'
+            elif mutation=='revision': wrong['receipts'][3]['receipt']['activationRevision']=5
+            elif mutation=='wrong-a': wrong['receipts'][4]['receipt']['manifestHash']='other'
+            elif mutation=='wrong-b': wrong['receipts'][3]['receipt']['proposalId']='other'
+            elif mutation=='pointer': wrong['current']=['a3',3,'release-a']
+            elif mutation=='old-current': observed=dict(state,mappingReceipt=rows[2]['receipt'])
+            with self.subTest(mutation=mutation), self.assertRaisesRegex(ValueError,'S23_PREFIX_'):
+                n.check_activation_chain(binding,observed,b,wrong,history=history,extension=registration)
+        self.assertNotEqual(n.activation_chain_sql('mapping-'+'1'*32),n.extension_sql('mapping-'+'1'*32))
+        self.assertIn(b'ck."Status"=\'PASS\'',n.extension_sql('mapping-'+'1'*32))
+
+    def test_prepare_and_reopen_freeze_only_the_observed_diagnostic(self):
+        import contextlib
+        import copy
+        import tempfile
+        from unittest.mock import patch, Mock
+        import workflow_oracle_mapping_continuation as n
+        import workflow_oracle_mapping_evidence as evidence
+        import workflow_oracle_mapping_platform as platform
+        import workflow_oracle_mapping_s2 as s2
+        import workflow_oracle_runtime_window as window
+        import workflow_oracle_mapping_continuity as continuity
+        with tempfile.TemporaryDirectory() as tmp, contextlib.ExitStack() as stack:
+            root=Path(tmp).resolve(); base=n.EXTENSION_FILE.parent; (root/base).mkdir(parents=True)
+            old=dict(mappingId='mapping-'+'1'*32,activationId='a1',proposalId='p1',kind='PUBLISH',
+                     mappingReleaseId='r1',activationRevision=1,manifestHash='ha',previousReleaseId=None,activatedAtUtc='2026-11-21T13:52:19Z')
+            rows=[]
+            for i in range(1,6):
+                receipt=dict(old,activationId=f'a{i}',proposalId=f'p{i}',activationRevision=i,
+                             mappingReleaseId='r1' if i%2 else f'r{i}',kind='ROLLBACK' if i>1 and i%2 else 'PUBLISH',
+                             previousReleaseId=rows[-1]['receipt']['mappingReleaseId'] if rows else None)
+                rows.append(dict(receipt=receipt,command=f'cmd{i}',check=f'k{i}',connection='c',catalog='s',fingerprint='f'))
+            current=rows[-1]['receipt'];binding=dict(activation=old,connectionId='c',catalogSnapshotId='s')
+            live=dict(catalog=dict(snapshotId='s',schemaFingerprint='f'),mappingCurrentReceipt=current,mappingReceipt=old,connectionId='c',
+                      latestQuery=dict(queryId='q-old',resultHash='hq',reportName='query.json',actor='reader',sessionHash='hs'))
+            path=root/base.parent/'oracle-two-table.json';path.write_text(json.dumps(live))
+            snapshot=dict(rows=[[],[]],hashes=['ha','hb'],projectionVersion=2,commandIds=['sa','sb'])
+            query=dict(oracleBinding=binding,independentSource=snapshot,oracleCases=[{}, {}, dict(queryId='q-old',sha256='hq')])
+            (root/base/'query.json').write_text(json.dumps(query))
+            qualified=dict(members={'query.json':{'path':str(base/'query.json')}})
+            host=dict(commandId='hh',oracle=dict(containerId='source'),services={'platform-pg':dict(containerId='pg',startedAt='2026-11-21T00:00:00Z')})
+            chain=dict(total=5,current=['a5',5,'r1'],receipts=rows)
+            stamp='2026-11-21T13:52:20Z'
+            archived=Mock();archived.paths={};archived.examined={};archived.dispatch=dict(host=host,commandId='parent')
+            archived.command.return_value=(dict(exitCode=0,classification='SUCCESS'),b'',b'')
+            archived.read.return_value=dict(startedAtUtc=stamp,endedAtUtc=stamp)
+            for mod,name,ret in [(n,'prefix_result',(qualified,None)),(n,'qualified_access',{}),(n,'_context',(query,{},host)),
+                    (n,'historical_chain',(rows[1]['receipt'],rows[:3])),
+                    (platform,'runtime_binding',host),(s2,'source_snapshot',snapshot),(window,'runtime_continuity',{}),
+                    (evidence,'stable_host',host),(evidence,'host_observation',{}),(evidence,'build_binding',{})]:
+                stack.enter_context(patch.object(mod,name,return_value=ret))
+            stack.enter_context(patch.object(platform,'AREA',root/base.parent.parent/'implementation-01'))
+            stack.enter_context(patch.object(platform,'read_pg',return_value=('', 'a'*32)))
+            stack.enter_context(patch.object(continuity,'command',side_effect=lambda *a:(dict(startedAtUtc=stamp),json.dumps(chain).encode(),b'')))
+            rec=dict(taskId=n.TASK,runId=n.RUN,batch='s2-s3-01',childId='child',queryId='q',parentId='p',measuredCommit='c',recovery=None)
+            (root/n.OUTCOME_FILE).write_text(json.dumps(dict(rec,exitCode=1)))
+            child_original=base/'child-original.txt';(root/child_original).write_text('frozen child')
+            def witnessed(root,record,archive):
+                n._read(root,child_original,archive)
+                return [dict(receipt=r['receipt'],command=r['command']) for r in rows[-2:]]
+            stack.enter_context(patch.object(n,'diagnostic_originals',side_effect=witnessed))
+            n.register_diagnostic_activation(root,'p','child','q','c')
+            ref=n.prepare_prefix(root,n.PREFIX,n.RUNTIME_PLAN)
+            (root/base.parent/'oracle-two-table.json').write_text(json.dumps(dict(live,mappingCurrentReceipt=old)))
+            stage=dict(plan=dict(planId=n.RUNTIME_PLAN,qualifiedPrefix=n.PREFIX),qualifiedPrefix=ref)
+            self.assertEqual(n.reopen_prefix(root,stage,archived)['status'],'REUSED_QUALIFIED_PREFIX')
+            (root/child_original).write_text('changed child')
+            with self.assertRaisesRegex(ValueError,'S23_DIAGNOSTIC_FROZEN_MEMBERS'):
+                n.reopen_prefix(root,stage,archived)
+
     def test_suffix_preserves_budgets_and_exact_qualified_prefix(self):
         import workflow_oracle_mapping_continuation as n
         old=c.frozen_plan(ROOT);new=c.frozen_plan(ROOT,n.PLAN_ID)
@@ -906,6 +1003,70 @@ class S2CapacityTests(unittest.TestCase):
                 usage['containerWritableBytes']['layer'] = total-base
                 with self.assertRaisesRegex(ValueError,'FORMAL_TOTAL_DISK'): measure()
                 exercise_window(measure)
+
+    def test_pg_only_registration_preserves_formal_host_and_blocks_unresolved_result(self):
+        import workflow_oracle_d368_pg_close as pg
+        import workflow_oracle_runtime_window as w
+        source = Path(w.__file__).with_name('workflow-oracle-runtime-close-registry.json')
+        registry = json.loads(source.read_bytes())
+        anchor = next(i for i,item in enumerate(registry['generations']) if item['sha256'] == pg.PREVIOUS)
+        registry['generations'] = registry['generations'][:anchor+1]
+        digest = '3'*64
+        pg_only = dict(kind=pg.KIND, operation='0'*32, queryId=pg.seal.QUERY, previousSha256=pg.PREVIOUS,
+                       sha256=digest, sizeBytes=15, status='BLOCKED', memberCount=1, memberIndexSha256='b'*64)
+        registry['generations'].append(pg_only)
+        registry['currentSha256'] = digest
+        with tempfile.TemporaryDirectory() as temp:
+            mock_registry = Path(temp)/'registry.json'
+            mock_registry.write_text(json.dumps(registry))
+            with patch.object(ex, 'ordinary', return_value=mock_registry):
+                entry = w.close_registration()
+                self.assertEqual(entry['grantCheckpoint']['epoch'],121)
+                self.assertNotIn('parentId',entry)
+                self.assertEqual(w.close_registration(pg.PREVIOUS)['nextPgOnlyClose'],digest)
+                with self.assertRaisesRegex(ValueError,'WINDOW_D368_PRODUCT_BLOCKED'):
+                    w.runtime_continuity(ROOT,{}, {})
+                with self.assertRaisesRegex(ValueError,'WINDOW_D368_RETIRED_HOST'):
+                    w.runtime_continuity(ROOT,{}, {},{'closeSha256':pg.PREVIOUS})
+                for key,value in [('queryId','query-other'),('parentId','other'),('status','PASS')]:
+                    with self.subTest(key=key):
+                        bad=copy.deepcopy(registry)
+                        bad['generations'][-1][key]=value
+                        mock_registry.write_text(json.dumps(bad))
+                        with self.assertRaisesRegex(ValueError,'WINDOW_D368_REGISTRY'):
+                            w.close_registration()
+
+    def test_pg_only_post_reopens_only_pg_successor(self):
+        import workflow_oracle_d368_pg_close as pg
+        old_start='2026-11-20T09:00:00Z'
+        old_end='2026-11-20T10:00:00Z'
+        pg_state=dict(StartedAt='2026-11-22T11:00:00Z',FinishedAt='2026-11-22T11:03:00Z')
+        ids={role:format(i+1,'064x') for i,role in enumerate(['platform-pg','fuseki','keycloak-test','rustfs','oracle'])}
+        prior=dict(data={role:dict(id=id,startedAt=old_start,after=dict(FinishedAt=old_end)) for role,id in ids.items()},
+                   apis={'api':dict(id='a'*64),'api-secondary':dict(id='b'*64)})
+        formal=dict(apis={'api':dict(id='c'*64),'api-secondary':dict(id='d'*64)})
+        row=dict(postState={'state':'1'*32,'absent':'2'*32})
+        stop=dict(endedUtc='2026-11-22T11:04:00Z')
+        def inspect(wrong):
+            def command(root,cid,run,argv,stage,key,seconds,archive):
+                self.assertEqual(argv[3:],pg.state_args(prior,formal)[stage.removeprefix('d368-post-')])
+                self.assertEqual(key,ex.sha(ex.encoded(argv[3:])))
+                stamp={'startedAtUtc':'2026-11-22T11:05:00Z'}
+                if stage=='d368-post-absent':
+                    return stamp,(b'new-api\n' if wrong=='api' else b''),b''
+                lines=[]
+                for role in sorted(ids):
+                    start,end=(pg_state['StartedAt'],pg_state['FinishedAt']) if role=='platform-pg' else (old_start,old_end)
+                    if role==wrong:
+                        start=pg_state['StartedAt'] if role!='platform-pg' else old_start
+                    lines.append('|'.join([ids[role],'exited','0',start,end,'false','']))
+                return stamp,'\n'.join(lines).encode(),b''
+            with patch.object(pg.w,'last_close',return_value=formal),patch.object(pg.c,'command',side_effect=command):
+                pg.post_state(ROOT,row,prior,pg_state,stop,None)
+        inspect(None)
+        for wrong in ('api','oracle','fuseki','keycloak-test','rustfs','platform-pg'):
+            with self.subTest(wrong=wrong),self.assertRaisesRegex(ValueError,'D368_FINAL_'):
+                inspect(wrong)
 
     def test_mapping_restore_preserves_historical_host_and_grant(self):
         import workflow_oracle_runtime_window as w

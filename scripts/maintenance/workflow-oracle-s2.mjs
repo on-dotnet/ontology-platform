@@ -1,4 +1,5 @@
 /** 本批 Oracle 双表真实场景；所有查询和状态变化使用正式服务及准确合成夹具。 */
+import { isDeepStrictEqual } from "node:util";
 import { randomUUID, createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve, basename } from "node:path";
@@ -96,6 +97,8 @@ export async function run(ctx, bridge=omq.s2Call) {
   }
   report.semanticQualification=consume(root,report,deadline);
   check("oracle_s23_semantics_qualified",report.semanticQualification.status==="SEMANTICS_QUALIFIED");
+  if(mode==="s2-oracle-aba" && shared.plan.planId==="s2-s3-01-runtime-01")
+    check("oracle_aba_ordinary_rejection_released",report.semanticQualification.oracleSettlement==="FINAL_REJECTION_RELEASED");
   report.status="PASS";report.scope="ORACLE_"+mode.toUpperCase().replaceAll("-","_");
 }
 
@@ -648,7 +651,11 @@ export async function aba(ctx) {
     currentQueryId:currentSelection.queryId,currentQueryHash:currentSelection.sha256,selected};
   const path="/api/v1/mappings/"+state.mappingDraft.mappingId;
   const baseline=await get(activator,path+"/active");
-  check("oracle_aba_current_A",baseline.mappingReleaseId===state.mappingReceipt.mappingReleaseId);
+  const prior=state.mappingCurrentReceipt??state.mappingReceipt;
+  const matchesActive=(view,receipt)=>view.usable===true && ["mappingId","mappingReleaseId","manifestHash","activationRevision"]
+    .every(key=>view[key]!==undefined && view[key]===receipt[key]);
+  check("oracle_aba_current_A",baseline.mappingReleaseId===state.mappingReceipt.mappingReleaseId
+    && matchesActive(baseline,prior));
   const current=await get(operator,path),mapping=structuredClone(current.mapping);
   mapping.identitySpecs[0].sourceNamespace="omq-aba-b-"+baseline.activationRevision;
   const draft=(await request(operator,"PATCH",path,{mapping,command:command(current.revision)},200,'"mapping:'+current.revision+'"')).data;
@@ -661,9 +668,19 @@ export async function aba(ctx) {
   const envelope={...runtimeEnvelope(ctx),proposalId:approved.proposalId};
   report.aba=await audit("inflight-activation-aba",()=>call("runtime_case","aba",envelope),8);
   const active=await get(activator,path+"/active");
-  check("oracle_aba_same_A_new_revision",active.mappingReleaseId===baseline.mappingReleaseId&&active.activationId!==baseline.activationId
-    &&active.activationRevision===baseline.activationRevision+2);
-  state.mappingCurrentReceipt=active;await save(state);
+  const {activatedA,capturedA}=report.aba.original;
+  check("oracle_aba_returned_proposal",/^proposal-[a-f0-9]{32}$/u.test(activatedA?.proposalId));
+  const rollback=await get(operator,"/api/v1/mapping-proposals/"+activatedA.proposalId);
+  const receipt=rollback.activation;
+  const normalize=value=>({...value,activatedAtUtc:value.activatedAtUtc.replace(/\+00:00$/u,"Z")});
+  check("oracle_aba_proposal_activation",rollback.kind==="ROLLBACK" && rollback.proposalId===activatedA.proposalId
+    && receipt?.kind==="ROLLBACK" && typeof receipt.activatedAtUtc==="string" && typeof activatedA.activatedAtUtc==="string"
+    && isDeepStrictEqual(normalize(receipt),normalize(activatedA)));
+  check("oracle_aba_same_A_new_revision",matchesActive(active,receipt) && receipt.mappingId===prior.mappingId
+    && receipt.mappingReleaseId===prior.mappingReleaseId && receipt.manifestHash===prior.manifestHash
+    && capturedA.activationId===prior.activationId && capturedA.activationRevision===String(prior.activationRevision)
+    && receipt.activationId!==prior.activationId && receipt.activationRevision===prior.activationRevision+2);
+  state.mappingCurrentReceipt=receipt;await save(state);
   await audit("aba-history-and-selection",async()=>{
     const restored=await request(reader,"GET","/api/v1/data/semantic-queries/"+selectionOrigin.queryId+"/result");
     check("oracle_aba_history_original_bytes",restored.raw===selectionOrigin.raw);

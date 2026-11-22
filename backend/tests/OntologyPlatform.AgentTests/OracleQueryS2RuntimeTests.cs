@@ -24,10 +24,13 @@ public sealed partial class G4QueryMafRuntimeTests
     private static async Task OracleCurrentRuntimeAsync(bool mappingAba)
     {
         Assert.AreEqual("G4-ORACLE-MAPPING-QUERY-001:product-resume-01", Environment.GetEnvironmentVariable("G4_QUERY_RUNTIME_TEST"));
+        // 此次子进程独占收集器，主 API 无法提供同一调用的日志。
+        using var sourceEvents = new OracleRuntimeSourceEvents();
         // 只消费当前替代API已经核定的只读配置和密钥环挂载。
         await using var app = OntologyPlatform.Api.PlatformApiHost.CreateApplication([], builder =>
         {
             builder.Logging.ClearProviders();
+            sourceEvents.Configure(builder.Logging);
             builder.Configuration.AddJsonFile("/private/api/appsettings.json", optional: false);
         });
         // 实际治理数据库必须是本任务内网服务，不允许外部连接串替换。
@@ -87,14 +90,14 @@ public sealed partial class G4QueryMafRuntimeTests
             sessionHash = G4QueryCanonical.Hash(System.Text.Encoding.UTF8.GetBytes(participants["Q"].Session)) };
         if (mappingAba)
             await MappingAbaAfterRealReadAsync(scope.ServiceProvider, participants["Q"].Actor, original, db,
-                envelope.RootElement.GetProperty("proposalId").GetString()!, participants["A"], participants["C"], participants["B"].Actor.SubjectId, participants["B"], seedReceipt);
+                envelope.RootElement.GetProperty("proposalId").GetString()!, participants["A"], participants["C"], participants["B"].Actor.SubjectId, participants["B"], seedReceipt, sourceEvents);
         else
-            await OracleConnectionRevisionAsync(scope.ServiceProvider, participants["Q"].Actor, original, participants["A"], seedReceipt);
+            await OracleConnectionRevisionAsync(scope.ServiceProvider, participants["Q"].Actor, original, participants["A"], seedReceipt, sourceEvents);
     }
 
     /// <summary>同一查询真实读取后以正式连接编辑推进修订，拒绝旧绑定并在拒绝后正常恢复连接状态。</summary>
     private static async Task OracleConnectionRevisionAsync(IServiceProvider services, ActorContext reader, G4QueryRecord original,
-        (ActorContext Actor, string Session) editor, object seedReceipt)
+        (ActorContext Actor, string Session) editor, object seedReceipt, OracleRuntimeSourceEvents sourceEvents)
     {
         // 正式连接处理器执行真实权限、ETag、配置修订和审计事务。
         var connections = services.GetRequiredService<IConnectionRequestHandler>();
@@ -118,6 +121,7 @@ public sealed partial class G4QueryMafRuntimeTests
             ["runtimeSeed"] = seedReceipt, ["case"] = "CONNECTION_AFTER_READ", ["status"] = "FAIL", ["connectionId"] = original.ConnectionId, ["subjectId"] = reader.SubjectId };
         // 真实单调计时覆盖原Gateway调用及拒绝，恢复连接发生在计时之后。
         var elapsed = new System.Diagnostics.Stopwatch();
+        sourceEvents.Bind(elapsed);
         // 正式提交是否已发生决定是否需要执行同一连接的正常test和enable。
         var changed = false;
         // 三个事件都来自同一调度进程及同一Q。
@@ -159,7 +163,7 @@ public sealed partial class G4QueryMafRuntimeTests
             evidence["newRevision"] = updated.ConfigRevision;
             evidence["changedState"] = updated.State;
             Record("CONNECTION_PATCH_COMMITTED");
-        });
+        }, logger: services.GetRequiredService<ILogger<G4QueryExecution>>());
         // 与HTTP/MCP/UI共享正式Gateway及不可重置绝对截止。
         var gateway = ActivatorUtilities.CreateInstance<SemanticGateway>(services, execution);
         try
@@ -168,6 +172,8 @@ public sealed partial class G4QueryMafRuntimeTests
             // 接受既有连接状态或旧修订错误合同，不接受普通超时或提前拒绝。
             var error = await Assert.ThrowsAsync<SemanticOperationException>(() =>
                 gateway.ExecuteG4Async(reader, original.SessionReference, query, key, null, CancellationToken.None));
+            // 响应边界一次取样，响应后的数据库取证不计入 Q 本身期限。
+            var rejectedAt = DateTimeOffset.UtcNow;
             Record("COMMIT_REJECTED");
             elapsed.Stop();
             Assert.IsTrue(changed && (error.Status, error.Code) is (409, "query_binding_stale") or (403, "query_forbidden"));
@@ -176,25 +182,38 @@ public sealed partial class G4QueryMafRuntimeTests
             await using var fresh = await services.GetRequiredService<IDbContextFactory<G4QueryDbContext>>().CreateDbContextAsync();
             // 本次查询终态可能由既有租约终结机制随后处理，不能称作成功。
             var rejected = await fresh.Queries.AsNoTracking().SingleAsync(row => row.IdempotencyKey == key);
-            Assert.IsTrue(DateTimeOffset.UtcNow < rejected.DeadlineAtUtc);
-            Assert.AreNotEqual("COMPLETED", rejected.ExecutionStatus);
-            Assert.IsNull(rejected.ResultHash);
-            Assert.AreEqual(0, rejected.ResultSize);
-            Assert.AreEqual(0, rejected.ResultCiphertext.Length);
-            Assert.AreEqual(0, G4QueryResultStore.ReadState(rejected).Receipts.Length);
             // 治理审计由单独数据库上下文读取同一Q。
             await using var governance = await services.GetRequiredService<IDbContextFactory<OntologyPlatform.Modules.Governance.GovernanceDbContext>>().CreateDbContextAsync();
-            // 只有成功执行审计为零才可声明无成功副作用。
-            var allowed = await governance.AuditRecords.CountAsync(row => row.Resource == rejected.Id && row.Action == "data.query.execute" && row.Outcome == "allowed");
-            Assert.AreEqual(0, allowed);
+            // 只回读同一组织和 Q 的实际执行审计。记录成功、失败及总数，使额外审计不能被过滤掉。
+            var audits = await governance.AuditRecords.AsNoTracking().Where(row => row.OrganizationId == reader.OrganizationId
+                && row.Resource == rejected.Id && row.Action == "data.query.execute").OrderBy(row => row.Id)
+                .Select(row => new { row.Id, row.Outcome, row.OccurredAtUtc }).ToArrayAsync();
+            evidence["queryAudits"] = audits;
+            evidence["failedQueryAudits"] = audits.Count(row => row.Outcome == "failure");
+            evidence["successfulQueryAudits"] = audits.Count(row => row.Outcome == "allowed");
             evidence["executionStatus"] = rejected.ExecutionStatus;
+            evidence["postErrorCode"] = rejected.ErrorCode;
+            evidence["postFence"] = rejected.Fence;
+            evidence["postLeaseOwnerHash"] = rejected.LeaseOwner is null ? null : G4QueryCanonical.Hash(System.Text.Encoding.UTF8.GetBytes(rejected.LeaseOwner));
+            evidence["postLeaseUntilUtc"] = rejected.LeaseUntilUtc;
             evidence["errorStatus"] = error.Status;
             evidence["errorCode"] = error.Code;
             evidence["resultHash"] = rejected.ResultHash;
             evidence["resultSize"] = rejected.ResultSize;
             evidence["ciphertextBytes"] = rejected.ResultCiphertext.Length;
-            evidence["committedReadReceipts"] = 0;
-            evidence["successfulQueryAudits"] = allowed;
+            evidence["committedReadReceipts"] = G4QueryResultStore.ReadState(rejected).Receipts.Length;
+            Assert.IsTrue(rejectedAt < rejected.DeadlineAtUtc);
+            Assert.IsNull(rejected.ResultHash);
+            Assert.AreEqual(0, rejected.ResultSize);
+            Assert.AreEqual(0, rejected.ResultCiphertext.Length);
+            Assert.AreEqual(0, evidence["committedReadReceipts"]);
+            Assert.AreEqual("FAILED", rejected.ExecutionStatus);
+            Assert.AreEqual(error.Code, rejected.ErrorCode);
+            Assert.AreEqual(Convert.ToInt64(evidence["fence"], System.Globalization.CultureInfo.InvariantCulture) + 1, rejected.Fence);
+            Assert.IsNull(rejected.LeaseOwner);
+            Assert.IsNull(rejected.LeaseUntilUtc);
+            Assert.AreEqual(1, audits.Length);
+            Assert.AreEqual("failure", audits[0].Outcome);
             evidence["status"] = "PASS";
         }
         finally
@@ -202,6 +221,7 @@ public sealed partial class G4QueryMafRuntimeTests
             elapsed.Stop();
             evidence["elapsedMs"] = elapsed.Elapsed.TotalMilliseconds;
             evidence["events"] = events;
+            sourceEvents.Export(evidence);
             try
             {
                 if (changed)

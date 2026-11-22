@@ -2,26 +2,33 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { restoreMapping } from "../maintenance/workflow-oracle-mapping-restore.mjs";
 
-function fixture(committed=false) {
+function fixture(committed=false,diagnostic=false) {
   const operator={me:{subjectId:"operator"}},auditor={me:{subjectId:"auditor"}},activator={me:{subjectId:"activator"}};
   const scope={organizationId:"org-demo",siteIds:["site-a"]},id="m", connection="conn", catalog="cat", fingerprint="finger";
   const oldA={mappingId:id,activationId:"a1",mappingReleaseId:"A",activationRevision:1,manifestHash:"a".repeat(64),kind:"PUBLISH",proposalId:"pa"};
   const oldB={...oldA,activationId:"b",mappingReleaseId:"B",activationRevision:2,kind:"PUBLISH",proposalId:"pb",previousReleaseId:"A",manifestHash:"b".repeat(64)};
   const fresh={...oldA,activationId:"a3",activationRevision:3,kind:"ROLLBACK",previousReleaseId:"B",proposalId:"proposal-"+"e".repeat(32)};
+  const historyA={...oldA}, historyB={...oldB};
+  if(diagnostic) {
+    Object.assign(oldA,{activationId:"activation-d2dcec9ef54c4f3bb96d60cab449580b",proposalId:"p3",activationRevision:3,kind:"ROLLBACK",previousReleaseId:"B"});
+    Object.assign(oldB,{activationId:"b4",activationRevision:4,mappingReleaseId:"B4"});
+    Object.assign(fresh,{activationId:"a5",activationRevision:5,previousReleaseId:"B4"});
+  }
   const target={kind:"ROLLBACK",targetReleaseId:"A",manifestHash:oldA.manifestHash};
   const job={jobId:"job-"+"1".repeat(32),status:"SUCCEEDED",assessmentId:"ma-"+"3".repeat(32),target,mappingId:id};
-  const assessment={assessmentId:job.assessmentId,status:"READY_FOR_PROPOSAL",target,mappingId:id,expectedActive:{releaseId:"B",activationRevision:2},
+  const assessment={assessmentId:job.assessmentId,status:"READY_FOR_PROPOSAL",target,mappingId:id,expectedActive:{releaseId:oldB.mappingReleaseId,activationRevision:oldB.activationRevision},
     binding:{assessmentId:job.assessmentId,authorizationEpoch:121,sourceConnectionId:connection,sourceCatalogSnapshotId:catalog},
     stages:["SCHEMA","IDENTITY","TIME_UNIT","SECURITY","EXECUTABILITY","RECONCILIATION","IMPACT"].map(stage=>({stage,status:"PASS"})),expiresAtUtc:"unused"};
   const proposal={kind:"ROLLBACK",proposalId:fresh.proposalId,mappingId:id,status:"PENDING",submittedBy:"operator",proposalRevision:1,bindingHash:"1".repeat(64),
     ...target, binding:assessment.binding, scope, expectedActive:assessment.expectedActive};
   const approved={...proposal,status:"APPROVED",proposalRevision:2,decision:{decision:"APPROVE",decidedBy:"auditor",bindingHash:proposal.bindingHash}};
-  const chain=(committed?[oldA,oldB,fresh]:[oldA,oldB]).map((receipt,i)=>({receipt,connection,catalog,fingerprint,command:"c"+i,check:"k"+i}));
+  const chain=[...(diagnostic?[historyA,historyB]:[]),...(committed?[oldA,oldB,fresh]:[oldA,oldB])].map((receipt,i)=>({receipt,connection,catalog,fingerprint,command:"c"+i,check:"k"+i}));
   let current=chain.at(-1).receipt,reservations=0;
   const calls=[];
   const ctx={oldA,oldB,report:{grant:{afterEpoch:121}},actors:{operator,auditor,activator},deadline:performance.now()+1000,
-    state:{mappingReceipt:oldA,connectionId:connection,catalog:{snapshotId:catalog,schemaFingerprint:fingerprint}},
-    chain:{receipts:chain,current:[current.activationId,current.activationRevision,current.mappingReleaseId]},
+    state:{mappingReceipt:diagnostic?historyA:oldA,connectionId:connection,catalog:{snapshotId:catalog,schemaFingerprint:fingerprint}},
+    diagnostic:diagnostic ? {activatedA:committed?fresh:null,activatedB:oldB,history:structuredClone(chain.slice(0,3))} : null,
+    chain:{total:chain.length,receipts:chain,current:[current.activationId,current.activationRevision,current.mappingReleaseId]},
     reserve:async()=>{assert.equal(reservations++,0)},persist:async()=>{},command:(revision=0)=>({expectedRevision:revision}),
     get:async(actor,path)=>{
       if(path.endsWith("/active"))return current;
@@ -61,5 +68,24 @@ test("wrong B, stale assessment and non-passing stage cannot activate",async()=>
     if(change==="stage")assessment.stages[4].status="FAIL";
     await assert.rejects(restoreMapping(ctx),/RESTORE_(EXACT_HISTORY|ASSESSMENT)/);
     assert.deepEqual(calls,change==="wrongB"?[]:[["operator","validate"]]);
+  }
+});
+
+test("registered diagnostic B4 calls the three normal parties and restores A5",async()=>{
+  const {ctx,calls,fresh}=fixture(false,true);
+  assert.deepEqual(await restoreMapping(ctx),fresh);
+  assert.deepEqual(calls,[["operator","validate"],["operator","proposals"],["auditor","decisions"],["activator","activate"]]);
+  assert.equal(fresh.activationRevision,5);
+});
+test("already restored diagnostic A5 reopens the full receipt without writes",async()=>{
+  const {ctx,calls,fresh}=fixture(true,true);
+  assert.deepEqual(await restoreMapping(ctx),fresh);
+  assert.deepEqual(calls,[]);
+});
+test("substituted historical check and hidden sixth activation reject before writes",async()=>{
+  for(const mutate of [ctx=>ctx.chain.receipts[1].check="bad",ctx=>ctx.chain.total=6]) {
+    const {ctx,calls}=fixture(false,true); mutate(ctx);
+    await assert.rejects(restoreMapping(ctx),/RESTORE_DIAGNOSTIC_PREFIX/);
+    assert.deepEqual(calls,[]);
   }
 });

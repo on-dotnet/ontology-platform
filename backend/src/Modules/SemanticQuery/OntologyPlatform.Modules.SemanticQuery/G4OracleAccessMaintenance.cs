@@ -17,6 +17,14 @@ internal sealed class G4OracleAccessMaintenanceProof
     /// <summary>保留唯一被授权的准确后继，不从数据库刷新目标身份。</summary>
     internal const string QueryId = "query-4b9f97e1bbdd45f7a39111c907447f65";
 
+    /// <summary>准确资源代次终止证明只允许本条失败查询。</summary>
+    internal const string GenerationQueryId = "query-d368ac610c7745889890e1589653af8f";
+
+    /// <summary>核对行锁内读取的 owner，专用代次模式仅暴露原 owner 的摘要。</summary>
+    internal bool MatchesOwner(string? owner) => owner is not null && (this["queryId"] == GenerationQueryId
+        ? G4QueryCanonical.Hash(System.Text.Encoding.UTF8.GetBytes(owner)) == this["ownerSha256"]
+        : owner == Owner);
+
     /// <summary>正式 Binding 引用的目标连接。</summary>
     internal const string ConnectionId = "a7913bb552eb4cd1a3f6eaf5b93cd619";
 
@@ -57,22 +65,50 @@ internal sealed class G4OracleAccessMaintenanceProof
 
     /// <summary>只接受已由独立维护执行器登记的原字节、准确观察及已封闭业务入口。</summary>
     internal static G4OracleAccessMaintenanceProof Read(byte[] bytes, string expectedSha, string operatorId, string sealSha,
-        string terminationSha, bool isolated = false)
+        string terminationSha, bool isolated = false) =>
+        ReadBound(bytes, expectedSha, operatorId, sealSha, terminationSha, isolated, "SOURCE_EXECUTION");
+
+    /// <summary>仅由核实原件的维护进程选择专用实例整体终止模式，无逐执行标识。</summary>
+    internal static G4OracleAccessMaintenanceProof ReadGeneration(byte[] bytes, string expectedSha, string operatorId, string sealSha,
+        string terminationSha, bool isolated = false) =>
+        ReadBound(bytes, expectedSha, operatorId, sealSha, terminationSha, isolated, "DEDICATED_GENERATION");
+
+    /// <summary>以进程选择的封闭判别值校验两种证明各自的准确字段与物理身份。</summary>
+    private static G4OracleAccessMaintenanceProof ReadBound(byte[] bytes, string expectedSha, string operatorId, string sealSha,
+        string terminationSha, bool isolated, string mode)
     {
+        // 只有专用模式接受原件锚定的整代关闭及生产者封闭。
+        var generation = mode == "DEDICATED_GENERATION";
         Check(bytes.Length is > 0 and <= 65536 && G4QueryCanonical.Hash(bytes) == expectedSha);
         using var document = JsonDocument.Parse(bytes);
         // 所有字段必须唯一且准确；输入声明不能替代私有进程环境传入的独立证据摘要。
         var fields = "taskId runId attemptId operationId operatorId systemIdentifier database databaseUser organizationId queryId connectionId owner originalFence terminalFence sourceExecutionId parentCommandId platformContainerId sourceContainerId createdUtc deadlineUtc completedUtc leaseUntilUtc requestSha256 bindingSha256 stableRowSha256 failureAuditId failureAuditSha256 sealSha256 terminationProofSha256 verifiedUtc validUntilUtc".Split(' ');
+        if (generation)
+        {
+            fields = fields.Except(["sourceExecutionId", "owner"]).Concat(["proofKind", "ownerSha256", "childCommandId",
+                "closeSha256", "sourceStartedAt", "sourceFinishedAt"]).ToArray();
+        }
         // 按键数和集合双检，避免重复 JSON 属性掩盖错误身份。
         var names = document.RootElement.EnumerateObject().Select(p => p.Name).ToArray();
         Check(names.Length == fields.Length && fields.ToHashSet(StringComparer.Ordinal).SetEquals(names));
         // 对象独立于临时 JsonDocument 的生命周期。
         var value = new G4OracleAccessMaintenanceProof(document.RootElement.Clone());
         Check(value["taskId"] == "G4-ORACLE-MAPPING-QUERY-001" && value["runId"] == "product-resume-01"
-            && value["organizationId"] == "org-demo" && value["queryId"] == QueryId && value["connectionId"] == ConnectionId
-            && value["owner"] == Owner && value["sourceExecutionId"] == "b4b07ea50d304927975cd5d052ff58e4"
-            && value["parentCommandId"] == "04f23ea8cfe34868a8500b80164d86fb"
+            && value["organizationId"] == "org-demo" && value["connectionId"] == ConnectionId
             && value["platformContainerId"] == PlatformContainer && value["sourceContainerId"] == SourceContainer);
+        if (generation)
+        {
+            Check(value["queryId"] == GenerationQueryId && value["proofKind"] == mode
+                && value["parentCommandId"] == "c02e89f8d8f2481f90058606ccf71b29" && value["childCommandId"] == "5b90bb8f66fb4ddd9bfeddbe5015133a"
+                && value["sourceStartedAt"] == "2026-11-21T13:49:57.33078955Z" && value["sourceFinishedAt"] == "2026-11-21T13:52:47.119332336Z"
+                && value["closeSha256"] == "21d6d0cff882452f4e810c28e59e82418fbb31a30ea9c40d74849f29dc48776e"
+                && Regex.IsMatch(value["ownerSha256"], @"\A[0-9a-f]{64}\z"));
+        }
+        else
+        {
+            Check(value["queryId"] == QueryId && value["owner"] == Owner && value["sourceExecutionId"] == "b4b07ea50d304927975cd5d052ff58e4"
+                && value["parentCommandId"] == "04f23ea8cfe34868a8500b80164d86fb");
+        }
         foreach (var (key, number) in new[] { ("originalFence", 1), ("terminalFence", 2) })
             Check(value.proof.GetProperty(key).GetInt32() == number);
         foreach (var key in new[] { "requestSha256", "bindingSha256", "stableRowSha256", "failureAuditSha256", "sealSha256", "terminationProofSha256" })
@@ -84,7 +120,22 @@ internal sealed class G4OracleAccessMaintenanceProof
             && Regex.IsMatch(value["systemIdentifier"], @"\A[0-9]{1,20}\z")
             && Regex.IsMatch(value["databaseUser"], @"\A[a-z_][a-z0-9_]{0,62}\z") && (isolated
                 ? Regex.IsMatch(value["database"], @"\Aomq_query_test_[a-z0-9_]+\z") : value["database"] == "mapping"));
-        if (!isolated)
+        if (!isolated && generation)
+        {
+            Check(value["systemIdentifier"] == "7709907053089669168" && value["databaseUser"] == "postgres" && operatorId == "os-uid-501"
+                && sealSha == "1d39291bc79d057dc310bdad98049442305aff73b236e4a004b4829d3890edb2"
+                && terminationSha == "a617d1e838631e9f16b5e9bc65aa97842c3a85cfc7c9991137262a537881c3d0"
+                && value["ownerSha256"] == "8fdc75f71c16c2972b1ab468d7a7ee79726888b2b45adc5970255183e569f013"
+                && value["requestSha256"] == "e65bb0daa424428e3b4f54f5931973ec7a34edc7b5a11230365cab8524503fbd"
+                && value["bindingSha256"] == "f9791b46957e72f0240a2bb8861d7cf7d58856136905e151c0c7c6be377b4a0a"
+                && value["stableRowSha256"] == "c7e08ef5d06001addd262eb403a8d86cca760efffc172f675d5c4ff9956e3bf6"
+                && value["failureAuditId"] == "83330a307d7a4583aa44e7c2a6db4fa4"
+                && value["failureAuditSha256"] == "ccad5f400813da2d9e641b2a2ba59af8dba87b41a5320e5bd095e40ee975d3c4"
+                && value["leaseUntilUtc"] == "2026-11-21T13:52:21.635112+00:00"
+                && value["deadlineUtc"] == value["leaseUntilUtc"] && value["createdUtc"] == "2026-11-21T13:52:17.360623+00:00"
+                && value["completedUtc"] == "2026-11-21T13:52:21.897952+00:00");
+        }
+        else if (!isolated)
         {
             // 首次真实只读快照冻结的物理集群及不可变原件。后续独立观察只能更新其新鲜证明。
             Check(value["systemIdentifier"] == "7709907053089669168" && value["databaseUser"] == "postgres" && operatorId == "os-uid-501"
@@ -121,7 +172,7 @@ internal static class G4OracleAccessMaintenance
         await db.Database.ExecuteSqlRawAsync("SET LOCAL TIME ZONE 'UTC'", token);
         await G4QueryResultStore.LockCapacityAsync(db, token);
         // 准确行锁沿产品既有顺序在容量锁之后取得。
-        var row = await G4QueryResultStore.LockedAsync(db, G4OracleAccessMaintenanceProof.QueryId, token);
+        var row = await G4QueryResultStore.LockedAsync(db, proof["queryId"], token);
         // 证明绑定物理 PostgreSQL 集群、数据库、当前用户和其余全部查询字段。
         var databaseFacts = await db.Database.SqlQuery<string>($"""
             SELECT json_build_array((pg_control_system()).system_identifier::text, current_database(), current_user,
@@ -161,7 +212,7 @@ internal static class G4OracleAccessMaintenance
             await transaction.CommitAsync(token);
             return "ALREADY_RECOVERED";
         }
-        G4OracleAccessMaintenanceProof.Check(recovered.Length == 0 && row.LeaseOwner == G4OracleAccessMaintenanceProof.Owner
+        G4OracleAccessMaintenanceProof.Check(recovered.Length == 0 && proof.MatchesOwner(row.LeaseOwner)
             && row.LeaseUntilUtc == proof.Utc("leaseUntilUtc") && row.CompletedAtUtc <= DateTimeOffset.UtcNow
             && row.LeaseUntilUtc <= DateTimeOffset.UtcNow && row.DeadlineAtUtc <= DateTimeOffset.UtcNow);
         // CAS 的更新集合只有两列；其余稳定字节均已在行锁内重核。

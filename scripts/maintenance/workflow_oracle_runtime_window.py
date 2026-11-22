@@ -75,6 +75,8 @@ def open_window():
     from workflow_oracle_mapping_s2_contract import frozen_plan
     require(not ACTIVE.get() and not COLD_MEASUREMENT.get() and p.product_run() == RUN and
             ROOT == resume.ROOT and frozen_plan(ROOT, PLAN)['planId'] == PLAN, 'WINDOW_COLD_SCOPE')
+    head = close_registration()
+    require(head.get('kind') != 'D368_PG_ONLY' or head['status'] == 'TASK_LEVEL_RECOVERY', 'WINDOW_D368_PRODUCT_BLOCKED')
     measuring = COLD_MEASUREMENT.set(True)
     try:
         cold = resume.admit(set(resume.recovery.ORIGINAL_IDS) | set(resume.APIS))
@@ -224,7 +226,17 @@ def close_registration(digest=None):
                 row['operation'] not in operations and re.fullmatch('[a-f0-9]{32}', row['operation']) and
                 row['sha256'] != CLOSE_SHA and re.fullmatch('[a-f0-9]{64}', row['sha256']),
                 'WINDOW_CLOSE_REGISTRY_CHAIN')
-        if kind == 'MAPPING_RESTORE':
+        if kind == 'D368_PG_ONLY':
+            from workflow_oracle_d368_pg_close import PREVIOUS
+            from workflow_oracle_d368_closure import QUERY
+            required = {'kind','operation','queryId','previousSha256','sha256','sizeBytes','status','memberCount','memberIndexSha256'}
+            require(set(row) == required and previous == PREVIOUS and known[previous]['kind'] == 'MAPPING_RESTORE'
+                    and row['queryId'] == QUERY and row['status'] in ('TASK_LEVEL_RECOVERY','BLOCKED')
+                    and type(row['sizeBytes']) is int and row['sizeBytes'] > 0 and type(row['memberCount']) is int
+                    and row['memberCount'] > 0 and re.fullmatch('[a-f0-9]{64}',row['memberIndexSha256']), 'WINDOW_D368_REGISTRY')
+            row = {**row, 'grantCheckpoint':known[previous]['grantCheckpoint']}
+            known[previous] = {**known[previous], 'nextPgOnlyClose':row['sha256']}
+        elif kind == 'MAPPING_RESTORE':
             require(previous in known and 'parentId' not in row and 'parentSha256' not in row and
                     re.fullmatch('[a-f0-9]{32}', row['hostId']) and row['exitCode'] == 0,
                     'WINDOW_RESTORE_REGISTRY')
@@ -249,6 +261,11 @@ def last_close(root, archive=None, digest=None):
     import workflow_oracle_mapping_continuity as c
     from workflow_oracle_mapping_evidence import utc
     entry = close_registration(digest)
+    if entry.get('kind') == 'D368_PG_ONLY':
+        from workflow_oracle_d368_pg_close import reopen
+        previous = last_close(root, archive, entry['previousSha256'])
+        normalized, _, _ = reopen(root, entry, previous, archive)
+        return normalized
     area = c.AREA
     restore = entry.get('kind') == 'MAPPING_RESTORE'
     prefix = 'controlled-mapping-restore-' if restore else 'controlled-run-'
@@ -476,7 +493,9 @@ def runtime_continuity(root, previous, current, proof=None, archive=None):
         entry = close_registration(None if proof is None else proof['closeSha256'])
         if 'nextRestoreHost' in entry:
             require(current['commandId'] == entry['nextRestoreHost'], 'WINDOW_RETIRED_HOST')
-        if entry.get('kind') == 'MAPPING_RESTORE':
+        require('nextPgOnlyClose' not in entry, 'WINDOW_D368_RETIRED_HOST')
+        if entry.get('kind') in ('MAPPING_RESTORE','D368_PG_ONLY'):
+            require(entry.get('kind') != 'D368_PG_ONLY' or entry['status'] == 'TASK_LEVEL_RECOVERY', 'WINDOW_D368_PRODUCT_BLOCKED')
             close = last_close(root, archive, entry['sha256'])
             middle = close['restoreHost']
             runtime_continuity(root, previous, middle, close['restoreHostProof'], archive)

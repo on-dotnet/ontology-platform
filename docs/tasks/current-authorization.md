@@ -75,3 +75,5 @@
 本次接受 7047f9cfb33bd46677433a368f19e5614a0f0179 为限定 PARTIAL 交接，继续 product-resume-01 / s2-s3-01。Master 单写、操作原树与资源。按现行任务卡先离线重开失败原件，独立复核限定维护，诊断与正式次数分别登记。
 
 本次归位回执为 activation-d2dcec9ef54c4f3bb96d60cab449580b，原授权复用。d368 的准确源关联缺证，停止该行维护与后续产品窗。唯一状态 S2_PARTIAL_SOURCE_LINK_CHATGPT_REVIEW。本批三文件提交、普通推送及远端回读后停 ChatGPT 复审。
+
+2026-11-22 最新授权沿原 Oracle 工作树、分支及 s2-s3-01 执行。准确 d368 专用源代次与生产者封闭证明可触发一次晚恢复。准许一次实际 DI 诊断及条件成立后一次正式十槽。G4、Oracle S0、AC03-B、cleanup250ms、物理资源、权限和 main 边界沿用任务卡。
