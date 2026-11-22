@@ -537,6 +537,11 @@
     },
     "oracle-task-admission": {
       "inputs": [
+        "scripts/maintenance/workflow-m4-query.mjs",
+        "scripts/maintenance/workflow_m2_build.py",
+        "scripts/maintenance/workflow_environment.py",
+        "backend/tests/OntologyPlatform.AgentTests/OracleRuntimeSourceEvents.cs",
+        "backend/src/Contracts/OntologyPlatform.Contracts/G4OracleQueryTrace.cs",
         "scripts/tests/WorkflowOracle.Tests.py",
         "scripts/tests/WorkflowOracleMappingEvidence.Tests.py",
         "scripts/tests/WorkflowOracleAuthEvidence.Tests.py",
@@ -617,6 +622,15 @@
       ],
       "testsRequired": true,
       "identityInputs": [
+        "backend/**",
+        "Directory.*",
+        "global.json",
+        "NuGet.Config",
+        "package.json",
+        "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
+        ".node-version",
+        "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/final-machine-receipt.json",
         "scripts/maintenance/workflow_execution.py",
         "scripts/maintenance/workflow_m2_evidence.py"
       ]

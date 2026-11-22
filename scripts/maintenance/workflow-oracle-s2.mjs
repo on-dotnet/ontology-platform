@@ -24,7 +24,7 @@ export async function run(ctx, bridge=omq.s2Call) {
   const deadline=shared.stageDeadline;
   const call=(method,...args)=>bridge(root,method,args,deadline);
   const s=()=>omq.grantState(state);
-  const prepare = shared.plan.planId==="s2-s3-01-runtime-01" && mode==="s2-oracle-aba";
+  const prepare = shared.plan.planId==="s2-s3-01-runtime-01" && ["s2-oracle-aba","s2-oracle-normal"].includes(mode);
   if (prepare && (shared.stageSpec?.index!==1 || shared.stages?.length!==1 ||
       shared.stages[0].mode!=="s0-oracle-auth" || shared.stages[0].status!=="PASS"))
     throw new Error("ORACLE_S2_PREPARATION_AUTH");
@@ -74,6 +74,12 @@ export async function run(ctx, bridge=omq.s2Call) {
       return audit(name,async()=>record(name,await request({...actor,headers:{...actor.headers,"Idempotency-Key":key}},"POST","/api/v1/data/semantic-queries",q),q),reads);
     };
     ctx={...ctx,query,record,execute};
+    if(mode==="s2-oracle-normal") {
+      await normalRelation(ctx);
+      report.status="PASS";
+      report.scope="NORMAL_RELATION_HTTP";
+      return;
+    }
     if(mode==="s2-oracle-queries") await queries(ctx);
     else if(mode==="s2-oracle-relations") await relations(ctx);
     else if(mode==="s2-oracle-states") await states(ctx);
@@ -100,6 +106,39 @@ export async function run(ctx, bridge=omq.s2Call) {
   if(mode==="s2-oracle-aba" && shared.plan.planId==="s2-s3-01-runtime-01")
     check("oracle_aba_ordinary_rejection_released",report.semanticQualification.oracleSettlement==="FINAL_REJECTION_RELEASED");
   report.status="PASS";report.scope="ORACLE_"+mode.toUpperCase().replaceAll("-","_");
+}
+
+/** 同一真实认证父最多发出一个普通 POST，成功后只恢复该 Q 的准确字节。 */
+async function normalRelation(ctx) {
+  const {shared,actors:{reader},root,output,query,request,record,report,check,audit}=ctx;
+  const key=shared.executionId, slot=process.env.OMQ_NORMAL_SLOT;
+  const q=query(), area=resolve(output,"s2-s3-01");
+  const canonical=value=>value && typeof value==="object" ? Array.isArray(value) ? value.map(canonical)
+    : Object.fromEntries(Object.keys(value).sort().map(k=>[k,canonical(value[k])])) : value;
+  check("normal_frozen_request",hash(JSON.stringify(canonical(q)))==="4530c34dbe04e8e6b5f3608d49d5189364bd94eeff5e3c4e45c82bf078036f44");
+  check("normal_frozen_activation",report.oracleBinding.activation.activationRevision===3);
+  check("normal_original_fixture",JSON.stringify(report.scenarioReady.fixtureBefore.hashes)===JSON.stringify([
+    "d80a9c2e4abe825bb0744619fe5c58d311f556175681184985ab0bedd95d2064","59b89ac9e0245fe1d9d85345bcf1ee032ec5fe5e1da1ea2ea746fb21d4ba8d0a"]));
+  const reservation=resolve(area,"normal-post-"+slot+".json");
+  const started=new Date().toISOString();
+  await writeFile(reservation,JSON.stringify({key,slot,started}),{flag:"wx"});
+  let reply;
+  try {
+    reply=await request({...reader,headers:{...reader.headers,"Idempotency-Key":key}},"POST","/api/v1/data/semantic-queries",q,[200,400,401,403,409,429,500,503]);
+  } finally {
+    const ended=new Date().toISOString();
+    report.normalPost={key,slot,started,ended};
+    report.normalPost.audit=omq.platform(root,"q.audit_window(*json.load(sys.stdin))",[started,ended,null],shared.stageDeadline);
+  }
+  check("normal_http_success",reply.status===200 && /^query-[a-f0-9]{32}$/u.test(reply.queryId));
+  const row=await record("healthy-relations",reply,q);
+  await audit("normal-get",async()=>{
+    const restored=await request(reader,"GET","/api/v1/data/semantic-queries/"+row.queryId+"/result");
+    check("normal_get_original",restored.raw===reply.raw);
+    report.normalGet={queryId:row.queryId,sha256:hash(restored.raw),sizeBytes:Buffer.byteLength(restored.raw)};
+  },0);
+  check("normal_literal_result",omq.platform(root,"__import__('workflow_oracle_mapping_s2_contract').result_case(*json.load(sys.stdin))",
+    [row,report.oracleBinding],shared.stageDeadline)==="FOUND");
 }
 
 /** 仅补原正式根所缺的Reading和关系词汇，保存原根；不重建连接或目录。 */

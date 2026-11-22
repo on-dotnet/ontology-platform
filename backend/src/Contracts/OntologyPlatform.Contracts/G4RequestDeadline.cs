@@ -55,6 +55,9 @@ public sealed class G4RequestDeadline : IDisposable
     /// <summary>真实上游取消及原期限的组合令牌。</summary>
     public CancellationToken Token => linked.Token;
 
+    /// <summary>仅根期限计时器发出的信号，用于区分客户端断开。</summary>
+    public CancellationToken TimeoutToken => timer.Token;
+
     /// <summary>当前进程内以单调时钟算出的剩余预算。</summary>
     public TimeSpan Remaining => TimeSpan.FromTicks(Math.Max(0,
         Interlocked.Read(ref limitTicks) - clock.GetElapsedTime(started).Ticks));

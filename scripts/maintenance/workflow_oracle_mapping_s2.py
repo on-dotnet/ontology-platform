@@ -389,7 +389,7 @@ def grants(state,execution_id,issue=False,plan_id=None):
 def ready(state,actors,execution_id,mode):
     """紧前重核正式目录、当前激活、已登记组合授权、会话和正常源前态。"""
     require(mode in ('s2-oracle-vocabulary','s2-oracle-mapping','s2-oracle-queries','s2-oracle-relations','s2-oracle-access',
-                     's2-oracle-aba','s2-oracle-connection','s2-oracle-versions','s2-oracle-states','s2-oracle-reopen','s3','ui-s3','ui-s1'),'S2_MODE')
+                     's2-oracle-aba','s2-oracle-normal','s2-oracle-connection','s2-oracle-versions','s2-oracle-states','s2-oracle-reopen','s3','ui-s3','ui-s1'),'S2_MODE')
     scope(state)
     result=grants(state,execution_id)
     require([a['subjectId'] for a in actors]==[v[1] for v in ROSTER.values()],'S2_ACTORS')

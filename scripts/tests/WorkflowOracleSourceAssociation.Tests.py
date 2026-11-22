@@ -43,11 +43,41 @@ class SourceAssociationTests(unittest.TestCase):
             next_connection_admission({**report,'http':[]},original)
 
     def test_reopen_two_branches_emitted_by_agent_test_process(self):
-        assembly=ROOT/'backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll'
-        with tempfile.TemporaryDirectory() as results:
-            subprocess.run(['dotnet',str(assembly),'--filter','FullyQualifiedName=OntologyPlatform.AgentTests.OracleRuntimeSourceEventsTests.ExportTwoCompleteSourceBranchesForOfflineReopen',
+        import workflow_m2_build as build
+        task = 'G4-ORACLE-MAPPING-QUERY-001'
+        area = ROOT/'artifacts/workflow'/task
+        import workflow_oracle_mapping_resume as resume
+        import workflow_oracle_mapping_evidence as evidence
+        from workflow_m2_evidence import mtp
+        binding, event = resume.bound_build('agent')
+        record = (area/'agent-build-binding.json').read_bytes()
+        self.assertEqual(hashlib.sha256(record).hexdigest(), binding['receiptSha256'])
+        command = json.loads(record)['command']
+        project = Path(build.TARGETS['agent'])
+        self.assertEqual(command[1:3], ['build', str(project)])
+        host = Path(command[0])
+        self.assertTrue(host.is_absolute() and host.is_file())
+        selection = json.loads((ROOT/'docs/evidence'/task/'product-resume-01/s2-s3-01/final-machine-receipt.json').read_bytes())
+        ref = selection['metadata'].get('normalQueryBatch', selection['metadata']['testSelection'])['prepare']
+        archive = evidence.CurrentTestOriginals(ROOT, {'prepare': ref})
+        raw = archive.raw('prepare.json')
+        home = area/'environment'/ref['contentKey']
+        prepare = home/'runs'/ref['attempt']/'receipt.json'
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), ref['sha256'])
+        ready = json.loads(raw)
+        self.assertEqual(Path(ready['runDirectory']), prepare.parent)
+        self.assertEqual(Path(ready['environmentDirectory']), home)
+        self.assertEqual(ready['dotnet'], str(host))
+        self.assertEqual(json.loads((home/'environment.json').read_bytes()), ready['environment'])
+        evidence.environment_checks(archive, ROOT)
+        assembly = ROOT/project.parent/'bin/Debug/net10.0'/(project.stem+'.dll')
+        with tempfile.TemporaryDirectory(dir=ready['environment']['TMPDIR']) as results:
+            result = subprocess.run([str(host),str(assembly),'--filter','FullyQualifiedName=OntologyPlatform.AgentTests.OracleRuntimeSourceEventsTests.ExportTwoCompleteSourceBranchesForOfflineReopen',
                                 '--minimum-expected-tests','1','--results-directory',results],
-                               cwd=results,env={**os.environ,'OMQ_OFFLINE_SOURCE_EVENTS_DIRECTORY':results},check=True,capture_output=True,text=True)
+                               cwd=results,timeout=60,env={**ready['environment'],'OMQ_OFFLINE_SOURCE_EVENTS_DIRECTORY':results},check=True,capture_output=True,text=True)
+            self.assertEqual(mtp((result.stdout+result.stderr).encode(),1),1)
+            print(f"AgentTests build={event['commandId']} prepare={ref['commandId']} "
+                  f"dllSha256={hashlib.sha256(assembly.read_bytes()).hexdigest()} passed=1 skipped=0")
             artifact,=Path(results).rglob('oracle-offline-source-events.json')
             data=artifact.read_bytes()
         self.assertNotIn(b'private-sentinel',data)

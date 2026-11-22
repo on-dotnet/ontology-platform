@@ -17,6 +17,69 @@ namespace OntologyPlatform.QueryTests;
 /// <summary>本次源ACL失败的准确维护复用隔离PostgreSQL，证明恢复不会放行旧fence。</summary>
 public sealed partial class G4QueryRaceTests
 {
+    /// <summary>普通失败 Q 的离线封闭证明只允许本代，任一目标或原件摘要变化均拒绝。</summary>
+    [TestMethod]
+    public void NormalQueryRejectsWrongGenerationOrTarget()
+    {
+        // 从已脱敏的冻结行建立本批唯一输入，时间仅用于检查五分钟维护窗。
+        var proof = new Dictionary<string, object?>
+        {
+            ["systemIdentifier"] = "7709907053089669168",
+            ["database"] = "mapping",
+            ["databaseUser"] = "postgres",
+            ["organizationId"] = "org-demo",
+            ["queryId"] = "query-f1599097a7274c20b82cbf0dfcea4e2b",
+            ["connectionId"] = "a7913bb552eb4cd1a3f6eaf5b93cd619",
+            ["ownerSha256"] = "08d6b6d8633b72b6ad4a980128d3e6a1b68c83b5c388cecd3a3296d84accf4cb",
+            ["createdUtc"] = "2026-11-22T12:50:37.198569+00:00",
+            ["deadlineUtc"] = "2026-11-22T12:50:41.308879+00:00",
+            ["completedUtc"] = "2026-11-22T12:50:37.974659+00:00",
+            ["leaseUntilUtc"] = "2026-11-22T12:50:41.308879+00:00",
+            ["requestSha256"] = "e65bb0daa424428e3b4f54f5931973ec7a34edc7b5a11230365cab8524503fbd",
+            ["bindingSha256"] = "8c5267a7cf1e34090f41b876fcdcf176898669dd4e240cf85082916ce88973dc",
+            ["stableRowSha256"] = "8bbdb6cb314c00994015ef3eef5c36c5f9ec60d41f005875256129f2b7d91a57",
+            ["taskId"] = "G4-ORACLE-MAPPING-QUERY-001",
+            ["runId"] = "product-resume-01",
+            ["attemptId"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            ["operationId"] = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            ["operatorId"] = "os-uid-501",
+            ["originalFence"] = 1,
+            ["terminalFence"] = 2,
+            ["proofKind"] = "NORMAL_GENERATION",
+            ["parentCommandId"] = "4032c1d770b240989966ba3275d86999",
+            ["childCommandId"] = null,
+            ["platformContainerId"] = "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+            ["sourceContainerId"] = "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+            ["closeSha256"] = "a3839fe8ebb6e418e42e2280d1d6044acd7a1a4f3f65babdc8f13b8c7d055348",
+            ["sourceStartedAt"] = "2026-11-22T12:48:17.47353763Z",
+            ["sourceFinishedAt"] = "2026-11-22T12:51:07.888426792Z",
+            ["failureAuditId"] = "38ebcc6e08504994b36a322edc4ffd86",
+            ["failureAuditSha256"] = "91713b546c40b9d6925079220bfa0420e6bbfc3d8dbd18c1a9c335cc2e0d422c",
+            ["sealSha256"] = "34fd7fda857fc5ca2f2456ad5cb76885b8473fafe00b588366d187286e0fd9c5",
+            ["terminationProofSha256"] = "d3bd83e5b832d68295dd3abeeb84a558bf290b51ce882b5df7a9995c4aefce6b",
+            ["verifiedUtc"] = DateTimeOffset.UtcNow.AddSeconds(-2).ToString("O"),
+            ["validUntilUtc"] = DateTimeOffset.UtcNow.AddMinutes(3).ToString("O")
+        };
+
+        // 每次都以改动后的真正输入字节重新计算摘要，验证生产目标守卫。
+        G4OracleAccessMaintenanceProof Read(Dictionary<string, object?> candidate)
+        {
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(candidate);
+            return G4OracleAccessMaintenanceProof.ReadNormal(bytes, G4QueryCanonical.Hash(bytes), "os-uid-501",
+                (string)proof["sealSha256"]!, (string)proof["terminationProofSha256"]!);
+        }
+
+        Assert.AreEqual(G4OracleAccessMaintenanceProof.NormalQueryId, Read(proof)["queryId"]);
+        foreach (var field in new[] { "queryId", "childCommandId", "closeSha256", "stableRowSha256", "failureAuditId",
+            "failureAuditSha256", "ownerSha256", "bindingSha256", "sourceStartedAt" })
+        {
+            // 替换一个字段，确保其余绑定继续满足生产前提。
+            var changed = new Dictionary<string, object?>(proof) { [field] = field == "queryId"
+                ? G4OracleAccessMaintenanceProof.GenerationQueryId : new string('0', 64) };
+            Assert.ThrowsExactly<InvalidOperationException>(() => Read(changed));
+        }
+    }
+
     /// <summary>核FAILED原行、完整证明、审计失败回滚、准确恢复和同操作幂等；不修改原取消维护。</summary>
     [TestMethod]
     public Task OracleAccessFailureMaintenanceInIsolatedPostgres() => CheckAccessMaintenanceAsync(false);

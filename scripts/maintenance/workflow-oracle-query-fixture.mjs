@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 
 /** 只有任务已冻结的主 API、副 API、OIDC 和 Web 可以被正式浏览器场景访问。 */
 export const ports = Object.freeze({ api: 15741, secondary: 15742, oidc: 15743, web: 15744 });
-export const modes = Object.freeze(["s2-s3-oracle", "s2-oracle-vocabulary", "s2-oracle-mapping", "s2-oracle-queries", "s2-oracle-relations", "s2-oracle-access", "s2-oracle-aba", "s2-oracle-connection", "s2-oracle-versions", "s2-oracle-states", "s2-oracle-reopen", "s3", "ui-s3", "ui-s1", "auth-handoff-s1", "reader-auth", "serve", "provision", "mapping", "s0-oracle-auth", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s0-oracle-natural-cancel", "s1", "s1-reopen"]);
+export const modes = Object.freeze(["s2-oracle-normal", "s2-s3-oracle", "s2-oracle-vocabulary", "s2-oracle-mapping", "s2-oracle-queries", "s2-oracle-relations", "s2-oracle-access", "s2-oracle-aba", "s2-oracle-connection", "s2-oracle-versions", "s2-oracle-states", "s2-oracle-reopen", "s3", "ui-s3", "ui-s1", "auth-handoff-s1", "reader-auth", "serve", "provision", "mapping", "s0-oracle-auth", "s0-oracle-ready", "s0-oracle-natural", "s0-oracle-cancel", "s0-oracle-natural-cancel", "s1", "s1-reopen"]);
 export const config = Object.freeze({ type: "ORACLE", profile: { host: "oracle-source", port: 2484, serviceName: "FREEPDB1",
   username: "FIXTURE_READER", allowedOwners: ["PRODUCTION", "CaseOwner"], tls: true } });
 const task = "G4-ORACLE-MAPPING-QUERY-001";

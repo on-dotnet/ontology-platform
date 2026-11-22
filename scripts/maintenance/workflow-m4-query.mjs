@@ -41,7 +41,8 @@ const mode = argument("mode"), require = createRequire(resolve(root, "apps/web/p
 if (oracle && !omq.modes.includes(mode)) throw new Error("ORACLE_SCENARIO_NOT_REGISTERED");
 if (doris && !["s3","ui-s1","ui-s3","serve","s2-doris-ready","s2-doris-root-deadline","s2-doris-authority-control","s2-doris-sentinel","s2-doris-overlap","provision","mapping","s1","s1-reopen","s1-current-catalog","s1-key-negative","s2-doris-mapping","s2-doris-queries","s2-doris-null","s2-doris-cancel","s2-doris-access","s2-doris-fanout","s2-doris-requalify","s2-doris-aba","s2-doris-admission-cancel","s2-doris-cancel-window","s2-doris-states","s2-doris-cardinality","s2-doris-identity","s2-doris-revoke-race","s2-doris-session-race","s2-doris-shape-prepare","s2-doris-shape-reject","s2-doris-shape-recover","s2-doris-cancel-profile","s2-doris-expiry","s2-doris-ddl-race","s2-doris-rotate-race","s2-doris-current-catalog","s2-doris-deadline","s2-doris-short-lock","s2-doris-disconnect","s2-doris-batch-binding"].includes(mode)) throw new Error("DORIS_SCENARIO_NOT_REGISTERED");
 if (integration && ["standard-provision", "replace-disabled-connection", "numeric-provision", "s3-provision"].includes(mode)) throw new Error("INTEGRATION_USE_SEPARATE_SCENARIO_SETUP");
-if (oracle && mode==="s2-oracle-aba" && args.includes("--diagnostic-id")) await authHandoffRun(true);
+if (oracle && mode==="s2-oracle-normal") await authHandoffRun();
+else if (oracle && mode==="s2-oracle-aba" && args.includes("--diagnostic-id")) await authHandoffRun(true);
 else if (oracle && ["auth-handoff-s1", "s2-s3-oracle"].includes(mode)) await authHandoffRun();
 else if (mode === "serve") {
   const { execFileSync } = await import("node:child_process");
@@ -102,10 +103,11 @@ async function browserRun(mode, shared = null) {
     if (shared) stageRemaining();
     check("no_known_secret_" + report.http.length, !secrets.some(secret => secret && raw.includes(secret)));
     let data; try { data = JSON.parse(raw); } catch { data = null; }
-    report.http.push({ method, path, status: response.status(), elapsedMs: performance.now() - start,
-      ...(oracleTwoTable && mode==="s2-oracle-aba" && path==="/api/v1/data/semantic-queries" && method==="POST"
+    report.http.push({ method, path, ...(mode==="s2-oracle-normal" ? {traceId:response.headers()["x-trace-id"]??null,
+      correlation:response.headers()["x-correlation-id"]??null} : {}), status: response.status(), elapsedMs: performance.now() - start,
+      ...(oracleTwoTable && ["s2-oracle-aba","s2-oracle-normal"].includes(mode) && path==="/api/v1/data/semantic-queries" && method==="POST"
         ? {queryId:response.headers()["x-query-id"]??null,query:body,subjectId:actor.me.subjectId,selectionQueryId:actor.headers["X-Selection-Query-Id"]??null} : {}),
-      ...(oracleTwoTable && mode==="s2-oracle-aba" && method==="GET" && /^\/api\/v1\/data\/semantic-queries\/query-[a-f0-9]{32}\/result$/u.test(path)
+      ...(oracleTwoTable && ["s2-oracle-aba","s2-oracle-normal"].includes(mode) && method==="GET" && /^\/api\/v1\/data\/semantic-queries\/query-[a-f0-9]{32}\/result$/u.test(path)
         ? {subjectId:actor.me.subjectId} : {}),
       ...(data?.code ? { code: data.code } : {}), sha256: createHash("sha256").update(raw).digest("hex") });
     check("http_" + report.http.length + "_" + expected, (Array.isArray(expected) ? expected.includes(response.status()) : response.status() === expected));
@@ -1871,7 +1873,19 @@ async function authHandoffRun(diagnostic=false) {
   const { writeFile } = await import("node:fs/promises");
   const output = resolve(root, "artifacts/workflow", task, runId);
   let plan, input;
-  if(diagnostic) {
+  if(mode==="s2-oracle-normal") {
+    const key=argument("normal-id"), slot=process.env.OMQ_NORMAL_SLOT;
+    if(args.length!==8 || !["Q1","Q2"].includes(slot) || !/^[0-9a-f]{32}$/u.test(key) || key!==process.env.OMQ_NORMAL_DIAGNOSTIC_KEY)
+      throw Error("ORACLE_NORMAL_ID");
+    const area=resolve(output,"s2-s3-01");
+    const charge=JSON.parse(await readFile(resolve(area,"normal-window-"+slot+".json"),"utf8"));
+    const win=JSON.parse(await readFile(resolve(area,"window-"+charge.windowId+".json"),"utf8"));
+    if(charge.key!==key || charge.taskId!==task || charge.runId!==runId || charge.slot!==slot || win.state!=="OPEN"
+      || win.id!==charge.windowId || win.priorCloseSha256!==charge.closeSha256) throw Error("ORACLE_NORMAL_WINDOW");
+    const full=omq.s2RuntimePlan();
+    plan={...full,stages:[full.stages[0],{...full.stages[1],mode:"s2-oracle-normal"}]};
+    input={executionId:key,slot,kind:"NORMAL_RELATION"};
+  } else if(diagnostic) {
     const id=argument("diagnostic-id");
     if(args.length!==8 || !/^[a-f0-9]{32}$/u.test(id) || process.env.OMQ_ABA_DIAGNOSTIC!==id) throw Error("ORACLE_DIAGNOSTIC_ID");
     const charge=JSON.parse(await readFile(resolve(output,"s2-s3-01/diagnostic-aba-start.json"),"utf8"));

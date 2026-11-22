@@ -50,7 +50,12 @@ internal static class OracleQueryReader
         using var work = CancellationTokenSource.CreateLinkedTokenSource(token, G4RequestDeadline.Current!.Token);
         // 单调预算同时约束回滚和物理释放后验。
         var origin = Stopwatch.GetTimestamp();
-        work.CancelAfter(budget - CleanupLimit);
+        using var readerCutoff = new CancellationTokenSource(TimeSpan.FromTicks(Math.Max(0, (budget - CleanupLimit - Stopwatch.GetElapsedTime(origin)).Ticks)));
+        using var readerSignal = readerCutoff.Token.Register(() =>
+        {
+            G4OracleQueryTrace.Mark("readerCutoff", "signal");
+            work.Cancel();
+        });
         // 目录前态与后验绑定同一非池化连接和同次真实核验。
         string? shape = null;
         // 已发布固定语句的行在所有后验结束前不会用于业务交付。
@@ -62,10 +67,13 @@ internal static class OracleQueryReader
                 async connection =>
                 {
                     // 权限元数据及其游标全部返回后，明确拒绝在已持有连接上进入物理清理。
-                    if (!await OracleSourceAdapter.MappingAccessMatchesAsync(connection, work.Token))
+                    if (!await G4OracleQueryTrace.ObserveAsync("readOnly", () => OracleSourceAdapter.MappingAccessMatchesAsync(connection, work.Token)))
+                    {
+                        G4OracleQueryTrace.Mark("readOnly", "failed");
                         throw new AccessRejectedException();
-                    shape = await OracleMappingSourceValidator.CheckCatalogAsync(connection, context.CurrentCatalog, work.Token);
-                    await adapter.RecordQuerySessionAsync(connection, lifetime, work.Token);
+                    }
+                    shape = await G4OracleQueryTrace.ObserveAsync("catalog", () => OracleMappingSourceValidator.CheckCatalogAsync(connection, context.CurrentCatalog, work.Token));
+                    await G4OracleQueryTrace.ObserveAsync("session", () => adapter.RecordQuerySessionAsync(connection, lifetime, work.Token));
                     return await OracleSourceAdapter.BeginMappingAsync(connection, work.Token);
                 },
                 (connection, tx, native, cancelling) => ReadCommandAsync(adapter, connection, tx, table.Schema == "CaseOwner",
@@ -186,6 +194,7 @@ internal static class OracleQueryReader
         // 已取消的工作不能新开源；申请号随下列每个物理观察一同记录。
         work.ThrowIfCancellationRequested();
         var acquisition = lifetime.BeginSource();
+        G4OracleQueryTrace.Mark("acquisition", "returned", acquisition);
         // 捕获正式请求，其他线程上的定向取消也复用该原期限。
         var request = G4RequestDeadline.Current;
         // 取消信号和工作线程共用最早清理起点，不能从回滚另起预算。
@@ -215,6 +224,7 @@ internal static class OracleQueryReader
             var stamp = Stopwatch.GetTimestamp();
             var previous = Interlocked.CompareExchange(ref cleanupStart, stamp, 0);
             lifetime.TightenCleanup(CleanupLimit - Stopwatch.GetElapsedTime(previous == 0 ? stamp : previous));
+            G4OracleQueryTrace.Mark("cleanupStart", acquisition: acquisition, originTick: previous == 0 ? stamp : previous);
             Record(trigger);
         }
         report?.Invoke("ACQUIRED", acquisition);
@@ -247,11 +257,11 @@ internal static class OracleQueryReader
                 {
                     try
                     {
-                        rows = await read(connection, tx, error => nativeTermination = error, () => StartCleanup("DIRECTED_CANCEL"));
+                        rows = await G4OracleQueryTrace.ObserveAsync("execute", () => read(connection, tx, error => nativeTermination = error, () => StartCleanup("DIRECTED_CANCEL")));
                         readReturned = true;
                         report?.Invoke("READ_RETURNED", acquisition);
                         work.ThrowIfCancellationRequested();
-                        await tx.CommitAsync(work);
+                        await G4OracleQueryTrace.ObserveAsync("commit", () => tx.CommitAsync(work));
                         report?.Invoke("COMMITTED", acquisition);
                     }
                     catch (Exception failure)
@@ -261,7 +271,7 @@ internal static class OracleQueryReader
                         var left = Left();
                         if (left <= TimeSpan.Zero) throw;
                         using var cleanup = new CancellationTokenSource(left);
-                        await tx.RollbackAsync(cleanup.Token);
+                        await G4OracleQueryTrace.ObserveAsync("rollback", () => tx.RollbackAsync(cleanup.Token));
                         report?.Invoke("ROLLED_BACK", acquisition);
                         confirmed = readReturned || (ReferenceEquals(failure, nativeTermination) && OracleSourceAdapter.IsNativeCancel(failure));
                         throw;
@@ -271,7 +281,7 @@ internal static class OracleQueryReader
                 {
                     try
                     {
-                        await tx.DisposeAsync();
+                        await G4OracleQueryTrace.ObserveAsync("disposeTransaction", () => tx.DisposeAsync().AsTask());
                         report?.Invoke("TX_DISPOSED", acquisition);
                     }
                     catch { confirmed = false; throw; }
@@ -282,11 +292,12 @@ internal static class OracleQueryReader
                 // 后验一旦开始便需独立等它返回；任意中断、读取或游标异常都保留未知。
                 confirmed = false;
                 report?.Invoke("POST_STARTED", acquisition);
-                await verifyAfter(connection);
+                await G4OracleQueryTrace.ObserveAsync("postcheck", () => verifyAfter(connection));
                 report?.Invoke("POST_RETURNED", acquisition);
                 confirmed = true;
                 // 健康读取仍只在本地度量物理释放。若释放本身失败，则向持有人传递这个已用起点。
                 Interlocked.CompareExchange(ref cleanupStart, Stopwatch.GetTimestamp(), 0);
+                G4OracleQueryTrace.Mark("cleanupStart", acquisition: acquisition, originTick: Volatile.Read(ref cleanupStart));
                 work.ThrowIfCancellationRequested();
                 return rows;
             }
@@ -301,7 +312,7 @@ internal static class OracleQueryReader
                 try
                 {
                     try { Record("PHYSICAL_DISPOSE"); }
-                    finally { await connection.DisposeAsync(); }
+                    finally { await G4OracleQueryTrace.ObserveAsync("disposeConnection", () => connection.DisposeAsync().AsTask()); }
                     released();
                     report?.Invoke("PHYSICAL_DISPOSED", acquisition);
                 }

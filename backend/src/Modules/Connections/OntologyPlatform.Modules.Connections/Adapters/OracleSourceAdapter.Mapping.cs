@@ -16,6 +16,7 @@ public sealed partial class OracleSourceAdapter
     {
         if (action is not ("EXECUTE" or "CANCEL_ENTER" or "CANCEL_RETURN" or "CANCEL_REJECT" or "NATIVE_1013" or "EOF" or "PHYSICAL_RELEASE"))
             throw new ArgumentOutOfRangeException(nameof(action));
+        G4OracleQueryTrace.Mark(action, "returned");
         logger?.LogInformation("OracleSourceEvent action={Action} query={QueryId} execution={ExecutionId} utc={Utc:O}",
             action, lifetime.QueryId, lifetime.ExecutionId, DateTimeOffset.UtcNow);
     }
@@ -53,6 +54,7 @@ public sealed partial class OracleSourceAdapter
             if (row.IsDBNull(i + 1) || !ulong.TryParse(row.GetString(i + 1), System.Globalization.NumberStyles.None,
                     System.Globalization.CultureInfo.InvariantCulture, out ids[i]) || ids[i] == 0)
                 throw new PgSourceException("connection_readonly_unverified");
+        G4OracleQueryTrace.Mark("session", "returned", session: ids);
         logger?.LogInformation("OracleSourceSession query={QueryId} execution={ExecutionId} instance={Instance} sid={Sid} audsid={Audsid} unified={Unified} con={Con} utc={Utc:O}",
             lifetime.QueryId, lifetime.ExecutionId, ids[0], ids[1], ids[2], ids[3], ids[4], DateTimeOffset.UtcNow);
     }
@@ -65,23 +67,27 @@ public sealed partial class OracleSourceAdapter
     /// <returns>完成实际 TCPS的非池化连接；默认还包含当前权限及对象核验。</returns>
     internal async Task<OracleConnection> OpenMappingAsync(string secret, Guid executionId, CancellationToken token, bool verifyAccess = true)
     {
-        await G4OracleSourceOpen.BeforePhysicalOpenAsync(token);
-        await VerifyTlsAsync(token);
+        await G4OracleQueryTrace.ObserveAsync("permitCheck", () => G4OracleSourceOpen.BeforePhysicalOpenAsync(token));
+        await G4OracleQueryTrace.ObserveAsync("tls", () => VerifyTlsAsync(token));
         // 连接配置沿用固定端点、可信钱包及零重试。
         var connection = Create(secret);
         try
         {
-            await G4OracleSourceOpen.BeforeSessionOpenAsync(token);
-            await connection.OpenAsync(token);
-            await G4OracleSourceOpen.AfterPhysicalOpenAsync();
-            connection.ModuleName = "G4-ORACLE-MAPPING-QUERY-001";
-            connection.ClientId = executionId.ToString("N");
+            await G4OracleQueryTrace.ObserveAsync("openCheck", () => G4OracleSourceOpen.BeforeSessionOpenAsync(token));
+            await G4OracleQueryTrace.ObserveAsync("open", () => connection.OpenAsync(token));
+            await G4OracleQueryTrace.ObserveAsync("permitReturn", () => G4OracleSourceOpen.AfterPhysicalOpenAsync().AsTask());
+            await G4OracleQueryTrace.ObserveAsync("sessionTag", () =>
+            {
+                connection.ModuleName = "G4-ORACLE-MAPPING-QUERY-001";
+                connection.ClientId = executionId.ToString("N");
+                return Task.CompletedTask;
+            });
             if (verifyAccess) await VerifyMappingAccessAsync(connection, token);
             return connection;
         }
         catch
         {
-            await connection.DisposeAsync();
+            await G4OracleQueryTrace.ObserveAsync("disposeConnection", () => connection.DisposeAsync().AsTask());
             throw;
         }
     }
@@ -122,18 +128,18 @@ public sealed partial class OracleSourceAdapter
         // 仅在当前会话的事务外关闭自动提交。
         connection.AutoCommit = false;
         // 明确让驱动创建本地事务，再发出第一行业务 SQL。
-        var transaction = (OracleTransaction)await connection.BeginTransactionAsync(IsolationLevel.ReadCommitted, token);
+        var transaction = (OracleTransaction)await G4OracleQueryTrace.ObserveAsync("transaction", () => connection.BeginTransactionAsync(IsolationLevel.ReadCommitted, token).AsTask());
         try
         {
             using var mode = connection.CreateCommand();
             mode.Transaction = transaction;
             mode.CommandText = "SET TRANSACTION READ ONLY";
-            await mode.ExecuteNonQueryAsync(token);
+            await G4OracleQueryTrace.ObserveAsync("declareReadOnly", () => mode.ExecuteNonQueryAsync(token));
             return transaction;
         }
         catch
         {
-            await transaction.DisposeAsync();
+            await G4OracleQueryTrace.ObserveAsync("disposeTransaction", () => transaction.DisposeAsync().AsTask());
             throw;
         }
     }

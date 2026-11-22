@@ -76,7 +76,7 @@ def open_window():
     require(not ACTIVE.get() and not COLD_MEASUREMENT.get() and p.product_run() == RUN and
             ROOT == resume.ROOT and frozen_plan(ROOT, PLAN)['planId'] == PLAN, 'WINDOW_COLD_SCOPE')
     head = close_registration()
-    require(head.get('kind') != 'D368_PG_ONLY' or head['status'] == 'TASK_LEVEL_RECOVERY', 'WINDOW_D368_PRODUCT_BLOCKED')
+    require(head.get('kind') not in ('D368_PG_ONLY','NORMAL_PG_ONLY') or head['status'] == 'TASK_LEVEL_RECOVERY', 'WINDOW_D368_PRODUCT_BLOCKED')
     measuring = COLD_MEASUREMENT.set(True)
     try:
         cold = resume.admit(set(resume.recovery.ORIGINAL_IDS) | set(resume.APIS))
@@ -236,11 +236,13 @@ def close_registration(digest=None):
                     and known[previous]['status'] == 'TASK_LEVEL_RECOVERY','WINDOW_PREDIAGNOSTIC_REGISTRY')
             row = {**row,'grantCheckpoint':known[previous]['grantCheckpoint']}
             known[previous] = {**known[previous],'nextPreDiagnosticClose':row['sha256']}
-        elif kind == 'D368_PG_ONLY':
+        elif kind in ('D368_PG_ONLY','NORMAL_PG_ONLY'):
             from workflow_oracle_d368_pg_close import PREVIOUS
             from workflow_oracle_d368_closure import QUERY
+            if kind=='NORMAL_PG_ONLY':
+                from workflow_oracle_d368_closure import NORMAL_CLOSE as PREVIOUS, NORMAL_QUERY as QUERY
             required = {'kind','operation','queryId','previousSha256','sha256','sizeBytes','status','memberCount','memberIndexSha256'}
-            require(set(row) == required and previous == PREVIOUS and known[previous]['kind'] == 'MAPPING_RESTORE'
+            require(set(row) == required and previous == PREVIOUS and (kind=='NORMAL_PG_ONLY' or known[previous]['kind'] == 'MAPPING_RESTORE')
                     and row['queryId'] == QUERY and row['status'] in ('TASK_LEVEL_RECOVERY','BLOCKED')
                     and type(row['sizeBytes']) is int and row['sizeBytes'] > 0 and type(row['memberCount']) is int
                     and row['memberCount'] > 0 and re.fullmatch('[a-f0-9]{64}',row['memberIndexSha256']), 'WINDOW_D368_REGISTRY')
@@ -255,6 +257,9 @@ def close_registration(digest=None):
         else:
             require(kind == 'FORMAL' and row['parentId'] not in parents and
                     re.fullmatch('[a-f0-9]{32}', row['parentId']), 'WINDOW_CLOSE_REGISTRY_CHAIN')
+            if row['sha256']=='a3839fe8ebb6e418e42e2280d1d6044acd7a1a4f3f65babdc8f13b8c7d055348':
+                require(known[previous]['kind']=='DIAGNOSTIC_CLOSE' and row['parentId']=='4032c1d770b240989966ba3275d86999','NORMAL_CLOSE_PREVIOUS')
+                row={**row,'grantCheckpoint':known[previous]['grantCheckpoint']}
             parents.add(row['parentId'])
         operations.add(row['operation'])
         known[row['sha256']] = row
@@ -279,7 +284,7 @@ def last_close(root, archive=None, digest=None):
         from workflow_oracle_prediagnostic_close import reopen
         prior = last_close(root, archive, entry['previousSha256'])
         return reopen(root, entry, prior, archive)[0]
-    if entry.get('kind') == 'D368_PG_ONLY':
+    if entry.get('kind') in ('D368_PG_ONLY','NORMAL_PG_ONLY'):
         from workflow_oracle_d368_pg_close import reopen
         previous = last_close(root, archive, entry['previousSha256'])
         normalized, _, _ = reopen(root, entry, previous, archive)
@@ -535,6 +540,10 @@ def runtime_continuity(root, previous, current, proof=None, archive=None):
             middle = close['restoreHost']
             runtime_continuity(root, previous, middle, close['restoreHostProof'], archive)
             return compare_generation(root, middle, current, close, entry['sha256'], proof, archive)
+        current_close=entry['sha256']
+        if entry.get('kind')=='NORMAL_PG_ONLY':
+            require(entry['status']=='TASK_LEVEL_RECOVERY','NORMAL_PRODUCT_BLOCKED')
+            entry=close_registration(entry['previousSha256'])
         data = c.raw(root, c.AREA / ('formal-run-s2-s3-oracle-' + entry['parentId'] + '.json'), archive)
         require(ex.sha(data) == entry['parentSha256'], 'WINDOW_LAST_PARENT')
         prior = json.loads(data)
@@ -550,8 +559,8 @@ def runtime_continuity(root, previous, current, proof=None, archive=None):
         require(e.stable_host(prior_obs['host']) == e.stable_host(middle) and
                 prior_obs['hostContinuity']['closeSha256'] == entry['previousSha256'], 'WINDOW_LAST_HOST')
         runtime_continuity(root, previous, prior_obs['host'], prior_obs['hostContinuity'], archive)
-        close = last_close(root, archive, entry['sha256'])
-        return compare_generation(root, middle, current, close, entry['sha256'], proof, archive)
+        close = last_close(root, archive, current_close)
+        return compare_generation(root, middle, current, close, current_close, proof, archive)
     parent = REUSED_ACCESS['commandId']
     data = c.raw(root, c.AREA / ('formal-run-s2-s3-oracle-'+parent+'.json'), archive)
     require(ex.sha(data) == 'b7861c9207dbed9d6018c8581c931b2c64f30c2697a302635a23974263428f2f','WINDOW_ACCESS_PARENT')

@@ -100,9 +100,9 @@ def historical_row(archive):
     return dict(row=row, failureAuditId=AUDIT_ID, failureAuditSha256=AUDIT_SHA, readReceipts=count)
 
 
-def shutdown_chain(archive):
+def shutdown_chain(archive, pairs=STOP_PAIRS):
     result = []
-    for command_id, state_id in STOP_PAIRS:
+    for command_id, state_id in pairs:
         row, out, _ = continuity.command(ROOT, command_id, continuity.RECOVERY, SQLPLUS, 'omq-recovery-oracle-shutdown',
                                          ex.sha(ex.encoded(SQLPLUS) + SHUTDOWN), 90, archive)
         require(all(marker in out.lower() for marker in
@@ -187,6 +187,115 @@ def origin(archive, formal):
                 measuredCommit=measured, sourceCode=code, composeSha256=host['composeSha256'],
                 mountsSha256=digest(rows['oracle']['mounts']), snapshots={k:v['snapshotId'] for k,v in builds.items()},
                 parentExitedAtUtc=parent['endedAtUtc'], childExitedAtUtc=child['endedAtUtc'])
+
+
+NORMAL_QUERY = 'query-f1599097a7274c20b82cbf0dfcea4e2b'
+NORMAL_PARENT = '4032c1d770b240989966ba3275d86999'
+NORMAL_CLOSE = 'a3839fe8ebb6e418e42e2280d1d6044acd7a1a4f3f65babdc8f13b8c7d055348'
+
+
+def target(normal=False):
+    """维护目标的身份和证明均在源码内冻结，调用者不能指定任意行或原件路径。"""
+    if not normal:
+        return SimpleNamespace(query=QUERY,parent=PARENT,child=CHILD,close=RESTORED,prefix='d368',prove=prove_d368_closure,
+            frozen=FROZEN_ROW,audit=AUDIT_ID,audit_sha=AUDIT_SHA,mode='DEDICATED_GENERATION',
+            generation_sha='a617d1e838631e9f16b5e9bc65aa97842c3a85cfc7c9991137262a537881c3d0',
+            seal_sha='1d39291bc79d057dc310bdad98049442305aff73b236e4a004b4829d3890edb2',
+            start='2026-11-21T13:49:57.33078955Z',end='2026-11-21T13:52:47.119332336Z')
+    raw=ex.ordinary(ROOT/continuity.AREA.parent/'commands'/RUN/'c4dafca14fbf4e12bf8687c2d78b0351/stdout.txt').read_bytes()
+    require(ex.sha(raw)=='afab62d7f6d11f8b651ef55b5c9a55bdc4120ab8d8b66ff8f4cb816962862ae8','NORMAL_FROZEN_ROW')
+    return SimpleNamespace(query=NORMAL_QUERY,parent=NORMAL_PARENT,child=None,close=NORMAL_CLOSE,prefix='normal',prove=prove_normal_closure,
+        frozen=json.loads(raw),audit='38ebcc6e08504994b36a322edc4ffd86',audit_sha='91713b546c40b9d6925079220bfa0420e6bbfc3d8dbd18c1a9c335cc2e0d422c',
+        mode='NORMAL_GENERATION',generation_sha='d3bd83e5b832d68295dd3abeeb84a558bf290b51ce882b5df7a9995c4aefce6b',
+        seal_sha='34fd7fda857fc5ca2f2456ad5cb76885b8473fafe00b588366d187286e0fd9c5',
+        start='2026-11-22T12:48:17.47353763Z',end='2026-11-22T12:51:07.888426792Z')
+
+
+def normal_generation(archive):
+    """从正式父、同代宿主、唯一失败行和完整执行账本绑定普通 POST 的专用源代次。"""
+    entry = window.close_registration(NORMAL_CLOSE)
+    require(entry['operation']=='c35242b898c04ae3ad5529ba346d320f' and entry['parentId']==NORMAL_PARENT,'NORMAL_CLOSE_ID')
+    closed = window.last_close(ROOT,archive,NORMAL_CLOSE)
+    def load(relative):
+        return json.loads(continuity.raw(ROOT,relative,archive))
+    raw = continuity.raw(ROOT,continuity.AREA/('formal-run-s2-s3-oracle-'+NORMAL_PARENT+'.json'),archive)
+    require(ex.sha(raw)==entry['parentSha256'],'NORMAL_DISPATCH')
+    dispatch=json.loads(raw)
+    host=dispatch['host']
+    _,rows=refresh.observed_rows(ROOT,host,archive)
+    builds=refresh.snapshot_builds(ROOT,host,archive)
+    require(dispatch['testedCommit']=='9e84841423bac82911fc989b7b0a4ec999ac1ac7' and host['commandId']=='e53018d6c4f242b0ae94cf462eb54a0f'
+            and all(rows[k]['containerId']==ident for k,ident in closed['ids'].items())
+            and rows['oracle']['startedAt']==closed['data']['oracle']['startedAt'] and len(rows['oracle']['networks'])==1
+            and all(rows['oracle']['networks'].items()<=rows[k]['networks'].items() for k in closed['apis']),'NORMAL_HOST')
+    manifest=continuity.raw(ROOT,continuity.AREA/('formal-resources-'+host['resourceManifestSha256']+'.json'),archive)
+    verify_product_manifest(host,json.loads(manifest),ex.sha(manifest))
+    compose=continuity.raw(ROOT,continuity.AREA/('formal-api-compose-'+host['composeSha256']+'.json'),archive)
+    spec=json.loads(compose)
+    require(ex.sha(compose)==host['composeSha256'] and set(spec['services'])=={'api','api-secondary'}
+            and set(rows['oracle']['networks'])=={spec['networks']['source-internal']['name']},'NORMAL_SOURCE_NETWORK')
+    for role,destination,build_name in (('api','/app','api'),('api-secondary','/app','api'),
+            ('api-secondary','/session-tests','agent'),('api-secondary','/query-tests','query')):
+        path=str(ROOT/builds[build_name]['directory'])
+        mounts=[m for m in rows[role]['mounts'] if m['Destination']==destination or m['Destination'].startswith(destination+'/')]
+        require(len(mounts)==1 and mounts[0]['Destination']==destination and mounts[0]['Type']=='bind' and not mounts[0]['RW']
+                and mounts[0]['Source'].removeprefix('/host_mnt')==path
+                and spec['services'][role]['volumes'].count(path+':'+destination+':ro')==1,'NORMAL_SOURCE_MOUNT')
+    chain=shutdown_chain(archive,[('4944ef11156e4789a871a14261cdc8ac','fa04a5c3408645faa78fbcc283ac3847')])
+    args=[NODE,DRIVER,'--task',TASK,'--run-id',RUN,'--mode','s2-s3-oracle','--batch-input',dispatch['stageInputs']['batchInput']]
+    parent=failed_command(archive,NORMAL_PARENT,args,'omq-browser-s2-s3-oracle',
+                          'bec919fe3c153200d4d05267e5b9045ffb3a12ba6b0bde4836da3d575b48af3d',host['commandId'],2340,1)
+    independent_raw=continuity.raw(ROOT,AREA/'independent-final-c352.json',archive)
+    require(ex.sha(independent_raw)=='788eec2150f40ca9163c5a5db796c973b2dc536c41cd67b387479940ac3d5499','NORMAL_INDEPENDENT')
+    evidence=json.loads(independent_raw)
+    book=evidence['ledger']
+    ledger=ROOT/continuity.AREA.parent/'command-events.jsonl'
+    with ex.ordinary(ledger).open('rb') as stream:
+        stream.seek(book['offset'])
+        data=stream.read(book['sizeBytes'])
+    require(ex.sha(data)==book['sha256'],'NORMAL_LEDGER')
+    starts=[r for raw in data.splitlines() if (r:=json.loads(raw)).get('event')=='START']
+    require([r['commandId'] for r in starts if r['stage']=='omq-browser-s2-s3-oracle']==[NORMAL_PARENT]
+            and not any(r['stage']=='query-real-aba-inflight-runtime' for r in starts),'NORMAL_PRODUCERS')
+    import workflow_oracle_access_maintenance as access
+    identification='''SET TIME ZONE 'UTC'; SELECT json_agg("Id" ORDER BY "CreatedAtUtc") FROM semantic_query."Queries" WHERE "ConnectionId"='a7913bb552eb4cd1a3f6eaf5b93cd619' AND "CreatedAtUtc" BETWEEN '2026-11-22T12:50:36.306Z' AND '2026-11-22T12:50:37.978Z';'''
+    seed_sql={'identification':identification,'row':access.ROW_SQL.replace(access.QUERY,NORMAL_QUERY).replace(''''owner',q."LeaseOwner"''',''''ownerSha256',encode(sha256(convert_to(q."LeaseOwner",'UTF8')),'hex')'''),
+              'audit':access.AUDIT_SQL.replace(access.QUERY,NORMAL_QUERY),'receipts':f'''SELECT json_array_length(convert_from("BindingBytes",'UTF8')::json->'receipts') FROM semantic_query."Queries" WHERE "Id"='{NORMAL_QUERY}';'''}
+    command_ids={'identification':'c23e34fe3ef049f29a78510983807d44','row':'c4dafca14fbf4e12bf8687c2d78b0351',
+                 'audit':'19b582350d8740d482ba3658e74e2934','receipts':'4a7ac0543a234f7992e0e041845fa66f'}
+    argv=[*DOCKER,'exec','-i','--user','postgres',PG,'psql','-XwqAt','-d','mapping','-v','ON_ERROR_STOP=1']
+    originals={}
+    for label,sql in seed_sql.items():
+        stage='omq-pg-formal-seed-'+('identification' if label=='identification' else 'post-'+label)
+        key=ex.sha(('BEGIN READ ONLY;\n'+sql+'\nCOMMIT;').encode())
+        receipt,out,err=continuity.command(ROOT,command_ids[label],RUN,argv,stage,key,15,archive)
+        require(not err and utc(parent['endedAtUtc'])<utc(receipt['startedAtUtc'])<utc(closed['data']['platform-pg']['after']['FinishedAt']),
+                'NORMAL_PG_ORIGINAL_WINDOW')
+        originals[label]=json.loads(out)
+    found,row,audits,receipts=(originals[k] for k in ('identification','row','audit','receipts'))
+    require(found==[NORMAL_QUERY] and row['queryId']==NORMAL_QUERY and row['stableRowSha256']=='8bbdb6cb314c00994015ef3eef5c36c5f9ec60d41f005875256129f2b7d91a57'
+            and len(audits)==1 and audits[0]['id']=='38ebcc6e08504994b36a322edc4ffd86' and receipts==0,'NORMAL_TARGET')
+    require(utc(chain[0]['startedAt'])<utc(parent['startedAtUtc'])<utc(row['createdUtc'])<utc(row['completedUtc'])
+            <utc(parent['endedAtUtc'])<utc(chain[0]['finishedAt']),'NORMAL_SOURCE_ORDER')
+    generation=dict(queryId=NORMAL_QUERY,parent=NORMAL_PARENT,child=None,host=host['commandId'],close=NORMAL_CLOSE,
+                    source=SOURCE,networks=rows['oracle']['networks'],shutdown=chain,code=source_code(dispatch['testedCommit']),
+                    snapshots={name:value['snapshotId'] for name,value in builds.items()})
+    return closed,generation,dict(row=row,audit=audits,receipts=receipts)
+
+
+def prove_normal_closure(*,pg_start_command=None):
+    """只为冻结的普通失败请求重开本代证明与当前生产者状态。"""
+    require(os.environ.get('OMQ_PRODUCT_RUN')==RUN,'NORMAL_RUN')
+    archive=SimpleNamespace(paths={},examined={})
+    closed,generation,historical=normal_generation(archive)
+    apis={row['id'] for row in closed['apis'].values()}
+    live=live_state(closed,apis,pg_start_command,archive)
+    seal=dict(queryId=NORMAL_QUERY,parent=NORMAL_PARENT,child=None,closedApis=sorted(apis),
+              sourceFinishedAt=live['states'][SOURCE]['finishedAt'],matchingDrivers=live['matchingDrivers'])
+    members={p:dict(sha256=archive.examined[k],sizeBytes=(ROOT/p).stat().st_size) for k,p in archive.paths.items()}
+    return dict(kind='DEDICATED_ORACLE_GENERATION_TERMINATED',queryId=NORMAL_QUERY,originals=members,originalsSha256=digest(members),
+                generation=generation,generationSha256=digest(generation),seal=seal,sealSha256=digest(seal),
+                live=live,historical=historical,verifiedUtc=dt.datetime.now(dt.timezone.utc).isoformat(timespec='microseconds'))
 
 
 def live_state(restored, old_apis, pg_start_command, archive):

@@ -2,6 +2,45 @@
 import * as omq from "../maintenance/workflow-oracle-query-fixture.mjs";
 import { readFile } from "node:fs/promises";
 const [root,mode]=process.argv.slice(2);
+// 从浏览器驱动读取实际 request 闭包，和 ready 夹具共用源码边界。
+if (mode === "catalog-http") {
+  const {createHash} = await import("node:crypto");
+  const {readFileSync} = await import("node:fs");
+  const input = JSON.parse(readFileSync(0, "utf8"));
+  const driver = await readFile(new URL("../maintenance/workflow-m4-query.mjs", import.meta.url), "utf8");
+  const start = driver.indexOf("  async function request(actor,");
+  const end = driver.indexOf("  const get = async ", start);
+  if (start < 0 || end <= start) throw new Error("REQUEST_IMPLEMENTATION_MISSING");
+  const report = {http: [], checks: []};
+  const responses = input.transport;
+  const actor = {me: {subjectId: input.reader}, headers: {}, context: {request: {
+    async fetch(url, options) {
+      const reply = responses.shift();
+      if (!reply || url !== "http://fixture.invalid"+reply.path || options.method !== reply.method) {
+        throw new Error("UNEXPECTED_HTTP");
+      }
+      return {text: async () => reply.raw, status: () => reply.status,
+              headers: () => ({"x-query-id": reply.queryId})};
+    }
+  }}};
+  const startOf = (prefix) => {
+    const lines = driver.split("\n").filter(line => line.startsWith("  const "+prefix+" = "));
+    if (lines.length !== 1) throw new Error("REQUEST_CLOSURE_MISSING");
+    return lines[0];
+  };
+  const factory = new Function("origin","omq","shared","report","oracleTwoTable","mode","realm","createHash",
+    startOf("stageRemaining")+"\n"+startOf("check")+"\n"+startOf("secrets")+"\n"+
+    driver.slice(start,end)+"\nreturn request;");
+  const request = factory("http://fixture.invalid", omq, {stageDeadline:performance.now()+5000},
+    report, true, "s2-oracle-aba", null, createHash);
+  const endpoint = "/api/v1/data/semantic-queries";
+  await request(actor,"GET",endpoint+"/"+input.old+"/result",undefined,410);
+  const posted = await request(actor,"POST",endpoint,input.query);
+  const restored = await request(actor,"GET",endpoint+"/"+posted.queryId+"/result");
+  if (posted.raw !== restored.raw || responses.length) throw new Error("SEED_ORIGINALS");
+  process.stdout.write(JSON.stringify(report.http));
+  process.exit(0);
+}
 const columns="ROW_ID JOIN_KEY VAL ORG_ID SITE_ID EXT_ID LABEL FROM_TS TO_TS EVENT_TS OBSERVED_TS".split(" ");
 const connectionId="4".repeat(32),snapshotId="snapshot",schemaFingerprint="d".repeat(64);
 const catalog={status:"READY",connectionId,snapshotId,schemaFingerprint,objects:[["PRODUCTION","OMQ_ENTITY"],["CaseOwner","OmqTarget"]].map(([schema,name])=>({

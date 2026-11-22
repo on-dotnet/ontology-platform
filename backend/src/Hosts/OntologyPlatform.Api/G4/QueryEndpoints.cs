@@ -29,12 +29,16 @@ public static class QueryEndpoints
     }
 
     /// <summary>在身份、防伪和请求体之前建立单次 G4 截止；保留客户端断开的独立语义。</summary>
-    private static async Task<IResult> TransportAsync(HttpContext context, string policy,
+    internal static async Task<IResult> TransportAsync(HttpContext context, string policy,
         Func<ActorContext, CancellationToken, Task<IResult>> operation, bool validateCsrf)
     {
         // 保留传输提供的真实断开令牌，结束后归还原请求上下文。
         var disconnected = context.RequestAborted;
         using var deadline = new G4RequestDeadline(context.RequestServices.GetRequiredService<TimeProvider>(), disconnected);
+        // 只接受宿主配置与本次幂等键均为同一随机标识的正式 POST。
+        using var trace = StartOracleTrace(context, policy, deadline);
+        using var cancelled = trace is null ? default : disconnected.Register(() => G4OracleQueryTrace.Mark("requestCancel", "signal"));
+        using var expired = trace is null ? default : deadline.TimeoutToken.Register(() => G4OracleQueryTrace.Mark("requestDeadline", "signal"));
         context.RequestAborted = deadline.Token;
         try
         {
@@ -49,8 +53,53 @@ public static class QueryEndpoints
         }
         finally
         {
+            G4OracleQueryTrace.Mark("http", "returned");
             context.RequestAborted = disconnected;
         }
+    }
+
+    /// <summary>在已建立根期限后启用准确 POST 的内存诊断，响应结束后一次性导出白名单投影。</summary>
+    internal static G4OracleQueryTrace? StartOracleTrace(HttpContext context, string policy, G4RequestDeadline deadline)
+    {
+        if (policy != "data.query.execute" || !HttpMethods.IsPost(context.Request.Method)
+            || context.Request.Path != "/api/v1/data/semantic-queries" || !context.RequestServices.GetRequiredService<IHostEnvironment>().IsDevelopment())
+            return null;
+        // 每个受控查询使用独立的幂等键，同时作为只读采集时的文件标识。
+        var key = context.RequestServices.GetRequiredService<IConfiguration>()["G4:OracleDiagnosticKey"];
+        if (!Guid.TryParseExact(key, "N", out _) || !string.Equals(context.Request.Headers[IdempotencyHeader].ToString(), key, StringComparison.Ordinal))
+            return null;
+        // HTTP 请求的 trace 与平台关联码只允许规范的 32 个十六进制字符。
+        var traceId = System.Diagnostics.Activity.Current?.TraceId.ToString();
+        var correlation = context.Items["CorrelationId"] as string;
+        // 该根期限已经开始，注册与记录均消耗原请求时间。
+        var rootDeadline = deadline.DeadlineUtc;
+        var projection = new G4OracleQueryTrace();
+        G4OracleQueryTrace.Mark("http");
+        context.Response.OnCompleted(async () =>
+        {
+            try
+            {
+                // 宿主临时目录保存固定单个文件，消费者在移除该宿主前重开。
+                var path = Path.Combine(Path.GetTempPath(), "omq-events-" + key + ".json");
+                using var exportDeadline = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+                await using (var output = new FileStream(path + ".tmp", FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, true))
+                {
+                await System.Text.Json.JsonSerializer.SerializeAsync(output, new { generation = key,
+                    process = Environment.ProcessId, module = typeof(QueryEndpoints).Module.ModuleVersionId, rootDeadline,
+                    traceId = Guid.TryParseExact(traceId, "N", out _) ? traceId : null,
+                    correlation = Guid.TryParseExact(correlation, "N", out _) ? correlation : null,
+                    status = context.Response.StatusCode, source = projection.Snapshot() }, cancellationToken: exportDeadline.Token);
+                }
+                File.Move(path + ".tmp", path);
+            }
+            catch (Exception)
+            {
+                // 文件缺失或不完整由外层采集明确拒绝；响应已结束。
+                context.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("OracleDiagnosticExport")
+                    .LogWarning("OracleDiagnosticExportFailed");
+            }
+        });
+        return projection;
     }
 
     /// <summary>先身份与CSRF，再有界严格JSON；不把客户端header当作会话引用。</summary>

@@ -40,13 +40,14 @@ def state_args(prior, formal):
             'absent': ['ps', '-aq', '--no-trunc', *[v for api in apis for v in ('--filter', 'id=' + api)]]}
 
 
-def capture_closed_state():
+def capture_closed_state(*,normal=False):
     """在当前 PG-only 窗 finally 收口之后、退出该窗前采集准确五角色和四个 API ID。"""
     import workflow_oracle_mapping_resume as resume
-    require(w.policy()['priorCloseSha256'] == PREVIOUS, 'D368_CLOSE_WINDOW')
-    prior = w.last_close(w.ROOT, digest=PREVIOUS)
-    formal = w.last_close(w.ROOT, digest=seal.FORMAL)
-    return {name: resume.command('d368-post-' + name, argv)[1]
+    target=seal.target(normal)
+    require(w.policy()['priorCloseSha256'] == target.close, 'D368_CLOSE_WINDOW')
+    prior = w.last_close(w.ROOT, digest=target.close)
+    formal = w.last_close(w.ROOT, digest=target.close if normal else seal.FORMAL)
+    return {name: resume.command(target.prefix+'-post-' + name, argv)[1]
             for name, argv in state_args(prior, formal).items()}
 
 
@@ -150,11 +151,12 @@ def inventory(root, ref, running, archive):
     return admission
 
 
-def post_state(root,row,prior,pg_state,stop,archive):
-    formal=w.last_close(root,archive,digest=seal.FORMAL)
+def post_state(root,row,prior,pg_state,stop,archive,normal=False):
+    target=seal.target(normal)
+    formal=w.last_close(root,archive,digest=target.close if normal else seal.FORMAL)
     args=state_args(prior,formal)
     for key,argv in args.items():
-        cmd,out,_=c.command(root,ident(row['postState'][key]),RUN,[*DOCKER,*argv],'d368-post-'+key,ex.sha(ex.encoded(argv)),30,archive)
+        cmd,out,_=c.command(root,ident(row['postState'][key]),RUN,[*DOCKER,*argv],target.prefix+'-post-'+key,ex.sha(ex.encoded(argv)),30,archive)
         require(utc(stop['endedUtc']) <= utc(cmd['startedAtUtc']), 'D368_FINAL_ORDER')
         if key=='absent':
             require(not out.strip(), 'D368_FINAL_APIS')
@@ -166,49 +168,58 @@ def post_state(root,row,prior,pg_state,stop,archive):
             require(fields==[old['id'],'exited','0',start,end,'false',''],'D368_FINAL_STATE_'+role)
 
 
-def observations(root, phase, refs, archive):
+def observations(root, phase, refs, archive,normal=False):
+    target=seal.target(normal)
     import workflow_oracle_access_maintenance as old
-    row=old.ROW_SQL.replace(old.QUERY,seal.QUERY).replace('''\x27owner\x27,q."LeaseOwner"''',
+    row=old.ROW_SQL.replace(old.QUERY,target.query).replace('''\x27owner\x27,q."LeaseOwner"''',
         '''\x27ownerSha256\x27,encode(sha256(convert_to(q."LeaseOwner",\x27UTF8\x27)),\x27hex\x27)''')
-    receipts=f"""SELECT json_array_length(convert_from("BindingBytes",'UTF8')::json->'receipts') FROM semantic_query."Queries" WHERE "Id"='{seal.QUERY}';"""
+    receipts=f"""SELECT json_array_length(convert_from("BindingBytes",'UTF8')::json->'receipts') FROM semantic_query."Queries" WHERE "Id"='{target.query}';"""
     argv=[*DOCKER,'exec','-i','--user','postgres',PG,'psql','-XwqAt','-d','mapping','-v','ON_ERROR_STOP=1']
     values={}
     commands={}
-    for label,sql in [('row',row),('audit',old.AUDIT_SQL.replace(old.QUERY,seal.QUERY)),('receipts',receipts)]:
+    for label,sql in [('row',row),('audit',old.AUDIT_SQL.replace(old.QUERY,target.query)),('receipts',receipts)]:
         payload=b'BEGIN READ ONLY;\n'+sql.encode()+b'\nCOMMIT;'
-        cmd,out,_=c.command(root,ident(refs[label]),RUN,argv,'omq-pg-d368-'+phase+'-'+label,ex.sha(payload),15,archive)
+        cmd,out,_=c.command(root,ident(refs[label]),RUN,argv,'omq-pg-'+target.prefix+'-'+phase+'-'+label,ex.sha(payload),15,archive)
         values[label]=json.loads(out)
         commands[label]=cmd
+    if normal:
+        sql=f'''SELECT COALESCE(to_json("ErrorCode")::text,CHR(110)||CHR(117)||CHR(108)||CHR(108)) FROM semantic_query."Queries" WHERE "Id"='{target.query}';'''
+        payload=b'BEGIN READ ONLY;\n'+sql.encode()+b'\nCOMMIT;'
+        cmd,out,_=c.command(root,ident(refs['errorCode']),RUN,argv,'omq-pg-normal-'+phase+'-error-code',ex.sha(payload),15,archive)
+        values['errorCode']=json.loads(out)
+        commands['errorCode']=cmd
     return values,commands
 
 
-def verified_seal(root, row, key, archive):
+def verified_seal(root, row, key, archive,normal=False):
+    target=seal.target(normal)
     label='cold' if key=='beforeSeal' else 'pg'
-    name='d368-seal-'+label+'-'+row['operation']+'.json'
+    name=target.prefix+'-seal-'+label+'-'+row['operation']+'.json'
     require(row[key]==name,'D368_SEAL_NAME')
     seen=raw_json(root,AREA/name,archive)
-    require(seen['kind']=='DEDICATED_ORACLE_GENERATION_TERMINATED' and seen['queryId']==seal.QUERY and
-            seen['generationSha256']==seal.digest(seen['generation'])=='a617d1e838631e9f16b5e9bc65aa97842c3a85cfc7c9991137262a537881c3d0' and
-            seen['sealSha256']==seal.digest(seen['seal'])=='1d39291bc79d057dc310bdad98049442305aff73b236e4a004b4829d3890edb2' and
-            seen['originalsSha256']==seal.digest(seen['originals']) and seen['historical']['row']==seal.FROZEN_ROW and
+    require(seen['kind']=='DEDICATED_ORACLE_GENERATION_TERMINATED' and seen['queryId']==target.query and
+            seen['generationSha256']==seal.digest(seen['generation'])==target.generation_sha and
+            seen['sealSha256']==seal.digest(seen['seal'])==target.seal_sha and
+            seen['originalsSha256']==seal.digest(seen['originals']) and seen['historical']['row']==target.frozen and
             seen['live']['pgStartCommand']==(None if key=='beforeSeal' else row['pgStartCommand']) and seen['live']['matchingDrivers']==0,
             'D368_SEAL_BINDING')
     return seen
 
 
-def reopen_cas(root,row,pg_seal,pg_state,archive):
-    name='d368-recovery-'+row['operation']+'.json'
+def reopen_cas(root,row,pg_seal,pg_state,archive,normal=False):
+    target=seal.target(normal)
+    name=target.prefix+'-recovery-'+row['operation']+'.json'
     require(row['cas']==name, 'D368_CAS_NAME')
     receipt=raw_json(root,AREA/name,archive)
-    proof_path=AREA/('d368-proof-'+row['operation']+'.json')
+    proof_path=AREA/(target.prefix+'-proof-'+row['operation']+'.json')
     require(receipt['proofFile']==str(proof_path), 'D368_PROOF_PATH')
     proof_row=raw_json(root,proof_path,archive)
     proof=proof_row['proof']
     require((receipt['taskId'],receipt['runId'],receipt['batch'],receipt['status'],receipt['exitCode'],receipt['helperReleased'])==
             (TASK,RUN,w.BATCH,'TASK_LEVEL_RECOVERY',0,True) and
             receipt['operationId']==proof['operationId'] and receipt['attemptId']==proof['attemptId'] and
-            proof['queryId']==seal.QUERY and proof['sourceContainerId']==seal.SOURCE and proof['platformContainerId']==PG and
-            proof['failureAuditId']==seal.AUDIT_ID and proof['failureAuditSha256']==seal.AUDIT_SHA and
+            proof['queryId']==target.query and proof['sourceContainerId']==seal.SOURCE and proof['platformContainerId']==PG and
+            proof['failureAuditId']==target.audit and proof['failureAuditSha256']==target.audit_sha and
             proof['sealSha256']==pg_seal['sealSha256'] and proof['terminationProofSha256']==pg_seal['generationSha256'] and
             receipt['proofSha256']==proof_row['proofSha256']==ex.sha(ex.encoded(proof)), 'D368_CAS_PROOF')
     helper=receipt['helperId']
@@ -219,12 +230,14 @@ def reopen_cas(root,row,pg_seal,pg_state,archive):
     require(envelope==receipt['commitEnvelope'] and envelope['status']=='TASK_LEVEL_RECOVERY' and
             envelope['operationId']==proof['operationId'] and utc(proof['verifiedUtc']) <= utc(cmd['startedAtUtc']) <
             utc(cmd['endedAtUtc']) < utc(proof['validUntilUtc']), 'D368_CAS_COMMIT')
-    before,pre=observations(root,'before',receipt['before'],archive)
-    after,post=observations(root,'after',receipt['after'],archive)
-    require(before['row']==seal.FROZEN_ROW and after['row']==dict(seal.FROZEN_ROW,ownerSha256=None,leaseUntilUtc=None) and
+    before,pre=observations(root,'before',receipt['before'],archive,normal)
+    after,post=observations(root,'after',receipt['after'],archive,normal)
+    require(before['row']==target.frozen and after['row']==dict(target.frozen,ownerSha256=None,leaseUntilUtc=None) and
             before['receipts']==after['receipts']==0 and len(before['audit'])==1 and len(after['audit'])==2 and
-            before['audit'][0]['id']==seal.AUDIT_ID and before['audit'][0]['sha256']==seal.AUDIT_SHA and
+            before['audit'][0]['id']==target.audit and before['audit'][0]['sha256']==target.audit_sha and
             before['audit'][0] in after['audit'], 'D368_CAS_POST')
+    if normal:
+        require(before['errorCode']==after['errorCode'],'NORMAL_ERROR_CHANGED')
     added,=[a for a in after['audit'] if a!=before['audit'][0]]
     require([added[k] for k in ('action','outcome','actor','trace','correlation','organization','sites')]==[
             'data.query.cleanup.recover','allowed',proof['operatorId'],proof['operationId'],proof['attemptId'],'org-demo',['site-a']],
@@ -243,37 +256,39 @@ def reopen_cas(root,row,pg_seal,pg_state,archive):
 
 def reopen(root,entry,prior,archive=None):
     """按维护后继的精确摘要重开，在此前正式宿主到下一正式宿主之间追加一个 PG 停机边。"""
+    normal=entry.get('kind')=='NORMAL_PG_ONLY'
+    target=seal.target(normal)
     local=SimpleNamespace(paths={},examined={})
     operation=ident(entry['operation'])
-    path=AREA/('d368-pg-only-'+operation+'.json')
+    path=AREA/(target.prefix+'-pg-only-'+operation+'.json')
     raw=c.raw(root,path,local)
     require(len(raw)==entry['sizeBytes'] and ex.sha(raw)==entry['sha256'],'WINDOW_LAST_CLOSE_ORIGINAL')
     row=json.loads(raw)
     require((row['taskId'],row['runId'],row['batch'],row['planId'],row['operation'],row['priorCloseSha256'],row['queryId']) ==
-            (TASK,RUN,w.BATCH,PLAN,operation,PREVIOUS,seal.QUERY) and
-            entry['previousSha256']==PREVIOUS and row['status'] in ('TASK_LEVEL_RECOVERY','BLOCKED') and
+            (TASK,RUN,w.BATCH,PLAN,operation,target.close,target.query) and
+            entry['previousSha256']==target.close and row['status'] in ('TASK_LEVEL_RECOVERY','BLOCKED') and
             row['status']==entry['status'], 'D368_CLOSE_SCOPE')
     win=raw_json(root,AREA/('window-'+ident(row['windowId'])+'.json'),local)
     require((win['state'],win['id'],win['taskId'],win['runId'],win['batch'],win['plan'],win['priorCloseSha256'],win['coldAttempt']) ==
-            ('CLOSED',row['windowId'],TASK,RUN,w.BATCH,PLAN,PREVIOUS,row['cold']) and win['ceiling']==w.choose(win['openingBytes']),
+            ('CLOSED',row['windowId'],TASK,RUN,w.BATCH,PLAN,target.close,row['cold']) and win['ceiling']==w.choose(win['openingBytes']),
             'D368_WINDOW')
     cold=inventory(root,row['cold'],[],local)
     post=inventory(root,row['post'],[],local)
     state,start,stop=reopen_native(root,row,prior,local)
     require(utc(cold['endedUtc']) <= utc(start['startedAtUtc']) < utc(state['FinishedAt']) <= utc(post['startedUtc']),
             'D368_ADMISSION_ORDER')
-    post_state(root,row,prior,state,stop,local)
-    cold_seal=verified_seal(root,row,'beforeSeal',local)
+    post_state(root,row,prior,state,stop,local,normal)
+    cold_seal=verified_seal(root,row,'beforeSeal',local,normal)
     require(utc(cold_seal['verifiedUtc']) <= utc(start['startedAtUtc']), 'D368_COLD_SEAL_ORDER')
     if row.get('pgSeal') is not None:
-        pg_seal=verified_seal(root,row,'pgSeal',local)
+        pg_seal=verified_seal(root,row,'pgSeal',local,normal)
         require(utc(state['StartedAt']) <= utc(pg_seal['verifiedUtc']) <= utc(stop['startedUtc']) and
                 pg_seal['live']['states'][PG]['startedAt']==state['StartedAt'], 'D368_PG_SEAL_ORDER')
     if row['status']=='TASK_LEVEL_RECOVERY':
         require(row.get('pgSeal') is not None, 'D368_CAS_WITHOUT_SEAL')
-        reopen_cas(root,row,pg_seal,state,local)
+        reopen_cas(root,row,pg_seal,state,local,normal)
     elif row.get('cas'):
-        require(row['cas']=='d368-recovery-'+operation+'.json', 'D368_FAILED_CAS_NAME')
+        require(row['cas']==target.prefix+'-recovery-'+operation+'.json', 'D368_FAILED_CAS_NAME')
         # 失败或未知回执只留作证据，永不取得后继产品窗准入。
         c.raw(root,AREA/row['cas'],local)
     members={p:local.examined[k] for k,p in local.paths.items()}
@@ -290,25 +305,26 @@ def reopen(root,entry,prior,archive=None):
     return normalized,len(members),index
 
 
-def publish_d368_pg_close(operation):
+def publish_d368_pg_close(operation,*,normal=False):
     """唯一 Master 在退出窗口后登记；同一组原件幂等，原件不全时保留关闭文件。"""
     from workflow_oracle_mapping_platform import save
+    target=seal.target(normal)
     root=w.ROOT
     op=ident(operation)
     require(not w.ACTIVE.get() and os.environ.get('OMQ_PRODUCT_RUN')==RUN, 'D368_PUBLISH_SCOPE')
     registry_path=ex.ordinary(root/'scripts/maintenance/workflow-oracle-runtime-close-registry.json')
     initial=registry_path.read_bytes()
     registry=json.loads(initial)
-    path=AREA/('d368-pg-only-'+op+'.json')
+    path=AREA/(target.prefix+'-pg-only-'+op+'.json')
     data=c.raw(root,path)
     row=json.loads(data)
     digest=ex.sha(data)
     if registry['currentSha256']==digest:
         w.last_close(root,digest=digest)
         return w.close_registration(digest)
-    require(registry['currentSha256']==PREVIOUS and w.close_registration()['kind']=='MAPPING_RESTORE', 'D368_PUBLISH_PREVIOUS')
-    entry=dict(kind=KIND,operation=op,queryId=seal.QUERY,previousSha256=PREVIOUS,sha256=digest,sizeBytes=len(data),status=row['status'])
-    _,count,index=reopen(root,entry,w.last_close(root,digest=PREVIOUS))
+    require(registry['currentSha256']==target.close and (normal or w.close_registration()['kind']=='MAPPING_RESTORE'), 'D368_PUBLISH_PREVIOUS')
+    entry=dict(kind='NORMAL_PG_ONLY' if normal else KIND,operation=op,queryId=target.query,previousSha256=target.close,sha256=digest,sizeBytes=len(data),status=row['status'])
+    _,count,index=reopen(root,entry,w.last_close(root,digest=target.close))
     entry.update(memberCount=count,memberIndexSha256=index)
     require(registry_path.read_bytes()==initial, 'D368_PUBLISH_CHANGED')
     registry['generations'].append(entry)

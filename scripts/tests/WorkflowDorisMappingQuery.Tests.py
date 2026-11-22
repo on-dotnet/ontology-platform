@@ -141,7 +141,37 @@ class DorisReferenceTests(unittest.TestCase):
         from workflow_execution import sha
 
         self.assertEqual(consumer.E1_RUN, 'review-fix-02')
-        root=workflow.ROOT
+        import subprocess
+        import tempfile
+        import workflow_m2_build as build
+        import workflow_m4_query as query
+        from contextlib import ExitStack
+
+        # 临时仓库只读共享 Git 对象，检出测试实际消费的历史文件。
+        stack = self.enterContext(ExitStack())
+        root = Path(stack.enter_context(tempfile.TemporaryDirectory())).resolve()
+        revision = '698ca0e2e4c5b50659e02637c77473e32bc1a343'
+        product = '9780c8f91cd084c1df11c604186d22d7f08f3023'
+        def git(*args, cwd=root):
+            return subprocess.check_output(['git', *args], cwd=cwd)
+        git('cat-file', '-e', product+'^{commit}', cwd=workflow.ROOT)
+        objects = git('rev-parse','--path-format=absolute','--git-path','objects',cwd=workflow.ROOT).decode().strip()
+        git('init','-q')
+        (root/'.git/objects/info/alternates').write_text(objects+'\n')
+        inputs = ['backend','apps/web','scripts','docs/contracts/g4-connections.openapi.json',
+                  'docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-01',
+                  'docs/evidence/G4-DORIS-MAPPING-QUERY-001/review-fix-02',
+                  'docs/evidence/G4-DORIS-MAPPING-QUERY-001/implementation-01/s3/prepare.json',
+                  'Directory.Build.props','Directory.Packages.props','global.json','NuGet.Config',
+                  'package.json','pnpm-lock.yaml','pnpm-workspace.yaml','.node-version']
+        listing = git('ls-tree','-rlz',revision,'--',*inputs)
+        total = sum(int(entry.split(b'\t',1)[0].split()[-1]) for entry in listing.split(b'\0') if entry)
+        self.assertLess(total, 20*1024**2)
+        git('update-ref','HEAD',revision)
+        git('read-tree',revision)
+        git('checkout',revision,'--',*inputs)
+        stack.enter_context(patch.object(build,'ROOT',root))
+        stack.enter_context(patch.object(query,'ROOT',root))
         public=root/'docs/evidence/G4-DORIS-MAPPING-QUERY-001'
         history=public/'review-fix-01/current-inputs.json'
         selected=public/consumer.E1_RUN/'selected.json'
@@ -200,6 +230,18 @@ class DorisReferenceTests(unittest.TestCase):
             self.assertIn(cid,former['readinessCommands'].values())
             reject(label,history,[(cid+'-receipt.json',['inputFingerprint'],empty_digest)],'RF02_HISTORICAL_ORIGINAL')
         reject('e2-control',history,[('628055b05b084b2393307ecc8b5029c9-receipt.json',['inputFingerprint'],empty_digest)],'RF_E2_EXECUTION')
+        changed = 'backend/src/Contracts/OntologyPlatform.Contracts/G4MappingRules.cs'
+        new_bytes = git('show','c44c6294e31ee990b068d2e95bfce9a7476be397:'+changed,cwd=workflow.ROOT)
+        self.assertNotEqual((root/changed).read_bytes(), new_bytes)
+        (root/changed).write_bytes(new_bytes)
+        git('add','--',changed)
+        tree = git('write-tree').decode().strip()
+        candidate = git('-c','user.name=Fixture','-c','user.email=fixture@localhost',
+                        'commit-tree',tree,'-p',revision,'-m','Change bound backend input').decode().strip()
+        git('update-ref','HEAD',candidate,revision)
+        with self.assertRaisesRegex(ValueError,'^RF_PRODUCT_REVISION$'):
+            consumer.qualify_review_fix('interaction',workflow.input_key(root,'interaction'),history.parent)
+
 
     def test_last_microsecond_is_preserved(self):
         self.assertEqual(fixture_instant('2026-11-17 12:00:00.123459'), '2026-11-17T12:00:00.123459Z')

@@ -906,6 +906,37 @@ class S2ConsumerTests(unittest.TestCase):
         self.assertIn('COMMIT; SELECT to_jsonb(g)',sql);self.assertEqual(sql.count('UPDATE governance."MappingAuthorizationGrants"'),1)
 
 
+class RecoveryHelperTests(unittest.TestCase):
+    def test_created_cleanup_requires_original_owner_and_no_start(self):
+        import workflow_oracle_access_maintenance as maintenance
+        helper='1'*64
+        attempt='2'*32
+        fields=[helper,maintenance.resume.platform.IMAGES['api'],maintenance.TASK,maintenance.RUN,
+                attempt,'created','0','0001-01-01T00:00:00Z','0']
+        for mutation in (None,(0,'wrong'),(2,'foreign'),(4,'old'),(6,'101'),(7,'started'),(8,'1')):
+            identity=fields.copy()
+            if mutation:
+                identity[mutation[0]]=mutation[1]
+            receipt=dict(attemptId=attempt)
+            commands=[]
+            def call(stage,args,cleanup):
+                self.assertTrue(cleanup)
+                commands.append(stage)
+                if stage=='recovery-exit': return 'created|0|false','exit'
+                if stage=='recovery-created-owner': return '|'.join(identity),'ownership'
+                if stage=='recovery-remove': self.assertEqual(args[-2:],['rm',helper])
+                return '',stage
+            with self.subTest(mutation=mutation),patch.object(maintenance,'command',call),patch.object(maintenance,'save'):
+                if mutation:
+                    with self.assertRaisesRegex(ValueError,'S23_ACCESS_CREATED_OWNER'):
+                        maintenance.release_recovery_helper(helper,None,receipt)
+                    self.assertNotIn('recovery-remove',commands)
+                else:
+                    maintenance.release_recovery_helper(helper,None,receipt)
+                    self.assertTrue(receipt['helperReleased'])
+                    self.assertEqual(commands[-2:],['recovery-remove','recovery-absent'])
+
+
 class S2CapacityTests(unittest.TestCase):
     def test_original_budget_program_and_global_bindings_remain_exact(self):
         import workflow_oracle_mapping_capacity as capacity
@@ -1201,9 +1232,15 @@ class S2ReadinessTests(unittest.TestCase):
         report['scenarioReady']=dict(session=dict(observations=[dict(subjectId=reader,sessionHash='3'*64)]))
         report['seedCatalogReadiness']=dict(queryId=fresh,actor=reader,raw=raw,sha256=digest)
         report['oracleCases']=[dict(name='aba-runtime-seed',queryId=fresh,query=q,raw=raw,sha256=digest,bytes=len(raw),httpStatus=200)]
-        report['http'].extend([dict(method='GET',path=path+'/'+old+'/result',status=410,sha256=ex.sha(error.encode()),subjectId=reader,elapsedMs=1,code='result_expired'),
-            dict(method='POST',path=path,status=200,selectionQueryId=None,subjectId=reader,query=q,queryId=fresh,sha256=digest),
-            dict(method='GET',path=path+'/'+fresh+'/result',status=200,sha256=digest,subjectId=reader,elapsedMs=2)])
+        import subprocess
+        transport=[dict(method='GET',path=path+'/'+old+'/result',status=410,raw=error),
+                   dict(method='POST',path=path,status=200,raw=raw,queryId=fresh),
+                   dict(method='GET',path=path+'/'+fresh+'/result',status=200,raw=raw)]
+        fixture=Path(__file__).with_name('WorkflowOracleReadyFixture.mjs')
+        run=subprocess.run(['node',str(fixture),str(ROOT),'catalog-http'],cwd=ROOT,
+                           input=json.dumps(dict(transport=transport,reader=reader,old=old,query=q)),
+                           text=True,capture_output=True,check=True,timeout=10)
+        report['http'].extend(json.loads(run.stdout))
         events=[dict(owner=o,table=t,action='SELECT',code=0) for o,t in [('CaseOwner','OmqTarget'),('PRODUCTION','OMQ_ENTITY')]]
         for i,(name,records) in enumerate([('oracle-current-catalog-readiness',[]),('aba-runtime-seed',events),('oracle-current-seed-catalog-readiness',[])],1):
             report['oracleWindows'].append(dict(name=name,expectedReads=len(records),audit=dict(clientId=None,records=records),

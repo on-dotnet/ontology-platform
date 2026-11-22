@@ -1,5 +1,6 @@
 """正式 Oracle 恢复窗口：原五副本、两个无状态 API 与现有阶段资源核验。"""
 import json
+import os
 import re
 import uuid
 from pathlib import Path
@@ -231,6 +232,10 @@ def prepare():
     binding,row,snap=builds['api']
     spec['name']=PROJECT
     spec['networks']={k:{'external':True,'name':v} for k,v in net_names().items()}
+    diagnostic_key=os.environ.get('OMQ_NORMAL_DIAGNOSTIC_KEY')
+    if diagnostic_key is not None:
+        require(re.fullmatch('[0-9a-f]{32}',diagnostic_key) and os.environ.get('OMQ_PRODUCT_RUN')==PRODUCT,'NORMAL_DIAGNOSTIC_SCOPE')
+        spec['services']['api']['environment']['G4__OracleDiagnosticKey']=diagnostic_key
     for role,service in spec['services'].items():
         service['labels']['ontology.run']=PRODUCT
         service['environment'].update({name:'false' for name in ('Governance__ApplyMigrations','Governance__SeedDevelopmentResources','G2__ApplyMigrations','G4__ApplyMigrations')})
@@ -249,6 +254,8 @@ def prepare():
     input_bytes=(json.dumps(inp,indent=2)+'\n').encode()
     registration=dict(taskId=TASK,runId=PRODUCT,project=PROJECT,ids=ids,networks=nets,snapshotId=snap['snapshotId'],
                       apiBuildId=row['commandId'],buildOutputKey=binding['outputKey'],inputsSha256=ex.sha(input_bytes))
+    if diagnostic_key:
+        registration['normalDiagnosticKey']=diagnostic_key
     unchanged=previous and all(previous.get(key)==value for key,value in registration.items())
     registration['admission']=previous['admission'] if unchanged else admission['attempt']
     registry_bytes=(json.dumps(registration,indent=2)+'\n').encode()
@@ -316,12 +323,13 @@ def host_binding():
         if role=='fuseki':recovery.require_current_fuseki(cid,started,int(pid))
         if role in APIS:platform.snapshots.demand_mount(ROOT,snap,json.loads(mounts),task=TASK,run_id=PRODUCT)
         if role=='api-secondary':
-            snapshot_id=inp.get('sessionSnapshotId','')
-            require(re.fullmatch('[0-9a-f]{64}',snapshot_id),'PRODUCT_SESSION_SNAPSHOT_ID')
-            expected=str(AREA/'runtime-snapshots'/snapshot_id)
-            session=[m for m in json.loads(mounts) if m['Destination']=='/session-tests' or m['Destination'].startswith('/session-tests/')]
-            require(len(session)==1 and session[0]['Destination']=='/session-tests' and session[0]['RW'] is False
-                    and session[0]['Source'].removeprefix('/host_mnt')==expected,'PRODUCT_SESSION_LIVE_MOUNT')
+            for destination, field in (('/query-tests','querySnapshotId'),('/session-tests','sessionSnapshotId')):
+                snapshot_id=inp.get(field,'')
+                require(re.fullmatch('[0-9a-f]{64}',snapshot_id),'PRODUCT_TEST_SNAPSHOT_ID')
+                expected=str(AREA/'runtime-snapshots'/snapshot_id)
+                mounts_at_path=[m for m in json.loads(mounts) if m['Destination']==destination or m['Destination'].startswith(destination+'/')]
+                require(len(mounts_at_path)==1 and mounts_at_path[0]['Destination']==destination and mounts_at_path[0]['Type']=='bind'
+                        and mounts_at_path[0]['RW'] is False and mounts_at_path[0]['Source'].removeprefix('/host_mnt')==expected,'PRODUCT_TEST_LIVE_MOUNT')
         services[role]=dict(containerId=cid,imageId=image,pid=int(pid),startedAt=started,mountSha256=ex.sha(ex.encoded(json.loads(mounts))),networks=networks)
     require(inp['composeSha256']==ex.sha((AREA/'formal-api-compose.json').read_bytes()) and inp['relaySha256']==ex.sha((BASE/'formal-relay/OracleRelay.dll').read_bytes()),'PRODUCT_INPUT_DRIFT')
     return dict(taskId=TASK,runId=PRODUCT,ports=platform.PORTS,commandId=result.receipt['commandId'],snapshotId=inp['snapshotId'],
@@ -489,12 +497,141 @@ def start_api(role):
     return row
 
 
+def reopen_normal_projection(raw,key):
+    """验证准确请求的有界字段和本进程时基，返回经过重开的完整记录。"""
+    from datetime import datetime
+    require(len(raw)<=65536 and re.fullmatch('[a-f0-9]{32}',key),'NORMAL_PROJECTION_SIZE')
+    value=json.loads(raw)
+    require(set(value)=={'generation','process','module','rootDeadline','traceId','correlation','status','source'} and
+            value['generation']==key and type(value['process']) is int and value['process']>0 and
+            all(re.fullmatch('[0-9a-f]{32}',value[k] or '') for k in ('traceId','correlation')) and
+            uuid.UUID(value['module']) and type(value['status']) is int,'NORMAL_PROJECTION_IDENTITY')
+    require(isinstance(value['rootDeadline'],str) and datetime.fromisoformat(value['rootDeadline']).utcoffset() is not None
+            and 100<=value['status']<=599,'NORMAL_ROOT_DEADLINE')
+    source=value['source']
+    require(set(source)=={'queryId','firstFailure','firstSignal','dropped','frequency','events'} and
+            re.fullmatch('query-[0-9a-f]{32}',source['queryId'] or '') and source['dropped']==0 and
+            type(source['frequency']) is int and source['frequency']>0 and 1<=len(source['events'])<=160,'NORMAL_PROJECTION_INCOMPLETE')
+    names=set('http initialLease permit permitCheck tls openCheck open permitReturn sessionTag readOnly catalog session transaction declareReadOnly execute commit rollback disposeTransaction postcheck disposeConnection observer cleanupStart cleanup workCutoff readerCutoff leaseTimeout leaseException formalCancel leaseInactive requestCancel requestDeadline branch acquisition source EXECUTE EOF NATIVE_1013 CANCEL_ENTER CANCEL_RETURN CANCEL_REJECT PHYSICAL_RELEASE'.split())
+    last=-1
+    for event in source['events']:
+        require(set(event)=={'stage','outcome','tick','remainingTicks','cleanupTicks','execution','acquisition','budgetTicks','originTick','session'}
+                and event['stage'] in names and event['outcome'] in ('enter','returned','failed','cancelled','unconfirmed','confirmed','signal')
+                and type(event['tick']) is int and event['tick']>=last and all(event[k] is None or type(event[k]) is int for k in ('remainingTicks','cleanupTicks','budgetTicks','originTick'))
+                and (event['session'] is None or (event['stage']=='session' and len(event['session'])==5 and all(type(v) is int and 0<v<2**64 for v in event['session'])))
+                and (event['execution'] is None or re.fullmatch('[a-f0-9]{32}',event['execution']))
+                and (event['acquisition'] is None or str(uuid.UUID(event['acquisition']))==event['acquisition']),'NORMAL_PROJECTION_EVENT')
+        last=event['tick']
+    events=source['events']
+    require(events[0]['stage']=='http' and events[0]['outcome']=='enter' and type(events[0]['remainingTicks']) is int and 0<=events[0]['remainingTicks']<=50000000 and source['firstFailure']==next((e['stage']+'.'+e['outcome'] for e in events if e['outcome'] in ('failed','cancelled')),None)
+            and source['firstSignal']==next((e['stage'] for e in events if e['outcome']=='signal'),None),'NORMAL_PROJECTION_FIRST')
+    return value
+
+
+def qualify_normal_projection(raw,key,*,query_id,trace_id,correlation,status,module,process,audit):
+    """外层只用独立 HTTP、PG、宿主与源审计签当前请求；缺失投影仍可单独保全。"""
+    value=reopen_normal_projection(raw,key)
+    source=value['source']
+    require((source['queryId'],value['traceId'],value['correlation'],value['status'],value['module'],value['process'])
+            ==(query_id,trace_id,correlation,status,module,process),'NORMAL_WRONG_REQUEST')
+    events=source['events']
+    require(events[-1]['stage']=='http' and events[-1]['outcome']=='returned','NORMAL_INCOMPLETE_HTTP')
+    branches=[e for e in events if e['stage']=='branch' and e['outcome']=='enter']
+    require(1<=len(branches)<=2 and all(b['execution'] for b in branches) and len({b['execution'] for b in branches})==len(branches),
+            'NORMAL_BRANCH_IDENTITIES')
+    if status!=200:
+        require(source['firstFailure'] or source['firstSignal'],'NORMAL_NO_FIRST_CAUSE')
+        covered=[]
+        for branch in branches:
+            rows=[e for e in events if e['execution']==branch['execution']]
+            pairs=[(e['stage'],e['outcome']) for e in rows]
+            require(('initialLease','enter') in pairs,'NORMAL_NO_LEASE')
+            for index,event in enumerate(rows):
+                if event['outcome'] in ('failed','cancelled'):
+                    require((event['stage'],'enter') in pairs[:index],'NORMAL_UNOPENED_STAGE')
+            if ('initialLease','returned') in pairs and not (('observer','enter') not in pairs and any(e['stage'] in ('formalCancel','leaseInactive') for e in rows)):
+                require(('observer','enter') in pairs and ('observer','returned') in pairs
+                        and rows[-1]['stage']=='cleanup','NORMAL_INCOMPLETE_RELEASE')
+            prefix='initialLease permit acquisition permitCheck tls openCheck open permitReturn sessionTag readOnly catalog session transaction declareReadOnly'.split()
+            for index,stage in enumerate(prefix[1:],1):
+                if any(e['stage']==stage for e in rows):
+                    position=next(n for n,e in enumerate(rows) if e['stage']==stage)
+                    require(all((p,'returned') in pairs[:position] for p in prefix[:index]),'NORMAL_SOURCE_PREFIX')
+            native=[a for a in audit if a['clientId']==branch['execution']]
+            if native:
+                sessions=[e['session'] for e in rows if e['stage']=='session' and e['session']]
+                require(len(native)==len(sessions)==1 and ('EXECUTE','returned') in pairs and
+                        int(native[0]['instance'])==sessions[0][0] and int(native[0]['session'])==sessions[0][3],
+                        'NORMAL_FAILURE_NATIVE')
+            covered.extend(native)
+        require(len(covered)==len(audit),'NORMAL_UNRELATED_READ')
+        return dict(status='FAILURE_TRACED',firstFailure=source['firstFailure'],firstSignal=source['firstSignal'])
+    require(len(branches)==2 and len(audit)==2 and source['firstFailure'] is None and source['firstSignal'] is None,'NORMAL_SUCCESS_BRANCHES')
+    metrics=[]
+    required='initialLease permit acquisition permitCheck tls openCheck open permitReturn sessionTag readOnly catalog session transaction declareReadOnly EXECUTE EOF execute commit disposeTransaction postcheck disposeConnection PHYSICAL_RELEASE observer cleanup'.split()
+    for index,branch in enumerate(branches):
+        rows=[e for e in events if e['execution']==branch['execution']]
+        observed=[e for e in rows if e['outcome'] in ('returned','confirmed')]
+        offset=0
+        for stage in required:
+            while offset<len(observed) and observed[offset]['stage']!=stage:
+                offset+=1
+            require(offset<len(observed),'NORMAL_MISSING_'+stage)
+            offset+=1
+        acquisition=[e['acquisition'] for e in rows if e['stage']=='acquisition']
+        session=[e['session'] for e in rows if e['stage']=='session' and e['session']]
+        require(len(acquisition)==len(session)==1 and acquisition[0] and rows[-1]['stage']=='cleanup'
+                and rows[-1]['outcome']=='confirmed','NORMAL_RELEASE')
+        native=[a for a in audit if a['clientId']==branch['execution'] and a['action']=='SELECT' and a['code']==0]
+        require(len(native)==1 and (native[0]['owner'],native[0]['table'])==(('PRODUCTION','OMQ_ENTITY'),('CaseOwner','OmqTarget'))[index] and int(native[0]['instance'])==session[0][0] and int(native[0]['session'])==session[0][3],'NORMAL_NATIVE_ASSOCIATION')
+        starts=[e['originTick'] for e in rows if e['stage']=='cleanupStart' and e['acquisition']==acquisition[0]]
+        hz=source['frequency']
+        require(starts and branch['originTick']<=branch['tick'] and 0<branch['budgetTicks']<=10000000,'NORMAL_BUDGET_ORIGIN')
+        elapsed=rows[-1]['tick']-branch['originTick']
+        cleanup=rows[-1]['tick']-min(starts)
+        require(0<=cleanup*4<=hz and 0<=elapsed*10000000<=branch['budgetTicks']*hz,'NORMAL_BRANCH_BUDGET')
+        metrics.append(dict(execution=branch['execution'],acquisition=acquisition[0],elapsedTicks=elapsed,cleanupTicks=cleanup))
+    require(events[-1]['remainingTicks']>0 and {r['table'] for r in audit}=={'OMQ_ENTITY','OmqTarget'},'NORMAL_ROOT_BUDGET')
+    return dict(status='NORMAL_TRACE_VERIFIED',branches=metrics,frequency=source['frequency'])
+
+
+def export_normal_projection(cid,key):
+    """只读取准确宿主中已由 OnCompleted 原子发布的受限文件，不采集全量日志。"""
+    require(re.fullmatch('[a-f0-9]{64}',cid) and re.fullmatch('[a-f0-9]{32}',key),'NORMAL_EXPORT_ID')
+    # 最多两秒等待响应后导出，采集有自己的外层命令期限。
+    script='i=0; while [ ! -f "$1" ] && [ "$i" -lt 20 ]; do sleep 0.1; i=$((i+1)); done; test -f "$1" && head -c 65537 "$1"'
+    args=['exec',cid,'/bin/sh','-c',script,'normal-export','/tmp/omq-events-'+key+'.json']
+    receipt=dict(containerId=cid,requestKey=key,commandId=None,exitCode=None,status='COLLECTION_FAILED')
+    try:
+        result=ex.run(['docker','--context','desktop-linux',*args],ROOT,task=TASK,run_id=PRODUCT,
+                      stage='normal-api-export',timeout=5,input_key=ex.sha(ex.encoded(args)))
+        rec=result.receipt
+        receipt.update(commandId=rec['commandId'],exitCode=result.returncode)
+        require(result.returncode==0,'NORMAL_EXPORT_COMMAND')
+        directory=AREA.parent/'commands'/PRODUCT/rec['commandId']
+        raw=ex.ordinary(directory/'stdout.txt').read_bytes()
+        require(len(raw)==rec['stdout']['sizeBytes'] and ex.sha(raw)==rec['stdout']['sha256'],'NORMAL_EXPORT_STREAM')
+        projection=reopen_normal_projection(raw,key)
+        receipt.update(status='EXPORTED',queryId=projection['source']['queryId'],sha256=ex.sha(raw),sizeBytes=len(raw))
+    finally:
+        platform.save(AREA/'s2-s3-01'/('normal-export-'+cid+'-'+key+'.json'),receipt)
+    return receipt
+
+
 def release_api(role):
     """先向准确 API 进程发 TERM 并观察引擎自然退出，再只移除该无状态实例。"""
     require(role in APIS and role in manifest()['ids'],'PRODUCT_RELEASE_ROLE')
     cid=manifest()['ids'][role]
     before=admit(); actions=[]
     state,_=command('resume-close-state',['inspect','-f','{{.State.Status}}',cid])
+    collection_failure=None
+    exported=None
+    key=manifest().get('normalDiagnosticKey')
+    if role=='api' and key:
+        try:
+            exported=export_normal_projection(cid,key)
+        except Exception as failure:
+            collection_failure=failure
     if state=='running':
         _,sig=command('resume-api-term',['stop','--signal','TERM','--timeout','-1',cid],timeout=45)
         actions.append(sig)
@@ -504,6 +641,15 @@ def release_api(role):
         require(out in ('exited 0 false','exited 143 false'),'PRODUCT_API_SHUTDOWN')
     else:
         require(state=='created','PRODUCT_API_CLOSED_STATE')
+    if exported is not None:
+        try:
+            raw=ex.ordinary(AREA.parent/'commands'/PRODUCT/exported['commandId']/'stdout.txt').read_bytes()
+            require(len(raw)==exported['sizeBytes'] and ex.sha(raw)==exported['sha256'],'NORMAL_DRAIN_EXPORT_BYTES')
+            reopen_normal_projection(raw,key)
+        except Exception as failure:
+            collection_failure=failure
+            exported['status']='DRAIN_REOPEN_FAILED'
+            platform.save(AREA/'s2-s3-01'/('normal-export-'+cid+'-'+key+'.json'),exported)
     # 复核准确无状态容器后按授权删除，无 force/卷参数。
     _,removed=command('resume-remove-stateless',['rm',cid]);actions.append(removed)
     remaining,_=command('resume-absent',['ps','-a','--no-trunc','--filter','id='+cid,'--format','{{.ID}}'])
@@ -511,3 +657,5 @@ def release_api(role):
     row=manifest();del row['ids'][role];save_manifest(row)
     post=admit()
     save_api_observation('removed',role,dict(id=cid,pre=before['attempt'],post=post['attempt'],commands=actions))
+    if collection_failure is not None:
+        raise ValueError('NORMAL_EXPORT_FAILED_AFTER_SAFE_RELEASE') from collection_failure

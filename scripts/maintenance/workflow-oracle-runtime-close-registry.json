@@ -3,7 +3,7 @@
   "runId": "product-resume-01",
   "batch": "s2-s3-01",
   "planId": "s2-s3-01-runtime-01",
-  "currentSha256": "d5598f018a72a3b22eec696cc3d2d85090882d03b11440d9442484103d0aa1ff",
+  "currentSha256": "b4a5acc7e4de1d788e666b44e125b642a338024b7d2000c44a8ace4820d4d430",
   "generations": [
     {
       "operation": "330c11744f364d1187332e0d93801098",
@@ -256,6 +256,72 @@
       },
       "memberCount": 598,
       "memberIndexSha256": "d80649cec9e1e98ed21ab47d7e717f5b0a6a99833732cfa8b3e311a31c70d5f9"
+    },
+    {
+      "operation": "c35242b898c04ae3ad5529ba346d320f",
+      "sha256": "a3839fe8ebb6e418e42e2280d1d6044acd7a1a4f3f65babdc8f13b8c7d055348",
+      "sizeBytes": 7735,
+      "previousSha256": "d5598f018a72a3b22eec696cc3d2d85090882d03b11440d9442484103d0aa1ff",
+      "parentId": "4032c1d770b240989966ba3275d86999",
+      "parentSha256": "4f4f5140df959c608f2eab08c0fae71e0a6346a8b72b5773a3187c16d9f7480a",
+      "exitCode": 1,
+      "nativeStops": {
+        "oracle": [
+          "60e88dfd168a44a1b4de64111e7c9864",
+          "fa04a5c3408645faa78fbcc283ac3847",
+          "4944ef11156e4789a871a14261cdc8ac",
+          "3c1cfddb90af4b55bc718aaee675d4d1"
+        ],
+        "rustfs": [
+          "8292917125af42919757f8a6099e46f6",
+          "f73113694f224231925324ae882e1367",
+          "1aad7a5bf55f495386912a71ae3fc172"
+        ],
+        "keycloak-test": [
+          "584a7ebc11704a36947df92ddde16381",
+          "66e2b44f44c046aaa212dca95b3a457f",
+          "0dbabe08ce374dcd8affed387bc310e6"
+        ],
+        "fuseki": [
+          "b68a613d3779411bb3eb16878722ed9f",
+          "e028091098cf42c482c16312c3bc7239",
+          "fd4218b2305e4a8698fa0c6964e2b463",
+          "5abf4462bd4f4e77bdbbd07ae56e824c"
+        ],
+        "platform-pg": [
+          "dbdbe2fd717048f3889698f1ee2cf80f",
+          "3d71fad7d4774ea892a7b9f97387ad5f",
+          "b2f2d02330774d11a712c4f2ecaa15bf",
+          "21363db86767490dad6a93e30cf9a496"
+        ]
+      },
+      "apiStops": {
+        "api": [
+          "d6a755f672ca464d869e7eb888f555ed",
+          "3032993f30ad4413bb63800594281bab",
+          "03584970ea904a8cb2bb4d2de80d561d",
+          "4853303573864be3924d6900f2a31e89"
+        ],
+        "api-secondary": [
+          "de1dc6d56a3d40429c15d9ed8788631e",
+          "c17d738b2ab54a998e59b282107d3799",
+          "0c6376d70e0f428e89caf8922a1706f3",
+          "84035b9c0d4d4bf194b1ad1444ab01b4"
+        ]
+      },
+      "memberCount": 88,
+      "memberIndexSha256": "b34069c6cfd3ecf37cf0048e1c51f18c2b5cdcb962b21a8e94b3a7b536a3f71c"
+    },
+    {
+      "kind": "NORMAL_PG_ONLY",
+      "operation": "06d1eefe38a64540b549ded9e3ce2c63",
+      "queryId": "query-f1599097a7274c20b82cbf0dfcea4e2b",
+      "previousSha256": "a3839fe8ebb6e418e42e2280d1d6044acd7a1a4f3f65babdc8f13b8c7d055348",
+      "sha256": "b4a5acc7e4de1d788e666b44e125b642a338024b7d2000c44a8ace4820d4d430",
+      "sizeBytes": 1810,
+      "status": "TASK_LEVEL_RECOVERY",
+      "memberCount": 191,
+      "memberIndexSha256": "10e1b70d17be4a05d5314251298479956a705c1aebbf2bdb4df476e77a1f6c27"
     }
   ]
 }

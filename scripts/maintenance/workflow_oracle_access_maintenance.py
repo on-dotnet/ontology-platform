@@ -353,7 +353,7 @@ def run_recovery_helper(row,path,file,verify_before,*,generation=False):
         'printf "Host=platform-pg;Port=5432;Database=mapping;Username=postgres;SSL Mode=VerifyFull;Root Certificate=/ca;Password=%s" '
         '"$(cat /auth)" > /tmp/maintenance.dsn; exec dotnet /app/OntologyPlatform.Api.dll --recover-omq-s23-access')
     if generation:
-        script=script.replace('--recover-omq-s23-access','--recover-omq-s23-d368')
+        script=script.replace('--recover-omq-s23-access','--recover-omq-normal' if proof['proofKind']=='NORMAL_GENERATION' else '--recover-omq-s23-d368')
     args=[*DOCKER,'create','--pull=never','-i','--network',resume.net_names()['platform-internal'],'--read-only','--user',str(os.getuid())+':'+str(os.getgid()),
         '--memory=512m','--memory-swap=512m','--cpus=.5','--pids-limit=128','--security-opt=no-new-privileges','--cap-drop=ALL',
         '--tmpfs','/tmp:rw,nosuid,nodev,size=32m,mode=1777','--label','ontology.task='+TASK,'--label','ontology.run='+RUN,'--label','ontology.attempt='+attempt,
@@ -372,37 +372,64 @@ def run_recovery_helper(row,path,file,verify_before,*,generation=False):
         receipt['actualCommandId']=result.receipt['commandId'];receipt['exitCode']=result.returncode;save(file,receipt)
         require(result.returncode==0 and (not result.stderr or (len(result.stderr)==127 and ex.sha(result.stderr)=='6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d')),'S23_ACCESS_RECOVERY_FAILED');receipt['commitEnvelope']=json.loads(result.stdout)
         require(receipt['commitEnvelope']['status']=='TASK_LEVEL_RECOVERY' and receipt['commitEnvelope']['operationId']==proof['operationId'],'S23_ACCESS_RECOVERY_OUTCOME')
-    finally:
-        state,cid=command('recovery-exit',[*DOCKER,'inspect','-f','{{.State.Status}}|{{.State.ExitCode}}|{{.State.OOMKilled}}',helper],cleanup=True);receipt['exitCommandId']=cid;save(file,receipt)
-        if state.startswith('running|'):
-            command('recovery-term',[*DOCKER,'stop','--signal','TERM','--timeout','-1',helper],timeout=15,cleanup=True)
-            state,cid=command('recovery-exit-after',[*DOCKER,'inspect','-f','{{.State.Status}}|{{.State.ExitCode}}|{{.State.OOMKilled}}',helper],cleanup=True);receipt['exitAfterCommandId']=cid
-        require(state.startswith('exited|') and state.endswith('|false'),'S23_ACCESS_RECOVERY_EXIT')
-        _,cid=command('recovery-remove',[*DOCKER,'rm',helper],cleanup=True);receipt['removeCommandId']=cid
-        out,cid=command('recovery-absent',[*DOCKER,'ps','-aq','--no-trunc','--filter','id='+helper],cleanup=True);receipt['absentCommandId']=cid;receipt['helperReleased']=not out;save(file,receipt)
-        require(not out,'S23_ACCESS_RECOVERY_HELPER_PRESENT')
+    except BaseException as first:
+        try:
+            release_recovery_helper(helper,file,receipt)
+        except Exception as cleanup_error:
+            first.add_note('S23_ACCESS_HELPER_CLEANUP_FAILED')
+            raise first from cleanup_error
+        raise
+    else:
+        release_recovery_helper(helper,file,receipt)
     return receipt
 
 
-def d368_pg_facts(phase):
+def release_recovery_helper(helper,file,receipt):
+    """核实退出或从未启动的准确 helper，普通移除后按完整 ID 核验缺席。"""
+    state,cid=command('recovery-exit',[*DOCKER,'inspect','-f','{{.State.Status}}|{{.State.ExitCode}}|{{.State.OOMKilled}}',helper],cleanup=True);receipt['exitCommandId']=cid;save(file,receipt)
+    if state.startswith('running|'):
+        command('recovery-term',[*DOCKER,'stop','--signal','TERM','--timeout','-1',helper],timeout=15,cleanup=True)
+        state,cid=command('recovery-exit-after',[*DOCKER,'inspect','-f','{{.State.Status}}|{{.State.ExitCode}}|{{.State.OOMKilled}}',helper],cleanup=True);receipt['exitAfterCommandId']=cid
+    if state == 'created|0|false':
+        fmt = ('{{.Id}}|{{.Image}}|{{index .Config.Labels "ontology.task"}}|'
+               '{{index .Config.Labels "ontology.run"}}|{{index .Config.Labels "ontology.attempt"}}|'
+               '{{.State.Status}}|{{.State.Pid}}|{{.State.StartedAt}}|{{.RestartCount}}')
+        identity,cid=command('recovery-created-owner',[*DOCKER,'inspect','-f',fmt,helper],cleanup=True)
+        receipt['createdOwnerCommandId']=cid
+        save(file,receipt)
+        expected=(helper,resume.platform.IMAGES['api'],TASK,RUN,receipt['attemptId'],'created','0','0001-01-01T00:00:00Z','0')
+        require(identity=='|'.join(expected),'S23_ACCESS_CREATED_OWNER')
+    else:
+        require(state.startswith('exited|') and state.endswith('|false'),'S23_ACCESS_RECOVERY_EXIT')
+    _,cid=command('recovery-remove',[*DOCKER,'rm',helper],cleanup=True);receipt['removeCommandId']=cid
+    out,cid=command('recovery-absent',[*DOCKER,'ps','-aq','--no-trunc','--filter','id='+helper],cleanup=True);receipt['absentCommandId']=cid;receipt['helperReleased']=not out;save(file,receipt)
+    require(not out,'S23_ACCESS_RECOVERY_HELPER_PRESENT')
+
+
+def d368_pg_facts(phase, *, normal=False):
     """由三个新连接按准确目标读行、原审计及绑定收据，仅向公开回执提供 owner 摘要。"""
     import workflow_oracle_d368_closure as c
+    target=c.target(normal)
     require(phase in ('before','after'),'D368_FACT_PHASE')
-    sql=ROW_SQL.replace(QUERY,c.QUERY).replace("'owner',q.\"LeaseOwner\"", """'ownerSha256',encode(sha256(convert_to(q."LeaseOwner",'UTF8')),'hex')""")
-    receipts=f"""SELECT json_array_length(convert_from("BindingBytes",'UTF8')::json->'receipts') FROM semantic_query."Queries" WHERE "Id"='{c.QUERY}';"""
+    sql=ROW_SQL.replace(QUERY,target.query).replace("'owner',q.\"LeaseOwner\"", """'ownerSha256',encode(sha256(convert_to(q."LeaseOwner",'UTF8')),'hex')""")
+    receipts=f"""SELECT json_array_length(convert_from("BindingBytes",'UTF8')::json->'receipts') FROM semantic_query."Queries" WHERE "Id"='{target.query}';"""
     values,commands={},{}
-    for key,query in [('row',sql),('audit',AUDIT_SQL.replace(QUERY,c.QUERY)),('receipts',receipts)]:
-        raw,commands[key]=resume.platform.read_pg(query.encode(),'d368-'+phase+'-'+key)
+    for key,query in [('row',sql),('audit',AUDIT_SQL.replace(QUERY,target.query)),('receipts',receipts)]:
+        raw,commands[key]=resume.platform.read_pg(query.encode(),target.prefix+'-'+phase+'-'+key)
         values[key]=json.loads(raw)
+    if normal:
+        error,commands['errorCode']=resume.platform.read_pg(('SELECT COALESCE(to_json("ErrorCode")::text,CHR(110)||CHR(117)||CHR(108)||CHR(108)) FROM semantic_query."Queries" WHERE "Id"=\''+target.query+'\';').encode(),'normal-'+phase+'-error-code')
+        values['errorCode']=json.loads(error)
     return values,commands
 
 
-def recover_d368(operation,pg_start_command,isolated_receipt):
+def recover_d368(operation,pg_start_command,isolated_receipt,*,normal=False):
     """仅对本次专用实例代次执行一次晚维护；提交不明时保留原件、禁止再次提交。"""
     import workflow_oracle_d368_closure as c
+    target=c.target(normal)
     from workflow_oracle_runtime_window import policy
     require(policy() and re.fullmatch('[a-f0-9]{32}',operation) and
-            policy()['priorCloseSha256']==c.RESTORED,'D368_PG_WINDOW')
+            policy()['priorCloseSha256']==target.close,'D368_PG_WINDOW')
     from workflow_oracle_mapping_continuity import command as reopen
     base=Path(isolated_receipt)
     require(not base.is_absolute() and base.parent.parent==AREA.relative_to(ROOT) and base.name=='receipt.json'
@@ -426,38 +453,60 @@ def recover_d368(operation,pg_start_command,isolated_receipt):
     require(qualified['status']=='PASS' and qualified['helperReleased'] and qualified['databaseReleased']
             and qualified['buildInputKey']==build.inputs('query') and qualified['outputs']==build.outputs('query')
             and qualified['test'][0]['method']=='G4QueryRaceTests.OracleGenerationMaintenanceInIsolatedPostgres','D368_ISOLATED_TEST')
-    seal=c.prove_d368_closure(pg_start_command=pg_start_command)
-    require(seal['generationSha256']=='a617d1e838631e9f16b5e9bc65aa97842c3a85cfc7c9991137262a537881c3d0' and
-            seal['sealSha256']=='1d39291bc79d057dc310bdad98049442305aff73b236e4a004b4829d3890edb2','D368_SEAL_CHANGED')
-    save(AREA/('d368-seal-pg-'+operation+'.json'),seal)
-    before,commands=d368_pg_facts('before')
-    require(before['row']==c.FROZEN_ROW and before['receipts']==0 and len(before['audit'])==1 and
+    seal=target.prove(pg_start_command=pg_start_command)
+    require(seal['generationSha256']==target.generation_sha and
+            seal['sealSha256']==target.seal_sha,'D368_SEAL_CHANGED')
+    save(AREA/(target.prefix+'-seal-pg-'+operation+'.json'),seal)
+    before,commands=d368_pg_facts('before',normal=normal)
+    require(before['row']==target.frozen and before['receipts']==0 and len(before['audit'])==1 and
             [before['audit'][0][k] for k in ('id','sha256','action','outcome')]==
-            [c.AUDIT_ID,c.AUDIT_SHA,'data.query.execute','failure'],'D368_CURRENT_FROZEN_ROW')
+            [target.audit,target.audit_sha,'data.query.execute','failure'],'D368_CURRENT_FROZEN_ROW')
     verified=dt.datetime.fromisoformat(seal['verifiedUtc'])
     proof={k:before['row'][k] for k in ('systemIdentifier','database','databaseUser','organizationId','queryId','connectionId',
            'ownerSha256','createdUtc','deadlineUtc','completedUtc','leaseUntilUtc','requestSha256','bindingSha256','stableRowSha256')}
     proof.update(taskId=TASK,runId=RUN,attemptId=uuid.uuid4().hex,operationId=operation,operatorId='os-uid-'+str(os.getuid()),
-        originalFence=1,terminalFence=2,proofKind='DEDICATED_GENERATION',parentCommandId=c.PARENT,childCommandId=c.CHILD,
-        platformContainerId=PG,sourceContainerId=SOURCE,closeSha256=c.RESTORED,
-        sourceStartedAt='2026-11-21T13:49:57.33078955Z',sourceFinishedAt='2026-11-21T13:52:47.119332336Z',
-        failureAuditId=c.AUDIT_ID,failureAuditSha256=c.AUDIT_SHA,sealSha256=seal['sealSha256'],
+        originalFence=1,terminalFence=2,proofKind=target.mode,parentCommandId=target.parent,childCommandId=target.child,
+        platformContainerId=PG,sourceContainerId=SOURCE,closeSha256=target.close,
+        sourceStartedAt=target.start,sourceFinishedAt=target.end,
+        failureAuditId=target.audit,failureAuditSha256=target.audit_sha,sealSha256=seal['sealSha256'],
         terminationProofSha256=seal['generationSha256'],verifiedUtc=verified.isoformat(),validUntilUtc=(verified+dt.timedelta(minutes=4)).isoformat())
-    path=AREA/('d368-proof-'+operation+'.json')
+    path=AREA/(target.prefix+'-proof-'+operation+'.json')
     row=dict(proof=proof,proofSha256=ex.sha(ex.encoded(proof)),before=commands,isolatedReceipt=isolated_receipt)
     resume.platform.save(path,row)
     # 排它单次标记先于 helper create，异常后由真实后态裁决。
-    once=AREA/'d368-cas-reservation.json'
+    once=AREA/(target.prefix+'-cas-reservation.json')
     with once.open('x') as stream:
         json.dump(dict(operation=operation,proofSha256=row['proofSha256']),stream)
-    file=AREA/('d368-recovery-'+operation+'.json')
-    def reopen():
-        current=c.prove_d368_closure(pg_start_command=pg_start_command)
+    file=AREA/(target.prefix+'-recovery-'+operation+'.json')
+    def recheck_seal():
+        current=target.prove(pg_start_command=pg_start_command)
         require(all(current[k]==seal[k] for k in ('generationSha256','sealSha256','live','historical')),'D368_SEAL_BEFORE_CAS')
-    result=run_recovery_helper(row,path,file,reopen,generation=True)
-    after,final=d368_pg_facts('after')
+    try:
+        result=run_recovery_helper(row,path,file,recheck_seal,generation=True)
+    except BaseException as first:
+        # 即使回执丢失也绝不再次提交。原 PG 仍在本窗时通过新连接读取真实后态。
+        reconciliation=dict(status='COMMIT_UNKNOWN',queryId=target.query,operation=operation)
+        try:
+            observed,refs=d368_pg_facts('after',normal=normal)
+            reconciliation.update(post=observed,commands=refs)
+            if observed==before:
+                reconciliation['status']='ORIGINAL_STATE_OBSERVED'
+            elif (observed['row']=={**before['row'],'ownerSha256':None,'leaseUntilUtc':None}
+                  and observed['receipts']==0 and observed.get('errorCode')==before.get('errorCode')
+                  and len(observed['audit'])==2 and before['audit'][0] in observed['audit']):
+                added=next(a for a in observed['audit'] if a!=before['audit'][0])
+                if [added[k] for k in ('action','actor','outcome','trace','correlation','organization','sites')]==[
+                        'data.query.cleanup.recover',proof['operatorId'],'allowed',operation,proof['attemptId'],'org-demo',['site-a']]:
+                    reconciliation['status']='COMMITTED_STATE_OBSERVED'
+        except Exception:
+            first.add_note('READ_ONLY_RECONCILIATION_FAILED')
+        save(AREA/(target.prefix+'-reconciliation-'+operation+'.json'),reconciliation)
+        raise
+    after,final=d368_pg_facts('after',normal=normal)
     require(after['row']=={**before['row'],'ownerSha256':None,'leaseUntilUtc':None}
             and after['receipts']==0 and len(after['audit'])==2 and before['audit'][0] in after['audit'],'D368_POST_STABLE')
+    if normal:
+        require(after['errorCode']==before['errorCode'],'NORMAL_ERROR_CODE_CHANGED')
     audit=next(item for item in after['audit'] if item!=before['audit'][0])
     require([audit[k] for k in ('action','actor','outcome','trace','correlation','organization','sites')]==
             ['data.query.cleanup.recover',proof['operatorId'],'allowed',operation,proof['attemptId'],'org-demo',['site-a']],
@@ -467,26 +516,28 @@ def recover_d368(operation,pg_start_command,isolated_receipt):
     return result
 
 
-def d368_maintenance_window():
+def d368_maintenance_window(*, normal=False, review_prestate=None):
     """冷态打开并只启动本任务 PG。完整关闭后再发布实际的单角色维护后继。"""
     import workflow_oracle_d368_closure as c
+    target=c.target(normal)
     import workflow_oracle_d368_pg_close as close
     import workflow_oracle_runtime_window as w
     recovery=resume.recovery
-    require(w.close_registration()['sha256']==c.RESTORED and not (AREA/'d368-cas-reservation.json').exists(),'D368_ONCE')
-    for target in ('api','query'):
-        build.validate(target,TASK)
+    require(not normal or callable(review_prestate),'NORMAL_PRESTATE_REVIEW')
+    require(w.close_registration()['sha256']==target.close and not (AREA/(target.prefix+'-cas-reservation.json')).exists(),'D368_ONCE')
+    for build_target in ('api','query'):
+        build.validate(build_target,TASK)
     operation=uuid.uuid4().hex
     log=AREA.parent.parent/'command-events.jsonl'
-    file=AREA/('d368-pg-only-'+operation+'.json')
+    file=AREA/(target.prefix+'-pg-only-'+operation+'.json')
     summary=dict(taskId=TASK,runId=RUN,batch=w.BATCH,planId=w.PLAN,operation=operation,
-                 priorCloseSha256=c.RESTORED,queryId=c.QUERY,status='BLOCKED')
+                 priorCloseSha256=target.close,queryId=target.query,status='BLOCKED')
     stopped=False
     try:
         with w.open_window() as window:
             summary.update(windowId=window['id'],cold=window['coldAttempt'])
-            summary['beforeSeal']='d368-seal-cold-'+operation+'.json'
-            save(AREA/summary['beforeSeal'],c.prove_d368_closure())
+            summary['beforeSeal']=target.prefix+'-seal-cold-'+operation+'.json'
+            save(AREA/summary['beforeSeal'],target.prove())
             save(file,summary)
             # PG-only 原入口对每个原生动作前后准入；短命只读助手另外约束临时盘及实测 DB+WAL。
             def check_capacity(attempt):
@@ -504,19 +555,23 @@ def d368_maintenance_window():
                      and row['stage']=='omq-recovery-start-platform-pg' and row['runId']==recovery.RECOVERY]
                 require(len(ids)==1,'D368_PG_START_COMMAND')
                 summary['pgStartCommand']=ids[0]
-                summary['pgSeal']='d368-seal-pg-'+operation+'.json'
-                save(AREA/summary['pgSeal'],c.prove_d368_closure(pg_start_command=ids[0]))
-                current,refs=d368_pg_facts('before')
-                require(current['row']==c.FROZEN_ROW and current['receipts']==0 and len(current['audit'])==1
-                        and current['audit'][0]['sha256']==c.AUDIT_SHA,'D368_FRESH_PRESTATE')
+                summary['pgSeal']=target.prefix+'-seal-pg-'+operation+'.json'
+                save(AREA/summary['pgSeal'],target.prove(pg_start_command=ids[0]))
+                current,refs=d368_pg_facts('before',normal=normal)
+                require(current['row']==target.frozen and current['receipts']==0 and len(current['audit'])==1
+                        and current['audit'][0]['sha256']==target.audit_sha,'D368_FRESH_PRESTATE')
                 summary['initialPgFacts']=refs
                 save(file,summary)
                 check_capacity(start['post'])
                 checked=isolated_test(generation=True)
                 summary['isolated']=checked
+                save(file,summary)
+                if normal:
+                    review_prestate(file,operation)
                 check_capacity(resume.admit()['attempt'])
-                receipt=recover_d368(operation,ids[0],checked['receipt'])
-                summary['cas']='d368-recovery-'+operation+'.json'
+                summary['cas']=target.prefix+'-recovery-'+operation+'.json'
+                save(file,summary)
+                receipt=recover_d368(operation,ids[0],checked['receipt'],normal=normal)
                 summary['status']=receipt['status']
             finally:
                 with w.close_resources():
@@ -527,11 +582,11 @@ def d368_maintenance_window():
                         require(len(matches)==1,'D368_EXACT_STOP')
                         summary['pgStopAttempt']=matches[0]
                         summary['pgNative']=close.native_references(matches[0])
-                        summary['postState']=close.capture_closed_state()
+                        summary['postState']=close.capture_closed_state(normal=normal)
                         summary['post']=resume.admit()['attempt']
                         stopped=True
                     save(file,summary)
     finally:
         if stopped:
-            close.publish_d368_pg_close(operation)
+            close.publish_d368_pg_close(operation,normal=normal)
     return summary

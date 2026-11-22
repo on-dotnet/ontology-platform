@@ -90,6 +90,7 @@ public sealed class G4QueryExecution
         var owner = (oracle is null ? "execution-" : G4QueryResultStore.OracleOwnerPrefix) + Guid.NewGuid().ToString("N");
         var admission = await store.AdmitAsync(session, proofs, query, state, key, selectionQueryId,
             owner, deadline, token);
+        if (oracle is not null) G4OracleQueryTrace.Bind(admission.Record.Id);
         if (!admission.Created) return await ReadAsync(actor, sessionReference, admission.Record.Id, true, false, deadline, verifyRoot, token);
         // 即便传输随后断开，结算也只能用原期限内、从第一次断开起不超过二百五十毫秒的余量。
         using var disconnected = oracle is null ? default : token.Register(() => oracle.Interrupt(clock.GetTimestamp()));
@@ -760,7 +761,7 @@ public sealed class G4QueryExecution
 
     /// <summary>业务读取和历史来源 ACL 复用同一连接的源打开锁；不改变权限证明或其他源。</summary>
     private async Task<T> WithOracleSourceGateAsync<T>(string connectionId, CancellationToken token, Func<Task<T>> access) =>
-        await G4OracleSourceOpen.RunAsync(await store.EnterOracleSourceAsync(connectionId, token), access);
+        await G4OracleSourceOpen.RunAsync(await G4OracleQueryTrace.ObserveAsync("permit", () => store.EnterOracleSourceAsync(connectionId, token)), access);
 
     /// <summary>工作、指定执行取消、物理释放与观察器退出均使用同一分支的单调时基。</summary>
     internal async Task<G4SourceQueryRead> ReadOracleAsync(G4QueryRecord lease, OracleExecution oracle, DateTimeOffset deadline,
@@ -780,14 +781,21 @@ public sealed class G4QueryExecution
         using var lifetime = new G4OracleSourceLifetime(lease.Id, clock);
         lifetime.TightenCleanup(limit - clock.GetElapsedTime(oracle.Started));
         oracle.Lifetime = lifetime;
+        G4OracleQueryTrace.Mark("branch", budgetTicks: limit.Ticks, originTick: oracle.Started);
         using var stop = CancellationTokenSource.CreateLinkedTokenSource(token);
-        using var cutoff = new CancellationTokenSource(limit - reserve, clock);
+        using var cutoff = new CancellationTokenSource(TimeSpan.FromTicks(Math.Max(0, (limit - reserve - clock.GetElapsedTime(oracle.Started)).Ticks)), clock);
         using var work = CancellationTokenSource.CreateLinkedTokenSource(token, cutoff.Token);
+        using var cutoffSignal = cutoff.Token.Register(() => G4OracleQueryTrace.Mark("workCutoff", "signal"));
         using var cancelled = work.Token.Register(() => lifetime.TightenCleanup(reserve));
         // 先核行再发起源工作，随后每次平台读取独立受限并仅绑定原 owner/fence。
         try
         {
-            if ((await ReadOracleLeaseAsync(lease, lifetime, observe, work.Token))?.Active != true) throw new OperationCanceledException(work.Token);
+            var initialLease = await G4OracleQueryTrace.ObserveAsync("initialLease", () => ReadOracleLeaseAsync(lease, lifetime, observe, work.Token));
+            if (initialLease?.Active != true)
+            {
+                G4OracleQueryTrace.Mark(initialLease?.CommittedCancel == true ? "formalCancel" : "leaseInactive", "signal");
+                throw new OperationCanceledException(work.Token);
+            }
         }
         catch
         {
@@ -796,8 +804,9 @@ public sealed class G4QueryExecution
             throw;
         }
         oracle.Confirmed = false;
-        logger?.LogInformation("OracleBranchBegin query={QueryId} owner={Owner} fence={Fence} execution={ExecutionId} utc={Utc:O} workDeadlineUtc={WorkDeadlineUtc:O} branchDeadlineUtc={BranchDeadlineUtc:O}",
-            lease.Id, lease.LeaseOwner, lease.Fence, lifetime.ExecutionId, clock.GetUtcNow(), branchDeadline - reserve, branchDeadline);
+        logger?.LogInformation("OracleBranchBegin query={QueryId} fence={Fence} execution={ExecutionId} utc={Utc:O} workDeadlineUtc={WorkDeadlineUtc:O} branchDeadlineUtc={BranchDeadlineUtc:O}",
+            lease.Id, lease.Fence, lifetime.ExecutionId, clock.GetUtcNow(), branchDeadline - reserve, branchDeadline);
+        G4OracleQueryTrace.Mark("observer");
         var observing = ObserveOracleLeaseAsync(lease, lifetime, branchDeadline, work, observe, stop.Token);
         // 若适配器返回数据却从未登记物理申请，既无来源证明也无清理证明。
         var missingAcquisition = false;
@@ -806,7 +815,7 @@ public sealed class G4QueryExecution
         try
         {
             // 当前分支独占源执行身份，实际驱动负责申请和逐资源证明。
-            result = await read(work.Token);
+            result = await G4OracleQueryTrace.ObserveAsync("source", () => read(work.Token));
             work.Token.ThrowIfCancellationRequested();
             missingAcquisition = !lifetime.HasAcquired;
             if (missingAcquisition || !lifetime.CleanupConfirmed) throw new SemanticOperationException(503, "query_source_cleanup_unconfirmed");
@@ -822,10 +831,12 @@ public sealed class G4QueryExecution
             // 包含原数据库读取退出，禁止分离未完成任务或以晚清理签当期成功。
             await stop.CancelAsync();
             await observing;
+            G4OracleQueryTrace.Mark("observer", "returned");
             oracle.Confirmed = !missingAcquisition && lifetime.CleanupConfirmed && lifetime.CleanupRemaining > TimeSpan.Zero
                 && clock.GetElapsedTime(oracle.Started) < limit;
             logger?.LogInformation("OracleBranchRelease query={QueryId} execution={ExecutionId} confirmed={Confirmed} observedUtc={ObservedUtc:O}",
                 lease.Id, lifetime.ExecutionId, oracle.Confirmed, clock.GetUtcNow());
+            G4OracleQueryTrace.Mark("cleanup", oracle.Confirmed ? "confirmed" : "unconfirmed");
             if (!oracle.Confirmed) throw new SemanticOperationException(503, "query_source_cleanup_unconfirmed");
             work.Token.ThrowIfCancellationRequested();
         }
@@ -857,14 +868,19 @@ public sealed class G4QueryExecution
                 await Task.Delay(TimeSpan.FromMilliseconds(10), clock, stop);
                 using var expiry = new CancellationTokenSource(TimeSpan.FromMilliseconds(100), clock);
                 using var probe = CancellationTokenSource.CreateLinkedTokenSource(stop, work.Token, expiry.Token);
-                using var timeout = expiry.Token.Register(work.Cancel);
+                using var timeout = expiry.Token.Register(() =>
+                {
+                    G4OracleQueryTrace.Mark("leaseTimeout", "signal");
+                    work.Cancel();
+                });
                 var observed = await ReadOracleLeaseAsync(lease, lifetime, observe, probe.Token);
                 if (observed?.Active != true)
                 {
                     // 平台信号与驱动原生 Cancel 分列；只登记因准确已提交取消而发出的首次通知。
+                    G4OracleQueryTrace.Mark(observed?.CommittedCancel == true ? "formalCancel" : "leaseInactive", "signal");
                     if (observed?.CommittedCancel == true && !work.IsCancellationRequested && !stop.IsCancellationRequested)
-                        logger?.LogInformation("OracleCancelDispatch query={QueryId} owner={Owner} fence={Fence} execution={ExecutionId} utc={Utc:O} workDeadlineUtc={WorkDeadlineUtc:O} branchDeadlineUtc={BranchDeadlineUtc:O} cleanupRemainingMs={CleanupRemainingMs}",
-                            lease.Id, lease.LeaseOwner, lease.Fence, lifetime.ExecutionId, clock.GetUtcNow(),
+                        logger?.LogInformation("OracleCancelDispatch query={QueryId} fence={Fence} execution={ExecutionId} utc={Utc:O} workDeadlineUtc={WorkDeadlineUtc:O} branchDeadlineUtc={BranchDeadlineUtc:O} cleanupRemainingMs={CleanupRemainingMs}",
+                            lease.Id, lease.Fence, lifetime.ExecutionId, clock.GetUtcNow(),
                             branchDeadline - TimeSpan.FromMilliseconds(250), branchDeadline, lifetime.CleanupRemaining?.TotalMilliseconds);
                     await work.CancelAsync();
                     return;
@@ -872,8 +888,10 @@ public sealed class G4QueryExecution
             }
         }
         catch (OperationCanceledException) when (stop.IsCancellationRequested) { }
+        catch (OperationCanceledException) when (work.IsCancellationRequested) { }
         catch
         {
+            G4OracleQueryTrace.Mark("leaseException", "signal");
             await work.CancelAsync();
         }
     }

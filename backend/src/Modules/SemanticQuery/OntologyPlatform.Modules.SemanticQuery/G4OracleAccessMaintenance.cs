@@ -20,8 +20,11 @@ internal sealed class G4OracleAccessMaintenanceProof
     /// <summary>准确资源代次终止证明只允许本条失败查询。</summary>
     internal const string GenerationQueryId = "query-d368ac610c7745889890e1589653af8f";
 
+    /// <summary>普通正式关系查询仅允许本代已冻结的一条失败行。</summary>
+    internal const string NormalQueryId = "query-f1599097a7274c20b82cbf0dfcea4e2b";
+
     /// <summary>核对行锁内读取的 owner，专用代次模式仅暴露原 owner 的摘要。</summary>
-    internal bool MatchesOwner(string? owner) => owner is not null && (this["queryId"] == GenerationQueryId
+    internal bool MatchesOwner(string? owner) => owner is not null && (this["queryId"] is GenerationQueryId or NormalQueryId
         ? G4QueryCanonical.Hash(System.Text.Encoding.UTF8.GetBytes(owner)) == this["ownerSha256"]
         : owner == Owner);
 
@@ -73,12 +76,16 @@ internal sealed class G4OracleAccessMaintenanceProof
         string terminationSha, bool isolated = false) =>
         ReadBound(bytes, expectedSha, operatorId, sealSha, terminationSha, isolated, "DEDICATED_GENERATION");
 
+    /// <summary>普通关系查询的专用实例证明需要无子进程的真实父和准确终态。</summary>
+    internal static G4OracleAccessMaintenanceProof ReadNormal(byte[] bytes, string expectedSha, string operatorId, string sealSha,
+        string terminationSha) => ReadBound(bytes, expectedSha, operatorId, sealSha, terminationSha, false, "NORMAL_GENERATION");
+
     /// <summary>以进程选择的封闭判别值校验两种证明各自的准确字段与物理身份。</summary>
     private static G4OracleAccessMaintenanceProof ReadBound(byte[] bytes, string expectedSha, string operatorId, string sealSha,
         string terminationSha, bool isolated, string mode)
     {
         // 只有专用模式接受原件锚定的整代关闭及生产者封闭。
-        var generation = mode == "DEDICATED_GENERATION";
+        var generation = mode is "DEDICATED_GENERATION" or "NORMAL_GENERATION";
         Check(bytes.Length is > 0 and <= 65536 && G4QueryCanonical.Hash(bytes) == expectedSha);
         using var document = JsonDocument.Parse(bytes);
         // 所有字段必须唯一且准确；输入声明不能替代私有进程环境传入的独立证据摘要。
@@ -96,7 +103,16 @@ internal sealed class G4OracleAccessMaintenanceProof
         Check(value["taskId"] == "G4-ORACLE-MAPPING-QUERY-001" && value["runId"] == "product-resume-01"
             && value["organizationId"] == "org-demo" && value["connectionId"] == ConnectionId
             && value["platformContainerId"] == PlatformContainer && value["sourceContainerId"] == SourceContainer);
-        if (generation)
+        if (mode == "NORMAL_GENERATION")
+        {
+            Check(value["queryId"] == NormalQueryId && value["proofKind"] == mode
+                && value["parentCommandId"] == "4032c1d770b240989966ba3275d86999"
+                && value.proof.GetProperty("childCommandId").ValueKind == JsonValueKind.Null
+                && value["sourceStartedAt"] == "2026-11-22T12:48:17.47353763Z"
+                && value["sourceFinishedAt"] == "2026-11-22T12:51:07.888426792Z"
+                && value["closeSha256"] == "a3839fe8ebb6e418e42e2280d1d6044acd7a1a4f3f65babdc8f13b8c7d055348");
+        }
+        else if (generation)
         {
             Check(value["queryId"] == GenerationQueryId && value["proofKind"] == mode
                 && value["parentCommandId"] == "c02e89f8d8f2481f90058606ccf71b29" && value["childCommandId"] == "5b90bb8f66fb4ddd9bfeddbe5015133a"
@@ -120,7 +136,22 @@ internal sealed class G4OracleAccessMaintenanceProof
             && Regex.IsMatch(value["systemIdentifier"], @"\A[0-9]{1,20}\z")
             && Regex.IsMatch(value["databaseUser"], @"\A[a-z_][a-z0-9_]{0,62}\z") && (isolated
                 ? Regex.IsMatch(value["database"], @"\Aomq_query_test_[a-z0-9_]+\z") : value["database"] == "mapping"));
-        if (!isolated && generation)
+        if (mode == "NORMAL_GENERATION")
+        {
+            Check(value["systemIdentifier"] == "7709907053089669168" && value["databaseUser"] == "postgres" && operatorId == "os-uid-501"
+                && sealSha == "34fd7fda857fc5ca2f2456ad5cb76885b8473fafe00b588366d187286e0fd9c5"
+                && terminationSha == "d3bd83e5b832d68295dd3abeeb84a558bf290b51ce882b5df7a9995c4aefce6b"
+                && value["ownerSha256"] == "08d6b6d8633b72b6ad4a980128d3e6a1b68c83b5c388cecd3a3296d84accf4cb"
+                && value["requestSha256"] == "e65bb0daa424428e3b4f54f5931973ec7a34edc7b5a11230365cab8524503fbd"
+                && value["bindingSha256"] == "8c5267a7cf1e34090f41b876fcdcf176898669dd4e240cf85082916ce88973dc"
+                && value["stableRowSha256"] == "8bbdb6cb314c00994015ef3eef5c36c5f9ec60d41f005875256129f2b7d91a57"
+                && value["failureAuditId"] == "38ebcc6e08504994b36a322edc4ffd86"
+                && value["failureAuditSha256"] == "91713b546c40b9d6925079220bfa0420e6bbfc3d8dbd18c1a9c335cc2e0d422c"
+                && value["leaseUntilUtc"] == "2026-11-22T12:50:41.308879+00:00"
+                && value["deadlineUtc"] == value["leaseUntilUtc"] && value["createdUtc"] == "2026-11-22T12:50:37.198569+00:00"
+                && value["completedUtc"] == "2026-11-22T12:50:37.974659+00:00");
+        }
+        else if (!isolated && generation)
         {
             Check(value["systemIdentifier"] == "7709907053089669168" && value["databaseUser"] == "postgres" && operatorId == "os-uid-501"
                 && sealSha == "1d39291bc79d057dc310bdad98049442305aff73b236e4a004b4829d3890edb2"

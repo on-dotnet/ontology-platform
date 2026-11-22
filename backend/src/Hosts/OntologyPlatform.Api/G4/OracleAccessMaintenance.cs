@@ -16,7 +16,7 @@ internal static class OracleAccessMaintenance
         ?? throw new InvalidOperationException("oracle_maintenance_environment_missing");
 
     /// <summary>读取并验证私有 stdin 原件，执行成功后只输出操作身份与提交包络。</summary>
-    internal static async Task RunAsync(bool generationClosure = false)
+    internal static async Task RunAsync(bool generationClosure = false, bool normalClosure = false)
     {
         using var limit = new CancellationTokenSource(TimeSpan.FromSeconds(15));
         try
@@ -27,7 +27,9 @@ internal static class OracleAccessMaintenance
             // 真实执行器关闭 stdin 后，最后一个字节也参与指纹。
             var count = await input.ReadAtLeastAsync(bytes, bytes.Length, false, limit.Token);
             // 独立核验器提供同一准确封闭原件与新鲜源证明的散列。
-            var proof = generationClosure
+            var proof = normalClosure
+                ? G4OracleAccessMaintenanceProof.ReadNormal(bytes[..count], Trusted("PROOF_SHA256"), Trusted("OPERATOR"), Trusted("SEAL_SHA256"), Trusted("TERMINATION_SHA256"))
+                : generationClosure
                 ? G4OracleAccessMaintenanceProof.ReadGeneration(bytes[..count], Trusted("PROOF_SHA256"), Trusted("OPERATOR"), Trusted("SEAL_SHA256"), Trusted("TERMINATION_SHA256"))
                 : G4OracleAccessMaintenanceProof.Read(bytes[..count], Trusted("PROOF_SHA256"), Trusted("OPERATOR"), Trusted("SEAL_SHA256"), Trusted("TERMINATION_SHA256"));
             // 凭据只在限权进程内使用。引擎 inspect 及命令行不得含连接口令。
