@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_PARTIAL_SOURCE_LINK_CHATGPT_REVIEW**。本次正常三角色回滚已恢复原 A release，当前 revision 3。原失败查询 d368 已查实零成功副作用，停机后准确源执行与 Q 的独立归属证据不足，保留 FAILED、fence 2、原期限、占位与原审计。本次准确晚 CAS、诊断 ABA 和修正后正式十槽均为 0。S2 PARTIAL、S3 NOT_RUN，停 ChatGPT 复审。[本批报告](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
+唯一任务状态 **S2_PARTIAL_FORMAL_SEED_CLEANUP_CHATGPT_REVIEW**。d368 已准确晚恢复。诊断和正式父各一次。正式关系准备查询 f159 返回 503，FAILED/fence 2、两租约列保留，零成功副作用。映射仍为 A3。S2 PARTIAL、S3 NOT_RUN，停 ChatGPT 复审。[本批三文件](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
 
 ## 执行身份与所有权
 

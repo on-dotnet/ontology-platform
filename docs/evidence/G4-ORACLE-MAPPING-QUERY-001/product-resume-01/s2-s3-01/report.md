@@ -1,48 +1,40 @@
-# Oracle S2 受限交接 · 旧查询取证与正式归位
+# Oracle S2/S3 限定交接
 
-**S2 PARTIAL，S3 NOT_RUN。** 原 A release 已恢复到 revision 3。旧查询 d368 的零成功副作用已证实，原租约占位仍在。本次准确晚 CAS、诊断 ABA、修正后正式十槽各 **0 次**。历史十槽仍为 1 PASS、1 FAIL、8 NOT_RUN。停在 ChatGPT 复审。[机器回执](final-machine-receipt.json) · [非作者复核](non-author-review.json)
+**S2 PARTIAL，S3 NOT_RUN。** d368 的准确晚 CAS 已完成。一次诊断与一次修正后的正式十槽均已执行。正式父通过四角色认证，随后在 ABA 槽的首个关系查询收到 `503 query_source_cleanup_unconfirmed`。该查询的两列租约仍在。两个父命令均未派发在途 ABA 的 25 秒 DI 子进程。交付停在 ChatGPT 复审。
 
-## 旧失败与后态
-
-原父 `c02e89f8d8f2481f90058606ccf71b29` 退出 1，子 `5b90bb8f66fb4ddd9bfeddbe5015133a` 退出 2。5349 B stdout 的 SHA-256 为 `d1fba9b095bec4a31831c598e4bbf7bd043579d923e57efd3403a0dab74efc15`。机器回执内含完整结构化原文、两条原始流和命令回执的定位及散列。
-
-| 有证事件 | 同一 Q 的时间（UTC） | 结论 |
+| 本轮实际操作 | 命令 | 结果 |
 |---|---|---|
-| 源读完成、B_ACTIVATED 事件 | 13:52:18.3722077、13:52:19.5006019 | 在途审计分四段为 2、2、2、0，共 6 次。 |
-| 回滚评估、job 读回 | 13:52:20.858066、13:52:21.3386383 | assessment 已落库，job SUCCEEDED。最后有证客户端调用为 ReadJobAsync，离原截止还有 296.4737 ms。 |
-| 原截止、Gateway 捕获异常 | 13:52:21.635112、13:52:21.6423091 | 捕获 503 query_timeout，晚 7.1971 ms。原事件 COMMIT_REJECTED 仅定位到异常捕获。 |
+| d368 准确维护 | `8c6dac18ce3940398c85dba1660cdcdc` | exit 0。新连接已核两列清空、原失败审计保留、恰有一条维护审计 |
+| 诊断父 | `a576965c8f4d47999676d82ecfde9106` | exit 1，24.169 秒。认证 6.217 秒，ABA 槽 13.453 秒，历史结果 GET 返回 410 |
+| 修正后的正式父 | `4032c1d770b240989966ba3275d86999` | exit 1，31.101／2340 秒。认证 6.729／600 秒，ABA 槽 22.005／180 秒。十槽 1 PASS、1 FAIL、8 NOT_RUN |
 
-回滚 job 为 `job-cb148f92ceeb4628a071c1a9a87c4af0`，assessment 为 `ma-3867fb5152d5444fb4953f7c47af62b9`，validate 命令为 `30336355-cba2-467b-a1de-0554287d28cc`。B 的正式激活时间为 13:52:19.4744354 UTC，表中列的是随后记下的 B_ACTIVATED 事件。原 stdout 无 rollbackDecision、activatedA。准确区间内只见 B 的激活检查和命令，未见回滚提案、决定、检查或激活提交。最后 Activate 是否被调用仍未知。
+## 准确晚恢复
 
-独立 PG 后读取到 `query-d368ac610c7745889890e1589653af8f` 为 FAILED、fence 2、原 owner 尚在，leaseUntil 与原 deadline 相同，结果 hash 为空、密文长度和大小为 0，读收据为 0。唯一失败审计为 `83330a307d7a4583aa44e7c2a6db4fa4`，成功审计为 0。原 Oracle 实例已停机，新代两次观察均为零会话。两条 Oracle clientId 只能按时间关联，缺少它们与该 Q 的准确执行归属原件。独立复核据此保留原行、原期限与审计，同连接后续产品任务未准入。
+非作者重开 d368 的请求与绑定、宿主和网络、专用 Oracle 实例、原父与实际 docker-exec 子进程、两台 API 及生产者关闭原件，再核 9b81 → 9386 → 05ea 的原生关闭与后态。维护只启任务 PG，冻结行位于 `mapping`、系统标识 `7709907053089669168`。事务校验身份、owner 散列、FAILED/fence 2、稳定行与唯一失败审计后，清空两列租约并写入维护审计。独立复核覆盖 493 件原件。
 
-## 正常回滚与时序
+查询 `query-d368ac610c7745889890e1589653af8f` 的 request、binding 和其余行字节稳定。原失败审计 `83330a307d7a4583aa44e7c2a6db4fa4` 保留，新维护审计为 `514479db82f74b4a921a4b2ca2674bb6`。新连接的行、审计及读收据三个命令分别为 `393e621987fd4b5cbdc4baea4030f82c`、`43a3dcf0771b488a9c2d835ff4dfcdeb`、`2abc9b489e224d49b06e7fba2e5ce477`。成功审计、结果和读收据均为零。历史两条 clientId 与 Q 的逐源归属仍为 NOT_PROVEN，cleanup250ms、AC03-B、Oracle S0 保留原资格。
 
-归位前，PG 及正式 Active 都指向原 B revision 2。操作者重新验证原 A release 并提出回滚，独立审核者批准，激活者正式提交，随后从提案、Active 和 PG 读取旧 A → B → 新 A 的完整链。北京时间 2026-11-22 00:16:52.8198980 的新回执 `activation-d2dcec9ef54c4f3bb96d60cab449580b`，原 release `release-6d6469e33f744b7c93b8e4d516fca0c4`，新提案 `proposal-c7e58b62fe234d7282689ae7b23000d5`。前缀消费命令 `34de8c4335f94f97b6eac73f32fbf3e3` 连接历史回执与 revision 3，历史查询字节保留。
+## 两次产品执行
 
-本次正常 HTTP 路径的 validate 返回耗时 41.6 ms，七轮 job 读回各 447.6–497.2 ms，assessment 读取 441.6 ms，提案 25.2 ms、决定 19.7 ms、激活 1646.8 ms。机器回执逐项列出开始/结束、身份、响应和计时。与旧在途 Q 的进程、传输和计时边界不同，这些数值不足以给旧 timeout 指定主因。归位产生的源读未单独计数。原 Q 的 12 次审计仅归于旧父窗。
+诊断中，当前连接五阶段探测通过。随后 reader 读取历史 `query-d293780099754592b3e2a00957e13c8b`，10.684 毫秒后返回 `410 result_expired`。实际驱动要求 200，因而停止。修正保留历史 queryId、5056 字节的原散列和真实 410。在准确过期分支中，驱动使用该槽原有的新关系查询，要求同一父、reader、会话和 Q 从正式 GET 取回相同字节并核零源读。该新分支的后半段取得离线正反例覆盖。
 
-PG 首次只读检查为 90 行、epoch 121、最短 6743.490 秒。归位时 6＋9 项最短还有 5705.121 秒，准入需 1710 秒，实际续发 0 项。离线覆盖第二笔自然到期提交中断后重开、错误身份、范围、epoch、短 TTL 和撤销。
+正式执行复现历史 410 并进入原有 seed POST。HTTP 用时 1671.913 毫秒，距五秒上限 3328.087 毫秒，响应 503、错误码 `query_source_cleanup_unconfirmed`。此次 HTTP 没有返回 queryId。关闭 PG 前，按准确连接和请求起止查询，唯一命中 `query-f1599097a7274c20b82cbf0dfcea4e2b`。
 
-## 工程、资源与资格
-
-- FRESH。按同一 backend 输入 `fb4819a6cfc6f68500ac11d7b1d46aa6775b1095935e004637524ce8c9345243` 零下载 prepare，重建 API、Agent、Query，重开 99／222／222 个快照成员，并验证 compose、挂载与新宿主。构建命令分别为 `baf431eb7fb04e3ca790dbbd6b27c22b`、`dc4969af41e544e2aaf81ef6e2007c23`、`28b4ef736f3a4b3da47969857b6e3171`。
-- FRESH。隔离 PostgreSQL 四组共 18/18，零跳过。覆盖及时物理释放后的普通最终拒绝、取消、未知或晚释放、错 owner/fence、PG 锁跨 root 以及审计失败回滚。仅普通拒绝且所有原条件成立时原子失败、解占并写审计。隔离库和两个临时容器已回收。
-- FRESH。原资源窗 `072d21b9dd5149abb97a0ed9ac92c6a5` 内 finally 两次排空各七项均零，两 API 按 ID 移除，五副本退出，末次准入 `c373ef49bf644a59a988ca7dba07145a` 的运行角色为空，保护清单一致。Fuseki 的 cleanShutdown 仍为 UNKNOWN。冷态 43,004,441,022 B，7 次计费采样最高 43,019,882,942 B，沿用 48/44/4 GiB。原卷、九份封存、四个 Finder 文件均保留。
-- FRESH。9b81 的正式关闭、9386 的两副本维护以及 05ea 的七角色归位均按准确代次登记。05ea 收口索引含 119 个原件；以后重开须绑定其真实宿主与关闭证明。
-- REUSED。原前五槽 684 个成员及其 546 个冻结成员、access 78 checks 和原 S1 按既有受控输入复用。C 的新增分段诊断、失败 finally 后态及被动消费者只完成构建和离线验证。原四事件资格合同保留。
-- NOT_RUN。新诊断、修正后正式十槽、S3 和 CI。AC03-B、Oracle S0、cleanup250ms 沿用原未资格状态。旧正式十槽还有一个独立的后置读取缺陷，ActiveView 仅提供 revision 等字段，完整 activationId 位于提案的 activation 回执。这次独立正常归位已从该回执取全身份。
-
-工程候选的正式 verify 退出 2。首个 backend 门禁尝试重开 implementation-01 的 Oracle S0 资格原件，返回 `OMQ_ORIGINALS_NOT_RUN_s0` 并退出 1，后继 interaction 门禁未执行。独立工程套件 29/29、Oracle 准入套件 145/145。政策检查初次缺少项目 YAML 解析器；从本地按字节核对后，复验退出 0。适用完整验收尚未通过。
-
-## 提交与原件
-
-| 身份 | 值 |
+| 正式失败 Q 的现场事实 | 实测 |
 |---|---|
-| 接受的 Base，亦为维护期间原工作树所见 HEAD | `7047f9cfb33bd46677433a368f19e5614a0f0179` |
-| 历史正式产品实测提交 | `851906f140c0defc0201b392e838e191b20afa27` |
-| 工程候选及本次维护构建输入的提交绑定 | `55107958b2e26547dd1f040800c9188d7443601d` |
-| 固定 main | `5168f2c93ca226caa521a6dc4ac85439335274c4` |
-| 交付 Head | 远端普通推送后从任务分支回读，完整对象、三个 blob 与散列见包外回执 `artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-delivery-readback-7047f9cf.json`。 |
+| 未过滤 Oracle 审计 | seed 窗预期 2 次业务 SELECT，实际 0 次；正式父全窗也是 0 次 |
+| PG 时间（UTC） | 创建 12:50:37.198569，完成 12:50:37.974659，截止 12:50:41.308879。行内执行 776.090 毫秒，完成时余 3334.220 毫秒 |
+| 状态与占位 | FAILED，fence 2，owner 散列 `08d6b6d8633b72b6ad4a980128d3e6a1b68c83b5c388cecd3a3296d84accf4cb`，租约截止等于原 Q 截止。LEASE_HELD_NOT_QUALIFIED |
+| 副作用 | 唯一失败审计 `38ebcc6e08504994b36a322edc4ffd86`；成功审计 0，resultHash 为 null，结果大小、密文长度和读收据均为 0 |
 
-维护期间源码尚在原工作树，实际构建以三份精确输入及快照绑定，工程候选另以同一输入重核。门禁、旧失败、资源与每条原件路径和散列列在机器回执中。未生成中间 PARTIAL ZIP。
+正式失败行保留现场。源分支一秒和清理 250 毫秒各自的实测时长与差额均未知。seed GET、实体选择、B4/A5、同 Q 在原期限内拒绝、普通最终 403/409 的占位释放与下一同连接新查询准入均未取得本轮实机资格。当前完整 A 仍为 `activation-d2dcec9ef54c4f3bb96d60cab449580b`、revision 3。历史父 `c02e89f8d8f2481f90058606ccf71b29` 和子 `5b90bb8f66fb4ddd9bfeddbe5015133a` 的失败原件保留；旧超时最后有证调用为 ReadJobAsync，剩 296.4737 毫秒。
+
+## 工程、授权与收口
+
+四处原入口修正覆盖完整激活回执与下一槽消费、真实子进程的有界允许字段收集和 logger、当前 run 的工程适配器、准确三笔或登记五笔激活链。普通最终 403/409 的已审实现保留。后端变更后按同一输入键重建 API、Agent、Query，实际宿主重开各 99／222／222 件快照。首次产品开窗因查错构建原件目录在诊断派发前关闭，诊断与正式计数均为零。实测候选通过 55 项 Python 和 9 项 JS 定向检查，历史五槽 684 件与 access 78 项按输入重开。
+
+诊断时 PG 确认原 15 项 grant 自然到期，按原范围签发 6＋9 项。检查点由 90 行／epoch 121 推进到 105 行／epoch 136。正式窗复用同一组，剩余 13713.168 秒，新增 0 项。工程 verify 退出 2。environment 21、contract 27、backend 10、query-task-admission 16 全部通过。旧 Doris 门执行 11 项，1 项因 RF_PRODUCT_REVISION 失败；后续门、CI 未运行。两份旧 Doris assessment 仍未资格。
+
+PG-only 维护后继为 `134da209…`，派发前关闭后继为 `344cb4dd…`，诊断关闭后继为 `d5598f01…`。最终正式操作 `c35242b898c04ae3ad5529ba346d320f` 的收口记录单独绑定实测末次关闭。两台 API 均已移除，五个任务持久角色均已退出，前后排空各七项均为零。Fuseki 的 cleanShutdown 为 UNKNOWN。原卷、九归档、旧 17 个停止实例与原 3 个运行实例受保护，四个 Finder 文件散列已核。正式窗 6 个样本的最高计费量为 43,155,800,510 字节（40.19 GiB）。非作者重开末窗 1,343 件原件，末次关闭摘要为 `a3839fe8ebb6e418e42e2280d1d6044acd7a1a4f3f65babdc8f13b8c7d055348`。各窗合计 1,453 组不重复的路径、字节散列及长度见机器回执。
+
+Base 为 `11f438423179d1cc64d043eb2483793b7e03f962`，正式及最终工程实测代码为 `9e84841423bac82911fc989b7b0a4ec999ac1ac7`。main 固定为 `5168f2c93ca226caa521a6dc4ac85439335274c4`。普通推送后的完整分支 Head 与三文件逐字节回读登记在同批本机包外回执 `delivery-readback-11f438.json`。本批无中间 PARTIAL ZIP。[机器回执](final-machine-receipt.json) · [非作者复核](non-author-review.json)

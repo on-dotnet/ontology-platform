@@ -2,51 +2,104 @@
   "taskId": "G4-ORACLE-MAPPING-QUERY-001",
   "runId": "product-resume-01",
   "batch": "s2-s3-01",
-  "baseline": "7047f9cfb33bd46677433a368f19e5614a0f0179",
-  "reviewedCode": "55107958b2e26547dd1f040800c9188d7443601d",
-  "engineeringCommit": "55107958b2e26547dd1f040800c9188d7443601d",
-  "state": "S2_PARTIAL_SOURCE_LINK_CHATGPT_REVIEW",
-  "conclusion": "普通 Mapping 归位和 PG 结算有实测。准确源关联不足，保留 d368，后续产品窗停止。",
+  "baseline": "11f438423179d1cc64d043eb2483793b7e03f962",
+  "reviewedCode": "9e84841423bac82911fc989b7b0a4ec999ac1ac7",
+  "state": "S2_PARTIAL_FORMAL_SEED_CLEANUP_CHATGPT_REVIEW",
+  "conclusion": "限定PARTIAL，额度用完，停ChatGPT复审。",
+  "history": {
+    "non-author-review.json": {
+      "commit": "11f438423179d1cc64d043eb2483793b7e03f962",
+      "blob": "2cbf22bc52364c20523fb2d15da05addaba82d8b",
+      "sha256": "f821c62943b754085f114602b0483b45cbc7e059e1164b1c79edeb438b519938",
+      "sizeBytes": 3026
+    },
+    "report.md": {
+      "commit": "11f438423179d1cc64d043eb2483793b7e03f962",
+      "blob": "84746110529e3228f3fcce62e21312f12a355d4c",
+      "sha256": "cbae7faafd0e366c7a5a24a7ca1d992624661938c1ce0683106c40365fbb695f",
+      "sizeBytes": 6837
+    },
+    "final-machine-receipt.json": {
+      "commit": "11f438423179d1cc64d043eb2483793b7e03f962",
+      "blob": "686d4159434a613f7a601f3fd198f5580ea8a540",
+      "sha256": "6571e120d734cdac8dfb0394676b71a050e3198801c7f48d94c7352d4581e320",
+      "sizeBytes": 100493
+    }
+  },
   "reviews": [
     {
-      "reviewer": "aba",
-      "scope": "三文件非作者重开",
-      "result": "141 个当期原件引用、Base 三个 blob 和四个 Finder 散列一致，完整 stdout JSON 与原字节投影一致。公开交付路径改为仓库相对路径，区分 B 事件与正式激活时刻。"
+      "reviewer": "A",
+      "scope": "Q、源实例及生产者封闭，PG 前后、维护审计和资源代次",
+      "result": "独立重开 d368 的 493 件原件；ae2b 与 7903 完整关闭均有七项前后排空和两 API 移除、五持久角色退出。7903 后继登记全链 1144 件。当前 A 仍为 revision3。",
+      "index": [
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/independent-d368-cas-139c.json",
+          "sizeBytes": 191192,
+          "sha256": "1a1af71da6e40bf6363402b5a17c14f5165a21cc479d44c4a9b72fc892b0e06e"
+        },
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/prediagnostic-independent-ae2b.json",
+          "sizeBytes": 41745,
+          "sha256": "c3a231be59d6279b41fbabd3ee1ef8ce92fcb0290136562eb75eaaafbffc44c3"
+        },
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/independent-7903.json",
+          "sizeBytes": 177758,
+          "sha256": "a91bb7523749985002f0d793118d2cdb9962cef898b08ce2b4f4295b9662ef45"
+        },
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/independent-registry-7903.json",
+          "sizeBytes": 300268,
+          "sha256": "cb3ffac681efa3128f7c87afdd4bb9ac4ad692e1868c6b152c67553440684998"
+        }
+      ]
     },
     {
-      "reviewer": "generation",
-      "scope": "非作者独立核 B、C 与 d368 的 18 份命令双流",
-      "result": "准确源关联 HOLD。PG 共18/18，当前三构建三快照通过。C 初版未核四个行字段，候选已补 fence、owner、leaseUntil、errorCode 的被动核验。",
-      "input": {
-        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-engineering-7047/reviewer-generation.json",
-        "sha256": "6f5e42933e2b0be7d723db9001b95f2fe3427a40bfcee49f11965d96fd801397",
-        "bytes": 10364
+      "reviewer": "B",
+      "scope": "真实 aba() 后置、激活链、宿主和准备路径",
+      "result": "完整回执与下一槽输入正反例通过；用实际 request 闭包与 Python 消费者离线交叉核验，错 reader、窗序、字节、过期码、父身份均拒绝。三份快照 99/222/222 件与准确宿主匹配。"
+    },
+    {
+      "reviewer": "C",
+      "scope": "工程路由、Oracle 测试子进程源观察和分段消费者",
+      "result": "当前 run 的四份工程用例、零下载准备与真实适配器重开；13种源或输入错配被拒。新过期分支通过当前消费者离线核验，四份旧 HTTP 200 报告及五槽历史输入重开。已复核九个审计窗口与原在途计数。",
+      "index": [
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/engineering-current-originals-reopen.json",
+          "sizeBytes": 8872,
+          "sha256": "5f5fd53f30ceaec8bc70b8a7b7f9e6273e17fa18bc4b7d7992f3fd9c42ef81e8"
+        },
+        {
+          "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/eng-plan-9e848414.json",
+          "sizeBytes": 6038,
+          "sha256": "a2a29104823677dbdcf0ace40bed26f482bb4952be9d019bfcc17c96ffd478c8"
+        }
+      ]
+    },
+    {
+      "reviewer": "A/B",
+      "scope": "唯一正式执行和准确关闭",
+      "result": "源窗口0次业务SELECT，准确正式准备Q为FAILED/fence2、租约两列保留、失败审计1、成功0、读收据0。七角色收口，前后排空各七零。",
+      "original": {
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/independent-final-c352.json",
+        "sizeBytes": 357833,
+        "sha256": "788eec2150f40ca9163c5a5db796c973b2dc536c41cd67b387479940ac3d5499"
+      },
+      "failedRow": {
+        "path": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/formal-seed-post-c352.json",
+        "sizeBytes": 1887,
+        "sha256": "8b6bd596a75724ed70bc55f139e8914b8a00d063f4a074631f551f39196665de"
       }
-    },
-    {
-      "reviewer": "aba",
-      "scope": "非作者复核 B 与 d368 行／审计／收据／源观察",
-      "result": "32 条隔离 PG 操作中的四个测试命令完整；零成功副作用已查清。旧实例停机后终止，按 Q 独立确证原源执行仍有缺口。"
-    },
-    {
-      "reviewer": "aba",
-      "scope": "复核被动后态修正后的四字段与 C# 真实输出及原件消费者",
-      "result": "独立运行 S2ConsumerTests 9/9，通过缺字段拒绝和保留占位分类测试。"
-    },
-    {
-      "reviewer": "generation",
-      "scope": "非作者独立重开 55107958 的七角色维护代次与三角色原始回执",
-      "result": "核准 15812 B 关闭、119 个成员、两次七项零排空、20＋3 项保护；历史宿主至新构建换代、恢复 revision 3、PG 时钟 5705.121 秒和零追加均由原件重开。"
-    },
-    {
-      "reviewer": "settle",
-      "scope": "非作者核 A 正常恢复的三角色 HTTP 协议、DTO、七阶段、原历史 A/B 及真实输入",
-      "result": "独立恢复链由三角色正式回执与 PG 新读确认。旧十槽后置校验从 ActiveView 读取不存在的 activationId。若未来获准恢复正式窗，应在产品响应后用完整激活回执核对。"
     }
   ],
   "limits": [
-    "正式 ABA、AC03-B、Oracle S0、cleanup250ms 资格保留原边界。",
-    "旧失败的最后已证客户端调用是回滚 job 读回。正常恢复的跨请求耗时与旧在途调用上下文不同。"
+    "d368 sourceExecutionId",
+    "AC03-B",
+    "Oracle S0",
+    "cleanup250ms",
+    "两份旧 Doris assessment",
+    "在途ABA、普通最终拒绝占位释放",
+    "Q内两源真实关联及各自清理时长"
   ],
-  "deliveryReadback": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/aba-delivery-readback-7047f9cf.json"
+  "deliveryReadback": "artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/delivery-readback-11f438.json"
 }
