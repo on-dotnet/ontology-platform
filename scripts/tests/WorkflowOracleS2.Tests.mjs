@@ -180,3 +180,43 @@ test("runtime suffix executes ten slots and ends at the first failed S2 gate",as
   }),false);
   assert.deepEqual(visited,plan.stages.slice(0,7).map(s=>s.mode));
 });
+
+test("catalog readiness keeps the exact expired history and reads the existing relation seed with zero source selects",async()=>{
+  const {observeCatalogReadiness}=await import("../maintenance/workflow-oracle-s2.mjs");
+  const digest=raw=>createHash("sha256").update(raw).digest("hex");
+  const reader={me:{subjectId:"f902a743-7079-4e22-a643-a51deb027e89"}};
+  const saved={queryId:"query-d293780099754592b3e2a00957e13c8b",actor:reader.me.subjectId,
+    resultHash:"fcb551ca11b24fb0a1cec8e38f07fb038d95ba774916c0cafdf2b3ad064c3e66"};
+  const raw='{"status":"FOUND"}', expired='{"code":"result_expired"}';
+  const seed={name:"aba-runtime-seed",queryId:"query-"+"1".repeat(32),httpStatus:200,
+    query:{capabilityId:"g4_traverse_relationships"},raw,sha256:digest(raw)};
+  const calls=[],windows=[];
+  let status=410,code="result_expired",retrieved=raw;
+  const ctx={actors:{reader},state:{latestQuery:saved},shared:{plan:{planId:"s2-s3-01-runtime-01"},executionId:"current"},
+    mode:"s2-oracle-aba",report:{},check:(label,ok)=>assert.ok(ok,label),audit:async(name,fn,count)=>{windows.push([name,count]);return fn();},
+    request:async(actor,method,path,body,expected=200)=>{
+      assert.equal(actor,reader);assert.equal(method,"GET");assert.equal(body,undefined);calls.push(path);
+      if(path.endsWith(seed.queryId+"/result"))return {status:200,raw:retrieved};
+      assert.ok([expected].flat().includes(status),"expected status");
+      return {status,raw:status===410?expired:raw,data:{code}};
+    }};
+  await observeCatalogReadiness(ctx);
+  assert.deepEqual(ctx.report.catalogReadiness,{queryId:saved.queryId,actor:saved.actor,status:410,code,raw:expired,
+    sha256:digest(expired),historicalSha256:saved.resultHash});
+  ctx.report.runtimeQuery={queryId:seed.queryId,actor:saved.actor,executionId:"current"};
+  await observeCatalogReadiness(ctx,seed);
+  assert.deepEqual(ctx.report.seedCatalogReadiness,{queryId:seed.queryId,actor:saved.actor,raw,sha256:digest(raw)});
+  assert.deepEqual(calls,[saved.queryId,seed.queryId].map(id=>"/api/v1/data/semantic-queries/"+id+"/result"));
+  assert.deepEqual(windows,[["oracle-current-catalog-readiness",0],["oracle-current-seed-catalog-readiness",0]]);
+  retrieved=raw+" ";
+  await assert.rejects(observeCatalogReadiness(ctx,seed),/seed_original/u);
+  for(const patch of [{name:"else"},{queryId:saved.queryId},{sha256:"0".repeat(64)}])
+    await assert.rejects(observeCatalogReadiness(ctx,{...seed,...patch}),/current_seed/u);
+  for(const patch of [{queryId:"query-"+"2".repeat(32)},{actor:"other"},{resultHash:seed.sha256}])
+    await assert.rejects(observeCatalogReadiness({...ctx,state:{latestQuery:{...saved,...patch}}}),/exact_expired_result|expected status/u);
+  code="different";await assert.rejects(observeCatalogReadiness(ctx),/exact_expired_result/u);
+  ctx.shared.plan.planId="s2-s3-01-access-01";
+  await assert.rejects(observeCatalogReadiness(ctx),/expected status/u);
+  status=200;await observeCatalogReadiness(ctx);
+  assert.deepEqual(ctx.report.catalogReadiness,{queryId:saved.queryId,actor:saved.actor,raw,sha256:digest(raw)});
+});

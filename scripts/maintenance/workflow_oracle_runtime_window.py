@@ -226,7 +226,11 @@ def close_registration(digest=None):
                 row['operation'] not in operations and re.fullmatch('[a-f0-9]{32}', row['operation']) and
                 row['sha256'] != CLOSE_SHA and re.fullmatch('[a-f0-9]{64}', row['sha256']),
                 'WINDOW_CLOSE_REGISTRY_CHAIN')
-        if kind == 'PRE_DIAGNOSTIC_CLOSE':
+        if kind == 'DIAGNOSTIC_CLOSE':
+            from workflow_oracle_diagnostic_close import ENTRY
+            require(row == ENTRY and known[previous]['kind'] == 'PRE_DIAGNOSTIC_CLOSE','WINDOW_DIAGNOSTIC_REGISTRY')
+            known[previous] = {**known[previous],'nextDiagnosticClose':row['sha256']}
+        elif kind == 'PRE_DIAGNOSTIC_CLOSE':
             from workflow_oracle_prediagnostic_close import ENTRY
             require(row == ENTRY and known[previous]['kind'] == 'D368_PG_ONLY'
                     and known[previous]['status'] == 'TASK_LEVEL_RECOVERY','WINDOW_PREDIAGNOSTIC_REGISTRY')
@@ -267,6 +271,10 @@ def last_close(root, archive=None, digest=None):
     import workflow_oracle_mapping_continuity as c
     from workflow_oracle_mapping_evidence import utc
     entry = close_registration(digest)
+    if entry.get('kind') == 'DIAGNOSTIC_CLOSE':
+        from workflow_oracle_diagnostic_close import reopen
+        prior = last_close(root, archive, entry['previousSha256'])
+        return reopen(root, entry, prior, archive)[0]
     if entry.get('kind') == 'PRE_DIAGNOSTIC_CLOSE':
         from workflow_oracle_prediagnostic_close import reopen
         prior = last_close(root, archive, entry['previousSha256'])
@@ -518,7 +526,8 @@ def runtime_continuity(root, previous, current, proof=None, archive=None):
             require(current['commandId'] == entry['nextRestoreHost'], 'WINDOW_RETIRED_HOST')
         require('nextPgOnlyClose' not in entry, 'WINDOW_D368_RETIRED_HOST')
         require('nextPreDiagnosticClose' not in entry,'WINDOW_PREDIAGNOSTIC_RETIRED_HOST')
-        if entry.get('kind') in ('MAPPING_RESTORE','D368_PG_ONLY','PRE_DIAGNOSTIC_CLOSE'):
+        require('nextDiagnosticClose' not in entry,'WINDOW_DIAGNOSTIC_RETIRED_HOST')
+        if entry.get('kind') in ('MAPPING_RESTORE','D368_PG_ONLY','PRE_DIAGNOSTIC_CLOSE','DIAGNOSTIC_CLOSE'):
             require(entry.get('kind') != 'D368_PG_ONLY' or entry['status'] == 'TASK_LEVEL_RECOVERY', 'WINDOW_D368_PRODUCT_BLOCKED')
             close = last_close(root, archive, entry['sha256'])
             middle = close['restoreHost']

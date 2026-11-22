@@ -66,18 +66,68 @@ def reopen(archive,report,host,origin):
     return dict(status='CURRENT_API_CONNECTION_READY',probeId=probe['probeId'],queryColdStart='NOT_QUALIFIED',sourceBusinessReads=0)
 
 
+def zero_read_window(window):
+    require(window['expectedReads']==0 and window['audit']['clientId'] is None and window['audit']['records']==[],
+            'S23_CATALOG_READY_SOURCE')
+
+
+def qualify_seed_catalog(report, original_query, first_post):
+    """过期锚点只记录历史状态。核本父窗独立 GET 从当前 reader 恢复的 seed 原字节。"""
+    from workflow_oracle_mapping_s2_contract import CAPABILITIES, RELATION
+    from workflow_oracle_mapping_evidence import utc
+    batch=report['batch']; seed=report['runtimeQuery']; restored=report['seedCatalogReadiness']; reader=ROSTER['reader'][1]
+    require(report['mode']==batch['mode']=='s2-oracle-aba' and batch['planId']=='s2-s3-01-runtime-01'
+            and re.fullmatch('[0-9a-f]{32}',batch['executionId']) and seed['executionId']==batch['executionId'],
+            'S23_CATALOG_SEED_PARENT')
+    sid=seed['queryId']; query=seed['query']; digest=seed['resultHash']
+    require(re.fullmatch('query-[0-9a-f]{32}',sid) and sid!=original_query and restored['queryId']==sid
+            and seed['actor']==restored['actor']==reader and query['capabilityId']==CAPABILITIES[2]
+            and query['relationshipIris']==[RELATION] and query['filters']==dict(siteId='site-a',entityExternalId='omq-entity-1')
+            and re.fullmatch('[0-9a-f]{64}',seed['sessionHash'])
+            and [r['sessionHash'] for r in report['scenarioReady']['session']['observations'] if r['subjectId']==reader]==[seed['sessionHash']],
+            'S23_CATALOG_SEED_READER')
+    cases=[r for r in report['oracleCases'] if r['name']=='aba-runtime-seed']
+    require(len(cases)==1,'S23_CATALOG_SEED_COUNT')
+    row=cases[0];raw=restored['raw'].encode()
+    require(row['query']==query and row['httpStatus']==200 and row['queryId']==sid and raw==row['raw'].encode()
+            and row['bytes']==len(raw) and ex.sha(raw)==row['sha256']==restored['sha256']==digest and json.loads(raw)['status']=='FOUND',
+            'S23_CATALOG_SEED_BYTES')
+    endpoint='/api/v1/data/semantic-queries';http=report['http']
+    posts=[i for i,h in enumerate(http) if h['method']=='POST' and h['path']==endpoint and h.get('queryId')==sid]
+    require(posts==[first_post] and first_post<len(http),'S23_CATALOG_SEED_POST')
+    post=http[first_post]
+    require(post['status']==200 and post['query']==query and post['subjectId']==reader and post['selectionQueryId'] is None
+            and post['sha256']==digest,'S23_CATALOG_SEED_POST')
+    gets=[i for i,h in enumerate(http) if h['method']=='GET' and h['path']==endpoint+'/'+sid+'/result']
+    require(len(gets)==1 and first_post<gets[0] and not any(h['method']=='POST' and h['path']==endpoint for h in http[first_post+1:gets[0]]),
+            'S23_CATALOG_SEED_GET')
+    response=http[gets[0]]
+    require(response['status']==200 and 0<response['elapsedMs']<=5000 and response['subjectId']==reader and response['sha256']==digest,
+            'S23_CATALOG_SEED_GET')
+    windows=report['oracleWindows']; names=[w['name'] for w in windows]; stages=['oracle-current-catalog-readiness','aba-runtime-seed','oracle-current-seed-catalog-readiness']
+    require(all(names.count(n)==1 for n in stages) and names[1:4]==stages and
+            all(utc(windows[i]['finishedAtUtc'])<=utc(windows[i+1]['startedAtUtc']) for i in (1,2)), 'S23_CATALOG_SEED_WINDOWS')
+    seed_window=windows[2]
+    records=seed_window['audit']['records']
+    require(seed_window['expectedReads']==2 and seed_window['audit']['clientId'] is None
+            and sorted((r['owner'],r['table']) for r in records)==[('CaseOwner','OmqTarget'),('PRODUCTION','OMQ_ENTITY')]
+            and all(r['action']=='SELECT' and r['code']==0 for r in records),'S23_CATALOG_SEED_READS')
+    zero_read_window(windows[3])
+    return dict(status='CURRENT_CATALOG_VERIFIED',queryId=sid,sha256=digest,historicalQueryId=original_query,historicalStatus=410)
+
+
 def qualify_catalog(report):
     """当前reader在原五秒恢复期限内取得已资格关系结果原字节，同时完整核当前目录。"""
     item=report['catalogReadiness']
     query='query-d293780099754592b3e2a00957e13c8b'
     digest='fcb551ca11b24fb0a1cec8e38f07fb038d95ba774916c0cafdf2b3ad064c3e66'
     raw=item['raw'].encode()
-    require(item['queryId']==query and item['actor']==ROSTER['reader'][1] and len(raw)==5056 and item['sha256']==ex.sha(raw)==digest,'S23_CATALOG_READY_ORIGINAL')
+    require(item['queryId']==query and item['actor']==ROSTER['reader'][1] and item['sha256']==ex.sha(raw),'S23_CATALOG_READY_ORIGINAL')
     path='/api/v1/data/semantic-queries/'+query+'/result'
     windows=[w for w in report['oracleWindows'] if w['name']=='oracle-current-catalog-readiness']
     require(len(windows)==1,'S23_CATALOG_READY_WINDOW')
     window=windows[0]
-    require(window['expectedReads']==0 and window['audit']['clientId'] is None and window['audit']['records']==[],'S23_CATALOG_READY_SOURCE')
+    zero_read_window(window)
     http=report['http']
     # 首次正式执行之后的恢复另按各自场景核验。
     query_start=next((i for i,h in enumerate(http) if h['method']=='POST' and h['path']=='/api/v1/data/semantic-queries'),len(http))
@@ -87,5 +137,12 @@ def qualify_catalog(report):
     requests=[i for i,h in enumerate(prefix) if h['method']=='GET' and h['path']==path]
     require(len(probes)==len(requests)==1 and probes[0]<requests[0],'S23_CATALOG_READY_ORDER')
     response=prefix[requests[0]]
+    if item.get('status')==410:
+        require(response['status']==410 and response['subjectId']==item['actor'] and response['sha256']==item['sha256']
+                and item['historicalSha256']==digest and response['code']==item['code']==json.loads(raw)['code']=='result_expired'
+                and 0<response['elapsedMs']<=5000,'S23_CATALOG_HISTORY_EXPIRED')
+        return qualify_seed_catalog(report,query,query_start)
+    require(item.get('status',200)==200 and 'seedCatalogReadiness' not in report and len(raw)==5056 and item['sha256']==digest,
+            'S23_CATALOG_READY_ORIGINAL')
     require(response['status']==200 and response['sha256']==digest and 0<response['elapsedMs']<=5000,'S23_CATALOG_READY_HTTP')
     return dict(status='CURRENT_CATALOG_VERIFIED',queryId=query,sha256=digest)

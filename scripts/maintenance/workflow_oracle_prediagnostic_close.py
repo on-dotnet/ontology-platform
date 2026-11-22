@@ -74,6 +74,12 @@ def reopen(root, entry, prior, archive=None):
             window['ceiling']==w.choose(window['openingBytes']), 'PREDIAGNOSTIC_WINDOW')
     cold,post=[pg.inventory(root,row[part],[],local) for part in ('cold','post')]
     commands=events(root,cold,post)
+    finishes = resources(root, row, prior, commands, cold, post, local, OP, PRIOR, STOPS, PG_NATIVE)
+    return result(local, archive, entry, prior, OP, finishes)
+
+
+def resources(root, row, prior, commands, cold, post, local, operation, previous_digest, stops, pg_native):
+    def read(path): return pg.raw_json(root,path,local)
     def command(run,stage,argv,key,seconds,ref=None,lower=None,upper=None):
         matches=[r for r in commands if r['runId']==run and r['stage']==stage and r['inputFingerprint']==key and
                  (ref is None or r['commandId']==ref) and (lower is None or utc(lower)<=utc(r['startedAtUtc'])) and
@@ -89,8 +95,8 @@ def reopen(root, entry, prior, archive=None):
     for role in DATA:
         resource=prior['data'][role]['id']
         started=read(pg.REC/('start-'+pg.ident(row['starts'][role])+'.json'))
-        stop=read(pg.REC/('stop-'+STOPS[role]+'.json'))
-        require(stop['operation']==OP and stop['role']==role,'PREDIAGNOSTIC_NATIVE_TARGET')
+        stop=read(pg.REC/('stop-'+stops[role]+'.json'))
+        require(stop['operation']==operation and stop['role']==role,'PREDIAGNOSTIC_NATIVE_TARGET')
         require((started['id'],started['role'],started['attempt'],started['stage'],started['status'])==
                 (resource,role,row['starts'][role],w.RUN,'RUNNING') and stop['id']==resource and
                 stop['group']=='replacement' and stop['status']==('PROCESS_EXITED' if role=='fuseki' else 'CLEAN_STOP') and
@@ -108,8 +114,8 @@ def reopen(root, entry, prior, archive=None):
                 <=utc(start['endedAtUtc'])<=utc(stop['startedUtc'])<utc(state['FinishedAt'])<=utc(stop['endedUtc'])
                 <=utc(post['startedUtc']),'PREDIAGNOSTIC_GENERATION')
         if role=='platform-pg':
-            args=dict(operation=OP,pgStartAttempt=started['attempt'],pgStopAttempt=STOPS[role],
-                      pgStartCommand=start['commandId'],pgNative=PG_NATIVE)
+            args=dict(operation=operation,pgStartAttempt=started['attempt'],pgStopAttempt=stops[role],
+                      pgStartCommand=start['commandId'],pgNative=pg_native)
             pg.reopen_native(root,args,prior,local)
         else:
             require(native('native-state',[*DOCKER,'inspect','-f','{{.State.Status}}',resource])==b'running' and
@@ -125,11 +131,11 @@ def reopen(root, entry, prior, archive=None):
             fuseki_termination(stop)
             require(stop['cleanShutdown']=='UNKNOWN' and stop['processExited'] is True and
                     started['productUse']=='CURRENT_GRAPHS_VERIFIED' and started['startedAt']==state['StartedAt'] and
-                    started['currentGraphs']['close']==PRIOR and started['pid']>0, 'PREDIAGNOSTIC_FUSEKI')
+                    started['currentGraphs']['close']==previous_digest and started['pid']>0, 'PREDIAGNOSTIC_FUSEKI')
             graphs=started['currentGraphs']
             require(set(graphs['commands'])=={'default','named','published'} and
                     graphs==w.published_graphs(resource,started['startedAt'],started['pid'],started['checkpoint'],
-                                               graphs['commands'],close_sha=PRIOR),'PREDIAGNOSTIC_GRAPH_ORIGINALS')
+                                               graphs['commands'],close_sha=previous_digest),'PREDIAGNOSTIC_GRAPH_ORIGINALS')
             for cid in graphs['commands'].values():
                 for member in ('receipt.json','stdout.txt','stderr.txt'):
                     c.raw(root,c.AREA.parent/'commands'/w.RUN/pg.ident(cid)/member,local)
@@ -155,6 +161,10 @@ def reopen(root, entry, prior, archive=None):
         receipt,out=command(w.RUN,'omq-pg-runtime-drain-'+label,[*DOCKER,'exec','-i','--user','postgres',c.PG,'psql',
                             '-XwqAt','-d','mapping','-v','ON_ERROR_STOP=1'],ex.sha(sql),15,row['drain'][label]['commandId'])
         require(json.loads(out)==row['drain'][label]['values']==[0]*7,'PREDIAGNOSTIC_DRAIN')
+    return finishes
+
+
+def result(local, archive, entry, prior, operation, finishes):
     members={p:local.examined[k] for k,p in local.paths.items()}
     index=ex.sha(ex.encoded(members))
     if 'memberIndexSha256' in entry:
@@ -164,5 +174,5 @@ def reopen(root, entry, prior, archive=None):
             require(archive.examined.get(k,local.examined[k])==local.examined[k],'PREDIAGNOSTIC_ARCHIVE')
             archive.paths[k]=p
             archive.examined[k]=local.examined[k]
-    normalized={**prior,'maintenance':[*prior.get('maintenance',[]),dict(operation=OP,finishedAt=finishes)]}
+    normalized={**prior,'maintenance':[*prior.get('maintenance',[]),dict(operation=operation,finishedAt=finishes)]}
     return normalized,len(members),index

@@ -340,15 +340,21 @@ def aba_reads(report, original):
     from workflow_oracle_mapping_identity_recovery import ROSTER
     names=['aba-runtime-seed','aba-selection-origin','aba-selection-current','mapping-aba-b','inflight-activation-aba','aba-history-and-selection']
     windows=report['oracleWindows']
+    base_windows=windows
     if report['batch']['planId']=='s2-s3-01-runtime-01':
+        if report.get('catalogReadiness',{}).get('status')==410:
+            from workflow_oracle_mapping_readiness import qualify_catalog
+            qualify_catalog(report)
+            names.insert(1,'oracle-current-seed-catalog-readiness')
+            base_windows=[w for w in windows if w['name']!='oracle-current-seed-catalog-readiness']
         names=['oracle-current-api-readiness','oracle-current-catalog-readiness',*names]
     require([w['name'] for w in windows]==names,'S23_ABA_WINDOW_SET')
-    seed,inflight=windows[-6],windows[-2]
+    seed,inflight=base_windows[-6],base_windows[-2]
     tables=sorted([('PRODUCTION','OMQ_ENTITY'),('CaseOwner','OmqTarget')])
     def table_pair(events):
         require(sorted((row['owner'],row['table']) for row in events)==tables
                 and all(row['action']=='SELECT' and row['code']==0 for row in events),'S23_ABA_TABLE_PAIR')
-    require([w['expectedReads'] for w in windows[-6:]]==[2,1,1,2,8,0]
+    require([w['expectedReads'] for w in base_windows[-6:]]==[2,1,1,2,8,0]
             and seed['expectedReads']==2 and inflight['expectedReads']==8
             and all(w['audit']['clientId'] is None for w in windows),'S23_ABA_READ_PLAN')
     table_pair(seed['audit']['records'])

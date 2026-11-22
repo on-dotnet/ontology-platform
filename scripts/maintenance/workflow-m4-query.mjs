@@ -105,6 +105,8 @@ async function browserRun(mode, shared = null) {
     report.http.push({ method, path, status: response.status(), elapsedMs: performance.now() - start,
       ...(oracleTwoTable && mode==="s2-oracle-aba" && path==="/api/v1/data/semantic-queries" && method==="POST"
         ? {queryId:response.headers()["x-query-id"]??null,query:body,subjectId:actor.me.subjectId,selectionQueryId:actor.headers["X-Selection-Query-Id"]??null} : {}),
+      ...(oracleTwoTable && mode==="s2-oracle-aba" && method==="GET" && /^\/api\/v1\/data\/semantic-queries\/query-[a-f0-9]{32}\/result$/u.test(path)
+        ? {subjectId:actor.me.subjectId} : {}),
       ...(data?.code ? { code: data.code } : {}), sha256: createHash("sha256").update(raw).digest("hex") });
     check("http_" + report.http.length + "_" + expected, (Array.isArray(expected) ? expected.includes(response.status()) : response.status() === expected));
     return { data, raw, status: response.status(), etag: response.headers()["etag"] ?? "", queryId: response.headers()["x-query-id"] ?? "", cacheControl: response.headers()["cache-control"] };

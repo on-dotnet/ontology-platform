@@ -534,12 +534,42 @@ async function currentReadiness(ctx) {
       snapshot:omq.platform(root,"__import__('workflow_oracle_mapping_readiness').snapshot(*json.load(sys.stdin))",[probe.data.probeId],shared.stageDeadline)};
   },0);
   omq.platform(root,"__import__('workflow_oracle_mapping_readiness').qualify(json.load(sys.stdin))",report,shared.stageDeadline);
-  await audit("oracle-current-catalog-readiness",async()=>{
-      const saved=state.latestQuery;
-      const restored=await request(reader,"GET","/api/v1/data/semantic-queries/"+saved.queryId+"/result");
-      report.catalogReadiness={queryId:saved.queryId,actor:reader.me.subjectId,raw:restored.raw,sha256:hash(restored.raw)};
+  await observeCatalogReadiness(ctx);
+  if(report.catalogReadiness.status!==410) {
+    omq.platform(root,"__import__('workflow_oracle_mapping_readiness').qualify_catalog(json.load(sys.stdin))",report,shared.stageDeadline);
+  }
+}
+
+/** 只在当前 ABA 保存准确历史过期响应，再用本槽已有的关系查询核读原字节。 */
+export async function observeCatalogReadiness(ctx,seed) {
+  const {state,actors:{reader},shared,report,request,check,audit}=ctx;
+  const saved=state.latestQuery;
+  const actor=reader.me.subjectId;
+  if(seed) {
+    check("oracle_catalog_current_seed",report.catalogReadiness.status===410 && report.runtimeQuery?.queryId===seed.queryId
+      && report.runtimeQuery.actor===actor && report.runtimeQuery.executionId===shared.executionId
+      && seed.name==="aba-runtime-seed" && seed.httpStatus===200 && seed.query.capabilityId===capabilities[2]
+      && /^query-[a-f0-9]{32}$/u.test(seed.queryId) && seed.queryId!==saved.queryId && hash(seed.raw)===seed.sha256);
+    await audit("oracle-current-seed-catalog-readiness",async()=>{
+      const reply=await request(reader,"GET","/api/v1/data/semantic-queries/"+seed.queryId+"/result");
+      check("oracle_catalog_seed_original",reply.status===200 && reply.raw===seed.raw);
+      report.seedCatalogReadiness={queryId:seed.queryId,actor,raw:reply.raw,sha256:hash(reply.raw)};
     },0);
-  omq.platform(root,"__import__('workflow_oracle_mapping_readiness').qualify_catalog(json.load(sys.stdin))",report,shared.stageDeadline);
+    return;
+  }
+  const runtimeAba=shared.plan.planId==="s2-s3-01-runtime-01" && ctx.mode==="s2-oracle-aba";
+  await audit("oracle-current-catalog-readiness",async()=>{
+    const restored=await request(reader,"GET","/api/v1/data/semantic-queries/"+saved.queryId+"/result",undefined,runtimeAba?[200,410]:200);
+    const observation={queryId:saved.queryId,actor,raw:restored.raw,sha256:hash(restored.raw)};
+    if(restored.status===410) {
+      check("oracle_catalog_exact_expired_result",runtimeAba && restored.data?.code==="result_expired"
+        && saved.queryId==="query-d293780099754592b3e2a00957e13c8b" && saved.actor===actor
+        && actor==="f902a743-7079-4e22-a643-a51deb027e89"
+        && saved.resultHash==="fcb551ca11b24fb0a1cec8e38f07fb038d95ba774916c0cafdf2b3ad064c3e66");
+      Object.assign(observation,{status:410,code:restored.data.code,historicalSha256:saved.resultHash});
+    }
+    report.catalogReadiness=observation;
+  },0);
 }
 
 /** 当前组合grant拒绝后既不执行业务SQL，也不恢复历史原值；每次恢复核原行。 */
@@ -638,6 +668,11 @@ export async function aba(ctx) {
   state.runtimeQuery={queryId:seed.queryId,query:seed.query,resultHash:seed.sha256,actor:reader.me.subjectId,
     sessionHash:readerSession(ctx),executionId:ctx.shared.executionId,reportName:basename(ctx.file)};
   await save(state);
+  if(report.catalogReadiness?.status===410) {
+    report.runtimeQuery=state.runtimeQuery;
+    await observeCatalogReadiness(ctx,seed);
+    omq.platform(ctx.root,"__import__('workflow_oracle_mapping_readiness').qualify_catalog(json.load(sys.stdin))",report,ctx.shared.stageDeadline);
+  }
   const changed=call("source_case","ambiguous");
   let selectionOrigin;report.activeSourceCase={action:"ambiguous",token:changed.token};
   try {selectionOrigin=await ctx.execute("aba-selection-origin",ctx.query(capabilities[0],{entityExternalId:null}));}

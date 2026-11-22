@@ -118,6 +118,19 @@ def _program(raw,skip):
             if not isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef)) or node.name not in skip]
 
 
+# 新 reader 取证只在既有五槽之后的 runtime ABA 启用。历史驱动对继续单独核验。
+CATALOG_PREFIX_DRIVERS={
+    'scripts/maintenance/workflow_oracle_mapping_s2.py':
+        ('314fae7820ad26533d2a2e651e271de731ae2983d2b91b224754a8afd2aa392b', '80c07012fd6e04edea931c2e17338876a09d9b2b6c8af876cb6fa2ac6dd98367'),
+    'scripts/maintenance/workflow-m4-query.mjs':
+        ('4dbd4e6b432d1b85c87abc7a002148bea7865c4dd1316b011315223ebc631542', '475416e55ad5982495c2707042354db877155463f3f5cafb581756dc6996b3b8'),
+    'scripts/maintenance/workflow-oracle-s2.mjs':
+        ('e7ab33e1bd38429eb2bc1d7aa7071da3a39022fb4329b6c23404bf9757a546e9', '21955abbea6260ef07392457608367ecd4d8504fa0d441a3aac514f290dcb4a2'),
+    'scripts/maintenance/workflow_oracle_mapping_s2_contract.py':
+        ('87601573a5b3ea57c6e7f46e96f048262f8eac94fddc76ed2dab7b6424afc8d2', 'd51ef91be4e3798a011ec3d20df69099a156697d457892af2a3a15382e48b689'),
+}
+
+
 def compatible_prefix(archive,measured,mode,stage):
     """仅五个准确已资格槽允许本次未执行权限段及父计划选择差异，其余执行内容仍逐字/AST相同。"""
     import workflow_oracle_mapping_evidence as e
@@ -129,7 +142,7 @@ def compatible_prefix(archive,measured,mode,stage):
         require(ex.sha(old)==frozen['browserIdentity']['measuredDrivers'][name],'S23_PREFIX_ORIGINAL_DRIVER')
         if old==new:continue
         # 此五槽原件已有固定资格。仅接受复核登记的完整驱动字节对，未登记编辑仍走原严格比较。
-        if (ex.sha(old),ex.sha(new))==RUNTIME_PREFIX_DRIVERS.get(name):
+        if (ex.sha(old),ex.sha(new)) in (RUNTIME_PREFIX_DRIVERS.get(name),CATALOG_PREFIX_DRIVERS.get(name)):
             continue
         left,right=old.decode(),new.decode()
         if name.endswith('/workflow-oracle-s2.mjs'):

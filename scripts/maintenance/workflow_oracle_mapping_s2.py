@@ -151,6 +151,13 @@ def check_grant_checkpoint(snapshot, current, execution_id, recorded):
     """冻结已接受的签发后原行；历史签发前读回仅供其原命令离线重开。"""
     from workflow_oracle_runtime_window import close_registration
     checkpoint = close_registration()['grantCheckpoint']
+    # 已登记诊断及其发放前驱须按各自签发时的原检查点重开。实时准入始终核当前登记。
+    if recorded is not None:
+        from workflow_oracle_diagnostic_close import CHECKPOINT, PRIOR
+        if checkpoint == CHECKPOINT:
+            earlier = close_registration(PRIOR)['grantCheckpoint']
+            if execution_id in (CHECKPOINT['executionId'], earlier['executionId']):
+                checkpoint = earlier
     data = snapshot(checkpoint['after'])
     require(ex.sha(data) == checkpoint['afterSha256'], 'S2_PREPARE_CHECKPOINT_ORIGINAL')
     accepted = json.loads(data)

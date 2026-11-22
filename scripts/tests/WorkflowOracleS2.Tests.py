@@ -1189,6 +1189,39 @@ class S2ReadinessTests(unittest.TestCase):
             http=[{k:v for k,v in part.items() if k not in ('raw','etag')} for part in parts],oracleReadiness=dict(actor=actor,api=api,http=parts,snapshot=snapshot),
             oracleWindows=[dict(name='oracle-current-api-readiness',expectedReads=0,startedAtUtc='2026-11-21T04:00:00+00:00',finishedAtUtc='2026-11-21T04:00:01+00:00')])
 
+    def test_expired_catalog_and_current_reader_seed_are_independently_bound(self):
+        import workflow_oracle_mapping_readiness as r
+        old='query-d293780099754592b3e2a00957e13c8b';fresh='query-'+'e'*32;reader=r.ROSTER['reader'][1]
+        path='/api/v1/data/semantic-queries';error='{"code":"result_expired"}';raw='{"status":"FOUND"}'
+        digest=ex.sha(raw.encode());q=dict(capabilityId=c.CAPABILITIES[2],relationshipIris=[c.RELATION],filters=dict(siteId='site-a',entityExternalId='omq-entity-1'))
+        report=self.model();report['mode']='s2-oracle-aba';report['batch']=dict(mode=report['mode'],planId='s2-s3-01-runtime-01',executionId='1'*32)
+        report['catalogReadiness']=dict(queryId=old,actor=reader,raw=error,sha256=ex.sha(error.encode()),status=410,code='result_expired',
+              historicalSha256='fcb551ca11b24fb0a1cec8e38f07fb038d95ba774916c0cafdf2b3ad064c3e66')
+        report['runtimeQuery']=dict(queryId=fresh,query=q,actor=reader,resultHash=digest,sessionHash='3'*64,executionId='1'*32)
+        report['scenarioReady']=dict(session=dict(observations=[dict(subjectId=reader,sessionHash='3'*64)]))
+        report['seedCatalogReadiness']=dict(queryId=fresh,actor=reader,raw=raw,sha256=digest)
+        report['oracleCases']=[dict(name='aba-runtime-seed',queryId=fresh,query=q,raw=raw,sha256=digest,bytes=len(raw),httpStatus=200)]
+        report['http'].extend([dict(method='GET',path=path+'/'+old+'/result',status=410,sha256=ex.sha(error.encode()),subjectId=reader,elapsedMs=1,code='result_expired'),
+            dict(method='POST',path=path,status=200,selectionQueryId=None,subjectId=reader,query=q,queryId=fresh,sha256=digest),
+            dict(method='GET',path=path+'/'+fresh+'/result',status=200,sha256=digest,subjectId=reader,elapsedMs=2)])
+        events=[dict(owner=o,table=t,action='SELECT',code=0) for o,t in [('CaseOwner','OmqTarget'),('PRODUCTION','OMQ_ENTITY')]]
+        for i,(name,records) in enumerate([('oracle-current-catalog-readiness',[]),('aba-runtime-seed',events),('oracle-current-seed-catalog-readiness',[])],1):
+            report['oracleWindows'].append(dict(name=name,expectedReads=len(records),audit=dict(clientId=None,records=records),
+                startedAtUtc=f'2026-11-21T04:00:0{i}Z',finishedAtUtc=f'2026-11-21T04:00:0{i+1}Z'))
+        self.assertEqual(r.qualify_catalog(report),dict(status='CURRENT_CATALOG_VERIFIED',queryId=fresh,sha256=digest,historicalQueryId=old,historicalStatus=410))
+        for path_keys,value in [
+            (['catalogReadiness','historicalSha256'],digest),(['catalogReadiness','code'],'other'),(['mode'],'s2-oracle-access'),
+            (['http',-3,'subjectId'],'other'),(['http',-1,'path'],path+'/'+old+'/result'),(['http',-1,'subjectId'],'other'),
+            (['seedCatalogReadiness','raw'],error),(['runtimeQuery','executionId'],'2'*32),(['runtimeQuery','sessionHash'],'4'*64),
+            (['oracleWindows',-1,'audit','records'],events),(['oracleWindows',-1,'audit','clientId'],'filtered'),
+            (['oracleWindows',-2,'audit','records'],events[:1]),(['http',-2,'queryId'],old),
+        ]:
+            with self.subTest(path=path_keys):
+                bad=copy.deepcopy(report);item=bad
+                for k in path_keys[:-1]:item=item[k]
+                item[path_keys[-1]]=value
+                with self.assertRaises(ValueError):r.qualify_catalog(bad)
+
     def test_formal_model_accepts_cumulative_equal_phase_times(self):
         import workflow_oracle_mapping_readiness as r
         self.assertEqual(r.qualify(self.model())['status'],'TEST_OK')
