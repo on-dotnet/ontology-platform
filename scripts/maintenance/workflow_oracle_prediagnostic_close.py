@@ -78,7 +78,7 @@ def reopen(root, entry, prior, archive=None):
     return result(local, archive, entry, prior, OP, finishes)
 
 
-def resources(root, row, prior, commands, cold, post, local, operation, previous_digest, stops, pg_native):
+def resources(root, row, prior, commands, cold, post, local, operation, previous_digest, stops, pg_native, *, normal=False):
     def read(path): return pg.raw_json(root,path,local)
     def command(run,stage,argv,key,seconds,ref=None,lower=None,upper=None):
         matches=[r for r in commands if r['runId']==run and r['stage']==stage and r['inputFingerprint']==key and
@@ -158,7 +158,7 @@ def resources(root, row, prior, commands, cold, post, local, operation, previous
             last=result['endedAtUtc']
     sql=('BEGIN READ ONLY;\nSELECT json_build_array('+','.join('('+v.strip()+')' for v in COUNTS)+');\nCOMMIT;').encode()
     for label in ('before','after'):
-        receipt,out=command(w.RUN,'omq-pg-runtime-drain-'+label,[*DOCKER,'exec','-i','--user','postgres',c.PG,'psql',
+        receipt,out=command(w.RUN,('omq-pg-normal-drain-' if normal else 'omq-pg-runtime-drain-')+label,[*DOCKER,'exec','-i','--user','postgres',c.PG,'psql',
                             '-XwqAt','-d','mapping','-v','ON_ERROR_STOP=1'],ex.sha(sql),15,row['drain'][label]['commandId'])
         require(json.loads(out)==row['drain'][label]['values']==[0]*7,'PREDIAGNOSTIC_DRAIN')
     return finishes

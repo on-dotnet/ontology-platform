@@ -3,7 +3,7 @@
   "runId": "product-resume-01",
   "batch": "s2-s3-01",
   "planId": "s2-s3-01-runtime-01",
-  "currentSha256": "b4a5acc7e4de1d788e666b44e125b642a338024b7d2000c44a8ace4820d4d430",
+  "currentSha256": "64bdc66845958810935eb00e9b633108b6c5dc7ebf56ea19d030c396a5db5040",
   "generations": [
     {
       "operation": "330c11744f364d1187332e0d93801098",
@@ -322,6 +322,40 @@
       "status": "TASK_LEVEL_RECOVERY",
       "memberCount": 191,
       "memberIndexSha256": "10e1b70d17be4a05d5314251298479956a705c1aebbf2bdb4df476e77a1f6c27"
+    },
+    {
+      "kind": "NORMAL_QUERY_CLOSE",
+      "operation": "f3d2efe12c984042a324c0f2cc133b30",
+      "previousSha256": "b4a5acc7e4de1d788e666b44e125b642a338024b7d2000c44a8ace4820d4d430",
+      "sha256": "64bdc66845958810935eb00e9b633108b6c5dc7ebf56ea19d030c396a5db5040",
+      "sizeBytes": 19744,
+      "parentId": "e1c70fc2faf344f39c98ac6731a061aa",
+      "exitCode": 1,
+      "queryId": "query-5d891e89221e4a3f8f6893873b1d7a9d",
+      "windowId": "44b78d3b39f04e6e9134a93257b1e51b",
+      "nativeStops": {
+        "platform-pg": "1666d85c1c80422ab44e4fc33a066c69",
+        "keycloak-test": "9b9cd5a4855a46a2bfd84479723c52ce",
+        "fuseki": "9ddb18f3980740e794433d88de3bf860",
+        "rustfs": "ff27f30f9dc54a8e8762cee33b0f8dfa",
+        "oracle": "b82aa26de8004c39bbfa01ddd245cd04"
+      },
+      "pgNative": {
+        "fast": "fb459808051b4f91ba531d75e09d4890",
+        "wait": "a6e61179574a479a914431a18eec336e",
+        "state": "c10305d518d945c0ba03dd9f02da773c",
+        "control": "76a98699fba5438b83bbc133a165bdbb",
+        "controlCreate": "76ad9f006ce84abbbe7b18ab941a0007",
+        "controlHelper": "61355816b1ca489db4fd3161b5914671"
+      },
+      "ledger": {
+        "offset": 121699251,
+        "sizeBytes": 4027613,
+        "sha256": "165eec5e8971a47fc22c125507f8c0fdf2d39a98ca9f40e8e86c4f5156ddd772"
+      },
+      "status": "NORMAL_PATH_BLOCKED",
+      "memberCount": 167,
+      "memberIndexSha256": "04db460676617adf7394adba42c034e6bde5f4942d8499c1f767cd30fabc4a45"
     }
   ]
 }

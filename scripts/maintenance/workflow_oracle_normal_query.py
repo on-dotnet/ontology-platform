@@ -195,6 +195,39 @@ def run_first():
     return output
 
 
+def reopen_closed(root,entry,prior,archive=None):
+    """复用七角色生命周期消费者，登记普通 Q 的末代并保持未知占位封闭。"""
+    from types import SimpleNamespace
+    import workflow_oracle_mapping_continuity as continuity
+    import workflow_oracle_d368_pg_close as pg
+    import workflow_oracle_prediagnostic_close as life
+    local=SimpleNamespace(paths={},examined={})
+    op=entry['operation']
+    raw=continuity.raw(root,continuity.AREA/w.BATCH/('normal-observation-'+op+'.json'),local)
+    require(len(raw)==entry['sizeBytes'] and r.ex.sha(raw)==entry['sha256'],'NORMAL_CLOSED_ORIGINAL')
+    row=json.loads(raw)
+    require(row['slot']=='Q1' and row['remaining']==row['errors']==[] and row['protectedSame'] and row['parentExit']==1
+            and row['facts']['row']['value']['queryId']==entry['queryId'] and row['parentCommand']==entry['parentId']
+            and row['windowId']==entry['windowId'] and row['closeSha256']==entry['previousSha256']==PG_CLOSE,'NORMAL_CLOSED_SCOPE')
+    win=pg.raw_json(root,continuity.AREA/w.BATCH/('window-'+row['windowId']+'.json'),local)
+    require(win['state']=='CLOSED' and win['id']==entry['windowId'] and win['coldAttempt']==row['cold']
+            and win['priorCloseSha256']==PG_CLOSE,'NORMAL_WINDOW_CLOSED')
+    book=entry['ledger']
+    with r.ex.ordinary(root/continuity.AREA.parent/'command-events.jsonl').open('rb') as stream:
+        stream.seek(book['offset'])
+        data=stream.read(book['sizeBytes'])
+    require(len(data)==book['sizeBytes'] and r.ex.sha(data)==book['sha256'],'NORMAL_CLOSE_LEDGER')
+    ends=[v for line in data.splitlines() if (v:=json.loads(line))['event']=='END']
+    require([v['commandId'] for v in ends if v['stage']=='omq-browser-normal-q1']==[entry['parentId']]
+            and not any(v['stage'] in ('query-real-aba-inflight-runtime','omq-browser-s2-s3-oracle') for v in ends),'NORMAL_CLOSED_PARENT')
+    cold=pg.inventory(root,row['cold'],[],local)
+    post=pg.inventory(root,row['post'],[],local)
+    record={**row,'closed':{**row['closed'],**{role:{k:v for k,v in row['closed'][role].items() if v is not None} for role in DATA}},
+            'drain':{label:{'values':v['value'],'commandId':v['commandId']} for label,v in row['drain'].items()}}
+    finishes=life.resources(root,record,prior,ends,cold,post,local,op,PG_CLOSE,entry['nativeStops'],entry['pgNative'],normal=True)
+    return life.result(local,archive,entry,prior,op,finishes)
+
+
 if __name__=='__main__':
     path=run_first()
     row=r.load(path)

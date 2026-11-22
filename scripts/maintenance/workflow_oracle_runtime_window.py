@@ -76,6 +76,7 @@ def open_window():
     require(not ACTIVE.get() and not COLD_MEASUREMENT.get() and p.product_run() == RUN and
             ROOT == resume.ROOT and frozen_plan(ROOT, PLAN)['planId'] == PLAN, 'WINDOW_COLD_SCOPE')
     head = close_registration()
+    require(head.get('kind')!='NORMAL_QUERY_CLOSE','WINDOW_NORMAL_QUERY_BLOCKED')
     require(head.get('kind') not in ('D368_PG_ONLY','NORMAL_PG_ONLY') or head['status'] == 'TASK_LEVEL_RECOVERY', 'WINDOW_D368_PRODUCT_BLOCKED')
     measuring = COLD_MEASUREMENT.set(True)
     try:
@@ -236,6 +237,11 @@ def close_registration(digest=None):
                     and known[previous]['status'] == 'TASK_LEVEL_RECOVERY','WINDOW_PREDIAGNOSTIC_REGISTRY')
             row = {**row,'grantCheckpoint':known[previous]['grantCheckpoint']}
             known[previous] = {**known[previous],'nextPreDiagnosticClose':row['sha256']}
+        elif kind=='NORMAL_QUERY_CLOSE':
+            require(known[previous]['kind']=='NORMAL_PG_ONLY' and row['operation']=='f3d2efe12c984042a324c0f2cc133b30'
+                    and row['status']=='NORMAL_PATH_BLOCKED' and row['exitCode']==1
+                    and row['sha256']=='64bdc66845958810935eb00e9b633108b6c5dc7ebf56ea19d030c396a5db5040','WINDOW_NORMAL_CLOSE')
+            row={**row,'grantCheckpoint':known[previous]['grantCheckpoint']}
         elif kind in ('D368_PG_ONLY','NORMAL_PG_ONLY'):
             from workflow_oracle_d368_pg_close import PREVIOUS
             from workflow_oracle_d368_closure import QUERY
@@ -276,6 +282,9 @@ def last_close(root, archive=None, digest=None):
     import workflow_oracle_mapping_continuity as c
     from workflow_oracle_mapping_evidence import utc
     entry = close_registration(digest)
+    if entry.get('kind')=='NORMAL_QUERY_CLOSE':
+        from workflow_oracle_normal_query import reopen_closed
+        return reopen_closed(root,entry,last_close(root,archive,entry['previousSha256']),archive)[0]
     if entry.get('kind') == 'DIAGNOSTIC_CLOSE':
         from workflow_oracle_diagnostic_close import reopen
         prior = last_close(root, archive, entry['previousSha256'])
