@@ -226,7 +226,13 @@ def close_registration(digest=None):
                 row['operation'] not in operations and re.fullmatch('[a-f0-9]{32}', row['operation']) and
                 row['sha256'] != CLOSE_SHA and re.fullmatch('[a-f0-9]{64}', row['sha256']),
                 'WINDOW_CLOSE_REGISTRY_CHAIN')
-        if kind == 'D368_PG_ONLY':
+        if kind == 'PRE_DIAGNOSTIC_CLOSE':
+            from workflow_oracle_prediagnostic_close import ENTRY
+            require(row == ENTRY and known[previous]['kind'] == 'D368_PG_ONLY'
+                    and known[previous]['status'] == 'TASK_LEVEL_RECOVERY','WINDOW_PREDIAGNOSTIC_REGISTRY')
+            row = {**row,'grantCheckpoint':known[previous]['grantCheckpoint']}
+            known[previous] = {**known[previous],'nextPreDiagnosticClose':row['sha256']}
+        elif kind == 'D368_PG_ONLY':
             from workflow_oracle_d368_pg_close import PREVIOUS
             from workflow_oracle_d368_closure import QUERY
             required = {'kind','operation','queryId','previousSha256','sha256','sizeBytes','status','memberCount','memberIndexSha256'}
@@ -261,6 +267,10 @@ def last_close(root, archive=None, digest=None):
     import workflow_oracle_mapping_continuity as c
     from workflow_oracle_mapping_evidence import utc
     entry = close_registration(digest)
+    if entry.get('kind') == 'PRE_DIAGNOSTIC_CLOSE':
+        from workflow_oracle_prediagnostic_close import reopen
+        prior = last_close(root, archive, entry['previousSha256'])
+        return reopen(root, entry, prior, archive)[0]
     if entry.get('kind') == 'D368_PG_ONLY':
         from workflow_oracle_d368_pg_close import reopen
         previous = last_close(root, archive, entry['previousSha256'])
@@ -442,6 +452,19 @@ def last_close(root, archive=None, digest=None):
     return normalized
 
 
+def graph_stop(close):
+    """沿已经重开的关闭链定位准确的最近一次 Fuseki 停机。"""
+    from workflow_oracle_mapping_evidence import utc
+    closed = close['data']['fuseki']
+    finished = closed['after']['FinishedAt']
+    for edge in close.get('maintenance', []):
+        if 'fuseki' in edge['finishedAt']:
+            newer = edge['finishedAt']['fuseki']
+            require(utc(finished) < utc(newer), 'WINDOW_GRAPH_STOP_ORDER')
+            finished = newer
+    return closed['id'], finished
+
+
 def published_graphs(cid, started, pid, basis, refs=None, archive=None, *, close_sha=CLOSE_SHA):
     import workflow_execution as ex
     import workflow_oracle_mapping_continuity as c
@@ -449,13 +472,13 @@ def published_graphs(cid, started, pid, basis, refs=None, archive=None, *, close
     from workflow_oracle_mapping_resume import recovery as r
     require(cid == c.FUSEKI and pid > 0, 'WINDOW_GRAPH_ROLE')
     if close_sha != CLOSE_SHA:
-        closed = last_close(ROOT, archive, close_sha)['data']['fuseki']
+        stopped_id, finished = graph_stop(last_close(ROOT, archive, close_sha))
     else:
         require(close_sha == CLOSE_SHA and (started, pid) == ('2026-11-21T11:53:49.540115255Z', 87804), 'WINDOW_GRAPH_GENERATION')
         close_bytes = c.raw(ROOT, c.AREA / BATCH / CLOSE_FILE, archive)
         require(ex.sha(close_bytes) == CLOSE_SHA, 'WINDOW_CLOSE_ORIGINAL')
-        closed = json.loads(close_bytes)['data']['fuseki']
-    require(closed['id'] == cid and closed['after']['FinishedAt'] == basis['finishedAt'] and
+        stopped_id, finished = graph_stop(json.loads(close_bytes))
+    require(stopped_id == cid and finished == basis['finishedAt'] and
             e.utc(basis['finishedAt']) < e.utc(started), 'WINDOW_GRAPH_STOP')
     capture = refs is None
     refs = {} if capture else refs.copy()
@@ -494,7 +517,8 @@ def runtime_continuity(root, previous, current, proof=None, archive=None):
         if 'nextRestoreHost' in entry:
             require(current['commandId'] == entry['nextRestoreHost'], 'WINDOW_RETIRED_HOST')
         require('nextPgOnlyClose' not in entry, 'WINDOW_D368_RETIRED_HOST')
-        if entry.get('kind') in ('MAPPING_RESTORE','D368_PG_ONLY'):
+        require('nextPreDiagnosticClose' not in entry,'WINDOW_PREDIAGNOSTIC_RETIRED_HOST')
+        if entry.get('kind') in ('MAPPING_RESTORE','D368_PG_ONLY','PRE_DIAGNOSTIC_CLOSE'):
             require(entry.get('kind') != 'D368_PG_ONLY' or entry['status'] == 'TASK_LEVEL_RECOVERY', 'WINDOW_D368_PRODUCT_BLOCKED')
             close = last_close(root, archive, entry['sha256'])
             middle = close['restoreHost']

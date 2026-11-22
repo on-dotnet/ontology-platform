@@ -425,7 +425,11 @@ def diagnostic_bound_inputs(root, archive=None):
                 return _read(root,START_FILE.parent.parent/'runtime-snapshots'/(sid+'.json'),archive)
             match=re.fullmatch(r'([a-f0-9]{32})-(receipt[.]json|std(?:out|err)[.]txt)',name)
             require(match,'S23_DIAGNOSTIC_HOST_MEMBER')
-            return _read(root,START_FILE.parent.parent.parent/'commands'/RUN/match[1]/match[2],archive)
+            from workflow_oracle_mapping_access_refresh import build_command_run
+            return _read(root,START_FILE.parent.parent.parent/'commands'/build_command_run(match[1],RUN)/match[1]/match[2],archive)
+    from workflow_oracle_mapping_access_refresh import BUILD_ORIGINS, snapshot_builds
+    if start['host']['snapshotId'] in {s for _,_,s in BUILD_ORIGINS.values()}:
+        snapshot_builds(root,start['host'],archive)
     frozen=Frozen()
     api=build_binding(frozen,'api',root);agent=build_binding(frozen,'agent',root)
     for target,expected in (('api',api),('agent',agent)):

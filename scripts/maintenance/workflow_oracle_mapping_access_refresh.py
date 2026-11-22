@@ -13,6 +13,26 @@ PARENT='04f23ea8cfe34868a8500b80164d86fb'
 OLD_COMMIT='1a62dc1bf190c991c0a23968f9bfcd16777044d6'
 
 
+
+# 三个独立工程命令各有原 run；资源快照仍属于原产品 run。
+BUILD_ORIGINS={
+    'b476d9094bb1446f8697c72ebb6aef02': ('api','9d9061710d24436890f330d57bdebed2','d642579639d179db00b54b0c5cad9f75d8f23ce540668e0b8442ee45eaf18864'),
+    'cdf62498ed92467aa594aaa4c664e935': ('agent','147456c1451c4d56b012311169ff6fb3','35858e825ea8e1b4c8a1164db737790deff245465aae55ff99116e6c2c9b084b'),
+    '9630336f873a4abcae75b5ee8200a604': ('query','0270975fc9164b568f6f503ed5035858','f6160f7fc4e6e45a15703ffd3e571c968355be2d8ff15b4267daf06ea39123e5'),
+}
+
+
+def build_command_run(command_id, default, *, target=None, snapshot=None):
+    original=BUILD_ORIGINS.get(command_id)
+    if original is None:
+        return default
+    if target is not None:
+        require((target,snapshot['snapshotId'])==(original[0],original[2]) and
+                snapshot['inputs']['inputKey']=='874c59cdfedf5f0f2ca5a8108636976bcdfbfc141fa2ccb89af0f04de67300df',
+                'S23_BUILD_ORIGIN_BINDING')
+    return original[1]
+
+
 def bound_inputs(root,host,archive=None,return_bytes=False):
     from workflow_oracle_mapping_evidence import RuntimeOriginals
     files=RuntimeOriginals(root,{'host':host})
@@ -45,7 +65,8 @@ def snapshot_builds(root,host,archive=None):
         require(chosen is not None,'S23_REFRESH_BUILD_LOG');log_bytes=c.raw(root,chosen,archive)
         argv=['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network*)',*binding['command']]
         require(binding['command'][1:]==['build',TARGETS[target],'--no-restore','--disable-build-servers','-m:1','-v:q'],'S23_REFRESH_BUILD_ARGV')
-        receipt,out,err=c.command(root,snap['commandId'],RUN,argv,'command',binding['inputKey'],180,archive)
+        command_run=build_command_run(snap['commandId'],RUN,target=target,snapshot=snap)
+        receipt,out,err=c.command(root,snap['commandId'],command_run,argv,'command',binding['inputKey'],180,archive)
         require(out+err==log_bytes and receipt['environmentFingerprint']==snap['environment']['toolEnvironment'],'S23_REFRESH_BUILD_COMMAND')
         # 按已登记快照完整复核当前保留的原文件；原构建不被当前文件替换。
         import workflow_m4_query_runtime as snapshots

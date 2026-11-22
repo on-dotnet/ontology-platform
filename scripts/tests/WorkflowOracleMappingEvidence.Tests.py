@@ -147,8 +147,10 @@ class OracleQualificationTests(unittest.TestCase):
         scripts.mkdir(parents=True)
         for name in ('workflow','workflow_execution','workflow_evidence','workflow_oracle_mapping_evidence',
                      'workflow_oracle_mapping_resources','workflow_m2_build','workflow_m2_evidence',
-                     'execution_preflight','task_run_timeline'):
+                     'execution_preflight','task_run_timeline','workflow_oracle_mapping_s2_contract','workflow_oracle_mapping_continuation'):
             shutil.copyfile(ROOT/'scripts/maintenance'/(name+'.py'),scripts/(name+'.py'))
+        plan_file='workflow-oracle-s2-runtime-plan.json'
+        shutil.copyfile(ROOT/'scripts/maintenance'/plan_file,scripts/plan_file)
         config=root/'docs/development'
         config.mkdir(parents=True)
         gates={name:dict(needs=needs,inputs=['backend/input.txt'],command=[],testsRequired=True)
@@ -243,6 +245,19 @@ class OracleQualificationTests(unittest.TestCase):
                 args=cli.copy()
                 args[args.index(flag)+1]=value
                 self.assertIn(reason,execute(args,1,{**env,'OMQ_PRODUCT_RUN':run})[1])
+        # 旧计划也有同名 UI/交互槽，不能因此取得当前正式父的准入。
+        parent='9'*32
+        previous_plan=json.loads((ROOT/'scripts/maintenance/workflow-oracle-s2-access-plan.json').read_bytes())
+        (area/run/('formal-run-s2-s3-oracle-'+parent+'.json')).write_bytes(oracle.encoded(dict(
+            commandId=parent,taskId=oracle.TASK,runId=run,mode='s2-s3-oracle',exitCode=0,stageInputs={'plan':previous_plan})))
+        wrong_parent=oracle.encoded({**index,'formalCommandId':parent})
+        wrong_sha=oracle.sha(wrong_parent)
+        (selected/('engineering-selection-'+wrong_sha+'.json')).write_bytes(wrong_parent)
+        args=cli.copy()
+        args[args.index('--gate')+1]='interaction'
+        args[args.index('--input-key')+1]=plan['inputKeys']['interaction']
+        args[args.index('--selection-sha')+1]=wrong_sha
+        self.assertIn('OMQ_CURRENT_FORMAL_SCOPE',execute(args,1,{**env,'OMQ_PRODUCT_RUN':run})[1])
         selection.write_bytes(raw+b'\n')
         self.assertIn('OMQ_CURRENT_SELECTION_SHA',execute(cli,1,{**env,'OMQ_PRODUCT_RUN':run})[1])
         selection.write_bytes(raw)

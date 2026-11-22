@@ -1111,6 +1111,25 @@ class S2CapacityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'GENERATION'):
             w.published_graphs(c.FUSEKI,start,5,{},refs={},close_sha='0'*64)
 
+    def test_graph_basis_tracks_only_the_latest_verified_fuseki_stop(self):
+        import workflow_oracle_mapping_continuity as continuity
+        import workflow_oracle_runtime_window as window
+        cid = continuity.FUSEKI
+        origin = '2026-11-21T16:17:35.140404969Z'
+        finished = '2026-11-22T12:28:02.229974721Z'
+        pg_only = {'finishedAt': {'platform-pg':'2026-11-22T12:17:09.035571168Z'}}
+        edge = {'finishedAt': {'fuseki':finished}}
+        base = {'data': {'fuseki': {'id':cid,'after':{'FinishedAt':origin}}}}
+        self.assertEqual(window.graph_stop(base),(cid,origin))
+        self.assertEqual(window.graph_stop({**base,'maintenance':[pg_only]}),(cid,origin))
+        current = {**base,'maintenance':[pg_only,edge]}
+        self.assertEqual(window.graph_stop(current),(cid,finished))
+        with self.assertRaisesRegex(ValueError,'WINDOW_GRAPH_STOP_ORDER'):
+            window.graph_stop({**base,'maintenance':[edge,edge]})
+        with patch.object(window,'last_close',return_value=current):
+            with self.assertRaisesRegex(ValueError,'WINDOW_GRAPH_STOP'):
+                window.published_graphs(cid,'2026-11-22T12:30:01Z',5,{'finishedAt':origin},{},close_sha='1'*64)
+
     def test_measured_child_is_stopped_on_future_threshold_or_failed_sample(self):
         import subprocess
         import workflow_oracle_runtime_window as window

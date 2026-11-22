@@ -574,7 +574,9 @@ def auth_test_snapshot(archive,origin,tests):
     require([v for v in spec if v.split(':')[1]=='/session-tests' or v.split(':')[1].startswith('/session-tests/')]
             ==[str(directory)+':/session-tests:ro'],'OMQ_AUTH_SESSION_RECIPE')
     cid=snapshot['commandId']
+    from workflow_oracle_mapping_access_refresh import build_command_run
     run=archive.read(cid+'-receipt.json')['runId']
+    require(run==build_command_run(cid,run,target='agent',snapshot=snapshot),'OMQ_AUTH_BUILD_ORIGIN')
     command=build_row['command']
     require((COMMAND.fullmatch(run) or RUN==PRODUCT_RUN and run==PRODUCT_RUN) and command[1:]==['build',build.TARGETS['agent'],'--no-restore','--disable-build-servers','-m:1','-v:q']
             and Path(command[0]).is_absolute() and Path(command[0]).name=='dotnet','OMQ_AUTH_BUILD_ARGV')
@@ -1088,8 +1090,9 @@ class RuntimeOriginals(Originals):
         command = re.fullmatch('([a-f0-9]{32})-(receipt.json|stdout.txt|stderr.txt)',name)
         host=self.dispatch['host']
         if command:
-            path=self.area.parent/'commands'/RUN/command[1]/command[2]
-            if (self.dispatch['mode']=='s0-oracle-auth' or self.dispatch.get('batch')) and not path.is_file() and command[1]==self.read('agent-snapshot.json')['commandId']:
+            from workflow_oracle_mapping_access_refresh import BUILD_ORIGINS, build_command_run
+            path=self.area.parent/'commands'/build_command_run(command[1],RUN)/command[1]/command[2]
+            if command[1] not in BUILD_ORIGINS and (self.dispatch.get('mode')=='s0-oracle-auth' or self.dispatch.get('batch')) and not path.is_file() and command[1]==self.read('agent-snapshot.json')['commandId']:
                 candidates=list((self.area.parent/'commands').glob('*/'+command[1]+'/'+command[2]))
                 require(len(candidates)==1 and COMMAND.fullmatch(candidates[0].parents[1].name),'OMQ_AUTH_BUILD_ORIGINAL')
                 path=candidates[0]
