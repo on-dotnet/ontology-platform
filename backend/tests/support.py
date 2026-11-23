@@ -7,6 +7,8 @@ from httpx import ASGITransport, AsyncClient, Response
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin-test-password"
 PROBLEM_JSON = "application/problem+json"
+# For direct inspection of the test database; see migrations/env.py on search_path.
+PUBLIC_SEARCH_PATH = {"options": "-c search_path=public"}
 
 
 def alembic_config(database_url: str) -> Config:

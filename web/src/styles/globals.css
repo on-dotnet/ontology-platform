@@ -1,3 +1,6 @@
+/* React Flow ships its styles in the xyflow layer; it must sit between base and utilities so utilities win. */
+@layer theme, base, xyflow, components, utilities;
+
 @import 'tailwindcss';
 
 /* `dark:` utilities follow the class on <html>, set by the theme provider and public/theme-init.js. */
@@ -161,6 +164,24 @@
       radial-gradient(48rem 32rem at 12% 8%, var(--primary-soft), transparent 70%),
       radial-gradient(40rem 28rem at 92% 96%, var(--info-soft), transparent 70%),
       radial-gradient(28rem 20rem at 88% 10%, var(--secondary-soft), transparent 70%);
+  }
+
+  /* React Flow variables mapped to design tokens (both themes follow the tokens). */
+  .ontology-graph .react-flow {
+    --xy-background-color: var(--background);
+    --xy-background-pattern-color: var(--border);
+    --xy-edge-stroke: var(--muted-foreground);
+    --xy-edge-stroke-selected: var(--primary);
+    --xy-edge-label-color: var(--foreground);
+    --xy-edge-label-background-color: var(--card);
+    --xy-node-border-radius: 12px;
+    --xy-attribution-background-color: transparent;
+    --xy-selection-background-color: var(--primary-soft);
+    --xy-selection-border: 1px dashed var(--primary);
+  }
+
+  .ontology-graph .react-flow__attribution a {
+    color: var(--muted-foreground);
   }
 
   .auth-grid {

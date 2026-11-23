@@ -29,7 +29,10 @@ export function PageHeader({ title, info, actions, documentTitle, className }: P
           </InfoTip>
         ) : null}
       </div>
-      {actions ? <div className="ml-auto flex items-center gap-2">{actions}</div> : null}
+      {actions ? (
+        // Wraps on narrow screens instead of pushing the page wider than the viewport.
+        <div className="ml-auto flex min-w-0 max-w-full flex-wrap items-center justify-end gap-2">{actions}</div>
+      ) : null}
     </div>
   );
 }

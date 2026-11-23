@@ -4,6 +4,7 @@ import type { Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { navItemForPath } from '@/app/navigation';
+import { AiStatusIndicator } from '@/features/ai/ai-status';
 import { Button } from '@/components/ui/button';
 import { Kbd } from '@/components/ui/kbd';
 import { Separator } from '@/components/ui/separator';
@@ -38,6 +39,7 @@ export function Topbar({ sidebarLabel, onToggleSidebar, assistantOpen, onToggleA
       <Breadcrumbs />
 
       <div className="ml-auto flex items-center gap-1">
+        <AiStatusIndicator />
         <Tooltip
           side="bottom"
           content={

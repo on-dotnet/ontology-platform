@@ -13,15 +13,24 @@ interface SegmentedControlProps<T extends string> {
   value: T;
   options: readonly SegmentedOption<T>[];
   onValueChange: (value: T) => void;
+  /** Keeps the legend for screen readers only, e.g. in a toolbar where the options speak for themselves. */
+  hideLegend?: boolean;
   className?: string;
 }
 
 /** A small set of mutually exclusive choices, built on native radios (arrow keys work out of the box). */
-export function SegmentedControl<T extends string>({ legend, value, options, onValueChange, className }: SegmentedControlProps<T>) {
+export function SegmentedControl<T extends string>({
+  legend,
+  value,
+  options,
+  onValueChange,
+  hideLegend = false,
+  className,
+}: SegmentedControlProps<T>) {
   const name = useId();
   return (
     <fieldset className={cn('m-0 min-w-0 border-0 p-0', className)}>
-      <legend className="mb-2 p-0 text-sm font-medium text-foreground">{legend}</legend>
+      <legend className={hideLegend ? 'sr-only' : 'mb-2 p-0 text-sm font-medium text-foreground'}>{legend}</legend>
       <div className="inline-flex flex-wrap gap-1 rounded-lg border border-border bg-muted p-1">
         {options.map((option) => (
           <label

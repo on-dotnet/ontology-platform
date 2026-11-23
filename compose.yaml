@@ -14,8 +14,13 @@ x-api-env: &api-env
   OP_ADMIN_PASSWORD: ${OP_ADMIN_PASSWORD:-admin12345}
   # Empty means "follow OP_ENV": Secure cookies in production, plain in development.
   OP_COOKIE_SECURE: ${OP_COOKIE_SECURE:-}
-  # The api is reachable only through the web container's nginx, which overwrites X-Forwarded-For.
-  FORWARDED_ALLOW_IPS: "*"
+  # Model access; values come from .env.local (see .env.example). Empty key = AI not configured.
+  OP_OPENAI_API_KEY: ${OP_OPENAI_API_KEY:-}
+  OP_AI_PROXY: ${OP_AI_PROXY:-}
+  OP_AI_BASE_URL: ${OP_AI_BASE_URL:-}
+  OP_AI_MODEL: ${OP_AI_MODEL:-}
+  OP_AI_REASONING_MODEL: ${OP_AI_REASONING_MODEL:-}
+  OP_DOCUMENTS_DIR: /data/documents
 
 services:
   postgres:
@@ -39,7 +44,12 @@ services:
       target: runtime
       args: *build-args
     image: ontology/api:local
-    environment: *api-env
+    environment:
+      <<: *api-env
+      # The api is reachable only through the web container's nginx, which overwrites X-Forwarded-For.
+      FORWARDED_ALLOW_IPS: "*"
+    volumes:
+      - documents-data:/data/documents
     depends_on:
       postgres:
         condition: service_healthy
@@ -48,6 +58,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 12
+    restart: unless-stopped
+
+  worker:
+    image: ontology/api:local
+    command: ["python", "-m", "ontology_platform.worker"]
+    environment: *api-env
+    volumes:
+      - documents-data:/data/documents
+    depends_on:
+      api:
+        condition: service_healthy
     restart: unless-stopped
 
   web:
@@ -87,3 +108,4 @@ services:
 
 volumes:
   postgres-data:
+  documents-data:

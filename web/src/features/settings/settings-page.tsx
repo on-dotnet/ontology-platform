@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AiServiceCard } from '@/features/ai/ai-status';
 import { useCurrentUser } from '@/features/auth/api';
 
 import { LanguageSelector, ThemeSelector } from './preference-controls';
@@ -54,7 +55,9 @@ export function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <AiServiceCard />
+
+        <Card>
           <CardContent className="flex items-center gap-4">
             <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-secondary-soft text-secondary-strong">
               <SlidersHorizontal className="size-5" aria-hidden />

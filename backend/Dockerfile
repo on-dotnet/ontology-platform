@@ -43,7 +43,10 @@ COPY alembic.ini ./
 COPY src ./src
 RUN --mount=type=cache,id=ontology-uv-cache,target=/root/.cache/uv uv sync --frozen --no-dev
 
-RUN useradd --system --user-group --uid 10001 --no-create-home --shell /usr/sbin/nologin app
+RUN useradd --system --user-group --uid 10001 --no-create-home --shell /usr/sbin/nologin app \
+    && mkdir -p /data/documents && chown app:app /data/documents
+# A fresh named volume mounted here inherits the ownership above.
+VOLUME ["/data/documents"]
 USER app
 
 # Trusted proxies come from the runtime environment (FORWARDED_ALLOW_IPS); uvicorn defaults to

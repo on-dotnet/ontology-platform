@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { api, unwrap, unwrapEmpty } from '@/api/client';
-import { jsonResponse, mockFetch, problemResponse, renderApp, testUser } from '@/test/utils';
+import { createApiHandler, mockApi, mockFetch, problemResponse, renderApp, testUser } from '@/test/utils';
 
 function pathOf(request: Request): string {
   return new URL(request.url).pathname;
@@ -21,7 +21,7 @@ describe('app routing and session', () => {
   });
 
   it('renders the shell with the eight navigation items for a signed-in user', async () => {
-    mockFetch(() => jsonResponse(testUser));
+    mockApi();
     renderApp('/');
 
     const nav = await screen.findByRole('navigation', { name: '主导航' });
@@ -34,13 +34,15 @@ describe('app routing and session', () => {
   it('signs in and returns to the requested page', async () => {
     const user = userEvent.setup();
     let signedIn = false;
-    mockFetch((request) => {
-      if (pathOf(request) === '/api/auth/login') {
-        signedIn = true;
-        return jsonResponse(testUser);
-      }
-      return signedIn ? jsonResponse(testUser) : problemResponse(401, 'auth.not_authenticated');
-    });
+    mockApi(
+      {
+        'POST /api/auth/login': () => {
+          signedIn = true;
+          return testUser;
+        },
+      },
+      { user: () => (signedIn ? testUser : null) },
+    );
     const { router } = renderApp('/login?redirect=%2Freview');
 
     await user.type(await screen.findByRole('textbox', { name: '用户名' }), 'admin');
@@ -53,7 +55,7 @@ describe('app routing and session', () => {
 
   it('toggles the AI assistant with Ctrl+J', async () => {
     const user = userEvent.setup();
-    mockFetch(() => jsonResponse(testUser));
+    mockApi();
     renderApp('/');
     await screen.findByRole('navigation', { name: '主导航' });
 
@@ -74,9 +76,7 @@ describe('signing out and ended sessions', () => {
   }
 
   it('signs out and shows the login page without a redirect target', async () => {
-    const fetchMock = mockFetch((request) =>
-      pathOf(request) === '/api/auth/logout' ? new Response(null, { status: 204 }) : jsonResponse(testUser),
-    );
+    const { fetchMock } = mockApi({ 'POST /api/auth/logout': () => new Response(null, { status: 204 }) });
     const { router } = renderApp('/settings');
 
     await signOut();
@@ -87,9 +87,7 @@ describe('signing out and ended sessions', () => {
   });
 
   it('treats 401 from logout as already signed out, without an error toast', async () => {
-    mockFetch((request) =>
-      pathOf(request) === '/api/auth/logout' ? problemResponse(401, 'auth.not_authenticated') : jsonResponse(testUser),
-    );
+    mockApi({ 'POST /api/auth/logout': () => problemResponse(401, 'auth.not_authenticated') });
     const { router } = renderApp('/settings');
 
     await signOut();
@@ -101,9 +99,7 @@ describe('signing out and ended sessions', () => {
   });
 
   it('keeps the user signed in and explains when logout fails for another reason', async () => {
-    mockFetch((request) =>
-      pathOf(request) === '/api/auth/logout' ? problemResponse(403, 'auth.csrf_failed') : jsonResponse(testUser),
-    );
+    mockApi({ 'POST /api/auth/logout': () => problemResponse(403, 'auth.csrf_failed') });
     const { router } = renderApp('/settings');
 
     await signOut();
@@ -128,7 +124,8 @@ describe('signing out and ended sessions', () => {
     ],
   ])('sends the user to /login?redirect=… when a %s returns 401', async (_kind, request) => {
     let sessionEnded = false;
-    mockFetch(() => (sessionEnded ? problemResponse(401, 'auth.not_authenticated') : jsonResponse(testUser)));
+    const api = createApiHandler({ 'GET /api/health': () => ({ status: 'ok' }) });
+    mockFetch((request) => (sessionEnded ? problemResponse(401, 'auth.not_authenticated') : api.handle(request)));
     const { router, queryClient } = renderApp('/documents?view=list');
     expect(await screen.findByRole('heading', { level: 1, name: '资料' })).toBeInTheDocument();
 

@@ -34,6 +34,25 @@ class Settings(BaseSettings):
     session_idle_hours: int = Field(default=8, gt=0)
     session_absolute_days: int = Field(default=7, gt=0)
 
+    # Model access (M1). AI features report "not configured" while the key is unset.
+    openai_api_key: SecretStr | None = None
+    # HTTP proxy used only for model calls; may embed credentials, hence secret.
+    ai_proxy: SecretStr | None = None
+    # OpenAI-compatible endpoint; unset means the official OpenAI API.
+    ai_base_url: str | None = None
+    ai_model: str = "gpt-6.2-sol"
+    ai_reasoning_model: str = "gpt-6.2-astra"
+    # Model calls are streamed, so this bounds the wait between two events, not a whole call.
+    ai_timeout_seconds: float = Field(default=120, gt=0)
+
+    # Uploaded documents (M1).
+    documents_dir: str = "/data/documents"
+    max_upload_mb: int = Field(default=20, gt=0)
+
+    @property
+    def ai_configured(self) -> bool:
+        return self.openai_api_key is not None and bool(self.openai_api_key.get_secret_value())
+
     @property
     def secure_cookies(self) -> bool:
         return self.env == "production" if self.cookie_secure is None else self.cookie_secure

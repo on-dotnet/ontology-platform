@@ -6,10 +6,18 @@ license = "Apache-2.0"
 requires-python = ">=3.13,<3.14"
 dependencies = [
     "alembic>=1.16",
+    "annotated-types>=0.7",
     "argon2-cffi>=25.1",
     "fastapi>=0.120",
+    "httpx2>=2.16",
+    "openai>=3.57",
+    "openpyxl>=3.1",
     "psycopg[binary]>=3.2,<4",
     "pydantic-settings>=2.10",
+    "pypdf>=5.0",
+    "python-docx>=1.1",
+    "python-multipart>=0.0.20",
+    "rdflib>=7.1",
     "sqlalchemy[asyncio]>=2.0.40,<3",
     "uvicorn>=0.35",
 ]
@@ -56,6 +64,8 @@ select = [
     "FAST",
     "RUF",
 ]
+# Chinese domain text uses full-width punctuation, which RUF001-003 would flag as confusable.
+allowed-confusables = ["，", "：", "；", "（", "）", "！", "？", "｜"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "S105", "S106", "S603"]

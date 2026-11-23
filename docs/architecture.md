@@ -70,7 +70,7 @@ AI Native 的本体智能平台：把企业的资料、数据和专家经验整�
 |---|---|
 | 后端 | Python 3.13、FastAPI、Pydantic 2、SQLAlchemy 2（异步，psycopg 3）、Alembic、uv |
 | 语义 | rdflib、pySHACL、owlrl（进程内） |
-| AI | OpenAI Responses API（模型可配置）、pydantic-ai；向量检索用 pgvector |
+| AI | OpenAI 官方 SDK 的 Responses API 结构化输出（模型可配置，经 `ModelGateway` 调用）；向量检索用 pgvector |
 | 存储 | PostgreSQL 18 + pgvector；资料原件存本地卷（可切换 S3 兼容存储） |
 | 前端 | React 19、TypeScript、Vite、TanStack Router 与 Query、Tailwind CSS 4、shadcn/ui 风格组件（Base UI）、lucide 图标、i18next |
 | 运行 | Docker Compose；`dev.ps1` 统一入口 |

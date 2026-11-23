@@ -10,6 +10,9 @@
     "retry": "Retry",
     "cancel": "Cancel",
     "close": "Close",
+    "dismiss": "Dismiss",
+    "colon": ": ",
+    "listSeparator": ", ",
     "loading": "Loading…",
     "stillWorking": "Still working, please wait…",
     "technicalDetails": "Technical details",
@@ -99,31 +102,451 @@
     "info": "The workbench gathers the items that need your attention and recent platform activity.",
     "aiCardTitle": "AI document analysis",
     "aiCardDescription": "Upload policies, procedures and manuals. AI identifies the terms, object types and relations in them and prepares a change set for your review.",
+    "uploadTarget": "Upload to",
+    "uploadNeedsRole": "Uploading documents requires the {{role}} role. Ask your platform administrator for access.",
     "sectionsLabel": "Overview",
     "pendingTitle": "Pending review",
-    "pendingDescription": "Change sets submitted by AI and members will wait here for your review.",
-    "ontologyTitle": "Ontology",
-    "ontologyDescription": "An overview of the object types, relation types and terms in the ontology will appear here.",
-    "dataTitle": "Data sources",
-    "dataDescription": "Connected data sources and data bindings will appear here.",
+    "pendingDescription": "Change sets waiting for review",
+    "pendingLink": "Review now",
+    "ontologyTitle": "Object types",
+    "ontologyDescription": "Object types in the ontology",
+    "ontologyLink": "View ontology",
+    "processingTitle": "Documents in progress",
+    "processingDescription": "Documents being parsed or analyzed",
+    "processingLink": "View documents",
     "activityTitle": "Recent activity",
-    "activityDescription": "Recent document parsing, reviews and releases will appear here."
+    "activityEmpty": "Uploads, reviews and releases will appear here."
+  },
+  "activity": {
+    "system": "Platform",
+    "view": "View",
+    "actions": {
+      "unknown": "made a change",
+      "ontology": {
+        "created": "created an ontology"
+      },
+      "document": {
+        "uploaded": "uploaded a document"
+      },
+      "changeset": {
+        "created": "submitted a change set for review",
+        "merged": "merged a change set",
+        "rejected": "rejected a change set"
+      },
+      "release": {
+        "published": "published a release",
+        "activated": "set the current release"
+      }
+    }
+  },
+  "ai": {
+    "health": {
+      "available": "Available",
+      "unreachable": "Unavailable",
+      "not_configured": "Not configured",
+      "unknown": "Not checked yet"
+    },
+    "notice": {
+      "not_configured": {
+        "title": "The AI service is not configured",
+        "description": "Documents can still be uploaded and saved, but AI will not analyze them. Ask your platform administrator to configure the model service."
+      },
+      "unreachable": {
+        "title": "AI analysis is temporarily unavailable",
+        "description": "Documents can still be uploaded and saved. Retry failed documents once AI is back."
+      }
+    }
+  },
+  "ontologies": {
+    "selectorLabel": "Ontology",
+    "create": {
+      "title": "Name your ontology first",
+      "description": "The ontology holds the object types, relations and properties AI finds in your documents. Your documents upload right after you name it.",
+      "name": "Ontology name",
+      "namePlaceholder": "For example: Steel production",
+      "nameRequired": "Enter an ontology name",
+      "descriptionLabel": "Description",
+      "validationSummary": "Enter an ontology name to create it.",
+      "failedTitle": "The ontology was not created",
+      "submit": "Create ontology"
+    }
+  },
+  "upload": {
+    "fileInputLabel": "Choose document files to upload",
+    "dropTitle": "Drag documents here, or",
+    "chooseFiles": "Choose files",
+    "uploading": "Uploading…",
+    "hint": "docx, xlsx, pdf, md or txt, up to {{size}} MB per file",
+    "uploaded": "Documents uploaded: {{count}}",
+    "uploadedDescription": "AI is analyzing them. See the results on the Documents page.",
+    "problemsTitle": "Documents not uploaded: {{count}}",
+    "rejected": {
+      "type": "This file type is not supported. Upload a docx, xlsx, pdf, md or txt file.",
+      "size": "The file is larger than {{size}} MB. Split or compress it and upload again.",
+      "empty": "The file is empty. Check it and choose it again."
+    }
+  },
+  "documents": {
+    "upload": "Upload documents",
+    "tableLabel": "Documents",
+    "noOntologyTitle": "No ontology yet",
+    "noOntologyDescription": "Once members upload documents, they and their AI results are listed here.",
+    "noOntologyUploadTitle": "Upload your first document: drag it here, or",
+    "emptyTitle": "This ontology has no documents yet",
+    "emptyDescription": "Once members upload documents, their progress and AI results are listed here.",
+    "emptyUploadTitle": "Upload your first document: drag it here, or",
+    "columns": {
+      "name": "Name",
+      "status": "Status",
+      "uploadedAt": "Uploaded",
+      "result": "Result"
+    },
+    "pages_one": "{{count}} page",
+    "pages_other": "{{count}} pages",
+    "loadMore": "Load more",
+    "status": {
+      "queued": "Queued",
+      "ready": "Done",
+      "failed": "Failed",
+      "failedAt": "{{step}} failed"
+    },
+    "steps": {
+      "parse": "Parsing",
+      "terms": "Finding terms",
+      "types": "Finding types",
+      "relations": "Finding relations",
+      "changeset": "Creating change set"
+    },
+    "stepsLabel": "Processing steps",
+    "stepCount": "{{done}}/{{total}}",
+    "stepStates": {
+      "done": "done",
+      "active": "in progress",
+      "pending": "not started",
+      "failed": "failed"
+    },
+    "resultPending": "Shown when processing finishes",
+    "resultNothingNew": "Nothing new was found",
+    "viewChangeSet": "View change set",
+    "failedUnknown": "Processing did not finish. Try again.",
+    "retryStarted": "Processing restarted",
+    "retryFailed": "Processing did not restart",
+    "failures": {
+      "changeset": {
+        "invalid_item": "The AI result was incomplete, so no change set was created. Try again."
+      },
+      "internal": {
+        "error": "Something went wrong while processing the document. It is saved; try again."
+      }
+    }
+  },
+  "evidence": {
+    "unknownDocument": "Document",
+    "page": "Page {{page}}",
+    "section": "Section: {{heading}}",
+    "notFound": "This quote was not found in the source. Check the source before deciding.",
+    "sourceText": "Source text"
+  },
+  "kinds": {
+    "entity_type": "Object types",
+    "relation_type": "Relations",
+    "property": "Properties"
+  },
+  "datatypes": {
+    "string": "Text",
+    "integer": "Integer",
+    "decimal": "Decimal",
+    "boolean": "Yes/No",
+    "date": "Date",
+    "dateTime": "Date and time"
+  },
+  "review": {
+    "noOntologyTitle": "Nothing to review yet",
+    "noOntologyDescription": "After documents are uploaded, the changes AI suggests are collected into change sets that wait here for review.",
+    "emptyTitle": "This ontology has no change sets yet",
+    "emptyDescription": "After documents are uploaded, the changes AI suggests are collected into change sets that wait here for review.",
+    "tableLabel": "Change sets",
+    "columns": {
+      "title": "Change set",
+      "source": "Source document",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "status": "Status",
+      "createdAt": "Created"
+    },
+    "status": {
+      "open": "Open",
+      "merged": "Merged",
+      "rejected": "Rejected"
+    },
+    "noSource": "Submitted manually",
+    "backToList": "Back to change sets",
+    "detailTitle": "Change set",
+    "detailInfo": "Accept, edit or reject each AI suggestion. Once everything is decided, merge the accepted items into the working ontology.",
+    "sourceLabel": "Source document:",
+    "countsSummary": "{{total}} items · {{pending}} pending · {{accepted}} accepted · {{rejected}} rejected",
+    "pendingHint_one": "{{count}} item still undecided",
+    "pendingHint_other": "{{count}} items still undecided",
+    "acceptHighConfidence": "Accept all high-confidence items ({{count}})",
+    "bulkAccepted": "High-confidence suggestions accepted: {{count}}",
+    "merge": "Merge into ontology",
+    "mergedToast": "Merged into the ontology",
+    "mergeFailedTitle": "The change set was not merged",
+    "mergedTitle": "Merged into the ontology",
+    "mergedDescription": "Changes applied to the working ontology: {{count}}.",
+    "mergedWithSkipsTitle": "Merged, {{skipped}} skipped",
+    "mergedWithSkipsDescription": "Applied: {{applied}}. These {{skipped}} were not applied:",
+    "unknownItem": "Unknown item",
+    "viewOntology": "View in ontology",
+    "readOnlyNotice": "You can view this change set. Accepting, rejecting and editing require the {{role}} role.",
+    "noItems": "This change set has no items.",
+    "decideFailed": "The decision was not saved",
+    "aiSuggestion": "AI suggestion",
+    "confidence": {
+      "high": "High confidence",
+      "medium": "Medium confidence",
+      "low": "Low confidence"
+    },
+    "confidencePercent": "AI confidence: {{percent}}",
+    "confidencePercentShort": " ({{percent}})",
+    "flags": {
+      "evidence_not_found": {
+        "label": "Quote not found",
+        "description": "The quote AI cited was not found in the source, so its confidence was lowered. Check the source before deciding."
+      },
+      "possible_duplicate": {
+        "label": "Possible duplicate",
+        "description": "This may duplicate an element already in the ontology. Confirm before accepting."
+      }
+    },
+    "decision": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
+    "op": {
+      "create": "New",
+      "update": "Update"
+    },
+    "edited": "Edited",
+    "rationale": "Reason: {{text}}",
+    "accept": "Accept",
+    "reject": "Reject",
+    "editItem": "Edit this item",
+    "editItemNamed": "Edit {{name}}",
+    "evidenceCount": "View evidence ({{count}})",
+    "evidenceTitle": "Evidence",
+    "noEvidence": "This item has no evidence.",
+    "evidenceSwitch": "Choose evidence",
+    "evidenceN": "Evidence {{n}}",
+    "unknownType": "Unknown object type",
+    "before": "Before: ",
+    "after": "After: ",
+    "emptyValue": "(empty)",
+    "facts": {
+      "parent": "Parent: {{name}}",
+      "domain": "Belongs to: {{name}}",
+      "datatype": "Data type: {{type}}",
+      "unit": "Unit: {{unit}}",
+      "required": "Required",
+      "multiple": "Multiple allowed",
+      "pointsTo": "points to",
+      "synonyms": "Synonyms: {{list}}"
+    },
+    "fields": {
+      "labelZh": "Chinese name",
+      "labelEn": "English name",
+      "localName": "Local name",
+      "definitionZh": "Chinese definition",
+      "definitionEn": "English definition",
+      "synonyms": "Synonyms",
+      "synonymsZh": "Chinese synonyms",
+      "synonymsEn": "English synonyms",
+      "parentRef": "Parent type",
+      "domainRef": "Domain (from object type)",
+      "propertyDomainRef": "Object type",
+      "rangeRef": "Range (to object type)",
+      "datatype": "Data type",
+      "unit": "Unit",
+      "required": "Required",
+      "multiple": "Allow multiple"
+    },
+    "edit": {
+      "title": "Edit {{name}}",
+      "description": {
+        "entity_type": "The merge uses your edited values. The local name forms the IRI and uses PascalCase, such as SteelSlab.",
+        "relation_type": "The merge uses your edited values. The local name forms the IRI and uses camelCase, such as producedBy.",
+        "property": "The merge uses your edited values. The local name forms the IRI and uses camelCase, such as slabThickness."
+      },
+      "validationSummary": "Fields to fix: {{count}}. Correct them and save again.",
+      "failedTitle": "The changes were not saved",
+      "newOption": "{{name}} (new in this change set)",
+      "synonymsPlaceholder": "Separate several with commas",
+      "noParent": "No parent type",
+      "chooseType": "Choose an object type",
+      "chooseDatatype": "Choose a data type",
+      "unitPlaceholder": "For example mm, ℃, %",
+      "cardinality": "Cardinality",
+      "save": "Save changes",
+      "saved": "Changes saved",
+      "errors": {
+        "labelZhRequired": "Enter a Chinese name",
+        "localNameRequired": "Enter a local name",
+        "localNamePascal": "Start with an uppercase letter and use only letters and digits, such as SteelSlab",
+        "localNameCamel": "Start with a lowercase letter and use only letters and digits, such as producedBy",
+        "parentSelf": "A type cannot be its own parent",
+        "domainRequired": "Choose an object type",
+        "rangeRequired": "Choose the target object type",
+        "datatypeRequired": "Choose a data type"
+      }
+    },
+    "readOnly": "Read-only"
+  },
+  "ontologyPage": {
+    "viewLabel": "View",
+    "viewGraph": "Graph",
+    "viewList": "List",
+    "exportTurtle": "Export Turtle",
+    "exported": "Turtle file exported",
+    "exportFailed": "The Turtle file was not exported",
+    "noOntologyTitle": "No ontology yet",
+    "noOntologyDescription": "After documents are uploaded and AI suggestions are reviewed, object types, relations and properties appear here.",
+    "stats": {
+      "entityTypes": "Object types",
+      "relationTypes": "Relations",
+      "properties": "Properties",
+      "activeRelease": "Current release",
+      "noRelease": "Not published yet"
+    },
+    "graph": {
+      "label": "Ontology graph: {{nodes}} object types, {{edges}} connections",
+      "propertyCount_one": "{{count}} property",
+      "propertyCount_other": "{{count}} properties",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "fitView": "Fit to view",
+      "legendRelation": "Relation",
+      "legendSubclass": "Parent type",
+      "a11yNode": "Press Enter or Space to see the details of this object type.",
+      "a11yEdge": "This line is a relation or a parent-type link between object types.",
+      "a11yHandle": "Connection point",
+      "emptyTitle": "No object types yet",
+      "emptyDescription": "Once change sets are reviewed and merged, object types and their relations are drawn here."
+    },
+    "list": {
+      "kindFilter": "Filter by kind",
+      "allKinds": "All",
+      "search": "Search names or synonyms",
+      "searchPlaceholder": "Search names or synonyms",
+      "activeFilters": "Active filters",
+      "kindChip": "Kind: {{kind}}",
+      "searchChip": "Keyword: {{q}}",
+      "removeFilter": "Remove filter {{label}}",
+      "noMatchTitle": "No matching elements",
+      "noMatchDescription": "Try another keyword or remove a filter.",
+      "emptyTitle": "The ontology has no elements yet",
+      "emptyDescription": "Once change sets are reviewed and merged, object types, relations and properties are listed here.",
+      "tableLabel": "Ontology elements",
+      "columns": {
+        "name": "Name",
+        "kind": "Kind",
+        "localName": "Local name",
+        "definition": "Definition"
+      }
+    },
+    "detail": {
+      "deprecated": "Deprecated",
+      "definition": "Definition",
+      "noDefinition": "No definition yet.",
+      "synonyms": "Synonyms",
+      "noSynonyms": "No synonyms yet.",
+      "structure": "Properties and relations",
+      "parent": "Parent type",
+      "children": "Child types",
+      "properties": "Properties ({{count}})",
+      "relations": "Relations ({{count}})",
+      "none": "None",
+      "cardinality": "Cardinality",
+      "optionalSingle": "Optional, at most one",
+      "provenance": "Source evidence",
+      "noProvenance": "This element did not come from a reviewed change set.",
+      "showSource": "Show source",
+      "hideSource": "Hide source"
+    }
+  },
+  "releases": {
+    "publishNew": "Publish new release",
+    "versionLabel": "v{{version}}",
+    "tableLabel": "Releases",
+    "noOntologyTitle": "No ontology yet",
+    "noOntologyDescription": "Once an ontology exists and AI suggestions are reviewed, you can publish releases here.",
+    "emptyTitle": "No releases yet",
+    "emptyDescription": "Once a reviewer publishes a release, every immutable version is listed here.",
+    "emptyDescriptionReviewer": "Publishing saves the working ontology as an immutable version for export and external use.",
+    "viewOntology": "View ontology",
+    "columns": {
+      "version": "Version",
+      "title": "Title",
+      "elements": "Elements",
+      "publishedAt": "Published",
+      "current": "Current",
+      "actions": "Actions"
+    },
+    "current": "Current release",
+    "notCurrent": "Not current",
+    "exportVersion": "Export v{{version}} as Turtle",
+    "exported": "Turtle file of v{{version}} exported",
+    "exportFailed": "The Turtle file was not exported",
+    "publish": {
+      "title": "Publish new release",
+      "description": "Publishing saves the current working ontology as an immutable version. Names, references and parent types are checked first.",
+      "openChangeSetsTitle": "Change sets not merged yet: {{count}}",
+      "openChangeSetsDescription": "Unmerged change sets are not part of this release. Review and merge them first to include them.",
+      "titleLabel": "Release title",
+      "titlePlaceholder": "For example: First steel production ontology",
+      "titleRequired": "Enter a release title",
+      "notesLabel": "Release notes",
+      "validationSummary": "Enter a release title to publish.",
+      "submit": "Publish release",
+      "published": "Release v{{version}} published",
+      "failedTitle": "The release was not published",
+      "invalidTitle": "The release check did not pass ({{count}})",
+      "invalidDescription": "Fix these problems in review, then publish again:"
+    },
+    "problems": {
+      "unknown": "Did not pass the release check. Check this element.",
+      "release": {
+        "empty": "The ontology has no elements yet. Review and merge a change set first",
+        "cyclic_hierarchy": "Parent types form a cycle",
+        "invalid_parent": "The parent type does not exist or is not a valid object type",
+        "invalid_domain": "The owning object type (domain) does not exist or is deprecated",
+        "invalid_range": "The target object type (range) does not exist or is deprecated",
+        "invalid_datatype": "The data type is not one the platform supports",
+        "invalid_local_name": "The local name does not follow the naming rules",
+        "missing_label": "The Chinese name is missing"
+      }
+    },
+    "activate": {
+      "action": "Set as current",
+      "title": "Make v{{version}} the current release?",
+      "change": "The current release changes from v{{from}} to v{{to}}.",
+      "first": "v{{to}} becomes the current release of this ontology.",
+      "consequence": "Queries, Q&A and exports offered to others will use the content of v{{to}}. The working ontology is not affected, and you can switch again later.",
+      "confirm": "Set as current release",
+      "done": "v{{version}} is now the current release",
+      "failedTitle": "The current release was not changed"
+    }
   },
   "pages": {
     "documents": {
-      "info": "Upload business documents and follow their parsing status and AI analysis results.",
-      "emptyTitle": "Document management is coming soon",
-      "emptyDescription": "Here you will upload documents, follow parsing progress and see the terms and object types AI identified."
+      "info": "Upload business documents and follow their parsing status and AI analysis results."
     },
     "review": {
-      "info": "Review change sets item by item: accept, edit or reject each change. Only approved changes enter the ontology.",
-      "emptyTitle": "Change set review is coming soon",
-      "emptyDescription": "Changes proposed by AI and members are collected into change sets and take effect after review here."
+      "info": "Review change sets item by item: accept, edit or reject each change. Only approved changes enter the ontology."
     },
     "ontology": {
-      "info": "Browse object types, properties, relation types, terms and constraints as a graph or a list.",
-      "emptyTitle": "Ontology browsing is coming soon",
-      "emptyDescription": "Here you will browse the object types, properties, relation types, terms and constraints of the ontology and propose changes."
+      "info": "Browse object types, relations and properties as a graph or a list. Select an element to see its details and source evidence."
     },
     "data": {
       "info": "Connect data sources, browse table catalogs and bind data to the ontology.",
@@ -136,9 +559,7 @@
       "emptyDescription": "Here you will browse business objects by ontology, trace them along relations and ask AI questions."
     },
     "releases": {
-      "info": "See release history, compare versions and roll back when needed.",
-      "emptyTitle": "Release management is coming soon",
-      "emptyDescription": "Every release creates an immutable version that you can compare or roll back here."
+      "info": "Publish immutable releases, export Turtle, and make an earlier release current again when needed."
     }
   },
   "settings": {
@@ -149,6 +570,10 @@
     "role": "Role",
     "preferencesTitle": "Interface preferences",
     "preferencesInfo": "Preferences are saved in this browser only. Set them again on another browser or device.",
+    "aiTitle": "AI service",
+    "aiStatus": "Status",
+    "aiModel": "Model",
+    "aiModelNone": "Not set",
     "platformTitle": "Platform settings",
     "platformDescription": "Settings for models, members and roles, and platform parameters are coming soon."
   },
@@ -165,6 +590,9 @@
     "network": {
       "unreachable": "Cannot reach the platform service. Check your network connection and try again."
     },
+    "internal": {
+      "error": "Something went wrong on the platform. Try again later, and contact your platform administrator if the problem continues."
+    },
     "auth": {
       "invalid_credentials": "The username or password is incorrect. Check them and try again.",
       "not_authenticated": "Your session has ended. Sign in again.",
@@ -175,11 +603,47 @@
     "validation": {
       "failed": "Some fields are missing or invalid. Check them and try again."
     },
+    "ontology": {
+      "not_found": "The ontology does not exist or was deleted. Refresh the page and try again.",
+      "key_taken": "An ontology with this identifier already exists. Choose another name and try again."
+    },
+    "element": {
+      "not_found": "This element does not exist or was deleted."
+    },
+    "changeset": {
+      "not_found": "The change set does not exist or was deleted.",
+      "closed": "This change set has been merged or rejected and can no longer change. Refresh the page to see its current state.",
+      "pending_items": "Some items are still undecided. Decide every item before merging.",
+      "invalid_edit": "The edited values are not valid. Check the names, local name and referenced object types.",
+      "stale_target": "the target element changed after the change set was created",
+      "dependency_skipped": "an item it refers to was rejected or skipped",
+      "invalid_item": "its content is incomplete or invalid"
+    },
+    "release": {
+      "not_found": "The release does not exist or was deleted.",
+      "invalid": "The ontology did not pass the release check. Fix the problems and publish again."
+    },
+    "documents": {
+      "not_found": "The document does not exist or was deleted.",
+      "too_large": "The file is larger than 20 MB. Split or compress it and upload again.",
+      "unsupported_type": "This file type is not supported. Upload a docx, xlsx, pdf, md or txt file.",
+      "not_failed": "This document did not fail, so it does not need a retry.",
+      "needs_ocr": "This document is a scan and its text cannot be extracted yet. Upload a version with selectable text.",
+      "unreadable": "No text could be read even after transcribing the scan. Check the file or upload a version with selectable text."
+    },
+    "ai": {
+      "not_configured": "The AI service is not configured. The document is saved; ask your platform administrator to configure it, then retry.",
+      "unavailable": "AI analysis is temporarily unavailable. The document is saved; try again later.",
+      "invalid_output": "AI returned a result in an unexpected format. The document is saved; try again later."
+    },
     "http": {
       "400": "The request is not valid. Check your input and try again.",
       "401": "Your session has ended. Sign in again.",
       "403": "You do not have permission for this action. Contact your platform administrator.",
       "404": "The requested content does not exist or was deleted.",
+      "409": "The content was changed by another action. Refresh the page and try again.",
+      "413": "The file is too large. Split or compress it and upload again.",
+      "415": "This file type is not supported.",
       "422": "Some fields are missing or invalid. Check them and try again.",
       "429": "Too many requests. Try again later.",
       "5xx": "The platform service is temporarily unavailable. Try again later."

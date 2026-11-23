@@ -10,9 +10,8 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import create_engine, pool
 
+from ontology_platform import models  # noqa: F401  (registers every module's tables)
 from ontology_platform.db import Base
-from ontology_platform.modules.audit import models as audit_models  # noqa: F401
-from ontology_platform.modules.identity import models as identity_models  # noqa: F401
 from ontology_platform.settings import Settings
 
 config = context.config
@@ -49,6 +48,11 @@ def run_migrations_online() -> None:
     engine = create_engine(database_url(), poolclass=pool.NullPool)
     try:
         with engine.connect() as connection:
+            # The default search_path starts with "$user". A role named like one of our schemas
+            # (the default role is "ontology") would make that schema the default one, which
+            # Alembic then compares as the unnamed schema and where alembic_version could land.
+            connection.exec_driver_sql("SET search_path TO public")
+            connection.commit()
             context.configure(
                 connection=connection,
                 target_metadata=target_metadata,
