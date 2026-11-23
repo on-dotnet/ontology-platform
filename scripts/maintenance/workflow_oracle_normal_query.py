@@ -238,6 +238,241 @@ def reopen_closed(root,entry,prior,archive=None):
     return normalized,count,index
 
 
+
+# 元数据探针使用相同生产方法与受限镜像。此入口没有业务表 SQL、平台 Query 或租约操作。
+def metadata_probe(slot, catalog, snapshots, sample_dir, *, question=None):
+    from concurrent.futures import ThreadPoolExecutor
+    from workflow_oracle_mapping_snapshot import probe_args
+    import workflow_oracle_d368_closure as closure
+    require(slot == 'B1' or slot == 'B2' and question, 'METADATA_SAMPLE_SLOT')
+    key = uuid.uuid4().hex
+    directory = sample_dir/slot
+    directory.mkdir(mode=0o700)
+    (directory/'execution').write_text(key)
+    (directory/'catalog.json').write_bytes(r.ex.encoded(catalog))
+    began = time.monotonic()
+    state = dict(slot=slot,kind='DIAGNOSTIC_ONLY',key=key,question=question,commands={},sourceTermination='UNKNOWN',
+                 source=closure.SOURCE,probeSnapshot=snapshots['connections']['snapshotId'],apiSnapshot=snapshots['api']['snapshotId'])
+    original = directory/'observation.json'
+    def save():
+        r.platform.save(original,state,original.exists())
+    def action(stage,args,limit=5,cleanup=False):
+        left = 30 - (time.monotonic() - began)
+        if not cleanup:
+            require(left >= 1, 'METADATA_SUPERVISION_DEADLINE')
+            limit = min(limit,left)
+        result = r.ex.run([*closure.DOCKER,*args],r.ROOT,task=r.TASK,run_id=r.PRODUCT,stage='metadata-'+slot+'-'+stage,
+                          input_key=r.ex.sha(r.ex.encoded(args)),timeout=limit,cleanup=cleanup)
+        state['commands'][stage] = result.receipt['commandId']
+        save()
+        return result
+    def read_source(stage,sql,limit):
+        data = ("whenever sqlerror exit failure rollback\nset echo off feedback off heading off pages 0 lines 32000 "
+                "verify off tab off trimspool on serveroutput on size 1000000\nalter session set container=FREEPDB1;\n"
+                +sql+"\nexit success\n").encode()
+        return r.ex.run([*closure.DOCKER,'exec','-i',closure.SOURCE,'sqlplus','-L','-s','/ as sysdba'],r.ROOT,
+                        task=r.TASK,run_id=r.PRODUCT,stage='metadata-'+slot+'-'+stage,stdin=data,
+                        input_key=r.ex.sha(data),timeout=limit)
+    condition = ("con_id=to_number(sys_context('USERENV','CON_ID')) and username='FIXTURE_READER' "
+                 "and module='G4-ORACLE-MAPPING-QUERY-001' and client_identifier='"+key+"'")
+    watch = """declare
+      t number; prev number := dbms_utility.get_time; maxgap number := 0;
+    begin
+      for i in 1..190 loop
+        t := dbms_utility.get_time; maxgap := greatest(maxgap,t-prev); prev := t;
+        for s in (select sid,serial#,audsid,con_id,sql_id,sql_child_number,prev_sql_id,prev_child_number
+                  from v$session where """+condition+""") loop
+          dbms_output.put_line(i||'|'||t||'|'||sys_context('USERENV','INSTANCE')||'|'||s.sid||'|'||s.serial#||'|'||
+              s.audsid||'|'||s.con_id||'|'||s.sql_id||'|'||s.sql_child_number||'|'||s.prev_sql_id||'|'||s.prev_child_number);
+        end loop;
+        dbms_session.sleep(0.05);
+      end loop;
+      dbms_output.put_line('SUMMARY|190|'||maxgap);
+    end;
+    /"""
+    # 准确镜像、快照和配额在开始任何源调用前从引擎独立回读。
+    base = probe_args(r.ROOT,r.TASK,key,r.net_names()['source-internal'],r.RESTORED/'reader',directory,'OracleMetadataCostTests')
+    base = [arg.replace('--memory=512m','--memory=768m').replace('--memory-swap=512m','--memory-swap=768m')
+            .replace('ontology.run=implementation-01','ontology.run='+r.PRODUCT)
+            .replace(str(r.ROOT/'backend/tests/OntologyPlatform.ConnectionsTests/bin/Debug/net10.0'),
+                     str(r.ROOT/snapshots['connections']['directory'])) for arg in base]
+    base[1:1] = ['--platform','linux/arm64']
+    cid = None
+    save()
+    try:
+        made = action('create',base)
+        require(made.returncode == 0,'METADATA_CREATE')
+        cid = made.stdout.decode().strip()
+        require(re.fullmatch('[a-f0-9]{64}',cid),'METADATA_HELPER_ID')
+        state['helper'] = cid
+        save()
+        fmt = '{{.Id}}|{{.Image}}|{{.State.Status}}|{{.HostConfig.Memory}}|{{.HostConfig.MemorySwap}}|{{.HostConfig.NanoCpus}}|{{.HostConfig.ReadonlyRootfs}}|{{index .Config.Labels "ontology.attempt"}}|{{json .Mounts}}|{{json .NetworkSettings.Networks}}'
+        checked = action('identity',['inspect','-f',fmt,cid])
+        fields = checked.stdout.decode().strip().split('|')
+        require(checked.returncode == 0 and fields[:8] == [cid,r.platform.IMAGES['api'],'created','805306368','805306368',
+                '500000000','true',key] and set(json.loads(fields[9])) == {r.net_names()['source-internal']}, 'METADATA_HOST')
+        mounts = {m['Destination']:(m['Source'].removeprefix('/host_mnt'),m['RW']) for m in json.loads(fields[8]) if m['Type']=='bind'}
+        require(mounts == {'/app':(str(r.ROOT/snapshots['connections']['directory']),False),
+                          '/run/fixture':(str(r.RESTORED/'reader'),False),'/run/sync':(str(directory),True)},'METADATA_MOUNTS')
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            observer = pool.submit(read_source,'sessions',watch,16)
+            time.sleep(.35)
+            launched = time.monotonic()
+            driver = action('actual',['start','-a',cid],16)
+            # 到期优先读回，不将 helper 已退出或 Dispose 返回解释成源会话已退出。
+            post = read_source('post-session',"select count(*) from v$session where "+condition+";",4)
+            post_seconds = time.monotonic()-launched
+            watched = observer.result()
+        state['commands'].update(observer=watched.receipt['commandId'],postSession=post.receipt['commandId'])
+        state.update(outerLaunchToPostSeconds=post_seconds,driverExit=driver.returncode)
+        require(post.returncode == watched.returncode == 0,'METADATA_SOURCE_OBSERVATION')
+        lines = watched.stdout.decode().strip().splitlines()
+        summary = lines[-1].strip().split('|')
+        require(summary[:2] == ['SUMMARY','190'],'METADATA_SAMPLE_COUNT')
+        rows = [line.strip().split('|') for line in lines[:-1] if line.strip()]
+        require(all(len(row)==11 for row in rows),'METADATA_SESSION_SHAPE')
+        state['sampleCount']=190
+        state['maxSampleGapMs']=int(summary[2])*10
+        state['matchedSamples']=len(rows)
+        ids=sorted({tuple(row[2:7]) for row in rows})
+        state['sessions']=ids
+        state['sqlChildren']=sorted({(row[i],row[i+1]) for row in rows for i in (7,9)
+                                    if re.fullmatch('[0-9a-z]{13}',row[i]) and row[i+1].isdigit()})
+        raw = r.ex.ordinary(directory/'metadata.json').read_bytes()
+        require(len(raw)<=r.METADATA_LIMIT,'METADATA_RAW_SIZE')
+        data=json.loads(raw)
+        require(data['source']['probe']==str(uuid.UUID(key)) and data['source']['queryId'] is None
+                and data['source']['dropped']==0 and data['source']['frequency']==data['frequency']>0,'METADATA_PROBE_KIND')
+        groups=r.check_metadata_spans(data['source'],component=True)
+        spans=groups.get(key,[])
+        identity=next((span['Session'] for span in spans if span['Session']),None)
+        terminated=(len(ids)==1 and all(v.isdigit() and int(v)>0 for v in ids[0]) and identity
+                    and tuple(map(int,(ids[0][0],ids[0][1],ids[0][3],ids[0][4]))) ==
+                    (identity[0],identity[1],identity[2],identity[4]) and post.stdout.strip()==b'0')
+        state.update(sourceTermination='CONFIRMED' if terminated else 'UNKNOWN',
+                     sourceExitWithinDiagnostic=bool(terminated and post_seconds<=10),rawSha256=r.ex.sha(raw),
+                     rawBytes=len(raw),workMs=(data['workEnd']-data['origin'])*1000/data['frequency'],
+                     exitMs=(data['end']-data['origin'])*1000/data['frequency'])
+        state['completed']=(driver.returncode==0 and len(spans)==12 and data['failure'] is None
+                            and data['disposeFailure'] is None and state['workMs']<=8000 and state['exitMs']<=10000)
+        save()
+    finally:
+        if cid:
+            checked=action('exit',['inspect','-f','{{.Id}}|{{.State.Status}}|{{.State.Pid}}',cid],cleanup=True)
+            ident,status,pid=checked.stdout.decode().strip().split('|')
+            require(ident==cid and status in ('created','exited','running'),'METADATA_EXIT_ID')
+            if status=='running':
+                require(action('term',['stop','--signal','TERM','--timeout','-1',cid],limit=15,cleanup=True).returncode==0,'METADATA_TERM')
+            require(action('remove',['rm',cid],cleanup=True).stdout.decode().strip()==cid,'METADATA_REMOVE')
+            absent=action('absent',['ps','-aq','--no-trunc','--filter','id='+cid],cleanup=True)
+            require(absent.returncode==0 and not absent.stdout.strip(),'METADATA_ABSENT')
+            state['helperAbsent']=True
+        state['outerSeconds']=time.monotonic()-began
+        save()
+    require(state['outerSeconds']<=30,'METADATA_SUPERVISION_OVERRUN')
+    return state
+
+
+def run_metadata_baseline():
+    """用本代 PG 的真实目录和已关闭维护后继打开一个双角色诊断窗。"""
+    import workflow_oracle_d368_closure as closure
+    from workflow_m2_build import TARGETS, inputs
+    head = w.close_registration()
+    require(head['kind']=='METADATA_PG_ONLY' and head['status']=='TASK_LEVEL_RECOVERY' and head['queryId']==closure.METADATA_QUERY,
+            'METADATA_PG_SUCCESSOR')
+    w.last_close(r.ROOT,digest=head['sha256'])
+    sample_dir=AREA/'metadata-baseline'
+    sample_dir.mkdir(mode=0o700)
+    operation=uuid.uuid4().hex
+    record=dict(taskId=r.TASK,runId=r.PRODUCT,batch=w.BATCH,operation=operation,priorClose=head['sha256'],starts={},closed={})
+    path=sample_dir/'window.json'
+    def save():
+        r.platform.save(path,record,path.exists())
+    with w.metadata_batch_window('source1'), w.open_window() as decision:
+        record.update(windowId=decision['id'],cold=decision['coldAttempt'])
+        save()
+        try:
+            snapshots={}
+            for target in ('api','connections'):
+                binding,event=r.bound_build(target)
+                src=r.ROOT/Path(TARGETS[target]).parent/'bin/Debug/net10.0'
+                disk=r.admit()['platformDisk']
+                snapshots[target]=r.platform.snapshots.freeze(r.ROOT,src,r.AREA/'runtime-snapshots',binding,event['commandId'],
+                        {'toolEnvironment':event['environmentFingerprint']},task=r.TASK,run_id=r.PRODUCT,
+                        remaining_bytes=decision['ceiling']-w.EXIT_MARGIN-w.CHECKOUT-disk['totalBytes'])
+            modules=['OntologyPlatform.Modules.Connections.dll','OntologyPlatform.Contracts.dll','Oracle.ManagedDataAccess.dll']
+            require(all(snapshots['api']['files'][n]==snapshots['connections']['files'][n] for n in modules),'METADATA_HOST_MODULES')
+            record.update(modules={n:snapshots['api']['files'][n] for n in modules},snapshots={t:s['snapshotId'] for t,s in snapshots.items()},
+                          buildInput=inputs('connections'),closeReserveSeconds=w.METADATA_CLOSE_SECONDS)
+            save()
+            for role in ('platform-pg','oracle'):
+                w.metadata_allow(210)
+                record['starts'][role]=r.recovery.start_owned('replacement',role,r.running_roles())['attempt']
+                save()
+            source_start,cmd=r.command('metadata-source-generation',['inspect','-f','{{.Id}}|{{.State.StartedAt}}|{{.State.Status}}',closure.SOURCE])
+            require(source_start.startswith(closure.SOURCE+'|') and source_start.endswith('|running'),'METADATA_LIVE_SOURCE')
+            record.update(sourceGeneration=source_start,sourceCommand=cmd)
+            cat,cmd=r.platform.read_pg(('SELECT "ViewJson" FROM connections."CatalogSnapshots" WHERE "ConnectionId"=\''+CONNECTION+
+                '\' ORDER BY "CapturedAtUtc" DESC,"Id" DESC LIMIT 1;').encode(),'metadata-current-catalog')
+            catalog=json.loads(cat)
+            require(catalog['connectionId']==CONNECTION and catalog['status']=='READY' and len(catalog['objects'])==2,'METADATA_CURRENT_CATALOG')
+            record.update(catalogCommand=cmd,catalogSha256=r.ex.sha(r.ex.encoded(catalog)))
+            save()
+            ddl,cmd=r.platform.native_fixture_sql("set long 100000 longchunksize 30000 linesize 32000\n"
+                        "select dbms_metadata.get_ddl('VIEW','READONLY_ATTESTATION','G4_CONTROL') from dual;",'metadata-view-definition')
+            require('READONLY_ATTESTATION' in ddl and 'BLOCKED_COUNT' in ddl and len(ddl)<65536,'METADATA_VIEW_DDL')
+            record.update(viewCommand=cmd,viewDdlSha256=r.ex.sha(ddl.encode()))
+            where="owner='G4_CONTROL' and "
+            obj="name='READONLY_ATTESTATION'"
+            sections=[
+                ("object","select json_array(owner,object_name,object_type,status) from dba_objects where "+where+"object_name='READONLY_ATTESTATION'"),
+                ("view","select json_array(owner,view_name,bequeath) from dba_views where "+where+"view_name='READONLY_ATTESTATION'"),
+                ("columns","select json_array(column_id,column_name,data_type,data_length,data_precision,data_scale) from dba_tab_columns where "+where+"table_name='READONLY_ATTESTATION' order by column_id"),
+                ("grants","select json_array(grantee,privilege,grantable,grantor) from dba_tab_privs where "+where+"table_name='READONLY_ATTESTATION' order by 1"),
+                ("dependencies","select json_array(referenced_owner,referenced_name,referenced_type) from dba_dependencies where "+where+obj+" and type='VIEW' order by 1"),
+                ("dependents","select json_array(owner,name,type) from dba_dependencies where referenced_owner='G4_CONTROL' and referenced_name='READONLY_ATTESTATION' order by 1"),
+                ("triggers","select json_array(owner,trigger_name,status) from dba_triggers where table_owner='G4_CONTROL' and table_name='READONLY_ATTESTATION' order by 1")]
+            body='\n'.join('prompt SECTION_'+section+'\n'+sql+';' for section,sql in sections)
+            meta,cmd=r.platform.native_fixture_sql(body,'metadata-view-dependencies')
+            record.update(viewMetadataCommand=cmd,viewMetadata=meta.splitlines())
+            save()
+            admission=r.admit()
+            with w.monitored(admission['attempt']):
+                sample=metadata_probe('B1',catalog,snapshots,sample_dir)
+            record.update(sample=sample,trace='OFF')
+            save()
+            # 计划和累计统计仅针对本次实际命中的 child，不对短语句猜测归属。
+            keys=sample.get('sqlChildren',[])
+            if keys:
+                require(len(keys)<=32,'METADATA_SQL_COUNT')
+                exact=','.join("('"+q+"',"+n+")" for q,n in keys)
+                selector="con_id=to_number(sys_context('USERENV','CON_ID')) and (sql_id,child_number) in ("+exact+")"
+                sql=("select json_array(sql_id,child_number,plan_hash_value,executions,cpu_time,elapsed_time,dbms_lob.getlength(sql_fulltext),"
+                     "rawtohex(standard_hash(dbms_lob.substr(sql_fulltext,4000,1),'SHA256'))) from v$sql where "+selector+
+                     " and parsing_schema_name='FIXTURE_READER' order by sql_id,child_number;\nprompt PLAN\n"
+                     "select json_array(sql_id,child_number,plan_hash_value,id,parent_id,operation,options) from v$sql_plan where "+
+                     selector+" order by sql_id,child_number,id fetch first 1000 rows only;")
+                _,record['planCommand']=r.platform.native_fixture_sql(sql,'metadata-sampled-plans')
+                save()
+        finally:
+            with w.close_resources():
+                failures=[]
+                for role in ('oracle','platform-pg'):
+                    try:
+                        active=r.running_roles()
+                        if role in active:
+                            record['closed'][role]=r.recovery.native_stop('replacement',role,active,operation)
+                            save()
+                    except Exception as err:
+                        failures.append((role,type(err).__name__))
+                record['post']=r.admit()['attempt']
+                record['remaining']=sorted(r.running_roles())
+                record['closeErrors']=failures
+                save()
+                require(not failures and not record['remaining'],'METADATA_WINDOW_CLOSURE')
+    return record
+
+
 if __name__=='__main__':
     path=run_first()
     row=r.load(path)

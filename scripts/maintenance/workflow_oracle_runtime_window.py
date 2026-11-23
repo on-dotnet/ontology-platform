@@ -181,10 +181,13 @@ def sample(attempt):
     require(os.environ.get('OMQ_PRODUCT_RUN') == RUN and re.fullmatch('[a-f0-9]{32}', attempt), 'WINDOW_SAMPLE_SCOPE')
     basis = r.load(AREA / ('source-admission-' + attempt + '.json'))
     ids = r.manifest()['ids']
-    require(set(ids) == set(basis['expectedRunningRoles']) and basis['runId'] == RUN and
+    metadata = AREA/BATCH/'metadata-elapsed-source1.json'
+    partial = (metadata.is_file() and json.loads(metadata.read_bytes()).get('status')=='ACTIVE'
+               and set(basis['expectedRunningRoles'])=={'platform-pg','oracle'} and not set(r.APIS).intersection(ids))
+    require((set(ids) == set(basis['expectedRunningRoles']) or partial) and basis['runId'] == RUN and
             basis['status'] == 'FORMAL_RESOURCE_READY', 'WINDOW_SAMPLE_ROLES')
     replacement = r.load(r.recovery.RECOVERY_AREA / 'replacement-resources.json')
-    usage = r.platform.current_storage(r.BASE, {**replacement, 'extraIds': {k: ids[k] for k in r.APIS}, 'extraRun': RUN})
+    usage = r.platform.current_storage(r.BASE, {**replacement, 'extraIds': {k: ids[k] for k in r.APIS if k in ids}, 'extraRun': RUN})
     disk = basis['platformDisk']
     paths = disk['hostPaths']
     sizes = [line.split(None, 1) for line in subprocess.check_output(['du', '-sk', *paths], text=True, timeout=15).splitlines()]
