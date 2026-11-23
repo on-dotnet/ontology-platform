@@ -1,7 +1,7 @@
 {
   "evidenceSchemaVersion": 2,
   "validationSource": "LOCAL",
-  "testedCommit": "4cd7b67eeea43cee1fa6160bf615e870aefdc881",
+  "testedCommit": "5e2f599db71b321834d52dd6f931a125ae340d7d",
   "ci": {
     "status": "NOT_RUN",
     "runId": null,
@@ -331,6 +331,160 @@
       "exitCode": 0,
       "status": "PASS",
       "output": "Q1业务审计 SUCCESS"
+    },
+    {
+      "name": "metadata-create",
+      "command": "3aa3b8d906d248d6aa472347ace65c52",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-B1-create 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-identity",
+      "command": "3c1a9ab6052c4414897d67b6ce29860a",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-B1-identity 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-actual",
+      "command": "344a18aed44b425287bed063baac067f",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-B1-actual 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-exit",
+      "command": "c9a6a96c1af4409397a3c9d7ff0a891b",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-B1-exit 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-remove",
+      "command": "8481ccc0a8ff4cdb91ca594d1072db54",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-B1-remove 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-absent",
+      "command": "41c75cbec2f2427ea6aab5e03cba196a",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-B1-absent 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-sessions",
+      "command": "b23ac9a3e2534bc3ad5b478add2fec15",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-B1-sessions 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-postSession",
+      "command": "e3699dafe1674af4a0851d3ae099b48a",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-B1-post-session 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-catalog",
+      "command": "940ca38ed8674ede996a9b3c8c1f8099",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "omq-pg-metadata-current-catalog 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-view",
+      "command": "83d09713284d48448da0eb1ebc03c6f8",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-view-definition 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-definitionMetadata",
+      "command": "64852c3f9dfe4ba69af75ab1d4d575df",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-view-dependencies 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-sourceGeneration",
+      "command": "8d7a25adfff6495fbe364e6367199d8b",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-source-generation 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-cas",
+      "command": "a9e08bfa28934f3480f052d6c4d64f3b",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "s23-access-recovery-cas 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-readback_row",
+      "command": "4533f994d89942c58d4e449a121b823b",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "omq-pg-metadata-after-row 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-readback_audit",
+      "command": "d643773b50814ce691d219cedb77b637",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "omq-pg-metadata-after-audit 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-readback_receipts",
+      "command": "5d82d418ec15426a9f233eaf5d292009",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "omq-pg-metadata-after-receipts 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-readback_errorCode",
+      "command": "c0dc275249d449a1b79b90e3bddd6282",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "omq-pg-normal-after-error-code 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-connectionsTests",
+      "command": "cafb98e8c8c34fc3ac6b5c20de21ae51",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-offline-connections 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-normalTarget",
+      "command": "e7c508baeea044ecba197ffcdea278e7",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-offline-query 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-offlineConsumer",
+      "command": "c835a395be6c42529b142580075aa13d",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "metadata-offline-consumer 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-plan",
+      "command": "055141a048754ed094db3c2e1058b68b",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "normal-engineering-plan 进程退出；业务与观测资格见 metadataCostBatch。"
+    },
+    {
+      "name": "metadata-verify",
+      "command": "29bf6f7a6b0a45bba021f5bb74925902",
+      "exitCode": 2,
+      "status": "FAIL",
+      "output": "normal-engineering-verify 进程退出；业务与观测资格见 metadataCostBatch。"
     }
   ],
   "metadata": {
@@ -345,7 +499,6 @@
       "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/.DS_Store": "71a471c1e128dee5f01dcb4c8deadb8d4599431efee6a7699b7da571f45af368",
       "docs/evidence/G4-ORACLE-MAPPING-QUERY-001/implementation-01/.DS_Store": "c5b6bb664f244c79d5bcb02d5e969db8f93ca92a9be34ff1f2d232b5650fbd5b"
     },
-    "baseline": "c44c6294e31ee990b068d2e95bfce9a7476be397",
     "state": "NORMAL_PATH_BLOCKED",
     "normalQueryBatch": {
       "status": "NORMAL_PATH_BLOCKED",
@@ -2594,29 +2747,6 @@
         "NormalQueryRejectsWrongGenerationOrTarget": 1
       }
     },
-    "counts": {
-      "Q1": 1,
-      "Q2": 0,
-      "businessPOST": 1,
-      "unusedPOST": 1,
-      "successfulResultGET": 0,
-      "productWindows": 1,
-      "unusedWindows": 1,
-      "windowActiveSeconds": 198.18483166597434,
-      "windowCapSeconds": 2340,
-      "maintenancePgOnly": 1,
-      "f159LateCAS": 1,
-      "Q1LateCAS": 0,
-      "d368Repeated": 0,
-      "A3Rollback": 0,
-      "newABAChild": 0,
-      "newTenSlot": 0,
-      "S3": 0,
-      "mainMerges": 0,
-      "historicalDiagnosticParent": 1,
-      "historicalFormalParent": 1
-    },
-    "productMeasuredCommit": "5318f9b1807f11ad517f5e8d7d1631eef42f8dff",
     "testSelection": {
       "batch": "s2-s3-01",
       "buildFiles": {
@@ -13404,7 +13534,878 @@
         "output": "已登记关闭链1144件重开"
       }
     ],
-    "timingStatus": "MEASURED",
-    "deliveryHeadBinding": "normal-delivery-readback.json"
+    "previousNormal_counts": {
+      "Q1": 1,
+      "Q2": 0,
+      "businessPOST": 1,
+      "unusedPOST": 1,
+      "successfulResultGET": 0,
+      "productWindows": 1,
+      "unusedWindows": 1,
+      "windowActiveSeconds": 198.18483166597434,
+      "windowCapSeconds": 2340,
+      "maintenancePgOnly": 1,
+      "f159LateCAS": 1,
+      "Q1LateCAS": 0,
+      "d368Repeated": 0,
+      "A3Rollback": 0,
+      "newABAChild": 0,
+      "newTenSlot": 0,
+      "S3": 0,
+      "mainMerges": 0,
+      "historicalDiagnosticParent": 1,
+      "historicalFormalParent": 1
+    },
+    "previousNormal_baseline": "c44c6294e31ee990b068d2e95bfce9a7476be397",
+    "previousNormal_productMeasuredCommit": "5318f9b1807f11ad517f5e8d7d1631eef42f8dff",
+    "previousNormal_timingStatus": "MEASURED",
+    "previousNormal_deliveryHeadBinding": "normal-delivery-readback.json",
+    "counts": {
+      "pgWindows": 1,
+      "sourceWindows": 1,
+      "B1": 1,
+      "B2": 0,
+      "candidates": 0,
+      "P1": 0,
+      "P2": 0,
+      "sameQGET": 0,
+      "platformQueries": 0,
+      "businessPOST": 0,
+      "grantRenewal": 0,
+      "DDL": 0,
+      "trace": 0,
+      "ABA": 0,
+      "tenSlots": 0,
+      "S3": 0,
+      "mainMerges": 0,
+      "oldQCas": 1
+    },
+    "baseline": "4a3e3411fb0df6777bf7eb2176dfea4463087225",
+    "productMeasuredCommit": null,
+    "deliveryHeadBinding": "metadata-delivery-readback.json",
+    "metadataCostBatch": {
+      "base": "4a3e3411fb0df6777bf7eb2176dfea4463087225",
+      "measuredController": "9a5e5bb65062bf870961d22a5b8cf1c00b4110ec",
+      "offlineCode": "5e2f599db71b321834d52dd6f931a125ae340d7d",
+      "state": "NORMAL_PATH_BLOCKED",
+      "classification": "DIAGNOSTIC_ONLY",
+      "outcome": "源窗采集失败并已正常关停。产品准入未满足。",
+      "frequency": 1000000000,
+      "probe": "c2c5059355af4c1fbe1852ea560729ee",
+      "session": [
+        1,
+        62,
+        250537,
+        915922451844688663,
+        3
+      ],
+      "serial": null,
+      "cost": [
+        {
+          "phase": "pre",
+          "sql": "identity",
+          "totalMs": 54.314625,
+          "executeMs": 50.861458,
+          "readMs": 0.884792,
+          "readCalls": 1,
+          "rows": 1,
+          "firstRowFromBeginMs": 52.803875,
+          "eofFromBeginMs": null,
+          "readerDisposeMs": 0.490458,
+          "commandDisposeMs": 0.105,
+          "gapMs": 1.972917,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "phase": "pre",
+          "sql": "privileges",
+          "totalMs": 86.62525,
+          "executeMs": 86.439542,
+          "readMs": 0.0,
+          "readCalls": 0,
+          "rows": 0,
+          "firstRowFromBeginMs": null,
+          "eofFromBeginMs": null,
+          "readerDisposeMs": null,
+          "commandDisposeMs": 0.001667,
+          "gapMs": 0.184041,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "phase": "pre",
+          "sql": "attestation",
+          "totalMs": 864.351667,
+          "executeMs": 863.737375,
+          "readMs": 0.081,
+          "readCalls": 2,
+          "rows": 1,
+          "firstRowFromBeginMs": 864.233,
+          "eofFromBeginMs": 864.326125,
+          "readerDisposeMs": 0.00125,
+          "commandDisposeMs": 0.001542,
+          "gapMs": 0.5305,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "phase": "pre",
+          "sql": "directRead",
+          "totalMs": 49.583917,
+          "executeMs": 48.002625,
+          "readMs": 0.116584,
+          "readCalls": 4,
+          "rows": 3,
+          "firstRowFromBeginMs": 48.454333,
+          "eofFromBeginMs": 48.829,
+          "readerDisposeMs": 0.001708,
+          "commandDisposeMs": 0.000959,
+          "gapMs": 1.462041,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "phase": "pre",
+          "sql": "catalog",
+          "totalMs": 159.518541,
+          "executeMs": 155.906542,
+          "readMs": 0.015666,
+          "readCalls": 23,
+          "rows": 22,
+          "firstRowFromBeginMs": 157.190541,
+          "eofFromBeginMs": 157.916291,
+          "readerDisposeMs": 0.002167,
+          "commandDisposeMs": 0.001541,
+          "gapMs": 3.592625,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "phase": "pre",
+          "sql": "physical",
+          "totalMs": 410.002209,
+          "executeMs": 402.82125,
+          "readMs": 0.009041,
+          "readCalls": 3,
+          "rows": 2,
+          "firstRowFromBeginMs": 403.395709,
+          "eofFromBeginMs": 403.744584,
+          "readerDisposeMs": 0.002458,
+          "commandDisposeMs": 0.001333,
+          "gapMs": 7.168127,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "phase": "post",
+          "sql": "identity",
+          "totalMs": 0.331167,
+          "executeMs": 0.305041,
+          "readMs": 0.001041,
+          "readCalls": 1,
+          "rows": 1,
+          "firstRowFromBeginMs": 0.315042,
+          "eofFromBeginMs": null,
+          "readerDisposeMs": 0.001041,
+          "commandDisposeMs": 0.000333,
+          "gapMs": 0.023711,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "phase": "post",
+          "sql": "privileges",
+          "totalMs": 2.477792,
+          "executeMs": 2.475042,
+          "readMs": 0.0,
+          "readCalls": 0,
+          "rows": 0,
+          "firstRowFromBeginMs": null,
+          "eofFromBeginMs": null,
+          "readerDisposeMs": null,
+          "commandDisposeMs": 0.000417,
+          "gapMs": 0.002333,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "phase": "post",
+          "sql": "attestation",
+          "totalMs": 167.045834,
+          "executeMs": 167.010209,
+          "readMs": 0.004251,
+          "readCalls": 2,
+          "rows": 1,
+          "firstRowFromBeginMs": 167.029084,
+          "eofFromBeginMs": 167.041167,
+          "readerDisposeMs": 0.00125,
+          "commandDisposeMs": 0.001459,
+          "gapMs": 0.028665,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "phase": "post",
+          "sql": "directRead",
+          "totalMs": 0.5155,
+          "executeMs": 0.483,
+          "readMs": 0.002166,
+          "readCalls": 4,
+          "rows": 3,
+          "firstRowFromBeginMs": 0.493833,
+          "eofFromBeginMs": 0.499166,
+          "readerDisposeMs": 0.000625,
+          "commandDisposeMs": 0.000375,
+          "gapMs": 0.029334,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "phase": "post",
+          "sql": "catalog",
+          "totalMs": 134.443,
+          "executeMs": 134.27325,
+          "readMs": 0.010499,
+          "readCalls": 23,
+          "rows": 22,
+          "firstRowFromBeginMs": 134.302083,
+          "eofFromBeginMs": 134.384416,
+          "readerDisposeMs": 0.001458,
+          "commandDisposeMs": 0.001375,
+          "gapMs": 0.156418,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "phase": "post",
+          "sql": "physical",
+          "totalMs": 93.087042,
+          "executeMs": 92.948917,
+          "readMs": 0.004167,
+          "readCalls": 3,
+          "rows": 2,
+          "firstRowFromBeginMs": 92.969084,
+          "eofFromBeginMs": 92.976042,
+          "readerDisposeMs": 0.002083,
+          "commandDisposeMs": 0.001417,
+          "gapMs": 0.130458,
+          "errors": [
+            null,
+            null,
+            null
+          ]
+        }
+      ],
+      "workMs": 2275.801168,
+      "totalMs": 2279.844543,
+      "openMeasuredMs": 222.434917,
+      "unattributedOutsideMs": 31.069707,
+      "unattributedInsideMs": 15.28117,
+      "viewMs": 1031.397501,
+      "withoutViewMs": 1244.403667,
+      "unknown": [
+        "样本期限内源终止，准确活跃 SERIAL#，源侧采样次数及最大间隔",
+        "本次逐语句 SQL_ID/child、计划、wait/cpu/gets 与实际行统计",
+        "完整窗口磁盘峰值、短语句采样覆盖及历史 Q1 内部成本",
+        "正式双分支耗时、正常释放、同 Q 原字节 GET 和下一请求准入"
+      ],
+      "nextReview": "下批若另行授权，先用固定输出夹具验独立采集器 summary、准确 SID/SERIAL#/实例/PDB 与缺席读回，以及 helper 在册计费。只在以上通过后申请一个同规格元数据诊断窗，核目录与证明 SQL 的实际 child/计划和打开成本。保持原期限，逐项量化后再裁决候选与产品准入。",
+      "counts": {
+        "pgWindows": 1,
+        "sourceWindows": 1,
+        "B1": 1,
+        "B2": 0,
+        "candidates": 0,
+        "P1": 0,
+        "P2": 0,
+        "sameQGET": 0,
+        "platformQueries": 0,
+        "businessPOST": 0,
+        "grantRenewal": 0,
+        "DDL": 0,
+        "trace": 0,
+        "ABA": 0,
+        "tenSlots": 0,
+        "S3": 0,
+        "mainMerges": 0,
+        "oldQCas": 1
+      },
+      "limits": {
+        "workMs": 750,
+        "branchMs": 1000,
+        "rootMs": 5000,
+        "cleanupMs": 250,
+        "probeWorkMs": 8000,
+        "probeAbsoluteMs": 10000,
+        "outerMs": 30000,
+        "outerActualSeconds": 10.41992370801745,
+        "pgSeconds": 108.440749875,
+        "sourceSeconds": 78.352728958,
+        "totalSeconds": 186.793478833,
+        "remainingSeconds": 2153.206521167,
+        "capSeconds": 2340,
+        "closeReserveSeconds": 180,
+        "policyGiB": 48,
+        "stopGiB": 44,
+        "diskExitGiB": 4,
+        "observedBytes": 43316269502,
+        "completePeak": null,
+        "pgOpeningBytes": 43255472574,
+        "sourceOpeningBytes": 43261350334,
+        "earlyColdBytes": 43250315710,
+        "earlyColdAttempt": "7f3b7b0e143840a586d180d9014144ee",
+        "checkoutReserveGiB": 1
+      },
+      "commands": {
+        "create": {
+          "commandId": "3aa3b8d906d248d6aa472347ace65c52",
+          "stage": "metadata-B1-create",
+          "inputFingerprint": "42a1adea2cfd692fd3213594084759c91fb7cd0c68df3d4ccf8e75c223f75ba6",
+          "exitCode": 0,
+          "elapsedSeconds": 0.03457366701331921,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/3aa3b8d906d248d6aa472347ace65c52/stdout.txt",
+            "sha256": "dd9fde06c24ffba44ef979998a585fdf81d6cd4c766e104bf3c564c6ba9f4f9b",
+            "sizeBytes": 65
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/3aa3b8d906d248d6aa472347ace65c52/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "identity": {
+          "commandId": "3c1a9ab6052c4414897d67b6ce29860a",
+          "stage": "metadata-B1-identity",
+          "inputFingerprint": "26d8ddd3798487932353dc1ff84c0ae3a26bf64808aad3a434661a053169610b",
+          "exitCode": 0,
+          "elapsedSeconds": 0.01910191698698327,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/3c1a9ab6052c4414897d67b6ce29860a/stdout.txt",
+            "sha256": "dfaeb9864e037d21812b64fdca5d8a49a248e5b1bfb16006786556b8dfb6680f",
+            "sizeBytes": 1384
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/3c1a9ab6052c4414897d67b6ce29860a/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "actual": {
+          "commandId": "344a18aed44b425287bed063baac067f",
+          "stage": "metadata-B1-actual",
+          "inputFingerprint": "2cb10a8cb4476f44a3cbce18196d07b3d6ec398a883816db45896a4262cb880f",
+          "exitCode": 0,
+          "elapsedSeconds": 2.710911333007971,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/344a18aed44b425287bed063baac067f/stdout.txt",
+            "sha256": "449cdf691bc68680d4f19ac3dfd34dc644a9aa791d48fc56effb1b03dac2c143",
+            "sizeBytes": 263
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/344a18aed44b425287bed063baac067f/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "exit": {
+          "commandId": "c9a6a96c1af4409397a3c9d7ff0a891b",
+          "stage": "metadata-B1-exit",
+          "inputFingerprint": "e10c2f86813c84c7c9af40b6f9f281d419839871a1b4197ecd9535247f19dd53",
+          "exitCode": 0,
+          "elapsedSeconds": 0.04085483300150372,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c9a6a96c1af4409397a3c9d7ff0a891b/stdout.txt",
+            "sha256": "391cf7e1dd5a3ec53a9f6a5100643218cc0b599092ad8abf6bce1ccb063a8613",
+            "sizeBytes": 74
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c9a6a96c1af4409397a3c9d7ff0a891b/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "remove": {
+          "commandId": "8481ccc0a8ff4cdb91ca594d1072db54",
+          "stage": "metadata-B1-remove",
+          "inputFingerprint": "69338bbc7f15c40d8050efcc85b154612331a4390bfbd8227ef8e03ab98ab117",
+          "exitCode": 0,
+          "elapsedSeconds": 0.04399879201082513,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8481ccc0a8ff4cdb91ca594d1072db54/stdout.txt",
+            "sha256": "dd9fde06c24ffba44ef979998a585fdf81d6cd4c766e104bf3c564c6ba9f4f9b",
+            "sizeBytes": 65
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8481ccc0a8ff4cdb91ca594d1072db54/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "absent": {
+          "commandId": "41c75cbec2f2427ea6aab5e03cba196a",
+          "stage": "metadata-B1-absent",
+          "inputFingerprint": "300ed2d698fe0f88562e22b58c1a942a251e11ce77c1e1876a10bfa6edac1164",
+          "exitCode": 0,
+          "elapsedSeconds": 0.02139537502080202,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/41c75cbec2f2427ea6aab5e03cba196a/stdout.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/41c75cbec2f2427ea6aab5e03cba196a/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "sessions": {
+          "commandId": "b23ac9a3e2534bc3ad5b478add2fec15",
+          "stage": "metadata-B1-sessions",
+          "inputFingerprint": "39332ea4c3b1abb06a2d3bd563b4473828f93d3a42ba6eaa381af4a135d25c07",
+          "exitCode": 0,
+          "elapsedSeconds": 10.242204333015252,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b23ac9a3e2534bc3ad5b478add2fec15/stdout.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/b23ac9a3e2534bc3ad5b478add2fec15/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "postSession": {
+          "commandId": "e3699dafe1674af4a0851d3ae099b48a",
+          "stage": "metadata-B1-post-session",
+          "inputFingerprint": "ed3dda09c4f5f7ff1e7ebcf268f82185f7724b3bcc9b6d04279117189866f830",
+          "exitCode": 0,
+          "elapsedSeconds": 0.05537062499206513,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e3699dafe1674af4a0851d3ae099b48a/stdout.txt",
+            "sha256": "67964cc741d4cf9acc09c350963d67e355b79b4d129ac10dbb30113e7325b07a",
+            "sizeBytes": 11
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e3699dafe1674af4a0851d3ae099b48a/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "catalog": {
+          "commandId": "940ca38ed8674ede996a9b3c8c1f8099",
+          "stage": "omq-pg-metadata-current-catalog",
+          "inputFingerprint": "467180ebf04b19ca3d3e5270bbb1f40b1ac31dfe1bac8456ef12445ec8ea6648",
+          "exitCode": 0,
+          "elapsedSeconds": 0.034626167005626485,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/940ca38ed8674ede996a9b3c8c1f8099/stdout.txt",
+            "sha256": "0dc70e86350123e5ecbbd7d4a0b6a332d555c0cf21b09942ace08c79556ba7b6",
+            "sizeBytes": 6580
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/940ca38ed8674ede996a9b3c8c1f8099/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "view": {
+          "commandId": "83d09713284d48448da0eb1ebc03c6f8",
+          "stage": "metadata-view-definition",
+          "inputFingerprint": "2b89585c05d425467884369e11e2719225f2f34879e98cc0617dff69f5ead138",
+          "exitCode": 0,
+          "elapsedSeconds": 1.1019613330136053,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/83d09713284d48448da0eb1ebc03c6f8/stdout.txt",
+            "sha256": "2d189afbe0084c0a63f3aacf27663a8aa6e8e87300cc46823dbeaa632bff48f8",
+            "sizeBytes": 1899
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/83d09713284d48448da0eb1ebc03c6f8/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "definitionMetadata": {
+          "commandId": "64852c3f9dfe4ba69af75ab1d4d575df",
+          "stage": "metadata-view-dependencies",
+          "inputFingerprint": "ebafcedfd270e109dc5fed5947e599a5432a9113db06cff1b2d3ed33ab471b2e",
+          "exitCode": 0,
+          "elapsedSeconds": 0.14113937501679175,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/64852c3f9dfe4ba69af75ab1d4d575df/stdout.txt",
+            "sha256": "1c8b17fb2fdacdbedf1def4a9c95bb883fa8c7a7b8842f4536f85a277dda5a34",
+            "sizeBytes": 584
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/64852c3f9dfe4ba69af75ab1d4d575df/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "sourceGeneration": {
+          "commandId": "8d7a25adfff6495fbe364e6367199d8b",
+          "stage": "metadata-source-generation",
+          "inputFingerprint": "d217800fd7faa1fa2fa8cd8eed4b9457692cc1d8824d69c45909c290aebce269",
+          "exitCode": 0,
+          "elapsedSeconds": 0.016114250000100583,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8d7a25adfff6495fbe364e6367199d8b/stdout.txt",
+            "sha256": "d18edb752007bb569da67b781f3856a9d392bfa9e4e8e291c26caa424af73607",
+            "sizeBytes": 104
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/8d7a25adfff6495fbe364e6367199d8b/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "cas": {
+          "commandId": "a9e08bfa28934f3480f052d6c4d64f3b",
+          "stage": "s23-access-recovery-cas",
+          "inputFingerprint": "a2403b77b406d9c6efdcf3b3839b825e3493954c14d0aa9115bc186aa1faf578",
+          "exitCode": 0,
+          "elapsedSeconds": 0.9790121660043951,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/a9e08bfa28934f3480f052d6c4d64f3b/stdout.txt",
+            "sha256": "4c7e1c1e9274ee541f985c7b230ea86ceacc2d608c88b723f02134aa784eb407",
+            "sizeBytes": 175
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/a9e08bfa28934f3480f052d6c4d64f3b/stderr.txt",
+            "sha256": "6a55ce9418db27c92344e3846e6ec6fe5718cb84e315fe05c82d3403ebff3a9d",
+            "sizeBytes": 127
+          }
+        },
+        "readback_row": {
+          "commandId": "4533f994d89942c58d4e449a121b823b",
+          "stage": "omq-pg-metadata-after-row",
+          "inputFingerprint": "8706cf184a0865a5a7957ecf674d8e72c5efaf6ba9aed7be24f8afe343a86cd5",
+          "exitCode": 0,
+          "elapsedSeconds": 0.0341105000115931,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/4533f994d89942c58d4e449a121b823b/stdout.txt",
+            "sha256": "eac3a1d1b655e6bf4465d10da6d51ffd32428a7666d157e576b8608ce5e3d4c3",
+            "sizeBytes": 828
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/4533f994d89942c58d4e449a121b823b/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "readback_audit": {
+          "commandId": "d643773b50814ce691d219cedb77b637",
+          "stage": "omq-pg-metadata-after-audit",
+          "inputFingerprint": "9fdc4f4ba4d85cb48b707fc765767ee6332738375cde5b983cafc27848fced72",
+          "exitCode": 0,
+          "elapsedSeconds": 0.03375191701343283,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/d643773b50814ce691d219cedb77b637/stdout.txt",
+            "sha256": "b79fc3a273a0be8cd2d848a9176ccbe5c17565ccd59f04109055d0d5af99bb17",
+            "sizeBytes": 741
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/d643773b50814ce691d219cedb77b637/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "readback_receipts": {
+          "commandId": "5d82d418ec15426a9f233eaf5d292009",
+          "stage": "omq-pg-metadata-after-receipts",
+          "inputFingerprint": "8889c19e5ec1bb3c1323b8d0fcbb25f97814cf3882db5a5c2688ea2750af2c4d",
+          "exitCode": 0,
+          "elapsedSeconds": 0.032425332989078015,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5d82d418ec15426a9f233eaf5d292009/stdout.txt",
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+            "sizeBytes": 2
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/5d82d418ec15426a9f233eaf5d292009/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "readback_errorCode": {
+          "commandId": "c0dc275249d449a1b79b90e3bddd6282",
+          "stage": "omq-pg-normal-after-error-code",
+          "inputFingerprint": "e20311c416d857feba457c882ca2dd8fa17c060fc68b71125c8b45022354aeb1",
+          "exitCode": 0,
+          "elapsedSeconds": 0.03214441699674353,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c0dc275249d449a1b79b90e3bddd6282/stdout.txt",
+            "sha256": "f9d7cd40e8704c656fd7f386282d52284f760898544ae07d04b684b0f0dde287",
+            "sizeBytes": 27
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c0dc275249d449a1b79b90e3bddd6282/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "connectionsTests": {
+          "commandId": "cafb98e8c8c34fc3ac6b5c20de21ae51",
+          "stage": "metadata-offline-connections",
+          "inputFingerprint": "34cbe9d480f934fc608515135be496c49202294fdb916f7047c8760cf78bf311",
+          "exitCode": 0,
+          "elapsedSeconds": 0.5149577080155723,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/cafb98e8c8c34fc3ac6b5c20de21ae51/stdout.txt",
+            "sha256": "5177e541507fdedce7103371726cf42569213524ca2e44d510c0e1ba43ebdf82",
+            "sizeBytes": 2119
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/cafb98e8c8c34fc3ac6b5c20de21ae51/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "normalTarget": {
+          "commandId": "e7c508baeea044ecba197ffcdea278e7",
+          "stage": "metadata-offline-query",
+          "inputFingerprint": "34cbe9d480f934fc608515135be496c49202294fdb916f7047c8760cf78bf311",
+          "exitCode": 0,
+          "elapsedSeconds": 0.3048194170114584,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e7c508baeea044ecba197ffcdea278e7/stdout.txt",
+            "sha256": "d3f9ffcb9240d4d81822a8c860b0aa4397b98e9fcd50dbd20f52a438a36da369",
+            "sizeBytes": 408
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/e7c508baeea044ecba197ffcdea278e7/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "offlineConsumer": {
+          "commandId": "c835a395be6c42529b142580075aa13d",
+          "stage": "metadata-offline-consumer",
+          "inputFingerprint": "34cbe9d480f934fc608515135be496c49202294fdb916f7047c8760cf78bf311",
+          "exitCode": 0,
+          "elapsedSeconds": 0.8193605410051532,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c835a395be6c42529b142580075aa13d/stdout.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/c835a395be6c42529b142580075aa13d/stderr.txt",
+            "sha256": "98a759a398c23a396d48485ab653ba2d588cd67590282d234da472257a112e2f",
+            "sizeBytes": 100
+          }
+        },
+        "plan": {
+          "commandId": "055141a048754ed094db3c2e1058b68b",
+          "stage": "normal-engineering-plan",
+          "inputFingerprint": "5e2f599db71b321834d52dd6f931a125ae340d7d",
+          "exitCode": 0,
+          "elapsedSeconds": 28.869801084016217,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/055141a048754ed094db3c2e1058b68b/stdout.txt",
+            "sha256": "565feb79e9a9b6e762b989c3bd151c243a5e676e63a3f955935533c28ea8254b",
+            "sizeBytes": 4944
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/055141a048754ed094db3c2e1058b68b/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        },
+        "verify": {
+          "commandId": "29bf6f7a6b0a45bba021f5bb74925902",
+          "stage": "normal-engineering-verify",
+          "inputFingerprint": "5e2f599db71b321834d52dd6f931a125ae340d7d",
+          "exitCode": 2,
+          "elapsedSeconds": 56.32986970900674,
+          "stdout": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/29bf6f7a6b0a45bba021f5bb74925902/stdout.txt",
+            "sha256": "233e863fa9c8de2b94528c29f5e67283e26df9f6decb33c647206bb44247500c",
+            "sizeBytes": 9812
+          },
+          "stderr": {
+            "path": "/Users/chasen/.codex/worktrees/g4-oracle-mapping-query-001/ontology-platform/artifacts/workflow/G4-ORACLE-MAPPING-QUERY-001/commands/product-resume-01/29bf6f7a6b0a45bba021f5bb74925902/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 0
+          }
+        }
+      },
+      "buildInput": "34cbe9d480f934fc608515135be496c49202294fdb916f7047c8760cf78bf311",
+      "modules": {
+        "OntologyPlatform.Modules.Connections.dll": "c8a5b1f162ab993bb8556c8b1435180c634c3d3ab200524e8ce4475fd00cddfd",
+        "OntologyPlatform.Contracts.dll": "7117b43bf095353f7e4015d54d86e3ee0c6e82ff940dfb01508270ea68225db0",
+        "Oracle.ManagedDataAccess.dll": "8ddd05950d7dc80514654a6be95c43fd0014ba058f2e434c026214ce73f73f80"
+      },
+      "snapshots": {
+        "api": "3a554a9525c399a6378e5cfa98d2bd158361959caf1203f36d9c2bc8f2f04900",
+        "connections": "9ca96998ce3de5092444d674b1867da381e902e61805474be5be3560e78236ac"
+      },
+      "catalogSha256": "12de027ed8b81fc5f04af37d165d91089abe28c2d26cb3a3315706474192505b",
+      "metadataOriginalSha256": "97bed4844799c0f518c959eefcc4a689bf58cefdfe8f8a0a2d12deb1b8d76b1d",
+      "viewOriginalSha256": "2d189afbe0084c0a63f3aacf27663a8aa6e8e87300cc46823dbeaa632bff48f8",
+      "view": [
+        "SECTION_object",
+        "[\"G4_CONTROL\",\"READONLY_ATTESTATION\",\"VIEW\",\"VALID\"]",
+        "SECTION_view",
+        "[\"G4_CONTROL\",\"READONLY_ATTESTATION\",\"DEFINER\"]",
+        "SECTION_columns",
+        "[1,\"POLICY_VERSION\",\"CHAR\",18]",
+        "[2,\"BLOCKED_COUNT\",\"NUMBER\",22]",
+        "SECTION_grants",
+        "[\"FIXTURE_READER\",\"READ\",\"NO\",\"G4_CONTROL\"]",
+        "SECTION_dependencies",
+        "[\"G4_CONTROL\",\"PUBLIC_PRIVILEGE_BASELINE\",\"TABLE\"]",
+        "[\"PUBLIC\",\"DUAL\",\"SYNONYM\"]",
+        "[\"SYS\",\"DBA_COL_PRIVS\",\"VIEW\"]",
+        "[\"SYS\",\"DBA_OBJECTS\",\"VIEW\"]",
+        "[\"SYS\",\"DBA_ROLE_PRIVS\",\"VIEW\"]",
+        "[\"SYS\",\"DBA_SYS_PRIVS\",\"VIEW\"]",
+        "[\"SYS\",\"DBA_TAB_PRIVS\",\"VIEW\"]",
+        "[\"SYS\",\"DBA_USERS\",\"VIEW\"]",
+        "SECTION_dependents",
+        "SECTION_triggers"
+      ],
+      "sourceGeneration": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1|2026-11-23T00:16:12.549726178Z|running",
+      "closed": {
+        "oracle": {
+          "role": "oracle",
+          "id": "65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1",
+          "group": "replacement",
+          "operation": "fbd9a704820d44b4ac29909fa0d5f91f",
+          "resourceAttempt": "38e1a94a36f349959de20ac50fd0d766",
+          "startedUtc": "2026-11-23T00:16:46.109062+00:00",
+          "status": "CLEAN_STOP",
+          "nativeShutdown": true,
+          "after": {
+            "Status": "exited",
+            "ExitCode": 143,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-23T00:16:49.192287833Z"
+          },
+          "logExit": 0,
+          "shutdownLogMarker": true,
+          "logSha256": "b4630603514b005ae1e9f10aa767834a7c2147fda9accb0a90aaf6543336fd00",
+          "endedUtc": "2026-11-23T00:16:49.308606+00:00"
+        },
+        "platform-pg": {
+          "role": "platform-pg",
+          "id": "79b5f2d2af1911ff87d54a3466623f06448c770d52a57c217783cbd643a4b545",
+          "group": "replacement",
+          "operation": "fbd9a704820d44b4ac29909fa0d5f91f",
+          "resourceAttempt": "d5b504b1e68249ac8a126f95d0d5dad7",
+          "startedUtc": "2026-11-23T00:16:53.529587+00:00",
+          "status": "CLEAN_STOP",
+          "after": {
+            "Status": "exited",
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "FinishedAt": "2026-11-23T00:16:53.562103002Z"
+          },
+          "logExit": 0,
+          "shutdownLogMarker": true,
+          "logSha256": "737c639f88597ced42036c2a66665070389d76cc33e561d476156a258e81409d",
+          "controlState": "shut down",
+          "endedUtc": "2026-11-23T00:16:57.994780+00:00"
+        }
+      },
+      "remaining": [],
+      "helperAbsent": true,
+      "sourceTermination": "UNKNOWN",
+      "priorClose": "64bdc66845958810935eb00e9b633108b6c5dc7ebf56ea19d030c396a5db5040",
+      "pgClose": "45e81bff11ee67580201193d50d083f9a85e4a9fb7a953e822f17677603570b4",
+      "maintenance": {
+        "query": "query-5d891e89221e4a3f8f6893873b1d7a9d",
+        "fence": 2,
+        "status": "FAILED",
+        "owner": null,
+        "until": null,
+        "error": "query_source_unavailable",
+        "resultSize": 0,
+        "receipts": 0,
+        "auditIds": [
+          "3e1ca8e4e1af42efa3ac8d0007c8debf",
+          "b1de68dc8ce548898fd27727a0c3453a"
+        ],
+        "auditHashes": [
+          "8625e5892d8c7360efd0a5eaaaf5da78e808c6fb859c4f15c529b36244c88de3",
+          "40f4b3e19c36207442994be70d77b2c0222f96bd9354a2d9d3d38d8b2a9267c7"
+        ],
+        "proof": "a2403b77b406d9c6efdcf3b3839b825e3493954c14d0aa9115bc186aa1faf578",
+        "review": "e1a220b36e73ebdef4c0e5a7bef6c9a9c68c27f0cbe025566f6e063f78d662b4",
+        "operation": "653cbcda45ee44859dc4065233539d05",
+        "attempt": "5b79eaae05a44e94be6b0d6e9410e4f0",
+        "successorMemberCount": 462,
+        "successorIndexSha256": "a0fea98789637afbfda9225f868d5d3f6fc6e3e3958de6f2bfd7f73445d9c493"
+      },
+      "reviews": [
+        {
+          "reviewer": "/root/cost",
+          "method": "独立差分 Begin/End、Execute/Read/Dispose ticks，逐字节重开双流及三模块 SHA，对照源代次收口和两窗时钟。",
+          "finding": "12 个跨度完整。组件工作 2275.801168 ms，去除两次证明仍需 1244.403667 ms。observer 双流 0 B，采样次数及最大间隔未知。",
+          "deliveryCheck": "12 行逐格重算，22 份命令、44 份双流按 ID、输入、长度、SHA 和退出码重开。"
+        },
+        {
+          "reviewer": "/root/consumer",
+          "method": "运行 WorkflowOracleSourceAssociation.Tests.py，并将真实 B1 span 绑定 Q1 失败事件后以 qualify_normal_projection 逐项重开。",
+          "finding": "四项指定反例拒绝。失败阶段边界相等接受，晚 1 tick 拒绝，重叠 1 tick 拒绝。旧 Q1 保留 FAILURE_TRACED。"
+        },
+        {
+          "reviewer": "/root/maintenance",
+          "method": "独立重开绑定的 386 项输入、父进程及实际源代次终止、两 API 缺席与新 PG 前态，核验 accurate proof 后签发 GO。",
+          "finding": "GO。全账本该 proof 恰一 CAS，新连接四项及任务级恢复后继已独立重开。462 个成员，索引 SHA a0fea98789637afbfda9225f868d5d3f6fc6e3e3958de6f2bfd7f73445d9c493。",
+          "binding": "e1a220b36e73ebdef4c0e5a7bef6c9a9c68c27f0cbe025566f6e063f78d662b4",
+          "proofSha256": "a2403b77b406d9c6efdcf3b3839b825e3493954c14d0aa9115bc186aa1faf578"
+        }
+      ],
+      "engineeringVerification": {
+        "selection": "d47be7acbe89622c38cd6f6e04fb7669de6708a8607dbee135ef8ffeb9f5f6c6",
+        "planExit": 0,
+        "verifyExit": 2,
+        "contract": "PASS",
+        "backend": "PASS",
+        "web": "FAIL",
+        "webExit": 1,
+        "webTests": 0,
+        "reason": "OMQ_FORMAL_S2_S3_NOT_RUN"
+      }
+    },
+    "timingStatus": "WINDOW_BUDGET_PASS / SAMPLE_TERMINATION_UNKNOWN",
+    "normalQueryBatchScope": "Historical ordinary Q1 batch ending at 4a3e3411. Current counts and qualification are in metadataCostBatch."
   }
 }

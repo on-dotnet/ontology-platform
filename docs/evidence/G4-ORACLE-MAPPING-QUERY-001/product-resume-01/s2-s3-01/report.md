@@ -1,3 +1,85 @@
+# Oracle 普通关系读取的元数据成本
+
+**NORMAL_PATH_BLOCKED · S2 PARTIAL · S3 NOT_RUN · G4 PARTIAL。** 准确旧 Q 已恢复。B1 工作耗时 2275.801168 ms，含连接释放 2279.844543 ms。普通分支工作阈值 750 ms、总阈值 1000 ms。前后两次证明视图共 1031.397501 ms，即使耗时降为零，仍需 1244.403667 ms。没有支持产品准入的候选，P1、P2、同 Q GET 均为 0。AC03-B、Oracle S0、cleanup250ms 沿用既有资格。
+
+## 实测成本
+
+同一 GUID `c2c5059355af4c1fbe1852ea560729ee`，单调频率 1 GHz，pre/post 客户端原生身份均为 1/62/250537/915922451844688663/3（实例、SID、AUDSID、统一审计会话、PDB）。表内时间单位为 ms，首行和 EOF 相对各 span 起点。— 表示没有该驱动动作。identity 成功只读一次；privileges 是 scalar。12 条的操作、游标释放及命令释放异常号均为空，丢弃为 0。
+
+| 阶段 | SQL | 总计 | Execute/scalar | Read | 次数/行 | 首行 | EOF | 游标释放 | 命令释放 | 间隙 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| pre | identity | 54.315 | 50.861 | 0.885 | 1/1 | 52.804 | — | 0.490 | 0.105 | 1.973 |
+| pre | privileges | 86.625 | 86.440 | 0.000 | 0/0 | — | — | — | 0.002 | 0.184 |
+| pre | attestation | 864.352 | 863.737 | 0.081 | 2/1 | 864.233 | 864.326 | 0.001 | 0.002 | 0.530 |
+| pre | directRead | 49.584 | 48.003 | 0.117 | 4/3 | 48.454 | 48.829 | 0.002 | 0.001 | 1.462 |
+| pre | catalog | 159.519 | 155.907 | 0.016 | 23/22 | 157.191 | 157.916 | 0.002 | 0.002 | 3.593 |
+| pre | physical | 410.002 | 402.821 | 0.009 | 3/2 | 403.396 | 403.745 | 0.002 | 0.001 | 7.168 |
+| post | identity | 0.331 | 0.305 | 0.001 | 1/1 | 0.315 | — | 0.001 | 0.000 | 0.024 |
+| post | privileges | 2.478 | 2.475 | 0.000 | 0/0 | — | — | — | 0.000 | 0.002 |
+| post | attestation | 167.046 | 167.010 | 0.004 | 2/1 | 167.029 | 167.041 | 0.001 | 0.001 | 0.029 |
+| post | directRead | 0.515 | 0.483 | 0.002 | 4/3 | 0.494 | 0.499 | 0.001 | 0.000 | 0.029 |
+| post | catalog | 134.443 | 134.273 | 0.010 | 23/22 | 134.302 | 134.384 | 0.001 | 0.001 | 0.156 |
+| post | physical | 93.087 | 92.949 | 0.004 | 3/2 | 92.969 | 92.976 | 0.002 | 0.001 | 0.130 |
+
+pre 1624.396209 ms、post 397.900335 ms。驱动各层合计 2007.015374 ms，span 内其余 15.281170 ms。Open 路径已计时操作 222.434917 ms，其中 Open 138.598 ms、TLS 83.356 ms；另有 31.069707 ms 工作间隙未归因。证明视图、目录和打开路径均有成本，单样本无法将驱动等待拆成 CPU、I/O 与调度。旧 Q1 的 545.729209 ms 只定位到 readOnly 内取消，不能用 B1 回填。
+
+## 输入、方法及失败
+
+Base `4a3e3411fb0df6777bf7eb2176dfea4463087225`，B1 控制器 `9a5e5bb65062bf870961d22a5b8cf1c00b4110ec`，离线修订 `5e2f599db71b321834d52dd6f931a125ae340d7d`。构建输入 `34cbe9d480f934fc608515135be496c49202294fdb916f7047c8760cf78bf311`；ConnectionsTests 快照 `9ca96998ce3de5092444d674b1867da381e902e61805474be5be3560e78236ac`、API 快照 `3a554a9525c399a6378e5cfa98d2bd158361959caf1203f36d9c2bc8f2f04900`。两者实际 Connections、Contracts、ODP.NET SHA 完全相同。固定 linux/arm64、.NET 10.0.13、0.5 CPU、768 MiB；测试进程不含 API 的租约、业务事务和并发分支，JIT、调度及线程池状态可能不同。组件只调用正常 Open、四条 ACL、两条目录及同组 post，未创建平台 Query。目录输入 SHA 为 `12de027ed8b81fc5f04af37d165d91089abe28c2d26cb3a3315706474192505b`。测试宿主通过受限只读挂载使用隔离 reader。诊断 8 秒工作、绝对 10 秒、外层 30 秒，外层实际 10.419924 秒。
+
+生产方法按真实 Execute、累计 Read、首行、实际 EOF 和释放写紧凑 span。身份字段并入原 SELECT，原 ACL 判定保留，各条命令在进入下一条前结束其释放计时。新 profile oracle-metadata-v2 单分支 12、双分支 24 span。普通成功路径 98+24 项，失败保守上界 160+24 项，估算上界 89,215 B、导出上限 128 KiB。旧 profile 仅按冻结旧命令和 key 重开。正常目标拒绝测试 1/1、ConnectionsTests 22/22，四个真实 Q1 反例分别移除释放、移除 origin/budget、置外来 execution、无证明改 confirmed；全部被拒。离线修订另核失败阶段终点、span 重叠与 helper 计量，SourceAssociation 5/5。初次构建同名局部变量与反例测试的失败保留。
+
+B1 原件 9660 B，SHA `97bed4844799c0f518c959eefcc4a689bf58cefdfe8f8a0a2d12deb1b8d76b1d`。独立 observer 运行 10.242204 s，双流均为 0 B，连汇总行也缺失。后查 COUNT(*) 返回一行，计数为 0，helper 物理释放返回并移除。活跃时的准确 SERIAL# 没有源端原件，故样本期限内源终止 UNKNOWN；采样次数、最大间隔、SQL_ID/child/计划、等待和本次增量统计也未知。保护监控第二次返回 WINDOW_SAMPLER_EXIT_1，窗控制器退出 1，完整磁盘峰值未知。离线修订分开设置 SERVEROUTPUT、保存两条控制命令回执、把实际已验 helper ID 的可写层纳入额度，并在观察器启动前检查外层收口余量。采集修订未经新的源样本验证。
+
+## 定义、准确维护和额度
+
+实际 READONLY_ATTESTATION 为 VALID DEFINER 视图，列 POLICY_VERSION CHAR(18)、BLOCKED_COUNT NUMBER；FIXTURE_READER 仅 READ、不可转授。依赖本地 PUBLIC_PRIVILEGE_BASELINE、PUBLIC.DUAL 和 SYS 的 DBA_COL_PRIVS/OBJECTS/ROLE_PRIVS/SYS_PRIVS/TAB_PRIVS/USERS。所查 dependents/triggers 均 0。实际定义原流 SHA `2d189afbe0084c0a63f3aacf27663a8aa6e8e87300cc46823dbeaa632bff48f8`。现有证据不能支持仅替换证明视图。DDL、差分矩阵、trace、恢复 DDL 和授权续期均为 0。
+
+关闭原件 `64bdc66845958810935eb00e9b633108b6c5dc7ebf56ea19d030c396a5db5040`。PG 启动前核 normal 生产者、原源代次终止和两 API 缺席；PG-only 窗内用新连接核前态。非作者绑定 proof `a2403b77b406d9c6efdcf3b3839b825e3493954c14d0aa9115bc186aa1faf578`、GO `e1a220b36e73ebdef4c0e5a7bef6c9a9c68c27f0cbe025566f6e063f78d662b4` 后，对 `query-5d891e89221e4a3f8f6893873b1d7a9d` 一次 CAS，仅清 owner、until。新连接读回 FAILED/fence 2、query_source_unavailable，原失败审计保留，新增唯一维护审计 `b1de68dc8ce548898fd27727a0c3453a`，结果与收据为 0。PG 关闭后继 `45e81bff11ee67580201193d50d083f9a85e4a9fb7a953e822f17677603570b4`。d368、f159 新维护为 0。构建期间三个旧默认绑定被覆盖，已据保留的原始输出与快照重建摘要命名副本，逐字节匹配原登记 SHA 后独立重开。
+
+PG-only 108.440749875 s，源窗 78.352728958 s，累计 186.793478833 / 2340 s，余 2153.206521167 s。冻结收口时间 180 s，48 GiB 政策、44 GiB 止损、4 GiB 收尾预留。前置冷态 43,250,315,710 B（7f3b7b0e143840a586d180d9014144ee），PG 开窗 43,255,472,574 B，源开窗 43,261,350,334 B，源窗有效观测 43,316,269,502 B。采样器另保留 1 GiB 检出量，48 GiB 档要求实际计费低于 43 GiB。代次 `65bdf442f5679f2f80c2a14f3a1e635f0333a0343679f4123809b314959b77e1|2026-11-23T00:16:12.549726178Z|running`。Oracle 自然停库完成 2026-11-23T00:16:49.192287833Z，PG 完成 2026-11-23T00:16:53.562103002Z，任务运行项空，旧保护资源保留。预算余量不能解除样本停止条件。B2/C1/C2、P1/P2、GET、ABA、十槽、S3、main 合并均 0。未进入产品前置核验，四角色/授权时效和普通双分支余量没有本轮资格。
+
+维护 operation `653cbcda45ee44859dc4065233539d05`，attempt `5b79eaae05a44e94be6b0d6e9410e4f0`。全账本该 proof 恰一 CAS，新连接四项及任务级恢复后继已独立重开。462 个成员，索引 SHA a0fea98789637afbfda9225f868d5d3f6fc6e3e3958de6f2bfd7f73445d9c493。
+
+工程计划退出 0。受影响 verify 退出 2，contract、backend 通过，web 在 OMQ_FORMAL_S2_S3_NOT_RUN 退出 1、测试数 0。未取得正式父的产品成功原件。
+
+## 命令与独立重开
+
+| 用途 | 实际命令 ID |
+|---|---|
+| create | `3aa3b8d906d248d6aa472347ace65c52` |
+| identity | `3c1a9ab6052c4414897d67b6ce29860a` |
+| actual | `344a18aed44b425287bed063baac067f` |
+| exit | `c9a6a96c1af4409397a3c9d7ff0a891b` |
+| remove | `8481ccc0a8ff4cdb91ca594d1072db54` |
+| absent | `41c75cbec2f2427ea6aab5e03cba196a` |
+| sessions | `b23ac9a3e2534bc3ad5b478add2fec15` |
+| postSession | `e3699dafe1674af4a0851d3ae099b48a` |
+| catalog | `940ca38ed8674ede996a9b3c8c1f8099` |
+| view | `83d09713284d48448da0eb1ebc03c6f8` |
+| definitionMetadata | `64852c3f9dfe4ba69af75ab1d4d575df` |
+| sourceGeneration | `8d7a25adfff6495fbe364e6367199d8b` |
+| cas | `a9e08bfa28934f3480f052d6c4d64f3b` |
+| readback_row | `4533f994d89942c58d4e449a121b823b` |
+| readback_audit | `d643773b50814ce691d219cedb77b637` |
+| readback_receipts | `5d82d418ec15426a9f233eaf5d292009` |
+| readback_errorCode | `c0dc275249d449a1b79b90e3bddd6282` |
+| connectionsTests | `cafb98e8c8c34fc3ac6b5c20de21ae51` |
+| normalTarget | `e7c508baeea044ecba197ffcdea278e7` |
+| offlineConsumer | `c835a395be6c42529b142580075aa13d` |
+| plan | `055141a048754ed094db3c2e1058b68b` |
+| verify | `29bf6f7a6b0a45bba021f5bb74925902` |
+
+/root/cost 独立差分 Begin/End、Execute/Read/Dispose ticks，逐字节重开双流及三模块 SHA，对照源代次收口和两窗时钟。 12 个跨度完整。组件工作 2275.801168 ms，去除两次证明仍需 1244.403667 ms。observer 双流 0 B，采样次数及最大间隔未知。
+
+/root/consumer 运行 WorkflowOracleSourceAssociation.Tests.py，并将真实 B1 span 绑定 Q1 失败事件后以 qualify_normal_projection 逐项重开。 四项指定反例拒绝。失败阶段边界相等接受，晚 1 tick 拒绝，重叠 1 tick 拒绝。旧 Q1 保留 FAILURE_TRACED。
+
+/root/maintenance 独立重开绑定的 386 项输入、父进程及实际源代次终止、两 API 缺席与新 PG 前态，核验 accurate proof 后签发 GO。 GO
+
+下批若另行授权，先用固定输出夹具验独立采集器 summary、准确 SID/SERIAL#/实例/PDB 与缺席读回，以及 helper 在册计费。只在以上通过后申请一个同规格元数据诊断窗，核目录与证明 SQL 的实际 child/计划和打开成本。保持原期限，逐项量化后再裁决候选与产品准入。
+
+## 历史批次原报告（截至 4a3e3411）
+
 # 普通 HTTP 关系查询诊断
 
 **NORMAL_PATH_BLOCKED · S2 PARTIAL · S3 NOT_RUN · G4 PARTIAL。** Q1 首个取消来源为 workCutoff，首个失败阶段为 readOnly.cancelled。只读校验包含会话身份、权限汇总、只读证明、直接对象授权和游标释放。现有事件无法区分内部耗时，离线注入取消仅复现外部症状。单一可修原因未锁定，停止 Q2。 本批清除了 f159 的 owner 与租约截止。Q1 没有结果字节可供 GET，原字节恢复尚未取得资格。

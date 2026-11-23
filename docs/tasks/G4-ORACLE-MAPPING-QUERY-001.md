@@ -1,6 +1,6 @@
 # G4-ORACLE-MAPPING-QUERY-001｜Oracle Mapping/Query
 
-唯一任务状态 **S2_PARTIAL_FORMAL_SEED_CLEANUP_CHATGPT_REVIEW**。d368 已准确晚恢复。诊断和正式父各一次。正式关系准备查询 f159 返回 503，FAILED/fence 2、两租约列保留，零成功副作用。映射仍为 A3。S2 PARTIAL、S3 NOT_RUN，停 ChatGPT 复审。[本批三文件](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
+唯一任务状态 **NORMAL_PATH_BLOCKED**。准确旧 Q 已恢复。B1 工作 2275.801168 ms，准确源会话期限内终止 UNKNOWN，停止全部后续样本与 POST。S2 PARTIAL、S3 NOT_RUN、G4 PARTIAL，停 ChatGPT 复审。[本批三文件](../evidence/G4-ORACLE-MAPPING-QUERY-001/product-resume-01/s2-s3-01/report.md)
 
 ## 执行身份与所有权
 
