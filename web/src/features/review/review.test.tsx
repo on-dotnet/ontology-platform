@@ -1,6 +1,6 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { cleanup, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { changeSetFixture, documentFixture, elementFixture, itemFixture, ontologyFixture } from '@/test/fixtures';
 import type { UserInfo } from '@/features/auth/api';
@@ -213,6 +213,31 @@ describe('change set review', () => {
     expect(alert).toHaveTextContent('没有合并到本体');
     expect(alert).toHaveTextContent('这个变更集已合并或已拒绝，不能再修改。');
     expect(alert).not.toHaveTextContent('Backend detail');
+  });
+
+  it('shows the evidence beside the list on wide screens and under the chosen item on narrow ones', async () => {
+    const user = userEvent.setup();
+    reviewServer();
+    renderApp('/review/cs-converter');
+
+    // Wide (jsdom defaults to 1024px): the first item's evidence sits after the whole list.
+    await screen.findByRole('article', { name: /钢包/ });
+    const aside = screen.getByRole('region', { name: '证据' });
+    expect(card(/厚度/).compareDocumentPosition(aside) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    cleanup();
+
+    vi.stubGlobal('innerWidth', 800);
+    renderApp('/review/cs-converter');
+    await screen.findByRole('article', { name: /板坯/ });
+    expect(screen.queryByRole('region', { name: '证据' })).toBeNull();
+
+    await user.click(within(card(/板坯/)).getByRole('button', { name: '查看证据（1）' }));
+    const inline = screen.getByRole('region', { name: '证据' });
+    expect(card(/板坯/).nextElementSibling).toBe(inline);
+    expect(within(inline).getByText('板坯')).toBeInTheDocument();
+
+    await user.click(within(card(/板坯/)).getByRole('button', { name: '查看证据（1）' }));
+    expect(screen.queryByRole('region', { name: '证据' })).toBeNull();
   });
 
   it('validates edits on blur and on save, then sends the edited fields', async () => {

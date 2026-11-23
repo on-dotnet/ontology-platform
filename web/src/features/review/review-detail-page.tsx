@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft, CheckCheck, GitMerge, Network, Quote } from 'lucide-react';
-import { useId, useMemo, useState } from 'react';
+import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { InfoTip } from '@/components/feedback/hint-tip';
@@ -19,6 +19,7 @@ import { EvidenceExcerpt } from '@/features/documents/evidence-excerpt';
 import { ELEMENT_KINDS, ontologyKeys, useElements, type Element } from '@/features/ontologies/api';
 import { codeMessage, useErrorMessage } from '@/i18n/error-message';
 import { cn } from '@/lib/cn';
+import { DESKTOP_QUERY, useMediaQuery } from '@/lib/use-media-query';
 
 import {
   changeSetKeys,
@@ -91,6 +92,7 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
   const queryClient = useQueryClient();
   const { canReview } = usePermissions();
   const pendingHintId = useId();
+  const wide = useMediaQuery(DESKTOP_QUERY);
 
   const context = useMemo(() => buildRefContext(changeSet.items, elements, language), [changeSet.items, elements, language]);
   const groups = ELEMENT_KINDS.map((kind) => ({
@@ -238,23 +240,26 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
                   </Badge>
                 </h2>
                 {group.items.map((item) => (
-                  <ChangeItemCard
-                    key={item.id}
-                    item={item}
-                    context={context}
-                    isAi={isAi}
-                    selected={item.id === selected?.id}
-                    onSelect={() => setSelectedId(item.id)}
-                    canDecide={canDecide}
-                    busy={busyItemId === item.id || bulk.isPending || merge.isPending}
-                    onDecide={(decision) => decide.mutate({ itemId: item.id, decision })}
-                    onEdit={() => setEditing(item)}
-                  />
+                  <Fragment key={item.id}>
+                    <ChangeItemCard
+                      item={item}
+                      context={context}
+                      isAi={isAi}
+                      selected={wide ? item.id === selected?.id : item.id === selectedId}
+                      onSelect={() => setSelectedId((current) => (!wide && current === item.id ? null : item.id))}
+                      canDecide={canDecide}
+                      busy={busyItemId === item.id || bulk.isPending || merge.isPending}
+                      onDecide={(decision) => decide.mutate({ itemId: item.id, decision })}
+                      onEdit={() => setEditing(item)}
+                    />
+                    {/* Stacked layout: the evidence opens under the chosen item, not after the whole list. */}
+                    {!wide && item.id === selectedId ? <EvidencePanel item={item} context={context} inline /> : null}
+                  </Fragment>
                 ))}
               </section>
             ))}
           </div>
-          {selected ? <EvidencePanel key={selected.id} item={selected} context={context} /> : null}
+          {wide && selected ? <EvidencePanel key={selected.id} item={selected} context={context} /> : null}
         </div>
       )}
 
@@ -276,14 +281,19 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
   );
 }
 
-function EvidencePanel({ item, context }: { item: ChangeItem; context: RefContext }) {
+function EvidencePanel({ item, context, inline = false }: { item: ChangeItem; context: RefContext; inline?: boolean }) {
   const { t } = useTranslation();
+  const titleId = useId();
+  const ref = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const current = item.evidence[index] ?? item.evidence[0];
+  useEffect(() => {
+    if (inline) ref.current?.scrollIntoView({ block: 'nearest' });
+  }, [inline]);
   return (
-    <Card className="lg:sticky lg:top-6" aria-labelledby="evidence-title">
+    <Card ref={ref} role="region" className={inline ? undefined : 'sticky top-6'} aria-labelledby={titleId}>
       <CardHeader>
-        <CardTitle id="evidence-title" className="flex items-center gap-2">
+        <CardTitle id={titleId} className="flex items-center gap-2">
           <Quote className="size-4 text-info-strong" aria-hidden />
           {t('review.evidenceTitle')}
         </CardTitle>
