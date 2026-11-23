@@ -555,8 +555,10 @@ describe('import change set review', () => {
       expect(within(article).queryByRole('button', { name: /^修改“/ })).not.toBeInTheDocument();
     }
 
-    // The first item has no evidence: the panel says why instead of showing source text.
-    expect(within(screen.getByRole('region', { name: '证据' })).getByText('导入的内容没有资料原文。')).toBeInTheDocument();
+    // Imports cite no sources: no evidence buttons and no evidence panel, and no card is selected.
+    expect(screen.queryByRole('button', { name: /^查看证据/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: '证据' })).not.toBeInTheDocument();
+    expect(shape).not.toHaveClass('ring-1');
   });
 
   it('shows what an update replaces: the old rules, the auto shape switch, a deleted one-line axiom', async () => {

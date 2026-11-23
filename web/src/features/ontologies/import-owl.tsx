@@ -21,11 +21,15 @@ import {
   MAX_IMPORT_MB,
   ontologyKeys,
   type ImportResult,
+  type ImportWarning,
   type OntologySummary,
 } from './api';
 
 const MB = 1024 * 1024;
 const COUNT_KEYS = ['create', 'update', 'delete', 'restore'] as const;
+// Warnings about content the review will not get as the file has it: references left out
+// because the element changed kind, and allowed values Protégé dropped with nothing to restore.
+const IMPORTANT_WARNINGS: ReadonlySet<ImportWarning['code']> = new Set(['kind_changed', 'lost_list']);
 
 /** Localized import failure; syntax errors name the line when the server knows it. */
 export function useImportErrorMessage(): (error: unknown) => string {
@@ -192,6 +196,8 @@ export function ImportResultView({ result, created, onClose }: ImportResultViewP
   const { t } = useTranslation();
   const headingRef = useRef<HTMLDivElement>(null);
   const { changeSetId, counts, warnings } = result;
+  const important = warnings.filter((warning) => IMPORTANT_WARNINGS.has(warning.code));
+  const minor = warnings.filter((warning) => !IMPORTANT_WARNINGS.has(warning.code));
 
   // The form is gone: move focus to the result so keyboard and screen reader users follow.
   useEffect(() => {
@@ -226,9 +232,16 @@ export function ImportResultView({ result, created, onClose }: ImportResultViewP
         </dl>
       ) : null}
 
-      {warnings.length > 0 ? (
+      {/* Content the review will not get as the file has it: a yellow notice (ui-guidelines §4). */}
+      {important.map((warning) => (
+        <InlineNotice key={warning.code} tone="warning" title={t(`ontologies.import.warnings.${warning.code}.label`, { count: warning.count })}>
+          {t(`ontologies.import.warnings.${warning.code}.description`)}
+        </InlineNotice>
+      ))}
+      {/* Kept as written, only shaped differently: a ! icon is enough. */}
+      {minor.length > 0 ? (
         <ul className="space-y-1.5" aria-label={t('ontologies.import.warningsLabel')}>
-          {warnings.map((warning) => {
+          {minor.map((warning) => {
             const label = t(`ontologies.import.warnings.${warning.code}.label`, { count: warning.count });
             return (
               <li key={warning.code} className="flex items-center gap-1.5 text-sm text-foreground">

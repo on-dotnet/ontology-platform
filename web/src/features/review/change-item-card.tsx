@@ -142,18 +142,21 @@ export function ChangeItemCard({
             ) : null}
           </>
         ) : null}
-        <Button
-          variant="ghost"
-          size="sm"
-          {...(evidencePanelId
-            ? { 'aria-expanded': selected, 'aria-controls': selected ? evidencePanelId : undefined }
-            : { 'aria-pressed': selected })}
-          onClick={onSelect}
-          className="ml-auto aria-expanded:bg-primary-soft aria-expanded:text-primary-strong aria-pressed:bg-primary-soft aria-pressed:text-primary-strong"
-        >
-          <Quote aria-hidden />
-          {t('review.evidenceCount', { count: item.evidence.length })}
-        </Button>
+        {/* Only AI proposals cite sources; imports and manual edits have nothing to show. */}
+        {isAi ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            {...(evidencePanelId
+              ? { 'aria-expanded': selected, 'aria-controls': selected ? evidencePanelId : undefined }
+              : { 'aria-pressed': selected })}
+            onClick={onSelect}
+            className="ml-auto aria-expanded:bg-primary-soft aria-expanded:text-primary-strong aria-pressed:bg-primary-soft aria-pressed:text-primary-strong"
+          >
+            <Quote aria-hidden />
+            {t('review.evidenceCount', { count: item.evidence.length })}
+          </Button>
+        ) : null}
       </div>
     </article>
   );

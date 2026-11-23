@@ -20,7 +20,7 @@ interface EmptyStateProps {
   title: ReactNode;
   /** One sentence on what will appear here or what to do next. */
   description?: ReactNode;
-  /** A single next-step button (ui-guidelines §5). */
+  /** The next-step button; at most one more, secondary, for another common way to start (ui-guidelines §5). */
   action?: ReactNode;
   /** Small label above the title, e.g. "Coming soon". */
   badge?: ReactNode;

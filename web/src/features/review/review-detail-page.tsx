@@ -33,7 +33,6 @@ import {
   useChangeSet,
   type ChangeItem,
   type ChangeSetDetail,
-  type ChangeSetSource,
   type Decision,
   type MergeResult,
 } from './api';
@@ -236,8 +235,9 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
         </Card>
       ) : (
         // Columns follow `wide`, not a CSS breakpoint: rem breakpoints move with the browser font
-        // size, and the evidence panel's placement must match the layout.
-        <div className={cn('mt-4 grid items-start gap-6', wide && 'grid-cols-[minmax(0,1fr)_minmax(0,26rem)]')}>
+        // size, and the evidence panel's placement must match the layout. Only AI proposals have
+        // evidence; imports and manual edits get the list alone.
+        <div className={cn('mt-4 grid items-start gap-6', wide && isAi ? 'grid-cols-[minmax(0,1fr)_minmax(0,26rem)]' : 'max-w-4xl')}>
           <div className="space-y-6">
             {groups.map((group) => (
               <section key={group.kind} aria-labelledby={`group-${group.kind}`} className="space-y-3">
@@ -253,7 +253,7 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
                       item={item}
                       context={context}
                       isAi={isAi}
-                      selected={wide ? item.id === selected?.id : item.id === selectedId}
+                      selected={isAi && (wide ? item.id === selected?.id : item.id === selectedId)}
                       onSelect={() => setSelectedId((current) => (!wide && current === item.id ? null : item.id))}
                       evidencePanelId={wide ? undefined : evidencePanelId}
                       canDecide={canDecide}
@@ -262,15 +262,13 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
                       onEdit={() => setEditing(item)}
                     />
                     {/* Stacked layout: the evidence opens under the chosen item, not after the whole list. */}
-                    {!wide && item.id === selectedId ? (
-                      <EvidencePanel id={evidencePanelId} item={item} context={context} source={changeSet.source} inline />
-                    ) : null}
+                    {isAi && !wide && item.id === selectedId ? <EvidencePanel id={evidencePanelId} item={item} context={context} inline /> : null}
                   </Fragment>
                 ))}
               </section>
             ))}
           </div>
-          {wide && selected ? <EvidencePanel key={selected.id} item={selected} context={context} source={changeSet.source} /> : null}
+          {isAi && wide && selected ? <EvidencePanel key={selected.id} item={selected} context={context} /> : null}
         </div>
       )}
 
@@ -296,13 +294,11 @@ interface EvidencePanelProps {
   id?: string;
   item: ChangeItem;
   context: RefContext;
-  /** Explains why there is no source text: imports and manual edits have none. */
-  source: ChangeSetSource;
   /** Opened under the chosen item (stacked layout) rather than beside the list. */
   inline?: boolean;
 }
 
-function EvidencePanel({ id, item, context, source, inline = false }: EvidencePanelProps) {
+function EvidencePanel({ id, item, context, inline = false }: EvidencePanelProps) {
   const { t } = useTranslation();
   const titleId = useId();
   const ref = useRef<HTMLDivElement>(null);
@@ -322,7 +318,7 @@ function EvidencePanel({ id, item, context, source, inline = false }: EvidencePa
       </CardHeader>
       <CardContent className="space-y-4">
         {item.evidence.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t(`review.noEvidenceBySource.${source}`)}</p>
+          <p className="text-sm text-muted-foreground">{t('review.noEvidence')}</p>
         ) : (
           <>
             {item.evidence.length > 1 ? (
