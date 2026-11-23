@@ -1,0 +1,29 @@
+# Synthetic M5 高阶结构只读语料；imports只保留，不加载。
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex: <urn:synthetic:m5:> .
+ex:ontology a owl:Ontology ; owl:imports <https://example.invalid/never-load> .
+ex:A a owl:Class ; rdfs:subClassOf [ a owl:Restriction ; owl:onProperty ex:p ; owl:someValuesFrom ex:B ],
+    [ a owl:Restriction ; owl:onProperty ex:p ; owl:allValuesFrom ex:B ],
+    [ a owl:Restriction ; owl:onProperty ex:count ; owl:hasValue "001"^^xsd:integer ],
+    [ a owl:Restriction ; owl:onProperty ex:p ; owl:cardinality "+02"^^xsd:nonNegativeInteger ],
+    [ a owl:Restriction ; owl:onProperty ex:p ; owl:minCardinality "0"^^xsd:nonNegativeInteger ],
+    [ a owl:Restriction ; owl:onProperty ex:p ; owl:maxCardinality "5"^^xsd:nonNegativeInteger ],
+    [ a owl:Restriction ; owl:onProperty ex:p ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass ex:B ],
+    [ a owl:Restriction ; owl:onProperty ex:p ; owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass ex:B ],
+    [ a owl:Restriction ; owl:onProperty ex:count ; owl:maxQualifiedCardinality "3"^^xsd:nonNegativeInteger ; owl:onDataRange xsd:integer ] .
+ex:B a owl:Class ; rdfs:label "乙类"@zh .
+ex:And a owl:Class ; owl:intersectionOf ( ex:A ex:B ) .
+ex:Or a owl:Class ; owl:unionOf ( ex:A ex:B ) .
+ex:Not a owl:Class ; owl:complementOf ex:B .
+ex:p a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty,
+    owl:TransitiveProperty, owl:SymmetricProperty, owl:AsymmetricProperty,
+    owl:ReflexiveProperty, owl:IrreflexiveProperty .
+ex:q a owl:ObjectProperty .
+ex:chain a owl:ObjectProperty ; owl:propertyChainAxiom ( ex:p ex:q ) .
+ex:count a owl:DatatypeProperty .
+ex:i a owl:NamedIndividual ; owl:sameAs ex:j ; owl:differentFrom ex:k .
+ex:j a owl:NamedIndividual .
+ex:k a owl:NamedIndividual .
+ex:A owl:hasKey ( ex:p ex:count ) .

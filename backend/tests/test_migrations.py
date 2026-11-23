@@ -10,7 +10,7 @@ from sqlalchemy import create_engine, inspect
 
 from ontology_platform import models  # noqa: F401  (registers every module's tables)
 from ontology_platform.db import Base
-from support import PUBLIC_SEARCH_PATH, alembic_config
+from support import PUBLIC_SEARCH_PATH, alembic_config, truncate_tables
 
 SCHEMAS = {table.schema for table in Base.metadata.tables.values()}
 
@@ -39,6 +39,8 @@ def test_migrations_match_models(database_url: str) -> None:
 
 
 def test_downgrade_and_upgrade_again(database_url: str) -> None:
+    # Rows of other tests (with M2 kinds) cannot go back to the M1 constraints.
+    truncate_tables(database_url)
     config = alembic_config(database_url)
 
     command.downgrade(config, "base")

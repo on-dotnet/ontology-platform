@@ -1,4 +1,4 @@
-"""Tables of the ontology module (see docs/specs/001-m1-ai-ingestion.md, section 3.1).
+"""Tables of the ontology module (docs/specs/001-m1-ai-ingestion.md 3.1, 002-m2 section 3).
 
 Columns that hold one of a fixed set of values are plain strings guarded by check constraints;
 the allowed values are the `Literal` aliases below, which the API models reuse.
@@ -18,6 +18,7 @@ from sqlalchemy import (
     false,
     func,
     text,
+    true,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
@@ -26,19 +27,22 @@ from ontology_platform.db import Base
 
 SCHEMA = "ontology"
 
-Kind = Literal["entity_type", "relation_type", "property"]
+Kind = Literal["entity_type", "relation_type", "property", "constraint", "axiom"]
 Datatype = Literal["string", "integer", "decimal", "boolean", "date", "dateTime"]
 ElementStatus = Literal["active", "deprecated"]
-Origin = Literal["ai", "manual"]
-ChangeSetSource = Literal["ai_extraction", "ai_assistant", "manual"]
+Origin = Literal["ai", "manual", "import"]
+ChangeSetSource = Literal["ai_extraction", "ai_assistant", "manual", "import"]
 ChangeSetStatus = Literal["open", "merged", "rejected"]
-ChangeOp = Literal["create", "update"]
+ChangeOp = Literal["create", "update", "delete", "restore"]
 Decision = Literal["pending", "accepted", "rejected"]
-ItemFlag = Literal["evidence_not_found", "possible_duplicate"]
+ItemFlag = Literal["evidence_not_found", "possible_duplicate", "non_standard"]
+# non_standard: an axiom that OWL API (and so Protégé) rewrites when it reads it.
+ElementFlag = Literal["non_standard"]
 
 KINDS: tuple[Kind, ...] = get_args(Kind)
 DATATYPES: tuple[Datatype, ...] = get_args(Datatype)
 ITEM_FLAGS: tuple[ItemFlag, ...] = get_args(ItemFlag)
+ELEMENT_FLAGS: tuple[ElementFlag, ...] = get_args(ElementFlag)
 
 
 def _one_of(column: str, values: tuple[str, ...]) -> str:
@@ -46,18 +50,45 @@ def _one_of(column: str, values: tuple[str, ...]) -> str:
     return f"{column} IN ({quoted})"
 
 
-# Which reference columns each kind uses (spec 3.1: "按 kind 检查各列是否允许为空").
-ELEMENT_KIND_COLUMNS = (
-    "(kind = 'entity_type' AND domain_id IS NULL AND range_id IS NULL"
-    " AND datatype IS NULL AND unit IS NULL)"
-    " OR (kind = 'relation_type' AND parent_id IS NULL AND domain_id IS NOT NULL"
-    " AND range_id IS NOT NULL AND datatype IS NULL AND unit IS NULL)"
-    " OR (kind = 'property' AND parent_id IS NULL AND domain_id IS NOT NULL"
-    " AND range_id IS NULL AND datatype IS NOT NULL)"
+# Which columns each kind uses (spec 001 3.1, relaxed by 002 3.1: OWL allows a relation or
+# property without domain, range or datatype, and imported elements may lack a Chinese label).
+_KIND_COLUMNS = {
+    "entity_type": (
+        "domain_id IS NULL AND range_id IS NULL AND inverse_id IS NULL"
+        " AND datatype IS NULL AND unit IS NULL"
+        " AND rules IS NULL AND turtle IS NULL AND subject_id IS NULL"
+    ),
+    "relation_type": (
+        "parent_id IS NULL AND datatype IS NULL AND unit IS NULL"
+        " AND rules IS NULL AND turtle IS NULL AND subject_id IS NULL"
+    ),
+    "property": (
+        "parent_id IS NULL AND range_id IS NULL AND inverse_id IS NULL"
+        " AND rules IS NULL AND turtle IS NULL AND subject_id IS NULL"
+    ),
+    "constraint": (
+        "parent_id IS NULL AND domain_id IS NOT NULL AND range_id IS NULL"
+        " AND inverse_id IS NULL AND datatype IS NULL AND unit IS NULL"
+        " AND rules IS NOT NULL AND turtle IS NULL AND subject_id IS NULL"
+    ),
+    "axiom": (
+        "parent_id IS NULL AND domain_id IS NULL AND range_id IS NULL"
+        " AND inverse_id IS NULL AND datatype IS NULL AND unit IS NULL AND rules IS NULL"
+        " AND turtle IS NOT NULL AND local_name IS NULL AND label_zh IS NULL AND iri IS NULL"
+    ),
+}
+ELEMENT_KIND_COLUMNS = " OR ".join(
+    f"(kind = '{kind}' AND {columns})" for kind, columns in _KIND_COLUMNS.items()
+)
+# Elements created in the platform need a Chinese label; imported ones (explicit IRI) may not.
+ELEMENT_NAMING = (
+    "(kind = 'axiom') = (local_name IS NULL)"
+    " AND (kind = 'axiom' OR label_zh IS NOT NULL OR iri IS NOT NULL)"
 )
 CHANGE_ITEM_TARGET = (
     "(op = 'create' AND target_element_id IS NULL AND target_revision IS NULL)"
-    " OR (op = 'update' AND target_element_id IS NOT NULL AND target_revision IS NOT NULL)"
+    " OR (op IN ('update', 'delete', 'restore')"
+    " AND target_element_id IS NOT NULL AND target_revision IS NOT NULL)"
 )
 
 
@@ -73,6 +104,14 @@ class Ontology(Base):
     name: Mapped[str] = mapped_column(String(200))
     description: Mapped[str | None] = mapped_column(Text)
     base_iri: Mapped[str] = mapped_column(String(512))
+    # IRI of the owl:Ontology; None means base_iri without its trailing # or /.
+    ontology_iri: Mapped[str | None] = mapped_column(Text)
+    # Prefixes brought by imported files ({"ex": "urn:example:"}); kept for later exports.
+    prefixes: Mapped[dict[str, str]] = mapped_column(
+        JSONB,
+        default=dict,
+        server_default=text("'{}'::jsonb"),
+    )
     created_by: Mapped[UUID | None]
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now())
@@ -88,11 +127,13 @@ class Element(Base):
     __tablename__ = "elements"
     __table_args__ = (
         UniqueConstraint("ontology_id", "local_name"),
+        UniqueConstraint("ontology_id", "iri"),
         CheckConstraint(_one_of("kind", KINDS), name="kind"),
         CheckConstraint("datatype IS NULL OR " + _one_of("datatype", DATATYPES), name="datatype"),
         CheckConstraint(_one_of("status", get_args(ElementStatus)), name="status"),
         CheckConstraint(_one_of("origin", get_args(Origin)), name="origin"),
         CheckConstraint(ELEMENT_KIND_COLUMNS, name="kind_columns"),
+        CheckConstraint(ELEMENT_NAMING, name="naming"),
         CheckConstraint("revision >= 1", name="revision"),
         {"schema": SCHEMA},
     )
@@ -102,8 +143,11 @@ class Element(Base):
         ForeignKey("ontology.ontologies.id", ondelete="CASCADE"),
     )
     kind: Mapped[str] = mapped_column(String(16))
-    local_name: Mapped[str] = mapped_column(String(128))
-    label_zh: Mapped[str] = mapped_column(String(200))
+    # None only for axioms, which have no IRI of their own.
+    local_name: Mapped[str | None] = mapped_column(String(128))
+    # An IRI brought by an import; None means base_iri + local_name.
+    iri: Mapped[str | None] = mapped_column(Text)
+    label_zh: Mapped[str | None] = mapped_column(String(200))
     label_en: Mapped[str | None] = mapped_column(String(200))
     definition_zh: Mapped[str | None] = mapped_column(Text)
     definition_en: Mapped[str | None] = mapped_column(Text)
@@ -114,12 +158,31 @@ class Element(Base):
         server_default=text("'[]'::jsonb"),
     )
     parent_id: Mapped[UUID | None] = mapped_column(ForeignKey("ontology.elements.id"))
+    # Relations and properties: the object type they belong to. Constraints: the target type.
     domain_id: Mapped[UUID | None] = mapped_column(ForeignKey("ontology.elements.id"))
     range_id: Mapped[UUID | None] = mapped_column(ForeignKey("ontology.elements.id"))
+    inverse_id: Mapped[UUID | None] = mapped_column(ForeignKey("ontology.elements.id"))
     datatype: Mapped[str | None] = mapped_column(String(16))
     unit: Mapped[str | None] = mapped_column(String(32))
     required: Mapped[bool] = mapped_column(default=False, server_default=false())
     multiple: Mapped[bool] = mapped_column(default=False, server_default=false())
+    # Whether the element takes part in the platform's generated SHACL shape ({type}-shape):
+    # always for elements made in the platform, only when the imported file had it otherwise.
+    auto_shape: Mapped[bool] = mapped_column(default=True, server_default=true())
+    # Constraints: the sh:property rules (camelCase JSON, see schemas.ConstraintRule).
+    rules: Mapped[list[dict[str, Any]] | None] = mapped_column(JSONB(none_as_null=True))
+    # Axioms: the Turtle fragment, written with the ontology's prefixes and no prefix lines.
+    turtle: Mapped[str | None] = mapped_column(Text)
+    # Axioms: the element the fragment is about, when its subject is one.
+    subject_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("ontology.elements.id"),
+        index=True,
+    )
+    flags: Mapped[list[str]] = mapped_column(
+        JSONB,
+        default=list,
+        server_default=text("'[]'::jsonb"),
+    )
     status: Mapped[str] = mapped_column(String(16), default="active", server_default="active")
     origin: Mapped[str] = mapped_column(String(16))
     # Optimistic lock: incremented on every change.
@@ -246,6 +309,8 @@ class Release(Base):
     notes: Mapped[str | None] = mapped_column(Text)
     # The API `Element` objects (camelCase) of every active element at publish time.
     snapshot: Mapped[list[dict[str, Any]]] = mapped_column(JSONB)
+    # The ontology IRI and prefixes at publish time; None for releases made before M2.
+    header: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
     turtle: Mapped[str] = mapped_column(Text)
     turtle_sha256: Mapped[str] = mapped_column(String(64))
     element_count: Mapped[int]

@@ -1,13 +1,13 @@
 """HTTP routes of the ontology module: ontologies, the working version, change sets, releases.
 
-Every route needs a session. Creating an ontology needs admin, editor or reviewer; reviewing,
-merging, rejecting, publishing and activating need admin or reviewer.
+Every route needs a session. Creating or importing an ontology needs admin, editor or reviewer;
+reviewing, merging, rejecting, publishing and activating need admin or reviewer.
 """
 
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request, Response
+from fastapi import APIRouter, Depends, Form, Query, Request, Response, UploadFile
 from fastapi.responses import JSONResponse
 
 from ontology_platform.db import DbSession
@@ -15,7 +15,7 @@ from ontology_platform.errors import PROBLEM_MEDIA_TYPE, problem_responses
 from ontology_platform.modules.identity.api import CurrentUser, client_ip, require_role
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.identity.service import Principal
-from ontology_platform.modules.ontology import schemas, service
+from ontology_platform.modules.ontology import importing, schemas, service
 from ontology_platform.modules.ontology.models import ChangeSetStatus, Kind
 
 Creator = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.EDITOR, Role.REVIEWER))]
@@ -63,6 +63,78 @@ async def create_ontology(
     return await service.create_ontology(db, body, actor=user.id, ip=client_ip(request))
 
 
+_IMPORT_ERRORS: dict[int | str, dict[str, Any]] = {
+    **problem_responses(401, 403, 404, 409, 413, 415),
+    422: {
+        "model": schemas.ImportParseProblem,
+        "description": "Invalid request, or the file is not valid Turtle / RDF/XML",
+    },
+}
+
+
+def _import_problem(error: importing.ImportParseError) -> JSONResponse:
+    return JSONResponse(error.body(), status_code=error.status, media_type=PROBLEM_MEDIA_TYPE)
+
+
+@router.post(
+    "/ontologies/import",
+    status_code=201,
+    response_model=schemas.ImportResult,
+    responses=_IMPORT_ERRORS,
+)
+async def import_ontology(
+    request: Request,
+    user: Creator,
+    db: DbSession,
+    file: UploadFile,
+    name: Annotated[str | None, Form(max_length=200)] = None,
+    key: Annotated[str | None, Form(pattern=schemas.KEY_PATTERN)] = None,
+) -> schemas.ImportResult | JSONResponse:
+    """Create an ontology from a Turtle or RDF/XML file. Its content arrives as a change set
+    (source `import`) to review and merge; what the platform cannot map is kept as axioms."""
+    data = await file.read(importing.MAX_BYTES + 1)
+    try:
+        return await importing.import_new(
+            db,
+            data=data,
+            filename=file.filename or "",
+            name=name.strip() if name and name.strip() else None,
+            key=key,
+            actor=user.id,
+            ip=client_ip(request),
+        )
+    except importing.ImportParseError as error:
+        return _import_problem(error)
+
+
+@router.post(
+    "/ontologies/{id}/import",
+    response_model=schemas.ImportResult,
+    responses=_IMPORT_ERRORS,
+)
+async def import_into_ontology(
+    id: UUID,
+    request: Request,
+    user: Creator,
+    db: DbSession,
+    file: UploadFile,
+) -> schemas.ImportResult | JSONResponse:
+    """Compare a file with the working version; the differences become an import change set
+    (none when there are no differences)."""
+    data = await file.read(importing.MAX_BYTES + 1)
+    try:
+        return await importing.import_into(
+            db,
+            id,
+            data=data,
+            filename=file.filename or "",
+            actor=user.id,
+            ip=client_ip(request),
+        )
+    except importing.ImportParseError as error:
+        return _import_problem(error)
+
+
 @router.get("/ontologies/{id}", responses=problem_responses(401, 404, 422))
 async def get_ontology(
     id: UUID,
@@ -80,9 +152,11 @@ async def list_elements(
     db: DbSession,
     kind: Kind | None = None,
     q: Annotated[str | None, Query(max_length=200)] = None,
+    status: Literal["active", "deprecated", "all"] = "active",
 ) -> list[schemas.Element]:
-    """Elements of the working version; `q` searches local names, labels and synonyms."""
-    return await service.list_elements(db, id, kind=kind, q=q)
+    """Elements of the working version (deleted ones with `status=deprecated` or `all`); `q`
+    searches local names, labels, synonyms, IRIs and axiom text."""
+    return await service.list_elements(db, id, kind=kind, q=q, status=status)
 
 
 @router.get(

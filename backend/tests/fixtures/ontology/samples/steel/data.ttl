@@ -1,0 +1,520 @@
+@prefix ex: <urn:synthetic:metals:> .
+@prefix op: <urn:ontology-platform:vocabulary:> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+# 人工合成，两个厂区外部号相同但IRI不同，关系允许多对多。
+<urn:synthetic:org-demo:site-a:local:heat-1> rdf:type ex:Heat .
+<urn:synthetic:assertion:0> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:heat-1> ; rdf:predicate rdf:type ; rdf:object ex:Heat ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-0" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:heat-1> op:externalId "heat-1" .
+<urn:synthetic:assertion:1> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:heat-1> ; rdf:predicate op:externalId ; rdf:object "heat-1" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-1" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:heat-1> op:organizationId "org-demo" .
+<urn:synthetic:assertion:2> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:heat-1> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-2" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:heat-1> op:siteId "site-a" .
+<urn:synthetic:assertion:3> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:heat-1> ; rdf:predicate op:siteId ; rdf:object "site-a" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-3" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:heat-1> op:synthetic true .
+<urn:synthetic:assertion:4> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:heat-1> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-4" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:heat-1> rdfs:label "炉次heat-1"@zh .
+<urn:synthetic:assertion:5> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:heat-1> ; rdf:predicate rdfs:label ; rdf:object "炉次heat-1"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-5" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:cast-1> rdf:type ex:CastingSequence .
+<urn:synthetic:assertion:6> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:cast-1> ; rdf:predicate rdf:type ; rdf:object ex:CastingSequence ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-6" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:cast-1> op:externalId "cast-1" .
+<urn:synthetic:assertion:7> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:cast-1> ; rdf:predicate op:externalId ; rdf:object "cast-1" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-7" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:cast-1> op:organizationId "org-demo" .
+<urn:synthetic:assertion:8> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:cast-1> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-8" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:cast-1> op:siteId "site-a" .
+<urn:synthetic:assertion:9> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:cast-1> ; rdf:predicate op:siteId ; rdf:object "site-a" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-9" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:cast-1> op:synthetic true .
+<urn:synthetic:assertion:10> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:cast-1> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-10" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:cast-1> rdfs:label "浇次cast-1"@zh .
+<urn:synthetic:assertion:11> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:cast-1> ; rdf:predicate rdfs:label ; rdf:object "浇次cast-1"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-11" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:slab-1> rdf:type ex:Slab .
+<urn:synthetic:assertion:12> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:slab-1> ; rdf:predicate rdf:type ; rdf:object ex:Slab ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-12" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:slab-1> op:externalId "slab-1" .
+<urn:synthetic:assertion:13> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:slab-1> ; rdf:predicate op:externalId ; rdf:object "slab-1" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-13" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:slab-1> op:organizationId "org-demo" .
+<urn:synthetic:assertion:14> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:slab-1> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-14" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:slab-1> op:siteId "site-a" .
+<urn:synthetic:assertion:15> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:slab-1> ; rdf:predicate op:siteId ; rdf:object "site-a" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-15" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:slab-1> op:synthetic true .
+<urn:synthetic:assertion:16> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:slab-1> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-16" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:slab-1> rdfs:label "板坯slab-1"@zh .
+<urn:synthetic:assertion:17> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:slab-1> ; rdf:predicate rdfs:label ; rdf:object "板坯slab-1"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-17" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-1> rdf:type ex:RollingEvent .
+<urn:synthetic:assertion:18> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-1> ; rdf:predicate rdf:type ; rdf:object ex:RollingEvent ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-18" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-1> op:externalId "roll-1" .
+<urn:synthetic:assertion:19> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-1> ; rdf:predicate op:externalId ; rdf:object "roll-1" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-19" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-1> op:organizationId "org-demo" .
+<urn:synthetic:assertion:20> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-1> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-20" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-1> op:siteId "site-a" .
+<urn:synthetic:assertion:21> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-1> ; rdf:predicate op:siteId ; rdf:object "site-a" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-21" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-1> op:synthetic true .
+<urn:synthetic:assertion:22> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-1> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-22" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-1> rdfs:label "轧制事件roll-1"@zh .
+<urn:synthetic:assertion:23> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-1> ; rdf:predicate rdfs:label ; rdf:object "轧制事件roll-1"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-23" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-2> rdf:type ex:RollingEvent .
+<urn:synthetic:assertion:24> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-2> ; rdf:predicate rdf:type ; rdf:object ex:RollingEvent ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-24" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-2> op:externalId "roll-2" .
+<urn:synthetic:assertion:25> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-2> ; rdf:predicate op:externalId ; rdf:object "roll-2" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-25" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-2> op:organizationId "org-demo" .
+<urn:synthetic:assertion:26> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-2> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-26" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-2> op:siteId "site-a" .
+<urn:synthetic:assertion:27> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-2> ; rdf:predicate op:siteId ; rdf:object "site-a" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-27" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-2> op:synthetic true .
+<urn:synthetic:assertion:28> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-2> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-28" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-2> rdfs:label "轧制事件roll-2"@zh .
+<urn:synthetic:assertion:29> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-2> ; rdf:predicate rdfs:label ; rdf:object "轧制事件roll-2"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-29" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-1> rdf:type ex:Coil .
+<urn:synthetic:assertion:30> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-1> ; rdf:predicate rdf:type ; rdf:object ex:Coil ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-30" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-1> op:externalId "coil-1" .
+<urn:synthetic:assertion:31> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-1> ; rdf:predicate op:externalId ; rdf:object "coil-1" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-31" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-1> op:organizationId "org-demo" .
+<urn:synthetic:assertion:32> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-1> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-32" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-1> op:siteId "site-a" .
+<urn:synthetic:assertion:33> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-1> ; rdf:predicate op:siteId ; rdf:object "site-a" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-33" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-1> op:synthetic true .
+<urn:synthetic:assertion:34> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-1> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-34" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-1> rdfs:label "钢卷coil-1"@zh .
+<urn:synthetic:assertion:35> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-1> ; rdf:predicate rdfs:label ; rdf:object "钢卷coil-1"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-35" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-1> op:weight "12.5"^^xsd:decimal .
+<urn:synthetic:assertion:36> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-1> ; rdf:predicate op:weight ; rdf:object "12.5"^^xsd:decimal ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-36" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-2> rdf:type ex:Coil .
+<urn:synthetic:assertion:37> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-2> ; rdf:predicate rdf:type ; rdf:object ex:Coil ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-37" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-2> op:externalId "coil-2" .
+<urn:synthetic:assertion:38> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-2> ; rdf:predicate op:externalId ; rdf:object "coil-2" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-38" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-2> op:organizationId "org-demo" .
+<urn:synthetic:assertion:39> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-2> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-39" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-2> op:siteId "site-a" .
+<urn:synthetic:assertion:40> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-2> ; rdf:predicate op:siteId ; rdf:object "site-a" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-40" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-2> op:synthetic true .
+<urn:synthetic:assertion:41> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-2> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-41" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-2> rdfs:label "钢卷coil-2"@zh .
+<urn:synthetic:assertion:42> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-2> ; rdf:predicate rdfs:label ; rdf:object "钢卷coil-2"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-42" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:coil-2> op:weight "12.5"^^xsd:decimal .
+<urn:synthetic:assertion:43> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:coil-2> ; rdf:predicate op:weight ; rdf:object "12.5"^^xsd:decimal ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-43" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:heat-1> ex:castIn <urn:synthetic:org-demo:site-a:local:cast-1> .
+<urn:synthetic:assertion:44> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:heat-1> ; rdf:predicate ex:castIn ; rdf:object <urn:synthetic:org-demo:site-a:local:cast-1> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-44" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:cast-1> ex:producesSlab <urn:synthetic:org-demo:site-a:local:slab-1> .
+<urn:synthetic:assertion:45> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:cast-1> ; rdf:predicate ex:producesSlab ; rdf:object <urn:synthetic:org-demo:site-a:local:slab-1> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-45" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:slab-1> ex:rolledIn <urn:synthetic:org-demo:site-a:local:roll-1> .
+<urn:synthetic:assertion:46> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:slab-1> ; rdf:predicate ex:rolledIn ; rdf:object <urn:synthetic:org-demo:site-a:local:roll-1> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-46" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:slab-1> ex:rolledIn <urn:synthetic:org-demo:site-a:local:roll-2> .
+<urn:synthetic:assertion:47> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:slab-1> ; rdf:predicate ex:rolledIn ; rdf:object <urn:synthetic:org-demo:site-a:local:roll-2> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-47" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-1> ex:producesCoil <urn:synthetic:org-demo:site-a:local:coil-1> .
+<urn:synthetic:assertion:48> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-1> ; rdf:predicate ex:producesCoil ; rdf:object <urn:synthetic:org-demo:site-a:local:coil-1> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-48" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-1> ex:producesCoil <urn:synthetic:org-demo:site-a:local:coil-2> .
+<urn:synthetic:assertion:49> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-1> ; rdf:predicate ex:producesCoil ; rdf:object <urn:synthetic:org-demo:site-a:local:coil-2> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-49" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-a:local:roll-2> ex:producesCoil <urn:synthetic:org-demo:site-a:local:coil-2> .
+<urn:synthetic:assertion:50> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-a:local:roll-2> ; rdf:predicate ex:producesCoil ; rdf:object <urn:synthetic:org-demo:site-a:local:coil-2> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-50" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:heat-1> rdf:type ex:Heat .
+<urn:synthetic:assertion:51> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:heat-1> ; rdf:predicate rdf:type ; rdf:object ex:Heat ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-51" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:heat-1> op:externalId "heat-1" .
+<urn:synthetic:assertion:52> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:heat-1> ; rdf:predicate op:externalId ; rdf:object "heat-1" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-52" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:heat-1> op:organizationId "org-demo" .
+<urn:synthetic:assertion:53> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:heat-1> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-53" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:heat-1> op:siteId "site-b" .
+<urn:synthetic:assertion:54> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:heat-1> ; rdf:predicate op:siteId ; rdf:object "site-b" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-54" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:heat-1> op:synthetic true .
+<urn:synthetic:assertion:55> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:heat-1> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-55" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:heat-1> rdfs:label "炉次heat-1"@zh .
+<urn:synthetic:assertion:56> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:heat-1> ; rdf:predicate rdfs:label ; rdf:object "炉次heat-1"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-56" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:cast-1> rdf:type ex:CastingSequence .
+<urn:synthetic:assertion:57> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:cast-1> ; rdf:predicate rdf:type ; rdf:object ex:CastingSequence ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-57" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:cast-1> op:externalId "cast-1" .
+<urn:synthetic:assertion:58> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:cast-1> ; rdf:predicate op:externalId ; rdf:object "cast-1" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-58" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:cast-1> op:organizationId "org-demo" .
+<urn:synthetic:assertion:59> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:cast-1> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-59" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:cast-1> op:siteId "site-b" .
+<urn:synthetic:assertion:60> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:cast-1> ; rdf:predicate op:siteId ; rdf:object "site-b" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-60" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:cast-1> op:synthetic true .
+<urn:synthetic:assertion:61> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:cast-1> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-61" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:cast-1> rdfs:label "浇次cast-1"@zh .
+<urn:synthetic:assertion:62> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:cast-1> ; rdf:predicate rdfs:label ; rdf:object "浇次cast-1"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-62" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:slab-1> rdf:type ex:Slab .
+<urn:synthetic:assertion:63> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:slab-1> ; rdf:predicate rdf:type ; rdf:object ex:Slab ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-63" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:slab-1> op:externalId "slab-1" .
+<urn:synthetic:assertion:64> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:slab-1> ; rdf:predicate op:externalId ; rdf:object "slab-1" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-64" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:slab-1> op:organizationId "org-demo" .
+<urn:synthetic:assertion:65> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:slab-1> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-65" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:slab-1> op:siteId "site-b" .
+<urn:synthetic:assertion:66> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:slab-1> ; rdf:predicate op:siteId ; rdf:object "site-b" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-66" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:slab-1> op:synthetic true .
+<urn:synthetic:assertion:67> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:slab-1> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-67" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:slab-1> rdfs:label "板坯slab-1"@zh .
+<urn:synthetic:assertion:68> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:slab-1> ; rdf:predicate rdfs:label ; rdf:object "板坯slab-1"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-68" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-1> rdf:type ex:RollingEvent .
+<urn:synthetic:assertion:69> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-1> ; rdf:predicate rdf:type ; rdf:object ex:RollingEvent ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-69" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-1> op:externalId "roll-1" .
+<urn:synthetic:assertion:70> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-1> ; rdf:predicate op:externalId ; rdf:object "roll-1" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-70" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-1> op:organizationId "org-demo" .
+<urn:synthetic:assertion:71> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-1> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-71" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-1> op:siteId "site-b" .
+<urn:synthetic:assertion:72> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-1> ; rdf:predicate op:siteId ; rdf:object "site-b" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-72" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-1> op:synthetic true .
+<urn:synthetic:assertion:73> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-1> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-73" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-1> rdfs:label "轧制事件roll-1"@zh .
+<urn:synthetic:assertion:74> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-1> ; rdf:predicate rdfs:label ; rdf:object "轧制事件roll-1"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-74" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-2> rdf:type ex:RollingEvent .
+<urn:synthetic:assertion:75> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-2> ; rdf:predicate rdf:type ; rdf:object ex:RollingEvent ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-75" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-2> op:externalId "roll-2" .
+<urn:synthetic:assertion:76> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-2> ; rdf:predicate op:externalId ; rdf:object "roll-2" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-76" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-2> op:organizationId "org-demo" .
+<urn:synthetic:assertion:77> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-2> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-77" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-2> op:siteId "site-b" .
+<urn:synthetic:assertion:78> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-2> ; rdf:predicate op:siteId ; rdf:object "site-b" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-78" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-2> op:synthetic true .
+<urn:synthetic:assertion:79> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-2> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-79" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-2> rdfs:label "轧制事件roll-2"@zh .
+<urn:synthetic:assertion:80> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-2> ; rdf:predicate rdfs:label ; rdf:object "轧制事件roll-2"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-80" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-1> rdf:type ex:Coil .
+<urn:synthetic:assertion:81> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-1> ; rdf:predicate rdf:type ; rdf:object ex:Coil ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-81" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-1> op:externalId "coil-1" .
+<urn:synthetic:assertion:82> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-1> ; rdf:predicate op:externalId ; rdf:object "coil-1" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-82" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-1> op:organizationId "org-demo" .
+<urn:synthetic:assertion:83> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-1> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-83" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-1> op:siteId "site-b" .
+<urn:synthetic:assertion:84> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-1> ; rdf:predicate op:siteId ; rdf:object "site-b" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-84" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-1> op:synthetic true .
+<urn:synthetic:assertion:85> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-1> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-85" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-1> rdfs:label "钢卷coil-1"@zh .
+<urn:synthetic:assertion:86> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-1> ; rdf:predicate rdfs:label ; rdf:object "钢卷coil-1"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-86" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-1> op:weight "12.5"^^xsd:decimal .
+<urn:synthetic:assertion:87> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-1> ; rdf:predicate op:weight ; rdf:object "12.5"^^xsd:decimal ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-87" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-2> rdf:type ex:Coil .
+<urn:synthetic:assertion:88> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-2> ; rdf:predicate rdf:type ; rdf:object ex:Coil ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-88" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-2> op:externalId "coil-2" .
+<urn:synthetic:assertion:89> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-2> ; rdf:predicate op:externalId ; rdf:object "coil-2" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-89" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-2> op:organizationId "org-demo" .
+<urn:synthetic:assertion:90> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-2> ; rdf:predicate op:organizationId ; rdf:object "org-demo" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-90" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-2> op:siteId "site-b" .
+<urn:synthetic:assertion:91> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-2> ; rdf:predicate op:siteId ; rdf:object "site-b" ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-91" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-2> op:synthetic true .
+<urn:synthetic:assertion:92> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-2> ; rdf:predicate op:synthetic ; rdf:object true ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-92" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-2> rdfs:label "钢卷coil-2"@zh .
+<urn:synthetic:assertion:93> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-2> ; rdf:predicate rdfs:label ; rdf:object "钢卷coil-2"@zh ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-93" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:coil-2> op:weight "12.5"^^xsd:decimal .
+<urn:synthetic:assertion:94> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:coil-2> ; rdf:predicate op:weight ; rdf:object "12.5"^^xsd:decimal ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-94" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:heat-1> ex:castIn <urn:synthetic:org-demo:site-b:local:cast-1> .
+<urn:synthetic:assertion:95> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:heat-1> ; rdf:predicate ex:castIn ; rdf:object <urn:synthetic:org-demo:site-b:local:cast-1> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-95" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:cast-1> ex:producesSlab <urn:synthetic:org-demo:site-b:local:slab-1> .
+<urn:synthetic:assertion:96> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:cast-1> ; rdf:predicate ex:producesSlab ; rdf:object <urn:synthetic:org-demo:site-b:local:slab-1> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-96" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:slab-1> ex:rolledIn <urn:synthetic:org-demo:site-b:local:roll-1> .
+<urn:synthetic:assertion:97> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:slab-1> ; rdf:predicate ex:rolledIn ; rdf:object <urn:synthetic:org-demo:site-b:local:roll-1> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-97" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:slab-1> ex:rolledIn <urn:synthetic:org-demo:site-b:local:roll-2> .
+<urn:synthetic:assertion:98> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:slab-1> ; rdf:predicate ex:rolledIn ; rdf:object <urn:synthetic:org-demo:site-b:local:roll-2> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-98" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-1> ex:producesCoil <urn:synthetic:org-demo:site-b:local:coil-1> .
+<urn:synthetic:assertion:99> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-1> ; rdf:predicate ex:producesCoil ; rdf:object <urn:synthetic:org-demo:site-b:local:coil-1> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-99" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-1> ex:producesCoil <urn:synthetic:org-demo:site-b:local:coil-2> .
+<urn:synthetic:assertion:100> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-1> ; rdf:predicate ex:producesCoil ; rdf:object <urn:synthetic:org-demo:site-b:local:coil-2> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-100" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .
+<urn:synthetic:org-demo:site-b:local:roll-2> ex:producesCoil <urn:synthetic:org-demo:site-b:local:coil-2> .
+<urn:synthetic:assertion:101> a rdf:Statement ; rdf:subject <urn:synthetic:org-demo:site-b:local:roll-2> ; rdf:predicate ex:producesCoil ; rdf:object <urn:synthetic:org-demo:site-b:local:coil-2> ;
+ prov:wasDerivedFrom <urn:synthetic:source:local> ; op:sourceId "local-synthetic" ; op:sourceRecordId "assertion-101" ;
+ op:validFromUtc "2026-10-01T00:00:00Z"^^xsd:dateTime ; op:observedAtUtc "2026-10-26T00:00:00Z"^^xsd:dateTime ;
+ op:modelVersion "g2-synthetic-1" ; op:mappingStatus "absent" ; op:synthetic true .

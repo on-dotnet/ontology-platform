@@ -31,9 +31,12 @@ SUMMARY_FIELDS = {
     "name",
     "description",
     "baseIri",
+    "ontologyIri",
     "entityTypeCount",
     "relationTypeCount",
     "propertyCount",
+    "constraintCount",
+    "axiomCount",
     "openChangeSetCount",
     "activeReleaseId",
     "activeReleaseVersion",
@@ -46,6 +49,7 @@ ELEMENT_FIELDS = {
     "kind",
     "localName",
     "iri",
+    "explicitIri",
     "labelZh",
     "labelEn",
     "definitionZh",
@@ -54,10 +58,16 @@ ELEMENT_FIELDS = {
     "parentId",
     "domainId",
     "rangeId",
+    "inverseId",
     "datatype",
     "unit",
     "required",
     "multiple",
+    "autoShape",
+    "rules",
+    "turtle",
+    "subjectId",
+    "flags",
     "status",
     "origin",
     "revision",
@@ -256,7 +266,8 @@ async def test_elements_list_filters_and_searches(client: AsyncClient, db: Async
     by_synonym = (await client.get(base, params={"q": "盛钢"})).json()
     by_label = (await client.get(base, params={"q": "LADLE"})).json()
     by_name = (await client.get(base, params={"q": "weight"})).json()
-    bad_kind = await client.get(base, params={"kind": "axiom"})
+    bad_kind = await client.get(base, params={"kind": "rule"})
+    axioms = await client.get(base, params={"kind": "axiom"})
 
     assert [item["localName"] for item in everything] == ["Heat", "Ladle", "netWeight"]
     assert set(everything[0]) == ELEMENT_FIELDS
@@ -270,6 +281,8 @@ async def test_elements_list_filters_and_searches(client: AsyncClient, db: Async
     assert [item["localName"] for item in by_label] == ["Ladle"]
     assert [item["localName"] for item in by_name] == ["netWeight"]
     assert bad_kind.status_code == 422
+    assert axioms.status_code == 200
+    assert axioms.json() == []
 
 
 async def test_element_detail_shows_merged_provenance(

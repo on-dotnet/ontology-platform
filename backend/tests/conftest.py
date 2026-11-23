@@ -15,14 +15,16 @@ from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ontology_platform import models  # noqa: F401  (registers every module's tables)
-from ontology_platform.db import Base
 from ontology_platform.main import create_app
 from ontology_platform.settings import Settings
-from support import ADMIN_PASSWORD, ADMIN_USERNAME, alembic_config, make_client
-
-
-def libpq_dsn(url: str) -> str:
-    return make_url(url).set(drivername="postgresql").render_as_string(hide_password=False)
+from support import (
+    ADMIN_PASSWORD,
+    ADMIN_USERNAME,
+    alembic_config,
+    libpq_dsn,
+    make_client,
+    truncate_tables,
+)
 
 
 @pytest.fixture(scope="session")
@@ -50,16 +52,6 @@ def settings(database_url: str) -> Settings:
         admin_username=ADMIN_USERNAME,
         admin_password=SecretStr(ADMIN_PASSWORD),
     )
-
-
-def truncate_tables(database_url: str) -> None:
-    # Every table registered by the application's modules, so new modules need no change here.
-    tables = sorted(Base.metadata.tables)
-    if not tables:
-        return
-    identifiers = sql.SQL(", ").join(sql.Identifier(*name.split(".", 1)) for name in tables)
-    with psycopg.connect(libpq_dsn(database_url), autocommit=True) as conn:
-        conn.execute(sql.SQL("TRUNCATE {} RESTART IDENTITY CASCADE").format(identifiers))
 
 
 @pytest.fixture

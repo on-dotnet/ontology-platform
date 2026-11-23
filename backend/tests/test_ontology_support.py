@@ -190,7 +190,8 @@ async def elements_by_name(db: AsyncSession, ontology: Ontology) -> dict[str, El
         .where(Element.ontology_id == ontology.id)
         .execution_options(populate_existing=True),
     )
-    return {row.local_name: row for row in rows}
+    # Axioms have no local name; tests look elements up by name.
+    return {row.local_name: row for row in rows if row.local_name is not None}
 
 
 async def publish(client: AsyncClient, ontology: Ontology, title: str = "首版") -> Response:

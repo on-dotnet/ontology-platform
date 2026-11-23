@@ -14,9 +14,10 @@ import secrets
 import string
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from http import HTTPStatus
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID, uuid4
 
 from sqlalchemy import func, select
@@ -29,6 +30,7 @@ from ontology_platform.modules.audit import service as audit
 from ontology_platform.modules.ontology import rules, schemas
 from ontology_platform.modules.ontology.models import (
     DATATYPES,
+    ELEMENT_FLAGS,
     ITEM_FLAGS,
     KINDS,
     ChangeItem,
@@ -37,16 +39,25 @@ from ontology_platform.modules.ontology.models import (
     ChangeSetStatus,
     Decision,
     Element,
+    ElementStatus,
     Evidence,
     Kind,
     Ontology,
     Release,
 )
+from ontology_platform.modules.ontology.rdf import axioms as rdf_axioms
+from ontology_platform.modules.ontology.rdf import writer as rdf_writer
+from ontology_platform.modules.ontology.rdf.reader import RdfInputError, parse_fragment
 from ontology_platform.modules.ontology.turtle import OntologyHeader, export_turtle
 
 STALE_TARGET = "changeset.stale_target"
 DEPENDENCY_SKIPPED = "changeset.dependency_skipped"
 INVALID_ITEM = "changeset.invalid_item"
+HAS_DEPENDENTS = "changeset.has_dependents"
+# The kinds M1's AI extraction aligns its proposals with.
+_ALIGNMENT_KINDS = ("entity_type", "relation_type", "property")
+# Deletes run last, dependents before what they depend on.
+_DELETE_ORDER = {"axiom": 0, "constraint": 1, "relation_type": 2, "property": 2, "entity_type": 3}
 
 TITLE_MAX_LENGTH = 300
 _KEY = re.compile(schemas.KEY_PATTERN)
@@ -86,8 +97,16 @@ def _now() -> datetime:
     return datetime.now(UTC)
 
 
-def _kind_order(element: Element) -> tuple[int, str]:
-    return (KINDS.index(element.kind), element.local_name)
+def _kind_order(element: Element) -> tuple[int, str, str]:
+    return (KINDS.index(element.kind), element.local_name or "", element.turtle or "")
+
+
+def iri_of(element: Element, base_iri: str) -> str | None:
+    """The element's IRI: the one it was imported with, else base + local name (none for
+    axioms)."""
+    if element.iri is not None:
+        return element.iri
+    return base_iri + element.local_name if element.local_name else None
 
 
 def _ontology_not_found() -> AppError:
@@ -99,13 +118,18 @@ def _change_set_not_found() -> AppError:
     return AppError(404, "changeset.not_found", "Change set or item not found.")
 
 
-def _header(ontology: Ontology) -> OntologyHeader:
+def header_of(ontology: Ontology) -> OntologyHeader:
     return OntologyHeader(
         key=ontology.key,
         name=ontology.name,
         description=ontology.description,
         base_iri=ontology.base_iri,
+        iri=ontology.ontology_iri,
+        prefixes=dict(ontology.prefixes or {}),
     )
+
+
+_header = header_of
 
 
 async def _ontology_or_404(
@@ -144,8 +168,8 @@ async def get_ontology(db: AsyncSession, ontology_id: UUID) -> Ontology | None:
 
 
 async def list_alignment_elements(db: AsyncSession, ontology_id: UUID) -> list[Element]:
-    """Every active element of the ontology, object types first, then by local name."""
-    return await _active_elements(db, ontology_id)
+    """Active object types, relations and properties, object types first, then by local name."""
+    return [e for e in await _active_elements(db, ontology_id) if e.kind in _ALIGNMENT_KINDS]
 
 
 async def count_entity_types(db: AsyncSession) -> int:
@@ -259,6 +283,22 @@ async def create_change_set(
     return change_set.id
 
 
+def item_references(
+    kind: str, fields: schemas.ElementFields
+) -> list[tuple[str, str, tuple[str, ...]]]:
+    """(name for messages, reference, kinds it may point at) for every reference given."""
+    found: list[tuple[str, str, tuple[str, ...]]] = []
+    for name in rules.KIND_REFS[kind]:
+        value = getattr(fields, name)
+        if value is not None:
+            found.append((rules.wire_name(name), value, rules.REF_TARGETS[name]))
+    for index, rule in enumerate(fields.rules or []):
+        found.append((f"rules[{index}].pathRef", rule.path_ref, rules.RULE_PATH_KINDS))
+        if rule.class_ref is not None:
+            found.append((f"rules[{index}].classRef", rule.class_ref, ("entity_type",)))
+    return found
+
+
 def _proposal_problem(
     item: schemas.ProposedItem,
     elements: dict[UUID, Element],
@@ -269,12 +309,12 @@ def _proposal_problem(
             return "a create item has no target element"
     else:
         if item.temp_ref is not None:
-            return "an update item has no temp_ref"
+            return f"an {item.op} item has no temp_ref"
         target = elements.get(item.target_element_id) if item.target_element_id else None
         if target is None:
-            return "the update target is not an element of this ontology"
+            return f"the {item.op} target is not an element of this ontology"
         if target.kind != item.kind:
-            return "the kind does not match the update target"
+            return f"the kind does not match the {item.op} target"
     unknown_flags = set(item.flags) - set(ITEM_FLAGS)
     if unknown_flags:
         return "unknown flags"
@@ -284,11 +324,8 @@ def _proposal_problem(
             return "evidence needs both charStart and charEnd, or neither"
         if start is not None and end is not None and end < start:
             return "evidence charEnd is before charStart"
-    for name in rules.REF_FIELDS:
-        value = getattr(item.proposed, name)
-        if value is None:
-            continue
-        own_id = item.target_element_id if item.op == "update" else None
+    own_id = item.target_element_id if item.op != "create" else None
+    for name, value, kinds in item_references(item.kind, item.proposed):
         problem = _reference_problem(
             value,
             elements,
@@ -296,10 +333,18 @@ def _proposal_problem(
             own_ref=item.temp_ref,
             own_id=own_id,
             require_active=False,
+            kinds=kinds,
         )
         if problem:
-            return f"{rules.wire_name(name)} {problem}"
+            return f"{name} {problem}"
     return None
+
+
+_KIND_NAMES = {
+    ("entity_type",): "an object type",
+    ("relation_type",): "a relation",
+    ("relation_type", "property"): "a relation or property",
+}
 
 
 def _reference_problem(
@@ -310,15 +355,17 @@ def _reference_problem(
     own_ref: str | None,
     own_id: UUID | None,
     require_active: bool,
+    kinds: tuple[str, ...] = ("entity_type",),
 ) -> str | None:
-    """Why a reference cannot point at an object type, or None if it can."""
+    """Why a reference cannot point at an element of `kinds`, or None if it can."""
     element_id = rules.parse_id(value)
+    kind_name = _KIND_NAMES.get(kinds, "an element of the right kind")
     if element_id is not None:
         element = elements.get(element_id)
         if element is None:
             return "refers to an element that is not in this ontology"
-        if element.kind != "entity_type":
-            return "must refer to an object type"
+        if element.kind not in kinds:
+            return f"must refer to {kind_name}"
         if require_active and element.status != "active":
             return "refers to an element that is not active"
         if element_id == own_id:
@@ -327,8 +374,8 @@ def _reference_problem(
     kind = created_kinds.get(value)
     if kind is None:
         return "refers to a temp_ref that is not in this change set"
-    if kind != "entity_type":
-        return "must refer to an object type"
+    if kind not in kinds:
+        return f"must refer to {kind_name}"
     if value == own_ref:
         return "refers to the item itself"
     return None
@@ -463,9 +510,12 @@ async def _summaries(
                 name=ontology.name,
                 description=ontology.description,
                 base_iri=ontology.base_iri,
+                ontology_iri=header_of(ontology).ontology_iri,
                 entity_type_count=counts["entity_type"],
                 relation_type_count=counts["relation_type"],
                 property_count=counts["property"],
+                constraint_count=counts["constraint"],
+                axiom_count=counts["axiom"],
                 open_change_set_count=open_counts.get(ontology.id, 0),
                 active_release_id=active_id,
                 active_release_version=versions.get(active_id) if active_id else None,
@@ -485,7 +535,8 @@ def _element_data(element: Element, base_iri: str) -> dict[str, Any]:
         "ontology_id": element.ontology_id,
         "kind": element.kind,
         "local_name": element.local_name,
-        "iri": base_iri + element.local_name,
+        "iri": iri_of(element, base_iri),
+        "explicit_iri": element.iri is not None,
         "label_zh": element.label_zh,
         "label_en": element.label_en,
         "definition_zh": element.definition_zh,
@@ -494,10 +545,16 @@ def _element_data(element: Element, base_iri: str) -> dict[str, Any]:
         "parent_id": element.parent_id,
         "domain_id": element.domain_id,
         "range_id": element.range_id,
+        "inverse_id": element.inverse_id,
         "datatype": element.datatype,
         "unit": element.unit,
         "required": element.required,
         "multiple": element.multiple,
+        "auto_shape": element.auto_shape,
+        "rules": element.rules,
+        "turtle": element.turtle,
+        "subject_id": element.subject_id,
+        "flags": [flag for flag in element.flags if flag in ELEMENT_FLAGS],
         "status": element.status,
         "origin": element.origin,
         "revision": element.revision,
@@ -511,7 +568,13 @@ def element_out(element: Element, base_iri: str) -> schemas.Element:
 
 
 def _matches(element: Element, needle: str) -> bool:
-    texts = [element.local_name, element.label_zh, element.label_en or ""]
+    texts = [
+        element.local_name or "",
+        element.label_zh or "",
+        element.label_en or "",
+        element.iri or "",
+        element.turtle or "",
+    ]
     texts.extend(str(synonym.get("text", "")) for synonym in element.synonyms)
     return any(needle in text.casefold() for text in texts)
 
@@ -522,10 +585,14 @@ async def list_elements(
     *,
     kind: Kind | None,
     q: str | None,
+    status: ElementStatus | Literal["all"] = "active",
 ) -> list[schemas.Element]:
-    """All elements, optionally of one kind and matching `q` in names, labels or synonyms."""
+    """Elements of one status (active by default), optionally of one kind and matching `q` in
+    names, labels, synonyms, the IRI or an axiom's text."""
     ontology = await _ontology_or_404(db, ontology_id)
     elements = await _elements(db, ontology_id)
+    if status != "all":
+        elements = [element for element in elements if element.status == status]
     if kind is not None:
         elements = [element for element in elements if element.kind == kind]
     needle = (q or "").strip().casefold()
@@ -582,7 +649,7 @@ async def get_graph(db: AsyncSession, ontology_id: UUID) -> schemas.Graph:
     nodes = [
         schemas.GraphNode(
             id=element.id,
-            label=element.label_zh,
+            label=rules.display_label(element.label_zh, element.label_en, element.local_name),
             local_name=element.local_name,
             parent_id=element.parent_id if element.parent_id in types else None,
             property_count=property_counts[element.id],
@@ -601,7 +668,11 @@ async def get_graph(db: AsyncSession, ontology_id: UUID) -> schemas.Graph:
                     source=source,
                     target=target,
                     kind="relation",
-                    label=element.label_zh,
+                    label=rules.display_label(
+                        element.label_zh,
+                        element.label_en,
+                        element.local_name,
+                    ),
                 ),
             )
     for element in types.values():
@@ -684,8 +755,23 @@ async def _evidence_by_item(
     return grouped
 
 
+def _ref(element_id: UUID | None) -> str | None:
+    return str(element_id) if element_id else None
+
+
+def stored_rule_fields(rule: dict[str, Any]) -> dict[str, Any]:
+    """A stored rule (ids) as change item fields (references)."""
+    data = {key: value for key, value in rule.items() if key not in ("pathId", "classId")}
+    data["pathRef"] = rule["pathId"]
+    if rule.get("classId"):
+        data["classRef"] = rule["classId"]
+    return data
+
+
 def _before(element: Element) -> schemas.ElementFields:
     """The element's current values as item fields, with only the keys its kind uses."""
+    if element.kind == "axiom":
+        return schemas.ElementFields.model_validate({"turtle": element.turtle})
     data: dict[str, Any] = {
         "local_name": element.local_name,
         "label_zh": element.label_zh,
@@ -695,16 +781,22 @@ def _before(element: Element) -> schemas.ElementFields:
         "synonyms": element.synonyms,
     }
     if element.kind == "entity_type":
-        data["parent_ref"] = str(element.parent_id) if element.parent_id else None
+        data["parent_ref"] = _ref(element.parent_id)
+        data["auto_shape"] = element.auto_shape
+    elif element.kind == "constraint":
+        data["domain_ref"] = _ref(element.domain_id)
+        data["rules"] = [stored_rule_fields(rule) for rule in element.rules or []]
     else:
-        data["domain_ref"] = str(element.domain_id) if element.domain_id else None
+        data["domain_ref"] = _ref(element.domain_id)
         if element.kind == "relation_type":
-            data["range_ref"] = str(element.range_id) if element.range_id else None
+            data["range_ref"] = _ref(element.range_id)
+            data["inverse_ref"] = _ref(element.inverse_id)
         else:
             data["datatype"] = element.datatype
             data["unit"] = element.unit
         data["required"] = element.required
         data["multiple"] = element.multiple
+        data["auto_shape"] = element.auto_shape
     return schemas.ElementFields.model_validate(data)
 
 
@@ -887,6 +979,7 @@ async def _edit_problems(
         item.op,
         fields,
         target_local_name=target.local_name if target else None,
+        target_imported=target is not None and target.iri is not None,
     )
     siblings = await _items(db, change_set)
     creates = {
@@ -897,10 +990,7 @@ async def _edit_problems(
     created_kinds = {temp_ref: sibling.kind for temp_ref, sibling in creates.items()}
     own_id = target.id if target else None
     reference_ok = True
-    for name in rules.KIND_REFS[kind]:
-        value = getattr(fields, name)
-        if value is None:
-            continue
+    for name, value, kinds in item_references(kind, fields):
         problem = _reference_problem(
             value,
             elements,
@@ -908,10 +998,16 @@ async def _edit_problems(
             own_ref=item.temp_ref,
             own_id=own_id,
             require_active=True,
+            kinds=kinds,
         )
         if problem:
             reference_ok = False
-            problems.append(f"{rules.wire_name(name)} {problem}")
+            problems.append(f"{name} {problem}")
+    if kind == "axiom" and fields.turtle:
+        ontology = await _ontology_or_404(db, change_set.ontology_id)
+        problem = axiom_problem(fields.turtle, header_of(ontology).prefix_map())
+        if problem:
+            problems.append(problem)
     if kind == "entity_type" and fields.parent_ref and reference_ok:
         own_key: str | None = None
         if own_id is not None:
@@ -1014,8 +1110,50 @@ async def reject_change_set(
 # ---------- change sets: merge ----------
 
 
+@dataclass(frozen=True, slots=True)
+class NormalizedAxiom:
+    turtle: str
+    non_standard: bool
+    subject: str | None
+    mentions: frozenset[str]
+
+
+def normalize_axiom(turtle: str, prefixes: Mapping[str, str]) -> NormalizedAxiom:
+    """The axiom written the way exports write it. Raises RdfInputError when the fragment does
+    not parse or is not exactly one axiom (spec 002, 3.4)."""
+    triples = parse_fragment(turtle, prefixes)
+    groups = rdf_axioms.group(triples)
+    if len(groups) != 1:
+        raise RdfInputError("axiom.invalid", "The fragment must hold exactly one axiom.")
+    (axiom,) = rdf_axioms.axioms_of(groups[0])
+    return NormalizedAxiom(
+        turtle=rdf_writer.fragment(axiom.triples, prefixes),
+        non_standard=axiom.non_standard,
+        subject=axiom.subject,
+        mentions=axiom.mentions,
+    )
+
+
+def axiom_problem(turtle: str, prefixes: Mapping[str, str]) -> str | None:
+    try:
+        normalize_axiom(turtle, prefixes)
+    except RdfInputError as error:
+        return error.detail.rstrip(".")
+    return None
+
+
+def _rule_references(element: Element) -> set[UUID]:
+    found: set[UUID] = set()
+    for rule in element.rules or []:
+        for key in ("pathId", "classId"):
+            value = rule.get(key)
+            if value:
+                found.add(UUID(str(value)))
+    return found
+
+
 class _Merge:
-    """Applies accepted items in order, each after the items it references.
+    """Applies accepted items, each after the items it references.
 
     The outcome of an item is None when it was applied, otherwise the skip code.
     """
@@ -1024,17 +1162,32 @@ class _Merge:
         self,
         db: AsyncSession,
         change_set: ChangeSet,
+        ontology: Ontology,
         elements: Sequence[Element],
         items: Sequence[ChangeItem],
         now: datetime,
     ) -> None:
         self._db = db
         self._change_set = change_set
+        self._base_iri = ontology.base_iri
+        self._prefixes = header_of(ontology).prefix_map()
         self._elements = {element.id: element for element in elements}
-        self._local_names = {element.local_name for element in elements}
+        self._local_names = {e.local_name for e in elements if e.local_name}
+        self._iris: dict[str, Element] = {}
+        for element in elements:
+            iri = iri_of(element, self._base_iri)
+            if iri is not None:
+                self._iris[iri] = element
         self._creates = {item.temp_ref: item for item in items if item.temp_ref is not None}
+        self._restores = {
+            item.target_element_id: item
+            for item in items
+            if item.op == "restore" and item.decision == "accepted" and item.target_element_id
+        }
         self._visiting: set[UUID] = set()
         self._now = now
+        # Imported and hand-made synonym lists replace the old ones; AI ones add to them.
+        self._replace_synonyms = change_set.source in ("import", "manual")
         self.outcomes: dict[UUID, str | None] = {}
 
     async def apply(self, item: ChangeItem) -> str | None:
@@ -1048,18 +1201,34 @@ class _Merge:
         self.outcomes[item.id] = outcome
         return outcome
 
+    def _target(self, item: ChangeItem) -> tuple[str | None, Element | None]:
+        target = self._elements.get(item.target_element_id) if item.target_element_id else None
+        if target is None or target.kind != item.kind:
+            return INVALID_ITEM, None
+        if target.revision != item.target_revision:
+            return STALE_TARGET, None
+        wanted_status = "deprecated" if item.op == "restore" else "active"
+        if target.status != wanted_status:
+            return INVALID_ITEM, None
+        return None, target
+
     async def _apply(self, item: ChangeItem) -> str | None:
+        if item.op == "delete":
+            return self._delete(item)
         kind = item.kind
         target: Element | None = None
-        if item.op == "update":
-            target = self._elements.get(item.target_element_id) if item.target_element_id else None
-            if target is None or target.kind != item.kind:
-                return INVALID_ITEM
-            if target.revision != item.target_revision:
-                return STALE_TARGET
+        if item.op in ("update", "restore"):
+            problem, target = self._target(item)
+            if problem is not None:
+                return problem
         fields = rules.effective_fields(item.proposed, item.edited)
-        local_name = target.local_name if target else None
-        if rules.field_problems(kind, item.op, fields, target_local_name=local_name):
+        if rules.field_problems(
+            kind,
+            item.op,
+            fields,
+            target_local_name=target.local_name if target else None,
+            target_imported=target is not None and target.iri is not None,
+        ):
             return INVALID_ITEM
         resolved: dict[str, UUID | None] = {}
         for name in rules.KIND_REFS[kind]:
@@ -1069,23 +1238,48 @@ class _Merge:
             if value is None:
                 resolved[name] = None
                 continue
-            outcome, element_id = await self._resolve(value)
+            outcome, element_id = await self._resolve(value, rules.REF_TARGETS[name], target)
             if outcome is not None:
                 return outcome
             resolved[name] = element_id
+        stored_rules: list[dict[str, Any]] | None = None
+        if fields.rules is not None:
+            outcome, stored_rules = await self._rules(fields.rules, target)
+            if outcome is not None:
+                return outcome
+        axiom: NormalizedAxiom | None = None
+        if kind == "axiom" and fields.turtle is not None:
+            try:
+                axiom = normalize_axiom(fields.turtle, self._prefixes)
+            except RdfInputError:
+                return INVALID_ITEM
         if target is None:
-            return await self._create(item, fields, resolved)
-        return self._update(item, target, fields, resolved)
+            return await self._create(item, fields, resolved, stored_rules, axiom)
+        return self._update(item, target, fields, resolved, stored_rules, axiom)
 
-    async def _resolve(self, value: str) -> tuple[str | None, UUID | None]:
+    async def _resolve(
+        self,
+        value: str,
+        kinds: tuple[str, ...],
+        own: Element | None,
+    ) -> tuple[str | None, UUID | None]:
         element_id = rules.parse_id(value)
         if element_id is not None:
             element = self._elements.get(element_id)
-            if element is None or element.kind != "entity_type" or element.status != "active":
+            if element is None or element.kind not in kinds:
                 return INVALID_ITEM, None
+            if own is not None and element.id == own.id:
+                return INVALID_ITEM, None
+            if element.status != "active":
+                # A deleted element this change set brings back can be referenced.
+                restore = self._restores.get(element.id)
+                if restore is None or restore.id in self._visiting:
+                    return INVALID_ITEM, None
+                if await self.apply(restore) is not None:
+                    return DEPENDENCY_SKIPPED, None
             return None, element.id
         dependency = self._creates.get(value)
-        if dependency is None or dependency.kind != "entity_type":
+        if dependency is None or dependency.kind not in kinds:
             return INVALID_ITEM, None
         if dependency.id in self._visiting:
             # The items reference each other in a loop.
@@ -1096,23 +1290,95 @@ class _Merge:
             return DEPENDENCY_SKIPPED, None
         return None, dependency.applied_element_id
 
+    async def _rules(
+        self,
+        given: list[schemas.ConstraintRuleFields],
+        own: Element | None,
+    ) -> tuple[str | None, list[dict[str, Any]]]:
+        stored: list[dict[str, Any]] = []
+        for rule in given:
+            data = rule.model_dump(
+                mode="json",
+                by_alias=True,
+                exclude_none=True,
+                exclude={"path_ref", "class_ref"},
+            )
+            outcome, path_id = await self._resolve(rule.path_ref, rules.RULE_PATH_KINDS, own)
+            if outcome is not None:
+                return outcome, []
+            data["pathId"] = str(path_id)
+            if rule.class_ref is not None:
+                outcome, class_id = await self._resolve(rule.class_ref, ("entity_type",), own)
+                if outcome is not None:
+                    return outcome, []
+                data["classId"] = str(class_id)
+            if not data.get("allowedValuesLost"):
+                data.pop("allowedValuesLost", None)
+            if not data.get("message"):
+                data.pop("message", None)
+            stored.append(data)
+        return None, stored
+
+    def _subject_id(self, axiom: NormalizedAxiom) -> UUID | None:
+        if axiom.subject is None:
+            return None
+        element = self._iris.get(axiom.subject)
+        if element is None or element.kind == "axiom" or element.status != "active":
+            return None
+        return element.id
+
     async def _create(
         self,
         item: ChangeItem,
         fields: schemas.ElementFields,
         resolved: dict[str, UUID | None],
+        stored_rules: list[dict[str, Any]] | None,
+        axiom: NormalizedAxiom | None,
     ) -> str | None:
-        if fields.local_name is None or fields.label_zh is None:
+        kind = item.kind
+        origin = {"manual": "manual", "import": "import"}.get(self._change_set.source, "ai")
+        if kind == "axiom":
+            if axiom is None:
+                return INVALID_ITEM
+            element = Element(
+                id=uuid4(),
+                ontology_id=self._change_set.ontology_id,
+                kind="axiom",
+                local_name=None,
+                iri=None,
+                label_zh=None,
+                synonyms=[],
+                turtle=axiom.turtle,
+                subject_id=self._subject_id(axiom),
+                flags=["non_standard"] if axiom.non_standard else [],
+                required=False,
+                multiple=False,
+                auto_shape=False,
+                status="active",
+                origin=origin,
+                revision=1,
+                created_at=self._now,
+                updated_at=self._now,
+            )
+            self._db.add(element)
+            await self._db.flush()
+            self._elements[element.id] = element
+            item.applied_element_id = element.id
+            return None
+        if fields.local_name is None or fields.local_name in self._local_names:
             return INVALID_ITEM
-        if fields.local_name in self._local_names:
+        iri = fields.iri if fields.iri is not None else self._base_iri + fields.local_name
+        if iri in self._iris:
             return INVALID_ITEM
-        is_property = item.kind == "property"
+        member = kind in rules.RULE_PATH_KINDS
+        auto_shape = fields.auto_shape if fields.auto_shape is not None else fields.iri is None
         element = Element(
             id=uuid4(),
             ontology_id=self._change_set.ontology_id,
-            kind=item.kind,
+            kind=kind,
             local_name=fields.local_name,
-            label_zh=fields.label_zh.strip(),
+            iri=fields.iri,
+            label_zh=rules.clean_text(fields.label_zh),
             label_en=rules.clean_text(fields.label_en),
             definition_zh=rules.clean_text(fields.definition_zh),
             definition_en=rules.clean_text(fields.definition_en),
@@ -1120,12 +1386,16 @@ class _Merge:
             parent_id=resolved.get("parent_ref"),
             domain_id=resolved.get("domain_ref"),
             range_id=resolved.get("range_ref"),
-            datatype=fields.datatype if is_property else None,
-            unit=rules.clean_text(fields.unit) if is_property else None,
-            required=bool(fields.required) and item.kind != "entity_type",
-            multiple=bool(fields.multiple) and item.kind != "entity_type",
+            inverse_id=resolved.get("inverse_ref"),
+            datatype=fields.datatype if kind == "property" else None,
+            unit=rules.clean_text(fields.unit) if kind == "property" else None,
+            required=bool(fields.required) and member,
+            multiple=bool(fields.multiple) and member,
+            auto_shape=bool(auto_shape) and kind != "constraint",
+            rules=stored_rules if kind == "constraint" else None,
+            flags=[],
             status="active",
-            origin="manual" if self._change_set.source == "manual" else "ai",
+            origin=origin,
             revision=1,
             created_at=self._now,
             updated_at=self._now,
@@ -1133,7 +1403,8 @@ class _Merge:
         self._db.add(element)
         await self._db.flush()
         self._elements[element.id] = element
-        self._local_names.add(element.local_name)
+        self._local_names.add(fields.local_name)
+        self._iris[iri] = element
         item.applied_element_id = element.id
         return None
 
@@ -1154,6 +1425,8 @@ class _Merge:
         target: Element,
         fields: schemas.ElementFields,
         resolved: dict[str, UUID | None],
+        stored_rules: list[dict[str, Any]] | None,
+        axiom: NormalizedAxiom | None,
     ) -> str | None:
         given = fields.model_fields_set
         if "parent_ref" in resolved:
@@ -1161,12 +1434,15 @@ class _Merge:
             if parent_id is not None and self._has_ancestor(parent_id, target.id):
                 return INVALID_ITEM
             target.parent_id = parent_id
-        if "domain_ref" in resolved:
-            target.domain_id = resolved["domain_ref"]
-        if "range_ref" in resolved:
-            target.range_id = resolved["range_ref"]
-        if "label_zh" in given and fields.label_zh is not None:
-            target.label_zh = fields.label_zh.strip()
+        for name, column in (
+            ("domain_ref", "domain_id"),
+            ("range_ref", "range_id"),
+            ("inverse_ref", "inverse_id"),
+        ):
+            if name in resolved:
+                setattr(target, column, resolved[name])
+        if "label_zh" in given:
+            target.label_zh = rules.clean_text(fields.label_zh)
         if "label_en" in given:
             target.label_en = rules.clean_text(fields.label_en)
         if "definition_zh" in given:
@@ -1174,21 +1450,72 @@ class _Merge:
         if "definition_en" in given:
             target.definition_en = rules.clean_text(fields.definition_en)
         if fields.synonyms is not None:
-            target.synonyms = rules.merge_synonyms(target.synonyms, fields.synonyms)
+            if self._replace_synonyms:
+                target.synonyms = rules.merge_synonyms(fields.synonyms)
+            else:
+                target.synonyms = rules.merge_synonyms(target.synonyms, fields.synonyms)
         if item.kind == "property":
-            if fields.datatype is not None:
+            if "datatype" in given:
                 target.datatype = fields.datatype
             if "unit" in given:
                 target.unit = rules.clean_text(fields.unit)
-        if item.kind != "entity_type":
+        if item.kind in rules.RULE_PATH_KINDS:
             if fields.required is not None:
                 target.required = fields.required
             if fields.multiple is not None:
                 target.multiple = fields.multiple
+        if fields.auto_shape is not None and item.kind != "constraint":
+            target.auto_shape = fields.auto_shape
+        if stored_rules is not None and item.kind == "constraint":
+            target.rules = stored_rules
+        if axiom is not None:
+            target.turtle = axiom.turtle
+            target.flags = ["non_standard"] if axiom.non_standard else []
+            target.subject_id = self._subject_id(axiom)
+        if item.op == "restore":
+            target.status = "active"
         target.revision += 1
         target.updated_at = self._now
         item.applied_element_id = target.id
         return None
+
+    def _dependents(self, target: Element) -> bool:
+        for element in self._elements.values():
+            if element.status != "active" or element.id == target.id:
+                continue
+            columns = (element.parent_id, element.domain_id, element.range_id, element.inverse_id)
+            if target.id in columns or element.subject_id == target.id:
+                return True
+            if target.id in _rule_references(element):
+                return True
+        return False
+
+    def _delete(self, item: ChangeItem) -> str | None:
+        problem, target = self._target(item)
+        if problem is not None or target is None:
+            return problem
+        fields = rules.effective_fields(item.proposed, item.edited)
+        if rules.field_problems(item.kind, "delete", fields):
+            return INVALID_ITEM
+        if self._dependents(target):
+            return HAS_DEPENDENTS
+        target.status = "deprecated"
+        target.revision += 1
+        target.updated_at = self._now
+        item.applied_element_id = target.id
+        return None
+
+    def delete_order(self, item: ChangeItem) -> tuple[int, int, int]:
+        """Dependents first: axioms, constraints, relations and properties, then object types,
+        subtypes before their parents."""
+        depth = 0
+        element = self._elements.get(item.target_element_id) if item.target_element_id else None
+        seen: set[UUID] = set()
+        while element is not None and element.parent_id is not None and element.id not in seen:
+            seen.add(element.id)
+            depth += 1
+            element = self._elements.get(element.parent_id)
+        return (_DELETE_ORDER.get(item.kind, 9), -depth, item.seq)
 
 
 async def merge_change_set(
@@ -1200,9 +1527,11 @@ async def merge_change_set(
 ) -> schemas.MergeResult:
     """Apply the accepted items to the working version in one transaction.
 
-    Skipped items: `changeset.stale_target` when an update's target changed after the item
-    was proposed, `changeset.dependency_skipped` when a reference resolves to a rejected or
-    skipped item (also transitively), `changeset.invalid_item` when the fields do not form a
+    Creates, updates and restores come first (axioms after elements, so that an axiom finds the
+    element it is about), deletes last. Skipped items: `changeset.stale_target` when the target
+    changed after the item was proposed, `changeset.dependency_skipped` when a reference
+    resolves to a rejected or skipped item (also transitively), `changeset.has_dependents` when
+    a deleted element is still in use, `changeset.invalid_item` when the fields do not form a
     valid element, a reference is unusable, or the type hierarchy would become circular.
     """
     change_set = await _change_set_or_404(db, change_set_id)
@@ -1213,9 +1542,14 @@ async def merge_change_set(
     if any(item.decision == "pending" for item in items):
         raise AppError(409, "changeset.pending_items", "Every item needs a decision first.")
     now = _now()
-    merge = _Merge(db, change_set, await _elements(db, ontology.id), items, now)
+    merge = _Merge(db, change_set, ontology, await _elements(db, ontology.id), items, now)
     accepted = [item for item in items if item.decision == "accepted"]
-    for item in accepted:
+    ordered = [
+        *(item for item in accepted if item.op != "delete" and item.kind != "axiom"),
+        *(item for item in accepted if item.op != "delete" and item.kind == "axiom"),
+        *sorted((item for item in accepted if item.op == "delete"), key=merge.delete_order),
+    ]
+    for item in ordered:
         await merge.apply(item)
     skipped = [
         schemas.MergeSkip.model_validate({"item_id": item.id, "code": merge.outcomes[item.id]})
@@ -1246,38 +1580,65 @@ async def merge_change_set(
 def release_problems(elements: Sequence[Element]) -> list[schemas.ReleaseProblem]:
     """Publish checks (spec section 6) over the working version."""
     by_id = {element.id: element for element in elements}
-    active = sorted((e for e in elements if e.status == "active"), key=_kind_order)
+    active_elements = sorted((e for e in elements if e.status == "active"), key=_kind_order)
     problems: list[schemas.ReleaseProblem] = []
 
     def report(code: str, element: Element, message: str) -> None:
         problems.append(schemas.ReleaseProblem(code=code, element_id=element.id, message=message))
 
-    if not active:
+    if not active_elements:
         message = "The working version has no elements yet"
         return [schemas.ReleaseProblem(code="release.empty", element_id=None, message=message)]
 
-    def active_type(element_id: UUID | None) -> bool:
+    def active(element_id: UUID | None, *kinds: str) -> bool:
         target = by_id.get(element_id) if element_id is not None else None
-        return target is not None and target.kind == "entity_type" and target.status == "active"
+        return target is not None and target.kind in kinds and target.status == "active"
 
-    for element in active:
-        naming = rules.local_name_problem(element.kind, element.local_name)
+    def reference(element: Element, element_id: UUID | None, code: str, what: str) -> None:
+        # Imported elements may lack a reference (OWL allows it); a given one must be usable.
+        if element_id is None and element.iri is not None:
+            return
+        if not active(element_id, "entity_type"):
+            report(code, element, f"The {what} is missing or inactive")
+
+    for element in active_elements:
+        if element.kind == "axiom":
+            continue  # checked when merged; kept as written
+        imported = element.iri is not None
+        naming = rules.local_name_problem(element.kind, element.local_name or "", imported=imported)
         if naming:
             report("release.invalid_local_name", element, naming)
-        if rules.is_blank(element.label_zh):
+        if rules.is_blank(element.label_zh) and not imported:
             report("release.missing_label", element, "labelZh is empty")
         if element.kind == "entity_type":
-            if element.parent_id is not None and not active_type(element.parent_id):
+            if element.parent_id is not None and not active(element.parent_id, "entity_type"):
                 report("release.invalid_parent", element, "The parent type is missing or inactive")
             continue
-        if not active_type(element.domain_id):
-            report("release.invalid_domain", element, "The domain is missing or inactive")
-        if element.kind == "relation_type" and not active_type(element.range_id):
-            report("release.invalid_range", element, "The range is missing or inactive")
-        if element.kind == "property" and element.datatype not in DATATYPES:
+        if element.kind == "constraint":
+            if not active(element.domain_id, "entity_type"):
+                report("release.invalid_domain", element, "The target type is missing or inactive")
+            for rule in element.rules or []:
+                path = UUID(str(rule["pathId"]))
+                class_id = UUID(str(rule["classId"])) if rule.get("classId") else None
+                if not active(path, *rules.RULE_PATH_KINDS) or (
+                    class_id is not None and not active(class_id, "entity_type")
+                ):
+                    message = "A rule refers to an element that is missing or inactive"
+                    report("release.invalid_constraint", element, message)
+                    break
+            continue
+        reference(element, element.domain_id, "release.invalid_domain", "domain")
+        if element.kind == "relation_type":
+            reference(element, element.range_id, "release.invalid_range", "range")
+            if element.inverse_id is not None and not active(element.inverse_id, "relation_type"):
+                message = "The inverse relation is missing or inactive"
+                report("release.invalid_inverse", element, message)
+        # An imported property may have no datatype (its range is kept as an axiom).
+        missing_ok = element.datatype is None and imported
+        if element.kind == "property" and element.datatype not in DATATYPES and not missing_ok:
             report("release.invalid_datatype", element, "The datatype is missing or unknown")
 
-    for element in active:
+    for element in active_elements:
         if element.kind != "entity_type":
             continue
         current = element.parent_id
@@ -1356,7 +1717,8 @@ async def publish_release(
     )
     version = (latest or 0) + 1
     now = _now()
-    turtle = export_turtle(_header(ontology), snapshot, version=version, created=now)
+    header = header_of(ontology)
+    turtle = export_turtle(header, snapshot, version=version, created=now)
     release = Release(
         id=uuid4(),
         ontology_id=ontology_id,
@@ -1364,6 +1726,7 @@ async def publish_release(
         title=body.title,
         notes=rules.clean_text(body.notes),
         snapshot=[element.model_dump(mode="json", by_alias=True) for element in snapshot],
+        header={"ontologyIri": header.ontology_iri, "prefixes": header.prefix_map()},
         turtle=turtle,
         turtle_sha256=hashlib.sha256(turtle.encode()).hexdigest(),
         element_count=len(snapshot),

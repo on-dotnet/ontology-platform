@@ -1,14 +1,15 @@
 """API models of the ontology module.
 
-Names and fields follow docs/specs/001-m1-api-shapes.md. `ProposedItem`, `ElementFields` and
-`EvidenceIn` are also the Python interface through which other modules propose changes.
+Names and fields follow docs/specs/001-m1-api-shapes.md and 002-m2-api-shapes.md.
+`ProposedItem`, `ElementFields` and `EvidenceIn` are also the Python interface through which
+other modules propose changes.
 """
 
 from datetime import datetime
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 from uuid import UUID
 
-from pydantic import Field, StringConstraints
+from pydantic import Field, StringConstraints, model_validator
 
 from ontology_platform.errors import Problem
 from ontology_platform.modules.ontology.models import (
@@ -17,6 +18,7 @@ from ontology_platform.modules.ontology.models import (
     ChangeSetStatus,
     Datatype,
     Decision,
+    ElementFlag,
     ElementStatus,
     ItemFlag,
     Kind,
@@ -25,11 +27,22 @@ from ontology_platform.modules.ontology.models import (
 from ontology_platform.schemas import CamelModel
 
 KEY_PATTERN = r"^[a-z][a-z0-9-]{1,62}$"
+IRI_MAX_LENGTH = 2048
+TURTLE_MAX_LENGTH = 20_000
 
 SkipCode = Literal[
     "changeset.stale_target",
     "changeset.dependency_skipped",
     "changeset.invalid_item",
+    "changeset.has_dependents",
+]
+NodeKind = Literal[
+    "IRI",
+    "Literal",
+    "BlankNode",
+    "BlankNodeOrIRI",
+    "BlankNodeOrLiteral",
+    "IRIOrLiteral",
 ]
 
 Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
@@ -41,16 +54,77 @@ class Synonym(CamelModel):
     text: str = Field(min_length=1, max_length=200)
 
 
+class RdfValue(CamelModel):
+    """An RDF value as written: an IRI, or a literal with its exact spelling.
+
+    `datatype` is an XSD local name (such as "integer") or a full IRI; null for plain text.
+    """
+
+    iri: str | None = Field(default=None, max_length=IRI_MAX_LENGTH)
+    lexical: str | None = Field(default=None, max_length=4000)
+    datatype: str | None = Field(default=None, max_length=IRI_MAX_LENGTH)
+    lang: str | None = Field(default=None, max_length=35)
+
+    @model_validator(mode="after")
+    def _one_kind(self) -> Self:
+        if (self.iri is None) == (self.lexical is None):
+            raise ValueError("give either iri or lexical")
+        if self.iri is not None and (self.datatype is not None or self.lang is not None):
+            raise ValueError("an IRI has no datatype or language")
+        return self
+
+
+class LangText(CamelModel):
+    lang: str | None = Field(default=None, max_length=35)
+    text: str = Field(min_length=1, max_length=2000)
+
+
+class _RuleValues(CamelModel):
+    """The checks of one sh:property (spec 002, 3.3), without the references."""
+
+    min_count: int | None = Field(default=None, ge=0)
+    max_count: int | None = Field(default=None, ge=0)
+    datatype: str | None = Field(default=None, max_length=IRI_MAX_LENGTH)
+    node_kind: NodeKind | None = None
+    # sh:in. `allowedValuesLost` marks a list Protégé dropped (sh:in points at nothing).
+    allowed_values: list[RdfValue] | None = Field(default=None, max_length=1000)
+    allowed_values_lost: bool = False
+    min_inclusive: RdfValue | None = None
+    max_inclusive: RdfValue | None = None
+    min_exclusive: RdfValue | None = None
+    max_exclusive: RdfValue | None = None
+    min_length: int | None = Field(default=None, ge=0)
+    max_length: int | None = Field(default=None, ge=0)
+    pattern: str | None = Field(default=None, max_length=2000)
+    flags: str | None = Field(default=None, max_length=16)
+    message: list[LangText] = Field(default_factory=list, max_length=20)
+
+
+class ConstraintRule(_RuleValues):
+    path_id: UUID
+    class_id: UUID | None = None
+
+
+class ConstraintRuleFields(_RuleValues):
+    """A rule in a change item: references are element ids or temp_refs."""
+
+    path_ref: Ref
+    class_ref: Ref | None = None
+
+
 class ElementFields(CamelModel):
     """Proposed or edited fields of an element; every field is optional.
 
     Which keys were given matters: only those are stored, returned and applied, and an explicit
-    null clears a value. References (`parentRef`, `domainRef`, `rangeRef`) hold an element id or
-    the `temp_ref` of a create item in the same change set. Rules that depend on the kind
-    (required fields, naming, references) are checked by the service.
+    null clears a value. References (`parentRef`, `domainRef`, `rangeRef`, `inverseRef` and the
+    rules' `pathRef` / `classRef`) hold an element id or the `temp_ref` of a create item in the
+    same change set. Rules that depend on the kind (required fields, naming, references) are
+    checked by the service.
     """
 
     local_name: str | None = Field(default=None, max_length=128)
+    # Only for elements brought by an import; elements made in the platform derive their IRI.
+    iri: str | None = Field(default=None, max_length=IRI_MAX_LENGTH)
     label_zh: str | None = Field(default=None, max_length=200)
     label_en: str | None = Field(default=None, max_length=200)
     definition_zh: str | None = Field(default=None, max_length=4000)
@@ -59,10 +133,14 @@ class ElementFields(CamelModel):
     parent_ref: Ref | None = None
     domain_ref: Ref | None = None
     range_ref: Ref | None = None
+    inverse_ref: Ref | None = None
     datatype: Datatype | None = None
     unit: str | None = Field(default=None, max_length=32)
     required: bool | None = None
     multiple: bool | None = None
+    auto_shape: bool | None = None
+    rules: list[ConstraintRuleFields] | None = Field(default=None, max_length=200)
+    turtle: str | None = Field(default=None, max_length=TURTLE_MAX_LENGTH)
 
 
 class EvidenceIn(CamelModel):
@@ -100,9 +178,12 @@ class OntologySummary(CamelModel):
     name: str
     description: str | None
     base_iri: str
+    ontology_iri: str
     entity_type_count: int
     relation_type_count: int
     property_count: int
+    constraint_count: int
+    axiom_count: int
     open_change_set_count: int
     active_release_id: UUID | None
     active_release_version: int | None
@@ -120,9 +201,12 @@ class Element(CamelModel):
     id: UUID
     ontology_id: UUID
     kind: Kind
-    local_name: str
-    iri: str
-    label_zh: str
+    # Null for axioms, which have no IRI of their own.
+    local_name: str | None
+    iri: str | None
+    # True when the IRI came with an import rather than from baseIri + localName.
+    explicit_iri: bool
+    label_zh: str | None
     label_en: str | None
     definition_zh: str | None
     definition_en: str | None
@@ -130,10 +214,17 @@ class Element(CamelModel):
     parent_id: UUID | None
     domain_id: UUID | None
     range_id: UUID | None
+    inverse_id: UUID | None
     datatype: Datatype | None
     unit: str | None
     required: bool
     multiple: bool
+    # Whether required / multiple are exported in the platform's generated SHACL shape.
+    auto_shape: bool
+    rules: list[ConstraintRule] | None
+    turtle: str | None
+    subject_id: UUID | None
+    flags: list[ElementFlag]
     status: ElementStatus
     origin: Origin
     revision: int
@@ -168,7 +259,7 @@ class ElementDetail(Element):
 class GraphNode(CamelModel):
     id: UUID
     label: str
-    local_name: str
+    local_name: str | None
     parent_id: UUID | None
     property_count: int
 
@@ -257,6 +348,38 @@ class MergeSkip(CamelModel):
 class MergeResult(CamelModel):
     applied: int
     skipped: list[MergeSkip]
+
+
+# ---------- import ----------
+
+ImportWarningCode = Literal["non_standard", "multiple_parents", "unsupported_shape", "lost_list"]
+
+
+class ImportCounts(CamelModel):
+    create: int
+    update: int
+    delete: int
+    restore: int
+
+
+class ImportWarning(CamelModel):
+    code: ImportWarningCode
+    count: int
+
+
+class ImportResult(CamelModel):
+    ontology: OntologySummary
+    # Null when the file holds nothing the ontology does not already have.
+    change_set_id: UUID | None
+    counts: ImportCounts
+    warnings: list[ImportWarning]
+
+
+class ImportParseProblem(Problem):
+    """422 `import.parse_error`: where the file stopped being valid, when known."""
+
+    line: int | None
+    column: int | None
 
 
 # ---------- releases ----------

@@ -1,0 +1,698 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix ontology-cb4989: <https://example.org/ontology/ontology-cb4989#> .
+@prefix op: <https://w3id.org/ontology-platform/vocab#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://example.org/ontology/ontology-cb4989> a owl:Ontology ;
+    dcterms:created "2026-11-23T12:54:14+00:00"^^xsd:dateTime ;
+    rdfs:label "钢铁冶金" ;
+    owl:versionInfo "1" .
+
+dcterms:created a owl:AnnotationProperty .
+
+skos:altLabel a owl:AnnotationProperty .
+
+skos:definition a owl:AnnotationProperty .
+
+ontology-cb4989:BlowingEndpointMeasurementAndSampling a owl:Class ;
+    rdfs:label "Blowing endpoint measurement and sampling"@en, "吹炼终点测温取样"@zh ;
+    skos:definition "在吹炼终点测量温度并取样，以记录终点温度和终点碳含量的操作。"@zh .
+
+ontology-cb4989:BlowingEndpointMeasurementAndSampling-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:endpointCarbonContent ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:endpointTemperature ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:BlowingEndpointMeasurementAndSampling .
+
+ontology-cb4989:Charging a owl:Class ;
+    rdfs:label "Charging"@en, "装料"@zh ;
+    skos:definition "将某炉次所需的铁水和废钢装入转炉的操作。"@zh .
+
+ontology-cb4989:Charging-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:hotMetalRatio ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:Charging .
+
+ontology-cb4989:ContinuousCastingMachine a owl:Class ;
+    rdfs:label "Continuous casting machine"@en, "连铸机"@zh ;
+    skos:definition "配置钢包回转台以接收精炼后钢包的连铸设备。"@zh .
+
+ontology-cb4989:ContinuousCastingMachine-shape a sh:NodeShape ;
+    sh:targetClass ontology-cb4989:ContinuousCastingMachine .
+
+ontology-cb4989:Converter a owl:Class ;
+    rdfs:label "Converter"@en, "转炉"@zh ;
+    skos:altLabel "顶底复吹转炉"@zh ;
+    skos:definition "采用顶底复吹方式进行冶炼的转炉；本规程适用于其中的 120 吨转炉。"@zh .
+
+ontology-cb4989:Converter-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:nominalConverterCapacity ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:Converter .
+
+ontology-cb4989:ConverterBlowing a owl:Class ;
+    rdfs:label "Converter blowing"@en, "吹炼"@zh ;
+    skos:definition "转炉冶炼中按钢种要求控制终点碳含量的操作。"@zh .
+
+ontology-cb4989:ConverterBlowing-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:hasEndpointMeasurementAndSampling ;
+        sh:class ontology-cb4989:BlowingEndpointMeasurementAndSampling ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:isControlledBySteelGrade ;
+        sh:class ontology-cb4989:SteelGrade ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:ConverterBlowing .
+
+ontology-cb4989:FinalSteelSample a owl:Class ;
+    rdfs:label "Final steel sample"@en, "成品样"@zh ;
+    skos:definition "精炼结束时取得、用于按钢种要求判定化学成分的样品。"@zh .
+
+ontology-cb4989:FinalSteelSample-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:carbonMassFraction ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:isAssessedAgainstSteelGrade ;
+        sh:class ontology-cb4989:SteelGrade ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:manganeseMassFraction ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:phosphorusMassFraction ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:siliconMassFraction ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:sulfurMassFraction ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:FinalSteelSample .
+
+ontology-cb4989:Heat a owl:Class ;
+    rdfs:label "Heat"@en, "炉次"@zh ;
+    skos:definition "从转炉装料到出钢完成的一次冶炼，以炉号唯一标识。"@zh .
+
+ontology-cb4989:Heat-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:hasCharging ;
+        sh:class ontology-cb4989:Charging ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:hasConverterBlowing ;
+        sh:class ontology-cb4989:ConverterBlowing ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:hasRefiningTreatment ;
+        sh:class ontology-cb4989:RefiningTreatment ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:hasReturnToFurnaceTreatment ;
+        sh:class ontology-cb4989:ReturnToFurnaceTreatment ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:hasSteelGradeReassignment ;
+        sh:class ontology-cb4989:SteelGradeReassignment ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:hasTapping ;
+        sh:class ontology-cb4989:Tapping ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:hasTargetSteelGrade ;
+        sh:class ontology-cb4989:SteelGrade ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:heatNumber ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:isSmeltedInConverter ;
+        sh:class ontology-cb4989:Converter ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:plannedTappingMass ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:Heat .
+
+ontology-cb4989:Ladle a owl:Class ;
+    rdfs:label "Ladle"@en, "钢包"@zh ;
+    skos:altLabel "盛钢桶"@zh ;
+    skos:definition "以包号识别、循环用于盛装和运输钢水的耐火容器。"@zh .
+
+ontology-cb4989:Ladle-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:ladleNumber ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:Ladle .
+
+ontology-cb4989:LadleFurnace a owl:Class ;
+    rdfs:label "LF 精炼炉"@zh, "Ladle furnace"@en ;
+    skos:definition "接收钢包、用于对炉次进行钢包精炼的设备。"@zh .
+
+ontology-cb4989:LadleFurnace-shape a sh:NodeShape ;
+    sh:targetClass ontology-cb4989:LadleFurnace .
+
+ontology-cb4989:LadleTransfer a owl:Class ;
+    rdfs:label "Ladle transfer"@en, "钢包吊运"@zh ;
+    skos:definition "将盛装钢水的钢包吊运至 LF 精炼炉或连铸机钢包回转台的操作。"@zh .
+
+ontology-cb4989:LadleTransfer-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:hasLadleFurnaceDestination ;
+        sh:class ontology-cb4989:LadleFurnace ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:hasLadleTurretDestination ;
+        sh:class ontology-cb4989:LadleTurret ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:transfersLadle ;
+        sh:class ontology-cb4989:Ladle ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:LadleTransfer .
+
+ontology-cb4989:LadleTurret a owl:Class ;
+    rdfs:label "Ladle turret"@en, "钢包回转台"@zh ;
+    skos:definition "连铸机上接收精炼后吊运钢包的装置。"@zh .
+
+ontology-cb4989:LadleTurret-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:belongsToContinuousCastingMachine ;
+        sh:class ontology-cb4989:ContinuousCastingMachine ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:LadleTurret .
+
+ontology-cb4989:MoltenSteel a owl:Class ;
+    rdfs:label "Molten steel"@en, "钢水"@zh ;
+    skos:definition "一个炉次出钢时倒入钢包、随后运往精炼炉的钢液。"@zh .
+
+ontology-cb4989:MoltenSteel-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:isCarriedInLadle ;
+        sh:class ontology-cb4989:Ladle ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:MoltenSteel .
+
+ontology-cb4989:RefiningTreatment a owl:Class ;
+    rdfs:label "Refining treatment"@en, "精炼处理"@zh ;
+    skos:definition "一个炉次在 LF 精炼炉接受的一次钢包精炼。"@zh .
+
+ontology-cb4989:RefiningTreatment-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:arrivalTemperature ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:departureTemperature ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:isFollowedByCastingTransfer ;
+        sh:class ontology-cb4989:LadleTransfer ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:isPerformedInLadleFurnace ;
+        sh:class ontology-cb4989:LadleFurnace ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:producesFinalSteelSample ;
+        sh:class ontology-cb4989:FinalSteelSample ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:refiningDuration ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:wireFeedQuantity ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:RefiningTreatment .
+
+ontology-cb4989:ReturnToFurnaceTreatment a owl:Class ;
+    rdfs:label "Return-to-furnace treatment"@en, "回炉处理"@zh ;
+    skos:definition "将化学成分不合格的炉次送回炉内处理的处置操作。"@zh .
+
+ontology-cb4989:ReturnToFurnaceTreatment-shape a sh:NodeShape ;
+    sh:targetClass ontology-cb4989:ReturnToFurnaceTreatment .
+
+ontology-cb4989:SteelGrade a owl:Class ;
+    rdfs:label "Steel grade"@en, "钢种"@zh ;
+    skos:definition "按化学成分和性能要求划分、用于指定炉次生产目标的钢的牌号。"@zh .
+
+ontology-cb4989:SteelGrade-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:gradeDesignation ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:maxFinalCarbonMassFraction ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:maxFinalManganeseMassFraction ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:maxFinalPhosphorusMassFraction ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:maxFinalSiliconMassFraction ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:maxFinalSulfurMassFraction ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:maxTargetTappingTemperature ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ], [
+        sh:path ontology-cb4989:minTargetTappingTemperature ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:SteelGrade .
+
+ontology-cb4989:SteelGradeReassignment a owl:Class ;
+    rdfs:label "Steel grade reassignment"@en, "改判钢种"@zh ;
+    skos:definition "对化学成分不合格的炉次重新判定钢种的处置操作。"@zh .
+
+ontology-cb4989:SteelGradeReassignment-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:assignsSteelGrade ;
+        sh:class ontology-cb4989:SteelGrade ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:SteelGradeReassignment .
+
+ontology-cb4989:Tapping a owl:Class ;
+    rdfs:label "Tapping"@en, "出钢"@zh ;
+    skos:definition "将某炉次的钢水从转炉倒入钢包的操作。"@zh .
+
+ontology-cb4989:Tapping-shape a sh:NodeShape ;
+    sh:property [
+        sh:path ontology-cb4989:isFollowedByRefiningTransfer ;
+        sh:class ontology-cb4989:LadleTransfer ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:tappingMass ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:tappingTemperature ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:tapsMoltenSteel ;
+        sh:class ontology-cb4989:MoltenSteel ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path ontology-cb4989:usesTappingLadle ;
+        sh:class ontology-cb4989:Ladle ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass ontology-cb4989:Tapping .
+
+ontology-cb4989:arrivalTemperature a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:RefiningTreatment ;
+    rdfs:label "Refining arrival temperature"@en, "进站温度"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "该次精炼处理记录的进站温度。"@zh .
+
+ontology-cb4989:assignsSteelGrade a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:SteelGradeReassignment ;
+    rdfs:label "Reassigned steel grade"@en, "改判后钢种"@zh ;
+    rdfs:range ontology-cb4989:SteelGrade ;
+    skos:definition "一次完成的改判操作为该炉次重新判定的钢种。"@zh .
+
+ontology-cb4989:belongsToContinuousCastingMachine a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:LadleTurret ;
+    rdfs:label "Turret's continuous casting machine"@en, "回转台所属连铸机"@zh ;
+    rdfs:range ontology-cb4989:ContinuousCastingMachine ;
+    skos:definition "配置该钢包回转台的连铸机。"@zh .
+
+ontology-cb4989:carbonMassFraction a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:FinalSteelSample ;
+    rdfs:label "Sample carbon mass fraction"@en, "样品碳质量分数"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "成品样中碳的质量分数，用于与适用钢种的碳限值比较。"@zh ;
+    op:unit "%" .
+
+ontology-cb4989:departureTemperature a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:RefiningTreatment ;
+    rdfs:label "Refining departure temperature"@en, "出站温度"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "该次精炼处理记录的出站温度。"@zh .
+
+ontology-cb4989:endpointCarbonContent a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:BlowingEndpointMeasurementAndSampling ;
+    rdfs:label "Endpoint carbon content"@en, "终点碳含量"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "吹炼终点测温取样后记录的碳含量。"@zh .
+
+ontology-cb4989:endpointTemperature a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:BlowingEndpointMeasurementAndSampling ;
+    rdfs:label "Endpoint temperature"@en, "终点温度"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "吹炼终点测温取样后记录的温度。"@zh .
+
+ontology-cb4989:gradeDesignation a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:SteelGrade ;
+    rdfs:label "Steel grade designation"@en, "钢种牌号"@zh ;
+    rdfs:range xsd:string ;
+    skos:definition "表示钢种的牌号，例如 Q235B。"@zh .
+
+ontology-cb4989:hasCharging a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:Heat ;
+    rdfs:label "Heat charging"@en, "炉次装料"@zh ;
+    rdfs:range ontology-cb4989:Charging ;
+    skos:definition "为该炉次向转炉装入铁水和废钢的装料工序。"@zh .
+
+ontology-cb4989:hasConverterBlowing a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:Heat ;
+    rdfs:label "Heat blowing"@en, "炉次吹炼"@zh ;
+    rdfs:range ontology-cb4989:ConverterBlowing ;
+    skos:definition "该炉次在转炉中进行的吹炼工序。"@zh .
+
+ontology-cb4989:hasEndpointMeasurementAndSampling a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:ConverterBlowing ;
+    rdfs:label "Endpoint measurement and sampling"@en, "终点测温取样"@zh ;
+    rdfs:range ontology-cb4989:BlowingEndpointMeasurementAndSampling ;
+    skos:definition "在该吹炼工序终点进行的测温取样操作。"@zh .
+
+ontology-cb4989:hasLadleFurnaceDestination a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:LadleTransfer ;
+    rdfs:label "Destination ladle furnace"@en, "吊运目的精炼炉"@zh ;
+    rdfs:range ontology-cb4989:LadleFurnace ;
+    skos:definition "出钢后吊运所到达的 LF 精炼炉。"@zh .
+
+ontology-cb4989:hasLadleTurretDestination a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:LadleTransfer ;
+    rdfs:label "Destination ladle turret"@en, "吊运目的钢包回转台"@zh ;
+    rdfs:range ontology-cb4989:LadleTurret ;
+    skos:definition "精炼后赴连铸吊运所到达的钢包回转台。"@zh .
+
+ontology-cb4989:hasRefiningTreatment a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:Heat ;
+    rdfs:label "Heat refining treatment"@en, "炉次精炼处理"@zh ;
+    rdfs:range ontology-cb4989:RefiningTreatment ;
+    skos:definition "该炉次在规程所述正常流程中接受的一次 LF 钢包精炼。"@zh .
+
+ontology-cb4989:hasReturnToFurnaceTreatment a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:Heat ;
+    rdfs:label "Heat return-to-furnace treatment"@en, "炉次回炉处置"@zh ;
+    rdfs:range ontology-cb4989:ReturnToFurnaceTreatment ;
+    skos:definition "化学成分不合格时，将该炉次送回炉内处理的处置。"@zh .
+
+ontology-cb4989:hasSteelGradeReassignment a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:Heat ;
+    rdfs:label "Heat grade reassignment"@en, "炉次改判处置"@zh ;
+    rdfs:range ontology-cb4989:SteelGradeReassignment ;
+    skos:definition "化学成分不合格时，对该炉次重新判定钢种的处置。"@zh .
+
+ontology-cb4989:hasTapping a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:Heat ;
+    rdfs:label "Heat tapping"@en, "炉次出钢"@zh ;
+    rdfs:range ontology-cb4989:Tapping ;
+    skos:definition "将该炉次钢水倒入钢包、完成转炉冶炼的出钢工序。"@zh .
+
+ontology-cb4989:hasTargetSteelGrade a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:Heat ;
+    rdfs:label "Target steel grade"@en, "生产钢种"@zh ;
+    rdfs:range ontology-cb4989:SteelGrade ;
+    skos:definition "炉次按其生产计划冶炼的钢种。"@zh .
+
+ontology-cb4989:heatNumber a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:Heat ;
+    rdfs:label "Heat number"@en, "炉号"@zh ;
+    rdfs:range xsd:string ;
+    skos:definition "由年份、转炉编号和流水号组成的炉次唯一标识。"@zh .
+
+ontology-cb4989:hotMetalRatio a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:Charging ;
+    rdfs:label "Hot metal ratio"@en, "铁水比"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "该炉次装料的铁水比例，规程要求不低于 85%。"@zh ;
+    op:unit "%" .
+
+ontology-cb4989:isAssessedAgainstSteelGrade a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:FinalSteelSample ;
+    rdfs:label "Steel grade for sample assessment"@en, "成品样判定依据钢种"@zh ;
+    rdfs:range ontology-cb4989:SteelGrade ;
+    skos:definition "成品样化学成分判定所依据的炉次生产钢种。"@zh .
+
+ontology-cb4989:isCarriedInLadle a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:MoltenSteel ;
+    rdfs:label "Molten steel carrying ladle"@en, "钢水承装钢包"@zh ;
+    rdfs:range ontology-cb4989:Ladle ;
+    skos:definition "承装该炉次出钢钢水并将其送往精炼炉的钢包。"@zh .
+
+ontology-cb4989:isControlledBySteelGrade a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:ConverterBlowing ;
+    rdfs:label "Steel grade governing blowing"@en, "吹炼控制依据钢种"@zh ;
+    rdfs:range ontology-cb4989:SteelGrade ;
+    skos:definition "为吹炼终点碳含量控制提供要求的钢种。"@zh .
+
+ontology-cb4989:isFollowedByCastingTransfer a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:RefiningTreatment ;
+    rdfs:label "Post-refining transfer to casting"@en, "精炼后赴连铸吊运"@zh ;
+    rdfs:range ontology-cb4989:LadleTransfer ;
+    skos:definition "精炼结束后，将允许送连铸的炉次的钢包吊运至钢包回转台的操作。"@zh .
+
+ontology-cb4989:isFollowedByRefiningTransfer a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:Tapping ;
+    rdfs:label "Post-tapping transfer to refining"@en, "出钢后赴精炼吊运"@zh ;
+    rdfs:range ontology-cb4989:LadleTransfer ;
+    skos:definition "出钢后将承装钢水的钢包吊运至 LF 精炼炉的操作。"@zh .
+
+ontology-cb4989:isPerformedInLadleFurnace a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:RefiningTreatment ;
+    rdfs:label "Treatment ladle furnace"@en, "处理所在精炼炉"@zh ;
+    rdfs:range ontology-cb4989:LadleFurnace ;
+    skos:definition "实施该次精炼处理的 LF 精炼炉。"@zh .
+
+ontology-cb4989:isSmeltedInConverter a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:Heat ;
+    rdfs:label "Smelting converter"@en, "冶炼转炉"@zh ;
+    rdfs:range ontology-cb4989:Converter ;
+    skos:definition "完成该炉次从装料到出钢的顶底复吹转炉。"@zh .
+
+ontology-cb4989:ladleNumber a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:Ladle ;
+    rdfs:label "Ladle number"@en, "包号"@zh ;
+    rdfs:range xsd:string ;
+    skos:definition "识别钢包并在出钢后登记的编号。"@zh .
+
+ontology-cb4989:manganeseMassFraction a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:FinalSteelSample ;
+    rdfs:label "Sample manganese mass fraction"@en, "样品锰质量分数"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "成品样中锰的质量分数，用于与适用钢种的锰限值比较。"@zh ;
+    op:unit "%" .
+
+ontology-cb4989:maxFinalCarbonMassFraction a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:SteelGrade ;
+    rdfs:label "Maximum final carbon mass fraction"@en, "成品碳质量分数上限"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "钢种规定的成品碳质量分数允许上限；Q235B 为 0.20%。"@zh ;
+    op:unit "%" .
+
+ontology-cb4989:maxFinalManganeseMassFraction a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:SteelGrade ;
+    rdfs:label "Maximum final manganese mass fraction"@en, "成品锰质量分数上限"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "钢种规定的成品锰质量分数允许上限；Q235B 为 1.40%。"@zh ;
+    op:unit "%" .
+
+ontology-cb4989:maxFinalPhosphorusMassFraction a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:SteelGrade ;
+    rdfs:label "Maximum final phosphorus mass fraction"@en, "成品磷质量分数上限"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "钢种规定的成品磷质量分数允许上限；Q235B 为 0.045%。"@zh ;
+    op:unit "%" .
+
+ontology-cb4989:maxFinalSiliconMassFraction a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:SteelGrade ;
+    rdfs:label "Maximum final silicon mass fraction"@en, "成品硅质量分数上限"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "钢种规定的成品硅质量分数允许上限；Q235B 为 0.35%。"@zh ;
+    op:unit "%" .
+
+ontology-cb4989:maxFinalSulfurMassFraction a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:SteelGrade ;
+    rdfs:label "Maximum final sulfur mass fraction"@en, "成品硫质量分数上限"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "钢种规定的成品硫质量分数允许上限；Q235B 为 0.045%。"@zh ;
+    op:unit "%" .
+
+ontology-cb4989:maxTargetTappingTemperature a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:SteelGrade ;
+    rdfs:label "Maximum target tapping temperature"@en, "目标出钢温度上限"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "钢种规定的目标出钢温度区间的上端值；Q235B 为 1670 ℃。"@zh ;
+    op:unit "℃" .
+
+ontology-cb4989:minTargetTappingTemperature a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:SteelGrade ;
+    rdfs:label "Minimum target tapping temperature"@en, "目标出钢温度下限"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "钢种规定的目标出钢温度区间的下端值；Q235B 为 1650 ℃。"@zh ;
+    op:unit "℃" .
+
+ontology-cb4989:nominalConverterCapacity a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:Converter ;
+    rdfs:label "Nominal converter capacity"@en, "转炉公称吨位"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "标示转炉规格的吨位；本规程适用的转炉规格为 120 吨。"@zh ;
+    op:unit "t" .
+
+ontology-cb4989:phosphorusMassFraction a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:FinalSteelSample ;
+    rdfs:label "Sample phosphorus mass fraction"@en, "样品磷质量分数"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "成品样中磷的质量分数，用于与适用钢种的磷限值比较。"@zh ;
+    op:unit "%" .
+
+ontology-cb4989:plannedTappingMass a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:Heat ;
+    rdfs:label "Planned tapping mass"@en, "计划出钢量"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "装料前为该炉次登记的计划出钢重量。"@zh ;
+    op:unit "t" .
+
+ontology-cb4989:producesFinalSteelSample a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:RefiningTreatment ;
+    rdfs:label "Refining final steel sample"@en, "精炼成品样"@zh ;
+    rdfs:range ontology-cb4989:FinalSteelSample ;
+    skos:definition "该次精炼结束时取得、用于化学成分判定的成品样。"@zh .
+
+ontology-cb4989:refiningDuration a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:RefiningTreatment ;
+    rdfs:label "Refining duration"@en, "精炼时间"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "该次精炼处理的持续时间，以分钟计。"@zh ;
+    op:unit "min" .
+
+ontology-cb4989:siliconMassFraction a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:FinalSteelSample ;
+    rdfs:label "Sample silicon mass fraction"@en, "样品硅质量分数"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "成品样中硅的质量分数，用于与适用钢种的硅限值比较。"@zh ;
+    op:unit "%" .
+
+ontology-cb4989:sulfurMassFraction a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:FinalSteelSample ;
+    rdfs:label "Sample sulfur mass fraction"@en, "样品硫质量分数"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "成品样中硫的质量分数，用于与适用钢种的硫限值比较。"@zh ;
+    op:unit "%" .
+
+ontology-cb4989:tappingMass a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:Tapping ;
+    rdfs:label "Tapping mass"@en, "出钢量"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "该次出钢从转炉倒入钢包的钢水实际重量。"@zh ;
+    op:unit "t" .
+
+ontology-cb4989:tappingTemperature a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:Tapping ;
+    rdfs:label "Tapping temperature"@en, "出钢温度"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "钢水从转炉倒入钢包时测得并在出钢后记录的温度。"@zh ;
+    op:unit "℃" .
+
+ontology-cb4989:tapsMoltenSteel a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:Tapping ;
+    rdfs:label "Tapped molten steel"@en, "出钢钢水"@zh ;
+    rdfs:range ontology-cb4989:MoltenSteel ;
+    skos:definition "该次出钢从转炉倒入钢包的钢水，按炉次计为一批。"@zh .
+
+ontology-cb4989:transfersLadle a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:LadleTransfer ;
+    rdfs:label "Transferred ladle"@en, "吊运钢包"@zh ;
+    rdfs:range ontology-cb4989:Ladle ;
+    skos:definition "该次吊运中承装钢水并被移动的钢包。"@zh .
+
+ontology-cb4989:usesTappingLadle a owl:ObjectProperty ;
+    rdfs:domain ontology-cb4989:Tapping ;
+    rdfs:label "Tapping ladle"@en, "出钢所用钢包"@zh ;
+    rdfs:range ontology-cb4989:Ladle ;
+    skos:definition "接收该次出钢钢水并在出钢后登记包号的钢包。"@zh .
+
+ontology-cb4989:wireFeedQuantity a owl:DatatypeProperty ;
+    rdfs:domain ontology-cb4989:RefiningTreatment ;
+    rdfs:label "Wire feed quantity"@en, "喂线量"@zh ;
+    rdfs:range xsd:decimal ;
+    skos:definition "该次精炼处理记录的喂线用量。"@zh .
+
+op:unit a owl:AnnotationProperty .
+

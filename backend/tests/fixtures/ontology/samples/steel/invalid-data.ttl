@@ -1,0 +1,10 @@
+@prefix ex: <urn:synthetic:metals:> .
+@prefix op: <urn:ontology-platform:vocabulary:> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<urn:synthetic:org-demo:site-a:local:bad> a ex:Coil ; op:synthetic true ; op:organizationId "org-demo" ; op:siteId "site-a" ; op:weight "错误" .
