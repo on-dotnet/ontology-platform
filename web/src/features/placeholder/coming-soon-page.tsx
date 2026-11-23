@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { EmptyState, type StateTone } from '@/components/states/empty-state';
 import { Card } from '@/components/ui/card';
 
-export type ComingSoonSection = 'documents' | 'review' | 'ontology' | 'data' | 'explore' | 'releases';
+export type ComingSoonSection = 'data' | 'explore';
 
 interface ComingSoonPageProps {
   section: ComingSoonSection;
@@ -13,7 +13,7 @@ interface ComingSoonPageProps {
   tone?: StateTone;
 }
 
-/** M0 placeholder: page header with ⓘ plus one sentence on what the page will do. No sample data. */
+/** Placeholder for sections that are not built yet: page header with ⓘ plus one sentence on what the page will do. No sample data. */
 export function ComingSoonPage({ section, icon, tone = 'primary' }: ComingSoonPageProps) {
   const { t } = useTranslation();
   return (

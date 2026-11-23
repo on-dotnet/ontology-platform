@@ -12,10 +12,14 @@
   logs [服务]       查看最近日志，例如 ./dev.ps1 logs api
   build             只构建 api、web 镜像
   lock [api|web]    在容器里重新生成依赖锁文件（uv.lock / pnpm-lock.yaml）并取回本机
-  test-api          后端检查：ruff、mypy、pytest（临时数据库，跑完删除）
+  test-api [参数]   后端检查：ruff、mypy、pytest（临时数据库，跑完删除）；
+                    带参数时只运行 pytest <参数>，如 test-api tests/test_ai_pipeline.py -x
   test-web          前端检查：eslint、tsc、vitest
   test              依次运行 test-api、test-web
   gen-api           从后端导出 OpenAPI，并生成前端类型 web/src/api/schema.d.ts
+  fmt <文件...>     用容器里的 ruff 修复并格式化指定的 backend 文件（经标准输入，只改这些文件）
+  ai-check          在容器里实际调用一次模型，只显示能否连通，不显示地址与 Key
+  eval [案例]       用真实模型识别 samples/<案例>（默认 steel）并按期望答案打分，结果存 .verification/eval/（会产生模型费用）
   ci [-Report]      完整门禁：compose 校验、test-api、test-web、构建镜像；-Report 把结果写成提交状态 local-ci
   psql              打开开发库的 psql
   init-env          由 .env.example 生成本机私有配置 .env.local（已存在则不动；由用户本人运行）
@@ -135,7 +139,7 @@ function Invoke-Up {
 }
 
 # 在工具容器里运行检查。输出照常显示；返回退出码。
-function Invoke-ToolTest([string]$Service) {
+function Invoke-ToolTest([string]$Service, [string[]]$Command = @()) {
     Confirm-BaseImages
     Write-Step "构建工具镜像 $Service（纳入当前工作区代码）"
     Invoke-Compose --profile tools build $Service
@@ -144,7 +148,7 @@ function Invoke-ToolTest([string]$Service) {
     $composeArgs = Get-ComposeArgs
     Write-Step "运行 $Service（临时容器 $name）"
     try {
-        docker compose @composeArgs --profile tools run --rm -T --name $name $Service | Out-Host
+        docker compose @composeArgs --profile tools run --rm -T --name $name $Service @Command | Out-Host
         $code = $LASTEXITCODE
     } finally {
         docker rm -f $name *> $null
@@ -240,6 +244,67 @@ function Invoke-Ci {
     if ($failed.Count -gt 0) { exit 1 }
 }
 
+# Formats only the named backend files: each file goes through ruff via stdin and is written back.
+function Invoke-Fmt([string[]]$Files) {
+    if (-not $Files) { Stop-Dev '用法：./dev.ps1 fmt <backend 下的 .py 文件...>' }
+    Invoke-Compose --profile tools build test-api
+    $backend = Join-Path $Root 'backend'
+    # Source files contain Chinese text: pipe UTF-8 both ways regardless of the console code page.
+    $previousConsole = [Console]::OutputEncoding
+    $OutputEncoding = [Text.UTF8Encoding]::new($false)
+    [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+    try {
+    foreach ($file in $Files) {
+        $full = (Resolve-Path -LiteralPath $file).Path
+        if (-not $full.StartsWith($backend, [StringComparison]::OrdinalIgnoreCase) -or -not $full.EndsWith('.py')) {
+            Stop-Dev "只能格式化 backend 下的 .py 文件：$file"
+        }
+        $relative = $full.Substring($backend.Length + 1).Replace('\', '/')
+        $source = Get-Content -Raw -LiteralPath $full
+        $fixed = $source | docker run --rm -i --name (New-TempName 'fmt') ontology/test-api:local sh -c "ruff check --fix --exit-zero --quiet --stdin-filename '$relative' - | ruff format --quiet --stdin-filename '$relative' -"
+        if ($LASTEXITCODE -ne 0) { Stop-Dev "格式化失败：$relative" }
+        $text = ($fixed -join "`n") + "`n"
+        if ($text -ne $source.Replace("`r`n", "`n")) {
+            Set-Content -LiteralPath $full -Encoding utf8NoBOM -NoNewline -Value $text
+            Write-Ok "已格式化 $relative"
+        }
+    }
+    } finally {
+        [Console]::OutputEncoding = $previousConsole
+    }
+}
+
+# Scores extraction on a case pack with the real model. Files travel as base64 JSON on stdin.
+function Invoke-Eval([string]$Case) {
+    if (-not $Case) { $Case = 'steel' }
+    $caseDir = Join-Path $Root "samples/$Case"
+    if (-not (Test-Path -LiteralPath (Join-Path $caseDir 'eval/expected.toml'))) { Stop-Dev "找不到 samples/$Case/eval/expected.toml" }
+    Confirm-BaseImages
+    Invoke-Compose build api
+    $files = @{}
+    foreach ($item in Get-ChildItem -LiteralPath (Join-Path $caseDir 'docs') -File) {
+        $files["docs/$($item.Name)"] = [Convert]::ToBase64String([IO.File]::ReadAllBytes($item.FullName))
+    }
+    $files['eval/expected.toml'] = [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $caseDir 'eval/expected.toml')))
+    $bundle = @{ files = $files } | ConvertTo-Json -Compress
+    $outDir = New-Item -ItemType Directory -Force -Path (Join-Path $Root '.verification/eval')
+    $outFile = Join-Path $outDir "$Case-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
+    $composeArgs = Get-ComposeArgs
+    $previousConsole = [Console]::OutputEncoding
+    [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+    try {
+        Write-Step "识别 samples/$Case（进度显示在下方）"
+        $result = $bundle | docker compose @composeArgs run --rm -T --no-deps --name (New-TempName 'eval') api python -m ontology_platform.modules.ai.eval
+        $code = $LASTEXITCODE
+    } finally {
+        [Console]::OutputEncoding = $previousConsole
+    }
+    if ($code -ne 0) { Stop-Dev "评测失败，退出码 $code" }
+    Set-Content -LiteralPath $outFile -Encoding utf8NoBOM -Value ($result -join "`n")
+    $result | Out-Host
+    Write-Ok "结果已保存到 $outFile"
+}
+
 # Creates the private settings file from the template; never prints its content.
 function Invoke-InitEnv {
     if (Test-Path -LiteralPath $EnvLocal) {
@@ -266,12 +331,28 @@ switch ($Command) {
     'logs' { Invoke-Compose logs --tail 200 @Rest }
     'build' { Confirm-BaseImages; Invoke-Compose build api web }
     'lock' { Invoke-Lock ($Rest | Select-Object -First 1) }
-    'test-api' { exit (Invoke-ToolTest 'test-api') }
+    'test-api' { exit (Invoke-ToolTest 'test-api' ($Rest.Count -gt 0 ? @('pytest') + $Rest : @())) }
     'test-web' { exit (Invoke-ToolTest 'test-web') }
     'test' { $a = Invoke-ToolTest 'test-api'; $w = Invoke-ToolTest 'test-web'; if ($a -ne 0 -or $w -ne 0) { exit 1 } }
     'gen-api' { Invoke-GenApi }
     'ci' { Invoke-Ci }
     'psql' { Invoke-Compose exec postgres psql -U ontology -d ontology }
+    'fmt' { Invoke-Fmt $Rest }
+    'eval' { Invoke-Eval ($Rest | Select-Object -First 1) }
+    'ai-check' {
+        Confirm-BaseImages
+        Invoke-Compose build api
+        $composeArgs = Get-ComposeArgs
+        $previousConsole = [Console]::OutputEncoding
+        [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+        try {
+            docker compose @composeArgs run --rm -T --no-deps --name (New-TempName 'ai-check') api python -m ontology_platform.modules.ai.check | Out-Host
+            $code = $LASTEXITCODE
+        } finally {
+            [Console]::OutputEncoding = $previousConsole
+        }
+        exit $code
+    }
     'init-env' { Invoke-InitEnv }
     'reset' { Invoke-Reset }
     default { Get-Help $PSCommandPath -Detailed | Out-Host }

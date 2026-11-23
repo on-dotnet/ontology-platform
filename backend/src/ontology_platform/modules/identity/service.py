@@ -4,7 +4,7 @@ import asyncio
 import functools
 import hashlib
 import secrets
-from collections.abc import Callable
+from collections.abc import Callable, Collection
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
@@ -250,3 +250,10 @@ async def logout(db: AsyncSession, context: AuthContext, *, ip: str | None) -> N
         ip=ip,
     )
     await db.commit()
+
+
+async def display_names(db: AsyncSession, user_ids: Collection[UUID]) -> dict[UUID, str]:
+    if not user_ids:
+        return {}
+    statement = select(User.id, User.display_name).where(User.id.in_(user_ids))
+    return {row.id: row.display_name for row in await db.execute(statement)}

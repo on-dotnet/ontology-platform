@@ -1,8 +1,20 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { FileText } from 'lucide-react';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
-import { ComingSoonPage } from '@/features/placeholder/coming-soon-page';
+import { DocumentsPage } from '@/features/documents/documents-page';
+import { validateOntologySearch } from '@/lib/search';
 
 export const Route = createFileRoute('/_app/documents')({
-  component: () => <ComingSoonPage section="documents" icon={FileText} tone="primary" />,
+  validateSearch: validateOntologySearch,
+  component: DocumentsRoute,
 });
+
+function DocumentsRoute() {
+  const { ontology } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  return (
+    <DocumentsPage
+      ontologyId={ontology}
+      onOntologyChange={(id) => void navigate({ search: (previous) => ({ ...previous, ontology: id }) })}
+    />
+  );
+}

@@ -10,6 +10,9 @@
     "retry": "重试",
     "cancel": "取消",
     "close": "关闭",
+    "dismiss": "知道了",
+    "colon": "：",
+    "listSeparator": "、",
     "loading": "正在加载…",
     "stillWorking": "仍在处理，请稍候…",
     "technicalDetails": "技术详情",
@@ -99,31 +102,450 @@
     "info": "工作台汇总你需要处理的事项和平台的最近动态。",
     "aiCardTitle": "AI 识别资料",
     "aiCardDescription": "上传制度、规程、手册等业务资料，AI 会识别其中的术语、对象类型和关系，整理成待你审核的变更集。",
+    "uploadTarget": "上传到",
+    "uploadNeedsRole": "上传资料需要“{{role}}”角色，请联系平台管理员开通。",
     "sectionsLabel": "概览",
     "pendingTitle": "待审核",
-    "pendingDescription": "AI 和成员提交的变更集会在这里等你审核。",
-    "ontologyTitle": "本体",
-    "ontologyDescription": "这里将显示本体中对象类型、关系类型和术语的概况。",
-    "dataTitle": "数据源",
-    "dataDescription": "这里将显示已连接的数据源和数据绑定情况。",
+    "pendingDescription": "等待审核的变更集",
+    "pendingLink": "去审核",
+    "ontologyTitle": "对象类型",
+    "ontologyDescription": "本体中已有的对象类型",
+    "ontologyLink": "查看本体",
+    "processingTitle": "处理中的资料",
+    "processingDescription": "正在解析或识别的资料",
+    "processingLink": "查看资料",
     "activityTitle": "最近动态",
-    "activityDescription": "这里将显示资料解析、审核和发布等最近动态。"
+    "activityEmpty": "资料上传、审核和发布等动态会显示在这里。"
+  },
+  "activity": {
+    "system": "平台",
+    "view": "查看",
+    "actions": {
+      "unknown": "进行了操作",
+      "ontology": {
+        "created": "创建了本体"
+      },
+      "document": {
+        "uploaded": "上传了资料"
+      },
+      "changeset": {
+        "created": "提交了变更集，等待审核",
+        "merged": "合并了变更集",
+        "rejected": "拒绝了变更集"
+      },
+      "release": {
+        "published": "发布了版本",
+        "activated": "设置了当前版本"
+      }
+    }
+  },
+  "ai": {
+    "health": {
+      "available": "可用",
+      "unreachable": "暂不可用",
+      "not_configured": "未配置",
+      "unknown": "尚未检测"
+    },
+    "notice": {
+      "not_configured": {
+        "title": "AI 服务尚未配置",
+        "description": "资料仍可上传和保存，但不会被 AI 识别。请联系平台管理员配置模型服务。"
+      },
+      "unreachable": {
+        "title": "AI 识别暂不可用",
+        "description": "资料仍可上传和保存；识别失败的资料可在 AI 恢复后重试。"
+      }
+    }
+  },
+  "ontologies": {
+    "selectorLabel": "本体",
+    "create": {
+      "title": "先给本体起个名字",
+      "description": "本体用来存放 AI 从资料中识别出的对象类型、关系和属性。起好名字后，资料会接着上传。",
+      "name": "本体名称",
+      "namePlaceholder": "例如：钢铁冶金",
+      "nameRequired": "请输入本体名称",
+      "descriptionLabel": "说明",
+      "validationSummary": "请填写本体名称后再创建。",
+      "failedTitle": "本体没有创建成功",
+      "submit": "创建本体"
+    }
+  },
+  "upload": {
+    "fileInputLabel": "选择要上传的资料文件",
+    "dropTitle": "把资料拖到这里，或者",
+    "chooseFiles": "选择文件",
+    "uploading": "正在上传…",
+    "hint": "支持 docx、xlsx、pdf、md、txt，单个文件不超过 {{size}} MB",
+    "uploaded": "已上传 {{count}} 份资料",
+    "uploadedDescription": "AI 正在识别，完成后可在资料页查看结果。",
+    "problemsTitle": "有 {{count}} 份资料没有上传",
+    "rejected": {
+      "type": "不支持这种文件类型，请上传 docx、xlsx、pdf、md 或 txt 文件。",
+      "size": "文件超过 {{size}} MB，请拆分或压缩后再上传。",
+      "empty": "文件是空的，请检查后重新选择。"
+    }
+  },
+  "documents": {
+    "upload": "上传资料",
+    "tableLabel": "资料列表",
+    "noOntologyTitle": "还没有本体",
+    "noOntologyDescription": "有成员上传资料后，这里会列出资料和 AI 识别结果。",
+    "noOntologyUploadTitle": "上传第一份资料：把文件拖到这里，或者",
+    "emptyTitle": "这个本体还没有资料",
+    "emptyDescription": "有成员上传资料后，这里会列出处理进度和 AI 识别结果。",
+    "emptyUploadTitle": "上传第一份资料：把文件拖到这里，或者",
+    "columns": {
+      "name": "名称",
+      "status": "状态",
+      "uploadedAt": "上传时间",
+      "result": "结果"
+    },
+    "pages_one": "{{count}} 页",
+    "pages_other": "{{count}} 页",
+    "loadMore": "加载更多",
+    "status": {
+      "queued": "排队中",
+      "ready": "已完成",
+      "failed": "处理失败",
+      "failedAt": "{{step}}失败"
+    },
+    "steps": {
+      "parse": "解析资料",
+      "terms": "识别术语",
+      "types": "识别类型",
+      "relations": "识别关系",
+      "changeset": "生成变更集"
+    },
+    "stepsLabel": "处理步骤",
+    "stepCount": "{{done}}/{{total}}",
+    "stepStates": {
+      "done": "已完成",
+      "active": "进行中",
+      "pending": "未开始",
+      "failed": "失败"
+    },
+    "resultPending": "处理完成后显示",
+    "resultNothingNew": "没有识别出新的内容",
+    "viewChangeSet": "查看变更集",
+    "failedUnknown": "处理没有完成，请重试。",
+    "retryStarted": "已重新开始处理",
+    "retryFailed": "没有重新开始处理",
+    "failures": {
+      "changeset": {
+        "invalid_item": "AI 识别出的内容不完整，没有生成变更集，请重试。"
+      },
+      "internal": {
+        "error": "处理资料时出了问题，资料已保存，请重试。"
+      }
+    }
+  },
+  "evidence": {
+    "unknownDocument": "资料",
+    "page": "第 {{page}} 页",
+    "section": "章节：{{heading}}",
+    "notFound": "未在原文中找到这段引语，请对照原文核实后再决定。",
+    "sourceText": "资料原文"
+  },
+  "kinds": {
+    "entity_type": "对象类型",
+    "relation_type": "关系",
+    "property": "属性"
+  },
+  "datatypes": {
+    "string": "文本",
+    "integer": "整数",
+    "decimal": "小数",
+    "boolean": "是/否",
+    "date": "日期",
+    "dateTime": "日期时间"
+  },
+  "review": {
+    "noOntologyTitle": "还没有可审核的内容",
+    "noOntologyDescription": "上传资料后，AI 识别出的修改会整理成变更集，在这里等待审核。",
+    "emptyTitle": "这个本体还没有变更集",
+    "emptyDescription": "上传资料后，AI 识别出的修改会整理成变更集，在这里等待审核。",
+    "tableLabel": "变更集列表",
+    "columns": {
+      "title": "变更集",
+      "source": "来源资料",
+      "pending": "待定",
+      "accepted": "接受",
+      "rejected": "拒绝",
+      "status": "状态",
+      "createdAt": "创建时间"
+    },
+    "status": {
+      "open": "待审核",
+      "merged": "已合并",
+      "rejected": "已拒绝"
+    },
+    "noSource": "手动提交",
+    "backToList": "返回变更集列表",
+    "detailTitle": "变更集",
+    "detailInfo": "逐项接受、修改或拒绝 AI 的建议。全部决定后，把接受的项合并到本体的工作版本。",
+    "sourceLabel": "来源资料：",
+    "countsSummary": "共 {{total}} 项 · 待定 {{pending}} · 接受 {{accepted}} · 拒绝 {{rejected}}",
+    "pendingHint_one": "还有 {{count}} 项未决定",
+    "pendingHint_other": "还有 {{count}} 项未决定",
+    "acceptHighConfidence": "接受全部高置信度项（{{count}}）",
+    "bulkAccepted": "已接受 {{count}} 项高置信度建议",
+    "merge": "合并到本体",
+    "mergedToast": "已合并到本体",
+    "mergeFailedTitle": "没有合并到本体",
+    "mergedTitle": "已合并到本体",
+    "mergedDescription": "已把 {{count}} 项修改应用到本体的工作版本。",
+    "mergedWithSkipsTitle": "已合并，{{skipped}} 项被跳过",
+    "mergedWithSkipsDescription": "已应用 {{applied}} 项，以下 {{skipped}} 项没有应用：",
+    "unknownItem": "未知项",
+    "viewOntology": "在本体中查看",
+    "readOnlyNotice": "你可以查看这个变更集；接受、拒绝和修改需要“{{role}}”角色。",
+    "noItems": "这个变更集没有任何项。",
+    "decideFailed": "决定没有保存",
+    "aiSuggestion": "AI 建议",
+    "confidence": {
+      "high": "置信度高",
+      "medium": "置信度中",
+      "low": "置信度低"
+    },
+    "confidencePercent": "AI 的置信度为 {{percent}}",
+    "confidencePercentShort": "（{{percent}}）",
+    "flags": {
+      "evidence_not_found": {
+        "label": "未找到证据原文",
+        "description": "AI 引用的话没有在原文中找到，置信度已降低。请对照原文核实后再决定。"
+      },
+      "possible_duplicate": {
+        "label": "可能重复",
+        "description": "这一项可能与本体中已有的元素重复，请确认后再接受。"
+      }
+    },
+    "decision": {
+      "pending": "待定",
+      "accepted": "已接受",
+      "rejected": "已拒绝"
+    },
+    "op": {
+      "create": "新建",
+      "update": "修改"
+    },
+    "edited": "已修改",
+    "rationale": "理由：{{text}}",
+    "accept": "接受",
+    "reject": "拒绝",
+    "editItem": "修改这一项",
+    "editItemNamed": "修改“{{name}}”",
+    "evidenceCount": "查看证据（{{count}}）",
+    "evidenceTitle": "证据",
+    "noEvidence": "这一项没有附证据。",
+    "evidenceSwitch": "选择证据",
+    "evidenceN": "证据 {{n}}",
+    "unknownType": "未知对象类型",
+    "before": "原值：",
+    "after": "新值：",
+    "emptyValue": "（空）",
+    "facts": {
+      "parent": "父类型：{{name}}",
+      "domain": "所属：{{name}}",
+      "datatype": "数据类型：{{type}}",
+      "unit": "单位：{{unit}}",
+      "required": "必填",
+      "multiple": "可有多个",
+      "pointsTo": "指向",
+      "synonyms": "同义词：{{list}}"
+    },
+    "fields": {
+      "labelZh": "中文名称",
+      "labelEn": "英文名称",
+      "localName": "局部名",
+      "definitionZh": "中文定义",
+      "definitionEn": "英文定义",
+      "synonyms": "同义词",
+      "synonymsZh": "中文同义词",
+      "synonymsEn": "英文同义词",
+      "parentRef": "父类型",
+      "domainRef": "定义域（起点对象类型）",
+      "propertyDomainRef": "所属对象类型",
+      "rangeRef": "值域（终点对象类型）",
+      "datatype": "数据类型",
+      "unit": "单位",
+      "required": "必填",
+      "multiple": "允许多个"
+    },
+    "edit": {
+      "title": "修改“{{name}}”",
+      "description": {
+        "entity_type": "合并时以修改后的内容为准。局部名用于生成 IRI，使用大驼峰，例如 SteelSlab。",
+        "relation_type": "合并时以修改后的内容为准。局部名用于生成 IRI，使用小驼峰，例如 producedBy。",
+        "property": "合并时以修改后的内容为准。局部名用于生成 IRI，使用小驼峰，例如 slabThickness。"
+      },
+      "validationSummary": "有 {{count}} 处需要修改，请按提示修正后再保存。",
+      "failedTitle": "修改没有保存",
+      "newOption": "{{name}}（本变更集新建）",
+      "synonymsPlaceholder": "多个用顿号或逗号分隔",
+      "noParent": "无父类型",
+      "chooseType": "请选择对象类型",
+      "chooseDatatype": "请选择数据类型",
+      "unitPlaceholder": "例如 mm、℃、%",
+      "cardinality": "基数",
+      "save": "保存修改",
+      "saved": "已保存修改",
+      "errors": {
+        "labelZhRequired": "请输入中文名称",
+        "localNameRequired": "请输入局部名",
+        "localNamePascal": "局部名需以大写字母开头，只含字母和数字，例如 SteelSlab",
+        "localNameCamel": "局部名需以小写字母开头，只含字母和数字，例如 producedBy",
+        "parentSelf": "父类型不能是它自己",
+        "domainRequired": "请选择对象类型",
+        "rangeRequired": "请选择终点对象类型",
+        "datatypeRequired": "请选择数据类型"
+      }
+    },
+    "readOnly": "只读"
+  },
+  "ontologyPage": {
+    "viewLabel": "视图",
+    "viewGraph": "图谱",
+    "viewList": "列表",
+    "exportTurtle": "导出 Turtle",
+    "exported": "已导出 Turtle 文件",
+    "exportFailed": "没有导出 Turtle 文件",
+    "noOntologyTitle": "还没有本体",
+    "noOntologyDescription": "上传资料并审核 AI 的建议后，对象类型、关系和属性会出现在这里。",
+    "stats": {
+      "entityTypes": "对象类型",
+      "relationTypes": "关系",
+      "properties": "属性",
+      "activeRelease": "当前版本",
+      "noRelease": "尚未发布"
+    },
+    "graph": {
+      "label": "本体图谱：{{nodes}} 个对象类型，{{edges}} 条连线",
+      "propertyCount_one": "{{count}} 个属性",
+      "propertyCount_other": "{{count}} 个属性",
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
+      "fitView": "适应窗口",
+      "legendRelation": "关系",
+      "legendSubclass": "父子类型",
+      "a11yNode": "按 Enter 或空格键查看这个对象类型的详情。",
+      "a11yEdge": "这条连线表示对象类型之间的关系或父子类型。",
+      "a11yHandle": "连接点",
+      "emptyTitle": "还没有对象类型",
+      "emptyDescription": "审核并合并变更集后，对象类型和它们之间的关系会画在这里。"
+    },
+    "list": {
+      "kindFilter": "按类型筛选",
+      "allKinds": "全部",
+      "search": "搜索名称或同义词",
+      "searchPlaceholder": "搜索名称或同义词",
+      "activeFilters": "当前筛选条件",
+      "kindChip": "类型：{{kind}}",
+      "searchChip": "关键词：{{q}}",
+      "removeFilter": "移除筛选条件“{{label}}”",
+      "noMatchTitle": "没有符合条件的元素",
+      "noMatchDescription": "换个关键词，或移除筛选条件再试。",
+      "emptyTitle": "本体里还没有元素",
+      "emptyDescription": "审核并合并变更集后，对象类型、关系和属性会列在这里。",
+      "tableLabel": "本体元素",
+      "columns": {
+        "name": "名称",
+        "kind": "类型",
+        "localName": "局部名",
+        "definition": "定义"
+      }
+    },
+    "detail": {
+      "deprecated": "已停用",
+      "definition": "定义",
+      "noDefinition": "还没有定义。",
+      "synonyms": "同义词",
+      "noSynonyms": "还没有同义词。",
+      "structure": "属性与关系",
+      "parent": "父类型",
+      "children": "子类型",
+      "properties": "属性（{{count}}）",
+      "relations": "关系（{{count}}）",
+      "none": "无",
+      "cardinality": "基数",
+      "optionalSingle": "可选，最多一个",
+      "provenance": "来源证据",
+      "noProvenance": "这个元素不是由审核过的变更集产生的。",
+      "showSource": "查看原文",
+      "hideSource": "收起原文"
+    }
+  },
+  "releases": {
+    "publishNew": "发布新版本",
+    "versionLabel": "v{{version}}",
+    "tableLabel": "版本列表",
+    "noOntologyTitle": "还没有本体",
+    "noOntologyDescription": "创建本体并审核 AI 的建议后，可以在这里发布版本。",
+    "emptyTitle": "还没有发布过版本",
+    "emptyDescription": "审核者发布版本后，这里会列出每个不可修改的版本。",
+    "emptyDescriptionReviewer": "发布会把本体的工作版本保存为不可修改的版本，供导出和外部使用。",
+    "viewOntology": "查看本体",
+    "columns": {
+      "version": "版本",
+      "title": "标题",
+      "elements": "元素数",
+      "publishedAt": "发布时间",
+      "current": "是否当前",
+      "actions": "操作"
+    },
+    "current": "当前版本",
+    "notCurrent": "不是当前版本",
+    "exportVersion": "导出 v{{version}} 的 Turtle",
+    "exported": "已导出 v{{version}} 的 Turtle 文件",
+    "exportFailed": "没有导出 Turtle 文件",
+    "publish": {
+      "title": "发布新版本",
+      "description": "发布会把本体当前的工作版本保存为不可修改的版本。发布前平台会校验命名、引用和父子关系。",
+      "openChangeSetsTitle": "还有 {{count}} 个变更集未合并",
+      "openChangeSetsDescription": "未合并的变更集不会进入这个版本。如需包含，请先完成审核并合并。",
+      "titleLabel": "版本标题",
+      "titlePlaceholder": "例如：首版钢铁冶金本体",
+      "titleRequired": "请输入版本标题",
+      "notesLabel": "版本说明",
+      "validationSummary": "请填写版本标题后再发布。",
+      "submit": "发布版本",
+      "published": "已发布版本 v{{version}}",
+      "failedTitle": "版本没有发布",
+      "invalidTitle": "发布校验没有通过（{{count}} 个问题）",
+      "invalidDescription": "请在审核中修正以下问题后再发布："
+    },
+    "problems": {
+      "unknown": "没有通过发布校验，请检查这个元素。",
+      "release": {
+        "cyclic_hierarchy": "父子类型形成了循环",
+        "invalid_parent": "父类型不存在或不是有效的对象类型",
+        "invalid_domain": "所属对象类型（定义域）不存在或已停用",
+        "invalid_range": "终点对象类型（值域）不存在或已停用",
+        "invalid_datatype": "数据类型不是平台支持的类型",
+        "invalid_local_name": "局部名不符合命名规则",
+        "missing_label": "缺少中文名称"
+      }
+    },
+    "activate": {
+      "action": "设为当前版本",
+      "title": "把 v{{version}} 设为当前版本？",
+      "change": "当前版本将从 v{{from}} 改为 v{{to}}。",
+      "first": "v{{to}} 将成为这个本体的当前版本。",
+      "consequence": "之后对外提供的查询、问答和导出都使用 v{{to}} 的内容；工作版本中的修改不受影响，你之后可以再切换。",
+      "confirm": "设为当前版本",
+      "done": "v{{version}} 已设为当前版本",
+      "failedTitle": "没有设为当前版本"
+    }
   },
   "pages": {
     "documents": {
-      "info": "上传业务资料，查看解析状态和 AI 识别结果。",
-      "emptyTitle": "资料管理即将推出",
-      "emptyDescription": "你可以在这里上传资料、跟踪解析进度，并查看 AI 识别出的术语和对象类型。"
+      "info": "上传业务资料，查看解析状态和 AI 识别结果。"
     },
     "review": {
-      "info": "逐项审核变更集：接受、修改或拒绝每一项修改。只有审核通过的修改才会进入本体。",
-      "emptyTitle": "变更集审核即将推出",
-      "emptyDescription": "AI 和成员提出的修改会汇集成变更集，在这里逐项审核后生效。"
+      "info": "逐项审核变更集：接受、修改或拒绝每一项修改。只有审核通过的修改才会进入本体。"
     },
     "ontology": {
-      "info": "用图谱或列表查看对象类型、属性、关系类型、术语和约束。",
-      "emptyTitle": "本体浏览即将推出",
-      "emptyDescription": "你可以在这里查看本体中的对象类型、属性、关系类型、术语和约束，并提出修改。"
+      "info": "用图谱或列表查看对象类型、关系和属性，点击元素查看详情和来源证据。"
     },
     "data": {
       "info": "连接数据源、浏览表目录，并把数据绑定到本体。",
@@ -136,9 +558,7 @@
       "emptyDescription": "你可以在这里按本体浏览业务对象、沿关系追溯来源，并向 AI 提问。"
     },
     "releases": {
-      "info": "查看发布记录、对比版本差异，必要时回滚。",
-      "emptyTitle": "版本管理即将推出",
-      "emptyDescription": "每次发布都会生成不可修改的版本，你可以在这里对比差异或回滚。"
+      "info": "发布不可修改的版本，导出 Turtle，必要时把旧版本重新设为当前版本。"
     }
   },
   "settings": {
@@ -149,6 +569,10 @@
     "role": "角色",
     "preferencesTitle": "界面偏好",
     "preferencesInfo": "偏好只保存在当前浏览器中，换浏览器或设备后需要重新设置。",
+    "aiTitle": "AI 服务",
+    "aiStatus": "状态",
+    "aiModel": "模型",
+    "aiModelNone": "未设置",
     "platformTitle": "平台设置",
     "platformDescription": "模型、成员与角色、平台参数等设置即将推出。"
   },
@@ -165,6 +589,9 @@
     "network": {
       "unreachable": "无法连接到平台服务，请检查网络后重试。"
     },
+    "internal": {
+      "error": "平台处理时出了问题，请稍后重试。如果问题持续出现，请联系平台管理员。"
+    },
     "auth": {
       "invalid_credentials": "用户名或密码不正确，请检查后重试。",
       "not_authenticated": "登录已失效，请重新登录。",
@@ -175,11 +602,47 @@
     "validation": {
       "failed": "填写的内容不完整或格式不正确，请检查后重试。"
     },
+    "ontology": {
+      "not_found": "本体不存在或已被删除，请刷新页面后重试。",
+      "key_taken": "已有同名标识的本体，请换一个名称后重试。"
+    },
+    "element": {
+      "not_found": "这个元素不存在或已被删除。"
+    },
+    "changeset": {
+      "not_found": "变更集不存在或已被删除。",
+      "closed": "这个变更集已合并或已拒绝，不能再修改。请刷新页面查看最新状态。",
+      "pending_items": "还有未决定的项，请全部决定后再合并。",
+      "invalid_edit": "修改的内容不符合要求，请检查名称、局部名和引用的对象类型。",
+      "stale_target": "目标元素在变更集生成后被修改过",
+      "dependency_skipped": "它引用的项被拒绝或被跳过",
+      "invalid_item": "内容不完整或不合法"
+    },
+    "release": {
+      "not_found": "版本不存在或已被删除。",
+      "invalid": "本体没有通过发布校验，请修正问题后再发布。"
+    },
+    "documents": {
+      "not_found": "资料不存在或已被删除。",
+      "too_large": "文件超过 20 MB，请拆分或压缩后再上传。",
+      "unsupported_type": "不支持这种文件类型，请上传 docx、xlsx、pdf、md 或 txt 文件。",
+      "not_failed": "这份资料没有处理失败，不需要重试。",
+      "needs_ocr": "这份资料是扫描件，暂时无法提取文字。请上传可复制文字的版本。",
+      "unreadable": "扫描件转写后仍没有读出文字，请检查文件或上传可复制文字的版本。"
+    },
+    "ai": {
+      "not_configured": "AI 服务尚未配置，资料已保存。请联系平台管理员配置后重试。",
+      "unavailable": "AI 识别暂不可用，资料已保存，可稍后重试。",
+      "invalid_output": "AI 返回的结果不符合要求，资料已保存，请稍后重试。"
+    },
     "http": {
       "400": "请求的内容不正确，请检查后重试。",
       "401": "登录已失效，请重新登录。",
       "403": "你没有执行此操作的权限，请联系平台管理员。",
       "404": "要访问的内容不存在或已被删除。",
+      "409": "内容已被其他操作修改，请刷新页面后重试。",
+      "413": "文件太大，请拆分或压缩后再上传。",
+      "415": "不支持这种文件类型。",
       "422": "填写的内容不完整或格式不正确，请检查后重试。",
       "429": "操作太频繁，请稍后再试。",
       "5xx": "平台服务暂时不可用，请稍后重试。"

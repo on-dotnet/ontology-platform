@@ -8,12 +8,19 @@ import { DEFAULT_LOCALE } from './index';
 
 const CODE_PATTERN = /^[a-z0-9_]+(\.[a-z0-9_]+)+$/i;
 
-function lookup(i18n: I18n, key: string): string | undefined {
+/** The string at `key` in the current language (falling back to the default), or undefined. */
+export function lookupText(i18n: I18n, key: string): string | undefined {
   for (const language of [i18n.resolvedLanguage ?? i18n.language, DEFAULT_LOCALE]) {
     const value: unknown = i18n.getResource(language, 'translation', key);
     if (typeof value === 'string') return value;
   }
   return undefined;
+}
+
+/** Localized text for a stable machine code (e.g. `ai.unavailable`) without an HTTP status. */
+export function codeMessage(i18n: I18n, code: string | null | undefined, fallbackKey = 'errors.unknown'): string {
+  const text = code && CODE_PATTERN.test(code) ? lookupText(i18n, `errors.${code}`) : undefined;
+  return text ?? lookupText(i18n, fallbackKey) ?? lookupText(i18n, 'errors.unknown') ?? 'Error';
 }
 
 /**
@@ -28,10 +35,10 @@ export function errorMessage(i18n: I18n, error: unknown): string {
     else if (error.status > 0) keys.push(`errors.http.${error.status}`);
   }
   for (const key of keys) {
-    const text = lookup(i18n, key);
+    const text = lookupText(i18n, key);
     if (text) return text;
   }
-  return lookup(i18n, 'errors.unknown') ?? 'Error';
+  return lookupText(i18n, 'errors.unknown') ?? 'Error';
 }
 
 /** Hook form of `errorMessage`; re-renders when the language changes. */

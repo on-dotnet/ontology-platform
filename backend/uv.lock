@@ -480,8 +480,10 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "alembic" },
+    { name = "annotated-types" },
     { name = "argon2-cffi" },
     { name = "fastapi" },
+    { name = "httpx2" },
     { name = "openai" },
     { name = "openpyxl" },
     { name = "psycopg", extra = ["binary"] },
@@ -506,9 +508,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "alembic", specifier = ">=1.16" },
+    { name = "annotated-types", specifier = ">=0.7" },
     { name = "argon2-cffi", specifier = ">=25.1" },
     { name = "fastapi", specifier = ">=0.120" },
-    { name = "openai", specifier = ">=2.0" },
+    { name = "httpx2", specifier = ">=2.16" },
+    { name = "openai", specifier = ">=3.57" },
     { name = "openpyxl", specifier = ">=3.1" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2,<4" },
     { name = "pydantic-settings", specifier = ">=2.10" },

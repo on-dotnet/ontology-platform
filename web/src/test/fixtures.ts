@@ -1,0 +1,135 @@
+import type { DocumentInfo } from '@/features/documents/api';
+import type { Element, ElementDetail, OntologySummary } from '@/features/ontologies/api';
+import type { ReleaseSummary } from '@/features/releases/api';
+import { countDecisions, type ChangeItem, type ChangeSetDetail } from '@/features/review/api';
+
+// Ids are not numbers on purpose: the router parses numeric search values as numbers.
+export const ONTOLOGY_ID = 'onto-steel';
+const CREATED_AT = '2026-11-20T08:00:00Z';
+
+export function ontologyFixture(overrides: Partial<OntologySummary> = {}): OntologySummary {
+  return {
+    id: ONTOLOGY_ID,
+    key: 'steel',
+    name: '钢铁冶金',
+    description: null,
+    baseIri: 'https://example.org/ontology/steel#',
+    entityTypeCount: 2,
+    relationTypeCount: 1,
+    propertyCount: 1,
+    openChangeSetCount: 0,
+    activeReleaseId: null,
+    activeReleaseVersion: null,
+    createdAt: CREATED_AT,
+    updatedAt: CREATED_AT,
+    ...overrides,
+  };
+}
+
+export function documentFixture(overrides: Partial<DocumentInfo> = {}): DocumentInfo {
+  return {
+    id: 'doc-converter',
+    ontologyId: ONTOLOGY_ID,
+    filename: '转炉炼钢工艺规程.docx',
+    mediaType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    sizeBytes: 128_000,
+    sha256: 'a'.repeat(64),
+    status: 'ready',
+    progress: { step: 'changeset', done: 1, total: 1 },
+    errorCode: null,
+    pageCount: 12,
+    charCount: 24_000,
+    changeSetId: null,
+    uploadedBy: '00000000-0000-4000-8000-000000000001',
+    createdAt: CREATED_AT,
+    updatedAt: CREATED_AT,
+    ...overrides,
+  };
+}
+
+export function elementFixture(overrides: Partial<Element> = {}): Element {
+  return {
+    id: 'el-molten-steel',
+    ontologyId: ONTOLOGY_ID,
+    kind: 'entity_type',
+    localName: 'MoltenSteel',
+    iri: 'https://example.org/ontology/steel#MoltenSteel',
+    labelZh: '钢水',
+    labelEn: 'Molten steel',
+    definitionZh: '转炉冶炼得到的液态钢。',
+    definitionEn: null,
+    synonyms: [],
+    parentId: null,
+    domainId: null,
+    rangeId: null,
+    datatype: null,
+    unit: null,
+    required: false,
+    multiple: false,
+    status: 'active',
+    origin: 'ai',
+    revision: 1,
+    createdAt: CREATED_AT,
+    updatedAt: CREATED_AT,
+    ...overrides,
+  };
+}
+
+export function elementDetailFixture(element: Element, provenance: ElementDetail['provenance'] = []): ElementDetail {
+  return { ...element, provenance };
+}
+
+export function itemFixture(overrides: Partial<ChangeItem> = {}): ChangeItem {
+  return {
+    id: 'item-ladle',
+    seq: 1,
+    op: 'create',
+    kind: 'entity_type',
+    targetElementId: null,
+    tempRef: 'new:Ladle',
+    proposed: { localName: 'Ladle', labelZh: '钢包', labelEn: 'Ladle', definitionZh: '盛装和运送钢水的容器。', synonyms: [] },
+    edited: null,
+    before: null,
+    decision: 'pending',
+    confidence: 0.92,
+    rationale: '原文多次出现并给出了定义。',
+    flags: [],
+    note: null,
+    decidedBy: null,
+    decidedAt: null,
+    appliedElementId: null,
+    evidence: [],
+    ...overrides,
+  };
+}
+
+export function changeSetFixture(items: ChangeItem[], overrides: Partial<ChangeSetDetail> = {}): ChangeSetDetail {
+  return {
+    id: 'cs-converter',
+    ontologyId: ONTOLOGY_ID,
+    title: '识别：转炉炼钢工艺规程.docx',
+    source: 'ai_extraction',
+    documentId: 'doc-converter',
+    status: 'open',
+    counts: countDecisions(items),
+    createdAt: CREATED_AT,
+    mergedAt: null,
+    items,
+    ...overrides,
+  };
+}
+
+export function releaseFixture(overrides: Partial<ReleaseSummary> = {}): ReleaseSummary {
+  return {
+    id: 'rel-one',
+    ontologyId: ONTOLOGY_ID,
+    version: 1,
+    title: '首版',
+    notes: null,
+    elementCount: 4,
+    isActive: false,
+    createdBy: null,
+    createdAt: CREATED_AT,
+    ...overrides,
+  };
+}

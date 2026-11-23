@@ -1,0 +1,51 @@
+# 钢铁冶金样例资料的期望识别结果，用于 ./dev.ps1 eval 计算准确率与召回率（Python 标准库 tomllib 读取）。
+# 匹配规则：模型给出的中文名、英文名或任一同义词，规范化（去空白、全角转半角、小写）后
+# 与 names 中任一项相同即算命中。
+# core = true 的项计入召回率；core = false 为可接受项：识别出来不算错，没识别出来也不扣召回。
+# 关系不计较方向与名称：A→B 与 B→A 都算命中。domain、range 用对应对象类型 names 的第一个名字。
+
+entity_types = [
+  { names = ["炉次", "冶炼炉次", "Heat"], core = true },
+  { names = ["钢种", "钢号", "牌号", "SteelGrade"], core = true },
+  { names = ["转炉", "Converter", "BOF"], core = true },
+  { names = ["钢包", "盛钢桶", "Ladle"], core = true },
+  { names = ["LF精炼炉", "LF炉", "精炼炉", "LadleFurnace"], core = true },
+  { names = ["精炼处理", "LF精炼处理", "RefiningTreatment"], core = false },
+  { names = ["浇次", "CastingSequence"], core = true },
+  { names = ["中间包", "Tundish"], core = true },
+  { names = ["结晶器", "Mold", "Mould"], core = false },
+  { names = ["连铸机", "CastingMachine", "Caster"], core = true },
+  { names = ["板坯", "Slab"], core = true },
+  { names = ["加热炉", "ReheatingFurnace"], core = true },
+  { names = ["加热", "加热过程", "Reheating"], core = false },
+  { names = ["轧制计划", "RollingSchedule"], core = false },
+  { names = ["轧制事件", "轧制过程", "RollingEvent"], core = true },
+  { names = ["钢卷", "热轧钢卷", "Coil"], core = true },
+  { names = ["检验批", "InspectionLot"], core = true },
+  { names = ["试样", "Sample", "Specimen"], core = false },
+  { names = ["检验结果", "InspectionResult"], core = true },
+  { names = ["缺陷记录", "表面缺陷", "缺陷", "Defect", "DefectRecord"], core = true },
+  { names = ["缺陷类型", "DefectType"], core = false },
+  { names = ["质量判定", "判定结果", "QualityDecision"], core = true },
+  { names = ["化学成分要求", "成分要求", "ChemicalCompositionRequirement"], core = false },
+  { names = ["力学性能要求", "MechanicalPropertyRequirement"], core = false },
+  { names = ["质量异常分析", "QualityAnalysis"], core = false },
+]
+
+relations = [
+  { domain = "炉次", range = "钢种", core = true },
+  { domain = "炉次", range = "转炉", core = true },
+  { domain = "炉次", range = "钢包", core = false },
+  { domain = "炉次", range = "浇次", core = true },
+  { domain = "精炼处理", range = "炉次", core = false },
+  { domain = "浇次", range = "中间包", core = false },
+  { domain = "浇次", range = "连铸机", core = false },
+  { domain = "板坯", range = "炉次", core = true },
+  { domain = "加热", range = "板坯", core = false },
+  { domain = "轧制事件", range = "板坯", core = true },
+  { domain = "钢卷", range = "板坯", core = true },
+  { domain = "钢卷", range = "检验批", core = false },
+  { domain = "检验结果", range = "检验批", core = true },
+  { domain = "缺陷记录", range = "钢卷", core = true },
+  { domain = "质量判定", range = "钢卷", core = true },
+]

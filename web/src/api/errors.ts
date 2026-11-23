@@ -6,6 +6,8 @@ interface ApiErrorInit {
   code: string;
   title?: string | undefined;
   detail?: string | undefined;
+  /** The parsed problem+json body, for extension members such as `problems`. */
+  body?: Record<string, unknown> | undefined;
   cause?: unknown;
 }
 
@@ -18,19 +20,26 @@ export class ApiError extends Error {
   readonly code: string;
   readonly title: string | undefined;
   readonly detail: string | undefined;
+  readonly body: Record<string, unknown>;
 
-  constructor({ status, code, title, detail, cause }: ApiErrorInit) {
+  constructor({ status, code, title, detail, body, cause }: ApiErrorInit) {
     super(`${code} (HTTP ${status})`, { cause });
     this.name = 'ApiError';
     this.status = status;
     this.code = code;
     this.title = title;
     this.detail = detail;
+    this.body = body ?? {};
   }
 }
 
 export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;
+}
+
+/** True for a 403: the user's role does not allow the request. */
+export function isForbidden(error: unknown): boolean {
+  return isApiError(error) && error.status === 403;
 }
 
 function readString(source: Record<string, unknown>, key: string): string | undefined {
@@ -46,5 +55,6 @@ export function problemToError(status: number, body: unknown): ApiError {
     code: readString(problem, 'code') ?? `http.${status}`,
     title: readString(problem, 'title'),
     detail: readString(problem, 'detail'),
+    body: problem,
   });
 }

@@ -11,12 +11,16 @@
 | 本体存储 | PostgreSQL 中按元素存储，发布时生成 RDF 快照 | 差异、审核、AI 提议都以元素为单位；对外仍是 W3C 标准 |
 | 图存储 | M3 起按需引入 Oxigraph，经 SPARQL 标准协议访问 | 前期用不到；协议标准化，可替换为 Fuseki、GraphDB |
 | 数据源 | 统一连接器接口，基于 SQLAlchemy 方言（PG、Oracle thin、Doris 走 MySQL 协议、TDengine）；Web 走 HTTP | 目录发现、只读、超时、取消只实现一次 |
-| AI | OpenAI Responses API（模型可配置）+ pydantic-ai；pgvector 做向量检索 | 结构化输出有类型校验；可切换到私有或其他兼容模型 |
+| AI | OpenAI 官方 Python SDK 的 Responses API 结构化输出（模型可配置），经平台自己的 `ModelGateway` 接口调用；pgvector 做向量检索 | 结构化输出有类型校验；可切换到私有或其他兼容 OpenAI 接口的模型；网关一层便于记录用量、换实现和在测试里替身 |
 | 文档解析 | 纯 Python 轻量解析（docx、xlsx、pptx、文本型 PDF）；扫描件与复杂 PDF 交给多模态模型 | 当前开发主机无 AVX，本地 OCR 与 torch 不可用；有条件后可加 Docling |
 | 后台任务 | 基于 PostgreSQL 的任务队列 | 不额外引入 Redis |
 | 认证 | 内置账号 + 可选 OIDC | 开源用户一条命令即可运行；企业可接入统一认证 |
 | 前端 | React 19 + Vite + TanStack Router/Query + Tailwind 4 + Base UI（shadcn/ui 写法）+ i18next | 管理后台不需要服务端渲染，构建与部署更简单 |
 | 运行 | Docker Compose + `dev.ps1` | 代码在本机、容器在 Docker 主机，与 hlc-iov 一致 |
+
+## 修订
+
+- 2026-11-23（M1）：AI 层原定"OpenAI Responses API + pydantic-ai"。M1 的分阶段抽取只需要"指令 + 文本 → Pydantic 结构"的单次调用，官方 SDK 的 `responses.parse` 已直接支持，再加一层框架只增加依赖和排错成本，因此改为直接用官方 SDK。pydantic-ai 等智能体框架推迟到 M2 的问答与智能体功能时再评估。
 
 ## 被否决的方案
 

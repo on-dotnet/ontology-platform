@@ -90,13 +90,13 @@ worker 用 `SELECT … FOR UPDATE SKIP LOCKED` 领取任务，运行期间每 15
 
 ### 3.4 `ai` 模块
 
-**`ai.runs`**：`id`、`purpose`（`extract.terms` / `extract.types` / `extract.relations` / `status.check`）、`model`、`document_id`（可空）、`status`、`input_tokens`、`output_tokens`、`latency_ms`、`error_code`、`created_at`。用于统计用量与排查问题，不保存提示词，也不保存资料原文。
+**`ai.runs`**：`id`、`purpose`（`extract.terms` / `extract.types` / `extract.relations` / `transcribe` / `status.check`）、`model`、`document_id`（可空）、`status`、`input_tokens`、`output_tokens`、`latency_ms`、`error_code`、`created_at`。用于统计用量与排查问题，不保存提示词，也不保存资料原文。
 
 ## 4 AI 识别流水线
 
 一份资料对应一个 `document.process` 任务，步骤如下（`progress.step` 依次取值）：
 
-1. `parse`：解析成纯文本并分块。docx 用 python-docx，xlsx 用 openpyxl（每个工作表转成 Markdown 表格），pdf 用 pypdf 逐页提取，md/txt 直接读取。如果 PDF 平均每页少于 50 个字（扫描件），把原件交给多模态模型逐页转写成文本再分块。
+1. `parse`：解析成纯文本并分块。docx 用 python-docx，xlsx 用 openpyxl（每个工作表转成 Markdown 表格），pdf 用 pypdf 逐页提取，md/txt 直接读取。如果 PDF 平均每页少于 50 个字（扫描件），把原件交给多模态模型转写成文本再分块（M1 一次转写整份，页数多时按页分批留作后续改进）。
 2. `terms`：逐块（或多块合批，每次约 8,000 字）抽取领域术语，记录名称、英文名、一句话定义、类别（对象 / 属性 / 关系 / 取值 / 其他）、原文引语。按规范化后的名称合并去重。
 3. `types`：把汇总的术语，连同本体中已有的对象类型摘要，交给推理模型，提出对象类型及层级：中英文名、局部名、定义、同义词、父类型（已有 id 或新的 temp_ref）、引语。
 4. `relations`：把对象类型（已有的加上本次新提出的）和相关分块交给模型，提出关系（定义域、值域、基数）与属性（数据类型、单位、是否必填）及引语。
@@ -179,7 +179,7 @@ Turtle 生成用 rdflib，包含：
 ## 8 样例与评测
 
 - `samples/steel/docs/`：合成的钢铁冶金资料，至少 4 份：转炉炼钢与精炼工艺规程、板坯连铸工艺规程、热轧带钢工艺规程、Q235B 钢卷质量检验与缺陷判定规范（含表格）。内容由人工编写，不含任何企业真实信息。
-- `samples/steel/eval/expected.yaml`：期望的对象类型（名称与可接受的同义词）和关系（定义域、名称、值域）。
+- `samples/steel/eval/expected.toml`：期望的对象类型（名称与可接受的同义词）和关系（定义域、名称、值域）。
 - `./dev.ps1 eval`：用真实模型处理样例资料，按名称或同义词匹配，统计对象类型与关系的准确率和召回率，结果写到 `.verification/eval/`。它会调用模型并产生费用，所以不纳入 `ci`。
 
 ## 9 测试

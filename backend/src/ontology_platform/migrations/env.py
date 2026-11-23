@@ -48,6 +48,11 @@ def run_migrations_online() -> None:
     engine = create_engine(database_url(), poolclass=pool.NullPool)
     try:
         with engine.connect() as connection:
+            # The default search_path starts with "$user". A role named like one of our schemas
+            # (the default role is "ontology") would make that schema the default one, which
+            # Alembic then compares as the unnamed schema and where alembic_version could land.
+            connection.exec_driver_sql("SET search_path TO public")
+            connection.commit()
             context.configure(
                 connection=connection,
                 target_metadata=target_metadata,

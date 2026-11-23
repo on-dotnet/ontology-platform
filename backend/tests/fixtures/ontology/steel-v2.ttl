@@ -1,0 +1,106 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix op: <https://w3id.org/ontology-platform/vocab#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix steel: <https://example.org/ontology/steel#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://example.org/ontology/steel> a owl:Ontology ;
+    dcterms:created "2026-11-22T08:00:00+00:00"^^xsd:dateTime ;
+    dcterms:description "合成的钢铁冶金样例。" ;
+    rdfs:label "钢铁冶金" ;
+    owl:versionInfo "2" .
+
+dcterms:created a owl:AnnotationProperty .
+
+dcterms:description a owl:AnnotationProperty .
+
+skos:altLabel a owl:AnnotationProperty .
+
+skos:definition a owl:AnnotationProperty .
+
+steel:Converter a owl:Class ;
+    rdfs:label "Converter"@en, "转炉"@zh ;
+    rdfs:subClassOf steel:Equipment ;
+    skos:altLabel "BOF"@en, "氧气转炉"@zh ;
+    skos:definition "Basic oxygen furnace."@en, "吹氧炼钢的炉子。"@zh .
+
+steel:Converter-shape a sh:NodeShape ;
+    sh:targetClass steel:Converter .
+
+steel:Equipment a owl:Class ;
+    rdfs:label "Equipment"@en, "装备"@zh ;
+    skos:definition "生产设备。"@zh .
+
+steel:Equipment-shape a sh:NodeShape ;
+    sh:targetClass steel:Equipment .
+
+steel:Heat a owl:Class ;
+    rdfs:label "Heat"@en, "炉次"@zh ;
+    skos:definition "One \"melt\" of a converter."@en .
+
+steel:Heat-shape a sh:NodeShape ;
+    sh:property [
+        sh:path steel:heatNumber ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path steel:producedIn ;
+        sh:class steel:Converter ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ], [
+        sh:path steel:tappedAt ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1
+    ] ;
+    sh:targetClass steel:Heat .
+
+steel:Slab a owl:Class ;
+    rdfs:label "Slab"@en, "板坯"@zh ;
+    skos:definition "连铸产出的\n半成品。"@zh .
+
+steel:Slab-shape a sh:NodeShape ;
+    sh:property [
+        sh:path steel:castFrom ;
+        sh:class steel:Heat
+    ], [
+        sh:path steel:thickness ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:minCount 1
+    ] ;
+    sh:targetClass steel:Slab .
+
+steel:castFrom a owl:ObjectProperty ;
+    rdfs:domain steel:Slab ;
+    rdfs:label "cast from"@en, "浇铸自"@zh ;
+    rdfs:range steel:Heat .
+
+steel:heatNumber a owl:DatatypeProperty ;
+    rdfs:domain steel:Heat ;
+    rdfs:label "炉号"@zh ;
+    rdfs:range xsd:string ;
+    skos:altLabel "炉次号"@zh .
+
+steel:producedIn a owl:ObjectProperty ;
+    rdfs:domain steel:Heat ;
+    rdfs:label "produced in"@en, "冶炼于"@zh ;
+    rdfs:range steel:Converter .
+
+steel:tappedAt a owl:DatatypeProperty ;
+    rdfs:domain steel:Heat ;
+    rdfs:label "出钢时间"@zh ;
+    rdfs:range xsd:dateTime .
+
+steel:thickness a owl:DatatypeProperty ;
+    rdfs:domain steel:Slab ;
+    rdfs:label "Thickness"@en, "厚度"@zh ;
+    rdfs:range xsd:decimal ;
+    op:unit "mm" .
+
+op:unit a owl:AnnotationProperty .

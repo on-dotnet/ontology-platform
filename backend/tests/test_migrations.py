@@ -10,7 +10,7 @@ from sqlalchemy import create_engine, inspect
 
 from ontology_platform import models  # noqa: F401  (registers every module's tables)
 from ontology_platform.db import Base
-from support import alembic_config
+from support import PUBLIC_SEARCH_PATH, alembic_config
 
 SCHEMAS = {table.schema for table in Base.metadata.tables.values()}
 
@@ -24,7 +24,7 @@ def test_models_cover_identity_and_audit() -> None:
 
 
 def test_migrations_match_models(database_url: str) -> None:
-    engine = create_engine(database_url)
+    engine = create_engine(database_url, connect_args=PUBLIC_SEARCH_PATH)
     try:
         with engine.connect() as connection:
             context = MigrationContext.configure(

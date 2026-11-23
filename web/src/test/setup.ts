@@ -1,9 +1,12 @@
 import '@testing-library/jest-dom/vitest';
 
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 
 import i18n from '@/i18n';
+
+// The first render of a route loads its code-split chunk, which can take over a second in CI containers.
+configure({ asyncUtilTimeout: 3000 });
 
 // --- jsdom gaps -------------------------------------------------------------
 
