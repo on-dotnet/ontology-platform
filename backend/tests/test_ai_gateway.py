@@ -61,6 +61,27 @@ def response_body(text: str) -> dict[str, Any]:
     }
 
 
+def stream(text: str, *, complete: bool = True) -> httpx2.Response:
+    """The server-sent events of a streamed response: created, then (unless cut off) completed."""
+    final = response_body(text)
+    events = [
+        (
+            "response.created",
+            {**final, "status": "in_progress", "output": [], "usage": None},
+        )
+    ]
+    if complete:
+        events.append(("response.completed", final))
+    lines = []
+    for seq, (name, response) in enumerate(events):
+        data = json.dumps({"type": name, "sequence_number": seq, "response": response})
+        lines.append(f"event: {name}\ndata: {data}\n\n")
+    body = "".join(lines)
+    return httpx2.Response(
+        200, headers={"content-type": "text/event-stream"}, content=body.encode()
+    )
+
+
 async def call(gateway: OpenAIGateway) -> Answer:
     return await gateway.structured(
         purpose="test", model="m", instructions="i", text="t", schema=Answer
@@ -80,13 +101,14 @@ async def test_parses_structured_output_and_records_the_run(settings: Settings, 
 
     def handler(request: httpx2.Request) -> httpx2.Response:
         seen.append(json.loads(request.content))
-        return httpx2.Response(200, json=response_body('{"value": 42}'))
+        return stream('{"value": 42}')
 
     gateway = OpenAIGateway(configured(settings), factory, http_client=client_with(handler))
     answer = await call(gateway)
 
     assert answer == Answer(value=42)
     assert seen[0]["model"] == "m"
+    assert seen[0]["stream"] is True
     assert seen[0]["text"]["format"]["type"] == "json_schema"
     async with factory() as db:
         runs = (await db.execute(select(AiRun))).scalars().all()
@@ -105,8 +127,7 @@ async def test_http_errors_map_to_ai_unavailable(
     def handler(request: httpx2.Request) -> httpx2.Response:
         return httpx2.Response(status, json={"error": {"message": "nope", "type": "x"}})
 
-    gateway = OpenAIGateway(configured(settings), http_client=client_with(handler))
-    gateway._get_client().max_retries = 0  # keep the test fast
+    gateway = OpenAIGateway(configured(settings), http_client=client_with(handler), retry_delays=())
     with pytest.raises(AiUnavailableError) as caught:
         await call(gateway)
     assert caught.value.code == "ai.unavailable"
@@ -117,8 +138,7 @@ async def test_connection_errors_are_retryable(settings: Settings) -> None:
     def handler(request: httpx2.Request) -> httpx2.Response:
         raise httpx2.ConnectError("refused", request=request)
 
-    gateway = OpenAIGateway(configured(settings), http_client=client_with(handler))
-    gateway._get_client().max_retries = 0
+    gateway = OpenAIGateway(configured(settings), http_client=client_with(handler), retry_delays=())
     with pytest.raises(AiUnavailableError) as caught:
         await call(gateway)
     assert caught.value.retryable is True
@@ -139,9 +159,11 @@ async def test_off_schema_output_is_a_retryable_invalid_output(
     factory: async_sessionmaker[AsyncSession] = app.state.session_factory
 
     def handler(request: httpx2.Request) -> httpx2.Response:
-        return httpx2.Response(200, json=response_body(text))
+        return stream(text)
 
-    gateway = OpenAIGateway(configured(settings), factory, http_client=client_with(handler))
+    gateway = OpenAIGateway(
+        configured(settings), factory, http_client=client_with(handler), retry_delays=()
+    )
     with pytest.raises(AiInvalidOutputError) as caught:
         await call(gateway)
 
@@ -167,3 +189,41 @@ async def test_a_bad_proxy_url_does_not_leak_into_the_error(settings: Settings) 
     assert error.__suppress_context__ is True
     assert "s3cret" not in str(error)
     assert "proxy.internal" not in str(error)
+
+
+async def test_a_stream_that_breaks_off_is_retried(settings: Settings, app: Any) -> None:
+    factory: async_sessionmaker[AsyncSession] = app.state.session_factory
+    responses = [stream('{"value": 7}', complete=False), stream('{"value": 7}')]
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        return responses.pop(0)
+
+    gateway = OpenAIGateway(
+        configured(settings), factory, http_client=client_with(handler), retry_delays=(0,)
+    )
+    assert await call(gateway) == Answer(value=7)
+
+    async with factory() as db:
+        runs = (await db.execute(select(AiRun).order_by(AiRun.created_at))).scalars().all()
+    assert [(run.status, run.error_code) for run in runs] == [
+        ("failed", "ai.unavailable"),
+        ("succeeded", None),
+    ]
+
+
+async def test_retries_stop_after_the_last_attempt(settings: Settings) -> None:
+    calls = 0
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        nonlocal calls
+        calls += 1
+        return httpx2.Response(503, json={"error": {"message": "busy", "type": "x"}})
+
+    gateway = OpenAIGateway(
+        configured(settings), http_client=client_with(handler), retry_delays=(0, 0)
+    )
+    with pytest.raises(AiUnavailableError) as caught:
+        await call(gateway)
+
+    assert caught.value.retryable is True
+    assert calls == 3

@@ -5,6 +5,7 @@ OpenAI-compatible providers can be plugged in through `OP_AI_BASE_URL`. The prox
 model calls only; nothing else in the platform goes through it.
 """
 
+import asyncio
 import json
 import time
 from collections.abc import Sequence
@@ -72,14 +73,26 @@ class ModelGateway(Protocol):
 
 
 PING_TIMEOUT_SECONDS = 5.0
+# Waits before the second and third attempt of a call that failed transiently.
+RETRY_DELAYS = (2.0, 8.0)
 
-# Transient failures are retried by the job queue; the rest are reported at once.
+# Transient failures: retried here, and once more by the job queue when they persist.
 _RETRYABLE = (
     openai.APIConnectionError,
     openai.APITimeoutError,
     openai.RateLimitError,
     openai.InternalServerError,
 )
+
+
+@dataclass(frozen=True)
+class _Call[T: BaseModel]:
+    purpose: str
+    model: str
+    instructions: str
+    message: Any
+    schema: type[T]
+    document_id: Any
 
 
 class OpenAIGateway:
@@ -89,10 +102,12 @@ class OpenAIGateway:
         session_factory: async_sessionmaker[AsyncSession] | None = None,
         *,
         http_client: httpx2.AsyncClient | None = None,
+        retry_delays: Sequence[float] = RETRY_DELAYS,
     ) -> None:
         self._settings = settings
         self._session_factory = session_factory
         self._http_client = http_client
+        self._retry_delays = tuple(retry_delays)
         self._client: AsyncOpenAI | None = None
 
     def _get_client(self) -> AsyncOpenAI:
@@ -111,7 +126,8 @@ class OpenAIGateway:
                     api_key=self._settings.openai_api_key.get_secret_value(),
                     base_url=self._settings.ai_base_url,
                     timeout=self._settings.ai_timeout_seconds,
-                    max_retries=2,
+                    # Retries happen in `structured`, which also covers streams that break off.
+                    max_retries=0,
                     http_client=http_client,
                 )
             except Exception as exc:
@@ -143,28 +159,46 @@ class OpenAIGateway:
         )
         # The SDK's input TypedDicts overlap, so mypy cannot pick one for a literal message.
         message: Any = {"role": "user", "content": content}
+        call = _Call(purpose, model, instructions, message, schema, document_id)
+        for delay in (*self._retry_delays, None):
+            try:
+                return await self._attempt(client, call)
+            except AiError as error:
+                if not error.retryable or delay is None:
+                    raise
+            await asyncio.sleep(delay)
+        raise AssertionError("unreachable")
+
+    async def _attempt[T: BaseModel](self, client: AsyncOpenAI, call: "_Call[T]") -> T:
         started = time.monotonic()
         try:
-            response = await client.responses.parse(
-                model=model,
-                instructions=instructions,
-                input=[message],
-                text_format=schema,
-            )
+            # Streamed, so that tokens keep the connection busy: proxies that drop idle
+            # connections (about a minute is common) would otherwise cut long calls.
+            async with client.responses.stream(
+                model=call.model,
+                instructions=call.instructions,
+                input=[call.message],
+                text_format=call.schema,
+            ) as stream:
+                response = await stream.get_final_response()
         except openai.OpenAIError as exc:
             error: AiError = _map_error(exc)
         except (ValidationError, json.JSONDecodeError) as exc:
-            # The SDK validates the output against `schema`; truncated or off-schema output
+            # The SDK validates the output against the schema; truncated or off-schema output
             # surfaces here rather than as an OpenAIError. Another attempt usually succeeds.
-            message = f"The model output did not match the schema: {type(exc).__name__}"
-            error = AiInvalidOutputError(message, retryable=True)
+            text = f"The model output did not match the schema: {type(exc).__name__}"
+            error = AiInvalidOutputError(text, retryable=True)
+        except (httpx2.TransportError, RuntimeError) as exc:
+            # The stream broke off, or ended without a completed response.
+            text = f"The model stream ended early: {type(exc).__name__}"
+            error = AiUnavailableError(text, retryable=True)
         else:
             parsed = response.output_parsed
             if parsed is not None:
-                await self._record(purpose, model, document_id, started, response.usage, None)
+                await self._record(call, started, response.usage, None)
                 return parsed
             error = AiInvalidOutputError("The model returned no structured output.", retryable=True)
-        await self._record(purpose, model, document_id, started, None, error.code)
+        await self._record(call, started, None, error.code)
         # No chain: provider error bodies are not ours to log.
         raise error from None
 
@@ -178,20 +212,15 @@ class OpenAIGateway:
         return True
 
     async def _record(
-        self,
-        purpose: str,
-        model: str,
-        document_id: Any,
-        started: float,
-        usage: Any,
-        error_code: str | None,
+        self, call: "_Call[Any]", started: float, usage: Any, error_code: str | None
     ) -> None:
+        """One row per attempt, so retries show up in the accounting."""
         if self._session_factory is None:
             return
         run = AiRun(
-            purpose=purpose,
-            model=model,
-            document_id=document_id,
+            purpose=call.purpose,
+            model=call.model,
+            document_id=call.document_id,
             status="failed" if error_code else "succeeded",
             input_tokens=getattr(usage, "input_tokens", None),
             output_tokens=getattr(usage, "output_tokens", None),
