@@ -124,7 +124,9 @@ function ElementDetailContent({ element, related, onSelect }: ElementDetailConte
   const language = i18n.resolvedLanguage ?? i18n.language;
   const isAxiom = element.kind === 'axiom';
   const title = isAxiom ? t('ontologyPage.detail.axiomTitle') : elementName(element, language) || '—';
-  const secondary = element.labelEn && element.labelEn !== title ? element.labelEn : null;
+  // The name in the other language, whichever one the title shows.
+  const other = language.startsWith('en') ? element.labelZh : element.labelEn;
+  const secondary = other && other !== title ? other : null;
 
   return (
     <div className="space-y-4">

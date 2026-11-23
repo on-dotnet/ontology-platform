@@ -139,9 +139,16 @@ function isEditableKind(kind: ElementKind): kind is EditableKind {
   return EDITABLE_KINDS.includes(kind);
 }
 
-/** Reviewers may edit creates and updates of types, relations and properties; other items are decided as they are. */
-export function isEditable(item: Pick<ChangeItem, 'kind' | 'op'>): boolean {
-  return isEditableKind(item.kind) && (item.op === 'create' || item.op === 'update');
+/**
+ * Reviewers may edit creates and updates of types, relations and properties; other items are
+ * decided as they are. So are elements with an IRI of their own (imported ones): their names
+ * follow the file, not the naming rules this form checks. A create carries its IRI; an update's
+ * target says whether it has one.
+ */
+export function isEditable(item: Pick<ChangeItem, 'kind' | 'op' | 'proposed' | 'edited' | 'targetElementId'>, context: RefContext): boolean {
+  if (!isEditableKind(item.kind) || (item.op !== 'create' && item.op !== 'update')) return false;
+  const target = item.targetElementId ? context.elementsById.get(item.targetElementId) : undefined;
+  return !effectiveFields(item).iri && !target?.explicitIri;
 }
 
 /** Which fields the form shows: updates change descriptive fields only; names and references are fixed. */
@@ -181,8 +188,30 @@ function textOrNull(value: string): string | null {
   return trimmed ? trimmed : null;
 }
 
-/** The `edited` payload for the fields this kind and operation allow. */
-export function fromEditForm(kind: ElementKind, op: ChangeItem['op'], form: EditForm): ElementFields {
+// The descriptive fields an update may change, with the inputs each is edited in.
+const UPDATE_INPUTS: readonly (readonly [keyof ElementFields, readonly EditField[]])[] = [
+  ['labelZh', ['labelZh']],
+  ['labelEn', ['labelEn']],
+  ['definitionZh', ['definitionZh']],
+  ['definitionEn', ['definitionEn']],
+  ['synonyms', ['synonymsZh', 'synonymsEn']],
+];
+
+/**
+ * The `edited` payload for the fields this kind and operation allow.
+ *
+ * An update carries only the fields that differ from `unedited` (the form for the proposal
+ * without edits): a field left out keeps the element's current value, while one sent empty
+ * would clear it.
+ */
+export function fromEditForm(kind: ElementKind, op: ChangeItem['op'], form: EditForm, unedited?: EditForm): ElementFields {
+  const edited = allEditFields(kind, op, form);
+  if (op !== 'update' || !unedited) return edited;
+  const same = new Set(UPDATE_INPUTS.filter(([, inputs]) => inputs.every((input) => form[input] === unedited[input])).map(([key]) => key));
+  return Object.fromEntries(Object.entries(edited).filter(([key]) => !same.has(key as keyof ElementFields)));
+}
+
+function allEditFields(kind: ElementKind, op: ChangeItem['op'], form: EditForm): ElementFields {
   const fields = new Set(editableFields(kind, op));
   const edited: ElementFields = {
     labelZh: form.labelZh.trim(),
@@ -218,6 +247,7 @@ export const COMPARED_FIELDS = [
   'unit',
   'required',
   'multiple',
+  'autoShape',
 ] as const;
 export type ComparedField = (typeof COMPARED_FIELDS)[number];
 
@@ -244,7 +274,8 @@ export function fieldText(fields: ElementFields | null | undefined, field: Compa
     case 'datatype':
       return fields.datatype ? format.datatype(fields.datatype) : '';
     case 'required':
-    case 'multiple': {
+    case 'multiple':
+    case 'autoShape': {
       const value = fields[field];
       return value === null || value === undefined ? '' : format.flag(value);
     }

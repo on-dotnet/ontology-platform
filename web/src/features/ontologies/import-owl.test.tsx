@@ -65,7 +65,9 @@ describe('import OWL into the current ontology', () => {
     expect(counts).toHaveTextContent('恢复2');
     const warnings = within(summary).getByRole('list', { name: '需要注意的内容' });
     expect(warnings).toHaveTextContent('2 条公理在 Protégé 中会被改写');
-    expect(within(warnings).getByRole('button', { name: '2 条公理在 Protégé 中会被改写' })).toHaveAccessibleDescription(
+    // The visible text names the warning; the icon only adds the explanation.
+    const [rewritten] = within(warnings).getAllByRole('listitem');
+    expect(within(rewritten as HTMLElement).getByRole('button', { name: '注意' })).toHaveAccessibleDescription(
       '在 Protégé 中打开时，这些公理会被改写成等价的写法。平台按原样保留，导出时不变。',
     );
     expect(warnings).toHaveTextContent('1 条规则的枚举取值被 Protégé 丢掉了');
@@ -95,8 +97,10 @@ describe('import OWL into the current ontology', () => {
 
   it('names the line of a syntax error and asks for a file before sending anything', async () => {
     const user = userEvent.setup({ applyAccept: false });
+    let line: number | null = 12;
     const api = ontologyServer({
-      'POST /api/ontologies/:id/import': () => problemResponse(422, 'import.parse_error', { line: 12, column: 5 }),
+      // The server never knows the column.
+      'POST /api/ontologies/:id/import': () => problemResponse(422, 'import.parse_error', { line, column: null }),
     });
     renderApp('/ontology?ontology=onto-steel&view=list');
 
@@ -110,8 +114,28 @@ describe('import OWL into the current ontology', () => {
 
     const alert = await within(dialog).findByRole('alert');
     expect(alert).toHaveTextContent('文件没有导入');
-    expect(alert).toHaveTextContent('文件第 12 行第 5 列有语法错误，请修正后重新导入。');
+    expect(alert).toHaveTextContent('文件第 12 行有语法错误，请修正后重新导入。');
     expect(alert).not.toHaveTextContent('Backend detail');
+
+    // A file the parser cannot place (RDF/XML, say) gets the message without a line.
+    line = null;
+    await user.click(within(dialog).getByRole('button', { name: '导入文件' }));
+    await waitFor(() => expect(api.calls('POST', '/api/ontologies/onto-steel/import')).toHaveLength(2));
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('文件有语法错误，请修正后重新导入。');
+    expect(within(dialog).getByRole('alert')).not.toHaveTextContent('第 12 行');
+  });
+
+  it('refuses a file over 5 MB without sending it', async () => {
+    const user = userEvent.setup({ applyAccept: false });
+    const api = ontologyServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const dialog = await openImportDialog(user);
+    await user.upload(within(dialog).getByLabelText('选择 OWL 文件'), owlFile('large.ttl', 5 * 1024 * 1024 + 1));
+    await user.click(within(dialog).getByRole('button', { name: '导入文件' }));
+
+    expect(await within(dialog).findByText('文件超过 5 MB，请拆分后再导入。')).toBeInTheDocument();
+    expect(api.calls('POST', '/api/ontologies/onto-steel/import')).toHaveLength(0);
   });
 
   it('maps an unsupported format to a localized message', async () => {
@@ -144,7 +168,7 @@ describe('create an ontology from an OWL file', () => {
     });
     const { router } = renderApp('/ontology?view=list');
 
-    await user.click(await screen.findByRole('button', { name: '从 OWL 文件导入' }));
+    await user.click(await screen.findByRole('button', { name: '导入 OWL 文件' }));
     const dialog = await screen.findByRole('dialog', { name: '新建本体' });
     expect(within(dialog).getByRole('radio', { name: '从 OWL 文件导入' })).toBeChecked();
 
@@ -197,7 +221,7 @@ describe('import entry points', () => {
     renderApp('/ontology');
 
     expect(await screen.findByText('还没有本体')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: '从 OWL 文件导入' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '导入 OWL 文件' })).not.toBeInTheDocument();
   });
 
   it('keeps the upload dialog to naming the ontology for waiting documents', async () => {

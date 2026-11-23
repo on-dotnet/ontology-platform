@@ -99,6 +99,13 @@ export function ChangeItemCard({
       {item.op === 'update' || item.op === 'restore' ? (
         <UpdateComparison kind={item.kind} before={item.before} after={effectiveFields(item)} context={context} />
       ) : null}
+      {/* The rules above are the new ones; an update that changes them shows what they replace. */}
+      {item.op === 'update' && item.kind === 'constraint' && item.before && effectiveFields(item).rules !== undefined ? (
+        <section className="mt-2 space-y-1.5" aria-label={t('review.rulesBefore')}>
+          <p className="text-xs font-medium text-muted-foreground">{t('review.rulesBefore')}</p>
+          <ConstraintRules rules={item.before.rules ?? []} nameOf={(ref) => refLabel(ref, context)} />
+        </section>
+      ) : null}
       {item.rationale ? <p className="mt-2 text-xs text-muted-foreground">{t('review.rationale', { text: item.rationale })}</p> : null}
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -126,7 +133,7 @@ export function ChangeItemCard({
               <X aria-hidden />
               {t('review.reject')}
             </Button>
-            {isEditable(item) ? (
+            {isEditable(item, context) ? (
               <Tooltip content={t('review.editItem')}>
                 <Button variant="ghost" size="icon-sm" aria-label={t('review.editItemNamed', { name: label })} disabled={busy} onClick={onEdit}>
                   <Pencil aria-hidden />
@@ -158,8 +165,10 @@ function ItemFacts({ item, fields, context }: { item: ChangeItem; fields: Elemen
 
   if (item.kind === 'axiom') {
     const turtle = fields.turtle ?? '';
-    // The heading already shows a one-line fragment in full.
-    return turtle && turtle.trim() !== turtleSummary(turtle) ? <TurtleBlock turtle={turtle} className="mt-2" /> : null;
+    // The heading already shows a one-line fragment in full; a delete or restore still shows it
+    // under "will delete / restore", which would otherwise lead nowhere.
+    const shownInHeading = turtle.trim() === turtleSummary(turtle) && item.op !== 'delete' && item.op !== 'restore';
+    return turtle && !shownInHeading ? <TurtleBlock turtle={turtle} className="mt-2" /> : null;
   }
 
   if (item.kind === 'constraint') {

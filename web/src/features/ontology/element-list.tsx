@@ -50,6 +50,7 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
   const everything = useElements(ontologyId);
   const byId = new Map((everything.data ?? []).map((element) => [element.id, element]));
   const nameOf = (id: string | null) => {
+    if (!everything.isSuccess) return null;
     const element = id ? byId.get(id) : undefined;
     return element ? elementName(element, language) : undefined;
   };
@@ -146,7 +147,8 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
 interface NameCellProps {
   element: Element;
   language: string;
-  nameOf: (id: string | null) => string | undefined;
+  /** The element's name; undefined for an unknown element, null until the names have loaded. */
+  nameOf: (id: string | null) => string | null | undefined;
   onSelect: (elementId: string) => void;
 }
 
@@ -157,7 +159,9 @@ function NameCell({ element, language, nameOf, onSelect }: NameCellProps) {
   const name = isAxiom ? turtleSummary(element.turtle) : displayName(element, language);
   let detail: string | null = null;
   if (element.kind === 'constraint') {
-    detail = t('ontologyPage.list.target', { name: nameOf(element.domainId) ?? t('review.unknownType') });
+    const target = nameOf(element.domainId);
+    // Nothing while names load: "unknown type" would be wrong for a moment.
+    detail = target === null ? null : t('ontologyPage.list.target', { name: target ?? t('review.unknownType') });
   } else if (isAxiom) {
     const subject = nameOf(element.subjectId);
     detail = subject ? t('ontologyPage.list.subject', { name: subject }) : null;

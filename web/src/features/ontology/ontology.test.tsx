@@ -53,7 +53,22 @@ const shape = elementFixture({
   origin: 'import',
 });
 const disjoint = axiomFixture({ flags: ['non_standard'] });
-const all = [moltenSteel, ladle, holds, temperature, shape, disjoint];
+// Imported: only an English name, the inverse of `holds`, no domain or range.
+const heldBy = elementFixture({
+  id: 'el-held-by',
+  kind: 'relation_type',
+  localName: 'heldBy',
+  iri: 'urn:metals:heldBy',
+  explicitIri: true,
+  labelZh: null,
+  labelEn: 'held by',
+  definitionZh: null,
+  inverseId: 'el-holds',
+  origin: 'import',
+});
+// Imported without any name: shown by its local name.
+const slab = elementFixture({ id: 'el-slab', localName: 'Slab', iri: 'urn:metals:Slab', explicitIri: true, labelZh: null, labelEn: null, definitionZh: null, origin: 'import' });
+const all = [moltenSteel, ladle, holds, temperature, shape, disjoint, heldBy, slab];
 
 function ontologyServer(extra: Record<string, RouteHandler> = {}) {
   return mockApi({
@@ -140,6 +155,21 @@ describe('ontology list view', () => {
     // Related elements open in the same panel.
     await user.click(within(sheet).getByRole('button', { name: '温度' }));
     expect(await screen.findByRole('dialog', { name: '温度' })).toHaveTextContent('℃');
+  });
+
+  it('names elements without a Chinese name by their English or local name, and shows the inverse of a relation', async () => {
+    const user = userEvent.setup();
+    ontologyServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const table = await screen.findByRole('table', { name: '本体元素' });
+    expect(within(table).getByRole('button', { name: 'Slab' })).toBeInTheDocument();
+    await user.click(within(table).getByRole('button', { name: 'held by' }));
+
+    const sheet = await screen.findByRole('dialog', { name: 'held by' });
+    expect(within(sheet).getByText('urn:metals:heldBy')).toBeInTheDocument();
+    const inverse = within(sheet).getByText('互逆关系').nextElementSibling as HTMLElement;
+    expect(within(inverse).getByRole('button', { name: '盛装' })).toBeInTheDocument();
   });
 });
 

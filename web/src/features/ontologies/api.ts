@@ -1,7 +1,7 @@
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query';
 
 import { api, unwrap } from '@/api/client';
-import type { components } from '@/api/schema';
+import type { components, operations } from '@/api/schema';
 
 export type OntologySummary = components['schemas']['OntologySummary'];
 export type OntologyCreate = components['schemas']['OntologyCreate'];
@@ -18,7 +18,9 @@ export type RdfValue = components['schemas']['RdfValue'];
 export type LangText = components['schemas']['LangText'];
 export type ImportResult = components['schemas']['ImportResult'];
 export type ImportWarning = components['schemas']['ImportWarning'];
-export type ElementStatusFilter = 'active' | 'deprecated' | 'all';
+export type ElementStatusFilter = NonNullable<
+  NonNullable<operations['list_elements_api_ontologies__id__elements_get']['parameters']['query']>['status']
+>;
 
 export const ELEMENT_KINDS: readonly ElementKind[] = ['entity_type', 'relation_type', 'property', 'constraint', 'axiom'];
 export const DATATYPES: readonly Datatype[] = ['string', 'integer', 'decimal', 'boolean', 'date', 'dateTime'];

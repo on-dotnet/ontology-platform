@@ -301,6 +301,48 @@ describe('change set review', () => {
     expect(within(card(/钢包车/)).getByText('已修改')).toBeInTheDocument();
   });
 
+  it('edits an update starting from the current values and sends only what differs from the proposal', async () => {
+    const user = userEvent.setup();
+    const update = itemFixture({
+      id: 'item-molten',
+      seq: 5,
+      op: 'update',
+      tempRef: null,
+      targetElementId: 'el-molten-steel',
+      proposed: { definitionEn: 'Liquid steel from the converter.' },
+      // An earlier edit by the reviewer: it must survive the next one.
+      edited: { definitionZh: '转炉冶炼得到的钢水。' },
+      before: {
+        localName: 'MoltenSteel',
+        labelZh: '钢水',
+        labelEn: 'Molten steel',
+        definitionZh: '转炉冶炼得到的液态钢。',
+        definitionEn: null,
+        synonyms: [{ lang: 'zh', text: '液态钢' }],
+        parentRef: null,
+      },
+    });
+    const api = reviewServer({ initial: changeSetFixture([...items(), update]) });
+    renderApp('/review/cs-converter');
+
+    await user.click(within(await screen.findByRole('article', { name: /钢水/ })).getByRole('button', { name: '修改“钢水”' }));
+    const dialog = await screen.findByRole('dialog', { name: '修改“钢水”' });
+    expect(within(dialog).getByRole('textbox', { name: '中文名称' })).toHaveValue('钢水');
+    expect(within(dialog).getByRole('textbox', { name: '中文定义' })).toHaveValue('转炉冶炼得到的钢水。');
+    expect(within(dialog).getByRole('textbox', { name: '英文定义' })).toHaveValue('Liquid steel from the converter.');
+    expect(within(dialog).getByRole('textbox', { name: '中文同义词' })).toHaveValue('液态钢');
+
+    const english = within(dialog).getByRole('textbox', { name: '英文名称' });
+    await user.clear(english);
+    await user.type(english, 'Liquid steel');
+    await user.click(within(dialog).getByRole('button', { name: '保存修改' }));
+
+    await waitFor(() => expect(api.calls('PATCH', '/api/change-sets/cs-converter/items/item-molten')).toHaveLength(1));
+    expect(api.calls('PATCH', '/api/change-sets/cs-converter/items/item-molten')[0]?.body).toEqual({
+      edited: { labelEn: 'Liquid steel', definitionZh: '转炉冶炼得到的钢水。' },
+    });
+  });
+
   it('offers existing and new object types as references when editing a relation', async () => {
     const user = userEvent.setup();
     const api = reviewServer();
@@ -376,6 +418,8 @@ const importedElements = [
   elementFixture({ id: 'el-grade', kind: 'property', localName: 'grade', labelZh: '钢种', labelEn: 'Grade', domainId: 'el-molten-steel' }),
   elementFixture({ id: 'el-ladle', localName: 'Ladle', labelZh: '钢包', labelEn: 'Ladle' }),
   elementFixture({ id: 'el-slag', localName: 'Slag', labelZh: '炉渣', labelEn: 'Slag', status: 'deprecated' }),
+  // Imported earlier: an IRI of its own and no names.
+  elementFixture({ id: 'el-heat', localName: 'Heat', iri: 'urn:metals:Heat', explicitIri: true, labelZh: null, labelEn: null, definitionZh: null, origin: 'import' }),
 ];
 
 const AXIOM = 'steel:Slab owl:unionOf (\n  steel:HotSlab\n  steel:ColdSlab\n) .';
@@ -432,7 +476,23 @@ function importItems(): ChangeItem[] {
       proposed: {},
       before: { localName: 'Slag', labelZh: '炉渣', labelEn: 'Slag', definitionZh: '浮在钢水表面的熔渣。', synonyms: [], parentRef: null },
     }),
-    itemFixture({ ...imported, id: 'item-ladle-car', seq: 5, tempRef: 'new:LadleCar', proposed: { localName: 'LadleCar', labelZh: '钢包车' } }),
+    itemFixture({
+      ...imported,
+      id: 'item-ladle-car',
+      seq: 5,
+      tempRef: 'new:LadleCar',
+      proposed: { iri: 'urn:metals:LadleCar', localName: 'LadleCar', labelEn: 'Ladle car' },
+    }),
+    itemFixture({
+      ...imported,
+      id: 'item-heat',
+      seq: 6,
+      op: 'update',
+      tempRef: null,
+      targetElementId: 'el-heat',
+      proposed: { definitionEn: 'One melt of the converter.' },
+      before: { localName: 'Heat', labelZh: null, labelEn: null, definitionZh: null, definitionEn: null, synonyms: [], parentRef: null },
+    }),
   ];
 }
 
@@ -482,16 +542,74 @@ describe('import change set review', () => {
     expect(restored).toHaveTextContent('将恢复以下内容：');
     expect(restored).toHaveTextContent('浮在钢水表面的熔渣。');
 
-    // Not AI: no AI label or confidence; only creates and updates of the original kinds can be edited.
+    // Without a Chinese name an item is named by its English name, then by its local name.
+    const ladleCar = card(/^Ladle car/);
+    const heat = card(/^Heat/);
+    expect(within(heat).getByText('修改')).toBeInTheDocument();
+
+    // Not AI: no AI label or confidence. Elements with an IRI of their own are accepted or
+    // rejected as they are: the edit form checks the platform's naming rules, not the file's.
     expect(screen.queryByText('AI 建议')).not.toBeInTheDocument();
     expect(screen.queryByText(/置信度/)).not.toBeInTheDocument();
-    expect(within(card(/钢包车/)).getByRole('button', { name: '修改“钢包车”' })).toBeInTheDocument();
-    for (const article of [shape, axiom, removed, restored]) {
+    for (const article of [shape, axiom, removed, restored, ladleCar, heat]) {
       expect(within(article).queryByRole('button', { name: /^修改“/ })).not.toBeInTheDocument();
     }
 
     // The first item has no evidence: the panel says why instead of showing source text.
     expect(within(screen.getByRole('region', { name: '证据' })).getByText('导入的内容没有资料原文。')).toBeInTheDocument();
+  });
+
+  it('shows what an update replaces: the old rules, the auto shape switch, a deleted one-line axiom', async () => {
+    // A confidence on an imported item must not show: only AI items have one that means anything.
+    const imported = { confidence: 0.8, rationale: null, evidence: [], tempRef: null };
+    const oneLine = 'steel:Slab owl:disjointWith steel:Slag .';
+    reviewServer({
+      initial: changeSetFixture(
+        [
+          itemFixture({
+            ...imported,
+            id: 'item-rules',
+            op: 'update',
+            kind: 'constraint',
+            targetElementId: 'el-shape',
+            proposed: { rules: [{ pathRef: 'el-temperature', minCount: 1, allowedValuesLost: false }] },
+            before: {
+              localName: 'MoltenSteelShape',
+              labelZh: '钢水校验',
+              domainRef: 'el-molten-steel',
+              rules: [{ pathRef: 'el-temperature', minCount: 1, maxCount: 1, allowedValuesLost: false }],
+            },
+          }),
+          itemFixture({
+            ...imported,
+            id: 'item-auto',
+            seq: 2,
+            op: 'update',
+            targetElementId: 'el-ladle',
+            proposed: { autoShape: false },
+            before: { localName: 'Ladle', labelZh: '钢包', labelEn: 'Ladle', synonyms: [], parentRef: null, autoShape: true },
+          }),
+          itemFixture({ ...imported, id: 'item-gone', seq: 3, op: 'delete', kind: 'axiom', targetElementId: 'el-axiom', proposed: {}, before: { turtle: oneLine } }),
+        ],
+        { id: 'cs-import', title: '导入：steel.ttl', source: 'import', documentId: null },
+      ),
+      extra: { 'GET /api/ontologies/:id/elements': () => importedElements },
+    });
+    renderApp('/review/cs-import');
+
+    const rules = await screen.findByRole('article', { name: /钢水校验/ });
+    const [now] = within(rules).getAllByRole('table', { name: '约束规则' });
+    expect(now).toHaveTextContent('至少 1 个');
+    const old = within(rules).getByRole('region', { name: '修改前的规则' });
+    expect(old).toHaveTextContent('恰好 1 个');
+
+    expect(card(/^钢包/)).toHaveTextContent('自动生成校验规则');
+
+    const gone = card(/owl:disjointWith/);
+    expect(gone).toHaveTextContent('将删除以下内容：');
+    expect(gone.querySelector('pre')).toHaveTextContent(oneLine);
+
+    expect(screen.queryByText(/置信度/)).not.toBeInTheDocument();
   });
 
   it('accepts every pending item at once and explains a delete skipped for dependents', async () => {
@@ -503,11 +621,11 @@ describe('import change set review', () => {
 
     expect(await screen.findByRole('article', { name: /钢水校验/ })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /接受全部高置信度项/ })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '接受全部（5）' }));
+    await user.click(screen.getByRole('button', { name: '接受全部（6）' }));
 
     await waitFor(() => expect(api.calls('POST', '/api/change-sets/cs-import/decisions')).toHaveLength(1));
     expect(api.calls('POST', '/api/change-sets/cs-import/decisions')[0]?.body).toEqual({
-      itemIds: ['item-shape', 'item-axiom', 'item-delete', 'item-restore', 'item-ladle-car'],
+      itemIds: ['item-shape', 'item-axiom', 'item-delete', 'item-restore', 'item-ladle-car', 'item-heat'],
       decision: 'accepted',
     });
     await waitFor(() => expect(screen.getByRole('button', { name: '合并到本体' })).toBeEnabled());

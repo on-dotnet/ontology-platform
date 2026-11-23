@@ -188,7 +188,6 @@
       "submit": "导入文件",
       "failedTitle": "文件没有导入",
       "parseErrorLine": "文件第 {{line}} 行有语法错误，请修正后重新导入。",
-      "parseErrorAt": "文件第 {{line}} 行第 {{column}} 列有语法错误，请修正后重新导入。",
       "intoTitle": "导入 OWL 到“{{name}}”",
       "intoDescription": "平台会把文件与工作版本比较，差异整理成变更集，审核并合并后才会生效。",
       "createdTitle": "已创建本体“{{name}}”",
@@ -414,6 +413,7 @@
     "unknownType": "未知对象类型",
     "before": "原值：",
     "after": "新值：",
+    "rulesBefore": "修改前的规则",
     "emptyValue": "（空）",
     "facts": {
       "parent": "父类型：{{name}}",
@@ -445,7 +445,8 @@
       "required": "必填",
       "multiple": "允许多个",
       "inverseRef": "互逆关系",
-      "targetRef": "目标类型"
+      "targetRef": "目标类型",
+      "autoShape": "自动生成校验规则"
     },
     "edit": {
       "title": "修改“{{name}}”",
@@ -586,7 +587,7 @@
     "moreActions": "更多操作",
     "newOntology": "新建本体",
     "importOwl": "导入 OWL",
-    "importOwlFile": "从 OWL 文件导入",
+    "importOwlFile": "导入 OWL 文件",
     "created": "已创建本体“{{name}}”"
   },
   "releases": {

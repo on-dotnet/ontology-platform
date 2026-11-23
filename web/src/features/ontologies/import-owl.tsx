@@ -11,6 +11,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { changeSetKeys } from '@/features/review/api';
 import { useErrorMessage } from '@/i18n/error-message';
 import { formatBytes } from '@/lib/format';
 
@@ -26,18 +27,13 @@ import {
 const MB = 1024 * 1024;
 const COUNT_KEYS = ['create', 'update', 'delete', 'restore'] as const;
 
-/** Localized import failure; syntax errors name the line (and column) when the server knows it. */
+/** Localized import failure; syntax errors name the line when the server knows it. */
 export function useImportErrorMessage(): (error: unknown) => string {
   const { t } = useTranslation();
   const message = useErrorMessage();
   return (error: unknown) => {
-    if (isApiError(error) && error.code === 'import.parse_error') {
-      const { line, column } = error.body;
-      if (typeof line === 'number') {
-        return typeof column === 'number'
-          ? t('ontologies.import.parseErrorAt', { line, column })
-          : t('ontologies.import.parseErrorLine', { line });
-      }
+    if (isApiError(error) && error.code === 'import.parse_error' && typeof error.body.line === 'number') {
+      return t('ontologies.import.parseErrorLine', { line: error.body.line });
     }
     return message(error);
   };
@@ -49,7 +45,7 @@ export function useRefreshAfterImport(): () => Promise<void> {
   return async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ontologyKeys.all }),
-      queryClient.invalidateQueries({ queryKey: ['change-sets'] }),
+      queryClient.invalidateQueries({ queryKey: changeSetKeys.all }),
       queryClient.invalidateQueries({ queryKey: ['workbench'] }),
     ]);
   };
@@ -135,6 +131,8 @@ export function ImportForm({ withName = false, run, onImported }: ImportFormProp
             variant="secondary"
             size="sm"
             aria-describedby={showFileError ? errorId : hintId}
+            // Choosing another file mid-request would reset the request under way.
+            disabled={mutation.isPending}
             onClick={() => inputRef.current?.click()}
           >
             <FileUp aria-hidden />
@@ -234,7 +232,7 @@ export function ImportResultView({ result, created, onClose }: ImportResultViewP
             const label = t(`ontologies.import.warnings.${warning.code}.label`, { count: warning.count });
             return (
               <li key={warning.code} className="flex items-center gap-1.5 text-sm text-foreground">
-                <WarnTip label={label}>{t(`ontologies.import.warnings.${warning.code}.description`)}</WarnTip>
+                <WarnTip>{t(`ontologies.import.warnings.${warning.code}.description`)}</WarnTip>
                 <span>{label}</span>
               </li>
             );

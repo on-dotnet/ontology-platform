@@ -188,7 +188,6 @@
       "submit": "Import file",
       "failedTitle": "The file was not imported",
       "parseErrorLine": "The file has a syntax error on line {{line}}. Fix it and import it again.",
-      "parseErrorAt": "The file has a syntax error on line {{line}}, column {{column}}. Fix it and import it again.",
       "intoTitle": "Import OWL into “{{name}}”",
       "intoDescription": "The file is compared with the working version. The differences become a change set that takes effect once it is reviewed and merged.",
       "createdTitle": "Ontology “{{name}}” created",
@@ -414,6 +413,7 @@
     "unknownType": "Unknown object type",
     "before": "Before: ",
     "after": "After: ",
+    "rulesBefore": "Rules before the change",
     "emptyValue": "(empty)",
     "facts": {
       "parent": "Parent: {{name}}",
@@ -445,7 +445,8 @@
       "required": "Required",
       "multiple": "Allow multiple",
       "inverseRef": "Inverse relation",
-      "targetRef": "Target type"
+      "targetRef": "Target type",
+      "autoShape": "Generate validation rules"
     },
     "edit": {
       "title": "Edit {{name}}",
@@ -732,7 +733,7 @@
       "stale_target": "the target element changed after the change set was created",
       "dependency_skipped": "an item it refers to was rejected or skipped",
       "invalid_item": "its content is incomplete or invalid",
-      "has_dependents": "Other elements still refer to it, so it was not deleted"
+      "has_dependents": "other elements still refer to it, so it was not deleted"
     },
     "release": {
       "not_found": "The release does not exist or was deleted.",
