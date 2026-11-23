@@ -8,9 +8,13 @@ from fastapi import FastAPI
 
 from ontology_platform.db import create_database_engine, create_session_factory
 from ontology_platform.errors import install_error_handlers
+from ontology_platform.modules.ai.api import router as ai_router
+from ontology_platform.modules.documents.api import router as documents_router
 from ontology_platform.modules.health.api import router as health_router
 from ontology_platform.modules.identity import service as identity_service
 from ontology_platform.modules.identity.api import router as auth_router
+from ontology_platform.modules.ontology.api import router as ontology_router
+from ontology_platform.modules.workbench.api import router as workbench_router
 from ontology_platform.settings import Settings
 
 
@@ -47,6 +51,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     install_error_handlers(app)
     app.include_router(health_router)
     app.include_router(auth_router)
+    app.include_router(ontology_router)
+    app.include_router(documents_router)
+    app.include_router(ai_router)
+    app.include_router(workbench_router)
     return app
 
 

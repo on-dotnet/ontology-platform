@@ -18,6 +18,7 @@
   gen-api           从后端导出 OpenAPI，并生成前端类型 web/src/api/schema.d.ts
   ci [-Report]      完整门禁：compose 校验、test-api、test-web、构建镜像；-Report 把结果写成提交状态 local-ci
   psql              打开开发库的 psql
+  init-env          由 .env.example 生成本机私有配置 .env.local（已存在则不动；由用户本人运行）
   reset             删除开发栈及其数据卷（只能由用户本人运行，会二次确认）
 
 脚本不改变调用方会话的当前目录和环境变量：所有 docker 调用都显式带 --context，所有路径都基于脚本所在目录。
@@ -124,9 +125,9 @@ function Invoke-Up {
     Write-Step '构建镜像'
     Invoke-Compose build api web
     Write-Step '启动开发栈'
-    Invoke-Compose up -d postgres api web
-    if (-not (Wait-Healthy @('postgres', 'api', 'web'))) {
-        Invoke-Compose logs --tail 80 api web
+    Invoke-Compose up -d postgres api worker web
+    if (-not (Wait-Healthy @('postgres', 'api', 'worker', 'web'))) {
+        Invoke-Compose logs --tail 80 api worker web
         Stop-Dev '开发栈未就绪，见上方日志'
     }
     Write-Ok '开发栈已就绪'
@@ -239,6 +240,17 @@ function Invoke-Ci {
     if ($failed.Count -gt 0) { exit 1 }
 }
 
+# Creates the private settings file from the template; never prints its content.
+function Invoke-InitEnv {
+    if (Test-Path -LiteralPath $EnvLocal) {
+        Write-Note "已存在 $EnvLocal，未做改动"
+        return
+    }
+    Copy-Item -LiteralPath (Join-Path $Root '.env.example') -Destination $EnvLocal
+    Write-Ok "已生成 $EnvLocal"
+    Write-Host '请用编辑器打开它，填写 OP_OPENAI_API_KEY 和 OP_AI_PROXY（例如 http://ontology:口令@10.16.0.157:7897），保存后运行 ./dev.ps1 up'
+}
+
 function Invoke-Reset {
     Write-Note '将删除开发栈的全部容器和数据卷（数据库内容会丢失）。'
     $answer = Read-Host '确认删除请输入 RESET'
@@ -260,6 +272,7 @@ switch ($Command) {
     'gen-api' { Invoke-GenApi }
     'ci' { Invoke-Ci }
     'psql' { Invoke-Compose exec postgres psql -U ontology -d ontology }
+    'init-env' { Invoke-InitEnv }
     'reset' { Invoke-Reset }
     default { Get-Help $PSCommandPath -Detailed | Out-Host }
 }

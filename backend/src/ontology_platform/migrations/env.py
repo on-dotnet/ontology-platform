@@ -10,9 +10,8 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import create_engine, pool
 
+from ontology_platform import models  # noqa: F401  (registers every module's tables)
 from ontology_platform.db import Base
-from ontology_platform.modules.audit import models as audit_models  # noqa: F401
-from ontology_platform.modules.identity import models as identity_models  # noqa: F401
 from ontology_platform.settings import Settings
 
 config = context.config

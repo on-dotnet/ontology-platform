@@ -8,9 +8,8 @@ from alembic.autogenerate import compare_metadata
 from alembic.migration import MigrationContext
 from sqlalchemy import create_engine, inspect
 
+from ontology_platform import models  # noqa: F401  (registers every module's tables)
 from ontology_platform.db import Base
-from ontology_platform.modules.audit import models as audit_models  # noqa: F401
-from ontology_platform.modules.identity import models as identity_models  # noqa: F401
 from support import alembic_config
 
 SCHEMAS = {table.schema for table in Base.metadata.tables.values()}
@@ -21,7 +20,7 @@ def include_name(name: str | None, type_: str, parent_names: object) -> bool:
 
 
 def test_models_cover_identity_and_audit() -> None:
-    assert set(Base.metadata.tables) == {"identity.users", "identity.sessions", "audit.events"}
+    assert {"identity.users", "identity.sessions", "audit.events"} <= set(Base.metadata.tables)
 
 
 def test_migrations_match_models(database_url: str) -> None:
