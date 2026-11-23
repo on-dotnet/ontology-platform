@@ -8,6 +8,7 @@ transaction.
 Change sets are the only way the working version changes (AGENTS.md, "AI 不直接改本体").
 """
 
+import asyncio
 import hashlib
 import re
 import secrets
@@ -56,8 +57,6 @@ INVALID_ITEM = "changeset.invalid_item"
 HAS_DEPENDENTS = "changeset.has_dependents"
 # The kinds M1's AI extraction aligns its proposals with.
 _ALIGNMENT_KINDS = ("entity_type", "relation_type", "property")
-# Deletes run last, dependents before what they depend on.
-_DELETE_ORDER = {"axiom": 0, "constraint": 1, "relation_type": 2, "property": 2, "entity_type": 3}
 
 TITLE_MAX_LENGTH = 300
 _KEY = re.compile(schemas.KEY_PATTERN)
@@ -240,7 +239,7 @@ async def create_change_set(
         db,
         "changeset.created",
         # AI change sets are the platform's work, not the uploader's.
-        actor_id=created_by if source == "manual" else None,
+        actor_id=created_by if source in ("manual", "import") else None,
         target_type="change_set",
         target_id=str(change_set.id),
         detail={"source": source, "items": len(items)},
@@ -696,7 +695,14 @@ async def export_working_version(db: AsyncSession, ontology_id: UUID) -> tuple[s
         element_out(element, ontology.base_iri)
         for element in await _active_elements(db, ontology_id)
     ]
-    turtle = export_turtle(_header(ontology), elements, version=None, created=ontology.created_at)
+    # Parsing axioms and writing Turtle is CPU work; keep it off the event loop.
+    turtle = await asyncio.to_thread(
+        export_turtle,
+        _header(ontology),
+        elements,
+        version=None,
+        created=ontology.created_at,
+    )
     return turtle, f"{ontology.key}.ttl"
 
 
@@ -1182,9 +1188,11 @@ class _Merge:
         self._restores = {
             item.target_element_id: item
             for item in items
-            if item.op == "restore" and item.decision == "accepted" and item.target_element_id
+            if item.op == "restore" and item.target_element_id
         }
         self._visiting: set[UUID] = set()
+        # Items whose inverse waits for the item (key) they are paired with to be applied.
+        self._deferred: dict[UUID, list[ChangeItem]] = defaultdict(list)
         self._now = now
         # Imported and hand-made synonym lists replace the old ones; AI ones add to them.
         self._replace_synonyms = change_set.source in ("import", "manual")
@@ -1199,6 +1207,16 @@ class _Merge:
         finally:
             self._visiting.discard(item.id)
         self.outcomes[item.id] = outcome
+        # Two relations that name each other as inverse: the one applied first gets its
+        # inverse once the other exists.
+        for waiting in self._deferred.pop(item.id, []):
+            partner = (
+                self._elements.get(waiting.applied_element_id)
+                if waiting.applied_element_id
+                else None
+            )
+            if outcome is None and partner is not None:
+                partner.inverse_id = item.applied_element_id
         return outcome
 
     def _target(self, item: ChangeItem) -> tuple[str | None, Element | None]:
@@ -1213,8 +1231,6 @@ class _Merge:
         return None, target
 
     async def _apply(self, item: ChangeItem) -> str | None:
-        if item.op == "delete":
-            return self._delete(item)
         kind = item.kind
         target: Element | None = None
         if item.op in ("update", "restore"):
@@ -1238,7 +1254,12 @@ class _Merge:
             if value is None:
                 resolved[name] = None
                 continue
-            outcome, element_id = await self._resolve(value, rules.REF_TARGETS[name], target)
+            outcome, element_id = await self._resolve(
+                value,
+                rules.REF_TARGETS[name],
+                target,
+                defer=item if name == "inverse_ref" else None,
+            )
             if outcome is not None:
                 return outcome
             resolved[name] = element_id
@@ -1262,7 +1283,14 @@ class _Merge:
         value: str,
         kinds: tuple[str, ...],
         own: Element | None,
+        *,
+        defer: ChangeItem | None = None,
     ) -> tuple[str | None, UUID | None]:
+        """The element a reference points at, applying the item that makes it first.
+
+        `defer` (only for inverse relations, which may point at each other) allows a loop: the
+        reference resolves to None for now and `apply` fills it in once the partner exists.
+        """
         element_id = rules.parse_id(value)
         if element_id is not None:
             element = self._elements.get(element_id)
@@ -1273,8 +1301,15 @@ class _Merge:
             if element.status != "active":
                 # A deleted element this change set brings back can be referenced.
                 restore = self._restores.get(element.id)
-                if restore is None or restore.id in self._visiting:
+                if restore is None:
                     return INVALID_ITEM, None
+                if restore.decision != "accepted":
+                    return DEPENDENCY_SKIPPED, None
+                if restore.id in self._visiting:
+                    if defer is None:
+                        return INVALID_ITEM, None
+                    self._deferred[restore.id].append(defer)
+                    return None, None
                 if await self.apply(restore) is not None:
                     return DEPENDENCY_SKIPPED, None
             return None, element.id
@@ -1282,6 +1317,9 @@ class _Merge:
         if dependency is None or dependency.kind not in kinds:
             return INVALID_ITEM, None
         if dependency.id in self._visiting:
+            if defer is not None and dependency.decision == "accepted":
+                self._deferred[dependency.id].append(defer)
+                return None, None
             # The items reference each other in a loop.
             return INVALID_ITEM, None
         if dependency.decision != "accepted":
@@ -1479,9 +1517,10 @@ class _Merge:
         item.applied_element_id = target.id
         return None
 
-    def _dependents(self, target: Element) -> bool:
+    def _used_by_others(self, target: Element, leaving: set[UUID]) -> bool:
+        """Whether an element that stays active refers to `target`."""
         for element in self._elements.values():
-            if element.status != "active" or element.id == target.id:
+            if element.status != "active" or element.id in leaving:
                 continue
             columns = (element.parent_id, element.domain_id, element.range_id, element.inverse_id)
             if target.id in columns or element.subject_id == target.id:
@@ -1490,32 +1529,38 @@ class _Merge:
                 return True
         return False
 
-    def _delete(self, item: ChangeItem) -> str | None:
-        problem, target = self._target(item)
-        if problem is not None or target is None:
-            return problem
-        fields = rules.effective_fields(item.proposed, item.edited)
-        if rules.field_problems(item.kind, "delete", fields):
-            return INVALID_ITEM
-        if self._dependents(target):
-            return HAS_DEPENDENTS
-        target.status = "deprecated"
-        target.revision += 1
-        target.updated_at = self._now
-        item.applied_element_id = target.id
-        return None
+    def apply_deletes(self, items: Sequence[ChangeItem]) -> None:
+        """Delete together what is only used by other elements deleted in this change set.
 
-    def delete_order(self, item: ChangeItem) -> tuple[int, int, int]:
-        """Dependents first: axioms, constraints, relations and properties, then object types,
-        subtypes before their parents."""
-        depth = 0
-        element = self._elements.get(item.target_element_id) if item.target_element_id else None
-        seen: set[UUID] = set()
-        while element is not None and element.parent_id is not None and element.id not in seen:
-            seen.add(element.id)
-            depth += 1
-            element = self._elements.get(element.parent_id)
-        return (_DELETE_ORDER.get(item.kind, 9), -depth, item.seq)
+        A delete whose target an element outside the deleted set still uses is skipped with
+        `changeset.has_dependents`; dropping it can make others fail too, so this repeats until
+        the deleted set is closed. Two relations that are each other's inverse go together.
+        """
+        leaving: dict[UUID, tuple[ChangeItem, Element]] = {}
+        for item in items:
+            problem, target = self._target(item)
+            fields = rules.effective_fields(item.proposed, item.edited)
+            if problem is None and rules.field_problems(item.kind, "delete", fields):
+                problem = INVALID_ITEM
+            if problem is not None or target is None:
+                self.outcomes[item.id] = problem
+                continue
+            leaving[item.id] = (item, target)
+        changed = True
+        while changed:
+            changed = False
+            ids = {target.id for _, target in leaving.values()}
+            for item_id, (_, target) in list(leaving.items()):
+                if self._used_by_others(target, ids):
+                    self.outcomes[item_id] = HAS_DEPENDENTS
+                    del leaving[item_id]
+                    changed = True
+        for item, target in leaving.values():
+            target.status = "deprecated"
+            target.revision += 1
+            target.updated_at = self._now
+            item.applied_element_id = target.id
+            self.outcomes[item.id] = None
 
 
 async def merge_change_set(
@@ -1547,10 +1592,10 @@ async def merge_change_set(
     ordered = [
         *(item for item in accepted if item.op != "delete" and item.kind != "axiom"),
         *(item for item in accepted if item.op != "delete" and item.kind == "axiom"),
-        *sorted((item for item in accepted if item.op == "delete"), key=merge.delete_order),
     ]
     for item in ordered:
         await merge.apply(item)
+    merge.apply_deletes([item for item in accepted if item.op == "delete"])
     skipped = [
         schemas.MergeSkip.model_validate({"item_id": item.id, "code": merge.outcomes[item.id]})
         for item in accepted
@@ -1718,7 +1763,7 @@ async def publish_release(
     version = (latest or 0) + 1
     now = _now()
     header = header_of(ontology)
-    turtle = export_turtle(header, snapshot, version=version, created=now)
+    turtle = await asyncio.to_thread(export_turtle, header, snapshot, version=version, created=now)
     release = Release(
         id=uuid4(),
         ontology_id=ontology_id,

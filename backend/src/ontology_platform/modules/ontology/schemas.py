@@ -28,7 +28,17 @@ from ontology_platform.schemas import CamelModel
 
 KEY_PATTERN = r"^[a-z][a-z0-9-]{1,62}$"
 IRI_MAX_LENGTH = 2048
-TURTLE_MAX_LENGTH = 20_000
+# One axiom; the file it comes from is at most 5 MB.
+TURTLE_MAX_LENGTH = 2_000_000
+SYNONYMS_MAX = 100
+RULES_MAX = 200
+ALLOWED_VALUES_MAX = 1000
+PATTERN_MAX = 2000
+FLAGS_MAX = 16
+MESSAGES_MAX = 20
+MESSAGE_MAX = 2000
+LEXICAL_MAX = 4000
+LANG_MAX = 35
 
 SkipCode = Literal[
     "changeset.stale_target",
@@ -61,9 +71,9 @@ class RdfValue(CamelModel):
     """
 
     iri: str | None = Field(default=None, max_length=IRI_MAX_LENGTH)
-    lexical: str | None = Field(default=None, max_length=4000)
+    lexical: str | None = Field(default=None, max_length=LEXICAL_MAX)
     datatype: str | None = Field(default=None, max_length=IRI_MAX_LENGTH)
-    lang: str | None = Field(default=None, max_length=35)
+    lang: str | None = Field(default=None, max_length=LANG_MAX)
 
     @model_validator(mode="after")
     def _one_kind(self) -> Self:
@@ -75,8 +85,8 @@ class RdfValue(CamelModel):
 
 
 class LangText(CamelModel):
-    lang: str | None = Field(default=None, max_length=35)
-    text: str = Field(min_length=1, max_length=2000)
+    lang: str | None = Field(default=None, max_length=LANG_MAX)
+    text: str = Field(min_length=1, max_length=MESSAGE_MAX)
 
 
 class _RuleValues(CamelModel):
@@ -87,7 +97,7 @@ class _RuleValues(CamelModel):
     datatype: str | None = Field(default=None, max_length=IRI_MAX_LENGTH)
     node_kind: NodeKind | None = None
     # sh:in. `allowedValuesLost` marks a list Protégé dropped (sh:in points at nothing).
-    allowed_values: list[RdfValue] | None = Field(default=None, max_length=1000)
+    allowed_values: list[RdfValue] | None = Field(default=None, max_length=ALLOWED_VALUES_MAX)
     allowed_values_lost: bool = False
     min_inclusive: RdfValue | None = None
     max_inclusive: RdfValue | None = None
@@ -95,9 +105,9 @@ class _RuleValues(CamelModel):
     max_exclusive: RdfValue | None = None
     min_length: int | None = Field(default=None, ge=0)
     max_length: int | None = Field(default=None, ge=0)
-    pattern: str | None = Field(default=None, max_length=2000)
-    flags: str | None = Field(default=None, max_length=16)
-    message: list[LangText] = Field(default_factory=list, max_length=20)
+    pattern: str | None = Field(default=None, max_length=PATTERN_MAX)
+    flags: str | None = Field(default=None, max_length=FLAGS_MAX)
+    message: list[LangText] = Field(default_factory=list, max_length=MESSAGES_MAX)
 
 
 class ConstraintRule(_RuleValues):
@@ -129,7 +139,7 @@ class ElementFields(CamelModel):
     label_en: str | None = Field(default=None, max_length=200)
     definition_zh: str | None = Field(default=None, max_length=4000)
     definition_en: str | None = Field(default=None, max_length=4000)
-    synonyms: list[Synonym] | None = Field(default=None, max_length=100)
+    synonyms: list[Synonym] | None = Field(default=None, max_length=SYNONYMS_MAX)
     parent_ref: Ref | None = None
     domain_ref: Ref | None = None
     range_ref: Ref | None = None
@@ -139,7 +149,7 @@ class ElementFields(CamelModel):
     required: bool | None = None
     multiple: bool | None = None
     auto_shape: bool | None = None
-    rules: list[ConstraintRuleFields] | None = Field(default=None, max_length=200)
+    rules: list[ConstraintRuleFields] | None = Field(default=None, max_length=RULES_MAX)
     turtle: str | None = Field(default=None, max_length=TURTLE_MAX_LENGTH)
 
 
@@ -352,7 +362,13 @@ class MergeResult(CamelModel):
 
 # ---------- import ----------
 
-ImportWarningCode = Literal["non_standard", "multiple_parents", "unsupported_shape", "lost_list"]
+ImportWarningCode = Literal[
+    "non_standard",
+    "multiple_parents",
+    "unsupported_shape",
+    "lost_list",
+    "kind_changed",
+]
 
 
 class ImportCounts(CamelModel):

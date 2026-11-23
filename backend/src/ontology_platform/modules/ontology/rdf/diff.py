@@ -69,8 +69,8 @@ class Change:
 @dataclass(slots=True)
 class Diff:
     changes: list[Change] = field(default_factory=list)
-    # Elements whose kind differs between the two sides; they are left alone.
-    kind_changed: int = 0
+    # IRIs of elements whose kind differs between the two sides; they are left alone.
+    kind_changed: list[str] = field(default_factory=list)
 
     def __bool__(self) -> bool:
         return bool(self.changes)
@@ -84,11 +84,33 @@ def field_value(element: ElementState, name: str) -> Any:
     return getattr(element, name)
 
 
-def changed_fields(have: ElementState, wanted: ElementState) -> frozenset[str]:
+def inverses(state: OntologyState) -> dict[str, str]:
+    """Each relation's inverse, read both ways: owl:inverseOf is symmetric, and OWL API writes
+    a pair that names each other with one triple only (the other direction is implied)."""
+    found: dict[str, str] = {}
+    for element in state.elements.values():
+        if element.active and element.inverse:
+            found[element.iri] = element.inverse
+    for iri, partner in sorted(found.items()):
+        found.setdefault(partner, iri)
+    return found
+
+
+def changed_fields(
+    have: ElementState,
+    wanted: ElementState,
+    have_inverses: dict[str, str] | None = None,
+    wanted_inverses: dict[str, str] | None = None,
+) -> frozenset[str]:
+    def value(element: ElementState, name: str, pairs: dict[str, str] | None) -> Any:
+        if name == "inverse" and pairs is not None:
+            return pairs.get(element.iri)
+        return field_value(element, name)
+
     return frozenset(
         name
         for name in KIND_FIELDS[wanted.kind]
-        if field_value(have, name) != field_value(wanted, name)
+        if value(have, name, have_inverses) != value(wanted, name, wanted_inverses)
     )
 
 
@@ -120,6 +142,7 @@ def keep_lost_lists(current: OntologyState, target: OntologyState) -> int:
 
 def diff(current: OntologyState, target: OntologyState) -> Diff:
     result = Diff()
+    pairs = (inverses(current), inverses(target))
     for iri in sorted(target.elements):
         wanted = target.elements[iri]
         if not wanted.active:
@@ -129,13 +152,13 @@ def diff(current: OntologyState, target: OntologyState) -> Diff:
             every = frozenset(KIND_FIELDS[wanted.kind])
             result.changes.append(Change("create", wanted.kind, wanted, fields=every))
         elif have.kind != wanted.kind:
-            result.kind_changed += 1
+            result.kind_changed.append(iri)
         elif not have.active:
             result.changes.append(
                 Change("restore", wanted.kind, wanted, fields=changed_fields(have, wanted)),
             )
         else:
-            changed = changed_fields(have, wanted)
+            changed = changed_fields(have, wanted, *pairs)
             if changed:
                 result.changes.append(Change("update", wanted.kind, wanted, fields=changed))
     for iri in sorted(current.elements):

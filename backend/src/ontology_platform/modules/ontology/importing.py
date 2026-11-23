@@ -10,6 +10,7 @@ import asyncio
 import re
 from collections import Counter
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from http import HTTPStatus
 from pathlib import PurePath
 from typing import Any, cast
@@ -24,7 +25,13 @@ from ontology_platform.modules.audit import service as audit
 from ontology_platform.modules.ontology import rules, schemas, service
 from ontology_platform.modules.ontology.models import KINDS, Element, Kind, Ontology
 from ontology_platform.modules.ontology.rdf import reader, writer
-from ontology_platform.modules.ontology.rdf.diff import KIND_FIELDS, Change, diff, keep_lost_lists
+from ontology_platform.modules.ontology.rdf.diff import (
+    KIND_FIELDS,
+    Change,
+    Diff,
+    diff,
+    keep_lost_lists,
+)
 from ontology_platform.modules.ontology.rdf.model import ElementState, OntologyState
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError
 from ontology_platform.modules.ontology.turtle import OntologyHeader, rule_fields, to_state
@@ -104,7 +111,11 @@ def _local_name(iri: str, used: set[str]) -> str:
 
 
 class _Proposals:
-    """Change items for a diff; references become element ids or temp_refs of creates."""
+    """Change items for a diff; references become element ids or temp_refs of creates.
+
+    Elements whose kind the file changed are left alone (spec 002, section 5), so references to
+    them are dropped rather than pointed at an element of the wrong kind.
+    """
 
     def __init__(
         self,
@@ -112,14 +123,16 @@ class _Proposals:
         axioms: Mapping[str, Element],
         local_names: set[str],
         prefixes: Mapping[str, str],
-        changes: Sequence[Change],
+        result: Diff,
     ) -> None:
         self.existing = existing
         self.axioms = axioms
         self.used = set(local_names)
         self.prefixes = prefixes
         self.refs: dict[str, str] = {iri: str(element.id) for iri, element in existing.items()}
-        creates = [c.element for c in changes if c.op == "create" and c.element is not None]
+        for iri in result.kind_changed:
+            self.refs.pop(iri, None)
+        creates = [c.element for c in result.changes if c.op == "create" and c.element]
         for number, created in enumerate(creates, start=1):
             self.refs[created.iri] = f"new:{number}"
 
@@ -132,7 +145,11 @@ class _Proposals:
             elif name == "synonyms":
                 data["synonyms"] = [{"lang": lang, "text": text} for lang, text in value]
             elif name == "rules":
-                data["rules"] = [rule_fields(rule, self.refs) for rule in value]
+                data["rules"] = [
+                    rule_fields(rule, self.refs)
+                    for rule in value
+                    if rule.references() <= self.refs.keys()
+                ]
             else:
                 data[rules.wire_name(name)] = value
         return data
@@ -141,12 +158,17 @@ class _Proposals:
         kind = cast(Kind, change.kind)  # the RDF layer uses the platform's kinds
         if change.axiom is not None:
             if change.op == "create":
+                turtle = writer.fragment(change.axiom.triples, self.prefixes)
+                if len(turtle) > schemas.TURTLE_MAX_LENGTH:
+                    raise AppError(
+                        422,
+                        "import.axiom_too_large",
+                        "One axiom of the file is longer than the platform keeps.",
+                    )
                 return schemas.ProposedItem(
                     op="create",
                     kind="axiom",
-                    proposed=schemas.ElementFields(
-                        turtle=writer.fragment(change.axiom.triples, self.prefixes),
-                    ),
+                    proposed=schemas.ElementFields(turtle=turtle),
                     flags=["non_standard"] if change.axiom.non_standard else [],
                 )
             target = self.axioms[str(change.axiom.id)]
@@ -202,12 +224,19 @@ def _counts(items: Sequence[schemas.ProposedItem]) -> schemas.ImportCounts:
 
 
 def _warnings(found: Counter[str]) -> list[schemas.ImportWarning]:
-    codes = ("non_standard", "multiple_parents", "unsupported_shape", "lost_list")
+    codes = ("non_standard", "multiple_parents", "unsupported_shape", "lost_list", "kind_changed")
     return [
         schemas.ImportWarning(code=code, count=found[code])  # type: ignore[arg-type]
         for code in codes
         if found[code] > 0
     ]
+
+
+@dataclass(slots=True)
+class _Proposed:
+    change_set_id: UUID | None
+    items: list[schemas.ProposedItem]
+    kind_changed: int
 
 
 async def _propose(
@@ -219,7 +248,7 @@ async def _propose(
     *,
     filename: str,
     actor: UUID,
-) -> tuple[UUID | None, list[schemas.ProposedItem]]:
+) -> _Proposed:
     header = service.header_of(ontology)
     existing: dict[str, Element] = {}
     for element in elements:
@@ -227,17 +256,17 @@ async def _propose(
         if iri is not None and element.kind != "axiom":
             existing[iri] = element
     axioms = {str(element.id): element for element in elements if element.kind == "axiom"}
-    changes = diff(current, target).changes
+    result = diff(current, target)
     proposals = _Proposals(
         existing,
         axioms,
         {element.local_name for element in elements if element.local_name},
         header.prefix_map(),
-        changes,
+        result,
     )
-    items = sorted((proposals.item(change) for change in changes), key=_sort_key)
+    items = sorted((proposals.item(change) for change in result.changes), key=_sort_key)
     if not items:
-        return None, items
+        return _Proposed(None, items, len(result.kind_changed))
     change_set_id = await service.create_change_set(
         db,
         ontology_id=ontology.id,
@@ -247,11 +276,25 @@ async def _propose(
         created_by=actor,
         items=items,
     )
-    return change_set_id, items
+    return _Proposed(change_set_id, items, len(result.kind_changed))
 
 
 def _stem(filename: str) -> str:
     return PurePath(filename).stem.strip()
+
+
+async def _free_key(db: AsyncSession, title: str, key: str | None) -> str:
+    """The key the user gave, else one from the name, numbered when the name is taken (the
+    same file may well be imported twice)."""
+    if key is not None:
+        return await service._choose_key(db, schemas.OntologyCreate(name=title, key=key))
+    slug = service._slug(title)
+    if slug is not None:
+        for number in range(1, 100):
+            candidate = slug if number == 1 else f"{slug[:58].rstrip('-')}-{number}"
+            if not await service._key_taken(db, candidate):
+                return candidate
+    return await service._choose_key(db, schemas.OntologyCreate(name=title))
 
 
 async def import_new(
@@ -266,21 +309,19 @@ async def import_new(
 ) -> schemas.ImportResult:
     """Create an ontology from a file; its content arrives as an import change set."""
     graph = await asyncio.to_thread(_parse, data)
-    result = await asyncio.to_thread(reader.read, graph)
+    # A name the user gave wins; a different name in the file stays as an annotation.
+    known = reader.KnownHeader(name=name) if name else None
+    result = await asyncio.to_thread(reader.read, graph, known=known)
     title = (name or result.state.name or _stem(filename) or "Imported ontology").strip()[:200]
-    body = schemas.OntologyCreate(
-        name=title,
-        key=key,
-        description=result.state.description,
-    )
-    chosen = await service._choose_key(db, body)
+    description = result.state.description
+    chosen = await _free_key(db, title, key)
     base = result.base_iri if result.base_iri and len(result.base_iri) <= 512 else None
     now = service._now()
     ontology = Ontology(
         id=uuid4(),
         key=chosen,
-        name=body.name,
-        description=rules.clean_text(body.description),
+        name=title,
+        description=rules.clean_text(description),
         base_iri=base or service.default_base_iri(chosen),
         ontology_iri=result.file_ontology_iri,
         prefixes={},
@@ -288,7 +329,17 @@ async def import_new(
         created_at=now,
         updated_at=now,
     )
-    ontology.prefixes = _merged_prefixes(service.header_of(ontology), result.prefixes)
+    header = service.header_of(ontology)
+    if result.file_ontology_iri is None:
+        # The file names no ontology: read it again with the IRI the ontology now has, so that
+        # annotations of an anonymous header are about this ontology.
+        result = await asyncio.to_thread(
+            reader.read,
+            graph,
+            ontology_iri=header.ontology_iri,
+            known=known,
+        )
+    ontology.prefixes = _merged_prefixes(header, result.prefixes)
     db.add(ontology)
     try:
         await db.flush()
@@ -296,13 +347,12 @@ async def import_new(
         await db.rollback()
         raise AppError(409, "ontology.key_taken", "The ontology key is already in use.") from exc
     target = result.state
-    target.ontology_iri = service.header_of(ontology).ontology_iri
-    current = OntologyState(ontology_iri=target.ontology_iri)
-    change_set_id, items = await _propose(
+    target.ontology_iri = header.ontology_iri
+    proposed = await _propose(
         db,
         ontology,
         [],
-        current,
+        OntologyState(ontology_iri=target.ontology_iri),
         target,
         filename=filename,
         actor=actor,
@@ -314,14 +364,14 @@ async def import_new(
             actor_id=actor,
             target_type="ontology",
             target_id=str(ontology.id),
-            detail={"key": chosen, "name": ontology.name, "items": len(items)},
+            detail={"key": chosen, "name": ontology.name, "items": len(proposed.items)},
             ip=ip,
         )
     await db.commit()
     return schemas.ImportResult(
         ontology=await service.get_ontology_summary(db, ontology.id),
-        change_set_id=change_set_id,
-        counts=_counts(items),
+        change_set_id=proposed.change_set_id,
+        counts=_counts(proposed.items),
         warnings=_warnings(result.warnings),
     )
 
@@ -344,18 +394,20 @@ async def import_into(
         graph,
         ontology_iri=header.ontology_iri,
         absorb={DCTERMS.created: writer.created_literal(ontology.created_at)},
+        known=reader.KnownHeader(ontology.name, ontology.description, strict=True),
     )
-    ontology.prefixes = _merged_prefixes(header, result.prefixes)
+    # From here on one import (or merge, or publish) of this ontology at a time: the prefixes
+    # the change set's axioms are written with must not change under them.
+    ontology = await service._ontology_or_404(db, ontology_id, lock=True)
+    ontology.prefixes = _merged_prefixes(service.header_of(ontology), result.prefixes)
     elements = await service._elements(db, ontology.id)
     current = to_state(
         service.header_of(ontology),
         [service.element_out(element, ontology.base_iri) for element in elements],
         include_deleted=True,
     )
-    found = Counter(result.warnings)
     restored = keep_lost_lists(current, result.state)
-    found["lost_list"] = max(0, found["lost_list"] - restored)
-    change_set_id, items = await _propose(
+    proposed = await _propose(
         db,
         ontology,
         elements,
@@ -370,13 +422,23 @@ async def import_into(
         actor_id=actor,
         target_type="ontology",
         target_id=str(ontology.id),
-        detail={"changeSetId": str(change_set_id) if change_set_id else None, "items": len(items)},
+        detail={
+            "changeSetId": str(proposed.change_set_id) if proposed.change_set_id else None,
+            "items": len(proposed.items),
+        },
         ip=ip,
     )
     await db.commit()
+    # Warnings are about what goes to review; a file that changes nothing needs none.
+    found: Counter[str] = Counter()
+    if proposed.change_set_id is not None:
+        found = Counter(result.warnings)
+        found["non_standard"] = sum("non_standard" in item.flags for item in proposed.items)
+        found["lost_list"] = max(0, found["lost_list"] - restored)
+    found["kind_changed"] = proposed.kind_changed
     return schemas.ImportResult(
         ontology=await service.get_ontology_summary(db, ontology.id),
-        change_set_id=change_set_id,
-        counts=_counts(items),
+        change_set_id=proposed.change_set_id,
+        counts=_counts(proposed.items),
         warnings=_warnings(found),
     )

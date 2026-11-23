@@ -73,8 +73,10 @@ type ImportResult = {
   ontology: OntologySummary;
   changeSetId: string | null;           // 没有差异时为 null
   counts: { create: number; update: number; delete: number; restore: number };
-  warnings: { code: 'non_standard' | 'multiple_parents' | 'unsupported_shape' | 'lost_list'; count: number }[];
+  warnings: { code: 'non_standard' | 'multiple_parents' | 'unsupported_shape' | 'lost_list' | 'kind_changed'; count: number }[];
 };
+// 导入到已有本体时，warnings 只针对本次变更集：没有差异时为空；lost_list 只计平台里沿用不了的列表；
+// kind_changed 是文件里换了种类的已有元素个数，这些元素保持原样，指向它们的引用不进变更集。
 // 语法错误：422 import.parse_error，附加字段 line: number | null、column: number | null
 
 // ---------- 手工编辑与影响（PR B） ----------
@@ -127,8 +129,8 @@ type AssistantRequest = {
 
 | 方法与路径 | 角色 | PR |
 |---|---|---|
-| `POST /api/ontologies/import` | editor | A |
-| `POST /api/ontologies/{id}/import` | editor | A |
+| `POST /api/ontologies/import` | editor（及 reviewer、admin） | A |
+| `POST /api/ontologies/{id}/import` | editor（及 reviewer、admin） | A |
 | `POST /api/ontologies/{id}/turtle` | editor | B |
 | `POST /api/ontologies/{id}/edits` | editor（`apply` 需要 reviewer 且为单人模式） | B |
 | `GET /api/ontologies/{id}/elements/{elementId}/impact` | viewer | B |
@@ -146,6 +148,7 @@ type AssistantRequest = {
 | `import.too_many_triples` | 422 | 三元组超过 50,000 个 |
 | `import.parse_error` | 422 | 语法错误，附 `line`、`column` |
 | `import.empty` | 422 | 文件里没有任何三元组 |
+| `import.axiom_too_large` | 422 | 某条公理超过平台能存的长度（200 万字符） |
 | `element.stale` | 409 | 元素在读取之后被修改过 |
 | `element.name_taken` | 409 | 局部名或 IRI 已被占用（包括已删除的元素） |
 | `element.not_found` | 404 | 沿用 M1 |

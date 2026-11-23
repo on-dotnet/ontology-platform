@@ -1,0 +1,7 @@
+@prefix ex: <urn:g3:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+# Two relations naming each other as inverse, and one pair stated once (review of PR #10).
+ex:p a owl:ObjectProperty ; owl:inverseOf ex:q .
+ex:q a owl:ObjectProperty ; owl:inverseOf ex:p .
+ex:r a owl:ObjectProperty ; owl:inverseOf ex:s .
+ex:s a owl:ObjectProperty .

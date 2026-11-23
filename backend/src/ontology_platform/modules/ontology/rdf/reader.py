@@ -8,7 +8,7 @@ element when the writer reproduces it exactly; the rest of the file is kept as i
 import re
 from collections import Counter, defaultdict
 from collections.abc import Mapping
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from xml.sax import SAXParseException
 
@@ -16,6 +16,7 @@ from rdflib import BNode, Graph, Literal, URIRef
 from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SKOS, XSD
 from rdflib.term import Node
 
+from ontology_platform.modules.ontology import schemas as limits
 from ontology_platform.modules.ontology.rdf.axioms import axioms_of
 from ontology_platform.modules.ontology.rdf.declarations import (
     implied_declarations,
@@ -170,6 +171,28 @@ def _plain(value: Node) -> bool:
     return isinstance(value, Literal) and value.language is None and value.datatype is None
 
 
+def _value_fits(value: Node) -> bool:
+    """Whether an RDF value fits the API models (RdfValue) unchanged."""
+    if isinstance(value, URIRef):
+        return len(str(value)) <= limits.IRI_MAX_LENGTH
+    if not isinstance(value, Literal):
+        return False
+    datatype = value.datatype
+    return (
+        len(str(value)) <= limits.LEXICAL_MAX
+        and len(value.language or "") <= limits.LANG_MAX
+        and (datatype is None or len(str(datatype)) <= limits.IRI_MAX_LENGTH)
+    )
+
+
+def _message_fits(value: Node) -> bool:
+    if not isinstance(value, Literal) or value.datatype is not None:
+        return False
+    return (
+        0 < len(str(value)) <= limits.MESSAGE_MAX and len(value.language or "") <= limits.LANG_MAX
+    )
+
+
 def _namespace(iri: str) -> str:
     for separator in ("#", "/", ":"):
         index = iri.rfind(separator)
@@ -178,60 +201,113 @@ def _namespace(iri: str) -> str:
     return iri
 
 
-def _rename(node: Node, old: URIRef, new: URIRef) -> Node:
+def _rename(node: Node, old: Node, new: URIRef) -> Node:
     return new if node == old else node
+
+
+def _cyclic_blanks(graph: Graph) -> set[Node]:
+    """Blank nodes on a cycle of blank nodes, or reaching one (iterative depth-first search)."""
+    children: dict[Node, list[Node]] = defaultdict(list)
+    blanks: set[Node] = set()
+    for subject, _, value in graph:
+        if isinstance(subject, BNode):
+            blanks.add(subject)
+            if isinstance(value, BNode):
+                children[subject].append(value)
+        if isinstance(value, BNode):
+            blanks.add(value)
+    state: dict[Node, int] = {}  # 1: on the current path, 2: finished
+    cyclic: set[Node] = set()
+    for start in blanks:
+        if start in state:
+            continue
+        state[start] = 1
+        stack = [(start, iter(children[start]))]
+        while stack:
+            node, pending = stack[-1]
+            child = next(pending, None)
+            if child is None:
+                stack.pop()
+                state[node] = 2
+                if any(c in cyclic for c in children[node]):
+                    cyclic.add(node)
+            elif child not in state:
+                state[child] = 1
+                stack.append((child, iter(children[child])))
+            elif state[child] == 1:
+                # A way back up the current path: everything from there on is a cycle.
+                for on_path, _ in reversed(stack):
+                    cyclic.add(on_path)
+                    if on_path == child:
+                        break
+    return cyclic
 
 
 def unshare(graph: Graph) -> Graph:
     """The graph with every blank node used as an object more than once copied per use.
 
-    OWL 2 does not share anonymous structures, but OWL API writes equal lists (such as the
-    `( true )` of several sh:in) once and points to that node from each place. Copying keeps
-    each statement's structure on its own, so it compares equal to the file before Protégé.
+    OWL 2 does not share anonymous structures, but OWL API writes equal lists once and points
+    to that node from each place. Copying keeps each statement's structure on its own, so it
+    compares equal to the file before Protégé. Blank nodes on (or leading into) a cycle cannot
+    be copied as trees; they stay as they are, with their own statements.
     """
     refs = Counter(o for _, _, o in graph if isinstance(o, BNode))
     if all(count <= 1 for count in refs.values()):
         return graph
+    cyclic = _cyclic_blanks(graph)
     out = Graph(bind_namespaces="none")
     for prefix, namespace in graph.namespaces():
         out.bind(prefix, namespace)
-    # Blank nodes in a cycle are kept as they are, with their own statements.
-    kept: set[Node] = set()
 
-    def copy(node: Node, path: frozenset[Node]) -> Node:
-        if not isinstance(node, BNode):
-            return node
-        if node in path:
-            kept.add(node)
+    def copy(node: Node) -> Node:
+        if not isinstance(node, BNode) or node in cyclic:
             return node
         fresh = BNode()
-        for predicate, value in graph.predicate_objects(node):
-            out.add((fresh, predicate, copy(value, path | {node})))
+        stack: list[tuple[Node, BNode]] = [(node, fresh)]
+        while stack:
+            original, made = stack.pop()
+            for predicate, value in graph.predicate_objects(original):
+                if isinstance(value, BNode) and value not in cyclic:
+                    child = BNode()
+                    out.add((made, predicate, child))
+                    stack.append((value, child))
+                else:
+                    out.add((made, predicate, value))
         return fresh
 
-    roots = [t for t in graph if not (isinstance(t[0], BNode) and t[0] in refs)]
-    reachable: set[Node] = set()
-    stack = [o for _, _, o in roots if isinstance(o, BNode)]
-    while stack:
-        node = stack.pop()
-        if node not in reachable:
-            reachable.add(node)
-            stack.extend(o for o in graph.objects(node) if isinstance(o, BNode))
-    for subject, predicate, value in roots:
-        out.add((subject, predicate, copy(value, frozenset({subject}))))
     for subject, predicate, value in graph:
-        shared = isinstance(subject, BNode) and subject in refs
-        if shared and (subject not in reachable or subject in kept):
-            out.add((subject, predicate, value))
+        if not isinstance(subject, BNode) or subject in cyclic or refs[subject] == 0:
+            out.add((subject, predicate, copy(value)))
     return out
 
 
+@dataclass(frozen=True, slots=True)
+class KnownHeader:
+    """What the platform already knows about the ontology's name and description.
+
+    `strict` (importing into an existing ontology): a file value is absorbed only when it equals
+    the known one. Otherwise a known None lets the file's value in (a new ontology whose name
+    the user gave, but not its description).
+    """
+
+    name: str | None = None
+    description: str | None = None
+    strict: bool = False
+
+
 class _Reader:
-    def __init__(self, graph: Graph, ontology_iri: str, absorb: Mapping[URIRef, Literal]) -> None:
+    def __init__(
+        self,
+        graph: Graph,
+        ontology_iri: str,
+        absorb: Mapping[URIRef, Literal],
+        known: KnownHeader | None,
+    ) -> None:
         self.graph = graph
         self.remaining: set[Triple] = set(graph)
         self.ontology = URIRef(ontology_iri)
         self.absorb = absorb
+        self.known = known
         self.state = OntologyState(ontology_iri=ontology_iri)
         self.warnings: Counter[str] = Counter()
         self.refs: Counter[Node] = Counter(o for _, _, o in graph if isinstance(o, BNode))
@@ -276,16 +352,33 @@ class _Reader:
         if (ontology, RDF.type, OWL.Ontology) not in self.remaining:
             return
         self.take((ontology, RDF.type, OWL.Ontology))
-        labels = [v for v in self.left(ontology, RDFS.label) if _plain(v)]
-        if len(labels) == 1 and _clean(labels[0], LABEL_MAX):
-            self.state.name = str(labels[0])
-            self.take((ontology, RDFS.label, labels[0]))
-        descriptions = [v for v in self.left(ontology, DCTERMS.description) if _plain(v)]
-        if len(descriptions) == 1 and _clean(descriptions[0], DESCRIPTION_MAX):
-            self.state.description = str(descriptions[0])
-            self.take((ontology, DCTERMS.description, descriptions[0]))
+        known = self.known
+        name = self.header_text(RDFS.label, LABEL_MAX, known.name if known else None)
+        if name is not None:
+            self.state.name = name
+        description_known = known.description if known else None
+        description = self.header_text(DCTERMS.description, DESCRIPTION_MAX, description_known)
+        if description is not None:
+            self.state.description = description
         for predicate, value in self.absorb.items():
             self.take((ontology, predicate, value))
+
+    def header_text(self, predicate: URIRef, limit: int, known: str | None) -> str | None:
+        """The ontology's name or description from the file's single plain literal.
+
+        Without a known value the file's one is taken. With one (the ontology the file is
+        imported into, or the name the user gave), only an equal literal is absorbed; another
+        one stays as an annotation of the ontology, so nothing of the file is lost.
+        """
+        values = [v for v in self.left(self.ontology, predicate) if _plain(v)]
+        if len(values) != 1 or _clean(values[0], limit) is None:
+            return None
+        text = str(values[0])
+        adopt = self.known is None or (known is None and not self.known.strict)
+        if adopt or text == known:
+            self.take((self.ontology, predicate, values[0]))
+            return text
+        return None
 
     def anonymous_headers(self) -> None:
         # OWL API writes `[] a owl:Ontology` for a file that names no ontology.
@@ -303,6 +396,7 @@ class _Reader:
                     isinstance(subject, URIRef)
                     and subject != self.ontology
                     and not is_reserved(str(subject))
+                    and len(str(subject)) <= limits.IRI_MAX_LENGTH
                 ):
                     kinds[subject].add(kind)
         for subject in sorted(kinds, key=str):
@@ -340,6 +434,8 @@ class _Reader:
             text = _clean(value, LABEL_MAX)
             if lang not in ("zh", "en") or text is None or (lang, text.casefold()) in seen:
                 continue
+            if len(found) >= limits.SYNONYMS_MAX:
+                break  # the rest stay as axioms
             seen.add((lang, text.casefold()))
             found.append((lang, text))
             self.take((subject, SKOS.altLabel, value))
@@ -544,7 +640,9 @@ class _Reader:
                 return None
         if len(targets) != 1 or not self.element(targets[0], "entity_type"):
             return None
-        if any(len(values) > 1 for values in labels.values()):
+        if any(len(values) > 1 for values in labels.values()) or len(rules) > limits.RULES_MAX:
+            return None
+        if len(str(shape)) > limits.IRI_MAX_LENGTH:
             return None
         element.domain = str(targets[0])
         element.label_zh = str(labels["zh"][0]) if labels["zh"] else None
@@ -582,7 +680,7 @@ class _Reader:
                 fields[name] = count
         if SH.datatype in single:
             datatype = single.pop(SH.datatype)
-            if not isinstance(datatype, URIRef):
+            if not isinstance(datatype, URIRef) or len(str(datatype)) > limits.IRI_MAX_LENGTH:
                 return None
             fields["datatype"] = str(datatype)
         if SH["class"] in single:
@@ -604,13 +702,14 @@ class _Reader:
         for predicate, name in bounds.items():
             if predicate in single:
                 bound = single.pop(predicate)
-                if not isinstance(bound, Literal | URIRef):
+                if not _value_fits(bound):
                     return None
                 fields[name] = bound
-        for predicate, name in ((SH.pattern, "pattern"), (SH.flags, "flags")):
+        texts = ((SH.pattern, "pattern", limits.PATTERN_MAX), (SH.flags, "flags", limits.FLAGS_MAX))
+        for predicate, name, limit in texts:
             if predicate in single:
                 text = single.pop(predicate)
-                if not _plain(text):
+                if not _plain(text) or len(str(text)) > limit:
                     return None
                 fields[name] = str(text)
         if SH["in"] in single:
@@ -624,11 +723,13 @@ class _Reader:
                 if listed is None:
                     return None
                 items, list_triples = listed
+                if len(items) > limits.ALLOWED_VALUES_MAX or not all(map(_value_fits, items)):
+                    return None
                 fields["in_"] = items
                 triples.extend(list_triples)
         if single:
             return None
-        if any(not isinstance(m, Literal) or m.datatype is not None for m in messages):
+        if len(messages) > limits.MESSAGES_MAX or not all(map(_message_fits, messages)):
             return None
         fields["message"] = tuple(sorted((m for m in messages if isinstance(m, Literal)), key=str))
         return Rule(**fields), triples  # type: ignore[arg-type]
@@ -694,12 +795,21 @@ class _Reader:
         self.warnings["non_standard"] += sum(axiom.non_standard for axiom in self.state.axioms)
 
 
+def _anonymous_header(graph: Graph) -> BNode | None:
+    """The blank node `[] a owl:Ontology` of a file that names no ontology, if there is one."""
+    headers = [s for s in graph.subjects(RDF.type, OWL.Ontology) if isinstance(s, BNode)]
+    if len(headers) != 1 or (None, None, headers[0]) in graph:
+        return None
+    return headers[0]
+
+
 def read(
     graph: Graph,
     *,
     ontology_iri: str | None = None,
     fallback_iri: str = "urn:x-ontology",
     absorb: Mapping[URIRef, Literal] | None = None,
+    known: KnownHeader | None = None,
 ) -> ReadResult:
     """Map a parsed file onto platform elements and axioms.
 
@@ -707,6 +817,7 @@ def read(
     (if different) is renamed to it. Without it the file's IRI is used, or `fallback_iri`.
     `absorb` lists header values the platform itself would generate (such as dcterms:created of
     a working-version export) so that importing an export again does not keep them as axioms.
+    `known` says which name and description the file may set (see `KnownHeader`).
     """
     named = sorted(
         (s for s in graph.subjects(RDF.type, OWL.Ontology) if isinstance(s, URIRef)),
@@ -714,17 +825,20 @@ def read(
     )
     file_iri = named[0] if named else None
     target = URIRef(ontology_iri) if ontology_iri else (file_iri or URIRef(fallback_iri))
+    # A file without a named header may still annotate an anonymous one (OWL API writes
+    # `[] a owl:Ontology` for such files): that is the ontology's header too.
+    header: Node | None = file_iri if file_iri is not None else _anonymous_header(graph)
     work = Graph(bind_namespaces="none")
     for s, p, o in graph:
-        if file_iri is not None:
-            s, o = _rename(s, file_iri, target), _rename(o, file_iri, target)
+        if header is not None:
+            s, o = _rename(s, header, target), _rename(o, header, target)
         work.add((s, p, o))
     work = unshare(work)
     # Read the file as OWL API does: an entity that is only used is still an entity of its
     # kind. Otherwise the copy Protégé saves (with those declarations) would read differently.
     for triple in missing_declarations(work):
         work.add(triple)
-    reader = _Reader(work, str(target), absorb or {})
+    reader = _Reader(work, str(target), absorb or {}, known)
     reader.header()
     reader.anonymous_headers()
     reader.elements()
@@ -744,8 +858,3 @@ def read(
         file_ontology_iri=str(file_iri) if file_iri is not None else None,
         warnings=reader.warnings,
     )
-
-
-def with_ontology_iri(result: ReadResult, ontology_iri: str) -> OntologyState:
-    """The state with another ontology IRI, for a file that named none."""
-    return replace(result.state, ontology_iri=ontology_iri)

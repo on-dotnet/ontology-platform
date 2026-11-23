@@ -398,3 +398,112 @@ async def test_review_edits_of_axioms_are_checked(client: AsyncClient, db: Async
     assert (await decide(client, change_set_id, [item["id"]], "accepted")).status_code == 200
     assert (await merge(client, change_set_id)).json()["skipped"] == []
     assert (await publish(client, steel)).status_code == 201
+
+
+# ---------- found in review ----------
+
+INVERSES = b"""
+@prefix ex: <urn:inv:> . @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+<urn:inv:onto> a owl:Ontology ; rdfs:label "Inverses" .
+ex:p a owl:ObjectProperty ; owl:inverseOf ex:q .
+ex:q a owl:ObjectProperty ; owl:inverseOf ex:p .
+ex:keep a owl:Class .
+"""
+
+
+async def test_relations_that_are_each_others_inverse(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    result = await import_and_merge(client, INVERSES)
+    ontology_id = result["ontology"]["id"]
+    relations = (
+        await client.get(
+            f"/api/ontologies/{ontology_id}/elements", params={"kind": "relation_type"}
+        )
+    ).json()
+    by_iri = {item["iri"]: item for item in relations}
+
+    assert by_iri["urn:inv:p"]["inverseId"] == by_iri["urn:inv:q"]["id"]
+    assert by_iri["urn:inv:q"]["inverseId"] == by_iri["urn:inv:p"]["id"]
+    assert lost(INVERSES, await export(client, ontology_id)) == []
+
+    without = INVERSES.split(b"ex:p a")[0] + b"ex:keep a owl:Class .\n"
+    removed = await upload(client, without, ontology_id=ontology_id)
+    merged = await accept_and_merge(client, removed.json()["changeSetId"])
+    assert merged["skipped"] == []
+    remaining = (await client.get(f"/api/ontologies/{ontology_id}/elements")).json()
+    assert [item["iri"] for item in remaining] == ["urn:inv:keep"]
+
+
+async def test_names_from_the_file_are_kept(client: AsyncClient, db: AsyncSession) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    named = await import_and_merge(client, INVERSES, name="我起的名字")
+    ontology_id = named["ontology"]["id"]
+
+    exported = Graph().parse(data=await export(client, ontology_id), format="turtle")
+    labels = {str(o) for o in exported.objects(URIRef("urn:inv:onto"), RDFS.label)}
+    assert labels == {"我起的名字", "Inverses"}
+
+    renamed = INVERSES.replace(b'"Inverses"', b'"Renamed"')
+    changed = await upload(client, renamed, ontology_id=ontology_id)
+    items = await change_set_items(client, changed.json()["changeSetId"])
+    assert [(item["op"], item["kind"]) for item in items] == [
+        ("create", "axiom"),
+        ("delete", "axiom"),
+    ]
+
+
+async def test_the_same_file_can_be_imported_twice(client: AsyncClient, db: AsyncSession) -> None:
+    await sign_in(client, db, Role.ADMIN)
+
+    first = await upload(client, INVERSES, filename="inverses.ttl")
+    second = await upload(client, INVERSES, filename="inverses.ttl")
+
+    assert (first.status_code, second.status_code) == (201, 201)
+    assert first.json()["ontology"]["key"] == "inverses"
+    assert second.json()["ontology"]["key"] == "inverses-2"
+
+
+async def test_an_axiom_too_long_to_keep(client: AsyncClient, db: AsyncSession) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    text = "x" * 2_000_001
+    data = f'<urn:t:a> <http://www.w3.org/2000/01/rdf-schema#comment> "{text}" .'.encode()
+
+    response = await upload(client, data)
+
+    assert (response.status_code, response.json()["code"]) == (422, "import.axiom_too_large")
+
+
+async def test_a_rejected_restore_skips_what_depends_on_it(
+    client: AsyncClient,
+    db: AsyncSession,
+) -> None:
+    steel = await add_ontology(db)
+    heat = element(steel, "entity_type", "Heat", "炉次", status="deprecated")
+    await add_elements(db, heat)
+    change_set_id = await open_change_set(
+        db,
+        steel,
+        [
+            proposal("restore", "entity_type", target=heat.id),
+            proposal(
+                "create",
+                "property",
+                temp_ref="new:weight",
+                local_name="weight",
+                label_zh="重量",
+                domain_ref=str(heat.id),
+                datatype="decimal",
+            ),
+        ],
+    )
+    await sign_in(client, db, Role.REVIEWER)
+    restore, create = await change_set_items(client, change_set_id)
+    assert (await decide(client, change_set_id, [restore["id"]], "rejected")).status_code == 200
+    assert (await decide(client, change_set_id, [create["id"]], "accepted")).status_code == 200
+
+    result = (await merge(client, change_set_id)).json()
+
+    assert result["skipped"] == [{"itemId": create["id"], "code": "changeset.dependency_skipped"}]

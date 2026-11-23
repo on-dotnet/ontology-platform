@@ -330,40 +330,43 @@ class TurtleWriter:
 
     # ----- structure -----
 
-    def _break_cycles(self) -> None:
-        """Blank nodes that reach themselves through inline objects need a label instead."""
-        changed = True
-        while changed:
-            changed = False
-            for start in sorted(self._inline, key=str):
-                if self._reaches(start, start, set()):
-                    self._inline.discard(start)
-                    changed = True
-                    break
+    def _shape(self, node: Node) -> str:
+        """A node's statements with blank node objects blanked out, for a stable order."""
+        pairs = sorted(
+            f"{p.n3()} {'[]' if isinstance(o, BNode) else o.n3()}"
+            for p, o in self._graph.predicate_objects(node)
+        )
+        return "\n".join(pairs)
 
-    def _reaches(self, node: BNode, target: BNode, seen: set[BNode]) -> bool:
-        for value in self._graph.objects(node):
-            if not isinstance(value, BNode) or value not in self._inline:
-                continue
-            if value == target:
-                return True
-            if value not in seen:
-                seen.add(value)
-                if self._reaches(value, target, seen):
-                    return True
-        return False
+    def _break_cycles(self) -> None:
+        """Blank nodes that reach themselves through inline objects need a label instead.
+
+        An inline node is referenced exactly once, so following that reference upwards from
+        any node either leaves the inline nodes or runs into a cycle; each cycle loses one
+        node (the one with the smallest shape) to labelling. Linear, without recursion.
+        """
+        parent: dict[Node, Node] = {}
+        for subject, _, value in self._graph:
+            if isinstance(value, BNode) and value in self._inline:
+                parent[value] = subject
+        state: dict[Node, int] = {}  # 1: on the current walk, 2: done
+        for start in sorted(self._inline, key=str):
+            walk: list[Node] = []
+            node: Node | None = start
+            while isinstance(node, BNode) and node in self._inline and node not in state:
+                state[node] = 1
+                walk.append(node)
+                node = parent.get(node)
+            if node is not None and state.get(node) == 1:
+                cycle = walk[walk.index(node) :]
+                breaker = min(cycle, key=lambda n: (self._shape(n), str(n)))
+                self._inline.discard(breaker)
+            for visited in walk:
+                state[visited] = 2
 
     def _assign_labels(self) -> dict[BNode, str]:
         labelled = [node for node in self._refs if node not in self._inline]
-
-        def shape(node: BNode) -> str:
-            pairs = sorted(
-                f"{p.n3()} {'[]' if isinstance(o, BNode) else o.n3()}"
-                for p, o in self._graph.predicate_objects(node)
-            )
-            return "\n".join(pairs)
-
-        ordered = sorted(labelled, key=lambda node: (shape(node), str(node)))
+        ordered = sorted(labelled, key=lambda node: (self._shape(node), str(node)))
         return {node: f"b{index}" for index, node in enumerate(ordered)}
 
     def _list_items(self, node: Node) -> list[Node] | None:

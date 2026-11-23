@@ -63,3 +63,20 @@ def test_export_then_compare(root: Path, tmp_path: Path) -> None:
 
     assert [o.status for o in outcomes].count("error") == 1
     assert all(o.status == "same" for o in outcomes[1:])
+
+
+def test_an_unrelated_change_in_a_rewritten_case_fails() -> None:
+    original = (SAMPLES / "owl-features" / "21-advanced.ttl").read_bytes()
+    saved = (FIXTURES / "owlapi" / "21-advanced.ttl").read_bytes()
+    # ex:q is not part of the rewritten class constructors.
+    extra = b'\n<urn:synthetic:m5:q> <http://www.w3.org/2000/01/rdf-schema#label> "Q"@en .\n'
+
+    assert owlcheck.compare_case("21-advanced", original, saved).status == "rewritten"
+    assert owlcheck.compare_case("21-advanced", original, saved + extra).status == "changed"
+
+
+def test_a_changed_kind_fails() -> None:
+    original = b"@prefix owl: <http://www.w3.org/2002/07/owl#> . <urn:t:A> a owl:Class ."
+    saved = b"@prefix owl: <http://www.w3.org/2002/07/owl#> . <urn:t:A> a owl:ObjectProperty ."
+
+    assert owlcheck.compare_case("kind", original, saved).status == "changed"

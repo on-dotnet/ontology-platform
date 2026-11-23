@@ -12,7 +12,7 @@ case's three files together, and extra/*.ttl (such as the dev stack's current re
 """
 
 import sys
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -20,12 +20,15 @@ from pathlib import Path
 from rdflib.namespace import DCTERMS
 
 from ontology_platform.modules.ontology.rdf import reader, writer
-from ontology_platform.modules.ontology.rdf.diff import Change, diff, keep_lost_lists
+from ontology_platform.modules.ontology.rdf.diff import Change, Diff, diff, keep_lost_lists
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError
+from ontology_platform.modules.ontology.rdf.vocab import is_builtin
 
 # The export's dcterms:created; the comparison absorbs it as an import into the same ontology
 # would.
 CREATED = datetime(2026, 1, 1, tzinfo=UTC)
+# OWL API names the class it makes of a malformed restriction here (sample 15).
+OWLAPI_ERRORS = "http://org.semanticweb.owlapi/error#"
 STEEL = ("ontology", "shapes", "vocabulary")
 
 
@@ -42,11 +45,42 @@ def cases(root: Path) -> dict[str, bytes]:
 
 
 def _imported(data: bytes) -> tuple[reader.ReadResult, dict[str, str]]:
-    result = reader.read(reader.parse_document(data))
+    """The file read as an import into a new ontology (see importing.import_new)."""
+    graph = reader.parse_document(data)
+    result = reader.read(graph)
     base = result.base_iri or "urn:x-owl-check:"
     if result.file_ontology_iri is None:
-        result.state.ontology_iri = writer.ontology_iri_of(base)
+        result = reader.read(graph, ontology_iri=writer.ontology_iri_of(base))
     return result, writer.prefix_map("checked", base, result.prefixes)
+
+
+def explained_by_rewrites(result: Diff) -> bool:
+    """Whether every change comes from OWL API rewriting axioms flagged non_standard.
+
+    The flagged axioms must be gone, and every other change may only touch what those axioms
+    mention (or OWL API's error class for a malformed restriction); RDF and OWL vocabulary
+    does not count.
+    """
+    if result.kind_changed:
+        return False
+    deleted = [change for change in result.changes if change.op == "delete"]
+    if not deleted or not all(c.axiom is not None and c.axiom.non_standard for c in deleted):
+        return False
+    mentioned = set().union(*(c.axiom.mentions for c in deleted if c.axiom is not None))
+
+    def covered(iris: Iterable[str]) -> bool:
+        return all(
+            iri in mentioned or iri.startswith(OWLAPI_ERRORS) or is_builtin(iri) for iri in iris
+        )
+
+    for change in result.changes:
+        if change.op == "delete":
+            continue
+        if change.element is not None and not covered([change.element.iri]):
+            return False
+        if change.axiom is not None and not covered(change.axiom.mentions):
+            return False
+    return True
 
 
 def export_case(data: bytes) -> str:
@@ -81,17 +115,21 @@ def compare_case(case: str, original: bytes, saved: bytes) -> Outcome:
             reader.parse_document(saved),
             ontology_iri=first.state.ontology_iri,
             absorb={DCTERMS.created: writer.created_literal(CREATED)},
+            known=reader.KnownHeader(first.state.name, first.state.description, strict=True),
         )
     except RdfInputError as error:
         return Outcome(case, "error", f"the saved copy cannot be read: {error.detail}")
     kept = keep_lost_lists(first.state, copy.state)
     note = f"{kept} sh:in lists dropped by OWL API, values kept" if kept else ""
-    changes = diff(first.state, copy.state).changes
+    result = diff(first.state, copy.state)
+    changes = result.changes
+    if result.kind_changed:
+        return Outcome(case, "changed", f"kinds changed: {', '.join(result.kind_changed)}")
     if not changes:
         return Outcome(case, "same", note)
-    deleted = [change for change in changes if change.op == "delete"]
-    if deleted and all(c.axiom is not None and c.axiom.non_standard for c in deleted):
-        return Outcome(case, "rewritten", f"{len(deleted)} non-standard axioms rewritten")
+    if explained_by_rewrites(result):
+        deleted = sum(change.op == "delete" for change in changes)
+        return Outcome(case, "rewritten", f"{deleted} non-standard axioms rewritten")
     shown = "; ".join(_describe(change) for change in changes[:5])
     more = f" (and {len(changes) - 5} more)" if len(changes) > 5 else ""
     return Outcome(case, "changed", f"{len(changes)} changes: {shown}{more}")

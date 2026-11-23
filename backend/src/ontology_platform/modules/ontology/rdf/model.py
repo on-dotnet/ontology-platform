@@ -7,8 +7,7 @@ between elements are IRIs here, never database ids.
 
 import hashlib
 import logging
-from collections.abc import Iterable, Iterator
-from contextlib import contextmanager
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from functools import cached_property
 from typing import Any
@@ -26,16 +25,15 @@ Triple = tuple[Node, Node, Node]
 Term = URIRef | Literal
 
 
-@contextmanager
-def _quiet_rdflib() -> Iterator[None]:
-    # rdflib logs a traceback for every ill-typed literal it converts; those are user data.
-    logger = logging.getLogger("rdflib.term")
-    level = logger.level
-    logger.setLevel(logging.CRITICAL)
-    try:
-        yield
-    finally:
-        logger.setLevel(level)
+class _IllTypedLiterals(logging.Filter):
+    """rdflib logs a traceback for every ill-typed literal it converts; those are user data
+    (a file may well say "abc"^^xsd:integer), not errors of the platform."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return not record.getMessage().startswith("Failed to convert Literal lexical form")
+
+
+logging.getLogger("rdflib.term").addFilter(_IllTypedLiterals())
 
 
 def canonical_term(term: Node) -> Node:
@@ -47,24 +45,73 @@ def canonical_term(term: Node) -> Node:
         if isinstance(term, Literal) and term.language:
             return Literal(str(term), lang=term.language.lower())
         return term
-    with _quiet_rdflib():
-        if term.ill_typed:
-            return term
-        normalized = Literal(str(term), datatype=term.datatype, normalize=True)
+    if term.ill_typed:
+        return term
+    normalized = Literal(str(term), datatype=term.datatype, normalize=True)
     return normalized if not normalized.ill_typed else term
 
 
-def canonical_key(triples: Iterable[Triple]) -> str:
-    """A key that two sets of triples share exactly when they are the same graph, up to blank
-    node names and the spelling of literal values."""
-    graph = Graph(bind_namespaces="none")
-    has_blank = False
+def _tree_lines(triples: list[Triple]) -> list[str] | None:
+    """Statements with every blank node replaced by a hash of what hangs below it.
+
+    Works when the blank nodes form trees (each used as an object at most once, no cycles),
+    which is what the reader leaves after splitting shared nodes; then it is linear, while
+    rdflib's general canonicalization takes minutes on a list of a thousand members. None for
+    anything else.
+    """
+    below: dict[Node, list[tuple[Node, Node]]] = {}
+    used: set[Node] = set()
+    # Where the trees start: blank objects of named subjects, and blank subjects nobody uses.
+    starts: list[Node] = []
     for s, p, o in triples:
-        graph.add((s, p, canonical_term(o)))
-        has_blank = has_blank or isinstance(s, BNode) or isinstance(o, BNode)
-    if has_blank:
-        graph = to_canonical_graph(graph)
-    lines = sorted(f"{s.n3()} {p.n3()} {o.n3()}" for s, p, o in graph)
+        if isinstance(s, BNode):
+            below.setdefault(s, []).append((p, o))
+        if isinstance(o, BNode):
+            if o in used:
+                return None
+            used.add(o)
+            if not isinstance(s, BNode):
+                starts.append(o)
+    starts.extend(node for node in below if node not in used)
+    names: dict[Node, str] = {}
+    # Post-order without recursion: a node is named once all its blank children are.
+    for root in starts:
+        stack: list[tuple[Node, bool]] = [(root, False)]
+        while stack:
+            node, ready = stack.pop()
+            if node in names:
+                continue
+            children = [o for _, o in below.get(node, []) if isinstance(o, BNode)]
+            if not ready:
+                stack.append((node, True))
+                stack.extend((child, False) for child in children if child not in names)
+                continue
+            if any(child not in names for child in children):
+                return None  # a cycle
+            parts = sorted(
+                f"{p.n3()} {names[o] if isinstance(o, BNode) else o.n3()}"
+                for p, o in below.get(node, [])
+            )
+            names[node] = "_:" + hashlib.sha256("\n".join(parts).encode()).hexdigest()
+    if any(node not in names for node in below) or any(node not in names for node in used):
+        return None  # blank nodes only reachable from a cycle, or never described
+    return sorted(
+        f"{names.get(s, s.n3())} {p.n3()} {names[o] if isinstance(o, BNode) else o.n3()}"
+        for s, p, o in triples
+        if not isinstance(s, BNode) or s not in used
+    )
+
+
+def canonical_key(triples: Iterable[Triple], *, exact: bool = False) -> str:
+    """A key that two sets of triples share exactly when they are the same graph, up to blank
+    node names and (unless `exact`) the spelling of literal values."""
+    given = [(s, p, o if exact else canonical_term(o)) for s, p, o in triples]
+    lines = _tree_lines(given)
+    if lines is None:
+        graph = Graph(bind_namespaces="none")
+        for triple in given:
+            graph.add(triple)
+        lines = sorted(f"{s.n3()} {p.n3()} {o.n3()}" for s, p, o in to_canonical_graph(graph))
     return hashlib.sha256("\n".join(lines).encode()).hexdigest()
 
 

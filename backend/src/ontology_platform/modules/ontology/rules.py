@@ -99,7 +99,15 @@ def _kind_problems(kind: str, fields: ElementFields) -> list[str]:
         if not applies and getattr(fields, name) is not None:
             problems.append(f"{wire_name(name)} does not apply to {kind}")
     if kind == "axiom":
-        for name in ("local_name", "iri", "label_zh", "label_en", "definition_zh", "synonyms"):
+        for name in (
+            "local_name",
+            "iri",
+            "label_zh",
+            "label_en",
+            "definition_zh",
+            "definition_en",
+            "synonyms",
+        ):
             if getattr(fields, name) is not None:
                 problems.append(f"{wire_name(name)} does not apply to axiom")
     return problems

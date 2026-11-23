@@ -13,13 +13,13 @@ from pathlib import Path
 import pytest
 from pyshacl import validate
 from rdflib import BNode, Graph, Literal, URIRef
-from rdflib.compare import to_canonical_graph
-from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, XSD
+from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SKOS, XSD
 
+from ontology_platform.modules.ontology.owlcheck import explained_by_rewrites
 from ontology_platform.modules.ontology.rdf import axioms, reader, writer
 from ontology_platform.modules.ontology.rdf.declarations import implied_declarations
 from ontology_platform.modules.ontology.rdf.diff import diff, keep_lost_lists
-from ontology_platform.modules.ontology.rdf.model import ElementState, Triple
+from ontology_platform.modules.ontology.rdf.model import ElementState, Triple, canonical_key
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError, parse_document, read
 from ontology_platform.modules.ontology.rdf.vocab import DECLARATION_TYPES, SH
 
@@ -35,6 +35,8 @@ REWRITTEN = {"15-cardinality.ttl", "16-boolean.ttl", "21-advanced.ttl"}
 
 CASES = {path.name: [path] for path in [*OWL_FEATURES, *STEEL_FILES, PLATFORM_V1]}
 CASES["steel"] = STEEL_FILES
+INVERSE_PAIR = FIXTURES / "inverse-pair.ttl"
+CASES[INVERSE_PAIR.name] = [INVERSE_PAIR]
 
 
 def load(paths: list[Path]) -> Graph:
@@ -55,12 +57,7 @@ def has_blank(triple: Triple) -> bool:
 
 
 def exact_key(triples: list[Triple]) -> str:
-    graph = Graph()
-    for triple in triples:
-        graph.add(triple)
-    return "\n".join(
-        sorted(" ".join(t.n3() for t in triple) for triple in to_canonical_graph(graph))
-    )
+    return canonical_key(triples, exact=True)
 
 
 def missing_from(source: Graph, output: Graph) -> list[str]:
@@ -130,15 +127,15 @@ def test_what_protege_saves_reads_back_the_same(name: str) -> None:
     original = read(load([SAMPLES / "owl-features" / name]))
     saved = read(load([FIXTURES / "owlapi" / name]), ontology_iri=original.state.ontology_iri)
 
-    changes = diff(original.state, saved.state).changes
+    result = diff(original.state, saved.state)
 
     if name in REWRITTEN:
-        # Only the flagged axioms are replaced (sample 15 also gains OWL API's error class).
-        removed = [change for change in changes if change.op == "delete"]
-        assert removed
-        assert all(c.axiom is not None and c.axiom.non_standard for c in removed)
+        # Only the flagged axioms are replaced, touching nothing else they do not mention.
+        assert result.changes
+        assert explained_by_rewrites(result)
     else:
-        assert changes == []
+        assert result.changes == []
+        assert result.kind_changed == []
 
 
 def protege_pair(name: str) -> tuple[reader.ReadResult, reader.ReadResult]:
@@ -296,7 +293,9 @@ def test_a_parent_loop_is_left_as_axioms() -> None:
     )
     elements = result.state.elements
 
-    assert [elements["urn:t:A"].parent, elements["urn:t:B"].parent].count(None) >= 1
+    assert (elements["urn:t:A"].parent, elements["urn:t:B"].parent) == (None, "urn:t:A")
+    (kept,) = result.state.axioms
+    assert kept.triples == ((URIRef("urn:t:A"), RDFS.subClassOf, URIRef("urn:t:B")),)
 
 
 def test_platform_shapes_become_required_and_multiple() -> None:
@@ -511,3 +510,128 @@ def test_diff_lists_each_kind_of_change() -> None:
         ("delete", "entity_type", "urn:t:B"),
         ("delete", "axiom", None),
     }
+
+
+# ---------- found in review ----------
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        "ex:a ex:p _:x . _:x ex:q _:x .",
+        "ex:a ex:p _:x . _:x ex:q _:y . _:y ex:r _:x .",
+        "ex:a ex:p _:x . ex:b ex:p _:x . _:x ex:q _:y . _:y ex:r _:x .",
+    ],
+    ids=["self-loop", "two-cycle", "shared-cycle"],
+)
+def test_blank_node_cycles_survive(body: str) -> None:
+    source = parse(PREFIXES + body)
+
+    first = read(source)
+    output = parse(export(first))
+
+    assert missing_from(source, output) == []
+    assert export(read(output)) == export(first)
+
+
+def test_long_lists_need_no_recursion() -> None:
+    members = " ".join(f"ex:i{n}" for n in range(1500))
+    values = " ".join(str(n) for n in range(1000))
+    source = parse(
+        PREFIXES
+        + f"ex:Big a owl:Class ; owl:oneOf ( {members} ) .\n"
+        + "ex:C a owl:Class . ex:v a owl:DatatypeProperty .\n"
+        + "ex:S a sh:NodeShape ; sh:targetClass ex:C ;\n"
+        + f"    sh:property [ sh:path ex:v ; sh:in ( {values} ) ] .",
+    )
+
+    result = read(source)
+    output = parse(export(result))
+
+    assert missing_from(source, output) == []
+    (rule,) = result.state.elements["urn:t:S"].rules
+    assert rule.in_ is not None
+    assert len(rule.in_) == 1000
+
+
+def test_what_the_api_cannot_hold_stays_an_axiom() -> None:
+    synonyms = ", ".join(f'"别名{n}"@zh' for n in range(101))
+    result = read_text(
+        f"ex:A a owl:Class ; skos:altLabel {synonyms} .\n"
+        "ex:v a owl:DatatypeProperty .\n"
+        "ex:S a sh:NodeShape ; sh:targetClass ex:A ;\n"
+        '    sh:property [ sh:path ex:v ; sh:message ""@zh ] .',
+    )
+
+    assert len(result.state.elements["urn:t:A"].synonyms) == 100
+    assert "urn:t:S" not in result.state.elements
+    assert result.warnings["unsupported_shape"] == 1
+    kept = [t for a in result.state.axioms for t in a.triples if t[1] == SKOS.altLabel]
+    assert len(kept) == 1
+
+
+def test_header_values_are_absorbed_only_when_they_match() -> None:
+    body = '<urn:t:file> a owl:Ontology ; rdfs:label "文件里的名称" ; dcterms:description "说明" .'
+    graph = parse(PREFIXES + "@prefix dcterms: <http://purl.org/dc/terms/> .\n" + body)
+
+    adopted = read(graph)
+    strict = read(
+        graph, ontology_iri="urn:t:mine", known=reader.KnownHeader("平台名称", "说明", strict=True)
+    )
+    named = read(graph, known=reader.KnownHeader(name="用户给的名称"))
+
+    assert (adopted.state.name, adopted.state.description) == ("文件里的名称", "说明")
+    assert (strict.state.name, strict.state.description) == (None, "说明")
+    (label,) = strict.state.axioms
+    assert label.triples == ((URIRef("urn:t:mine"), RDFS.label, Literal("文件里的名称")),)
+    assert (named.state.name, named.state.description) == (None, "说明")
+
+
+def test_an_anonymous_header_belongs_to_the_ontology() -> None:
+    graph = parse(
+        PREFIXES + '[] a owl:Ontology ; rdfs:comment "无名本体的说明" . ex:A a owl:Class .'
+    )
+
+    result = read(graph, ontology_iri="urn:t:mine")
+    output = parse(export(result))
+
+    (comment,) = result.state.axioms
+    assert comment.triples == ((URIRef("urn:t:mine"), RDFS.comment, Literal("无名本体的说明")),)
+    assert len(list(output.subjects(RDF.type, OWL.Ontology))) == 1
+
+
+def test_inverses_in_both_directions() -> None:
+    result = read_text(
+        "ex:p a owl:ObjectProperty ; owl:inverseOf ex:q .\n"
+        "ex:q a owl:ObjectProperty ; owl:inverseOf ex:p .",
+    )
+
+    elements = result.state.elements
+    assert (elements["urn:t:p"].inverse, elements["urn:t:q"].inverse) == ("urn:t:q", "urn:t:p")
+    assert result.state.axioms == []
+
+
+def test_tree_keys_match_rdflib_canonical_keys() -> None:
+    # The fast key for blank node trees and rdflib's general canonicalization agree on what is
+    # equal; a cycle falls back to rdflib.
+    first = parse(PREFIXES + "ex:a ex:p [ ex:q ( 1 2 ) ; ex:r [ ex:s 3 ] ] .")
+    same = parse(PREFIXES + "ex:a ex:p [ ex:r [ ex:s 3 ] ; ex:q ( 1 2 ) ] .")
+    other = parse(PREFIXES + "ex:a ex:p [ ex:q ( 2 1 ) ; ex:r [ ex:s 3 ] ] .")
+    ring = PREFIXES + "ex:a ex:p _:x . _:x ex:q _:y . _:y ex:r _:x ."
+
+    assert canonical_key(list(first)) == canonical_key(list(same))
+    assert canonical_key(list(first)) != canonical_key(list(other))
+    assert canonical_key(list(parse(ring))) == canonical_key(list(parse(ring)))
+
+
+def test_protege_keeps_one_direction_of_an_inverse_pair() -> None:
+    # OWL API writes `p owl:inverseOf q` once for a pair that names each other; the other
+    # direction is implied, so the copy compares equal.
+    original = read(load([INVERSE_PAIR]))
+    saved = read(
+        load([FIXTURES / "owlapi" / INVERSE_PAIR.name]), ontology_iri=original.state.ontology_iri
+    )
+
+    assert original.state.elements["urn:g3:q"].inverse == "urn:g3:p"
+    assert saved.state.elements["urn:g3:q"].inverse is None
+    assert diff(original.state, saved.state).changes == []
