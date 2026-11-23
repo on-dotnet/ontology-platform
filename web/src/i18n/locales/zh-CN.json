@@ -1,0 +1,188 @@
+{
+  "app": {
+    "name": "本体智能平台",
+    "authCenter": "身份认证中心",
+    "skipToContent": "跳到主要内容",
+    "documentTitle": "{{page}} · 本体智能平台"
+  },
+  "common": {
+    "comingSoon": "即将推出",
+    "retry": "重试",
+    "cancel": "取消",
+    "close": "关闭",
+    "loading": "正在加载…",
+    "stillWorking": "仍在处理，请稍候…",
+    "technicalDetails": "技术详情",
+    "moreInfo": "查看说明",
+    "aboutPage": "关于“{{title}}”",
+    "attention": "注意",
+    "backToWorkbench": "返回工作台"
+  },
+  "nav": {
+    "label": "主导航",
+    "workbench": "工作台",
+    "documents": "资料",
+    "review": "审核",
+    "ontology": "本体",
+    "data": "数据",
+    "explore": "探索",
+    "releases": "版本",
+    "settings": "设置"
+  },
+  "shell": {
+    "collapseSidebar": "收起侧栏",
+    "expandSidebar": "展开侧栏",
+    "openNavigation": "打开导航",
+    "closeNavigation": "关闭导航",
+    "breadcrumb": "当前位置",
+    "openAssistant": "打开 AI 助手",
+    "closeAssistant": "关闭 AI 助手",
+    "assistantShortcut": "{{key}} + J"
+  },
+  "preferences": {
+    "language": "界面语言",
+    "switchLanguage": "切换语言",
+    "theme": "主题",
+    "switchTheme": "切换主题",
+    "themeLight": "浅色",
+    "themeDark": "深色",
+    "themeSystem": "跟随系统",
+    "themeSystemHint": "跟随系统时，界面会随操作系统的浅色或深色设置自动切换。",
+    "languages": {
+      "zh-CN": "简体中文",
+      "en": "English"
+    }
+  },
+  "user": {
+    "menu": "账号菜单：{{name}}",
+    "settings": "账号与偏好",
+    "signOut": "退出登录",
+    "signOutFailed": "退出登录没有完成",
+    "roles": {
+      "admin": "管理员",
+      "editor": "编辑者",
+      "reviewer": "审核者",
+      "viewer": "只读成员"
+    }
+  },
+  "assistant": {
+    "title": "AI 助手",
+    "context": "当前页面：{{page}}",
+    "emptyTitle": "AI 助手即将推出",
+    "emptyDescription": "它会了解你所在的页面和选中的对象，随时协助你建模和分析。",
+    "capabilitiesLabel": "上线后，你可以让它：",
+    "capabilityExtract": "从资料中识别术语、对象类型和关系，整理成变更集",
+    "capabilityExplain": "解释当前页面里的对象、属性和约束",
+    "capabilityAsk": "用自然语言查询本体和业务数据",
+    "reviewNote": "AI 只提出建议，所有修改都需要你审核后才会生效。"
+  },
+  "login": {
+    "title": "登录",
+    "subtitle": "使用平台账号继续",
+    "username": "用户名",
+    "password": "密码",
+    "showPassword": "显示密码",
+    "hidePassword": "隐藏密码",
+    "submit": "登录",
+    "submitting": "正在登录…",
+    "usernameRequired": "请输入用户名",
+    "passwordRequired": "请输入密码",
+    "validationSummary": "请填写用户名和密码后再登录。",
+    "failedTitle": "登录没有成功",
+    "help": "还没有账号？请联系平台管理员开通。"
+  },
+  "workbench": {
+    "title": "工作台",
+    "greetingMorning": "早上好，{{name}}",
+    "greetingAfternoon": "下午好，{{name}}",
+    "greetingEvening": "晚上好，{{name}}",
+    "info": "工作台汇总你需要处理的事项和平台的最近动态。",
+    "aiCardTitle": "AI 识别资料",
+    "aiCardDescription": "上传制度、规程、手册等业务资料，AI 会识别其中的术语、对象类型和关系，整理成待你审核的变更集。",
+    "sectionsLabel": "概览",
+    "pendingTitle": "待审核",
+    "pendingDescription": "AI 和成员提交的变更集会在这里等你审核。",
+    "ontologyTitle": "本体",
+    "ontologyDescription": "这里将显示本体中对象类型、关系类型和术语的概况。",
+    "dataTitle": "数据源",
+    "dataDescription": "这里将显示已连接的数据源和数据绑定情况。",
+    "activityTitle": "最近动态",
+    "activityDescription": "这里将显示资料解析、审核和发布等最近动态。"
+  },
+  "pages": {
+    "documents": {
+      "info": "上传业务资料，查看解析状态和 AI 识别结果。",
+      "emptyTitle": "资料管理即将推出",
+      "emptyDescription": "你可以在这里上传资料、跟踪解析进度，并查看 AI 识别出的术语和对象类型。"
+    },
+    "review": {
+      "info": "逐项审核变更集：接受、修改或拒绝每一项修改。只有审核通过的修改才会进入本体。",
+      "emptyTitle": "变更集审核即将推出",
+      "emptyDescription": "AI 和成员提出的修改会汇集成变更集，在这里逐项审核后生效。"
+    },
+    "ontology": {
+      "info": "用图谱或列表查看对象类型、属性、关系类型、术语和约束。",
+      "emptyTitle": "本体浏览即将推出",
+      "emptyDescription": "你可以在这里查看本体中的对象类型、属性、关系类型、术语和约束，并提出修改。"
+    },
+    "data": {
+      "info": "连接数据源、浏览表目录，并把数据绑定到本体。",
+      "emptyTitle": "数据连接即将推出",
+      "emptyDescription": "你可以在这里以只读方式连接数据源，并把表和字段绑定到对象类型与属性。"
+    },
+    "explore": {
+      "info": "按本体浏览业务对象、沿关系追溯，或用自然语言提问。",
+      "emptyTitle": "探索即将推出",
+      "emptyDescription": "你可以在这里按本体浏览业务对象、沿关系追溯来源，并向 AI 提问。"
+    },
+    "releases": {
+      "info": "查看发布记录、对比版本差异，必要时回滚。",
+      "emptyTitle": "版本管理即将推出",
+      "emptyDescription": "每次发布都会生成不可修改的版本，你可以在这里对比差异或回滚。"
+    }
+  },
+  "settings": {
+    "info": "管理你的账号信息和界面偏好。",
+    "accountTitle": "账号",
+    "displayName": "显示名称",
+    "username": "用户名",
+    "role": "角色",
+    "preferencesTitle": "界面偏好",
+    "preferencesInfo": "偏好只保存在当前浏览器中，换浏览器或设备后需要重新设置。",
+    "platformTitle": "平台设置",
+    "platformDescription": "模型、成员与角色、平台参数等设置即将推出。"
+  },
+  "states": {
+    "errorTitle": "内容没有加载出来",
+    "forbiddenTitle": "没有访问权限",
+    "forbiddenDescription": "查看此内容需要“{{role}}”角色，请联系平台管理员开通。",
+    "notFoundTitle": "页面不存在",
+    "notFoundDescription": "你访问的页面不存在或已被移动。",
+    "appErrorTitle": "暂时无法进入平台"
+  },
+  "errors": {
+    "unknown": "操作没有完成，请稍后重试。如果问题持续出现，请联系平台管理员。",
+    "network": {
+      "unreachable": "无法连接到平台服务，请检查网络后重试。"
+    },
+    "auth": {
+      "invalid_credentials": "用户名或密码不正确，请检查后重试。",
+      "not_authenticated": "登录已失效，请重新登录。",
+      "csrf_failed": "页面已过期，请刷新页面后重试。",
+      "rate_limited": "尝试次数过多，请稍后再试。",
+      "forbidden": "你没有执行此操作的权限，请联系平台管理员。"
+    },
+    "validation": {
+      "failed": "填写的内容不完整或格式不正确，请检查后重试。"
+    },
+    "http": {
+      "400": "请求的内容不正确，请检查后重试。",
+      "401": "登录已失效，请重新登录。",
+      "403": "你没有执行此操作的权限，请联系平台管理员。",
+      "404": "要访问的内容不存在或已被删除。",
+      "422": "填写的内容不完整或格式不正确，请检查后重试。",
+      "429": "操作太频繁，请稍后再试。",
+      "5xx": "平台服务暂时不可用，请稍后重试。"
+    }
+  }
+}

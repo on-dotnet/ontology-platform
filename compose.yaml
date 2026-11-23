@@ -1,0 +1,89 @@
+# 开发与测试用的容器编排。统一经 ./dev.ps1 调用，不要直接 docker compose down -v。
+name: ontology
+
+x-build-args: &build-args
+  PIP_INDEX_URL: ${OP_PIP_INDEX_URL:-https://pypi.org/simple}
+  PYPI_FILES_MIRROR: ${OP_PYPI_FILES_MIRROR:-}
+  NPM_REGISTRY: ${OP_NPM_REGISTRY:-https://registry.npmjs.org}
+
+x-api-env: &api-env
+  OP_ENV: ${OP_ENV:-development}
+  OP_DATABASE_URL: postgresql+psycopg://ontology:${OP_POSTGRES_PASSWORD:-ontology-dev-only}@postgres:5432/ontology
+  OP_SECRET_KEY: ${OP_SECRET_KEY:-dev-only-secret-change-me}
+  OP_ADMIN_USERNAME: ${OP_ADMIN_USERNAME:-admin}
+  OP_ADMIN_PASSWORD: ${OP_ADMIN_PASSWORD:-admin12345}
+  # Empty means "follow OP_ENV": Secure cookies in production, plain in development.
+  OP_COOKIE_SECURE: ${OP_COOKIE_SECURE:-}
+  # The api is reachable only through the web container's nginx, which overwrites X-Forwarded-For.
+  FORWARDED_ALLOW_IPS: "*"
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.1-pg18-trixie
+    environment:
+      POSTGRES_DB: ontology
+      POSTGRES_USER: ontology
+      POSTGRES_PASSWORD: ${OP_POSTGRES_PASSWORD:-ontology-dev-only}
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ontology -d ontology"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+      target: runtime
+      args: *build-args
+    image: ontology/api:local
+    environment: *api-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+      target: runtime
+      args: *build-args
+    image: ontology/web:local
+    ports:
+      - "${OP_WEB_PORT:-28080}:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # 以下为工具容器，只在 ./dev.ps1 test-* 时临时运行
+  test-api:
+    profiles: [tools]
+    build:
+      context: ./backend
+      target: test
+      args: *build-args
+    image: ontology/test-api:local
+    environment:
+      OP_TEST_ADMIN_DATABASE_URL: postgresql+psycopg://ontology:${OP_POSTGRES_PASSWORD:-ontology-dev-only}@postgres:5432/postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  test-web:
+    profiles: [tools]
+    build:
+      context: ./web
+      target: test
+      args: *build-args
+    image: ontology/test-web:local
+
+volumes:
+  postgres-data:

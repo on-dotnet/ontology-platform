@@ -1,0 +1,6 @@
+# pnpm settings for the web app (a single package, not a multi-package workspace).
+
+# Dependency build scripts stay disabled unless reviewed here. None are needed:
+# native binaries (rolldown, lightningcss, tailwind oxide) arrive as optional dependencies.
+strictDepBuilds: true
+allowBuilds: {}
