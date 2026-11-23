@@ -1,0 +1,184 @@
+@import 'tailwindcss';
+
+/* `dark:` utilities follow the class on <html>, set by the theme provider and public/theme-init.js. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens — docs/ui-guidelines.md §2. Components use these tokens only, never raw colors. */
+:root {
+  --background: #f5f8fc;
+  --card: #ffffff;
+  --muted: #eff4fa;
+  --border: #e5eaef;
+  --foreground: #2a3547;
+  --muted-foreground: #5a6a85;
+  /* Brand blue darkened from #5d87ff so white button text meets WCAG AA (4.7:1); tints keep #5d87ff. */
+  --primary: #3f6ae8;
+  --secondary: #49beff;
+  --success: #13deb9;
+  --warning: #f6b51e;
+  --error: #ef4444;
+  --info: #8754ec;
+
+  /* Tinted backgrounds for stat cards, badges and notices (~10% in light theme). */
+  --primary-soft: rgb(93 135 255 / 0.1);
+  --secondary-soft: rgb(73 190 255 / 0.1);
+  --success-soft: rgb(19 222 185 / 0.1);
+  --warning-soft: rgb(246 181 30 / 0.12);
+  --error-soft: rgb(239 68 68 / 0.1);
+  --info-soft: rgb(135 84 236 / 0.1);
+
+  /*
+   * Derived tokens. `-strong` is the same hue for text and icons on card/soft surfaces,
+   * darkened in the light theme so small text keeps WCAG AA contrast.
+   */
+  --primary-strong: #3a62d7;
+  --secondary-strong: #0b78b8;
+  --success-strong: #0a7d68;
+  --warning-strong: #8a5a00;
+  --error-strong: #c81e1e;
+  --info-strong: #6b3fd4;
+
+  --primary-foreground: #ffffff;
+  --primary-hover: #3459cc;
+  --ring: var(--primary);
+  --overlay: rgb(15 23 42 / 0.45);
+  --card-shadow: 0 1px 2px rgb(42 53 71 / 0.04), 0 6px 20px -6px rgb(42 53 71 / 0.08);
+  --popover-shadow: 0 12px 32px -8px rgb(42 53 71 / 0.22);
+}
+
+.dark {
+  --background: #151d2b;
+  --card: #1c2536;
+  --muted: #2a3851;
+  --border: #333f55;
+  --foreground: #eaeff4;
+  --muted-foreground: #7c8fac;
+  --primary-hover: #5079f0;
+  --error: #f87171;
+  --info: #a07cf5;
+
+  /* ~15% in dark theme. */
+  --primary-soft: rgb(93 135 255 / 0.15);
+  --secondary-soft: rgb(73 190 255 / 0.15);
+  --success-soft: rgb(19 222 185 / 0.15);
+  --warning-soft: rgb(246 181 30 / 0.15);
+  --error-soft: rgb(248 113 113 / 0.15);
+  --info-soft: rgb(160 124 245 / 0.15);
+
+  --primary-strong: #8aa9ff;
+  --secondary-strong: #6fcbff;
+  --success-strong: #13deb9;
+  --warning-strong: #f6b51e;
+  --error-strong: #fca5a5;
+  --info-strong: #b8a0fa;
+
+  --overlay: rgb(0 0 0 / 0.6);
+  /* Dark theme separates layers with borders, not shadows. */
+  --card-shadow: none;
+  --popover-shadow: 0 12px 32px -8px rgb(0 0 0 / 0.55);
+}
+
+@theme inline {
+  --font-sans: 'DM Sans', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-strong: var(--primary-strong);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-secondary-strong: var(--secondary-strong);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-strong: var(--success-strong);
+
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-strong: var(--warning-strong);
+
+  --color-error: var(--error);
+  --color-error-soft: var(--error-soft);
+  --color-error-strong: var(--error-strong);
+
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-strong: var(--info-strong);
+
+  --shadow-card: var(--card-shadow);
+  --shadow-popover: var(--popover-shadow);
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--primary-soft);
+  }
+}
+
+@layer components {
+  /* Decorative backdrop of the sign-in page. */
+  .auth-backdrop {
+    background-image:
+      radial-gradient(48rem 32rem at 12% 8%, var(--primary-soft), transparent 70%),
+      radial-gradient(40rem 28rem at 92% 96%, var(--info-soft), transparent 70%),
+      radial-gradient(28rem 20rem at 88% 10%, var(--secondary-soft), transparent 70%);
+  }
+
+  .auth-grid {
+    background-image:
+      linear-gradient(to right, var(--border) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

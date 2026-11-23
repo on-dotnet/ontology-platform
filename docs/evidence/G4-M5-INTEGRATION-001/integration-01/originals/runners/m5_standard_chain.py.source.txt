@@ -1,9 +1,0 @@
-import sys,json
-from pathlib import Path
-sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as q
-from workflow_execution import run
-print(json.dumps(q.synthetic_grants('query')),flush=True)
-for mode in ['s1','ui-s1','s3','ui-s3']:
- r=run(['python3','-B','-c',f"import sys;sys.path.insert(0,'scripts/maintenance');import workflow_m5_integration as q;sys.exit(q.attest({mode!r}))"],Path.cwd(),task=q.TASK,run_id=q.RUN,stage='m5-standard-'+mode,timeout=210)
- print(json.dumps(dict(mode=mode,exitCode=r.returncode,commandId=r.receipt['commandId'])),flush=True);print(r.stdout.decode()[-1200:],flush=True)
- if r.returncode:print(r.stderr.decode()[-1200:],flush=True);break

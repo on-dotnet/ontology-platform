@@ -1,20 +1,33 @@
-node_modules/
-.next/
-.turbo/
-**/bin/
-**/obj/
-TestResults/
-coverage/
+# 本机私有配置与临时产物
 .env
 .env.*
 !.env.example
-*.user
-*.suo
-.vs/
-.worktrees/
-.codex/local/
-*.log
-artifacts/
-.tools/
+.verification/
+
+# Python
 __pycache__/
 *.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# 编辑器与系统
+.vs/
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log
+.DS_Store
+Thumbs.db
+
+# Claude Code 本机设置
+.claude/settings.local.json
