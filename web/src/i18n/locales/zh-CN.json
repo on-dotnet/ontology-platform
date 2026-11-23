@@ -224,7 +224,12 @@
         "lost_list": {
           "label_one": "{{count}} 条规则的枚举取值被 Protégé 丢掉了",
           "label_other": "{{count}} 条规则的枚举取值被 Protégé 丢掉了",
-          "description": "Protégé 保存文件时会丢掉枚举取值列表。平台沿用了已有的取值，请核对这些规则。"
+          "description": "Protégé 保存文件时会丢掉枚举取值列表，平台里也没有这些规则的取值。导出时照原样写回，请在审核后补上取值。"
+        },
+        "kind_changed": {
+          "label_one": "{{count}} 个元素在文件里换了种类",
+          "label_other": "{{count}} 个元素在文件里换了种类",
+          "description": "平台不会改变已有元素的种类，这些元素保持原样，文件里指向它们的引用没有导入。"
         }
       },
       "goReview": "去审核"
@@ -763,7 +768,8 @@
       "unsupported_format": "这不是 Turtle 或 RDF/XML 文件，请另存为 .ttl 或 .owl 后再导入。",
       "too_large": "文件超过 5 MB，请拆分后再导入。",
       "too_many_triples": "文件里的三元组超过 50,000 个，请拆分后再导入。",
-      "empty": "文件里没有任何内容，请检查后重新选择。"
+      "empty": "文件里没有任何内容，请检查后重新选择。",
+      "axiom_too_large": "文件里有一条公理太长（超过 200 万字符），平台无法保存，请拆分后再导入。"
     }
   },
   "rules": {

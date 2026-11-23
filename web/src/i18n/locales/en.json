@@ -224,7 +224,12 @@
         "lost_list": {
           "label_one": "{{count}} rule lost its allowed values in Protégé",
           "label_other": "{{count}} rules lost their allowed values in Protégé",
-          "description": "Protégé drops allowed-value lists when it saves a file. The platform kept the values it already had; check these rules."
+          "description": "Protégé drops allowed-value lists when it saves a file, and the platform has no values for these rules either. They are exported as they are; add the values after review."
+        },
+        "kind_changed": {
+          "label_one": "{{count}} element changed its kind in the file",
+          "label_other": "{{count}} elements changed their kind in the file",
+          "description": "The platform does not change the kind of an existing element. These elements stay as they are, and references to them in the file were not imported."
         }
       },
       "goReview": "Go to review"
@@ -763,7 +768,8 @@
       "unsupported_format": "This is not a Turtle or RDF/XML file. Save it as .ttl or .owl and import it again.",
       "too_large": "The file is larger than 5 MB. Split it and import the parts.",
       "too_many_triples": "The file has more than 50,000 triples. Split it and import the parts.",
-      "empty": "The file has no content. Check it and choose another file."
+      "empty": "The file has no content. Check it and choose another file.",
+      "axiom_too_large": "One axiom in the file is too long (over two million characters) for the platform to keep. Split it and import again."
     }
   },
   "rules": {

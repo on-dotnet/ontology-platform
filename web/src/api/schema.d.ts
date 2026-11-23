@@ -1309,7 +1309,7 @@ export interface components {
              * Code
              * @enum {string}
              */
-            code: "non_standard" | "multiple_parents" | "unsupported_shape" | "lost_list";
+            code: "non_standard" | "multiple_parents" | "unsupported_shape" | "lost_list" | "kind_changed";
             /** Count */
             count: number;
         };
