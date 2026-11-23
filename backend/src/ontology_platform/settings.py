@@ -42,6 +42,7 @@ class Settings(BaseSettings):
     ai_base_url: str | None = None
     ai_model: str = "gpt-6.2-sol"
     ai_reasoning_model: str = "gpt-6.2-astra"
+    # Model calls are streamed, so this bounds the wait between two events, not a whole call.
     ai_timeout_seconds: float = Field(default=120, gt=0)
 
     # Uploaded documents (M1).

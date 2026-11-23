@@ -18,6 +18,8 @@ interface ChangeItemCardProps {
   isAi: boolean;
   selected: boolean;
   onSelect: () => void;
+  /** Id of the evidence panel the button opens under the card (stacked layout); unset when it selects. */
+  evidencePanelId?: string;
   /** Accept / reject / edit are offered (reviewer role, change set still open). */
   canDecide: boolean;
   busy: boolean;
@@ -26,7 +28,18 @@ interface ChangeItemCardProps {
 }
 
 /** One proposed change with its AI label, confidence, flags, decision buttons and evidence entry. */
-export function ChangeItemCard({ item, context, isAi, selected, onSelect, canDecide, busy, onDecide, onEdit }: ChangeItemCardProps) {
+export function ChangeItemCard({
+  item,
+  context,
+  isAi,
+  selected,
+  onSelect,
+  evidencePanelId,
+  canDecide,
+  busy,
+  onDecide,
+  onEdit,
+}: ChangeItemCardProps) {
   const { t } = useTranslation();
   const titleId = useId();
   const fields = effectiveFields(item);
@@ -98,9 +111,11 @@ export function ChangeItemCard({ item, context, isAi, selected, onSelect, canDec
         <Button
           variant="ghost"
           size="sm"
-          aria-pressed={selected}
+          {...(evidencePanelId
+            ? { 'aria-expanded': selected, 'aria-controls': selected ? evidencePanelId : undefined }
+            : { 'aria-pressed': selected })}
           onClick={onSelect}
-          className="ml-auto aria-pressed:bg-primary-soft aria-pressed:text-primary-strong"
+          className="ml-auto aria-expanded:bg-primary-soft aria-expanded:text-primary-strong aria-pressed:bg-primary-soft aria-pressed:text-primary-strong"
         >
           <Quote aria-hidden />
           {t('review.evidenceCount', { count: item.evidence.length })}

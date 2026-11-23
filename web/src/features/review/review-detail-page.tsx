@@ -93,6 +93,7 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
   const { canReview } = usePermissions();
   const pendingHintId = useId();
   const wide = useMediaQuery(DESKTOP_QUERY);
+  const evidencePanelId = useId();
 
   const context = useMemo(() => buildRefContext(changeSet.items, elements, language), [changeSet.items, elements, language]);
   const groups = ELEMENT_KINDS.map((kind) => ({
@@ -229,7 +230,9 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
           <CardContent className="text-sm text-muted-foreground">{t('review.noItems')}</CardContent>
         </Card>
       ) : (
-        <div className="mt-4 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)]">
+        // Columns follow `wide`, not a CSS breakpoint: rem breakpoints move with the browser font
+        // size, and the evidence panel's placement must match the layout.
+        <div className={cn('mt-4 grid items-start gap-6', wide && 'grid-cols-[minmax(0,1fr)_minmax(0,26rem)]')}>
           <div className="space-y-6">
             {groups.map((group) => (
               <section key={group.kind} aria-labelledby={`group-${group.kind}`} className="space-y-3">
@@ -247,13 +250,14 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
                       isAi={isAi}
                       selected={wide ? item.id === selected?.id : item.id === selectedId}
                       onSelect={() => setSelectedId((current) => (!wide && current === item.id ? null : item.id))}
+                      evidencePanelId={wide ? undefined : evidencePanelId}
                       canDecide={canDecide}
                       busy={busyItemId === item.id || bulk.isPending || merge.isPending}
                       onDecide={(decision) => decide.mutate({ itemId: item.id, decision })}
                       onEdit={() => setEditing(item)}
                     />
                     {/* Stacked layout: the evidence opens under the chosen item, not after the whole list. */}
-                    {!wide && item.id === selectedId ? <EvidencePanel item={item} context={context} inline /> : null}
+                    {!wide && item.id === selectedId ? <EvidencePanel id={evidencePanelId} item={item} context={context} inline /> : null}
                   </Fragment>
                 ))}
               </section>
@@ -281,7 +285,15 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
   );
 }
 
-function EvidencePanel({ item, context, inline = false }: { item: ChangeItem; context: RefContext; inline?: boolean }) {
+interface EvidencePanelProps {
+  id?: string;
+  item: ChangeItem;
+  context: RefContext;
+  /** Opened under the chosen item (stacked layout) rather than beside the list. */
+  inline?: boolean;
+}
+
+function EvidencePanel({ id, item, context, inline = false }: EvidencePanelProps) {
   const { t } = useTranslation();
   const titleId = useId();
   const ref = useRef<HTMLDivElement>(null);
@@ -291,7 +303,7 @@ function EvidencePanel({ item, context, inline = false }: { item: ChangeItem; co
     if (inline) ref.current?.scrollIntoView({ block: 'nearest' });
   }, [inline]);
   return (
-    <Card ref={ref} role="region" className={inline ? undefined : 'sticky top-6'} aria-labelledby={titleId}>
+    <Card id={id} ref={ref} role="region" className={inline ? undefined : 'sticky top-6'} aria-labelledby={titleId}>
       <CardHeader>
         <CardTitle id={titleId} className="flex items-center gap-2">
           <Quote className="size-4 text-info-strong" aria-hidden />

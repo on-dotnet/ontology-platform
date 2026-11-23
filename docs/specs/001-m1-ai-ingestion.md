@@ -108,7 +108,13 @@ worker 用 `SELECT … FOR UPDATE SKIP LOCKED` 领取任务，运行期间每 15
 
 所有模型调用都要求**结构化输出**（JSON Schema 由 Pydantic 模型生成），提示词里写明：只依据给定原文，引语必须逐字摘自原文，不确定时降低置信度。模型名取自配置：`terms` 与 `relations` 用 `OP_AI_MODEL`，`types` 用 `OP_AI_REASONING_MODEL`。
 
-失败处理：模型未配置时返回 `ai.not_configured`；网络或接口错误按任务重试；三次都失败后资料状态为 `failed`，`error_code` 为 `ai.unavailable`。界面上提示"AI 识别暂不可用，资料已保存，可稍后重试"。
+模型调用一律走流式（Responses 流）：常见的代理会切断约 60 秒没有数据的连接，而一次识别常要一到两分钟。`OP_AI_TIMEOUT_SECONDS` 因此限制的是两次数据之间的等待，不是整次调用。
+
+失败处理：
+- 模型未配置时返回 `ai.not_configured`，不重试。
+- 暂时性失败在网关内重试，间隔 2 秒、8 秒，最多 3 次。暂时性失败包括：连接断开、流没有结束事件就关闭、限流、5xx、服务端 `server_error`、输出不合结构。每次尝试都记一行调用记录。
+- 不会因重试而改变的失败不重试，包括：401/400、额度耗尽（`insufficient_quota`）、输出被截断或被过滤（`response.incomplete`，记为 `ai.invalid_output`）。
+- 网关重试后仍失败的，再按任务重试整份资料。三次都失败后资料状态为 `failed`，`error_code` 为 `ai.unavailable` 或 `ai.invalid_output`。界面上提示"AI 识别暂不可用，资料已保存，可稍后重试"。
 
 ## 5 接口
 

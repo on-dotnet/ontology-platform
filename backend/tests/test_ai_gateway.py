@@ -1,6 +1,7 @@
 """OpenAIGateway: error mapping, run accounting and the not-configured case, without network."""
 
 import json
+from collections.abc import AsyncIterator, Callable
 from typing import Any
 
 import httpx2
@@ -32,22 +33,26 @@ def client_with(handler: Any) -> httpx2.AsyncClient:
     return DefaultAsyncHttpx2Client(transport=httpx2.MockTransport(handler))
 
 
-def response_body(text: str) -> dict[str, Any]:
+LEAK = "upstream says: secret detail"
+
+
+def response_body(text: str | None) -> dict[str, Any]:
+    output = [
+        {
+            "type": "message",
+            "id": "msg_1",
+            "role": "assistant",
+            "status": "completed",
+            "content": [{"type": "output_text", "text": text, "annotations": []}],
+        }
+    ]
     return {
         "id": "resp_1",
         "object": "response",
         "created_at": 1,
         "model": "m",
         "status": "completed",
-        "output": [
-            {
-                "type": "message",
-                "id": "msg_1",
-                "role": "assistant",
-                "status": "completed",
-                "content": [{"type": "output_text", "text": text, "annotations": []}],
-            }
-        ],
+        "output": output if text is not None else [],
         "parallel_tool_calls": False,
         "tool_choice": "auto",
         "tools": [],
@@ -61,25 +66,39 @@ def response_body(text: str) -> dict[str, Any]:
     }
 
 
-def stream(text: str, *, complete: bool = True) -> httpx2.Response:
-    """The server-sent events of a streamed response: created, then (unless cut off) completed."""
-    final = response_body(text)
-    events = [
-        (
-            "response.created",
-            {**final, "status": "in_progress", "output": [], "usage": None},
-        )
-    ]
-    if complete:
-        events.append(("response.completed", final))
+def sse(*events: tuple[str, dict[str, Any]]) -> bytes:
     lines = []
     for seq, (name, response) in enumerate(events):
         data = json.dumps({"type": name, "sequence_number": seq, "response": response})
         lines.append(f"event: {name}\ndata: {data}\n\n")
-    body = "".join(lines)
-    return httpx2.Response(
-        200, headers={"content-type": "text/event-stream"}, content=body.encode()
-    )
+    return "".join(lines).encode()
+
+
+def created(text: str | None) -> tuple[str, dict[str, Any]]:
+    return ("response.created", {**response_body(text), "status": "in_progress", "output": []})
+
+
+def stream(
+    text: str | None,
+    *,
+    terminal: str | None = "response.completed",
+    **final_fields: Any,
+) -> httpx2.Response:
+    """A streamed response: created, then the terminal event (none when `terminal` is None)."""
+    events = [created(text)]
+    if terminal is not None:
+        status = terminal.removeprefix("response.")
+        events.append((terminal, {**response_body(text), "status": status, **final_fields}))
+    headers = {"content-type": "text/event-stream"}
+    return httpx2.Response(200, headers=headers, content=sse(*events))
+
+
+class CutStream(httpx2.AsyncByteStream):
+    """Sends the first event, then the connection drops, as a proxy cutting it would."""
+
+    async def __aiter__(self) -> AsyncIterator[bytes]:
+        yield sse(created('{"value": 7}'))
+        raise httpx2.RemoteProtocolError("peer closed connection")
 
 
 async def call(gateway: OpenAIGateway) -> Answer:
@@ -117,21 +136,45 @@ async def test_parses_structured_output_and_records_the_run(settings: Settings, 
     ]
 
 
-@pytest.mark.parametrize(
-    ("status", "retryable"),
-    [(429, True), (500, True), (401, False), (400, False)],
-)
-async def test_http_errors_map_to_ai_unavailable(
-    settings: Settings, status: int, retryable: bool
-) -> None:
-    def handler(request: httpx2.Request) -> httpx2.Response:
-        return httpx2.Response(status, json={"error": {"message": "nope", "type": "x"}})
+def assert_no_leak(error: Exception) -> None:
+    """Provider error bodies stay out of messages, logs and job rows."""
+    assert LEAK not in str(error)
+    assert error.__cause__ is None
+    assert error.__suppress_context__ is True
 
-    gateway = OpenAIGateway(configured(settings), http_client=client_with(handler), retry_delays=())
+
+@pytest.mark.parametrize(
+    ("status", "code", "attempts"),
+    [
+        (429, None, 3),
+        (500, None, 3),
+        (503, None, 3),
+        (429, "insufficient_quota", 1),
+        (401, None, 1),
+        (400, None, 1),
+    ],
+)
+async def test_http_errors_are_retried_only_when_transient(
+    settings: Settings, status: int, code: str | None, attempts: int
+) -> None:
+    calls = 0
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        nonlocal calls
+        calls += 1
+        error = {"message": LEAK, "type": "x", "code": code}
+        return httpx2.Response(status, json={"error": error})
+
+    gateway = OpenAIGateway(
+        configured(settings), http_client=client_with(handler), retry_delays=(0, 0)
+    )
     with pytest.raises(AiUnavailableError) as caught:
         await call(gateway)
+
     assert caught.value.code == "ai.unavailable"
-    assert caught.value.retryable is retryable
+    assert caught.value.retryable is (attempts == 3)
+    assert calls == attempts
+    assert_no_leak(caught.value)
 
 
 async def test_connection_errors_are_retryable(settings: Settings) -> None:
@@ -191,9 +234,27 @@ async def test_a_bad_proxy_url_does_not_leak_into_the_error(settings: Settings) 
     assert "proxy.internal" not in str(error)
 
 
-async def test_a_stream_that_breaks_off_is_retried(settings: Settings, app: Any) -> None:
+async def runs_of(factory: async_sessionmaker[AsyncSession]) -> list[tuple[str, str | None]]:
+    async with factory() as db:
+        runs = (await db.execute(select(AiRun).order_by(AiRun.created_at))).scalars().all()
+    return [(run.status, run.error_code) for run in runs]
+
+
+@pytest.mark.parametrize(
+    "first",
+    [
+        lambda: httpx2.Response(
+            200, headers={"content-type": "text/event-stream"}, stream=CutStream()
+        ),
+        lambda: stream('{"value": 7}', terminal=None),
+    ],
+    ids=["connection-cut", "no-final-event"],
+)
+async def test_a_stream_that_breaks_off_is_retried(
+    settings: Settings, app: Any, first: Callable[[], httpx2.Response]
+) -> None:
     factory: async_sessionmaker[AsyncSession] = app.state.session_factory
-    responses = [stream('{"value": 7}', complete=False), stream('{"value": 7}')]
+    responses = [first(), stream('{"value": 7}')]
 
     def handler(request: httpx2.Request) -> httpx2.Response:
         return responses.pop(0)
@@ -202,22 +263,44 @@ async def test_a_stream_that_breaks_off_is_retried(settings: Settings, app: Any)
         configured(settings), factory, http_client=client_with(handler), retry_delays=(0,)
     )
     assert await call(gateway) == Answer(value=7)
-
-    async with factory() as db:
-        runs = (await db.execute(select(AiRun).order_by(AiRun.created_at))).scalars().all()
-    assert [(run.status, run.error_code) for run in runs] == [
-        ("failed", "ai.unavailable"),
-        ("succeeded", None),
-    ]
+    assert await runs_of(factory) == [("failed", "ai.unavailable"), ("succeeded", None)]
 
 
-async def test_retries_stop_after_the_last_attempt(settings: Settings) -> None:
+async def test_output_cut_off_by_the_model_is_not_retried(settings: Settings, app: Any) -> None:
+    factory: async_sessionmaker[AsyncSession] = app.state.session_factory
     calls = 0
 
     def handler(request: httpx2.Request) -> httpx2.Response:
         nonlocal calls
         calls += 1
-        return httpx2.Response(503, json={"error": {"message": "busy", "type": "x"}})
+        reason = {"reason": "max_output_tokens"}
+        return stream('{"value": 4', terminal="response.incomplete", incomplete_details=reason)
+
+    gateway = OpenAIGateway(
+        configured(settings), factory, http_client=client_with(handler), retry_delays=(0, 0)
+    )
+    with pytest.raises(AiInvalidOutputError) as caught:
+        await call(gateway)
+
+    assert caught.value.retryable is False
+    assert "max_output_tokens" in str(caught.value)
+    assert calls == 1
+    async with factory() as db:
+        run = (await db.execute(select(AiRun))).scalar_one()
+    assert (run.status, run.error_code, run.input_tokens) == ("failed", "ai.invalid_output", 11)
+
+
+@pytest.mark.parametrize(("code", "attempts"), [("server_error", 3), ("invalid_prompt", 1)])
+async def test_a_failed_response_is_retried_only_for_transient_codes(
+    settings: Settings, code: str, attempts: int
+) -> None:
+    calls = 0
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        nonlocal calls
+        calls += 1
+        error = {"code": code, "message": LEAK}
+        return stream(None, terminal="response.failed", error=error)
 
     gateway = OpenAIGateway(
         configured(settings), http_client=client_with(handler), retry_delays=(0, 0)
@@ -225,5 +308,19 @@ async def test_retries_stop_after_the_last_attempt(settings: Settings) -> None:
     with pytest.raises(AiUnavailableError) as caught:
         await call(gateway)
 
+    assert caught.value.retryable is (attempts == 3)
+    assert code in str(caught.value)
+    assert calls == attempts
+    assert_no_leak(caught.value)
+
+
+async def test_a_completed_response_without_output_is_an_invalid_output(
+    settings: Settings,
+) -> None:
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        return stream(None)
+
+    gateway = OpenAIGateway(configured(settings), http_client=client_with(handler), retry_delays=())
+    with pytest.raises(AiInvalidOutputError) as caught:
+        await call(gateway)
     assert caught.value.retryable is True
-    assert calls == 3

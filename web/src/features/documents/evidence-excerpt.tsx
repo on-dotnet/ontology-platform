@@ -27,13 +27,18 @@ export function EvidenceExcerpt({ evidence, className }: { evidence: Evidence; c
   const { t } = useTranslation();
   const chunk = useChunk(evidence.documentId, evidence.chunkId);
   const document = useDocument(evidence.documentId);
+  const boxRef = useRef<HTMLElement>(null);
   const markRef = useRef<HTMLElement>(null);
   const parts = chunk.data ? highlightRange(chunk.data.text, evidence.charStart, evidence.charEnd) : null;
   // No position from the pipeline, or one that does not fit the chunk text.
   const notFound = evidence.charStart === null || evidence.charEnd === null || (chunk.data !== undefined && parts === null);
 
   useEffect(() => {
-    markRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    const box = boxRef.current;
+    const mark = markRef.current;
+    if (!box || !mark) return;
+    // Centre the quote inside the source box only; scrolling the page is the caller's business.
+    box.scrollTop = Math.max(0, mark.offsetTop - (box.clientHeight - mark.offsetHeight) / 2);
   }, [chunk.data, evidence.id]);
 
   return (
@@ -80,7 +85,8 @@ export function EvidenceExcerpt({ evidence, className }: { evidence: Evidence; c
       >
         {(data) => (
             <section
-              className="max-h-[28rem] overflow-y-auto whitespace-pre-wrap rounded-lg border border-border bg-background p-4 text-sm leading-relaxed text-foreground"
+              ref={boxRef}
+              className="relative max-h-[28rem] overflow-y-auto whitespace-pre-wrap rounded-lg border border-border bg-background p-4 text-sm leading-relaxed text-foreground"
               aria-label={t('evidence.sourceText')}
             >
               {parts ? (

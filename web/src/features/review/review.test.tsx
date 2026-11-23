@@ -224,20 +224,31 @@ describe('change set review', () => {
     await screen.findByRole('article', { name: /钢包/ });
     const aside = screen.getByRole('region', { name: '证据' });
     expect(card(/厚度/).compareDocumentPosition(aside) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(card(/钢包/)).getByRole('button', { name: '查看证据（1）' })).toHaveAttribute('aria-pressed', 'true');
     cleanup();
 
     vi.stubGlobal('innerWidth', 800);
+    const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView');
     renderApp('/review/cs-converter');
     await screen.findByRole('article', { name: /板坯/ });
     expect(screen.queryByRole('region', { name: '证据' })).toBeNull();
 
-    await user.click(within(card(/板坯/)).getByRole('button', { name: '查看证据（1）' }));
+    // Narrow: the button discloses the panel under the card and scrolls it into view.
+    const toggle = within(card(/板坯/)).getByRole('button', { name: '查看证据（1）' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).not.toHaveAttribute('aria-pressed');
+    await user.click(toggle);
     const inline = screen.getByRole('region', { name: '证据' });
     expect(card(/板坯/).nextElementSibling).toBe(inline);
     expect(within(inline).getByText('板坯')).toBeInTheDocument();
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(toggle).toHaveAttribute('aria-controls', inline.id);
+    expect(scrolled.mock.contexts).toContain(inline);
 
-    await user.click(within(card(/板坯/)).getByRole('button', { name: '查看证据（1）' }));
+    await user.click(toggle);
     expect(screen.queryByRole('region', { name: '证据' })).toBeNull();
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    scrolled.mockRestore();
   });
 
   it('validates edits on blur and on save, then sends the edited fields', async () => {

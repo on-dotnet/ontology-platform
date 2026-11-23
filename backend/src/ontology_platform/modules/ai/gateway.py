@@ -76,13 +76,19 @@ PING_TIMEOUT_SECONDS = 5.0
 # Waits before the second and third attempt of a call that failed transiently.
 RETRY_DELAYS = (2.0, 8.0)
 
-# Transient failures: retried here, and once more by the job queue when they persist.
+# Transient failures: retried here; when they persist, the job queue reruns the whole document
+# (up to its own attempt limit), so one call can be tried several times over.
 _RETRYABLE = (
     openai.APIConnectionError,
     openai.APITimeoutError,
     openai.RateLimitError,
     openai.InternalServerError,
 )
+# Error codes that look transient but are not: retrying cannot help.
+_PERMANENT_CODES = frozenset({"insufficient_quota"})
+# `response.failed` codes worth another attempt.
+_RETRYABLE_FAILURES = frozenset({"server_error", "rate_limit_exceeded"})
+_TERMINAL_EVENTS = frozenset({"response.completed", "response.incomplete", "response.failed"})
 
 
 @dataclass(frozen=True)
@@ -171,34 +177,46 @@ class OpenAIGateway:
 
     async def _attempt[T: BaseModel](self, client: AsyncOpenAI, call: "_Call[T]") -> T:
         started = time.monotonic()
+        usage: Any = None
         try:
             # Streamed, so that tokens keep the connection busy: proxies that drop idle
             # connections (about a minute is common) would otherwise cut long calls.
+            # `ai_timeout_seconds` therefore bounds the gaps between events, not the whole call.
             async with client.responses.stream(
                 model=call.model,
                 instructions=call.instructions,
                 input=[call.message],
                 text_format=call.schema,
             ) as stream:
-                response = await stream.get_final_response()
+                final: Any = None
+                async for event in stream:
+                    if event.type in _TERMINAL_EVENTS:
+                        final = event
+                if final is None:
+                    raise _StreamEndedError
+                usage = final.response.usage
+                if final.type == "response.completed":
+                    parsed = (await stream.get_final_response()).output_parsed
+                    if parsed is not None:
+                        await self._record(call, started, usage, None)
+                        return parsed
+                    error: AiError = AiInvalidOutputError(
+                        "The model returned no structured output.", retryable=True
+                    )
+                else:
+                    error = _terminal_error(final)
         except openai.OpenAIError as exc:
-            error: AiError = _map_error(exc)
+            error = _map_error(exc)
         except (ValidationError, json.JSONDecodeError) as exc:
-            # The SDK validates the output against the schema; truncated or off-schema output
-            # surfaces here rather than as an OpenAIError. Another attempt usually succeeds.
+            # The SDK validates the output against the schema; off-schema output surfaces here
+            # rather than as an OpenAIError. Another attempt usually succeeds.
             text = f"The model output did not match the schema: {type(exc).__name__}"
             error = AiInvalidOutputError(text, retryable=True)
-        except (httpx2.TransportError, RuntimeError) as exc:
-            # The stream broke off, or ended without a completed response.
+        except (httpx2.TransportError, _StreamEndedError) as exc:
+            # The connection broke off, or the stream ended without a final event.
             text = f"The model stream ended early: {type(exc).__name__}"
             error = AiUnavailableError(text, retryable=True)
-        else:
-            parsed = response.output_parsed
-            if parsed is not None:
-                await self._record(call, started, response.usage, None)
-                return parsed
-            error = AiInvalidOutputError("The model returned no structured output.", retryable=True)
-        await self._record(call, started, None, error.code)
+        await self._record(call, started, usage, error.code)
         # No chain: provider error bodies are not ours to log.
         raise error from None
 
@@ -214,7 +232,11 @@ class OpenAIGateway:
     async def _record(
         self, call: "_Call[Any]", started: float, usage: Any, error_code: str | None
     ) -> None:
-        """One row per attempt, so retries show up in the accounting."""
+        """One row per attempt, so retries show up in the accounting.
+
+        A cancelled attempt (the job lost its lease) is not recorded: writing from a cancelled
+        task is unreliable, and the provider may still bill for it.
+        """
         if self._session_factory is None:
             return
         run = AiRun(
@@ -233,8 +255,27 @@ class OpenAIGateway:
             await db.commit()
 
 
+class _StreamEndedError(Exception):
+    """The response stream closed without a completed, incomplete or failed event."""
+
+
 def _map_error(exc: openai.OpenAIError) -> AiError:
-    retryable = isinstance(exc, _RETRYABLE)
+    code = getattr(exc, "code", None)
+    retryable = isinstance(exc, _RETRYABLE) and code not in _PERMANENT_CODES
     status = getattr(exc, "status_code", None)
     detail = f"{type(exc).__name__} (HTTP {status})" if status else type(exc).__name__
     return AiUnavailableError(f"Model call failed: {detail}", retryable=retryable)
+
+
+def _terminal_error(event: Any) -> AiError:
+    """Maps a `response.incomplete` or `response.failed` event; codes only, never messages."""
+    response = event.response
+    if event.type == "response.incomplete":
+        # Cut off at the output limit or by a content filter: the same input would be cut again.
+        details = getattr(response, "incomplete_details", None)
+        reason = getattr(details, "reason", None) or "unknown"
+        return AiInvalidOutputError(f"The model output was cut off: {reason}", retryable=False)
+    code = getattr(getattr(response, "error", None), "code", None) or "unknown"
+    return AiUnavailableError(
+        f"The model call failed: {code}", retryable=code in _RETRYABLE_FAILURES
+    )
