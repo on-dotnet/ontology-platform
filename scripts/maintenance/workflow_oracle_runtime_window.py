@@ -123,7 +123,11 @@ def open_window(*, metadata_maintenance=False):
     from workflow_oracle_mapping_s2_contract import frozen_plan
     require(not ACTIVE.get() and not COLD_MEASUREMENT.get() and p.product_run() == RUN and
             ROOT == resume.ROOT and frozen_plan(ROOT, PLAN)['planId'] == PLAN, 'WINDOW_COLD_SCOPE')
+    # 已有本批诊断关闭原件时，PG 维护的后继不能再次准入源窗。
     head = close_registration()
+    if head.get('kind') == 'METADATA_PG_ONLY' and (AREA/BATCH/'metadata-baseline/window.json').exists():
+        recorded = json.loads((AREA/BATCH/'metadata-baseline/window.json').read_bytes())
+        require(recorded['priorClose'] != head['sha256'], 'METADATA_WINDOW_CONSUMED')
     if metadata_maintenance:
         from workflow_oracle_d368_closure import METADATA_CLOSE
         require(head['kind'] == 'NORMAL_QUERY_CLOSE' and head['sha256'] == METADATA_CLOSE, 'METADATA_WINDOW_ORIGIN')
@@ -158,16 +162,20 @@ def open_window(*, metadata_maintenance=False):
         p.save(path, {**row, 'state': 'CLOSED'}, True)
 
 
-def charged(disk, current, host):
+def charged(disk, current, host, *, metadata_helper=None):
     """固定项保留；逐项叠加正向实耗，不借用同窗其他行下降。"""
     allocations = disk['allocations']
     sources = current['volumesLogicalBytes']
     initial = disk['initialSourceMeasurement']
+    extra = {metadata_helper} if metadata_helper is not None else set()
+    require(not extra.intersection(initial['containerWritableBytes'])
+            and current['containerWritableBytes'].keys() == initial['containerWritableBytes'].keys() | extra,
+            'WINDOW_STORAGE_IDENTITIES')
     require(sources.keys() == disk['sourceVolumeCaps'].keys() and
             all(current[key].keys() == initial[key].keys() for key in
-                ('platformVolumes', 'replacementVolumes', 'containerWritableBytes')), 'WINDOW_STORAGE_IDENTITIES')
+                ('platformVolumes', 'replacementVolumes')), 'WINDOW_STORAGE_IDENTITIES')
     source = sum(max(size, disk['sourceVolumeCaps'][name]) for name, size in sources.items())
-    layers = sum(max(size, initial['containerWritableBytes'][key]) for key, size in current['containerWritableBytes'].items())
+    layers = sum(max(size, initial['containerWritableBytes'].get(key,0)) for key, size in current['containerWritableBytes'].items())
     growth = dict(source=source - allocations['sourceAndReplacement'],
                   layers=layers - allocations['containerLayers'],
                   host=max(0, host - allocations['currentHostIncludingFirstBackup']))
@@ -176,7 +184,7 @@ def charged(disk, current, host):
     return disk['totalBytes'] + sum(growth.values()), growth
 
 
-def sample(attempt):
+def sample(attempt, metadata_helper=None):
     import workflow_oracle_mapping_resume as r
     require(os.environ.get('OMQ_PRODUCT_RUN') == RUN and re.fullmatch('[a-f0-9]{32}', attempt), 'WINDOW_SAMPLE_SCOPE')
     basis = r.load(AREA / ('source-admission-' + attempt + '.json'))
@@ -187,12 +195,27 @@ def sample(attempt):
     require((set(ids) == set(basis['expectedRunningRoles']) or partial) and basis['runId'] == RUN and
             basis['status'] == 'FORMAL_RESOURCE_READY', 'WINDOW_SAMPLE_ROLES')
     replacement = r.load(r.recovery.RECOVERY_AREA / 'replacement-resources.json')
-    usage = r.platform.current_storage(r.BASE, {**replacement, 'extraIds': {k: ids[k] for k in r.APIS if k in ids}, 'extraRun': RUN})
+    extra_ids = {k: ids[k] for k in r.APIS if k in ids}
+    if metadata_helper is not None:
+        require(partial and re.fullmatch('[a-f0-9]{64}',metadata_helper), 'METADATA_SAMPLE_HELPER')
+        # 仅接纳当前监控原件中已经验过挂载和配额的完整 helper ID，所有其他容器继续拒绝。
+        rows = [r.load(path) for path in (AREA/BATCH/'metadata-baseline').glob('B[12]/observation.json')]
+        bound, = [row for row in rows if row.get('helper') == metadata_helper and not row.get('helperAbsent')]
+        create = AREA.parent/'commands'/RUN/bound['commands']['create']
+        check = AREA.parent/'commands'/RUN/bound['commands']['identity']
+        for path,stage in [(create,'create'),(check,'identity')]:
+            receipt = r.load(path/'receipt.json')
+            raw = (path/'stdout.txt').read_bytes()
+            require(receipt['exitCode']==0 and receipt['stage']=='metadata-'+bound['slot']+'-'+stage
+                    and receipt['stdout']['sha256']==r.ex.sha(raw) and raw.startswith(metadata_helper.encode()),
+                    'METADATA_HELPER_ORIGINAL')
+        extra_ids['metadata-helper'] = metadata_helper
+    usage = r.platform.current_storage(r.BASE, {**replacement, 'extraIds': extra_ids, 'extraRun': RUN})
     disk = basis['platformDisk']
     paths = disk['hostPaths']
     sizes = [line.split(None, 1) for line in subprocess.check_output(['du', '-sk', *paths], text=True, timeout=15).splitlines()]
     require([path for size, path in sizes] == paths, 'WINDOW_HOST_SET')
-    total, growth = charged(disk, usage, sum(int(size)*1024 for size, path in sizes))
+    total, growth = charged(disk, usage, sum(int(size)*1024 for size, path in sizes),metadata_helper=metadata_helper)
     vm = subprocess.check_output(['docker', '--context', 'desktop-linux', 'exec', ids['platform-pg'],
                                   'sh', '-ec', 'df -Pk /; cat /proc/meminfo'], text=True, timeout=5)
     raw = subprocess.check_output(['vm_stat'], text=True, timeout=3)
@@ -210,7 +233,7 @@ def allow_sample(row, limit):
 
 
 @contextlib.contextmanager
-def monitored(attempt):
+def monitored(attempt, *, metadata_helper=None):
     """启动前同步采样，父命令期间采样失败或余量不足即中断进程组。"""
     decision = policy()
     require(decision is not None, 'WINDOW_DECISION_REQUIRED')
@@ -221,7 +244,7 @@ def monitored(attempt):
         with output.open('a') as stream:
             stream.write(json.dumps(row) + '\n')
     def once():
-        result = subprocess.run([sys.executable, '-B', __file__, attempt], capture_output=True, timeout=25)
+        result = subprocess.run([sys.executable, '-B', __file__, attempt, *([metadata_helper] if metadata_helper else [])], capture_output=True, timeout=25)
         require(result.returncode == 0, 'WINDOW_SAMPLER_EXIT_' + str(result.returncode))
         row = json.loads(result.stdout)
         record(row)
@@ -259,7 +282,7 @@ def monitored(attempt):
 
 
 if __name__ == '__main__':
-    print(json.dumps(sample(sys.argv[1])))
+    print(json.dumps(sample(*sys.argv[1:])))
 
 # 当前准许的替代副本由该次收口关闭，图库含两次已发布内容。
 CLOSE_FILE = 'closeout-ec277a6910354c72884c646d9e3e6df0.json'

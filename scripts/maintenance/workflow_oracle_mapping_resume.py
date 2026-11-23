@@ -525,6 +525,7 @@ def check_metadata_spans(source, *, component=False):
         calls = groups.setdefault(execution, [])
         index = len(calls)
         require(index < 12 and (span['Statement'], span['Post']) == (STATEMENTS[index % 6], index >= 6), 'METADATA_ORDER')
+        require(not calls or calls[-1]['End'] <= span['Begin'], 'METADATA_SPAN_OVERLAP')
         calls.append(span)
         times = [span[k] for k in ('Begin', 'ExecuteBegin', 'ExecuteEnd', 'FirstRow', 'Eof',
                                     'CursorDisposeBegin', 'CursorDisposeEnd', 'CommandDisposeBegin', 'End') if span[k] is not None]
@@ -560,6 +561,9 @@ def check_metadata_spans(source, *, component=False):
                 returned = next((e for e in rows if e['stage'] == stage and e['outcome'] == 'returned'), None)
                 reached = items[low:high]
                 require(not reached or enter and all(enter['tick'] <= s['Begin'] for s in reached), 'METADATA_STAGE_START')
+                terminal = next((e for e in rows if e['stage'] == stage and e['outcome'] in ('returned','failed','cancelled')), None)
+                require(not reached or terminal and all(s['End'] <= terminal['tick'] for s in reached),
+                        'METADATA_STAGE_END')
                 if returned:
                     rejected = stage == 'readOnly' and any(e['stage'] == stage and e['outcome'] == 'failed' for e in rows)
                     require(len(reached) in ((3,4) if rejected else (high-low,))

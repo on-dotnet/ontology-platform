@@ -240,7 +240,7 @@ def reopen_closed(root,entry,prior,archive=None):
 
 
 # 元数据探针使用相同生产方法与受限镜像。此入口没有业务表 SQL、平台 Query 或租约操作。
-def metadata_probe(slot, catalog, snapshots, sample_dir, *, question=None):
+def metadata_probe(slot, catalog, snapshots, sample_dir, admission, *, question=None):
     from concurrent.futures import ThreadPoolExecutor
     from workflow_oracle_mapping_snapshot import probe_args
     import workflow_oracle_d368_closure as closure
@@ -268,11 +268,15 @@ def metadata_probe(slot, catalog, snapshots, sample_dir, *, question=None):
         return result
     def read_source(stage,sql,limit):
         data = ("whenever sqlerror exit failure rollback\nset echo off feedback off heading off pages 0 lines 32000 "
-                "verify off tab off trimspool on serveroutput on size 1000000\nalter session set container=FREEPDB1;\n"
+                "verify off tab off trimspool on\nset serveroutput on size 1000000\nalter session set container=FREEPDB1;\n"
                 +sql+"\nexit success\n").encode()
-        return r.ex.run([*closure.DOCKER,'exec','-i',closure.SOURCE,'sqlplus','-L','-s','/ as sysdba'],r.ROOT,
+        observed = r.ex.run([*closure.DOCKER,'exec','-i',closure.SOURCE,'sqlplus','-L','-s','/ as sysdba'],r.ROOT,
                         task=r.TASK,run_id=r.PRODUCT,stage='metadata-'+slot+'-'+stage,stdin=data,
                         input_key=r.ex.sha(data),timeout=limit)
+        # 每条命令独立持久化，资源监控保护退出也能找到已结束的实际观察。
+        r.platform.save(directory/(stage+'-command.json'),dict(commandId=observed.receipt['commandId'],
+                        exitCode=observed.returncode,stdout=observed.receipt['stdout'],stderr=observed.receipt['stderr']))
+        return observed
     condition = ("con_id=to_number(sys_context('USERENV','CON_ID')) and username='FIXTURE_READER' "
                  "and module='G4-ORACLE-MAPPING-QUERY-001' and client_identifier='"+key+"'")
     watch = """declare
@@ -289,7 +293,7 @@ def metadata_probe(slot, catalog, snapshots, sample_dir, *, question=None):
       end loop;
       dbms_output.put_line('SUMMARY|190|'||maxgap);
     end;
-    /"""
+/"""
     # 准确镜像、快照和配额在开始任何源调用前从引擎独立回读。
     base = probe_args(r.ROOT,r.TASK,key,r.net_names()['source-internal'],r.RESTORED/'reader',directory,'OracleMetadataCostTests')
     base = [arg.replace('--memory=512m','--memory=768m').replace('--memory-swap=512m','--memory-swap=768m')
@@ -314,7 +318,9 @@ def metadata_probe(slot, catalog, snapshots, sample_dir, *, question=None):
         mounts = {m['Destination']:(m['Source'].removeprefix('/host_mnt'),m['RW']) for m in json.loads(fields[8]) if m['Type']=='bind'}
         require(mounts == {'/app':(str(r.ROOT/snapshots['connections']['directory']),False),
                           '/run/fixture':(str(r.RESTORED/'reader'),False),'/run/sync':(str(directory),True)},'METADATA_MOUNTS')
-        with ThreadPoolExecutor(max_workers=1) as pool:
+        with w.monitored(admission,metadata_helper=cid), ThreadPoolExecutor(max_workers=1) as pool:
+            w.metadata_allow(30)
+            require(30 - (time.monotonic() - began) >= 23, 'METADATA_SUPERVISION_RESERVE')
             observer = pool.submit(read_source,'sessions',watch,16)
             time.sleep(.35)
             launched = time.monotonic()
@@ -437,8 +443,7 @@ def run_metadata_baseline():
             record.update(viewMetadataCommand=cmd,viewMetadata=meta.splitlines())
             save()
             admission=r.admit()
-            with w.monitored(admission['attempt']):
-                sample=metadata_probe('B1',catalog,snapshots,sample_dir)
+            sample=metadata_probe('B1',catalog,snapshots,sample_dir,admission['attempt'])
             record.update(sample=sample,trace='OFF')
             save()
             # 计划和累计统计仅针对本次实际命中的 child，不对短语句猜测归属。

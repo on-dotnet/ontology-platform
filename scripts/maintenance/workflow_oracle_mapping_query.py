@@ -34,7 +34,7 @@ def structural(root, task, phase):
         frozen_plan(root)
         frozen_plan(root,"s2-s3-01-access-01")
         frozen_plan(root,"s2-s3-01-runtime-01")
-        consumers['scripts/maintenance/workflow_oracle_runtime_window.py']=['def open_window()', 'cold = resume.admit(',
+        consumers['scripts/maintenance/workflow_oracle_runtime_window.py']=['def open_window(*, metadata_maintenance=False)', 'cold = resume.admit(',
             'def last_close(', 'def compare_generation(', 'def published_graphs(']
         consumers['scripts/maintenance/workflow_oracle_mapping_postprobe.py']=['def maintenance(', 'def lifecycle(', 'POSTPROBE_TEMPLATE']
         consumers['scripts/maintenance/workflow_oracle_mapping_preparation_refresh.py']=['def lifecycle(', 'def maintenance_result(', 'def reopen_isolated(', 'S23_PREPARATION_REFRESH_CAS']

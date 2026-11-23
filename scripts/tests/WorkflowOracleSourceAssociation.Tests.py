@@ -132,6 +132,34 @@ class SourceAssociationTests(unittest.TestCase):
                     patch.object(Path, 'read_bytes', return_value=changed), self.assertRaises(ValueError):
                 normal.consume_observation(row)
 
+    def test_cancelled_stage_bounds_and_helper_accounting(self):
+        import workflow_oracle_mapping_resume as resume
+        import workflow_oracle_normal_query as normal
+        import workflow_oracle_runtime_window as window
+
+        source = json.loads((normal.AREA/'metadata-baseline/B1/metadata.json').read_bytes())['source']
+        resume.check_metadata_spans(source, component=True)
+        span = source['metadata'][0]
+        def mark(stage, outcome, tick):
+            return dict(stage=stage, outcome=outcome, tick=tick, execution=span['Execution'],
+                        acquisition=span['Acquisition'], session=None)
+        source.update(kind='product', metadata=[span], events=[
+            mark('acquisition','returned',span['Begin']), mark('branch','enter',span['Begin']),
+            mark('readOnly','enter',span['Begin']), mark('readOnly','cancelled',span['End'])])
+        resume.check_metadata_spans(source)
+        source['events'][-1]['tick'] -= 1
+        with self.assertRaisesRegex(ValueError,'METADATA_STAGE_END'):
+            resume.check_metadata_spans(source)
+
+        initial = dict(volumesLogicalBytes={}, platformVolumes={}, replacementVolumes={}, containerWritableBytes={})
+        allocations = dict(sourceAndReplacement=0,containerLayers=0,currentHostIncludingFirstBackup=0,
+                           platformOriginal=0,platformReplacement=0)
+        disk = dict(allocations=allocations,initialSourceMeasurement=initial,sourceVolumeCaps={},totalBytes=0)
+        current = dict(initial,containerWritableBytes={'registered':214})
+        self.assertEqual(window.charged(disk,current,0,metadata_helper='registered')[0],214)
+        with self.assertRaisesRegex(ValueError,'WINDOW_STORAGE_IDENTITIES'):
+            window.charged(disk,current,0,metadata_helper='foreign')
+
     def test_reopen_two_branches_emitted_by_agent_test_process(self):
         from workflow_m2_evidence import mtp
         ready,host,assembly,event,ref=self.current_test_host('agent')
