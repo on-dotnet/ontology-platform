@@ -80,9 +80,9 @@ internal static class OracleQueryReader
                     lifetime, work.Token, native, cancelling),
                 async connection =>
                 {
-                    await OracleSourceAdapter.VerifyMappingAccessAsync(connection, work.Token);
+                    await OracleSourceAdapter.VerifyMappingAccessAsync(connection, work.Token, post: true);
                     work.Token.ThrowIfCancellationRequested();
-                    if (await OracleMappingSourceValidator.CheckCatalogAsync(connection, context.CurrentCatalog, work.Token) != shape)
+                    if (await OracleMappingSourceValidator.CheckCatalogAsync(connection, context.CurrentCatalog, work.Token, post: true) != shape)
                         throw Invalid();
                 },
                 () => adapter.QueryEvent("PHYSICAL_RELEASE", lifetime), work.Token, origin, budget,

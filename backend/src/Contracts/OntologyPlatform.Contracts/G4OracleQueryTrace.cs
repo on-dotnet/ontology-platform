@@ -11,6 +11,15 @@ public sealed class G4OracleQueryTrace : IDisposable
     /// <summary>同一内存上限覆盖两个分支和全部取消通知。</summary>
     private readonly List<object> events = new(160);
 
+    /// <summary>同次请求两分支各十二个固定元数据调用，每个调用独占一条记录。</summary>
+    private readonly List<G4OracleMetadataSpan> metadata = new(24);
+
+    /// <summary>组件探针直接绑定实际驱动执行号，不需要平台查询或租约。</summary>
+    private readonly Guid? probe;
+
+    /// <summary>已申请资源的执行号和唯一物理申请，前后验使用同一映射。</summary>
+    private readonly Dictionary<string, Guid> acquisitions = new();
+
     /// <summary>调用前的作用域，退出时原样恢复。</summary>
     private readonly G4OracleQueryTrace? previous = Scope.Value;
 
@@ -27,7 +36,30 @@ public sealed class G4OracleQueryTrace : IDisposable
     private string? queryId;
 
     /// <summary>沿实际 API 进程的单调时钟记录本次调用，根预算在调用方先建立。</summary>
-    public G4OracleQueryTrace() => Scope.Value = this;
+    public G4OracleQueryTrace(Guid? probe = null)
+    {
+        this.probe = probe;
+        Scope.Value = this;
+    }
+
+    /// <summary>在调用点绑定固定语句、前后验与同一时钟，未开启观察时不创建投影。</summary>
+    public static G4OracleMetadataSpan? BeginMetadata(string statement, bool post)
+    {
+        if (Scope.Value is not { } trace) return null;
+        if (statement is not ("identity" or "privileges" or "attestation" or "directRead" or "catalog" or "physical"))
+            throw new ArgumentOutOfRangeException(nameof(statement));
+        // 产品执行号来自已建立的分支，组件直接使用实际 ClientId。
+        var execution = G4OracleSourceLifetime.Current?.ExecutionId ?? trace.probe?.ToString("N");
+        lock (trace.events)
+        {
+            if (trace.metadata.Count == 24) { trace.dropped++; return null; }
+            // 申请仅来自真实 BeginSource；独立探针的物理申请使用自己的执行标识。
+            var span = new G4OracleMetadataSpan(statement, post, trace.metadata.Count + 1, execution,
+                execution is not null && trace.acquisitions.TryGetValue(execution, out var id) ? id : trace.probe);
+            trace.metadata.Add(span);
+            return span;
+        }
+    }
 
     /// <summary>将服务端成功分配的查询关联到当前请求。</summary>
     public static void Bind(string id)
@@ -48,6 +80,8 @@ public sealed class G4OracleQueryTrace : IDisposable
         if (outcome is not ("enter" or "returned" or "failed" or "cancelled" or "unconfirmed" or "confirmed" or "signal")) return;
         lock (trace.events)
         {
+            if (stage == "acquisition" && acquisition is { } id && G4OracleSourceLifetime.Current is { } lifetime)
+                trace.acquisitions[lifetime.ExecutionId] = id;
             if (outcome == "signal") trace.firstSignal ??= stage;
             if (outcome is "failed" or "cancelled") trace.firstFailure ??= stage + "." + outcome;
             if (trace.events.Count == 160) { trace.dropped++; return; }
@@ -84,7 +118,9 @@ public sealed class G4OracleQueryTrace : IDisposable
     /// <summary>响应后的外层阶段复制有界快照；时间戳均来自同一 API 进程。</summary>
     public object Snapshot()
     {
-        lock (events) return new { queryId, firstFailure, firstSignal, dropped, frequency = Stopwatch.Frequency, events = events.ToArray() };
+        lock (events) return new { profile = "oracle-metadata-v2", kind = probe is null ? "product" : "DIAGNOSTIC_ONLY",
+            probe, queryId, firstFailure, firstSignal, dropped, frequency = Stopwatch.Frequency, events = events.ToArray(),
+            metadata = metadata.ToArray() };
     }
 
     /// <summary>释放请求上下文，已经注册的响应后导出仍可读取本次快照。</summary>

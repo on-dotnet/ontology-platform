@@ -10,6 +10,7 @@ import signal
 import subprocess
 import sys
 import threading
+import time
 import uuid
 from pathlib import Path
 
@@ -28,6 +29,52 @@ EXIT_MARGIN = 4 * GIB
 RUN_MARGIN = 2 * GIB
 
 
+# 只在本次元数据批次由 Master 设置，原窗口读取者及历史重开没有计时副作用。
+METADATA_TIMER = contextvars.ContextVar('oracle_metadata_timer', default=None)
+METADATA_LIMIT_SECONDS = 2340
+METADATA_CLOSE_SECONDS = 180
+
+
+def metadata_allow(seconds):
+    """按同一累计余量准入下一项工作，预留的安全退出不得用于新增动作。"""
+    active = METADATA_TIMER.get()
+    if active is None or CLOSING.get():
+        return
+    elapsed = active['priorNs'] + time.monotonic_ns() - active['startNs']
+    require(elapsed + (seconds + METADATA_CLOSE_SECONDS) * 10**9 < METADATA_LIMIT_SECONDS * 10**9,
+            'METADATA_REMAINING_BUDGET')
+
+
+@contextlib.contextmanager
+def metadata_batch_window(kind):
+    """记录真实阶段全程，包括 finally、原件登记及读回，不截断必要的安全退出。"""
+    from workflow_oracle_mapping_resources import require
+    from workflow_oracle_mapping_platform import save
+    require(kind in ('pg','source1','source2') and METADATA_TIMER.get() is None, 'METADATA_WINDOW_KIND')
+    area = AREA/BATCH
+    rows = [json.loads(p.read_bytes()) for p in area.glob('metadata-elapsed-*.json')]
+    require(all(r['status'] == 'CLOSED' for r in rows) and kind not in {r['kind'] for r in rows}
+            and len(rows) < 3 and (kind == 'pg' and not rows or kind == 'source1' and len(rows) == 1
+                                   or kind == 'source2' and len(rows) == 2), 'METADATA_WINDOW_SEQUENCE')
+    prior = sum(r['elapsedNs'] for r in rows)
+    path = area/('metadata-elapsed-'+kind+'.json')
+    row = dict(kind=kind,taskId=TASK,runId=RUN,batch=BATCH,priorNs=prior,startNs=time.monotonic_ns(),
+               reserveSeconds=METADATA_CLOSE_SECONDS,status='ACTIVE')
+    token = METADATA_TIMER.set(row)
+    try:
+        metadata_allow(360)
+        with path.open('x') as output:
+            json.dump(row,output)
+        try:
+            yield
+        finally:
+            elapsed = time.monotonic_ns()-row['startNs']
+            save(path,{**row,'status':'CLOSED','elapsedNs':elapsed,'totalNs':prior+elapsed,
+                       'budgetStatus':'PASS' if prior+elapsed <= METADATA_LIMIT_SECONDS*10**9 else 'FAIL'}, True)
+    finally:
+        METADATA_TIMER.reset(token)
+
+
 def choose(total):
     """完整当期账本须能容纳候选检出、运行增长与保护退出。"""
     needed = total + CHECKOUT + RUN_MARGIN + EXIT_MARGIN
@@ -36,6 +83,7 @@ def choose(total):
 
 
 def policy():
+    metadata_allow(30)
     nonce = ACTIVE.get()
     if nonce is None:
         return None
@@ -68,7 +116,7 @@ def ceiling(total=None):
 
 
 @contextlib.contextmanager
-def open_window():
+def open_window(*, metadata_maintenance=False):
     """由 Master 的单次冷态准入创建限本树、本批的决定，退出时撤销。"""
     import workflow_oracle_mapping_platform as p
     import workflow_oracle_mapping_resume as resume
@@ -76,8 +124,12 @@ def open_window():
     require(not ACTIVE.get() and not COLD_MEASUREMENT.get() and p.product_run() == RUN and
             ROOT == resume.ROOT and frozen_plan(ROOT, PLAN)['planId'] == PLAN, 'WINDOW_COLD_SCOPE')
     head = close_registration()
-    require(head.get('kind')!='NORMAL_QUERY_CLOSE','WINDOW_NORMAL_QUERY_BLOCKED')
-    require(head.get('kind') not in ('D368_PG_ONLY','NORMAL_PG_ONLY') or head['status'] == 'TASK_LEVEL_RECOVERY', 'WINDOW_D368_PRODUCT_BLOCKED')
+    if metadata_maintenance:
+        from workflow_oracle_d368_closure import METADATA_CLOSE
+        require(head['kind'] == 'NORMAL_QUERY_CLOSE' and head['sha256'] == METADATA_CLOSE, 'METADATA_WINDOW_ORIGIN')
+    else:
+        require(head.get('kind')!='NORMAL_QUERY_CLOSE','WINDOW_NORMAL_QUERY_BLOCKED')
+    require(head.get('kind') not in ('D368_PG_ONLY','NORMAL_PG_ONLY','METADATA_PG_ONLY') or head['status'] == 'TASK_LEVEL_RECOVERY', 'WINDOW_D368_PRODUCT_BLOCKED')
     measuring = COLD_MEASUREMENT.set(True)
     try:
         cold = resume.admit(set(resume.recovery.ORIGINAL_IDS) | set(resume.APIS))
@@ -242,13 +294,15 @@ def close_registration(digest=None):
                     and row['status']=='NORMAL_PATH_BLOCKED' and row['exitCode']==1
                     and row['sha256']=='64bdc66845958810935eb00e9b633108b6c5dc7ebf56ea19d030c396a5db5040','WINDOW_NORMAL_CLOSE')
             row={**row,'grantCheckpoint':known[previous]['grantCheckpoint']}
-        elif kind in ('D368_PG_ONLY','NORMAL_PG_ONLY'):
+        elif kind in ('D368_PG_ONLY','NORMAL_PG_ONLY','METADATA_PG_ONLY'):
             from workflow_oracle_d368_pg_close import PREVIOUS
             from workflow_oracle_d368_closure import QUERY
             if kind=='NORMAL_PG_ONLY':
                 from workflow_oracle_d368_closure import NORMAL_CLOSE as PREVIOUS, NORMAL_QUERY as QUERY
+            if kind == 'METADATA_PG_ONLY':
+                from workflow_oracle_d368_closure import METADATA_CLOSE as PREVIOUS, METADATA_QUERY as QUERY
             required = {'kind','operation','queryId','previousSha256','sha256','sizeBytes','status','memberCount','memberIndexSha256'}
-            require(set(row) == required and previous == PREVIOUS and (kind=='NORMAL_PG_ONLY' or known[previous]['kind'] == 'MAPPING_RESTORE')
+            require(set(row) == required and previous == PREVIOUS and (kind in ('NORMAL_PG_ONLY','METADATA_PG_ONLY') or known[previous]['kind'] == 'MAPPING_RESTORE')
                     and row['queryId'] == QUERY and row['status'] in ('TASK_LEVEL_RECOVERY','BLOCKED')
                     and type(row['sizeBytes']) is int and row['sizeBytes'] > 0 and type(row['memberCount']) is int
                     and row['memberCount'] > 0 and re.fullmatch('[a-f0-9]{64}',row['memberIndexSha256']), 'WINDOW_D368_REGISTRY')
@@ -293,7 +347,7 @@ def last_close(root, archive=None, digest=None):
         from workflow_oracle_prediagnostic_close import reopen
         prior = last_close(root, archive, entry['previousSha256'])
         return reopen(root, entry, prior, archive)[0]
-    if entry.get('kind') in ('D368_PG_ONLY','NORMAL_PG_ONLY'):
+    if entry.get('kind') in ('D368_PG_ONLY','NORMAL_PG_ONLY','METADATA_PG_ONLY'):
         from workflow_oracle_d368_pg_close import reopen
         previous = last_close(root, archive, entry['previousSha256'])
         normalized, _, _ = reopen(root, entry, previous, archive)

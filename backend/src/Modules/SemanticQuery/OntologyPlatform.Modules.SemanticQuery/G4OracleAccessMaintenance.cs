@@ -23,8 +23,11 @@ internal sealed class G4OracleAccessMaintenanceProof
     /// <summary>普通正式关系查询仅允许本代已冻结的一条失败行。</summary>
     internal const string NormalQueryId = "query-f1599097a7274c20b82cbf0dfcea4e2b";
 
+    /// <summary>本次有界元数据诊断前唯一允许清租约的历史行。</summary>
+    internal const string MetadataQueryId = "query-5d891e89221e4a3f8f6893873b1d7a9d";
+
     /// <summary>核对行锁内读取的 owner，专用代次模式仅暴露原 owner 的摘要。</summary>
-    internal bool MatchesOwner(string? owner) => owner is not null && (this["queryId"] is GenerationQueryId or NormalQueryId
+    internal bool MatchesOwner(string? owner) => owner is not null && (this["queryId"] is GenerationQueryId or NormalQueryId or MetadataQueryId
         ? G4QueryCanonical.Hash(System.Text.Encoding.UTF8.GetBytes(owner)) == this["ownerSha256"]
         : owner == Owner);
 
@@ -103,7 +106,16 @@ internal sealed class G4OracleAccessMaintenanceProof
         Check(value["taskId"] == "G4-ORACLE-MAPPING-QUERY-001" && value["runId"] == "product-resume-01"
             && value["organizationId"] == "org-demo" && value["connectionId"] == ConnectionId
             && value["platformContainerId"] == PlatformContainer && value["sourceContainerId"] == SourceContainer);
-        if (mode == "NORMAL_GENERATION")
+        if (mode == "NORMAL_GENERATION" && value["queryId"] == MetadataQueryId)
+        {
+            Check(value["queryId"] == MetadataQueryId && value["proofKind"] == mode
+                && value["parentCommandId"] == "e1c70fc2faf344f39c98ac6731a061aa"
+                && value.proof.GetProperty("childCommandId").ValueKind == JsonValueKind.Null
+                && value["sourceStartedAt"] == "2026-11-22T15:03:56.505162467Z"
+                && value["sourceFinishedAt"] == "2026-11-22T15:06:22.192480006Z"
+                && value["closeSha256"] == "64bdc66845958810935eb00e9b633108b6c5dc7ebf56ea19d030c396a5db5040");
+        }
+        else if (mode == "NORMAL_GENERATION")
         {
             Check(value["queryId"] == NormalQueryId && value["proofKind"] == mode
                 && value["parentCommandId"] == "4032c1d770b240989966ba3275d86999"
@@ -136,7 +148,22 @@ internal sealed class G4OracleAccessMaintenanceProof
             && Regex.IsMatch(value["systemIdentifier"], @"\A[0-9]{1,20}\z")
             && Regex.IsMatch(value["databaseUser"], @"\A[a-z_][a-z0-9_]{0,62}\z") && (isolated
                 ? Regex.IsMatch(value["database"], @"\Aomq_query_test_[a-z0-9_]+\z") : value["database"] == "mapping"));
-        if (mode == "NORMAL_GENERATION")
+        if (mode == "NORMAL_GENERATION" && value["queryId"] == MetadataQueryId)
+        {
+            Check(value["systemIdentifier"] == "7709907053089669168" && value["databaseUser"] == "postgres" && operatorId == "os-uid-501"
+                && sealSha == "2120d6d36a993bdc5234e8febce44d42d83d3315fd0ad405f6bbfc3e9ef2588b"
+                && terminationSha == "3004a217e2551b91d104092fd3faad8cc8d8fa56ee4eac0119e5f37d7327a858"
+                && value["ownerSha256"] == "f155210a2019304736db8f52cc879be44f88045bd28ddcbae06878159f09e08b"
+                && value["requestSha256"] == "e65bb0daa424428e3b4f54f5931973ec7a34edc7b5a11230365cab8524503fbd"
+                && value["bindingSha256"] == "8c5267a7cf1e34090f41b876fcdcf176898669dd4e240cf85082916ce88973dc"
+                && value["stableRowSha256"] == "aa8ed5eaf5a90a5073d404707a023b560fa6a2298144c90e1c18613a55bc2a03"
+                && value["failureAuditId"] == "3e1ca8e4e1af42efa3ac8d0007c8debf"
+                && value["failureAuditSha256"] == "8625e5892d8c7360efd0a5eaaaf5da78e808c6fb859c4f15c529b36244c88de3"
+                && value["leaseUntilUtc"] == "2026-11-22T15:05:57.808477+00:00"
+                && value["deadlineUtc"] == value["leaseUntilUtc"] && value["createdUtc"] == "2026-11-22T15:05:53.724627+00:00"
+                && value["completedUtc"] == "2026-11-22T15:05:54.520735+00:00");
+        }
+        else if (mode == "NORMAL_GENERATION")
         {
             Check(value["systemIdentifier"] == "7709907053089669168" && value["databaseUser"] == "postgres" && operatorId == "os-uid-501"
                 && sealSha == "34fd7fda857fc5ca2f2456ad5cb76885b8473fafe00b588366d187286e0fd9c5"

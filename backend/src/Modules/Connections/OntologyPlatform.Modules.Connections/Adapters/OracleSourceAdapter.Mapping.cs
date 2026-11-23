@@ -93,30 +93,36 @@ public sealed partial class OracleSourceAdapter
     }
 
     /// <summary>在当前独占物理会话复核只读身份与准确三项直接授权。</summary>
-    internal static async Task VerifyMappingAccessAsync(OracleConnection connection, CancellationToken token)
+    internal static async Task VerifyMappingAccessAsync(OracleConnection connection, CancellationToken token, bool post = false)
     {
-        if (!await MappingAccessMatchesAsync(connection, token))
+        if (!await MappingAccessMatchesAsync(connection, token, post))
             throw new PgSourceException("connection_readonly_unverified");
     }
 
     /// <summary>完整读取并释放权限元数据后才返回匹配结论；取消或资源异常不能伪装成明确拒绝。</summary>
-    internal static async Task<bool> MappingAccessMatchesAsync(OracleConnection connection, CancellationToken token)
+    internal static async Task<bool> MappingAccessMatchesAsync(OracleConnection connection, CancellationToken token, bool post = false)
     {
         token.ThrowIfCancellationRequested();
-        if (!await ReadOnlyPolicyMatchesAsync(connection, token)) return false;
+        if (!await ReadOnlyPolicyMatchesAsync(connection, token, post)) return false;
         // 直接授予的可读闭包须准确匹配两表和证明视图。
-        using var grants = connection.CreateCommand();
-        grants.CommandText = """
-            SELECT OWNER, TABLE_NAME FROM USER_TAB_PRIVS_RECD
-            WHERE PRIVILEGE='READ' AND GRANTABLE='NO' ORDER BY OWNER,TABLE_NAME
-            """;
-        // 集合采用 Oracle 目录原始标识符，不折叠大小写。
-        var objects = new HashSet<(string, string)>();
-        token.ThrowIfCancellationRequested();
-        await using var cursor = await grants.ExecuteReaderAsync(token);
-        while (await cursor.ReadAsync(token))
-            objects.Add((cursor.GetString(0), cursor.GetString(1)));
-        return objects.SetEquals([("PRODUCTION", "OMQ_ENTITY"), ("CaseOwner", "OmqTarget"), ("G4_CONTROL", "READONLY_ATTESTATION")]);
+        return await OracleMetadataCommand.RunAsync(connection, "directRead", post, async grantsCost =>
+        {
+            // 保留生产命令的原 SQL 及超时。
+            var grants = grantsCost.Command;
+            grants.CommandText = """
+                SELECT OWNER, TABLE_NAME FROM USER_TAB_PRIVS_RECD
+                WHERE PRIVILEGE='READ' AND GRANTABLE='NO' ORDER BY OWNER,TABLE_NAME
+                """;
+            // 集合采用 Oracle 目录原始标识符，不折叠大小写。
+            var objects = new HashSet<(string, string)>();
+            token.ThrowIfCancellationRequested();
+            return await grantsCost.WithReaderAsync(token, async cursor =>
+            {
+                while (await OracleMetadataCommand.ReadAsync(cursor, token))
+                    objects.Add((cursor.GetString(0), cursor.GetString(1)));
+                return objects.SetEquals([("PRODUCTION", "OMQ_ENTITY"), ("CaseOwner", "OmqTarget"), ("G4_CONTROL", "READONLY_ATTESTATION")]);
+            });
+        });
     }
 
     /// <summary>所有前置核验已结束，在该连接显式建立本地事务并立即发出只读声明。</summary>

@@ -497,10 +497,86 @@ def start_api(role):
     return row
 
 
-def reopen_normal_projection(raw,key):
+METADATA_PROFILE = 'oracle-metadata-v2'
+HISTORICAL_PROFILE = 'normal-v1'
+METADATA_LIMIT = 128 * 1024
+STATEMENTS = ('identity', 'privileges', 'attestation', 'directRead', 'catalog', 'physical')
+
+
+def check_metadata_spans(source, *, component=False):
+    """在已绑定宿主和命令的 profile 内核真实驱动边界及实际取行，同会话允许重复。"""
+    require(source['profile'] == METADATA_PROFILE and source['kind'] == ('DIAGNOSTIC_ONLY' if component else 'product'),
+            'METADATA_PROFILE')
+    spans = source['metadata']
+    require(isinstance(spans, list) and len(spans) <= (12 if component else 24), 'METADATA_COUNT')
+    events = source['events']
+    acquisitions = {e['execution']:e['acquisition'] for e in events if e['stage'] == 'acquisition'}
+    groups = {}
+    sessions = {}
+    for ordinal, span in enumerate(spans, 1):
+        fields = ('Statement Post Ordinal Execution Acquisition Begin End ExecuteBegin ExecuteEnd ReadTicks ReadCalls Rows '
+                  'FirstRow Eof CursorDisposeBegin CursorDisposeEnd CommandDisposeBegin OperationError CursorError CommandError Session')
+        require(isinstance(span, dict) and set(span) == set(fields.split()) and span['Ordinal'] == ordinal
+                and type(span['Post']) is bool, 'METADATA_FIELDS')
+        execution = span['Execution']
+        acquisition = source['probe'] if component else acquisitions.get(execution)
+        require(acquisition and acquisition == span['Acquisition'] and (not component or uuid.UUID(acquisition).hex == execution),
+                'METADATA_EXECUTION')
+        calls = groups.setdefault(execution, [])
+        index = len(calls)
+        require(index < 12 and (span['Statement'], span['Post']) == (STATEMENTS[index % 6], index >= 6), 'METADATA_ORDER')
+        calls.append(span)
+        times = [span[k] for k in ('Begin', 'ExecuteBegin', 'ExecuteEnd', 'FirstRow', 'Eof',
+                                    'CursorDisposeBegin', 'CursorDisposeEnd', 'CommandDisposeBegin', 'End') if span[k] is not None]
+        require(all(type(t) is int and t >= 0 for t in times) and times == sorted(times)
+                and span['Begin'] is not None and span['End'] is not None and span['CommandDisposeBegin'] is not None
+                and (span['ExecuteBegin'] is None) == (span['ExecuteEnd'] is None)
+                and (span['CursorDisposeBegin'] is None) == (span['CursorDisposeEnd'] is None), 'METADATA_TIME')
+        require(all(type(span[k]) is int and span[k] >= 0 for k in ('ReadTicks', 'ReadCalls', 'Rows'))
+                and span['Rows'] + int(span['Eof'] is not None) <= span['ReadCalls']
+                and bool(span['Rows']) == (span['FirstRow'] is not None)
+                and all(span[k] is None or type(span[k]) is int and -2 <= span[k] <= 2147483647
+                        for k in ('OperationError','CursorError','CommandError')), 'METADATA_READ')
+        require(span['CursorError'] is None or span['CursorDisposeEnd'] is not None, 'METADATA_CURSOR_ERROR')
+        if span['Statement'] == 'identity':
+            require(span['ReadCalls'] <= 1 and span['Eof'] is None if span['Rows'] else span['ReadCalls'] <= 1,
+                    'METADATA_IDENTITY_READ')
+        if span['Statement'] == 'privileges':
+            require(not span['ReadCalls'] and span['CursorDisposeBegin'] is None, 'METADATA_SCALAR')
+        if span['Session'] is not None:
+            session = span['Session']
+            require(span['Statement'] == 'identity' and isinstance(session, list) and len(session) == 5
+                    and all(type(n) is int and 0 < n < 2**64 for n in session)
+                    and sessions.setdefault(execution, session) == session, 'METADATA_SESSION')
+    if not component:
+        for branch in (e for e in events if e['stage'] == 'branch'):
+            execution = branch['execution']
+            rows = [e for e in events if e['execution'] == execution]
+            items = groups.get(execution, [])
+            native = [e['session'] for e in rows if e['stage'] == 'session' and e['session']]
+            require(not native or sessions.get(execution) == native[0], 'METADATA_SESSION_MISMATCH')
+            for stage, low, high in [('readOnly',0,4),('catalog',4,6),('postcheck',6,12)]:
+                enter = next((e for e in rows if e['stage'] == stage and e['outcome'] == 'enter'), None)
+                returned = next((e for e in rows if e['stage'] == stage and e['outcome'] == 'returned'), None)
+                reached = items[low:high]
+                require(not reached or enter and all(enter['tick'] <= s['Begin'] for s in reached), 'METADATA_STAGE_START')
+                if returned:
+                    rejected = stage == 'readOnly' and any(e['stage'] == stage and e['outcome'] == 'failed' for e in rows)
+                    require(len(reached) in ((3,4) if rejected else (high-low,))
+                            and all(s['End'] <= returned['tick'] for s in reached), 'METADATA_STAGE_COVERAGE')
+                    for span in reached:
+                        require(span['ExecuteEnd'] is not None and all(span[k] is None for k in ('OperationError','CursorError','CommandError')),
+                                'METADATA_STAGE_OUTCOME')
+                        if span['Statement'] != 'privileges':
+                            require(span['CursorDisposeEnd'] is not None and (span['Session'] is not None
+                                    if span['Statement'] == 'identity' else span['Eof'] is not None), 'METADATA_STAGE_READER')
+    return groups
+
+
+def reopen_normal_projection(raw,key,profile=METADATA_PROFILE):
     """验证准确请求的有界字段和本进程时基，返回经过重开的完整记录。"""
     from datetime import datetime
-    require(len(raw)<=65536 and re.fullmatch('[a-f0-9]{32}',key),'NORMAL_PROJECTION_SIZE')
+    require(profile in (METADATA_PROFILE, HISTORICAL_PROFILE) and len(raw)<=(METADATA_LIMIT if profile == METADATA_PROFILE else 65536) and re.fullmatch('[a-f0-9]{32}',key),'NORMAL_PROJECTION_SIZE')
     value=json.loads(raw)
     require(set(value)=={'generation','process','module','rootDeadline','traceId','correlation','status','source'} and
             value['generation']==key and type(value['process']) is int and value['process']>0 and
@@ -509,7 +585,10 @@ def reopen_normal_projection(raw,key):
     require(isinstance(value['rootDeadline'],str) and datetime.fromisoformat(value['rootDeadline']).utcoffset() is not None
             and 100<=value['status']<=599,'NORMAL_ROOT_DEADLINE')
     source=value['source']
-    require(set(source)=={'queryId','firstFailure','firstSignal','dropped','frequency','events'} and
+    expected = {'queryId','firstFailure','firstSignal','dropped','frequency','events'}
+    if profile == METADATA_PROFILE:
+        expected.update(('profile','kind','probe','metadata'))
+    require(set(source)==expected and
             re.fullmatch('query-[0-9a-f]{32}',source['queryId'] or '') and source['dropped']==0 and
             type(source['frequency']) is int and source['frequency']>0 and 1<=len(source['events'])<=160,'NORMAL_PROJECTION_INCOMPLETE')
     names=set('http initialLease permit permitCheck tls openCheck open permitReturn sessionTag readOnly catalog session transaction declareReadOnly execute commit rollback disposeTransaction postcheck disposeConnection observer cleanupStart cleanup workCutoff readerCutoff leaseTimeout leaseException formalCancel leaseInactive requestCancel requestDeadline branch acquisition source EXECUTE EOF NATIVE_1013 CANCEL_ENTER CANCEL_RETURN CANCEL_REJECT PHYSICAL_RELEASE'.split())
@@ -525,12 +604,15 @@ def reopen_normal_projection(raw,key):
     events=source['events']
     require(events[0]['stage']=='http' and events[0]['outcome']=='enter' and type(events[0]['remainingTicks']) is int and 0<=events[0]['remainingTicks']<=50000000 and source['firstFailure']==next((e['stage']+'.'+e['outcome'] for e in events if e['outcome'] in ('failed','cancelled')),None)
             and source['firstSignal']==next((e['stage'] for e in events if e['outcome']=='signal'),None),'NORMAL_PROJECTION_FIRST')
+    if profile == METADATA_PROFILE:
+        require(source['probe'] is None, 'METADATA_PRODUCT')
+        check_metadata_spans(source)
     return value
 
 
-def qualify_normal_projection(raw,key,*,query_id,trace_id,correlation,status,module,process,audit):
+def qualify_normal_projection(raw,key,*,query_id,trace_id,correlation,status,module,process,audit,profile=METADATA_PROFILE):
     """外层只用独立 HTTP、PG、宿主与源审计签当前请求；缺失投影仍可单独保全。"""
-    value=reopen_normal_projection(raw,key)
+    value=reopen_normal_projection(raw,key,profile)
     source=value['source']
     require((source['queryId'],value['traceId'],value['correlation'],value['status'],value['module'],value['process'])
             ==(query_id,trace_id,correlation,status,module,process),'NORMAL_WRONG_REQUEST')
@@ -539,7 +621,17 @@ def qualify_normal_projection(raw,key,*,query_id,trace_id,correlation,status,mod
     branches=[e for e in events if e['stage']=='branch' and e['outcome']=='enter']
     require(1<=len(branches)<=2 and all(b['execution'] for b in branches) and len({b['execution'] for b in branches})==len(branches),
             'NORMAL_BRANCH_IDENTITIES')
+    executions = {branch['execution'] for branch in branches}
+    for event in events:
+        request_scope = event['stage'] in ('http', 'requestCancel', 'requestDeadline')
+        require(event['execution'] is None if request_scope else event['execution'] in executions,
+                'NORMAL_EXECUTION_SCOPE')
+    for branch in branches:
+        require(type(branch['originTick']) is int and 0 <= branch['originTick'] <= branch['tick']
+                and type(branch['budgetTicks']) is int and 0 < branch['budgetTicks'] <= 10000000,
+                'NORMAL_BUDGET_ORIGIN')
     if status!=200:
+        metrics = []
         require(source['firstFailure'] or source['firstSignal'],'NORMAL_NO_FIRST_CAUSE')
         covered=[]
         for branch in branches:
@@ -557,6 +649,59 @@ def qualify_normal_projection(raw,key,*,query_id,trace_id,correlation,status,mod
                 if any(e['stage']==stage for e in rows):
                     position=next(n for n,e in enumerate(rows) if e['stage']==stage)
                     require(all((p,'returned') in pairs[:position] for p in prefix[:index]),'NORMAL_SOURCE_PREFIX')
+            hz = source['frequency']
+            elapsed = rows[-1]['tick'] - branch['originTick']
+            within_budget = 0 <= elapsed * 10000000 <= branch['budgetTicks'] * hz
+            acquisitions = [e['acquisition'] for e in rows if e['stage'] == 'acquisition']
+            require(not acquisitions or (len(acquisitions) == 1 and acquisitions[0] is not None),
+                    'NORMAL_ACQUISITION_ID')
+            source_positions = [(i, outcome) for i, (stage, outcome) in enumerate(pairs) if stage == 'source']
+            if ('observer', 'enter') in pairs:
+                require(len(source_positions) == 2 and source_positions[0][1] == 'enter'
+                        and source_positions[1][1] in ('failed', 'cancelled', 'returned')
+                        and pairs.index(('observer', 'enter')) < source_positions[0][0]
+                        and source_positions[-1][0] < pairs.index(('observer', 'returned'))
+                        and [state for stage, state in pairs if stage == 'cleanup'] in (['confirmed'], ['unconfirmed']),
+                        'NORMAL_SOURCE_TERMINAL')
+            starts = [e for e in rows if e['stage'] == 'cleanupStart']
+            require(all(len(acquisitions) == 1 and e['acquisition'] == acquisitions[0]
+                        and type(e['originTick']) is int and branch['originTick'] <= e['originTick'] <= e['tick']
+                        for e in starts), 'NORMAL_CLEANUP_ORIGIN')
+            cleanup = rows[-1]['tick'] - min(e['originTick'] for e in starts) if starts else None
+            terminal = ('returned', 'failed', 'cancelled')
+            released = ('PHYSICAL_RELEASE', 'returned') in pairs
+            opened = ('open', 'returned') in pairs
+            dispose = [(i, state) for i, (name, state) in enumerate(pairs) if name == 'disposeConnection']
+            if opened:
+                require(len(dispose) == 2 and dispose[0][1] == 'enter' and dispose[1][1] in terminal
+                        and pairs.index(('open', 'returned')) < dispose[0][0], 'NORMAL_DISPOSE_TERMINAL')
+            if released:
+                require(dispose and dispose[-1][1] == 'returned'
+                        and dispose[-1][0] < pairs.index(('PHYSICAL_RELEASE', 'returned')) < source_positions[-1][0], 'NORMAL_PHYSICAL_RELEASE')
+            if ('sessionTag', 'returned') in pairs and dispose and dispose[-1][1] == 'returned':
+                require(released, 'NORMAL_MISSING_PHYSICAL_RELEASE')
+            if ('transaction', 'returned') in pairs:
+                require(any(('disposeTransaction', state) in pairs for state in terminal), 'NORMAL_TRANSACTION_TERMINAL')
+            # 连接释放只能证明驱动资源退出。原事件须另证业务游标或原生取消、事务和后验的终态。
+            business_end = (('EOF', 'returned') in pairs or ('NATIVE_1013', 'returned') in pairs)
+            tx_end = ('commit', 'returned') in pairs or ('rollback', 'returned') in pairs
+            source_end = (business_end and tx_end and ('disposeTransaction', 'returned') in pairs
+                          and (('postcheck', 'enter') not in pairs or ('postcheck', 'returned') in pairs))
+            acl_rejected = (('readOnly', 'returned') in pairs and ('readOnly', 'failed') in pairs
+                            and pairs.index(('readOnly', 'returned')) < pairs.index(('readOnly', 'failed'))
+                            and ('transaction', 'enter') not in pairs and ('catalog', 'enter') not in pairs
+                            and ('source', 'failed') in pairs and not any(e['outcome'] == 'signal' for e in rows))
+            confirmed = ('cleanup', 'confirmed') in pairs
+            if confirmed:
+                require(released and (source_end or acl_rejected) and len(acquisitions) == 1 and acquisitions[0]
+                        and (acl_rejected or len([e for e in rows if e['stage'] == 'session' and e['session']]) == 1)
+                        and (rows[-1]['cleanupTicks'] or 0) > 0 and (rows[-1]['remainingTicks'] or 0) > 0
+                        and within_budget and cleanup is not None and 0 <= cleanup * 4 <= hz,
+                        'NORMAL_UNPROVEN_CONFIRMATION')
+            metrics.append(dict(execution=branch['execution'], elapsedTicks=elapsed, budgetTicks=branch['budgetTicks'],
+                                budgetExceeded=not within_budget, cleanupTicks=cleanup,
+                                physicalRelease='returned' if released else dispose[-1][1] if dispose else 'unobserved',
+                                sourceTermination='observed' if source_end or acl_rejected else 'unconfirmed', cleanupQualified=confirmed))
             native=[a for a in audit if a['clientId']==branch['execution']]
             if native:
                 sessions=[e['session'] for e in rows if e['stage']=='session' and e['session']]
@@ -565,8 +710,19 @@ def qualify_normal_projection(raw,key,*,query_id,trace_id,correlation,status,mod
                         'NORMAL_FAILURE_NATIVE')
             covered.extend(native)
         require(len(covered)==len(audit),'NORMAL_UNRELATED_READ')
-        return dict(status='FAILURE_TRACED',firstFailure=source['firstFailure'],firstSignal=source['firstSignal'])
+        return dict(status='FAILURE_TRACED', evidenceComplete=True, productSucceeded=False, branches=metrics,
+                    frequency=source['frequency'], firstFailure=source['firstFailure'], firstSignal=source['firstSignal'])
     require(len(branches)==2 and len(audit)==2 and source['firstFailure'] is None and source['firstSignal'] is None,'NORMAL_SUCCESS_BRANCHES')
+    if profile == METADATA_PROFILE:
+        groups = check_metadata_spans(source)
+        require(set(groups) == executions and all(len(items) == 12 for items in groups.values()), 'METADATA_PRODUCT_COVERAGE')
+        for items in groups.values():
+            for span in items:
+                require(span['ExecuteEnd'] is not None and all(span[k] is None for k in ('OperationError','CursorError','CommandError')),
+                        'METADATA_SQL_INCOMPLETE')
+                if span['Statement'] != 'privileges':
+                    require(span['CursorDisposeEnd'] is not None and (span['Session'] is not None
+                            if span['Statement'] == 'identity' else span['Eof'] is not None), 'METADATA_READER_INCOMPLETE')
     metrics=[]
     required='initialLease permit acquisition permitCheck tls openCheck open permitReturn sessionTag readOnly catalog session transaction declareReadOnly EXECUTE EOF execute commit disposeTransaction postcheck disposeConnection PHYSICAL_RELEASE observer cleanup'.split()
     for index,branch in enumerate(branches):
@@ -599,7 +755,7 @@ def export_normal_projection(cid,key):
     """只读取准确宿主中已由 OnCompleted 原子发布的受限文件，不采集全量日志。"""
     require(re.fullmatch('[a-f0-9]{64}',cid) and re.fullmatch('[a-f0-9]{32}',key),'NORMAL_EXPORT_ID')
     # 最多两秒等待响应后导出，采集有自己的外层命令期限。
-    script='i=0; while [ ! -f "$1" ] && [ "$i" -lt 20 ]; do sleep 0.1; i=$((i+1)); done; test -f "$1" && head -c 65537 "$1"'
+    script='i=0; while [ ! -f "$1" ] && [ "$i" -lt 20 ]; do sleep 0.1; i=$((i+1)); done; test -f "$1" && head -c 131073 "$1"'
     args=['exec',cid,'/bin/sh','-c',script,'normal-export','/tmp/omq-events-'+key+'.json']
     receipt=dict(containerId=cid,requestKey=key,commandId=None,exitCode=None,status='COLLECTION_FAILED')
     try:

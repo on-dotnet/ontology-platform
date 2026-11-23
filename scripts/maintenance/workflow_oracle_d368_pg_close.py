@@ -256,7 +256,7 @@ def reopen_cas(root,row,pg_seal,pg_state,archive,normal=False):
 
 def reopen(root,entry,prior,archive=None):
     """按维护后继的精确摘要重开，在此前正式宿主到下一正式宿主之间追加一个 PG 停机边。"""
-    normal=entry.get('kind')=='NORMAL_PG_ONLY'
+    normal='metadata' if entry.get('kind')=='METADATA_PG_ONLY' else entry.get('kind')=='NORMAL_PG_ONLY'
     target=seal.target(normal)
     local=SimpleNamespace(paths={},examined={})
     operation=ident(entry['operation'])
@@ -323,7 +323,7 @@ def publish_d368_pg_close(operation,*,normal=False):
         w.last_close(root,digest=digest)
         return w.close_registration(digest)
     require(registry['currentSha256']==target.close and (normal or w.close_registration()['kind']=='MAPPING_RESTORE'), 'D368_PUBLISH_PREVIOUS')
-    entry=dict(kind='NORMAL_PG_ONLY' if normal else KIND,operation=op,queryId=target.query,previousSha256=target.close,sha256=digest,sizeBytes=len(data),status=row['status'])
+    entry=dict(kind='METADATA_PG_ONLY' if normal=='metadata' else 'NORMAL_PG_ONLY' if normal else KIND,operation=op,queryId=target.query,previousSha256=target.close,sha256=digest,sizeBytes=len(data),status=row['status'])
     _,count,index=reopen(root,entry,w.last_close(root,digest=target.close))
     entry.update(memberCount=count,memberIndexSha256=index)
     require(registry_path.read_bytes()==initial, 'D368_PUBLISH_CHANGED')

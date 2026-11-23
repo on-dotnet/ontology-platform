@@ -34,55 +34,72 @@ public sealed partial class OracleSourceAdapter
     }
 
     /// <summary>完整的只读证明明确报告阻断数量时返回拒绝；身份、游标或版本无法核实时保留异常。</summary>
-    private static async Task<bool> ReadOnlyPolicyMatchesAsync(OracleConnection connection, CancellationToken token)
+    private static async Task<bool> ReadOnlyPolicyMatchesAsync(OracleConnection connection, CancellationToken token, bool post = false)
     {
         // 认证身份、PDB和实际协议来自当前会话，不相信连接串自报。
-        using var identity = connection.CreateCommand();
-        identity.CommandText = "SELECT SYS_CONTEXT('USERENV','SESSION_USER'), SYS_CONTEXT('USERENV','CON_NAME'), SYS_CONTEXT('USERENV','NETWORK_PROTOCOL') FROM DUAL";
-        identity.CommandTimeout = 5;
-        token.ThrowIfCancellationRequested();
-        await using (var reader = await identity.ExecuteReaderAsync(token))
+        await OracleMetadataCommand.RunAsync(connection, "identity", post, async identityCost =>
         {
-            if (!await reader.ReadAsync(token) || reader.GetString(0) != "FIXTURE_READER"
-                || reader.GetString(1) != "FREEPDB1" || !reader.GetString(2).Equals("tcps", StringComparison.OrdinalIgnoreCase))
-                throw new PgSourceException("connection_readonly_unverified");
-        }
+            // 保留生产命令的原 SQL 及超时。
+            var identity = identityCost.Command;
+            identity.CommandText = "SELECT SYS_CONTEXT('USERENV','SESSION_USER'), SYS_CONTEXT('USERENV','CON_NAME'), SYS_CONTEXT('USERENV','NETWORK_PROTOCOL'), SYS_CONTEXT('USERENV','INSTANCE'), SYS_CONTEXT('USERENV','SID'), SYS_CONTEXT('USERENV','SESSIONID'), SYS_CONTEXT('USERENV','UNIFIED_AUDIT_SESSIONID'), SYS_CONTEXT('USERENV','CON_ID') FROM DUAL";
+            identity.CommandTimeout = 5;
+            token.ThrowIfCancellationRequested();
+            return await identityCost.WithReaderAsync(token, async reader =>
+            {
+                if (!await OracleMetadataCommand.ReadAsync(reader, token) || reader.GetString(0) != "FIXTURE_READER"
+                    || reader.GetString(1) != "FREEPDB1" || !reader.GetString(2).Equals("tcps", StringComparison.OrdinalIgnoreCase))
+                    throw new PgSourceException("connection_readonly_unverified");
+                identityCost.CaptureSession(reader);
+                return true;
+            });
+        });
         // 当前有效系统权限只能有CREATE SESSION，角色/自有对象会产生未审能力。
-        using var privileges = connection.CreateCommand();
-        privileges.CommandText = """
-            SELECT
-              (SELECT COUNT(*) FROM SESSION_PRIVS WHERE PRIVILEGE <> 'CREATE SESSION') +
-              (SELECT COUNT(*) FROM SESSION_ROLES) +
-              (SELECT COUNT(*) FROM USER_ROLE_PRIVS) +
-              (SELECT COUNT(*) FROM USER_OBJECTS) +
-              (SELECT COUNT(*) FROM USER_COL_PRIVS_RECD) +
-              (SELECT COUNT(*) FROM USER_SYS_PRIVS WHERE PRIVILEGE <> 'CREATE SESSION' OR ADMIN_OPTION <> 'NO') +
-              (SELECT COUNT(*) FROM USER_TAB_PRIVS_RECD WHERE PRIVILEGE <> 'READ' OR GRANTABLE <> 'NO'
-                OR NOT (OWNER IN ('PRODUCTION','CaseOwner') OR (OWNER='G4_CONTROL' AND TABLE_NAME='READONLY_ATTESTATION')))
-            FROM DUAL
-            """;
-        privileges.CommandTimeout = 5;
-        token.ThrowIfCancellationRequested();
-        if (Convert.ToInt32(await privileges.ExecuteScalarAsync(token), CultureInfo.InvariantCulture) != 0)
-            throw new PgSourceException("connection_readonly_unverified");
+        await OracleMetadataCommand.RunAsync(connection, "privileges", post, async privilegesCost =>
+        {
+            // 保留生产命令的原 SQL 及超时。
+            var privileges = privilegesCost.Command;
+            privileges.CommandText = """
+                SELECT
+                  (SELECT COUNT(*) FROM SESSION_PRIVS WHERE PRIVILEGE <> 'CREATE SESSION') +
+                  (SELECT COUNT(*) FROM SESSION_ROLES) +
+                  (SELECT COUNT(*) FROM USER_ROLE_PRIVS) +
+                  (SELECT COUNT(*) FROM USER_OBJECTS) +
+                  (SELECT COUNT(*) FROM USER_COL_PRIVS_RECD) +
+                  (SELECT COUNT(*) FROM USER_SYS_PRIVS WHERE PRIVILEGE <> 'CREATE SESSION' OR ADMIN_OPTION <> 'NO') +
+                  (SELECT COUNT(*) FROM USER_TAB_PRIVS_RECD WHERE PRIVILEGE <> 'READ' OR GRANTABLE <> 'NO'
+                    OR NOT (OWNER IN ('PRODUCTION','CaseOwner') OR (OWNER='G4_CONTROL' AND TABLE_NAME='READONLY_ATTESTATION')))
+                FROM DUAL
+                """;
+            privileges.CommandTimeout = 5;
+            token.ThrowIfCancellationRequested();
+            if (Convert.ToInt32(await privilegesCost.ScalarAsync(token), CultureInfo.InvariantCulture) != 0)
+                throw new PgSourceException("connection_readonly_unverified");
+            return true;
+        });
         // 管理面窄视图检查PUBLIC和无法向reader开放的字典；它只给计数，不授广域字典权。
-        using var attestation = connection.CreateCommand();
-        attestation.CommandText = "SELECT POLICY_VERSION, BLOCKED_COUNT FROM G4_CONTROL.READONLY_ATTESTATION";
-        attestation.CommandTimeout = 5;
-        token.ThrowIfCancellationRequested();
-        await using var proof = await attestation.ExecuteReaderAsync(token);
-        return await AttestationAllowsReadAsync(proof, token);
+        return await OracleMetadataCommand.RunAsync(connection, "attestation", post, async attestationCost =>
+        {
+            // 保留生产命令的原 SQL 及超时。
+            var attestation = attestationCost.Command;
+            attestation.CommandText = "SELECT POLICY_VERSION, BLOCKED_COUNT FROM G4_CONTROL.READONLY_ATTESTATION";
+            attestation.CommandTimeout = 5;
+            token.ThrowIfCancellationRequested();
+            return await attestationCost.WithReaderAsync(token, async proof =>
+            {
+                return await AttestationAllowsReadAsync(proof, token);
+            });
+        });
     }
 
     /// <summary>仅接受现行证明版本的一行非负计数，完整读到末尾才可判定允许或拒绝。</summary>
     internal static async Task<bool> AttestationAllowsReadAsync(DbDataReader proof, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
-        if (!await proof.ReadAsync(token) || proof.GetString(0) != "oracle-readonly-v1" || proof.IsDBNull(1))
+        if (!await OracleMetadataCommand.ReadAsync(proof, token) || proof.GetString(0) != "oracle-readonly-v1" || proof.IsDBNull(1))
             throw new PgSourceException("connection_readonly_unverified");
         // 完整性计数大于零表示本次确有权限漂移，负数和多行都不是有效证明。
         var blocked = Convert.ToDecimal(proof.GetValue(1), CultureInfo.InvariantCulture);
-        if (blocked < 0 || decimal.Truncate(blocked) != blocked || await proof.ReadAsync(token))
+        if (blocked < 0 || decimal.Truncate(blocked) != blocked || await OracleMetadataCommand.ReadAsync(proof, token))
             throw new PgSourceException("connection_readonly_unverified");
         return blocked == 0;
     }
@@ -91,19 +108,25 @@ public sealed partial class OracleSourceAdapter
     /// <param name="connection">当前已验证权限的连接。</param>
     /// <param name="token">调用方和总期限共同控制的取消令牌。</param>
     /// <returns>完整有界目录。</returns>
-    internal static async Task<CatalogObject[]> ReadCatalogAsync(OracleConnection connection, CancellationToken token)
+    internal static async Task<CatalogObject[]> ReadCatalogAsync(OracleConnection connection, CancellationToken token, bool post = false)
     {
         // 固定SQL不插入配置中的标识符或其它用户文本。
-        using var command = connection.CreateCommand();
-        command.CommandText = CatalogSql;
-        command.CommandTimeout = 10;
-        token.ThrowIfCancellationRequested();
-        await using var reader = await command.ExecuteReaderAsync(token);
-        // 同一reader按预算消费，不先整表物化再截断。
-        var result = await ReadCatalogRowsAsync(reader, token);
-        if (!result.Any(value => value.Schema == "PRODUCTION") || !result.Any(value => value.Schema == "CaseOwner"))
-            throw new PgSourceException("catalog_permission_limited");
-        return result;
+        return await OracleMetadataCommand.RunAsync(connection, "catalog", post, async commandCost =>
+        {
+            // 保留生产命令的原 SQL 及超时。
+            var command = commandCost.Command;
+            command.CommandText = CatalogSql;
+            command.CommandTimeout = 10;
+            token.ThrowIfCancellationRequested();
+            return await commandCost.WithReaderAsync(token, async reader =>
+            {
+                // 同一reader按预算消费，不先整表物化再截断。
+                var result = await ReadCatalogRowsAsync(reader, token);
+                if (!result.Any(value => value.Schema == "PRODUCTION") || !result.Any(value => value.Schema == "CaseOwner"))
+                    throw new PgSourceException("catalog_permission_limited");
+                return result;
+            });
+        });
     }
 
     /// <summary>保留字典原名、原生类型和null，未知类型不发布完整可信目录。</summary>
@@ -117,7 +140,7 @@ public sealed partial class OracleSourceAdapter
         // 整个结果共享列预算，而非每个表重新计数。
         var columns = 0;
         token.ThrowIfCancellationRequested();
-        while (await reader.ReadAsync(token))
+        while (await OracleMetadataCommand.ReadAsync(reader, token))
         {
             // 元组顺序与SELECT前三列一致。
             var key = (Owner: reader.GetString(0), Name: reader.GetString(1), Kind: reader.GetString(2));

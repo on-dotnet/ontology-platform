@@ -194,8 +194,109 @@ NORMAL_PARENT = '4032c1d770b240989966ba3275d86999'
 NORMAL_CLOSE = 'a3839fe8ebb6e418e42e2280d1d6044acd7a1a4f3f65babdc8f13b8c7d055348'
 
 
+METADATA_CLOSE = '64bdc66845958810935eb00e9b633108b6c5dc7ebf56ea19d030c396a5db5040'
+METADATA_QUERY = 'query-5d891e89221e4a3f8f6893873b1d7a9d'
+METADATA_PARENT = 'e1c70fc2faf344f39c98ac6731a061aa'
+METADATA_OPERATION = 'f3d2efe12c984042a324c0f2cc133b30'
+METADATA_OUTER_SHA = '9b956c976814dc2f5e77c48b4d83114a304c5bc5dbecf4f31d229a1a124d018e'
+
+
+def metadata_inputs(archive):
+    """重开冻结的外层完成行、Node 正式父和所有有能力接触源的注册命令。"""
+    entry = window.close_registration(METADATA_CLOSE)
+    closed = window.last_close(ROOT, archive, METADATA_CLOSE)
+    # 原始调度器在仓库命令账本之外，单独重开准确完成事件，不读取历史会话其它字节。
+    session = Path.home()/'.codex/sessions/2026/11/22/rollout-2026-11-22T22-05-24-01a20393-7456-76f3-b937-014dc810533c.jsonl'
+    with ex.ordinary(session).open('rb') as stream:
+        stream.seek(6611299)
+        outer = stream.read(940)
+    require(ex.sha(outer) == METADATA_OUTER_SHA, 'METADATA_OUTER_ORIGINAL')
+    item = json.loads(outer)['payload']['item']
+    require(item['id'] == 'exec-221bcd2c-e188-43e4-8ac6-2627636422a7' and item['exit_code'] == 1
+            and item['cwd'] == ROOT.as_uri() and item['command'] == ['/bin/zsh', '-lc',
+            'env OMQ_PRODUCT_RUN=product-resume-01 python3 -B scripts/maintenance/workflow_oracle_normal_query.py']
+            and item['aggregated_output'] == 'normal-observation-'+METADATA_OPERATION+'.json 1 [] []\n', 'METADATA_OUTER')
+    raw = continuity.raw(ROOT, AREA/('normal-observation-'+METADATA_OPERATION+'.json'), archive)
+    require(ex.sha(raw) == METADATA_CLOSE and len(raw) == 19744 and entry['memberCount'] == 167
+            and entry['memberIndexSha256'] == '04db460676617adf7394adba42c034e6bde5f4942d8499c1f767cd30fabc4a45', 'METADATA_CLOSE')
+    row = json.loads(raw)
+    host = row['host']
+    _, services = refresh.observed_rows(ROOT, host, archive)
+    builds = refresh.snapshot_builds(ROOT, host, archive)
+    apis = {name: {'id': services[name]['containerId']} for name in ('api', 'api-secondary')}
+    require(all(row['closed'][name] == data['id'] for name, data in apis.items()), 'METADATA_API_IDS')
+    # 从当前已复核的生命周期原件重建本代启动与退出，通用历史结构中可能仍保留更早代次。
+    data = {name: {**native, 'startedAt': services[name]['startedAt'], 'after': row['closed'][name]['after']}
+            for name, native in closed['data'].items()}
+    require(all(item['id'] == services[name]['containerId'] == row['closed'][name]['id'] for name, item in data.items()),
+            'METADATA_DATA_IDS')
+    network = services['oracle']['networks']
+    require(len(network) == 1 and list(network.values()) == ['26fd20922335607a74f39db63b00715a116760047f76c9c64b58790b891e91dd']
+            and all(network.items() <= services[k]['networks'].items() for k in apis)
+            and digest(services['oracle']['mounts']) == 'cab41c9abaccb8b2d35c9d6221cc6c7165dbfd5dd29428b2e62e92efa7b8b887', 'METADATA_NETWORK')
+    argv = [NODE, DRIVER, '--task', TASK, '--run-id', RUN, '--mode', 's2-oracle-normal', '--normal-id', METADATA_OPERATION]
+    parent = failed_command(archive, METADATA_PARENT, argv, 'omq-browser-normal-q1', digest([METADATA_OPERATION,host,argv]),
+                            host['commandId'], 804, 1)
+    book = entry['ledger']
+    with ex.ordinary(ROOT/continuity.AREA.parent/'command-events.jsonl').open('rb') as stream:
+        stream.seek(book['offset'])
+        ledger = stream.read(book['sizeBytes'])
+    require(ex.sha(ledger) == '165eec5e8971a47fc22c125507f8c0fdf2d39a98ca9f40e8e86c4f5156ddd772', 'METADATA_LEDGER')
+    starts, ends = {}, {}
+    for line in ledger.splitlines():
+        event = json.loads(line)
+        bucket = starts if event['event'] == 'START' else ends
+        require(event['event'] in ('START', 'END') and event['commandId'] not in bucket, 'METADATA_COMMAND_PAIR')
+        bucket[event['commandId']] = event
+    require(len(starts) == 1714 and starts.keys() == ends.keys(), 'METADATA_PRODUCER_SET')
+    for cid, start in starts.items():
+        end = ends[cid]
+        require(all(start[k] == end[k] for k in ('identity','cwd','commandSummary','inputFingerprint','stage','parentId','runId'))
+                and end['exitCode'] is not None, 'METADATA_PRODUCER_EXIT')
+    require(utc(parent['endedAtUtc']) < utc(data['oracle']['after']['FinishedAt']), 'METADATA_EXIT_ORDER')
+    facts = row['facts']
+    for label, sha in [('row','a08ebed4e8c3fed65b076a4bd8988999d2f2f84c8308df8d8158734df678bab3'),
+                       ('audit','40c3fbca6174d0a8d69393752d6794f74eaff3ebca50ede85c86e284949e84c7'),
+                       ('data','f553c53c619b931252a15a8c46218163bd8565e0e0bcb3253a8c2b355aaa2d6c'),
+                       ('ident','11b60a6e31c626ca581339f3181daf469c426395bb07c94224f660938ed50106')]:
+        command = facts[label]['commandId']
+        result = continuity.raw(ROOT, continuity.AREA.parent/'commands'/RUN/command/'stdout.txt', archive)
+        require(ex.sha(result) == sha and json.loads(result) == facts[label]['value'] and ends[command]['exitCode'] == 0, 'METADATA_ORIGINAL_'+label)
+    generation = dict(queryId=METADATA_QUERY, parent=METADATA_PARENT, close=METADATA_CLOSE, source=SOURCE,
+                      start=data['oracle']['startedAt'], end=data['oracle']['after']['FinishedAt'], outer=METADATA_OUTER_SHA,
+                      ledger=book, networks=network, mounts=digest(services['oracle']['mounts']),
+                      host=host['commandId'], snapshots={name:b['snapshotId'] for name,b in builds.items()})
+    seal = dict(queryId=METADATA_QUERY, closedApis=sorted(item['id'] for item in apis.values()), parent=METADATA_PARENT,
+                ended=parent['endedAtUtc'], outer=item['id'], matchingDrivers=0)
+    history = dict(row=facts['row']['value'], audit=facts['audit']['value'], **facts['data']['value'])
+    return {**closed,'data':data,'apis':apis},generation,seal,history
+
+
+def prove_metadata_closure(*, pg_start_command=None):
+    """对准确正常请求的旧代次复查历史和当前生产者，任何漂移均关闭维护。"""
+    require(os.environ.get('OMQ_PRODUCT_RUN') == RUN, 'METADATA_RUN')
+    archive = SimpleNamespace(paths={},examined={})
+    closed,generation,seal,history = metadata_inputs(archive)
+    live = live_state(closed, set(seal['closedApis']), pg_start_command, archive, metadata=True)
+    originals = {p:dict(sha256=archive.examined[k],sizeBytes=(ROOT/p).stat().st_size) for k,p in archive.paths.items()}
+    return dict(kind='DEDICATED_ORACLE_GENERATION_TERMINATED',queryId=METADATA_QUERY, originals=originals,
+                originalsSha256=digest(originals),generation=generation,generationSha256=digest(generation),
+                seal=seal,sealSha256=digest(seal),historical=history,live=live,
+                verifiedUtc=dt.datetime.now(dt.timezone.utc).isoformat(timespec='microseconds'))
+
+
 def target(normal=False):
     """维护目标的身份和证明均在源码内冻结，调用者不能指定任意行或原件路径。"""
+    if normal == 'metadata':
+        path = ROOT/continuity.AREA.parent/'commands'/RUN/'6795cc23c706473ba61daf2830a1670c/stdout.txt'
+        raw = ex.ordinary(path).read_bytes()
+        require(ex.sha(raw) == 'a08ebed4e8c3fed65b076a4bd8988999d2f2f84c8308df8d8158734df678bab3', 'METADATA_FROZEN_ROW')
+        return SimpleNamespace(query=METADATA_QUERY,parent=METADATA_PARENT,child=None,close=METADATA_CLOSE,prefix='metadata',
+            prove=prove_metadata_closure,frozen=json.loads(raw),audit='3e1ca8e4e1af42efa3ac8d0007c8debf',
+            audit_sha='8625e5892d8c7360efd0a5eaaaf5da78e808c6fb859c4f15c529b36244c88de3',mode='NORMAL_GENERATION',
+            generation_sha='3004a217e2551b91d104092fd3faad8cc8d8fa56ee4eac0119e5f37d7327a858',seal_sha='2120d6d36a993bdc5234e8febce44d42d83d3315fd0ad405f6bbfc3e9ef2588b',
+            start='2026-11-22T15:03:56.505162467Z',end='2026-11-22T15:06:22.192480006Z')
+    require(type(normal) is bool, 'MAINTENANCE_TARGET')
     if not normal:
         return SimpleNamespace(query=QUERY,parent=PARENT,child=CHILD,close=RESTORED,prefix='d368',prove=prove_d368_closure,
             frozen=FROZEN_ROW,audit=AUDIT_ID,audit_sha=AUDIT_SHA,mode='DEDICATED_GENERATION',
@@ -298,7 +399,7 @@ def prove_normal_closure(*,pg_start_command=None):
                 live=live,historical=historical,verifiedUtc=dt.datetime.now(dt.timezone.utc).isoformat(timespec='microseconds'))
 
 
-def live_state(restored, old_apis, pg_start_command, archive):
+def live_state(restored, old_apis, pg_start_command, archive, *, metadata=False):
     """只向 Docker 请求当前状态和别名；进程查询只取匹配 PID。"""
     def docker(*args):
         return subprocess.check_output([*DOCKER, *args], cwd=ROOT, timeout=10, text=True).strip()
@@ -331,6 +432,10 @@ def live_state(restored, old_apis, pg_start_command, archive):
     require('oracle-source' in aliases, 'D368_SOURCE_ALIAS')
     # pgrep 只对实际工作流可执行程序开头匹配；不会读取密钥文件或输出进程命令行。
     pattern = r'^([^ ]*/)?(node|python[0-9.]*|dotnet) +([^ ]+ +)*(.*workflow-m4-query\.mjs.*s2-s3-oracle.*|.*workflow-oracle-query-fixture\.mjs.*|.*G4QueryMafRuntimeTests\.OracleActivationRevisionRejectsInflightQuery.*)$'
+    if metadata:
+        pattern = (r'^([^ ]*/)?(node|python[0-9.]*|dotnet) +([^ ]+ +)*'
+                   r'(.*workflow-m4-query\.mjs.*s2-(s3-oracle|oracle-normal).*|.*workflow_oracle_normal_query\.py.*|'
+                   r'.*workflow-oracle-query-fixture\.mjs.*|.*OracleActivationRevisionRejectsInflightQuery.*)$')
     observed = subprocess.run(['/usr/bin/pgrep', '-f', pattern], capture_output=True, timeout=5, text=True)
     require(observed.returncode == 1 and not observed.stderr.strip() and not observed.stdout.strip(), 'D368_ACTIVE_PRODUCER')
     return dict(running=sorted(expected), absentApis=sorted(old_apis), states=found, sourceAliases=aliases,

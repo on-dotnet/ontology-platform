@@ -423,7 +423,7 @@ def d368_pg_facts(phase, *, normal=False):
     return values,commands
 
 
-def recover_d368(operation,pg_start_command,isolated_receipt,*,normal=False):
+def recover_d368(operation,pg_start_command,isolated_receipt,*,normal=False,review_proof=None):
     """仅对本次专用实例代次执行一次晚维护；提交不明时保留原件、禁止再次提交。"""
     import workflow_oracle_d368_closure as c
     target=c.target(normal)
@@ -473,6 +473,14 @@ def recover_d368(operation,pg_start_command,isolated_receipt,*,normal=False):
     path=AREA/(target.prefix+'-proof-'+operation+'.json')
     row=dict(proof=proof,proofSha256=ex.sha(ex.encoded(proof)),before=commands,isolatedReceipt=isolated_receipt)
     resume.platform.save(path,row)
+    if normal == 'metadata':
+        require(before.get('errorCode') == 'query_source_unavailable', 'METADATA_FAILURE_CODE')
+        require(callable(review_proof), 'METADATA_NO_PROOF_REVIEW')
+        from workflow_oracle_runtime_window import metadata_allow
+        metadata_allow(300)
+        review_proof(path, operation)
+        metadata_allow(60)
+        require(dt.datetime.now(dt.timezone.utc) < dt.datetime.fromisoformat(proof['validUntilUtc']), 'METADATA_REVIEW_EXPIRED')
     # 排它单次标记先于 helper create，异常后由真实后态裁决。
     once=AREA/(target.prefix+'-cas-reservation.json')
     with once.open('x') as stream:
@@ -534,7 +542,7 @@ def d368_maintenance_window(*, normal=False, review_prestate=None):
                  priorCloseSha256=target.close,queryId=target.query,status='BLOCKED')
     stopped=False
     try:
-        with w.open_window() as window:
+        with w.open_window(metadata_maintenance=normal=='metadata') as window:
             summary.update(windowId=window['id'],cold=window['coldAttempt'])
             summary['beforeSeal']=target.prefix+'-seal-cold-'+operation+'.json'
             save(AREA/summary['beforeSeal'],target.prove())
@@ -546,6 +554,7 @@ def d368_maintenance_window(*, normal=False, review_prestate=None):
             check_capacity(window['coldAttempt'])
             offset=log.stat().st_size
             try:
+                w.metadata_allow(360)
                 start=recovery.start_owned('replacement','platform-pg',set())
                 summary['pgStartAttempt']=start['attempt']
                 with log.open('rb') as stream:
@@ -563,15 +572,16 @@ def d368_maintenance_window(*, normal=False, review_prestate=None):
                 summary['initialPgFacts']=refs
                 save(file,summary)
                 check_capacity(start['post'])
+                w.metadata_allow(240)
                 checked=isolated_test(generation=True)
                 summary['isolated']=checked
                 save(file,summary)
-                if normal:
+                if normal is True:
                     review_prestate(file,operation)
                 check_capacity(resume.admit()['attempt'])
                 summary['cas']=target.prefix+'-recovery-'+operation+'.json'
                 save(file,summary)
-                receipt=recover_d368(operation,ids[0],checked['receipt'],normal=normal)
+                receipt=recover_d368(operation,ids[0],checked['receipt'],normal=normal,review_proof=review_prestate)
                 summary['status']=receipt['status']
             finally:
                 with w.close_resources():

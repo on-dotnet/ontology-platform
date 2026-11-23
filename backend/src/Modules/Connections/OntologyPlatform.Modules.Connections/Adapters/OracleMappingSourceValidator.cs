@@ -96,42 +96,48 @@ internal static class OracleMappingSourceValidator
     }
 
     /// <summary>在事务外采集新鲜 M2 目录、实际主键、对象标识和 NLS/字符排序。</summary>
-    internal static async Task<string> CheckCatalogAsync(OracleConnection connection, CatalogSnapshotView snapshot, CancellationToken token)
+    internal static async Task<string> CheckCatalogAsync(OracleConnection connection, CatalogSnapshotView snapshot, CancellationToken token, bool post = false)
     {
         // 对业务读者实际可见的原 M2 全量目录重算，而非对预设合成列散列。
         token.ThrowIfCancellationRequested();
-        var catalog = ConnectionApplicationService.CanonicalCatalog(await OracleSourceAdapter.ReadCatalogAsync(connection, token), "oracle-m2-v1");
+        var catalog = ConnectionApplicationService.CanonicalCatalog(await OracleSourceAdapter.ReadCatalogAsync(connection, token, post), "oracle-m2-v1");
         if (catalog.Fingerprint != snapshot.SchemaFingerprint || catalog.Objects.Length != 2
             || ConnectionApplicationService.Encode(catalog.Objects) != ConnectionApplicationService.Encode(snapshot.Objects)) throw Shape();
         foreach (var table in catalog.Objects) RequireShape(table);
         // 每行要求完整启用、已验证、非延迟的单列 PK；非二进制文本/会话语义不能发布。
-        using var physical = connection.CreateCommand();
-        physical.CommandText = """
-            SELECT o.OWNER,o.OBJECT_NAME,o.OBJECT_ID,o.DATA_OBJECT_ID
-            FROM ALL_OBJECTS o JOIN ALL_CONSTRAINTS k ON k.OWNER=o.OWNER AND k.TABLE_NAME=o.OBJECT_NAME
-            JOIN ALL_CONS_COLUMNS c ON c.OWNER=k.OWNER AND c.CONSTRAINT_NAME=k.CONSTRAINT_NAME
-            WHERE (o.OWNER,o.OBJECT_NAME) IN (('PRODUCTION','OMQ_ENTITY'),('CaseOwner','OmqTarget'))
-              AND o.OBJECT_TYPE='TABLE' AND o.STATUS='VALID' AND k.CONSTRAINT_TYPE='P'
-              AND k.STATUS='ENABLED' AND k.VALIDATED='VALIDATED' AND k.DEFERRABLE='NOT DEFERRABLE'
-              AND c.POSITION=1 AND c.COLUMN_NAME='ROW_ID'
-              AND NOT EXISTS (SELECT 1 FROM ALL_CONS_COLUMNS x WHERE x.OWNER=c.OWNER AND x.CONSTRAINT_NAME=c.CONSTRAINT_NAME AND x.POSITION<>1)
-              AND NOT EXISTS (SELECT 1 FROM ALL_TAB_COLUMNS x WHERE x.OWNER=o.OWNER AND x.TABLE_NAME=o.OBJECT_NAME
-                AND x.DATA_TYPE='VARCHAR2' AND (x.COLLATION IS NULL OR x.COLLATION NOT IN ('BINARY','USING_NLS_COMP')))
-              AND (SELECT VALUE FROM NLS_DATABASE_PARAMETERS WHERE PARAMETER='NLS_CHARACTERSET')='AL32UTF8'
-              AND (SELECT COUNT(*) FROM NLS_SESSION_PARAMETERS WHERE PARAMETER IN ('NLS_COMP','NLS_SORT') AND VALUE='BINARY')=2
-            ORDER BY o.OWNER,o.OBJECT_NAME
-            """;
-        // 将物理对象身份绑定到本次观察；同名重建不能伪造相同模型。
-        var keys = new List<object>();
-        token.ThrowIfCancellationRequested();
-        await using var cursor = await physical.ExecuteReaderAsync(token);
-        while (await cursor.ReadAsync(token))
+        return await OracleMetadataCommand.RunAsync(connection, "physical", post, async physicalCost =>
         {
-            if (keys.Count >= 2 || cursor.IsDBNull(2) || cursor.IsDBNull(3)) throw Shape();
-            keys.Add(new { owner = cursor.GetString(0), table = cursor.GetString(1), objectId = cursor.GetInt64(2), dataObjectId = cursor.GetInt64(3) });
-        }
-        if (keys.Count != 2) throw Shape();
-        return MappingValidationService.Digest(new { adapterVersion = "oracle-mapping-v1", catalog.Fingerprint, keys });
+            // 保留生产命令的原 SQL 及超时。
+            var physical = physicalCost.Command;
+            physical.CommandText = """
+                SELECT o.OWNER,o.OBJECT_NAME,o.OBJECT_ID,o.DATA_OBJECT_ID
+                FROM ALL_OBJECTS o JOIN ALL_CONSTRAINTS k ON k.OWNER=o.OWNER AND k.TABLE_NAME=o.OBJECT_NAME
+                JOIN ALL_CONS_COLUMNS c ON c.OWNER=k.OWNER AND c.CONSTRAINT_NAME=k.CONSTRAINT_NAME
+                WHERE (o.OWNER,o.OBJECT_NAME) IN (('PRODUCTION','OMQ_ENTITY'),('CaseOwner','OmqTarget'))
+                  AND o.OBJECT_TYPE='TABLE' AND o.STATUS='VALID' AND k.CONSTRAINT_TYPE='P'
+                  AND k.STATUS='ENABLED' AND k.VALIDATED='VALIDATED' AND k.DEFERRABLE='NOT DEFERRABLE'
+                  AND c.POSITION=1 AND c.COLUMN_NAME='ROW_ID'
+                  AND NOT EXISTS (SELECT 1 FROM ALL_CONS_COLUMNS x WHERE x.OWNER=c.OWNER AND x.CONSTRAINT_NAME=c.CONSTRAINT_NAME AND x.POSITION<>1)
+                  AND NOT EXISTS (SELECT 1 FROM ALL_TAB_COLUMNS x WHERE x.OWNER=o.OWNER AND x.TABLE_NAME=o.OBJECT_NAME
+                    AND x.DATA_TYPE='VARCHAR2' AND (x.COLLATION IS NULL OR x.COLLATION NOT IN ('BINARY','USING_NLS_COMP')))
+                  AND (SELECT VALUE FROM NLS_DATABASE_PARAMETERS WHERE PARAMETER='NLS_CHARACTERSET')='AL32UTF8'
+                  AND (SELECT COUNT(*) FROM NLS_SESSION_PARAMETERS WHERE PARAMETER IN ('NLS_COMP','NLS_SORT') AND VALUE='BINARY')=2
+                ORDER BY o.OWNER,o.OBJECT_NAME
+                """;
+            // 将物理对象身份绑定到本次观察；同名重建不能伪造相同模型。
+            var keys = new List<object>();
+            token.ThrowIfCancellationRequested();
+            return await physicalCost.WithReaderAsync(token, async cursor =>
+            {
+                while (await OracleMetadataCommand.ReadAsync(cursor, token))
+                {
+                    if (keys.Count >= 2 || cursor.IsDBNull(2) || cursor.IsDBNull(3)) throw Shape();
+                    keys.Add(new { owner = cursor.GetString(0), table = cursor.GetString(1), objectId = cursor.GetInt64(2), dataObjectId = cursor.GetInt64(3) });
+                }
+                if (keys.Count != 2) throw Shape();
+                return MappingValidationService.Digest(new { adapterVersion = "oracle-mapping-v1", catalog.Fingerprint, keys });
+            });
+        });
     }
 
     /// <summary>同一真实只读事务内读取所有映射表，目录与 ACL 在事务外复核。</summary>

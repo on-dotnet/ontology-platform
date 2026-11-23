@@ -102,6 +102,36 @@ class SourceAssociationTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 qualify_normal_projection(overflow.read_bytes(),overflow.stem.split('-')[-1],**identity)
 
+    def test_q1_failure_consumer_validates_release_budget_and_execution(self):
+        from unittest.mock import patch
+        import workflow_oracle_normal_query as normal
+        import workflow_oracle_mapping_resume as resume
+
+        observation = normal.AREA/'normal-observation-f3d2efe12c984042a324c0f2cc133b30.json'
+        row = json.loads(observation.read_bytes())
+        export = normal.AREA/('normal-export-'+row['identity']['container']+'-'+row['key']+'.json')
+        receipt = json.loads(export.read_bytes())
+        stream = resume.BASE.parent/'commands'/resume.PRODUCT/receipt['commandId']/'stdout.txt'
+        raw = stream.read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), '6af20f5eb2369c71d3f95133e2f9d51ccb7bf633e137d7990cffb92cad358bc2')
+        self.assertEqual(normal.consume_observation(row)['status'], 'FAILURE_TRACED')
+        for case in ('release', 'origin', 'execution', 'confirmed'):
+            projection = json.loads(raw)
+            events = projection['source']['events']
+            if case == 'release':
+                events[:] = [event for event in events if event['stage'] not in ('disposeConnection', 'PHYSICAL_RELEASE')]
+            elif case == 'origin':
+                next(event for event in events if event['stage'] == 'branch').update(originTick=None, budgetTicks=None)
+            elif case == 'execution':
+                next(event for event in events if event['stage'] == 'workCutoff')['execution'] = 'f' * 32
+            else:
+                next(event for event in events if event['stage'] == 'cleanup')['outcome'] = 'confirmed'
+            changed = json.dumps(projection).encode()
+            registered = dict(receipt, sizeBytes=len(changed), sha256=hashlib.sha256(changed).hexdigest())
+            with self.subTest(case=case), patch.object(resume, 'load', return_value=registered), \
+                    patch.object(Path, 'read_bytes', return_value=changed), self.assertRaises(ValueError):
+                normal.consume_observation(row)
+
     def test_reopen_two_branches_emitted_by_agent_test_process(self):
         from workflow_m2_evidence import mtp
         ready,host,assembly,event,ref=self.current_test_host('agent')

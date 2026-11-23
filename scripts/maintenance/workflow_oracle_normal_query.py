@@ -70,7 +70,9 @@ def consume_observation(row):
     raw=(r.BASE.parent/'commands'/r.PRODUCT/exported['commandId']/'stdout.txt').read_bytes()
     require(len(raw)==exported['sizeBytes'] and r.ex.sha(raw)==exported['sha256'],'NORMAL_EXPORT_BYTES')
     verdict=r.qualify_normal_projection(raw,key,query_id=db['queryId'],trace_id=http['traceId'],correlation=http['correlation'],
-            status=http['status'],process=identity['process'],module=identity['module'],audit=row['audit']['records'])
+            status=http['status'],process=identity['process'],module=identity['module'],audit=row['audit']['records'],
+            profile=r.HISTORICAL_PROFILE if exported['commandId']=='56bca1e4a9d84523b85a993124b8a48e' and
+            key=='f3d2efe12c984042a324c0f2cc133b30' else r.METADATA_PROFILE)
     if http['status']==200:
         require(row['parentExit']==0 and http['queryId']==db['queryId']==row['get']['queryId'] and http['elapsedMs']<=5000
                 and http['sha256']==db['resultHash']==row['get']['sha256'] and row['get']['sizeBytes']==db['resultSize']
@@ -225,7 +227,15 @@ def reopen_closed(root,entry,prior,archive=None):
     record={**row,'closed':{**row['closed'],**{role:{k:v for k,v in row['closed'][role].items() if v is not None} for role in DATA}},
             'drain':{label:{'values':v['value'],'commandId':v['commandId']} for label,v in row['drain'].items()}}
     finishes=life.resources(root,record,prior,ends,cold,post,local,op,PG_CLOSE,entry['nativeStops'],entry['pgNative'],normal=True)
-    return life.result(local,archive,entry,prior,op,finishes)
+    normalized,count,index = life.result(local,archive,entry,prior,op,finishes)
+    # 仅发布已经过七角色生命周期重开的当代字段；成员索引仍由原始文件集计算。
+    import workflow_oracle_mapping_access_refresh as refresh
+    _,services = refresh.observed_rows(root,row['host'],archive)
+    normalized['data'] = {role:{**native,'startedAt':services[role]['startedAt'],'after':row['closed'][role]['after']}
+                          for role,native in prior['data'].items()}
+    normalized['apis'] = {role:{**prior['apis'][role],'id':row['closed'][role]} for role in ('api','api-secondary')}
+    normalized['ids'] = {role:item['containerId'] for role,item in services.items()}
+    return normalized,count,index
 
 
 if __name__=='__main__':
