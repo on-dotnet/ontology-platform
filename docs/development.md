@@ -27,8 +27,21 @@
 ./dev.ps1 lock api     # 改了 backend/pyproject.toml 之后
 ./dev.ps1 lock web     # 改了 web/package.json 之后
 ./dev.ps1 gen-api      # 改了后端接口之后，同步前端类型
+./dev.ps1 owl-check    # 改了 OWL 导入导出之后，做一次 Protégé 往返检查
 ./dev.ps1 ci -Report   # 提交并推送之后，对 HEAD 跑完整门禁
 ```
+
+## Protégé 往返检查 `./dev.ps1 owl-check`
+
+用 Protégé 底层的库 OWL API（4.5.29）检查平台的导出能否被 Protégé 原样读写。步骤：
+
+1. 在临时 api 容器里，把 `samples/owl-features` 的每个样例、钢铁样例（三个文件合在一起）、开发栈每个本体的当前版本（开发栈在运行时）导入平台再导出；
+2. 在断网的 OWL API 容器（镜像 `ontology/owlapi:local`，由 [dev/owlapi](../dev/owlapi) 构建）里读入并另存为 Turtle；
+3. 把另存的文件当作对同一本体的导入读回，比较差异。
+
+通过的条件：OWL API 没有解析错误，也没有未解析的三元组；读回后没有差异，只允许导入时标为"Protégé 会改写"的公理被改写。判定规则见[规格 002](specs/002-m2-ontology-workbench.md) 第 4.3 节。
+
+报告、导出文件和 OWL API 的输出都存放在 `.verification/owl-check/`。构建工具镜像时，Maven 依赖经 `dev/mirrors.cn.env` 里的 `OP_MAVEN_MIRROR` 下载。这个命令不纳入门禁。
 
 ## 门禁 `./dev.ps1 ci`
 

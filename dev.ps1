@@ -20,6 +20,8 @@
   fmt <文件...>     用容器里的 ruff 修复并格式化指定的 backend 文件（经标准输入，只改这些文件）
   ai-check          在容器里实际调用一次模型，只显示能否连通，不显示地址与 Key
   eval [案例]       用真实模型识别 samples/<案例>（默认 steel）并按期望答案打分，结果存 .verification/eval/（会产生模型费用）
+  owl-check         Protégé 往返检查：样例与开发栈当前版本经平台导出，由 OWL API（断网）读写后再导回，
+                    除已知改写外不得有差异；报告存 .verification/owl-check/
   ci [-Report]      完整门禁：compose 校验、test-api、test-web、构建镜像；-Report 把结果写成提交状态 local-ci
   psql              打开开发库的 psql
   init-env          由 .env.example 生成本机私有配置 .env.local（已存在则不动；由用户本人运行）
@@ -305,6 +307,92 @@ function Invoke-Eval([string]$Case) {
     Write-Ok "结果已保存到 $outFile"
 }
 
+# A value from dev/mirrors.cn.env, unless mirrors are switched off.
+function Get-MirrorValue([string]$Name) {
+    if ((Get-Setting 'OP_MIRROR' 'on') -eq 'off') { return '' }
+    $hit = Select-String -LiteralPath (Join-Path $Root 'dev/mirrors.cn.env') -Pattern "^\s*$Name\s*=\s*(.*)$" | Select-Object -Last 1
+    if ($hit) { return $hit.Matches[0].Groups[1].Value.Trim() }
+    return ''
+}
+
+# Protégé round trip (spec 002, 4.3): platform export -> OWL API, offline -> import again.
+function Invoke-OwlCheck {
+    Confirm-BaseImages
+    Invoke-Compose build api
+    foreach ($image in @('maven:3.9-eclipse-temurin-25', 'eclipse-temurin:25-jre')) {
+        docker image inspect $image *> $null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Step "docker pull $image"
+            docker pull --quiet $image | Out-Host
+            if ($LASTEXITCODE -ne 0) { Stop-Dev "拉取基础镜像失败：$image" }
+        }
+    }
+    Write-Step '构建 OWL API 工具镜像 ontology/owlapi:local'
+    docker build --build-arg "MAVEN_MIRROR=$(Get-MirrorValue 'OP_MAVEN_MIRROR')" -t ontology/owlapi:local (Join-Path $Root 'dev/owlapi') | Out-Host
+    if ($LASTEXITCODE -ne 0) { Stop-Dev '构建 OWL API 工具镜像失败' }
+
+    $work = Join-Path $Root '.verification/owl-check'
+    foreach ($name in @('cases', 'export', 'saved')) {
+        $path = Join-Path $work $name
+        if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Recurse -Force }
+    }
+    $cases = New-Item -ItemType Directory -Force -Path (Join-Path $work 'cases')
+    Copy-Item -LiteralPath (Join-Path $Root 'samples/owl-features') -Destination $cases -Recurse
+    $steel = New-Item -ItemType Directory -Force -Path (Join-Path $cases 'steel')
+    foreach ($name in @('ontology', 'shapes', 'vocabulary')) {
+        Copy-Item -LiteralPath (Join-Path $Root "samples/steel/$name.ttl") -Destination $steel
+    }
+    $composeArgs = Get-ComposeArgs
+    $previousConsole = [Console]::OutputEncoding
+    [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+    try {
+        $running = docker compose @composeArgs ps -q --status running postgres 2>$null
+        if ($running) {
+            $extra = New-Item -ItemType Directory -Force -Path (Join-Path $cases 'extra')
+            $query = 'select o.key, r.version from ontology.ontologies o join ontology.releases r on r.id = o.active_release_id order by o.key'
+            foreach ($row in @(docker compose @composeArgs exec -T postgres psql -U ontology -d ontology -At -F '|' -c $query)) {
+                $key, $version = $row.Split('|')
+                $turtle = docker compose @composeArgs exec -T postgres psql -U ontology -d ontology -At -c "select r.turtle from ontology.ontologies o join ontology.releases r on r.id = o.active_release_id where o.key = '$key'"
+                Set-Content -LiteralPath (Join-Path $extra "$key-v$version.ttl") -Encoding utf8NoBOM -Value ($turtle -join "`n")
+                Write-Note "包含开发栈的当前版本：$key v$version"
+            }
+        } else {
+            Write-Note '开发栈未运行，只检查样例'
+        }
+
+        $api = New-TempName 'owl-api'
+        $java = New-TempName 'owl-java'
+        try {
+            docker run -d --network none --name $api --entrypoint sleep ontology/api:local 1800 | Out-Null
+            docker run -d --network none --name $java --entrypoint sleep ontology/owlapi:local 1800 | Out-Null
+            Write-Step '平台导出'
+            docker cp $cases "${api}:/tmp/cases" | Out-Null
+            docker exec $api python -m ontology_platform.modules.ontology.owlcheck export /tmp/cases /tmp/export | Out-Host
+            if ($LASTEXITCODE -ne 0) { Stop-Dev '平台导出失败' }
+            docker cp "${api}:/tmp/export" (Join-Path $work 'export') | Out-Null
+            Write-Step 'OWL API 读入并另存（断网）'
+            docker cp (Join-Path $work 'export') "${java}:/work/in" | Out-Null
+            $log = docker exec $java java -cp '/opt/owlapi/owl-roundtrip-0.jar:/opt/owlapi/lib/*' RoundTrip /work/in /work/out
+            if ($LASTEXITCODE -ne 0) { Stop-Dev 'OWL API 运行失败' }
+            Set-Content -LiteralPath (Join-Path $work 'owlapi.log') -Encoding utf8NoBOM -Value ($log -join "`n")
+            docker cp "${java}:/work/out" (Join-Path $work 'saved') | Out-Null
+            Write-Step '导回平台并比较'
+            docker cp (Join-Path $work 'saved') "${api}:/tmp/saved" | Out-Null
+            docker cp (Join-Path $work 'owlapi.log') "${api}:/tmp/owlapi.log" | Out-Null
+            $report = docker exec $api python -m ontology_platform.modules.ontology.owlcheck compare /tmp/cases /tmp/saved /tmp/owlapi.log
+            $code = $LASTEXITCODE
+        } finally {
+            docker rm -f $api $java *> $null
+        }
+    } finally {
+        [Console]::OutputEncoding = $previousConsole
+    }
+    Set-Content -LiteralPath (Join-Path $work 'report.txt') -Encoding utf8NoBOM -Value ($report -join "`n")
+    $report | Out-Host
+    if ($code -ne 0) { Stop-Dev "owl-check 未通过，详见 .verification/owl-check/report.txt" }
+    Write-Ok 'owl-check 通过（报告：.verification/owl-check/report.txt）'
+}
+
 # Creates the private settings file from the template; never prints its content.
 function Invoke-InitEnv {
     if (Test-Path -LiteralPath $EnvLocal) {
@@ -339,6 +427,7 @@ switch ($Command) {
     'psql' { Invoke-Compose exec postgres psql -U ontology -d ontology }
     'fmt' { Invoke-Fmt $Rest }
     'eval' { Invoke-Eval ($Rest | Select-Object -First 1) }
+    'owl-check' { Invoke-OwlCheck }
     'ai-check' {
         Confirm-BaseImages
         Invoke-Compose build api
