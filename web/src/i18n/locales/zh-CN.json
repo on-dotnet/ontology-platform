@@ -123,7 +123,8 @@
     "actions": {
       "unknown": "进行了操作",
       "ontology": {
-        "created": "创建了本体"
+        "created": "创建了本体",
+        "imported": "导入了 OWL 文件"
       },
       "document": {
         "uploaded": "上传了资料"
@@ -168,7 +169,65 @@
       "descriptionLabel": "说明",
       "validationSummary": "请填写本体名称后再创建。",
       "failedTitle": "本体没有创建成功",
-      "submit": "创建本体"
+      "submit": "创建本体",
+      "standaloneTitle": "新建本体",
+      "standaloneDescription": "从空白本体开始，或者导入已有的 OWL 文件。",
+      "method": "创建方式",
+      "methodBlank": "空白本体",
+      "methodImport": "从 OWL 文件导入"
+    },
+    "import": {
+      "file": "OWL 文件",
+      "fileInputLabel": "选择 OWL 文件",
+      "chooseFile": "选择文件",
+      "changeFile": "重新选择",
+      "fileHint": "支持 Turtle（.ttl）和 RDF/XML（.owl、.rdf、.xml），不超过 {{size}} MB",
+      "fileRequired": "请选择要导入的文件",
+      "fileTooLarge": "文件超过 {{size}} MB，请拆分后再导入。",
+      "namePlaceholder": "不填时使用文件里的名称",
+      "submit": "导入文件",
+      "failedTitle": "文件没有导入",
+      "parseErrorLine": "文件第 {{line}} 行有语法错误，请修正后重新导入。",
+      "parseErrorAt": "文件第 {{line}} 行第 {{column}} 列有语法错误，请修正后重新导入。",
+      "intoTitle": "导入 OWL 到“{{name}}”",
+      "intoDescription": "平台会把文件与工作版本比较，差异整理成变更集，审核并合并后才会生效。",
+      "createdTitle": "已创建本体“{{name}}”",
+      "importedTitle": "文件已导入",
+      "noDifferenceTitle": "没有发现差异",
+      "reviewDescription": "导入的内容已整理成变更集，审核并合并后才会进入本体。",
+      "nothingToReview": "文件里没有需要审核的内容。",
+      "noDifference": "文件与工作版本没有差异，没有生成变更集。",
+      "countsLabel": "变更项数量",
+      "counts": {
+        "create": "新增",
+        "update": "修改",
+        "delete": "删除",
+        "restore": "恢复"
+      },
+      "warningsLabel": "需要注意的内容",
+      "warnings": {
+        "non_standard": {
+          "label_one": "{{count}} 条公理在 Protégé 中会被改写",
+          "label_other": "{{count}} 条公理在 Protégé 中会被改写",
+          "description": "在 Protégé 中打开时，这些公理会被改写成等价的写法。平台按原样保留，导出时不变。"
+        },
+        "multiple_parents": {
+          "label_one": "{{count}} 个对象类型有多个父类型",
+          "label_other": "{{count}} 个对象类型有多个父类型",
+          "description": "表单只支持一个父类型，这些父类型已作为高级公理保留，导出时不丢。"
+        },
+        "unsupported_shape": {
+          "label_one": "{{count}} 个 SHACL 形状用了表单不支持的写法",
+          "label_other": "{{count}} 个 SHACL 形状用了表单不支持的写法",
+          "description": "这些形状已作为高级公理原样保留，导出时不丢。"
+        },
+        "lost_list": {
+          "label_one": "{{count}} 条规则的枚举取值被 Protégé 丢掉了",
+          "label_other": "{{count}} 条规则的枚举取值被 Protégé 丢掉了",
+          "description": "Protégé 保存文件时会丢掉枚举取值列表。平台沿用了已有的取值，请核对这些规则。"
+        }
+      },
+      "goReview": "去审核"
     }
   },
   "upload": {
@@ -250,7 +309,9 @@
   "kinds": {
     "entity_type": "对象类型",
     "relation_type": "关系",
-    "property": "属性"
+    "property": "属性",
+    "constraint": "约束",
+    "axiom": "高级公理"
   },
   "datatypes": {
     "string": "文本",
@@ -268,7 +329,7 @@
     "tableLabel": "变更集列表",
     "columns": {
       "title": "变更集",
-      "source": "来源资料",
+      "source": "来源",
       "pending": "待定",
       "accepted": "接受",
       "rejected": "拒绝",
@@ -283,8 +344,8 @@
     "noSource": "手动提交",
     "backToList": "返回变更集列表",
     "detailTitle": "变更集",
-    "detailInfo": "逐项接受、修改或拒绝 AI 的建议。全部决定后，把接受的项合并到本体的工作版本。",
-    "sourceLabel": "来源资料：",
+    "detailInfo": "逐项接受、修改或拒绝变更集里的修改。全部决定后，把接受的项合并到本体的工作版本。",
+    "sourceLabel": "来源：",
     "countsSummary": "共 {{total}} 项 · 待定 {{pending}} · 接受 {{accepted}} · 拒绝 {{rejected}}",
     "pendingHint_one": "还有 {{count}} 项未决定",
     "pendingHint_other": "还有 {{count}} 项未决定",
@@ -318,6 +379,10 @@
       "possible_duplicate": {
         "label": "可能重复",
         "description": "这一项可能与本体中已有的元素重复，请确认后再接受。"
+      },
+      "non_standard": {
+        "label": "非标准写法",
+        "description": "在 Protégé 中打开时会改写这条公理。"
       }
     },
     "decision": {
@@ -327,7 +392,9 @@
     },
     "op": {
       "create": "新建",
-      "update": "修改"
+      "update": "修改",
+      "delete": "删除",
+      "restore": "恢复"
     },
     "edited": "已修改",
     "rationale": "理由：{{text}}",
@@ -337,7 +404,6 @@
     "editItemNamed": "修改“{{name}}”",
     "evidenceCount": "查看证据（{{count}}）",
     "evidenceTitle": "证据",
-    "noEvidence": "这一项没有附证据。",
     "evidenceSwitch": "选择证据",
     "evidenceN": "证据 {{n}}",
     "unknownType": "未知对象类型",
@@ -352,7 +418,9 @@
       "required": "必填",
       "multiple": "可有多个",
       "pointsTo": "指向",
-      "synonyms": "同义词：{{list}}"
+      "synonyms": "同义词：{{list}}",
+      "target": "目标类型：{{name}}",
+      "inverse": "互逆：{{name}}"
     },
     "fields": {
       "labelZh": "中文名称",
@@ -370,7 +438,9 @@
       "datatype": "数据类型",
       "unit": "单位",
       "required": "必填",
-      "multiple": "允许多个"
+      "multiple": "允许多个",
+      "inverseRef": "互逆关系",
+      "targetRef": "目标类型"
     },
     "edit": {
       "title": "修改“{{name}}”",
@@ -401,7 +471,28 @@
         "datatypeRequired": "请选择数据类型"
       }
     },
-    "readOnly": "只读"
+    "readOnly": "只读",
+    "source": {
+      "ai_extraction": "资料识别",
+      "import": "导入",
+      "manual": "手工",
+      "ai_assistant": "AI 助手"
+    },
+    "acceptAll": "接受全部（{{count}}）",
+    "allAccepted": "已接受 {{count}} 项",
+    "currentValue": {
+      "delete": "将删除以下内容：",
+      "restore": "将恢复以下内容："
+    },
+    "noEvidenceBySource": {
+      "ai_extraction": "这一项没有附证据。",
+      "ai_assistant": "这一项没有附证据。",
+      "import": "导入的内容没有资料原文。",
+      "manual": "手工修改没有资料原文。"
+    },
+    "unknownElement": "未知元素",
+    "yes": "是",
+    "no": "否"
   },
   "ontologyPage": {
     "viewLabel": "视图",
@@ -411,13 +502,15 @@
     "exported": "已导出 Turtle 文件",
     "exportFailed": "没有导出 Turtle 文件",
     "noOntologyTitle": "还没有本体",
-    "noOntologyDescription": "上传资料并审核 AI 的建议后，对象类型、关系和属性会出现在这里。",
+    "noOntologyDescription": "上传资料或导入 OWL 文件，审核通过后，对象类型、关系和属性会出现在这里。",
     "stats": {
       "entityTypes": "对象类型",
       "relationTypes": "关系",
       "properties": "属性",
       "activeRelease": "当前版本",
-      "noRelease": "尚未发布"
+      "noRelease": "尚未发布",
+      "constraints": "约束",
+      "axioms": "高级公理"
     },
     "graph": {
       "label": "本体图谱：{{nodes}} 个对象类型，{{edges}} 条连线",
@@ -446,17 +539,19 @@
       "noMatchTitle": "没有符合条件的元素",
       "noMatchDescription": "换个关键词，或移除筛选条件再试。",
       "emptyTitle": "本体里还没有元素",
-      "emptyDescription": "审核并合并变更集后，对象类型、关系和属性会列在这里。",
+      "emptyDescription": "审核并合并变更集后，本体里的元素会列在这里。",
       "tableLabel": "本体元素",
       "columns": {
         "name": "名称",
         "kind": "类型",
         "localName": "局部名",
         "definition": "定义"
-      }
+      },
+      "target": "目标类型：{{name}}",
+      "subject": "所属：{{name}}"
     },
     "detail": {
-      "deprecated": "已停用",
+      "deprecated": "已删除",
       "definition": "定义",
       "noDefinition": "还没有定义。",
       "synonyms": "同义词",
@@ -472,8 +567,22 @@
       "provenance": "来源证据",
       "noProvenance": "这个元素不是由审核过的变更集产生的。",
       "showSource": "查看原文",
-      "hideSource": "收起原文"
-    }
+      "hideSource": "收起原文",
+      "iri": "IRI",
+      "unknownElement": "未知元素",
+      "rules": "规则",
+      "relatedAxioms": "相关公理",
+      "noRelatedAxioms": "没有相关公理。",
+      "axiomTitle": "高级公理",
+      "turtle": "Turtle",
+      "subject": "所属元素",
+      "noSubject": "这条公理不属于某个元素。"
+    },
+    "moreActions": "更多操作",
+    "newOntology": "新建本体",
+    "importOwl": "导入 OWL",
+    "importOwlFile": "从 OWL 文件导入",
+    "created": "已创建本体“{{name}}”"
   },
   "releases": {
     "publishNew": "发布新版本",
@@ -546,7 +655,7 @@
       "info": "逐项审核变更集：接受、修改或拒绝每一项修改。只有审核通过的修改才会进入本体。"
     },
     "ontology": {
-      "info": "用图谱或列表查看对象类型、关系和属性，点击元素查看详情和来源证据。"
+      "info": "用图谱或列表查看对象类型、关系、属性、约束和高级公理，点击元素查看详情和来源。"
     },
     "data": {
       "info": "连接数据源、浏览表目录，并把数据绑定到本体。",
@@ -617,7 +726,8 @@
       "invalid_edit": "修改的内容不符合要求，请检查名称、局部名和引用的对象类型。",
       "stale_target": "目标元素在变更集生成后被修改过",
       "dependency_skipped": "它引用的项被拒绝或被跳过",
-      "invalid_item": "内容不完整或不合法"
+      "invalid_item": "内容不完整或不合法",
+      "has_dependents": "仍有其他元素引用它，没有删除"
     },
     "release": {
       "not_found": "版本不存在或已被删除。",
@@ -647,6 +757,54 @@
       "422": "填写的内容不完整或格式不正确，请检查后重试。",
       "429": "操作太频繁，请稍后再试。",
       "5xx": "平台服务暂时不可用，请稍后重试。"
+    },
+    "import": {
+      "parse_error": "文件有语法错误，请修正后重新导入。",
+      "unsupported_format": "这不是 Turtle 或 RDF/XML 文件，请另存为 .ttl 或 .owl 后再导入。",
+      "too_large": "文件超过 5 MB，请拆分后再导入。",
+      "too_many_triples": "文件里的三元组超过 50,000 个，请拆分后再导入。",
+      "empty": "文件里没有任何内容，请检查后重新选择。"
+    }
+  },
+  "rules": {
+    "none": "没有规则。",
+    "tableLabel": "约束规则",
+    "unknownPath": "未知属性或关系",
+    "columns": {
+      "path": "属性或关系",
+      "count": "个数",
+      "type": "取值类型",
+      "values": "取值限制",
+      "message": "提示信息"
+    },
+    "countExactly": "恰好 {{n}} 个",
+    "countRange": "{{min}}–{{max}} 个",
+    "countAtLeast": "至少 {{n}} 个",
+    "countAtMost": "至多 {{n}} 个",
+    "lengthRange": "{{min}}–{{max}} 个字符",
+    "lengthAtLeast": "至少 {{n}} 个字符",
+    "lengthAtMost": "至多 {{n}} 个字符",
+    "minInclusive": "≥ {{value}}",
+    "minExclusive": "> {{value}}",
+    "maxInclusive": "≤ {{value}}",
+    "maxExclusive": "< {{value}}",
+    "rangeSeparator": "，",
+    "enumLabel": "枚举",
+    "rangeLabel": "范围",
+    "lengthLabel": "长度",
+    "patternLabel": "正则",
+    "patternFlags": "（标志 {{flags}}）",
+    "nodeKinds": {
+      "IRI": "IRI",
+      "Literal": "字面量",
+      "BlankNode": "空白节点",
+      "BlankNodeOrIRI": "空白节点或 IRI",
+      "BlankNodeOrLiteral": "空白节点或字面量",
+      "IRIOrLiteral": "IRI 或字面量"
+    },
+    "valuesLost": {
+      "label": "Protégé 丢掉了枚举取值",
+      "description": "Protégé 保存文件时丢掉了这条规则的枚举取值，请对照原始文件核实。"
     }
   }
 }

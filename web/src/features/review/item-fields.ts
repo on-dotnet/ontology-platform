@@ -1,11 +1,19 @@
 import type { Datatype, Element, ElementKind, Synonym } from '@/features/ontologies/api';
-import { DATATYPES, elementLabel } from '@/features/ontologies/api';
+import { DATATYPES, displayName, elementName, turtleSummary } from '@/features/ontologies/api';
 
 import type { ChangeItem, ElementFields } from './api';
 
 /** The fields a merge would apply: the reviewer's edits over the AI proposal. */
 export function effectiveFields(item: Pick<ChangeItem, 'proposed' | 'edited'>): ElementFields {
   return { ...item.proposed, ...(item.edited ?? {}) };
+}
+
+/**
+ * What the item shows: the target's current values (update, delete, restore) under the proposed
+ * and edited ones, so references and names are known even when only one field changes.
+ */
+export function shownFields(item: Pick<ChangeItem, 'proposed' | 'edited' | 'before'>): ElementFields {
+  return { ...(item.before ?? {}), ...effectiveFields(item) };
 }
 
 /** Resolves element ids and `temp_ref`s of this change set to display names. */
@@ -24,26 +32,24 @@ export function buildRefContext(items: readonly ChangeItem[], elements: readonly
 }
 
 function fieldsLabel(fields: ElementFields, language: string): string | undefined {
-  if (language.startsWith('en') && fields.labelEn) return fields.labelEn;
-  return fields.labelZh ?? undefined;
+  return displayName(fields, language) || turtleSummary(fields.turtle) || undefined;
 }
 
 /** Name of what an element id or `temp_ref` points to, or undefined when it is unknown. */
 export function refLabel(ref: string | null | undefined, context: RefContext): string | undefined {
   if (!ref) return undefined;
   const element = context.elementsById.get(ref);
-  if (element) return elementLabel(element, context.language);
+  if (element) return elementName(element, context.language);
   const item = context.itemsByTempRef.get(ref);
   return item ? fieldsLabel(effectiveFields(item), context.language) : undefined;
 }
 
-/** Display name of an item: its proposed label, or the target element's for updates without one. */
+/** Display name of an item: its proposed or current name; axioms are named by their Turtle. */
 export function itemLabel(item: ChangeItem, context: RefContext): string {
-  const own = fieldsLabel(effectiveFields(item), context.language);
+  const own = fieldsLabel(shownFields(item), context.language);
   if (own) return own;
   const target = item.targetElementId ? context.elementsById.get(item.targetElementId) : undefined;
-  if (target) return elementLabel(target, context.language);
-  return (item.before ? fieldsLabel(item.before, context.language) : undefined) ?? '—';
+  return (target ? elementName(target, context.language) : '') || '—';
 }
 
 export interface RefOption {
@@ -57,7 +63,7 @@ export interface RefOption {
 export function entityTypeOptions(items: readonly ChangeItem[], context: RefContext, excludeRef?: string | null): RefOption[] {
   const existing = [...context.elementsById.values()]
     .filter((element) => element.kind === 'entity_type' && element.status === 'active')
-    .map((element) => ({ value: element.id, label: elementLabel(element, context.language), isNew: false }));
+    .map((element) => ({ value: element.id, label: displayName(element, context.language), isNew: false }));
   const proposed = items
     .filter((item) => item.op === 'create' && item.kind === 'entity_type' && item.tempRef && item.decision !== 'rejected')
     .map((item) => ({ value: item.tempRef ?? '', label: fieldsLabel(effectiveFields(item), context.language) ?? '—', isNew: true }));
@@ -126,11 +132,24 @@ export function toEditForm(fields: ElementFields, separator: string): EditForm {
   };
 }
 
+type EditableKind = Extract<ElementKind, 'entity_type' | 'relation_type' | 'property'>;
+const EDITABLE_KINDS: readonly ElementKind[] = ['entity_type', 'relation_type', 'property'];
+
+function isEditableKind(kind: ElementKind): kind is EditableKind {
+  return EDITABLE_KINDS.includes(kind);
+}
+
+/** Reviewers may edit creates and updates of types, relations and properties; other items are decided as they are. */
+export function isEditable(item: Pick<ChangeItem, 'kind' | 'op'>): boolean {
+  return isEditableKind(item.kind) && (item.op === 'create' || item.op === 'update');
+}
+
 /** Which fields the form shows: updates change descriptive fields only; names and references are fixed. */
 export function editableFields(kind: ElementKind, op: ChangeItem['op']): EditField[] {
+  if (!isEditableKind(kind) || (op !== 'create' && op !== 'update')) return [];
   const descriptive: EditField[] = ['labelZh', 'labelEn', 'definitionZh', 'definitionEn', 'synonymsZh', 'synonymsEn'];
   if (op === 'update') return descriptive;
-  const byKind: Record<ElementKind, EditField[]> = {
+  const byKind: Record<EditableKind, EditField[]> = {
     entity_type: ['parentRef'],
     relation_type: ['domainRef', 'rangeRef', 'required', 'multiple'],
     property: ['domainRef', 'datatype', 'unit', 'required', 'multiple'],
@@ -183,12 +202,53 @@ export function fromEditForm(kind: ElementKind, op: ChangeItem['op'], form: Edit
   return edited;
 }
 
-/** Fields compared in the before/after view of an update. */
-export const COMPARED_FIELDS = ['labelZh', 'labelEn', 'definitionZh', 'definitionEn', 'synonyms'] as const;
+/** Fields compared in the before/after view of an update (rules and Turtle are shown whole instead). */
+export const COMPARED_FIELDS = [
+  'labelZh',
+  'labelEn',
+  'localName',
+  'definitionZh',
+  'definitionEn',
+  'synonyms',
+  'parentRef',
+  'domainRef',
+  'rangeRef',
+  'inverseRef',
+  'datatype',
+  'unit',
+  'required',
+  'multiple',
+] as const;
 export type ComparedField = (typeof COMPARED_FIELDS)[number];
 
-export function fieldText(fields: ElementFields | null | undefined, field: ComparedField, separator: string): string {
+/** How compared values are written: list separator, names of references, datatypes and yes / no. */
+export interface FieldFormat {
+  separator: string;
+  ref: (ref: string) => string;
+  datatype: (datatype: string) => string;
+  flag: (value: boolean) => string;
+}
+
+export function fieldText(fields: ElementFields | null | undefined, field: ComparedField, format: FieldFormat): string {
   if (!fields) return '';
-  if (field === 'synonyms') return (fields.synonyms ?? []).map((synonym) => synonym.text).join(separator);
-  return fields[field] ?? '';
+  switch (field) {
+    case 'synonyms':
+      return (fields.synonyms ?? []).map((synonym) => synonym.text).join(format.separator);
+    case 'parentRef':
+    case 'domainRef':
+    case 'rangeRef':
+    case 'inverseRef': {
+      const ref = fields[field];
+      return ref ? format.ref(ref) : '';
+    }
+    case 'datatype':
+      return fields.datatype ? format.datatype(fields.datatype) : '';
+    case 'required':
+    case 'multiple': {
+      const value = fields[field];
+      return value === null || value === undefined ? '' : format.flag(value);
+    }
+    default:
+      return fields[field] ?? '';
+  }
 }

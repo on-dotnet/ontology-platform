@@ -9,7 +9,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } fr
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { elementLabel, ontologyKeys, useElements, type OntologySummary } from '@/features/ontologies/api';
+import { elementName, ontologyKeys, useElements, type OntologySummary } from '@/features/ontologies/api';
 import { lookupText, useErrorMessage } from '@/i18n/error-message';
 
 import { activateRelease, publishRelease, releaseKeys, releaseProblems, type ReleaseProblem, type ReleaseSummary } from './api';
@@ -147,7 +147,7 @@ function ProblemList({ ontologyId, problems }: { ontologyId: string; problems: r
             <li key={`${problem.code}-${problem.elementId ?? 'none'}-${index}`}>
               {element ? (
                 <>
-                  <span className="font-medium">{elementLabel(element, language)}</span>
+                  <span className="font-medium">{elementName(element, language)}</span>
                   {t('common.colon')}
                 </>
               ) : null}

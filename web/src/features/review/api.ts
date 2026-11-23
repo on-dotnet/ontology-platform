@@ -8,6 +8,8 @@ export type ChangeSetDetail = components['schemas']['ChangeSetDetail'];
 export type ChangeItem = components['schemas']['ChangeItem'];
 export type ElementFields = components['schemas']['ElementFields'];
 export type Decision = ChangeItem['decision'];
+export type ChangeOp = ChangeItem['op'];
+export type ChangeSetSource = ChangeSetDetail['source'];
 export type ItemFlag = ChangeItem['flags'][number];
 export type ItemPatch = components['schemas']['ItemDecisionPatch'];
 export type MergeResult = components['schemas']['MergeResult'];
@@ -61,6 +63,16 @@ export function countDecisions(items: readonly Pick<ChangeItem, 'decision'>[]): 
     accepted: items.filter((item) => item.decision === 'accepted').length,
     rejected: items.filter((item) => item.decision === 'rejected').length,
   };
+}
+
+/** Change sets proposed by AI: their items carry the AI label, confidence and evidence. */
+export function isAiSource(source: ChangeSetSource): boolean {
+  return source === 'ai_extraction' || source === 'ai_assistant';
+}
+
+/** Sources reviewed as a whole: imports and manual edits offer "accept all". */
+export function acceptsAll(source: ChangeSetSource): boolean {
+  return source === 'import' || source === 'manual';
 }
 
 /** Confidence tier boundaries (ui-guidelines §7: high / medium / low). */

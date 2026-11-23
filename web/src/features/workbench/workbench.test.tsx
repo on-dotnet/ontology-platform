@@ -112,6 +112,14 @@ describe('workbench overview', () => {
             targetId: 'cs-converter',
           },
           { id: 'act-2', action: 'something.new', occurredAt: new Date().toISOString(), actorName: null, targetType: null, targetId: null },
+          {
+            id: 'act-3',
+            action: 'ontology.imported',
+            occurredAt: new Date().toISOString(),
+            actorName: '张工',
+            targetType: 'ontology',
+            targetId: 'onto-steel',
+          },
         ],
       }),
     });
@@ -124,7 +132,11 @@ describe('workbench overview', () => {
     const activity = within(overview).getByRole('list', { name: '最近动态' });
     expect(activity).toHaveTextContent('李工 合并了变更集');
     expect(activity).toHaveTextContent('平台 进行了操作');
-    expect(within(activity).getByRole('link', { name: '查看' })).toHaveAttribute('href', '/review/cs-converter');
+    expect(activity).toHaveTextContent('张工 导入了 OWL 文件');
+    expect(within(activity).getAllByRole('link', { name: '查看' }).map((link) => link.getAttribute('href'))).toEqual([
+      '/review/cs-converter',
+      '/ontology?ontology=onto-steel',
+    ]);
   });
 
   it('warns that AI analysis is unavailable and what still works', async () => {

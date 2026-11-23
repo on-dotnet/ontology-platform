@@ -12,8 +12,15 @@ export type Datatype = NonNullable<Element['datatype']>;
 export type Synonym = Element['synonyms'][number];
 export type Evidence = components['schemas']['Evidence'];
 export type Graph = components['schemas']['Graph'];
+export type ConstraintRule = components['schemas']['ConstraintRule'];
+export type ConstraintRuleFields = components['schemas']['ConstraintRuleFields'];
+export type RdfValue = components['schemas']['RdfValue'];
+export type LangText = components['schemas']['LangText'];
+export type ImportResult = components['schemas']['ImportResult'];
+export type ImportWarning = components['schemas']['ImportWarning'];
+export type ElementStatusFilter = 'active' | 'deprecated' | 'all';
 
-export const ELEMENT_KINDS: readonly ElementKind[] = ['entity_type', 'relation_type', 'property'];
+export const ELEMENT_KINDS: readonly ElementKind[] = ['entity_type', 'relation_type', 'property', 'constraint', 'axiom'];
 export const DATATYPES: readonly Datatype[] = ['string', 'integer', 'decimal', 'boolean', 'date', 'dateTime'];
 
 export const ontologyKeys = {
@@ -39,9 +46,47 @@ export function createOntology(body: OntologyCreate): Promise<OntologySummary> {
   return unwrap(api.POST('/api/ontologies', { body }));
 }
 
+/** Largest OWL file the server accepts (`import.too_large`). */
+export const MAX_IMPORT_MB = 5;
+/** File types offered by the picker; the server detects the format from the content. */
+export const IMPORT_ACCEPT = '.ttl,.owl,.rdf,.xml';
+
+/** Creates an ontology from a Turtle or RDF/XML file; its content arrives as an import change set. */
+export function importOntology(file: File, name?: string): Promise<ImportResult> {
+  return unwrap(
+    api.POST('/api/ontologies/import', {
+      // The generated type models the binary part as a string; the serializer sends the File itself.
+      body: { file: file as unknown as string, ...(name ? { name } : {}) },
+      bodySerializer: () => {
+        const form = new FormData();
+        form.append('file', file, file.name);
+        if (name) form.append('name', name);
+        return form;
+      },
+    }),
+  );
+}
+
+/** Compares a file with the working version; the differences become an import change set (none without differences). */
+export function importIntoOntology(ontologyId: string, file: File): Promise<ImportResult> {
+  return unwrap(
+    api.POST('/api/ontologies/{id}/import', {
+      params: { path: { id: ontologyId } },
+      body: { file: file as unknown as string },
+      bodySerializer: () => {
+        const form = new FormData();
+        form.append('file', file, file.name);
+        return form;
+      },
+    }),
+  );
+}
+
 export interface ElementFilter {
   kind?: ElementKind;
   q?: string;
+  /** Active elements by default; deleted ones with `deprecated` or `all`. */
+  status?: ElementStatusFilter;
 }
 
 export function useElements(ontologyId: string | undefined, filter: ElementFilter = {}) {
@@ -50,7 +95,7 @@ export function useElements(ontologyId: string | undefined, filter: ElementFilte
     queryFn: () =>
       unwrap(
         api.GET('/api/ontologies/{id}/elements', {
-          params: { path: { id: ontologyId ?? '' }, query: { kind: filter.kind, q: filter.q || undefined } },
+          params: { path: { id: ontologyId ?? '' }, query: { kind: filter.kind, q: filter.q || undefined, status: filter.status } },
         }),
       ),
     enabled: Boolean(ontologyId),
@@ -84,7 +129,29 @@ export function exportOntologyTurtle(ontologyId: string): Promise<string> {
   );
 }
 
-/** Display name of an element in the current language: the English label when available in English. */
-export function elementLabel(element: Pick<Element, 'labelZh' | 'labelEn'>, language: string): string {
-  return language.startsWith('en') && element.labelEn ? element.labelEn : element.labelZh;
+/** The names an element or change item may carry; any of them can be missing (imports, axioms). */
+export interface Names {
+  labelZh?: string | null;
+  labelEn?: string | null;
+  localName?: string | null;
+}
+
+/**
+ * Display name in the current language: the label of that language, then the other label, then the
+ * local name; empty when there is none (axioms).
+ */
+export function displayName(names: Names, language: string): string {
+  const labels = language.startsWith('en') ? [names.labelEn, names.labelZh] : [names.labelZh, names.labelEn];
+  return [...labels, names.localName].find((value): value is string => Boolean(value?.trim())) ?? '';
+}
+
+/** First line of a Turtle fragment, shortened to `max` characters, to name an axiom. */
+export function turtleSummary(turtle: string | null | undefined, max = 80): string {
+  const line = (turtle ?? '').split('\n').map((part) => part.trim()).find(Boolean) ?? '';
+  return line.length > max ? `${line.slice(0, max - 1)}…` : line;
+}
+
+/** Display name of an element; axioms, which have no names, are named by their Turtle. */
+export function elementName(element: Names & { turtle?: string | null }, language: string): string {
+  return displayName(element, language) || turtleSummary(element.turtle);
 }

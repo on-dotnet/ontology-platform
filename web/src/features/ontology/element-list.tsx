@@ -11,12 +11,19 @@ import { Input } from '@/components/ui/input';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip } from '@/components/ui/tooltip';
-import { ELEMENT_KINDS, elementLabel, useElements, type ElementKind } from '@/features/ontologies/api';
+import { displayName, ELEMENT_KINDS, elementName, turtleSummary, useElements, type Element, type ElementKind } from '@/features/ontologies/api';
+import { cn } from '@/lib/cn';
 
 /** Search waits this long after the last keystroke. */
 export const SEARCH_DEBOUNCE_MS = 300;
 
-export const kindTone: Record<ElementKind, BadgeTone> = { entity_type: 'primary', relation_type: 'secondary', property: 'success' };
+export const kindTone: Record<ElementKind, BadgeTone> = {
+  entity_type: 'primary',
+  relation_type: 'secondary',
+  property: 'success',
+  constraint: 'neutral',
+  axiom: 'neutral',
+};
 
 type KindFilter = ElementKind | 'all';
 
@@ -39,6 +46,13 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
   }, [text]);
 
   const query = useElements(ontologyId, { ...(kind === 'all' ? {} : { kind }), ...(q ? { q } : {}) });
+  // Names of the types constraints target and of the elements axioms belong to.
+  const everything = useElements(ontologyId);
+  const byId = new Map((everything.data ?? []).map((element) => [element.id, element]));
+  const nameOf = (id: string | null) => {
+    const element = id ? byId.get(id) : undefined;
+    return element ? elementName(element, language) : undefined;
+  };
   const filtered = kind !== 'all' || q !== '';
 
   const clearSearch = () => {
@@ -109,21 +123,12 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
                 {elements.map((element) => (
                   <TableRow key={element.id}>
                     <TableCell className="max-w-64">
-                      <button
-                        type="button"
-                        onClick={() => onSelect(element.id)}
-                        className="block max-w-full truncate rounded text-left font-medium text-primary-strong hover:underline"
-                      >
-                        {elementLabel(element, language)}
-                      </button>
-                      {element.labelEn && !language.startsWith('en') ? (
-                        <p className="truncate text-xs text-muted-foreground">{element.labelEn}</p>
-                      ) : null}
+                      <NameCell element={element} language={language} nameOf={nameOf} onSelect={onSelect} />
                     </TableCell>
                     <TableCell>
                       <Badge tone={kindTone[element.kind]}>{t(`kinds.${element.kind}`)}</Badge>
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-muted-foreground">{element.localName}</TableCell>
+                    <TableCell className="font-mono text-xs text-muted-foreground">{element.localName ?? '—'}</TableCell>
                     <TableCell className="max-w-md">
                       <p className="line-clamp-2 text-muted-foreground">{element.definitionZh ?? element.definitionEn ?? '—'}</p>
                     </TableCell>
@@ -135,6 +140,44 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
         }
       </QueryState>
     </Card>
+  );
+}
+
+interface NameCellProps {
+  element: Element;
+  language: string;
+  nameOf: (id: string | null) => string | undefined;
+  onSelect: (elementId: string) => void;
+}
+
+/** Name and second line: axioms show their Turtle; constraints their target type; others the English name. */
+function NameCell({ element, language, nameOf, onSelect }: NameCellProps) {
+  const { t } = useTranslation();
+  const isAxiom = element.kind === 'axiom';
+  const name = isAxiom ? turtleSummary(element.turtle) : displayName(element, language);
+  let detail: string | null = null;
+  if (element.kind === 'constraint') {
+    detail = t('ontologyPage.list.target', { name: nameOf(element.domainId) ?? t('review.unknownType') });
+  } else if (isAxiom) {
+    const subject = nameOf(element.subjectId);
+    detail = subject ? t('ontologyPage.list.subject', { name: subject }) : null;
+  } else if (element.labelEn && !language.startsWith('en') && element.labelEn !== name) {
+    detail = element.labelEn;
+  }
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => onSelect(element.id)}
+        className={cn(
+          'block max-w-full truncate rounded text-left font-medium text-primary-strong hover:underline',
+          isAxiom && 'font-mono text-xs',
+        )}
+      >
+        {name || '—'}
+      </button>
+      {detail ? <p className="truncate text-xs text-muted-foreground">{detail}</p> : null}
+    </>
   );
 }
 

@@ -7,28 +7,104 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Textarea } from '@/components/ui/textarea';
 import { useErrorMessage } from '@/i18n/error-message';
 
-import { createOntology, ontologyKeys, type OntologySummary } from './api';
+import { createOntology, importOntology, ontologyKeys, type ImportResult, type OntologySummary } from './api';
+import { ImportForm, ImportResultView, useRefreshAfterImport } from './import-owl';
+
+export type CreateMethod = 'blank' | 'import';
 
 interface CreateOntologyDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreated: (ontology: OntologySummary) => void;
+  /**
+   * Offers "import from an OWL file" next to the blank ontology. Off while documents wait to be
+   * uploaded: that dialog only names the ontology they go into.
+   */
+  allowImport?: boolean;
+  initialMethod?: CreateMethod;
+  /** Called once the import created the ontology; the dialog stays open on the result. */
+  onImported?: (result: ImportResult) => void;
 }
 
-/** Names the first ontology before documents can be uploaded into it. */
-export function CreateOntologyDialog({ open, onOpenChange, onCreated }: CreateOntologyDialogProps) {
+/** Names a new ontology, or creates one from an OWL file when `allowImport` is set. */
+export function CreateOntologyDialog({
+  open,
+  onOpenChange,
+  onCreated,
+  allowImport = false,
+  initialMethod = 'blank',
+  onImported,
+}: CreateOntologyDialogProps) {
   const { t } = useTranslation();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent closeLabel={t('common.close')}>
-        <DialogTitle>{t('ontologies.create.title')}</DialogTitle>
-        <DialogDescription>{t('ontologies.create.description')}</DialogDescription>
-        <CreateOntologyForm onCreated={onCreated} />
+        {allowImport ? (
+          <CreateOrImport
+            initialMethod={initialMethod}
+            onCreated={onCreated}
+            onImported={onImported}
+            onClose={() => onOpenChange(false)}
+          />
+        ) : (
+          <>
+            <DialogTitle>{t('ontologies.create.title')}</DialogTitle>
+            <DialogDescription>{t('ontologies.create.description')}</DialogDescription>
+            <CreateOntologyForm onCreated={onCreated} />
+          </>
+        )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+interface CreateOrImportProps {
+  initialMethod: CreateMethod;
+  onCreated: (ontology: OntologySummary) => void;
+  onImported: ((result: ImportResult) => void) | undefined;
+  onClose: () => void;
+}
+
+function CreateOrImport({ initialMethod, onCreated, onImported, onClose }: CreateOrImportProps) {
+  const { t } = useTranslation();
+  const refresh = useRefreshAfterImport();
+  const [method, setMethod] = useState<CreateMethod>(initialMethod);
+  const [result, setResult] = useState<ImportResult | null>(null);
+
+  if (result) return <ImportResultView result={result} created onClose={onClose} />;
+  return (
+    <>
+      <DialogTitle>{t('ontologies.create.standaloneTitle')}</DialogTitle>
+      <DialogDescription>{t('ontologies.create.standaloneDescription')}</DialogDescription>
+      <SegmentedControl
+        legend={t('ontologies.create.method')}
+        hideLegend
+        className="mt-5"
+        value={method}
+        onValueChange={setMethod}
+        options={[
+          { value: 'blank', label: t('ontologies.create.methodBlank') },
+          { value: 'import', label: t('ontologies.create.methodImport') },
+        ]}
+      />
+      {method === 'import' ? (
+        <ImportForm
+          withName
+          run={(file, name) => importOntology(file, name)}
+          onImported={async (imported) => {
+            await refresh();
+            setResult(imported);
+            onImported?.(imported);
+          }}
+        />
+      ) : (
+        <CreateOntologyForm onCreated={onCreated} />
+      )}
+    </>
   );
 }
 

@@ -131,6 +131,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ontologies/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Ontology
+         * @description Create an ontology from a Turtle or RDF/XML file. Its content arrives as a change set
+         *     (source `import`) to review and merge; what the platform cannot map is kept as axioms.
+         */
+        post: operations["import_ontology_api_ontologies_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Into Ontology
+         * @description Compare a file with the working version; the differences become an import change set
+         *     (none when there are no differences).
+         */
+        post: operations["import_into_ontology_api_ontologies__id__import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ontologies/{id}": {
         parameters: {
             query?: never;
@@ -160,7 +202,8 @@ export interface paths {
         };
         /**
          * List Elements
-         * @description Elements of the working version; `q` searches local names, labels and synonyms.
+         * @description Elements of the working version (deleted ones with `status=deprecated` or `all`); `q`
+         *     searches local names, labels, synonyms, IRIs and axiom text.
          */
         get: operations["list_elements_api_ontologies__id__elements_get"];
         put?: never;
@@ -593,6 +636,20 @@ export interface components {
             /** Model */
             model: string | null;
         };
+        /** Body_import_into_ontology_api_ontologies__id__import_post */
+        Body_import_into_ontology_api_ontologies__id__import_post: {
+            /** File */
+            file: string;
+        };
+        /** Body_import_ontology_api_ontologies_import_post */
+        Body_import_ontology_api_ontologies_import_post: {
+            /** File */
+            file: string;
+            /** Name */
+            name?: string | null;
+            /** Key */
+            key?: string | null;
+        };
         /** Body_upload_document_api_documents_post */
         Body_upload_document_api_documents_post: {
             /** File */
@@ -626,12 +683,12 @@ export interface components {
              * Op
              * @enum {string}
              */
-            op: "create" | "update";
+            op: "create" | "update" | "delete" | "restore";
             /**
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
             /** Targetelementid */
             targetElementId: string | null;
             /** Tempref */
@@ -649,7 +706,7 @@ export interface components {
             /** Rationale */
             rationale: string | null;
             /** Flags */
-            flags: ("evidence_not_found" | "possible_duplicate")[];
+            flags: ("evidence_not_found" | "possible_duplicate" | "non_standard")[];
             /** Note */
             note: string | null;
             /** Decidedby */
@@ -679,7 +736,7 @@ export interface components {
              * Source
              * @enum {string}
              */
-            source: "ai_extraction" | "ai_assistant" | "manual";
+            source: "ai_extraction" | "ai_assistant" | "manual" | "import";
             /** Documentid */
             documentId: string | null;
             /**
@@ -716,7 +773,7 @@ export interface components {
              * Source
              * @enum {string}
              */
-            source: "ai_extraction" | "ai_assistant" | "manual";
+            source: "ai_extraction" | "ai_assistant" | "manual" | "import";
             /** Documentid */
             documentId: string | null;
             /**
@@ -755,6 +812,84 @@ export interface components {
             heading: string | null;
             /** Charcount */
             charCount: number;
+        };
+        /** ConstraintRule */
+        ConstraintRule: {
+            /** Mincount */
+            minCount?: number | null;
+            /** Maxcount */
+            maxCount?: number | null;
+            /** Datatype */
+            datatype?: string | null;
+            /** Nodekind */
+            nodeKind?: ("IRI" | "Literal" | "BlankNode" | "BlankNodeOrIRI" | "BlankNodeOrLiteral" | "IRIOrLiteral") | null;
+            /** Allowedvalues */
+            allowedValues?: components["schemas"]["RdfValue"][] | null;
+            /**
+             * Allowedvalueslost
+             * @default false
+             */
+            allowedValuesLost: boolean;
+            minInclusive?: components["schemas"]["RdfValue"] | null;
+            maxInclusive?: components["schemas"]["RdfValue"] | null;
+            minExclusive?: components["schemas"]["RdfValue"] | null;
+            maxExclusive?: components["schemas"]["RdfValue"] | null;
+            /** Minlength */
+            minLength?: number | null;
+            /** Maxlength */
+            maxLength?: number | null;
+            /** Pattern */
+            pattern?: string | null;
+            /** Flags */
+            flags?: string | null;
+            /** Message */
+            message?: components["schemas"]["LangText"][];
+            /**
+             * Pathid
+             * Format: uuid
+             */
+            pathId: string;
+            /** Classid */
+            classId?: string | null;
+        };
+        /**
+         * ConstraintRuleFields
+         * @description A rule in a change item: references are element ids or temp_refs.
+         */
+        ConstraintRuleFields: {
+            /** Mincount */
+            minCount?: number | null;
+            /** Maxcount */
+            maxCount?: number | null;
+            /** Datatype */
+            datatype?: string | null;
+            /** Nodekind */
+            nodeKind?: ("IRI" | "Literal" | "BlankNode" | "BlankNodeOrIRI" | "BlankNodeOrLiteral" | "IRIOrLiteral") | null;
+            /** Allowedvalues */
+            allowedValues?: components["schemas"]["RdfValue"][] | null;
+            /**
+             * Allowedvalueslost
+             * @default false
+             */
+            allowedValuesLost: boolean;
+            minInclusive?: components["schemas"]["RdfValue"] | null;
+            maxInclusive?: components["schemas"]["RdfValue"] | null;
+            minExclusive?: components["schemas"]["RdfValue"] | null;
+            maxExclusive?: components["schemas"]["RdfValue"] | null;
+            /** Minlength */
+            minLength?: number | null;
+            /** Maxlength */
+            maxLength?: number | null;
+            /** Pattern */
+            pattern?: string | null;
+            /** Flags */
+            flags?: string | null;
+            /** Message */
+            message?: components["schemas"]["LangText"][];
+            /** Pathref */
+            pathRef: string;
+            /** Classref */
+            classRef?: string | null;
         };
         /** DecisionCounts */
         DecisionCounts: {
@@ -849,13 +984,15 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
             /** Localname */
-            localName: string;
+            localName: string | null;
             /** Iri */
-            iri: string;
+            iri: string | null;
+            /** Explicitiri */
+            explicitIri: boolean;
             /** Labelzh */
-            labelZh: string;
+            labelZh: string | null;
             /** Labelen */
             labelEn: string | null;
             /** Definitionzh */
@@ -870,6 +1007,8 @@ export interface components {
             domainId: string | null;
             /** Rangeid */
             rangeId: string | null;
+            /** Inverseid */
+            inverseId: string | null;
             /** Datatype */
             datatype: ("string" | "integer" | "decimal" | "boolean" | "date" | "dateTime") | null;
             /** Unit */
@@ -878,6 +1017,16 @@ export interface components {
             required: boolean;
             /** Multiple */
             multiple: boolean;
+            /** Autoshape */
+            autoShape: boolean;
+            /** Rules */
+            rules: components["schemas"]["ConstraintRule"][] | null;
+            /** Turtle */
+            turtle: string | null;
+            /** Subjectid */
+            subjectId: string | null;
+            /** Flags */
+            flags: "non_standard"[];
             /**
              * Status
              * @enum {string}
@@ -887,7 +1036,7 @@ export interface components {
              * Origin
              * @enum {string}
              */
-            origin: "ai" | "manual";
+            origin: "ai" | "manual" | "import";
             /** Revision */
             revision: number;
             /**
@@ -917,13 +1066,15 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
             /** Localname */
-            localName: string;
+            localName: string | null;
             /** Iri */
-            iri: string;
+            iri: string | null;
+            /** Explicitiri */
+            explicitIri: boolean;
             /** Labelzh */
-            labelZh: string;
+            labelZh: string | null;
             /** Labelen */
             labelEn: string | null;
             /** Definitionzh */
@@ -938,6 +1089,8 @@ export interface components {
             domainId: string | null;
             /** Rangeid */
             rangeId: string | null;
+            /** Inverseid */
+            inverseId: string | null;
             /** Datatype */
             datatype: ("string" | "integer" | "decimal" | "boolean" | "date" | "dateTime") | null;
             /** Unit */
@@ -946,6 +1099,16 @@ export interface components {
             required: boolean;
             /** Multiple */
             multiple: boolean;
+            /** Autoshape */
+            autoShape: boolean;
+            /** Rules */
+            rules: components["schemas"]["ConstraintRule"][] | null;
+            /** Turtle */
+            turtle: string | null;
+            /** Subjectid */
+            subjectId: string | null;
+            /** Flags */
+            flags: "non_standard"[];
             /**
              * Status
              * @enum {string}
@@ -955,7 +1118,7 @@ export interface components {
              * Origin
              * @enum {string}
              */
-            origin: "ai" | "manual";
+            origin: "ai" | "manual" | "import";
             /** Revision */
             revision: number;
             /**
@@ -976,13 +1139,16 @@ export interface components {
          * @description Proposed or edited fields of an element; every field is optional.
          *
          *     Which keys were given matters: only those are stored, returned and applied, and an explicit
-         *     null clears a value. References (`parentRef`, `domainRef`, `rangeRef`) hold an element id or
-         *     the `temp_ref` of a create item in the same change set. Rules that depend on the kind
-         *     (required fields, naming, references) are checked by the service.
+         *     null clears a value. References (`parentRef`, `domainRef`, `rangeRef`, `inverseRef` and the
+         *     rules' `pathRef` / `classRef`) hold an element id or the `temp_ref` of a create item in the
+         *     same change set. Rules that depend on the kind (required fields, naming, references) are
+         *     checked by the service.
          */
         ElementFields: {
             /** Localname */
             localName?: string | null;
+            /** Iri */
+            iri?: string | null;
             /** Labelzh */
             labelZh?: string | null;
             /** Labelen */
@@ -999,6 +1165,8 @@ export interface components {
             domainRef?: string | null;
             /** Rangeref */
             rangeRef?: string | null;
+            /** Inverseref */
+            inverseRef?: string | null;
             /** Datatype */
             datatype?: ("string" | "integer" | "decimal" | "boolean" | "date" | "dateTime") | null;
             /** Unit */
@@ -1007,6 +1175,12 @@ export interface components {
             required?: boolean | null;
             /** Multiple */
             multiple?: boolean | null;
+            /** Autoshape */
+            autoShape?: boolean | null;
+            /** Rules */
+            rules?: components["schemas"]["ConstraintRuleFields"][] | null;
+            /** Turtle */
+            turtle?: string | null;
         };
         /** Evidence */
         Evidence: {
@@ -1071,7 +1245,7 @@ export interface components {
             /** Label */
             label: string;
             /** Localname */
-            localName: string;
+            localName: string | null;
             /** Parentid */
             parentId: string | null;
             /** Propertycount */
@@ -1086,6 +1260,59 @@ export interface components {
              */
             status: "ok";
         };
+        /** ImportCounts */
+        ImportCounts: {
+            /** Create */
+            create: number;
+            /** Update */
+            update: number;
+            /** Delete */
+            delete: number;
+            /** Restore */
+            restore: number;
+        };
+        /**
+         * ImportParseProblem
+         * @description 422 `import.parse_error`: where the file stopped being valid, when known.
+         */
+        ImportParseProblem: {
+            /**
+             * Type
+             * @default about:blank
+             */
+            type: string;
+            /** Title */
+            title: string;
+            /** Status */
+            status: number;
+            /** Detail */
+            detail: string;
+            /** Code */
+            code: string;
+            /** Line */
+            line: number | null;
+            /** Column */
+            column: number | null;
+        };
+        /** ImportResult */
+        ImportResult: {
+            ontology: components["schemas"]["OntologySummary"];
+            /** Changesetid */
+            changeSetId: string | null;
+            counts: components["schemas"]["ImportCounts"];
+            /** Warnings */
+            warnings: components["schemas"]["ImportWarning"][];
+        };
+        /** ImportWarning */
+        ImportWarning: {
+            /**
+             * Code
+             * @enum {string}
+             */
+            code: "non_standard" | "multiple_parents" | "unsupported_shape" | "lost_list";
+            /** Count */
+            count: number;
+        };
         /**
          * ItemDecisionPatch
          * @description Only the given keys change; `edited: null` drops the reviewer's edit.
@@ -1096,6 +1323,13 @@ export interface components {
             edited?: components["schemas"]["ElementFields"] | null;
             /** Note */
             note?: string | null;
+        };
+        /** LangText */
+        LangText: {
+            /** Lang */
+            lang?: string | null;
+            /** Text */
+            text: string;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -1122,7 +1356,7 @@ export interface components {
              * Code
              * @enum {string}
              */
-            code: "changeset.stale_target" | "changeset.dependency_skipped" | "changeset.invalid_item";
+            code: "changeset.stale_target" | "changeset.dependency_skipped" | "changeset.invalid_item" | "changeset.has_dependents";
         };
         /** OntologyCreate */
         OntologyCreate: {
@@ -1148,12 +1382,18 @@ export interface components {
             description: string | null;
             /** Baseiri */
             baseIri: string;
+            /** Ontologyiri */
+            ontologyIri: string;
             /** Entitytypecount */
             entityTypeCount: number;
             /** Relationtypecount */
             relationTypeCount: number;
             /** Propertycount */
             propertyCount: number;
+            /** Constraintcount */
+            constraintCount: number;
+            /** Axiomcount */
+            axiomCount: number;
             /** Openchangesetcount */
             openChangeSetCount: number;
             /** Activereleaseid */
@@ -1208,7 +1448,7 @@ export interface components {
              * Op
              * @enum {string}
              */
-            op: "create" | "update";
+            op: "create" | "update" | "delete" | "restore";
             /**
              * Mergedat
              * Format: date-time
@@ -1216,6 +1456,22 @@ export interface components {
             mergedAt: string;
             /** Evidence */
             evidence: components["schemas"]["Evidence"][];
+        };
+        /**
+         * RdfValue
+         * @description An RDF value as written: an IRI, or a literal with its exact spelling.
+         *
+         *     `datatype` is an XSD local name (such as "integer") or a full IRI; null for plain text.
+         */
+        RdfValue: {
+            /** Iri */
+            iri?: string | null;
+            /** Lexical */
+            lexical?: string | null;
+            /** Datatype */
+            datatype?: string | null;
+            /** Lang */
+            lang?: string | null;
         };
         /** ReleaseCreate */
         ReleaseCreate: {
@@ -1604,6 +1860,182 @@ export interface operations {
             };
         };
     };
+    import_ontology_api_ontologies_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_import_ontology_api_ontologies_import_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Content Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Invalid request, or the file is not valid Turtle / RDF/XML */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ImportParseProblem"];
+                };
+            };
+        };
+    };
+    import_into_ontology_api_ontologies__id__import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_import_into_ontology_api_ontologies__id__import_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Content Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Invalid request, or the file is not valid Turtle / RDF/XML */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ImportParseProblem"];
+                };
+            };
+        };
+    };
     get_ontology_api_ontologies__id__get: {
         parameters: {
             query?: never;
@@ -1656,8 +2088,9 @@ export interface operations {
     list_elements_api_ontologies__id__elements_get: {
         parameters: {
             query?: {
-                kind?: ("entity_type" | "relation_type" | "property") | null;
+                kind?: ("entity_type" | "relation_type" | "property" | "constraint" | "axiom") | null;
                 q?: string | null;
+                status?: "active" | "deprecated" | "all";
             };
             header?: never;
             path: {

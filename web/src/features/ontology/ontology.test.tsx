@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { elementDetailFixture, elementFixture, ontologyFixture } from '@/test/fixtures';
+import { axiomFixture, elementDetailFixture, elementFixture, ontologyFixture } from '@/test/fixtures';
 import { captureDownloads, mockApi, renderApp, type RouteHandler } from '@/test/utils';
 
 import { displayEdges, layoutGraph } from './graph-layout';
@@ -31,7 +31,29 @@ const temperature = elementFixture({
   unit: '℃',
   required: true,
 });
-const all = [moltenSteel, ladle, holds, temperature];
+const shape = elementFixture({
+  id: 'el-shape',
+  kind: 'constraint',
+  localName: 'MoltenSteelShape',
+  iri: 'https://example.org/ontology/steel#MoltenSteelShape',
+  labelZh: '钢水校验',
+  labelEn: null,
+  definitionZh: null,
+  domainId: 'el-molten-steel',
+  rules: [
+    {
+      pathId: 'el-temperature',
+      minCount: 1,
+      maxCount: null,
+      minInclusive: { iri: null, lexical: '1580', datatype: 'decimal', lang: null },
+      allowedValuesLost: false,
+      message: [{ lang: 'zh', text: '钢水温度不得低于 1580℃' }],
+    },
+  ],
+  origin: 'import',
+});
+const disjoint = axiomFixture({ flags: ['non_standard'] });
+const all = [moltenSteel, ladle, holds, temperature, shape, disjoint];
 
 function ontologyServer(extra: Record<string, RouteHandler> = {}) {
   return mockApi({
@@ -42,7 +64,7 @@ function ontologyServer(extra: Record<string, RouteHandler> = {}) {
       return all.filter(
         (element) =>
           (!kind || element.kind === kind) &&
-          (!q || element.labelZh.includes(q) || element.synonyms.some((synonym) => synonym.text.includes(q))),
+          (!q || (element.labelZh ?? '').includes(q) || element.synonyms.some((synonym) => synonym.text.includes(q))),
       );
     },
     'GET /api/ontologies/:id/elements/:elementId': ({ params }) => {
@@ -118,6 +140,52 @@ describe('ontology list view', () => {
     // Related elements open in the same panel.
     await user.click(within(sheet).getByRole('button', { name: '温度' }));
     expect(await screen.findByRole('dialog', { name: '温度' })).toHaveTextContent('℃');
+  });
+});
+
+describe('constraints and axioms', () => {
+  it('lists axioms by their Turtle and opens the full fragment with its subject and rewrite warning', async () => {
+    const user = userEvent.setup();
+    const api = ontologyServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const table = await screen.findByRole('table', { name: '本体元素' });
+    await user.click(screen.getByRole('radio', { name: '高级公理' }));
+    await waitFor(() => expect(within(table).getAllByRole('row')).toHaveLength(2));
+    expect(api.requests.some((request) => request.path.endsWith('/elements') && request.query.get('kind') === 'axiom')).toBe(true);
+    expect(within(table).getByText('所属：钢水')).toBeInTheDocument();
+
+    await user.click(within(table).getByRole('button', { name: 'steel:MoltenSteel owl:disjointWith steel:Slag .' }));
+    const sheet = await screen.findByRole('dialog', { name: '高级公理' });
+    expect(sheet.querySelector('pre')).toHaveTextContent('steel:MoltenSteel owl:disjointWith steel:Slag .');
+    expect(within(sheet).getByRole('button', { name: '非标准写法' })).toHaveAccessibleDescription('在 Protégé 中打开时会改写这条公理。');
+
+    // The subject opens in the same panel and lists the axiom among its related axioms.
+    await user.click(within(sheet).getByRole('button', { name: '钢水' }));
+    const subject = await screen.findByRole('dialog', { name: '钢水' });
+    expect(within(subject).getByRole('button', { name: 'steel:MoltenSteel owl:disjointWith steel:Slag .' })).toBeInTheDocument();
+  });
+
+  it('shows a constraint with its target type, IRI and rule table', async () => {
+    const user = userEvent.setup();
+    ontologyServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const table = await screen.findByRole('table', { name: '本体元素' });
+    await user.click(screen.getByRole('radio', { name: '约束' }));
+    await waitFor(() => expect(within(table).getAllByRole('row')).toHaveLength(2));
+    expect(within(table).getByText('目标类型：钢水')).toBeInTheDocument();
+
+    await user.click(within(table).getByRole('button', { name: '钢水校验' }));
+    const sheet = await screen.findByRole('dialog', { name: '钢水校验' });
+    expect(within(sheet).getByText('https://example.org/ontology/steel#MoltenSteelShape')).toBeInTheDocument();
+    const rules = within(sheet).getByRole('table', { name: '约束规则' });
+    const [, row] = within(rules).getAllByRole('row');
+    expect(row).toHaveTextContent('温度');
+    expect(row).toHaveTextContent('至少 1 个');
+    expect(row).toHaveTextContent('≥ 1580');
+    expect(row).toHaveTextContent('钢水温度不得低于 1580℃');
+    expect(within(sheet).getByRole('button', { name: '钢水' })).toBeInTheDocument();
   });
 });
 
@@ -225,7 +293,8 @@ describe('ontology graph view', () => {
     });
     renderApp('/ontology?ontology=onto-steel');
 
-    await user.click(await screen.findByRole('button', { name: '导出 Turtle' }));
+    await user.click(await screen.findByRole('button', { name: '更多操作' }));
+    await user.click(await screen.findByRole('menuitem', { name: '导出 Turtle' }));
 
     await waitFor(() => expect(downloads.names).toEqual(['steel.ttl']));
     expect(api.calls('GET', '/api/ontologies/onto-steel/export')[0]?.query.get('format')).toBe('turtle');
