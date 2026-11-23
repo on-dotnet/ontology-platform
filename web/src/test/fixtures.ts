@@ -1,5 +1,5 @@
 import type { DocumentInfo } from '@/features/documents/api';
-import type { Element, ElementDetail, OntologySummary } from '@/features/ontologies/api';
+import type { Element, ElementDetail, ImportResult, OntologySummary } from '@/features/ontologies/api';
 import type { ReleaseSummary } from '@/features/releases/api';
 import { countDecisions, type ChangeItem, type ChangeSetDetail } from '@/features/review/api';
 
@@ -14,9 +14,12 @@ export function ontologyFixture(overrides: Partial<OntologySummary> = {}): Ontol
     name: '钢铁冶金',
     description: null,
     baseIri: 'https://example.org/ontology/steel#',
+    ontologyIri: 'https://example.org/ontology/steel',
     entityTypeCount: 2,
     relationTypeCount: 1,
     propertyCount: 1,
+    constraintCount: 0,
+    axiomCount: 0,
     openChangeSetCount: 0,
     activeReleaseId: null,
     activeReleaseVersion: null,
@@ -54,6 +57,7 @@ export function elementFixture(overrides: Partial<Element> = {}): Element {
     kind: 'entity_type',
     localName: 'MoltenSteel',
     iri: 'https://example.org/ontology/steel#MoltenSteel',
+    explicitIri: false,
     labelZh: '钢水',
     labelEn: 'Molten steel',
     definitionZh: '转炉冶炼得到的液态钢。',
@@ -62,15 +66,49 @@ export function elementFixture(overrides: Partial<Element> = {}): Element {
     parentId: null,
     domainId: null,
     rangeId: null,
+    inverseId: null,
     datatype: null,
     unit: null,
     required: false,
     multiple: false,
+    autoShape: true,
+    rules: null,
+    turtle: null,
+    subjectId: null,
+    flags: [],
     status: 'active',
     origin: 'ai',
     revision: 1,
     createdAt: CREATED_AT,
     updatedAt: CREATED_AT,
+    ...overrides,
+  };
+}
+
+/** An axiom: no names or IRI, only its Turtle and the element it belongs to. */
+export function axiomFixture(overrides: Partial<Element> = {}): Element {
+  return elementFixture({
+    id: 'el-axiom-disjoint',
+    kind: 'axiom',
+    localName: null,
+    iri: null,
+    labelZh: null,
+    labelEn: null,
+    definitionZh: null,
+    autoShape: false,
+    turtle: 'steel:MoltenSteel owl:disjointWith steel:Slag .',
+    subjectId: 'el-molten-steel',
+    origin: 'import',
+    ...overrides,
+  });
+}
+
+export function importResultFixture(overrides: Partial<ImportResult> = {}): ImportResult {
+  return {
+    ontology: ontologyFixture(),
+    changeSetId: 'cs-import',
+    counts: { create: 12, update: 2, delete: 1, restore: 0 },
+    warnings: [],
     ...overrides,
   };
 }

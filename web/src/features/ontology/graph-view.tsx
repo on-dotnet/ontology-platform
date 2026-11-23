@@ -24,7 +24,7 @@ import { useTheme } from '@/theme/theme-provider';
 
 import { layoutGraph, NODE_HEIGHT, NODE_WIDTH, type GraphData } from './graph-layout';
 
-type EntityNodeData = { label: string; localName: string; propertyCount: number };
+type EntityNodeData = { label: string; localName: string | null; propertyCount: number };
 type EntityNode = Node<EntityNodeData, 'entityType'>;
 
 /** An object type card. Handles are invisible: the graph is read-only. */

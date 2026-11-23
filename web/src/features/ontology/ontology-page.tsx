@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { Download, List, Network, Workflow } from 'lucide-react';
+import { Download, Ellipsis, FilePlus, FileUp, List, Network, Workflow } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -10,10 +10,20 @@ import { EmptyState } from '@/components/states/empty-state';
 import { QueryState } from '@/components/states/query-state';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip } from '@/components/ui/tooltip';
 import { usePermissions } from '@/features/auth/permissions';
 import { exportOntologyTurtle, useGraph, type OntologySummary } from '@/features/ontologies/api';
+import { CreateOntologyDialog, type CreateMethod } from '@/features/ontologies/create-ontology-dialog';
+import { ImportOwlDialog } from '@/features/ontologies/import-owl';
 import { OntologySelector } from '@/features/ontologies/ontology-selector';
 import { useSelectedOntology } from '@/features/ontologies/use-selected-ontology';
 import { useErrorMessage } from '@/i18n/error-message';
@@ -39,6 +49,14 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
   const { canUpload } = usePermissions();
   const { query, ontologies, selected } = useSelectedOntology(ontologyId);
   const [elementId, setElementId] = useState<string | null>(null);
+  // Which create method the "new ontology" dialog opens with; null while it is closed.
+  const [creating, setCreating] = useState<CreateMethod | null>(null);
+  const [importing, setImporting] = useState(false);
+
+  const switchOntology = (id: string) => {
+    setElementId(null);
+    onOntologyChange(id);
+  };
 
   const exportTurtle = useMutation({
     mutationFn: (ontology: OntologySummary) => exportOntologyTurtle(ontology.id).then((text) => ({ ontology, text })),
@@ -49,6 +67,8 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
     onError: (error) => toast.error(t('ontologyPage.exportFailed'), message(error)),
   });
 
+  const moreLabel = t('ontologyPage.moreActions');
+
   return (
     <>
       <PageHeader
@@ -57,14 +77,7 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
         actions={
           selected && ontologies ? (
             <>
-              <OntologySelector
-                ontologies={ontologies}
-                value={selected.id}
-                onValueChange={(id) => {
-                  setElementId(null);
-                  onOntologyChange(id);
-                }}
-              />
+              <OntologySelector ontologies={ontologies} value={selected.id} onValueChange={switchOntology} />
               <SegmentedControl
                 legend={t('ontologyPage.viewLabel')}
                 hideLegend
@@ -75,10 +88,32 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
                   { value: 'list', label: t('ontologyPage.viewList'), icon: <List aria-hidden /> },
                 ]}
               />
-              <Button variant="secondary" loading={exportTurtle.isPending} onClick={() => exportTurtle.mutate(selected)}>
-                {exportTurtle.isPending ? null : <Download aria-hidden />}
-                {t('ontologyPage.exportTurtle')}
-              </Button>
+              <DropdownMenu>
+                <Tooltip content={moreLabel}>
+                  <DropdownMenuTrigger aria-label={moreLabel} className={buttonVariants({ variant: 'secondary', size: 'icon' })}>
+                    <Ellipsis aria-hidden />
+                  </DropdownMenuTrigger>
+                </Tooltip>
+                <DropdownMenuContent className="min-w-52">
+                  {canUpload ? (
+                    <>
+                      <DropdownMenuItem onClick={() => setCreating('blank')}>
+                        <FilePlus aria-hidden />
+                        {t('ontologyPage.newOntology')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setImporting(true)}>
+                        <FileUp aria-hidden />
+                        {t('ontologyPage.importOwl')}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  ) : null}
+                  <DropdownMenuItem disabled={exportTurtle.isPending} onClick={() => exportTurtle.mutate(selected)}>
+                    <Download aria-hidden />
+                    {t('ontologyPage.exportTurtle')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           ) : null
         }
@@ -95,9 +130,15 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
                 description={t('ontologyPage.noOntologyDescription')}
                 action={
                   canUpload ? (
-                    <Link to="/documents" className={buttonVariants({ variant: 'primary' })}>
-                      {t('documents.upload')}
-                    </Link>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      <Link to="/documents" className={buttonVariants({ variant: 'primary' })}>
+                        {t('documents.upload')}
+                      </Link>
+                      <Button variant="secondary" onClick={() => setCreating('import')}>
+                        <FileUp aria-hidden />
+                        {t('ontologyPage.importOwlFile')}
+                      </Button>
+                    </div>
                   ) : undefined
                 }
               />
@@ -115,6 +156,26 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
           )
         }
       </QueryState>
+
+      {canUpload ? (
+        <>
+          <CreateOntologyDialog
+            open={creating !== null}
+            onOpenChange={(open) => {
+              if (!open) setCreating(null);
+            }}
+            allowImport
+            initialMethod={creating ?? 'blank'}
+            onCreated={(ontology) => {
+              setCreating(null);
+              toast.success(t('ontologyPage.created', { name: ontology.name }));
+              switchOntology(ontology.id);
+            }}
+            onImported={(result) => switchOntology(result.ontology.id)}
+          />
+          {selected ? <ImportOwlDialog ontology={selected} open={importing} onOpenChange={setImporting} /> : null}
+        </>
+      ) : null}
     </>
   );
 }
@@ -125,6 +186,8 @@ function OntologyStats({ ontology }: { ontology: OntologySummary }) {
     { key: 'entityTypes', value: ontology.entityTypeCount, className: 'bg-primary-soft text-primary-strong' },
     { key: 'relationTypes', value: ontology.relationTypeCount, className: 'bg-secondary-soft text-secondary-strong' },
     { key: 'properties', value: ontology.propertyCount, className: 'bg-success-soft text-success-strong' },
+    { key: 'constraints', value: ontology.constraintCount, className: 'bg-muted text-muted-foreground' },
+    { key: 'axioms', value: ontology.axiomCount, className: 'bg-muted text-muted-foreground' },
   ] as const;
   return (
     <dl className="flex flex-wrap gap-3 text-sm">

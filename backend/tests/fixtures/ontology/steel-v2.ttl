@@ -22,27 +22,43 @@ skos:altLabel a owl:AnnotationProperty .
 
 skos:definition a owl:AnnotationProperty .
 
+sh:NodeShape a owl:Class .
+
+sh:class a owl:AnnotationProperty .
+
+sh:datatype a owl:AnnotationProperty .
+
+sh:maxCount a owl:AnnotationProperty .
+
+sh:minCount a owl:AnnotationProperty .
+
+sh:path a owl:AnnotationProperty .
+
+sh:property a owl:AnnotationProperty .
+
+sh:targetClass a owl:AnnotationProperty .
+
 steel:Converter a owl:Class ;
     rdfs:label "Converter"@en, "转炉"@zh ;
     rdfs:subClassOf steel:Equipment ;
     skos:altLabel "BOF"@en, "氧气转炉"@zh ;
     skos:definition "Basic oxygen furnace."@en, "吹氧炼钢的炉子。"@zh .
 
-steel:Converter-shape a sh:NodeShape ;
+steel:Converter-shape a owl:NamedIndividual, sh:NodeShape ;
     sh:targetClass steel:Converter .
 
 steel:Equipment a owl:Class ;
     rdfs:label "Equipment"@en, "装备"@zh ;
     skos:definition "生产设备。"@zh .
 
-steel:Equipment-shape a sh:NodeShape ;
+steel:Equipment-shape a owl:NamedIndividual, sh:NodeShape ;
     sh:targetClass steel:Equipment .
 
 steel:Heat a owl:Class ;
     rdfs:label "Heat"@en, "炉次"@zh ;
     skos:definition "One \"melt\" of a converter."@en .
 
-steel:Heat-shape a sh:NodeShape ;
+steel:Heat-shape a owl:NamedIndividual, sh:NodeShape ;
     sh:property [
         sh:path steel:heatNumber ;
         sh:datatype xsd:string ;
@@ -64,7 +80,7 @@ steel:Slab a owl:Class ;
     rdfs:label "Slab"@en, "板坯"@zh ;
     skos:definition "连铸产出的\n半成品。"@zh .
 
-steel:Slab-shape a sh:NodeShape ;
+steel:Slab-shape a owl:NamedIndividual, sh:NodeShape ;
     sh:property [
         sh:path steel:castFrom ;
         sh:class steel:Heat

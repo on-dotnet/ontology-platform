@@ -1,0 +1,24 @@
+@prefix ex: <urn:synthetic:metals:> .
+@prefix op: <urn:ontology-platform:vocabulary:> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+# 仅合成示例；通用运行时不含这些行业类。
+ex:Heat a owl:Class ; rdfs:label "炉次"@zh .
+ex:CastingSequence a owl:Class ; rdfs:label "浇次"@zh .
+ex:Slab a owl:Class ; rdfs:label "板坯"@zh .
+ex:RollingEvent a owl:Class ; rdfs:label "轧制事件"@zh .
+ex:Coil a owl:Class ; rdfs:label "钢卷"@zh .
+ex:castIn a owl:ObjectProperty ; rdfs:domain ex:Heat ; rdfs:range ex:CastingSequence ; rdfs:label "对应浇次"@zh .
+ex:producesSlab a owl:ObjectProperty ; rdfs:domain ex:CastingSequence ; rdfs:range ex:Slab ; rdfs:label "产出板坯"@zh .
+ex:rolledIn a owl:ObjectProperty ; rdfs:domain ex:Slab ; rdfs:range ex:RollingEvent ; rdfs:label "参与轧制"@zh .
+ex:producesCoil a owl:ObjectProperty ; rdfs:domain ex:RollingEvent ; rdfs:range ex:Coil ; rdfs:label "产出钢卷"@zh .
+op:externalId a owl:DatatypeProperty ; rdfs:range xsd:string .
+op:organizationId a owl:DatatypeProperty ; rdfs:range xsd:string .
+op:siteId a owl:DatatypeProperty ; rdfs:range xsd:string .
+op:synthetic a owl:DatatypeProperty ; rdfs:range xsd:boolean .
+op:weight a owl:DatatypeProperty ; rdfs:range xsd:decimal .

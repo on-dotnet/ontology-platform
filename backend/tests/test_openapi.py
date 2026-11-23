@@ -38,6 +38,10 @@ M1_PATHS = {
     "/api/ai/status",
     "/api/workbench/summary",
 }
+M2_PATHS = {
+    "/api/ontologies/import",
+    "/api/ontologies/{id}/import",
+}
 
 
 def test_openapi_export_documents_the_api(capsys: pytest.CaptureFixture[str]) -> None:
@@ -45,7 +49,7 @@ def test_openapi_export_documents_the_api(capsys: pytest.CaptureFixture[str]) ->
 
     document = json.loads(capsys.readouterr().out)
 
-    assert set(document["paths"]) == M0_PATHS | M1_PATHS
+    assert set(document["paths"]) == M0_PATHS | M1_PATHS | M2_PATHS
     login_responses = document["paths"]["/api/auth/login"]["post"]["responses"]
     assert "application/problem+json" in login_responses["401"]["content"]
     assert "application/problem+json" in login_responses["422"]["content"]

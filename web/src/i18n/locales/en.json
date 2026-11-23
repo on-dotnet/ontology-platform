@@ -123,7 +123,8 @@
     "actions": {
       "unknown": "made a change",
       "ontology": {
-        "created": "created an ontology"
+        "created": "created an ontology",
+        "imported": "imported an OWL file"
       },
       "document": {
         "uploaded": "uploaded a document"
@@ -168,7 +169,69 @@
       "descriptionLabel": "Description",
       "validationSummary": "Enter an ontology name to create it.",
       "failedTitle": "The ontology was not created",
-      "submit": "Create ontology"
+      "submit": "Create ontology",
+      "standaloneTitle": "New ontology",
+      "standaloneDescription": "Start from a blank ontology, or import an existing OWL file.",
+      "method": "How to create it",
+      "methodBlank": "Blank ontology",
+      "methodImport": "Import an OWL file"
+    },
+    "import": {
+      "file": "OWL file",
+      "fileInputLabel": "Choose an OWL file",
+      "chooseFile": "Choose file",
+      "changeFile": "Choose another file",
+      "fileHint": "Turtle (.ttl) or RDF/XML (.owl, .rdf, .xml), up to {{size}} MB",
+      "fileRequired": "Choose the file to import",
+      "fileTooLarge": "The file is larger than {{size}} MB. Split it and import the parts.",
+      "namePlaceholder": "Leave empty to use the name in the file",
+      "submit": "Import file",
+      "failedTitle": "The file was not imported",
+      "parseErrorLine": "The file has a syntax error on line {{line}}. Fix it and import it again.",
+      "intoTitle": "Import OWL into “{{name}}”",
+      "intoDescription": "The file is compared with the working version. The differences become a change set that takes effect once it is reviewed and merged.",
+      "createdTitle": "Ontology “{{name}}” created",
+      "importedTitle": "File imported",
+      "noDifferenceTitle": "No differences found",
+      "reviewDescription": "The imported content is in a change set. It enters the ontology once it is reviewed and merged.",
+      "nothingToReview": "The file has nothing to review.",
+      "noDifference": "The file has no differences from the working version, so no change set was created.",
+      "countsLabel": "Change items",
+      "counts": {
+        "create": "New",
+        "update": "Changed",
+        "delete": "Deleted",
+        "restore": "Restored"
+      },
+      "warningsLabel": "Things to note",
+      "warnings": {
+        "non_standard": {
+          "label_one": "{{count}} axiom is rewritten by Protégé",
+          "label_other": "{{count}} axioms are rewritten by Protégé",
+          "description": "Protégé rewrites these axioms into equivalent forms when it opens the file. The platform keeps them as written and exports them unchanged."
+        },
+        "multiple_parents": {
+          "label_one": "{{count}} object type has several parent types",
+          "label_other": "{{count}} object types have several parent types",
+          "description": "The form supports one parent type. These parent types are kept as advanced axioms and exported unchanged."
+        },
+        "unsupported_shape": {
+          "label_one": "{{count}} SHACL shape uses features the form does not support",
+          "label_other": "{{count}} SHACL shapes use features the form does not support",
+          "description": "These shapes are kept as advanced axioms, exactly as written, and exported unchanged."
+        },
+        "lost_list": {
+          "label_one": "{{count}} rule lost its allowed values in Protégé",
+          "label_other": "{{count}} rules lost their allowed values in Protégé",
+          "description": "Protégé drops allowed-value lists when it saves a file, and the platform has no values for these rules either. They are exported as they are; add the values after review."
+        },
+        "kind_changed": {
+          "label_one": "{{count}} element changed its kind in the file",
+          "label_other": "{{count}} elements changed their kind in the file",
+          "description": "The platform does not change the kind of an existing element. These elements stay as they are, and references to them in the file were not imported."
+        }
+      },
+      "goReview": "Go to review"
     }
   },
   "upload": {
@@ -250,7 +313,16 @@
   "kinds": {
     "entity_type": "Object types",
     "relation_type": "Relations",
-    "property": "Properties"
+    "property": "Properties",
+    "constraint": "Constraints",
+    "axiom": "Advanced axioms"
+  },
+  "kind": {
+    "entity_type": "Object type",
+    "relation_type": "Relation",
+    "property": "Property",
+    "constraint": "Constraint",
+    "axiom": "Advanced axiom"
   },
   "datatypes": {
     "string": "Text",
@@ -268,7 +340,7 @@
     "tableLabel": "Change sets",
     "columns": {
       "title": "Change set",
-      "source": "Source document",
+      "source": "Source",
       "pending": "Pending",
       "accepted": "Accepted",
       "rejected": "Rejected",
@@ -283,8 +355,8 @@
     "noSource": "Submitted manually",
     "backToList": "Back to change sets",
     "detailTitle": "Change set",
-    "detailInfo": "Accept, edit or reject each AI suggestion. Once everything is decided, merge the accepted items into the working ontology.",
-    "sourceLabel": "Source document:",
+    "detailInfo": "Accept, edit or reject each change in the change set. Once everything is decided, merge the accepted items into the working ontology.",
+    "sourceLabel": "Source:",
     "countsSummary": "{{total}} items · {{pending}} pending · {{accepted}} accepted · {{rejected}} rejected",
     "pendingHint_one": "{{count}} item still undecided",
     "pendingHint_other": "{{count}} items still undecided",
@@ -318,6 +390,10 @@
       "possible_duplicate": {
         "label": "Possible duplicate",
         "description": "This may duplicate an element already in the ontology. Confirm before accepting."
+      },
+      "non_standard": {
+        "label": "Non-standard form",
+        "description": "Protégé rewrites this axiom when it opens the file."
       }
     },
     "decision": {
@@ -327,7 +403,9 @@
     },
     "op": {
       "create": "New",
-      "update": "Update"
+      "update": "Update",
+      "delete": "Delete",
+      "restore": "Restore"
     },
     "edited": "Edited",
     "rationale": "Reason: {{text}}",
@@ -337,12 +415,12 @@
     "editItemNamed": "Edit {{name}}",
     "evidenceCount": "View evidence ({{count}})",
     "evidenceTitle": "Evidence",
-    "noEvidence": "This item has no evidence.",
     "evidenceSwitch": "Choose evidence",
     "evidenceN": "Evidence {{n}}",
     "unknownType": "Unknown object type",
     "before": "Before: ",
     "after": "After: ",
+    "rulesBefore": "Rules before the change",
     "emptyValue": "(empty)",
     "facts": {
       "parent": "Parent: {{name}}",
@@ -352,7 +430,9 @@
       "required": "Required",
       "multiple": "Multiple allowed",
       "pointsTo": "points to",
-      "synonyms": "Synonyms: {{list}}"
+      "synonyms": "Synonyms: {{list}}",
+      "target": "Target: {{name}}",
+      "inverse": "Inverse: {{name}}"
     },
     "fields": {
       "labelZh": "Chinese name",
@@ -370,7 +450,10 @@
       "datatype": "Data type",
       "unit": "Unit",
       "required": "Required",
-      "multiple": "Allow multiple"
+      "multiple": "Allow multiple",
+      "inverseRef": "Inverse relation",
+      "targetRef": "Target type",
+      "autoShape": "Generate validation rules"
     },
     "edit": {
       "title": "Edit {{name}}",
@@ -401,7 +484,28 @@
         "datatypeRequired": "Choose a data type"
       }
     },
-    "readOnly": "Read-only"
+    "readOnly": "Read-only",
+    "source": {
+      "ai_extraction": "Document analysis",
+      "import": "Import",
+      "manual": "Manual",
+      "ai_assistant": "AI assistant"
+    },
+    "acceptAll": "Accept all ({{count}})",
+    "allAccepted": "Items accepted: {{count}}",
+    "currentValue": {
+      "delete": "Deletes:",
+      "restore": "Restores:"
+    },
+    "noEvidenceBySource": {
+      "ai_extraction": "This item has no evidence.",
+      "ai_assistant": "This item has no evidence.",
+      "import": "Imported content has no source text.",
+      "manual": "Manual changes have no source text."
+    },
+    "unknownElement": "Unknown element",
+    "yes": "Yes",
+    "no": "No"
   },
   "ontologyPage": {
     "viewLabel": "View",
@@ -411,13 +515,15 @@
     "exported": "Turtle file exported",
     "exportFailed": "The Turtle file was not exported",
     "noOntologyTitle": "No ontology yet",
-    "noOntologyDescription": "After documents are uploaded and AI suggestions are reviewed, object types, relations and properties appear here.",
+    "noOntologyDescription": "Upload documents or import an OWL file. Once reviewed, object types, relations and properties appear here.",
     "stats": {
       "entityTypes": "Object types",
       "relationTypes": "Relations",
       "properties": "Properties",
       "activeRelease": "Current release",
-      "noRelease": "Not published yet"
+      "noRelease": "Not published yet",
+      "constraints": "Constraints",
+      "axioms": "Advanced axioms"
     },
     "graph": {
       "label": "Ontology graph: {{nodes}} object types, {{edges}} connections",
@@ -446,17 +552,19 @@
       "noMatchTitle": "No matching elements",
       "noMatchDescription": "Try another keyword or remove a filter.",
       "emptyTitle": "The ontology has no elements yet",
-      "emptyDescription": "Once change sets are reviewed and merged, object types, relations and properties are listed here.",
+      "emptyDescription": "Once change sets are reviewed and merged, the elements of the ontology are listed here.",
       "tableLabel": "Ontology elements",
       "columns": {
         "name": "Name",
         "kind": "Kind",
         "localName": "Local name",
         "definition": "Definition"
-      }
+      },
+      "target": "Target: {{name}}",
+      "subject": "Belongs to: {{name}}"
     },
     "detail": {
-      "deprecated": "Deprecated",
+      "deprecated": "Deleted",
       "definition": "Definition",
       "noDefinition": "No definition yet.",
       "synonyms": "Synonyms",
@@ -472,8 +580,22 @@
       "provenance": "Source evidence",
       "noProvenance": "This element did not come from a reviewed change set.",
       "showSource": "Show source",
-      "hideSource": "Hide source"
-    }
+      "hideSource": "Hide source",
+      "iri": "IRI",
+      "unknownElement": "Unknown element",
+      "rules": "Rules",
+      "relatedAxioms": "Related axioms",
+      "noRelatedAxioms": "No related axioms.",
+      "axiomTitle": "Advanced axiom",
+      "turtle": "Turtle",
+      "subject": "Belongs to",
+      "noSubject": "This axiom does not belong to an element."
+    },
+    "moreActions": "More actions",
+    "newOntology": "New ontology",
+    "importOwl": "Import OWL",
+    "importOwlFile": "Import an OWL file",
+    "created": "Ontology “{{name}}” created"
   },
   "releases": {
     "publishNew": "Publish new release",
@@ -546,7 +668,7 @@
       "info": "Review change sets item by item: accept, edit or reject each change. Only approved changes enter the ontology."
     },
     "ontology": {
-      "info": "Browse object types, relations and properties as a graph or a list. Select an element to see its details and source evidence."
+      "info": "Browse object types, relations, properties, constraints and advanced axioms as a graph or a list. Select an element to see its details and where it came from."
     },
     "data": {
       "info": "Connect data sources, browse table catalogs and bind data to the ontology.",
@@ -617,7 +739,8 @@
       "invalid_edit": "The edited values are not valid. Check the names, local name and referenced object types.",
       "stale_target": "the target element changed after the change set was created",
       "dependency_skipped": "an item it refers to was rejected or skipped",
-      "invalid_item": "its content is incomplete or invalid"
+      "invalid_item": "its content is incomplete or invalid",
+      "has_dependents": "other elements still refer to it, so it was not deleted"
     },
     "release": {
       "not_found": "The release does not exist or was deleted.",
@@ -647,6 +770,55 @@
       "422": "Some fields are missing or invalid. Check them and try again.",
       "429": "Too many requests. Try again later.",
       "5xx": "The platform service is temporarily unavailable. Try again later."
+    },
+    "import": {
+      "parse_error": "The file has a syntax error. Fix it and import it again.",
+      "unsupported_format": "This is not a Turtle or RDF/XML file. Save it as .ttl or .owl and import it again.",
+      "too_large": "The file is larger than 5 MB. Split it and import the parts.",
+      "too_many_triples": "The file has more than 50,000 triples. Split it and import the parts.",
+      "empty": "The file has no content. Check it and choose another file.",
+      "axiom_too_large": "One axiom in the file is too long (over two million characters) for the platform to keep. Split it and import again."
+    }
+  },
+  "rules": {
+    "none": "No rules.",
+    "tableLabel": "Constraint rules",
+    "unknownPath": "Unknown property or relation",
+    "columns": {
+      "path": "Property or relation",
+      "count": "Count",
+      "type": "Value type",
+      "values": "Allowed values",
+      "message": "Message"
+    },
+    "countExactly": "exactly {{n}}",
+    "countRange": "{{min}}–{{max}}",
+    "countAtLeast": "at least {{n}}",
+    "countAtMost": "at most {{n}}",
+    "lengthRange": "{{min}}–{{max}} characters",
+    "lengthAtLeast": "at least {{n}} characters",
+    "lengthAtMost": "at most {{n}} characters",
+    "minInclusive": "≥ {{value}}",
+    "minExclusive": "> {{value}}",
+    "maxInclusive": "≤ {{value}}",
+    "maxExclusive": "< {{value}}",
+    "rangeSeparator": ", ",
+    "enumLabel": "One of",
+    "rangeLabel": "Range",
+    "lengthLabel": "Length",
+    "patternLabel": "Pattern",
+    "patternFlags": "(flags {{flags}})",
+    "nodeKinds": {
+      "IRI": "IRI",
+      "Literal": "Literal",
+      "BlankNode": "Blank node",
+      "BlankNodeOrIRI": "Blank node or IRI",
+      "BlankNodeOrLiteral": "Blank node or literal",
+      "IRIOrLiteral": "IRI or literal"
+    },
+    "valuesLost": {
+      "label": "Protégé dropped the allowed values",
+      "description": "Protégé dropped the allowed values of this rule when it saved the file. Check them against the original file."
     }
   }
 }

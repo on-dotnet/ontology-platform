@@ -22,22 +22,25 @@ import { cn } from '@/lib/cn';
 import { DESKTOP_QUERY, useMediaQuery } from '@/lib/use-media-query';
 
 import {
+  acceptsAll,
   changeSetKeys,
   decideItems,
   highConfidencePending,
+  isAiSource,
   mergeChangeSet,
   patchItem,
   replaceItemInCache,
   useChangeSet,
   type ChangeItem,
   type ChangeSetDetail,
+  type ChangeSetSource,
   type Decision,
   type MergeResult,
 } from './api';
 import { ChangeItemCard } from './change-item-card';
 import { ChangeItemEditDialog } from './change-item-edit-dialog';
 import { buildRefContext, itemLabel, type RefContext } from './item-fields';
-import { DocumentName } from './review-list-page';
+import { DocumentName, SourceBadge } from './review-list-page';
 
 function BackToList({ ontologyId }: { ontologyId?: string }) {
   const { t } = useTranslation();
@@ -71,7 +74,8 @@ export function ReviewDetailPage({ changeSetId }: { changeSetId: string }) {
 /** Waits for the ontology's elements, which name the object types items refer to. */
 function ChangeSetLoaded({ changeSet }: { changeSet: ChangeSetDetail }) {
   const { i18n } = useTranslation();
-  const elements = useElements(changeSet.ontologyId);
+  // Deleted elements too: restore items point to them.
+  const elements = useElements(changeSet.ontologyId, { status: 'all' });
   return (
     <QueryState query={elements} loading={<LoadingState variant="detail" />}>
       {(list) => <ChangeSetReview changeSet={changeSet} elements={list} language={i18n.resolvedLanguage ?? i18n.language} />}
@@ -109,9 +113,11 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
 
   const isOpen = changeSet.status === 'open';
   const canDecide = canReview && isOpen;
-  const isAi = changeSet.source !== 'manual';
-  const pendingCount = changeSet.items.filter((item) => item.decision === 'pending').length;
-  const highConfidence = highConfidencePending(changeSet.items);
+  const isAi = isAiSource(changeSet.source);
+  const pending = changeSet.items.filter((item) => item.decision === 'pending');
+  const pendingCount = pending.length;
+  // AI proposals are bulk-accepted only when confident; imports and manual edits as a whole.
+  const bulkItems = acceptsAll(changeSet.source) ? pending : isAi ? highConfidencePending(changeSet.items) : [];
 
   const refreshDetail = () => queryClient.invalidateQueries({ queryKey: changeSetKeys.detail(changeSet.id) });
   const markListStale = () => queryClient.invalidateQueries({ queryKey: [...changeSetKeys.all, 'list'], refetchType: 'none' });
@@ -131,7 +137,7 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
   const bulk = useMutation({
     mutationFn: (itemIds: string[]) => decideItems(changeSet.id, itemIds, 'accepted'),
     onSuccess: async (_, itemIds) => {
-      toast.success(t('review.bulkAccepted', { count: itemIds.length }));
+      toast.success(t(isAi ? 'review.bulkAccepted' : 'review.allAccepted', { count: itemIds.length }));
       await Promise.all([refreshDetail(), markListStale()]);
     },
     onError: (error) => toast.error(t('review.decideFailed'), message(error)),
@@ -166,14 +172,10 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
                   {t('review.pendingHint', { count: pendingCount })}
                 </span>
               ) : null}
-              {highConfidence.length > 0 ? (
-                <Button
-                  variant="secondary"
-                  loading={bulk.isPending}
-                  onClick={() => bulk.mutate(highConfidence.map((item) => item.id))}
-                >
+              {bulkItems.length > 0 ? (
+                <Button variant="secondary" loading={bulk.isPending} onClick={() => bulk.mutate(bulkItems.map((item) => item.id))}>
                   {bulk.isPending ? null : <CheckCheck aria-hidden />}
-                  {t('review.acceptHighConfidence', { count: highConfidence.length })}
+                  {t(isAi ? 'review.acceptHighConfidence' : 'review.acceptAll', { count: bulkItems.length })}
                 </Button>
               ) : null}
               <Button
@@ -209,11 +211,14 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
       />
 
       <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-        <span className="inline-flex min-w-0 items-center gap-1">
+        <span className="inline-flex min-w-0 items-center gap-1.5">
           {t('review.sourceLabel')}
-          <span className="min-w-0 max-w-72 font-medium text-foreground">
-            <DocumentName id={changeSet.documentId} />
-          </span>
+          <SourceBadge source={changeSet.source} />
+          {changeSet.documentId ? (
+            <span className="min-w-0 max-w-72 font-medium text-foreground">
+              <DocumentName id={changeSet.documentId} />
+            </span>
+          ) : null}
         </span>
         <span className="tabular-nums">{t('review.countsSummary', { ...changeSet.counts })}</span>
       </div>
@@ -257,13 +262,15 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
                       onEdit={() => setEditing(item)}
                     />
                     {/* Stacked layout: the evidence opens under the chosen item, not after the whole list. */}
-                    {!wide && item.id === selectedId ? <EvidencePanel id={evidencePanelId} item={item} context={context} inline /> : null}
+                    {!wide && item.id === selectedId ? (
+                      <EvidencePanel id={evidencePanelId} item={item} context={context} source={changeSet.source} inline />
+                    ) : null}
                   </Fragment>
                 ))}
               </section>
             ))}
           </div>
-          {wide && selected ? <EvidencePanel key={selected.id} item={selected} context={context} /> : null}
+          {wide && selected ? <EvidencePanel key={selected.id} item={selected} context={context} source={changeSet.source} /> : null}
         </div>
       )}
 
@@ -289,11 +296,13 @@ interface EvidencePanelProps {
   id?: string;
   item: ChangeItem;
   context: RefContext;
+  /** Explains why there is no source text: imports and manual edits have none. */
+  source: ChangeSetSource;
   /** Opened under the chosen item (stacked layout) rather than beside the list. */
   inline?: boolean;
 }
 
-function EvidencePanel({ id, item, context, inline = false }: EvidencePanelProps) {
+function EvidencePanel({ id, item, context, source, inline = false }: EvidencePanelProps) {
   const { t } = useTranslation();
   const titleId = useId();
   const ref = useRef<HTMLDivElement>(null);
@@ -313,7 +322,7 @@ function EvidencePanel({ id, item, context, inline = false }: EvidencePanelProps
       </CardHeader>
       <CardContent className="space-y-4">
         {item.evidence.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t('review.noEvidence')}</p>
+          <p className="text-sm text-muted-foreground">{t(`review.noEvidenceBySource.${source}`)}</p>
         ) : (
           <>
             {item.evidence.length > 1 ? (

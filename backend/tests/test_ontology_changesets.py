@@ -163,6 +163,7 @@ async def test_create_change_set_stores_items_in_order(
         "definitionEn": None,
         "synonyms": [],
         "parentRef": None,
+        "autoShape": True,
     }
 
 

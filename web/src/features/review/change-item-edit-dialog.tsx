@@ -15,11 +15,11 @@ import { useErrorMessage } from '@/i18n/error-message';
 import { patchItem, type ChangeItem } from './api';
 import {
   editableFields,
-  effectiveFields,
   entityTypeOptions,
   fromEditForm,
   itemLabel,
   refLabel,
+  shownFields,
   toEditForm,
   validateEdit,
   type EditField,
@@ -72,7 +72,10 @@ function EditItemForm({ changeSetId, item, items, context, onSaved }: EditItemFo
   const { t } = useTranslation();
   const message = useErrorMessage();
   const baseId = useId();
-  const [form, setForm] = useState<EditForm>(() => toEditForm(effectiveFields(item), t('common.listSeparator')));
+  const separator = t('common.listSeparator');
+  // An update shows the element's current values under the proposed ones; only differences are sent.
+  const [unedited] = useState<EditForm>(() => toEditForm(shownFields({ ...item, edited: null }), separator));
+  const [form, setForm] = useState<EditForm>(() => toEditForm(shownFields(item), separator));
   const [touched, setTouched] = useState<ReadonlySet<EditField>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const fields = new Set(editableFields(item.kind, item.op));
@@ -80,7 +83,7 @@ function EditItemForm({ changeSetId, item, items, context, onSaved }: EditItemFo
   const errorCount = Object.keys(errors).length;
 
   const mutation = useMutation({
-    mutationFn: () => patchItem(changeSetId, item.id, { edited: fromEditForm(item.kind, item.op, form) }),
+    mutationFn: () => patchItem(changeSetId, item.id, { edited: fromEditForm(item.kind, item.op, form, unedited) }),
     onSuccess: onSaved,
   });
 

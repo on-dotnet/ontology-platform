@@ -1,4 +1,4 @@
-import { Check, Sparkles, X } from 'lucide-react';
+import { Check, FilePlus, PenLine, RotateCcw, Sparkles, Trash2, X, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { WarnTip } from '@/components/feedback/hint-tip';
@@ -6,7 +6,7 @@ import { Badge, type BadgeTone } from '@/components/ui/badge';
 import { Tooltip } from '@/components/ui/tooltip';
 import { formatPercent } from '@/lib/format';
 
-import { confidenceTier, type ConfidenceTier, type Decision, type ItemFlag } from './api';
+import { confidenceTier, type ChangeOp, type ConfidenceTier, type Decision, type ItemFlag } from './api';
 
 /** "✦ AI 建议" in the AI color (ui-guidelines §7). */
 export function AiSuggestionBadge() {
@@ -59,6 +59,25 @@ export function DecisionBadge({ decision }: { decision: Decision }) {
       {decision === 'accepted' ? <Check aria-hidden /> : null}
       {decision === 'rejected' ? <X aria-hidden /> : null}
       {t(`review.decision.${decision}`)}
+    </Badge>
+  );
+}
+
+const opStyle: Record<ChangeOp, { tone: BadgeTone; icon: LucideIcon }> = {
+  create: { tone: 'primary', icon: FilePlus },
+  update: { tone: 'secondary', icon: PenLine },
+  delete: { tone: 'error', icon: Trash2 },
+  restore: { tone: 'success', icon: RotateCcw },
+};
+
+/** What a change item does to the ontology; delete and restore stand out in color and icon. */
+export function OpBadge({ op }: { op: ChangeOp }) {
+  const { t } = useTranslation();
+  const { tone, icon: Icon } = opStyle[op];
+  return (
+    <Badge tone={tone}>
+      <Icon aria-hidden />
+      {t(`review.op.${op}`)}
     </Badge>
   );
 }

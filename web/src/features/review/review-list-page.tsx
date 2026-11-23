@@ -17,7 +17,7 @@ import type { OntologySummary } from '@/features/ontologies/api';
 import { OntologySelector } from '@/features/ontologies/ontology-selector';
 import { useSelectedOntology } from '@/features/ontologies/use-selected-ontology';
 
-import { useChangeSets, type ChangeSetSummary } from './api';
+import { useChangeSets, type ChangeSetSource, type ChangeSetSummary } from './api';
 
 interface ReviewListPageProps {
   ontologyId: string | undefined;
@@ -116,7 +116,14 @@ function ChangeSetTable({ ontology, canUpload }: { ontology: OntologySummary; ca
                       </Link>
                     </TableCell>
                     <TableCell className="max-w-64 text-muted-foreground">
-                      <DocumentName id={changeSet.documentId} />
+                      <div className="flex min-w-0 items-center gap-2">
+                        <SourceBadge source={changeSet.source} />
+                        {changeSet.documentId ? (
+                          <span className="min-w-0">
+                            <DocumentName id={changeSet.documentId} />
+                          </span>
+                        ) : null}
+                      </div>
                     </TableCell>
                     <TableCell numeric className="font-semibold text-warning-strong">
                       {changeSet.counts.pending}
@@ -138,6 +145,19 @@ function ChangeSetTable({ ontology, canUpload }: { ontology: OntologySummary; ca
       }
     </QueryState>
   );
+}
+
+const sourceTone: Record<ChangeSetSource, BadgeTone> = {
+  ai_extraction: 'info',
+  ai_assistant: 'info',
+  import: 'secondary',
+  manual: 'neutral',
+};
+
+/** Where a change set comes from: document analysis, import, manual edits or the AI assistant. */
+export function SourceBadge({ source }: { source: ChangeSetSource }) {
+  const { t } = useTranslation();
+  return <Badge tone={sourceTone[source]}>{t(`review.source.${source}`)}</Badge>;
 }
 
 /** Filename of a change set's source document. */

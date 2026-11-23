@@ -163,6 +163,8 @@ describe('change set review', () => {
     expect(within(card(/板坯/)).getByRole('button', { name: '接受' })).toHaveAttribute('aria-pressed', 'false');
     // No more pending high-confidence items: the shortcut disappears.
     expect(screen.queryByRole('button', { name: /接受全部高置信度项/ })).not.toBeInTheDocument();
+    // AI proposals are never accepted wholesale.
+    expect(screen.queryByRole('button', { name: /^接受全部（/ })).not.toBeInTheDocument();
   });
 
   it('enables merging only after every item is decided and lists skipped items with reasons', async () => {
@@ -299,6 +301,48 @@ describe('change set review', () => {
     expect(within(card(/钢包车/)).getByText('已修改')).toBeInTheDocument();
   });
 
+  it('edits an update starting from the current values and sends only what differs from the proposal', async () => {
+    const user = userEvent.setup();
+    const update = itemFixture({
+      id: 'item-molten',
+      seq: 5,
+      op: 'update',
+      tempRef: null,
+      targetElementId: 'el-molten-steel',
+      proposed: { definitionEn: 'Liquid steel from the converter.' },
+      // An earlier edit by the reviewer: it must survive the next one.
+      edited: { definitionZh: '转炉冶炼得到的钢水。' },
+      before: {
+        localName: 'MoltenSteel',
+        labelZh: '钢水',
+        labelEn: 'Molten steel',
+        definitionZh: '转炉冶炼得到的液态钢。',
+        definitionEn: null,
+        synonyms: [{ lang: 'zh', text: '液态钢' }],
+        parentRef: null,
+      },
+    });
+    const api = reviewServer({ initial: changeSetFixture([...items(), update]) });
+    renderApp('/review/cs-converter');
+
+    await user.click(within(await screen.findByRole('article', { name: /钢水/ })).getByRole('button', { name: '修改“钢水”' }));
+    const dialog = await screen.findByRole('dialog', { name: '修改“钢水”' });
+    expect(within(dialog).getByRole('textbox', { name: '中文名称' })).toHaveValue('钢水');
+    expect(within(dialog).getByRole('textbox', { name: '中文定义' })).toHaveValue('转炉冶炼得到的钢水。');
+    expect(within(dialog).getByRole('textbox', { name: '英文定义' })).toHaveValue('Liquid steel from the converter.');
+    expect(within(dialog).getByRole('textbox', { name: '中文同义词' })).toHaveValue('液态钢');
+
+    const english = within(dialog).getByRole('textbox', { name: '英文名称' });
+    await user.clear(english);
+    await user.type(english, 'Liquid steel');
+    await user.click(within(dialog).getByRole('button', { name: '保存修改' }));
+
+    await waitFor(() => expect(api.calls('PATCH', '/api/change-sets/cs-converter/items/item-molten')).toHaveLength(1));
+    expect(api.calls('PATCH', '/api/change-sets/cs-converter/items/item-molten')[0]?.body).toEqual({
+      edited: { labelEn: 'Liquid steel', definitionZh: '转炉冶炼得到的钢水。' },
+    });
+  });
+
   it('offers existing and new object types as references when editing a relation', async () => {
     const user = userEvent.setup();
     const api = reviewServer();
@@ -365,6 +409,231 @@ describe('change set review', () => {
     expect(screen.queryByRole('button', { name: /接受全部高置信度项/ })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: '只读' })).toHaveAccessibleDescription('你可以查看这个变更集；接受、拒绝和修改需要“审核者”角色。');
     expect(api.calls('PATCH', '/api/change-sets/cs-converter/items/item-ladle')).toHaveLength(0);
+  });
+});
+
+const importedElements = [
+  elementFixture(),
+  elementFixture({ id: 'el-temperature', kind: 'property', localName: 'temperature', labelZh: '温度', labelEn: 'Temperature', domainId: 'el-molten-steel' }),
+  elementFixture({ id: 'el-grade', kind: 'property', localName: 'grade', labelZh: '钢种', labelEn: 'Grade', domainId: 'el-molten-steel' }),
+  elementFixture({ id: 'el-ladle', localName: 'Ladle', labelZh: '钢包', labelEn: 'Ladle' }),
+  elementFixture({ id: 'el-slag', localName: 'Slag', labelZh: '炉渣', labelEn: 'Slag', status: 'deprecated' }),
+  // Imported earlier: an IRI of its own and no names.
+  elementFixture({ id: 'el-heat', localName: 'Heat', iri: 'urn:metals:Heat', explicitIri: true, labelZh: null, labelEn: null, definitionZh: null, origin: 'import' }),
+];
+
+const AXIOM = 'steel:Slab owl:unionOf (\n  steel:HotSlab\n  steel:ColdSlab\n) .';
+
+/** An import change set: no confidence, no evidence; constraints, axioms, deletes and restores. */
+function importItems(): ChangeItem[] {
+  const imported = { confidence: null, rationale: null, evidence: [] };
+  return [
+    itemFixture({
+      ...imported,
+      id: 'item-shape',
+      seq: 1,
+      kind: 'constraint',
+      tempRef: 'new:MoltenSteelShape',
+      proposed: {
+        localName: 'MoltenSteelShape',
+        labelZh: '钢水校验',
+        domainRef: 'el-molten-steel',
+        rules: [
+          {
+            pathRef: 'el-temperature',
+            minCount: 1,
+            maxCount: 1,
+            datatype: 'decimal',
+            minInclusive: { lexical: '1580', datatype: 'decimal' },
+            allowedValuesLost: false,
+            message: [
+              { lang: 'en', text: 'At least 1580 °C' },
+              { lang: 'zh', text: '钢水温度不得低于 1580℃' },
+            ],
+          },
+          { pathRef: 'el-grade', allowedValues: [{ lexical: 'Q235' }, { lexical: 'Q345' }], allowedValuesLost: true, pattern: '^Q[0-9]+$' },
+        ],
+      },
+    }),
+    itemFixture({ ...imported, id: 'item-axiom', seq: 2, kind: 'axiom', tempRef: null, flags: ['non_standard'], proposed: { turtle: AXIOM } }),
+    itemFixture({
+      ...imported,
+      id: 'item-delete',
+      seq: 3,
+      op: 'delete',
+      tempRef: null,
+      targetElementId: 'el-ladle',
+      proposed: {},
+      before: { localName: 'Ladle', labelZh: '钢包', labelEn: 'Ladle', definitionZh: '盛装和运送钢水的容器。', synonyms: [], parentRef: null },
+    }),
+    itemFixture({
+      ...imported,
+      id: 'item-restore',
+      seq: 4,
+      op: 'restore',
+      tempRef: null,
+      targetElementId: 'el-slag',
+      proposed: {},
+      before: { localName: 'Slag', labelZh: '炉渣', labelEn: 'Slag', definitionZh: '浮在钢水表面的熔渣。', synonyms: [], parentRef: null },
+    }),
+    itemFixture({
+      ...imported,
+      id: 'item-ladle-car',
+      seq: 5,
+      tempRef: 'new:LadleCar',
+      proposed: { iri: 'urn:metals:LadleCar', localName: 'LadleCar', labelEn: 'Ladle car' },
+    }),
+    itemFixture({
+      ...imported,
+      id: 'item-heat',
+      seq: 6,
+      op: 'update',
+      tempRef: null,
+      targetElementId: 'el-heat',
+      proposed: { definitionEn: 'One melt of the converter.' },
+      before: { localName: 'Heat', labelZh: null, labelEn: null, definitionZh: null, definitionEn: null, synonyms: [], parentRef: null },
+    }),
+  ];
+}
+
+function importServer(extra: Record<string, RouteHandler> = {}) {
+  return reviewServer({
+    initial: changeSetFixture(importItems(), { id: 'cs-import', title: '导入：steel.ttl', source: 'import', documentId: null }),
+    extra: { 'GET /api/ontologies/:id/elements': () => importedElements, ...extra },
+  });
+}
+
+describe('import change set review', () => {
+  it('shows constraints with their rules, axioms as Turtle, and deletes and restores with the current values', async () => {
+    const api = importServer();
+    renderApp('/review/cs-import');
+
+    const shape = await screen.findByRole('article', { name: /钢水校验/ });
+    expect(screen.getByText('导入', { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /^约束/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /^高级公理/ })).toBeInTheDocument();
+    // Deleted elements are loaded too, so restores name their target.
+    expect(api.requests.some((request) => request.path.endsWith('/elements') && request.query.get('status') === 'all')).toBe(true);
+
+    expect(within(shape).getByText('目标类型：钢水')).toBeInTheDocument();
+    const [, temperature, grade] = within(within(shape).getByRole('table', { name: '约束规则' })).getAllByRole('row');
+    expect(temperature).toHaveTextContent('温度');
+    expect(temperature).toHaveTextContent('恰好 1 个');
+    expect(temperature).toHaveTextContent('小数');
+    expect(temperature).toHaveTextContent('≥ 1580');
+    expect(temperature).toHaveTextContent('钢水温度不得低于 1580℃');
+    expect(temperature).not.toHaveTextContent('At least 1580 °C');
+    expect(grade).toHaveTextContent('钢种');
+    expect(grade).toHaveTextContent('Q235');
+    expect(grade).toHaveTextContent('Q345');
+    expect(grade).toHaveTextContent('^Q[0-9]+$');
+    expect(within(grade as HTMLElement).getByRole('button', { name: 'Protégé 丢掉了枚举取值' })).toBeInTheDocument();
+
+    const axiom = card(/steel:Slab owl:unionOf/);
+    expect(axiom.querySelector('pre')).toHaveTextContent('steel:HotSlab steel:ColdSlab');
+    expect(within(axiom).getByRole('button', { name: '非标准写法' })).toHaveAccessibleDescription('在 Protégé 中打开时会改写这条公理。');
+
+    const removed = card(/^钢包(?!车)/);
+    expect(within(removed).getByText('删除')).toBeInTheDocument();
+    expect(removed).toHaveTextContent('将删除以下内容：');
+    expect(removed).toHaveTextContent('盛装和运送钢水的容器。');
+    const restored = card(/炉渣/);
+    expect(within(restored).getByText('恢复')).toBeInTheDocument();
+    expect(restored).toHaveTextContent('将恢复以下内容：');
+    expect(restored).toHaveTextContent('浮在钢水表面的熔渣。');
+
+    // Without a Chinese name an item is named by its English name, then by its local name.
+    const ladleCar = card(/^Ladle car/);
+    const heat = card(/^Heat/);
+    expect(within(heat).getByText('修改')).toBeInTheDocument();
+
+    // Not AI: no AI label or confidence. Elements with an IRI of their own are accepted or
+    // rejected as they are: the edit form checks the platform's naming rules, not the file's.
+    expect(screen.queryByText('AI 建议')).not.toBeInTheDocument();
+    expect(screen.queryByText(/置信度/)).not.toBeInTheDocument();
+    for (const article of [shape, axiom, removed, restored, ladleCar, heat]) {
+      expect(within(article).queryByRole('button', { name: /^修改“/ })).not.toBeInTheDocument();
+    }
+
+    // The first item has no evidence: the panel says why instead of showing source text.
+    expect(within(screen.getByRole('region', { name: '证据' })).getByText('导入的内容没有资料原文。')).toBeInTheDocument();
+  });
+
+  it('shows what an update replaces: the old rules, the auto shape switch, a deleted one-line axiom', async () => {
+    // A confidence on an imported item must not show: only AI items have one that means anything.
+    const imported = { confidence: 0.8, rationale: null, evidence: [], tempRef: null };
+    const oneLine = 'steel:Slab owl:disjointWith steel:Slag .';
+    reviewServer({
+      initial: changeSetFixture(
+        [
+          itemFixture({
+            ...imported,
+            id: 'item-rules',
+            op: 'update',
+            kind: 'constraint',
+            targetElementId: 'el-shape',
+            proposed: { rules: [{ pathRef: 'el-temperature', minCount: 1, allowedValuesLost: false }] },
+            before: {
+              localName: 'MoltenSteelShape',
+              labelZh: '钢水校验',
+              domainRef: 'el-molten-steel',
+              rules: [{ pathRef: 'el-temperature', minCount: 1, maxCount: 1, allowedValuesLost: false }],
+            },
+          }),
+          itemFixture({
+            ...imported,
+            id: 'item-auto',
+            seq: 2,
+            op: 'update',
+            targetElementId: 'el-ladle',
+            proposed: { autoShape: false },
+            before: { localName: 'Ladle', labelZh: '钢包', labelEn: 'Ladle', synonyms: [], parentRef: null, autoShape: true },
+          }),
+          itemFixture({ ...imported, id: 'item-gone', seq: 3, op: 'delete', kind: 'axiom', targetElementId: 'el-axiom', proposed: {}, before: { turtle: oneLine } }),
+        ],
+        { id: 'cs-import', title: '导入：steel.ttl', source: 'import', documentId: null },
+      ),
+      extra: { 'GET /api/ontologies/:id/elements': () => importedElements },
+    });
+    renderApp('/review/cs-import');
+
+    const rules = await screen.findByRole('article', { name: /钢水校验/ });
+    const [now] = within(rules).getAllByRole('table', { name: '约束规则' });
+    expect(now).toHaveTextContent('至少 1 个');
+    const old = within(rules).getByRole('region', { name: '修改前的规则' });
+    expect(old).toHaveTextContent('恰好 1 个');
+
+    expect(card(/^钢包/)).toHaveTextContent('自动生成校验规则');
+
+    const gone = card(/owl:disjointWith/);
+    expect(gone).toHaveTextContent('将删除以下内容：');
+    expect(gone.querySelector('pre')).toHaveTextContent(oneLine);
+
+    expect(screen.queryByText(/置信度/)).not.toBeInTheDocument();
+  });
+
+  it('accepts every pending item at once and explains a delete skipped for dependents', async () => {
+    const user = userEvent.setup();
+    const api = importServer({
+      'POST /api/change-sets/:id/merge': () => ({ applied: 4, skipped: [{ itemId: 'item-delete', code: 'changeset.has_dependents' }] }),
+    });
+    renderApp('/review/cs-import');
+
+    expect(await screen.findByRole('article', { name: /钢水校验/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /接受全部高置信度项/ })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '接受全部（6）' }));
+
+    await waitFor(() => expect(api.calls('POST', '/api/change-sets/cs-import/decisions')).toHaveLength(1));
+    expect(api.calls('POST', '/api/change-sets/cs-import/decisions')[0]?.body).toEqual({
+      itemIds: ['item-shape', 'item-axiom', 'item-delete', 'item-restore', 'item-ladle-car', 'item-heat'],
+      decision: 'accepted',
+    });
+    await waitFor(() => expect(screen.getByRole('button', { name: '合并到本体' })).toBeEnabled());
+    expect(screen.queryByRole('button', { name: /^接受全部（/ })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '合并到本体' }));
+    const banner = (await screen.findByText('已合并，1 项被跳过')).closest('[role="status"]');
+    expect(banner).toHaveTextContent('钢包：仍有其他元素引用它，没有删除');
   });
 });
 

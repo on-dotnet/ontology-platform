@@ -1,0 +1,39 @@
+@prefix ex: <urn:synthetic:metals:> .
+@prefix op: <urn:ontology-platform:vocabulary:> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+ex:HeatShape a sh:NodeShape ; sh:targetClass ex:Heat ;
+ sh:property [ sh:path op:externalId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:message "缺少或错误业务键"@zh ] ;
+ sh:property [ sh:path op:organizationId ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+ sh:property [ sh:path op:siteId ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+ sh:property [ sh:path op:synthetic ; sh:minCount 1 ; sh:in ( true ) ] .
+ex:CastingSequenceShape a sh:NodeShape ; sh:targetClass ex:CastingSequence ;
+ sh:property [ sh:path op:externalId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:message "缺少或错误业务键"@zh ] ;
+ sh:property [ sh:path op:organizationId ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+ sh:property [ sh:path op:siteId ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+ sh:property [ sh:path op:synthetic ; sh:minCount 1 ; sh:in ( true ) ] .
+ex:SlabShape a sh:NodeShape ; sh:targetClass ex:Slab ;
+ sh:property [ sh:path op:externalId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:message "缺少或错误业务键"@zh ] ;
+ sh:property [ sh:path op:organizationId ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+ sh:property [ sh:path op:siteId ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+ sh:property [ sh:path op:synthetic ; sh:minCount 1 ; sh:in ( true ) ] .
+ex:RollingEventShape a sh:NodeShape ; sh:targetClass ex:RollingEvent ;
+ sh:property [ sh:path op:externalId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:message "缺少或错误业务键"@zh ] ;
+ sh:property [ sh:path op:organizationId ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+ sh:property [ sh:path op:siteId ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+ sh:property [ sh:path op:synthetic ; sh:minCount 1 ; sh:in ( true ) ] .
+ex:CoilShape a sh:NodeShape ; sh:targetClass ex:Coil ;
+ sh:property [ sh:path op:externalId ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:message "缺少或错误业务键"@zh ] ;
+ sh:property [ sh:path op:organizationId ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+ sh:property [ sh:path op:siteId ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+ sh:property [ sh:path op:synthetic ; sh:minCount 1 ; sh:in ( true ) ] .
+ex:HeatShape sh:property [ sh:path ex:castIn ; sh:minCount 1 ; sh:class ex:CastingSequence ; sh:nodeKind sh:IRI ; sh:message "缺少关系或目标类型不符"@zh ] .
+ex:CastingSequenceShape sh:property [ sh:path ex:producesSlab ; sh:minCount 1 ; sh:class ex:Slab ; sh:nodeKind sh:IRI ; sh:message "缺少关系或目标类型不符"@zh ] .
+ex:SlabShape sh:property [ sh:path ex:rolledIn ; sh:minCount 1 ; sh:class ex:RollingEvent ; sh:nodeKind sh:IRI ; sh:message "缺少关系或目标类型不符"@zh ] .
+ex:RollingEventShape sh:property [ sh:path ex:producesCoil ; sh:minCount 1 ; sh:class ex:Coil ; sh:nodeKind sh:IRI ; sh:message "缺少关系或目标类型不符"@zh ] .
+ex:CoilShape sh:property [ sh:path op:weight ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ; sh:maxInclusive 100 ; sh:message "重量必须为0到100的十进制值"@zh ] .

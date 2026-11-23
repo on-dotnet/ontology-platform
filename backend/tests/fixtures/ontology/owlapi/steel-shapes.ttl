@@ -1,0 +1,230 @@
+@prefix ex: <urn:synthetic:metals:> .
+@prefix op: <urn:ontology-platform:vocabulary:> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.w3.org/2002/07/owl#> .
+
+[ rdf:type owl:Ontology
+ ] .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://www.w3.org/ns/shacl#class
+sh:class rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/ns/shacl#datatype
+sh:datatype rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/ns/shacl#in
+sh:in rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/ns/shacl#maxCount
+sh:maxCount rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/ns/shacl#maxInclusive
+sh:maxInclusive rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/ns/shacl#message
+sh:message rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/ns/shacl#minCount
+sh:minCount rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/ns/shacl#minInclusive
+sh:minInclusive rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/ns/shacl#nodeKind
+sh:nodeKind rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/ns/shacl#path
+sh:path rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/ns/shacl#property
+sh:property rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/ns/shacl#targetClass
+sh:targetClass rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.w3.org/ns/shacl#NodeShape
+sh:NodeShape rdf:type owl:Class .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  urn:synthetic:metals:CastingSequenceShape
+ex:CastingSequenceShape rdf:type owl:NamedIndividual ,
+                                 sh:NodeShape ;
+                        sh:property [ sh:in [ ] ;
+                                    sh:minCount 1 ;
+                                    sh:path op:synthetic
+                        ] ,
+[ sh:datatype xsd:string ;
+  sh:minCount 1 ;
+  sh:path op:siteId
+] ,
+[ sh:datatype xsd:string ;
+  sh:minCount 1 ;
+  sh:path op:organizationId
+] ,
+[ sh:class ex:Slab ;
+  sh:message "缺少关系或目标类型不符"@zh ;
+  sh:minCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:path ex:producesSlab
+] ,
+[ sh:datatype xsd:string ;
+  sh:maxCount 1 ;
+  sh:message "缺少或错误业务键"@zh ;
+  sh:minCount 1 ;
+  sh:path op:externalId
+] ;
+sh:targetClass ex:CastingSequence .
+
+
+###  urn:synthetic:metals:CoilShape
+ex:CoilShape rdf:type owl:NamedIndividual ,
+                      sh:NodeShape ;
+             sh:property [ sh:in [ ] ;
+                         sh:minCount 1 ;
+                         sh:path op:synthetic
+             ] ,
+[ sh:datatype xsd:string ;
+  sh:minCount 1 ;
+  sh:path op:siteId
+] ,
+[ sh:datatype xsd:string ;
+  sh:minCount 1 ;
+  sh:path op:organizationId
+] ,
+[ sh:datatype xsd:string ;
+  sh:maxCount 1 ;
+  sh:message "缺少或错误业务键"@zh ;
+  sh:minCount 1 ;
+  sh:path op:externalId
+] ,
+[ sh:datatype xsd:decimal ;
+  sh:maxInclusive 100 ;
+  sh:message "重量必须为0到100的十进制值"@zh ;
+  sh:minCount 1 ;
+  sh:minInclusive 0 ;
+  sh:path op:weight
+] ;
+sh:targetClass ex:Coil .
+
+
+###  urn:synthetic:metals:HeatShape
+ex:HeatShape rdf:type owl:NamedIndividual ,
+                      sh:NodeShape ;
+             sh:property [ sh:datatype xsd:string ;
+                           sh:minCount 1 ;
+                           sh:path op:organizationId
+                         ] ,
+                         [ sh:datatype xsd:string ;
+                           sh:maxCount 1 ;
+                           sh:message "缺少或错误业务键"@zh ;
+                           sh:minCount 1 ;
+                           sh:path op:externalId
+                         ] ,
+                         [ sh:in [ ] ;
+                         sh:minCount 1 ;
+                         sh:path op:synthetic
+             ] ,
+[ sh:class ex:CastingSequence ;
+  sh:message "缺少关系或目标类型不符"@zh ;
+  sh:minCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:path ex:castIn
+] ,
+[ sh:datatype xsd:string ;
+  sh:minCount 1 ;
+  sh:path op:siteId
+] ;
+sh:targetClass ex:Heat .
+
+
+###  urn:synthetic:metals:RollingEventShape
+ex:RollingEventShape rdf:type owl:NamedIndividual ,
+                              sh:NodeShape ;
+                     sh:property [ sh:datatype xsd:string ;
+                                   sh:maxCount 1 ;
+                                   sh:message "缺少或错误业务键"@zh ;
+                                   sh:minCount 1 ;
+                                   sh:path op:externalId
+                                 ] ,
+                                 [ sh:in [ ] ;
+                                 sh:minCount 1 ;
+                                 sh:path op:synthetic
+                     ] ,
+[ sh:datatype xsd:string ;
+  sh:minCount 1 ;
+  sh:path op:siteId
+] ,
+[ sh:class ex:Coil ;
+  sh:message "缺少关系或目标类型不符"@zh ;
+  sh:minCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:path ex:producesCoil
+] ,
+[ sh:datatype xsd:string ;
+  sh:minCount 1 ;
+  sh:path op:organizationId
+] ;
+sh:targetClass ex:RollingEvent .
+
+
+###  urn:synthetic:metals:SlabShape
+ex:SlabShape rdf:type owl:NamedIndividual ,
+                      sh:NodeShape ;
+             sh:property [ sh:datatype xsd:string ;
+                           sh:minCount 1 ;
+                           sh:path op:siteId
+                         ] ,
+                         [ sh:datatype xsd:string ;
+                           sh:minCount 1 ;
+                           sh:path op:organizationId
+                         ] ,
+                         [ sh:datatype xsd:string ;
+                           sh:maxCount 1 ;
+                           sh:message "缺少或错误业务键"@zh ;
+                           sh:minCount 1 ;
+                           sh:path op:externalId
+                         ] ,
+                         [ sh:in [ ] ;
+                         sh:minCount 1 ;
+                         sh:path op:synthetic
+             ] ,
+[ sh:class ex:RollingEvent ;
+  sh:message "缺少关系或目标类型不符"@zh ;
+  sh:minCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:path ex:rolledIn
+] ;
+sh:targetClass ex:Slab .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi

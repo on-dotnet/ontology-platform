@@ -49,8 +49,10 @@ def known_element(element: Element) -> KnownElement:
     return KnownElement(
         id=element.id,
         kind=cast(Kind, element.kind),  # the column is constrained to these values
-        local_name=element.local_name,
-        label_zh=element.label_zh,
+        # Alignment elements are never axioms, so they have a local name; imported ones may
+        # lack a Chinese label and are matched by the name the platform shows instead.
+        local_name=element.local_name or "",
+        label_zh=element.label_zh or element.label_en or element.local_name or "",
         label_en=element.label_en,
         synonyms=tuple(item["text"] for item in element.synonyms),
         definition_zh=element.definition_zh,
