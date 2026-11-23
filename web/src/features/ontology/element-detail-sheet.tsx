@@ -132,7 +132,7 @@ function ElementDetailContent({ element, related, onSelect }: ElementDetailConte
     <div className="space-y-4">
       <div className="space-y-1.5">
         <div className="flex flex-wrap items-center gap-1.5">
-          <Badge tone={kindTone[element.kind]}>{t(`kinds.${element.kind}`)}</Badge>
+          <Badge tone={kindTone[element.kind]}>{t(`kind.${element.kind}`)}</Badge>
           {element.status === 'deprecated' ? <Badge tone="warning">{t('ontologyPage.detail.deprecated')}</Badge> : null}
           {element.flags.includes('non_standard') ? (
             <WarnTip label={t('review.flags.non_standard.label')}>{t('review.flags.non_standard.description')}</WarnTip>

@@ -127,7 +127,7 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
                       <NameCell element={element} language={language} nameOf={nameOf} onSelect={onSelect} />
                     </TableCell>
                     <TableCell>
-                      <Badge tone={kindTone[element.kind]}>{t(`kinds.${element.kind}`)}</Badge>
+                      <Badge tone={kindTone[element.kind]}>{t(`kind.${element.kind}`)}</Badge>
                     </TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground">{element.localName ?? '—'}</TableCell>
                     <TableCell className="max-w-md">
