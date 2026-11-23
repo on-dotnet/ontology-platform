@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { WarnTip } from '@/components/feedback/hint-tip';
@@ -92,7 +93,7 @@ export function ConstraintRules({ rules, nameOf, className }: ConstraintRulesPro
                 <td className="px-3 py-2 text-foreground">
                   <RuleTypes datatype={rule.datatype} className={classRef ? (nameOf(classRef) ?? t('review.unknownType')) : null} nodeKind={rule.nodeKind} />
                 </td>
-                <td className="px-3 py-2 text-foreground">
+                <td className="min-w-40 px-3 py-2 text-foreground">
                   <RuleValues rule={rule} />
                 </td>
                 <td className="min-w-32 px-3 py-2 text-muted-foreground">{message ?? '—'}</td>
@@ -163,7 +164,7 @@ function RuleValues({ rule }: { rule: AnyRule }) {
     <dl className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1">
       {hasValues ? (
         <>
-          <dt className="text-xs text-muted-foreground">{t('rules.enumLabel')}</dt>
+          <dt className="whitespace-nowrap text-xs text-muted-foreground">{t('rules.enumLabel')}</dt>
           <dd className="flex min-w-0 flex-wrap items-center gap-1">
             {values.map((value, index) => (
               <code key={index} className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs" title={value.iri ?? undefined}>
@@ -176,19 +177,26 @@ function RuleValues({ rule }: { rule: AnyRule }) {
       ) : null}
       {range.length > 0 ? (
         <>
-          <dt className="text-xs text-muted-foreground">{t('rules.rangeLabel')}</dt>
-          <dd className="tabular-nums">{range.join(t('rules.rangeSeparator'))}</dd>
+          <dt className="whitespace-nowrap text-xs text-muted-foreground">{t('rules.rangeLabel')}</dt>
+          <dd className="tabular-nums">
+            {range.map((part, index) => (
+              <Fragment key={index}>
+                {index > 0 ? t('rules.rangeSeparator') : null}
+                <span className="whitespace-nowrap">{part}</span>
+              </Fragment>
+            ))}
+          </dd>
         </>
       ) : null}
       {length ? (
         <>
-          <dt className="text-xs text-muted-foreground">{t('rules.lengthLabel')}</dt>
+          <dt className="whitespace-nowrap text-xs text-muted-foreground">{t('rules.lengthLabel')}</dt>
           <dd>{length}</dd>
         </>
       ) : null}
       {rule.pattern ? (
         <>
-          <dt className="text-xs text-muted-foreground">{t('rules.patternLabel')}</dt>
+          <dt className="whitespace-nowrap text-xs text-muted-foreground">{t('rules.patternLabel')}</dt>
           <dd className="min-w-0 break-all font-mono text-xs">
             {rule.pattern}
             {rule.flags ? <span className="ml-1 text-muted-foreground">{t('rules.patternFlags', { flags: rule.flags })}</span> : null}

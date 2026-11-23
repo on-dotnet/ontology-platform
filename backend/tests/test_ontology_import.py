@@ -143,6 +143,45 @@ async def test_importing_the_steel_case(client: AsyncClient, db: AsyncSession) -
     assert lost(STEEL, exported) == []
 
 
+async def test_a_new_ontology_names_its_namespace_as_the_file_does(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    result = await import_and_merge(client, STEEL, filename="steel.ttl")
+    ontology_id = result["ontology"]["id"]
+    key = result["ontology"]["key"]
+
+    exported = await export(client, ontology_id)
+    assert "@prefix ex: <urn:synthetic:metals:> ." in exported
+    assert f"@prefix {key}:" not in exported
+    axioms = await client.get(f"/api/ontologies/{ontology_id}/elements", params={"kind": "axiom"})
+    assert all(a["turtle"].startswith("ex:") for a in axioms.json()), axioms.json()
+
+    # The name a namespace has stays: fragments stored earlier are written with it.
+    renamed = STEEL.replace(b"ex:", b"m:")
+    assert b"ex:" not in renamed
+    again = await upload(client, renamed, ontology_id=ontology_id)
+    assert again.json()["changeSetId"] is None
+    assert await export(client, ontology_id) == exported
+
+
+async def test_an_ontology_made_by_hand_keeps_its_own_prefix(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    ontology = await add_ontology(db, key="plant")
+    base = ontology.base_iri.encode()
+    data = b"@prefix p: <" + base + b"> . @prefix owl: <http://www.w3.org/2002/07/owl#> .\n"
+    data += b"p:Mill a owl:Class .\n"
+
+    response = await upload(client, data, ontology_id=ontology.id)
+    await accept_and_merge(client, response.json()["changeSetId"])
+
+    exported = await export(client, str(ontology.id))
+    assert f"@prefix plant: <{ontology.base_iri}> ." in exported
+    assert "@prefix p:" not in exported
+
+
 async def all_elements(client: AsyncClient, result: dict[str, Any]) -> list[dict[str, Any]]:
     response = await client.get(f"/api/ontologies/{result['ontology']['id']}/elements")
     elements: list[dict[str, Any]] = response.json()

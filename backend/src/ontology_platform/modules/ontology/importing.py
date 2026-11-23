@@ -34,6 +34,7 @@ from ontology_platform.modules.ontology.rdf.diff import (
 )
 from ontology_platform.modules.ontology.rdf.model import ElementState, OntologyState
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError
+from ontology_platform.modules.ontology.rdf.vocab import FIXED_PREFIXES
 from ontology_platform.modules.ontology.turtle import OntologyHeader, rule_fields, to_state
 
 MAX_BYTES = reader.MAX_BYTES
@@ -82,13 +83,19 @@ def _parse(data: bytes) -> Any:
         raise AppError(_STATUS[error.code], error.code, error.detail) from error
 
 
-def _merged_prefixes(header: OntologyHeader, incoming: Mapping[str, str]) -> dict[str, str]:
+def _merged_prefixes(
+    header: OntologyHeader,
+    incoming: Mapping[str, str],
+    *,
+    new: bool = False,
+) -> dict[str, str]:
     """Stored prefixes plus new ones. A namespace keeps the one name it already has, so that
-    axiom fragments written earlier always parse with the export's prefixes."""
+    axiom fragments written earlier always parse with the export's prefixes; only a `new`
+    ontology, which has no fragments yet, takes the file's name for its own namespace."""
     stored = dict(header.prefixes)
-    current = header.prefix_map()
+    current = FIXED_PREFIXES if new else header.prefix_map()
     names, namespaces = set(current), set(current.values())
-    for name, namespace in sorted(incoming.items()):
+    for name, namespace in sorted(incoming.items(), key=writer.prefix_order):
         if not writer.valid_prefix_name(name) or name in names or namespace in namespaces:
             continue
         stored[name] = namespace
@@ -339,7 +346,7 @@ async def import_new(
             ontology_iri=header.ontology_iri,
             known=known,
         )
-    ontology.prefixes = _merged_prefixes(header, result.prefixes)
+    ontology.prefixes = _merged_prefixes(header, result.prefixes, new=True)
     db.add(ontology)
     try:
         await db.flush()

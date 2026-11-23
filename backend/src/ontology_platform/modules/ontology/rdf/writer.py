@@ -75,15 +75,31 @@ def valid_prefix_name(name: str) -> bool:
     return name == "" or (name not in _RESERVED_PREFIXES and bool(_PREFIX_NAME.fullmatch(name)))
 
 
+def prefix_order(item: tuple[str, str]) -> tuple[bool, str]:
+    """Named prefixes before the empty one, then by name: which name a namespace gets when a
+    file gives it several."""
+    return (item[0] == "", item[0])
+
+
 def prefix_map(key: str, base_iri: str, extra: Mapping[str, str]) -> dict[str, str]:
     """The prefixes an export uses: fixed ones, the ontology's own, then imported ones that clash
-    with neither (a clash would change what an existing prefix means)."""
+    with neither (a clash would change what an existing prefix means).
+
+    The ontology's own namespace is named after its key, unless the stored prefixes name it
+    (an ontology imported from a file keeps the file's name for it).
+    """
     prefixes = dict(FIXED_PREFIXES)
-    own = own_prefix(key)
-    if own not in prefixes and base_iri not in prefixes.values():
-        prefixes[own] = base_iri
+    if base_iri not in prefixes.values():
+        named = [
+            name
+            for name, namespace in sorted(extra.items(), key=prefix_order)
+            if namespace == base_iri and valid_prefix_name(name)
+        ]
+        own = named[0] if named else own_prefix(key)
+        if own not in prefixes:
+            prefixes[own] = base_iri
     taken = set(prefixes.values())
-    for name, namespace in sorted(extra.items()):
+    for name, namespace in sorted(extra.items(), key=prefix_order):
         if name in prefixes or namespace in taken or not valid_prefix_name(name):
             continue
         prefixes[name] = namespace
