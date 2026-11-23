@@ -1252,6 +1252,10 @@ def release_problems(elements: Sequence[Element]) -> list[schemas.ReleaseProblem
     def report(code: str, element: Element, message: str) -> None:
         problems.append(schemas.ReleaseProblem(code=code, element_id=element.id, message=message))
 
+    if not active:
+        message = "The working version has no elements yet"
+        return [schemas.ReleaseProblem(code="release.empty", element_id=None, message=message)]
+
     def active_type(element_id: UUID | None) -> bool:
         target = by_id.get(element_id) if element_id is not None else None
         return target is not None and target.kind == "entity_type" and target.status == "active"

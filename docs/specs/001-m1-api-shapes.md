@@ -111,5 +111,5 @@ type WorkbenchSummary = {
 - 资料没识别出任何内容时状态为 `ready`、`changeSetId` 为 null。
 - 拒绝整个变更集返回 `ChangeSetSummary`；批量决定返回 `ChangeSetDetail`；`GET /api/releases/{id}` 返回 `ReleaseSummary`。变更项不属于该变更集时返回 `changeset.not_found`。
 - 变更集响应里的 `proposed` / `edited` 只包含设置过的键；OpenAPI 中这些键生成为 `T | null`。
-- `ReleaseProblem.code`：`release.cyclic_hierarchy`、`release.invalid_parent`、`release.invalid_domain`、`release.invalid_range`、`release.invalid_datatype`、`release.invalid_local_name`、`release.missing_label`。
+- `ReleaseProblem.code`：`release.empty`（工作版本没有任何元素，`elementId` 为 null）、`release.cyclic_hierarchy`、`release.invalid_parent`、`release.invalid_domain`、`release.invalid_range`、`release.invalid_datatype`、`release.invalid_local_name`、`release.missing_label`。
 - 工作台 `recentActivity` 最多 10 条，只含 `ontology.*`、`document.*`、`changeset.*`、`release.*`；登录类事件只留在审计日志里。

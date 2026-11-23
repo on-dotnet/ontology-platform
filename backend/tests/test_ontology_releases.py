@@ -240,3 +240,16 @@ async def test_empty_title_is_rejected(client: AsyncClient, db: AsyncSession) ->
     assert response.status_code == 422
     assert response.json()["code"] == "validation.failed"
     assert await release_rows(db) == 0
+
+
+async def test_an_empty_ontology_cannot_be_published(client: AsyncClient, db: AsyncSession) -> None:
+    steel = await add_ontology(db)
+    await sign_in(client, db, Role.REVIEWER)
+
+    response = await publish(client, steel)
+
+    assert response.status_code == 422
+    body = response.json()
+    assert body["code"] == "release.invalid"
+    assert [(p["code"], p["elementId"]) for p in body["problems"]] == [("release.empty", None)]
+    assert await release_rows(db) == 0

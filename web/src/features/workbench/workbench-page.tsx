@@ -114,7 +114,7 @@ function AiIntakeCard() {
     <section aria-labelledby="ai-intake-title" className="relative overflow-hidden rounded-xl border border-border bg-card shadow-card">
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-linear-to-r from-info-soft via-primary-soft to-transparent" />
       <Sparkles aria-hidden className="pointer-events-none absolute -right-6 -top-8 size-44 text-info/10" strokeWidth={1.25} />
-      <div className="relative grid gap-6 p-6 md:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:items-center">
+      <div className="relative grid gap-6 p-6 md:p-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:items-center">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
           <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-info text-primary-foreground shadow-sm">
             <Sparkles className="size-7" aria-hidden />
@@ -230,7 +230,7 @@ const activityIcons: Record<string, LucideIcon> = {
 function ActivityCard({ activities }: { activities: readonly Activity[] }) {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col rounded-xl bg-info-soft p-5 sm:col-span-2 xl:col-span-1">
+    <div className="flex flex-col rounded-xl bg-info-soft p-5">
       <div className="flex items-center gap-3">
         <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-card text-info-strong shadow-sm">
           <ActivityIcon className="size-5" aria-hidden />

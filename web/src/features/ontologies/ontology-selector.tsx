@@ -18,7 +18,7 @@ export function OntologySelector({ ontologies, value, onValueChange, className }
   const { t } = useTranslation();
   const id = useId();
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex min-w-0 items-center gap-2', className)}>
       <label htmlFor={id} className="shrink-0 text-sm font-medium text-muted-foreground">
         {t('ontologies.selectorLabel')}
       </label>
