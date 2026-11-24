@@ -184,6 +184,30 @@ export function exportOntologyTurtle(ontologyId: string): Promise<string> {
   );
 }
 
+/** The working version as Turtle: the expert mode's text and the prefixes axioms may use. */
+export function useOntologyTurtle(ontologyId: string) {
+  return useQuery({
+    queryKey: ontologyKeys.turtle(ontologyId),
+    queryFn: () => exportOntologyTurtle(ontologyId),
+  });
+}
+
+export interface TurtlePrefix {
+  /** Empty for the default prefix `:`. */
+  name: string;
+  iri: string;
+}
+
+const PREFIX_LINE = /^\s*@prefix\s+([A-Za-z][\w.-]*)?:\s*<([^>]*)>\s*\.\s*$/;
+
+/** The `@prefix` declarations of a Turtle text, in order. */
+export function turtlePrefixes(turtle: string): TurtlePrefix[] {
+  return turtle.split('\n').flatMap((line) => {
+    const match = PREFIX_LINE.exec(line);
+    return match ? [{ name: match[1] ?? '', iri: match[2] ?? '' }] : [];
+  });
+}
+
 /** The names an element or change item may carry; any of them can be missing (imports, axioms). */
 export interface Names {
   labelZh?: string | null;

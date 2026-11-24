@@ -41,6 +41,19 @@ if (!('scrollIntoView' in Element.prototype)) {
   Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, writable: true, value: () => undefined });
 }
 
+// CodeMirror measures text through ranges, which jsdom does not lay out.
+if (!('getClientRects' in Range.prototype)) {
+  const emptyRects = { length: 0, item: () => null, [Symbol.iterator]: () => [][Symbol.iterator]() };
+  Object.defineProperty(Range.prototype, 'getClientRects', { configurable: true, writable: true, value: () => emptyRects });
+}
+if (!('getBoundingClientRect' in Range.prototype)) {
+  Object.defineProperty(Range.prototype, 'getBoundingClientRect', {
+    configurable: true,
+    writable: true,
+    value: () => ({ x: 0, y: 0, width: 0, height: 0, top: 0, right: 0, bottom: 0, left: 0, toJSON: () => ({}) }),
+  });
+}
+
 // Router scroll restoration calls window.scrollTo, which jsdom does not implement.
 Object.defineProperty(window, 'scrollTo', { configurable: true, writable: true, value: () => undefined });
 

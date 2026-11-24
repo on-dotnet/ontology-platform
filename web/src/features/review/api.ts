@@ -47,6 +47,11 @@ export function mergeChangeSet(changeSetId: string): Promise<MergeResult> {
   return unwrap(api.POST('/api/change-sets/{id}/merge', { params: { path: { id: changeSetId } } }));
 }
 
+/** Rejects the whole change set; its creator may do so to withdraw it, whatever their role. */
+export function rejectChangeSet(changeSetId: string): Promise<ChangeSetSummary> {
+  return unwrap(api.POST('/api/change-sets/{id}/reject', { params: { path: { id: changeSetId } } }));
+}
+
 /** Writes an updated item into the cached change set and recomputes the decision counts. */
 export function replaceItemInCache(queryClient: QueryClient, changeSetId: string, item: ChangeItem): void {
   queryClient.setQueryData<ChangeSetDetail>(changeSetKeys.detail(changeSetId), (current) => {

@@ -1,5 +1,5 @@
-import { ArrowRight, Check, Pencil, Quote, X } from 'lucide-react';
-import { useId } from 'react';
+import { ArrowRight, Check, Pencil, Quote, Waypoints, X } from 'lucide-react';
+import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import { cn } from '@/lib/cn';
 
 import type { ChangeItem, Decision, ElementFields } from './api';
 import { AiSuggestionBadge, ConfidenceBadge, DecisionBadge, FlagTips, OpBadge } from './item-badges';
+import { ItemImpact } from './item-impact';
 import {
   COMPARED_FIELDS,
   effectiveFields,
@@ -38,6 +39,8 @@ interface ChangeItemCardProps {
   busy: boolean;
   onDecide: (decision: Decision) => void;
   onEdit: () => void;
+  /** Offers the impact summary of updates and deletes, loaded from this ontology when opened. */
+  impactOntologyId?: string;
 }
 
 /** One proposed change with its operation, AI label and confidence, flags, decision buttons and evidence entry. */
@@ -52,9 +55,14 @@ export function ChangeItemCard({
   busy,
   onDecide,
   onEdit,
+  impactOntologyId,
 }: ChangeItemCardProps) {
   const { t } = useTranslation();
   const titleId = useId();
+  const impactId = useId();
+  const [showImpact, setShowImpact] = useState(false);
+  const { targetElementId } = item;
+  const hasImpact = impactOntologyId !== undefined && targetElementId !== null && (item.op === 'update' || item.op === 'delete');
   const fields = shownFields(item);
   const label = itemLabel(item, context);
   const isAxiom = item.kind === 'axiom';
@@ -142,6 +150,19 @@ export function ChangeItemCard({
             ) : null}
           </>
         ) : null}
+        {hasImpact ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-expanded={showImpact}
+            aria-controls={showImpact ? impactId : undefined}
+            onClick={() => setShowImpact((value) => !value)}
+            className="aria-expanded:bg-primary-soft aria-expanded:text-primary-strong"
+          >
+            <Waypoints aria-hidden />
+            {showImpact ? t('review.impact.hide') : t('review.impact.show')}
+          </Button>
+        ) : null}
         {/* Only AI proposals cite sources; imports and manual edits have nothing to show. */}
         {isAi ? (
           <Button
@@ -158,6 +179,11 @@ export function ChangeItemCard({
           </Button>
         ) : null}
       </div>
+      {hasImpact && showImpact ? (
+        <div id={impactId} role="region" aria-label={t('review.impact.label', { name: label })} className="mt-3">
+          <ItemImpact ontologyId={impactOntologyId} item={{ ...item, targetElementId }} context={context} />
+        </div>
+      ) : null}
     </article>
   );
 }

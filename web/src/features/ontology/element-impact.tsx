@@ -1,4 +1,4 @@
-import { useQueryClient, type UseQueryResult } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { RefreshCw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,41 +16,17 @@ import { cn } from '@/lib/cn';
 import { isStale, useSaveEdits } from './edit-actions';
 import { kindTone } from './element-list';
 
-/** What happens to an element that refers to a deleted one (spec 002, section 6). */
-export type ImpactEffect = 'deleted' | 'parentCleared' | 'inverseCleared' | 'rulesRemoved';
-
-export interface ImpactEntry {
-  ref: ElementRef;
-  effect: ImpactEffect;
-}
+type CascadeEntry = Impact['cascade'][number];
 
 /**
- * Sorts the elements referring to `target` by what deleting it does to them: relations and
- * properties on it, constraints targeting it (or left without rules) and axioms mentioning it are
- * deleted; subtypes lose their parent, the inverse relation its inverse, other constraints the
- * rules that use it.
+ * What a cascade update does to an element, by its kind (spec 002, section 6): subtypes lose their
+ * parent, relations their inverse, constraints the rules that use the deleted element.
  */
-export function impactEntries(impact: Impact, target: Pick<Element, 'id'>, all: readonly Element[]): ImpactEntry[] {
-  const byId = new Map(all.map((element) => [element.id, element]));
-  const constraintEffect = (ref: ElementRef): ImpactEffect => {
-    const constraint = byId.get(ref.id);
-    if (!constraint || constraint.domainId === target.id) return 'deleted';
-    const kept = (constraint.rules ?? []).filter((rule) => rule.pathId !== target.id && rule.classId !== target.id);
-    return kept.length === 0 ? 'deleted' : 'rulesRemoved';
-  };
-  const entries: ImpactEntry[] = [
-    ...impact.relations.map((ref) => ({ ref, effect: 'deleted' as const })),
-    ...impact.properties.map((ref) => ({ ref, effect: 'deleted' as const })),
-    ...impact.constraints.map((ref) => ({ ref, effect: constraintEffect(ref) })),
-    ...impact.axioms.map((ref) => ({ ref, effect: 'deleted' as const })),
-    ...impact.subtypes.map((ref) => ({ ref, effect: 'parentCleared' as const })),
-  ];
-  // A relation on the element that is also its inverse goes anyway.
-  if (impact.inverse && !entries.some((entry) => entry.ref.id === impact.inverse?.id)) {
-    entries.push({ ref: impact.inverse, effect: 'inverseCleared' });
-  }
-  return entries;
-}
+const updateEffects: Partial<Record<ElementRef['kind'], 'parentCleared' | 'inverseCleared' | 'rulesRemoved'>> = {
+  entity_type: 'parentCleared',
+  relation_type: 'inverseCleared',
+  constraint: 'rulesRemoved',
+};
 
 function refName(ref: ElementRef, byId: ReadonlyMap<string, Element>, language: string): string {
   const element = byId.get(ref.id);
@@ -112,16 +88,59 @@ export function ReferencedBy({ ontologyId, element, all, onSelect }: ReferencedB
   );
 }
 
+interface CascadeListProps {
+  cascade: readonly CascadeEntry[];
+  /** Name of an element in the reader's language; falls back to the server's label. */
+  nameOf: (ref: ElementRef) => string;
+}
+
+/**
+ * Everything deleting an element brings along, as the server will propose it (the transitive
+ * cascade): elements deleted with it, and elements that only lose a reference.
+ */
+export function CascadeList({ cascade, nameOf }: CascadeListProps) {
+  const { t } = useTranslation();
+  if (cascade.length === 0) return <p className="text-sm text-muted-foreground">{t('ontologyPage.delete.noImpact')}</p>;
+  const deleted = cascade.filter((entry) => entry.op === 'delete');
+  const changed = cascade.filter((entry) => entry.op === 'update');
+  const list = (entries: readonly CascadeEntry[], label: string) => (
+    <section className="space-y-2">
+      <h3 className="text-sm font-semibold text-foreground">{label}</h3>
+      <ul className="divide-y divide-border rounded-lg border border-border" aria-label={label}>
+        {entries.map(({ op, element }) => {
+          const effect = op === 'update' ? updateEffects[element.kind] : undefined;
+          return (
+            <li key={element.id} className="flex flex-wrap items-center gap-x-2 gap-y-1 px-3 py-2 text-sm">
+              <Badge tone={kindTone[element.kind]}>{t(`kind.${element.kind}`)}</Badge>
+              <span className={cn('min-w-0 flex-1 truncate text-foreground', element.kind === 'axiom' && 'font-mono text-xs')}>{nameOf(element)}</span>
+              {effect ? <span className="text-xs text-muted-foreground">{t(`ontologyPage.delete.effects.${effect}`)}</span> : null}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+  return (
+    <div className="space-y-4">
+      <InlineNotice tone="warning" title={t('ontologyPage.delete.impactTitle', { count: cascade.length })}>
+        {t('ontologyPage.delete.impactDescription')}
+      </InlineNotice>
+      {deleted.length > 0 ? list(deleted, t('ontologyPage.delete.deletedLabel', { count: deleted.length })) : null}
+      {changed.length > 0 ? list(changed, t('ontologyPage.delete.changedLabel', { count: changed.length })) : null}
+    </div>
+  );
+}
+
 interface DeleteElementDialogProps {
   ontologyId: string;
   element: Element;
-  /** Active elements: they tell constraints that go from those that only lose rules. */
-  all: UseQueryResult<Element[]>;
+  /** Active elements, for names in the reader's language; undefined while they load. */
+  all: readonly Element[] | undefined;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-/** Confirms deleting an element and lists what goes with it; the server adds the cascade items. */
+/** Confirms deleting an element and lists the full cascade; the server adds the cascade items on saving. */
 export function DeleteElementDialog({ ontologyId, element, all, open, onOpenChange }: DeleteElementDialogProps) {
   const { t } = useTranslation();
   return (
@@ -142,7 +161,7 @@ function DeleteBody({ ontologyId, element, all, onDone }: Omit<DeleteElementDial
   const { apply, mutation } = useSaveEdits(ontologyId);
   const [reloading, setReloading] = useState(false);
   const name = element.kind === 'axiom' ? t('ontologyPage.detail.axiomTitle') : elementName(element, language) || '—';
-  const ready = impact.isSuccess && all.isSuccess;
+  const byId = new Map((all ?? []).map((item) => [item.id, item]));
 
   const confirm = () =>
     mutation.mutate(
@@ -190,54 +209,17 @@ function DeleteBody({ ontologyId, element, all, onDone }: Omit<DeleteElementDial
         ) : null}
 
         <QueryState query={impact} loading={<Skeleton className="h-24 rounded-lg" />}>
-          {(data) => (
-            <QueryState query={all} loading={<Skeleton className="h-24 rounded-lg" />}>
-              {(elements) => <ImpactList entries={impactEntries(data, element, elements)} elements={elements} language={language} />}
-            </QueryState>
-          )}
+          {(data) => <CascadeList cascade={data.cascade} nameOf={(ref) => refName(ref, byId, language)} />}
         </QueryState>
 
         <div className="flex justify-end gap-2 pt-2">
           <DialogClose className={buttonVariants({ variant: 'secondary' })}>{t('common.cancel')}</DialogClose>
-          <Button variant="destructive" disabled={!ready} loading={mutation.isPending} onClick={confirm}>
+          <Button variant="destructive" disabled={!impact.isSuccess} loading={mutation.isPending} onClick={confirm}>
             <Trash2 aria-hidden />
             {apply ? t('ontologyPage.delete.confirm') : t('ontologyPage.edit.submitForReview')}
           </Button>
         </div>
       </div>
     </>
-  );
-}
-
-function ImpactList({ entries, elements, language }: { entries: readonly ImpactEntry[]; elements: readonly Element[]; language: string }) {
-  const { t } = useTranslation();
-  const byId = new Map(elements.map((element) => [element.id, element]));
-  if (entries.length === 0) return <p className="text-sm text-muted-foreground">{t('ontologyPage.delete.noImpact')}</p>;
-  const deleted = entries.filter((entry) => entry.effect === 'deleted');
-  const changed = entries.filter((entry) => entry.effect !== 'deleted');
-  const list = (items: readonly ImpactEntry[], label: string) => (
-    <section className="space-y-2">
-      <h3 className="text-sm font-semibold text-foreground">{label}</h3>
-      <ul className="divide-y divide-border rounded-lg border border-border" aria-label={label}>
-        {items.map((entry) => (
-          <li key={entry.ref.id} className="flex flex-wrap items-center gap-x-2 gap-y-1 px-3 py-2 text-sm">
-            <Badge tone={kindTone[entry.ref.kind]}>{t(`kind.${entry.ref.kind}`)}</Badge>
-            <span className={cn('min-w-0 flex-1 truncate text-foreground', entry.ref.kind === 'axiom' && 'font-mono text-xs')}>
-              {refName(entry.ref, byId, language)}
-            </span>
-            {entry.effect !== 'deleted' ? <span className="text-xs text-muted-foreground">{t(`ontologyPage.delete.effects.${entry.effect}`)}</span> : null}
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-  return (
-    <div className="space-y-4">
-      <InlineNotice tone="warning" title={t('ontologyPage.delete.impactTitle', { count: entries.length })}>
-        {t('ontologyPage.delete.impactDescription')}
-      </InlineNotice>
-      {deleted.length > 0 ? list(deleted, t('ontologyPage.delete.deletedLabel', { count: deleted.length })) : null}
-      {changed.length > 0 ? list(changed, t('ontologyPage.delete.changedLabel', { count: changed.length })) : null}
-    </div>
   );
 }

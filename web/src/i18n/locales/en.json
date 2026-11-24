@@ -231,7 +231,10 @@
           "description": "The platform does not change the kind of an existing element. These elements stay as they are, and references to them in the file were not imported."
         }
       },
-      "goReview": "Go to review"
+      "goReview": "Go to review",
+      "turtleTitle": "Change set created",
+      "turtleReviewDescription": "Your edits are in a change set. They enter the ontology once it is reviewed and merged.",
+      "turtleNoDifference": "The Turtle has no differences from the working version, so no change set was created."
     }
   },
   "upload": {
@@ -500,7 +503,22 @@
     "noEvidence": "This item has no evidence.",
     "unknownElement": "Unknown element",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "withdraw": "Withdraw",
+    "withdrawTitle": "Withdraw “{{title}}”?",
+    "withdrawDescription": "The change set becomes rejected and none of its changes enter the ontology. This cannot be undone.",
+    "withdrawConfirm": "Withdraw change set",
+    "withdrawn": "Change set withdrawn",
+    "withdrawFailedTitle": "Not withdrawn",
+    "selfReviewNotice": "In separate review mode, change sets you submitted are reviewed by someone else.",
+    "impact": {
+      "show": "Show impact",
+      "hide": "Hide impact",
+      "label": "Impact of “{{name}}”",
+      "referencedBy_one": "Referenced by {{count}} element",
+      "referencedBy_other": "Referenced by {{count}} elements",
+      "none": "No other element refers to it."
+    }
   },
   "ontologyPage": {
     "viewLabel": "View",
@@ -565,7 +583,10 @@
         "all": "All"
       },
       "statusChip": "Status: {{status}}",
-      "restoreElement": "Restore {{name}}"
+      "restoreElement": "Restore {{name}}",
+      "annotations": "Ontology annotations",
+      "groupCount_one": "{{count}} axiom",
+      "groupCount_other": "{{count}} axioms"
     },
     "detail": {
       "deprecated": "Deleted",
@@ -689,9 +710,9 @@
       "title": "Delete {{name}}?",
       "description": "Once deleted it is no longer exported or listed by default; you can restore it later from Deleted in the list.",
       "noImpact": "No other element refers to it; only this element is deleted.",
-      "impactTitle_one": "{{count}} element refers to it",
-      "impactTitle_other": "{{count}} elements refer to it",
-      "impactDescription": "They are handled as listed below, and so is whatever refers to them. Restoring it later does not undo these changes.",
+      "impactTitle_one": "Deleting it also changes {{count}} element",
+      "impactTitle_other": "Deleting it also changes {{count}} elements",
+      "impactDescription": "This includes elements that refer to it indirectly. Restoring it later does not undo these changes.",
       "deletedLabel": "Also deleted ({{count}})",
       "changedLabel": "References removed ({{count}})",
       "effects": {
@@ -702,6 +723,38 @@
       "confirm": "Delete",
       "failedTitle": "Not deleted",
       "staleDescription": "Reload to see the latest references, then confirm again."
+    },
+    "viewTurtle": "Turtle",
+    "turtle": {
+      "title": "Turtle of the working version",
+      "info": "The working version exported as Turtle. Edits become a change set that takes effect once it is reviewed and merged.",
+      "editorLabel": "Turtle of the working version",
+      "generate": "Create change set",
+      "reviewNote": "The change set always goes to review and takes effect once merged.",
+      "emptyDraft": "The Turtle is empty. Enter content before creating a change set.",
+      "parseErrorTitle": "The Turtle has a syntax error",
+      "parseErrorLine": "There is a syntax error on line {{line}}; the cursor is on that line. Fix it, then create the change set again.",
+      "parseError": "Fix the syntax error, then create the change set again.",
+      "goToLine": "Go to line {{line}}",
+      "failedTitle": "No change set was created",
+      "baseChangedTitle": "The working version has changed",
+      "baseChangedDescription": "Other changes were merged after you started editing, and a change set made now would undo them. Cancel and edit the latest content instead.",
+      "discardTitle": "Discard unsaved changes?",
+      "discardDescription": "Your Turtle edits have not become a change set yet and will be lost.",
+      "keepEditing": "Keep editing",
+      "discard": "Discard changes"
+    },
+    "axiom": {
+      "createTitle": "New advanced axiom",
+      "editTitle": "Edit advanced axiom",
+      "fragment": "Turtle fragment",
+      "fragmentInfoLabel": "About advanced axioms",
+      "fragmentInfo": "An axiom is one triple of one subject, with the blank nodes reachable from its object. Edit what the forms can express, such as names, parent types and domains, on the element itself.",
+      "fragmentRequired": "Enter a Turtle fragment",
+      "prefixesHint": "You can use the ontology's prefixes.",
+      "showPrefixes": "Show prefixes ({{count}})",
+      "hidePrefixes": "Hide prefixes",
+      "prefixesLabel": "Prefixes of the ontology"
     }
   },
   "releases": {
@@ -775,7 +828,7 @@
       "info": "Review change sets item by item: accept, edit or reject each change. Only approved changes enter the ontology."
     },
     "ontology": {
-      "info": "Browse object types, relations, properties, constraints and advanced axioms as a graph or a list. Select an element to see its details and where it came from."
+      "info": "Browse object types, relations, properties, constraints and advanced axioms as a graph or a list, and select an element to see its details and where it came from. The Turtle view edits the whole ontology as Turtle."
     },
     "data": {
       "info": "Connect data sources, browse table catalogs and bind data to the ontology.",
@@ -804,7 +857,15 @@
     "aiModel": "Model",
     "aiModelNone": "Not set",
     "platformTitle": "Platform settings",
-    "platformDescription": "Settings for models, members and roles, and platform parameters are coming soon."
+    "platformDescription": "Settings for models, members and roles, and platform parameters are coming soon.",
+    "reviewTitle": "Review mode",
+    "reviewModeLabel": "Current mode",
+    "reviewModes": {
+      "single": "Single reviewer",
+      "separate": "Separate reviewer"
+    },
+    "reviewModeInfoLabel": "About review modes",
+    "reviewModeInfo": "In single review mode, reviewers may review and merge their own changes; in separate mode, someone other than the submitter must review them. Set with the platform option OP_REVIEW_MODE (single or separate)."
   },
   "states": {
     "errorTitle": "This content could not be loaded",

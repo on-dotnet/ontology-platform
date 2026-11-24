@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { ArrowLeft, CheckCheck, GitMerge, Network, Quote } from 'lucide-react';
+import { ArrowLeft, CheckCheck, GitMerge, Network, Quote, Undo2 } from 'lucide-react';
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,9 +14,11 @@ import { QueryState } from '@/components/states/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { useCurrentUser } from '@/features/auth/api';
 import { usePermissions } from '@/features/auth/permissions';
 import { EvidenceExcerpt } from '@/features/documents/evidence-excerpt';
-import { ELEMENT_KINDS, ontologyKeys, useElements, type Element } from '@/features/ontologies/api';
+import { ELEMENT_KINDS, ontologyKeys, useElements, usePlatformSettings, type Element } from '@/features/ontologies/api';
 import { codeMessage, useErrorMessage } from '@/i18n/error-message';
 import { cn } from '@/lib/cn';
 import { DESKTOP_QUERY, useMediaQuery } from '@/lib/use-media-query';
@@ -29,6 +31,7 @@ import {
   isAiSource,
   mergeChangeSet,
   patchItem,
+  rejectChangeSet,
   replaceItemInCache,
   useChangeSet,
   type ChangeItem,
@@ -70,30 +73,61 @@ export function ReviewDetailPage({ changeSetId }: { changeSetId: string }) {
   );
 }
 
-/** Waits for the ontology's elements, which name the object types items refer to. */
+/**
+ * Waits for the ontology's elements, which name the object types items refer to, and, for a change
+ * set the user submitted, for the review mode, which decides whether they may review it.
+ */
 function ChangeSetLoaded({ changeSet }: { changeSet: ChangeSetDetail }) {
+  const user = useCurrentUser();
+  const own = user !== null && changeSet.createdBy === user.id;
+  return own ? <OwnChangeSetLoaded changeSet={changeSet} /> : <ElementsLoaded changeSet={changeSet} own={false} selfReview={false} />;
+}
+
+function OwnChangeSetLoaded({ changeSet }: { changeSet: ChangeSetDetail }) {
+  const settings = usePlatformSettings();
+  return (
+    <QueryState query={settings} loading={<LoadingState variant="detail" />}>
+      {({ reviewMode }) => <ElementsLoaded changeSet={changeSet} own selfReview={reviewMode === 'single'} />}
+    </QueryState>
+  );
+}
+
+interface ElementsLoadedProps {
+  changeSet: ChangeSetDetail;
+  /** The current user submitted the change set. */
+  own: boolean;
+  /** Submitters may review their own change sets (single review mode). */
+  selfReview: boolean;
+}
+
+function ElementsLoaded({ changeSet, own, selfReview }: ElementsLoadedProps) {
   const { i18n } = useTranslation();
   // Deleted elements too: restore items point to them.
   const elements = useElements(changeSet.ontologyId, { status: 'all' });
   return (
     <QueryState query={elements} loading={<LoadingState variant="detail" />}>
-      {(list) => <ChangeSetReview changeSet={changeSet} elements={list} language={i18n.resolvedLanguage ?? i18n.language} />}
+      {(list) => (
+        <ChangeSetReview changeSet={changeSet} elements={list} language={i18n.resolvedLanguage ?? i18n.language} own={own} selfReview={selfReview} />
+      )}
     </QueryState>
   );
 }
 
-interface ChangeSetReviewProps {
-  changeSet: ChangeSetDetail;
+interface ChangeSetReviewProps extends ElementsLoadedProps {
   elements: readonly Element[];
   language: string;
 }
 
-function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps) {
+function ChangeSetReview({ changeSet, elements, language, own, selfReview }: ChangeSetReviewProps) {
   const { t } = useTranslation();
   const message = useErrorMessage();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const { canReview } = usePermissions();
+  const permissions = usePermissions();
+  // In separate review mode nobody reviews what they submitted (403 `changeset.self_review`).
+  const blockedAsSubmitter = own && !selfReview;
+  const canReview = permissions.canReview && !blockedAsSubmitter;
+  const [withdrawing, setWithdrawing] = useState(false);
   const pendingHintId = useId();
   const wide = useMediaQuery(DESKTOP_QUERY);
   const evidencePanelId = useId();
@@ -112,6 +146,8 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
 
   const isOpen = changeSet.status === 'open';
   const canDecide = canReview && isOpen;
+  // Submitters who may not review their change set can still take it back.
+  const canWithdraw = isOpen && own && !canReview;
   const isAi = isAiSource(changeSet.source);
   const pending = changeSet.items.filter((item) => item.decision === 'pending');
   const pendingCount = pending.length;
@@ -192,7 +228,11 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
               {isOpen ? (
                 <span className="inline-flex items-center gap-0.5">
                   <Badge tone="neutral">{t('review.readOnly')}</Badge>
-                  <InfoTip label={t('review.readOnly')}>{t('review.readOnlyNotice', { role: t('user.roles.reviewer') })}</InfoTip>
+                  <InfoTip label={t('review.readOnly')}>
+                    {permissions.canReview && blockedAsSubmitter
+                      ? t('review.selfReviewNotice')
+                      : t('review.readOnlyNotice', { role: t('user.roles.reviewer') })}
+                  </InfoTip>
                 </span>
               ) : null}
               <Badge tone={changeSet.status === 'merged' ? 'success' : changeSet.status === 'rejected' ? 'neutral' : 'warning'}>
@@ -203,6 +243,12 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
                   <Network aria-hidden />
                   {t('review.viewOntology')}
                 </Link>
+              ) : null}
+              {canWithdraw ? (
+                <Button variant="secondary" className="text-error-strong" onClick={() => setWithdrawing(true)}>
+                  <Undo2 aria-hidden />
+                  {t('review.withdraw')}
+                </Button>
               ) : null}
             </>
           )
@@ -260,6 +306,7 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
                       busy={busyItemId === item.id || bulk.isPending || merge.isPending}
                       onDecide={(decision) => decide.mutate({ itemId: item.id, decision })}
                       onEdit={() => setEditing(item)}
+                      impactOntologyId={isOpen ? changeSet.ontologyId : undefined}
                     />
                     {/* Stacked layout: the evidence opens under the chosen item, not after the whole list. */}
                     {isAi && !wide && item.id === selectedId ? <EvidencePanel id={evidencePanelId} item={item} context={context} inline /> : null}
@@ -271,6 +318,8 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
           {isAi && wide && selected ? <EvidencePanel key={selected.id} item={selected} context={context} /> : null}
         </div>
       )}
+
+      {canWithdraw ? <WithdrawDialog changeSet={changeSet} open={withdrawing} onOpenChange={setWithdrawing} /> : null}
 
       {canDecide ? (
         <ChangeItemEditDialog
@@ -287,6 +336,60 @@ function ChangeSetReview({ changeSet, elements, language }: ChangeSetReviewProps
         />
       ) : null}
     </>
+  );
+}
+
+interface WithdrawDialogProps {
+  changeSet: ChangeSetDetail;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+/** Confirms withdrawing a change set the user submitted: it is rejected as a whole and cannot be reopened. */
+function WithdrawDialog({ changeSet, open, onOpenChange }: WithdrawDialogProps) {
+  const { t } = useTranslation();
+  const message = useErrorMessage();
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const withdraw = useMutation({
+    mutationFn: () => rejectChangeSet(changeSet.id),
+    onSuccess: async () => {
+      onOpenChange(false);
+      toast.success(t('review.withdrawn'));
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: changeSetKeys.all }),
+        queryClient.invalidateQueries({ queryKey: ontologyKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: ['workbench'] }),
+      ]);
+    },
+  });
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) withdraw.reset();
+        onOpenChange(next);
+      }}
+    >
+      <DialogContent closeLabel={t('common.close')}>
+        <DialogTitle>{t('review.withdrawTitle', { title: changeSet.title })}</DialogTitle>
+        <DialogDescription>{t('review.withdrawDescription')}</DialogDescription>
+        <div className="mt-5 space-y-4">
+          {withdraw.isError ? (
+            <InlineNotice tone="error" title={t('review.withdrawFailedTitle')}>
+              {message(withdraw.error)}
+            </InlineNotice>
+          ) : null}
+          <div className="flex justify-end gap-2">
+            <DialogClose className={buttonVariants({ variant: 'secondary' })}>{t('common.cancel')}</DialogClose>
+            <Button variant="destructive" loading={withdraw.isPending} onClick={() => withdraw.mutate()}>
+              {withdraw.isPending ? null : <Undo2 aria-hidden />}
+              {t('review.withdrawConfirm')}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

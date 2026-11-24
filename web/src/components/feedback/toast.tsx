@@ -1,12 +1,24 @@
 import { Toast } from '@base-ui/react/toast';
 import { CircleCheck, CircleX, Info, X } from 'lucide-react';
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, type MouseEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 
 type ToastType = 'success' | 'error' | 'info';
+
+/** A follow-up offered in a toast, such as "Undo" or "Go to review"; the toast closes once it is used. */
+export interface ToastAction {
+  /** Verb first, like every button (ui-guidelines §6). */
+  label: string;
+  onClick: () => void;
+  /**
+   * Address of the page the action opens. Renders a link, so it can also be opened in a new tab;
+   * a plain click runs `onClick` instead (toasts sit outside the router, so the caller navigates).
+   */
+  href?: string;
+}
 
 const icons = {
   success: { icon: CircleCheck, className: 'text-success-strong' },
@@ -16,6 +28,17 @@ const icons = {
 
 function isToastType(value: unknown): value is ToastType {
   return value === 'success' || value === 'error' || value === 'info';
+}
+
+/** The action stored with a toast; toast data is untyped, so it is checked before use. */
+function toastAction(data: unknown): ToastAction | undefined {
+  if (typeof data !== 'object' || data === null || !('action' in data)) return undefined;
+  const { action } = data;
+  if (typeof action !== 'object' || action === null || !('label' in action) || !('onClick' in action)) return undefined;
+  const { label, onClick } = action;
+  if (typeof label !== 'string' || typeof onClick !== 'function') return undefined;
+  const href = 'href' in action && typeof action.href === 'string' ? action.href : undefined;
+  return { label, onClick: () => void (onClick as () => unknown)(), ...(href ? { href } : {}) };
 }
 
 /** Bottom-right toasts. Success toasts close after 3 seconds (ui-guidelines §4). */
@@ -28,14 +51,27 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
+const actionClassName = 'rounded text-sm font-medium text-primary-strong hover:underline';
+
 function ToastViewport() {
-  const { toasts } = Toast.useToastManager();
+  const { toasts, close } = Toast.useToastManager();
   const { t } = useTranslation();
   return (
     <Toast.Portal>
       <Toast.Viewport className="fixed bottom-4 right-4 z-70 flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2 outline-none">
         {toasts.map((toast) => {
           const { icon: Icon, className } = icons[isToastType(toast.type) ? toast.type : 'info'];
+          const action = toastAction(toast.data);
+          const run = () => {
+            action?.onClick();
+            close(toast.id);
+          };
+          const followLink = (event: MouseEvent<HTMLAnchorElement>) => {
+            // Modified clicks open the address in a new tab or window, as links do.
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            run();
+          };
           return (
             <Toast.Root
               key={toast.id}
@@ -50,6 +86,19 @@ function ToastViewport() {
               <div className="min-w-0 flex-1">
                 <Toast.Title className="font-semibold" />
                 <Toast.Description className="text-muted-foreground" />
+                {action ? (
+                  <div className="mt-1">
+                    {action.href ? (
+                      <a href={action.href} className={actionClassName} onClick={followLink}>
+                        {action.label}
+                      </a>
+                    ) : (
+                      <button type="button" className={actionClassName} onClick={run}>
+                        {action.label}
+                      </button>
+                    )}
+                  </div>
+                ) : null}
               </div>
               <Toast.Close
                 aria-label={t('common.close')}
@@ -69,9 +118,10 @@ export function useToast() {
   const manager = Toast.useToastManager();
   return useMemo(
     () => ({
-      success: (title: string, description?: string) => manager.add({ title, description, type: 'success' }),
-      error: (title: string, description?: string) =>
-        manager.add({ title, description, type: 'error', priority: 'high', timeout: 8000 }),
+      success: (title: string, description?: string, action?: ToastAction) =>
+        manager.add({ title, description, type: 'success', ...(action ? { data: { action } } : {}) }),
+      error: (title: string, description?: string, action?: ToastAction) =>
+        manager.add({ title, description, type: 'error', priority: 'high', timeout: 8000, ...(action ? { data: { action } } : {}) }),
     }),
     [manager],
   );

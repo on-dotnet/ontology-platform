@@ -10,6 +10,7 @@ import { AiServiceCard } from '@/features/ai/ai-status';
 import { useCurrentUser } from '@/features/auth/api';
 
 import { LanguageSelector, ThemeSelector } from './preference-controls';
+import { ReviewModeCard } from './review-mode-card';
 
 export function SettingsPage() {
   const { t } = useTranslation();
@@ -56,6 +57,8 @@ export function SettingsPage() {
         </Card>
 
         <AiServiceCard />
+
+        <ReviewModeCard />
 
         <Card>
           <CardContent className="flex items-center gap-4">

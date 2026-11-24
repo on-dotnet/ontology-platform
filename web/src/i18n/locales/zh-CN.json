@@ -231,7 +231,10 @@
           "description": "平台不会改变已有元素的种类，这些元素保持原样，文件里指向它们的引用没有导入。"
         }
       },
-      "goReview": "去审核"
+      "goReview": "去审核",
+      "turtleTitle": "已生成变更集",
+      "turtleReviewDescription": "修改已整理成变更集，审核并合并后才会进入本体。",
+      "turtleNoDifference": "Turtle 与工作版本没有差异，没有生成变更集。"
     }
   },
   "upload": {
@@ -500,7 +503,22 @@
     "noEvidence": "这一项没有附证据。",
     "unknownElement": "未知元素",
     "yes": "是",
-    "no": "否"
+    "no": "否",
+    "withdraw": "撤回",
+    "withdrawTitle": "撤回“{{title}}”？",
+    "withdrawDescription": "撤回后变更集变为已拒绝，其中的修改都不会进入本体，撤回后不能恢复。",
+    "withdrawConfirm": "撤回变更集",
+    "withdrawn": "已撤回变更集",
+    "withdrawFailedTitle": "没有撤回",
+    "selfReviewNotice": "异人审核模式下，你提交的变更集由其他审核人处理。",
+    "impact": {
+      "show": "查看影响",
+      "hide": "收起影响",
+      "label": "“{{name}}”的影响",
+      "referencedBy_one": "被 {{count}} 个元素引用",
+      "referencedBy_other": "被 {{count}} 个元素引用",
+      "none": "没有其他元素引用它。"
+    }
   },
   "ontologyPage": {
     "viewLabel": "视图",
@@ -565,7 +583,10 @@
         "all": "全部"
       },
       "statusChip": "状态：{{status}}",
-      "restoreElement": "恢复“{{name}}”"
+      "restoreElement": "恢复“{{name}}”",
+      "annotations": "本体注解",
+      "groupCount_one": "{{count}} 条",
+      "groupCount_other": "{{count}} 条"
     },
     "detail": {
       "deprecated": "已删除",
@@ -689,9 +710,9 @@
       "title": "删除“{{name}}”？",
       "description": "删除后它不再导出，列表默认也不显示；之后可以在列表的“已删除”里恢复。",
       "noImpact": "没有其他元素引用它，只删除它本身。",
-      "impactTitle_one": "还有 {{count}} 个元素引用它",
-      "impactTitle_other": "还有 {{count}} 个元素引用它",
-      "impactDescription": "删除时它们按下面的方式一并处理，引用它们的内容也照此处理；以后恢复它，这些改动不会自动撤回。",
+      "impactTitle_one": "删除时会一并处理 {{count}} 个元素",
+      "impactTitle_other": "删除时会一并处理 {{count}} 个元素",
+      "impactDescription": "包括间接引用它的元素。以后恢复它，这些改动不会自动撤回。",
       "deletedLabel": "一并删除（{{count}}）",
       "changedLabel": "清除引用（{{count}}）",
       "effects": {
@@ -702,6 +723,38 @@
       "confirm": "删除",
       "failedTitle": "没有删除",
       "staleDescription": "刷新后会载入最新的引用情况，请确认后再删除。"
+    },
+    "viewTurtle": "Turtle",
+    "turtle": {
+      "title": "工作版本的 Turtle",
+      "info": "这里是工作版本导出的 Turtle。编辑后生成变更集，审核并合并后才会生效。",
+      "editorLabel": "工作版本的 Turtle",
+      "generate": "生成变更集",
+      "reviewNote": "生成的变更集一律进入审核，合并后才会生效。",
+      "emptyDraft": "Turtle 内容不能为空，请输入后再生成变更集。",
+      "parseErrorTitle": "Turtle 有语法错误",
+      "parseErrorLine": "第 {{line}} 行有语法错误，光标已移到这一行。请修正后再生成变更集。",
+      "parseError": "请修正语法错误后再生成变更集。",
+      "goToLine": "定位到第 {{line}} 行",
+      "failedTitle": "没有生成变更集",
+      "baseChangedTitle": "工作版本有了新的修改",
+      "baseChangedDescription": "你开始编辑后，工作版本又合并了其他修改，现在生成的变更集会把它们改回去。建议取消后在最新内容上重新编辑。",
+      "discardTitle": "放弃未保存的修改？",
+      "discardDescription": "Turtle 里的修改还没有生成变更集，离开后会丢失。",
+      "keepEditing": "继续编辑",
+      "discard": "放弃修改"
+    },
+    "axiom": {
+      "createTitle": "新建高级公理",
+      "editTitle": "编辑高级公理",
+      "fragment": "Turtle 片段",
+      "fragmentInfoLabel": "关于高级公理",
+      "fragmentInfo": "一条公理是一个主语的一个三元组，加上从它的宾语出发的空白节点。名称、父类型、定义域等表单能表达的内容，请到对应元素上编辑。",
+      "fragmentRequired": "请输入 Turtle 片段",
+      "prefixesHint": "可以使用本体的前缀。",
+      "showPrefixes": "查看前缀（{{count}}）",
+      "hidePrefixes": "收起前缀",
+      "prefixesLabel": "本体的前缀"
     }
   },
   "releases": {
@@ -775,7 +828,7 @@
       "info": "逐项审核变更集：接受、修改或拒绝每一项修改。只有审核通过的修改才会进入本体。"
     },
     "ontology": {
-      "info": "用图谱或列表查看对象类型、关系、属性、约束和高级公理，点击元素查看详情和来源。"
+      "info": "用图谱或列表查看对象类型、关系、属性、约束和高级公理，点击元素查看详情和来源；Turtle 视图可以直接编辑整份 Turtle。"
     },
     "data": {
       "info": "连接数据源、浏览表目录，并把数据绑定到本体。",
@@ -804,7 +857,15 @@
     "aiModel": "模型",
     "aiModelNone": "未设置",
     "platformTitle": "平台设置",
-    "platformDescription": "模型、成员与角色、平台参数等设置即将推出。"
+    "platformDescription": "模型、成员与角色、平台参数等设置即将推出。",
+    "reviewTitle": "审核模式",
+    "reviewModeLabel": "当前模式",
+    "reviewModes": {
+      "single": "单人审核",
+      "separate": "异人审核"
+    },
+    "reviewModeInfoLabel": "关于审核模式",
+    "reviewModeInfo": "单人审核时，审核人可以审核并合并自己提交的修改；异人审核时，提交人的变更集必须由其他审核人处理。由平台配置项 OP_REVIEW_MODE（single 或 separate）设置。"
   },
   "states": {
     "errorTitle": "内容没有加载出来",

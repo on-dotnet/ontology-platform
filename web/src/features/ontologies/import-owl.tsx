@@ -184,15 +184,17 @@ export function ImportForm({ withName = false, run, onImported }: ImportFormProp
   );
 }
 
+/** What produced the result: a new ontology from a file, a file compared with an ontology, or edited Turtle. */
+export type ImportResultMode = 'created' | 'imported' | 'turtle';
+
 interface ImportResultViewProps {
   result: ImportResult;
-  /** The import created the ontology (rather than comparing with an existing one). */
-  created: boolean;
+  mode: ImportResultMode;
   onClose: () => void;
 }
 
 /** What the import found: counts per operation, warnings, and the way to the change set. */
-export function ImportResultView({ result, created, onClose }: ImportResultViewProps) {
+export function ImportResultView({ result, mode, onClose }: ImportResultViewProps) {
   const { t } = useTranslation();
   const headingRef = useRef<HTMLDivElement>(null);
   const { changeSetId, counts, warnings } = result;
@@ -206,9 +208,12 @@ export function ImportResultView({ result, created, onClose }: ImportResultViewP
 
   let title: string;
   let description: string;
-  if (created) {
+  if (mode === 'created') {
     title = t('ontologies.import.createdTitle', { name: result.ontology.name });
     description = changeSetId ? t('ontologies.import.reviewDescription') : t('ontologies.import.nothingToReview');
+  } else if (mode === 'turtle') {
+    title = changeSetId ? t('ontologies.import.turtleTitle') : t('ontologies.import.noDifferenceTitle');
+    description = changeSetId ? t('ontologies.import.turtleReviewDescription') : t('ontologies.import.turtleNoDifference');
   } else {
     title = changeSetId ? t('ontologies.import.importedTitle') : t('ontologies.import.noDifferenceTitle');
     description = changeSetId ? t('ontologies.import.reviewDescription') : t('ontologies.import.noDifference');
@@ -288,7 +293,7 @@ function ImportIntoBody({ ontology, onClose }: { ontology: OntologySummary; onCl
   const { t } = useTranslation();
   const refresh = useRefreshAfterImport();
   const [result, setResult] = useState<ImportResult | null>(null);
-  if (result) return <ImportResultView result={result} created={false} onClose={onClose} />;
+  if (result) return <ImportResultView result={result} mode="imported" onClose={onClose} />;
   return (
     <>
       <DialogTitle>{t('ontologies.import.intoTitle', { name: ontology.name })}</DialogTitle>

@@ -1,5 +1,5 @@
 import { RotateCcw, Search, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/states/empty-state';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { SegmentedControl } from '@/components/ui/segmented-control';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip } from '@/components/ui/tooltip';
 import { usePermissions } from '@/features/auth/permissions';
@@ -62,8 +63,8 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
   }, [text]);
 
   const query = useElements(ontologyId, { ...(kind === 'all' ? {} : { kind }), ...(q ? { q } : {}), ...(status === 'active' ? {} : { status }) });
-  // Names of the types constraints target and of the elements axioms belong to.
-  const everything = useElements(ontologyId);
+  // Names of the types constraints target and of the elements axioms belong to, deleted ones included.
+  const everything = useElements(ontologyId, { status: 'all' });
   const { restore, pendingId } = useRestoreElement(ontologyId);
   const byId = new Map((everything.data ?? []).map((element) => [element.id, element]));
   const nameOf = (id: string | null) => {
@@ -75,11 +76,49 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
   // Only deleted rows have an action: restoring them.
   const showActions = canUpload && status !== 'active';
   const statusLabel = (value: ElementStatusFilter) => t(`ontologyPage.list.status.${value}`);
+  const groupId = useId();
+  const columnCount = showActions ? 5 : 4;
 
   const clearSearch = () => {
     setText('');
     setQ('');
   };
+
+  /** A table row; axioms listed under their subject leave the subject out of the row. */
+  const renderRow = (element: Element, grouped: boolean) => (
+    <TableRow key={element.id}>
+      <TableCell className="max-w-64">
+        <NameCell element={element} language={language} nameOf={nameOf} showSubject={!grouped} onSelect={onSelect} />
+      </TableCell>
+      <TableCell>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Badge tone={kindTone[element.kind]}>{t(`kind.${element.kind}`)}</Badge>
+          {element.status === 'deprecated' ? <Badge tone="warning">{t('ontologyPage.detail.deprecated')}</Badge> : null}
+        </div>
+      </TableCell>
+      <TableCell className="font-mono text-xs text-muted-foreground">{element.localName ?? '—'}</TableCell>
+      <TableCell className="max-w-md">
+        <p className="line-clamp-2 text-muted-foreground">{element.definitionZh ?? element.definitionEn ?? '—'}</p>
+      </TableCell>
+      {showActions ? (
+        <TableCell className="whitespace-nowrap">
+          {element.status === 'deprecated' ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              aria-label={t('ontologyPage.list.restoreElement', { name: elementName(element, language) || t('kind.axiom') })}
+              loading={pendingId === element.id}
+              disabled={pendingId !== undefined && pendingId !== element.id}
+              onClick={() => restore(element)}
+            >
+              <RotateCcw aria-hidden />
+              {t('ontologyPage.edit.restore')}
+            </Button>
+          ) : null}
+        </TableCell>
+      ) : null}
+    </TableRow>
+  );
 
   return (
     <Card>
@@ -153,42 +192,39 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
                   {showActions ? <TableHead className="w-px whitespace-nowrap">{t('ontologyPage.list.columns.actions')}</TableHead> : null}
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {elements.map((element) => (
-                  <TableRow key={element.id}>
-                    <TableCell className="max-w-64">
-                      <NameCell element={element} language={language} nameOf={nameOf} onSelect={onSelect} />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <Badge tone={kindTone[element.kind]}>{t(`kind.${element.kind}`)}</Badge>
-                        {element.status === 'deprecated' ? <Badge tone="warning">{t('ontologyPage.detail.deprecated')}</Badge> : null}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-mono text-xs text-muted-foreground">{element.localName ?? '—'}</TableCell>
-                    <TableCell className="max-w-md">
-                      <p className="line-clamp-2 text-muted-foreground">{element.definitionZh ?? element.definitionEn ?? '—'}</p>
-                    </TableCell>
-                    {showActions ? (
-                      <TableCell className="whitespace-nowrap">
-                        {element.status === 'deprecated' ? (
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            aria-label={t('ontologyPage.list.restoreElement', { name: elementName(element, language) || t('kind.axiom') })}
-                            loading={pendingId === element.id}
-                            disabled={pendingId !== undefined && pendingId !== element.id}
-                            onClick={() => restore(element)}
-                          >
-                            <RotateCcw aria-hidden />
-                            {t('ontologyPage.edit.restore')}
-                          </Button>
-                        ) : null}
-                      </TableCell>
-                    ) : null}
-                  </TableRow>
-                ))}
-              </TableBody>
+              {kind === 'axiom' ? (
+                // Only axioms, also while the rows of the previous filter stay on screen.
+                axiomGroups(
+                  elements.filter((element) => element.kind === 'axiom'),
+                  nameOf,
+                  language,
+                ).map((group, index) => {
+                  const labelId = `${groupId}-${index}`;
+                  return (
+                    <TableBody key={group.subjectId ?? ''} aria-labelledby={labelId}>
+                      <tr className="border-t border-border bg-background">
+                        <th scope="rowgroup" colSpan={columnCount} className="h-9 px-4 text-left text-xs font-semibold text-muted-foreground">
+                          <span className="inline-flex items-center gap-2">
+                            <span id={labelId} className="text-foreground">
+                              {group.subjectId === null ? (
+                                t('ontologyPage.list.annotations')
+                              ) : group.name === null ? (
+                                <Skeleton className="inline-block h-3.5 w-20 align-middle" />
+                              ) : (
+                                (group.name ?? t('ontologyPage.detail.unknownElement'))
+                              )}
+                            </span>
+                            <span className="font-normal tabular-nums">{t('ontologyPage.list.groupCount', { count: group.axioms.length })}</span>
+                          </span>
+                        </th>
+                      </tr>
+                      {group.axioms.map((element) => renderRow(element, true))}
+                    </TableBody>
+                  );
+                })
+              ) : (
+                <TableBody>{elements.map((element) => renderRow(element, false))}</TableBody>
+              )}
             </Table>
           )
         }
@@ -197,16 +233,45 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
   );
 }
 
+export interface AxiomGroup {
+  /** The element the axioms belong to; null for annotations of the ontology itself. */
+  subjectId: string | null;
+  /** The subject's name; undefined when it is unknown, null until the names have loaded. */
+  name: string | null | undefined;
+  axioms: Element[];
+}
+
+/**
+ * Axioms grouped by the element they belong to, groups in name order; annotations of the ontology
+ * (axioms without a subject) come last. Axioms keep the server's order within a group.
+ */
+export function axiomGroups(axioms: readonly Element[], nameOf: (id: string | null) => string | null | undefined, language: string): AxiomGroup[] {
+  const groups = new Map<string | null, AxiomGroup>();
+  for (const axiom of axioms) {
+    const key = axiom.subjectId ?? null;
+    const group = groups.get(key) ?? { subjectId: key, name: key === null ? undefined : nameOf(key), axioms: [] };
+    group.axioms.push(axiom);
+    groups.set(key, group);
+  }
+  const collator = new Intl.Collator(language);
+  return [...groups.values()].sort((a, b) => {
+    if (a.subjectId === null || b.subjectId === null) return a.subjectId === null ? 1 : -1;
+    return collator.compare(a.name ?? '', b.name ?? '');
+  });
+}
+
 interface NameCellProps {
   element: Element;
   language: string;
   /** The element's name; undefined for an unknown element, null until the names have loaded. */
   nameOf: (id: string | null) => string | null | undefined;
+  /** Axioms name the element they belong to, unless they are listed under it. */
+  showSubject: boolean;
   onSelect: (elementId: string) => void;
 }
 
 /** Name and second line: axioms show their Turtle; constraints their target type; others the English name. */
-function NameCell({ element, language, nameOf, onSelect }: NameCellProps) {
+function NameCell({ element, language, nameOf, showSubject, onSelect }: NameCellProps) {
   const { t } = useTranslation();
   const isAxiom = element.kind === 'axiom';
   const name = isAxiom ? turtleSummary(element.turtle) : displayName(element, language);
@@ -215,7 +280,7 @@ function NameCell({ element, language, nameOf, onSelect }: NameCellProps) {
     const target = nameOf(element.domainId);
     // Nothing while names load: "unknown type" would be wrong for a moment.
     detail = target === null ? null : t('ontologyPage.list.target', { name: target ?? t('review.unknownType') });
-  } else if (isAxiom) {
+  } else if (isAxiom && showSubject) {
     const subject = nameOf(element.subjectId);
     detail = subject ? t('ontologyPage.list.subject', { name: subject }) : null;
   } else if (element.labelEn && !language.startsWith('en') && element.labelEn !== name) {

@@ -1,4 +1,3 @@
-import { Toast } from '@base-ui/react/toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
@@ -39,32 +38,18 @@ export function useRefreshAfterEdit(): () => Promise<void> {
  */
 function useEditToast(): (result: EditResult, appliedTitle: string) => void {
   const { t } = useTranslation();
-  // The shared `useToast` only takes text; a link to the change set needs a node as description.
-  const manager = Toast.useToastManager();
+  const toast = useToast();
   const router = useRouter();
   return (result, appliedTitle) => {
     if (result.merged) {
-      manager.add({ title: appliedTitle, type: 'success' });
+      toast.success(appliedTitle);
       return;
     }
     const target = { to: '/review/$changeSetId', params: { changeSetId: result.changeSetId } } as const;
-    // Toasts render outside the router, so the link navigates through the router it was made with.
-    const href = router.buildLocation(target).href;
-    manager.add({
-      title: t('ontologyPage.edit.submitted'),
-      type: 'success',
-      description: (
-        <a
-          href={href}
-          className="rounded font-medium text-primary-strong hover:underline"
-          onClick={(event) => {
-            event.preventDefault();
-            void router.navigate(target);
-          }}
-        >
-          {t('ontologyPage.edit.goReview')}
-        </a>
-      ),
+    toast.success(t('ontologyPage.edit.submitted'), undefined, {
+      label: t('ontologyPage.edit.goReview'),
+      href: router.buildLocation(target).href,
+      onClick: () => void router.navigate(target),
     });
   };
 }

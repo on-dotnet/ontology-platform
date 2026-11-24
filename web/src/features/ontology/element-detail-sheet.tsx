@@ -25,6 +25,7 @@ import {
 import { OpBadge } from '@/features/review/item-badges';
 import { cn } from '@/lib/cn';
 
+import { AxiomFormDialog } from './axiom-form-dialog';
 import { useRestoreElement } from './edit-actions';
 import { ConstraintRules, TurtleBlock } from './element-content';
 import { isFormKind } from './element-form';
@@ -172,13 +173,11 @@ function ElementDetailContent({ ontologyId, element, related, onSelect }: Elemen
               </Button>
             ) : (
               <>
-                {/* Axioms are edited as Turtle in expert mode, not with the element form. */}
-                {isFormKind(element.kind) ? (
-                  <Button variant="secondary" size="sm" onClick={() => setEditing(true)}>
-                    <Pencil aria-hidden />
-                    {t('ontologyPage.edit.edit')}
-                  </Button>
-                ) : null}
+                {/* Axioms are edited as Turtle (expert mode), the other kinds with the element form. */}
+                <Button variant="secondary" size="sm" onClick={() => setEditing(true)}>
+                  <Pencil aria-hidden />
+                  {t('ontologyPage.edit.edit')}
+                </Button>
                 <Button variant="secondary" size="sm" className="text-error-strong" onClick={() => setDeleting(true)}>
                   <Trash2 aria-hidden />
                   {t('ontologyPage.edit.delete')}
@@ -190,8 +189,12 @@ function ElementDetailContent({ ontologyId, element, related, onSelect }: Elemen
       </div>
       {canUpload ? (
         <>
-          <ElementFormDialog ontologyId={ontologyId} target={editing ? { elementId: element.id } : null} onClose={() => setEditing(false)} />
-          <DeleteElementDialog ontologyId={ontologyId} element={element} all={related} open={deleting} onOpenChange={setDeleting} />
+          {isFormKind(element.kind) ? (
+            <ElementFormDialog ontologyId={ontologyId} target={editing ? { elementId: element.id } : null} onClose={() => setEditing(false)} />
+          ) : (
+            <AxiomFormDialog ontologyId={ontologyId} open={editing} elementId={element.id} onClose={() => setEditing(false)} />
+          )}
+          <DeleteElementDialog ontologyId={ontologyId} element={element} all={related.data} open={deleting} onOpenChange={setDeleting} />
         </>
       ) : null}
 

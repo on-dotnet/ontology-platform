@@ -112,6 +112,17 @@ const moltenSteelImpact = impactFixture('el-molten-steel', {
   properties: [elementRefFixture(temperature)],
   constraints: [elementRefFixture(steelShape), elementRefFixture(ladleShape)],
   axioms: [elementRefFixture(disjoint)],
+  // The server's full cascade: `held by` does not refer to molten steel, but loses its inverse
+  // because `holds` goes; the steel shape is deleted, the ladle shape only loses a rule.
+  cascade: [
+    { op: 'delete', element: elementRefFixture(holds) },
+    { op: 'delete', element: elementRefFixture(temperature) },
+    { op: 'delete', element: elementRefFixture(steelShape) },
+    { op: 'delete', element: elementRefFixture(disjoint) },
+    { op: 'update', element: elementRefFixture(ladleShape) },
+    { op: 'update', element: elementRefFixture(refined) },
+    { op: 'update', element: elementRefFixture(heldBy) },
+  ],
 });
 
 interface ServerOptions {
@@ -547,7 +558,7 @@ describe('editing elements by hand', () => {
 });
 
 describe('deleting and restoring elements', () => {
-  it('lists what goes with an element before deleting it and sends only the delete', async () => {
+  it('lists the whole cascade from the server before deleting it and sends only the delete', async () => {
     const user = userEvent.setup();
     const api = editingServer();
     renderApp('/ontology?ontology=onto-steel&view=list');
@@ -556,7 +567,7 @@ describe('deleting and restoring elements', () => {
     await user.click(within(sheet).getByRole('button', { name: '删除' }));
     const dialog = await screen.findByRole('dialog', { name: '删除“钢水”？' });
 
-    expect(await within(dialog).findByText('还有 6 个元素引用它')).toBeInTheDocument();
+    expect(await within(dialog).findByText('删除时会一并处理 7 个元素')).toBeInTheDocument();
     const deleted = within(dialog).getByRole('list', { name: '一并删除（4）' });
     expect(within(deleted).getAllByRole('listitem').map((item) => item.textContent)).toEqual([
       '关系盛装',
@@ -564,10 +575,11 @@ describe('deleting and restoring elements', () => {
       '约束钢水校验',
       '高级公理steel:MoltenSteel owl:disjointWith steel:Slag .',
     ]);
-    const changed = within(dialog).getByRole('list', { name: '清除引用（2）' });
+    const changed = within(dialog).getByRole('list', { name: '清除引用（3）' });
     expect(within(changed).getAllByRole('listitem').map((item) => item.textContent)).toEqual([
       '约束钢包校验移除引用它的规则',
       '对象类型精炼钢清空父类型',
+      '关系held by清空互逆关系',
     ]);
 
     await user.click(within(dialog).getByRole('button', { name: '删除' }));
