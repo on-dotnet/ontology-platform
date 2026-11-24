@@ -140,8 +140,8 @@ def _with_fields(
         changes["rules"] = [_stored_rule(rule) for rule in fields.rules]
     if view.kind == "axiom" and fields.turtle is not None:
         changes["turtle"] = fields.turtle
-        # A merge reads the subject from the new text; so must the cascade, or it keeps tying
-        # the axiom to the element it was about before.
+        # The old subject must stop pulling the axiom into the cascade. The new one needs no
+        # binding here: a subject is always mentioned, and mentions are read from the fragment.
         try:
             subject = service.normalize_axiom(fields.turtle, prefixes).subject
         except RdfInputError:

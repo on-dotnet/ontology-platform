@@ -599,7 +599,37 @@ async def test_rewriting_an_axiom_away_from_a_deleted_subject_is_not_a_conflict(
     await db.refresh(rows["Slab"])
     assert (rows["Slab"].status, rows["axiom"].status) == ("deprecated", "active")
     assert rows["axiom"].subject_id == rows["Heat"].id
-    assert "Other" in (rows["axiom"].turtle or "")
+    assert rows["axiom"].turtle is not None
+    assert "Heat" in rows["axiom"].turtle
+    assert "Other" in rows["axiom"].turtle
+    assert "Slab" not in rows["axiom"].turtle
+
+
+async def test_a_rewritten_axiom_still_cannot_mention_the_deleted_subject(
+    client: AsyncClient, db: AsyncSession, linked_ontology: tuple[Ontology, dict[str, Element]]
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    ontology, rows = linked_ontology
+    disjoint = "<http://www.w3.org/2002/07/owl#disjointWith>"
+    heat, slab = (f"<{ontology.base_iri}{name}>" for name in ("Heat", "Slab"))
+    detail = "Item 2: it refers to an element this save deletes."
+    for turtle in (
+        # Another subject, but the deleted element is still mentioned.
+        f"{heat} {disjoint} {slab} .",
+        # The same subject, which this save deletes.
+        f"{slab} {disjoint} {heat} .",
+    ):
+        response = await save(
+            client,
+            ontology,
+            edit("delete", rows["Slab"]),
+            edit("update", rows["axiom"], turtle=turtle),
+        )
+        assert response.status_code == 422, response.text
+        assert response.json()["detail"] == detail
+    assert await db.scalar(select(ChangeSet.id)) is None
+    await db.refresh(rows["Slab"])
+    assert rows["Slab"].status == "active"
 
 
 async def test_restoring_an_axiom_checks_it_again(client: AsyncClient, db: AsyncSession) -> None:
