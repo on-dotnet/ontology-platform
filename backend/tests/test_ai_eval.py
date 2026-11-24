@@ -1,8 +1,9 @@
 """Scoring of the extraction evaluation: synonyms count, direction does not, only core recalls."""
 
+import json
 from uuid import uuid4
 
-from ontology_platform.modules.ai.eval import accept, score
+from ontology_platform.modules.ai.eval import accept, dump_elements, load_elements, score
 from ontology_platform.modules.ai.extraction import KnownElement, Proposal
 
 EXPECTED = {
@@ -46,7 +47,12 @@ def test_accept_then_score() -> None:
     assert result["entityTypes"]["unmatched"] == ["行车"]
     assert result["entityTypes"]["missedCore"] == ["钢卷"]
     # direction is ignored: 浇次 → 炉次 matches the expected 炉次 → 浇次
-    assert result["relations"] == {"predicted": 1, "precision": 1.0, "recall": 0.5}
+    assert result["relations"] == {
+        "predicted": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "unmatched": [],
+    }
 
 
 def test_updates_add_synonyms_to_existing_elements() -> None:
@@ -60,3 +66,27 @@ def test_updates_add_synonyms_to_existing_elements() -> None:
     [merged] = accept([element], [update])
     assert merged.synonyms == ("钢卷",)
     assert score([merged], EXPECTED)["entityTypes"]["missedCore"] == ["炉次", "浇次"]
+
+
+def test_unmatched_relations_are_listed_by_their_ends() -> None:
+    proposals = [
+        create("entity_type", "new:Heat", "炉次"),
+        create("entity_type", "new:Crane", "行车"),
+        create("relation_type", "new:lifts", "吊运", domainRef="new:Crane", rangeRef="new:Heat"),
+    ]
+    result = score(accept([], proposals), EXPECTED)
+    assert result["relations"]["unmatched"] == ["行车 → 炉次（吊运）"]
+
+
+def test_saved_elements_score_the_same_after_loading() -> None:
+    proposals = [
+        create("entity_type", "new:Heat", "冶炼炉次", synonyms=[{"lang": "en", "text": "Heat"}]),
+        create("entity_type", "new:Cast", "浇次"),
+        create(
+            "relation_type", "new:inSequence", "属于", domainRef="new:Cast", rangeRef="new:Heat"
+        ),
+    ]
+    known = accept([], proposals)
+    saved = json.loads(json.dumps(dump_elements(known)))
+    assert load_elements(saved) == known
+    assert score(load_elements(saved), EXPECTED) == score(known, EXPECTED)
