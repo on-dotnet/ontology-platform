@@ -7,6 +7,7 @@ elements, reference checks and evidence grounding are deterministic code, not mo
 
 import re
 import unicodedata
+from collections import Counter
 from collections.abc import Awaitable, Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Literal
@@ -268,12 +269,11 @@ def merge_types(
     unknown, so the type is added and `build_proposals` resolves the shared ref.
     """
     merged = list(found)
-    earlier: dict[str, int | None] = {}
-    for position, item in enumerate(found):
-        earlier[item.ref] = None if item.ref in earlier else position
+    earlier = {item.ref: index for index, item in enumerate(found)}
+    shared = {ref for ref, count in Counter(item.ref for item in found).items() if count > 1}
     for item in batch:
         index = earlier.get(item.ref)
-        if index is None:
+        if index is None or item.ref in shared:
             merged.append(item)
             continue
         other = merged[index]

@@ -459,6 +459,7 @@ def test_a_later_batch_does_not_extend_a_ref_an_earlier_batch_gave_to_two_types(
     proposals = build_proposals([LADLE_CHUNK], [], types, RelationsOut(relations=[], properties=[]))
     assert [p.fields["labelZh"] for p in proposals] == ["钢包", "行车"]
     assert [s["text"] for s in by_label(proposals, "钢包").fields["synonyms"]] == ["盛钢桶"]
+    assert by_label(proposals, "行车").fields["synonyms"] == []
 
 
 async def test_new_types_sharing_a_name_become_one_type() -> None:
