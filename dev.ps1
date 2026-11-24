@@ -1,4 +1,6 @@
 #!/usr/bin/env pwsh
+# Keep the blank line below: Get-Help ignores a help block that directly follows a comment.
+
 <#
 .SYNOPSIS
 本体智能平台的开发入口。代码在本机，容器跑在 Docker 主机（默认 10.16.0.13，上下文 linux013-rootless）。
