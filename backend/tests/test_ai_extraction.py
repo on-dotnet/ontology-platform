@@ -940,3 +940,113 @@ def test_a_name_only_inside_a_longer_name_is_no_evidence() -> None:
     proposals = build_proposals(chunks, [], types, rels)
 
     assert [p.kind for p in proposals] == ["entity_type", "entity_type"]
+
+
+# Alignment with existing types by name (#33): the same names as the other rules.
+CONVERTER = KnownElement(
+    id=uuid4(), kind="entity_type", local_name="Converter", label_zh="转炉", synonyms=("炉",)
+)
+NO_RELATIONS = RelationsOut(relations=[], properties=[])
+
+
+def test_a_shared_one_character_synonym_does_not_align_a_type() -> None:
+    types = [entity("new:ReheatingFurnace", "加热炉", "ReheatingFurnace", synonyms=["炉"])]
+    [created] = build_proposals([LADLE_CHUNK], [CONVERTER], types, NO_RELATIONS)
+
+    assert (created.op, created.fields["labelZh"]) == ("create", "加热炉")
+    assert "possible_duplicate" not in created.flags
+
+
+def test_a_mistaken_id_and_a_shared_one_character_synonym_do_not_align_a_type() -> None:
+    types = [entity(str(CONVERTER.id), "加热炉", "ReheatingFurnace", synonyms=["炉"])]
+    [created] = build_proposals([LADLE_CHUNK], [CONVERTER], types, NO_RELATIONS)
+
+    assert (created.op, created.fields["labelZh"]) == ("create", "加热炉")
+    assert "possible_duplicate" in created.flags
+
+
+def test_an_existing_local_name_does_not_align_a_type() -> None:
+    types = [entity("new:Furnace", "加热炉", "ReheatingFurnace", label_en="Converter")]
+    [created] = build_proposals([LADLE_CHUNK], [CONVERTER], types, NO_RELATIONS)
+
+    assert (created.op, created.fields["labelZh"]) == ("create", "加热炉")
+
+
+def test_a_one_character_label_aligns_only_with_the_same_label() -> None:
+    steel = KnownElement(id=uuid4(), kind="entity_type", local_name="Steel", label_zh="钢")
+    types = [
+        entity("new:Steel", "钢", "Steel", synonyms=["钢材"]),
+        entity("new:MoltenSteel", "钢水", "MoltenSteel", synonyms=["钢"]),
+        entity("new:Furnace", "炉", "Furnace"),
+    ]
+    proposals = build_proposals([LADLE_CHUNK], [steel, CONVERTER], types, NO_RELATIONS)
+
+    # 钢 is the whole name of both: one type. A one-character synonym aligns nothing, and a
+    # one-character synonym of an existing type (炉 of 转炉) may mean it: a reviewer decides.
+    assert [(p.op, p.fields.get("labelZh")) for p in proposals] == [
+        ("update", None),
+        ("create", "钢水"),
+        ("create", "炉"),
+    ]
+    assert proposals[0].target_element_id == steel.id
+    assert proposals[0].fields == {"synonyms": [{"lang": "zh", "text": "钢材"}]}
+    assert "possible_duplicate" not in proposals[1].flags
+    assert "possible_duplicate" in proposals[2].flags
+
+
+def test_the_label_of_a_type_aligned_by_name_becomes_a_synonym() -> None:
+    equipment = KnownElement(
+        id=uuid4(), kind="entity_type", local_name="ConverterUnit", label_zh="转炉设备"
+    )
+    types = [entity("new:Converter", "转炉", "Converter", synonyms=["转炉设备"])]
+    [update] = build_proposals([LADLE_CHUNK], [equipment], types, NO_RELATIONS)
+
+    assert (update.op, update.target_element_id) == ("update", equipment.id)
+    assert update.fields == {"synonyms": [{"lang": "zh", "text": "转炉"}]}
+
+
+def test_the_label_of_a_type_aligned_by_its_id_becomes_a_synonym() -> None:
+    types = [entity(str(EXISTING_GRADE.id), "钢号", "Grade", synonyms=["钢种"])]
+    [update] = build_proposals([LADLE_CHUNK], [EXISTING_GRADE], types, NO_RELATIONS)
+
+    assert (update.op, update.target_element_id) == ("update", EXISTING_GRADE.id)
+    assert update.fields == {"synonyms": [{"lang": "zh", "text": "钢号"}]}
+
+
+STEELMAKING_CONVERTER = KnownElement(
+    id=uuid4(), kind="entity_type", local_name="Converter", label_zh="转炉", synonyms=("炼钢炉",)
+)
+
+
+@pytest.mark.parametrize(
+    "ref",
+    ["new:ElectricFurnace", str(STEELMAKING_CONVERTER.id)],
+    ids=["new-ref", "existing-id"],  # stable ids: the uuid differs per xdist worker
+)
+def test_a_shared_synonym_alone_does_not_align_a_type(ref: str) -> None:
+    types = [entity(ref, "电炉", "ElectricFurnace", synonyms=["炼钢炉"])]
+    [created] = build_proposals([LADLE_CHUNK], [STEELMAKING_CONVERTER], types, NO_RELATIONS)
+
+    assert (created.op, created.fields["labelZh"]) == ("create", "电炉")
+    # With the converter's id the flag also follows from the mistaken id.
+    assert "possible_duplicate" in created.flags
+
+
+def test_a_synonym_that_is_an_existing_label_aligns_a_type() -> None:
+    types = [entity("new:Bof", "氧气转炉", "Bof", synonyms=["转炉"])]
+    [update] = build_proposals([LADLE_CHUNK], [STEELMAKING_CONVERTER], types, NO_RELATIONS)
+
+    assert (update.op, update.target_element_id) == ("update", STEELMAKING_CONVERTER.id)
+    assert update.fields == {"synonyms": [{"lang": "zh", "text": "氧气转炉"}]}
+
+
+def test_an_existing_id_given_to_a_type_of_its_one_character_label_is_kept() -> None:
+    steel = KnownElement(id=uuid4(), kind="entity_type", local_name="Steel", label_zh="钢")
+    types = [
+        entity(str(steel.id), "钢", "Steel"),
+        entity("new:Billet", "钢坯", "Billet", parent=str(steel.id)),
+    ]
+    [billet] = build_proposals([LADLE_CHUNK], [steel], types, NO_RELATIONS)
+
+    # Not a mistaken id: the parent given it stands for 钢.
+    assert billet.fields["parentRef"] == str(steel.id)

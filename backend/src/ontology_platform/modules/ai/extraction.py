@@ -379,18 +379,27 @@ class _Builder:
         return name
 
     def match_known(
-        self, kind: Kind, labels: Iterable[str], domain: UUID | None = None
+        self,
+        kind: Kind,
+        labels: Sequence[str],
+        domain: UUID | None = None,
+        synonyms: Sequence[str] = (),
     ) -> KnownElement | None:
-        keys = {normalize(label) for label in labels if label}
+        """The first existing element of the kind that shares a name with the given ones."""
         for element in self.known:
             if element.kind != kind or (domain is not None and element.domain_id != domain):
                 continue
-            names = {element.label_zh, element.local_name, *element.synonyms}
-            if element.label_en:
-                names.add(element.label_en)
-            if keys & {normalize(name) for name in names}:
+            if _shares_name(labels, synonyms, element):
                 return element
         return None
+
+    def shares_synonym(self, labels: Sequence[str], synonyms: Sequence[str]) -> bool:
+        """Whether a new type shares a synonym with an existing type (see `_shares_synonym`)."""
+        return any(
+            _shares_synonym(labels, synonyms, element)
+            for element in self.known
+            if element.kind == "entity_type"
+        )
 
     def add(self, proposal: Proposal, quotes: Sequence[Quote], confidence: float) -> None:
         evidence, all_found = self.ground(quotes)
@@ -416,24 +425,24 @@ def build_proposals(
     mistaken: set[str] = set()  # existing ids given to types that share no name with them
 
     for item in types:
-        labels = [item.label_zh, item.label_en or "", *item.synonyms]
+        labels = [item.label_zh, item.label_en or ""]
         claimed = builder.known_ids.get(item.ref)
         if claimed is not None and claimed.kind != "entity_type":
             claimed = None
-        # An existing type reused by its id shares a name (two characters or more) with it. A
-        # type that shares none was given a mistaken id, or is a new name for that type: it is
+        # An existing type reused by its id shares a name with it (see `_shares_name`). A type
+        # that shares none was given a mistaken id, or is a new name for that type: it is
         # aligned by its own names, and if it stays new a reviewer decides.
-        mistaken_id = claimed is not None and not (_keys(labels) & _element_keys(claimed))
+        mistaken_id = claimed is not None and not _shares_name(labels, item.synonyms, claimed)
         if claimed is not None and not mistaken_id:
             became.append((item, item.ref))
-            _maybe_update(builder, claimed, item.synonyms, item, item.quotes)
+            _maybe_update(builder, claimed, item, item.quotes)
             continue
         if mistaken_id:
             mistaken.add(item.ref)
-        existing = builder.match_known("entity_type", labels)
+        existing = builder.match_known("entity_type", labels, synonyms=item.synonyms)
         if existing is not None:
             became.append((item, str(existing.id)))
-            _maybe_update(builder, existing, item.synonyms, item, item.quotes)
+            _maybe_update(builder, existing, item, item.quotes)
             continue
         # A new type with a label that is a name of an earlier new type, or with a name that is
         # that type's label, is the same concept. Synonyms alone do not merge: two kinds of one
@@ -478,9 +487,13 @@ def build_proposals(
                 "parentRef": None,
             },
         )
-        # Only a synonym is shared with another new type, or the model took it for an existing
-        # type whose names it does not have: ask a human.
-        if mistaken_id or any(item_synonyms & _type_keys(p) for _, p in new_types):
+        # Only a synonym is shared with another new type or with an existing type, or the model
+        # took it for an existing type whose names it does not have: ask a human.
+        if (
+            mistaken_id
+            or any(item_synonyms & _type_keys(p) for _, p in new_types)
+            or builder.shares_synonym(labels, item.synonyms)
+        ):
             proposal.flags.append("possible_duplicate")
         new_types.append((item, proposal))
         builder.add(proposal, item.quotes, item.confidence)
@@ -618,6 +631,37 @@ def _element_keys(element: KnownElement) -> set[str]:
     return _keys([element.label_zh, element.label_en or "", *element.synonyms])
 
 
+def _short_keys(names: Iterable[str]) -> set[str]:
+    """Normalized names of one character, too short for `_keys`."""
+    return {key for key in (normalize(name) for name in names) if 0 < len(key) < MIN_NAME}
+
+
+def _shares_name(labels: Sequence[str], synonyms: Sequence[str], element: KnownElement) -> bool:
+    """Whether a proposed element is an existing one by name.
+
+    As for merging new types: a label is one of the element's names, or a synonym is one of
+    its labels, comparing names of two characters or more; local names do not count. A shared
+    synonym alone does not align, since two kinds of one thing often share one (转炉 and 电炉
+    both go by 炼钢炉, and both by 炉). A label that is one character as a whole (钢) still is
+    the element whose label is the same character, or each would duplicate the other.
+    """
+    element_labels = [element.label_zh, element.label_en or ""]
+    if _keys(labels) & _element_keys(element) or _keys(synonyms) & _keys(element_labels):
+        return True
+    return bool(_short_keys(labels) & _short_keys(element_labels))
+
+
+def _shares_synonym(labels: Sequence[str], synonyms: Sequence[str], element: KnownElement) -> bool:
+    """Whether a proposed element not aligned with an existing one shares a synonym with it.
+
+    Also a one-character label that is a one-character synonym of the element: 炉 may be 转炉.
+    """
+    return bool(
+        _keys(synonyms) & _keys(element.synonyms)
+        or _short_keys(labels) & _short_keys(element.synonyms)
+    )
+
+
 def _mentions(line: str, names: set[str]) -> list[tuple[int, int]]:
     """Spans of every occurrence of any of the names in a normalized line."""
     spans: list[tuple[int, int]] = []
@@ -649,20 +693,25 @@ def _synonyms(values: Iterable[str], label: str) -> list[dict[str, str]]:
 def _maybe_update(
     builder: _Builder,
     element: KnownElement,
-    synonyms: Sequence[str],
     item: EntityTypeOut,
     quotes: Sequence[Quote],
 ) -> None:
     """Propose adding synonyms or a missing definition to an existing type; nothing otherwise.
 
-    Several model types can land on the same existing type. They become one update: two
-    updates of one element in a change set would make the second look stale at merge time.
+    The model's Chinese label is a name the source uses for the type, so it is added as a
+    synonym when it is none of the type's names yet. Several model types can land on the same
+    existing type. They become one update: two updates of one element in a change set would
+    make the second look stale at merge time.
     """
     previous = builder.updates.get(element.id)
     known = {normalize(s) for s in (*element.synonyms, element.label_zh, element.label_en or "")}
     if previous is not None:
         known |= {normalize(s["text"]) for s in previous.fields.get("synonyms", [])}
-    added = [s for s in _synonyms(synonyms, element.label_zh) if normalize(s["text"]) not in known]
+    added = [
+        s
+        for s in _synonyms([item.label_zh, *item.synonyms], element.label_zh)
+        if normalize(s["text"]) not in known
+    ]
     fields: dict[str, Any] = {}
     if added:
         fields["synonyms"] = added
