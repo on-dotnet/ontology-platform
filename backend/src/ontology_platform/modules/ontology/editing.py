@@ -131,6 +131,8 @@ def _with_fields(view: _View, op: str, fields: schemas.ElementFields) -> _View:
             changes[column] = _ref_id(getattr(fields, key))
     if "rules" in given and fields.rules is not None:
         changes["rules"] = [_stored_rule(rule) for rule in fields.rules]
+    if view.kind == "axiom" and fields.turtle is not None:
+        changes["turtle"] = fields.turtle
     if op == "restore":
         changes["status"] = "active"
     return replace(view, **changes)
@@ -149,6 +151,17 @@ def _field_refs(fields: schemas.ElementFields) -> set[UUID]:
             if ref is not None:
                 found.add(ref)
     return found
+
+
+def _mentioned_iris(fields: schemas.ElementFields, prefixes: Mapping[str, str]) -> frozenset[str]:
+    """The IRIs an axiom fragment of the fields mentions, as the cascade reads stored axioms."""
+    if not fields.turtle:
+        return frozenset()
+    try:
+        return service.normalize_axiom(fields.turtle, prefixes).mentions
+    except RdfInputError:
+        # Saves check fragments before the cascade; one that does not parse mentions nothing.
+        return frozenset()
 
 
 class _Cascade:
@@ -367,17 +380,21 @@ def _add_cascade(ontology: Ontology, elements: Sequence[Element], checked: _Chec
         if item.op in ("update", "restore") and item.target_element_id is not None:
             view = views[item.target_element_id]
             views[view.id] = _with_fields(view, item.op, item.proposed)
-    changes = _Cascade(views, service.header_of(ontology).prefix_map()).changes(checked.deletes)
+    prefixes = service.header_of(ontology).prefix_map()
+    changes = _Cascade(views, prefixes).changes(checked.deletes)
     leaving = set(checked.deletes) | {id_ for id_, fields in changes.items() if fields is None}
+    leaving_iris = {iri for id_ in leaving if (iri := views[id_].iri)}
     for seq, item in enumerate(checked.items, start=1):
         if item.op == "delete":
             continue
+        # A new axiom is no row yet, so the cascade cannot see what it mentions: read its fragment.
+        mentioned = _mentioned_iris(item.proposed, prefixes)
+        if _field_refs(item.proposed) & leaving or mentioned & leaving_iris:
+            raise CascadeConflictError(seq, "it refers to an element this save deletes")
         if item.target_element_id in leaving:
             raise CascadeConflictError(
                 seq, "another item of this save deletes this element along with its own"
             )
-        if _field_refs(item.proposed) & leaving:
-            raise CascadeConflictError(seq, "it refers to an element this save deletes")
     for element_id, fields in changes.items():
         index = checked.targets.get(element_id)
         if index is None:

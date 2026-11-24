@@ -464,6 +464,32 @@ async def test_what_conflicts_with_a_delete_goes_with_what_depends_on_it(
     assert row.dropped == 2
 
 
+async def test_an_axiom_that_mentions_a_deleted_element_is_dropped(
+    app: FastAPI, client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.EDITOR)
+    ontology, rows = await steel(db)
+    heat, slab = (f"<{ontology.base_iri}{name}>" for name in ("Heat", "Slab"))
+    disjoint = "<http://www.w3.org/2002/07/owl#disjointWith>"
+
+    row = await run(
+        app,
+        client,
+        ontology,
+        [
+            operation("delete", "entity_type", target=rows["Slab"]),
+            operation("create", "axiom", turtle=f"{heat} {disjoint} {slab} ."),
+        ],
+    )
+
+    items = await proposed_items(client, row.change_set_id)
+    assert [(item["op"], item["kind"], item["targetElementId"]) for item in items] == [
+        ("delete", "entity_type", str(rows["Slab"].id)),
+        ("delete", "relation_type", str(rows["castIn"].id)),
+    ]
+    assert row.dropped == 1
+
+
 async def test_axioms_are_checked_normalized_and_taken_once(
     app: FastAPI, client: AsyncClient, db: AsyncSession
 ) -> None:
