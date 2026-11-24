@@ -41,7 +41,10 @@ function toastAction(data: unknown): ToastAction | undefined {
   return { label, onClick: () => void (onClick as () => unknown)(), ...(href ? { href } : {}) };
 }
 
-/** Bottom-right toasts. Success toasts close after 3 seconds (ui-guidelines §4). */
+/** How long a toast with an action stays: long enough to reach the action, also by keyboard. */
+const ACTION_TIMEOUT = 8000;
+
+/** Bottom-right toasts. Success toasts close after 3 seconds (ui-guidelines §4), those with an action after 8. */
 export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <Toast.Provider timeout={3000} limit={3}>
@@ -119,7 +122,7 @@ export function useToast() {
   return useMemo(
     () => ({
       success: (title: string, description?: string, action?: ToastAction) =>
-        manager.add({ title, description, type: 'success', ...(action ? { data: { action } } : {}) }),
+        manager.add({ title, description, type: 'success', ...(action ? { data: { action }, timeout: ACTION_TIMEOUT } : {}) }),
       error: (title: string, description?: string, action?: ToastAction) =>
         manager.add({ title, description, type: 'error', priority: 'high', timeout: 8000, ...(action ? { data: { action } } : {}) }),
     }),

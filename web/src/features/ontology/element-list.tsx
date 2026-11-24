@@ -65,7 +65,7 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
   const query = useElements(ontologyId, { ...(kind === 'all' ? {} : { kind }), ...(q ? { q } : {}), ...(status === 'active' ? {} : { status }) });
   // Names of the types constraints target and of the elements axioms belong to, deleted ones included.
   const everything = useElements(ontologyId, { status: 'all' });
-  const { restore, pendingId } = useRestoreElement(ontologyId);
+  const { restore, pendingId, apply: restoresAtOnce } = useRestoreElement(ontologyId);
   const byId = new Map((everything.data ?? []).map((element) => [element.id, element]));
   const nameOf = (id: string | null) => {
     if (!everything.isSuccess) return null;
@@ -106,13 +106,15 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
             <Button
               variant="secondary"
               size="sm"
-              aria-label={t('ontologyPage.list.restoreElement', { name: elementName(element, language) || t('kind.axiom') })}
+              aria-label={t(restoresAtOnce ? 'ontologyPage.list.restoreElement' : 'ontologyPage.list.submitRestoreElement', {
+                name: elementName(element, language) || t('kind.axiom'),
+              })}
               loading={pendingId === element.id}
               disabled={pendingId !== undefined && pendingId !== element.id}
               onClick={() => restore(element)}
             >
               <RotateCcw aria-hidden />
-              {t('ontologyPage.edit.restore')}
+              {restoresAtOnce ? t('ontologyPage.edit.restore') : t('ontologyPage.edit.submitRestore')}
             </Button>
           ) : null}
         </TableCell>
@@ -207,7 +209,7 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
                           <span className="inline-flex items-center gap-2">
                             <span id={labelId} className="text-foreground">
                               {group.subjectId === null ? (
-                                t('ontologyPage.list.annotations')
+                                t('ontologyPage.list.noSubject')
                               ) : group.name === null ? (
                                 <Skeleton className="inline-block h-3.5 w-20 align-middle" />
                               ) : (
@@ -234,7 +236,7 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
 }
 
 export interface AxiomGroup {
-  /** The element the axioms belong to; null for annotations of the ontology itself. */
+  /** The element the axioms belong to; null for axioms whose subject is no element (ontology annotations, SKOS terms…). */
   subjectId: string | null;
   /** The subject's name; undefined when it is unknown, null until the names have loaded. */
   name: string | null | undefined;
@@ -242,8 +244,8 @@ export interface AxiomGroup {
 }
 
 /**
- * Axioms grouped by the element they belong to, groups in name order; annotations of the ontology
- * (axioms without a subject) come last. Axioms keep the server's order within a group.
+ * Axioms grouped by the element they belong to, groups in name order; axioms about no element
+ * (ontology annotations, terms of other vocabularies) come last. Axioms keep the server's order within a group.
  */
 export function axiomGroups(axioms: readonly Element[], nameOf: (id: string | null) => string | null | undefined, language: string): AxiomGroup[] {
   const groups = new Map<string | null, AxiomGroup>();

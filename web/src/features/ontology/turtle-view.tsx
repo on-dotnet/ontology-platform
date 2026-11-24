@@ -9,14 +9,16 @@ import { TurtleEditor, type TurtleEditorHandle } from '@/components/code/turtle-
 import { InfoTip } from '@/components/feedback/hint-tip';
 import { InlineNotice } from '@/components/feedback/inline-notice';
 import { QueryState } from '@/components/states/query-state';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePermissions } from '@/features/auth/permissions';
 import { saveTurtle, useOntologyTurtle, type ImportResult, type OntologySummary } from '@/features/ontologies/api';
 import { ImportResultView, useRefreshAfterImport } from '@/features/ontologies/import-owl';
 import { useErrorMessage } from '@/i18n/error-message';
+
+import { DiscardChangesDialog } from './discard-changes-dialog';
 
 const EDITOR_SIZE = 'h-[min(65dvh,40rem)] min-h-80';
 
@@ -186,23 +188,12 @@ export function TurtleView({ ontology }: { ontology: OntologySummary }) {
         </DialogContent>
       </Dialog>
 
-      <Dialog
+      <DiscardChangesDialog
         open={blocker.status === 'blocked'}
-        onOpenChange={(open) => {
-          if (!open) blocker.reset?.();
-        }}
-      >
-        <DialogContent closeLabel={t('common.close')}>
-          <DialogTitle>{t('ontologyPage.turtle.discardTitle')}</DialogTitle>
-          <DialogDescription>{t('ontologyPage.turtle.discardDescription')}</DialogDescription>
-          <div className="mt-5 flex justify-end gap-2">
-            <DialogClose className={buttonVariants({ variant: 'secondary' })}>{t('ontologyPage.turtle.keepEditing')}</DialogClose>
-            <Button variant="destructive" onClick={() => blocker.proceed?.()}>
-              {t('ontologyPage.turtle.discard')}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+        description={t('ontologyPage.turtle.discardDescription')}
+        onKeep={() => blocker.reset?.()}
+        onDiscard={() => blocker.proceed?.()}
+      />
     </>
   );
 }

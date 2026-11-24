@@ -584,9 +584,10 @@
       },
       "statusChip": "Status: {{status}}",
       "restoreElement": "Restore {{name}}",
-      "annotations": "Ontology annotations",
       "groupCount_one": "{{count}} axiom",
-      "groupCount_other": "{{count}} axioms"
+      "groupCount_other": "{{count}} axioms",
+      "submitRestoreElement": "Submit restoring {{name}}",
+      "noSubject": "Not about an element"
     },
     "detail": {
       "deprecated": "Deleted",
@@ -633,7 +634,14 @@
       "restored": "Restored {{name}}",
       "restoreFailed": "Not restored",
       "submitted": "Submitted for review; it takes effect once approved",
-      "goReview": "Go to review"
+      "goReview": "Go to review",
+      "submitRestore": "Submit restore",
+      "saveErrors": {
+        "has_dependents": "Other elements still refer to what you are deleting, so nothing was saved. Reload to see the references and change those elements first.",
+        "invalid_item": "One of the changes is incomplete or not valid, so nothing was saved. Check what you entered and save again.",
+        "dependency_skipped": "A change this one depends on could not take effect, so nothing was saved. Reload and make the change again.",
+        "stale_target": "Someone else just changed this element, so nothing was saved. Reload and make your change on the latest version."
+      }
     },
     "form": {
       "createTitle": {
@@ -665,7 +673,8 @@
         "lengthOrder": "The maximum length cannot be less than the minimum length",
         "integerValue": "Enter a whole number",
         "numberValue": "Enter a number",
-        "flagsInvalid": "Use only the flags s, m, i, x and q"
+        "flagsInvalid": "Use only the flags s, m, i, x and q",
+        "synonymTooLong": "Each synonym can be at most 200 characters"
       },
       "rules": {
         "title": "Rules",
@@ -692,7 +701,9 @@
         "flagsPlaceholder": "e.g. i",
         "messageZh": "Chinese message",
         "messageEn": "English message"
-      }
+      },
+      "autoShapeLabel": "About validation rules",
+      "autoShapeHint": "This element was imported, and its required and multiple settings are not in the platform’s validation rules yet. Once you change them and save, the platform creates the rules for it."
     },
     "impact": {
       "title": "Referenced by",
@@ -722,7 +733,8 @@
       },
       "confirm": "Delete",
       "failedTitle": "Not deleted",
-      "staleDescription": "Reload to see the latest references, then confirm again."
+      "staleDescription": "Reload to see the latest references, then confirm again.",
+      "reviewDescription": "This creates a change set; the element is deleted once it is approved. It is then no longer exported, and you can restore it later from Deleted in the list."
     },
     "viewTurtle": "Turtle",
     "turtle": {
@@ -739,10 +751,7 @@
       "failedTitle": "No change set was created",
       "baseChangedTitle": "The working version has changed",
       "baseChangedDescription": "Other changes were merged after you started editing, and a change set made now would undo them. Cancel and edit the latest content instead.",
-      "discardTitle": "Discard unsaved changes?",
-      "discardDescription": "Your Turtle edits have not become a change set yet and will be lost.",
-      "keepEditing": "Keep editing",
-      "discard": "Discard changes"
+      "discardDescription": "Your Turtle edits have not become a change set yet and will be lost."
     },
     "axiom": {
       "createTitle": "New advanced axiom",
@@ -755,6 +764,12 @@
       "showPrefixes": "Show prefixes ({{count}})",
       "hidePrefixes": "Hide prefixes",
       "prefixesLabel": "Prefixes of the ontology"
+    },
+    "discard": {
+      "title": "Discard unsaved changes?",
+      "description": "Your changes here are not saved yet and will be lost.",
+      "keep": "Keep editing",
+      "confirm": "Discard changes"
     }
   },
   "releases": {

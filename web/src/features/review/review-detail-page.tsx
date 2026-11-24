@@ -146,8 +146,14 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
 
   const isOpen = changeSet.status === 'open';
   const canDecide = canReview && isOpen;
-  // Submitters who may not review their change set can still take it back.
-  const canWithdraw = isOpen && own && !canReview;
+  // Submitters can take their open change set back in either review mode, reviewers too (spec 002, section 8).
+  const canWithdraw = isOpen && own;
+  const withdrawButton = canWithdraw ? (
+    <Button variant="secondary" className="text-error-strong" onClick={() => setWithdrawing(true)}>
+      <Undo2 aria-hidden />
+      {t('review.withdraw')}
+    </Button>
+  ) : null;
   const isAi = isAiSource(changeSet.source);
   const pending = changeSet.items.filter((item) => item.decision === 'pending');
   const pendingCount = pending.length;
@@ -222,6 +228,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                 {merge.isPending ? null : <GitMerge aria-hidden />}
                 {t('review.merge')}
               </Button>
+              {withdrawButton}
             </>
           ) : (
             <>
@@ -244,12 +251,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                   {t('review.viewOntology')}
                 </Link>
               ) : null}
-              {canWithdraw ? (
-                <Button variant="secondary" className="text-error-strong" onClick={() => setWithdrawing(true)}>
-                  <Undo2 aria-hidden />
-                  {t('review.withdraw')}
-                </Button>
-              ) : null}
+              {withdrawButton}
             </>
           )
         }

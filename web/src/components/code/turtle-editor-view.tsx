@@ -1,7 +1,7 @@
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { HighlightStyle, StreamLanguage, syntaxHighlighting } from '@codemirror/language';
 import { turtle } from '@codemirror/legacy-modes/mode/turtle';
-import { Annotation, Compartment, EditorState, type Extension } from '@codemirror/state';
+import { Annotation, Compartment, EditorState, Transaction, type Extension } from '@codemirror/state';
 import { drawSelection, EditorView, highlightActiveLine, highlightActiveLineGutter, keymap, lineNumbers } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
 import { useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
@@ -114,6 +114,13 @@ export default function TurtleEditorView({ value, onChange, onBlur, readOnly = f
           history(),
           keymap.of([...defaultKeymap, ...historyKeymap]),
           EditorView.lineWrapping,
+          // Esc stays in the editor instead of closing the dialog around it, with the edits in it.
+          EditorView.domEventHandlers({
+            keydown: (event) => {
+              if (event.key === 'Escape') event.stopPropagation();
+              return false;
+            },
+          }),
           turtleLanguage,
           syntaxHighlighting(highlightStyle),
           editorTheme,
@@ -140,7 +147,11 @@ export default function TurtleEditorView({ value, onChange, onBlur, readOnly = f
     if (!view) return;
     const current = view.state.doc.toString();
     if (current !== value) {
-      view.dispatch({ changes: { from: 0, to: current.length, insert: value }, annotations: external.of(true) });
+      // A value from outside is not an edit to undo.
+      view.dispatch({
+        changes: { from: 0, to: current.length, insert: value },
+        annotations: [external.of(true), Transaction.addToHistory.of(false)],
+      });
     }
   }, [value]);
 

@@ -1,5 +1,5 @@
 import type { DocumentInfo } from '@/features/documents/api';
-import type { Element, ElementDetail, ElementRef, Impact, ImportResult, OntologySummary } from '@/features/ontologies/api';
+import type { EditRequest, Element, ElementDetail, ElementRef, Impact, ImportResult, OntologySummary } from '@/features/ontologies/api';
 import type { ReleaseSummary } from '@/features/releases/api';
 import { countDecisions, type ChangeItem, type ChangeSetDetail } from '@/features/review/api';
 
@@ -186,4 +186,18 @@ export function elementRefFixture(element: Element): ElementRef {
     label: element.labelZh ?? element.labelEn ?? element.localName ?? element.turtle ?? '',
     iri: element.iri,
   };
+}
+
+/**
+ * What merging a manual save does to the elements a fake server holds: each target moves to its
+ * next revision, deletes and restores also change its status. Fields are left as they were.
+ */
+export function mergeEdits(elements: Element[], { items }: EditRequest): void {
+  for (const item of items) {
+    const index = elements.findIndex((element) => element.id === item.targetElementId);
+    const target = elements[index];
+    if (!target) continue;
+    const status = item.op === 'delete' ? 'deprecated' : item.op === 'restore' ? 'active' : target.status;
+    elements[index] = { ...target, status, revision: target.revision + 1 };
+  }
 }

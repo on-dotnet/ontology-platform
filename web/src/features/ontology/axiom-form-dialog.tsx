@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, RefreshCw } from 'lucide-react';
-import { useId, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TurtleEditor, type TurtleEditorHandle } from '@/components/code/turtle-editor';
@@ -11,10 +11,10 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ontologyKeys, turtlePrefixes, useElementDetail, useOntologyTurtle, type EditItem, type Element } from '@/features/ontologies/api';
-import { useErrorMessage } from '@/i18n/error-message';
 import { cn } from '@/lib/cn';
 
-import { isStale, useSaveEdits } from './edit-actions';
+import { DiscardChangesDialog, useDiscardGuard } from './discard-changes-dialog';
+import { isStale, useSaveErrorMessage, useSaveEdits } from './edit-actions';
 
 interface AxiomFormDialogProps {
   ontologyId: string;
@@ -27,31 +27,37 @@ interface AxiomFormDialogProps {
 /** Writes or rewrites one advanced axiom as a Turtle fragment (spec 002, section 7). */
 export function AxiomFormDialog({ ontologyId, open, elementId, onClose }: AxiomFormDialogProps) {
   const { t } = useTranslation();
+  const guard = useDiscardGuard(onClose);
+  const body = { ontologyId, onDone: guard.close, onDirtyChange: guard.setDirty };
   return (
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) onClose();
+        if (!next) guard.requestClose();
       }}
     >
       <DialogContent closeLabel={t('common.close')} className="max-h-[calc(100dvh-2rem)] w-[min(48rem,calc(100vw-2rem))] overflow-y-auto">
-        {open ? (
-          elementId ? (
-            <EditAxiom ontologyId={ontologyId} elementId={elementId} onDone={onClose} />
-          ) : (
-            <AxiomForm ontologyId={ontologyId} onDone={onClose} />
-          )
-        ) : null}
+        {open ? elementId ? <EditAxiom {...body} elementId={elementId} /> : <AxiomForm {...body} /> : null}
+        <DiscardChangesDialog open={guard.confirming} description={t('ontologyPage.discard.description')} onKeep={guard.keep} onDiscard={guard.close} />
       </DialogContent>
     </Dialog>
   );
 }
 
-function EditAxiom({ ontologyId, elementId, onDone }: { ontologyId: string; elementId: string; onDone: () => void }) {
+interface BodyProps {
+  ontologyId: string;
+  onDone: () => void;
+  /** Tells the dialog whether the fragment has unsaved changes. */
+  onDirtyChange: (dirty: boolean) => void;
+}
+
+function EditAxiom({ elementId, ...body }: BodyProps & { elementId: string }) {
+  const { ontologyId } = body;
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const detail = useElementDetail(ontologyId, elementId);
-  // Bumped after reloading a changed axiom, so the form starts again from the fresh fragment.
+  // Bumped after reloading a changed axiom, so the form starts again from the fresh fragment. Not
+  // the revision: a save that applies at once raises it while the dialog is still closing.
   const [generation, setGeneration] = useState(0);
   const reload = async () => {
     await queryClient.invalidateQueries({ queryKey: ontologyKeys.all });
@@ -69,24 +75,24 @@ function EditAxiom({ ontologyId, elementId, onDone }: { ontologyId: string; elem
       }
     >
       {(element) => (
-        <AxiomForm key={`${element.revision}-${generation}`} ontologyId={ontologyId} element={element} onDone={onDone} onReload={reload} />
+        <AxiomForm key={generation} {...body} element={element} onReload={reload} />
       )}
     </QueryState>
   );
 }
 
-interface AxiomFormProps {
-  ontologyId: string;
+interface AxiomFormProps extends BodyProps {
   /** The axiom being changed; undefined when writing a new one. */
   element?: Element;
-  onDone: () => void;
   /** Loads the axiom again after someone else changed it. */
   onReload?: () => Promise<void>;
 }
 
-function AxiomForm({ ontologyId, element, onDone, onReload }: AxiomFormProps) {
+function AxiomForm({ ontologyId, element: current, onDone, onDirtyChange, onReload }: AxiomFormProps) {
   const { t } = useTranslation();
-  const message = useErrorMessage();
+  const message = useSaveErrorMessage();
+  // The axiom as read when the form opened: its revision is the one the save is checked against.
+  const [element] = useState(current);
   const labelId = useId();
   const hintId = useId();
   const errorId = useId();
@@ -101,6 +107,8 @@ function AxiomForm({ ontologyId, element, onDone, onReload }: AxiomFormProps) {
 
   const missing = turtle.trim() === '';
   const showMissing = missing && (touched || submitted);
+  const dirty = turtle !== initial;
+  useEffect(() => onDirtyChange(dirty), [dirty, onDirtyChange]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -177,6 +185,8 @@ function AxiomForm({ ontologyId, element, onDone, onReload }: AxiomFormProps) {
             }}
             onBlur={() => setTouched(true)}
             aria-labelledby={labelId}
+            // The same name again, for tools that do not follow aria-labelledby into the label.
+            aria-label={t('ontologyPage.axiom.fragment')}
             aria-describedby={showMissing ? `${hintId} ${errorId}` : hintId}
             aria-invalid={showMissing}
             aria-required

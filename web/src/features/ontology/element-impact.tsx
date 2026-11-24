@@ -10,10 +10,9 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { elementName, ontologyKeys, useImpact, type Element, type ElementRef, type Impact } from '@/features/ontologies/api';
-import { useErrorMessage } from '@/i18n/error-message';
 import { cn } from '@/lib/cn';
 
-import { isStale, useSaveEdits } from './edit-actions';
+import { isStale, useSaveErrorMessage, useSaveEdits } from './edit-actions';
 import { kindTone } from './element-list';
 
 type CascadeEntry = Impact['cascade'][number];
@@ -155,7 +154,7 @@ export function DeleteElementDialog({ ontologyId, element, all, open, onOpenChan
 function DeleteBody({ ontologyId, element, all, onDone }: Omit<DeleteElementDialogProps, 'open' | 'onOpenChange'> & { onDone: () => void }) {
   const { t, i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? i18n.language;
-  const message = useErrorMessage();
+  const message = useSaveErrorMessage();
   const queryClient = useQueryClient();
   const impact = useImpact(ontologyId, element.id);
   const { apply, mutation } = useSaveEdits(ontologyId);
@@ -185,7 +184,7 @@ function DeleteBody({ ontologyId, element, all, onDone }: Omit<DeleteElementDial
   return (
     <>
       <DialogTitle>{t('ontologyPage.delete.title', { name })}</DialogTitle>
-      <DialogDescription>{t('ontologyPage.delete.description')}</DialogDescription>
+      <DialogDescription>{apply ? t('ontologyPage.delete.description') : t('ontologyPage.delete.reviewDescription')}</DialogDescription>
       <div className="mt-5 space-y-4">
         {mutation.isError ? (
           isStale(mutation.error) ? (
@@ -214,7 +213,8 @@ function DeleteBody({ ontologyId, element, all, onDone }: Omit<DeleteElementDial
 
         <div className="flex justify-end gap-2 pt-2">
           <DialogClose className={buttonVariants({ variant: 'secondary' })}>{t('common.cancel')}</DialogClose>
-          <Button variant="destructive" disabled={!impact.isSuccess} loading={mutation.isPending} onClick={confirm}>
+          {/* Not while the cascade is reloading: the list must show what the delete brings along. */}
+          <Button variant="destructive" disabled={!impact.isSuccess || impact.isFetching} loading={mutation.isPending} onClick={confirm}>
             <Trash2 aria-hidden />
             {apply ? t('ontologyPage.delete.confirm') : t('ontologyPage.edit.submitForReview')}
           </Button>

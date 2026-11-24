@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tooltip } from '@/components/ui/tooltip';
 import { DATATYPES, elementName, type Element } from '@/features/ontologies/api';
 
-import { emptyRule, ruleErrorKey, type RuleField, type RuleForm } from './element-form';
+import { emptyRule, MAX_LENGTH, ruleErrorKey, type RuleField, type RuleForm } from './element-form';
 
 interface RuleEditorProps {
   rules: readonly RuleForm[];
@@ -101,10 +101,14 @@ function RuleCard({ rule, index, elements, language, onUpdate, onRemove, fieldId
     </div>
   );
 
-  const text = (name: Exclude<RuleField, 'minExclusive' | 'maxExclusive'>, extra: { mono?: boolean; numeric?: boolean; placeholder?: string } = {}) => (
+  const text = (
+    name: Exclude<RuleField, 'minExclusive' | 'maxExclusive'>,
+    extra: { mono?: boolean; numeric?: boolean; placeholder?: string; maxLength?: number } = {},
+  ) => (
     <Input
       id={id(name)}
       value={rule[name]}
+      maxLength={extra.maxLength}
       inputMode={extra.numeric ? 'numeric' : undefined}
       placeholder={extra.placeholder}
       className={extra.mono ? 'font-mono' : undefined}
@@ -152,6 +156,7 @@ function RuleCard({ rule, index, elements, language, onUpdate, onRemove, fieldId
         <NativeSelect
           id={id('pathRef')}
           value={rule.pathRef}
+          aria-required
           aria-invalid={error('pathRef') ? true : undefined}
           aria-describedby={describedBy('pathRef')}
           onChange={(event) => onUpdate({ pathRef: event.target.value })}
@@ -230,10 +235,14 @@ function RuleCard({ rule, index, elements, language, onUpdate, onRemove, fieldId
         {bound('maxValue', 'maxExclusive', t('ontologyPage.form.rules.maxValue'))}
         {field('minLength', t('ontologyPage.form.rules.minLength'), text('minLength', { numeric: true }))}
         {field('maxLength', t('ontologyPage.form.rules.maxLength'), text('maxLength', { numeric: true }))}
-        {field('pattern', t('ontologyPage.form.rules.pattern'), text('pattern', { mono: true }))}
-        {field('flags', t('ontologyPage.form.rules.flags'), text('flags', { mono: true, placeholder: t('ontologyPage.form.rules.flagsPlaceholder') }))}
-        {field('messageZh', t('ontologyPage.form.rules.messageZh'), text('messageZh'))}
-        {field('messageEn', t('ontologyPage.form.rules.messageEn'), text('messageEn'))}
+        {field('pattern', t('ontologyPage.form.rules.pattern'), text('pattern', { mono: true, maxLength: MAX_LENGTH.pattern }))}
+        {field(
+          'flags',
+          t('ontologyPage.form.rules.flags'),
+          text('flags', { mono: true, placeholder: t('ontologyPage.form.rules.flagsPlaceholder'), maxLength: MAX_LENGTH.flags }),
+        )}
+        {field('messageZh', t('ontologyPage.form.rules.messageZh'), text('messageZh', { maxLength: MAX_LENGTH.message }))}
+        {field('messageEn', t('ontologyPage.form.rules.messageEn'), text('messageEn', { maxLength: MAX_LENGTH.message }))}
       </div>
     </section>
   );

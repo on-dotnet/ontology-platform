@@ -584,9 +584,10 @@
       },
       "statusChip": "状态：{{status}}",
       "restoreElement": "恢复“{{name}}”",
-      "annotations": "本体注解",
       "groupCount_one": "{{count}} 条",
-      "groupCount_other": "{{count}} 条"
+      "groupCount_other": "{{count}} 条",
+      "submitRestoreElement": "提交恢复“{{name}}”",
+      "noSubject": "不属于任何元素"
     },
     "detail": {
       "deprecated": "已删除",
@@ -633,7 +634,14 @@
       "restored": "已恢复“{{name}}”",
       "restoreFailed": "没有恢复",
       "submitted": "已提交审核，审核通过后生效",
-      "goReview": "去审核"
+      "goReview": "去审核",
+      "submitRestore": "提交恢复",
+      "saveErrors": {
+        "has_dependents": "还有其他元素引用要删除的元素，这次修改没有保存。请刷新后查看引用情况，先修改引用它的元素再删除。",
+        "invalid_item": "有一项内容不完整或不合法，这次修改没有保存。请检查填写的内容后再保存。",
+        "dependency_skipped": "这次修改依赖的另一项没能生效，整次修改都没有保存。请刷新后重新修改。",
+        "stale_target": "要修改的元素刚被其他人改过，这次修改没有保存。请刷新后在最新内容上重新修改。"
+      }
     },
     "form": {
       "createTitle": {
@@ -665,7 +673,8 @@
         "lengthOrder": "最长长度不能小于最短长度",
         "integerValue": "请输入整数",
         "numberValue": "请输入数字",
-        "flagsInvalid": "只能使用 s、m、i、x、q 这几个标志"
+        "flagsInvalid": "只能使用 s、m、i、x、q 这几个标志",
+        "synonymTooLong": "每个同义词不能超过 200 个字符"
       },
       "rules": {
         "title": "规则",
@@ -692,7 +701,9 @@
         "flagsPlaceholder": "例如 i",
         "messageZh": "中文提示信息",
         "messageEn": "英文提示信息"
-      }
+      },
+      "autoShapeLabel": "关于校验规则",
+      "autoShapeHint": "这个元素来自导入，必填和允许多个还没有写进平台的校验规则。修改这两项并保存后，平台会为它生成校验规则。"
     },
     "impact": {
       "title": "被引用",
@@ -722,7 +733,8 @@
       },
       "confirm": "删除",
       "failedTitle": "没有删除",
-      "staleDescription": "刷新后会载入最新的引用情况，请确认后再删除。"
+      "staleDescription": "刷新后会载入最新的引用情况，请确认后再删除。",
+      "reviewDescription": "提交后生成变更集，审核通过后才会删除；删除后它不再导出，之后可以在列表的“已删除”里恢复。"
     },
     "viewTurtle": "Turtle",
     "turtle": {
@@ -739,10 +751,7 @@
       "failedTitle": "没有生成变更集",
       "baseChangedTitle": "工作版本有了新的修改",
       "baseChangedDescription": "你开始编辑后，工作版本又合并了其他修改，现在生成的变更集会把它们改回去。建议取消后在最新内容上重新编辑。",
-      "discardTitle": "放弃未保存的修改？",
-      "discardDescription": "Turtle 里的修改还没有生成变更集，离开后会丢失。",
-      "keepEditing": "继续编辑",
-      "discard": "放弃修改"
+      "discardDescription": "Turtle 里的修改还没有生成变更集，离开后会丢失。"
     },
     "axiom": {
       "createTitle": "新建高级公理",
@@ -755,6 +764,12 @@
       "showPrefixes": "查看前缀（{{count}}）",
       "hidePrefixes": "收起前缀",
       "prefixesLabel": "本体的前缀"
+    },
+    "discard": {
+      "title": "放弃未保存的修改？",
+      "description": "这里的修改还没有保存，关闭后会丢失。",
+      "keep": "继续编辑",
+      "confirm": "放弃修改"
     }
   },
   "releases": {

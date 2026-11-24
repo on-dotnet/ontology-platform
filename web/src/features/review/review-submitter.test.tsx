@@ -134,13 +134,16 @@ describe('withdrawing a change set', () => {
     expect(screen.queryByRole('button', { name: '撤回' })).not.toBeInTheDocument();
   });
 
-  it('is not offered to a reviewer who may review their own change set (single review mode)', async () => {
-    submitterServer({ user: userWithRole('reviewer'), reviewMode: 'single' });
+  it('is offered next to reviewing to a reviewer who may review their own change set (single review mode)', async () => {
+    const user = userEvent.setup();
+    const api = submitterServer({ user: userWithRole('reviewer'), reviewMode: 'single' });
     renderApp('/review/cs-manual');
 
     expect(await screen.findByRole('button', { name: '合并到本体' })).toBeInTheDocument();
     expect(within(card(/板坯/)).getByRole('button', { name: '接受' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: '撤回' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '撤回' }));
+    await user.click(within(await screen.findByRole('dialog', { name: '撤回“手工编辑”？' })).getByRole('button', { name: '撤回变更集' }));
+    await waitFor(() => expect(api.calls('POST', REJECT)).toHaveLength(1));
   });
 });
 

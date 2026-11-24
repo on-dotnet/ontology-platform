@@ -67,9 +67,20 @@ export interface ElementForm {
   required: boolean;
   multiple: boolean;
   rules: RuleForm[];
+  /**
+   * The stored synonyms and how the form wrote them. A language whose text is left alone keeps its
+   * list as stored: a synonym may itself contain a separator, such as "Steel, molten".
+   */
+  synonymSource: SynonymSource | null;
 }
 
-export type FormField = Exclude<keyof ElementForm, 'rules'>;
+export interface SynonymSource {
+  synonyms: readonly Synonym[];
+  zh: string;
+  en: string;
+}
+
+export type FormField = Exclude<keyof ElementForm, 'rules' | 'synonymSource'>;
 
 /** Error key of a rule's field. */
 export function ruleErrorKey(rule: Pick<RuleForm, 'key'>, field: RuleField): string {
@@ -88,7 +99,20 @@ const DECIMAL = /^[+-]?(\d+(\.\d*)?|\.\d+)$/;
 // XPath regular expression flags SHACL accepts for sh:flags.
 const PATTERN_FLAGS = /^[smixq]*$/;
 const IRI_LIKE = /^(https?|urn):\S+$/i;
+// A literal written with its language, as `valueText` writes one: text@zh, text@en-GB.
+const LANG_LITERAL = /^([\s\S]*)@([A-Za-z]{1,8}(?:-[A-Za-z0-9]{1,8})*)$/;
 export const LOCAL_NAME_MAX = 128;
+
+/** Longest values the server accepts (backend schemas). */
+export const MAX_LENGTH = {
+  name: 200,
+  definition: 4000,
+  unit: 32,
+  synonym: 200,
+  pattern: 2000,
+  flags: 16,
+  message: 2000,
+} as const;
 
 /** Object types and constraints use PascalCase local names; relations and properties camelCase. */
 export function usesPascalCase(kind: FormKind): boolean {
@@ -224,16 +248,19 @@ export function toElementForm(element: Element | undefined, kind: FormKind, sepa
       required: false,
       multiple: false,
       rules: kind === 'constraint' ? [emptyRule()] : [],
+      synonymSource: null,
     };
   }
+  const synonymsZh = synonymsText(element.synonyms, 'zh', separator);
+  const synonymsEn = synonymsText(element.synonyms, 'en', separator);
   return {
     localName: element.localName ?? '',
     labelZh: element.labelZh ?? '',
     labelEn: element.labelEn ?? '',
     definitionZh: element.definitionZh ?? '',
     definitionEn: element.definitionEn ?? '',
-    synonymsZh: synonymsText(element.synonyms, 'zh', separator),
-    synonymsEn: synonymsText(element.synonyms, 'en', separator),
+    synonymsZh,
+    synonymsEn,
     parentRef: element.parentId ?? '',
     domainRef: element.domainId ?? '',
     rangeRef: element.rangeId ?? '',
@@ -243,6 +270,7 @@ export function toElementForm(element: Element | undefined, kind: FormKind, sepa
     required: element.required,
     multiple: element.multiple,
     rules: (element.rules ?? []).map(ruleToForm),
+    synonymSource: { synonyms: element.synonyms, zh: synonymsZh, en: synonymsEn },
   };
 }
 
@@ -272,6 +300,11 @@ export interface FormMode {
    * needs its target type.
    */
   imported: boolean;
+  /**
+   * False for an element outside the platform's automatic shape (imported without one): its
+   * "required" and "multiple" only reach SHACL once it joins the shape. True when omitted.
+   */
+  autoShape?: boolean;
 }
 
 export function isRequired(field: FormField, mode: FormMode): boolean {
@@ -313,10 +346,19 @@ function valueType(rule: RuleForm, pathDatatype: (ref: string) => string | null 
   return rule.datatype.trim() || pathDatatype(rule.pathRef) || null;
 }
 
+/** The stored bound a rule's min or max value was read from. */
+function storedBound(rule: RuleForm, field: 'minValue' | 'maxValue'): RdfValue | null {
+  const source = rule.source;
+  if (!source) return null;
+  return field === 'minValue' ? (source.minInclusive ?? source.minExclusive ?? null) : (source.maxInclusive ?? source.maxExclusive ?? null);
+}
+
 function checkBound(errors: FormErrors, rule: RuleForm, field: 'minValue' | 'maxValue', type: string | null): void {
   const text = rule[field].trim();
   if (!text) return;
-  // An unchanged value keeps its stored spelling, whatever it is.
+  // An unchanged value keeps its stored spelling, whatever it is (an import may write 0.0 for an integer).
+  const stored = storedBound(rule, field);
+  if (stored && valueText(stored).trim() === text) return;
   if (type === 'integer' && !INTEGER.test(text)) errors[ruleErrorKey(rule, field)] = 'ontologyPage.form.errors.integerValue';
   else if (type === 'decimal' && !DECIMAL.test(text)) errors[ruleErrorKey(rule, field)] = 'ontologyPage.form.errors.numberValue';
 }
@@ -334,7 +376,16 @@ function validateRule(errors: FormErrors, rule: RuleForm, pathDatatype: (ref: st
   const type = valueType(rule, pathDatatype);
   checkBound(errors, rule, 'minValue', type);
   checkBound(errors, rule, 'maxValue', type);
-  if (!PATTERN_FLAGS.test(rule.flags.trim())) errors[ruleErrorKey(rule, 'flags')] = 'ontologyPage.form.errors.flagsInvalid';
+  const flagsUnchanged = rule.source !== null && rule.flags === (rule.source.flags ?? '');
+  if (!flagsUnchanged && !PATTERN_FLAGS.test(rule.flags.trim())) errors[ruleErrorKey(rule, 'flags')] = 'ontologyPage.form.errors.flagsInvalid';
+}
+
+/** The synonyms a language's text gives: as stored when the text is left alone, else split at the separators. */
+function synonymsOf(form: ElementForm, lang: Synonym['lang']): Synonym[] {
+  const text = lang === 'zh' ? form.synonymsZh : form.synonymsEn;
+  const source = form.synonymSource;
+  if (source && text === source[lang]) return source.synonyms.filter((synonym) => synonym.lang === lang);
+  return parseSynonyms(text, lang);
 }
 
 export function validateElementForm(
@@ -359,6 +410,14 @@ export function validateElementForm(
   if (fields.has('rangeRef') && isRequired('rangeRef', mode) && !form.rangeRef) errors.rangeRef = 'review.edit.errors.rangeRequired';
   if (fields.has('datatype') && isRequired('datatype', mode) && !(DATATYPES as readonly string[]).includes(form.datatype)) {
     errors.datatype = 'review.edit.errors.datatypeRequired';
+  }
+  for (const [field, lang] of [
+    ['synonymsZh', 'zh'],
+    ['synonymsEn', 'en'],
+  ] as const) {
+    if (fields.has(field) && synonymsOf(form, lang).some((synonym) => synonym.text.length > MAX_LENGTH.synonym)) {
+      errors[field] = 'ontologyPage.form.errors.synonymTooLong';
+    }
   }
   if (mode.kind === 'constraint') for (const rule of form.rules) validateRule(errors, rule, pathDatatype);
   return errors;
@@ -393,20 +452,28 @@ function literal(text: string, datatype: string | null): RdfValue {
   return { iri: null, lexical: text, datatype, lang: null };
 }
 
+/** A value typed on its own line: an IRI, a literal with its language (as `valueText` writes it), or a plain literal. */
+function parseValue(line: string, type: string | null): RdfValue {
+  if (IRI_LIKE.test(line)) return { iri: line, lexical: null, datatype: null, lang: null };
+  const tagged = LANG_LITERAL.exec(line);
+  if (tagged) return { iri: null, lexical: tagged[1] ?? '', datatype: null, lang: tagged[2] ?? null };
+  return literal(line, literalDatatype(type));
+}
+
 function allowedValues(form: RuleForm, type: string | null): Pick<ConstraintRuleFields, 'allowedValues' | 'allowedValuesLost'> {
+  const source = form.source;
+  const stored = source?.allowedValues ?? null;
+  // Left alone: exactly as stored, also values the text cannot show faithfully (empty strings,
+  // leading or trailing spaces, line breaks).
+  if (source && form.allowedValues === (stored ?? []).map(valueText).join('\n')) {
+    return { allowedValues: stored, allowedValuesLost: source.allowedValuesLost };
+  }
   const lines = form.allowedValues
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean);
-  const stored = form.source?.allowedValues ?? null;
-  if (lines.length === 0) {
-    return { allowedValues: stored && stored.length === 0 ? [] : null, allowedValuesLost: form.source?.allowedValuesLost ?? false };
-  }
-  const values = lines.map((line): RdfValue => {
-    const kept = stored?.find((value) => valueText(value) === line);
-    if (kept) return kept;
-    return IRI_LIKE.test(line) ? { iri: line, lexical: null, datatype: null, lang: null } : literal(line, literalDatatype(type));
-  });
+  if (lines.length === 0) return { allowedValues: null, allowedValuesLost: false };
+  const values = lines.map((line): RdfValue => stored?.find((value) => valueText(value) === line) ?? parseValue(line, type));
   return { allowedValues: values, allowedValuesLost: false };
 }
 
@@ -453,8 +520,55 @@ function messages(form: RuleForm): LangText[] {
   return result;
 }
 
+// Every field of a rule as the form edits it; a Record so that a new field cannot be forgotten.
+const RULE_FIELDS = Object.keys({
+  pathRef: true,
+  classRef: true,
+  minCount: true,
+  maxCount: true,
+  datatype: true,
+  allowedValues: true,
+  minValue: true,
+  minExclusive: true,
+  maxValue: true,
+  maxExclusive: true,
+  minLength: true,
+  maxLength: true,
+  pattern: true,
+  flags: true,
+  messageZh: true,
+  messageEn: true,
+} satisfies Record<RuleField, true>) as RuleField[];
+
+/** A stored rule as change item fields, without passing through the form's text. */
+function storedRuleFields(rule: ConstraintRule): ConstraintRuleFields {
+  return {
+    pathRef: rule.pathId,
+    classRef: rule.classId ?? null,
+    minCount: rule.minCount ?? null,
+    maxCount: rule.maxCount ?? null,
+    datatype: rule.datatype ?? null,
+    nodeKind: rule.nodeKind ?? null,
+    allowedValues: rule.allowedValues ?? null,
+    allowedValuesLost: rule.allowedValuesLost,
+    minInclusive: rule.minInclusive ?? null,
+    maxInclusive: rule.maxInclusive ?? null,
+    minExclusive: rule.minExclusive ?? null,
+    maxExclusive: rule.maxExclusive ?? null,
+    minLength: rule.minLength ?? null,
+    maxLength: rule.maxLength ?? null,
+    pattern: rule.pattern ?? null,
+    flags: rule.flags ?? null,
+    message: rule.message ?? [],
+  };
+}
+
 export function ruleFromForm(form: RuleForm, pathDatatype: (ref: string) => string | null | undefined = () => null): ConstraintRuleFields {
   const source = form.source;
+  if (source) {
+    const opened = ruleToForm(source);
+    if (RULE_FIELDS.every((field) => form[field] === opened[field])) return storedRuleFields(source);
+  }
   const type = valueType(form, pathDatatype);
   const [minInclusive, minExclusive] = bounds(form.minValue, form.minExclusive, source?.minInclusive, source?.minExclusive, type);
   const [maxInclusive, maxExclusive] = bounds(form.maxValue, form.maxExclusive, source?.maxInclusive, source?.maxExclusive, type);
@@ -487,7 +601,7 @@ function allFields(mode: FormMode, form: ElementForm, pathDatatype: (ref: string
   fields.labelEn = textOrNull(form.labelEn);
   fields.definitionZh = textOrNull(form.definitionZh);
   fields.definitionEn = textOrNull(form.definitionEn);
-  if (mode.kind !== 'constraint') fields.synonyms = [...parseSynonyms(form.synonymsZh, 'zh'), ...parseSynonyms(form.synonymsEn, 'en')];
+  if (mode.kind !== 'constraint') fields.synonyms = [...synonymsOf(form, 'zh'), ...synonymsOf(form, 'en')];
   switch (mode.kind) {
     case 'entity_type':
       fields.parentRef = form.parentRef || null;
@@ -541,5 +655,8 @@ export function formToFields(
   const next = allFields(mode, form, pathDatatype);
   if (mode.creating) return next;
   const before = allFields(mode, initial, pathDatatype) as Record<string, unknown>;
-  return Object.fromEntries(Object.entries(next).filter(([key, value]) => canonical(value) !== canonical(before[key])));
+  const changes: ElementFields = Object.fromEntries(Object.entries(next).filter(([key, value]) => canonical(value) !== canonical(before[key])));
+  // The server changes the shape membership only when asked; new cardinality needs the shape.
+  if (mode.autoShape === false && ('required' in changes || 'multiple' in changes)) changes.autoShape = true;
+  return changes;
 }

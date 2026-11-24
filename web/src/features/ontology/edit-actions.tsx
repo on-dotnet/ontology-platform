@@ -14,6 +14,28 @@ export function isStale(error: unknown): boolean {
   return isApiError(error) && error.code === 'element.stale';
 }
 
+/** 409 `element.name_taken`: the local name or IRI is in use. */
+export function isNameTaken(error: unknown): boolean {
+  return isApiError(error) && error.code === 'element.name_taken';
+}
+
+// Skip codes of a merge that, when saving with `apply`, roll the whole save back. Their usual text
+// is half a sentence written for the list of skipped items after a merge.
+const SAVE_ROLLBACK_CODES: ReadonlySet<string> = new Set([
+  'changeset.has_dependents',
+  'changeset.invalid_item',
+  'changeset.dependency_skipped',
+  'changeset.stale_target',
+]);
+
+/** Localized failure of a save: what went wrong and what to do, also for a rolled-back merge. */
+export function useSaveErrorMessage(): (error: unknown) => string {
+  const { t } = useTranslation();
+  const message = useErrorMessage();
+  return (error: unknown) =>
+    isApiError(error) && SAVE_ROLLBACK_CODES.has(error.code) ? t(`ontologyPage.edit.saveErrors.${error.code.replace('changeset.', '')}`) : message(error);
+}
+
 /** Whether saving takes effect at once (true) or goes to review; decides the button labels. */
 export function useAppliesOwnEdits(): boolean {
   const { canReview } = usePermissions();
@@ -82,9 +104,9 @@ export function useSaveEdits(ontologyId: string) {
 export function useRestoreElement(ontologyId: string) {
   const { t, i18n } = useTranslation();
   const toast = useToast();
-  const message = useErrorMessage();
+  const message = useSaveErrorMessage();
   const refresh = useRefreshAfterEdit();
-  const { mutation } = useSaveEdits(ontologyId);
+  const { apply, mutation } = useSaveEdits(ontologyId);
   const restore = (element: Element) =>
     mutation.mutate(
       {
@@ -100,5 +122,6 @@ export function useRestoreElement(ontologyId: string) {
     );
   /** The element being restored right now, if any. */
   const pendingId = mutation.isPending ? mutation.variables.items[0]?.targetElementId : undefined;
-  return { restore, pendingId };
+  /** Whether restoring takes effect at once; otherwise it is submitted for review. */
+  return { restore, pendingId, apply };
 }

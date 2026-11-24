@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { UserInfo } from '@/features/auth/api';
 import type { EditRequest, Element } from '@/features/ontologies/api';
-import { axiomFixture, elementDetailFixture, elementFixture, elementRefFixture, impactFixture, ontologyFixture } from '@/test/fixtures';
+import { axiomFixture, elementDetailFixture, elementFixture, elementRefFixture, impactFixture, mergeEdits, ontologyFixture } from '@/test/fixtures';
 import { mockApi, problemResponse, renderApp, userWithRole, type RouteHandler } from '@/test/utils';
 
 const EDITS = '/api/ontologies/onto-steel/edits';
@@ -152,8 +152,10 @@ function editingServer({ user, reviewMode = 'single', elements = initialElements
       'POST /api/ontologies/:id/edits':
         edits ??
         (({ body }) => {
-          const { apply } = body as EditRequest;
-          return { changeSetId: 'cs-manual', merged: apply, merge: apply ? { applied: 1, skipped: [] } : null };
+          const request = body as EditRequest;
+          // Merged at once, as the server does: the targets move to their next revision.
+          if (request.apply) mergeEdits(elements, request);
+          return { changeSetId: 'cs-manual', merged: request.apply, merge: request.apply ? { applied: 1, skipped: [] } : null };
         }),
       'GET /api/ontologies/:id/graph': () => ({ nodes: [], edges: [] }),
     },
@@ -390,6 +392,29 @@ describe('creating elements by hand', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/review/cs-manual'));
   });
 
+  it('shows a taken local name under the field', async () => {
+    const user = userEvent.setup();
+    editingServer({ edits: () => problemResponse(409, 'element.name_taken') });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const dialog = await openCreateForm(user, '对象类型', '新建对象类型');
+    await within(dialog).findByRole('button', { name: '保存' });
+    expect(within(dialog).getByRole('textbox', { name: '中文名称' })).toHaveAttribute('aria-required', 'true');
+    expect(within(dialog).getByRole('textbox', { name: '中文名称' })).toHaveAttribute('maxlength', '200');
+    await user.type(within(dialog).getByRole('textbox', { name: '中文名称' }), '钢水');
+    await user.type(within(dialog).getByRole('textbox', { name: '英文名称' }), 'Molten steel');
+    await user.click(within(dialog).getByRole('button', { name: '保存' }));
+
+    const localName = within(dialog).getByRole('textbox', { name: '局部名' });
+    await waitFor(() => expect(localName).toHaveAttribute('aria-invalid', 'true'));
+    expect(localName).toHaveAccessibleDescription('局部名或 IRI 已被占用（包括已删除的元素），请换一个。');
+    expect(localName).toHaveFocus();
+    expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument();
+
+    await user.type(localName, '2');
+    expect(localName).not.toHaveAttribute('aria-invalid');
+  });
+
   it('submits for review for a reviewer in separate review mode', async () => {
     const user = userEvent.setup();
     editingServer({ user: userWithRole('reviewer'), reviewMode: 'separate' });
@@ -413,6 +438,7 @@ describe('editing elements by hand', () => {
     const save = await within(dialog).findByRole('button', { name: '保存' });
     expect(within(dialog).getByRole('textbox', { name: '局部名' })).toHaveAttribute('readonly');
     expect(within(dialog).getByRole('textbox', { name: '中文同义词' })).toHaveValue('铁水');
+    expect(within(dialog).getByRole('textbox', { name: '英文同义词' })).toHaveValue('');
 
     await user.click(save);
     expect(within(dialog).getByText('还没有修改任何内容。')).toBeInTheDocument();
@@ -436,8 +462,116 @@ describe('editing elements by hand', () => {
       ],
       apply: true,
     });
+    // Merging raised the revision while the save finished; the dialog still closes.
     await waitFor(() => expect(screen.queryByRole('dialog', { name: '编辑“钢水”' })).not.toBeInTheDocument());
     expect(screen.getByRole('dialog', { name: '钢水' })).toBeInTheDocument();
+  });
+
+  it('keeps the synonyms of a language left alone as stored, separators and all', async () => {
+    const user = userEvent.setup();
+    const elements = initialElements();
+    elements[0] = {
+      ...moltenSteel,
+      synonyms: [
+        { lang: 'zh', text: '铁水' },
+        { lang: 'en', text: 'Steel, molten' },
+      ],
+    };
+    const api = editingServer({ elements });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const sheet = await openElement(user, '钢水');
+    await user.click(within(sheet).getByRole('button', { name: '编辑' }));
+    const dialog = await screen.findByRole('dialog', { name: '编辑“钢水”' });
+    await user.type(await within(dialog).findByRole('textbox', { name: '中文同义词' }), '、钢液');
+    await user.click(within(dialog).getByRole('button', { name: '保存' }));
+
+    await waitFor(() => expect(api.calls('POST', EDITS)).toHaveLength(1));
+    expect((api.calls('POST', EDITS)[0]?.body as EditRequest).items[0]?.fields).toEqual({
+      synonyms: [
+        { lang: 'zh', text: '铁水' },
+        { lang: 'zh', text: '钢液' },
+        { lang: 'en', text: 'Steel, molten' },
+      ],
+    });
+  });
+
+  it('asks before discarding unsaved changes, and closes at once without them', async () => {
+    const user = userEvent.setup();
+    const api = editingServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const sheet = await openElement(user, '钢水');
+    await user.click(within(sheet).getByRole('button', { name: '编辑' }));
+    let dialog = await screen.findByRole('dialog', { name: '编辑“钢水”' });
+    await within(dialog).findByRole('button', { name: '保存' });
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '编辑“钢水”' })).not.toBeInTheDocument());
+
+    await user.click(within(sheet).getByRole('button', { name: '编辑' }));
+    dialog = await screen.findByRole('dialog', { name: '编辑“钢水”' });
+    const definition = await within(dialog).findByRole('textbox', { name: '英文定义' });
+    await user.type(definition, 'Liquid steel.');
+
+    await user.keyboard('{Escape}');
+    const confirm = await screen.findByRole('dialog', { name: '放弃未保存的修改？' });
+    expect(confirm).toHaveTextContent('这里的修改还没有保存，关闭后会丢失。');
+    await user.click(within(confirm).getByRole('button', { name: '继续编辑' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '放弃未保存的修改？' })).not.toBeInTheDocument());
+    expect(within(dialog).getByRole('textbox', { name: '英文定义' })).toHaveValue('Liquid steel.');
+
+    await user.click(within(dialog).getByRole('button', { name: '取消' }));
+    await user.click(within(await screen.findByRole('dialog', { name: '放弃未保存的修改？' })).getByRole('button', { name: '放弃修改' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '编辑“钢水”' })).not.toBeInTheDocument());
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+  });
+
+  it('brings an imported element into the platform’s shape when its cardinality changes', async () => {
+    const user = userEvent.setup();
+    const elements = initialElements().map((element) => (element.id === 'el-held-by' ? { ...element, autoShape: false } : element));
+    const api = editingServer({ elements });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    let sheet = await openElement(user, '盛装');
+    await user.click(within(sheet).getByRole('button', { name: '编辑' }));
+    let dialog = await screen.findByRole('dialog', { name: '编辑“盛装”' });
+    await within(dialog).findByRole('button', { name: '保存' });
+    // Already in the shape: nothing to explain.
+    expect(within(dialog).queryByRole('button', { name: '关于校验规则' })).not.toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: '取消' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '编辑“盛装”' })).not.toBeInTheDocument());
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '盛装' })).not.toBeInTheDocument());
+
+    sheet = await openElement(user, 'held by');
+    await user.click(within(sheet).getByRole('button', { name: '编辑' }));
+    dialog = await screen.findByRole('dialog', { name: '编辑“held by”' });
+    await within(dialog).findByRole('button', { name: '保存' });
+    expect(within(dialog).getByRole('button', { name: '关于校验规则' })).toHaveAccessibleDescription(
+      '这个元素来自导入，必填和允许多个还没有写进平台的校验规则。修改这两项并保存后，平台会为它生成校验规则。',
+    );
+
+    await user.type(within(dialog).getByRole('textbox', { name: '中文名称' }), '被盛装');
+    await user.click(within(dialog).getByRole('checkbox', { name: '必填' }));
+    await user.click(within(dialog).getByRole('button', { name: '保存' }));
+    await waitFor(() => expect(api.calls('POST', EDITS)).toHaveLength(1));
+    expect((api.calls('POST', EDITS)[0]?.body as EditRequest).items[0]?.fields).toEqual({ labelZh: '被盛装', required: true, autoShape: true });
+  });
+
+  it('explains a save that the merge rolled back in a whole sentence', async () => {
+    const user = userEvent.setup();
+    editingServer({ edits: () => problemResponse(409, 'changeset.has_dependents') });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const sheet = await openElement(user, '钢水');
+    await user.click(within(sheet).getByRole('button', { name: '编辑' }));
+    const dialog = await screen.findByRole('dialog', { name: '编辑“钢水”' });
+    await user.type(await within(dialog).findByRole('textbox', { name: '英文定义' }), 'Liquid steel.');
+    await user.click(within(dialog).getByRole('button', { name: '保存' }));
+
+    const alert = await within(dialog).findByRole('alert');
+    expect(alert).toHaveTextContent('没有保存');
+    expect(alert).toHaveTextContent('还有其他元素引用要删除的元素，这次修改没有保存。请刷新后查看引用情况，先修改引用它的元素再删除。');
   });
 
   it('tells the user when someone else changed the element and reloads it on request', async () => {
@@ -602,6 +736,32 @@ describe('deleting and restoring elements', () => {
     const dialog = await screen.findByRole('dialog', { name: '删除“钢包”？' });
     expect(await within(dialog).findByText('没有其他元素引用它，只删除它本身。')).toBeInTheDocument();
     expect(within(dialog).getByRole('button', { name: '提交审核' })).toBeEnabled();
+    // The delete waits for review; the dialog says so.
+    expect(dialog).toHaveTextContent('提交后生成变更集，审核通过后才会删除');
+    expect(dialog).not.toHaveTextContent('删除后它不再导出，列表默认也不显示');
+  });
+
+  it('submits a restore for review when the user may not apply it', async () => {
+    const user = userEvent.setup();
+    const api = editingServer({ user: userWithRole('editor') });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const table = await screen.findByRole('table', { name: '本体元素' });
+    await user.click(within(screen.getByRole('group', { name: '按状态筛选' })).getByRole('radio', { name: '已删除' }));
+    await waitFor(() => expect(within(table).getAllByRole('row')).toHaveLength(2));
+    expect(within(table).queryByRole('button', { name: '恢复“Slab”' })).not.toBeInTheDocument();
+    await user.click(within(table).getByRole('button', { name: '提交恢复“Slab”' }));
+
+    await waitFor(() => expect(api.calls('POST', EDITS)).toHaveLength(1));
+    expect(api.calls('POST', EDITS)[0]?.body).toEqual({
+      items: [{ op: 'restore', kind: 'entity_type', targetElementId: 'el-slab', targetRevision: 2 }],
+      apply: false,
+    });
+    expect(await screen.findByText('已提交审核，审核通过后生效')).toBeInTheDocument();
+
+    const sheet = await openElement(user, 'Slab');
+    expect(within(sheet).getByRole('button', { name: '提交恢复' })).toBeInTheDocument();
+    expect(within(sheet).queryByRole('button', { name: '恢复' })).not.toBeInTheDocument();
   });
 
   it('filters deleted elements with a removable chip and restores one', async () => {
@@ -628,7 +788,13 @@ describe('deleting and restoring elements', () => {
     expect(await screen.findByText('已恢复“Slab”')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: '移除筛选条件“状态：已删除”' }));
-    await waitFor(() => expect(within(table).queryByRole('button', { name: 'Slab' })).not.toBeInTheDocument());
+    // Back to the elements in use, which now include the restored one.
+    await waitFor(() => expect(screen.queryByRole('list', { name: '当前筛选条件' })).not.toBeInTheDocument());
+    // Nothing was left deleted, so the list was empty; it is a new table now.
+    const inUse = await screen.findByRole('table', { name: '本体元素' });
+    await waitFor(() => expect(within(inUse).getAllByRole('row')).toHaveLength(initialElements().filter((element) => element.status === 'active').length + 2));
+    const restored = within(inUse).getByRole('button', { name: 'Slab' }).closest('tr');
+    expect(restored).not.toHaveTextContent('已删除');
   });
 
   it('restores a deleted element from its panel', async () => {

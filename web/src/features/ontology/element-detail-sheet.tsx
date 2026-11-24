@@ -132,7 +132,7 @@ function ElementDetailContent({ ontologyId, element, related, onSelect }: Elemen
   const { canUpload } = usePermissions();
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const { restore, pendingId } = useRestoreElement(ontologyId);
+  const { restore, pendingId, apply: restoresAtOnce } = useRestoreElement(ontologyId);
   const deleted = element.status === 'deprecated';
   const language = i18n.resolvedLanguage ?? i18n.language;
   const isAxiom = element.kind === 'axiom';
@@ -169,7 +169,7 @@ function ElementDetailContent({ ontologyId, element, related, onSelect }: Elemen
             {deleted ? (
               <Button variant="secondary" size="sm" loading={pendingId === element.id} onClick={() => restore(element)}>
                 <RotateCcw aria-hidden />
-                {t('ontologyPage.edit.restore')}
+                {restoresAtOnce ? t('ontologyPage.edit.restore') : t('ontologyPage.edit.submitRestore')}
               </Button>
             ) : (
               <>

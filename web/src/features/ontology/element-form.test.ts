@@ -146,3 +146,82 @@ describe('constraint rules in the form', () => {
     });
   });
 });
+
+describe('values the form leaves alone', () => {
+  const withValues: ConstraintRule = {
+    pathId: 'el-grade',
+    classId: null,
+    datatype: 'integer',
+    allowedValues: [
+      { iri: null, lexical: '', datatype: null, lang: null },
+      { iri: null, lexical: ' Q235 ', datatype: null, lang: null },
+      { iri: null, lexical: 'line\nbreak', datatype: null, lang: null },
+    ],
+    allowedValuesLost: false,
+    minInclusive: { iri: null, lexical: '0.0', datatype: 'decimal', lang: null },
+    maxInclusive: { iri: null, lexical: '1.5E3', datatype: 'double', lang: null },
+    flags: 'g',
+    message: [],
+  };
+
+  it('keeps the synonyms of a language whose text did not change, even with separators in them', () => {
+    const element = elementFixture({
+      synonyms: [
+        { lang: 'zh', text: '铁水' },
+        { lang: 'en', text: 'Steel, molten' },
+      ],
+    });
+    const mode: FormMode = { kind: 'entity_type', creating: false, imported: false };
+    const initial = toElementForm(element, 'entity_type', '、');
+    expect(formToFields(mode, { ...initial, synonymsZh: '铁水、钢液' }, initial)).toEqual({
+      synonyms: [
+        { lang: 'zh', text: '铁水' },
+        { lang: 'zh', text: '钢液' },
+        { lang: 'en', text: 'Steel, molten' },
+      ],
+    });
+    expect(validateElementForm(mode, { ...initial, synonymsEn: 'x'.repeat(201) })).toEqual({ synonymsEn: 'ontologyPage.form.errors.synonymTooLong' });
+  });
+
+  it('saves an untouched rule from the stored one, values the text cannot show included', () => {
+    const fields = ruleFromForm(ruleToForm(withValues));
+    expect(fields.allowedValues).toEqual(withValues.allowedValues);
+    expect(fields.minInclusive).toEqual(withValues.minInclusive);
+    expect(fields.maxInclusive).toEqual(withValues.maxInclusive);
+    expect(fields.flags).toBe('g');
+  });
+
+  it('keeps untouched allowed values when other fields of the rule change, and reads new ones with their language', () => {
+    const form = ruleToForm(withValues);
+    expect(ruleFromForm({ ...form, minCount: '1' }).allowedValues).toEqual(withValues.allowedValues);
+    const added = ruleFromForm({ ...form, allowedValues: 'Q235@zh\nQ345@en-GB\nuser@example.org' });
+    expect(added.allowedValues).toEqual([
+      { iri: null, lexical: 'Q235', datatype: null, lang: 'zh' },
+      { iri: null, lexical: 'Q345', datatype: null, lang: 'en-GB' },
+      { iri: null, lexical: 'user@example.org', datatype: 'integer', lang: null },
+    ]);
+  });
+
+  it('does not check bounds and flags the form did not touch', () => {
+    const element = elementFixture({ kind: 'constraint', domainId: 'el-ladle', rules: [withValues] });
+    const mode: FormMode = { kind: 'constraint', creating: false, imported: true };
+    const form = toElementForm(element, 'constraint', '、');
+    expect(validateElementForm(mode, form)).toEqual({});
+    const [rule] = form.rules;
+    if (!rule) throw new Error('rule expected');
+    const key = (field: string) => `rule:${rule.key}:${field}`;
+    expect(validateElementForm(mode, { ...form, rules: [{ ...rule, minValue: '0.5', flags: 'gg' }] })).toEqual({
+      [key('minValue')]: 'ontologyPage.form.errors.integerValue',
+      [key('flags')]: 'ontologyPage.form.errors.flagsInvalid',
+    });
+  });
+
+  it('brings an element outside the platform shape into it when its cardinality changes', () => {
+    const element = elementFixture({ kind: 'property', explicitIri: true, autoShape: false, datatype: 'decimal' });
+    const mode: FormMode = { kind: 'property', creating: false, imported: true, autoShape: false };
+    const initial = toElementForm(element, 'property', '、');
+    expect(formToFields(mode, { ...initial, labelEn: 'Molten steel temperature' }, initial)).toEqual({ labelEn: 'Molten steel temperature' });
+    expect(formToFields(mode, { ...initial, multiple: true }, initial)).toEqual({ multiple: true, autoShape: true });
+    expect(formToFields({ ...mode, autoShape: true }, { ...initial, multiple: true }, initial)).toEqual({ multiple: true });
+  });
+});

@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { UserInfo } from '@/features/auth/api';
 import type { EditRequest, Element, ImportResult } from '@/features/ontologies/api';
-import { axiomFixture, elementDetailFixture, elementFixture, impactFixture, importResultFixture, ontologyFixture } from '@/test/fixtures';
+import { axiomFixture, elementDetailFixture, elementFixture, impactFixture, importResultFixture, mergeEdits, ontologyFixture } from '@/test/fixtures';
 import { mockApi, problemResponse, renderApp, userWithRole, type RouteHandler } from '@/test/utils';
 
 // jsdom cannot type into CodeMirror; the stand-in has the same props and handle.
@@ -58,8 +58,10 @@ function expertServer({ user, reviewMode = 'single', elements = [moltenSteel, la
       'POST /api/ontologies/:id/edits':
         edits ??
         (({ body }) => {
-          const { apply } = body as EditRequest;
-          return { changeSetId: 'cs-manual', merged: apply, merge: apply ? { applied: 1, skipped: [] } : null };
+          const request = body as EditRequest;
+          // Merged at once, as the server does: the targets move to their next revision.
+          if (request.apply) mergeEdits(elements, request);
+          return { changeSetId: 'cs-manual', merged: request.apply, merge: request.apply ? { applied: 1, skipped: [] } : null };
         }),
     },
     { user },
@@ -332,7 +334,49 @@ describe('expert mode: single axioms', () => {
     expect(await screen.findByText('已提交审核，审核通过后生效')).toBeInTheDocument();
   });
 
-  it('groups the axioms list by the element they belong to, with ontology annotations last', async () => {
+  it('closes after rewriting an axiom that takes effect at once, although the merge raised its revision', async () => {
+    const user = userEvent.setup();
+    const api = expertServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const table = await screen.findByRole('table', { name: '本体元素' });
+    await user.click(within(table).getByRole('button', { name: 'steel:MoltenSteel owl:disjointWith steel:Slag .' }));
+    await user.click(within(await screen.findByRole('dialog', { name: '高级公理' })).getByRole('button', { name: '编辑' }));
+    const dialog = await screen.findByRole('dialog', { name: '编辑高级公理' });
+    const fragment = within(dialog).getByRole('textbox', { name: 'Turtle 片段' });
+    await user.clear(fragment);
+    await user.type(fragment, 'steel:MoltenSteel owl:disjointWith steel:Ladle .');
+    await user.click(within(dialog).getByRole('button', { name: '保存' }));
+
+    await waitFor(() => expect(api.calls('POST', EDITS)).toHaveLength(1));
+    expect(api.calls('POST', EDITS)[0]?.body).toMatchObject({ items: [{ op: 'update', targetRevision: 2 }], apply: true });
+    expect(await screen.findByText('已保存')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '编辑高级公理' })).not.toBeInTheDocument());
+  });
+
+  it('asks before discarding an unsaved fragment', async () => {
+    const user = userEvent.setup();
+    const api = expertServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    await user.click(await screen.findByRole('button', { name: '新建' }));
+    await user.click(await screen.findByRole('menuitem', { name: '高级公理' }));
+    const dialog = await screen.findByRole('dialog', { name: '新建高级公理' });
+    await user.type(within(dialog).getByRole('textbox', { name: 'Turtle 片段' }), 'steel:Ladle owl:disjointWith steel:Slag .');
+
+    await user.keyboard('{Escape}');
+    const confirm = await screen.findByRole('dialog', { name: '放弃未保存的修改？' });
+    await user.click(within(confirm).getByRole('button', { name: '继续编辑' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '放弃未保存的修改？' })).not.toBeInTheDocument());
+    expect(within(dialog).getByRole('textbox', { name: 'Turtle 片段' })).toHaveValue('steel:Ladle owl:disjointWith steel:Slag .');
+
+    await user.click(within(dialog).getByRole('button', { name: '取消' }));
+    await user.click(within(await screen.findByRole('dialog', { name: '放弃未保存的修改？' })).getByRole('button', { name: '放弃修改' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: '新建高级公理' })).not.toBeInTheDocument());
+    expect(api.calls('POST', EDITS)).toHaveLength(0);
+  });
+
+  it('groups the axioms list by the element they belong to, with axioms about no element last', async () => {
     const user = userEvent.setup();
     expertServer();
     renderApp('/ontology?ontology=onto-steel&view=list');
@@ -344,7 +388,7 @@ describe('expert mode: single axioms', () => {
     const bodies = within(table)
       .getAllByRole('rowgroup')
       .filter((group) => group.tagName === 'TBODY');
-    expect(bodies.map((group) => group.querySelector('th')?.textContent)).toEqual(['钢包1 条', '钢水2 条', '本体注解1 条']);
+    expect(bodies.map((group) => group.querySelector('th')?.textContent)).toEqual(['钢包1 条', '钢水2 条', '不属于任何元素1 条']);
     expect(
       within(steelGroup)
         .getAllByRole('button')
@@ -352,7 +396,7 @@ describe('expert mode: single axioms', () => {
     ).toEqual(['steel:MoltenSteel owl:disjointWith steel:Slag .', 'steel:MoltenSteel owl:hasKey ( steel:heatNumber ) .']);
     // The group names the subject, so the rows do not repeat it.
     expect(within(steelGroup).queryByText('所属：钢水')).not.toBeInTheDocument();
-    const annotations = within(table).getByRole('rowgroup', { name: '本体注解' });
+    const annotations = within(table).getByRole('rowgroup', { name: '不属于任何元素' });
     expect(within(annotations).getByRole('button', { name: /owl:imports/ })).toBeInTheDocument();
   });
 });
