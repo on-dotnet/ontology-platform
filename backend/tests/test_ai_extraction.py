@@ -449,6 +449,19 @@ def test_a_single_batch_of_types_is_kept_as_the_model_returned_it() -> None:
     assert merge_types([], batch) == batch
 
 
+def test_a_later_batch_does_not_extend_a_ref_an_earlier_batch_gave_to_two_types() -> None:
+    found = [entity("new:Ladle", "钢包", "Ladle"), entity("new:Ladle", "行车", "Crane")]
+    later = entity("new:Ladle", "钢包", "Ladle", synonyms=["盛钢桶"])
+    # Which of the two it extends is unknown: it is added, and its name decides, as for any
+    # type sharing a ref.
+    types = merge_types(found, [later])
+    assert types == [*found, later]
+    proposals = build_proposals([LADLE_CHUNK], [], types, RelationsOut(relations=[], properties=[]))
+    assert [p.fields["labelZh"] for p in proposals] == ["钢包", "行车"]
+    assert [s["text"] for s in by_label(proposals, "钢包").fields["synonyms"]] == ["盛钢桶"]
+    assert by_label(proposals, "行车").fields["synonyms"] == []
+
+
 async def test_new_types_sharing_a_name_become_one_type() -> None:
     types = [
         entity("new:LadleFurnace", "LF精炼炉", "LadleFurnace", synonyms=["精炼炉"]),
@@ -473,6 +486,120 @@ async def test_new_types_sharing_a_name_become_one_type() -> None:
     assert [s["text"] for s in by_label(proposals, "转炉").fields["synonyms"]] == ["顶底复吹转炉"]
     [link] = [p for p in proposals if p.kind == "relation_type"]
     assert link.fields["rangeRef"] == "new:LadleFurnace"
+
+
+def prop(domain: str, label: str) -> PropertyOut:
+    return PropertyOut(
+        label_zh=label,
+        label_en=None,
+        local_name="weight",
+        domain=domain,
+        datatype="decimal",
+        unit="t",
+        required=False,
+        multiple=False,
+        definition_zh=None,
+        confidence=0.8,
+        rationale="r",
+        quotes=[],
+    )
+
+
+LADLE_CHUNK = ChunkText(
+    id=uuid4(),
+    seq=0,
+    text="钢水由钢包吊运至精炼炉。\n行车吊运钢包。\n行车把印有牌号的钢包吊运至精炼炉。\n天车停在精炼炉旁。",
+)
+
+
+@pytest.mark.parametrize(
+    ("label", "name", "created"),
+    [
+        ("行车", "Crane", ["钢包", "行车", "精炼炉"]),  # a second new type
+        ("牌号", "Grade", ["钢包", "精炼炉"]),  # an existing type, matched by its synonym
+    ],
+)
+def test_types_sharing_a_ref_but_not_a_name_are_kept_and_the_ref_resolves_to_none(
+    label: str, name: str, created: list[str]
+) -> None:
+    types = [
+        entity("new:Ladle", "钢包", "Ladle"),
+        entity("new:Ladle", label, name),
+        entity("new:Furnace", "精炼炉", "Furnace", parent="new:Ladle"),
+    ]
+    # The line names both candidates and the furnace: only the shared ref can drop these.
+    line = [quote(0, "行车把印有牌号的钢包吊运至精炼炉")]
+    rels = RelationsOut(
+        relations=[
+            relation("new:Ladle", "new:Furnace", "运至", line),
+            relation("new:Furnace", "new:Ladle", "接收", line),
+        ],
+        properties=[prop("new:Ladle", "容量")],
+    )
+    proposals = build_proposals([LADLE_CHUNK], [EXISTING_GRADE], types, rels)
+
+    # Which of the two the model meant is unknown: whatever references the ref is dropped.
+    assert [p.fields.get("labelZh") for p in proposals] == created
+    assert by_label(proposals, "精炼炉").fields["parentRef"] is None
+
+
+def test_types_sharing_a_ref_and_a_name_are_one_type_the_ref_resolves_to() -> None:
+    types = [
+        entity("new:Ladle", "钢包", "Ladle"),
+        entity("new:Ladle", "钢包", "Ladle", synonyms=["盛钢桶"]),
+        entity("new:Furnace", "精炼炉", "Furnace", parent="new:Ladle"),
+        entity("new:Grade", "钢种", "Grade"),
+        entity("new:Grade", "牌号", "Grade"),  # both names of the existing type
+    ]
+    rels = RelationsOut(
+        relations=[
+            relation("new:Ladle", "new:Furnace", "运至", [quote(0, "钢水由钢包吊运至精炼炉")]),
+        ],
+        properties=[prop("new:Ladle", "容量"), prop("new:Grade", "代号")],
+    )
+    proposals = build_proposals([LADLE_CHUNK], [EXISTING_GRADE], types, rels)
+
+    assert [p.fields["labelZh"] for p in proposals if p.kind == "entity_type"] == ["钢包", "精炼炉"]
+    assert [s["text"] for s in by_label(proposals, "钢包").fields["synonyms"]] == ["盛钢桶"]
+    assert by_label(proposals, "精炼炉").fields["parentRef"] == "new:Ladle"
+    [link] = [p for p in proposals if p.kind == "relation_type"]
+    assert (link.fields["domainRef"], link.fields["rangeRef"]) == ("new:Ladle", "new:Furnace")
+    assert by_label(proposals, "容量").fields["domainRef"] == "new:Ladle"
+    assert by_label(proposals, "代号").fields["domainRef"] == str(EXISTING_GRADE.id)
+
+
+def test_names_of_a_type_given_a_shared_ref_count_only_for_the_type_it_became() -> None:
+    types = [
+        entity("new:Crane", "行车", "Crane"),
+        entity("new:Ladle", "钢包", "Ladle"),
+        # Shares the ref of 钢包, but is named 行车: it is merged into the crane.
+        entity("new:Ladle", "行车", "Crane2", synonyms=["天车"]),
+        entity("new:Furnace", "精炼炉", "Furnace"),
+    ]
+    rels = RelationsOut(
+        relations=[
+            # The line names 钢包, not the crane: no direct evidence for the crane.
+            relation("new:Crane", "new:Furnace", "运至", [quote(0, "钢水由钢包吊运至精炼炉")]),
+            relation("new:Crane", "new:Crane", "吊运", [quote(0, "行车吊运钢包")]),
+            # 天车 came with the type that shares the ref and was merged: it names the crane.
+            relation("new:Crane", "new:Furnace", "停靠", [quote(0, "天车停在精炼炉旁")]),
+        ],
+        properties=[],
+    )
+    proposals = build_proposals([LADLE_CHUNK], [], types, rels)
+
+    assert [p.fields["labelZh"] for p in proposals if p.kind == "entity_type"] == [
+        "行车",
+        "钢包",
+        "精炼炉",
+    ]
+    assert [s["text"] for s in by_label(proposals, "行车").fields["synonyms"]] == ["天车"]
+    [link] = [p for p in proposals if p.kind == "relation_type"]
+    assert (link.fields["labelZh"], link.fields["domainRef"], link.fields["rangeRef"]) == (
+        "停靠",
+        "new:Crane",
+        "new:Furnace",
+    )
 
 
 async def test_relations_need_a_quote_whose_line_names_both_types() -> None:
