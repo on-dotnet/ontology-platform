@@ -32,20 +32,21 @@ shallow hierarchy only where the text supports an "is a kind of" relation.
 An entity type is a class whose individual members are told apart and kept track of: physical
 things (equipment, containers, materials and products), records and documents, and events that
 the text treats as occurrences in their own right, each with an identifier or with data
-recorded for it (for example "each X is recorded as one Y, with its times and temperatures").
+recorded for it (for example "every delivery is recorded with its date and quantity").
 These are not entity types:
-- Process steps and operations, usually named by a verb (charging, blowing, tapping, cutting,
-  coiling, starting or stopping a cast, grinding, returning to the furnace). Data recorded at a
-  step belongs, as attributes, to the object or event it is recorded for. Make a step a type
-  only when the text records each occurrence of it as a record of its own.
-- Outcomes, statuses, decisions' possible results, grades and categories (these are values);
-  measurable quantities (attributes); people, roles and departments mentioned only as the one
-  who acts; parts or zones of equipment and input materials that have no data of their own.
+- Process steps and operations, usually named by a verb (for example unpacking, sorting,
+  sealing, starting a machine). Data recorded at a step belongs, as attributes, to the object
+  or event it is recorded for. Make a step a type only when the text records each occurrence
+  of it as a record of its own.
+- Outcomes, statuses, the possible results of a decision, quality levels and other categories
+  (these are values); measurable quantities (attributes); people, roles and departments
+  mentioned only as the one who acts; parts or zones of equipment and input materials that have
+  no data of their own.
 One concept is one type. When several terms name the same thing (a short and a qualified name,
-a thing and the record of it, "X" and "X treatment"), propose one type, name it by the general
-term the text uses most, and put the other names in synonyms. A process and the equipment that
-performs it are different concepts; keep the equipment, and the process only if it is an event
-as defined above.
+a thing and the record of it), propose one type, name it by the general term the text uses
+most, and put the other names in synonyms. A process and the equipment that performs it are
+different concepts; keep the equipment, and the process only if it is an event as defined
+above.
 Existing entity types are listed with their ids; reuse them instead of proposing duplicates
 (refer to an existing type by its id). For each new type, choose a PascalCase English
 local_name and refer to it as "new:<local_name>". Attributes, values and relations are not

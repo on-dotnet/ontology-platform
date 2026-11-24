@@ -36,6 +36,9 @@ MAX_QUOTES = 3
 UNFOUND_PENALTY = 0.5
 # Local names stay well below the 128 characters the ontology allows, leaving room for "new:".
 NAME_MAX = 100
+# Shorter names (one character after normalizing) occur everywhere: they neither merge types
+# nor count as naming a type in a relation's evidence.
+MIN_NAME = 2
 _PASCAL = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 _CAMEL = re.compile(r"^[a-z][A-Za-z0-9]*$")
 
@@ -293,7 +296,6 @@ class _Builder:
     def __init__(self, chunks: Sequence[ChunkText], known: Sequence[KnownElement]) -> None:
         self.by_seq = {chunk.seq: chunk for chunk in chunks}
         self.by_id = {chunk.id: chunk for chunk in chunks}
-        self.document = normalize("\n".join(chunk.text for chunk in chunks))
         self.chunks = list(chunks)
         self.known = list(known)
         self.known_ids = {str(element.id): element for element in known}
@@ -322,13 +324,15 @@ class _Builder:
                     evidence.append(ProposedEvidence(fallback.id, quote.text[:500], None, None))
         return evidence, all_found
 
-    def states_link(self, evidence: Sequence[ProposedEvidence], *ends: set[str]) -> bool:
-        """Whether a located quote's line names every end (by any of its normalized names).
+    def states_link(
+        self, evidence: Sequence[ProposedEvidence], domain: set[str], range_: set[str]
+    ) -> bool:
+        """Whether a located quote's line names both ends (by any of their normalized names).
 
-        A line is the unit of direct evidence: a sentence group, list item or table row. An end
-        none of whose names occurs in the document cannot be checked and is not required.
+        A line is the unit of direct evidence: a sentence group, list item or table row. The two
+        mentions must be separate, so that one name inside another (钢种 in 钢种成分要求) or a
+        single mention of a type related to itself does not count twice.
         """
-        required = [{key for key in names if key and key in self.document} for names in ends]
         for item in evidence:
             chunk = self.by_id.get(item.chunk_id)
             if chunk is None or item.char_start is None or item.char_end is None:
@@ -336,7 +340,8 @@ class _Builder:
             start = chunk.text.rfind("\n", 0, item.char_start) + 1
             end = chunk.text.find("\n", item.char_end)
             line = normalize(chunk.text[start : end if end != -1 else len(chunk.text)])
-            if all(not names or any(key in line for key in names) for names in required):
+            spans = [_mentions(line, names) for names in (domain, range_)]
+            if any(not _nested(a, b) for a in spans[0] for b in spans[1]):
                 return True
         return False
 
@@ -399,9 +404,19 @@ def build_proposals(
             refs[item.ref] = str(existing.id)
             _maybe_update(builder, existing, item.synonyms, item, item.quotes)
             continue
-        # A new type sharing any name with an earlier new type is the same concept.
-        item_keys = {normalize(label) for label in labels if label}
-        duplicate = next((p for _, p in new_types if item_keys & _type_keys(p)), None)
+        # A new type with a label that is a name of an earlier new type, or with a name that is
+        # that type's label, is the same concept. Synonyms alone do not merge: two kinds of one
+        # thing often share one.
+        item_labels = _keys([item.label_zh, item.label_en or ""])
+        item_synonyms = _keys(item.synonyms)
+        duplicate = next(
+            (
+                p
+                for _, p in new_types
+                if item_labels & _type_keys(p) or item_synonyms & _label_keys(p)
+            ),
+            None,
+        )
         if duplicate is not None:
             refs[item.ref] = duplicate.temp_ref or ""
             duplicate.fields["synonyms"] += [
@@ -412,6 +427,8 @@ def build_proposals(
                 )
                 if normalize(s["text"]) not in _type_keys(duplicate)
             ]
+            evidence, _ = builder.ground(item.quotes)
+            duplicate.evidence += [e for e in evidence if e.char_start is not None]
             continue
         local_name = builder.unique_name(item.local_name, _PASCAL, "EntityType")
         temp_ref = f"new:{local_name}"
@@ -449,7 +466,7 @@ def build_proposals(
     for item in types:
         if item.ref in refs:
             names_of.setdefault(refs[item.ref], set()).update(
-                normalize(name) for name in (item.label_zh, item.label_en or "", *item.synonyms)
+                _keys([item.label_zh, item.label_en or "", *item.synonyms])
             )
 
     seen_relations: set[tuple[str, str, str]] = set()
@@ -529,20 +546,37 @@ def build_proposals(
     return builder.proposals
 
 
+def _keys(names: Iterable[str]) -> set[str]:
+    """Normalized names long enough to identify a type."""
+    return {key for key in (normalize(name) for name in names) if len(key) >= MIN_NAME}
+
+
+def _label_keys(proposal: Proposal) -> set[str]:
+    return _keys([proposal.fields["labelZh"], proposal.fields.get("labelEn") or ""])
+
+
 def _type_keys(proposal: Proposal) -> set[str]:
-    """Normalized names of a proposed new type: its labels and synonyms."""
-    fields = proposal.fields
-    names = [
-        fields["labelZh"],
-        fields.get("labelEn") or "",
-        *(s["text"] for s in fields["synonyms"]),
-    ]
-    return {normalize(name) for name in names if name}
+    """Names of a proposed new type: its labels and synonyms."""
+    return _label_keys(proposal) | _keys(s["text"] for s in proposal.fields["synonyms"])
 
 
 def _element_keys(element: KnownElement) -> set[str]:
-    names = [element.label_zh, element.label_en or "", *element.synonyms]
-    return {normalize(name) for name in names if name}
+    return _keys([element.label_zh, element.label_en or "", *element.synonyms])
+
+
+def _mentions(line: str, names: set[str]) -> list[tuple[int, int]]:
+    """Spans of every occurrence of any of the names in a normalized line."""
+    spans: list[tuple[int, int]] = []
+    for name in names:
+        start = line.find(name)
+        while start != -1:
+            spans.append((start, start + len(name)))
+            start = line.find(name, start + 1)
+    return spans
+
+
+def _nested(a: tuple[int, int], b: tuple[int, int]) -> bool:
+    return (a[0] <= b[0] and b[1] <= a[1]) or (b[0] <= a[0] and a[1] <= b[1])
 
 
 def _synonyms(values: Iterable[str], label: str) -> list[dict[str, str]]:

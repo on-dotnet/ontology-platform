@@ -492,7 +492,7 @@ async def test_relations_need_a_quote_whose_line_names_both_types() -> None:
             relation("new:Heat", "new:Ladle", "使用", [quote(0, "钢水由钢包吊运至精炼炉")]),
             relation("new:Heat", grade, "计划钢种", []),
             relation("new:Heat", grade, "虚构", [quote(0, "炉次与钢种一一对应")]),
-            # 行车 is not named anywhere in the document, so that end cannot be checked.
+            # 行车 is not named anywhere in the document: no direct evidence either.
             relation("new:Crane", "new:Ladle", "吊运", [quote(0, "由钢包吊运")]),
         ],
         properties=[],
@@ -508,7 +508,84 @@ async def test_relations_need_a_quote_whose_line_names_both_types() -> None:
     )
 
     relations = [p for p in proposals if p.kind == "relation_type"]
-    assert [r.fields["labelZh"] for r in relations] == ["冶炼", "吊运"]
-    assert all(r.flags == [] for r in relations)
+    assert [r.fields["labelZh"] for r in relations] == ["冶炼"]
+    assert relations[0].flags == []
     [relations_text] = [text for purpose, text in gateway.texts if purpose == "extract.relations"]
     assert "- new:Ladle | 盛钢桶 | 钢包 | \n" in relations_text
+
+
+async def test_only_names_of_two_characters_or_more_and_labels_merge_types() -> None:
+    types = [
+        entity("new:Converter", "转炉", "Converter", synonyms=["炉"]),
+        entity("new:Reheater", "加热炉", "Reheater", synonyms=["炉"]),  # one character: no
+        entity("new:Refiner", "精炼炉", "Refiner", synonyms=["LF炉"]),
+        entity("new:LF", "LF精炼炉", "LF", synonyms=["LF炉"]),  # synonym against synonym: no
+        entity("new:Return", "回炉处理", "Return", quotes=[quote(0, "每个炉次只冶炼一个钢种")]),
+        entity(
+            "new:SlabReturn",
+            "板坯回炉",
+            "SlabReturn",
+            synonyms=["回炉处理"],  # names the earlier type's label: the same concept
+            quotes=[quote(1, "一个浇次由若干个炉次"), quote(1, "没有这句话")],
+        ),
+    ]
+    proposals, _ = await run(
+        ScriptedGateway(outputs(types, RelationsOut(relations=[], properties=[])))
+    )
+
+    assert [p.fields["labelZh"] for p in proposals] == [
+        "转炉",
+        "加热炉",
+        "精炼炉",
+        "LF精炼炉",
+        "回炉处理",
+    ]
+    merged = by_label(proposals, "回炉处理")
+    assert [s["text"] for s in merged.fields["synonyms"]] == ["板坯回炉"]
+    # Located quotes of the merged term are kept as evidence; unlocated ones are not.
+    assert [e.chunk_id for e in merged.evidence] == [CHUNK_A.id, CHUNK_B.id]
+    assert merged.flags == []
+
+
+async def test_relation_evidence_uses_every_name_and_needs_two_separate_mentions() -> None:
+    chunk = ChunkText(
+        id=uuid4(),
+        seq=0,
+        text="铁水由铁水罐运入转炉。\n钢种成分要求见下表。\n相邻炉次的钢种相同。",
+    )
+    converter = KnownElement(
+        id=uuid4(), kind="entity_type", local_name="Converter", label_zh="转炉设备"
+    )
+    types = [
+        # Matches the existing type by a synonym: its label 转炉 is checked too.
+        entity("new:BOF", "转炉", "BOF", synonyms=["转炉设备"]),
+        entity("new:Pot", "铁水罐", "Pot"),
+        entity("new:Requirement", "钢种成分要求", "Requirement"),
+        entity("new:Heat", "炉次", "Heat"),
+    ]
+    grade = str(EXISTING_GRADE.id)
+    rels = RelationsOut(
+        relations=[
+            relation("new:Pot", "new:BOF", "运入", [quote(0, "铁水由铁水罐运入转炉")]),
+            # 钢种 is only found inside 钢种成分要求: one mention, not two.
+            relation(grade, "new:Requirement", "要求", [quote(0, "钢种成分要求见下表")]),
+            relation("new:Heat", "new:Heat", "相邻", [quote(0, "相邻炉次的钢种相同")]),
+        ],
+        properties=[],
+    )
+    gateway = ScriptedGateway(outputs(types, rels))
+    extractor = Extractor(gateway, ExtractionModels(standard="std", reasoning="deep"))
+
+    async def progress(step: str, done: int, total: int) -> None:
+        pass
+
+    proposals = await extractor.run(
+        document_id=DOC,
+        title="t",
+        chunks=[chunk],
+        known=[EXISTING_GRADE, converter],
+        progress=progress,
+    )
+
+    [link] = [p for p in proposals if p.kind == "relation_type"]
+    assert (link.fields["labelZh"], link.fields["rangeRef"]) == ("运入", str(converter.id))
