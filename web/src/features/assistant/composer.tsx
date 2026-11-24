@@ -7,13 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useErrorMessage } from '@/i18n/error-message';
 import { cn } from '@/lib/cn';
+import { isImeComposing } from '@/lib/keyboard';
 
 import { MESSAGE_MAX_LENGTH, messageLength } from './api';
-
-/** Marks the panel element; the composer takes focus from it when it appears after loading. */
-export const PANEL_ATTRIBUTE = 'data-assistant-panel';
-/** Selects the field the shell focuses when the panel opens (set on the textarea below). */
-export const AUTOFOCUS_SELECTOR = '[data-assistant-autofocus]';
+import { autofocusMarker, PANEL_SELECTOR } from './focus';
 
 /** The counter appears near the limit, so it does not distract while typing short requests. */
 const COUNTER_FROM = Math.floor(MESSAGE_MAX_LENGTH * 0.9);
@@ -40,7 +37,7 @@ export function Composer({ onSend, sending, sendError }: ComposerProps) {
   // When the panel opened before the composer could render, focus still sits on the panel itself.
   useEffect(() => {
     const field = fieldRef.current;
-    if (field && document.activeElement === field.closest(`[${PANEL_ATTRIBUTE}]`)) field.focus();
+    if (field && document.activeElement === field.closest(PANEL_SELECTOR)) field.focus();
   }, []);
 
   const length = messageLength(text);
@@ -73,9 +70,9 @@ export function Composer({ onSend, sending, sendError }: ComposerProps) {
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    // Enter confirms an IME candidate while composing (Chinese input); only a plain Enter sends.
+    // Only a plain Enter sends; while an input method composes, Enter picks a candidate.
     if (event.key !== 'Enter' || event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) return;
-    if (event.nativeEvent.isComposing || event.keyCode === 229) return;
+    if (isImeComposing(event.nativeEvent)) return;
     event.preventDefault();
     if (!sending) send();
   };
@@ -101,7 +98,7 @@ export function Composer({ onSend, sending, sendError }: ComposerProps) {
         className="min-h-20 resize-none"
         onChange={(event) => setText(event.target.value)}
         onKeyDown={handleKeyDown}
-        data-assistant-autofocus=""
+        {...autofocusMarker}
       />
       {error ? (
         <p id={errorId} className="text-sm text-error-strong">
@@ -113,7 +110,7 @@ export function Composer({ onSend, sending, sendError }: ComposerProps) {
           {t('assistant.composer.hint')}
           {length >= COUNTER_FROM ? (
             <span className={cn('ml-2 tabular-nums', tooLong && 'font-semibold text-error-strong')}>
-              {t('assistant.composer.count', { count: length, max: MESSAGE_MAX_LENGTH })}
+              {t('assistant.composer.count', { length, max: MESSAGE_MAX_LENGTH })}
             </span>
           ) : null}
         </p>

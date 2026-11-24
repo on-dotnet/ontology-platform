@@ -8,9 +8,10 @@ import { RelativeTime } from '@/components/ui/relative-time';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useChangeSet, type ChangeOp } from '@/features/review/api';
 import { AiSuggestionBadge } from '@/features/review/item-badges';
+import { useErrorMessage } from '@/i18n/error-message';
 import { cn } from '@/lib/cn';
 
-import { ASSISTANT_STEPS, isActive, useAssistantRequest, type AssistantRequest } from './api';
+import { ASSISTANT_STEPS, isActive, stopsPolling, useAssistantRequest, type AssistantRequest } from './api';
 
 export type StepState = 'done' | 'active' | 'pending';
 
@@ -29,12 +30,15 @@ const stepIconClassName: Record<StepState, string> = {
   pending: 'text-muted-foreground',
 };
 
-/** "读取本体 → 调用模型 → 生成变更集" with the current step marked; no log (ui-guidelines §7). */
+/**
+ * "读取本体 → 调用模型 → 生成变更集" with the current step marked; no log (ui-guidelines §7). Not a live
+ * region: the panel announces once when the request ends.
+ */
 function StepProgress({ request }: { request: AssistantRequest }) {
   const { t } = useTranslation();
   const states = stepStates(request);
   return (
-    <div role="status" className="rounded-lg border border-border px-3 py-2.5">
+    <div className="rounded-lg border border-border px-3 py-2.5">
       <p className="text-xs font-semibold text-muted-foreground">
         {t(request.status === 'queued' ? 'assistant.progress.queued' : 'assistant.progress.running')}
       </p>
@@ -132,30 +136,41 @@ interface RequestEntryProps {
   /** Offered on failures when the user may ask the assistant. */
   onRetry?: (() => void) | undefined;
   retrying?: boolean;
+  /** Why sending this request again failed, shown with it. */
+  retryError?: unknown;
+  /** Called when a request seen in progress ends (or can no longer be followed). */
+  onSettled?: ((outcome: 'succeeded' | 'failed' | 'lost') => void) | undefined;
 }
 
 /** One request: the user's words, then the progress, the result or the failure. */
-export function RequestEntry({ request, onRetry, retrying = false }: RequestEntryProps) {
+export function RequestEntry({ request, onRetry, retrying = false, retryError, onSettled }: RequestEntryProps) {
   const { t } = useTranslation();
-  const polled = useAssistantRequest(request);
+  const message = useErrorMessage();
+  const polled = useAssistantRequest(request, (next) => onSettled?.(next.status === 'succeeded' ? 'succeeded' : 'failed'), () =>
+    onSettled?.('lost'),
+  );
   // The list holds the outcome once known; until then the polled copy is the newer one.
   const shown = isActive(request) ? polled.data : request;
   const reason = failureReason(shown.errorCode);
+  // Polling stopped for good (e.g. the request is gone): say so instead of spinning on.
+  const lost = isActive(shown) && polled.isError && stopsPolling(polled.error);
 
-  return (
-    <li className="space-y-2">
-      <div className="ml-8 rounded-lg bg-muted px-3 py-2">
-        <p className="whitespace-pre-wrap break-words text-sm text-foreground">
-          <span className="sr-only">{t('assistant.youAsked')}</span>
-          {shown.message}
-        </p>
-        <RelativeTime value={shown.createdAt} className="mt-0.5 block text-xs text-muted-foreground" />
-      </div>
-      {isActive(shown) ? (
-        <StepProgress request={shown} />
-      ) : shown.status === 'failed' ? (
+  let outcome;
+  if (lost) {
+    outcome = (
+      <InlineNotice tone="error" announce={false} title={t('assistant.lostTitle')}>
+        {message(polled.error)}
+      </InlineNotice>
+    );
+  } else if (isActive(shown)) {
+    outcome = <StepProgress request={shown} />;
+  } else if (shown.status === 'failed') {
+    outcome = (
+      <div className="space-y-2">
+        {/* Past failures are part of the history: not read out when the list appears. */}
         <InlineNotice
           tone="error"
+          announce={false}
           title={t(`assistant.failure.${reason}.title`)}
           action={
             onRetry ? (
@@ -168,9 +183,27 @@ export function RequestEntry({ request, onRetry, retrying = false }: RequestEntr
         >
           {t(`assistant.failure.${reason}.description`)}
         </InlineNotice>
-      ) : (
-        <ResultCard request={shown} />
-      )}
+        {retryError ? (
+          <InlineNotice tone="error" title={t('assistant.retryFailedTitle')}>
+            {message(retryError)}
+          </InlineNotice>
+        ) : null}
+      </div>
+    );
+  } else {
+    outcome = <ResultCard request={shown} />;
+  }
+
+  return (
+    <li className="space-y-2">
+      <div className="ml-8 rounded-lg bg-muted px-3 py-2">
+        <p className="whitespace-pre-wrap break-words text-sm text-foreground">
+          <span className="sr-only">{t('assistant.youAsked')}</span>
+          {shown.message}
+        </p>
+        <RelativeTime value={shown.createdAt} className="mt-0.5 block text-xs text-muted-foreground" />
+      </div>
+      {outcome}
     </li>
   );
 }

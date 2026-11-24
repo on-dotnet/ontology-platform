@@ -62,8 +62,11 @@ function BackToList({ ontologyId }: { ontologyId?: string }) {
 export function ReviewDetailPage({ changeSetId }: { changeSetId: string }) {
   const { t } = useTranslation();
   const query = useChangeSet(changeSetId);
-  // The URL names no ontology here; the assistant works on the change set's.
-  usePublishAssistantSelection({ ontologyId: query.data?.ontologyId });
+  // The URL names no ontology here; the assistant works on the change set's, once it is known.
+  usePublishAssistantSelection({
+    ontologyId: query.data?.ontologyId,
+    ontologyStatus: query.isPending ? 'pending' : query.isError ? 'failed' : undefined,
+  });
   if (query.isSuccess) return <ChangeSetLoaded changeSet={query.data} />;
   return (
     <>

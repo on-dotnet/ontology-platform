@@ -76,13 +76,15 @@
     "noOntologyTitle": "No ontology yet",
     "noOntologyDescription": "Build an ontology on the ontology page by uploading documents or importing an OWL file, then let the assistant change it.",
     "goToOntology": "Go to the ontology page",
+    "unknownOntologyTitle": "Cannot tell which ontology to change",
+    "unknownOntologyDescription": "This page did not load, so the assistant does not know which ontology to change. Reload the page and try again.",
     "viewerTitle": "Editor role required",
     "viewerDescription": "Asking the assistant to change the ontology needs the “Editor” role or higher. Contact your platform admin to get access.",
     "composer": {
       "label": "Tell the assistant what to change",
       "placeholder": "For example: add a property “capacity” in tonnes to “Ladle”",
       "hint": "Enter to send, Shift + Enter for a new line",
-      "count": "{{count}}/{{max}}",
+      "count": "{{length}}/{{max}}",
       "send": "Send",
       "required": "Write what the assistant should change first.",
       "tooLong": "Use at most {{max}} characters, then send again.",
@@ -93,6 +95,13 @@
     "reviewNote": "AI only makes suggestions. Every change takes effect only after you review it.",
     "listLabel": "Recent requests",
     "youAsked": "Your request: ",
+    "lostTitle": "Cannot follow this request",
+    "retryFailedTitle": "The request was not sent again",
+    "announce": {
+      "succeeded": "Request finished",
+      "failed": "Request failed",
+      "lost": "Cannot get the result of the request"
+    },
     "progress": {
       "label": "Progress",
       "queued": "Queued",
@@ -109,11 +118,14 @@
       "pending": "not started"
     },
     "result": {
-      "summary": "Change set with {{count}} items: {{ops}}",
-      "opCount": "{{op}} {{count}}",
+      "summary_one": "Change set with {{count}} item: {{ops}}",
+      "summary_other": "Change set with {{count}} items: {{ops}}",
+      "opCount_one": "{{op}} {{count}}",
+      "opCount_other": "{{op}} {{count}}",
       "summaryFailed": "The change summary could not be loaded. You can see it on the review page.",
       "review": "Review changes",
-      "dropped": "Could not apply and ignored: {{count}}",
+      "dropped_one": "{{count}} item could not be applied and was ignored",
+      "dropped_other": "{{count}} items could not be applied and were ignored",
       "noChanges": "No changes were drafted. The ontology stays as it is."
     },
     "failure": {
@@ -870,7 +882,8 @@
       "summaryTitleCurrent": "Changes since the current release",
       "summaryFailed": "The change summary could not be loaded",
       "noChanges": "The working version is the same as the current release.",
-      "breakingNotice": "Breaking changes: {{count}}. Data and queries that rely on these elements may stop working"
+      "breakingNotice_one": "{{count}} breaking change. Data and queries that rely on this element may stop working",
+      "breakingNotice_other": "{{count}} breaking changes. Data and queries that rely on these elements may stop working"
     },
     "problems": {
       "unknown": "Did not pass the release check. Check this element.",
@@ -905,7 +918,8 @@
       "currentOption": "v{{version}} · {{title}} (current)",
       "failedTitle": "The comparison could not be loaded",
       "countsLabel": "Changes per level",
-      "levelCount": "{{level}}: {{count}}",
+      "levelCount_one": "{{level}}: {{count}}",
+      "levelCount_other": "{{level}}: {{count}}",
       "levels": {
         "breaking": "Breaking",
         "review": "Needs review",
@@ -930,6 +944,8 @@
       },
       "rulesChanged": "Rules changed",
       "turtleChanged": "Fragment changed",
+      "turtleBefore": "Before",
+      "turtleAfter": "After",
       "valueChanged": "Changed",
       "becomes": "becomes",
       "none": "None",

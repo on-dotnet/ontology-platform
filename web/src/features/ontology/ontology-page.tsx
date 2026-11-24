@@ -85,18 +85,21 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
   const [newKind, setNewKind] = useState<FormKind | null>(null);
   const [newAxiom, setNewAxiom] = useState(false);
   // The element last opened stays the assistant's context after its (modal) sheet closes, since the
-  // assistant cannot be used while the sheet is open.
-  const [contextElementId, setContextElementId] = useState<string | null>(null);
-  usePublishAssistantSelection({ ontologyId: selected?.id, elementId: contextElementId });
+  // assistant cannot be used while the sheet is open. It belongs to the ontology it was opened in, so
+  // a switch by any means (selector, back and forward) leaves it out.
+  const [contextElement, setContextElement] = useState<{ ontologyId: string; elementId: string } | null>(null);
+  usePublishAssistantSelection({
+    ontologyId: selected?.id,
+    elementId: selected && contextElement?.ontologyId === selected.id ? contextElement.elementId : null,
+  });
 
   const selectElement = (id: string | null) => {
     setElementId(id);
-    if (id) setContextElementId(id);
+    if (id && selected) setContextElement({ ontologyId: selected.id, elementId: id });
   };
 
   const switchOntology = (id: string) => {
     setElementId(null);
-    setContextElementId(null);
     onOntologyChange(id);
   };
 

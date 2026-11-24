@@ -20,18 +20,23 @@ interface InlineNoticeProps {
   children?: ReactNode;
   /** Optional action, e.g. a retry button. */
   action?: ReactNode;
+  /**
+   * Announce the notice to screen readers as it appears (default). Off for notices that are part of
+   * loaded content, such as past failures in a history list, which would otherwise all be read out.
+   */
+  announce?: boolean;
   className?: string;
 }
 
 /**
  * In-page banner. Warnings the user must know about are yellow, errors red (ui-guidelines §4);
- * errors are announced immediately (`role="alert"`).
+ * errors are announced immediately (`role="alert"`) unless `announce` is off.
  */
-export function InlineNotice({ tone, title, children, action, className }: InlineNoticeProps) {
+export function InlineNotice({ tone, title, children, action, announce = true, className }: InlineNoticeProps) {
   const { icon: Icon, className: toneClassName, iconClassName } = tones[tone];
   return (
     <div
-      role={tone === 'error' ? 'alert' : 'status'}
+      role={announce ? (tone === 'error' ? 'alert' : 'status') : undefined}
       className={cn('flex items-start gap-3 rounded-lg border px-4 py-3 text-sm', toneClassName, className)}
     >
       <Icon className={cn('mt-0.5 size-4 shrink-0', iconClassName)} aria-hidden />

@@ -10,6 +10,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDocumentTitle } from '@/lib/use-document-title';
+import { DESKTOP_QUERY, useMediaQuery } from '@/lib/use-media-query';
 
 function StandaloneLayout({ children }: { children: ReactNode }) {
   return (
@@ -68,18 +69,22 @@ export function AppErrorPage({ error, reset }: ErrorComponentProps) {
 /** Skeleton of the app shell while the session is being checked; keeps the final layout. */
 export function AppShellSkeleton() {
   const { t } = useTranslation();
+  // Same switch as the shell itself (#8): a CSS `lg:` would move with the browser's font size.
+  const isDesktop = useMediaQuery(DESKTOP_QUERY);
   return (
     <div role="status" aria-busy className="flex h-dvh overflow-hidden bg-background">
       <span className="sr-only">{t('common.loading')}</span>
-      <div className="hidden w-64 shrink-0 flex-col gap-3 border-r border-border bg-card p-4 lg:flex">
-        <div className="mb-4 flex items-center gap-3 px-1 pt-2">
-          <BrandMark />
-          <Skeleton className="h-4 w-28" />
+      {isDesktop ? (
+        <div className="flex w-64 shrink-0 flex-col gap-3 border-r border-border bg-card p-4">
+          <div className="mb-4 flex items-center gap-3 px-1 pt-2">
+            <BrandMark />
+            <Skeleton className="h-4 w-28" />
+          </div>
+          {[0, 1, 2, 3, 4, 5, 6].map((key) => (
+            <Skeleton key={key} className="h-9 rounded-lg" />
+          ))}
         </div>
-        {[0, 1, 2, 3, 4, 5, 6].map((key) => (
-          <Skeleton key={key} className="h-9 rounded-lg" />
-        ))}
-      </div>
+      ) : null}
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex h-16 items-center gap-3 border-b border-border px-6">
           <Skeleton className="h-5 w-32" />

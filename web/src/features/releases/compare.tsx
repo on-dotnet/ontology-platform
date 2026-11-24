@@ -98,8 +98,6 @@ function fieldLabel(t: TFunction, field: string, kind: ElementKind): string {
   return key ? t(key) : t('releases.compare.fields.other');
 }
 
-/** Long or structured values are only said to have changed. */
-const SUMMARIZED: Record<string, string> = { rules: 'releases.compare.rulesChanged', turtle: 'releases.compare.turtleChanged' };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -131,18 +129,53 @@ function FieldChanges({ change }: { change: ElementChange }) {
   return (
     <dl className="space-y-1 text-xs">
       {change.fields.map((field) => {
-        const summary = SUMMARIZED[field.field];
         return (
           <div key={field.field} className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <dt className="shrink-0 text-muted-foreground">
               {fieldLabel(t, field.field, change.kind)}
               {t('common.colon')}
             </dt>
-            <dd className="min-w-0 text-foreground">{summary ? t(summary) : <FieldValues field={field} />}</dd>
+            <dd className="min-w-0 flex-1 text-foreground">
+              {field.field === 'turtle' ? (
+                <TurtleChange field={field} />
+              ) : field.field === 'rules' ? (
+                // Rule lists are long and structured; the constraint's own page shows them.
+                t('releases.compare.rulesChanged')
+              ) : (
+                <FieldValues field={field} />
+              )}
+            </dd>
           </div>
         );
       })}
     </dl>
+  );
+}
+
+/** An axiom's fragment before and after, collapsed by default since fragments can be long. */
+function TurtleChange({ field }: { field: FieldChange }) {
+  const { t } = useTranslation();
+  const fragment = (value: unknown) => (typeof value === 'string' && value.trim() ? value : t('releases.compare.none'));
+  const sides = [
+    { key: 'before', label: t('releases.compare.turtleBefore'), value: field.before },
+    { key: 'after', label: t('releases.compare.turtleAfter'), value: field.after },
+  ];
+  return (
+    <details>
+      <summary className="w-fit cursor-pointer select-none rounded outline-none hover:text-primary-strong focus-visible:outline-2 focus-visible:outline-ring">
+        {t('releases.compare.turtleChanged')}
+      </summary>
+      <div className="mt-1.5 space-y-2">
+        {sides.map((side) => (
+          <div key={side.key}>
+            <p className="text-muted-foreground">{side.label}</p>
+            <pre className="mt-0.5 overflow-x-auto whitespace-pre-wrap break-all rounded-md bg-muted px-2 py-1.5 font-mono text-xs text-foreground">
+              {fragment(side.value)}
+            </pre>
+          </div>
+        ))}
+      </div>
+    </details>
   );
 }
 
@@ -263,9 +296,10 @@ export function CompareCard({ ontology, releases }: CompareCardProps) {
   return (
     <Card>
       <CardHeader className="flex-row flex-wrap items-center gap-x-4 gap-y-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
+        {/* The title keeps its line; the selectors move below it when the card gets narrow. */}
+        <div className="flex shrink-0 grow items-center gap-2">
           <ArrowRightLeft className="size-4.5 text-primary-strong" aria-hidden />
-          <CardTitle>{t('releases.compare.title')}</CardTitle>
+          <CardTitle className="whitespace-nowrap">{t('releases.compare.title')}</CardTitle>
           <InfoTip label={t('common.aboutPage', { title: t('releases.compare.title') })}>{t('releases.compare.info')}</InfoTip>
         </div>
         <div className="flex flex-wrap items-center gap-2">

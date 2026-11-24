@@ -155,7 +155,8 @@ function ChangesSinceCurrent({ ontologyId, releaseId, version }: ChangesSinceCur
   const query = useComparison(ontologyId, releaseId);
 
   let body;
-  if (query.isPending) {
+  // A comparison cached before the dialog opened may predate the latest merge: wait for a fresh one.
+  if (query.isPending || !query.isFetchedAfterMount) {
     body = (
       <div role="status" aria-busy className="flex gap-2">
         <span className="sr-only">{t('common.loading')}</span>

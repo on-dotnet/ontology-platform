@@ -76,13 +76,15 @@
     "noOntologyTitle": "还没有本体",
     "noOntologyDescription": "先在本体页上传资料或导入 OWL 文件建立本体，再让 AI 助手帮你修改它。",
     "goToOntology": "前往本体页",
+    "unknownOntologyTitle": "无法确定要修改哪个本体",
+    "unknownOntologyDescription": "这个页面的内容没有加载出来，AI 助手不知道该修改哪个本体。请刷新页面后再试。",
     "viewerTitle": "需要编辑者角色",
     "viewerDescription": "让 AI 助手修改本体需要“编辑者”或更高的角色，请联系平台管理员开通。",
     "composer": {
       "label": "告诉 AI 助手要做的修改",
       "placeholder": "例如：给“钢包”加一个属性“容量”，单位为吨",
       "hint": "Enter 发送，Shift + Enter 换行",
-      "count": "{{count}}/{{max}}",
+      "count": "{{length}}/{{max}}",
       "send": "发送",
       "required": "请先写下要让 AI 助手做的修改。",
       "tooLong": "最多 {{max}} 字，请精简后再发送。",
@@ -93,6 +95,13 @@
     "reviewNote": "AI 只提出建议，所有修改都需要你审核后才会生效。",
     "listLabel": "最近的请求",
     "youAsked": "你的请求：",
+    "lostTitle": "无法获取这条请求的进度",
+    "retryFailedTitle": "没有重新提交",
+    "announce": {
+      "succeeded": "请求已完成",
+      "failed": "请求失败",
+      "lost": "无法获取请求的结果"
+    },
     "progress": {
       "label": "处理进度",
       "queued": "排队中",
@@ -109,11 +118,14 @@
       "pending": "未开始"
     },
     "result": {
-      "summary": "变更集共 {{count}} 项：{{ops}}",
-      "opCount": "{{op}} {{count}} 项",
+      "summary_one": "变更集共 {{count}} 项：{{ops}}",
+      "summary_other": "变更集共 {{count}} 项：{{ops}}",
+      "opCount_one": "{{op}} {{count}} 项",
+      "opCount_other": "{{op}} {{count}} 项",
       "summaryFailed": "变更摘要没有加载出来，可以在审核页查看。",
       "review": "去审核",
-      "dropped": "有 {{count}} 项无法执行，已忽略",
+      "dropped_one": "有 {{count}} 项无法执行，已忽略",
+      "dropped_other": "有 {{count}} 项无法执行，已忽略",
       "noChanges": "没有生成修改，本体保持不变。"
     },
     "failure": {
@@ -870,7 +882,8 @@
       "summaryTitleCurrent": "相对当前版本的变更",
       "summaryFailed": "变更摘要没有加载出来",
       "noChanges": "工作版本与当前版本相同，没有变化。",
-      "breakingNotice": "有 {{count}} 项不兼容变更，依赖这些元素的数据和查询可能失效"
+      "breakingNotice_one": "有 {{count}} 项不兼容变更，依赖这些元素的数据和查询可能失效",
+      "breakingNotice_other": "有 {{count}} 项不兼容变更，依赖这些元素的数据和查询可能失效"
     },
     "problems": {
       "unknown": "没有通过发布校验，请检查这个元素。",
@@ -905,7 +918,8 @@
       "currentOption": "v{{version}} · {{title}}（当前）",
       "failedTitle": "对比结果没有加载出来",
       "countsLabel": "各级变更的数量",
-      "levelCount": "{{level}} {{count}} 项",
+      "levelCount_one": "{{level}} {{count}} 项",
+      "levelCount_other": "{{level}} {{count}} 项",
       "levels": {
         "breaking": "不兼容",
         "review": "需确认",
@@ -930,6 +944,8 @@
       },
       "rulesChanged": "规则有变化",
       "turtleChanged": "片段有变化",
+      "turtleBefore": "修改前",
+      "turtleAfter": "修改后",
       "valueChanged": "有变化",
       "becomes": "改为",
       "none": "无",

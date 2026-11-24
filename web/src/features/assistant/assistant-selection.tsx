@@ -1,9 +1,14 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
 
 /** What the page the user is on works with, so the assistant can take it as context. */
 export interface AssistantSelection {
   /** The ontology the page shows, when the URL does not say (e.g. a change set's review page). */
   ontologyId?: string | undefined;
+  /**
+   * The page will name its ontology once it has loaded (`pending`) or could not find out which it
+   * is (`failed`); the assistant must not fall back to another ontology meanwhile.
+   */
+  ontologyStatus?: 'pending' | 'failed' | undefined;
   /** The element selected on the page, if any. */
   elementId?: string | null | undefined;
 }
@@ -29,11 +34,12 @@ export function useAssistantSelection(): AssistantSelection {
 }
 
 /** Publishes the page's ontology and selected element while the page is shown. */
-export function usePublishAssistantSelection({ ontologyId, elementId }: AssistantSelection): void {
+export function usePublishAssistantSelection({ ontologyId, ontologyStatus, elementId }: AssistantSelection): void {
   const setSelection = useContext(SelectionContext)?.setSelection;
-  useEffect(() => {
+  // Before paint, so the panel never shows another page's (or the fallback) ontology in between.
+  useLayoutEffect(() => {
     if (!setSelection) return undefined;
-    setSelection({ ontologyId, elementId: elementId ?? null });
+    setSelection({ ontologyId, ontologyStatus, elementId: elementId ?? null });
     return () => setSelection(EMPTY);
-  }, [setSelection, ontologyId, elementId]);
+  }, [setSelection, ontologyId, ontologyStatus, elementId]);
 }

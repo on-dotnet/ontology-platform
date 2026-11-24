@@ -5,8 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { navItemForPath } from '@/app/navigation';
 import { Dialog, DialogTitle, SheetContent } from '@/components/ui/dialog';
 import { AssistantSelectionProvider } from '@/features/assistant/assistant-selection';
-import { AUTOFOCUS_SELECTOR } from '@/features/assistant/composer';
+import { AUTOFOCUS_SELECTOR } from '@/features/assistant/focus';
 import { cn } from '@/lib/cn';
+import { isImeComposing } from '@/lib/keyboard';
 import { storage } from '@/lib/storage';
 import { DESKTOP_QUERY, useMediaQuery } from '@/lib/use-media-query';
 
@@ -58,13 +59,14 @@ export function AppShell() {
     (panel?.querySelector<HTMLElement>(AUTOFOCUS_SELECTOR) ?? panel)?.focus();
   }, [assistantOpen]);
 
-  // Ctrl/⌘ + J toggles the assistant anywhere; Escape closes it while focus is inside.
+  // Ctrl/⌘ + J toggles the assistant anywhere; Escape closes it while focus is inside, unless it only
+  // cancels an input method's composition.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 'j') {
         event.preventDefault();
         toggleAssistant();
-      } else if (event.key === 'Escape' && assistantRef.current?.contains(document.activeElement)) {
+      } else if (event.key === 'Escape' && !isImeComposing(event) && assistantRef.current?.contains(document.activeElement)) {
         closeAssistant();
       }
     };

@@ -15,7 +15,14 @@ import { elementName, useElementDetail, type ElementDetail, type OntologySummary
 import { useSelectedOntology } from '@/features/ontologies/use-selected-ontology';
 import { optionalString } from '@/lib/search';
 
-import { createAssistantRequest, storeRequest, useAssistantRequests, type AssistantRequest, type AssistantRequestCreate } from './api';
+import {
+  assistantKeys,
+  createAssistantRequest,
+  storeRequest,
+  useAssistantRequests,
+  type AssistantRequest,
+  type AssistantRequestCreate,
+} from './api';
 import { useAssistantSelection } from './assistant-selection';
 import { Composer } from './composer';
 import { RequestEntry } from './request-entry';
@@ -32,21 +39,61 @@ function PanelSkeleton() {
   );
 }
 
+function UnknownOntology() {
+  const { t } = useTranslation();
+  return (
+    <div className="p-4">
+      <InlineNotice tone="warning" title={t('assistant.unknownOntologyTitle')}>
+        {t('assistant.unknownOntologyDescription')}
+      </InlineNotice>
+    </div>
+  );
+}
+
 /**
  * The assistant for the ontology the user works on: the one the page published, else the one in
- * the URL, else the first, as the pages themselves choose it.
+ * the URL, else the first, as the pages themselves choose it. A page that names its ontology only
+ * once loaded gets no fallback in the meantime.
  */
 export function AssistantWorkspace({ page }: { page: NavItem['key'] }) {
   const { t } = useTranslation();
   const { canUpload } = usePermissions();
   const selection = useAssistantSelection();
   const search = useRouterState({ select: (state) => state.location.search as Record<string, unknown> });
-  const { query, selected } = useSelectedOntology(selection.ontologyId ?? optionalString(search.ontology));
+  const { query, ontologies, selected } = useSelectedOntology(selection.ontologyId ?? optionalString(search.ontology));
+
+  if (selection.ontologyStatus === 'pending') return <PanelSkeleton />;
+  if (selection.ontologyStatus === 'failed') return <UnknownOntology />;
 
   return (
     <QueryState query={query} loading={<PanelSkeleton />}>
-      {() =>
-        selected ? (
+      {() => {
+        // The page named an ontology that is not in the list: never swap in another one.
+        if (selection.ontologyId && !ontologies?.some((ontology) => ontology.id === selection.ontologyId)) {
+          return <UnknownOntology />;
+        }
+        if (!selected) {
+          return (
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <EmptyState
+                icon={Network}
+                tone="info"
+                title={t('assistant.noOntologyTitle')}
+                description={t('assistant.noOntologyDescription')}
+                headingLevel="h3"
+                className="py-10"
+                action={
+                  canUpload ? (
+                    <Link to="/ontology" className={buttonVariants({ variant: 'primary', size: 'sm' })}>
+                      {t('assistant.goToOntology')}
+                    </Link>
+                  ) : undefined
+                }
+              />
+            </div>
+          );
+        }
+        return (
           <OntologyAssistant
             key={selected.id}
             ontology={selected}
@@ -54,26 +101,8 @@ export function AssistantWorkspace({ page }: { page: NavItem['key'] }) {
             elementId={selection.ontologyId === selected.id ? (selection.elementId ?? null) : null}
             canAsk={canUpload}
           />
-        ) : (
-          <div className="min-h-0 flex-1 overflow-y-auto">
-            <EmptyState
-              icon={Network}
-              tone="info"
-              title={t('assistant.noOntologyTitle')}
-              description={t('assistant.noOntologyDescription')}
-              headingLevel="h3"
-              className="py-10"
-              action={
-                canUpload ? (
-                  <Link to="/ontology" className={buttonVariants({ variant: 'primary', size: 'sm' })}>
-                    {t('assistant.goToOntology')}
-                  </Link>
-                ) : undefined
-              }
-            />
-          </div>
-        )
-      }
+        );
+      }}
     </QueryState>
   );
 }
@@ -86,6 +115,8 @@ interface OntologyAssistantProps {
   canAsk: boolean;
 }
 
+type Outcome = 'succeeded' | 'failed' | 'lost';
+
 function OntologyAssistant({ ontology, page, elementId, canAsk }: OntologyAssistantProps) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -93,30 +124,40 @@ function OntologyAssistant({ ontology, page, elementId, canAsk }: OntologyAssist
   // Only an element that still exists is context; one deleted meanwhile is left out.
   const detail = useElementDetail(ontology.id, elementId ?? undefined);
   const element = elementId && detail.data?.id === elementId && detail.data.status === 'active' ? detail.data : undefined;
-  // The failed request being sent again; null while sending from the composer.
-  const [retryingId, setRetryingId] = useState<string | null>(null);
+  // What the live region last said; the counter re-creates its text so a repeat is read out again.
+  const [announcement, setAnnouncement] = useState<{ outcome: Outcome; count: number } | null>(null);
+
+  const added = (created: AssistantRequest) => {
+    storeRequest(queryClient, created);
+    // A list request already under way would otherwise overwrite the list without the new request.
+    void queryClient.invalidateQueries({ queryKey: assistantKeys.list(ontology.id) });
+  };
   const create = useMutation({
     mutationFn: (body: AssistantRequestCreate) => createAssistantRequest(ontology.id, body),
-    onSuccess: (created) => storeRequest(queryClient, created),
+    onSuccess: added,
+  });
+  // Sending a failed request again: its own state, so its outcome shows with that request.
+  const retry = useMutation({
+    mutationFn: (request: AssistantRequest) =>
+      createAssistantRequest(ontology.id, {
+        message: request.message,
+        context: { page: request.context.page, elementId: request.context.elementId ?? null },
+      }),
+    onSuccess: added,
   });
 
-  const send = (message: string) => {
-    setRetryingId(null);
-    return create.mutateAsync({ message, context: { page, elementId: element?.id ?? null } });
-  };
-
-  // The same words in the same context as the first time.
-  const retry = (request: AssistantRequest) => {
-    setRetryingId(request.id);
-    create.mutate({ message: request.message, context: { page: request.context.page, elementId: request.context.elementId ?? null } });
-  };
+  const send = (message: string) => create.mutateAsync({ message, context: { page, elementId: element?.id ?? null } });
+  const announce = (outcome: Outcome) => setAnnouncement((previous) => ({ outcome, count: (previous?.count ?? 0) + 1 }));
 
   return (
     <>
       <ContextBar ontology={ontology} element={element} />
+      <div aria-live="polite" className="sr-only">
+        {announcement ? <span key={announcement.count}>{t(`assistant.announce.${announcement.outcome}`)}</span> : null}
+      </div>
       <div className="shrink-0 border-b border-border p-4">
         {canAsk ? (
-          <Composer onSend={send} sending={create.isPending && retryingId === null} sendError={create.isError ? create.error : null} />
+          <Composer onSend={send} sending={create.isPending} sendError={create.isError ? create.error : null} />
         ) : (
           <InlineNotice tone="info" title={t('assistant.viewerTitle')}>
             {t('assistant.viewerDescription')}
@@ -142,14 +183,19 @@ function OntologyAssistant({ ontology, page, elementId, canAsk }: OntologyAssist
               ) : null
             ) : (
               <ol aria-label={t('assistant.listLabel')} className="space-y-5">
-                {list.map((request) => (
-                  <RequestEntry
-                    key={request.id}
-                    request={request}
-                    onRetry={canAsk ? () => retry(request) : undefined}
-                    retrying={create.isPending && retryingId === request.id}
-                  />
-                ))}
+                {list.map((request) => {
+                  const retried = retry.variables?.id === request.id;
+                  return (
+                    <RequestEntry
+                      key={request.id}
+                      request={request}
+                      onRetry={canAsk ? () => retry.mutate(request) : undefined}
+                      retrying={retry.isPending && retried}
+                      retryError={retry.isError && retried ? retry.error : undefined}
+                      onSettled={announce}
+                    />
+                  );
+                })}
               </ol>
             )
           }

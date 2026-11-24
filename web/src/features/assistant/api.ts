@@ -51,7 +51,10 @@ export function createAssistantRequest(ontologyId: string, body: AssistantReques
   return unwrap(api.POST('/api/ontologies/{id}/assistant/requests', { params: { path: { id: ontologyId } }, body }));
 }
 
-/** Puts a new or updated request into the cached list, newest first. */
+/**
+ * Puts a new or updated request into the cached list, newest first. A list request already under
+ * way may answer without it, so callers that add a request refetch the list as well.
+ */
 export function storeRequest(queryClient: QueryClient, request: AssistantRequest): void {
   queryClient.setQueryData<AssistantRequest[]>(assistantKeys.list(request.ontologyId), (current) => {
     if (!current) return [request];
@@ -69,19 +72,35 @@ function finished(queryClient: QueryClient, request: AssistantRequest): void {
   void queryClient.invalidateQueries({ queryKey: ['workbench'] });
 }
 
-function stopsPolling(error: unknown): boolean {
+export function stopsPolling(error: unknown): boolean {
   // A 4xx (e.g. `assistant.not_found`) will not change by asking again; network and 5xx may.
   return isApiError(error) && error.status >= 400 && error.status < 500;
 }
 
-/** One request, polled while it is queued or running; the list learns the outcome. */
-export function useAssistantRequest(request: AssistantRequest) {
+/**
+ * One request, polled while it is queued or running; the list learns the outcome. `onSettled` hears
+ * when a request seen in progress ends, `onLost` when polling stops on an error that will not pass.
+ */
+export function useAssistantRequest(
+  request: AssistantRequest,
+  onSettled?: (request: AssistantRequest) => void,
+  onLost?: () => void,
+) {
   const queryClient = useQueryClient();
   return useQuery({
     queryKey: assistantKeys.request(request.id),
     queryFn: async () => {
-      const next = await unwrap(api.GET('/api/assistant/requests/{id}', { params: { path: { id: request.id } } }));
-      if (!isActive(next)) finished(queryClient, next);
+      let next: AssistantRequest;
+      try {
+        next = await unwrap(api.GET('/api/assistant/requests/{id}', { params: { path: { id: request.id } } }));
+      } catch (error) {
+        if (stopsPolling(error)) onLost?.();
+        throw error;
+      }
+      if (!isActive(next)) {
+        finished(queryClient, next);
+        onSettled?.(next);
+      }
       return next;
     },
     initialData: request,

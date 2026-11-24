@@ -6,6 +6,7 @@ import type { NavItem } from '@/app/navigation';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
 import { AssistantWorkspace } from '@/features/assistant/assistant-workspace';
+import { panelMarker } from '@/features/assistant/focus';
 import { cn } from '@/lib/cn';
 
 export const ASSISTANT_PANEL_ID = 'assistant-panel';
@@ -28,10 +29,11 @@ export function AssistantPanel({ page, onClose, ref }: AssistantPanelProps) {
       ref={ref}
       tabIndex={-1}
       aria-labelledby={`${ASSISTANT_PANEL_ID}-title`}
-      data-assistant-panel=""
+      {...panelMarker}
       className={cn(
         'flex w-[24rem] shrink-0 flex-col border-l border-border bg-card outline-none',
-        // Overlays the content below 1280px, sits beside it on wide screens.
+        // Overlays the content below Tailwind's xl (80rem: 1280px at the default font size, more when
+        // the user enlarges it), sits beside it on wider screens.
         'max-xl:fixed max-xl:bottom-0 max-xl:right-0 max-xl:top-16 max-xl:z-30 max-xl:w-[min(24rem,100vw)] max-xl:shadow-popover',
       )}
     >

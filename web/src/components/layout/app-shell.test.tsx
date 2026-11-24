@@ -9,6 +9,8 @@ describe('app shell breakpoint', () => {
   // With a 20px default font size, Tailwind's `lg` (64rem) is 1280px while the layout query says
   // desktop from 1024px: the sidebar must not depend on the CSS breakpoint in between (#8).
   it('keeps the navigation available between 1024px and 1280px at a 20px default font size', async () => {
+    // The matchMedia stub then evaluates rem and em queries with a 20px default font size, as a
+    // browser does for a user who enlarged it; px queries such as DESKTOP_QUERY are unaffected.
     setBrowserFontSize(20);
     vi.stubGlobal('innerWidth', 1100);
     mockApi();
@@ -18,13 +20,15 @@ describe('app shell breakpoint', () => {
     const sidebar = nav.closest('aside');
     expect(sidebar).not.toBeNull();
     expect(sidebar?.className ?? '').not.toMatch(/(^|\s)hidden(\s|$)/);
-    expect(sidebar?.className ?? '').not.toMatch(/(^|\s)lg:/);
+    // Nor may a responsive Tailwind variant show or hide it: those breakpoints are in rem.
+    expect(sidebar?.className ?? '').not.toMatch(/(^|\s)(sm|md|lg|xl|2xl):/);
     expect(within(nav).getAllByRole('link')).toHaveLength(8);
     expect(screen.getByRole('button', { name: '收起侧栏' })).toBeInTheDocument();
   });
 
   it('opens the navigation as a drawer below 1024px', async () => {
     const user = userEvent.setup();
+    // As above: rem queries in the stub use a 20px default font size.
     setBrowserFontSize(20);
     vi.stubGlobal('innerWidth', 1000);
     mockApi();

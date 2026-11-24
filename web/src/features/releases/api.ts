@@ -20,7 +20,6 @@ export const CHANGE_LEVELS: readonly ChangeLevel[] = ['breaking', 'review', 'com
 export const releaseKeys = {
   all: ['releases'] as const,
   list: (ontologyId: string) => [...releaseKeys.all, 'list', ontologyId] as const,
-  // Under 'releases' so that publishing refreshes it; 'working' changes with every merge.
   compare: (ontologyId: string, from: string, to: string) => [...releaseKeys.all, 'compare', ontologyId, from, to] as const,
 };
 

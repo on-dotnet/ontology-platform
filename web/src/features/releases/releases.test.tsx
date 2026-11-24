@@ -1,10 +1,10 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
 import type { UserInfo } from '@/features/auth/api';
 import { comparisonFixture, elementChangeFixture, elementFixture, ontologyFixture, releaseFixture } from '@/test/fixtures';
-import { captureDownloads, mockApi, problemResponse, renderApp, userWithRole, type RouteHandler } from '@/test/utils';
+import { captureDownloads, jsonResponse, mockApi, problemResponse, renderApp, userWithRole, type RouteHandler } from '@/test/utils';
 
 import type { ReleaseSummary } from './api';
 
@@ -194,7 +194,8 @@ const workingChanges = [
   elementChangeFixture({
     elementId: 'el-axiom',
     kind: 'axiom',
-    label: 'steel:MoltenSteel owl:disjointWith steel:Slag .',
+    // Like the server: a changed element is named as it is in the target version.
+    label: 'steel:MoltenSteel owl:disjointWith steel:Ladle .',
     iri: null,
     level: 'review',
     fields: [{ field: 'turtle', before: 'steel:MoltenSteel owl:disjointWith steel:Slag .', after: 'steel:MoltenSteel owl:disjointWith steel:Ladle .' }],
@@ -214,7 +215,7 @@ const workingChanges = [
 function entry(region: HTMLElement, label: string) {
   const item = within(region)
     .getAllByRole('listitem')
-    .find((candidate) => within(candidate).queryByText(label) !== null);
+    .find((candidate) => within(candidate).queryAllByText(label).length > 0);
   if (!item) throw new Error(`No change for ${label}`);
   return item;
 }
@@ -250,9 +251,15 @@ describe('version comparison', () => {
 
     const review = screen.getByRole('region', { name: '需确认 2 项' });
     expect(entry(review, '钢水校验')).toHaveTextContent('约束规则：规则有变化');
-    const axiom = entry(review, 'steel:MoltenSteel owl:disjointWith steel:Slag .');
+    const axiom = entry(review, 'steel:MoltenSteel owl:disjointWith steel:Ladle .');
     expect(axiom).toHaveTextContent('Turtle 片段：片段有变化');
-    expect(axiom).not.toHaveTextContent('steel:Ladle');
+    // Both fragments, in monospace, behind a collapsed disclosure.
+    const fragments = within(axiom).getByText('片段有变化').closest('details');
+    if (!fragments) throw new Error('No disclosure for the fragments');
+    expect(fragments).not.toHaveAttribute('open');
+    expect(fragments).toHaveTextContent('修改前steel:MoltenSteel owl:disjointWith steel:Slag .');
+    expect(fragments).toHaveTextContent('修改后steel:MoltenSteel owl:disjointWith steel:Ladle .');
+    for (const fragment of within(fragments).getAllByText(/owl:disjointWith/)) expect(fragment).toHaveClass('font-mono');
 
     const compatible = screen.getByRole('region', { name: '兼容 3 项' });
     const moltenSteel = entry(compatible, '钢水');
@@ -317,6 +324,33 @@ describe('publish dialog summary', () => {
     expect(summary).toHaveTextContent('需确认 2 项');
     expect(summary).toHaveTextContent('兼容 3 项');
     expect(within(summary).getByRole('status')).toHaveTextContent('有 2 项不兼容变更，依赖这些元素的数据和查询可能失效');
+  });
+
+  it('waits for a fresh comparison rather than showing one from before the dialog opened', async () => {
+    const user = userEvent.setup();
+    let answer: () => Response | Promise<Response> = () => jsonResponse(comparisonFixture(workingChanges));
+    releasesServer({ extra: { 'GET /api/ontologies/:id/compare': () => answer() } });
+    renderApp('/releases?ontology=onto-steel');
+
+    // The page's own comparison is cached with two breaking changes.
+    await screen.findByRole('region', { name: '不兼容 2 项' });
+    // Meanwhile a merge removed them; the server answers once the test lets it.
+    let respond: (() => void) | undefined;
+    answer = () =>
+      new Promise<Response>((resolve) => {
+        respond = () => resolve(jsonResponse(comparisonFixture([])));
+      });
+
+    await user.click(screen.getByRole('button', { name: '发布新版本' }));
+    const dialog = await screen.findByRole('dialog', { name: '发布新版本' });
+    const summary = within(dialog).getByRole('region', { name: '相对当前版本 v2 的变更' });
+    expect(within(summary).getByRole('status')).toHaveAttribute('aria-busy', 'true');
+    expect(summary).not.toHaveTextContent('不兼容 2 项');
+    expect(summary).not.toHaveTextContent('不兼容变更，依赖这些元素');
+
+    await waitFor(() => expect(respond).toBeDefined());
+    act(() => respond?.());
+    expect(await within(summary).findByText('工作版本与当前版本相同，没有变化。')).toBeInTheDocument();
   });
 
   it('shows the summary without a warning when nothing breaks', async () => {
