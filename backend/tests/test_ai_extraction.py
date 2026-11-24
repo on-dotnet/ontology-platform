@@ -445,3 +445,70 @@ def test_a_single_batch_of_types_is_kept_as_the_model_returned_it() -> None:
         entity("new:LadleFurnace", "精炼炉", "LadleFurnace"),
     ]
     assert merge_types([], batch) == batch
+
+
+async def test_new_types_sharing_a_name_become_one_type() -> None:
+    types = [
+        entity("new:LadleFurnace", "LF精炼炉", "LadleFurnace", synonyms=["精炼炉"]),
+        entity("new:Ladle", "钢包", "Ladle"),
+        # Another name of the same furnace: merged, its names kept as synonyms.
+        entity("new:Refiner", "精炼炉", "Refiner", synonyms=["LF炉"]),
+        entity("new:Converter", "转炉", "Converter", label_en="Converter"),
+        entity("new:BOF", "顶底复吹转炉", "BOF", label_en="converter"),
+    ]
+    rels = RelationsOut(
+        relations=[
+            relation("new:Ladle", "new:Refiner", "运至", [quote(0, "钢水由钢包吊运至精炼炉")])
+        ],
+        properties=[],
+    )
+    proposals, _ = await run(ScriptedGateway(outputs(types, rels)))
+
+    created = [p for p in proposals if p.kind == "entity_type"]
+    assert [p.fields["labelZh"] for p in created] == ["LF精炼炉", "钢包", "转炉"]
+    furnace = by_label(proposals, "LF精炼炉")
+    assert [s["text"] for s in furnace.fields["synonyms"]] == ["精炼炉", "LF炉"]
+    assert [s["text"] for s in by_label(proposals, "转炉").fields["synonyms"]] == ["顶底复吹转炉"]
+    [link] = [p for p in proposals if p.kind == "relation_type"]
+    assert link.fields["rangeRef"] == "new:LadleFurnace"
+
+
+async def test_relations_need_a_quote_whose_line_names_both_types() -> None:
+    chunk = ChunkText(
+        id=uuid4(),
+        seq=0,
+        text="每个炉次只冶炼一个钢种。\n钢水由钢包吊运至精炼炉。\n炉次按计划组织生产。",
+    )
+    types = [
+        entity("new:Heat", "炉次", "Heat"),
+        entity("new:Ladle", "盛钢桶", "Ladle", synonyms=["钢包"]),
+        entity("new:Crane", "行车", "Crane"),
+    ]
+    grade = str(EXISTING_GRADE.id)
+    rels = RelationsOut(
+        relations=[
+            relation("new:Heat", grade, "冶炼", [quote(0, "只冶炼一个钢种")]),
+            # The line of the quote does not name the heat: no direct evidence.
+            relation("new:Heat", "new:Ladle", "使用", [quote(0, "钢水由钢包吊运至精炼炉")]),
+            relation("new:Heat", grade, "计划钢种", []),
+            relation("new:Heat", grade, "虚构", [quote(0, "炉次与钢种一一对应")]),
+            # 行车 is not named anywhere in the document, so that end cannot be checked.
+            relation("new:Crane", "new:Ladle", "吊运", [quote(0, "由钢包吊运")]),
+        ],
+        properties=[],
+    )
+    gateway = ScriptedGateway(outputs(types, rels))
+    extractor = Extractor(gateway, ExtractionModels(standard="std", reasoning="deep"))
+
+    async def progress(step: str, done: int, total: int) -> None:
+        pass
+
+    proposals = await extractor.run(
+        document_id=DOC, title="t", chunks=[chunk], known=[EXISTING_GRADE], progress=progress
+    )
+
+    relations = [p for p in proposals if p.kind == "relation_type"]
+    assert [r.fields["labelZh"] for r in relations] == ["冶炼", "吊运"]
+    assert all(r.flags == [] for r in relations)
+    [relations_text] = [text for purpose, text in gateway.texts if purpose == "extract.relations"]
+    assert "- new:Ladle | 盛钢桶 | 钢包 | \n" in relations_text
