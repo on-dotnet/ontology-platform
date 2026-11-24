@@ -263,10 +263,14 @@ def merge_types(
     """Adds a batch's types; one reusing the ref of an earlier batch's type extends that type.
 
     Only earlier batches are merged into: a single batch is kept exactly as the model returned
-    it, and duplicates by name are left to `build_proposals`, as before batching.
+    it, and duplicates by name are left to `build_proposals`, as before batching. A ref that
+    earlier batches gave to several types is not extended either: which one is meant is
+    unknown, so the type is added and `build_proposals` resolves the shared ref.
     """
     merged = list(found)
-    earlier = {item.ref: index for index, item in enumerate(found)}
+    earlier: dict[str, int | None] = {}
+    for position, item in enumerate(found):
+        earlier[item.ref] = None if item.ref in earlier else position
     for item in batch:
         index = earlier.get(item.ref)
         if index is None:
@@ -509,7 +513,7 @@ def build_proposals(
         domain = resolve(relation.domain)
         range_ = resolve(relation.range)
         if domain is None or range_ is None:
-            continue  # the model referenced a type that does not exist
+            continue  # the model referenced a type that does not exist, or an ambiguous ref
         key = (domain, range_, normalize(relation.label_zh))
         if key in seen_relations:
             continue
@@ -548,7 +552,7 @@ def build_proposals(
     for prop in relations.properties:
         domain = resolve(prop.domain)
         if domain is None:
-            continue
+            continue  # as for relations
         prop_key = (domain, normalize(prop.label_zh))
         if prop_key in seen_properties:
             continue
