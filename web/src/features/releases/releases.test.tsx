@@ -1,10 +1,10 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
 import type { UserInfo } from '@/features/auth/api';
-import { elementFixture, ontologyFixture, releaseFixture } from '@/test/fixtures';
-import { captureDownloads, mockApi, problemResponse, renderApp, userWithRole, type RouteHandler } from '@/test/utils';
+import { comparisonFixture, elementChangeFixture, elementFixture, ontologyFixture, releaseFixture } from '@/test/fixtures';
+import { captureDownloads, jsonResponse, mockApi, problemResponse, renderApp, userWithRole, type RouteHandler } from '@/test/utils';
 
 import type { ReleaseSummary } from './api';
 
@@ -23,6 +23,7 @@ function releasesServer({ extra = {}, user }: { extra?: Record<string, RouteHand
         releases = [created, ...releases];
         return created;
       },
+      'GET /api/ontologies/:id/compare': () => comparisonFixture(),
       'POST /api/releases/:id/activate': ({ params }) => {
         releases = releases.map((release) => ({ ...release, isActive: release.id === params.id }));
         return releases.find((release) => release.id === params.id);
@@ -165,5 +166,221 @@ describe('releases page', () => {
 
     await screen.findByRole('table', { name: '版本列表' });
     expect(screen.queryByRole('button', { name: '发布新版本' })).not.toBeInTheDocument();
+  });
+});
+
+const ladleRef = { id: 'el-ladle', label: '钢包' };
+const steelRef = { id: 'el-molten-steel', label: '钢水' };
+const workingChanges = [
+  elementChangeFixture({ elementId: 'el-ladle', label: '钢包', change: 'removed', level: 'breaking' }),
+  elementChangeFixture({
+    elementId: 'el-temperature',
+    kind: 'property',
+    label: '温度',
+    level: 'breaking',
+    fields: [
+      { field: 'domainId', before: steelRef, after: ladleRef },
+      { field: 'datatype', before: 'decimal', after: 'integer' },
+      { field: 'required', before: false, after: true },
+    ],
+  }),
+  elementChangeFixture({
+    elementId: 'el-shape',
+    kind: 'constraint',
+    label: '钢水校验',
+    level: 'review',
+    fields: [{ field: 'rules', before: [{ pathId: 'el-temperature' }], after: [] }],
+  }),
+  elementChangeFixture({
+    elementId: 'el-axiom',
+    kind: 'axiom',
+    // Like the server: a changed element is named as it is in the target version.
+    label: 'steel:MoltenSteel owl:disjointWith steel:Ladle .',
+    iri: null,
+    level: 'review',
+    fields: [{ field: 'turtle', before: 'steel:MoltenSteel owl:disjointWith steel:Slag .', after: 'steel:MoltenSteel owl:disjointWith steel:Ladle .' }],
+  }),
+  elementChangeFixture({
+    level: 'compatible',
+    fields: [
+      { field: 'labelEn', before: 'Molten steel', after: 'Liquid steel' },
+      { field: 'synonyms', before: [], after: [{ lang: 'zh', text: '铁水' }, { lang: 'zh', text: '液态钢' }] },
+      { field: 'parentId', before: { id: 'el-gone', label: null }, after: null },
+    ],
+  }),
+  elementChangeFixture({ elementId: 'el-heat', label: '炉次', change: 'added', level: 'compatible' }),
+  elementChangeFixture({ elementId: 'el-slab', label: '板坯', change: 'restored', level: 'compatible' }),
+];
+
+function entry(region: HTMLElement, label: string) {
+  const item = within(region)
+    .getAllByRole('listitem')
+    .find((candidate) => within(candidate).queryAllByText(label).length > 0);
+  if (!item) throw new Error(`No change for ${label}`);
+  return item;
+}
+
+describe('version comparison', () => {
+  it('compares the current release with the working version by default, grouped by level with field changes', async () => {
+    const api = releasesServer({ extra: { 'GET /api/ontologies/:id/compare': () => comparisonFixture(workingChanges) } });
+    renderApp('/releases?ontology=onto-steel');
+
+    expect(await screen.findByRole('heading', { name: '版本对比' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: '起点' })).toHaveDisplayValue('v2 · 补充精炼工艺（当前）');
+    expect(screen.getByRole('combobox', { name: '终点' })).toHaveDisplayValue('工作版本');
+    await waitFor(() => expect(api.calls('GET', '/api/ontologies/onto-steel/compare').length).toBeGreaterThan(0));
+    const query = api.calls('GET', '/api/ontologies/onto-steel/compare')[0]?.query;
+    expect(query?.get('from')).toBe('rel-two');
+    expect(query?.get('to')).toBe('working');
+
+    const counts = await screen.findByRole('list', { name: '各级变更的数量' });
+    expect(counts).toHaveTextContent('不兼容 2 项');
+    expect(counts).toHaveTextContent('需确认 2 项');
+    expect(counts).toHaveTextContent('兼容 3 项');
+
+    const breaking = screen.getByRole('region', { name: '不兼容 2 项' });
+    expect(entry(breaking, '钢包')).toHaveTextContent('对象类型');
+    expect(entry(breaking, '钢包')).toHaveTextContent('删除');
+    const temperature = entry(breaking, '温度');
+    expect(temperature).toHaveTextContent('属性');
+    expect(temperature).toHaveTextContent('修改');
+    // References by name; a property's domain is the object type it belongs to.
+    expect(temperature).toHaveTextContent('所属对象类型：钢水改为钢包');
+    expect(temperature).toHaveTextContent('数据类型：小数改为整数');
+    expect(temperature).toHaveTextContent('必填：否改为是');
+
+    const review = screen.getByRole('region', { name: '需确认 2 项' });
+    expect(entry(review, '钢水校验')).toHaveTextContent('约束规则：规则有变化');
+    const axiom = entry(review, 'steel:MoltenSteel owl:disjointWith steel:Ladle .');
+    expect(axiom).toHaveTextContent('Turtle 片段：片段有变化');
+    // Both fragments, in monospace, behind a collapsed disclosure.
+    const fragments = within(axiom).getByText('片段有变化').closest('details');
+    if (!fragments) throw new Error('No disclosure for the fragments');
+    expect(fragments).not.toHaveAttribute('open');
+    expect(fragments).toHaveTextContent('修改前steel:MoltenSteel owl:disjointWith steel:Slag .');
+    expect(fragments).toHaveTextContent('修改后steel:MoltenSteel owl:disjointWith steel:Ladle .');
+    for (const fragment of within(fragments).getAllByText(/owl:disjointWith/)) expect(fragment).toHaveClass('font-mono');
+
+    const compatible = screen.getByRole('region', { name: '兼容 3 项' });
+    const moltenSteel = entry(compatible, '钢水');
+    expect(moltenSteel).toHaveTextContent('英文名称：Molten steel改为Liquid steel');
+    expect(moltenSteel).toHaveTextContent('同义词：无改为铁水、液态钢');
+    expect(moltenSteel).toHaveTextContent('父类型：已不存在的元素改为无');
+    expect(entry(compatible, '炉次')).toHaveTextContent('新增');
+    expect(entry(compatible, '板坯')).toHaveTextContent('恢复');
+
+    // No ids or internal codes on the page.
+    expect(document.body).not.toHaveTextContent('el-temperature');
+    expect(document.body).not.toHaveTextContent('breaking');
+  });
+
+  it('compares two releases when the user picks them', async () => {
+    const user = userEvent.setup();
+    const api = releasesServer({
+      extra: {
+        'GET /api/ontologies/:id/compare': ({ query }) =>
+          query.get('to') === 'working'
+            ? comparisonFixture(workingChanges)
+            : comparisonFixture([], { from: { releaseId: 'rel-one', version: 1 }, to: { releaseId: 'rel-two', version: 2 } }),
+      },
+    });
+    renderApp('/releases?ontology=onto-steel');
+
+    await screen.findByRole('region', { name: '不兼容 2 项' });
+    await user.selectOptions(screen.getByRole('combobox', { name: '起点' }), 'v1 · 首版');
+    await user.selectOptions(screen.getByRole('combobox', { name: '终点' }), 'v2 · 补充精炼工艺（当前）');
+
+    expect(await screen.findByText('两个版本没有差异')).toBeInTheDocument();
+    const last = api.calls('GET', '/api/ontologies/onto-steel/compare').at(-1)?.query;
+    expect(last?.get('from')).toBe('rel-one');
+    expect(last?.get('to')).toBe('rel-two');
+    expect(screen.queryByRole('region', { name: '不兼容 2 项' })).not.toBeInTheDocument();
+  });
+
+  it('offers no comparison before the first release', async () => {
+    const api = mockApi({
+      'GET /api/ontologies': () => [ontologyFixture()],
+      'GET /api/ontologies/:id/releases': () => [],
+      'GET /api/ontologies/:id/compare': () => comparisonFixture(),
+    });
+    renderApp('/releases?ontology=onto-steel');
+
+    expect(await screen.findByText('还没有发布过版本')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: '版本对比' })).not.toBeInTheDocument();
+    expect(api.calls('GET', '/api/ontologies/onto-steel/compare')).toHaveLength(0);
+  });
+});
+
+describe('publish dialog summary', () => {
+  it('summarizes the changes since the current release and warns about breaking ones', async () => {
+    const user = userEvent.setup();
+    releasesServer({ extra: { 'GET /api/ontologies/:id/compare': () => comparisonFixture(workingChanges) } });
+    renderApp('/releases?ontology=onto-steel');
+
+    await user.click(await screen.findByRole('button', { name: '发布新版本' }));
+    const dialog = await screen.findByRole('dialog', { name: '发布新版本' });
+    const summary = within(dialog).getByRole('region', { name: '相对当前版本 v2 的变更' });
+    expect(await within(summary).findByText('不兼容 2 项')).toBeInTheDocument();
+    expect(summary).toHaveTextContent('需确认 2 项');
+    expect(summary).toHaveTextContent('兼容 3 项');
+    expect(within(summary).getByRole('status')).toHaveTextContent('有 2 项不兼容变更，依赖这些元素的数据和查询可能失效');
+  });
+
+  it('waits for a fresh comparison rather than showing one from before the dialog opened', async () => {
+    const user = userEvent.setup();
+    let answer: () => Response | Promise<Response> = () => jsonResponse(comparisonFixture(workingChanges));
+    releasesServer({ extra: { 'GET /api/ontologies/:id/compare': () => answer() } });
+    renderApp('/releases?ontology=onto-steel');
+
+    // The page's own comparison is cached with two breaking changes.
+    await screen.findByRole('region', { name: '不兼容 2 项' });
+    // Meanwhile a merge removed them; the server answers once the test lets it.
+    let respond: (() => void) | undefined;
+    answer = () =>
+      new Promise<Response>((resolve) => {
+        respond = () => resolve(jsonResponse(comparisonFixture([])));
+      });
+
+    await user.click(screen.getByRole('button', { name: '发布新版本' }));
+    const dialog = await screen.findByRole('dialog', { name: '发布新版本' });
+    const summary = within(dialog).getByRole('region', { name: '相对当前版本 v2 的变更' });
+    expect(within(summary).getByRole('status')).toHaveAttribute('aria-busy', 'true');
+    expect(summary).not.toHaveTextContent('不兼容 2 项');
+    expect(summary).not.toHaveTextContent('不兼容变更，依赖这些元素');
+
+    await waitFor(() => expect(respond).toBeDefined());
+    act(() => respond?.());
+    expect(await within(summary).findByText('工作版本与当前版本相同，没有变化。')).toBeInTheDocument();
+  });
+
+  it('shows the summary without a warning when nothing breaks', async () => {
+    const user = userEvent.setup();
+    const compatibleOnly = workingChanges.filter((change) => change.level !== 'breaking');
+    releasesServer({ extra: { 'GET /api/ontologies/:id/compare': () => comparisonFixture(compatibleOnly) } });
+    renderApp('/releases?ontology=onto-steel');
+
+    await user.click(await screen.findByRole('button', { name: '发布新版本' }));
+    const dialog = await screen.findByRole('dialog', { name: '发布新版本' });
+    const summary = within(dialog).getByRole('region', { name: '相对当前版本 v2 的变更' });
+    expect(await within(summary).findByText('不兼容 0 项')).toBeInTheDocument();
+    expect(summary).toHaveTextContent('需确认 2 项');
+    expect(summary).not.toHaveTextContent('不兼容变更，依赖这些元素');
+  });
+
+  it('shows no summary for the first release', async () => {
+    const user = userEvent.setup();
+    const api = mockApi({
+      'GET /api/ontologies': () => [ontologyFixture()],
+      'GET /api/ontologies/:id/releases': () => [],
+      'GET /api/ontologies/:id/compare': () => comparisonFixture(workingChanges),
+    });
+    renderApp('/releases?ontology=onto-steel');
+
+    await user.click(await screen.findByRole('button', { name: '发布新版本' }));
+    const dialog = await screen.findByRole('dialog', { name: '发布新版本' });
+    expect(within(dialog).getByRole('textbox', { name: '版本标题' })).toBeInTheDocument();
+    expect(within(dialog).queryByText(/相对当前版本/)).not.toBeInTheDocument();
+    expect(within(dialog).queryByText(/不兼容/)).not.toBeInTheDocument();
+    expect(api.calls('GET', '/api/ontologies/onto-steel/compare')).toHaveLength(0);
   });
 });

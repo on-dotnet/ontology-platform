@@ -4,15 +4,26 @@ import { useTranslation } from 'react-i18next';
 
 import { InlineNotice } from '@/components/feedback/inline-notice';
 import { useToast } from '@/components/feedback/toast';
+import { ErrorState } from '@/components/states/error-state';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { elementName, ontologyKeys, useElements, type OntologySummary } from '@/features/ontologies/api';
 import { lookupText, useErrorMessage } from '@/i18n/error-message';
 
-import { activateRelease, publishRelease, releaseKeys, releaseProblems, type ReleaseProblem, type ReleaseSummary } from './api';
+import {
+  activateRelease,
+  publishRelease,
+  releaseKeys,
+  releaseProblems,
+  useComparison,
+  type ReleaseProblem,
+  type ReleaseSummary,
+} from './api';
+import { LevelCounts } from './compare';
 
 interface PublishReleaseDialogProps {
   ontology: OntologySummary;
@@ -77,6 +88,9 @@ function PublishForm({ ontology, onDone }: { ontology: OntologySummary; onDone: 
 
   return (
     <form noValidate onSubmit={handleSubmit} className="mt-5 space-y-4">
+      {ontology.activeReleaseId ? (
+        <ChangesSinceCurrent ontologyId={ontology.id} releaseId={ontology.activeReleaseId} version={ontology.activeReleaseVersion} />
+      ) : null}
       {ontology.openChangeSetCount > 0 ? (
         <InlineNotice tone="warning" title={t('releases.publish.openChangeSetsTitle', { count: ontology.openChangeSetCount })}>
           {t('releases.publish.openChangeSetsDescription')}
@@ -125,6 +139,53 @@ function PublishForm({ ontology, onDone }: { ontology: OntologySummary; onDone: 
         </Button>
       </div>
     </form>
+  );
+}
+
+interface ChangesSinceCurrentProps {
+  ontologyId: string;
+  releaseId: string;
+  version: number | null;
+}
+
+/** What publishing changes for those who use the current release; breaking changes get a yellow banner. */
+function ChangesSinceCurrent({ ontologyId, releaseId, version }: ChangesSinceCurrentProps) {
+  const { t } = useTranslation();
+  const headingId = useId();
+  const query = useComparison(ontologyId, releaseId);
+
+  let body;
+  // A comparison cached before the dialog opened may predate the latest merge: wait for a fresh one.
+  if (query.isPending || !query.isFetchedAfterMount) {
+    body = (
+      <div role="status" aria-busy className="flex gap-2">
+        <span className="sr-only">{t('common.loading')}</span>
+        <Skeleton className="h-6 w-24" />
+        <Skeleton className="h-6 w-24" />
+        <Skeleton className="h-6 w-24" />
+      </div>
+    );
+  } else if (query.isError) {
+    body = <ErrorState error={query.error} title={t('releases.publish.summaryFailed')} onRetry={() => void query.refetch()} />;
+  } else if (query.data.changes.length === 0) {
+    body = <p className="text-sm text-muted-foreground">{t('releases.publish.noChanges')}</p>;
+  } else {
+    const { breaking } = query.data.counts;
+    body = (
+      <>
+        <LevelCounts counts={query.data.counts} />
+        {breaking > 0 ? <InlineNotice tone="warning" title={t('releases.publish.breakingNotice', { count: breaking })} /> : null}
+      </>
+    );
+  }
+
+  return (
+    <section aria-labelledby={headingId} className="space-y-2.5">
+      <h3 id={headingId} className="text-sm font-semibold text-foreground">
+        {version === null ? t('releases.publish.summaryTitleCurrent') : t('releases.publish.summaryTitle', { version })}
+      </h3>
+      {body}
+    </section>
   );
 }
 

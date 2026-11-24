@@ -5,26 +5,12 @@ import { afterEach, beforeEach, vi } from 'vitest';
 
 import i18n from '@/i18n';
 
+import { createMediaQueryList, resetBrowserFontSize } from './media';
+
 // The first render of a route loads its code-split chunk, which can take over a second in CI containers.
 configure({ asyncUtilTimeout: 3000 });
 
 // --- jsdom gaps -------------------------------------------------------------
-
-/** Evaluates `(min-width: Npx)` against the window width; everything else (e.g. dark mode) is false. */
-function createMediaQueryList(query: string): MediaQueryList {
-  const minWidth = /\(min-width:\s*(\d+)px\)/.exec(query);
-  const matches = minWidth ? window.innerWidth >= Number(minWidth[1]) : false;
-  return {
-    matches,
-    media: query,
-    onchange: null,
-    addEventListener: () => undefined,
-    removeEventListener: () => undefined,
-    addListener: () => undefined,
-    removeListener: () => undefined,
-    dispatchEvent: () => false,
-  };
-}
 
 Object.defineProperty(window, 'matchMedia', { configurable: true, writable: true, value: createMediaQueryList });
 
@@ -70,6 +56,7 @@ beforeEach(async () => {
   window.localStorage.clear();
   clearCookies();
   document.documentElement.className = '';
+  resetBrowserFontSize();
   await i18n.changeLanguage('zh-CN');
 });
 

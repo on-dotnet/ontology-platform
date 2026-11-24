@@ -3,12 +3,18 @@
 import asyncio
 import time
 from typing import Annotated
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 
+from ontology_platform.db import DbSession
+from ontology_platform.errors import problem_responses
+from ontology_platform.modules.ai import assistant, schemas
 from ontology_platform.modules.ai.gateway import ModelGateway, OpenAIGateway
 from ontology_platform.modules.ai.schemas import AiStatus
-from ontology_platform.modules.identity.api import CurrentUser
+from ontology_platform.modules.identity.api import CurrentUser, require_role
+from ontology_platform.modules.identity.models import Role
+from ontology_platform.modules.identity.service import Principal
 from ontology_platform.settings import Settings, get_settings
 
 router = APIRouter(prefix="/api", tags=["ai"])
@@ -28,6 +34,7 @@ def get_gateway(request: Request) -> ModelGateway:
 
 Gateway = Annotated[ModelGateway, Depends(get_gateway)]
 AppSettings = Annotated[Settings, Depends(get_settings)]
+Creator = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.EDITOR, Role.REVIEWER))]
 
 
 @router.get("/ai/status")
@@ -51,3 +58,43 @@ async def ai_status(
             reachable = await gateway.ping()
             state.ai_status_cache = (time.monotonic(), reachable)
     return AiStatus(configured=True, reachable=reachable, model=settings.ai_model)
+
+
+# ---------- AI assistant (spec 002 §10) ----------
+
+
+@router.post(
+    "/ontologies/{id}/assistant/requests",
+    status_code=201,
+    responses=problem_responses(401, 403, 404, 422),
+)
+async def create_assistant_request(
+    id: UUID,
+    body: schemas.AssistantRequestCreate,
+    user: Creator,
+    db: DbSession,
+) -> schemas.AssistantRequest:
+    """Ask the assistant for a change. The answer comes from a background job: its result is a
+    change set waiting for review (or only a reply); poll the request for it."""
+    return await assistant.create_request(db, id, body, user_id=user.id)
+
+
+@router.get("/assistant/requests/{id}", responses=problem_responses(401, 404, 422))
+async def get_assistant_request(
+    id: UUID,
+    user: CurrentUser,
+    db: DbSession,
+) -> schemas.AssistantRequest:
+    """One of the user's own requests (404 `assistant.not_found` for others')."""
+    return await assistant.get_request(db, id, user_id=user.id)
+
+
+@router.get("/ontologies/{id}/assistant/requests", responses=problem_responses(401, 422))
+async def list_assistant_requests(
+    id: UUID,
+    user: CurrentUser,
+    db: DbSession,
+    limit: Annotated[int, Query(ge=1, le=50)] = 20,
+) -> list[schemas.AssistantRequest]:
+    """The user's latest requests about the ontology, newest first."""
+    return await assistant.list_requests(db, id, user_id=user.id, limit=limit)

@@ -45,6 +45,9 @@ M2_PATHS = {
     "/api/ontologies/{id}/edits",
     "/api/ontologies/{id}/elements/{elementId}/impact",
     "/api/settings/platform",
+    "/api/ontologies/{id}/compare",
+    "/api/ontologies/{id}/assistant/requests",
+    "/api/assistant/requests/{id}",
 }
 
 

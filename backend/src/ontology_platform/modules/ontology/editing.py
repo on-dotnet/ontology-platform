@@ -39,6 +39,14 @@ def _invalid(seq: int, problem: str) -> AppError:
     return AppError(422, "changeset.invalid_edit", f"Item {seq}: {problem}.")
 
 
+class CascadeConflictError(AppError):
+    """An item keeps, adds or edits what a delete of the same save removes."""
+
+    def __init__(self, seq: int, problem: str) -> None:
+        super().__init__(422, "changeset.invalid_edit", f"Item {seq}: {problem}.")
+        self.seq = seq
+
+
 @dataclass
 class _View:
     """What the cascade needs of an element, possibly as the save's updates leave it."""
@@ -207,9 +215,8 @@ def cascade_items(
     targets: Sequence[Element],
 ) -> list[schemas.ProposedItem]:
     """The items that go with deleting `targets` (spec 002, section 6), computed together so
-    that a constraint losing rules to several of them is updated once. Also used by the AI
-    assistant (PR C), which adds them to its own deletes. The ontology's prefixes are needed to
-    read which IRIs stored axioms mention."""
+    that a constraint losing rules to several of them is updated once. The ontology's prefixes
+    are needed to read which IRIs stored axioms mention."""
     views = _views(ontology, elements)
     changes = _Cascade(views, service.header_of(ontology).prefix_map()).changes(
         target.id for target in targets
@@ -366,9 +373,11 @@ def _add_cascade(ontology: Ontology, elements: Sequence[Element], checked: _Chec
         if item.op == "delete":
             continue
         if item.target_element_id in leaving:
-            raise _invalid(seq, "another item of this save deletes this element along with its own")
+            raise CascadeConflictError(
+                seq, "another item of this save deletes this element along with its own"
+            )
         if _field_refs(item.proposed) & leaving:
-            raise _invalid(seq, "it refers to an element this save deletes")
+            raise CascadeConflictError(seq, "it refers to an element this save deletes")
     for element_id, fields in changes.items():
         index = checked.targets.get(element_id)
         if index is None:

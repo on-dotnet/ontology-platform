@@ -16,7 +16,7 @@ from ontology_platform.errors import PROBLEM_MEDIA_TYPE, problem_responses
 from ontology_platform.modules.identity.api import CurrentUser, client_ip, require_role
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.identity.service import Principal
-from ontology_platform.modules.ontology import editing, expert, importing, schemas, service
+from ontology_platform.modules.ontology import compare, editing, expert, importing, schemas, service
 from ontology_platform.modules.ontology.models import ChangeSetStatus, Kind
 from ontology_platform.settings import Settings, get_settings
 
@@ -25,6 +25,7 @@ Reviewer = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.REVIEWER))
 AppSettings = Annotated[Settings, Depends(get_settings)]
 ExportFormat = Annotated[Literal["turtle"], Query(alias="format")]
 REVIEWER_ROLES = frozenset({Role.ADMIN, Role.REVIEWER})
+_COMPARE_TARGET = r"^(working|[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})$"
 
 
 def _may_review_own(user: Principal, settings: Settings) -> bool:
@@ -401,6 +402,22 @@ async def reject_change_set(
 
 
 # ---------- releases ----------
+
+
+@router.get("/ontologies/{id}/compare", responses=problem_responses(401, 404, 422))
+async def compare_versions(
+    id: UUID,
+    user: CurrentUser,
+    db: DbSession,
+    from_: Annotated[UUID, Query(alias="from")],
+    # One string type rather than `UUID | Literal["working"]`, whose generated client type
+    # (`string | "working"`) collapses to string anyway.
+    to: Annotated[str, Query(pattern=_COMPARE_TARGET)] = "working",
+) -> schemas.Comparison:
+    """What changed from a release (`to`: its id) to another release or to the working version
+    (`to`: `working`), each change rated breaking, review or compatible (spec 002, section 9).
+    404 `release.not_found` when a release does not belong to the ontology."""
+    return await compare.compare(db, id, from_, "working" if to == "working" else UUID(to))
 
 
 @router.get("/ontologies/{id}/releases", responses=problem_responses(401, 404, 422))
