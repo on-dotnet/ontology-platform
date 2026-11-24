@@ -545,6 +545,36 @@ async def test_a_save_cannot_keep_what_it_deletes(
     assert await db.scalar(select(ChangeSet.id)) is None
 
 
+async def test_a_new_or_rewritten_axiom_cannot_mention_what_the_save_deletes(
+    client: AsyncClient, db: AsyncSession, linked_ontology: tuple[Ontology, dict[str, Element]]
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    ontology, rows = linked_ontology
+    other = element(ontology, "entity_type", "Other", "其他")
+    await add_elements(db, other)
+    disjoint = "<http://www.w3.org/2002/07/owl#disjointWith>"
+    heat, other_iri = (f"<{ontology.base_iri}{name}>" for name in ("Heat", "Other"))
+    turtle = f"{heat} {disjoint} {other_iri} ."
+    detail = "Item 2: it refers to an element this save deletes."
+    for item in (
+        {"kind": "axiom", "op": "create", "fields": {"turtle": turtle}},
+        edit("update", rows["axiom"], turtle=turtle),
+    ):
+        response = await save(client, ontology, edit("delete", other), item)
+        assert response.status_code == 422, response.text
+        assert (response.json()["code"], response.json()["detail"]) == (
+            "changeset.invalid_edit",
+            detail,
+        )
+    assert await db.scalar(select(ChangeSet.id)) is None
+    await db.refresh(other)
+    await db.refresh(rows["axiom"])
+    assert (other.status, rows["axiom"].turtle) == (
+        "active",
+        "steel:Slab owl:disjointWith steel:Heat .",
+    )
+
+
 async def test_restoring_an_axiom_checks_it_again(client: AsyncClient, db: AsyncSession) -> None:
     ontology = await small_ontology(client, db)
     retired = element(
