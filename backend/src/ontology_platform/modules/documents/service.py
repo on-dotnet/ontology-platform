@@ -1,4 +1,8 @@
-"""Document metadata and queue operations in the caller's transaction."""
+"""Document metadata and queue operations in the caller's transaction.
+
+Other modules get read-only copies (`get`, `lock`, `list_chunks`). The functions that return ORM
+rows (`get_row` and others) are for this module only, so nothing outside it writes documents.
+"""
 
 import asyncio
 from uuid import UUID
@@ -11,6 +15,7 @@ from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
 from ontology_platform.modules.documents.models import Chunk, Document
 from ontology_platform.modules.documents.parsers import detect_type
+from ontology_platform.modules.documents.schemas import ChunkInfo, DocumentInfo
 from ontology_platform.modules.documents.storage import DocumentStorage
 from ontology_platform.modules.jobs import service as jobs
 
@@ -64,7 +69,8 @@ def _not_found() -> AppError:
     return AppError(404, "documents.not_found", "Document or chunk not found.")
 
 
-async def get(db: AsyncSession, document_id: UUID) -> Document:
+async def get_row(db: AsyncSession, document_id: UUID) -> Document:
+    """The ORM row, for this module only."""
     document = await db.get(Document, document_id)
     if document is None:
         raise _not_found()
@@ -99,10 +105,17 @@ async def get_chunk(db: AsyncSession, document_id: UUID, chunk_id: UUID) -> Chun
     return chunk
 
 
-async def list_chunks(db: AsyncSession, document_id: UUID) -> list[Chunk]:
-    await get(db, document_id)
+async def get(db: AsyncSession, document_id: UUID) -> DocumentInfo:
+    return DocumentInfo.model_validate(await get_row(db, document_id), from_attributes=True)
+
+
+async def list_chunks(db: AsyncSession, document_id: UUID) -> list[ChunkInfo]:
+    await get_row(db, document_id)
     statement = select(Chunk).where(Chunk.document_id == document_id).order_by(Chunk.seq)
-    return list(await db.scalars(statement))
+    return [
+        ChunkInfo.model_validate(chunk, from_attributes=True)
+        for chunk in await db.scalars(statement)
+    ]
 
 
 async def retry(db: AsyncSession, document_id: UUID) -> Document:
@@ -124,30 +137,30 @@ async def retry(db: AsyncSession, document_id: UUID) -> Document:
 async def set_progress(
     db: AsyncSession, document_id: UUID, step: str, done: int, total: int
 ) -> None:
-    document = await get(db, document_id)
+    document = await get_row(db, document_id)
     document.progress = {"step": step, "done": done, "total": total}
 
 
 async def set_status(
     db: AsyncSession, document_id: UUID, status: str, *, error_code: str | None = None
 ) -> None:
-    document = await get(db, document_id)
+    document = await get_row(db, document_id)
     document.status = status
     document.error_code = error_code
 
 
 async def set_change_set(db: AsyncSession, document_id: UUID, change_set_id: UUID | None) -> None:
-    document = await get(db, document_id)
+    document = await get_row(db, document_id)
     document.change_set_id = change_set_id
 
 
-async def lock(db: AsyncSession, document_id: UUID) -> Document:
-    """The document row, locked until the end of the caller's transaction."""
+async def lock(db: AsyncSession, document_id: UUID) -> DocumentInfo:
+    """The document as it is while locked until the end of the caller's transaction."""
     statement = select(Document).where(Document.id == document_id).with_for_update()
     document = await db.scalar(statement.execution_options(populate_existing=True))
     if document is None:
         raise _not_found()
-    return document
+    return DocumentInfo.model_validate(document, from_attributes=True)
 
 
 async def count_processing(db: AsyncSession) -> int:

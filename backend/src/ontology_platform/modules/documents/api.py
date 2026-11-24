@@ -35,7 +35,7 @@ async def upload_document(
     file: UploadFile,
     ontology_id: Annotated[UUID, Form(alias="ontologyId")],
 ) -> DocumentInfo:
-    if await ontology.get_ontology(db, ontology_id) is None:
+    if not await ontology.ontology_exists(db, ontology_id):
         raise AppError(404, "ontology.not_found", "Ontology not found.")
     data = await file.read(settings.max_upload_mb * 1024**2 + 1)
     document, created = await service.upload(
@@ -72,7 +72,7 @@ async def list_documents(
 
 @router.get("/documents/{id}", responses=problem_responses(401, 404, 422))
 async def get_document(id: UUID, user: CurrentUser, db: DbSession) -> DocumentInfo:
-    return DocumentInfo.model_validate(await service.get(db, id), from_attributes=True)
+    return await service.get(db, id)
 
 
 @router.get("/documents/{id}/chunks/{chunkId}", responses=problem_responses(401, 404, 422))
@@ -104,7 +104,7 @@ async def download_document(
     db: DbSession,
     settings: AppSettings,
 ) -> Response:
-    document = await service.get(db, id)
+    document = await service.get_row(db, id)
     storage = LocalDocumentStorage(settings.documents_dir)
     data = await asyncio.to_thread(storage.open, document.storage_key)
     disposition = f"attachment; filename*=UTF-8''{quote(document.filename, safe='')}"

@@ -163,13 +163,20 @@ async def _active_elements(db: AsyncSession, ontology_id: UUID) -> list[Element]
 # ---------- interface for other modules ----------
 
 
-async def get_ontology(db: AsyncSession, ontology_id: UUID) -> Ontology | None:
-    return await db.get(Ontology, ontology_id)
+async def ontology_exists(db: AsyncSession, ontology_id: UUID) -> bool:
+    return await db.get(Ontology, ontology_id) is not None
 
 
-async def list_alignment_elements(db: AsyncSession, ontology_id: UUID) -> list[Element]:
+async def list_alignment_elements(db: AsyncSession, ontology_id: UUID) -> list[schemas.ElementCopy]:
     """Active object types, relations and properties, object types first, then by local name."""
-    return [e for e in await _active_elements(db, ontology_id) if e.kind in _ALIGNMENT_KINDS]
+    ontology = await db.get(Ontology, ontology_id)
+    if ontology is None:
+        return []
+    return [
+        schemas.ElementCopy.model_validate(_element_data(element, ontology.base_iri))
+        for element in await _active_elements(db, ontology_id)
+        if element.kind in _ALIGNMENT_KINDS
+    ]
 
 
 async def count_entity_types(db: AsyncSession) -> int:

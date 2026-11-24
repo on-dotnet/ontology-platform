@@ -29,8 +29,12 @@ from ontology_platform.modules.documents import service as documents
 from ontology_platform.modules.documents.parsers import ParsedPage
 from ontology_platform.modules.jobs.runner import RetryableJobError
 from ontology_platform.modules.ontology import service as ontology
-from ontology_platform.modules.ontology.models import Element
-from ontology_platform.modules.ontology.schemas import ElementFields, EvidenceIn, ProposedItem
+from ontology_platform.modules.ontology.schemas import (
+    ElementCopy,
+    ElementFields,
+    EvidenceIn,
+    ProposedItem,
+)
 
 TITLE = "识别：{filename}"
 QUOTE_MAX = 500
@@ -45,16 +49,16 @@ def job_error(exc: AiError) -> Exception:
     return AppError(422, exc.code, str(exc))
 
 
-def known_element(element: Element) -> KnownElement:
+def known_element(element: ElementCopy) -> KnownElement:
     return KnownElement(
         id=element.id,
-        kind=cast(Kind, element.kind),  # the column is constrained to these values
+        kind=cast(Kind, element.kind),  # list_alignment_elements returns only these kinds
         # Alignment elements are never axioms, so they have a local name; imported ones may
         # lack a Chinese label and are matched by the name the platform shows instead.
         local_name=element.local_name or "",
         label_zh=element.label_zh or element.label_en or element.local_name or "",
         label_en=element.label_en,
-        synonyms=tuple(item["text"] for item in element.synonyms),
+        synonyms=tuple(item.text for item in element.synonyms),
         definition_zh=element.definition_zh,
         domain_id=element.domain_id,
         range_id=element.range_id,
