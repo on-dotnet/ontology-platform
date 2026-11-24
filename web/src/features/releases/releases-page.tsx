@@ -22,6 +22,7 @@ import { useErrorMessage } from '@/i18n/error-message';
 import { downloadText } from '@/lib/download';
 
 import { exportReleaseTurtle, useReleases, type ReleaseSummary } from './api';
+import { CompareCard } from './compare';
 import { ActivateReleaseDialog, PublishReleaseDialog } from './release-dialogs';
 
 interface ReleasesPageProps {
@@ -109,77 +110,80 @@ function ReleasesTable({ ontology, canReview }: { ontology: OntologySummary; can
           );
         }
         return (
-          <Card>
-            <Table aria-label={t('releases.tableLabel')}>
-              <TableHeader>
-                <TableRow className="border-t-0 hover:bg-transparent">
-                  <TableHead>{t('releases.columns.version')}</TableHead>
-                  <TableHead>{t('releases.columns.title')}</TableHead>
-                  <TableHead numeric>{t('releases.columns.elements')}</TableHead>
-                  <TableHead>{t('releases.columns.publishedAt')}</TableHead>
-                  <TableHead>{t('releases.columns.current')}</TableHead>
-                  <TableHead className="text-right">{t('releases.columns.actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {releases.map((release) => {
-                  const exporting = exportTurtle.isPending && exportTurtle.variables?.id === release.id;
-                  const exportLabel = t('releases.exportVersion', { version: release.version });
-                  return (
-                    <TableRow key={release.id}>
-                      <TableCell className="whitespace-nowrap font-semibold tabular-nums text-foreground">
-                        {t('releases.versionLabel', { version: release.version })}
-                      </TableCell>
-                      <TableCell className="max-w-96">
-                        <p className="truncate font-medium text-foreground">{release.title}</p>
-                        {release.notes ? <p className="line-clamp-1 text-xs text-muted-foreground">{release.notes}</p> : null}
-                      </TableCell>
-                      <TableCell numeric>{release.elementCount}</TableCell>
-                      <TableCell className="whitespace-nowrap text-muted-foreground">
-                        <RelativeTime value={release.createdAt} />
-                      </TableCell>
-                      <TableCell>
-                        {release.isActive ? (
-                          <Badge tone="success">
-                            <CircleCheck aria-hidden />
-                            {t('releases.current')}
-                          </Badge>
-                        ) : (
-                          <span className="text-muted-foreground">
-                            <span aria-hidden>—</span>
-                            <span className="sr-only">{t('releases.notCurrent')}</span>
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-end gap-1">
-                          <Tooltip content={exportLabel}>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              aria-label={exportLabel}
-                              loading={exporting}
-                              onClick={() => exportTurtle.mutate(release)}
-                            >
-                              {exporting ? null : <Download aria-hidden />}
-                            </Button>
-                          </Tooltip>
-                          {canReview && !release.isActive ? (
-                            <Button variant="secondary" size="sm" onClick={() => setActivating(release)}>
-                              {t('releases.activate.action')}
-                            </Button>
-                          ) : null}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-            {canReview ? (
-              <ActivateReleaseDialog ontology={ontology} release={activating} current={current} onClose={() => setActivating(null)} />
-            ) : null}
-          </Card>
+          <div className="space-y-6">
+            <Card>
+              <Table aria-label={t('releases.tableLabel')}>
+                <TableHeader>
+                  <TableRow className="border-t-0 hover:bg-transparent">
+                    <TableHead>{t('releases.columns.version')}</TableHead>
+                    <TableHead>{t('releases.columns.title')}</TableHead>
+                    <TableHead numeric>{t('releases.columns.elements')}</TableHead>
+                    <TableHead>{t('releases.columns.publishedAt')}</TableHead>
+                    <TableHead>{t('releases.columns.current')}</TableHead>
+                    <TableHead className="text-right">{t('releases.columns.actions')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {releases.map((release) => {
+                    const exporting = exportTurtle.isPending && exportTurtle.variables?.id === release.id;
+                    const exportLabel = t('releases.exportVersion', { version: release.version });
+                    return (
+                      <TableRow key={release.id}>
+                        <TableCell className="whitespace-nowrap font-semibold tabular-nums text-foreground">
+                          {t('releases.versionLabel', { version: release.version })}
+                        </TableCell>
+                        <TableCell className="max-w-96">
+                          <p className="truncate font-medium text-foreground">{release.title}</p>
+                          {release.notes ? <p className="line-clamp-1 text-xs text-muted-foreground">{release.notes}</p> : null}
+                        </TableCell>
+                        <TableCell numeric>{release.elementCount}</TableCell>
+                        <TableCell className="whitespace-nowrap text-muted-foreground">
+                          <RelativeTime value={release.createdAt} />
+                        </TableCell>
+                        <TableCell>
+                          {release.isActive ? (
+                            <Badge tone="success">
+                              <CircleCheck aria-hidden />
+                              {t('releases.current')}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground">
+                              <span aria-hidden>—</span>
+                              <span className="sr-only">{t('releases.notCurrent')}</span>
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center justify-end gap-1">
+                            <Tooltip content={exportLabel}>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={exportLabel}
+                                loading={exporting}
+                                onClick={() => exportTurtle.mutate(release)}
+                              >
+                                {exporting ? null : <Download aria-hidden />}
+                              </Button>
+                            </Tooltip>
+                            {canReview && !release.isActive ? (
+                              <Button variant="secondary" size="sm" onClick={() => setActivating(release)}>
+                                {t('releases.activate.action')}
+                              </Button>
+                            ) : null}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+              {canReview ? (
+                <ActivateReleaseDialog ontology={ontology} release={activating} current={current} onClose={() => setActivating(null)} />
+              ) : null}
+            </Card>
+            <CompareCard ontology={ontology} releases={releases} />
+          </div>
         );
       }}
     </QueryState>

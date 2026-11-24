@@ -230,6 +230,11 @@ async def test_scope_errors(client: AsyncClient, db: AsyncSession) -> None:
         )
         assert response.status_code == 404
         assert response.json()["code"] == code
+    for target in ("latest", "Working", own + "x"):
+        response = await client.get(
+            f"/api/ontologies/{ontology.id}/compare", params={"from": own, "to": target}
+        )
+        assert response.status_code == 422, target
 
 
 async def test_created_at_release_instant_counts_as_added(

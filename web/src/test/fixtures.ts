@@ -1,6 +1,7 @@
+import type { AssistantRequest } from '@/features/assistant/api';
 import type { DocumentInfo } from '@/features/documents/api';
 import type { EditRequest, Element, ElementDetail, ElementRef, Impact, ImportResult, OntologySummary } from '@/features/ontologies/api';
-import type { ReleaseSummary } from '@/features/releases/api';
+import type { Comparison, ElementChange, ReleaseSummary } from '@/features/releases/api';
 import { countDecisions, type ChangeItem, type ChangeSetDetail } from '@/features/review/api';
 
 // Ids are not numbers on purpose: the router parses numeric search values as numbers.
@@ -200,4 +201,48 @@ export function mergeEdits(elements: Element[], { items }: EditRequest): void {
     const status = item.op === 'delete' ? 'deprecated' : item.op === 'restore' ? 'active' : target.status;
     elements[index] = { ...target, status, revision: target.revision + 1 };
   }
+}
+
+/** A request to the AI assistant; queued unless the overrides say otherwise. */
+export function assistantRequestFixture(overrides: Partial<AssistantRequest> = {}): AssistantRequest {
+  return {
+    id: 'req-ladle',
+    ontologyId: ONTOLOGY_ID,
+    message: '给钢包加一个属性“容量”，单位为吨',
+    context: { page: 'ontology', elementId: null },
+    status: 'queued',
+    step: null,
+    reply: null,
+    dropped: 0,
+    changeSetId: null,
+    errorCode: null,
+    createdAt: CREATED_AT,
+    finishedAt: null,
+    ...overrides,
+  };
+}
+
+export function elementChangeFixture(overrides: Partial<ElementChange> = {}): ElementChange {
+  return {
+    elementId: 'el-molten-steel',
+    kind: 'entity_type',
+    label: '钢水',
+    iri: 'https://example.org/ontology/steel#MoltenSteel',
+    change: 'changed',
+    level: 'compatible',
+    fields: [],
+    ...overrides,
+  };
+}
+
+/** A comparison from release v2 (`rel-two`) to the working version; counts follow the changes. */
+export function comparisonFixture(changes: ElementChange[] = [], overrides: Partial<Comparison> = {}): Comparison {
+  const count = (level: ElementChange['level']) => changes.filter((change) => change.level === level).length;
+  return {
+    from: { releaseId: 'rel-two', version: 2 },
+    to: { releaseId: null, version: null },
+    changes,
+    counts: { breaking: count('breaking'), review: count('review'), compatible: count('compatible') },
+    ...overrides,
+  };
 }

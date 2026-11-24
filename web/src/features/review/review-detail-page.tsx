@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { useCurrentUser } from '@/features/auth/api';
 import { usePermissions } from '@/features/auth/permissions';
+import { usePublishAssistantSelection } from '@/features/assistant/assistant-selection';
 import { EvidenceExcerpt } from '@/features/documents/evidence-excerpt';
 import { ELEMENT_KINDS, ontologyKeys, useElements, usePlatformSettings, type Element } from '@/features/ontologies/api';
 import { codeMessage, useErrorMessage } from '@/i18n/error-message';
@@ -61,6 +62,8 @@ function BackToList({ ontologyId }: { ontologyId?: string }) {
 export function ReviewDetailPage({ changeSetId }: { changeSetId: string }) {
   const { t } = useTranslation();
   const query = useChangeSet(changeSetId);
+  // The URL names no ontology here; the assistant works on the change set's.
+  usePublishAssistantSelection({ ontologyId: query.data?.ontologyId });
   if (query.isSuccess) return <ChangeSetLoaded changeSet={query.data} />;
   return (
     <>

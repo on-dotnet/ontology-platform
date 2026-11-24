@@ -7,16 +7,39 @@ import type { components } from '@/api/schema';
 export type ReleaseSummary = components['schemas']['ReleaseSummary'];
 export type ReleaseCreate = components['schemas']['ReleaseCreate'];
 export type ReleaseProblem = components['schemas']['ReleaseProblem'];
+export type Comparison = components['schemas']['Comparison'];
+export type ElementChange = components['schemas']['ElementChange'];
+export type FieldChange = components['schemas']['FieldChange'];
+export type ChangeLevel = ElementChange['level'];
+
+/** Compare target meaning the working version rather than a release. */
+export const WORKING = 'working';
+/** Most severe first, the order the server sorts changes in. */
+export const CHANGE_LEVELS: readonly ChangeLevel[] = ['breaking', 'review', 'compatible'];
 
 export const releaseKeys = {
   all: ['releases'] as const,
   list: (ontologyId: string) => [...releaseKeys.all, 'list', ontologyId] as const,
+  // Under 'releases' so that publishing refreshes it; 'working' changes with every merge.
+  compare: (ontologyId: string, from: string, to: string) => [...releaseKeys.all, 'compare', ontologyId, from, to] as const,
 };
 
 export function useReleases(ontologyId: string) {
   return useQuery({
     queryKey: releaseKeys.list(ontologyId),
     queryFn: () => unwrap(api.GET('/api/ontologies/{id}/releases', { params: { path: { id: ontologyId } } })),
+  });
+}
+
+/** What changed from a release to another release or to the working version (`to` = `WORKING`). */
+export function useComparison(ontologyId: string, from: string | undefined, to: string = WORKING) {
+  return useQuery({
+    queryKey: releaseKeys.compare(ontologyId, from ?? '', to),
+    queryFn: () =>
+      unwrap(api.GET('/api/ontologies/{id}/compare', { params: { path: { id: ontologyId }, query: { from: from ?? '', to } } })),
+    enabled: Boolean(from),
+    // Releases never change; the working version may have moved on since the last look.
+    staleTime: to === WORKING ? 0 : Infinity,
   });
 }
 

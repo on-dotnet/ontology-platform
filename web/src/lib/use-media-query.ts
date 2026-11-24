@@ -22,5 +22,9 @@ export function useMediaQuery(query: string): boolean {
   );
 }
 
-/** Matches the layout breakpoint where the sidebar turns into a drawer (ui-guidelines §3). */
+/**
+ * Matches the layout breakpoint where the sidebar turns into a drawer (ui-guidelines §3). Layouts
+ * that switch on it must take the switch from this query alone, not also from a Tailwind `lg:`
+ * class: `lg` is in rem and moves when the user changes the browser's default font size (#8).
+ */
 export const DESKTOP_QUERY = '(min-width: 1024px)';

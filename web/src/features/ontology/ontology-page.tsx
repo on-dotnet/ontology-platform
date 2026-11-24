@@ -37,6 +37,7 @@ import {
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip } from '@/components/ui/tooltip';
+import { usePublishAssistantSelection } from '@/features/assistant/assistant-selection';
 import { usePermissions } from '@/features/auth/permissions';
 import { exportOntologyTurtle, useGraph, type OntologySummary } from '@/features/ontologies/api';
 import { CreateOntologyDialog, type CreateMethod } from '@/features/ontologies/create-ontology-dialog';
@@ -83,9 +84,19 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
   // The kind of element being created by hand; null while the form is closed.
   const [newKind, setNewKind] = useState<FormKind | null>(null);
   const [newAxiom, setNewAxiom] = useState(false);
+  // The element last opened stays the assistant's context after its (modal) sheet closes, since the
+  // assistant cannot be used while the sheet is open.
+  const [contextElementId, setContextElementId] = useState<string | null>(null);
+  usePublishAssistantSelection({ ontologyId: selected?.id, elementId: contextElementId });
+
+  const selectElement = (id: string | null) => {
+    setElementId(id);
+    if (id) setContextElementId(id);
+  };
 
   const switchOntology = (id: string) => {
     setElementId(null);
+    setContextElementId(null);
     onOntologyChange(id);
   };
 
@@ -205,11 +216,11 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
               {view === 'turtle' ? (
                 <TurtleView key={selected.id} ontology={selected} />
               ) : view === 'list' ? (
-                <ElementList key={selected.id} ontologyId={selected.id} onSelect={setElementId} />
+                <ElementList key={selected.id} ontologyId={selected.id} onSelect={selectElement} />
               ) : (
-                <GraphPanel ontology={selected} canUpload={canUpload} onSelect={setElementId} />
+                <GraphPanel ontology={selected} canUpload={canUpload} onSelect={selectElement} />
               )}
-              <ElementDetailSheet ontologyId={selected.id} elementId={elementId} onSelect={setElementId} onClose={() => setElementId(null)} />
+              <ElementDetailSheet ontologyId={selected.id} elementId={elementId} onSelect={selectElement} onClose={() => setElementId(null)} />
             </div>
           )
         }

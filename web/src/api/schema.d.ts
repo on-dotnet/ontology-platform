@@ -487,6 +487,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ontologies/{id}/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Compare Versions
+         * @description What changed from a release (`to`: its id) to another release or to the working version
+         *     (`to`: `working`), each change rated breaking, review or compatible (spec 002, section 9).
+         *     404 `release.not_found` when a release does not belong to the ontology.
+         */
+        get: operations["compare_versions_api_ontologies__id__compare_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ontologies/{id}/releases": {
         parameters: {
             query?: never;
@@ -678,6 +700,51 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ontologies/{id}/assistant/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Assistant Requests
+         * @description The user's latest requests about the ontology, newest first.
+         */
+        get: operations["list_assistant_requests_api_ontologies__id__assistant_requests_get"];
+        put?: never;
+        /**
+         * Create Assistant Request
+         * @description Ask the assistant for a change. The answer comes from a background job: its result is a
+         *     change set waiting for review (or only a reply); poll the request for it.
+         */
+        post: operations["create_assistant_request_api_ontologies__id__assistant_requests_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assistant/requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Assistant Request
+         * @description One of the user's own requests (404 `assistant.not_found` for others').
+         */
+        get: operations["get_assistant_request_api_assistant_requests__id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/workbench/summary": {
         parameters: {
             query?: never;
@@ -725,6 +792,60 @@ export interface components {
             reachable: boolean | null;
             /** Model */
             model: string | null;
+        };
+        /**
+         * AssistantContext
+         * @description Where the user was when they asked: the page and the element they had selected.
+         */
+        AssistantContext: {
+            /** Page */
+            page: string;
+            /** Elementid */
+            elementId?: string | null;
+        };
+        /** AssistantRequest */
+        AssistantRequest: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Ontologyid
+             * Format: uuid
+             */
+            ontologyId: string;
+            /** Message */
+            message: string;
+            context: components["schemas"]["AssistantContext"];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "running" | "succeeded" | "failed";
+            /** Step */
+            step: ("context" | "model" | "changeset") | null;
+            /** Reply */
+            reply: string | null;
+            /** Dropped */
+            dropped: number;
+            /** Changesetid */
+            changeSetId: string | null;
+            /** Errorcode */
+            errorCode: string | null;
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /** Finishedat */
+            finishedAt: string | null;
+        };
+        /** AssistantRequestCreate */
+        AssistantRequestCreate: {
+            /** Message */
+            message: string;
+            context: components["schemas"]["AssistantContext"];
         };
         /** Body_import_into_ontology_api_ontologies__id__import_post */
         Body_import_into_ontology_api_ontologies__id__import_post: {
@@ -918,6 +1039,34 @@ export interface components {
             heading: string | null;
             /** Charcount */
             charCount: number;
+        };
+        /** CompareCounts */
+        CompareCounts: {
+            /** Breaking */
+            breaking: number;
+            /** Review */
+            review: number;
+            /** Compatible */
+            compatible: number;
+        };
+        /** CompareSide */
+        CompareSide: {
+            /** Releaseid */
+            releaseId: string | null;
+            /** Version */
+            version: number | null;
+        };
+        /**
+         * Comparison
+         * @description What changed from one release to another release or to the working version (spec 002,
+         *     section 9), most severe first.
+         */
+        Comparison: {
+            from: components["schemas"]["CompareSide"];
+            to: components["schemas"]["CompareSide"];
+            /** Changes */
+            changes: components["schemas"]["ElementChange"][];
+            counts: components["schemas"]["CompareCounts"];
         };
         /** ConstraintRule */
         ConstraintRule: {
@@ -1201,6 +1350,35 @@ export interface components {
              */
             updatedAt: string;
         };
+        /** ElementChange */
+        ElementChange: {
+            /**
+             * Elementid
+             * Format: uuid
+             */
+            elementId: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            /** Label */
+            label: string;
+            /** Iri */
+            iri: string | null;
+            /**
+             * Change
+             * @enum {string}
+             */
+            change: "added" | "removed" | "changed" | "restored";
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "breaking" | "review" | "compatible";
+            /** Fields */
+            fields: components["schemas"]["FieldChange"][];
+        };
         /** ElementDetail */
         ElementDetail: {
             /**
@@ -1373,6 +1551,19 @@ export interface components {
             charStart: number | null;
             /** Charend */
             charEnd: number | null;
+        };
+        /**
+         * FieldChange
+         * @description One field of an element in two versions. `field` is the Element field name (camelCase);
+         *     references are {id, label} objects, rules and synonyms are given whole.
+         */
+        FieldChange: {
+            /** Field */
+            field: string;
+            /** Before */
+            before: unknown;
+            /** After */
+            after: unknown;
         };
         /** Graph */
         Graph: {
@@ -3103,6 +3294,58 @@ export interface operations {
             };
         };
     };
+    compare_versions_api_ontologies__id__compare_get: {
+        parameters: {
+            query: {
+                from: string;
+                to?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Comparison"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
     list_releases_api_ontologies__id__releases_get: {
         parameters: {
             query?: never;
@@ -3741,6 +3984,159 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AiStatus"];
+                };
+            };
+        };
+    };
+    list_assistant_requests_api_ontologies__id__assistant_requests_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantRequest"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    create_assistant_request_api_ontologies__id__assistant_requests_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssistantRequestCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantRequest"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    get_assistant_request_api_assistant_requests__id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantRequest"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
                 };
             };
         };

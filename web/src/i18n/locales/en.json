@@ -71,13 +71,69 @@
   "assistant": {
     "title": "AI assistant",
     "context": "Current page: {{page}}",
-    "emptyTitle": "The AI assistant is coming soon",
-    "emptyDescription": "It will know which page and objects you are working on and help you model and analyze.",
-    "capabilitiesLabel": "Once available, you can ask it to:",
-    "capabilityExtract": "Identify terms, object types and relations in documents and draft a change set",
-    "capabilityExplain": "Explain the objects, properties and constraints on the current page",
-    "capabilityAsk": "Query the ontology and business data in natural language",
-    "reviewNote": "AI only makes suggestions. Every change takes effect only after you review it."
+    "ontologyLabel": "Ontology",
+    "elementLabel": "Selected",
+    "noOntologyTitle": "No ontology yet",
+    "noOntologyDescription": "Build an ontology on the ontology page by uploading documents or importing an OWL file, then let the assistant change it.",
+    "goToOntology": "Go to the ontology page",
+    "viewerTitle": "Editor role required",
+    "viewerDescription": "Asking the assistant to change the ontology needs the “Editor” role or higher. Contact your platform admin to get access.",
+    "composer": {
+      "label": "Tell the assistant what to change",
+      "placeholder": "For example: add a property “capacity” in tonnes to “Ladle”",
+      "hint": "Enter to send, Shift + Enter for a new line",
+      "count": "{{count}}/{{max}}",
+      "send": "Send",
+      "required": "Write what the assistant should change first.",
+      "tooLong": "Use at most {{max}} characters, then send again.",
+      "failedTitle": "The request was not sent"
+    },
+    "emptyTitle": "Tell the assistant how to change the ontology",
+    "emptyDescription": "It reads the current ontology and the element you selected, and drafts the changes as a change set.",
+    "reviewNote": "AI only makes suggestions. Every change takes effect only after you review it.",
+    "listLabel": "Recent requests",
+    "youAsked": "Your request: ",
+    "progress": {
+      "label": "Progress",
+      "queued": "Queued",
+      "running": "Working on it"
+    },
+    "steps": {
+      "context": "Read ontology",
+      "model": "Call model",
+      "changeset": "Draft change set"
+    },
+    "stepStates": {
+      "done": "done",
+      "active": "in progress",
+      "pending": "not started"
+    },
+    "result": {
+      "summary": "Change set with {{count}} items: {{ops}}",
+      "opCount": "{{op}} {{count}}",
+      "summaryFailed": "The change summary could not be loaded. You can see it on the review page.",
+      "review": "Review changes",
+      "dropped": "Could not apply and ignored: {{count}}",
+      "noChanges": "No changes were drafted. The ontology stays as it is."
+    },
+    "failure": {
+      "not_configured": {
+        "title": "The AI service is not configured",
+        "description": "The ontology was not changed. Ask your platform admin to configure the model service, then retry."
+      },
+      "unavailable": {
+        "title": "The AI assistant is unavailable right now",
+        "description": "The ontology was not changed. Try again later."
+      },
+      "invalid_output": {
+        "title": "The AI returned an unusable result",
+        "description": "The ontology was not changed. Try again later."
+      },
+      "other": {
+        "title": "The AI assistant could not finish this request",
+        "description": "The ontology was not changed. Try again later."
+      }
+    }
   },
   "login": {
     "title": "Sign in",
@@ -809,7 +865,12 @@
       "published": "Release v{{version}} published",
       "failedTitle": "The release was not published",
       "invalidTitle": "The release check did not pass ({{count}})",
-      "invalidDescription": "Fix these problems in review, then publish again:"
+      "invalidDescription": "Fix these problems in review, then publish again:",
+      "summaryTitle": "Changes since the current release v{{version}}",
+      "summaryTitleCurrent": "Changes since the current release",
+      "summaryFailed": "The change summary could not be loaded",
+      "noChanges": "The working version is the same as the current release.",
+      "breakingNotice": "Breaking changes: {{count}}. Data and queries that rely on these elements may stop working"
     },
     "problems": {
       "unknown": "Did not pass the release check. Check this element.",
@@ -833,6 +894,52 @@
       "confirm": "Set as current release",
       "done": "v{{version}} is now the current release",
       "failedTitle": "The current release was not changed"
+    },
+    "compare": {
+      "title": "Compare versions",
+      "info": "Lists the elements added, deleted and changed between two versions, rated by how they affect data and queries that rely on them.",
+      "fromLabel": "From",
+      "toLabel": "To",
+      "working": "Working version",
+      "option": "v{{version}} · {{title}}",
+      "currentOption": "v{{version}} · {{title}} (current)",
+      "failedTitle": "The comparison could not be loaded",
+      "countsLabel": "Changes per level",
+      "levelCount": "{{level}}: {{count}}",
+      "levels": {
+        "breaking": "Breaking",
+        "review": "Needs review",
+        "compatible": "Compatible"
+      },
+      "levelInfoLabel": "About “{{level}}”",
+      "levelInfo": {
+        "breaking": "Elements deleted, or their data type, unit, domain, range, parent type or inverse changed. Data and queries that rely on them may break.",
+        "review": "Changes to constraints and advanced axioms. Check that they are what you expect.",
+        "compatible": "Additions, restores, or changes to names, definitions and synonyms. Existing data and queries are not affected."
+      },
+      "change": {
+        "added": "Added",
+        "removed": "Deleted",
+        "changed": "Changed",
+        "restored": "Restored"
+      },
+      "fields": {
+        "rules": "Constraint rules",
+        "turtle": "Turtle fragment",
+        "other": "Other field"
+      },
+      "rulesChanged": "Rules changed",
+      "turtleChanged": "Fragment changed",
+      "valueChanged": "Changed",
+      "becomes": "becomes",
+      "none": "None",
+      "empty": "(empty)",
+      "missingRef": "An element that no longer exists",
+      "yes": "Yes",
+      "no": "No",
+      "unnamed": "Unnamed element",
+      "noChangesTitle": "No differences",
+      "noChangesDescription": "The two versions you picked have the same content."
     }
   },
   "pages": {
@@ -968,6 +1075,9 @@
     "axiom": {
       "invalid": "The fragment does not parse, is not exactly one axiom, or the ontology already has it. Check it and save again.",
       "maps_to_element": "The forms can express this content. Edit it on the element instead."
+    },
+    "assistant": {
+      "not_found": "This request does not exist or was not made by you."
     }
   },
   "rules": {
