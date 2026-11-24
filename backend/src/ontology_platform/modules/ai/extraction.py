@@ -403,19 +403,20 @@ def build_proposals(
     relations: RelationsOut,
 ) -> list[Proposal]:
     builder = _Builder(chunks, known)
-    # ref (model's) -> reference usable in the change set: existing id or our temp_ref
-    refs: dict[str, str] = {}
+    # Each type the model gave -> the type it is in the change set: an existing id or our
+    # temp_ref. The model sometimes gives one ref to two types; see `resolve`.
+    became: list[tuple[EntityTypeOut, str]] = []
     new_types: list[tuple[EntityTypeOut, Proposal]] = []
 
     for item in types:
         if item.ref in builder.known_ids and builder.known_ids[item.ref].kind == "entity_type":
-            refs[item.ref] = item.ref
+            became.append((item, item.ref))
             _maybe_update(builder, builder.known_ids[item.ref], item.synonyms, item, item.quotes)
             continue
         labels = [item.label_zh, item.label_en or "", *item.synonyms]
         existing = builder.match_known("entity_type", labels)
         if existing is not None:
-            refs[item.ref] = str(existing.id)
+            became.append((item, str(existing.id)))
             _maybe_update(builder, existing, item.synonyms, item, item.quotes)
             continue
         # A new type with a label that is a name of an earlier new type, or with a name that is
@@ -432,7 +433,7 @@ def build_proposals(
             None,
         )
         if duplicate is not None:
-            refs[item.ref] = duplicate.temp_ref or ""
+            became.append((item, duplicate.temp_ref or ""))
             duplicate.fields["synonyms"] += [
                 s
                 for s in _synonyms(
@@ -446,7 +447,7 @@ def build_proposals(
             continue
         local_name = builder.unique_name(item.local_name, _PASCAL, "EntityType")
         temp_ref = f"new:{local_name}"
-        refs[item.ref] = temp_ref
+        became.append((item, temp_ref))
         proposal = Proposal(
             op="create",
             kind="entity_type",
@@ -466,29 +467,47 @@ def build_proposals(
         new_types.append((item, proposal))
         builder.add(proposal, item.quotes, item.confidence)
 
+    targets: dict[str, set[str]] = {}
+    for item, target in became:
+        targets.setdefault(item.ref, set()).add(target)
+
+    def resolve(ref: str) -> str | None:
+        """The type a ref of the model stands for, or None.
+
+        A ref the model gave to types that stayed apart (their names do not merge them) stands
+        for none of them: which one a parent, relation or property meant is unknown, so the
+        reference is dropped, while the types themselves are kept.
+        """
+        found = targets.get(ref)
+        if found is None:
+            return builder.known_type(ref)
+        if len(found) > 1:
+            return None
+        return next(iter(found))
+
     # Parents are resolved after all types are known: a type of this run or an existing one.
-    # Unknown or self parents are dropped.
+    # Unknown, ambiguous or self parents are dropped.
     for item, proposal in new_types:
-        parent = (refs.get(item.parent) or builder.known_type(item.parent)) if item.parent else None
+        parent = resolve(item.parent) if item.parent else None
         if parent and parent != proposal.temp_ref:
             proposal.fields["parentRef"] = parent
 
     # Every name a type goes by in this run, to check that a relation's evidence names its ends.
+    # A model type's names count only for the type it became, whatever ref it shares.
     names_of: dict[str, set[str]] = {
         str(element.id): _element_keys(element)
         for element in known
         if element.kind == "entity_type"
     }
-    for item in types:
-        if item.ref in refs:
-            names_of.setdefault(refs[item.ref], set()).update(
-                _keys([item.label_zh, item.label_en or "", *item.synonyms])
-            )
+    for item, target in became:
+        names_of.setdefault(target, set()).update(
+            _keys([item.label_zh, item.label_en or "", *item.synonyms])
+        )
 
     seen_relations: set[tuple[str, str, str]] = set()
     for relation in relations.relations:
-        domain = refs.get(relation.domain) or builder.known_type(relation.domain)
-        range_ = refs.get(relation.range) or builder.known_type(relation.range)
+        domain = resolve(relation.domain)
+        range_ = resolve(relation.range)
         if domain is None or range_ is None:
             continue  # the model referenced a type that does not exist
         key = (domain, range_, normalize(relation.label_zh))
@@ -527,7 +546,7 @@ def build_proposals(
 
     seen_properties: set[tuple[str, str]] = set()
     for prop in relations.properties:
-        domain = refs.get(prop.domain) or builder.known_type(prop.domain)
+        domain = resolve(prop.domain)
         if domain is None:
             continue
         prop_key = (domain, normalize(prop.label_zh))
