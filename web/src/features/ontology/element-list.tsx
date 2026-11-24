@@ -1,5 +1,5 @@
 import { RotateCcw, Search, X } from 'lucide-react';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/states/empty-state';
@@ -8,6 +8,7 @@ import { Badge, type BadgeTone } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -24,6 +25,7 @@ import {
   type ElementStatusFilter,
 } from '@/features/ontologies/api';
 import { cn } from '@/lib/cn';
+import { usePagination } from '@/lib/pagination';
 
 import { useRestoreElement } from './edit-actions';
 
@@ -72,6 +74,10 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
     const element = id ? byId.get(id) : undefined;
     return element ? elementName(element, language) : undefined;
   };
+  // Only axioms while axioms are listed, also while the rows of the previous filter stay on screen.
+  const shown = (query.data ?? []).filter((element) => kind !== 'axiom' || element.kind === 'axiom');
+  const pager = usePagination(shown.length, `${kind}|${q}|${status}`);
+  const cardRef = useRef<HTMLDivElement>(null);
   const filtered = kind !== 'all' || q !== '' || status !== 'active';
   // Only deleted rows have an action: restoring them.
   const showActions = canUpload && status !== 'active';
@@ -123,7 +129,7 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
   );
 
   return (
-    <Card>
+    <Card ref={cardRef}>
       <div className="flex flex-wrap items-center gap-3 border-b border-border p-4">
         <SegmentedControl
           legend={t('ontologyPage.list.kindFilter')}
@@ -175,8 +181,8 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
       </div>
 
       <QueryState query={query}>
-        {(elements) =>
-          elements.length === 0 ? (
+        {() =>
+          shown.length === 0 ? (
             <EmptyState
               icon={Search}
               tone="secondary"
@@ -184,6 +190,7 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
               description={filtered ? t('ontologyPage.list.noMatchDescription') : t('ontologyPage.list.emptyDescription')}
             />
           ) : (
+            <>
             <Table aria-label={t('ontologyPage.list.tableLabel')}>
               <TableHeader>
                 <TableRow className="border-t-0 hover:bg-transparent">
@@ -195,12 +202,7 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
                 </TableRow>
               </TableHeader>
               {kind === 'axiom' ? (
-                // Only axioms, also while the rows of the previous filter stay on screen.
-                axiomGroups(
-                  elements.filter((element) => element.kind === 'axiom'),
-                  nameOf,
-                  language,
-                ).map((group, index) => {
+                pageGroups(axiomGroups(shown, nameOf, language), pager.start, pager.end).map((group, index) => {
                   const labelId = `${groupId}-${index}`;
                   return (
                     <TableBody key={group.subjectId ?? ''} aria-labelledby={labelId}>
@@ -216,7 +218,7 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
                                 (group.name ?? t('ontologyPage.detail.unknownElement'))
                               )}
                             </span>
-                            <span className="font-normal tabular-nums">{t('ontologyPage.list.groupCount', { count: group.axioms.length })}</span>
+                            <span className="font-normal tabular-nums">{t('ontologyPage.list.groupCount', { count: group.total })}</span>
                           </span>
                         </th>
                       </tr>
@@ -225,9 +227,11 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
                   );
                 })
               ) : (
-                <TableBody>{elements.map((element) => renderRow(element, false))}</TableBody>
+                <TableBody>{shown.slice(pager.start, pager.end).map((element) => renderRow(element, false))}</TableBody>
               )}
             </Table>
+            <Pagination state={pager} total={shown.length} onChange={() => cardRef.current?.scrollIntoView({ block: 'nearest' })} />
+            </>
           )
         }
       </QueryState>
@@ -260,6 +264,23 @@ export function axiomGroups(axioms: readonly Element[], nameOf: (id: string | nu
     if (a.subjectId === null || b.subjectId === null) return a.subjectId === null ? 1 : -1;
     return collator.compare(a.name ?? '', b.name ?? '');
   });
+}
+
+export interface PagedAxiomGroup extends AxiomGroup {
+  /** All axioms of the group, of which `axioms` holds those on the page. */
+  total: number;
+}
+
+/** The part of the groups, read in order, that falls on the rows `start` to `end` (exclusive); groups left empty are dropped. */
+export function pageGroups(groups: readonly AxiomGroup[], start: number, end: number): PagedAxiomGroup[] {
+  const paged: PagedAxiomGroup[] = [];
+  let offset = 0;
+  for (const group of groups) {
+    const axioms = group.axioms.slice(Math.max(start - offset, 0), Math.max(end - offset, 0));
+    offset += group.axioms.length;
+    if (axioms.length > 0) paged.push({ ...group, axioms, total: group.axioms.length });
+  }
+  return paged;
 }
 
 interface NameCellProps {
