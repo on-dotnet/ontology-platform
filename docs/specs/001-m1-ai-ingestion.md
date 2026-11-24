@@ -148,7 +148,7 @@ worker 用 `SELECT … FOR UPDATE SKIP LOCKED` 领取任务，运行期间每 15
 | `GET /api/documents/{id}/chunks/{chunkId}` | 分块文本，用于证据高亮 | viewer |
 | `GET /api/documents/{id}/file` | 下载原件 | viewer |
 | `POST /api/documents/{id}/retry` | 仅 `failed` 状态可用 | editor |
-| `GET /api/ai/status` | `{ configured, reachable, model }`；`reachable` 缓存 60 秒；不返回地址与 Key | viewer |
+| `GET /api/ai/status` | `{ configured, reachable, model }`；`reachable` 缓存 60 秒；不返回地址与 Key。可达性先调免费的 `models.retrieve`；服务不支持（404、405、501）时改用一次极小的结构化调用（`status.check`，计费、记一行调用记录），成功后 10 分钟内不再重复调用，失败不缓存 | viewer |
 | `GET /api/workbench/summary` | 待审核变更集数、对象类型数、处理中的资料数、最近 10 条动态 | viewer |
 
 合并规则：
