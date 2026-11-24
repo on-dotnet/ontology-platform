@@ -8,16 +8,22 @@
 #   1. 有标识的事物：原文给出编号（炉号、包号、板坯号、钢卷号、检验批号等）。
 #   2. 原文逐个记录数据的事物或记录：原文写明对每一个记录测量值、时间、结果，或把每次发生
 #      称为“一次……”“一份……”“……记录”。
-#   3. 钢在其中或其上被加工、盛装的生产设备（与转炉、加热炉同类）。
-#   4. 钢在各工序的物料形态，且原文记录了它的测量值（钢水、铸坯、中间坯、带钢）。
+#   3. 钢在其中或其上被加工、盛装的生产设备（与转炉、加热炉同类）：能单独运行的设备或机组；
+#      设备内部的区段与部件（二冷区，机组里的一架轧机）不算。
+#   4. 钢在各工序的物料形态，且原文记录了它的测量值（钢水、中间坯、带钢）。
 # 不收录：工艺步骤与操作（装料、吹炼、出钢、切割、开浇、停浇、连浇、修磨、粗轧、精轧、
-#   层流冷却、卷取、回炉等，其数据在原文里记在别的对象上）；判定结果、状态与取值（判废、
-#   改判钢种、异常坯）；只作为执行者出现的人员与部门（质检员、质量部门）；没有自身数据的
-#   设备部位与辅助设备（二冷区、钢包回转台、行车、表面检测仪）；没有自身数据的投入物料
-#   （铁水、废钢、脱氧合金）。拿不准的不收（例如精整线、订单、中间包测温、出钢）。
-# 同一事物在原文里的全称或别称并入同一项的 names（如“顶底复吹转炉”“板坯连铸机”“成品化学成分要求”）。
+#   层流冷却、卷取、回炉等，其数据在原文里记在别的对象上）；判定结果的取值、状态与类别
+#   （正品、降级品、判废、改判钢种、异常坯）；只作为执行者出现的人员与部门（质检员、质量部门）；
+#   没有自身数据的设备部位与辅助设备（二冷区、钢包回转台、行车、表面检测仪）；没有自身数据的
+#   投入物料（铁水、废钢、脱氧合金）。拿不准的不收（例如精整线、订单、中间包测温、出钢、成品样、
+#   铸坯、四辊轧机）。
+# 同一事物在原文里逐字出现的全称或别称并入同一项的 names（如“顶底复吹转炉”“板坯连铸机”
+# “成品化学成分要求”“精轧机”）。
 # 关系收录两端都在本清单里、且原文有一行（一句或几句、列表项、表格行）直接写明两者联系的；
-# 只在定义某个属性时顺带出现的两者（如“拉速：铸坯从结晶器拉出的速度”）不收。
+# 只在定义或列举某个属性时顺带出现的两者（如“拉速：铸坯从结晶器拉出的速度”“记录缺陷类型、
+# 位置和严重程度”）不收；记录对方的编号（检验批号、试样编号）算写明联系，因为编号指向另一个
+# 有标识的事物，而缺陷类型、位置这类取值不算。
+# 补充项的候选来自两次基线评测里没对上的类型与关系，以及逐份通读资料，逐项按上述标准判断。
 
 entity_types = [
   { names = ["炉次", "冶炼炉次", "Heat"], core = true },
@@ -42,21 +48,18 @@ entity_types = [
   { names = ["缺陷记录", "表面缺陷", "缺陷", "Defect", "DefectRecord"], core = true },
   { names = ["缺陷类型", "DefectType"], core = false },
   { names = ["质量判定", "判定结果", "QualityDecision"], core = true },
-  { names = ["化学成分要求", "成分要求", "钢种成分要求", "成品化学成分要求", "ChemicalCompositionRequirement"], core = false },
+  { names = ["化学成分要求", "成分要求", "成品化学成分要求", "ChemicalCompositionRequirement"], core = false },
   { names = ["力学性能要求", "MechanicalPropertyRequirement"], core = false },
   { names = ["质量异常分析", "QualityAnalysis"], core = false },
   # 以下按收录标准补充（#7），括号内为依据的标准序号
   { names = ["钢水", "MoltenSteel"], core = false },  # 4：出钢温度、过热度
-  { names = ["铸坯", "Strand"], core = false },  # 4：拉速
   { names = ["中间坯", "TransferBar"], core = false },  # 4：中间坯温度、厚度
   { names = ["带钢", "热轧带钢", "Strip"], core = false },  # 4：厚度、宽度、凸度
   { names = ["板坯表面缺陷", "板坯缺陷", "SlabDefect"], core = false },  # 2：记录缺陷类型、位置和严重程度
-  { names = ["成品样", "FinalSample"], core = false },  # 2：化学成分须满足要求
   { names = ["火焰切割机", "TorchCuttingMachine"], core = false },  # 3
   { names = ["热轧机组", "HotStripMill"], core = false },  # 3
   { names = ["粗轧机组", "RoughingMill"], core = false },  # 3
-  { names = ["精轧机组", "FinishingMill"], core = false },  # 3
-  { names = ["四辊轧机", "FourHighMill"], core = false },  # 3
+  { names = ["精轧机组", "精轧机", "FinishingMill"], core = false },  # 3
   { names = ["卷取机", "Coiler", "DownCoiler"], core = false },  # 3
 ]
 
@@ -77,22 +80,23 @@ relations = [
   { domain = "缺陷记录", range = "钢卷", core = true },
   { domain = "质量判定", range = "钢卷", core = true },
   # 以下按收录标准补充（#7），注释为依据的原文
-  { domain = "炉次", range = "钢水", core = false },  # 一个炉次倒入钢包的钢水重量
+  { domain = "炉次", range = "钢水", core = false },  # 一个浇次由若干个炉次的钢水连续浇铸而成
   { domain = "钢包", range = "钢水", core = false },  # 盛装并运输钢水的耐火容器
   { domain = "钢包", range = "LF精炼炉", core = false },  # 钢水由钢包吊运至 LF 精炼炉
+  { domain = "钢水", range = "LF精炼炉", core = false },  # 同上
   { domain = "钢包", range = "连铸机", core = false },  # 钢包由行车吊运至连铸机的钢包回转台
   { domain = "精炼处理", range = "LF精炼炉", core = false },  # 每个炉次在 LF 精炼炉的处理称为一次精炼处理
   { domain = "钢种", range = "化学成分要求", core = false },  # 钢种的成分要求
-  { domain = "成品样", range = "化学成分要求", core = false },  # 成品样的化学成分须满足钢种的成分要求
   { domain = "连铸机", range = "钢水", core = false },  # 板坯连铸机把精炼后的钢水连续浇铸成板坯
   { domain = "连铸机", range = "板坯", core = false },  # 同上
   { domain = "钢水", range = "中间包", core = false },  # 钢水依次经过钢包、中间包和结晶器
   { domain = "钢水", range = "结晶器", core = false },  # 同上
+  { domain = "浇次", range = "钢水", core = false },  # 一个浇次由若干个炉次的钢水连续浇铸而成
+  { domain = "中间包", range = "钢包", core = false },  # 位于钢包和结晶器之间的耐火容器
+  { domain = "中间包", range = "结晶器", core = false },  # 同上
   { domain = "火焰切割机", range = "板坯", core = false },  # 由火焰切割机切成定尺板坯
-  { domain = "铸坯", range = "板坯", core = false },  # 铸坯按……定尺长度切割成板坯
   { domain = "轧制计划", range = "板坯", core = false },  # 由若干块板坯组成
   { domain = "板坯表面缺陷", range = "板坯", core = false },  # 对板坯表面进行目视检查……记录缺陷
-  { domain = "板坯表面缺陷", range = "缺陷类型", core = false },  # 记录缺陷类型、位置和严重程度
   { domain = "加热", range = "加热炉", core = false },  # 每块板坯在加热炉内的过程记录为一次加热
   { domain = "加热炉", range = "板坯", core = false },  # 把板坯加热到轧制温度的步进梁式炉
   { domain = "轧制事件", range = "热轧机组", core = false },  # 一块板坯在热轧机组上的完整轧制过程
@@ -101,12 +105,10 @@ relations = [
   { domain = "粗轧机组", range = "板坯", core = false },  # 粗轧机组把板坯轧制成……中间坯
   { domain = "粗轧机组", range = "中间坯", core = false },  # 同上
   { domain = "中间坯", range = "板坯", core = false },  # 同上
-  { domain = "精轧机组", range = "四辊轧机", core = false },  # 精轧机组由 7 架四辊轧机组成
   { domain = "板坯", range = "浇次", core = false },  # 板坯必须能够追溯到所属炉次和浇次
   { domain = "检验批", range = "炉次", core = false },  # 同一炉次、同一厚度规格的钢卷组成一个检验批
   { domain = "检验结果", range = "试样", core = false },  # 记录检验批号、试样编号
   { domain = "力学性能要求", range = "钢卷", core = false },  # 对厚度不大于 16 mm 的 Q235B 钢卷，力学性能要求如下
-  { domain = "缺陷记录", range = "缺陷类型", core = false },  # 包括缺陷类型、所在钢卷的位置
   { domain = "质量异常分析", range = "浇次", core = false },  # 同一浇次的多个钢卷出现同类缺陷时
   { domain = "质量异常分析", range = "钢卷", core = false },  # 同上
 ]
