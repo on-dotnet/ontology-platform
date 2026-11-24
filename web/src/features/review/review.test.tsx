@@ -639,3 +639,67 @@ describe('import change set review', () => {
   });
 });
 
+describe('change item pagination', () => {
+  const many = Array.from({ length: 120 }, (_, index) =>
+    itemFixture({
+      id: `item-${index}`,
+      seq: index + 1,
+      kind: index < 70 ? 'entity_type' : 'property',
+      tempRef: `new:N${index}`,
+      proposed: { localName: `N${index}`, labelZh: `项目${String(index + 1).padStart(3, '0')}`, ...(index < 70 ? {} : { domainRef: 'el-molten-steel', datatype: 'decimal' }) },
+      confidence: 0.9,
+      evidence: [{ id: `ev-${index}`, documentId: 'doc-converter', chunkId: 'chunk-1', quote: QUOTE, charStart: null, charEnd: null }],
+    }),
+  );
+
+  it('shows 50 items per page across the kind groups and keeps the page after a decision', async () => {
+    const user = userEvent.setup();
+    const api = reviewServer({ initial: changeSetFixture(many) });
+    renderApp('/review/cs-converter');
+
+    await screen.findByRole('article', { name: /项目001/ });
+    expect(screen.getAllByRole('article')).toHaveLength(50);
+    expect(screen.queryByRole('article', { name: /项目051/ })).not.toBeInTheDocument();
+    const pager = screen.getByRole('navigation', { name: '分页' });
+    expect(pager).toHaveTextContent('第 1–50 项，共 120 项');
+    expect(screen.queryByRole('heading', { name: /属性/ })).not.toBeInTheDocument();
+
+    await user.click(within(pager).getByRole('button', { name: '下一页' }));
+    expect(screen.getAllByRole('article')).toHaveLength(50);
+    expect(screen.getByRole('article', { name: /项目051/ })).toBeInTheDocument();
+    // The property group begins on this page; each heading counts its whole group.
+    expect(screen.getByRole('heading', { name: /属性\s*50/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /对象类型\s*70/ })).toBeInTheDocument();
+
+    await user.click(within(card(/项目051/)).getByRole('button', { name: '接受' }));
+    await waitFor(() => expect(api.calls('PATCH', '/api/change-sets/cs-converter/items/item-50')).toHaveLength(1));
+    expect(screen.getByRole('article', { name: /项目051/ })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: '分页' })).toHaveTextContent('第 51–100 项，共 120 项');
+
+    await user.click(within(screen.getByRole('navigation', { name: '分页' })).getByRole('button', { name: '下一页' }));
+    expect(screen.getAllByRole('article')).toHaveLength(20);
+    expect(screen.getByRole('article', { name: /项目120/ })).toBeInTheDocument();
+  });
+
+  it('shows the evidence of an item on the current page, not of the first page', async () => {
+    const user = userEvent.setup();
+    reviewServer({ initial: changeSetFixture(many) });
+    renderApp('/review/cs-converter');
+
+    await screen.findByRole('article', { name: /项目001/ });
+    expect(within(screen.getByRole('region', { name: '证据' })).getByText('项目001')).toBeInTheDocument();
+
+    await user.click(within(screen.getByRole('navigation', { name: '分页' })).getByRole('button', { name: '下一页' }));
+    expect(within(screen.getByRole('region', { name: '证据' })).getByText('项目051')).toBeInTheDocument();
+    expect(within(card(/项目051/)).getByRole('button', { name: /查看证据/ })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('shows no pager for 50 items or fewer', async () => {
+    reviewServer();
+    renderApp('/review/cs-converter');
+
+    await screen.findByRole('article', { name: /钢包/ });
+    expect(screen.queryByRole('navigation', { name: '分页' })).not.toBeInTheDocument();
+  });
+});
+

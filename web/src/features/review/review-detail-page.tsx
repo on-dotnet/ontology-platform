@@ -14,6 +14,7 @@ import { QueryState } from '@/components/states/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Pagination } from '@/components/ui/pagination';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { useCurrentUser } from '@/features/auth/api';
 import { usePermissions } from '@/features/auth/permissions';
@@ -22,6 +23,7 @@ import { EvidenceExcerpt } from '@/features/documents/evidence-excerpt';
 import { ELEMENT_KINDS, ontologyKeys, useElements, usePlatformSettings, type Element } from '@/features/ontologies/api';
 import { codeMessage, useErrorMessage } from '@/i18n/error-message';
 import { cn } from '@/lib/cn';
+import { usePagination } from '@/lib/pagination';
 import { DESKTOP_QUERY, useMediaQuery } from '@/lib/use-media-query';
 
 import {
@@ -144,11 +146,18 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
     items: changeSet.items.filter((item) => item.kind === kind).sort((a, b) => a.seq - b.seq),
   })).filter((group) => group.items.length > 0);
   const ordered = groups.flatMap((group) => group.items);
+  // Items are paged in the order they are listed, across the kind groups.
+  const pager = usePagination(ordered.length, changeSet.id);
+  const pageItems = ordered.slice(pager.start, pager.end);
+  const onPage = new Set(pageItems);
+  const pageGroups = groups.map((group) => ({ ...group, shown: group.items.filter((item) => onPage.has(item)) })).filter((group) => group.shown.length > 0);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editing, setEditing] = useState<ChangeItem | null>(null);
   const [mergeResult, setMergeResult] = useState<MergeResult | null>(null);
-  const selected = ordered.find((item) => item.id === selectedId) ?? ordered[0];
+  // The evidence beside the list follows the page: the first item of it until one is chosen there.
+  const selected = pageItems.find((item) => item.id === selectedId) ?? pageItems[0];
 
   const isOpen = changeSet.status === 'open';
   const canDecide = canReview && isOpen;
@@ -292,8 +301,8 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
         // size, and the evidence panel's placement must match the layout. Only AI proposals have
         // evidence; imports and manual edits get the list alone.
         <div className={cn('mt-4 grid items-start gap-6', wide && isAi ? 'grid-cols-[minmax(0,1fr)_minmax(0,26rem)]' : 'max-w-4xl')}>
-          <div className="space-y-6">
-            {groups.map((group) => (
+          <div ref={listRef} className="space-y-6">
+            {pageGroups.map((group) => (
               <section key={group.kind} aria-labelledby={`group-${group.kind}`} className="space-y-3">
                 <h2 id={`group-${group.kind}`} className="flex items-center gap-2 text-base font-semibold text-foreground">
                   {t(`kinds.${group.kind}`)}
@@ -301,7 +310,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                     {group.items.length}
                   </Badge>
                 </h2>
-                {group.items.map((item) => (
+                {group.shown.map((item) => (
                   <Fragment key={item.id}>
                     <ChangeItemCard
                       item={item}
@@ -322,6 +331,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                 ))}
               </section>
             ))}
+            <Pagination state={pager} total={ordered.length} className="rounded-xl border" onChange={() => listRef.current?.scrollIntoView({ block: 'start' })} />
           </div>
           {isAi && wide && selected ? <EvidencePanel key={selected.id} item={selected} context={context} /> : null}
         </div>

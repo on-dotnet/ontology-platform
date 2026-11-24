@@ -337,3 +337,99 @@ describe('ontology graph view', () => {
     expect((await screen.findAllByText('已导出 Turtle 文件')).length).toBeGreaterThan(0);
   });
 });
+
+describe('list pagination', () => {
+  const many = Array.from({ length: 120 }, (_, index) =>
+    elementFixture({ id: `el-n-${index}`, localName: `Node${index}`, labelZh: `节点${String(index + 1).padStart(3, '0')}`, labelEn: null, definitionZh: null }),
+  );
+
+  function manyServer() {
+    return ontologyServer({
+      'GET /api/ontologies/:id/elements': ({ query }) => many.filter((element) => !query.get('q') || (element.labelZh ?? '').includes(query.get('q') ?? '')),
+    });
+  }
+
+  it('shows 50 elements per page and moves between pages', async () => {
+    const user = userEvent.setup();
+    manyServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const table = await screen.findByRole('table', { name: '本体元素' });
+    expect(within(table).getAllByRole('row')).toHaveLength(51);
+    expect(within(table).getByRole('button', { name: '节点001' })).toBeInTheDocument();
+    expect(within(table).getByRole('button', { name: '节点050' })).toBeInTheDocument();
+    expect(within(table).queryByRole('button', { name: '节点051' })).not.toBeInTheDocument();
+    const pager = screen.getByRole('navigation', { name: '分页' });
+    expect(pager).toHaveTextContent('第 1–50 项，共 120 项');
+    expect(within(pager).getByRole('button', { name: '上一页' })).toHaveAttribute('aria-disabled', 'true');
+
+    await user.click(within(pager).getByRole('button', { name: '下一页' }));
+    expect(within(table).getAllByRole('row')).toHaveLength(51);
+    expect(within(table).getByRole('button', { name: '节点051' })).toBeInTheDocument();
+    expect(pager).toHaveTextContent('第 51–100 项，共 120 项');
+
+    await user.click(within(pager).getByRole('button', { name: '下一页' }));
+    expect(within(table).getAllByRole('row')).toHaveLength(21);
+    expect(within(table).getByRole('button', { name: '节点120' })).toBeInTheDocument();
+    expect(pager).toHaveTextContent('第 101–120 项，共 120 项');
+    expect(within(pager).getByRole('button', { name: '下一页' })).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('goes back to the first page when a filter changes, and again when the earlier filter returns', async () => {
+    const user = userEvent.setup();
+    manyServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    await screen.findByRole('table', { name: '本体元素' });
+    const next = () => within(screen.getByRole('navigation', { name: '分页' })).getByRole('button', { name: '下一页' });
+    await user.click(next());
+    expect(screen.getByRole('navigation', { name: '分页' })).toHaveTextContent('第 51–100 项，共 120 项');
+    // The same 120 elements stay in the list (the server of this test ignores the kind): only the filter changed.
+    await user.click(screen.getByRole('radio', { name: '对象类型' }));
+    await waitFor(() => expect(screen.getByRole('navigation', { name: '分页' })).toHaveTextContent('第 1–50 项，共 120 项'));
+    // The kind filter comes first; the status filter has a "全部" of its own.
+    await user.click(screen.getAllByRole('radio', { name: '全部' })[0] as HTMLElement);
+    await waitFor(() => expect(screen.getByRole('navigation', { name: '分页' })).toHaveTextContent('第 1–50 项，共 120 项'));
+
+    // Searching with more than one page of matches starts over at the first page too.
+    await user.click(next());
+    await user.type(screen.getByRole('searchbox', { name: '搜索名称或同义词' }), '节点0');
+    await waitFor(() => expect(screen.getByRole('navigation', { name: '分页' })).toHaveTextContent('第 1–50 项，共 99 项'));
+  });
+
+  it('falls back to one page without a pager when a search leaves 50 or fewer', async () => {
+    const user = userEvent.setup();
+    manyServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    const table = await screen.findByRole('table', { name: '本体元素' });
+    await user.click(within(screen.getByRole('navigation', { name: '分页' })).getByRole('button', { name: '下一页' }));
+    await user.type(screen.getByRole('searchbox', { name: '搜索名称或同义词' }), '节点01');
+    // 节点010 to 节点019: ten matches, so a single page without a pager.
+    await waitFor(() => expect(within(table).getAllByRole('row')).toHaveLength(11));
+    expect(screen.queryByRole('navigation', { name: '分页' })).not.toBeInTheDocument();
+    expect(within(table).getByRole('button', { name: '节点010' })).toBeInTheDocument();
+  });
+
+  it('pages axioms listed by subject without losing the groups', async () => {
+    const user = userEvent.setup();
+    const axioms = Array.from({ length: 60 }, (_, index) =>
+      axiomFixture({ id: `ax-${index}`, subjectId: index < 30 ? 'el-molten-steel' : 'el-ladle', turtle: `steel:A${String(index).padStart(2, '0')} owl:disjointWith steel:B .` }),
+    );
+    ontologyServer({
+      'GET /api/ontologies/:id/elements': ({ query }) => (query.get('kind') === 'axiom' ? axioms : [moltenSteel, ladle]),
+    });
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    await screen.findByRole('table', { name: '本体元素' });
+    await user.click(screen.getByRole('radio', { name: '高级公理' }));
+    const pager = await screen.findByRole('navigation', { name: '分页' });
+    expect(pager).toHaveTextContent('第 1–50 项，共 60 项');
+    // The table is rebuilt for the new filter: look it up again.
+    const table = screen.getByRole('table', { name: '本体元素' });
+    expect(within(table).getAllByRole('rowgroup')).toHaveLength(3);
+    await user.click(within(pager).getByRole('button', { name: '下一页' }));
+    expect(pager).toHaveTextContent('第 51–60 项，共 60 项');
+    expect(within(table).getAllByRole('button', { name: /^steel:A\d\d/ })).toHaveLength(10);
+  });
+});
