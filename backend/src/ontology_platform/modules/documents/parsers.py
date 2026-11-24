@@ -1,6 +1,10 @@
 """Detect supported originals and extract pages in reading order."""
 
+import asyncio
+import json
+import logging
 import re
+import sys
 import zlib
 from dataclasses import dataclass
 from io import BytesIO
@@ -29,6 +33,15 @@ _TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types"
 # Bound parser memory independently of the compressed upload size.
 _MAX_EXPANDED_BYTES = 128 * 1024 * 1024
 _MAX_SHEET_CELLS = 1_000_000
+# A malformed file can make a parser loop or wait forever; the job queue must not wait with it.
+PARSE_TIMEOUT = 180.0
+PARSE_COMMAND: tuple[str, ...] = (
+    sys.executable,
+    "-m",
+    "ontology_platform.modules.documents.parsers",
+)
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -215,3 +228,66 @@ def parse_document(media_type: str, data: bytes) -> ParsedDocument:
     if not result.needs_vision and not any(page.text.strip() for page in result.pages):
         raise _unreadable()
     return result
+
+
+def _parse_timeout() -> AppError:
+    return AppError(422, "documents.parse_timeout", "Parsing the document took too long.")
+
+
+async def parse_isolated(media_type: str, data: bytes) -> ParsedDocument:
+    """`parse_document` in a child process that is killed after `PARSE_TIMEOUT` seconds.
+
+    Library code cannot be interrupted from a thread, and a hung parser would hold the only
+    worker while its heartbeat keeps the job alive.
+    """
+    process = await asyncio.create_subprocess_exec(
+        *PARSE_COMMAND,
+        media_type,
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    try:
+        async with asyncio.timeout(PARSE_TIMEOUT):
+            output, errors = await process.communicate(data)
+    except TimeoutError:
+        raise _parse_timeout() from None
+    finally:
+        # Also on cancellation, for example when the job was taken over by another execution.
+        if process.returncode is None:
+            process.kill()
+            await process.wait()
+    if process.returncode != 0:
+        logger.warning(
+            "Parser process exited with %s: %s",
+            process.returncode,
+            errors[-2000:].decode("utf-8", "replace"),
+        )
+        raise _unreadable()
+    result = json.loads(output)
+    if "error" in result:
+        error = result["error"]
+        raise AppError(error["status"], error["code"], error["detail"])
+    return ParsedDocument(
+        pages=[ParsedPage(number, text, heading) for number, text, heading in result["pages"]],
+        page_count=result["pageCount"],
+        needs_vision=result["needsVision"],
+    )
+
+
+def _main() -> None:
+    """Child process: media type as the argument, original on stdin, JSON result on stdout."""
+    try:
+        parsed = parse_document(sys.argv[1], sys.stdin.buffer.read())
+        result: dict[str, object] = {
+            "pages": [[page.number, page.text, page.heading] for page in parsed.pages],
+            "pageCount": parsed.page_count,
+            "needsVision": parsed.needs_vision,
+        }
+    except AppError as exc:
+        result = {"error": {"status": exc.status, "code": exc.code, "detail": exc.detail}}
+    sys.stdout.buffer.write(json.dumps(result, ensure_ascii=False).encode("utf-8"))
+
+
+if __name__ == "__main__":
+    _main()

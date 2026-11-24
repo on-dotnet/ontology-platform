@@ -10,11 +10,16 @@ from ontology_platform.errors import AppError
 from ontology_platform.modules.documents import service
 from ontology_platform.modules.documents.chunking import TextChunk, chunk_pages
 from ontology_platform.modules.documents.models import Chunk
-from ontology_platform.modules.documents.parsers import ParsedDocument, ParsedPage, parse_document
+from ontology_platform.modules.documents.parsers import ParsedDocument, ParsedPage, parse_isolated
 from ontology_platform.modules.documents.storage import DocumentStorage
-from ontology_platform.modules.jobs.runner import JobContext, RetryableJobError, register
+from ontology_platform.modules.jobs.runner import (
+    JobContext,
+    LeaseCheck,
+    RetryableJobError,
+    register,
+)
 
-type Extractor = Callable[[UUID], Awaitable[UUID | None]]
+type Extractor = Callable[[UUID, LeaseCheck], Awaitable[UUID | None]]
 type VisionTranscriber = Callable[[bytes], Awaitable[list[ParsedPage]]]
 
 _extractor: Extractor | None = None
@@ -22,7 +27,11 @@ _transcriber: VisionTranscriber | None = None
 
 
 def register_extractor(fn: Extractor | None) -> None:
-    """An extractor can persist set_change_set in its change-set creation transaction for replay."""
+    """An extractor can persist set_change_set in its change-set creation transaction for replay.
+
+    It must call the lease check in that transaction first: an execution that lost its job
+    must not add a change set whose evidence points at chunks a newer execution replaced.
+    """
     global _extractor
     _extractor = fn
 
@@ -36,7 +45,7 @@ async def _parse(
     storage: DocumentStorage, key: str, media_type: str
 ) -> tuple[ParsedDocument, list[TextChunk]]:
     data = await asyncio.to_thread(storage.open, key)
-    parsed = await asyncio.to_thread(parse_document, media_type, data)
+    parsed = await parse_isolated(media_type, data)
     pages = parsed.pages
     if parsed.needs_vision:
         if _transcriber is None:
@@ -88,7 +97,7 @@ async def _process(job: JobContext, storage: DocumentStorage, document_id: UUID)
         doc.status = "extracting"
         doc.progress = {"step": "parse", "done": 1, "total": 1}
 
-    change_set_id = await _extractor(document_id) if _extractor else None
+    change_set_id = await _extractor(document_id, job.check_lease) if _extractor else None
     async with job.session_factory.begin() as db:
         await job.check_lease(db)
         doc = await service.get_row(db, document_id)

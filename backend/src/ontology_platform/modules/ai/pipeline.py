@@ -27,7 +27,7 @@ from ontology_platform.modules.ai.gateway import AiError, InputFile, ModelGatewa
 from ontology_platform.modules.ai.prompts import TRANSCRIBE_INSTRUCTIONS, TranscriptOut
 from ontology_platform.modules.documents import service as documents
 from ontology_platform.modules.documents.parsers import ParsedPage
-from ontology_platform.modules.jobs.runner import RetryableJobError
+from ontology_platform.modules.jobs.runner import LeaseCheck, RetryableJobError
 from ontology_platform.modules.ontology import service as ontology
 from ontology_platform.modules.ontology.schemas import (
     ElementCopy,
@@ -125,10 +125,10 @@ def make_extractor(
     session_factory: async_sessionmaker[AsyncSession],
     gateway: ModelGateway,
     models: ExtractionModels,
-) -> Callable[[UUID], Awaitable[UUID | None]]:
+) -> Callable[[UUID, LeaseCheck], Awaitable[UUID | None]]:
     extractor = Extractor(gateway, models)
 
-    async def extract(document_id: UUID) -> UUID | None:
+    async def extract(document_id: UUID, check_lease: LeaseCheck) -> UUID | None:
         async with session_factory() as db:
             document = await documents.get(db, document_id)
             ontology_id, filename = document.ontology_id, document.filename
@@ -159,6 +159,8 @@ def make_extractor(
         items = [to_item(proposal, document_id) for proposal in proposals]
 
         async with session_factory.begin() as db:
+            # Lost the job to a newer execution: it rebuilt the chunks this evidence points at.
+            await check_lease(db)
             # The lock makes a replayed job reuse the change set instead of adding a second one.
             document = await documents.lock(db, document_id)
             if document.change_set_id is not None:

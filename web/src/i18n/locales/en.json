@@ -1068,7 +1068,8 @@
       "unsupported_type": "This file type is not supported. Upload a docx, xlsx, pdf, md or txt file.",
       "not_failed": "This document did not fail, so it does not need a retry.",
       "needs_ocr": "This document is a scan and its text cannot be extracted yet. Upload a version with selectable text.",
-      "unreadable": "No text could be read even after transcribing the scan. Check the file or upload a version with selectable text."
+      "unreadable": "No text could be read from this document. The file may be damaged, or a scan that still had no text after transcription. Check the file or upload a version with selectable text.",
+      "parse_timeout": "Reading this document took too long; the file may be damaged. Check it, or save a new copy and upload that."
     },
     "ai": {
       "not_configured": "The AI service is not configured. The document is saved; ask your platform administrator to configure it, then retry.",
