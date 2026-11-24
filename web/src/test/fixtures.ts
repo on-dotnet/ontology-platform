@@ -1,5 +1,5 @@
 import type { DocumentInfo } from '@/features/documents/api';
-import type { Element, ElementDetail, ImportResult, OntologySummary } from '@/features/ontologies/api';
+import type { Element, ElementDetail, ElementRef, Impact, ImportResult, OntologySummary } from '@/features/ontologies/api';
 import type { ReleaseSummary } from '@/features/releases/api';
 import { countDecisions, type ChangeItem, type ChangeSetDetail } from '@/features/review/api';
 
@@ -150,6 +150,7 @@ export function changeSetFixture(items: ChangeItem[], overrides: Partial<ChangeS
     documentId: 'doc-converter',
     status: 'open',
     counts: countDecisions(items),
+    createdBy: null,
     createdAt: CREATED_AT,
     mergedAt: null,
     items,
@@ -169,5 +170,20 @@ export function releaseFixture(overrides: Partial<ReleaseSummary> = {}): Release
     createdBy: null,
     createdAt: CREATED_AT,
     ...overrides,
+  };
+}
+
+/** What refers to an element: nothing unless the overrides say so. */
+export function impactFixture(elementId: string, overrides: Partial<Impact> = {}): Impact {
+  return { elementId, subtypes: [], relations: [], properties: [], constraints: [], axioms: [], inverse: null, cascade: [], ...overrides };
+}
+
+/** How an impact names an element: its Chinese, English or local name, or an axiom's Turtle. */
+export function elementRefFixture(element: Element): ElementRef {
+  return {
+    id: element.id,
+    kind: element.kind,
+    label: element.labelZh ?? element.labelEn ?? element.localName ?? element.turtle ?? '',
+    iri: element.iri,
   };
 }

@@ -1,4 +1,4 @@
-import { Search, X } from 'lucide-react';
+import { RotateCcw, Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -11,8 +11,20 @@ import { Input } from '@/components/ui/input';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip } from '@/components/ui/tooltip';
-import { displayName, ELEMENT_KINDS, elementName, turtleSummary, useElements, type Element, type ElementKind } from '@/features/ontologies/api';
+import { usePermissions } from '@/features/auth/permissions';
+import {
+  displayName,
+  ELEMENT_KINDS,
+  elementName,
+  turtleSummary,
+  useElements,
+  type Element,
+  type ElementKind,
+  type ElementStatusFilter,
+} from '@/features/ontologies/api';
 import { cn } from '@/lib/cn';
+
+import { useRestoreElement } from './edit-actions';
 
 /** Search waits this long after the last keystroke. */
 export const SEARCH_DEBOUNCE_MS = 300;
@@ -26,17 +38,21 @@ export const kindTone: Record<ElementKind, BadgeTone> = {
 };
 
 type KindFilter = ElementKind | 'all';
+const STATUS_FILTERS: readonly ElementStatusFilter[] = ['active', 'deprecated', 'all'];
 
 interface ElementListProps {
   ontologyId: string;
   onSelect: (elementId: string) => void;
 }
 
-/** Elements filtered by kind and searched by name or synonym (server side). */
+/** Elements filtered by kind and status and searched by name or synonym (server side); deleted ones can be restored. */
 export function ElementList({ ontologyId, onSelect }: ElementListProps) {
   const { t, i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? i18n.language;
+  const { canUpload } = usePermissions();
   const [kind, setKind] = useState<KindFilter>('all');
+  // In-use elements by default, like the server.
+  const [status, setStatus] = useState<ElementStatusFilter>('active');
   const [text, setText] = useState('');
   const [q, setQ] = useState('');
 
@@ -45,16 +61,20 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
     return () => window.clearTimeout(timer);
   }, [text]);
 
-  const query = useElements(ontologyId, { ...(kind === 'all' ? {} : { kind }), ...(q ? { q } : {}) });
+  const query = useElements(ontologyId, { ...(kind === 'all' ? {} : { kind }), ...(q ? { q } : {}), ...(status === 'active' ? {} : { status }) });
   // Names of the types constraints target and of the elements axioms belong to.
   const everything = useElements(ontologyId);
+  const { restore, pendingId } = useRestoreElement(ontologyId);
   const byId = new Map((everything.data ?? []).map((element) => [element.id, element]));
   const nameOf = (id: string | null) => {
     if (!everything.isSuccess) return null;
     const element = id ? byId.get(id) : undefined;
     return element ? elementName(element, language) : undefined;
   };
-  const filtered = kind !== 'all' || q !== '';
+  const filtered = kind !== 'all' || q !== '' || status !== 'active';
+  // Only deleted rows have an action: restoring them.
+  const showActions = canUpload && status !== 'active';
+  const statusLabel = (value: ElementStatusFilter) => t(`ontologyPage.list.status.${value}`);
 
   const clearSearch = () => {
     setText('');
@@ -74,6 +94,13 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
             ...ELEMENT_KINDS.map((value) => ({ value, label: t(`kinds.${value}`) })),
           ]}
         />
+        <SegmentedControl
+          legend={t('ontologyPage.list.statusFilter')}
+          hideLegend
+          value={status}
+          onValueChange={setStatus}
+          options={STATUS_FILTERS.map((value) => ({ value, label: statusLabel(value) }))}
+        />
         <div className="relative ml-auto w-full sm:w-72">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
           <Input
@@ -90,6 +117,11 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
             {kind !== 'all' ? (
               <li>
                 <FilterChip label={t('ontologyPage.list.kindChip', { kind: t(`kinds.${kind}`) })} onRemove={() => setKind('all')} />
+              </li>
+            ) : null}
+            {status !== 'active' ? (
+              <li>
+                <FilterChip label={t('ontologyPage.list.statusChip', { status: statusLabel(status) })} onRemove={() => setStatus('active')} />
               </li>
             ) : null}
             {q ? (
@@ -118,6 +150,7 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
                   <TableHead>{t('ontologyPage.list.columns.kind')}</TableHead>
                   <TableHead>{t('ontologyPage.list.columns.localName')}</TableHead>
                   <TableHead>{t('ontologyPage.list.columns.definition')}</TableHead>
+                  {showActions ? <TableHead className="w-px whitespace-nowrap">{t('ontologyPage.list.columns.actions')}</TableHead> : null}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -127,12 +160,32 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
                       <NameCell element={element} language={language} nameOf={nameOf} onSelect={onSelect} />
                     </TableCell>
                     <TableCell>
-                      <Badge tone={kindTone[element.kind]}>{t(`kind.${element.kind}`)}</Badge>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <Badge tone={kindTone[element.kind]}>{t(`kind.${element.kind}`)}</Badge>
+                        {element.status === 'deprecated' ? <Badge tone="warning">{t('ontologyPage.detail.deprecated')}</Badge> : null}
+                      </div>
                     </TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground">{element.localName ?? '—'}</TableCell>
                     <TableCell className="max-w-md">
                       <p className="line-clamp-2 text-muted-foreground">{element.definitionZh ?? element.definitionEn ?? '—'}</p>
                     </TableCell>
+                    {showActions ? (
+                      <TableCell className="whitespace-nowrap">
+                        {element.status === 'deprecated' ? (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            aria-label={t('ontologyPage.list.restoreElement', { name: elementName(element, language) || t('kind.axiom') })}
+                            loading={pendingId === element.id}
+                            disabled={pendingId !== undefined && pendingId !== element.id}
+                            onClick={() => restore(element)}
+                          >
+                            <RotateCcw aria-hidden />
+                            {t('ontologyPage.edit.restore')}
+                          </Button>
+                        ) : null}
+                      </TableCell>
+                    ) : null}
                   </TableRow>
                 ))}
               </TableBody>

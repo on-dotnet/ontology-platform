@@ -553,10 +553,19 @@
         "name": "Name",
         "kind": "Kind",
         "localName": "Local name",
-        "definition": "Definition"
+        "definition": "Definition",
+        "actions": "Actions"
       },
       "target": "Target: {{name}}",
-      "subject": "Belongs to: {{name}}"
+      "subject": "Belongs to: {{name}}",
+      "statusFilter": "Filter by status",
+      "status": {
+        "active": "In use",
+        "deprecated": "Deleted",
+        "all": "All"
+      },
+      "statusChip": "Status: {{status}}",
+      "restoreElement": "Restore {{name}}"
     },
     "detail": {
       "deprecated": "Deleted",
@@ -590,7 +599,110 @@
     "newOntology": "New ontology",
     "importOwl": "Import OWL",
     "importOwlFile": "Import an OWL file",
-    "created": "Ontology “{{name}}” created"
+    "created": "Ontology “{{name}}” created",
+    "edit": {
+      "create": "New",
+      "edit": "Edit",
+      "delete": "Delete",
+      "restore": "Restore",
+      "save": "Save",
+      "submitForReview": "Submit for review",
+      "saved": "Saved",
+      "deleted": "Deleted {{name}}",
+      "restored": "Restored {{name}}",
+      "restoreFailed": "Not restored",
+      "submitted": "Submitted for review; it takes effect once approved",
+      "goReview": "Go to review"
+    },
+    "form": {
+      "createTitle": {
+        "entity_type": "New object type",
+        "relation_type": "New relation",
+        "property": "New property",
+        "constraint": "New constraint"
+      },
+      "editTitle": "Edit {{name}}",
+      "appliesDescription": "Changes take effect as soon as you save.",
+      "reviewDescription": "Saving creates a change set; it takes effect once reviewed.",
+      "nothingChanged": "Nothing has been changed yet.",
+      "staleTitle": "Someone else changed this element",
+      "staleDescription": "Reload to get the latest version. Your changes here are not kept; make them again on the latest version.",
+      "reload": "Reload",
+      "failedTitle": "Not saved",
+      "noInverse": "No inverse relation",
+      "localNameInfoLabel": "About the local name",
+      "localNameHintPascal": "Used in the IRI, in PascalCase such as SteelSlab. Suggested from the English name; you can change it.",
+      "localNameHintCamel": "Used in the IRI, in camelCase such as producedBy. Suggested from the English name; you can change it.",
+      "localNameFixed": "The local name fixes the IRI and cannot change after creation.",
+      "errors": {
+        "localNameTooLong": "Use at most 128 characters",
+        "targetRequired": "Choose the target object type",
+        "pathRequired": "Choose a property or relation",
+        "countInvalid": "Enter 0 or a positive whole number",
+        "countOrder": "The maximum cannot be less than the minimum",
+        "lengthInvalid": "Enter 0 or a positive whole number",
+        "lengthOrder": "The maximum length cannot be less than the minimum length",
+        "integerValue": "Enter a whole number",
+        "numberValue": "Enter a number",
+        "flagsInvalid": "Use only the flags s, m, i, x and q"
+      },
+      "rules": {
+        "title": "Rules",
+        "add": "Add rule",
+        "remove": "Remove rule {{n}}",
+        "ruleTitle": "Rule {{n}}",
+        "choosePath": "Choose a property or relation",
+        "any": "Any",
+        "minCount": "Minimum count",
+        "maxCount": "Maximum count",
+        "classRef": "Value object type",
+        "allowedValues": "Allowed values",
+        "allowedValuesPlaceholder": "One value per line",
+        "minValue": "Minimum value",
+        "maxValue": "Maximum value",
+        "minValueMode": "Whether the minimum itself is allowed",
+        "maxValueMode": "Whether the maximum itself is allowed",
+        "inclusive": "Inclusive",
+        "exclusive": "Exclusive",
+        "minLength": "Minimum length",
+        "maxLength": "Maximum length",
+        "pattern": "Regular expression",
+        "flags": "Regex flags",
+        "flagsPlaceholder": "e.g. i",
+        "messageZh": "Chinese message",
+        "messageEn": "English message"
+      }
+    },
+    "impact": {
+      "title": "Referenced by",
+      "none": "No other element refers to it.",
+      "groups": {
+        "subtypes": "Subtypes ({{count}})",
+        "relations": "Relations ({{count}})",
+        "properties": "Properties ({{count}})",
+        "constraints": "Constraints ({{count}})",
+        "axioms": "Axioms ({{count}})",
+        "inverse": "Inverse relation"
+      }
+    },
+    "delete": {
+      "title": "Delete {{name}}?",
+      "description": "Once deleted it is no longer exported or listed by default; you can restore it later from Deleted in the list.",
+      "noImpact": "No other element refers to it; only this element is deleted.",
+      "impactTitle_one": "{{count}} element refers to it",
+      "impactTitle_other": "{{count}} elements refer to it",
+      "impactDescription": "They are handled as listed below, and so is whatever refers to them. Restoring it later does not undo these changes.",
+      "deletedLabel": "Also deleted ({{count}})",
+      "changedLabel": "References removed ({{count}})",
+      "effects": {
+        "parentCleared": "Parent type cleared",
+        "inverseCleared": "Inverse relation cleared",
+        "rulesRemoved": "Rules using it removed"
+      },
+      "confirm": "Delete",
+      "failedTitle": "Not deleted",
+      "staleDescription": "Reload to see the latest references, then confirm again."
+    }
   },
   "releases": {
     "publishNew": "Publish new release",
@@ -725,7 +837,9 @@
       "key_taken": "An ontology with this identifier already exists. Choose another name and try again."
     },
     "element": {
-      "not_found": "This element does not exist or was deleted."
+      "not_found": "This element does not exist or was deleted.",
+      "stale": "Someone else changed this element. Refresh and make your change again.",
+      "name_taken": "The local name or IRI is taken, possibly by a deleted element. Choose another one."
     },
     "changeset": {
       "not_found": "The change set does not exist or was deleted.",
@@ -735,7 +849,8 @@
       "stale_target": "the target element changed after the change set was created",
       "dependency_skipped": "an item it refers to was rejected or skipped",
       "invalid_item": "its content is incomplete or invalid",
-      "has_dependents": "other elements still refer to it, so it was not deleted"
+      "has_dependents": "other elements still refer to it, so it was not deleted",
+      "self_review": "Separate review mode is on: another reviewer must decide change sets you submitted."
     },
     "release": {
       "not_found": "The release does not exist or was deleted.",
@@ -773,6 +888,10 @@
       "too_many_triples": "The file has more than 50,000 triples. Split it and import the parts.",
       "empty": "The file has no content. Check it and choose another file.",
       "axiom_too_large": "One axiom in the file is too long (over two million characters) for the platform to keep. Split it and import again."
+    },
+    "axiom": {
+      "invalid": "The fragment does not parse, is not exactly one axiom, or the ontology already has it. Check it and save again.",
+      "maps_to_element": "The forms can express this content. Edit it on the element instead."
     }
   },
   "rules": {

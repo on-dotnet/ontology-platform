@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { Download, Ellipsis, FilePlus, FileUp, List, Network, Workflow } from 'lucide-react';
+import { ArrowRightLeft, Box, ChevronDown, Download, Ellipsis, FilePlus, FileUp, List, Network, Plus, ShieldCheck, Tag, Workflow, type LucideIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -30,10 +30,19 @@ import { useErrorMessage } from '@/i18n/error-message';
 import { downloadText } from '@/lib/download';
 
 import { ElementDetailSheet } from './element-detail-sheet';
+import { FORM_KINDS, type FormKind } from './element-form';
+import { ElementFormDialog } from './element-form-dialog';
 import { ElementList } from './element-list';
 import { GraphView } from './graph-view';
 
 export type OntologyView = 'graph' | 'list';
+
+const kindIcons: Record<FormKind, LucideIcon> = {
+  entity_type: Box,
+  relation_type: ArrowRightLeft,
+  property: Tag,
+  constraint: ShieldCheck,
+};
 
 interface OntologyPageProps {
   ontologyId: string | undefined;
@@ -52,6 +61,8 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
   // Which create method the "new ontology" dialog opens with; null while it is closed.
   const [creating, setCreating] = useState<CreateMethod | null>(null);
   const [importing, setImporting] = useState(false);
+  // The kind of element being created by hand; null while the form is closed.
+  const [newKind, setNewKind] = useState<FormKind | null>(null);
 
   const switchOntology = (id: string) => {
     setElementId(null);
@@ -114,6 +125,26 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              {canUpload ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className={buttonVariants({ variant: 'primary' })}>
+                    <Plus aria-hidden />
+                    {t('ontologyPage.edit.create')}
+                    <ChevronDown aria-hidden />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="min-w-44">
+                    {FORM_KINDS.map((kind) => {
+                      const Icon = kindIcons[kind];
+                      return (
+                        <DropdownMenuItem key={kind} onClick={() => setNewKind(kind)}>
+                          <Icon aria-hidden />
+                          {t(`kind.${kind}`)}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : null}
             </>
           ) : null
         }
@@ -174,6 +205,7 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
             onImported={(result) => switchOntology(result.ontology.id)}
           />
           {selected ? <ImportOwlDialog ontology={selected} open={importing} onOpenChange={setImporting} /> : null}
+          {selected ? <ElementFormDialog ontologyId={selected.id} target={newKind ? { kind: newKind } : null} onClose={() => setNewKind(null)} /> : null}
         </>
       ) : null}
     </>

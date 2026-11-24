@@ -173,6 +173,93 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ontologies/{id}/turtle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Edit Turtle
+         * @description Expert mode: compare the edited Turtle of the whole working version with it; the
+         *     differences become a manual change set that always goes to review.
+         */
+        post: operations["edit_turtle_api_ontologies__id__turtle_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/edits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Save Edits
+         * @description Save changes made by hand as a manual change set. With `apply`, a user who may review
+         *     their own changes (admin or reviewer, single review mode) merges it at once; any item that
+         *     would be skipped rolls everything back (409 `element.stale` or the item's code). Otherwise
+         *     the change set stays open for review. 409 `element.stale` when a target moved on since it
+         *     was read, `element.name_taken` for a taken local name or IRI; 422 `axiom.invalid` and
+         *     `axiom.maps_to_element` for axiom fragments.
+         */
+        post: operations["save_edits_api_ontologies__id__edits_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/elements/{elementId}/impact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Impact
+         * @description What refers to an element: subtypes, relations and properties, constraints, axioms, and
+         *     its inverse. Deleting it takes these along (spec 002, section 6).
+         */
+        get: operations["get_impact_api_ontologies__id__elements__elementId__impact_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/settings/platform": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Platform Settings
+         * @description Settings every page may need: the review mode.
+         */
+        get: operations["get_platform_settings_api_settings_platform_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ontologies/{id}": {
         parameters: {
             query?: never;
@@ -331,7 +418,8 @@ export interface paths {
          * Update Item
          * @description Decide, edit or annotate one item. `edited` is checked against the item's kind
          *     (422 `changeset.invalid_edit`); a merged or rejected change set answers 409
-         *     `changeset.closed`.
+         *     `changeset.closed`; in separate review mode, 403 `changeset.self_review` for a decision or
+         *     an edit on one's own change set.
          */
         patch: operations["update_item_api_change_sets__id__items__itemId__patch"];
         trace?: never;
@@ -347,7 +435,7 @@ export interface paths {
         put?: never;
         /**
          * Decide Items
-         * @description Apply one decision to several items.
+         * @description Apply one decision to several items (403 `changeset.self_review` as for one item).
          */
         post: operations["decide_items_api_change_sets__id__decisions_post"];
         delete?: never;
@@ -368,7 +456,8 @@ export interface paths {
         /**
          * Merge Change Set
          * @description Apply the accepted items in one transaction and report the skipped ones. Answers 409
-         *     `changeset.pending_items` while any item is undecided.
+         *     `changeset.pending_items` while any item is undecided, 403 `changeset.self_review` in
+         *     separate review mode for one's own change set.
          */
         post: operations["merge_change_set_api_change_sets__id__merge_post"];
         delete?: never;
@@ -388,7 +477,8 @@ export interface paths {
         put?: never;
         /**
          * Reject Change Set
-         * @description Reject the whole change set.
+         * @description Reject the whole change set. Reviewers may reject any; its creator may withdraw their
+         *     own (403 `auth.forbidden` otherwise).
          */
         post: operations["reject_change_set_api_change_sets__id__reject_post"];
         delete?: never;
@@ -670,6 +760,18 @@ export interface components {
              */
             decision: "pending" | "accepted" | "rejected";
         };
+        /**
+         * CascadeChange
+         * @description What deleting an element does to another one: delete it, or update it to let go.
+         */
+        CascadeChange: {
+            /**
+             * Op
+             * @enum {string}
+             */
+            op: "delete" | "update";
+            element: components["schemas"]["ElementRef"];
+        };
         /** ChangeItem */
         ChangeItem: {
             /**
@@ -745,6 +847,8 @@ export interface components {
              */
             status: "open" | "merged" | "rejected";
             counts: components["schemas"]["DecisionCounts"];
+            /** Createdby */
+            createdBy: string | null;
             /**
              * Createdat
              * Format: date-time
@@ -782,6 +886,8 @@ export interface components {
              */
             status: "open" | "merged" | "rejected";
             counts: components["schemas"]["DecisionCounts"];
+            /** Createdby */
+            createdBy: string | null;
             /**
              * Createdat
              * Format: date-time
@@ -967,6 +1073,51 @@ export interface components {
             done: number;
             /** Total */
             total: number;
+        };
+        /**
+         * EditItem
+         * @description One change made by hand. update, delete and restore name their target and the revision
+         *     the user read (409 `element.stale` when it moved on).
+         */
+        EditItem: {
+            /**
+             * Op
+             * @enum {string}
+             */
+            op: "create" | "update" | "delete" | "restore";
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            /** Targetelementid */
+            targetElementId?: string | null;
+            /** Targetrevision */
+            targetRevision?: number | null;
+            /** Tempref */
+            tempRef?: string | null;
+            fields?: components["schemas"]["ElementFields"];
+        };
+        /** EditRequest */
+        EditRequest: {
+            /** Items */
+            items: components["schemas"]["EditItem"][];
+            /**
+             * Apply
+             * @default false
+             */
+            apply: boolean;
+        };
+        /** EditResult */
+        EditResult: {
+            /**
+             * Changesetid
+             * Format: uuid
+             */
+            changeSetId: string;
+            /** Merged */
+            merged: boolean;
+            merge: components["schemas"]["MergeResult"] | null;
         };
         /** Element */
         Element: {
@@ -1182,6 +1333,23 @@ export interface components {
             /** Turtle */
             turtle?: string | null;
         };
+        /** ElementRef */
+        ElementRef: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            /** Label */
+            label: string;
+            /** Iri */
+            iri: string | null;
+        };
         /** Evidence */
         Evidence: {
             /**
@@ -1259,6 +1427,31 @@ export interface components {
              * @constant
              */
             status: "ok";
+        };
+        /**
+         * Impact
+         * @description Active elements that refer to one element (spec 002, section 9), and everything a delete
+         *     of it would change, transitively, as a manual save proposes it (section 6).
+         */
+        Impact: {
+            /**
+             * Elementid
+             * Format: uuid
+             */
+            elementId: string;
+            /** Subtypes */
+            subtypes: components["schemas"]["ElementRef"][];
+            /** Relations */
+            relations: components["schemas"]["ElementRef"][];
+            /** Properties */
+            properties: components["schemas"]["ElementRef"][];
+            /** Constraints */
+            constraints: components["schemas"]["ElementRef"][];
+            /** Axioms */
+            axioms: components["schemas"]["ElementRef"][];
+            inverse: components["schemas"]["ElementRef"] | null;
+            /** Cascade */
+            cascade: components["schemas"]["CascadeChange"][];
         };
         /** ImportCounts */
         ImportCounts: {
@@ -1411,6 +1604,14 @@ export interface components {
              */
             updatedAt: string;
         };
+        /** PlatformSettings */
+        PlatformSettings: {
+            /**
+             * Reviewmode
+             * @enum {string}
+             */
+            reviewMode: "single" | "separate";
+        };
         /** Problem */
         Problem: {
             /**
@@ -1554,6 +1755,14 @@ export interface components {
             lang: "zh" | "en";
             /** Text */
             text: string;
+        };
+        /**
+         * TurtleEdit
+         * @description The whole working version as edited in expert mode.
+         */
+        TurtleEdit: {
+            /** Turtle */
+            turtle: string;
         };
         /** UserInfo */
         UserInfo: {
@@ -2032,6 +2241,245 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ImportParseProblem"];
+                };
+            };
+        };
+    };
+    edit_turtle_api_ontologies__id__turtle_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TurtleEdit"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Content Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Invalid request, or the file is not valid Turtle / RDF/XML */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ImportParseProblem"];
+                };
+            };
+        };
+    };
+    save_edits_api_ontologies__id__edits_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EditResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    get_impact_api_ontologies__id__elements__elementId__impact_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                elementId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Impact"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    get_platform_settings_api_settings_platform_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformSettings"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
         };
