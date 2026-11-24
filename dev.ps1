@@ -83,29 +83,43 @@ function New-TempName([string]$Purpose) { "op-tmp-$Purpose-$([guid]::NewGuid().T
 
 function Get-NormalizedPath([string]$Path) { [IO.Path]::GetFullPath($Path).TrimEnd('\', '/').ToLowerInvariant() }
 
-# Every git worktree of this repository with its image tag: "local" for the main checkout,
-# "<folder>-<path hash>" for the others, so two workspaces never share an image name.
+# Image tag of a workspace other than the main checkout: "<folder>-<path hash>".
+$WorktreeTagPattern = '^[a-z0-9_][a-z0-9_.-]*-[0-9a-f]{8}$'
+function Get-WorktreeTag([string]$Path) {
+    $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($Path))).Substring(0, 8).ToLowerInvariant()
+    $folder = ((Split-Path -Leaf $Path) -replace '[^a-z0-9_.-]', '-').TrimStart('.', '-')
+    if (-not $folder) { $folder = 'wt' }
+    return "$($folder.Substring(0, [Math]::Min(40, $folder.Length)))-$hash"
+}
+
+# Every git worktree of this repository, main checkout first, with its image tag: "local" for the
+# main checkout, Get-WorktreeTag for the others. Empty when git cannot list them.
 function Get-Workspaces {
-    $paths = @(git -C $Root worktree list --porcelain 2>$null | Where-Object { $_ -like 'worktree *' } | ForEach-Object { $_.Substring(9) })
+    # git prints paths as UTF-8; decode them as such so non-ASCII folders compare correctly.
+    $previousConsole = [Console]::OutputEncoding
+    [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+    try {
+        $lines = @(git -C $Root worktree list --porcelain 2>$null)
+        $code = $LASTEXITCODE
+    } finally {
+        [Console]::OutputEncoding = $previousConsole
+    }
+    if ($code -ne 0) { return }
+    $paths = @($lines | Where-Object { $_ -like 'worktree *' } | ForEach-Object { Get-NormalizedPath $_.Substring(9) })
     for ($i = 0; $i -lt $paths.Count; $i++) {
-        $path = Get-NormalizedPath $paths[$i]
-        $tag = 'local'
-        if ($i -gt 0) {
-            $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($path))).Substring(0, 8).ToLowerInvariant()
-            $folder = ((Split-Path -Leaf $path) -replace '[^a-z0-9_.-]', '-').TrimStart('.', '-')
-            $tag = "$($folder.Substring(0, [Math]::Min(40, $folder.Length)))-$hash"
-        }
-        [pscustomobject]@{ Path = $path; Tag = $tag }
+        [pscustomobject]@{ Path = $paths[$i]; Tag = ($i -eq 0 ? 'local' : (Get-WorktreeTag $paths[$i])) }
     }
 }
 
+# "local" only when this is provably the main checkout; anything else gets its own tag, so a
+# worktree never falls back to (and overwrites) the main checkout's images.
 function Get-ImageTag {
     $configured = Get-Setting 'OP_IMAGE_TAG' ''
     if ($configured) { return $configured }
     $here = Get-NormalizedPath $Root
-    $workspace = Get-Workspaces | Where-Object { $_.Path -eq $here } | Select-Object -First 1
-    if ($workspace) { return $workspace.Tag }
-    return 'local'
+    $main = Get-Workspaces | Select-Object -First 1
+    if ($main -and $main.Path -eq $here) { return 'local' }
+    return Get-WorktreeTag $here
 }
 
 $ImageTag = Get-ImageTag
@@ -263,14 +277,23 @@ function Invoke-Parallel([string[]]$Commands, [string]$LogDir) {
     Write-Step "同时运行 $($Commands -join '、')（日志在 $logs）"
     $outcomes = @{}
     $pending = @($jobs.Values)
-    while ($pending.Count -gt 0) {
-        $job = Wait-Job -Job $pending -Any
-        $outcome = Receive-Job -Job $job -ErrorAction SilentlyContinue | Select-Object -Last 1
-        if (-not $outcome -or $null -eq $outcome.Code) { $outcome = [pscustomobject]@{ Code = 1; Seconds = 0 } }
-        $outcomes[$job.Name] = $outcome
-        Remove-Job -Job $job
-        $pending = @($pending | Where-Object { $_.Id -ne $job.Id })
-        Write-Host "  完成  $($job.Name)：退出码 $($outcome.Code)，$($outcome.Seconds) 秒"
+    try {
+        while ($pending.Count -gt 0) {
+            $job = Wait-Job -Job $pending -Any
+            $outcome = Receive-Job -Job $job -ErrorAction SilentlyContinue | Select-Object -Last 1
+            if (-not $outcome -or $null -eq $outcome.Code) { $outcome = [pscustomobject]@{ Code = 1; Seconds = 0 } }
+            $outcomes[$job.Name] = $outcome
+            Remove-Job -Job $job
+            $pending = @($pending | Where-Object { $_.Id -ne $job.Id })
+            Write-Host "  完成  $($job.Name)：退出码 $($outcome.Code)，$($outcome.Seconds) 秒"
+        }
+    } finally {
+        # Interrupted (Ctrl+C): in a console the child processes get the same Ctrl+C and clean up
+        # their own temporary containers; elsewhere they may still be running.
+        if ($pending.Count -gt 0) {
+            $pending | Remove-Job -Force -ErrorAction SilentlyContinue
+            Write-Note "已中断：$(@($pending.Name) -join '、') 的子进程可能仍在运行（日志在 $logs）；重跑前用 docker ps --filter name=op-tmp- 确认临时容器已退出"
+        }
     }
     $codes = [ordered]@{}
     foreach ($command in $Commands) {
@@ -489,15 +512,22 @@ function Invoke-InitEnv {
 # removes the tags of workspaces that no longer exist. Never prunes and never forces: an image a
 # container still uses stays.
 function Invoke-Images([switch]$Clean) {
+    $workspaces = @(Get-Workspaces)
+    if ($workspaces.Count -eq 0) { Stop-Dev 'git worktree list 失败，无法判断哪些工作区还在；未做任何改动' }
     $owners = @{}
-    foreach ($workspace in Get-Workspaces) { $owners[$workspace.Tag] = $workspace.Path }
-    if (-not $owners.ContainsKey($ImageTag)) { $owners[$ImageTag] = '（当前，OP_IMAGE_TAG）' }
+    foreach ($workspace in $workspaces) { $owners[$workspace.Tag] = $workspace.Path }
+    if (-not $owners.ContainsKey($ImageTag)) { $owners[$ImageTag] = '（当前工作区）' }
     $stale = @()
     foreach ($row in @(docker image ls --filter 'reference=ontology/*' --format '{{.Repository}}:{{.Tag}}|{{.Size}}|{{.CreatedSince}}')) {
         if ($row -notmatch '^(ontology/[^:|]+):([^|]+)\|([^|]*)\|(.*)$') { continue }
-        $name = "$($Matches[1]):$($Matches[2])"
-        $owner = $owners[$Matches[2]]
-        if (-not $owner) { $stale += $name; $owner = '已不存在的工作区' }
+        $tag = $Matches[2]
+        $name = "$($Matches[1]):$tag"
+        $owner = $owners[$tag]
+        if (-not $owner) {
+            # Only tags in the generated worktree format are ours to clean; "local", tags set with
+            # OP_IMAGE_TAG by other sessions and <none> stay.
+            if ($tag -cmatch $WorktreeTagPattern) { $stale += $name; $owner = '已不存在的工作区' } else { $owner = '其他标签，不清理' }
+        }
         Write-Host ('{0,-58} {1,9}  {2,-20} {3}' -f $name, $Matches[3], $Matches[4], $owner)
     }
     if (-not $Clean) {

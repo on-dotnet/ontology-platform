@@ -45,9 +45,12 @@
 
 1. 每个会话一个 worktree、一条分支，例如 `git worktree add ../op-feat-x -b feat/x origin/main`。Claude Code 的会话默认就建在 `.claude/worktrees/` 下的独立 worktree 里。
 2. 构建和测试的镜像带工作区标签：主检出目录是 `local`，其他 worktree 是"目录名-路径哈希"（例如 `ontology/test-api:faster-gate-354080-21e96cdc`），由 `dev.ps1` 按所在目录算出，也可以用 `OP_IMAGE_TAG` 指定。两个工作区同时跑 `test-api`、`test-web`、`ci`，各用各的镜像和临时数据库，结果只取决于各自的代码。
-3. 开发栈（`up`、`status`、`psql`）只有一套，postgres 和数据卷共用：同一时间只让一个工作区运行 `./dev.ps1 up`，最后一次 `up` 的工作区决定开发栈跑的是哪份代码。
-   本机私有配置 `.env.local` 不在 Git 里，新 worktree 里没有：跑测试和门禁不需要它；要在 worktree 里 `up`、`ai-check`、`eval`，由用户本人把主检出目录里的那份复制过去，否则开发栈会以"AI 未配置"启动。
-4. worktree 删掉以后，它的镜像标签会留下。`./dev.ps1 images` 列出本项目的镜像（`ontology/*`）及所属工作区，`./dev.ps1 clean-images` 删除已不存在的工作区的标签。它只删 `ontology/*` 的标签，不 prune、不强制删除，仍有容器在用的镜像会保留。
+3. 开发栈（`up`、`status`、`psql`）只有一套，postgres 和数据卷共用：同一时间只让一个工作区运行 `./dev.ps1 up`，最后一次 `up` 的工作区决定开发栈跑的是哪份代码。测试的临时库也建在这个 postgres 里，所以：
+   - 别在有人跑测试时运行 `./dev.ps1 down`：它会停掉共用的 postgres，并删掉同一 compose 项目下的一次性容器，其他工作区正在跑的测试会中断。
+   - 每次 `test-api` 都会 `up -d postgres`。哪个工作区的 postgres 配置（`compose.yaml` 里的 postgres 服务，或 `OP_POSTGRES_PASSWORD` 等设置）和正在运行的不同，就会重建共用的 postgres 容器（数据卷保留），同样会打断别人。改 postgres 服务定义的分支，测试时先确认没有别的会话在跑。
+4. 本机私有配置 `.env.local` 不在 Git 里，新 worktree 里没有。主检出目录的这份没有改 `OP_POSTGRES_PASSWORD`、`OP_DOCKER_CONTEXT`、`OP_MIRROR` 时，跑测试和门禁不需要它；改了的话，由用户本人把它复制到 worktree，否则 worktree 会用默认值，触发上一条的重建或连错主机。要在 worktree 里 `up`、`ai-check`、`eval` 也需要复制，否则开发栈会以"AI 未配置"启动。
+5. worktree 删掉以后，它的镜像标签会留下。`./dev.ps1 images` 列出本项目的镜像（`ontology/*`）及所属工作区，`./dev.ps1 clean-images` 删除已不存在的工作区的标签。它只删符合"目录名-8 位哈希"格式、且不属于任何现存工作区的 `ontology/*` 标签；`local`、用 `OP_IMAGE_TAG` 指定的标签和 `<none>` 一律不动；`git worktree list` 失败时什么也不删；不 prune、不强制删除，仍有容器在用的镜像会保留。
+6. `ci`、`test` 被 Ctrl+C 中断时，在控制台里子进程会收到同一个中断并清理自己的临时容器；在别的环境里子进程可能还在跑，重跑前用 `docker ps --filter name=op-tmp-` 确认。
 
 ## Protégé 往返检查 `./dev.ps1 owl-check`
 

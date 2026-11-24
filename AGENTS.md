@@ -32,6 +32,7 @@ AI Native 的本体智能平台：用户把资料和数据交给平台，AI 识�
 ./dev.ps1 lock api    # 重新生成 backend/uv.lock（web 同理）
 ./dev.ps1 gen-api     # 由后端 OpenAPI 生成 web/src/api/schema.d.ts
 ./dev.ps1 ci -Report  # 完整门禁（三项同时跑），结果写成提交状态 local-ci
+./dev.ps1 images      # 列出本项目镜像及所属工作区
 ./dev.ps1 clean-images  # 删除已不存在的工作区留下的 ontology/* 镜像标签
 ```
 

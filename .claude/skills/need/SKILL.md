@@ -51,11 +51,12 @@ disable-model-invocation: true
 
 ## 5 验证与复审
 
-1. 按 verify 技能确定并运行必须的命令，贴出实际输出。失败就修，不跳过。
-2. L1、L2：把 `git diff origin/main...HEAD` 写到 `.verification/review.diff`，调用 `reviewer` 子代理复审。
-3. 必须修的改掉并重新验证；建议项改或在 PR 里说明不改的理由；疑问回答清楚。
-4. 界面改动按界面规范第 12 节走查，附深浅两种主题的截图。
-5. 全部改动提交并推送后，对当前 HEAD 运行 `./dev.ps1 ci -Report`，必须成功。
+顺序按 verify 技能第 3 节：
+
+1. L1、L2：把 `git diff origin/main...HEAD` 写到 `.verification/review.diff`，调用 `reviewer` 子代理复审；同时按 verify 技能第 2 节只跑受影响的测试，贴出实际输出。失败就修，不跳过。
+2. 必须修的改掉，只重跑受影响的测试，第二轮复审只看修改的部分；建议项改或在 PR 里说明不改的理由；疑问回答清楚。
+3. 界面改动按界面规范第 12 节走查，附深浅两种主题的截图。
+4. 复审没有必须修的项之后，全部改动提交并推送，对最终 HEAD 运行一次 `./dev.ps1 ci -Report`，必须成功。不在这之前手动跑后端全量。
 
 ## 6 转为可评审
 
