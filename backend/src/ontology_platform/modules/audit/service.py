@@ -8,6 +8,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.modules.audit.models import AuditEvent
+from ontology_platform.modules.audit.schemas import AuditEventInfo
 
 
 def record(
@@ -31,7 +32,9 @@ def record(
     db.add(event)
 
 
-async def recent(db: AsyncSession, *, prefixes: Sequence[str], limit: int = 10) -> list[AuditEvent]:
+async def recent(
+    db: AsyncSession, *, prefixes: Sequence[str], limit: int = 10
+) -> list[AuditEventInfo]:
     """The latest events whose action starts with one of `prefixes`, newest first."""
     statement = (
         select(AuditEvent)
@@ -39,4 +42,14 @@ async def recent(db: AsyncSession, *, prefixes: Sequence[str], limit: int = 10) 
         .order_by(AuditEvent.occurred_at.desc(), AuditEvent.id.desc())
         .limit(limit)
     )
-    return list(await db.scalars(statement))
+    return [
+        AuditEventInfo(
+            id=event.id,
+            occurred_at=event.occurred_at,
+            actor_id=event.actor_id,
+            action=event.action,
+            target_type=event.target_type,
+            target_id=event.target_id,
+        )
+        for event in await db.scalars(statement)
+    ]

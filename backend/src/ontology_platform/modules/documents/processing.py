@@ -50,7 +50,7 @@ async def _parse(
 async def _process(job: JobContext, storage: DocumentStorage, document_id: UUID) -> None:
     async with job.session_factory.begin() as db:
         await job.check_lease(db)
-        doc = await service.get(db, document_id)
+        doc = await service.get_row(db, document_id)
         if doc.status == "ready":
             return
         if doc.change_set_id is not None:
@@ -70,7 +70,7 @@ async def _process(job: JobContext, storage: DocumentStorage, document_id: UUID)
     parsed, chunks = await _parse(storage, key, media_type)
     async with job.session_factory.begin() as db:
         await job.check_lease(db)
-        doc = await service.get(db, document_id)
+        doc = await service.get_row(db, document_id)
         await db.execute(delete(Chunk).where(Chunk.document_id == document_id))
         db.add_all(
             Chunk(
@@ -91,7 +91,7 @@ async def _process(job: JobContext, storage: DocumentStorage, document_id: UUID)
     change_set_id = await _extractor(document_id) if _extractor else None
     async with job.session_factory.begin() as db:
         await job.check_lease(db)
-        doc = await service.get(db, document_id)
+        doc = await service.get_row(db, document_id)
         doc.change_set_id = change_set_id
         doc.status = "ready"
 

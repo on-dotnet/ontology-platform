@@ -408,13 +408,12 @@ async def test_interface_functions_for_other_modules(db: AsyncSession) -> None:
     heat = proposal("create", "entity_type", local_name="Heat", label_zh="炉次")
     await open_change_set(db, steel, [heat])
 
-    found = await service.get_ontology(db, steel.id)
-    missing = await service.get_ontology(db, uuid4())
+    found = await service.ontology_exists(db, steel.id)
+    missing = await service.ontology_exists(db, uuid4())
     alignment = await service.list_alignment_elements(db, steel.id)
 
-    assert found is not None
-    assert found.key == "steel"
-    assert missing is None
+    assert found
+    assert not missing
     assert [item.local_name for item in alignment] == ["Slab", "width"]
     assert await service.count_entity_types(db) == 2
     assert await service.count_open_change_sets(db) == 1

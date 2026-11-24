@@ -88,7 +88,7 @@ async def create_request(
     user_id: UUID,
 ) -> schemas.AssistantRequest:
     """Store the request and queue the job that answers it."""
-    if await ontology.get_ontology(db, ontology_id) is None:
+    if not await ontology.ontology_exists(db, ontology_id):
         raise AppError(404, "ontology.not_found", "Ontology not found.")
     row = AssistantRequest(
         id=uuid4(),

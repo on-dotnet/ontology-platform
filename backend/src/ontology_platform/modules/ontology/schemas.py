@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Annotated, Any, Literal, Self
 from uuid import UUID
 
-from pydantic import Field, StringConstraints, model_validator
+from pydantic import ConfigDict, Field, StringConstraints, model_validator
 
 from ontology_platform.errors import Problem
 from ontology_platform.modules.ontology.models import (
@@ -240,6 +240,15 @@ class Element(CamelModel):
     revision: int
     created_at: datetime
     updated_at: datetime
+
+
+class ElementCopy(Element):
+    """A copy of an element for other modules, which must not get the ORM row.
+
+    Detached from the session, so changing it writes nothing; only the top level is frozen.
+    """
+
+    model_config = ConfigDict(frozen=True)
 
 
 class Evidence(CamelModel):

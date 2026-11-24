@@ -4,16 +4,25 @@ from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
+from pydantic import ConfigDict
+
 from ontology_platform.schemas import CamelModel
+
+# Other modules receive these as read-only copies, never the ORM rows (see service.get).
+_FROZEN = ConfigDict(frozen=True)
 
 
 class DocumentProgress(CamelModel):
+    model_config = _FROZEN
+
     step: str
     done: int
     total: int
 
 
 class DocumentInfo(CamelModel):
+    model_config = _FROZEN
+
     id: UUID
     ontology_id: UUID
     filename: str
@@ -37,6 +46,8 @@ class DocumentList(CamelModel):
 
 
 class ChunkInfo(CamelModel):
+    model_config = _FROZEN
+
     id: UUID
     document_id: UUID
     seq: int
