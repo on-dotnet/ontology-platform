@@ -28,7 +28,7 @@ class JobLeaseLostError(Exception):
     """A newer execution owns the job."""
 
 
-# `JobContext.check_lease`, handed to code that commits a job.s effects in its own transactions.
+# `JobContext.check_lease`, handed to code that commits a job's effects in its own transactions.
 type LeaseCheck = Callable[[AsyncSession], Awaitable[None]]
 
 
