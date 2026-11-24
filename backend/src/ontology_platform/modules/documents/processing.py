@@ -7,10 +7,15 @@ from uuid import UUID
 from sqlalchemy import delete
 
 from ontology_platform.errors import AppError
-from ontology_platform.modules.documents import service
+from ontology_platform.modules.documents import parsers, service
 from ontology_platform.modules.documents.chunking import TextChunk, chunk_pages
 from ontology_platform.modules.documents.models import Chunk
-from ontology_platform.modules.documents.parsers import ParsedDocument, ParsedPage, parse_isolated
+from ontology_platform.modules.documents.parsers import (
+    ParsedDocument,
+    ParsedPage,
+    ScanPart,
+    parse_isolated,
+)
 from ontology_platform.modules.documents.storage import DocumentStorage
 from ontology_platform.modules.jobs.runner import (
     JobContext,
@@ -20,7 +25,11 @@ from ontology_platform.modules.jobs.runner import (
 )
 
 type Extractor = Callable[[UUID, LeaseCheck], Awaitable[UUID | None]]
-type VisionTranscriber = Callable[[bytes], Awaitable[list[ParsedPage]]]
+type VisionTranscriber = Callable[[ScanPart], Awaitable[list[ParsedPage]]]
+
+# Recognition limit per document: it bounds the model calls (about two per 8,000 characters)
+# and is shown next to the upload control, like `parsers.MAX_SCANNED_PAGES`.
+MAX_RECOGNIZED_CHARS = 200_000
 
 _extractor: Extractor | None = None
 _transcriber: VisionTranscriber | None = None
@@ -41,19 +50,46 @@ def register_vision_transcriber(fn: VisionTranscriber | None) -> None:
     _transcriber = fn
 
 
+async def _record(job: JobContext, document_id: UUID, **values: object) -> None:
+    """Write document columns (progress, counts) in a transaction of this execution."""
+    async with job.session_factory.begin() as db:
+        await job.check_lease(db)
+        doc = await service.get_row(db, document_id)
+        for name, value in values.items():
+            setattr(doc, name, value)
+
+
+async def _transcribe(
+    job: JobContext, document_id: UUID, parsed: ParsedDocument
+) -> list[ParsedPage]:
+    if _transcriber is None:
+        raise AppError(422, "documents.needs_ocr", "This PDF requires vision transcription.")
+    if parsed.page_count > parsers.MAX_SCANNED_PAGES:
+        # Kept so that the page can say by how much the scan exceeds the limit.
+        await _record(job, document_id, page_count=parsed.page_count)
+        raise AppError(422, "documents.too_many_pages", "The scan has too many pages.")
+    pages: list[ParsedPage] = []
+    total = len(parsed.scan_parts)
+    for done, part in enumerate(parsed.scan_parts):
+        await _record(job, document_id, progress={"step": "parse", "done": done, "total": total})
+        pages.extend(await _transcriber(part))
+    if not any(page.text.strip() for page in pages):
+        raise AppError(422, "documents.unreadable", "Vision transcription returned no text.")
+    return pages
+
+
 async def _parse(
-    storage: DocumentStorage, key: str, media_type: str
+    job: JobContext, storage: DocumentStorage, document_id: UUID, key: str, media_type: str
 ) -> tuple[ParsedDocument, list[TextChunk]]:
     data = await asyncio.to_thread(storage.open, key)
     parsed = await parse_isolated(media_type, data)
-    pages = parsed.pages
-    if parsed.needs_vision:
-        if _transcriber is None:
-            raise AppError(422, "documents.needs_ocr", "This PDF requires vision transcription.")
-        pages = await _transcriber(data)
-        if not any(page.text.strip() for page in pages):
-            raise AppError(422, "documents.unreadable", "Vision transcription returned no text.")
-    return parsed, await asyncio.to_thread(chunk_pages, pages)
+    pages = await _transcribe(job, document_id, parsed) if parsed.needs_vision else parsed.pages
+    chunks = await asyncio.to_thread(chunk_pages, pages)
+    char_count = sum(chunk.char_count for chunk in chunks)
+    if char_count > MAX_RECOGNIZED_CHARS:
+        await _record(job, document_id, char_count=char_count, page_count=parsed.page_count)
+        raise AppError(422, "documents.too_long", "The document has too many characters.")
+    return parsed, chunks
 
 
 async def _process(job: JobContext, storage: DocumentStorage, document_id: UUID) -> None:
@@ -76,7 +112,7 @@ async def _process(job: JobContext, storage: DocumentStorage, document_id: UUID)
         doc.progress = {"step": "parse", "done": 0, "total": 1}
         key, media_type = doc.storage_key, doc.media_type
 
-    parsed, chunks = await _parse(storage, key, media_type)
+    parsed, chunks = await _parse(job, storage, document_id, key, media_type)
     async with job.session_factory.begin() as db:
         await job.check_lease(db)
         doc = await service.get_row(db, document_id)

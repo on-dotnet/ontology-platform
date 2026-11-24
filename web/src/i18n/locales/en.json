@@ -324,11 +324,18 @@
     "rejected": {
       "type": "This file type is not supported. Upload a docx, xlsx, pdf, md or txt file.",
       "size": "The file is larger than {{size}} MB. Split or compress it and upload again.",
-      "empty": "The file is empty. Check it and choose it again."
-    }
+      "empty": "The file is empty. Check it and choose it again.",
+      "chars": "This document has {{count}} characters, more than the {{limit}} one document can have for recognition. Split it into parts and upload those."
+    },
+    "limitsLabel": "Upload limits",
+    "limits": "Each file can be up to {{size}} MB. A document can have up to {{chars}} characters for recognition, and a scan up to {{pages}} pages; split larger ones into parts before uploading."
   },
   "documents": {
     "upload": "Upload documents",
+    "overLimit": {
+      "chars": "This document has {{count}} characters, more than the {{limit}} one document can have for recognition. Split it into parts and upload those.",
+      "pages": "This scan has {{count}} pages, more than the {{limit}} a scan can have for recognition. Split it into parts and upload those."
+    },
     "tableLabel": "Documents",
     "noOntologyTitle": "No ontology yet",
     "noOntologyDescription": "Once members upload documents, they and their AI results are listed here.",
@@ -1069,7 +1076,9 @@
       "not_failed": "This document did not fail, so it does not need a retry.",
       "needs_ocr": "This document is a scan and its text cannot be extracted yet. Upload a version with selectable text.",
       "unreadable": "No text could be read from this document. The file may be damaged, or a scan that still had no text after transcription. Check the file or upload a version with selectable text.",
-      "parse_timeout": "Reading this document took too long; the file may be damaged. Check it, or save a new copy and upload that."
+      "parse_timeout": "Reading this document took too long; the file may be damaged. Check it, or save a new copy and upload that.",
+      "too_long": "This document has more characters than one document can have for recognition. Split it into parts and upload those.",
+      "too_many_pages": "This scan has more pages than a scan can have for recognition. Split it into parts and upload those."
     },
     "ai": {
       "not_configured": "The AI service is not configured. The document is saved; ask your platform administrator to configure it, then retry.",

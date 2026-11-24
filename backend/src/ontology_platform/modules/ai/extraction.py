@@ -30,6 +30,8 @@ Kind = Literal["entity_type", "relation_type", "property"]
 ProgressFn = Callable[[str, int, int], Awaitable[None]]
 
 BATCH_CHARS = 8000
+# Candidate terms per call of the types stage: a large document's terms would not fit one call.
+TYPES_BATCH_TERMS = 150
 MAX_QUOTES = 3
 UNFOUND_PENALTY = 0.5
 # Local names stay well below the 128 characters the ontology allows, leaving room for "new:".
@@ -132,9 +134,7 @@ class Extractor:
     ) -> list[Proposal]:
         groups = batches(chunks)
         terms = await self._terms(document_id, title, groups, progress)
-        await progress("types", 0, 1)
-        types = await self._types(document_id, title, terms, known)
-        await progress("types", 1, 1)
+        types = await self._types(document_id, title, terms, known, progress)
         relations = await self._relations(document_id, title, groups, types, known, progress)
         await progress("changeset", 0, 1)
         proposals = build_proposals(chunks, known, types, relations)
@@ -165,30 +165,33 @@ class Extractor:
         return list(found.values())
 
     async def _types(
-        self, document_id: UUID, title: str, terms: list[TermOut], known: Sequence[KnownElement]
+        self,
+        document_id: UUID,
+        title: str,
+        terms: list[TermOut],
+        known: Sequence[KnownElement],
+        progress: ProgressFn,
     ) -> list[EntityTypeOut]:
+        """Types in batches of terms; later batches see the types found so far and reuse them."""
         existing = [element for element in known if element.kind == "entity_type"]
-        lines = ["Existing entity types (id | label | synonyms):"]
-        lines += [
-            f"- {element.id} | {element.label_zh} | {', '.join(element.synonyms)}"
-            for element in existing
-        ] or ["- (none)"]
-        lines.append("\nCandidate terms (category | name | english | definition | quotes):")
-        for term in terms:
-            quotes = "; ".join(f"[chunk {q.chunk}] {q.text}" for q in term.quotes[:MAX_QUOTES])
-            lines.append(
-                f"- {term.category} | {term.name} | {term.english or ''} | "
-                f"{term.definition or ''} | {quotes}"
+        groups = [
+            terms[start : start + TYPES_BATCH_TERMS]
+            for start in range(0, len(terms), TYPES_BATCH_TERMS)
+        ] or [[]]
+        found: list[EntityTypeOut] = []
+        await progress("types", 0, len(groups))
+        for index, group in enumerate(groups, start=1):
+            result = await self.gateway.structured(
+                purpose="extract.types",
+                model=self.models.reasoning,
+                instructions=TYPES_INSTRUCTIONS,
+                text=f"Document: {title}\n\n" + "\n".join(_types_lines(existing, found, group)),
+                schema=TypesOut,
+                document_id=document_id,
             )
-        result = await self.gateway.structured(
-            purpose="extract.types",
-            model=self.models.reasoning,
-            instructions=TYPES_INSTRUCTIONS,
-            text=f"Document: {title}\n\n" + "\n".join(lines),
-            schema=TypesOut,
-            document_id=document_id,
-        )
-        return result.entity_types
+            found = merge_types(found, result.entity_types)
+            await progress("types", index, len(groups))
+        return found
 
     async def _relations(
         self,
@@ -221,6 +224,62 @@ class Extractor:
             merged.properties.extend(result.properties)
             await progress("relations", index, len(groups))
         return merged
+
+
+def _types_lines(
+    existing: Sequence[KnownElement], found: Sequence[EntityTypeOut], terms: Sequence[TermOut]
+) -> list[str]:
+    lines = ["Existing entity types (id | label | synonyms):"]
+    lines += [
+        f"- {element.id} | {element.label_zh} | {', '.join(element.synonyms)}"
+        for element in existing
+    ] or ["- (none)"]
+    if found:
+        lines.append(
+            "\nEntity types proposed from earlier terms of this document; reuse their ref "
+            "instead of proposing duplicates (ref | label | synonyms):"
+        )
+        lines += [f"- {item.ref} | {item.label_zh} | {', '.join(item.synonyms)}" for item in found]
+    lines.append("\nCandidate terms (category | name | english | definition | quotes):")
+    for term in terms:
+        quotes = "; ".join(f"[chunk {q.chunk}] {q.text}" for q in term.quotes[:MAX_QUOTES])
+        lines.append(
+            f"- {term.category} | {term.name} | {term.english or ''} | "
+            f"{term.definition or ''} | {quotes}"
+        )
+    return lines
+
+
+def merge_types(
+    found: Sequence[EntityTypeOut], batch: Iterable[EntityTypeOut]
+) -> list[EntityTypeOut]:
+    """Adds a batch's types; one reusing the ref of an earlier batch's type extends that type.
+
+    Only earlier batches are merged into: a single batch is kept exactly as the model returned
+    it, and duplicates by label are left to `build_proposals`, as before batching.
+    """
+    merged = list(found)
+    earlier = {item.ref: index for index, item in enumerate(found)}
+    for item in batch:
+        index = earlier.get(item.ref)
+        if index is None:
+            merged.append(item)
+            continue
+        other = merged[index]
+        seen = {normalize(value) for value in other.synonyms}
+        merged[index] = other.model_copy(
+            update={
+                "synonyms": [
+                    *other.synonyms,
+                    *(value for value in item.synonyms if normalize(value) not in seen),
+                ],
+                "quotes": [*other.quotes, *item.quotes],
+                "label_en": other.label_en or item.label_en,
+                "definition_zh": other.definition_zh or item.definition_zh,
+                "parent": other.parent or item.parent,
+            }
+        )
+    return merged
 
 
 # ---------------------------------------------------------------------------- proposals

@@ -5,6 +5,7 @@ from zipfile import ZipFile
 import pytest
 from docx import Document
 from openpyxl import Workbook  # type: ignore[import-untyped]
+from pypdf import PdfReader, PdfWriter
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.documents import parsers
@@ -131,3 +132,34 @@ def test_pdf_text_and_scan_detection() -> None:
         else:
             assert result.pages[0].number == 1
             assert "Steel" in result.pages[0].text
+
+
+def test_a_scan_is_split_into_parts_for_transcription() -> None:
+    writer = PdfWriter()
+    for _ in range(12):
+        writer.add_blank_page(width=200, height=200)
+    file = BytesIO()
+    writer.write(file)
+
+    result = parse_document("application/pdf", file.getvalue())
+
+    assert (result.needs_vision, result.page_count) == (True, 12)
+    assert [(p.first_page, p.page_count) for p in result.scan_parts] == [(1, 5), (6, 5), (11, 2)]
+    assert [len(PdfReader(BytesIO(p.data)).pages) for p in result.scan_parts] == [5, 5, 2]
+
+
+def test_a_text_pdf_has_no_scan_parts() -> None:
+    data = (FIXTURES / "text.pdf").read_bytes()
+    assert parse_document("application/pdf", data).scan_parts == ()
+
+
+def test_a_scan_over_the_page_limit_is_not_split() -> None:
+    writer = PdfWriter()
+    for _ in range(12):
+        writer.add_blank_page(width=200, height=200)
+    file = BytesIO()
+    writer.write(file)
+
+    result = parse_document("application/pdf", file.getvalue(), max_scanned_pages=11)
+
+    assert (result.needs_vision, result.page_count, result.scan_parts) == (True, 12, ())

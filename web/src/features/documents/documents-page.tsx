@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { ArrowRight, FileText, RefreshCw, Upload } from 'lucide-react';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { useToast } from '@/components/feedback/toast';
@@ -19,11 +20,12 @@ import { OntologySelector } from '@/features/ontologies/ontology-selector';
 import { useSelectedOntology } from '@/features/ontologies/use-selected-ontology';
 import { codeMessage, lookupText, useErrorMessage } from '@/i18n/error-message';
 import { cn } from '@/lib/cn';
-import { formatBytes } from '@/lib/format';
+import { formatBytes, formatCount } from '@/lib/format';
 
 import { documentKeys, retryDocument, useDocuments, type DocumentInfo } from './api';
 import { DocumentProgress } from './document-progress';
-import { UploadDropZone, UploadProblems, useDocumentUpload, useFileDrop, useFilePicker } from './upload';
+import { UploadDropZone, UploadLimitsTip, UploadProblems, useDocumentUpload, useFileDrop, useFilePicker } from './upload';
+import { MAX_RECOGNIZED_CHARS, MAX_SCANNED_PAGES } from './upload-rules';
 
 interface DocumentsPageProps {
   ontologyId: string | undefined;
@@ -54,10 +56,13 @@ export function DocumentsPage({ ontologyId, onOntologyChange }: DocumentsPagePro
               <OntologySelector ontologies={ontologies} value={selected.id} onValueChange={onOntologyChange} />
             ) : null}
             {canUpload && ontologies ? (
-              <Button onClick={picker.open} loading={upload.isUploading}>
-                {upload.isUploading ? null : <Upload aria-hidden />}
-                {upload.isUploading ? t('upload.uploading') : t('documents.upload')}
-              </Button>
+              <span className="flex items-center gap-1">
+                <Button onClick={picker.open} loading={upload.isUploading}>
+                  {upload.isUploading ? null : <Upload aria-hidden />}
+                  {upload.isUploading ? t('upload.uploading') : t('documents.upload')}
+                </Button>
+                <UploadLimitsTip />
+              </span>
             ) : null}
           </>
         }
@@ -178,6 +183,26 @@ function DocumentsTable({ ontology, canUpload, busy, onFiles }: DocumentsTablePr
   );
 }
 
+/** Failures a retry cannot fix: the same file exceeds the same recognition limit again. */
+const OVER_LIMIT = ['documents.too_long', 'documents.too_many_pages'];
+
+/** How far over a recognition limit the document is, when the server stored its size. */
+function overLimitMessage(t: TFunction, locale: string, document: DocumentInfo): string | undefined {
+  if (document.errorCode === 'documents.too_long' && typeof document.charCount === 'number') {
+    return t('documents.overLimit.chars', {
+      count: formatCount(document.charCount, locale),
+      limit: formatCount(MAX_RECOGNIZED_CHARS, locale),
+    });
+  }
+  if (document.errorCode === 'documents.too_many_pages' && typeof document.pageCount === 'number') {
+    return t('documents.overLimit.pages', {
+      count: formatCount(document.pageCount, locale),
+      limit: formatCount(MAX_SCANNED_PAGES, locale),
+    });
+  }
+  return undefined;
+}
+
 function DocumentResult({ document, canRetry }: { document: DocumentInfo; canRetry: boolean }) {
   const { t, i18n } = useTranslation();
   const message = useErrorMessage();
@@ -196,10 +221,11 @@ function DocumentResult({ document, canRetry }: { document: DocumentInfo; canRet
     return (
       <div className="flex max-w-80 flex-col items-start gap-1.5">
         <p className="text-sm text-error-strong">
-          {(document.errorCode ? lookupText(i18n, `documents.failures.${document.errorCode}`) : undefined) ??
+          {overLimitMessage(t, i18n.language, document) ??
+            (document.errorCode ? lookupText(i18n, `documents.failures.${document.errorCode}`) : undefined) ??
             codeMessage(i18n, document.errorCode, 'documents.failedUnknown')}
         </p>
-        {canRetry ? (
+        {canRetry && !OVER_LIMIT.includes(document.errorCode ?? '') ? (
           <Button variant="secondary" size="sm" loading={retry.isPending} onClick={() => retry.mutate()}>
             {retry.isPending ? null : <RefreshCw aria-hidden />}
             {t('common.retry')}

@@ -3,15 +3,17 @@ import { CloudUpload } from 'lucide-react';
 import { useRef, useState, type DragEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { InfoTip } from '@/components/feedback/hint-tip';
 import { InlineNotice } from '@/components/feedback/inline-notice';
 import { useToast } from '@/components/feedback/toast';
 import { Button } from '@/components/ui/button';
 import { CreateOntologyDialog } from '@/features/ontologies/create-ontology-dialog';
 import { useErrorMessage } from '@/i18n/error-message';
 import { cn } from '@/lib/cn';
+import { formatCount } from '@/lib/format';
 
 import { documentKeys, uploadDocument } from './api';
-import { ACCEPT_ATTRIBUTE, MAX_UPLOAD_MB, validateFiles } from './upload-rules';
+import { ACCEPT_ATTRIBUTE, MAX_RECOGNIZED_CHARS, MAX_SCANNED_PAGES, MAX_UPLOAD_MB, validateFiles } from './upload-rules';
 
 export interface UploadProblem {
   fileName: string;
@@ -28,11 +30,11 @@ interface UploadOptions {
 }
 
 /**
- * Validates files (type, size), creates the first ontology when there is none, then uploads
+ * Validates files (type, size, characters of text files), creates the first ontology when there is none, then uploads
  * the files one by one. Render `dialog` once; show `problems` near the upload control.
  */
 export function useDocumentUpload({ ontologyId, needsOntology, onUploaded }: UploadOptions) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const message = useErrorMessage();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -66,17 +68,32 @@ export function useDocumentUpload({ ontologyId, needsOntology, onUploaded }: Upl
     },
   });
 
+  // Counting characters reads the files; the controls stay busy meanwhile, and only the latest
+  // choice of files is acted on.
+  const [checking, setChecking] = useState(false);
+  const latest = useRef(0);
+
   const submit = (files: readonly File[]) => {
-    const { accepted, rejected } = validateFiles(files);
-    setProblems(
-      rejected.map(({ fileName, reason }) => ({
-        fileName,
-        message: t(`upload.rejected.${reason}`, { size: MAX_UPLOAD_MB }),
-      })),
-    );
-    if (accepted.length === 0) return;
-    if (ontologyId) mutation.mutate({ target: ontologyId, files: accepted });
-    else if (needsOntology) setWaiting(accepted);
+    const submission = (latest.current += 1);
+    setChecking(true);
+    void (async () => {
+      const { accepted, rejected } = await validateFiles(files);
+      if (submission !== latest.current) return;
+      setChecking(false);
+      setProblems(
+        rejected.map(({ fileName, reason, count }) => ({
+          fileName,
+          message: t(`upload.rejected.${reason}`, {
+            size: MAX_UPLOAD_MB,
+            count: formatCount(count ?? 0, i18n.language),
+            limit: formatCount(MAX_RECOGNIZED_CHARS, i18n.language),
+          }),
+        })),
+      );
+      if (accepted.length === 0) return;
+      if (ontologyId) mutation.mutate({ target: ontologyId, files: accepted });
+      else if (needsOntology) setWaiting(accepted);
+    })();
   };
 
   const dialog = (
@@ -98,7 +115,7 @@ export function useDocumentUpload({ ontologyId, needsOntology, onUploaded }: Upl
     dialog,
     problems,
     dismissProblems: () => setProblems([]),
-    isUploading: mutation.isPending,
+    isUploading: mutation.isPending || checking,
   };
 }
 
@@ -191,8 +208,25 @@ export function UploadDropZone({ onFiles, busy = false, title, primary = false, 
       <Button variant={primary ? 'primary' : 'secondary'} onClick={picker.open} loading={busy}>
         {busy ? t('upload.uploading') : t('upload.chooseFiles')}
       </Button>
-      <p className="text-xs text-muted-foreground">{t('upload.hint', { size: MAX_UPLOAD_MB })}</p>
+      <p className="flex items-center gap-1 text-xs text-muted-foreground">
+        {t('upload.hint', { size: MAX_UPLOAD_MB })}
+        <UploadLimitsTip />
+      </p>
     </div>
+  );
+}
+
+/** ⓘ with the upload and recognition limits, next to an upload control. */
+export function UploadLimitsTip() {
+  const { t, i18n } = useTranslation();
+  return (
+    <InfoTip label={t('upload.limitsLabel')}>
+      {t('upload.limits', {
+        size: MAX_UPLOAD_MB,
+        chars: formatCount(MAX_RECOGNIZED_CHARS, i18n.language),
+        pages: formatCount(MAX_SCANNED_PAGES, i18n.language),
+      })}
+    </InfoTip>
   );
 }
 

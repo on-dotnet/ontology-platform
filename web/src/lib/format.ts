@@ -48,3 +48,8 @@ export function formatBytes(bytes: number, locale: string): string {
 export function formatPercent(ratio: number, locale: string): string {
   return new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 0 }).format(ratio);
 }
+
+/** Whole number with grouping, e.g. 200000 → "200,000". */
+export function formatCount(value: number, locale: string): string {
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
+}

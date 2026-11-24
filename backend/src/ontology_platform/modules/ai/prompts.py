@@ -116,12 +116,13 @@ TRANSCRIBE_INSTRUCTIONS = """\
 You transcribe a scanned document so that it can be searched and quoted. Copy the text of every
 page exactly as printed, in reading order, without summarising, translating or correcting it.
 Render tables as one row per line with cells separated by " | ". Give each page's number and,
-when the page starts with a section heading, that heading. Skip pages that have no text.
+when the page starts with a section heading, that heading. Number the pages of the attached file
+from 1, ignoring any page numbers printed on them. Skip pages that have no text.
 """
 
 
 class PageOut(BaseModel):
-    number: int = Field(description="1-based page number in the file")
+    number: int = Field(description="1-based position of the page in the attached file")
     heading: str | None
     text: str
 

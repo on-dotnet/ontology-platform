@@ -171,6 +171,42 @@ describe('documents page', () => {
     expect(within(rowOf('坏文件.pdf')).getByText('解析这份资料超时，文件可能已损坏。请检查文件，或另存一份后重新上传。')).toBeInTheDocument();
   });
 
+  it('says by how much a document exceeds the recognition limits, and offers no retry', async () => {
+    mockApi({
+      'GET /api/ontologies': () => [ontologyFixture()],
+      'GET /api/documents': () => ({
+        items: [
+          documentFixture({
+            id: 'doc-long',
+            filename: '工艺手册.docx',
+            status: 'failed',
+            errorCode: 'documents.too_long',
+            charCount: 352_140,
+            progress: { step: 'parse', done: 0, total: 1 },
+          }),
+          documentFixture({
+            id: 'doc-pages',
+            filename: '图纸扫描.pdf',
+            status: 'failed',
+            errorCode: 'documents.too_many_pages',
+            pageCount: 130,
+            progress: { step: 'parse', done: 0, total: 1 },
+          }),
+        ],
+        nextCursor: null,
+      }),
+    });
+    renderApp('/documents?ontology=onto-steel');
+
+    const table = await screen.findByRole('table', { name: '资料列表' });
+    const rowOf = (name: string) => within(table).getByText(name).closest('tr') as HTMLElement;
+    expect(within(rowOf('工艺手册.docx')).getByText('这份资料有 352,140 字，超过单份 200,000 字的识别上限。请拆分成几份后再上传。')).toBeInTheDocument();
+    expect(within(rowOf('图纸扫描.pdf')).getByText('这份扫描件有 130 页，超过 100 页的识别上限。请拆分成几份后再上传。')).toBeInTheDocument();
+    // Retrying cannot help: the same file exceeds the same limit again.
+    expect(within(table).queryByRole('button', { name: '重试' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '上传限制' })).toBeInTheDocument();
+  });
+
   it('maps unknown failure codes to a generic reason', async () => {
     mockApi({
       'GET /api/ontologies': () => [ontologyFixture()],
