@@ -144,6 +144,9 @@ def make_extractor(
 
         async def progress(step: str, done: int, total: int) -> None:
             async with session_factory.begin() as db:
+                # An execution that lost its job stops here instead of overwriting the newer
+                # execution's progress and paying for model calls whose result it cannot keep.
+                await check_lease(db)
                 await documents.set_progress(db, document_id, step, done, total)
 
         try:

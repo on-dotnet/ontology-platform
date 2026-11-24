@@ -271,15 +271,21 @@ async def test_an_execution_that_lost_its_lease_writes_no_change_set(
     grade = element(ontology, "entity_type", "SteelGrade", "钢种")
     await add_elements(db, grade)
     document, _ = await add_document(db, ontology)
+    document_id = document.id
     extract = make_extractor(factory(app), ScriptedGateway(outputs(grade)), MODELS)
-    # A worker whose claim on the job was taken over by a newer execution.
-    stale = JobContext(id=uuid4(), payload={}, session_factory=factory(app), worker_id="gone")
+
+    async def lost_before_the_change_set(check_db: AsyncSession) -> None:
+        # The job is taken over after the last progress write, just before the change set.
+        progress = await check_db.scalar(
+            select(Document.progress).where(Document.id == document_id)
+        )
+        if progress == {"step": "changeset", "done": 1, "total": 1}:
+            raise JobLeaseLostError
 
     with pytest.raises(JobLeaseLostError):
-        await extract(document.id, stale.check_lease)
+        await extract(document_id, lost_before_the_change_set)
 
     assert await change_set_count(db) == 0
-    document_id = document.id
     db.expire_all()
     stored = await db.get(Document, document_id)
     assert stored is not None
@@ -301,3 +307,50 @@ async def test_a_part_of_a_scan_gets_the_page_numbers_of_the_whole_file() -> Non
     )
 
     assert [(p.number, p.text) for p in pages] == [(6, "第六页"), (7, "第七页"), (None, "页码不明")]
+
+
+async def test_an_execution_that_lost_its_lease_stops_before_writing_progress(
+    app: FastAPI, db: AsyncSession
+) -> None:
+    ontology = await add_ontology(db)
+    grade = element(ontology, "entity_type", "SteelGrade", "钢种")
+    await add_elements(db, grade)
+    document, _ = await add_document(db, ontology)
+    document_id = document.id
+    gateway = ScriptedGateway(outputs(grade))
+    extract = make_extractor(factory(app), gateway, MODELS)
+    stale = JobContext(id=uuid4(), payload={}, session_factory=factory(app), worker_id="gone")
+
+    with pytest.raises(JobLeaseLostError):
+        await extract(document_id, stale.check_lease)
+
+    # The newer execution's progress stays as it was, and no model call was paid for.
+    assert gateway.calls == []
+    db.expire_all()
+    stored = await db.get(Document, document_id)
+    assert stored is not None
+    assert stored.progress == {"step": "parse", "done": 1, "total": 1}
+
+
+async def test_an_execution_that_loses_its_lease_midway_stops_calling_the_model(
+    app: FastAPI, db: AsyncSession
+) -> None:
+    ontology = await add_ontology(db)
+    grade = element(ontology, "entity_type", "SteelGrade", "钢种")
+    await add_elements(db, grade)
+    document, _ = await add_document(db, ontology)
+    gateway = ScriptedGateway(outputs(grade))
+    extract = make_extractor(factory(app), gateway, MODELS)
+    checks = 0
+
+    async def lost_after_terms(_: AsyncSession) -> None:
+        nonlocal checks
+        checks += 1
+        # 1: terms 0/1, 2: terms 1/1, 3: types 0/1.
+        if checks == 3:
+            raise JobLeaseLostError
+
+    with pytest.raises(JobLeaseLostError):
+        await extract(document.id, lost_after_terms)
+
+    assert gateway.calls == [("extract.terms", "std")]

@@ -117,7 +117,7 @@ worker 用 `SELECT … FOR UPDATE SKIP LOCKED` 领取任务，运行期间每 15
 - 不会因重试而改变的失败不重试，包括：401/400、额度耗尽（`insufficient_quota`）、输出被截断或被过滤（`response.incomplete`，记为 `ai.invalid_output`）。
 - 网关重试后仍失败的，再按任务重试整份资料。三次都失败后资料状态为 `failed`，`error_code` 为 `ai.unavailable` 或 `ai.invalid_output`。界面上提示"AI 识别暂不可用，资料已保存，可稍后重试"。
 - 解析在独立的子进程中运行，超过 180 秒即终止子进程，资料状态为 `failed`，`error_code` 为 `documents.parse_timeout`，不自动重试（畸形文件再解析多半还会卡住），用户可手动重试。解析进程异常退出记为 `documents.unreadable`。
-- 写变更集的事务先锁定并核对任务租约：已被新一次执行接管的旧执行不写变更集，以免证据指向已被重建的分块。
+- 写变更集的事务先锁定并核对任务租约：已被新一次执行接管的旧执行不写变更集，以免证据指向已被重建的分块。识别过程中每次写进度也先核对租约，旧执行在下一次写进度时就停下，不再覆盖新执行的进度，也不再继续调用模型。
 
 ## 5 接口
 
