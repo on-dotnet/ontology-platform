@@ -73,6 +73,12 @@ class ModelGateway(Protocol):
 
 
 PING_TIMEOUT_SECONDS = 5.0
+# Fallback probe of services without a models endpoint: a real model call, so a longer wait
+# for the first event, and a success is reused for a while to keep the cost negligible.
+PROBE_TIMEOUT_SECONDS = 20.0
+PROBE_INTERVAL_SECONDS = 600.0
+# What `models.retrieve` answers when the service does not implement it.
+_MODELS_UNSUPPORTED = frozenset({404, 405, 501})
 # Waits before the second and third attempt of a call that failed transiently.
 RETRY_DELAYS = (2.0, 8.0)
 
@@ -115,6 +121,7 @@ class OpenAIGateway:
         self._http_client = http_client
         self._retry_delays = tuple(retry_delays)
         self._client: AsyncOpenAI | None = None
+        self._probed_ok_at: float | None = None
 
     def _get_client(self) -> AsyncOpenAI:
         if not self._settings.ai_configured or self._settings.openai_api_key is None:
@@ -221,12 +228,43 @@ class OpenAIGateway:
         raise error from None
 
     async def ping(self) -> bool:
-        """A quick reachability check: short timeout and no retries, for the status badge."""
+        """A quick reachability check for the status badge: short timeouts, no retries.
+
+        The free `models.retrieve` goes first. Services that do not implement it answer 404, 405
+        or 501; for those a tiny structured call (billed) confirms the service works, at most once
+        per `PROBE_INTERVAL_SECONDS` after a success, since the badge is polled every minute.
+        """
         try:
             client = self._get_client().with_options(timeout=PING_TIMEOUT_SECONDS, max_retries=0)
             await client.models.retrieve(self._settings.ai_model)
-        except (AiError, openai.OpenAIError):
+        except AiError:
             return False
+        except openai.APIStatusError as exc:
+            if exc.status_code not in _MODELS_UNSUPPORTED:
+                return False
+            return await self._probe()
+        except openai.OpenAIError:
+            return False
+        return True
+
+    async def _probe(self) -> bool:
+        now = time.monotonic()
+        if self._probed_ok_at is not None and now - self._probed_ok_at < PROBE_INTERVAL_SECONDS:
+            return True
+        client = self._get_client().with_options(timeout=PROBE_TIMEOUT_SECONDS, max_retries=0)
+        call = _Call[_Pong](
+            "status.check",
+            self._settings.ai_model,
+            "Reply with the single word pong.",
+            {"role": "user", "content": [{"type": "input_text", "text": "ping"}]},
+            _Pong,
+            None,
+        )
+        try:
+            await self._attempt(client, call)
+        except AiError:
+            return False
+        self._probed_ok_at = time.monotonic()
         return True
 
     async def _record(
@@ -253,6 +291,10 @@ class OpenAIGateway:
         async with self._session_factory() as db:
             db.add(run)
             await db.commit()
+
+
+class _Pong(BaseModel):
+    reply: str
 
 
 class _StreamEndedError(Exception):

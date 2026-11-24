@@ -324,3 +324,87 @@ async def test_a_completed_response_without_output_is_an_invalid_output(
     with pytest.raises(AiInvalidOutputError) as caught:
         await call(gateway)
     assert caught.value.retryable is True
+
+
+def ping_gateway(
+    settings: Settings,
+    models_status: int,
+    *,
+    factory: async_sessionmaker[AsyncSession] | None = None,
+    reply: Callable[[], httpx2.Response] = lambda: stream('{"reply": "pong"}'),
+) -> tuple[OpenAIGateway, list[str]]:
+    """A gateway whose `/models/{id}` answers `models_status`; returns it with the seen paths."""
+    seen: list[str] = []
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        seen.append(f"{request.method} {request.url.path}")
+        if request.url.path.startswith("/v1/models") or request.url.path.startswith("/models"):
+            if models_status == 200:
+                body = {"id": "m", "object": "model", "created": 1, "owned_by": "x"}
+                return httpx2.Response(200, json=body)
+            return httpx2.Response(models_status, json={"error": {"message": LEAK}})
+        return reply()
+
+    gateway = OpenAIGateway(
+        configured(settings), factory, http_client=client_with(handler), retry_delays=()
+    )
+    return gateway, seen
+
+
+async def test_ping_uses_the_models_endpoint_when_it_exists(settings: Settings) -> None:
+    gateway, seen = ping_gateway(settings, 200)
+    assert await gateway.ping() is True
+    assert len(seen) == 1
+    assert "models" in seen[0]
+
+
+@pytest.mark.parametrize("status", [404, 405, 501])
+async def test_ping_falls_back_to_a_tiny_call_when_models_is_unsupported(
+    settings: Settings, app: Any, status: int
+) -> None:
+    factory: async_sessionmaker[AsyncSession] = app.state.session_factory
+    gateway, seen = ping_gateway(settings, status, factory=factory)
+
+    assert await gateway.ping() is True
+
+    assert [path.split()[0] for path in seen] == ["GET", "POST"]
+    async with factory() as db:
+        runs = (await db.execute(select(AiRun))).scalars().all()
+    assert [(run.purpose, run.status) for run in runs] == [("status.check", "succeeded")]
+
+
+async def test_ping_does_not_fall_back_on_other_models_errors(settings: Settings) -> None:
+    gateway, seen = ping_gateway(settings, 401)
+    assert await gateway.ping() is False
+    assert len(seen) == 1
+
+
+async def test_a_successful_fallback_is_not_paid_for_again_soon(settings: Settings) -> None:
+    gateway, seen = ping_gateway(settings, 404)
+    assert await gateway.ping() is True
+    assert await gateway.ping() is True
+    assert await gateway.ping() is True
+    # The free models check is repeated, the billed call only once.
+    assert [path.split()[0] for path in seen].count("POST") == 1
+
+
+async def test_a_failed_fallback_is_retried_and_not_retried_within_one_ping(
+    settings: Settings,
+) -> None:
+    gateway, seen = ping_gateway(settings, 404, reply=lambda: httpx2.Response(500, json={}))
+    assert await gateway.ping() is False
+    assert [path.split()[0] for path in seen].count("POST") == 1
+    assert await gateway.ping() is False
+    assert [path.split()[0] for path in seen].count("POST") == 2
+
+
+async def test_the_fallback_call_expires_after_the_probe_interval(
+    settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    clock = [1000.0]
+    monkeypatch.setattr("ontology_platform.modules.ai.gateway.time.monotonic", lambda: clock[0])
+    gateway, seen = ping_gateway(settings, 404)
+    assert await gateway.ping() is True
+    clock[0] += 3600
+    assert await gateway.ping() is True
+    assert [path.split()[0] for path in seen].count("POST") == 2
