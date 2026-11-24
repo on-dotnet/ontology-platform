@@ -26,11 +26,14 @@ AI Native 的本体智能平台：用户把资料和数据交给平台，AI 识�
 ./dev.ps1 up          # 构建并启动 postgres、api、web；平台地址 http://10.16.0.13:28080
 ./dev.ps1 status      # 状态与地址
 ./dev.ps1 logs api    # 最近日志
-./dev.ps1 test-api    # 后端：ruff、mypy、pytest
+./dev.ps1 test-api tests/test_x.py   # 开发中：只跑受影响的后端测试文件
+./dev.ps1 test-api    # 后端全量：ruff、mypy、pytest（8 进程并行）
 ./dev.ps1 test-web    # 前端：eslint、tsc、vitest
 ./dev.ps1 lock api    # 重新生成 backend/uv.lock（web 同理）
 ./dev.ps1 gen-api     # 由后端 OpenAPI 生成 web/src/api/schema.d.ts
-./dev.ps1 ci -Report  # 完整门禁，结果写成提交状态 local-ci
+./dev.ps1 ci -Report  # 完整门禁（三项同时跑），结果写成提交状态 local-ci
+./dev.ps1 images      # 列出本项目镜像及所属工作区
+./dev.ps1 clean-images  # 删除已不存在的工作区留下的 ontology/* 镜像标签
 ```
 
 ## 4 红线
@@ -50,10 +53,11 @@ AI Native 的本体智能平台：用户把资料和数据交给平台，AI 识�
 
 - **语言**：与用户的一切沟通都用简体中文，包括最终答复、过程中的进度说明、等待说明、计划与任务列表条目、子代理和 Codex 的汇报转述。代码标识符、命令、路径、日志原文保持原样。上下文被压缩后的第一批输出尤其要检查。
 - 提需求用 `/need <一句话需求>`（[.claude/skills/need](.claude/skills/need/SKILL.md)）：先出理解卡，确认后再动手。验证按 [verify](.claude/skills/verify/SKILL.md)。
-- **分支**：长期分支只有 `main`。每个需求从最新 main 开一条短分支（`feat/`、`fix/`、`chore/`），经 PR 合并，合并后删除分支。一次一个分支。
+- **分支**：长期分支只有 `main`。每个需求从最新 main 开一条短分支（`feat/`、`fix/`、`chore/`），经 PR 合并，合并后删除分支。每个会话一次一个分支。
+- **工作区**：会话默认在自己的 git worktree 里工作，不在主检出目录里改代码。几个会话可以同时开发、同时跑测试，镜像按工作区区分，互不覆盖（做法见[开发手册](docs/development.md)"并行开发"一节）。
 - 先读后改：动手前读相关代码、测试和本文件指向的文档。
-- 先写会失败的测试，再写实现。改完运行受影响的测试，在 PR 描述里贴出命令和结果。
-- PR 转为可评审之前，必须对当前 HEAD 运行 `./dev.ps1 ci -Report` 并成功（提交状态 `local-ci` 为 success）。HEAD 变化后重新运行。
+- 先写会失败的测试，再写实现。开发中只跑受影响的测试：`./dev.ps1 test-api tests/<文件>.py`、改了前端时 `./dev.ps1 test-web`。不手动跑后端全量，全量只在门禁里跑一次。在 PR 描述里贴出命令和结果。
+- **复审与门禁的顺序**：复审和受影响的测试同时进行；复审没有必须修的项之后，再对最终 HEAD 运行一次 `./dev.ps1 ci -Report`，要求成功（提交状态 `local-ci` 为 success）。按复审意见修改后，第二轮复审只看修改的部分。门禁之后 HEAD 又变了，就重新运行。
 - 涉及 L2 范围先停下来问。
 - 进度写在 PR 描述里。发现与当前任务无关的问题，用 `gh issue create --label backlog` 记录后继续，不扩大范围。
 - 提交与发 PR：`git add`、`git commit`、`git push`、`gh pr create` 各自单独执行，不用 `;` 串成一条；较长的提交信息或 PR 正文先写到 `.verification/` 下的文件，再用 `git commit -F`、`gh pr create --body-file`。
@@ -64,7 +68,7 @@ AI Native 的本体智能平台：用户把资料和数据交给平台，AI 识�
 - 一个任务里文件范围互不重叠、彼此不等对方结果的部分，交给子代理同时做。同一批文件只有一个写入者；拆不干净就不拆。
 - 任务说明写全：只许改哪些路径；不许做 git 写操作；能运行哪些命令；验收标准；最后报告什么（改了哪些文件、测试汇总行原文、没做到的、拿不准的取舍）。
 - 子代理不提交：主会话读过 diff、跑过受影响的测试后才提交。子代理的结论要核对，不能直接当作"已验证"。
-- 复审交给 `reviewer` 子代理，与门禁同时进行。
+- 复审交给 `reviewer` 子代理，与受影响的测试同时进行；门禁在复审通过之后跑（见上）。
 
 ### Codex 分工
 

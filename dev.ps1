@@ -12,22 +12,28 @@
   logs [服务]       查看最近日志，例如 ./dev.ps1 logs api
   build             只构建 api、web 镜像
   lock [api|web]    在容器里重新生成依赖锁文件（uv.lock / pnpm-lock.yaml）并取回本机
-  test-api [参数]   后端检查：ruff、mypy、pytest（临时数据库，跑完删除）；
-                    带参数时只运行 pytest <参数>，如 test-api tests/test_ai_pipeline.py -x
+  test-api [参数]   后端检查：ruff、mypy、pytest（8 个进程并行，每个进程一个临时库，跑完删除）；
+                    带参数时只运行 pytest <参数>（单进程），如 test-api tests/test_ai_pipeline.py -x
   test-web          前端检查：eslint、tsc、vitest
-  test              依次运行 test-api、test-web
+  test              同时运行 test-api、test-web，日志在 .verification/test/
   gen-api           从后端导出 OpenAPI，并生成前端类型 web/src/api/schema.d.ts
   fmt <文件...>     用容器里的 ruff 修复并格式化指定的 backend 文件（经标准输入，只改这些文件）
   ai-check          在容器里实际调用一次模型，只显示能否连通，不显示地址与 Key
   eval [案例]       用真实模型识别 samples/<案例>（默认 steel）并按期望答案打分，结果存 .verification/eval/（会产生模型费用）
   owl-check         Protégé 往返检查：样例与开发栈当前版本经平台导出，由 OWL API（断网）读写后再导回，
                     除已知改写外不得有差异；报告存 .verification/owl-check/
-  ci [-Report]      完整门禁：compose 校验、test-api、test-web、构建镜像；-Report 把结果写成提交状态 local-ci
+  ci [-Report]      完整门禁：compose 校验后，test-api、test-web、构建运行镜像三项同时运行，
+                    日志在 .verification/ci/；-Report 把结果写成提交状态 local-ci
+  images            列出本项目的镜像（ontology/*）及其所属工作区
+  clean-images      删除已不存在的工作区留下的 ontology/* 镜像标签（只删本项目的，不 prune）
   psql              打开开发库的 psql
   init-env          由 .env.example 生成本机私有配置 .env.local（已存在则不动；由用户本人运行）
   reset             删除开发栈及其数据卷（只能由用户本人运行，会二次确认）
 
 脚本不改变调用方会话的当前目录和环境变量：所有 docker 调用都显式带 --context，所有路径都基于脚本所在目录。
+
+本项目构建的镜像都带工作区标签：主检出目录用 local，其他 git worktree 用"目录名-路径哈希"，
+可用 OP_IMAGE_TAG 覆盖。几个工作区同时构建、测试时各用各的镜像，互不覆盖。
 #>
 [CmdletBinding()]
 param(
@@ -74,6 +80,51 @@ function docker {
 }
 
 function New-TempName([string]$Purpose) { "op-tmp-$Purpose-$([guid]::NewGuid().ToString('N').Substring(0, 8))" }
+
+function Get-NormalizedPath([string]$Path) { [IO.Path]::GetFullPath($Path).TrimEnd('\', '/').ToLowerInvariant() }
+
+# Image tag of a workspace other than the main checkout: "<folder>-<path hash>".
+$WorktreeTagPattern = '^[a-z0-9_][a-z0-9_.-]*-[0-9a-f]{8}$'
+function Get-WorktreeTag([string]$Path) {
+    $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($Path))).Substring(0, 8).ToLowerInvariant()
+    $folder = ((Split-Path -Leaf $Path) -replace '[^a-z0-9_.-]', '-').TrimStart('.', '-')
+    if (-not $folder) { $folder = 'wt' }
+    return "$($folder.Substring(0, [Math]::Min(40, $folder.Length)))-$hash"
+}
+
+# Every git worktree of this repository, main checkout first, with its image tag: "local" for the
+# main checkout, Get-WorktreeTag for the others. Empty when git cannot list them.
+function Get-Workspaces {
+    # git prints paths as UTF-8; decode them as such so non-ASCII folders compare correctly.
+    # Hosts without a console may refuse the change; git still runs, and a path that then fails to
+    # match only gets its own hash tag (Get-ImageTag), never "local".
+    $previousConsole = [Console]::OutputEncoding
+    try {
+        try { [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false) } catch { }
+        $lines = @(git -C $Root worktree list --porcelain 2>$null)
+        $code = $LASTEXITCODE
+    } finally {
+        try { [Console]::OutputEncoding = $previousConsole } catch { }
+    }
+    if ($code -ne 0) { return }
+    $paths = @($lines | Where-Object { $_ -like 'worktree *' } | ForEach-Object { Get-NormalizedPath $_.Substring(9) })
+    for ($i = 0; $i -lt $paths.Count; $i++) {
+        [pscustomobject]@{ Path = $paths[$i]; Tag = ($i -eq 0 ? 'local' : (Get-WorktreeTag $paths[$i])) }
+    }
+}
+
+# "local" only when this is provably the main checkout; anything else gets its own tag, so a
+# worktree never falls back to (and overwrites) the main checkout's images.
+function Get-ImageTag {
+    $configured = Get-Setting 'OP_IMAGE_TAG' ''
+    if ($configured) { return $configured }
+    $here = Get-NormalizedPath $Root
+    $main = Get-Workspaces | Select-Object -First 1
+    if ($main -and $main.Path -eq $here) { return 'local' }
+    return Get-WorktreeTag $here
+}
+
+$ImageTag = Get-ImageTag
 
 function Get-ComposeArgs {
     $composeArgs = @('-f', (Join-Path $Root 'compose.yaml'))
@@ -174,7 +225,7 @@ function Invoke-Lock([string]$Target) {
         foreach ($line in (docker compose @composeArgs config --format json | ConvertFrom-Json).services.api.build.args.PSObject.Properties) {
             $buildArgs += @('--build-arg', "$($line.Name)=$($line.Value)")
         }
-        $image = "ontology/lock-${t}:local"
+        $image = "ontology/lock-${t}:$ImageTag"
         $dir = Join-Path $Root $spec.Dir
         Write-Step "生成 $($spec.Dir)/$($spec.File)"
         docker build --target lock @buildArgs -t $image $dir | Out-Host
@@ -198,16 +249,72 @@ function Invoke-GenApi {
     $tmp = New-Item -ItemType Directory -Force -Path (Join-Path $Root '.verification/gen-api')
     $openapi = Join-Path $tmp 'openapi.json'
     Write-Step '导出 OpenAPI'
-    docker run --rm --name (New-TempName 'openapi') ontology/api:local python -m ontology_platform.openapi > $openapi
+    docker run --rm --name (New-TempName 'openapi') "ontology/api:$ImageTag" python -m ontology_platform.openapi > $openapi
     if ($LASTEXITCODE -ne 0) { Stop-Dev '导出 OpenAPI 失败' }
     Write-Step '生成 web/src/api/schema.d.ts'
-    $types = Get-Content -Raw -LiteralPath $openapi | docker run --rm -i --name (New-TempName 'gen-api') ontology/test-web:local sh -c 'cat > /tmp/openapi.json && pnpm exec openapi-typescript /tmp/openapi.json -o /tmp/schema.d.ts >/dev/null && cat /tmp/schema.d.ts'
+    $types = Get-Content -Raw -LiteralPath $openapi | docker run --rm -i --name (New-TempName 'gen-api') "ontology/test-web:$ImageTag" sh -c 'cat > /tmp/openapi.json && pnpm exec openapi-typescript /tmp/openapi.json -o /tmp/schema.d.ts >/dev/null && cat /tmp/schema.d.ts'
     if ($LASTEXITCODE -ne 0) { Stop-Dev '生成前端类型失败' }
     $header = '// Generated by ./dev.ps1 gen-api from the backend OpenAPI schema. Do not edit by hand.'
     # Join with LF explicitly; Set-Content would otherwise write CRLF on Windows.
     $text = ((@($header) + @($types)) -join "`n") + "`n"
     Set-Content -LiteralPath (Join-Path $Root 'web/src/api/schema.d.ts') -Encoding utf8NoBOM -NoNewline -Value $text
     Write-Ok '已更新 web/src/api/schema.d.ts'
+}
+
+# Runs dev.ps1 commands at the same time, each as its own process writing its own log, then prints
+# them in the given order: the summary line of a passing step, the failures and log tail of a
+# failing one. Returns command -> exit code, in the given order.
+function Invoke-Parallel([string[]]$Commands, [string]$LogDir) {
+    $logs = New-Item -ItemType Directory -Force -Path $LogDir
+    $jobs = [ordered]@{}
+    foreach ($command in $Commands) {
+        $log = Join-Path $logs "$command.log"
+        $jobs[$command] = Start-ThreadJob -Name $command -ArgumentList $PSCommandPath, $command, $log -ScriptBlock {
+            param($Script, $Command, $Log)
+            $watch = [Diagnostics.Stopwatch]::StartNew()
+            & pwsh -NoProfile -NonInteractive -File $Script $Command *> $Log
+            [pscustomobject]@{ Code = $LASTEXITCODE; Seconds = [Math]::Round($watch.Elapsed.TotalSeconds) }
+        }
+    }
+    Write-Step "同时运行 $($Commands -join '、')（日志在 $logs）"
+    $outcomes = @{}
+    $pending = @($jobs.Values)
+    try {
+        while ($pending.Count -gt 0) {
+            $job = Wait-Job -Job $pending -Any
+            $outcome = Receive-Job -Job $job -ErrorAction SilentlyContinue | Select-Object -Last 1
+            if (-not $outcome -or $null -eq $outcome.Code) { $outcome = [pscustomobject]@{ Code = 1; Seconds = 0 } }
+            $outcomes[$job.Name] = $outcome
+            Remove-Job -Job $job
+            $pending = @($pending | Where-Object { $_.Id -ne $job.Id })
+            Write-Host "  完成  $($job.Name)：退出码 $($outcome.Code)，$($outcome.Seconds) 秒"
+        }
+    } finally {
+        # Interrupted (Ctrl+C): in a console the child processes get the same Ctrl+C and clean up
+        # their own temporary containers; elsewhere they may still be running.
+        if ($pending.Count -gt 0) {
+            $pending | Remove-Job -Force -ErrorAction SilentlyContinue
+            Write-Note "已中断：$(@($pending.Name) -join '、') 的子进程可能仍在运行（日志在 $logs）；重跑前用 docker ps --filter name=op-tmp- 确认临时容器已退出"
+        }
+    }
+    $codes = [ordered]@{}
+    foreach ($command in $Commands) {
+        $log = Join-Path $logs "$command.log"
+        $code = $outcomes[$command].Code
+        $codes[$command] = $code
+        $lines = @(if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log } else { '（没有日志）' })
+        Write-Host ''
+        if ($code -eq 0) {
+            Write-Ok "$command（$($outcomes[$command].Seconds) 秒）"
+            $lines | Where-Object { $_ -match '^(check\.sh: |test-web summary: )' } | ForEach-Object { Write-Host "        $_" }
+        } else {
+            Write-Bad "$command（退出码 $code，$($outcomes[$command].Seconds) 秒，完整日志 $log）"
+            $lines | Where-Object { $_ -match '^(FAILED|ERROR) |^\s+FAIL\s|^\s*×' } | Select-Object -First 30 | ForEach-Object { Write-Host "        $_" }
+            Write-Host '        ---- 日志末尾 ----'
+            $lines | Select-Object -Last 30 | ForEach-Object { Write-Host "        $_" }
+        }
+    }
+    return $codes
 }
 
 function Invoke-Ci {
@@ -222,11 +329,10 @@ function Invoke-Ci {
     $composeArgs = Get-ComposeArgs
     docker compose @composeArgs config -q
     $results['compose'] = $LASTEXITCODE
-    $results['test-api'] = Invoke-ToolTest 'test-api'
-    $results['test-web'] = Invoke-ToolTest 'test-web'
-    Write-Step '构建运行镜像'
-    docker compose @composeArgs build api web | Out-Host
-    $results['build'] = $LASTEXITCODE
+    # Pull missing base images once, before the steps below would each pull them at the same time.
+    Confirm-BaseImages
+    $steps = Invoke-Parallel @('test-api', 'test-web', 'build') (Join-Path $Root '.verification/ci')
+    foreach ($name in $steps.Keys) { $results[$name] = $steps[$name] }
 
     Write-Host ''
     $failed = @($results.Keys | Where-Object { $results[$_] -ne 0 })
@@ -263,7 +369,7 @@ function Invoke-Fmt([string[]]$Files) {
         }
         $relative = $full.Substring($backend.Length + 1).Replace('\', '/')
         $source = Get-Content -Raw -LiteralPath $full
-        $fixed = $source | docker run --rm -i --name (New-TempName 'fmt') ontology/test-api:local sh -c "ruff check --fix --exit-zero --quiet --stdin-filename '$relative' - | ruff format --quiet --stdin-filename '$relative' -"
+        $fixed = $source | docker run --rm -i --name (New-TempName 'fmt') "ontology/test-api:$ImageTag" sh -c "ruff check --fix --exit-zero --quiet --stdin-filename '$relative' - | ruff format --quiet --stdin-filename '$relative' -"
         if ($LASTEXITCODE -ne 0) { Stop-Dev "格式化失败：$relative" }
         $text = ($fixed -join "`n") + "`n"
         if ($text -ne $source.Replace("`r`n", "`n")) {
@@ -327,8 +433,8 @@ function Invoke-OwlCheck {
             if ($LASTEXITCODE -ne 0) { Stop-Dev "拉取基础镜像失败：$image" }
         }
     }
-    Write-Step '构建 OWL API 工具镜像 ontology/owlapi:local'
-    docker build --build-arg "MAVEN_MIRROR=$(Get-MirrorValue 'OP_MAVEN_MIRROR')" -t ontology/owlapi:local (Join-Path $Root 'dev/owlapi') | Out-Host
+    Write-Step "构建 OWL API 工具镜像 ontology/owlapi:$ImageTag"
+    docker build --build-arg "MAVEN_MIRROR=$(Get-MirrorValue 'OP_MAVEN_MIRROR')" -t "ontology/owlapi:$ImageTag" (Join-Path $Root 'dev/owlapi') | Out-Host
     if ($LASTEXITCODE -ne 0) { Stop-Dev '构建 OWL API 工具镜像失败' }
 
     $work = Join-Path $Root '.verification/owl-check'
@@ -363,8 +469,8 @@ function Invoke-OwlCheck {
         $api = New-TempName 'owl-api'
         $java = New-TempName 'owl-java'
         try {
-            docker run -d --network none --name $api --entrypoint sleep ontology/api:local 1800 | Out-Null
-            docker run -d --network none --name $java --entrypoint sleep ontology/owlapi:local 1800 | Out-Null
+            docker run -d --network none --name $api --entrypoint sleep "ontology/api:$ImageTag" 1800 | Out-Null
+            docker run -d --network none --name $java --entrypoint sleep "ontology/owlapi:$ImageTag" 1800 | Out-Null
             Write-Step '平台导出'
             docker cp $cases "${api}:/tmp/cases" | Out-Null
             docker exec $api python -m ontology_platform.modules.ontology.owlcheck export /tmp/cases /tmp/export | Out-Host
@@ -404,6 +510,39 @@ function Invoke-InitEnv {
     Write-Host '请用编辑器打开它，填写 OP_OPENAI_API_KEY 和 OP_AI_PROXY（例如 http://ontology:口令@10.16.0.157:7897），保存后运行 ./dev.ps1 up'
 }
 
+# Lists this project's images (ontology/*) with the workspace each tag belongs to. With -Clean,
+# removes the tags of workspaces that no longer exist. Never prunes and never forces: an image a
+# container still uses stays.
+function Invoke-Images([switch]$Clean) {
+    $workspaces = @(Get-Workspaces)
+    if ($workspaces.Count -eq 0) { Stop-Dev 'git worktree list 失败，无法判断哪些工作区还在；未做任何改动' }
+    $owners = @{}
+    foreach ($workspace in $workspaces) { $owners[$workspace.Tag] = $workspace.Path }
+    if (-not $owners.ContainsKey($ImageTag)) { $owners[$ImageTag] = '（当前工作区）' }
+    $stale = @()
+    foreach ($row in @(docker image ls --filter 'reference=ontology/*' --format '{{.Repository}}:{{.Tag}}|{{.Size}}|{{.CreatedSince}}')) {
+        if ($row -notmatch '^(ontology/[^:|]+):([^|]+)\|([^|]*)\|(.*)$') { continue }
+        $tag = $Matches[2]
+        $name = "$($Matches[1]):$tag"
+        $owner = $owners[$tag]
+        if (-not $owner) {
+            # Only tags in the generated worktree format are ours to clean; "local", tags set with
+            # OP_IMAGE_TAG by other sessions and <none> stay.
+            if ($tag -cmatch $WorktreeTagPattern) { $stale += $name; $owner = '已不存在的工作区' } else { $owner = '其他标签，不清理' }
+        }
+        Write-Host ('{0,-58} {1,9}  {2,-20} {3}' -f $name, $Matches[3], $Matches[4], $owner)
+    }
+    if (-not $Clean) {
+        if ($stale.Count -gt 0) { Write-Note "$($stale.Count) 个标签属于已不存在的工作区，./dev.ps1 clean-images 可删除" }
+        return
+    }
+    if ($stale.Count -eq 0) { Write-Ok '没有需要清理的标签'; return }
+    foreach ($name in $stale) {
+        docker rmi $name *> $null
+        if ($LASTEXITCODE -eq 0) { Write-Ok "已删除 $name" } else { Write-Note "未删除 $name（可能仍有容器在用）" }
+    }
+}
+
 function Invoke-Reset {
     Write-Note '将删除开发栈的全部容器和数据卷（数据库内容会丢失）。'
     $answer = Read-Host '确认删除请输入 RESET'
@@ -412,37 +551,50 @@ function Invoke-Reset {
     Write-Ok '已删除'
 }
 
-switch ($Command) {
-    'up' { Invoke-Up }
-    'down' { Invoke-Compose --profile tools down }
-    'status' { Show-Status }
-    'logs' { Invoke-Compose logs --tail 200 @Rest }
-    'build' { Confirm-BaseImages; Invoke-Compose build api web }
-    'lock' { Invoke-Lock ($Rest | Select-Object -First 1) }
-    'test-api' { exit (Invoke-ToolTest 'test-api' ($Rest.Count -gt 0 ? @('pytest') + $Rest : @())) }
-    'test-web' { exit (Invoke-ToolTest 'test-web') }
-    'test' { $a = Invoke-ToolTest 'test-api'; $w = Invoke-ToolTest 'test-web'; if ($a -ne 0 -or $w -ne 0) { exit 1 } }
-    'gen-api' { Invoke-GenApi }
-    'ci' { Invoke-Ci }
-    'psql' { Invoke-Compose exec postgres psql -U ontology -d ontology }
-    'fmt' { Invoke-Fmt $Rest }
-    'eval' { Invoke-Eval ($Rest | Select-Object -First 1) }
-    'owl-check' { Invoke-OwlCheck }
-    'ai-check' {
-        Confirm-BaseImages
-        Invoke-Compose build api
-        $composeArgs = Get-ComposeArgs
-        $previousConsole = [Console]::OutputEncoding
-        [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
-        try {
-            docker compose @composeArgs run --rm -T --no-deps --name (New-TempName 'ai-check') api python -m ontology_platform.modules.ai.check | Out-Host
-            $code = $LASTEXITCODE
-        } finally {
-            [Console]::OutputEncoding = $previousConsole
+# compose.yaml reads the image tag from the environment; restore the caller's value afterwards.
+$callerImageTag = $env:OP_IMAGE_TAG
+$env:OP_IMAGE_TAG = $ImageTag
+try {
+    switch ($Command) {
+        'up' { Invoke-Up }
+        'down' { Invoke-Compose --profile tools down }
+        'status' { Show-Status }
+        'logs' { Invoke-Compose logs --tail 200 @Rest }
+        'build' { Confirm-BaseImages; Invoke-Compose build api web }
+        'lock' { Invoke-Lock ($Rest | Select-Object -First 1) }
+        'test-api' { exit (Invoke-ToolTest 'test-api' ($Rest.Count -gt 0 ? @('pytest') + $Rest : @())) }
+        'test-web' { exit (Invoke-ToolTest 'test-web') }
+        'test' {
+            Confirm-BaseImages
+            $codes = Invoke-Parallel @('test-api', 'test-web') (Join-Path $Root '.verification/test')
+            if (@($codes.Values | Where-Object { $_ -ne 0 }).Count -gt 0) { exit 1 }
         }
-        exit $code
+        'gen-api' { Invoke-GenApi }
+        'ci' { Invoke-Ci }
+        'psql' { Invoke-Compose exec postgres psql -U ontology -d ontology }
+        'fmt' { Invoke-Fmt $Rest }
+        'eval' { Invoke-Eval ($Rest | Select-Object -First 1) }
+        'owl-check' { Invoke-OwlCheck }
+        'ai-check' {
+            Confirm-BaseImages
+            Invoke-Compose build api
+            $composeArgs = Get-ComposeArgs
+            $previousConsole = [Console]::OutputEncoding
+            [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+            try {
+                docker compose @composeArgs run --rm -T --no-deps --name (New-TempName 'ai-check') api python -m ontology_platform.modules.ai.check | Out-Host
+                $code = $LASTEXITCODE
+            } finally {
+                [Console]::OutputEncoding = $previousConsole
+            }
+            exit $code
+        }
+        'images' { Invoke-Images }
+        'clean-images' { Invoke-Images -Clean }
+        'init-env' { Invoke-InitEnv }
+        'reset' { Invoke-Reset }
+        default { Get-Help $PSCommandPath -Detailed | Out-Host }
     }
-    'init-env' { Invoke-InitEnv }
-    'reset' { Invoke-Reset }
-    default { Get-Help $PSCommandPath -Detailed | Out-Host }
+} finally {
+    $env:OP_IMAGE_TAG = $callerImageTag
 }

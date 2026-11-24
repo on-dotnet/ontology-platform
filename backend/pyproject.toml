@@ -30,6 +30,8 @@ dev = [
     "pyshacl>=0.30",
     "pytest>=8.4",
     "pytest-asyncio>=1.0",
+    # Runs the full suite across processes, each with its own test database (MIT).
+    "pytest-xdist>=3.8",
     "ruff>=0.12",
 ]
 

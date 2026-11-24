@@ -1,4 +1,4 @@
-# OWL API round-trip tool for ./dev.ps1 owl-check (image ontology/owlapi:local).
+# OWL API round-trip tool for ./dev.ps1 owl-check (image ontology/owlapi:<workspace tag>).
 # Development only: never part of the runtime images.
 
 FROM maven:3.9-eclipse-temurin-25 AS build
