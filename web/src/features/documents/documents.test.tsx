@@ -147,6 +147,13 @@ describe('documents page', () => {
             errorCode: 'documents.unreadable',
             progress: { step: 'parse', done: 0, total: 1 },
           }),
+          documentFixture({
+            id: 'doc-hung',
+            filename: '坏文件.pdf',
+            status: 'failed',
+            errorCode: 'documents.parse_timeout',
+            progress: { step: 'parse', done: 0, total: 1 },
+          }),
         ],
         nextCursor: null,
       }),
@@ -160,7 +167,8 @@ describe('documents page', () => {
     expect(within(rowOf('缺陷判定规范.xlsx')).getByText('AI 识别出的内容不完整，没有生成变更集，请重试。')).toBeInTheDocument();
     expect(within(rowOf('缺陷判定规范.xlsx')).getByText('生成变更集失败')).toBeInTheDocument();
     expect(within(rowOf('精炼规程.pdf')).getByText('AI 返回的结果不符合要求，资料已保存，请稍后重试。')).toBeInTheDocument();
-    expect(within(rowOf('扫描件.pdf')).getByText('扫描件转写后仍没有读出文字，请检查文件或上传可复制文字的版本。')).toBeInTheDocument();
+    expect(within(rowOf('扫描件.pdf')).getByText('没有从这份资料里读出文字，文件可能已损坏，或是转写后仍无文字的扫描件。请检查文件或上传可复制文字的版本。')).toBeInTheDocument();
+    expect(within(rowOf('坏文件.pdf')).getByText('解析这份资料超时，文件可能已损坏。请检查文件，或另存一份后重新上传。')).toBeInTheDocument();
   });
 
   it('maps unknown failure codes to a generic reason', async () => {

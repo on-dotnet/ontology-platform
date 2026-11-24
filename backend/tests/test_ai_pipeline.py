@@ -29,7 +29,7 @@ from ontology_platform.modules.ai.prompts import (
 )
 from ontology_platform.modules.audit.models import AuditEvent
 from ontology_platform.modules.documents.models import Chunk, Document
-from ontology_platform.modules.jobs.runner import RetryableJobError
+from ontology_platform.modules.jobs.runner import JobContext, JobLeaseLostError, RetryableJobError
 from ontology_platform.modules.ontology import service as ontology_service
 from ontology_platform.modules.ontology.models import ChangeSet, Element, Ontology
 from test_ai_extraction import ScriptedGateway, entity, quote, relation
@@ -56,6 +56,10 @@ class FailingGateway(ScriptedGateway):
         document_id: Any = None,
     ) -> T:
         raise self.error
+
+
+async def held(_: AsyncSession) -> None:
+    """A lease check for an execution that still owns its job."""
 
 
 def factory(app: FastAPI) -> async_sessionmaker[AsyncSession]:
@@ -109,7 +113,7 @@ async def test_extraction_writes_one_open_change_set(app: FastAPI, db: AsyncSess
     document, chunk = await add_document(db, ontology)
     extract = make_extractor(factory(app), ScriptedGateway(outputs(grade)), MODELS)
 
-    change_set_id = await extract(document.id)
+    change_set_id = await extract(document.id, held)
 
     assert change_set_id is not None
     detail = await ontology_service.get_change_set(db, change_set_id)
@@ -150,8 +154,8 @@ async def test_a_replayed_job_reuses_the_change_set(app: FastAPI, db: AsyncSessi
     gateway = ScriptedGateway({k: v * 2 for k, v in outputs(grade).items()})
     extract = make_extractor(factory(app), gateway, MODELS)
 
-    first = await extract(document.id)
-    second = await extract(document.id)
+    first = await extract(document.id, held)
+    second = await extract(document.id, held)
 
     assert first == second
     assert await change_set_count(db) == 1
@@ -164,7 +168,7 @@ async def test_nothing_found_means_no_change_set(app: FastAPI, db: AsyncSession)
     document, _ = await add_document(db, ontology)
     extract = make_extractor(factory(app), ScriptedGateway(outputs(grade, empty=True)), MODELS)
 
-    assert await extract(document.id) is None
+    assert await extract(document.id, held) is None
     assert await change_set_count(db) == 0
 
 
@@ -184,7 +188,7 @@ async def test_model_errors_become_job_errors(
     extract = make_extractor(factory(app), FailingGateway(error), MODELS)
 
     with pytest.raises(expected) as raised:
-        await extract(document.id)
+        await extract(document.id, held)
 
     assert getattr(raised.value, "code", None) == code
     assert await change_set_count(db) == 0
@@ -255,3 +259,25 @@ async def test_transcriber_returns_pages_in_order() -> None:
     assert file.media_type == "application/pdf"
     assert base64.b64decode(file.data_base64) == b"%PDF-1.7 scanned"
     assert gateway.calls == [("transcribe", "std")]
+
+
+async def test_an_execution_that_lost_its_lease_writes_no_change_set(
+    app: FastAPI, db: AsyncSession
+) -> None:
+    ontology = await add_ontology(db)
+    grade = element(ontology, "entity_type", "SteelGrade", "钢种")
+    await add_elements(db, grade)
+    document, _ = await add_document(db, ontology)
+    extract = make_extractor(factory(app), ScriptedGateway(outputs(grade)), MODELS)
+    # A worker whose claim on the job was taken over by a newer execution.
+    stale = JobContext(id=uuid4(), payload={}, session_factory=factory(app), worker_id="gone")
+
+    with pytest.raises(JobLeaseLostError):
+        await extract(document.id, stale.check_lease)
+
+    assert await change_set_count(db) == 0
+    document_id = document.id
+    db.expire_all()
+    stored = await db.get(Document, document_id)
+    assert stored is not None
+    assert stored.change_set_id is None
