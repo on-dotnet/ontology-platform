@@ -7,7 +7,7 @@ from uuid import UUID
 from sqlalchemy import delete
 
 from ontology_platform.errors import AppError
-from ontology_platform.modules.documents import service
+from ontology_platform.modules.documents import parsers, service
 from ontology_platform.modules.documents.chunking import TextChunk, chunk_pages
 from ontology_platform.modules.documents.models import Chunk
 from ontology_platform.modules.documents.parsers import (
@@ -27,10 +27,9 @@ from ontology_platform.modules.jobs.runner import (
 type Extractor = Callable[[UUID, LeaseCheck], Awaitable[UUID | None]]
 type VisionTranscriber = Callable[[ScanPart], Awaitable[list[ParsedPage]]]
 
-# Recognition limits per document. They bound the model calls (about two per 8,000
-# characters, one per scan part) and are shown next to the upload control.
+# Recognition limit per document: it bounds the model calls (about two per 8,000 characters)
+# and is shown next to the upload control, like `parsers.MAX_SCANNED_PAGES`.
 MAX_RECOGNIZED_CHARS = 200_000
-MAX_SCANNED_PAGES = 100
 
 _extractor: Extractor | None = None
 _transcriber: VisionTranscriber | None = None
@@ -65,7 +64,7 @@ async def _transcribe(
 ) -> list[ParsedPage]:
     if _transcriber is None:
         raise AppError(422, "documents.needs_ocr", "This PDF requires vision transcription.")
-    if parsed.page_count > MAX_SCANNED_PAGES:
+    if parsed.page_count > parsers.MAX_SCANNED_PAGES:
         # Kept so that the page can say by how much the scan exceeds the limit.
         await _record(job, document_id, page_count=parsed.page_count)
         raise AppError(422, "documents.too_many_pages", "The scan has too many pages.")

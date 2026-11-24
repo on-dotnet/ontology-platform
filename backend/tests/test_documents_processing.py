@@ -17,7 +17,12 @@ from ontology_platform.errors import AppError
 from ontology_platform.modules.documents import parsers, processing, service
 from ontology_platform.modules.documents.parsers import ParsedPage, ScanPart
 from ontology_platform.modules.documents.storage import LocalDocumentStorage
-from ontology_platform.modules.jobs.runner import JobContext, LeaseCheck, RetryableJobError
+from ontology_platform.modules.jobs.runner import (
+    JobContext,
+    JobLeaseLostError,
+    LeaseCheck,
+    RetryableJobError,
+)
 
 
 async def prepare(
@@ -347,7 +352,7 @@ async def test_a_scan_is_transcribed_in_parts_of_five_pages(app: FastAPI, tmp_pa
 async def test_a_scan_with_too_many_pages_fails_before_transcription(
     app: FastAPI, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr(processing, "MAX_SCANNED_PAGES", 2)
+    monkeypatch.setattr(parsers, "MAX_SCANNED_PAGES", 2)
     storage = LocalDocumentStorage(tmp_path)
     document_id, job = await prepare(app, storage, "scan.pdf", blank_pdf(3))
     calls: list[ScanPart] = []
@@ -402,3 +407,57 @@ async def test_a_document_over_the_character_limit_fails_before_recognition(
         chunks = await service.list_chunks(db, over_limit)
     assert (doc.status, doc.error_code, doc.char_count) == ("failed", "documents.too_long", 101)
     assert chunks == []
+
+
+async def test_transcription_reports_progress_and_stops_when_the_lease_is_lost(
+    app: FastAPI, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    storage = LocalDocumentStorage(tmp_path)
+    document_id, job = await prepare(app, storage, "scan.pdf", blank_pdf(12))
+    progress: list[tuple[int, int]] = []
+    checks = 0
+    check_lease = JobContext.check_lease
+
+    async def lose_after_first_part(self: JobContext, db: AsyncSession) -> None:
+        nonlocal checks
+        checks += 1
+        # 1: start of processing, 2: before part 1, 3: before part 2.
+        if checks == 3:
+            raise JobLeaseLostError
+        await check_lease(self, db)
+
+    async def transcribe(part: ScanPart) -> list[ParsedPage]:
+        async with job.session_factory() as db:
+            doc = await service.get(db, document_id)
+        progress.append((doc.progress.done, doc.progress.total))
+        return [ParsedPage(part.first_page, "页")]
+
+    monkeypatch.setattr(JobContext, "check_lease", lose_after_first_part)
+    processing.register_vision_transcriber(transcribe)
+    try:
+        with pytest.raises(JobLeaseLostError):
+            await processing.process(job, storage)
+    finally:
+        processing.register_vision_transcriber(None)
+
+    assert progress == [(0, 3)]
+
+
+async def test_scan_progress_counts_the_parts(app: FastAPI, tmp_path: Path) -> None:
+    storage = LocalDocumentStorage(tmp_path)
+    document_id, job = await prepare(app, storage, "scan.pdf", blank_pdf(12))
+    progress: list[tuple[str, int, int]] = []
+
+    async def transcribe(part: ScanPart) -> list[ParsedPage]:
+        async with job.session_factory() as db:
+            doc = await service.get(db, document_id)
+        progress.append((doc.progress.step, doc.progress.done, doc.progress.total))
+        return [ParsedPage(part.first_page, "页")]
+
+    processing.register_vision_transcriber(transcribe)
+    try:
+        await processing.process(job, storage)
+    finally:
+        processing.register_vision_transcriber(None)
+
+    assert progress == [("parse", 0, 3), ("parse", 1, 3), ("parse", 2, 3)]

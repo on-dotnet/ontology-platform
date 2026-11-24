@@ -14,6 +14,7 @@ from ontology_platform.modules.ai.extraction import (
     KnownElement,
     Proposal,
     batches,
+    merge_types,
     normalize,
 )
 from ontology_platform.modules.ai.gateway import InputFile
@@ -434,3 +435,13 @@ async def test_many_terms_are_typed_in_batches_that_see_earlier_types() -> None:
     assert heat.fields["definitionZh"] == "一次冶炼"
     assert heat.fields["parentRef"] == "new:Furnace"
     assert len(heat.evidence) == 2
+
+
+def test_a_single_batch_of_types_is_kept_as_the_model_returned_it() -> None:
+    batch = [
+        entity("new:Heat", "炉次", "Heat"),
+        entity("new:Heat", "炉次", "Heat2", synonyms=["炉"]),
+        entity("new:LF", "精炼炉", "LF"),
+        entity("new:LadleFurnace", "精炼炉", "LadleFurnace"),
+    ]
+    assert merge_types([], batch) == batch

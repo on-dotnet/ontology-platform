@@ -68,9 +68,18 @@ export function useDocumentUpload({ ontologyId, needsOntology, onUploaded }: Upl
     },
   });
 
+  // Counting characters reads the files; the controls stay busy meanwhile, and only the latest
+  // choice of files is acted on.
+  const [checking, setChecking] = useState(false);
+  const latest = useRef(0);
+
   const submit = (files: readonly File[]) => {
+    const submission = (latest.current += 1);
+    setChecking(true);
     void (async () => {
       const { accepted, rejected } = await validateFiles(files);
+      if (submission !== latest.current) return;
+      setChecking(false);
       setProblems(
         rejected.map(({ fileName, reason, count }) => ({
           fileName,
@@ -106,7 +115,7 @@ export function useDocumentUpload({ ontologyId, needsOntology, onUploaded }: Upl
     dialog,
     problems,
     dismissProblems: () => setProblems([]),
-    isUploading: mutation.isPending,
+    isUploading: mutation.isPending || checking,
   };
 }
 

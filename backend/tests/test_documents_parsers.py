@@ -151,3 +151,15 @@ def test_a_scan_is_split_into_parts_for_transcription() -> None:
 def test_a_text_pdf_has_no_scan_parts() -> None:
     data = (FIXTURES / "text.pdf").read_bytes()
     assert parse_document("application/pdf", data).scan_parts == ()
+
+
+def test_a_scan_over_the_page_limit_is_not_split() -> None:
+    writer = PdfWriter()
+    for _ in range(12):
+        writer.add_blank_page(width=200, height=200)
+    file = BytesIO()
+    writer.write(file)
+
+    result = parse_document("application/pdf", file.getvalue(), max_scanned_pages=11)
+
+    assert (result.needs_vision, result.page_count, result.scan_parts) == (True, 12, ())

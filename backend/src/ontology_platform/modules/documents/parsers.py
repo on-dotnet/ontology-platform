@@ -38,6 +38,8 @@ _MAX_EXPANDED_BYTES = 128 * 1024 * 1024
 _MAX_SHEET_CELLS = 1_000_000
 # Scans are transcribed a few pages per model call, so that each answer fits the output limit.
 SCAN_PART_PAGES = 5
+# Recognition limit for scans (`documents.too_many_pages`). Longer scans are not split at all.
+MAX_SCANNED_PAGES = 100
 # A malformed file can make a parser loop or wait forever; the job queue must not wait with it.
 PARSE_TIMEOUT = 180.0
 # -P: the working directory never shadows a module the parser imports.
@@ -216,8 +218,10 @@ def _text(data: bytes) -> str:
         return data.decode("gb18030")
 
 
-def _scan_parts(reader: PdfReader) -> tuple[ScanPart, ...]:
+def _scan_parts(reader: PdfReader, original_size: int) -> tuple[ScanPart, ...]:
     parts: list[ScanPart] = []
+    # Pages that share one resource dictionary copy all of it into every part.
+    budget = 3 * original_size + 1024 * 1024
     for start in range(0, len(reader.pages), SCAN_PART_PAGES):
         writer = PdfWriter()
         numbers = range(start, min(start + SCAN_PART_PAGES, len(reader.pages)))
@@ -226,19 +230,28 @@ def _scan_parts(reader: PdfReader) -> tuple[ScanPart, ...]:
         file = BytesIO()
         writer.write(file)
         parts.append(ScanPart(start + 1, len(numbers), file.getvalue()))
+        budget -= len(parts[-1].data)
+        if budget < 0:
+            raise _unreadable()
     return tuple(parts)
 
 
-def _pdf(data: bytes) -> ParsedDocument:
+def _pdf(data: bytes, max_scanned_pages: int) -> ParsedDocument:
     reader = PdfReader(BytesIO(data))
     pages = [ParsedPage(number, page.extract_text()) for number, page in enumerate(reader.pages, 1)]
     chars = sum(not char.isspace() for page in pages for char in page.text)
     if pages and chars < 50 * len(pages):
-        return ParsedDocument([], len(pages), needs_vision=True, scan_parts=_scan_parts(reader))
+        # Over the limit the page count is all the caller needs to refuse the scan.
+        parts = _scan_parts(reader, len(data)) if len(pages) <= max_scanned_pages else ()
+        return ParsedDocument([], len(pages), needs_vision=True, scan_parts=parts)
     return ParsedDocument(pages, len(pages))
 
 
-def parse_document(media_type: str, data: bytes) -> ParsedDocument:
+def parse_document(
+    media_type: str, data: bytes, max_scanned_pages: int | None = None
+) -> ParsedDocument:
+    if max_scanned_pages is None:
+        max_scanned_pages = MAX_SCANNED_PAGES
     try:
         if media_type in {"text/markdown", "text/plain"}:
             result = ParsedDocument([ParsedPage(None, _text(data))], 1)
@@ -247,7 +260,7 @@ def parse_document(media_type: str, data: bytes) -> ParsedDocument:
         elif media_type == _XLSX:
             result = _workbook(data)
         elif media_type == "application/pdf":
-            result = _pdf(data)
+            result = _pdf(data, max_scanned_pages)
         else:
             raise _unsupported()
     except AppError:
@@ -278,6 +291,7 @@ async def parse_isolated(media_type: str, data: bytes) -> ParsedDocument:
     process = await asyncio.create_subprocess_exec(
         *PARSE_COMMAND,
         media_type,
+        str(MAX_SCANNED_PAGES),
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
@@ -321,9 +335,9 @@ async def parse_isolated(media_type: str, data: bytes) -> ParsedDocument:
 
 
 def _main() -> None:
-    """Child process: media type as the argument, original on stdin, JSON result on stdout."""
+    """Child process: media type and scan page limit as arguments, original on stdin, JSON out."""
     try:
-        parsed = parse_document(sys.argv[1], sys.stdin.buffer.read())
+        parsed = parse_document(sys.argv[1], sys.stdin.buffer.read(), int(sys.argv[2]))
         result: dict[str, object] = {
             "pages": [dataclasses.asdict(page) for page in parsed.pages],
             "pageCount": parsed.page_count,
