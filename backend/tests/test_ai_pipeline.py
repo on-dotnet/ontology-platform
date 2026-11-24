@@ -29,6 +29,7 @@ from ontology_platform.modules.ai.prompts import (
 )
 from ontology_platform.modules.audit.models import AuditEvent
 from ontology_platform.modules.documents.models import Chunk, Document
+from ontology_platform.modules.documents.parsers import ScanPart
 from ontology_platform.modules.jobs.runner import JobContext, JobLeaseLostError, RetryableJobError
 from ontology_platform.modules.ontology import service as ontology_service
 from ontology_platform.modules.ontology.models import ChangeSet, Element, Ontology
@@ -249,7 +250,9 @@ async def test_transcriber_returns_pages_in_order() -> None:
     )
     gateway = TranscriptGateway(transcript)
 
-    pages = await make_transcriber(gateway, "std")(b"%PDF-1.7 scanned")
+    pages = await make_transcriber(gateway, "std")(
+        ScanPart(first_page=1, page_count=3, data=b"%PDF-1.7 scanned")
+    )
 
     assert [(p.number, p.heading, p.text) for p in pages] == [
         (1, "总则", "第一页"),
@@ -281,3 +284,20 @@ async def test_an_execution_that_lost_its_lease_writes_no_change_set(
     stored = await db.get(Document, document_id)
     assert stored is not None
     assert stored.change_set_id is None
+
+
+async def test_a_part_of_a_scan_gets_the_page_numbers_of_the_whole_file() -> None:
+    transcript = TranscriptOut(
+        pages=[
+            PageOut(number=1, heading="第二章", text="第六页"),
+            PageOut(number=2, heading=None, text="第七页"),
+            # The model numbered a page outside the part it was given.
+            PageOut(number=9, heading=None, text="页码不明"),
+        ]
+    )
+
+    pages = await make_transcriber(TranscriptGateway(transcript), "std")(
+        ScanPart(first_page=6, page_count=5, data=b"%PDF-1.7 part")
+    )
+
+    assert [(p.number, p.text) for p in pages] == [(6, "第六页"), (7, "第七页"), (None, "页码不明")]

@@ -7,6 +7,7 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel
 
 from ontology_platform.modules.ai.extraction import (
+    TYPES_BATCH_TERMS,
     ChunkText,
     ExtractionModels,
     Extractor,
@@ -43,6 +44,7 @@ class ScriptedGateway:
     def __init__(self, outputs: dict[str, list[BaseModel]]) -> None:
         self.outputs = {purpose: list(items) for purpose, items in outputs.items()}
         self.calls: list[tuple[str, str]] = []
+        self.texts: list[tuple[str, str]] = []
 
     async def structured[T: BaseModel](
         self,
@@ -56,6 +58,7 @@ class ScriptedGateway:
         document_id: Any = None,
     ) -> T:
         self.calls.append((purpose, model))
+        self.texts.append((purpose, text))
         result = self.outputs[purpose].pop(0)
         assert isinstance(result, schema)
         return result
@@ -330,3 +333,104 @@ async def test_references_to_elements_that_are_not_types_are_dropped() -> None:
 
     assert by_label(proposals, "炉次").fields["parentRef"] is None
     assert [p.kind for p in proposals] == ["entity_type"]
+
+
+def term(name: str, **extra: Any) -> TermOut:
+    values: dict[str, Any] = {
+        "name": name,
+        "english": None,
+        "definition": None,
+        "category": "entity",
+        "quotes": [],
+    }
+    values.update(extra)
+    return TermOut(**values)
+
+
+def types_texts(gateway: ScriptedGateway) -> list[str]:
+    return [text for purpose, text in gateway.texts if purpose == "extract.types"]
+
+
+async def test_few_terms_are_typed_in_one_call_with_an_unchanged_prompt() -> None:
+    gateway = ScriptedGateway(
+        {
+            "extract.terms": [
+                TermsOut(terms=[term("炉次", english="Heat", quotes=[quote(0, "每个炉次")])]),
+                TermsOut(terms=[term("浇次", category="other", definition="连续浇铸的炉次")]),
+            ],
+            "extract.types": [TypesOut(entity_types=[])],
+            "extract.relations": [RelationsOut(relations=[], properties=[])] * 2,
+        }
+    )
+    extractor = Extractor(gateway, ExtractionModels(standard="std", reasoning="deep"))
+
+    async def progress(step: str, done: int, total: int) -> None:
+        pass
+
+    # Two chunk batches, so terms come from two calls but are typed together.
+    long_a = ChunkText(id=CHUNK_A.id, seq=0, text="每个炉次" + "。" * 8100)
+    await extractor.run(
+        document_id=DOC,
+        title="规程",
+        chunks=[long_a, CHUNK_B],
+        known=[EXISTING_GRADE],
+        progress=progress,
+    )
+
+    # The prompt documents with at most TYPES_BATCH_TERMS terms were typed with before.
+    assert types_texts(gateway) == [
+        "Document: 规程\n\n"
+        "Existing entity types (id | label | synonyms):\n"
+        f"- {EXISTING_GRADE.id} | 钢种 | 牌号\n"
+        "\n"
+        "Candidate terms (category | name | english | definition | quotes):\n"
+        "- entity | 炉次 | Heat |  | [chunk 0] 每个炉次\n"
+        "- other | 浇次 |  | 连续浇铸的炉次 | "
+    ]
+
+
+async def test_many_terms_are_typed_in_batches_that_see_earlier_types() -> None:
+    names = [f"术语{index}" for index in range(TYPES_BATCH_TERMS + 10)]
+    first = [
+        entity("new:Heat", "炉次", "Heat", synonyms=["炉"], quotes=[quote(0, "每个炉次")]),
+        entity("new:Furnace", "炉子", "Furnace"),
+    ]
+    second = [
+        # The second batch reuses a type of the first one and adds what it knows.
+        entity(
+            "new:Heat",
+            "炉次",
+            "Heat",
+            synonyms=["熔炼炉次"],
+            definition_zh="一次冶炼",
+            parent="new:Furnace",
+            quotes=[quote(0, "只冶炼一个钢种")],
+        ),
+        entity("new:Cast", "浇次", "Cast"),
+    ]
+    gateway = ScriptedGateway(
+        {
+            "extract.terms": [TermsOut(terms=[term(name) for name in names]), TermsOut(terms=[])],
+            "extract.types": [TypesOut(entity_types=first), TypesOut(entity_types=second)],
+            "extract.relations": [RelationsOut(relations=[], properties=[])] * 2,
+        }
+    )
+    proposals, steps = await run(gateway)
+
+    first_text, second_text = types_texts(gateway)
+    assert f"- entity | {names[TYPES_BATCH_TERMS - 1]} |" in first_text
+    assert f"- entity | {names[TYPES_BATCH_TERMS]} |" not in first_text
+    assert f"- entity | {names[TYPES_BATCH_TERMS]} |" in second_text
+    assert "Entity types proposed from earlier terms of this document" not in first_text
+    assert "- new:Heat | 炉次 | 炉" in second_text
+    assert [step for step in steps if step[0] == "types"] == [
+        ("types", 0, 2),
+        ("types", 1, 2),
+        ("types", 2, 2),
+    ]
+    assert [p.fields["labelZh"] for p in proposals] == ["炉次", "炉子", "浇次"]
+    heat = by_label(proposals, "炉次")
+    assert [s["text"] for s in heat.fields["synonyms"]] == ["炉", "熔炼炉次"]
+    assert heat.fields["definitionZh"] == "一次冶炼"
+    assert heat.fields["parentRef"] == "new:Furnace"
+    assert len(heat.evidence) == 2

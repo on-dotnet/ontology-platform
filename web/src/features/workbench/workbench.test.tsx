@@ -30,6 +30,36 @@ describe('workbench upload', () => {
     expect(api.calls('POST', '/api/documents')).toHaveLength(0);
   });
 
+  it('counts the characters of text files before uploading and refuses those over the limit', async () => {
+    const api = mockApi({
+      'GET /api/ontologies': () => [ontologyFixture()],
+      'POST /api/documents': () => documentFixture({ status: 'queued' }),
+      'GET /api/documents': () => ({ items: [], nextCursor: null }),
+    });
+    renderApp('/');
+
+    const zone = (await screen.findByRole('button', { name: '选择文件' })).parentElement;
+    const atLimit = new File(['炉'.repeat(200_000)], '规程.md');
+    const overLimit = new File(['钢'.repeat(200_001)], '手册.txt');
+    const gbk = new File([new Uint8Array([0xb8, 0xd6, 0xbe, 0xed])], '目录.txt');
+    fireEvent.drop(zone as HTMLElement, { dataTransfer: { files: [atLimit, overLimit, gbk] } });
+
+    const notice = await screen.findByRole('alert');
+    expect(notice).toHaveTextContent('有 1 份资料没有上传');
+    expect(notice).toHaveTextContent('手册.txt：这份资料有 200,001 字，超过单份 200,000 字的识别上限。请拆分成几份后再上传。');
+    await waitFor(() => expect(api.calls('POST', '/api/documents')).toHaveLength(2));
+  });
+
+  it('tells the upload limits behind an information icon next to the drop zone', async () => {
+    mockApi({ 'GET /api/ontologies': () => [ontologyFixture()] });
+    renderApp('/');
+
+    const tip = await screen.findByRole('button', { name: '上传限制' });
+    expect(tip).toHaveAccessibleDescription(
+      '单个文件不超过 20 MB。一份资料最多识别 200,000 字，扫描件最多 100 页；超出时请拆分成几份再上传。',
+    );
+  });
+
   it('accepts a file of exactly 20 MB and uploads it into the only ontology', async () => {
     const user = userEvent.setup({ applyAccept: false });
     const append = vi.spyOn(FormData.prototype, 'append');

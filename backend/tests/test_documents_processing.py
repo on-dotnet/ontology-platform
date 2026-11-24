@@ -10,11 +10,12 @@ import pytest
 from docx import Document as DocxDocument
 from fastapi import FastAPI
 from openpyxl import Workbook  # type: ignore[import-untyped]
+from pypdf import PdfReader, PdfWriter
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.documents import parsers, processing, service
-from ontology_platform.modules.documents.parsers import ParsedPage
+from ontology_platform.modules.documents.parsers import ParsedPage, ScanPart
 from ontology_platform.modules.documents.storage import LocalDocumentStorage
 from ontology_platform.modules.jobs.runner import JobContext, LeaseCheck, RetryableJobError
 
@@ -92,11 +93,12 @@ async def test_vision_registration(app: FastAPI, tmp_path: Path) -> None:
         doc = await service.get(db, document_id)
         assert (doc.status, doc.error_code) == ("failed", "documents.needs_ocr")
 
-    async def transcribe(original: bytes) -> list[ParsedPage]:
-        assert original == data
+    async def transcribe(part: ScanPart) -> list[ParsedPage]:
+        assert (part.first_page, part.page_count) == (1, 1)
+        assert len(PdfReader(BytesIO(part.data)).pages) == 1
         return [ParsedPage(1, "page one")]
 
-    async def empty_transcription(_: bytes) -> list[ParsedPage]:
+    async def empty_transcription(_: ScanPart) -> list[ParsedPage]:
         return [ParsedPage(1, "  ")]
 
     processing.register_vision_transcriber(empty_transcription)
@@ -292,7 +294,7 @@ async def test_the_child_process_gets_no_secrets(monkeypatch: pytest.MonkeyPatch
     report = (
         "import json, os, sys; sys.stdout.write(json.dumps({'pages': [{'number': None, "
         "'text': ' '.join(sorted(os.environ)), 'heading': None}], 'pageCount': 1, "
-        "'needsVision': False}))"
+        "'needsVision': False, 'scanParts': []}))"
     )
     monkeypatch.setattr(parsers, "PARSE_COMMAND", (sys.executable, "-c", report))
 
@@ -308,3 +310,95 @@ async def test_unexpected_output_makes_the_document_unreadable(
     with pytest.raises(AppError) as caught:
         await parsers.parse_isolated("text/plain", b"steel")
     assert caught.value.code == "documents.unreadable"
+
+
+def blank_pdf(pages: int) -> bytes:
+    writer = PdfWriter()
+    for _ in range(pages):
+        writer.add_blank_page(width=200, height=200)
+    file = BytesIO()
+    writer.write(file)
+    return file.getvalue()
+
+
+async def test_a_scan_is_transcribed_in_parts_of_five_pages(app: FastAPI, tmp_path: Path) -> None:
+    storage = LocalDocumentStorage(tmp_path)
+    document_id, job = await prepare(app, storage, "scan.pdf", blank_pdf(12))
+    parts: list[tuple[int, int, int]] = []
+
+    async def transcribe(part: ScanPart) -> list[ParsedPage]:
+        parts.append((part.first_page, part.page_count, len(PdfReader(BytesIO(part.data)).pages)))
+        return [ParsedPage(part.first_page, f"第 {part.first_page} 页起")]
+
+    processing.register_vision_transcriber(transcribe)
+    try:
+        await processing.process(job, storage)
+    finally:
+        processing.register_vision_transcriber(None)
+
+    assert parts == [(1, 5, 5), (6, 5, 5), (11, 2, 2)]
+    async with job.session_factory() as db:
+        doc = await service.get(db, document_id)
+        chunks = await service.list_chunks(db, document_id)
+    assert (doc.status, doc.page_count) == ("ready", 12)
+    assert [chunk.page for chunk in chunks] == [1, 6, 11]
+
+
+async def test_a_scan_with_too_many_pages_fails_before_transcription(
+    app: FastAPI, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(processing, "MAX_SCANNED_PAGES", 2)
+    storage = LocalDocumentStorage(tmp_path)
+    document_id, job = await prepare(app, storage, "scan.pdf", blank_pdf(3))
+    calls: list[ScanPart] = []
+
+    async def transcribe(part: ScanPart) -> list[ParsedPage]:
+        calls.append(part)
+        return [ParsedPage(1, "x")]
+
+    processing.register_vision_transcriber(transcribe)
+    try:
+        with pytest.raises(AppError) as caught:
+            await processing.process(job, storage)
+    finally:
+        processing.register_vision_transcriber(None)
+
+    assert caught.value.code == "documents.too_many_pages"
+    assert calls == []
+    async with job.session_factory() as db:
+        doc = await service.get(db, document_id)
+    # The page count stays so that the page can say how far over the limit the scan is.
+    assert (doc.status, doc.error_code, doc.page_count) == (
+        "failed",
+        "documents.too_many_pages",
+        3,
+    )
+
+
+async def test_a_document_over_the_character_limit_fails_before_recognition(
+    app: FastAPI, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(processing, "MAX_RECOGNIZED_CHARS", 100)
+    storage = LocalDocumentStorage(tmp_path)
+    calls: list[UUID] = []
+
+    async def extract(document: UUID, _: LeaseCheck) -> None:
+        calls.append(document)
+
+    processing.register_extractor(extract)
+    try:
+        at_limit, job = await prepare(app, storage, "short.txt", ("炉" * 100).encode())
+        await processing.process(job, storage)
+        over_limit, job = await prepare(app, storage, "long.txt", ("钢" * 101).encode())
+        with pytest.raises(AppError) as caught:
+            await processing.process(job, storage)
+    finally:
+        processing.register_extractor(None)
+
+    assert caught.value.code == "documents.too_long"
+    assert calls == [at_limit]
+    async with job.session_factory() as db:
+        doc = await service.get(db, over_limit)
+        chunks = await service.list_chunks(db, over_limit)
+    assert (doc.status, doc.error_code, doc.char_count) == ("failed", "documents.too_long", 101)
+    assert chunks == []

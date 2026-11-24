@@ -26,7 +26,7 @@ from ontology_platform.modules.ai.extraction import (
 from ontology_platform.modules.ai.gateway import AiError, InputFile, ModelGateway
 from ontology_platform.modules.ai.prompts import TRANSCRIBE_INSTRUCTIONS, TranscriptOut
 from ontology_platform.modules.documents import service as documents
-from ontology_platform.modules.documents.parsers import ParsedPage
+from ontology_platform.modules.documents.parsers import ParsedPage, ScanPart
 from ontology_platform.modules.jobs.runner import LeaseCheck, RetryableJobError
 from ontology_platform.modules.ontology import service as ontology
 from ontology_platform.modules.ontology.schemas import (
@@ -185,10 +185,10 @@ def make_extractor(
 
 def make_transcriber(
     gateway: ModelGateway, model: str
-) -> Callable[[bytes], Awaitable[list[ParsedPage]]]:
-    """Scanned PDFs: the model reads the pages and returns their text."""
+) -> Callable[[ScanPart], Awaitable[list[ParsedPage]]]:
+    """Scanned PDFs: the model reads a part of a few pages and returns their text."""
 
-    async def transcribe(data: bytes) -> list[ParsedPage]:
+    async def transcribe(part: ScanPart) -> list[ParsedPage]:
         try:
             transcript = await gateway.structured(
                 purpose="transcribe",
@@ -200,14 +200,21 @@ def make_transcriber(
                     InputFile(
                         filename="document.pdf",
                         media_type="application/pdf",
-                        data_base64=base64.b64encode(data).decode("ascii"),
+                        data_base64=base64.b64encode(part.data).decode("ascii"),
                     ),
                 ),
             )
         except AiError as exc:
             raise job_error(exc) from exc
+        # Page numbers count from 1 within the part; a number outside it stays unknown.
         return [
-            ParsedPage(number=page.number, text=page.text, heading=page.heading)
+            ParsedPage(
+                number=part.first_page + page.number - 1
+                if 1 <= page.number <= part.page_count
+                else None,
+                text=page.text,
+                heading=page.heading,
+            )
             for page in sorted(transcript.pages, key=lambda page: page.number)
             if page.text.strip()
         ]

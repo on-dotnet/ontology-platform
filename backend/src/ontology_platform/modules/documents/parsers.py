@@ -1,6 +1,7 @@
 """Detect supported originals and extract pages in reading order."""
 
 import asyncio
+import base64
 import dataclasses
 import json
 import logging
@@ -17,7 +18,7 @@ from zipfile import BadZipFile, ZipFile, is_zipfile
 from docx import Document
 from docx.text.paragraph import Paragraph
 from openpyxl import load_workbook  # type: ignore[import-untyped]
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter
 
 from ontology_platform.errors import AppError
 
@@ -35,6 +36,8 @@ _TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types"
 # Bound parser memory independently of the compressed upload size.
 _MAX_EXPANDED_BYTES = 128 * 1024 * 1024
 _MAX_SHEET_CELLS = 1_000_000
+# Scans are transcribed a few pages per model call, so that each answer fits the output limit.
+SCAN_PART_PAGES = 5
 # A malformed file can make a parser loop or wait forever; the job queue must not wait with it.
 PARSE_TIMEOUT = 180.0
 # -P: the working directory never shadows a module the parser imports.
@@ -56,10 +59,20 @@ class ParsedPage:
 
 
 @dataclass(frozen=True, slots=True)
+class ScanPart:
+    """Consecutive pages of a scanned PDF as a PDF of their own, for one transcription call."""
+
+    first_page: int
+    page_count: int
+    data: bytes
+
+
+@dataclass(frozen=True, slots=True)
 class ParsedDocument:
     pages: list[ParsedPage]
     page_count: int
     needs_vision: bool = False
+    scan_parts: tuple[ScanPart, ...] = ()
 
 
 def _unsupported() -> AppError:
@@ -203,12 +216,25 @@ def _text(data: bytes) -> str:
         return data.decode("gb18030")
 
 
+def _scan_parts(reader: PdfReader) -> tuple[ScanPart, ...]:
+    parts: list[ScanPart] = []
+    for start in range(0, len(reader.pages), SCAN_PART_PAGES):
+        writer = PdfWriter()
+        numbers = range(start, min(start + SCAN_PART_PAGES, len(reader.pages)))
+        for number in numbers:
+            writer.add_page(reader.pages[number])
+        file = BytesIO()
+        writer.write(file)
+        parts.append(ScanPart(start + 1, len(numbers), file.getvalue()))
+    return tuple(parts)
+
+
 def _pdf(data: bytes) -> ParsedDocument:
     reader = PdfReader(BytesIO(data))
     pages = [ParsedPage(number, page.extract_text()) for number, page in enumerate(reader.pages, 1)]
     chars = sum(not char.isspace() for page in pages for char in page.text)
     if pages and chars < 50 * len(pages):
-        return ParsedDocument([], len(pages), needs_vision=True)
+        return ParsedDocument([], len(pages), needs_vision=True, scan_parts=_scan_parts(reader))
     return ParsedDocument(pages, len(pages))
 
 
@@ -284,6 +310,10 @@ async def parse_isolated(media_type: str, data: bytes) -> ParsedDocument:
             pages=[ParsedPage(**page) for page in result["pages"]],
             page_count=result["pageCount"],
             needs_vision=result["needsVision"],
+            scan_parts=tuple(
+                ScanPart(part["firstPage"], part["pageCount"], base64.b64decode(part["data"]))
+                for part in result["scanParts"]
+            ),
         )
     except (ValueError, KeyError, TypeError) as exc:
         logger.warning("Parser process returned unexpected output", exc_info=True)
@@ -298,6 +328,14 @@ def _main() -> None:
             "pages": [dataclasses.asdict(page) for page in parsed.pages],
             "pageCount": parsed.page_count,
             "needsVision": parsed.needs_vision,
+            "scanParts": [
+                {
+                    "firstPage": part.first_page,
+                    "pageCount": part.page_count,
+                    "data": base64.b64encode(part.data).decode("ascii"),
+                }
+                for part in parsed.scan_parts
+            ],
         }
     except AppError as exc:
         result = {"error": {"status": exc.status, "code": exc.code, "detail": exc.detail}}
