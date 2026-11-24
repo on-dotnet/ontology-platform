@@ -51,18 +51,6 @@ def upgrade() -> None:
             name=op.f("ck_assistant_requests_message"),
         ),
         sa.CheckConstraint("dropped >= 0", name=op.f("ck_assistant_requests_dropped")),
-        sa.ForeignKeyConstraint(
-            ["ontology_id"],
-            ["ontology.ontologies.id"],
-            name=op.f("fk_assistant_requests_ontology_id_ontologies"),
-            ondelete="CASCADE",
-        ),
-        sa.ForeignKeyConstraint(
-            ["change_set_id"],
-            ["ontology.change_sets.id"],
-            name=op.f("fk_assistant_requests_change_set_id_change_sets"),
-            ondelete="SET NULL",
-        ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_assistant_requests")),
         schema="ai",
     )

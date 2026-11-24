@@ -260,3 +260,24 @@ async def test_created_at_release_instant_counts_as_added(
             "fields": [],
         }
     ]
+
+
+async def test_restored_constraints_and_axioms_need_review(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.VIEWER)
+    ontology = await add_ontology(db)
+    v1 = await snapshot(db, ontology, 1, [])
+    earlier = "2020-01-01T00:00:00+00:00"
+    back = [
+        {"id": str(uuid4()), "kind": "entity_type", "localName": "Back", "createdAt": earlier},
+        {"id": str(uuid4()), "kind": "constraint", "localName": "Check", "createdAt": earlier},
+        {"id": str(uuid4()), "kind": "axiom", "turtle": "A", "createdAt": earlier},
+    ]
+    v2 = await snapshot(db, ontology, 2, back)
+    result = await comparison(client, ontology, v1, v2)
+    assert [(c["kind"], c["change"], c["level"]) for c in result["changes"]] == [
+        ("constraint", "restored", "review"),
+        ("axiom", "restored", "review"),
+        ("entity_type", "restored", "compatible"),
+    ]

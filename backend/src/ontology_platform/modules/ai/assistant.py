@@ -32,6 +32,9 @@ from ontology_platform.modules.ontology.schemas import ElementFields, ProposedIt
 JOB_KIND = "assistant.propose"
 PURPOSE = "assistant"
 RATIONALE_MAX_LENGTH = 2000
+REPLY_MAX_LENGTH = 4000
+# A request is one change in the user's words; more operations than this are not one change.
+OPERATIONS_MAX = 50
 _PLAIN_FIELDS = (
     "label_zh",
     "label_en",
@@ -165,7 +168,7 @@ def to_item(operation: AssistantOperationOut) -> ProposedItem | None:
             op=operation.op,
             kind=operation.kind,
             target_element_id=None if creates else _id(operation.target),
-            temp_ref=(operation.temp_ref or None) if creates else None,
+            temp_ref=((operation.temp_ref or "").strip() or None) if creates else None,
             proposed=ElementFields.model_validate(fields),
             confidence=min(max(operation.confidence, 0.0), 1.0),
             rationale=operation.rationale[:RATIONALE_MAX_LENGTH] or None,
@@ -202,9 +205,17 @@ def make_assistant(
             row = await db.get(AssistantRequest, request_id, with_for_update=True)
             if row is None or row.status in ("succeeded", "failed"):
                 return  # a replayed job: the request has its answer
-            row.status, row.step = "running", "context"
+            # Only reachable through stale-lease recovery: earlier runs died without reporting
+            # (worker killed). Stop instead of asking the model once more.
+            interrupted = job.attempts > job.max_attempts
+            if interrupted:
+                row.status, row.error_code, row.finished_at = "failed", "internal.error", _now()
+            else:
+                row.status, row.step = "running", "context"
             ontology_id, user_id, message = row.ontology_id, row.user_id, row.message
             context = schemas.AssistantContext.model_validate(row.context)
+        if interrupted:
+            raise AppError(500, "internal.error", "The assistant was interrupted too often.")
         try:
             async with session_factory() as db:
                 text = await ontology_assistant.context_for(
@@ -222,7 +233,8 @@ def make_assistant(
                 text=f"{text}\n\nThe user's request:\n{message}",
                 schema=AssistantOut,
             )
-            items = [to_item(operation) for operation in output.operations]
+            # Operations past the cap are dropped like those that fail the checks.
+            items = [to_item(operation) for operation in output.operations[:OPERATIONS_MAX]]
             valid = [item for item in items if item is not None]
             async with session_factory.begin() as db:
                 await job.check_lease(db)
@@ -238,8 +250,8 @@ def make_assistant(
                     items=valid,
                 )
                 row.status = "succeeded"
-                row.reply = output.reply.strip() or None
-                row.dropped = proposal.dropped + len(items) - len(valid)
+                row.reply = output.reply.strip()[:REPLY_MAX_LENGTH] or None
+                row.dropped = proposal.dropped + len(output.operations) - len(valid)
                 row.change_set_id = proposal.change_set_id
                 row.finished_at = _now()
         except AiError as exc:

@@ -11,7 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ontology_platform.errors import AppError
-from ontology_platform.modules.ai.assistant import JOB_KIND, make_assistant
+from ontology_platform.modules.ai.assistant import JOB_KIND, OPERATIONS_MAX, make_assistant
 from ontology_platform.modules.ai.gateway import AiNotConfiguredError, AiUnavailableError
 from ontology_platform.modules.ai.models import AssistantRequest
 from ontology_platform.modules.ai.prompts import (
@@ -257,7 +257,7 @@ async def test_a_reply_alone_makes_no_change_set(
     assert await db.scalar(select(ChangeSet.id).where(ChangeSet.ontology_id == ontology.id)) is None
 
 
-async def test_operations_that_all_fail_make_no_change_set(
+async def test_only_the_first_passing_operation_on_an_element_counts(
     app: FastAPI, client: AsyncClient, db: AsyncSession
 ) -> None:
     await sign_in(client, db, Role.EDITOR)
@@ -289,6 +289,225 @@ async def test_operations_that_all_fail_make_no_change_set(
     assert row.change_set_id is not None
 
 
+async def element_rows(db: AsyncSession, ontology: Ontology) -> set[tuple[Any, ...]]:
+    rows = await db.execute(
+        select(Element.id, Element.status, Element.revision).where(
+            Element.ontology_id == ontology.id
+        )
+    )
+    return {tuple(row) for row in rows}
+
+
+async def proposed_items(client: AsyncClient, change_set_id: UUID | None) -> list[dict[str, Any]]:
+    assert change_set_id is not None
+    detail = (await client.get(f"/api/change-sets/{change_set_id}")).json()
+    items: list[dict[str, Any]] = detail["items"]
+    return items
+
+
+async def run(
+    app: FastAPI, client: AsyncClient, ontology: Ontology, operations: list[AssistantOperationOut]
+) -> AssistantRequest:
+    request = await ask(client, ontology, "改一改")
+    gateway = ScriptedGateway({"assistant": [AssistantOut(reply="好的。", operations=operations)]})
+    await answer(app, request["id"], gateway)
+    row = await stored(app, request["id"])
+    assert row.status == "succeeded", row.error_code
+    return row
+
+
+async def test_operations_that_all_fail_make_no_change_set_and_touch_nothing(
+    app: FastAPI, client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.EDITOR)
+    ontology, rows = await steel(db)
+    before = await element_rows(db, ontology)
+
+    row = await run(
+        app,
+        client,
+        ontology,
+        [
+            operation("delete", "entity_type", target=None),
+            operation("update", "entity_type", target=rows["Heat"], datatype="decimal"),
+            # Fails the field limits before any check: counted all the same.
+            operation("update", "entity_type", target=rows["Heat"], label_zh="长" * 201),
+            # Changes nothing.
+            operation("update", "entity_type", target=rows["Slab"]),
+        ],
+    )
+
+    assert (row.dropped, row.change_set_id) == (4, None)
+    assert await element_rows(db, ontology) == before
+
+
+async def test_constraints_can_only_be_deleted(
+    app: FastAPI, client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.EDITOR)
+    ontology, rows = await steel(db)
+    shape = element(
+        ontology, "constraint", "HeatShape", "炉次约束", domain_id=rows["Heat"].id, rules=[]
+    )
+    other = element(
+        ontology, "constraint", "SlabShape", "板坯约束", domain_id=rows["Slab"].id, rules=[]
+    )
+    await add_elements(db, shape, other)
+
+    row = await run(
+        app,
+        client,
+        ontology,
+        [
+            operation("update", "constraint", target=shape, label_zh="新名字"),
+            operation("update", "constraint", target=other, domain=str(rows["Heat"].id)),
+            operation("delete", "constraint", target=other),
+        ],
+    )
+
+    items = await proposed_items(client, row.change_set_id)
+    assert [(item["op"], item["targetElementId"]) for item in items] == [("delete", str(other.id))]
+    assert row.dropped == 2
+
+
+async def test_temp_refs_are_claimed_once_and_never_look_like_ids(
+    app: FastAPI, client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.EDITOR)
+    ontology, rows = await steel(db)
+
+    row = await run(
+        app,
+        client,
+        ontology,
+        [
+            operation(
+                "create", "entity_type", temp_ref=" new:Ladle ", label_zh="钢包", local_name="Ladle"
+            ),
+            # The same temp_ref again, a temp_ref that is an element id.
+            operation(
+                "create",
+                "entity_type",
+                temp_ref="new:Ladle",
+                label_zh="钢包二",
+                local_name="Ladle2",
+            ),
+            operation(
+                "create", "entity_type", temp_ref=str(uuid4()), label_zh="罐", local_name="Tank"
+            ),
+            operation(
+                "create",
+                "property",
+                label_zh="容量",
+                local_name="capacity",
+                domain="new:Ladle",
+                datatype="decimal",
+                required=False,
+                multiple=False,
+            ),
+            # "none" clears a reference.
+            operation("update", "relation_type", target=rows["castIn"], inverse=" None "),
+        ],
+    )
+
+    items = await proposed_items(client, row.change_set_id)
+    assert [(item["op"], item["proposed"].get("localName")) for item in items] == [
+        ("create", "Ladle"),
+        ("create", "capacity"),
+        ("update", None),
+    ]
+    assert items[0]["tempRef"] == "new:Ladle"
+    assert items[1]["proposed"]["domainRef"] == "new:Ladle"
+    assert items[2]["proposed"] == {"inverseRef": None}
+    assert row.dropped == 2
+
+
+async def test_what_conflicts_with_a_delete_goes_with_what_depends_on_it(
+    app: FastAPI, client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.EDITOR)
+    ontology, rows = await steel(db)
+
+    row = await run(
+        app,
+        client,
+        ontology,
+        [
+            operation("delete", "entity_type", target=rows["Slab"]),
+            # A subtype of what goes away, and a property built on that subtype.
+            operation(
+                "create",
+                "entity_type",
+                temp_ref="new:Thick",
+                label_zh="厚板坯",
+                local_name="ThickSlab",
+                parent=str(rows["Slab"].id),
+            ),
+            operation(
+                "create",
+                "property",
+                label_zh="厚度",
+                local_name="thickness",
+                domain="new:Thick",
+                datatype="decimal",
+                required=False,
+                multiple=False,
+            ),
+        ],
+    )
+
+    items = await proposed_items(client, row.change_set_id)
+    assert [(item["op"], item["targetElementId"]) for item in items] == [
+        ("delete", str(rows["Slab"].id)),
+        ("delete", str(rows["castIn"].id)),
+    ]
+    assert row.dropped == 2
+
+
+async def test_axioms_are_checked_normalized_and_taken_once(
+    app: FastAPI, client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.EDITOR)
+    ontology, _ = await steel(db)
+    heat, slab = (f"<{ontology.base_iri}{name}>" for name in ("Heat", "Slab"))
+    disjoint = "<http://www.w3.org/2002/07/owl#disjointWith>"
+
+    row = await run(
+        app,
+        client,
+        ontology,
+        [
+            operation("create", "axiom", turtle=f"{heat}   {disjoint}   {slab} ."),
+            # The same axiom written another way; one that does not parse.
+            operation("create", "axiom", turtle=f"{heat} {disjoint} {slab} ."),
+            operation("create", "axiom", turtle=f"{heat} {disjoint} ."),
+        ],
+    )
+
+    items = await proposed_items(client, row.change_set_id)
+    assert len(items) == 1
+    turtle = items[0]["proposed"]["turtle"]
+    assert "   " not in turtle
+    assert "disjointWith" in turtle
+    assert row.dropped == 2
+
+
+async def test_operations_past_the_cap_are_dropped(
+    app: FastAPI, client: AsyncClient, db: AsyncSession
+) -> None:
+    await sign_in(client, db, Role.EDITOR)
+    ontology, _ = await steel(db)
+    operations = [
+        operation("create", "entity_type", label_zh=f"类型{n}", local_name=f"Type{n}")
+        for n in range(OPERATIONS_MAX + 2)
+    ]
+
+    row = await run(app, client, ontology, operations)
+
+    assert len(await proposed_items(client, row.change_set_id)) == OPERATIONS_MAX
+    assert row.dropped == 2
+
+
 async def test_model_failures_are_reported_and_transient_ones_retried(
     app: FastAPI, client: AsyncClient, db: AsyncSession
 ) -> None:
@@ -316,6 +535,17 @@ async def test_model_failures_are_reported_and_transient_ones_retried(
     # A replayed job leaves a finished request alone.
     await answer(app, second["id"], ScriptedGateway({}))
     assert (await stored(app, second["id"])).status == "failed"
+
+    # Claimed again after the last attempt died without reporting: no more model calls.
+    third = await ask(client, ontology)
+    idle = ScriptedGateway({})
+    with pytest.raises(AppError) as raised:
+        await answer(app, third["id"], idle, attempts=4)
+    assert raised.value.code == "internal.error"
+    row = await stored(app, third["id"])
+    assert (row.status, row.error_code) == ("failed", "internal.error")
+    assert row.finished_at is not None
+    assert idle.calls == []
 
 
 async def test_users_see_only_their_own_requests(client: AsyncClient, db: AsyncSession) -> None:
@@ -363,3 +593,9 @@ async def test_the_model_sees_a_summary_and_the_selected_element(
     assert f"{rows['Slab'].id} |" in cut
     assert f"{rows['castIn'].id} |" in cut
     assert f"{rows['weight'].id} |" not in cut
+    # Naming nothing still says why the list is empty.
+    nothing = await ontology_assistant.context_for(
+        db, ontology.id, message="加一个类型", page="ontology", element_id=None
+    )
+    assert "Only the 0 of 4 elements" in nothing
+    assert "(none)" in nothing

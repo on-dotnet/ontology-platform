@@ -215,9 +215,8 @@ def cascade_items(
     targets: Sequence[Element],
 ) -> list[schemas.ProposedItem]:
     """The items that go with deleting `targets` (spec 002, section 6), computed together so
-    that a constraint losing rules to several of them is updated once. Also used by the AI
-    assistant (PR C), which adds them to its own deletes. The ontology's prefixes are needed to
-    read which IRIs stored axioms mention."""
+    that a constraint losing rules to several of them is updated once. The ontology's prefixes
+    are needed to read which IRIs stored axioms mention."""
     views = _views(ontology, elements)
     changes = _Cascade(views, service.header_of(ontology).prefix_map()).changes(
         target.id for target in targets

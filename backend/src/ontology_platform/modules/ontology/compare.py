@@ -9,7 +9,9 @@ from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import defer
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.ontology import schemas, service
@@ -46,8 +48,11 @@ _DEFAULTS: dict[str, Any] = {
 
 
 async def _release(db: AsyncSession, ontology_id: UUID, release_id: UUID) -> Release:
-    release = await service._release_or_404(db, release_id, content=True)
-    if release.ontology_id != ontology_id:
+    # The snapshot only: the release's Turtle can be megabytes and is not compared.
+    release = await db.scalar(
+        select(Release).where(Release.id == release_id).options(defer(Release.turtle))
+    )
+    if release is None or release.ontology_id != ontology_id:
         raise AppError(404, "release.not_found", "Release not found.")
     return release
 
@@ -107,11 +112,10 @@ def _element_change(
         level = "review" if row["kind"] in {"constraint", "axiom"} else "breaking"
     elif element_id not in left:
         row = right[element_id]
-        if datetime.fromisoformat(row["createdAt"]) < published:
-            change, level = "restored", "compatible"
-        else:
-            change = "added"
-            level = "review" if row["kind"] in {"constraint", "axiom"} else "compatible"
+        restored = datetime.fromisoformat(row["createdAt"]) < published
+        change = "restored" if restored else "added"
+        # Bringing a constraint or an axiom back adds its rules again, like a new one.
+        level = "review" if row["kind"] in {"constraint", "axiom"} else "compatible"
     else:
         row = right[element_id]
         fields = _field_changes(element_id, left, right)

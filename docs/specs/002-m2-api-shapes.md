@@ -117,7 +117,7 @@ type ElementChange = {
   elementId: string; kind: Kind; label: string; iri: string | null;
   change: 'added' | 'removed' | 'changed' | 'restored';
   level: 'breaking' | 'review' | 'compatible';
-  fields: FieldChange[];                // 仅 changed / restored
+  fields: FieldChange[];                // 仅 changed；restored 为空，起点版本里没有它的前值
 };
 type Comparison = {
   from: { releaseId: string; version: number };

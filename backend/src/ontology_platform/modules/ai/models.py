@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, ForeignKey, Index, String, Text, func
+from sqlalchemy import CheckConstraint, Index, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -55,9 +55,8 @@ class AssistantRequest(Base):
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-    ontology_id: Mapped[UUID] = mapped_column(
-        ForeignKey("ontology.ontologies.id", ondelete="CASCADE"),
-    )
+    # Rows of other modules are referenced by id without a foreign key, like ai.runs.
+    ontology_id: Mapped[UUID]
     user_id: Mapped[UUID]
     message: Mapped[str] = mapped_column(Text)
     # {page, elementId}: where the user was when they asked.
@@ -67,9 +66,7 @@ class AssistantRequest(Base):
     reply: Mapped[str | None] = mapped_column(Text)
     # Operations the model proposed that failed the checks and were left out.
     dropped: Mapped[int] = mapped_column(server_default="0", default=0)
-    change_set_id: Mapped[UUID | None] = mapped_column(
-        ForeignKey("ontology.change_sets.id", ondelete="SET NULL"),
-    )
+    change_set_id: Mapped[UUID | None]
     error_code: Mapped[str | None] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     finished_at: Mapped[datetime | None]
