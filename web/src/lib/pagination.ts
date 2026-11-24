@@ -15,10 +15,12 @@ export interface PageState {
 
 /**
  * The page of a list of `total` entries. Pass a `resetKey` that changes with whatever filters the list:
- * the page then starts over at 1. A page past the end (the list shrank) falls back to the last page.
+ * the page then starts over at 1, and stays there when an earlier filter comes back. A page past the
+ * end (the list shrank) falls back to the last page.
  */
 export function usePagination(total: number, resetKey = ''): PageState {
   const [state, setState] = useState({ page: 1, key: resetKey });
+  if (state.key !== resetKey) setState({ page: 1, key: resetKey });
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const requested = state.key === resetKey ? state.page : 1;
   const page = Math.min(Math.max(requested, 1), pages);

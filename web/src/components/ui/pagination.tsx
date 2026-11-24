@@ -23,14 +23,14 @@ export function Pagination({ state, total, className, onChange }: PaginationProp
   };
   return (
     <nav aria-label={t('pagination.label')} className={cn('flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm', className)}>
-      <p className="tabular-nums text-muted-foreground">{t('pagination.range', { from: state.start + 1, to: state.end, total })}</p>
-      <div className="flex items-center gap-2">
-        <span className="tabular-nums text-muted-foreground">{t('pagination.page', { page: state.page, pages: state.pages })}</span>
-        <Button variant="secondary" size="sm" disabled={state.page <= 1} onClick={() => go(state.page - 1)}>
+      <p aria-live="polite" className="whitespace-nowrap tabular-nums text-muted-foreground">{t('pagination.range', { from: state.start + 1, to: state.end, total })}</p>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="whitespace-nowrap tabular-nums text-muted-foreground">{t('pagination.page', { page: state.page, pages: state.pages })}</span>
+        <Button variant="secondary" size="sm" aria-disabled={state.page <= 1} onClick={() => state.page > 1 && go(state.page - 1)}>
           <ChevronLeft aria-hidden />
           {t('pagination.previous')}
         </Button>
-        <Button variant="secondary" size="sm" disabled={state.page >= state.pages} onClick={() => go(state.page + 1)}>
+        <Button variant="secondary" size="sm" aria-disabled={state.page >= state.pages} onClick={() => state.page < state.pages && go(state.page + 1)}>
           {t('pagination.next')}
           <ChevronRight aria-hidden />
         </Button>

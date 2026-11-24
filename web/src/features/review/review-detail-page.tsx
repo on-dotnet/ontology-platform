@@ -148,14 +148,16 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
   const ordered = groups.flatMap((group) => group.items);
   // Items are paged in the order they are listed, across the kind groups.
   const pager = usePagination(ordered.length, changeSet.id);
-  const onPage = new Set(ordered.slice(pager.start, pager.end));
+  const pageItems = ordered.slice(pager.start, pager.end);
+  const onPage = new Set(pageItems);
   const pageGroups = groups.map((group) => ({ ...group, shown: group.items.filter((item) => onPage.has(item)) })).filter((group) => group.shown.length > 0);
   const listRef = useRef<HTMLDivElement>(null);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editing, setEditing] = useState<ChangeItem | null>(null);
   const [mergeResult, setMergeResult] = useState<MergeResult | null>(null);
-  const selected = ordered.find((item) => item.id === selectedId) ?? ordered[0];
+  // The evidence beside the list follows the page: the first item of it until one is chosen there.
+  const selected = pageItems.find((item) => item.id === selectedId) ?? pageItems[0];
 
   const isOpen = changeSet.status === 'open';
   const canDecide = canReview && isOpen;
@@ -329,7 +331,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                 ))}
               </section>
             ))}
-            <Pagination state={pager} total={ordered.length} className="rounded-xl border" onChange={() => listRef.current?.scrollIntoView({ block: 'nearest' })} />
+            <Pagination state={pager} total={ordered.length} className="rounded-xl border" onChange={() => listRef.current?.scrollIntoView({ block: 'start' })} />
           </div>
           {isAi && wide && selected ? <EvidencePanel key={selected.id} item={selected} context={context} /> : null}
         </div>

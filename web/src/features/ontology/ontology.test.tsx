@@ -361,7 +361,7 @@ describe('list pagination', () => {
     expect(within(table).queryByRole('button', { name: '节点051' })).not.toBeInTheDocument();
     const pager = screen.getByRole('navigation', { name: '分页' });
     expect(pager).toHaveTextContent('第 1–50 项，共 120 项');
-    expect(within(pager).getByRole('button', { name: '上一页' })).toBeDisabled();
+    expect(within(pager).getByRole('button', { name: '上一页' })).toHaveAttribute('aria-disabled', 'true');
 
     await user.click(within(pager).getByRole('button', { name: '下一页' }));
     expect(within(table).getAllByRole('row')).toHaveLength(51);
@@ -372,10 +372,32 @@ describe('list pagination', () => {
     expect(within(table).getAllByRole('row')).toHaveLength(21);
     expect(within(table).getByRole('button', { name: '节点120' })).toBeInTheDocument();
     expect(pager).toHaveTextContent('第 101–120 项，共 120 项');
-    expect(within(pager).getByRole('button', { name: '下一页' })).toBeDisabled();
+    expect(within(pager).getByRole('button', { name: '下一页' })).toHaveAttribute('aria-disabled', 'true');
   });
 
-  it('goes back to the first page when the filter changes, and shows no pager for 50 or fewer', async () => {
+  it('goes back to the first page when a filter changes, and again when the earlier filter returns', async () => {
+    const user = userEvent.setup();
+    manyServer();
+    renderApp('/ontology?ontology=onto-steel&view=list');
+
+    await screen.findByRole('table', { name: '本体元素' });
+    const next = () => within(screen.getByRole('navigation', { name: '分页' })).getByRole('button', { name: '下一页' });
+    await user.click(next());
+    expect(screen.getByRole('navigation', { name: '分页' })).toHaveTextContent('第 51–100 项，共 120 项');
+    // The same 120 elements stay in the list (the server of this test ignores the kind): only the filter changed.
+    await user.click(screen.getByRole('radio', { name: '对象类型' }));
+    await waitFor(() => expect(screen.getByRole('navigation', { name: '分页' })).toHaveTextContent('第 1–50 项，共 120 项'));
+    // The kind filter comes first; the status filter has a "全部" of its own.
+    await user.click(screen.getAllByRole('radio', { name: '全部' })[0] as HTMLElement);
+    await waitFor(() => expect(screen.getByRole('navigation', { name: '分页' })).toHaveTextContent('第 1–50 项，共 120 项'));
+
+    // Searching with more than one page of matches starts over at the first page too.
+    await user.click(next());
+    await user.type(screen.getByRole('searchbox', { name: '搜索名称或同义词' }), '节点0');
+    await waitFor(() => expect(screen.getByRole('navigation', { name: '分页' })).toHaveTextContent('第 1–50 项，共 99 项'));
+  });
+
+  it('falls back to one page without a pager when a search leaves 50 or fewer', async () => {
     const user = userEvent.setup();
     manyServer();
     renderApp('/ontology?ontology=onto-steel&view=list');

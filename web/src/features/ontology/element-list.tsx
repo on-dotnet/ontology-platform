@@ -181,8 +181,8 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
       </div>
 
       <QueryState query={query}>
-        {() =>
-          shown.length === 0 ? (
+        {(elements) =>
+          elements.length === 0 ? (
             <EmptyState
               icon={Search}
               tone="secondary"
@@ -230,7 +230,7 @@ export function ElementList({ ontologyId, onSelect }: ElementListProps) {
                 <TableBody>{shown.slice(pager.start, pager.end).map((element) => renderRow(element, false))}</TableBody>
               )}
             </Table>
-            <Pagination state={pager} total={shown.length} onChange={() => cardRef.current?.scrollIntoView({ block: 'nearest' })} />
+            <Pagination state={pager} total={shown.length} onChange={() => cardRef.current?.scrollIntoView({ block: 'start' })} />
             </>
           )
         }

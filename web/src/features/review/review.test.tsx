@@ -648,6 +648,7 @@ describe('change item pagination', () => {
       tempRef: `new:N${index}`,
       proposed: { localName: `N${index}`, labelZh: `项目${String(index + 1).padStart(3, '0')}`, ...(index < 70 ? {} : { domainRef: 'el-molten-steel', datatype: 'decimal' }) },
       confidence: 0.9,
+      evidence: [{ id: `ev-${index}`, documentId: 'doc-converter', chunkId: 'chunk-1', quote: QUOTE, charStart: null, charEnd: null }],
     }),
   );
 
@@ -678,6 +679,19 @@ describe('change item pagination', () => {
     await user.click(within(screen.getByRole('navigation', { name: '分页' })).getByRole('button', { name: '下一页' }));
     expect(screen.getAllByRole('article')).toHaveLength(20);
     expect(screen.getByRole('article', { name: /项目120/ })).toBeInTheDocument();
+  });
+
+  it('shows the evidence of an item on the current page, not of the first page', async () => {
+    const user = userEvent.setup();
+    reviewServer({ initial: changeSetFixture(many) });
+    renderApp('/review/cs-converter');
+
+    await screen.findByRole('article', { name: /项目001/ });
+    expect(within(screen.getByRole('region', { name: '证据' })).getByText('项目001')).toBeInTheDocument();
+
+    await user.click(within(screen.getByRole('navigation', { name: '分页' })).getByRole('button', { name: '下一页' }));
+    expect(within(screen.getByRole('region', { name: '证据' })).getByText('项目051')).toBeInTheDocument();
+    expect(within(card(/项目051/)).getByRole('button', { name: /查看证据/ })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('shows no pager for 50 items or fewer', async () => {
