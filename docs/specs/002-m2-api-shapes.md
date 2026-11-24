@@ -93,9 +93,18 @@ type EditResult = { changeSetId: string; merged: boolean; merge: MergeResult | n
 type ElementRef = { id: string; kind: Kind; label: string; iri: string | null };
 type Impact = {
   elementId: string;
+  // 直接引用它的在用元素（侧栏"被引用"）
   subtypes: ElementRef[]; relations: ElementRef[]; properties: ElementRef[];
   constraints: ElementRef[]; axioms: ElementRef[]; inverse: ElementRef | null;
+  // 删除它时手工保存会一并提出的全部变更（传递闭包，删除确认框用）
+  cascade: { op: 'delete' | 'update'; element: ElementRef }[];
 };
+// 手工保存的补充规则：
+// - create 不能带 iri（显式 IRI 只来自导入），否则 422 changeset.invalid_edit；
+// - 同一次保存里两项指向同一元素，或某项引用、修改的元素会被本次删除（含级联）一并删除，422 changeset.invalid_edit；
+// - 级联按本次修改之后的引用计算：用户在同一次保存里把引用改走的，不再清空或删除；
+// - 约束的规则被级联移除光后保留约束（空规则列表合法），不删除；
+// - 公理的 create、update、restore 都做三项校验；同一次保存里重复的公理按 422 axiom.invalid。
 
 type PlatformSettings = { reviewMode: 'single' | 'separate' };   // GET /api/settings/platform
 
@@ -154,7 +163,7 @@ type AssistantRequest = {
 | `element.stale` | 409 | 元素在读取之后被修改过 |
 | `element.name_taken` | 409 | 局部名或 IRI 已被占用（包括已删除的元素） |
 | `element.not_found` | 404 | 沿用 M1 |
-| `axiom.invalid` | 422 | 公理片段无法解析，或不是恰好一条公理 |
+| `axiom.invalid` | 422 | 公理片段无法解析、不是恰好一条公理，或本体（或同一次保存）里已有这条公理 |
 | `axiom.maps_to_element` | 422 | 片段的内容可以用表单表达 |
 | `changeset.self_review` | 403 | 异人审核模式下，审核自己创建的变更集 |
 | `assistant.not_found` | 404 | 请求不存在，或不属于当前用户 |

@@ -144,17 +144,27 @@ async def test_name_collisions_include_retired_and_batch_iris(
     await sign_in(client, db, Role.ADMIN)
     ontology = await add_ontology(db)
     retired = element(ontology, "entity_type", "Heat", "炉次", status="deprecated")
-    await add_elements(db, retired)
+    # Imported: its explicit IRI is what a hand-made "Mill" would get.
+    imported = element(ontology, "entity_type", "Mill2", "轧机", iri=ontology.base_iri + "Mill")
+    await add_elements(db, retired, imported)
     first = create("entity_type", "Slab", "板坯")
     for items in (
         [create("entity_type", "Heat", "新炉次")],
-        [create("entity_type", "Other", "其他", iri=ontology.base_iri + "Heat")],
+        [create("entity_type", "Mill", "轧机")],
         [first, first | {"tempRef": "new:second"}],
-        [first, create("entity_type", "Other", "其他", iri=ontology.base_iri + "Slab")],
     ):
         response = await save(client, ontology, *items, apply=False)
         assert response.status_code == 409
         assert response.json()["code"] == "element.name_taken"
+    # Only imports bring their own IRI: it would skip the naming rules.
+    own_iri = await save(
+        client,
+        ontology,
+        create("entity_type", "Other", "其他", iri="urn:x:Other"),
+        apply=False,
+    )
+    assert own_iri.status_code == 422
+    assert own_iri.json()["detail"] == "Item 1: iri is set by imports only."
     assert await db.scalar(select(ChangeSet.id)) is None
 
 
@@ -173,7 +183,7 @@ async def test_invalid_edit_reports_the_item_and_field(
     assert response.status_code == 422
     problem = response.json()
     assert problem["code"] == "changeset.invalid_edit"
-    assert "2" in problem["detail"]
+    assert problem["detail"].startswith("Item 2:")
     assert "datatype" in problem["detail"]
     assert await db.scalar(select(ChangeSet.id)) is None
 
@@ -221,18 +231,31 @@ async def test_skip_rolls_back_an_otherwise_valid_create(
     heat = element(ontology, "entity_type", "Heat", "炉次")
     await add_elements(db, heat)
 
-    response = await save(
+    retired = element(ontology, "entity_type", "Old", "旧", status="deprecated")
+    await add_elements(db, retired)
+
+    # Referring to what the same save deletes is refused before anything is written.
+    conflict = await save(
         client,
         ontology,
         create("entity_type", "Child", "子类型", parentRef=str(heat.id)),
         edit("delete", heat),
     )
-
+    assert conflict.status_code == 422
+    assert conflict.json()["detail"] == "Item 1: it refers to an element this save deletes."
+    # A reference the merge refuses (a deleted type) rolls the whole save back.
+    response = await save(
+        client,
+        ontology,
+        create("entity_type", "Slab", "板坯"),
+        create("property", "weight", "重量", domainRef=str(retired.id), datatype="decimal"),
+    )
     assert response.status_code == 409
-    assert response.json()["code"] == "changeset.has_dependents"
+    assert response.json()["code"] == "changeset.invalid_item"
+    assert response.json()["detail"].startswith("Item 2 ")
     assert await db.scalar(select(ChangeSet.id)) is None
     rows = await elements_by_name(db, ontology)
-    assert set(rows) == {"Heat"}
+    assert set(rows) == {"Heat", "Old"}
     assert (rows["Heat"].revision, rows["Heat"].status) == (1, "active")
 
 
@@ -328,8 +351,9 @@ def test_single_root_cascade_carries_revisions_and_object_iri_mentions(
 
     proposals = cascade_items(ontology, list(rows.values()), [root])
 
-    deletes = ["weight", "casts", "Direct", "Empty", "axiom"]
-    updates = ["Slab", "Mixed", "castBy"]
+    deletes = ["weight", "casts", "Direct", "axiom"]
+    # Empty loses all its rules but stays: an empty rule list is a valid constraint.
+    updates = ["Slab", "Mixed", "castBy", "Empty"]
     expected = {
         (op, rows[name].id, rows[name].revision)
         for op, names in (("delete", deletes), ("update", updates))
@@ -355,8 +379,8 @@ async def test_cascade_applies_once_per_target(
     )
 
     assert response.status_code == 200, response.text
-    removed = {"Heat", "weight", "casts", "Direct", "Empty", "axiom"}
-    updated = {"Slab", "Mixed", "castBy"}
+    removed = {"Heat", "weight", "casts", "Direct", "axiom"}
+    updated = {"Slab", "Mixed", "castBy", "Empty"}
     assert response.json()["merge"] == {"applied": len(removed | updated), "skipped": []}
     detail = await client.get(f"/api/change-sets/{response.json()['changeSetId']}")
     assert detail.status_code == 200
@@ -372,6 +396,7 @@ async def test_cascade_applies_once_per_target(
     assert (rows["Slab"].parent_id, rows["Slab"].label_zh) == (None, "连铸板坯")
     assert rows["castBy"].inverse_id is None
     assert rows["Mixed"].rules == [{"pathId": str(rows["width"].id), "minCount": 2}]
+    assert rows["Empty"].rules == []
 
 
 async def test_viewer_reads_sorted_direct_impact_and_cannot_save(
@@ -402,6 +427,12 @@ async def test_viewer_reads_sorted_direct_impact_and_cannot_save(
     }
     assert impact["axioms"][0]["label"] == rows["axiom"].turtle
     assert impact["axioms"][0]["iri"] is None
+    # Everything a delete would change, beyond the direct references.
+    cascade = {(change["op"], change["element"]["id"]) for change in impact["cascade"]}
+    assert cascade == {
+        *(("delete", str(rows[name].id)) for name in ("weight", "casts", "Direct", "axiom")),
+        *(("update", str(rows[name].id)) for name in ("Slab", "Mixed", "castBy", "Empty")),
+    }
     for name, partner in (("casts", "castBy"), ("castBy", "casts")):
         result = await client.get(f"{elements_url}/{rows[name].id}/impact")
         assert result.status_code == 200
@@ -417,7 +448,7 @@ async def test_viewer_reads_sorted_direct_impact_and_cannot_save(
     assert await db.scalar(select(ChangeSet.id)) is None
 
 
-async def test_independent_deletes_remove_the_last_rules_together(
+async def test_independent_deletes_empty_a_constraint_once(
     client: AsyncClient, db: AsyncSession, linked_ontology: tuple[Ontology, dict[str, Element]]
 ) -> None:
     await sign_in(client, db, Role.ADMIN)
@@ -445,13 +476,89 @@ async def test_independent_deletes_remove_the_last_rules_together(
         for item in detail.json()["items"]
         if item["targetElementId"] == str(rows["Empty"].id)
     ]
-    assert empty_ops == ["delete"]
+    assert empty_ops == ["update"]
     await db.refresh(rows["Empty"])
     await db.refresh(shape_axiom)
-    assert rows["Empty"].status == shape_axiom.status == "deprecated"
-    assert rows["Empty"].revision == shape_axiom.revision == 2
+    # Both deletes took its rules; it stays, so does the axiom about it.
+    assert (rows["Empty"].status, rows["Empty"].rules, rows["Empty"].revision) == ("active", [], 2)
+    assert (shape_axiom.status, shape_axiom.revision) == ("active", 1)
     await db.refresh(rows["Mixed"])
     assert rows["Mixed"].rules == [
         {"pathId": str(rows["castBy"].id), "classId": str(rows["Heat"].id)},
         {"pathId": str(rows["width"].id), "minCount": 2},
     ]
+
+
+async def test_a_reference_moved_away_in_the_same_save_stays(
+    client: AsyncClient, db: AsyncSession, linked_ontology: tuple[Ontology, dict[str, Element]]
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    ontology, rows = linked_ontology
+    other = element(ontology, "entity_type", "Other", "其他")
+    await add_elements(db, other)
+
+    response = await save(
+        client,
+        ontology,
+        edit("delete", rows["Heat"]),
+        edit("update", rows["Slab"], parentRef=str(other.id)),
+        edit("update", rows["weight"], domainRef=str(rows["Slab"].id)),
+    )
+
+    assert response.status_code == 200, response.text
+    for name in ("Slab", "weight"):
+        await db.refresh(rows[name])
+    # Not cleared by the cascade, and not deleted with Heat: the user moved them away.
+    assert rows["Slab"].parent_id == other.id
+    assert (rows["weight"].status, rows["weight"].domain_id) == ("active", rows["Slab"].id)
+
+
+async def test_a_save_cannot_keep_what_it_deletes(
+    client: AsyncClient, db: AsyncSession, linked_ontology: tuple[Ontology, dict[str, Element]]
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    ontology, rows = linked_ontology
+    heat = edit("delete", rows["Heat"])
+    for items, detail in (
+        (
+            [heat, edit("update", rows["Slab"], parentRef=str(rows["Heat"].id))],
+            "Item 2: it refers to an element this save deletes.",
+        ),
+        (
+            [heat, edit("update", rows["weight"], labelZh="称重")],
+            "Item 2: another item of this save deletes this element along with its own.",
+        ),
+        (
+            [
+                edit("update", rows["Slab"], labelZh="甲"),
+                edit("update", rows["Slab"], labelZh="乙"),
+            ],
+            "Item 2: item 1 already changes this element.",
+        ),
+    ):
+        response = await save(client, ontology, *items)
+        assert response.status_code == 422
+        assert (response.json()["code"], response.json()["detail"]) == (
+            "changeset.invalid_edit",
+            detail,
+        )
+    assert await db.scalar(select(ChangeSet.id)) is None
+
+
+async def test_restoring_an_axiom_checks_it_again(client: AsyncClient, db: AsyncSession) -> None:
+    ontology = await small_ontology(client, db)
+    retired = element(
+        ontology,
+        "axiom",
+        "",
+        "",
+        turtle="ex:A rdfs:subClassOf ex:B .",
+        status="deprecated",
+    )
+    retired.local_name = retired.label_zh = None
+    await add_elements(db, retired)
+
+    response = await save(client, ontology, edit("restore", retired))
+
+    assert response.status_code == 422
+    assert response.json()["code"] == "axiom.maps_to_element"

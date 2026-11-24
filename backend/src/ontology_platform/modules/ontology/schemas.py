@@ -446,8 +446,16 @@ class ElementRef(CamelModel):
     iri: str | None
 
 
+class CascadeChange(CamelModel):
+    """What deleting an element does to another one: delete it, or update it to let go."""
+
+    op: Literal["delete", "update"]
+    element: ElementRef
+
+
 class Impact(CamelModel):
-    """Active elements that refer to one element (spec 002, section 9)."""
+    """Active elements that refer to one element (spec 002, section 9), and everything a delete
+    of it would change, transitively, as a manual save proposes it (section 6)."""
 
     element_id: UUID
     subtypes: list[ElementRef]
@@ -456,6 +464,7 @@ class Impact(CamelModel):
     constraints: list[ElementRef]
     axioms: list[ElementRef]
     inverse: ElementRef | None
+    cascade: list[CascadeChange]
 
 
 class TurtleEdit(CamelModel):

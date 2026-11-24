@@ -1045,7 +1045,7 @@ async def update_item(
     patch: schemas.ItemDecisionPatch,
     *,
     actor: UUID,
-    review_mode: ReviewMode = "single",
+    review_mode: ReviewMode,
 ) -> schemas.ChangeItem:
     """Set the decision, the reviewer's edit and/or the note of one item."""
     change_set = await _change_set_or_404(db, change_set_id, lock=True)
@@ -1085,7 +1085,7 @@ async def decide_items(
     body: schemas.BulkDecision,
     *,
     actor: UUID,
-    review_mode: ReviewMode = "single",
+    review_mode: ReviewMode,
 ) -> schemas.ChangeSetDetail:
     """Apply one decision to several items; unknown item ids change nothing."""
     change_set = await _change_set_or_404(db, change_set_id, lock=True)
@@ -1108,7 +1108,7 @@ async def reject_change_set(
     change_set_id: UUID,
     *,
     actor: UUID,
-    may_reject_any: bool = True,
+    may_reject_any: bool,
     ip: str | None,
 ) -> schemas.ChangeSetSummary:
     """Close the change set without applying anything; pending items become rejected.
@@ -1593,7 +1593,7 @@ async def merge_change_set(
     *,
     actor: UUID,
     ip: str | None,
-    review_mode: ReviewMode = "single",
+    review_mode: ReviewMode,
 ) -> schemas.MergeResult:
     """Apply the accepted items to the working version in one transaction.
 
@@ -1609,12 +1609,12 @@ async def merge_change_set(
     change_set = await _change_set_or_404(db, change_set_id, lock=True)
     _ensure_open(change_set)
     _ensure_not_own(change_set, actor, review_mode)
-    result = await apply_change_set(db, change_set, ontology, actor=actor, ip=ip)
+    result = await _apply_change_set(db, change_set, ontology, actor=actor, ip=ip)
     await db.commit()
     return result
 
 
-async def apply_change_set(
+async def _apply_change_set(
     db: AsyncSession,
     change_set: ChangeSet,
     ontology: Ontology,

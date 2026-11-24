@@ -18,8 +18,9 @@ from ontology_platform.modules.ontology import importing, schemas, service
 from ontology_platform.modules.ontology.models import Element, Ontology
 from ontology_platform.modules.ontology.rdf import reader, writer
 from ontology_platform.modules.ontology.rdf.diff import Change, diff, keep_lost_lists
+from ontology_platform.modules.ontology.rdf.model import AxiomState
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError
-from ontology_platform.modules.ontology.turtle import axiom_triples, build_graph, to_state
+from ontology_platform.modules.ontology.turtle import axiom_triples, to_state
 
 TURTLE_EDIT_TITLE = "专家模式：编辑 Turtle"
 
@@ -64,10 +65,11 @@ def _added(
     header = service.header_of(ontology)
     shown = [service.element_out(element, ontology.base_iri) for element in elements]
     current = to_state(header, shown, include_deleted=True)
-    graph = build_graph(header, shown, version=None, created=ontology.created_at)
+    exported = to_state(header, shown)
     if turtle is not None:
-        for triple in axiom_triples(turtle, header.prefix_map()):
-            graph.add(triple)
+        # As a merged axiom would be exported: the writer also declares what it mentions.
+        exported.axioms.append(AxiomState(triples=axiom_triples(turtle, header.prefix_map())))
+    graph = writer.build_graph(exported, version=None, created=ontology.created_at)
     result = reader.read(
         graph,
         ontology_iri=header.ontology_iri,

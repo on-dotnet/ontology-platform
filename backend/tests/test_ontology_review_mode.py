@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.modules.identity.models import Role, User
 from ontology_platform.modules.ontology import service
-from ontology_platform.modules.ontology.models import Ontology
+from ontology_platform.modules.ontology.models import ChangeSetSource, Ontology
 from ontology_platform.modules.ontology.schemas import ElementFields, ProposedItem
 from support import csrf_headers
 from test_ontology_support import add_ontology, sign_in
@@ -22,12 +22,17 @@ async def user_id(db: AsyncSession, role: Role) -> UUID:
     return found
 
 
-async def change_set_by(db: AsyncSession, ontology: Ontology, creator: UUID) -> UUID:
+async def change_set_by(
+    db: AsyncSession,
+    ontology: Ontology,
+    creator: UUID,
+    source: ChangeSetSource = "manual",
+) -> UUID:
     change_set_id = await service.create_change_set(
         db,
         ontology_id=ontology.id,
         title="手工修改",
-        source="manual",
+        source=source,
         document_id=None,
         created_by=creator,
         items=[
@@ -155,3 +160,29 @@ async def test_creators_withdraw_their_own_change_sets_only(
     )
     assert decided.status_code == 403
     assert decided.json()["code"] == "auth.forbidden"
+
+
+async def test_separate_mode_covers_ai_change_sets_of_ones_upload(
+    app: FastAPI, client: AsyncClient, db: AsyncSession
+) -> None:
+    app.state.settings.review_mode = "separate"
+    await sign_in(client, db, Role.REVIEWER)
+    ontology = await add_ontology(db)
+    # An AI change set belongs to whoever uploaded the document.
+    uploaded = await change_set_by(
+        db, ontology, await user_id(db, Role.REVIEWER), source="ai_extraction"
+    )
+    item_id = await first_item(client, uploaded)
+    headers = csrf_headers(client)
+
+    decided = await client.patch(
+        f"/api/change-sets/{uploaded}/items/{item_id}",
+        json={"decision": "accepted"},
+        headers=headers,
+    )
+    assert decided.status_code == 403
+    assert decided.json()["code"] == "changeset.self_review"
+    # Withdrawing is not reviewing: a reviewer takes back their own.
+    withdrawn = await client.post(f"/api/change-sets/{uploaded}/reject", headers=headers)
+    assert withdrawn.status_code == 200
+    assert withdrawn.json()["status"] == "rejected"
