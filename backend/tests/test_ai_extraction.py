@@ -518,6 +518,7 @@ async def test_only_names_of_two_characters_or_more_and_labels_merge_types() -> 
     types = [
         entity("new:Converter", "转炉", "Converter", synonyms=["炉"]),
         entity("new:Reheater", "加热炉", "Reheater", synonyms=["炉"]),  # one character: no
+        entity("new:Furnace", "炉", "Furnace"),  # one character, even as a label: no
         entity("new:Refiner", "精炼炉", "Refiner", synonyms=["LF炉"]),
         entity("new:LF", "LF精炼炉", "LF", synonyms=["LF炉"]),  # synonym against synonym: no
         entity("new:Return", "回炉处理", "Return", quotes=[quote(0, "每个炉次只冶炼一个钢种")]),
@@ -536,6 +537,7 @@ async def test_only_names_of_two_characters_or_more_and_labels_merge_types() -> 
     assert [p.fields["labelZh"] for p in proposals] == [
         "转炉",
         "加热炉",
+        "炉",
         "精炼炉",
         "LF精炼炉",
         "回炉处理",
@@ -545,13 +547,17 @@ async def test_only_names_of_two_characters_or_more_and_labels_merge_types() -> 
     # Located quotes of the merged term are kept as evidence; unlocated ones are not.
     assert [e.chunk_id for e in merged.evidence] == [CHUNK_A.id, CHUNK_B.id]
     assert merged.flags == []
+    # Sharing only a synonym is left to the reviewer, marked as a possible duplicate.
+    # (Types without quotes also carry evidence_not_found.)
+    flagged = [p.fields["labelZh"] for p in proposals if "possible_duplicate" in p.flags]
+    assert flagged == ["LF精炼炉"]
 
 
 async def test_relation_evidence_uses_every_name_and_needs_two_separate_mentions() -> None:
     chunk = ChunkText(
         id=uuid4(),
         seq=0,
-        text="铁水由铁水罐运入转炉。\n钢种成分要求见下表。\n相邻炉次的钢种相同。",
+        text="铁水由铁水罐运入转炉。\n钢种成分要求见下表。\n相邻炉次的钢种相同。\n铁水由罐运入转炉。",
     )
     converter = KnownElement(
         id=uuid4(), kind="entity_type", local_name="Converter", label_zh="转炉设备"
@@ -560,8 +566,10 @@ async def test_relation_evidence_uses_every_name_and_needs_two_separate_mentions
         # Matches the existing type by a synonym: its label 转炉 is checked too.
         entity("new:BOF", "转炉", "BOF", synonyms=["转炉设备"]),
         entity("new:Pot", "铁水罐", "Pot"),
-        entity("new:Requirement", "钢种成分要求", "Requirement"),
+        # Its short synonym 成分要求 lies inside 钢种成分要求 and is no separate mention either.
+        entity("new:Requirement", "钢种成分要求", "Requirement", synonyms=["成分要求"]),
         entity("new:Heat", "炉次", "Heat"),
+        entity("new:Tank", "罐", "Tank"),
     ]
     grade = str(EXISTING_GRADE.id)
     rels = RelationsOut(
@@ -570,6 +578,8 @@ async def test_relation_evidence_uses_every_name_and_needs_two_separate_mentions
             # 钢种 is only found inside 钢种成分要求: one mention, not two.
             relation(grade, "new:Requirement", "要求", [quote(0, "钢种成分要求见下表")]),
             relation("new:Heat", "new:Heat", "相邻", [quote(0, "相邻炉次的钢种相同")]),
+            # A one-character name does not count as naming a type.
+            relation("new:Tank", "new:BOF", "装运", [quote(0, "铁水由罐运入转炉")]),
         ],
         properties=[],
     )

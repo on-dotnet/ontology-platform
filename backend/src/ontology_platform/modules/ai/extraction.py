@@ -329,9 +329,10 @@ class _Builder:
     ) -> bool:
         """Whether a located quote's line names both ends (by any of their normalized names).
 
-        A line is the unit of direct evidence: a sentence group, list item or table row. The two
-        mentions must be separate, so that one name inside another (钢种 in 钢种成分要求) or a
-        single mention of a type related to itself does not count twice.
+        A line is the unit of direct evidence: a sentence group, list item or table row. Only
+        the longest mentions count, and the two ends need mentions that do not overlap: a name
+        inside a longer name (钢种 in 钢种成分要求) is not a mention of its own, and a type
+        related to itself has to be named twice.
         """
         for item in evidence:
             chunk = self.by_id.get(item.chunk_id)
@@ -340,8 +341,21 @@ class _Builder:
             start = chunk.text.rfind("\n", 0, item.char_start) + 1
             end = chunk.text.find("\n", item.char_end)
             line = normalize(chunk.text[start : end if end != -1 else len(chunk.text)])
-            spans = [_mentions(line, names) for names in (domain, range_)]
-            if any(not _nested(a, b) for a in spans[0] for b in spans[1]):
+            mentions = [
+                (span, side)
+                for side, names in enumerate((domain, range_))
+                for span in _mentions(line, names)
+            ]
+            longest = [
+                (span, side)
+                for span, side in mentions
+                if not any(_inside(span, other) for other, _ in mentions)
+            ]
+            if any(
+                a_side == 0 and b_side == 1 and (a[1] <= b[0] or b[1] <= a[0])
+                for a, a_side in longest
+                for b, b_side in longest
+            ):
                 return True
         return False
 
@@ -447,6 +461,8 @@ def build_proposals(
                 "parentRef": None,
             },
         )
+        if any(item_synonyms & _type_keys(p) for _, p in new_types):
+            proposal.flags.append("possible_duplicate")  # only a synonym is shared: ask a human
         new_types.append((item, proposal))
         builder.add(proposal, item.quotes, item.confidence)
 
@@ -575,8 +591,9 @@ def _mentions(line: str, names: set[str]) -> list[tuple[int, int]]:
     return spans
 
 
-def _nested(a: tuple[int, int], b: tuple[int, int]) -> bool:
-    return (a[0] <= b[0] and b[1] <= a[1]) or (b[0] <= a[0] and a[1] <= b[1])
+def _inside(span: tuple[int, int], other: tuple[int, int]) -> bool:
+    """Whether `span` lies within the longer `other`."""
+    return other[0] <= span[0] and span[1] <= other[1] and other[1] - other[0] > span[1] - span[0]
 
 
 def _synonyms(values: Iterable[str], label: str) -> list[dict[str, str]]:
