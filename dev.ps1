@@ -96,13 +96,15 @@ function Get-WorktreeTag([string]$Path) {
 # main checkout, Get-WorktreeTag for the others. Empty when git cannot list them.
 function Get-Workspaces {
     # git prints paths as UTF-8; decode them as such so non-ASCII folders compare correctly.
+    # Hosts without a console may refuse the change; git still runs, and a path that then fails to
+    # match only gets its own hash tag (Get-ImageTag), never "local".
     $previousConsole = [Console]::OutputEncoding
-    [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
     try {
+        try { [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false) } catch { }
         $lines = @(git -C $Root worktree list --porcelain 2>$null)
         $code = $LASTEXITCODE
     } finally {
-        [Console]::OutputEncoding = $previousConsole
+        try { [Console]::OutputEncoding = $previousConsole } catch { }
     }
     if ($code -ne 0) { return }
     $paths = @($lines | Where-Object { $_ -like 'worktree *' } | ForEach-Object { Get-NormalizedPath $_.Substring(9) })
