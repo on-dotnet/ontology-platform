@@ -5,6 +5,10 @@ Runs the real model over every document in order, accepting every proposal so th
 documents align with what earlier ones produced, then scores entity types and relations
 against eval/expected.toml (format documented in that file). Progress goes to stderr, the
 result as JSON to stdout. This spends model tokens, so it is not part of CI.
+
+The result keeps the accepted elements, so that a changed expected.toml can be scored against
+the same run without calling the model again: `--rescore` reads
+{"expected": "<toml text>", "elements": [...]} on stdin and prints the score.
 """
 
 import asyncio
@@ -13,7 +17,7 @@ import json
 import sys
 import tomllib
 from collections.abc import Sequence
-from dataclasses import replace
+from dataclasses import asdict, replace
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -81,6 +85,34 @@ def accept(known: list[KnownElement], proposals: Sequence[Proposal]) -> list[Kno
     return result
 
 
+def dump_elements(known: Sequence[KnownElement]) -> list[dict[str, Any]]:
+    return [
+        {
+            key: (str(value) if isinstance(value, UUID) else value)
+            for key, value in asdict(element).items()
+        }
+        for element in known
+    ]
+
+
+def load_elements(saved: Sequence[dict[str, Any]]) -> list[KnownElement]:
+    def uuid_or_none(value: Any) -> UUID | None:
+        return UUID(value) if value else None
+
+    return [
+        KnownElement(
+            **{
+                **item,
+                "id": UUID(item["id"]),
+                "synonyms": tuple(item["synonyms"]),
+                "domain_id": uuid_or_none(item["domain_id"]),
+                "range_id": uuid_or_none(item["range_id"]),
+            }
+        )
+        for item in saved
+    ]
+
+
 def _names(element: KnownElement) -> set[str]:
     values = {element.label_zh, element.local_name, *element.synonyms}
     if element.label_en:
@@ -125,6 +157,13 @@ def score(known: Sequence[KnownElement], expected: dict[str, Any]) -> dict[str, 
     )
     core_pairs = [pair for pair, core in expected_pairs if core]
     relation_recall = sum(pair in set(predicted_pairs) for pair in core_pairs) / len(core_pairs)
+    label = {element.id: element.label_zh for element in types}
+    unmatched_relations = sorted(
+        f"{label.get(r.domain_id, '?') if r.domain_id else '?'} → "
+        f"{label.get(r.range_id, '?') if r.range_id else '?'}（{r.label_zh}）"
+        for r, pair in zip(relations, predicted_pairs, strict=True)
+        if pair not in valid_pairs
+    )
 
     return {
         "entityTypes": {
@@ -140,6 +179,7 @@ def score(known: Sequence[KnownElement], expected: dict[str, Any]) -> dict[str, 
             "predicted": len(relations),
             "precision": round(relation_precision, 3),
             "recall": round(relation_recall, 3),
+            "unmatched": unmatched_relations,
         },
         "properties": sum(e.kind == "property" for e in known),
     }
@@ -183,11 +223,16 @@ async def evaluate(files: dict[str, bytes]) -> dict[str, Any]:
     result["groundedShare"] = (
         round(1 - ungrounded / proposals_total, 3) if proposals_total else None
     )
+    result["elements"] = dump_elements(known)
     return result
 
 
 def main() -> int:
     bundle = json.loads(sys.stdin.read())
+    if "--rescore" in sys.argv[1:]:
+        known = load_elements(bundle["elements"])
+        print(json.dumps(score(known, tomllib.loads(bundle["expected"])), ensure_ascii=False))
+        return 0
     files = {path: base64.b64decode(value) for path, value in bundle["files"].items()}
     result = asyncio.run(evaluate(files))
     print(json.dumps(result, ensure_ascii=False, indent=2))

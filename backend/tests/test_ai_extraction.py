@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from typing import Any
 from uuid import UUID, uuid4
 
+import pytest
 from pydantic import BaseModel
 
 from ontology_platform.modules.ai.extraction import (
@@ -14,6 +15,7 @@ from ontology_platform.modules.ai.extraction import (
     KnownElement,
     Proposal,
     batches,
+    build_proposals,
     merge_types,
     normalize,
 )
@@ -445,3 +447,259 @@ def test_a_single_batch_of_types_is_kept_as_the_model_returned_it() -> None:
         entity("new:LadleFurnace", "精炼炉", "LadleFurnace"),
     ]
     assert merge_types([], batch) == batch
+
+
+async def test_new_types_sharing_a_name_become_one_type() -> None:
+    types = [
+        entity("new:LadleFurnace", "LF精炼炉", "LadleFurnace", synonyms=["精炼炉"]),
+        entity("new:Ladle", "钢包", "Ladle"),
+        # Another name of the same furnace: merged, its names kept as synonyms.
+        entity("new:Refiner", "精炼炉", "Refiner", synonyms=["LF炉"]),
+        entity("new:Converter", "转炉", "Converter", label_en="Converter"),
+        entity("new:BOF", "顶底复吹转炉", "BOF", label_en="converter"),
+    ]
+    rels = RelationsOut(
+        relations=[
+            relation("new:Ladle", "new:Refiner", "运至", [quote(0, "钢水由钢包吊运至精炼炉")])
+        ],
+        properties=[],
+    )
+    proposals, _ = await run(ScriptedGateway(outputs(types, rels)))
+
+    created = [p for p in proposals if p.kind == "entity_type"]
+    assert [p.fields["labelZh"] for p in created] == ["LF精炼炉", "钢包", "转炉"]
+    furnace = by_label(proposals, "LF精炼炉")
+    assert [s["text"] for s in furnace.fields["synonyms"]] == ["精炼炉", "LF炉"]
+    assert [s["text"] for s in by_label(proposals, "转炉").fields["synonyms"]] == ["顶底复吹转炉"]
+    [link] = [p for p in proposals if p.kind == "relation_type"]
+    assert link.fields["rangeRef"] == "new:LadleFurnace"
+
+
+async def test_relations_need_a_quote_whose_line_names_both_types() -> None:
+    chunk = ChunkText(
+        id=uuid4(),
+        seq=0,
+        text="每个炉次只冶炼一个钢种。\n钢水由钢包吊运至精炼炉。\n炉次按计划组织生产。",
+    )
+    types = [
+        entity("new:Heat", "炉次", "Heat"),
+        entity("new:Ladle", "盛钢桶", "Ladle", synonyms=["钢包"]),
+        entity("new:Crane", "行车", "Crane"),
+    ]
+    grade = str(EXISTING_GRADE.id)
+    rels = RelationsOut(
+        relations=[
+            relation("new:Heat", grade, "冶炼", [quote(0, "只冶炼一个钢种")]),
+            # The line of the quote does not name the heat: no direct evidence.
+            relation("new:Heat", "new:Ladle", "使用", [quote(0, "钢水由钢包吊运至精炼炉")]),
+            relation("new:Heat", grade, "计划钢种", []),
+            relation("new:Heat", grade, "虚构", [quote(0, "炉次与钢种一一对应")]),
+            # 行车 is not named anywhere in the document: no direct evidence either.
+            relation("new:Crane", "new:Ladle", "吊运", [quote(0, "由钢包吊运")]),
+        ],
+        properties=[],
+    )
+    gateway = ScriptedGateway(outputs(types, rels))
+    extractor = Extractor(gateway, ExtractionModels(standard="std", reasoning="deep"))
+
+    async def progress(step: str, done: int, total: int) -> None:
+        pass
+
+    proposals = await extractor.run(
+        document_id=DOC, title="t", chunks=[chunk], known=[EXISTING_GRADE], progress=progress
+    )
+
+    relations = [p for p in proposals if p.kind == "relation_type"]
+    assert [r.fields["labelZh"] for r in relations] == ["冶炼"]
+    assert relations[0].flags == []
+    [relations_text] = [text for purpose, text in gateway.texts if purpose == "extract.relations"]
+    assert "- new:Ladle | 盛钢桶 | 钢包 | \n" in relations_text
+
+
+async def test_only_names_of_two_characters_or_more_and_labels_merge_types() -> None:
+    types = [
+        entity("new:Converter", "转炉", "Converter", synonyms=["炉"]),
+        entity("new:Reheater", "加热炉", "Reheater", synonyms=["炉"]),  # one character: no
+        entity("new:Furnace", "炉", "Furnace"),  # one character, even as a label: no
+        entity("new:Refiner", "精炼炉", "Refiner", synonyms=["LF炉"]),
+        entity("new:LF", "LF精炼炉", "LF", synonyms=["LF炉"]),  # synonym against synonym: no
+        entity("new:Return", "回炉处理", "Return", quotes=[quote(0, "每个炉次只冶炼一个钢种")]),
+        entity(
+            "new:SlabReturn",
+            "板坯回炉",
+            "SlabReturn",
+            synonyms=["回炉处理"],  # names the earlier type's label: the same concept
+            quotes=[quote(1, "一个浇次由若干个炉次"), quote(1, "没有这句话")],
+        ),
+    ]
+    proposals, _ = await run(
+        ScriptedGateway(outputs(types, RelationsOut(relations=[], properties=[])))
+    )
+
+    assert [p.fields["labelZh"] for p in proposals] == [
+        "转炉",
+        "加热炉",
+        "炉",
+        "精炼炉",
+        "LF精炼炉",
+        "回炉处理",
+    ]
+    merged = by_label(proposals, "回炉处理")
+    assert [s["text"] for s in merged.fields["synonyms"]] == ["板坯回炉"]
+    # Located quotes of the merged term are kept as evidence; unlocated ones are not.
+    assert [e.chunk_id for e in merged.evidence] == [CHUNK_A.id, CHUNK_B.id]
+    assert merged.flags == []
+    # Sharing only a synonym is left to the reviewer, marked as a possible duplicate.
+    # (Types without quotes also carry evidence_not_found.)
+    flagged = [p.fields["labelZh"] for p in proposals if "possible_duplicate" in p.flags]
+    assert flagged == ["LF精炼炉"]
+
+
+async def test_relation_evidence_uses_every_name_and_needs_two_separate_mentions() -> None:
+    chunk = ChunkText(
+        id=uuid4(),
+        seq=0,
+        text="铁水由铁水罐运入转炉。\n钢种成分要求见下表。\n相邻炉次的钢种相同。\n铁水由罐运入转炉。",
+    )
+    converter = KnownElement(
+        id=uuid4(), kind="entity_type", local_name="Converter", label_zh="转炉设备"
+    )
+    types = [
+        # Matches the existing type by a synonym: its label 转炉 is checked too.
+        entity("new:BOF", "转炉", "BOF", synonyms=["转炉设备"]),
+        entity("new:Pot", "铁水罐", "Pot"),
+        # Its short synonym 成分要求 lies inside 钢种成分要求 and is no separate mention either.
+        entity("new:Requirement", "钢种成分要求", "Requirement", synonyms=["成分要求"]),
+        entity("new:Heat", "炉次", "Heat"),
+        entity("new:Tank", "罐", "Tank"),
+    ]
+    grade = str(EXISTING_GRADE.id)
+    rels = RelationsOut(
+        relations=[
+            relation("new:Pot", "new:BOF", "运入", [quote(0, "铁水由铁水罐运入转炉")]),
+            # 钢种 is only found inside 钢种成分要求: one mention, not two.
+            relation(grade, "new:Requirement", "要求", [quote(0, "钢种成分要求见下表")]),
+            relation("new:Heat", "new:Heat", "相邻", [quote(0, "相邻炉次的钢种相同")]),
+            # A one-character name does not count as naming a type.
+            relation("new:Tank", "new:BOF", "装运", [quote(0, "铁水由罐运入转炉")]),
+        ],
+        properties=[],
+    )
+    gateway = ScriptedGateway(outputs(types, rels))
+    extractor = Extractor(gateway, ExtractionModels(standard="std", reasoning="deep"))
+
+    async def progress(step: str, done: int, total: int) -> None:
+        pass
+
+    proposals = await extractor.run(
+        document_id=DOC,
+        title="t",
+        chunks=[chunk],
+        known=[EXISTING_GRADE, converter],
+        progress=progress,
+    )
+
+    [link] = [p for p in proposals if p.kind == "relation_type"]
+    assert (link.fields["labelZh"], link.fields["rangeRef"]) == ("运入", str(converter.id))
+
+
+# Lines of samples/steel/docs, verbatim, that state the nine core relations of the expected list.
+STEEL_LINES = [
+    "- **炉次**：转炉从装料到出钢完成的一次冶炼过程，以炉号唯一标识，炉号由年份、转炉编号和"
+    "流水号组成，例如 2611-2-0457。",
+    "- **钢种**：按化学成分和性能要求划分的钢的牌号，例如 Q235B。每个炉次只冶炼一个钢种。",
+    "- **浇次**：连铸机从开浇到停浇的一次连续浇铸过程。一个浇次由若干个炉次的钢水连续浇铸而成，"
+    "炉次在浇次内的顺序称为炉序。",
+    "铸坯按轧制计划要求的定尺长度切割成板坯。每块板坯记录板坯号、所属炉次、厚度、宽度、长度"
+    "（毫米）和理论重量（吨）。板坯规格一般为厚度 230 mm、宽度 1000～1650 mm、"  # noqa: RUF001 (verbatim)
+    "长度 8000～11000 mm。",  # noqa: RUF001 (verbatim)
+    "- **轧制事件**：一块板坯在热轧机组上的完整轧制过程，产出一个钢卷。",
+    "钢卷必须能够追溯到来源板坯，板坯必须能够追溯到所属炉次和浇次。轧制过程的温度、厚度等"
+    "过程数据按钢卷号保存，保存期不少于三年。",
+    "每次取样检验形成一份检验结果，记录检验批号、试样编号、检验日期以及各项力学性能的实测值。"
+    '检验结果判定为"合格"或"不合格"。',
+    "钢卷在精整线上由表面检测仪和人工共同检查表面质量。发现的缺陷记录为缺陷记录，包括缺陷类型、"
+    "所在钢卷的位置（距卷头长度，单位米）、严重等级（轻微、一般、严重）。",
+    "质量判定须由质检员确认，判定结果关联到钢卷，并记录判定人和判定时间。",
+]
+# (domain, range, quote) of the nine core relations; the quote is part of one line above.
+STEEL_CORE_RELATIONS = [
+    ("new:Heat", "new:Grade", "每个炉次只冶炼一个钢种"),
+    ("new:Heat", "new:Converter", "转炉从装料到出钢完成的一次冶炼过程"),
+    ("new:Heat", "new:Cast", "一个浇次由若干个炉次的钢水连续浇铸而成"),
+    ("new:Slab", "new:Heat", "每块板坯记录板坯号、所属炉次"),
+    ("new:Rolling", "new:Slab", "一块板坯在热轧机组上的完整轧制过程"),
+    ("new:Coil", "new:Slab", "钢卷必须能够追溯到来源板坯"),
+    ("new:Result", "new:Lot", "每次取样检验形成一份检验结果，记录检验批号"),
+    ("new:Defect", "new:Coil", "发现的缺陷记录为缺陷记录，包括缺陷类型、所在钢卷的位置"),
+    ("new:Decision", "new:Coil", "判定结果关联到钢卷"),
+]
+
+
+def _steel_types(defect_label: str, defect_synonyms: list[str]) -> list[EntityTypeOut]:
+    """The names the model gave these types in the final evaluation runs of #7."""
+    return [
+        entity("new:Heat", "炉次", "Heat", label_en="Heat"),
+        entity("new:Grade", "钢种", "Grade", label_en="Steel grade"),
+        entity("new:Converter", "转炉", "Converter", label_en="Converter"),
+        entity("new:Cast", "浇次", "Cast", label_en="Casting sequence"),
+        entity("new:Slab", "板坯", "Slab", label_en="Slab"),
+        # Its synonym 表面缺陷 must not count as a mention inside 缺陷记录's lines.
+        entity("new:SlabDefect", "板坯表面缺陷", "SlabDefect", label_en="Slab surface defect"),
+        entity("new:Rolling", "轧制事件", "Rolling", label_en="Rolling event"),
+        entity("new:Coil", "钢卷", "Coil", label_en="Steel coil", synonyms=["热轧钢卷"]),
+        entity("new:Lot", "检验批", "Lot", label_en="Inspection lot"),
+        entity("new:Result", "检验结果", "Result", label_en="Test result"),
+        entity("new:Defect", defect_label, "Defect", synonyms=defect_synonyms),
+        entity("new:Decision", "质量判定", "Decision", label_en="Quality disposition"),
+    ]
+
+
+@pytest.mark.parametrize(
+    ("defect_label", "defect_synonyms"),
+    [("缺陷记录", ["钢卷表面缺陷"]), ("表面缺陷", ["缺陷记录"])],  # the two final runs
+)
+def test_the_core_steel_relations_have_direct_evidence(
+    defect_label: str, defect_synonyms: list[str]
+) -> None:
+    chunks = [ChunkText(id=uuid4(), seq=0, text="\n".join(STEEL_LINES))]
+    rels = RelationsOut(
+        relations=[
+            relation(domain, range_, f"关系{index}", [quote(0, text)])
+            for index, (domain, range_, text) in enumerate(STEEL_CORE_RELATIONS)
+        ],
+        properties=[],
+    )
+    proposals = build_proposals(chunks, [], _steel_types(defect_label, defect_synonyms), rels)
+
+    kept = [p.fields["labelZh"] for p in proposals if p.kind == "relation_type"]
+    assert kept == [f"关系{index}" for index in range(len(STEEL_CORE_RELATIONS))]
+
+
+def test_a_name_only_inside_a_longer_name_is_no_evidence() -> None:
+    chunks = [
+        ChunkText(
+            id=uuid4(),
+            seq=0,
+            text="钢种成分要求见下表。\n钢种成分要求与钢种成分要求的检验方法见附录。",
+        )
+    ]
+    types = [
+        entity("new:Grade", "钢种", "Grade"),
+        entity("new:Requirement", "钢种成分要求", "Requirement", synonyms=["成分要求"]),
+    ]
+    rels = RelationsOut(
+        relations=[
+            # Passed before the longest-mention rule: 钢种 and the short synonym 成分要求 sit
+            # side by side inside the single mention 钢种成分要求.
+            relation("new:Grade", "new:Requirement", "规定", [quote(0, "钢种成分要求见下表")]),
+            # Passed before too: 钢种 inside the first 钢种成分要求 paired with the second one.
+            relation(
+                "new:Grade", "new:Requirement", "检验", [quote(0, "钢种成分要求与钢种成分要求")]
+            ),
+        ],
+        properties=[],
+    )
+    proposals = build_proposals(chunks, [], types, rels)
+
+    assert [p.kind for p in proposals] == ["entity_type", "entity_type"]

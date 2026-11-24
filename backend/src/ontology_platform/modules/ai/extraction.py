@@ -36,6 +36,9 @@ MAX_QUOTES = 3
 UNFOUND_PENALTY = 0.5
 # Local names stay well below the 128 characters the ontology allows, leaving room for "new:".
 NAME_MAX = 100
+# Shorter names (one character after normalizing) occur everywhere: they neither merge types
+# nor count as naming a type in a relation's evidence.
+MIN_NAME = 2
 _PASCAL = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 _CAMEL = re.compile(r"^[a-z][A-Za-z0-9]*$")
 
@@ -202,13 +205,17 @@ class Extractor:
         known: Sequence[KnownElement],
         progress: ProgressFn,
     ) -> RelationsOut:
-        catalog = [f"- {t.ref} | {t.label_zh} | {t.definition_zh or ''}" for t in types]
+        catalog = [
+            f"- {t.ref} | {t.label_zh} | {', '.join(t.synonyms)} | {t.definition_zh or ''}"
+            for t in types
+        ]
         catalog += [
-            f"- {element.id} | {element.label_zh} | {element.definition_zh or ''}"
+            f"- {element.id} | {element.label_zh} | {', '.join(element.synonyms)} | "
+            f"{element.definition_zh or ''}"
             for element in known
             if element.kind == "entity_type" and str(element.id) not in {t.ref for t in types}
         ]
-        header = "Entity types (ref | label | definition):\n" + "\n".join(catalog)
+        header = "Entity types (ref | label | synonyms | definition):\n" + "\n".join(catalog)
         merged = RelationsOut(relations=[], properties=[])
         await progress("relations", 0, len(groups))
         for index, group in enumerate(groups, start=1):
@@ -256,7 +263,7 @@ def merge_types(
     """Adds a batch's types; one reusing the ref of an earlier batch's type extends that type.
 
     Only earlier batches are merged into: a single batch is kept exactly as the model returned
-    it, and duplicates by label are left to `build_proposals`, as before batching.
+    it, and duplicates by name are left to `build_proposals`, as before batching.
     """
     merged = list(found)
     earlier = {item.ref: index for index, item in enumerate(found)}
@@ -288,6 +295,7 @@ def merge_types(
 class _Builder:
     def __init__(self, chunks: Sequence[ChunkText], known: Sequence[KnownElement]) -> None:
         self.by_seq = {chunk.seq: chunk for chunk in chunks}
+        self.by_id = {chunk.id: chunk for chunk in chunks}
         self.chunks = list(chunks)
         self.known = list(known)
         self.known_ids = {str(element.id): element for element in known}
@@ -315,6 +323,41 @@ class _Builder:
                 if fallback is not None:
                     evidence.append(ProposedEvidence(fallback.id, quote.text[:500], None, None))
         return evidence, all_found
+
+    def states_link(
+        self, evidence: Sequence[ProposedEvidence], domain: set[str], range_: set[str]
+    ) -> bool:
+        """Whether a located quote's line names both ends (by any of their normalized names).
+
+        A line is the unit of direct evidence: a sentence group, list item or table row. Only
+        the longest mentions count, and the two ends need mentions that do not overlap: a name
+        inside a longer name (钢种 in 钢种成分要求) is not a mention of its own, and a type
+        related to itself has to be named twice.
+        """
+        for item in evidence:
+            chunk = self.by_id.get(item.chunk_id)
+            if chunk is None or item.char_start is None or item.char_end is None:
+                continue
+            start = chunk.text.rfind("\n", 0, item.char_start) + 1
+            end = chunk.text.find("\n", item.char_end)
+            line = normalize(chunk.text[start : end if end != -1 else len(chunk.text)])
+            mentions = [
+                (span, side)
+                for side, names in enumerate((domain, range_))
+                for span in _mentions(line, names)
+            ]
+            longest = [
+                (span, side)
+                for span, side in mentions
+                if not any(_inside(span, other) for other, _ in mentions)
+            ]
+            if any(
+                a_side == 0 and b_side == 1 and (a[1] <= b[0] or b[1] <= a[0])
+                for a, a_side in longest
+                for b, b_side in longest
+            ):
+                return True
+        return False
 
     def known_type(self, ref: str) -> str | None:
         """`ref` if it is the id of an existing object type (relations and parents need one)."""
@@ -375,12 +418,31 @@ def build_proposals(
             refs[item.ref] = str(existing.id)
             _maybe_update(builder, existing, item.synonyms, item, item.quotes)
             continue
-        label_key = normalize(item.label_zh)
+        # A new type with a label that is a name of an earlier new type, or with a name that is
+        # that type's label, is the same concept. Synonyms alone do not merge: two kinds of one
+        # thing often share one.
+        item_labels = _keys([item.label_zh, item.label_en or ""])
+        item_synonyms = _keys(item.synonyms)
         duplicate = next(
-            (p for _, p in new_types if normalize(p.fields["labelZh"]) == label_key), None
+            (
+                p
+                for _, p in new_types
+                if item_labels & _type_keys(p) or item_synonyms & _label_keys(p)
+            ),
+            None,
         )
         if duplicate is not None:
             refs[item.ref] = duplicate.temp_ref or ""
+            duplicate.fields["synonyms"] += [
+                s
+                for s in _synonyms(
+                    [item.label_zh, item.label_en or "", *item.synonyms],
+                    duplicate.fields["labelZh"],
+                )
+                if normalize(s["text"]) not in _type_keys(duplicate)
+            ]
+            evidence, _ = builder.ground(item.quotes)
+            duplicate.evidence += [e for e in evidence if e.char_start is not None]
             continue
         local_name = builder.unique_name(item.local_name, _PASCAL, "EntityType")
         temp_ref = f"new:{local_name}"
@@ -399,6 +461,8 @@ def build_proposals(
                 "parentRef": None,
             },
         )
+        if any(item_synonyms & _type_keys(p) for _, p in new_types):
+            proposal.flags.append("possible_duplicate")  # only a synonym is shared: ask a human
         new_types.append((item, proposal))
         builder.add(proposal, item.quotes, item.confidence)
 
@@ -409,6 +473,18 @@ def build_proposals(
         if parent and parent != proposal.temp_ref:
             proposal.fields["parentRef"] = parent
 
+    # Every name a type goes by in this run, to check that a relation's evidence names its ends.
+    names_of: dict[str, set[str]] = {
+        str(element.id): _element_keys(element)
+        for element in known
+        if element.kind == "entity_type"
+    }
+    for item in types:
+        if item.ref in refs:
+            names_of.setdefault(refs[item.ref], set()).update(
+                _keys([item.label_zh, item.label_en or "", *item.synonyms])
+            )
+
     seen_relations: set[tuple[str, str, str]] = set()
     for relation in relations.relations:
         domain = refs.get(relation.domain) or builder.known_type(relation.domain)
@@ -418,6 +494,11 @@ def build_proposals(
         key = (domain, range_, normalize(relation.label_zh))
         if key in seen_relations:
             continue
+        evidence, _ = builder.ground(relation.quotes)
+        if not builder.states_link(
+            evidence, names_of.get(domain, set()), names_of.get(range_, set())
+        ):
+            continue  # no direct evidence: no quote's line names both types
         seen_relations.add(key)
         domain_uuid = _as_uuid(domain)
         if domain_uuid and builder.match_known("relation_type", [relation.label_zh], domain_uuid):
@@ -479,6 +560,40 @@ def build_proposals(
             prop.confidence,
         )
     return builder.proposals
+
+
+def _keys(names: Iterable[str]) -> set[str]:
+    """Normalized names long enough to identify a type."""
+    return {key for key in (normalize(name) for name in names) if len(key) >= MIN_NAME}
+
+
+def _label_keys(proposal: Proposal) -> set[str]:
+    return _keys([proposal.fields["labelZh"], proposal.fields.get("labelEn") or ""])
+
+
+def _type_keys(proposal: Proposal) -> set[str]:
+    """Names of a proposed new type: its labels and synonyms."""
+    return _label_keys(proposal) | _keys(s["text"] for s in proposal.fields["synonyms"])
+
+
+def _element_keys(element: KnownElement) -> set[str]:
+    return _keys([element.label_zh, element.label_en or "", *element.synonyms])
+
+
+def _mentions(line: str, names: set[str]) -> list[tuple[int, int]]:
+    """Spans of every occurrence of any of the names in a normalized line."""
+    spans: list[tuple[int, int]] = []
+    for name in names:
+        start = line.find(name)
+        while start != -1:
+            spans.append((start, start + len(name)))
+            start = line.find(name, start + 1)
+    return spans
+
+
+def _inside(span: tuple[int, int], other: tuple[int, int]) -> bool:
+    """Whether `span` lies within the longer `other`."""
+    return other[0] <= span[0] and span[1] <= other[1] and other[1] - other[0] > span[1] - span[0]
 
 
 def _synonyms(values: Iterable[str], label: str) -> list[dict[str, str]]:

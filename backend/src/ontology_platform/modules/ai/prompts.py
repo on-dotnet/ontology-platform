@@ -29,6 +29,24 @@ TYPES_INSTRUCTIONS = f"""\
 You are an ontology engineer. From the candidate terms below, decide which are entity types
 (classes of business objects or events that have their own identity), and arrange them into a
 shallow hierarchy only where the text supports an "is a kind of" relation.
+An entity type is a class whose individual members are told apart and kept track of: physical
+things (equipment, containers, materials and products), records and documents, and events that
+the text treats as occurrences in their own right, each with an identifier or with data
+recorded for it (for example "every delivery is recorded with its date and quantity").
+These are not entity types:
+- Process steps and operations, usually named by a verb (for example unpacking, sorting,
+  sealing, starting a machine). Data recorded at a step belongs, as attributes, to the object
+  or event it is recorded for. Make a step a type only when the text records each occurrence
+  of it as a record of its own.
+- Outcomes, statuses, the possible results of a decision, quality levels and other categories
+  (these are values); measurable quantities (attributes); people, roles and departments
+  mentioned only as the one who acts; parts or zones of equipment and input materials that have
+  no data of their own.
+One concept is one type. When several terms name the same thing (a short and a qualified name,
+a thing and the record of it), propose one type, name it by the general term the text uses
+most, and put the other names in synonyms. A process and the equipment that performs it are
+different concepts; keep the equipment, and the process only if it is an event as defined
+above.
 Existing entity types are listed with their ids; reuse them instead of proposing duplicates
 (refer to an existing type by its id). For each new type, choose a PascalCase English
 local_name and refer to it as "new:<local_name>". Attributes, values and relations are not
@@ -38,6 +56,10 @@ entity types.
 RELATIONS_INSTRUCTIONS = f"""\
 You are an ontology engineer. Using only the entity types listed (refer to them by their ref),
 find in the text (1) relations between two entity types and (2) attributes of an entity type.
+Propose a relation only where one sentence, list item or table row states the link directly and
+names both types (by their label or a synonym); quote that sentence. Relations whose quotes do
+not name both types are discarded. Do not derive relations from the order of process steps,
+from shared attributes or from general knowledge, and give each link once, in one direction.
 Give relations and attributes a camelCase English local_name. For attributes choose the
 datatype and the unit symbol when the text states one (for example mm, t, ℃, %, MPa, m/min).
 "required" means every instance must have it; "multiple" means an instance can have several.
