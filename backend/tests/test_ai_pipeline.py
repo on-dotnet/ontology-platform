@@ -301,3 +301,26 @@ async def test_a_part_of_a_scan_gets_the_page_numbers_of_the_whole_file() -> Non
     )
 
     assert [(p.number, p.text) for p in pages] == [(6, "第六页"), (7, "第七页"), (None, "页码不明")]
+
+
+async def test_an_execution_that_lost_its_lease_stops_before_writing_progress(
+    app: FastAPI, db: AsyncSession
+) -> None:
+    ontology = await add_ontology(db)
+    grade = element(ontology, "entity_type", "SteelGrade", "钢种")
+    await add_elements(db, grade)
+    document, _ = await add_document(db, ontology)
+    document_id = document.id
+    gateway = ScriptedGateway(outputs(grade))
+    extract = make_extractor(factory(app), gateway, MODELS)
+    stale = JobContext(id=uuid4(), payload={}, session_factory=factory(app), worker_id="gone")
+
+    with pytest.raises(JobLeaseLostError):
+        await extract(document_id, stale.check_lease)
+
+    # The newer execution's progress stays as it was, and no model call was paid for.
+    assert gateway.calls == []
+    db.expire_all()
+    stored = await db.get(Document, document_id)
+    assert stored is not None
+    assert stored.progress == {"step": "parse", "done": 1, "total": 1}
