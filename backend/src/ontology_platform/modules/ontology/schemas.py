@@ -243,7 +243,10 @@ class Element(CamelModel):
 
 
 class ElementCopy(Element):
-    """A read-only copy of an element for other modules, which must not get the ORM row."""
+    """A copy of an element for other modules, which must not get the ORM row.
+
+    Detached from the session, so changing it writes nothing; only the top level is frozen.
+    """
 
     model_config = ConfigDict(frozen=True)
 
