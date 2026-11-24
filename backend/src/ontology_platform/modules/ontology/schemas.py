@@ -6,7 +6,7 @@ other modules propose changes.
 """
 
 from datetime import datetime
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, Literal, Self
 from uuid import UUID
 
 from pydantic import Field, StringConstraints, model_validator
@@ -471,6 +471,51 @@ class TurtleEdit(CamelModel):
     """The whole working version as edited in expert mode."""
 
     turtle: str = Field(min_length=1, max_length=5 * 1024 * 1024)
+
+
+ChangeLevel = Literal["breaking", "review", "compatible"]
+
+
+class FieldChange(CamelModel):
+    """One field of an element in two versions. `field` is the Element field name (camelCase);
+    references are {id, label} objects, rules and synonyms are given whole."""
+
+    field: str
+    before: Any
+    after: Any
+
+
+class ElementChange(CamelModel):
+    element_id: UUID
+    kind: Kind
+    label: str
+    iri: str | None
+    change: Literal["added", "removed", "changed", "restored"]
+    level: ChangeLevel
+    # Only for changed and restored elements.
+    fields: list[FieldChange]
+
+
+class CompareSide(CamelModel):
+    # Null for the working version.
+    release_id: UUID | None
+    version: int | None
+
+
+class CompareCounts(CamelModel):
+    breaking: int
+    review: int
+    compatible: int
+
+
+class Comparison(CamelModel):
+    """What changed from one release to another release or to the working version (spec 002,
+    section 9), most severe first."""
+
+    from_: CompareSide = Field(alias="from")
+    to: CompareSide
+    changes: list[ElementChange]
+    counts: CompareCounts
 
 
 ReviewMode = Literal["single", "separate"]

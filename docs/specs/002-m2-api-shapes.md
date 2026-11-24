@@ -110,6 +110,8 @@ type PlatformSettings = { reviewMode: 'single' | 'separate' };   // GET /api/set
 
 // ---------- 版本对比（PR C） ----------
 // GET /api/ontologies/{id}/compare?from=<releaseId>&to=<releaseId|working>
+// field 是 Element 的字段名（camelCase）；引用字段（parentId、domainId、rangeId、inverseId）的取值是
+// { id, label } 或 null，label 取对应那一边版本里的名称；rules、synonyms、turtle 给原值
 type FieldChange = { field: string; before: unknown; after: unknown };
 type ElementChange = {
   elementId: string; kind: Kind; label: string; iri: string | null;
@@ -132,6 +134,7 @@ type AssistantRequest = {
   status: 'queued' | 'running' | 'succeeded' | 'failed';
   step: 'context' | 'model' | 'changeset' | null;
   reply: string | null; changeSetId: string | null; errorCode: string | null;
+  dropped: number;                       // 模型提出、但没通过校验而被忽略的操作数
   createdAt: string; finishedAt: string | null;
 };
 ```

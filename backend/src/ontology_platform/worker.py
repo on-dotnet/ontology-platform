@@ -9,6 +9,7 @@ from uuid import uuid4
 
 from ontology_platform import models  # noqa: F401  (registers all module tables)
 from ontology_platform.db import create_database_engine, create_session_factory
+from ontology_platform.modules.ai import assistant
 from ontology_platform.modules.ai.extraction import ExtractionModels
 from ontology_platform.modules.ai.gateway import OpenAIGateway
 from ontology_platform.modules.ai.pipeline import make_extractor, make_transcriber
@@ -18,7 +19,7 @@ from ontology_platform.modules.documents.processing import (
     register_vision_transcriber,
 )
 from ontology_platform.modules.documents.storage import LocalDocumentStorage
-from ontology_platform.modules.jobs.runner import run_worker
+from ontology_platform.modules.jobs.runner import register, run_worker
 from ontology_platform.settings import Settings
 
 
@@ -37,6 +38,10 @@ async def run() -> None:
         register_extractor(make_extractor(session_factory, gateway, extraction_models))
         register_vision_transcriber(make_transcriber(gateway, settings.ai_model))
         register_handlers(LocalDocumentStorage(Path(settings.documents_dir)))
+        register(
+            assistant.JOB_KIND,
+            assistant.make_assistant(session_factory, gateway, settings.ai_model),
+        )
         await run_worker(session_factory, f"{socket.gethostname()}-{uuid4()}", stop_event=stop)
     finally:
         loop.remove_signal_handler(signal.SIGTERM)

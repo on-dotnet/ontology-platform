@@ -128,3 +128,64 @@ class PageOut(BaseModel):
 
 class TranscriptOut(BaseModel):
     pages: list[PageOut]
+
+
+# ---------- AI assistant (spec 002 §10) ----------
+
+ASSISTANT_INSTRUCTIONS = """\
+You are an ontology engineer helping a user who maintains an ontology. The user describes a
+change in their own words; you propose operations that make exactly that change. A human
+reviews every operation before anything changes.
+
+Rules:
+- Do only what the user asked. Do not tidy up, rename or extend anything else.
+- Refer to existing elements by the id given in the element list. For a new element, choose a
+  local_name (PascalCase for object types, camelCase for relations and properties) and refer to
+  it in the same answer as "new:<local_name>"; put that ref in temp_ref.
+- In fields, give only what the operation sets; every field you do not set must be null. To
+  clear a parent, domain, range or inverse, write "none". Synonyms you give are added.
+- Write labels in the language the user writes in (Chinese gives label_zh) and also give a
+  concise English label for new elements.
+- Constraints cannot be created or edited here, only deleted. Advanced axioms are Turtle
+  fragments using the prefixes listed, one subject triple each.
+- Deleting an element also removes what depends on it; the platform adds those changes itself.
+- When unsure, lower the confidence (0 to 1) instead of guessing.
+- If the request is a question, a data query or anything other than changing the ontology,
+  return no operations and reply that this will be supported in a later version.
+- If you cannot do what is asked, return no operations and say why in the reply.
+- The reply is one or two short sentences in the user's language.
+"""
+
+
+class AssistantFieldsOut(BaseModel):
+    label_zh: str | None
+    label_en: str | None
+    local_name: str | None
+    definition_zh: str | None
+    definition_en: str | None
+    synonyms_zh: list[str] | None
+    synonyms_en: list[str] | None
+    parent: str | None = Field(description='ref of the parent type, or "none" to clear it')
+    domain: str | None = Field(description='ref of the domain type, or "none" to clear it')
+    range: str | None = Field(description='ref of the range type, or "none" to clear it')
+    inverse: str | None = Field(description='ref of the inverse relation, or "none" to clear it')
+    datatype: Literal["string", "integer", "decimal", "boolean", "date", "dateTime"] | None
+    unit: str | None
+    required: bool | None
+    multiple: bool | None
+    turtle: str | None = Field(description="Turtle fragment of an advanced axiom")
+
+
+class AssistantOperationOut(BaseModel):
+    op: Literal["create", "update", "delete"]
+    kind: Literal["entity_type", "relation_type", "property", "constraint", "axiom"]
+    target: str | None = Field(description="id of the element an update or delete changes")
+    temp_ref: str | None = Field(description='"new:<local_name>" for a created element')
+    fields: AssistantFieldsOut
+    rationale: str
+    confidence: float
+
+
+class AssistantOut(BaseModel):
+    reply: str
+    operations: list[AssistantOperationOut]

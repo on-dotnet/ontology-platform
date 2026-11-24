@@ -39,6 +39,14 @@ def _invalid(seq: int, problem: str) -> AppError:
     return AppError(422, "changeset.invalid_edit", f"Item {seq}: {problem}.")
 
 
+class CascadeConflictError(AppError):
+    """An item keeps, adds or edits what a delete of the same save removes."""
+
+    def __init__(self, seq: int, problem: str) -> None:
+        super().__init__(422, "changeset.invalid_edit", f"Item {seq}: {problem}.")
+        self.seq = seq
+
+
 @dataclass
 class _View:
     """What the cascade needs of an element, possibly as the save's updates leave it."""
@@ -366,9 +374,11 @@ def _add_cascade(ontology: Ontology, elements: Sequence[Element], checked: _Chec
         if item.op == "delete":
             continue
         if item.target_element_id in leaving:
-            raise _invalid(seq, "another item of this save deletes this element along with its own")
+            raise CascadeConflictError(
+                seq, "another item of this save deletes this element along with its own"
+            )
         if _field_refs(item.proposed) & leaving:
-            raise _invalid(seq, "it refers to an element this save deletes")
+            raise CascadeConflictError(seq, "it refers to an element this save deletes")
     for element_id, fields in changes.items():
         index = checked.targets.get(element_id)
         if index is None:
