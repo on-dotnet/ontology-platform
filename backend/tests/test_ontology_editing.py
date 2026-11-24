@@ -575,6 +575,33 @@ async def test_a_new_or_rewritten_axiom_cannot_mention_what_the_save_deletes(
     )
 
 
+async def test_rewriting_an_axiom_away_from_a_deleted_subject_is_not_a_conflict(
+    client: AsyncClient, db: AsyncSession, linked_ontology: tuple[Ontology, dict[str, Element]]
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    ontology, rows = linked_ontology
+    other = element(ontology, "entity_type", "Other", "其他")
+    await add_elements(db, other)
+    disjoint = "<http://www.w3.org/2002/07/owl#disjointWith>"
+    heat, other_iri = (f"<{ontology.base_iri}{name}>" for name in ("Heat", "Other"))
+    # The axiom was about Slab, which this save deletes; its new text is about Heat.
+    assert rows["axiom"].subject_id == rows["Slab"].id
+
+    response = await save(
+        client,
+        ontology,
+        edit("delete", rows["Slab"]),
+        edit("update", rows["axiom"], turtle=f"{heat} {disjoint} {other_iri} ."),
+    )
+
+    assert response.status_code == 200, response.text
+    await db.refresh(rows["axiom"])
+    await db.refresh(rows["Slab"])
+    assert (rows["Slab"].status, rows["axiom"].status) == ("deprecated", "active")
+    assert rows["axiom"].subject_id == rows["Heat"].id
+    assert "Other" in (rows["axiom"].turtle or "")
+
+
 async def test_restoring_an_axiom_checks_it_again(client: AsyncClient, db: AsyncSession) -> None:
     ontology = await small_ontology(client, db)
     retired = element(

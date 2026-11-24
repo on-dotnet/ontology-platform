@@ -122,8 +122,15 @@ def _stored_rule(rule: schemas.ConstraintRuleFields) -> dict[str, Any]:
     return data
 
 
-def _with_fields(view: _View, op: str, fields: schemas.ElementFields) -> _View:
-    """The view after an update or restore with `fields`."""
+def _with_fields(
+    view: _View,
+    op: str,
+    fields: schemas.ElementFields,
+    prefixes: Mapping[str, str],
+    subjects: Mapping[str, UUID],
+) -> _View:
+    """The view after an update or restore with `fields`. `subjects` maps the IRIs of the
+    elements an axiom can be about to their ids."""
     given = fields.model_fields_set
     changes: dict[str, Any] = {}
     for key, column in _REF_COLUMNS.items():
@@ -133,6 +140,13 @@ def _with_fields(view: _View, op: str, fields: schemas.ElementFields) -> _View:
         changes["rules"] = [_stored_rule(rule) for rule in fields.rules]
     if view.kind == "axiom" and fields.turtle is not None:
         changes["turtle"] = fields.turtle
+        # A merge reads the subject from the new text; so must the cascade, or it keeps tying
+        # the axiom to the element it was about before.
+        try:
+            subject = service.normalize_axiom(fields.turtle, prefixes).subject
+        except RdfInputError:
+            subject = None
+        changes["subject_id"] = subjects.get(subject) if subject is not None else None
     if op == "restore":
         changes["status"] = "active"
     return replace(view, **changes)
@@ -376,11 +390,16 @@ def _add_cascade(ontology: Ontology, elements: Sequence[Element], checked: _Chec
     """Append the cascade of the save's deletes, computed on the ontology as its updates leave
     it, and refuse a save that keeps or adds a reference to what it deletes."""
     views = _views(ontology, elements)
+    prefixes = service.header_of(ontology).prefix_map()
+    subjects = {
+        view.iri: view.id
+        for view in views.values()
+        if view.iri and view.kind != "axiom" and view.status == "active"
+    }
     for item in checked.items:
         if item.op in ("update", "restore") and item.target_element_id is not None:
             view = views[item.target_element_id]
-            views[view.id] = _with_fields(view, item.op, item.proposed)
-    prefixes = service.header_of(ontology).prefix_map()
+            views[view.id] = _with_fields(view, item.op, item.proposed, prefixes, subjects)
     changes = _Cascade(views, prefixes).changes(checked.deletes)
     leaving = set(checked.deletes) | {id_ for id_, fields in changes.items() if fields is None}
     leaving_iris = {iri for id_ in leaving if (iri := views[id_].iri)}
