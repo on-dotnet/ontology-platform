@@ -393,11 +393,10 @@ class _Builder:
                 return element
         return None
 
-    def shares_short_synonym(self, labels: Sequence[str]) -> bool:
-        """Whether a one-character label is a one-character synonym of an existing type."""
-        short = _short_keys(labels)
+    def shares_synonym(self, labels: Sequence[str], synonyms: Sequence[str]) -> bool:
+        """Whether a new type shares a synonym with an existing type (see `_shares_synonym`)."""
         return any(
-            short & _short_keys(element.synonyms)
+            _shares_synonym(labels, synonyms, element)
             for element in self.known
             if element.kind == "entity_type"
         )
@@ -488,13 +487,12 @@ def build_proposals(
                 "parentRef": None,
             },
         )
-        # Only a synonym is shared with another new type, the model took it for an existing
-        # type whose names it does not have, or its one-character label is an existing type's
-        # one-character synonym (炉 of 转炉 may be that type or any furnace): ask a human.
+        # Only a synonym is shared with another new type or with an existing type, or the model
+        # took it for an existing type whose names it does not have: ask a human.
         if (
             mistaken_id
             or any(item_synonyms & _type_keys(p) for _, p in new_types)
-            or builder.shares_short_synonym(labels)
+            or builder.shares_synonym(labels, item.synonyms)
         ):
             proposal.flags.append("possible_duplicate")
         new_types.append((item, proposal))
@@ -641,15 +639,27 @@ def _short_keys(names: Iterable[str]) -> set[str]:
 def _shares_name(labels: Sequence[str], synonyms: Sequence[str], element: KnownElement) -> bool:
     """Whether a proposed element is an existing one by name.
 
-    The names compared are those that merge new types: Chinese and English labels and synonyms
-    of two characters or more; local names are not. A label that is one character as a whole
-    (钢) still is that element if the element's label is the same character, or each would
-    become a duplicate of the other. One-character synonyms never align: 转炉 and 加热炉 can
-    both go by 炉.
+    As for merging new types: a label is one of the element's names, or a synonym is one of
+    its labels, comparing names of two characters or more; local names do not count. A shared
+    synonym alone does not align, since two kinds of one thing often share one (转炉 and 电炉
+    both go by 炼钢炉, and both by 炉). A label that is one character as a whole (钢) still is
+    the element whose label is the same character, or each would duplicate the other.
     """
-    if _keys([*labels, *synonyms]) & _element_keys(element):
+    element_labels = [element.label_zh, element.label_en or ""]
+    if _keys(labels) & _element_keys(element) or _keys(synonyms) & _keys(element_labels):
         return True
-    return bool(_short_keys(labels) & _short_keys([element.label_zh, element.label_en or ""]))
+    return bool(_short_keys(labels) & _short_keys(element_labels))
+
+
+def _shares_synonym(labels: Sequence[str], synonyms: Sequence[str], element: KnownElement) -> bool:
+    """Whether a proposed element not aligned with an existing one shares a synonym with it.
+
+    Also a one-character label that is a one-character synonym of the element: 炉 may be 转炉.
+    """
+    return bool(
+        _keys(synonyms) & _keys(element.synonyms)
+        or _short_keys(labels) & _short_keys(element.synonyms)
+    )
 
 
 def _mentions(line: str, names: set[str]) -> list[tuple[int, int]]:
