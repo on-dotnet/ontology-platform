@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 import sys
 from dataclasses import replace
@@ -461,3 +462,114 @@ async def test_scan_progress_counts_the_parts(app: FastAPI, tmp_path: Path) -> N
         processing.register_vision_transcriber(None)
 
     assert progress == [("parse", 0, 3), ("parse", 1, 3), ("parse", 2, 3)]
+
+
+async def test_a_retry_transcribes_only_the_parts_not_done_yet(
+    app: FastAPI, tmp_path: Path
+) -> None:
+    storage = LocalDocumentStorage(tmp_path)
+    document_id, job = await prepare(app, storage, "scan.pdf", blank_pdf(12))
+    calls: list[int] = []
+
+    async def flaky(part: ScanPart) -> list[ParsedPage]:
+        calls.append(part.first_page)
+        if part.first_page == 6 and calls.count(6) == 1:
+            raise RetryableJobError("ai.unavailable")
+        return [ParsedPage(part.first_page, f"第 {part.first_page} 页起", "总则")]
+
+    processing.register_vision_transcriber(flaky)
+    try:
+        with pytest.raises(RetryableJobError):
+            await processing.process(job, storage)
+        await processing.process(replace(job, attempts=2), storage)
+    finally:
+        processing.register_vision_transcriber(None)
+
+    # Pages 1 to 5 were transcribed once: the retry read them back instead of paying again.
+    assert calls == [1, 6, 6, 11]
+    async with job.session_factory() as db:
+        doc = await service.get(db, document_id)
+        chunks = await service.list_chunks(db, document_id)
+    assert doc.status == "ready"
+    assert [(c.page, c.text, c.heading) for c in chunks] == [
+        (1, "第 1 页起", "总则"),
+        (6, "第 6 页起", "总则"),
+        (11, "第 11 页起", "总则"),
+    ]
+
+
+async def test_an_unreadable_saved_transcript_is_transcribed_again(
+    app: FastAPI, tmp_path: Path
+) -> None:
+    storage = LocalDocumentStorage(tmp_path)
+    document_id, job = await prepare(app, storage, "scan.pdf", blank_pdf(3))
+    storage.save_derived(document_id, "transcript-1-3.json", b"{not json")
+    calls: list[int] = []
+
+    async def transcribe(part: ScanPart) -> list[ParsedPage]:
+        calls.append(part.first_page)
+        return [ParsedPage(1, "第一页")]
+
+    processing.register_vision_transcriber(transcribe)
+    try:
+        await processing.process(job, storage)
+    finally:
+        processing.register_vision_transcriber(None)
+
+    assert calls == [1]
+    saved = storage.open_derived(document_id, "transcript-1-3.json")
+    assert saved is not None
+    assert json.loads(saved) == [{"number": 1, "text": "第一页", "heading": None}]
+
+
+async def test_a_transcript_that_cannot_be_saved_still_counts(
+    app: FastAPI, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    storage = LocalDocumentStorage(tmp_path)
+    document_id, job = await prepare(app, storage, "scan.pdf", blank_pdf(3))
+
+    def disk_full(*_: object) -> None:
+        raise OSError("No space left on device")
+
+    async def transcribe(part: ScanPart) -> list[ParsedPage]:
+        return [ParsedPage(1, "第一页")]
+
+    monkeypatch.setattr(storage, "save_derived", disk_full)
+    processing.register_vision_transcriber(transcribe)
+    try:
+        await processing.process(job, storage)
+    finally:
+        processing.register_vision_transcriber(None)
+
+    async with job.session_factory() as db:
+        assert (await service.get(db, document_id)).status == "ready"
+
+
+@pytest.mark.parametrize(
+    "saved",
+    [
+        b'[{"number": 1, "text": null, "heading": null}]',
+        b'[{"number": "1", "text": "x", "heading": null}]',
+        b'[{"number": 1, "text": "x", "heading": 2}]',
+        b'{"number": 1}',
+    ],
+)
+async def test_a_saved_transcript_of_the_wrong_shape_is_transcribed_again(
+    app: FastAPI, tmp_path: Path, saved: bytes
+) -> None:
+    storage = LocalDocumentStorage(tmp_path)
+    document_id, job = await prepare(app, storage, "scan.pdf", blank_pdf(3))
+    storage.save_derived(document_id, "transcript-1-3.json", saved)
+    calls: list[int] = []
+
+    async def transcribe(part: ScanPart) -> list[ParsedPage]:
+        calls.append(part.first_page)
+        return [ParsedPage(1, "第一页")]
+
+    processing.register_vision_transcriber(transcribe)
+    try:
+        await processing.process(job, storage)
+    finally:
+        processing.register_vision_transcriber(None)
+
+    assert calls == [1]

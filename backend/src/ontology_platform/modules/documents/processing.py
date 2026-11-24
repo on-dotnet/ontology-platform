@@ -1,6 +1,9 @@
 """Parse and replace evidence chunks before invoking the registered extraction pipeline."""
 
 import asyncio
+import dataclasses
+import json
+import logging
 from collections.abc import Awaitable, Callable
 from uuid import UUID
 
@@ -23,6 +26,8 @@ from ontology_platform.modules.jobs.runner import (
     RetryableJobError,
     register,
 )
+
+logger = logging.getLogger(__name__)
 
 type Extractor = Callable[[UUID, LeaseCheck], Awaitable[UUID | None]]
 type VisionTranscriber = Callable[[ScanPart], Awaitable[list[ParsedPage]]]
@@ -59,8 +64,62 @@ async def _record(job: JobContext, document_id: UUID, **values: object) -> None:
             setattr(doc, name, value)
 
 
+def _transcript_name(part: ScanPart) -> str:
+    return f"transcript-{part.first_page}-{part.page_count}.json"
+
+
+def _saved_transcript(
+    storage: DocumentStorage, document_id: UUID, part: ScanPart
+) -> list[ParsedPage] | None:
+    name = _transcript_name(part)
+    data = storage.open_derived(document_id, name)
+    if data is None:
+        return None
+    try:
+        saved = json.loads(data)
+        if not isinstance(saved, list):
+            raise TypeError("not a list of pages")
+        pages = [_saved_page(**page) for page in saved]
+    except (ValueError, TypeError) as exc:
+        logger.warning(
+            "Transcribing again: saved %s of %s is unreadable: %s", name, document_id, exc
+        )
+        return None
+    return pages
+
+
+def _saved_page(number: object, text: object, heading: object) -> ParsedPage:
+    if (
+        not (number is None or (isinstance(number, int) and not isinstance(number, bool)))
+        or not isinstance(text, str)
+        or not (heading is None or isinstance(heading, str))
+    ):
+        raise TypeError("a page field has the wrong type")
+    return ParsedPage(number, text, heading)
+
+
+async def _transcribe_part(
+    transcriber: VisionTranscriber, storage: DocumentStorage, document_id: UUID, part: ScanPart
+) -> list[ParsedPage]:
+    """A part transcribed by an earlier execution is read back instead of paid for again."""
+    saved = await asyncio.to_thread(_saved_transcript, storage, document_id, part)
+    if saved is not None:
+        return saved
+    pages = await transcriber(part)
+    # A part without text is not kept: a retry asked for after "no text" transcribes it again.
+    if any(page.text.strip() for page in pages):
+        name = _transcript_name(part)
+        data = json.dumps([dataclasses.asdict(page) for page in pages], ensure_ascii=False)
+        try:
+            await asyncio.to_thread(storage.save_derived, document_id, name, data.encode("utf-8"))
+        except OSError:
+            # Saving only spares a retry the cost; the transcript itself is good.
+            logger.warning("Could not save %s of %s", name, document_id, exc_info=True)
+    return pages
+
+
 async def _transcribe(
-    job: JobContext, document_id: UUID, parsed: ParsedDocument
+    job: JobContext, storage: DocumentStorage, document_id: UUID, parsed: ParsedDocument
 ) -> list[ParsedPage]:
     if _transcriber is None:
         raise AppError(422, "documents.needs_ocr", "This PDF requires vision transcription.")
@@ -72,7 +131,7 @@ async def _transcribe(
     total = len(parsed.scan_parts)
     for done, part in enumerate(parsed.scan_parts):
         await _record(job, document_id, progress={"step": "parse", "done": done, "total": total})
-        pages.extend(await _transcriber(part))
+        pages.extend(await _transcribe_part(_transcriber, storage, document_id, part))
     if not any(page.text.strip() for page in pages):
         raise AppError(422, "documents.unreadable", "Vision transcription returned no text.")
     return pages
@@ -83,7 +142,11 @@ async def _parse(
 ) -> tuple[ParsedDocument, list[TextChunk]]:
     data = await asyncio.to_thread(storage.open, key)
     parsed = await parse_isolated(media_type, data)
-    pages = await _transcribe(job, document_id, parsed) if parsed.needs_vision else parsed.pages
+    pages = (
+        await _transcribe(job, storage, document_id, parsed)
+        if parsed.needs_vision
+        else parsed.pages
+    )
     chunks = await asyncio.to_thread(chunk_pages, pages)
     char_count = sum(chunk.char_count for chunk in chunks)
     if char_count > MAX_RECOGNIZED_CHARS:
