@@ -71,14 +71,31 @@ def _transcript_name(part: ScanPart) -> str:
 def _saved_transcript(
     storage: DocumentStorage, document_id: UUID, part: ScanPart
 ) -> list[ParsedPage] | None:
-    data = storage.open_derived(document_id, _transcript_name(part))
+    name = _transcript_name(part)
+    data = storage.open_derived(document_id, name)
     if data is None:
         return None
     try:
-        return [ParsedPage(**page) for page in json.loads(data)]
+        saved = json.loads(data)
+        if not isinstance(saved, list):
+            raise TypeError("not a list of pages")
+        pages = [_saved_page(**page) for page in saved]
     except (ValueError, TypeError) as exc:
-        logger.warning("Ignoring an unreadable saved transcript: %s", exc)
+        logger.warning(
+            "Transcribing again: saved %s of %s is unreadable: %s", name, document_id, exc
+        )
         return None
+    return pages
+
+
+def _saved_page(number: object, text: object, heading: object) -> ParsedPage:
+    if (
+        not (number is None or (isinstance(number, int) and not isinstance(number, bool)))
+        or not isinstance(text, str)
+        or not (heading is None or isinstance(heading, str))
+    ):
+        raise TypeError("a page field has the wrong type")
+    return ParsedPage(number, text, heading)
 
 
 async def _transcribe_part(
@@ -91,10 +108,13 @@ async def _transcribe_part(
     pages = await transcriber(part)
     # A part without text is not kept: a retry asked for after "no text" transcribes it again.
     if any(page.text.strip() for page in pages):
+        name = _transcript_name(part)
         data = json.dumps([dataclasses.asdict(page) for page in pages], ensure_ascii=False)
-        await asyncio.to_thread(
-            storage.save_derived, document_id, _transcript_name(part), data.encode("utf-8")
-        )
+        try:
+            await asyncio.to_thread(storage.save_derived, document_id, name, data.encode("utf-8"))
+        except OSError:
+            # Saving only spares a retry the cost; the transcript itself is good.
+            logger.warning("Could not save %s of %s", name, document_id, exc_info=True)
     return pages
 
 

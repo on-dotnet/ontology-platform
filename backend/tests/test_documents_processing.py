@@ -520,3 +520,56 @@ async def test_an_unreadable_saved_transcript_is_transcribed_again(
     saved = storage.open_derived(document_id, "transcript-1-3.json")
     assert saved is not None
     assert json.loads(saved) == [{"number": 1, "text": "第一页", "heading": None}]
+
+
+async def test_a_transcript_that_cannot_be_saved_still_counts(
+    app: FastAPI, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    storage = LocalDocumentStorage(tmp_path)
+    document_id, job = await prepare(app, storage, "scan.pdf", blank_pdf(3))
+
+    def disk_full(*_: object) -> None:
+        raise OSError("No space left on device")
+
+    async def transcribe(part: ScanPart) -> list[ParsedPage]:
+        return [ParsedPage(1, "第一页")]
+
+    monkeypatch.setattr(storage, "save_derived", disk_full)
+    processing.register_vision_transcriber(transcribe)
+    try:
+        await processing.process(job, storage)
+    finally:
+        processing.register_vision_transcriber(None)
+
+    async with job.session_factory() as db:
+        assert (await service.get(db, document_id)).status == "ready"
+
+
+@pytest.mark.parametrize(
+    "saved",
+    [
+        b'[{"number": 1, "text": null, "heading": null}]',
+        b'[{"number": "1", "text": "x", "heading": null}]',
+        b'[{"number": 1, "text": "x", "heading": 2}]',
+        b'{"number": 1}',
+    ],
+)
+async def test_a_saved_transcript_of_the_wrong_shape_is_transcribed_again(
+    app: FastAPI, tmp_path: Path, saved: bytes
+) -> None:
+    storage = LocalDocumentStorage(tmp_path)
+    document_id, job = await prepare(app, storage, "scan.pdf", blank_pdf(3))
+    storage.save_derived(document_id, "transcript-1-3.json", saved)
+    calls: list[int] = []
+
+    async def transcribe(part: ScanPart) -> list[ParsedPage]:
+        calls.append(part.first_page)
+        return [ParsedPage(1, "第一页")]
+
+    processing.register_vision_transcriber(transcribe)
+    try:
+        await processing.process(job, storage)
+    finally:
+        processing.register_vision_transcriber(None)
+
+    assert calls == [1]
