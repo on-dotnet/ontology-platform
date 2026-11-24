@@ -266,9 +266,9 @@ def merge_types(
     Only earlier batches are merged into: a single batch is kept exactly as the model returned
     it, and duplicates by name are left to `build_proposals`, as before batching. A ref that
     earlier batches gave to several types is not extended either: which one is meant is
-    unknown, so the type is added and `build_proposals` resolves the shared ref. Nor is the id
-    of an existing type: `build_proposals` checks each type given one against that type's
-    names, and makes those that match one update.
+    unknown, so the type is added and `build_proposals` resolves the shared ref. Nor is a ref
+    in the form of an id (a UUID): `build_proposals` checks each type given an existing type's
+    id against that type's names, and makes those that match one update.
     """
     merged = list(found)
     earlier = {item.ref: index for index, item in enumerate(found)}
