@@ -1,4 +1,8 @@
-"""Fixtures: a throwaway database for the whole run and a fresh app per test."""
+"""Fixtures: a throwaway database per test process and a fresh app per test.
+
+Under pytest-xdist every worker process gets its own database from the session fixture below,
+so workers share nothing but the PostgreSQL server.
+"""
 
 import os
 import secrets
@@ -7,6 +11,7 @@ from collections.abc import AsyncIterator, Iterator
 import psycopg
 import pytest
 from alembic import command
+from argon2 import PasswordHasher
 from fastapi import FastAPI
 from httpx import AsyncClient
 from psycopg import sql
@@ -16,15 +21,26 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ontology_platform import models  # noqa: F401  (registers every module's tables)
 from ontology_platform.main import create_app
+from ontology_platform.modules.identity import service as identity_service
 from ontology_platform.settings import Settings
 from support import (
     ADMIN_PASSWORD,
     ADMIN_USERNAME,
+    TEST_HASHER,
     alembic_config,
     libpq_dsn,
     make_client,
     truncate_tables,
 )
+
+
+@pytest.fixture(scope="session", autouse=True)
+def production_hasher() -> Iterator[PasswordHasher]:
+    """Hash with TEST_HASHER for the whole run; yields the hasher production uses."""
+    production = identity_service._hasher
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(identity_service, "_hasher", TEST_HASHER)
+        yield production
 
 
 @pytest.fixture(scope="session")

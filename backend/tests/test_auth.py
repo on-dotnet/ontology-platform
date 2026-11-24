@@ -9,7 +9,8 @@ from datetime import UTC, datetime, timedelta
 from typing import Literal
 
 import pytest
-from argon2 import PasswordHasher
+from argon2 import PasswordHasher, extract_parameters
+from argon2.profiles import RFC_9106_LOW_MEMORY
 from fastapi import Depends, FastAPI
 from httpx import AsyncClient
 from pydantic import SecretStr
@@ -270,6 +271,14 @@ async def test_password_is_hashed_with_argon2id(db: AsyncSession) -> None:
     assert password_hash is not None
     assert password_hash.startswith("$argon2id$")
     assert ADMIN_PASSWORD not in password_hash
+
+
+def test_production_hashes_keep_the_rfc_9106_low_memory_profile(
+    production_hasher: PasswordHasher,
+) -> None:
+    # The tests swap in a cheap hasher (conftest.py); production must stay on the full profile.
+    assert service._hasher is not production_hasher
+    assert extract_parameters(production_hasher.hash("x")) == RFC_9106_LOW_MEMORY
 
 
 async def test_admin_is_created_only_once(

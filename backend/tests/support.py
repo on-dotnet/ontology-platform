@@ -2,6 +2,7 @@
 
 import psycopg
 from alembic.config import Config
+from argon2 import PasswordHasher, Type
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient, Response
 from psycopg import sql
@@ -15,6 +16,9 @@ ADMIN_PASSWORD = "admin-test-password"
 PROBLEM_JSON = "application/problem+json"
 # For direct inspection of the test database; see migrations/env.py on search_path.
 PUBLIC_SEARCH_PATH = {"options": "-c search_path=public"}
+# Still Argon2id, but with the smallest cost: the production profile spends about 80 ms and
+# 64 MiB per hash, and every app start hashes the admin password. See conftest.py.
+TEST_HASHER = PasswordHasher(time_cost=1, memory_cost=8, parallelism=1, type=Type.ID)
 
 
 def alembic_config(database_url: str) -> Config:

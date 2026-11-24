@@ -1,4 +1,6 @@
 # 开发与测试用的容器编排。统一经 ./dev.ps1 调用，不要直接 docker compose down -v。
+# 本项目构建的镜像带工作区标签 OP_IMAGE_TAG（由 dev.ps1 按所在目录算出），
+# 几个 git worktree 同时构建、测试时各用各的镜像。
 name: ontology
 
 x-build-args: &build-args
@@ -45,7 +47,7 @@ services:
       context: ./backend
       target: runtime
       args: *build-args
-    image: ontology/api:local
+    image: ontology/api:${OP_IMAGE_TAG:-local}
     environment:
       <<: *api-env
       # The api is reachable only through the web container's nginx, which overwrites X-Forwarded-For.
@@ -63,7 +65,7 @@ services:
     restart: unless-stopped
 
   worker:
-    image: ontology/api:local
+    image: ontology/api:${OP_IMAGE_TAG:-local}
     command: ["python", "-m", "ontology_platform.worker"]
     environment: *api-env
     volumes:
@@ -78,7 +80,7 @@ services:
       context: ./web
       target: runtime
       args: *build-args
-    image: ontology/web:local
+    image: ontology/web:${OP_IMAGE_TAG:-local}
     ports:
       - "${OP_WEB_PORT:-28080}:8080"
     depends_on:
@@ -93,9 +95,11 @@ services:
       context: ./backend
       target: test
       args: *build-args
-    image: ontology/test-api:local
+    image: ontology/test-api:${OP_IMAGE_TAG:-local}
     environment:
       OP_TEST_ADMIN_DATABASE_URL: postgresql+psycopg://ontology:${OP_POSTGRES_PASSWORD:-ontology-dev-only}@postgres:5432/postgres
+      # pytest-xdist workers for the full run in scripts/check.sh; empty = its default.
+      OP_TEST_WORKERS: ${OP_TEST_WORKERS:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -106,7 +110,7 @@ services:
       context: ./web
       target: test
       args: *build-args
-    image: ontology/test-web:local
+    image: ontology/test-web:${OP_IMAGE_TAG:-local}
 
 volumes:
   postgres-data:

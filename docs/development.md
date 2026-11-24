@@ -20,23 +20,40 @@
 
 ```powershell
 ./dev.ps1 up           # 构建并启动，等待健康
-./dev.ps1 test-api     # 后端检查
-./dev.ps1 test-api tests/test_ai_pipeline.py '-x'   # 只跑指定测试；PowerShell 里以 - 开头的参数要加引号
+./dev.ps1 test-api tests/test_ai_pipeline.py '-x'   # 开发中只跑受影响的测试；PowerShell 里以 - 开头的参数要加引号
+./dev.ps1 test-api tests/test_auth.py tests/test_workbench.py '-n' '4'   # 文件多时可以加 -n 并行
+./dev.ps1 test-api     # 后端全量（ruff、mypy、pytest），一般交给门禁
 ./dev.ps1 fmt <文件…>  # 在容器里用 ruff 修正并格式化指定的后端文件
-./dev.ps1 test-web     # 前端检查
+./dev.ps1 test-web     # 前端检查（eslint、tsc、vitest 同时跑）
 ./dev.ps1 lock api     # 改了 backend/pyproject.toml 之后
 ./dev.ps1 lock web     # 改了 web/package.json 之后
 ./dev.ps1 gen-api      # 改了后端接口之后，同步前端类型
 ./dev.ps1 owl-check    # 改了 OWL 导入导出之后，做一次 Protégé 往返检查
-./dev.ps1 ci -Report   # 提交并推送之后，对 HEAD 跑完整门禁
+./dev.ps1 ci -Report   # 复审通过、提交并推送之后，对最终 HEAD 跑一次完整门禁
 ```
+
+## 测试的组织
+
+- 后端全量用 pytest-xdist 跑 8 个进程（在 16 核的 Docker 主机上实测，12、16 个不再变快）。每个进程由 `backend/tests/conftest.py` 的会话级夹具 `database_url` 新建一个临时库并迁移到最新版，跑完删除；进程之间只共用 PostgreSQL 服务本身。临时设置进程数：本机配置里写 `OP_TEST_WORKERS=4`，`0` 表示单进程。
+- 带参数的 `test-api`（指定文件）默认单进程，需要时自己加 `'-n' '4'`。
+- 测试期间密码哈希换成低成本的 Argon2id 参数（`support.TEST_HASHER`），生产参数不变，由 `test_production_hashes_keep_the_rfc_9106_low_memory_profile` 守住。新测试不要依赖哈希的耗时。
+- 测试之间不得共享可变状态：文件写到 `tmp_path`，不用固定的端口、目录或数据库名。
+
+## 并行开发
+
+几个会话可以同时开发，各自在一个 git worktree 里工作：
+
+1. 每个会话一个 worktree、一条分支，例如 `git worktree add ../op-feat-x -b feat/x origin/main`。Claude Code 的会话默认就建在 `.claude/worktrees/` 下的独立 worktree 里。
+2. 构建和测试的镜像带工作区标签：主检出目录是 `local`，其他 worktree 是"目录名-路径哈希"（例如 `ontology/test-api:faster-gate-354080-21e96cdc`），由 `dev.ps1` 按所在目录算出，也可以用 `OP_IMAGE_TAG` 指定。两个工作区同时跑 `test-api`、`test-web`、`ci`，各用各的镜像和临时数据库，结果只取决于各自的代码。
+3. 开发栈（`up`、`status`、`psql`）只有一套，postgres 和数据卷共用：同一时间只让一个工作区运行 `./dev.ps1 up`，最后一次 `up` 的工作区决定开发栈跑的是哪份代码。
+4. worktree 删掉以后，它的镜像标签会留下。`./dev.ps1 images` 列出本项目的镜像（`ontology/*`）及所属工作区，`./dev.ps1 clean-images` 删除已不存在的工作区的标签。它只删 `ontology/*` 的标签，不 prune、不强制删除，仍有容器在用的镜像会保留。
 
 ## Protégé 往返检查 `./dev.ps1 owl-check`
 
 用 Protégé 底层的库 OWL API（4.5.29）检查平台的导出能否被 Protégé 原样读写。步骤：
 
 1. 在临时 api 容器里，把 `samples/owl-features` 的每个样例、钢铁样例（三个文件合在一起）、开发栈每个本体的当前版本（开发栈在运行时）导入平台再导出；
-2. 在断网的 OWL API 容器（镜像 `ontology/owlapi:local`，由 [dev/owlapi](../dev/owlapi) 构建）里读入并另存为 Turtle；
+2. 在断网的 OWL API 容器（镜像 `ontology/owlapi:<工作区标签>`，由 [dev/owlapi](../dev/owlapi) 构建）里读入并另存为 Turtle；
 3. 把另存的文件当作对同一本体的导入读回，比较差异。
 
 通过的条件：OWL API 没有解析错误，也没有未解析的三元组；读回后没有差异，只允许导入时标为"Protégé 会改写"的公理被改写。判定规则见[规格 002](specs/002-m2-ontology-workbench.md) 第 4.3 节。
@@ -45,7 +62,9 @@
 
 ## 门禁 `./dev.ps1 ci`
 
-依次运行：compose 配置校验、`test-api`、`test-web`、构建 api 与 web 运行镜像。任一步失败即整体失败。带 `-Report` 时要求工作区干净、提交已推送，并把结果写成 GitHub 提交状态 `local-ci`。
+先校验 compose 配置，再同时运行 `test-api`（全量）、`test-web`、构建 api 与 web 运行镜像，三项各写一个日志到 `.verification/ci/`。全部结束后按这个顺序打印：通过的一项打出汇总行，失败的一项打出失败用例和日志末尾。任一步失败即整体失败，退出码为 1。带 `-Report` 时要求工作区干净、提交已推送，并把结果写成 GitHub 提交状态 `local-ci`。`./dev.ps1 test` 同样同时运行 `test-api`、`test-web`，日志在 `.verification/test/`。
+
+开发中不要先手动跑一遍全量再跑门禁：只跑受影响的测试，复审通过后对最终 HEAD 跑一次门禁（见 [AGENTS.md](../AGENTS.md) 第 5 节）。
 
 ## Docker 主机的限制
 
