@@ -1,5 +1,6 @@
 import hashlib
 from pathlib import Path
+from uuid import uuid4
 
 import pytest
 
@@ -35,3 +36,27 @@ def test_atomic_publication_cleans_up_on_error(
 def test_open_rejects_parent_path(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="storage key"):
         LocalDocumentStorage(tmp_path).open("../private")
+
+
+def test_derived_files_are_kept_per_document(tmp_path: Path) -> None:
+    storage = LocalDocumentStorage(tmp_path)
+    owner = uuid4()
+    assert storage.open_derived(owner, "transcript-1-5.json") is None
+
+    storage.save_derived(owner, "transcript-1-5.json", b"[]")
+    storage.save_derived(owner, "transcript-1-5.json", b'[{"number": 1}]')
+
+    assert storage.open_derived(owner, "transcript-1-5.json") == b'[{"number": 1}]'
+    assert storage.open_derived(uuid4(), "transcript-1-5.json") is None
+    assert [p.name for p in (tmp_path / "derived" / str(owner)).iterdir()] == [
+        "transcript-1-5.json"
+    ]
+
+
+@pytest.mark.parametrize("name", ["../escape.json", "a/b.json", "", "Transcript.JSON"])
+def test_derived_names_stay_in_their_folder(tmp_path: Path, name: str) -> None:
+    storage = LocalDocumentStorage(tmp_path)
+    with pytest.raises(ValueError, match="derived file name"):
+        storage.save_derived(uuid4(), name, b"x")
+    with pytest.raises(ValueError, match="derived file name"):
+        storage.open_derived(uuid4(), name)
