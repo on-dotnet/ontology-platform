@@ -1018,7 +1018,11 @@ STEELMAKING_CONVERTER = KnownElement(
 )
 
 
-@pytest.mark.parametrize("ref", ["new:ElectricFurnace", str(STEELMAKING_CONVERTER.id)])
+@pytest.mark.parametrize(
+    "ref",
+    ["new:ElectricFurnace", str(STEELMAKING_CONVERTER.id)],
+    ids=["new-ref", "existing-id"],  # stable ids: the uuid differs per xdist worker
+)
 def test_a_shared_synonym_alone_does_not_align_a_type(ref: str) -> None:
     types = [entity(ref, "电炉", "ElectricFurnace", synonyms=["炼钢炉"])]
     [created] = build_proposals([LADLE_CHUNK], [STEELMAKING_CONVERTER], types, NO_RELATIONS)
