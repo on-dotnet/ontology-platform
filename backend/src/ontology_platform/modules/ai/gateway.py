@@ -248,6 +248,9 @@ class OpenAIGateway:
         return True
 
     async def _probe(self) -> bool:
+        # The remembered success is per process, so each worker probes once per interval.
+        # A 404 can also come from a proxy whose upstream is down; a remembered success then
+        # hides it for up to the interval, while connection errors are still reported at once.
         now = time.monotonic()
         if self._probed_ok_at is not None and now - self._probed_ok_at < PROBE_INTERVAL_SECONDS:
             return True

@@ -15,6 +15,7 @@ from ontology_platform.modules.ai.gateway import (
     AiInvalidOutputError,
     AiNotConfiguredError,
     AiUnavailableError,
+    PROBE_INTERVAL_SECONDS,
     OpenAIGateway,
 )
 from ontology_platform.modules.ai.models import AiRun
@@ -398,13 +399,20 @@ async def test_a_failed_fallback_is_retried_and_not_retried_within_one_ping(
     assert [path.split()[0] for path in seen].count("POST") == 2
 
 
-async def test_the_fallback_call_expires_after_the_probe_interval(
-    settings: Settings, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    clock = [1000.0]
-    monkeypatch.setattr("ontology_platform.modules.ai.gateway.time.monotonic", lambda: clock[0])
+async def test_the_fallback_call_expires_after_the_probe_interval(settings: Settings) -> None:
     gateway, seen = ping_gateway(settings, 404)
     assert await gateway.ping() is True
-    clock[0] += 3600
+    # Age the remembered success instead of patching the process-wide clock.
+    assert gateway._probed_ok_at is not None
+    gateway._probed_ok_at -= PROBE_INTERVAL_SECONDS + 1
     assert await gateway.ping() is True
     assert [path.split()[0] for path in seen].count("POST") == 2
+
+
+@pytest.mark.parametrize("status", [429, 500, 503])
+async def test_ping_does_not_probe_on_transient_models_errors(
+    settings: Settings, status: int
+) -> None:
+    gateway, seen = ping_gateway(settings, status)
+    assert await gateway.ping() is False
+    assert [path.split()[0] for path in seen] == ["GET"]
