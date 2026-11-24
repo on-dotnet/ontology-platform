@@ -266,14 +266,16 @@ def merge_types(
     Only earlier batches are merged into: a single batch is kept exactly as the model returned
     it, and duplicates by name are left to `build_proposals`, as before batching. A ref that
     earlier batches gave to several types is not extended either: which one is meant is
-    unknown, so the type is added and `build_proposals` resolves the shared ref.
+    unknown, so the type is added and `build_proposals` resolves the shared ref. Nor is the id
+    of an existing type: `build_proposals` checks each type given one against that type's
+    names, and makes those that match one update.
     """
     merged = list(found)
     earlier = {item.ref: index for index, item in enumerate(found)}
     shared = {ref for ref, count in Counter(item.ref for item in found).items() if count > 1}
     for item in batch:
         index = earlier.get(item.ref)
-        if index is None or item.ref in shared:
+        if index is None or item.ref in shared or _as_uuid(item.ref) is not None:
             merged.append(item)
             continue
         other = merged[index]
@@ -411,19 +413,23 @@ def build_proposals(
     # temp_ref. The model sometimes gives one ref to two types; see `resolve`.
     became: list[tuple[EntityTypeOut, str]] = []
     new_types: list[tuple[EntityTypeOut, Proposal]] = []
+    mistaken: set[str] = set()  # existing ids given to types that share no name with them
 
     for item in types:
         labels = [item.label_zh, item.label_en or "", *item.synonyms]
         claimed = builder.known_ids.get(item.ref)
         if claimed is not None and claimed.kind != "entity_type":
             claimed = None
-        # An existing type reused by its id keeps one of its names. A type given the id of an
-        # existing type it shares no name with is a mistaken id, or a new name for that type:
-        # it is aligned by its own names, and if it stays new a reviewer decides.
-        if claimed is not None and _keys(labels) & _element_keys(claimed):
+        # An existing type reused by its id shares a name (two characters or more) with it. A
+        # type that shares none was given a mistaken id, or is a new name for that type: it is
+        # aligned by its own names, and if it stays new a reviewer decides.
+        mistaken_id = claimed is not None and not (_keys(labels) & _element_keys(claimed))
+        if claimed is not None and not mistaken_id:
             became.append((item, item.ref))
             _maybe_update(builder, claimed, item.synonyms, item, item.quotes)
             continue
+        if mistaken_id:
+            mistaken.add(item.ref)
         existing = builder.match_known("entity_type", labels)
         if existing is not None:
             became.append((item, str(existing.id)))
@@ -474,7 +480,7 @@ def build_proposals(
         )
         # Only a synonym is shared with another new type, or the model took it for an existing
         # type whose names it does not have: ask a human.
-        if claimed is not None or any(item_synonyms & _type_keys(p) for _, p in new_types):
+        if mistaken_id or any(item_synonyms & _type_keys(p) for _, p in new_types):
             proposal.flags.append("possible_duplicate")
         new_types.append((item, proposal))
         builder.add(proposal, item.quotes, item.confidence)
@@ -498,9 +504,10 @@ def build_proposals(
         return next(iter(found))
 
     # Parents are resolved after all types are known: a type of this run or an existing one.
-    # Unknown, ambiguous or self parents are dropped.
+    # Unknown, ambiguous or self parents are dropped. So is a mistaken id: the types stage
+    # listed it with the existing type's names, while the type given it means another thing.
     for item, proposal in new_types:
-        parent = resolve(item.parent) if item.parent else None
+        parent = resolve(item.parent) if item.parent and item.parent not in mistaken else None
         if parent and parent != proposal.temp_ref:
             proposal.fields["parentRef"] = parent
 

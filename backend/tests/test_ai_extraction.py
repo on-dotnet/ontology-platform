@@ -606,7 +606,7 @@ def test_an_existing_id_given_to_a_type_of_other_names_does_not_align_it() -> No
     grade = str(EXISTING_GRADE.id)
     types = [
         entity(grade, "行车", "Crane", synonyms=["天车"], quotes=[quote(0, "行车吊运钢包")]),
-        entity("new:Ladle", "钢包", "Ladle"),
+        entity("new:Ladle", "钢包", "Ladle", parent=grade),
     ]
     rels = RelationsOut(
         relations=[relation(grade, "new:Ladle", "吊运", [quote(0, "行车吊运钢包")])],
@@ -627,6 +627,51 @@ def test_an_existing_id_given_to_a_type_of_other_names_does_not_align_it() -> No
     # The relations stage listed the id with this type's names, so the id stands for it.
     assert by_label(proposals, "吊运").fields["domainRef"] == crane.temp_ref
     assert by_label(proposals, "起重量").fields["domainRef"] == crane.temp_ref
+    # The types stage listed the id as 钢种, so a parent given it may mean either.
+    assert by_label(proposals, "钢包").fields["parentRef"] is None
+
+
+def test_an_existing_id_given_to_a_type_of_other_names_can_merge_by_name() -> None:
+    grade = str(EXISTING_GRADE.id)
+    types = [
+        entity("new:Crane", "行车", "Crane", quotes=[quote(0, "行车吊运钢包")]),
+        entity(grade, "行车", "Crane2", synonyms=["天车"]),
+    ]
+    proposals = build_proposals(
+        [LADLE_CHUNK],
+        [EXISTING_GRADE],
+        types,
+        RelationsOut(relations=[], properties=[prop(grade, "起重量")]),
+    )
+
+    # Merged into the new type of the same name, as any new type would be: no flag.
+    assert [(p.op, p.fields.get("labelZh")) for p in proposals] == [
+        ("create", "行车"),
+        ("create", "起重量"),
+    ]
+    crane = by_label(proposals, "行车")
+    assert crane.flags == []
+    assert [s["text"] for s in crane.fields["synonyms"]] == ["天车"]
+    assert by_label(proposals, "起重量").fields["domainRef"] == "new:Crane"
+
+
+def test_a_later_batch_leaves_types_given_an_existing_id_to_be_checked_one_by_one() -> None:
+    grade = str(EXISTING_GRADE.id)
+    found = [entity(grade, "钢种", "Grade")]
+    later = [
+        entity(grade, "钢种", "Grade", synonyms=["钢级"]),
+        entity(grade, "行车", "Crane", synonyms=["天车"]),
+    ]
+    types = merge_types(found, later)
+    assert types == [*found, *later]
+
+    proposals = build_proposals(
+        [LADLE_CHUNK], [EXISTING_GRADE], types, RelationsOut(relations=[], properties=[])
+    )
+    # Those with a name of 钢种 make one update; 行车 is not folded into it.
+    [update] = [p for p in proposals if p.op == "update"]
+    assert [s["text"] for s in update.fields["synonyms"]] == ["钢级"]
+    assert [p.fields["labelZh"] for p in proposals if p.op == "create"] == ["行车"]
 
 
 def test_an_existing_id_given_to_another_existing_type_aligns_by_name() -> None:
