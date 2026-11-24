@@ -46,6 +46,7 @@
 1. 每个会话一个 worktree、一条分支，例如 `git worktree add ../op-feat-x -b feat/x origin/main`。Claude Code 的会话默认就建在 `.claude/worktrees/` 下的独立 worktree 里。
 2. 构建和测试的镜像带工作区标签：主检出目录是 `local`，其他 worktree 是"目录名-路径哈希"（例如 `ontology/test-api:faster-gate-354080-21e96cdc`），由 `dev.ps1` 按所在目录算出，也可以用 `OP_IMAGE_TAG` 指定。两个工作区同时跑 `test-api`、`test-web`、`ci`，各用各的镜像和临时数据库，结果只取决于各自的代码。
 3. 开发栈（`up`、`status`、`psql`）只有一套，postgres 和数据卷共用：同一时间只让一个工作区运行 `./dev.ps1 up`，最后一次 `up` 的工作区决定开发栈跑的是哪份代码。
+   本机私有配置 `.env.local` 不在 Git 里，新 worktree 里没有：跑测试和门禁不需要它；要在 worktree 里 `up`、`ai-check`、`eval`，由用户本人把主检出目录里的那份复制过去，否则开发栈会以"AI 未配置"启动。
 4. worktree 删掉以后，它的镜像标签会留下。`./dev.ps1 images` 列出本项目的镜像（`ontology/*`）及所属工作区，`./dev.ps1 clean-images` 删除已不存在的工作区的标签。它只删 `ontology/*` 的标签，不 prune、不强制删除，仍有容器在用的镜像会保留。
 
 ## Protégé 往返检查 `./dev.ps1 owl-check`

@@ -498,7 +498,7 @@ function Invoke-Images([switch]$Clean) {
         $name = "$($Matches[1]):$($Matches[2])"
         $owner = $owners[$Matches[2]]
         if (-not $owner) { $stale += $name; $owner = '已不存在的工作区' }
-        Write-Host ('{0,-58} {1,9}  {2,-15} {3}' -f $name, $Matches[3], $Matches[4], $owner)
+        Write-Host ('{0,-58} {1,9}  {2,-20} {3}' -f $name, $Matches[3], $Matches[4], $owner)
     }
     if (-not $Clean) {
         if ($stale.Count -gt 0) { Write-Note "$($stale.Count) 个标签属于已不存在的工作区，./dev.ps1 clean-images 可删除" }
