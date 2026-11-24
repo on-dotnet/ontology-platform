@@ -12,10 +12,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ontology_platform.modules.ai.gateway import (
+    PROBE_INTERVAL_SECONDS,
     AiInvalidOutputError,
     AiNotConfiguredError,
     AiUnavailableError,
-    PROBE_INTERVAL_SECONDS,
     OpenAIGateway,
 )
 from ontology_platform.modules.ai.models import AiRun
