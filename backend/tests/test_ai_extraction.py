@@ -602,6 +602,71 @@ def test_names_of_a_type_given_a_shared_ref_count_only_for_the_type_it_became() 
     )
 
 
+def test_an_existing_id_given_to_a_type_of_other_names_does_not_align_it() -> None:
+    grade = str(EXISTING_GRADE.id)
+    types = [
+        entity(grade, "行车", "Crane", synonyms=["天车"], quotes=[quote(0, "行车吊运钢包")]),
+        entity("new:Ladle", "钢包", "Ladle"),
+    ]
+    rels = RelationsOut(
+        relations=[relation(grade, "new:Ladle", "吊运", [quote(0, "行车吊运钢包")])],
+        properties=[prop(grade, "起重量")],
+    )
+    proposals = build_proposals([LADLE_CHUNK], [EXISTING_GRADE], types, rels)
+
+    # Not one name of 钢种: a new type, left to the reviewer; 钢种 gets no synonyms.
+    assert [(p.op, p.fields.get("labelZh")) for p in proposals] == [
+        ("create", "行车"),
+        ("create", "钢包"),
+        ("create", "吊运"),
+        ("create", "起重量"),
+    ]
+    crane = by_label(proposals, "行车")
+    assert crane.flags == ["possible_duplicate"]
+    assert [s["text"] for s in crane.fields["synonyms"]] == ["天车"]
+    # The relations stage listed the id with this type's names, so the id stands for it.
+    assert by_label(proposals, "吊运").fields["domainRef"] == crane.temp_ref
+    assert by_label(proposals, "起重量").fields["domainRef"] == crane.temp_ref
+
+
+def test_an_existing_id_given_to_another_existing_type_aligns_by_name() -> None:
+    converter = KnownElement(id=uuid4(), kind="entity_type", local_name="BOF", label_zh="转炉")
+    types = [entity(str(converter.id), "钢种", "Grade", synonyms=["钢级"])]
+    proposals = build_proposals(
+        [LADLE_CHUNK],
+        [EXISTING_GRADE, converter],
+        types,
+        RelationsOut(relations=[], properties=[prop(str(converter.id), "代号")]),
+    )
+
+    [update, attribute] = proposals
+    assert (update.op, update.target_element_id) == ("update", EXISTING_GRADE.id)
+    assert [s["text"] for s in update.fields["synonyms"]] == ["钢级"]
+    assert attribute.fields["domainRef"] == str(EXISTING_GRADE.id)
+
+
+def test_an_existing_id_given_to_its_type_and_a_type_of_other_names_is_ambiguous() -> None:
+    grade = str(EXISTING_GRADE.id)
+    types = [
+        entity(grade, "钢种", "Grade"),
+        entity(grade, "行车", "Crane", quotes=[quote(0, "行车吊运钢包")]),
+        entity("new:Ladle", "钢包", "Ladle"),
+    ]
+    # The line names 牌号, 行车 and 钢包: either reading has direct evidence.
+    line = [quote(0, "行车把印有牌号的钢包吊运至精炼炉")]
+    rels = RelationsOut(
+        relations=[relation(grade, "new:Ladle", "吊运", line)],
+        properties=[prop(grade, "起重量")],
+    )
+    proposals = build_proposals([LADLE_CHUNK], [EXISTING_GRADE], types, rels)
+
+    assert [(p.op, p.fields.get("labelZh")) for p in proposals] == [
+        ("create", "行车"),
+        ("create", "钢包"),
+    ]
+    assert by_label(proposals, "行车").flags == ["possible_duplicate"]
+
+
 async def test_relations_need_a_quote_whose_line_names_both_types() -> None:
     chunk = ChunkText(
         id=uuid4(),

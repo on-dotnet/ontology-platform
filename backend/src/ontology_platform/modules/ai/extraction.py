@@ -413,11 +413,17 @@ def build_proposals(
     new_types: list[tuple[EntityTypeOut, Proposal]] = []
 
     for item in types:
-        if item.ref in builder.known_ids and builder.known_ids[item.ref].kind == "entity_type":
-            became.append((item, item.ref))
-            _maybe_update(builder, builder.known_ids[item.ref], item.synonyms, item, item.quotes)
-            continue
         labels = [item.label_zh, item.label_en or "", *item.synonyms]
+        claimed = builder.known_ids.get(item.ref)
+        if claimed is not None and claimed.kind != "entity_type":
+            claimed = None
+        # An existing type reused by its id keeps one of its names. A type given the id of an
+        # existing type it shares no name with is a mistaken id, or a new name for that type:
+        # it is aligned by its own names, and if it stays new a reviewer decides.
+        if claimed is not None and _keys(labels) & _element_keys(claimed):
+            became.append((item, item.ref))
+            _maybe_update(builder, claimed, item.synonyms, item, item.quotes)
+            continue
         existing = builder.match_known("entity_type", labels)
         if existing is not None:
             became.append((item, str(existing.id)))
@@ -466,8 +472,10 @@ def build_proposals(
                 "parentRef": None,
             },
         )
-        if any(item_synonyms & _type_keys(p) for _, p in new_types):
-            proposal.flags.append("possible_duplicate")  # only a synonym is shared: ask a human
+        # Only a synonym is shared with another new type, or the model took it for an existing
+        # type whose names it does not have: ask a human.
+        if claimed is not None or any(item_synonyms & _type_keys(p) for _, p in new_types):
+            proposal.flags.append("possible_duplicate")
         new_types.append((item, proposal))
         builder.add(proposal, item.quotes, item.confidence)
 
