@@ -542,9 +542,11 @@ async def test_list_change_sets_with_counts_and_filters(
         "documentId",
         "status",
         "counts",
+        "createdBy",
         "createdAt",
         "mergedAt",
     }
+    assert summary["createdBy"] is None  # open_change_set names no creator
     assert summary["counts"] == {"total": 2, "pending": 2, "accepted": 0, "rejected": 0}
     merged = next(item for item in everything if item["id"] == str(merged_id))
     assert merged["status"] == "merged"

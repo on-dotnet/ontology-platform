@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     documents_dir: str = "/data/documents"
     max_upload_mb: int = Field(default=20, gt=0)
 
+    # Who may decide a change set (M2): in `separate` mode nobody reviews their own.
+    review_mode: Literal["single", "separate"] = "single"
+
     @property
     def ai_configured(self) -> bool:
         return self.openai_api_key is not None and bool(self.openai_api_key.get_secret_value())

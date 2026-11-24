@@ -63,6 +63,8 @@ type ElementFields = M1ElementFields & {
 type ChangeOp = 'create' | 'update' | 'delete' | 'restore';
 type ChangeItem = M1ChangeItem & { op: ChangeOp; kind: Kind; flags: ('evidence_not_found' | 'possible_duplicate' | 'non_standard')[] };
 type ChangeSetSource = 'ai_extraction' | 'ai_assistant' | 'manual' | 'import';
+// ChangeSetSummary 新增 createdBy: string | null（提交人；AI 变更集为上传资料或提问的人）。
+// 异人审核模式下，提交人可以撤回（整体拒绝）自己的变更集，但不能逐项决定或合并（PR B）。
 type MergeSkipCode = 'changeset.stale_target' | 'changeset.dependency_skipped' | 'changeset.invalid_item' | 'changeset.has_dependents';
 
 // ---------- 导入（PR A） ----------

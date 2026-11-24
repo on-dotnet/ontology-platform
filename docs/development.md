@@ -52,6 +52,15 @@
 - CPU 目前只有 x86-64-v1 指令集：Doris 无法运行；NumPy 2.4 及以上会崩溃。依赖选型时避开需要 SSE4.2/AVX 的包。
 - 无法直接访问 api.openai.com 与 github.com，模型调用经本机代理出去（见下节）。
 
+## 审核模式
+
+`OP_REVIEW_MODE` 决定谁能审核变更集（规格 002 第 8 节）：
+
+- `single`（默认）：reviewer 和 admin 可以审核、合并自己提交的变更集；他们手工编辑时"保存"直接生效。
+- `separate`：任何人都不能审核自己提交的变更集（返回 403 `changeset.self_review`），手工编辑一律提交审核，由另一位审核人处理。
+
+在本机配置文件里写 `OP_REVIEW_MODE=separate`，再运行 `./dev.ps1 up` 生效。设置页会显示当前模式。
+
 ## 大模型
 
 模型配置只经环境变量提供。Key 不进仓库、不写日志、不在任何接口返回。

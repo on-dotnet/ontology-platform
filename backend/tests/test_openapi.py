@@ -41,6 +41,10 @@ M1_PATHS = {
 M2_PATHS = {
     "/api/ontologies/import",
     "/api/ontologies/{id}/import",
+    "/api/ontologies/{id}/turtle",
+    "/api/ontologies/{id}/edits",
+    "/api/ontologies/{id}/elements/{elementId}/impact",
+    "/api/settings/platform",
 }
 
 

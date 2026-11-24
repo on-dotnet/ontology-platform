@@ -26,14 +26,26 @@ READS: list[Call] = [
     ("GET", f"/api/change-sets/{ID}", None),
     ("GET", f"/api/releases/{ID}", None),
     ("GET", f"/api/releases/{ID}/export?format=turtle", None),
+    ("GET", f"/api/ontologies/{ID}/elements/{ID}/impact", None),
+    ("GET", "/api/settings/platform", None),
 ]
 CREATE: Call = ("POST", "/api/ontologies", {"name": "Role Check"})
 # Placeholder ids: a permitted caller gets 404, a refused one 403.
+EDIT_ITEM = {
+    "op": "create",
+    "kind": "entity_type",
+    "fields": {"localName": "Mill", "labelZh": "轧机"},
+}
+WRITES: list[Call] = [
+    ("POST", f"/api/ontologies/{ID}/edits", {"items": [EDIT_ITEM], "apply": True}),
+    ("POST", f"/api/ontologies/{ID}/turtle", {"turtle": "@prefix ex: <urn:t:> ."}),
+    # Creators withdraw their own change sets; whose it is is checked after it is found.
+    ("POST", f"/api/change-sets/{ID}/reject", None),
+]
 REVIEWS: list[Call] = [
     ("PATCH", f"/api/change-sets/{ID}/items/{ID}", {"decision": "accepted"}),
     ("POST", f"/api/change-sets/{ID}/decisions", {"itemIds": [], "decision": "accepted"}),
     ("POST", f"/api/change-sets/{ID}/merge", None),
-    ("POST", f"/api/change-sets/{ID}/reject", None),
     ("POST", f"/api/ontologies/{ID}/releases", {"title": "v1"}),
     ("POST", f"/api/releases/{ID}/activate", None),
 ]
@@ -46,7 +58,7 @@ async def call(client: AsyncClient, request: Call) -> Response:
 
 
 async def test_every_route_needs_a_session(client: AsyncClient) -> None:
-    for request in [*READS, CREATE, *REVIEWS]:
+    for request in [*READS, CREATE, *WRITES, *REVIEWS]:
         response = await call(client, request)
         assert response.status_code == 401, request
         assert response.json()["code"] == "auth.not_authenticated"
@@ -68,6 +80,10 @@ async def test_roles(client: AsyncClient, db: AsyncSession, role: Role) -> None:
     else:
         assert created.status_code == 403
         assert created.json()["code"] == "auth.forbidden"
+
+    for request in WRITES:
+        response = await call(client, request)
+        assert response.status_code == (404 if may_create else 403), request
 
     for request in REVIEWS:
         response = await call(client, request)

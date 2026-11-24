@@ -21,6 +21,8 @@ x-api-env: &api-env
   OP_AI_MODEL: ${OP_AI_MODEL:-}
   OP_AI_REASONING_MODEL: ${OP_AI_REASONING_MODEL:-}
   OP_DOCUMENTS_DIR: /data/documents
+  # single (default): reviewers merge their own changes; separate: another reviewer decides.
+  OP_REVIEW_MODE: ${OP_REVIEW_MODE:-}
 
 services:
   postgres:
