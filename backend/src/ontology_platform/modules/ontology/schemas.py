@@ -329,6 +329,9 @@ class ChangeSetSummary(CamelModel):
     document_id: UUID | None
     status: ChangeSetStatus
     counts: DecisionCounts
+    # Who submitted it (for AI change sets, who uploaded or asked); null for system work. In
+    # separate review mode they may withdraw it but not decide it.
+    created_by: UUID | None
     created_at: datetime
     merged_at: datetime | None
 
@@ -396,6 +399,85 @@ class ImportParseProblem(Problem):
 
     line: int | None
     column: int | None
+
+
+# ---------- manual edits, impact, expert mode (PR B) ----------
+
+EDIT_ITEMS_MAX = 500
+
+
+class EditItem(CamelModel):
+    """One change made by hand. update, delete and restore name their target and the revision
+    the user read (409 `element.stale` when it moved on)."""
+
+    op: ChangeOp
+    kind: Kind
+    target_element_id: UUID | None = None
+    target_revision: int | None = Field(default=None, ge=1)
+    temp_ref: Ref | None = None
+    fields: ElementFields = Field(default_factory=ElementFields)
+
+    @model_validator(mode="after")
+    def check_target(self) -> Self:
+        if self.op == "create":
+            if self.target_element_id is not None or self.target_revision is not None:
+                raise ValueError("A create has no target.")
+        elif self.target_element_id is None or self.target_revision is None:
+            raise ValueError("update, delete and restore need targetElementId and targetRevision.")
+        return self
+
+
+class EditRequest(CamelModel):
+    items: list[EditItem] = Field(min_length=1, max_length=EDIT_ITEMS_MAX)
+    # Merge at once when the user may review their own changes (spec 002, section 6).
+    apply: bool = False
+
+
+class EditResult(CamelModel):
+    change_set_id: UUID
+    merged: bool
+    merge: MergeResult | None
+
+
+class ElementRef(CamelModel):
+    id: UUID
+    kind: Kind
+    label: str
+    iri: str | None
+
+
+class CascadeChange(CamelModel):
+    """What deleting an element does to another one: delete it, or update it to let go."""
+
+    op: Literal["delete", "update"]
+    element: ElementRef
+
+
+class Impact(CamelModel):
+    """Active elements that refer to one element (spec 002, section 9), and everything a delete
+    of it would change, transitively, as a manual save proposes it (section 6)."""
+
+    element_id: UUID
+    subtypes: list[ElementRef]
+    relations: list[ElementRef]
+    properties: list[ElementRef]
+    constraints: list[ElementRef]
+    axioms: list[ElementRef]
+    inverse: ElementRef | None
+    cascade: list[CascadeChange]
+
+
+class TurtleEdit(CamelModel):
+    """The whole working version as edited in expert mode."""
+
+    turtle: str = Field(min_length=1, max_length=5 * 1024 * 1024)
+
+
+ReviewMode = Literal["single", "separate"]
+
+
+class PlatformSettings(CamelModel):
+    review_mode: ReviewMode
 
 
 # ---------- releases ----------

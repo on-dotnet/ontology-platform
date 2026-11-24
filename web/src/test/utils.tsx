@@ -93,7 +93,7 @@ interface ApiOptions {
 
 /**
  * Builds a fetch handler from routes such as `'GET /api/change-sets/:id'`. App-wide endpoints
- * (session, AI status, workbench summary, ontologies) have defaults that routes can override.
+ * (session, AI status, workbench summary, ontologies, review mode) have defaults that routes can override.
  * Unmatched requests get a 404 problem so a missing route fails visibly.
  */
 export function createApiHandler(routes: Record<string, RouteHandler> = {}, options: ApiOptions = {}) {
@@ -104,6 +104,7 @@ export function createApiHandler(routes: Record<string, RouteHandler> = {}, opti
     'GET /api/ai/status': () => defaultAiStatus,
     'GET /api/workbench/summary': () => emptyWorkbenchSummary,
     'GET /api/ontologies': () => [],
+    'GET /api/settings/platform': () => ({ reviewMode: 'single' }),
   };
   const compiled = Object.entries({ ...defaults, ...routes }).map(([key, handler]) => {
     const [method = 'GET', pattern = '/'] = key.split(' ');

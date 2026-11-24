@@ -231,7 +231,10 @@
           "description": "The platform does not change the kind of an existing element. These elements stay as they are, and references to them in the file were not imported."
         }
       },
-      "goReview": "Go to review"
+      "goReview": "Go to review",
+      "turtleTitle": "Change set created",
+      "turtleReviewDescription": "Your edits are in a change set. They enter the ontology once it is reviewed and merged.",
+      "turtleNoDifference": "The Turtle has no differences from the working version, so no change set was created."
     }
   },
   "upload": {
@@ -497,15 +500,25 @@
       "delete": "Deletes:",
       "restore": "Restores:"
     },
-    "noEvidenceBySource": {
-      "ai_extraction": "This item has no evidence.",
-      "ai_assistant": "This item has no evidence.",
-      "import": "Imported content has no source text.",
-      "manual": "Manual changes have no source text."
-    },
+    "noEvidence": "This item has no evidence.",
     "unknownElement": "Unknown element",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "withdraw": "Withdraw",
+    "withdrawTitle": "Withdraw “{{title}}”?",
+    "withdrawDescription": "The change set becomes rejected and none of its changes enter the ontology. This cannot be undone.",
+    "withdrawConfirm": "Withdraw change set",
+    "withdrawn": "Change set withdrawn",
+    "withdrawFailedTitle": "Not withdrawn",
+    "selfReviewNotice": "In separate review mode, change sets you submitted are reviewed by someone else.",
+    "impact": {
+      "show": "Show impact",
+      "hide": "Hide impact",
+      "label": "Impact of “{{name}}”",
+      "referencedBy_one": "Referenced by {{count}} element",
+      "referencedBy_other": "Referenced by {{count}} elements",
+      "none": "No other element refers to it."
+    }
   },
   "ontologyPage": {
     "viewLabel": "View",
@@ -558,10 +571,23 @@
         "name": "Name",
         "kind": "Kind",
         "localName": "Local name",
-        "definition": "Definition"
+        "definition": "Definition",
+        "actions": "Actions"
       },
       "target": "Target: {{name}}",
-      "subject": "Belongs to: {{name}}"
+      "subject": "Belongs to: {{name}}",
+      "statusFilter": "Filter by status",
+      "status": {
+        "active": "In use",
+        "deprecated": "Deleted",
+        "all": "All"
+      },
+      "statusChip": "Status: {{status}}",
+      "restoreElement": "Restore {{name}}",
+      "groupCount_one": "{{count}} axiom",
+      "groupCount_other": "{{count}} axioms",
+      "submitRestoreElement": "Submit restoring {{name}}",
+      "noSubject": "Not about an element"
     },
     "detail": {
       "deprecated": "Deleted",
@@ -595,7 +621,156 @@
     "newOntology": "New ontology",
     "importOwl": "Import OWL",
     "importOwlFile": "Import an OWL file",
-    "created": "Ontology “{{name}}” created"
+    "created": "Ontology “{{name}}” created",
+    "edit": {
+      "create": "New",
+      "edit": "Edit",
+      "delete": "Delete",
+      "restore": "Restore",
+      "save": "Save",
+      "submitForReview": "Submit for review",
+      "saved": "Saved",
+      "deleted": "Deleted {{name}}",
+      "restored": "Restored {{name}}",
+      "restoreFailed": "Not restored",
+      "submitted": "Submitted for review; it takes effect once approved",
+      "goReview": "Go to review",
+      "submitRestore": "Submit restore",
+      "saveErrors": {
+        "has_dependents": "Other elements still refer to what you are deleting, so nothing was saved. Reload to see the references and change those elements first.",
+        "invalid_item": "One of the changes is incomplete or not valid, so nothing was saved. Check what you entered and save again.",
+        "dependency_skipped": "A change this one depends on could not take effect, so nothing was saved. Reload and make the change again.",
+        "stale_target": "Someone else just changed this element, so nothing was saved. Reload and make your change on the latest version."
+      }
+    },
+    "form": {
+      "createTitle": {
+        "entity_type": "New object type",
+        "relation_type": "New relation",
+        "property": "New property",
+        "constraint": "New constraint"
+      },
+      "editTitle": "Edit {{name}}",
+      "appliesDescription": "Changes take effect as soon as you save.",
+      "reviewDescription": "Saving creates a change set; it takes effect once reviewed.",
+      "nothingChanged": "Nothing has been changed yet.",
+      "staleTitle": "Someone else changed this element",
+      "staleDescription": "Reload to get the latest version. Your changes here are not kept; make them again on the latest version.",
+      "reload": "Reload",
+      "failedTitle": "Not saved",
+      "noInverse": "No inverse relation",
+      "localNameInfoLabel": "About the local name",
+      "localNameHintPascal": "Used in the IRI, in PascalCase such as SteelSlab. Suggested from the English name; you can change it.",
+      "localNameHintCamel": "Used in the IRI, in camelCase such as producedBy. Suggested from the English name; you can change it.",
+      "localNameFixed": "The local name fixes the IRI and cannot change after creation.",
+      "errors": {
+        "localNameTooLong": "Use at most 128 characters",
+        "targetRequired": "Choose the target object type",
+        "pathRequired": "Choose a property or relation",
+        "countInvalid": "Enter 0 or a positive whole number",
+        "countOrder": "The maximum cannot be less than the minimum",
+        "lengthInvalid": "Enter 0 or a positive whole number",
+        "lengthOrder": "The maximum length cannot be less than the minimum length",
+        "integerValue": "Enter a whole number",
+        "numberValue": "Enter a number",
+        "flagsInvalid": "Use only the flags s, m, i, x and q",
+        "synonymTooLong": "Each synonym can be at most 200 characters"
+      },
+      "rules": {
+        "title": "Rules",
+        "add": "Add rule",
+        "remove": "Remove rule {{n}}",
+        "ruleTitle": "Rule {{n}}",
+        "choosePath": "Choose a property or relation",
+        "any": "Any",
+        "minCount": "Minimum count",
+        "maxCount": "Maximum count",
+        "classRef": "Value object type",
+        "allowedValues": "Allowed values",
+        "allowedValuesPlaceholder": "One value per line",
+        "minValue": "Minimum value",
+        "maxValue": "Maximum value",
+        "minValueMode": "Whether the minimum itself is allowed",
+        "maxValueMode": "Whether the maximum itself is allowed",
+        "inclusive": "Inclusive",
+        "exclusive": "Exclusive",
+        "minLength": "Minimum length",
+        "maxLength": "Maximum length",
+        "pattern": "Regular expression",
+        "flags": "Regex flags",
+        "flagsPlaceholder": "e.g. i",
+        "messageZh": "Chinese message",
+        "messageEn": "English message"
+      },
+      "autoShapeLabel": "About validation rules",
+      "autoShapeHint": "This element was imported, and its required and multiple settings are not in the platform’s validation rules yet. Once you change them and save, the platform creates the rules for it."
+    },
+    "impact": {
+      "title": "Referenced by",
+      "none": "No other element refers to it.",
+      "groups": {
+        "subtypes": "Subtypes ({{count}})",
+        "relations": "Relations ({{count}})",
+        "properties": "Properties ({{count}})",
+        "constraints": "Constraints ({{count}})",
+        "axioms": "Axioms ({{count}})",
+        "inverse": "Inverse relation"
+      }
+    },
+    "delete": {
+      "title": "Delete {{name}}?",
+      "description": "Once deleted it is no longer exported or listed by default; you can restore it later from Deleted in the list.",
+      "noImpact": "No other element refers to it; only this element is deleted.",
+      "impactTitle_one": "Deleting it also changes {{count}} element",
+      "impactTitle_other": "Deleting it also changes {{count}} elements",
+      "impactDescription": "This includes elements that refer to it indirectly. Restoring it later does not undo these changes.",
+      "deletedLabel": "Also deleted ({{count}})",
+      "changedLabel": "References removed ({{count}})",
+      "effects": {
+        "parentCleared": "Parent type cleared",
+        "inverseCleared": "Inverse relation cleared",
+        "rulesRemoved": "Rules using it removed"
+      },
+      "confirm": "Delete",
+      "failedTitle": "Not deleted",
+      "staleDescription": "Reload to see the latest references, then confirm again.",
+      "reviewDescription": "This creates a change set; the element is deleted once it is approved. It is then no longer exported, and you can restore it later from Deleted in the list."
+    },
+    "viewTurtle": "Turtle",
+    "turtle": {
+      "title": "Turtle of the working version",
+      "info": "The working version exported as Turtle. Edits become a change set that takes effect once it is reviewed and merged.",
+      "editorLabel": "Turtle of the working version",
+      "generate": "Create change set",
+      "reviewNote": "The change set always goes to review and takes effect once merged.",
+      "emptyDraft": "The Turtle is empty. Enter content before creating a change set.",
+      "parseErrorTitle": "The Turtle has a syntax error",
+      "parseErrorLine": "There is a syntax error on line {{line}}; the cursor is on that line. Fix it, then create the change set again.",
+      "parseError": "Fix the syntax error, then create the change set again.",
+      "goToLine": "Go to line {{line}}",
+      "failedTitle": "No change set was created",
+      "baseChangedTitle": "The working version has changed",
+      "baseChangedDescription": "Other changes were merged after you started editing, and a change set made now would undo them. Cancel and edit the latest content instead.",
+      "discardDescription": "Your Turtle edits have not become a change set yet and will be lost."
+    },
+    "axiom": {
+      "createTitle": "New advanced axiom",
+      "editTitle": "Edit advanced axiom",
+      "fragment": "Turtle fragment",
+      "fragmentInfoLabel": "About advanced axioms",
+      "fragmentInfo": "An axiom is one triple of one subject, with the blank nodes reachable from its object. Edit what the forms can express, such as names, parent types and domains, on the element itself.",
+      "fragmentRequired": "Enter a Turtle fragment",
+      "prefixesHint": "You can use the ontology's prefixes.",
+      "showPrefixes": "Show prefixes ({{count}})",
+      "hidePrefixes": "Hide prefixes",
+      "prefixesLabel": "Prefixes of the ontology"
+    },
+    "discard": {
+      "title": "Discard unsaved changes?",
+      "description": "Your changes here are not saved yet and will be lost.",
+      "keep": "Keep editing",
+      "confirm": "Discard changes"
+    }
   },
   "releases": {
     "publishNew": "Publish new release",
@@ -668,7 +843,7 @@
       "info": "Review change sets item by item: accept, edit or reject each change. Only approved changes enter the ontology."
     },
     "ontology": {
-      "info": "Browse object types, relations, properties, constraints and advanced axioms as a graph or a list. Select an element to see its details and where it came from."
+      "info": "Browse object types, relations, properties, constraints and advanced axioms as a graph or a list, and select an element to see its details and where it came from. The Turtle view edits the whole ontology as Turtle."
     },
     "data": {
       "info": "Connect data sources, browse table catalogs and bind data to the ontology.",
@@ -697,7 +872,15 @@
     "aiModel": "Model",
     "aiModelNone": "Not set",
     "platformTitle": "Platform settings",
-    "platformDescription": "Settings for models, members and roles, and platform parameters are coming soon."
+    "platformDescription": "Settings for models, members and roles, and platform parameters are coming soon.",
+    "reviewTitle": "Review mode",
+    "reviewModeLabel": "Current mode",
+    "reviewModes": {
+      "single": "Single reviewer",
+      "separate": "Separate reviewer"
+    },
+    "reviewModeInfoLabel": "About review modes",
+    "reviewModeInfo": "In single review mode, reviewers may review and merge their own changes; in separate mode, someone other than the submitter must review them. Set with the platform option OP_REVIEW_MODE (single or separate)."
   },
   "states": {
     "errorTitle": "This content could not be loaded",
@@ -730,7 +913,9 @@
       "key_taken": "An ontology with this identifier already exists. Choose another name and try again."
     },
     "element": {
-      "not_found": "This element does not exist or was deleted."
+      "not_found": "This element does not exist or was deleted.",
+      "stale": "Someone else changed this element. Refresh and make your change again.",
+      "name_taken": "The local name or IRI is taken, possibly by a deleted element. Choose another one."
     },
     "changeset": {
       "not_found": "The change set does not exist or was deleted.",
@@ -740,7 +925,8 @@
       "stale_target": "the target element changed after the change set was created",
       "dependency_skipped": "an item it refers to was rejected or skipped",
       "invalid_item": "its content is incomplete or invalid",
-      "has_dependents": "other elements still refer to it, so it was not deleted"
+      "has_dependents": "other elements still refer to it, so it was not deleted",
+      "self_review": "Separate review mode is on: another reviewer must decide change sets you submitted."
     },
     "release": {
       "not_found": "The release does not exist or was deleted.",
@@ -778,6 +964,10 @@
       "too_many_triples": "The file has more than 50,000 triples. Split it and import the parts.",
       "empty": "The file has no content. Check it and choose another file.",
       "axiom_too_large": "One axiom in the file is too long (over two million characters) for the platform to keep. Split it and import again."
+    },
+    "axiom": {
+      "invalid": "The fragment does not parse, is not exactly one axiom, or the ontology already has it. Check it and save again.",
+      "maps_to_element": "The forms can express this content. Edit it on the element instead."
     }
   },
   "rules": {

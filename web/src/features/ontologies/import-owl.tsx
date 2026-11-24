@@ -21,11 +21,15 @@ import {
   MAX_IMPORT_MB,
   ontologyKeys,
   type ImportResult,
+  type ImportWarning,
   type OntologySummary,
 } from './api';
 
 const MB = 1024 * 1024;
 const COUNT_KEYS = ['create', 'update', 'delete', 'restore'] as const;
+// Warnings about content the review will not get as the file has it: references left out
+// because the element changed kind, and allowed values Protégé dropped with nothing to restore.
+const IMPORTANT_WARNINGS: ReadonlySet<ImportWarning['code']> = new Set(['kind_changed', 'lost_list']);
 
 /** Localized import failure; syntax errors name the line when the server knows it. */
 export function useImportErrorMessage(): (error: unknown) => string {
@@ -180,18 +184,22 @@ export function ImportForm({ withName = false, run, onImported }: ImportFormProp
   );
 }
 
+/** What produced the result: a new ontology from a file, a file compared with an ontology, or edited Turtle. */
+export type ImportResultMode = 'created' | 'imported' | 'turtle';
+
 interface ImportResultViewProps {
   result: ImportResult;
-  /** The import created the ontology (rather than comparing with an existing one). */
-  created: boolean;
+  mode: ImportResultMode;
   onClose: () => void;
 }
 
 /** What the import found: counts per operation, warnings, and the way to the change set. */
-export function ImportResultView({ result, created, onClose }: ImportResultViewProps) {
+export function ImportResultView({ result, mode, onClose }: ImportResultViewProps) {
   const { t } = useTranslation();
   const headingRef = useRef<HTMLDivElement>(null);
   const { changeSetId, counts, warnings } = result;
+  const important = warnings.filter((warning) => IMPORTANT_WARNINGS.has(warning.code));
+  const minor = warnings.filter((warning) => !IMPORTANT_WARNINGS.has(warning.code));
 
   // The form is gone: move focus to the result so keyboard and screen reader users follow.
   useEffect(() => {
@@ -200,9 +208,12 @@ export function ImportResultView({ result, created, onClose }: ImportResultViewP
 
   let title: string;
   let description: string;
-  if (created) {
+  if (mode === 'created') {
     title = t('ontologies.import.createdTitle', { name: result.ontology.name });
     description = changeSetId ? t('ontologies.import.reviewDescription') : t('ontologies.import.nothingToReview');
+  } else if (mode === 'turtle') {
+    title = changeSetId ? t('ontologies.import.turtleTitle') : t('ontologies.import.noDifferenceTitle');
+    description = changeSetId ? t('ontologies.import.turtleReviewDescription') : t('ontologies.import.turtleNoDifference');
   } else {
     title = changeSetId ? t('ontologies.import.importedTitle') : t('ontologies.import.noDifferenceTitle');
     description = changeSetId ? t('ontologies.import.reviewDescription') : t('ontologies.import.noDifference');
@@ -226,9 +237,16 @@ export function ImportResultView({ result, created, onClose }: ImportResultViewP
         </dl>
       ) : null}
 
-      {warnings.length > 0 ? (
+      {/* Content the review will not get as the file has it: a yellow notice (ui-guidelines §4). */}
+      {important.map((warning) => (
+        <InlineNotice key={warning.code} tone="warning" title={t(`ontologies.import.warnings.${warning.code}.label`, { count: warning.count })}>
+          {t(`ontologies.import.warnings.${warning.code}.description`)}
+        </InlineNotice>
+      ))}
+      {/* Kept as written, only shaped differently: a ! icon is enough. */}
+      {minor.length > 0 ? (
         <ul className="space-y-1.5" aria-label={t('ontologies.import.warningsLabel')}>
-          {warnings.map((warning) => {
+          {minor.map((warning) => {
             const label = t(`ontologies.import.warnings.${warning.code}.label`, { count: warning.count });
             return (
               <li key={warning.code} className="flex items-center gap-1.5 text-sm text-foreground">
@@ -275,7 +293,7 @@ function ImportIntoBody({ ontology, onClose }: { ontology: OntologySummary; onCl
   const { t } = useTranslation();
   const refresh = useRefreshAfterImport();
   const [result, setResult] = useState<ImportResult | null>(null);
-  if (result) return <ImportResultView result={result} created={false} onClose={onClose} />;
+  if (result) return <ImportResultView result={result} mode="imported" onClose={onClose} />;
   return (
     <>
       <DialogTitle>{t('ontologies.import.intoTitle', { name: ontology.name })}</DialogTitle>

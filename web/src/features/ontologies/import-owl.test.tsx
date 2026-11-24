@@ -70,7 +70,10 @@ describe('import OWL into the current ontology', () => {
     expect(within(rewritten as HTMLElement).getByRole('button', { name: '注意' })).toHaveAccessibleDescription(
       '在 Protégé 中打开时，这些公理会被改写成等价的写法。平台按原样保留，导出时不变。',
     );
-    expect(warnings).toHaveTextContent('1 条规则的枚举取值被 Protégé 丢掉了');
+    // Values the review will not get are a yellow notice, not a line in the list.
+    expect(warnings).not.toHaveTextContent('枚举取值');
+    const lostValues = within(summary).getByText('1 条规则的枚举取值被 Protégé 丢掉了').closest('[role="status"]');
+    expect(lostValues).toHaveClass('bg-warning-soft');
 
     const goReview = within(summary).getByRole('link', { name: '去审核' });
     expect(goReview).toHaveAttribute('href', '/review/cs-import');

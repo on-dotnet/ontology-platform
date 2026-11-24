@@ -1,7 +1,8 @@
 """HTTP routes of the ontology module: ontologies, the working version, change sets, releases.
 
-Every route needs a session. Creating or importing an ontology needs admin, editor or reviewer;
-reviewing, merging, rejecting, publishing and activating need admin or reviewer.
+Every route needs a session. Creating or importing an ontology, editing it by hand or in expert
+mode, and withdrawing one's own change set need admin, editor or reviewer; reviewing, merging,
+rejecting others' change sets, publishing and activating need admin or reviewer.
 """
 
 from typing import Annotated, Any, Literal
@@ -15,12 +16,21 @@ from ontology_platform.errors import PROBLEM_MEDIA_TYPE, problem_responses
 from ontology_platform.modules.identity.api import CurrentUser, client_ip, require_role
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.identity.service import Principal
-from ontology_platform.modules.ontology import importing, schemas, service
+from ontology_platform.modules.ontology import editing, expert, importing, schemas, service
 from ontology_platform.modules.ontology.models import ChangeSetStatus, Kind
+from ontology_platform.settings import Settings, get_settings
 
 Creator = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.EDITOR, Role.REVIEWER))]
 Reviewer = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.REVIEWER))]
+AppSettings = Annotated[Settings, Depends(get_settings)]
 ExportFormat = Annotated[Literal["turtle"], Query(alias="format")]
+REVIEWER_ROLES = frozenset({Role.ADMIN, Role.REVIEWER})
+
+
+def _may_review_own(user: Principal, settings: Settings) -> bool:
+    """Whether the user may decide and merge change sets they created (spec 002, section 8)."""
+    return user.role in REVIEWER_ROLES and settings.review_mode == "single"
+
 
 _RELEASE_INVALID: dict[int | str, dict[str, Any]] = {
     422: {
@@ -135,6 +145,84 @@ async def import_into_ontology(
         return _import_problem(error)
 
 
+@router.post(
+    "/ontologies/{id}/turtle",
+    response_model=schemas.ImportResult,
+    responses=_IMPORT_ERRORS,
+)
+async def edit_turtle(
+    id: UUID,
+    body: schemas.TurtleEdit,
+    request: Request,
+    user: Creator,
+    db: DbSession,
+) -> schemas.ImportResult | JSONResponse:
+    """Expert mode: compare the edited Turtle of the whole working version with it; the
+    differences become a manual change set that always goes to review."""
+    try:
+        return await expert.save_turtle(
+            db,
+            id,
+            body.turtle,
+            actor=user.id,
+            ip=client_ip(request),
+        )
+    except importing.ImportParseError as error:
+        return _import_problem(error)
+
+
+@router.post(
+    "/ontologies/{id}/edits",
+    responses=problem_responses(401, 403, 404, 409, 422),
+)
+async def save_edits(
+    id: UUID,
+    body: schemas.EditRequest,
+    request: Request,
+    user: Creator,
+    db: DbSession,
+    settings: AppSettings,
+) -> schemas.EditResult:
+    """Save changes made by hand as a manual change set. With `apply`, a user who may review
+    their own changes (admin or reviewer, single review mode) merges it at once; any item that
+    would be skipped rolls everything back (409 `element.stale` or the item's code). Otherwise
+    the change set stays open for review. 409 `element.stale` when a target moved on since it
+    was read, `element.name_taken` for a taken local name or IRI; 422 `axiom.invalid` and
+    `axiom.maps_to_element` for axiom fragments."""
+    return await editing.save_edits(
+        db,
+        id,
+        body,
+        actor=user.id,
+        may_apply=_may_review_own(user, settings),
+        ip=client_ip(request),
+    )
+
+
+@router.get(
+    "/ontologies/{id}/elements/{elementId}/impact",
+    responses=problem_responses(401, 404, 422),
+)
+async def get_impact(
+    id: UUID,
+    elementId: UUID,  # noqa: N803
+    user: CurrentUser,
+    db: DbSession,
+) -> schemas.Impact:
+    """What refers to an element: subtypes, relations and properties, constraints, axioms, and
+    its inverse. Deleting it takes these along (spec 002, section 6)."""
+    return await editing.impact(db, id, elementId)
+
+
+@router.get("/settings/platform", responses=problem_responses(401))
+async def get_platform_settings(
+    user: CurrentUser,
+    settings: AppSettings,
+) -> schemas.PlatformSettings:
+    """Settings every page may need: the review mode."""
+    return schemas.PlatformSettings(review_mode=settings.review_mode)
+
+
 @router.get("/ontologies/{id}", responses=problem_responses(401, 404, 422))
 async def get_ontology(
     id: UUID,
@@ -236,11 +324,20 @@ async def update_item(
     body: schemas.ItemDecisionPatch,
     user: Reviewer,
     db: DbSession,
+    settings: AppSettings,
 ) -> schemas.ChangeItem:
     """Decide, edit or annotate one item. `edited` is checked against the item's kind
     (422 `changeset.invalid_edit`); a merged or rejected change set answers 409
-    `changeset.closed`."""
-    return await service.update_item(db, id, itemId, body, actor=user.id)
+    `changeset.closed`; in separate review mode, 403 `changeset.self_review` for a decision or
+    an edit on one's own change set."""
+    return await service.update_item(
+        db,
+        id,
+        itemId,
+        body,
+        actor=user.id,
+        review_mode=settings.review_mode,
+    )
 
 
 @router.post(
@@ -253,9 +350,10 @@ async def decide_items(
     body: schemas.BulkDecision,
     user: Reviewer,
     db: DbSession,
+    settings: AppSettings,
 ) -> schemas.ChangeSetDetail:
-    """Apply one decision to several items."""
-    return await service.decide_items(db, id, body, actor=user.id)
+    """Apply one decision to several items (403 `changeset.self_review` as for one item)."""
+    return await service.decide_items(db, id, body, actor=user.id, review_mode=settings.review_mode)
 
 
 @router.post(
@@ -267,14 +365,17 @@ async def merge_change_set(
     request: Request,
     user: Reviewer,
     db: DbSession,
+    settings: AppSettings,
 ) -> schemas.MergeResult:
     """Apply the accepted items in one transaction and report the skipped ones. Answers 409
-    `changeset.pending_items` while any item is undecided."""
+    `changeset.pending_items` while any item is undecided, 403 `changeset.self_review` in
+    separate review mode for one's own change set."""
     return await service.merge_change_set(
         db,
         id,
         actor=user.id,
         ip=client_ip(request),
+        review_mode=settings.review_mode,
     )
 
 
@@ -285,14 +386,16 @@ async def merge_change_set(
 async def reject_change_set(
     id: UUID,
     request: Request,
-    user: Reviewer,
+    user: Creator,
     db: DbSession,
 ) -> schemas.ChangeSetSummary:
-    """Reject the whole change set."""
+    """Reject the whole change set. Reviewers may reject any; its creator may withdraw their
+    own (403 `auth.forbidden` otherwise)."""
     return await service.reject_change_set(
         db,
         id,
         actor=user.id,
+        may_reject_any=user.role in REVIEWER_ROLES,
         ip=client_ip(request),
     )
 

@@ -49,6 +49,7 @@ from ontology_platform.modules.ontology.models import (
 from ontology_platform.modules.ontology.rdf import axioms as rdf_axioms
 from ontology_platform.modules.ontology.rdf import writer as rdf_writer
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError, parse_fragment
+from ontology_platform.modules.ontology.schemas import ReviewMode
 from ontology_platform.modules.ontology.turtle import OntologyHeader, export_turtle
 
 STALE_TARGET = "changeset.stale_target"
@@ -724,6 +725,17 @@ async def _change_set_or_404(
     return change_set
 
 
+def _ensure_not_own(change_set: ChangeSet, actor: UUID, review_mode: ReviewMode) -> None:
+    """In separate review mode nobody decides or merges a change set they created (spec 002,
+    section 8); AI change sets belong to whoever uploaded the document or asked."""
+    if review_mode == "separate" and change_set.created_by == actor:
+        raise AppError(
+            403,
+            "changeset.self_review",
+            "In separate review mode another reviewer must decide this change set.",
+        )
+
+
 def _ensure_open(change_set: ChangeSet) -> None:
     if change_set.status != "open":
         raise AppError(409, "changeset.closed", "The change set is already merged or rejected.")
@@ -862,6 +874,7 @@ def _summary_data(change_set: ChangeSet, counts: schemas.DecisionCounts) -> dict
         "document_id": change_set.document_id,
         "status": change_set.status,
         "counts": counts,
+        "created_by": change_set.created_by,
         "created_at": change_set.created_at,
         "merged_at": change_set.merged_at,
     }
@@ -1032,10 +1045,14 @@ async def update_item(
     patch: schemas.ItemDecisionPatch,
     *,
     actor: UUID,
+    review_mode: ReviewMode,
 ) -> schemas.ChangeItem:
     """Set the decision, the reviewer's edit and/or the note of one item."""
     change_set = await _change_set_or_404(db, change_set_id, lock=True)
     _ensure_open(change_set)
+    given = patch.model_fields_set
+    if patch.decision is not None or "edited" in given:
+        _ensure_not_own(change_set, actor, review_mode)
     item = await db.scalar(
         select(ChangeItem).where(
             ChangeItem.id == item_id,
@@ -1044,7 +1061,6 @@ async def update_item(
     )
     if item is None:
         raise _change_set_not_found()
-    given = patch.model_fields_set
     if "edited" in given:
         if patch.edited is None:
             item.edited = None
@@ -1069,10 +1085,12 @@ async def decide_items(
     body: schemas.BulkDecision,
     *,
     actor: UUID,
+    review_mode: ReviewMode,
 ) -> schemas.ChangeSetDetail:
     """Apply one decision to several items; unknown item ids change nothing."""
     change_set = await _change_set_or_404(db, change_set_id, lock=True)
     _ensure_open(change_set)
+    _ensure_not_own(change_set, actor, review_mode)
     item_ids = set(body.item_ids)
     if item_ids:
         items = [item for item in await _items(db, change_set) if item.id in item_ids]
@@ -1090,11 +1108,17 @@ async def reject_change_set(
     change_set_id: UUID,
     *,
     actor: UUID,
+    may_reject_any: bool,
     ip: str | None,
 ) -> schemas.ChangeSetSummary:
-    """Close the change set without applying anything; pending items become rejected."""
+    """Close the change set without applying anything; pending items become rejected.
+
+    Reviewers may reject any change set; others only withdraw their own.
+    """
     change_set = await _change_set_or_404(db, change_set_id, lock=True)
     _ensure_open(change_set)
+    if not may_reject_any and change_set.created_by != actor:
+        raise AppError(403, "auth.forbidden", "Only reviewers reject change sets of others.")
     now = _now()
     for item in await _items(db, change_set):
         if item.decision == "pending":
@@ -1569,6 +1593,7 @@ async def merge_change_set(
     *,
     actor: UUID,
     ip: str | None,
+    review_mode: ReviewMode,
 ) -> schemas.MergeResult:
     """Apply the accepted items to the working version in one transaction.
 
@@ -1583,6 +1608,22 @@ async def merge_change_set(
     ontology = await _ontology_or_404(db, change_set.ontology_id, lock=True)
     change_set = await _change_set_or_404(db, change_set_id, lock=True)
     _ensure_open(change_set)
+    _ensure_not_own(change_set, actor, review_mode)
+    result = await _apply_change_set(db, change_set, ontology, actor=actor, ip=ip)
+    await db.commit()
+    return result
+
+
+async def _apply_change_set(
+    db: AsyncSession,
+    change_set: ChangeSet,
+    ontology: Ontology,
+    *,
+    actor: UUID,
+    ip: str | None,
+) -> schemas.MergeResult:
+    """The merge without the commit: the caller holds the ontology and change set locks and
+    decides whether to commit (a manual edit rolls back when any item was skipped)."""
     items = await _items(db, change_set)
     if any(item.decision == "pending" for item in items):
         raise AppError(409, "changeset.pending_items", "Every item needs a decision first.")
@@ -1615,7 +1656,6 @@ async def merge_change_set(
         detail={"ontologyId": str(ontology.id), "applied": applied, "skipped": len(skipped)},
         ip=ip,
     )
-    await db.commit()
     return schemas.MergeResult(applied=applied, skipped=skipped)
 
 

@@ -1,6 +1,23 @@
 import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { Download, Ellipsis, FilePlus, FileUp, List, Network, Workflow } from 'lucide-react';
+import {
+  ArrowRightLeft,
+  Box,
+  Braces,
+  ChevronDown,
+  Download,
+  Ellipsis,
+  FileCode,
+  FilePlus,
+  FileUp,
+  List,
+  Network,
+  Plus,
+  ShieldCheck,
+  Tag,
+  Workflow,
+  type LucideIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -29,11 +46,22 @@ import { useSelectedOntology } from '@/features/ontologies/use-selected-ontology
 import { useErrorMessage } from '@/i18n/error-message';
 import { downloadText } from '@/lib/download';
 
+import { AxiomFormDialog } from './axiom-form-dialog';
 import { ElementDetailSheet } from './element-detail-sheet';
+import { FORM_KINDS, type FormKind } from './element-form';
+import { ElementFormDialog } from './element-form-dialog';
 import { ElementList } from './element-list';
 import { GraphView } from './graph-view';
+import { TurtleView } from './turtle-view';
 
-export type OntologyView = 'graph' | 'list';
+export type OntologyView = 'graph' | 'list' | 'turtle';
+
+const kindIcons: Record<FormKind, LucideIcon> = {
+  entity_type: Box,
+  relation_type: ArrowRightLeft,
+  property: Tag,
+  constraint: ShieldCheck,
+};
 
 interface OntologyPageProps {
   ontologyId: string | undefined;
@@ -52,6 +80,9 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
   // Which create method the "new ontology" dialog opens with; null while it is closed.
   const [creating, setCreating] = useState<CreateMethod | null>(null);
   const [importing, setImporting] = useState(false);
+  // The kind of element being created by hand; null while the form is closed.
+  const [newKind, setNewKind] = useState<FormKind | null>(null);
+  const [newAxiom, setNewAxiom] = useState(false);
 
   const switchOntology = (id: string) => {
     setElementId(null);
@@ -86,6 +117,7 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
                 options={[
                   { value: 'graph', label: t('ontologyPage.viewGraph'), icon: <Workflow aria-hidden /> },
                   { value: 'list', label: t('ontologyPage.viewList'), icon: <List aria-hidden /> },
+                  { value: 'turtle', label: t('ontologyPage.viewTurtle'), icon: <FileCode aria-hidden /> },
                 ]}
               />
               <DropdownMenu>
@@ -114,6 +146,30 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              {canUpload ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className={buttonVariants({ variant: 'primary' })}>
+                    <Plus aria-hidden />
+                    {t('ontologyPage.edit.create')}
+                    <ChevronDown aria-hidden />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="min-w-44">
+                    {FORM_KINDS.map((kind) => {
+                      const Icon = kindIcons[kind];
+                      return (
+                        <DropdownMenuItem key={kind} onClick={() => setNewKind(kind)}>
+                          <Icon aria-hidden />
+                          {t(`kind.${kind}`)}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                    <DropdownMenuItem onClick={() => setNewAxiom(true)}>
+                      <Braces aria-hidden />
+                      {t('kind.axiom')}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : null}
             </>
           ) : null
         }
@@ -146,7 +202,9 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
           ) : (
             <div className="space-y-4">
               <OntologyStats ontology={selected} />
-              {view === 'list' ? (
+              {view === 'turtle' ? (
+                <TurtleView key={selected.id} ontology={selected} />
+              ) : view === 'list' ? (
                 <ElementList key={selected.id} ontologyId={selected.id} onSelect={setElementId} />
               ) : (
                 <GraphPanel ontology={selected} canUpload={canUpload} onSelect={setElementId} />
@@ -174,6 +232,8 @@ export function OntologyPage({ ontologyId, view, onOntologyChange, onViewChange 
             onImported={(result) => switchOntology(result.ontology.id)}
           />
           {selected ? <ImportOwlDialog ontology={selected} open={importing} onOpenChange={setImporting} /> : null}
+          {selected ? <ElementFormDialog ontologyId={selected.id} target={newKind ? { kind: newKind } : null} onClose={() => setNewKind(null)} /> : null}
+          {selected ? <AxiomFormDialog ontologyId={selected.id} open={newAxiom} onClose={() => setNewAxiom(false)} /> : null}
         </>
       ) : null}
     </>

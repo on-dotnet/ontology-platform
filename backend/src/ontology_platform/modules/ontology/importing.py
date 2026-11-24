@@ -16,6 +16,7 @@ from pathlib import PurePath
 from typing import Any, cast
 from uuid import UUID, uuid4
 
+from rdflib import Graph
 from rdflib.namespace import DCTERMS
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,7 +24,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
 from ontology_platform.modules.ontology import rules, schemas, service
-from ontology_platform.modules.ontology.models import KINDS, Element, Kind, Ontology
+from ontology_platform.modules.ontology.models import (
+    KINDS,
+    ChangeSetSource,
+    Element,
+    Kind,
+    Ontology,
+)
 from ontology_platform.modules.ontology.rdf import reader, writer
 from ontology_platform.modules.ontology.rdf.diff import (
     KIND_FIELDS,
@@ -253,7 +260,8 @@ async def _propose(
     current: OntologyState,
     target: OntologyState,
     *,
-    filename: str,
+    title: str,
+    source: ChangeSetSource,
     actor: UUID,
 ) -> _Proposed:
     header = service.header_of(ontology)
@@ -277,8 +285,8 @@ async def _propose(
     change_set_id = await service.create_change_set(
         db,
         ontology_id=ontology.id,
-        title=f"导入：{filename}"[: service.TITLE_MAX_LENGTH],
-        source="import",
+        title=title[: service.TITLE_MAX_LENGTH],
+        source=source,
         document_id=None,
         created_by=actor,
         items=items,
@@ -361,7 +369,8 @@ async def import_new(
         [],
         OntologyState(ontology_iri=target.ontology_iri),
         target,
-        filename=filename,
+        title=f"导入：{filename}",
+        source="import",
         actor=actor,
     )
     for action in ("ontology.created", "ontology.imported"):
@@ -393,8 +402,34 @@ async def import_into(
     ip: str | None,
 ) -> schemas.ImportResult:
     """Compare a file with the working version; the differences become an import change set."""
-    ontology = await service._ontology_or_404(db, ontology_id)
+    await service._ontology_or_404(db, ontology_id)
     graph = await asyncio.to_thread(_parse, data)
+    return await compare_into(
+        db,
+        ontology_id,
+        graph,
+        title=f"导入：{filename}",
+        source="import",
+        audit_action="ontology.imported",
+        actor=actor,
+        ip=ip,
+    )
+
+
+async def compare_into(
+    db: AsyncSession,
+    ontology_id: UUID,
+    graph: Graph,
+    *,
+    title: str,
+    source: ChangeSetSource,
+    audit_action: str,
+    actor: UUID,
+    ip: str | None,
+) -> schemas.ImportResult:
+    """The differences between `graph` and the working version, as an open change set (none
+    when there are none). Shared by imports and the expert mode's Turtle edits."""
+    ontology = await service._ontology_or_404(db, ontology_id)
     header = service.header_of(ontology)
     result = await asyncio.to_thread(
         reader.read,
@@ -420,12 +455,13 @@ async def import_into(
         elements,
         current,
         result.state,
-        filename=filename,
+        title=title,
+        source=source,
         actor=actor,
     )
     audit.record(
         db,
-        "ontology.imported",
+        audit_action,
         actor_id=actor,
         target_type="ontology",
         target_id=str(ontology.id),

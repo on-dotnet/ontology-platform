@@ -75,7 +75,7 @@ function CreateOrImport({ initialMethod, onCreated, onImported, onClose }: Creat
   const [method, setMethod] = useState<CreateMethod>(initialMethod);
   const [result, setResult] = useState<ImportResult | null>(null);
 
-  if (result) return <ImportResultView result={result} created onClose={onClose} />;
+  if (result) return <ImportResultView result={result} mode="created" onClose={onClose} />;
   return (
     <>
       <DialogTitle>{t('ontologies.create.standaloneTitle')}</DialogTitle>

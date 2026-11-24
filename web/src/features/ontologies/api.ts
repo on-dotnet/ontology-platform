@@ -18,6 +18,13 @@ export type RdfValue = components['schemas']['RdfValue'];
 export type LangText = components['schemas']['LangText'];
 export type ImportResult = components['schemas']['ImportResult'];
 export type ImportWarning = components['schemas']['ImportWarning'];
+export type EditItem = components['schemas']['EditItem'];
+export type EditRequest = components['schemas']['EditRequest'];
+export type EditResult = components['schemas']['EditResult'];
+export type ElementFields = components['schemas']['ElementFields'];
+export type Impact = components['schemas']['Impact'];
+export type ElementRef = components['schemas']['ElementRef'];
+export type PlatformSettings = components['schemas']['PlatformSettings'];
 export type ElementStatusFilter = NonNullable<
   NonNullable<operations['list_elements_api_ontologies__id__elements_get']['parameters']['query']>['status']
 >;
@@ -31,7 +38,53 @@ export const ontologyKeys = {
   elements: (id: string, filter: ElementFilter = {}) => [...ontologyKeys.all, id, 'elements', filter] as const,
   element: (id: string, elementId: string) => [...ontologyKeys.all, id, 'element', elementId] as const,
   graph: (id: string) => [...ontologyKeys.all, id, 'graph'] as const,
+  impact: (id: string, elementId: string) => [...ontologyKeys.all, id, 'impact', elementId] as const,
+  turtle: (id: string) => [...ontologyKeys.all, id, 'turtle'] as const,
 };
+
+export const platformSettingsKey = ['platform-settings'] as const;
+
+/** Settings every page may need: the review mode. */
+export function usePlatformSettings() {
+  return useQuery({
+    queryKey: platformSettingsKey,
+    queryFn: () => unwrap(api.GET('/api/settings/platform')),
+    staleTime: Infinity,
+  });
+}
+
+/**
+ * Whether the user's manual edits take effect on saving: reviewers and admins in single review
+ * mode merge their own changes at once; everyone else submits them for review. False while the
+ * settings load, so that nothing claims to apply what may go to review.
+ */
+export function useAppliesEdits(canReview: boolean): boolean {
+  const settings = usePlatformSettings();
+  return canReview && settings.data?.reviewMode === 'single';
+}
+
+/**
+ * Saves changes made by hand as a manual change set; with `apply` and the right to review one's
+ * own changes it is merged at once (409 `element.stale` when a target changed meanwhile).
+ */
+export function saveEdits(ontologyId: string, body: EditRequest): Promise<EditResult> {
+  return unwrap(api.POST('/api/ontologies/{id}/edits', { params: { path: { id: ontologyId } }, body }));
+}
+
+/** What refers to an element; deleting it takes these along. */
+export function useImpact(ontologyId: string, elementId: string | undefined) {
+  return useQuery({
+    queryKey: ontologyKeys.impact(ontologyId, elementId ?? ''),
+    queryFn: () =>
+      unwrap(api.GET('/api/ontologies/{id}/elements/{elementId}/impact', { params: { path: { id: ontologyId, elementId: elementId ?? '' } } })),
+    enabled: Boolean(elementId),
+  });
+}
+
+/** Expert mode: the edited Turtle of the whole working version; the differences go to review. */
+export function saveTurtle(ontologyId: string, turtle: string): Promise<ImportResult> {
+  return unwrap(api.POST('/api/ontologies/{id}/turtle', { params: { path: { id: ontologyId } }, body: { turtle } }));
+}
 
 export function ontologiesQueryOptions() {
   return queryOptions({
@@ -129,6 +182,30 @@ export function exportOntologyTurtle(ontologyId: string): Promise<string> {
       parseAs: 'text',
     }),
   );
+}
+
+/** The working version as Turtle: the expert mode's text and the prefixes axioms may use. */
+export function useOntologyTurtle(ontologyId: string) {
+  return useQuery({
+    queryKey: ontologyKeys.turtle(ontologyId),
+    queryFn: () => exportOntologyTurtle(ontologyId),
+  });
+}
+
+export interface TurtlePrefix {
+  /** Empty for the default prefix `:`. */
+  name: string;
+  iri: string;
+}
+
+const PREFIX_LINE = /^\s*@prefix\s+([A-Za-z][\w.-]*)?:\s*<([^>]*)>\s*\.\s*$/;
+
+/** The `@prefix` declarations of a Turtle text, in order. */
+export function turtlePrefixes(turtle: string): TurtlePrefix[] {
+  return turtle.split('\n').flatMap((line) => {
+    const match = PREFIX_LINE.exec(line);
+    return match ? [{ name: match[1] ?? '', iri: match[2] ?? '' }] : [];
+  });
 }
 
 /** The names an element or change item may carry; any of them can be missing (imports, axioms). */

@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { axiomFixture, elementDetailFixture, elementFixture, ontologyFixture } from '@/test/fixtures';
+import { axiomFixture, elementDetailFixture, elementFixture, impactFixture, ontologyFixture } from '@/test/fixtures';
 import { captureDownloads, mockApi, renderApp, type RouteHandler } from '@/test/utils';
 
 import { displayEdges, layoutGraph } from './graph-layout';
@@ -95,6 +95,7 @@ function ontologyServer(extra: Record<string, RouteHandler> = {}) {
         },
       ]);
     },
+    'GET /api/ontologies/:id/elements/:elementId/impact': ({ params }) => impactFixture(params.elementId ?? ''),
     'GET /api/ontologies/:id/graph': () => ({
       nodes: [
         { id: 'el-molten-steel', label: '钢水', localName: 'MoltenSteel', parentId: null, propertyCount: 1 },
@@ -151,6 +152,9 @@ describe('ontology list view', () => {
     expect(within(sheet).getByRole('button', { name: '盛装' })).toBeInTheDocument();
     expect(within(sheet).getByRole('link', { name: '识别：转炉炼钢工艺规程.docx' })).toHaveAttribute('href', '/review/cs-converter');
     expect(within(sheet).getByText('钢水温度不得低于 1580℃')).toBeInTheDocument();
+    // The "referenced by" block loads like the rest of the panel.
+    expect(await within(sheet).findByText('没有其他元素引用它。')).toBeInTheDocument();
+    expect(within(sheet).queryByRole('alert')).not.toBeInTheDocument();
 
     // Related elements open in the same panel.
     await user.click(within(sheet).getByRole('button', { name: '温度' }));
@@ -181,11 +185,12 @@ describe('constraints and axioms', () => {
 
     const table = await screen.findByRole('table', { name: '本体元素' });
     await user.click(screen.getByRole('radio', { name: '高级公理' }));
-    await waitFor(() => expect(within(table).getAllByRole('row')).toHaveLength(2));
+    // Listed under the element it belongs to: a group heading row, then the axiom.
+    const group = await within(table).findByRole('rowgroup', { name: '钢水' });
+    expect(within(table).getAllByRole('row')).toHaveLength(3);
     expect(api.requests.some((request) => request.path.endsWith('/elements') && request.query.get('kind') === 'axiom')).toBe(true);
-    expect(within(table).getByText('所属：钢水')).toBeInTheDocument();
 
-    await user.click(within(table).getByRole('button', { name: 'steel:MoltenSteel owl:disjointWith steel:Slag .' }));
+    await user.click(within(group).getByRole('button', { name: 'steel:MoltenSteel owl:disjointWith steel:Slag .' }));
     const sheet = await screen.findByRole('dialog', { name: '高级公理' });
     expect(sheet.querySelector('pre')).toHaveTextContent('steel:MoltenSteel owl:disjointWith steel:Slag .');
     expect(within(sheet).getByRole('button', { name: '非标准写法' })).toHaveAccessibleDescription('在 Protégé 中打开时会改写这条公理。');

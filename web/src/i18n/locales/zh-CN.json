@@ -231,7 +231,10 @@
           "description": "平台不会改变已有元素的种类，这些元素保持原样，文件里指向它们的引用没有导入。"
         }
       },
-      "goReview": "去审核"
+      "goReview": "去审核",
+      "turtleTitle": "已生成变更集",
+      "turtleReviewDescription": "修改已整理成变更集，审核并合并后才会进入本体。",
+      "turtleNoDifference": "Turtle 与工作版本没有差异，没有生成变更集。"
     }
   },
   "upload": {
@@ -497,15 +500,25 @@
       "delete": "将删除以下内容：",
       "restore": "将恢复以下内容："
     },
-    "noEvidenceBySource": {
-      "ai_extraction": "这一项没有附证据。",
-      "ai_assistant": "这一项没有附证据。",
-      "import": "导入的内容没有资料原文。",
-      "manual": "手工修改没有资料原文。"
-    },
+    "noEvidence": "这一项没有附证据。",
     "unknownElement": "未知元素",
     "yes": "是",
-    "no": "否"
+    "no": "否",
+    "withdraw": "撤回",
+    "withdrawTitle": "撤回“{{title}}”？",
+    "withdrawDescription": "撤回后变更集变为已拒绝，其中的修改都不会进入本体，撤回后不能恢复。",
+    "withdrawConfirm": "撤回变更集",
+    "withdrawn": "已撤回变更集",
+    "withdrawFailedTitle": "没有撤回",
+    "selfReviewNotice": "异人审核模式下，你提交的变更集由其他审核人处理。",
+    "impact": {
+      "show": "查看影响",
+      "hide": "收起影响",
+      "label": "“{{name}}”的影响",
+      "referencedBy_one": "被 {{count}} 个元素引用",
+      "referencedBy_other": "被 {{count}} 个元素引用",
+      "none": "没有其他元素引用它。"
+    }
   },
   "ontologyPage": {
     "viewLabel": "视图",
@@ -558,10 +571,23 @@
         "name": "名称",
         "kind": "类型",
         "localName": "局部名",
-        "definition": "定义"
+        "definition": "定义",
+        "actions": "操作"
       },
       "target": "目标类型：{{name}}",
-      "subject": "所属：{{name}}"
+      "subject": "所属：{{name}}",
+      "statusFilter": "按状态筛选",
+      "status": {
+        "active": "在用",
+        "deprecated": "已删除",
+        "all": "全部"
+      },
+      "statusChip": "状态：{{status}}",
+      "restoreElement": "恢复“{{name}}”",
+      "groupCount_one": "{{count}} 条",
+      "groupCount_other": "{{count}} 条",
+      "submitRestoreElement": "提交恢复“{{name}}”",
+      "noSubject": "不属于任何元素"
     },
     "detail": {
       "deprecated": "已删除",
@@ -595,7 +621,156 @@
     "newOntology": "新建本体",
     "importOwl": "导入 OWL",
     "importOwlFile": "导入 OWL 文件",
-    "created": "已创建本体“{{name}}”"
+    "created": "已创建本体“{{name}}”",
+    "edit": {
+      "create": "新建",
+      "edit": "编辑",
+      "delete": "删除",
+      "restore": "恢复",
+      "save": "保存",
+      "submitForReview": "提交审核",
+      "saved": "已保存",
+      "deleted": "已删除“{{name}}”",
+      "restored": "已恢复“{{name}}”",
+      "restoreFailed": "没有恢复",
+      "submitted": "已提交审核，审核通过后生效",
+      "goReview": "去审核",
+      "submitRestore": "提交恢复",
+      "saveErrors": {
+        "has_dependents": "还有其他元素引用要删除的元素，这次修改没有保存。请刷新后查看引用情况，先修改引用它的元素再删除。",
+        "invalid_item": "有一项内容不完整或不合法，这次修改没有保存。请检查填写的内容后再保存。",
+        "dependency_skipped": "这次修改依赖的另一项没能生效，整次修改都没有保存。请刷新后重新修改。",
+        "stale_target": "要修改的元素刚被其他人改过，这次修改没有保存。请刷新后在最新内容上重新修改。"
+      }
+    },
+    "form": {
+      "createTitle": {
+        "entity_type": "新建对象类型",
+        "relation_type": "新建关系",
+        "property": "新建属性",
+        "constraint": "新建约束"
+      },
+      "editTitle": "编辑“{{name}}”",
+      "appliesDescription": "保存后立即生效。",
+      "reviewDescription": "保存后生成变更集，审核通过后才会生效。",
+      "nothingChanged": "还没有修改任何内容。",
+      "staleTitle": "该元素已被其他人修改",
+      "staleDescription": "刷新后会载入最新内容，这里的修改不会保留，请在最新内容上重新修改。",
+      "reload": "刷新",
+      "failedTitle": "没有保存",
+      "noInverse": "无互逆关系",
+      "localNameInfoLabel": "关于局部名",
+      "localNameHintPascal": "用于生成 IRI，使用大驼峰，例如 SteelSlab。默认由英文名称生成，可以修改。",
+      "localNameHintCamel": "用于生成 IRI，使用小驼峰，例如 producedBy。默认由英文名称生成，可以修改。",
+      "localNameFixed": "局部名决定 IRI，创建后不能修改。",
+      "errors": {
+        "localNameTooLong": "局部名不能超过 128 个字符",
+        "targetRequired": "请选择目标对象类型",
+        "pathRequired": "请选择属性或关系",
+        "countInvalid": "请输入 0 或正整数",
+        "countOrder": "最多个数不能小于最少个数",
+        "lengthInvalid": "请输入 0 或正整数",
+        "lengthOrder": "最长长度不能小于最短长度",
+        "integerValue": "请输入整数",
+        "numberValue": "请输入数字",
+        "flagsInvalid": "只能使用 s、m、i、x、q 这几个标志",
+        "synonymTooLong": "每个同义词不能超过 200 个字符"
+      },
+      "rules": {
+        "title": "规则",
+        "add": "添加规则",
+        "remove": "删除规则 {{n}}",
+        "ruleTitle": "规则 {{n}}",
+        "choosePath": "请选择属性或关系",
+        "any": "不限",
+        "minCount": "最少个数",
+        "maxCount": "最多个数",
+        "classRef": "取值对象类型",
+        "allowedValues": "枚举取值",
+        "allowedValuesPlaceholder": "每行一个取值",
+        "minValue": "最小值",
+        "maxValue": "最大值",
+        "minValueMode": "最小值是否包含本身",
+        "maxValueMode": "最大值是否包含本身",
+        "inclusive": "包含",
+        "exclusive": "不含",
+        "minLength": "最短长度",
+        "maxLength": "最长长度",
+        "pattern": "正则表达式",
+        "flags": "正则标志",
+        "flagsPlaceholder": "例如 i",
+        "messageZh": "中文提示信息",
+        "messageEn": "英文提示信息"
+      },
+      "autoShapeLabel": "关于校验规则",
+      "autoShapeHint": "这个元素来自导入，必填和允许多个还没有写进平台的校验规则。修改这两项并保存后，平台会为它生成校验规则。"
+    },
+    "impact": {
+      "title": "被引用",
+      "none": "没有其他元素引用它。",
+      "groups": {
+        "subtypes": "子类型（{{count}}）",
+        "relations": "关系（{{count}}）",
+        "properties": "属性（{{count}}）",
+        "constraints": "约束（{{count}}）",
+        "axioms": "公理（{{count}}）",
+        "inverse": "互逆关系"
+      }
+    },
+    "delete": {
+      "title": "删除“{{name}}”？",
+      "description": "删除后它不再导出，列表默认也不显示；之后可以在列表的“已删除”里恢复。",
+      "noImpact": "没有其他元素引用它，只删除它本身。",
+      "impactTitle_one": "删除时会一并处理 {{count}} 个元素",
+      "impactTitle_other": "删除时会一并处理 {{count}} 个元素",
+      "impactDescription": "包括间接引用它的元素。以后恢复它，这些改动不会自动撤回。",
+      "deletedLabel": "一并删除（{{count}}）",
+      "changedLabel": "清除引用（{{count}}）",
+      "effects": {
+        "parentCleared": "清空父类型",
+        "inverseCleared": "清空互逆关系",
+        "rulesRemoved": "移除引用它的规则"
+      },
+      "confirm": "删除",
+      "failedTitle": "没有删除",
+      "staleDescription": "刷新后会载入最新的引用情况，请确认后再删除。",
+      "reviewDescription": "提交后生成变更集，审核通过后才会删除；删除后它不再导出，之后可以在列表的“已删除”里恢复。"
+    },
+    "viewTurtle": "Turtle",
+    "turtle": {
+      "title": "工作版本的 Turtle",
+      "info": "这里是工作版本导出的 Turtle。编辑后生成变更集，审核并合并后才会生效。",
+      "editorLabel": "工作版本的 Turtle",
+      "generate": "生成变更集",
+      "reviewNote": "生成的变更集一律进入审核，合并后才会生效。",
+      "emptyDraft": "Turtle 内容不能为空，请输入后再生成变更集。",
+      "parseErrorTitle": "Turtle 有语法错误",
+      "parseErrorLine": "第 {{line}} 行有语法错误，光标已移到这一行。请修正后再生成变更集。",
+      "parseError": "请修正语法错误后再生成变更集。",
+      "goToLine": "定位到第 {{line}} 行",
+      "failedTitle": "没有生成变更集",
+      "baseChangedTitle": "工作版本有了新的修改",
+      "baseChangedDescription": "你开始编辑后，工作版本又合并了其他修改，现在生成的变更集会把它们改回去。建议取消后在最新内容上重新编辑。",
+      "discardDescription": "Turtle 里的修改还没有生成变更集，离开后会丢失。"
+    },
+    "axiom": {
+      "createTitle": "新建高级公理",
+      "editTitle": "编辑高级公理",
+      "fragment": "Turtle 片段",
+      "fragmentInfoLabel": "关于高级公理",
+      "fragmentInfo": "一条公理是一个主语的一个三元组，加上从它的宾语出发的空白节点。名称、父类型、定义域等表单能表达的内容，请到对应元素上编辑。",
+      "fragmentRequired": "请输入 Turtle 片段",
+      "prefixesHint": "可以使用本体的前缀。",
+      "showPrefixes": "查看前缀（{{count}}）",
+      "hidePrefixes": "收起前缀",
+      "prefixesLabel": "本体的前缀"
+    },
+    "discard": {
+      "title": "放弃未保存的修改？",
+      "description": "这里的修改还没有保存，关闭后会丢失。",
+      "keep": "继续编辑",
+      "confirm": "放弃修改"
+    }
   },
   "releases": {
     "publishNew": "发布新版本",
@@ -668,7 +843,7 @@
       "info": "逐项审核变更集：接受、修改或拒绝每一项修改。只有审核通过的修改才会进入本体。"
     },
     "ontology": {
-      "info": "用图谱或列表查看对象类型、关系、属性、约束和高级公理，点击元素查看详情和来源。"
+      "info": "用图谱或列表查看对象类型、关系、属性、约束和高级公理，点击元素查看详情和来源；Turtle 视图可以直接编辑整份 Turtle。"
     },
     "data": {
       "info": "连接数据源、浏览表目录，并把数据绑定到本体。",
@@ -697,7 +872,15 @@
     "aiModel": "模型",
     "aiModelNone": "未设置",
     "platformTitle": "平台设置",
-    "platformDescription": "模型、成员与角色、平台参数等设置即将推出。"
+    "platformDescription": "模型、成员与角色、平台参数等设置即将推出。",
+    "reviewTitle": "审核模式",
+    "reviewModeLabel": "当前模式",
+    "reviewModes": {
+      "single": "单人审核",
+      "separate": "异人审核"
+    },
+    "reviewModeInfoLabel": "关于审核模式",
+    "reviewModeInfo": "单人审核时，审核人可以审核并合并自己提交的修改；异人审核时，提交人的变更集必须由其他审核人处理。由平台配置项 OP_REVIEW_MODE（single 或 separate）设置。"
   },
   "states": {
     "errorTitle": "内容没有加载出来",
@@ -730,7 +913,9 @@
       "key_taken": "已有同名标识的本体，请换一个名称后重试。"
     },
     "element": {
-      "not_found": "这个元素不存在或已被删除。"
+      "not_found": "这个元素不存在或已被删除。",
+      "stale": "该元素已被其他人修改，请刷新后再改。",
+      "name_taken": "局部名或 IRI 已被占用（包括已删除的元素），请换一个。"
     },
     "changeset": {
       "not_found": "变更集不存在或已被删除。",
@@ -740,7 +925,8 @@
       "stale_target": "目标元素在变更集生成后被修改过",
       "dependency_skipped": "它引用的项被拒绝或被跳过",
       "invalid_item": "内容不完整或不合法",
-      "has_dependents": "仍有其他元素引用它，没有删除"
+      "has_dependents": "仍有其他元素引用它，没有删除",
+      "self_review": "当前为异人审核模式，不能审核自己提交的变更集，请让其他审核人处理。"
     },
     "release": {
       "not_found": "版本不存在或已被删除。",
@@ -778,6 +964,10 @@
       "too_many_triples": "文件里的三元组超过 50,000 个，请拆分后再导入。",
       "empty": "文件里没有任何内容，请检查后重新选择。",
       "axiom_too_large": "文件里有一条公理太长（超过 200 万字符），平台无法保存，请拆分后再导入。"
+    },
+    "axiom": {
+      "invalid": "公理片段无法解析、不是恰好一条公理，或本体里已有这条公理，请检查后再保存。",
+      "maps_to_element": "这段内容可以用元素的表单表达，请到对应元素上编辑。"
     }
   },
   "rules": {
