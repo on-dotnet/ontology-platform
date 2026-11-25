@@ -954,7 +954,12 @@ async def detail_of(client: AsyncClient, change_set_id: UUID) -> dict[str, Any]:
 
 
 def resolution(mode: str, **values: Any) -> dict[str, Any]:
-    empty = {"elementId": None, "elementLabel": None, "localName": None, "keptFields": []}
+    empty: dict[str, Any] = {
+        "elementId": None,
+        "elementLabel": None,
+        "localName": None,
+        "keptFields": [],
+    }
     return {"mode": mode, **empty, **values}
 
 
