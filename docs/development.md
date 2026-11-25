@@ -28,6 +28,7 @@
 ./dev.ps1 lock api     # 改了 backend/pyproject.toml 之后
 ./dev.ps1 lock web     # 改了 web/package.json 之后
 ./dev.ps1 gen-api      # 改了后端接口之后，同步前端类型
+./dev.ps1 schema-check # 检查前端类型是否与后端接口一致（门禁里也会跑）
 ./dev.ps1 owl-check    # 改了 OWL 导入导出之后，做一次 Protégé 往返检查
 ./dev.ps1 ci -Report   # 复审通过、提交并推送之后，对最终 HEAD 跑一次完整门禁
 ```
@@ -66,7 +67,9 @@
 
 ## 门禁 `./dev.ps1 ci`
 
-先校验 compose 配置，再同时运行 `test-api`（全量）、`test-web`、构建 api 与 web 运行镜像，三项各写一个日志到 `.verification/ci/`。全部结束后按这个顺序打印：通过的一项打出汇总行，失败的一项打出失败用例和日志末尾。任一步失败即整体失败，退出码为 1。带 `-Report` 时要求工作区干净、提交已推送，并把结果写成 GitHub 提交状态 `local-ci`。`./dev.ps1 test` 同样同时运行 `test-api`、`test-web`，日志在 `.verification/test/`。
+先校验 compose 配置，再同时运行 `test-api`（全量）、`test-web`、构建 api 与 web 运行镜像（`build`）、接口类型检查（`schema-check`），四项各写一个日志到 `.verification/ci/`。全部结束后按这个顺序打印：通过的一项打出汇总行，失败的一项打出失败用例和日志末尾。任一步失败即整体失败，退出码为 1。汇总行和提交状态里，接口类型检查记作 `schema`，例如 `compose=ok test-api=ok test-web=ok build=ok schema=ok`。带 `-Report` 时要求工作区干净、提交已推送，并把结果写成 GitHub 提交状态 `local-ci`。`./dev.ps1 test` 同样同时运行 `test-api`、`test-web`，日志在 `.verification/test/`。
+
+接口类型检查 `./dev.ps1 schema-check` 用 `gen-api` 同一个生成函数从当前代码生成 `web/src/api/schema.d.ts` 的内容，与仓库里的文件比较（两边的换行都按 LF 比较）。不一致就失败，显示差异的开头，并提示运行 `./dev.ps1 gen-api` 后提交；完整的两份文件留在 `.verification/gen-api/`。它要用 api 运行镜像，所以在门禁里等 `build` 完成后才开始；test-web 镜像由它自己再构建一次（与 `test-web` 一步共用缓存），不等 `test-web` 跑完。实测门禁总耗时与加这一项之前持平（约 42 秒）。
 
 开发中不要先手动跑一遍全量再跑门禁：只跑受影响的测试，复审通过后对最终 HEAD 跑一次门禁（见 [AGENTS.md](../AGENTS.md) 第 5 节）。
 
