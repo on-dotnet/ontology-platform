@@ -1,10 +1,10 @@
 """API models of the ai module."""
 
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Self
 from uuid import UUID
 
-from pydantic import Field, StringConstraints
+from pydantic import Field, StringConstraints, model_validator
 
 from ontology_platform.modules.ai.models import (
     MESSAGE_MAX_LENGTH,
@@ -84,6 +84,12 @@ class BindingSuggestionCreate(CamelModel):
         default=None, min_length=1, max_length=SUGGESTION_SCHEMAS_MAX
     )
     type_ids: list[UUID] | None = Field(default=None, min_length=1, max_length=SUGGESTION_TYPES_MAX)
+
+    @model_validator(mode="after")
+    def one_scope(self) -> Self:
+        if (self.tables is None) == (self.schemas is None):
+            raise ValueError("Give exactly one of tables and schemas")
+        return self
 
 
 class BindingSuggestion(CamelModel):

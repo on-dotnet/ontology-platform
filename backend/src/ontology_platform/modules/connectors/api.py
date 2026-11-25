@@ -8,7 +8,7 @@ test unsaved settings. None of these routes accepts an access token.
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Path, Query, Request
 
 from ontology_platform.db import DbSession
 from ontology_platform.errors import problem_responses
@@ -42,14 +42,14 @@ async def create_data_source(
 
 
 @router.post("/data-sources/test", responses=problem_responses(401, 403, 404, 422))
-async def test_connection(
+async def check_connection(
     body: schemas.ConnectionTestRequest,
     request: Request,
     user: Admin,
     db: DbSession,
 ) -> schemas.ConnectionTest:
     """Test connection settings that are not saved yet."""
-    return await service.test_connection(db, body, actor=user, ip=client_ip(request))
+    return await service.check_connection(db, body, actor=user, ip=client_ip(request))
 
 
 @router.get("/data-sources/{id}", responses=problem_responses(401, 404, 422))
@@ -81,13 +81,13 @@ async def archive_data_source(
 
 
 @router.post("/data-sources/{id}/test", responses=problem_responses(401, 403, 404, 409, 422))
-async def test_data_source(
+async def check_data_source(
     id: UUID,
     request: Request,
     user: Editor,
     db: DbSession,
 ) -> schemas.ConnectionTest:
-    return await service.test_data_source(db, id, actor=user, ip=client_ip(request))
+    return await service.check_data_source(db, id, actor=user, ip=client_ip(request))
 
 
 @router.post(
@@ -138,8 +138,8 @@ async def list_catalog_tables(
 )
 async def get_catalog_table(
     id: UUID,
-    schema: str,
-    table: str,
+    schema: Annotated[str, Path(min_length=1, max_length=128)],
+    table: Annotated[str, Path(min_length=1, max_length=128)],
     user: Editor,
     db: DbSession,
 ) -> schemas.CatalogTable:

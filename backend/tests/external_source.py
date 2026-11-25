@@ -6,7 +6,7 @@ loaded from fixtures/connectors/steel, with a read-only account and an account t
 shared by the whole server and several workspaces run tests at the same time.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import pytest
 
@@ -17,10 +17,11 @@ class ExternalSource:
     port: int
     database: str
     reader: str
-    reader_password: str
+    # Kept out of reprs: failure output and the log scans of batch 6a must not show them.
+    reader_password: str = field(repr=False)
     # An account with write privileges: the read-only guarantees must hold even for it.
     writer: str
-    writer_password: str
+    writer_password: str = field(repr=False)
 
 
 @pytest.fixture(scope="session")

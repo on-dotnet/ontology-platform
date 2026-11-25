@@ -8,7 +8,7 @@ from httpx import AsyncClient
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ontology_platform.modules.connectors.models import DataSource
+from ontology_platform.modules.connectors.models import CatalogTable, DataSource
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.ontology.models import ChangeSet, Element
 from support import csrf_headers
@@ -30,6 +30,28 @@ async def test_a_suggestion_request_only_queues_work(client: AsyncClient, db: As
         catalog_status="ready",
     )
     db.add(source)
+    await db.flush()
+    db.add(
+        CatalogTable(
+            data_source_id=source.id,
+            schema_name="mes",
+            table_name="heat",
+            kind="table",
+            comment="炉次",
+            columns=[
+                {
+                    "name": "heat_no",
+                    "type": "character varying(20)",
+                    "family": "string",
+                    "nullable": False,
+                    "comment": "炉次号",
+                    "position": 1,
+                }
+            ],
+            primary_key=["heat_no"],
+            foreign_keys=[],
+        )
+    )
     await db.commit()
     await sign_in(client, db, Role.EDITOR)
     elements_before = await db.scalar(select(func.count()).select_from(Element))

@@ -134,6 +134,9 @@ class ConnectionTest(CamelModel):
 
 
 class CatalogColumn(CamelModel):
+    # Frozen: also part of the copies other modules receive.
+    model_config = ConfigDict(frozen=True)
+
     name: str
     # The type as the data source names it, e.g. "character varying(20)".
     type: str
@@ -144,6 +147,8 @@ class CatalogColumn(CamelModel):
 
 
 class CatalogForeignKey(CamelModel):
+    model_config = ConfigDict(frozen=True)
+
     name: str | None
     columns: list[str]
     ref_schema: str
@@ -196,6 +201,8 @@ class DataSourceRef(CamelModel):
     kind: DataSourceKind
     status: DataSourceStatus
     allow_samples: bool
+    has_credential: bool
+    catalog_status: CatalogStatus
 
 
 class CatalogTableCopy(CamelModel):

@@ -70,7 +70,11 @@ class SelectQuery:
 
 @dataclass(frozen=True, slots=True)
 class Rows:
-    """The result of one SELECT, in the order of `SelectQuery.columns`."""
+    """The result of one SELECT, in the order of `SelectQuery.columns`.
+
+    Values are normalized to `Value` by the connector: uuid columns come back as `str`, real
+    and double precision columns as `Decimal`, so that callers never see driver types.
+    """
 
     rows: tuple[tuple[Value, ...], ...]
     # Whether more rows matched than `limit` let through.
