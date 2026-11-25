@@ -40,6 +40,7 @@ from ontology_platform.modules.ai.prompts import (
     TypesOut,
 )
 from ontology_platform.modules.ai.sentences import covering, split_sentences
+from ontology_platform.settings import Settings, effort_value
 
 Kind = Literal["entity_type", "relation_type", "property"]
 ProgressFn = Callable[[str, int, int], Awaitable[None]]
@@ -146,8 +147,24 @@ class Proposal:
 
 @dataclass(frozen=True)
 class ExtractionModels:
+    """The models of the stages and their reasoning efforts (None: the service's default).
+
+    `standard` runs the terms, resolve and relations stages, `reasoning` the types stage.
+    """
+
     standard: str
     reasoning: str
+    standard_effort: str | None = None
+    reasoning_effort: str | None = None
+
+    @classmethod
+    def of(cls, settings: Settings) -> "ExtractionModels":
+        return cls(
+            standard=settings.ai_model,
+            reasoning=settings.ai_reasoning_model,
+            standard_effort=effort_value(settings.ai_effort),
+            reasoning_effort=effort_value(settings.ai_reasoning_effort),
+        )
 
 
 # What a candidate is: ("element", id), ("item", pending item id) or ("run", index of an
@@ -200,6 +217,10 @@ class RunStats:
     pairs: list[JudgedPair] = field(default_factory=list)
     # Existing types left out of a stage's prompts by the size limits, per stage.
     trimmed: Counter[str] = field(default_factory=Counter)
+    # Evidence checked literally (spec 004, 7.2), per kind: "<kind>" counts the items whose
+    # evidence was checked, "<kind>:ok" those whose cited sentence names them (both ends, for
+    # a relation).
+    literal: Counter[str] = field(default_factory=Counter)
 
 
 def judged_pairs(
@@ -303,6 +324,7 @@ class Extractor:
             pending=pending,
             decisions=decisions,
             threshold=self.threshold,
+            literal=self.last.literal,
         )
         await progress("changeset", 1, 1)
         return proposals
@@ -320,6 +342,7 @@ class Extractor:
                 text=f"Document: {title}\n\n{render_chunks(group)}",
                 schema=TermsOut,
                 document_id=document_id,
+                effort=self.models.standard_effort,
             )
             for term in result.terms:
                 key = normalize(term.name)
@@ -356,6 +379,7 @@ class Extractor:
                 text=f"Document: {title}\n\n" + "\n".join(_types_lines(context, found, group)),
                 schema=TypesOut,
                 document_id=document_id,
+                effort=self.models.reasoning_effort,
             )
             found = merge_types(found, result.entity_types)
             await progress("types", index, len(groups))
@@ -382,6 +406,7 @@ class Extractor:
                 text=text,
                 schema=ResolveOut,
                 document_id=document_id,
+                effort=self.models.standard_effort,
             )
             for row in result.decisions:
                 found = aliases.types.get(row.type.strip())
@@ -418,6 +443,7 @@ class Extractor:
                 text=f"Document: {title}\n\n{header}\n\n{render_chunks(group)}",
                 schema=RelationsOut,
                 document_id=document_id,
+                effort=self.models.standard_effort,
             )
             merged.relations.extend(result.relations)
             merged.properties.extend(result.properties)
@@ -508,6 +534,11 @@ def catalog_for(catalog: Sequence[CatalogLine], group: Sequence[ChunkText]) -> l
     named = [line for line in catalog if any(name in text for name in line[1])]
     rest = [line for line in catalog if line[2] and line not in named]
     return (named + rest)[:RELATIONS_CATALOG_MAX]
+
+
+def _literal_keys(names: Iterable[str]) -> set[str]:
+    """Normalized names, however short: what the literal check of evidence looks for."""
+    return {key for key in (normalize(name) for name in names) if key}
 
 
 def _mention_keys(names: Iterable[str]) -> set[str]:
@@ -928,6 +959,20 @@ class _Builder:
                 return True
         return False
 
+    def names_cited(self, evidence: Sequence[ProposedEvidence], names: set[str]) -> bool:
+        """Whether a sentence that located evidence touches contains one of the (normalized)
+        names: the literal check of a type's or property's evidence (spec 004, 7.2)."""
+        for item in evidence:
+            chunk = self.by_id.get(item.chunk_id)
+            if chunk is None or item.char_start is None or item.char_end is None:
+                continue
+            span = covering(self.units(chunk), item.char_start, item.char_end)
+            if span is not None and any(
+                name in normalize(chunk.text[span[0] : span[1]]) for name in names
+            ):
+                return True
+        return False
+
     def known_type(self, ref: str) -> str | None:
         """`ref` if it is the id of an existing object type (relations and parents need one)."""
         element = self.known_ids.get(ref)
@@ -977,6 +1022,7 @@ def build_proposals(
     pending: Sequence[PendingType] = (),
     decisions: Decisions | None = None,
     threshold: float = THRESHOLD,
+    literal: Counter[str] | None = None,
 ) -> list[Proposal]:
     """Change items from the model's output, aligned with the existing elements `known`.
 
@@ -985,8 +1031,15 @@ def build_proposals(
     `pending` are the object types of other open change sets, and `decisions` the resolve
     call's answers per type (keyed by position in `types`); a candidate without an answer is
     a possible duplicate (G5).
+    `literal`, when given, counts the evidence checked literally (see `RunStats.literal`).
     """
     builder = _Builder(chunks, known, deleted)
+    counts: Counter[str] = literal if literal is not None else Counter()
+
+    def checked(kind: Kind, ok: bool) -> None:
+        counts[kind] += 1
+        counts[f"{kind}:ok"] += ok
+
     fates = _fates(known, types, deleted, pending)
     requests = {
         request.index: request
@@ -1030,6 +1083,9 @@ def build_proposals(
         return check
 
     for index, (item, fate) in enumerate(zip(types, fates, strict=True)):
+        cited, _ = builder.ground(item.quotes)
+        names = [item.label_zh, item.label_en or "", *item.synonyms]
+        checked("entity_type", builder.names_cited(cited, _literal_keys(names)))
         if fate.element is not None:
             became.append((item, str(fate.element.id)))
             op: Literal["update", "restore"] = "update" if fate.kind == "existing" else "restore"
@@ -1140,9 +1196,11 @@ def build_proposals(
         if key in seen_relations:
             continue
         evidence, _ = builder.ground(relation.quotes)
-        if not builder.states_link(
+        stated = builder.states_link(
             evidence, names_of.get(domain, set()), names_of.get(range_, set())
-        ):
+        )
+        checked("relation_type", stated)
+        if not stated:
             continue  # no direct evidence: no quote's sentence names both types
         seen_relations.add(key)
         domain_uuid, range_uuid = _as_uuid(domain), _as_uuid(range_)
@@ -1183,6 +1241,9 @@ def build_proposals(
         if prop_key in seen_properties:
             continue
         seen_properties.add(prop_key)
+        cited, _ = builder.ground(prop.quotes)
+        names = [prop.label_zh, prop.label_en or ""]
+        checked("property", builder.names_cited(cited, _literal_keys(names)))
         domain_uuid = _as_uuid(domain)
         if domain_uuid and builder.match_known("property", prop.label_zh, domain_uuid):
             continue

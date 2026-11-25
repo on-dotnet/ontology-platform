@@ -397,6 +397,7 @@ class ModelStandIn:
         schema: type[T],
         files: Sequence[InputFile] = (),
         document_id: Any = None,
+        effort: str | None = None,
     ) -> T:
         self.calls += 1
         second = "b.md" in text.splitlines()[0]
@@ -487,12 +488,25 @@ async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> Non
         "seconds": recorded["sameBaseline"]["usage"]["total"]["seconds"],
         "inputTokens": 0,
         "outputTokens": 0,
+        "reasoningTokens": 0,
+        "recordedSeconds": recorded["sameBaseline"]["usage"]["total"]["recordedSeconds"],
+        "recordedInputTokens": 0,
+        "recordedOutputTokens": 0,
+        "recordedReasoningTokens": 0,
     }
 
     recordings = load_recordings(text for _, text in recorder.recording_files())
     replayed = await run_case(CASE_FILES, ReplayGateway(recordings, None), MODELS)
 
     assert _scores(replayed) == _scores(recorded)
+    # The relation's sentence names both ends; of the types, b.md's 炉次 cites a sentence of a.md.
+    assert recorded["literalShare"] == {
+        "entityTypes": 0.667,
+        "relations": 1.0,
+        "properties": None,
+        "all": 0.75,
+        "checked": 4,
+    }
     assert replayed["usage"]["total"]["calls"] == 0
     assert replayed["usage"]["total"]["replayed"] == 7  # with the resolve call of b.md
 
@@ -574,7 +588,12 @@ def test_a_failed_run_still_returns_the_calls_it_paid_for() -> None:
     assert len(names) == 3  # two recordings and the models
     assert names[-1] == "models.json"
     models = json.loads(output["files"][-1]["content"])["models"]
-    assert models == {"standard": Settings().ai_model, "reasoning": Settings().ai_reasoning_model}
+    assert models == {
+        "standard": Settings().ai_model,
+        "reasoning": Settings().ai_reasoning_model,
+        "standard_effort": "low",
+        "reasoning_effort": None,
+    }
 
 
 def test_a_run_that_recorded_nothing_leaves_the_models_file_alone() -> None:

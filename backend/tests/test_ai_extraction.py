@@ -26,6 +26,7 @@ from ontology_platform.modules.ai.extraction import (
     resolve_requests,
 )
 from ontology_platform.modules.ai.gateway import InputFile
+from ontology_platform.settings import Settings
 from ontology_platform.modules.ai.prompts import (
     DecisionOut,
     EntityTypeOut,
@@ -131,6 +132,7 @@ class ScriptedGateway:
         self.outputs = {purpose: list(items) for purpose, items in outputs.items()}
         self.resolver = resolver or judge()
         self.calls: list[tuple[str, str]] = []
+        self.efforts: list[tuple[str, str | None]] = []
         self.texts: list[tuple[str, str]] = []
 
     async def structured[T: BaseModel](
@@ -143,8 +145,10 @@ class ScriptedGateway:
         schema: type[T],
         files: Sequence[InputFile] = (),
         document_id: Any = None,
+        effort: str | None = None,
     ) -> T:
         self.calls.append((purpose, model))
+        self.efforts.append((purpose, effort))
         self.texts.append((purpose, text))
         if purpose == "extract.resolve" and purpose not in self.outputs:
             answer = self.resolver(text)
@@ -1434,3 +1438,31 @@ def test_deleted_elements_hold_their_local_names_and_do_not_align_otherwise() ->
         ("create", "Heat"),
         ("create", "smeltedIn2"),
     ]
+
+
+async def test_stages_use_the_configured_efforts() -> None:
+    gateway = ScriptedGateway(outputs([], RelationsOut(relations=[], properties=[])))
+    extractor = Extractor(
+        gateway,
+        ExtractionModels(
+            standard="std", reasoning="deep", standard_effort="low", reasoning_effort=None
+        ),
+    )
+
+    async def progress(step: str, done: int, total: int) -> None:
+        pass
+
+    await extractor.run(
+        document_id=DOC, title="t", chunks=[CHUNK_A], known=[], progress=progress
+    )
+    assert gateway.efforts == [
+        ("extract.terms", "low"),
+        ("extract.types", None),
+        ("extract.relations", "low"),
+    ]
+
+
+def test_extraction_models_take_the_efforts_from_the_settings() -> None:
+    settings = Settings(ai_effort="medium", ai_reasoning_effort="default")
+    models = ExtractionModels.of(settings)
+    assert (models.standard_effort, models.reasoning_effort) == ("medium", None)

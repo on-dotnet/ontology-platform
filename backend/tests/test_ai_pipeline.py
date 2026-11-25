@@ -55,6 +55,7 @@ class FailingGateway(ScriptedGateway):
         schema: type[T],
         files: Sequence[InputFile] = (),
         document_id: Any = None,
+        effort: str | None = None,
     ) -> T:
         raise self.error
 
@@ -272,6 +273,7 @@ class TranscriptGateway(ScriptedGateway):
         schema: type[T],
         files: Sequence[InputFile] = (),
         document_id: Any = None,
+        effort: str | None = None,
     ) -> T:
         self.files = files
         return await super().structured(

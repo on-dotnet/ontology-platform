@@ -47,6 +47,7 @@ class CountingGateway:
         schema: type[T],
         files: Sequence[InputFile] = (),
         document_id: Any = None,
+        effort: str | None = None,
     ) -> T:
         self.calls += 1
         return schema.model_validate({"items": [f"call {self.calls}", text]})
@@ -54,8 +55,8 @@ class CountingGateway:
     async def ping(self) -> bool:
         return True
 
-    def take_usage(self) -> tuple[int, int, int]:
-        return 2, 100, 10  # attempts (one retry), input tokens, output tokens
+    def take_usage(self) -> tuple[int, int, int, int]:
+        return 2, 100, 10, 4  # attempts (one retry), input, output and reasoning tokens
 
 
 def ask(**overrides: Any) -> dict[str, Any]:
@@ -127,6 +128,8 @@ async def test_recordings_survive_a_round_trip_through_files() -> None:
         "attempts",
         "inputTokens",
         "outputTokens",
+        "reasoningTokens",
+        "seconds",
     }
     assert record["document"] == "docs/a.md"
 
@@ -152,6 +155,10 @@ async def test_stats_count_paid_calls_and_their_tokens_but_not_replays() -> None
     assert stats["docs/a.md"]["extract.terms"]["replayed"] == 1
     assert stats["docs/a.md"]["extract.terms"]["inputTokens"] == 100
     assert stats["docs/a.md"]["extract.terms"]["outputTokens"] == 10
+    assert stats["docs/a.md"]["extract.terms"]["reasoningTokens"] == 4
+    # The replayed call adds what its recording says it cost.
+    assert stats["docs/a.md"]["extract.terms"]["recordedOutputTokens"] == 20
+    assert stats["docs/a.md"]["extract.terms"]["recordedReasoningTokens"] == 8
     assert stats["docs/a.md"]["extract.terms"]["seconds"] >= 0
 
 
@@ -169,6 +176,7 @@ async def test_a_replayed_run_reports_no_calls_at_all() -> None:
         0,
         0,
     )
+    assert (stage["recordedInputTokens"], stage["recordedOutputTokens"]) == (100, 10)
     assert replayer.new_recordings == {}
 
 
@@ -184,19 +192,43 @@ async def test_metered_gateway_counts_a_retried_call_end_to_end() -> None:
         purpose="test", model="m", instructions="i", text="t", schema=GatewayAnswer
     )
     assert answer == GatewayAnswer(value=7)
-    assert gateway.take_usage() == (2, 11, 3)  # the failed attempt reports no usage
+    assert gateway.take_usage() == (2, 11, 3, 0)  # the failed attempt reports no usage
 
 
 async def test_metered_gateway_sums_the_usage_of_every_attempt() -> None:
     gateway = MeteredGateway(Settings(openai_api_key=None))
     call = SimpleNamespace(purpose="extract.terms", model="m", document_id=None)
     await gateway._record(call, 0.0, SimpleNamespace(input_tokens=7, output_tokens=3), "x")  # type: ignore[arg-type]
-    await gateway._record(call, 0.0, SimpleNamespace(input_tokens=5, output_tokens=2), None)  # type: ignore[arg-type]
+    details = SimpleNamespace(reasoning_tokens=1)
+    usage = SimpleNamespace(input_tokens=5, output_tokens=2, output_tokens_details=details)
+    await gateway._record(call, 0.0, usage, None)  # type: ignore[arg-type]
     await gateway._record(call, 0.0, None, "ai.unavailable")  # type: ignore[arg-type]
 
-    assert gateway.take_usage() == (3, 12, 5)
-    assert gateway.take_usage() == (0, 0, 0)
+    assert gateway.take_usage() == (3, 12, 5, 1)
+    assert gateway.take_usage() == (0, 0, 0, 0)
 
 
 def _key_fields(call: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in call.items() if k != "document_id"}
+
+
+def test_the_effort_is_part_of_the_key_only_when_given() -> None:
+    fields = _key_fields(ask())
+    assert call_key(**fields, effort=None) == call_key(**fields)
+    assert call_key(**fields, effort="low") != call_key(**fields)
+    assert call_key(**fields, effort="low") != call_key(**fields, effort="high")
+
+
+async def test_the_effort_reaches_the_model_and_keys_the_recording() -> None:
+    seen: list[str | None] = []
+
+    class Inner(CountingGateway):
+        async def structured[T: BaseModel](self, **call: Any) -> T:
+            seen.append(call.get("effort"))
+            return await super().structured(**call)
+
+    gateway = ReplayGateway({}, Inner())
+    await gateway.structured(**ask(), effort="low")
+    await gateway.structured(**ask(), effort="low")
+    await gateway.structured(**ask())
+    assert seen == ["low", None]
