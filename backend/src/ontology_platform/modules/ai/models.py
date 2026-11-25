@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, Index, String, Text, func
+from sqlalchemy import CheckConstraint, Index, String, Text, false, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -18,6 +18,7 @@ from ontology_platform.db import Base
 AssistantStatus = Literal["queued", "running", "succeeded", "failed"]
 AssistantStep = Literal["context", "model", "changeset"]
 MESSAGE_MAX_LENGTH = 2000
+BindingSuggestionStep = Literal["catalog", "match", "columns", "changeset"]
 
 
 class AiRun(Base):
@@ -67,6 +68,45 @@ class AssistantRequest(Base):
     # Operations the model proposed that failed the checks and were left out.
     dropped: Mapped[int] = mapped_column(server_default="0", default=0)
     change_set_id: Mapped[UUID | None]
+    error_code: Mapped[str | None] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    finished_at: Mapped[datetime | None]
+
+
+class BindingSuggestion(Base):
+    """One request for AI binding suggestions and what came of it (spec 003, section 8).
+
+    Neither catalog content nor sample values are stored here: what the model was shown lives
+    on as the evidence of the change set it led to.
+    """
+
+    __tablename__ = "binding_suggestions"
+    __table_args__ = (
+        CheckConstraint("status IN ('queued', 'running', 'succeeded', 'failed')", name="status"),
+        CheckConstraint(
+            "step IS NULL OR step IN ('catalog', 'match', 'columns', 'changeset')",
+            name="step",
+        ),
+        CheckConstraint("proposed >= 0 AND dropped >= 0", name="counts"),
+        Index(None, "ontology_id", "user_id", "created_at"),
+        {"schema": "ai"},
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    # Rows of other modules are referenced by id without a foreign key, like ai.runs.
+    ontology_id: Mapped[UUID]
+    data_source_id: Mapped[UUID]
+    user_id: Mapped[UUID]
+    # {tables: [{schema, name}] | null, schemas: [...] | null, typeIds: [...] | null}
+    scope: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    status: Mapped[str] = mapped_column(String(16))
+    step: Mapped[str | None] = mapped_column(String(16))
+    change_set_id: Mapped[UUID | None]
+    # Suggestions that became change items, and those left out by the checks.
+    proposed: Mapped[int] = mapped_column(server_default="0", default=0)
+    dropped: Mapped[int] = mapped_column(server_default="0", default=0)
+    # Whether sample values were read and sent to the model for this request.
+    samples_sent: Mapped[bool] = mapped_column(default=False, server_default=false())
     error_code: Mapped[str | None] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     finished_at: Mapped[datetime | None]

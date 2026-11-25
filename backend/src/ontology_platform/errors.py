@@ -25,6 +25,12 @@ class AppError(Exception):
         self.detail = detail
 
 
+def not_implemented(what: str) -> AppError:
+    """A route whose shape is fixed while its implementation has not been merged yet (the M3
+    skeleton, spec 003 section 16). Later batches replace every use of this."""
+    return AppError(501, "http.not_implemented", f"{what} is not implemented yet.")
+
+
 class Problem(BaseModel):
     type: str = "about:blank"
     title: str
