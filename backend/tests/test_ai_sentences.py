@@ -114,7 +114,11 @@ def test_covering_takes_every_unit_a_span_touches() -> None:
     text = "炉次在转炉冶炼。钢水装入钢包。钢包运往精炼炉。"
     spans = split_sentences(text)
     start = text.index("装入")
-    assert text[slice(*covering(spans, start, start + 2))] == "钢水装入钢包。"
+    one = covering(spans, start, start + 2)
+    assert one is not None
+    assert text[slice(*one)] == "钢水装入钢包。"
     end = text.index("运往") + 2
-    assert text[slice(*covering(spans, start, end))] == "钢水装入钢包。钢包运往精炼炉。"
+    both = covering(spans, start, end)
+    assert both is not None
+    assert text[slice(*both)] == "钢水装入钢包。钢包运往精炼炉。"
     assert covering(spans, len(text) + 5, len(text) + 6) is None
