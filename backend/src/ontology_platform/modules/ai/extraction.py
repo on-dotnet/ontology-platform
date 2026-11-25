@@ -25,6 +25,7 @@ from ontology_platform.modules.ai.candidates import (
     shortlist,
 )
 from ontology_platform.modules.ai.candidates import normalize as normalize
+from ontology_platform.modules.ai.evidence import locate_quote
 from ontology_platform.modules.ai.gateway import ModelGateway
 from ontology_platform.modules.ai.prompts import (
     RELATIONS_INSTRUCTIONS,
@@ -48,7 +49,8 @@ Verdict = Literal["same", "different", "unsure"]
 BATCH_CHARS = 8000
 # Candidate terms per call of the types stage: a large document's terms would not fit one call.
 TYPES_BATCH_TERMS = 150
-# Sentences shown per term to the types stage: the first ones it occurs in.
+# Sentences shown per term to the types stage: those its quotes are in, as many as it had
+# quotes shown before PR 4.
 TERM_SENTENCES = 3
 UNFOUND_PENALTY = 0.5
 # Local names stay well below the 128 characters the ontology allows, leaving room for "new:".
@@ -155,6 +157,8 @@ class ExtractionModels:
     """The models of the stages and their reasoning efforts (None: the service's default).
 
     `standard` runs the terms, resolve and relations stages, `reasoning` the types stage.
+    `standard_effort` applies to resolve and relations: the terms stage sends none, its request
+    being kept as it was before PR 4 (spec 004, 7.2).
     """
 
     standard: str
@@ -411,12 +415,13 @@ class Extractor:
                 text=f"Document: {title}\n\n{render_chunks(group)}",
                 schema=TermsOut,
                 document_id=document_id,
-                effort=self.models.standard_effort,
             )
             for term in result.terms:
                 key = normalize(term.name)
                 if key and key not in found:
                     found[key] = term
+                elif key:
+                    found[key].quotes.extend(term.quotes)
             await progress("terms", index, len(groups))
         return list(found.values())
 
@@ -449,11 +454,7 @@ class Extractor:
                 [str(element.id) for element in context]
                 + [item.ref for item in found if _as_uuid(item.ref) is not None]
             )
-            keys = {term.name: normalize(term.name) for term in group}
-            occurs = {
-                name: [s for text, s in sentences if key in text][:TERM_SENTENCES]
-                for name, key in keys.items()
-            }
+            occurs = {term.name: _term_sentences(term, chunks, sentences) for term in group}
             lines = _types_lines(context, found, group, aliases, occurs)
             result = await self.gateway.structured(
                 purpose="extract.types",
@@ -679,11 +680,43 @@ def _types_lines(
             f"- {ids.get(item.ref, item.ref)} | {item.label_zh} | {', '.join(item.synonyms)}"
             for item in found
         ]
-    lines.append("\nCandidate terms (category | name | definition | sentences):")
+    lines.append("\nCandidate terms (category | name | english | definition | sentences):")
     for term in terms:
         context = "; ".join(f"[{s.ref}] {s.line}" for s in occurs.get(term.name, ()))
-        lines.append(f"- {term.category} | {term.name} | {term.definition or ''} | {context}")
+        lines.append(
+            f"- {term.category} | {term.name} | {term.english or ''} | "
+            f"{term.definition or ''} | {context}"
+        )
     return lines
+
+
+def _term_sentences(
+    term: TermOut, chunks: Sequence[ChunkText], sentences: Sequence[tuple[str, Sentence]]
+) -> list[Sentence]:
+    """The sentences a term's located quotes are in, at most `TERM_SENTENCES`; without any,
+    the first sentences that contain its name. `sentences` pairs each with its normalized text.
+    """
+    by_seq = {chunk.seq: chunk for chunk in chunks}
+    found: list[Sentence] = []
+    for quote in term.quotes:
+        cited = by_seq.get(quote.chunk)
+        for chunk in [*([cited] if cited else []), *(c for c in chunks if c is not cited)]:
+            located = locate_quote(quote.text, chunk.text)
+            if located is None:
+                continue
+            found += [
+                s
+                for _, s in sentences
+                if s.chunk.id == chunk.id
+                and s.start < located.char_end
+                and located.char_start < s.end
+                and s not in found
+            ]
+            break
+    if not found:
+        key = normalize(term.name)
+        found = [s for text, s in sentences if key and key in text]
+    return found[:TERM_SENTENCES]
 
 
 def merge_types(

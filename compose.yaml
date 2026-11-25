@@ -22,8 +22,7 @@ x-api-env: &api-env
   OP_AI_BASE_URL: ${OP_AI_BASE_URL:-}
   OP_AI_MODEL: ${OP_AI_MODEL:-}
   OP_AI_REASONING_MODEL: ${OP_AI_REASONING_MODEL:-}
-  # Reasoning effort: OP_AI_EFFORT for terms, resolve and relations; OP_AI_REASONING_EFFORT for
-  # types. "default" sends none (for compatible services without the parameter).
+  # Reasoning effort: OP_AI_EFFORT for resolve and relations; OP_AI_REASONING_EFFORT for types. "default" sends none (for compatible services without the parameter).
   OP_AI_EFFORT: ${OP_AI_EFFORT:-}
   OP_AI_REASONING_EFFORT: ${OP_AI_REASONING_EFFORT:-}
   OP_DOCUMENTS_DIR: /data/documents

@@ -51,7 +51,8 @@ class Settings(BaseSettings):
     ai_base_url: str | None = None
     ai_model: str = "gpt-6.2-sol"
     ai_reasoning_model: str = "gpt-6.2-astra"
-    # `ai_effort` for the terms, resolve and relations stages; `ai_reasoning_effort` for types.
+    # `ai_effort` for the resolve and relations stages; `ai_reasoning_effort` for types. The terms
+    # stage sends none: its request is kept as it was before (spec 004, 7.2).
     ai_effort: Effort = "low"
     ai_reasoning_effort: Effort = "default"
     # Model calls are streamed, so this bounds the wait between two events, not a whole call.

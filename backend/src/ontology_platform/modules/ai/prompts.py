@@ -22,14 +22,25 @@ CITE_RULE = """\
   an item by its number, for example "3.12"; never copy text. Use null when none does.
 """
 
+# The terms stage is not trimmed (spec 004, 7.2, PR 4): without definitions and quotes the model
+# listed about twice as many terms, and the types stage made types of many of them. Its request
+# stays exactly what it was before PR 4 (also no reasoning effort), so its recordings replay.
+TERMS_RULES = """\
+Rules:
+- Use only the text provided. Do not add knowledge that the text does not state or clearly imply.
+- Every quote must be copied verbatim from the text, 5 to 120 characters, and identify its chunk
+  by the number in the [chunk N] marker that precedes it.
+- Write labels and definitions in the language of the text (Chinese text gives Chinese labels)
+  and also give a concise English label.
+- When unsure, lower the confidence (0 to 1) instead of guessing.
+"""
+
 TERMS_INSTRUCTIONS = f"""\
 You are an ontology engineer reading an industrial document. List the domain terms that a
 business ontology for this domain would need: business objects and events (entity), their
 measurable or descriptive attributes (attribute), links between objects (relation), and
-enumerated values such as grades or categories (value). Skip generic words. Give each term as
-the text writes it, once, with a definition of one short sentence from the text (null when the
-text says nothing about it).
-{COMMON_RULES}"""
+enumerated values such as grades or categories (value). Skip generic words.
+{TERMS_RULES}"""
 
 TYPES_INSTRUCTIONS = f"""\
 You are an ontology engineer. From the candidate terms below, decide which are entity types
@@ -57,8 +68,8 @@ Existing entity types are listed with short ids (E1, E2, ...); reuse them instea
 duplicates (refer to an existing type by its id). Refer to a new type as "new:<Name>", where
 <Name> is a PascalCase English name. Give a concise English label, and a definition of one
 sentence, or null. Attributes, values and relations are not entity types.
-Each term is shown with the first sentences it occurs in; cite the sentence that best shows
-the type.
+Each term is shown with the sentences it was found in; cite the sentence that best shows the
+type.
 {COMMON_RULES}{CITE_RULE}"""
 
 RELATIONS_INSTRUCTIONS = f"""\
@@ -78,10 +89,17 @@ several.
 _CITED = 'Number of the sentence cited, for example "3.12"; null if none'
 
 
+class Quote(BaseModel):
+    chunk: int = Field(description="Number N of the [chunk N] marker the quote comes from")
+    text: str
+
+
 class TermOut(BaseModel):
     name: str
+    english: str | None
     definition: str | None
     category: Literal["entity", "attribute", "relation", "value", "other"]
+    quotes: list[Quote]
 
 
 class TermsOut(BaseModel):

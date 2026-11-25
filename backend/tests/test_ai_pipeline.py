@@ -91,7 +91,7 @@ async def add_document(db: AsyncSession, ontology: Ontology) -> tuple[Document, 
 
 
 def outputs(grade: Element, *, empty: bool = False) -> dict[str, list[BaseModel]]:
-    term = TermOut(name="炉次", definition=None, category="entity")
+    term = TermOut(name="炉次", english=None, definition=None, category="entity", quotes=[])
     types = [
         entity("new:Heat", "炉次", sentence="0.1"),
         entity(str(grade.id), "钢种", synonyms=["牌号", "钢级"]),

@@ -33,6 +33,7 @@ from ontology_platform.modules.ai.prompts import (
     DecisionOut,
     EntityTypeOut,
     PropertyOut,
+    Quote,
     RelationOut,
     RelationsOut,
     ResolveOut,
@@ -199,7 +200,7 @@ def relation(domain: str, range_: str, label: str, sentence: str | None) -> Rela
 
 
 def outputs(types: list[EntityTypeOut], rels: RelationsOut) -> dict[str, list[BaseModel]]:
-    term = TermOut(name="炉次", definition=None, category="entity")
+    term = TermOut(name="炉次", english=None, definition=None, category="entity", quotes=[])
     return {
         "extract.terms": [TermsOut(terms=[term])],
         "extract.types": [TypesOut(entity_types=types)],
@@ -477,8 +478,11 @@ def term(
     name: str,
     category: Literal["entity", "attribute", "relation", "value", "other"] = "entity",
     definition: str | None = None,
+    quotes: Sequence[Quote] = (),
 ) -> TermOut:
-    return TermOut(name=name, definition=definition, category=category)
+    return TermOut(
+        name=name, english=None, definition=definition, category=category, quotes=list(quotes)
+    )
 
 
 def types_texts(gateway: ScriptedGateway) -> list[str]:
@@ -489,7 +493,7 @@ async def test_few_terms_are_typed_in_one_call_each_with_its_first_sentences() -
     gateway = ScriptedGateway(
         {
             "extract.terms": [
-                TermsOut(terms=[term("炉次")]),
+                TermsOut(terms=[term("炉次", quotes=[Quote(chunk=0, text="每个炉次")])]),
                 TermsOut(
                     terms=[term("浇次", "other", definition="连续浇铸的炉次"), term("铁水罐")]
                 ),
@@ -519,10 +523,11 @@ async def test_few_terms_are_typed_in_one_call_each_with_its_first_sentences() -
         "Existing entity types (id | label | synonyms):\n"
         "- E1 | 钢种 | 牌号\n"
         "\n"
-        "Candidate terms (category | name | definition | sentences):\n"
-        "- entity | 炉次 |  | [0.1] 每个炉次。; [1.1] 一个浇次由若干个炉次的钢水连续浇铸而成。\n"
-        "- other | 浇次 | 连续浇铸的炉次 | [1.1] 一个浇次由若干个炉次的钢水连续浇铸而成。\n"
-        "- entity | 铁水罐 |  | "
+        "Candidate terms (category | name | english | definition | sentences):\n"
+        # The sentence of its quote; without quotes, the sentences that contain the name.
+        "- entity | 炉次 |  |  | [0.1] 每个炉次。\n"
+        "- other | 浇次 |  | 连续浇铸的炉次 | [1.1] 一个浇次由若干个炉次的钢水连续浇铸而成。\n"
+        "- entity | 铁水罐 |  |  | "
     ]
 
 
@@ -1475,7 +1480,7 @@ async def test_stages_use_the_configured_efforts() -> None:
         document_id=DOC, title="t", chunks=[CHUNK_A], known=[EXISTING_GRADE], progress=progress
     )
     assert gateway.efforts == [
-        ("extract.terms", "low"),
+        ("extract.terms", None),  # kept as it was before (spec 004, 7.2)
         ("extract.types", None),
         ("extract.resolve", "low"),
         ("extract.relations", "low"),
@@ -1641,4 +1646,4 @@ async def test_a_term_is_shown_with_at_most_three_sentences() -> None:
 
     await extractor.run(document_id=DOC, title="t", chunks=[chunk], known=[], progress=progress)
     [text] = types_texts(gateway)
-    assert text.endswith("- entity | 钢包 |  | [0.1] 钢包一。; [0.2] 钢包二。; [0.3] 钢包三。")
+    assert text.endswith("- entity | 钢包 |  |  | [0.1] 钢包一。; [0.2] 钢包二。; [0.3] 钢包三。")
