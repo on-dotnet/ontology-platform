@@ -238,6 +238,31 @@ def test_a_reference_to_an_element_of_another_kind_is_an_invalid_item() -> None:
     assert version.merge(proposals) == ["changeset.invalid_item"]
     assert [e.local_name for e in version.elements] == ["Heat", "smelts"]
 
+    # The same for an element of an earlier change set, by its id, and for an update.
+    smelts = version.elements[1]
+    later = [
+        create("property", "new:temperature", "温度", domainRef=str(smelts.id)),
+        Proposal(
+            op="update",
+            kind="entity_type",
+            target_element_id=smelts.id,
+            target_revision=smelts.revision,
+            fields={"synonyms": [{"lang": "zh", "text": "熔炼"}]},
+        ),
+    ]
+    assert version.merge(later) == ["changeset.invalid_item", "changeset.invalid_item"]
+    assert [e.local_name for e in version.elements] == ["Heat", "smelts"]
+
+
+def test_items_referencing_each_other_in_a_loop_are_skipped_as_the_merge_does() -> None:
+    proposals = [
+        create("entity_type", "new:A", "甲", parentRef="new:B"),
+        create("entity_type", "new:B", "乙", parentRef="new:A"),
+    ]
+    version = WorkingVersion()
+    assert version.merge(proposals) == ["changeset.dependency_skipped", "changeset.invalid_item"]
+    assert version.elements == []
+
 
 # ---------------------------------------------------------------- properties and hierarchy
 
@@ -534,6 +559,13 @@ def test_a_run_that_recorded_nothing_leaves_the_models_file_alone() -> None:
     output, code = evaluate(_bundle(CASE_FILES), FailsAfter(good=0))
     assert code == 1
     assert output["files"] == []
+
+
+def test_scenarios_must_be_a_list_of_names() -> None:
+    model = ModelStandIn()
+    with pytest.raises(ValueError, match="list of names"):
+        evaluate({**_bundle(CASE_FILES), "scenarios": "sequential"}, model)
+    assert model.calls == 0
 
 
 def test_malformed_answers_fail_before_any_model_call() -> None:
