@@ -28,6 +28,7 @@ class FakeGateway:
         schema: type[T],
         files: Sequence[InputFile] = (),
         document_id: Any = None,
+        effort: str | None = None,
     ) -> T:
         raise NotImplementedError
 

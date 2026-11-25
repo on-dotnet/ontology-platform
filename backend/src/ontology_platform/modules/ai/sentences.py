@@ -1,6 +1,6 @@
 """Sentence units of a chunk's text (spec 004, section 8).
 
-A relation's direct evidence is the sentence its quote touches, whatever the file format: a
+A relation's direct evidence is the sentence it cites, whatever the file format: a
 PDF breaks a sentence over several lines where the page ends, while a Markdown or Word line is
 a whole paragraph. Units are spans of the original text, so that evidence offsets map onto them.
 """

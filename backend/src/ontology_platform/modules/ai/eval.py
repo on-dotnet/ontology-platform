@@ -58,6 +58,7 @@ from ontology_platform.modules.ai.extraction import (
 from ontology_platform.modules.ai.gateway import AiError, ModelGateway
 from ontology_platform.modules.ai.pipeline import to_item
 from ontology_platform.modules.ai.replay import (
+    STAGE_COUNTS,
     MeteredGateway,
     ReplayGateway,
     ReplayMissError,
@@ -738,7 +739,7 @@ def _score_hierarchy(
     }
 
 
-_COUNTS = ("calls", "replayed", "seconds", "inputTokens", "outputTokens")
+_COUNTS = STAGE_COUNTS
 
 
 def _usage(gateway: ReplayGateway, labels: Sequence[str]) -> dict[str, Any]:
@@ -755,7 +756,7 @@ def _usage(gateway: ReplayGateway, labels: Sequence[str]) -> dict[str, Any]:
 
     def tidy(numbers: dict[str, float]) -> dict[str, Any]:
         return {
-            key: round(value, 1) if key == "seconds" else int(value)
+            key: round(value, 1) if key in ("seconds", "recordedSeconds") else int(value)
             for key, value in numbers.items()
         }
 
@@ -940,6 +941,26 @@ def resolve_counts(
     }
 
 
+_LITERAL_KINDS = {
+    "entityTypes": "entity_type",
+    "relations": "relation_type",
+    "properties": "property",
+}
+
+
+def literal_share(counts: Counter[str]) -> dict[str, Any]:
+    """The share of items whose cited sentence names them (spec 004, 7.2 and 10, item 7):
+    per kind, and over all checked items (`all`), with the number checked (`checked`)."""
+    out: dict[str, Any] = {
+        name: _ratio(counts[f"{kind}:ok"], counts[kind]) for name, kind in _LITERAL_KINDS.items()
+    }
+    total = sum(counts[kind] for kind in _LITERAL_KINDS.values())
+    passed = sum(counts[f"{kind}:ok"] for kind in _LITERAL_KINDS.values())
+    out["all"] = _ratio(passed, total)
+    out["checked"] = total
+    return out
+
+
 def shortlist_recall(expected: Mapping[str, Any]) -> dict[str, Any]:
     """The free lower bound of the shortlist's recall (spec 004, 4.1), per threshold."""
     groups = [group["names"] for group in expected["entity_types"]]
@@ -977,6 +998,7 @@ async def run_case(
     extractor = Extractor(gateway, models)
     pairs: dict[str, list[JudgedPair]] = {}
     trimmed: dict[str, Counter[str]] = {}
+    literal: dict[str, Counter[str]] = {}
 
     async def identify(
         document: _Document,
@@ -1007,6 +1029,7 @@ async def run_case(
         log(f"    {time.monotonic() - started:.1f} s")
         pairs.setdefault(scenario, []).extend(extractor.last.pairs)
         trimmed.setdefault(scenario, Counter()).update(extractor.last.trimmed)
+        literal.setdefault(scenario, Counter()).update(extractor.last.literal)
         return proposals
 
     async def sequential(review: str) -> tuple[WorkingVersion, list[str], list[Proposal]]:
@@ -1031,6 +1054,7 @@ async def run_case(
     result["resolve"] = resolve_counts(
         pairs["sequential/acceptAll"], expected, trimmed["sequential/acceptAll"]
     )
+    result["literalShare"] = literal_share(literal["sequential/acceptAll"])
     if expected is not None:
         result["shortlistRecall"] = shortlist_recall(expected)
         version, skipped, proposed = await sequential("byFlags")
@@ -1070,6 +1094,7 @@ async def run_case(
             _usage(gateway, labels),
         )
         same["resolve"] = resolve_counts(pairs["sameBaseline"], expected, trimmed["sameBaseline"])
+        same["literalShare"] = literal_share(literal["sameBaseline"])
         if "byFlags" in outcomes and expected is not None:
             version, skipped = outcomes["byFlags"]
             same["byFlags"] = _review(version, skipped, expected, None)
@@ -1135,7 +1160,7 @@ def _scenario(
 def _models(settings: Settings, mode: str, manifest: str | None) -> ExtractionModels:
     if mode == "replay" and manifest:
         return ExtractionModels(**json.loads(manifest)["models"])
-    return ExtractionModels(standard=settings.ai_model, reasoning=settings.ai_reasoning_model)
+    return ExtractionModels.of(settings)
 
 
 def _files(gateway: ReplayGateway, models: ExtractionModels) -> list[dict[str, str]]:

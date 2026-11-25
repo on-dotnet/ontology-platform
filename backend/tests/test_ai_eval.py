@@ -377,7 +377,7 @@ def test_a_case_without_the_new_sections_scores_as_before() -> None:
 
 # ---------------------------------------------------------------- whole runs and replay
 
-_HEAT_ID = re.compile(r"^- ([0-9a-f-]{36}) \| 炉次", re.MULTILINE)
+_HEAT_ID = re.compile(r"^- (E\d+) \| 炉次", re.MULTILINE)
 
 
 class ModelStandIn:
@@ -397,6 +397,7 @@ class ModelStandIn:
         schema: type[T],
         files: Sequence[InputFile] = (),
         document_id: Any = None,
+        effort: str | None = None,
     ) -> T:
         self.calls += 1
         second = "b.md" in text.splitlines()[0]
@@ -408,36 +409,34 @@ class ModelStandIn:
         shown = _HEAT_ID.findall(text)
         heat = shown[0] if second and shown else "new:Heat"
         if purpose == "extract.types":
-            types = [_type(heat, "炉次", "Heat", "每个炉次有炉号")]
+            types = [_type(heat, "炉次", "Heat")]
             if second:
-                types.append(_type("new:Cast", "浇次", "CastingSequence", "一个浇次由若干炉次组成"))
+                types.append(_type("new:Cast", "浇次", "CastingSequence"))
             return schema.model_validate({"entity_types": types})
-        relations = [_relation("new:Cast", heat, "一个浇次由若干炉次组成")] if second else []
+        relations = [_relation("new:Cast", heat)] if second else []
         return schema.model_validate({"relations": relations, "properties": []})
 
     async def ping(self) -> bool:
         return True
 
 
-def _type(ref: str, label: str, english: str, quote: str) -> dict[str, Any]:
+def _type(ref: str, label: str, english: str) -> dict[str, Any]:
+    # Sentence 0.2 is the one after the heading in both documents.
     return {
         "ref": ref,
         "label_zh": label,
         "label_en": english,
-        "local_name": english,
         "definition_zh": None,
         "synonyms": [],
         "parent": None,
         "confidence": 0.9,
-        "rationale": "",
-        "quotes": [{"chunk": 0, "text": quote}],
+        "sentence": "0.2",
     }
 
 
-def _relation(domain: str, range_: str, quote: str) -> dict[str, Any]:
+def _relation(domain: str, range_: str) -> dict[str, Any]:
     return {
         "label_zh": "包含",
-        "label_en": "includes",
         "local_name": "includesHeat",
         "domain": domain,
         "range": range_,
@@ -445,8 +444,7 @@ def _relation(domain: str, range_: str, quote: str) -> dict[str, Any]:
         "multiple": True,
         "definition_zh": None,
         "confidence": 0.9,
-        "rationale": "",
-        "quotes": [{"chunk": 0, "text": quote}],
+        "sentence": "0.2",
     }
 
 
@@ -487,12 +485,25 @@ async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> Non
         "seconds": recorded["sameBaseline"]["usage"]["total"]["seconds"],
         "inputTokens": 0,
         "outputTokens": 0,
+        "reasoningTokens": 0,
+        "recordedSeconds": recorded["sameBaseline"]["usage"]["total"]["recordedSeconds"],
+        "recordedInputTokens": 0,
+        "recordedOutputTokens": 0,
+        "recordedReasoningTokens": 0,
     }
 
     recordings = load_recordings(text for _, text in recorder.recording_files())
     replayed = await run_case(CASE_FILES, ReplayGateway(recordings, None), MODELS)
 
     assert _scores(replayed) == _scores(recorded)
+    # Every cited sentence names its type, and the relation's both ends.
+    assert recorded["literalShare"] == {
+        "entityTypes": 1.0,
+        "relations": 1.0,
+        "properties": None,
+        "all": 1.0,
+        "checked": 4,
+    }
     assert replayed["usage"]["total"]["calls"] == 0
     assert replayed["usage"]["total"]["replayed"] == 7  # with the resolve call of b.md
 
@@ -574,7 +585,12 @@ def test_a_failed_run_still_returns_the_calls_it_paid_for() -> None:
     assert len(names) == 3  # two recordings and the models
     assert names[-1] == "models.json"
     models = json.loads(output["files"][-1]["content"])["models"]
-    assert models == {"standard": Settings().ai_model, "reasoning": Settings().ai_reasoning_model}
+    assert models == {
+        "standard": Settings().ai_model,
+        "reasoning": Settings().ai_reasoning_model,
+        "standard_effort": "low",
+        "reasoning_effort": None,
+    }
 
 
 def test_a_run_that_recorded_nothing_leaves_the_models_file_alone() -> None:
@@ -694,7 +710,7 @@ def test_a_type_of_a_pending_items_main_name_follows_where_that_item_went() -> N
     third = build_proposals(
         [],
         [],
-        [entity("new:IssueSlip", "领用单", "IssueSlip")],
+        [entity("new:IssueSlip", "领用单")],
         RelationsOut(relations=[], properties=[]),
         pending=pending,
     )

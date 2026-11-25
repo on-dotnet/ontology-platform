@@ -24,7 +24,7 @@ from test_ai_alignment import (
     named,
     working_version,
 )
-from test_ai_extraction import ScriptedGateway, entity, judge, quote, relation
+from test_ai_extraction import ScriptedGateway, entity, judge, relation
 from test_ontology_changesets import patch_item
 from test_ontology_support import add_ontology, sign_in
 
@@ -55,14 +55,14 @@ async def two_documents(
     ontology = await add_ontology(db, key)
     first = await add_document(db, ontology, "吊运规程.md", LADLE_TEXT)
     second = await add_document(db, ontology, "浇铸规程.md", TEEMING_TEXT)
-    teeming = [entity("new:TeemingLadle", "钢水包", "TeemingLadle", quotes=[quote(0, "钢水包")])]
+    teeming = [entity("new:TeemingLadle", "钢水包", sentence="0.1")]
     relations = RelationsOut(relations=[], properties=[])
     if refiner_in_second:
-        teeming.append(entity("new:Refiner", "精炼炉", "Refiner", quotes=[quote(0, "精炼")]))
+        teeming.append(entity("new:Refiner", "精炼炉", sentence="0.1"))
     change_sets = await identify(
         app,
         [
-            (first, [entity("new:Ladle", "钢包", "Ladle", quotes=[quote(0, "钢包")])], relations),
+            (first, [entity("new:Ladle", "钢包", sentence="0.1")], relations),
             (second, teeming, relations),
         ],
         judge({"钢水包": ("钢包", verdict)}),
@@ -199,16 +199,14 @@ async def test_a_possible_duplicate_within_one_change_set_can_be_merged_into_the
             (
                 document,
                 [
-                    entity("new:Ladle", "钢包", "Ladle", quotes=[quote(0, "钢包")]),
-                    entity("new:Refiner", "精炼炉", "Refiner", quotes=[quote(0, "精炼炉")]),
-                    entity("new:Teeming", "钢水包", "Teeming", quotes=[quote(0, "钢水包")]),
+                    entity("new:Ladle", "钢包", sentence="0.1"),
+                    entity("new:Refiner", "精炼炉", sentence="0.1"),
+                    entity("new:Teeming", "钢水包", sentence="0.1"),
                 ],
                 RelationsOut(
                     relations=[
                         named(
-                            relation("new:Teeming", "new:Refiner", "运自", []),
-                            "comesFrom",
-                            [quote(0, "钢水由钢包吊运至精炼炉，精炼后装入钢水包")],
+                            relation("new:Teeming", "new:Refiner", "运自", None), "comesFrom", "0.1"
                         )
                     ],
                     properties=[],
@@ -246,9 +244,7 @@ async def test_a_type_proposed_meanwhile_is_marked_when_the_change_set_is_writte
     document = await add_document(db, ontology, "吊运规程.md", LADLE_TEXT)
     outputs: dict[str, list[BaseModel]] = {
         "extract.terms": [TermsOut(terms=[])],
-        "extract.types": [
-            TypesOut(entity_types=[entity("new:Ladle", "钢包", "Ladle", quotes=[quote(0, "钢包")])])
-        ],
+        "extract.types": [TypesOut(entity_types=[entity("new:Ladle", "钢包", sentence="0.1")])],
         "extract.relations": [RelationsOut(relations=[], properties=[])],
     }
     written: list[UUID] = []
@@ -301,8 +297,8 @@ async def test_a_type_of_a_pending_items_main_name_follows_it_until_renamed(
             for name, text in (("a", "备件领用单。"), ("b", "领用单。"), ("c", "领用单一式两份。"))
         ]
         relations = RelationsOut(relations=[], properties=[])
-        issue = entity("new:Issue", "备件领用单", "Issue", quotes=[quote(0, "备件领用单")])
-        slip = entity("new:Slip", "领用单", "Slip", quotes=[quote(0, "领用单")])
+        issue = entity("new:Issue", "备件领用单", sentence="0.1")
+        slip = entity("new:Slip", "领用单", sentence="0.1")
         change_sets = await identify(
             app,
             [

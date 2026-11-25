@@ -35,9 +35,7 @@ async def run() -> None:
         loop.add_signal_handler(signal.SIGTERM, stop.set)
         session_factory = create_session_factory(engine)
         gateway = OpenAIGateway(settings, session_factory)
-        extraction_models = ExtractionModels(
-            standard=settings.ai_model, reasoning=settings.ai_reasoning_model
-        )
+        extraction_models = ExtractionModels.of(settings)
         register_extractor(make_extractor(session_factory, gateway, extraction_models))
         register_vision_transcriber(make_transcriber(gateway, settings.ai_model))
         register_handlers(LocalDocumentStorage(Path(settings.documents_dir)))

@@ -21,12 +21,12 @@ from ontology_platform.modules.ai.extraction import (
     ExtractionModels,
     KnownElement,
     build_proposals,
+    sentences_of,
 )
 from ontology_platform.modules.ai.pipeline import make_extractor
 from ontology_platform.modules.ai.prompts import (
     EntityTypeOut,
     PropertyOut,
-    Quote,
     RelationOut,
     RelationsOut,
     ResolveOut,
@@ -38,7 +38,7 @@ from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.ontology import service as ontology_service
 from ontology_platform.modules.ontology.models import Ontology
 from ontology_platform.modules.ontology.schemas import ElementCopy
-from test_ai_extraction import ScriptedGateway, entity, prop, quote, relation
+from test_ai_extraction import ScriptedGateway, entity, prop, relation
 from test_ai_pipeline import held
 from test_ontology_support import accept_and_merge, add_elements, add_ontology, element, sign_in
 
@@ -66,8 +66,8 @@ async def add_document(db: AsyncSession, ontology: Ontology, filename: str, text
     return document.id
 
 
-def named[T: (RelationOut, PropertyOut)](item: T, local_name: str, quotes: list[Quote]) -> T:
-    return item.model_copy(update={"local_name": local_name, "quotes": quotes})
+def named[T: (RelationOut, PropertyOut)](item: T, local_name: str, sentence: str) -> T:
+    return item.model_copy(update={"local_name": local_name, "sentence": sentence})
 
 
 async def identify(
@@ -137,15 +137,15 @@ async def test_documents_naming_one_concept_give_one_type_and_keep_what_hangs_on
             (
                 first,
                 [
-                    entity("new:Converter", "转炉", "Converter", quotes=[quote(0, HEAT_TEXT[:-1])]),
-                    entity("new:Heat", "炉次", "Heat", quotes=[quote(0, HEAT_TEXT[:-1])]),
+                    entity("new:Converter", "转炉", sentence="0.1"),
+                    entity("new:Heat", "炉次", sentence="0.1"),
                 ],
                 RelationsOut(
                     relations=[
                         named(
-                            relation("new:Heat", "new:Converter", "冶炼于", []),
+                            relation("new:Heat", "new:Converter", "冶炼于", None),
                             "smeltedIn",
-                            [quote(0, HEAT_TEXT[:-1])],
+                            "0.1",
                         )
                     ],
                     properties=[],
@@ -154,27 +154,22 @@ async def test_documents_naming_one_concept_give_one_type_and_keep_what_hangs_on
             (
                 second,
                 [
-                    entity(
-                        converter,
-                        "转炉",
-                        second_local_name,
-                        quotes=[quote(0, "转炉出钢时钢水流入钢包")],
-                    ),
-                    entity("new:Ladle", "钢包", "Ladle", quotes=[quote(0, "钢水流入钢包")]),
+                    entity(converter, "转炉", sentence="0.1"),
+                    entity("new:Ladle", "钢包", sentence="0.1"),
                 ],
                 RelationsOut(
                     relations=[
                         named(
-                            relation(converter, "new:Ladle", "出钢至", []),
+                            relation(converter, "new:Ladle", "出钢至", None),
                             "tapsInto",
-                            [quote(0, "转炉出钢时钢水流入钢包")],
+                            "0.1",
                         )
                     ],
                     properties=[
                         named(
                             prop(converter, "公称容量"),
                             "nominalCapacity",
-                            [quote(0, "转炉的公称容量为120吨")],
+                            "0.2",
                         )
                     ],
                 ),
@@ -204,8 +199,8 @@ CHUNK = ChunkText(id=uuid4(), seq=0, text="钢水由钢包吊运至精炼炉。�
 
 def test_new_types_with_the_same_one_character_name_become_one_type() -> None:
     types = [
-        entity("new:Steel", "钢", "Steel"),
-        entity("new:SteelMaterial", "钢", "Steel", synonyms=["钢材"]),
+        entity("new:Steel", "钢"),
+        entity("new:SteelMaterial", "钢", synonyms=["钢材"]),
     ]
     proposals = build_proposals([CHUNK], [], types, NO_RELATIONS)
 
@@ -218,8 +213,8 @@ def test_a_one_character_name_that_is_another_new_types_synonym_is_a_possible_du
     furnace_first: bool,
 ) -> None:
     types = [
-        entity("new:Converter", "转炉", "Converter", synonyms=["炉"]),
-        entity("new:Furnace", "炉", "Furnace"),
+        entity("new:Converter", "转炉", synonyms=["炉"]),
+        entity("new:Furnace", "炉"),
     ]
     if furnace_first:
         types.reverse()
@@ -252,9 +247,8 @@ async def test_pending_change_sets_adding_synonyms_to_one_type_both_take_effect(
                     entity(
                         grade_ref,
                         "钢种",
-                        "SteelGrade",
                         synonyms=["牌号"],
-                        quotes=[quote(0, "钢种又称牌号")],
+                        sentence="0.1",
                     )
                 ],
                 NO_RELATIONS,
@@ -265,9 +259,8 @@ async def test_pending_change_sets_adding_synonyms_to_one_type_both_take_effect(
                     entity(
                         grade_ref,
                         "钢种",
-                        "SteelGrade",
                         synonyms=["钢号"],
-                        quotes=[quote(0, "钢种在检验单上写作钢号")],
+                        sentence="0.1",
                     )
                 ],
                 NO_RELATIONS,
@@ -298,7 +291,7 @@ async def test_pending_change_sets_proposing_one_relation_give_one_relation(
     second = await add_document(db, ontology, "质量手册.md", text + "钢种由计划确定。")
 
     def smelts(local_name: str) -> RelationsOut:
-        link = named(relation(heat_ref, grade_ref, "冶炼", []), local_name, [quote(0, text[:-1])])
+        link = named(relation(heat_ref, grade_ref, "冶炼", None), local_name, "0.1")
         return RelationsOut(relations=[link], properties=[])
 
     first_change_set, second_change_set = await identify(
@@ -324,15 +317,15 @@ async def test_pending_change_sets_reusing_a_local_name_for_other_elements_keep_
     first = await add_document(db, ontology, "连铸规程.md", "每块板坯记录厚度。")
     second = await add_document(db, ontology, "热轧规程.md", "每个钢卷记录厚度。")
 
-    def thickness(domain: UUID, text: str) -> RelationsOut:
-        measured = named(prop(str(domain), "厚度"), "thickness", [quote(0, text)])
+    def thickness(domain: UUID) -> RelationsOut:
+        measured = named(prop(str(domain), "厚度"), "thickness", "0.1")
         return RelationsOut(relations=[], properties=[measured])
 
     first_change_set, second_change_set = await identify(
         app,
         [
-            (first, [], thickness(slab_id, "每块板坯记录厚度")),
-            (second, [], thickness(coil_id, "每个钢卷记录厚度")),
+            (first, [], thickness(slab_id)),
+            (second, [], thickness(coil_id)),
         ],
     )
     await sign_in(client, db, Role.ADMIN)
@@ -363,15 +356,15 @@ async def test_a_type_deleted_earlier_can_be_identified_again(
             (
                 document,
                 [
-                    entity("new:Converter", "转炉", "Converter", quotes=[quote(0, HEAT_TEXT[:-1])]),
-                    entity("new:Heat", "炉次", "Heat", quotes=[quote(0, HEAT_TEXT[:-1])]),
+                    entity("new:Converter", "转炉", sentence="0.1"),
+                    entity("new:Heat", "炉次", sentence="0.1"),
                 ],
                 RelationsOut(
                     relations=[
                         named(
-                            relation("new:Heat", "new:Converter", "冶炼于", []),
+                            relation("new:Heat", "new:Converter", "冶炼于", None),
                             "smeltedIn",
-                            [quote(0, HEAT_TEXT[:-1])],
+                            "0.1",
                         )
                     ],
                     properties=[],
@@ -410,9 +403,9 @@ def test_a_relation_with_an_existing_label_and_domain_but_another_range_is_propo
     relations = RelationsOut(
         relations=[
             named(
-                relation(str(heat.id), str(converter.id), "使用", []),
+                relation(str(heat.id), str(converter.id), "使用", None),
                 "usesConverter",
-                [quote(0, "每个炉次使用一座转炉冶炼")],
+                "0.2",
             )
         ],
         properties=[],
@@ -429,10 +422,10 @@ def test_relation_evidence_does_not_depend_on_where_the_lines_wrap() -> None:
     sentence = "每个炉次的钢水出钢后装入钢包，随后由行车吊运至精炼炉。"
     # Text extracted from a PDF breaks lines where the page does, here after 随后.
     wrapped = sentence.replace("随后", "随后\n")
-    types = [entity("new:Ladle", "钢包", "Ladle"), entity("new:Refiner", "精炼炉", "Refiner")]
+    types = [entity("new:Ladle", "钢包"), entity("new:Refiner", "精炼炉")]
     relations = RelationsOut(
-        # The model quotes the clause that states the move, not the whole sentence.
-        relations=[relation("new:Ladle", "new:Refiner", "运往", [quote(0, "由行车吊运至精炼炉")])],
+        # The model cites the sentence by its number: one sentence however the lines wrap.
+        relations=[relation("new:Ladle", "new:Refiner", "运往", "0.1")],
         properties=[],
     )
 
@@ -442,3 +435,5 @@ def test_relation_evidence_does_not_depend_on_where_the_lines_wrap() -> None:
 
     assert kept(sentence) == ["运往"]
     assert kept(wrapped) == ["运往"]
+    [one] = sentences_of([ChunkText(id=uuid4(), seq=0, text=wrapped)])
+    assert one.text == wrapped

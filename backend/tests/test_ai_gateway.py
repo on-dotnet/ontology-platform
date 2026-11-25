@@ -19,7 +19,7 @@ from ontology_platform.modules.ai.gateway import (
     OpenAIGateway,
 )
 from ontology_platform.modules.ai.models import AiRun
-from ontology_platform.settings import Settings
+from ontology_platform.settings import Settings, effort_value
 
 
 class Answer(BaseModel):
@@ -416,3 +416,30 @@ async def test_ping_does_not_probe_on_transient_models_errors(
     gateway, seen = ping_gateway(settings, status)
     assert await gateway.ping() is False
     assert [path.split()[0] for path in seen] == ["GET"]
+
+
+@pytest.mark.parametrize(("effort", "sent"), [("low", {"effort": "low"}), (None, None)])
+async def test_the_reasoning_effort_is_sent_only_when_given(
+    settings: Settings, effort: str | None, sent: dict[str, str] | None
+) -> None:
+    seen: list[dict[str, Any]] = []
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        seen.append(json.loads(request.content))
+        return stream('{"value": 1}')
+
+    gateway = OpenAIGateway(configured(settings), http_client=client_with(handler))
+    await gateway.structured(
+        purpose="test", model="m", instructions="i", text="t", schema=Answer, effort=effort
+    )
+    assert seen[0].get("reasoning") == sent
+
+
+def test_effort_settings_default_to_low_and_to_the_services_default() -> None:
+    settings = Settings()
+    assert (settings.ai_effort, settings.ai_reasoning_effort) == ("low", "default")
+    assert (effort_value("default"), effort_value("low"), effort_value("none")) == (
+        None,
+        "low",
+        "none",
+    )

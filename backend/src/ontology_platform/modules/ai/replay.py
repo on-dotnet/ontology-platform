@@ -36,8 +36,9 @@ def call_key(
     text: str,
     schema: type[BaseModel],
     files: Sequence[InputFile] = (),
+    effort: str | None = None,
 ) -> str:
-    payload = {
+    payload: dict[str, Any] = {
         "format": FORMAT,
         "purpose": purpose,
         "model": model,
@@ -49,6 +50,9 @@ def call_key(
             for item in files
         ],
     }
+    # Only when given, so that the keys of calls without an effort stay what they were.
+    if effort is not None:
+        payload["effort"] = effort
     encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 
@@ -74,8 +78,33 @@ def load_recordings(
     return records
 
 
+# Paid calls: attempts, seconds and tokens. "recorded…": the usage every call had when it was
+# recorded, paid now or replayed, so that runs compare whatever they replayed.
+STAGE_COUNTS = (
+    "calls",
+    "replayed",
+    "seconds",
+    "inputTokens",
+    "outputTokens",
+    "reasoningTokens",
+    "recordedSeconds",
+    "recordedInputTokens",
+    "recordedOutputTokens",
+    "recordedReasoningTokens",
+)
+_SECONDS = frozenset({"seconds", "recordedSeconds"})
+
+
 def _stage() -> dict[str, Any]:
-    return {"calls": 0, "replayed": 0, "seconds": 0.0, "inputTokens": 0, "outputTokens": 0}
+    return {key: 0.0 if key in _SECONDS else 0 for key in STAGE_COUNTS}
+
+
+def _add_recorded(stage: dict[str, Any], record: Mapping[str, Any]) -> None:
+    # Recordings made before these fields existed have no seconds or reasoning tokens.
+    stage["recordedSeconds"] += record.get("seconds", 0.0)
+    stage["recordedInputTokens"] += record.get("inputTokens", 0)
+    stage["recordedOutputTokens"] += record.get("outputTokens", 0)
+    stage["recordedReasoningTokens"] += record.get("reasoningTokens", 0)
 
 
 class ReplayGateway:
@@ -112,6 +141,7 @@ class ReplayGateway:
         schema: type[T],
         files: Sequence[InputFile] = (),
         document_id: Any = None,
+        effort: str | None = None,
     ) -> T:
         key = call_key(
             purpose=purpose,
@@ -120,6 +150,7 @@ class ReplayGateway:
             text=text,
             schema=schema,
             files=files,
+            effort=effort,
         )
         document = self._labels.get(document_id)
         stage = self._stats.setdefault(document or "-", {}).setdefault(purpose, _stage())
@@ -128,6 +159,7 @@ class ReplayGateway:
         if record is not None:
             stage["replayed"] += 1
             stage["seconds"] += time.monotonic() - started
+            _add_recorded(stage, record)
             # A fresh object each time: callers extend the lists of what they get.
             return schema.model_validate(record["output"])
         if self._inner is None:
@@ -146,14 +178,17 @@ class ReplayGateway:
             schema=schema,
             files=files,
             document_id=document_id,
+            effort=effort,
         )
         # Usage since the last take is this call's: extraction makes its calls one at a time.
         # Concurrent calls through one gateway would need usage handed back per call instead.
-        attempts, input_tokens, output_tokens = _take_usage(self._inner)
+        attempts, input_tokens, output_tokens, reasoning_tokens = _take_usage(self._inner)
+        seconds = time.monotonic() - started
         stage["calls"] += attempts
         stage["inputTokens"] += input_tokens
         stage["outputTokens"] += output_tokens
-        stage["seconds"] += time.monotonic() - started
+        stage["reasoningTokens"] += reasoning_tokens
+        stage["seconds"] += seconds
         record = {
             "format": FORMAT,
             "key": key,
@@ -165,7 +200,10 @@ class ReplayGateway:
             "attempts": attempts,
             "inputTokens": input_tokens,
             "outputTokens": output_tokens,
+            "reasoningTokens": reasoning_tokens,
+            "seconds": round(seconds, 1),
         }
+        _add_recorded(stage, record)
         self._recordings[key] = record
         self.new_recordings[key] = record
         return result
@@ -184,19 +222,23 @@ class ReplayGateway:
         """Per document and stage: paid calls (attempts), replayed calls, seconds, tokens."""
         return {
             document: {
-                purpose: {**stage, "seconds": round(stage["seconds"], 1)}
+                purpose: {
+                    **stage,
+                    "seconds": round(stage["seconds"], 1),
+                    "recordedSeconds": round(stage["recordedSeconds"], 1),
+                }
                 for purpose, stage in stages.items()
             }
             for document, stages in self._stats.items()
         }
 
 
-def _take_usage(gateway: ModelGateway) -> tuple[int, int, int]:
+def _take_usage(gateway: ModelGateway) -> tuple[int, int, int, int]:
     take = getattr(gateway, "take_usage", None)
     if take is None:
-        return 1, 0, 0
-    attempts, input_tokens, output_tokens = take()
-    return int(attempts), int(input_tokens), int(output_tokens)
+        return 1, 0, 0, 0
+    attempts, input_tokens, output_tokens, reasoning_tokens = take()
+    return int(attempts), int(input_tokens), int(output_tokens), int(reasoning_tokens)
 
 
 class MeteredGateway(OpenAIGateway):
@@ -204,7 +246,7 @@ class MeteredGateway(OpenAIGateway):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self._usage = [0, 0, 0]
+        self._usage = [0, 0, 0, 0]
 
     async def _record(
         self, call: "_Call[Any]", started: float, usage: Any, error_code: str | None
@@ -212,9 +254,11 @@ class MeteredGateway(OpenAIGateway):
         self._usage[0] += 1
         self._usage[1] += getattr(usage, "input_tokens", None) or 0
         self._usage[2] += getattr(usage, "output_tokens", None) or 0
+        details = getattr(usage, "output_tokens_details", None)
+        self._usage[3] += getattr(details, "reasoning_tokens", None) or 0
 
-    def take_usage(self) -> tuple[int, int, int]:
-        """Attempts and tokens since the last call of this method."""
-        attempts, input_tokens, output_tokens = self._usage
-        self._usage = [0, 0, 0]
-        return attempts, input_tokens, output_tokens
+    def take_usage(self) -> tuple[int, int, int, int]:
+        """Attempts, input, output and reasoning tokens since the last call of this method."""
+        attempts, input_tokens, output_tokens, reasoning_tokens = self._usage
+        self._usage = [0, 0, 0, 0]
+        return attempts, input_tokens, output_tokens, reasoning_tokens
