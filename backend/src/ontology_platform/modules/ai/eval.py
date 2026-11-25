@@ -43,12 +43,16 @@ from datetime import UTC, datetime, timedelta
 from typing import Any, cast
 from uuid import UUID, uuid5
 
+from ontology_platform.modules.ai.candidates import group_recall
 from ontology_platform.modules.ai.extraction import (
     ChunkText,
     ExtractionModels,
     Extractor,
+    JudgedPair,
     KnownElement,
+    PendingType,
     Proposal,
+    ProposedMatch,
     normalize,
 )
 from ontology_platform.modules.ai.gateway import AiError, ModelGateway
@@ -65,6 +69,8 @@ from ontology_platform.modules.ontology.schemas import ElementFields
 from ontology_platform.modules.ontology.service import (
     PlanElement,
     PlanItem,
+    PlanMatch,
+    PlanMatchedBy,
     Resolution,
     plan_merge,
 )
@@ -103,8 +109,15 @@ class WorkingVersion:
     def __init__(self) -> None:
         self.elements: list[KnownElement] = []
         self.parents: dict[UUID, UUID] = {}
-        # Flags of the item that created an element: whether a duplicate was marked.
+        # Flags of the item that created an element: whether a duplicate was marked ("aligned":
+        # the item carried an alignment record).
         self.flags: dict[UUID, tuple[str, ...]] = {}
+        # Merged items: the element each went into or created, the decision its reviewer wrote,
+        # and the records that point at items of other change sets (spec 004, 5.3).
+        self.made: dict[UUID, UUID] = {}
+        self.decisions: dict[UUID, str] = {}
+        self.records: dict[UUID, list[PlanMatchedBy]] = {}
+        self._merges = 0
 
     def copy(self) -> "WorkingVersion":
         other = WorkingVersion()
@@ -113,28 +126,72 @@ class WorkingVersion:
             dict(self.parents),
             dict(self.flags),
         )
+        other.made, other.decisions = dict(self.made), dict(self.decisions)
+        other.records = {key: list(value) for key, value in self.records.items()}
+        other._merges = self._merges
         return other
 
-    def merge(self, proposals: Sequence[Proposal]) -> list[str]:
-        """Merges one change set with every item accepted; returns the codes of skipped items."""
-        items = [
-            PlanItem(
-                id=stable_id("item", str(seq)),
-                seq=seq,
-                op=proposal.op,
-                kind=proposal.kind,
-                decision="accepted",
-                temp_ref=proposal.temp_ref,
-                target_element_id=proposal.target_element_id,
-                target_revision=proposal.target_revision,
-                fields=to_item(proposal, _EVAL_DOCUMENT).proposed,
-                edited=False,
+    def known(self) -> list[KnownElement]:
+        """The elements as an extraction sees them, object types with their parents."""
+        return [replace(e, parent_id=self.parents.get(e.id)) for e in self.elements]
+
+    def merge(
+        self,
+        proposals: Sequence[Proposal],
+        label: str | None = None,
+        decide: "Callable[[Proposal, ProposedMatch], str | None] | None" = None,
+    ) -> list[str]:
+        """Merges one change set with every item accepted; returns the codes of skipped items.
+
+        `label` names the change set, so that items of later ones can refer to its items (as
+        pending ones); `decide` is the reviewer's decision on an item's alignment record.
+        """
+        self._merges += 1
+        label = label if label is not None else f"#{self._merges}"
+        ids = [item_id(label, seq) for seq in range(1, len(proposals) + 1)]
+        by_ref = {
+            proposal.temp_ref: ids[index]
+            for index, proposal in enumerate(proposals)
+            if proposal.op == "create" and proposal.temp_ref
+        }
+        merged_at = self._merges
+        items: list[PlanItem] = []
+        for seq, proposal in enumerate(proposals, start=1):
+            own = ids[seq - 1]
+            record = proposal.match
+            match: PlanMatch | None = None
+            decision: str | None = None
+            if record is not None:
+                other = record.item_id or (by_ref.get(record.temp_ref) if record.temp_ref else None)
+                match = PlanMatch(
+                    record.kind,
+                    element_id=record.element_id,
+                    item_id=other,
+                    item_element_id=self.made.get(other) if other else None,
+                    other_decision=self.decisions.get(other) if other else None,
+                )
+                decision = decide(proposal, record) if decide is not None else None
+            items.append(
+                PlanItem(
+                    id=own,
+                    seq=seq,
+                    op=proposal.op,
+                    kind=proposal.kind,
+                    decision="accepted",
+                    temp_ref=proposal.temp_ref,
+                    target_element_id=proposal.target_element_id,
+                    target_revision=proposal.target_revision,
+                    fields=to_item(proposal, _EVAL_DOCUMENT).proposed,
+                    edited=False,
+                    match=match,
+                    match_decision=decision,
+                    matched_by=tuple(self.records.get(own, ())),
+                )
             )
-            for seq, proposal in enumerate(proposals, start=1)
-        ]
         plan = plan_merge(items, self._plan_elements(), base_iri=BASE_IRI)
         proposal_of = {item.id: proposal for item, proposal in zip(items, proposals, strict=True)}
         creates = {item.temp_ref: item for item in items if item.op == "create" and item.temp_ref}
+        by_item = {item.id: item for item in items}
         outcomes: dict[UUID, str | None] = {}
         made: dict[UUID, UUID] = {}  # item -> the element it created or went into
         visiting: set[UUID] = set()
@@ -146,7 +203,7 @@ class WorkingVersion:
             visiting.add(item.id)
             try:
                 outcome, element_id = self._apply(
-                    item, proposal_of[item.id], plan.get(item.id), resolve
+                    item, proposal_of[item.id], plan.get(item.id), resolve, joined
                 )
             finally:
                 visiting.discard(item.id)
@@ -171,11 +228,36 @@ class WorkingVersion:
                 return DEPENDENCY_SKIPPED, None
             return None, made[dependency.id]
 
+        def joined(target: UUID) -> UUID | None:
+            """The element an item of this change set made, applying it first; None if not."""
+            dependency = by_item[target]
+            if dependency.id in visiting or apply(dependency) is not None:
+                return None
+            return made.get(dependency.id)
+
         for item in items:
             apply(item)
         # New elements keep the order of their items, whatever order dependencies made them in.
-        seq_of = {made[item.id]: item.seq for item in items if item.id in made}
+        seq_of = {
+            element_id: item.seq for item in reversed(items) if (element_id := made.get(item.id))
+        }
         self.elements[start:] = sorted(self.elements[start:], key=lambda e: seq_of[e.id])
+        for item in items:
+            if item.id not in made:
+                continue
+            self.made[item.id] = made[item.id]
+            if item.match_decision is not None:
+                self.decisions[item.id] = item.match_decision
+            record = item.match
+            if record is not None and record.item_id and record.item_id not in by_item:
+                self.records.setdefault(record.item_id, []).append(
+                    PlanMatchedBy(
+                        record.kind,
+                        made[item.id],
+                        item.match_decision,
+                        _EPOCH + timedelta(seconds=merged_at),
+                    )
+                )
         return [code for item in items if (code := outcomes[item.id]) is not None]
 
     def _plan_elements(self) -> list[PlanElement]:
@@ -209,6 +291,7 @@ class WorkingVersion:
         proposal: Proposal,
         resolution: Resolution | None,
         resolve: Callable[[str], tuple[str | None, UUID | None]],
+        joined: Callable[[UUID], UUID | None],
     ) -> tuple[str | None, UUID | None]:
         """The code the item is skipped with (or None) and the element it went into."""
         by_id = {element.id: element for element in self.elements}
@@ -230,6 +313,13 @@ class WorkingVersion:
                 return outcome, None
             refs[name] = element_id
         by_id = {element.id: element for element in self.elements}  # resolving may add some
+        if resolution is not None and resolution.mode == "into" and resolution.item_id:
+            joined_id = joined(resolution.item_id)
+            if joined_id is not None:
+                target = next(e for e in self.elements if e.id == joined_id)
+                self._add_to(target, item.fields, refs.get("parent_ref"))
+                return None, joined_id
+            # The item it goes into was not applied: it is created on its own.
         if resolution is not None and resolution.mode == "into" and resolution.element_id:
             self._add_to(by_id[resolution.element_id], item.fields, refs.get("parent_ref"))
             return None, resolution.element_id
@@ -256,7 +346,7 @@ class WorkingVersion:
         )
         if refs.get("parent_ref") is not None:
             self.parents[element_id] = cast(UUID, refs["parent_ref"])
-        self.flags[element_id] = tuple(proposal.flags)
+        self.flags[element_id] = tuple(proposal.flags) + (("aligned",) if proposal.match else ())
         return None, element_id
 
     def _new_id(self, kind: str, local_name: str) -> UUID:
@@ -317,6 +407,11 @@ class WorkingVersion:
 _EVAL_DOCUMENT = UUID(int=0)
 
 
+def item_id(label: str, seq: int) -> UUID:
+    """The id of a change set's item in a run: later documents see it as a pending item."""
+    return stable_id("item", label, str(seq))
+
+
 def _uuid(value: str) -> UUID | None:
     try:
         return UUID(value)
@@ -330,7 +425,8 @@ def merge_counts(
     """What merging left behind (spec 004, section 10), for a reviewer who accepts everything.
 
     Duplicate types are groups of the expected list with several types: by main name (the
-    same Chinese label), marked (a member was proposed as a possible duplicate) or unmarked.
+    same Chinese label), marked (a member was proposed as a possible duplicate or with an
+    alignment record) or unmarked.
     Duplicate relations have the ends and the label of an earlier one.
     """
     codes = Counter(skipped)
@@ -367,7 +463,11 @@ def merge_counts(
         found
         for found in duplicates
         if found not in same_name
-        and any("possible_duplicate" in version.flags.get(e.id, ()) for e in found)
+        and any(
+            flag in ("possible_duplicate", "aligned")
+            for e in found
+            for flag in version.flags.get(e.id, ())
+        )
     ]
     counts["duplicateTypeGroups"] = {
         "total": len(duplicates),
@@ -401,6 +501,7 @@ def load_elements(saved: Sequence[dict[str, Any]]) -> list[KnownElement]:
                 "synonyms": tuple(item["synonyms"]),
                 "domain_id": uuid_or_none(item["domain_id"]),
                 "range_id": uuid_or_none(item["range_id"]),
+                "parent_id": uuid_or_none(item.get("parent_id")),
             }
         )
         for item in saved
@@ -684,6 +785,151 @@ def _documents(files: Mapping[str, bytes]) -> list[_Document]:
     return documents
 
 
+REVIEWS = ("acceptAll", "byFlags")
+# Label of the sequential scenario's documents in the by-flags review, apart in the usage.
+_BY_FLAGS = "{name} (by flags)"
+# The thresholds the evaluation compares (spec 004, 4.1).
+_THRESHOLDS = (0.5, 0.6)
+
+
+def pending_of(
+    label: str, proposals: Sequence[Proposal], known: Sequence[KnownElement]
+) -> list[PendingType]:
+    """The object types a change set proposes, as later documents see them while it is open."""
+    by_ref = {p.temp_ref: p for p in proposals if p.op == "create" and p.temp_ref}
+    labels = {str(element.id): element.label_zh for element in known}
+    out: list[PendingType] = []
+    for seq, proposal in enumerate(proposals, start=1):
+        if proposal.op != "create" or proposal.kind != "entity_type":
+            continue
+        parent = proposal.fields.get("parentRef")
+        parent_label = (
+            by_ref[parent].fields["labelZh"] if parent in by_ref else labels.get(parent or "")
+        )
+        out.append(
+            PendingType(
+                item_id=item_id(label, seq),
+                change_set_id=stable_id("changeset", label),
+                change_set_title=label,
+                label_zh=proposal.fields["labelZh"],
+                label_en=proposal.fields.get("labelEn"),
+                synonyms=tuple(s["text"] for s in proposal.fields["synonyms"]),
+                definition_zh=proposal.fields.get("definitionZh"),
+                parent_label=parent_label,
+                members=tuple(
+                    other.fields["labelZh"]
+                    for other in proposals
+                    if other.kind != "entity_type"
+                    and other.fields.get("domainRef") == proposal.temp_ref
+                ),
+            )
+        )
+    return out
+
+
+def _proposal_names(proposal: Proposal) -> set[str]:
+    fields = proposal.fields
+    values = [fields.get("labelZh") or "", fields.get("labelEn") or ""]
+    values += [s["text"] for s in fields.get("synonyms") or []]
+    return {normalize(value) for value in values if value}
+
+
+class FlagReviewer:
+    """The by-flags review (spec 004, section 10): a possible duplicate is merged when the
+    other side is in the same expected group and kept apart otherwise; a type the model judged
+    the same is kept apart when the other side is not in its group. Everything else is
+    accepted as proposed."""
+
+    def __init__(self, expected: Mapping[str, Any]) -> None:
+        self.groups = [{normalize(n) for n in group["names"]} for group in expected["entity_types"]]
+        self.items: dict[UUID, set[str]] = {}
+
+    def remember(self, label: str, proposals: Sequence[Proposal]) -> None:
+        for seq, proposal in enumerate(proposals, start=1):
+            self.items[item_id(label, seq)] = _proposal_names(proposal)
+
+    def decider(
+        self, version: WorkingVersion, proposals: Sequence[Proposal]
+    ) -> Callable[[Proposal, ProposedMatch], str | None]:
+        by_ref = {p.temp_ref: p for p in proposals if p.temp_ref}
+
+        def group(names: set[str]) -> int | None:
+            return next((i for i, g in enumerate(self.groups) if names & g), None)
+
+        def decide(proposal: Proposal, record: ProposedMatch) -> str | None:
+            other: set[str] = set()
+            if record.element_id is not None:
+                element = next((e for e in version.elements if e.id == record.element_id), None)
+                other = _names(element) if element is not None else set()
+            elif record.item_id is not None:
+                other = self.items.get(record.item_id, set())
+            elif record.temp_ref in by_ref:
+                other = _proposal_names(by_ref[record.temp_ref])
+            mine = group(_proposal_names(proposal))
+            together = mine is not None and mine == group(other)
+            if record.kind == "possible":
+                return "same" if together else "different"
+            return None if together else "different"
+
+        return decide
+
+
+def resolve_counts(
+    pairs: Sequence[JudgedPair], expected: Mapping[str, Any] | None, trimmed: Counter[str]
+) -> dict[str, Any]:
+    """The pairs the resolve calls judged, overall and in the band between the thresholds."""
+    groups = (
+        [{normalize(n) for n in g["names"]} for g in expected["entity_types"]] if expected else []
+    )
+
+    def together(pair: JudgedPair) -> bool | None:
+        if not groups:
+            return None
+        a = {normalize(n) for n in pair.names if n}
+        b = {normalize(n) for n in pair.candidate_names if n}
+        mine = next((i for i, g in enumerate(groups) if a & g), None)
+        return mine is not None and mine == next((i for i, g in enumerate(groups) if b & g), None)
+
+    def summary(selected: Sequence[JudgedPair]) -> dict[str, Any]:
+        verdicts = Counter(str(pair.verdict) for pair in selected)
+        out: dict[str, Any] = {"pairs": len(selected), "verdicts": dict(sorted(verdicts.items()))}
+        if groups:
+            out["sameGroup"] = sum(together(pair) is True for pair in selected)
+            out["sameJudgedRight"] = sum(
+                pair.verdict == "same" and together(pair) is True for pair in selected
+            )
+            out["sameJudgedWrong"] = sum(
+                pair.verdict == "same" and together(pair) is False for pair in selected
+            )
+        return out
+
+    low, high = _THRESHOLDS
+    return {
+        "all": summary(pairs),
+        "band": {
+            "from": low,
+            "below": high,
+            **summary([p for p in pairs if low <= p.score < high]),
+            "examples": sorted(
+                f"{p.names[0]} / {p.candidate_names[0]}: {p.verdict}"
+                for p in pairs
+                if low <= p.score < high
+            )[:40],
+        },
+        "trimmed": dict(sorted(trimmed.items())),
+    }
+
+
+def shortlist_recall(expected: Mapping[str, Any]) -> dict[str, Any]:
+    """The free lower bound of the shortlist's recall (spec 004, 4.1), per threshold."""
+    groups = [group["names"] for group in expected["entity_types"]]
+    out: dict[str, Any] = {}
+    for threshold in _THRESHOLDS:
+        hits, total = group_recall(groups, threshold)
+        out[str(threshold)] = {"pairs": total, "candidates": hits, "recall": _ratio(hits, total)}
+    return out
+
+
 async def run_case(
     files: Mapping[str, bytes],
     gateway: ReplayGateway,
@@ -694,8 +940,12 @@ async def run_case(
 
     The sequential scenario merges each document's change set before identifying the next one;
     its result is the top level. The same-baseline one (`sameBaseline`) identifies every
-    document against the starting ontology first and merges the change sets in order after,
-    as when documents are uploaded together and reviewed later (spec 004, section 10).
+    document against the starting ontology first, each seeing the earlier ones' items as
+    pending, and merges the change sets in order after, as when documents are uploaded together
+    and reviewed later (spec 004, section 10). Both are reported for a reviewer who accepts
+    everything and, with expected answers, for one who follows the flags (`byFlags`); in the
+    sequential scenario the latter is a run of its own, since merging decides what later
+    documents see.
     """
     # The sequential scenario is the one comparable with the baselines: it always runs.
     if "sequential" not in scenarios or set(scenarios) - set(SCENARIOS):
@@ -705,8 +955,16 @@ async def run_case(
     expected = parse_expected(answers.decode("utf-8")) if answers is not None else None
     documents = _documents(files)
     extractor = Extractor(gateway, models)
+    pairs: dict[str, list[JudgedPair]] = {}
+    trimmed: dict[str, Counter[str]] = {}
 
-    async def identify(document: _Document, label: str, version: WorkingVersion) -> list[Proposal]:
+    async def identify(
+        document: _Document,
+        label: str,
+        version: WorkingVersion,
+        scenario: str,
+        pending: Sequence[PendingType] = (),
+    ) -> list[Proposal]:
         document_id = stable_id("document", label)
         gateway.label(document_id, label)
         log(
@@ -722,41 +980,104 @@ async def run_case(
             document_id=document_id,
             title=document.name,
             chunks=document.chunks,
-            known=version.elements,
+            known=version.known(),
             progress=progress,
+            pending=pending,
         )
         log(f"    {time.monotonic() - started:.1f} s")
+        pairs.setdefault(scenario, []).extend(extractor.last.pairs)
+        trimmed.setdefault(scenario, Counter()).update(extractor.last.trimmed)
         return proposals
 
-    version = WorkingVersion()
-    skipped: list[str] = []
-    proposed: list[Proposal] = []
-    for document in documents:
-        proposals = await identify(document, document.name, version)
-        proposed += proposals
-        skipped += version.merge(proposals)
+    async def sequential(review: str) -> tuple[WorkingVersion, list[str], list[Proposal]]:
+        version = WorkingVersion()
+        reviewer = FlagReviewer(expected) if expected is not None else None
+        skipped: list[str] = []
+        proposed: list[Proposal] = []
+        for document in documents:
+            label = document.name if review == "acceptAll" else _BY_FLAGS.format(name=document.name)
+            proposals = await identify(document, label, version, f"sequential/{review}")
+            proposed += proposals
+            decide = None
+            if review == "byFlags" and reviewer is not None:
+                reviewer.remember(label, proposals)
+                decide = reviewer.decider(version, proposals)
+            skipped += version.merge(proposals, label, decide)
+        return version, skipped, proposed
+
+    version, skipped, proposed = await sequential("acceptAll")
     labels = [document.name for document in documents]
     result = _scenario(version, skipped, proposed, expected, _usage(gateway, labels))
+    result["resolve"] = resolve_counts(
+        pairs["sequential/acceptAll"], expected, trimmed["sequential/acceptAll"]
+    )
+    if expected is not None:
+        result["shortlistRecall"] = shortlist_recall(expected)
+        version, skipped, proposed = await sequential("byFlags")
+        labels = [_BY_FLAGS.format(name=document.name) for document in documents]
+        result["byFlags"] = _review(version, skipped, expected, _usage(gateway, labels))
     if "sameBaseline" in scenarios:
         baseline = WorkingVersion()
-        identified = [
-            await identify(document, _SAME_BASELINE.format(name=document.name), baseline)
-            for document in documents
-        ]
-        version, skipped = baseline.copy(), []
-        for proposals in identified:
-            skipped += version.merge(proposals)
-        labels = [_SAME_BASELINE.format(name=document.name) for document in documents]
+        identified: list[tuple[str, list[Proposal]]] = []
+        for document in documents:
+            label = _SAME_BASELINE.format(name=document.name)
+            pending = [
+                item
+                for earlier, proposals in identified
+                for item in pending_of(earlier, proposals, baseline.elements)
+            ]
+            proposals = await identify(document, label, baseline, "sameBaseline", pending)
+            identified.append((label, proposals))
+        labels = [label for label, _ in identified]
+        reviews = REVIEWS if expected is not None else REVIEWS[:1]
+        outcomes: dict[str, tuple[WorkingVersion, list[str]]] = {}
+        for review in reviews:
+            version, skipped = baseline.copy(), []
+            reviewer = FlagReviewer(expected) if expected is not None else None
+            for label, proposals in identified:
+                decide = None
+                if review == "byFlags" and reviewer is not None:
+                    reviewer.remember(label, proposals)
+                    decide = reviewer.decider(version, proposals)
+                skipped += version.merge(proposals, label, decide)
+            outcomes[review] = (version, skipped)
+        version, skipped = outcomes["acceptAll"]
         same = _scenario(
             version,
             skipped,
-            [p for proposals in identified for p in proposals],
+            [p for _, proposals in identified for p in proposals],
             expected,
             _usage(gateway, labels),
         )
+        same["resolve"] = resolve_counts(pairs["sameBaseline"], expected, trimmed["sameBaseline"])
+        if "byFlags" in outcomes and expected is not None:
+            version, skipped = outcomes["byFlags"]
+            same["byFlags"] = _review(version, skipped, expected, None)
         result["sameBaseline"] = same
     result["models"] = asdict(models)
     return result
+
+
+def _review(
+    version: WorkingVersion,
+    skipped: Sequence[str],
+    expected: dict[str, Any],
+    usage: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """The scores and merge counts of the by-flags review."""
+    scored = score(version.elements, expected, version.parents)
+    out: dict[str, Any] = {
+        section: {
+            key: value
+            for key, value in scored[section].items()
+            if key in ("predicted", "precision", "recall")
+        }
+        for section in ("entityTypes", "relations", "properties", "hierarchy")
+    }
+    out["merge"] = {**merge_counts(version, skipped, expected), "review": "byFlags"}
+    if usage is not None:
+        out["usage"] = usage["total"]
+    return out
 
 
 def _scenario(
@@ -781,6 +1102,9 @@ def _scenario(
     ungrounded = sum("evidence_not_found" in p.flags for p in proposals)
     result["proposals"] = len(proposals)
     result["groundedShare"] = round(1 - ungrounded / len(proposals), 3) if proposals else None
+    result["aligned"] = dict(
+        sorted(Counter(p.match.kind for p in proposals if p.match is not None).items())
+    )
     result["merge"] = merge_counts(version, skipped, expected)
     result["usage"] = usage
     result["elements"] = dump_elements(known)

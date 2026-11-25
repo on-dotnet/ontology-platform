@@ -27,6 +27,7 @@ from ontology_platform.modules.ai.extraction import ExtractionModels, KnownEleme
 from ontology_platform.modules.ai.gateway import AiUnavailableError, InputFile
 from ontology_platform.modules.ai.replay import ReplayGateway, ReplayMissError, load_recordings
 from ontology_platform.settings import Settings
+from test_ai_extraction import judge
 
 EXPECTED = {
     "entity_types": [
@@ -384,6 +385,9 @@ class ModelStandIn:
     ) -> T:
         self.calls += 1
         second = "b.md" in text.splitlines()[0]
+        if purpose == "extract.resolve":
+            # Each type judged a different concept from its candidates.
+            return schema.model_validate(judge()(text).model_dump())
         if purpose == "extract.terms":
             return schema.model_validate({"terms": []})
         shown = _HEAT_ID.findall(text)
@@ -456,12 +460,14 @@ async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> Non
     recorder = ReplayGateway({}, model)
     recorded = await run_case(CASE_FILES, recorder, MODELS)
     assert recorded["relations"]["recall"] == 1.0
-    # Terms, types and relations of each document, and two more: in the same-baseline scenario
-    # b.md is shown no 炉次 of a.md, so its types and relations calls see another input.
-    assert model.calls == 8
+    # Terms, types and relations of each document, the resolve call of b.md (浇次 and 炉次), and
+    # three more: in the same-baseline scenario b.md is shown no 炉次 of a.md, so its types and
+    # relations calls see another input, and its resolve call sees 炉次 as a pending item as well.
+    # The by-flags review of the sequential scenario repeats the same inputs: all replayed.
+    assert model.calls == 10
     assert recorded["usage"]["documents"]["docs/b.md"]["extract.types"]["calls"] == 1
     assert recorded["sameBaseline"]["usage"]["total"] == {
-        "calls": 2,
+        "calls": 3,
         "replayed": 4,
         "seconds": recorded["sameBaseline"]["usage"]["total"]["seconds"],
         "inputTokens": 0,
@@ -503,7 +509,7 @@ async def test_the_same_baseline_scenario_can_be_left_out() -> None:
     model = ModelStandIn()
     result = await run_case(CASE_FILES, ReplayGateway({}, model), MODELS, ["sequential"])
     assert "sameBaseline" not in result
-    assert model.calls == 6
+    assert model.calls == 7  # with the resolve call of b.md
     with pytest.raises(ValueError, match="sequential"):
         await run_case(CASE_FILES, ReplayGateway({}, model), MODELS, ["sameBaseline"])
 
@@ -515,7 +521,7 @@ async def test_a_case_without_answers_is_run_but_not_scored_and_can_be_scored_la
     assert result["scored"] is False
     assert result["entityTypes"] == {"predicted": 2}
     assert result["relations"] == {"predicted": 1}
-    assert result["usage"]["total"]["calls"] == 6
+    assert result["usage"]["total"]["calls"] == 7  # with the resolve call of b.md
 
     expected = tomllib.loads(CASE_FILES["eval/expected.toml"].decode())
     parents = {UUID(c): UUID(p) for c, p in result["parents"].items()}

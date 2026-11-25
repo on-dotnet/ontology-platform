@@ -169,6 +169,8 @@ plan_merge = mergeplan.plan_merge
 PlanItem = mergeplan.PlanItem
 PlanElement = mergeplan.PlanElement
 Resolution = mergeplan.Resolution
+PlanMatch = mergeplan.PlanMatch
+PlanMatchedBy = mergeplan.PlanMatchedBy
 
 
 async def ontology_exists(db: AsyncSession, ontology_id: UUID) -> bool:

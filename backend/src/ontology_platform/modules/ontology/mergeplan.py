@@ -55,6 +55,32 @@ class PlanElement:
 
 
 @dataclass(frozen=True, slots=True)
+class PlanMatch:
+    """The alignment record of an item (spec 004, 4.3): what it was found to be the same as.
+
+    The other side is an element, or a create item: of this change set, or of another one, in
+    which case the caller fills in the element that item was merged into (None while it is
+    pending) and the decision its reviewer wrote on it.
+    """
+
+    kind: str  # same | possible
+    element_id: UUID | None = None
+    item_id: UUID | None = None
+    item_element_id: UUID | None = None
+    other_decision: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class PlanMatchedBy:
+    """A merged item of another change set whose record points at this item."""
+
+    kind: str
+    element_id: UUID  # what the other item was merged into
+    decision: str | None
+    created_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
 class PlanItem:
     """A change item with the fields a merge applies (the reviewer's edit over the proposal)."""
 
@@ -68,6 +94,10 @@ class PlanItem:
     target_revision: int | None
     fields: ElementFields
     edited: bool
+    match: PlanMatch | None = None
+    # The reviewer's conclusion about the item's alignment: same | different.
+    match_decision: str | None = None
+    matched_by: tuple[PlanMatchedBy, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -80,6 +110,19 @@ class Resolution:
     local_name: str | None = None
     # into, update: fields (wire names) the element already has a value for, which stays.
     kept_fields: tuple[str, ...] = ()
+    # into: an item of this change set whose new element this one goes into (no element yet).
+    item_id: UUID | None = None
+
+
+def same_concept(kind: str, *decisions: str | None) -> bool:
+    """The effective conclusion of an alignment record (spec 004, 5.3).
+
+    Either side kept apart: not the same. Otherwise either side merged: the same. Without a
+    decision, the record itself: "same" is, "possible" is not.
+    """
+    if "different" in decisions:
+        return False
+    return "same" in decisions or kind == "same"
 
 
 def name_key(text: str) -> str:
@@ -158,14 +201,47 @@ def plan_merge(
         resolution = plan.get(by_ref[ref].id) if ref in by_ref else None
         return resolution.element_id if resolution and resolution.mode == "into" else None
 
+    def active_type(element_id: UUID | None) -> PlanElement | None:
+        element = by_id.get(element_id) if element_id else None
+        ok = element is not None and element.kind == "entity_type" and element.status == "active"
+        return element if ok else None
+
+    by_item = {item.id: item for item in creates}
     # Object types first: relations and properties are the same as existing ones only once
-    # their ends are known.
+    # their ends are known. An object type is an active one of the same main name, or what its
+    # alignment record says it is (spec 004, 5.3).
     for item in creates:
         if item.kind != "entity_type":
             continue
         target = next(
             (e for e in active if e.kind == "entity_type" and same_name(item.fields, e)), None
         )
+        record = item.match
+        if (
+            target is None
+            and record is not None
+            and same_concept(record.kind, item.match_decision, record.other_decision)
+        ):
+            target = active_type(record.element_id) or active_type(record.item_element_id)
+            other = by_item.get(record.item_id) if record.item_id else None
+            if target is None and other is not None and other.seq < item.seq:
+                found = plan.get(other.id)
+                if found is not None and found.mode == "into":
+                    plan[item.id] = found
+                else:
+                    plan[item.id] = Resolution("into", item_id=other.id)
+                continue
+        if target is None:
+            reverse = sorted(
+                (
+                    entry
+                    for entry in item.matched_by
+                    if same_concept(entry.kind, entry.decision, item.match_decision)
+                    and active_type(entry.element_id) is not None
+                ),
+                key=lambda entry: entry.created_at,
+            )
+            target = active_type(reverse[0].element_id) if reverse else None
         if target is not None:
             into(item, target)
     for item in creates:
@@ -315,7 +391,8 @@ def plan_token(
             continue
         resolution = plan.get(item.id)
         if resolution is not None and resolution.mode != "create":
-            target = str(resolution.element_id) if resolution.element_id else None
+            target_id = resolution.element_id or resolution.item_id
+            target = str(target_id) if target_id else None
             entries.append(
                 [
                     str(item.id),

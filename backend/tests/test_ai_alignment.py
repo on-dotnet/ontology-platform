@@ -45,14 +45,6 @@ MODELS = ExtractionModels(standard="std", reasoning="deep")
 NO_RELATIONS = RelationsOut(relations=[], properties=[])
 
 
-def delivered_by(change: str) -> pytest.MarkDecorator:
-    """Marks what a later change of spec 004 (section 11) delivers.
-
-    Strict: the change that makes the test pass has to remove the mark.
-    """
-    return pytest.mark.xfail(strict=True, reason=f"spec 004, section 11: {change}")
-
-
 async def add_document(db: AsyncSession, ontology: Ontology, filename: str, text: str) -> UUID:
     document = Document(
         id=uuid4(),
@@ -206,7 +198,6 @@ async def test_documents_naming_one_concept_give_one_type_and_keep_what_hangs_on
 CHUNK = ChunkText(id=uuid4(), seq=0, text="钢水由钢包吊运至精炼炉。每个炉次使用一座转炉冶炼。")
 
 
-@delivered_by("PR 3")
 def test_new_types_with_the_same_one_character_name_become_one_type() -> None:
     types = [
         entity("new:Steel", "钢", "Steel"),
@@ -218,7 +209,6 @@ def test_new_types_with_the_same_one_character_name_become_one_type() -> None:
     assert [p.fields["labelZh"] for p in proposals] == ["钢"]
 
 
-@delivered_by("PR 3")
 @pytest.mark.parametrize("furnace_first", [False, True], ids=["synonym-first", "label-first"])
 def test_a_one_character_name_that_is_another_new_types_synonym_is_a_possible_duplicate(
     furnace_first: bool,
