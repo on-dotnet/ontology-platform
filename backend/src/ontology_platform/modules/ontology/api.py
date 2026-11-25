@@ -346,7 +346,8 @@ async def update_item(
     """Decide, edit or annotate one item. `edited` is checked against the item's kind
     (422 `changeset.invalid_edit`); a merged or rejected change set answers 409
     `changeset.closed`; in separate review mode, 403 `changeset.self_review` for a decision or
-    an edit on one's own change set."""
+    an edit on one's own change set. `matchDecision` (spec 004, 5.5) is the reviewer's
+    conclusion about the item's alignment record: 422 `changeset.no_match` when there is none."""
     return await service.update_item(
         db,
         id,

@@ -6,7 +6,7 @@ baseline), issue #36 (one-character names of new types) and related cases.
 """
 
 import hashlib
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -29,6 +29,7 @@ from ontology_platform.modules.ai.prompts import (
     Quote,
     RelationOut,
     RelationsOut,
+    ResolveOut,
     TermsOut,
     TypesOut,
 )
@@ -72,10 +73,13 @@ def named[T: (RelationOut, PropertyOut)](item: T, local_name: str, quotes: list[
 async def identify(
     app: FastAPI,
     scripts: Sequence[tuple[UUID, list[EntityTypeOut], RelationsOut]],
+    resolver: Callable[[str], ResolveOut] | None = None,
 ) -> list[UUID]:
     """Identify every document before anything is merged: they all see the same baseline.
 
     This is what uploading several documents at once does; the worker takes them one by one.
+    Each sees the change sets of the earlier ones as pending; `resolver` answers the resolve
+    calls (by default: every type is a different concept from its candidates).
     """
     outputs: dict[str, list[BaseModel]] = {
         "extract.terms": [TermsOut(terms=[]) for _ in scripts],
@@ -83,7 +87,7 @@ async def identify(
         "extract.relations": [relations for _, _, relations in scripts],
     }
     session_factory: async_sessionmaker[AsyncSession] = app.state.session_factory
-    extract = make_extractor(session_factory, ScriptedGateway(outputs), MODELS)
+    extract = make_extractor(session_factory, ScriptedGateway(outputs, resolver), MODELS)
     change_sets: list[UUID] = []
     for document_id, _, _ in scripts:
         change_set_id = await extract(document_id, held)

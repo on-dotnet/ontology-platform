@@ -50,6 +50,8 @@ ChangeSetStatus = Literal["open", "merged", "rejected"]
 ChangeOp = Literal["create", "update", "delete", "restore"]
 Decision = Literal["pending", "accepted", "rejected"]
 ItemFlag = Literal["evidence_not_found", "possible_duplicate", "non_standard", "key_unverified"]
+MatchKind = Literal["same", "possible"]
+MatchDecision = Literal["same", "different"]
 # non_standard: an axiom that OWL API (and so Protégé) rewrites when it reads it.
 # key_unverified: a proposed binding key without a primary key or unique constraint behind it.
 ElementFlag = Literal["non_standard"]
@@ -293,6 +295,13 @@ class ChangeItem(Base):
             "confidence IS NULL OR (confidence >= 0 AND confidence <= 1)",
             name="confidence",
         ),
+        CheckConstraint(
+            "match_kind IS NULL OR match_kind IN ('same', 'possible')", name="match_kind"
+        ),
+        CheckConstraint(
+            "match_decision IS NULL OR match_decision IN ('same', 'different')",
+            name="match_decision",
+        ),
         {"schema": SCHEMA},
     )
 
@@ -328,6 +337,17 @@ class ChangeItem(Base):
         ForeignKey("ontology.elements.id"),
         index=True,
     )
+    # The alignment record (spec 004, 4.3): what the item was found to be the same as, or
+    # possibly the same as: an element, or a create item (of this or another change set).
+    match_kind: Mapped[str | None] = mapped_column(String(16))
+    match_element_id: Mapped[UUID | None] = mapped_column(ForeignKey("ontology.elements.id"))
+    match_item_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("ontology.change_items.id", ondelete="SET NULL"),
+        index=True,
+    )
+    match_reason: Mapped[str | None] = mapped_column(Text)
+    # The reviewer's conclusion about the alignment: same (merge) or different (keep apart).
+    match_decision: Mapped[str | None] = mapped_column(String(16))
 
 
 class Evidence(Base):

@@ -479,7 +479,7 @@ async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> Non
 
     assert _scores(replayed) == _scores(recorded)
     assert replayed["usage"]["total"]["calls"] == 0
-    assert replayed["usage"]["total"]["replayed"] == 6
+    assert replayed["usage"]["total"]["replayed"] == 7  # with the resolve call of b.md
 
 
 async def test_the_same_baseline_scenario_merges_what_documents_proposed_twice() -> None:

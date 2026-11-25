@@ -55,6 +55,7 @@ ITEM_FIELDS = {
     "appliedElementId",
     "evidence",
     "resolution",
+    "match",
 }
 
 
