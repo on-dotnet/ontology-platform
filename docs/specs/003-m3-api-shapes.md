@@ -163,6 +163,7 @@ type Filter = { propertyId: string; op: FilterOp; value?: Scalar | Scalar[] };
 type ObjectTypeInfo = {
   typeId: string; label: string; localName: string | null; iri: string | null;
   keyColumns: string[];
+  problem: 'source_mismatch' | 'source_disabled' | null;   // 非空时这个类型暂时不能查询，其余类型不受影响
   properties: { propertyId: string; label: string; datatype: Datatype; unit: string | null; ops: FilterOp[] }[];   // 只列绑定过的属性，都可以排序
   relations: { relationId: string; label: string; direction: 'out' | 'in'; otherTypeId: string; otherTypeLabel: string }[];
 };
@@ -284,7 +285,7 @@ type ElementInfo = ElementBrief & {
 | `query.timeout` | 504 | 查询超时 |
 | `query.busy` | 503 | 这个数据源上排队的查询太多 |
 | `query.source_unavailable` | 502 | 数据源连不上 |
-| `query.source_mismatch` | 409 | 绑定的表或列在数据源里已不存在 |
+| `query.source_mismatch` | 409 | 绑定的表或列在目录缓存或数据源里已不存在，或所绑视图在数据库里执行出错 |
 | `query.source_disabled` | 409 | 数据源已归档，或口令不可用 |
 | `mcp.rate_limited` | 429 | 超过 nginx 对 `/mcp` 的限流（HTTP 429）；或超过提议变更的频率限制（工具错误，HTTP 仍是 200） |
 
