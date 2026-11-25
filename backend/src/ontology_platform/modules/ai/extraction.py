@@ -682,7 +682,7 @@ def resolve_requests(
     for index, (item, fate) in enumerate(zip(types, fates, strict=True)):
         if fate.kind != "new" or fate.pending is not None:
             continue
-        earlier = [
+        earlier: list[tuple[CandidateKey, Names]] = [
             (("run", str(j)), Names.of(types[j].label_zh, types[j].label_en, run_names[j]))
             for j in run_names
             if j < index

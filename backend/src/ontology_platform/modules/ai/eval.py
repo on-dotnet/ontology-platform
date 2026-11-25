@@ -266,9 +266,9 @@ class WorkingVersion:
         }
         self.elements[start:] = sorted(self.elements[start:], key=lambda e: seq_of[e.id])
         merged_at = _EPOCH + timedelta(seconds=self._merges)
-        for item in recorded:
-            self.recorded[item.id] = replace(
-                item, merged_into=made.get(item.id), merged_at=merged_at
+        for entry in recorded:
+            self.recorded[entry.id] = replace(
+                entry, merged_into=made.get(entry.id), merged_at=merged_at
             )
         return [code for item in items if (code := outcomes[item.id]) is not None]
 

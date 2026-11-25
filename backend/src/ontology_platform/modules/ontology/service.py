@@ -1282,8 +1282,8 @@ async def _matches_out(
     }
     elements: dict[UUID, Element] = {}
     if element_ids:
-        found = await db.scalars(select(Element).where(Element.id.in_(element_ids)))
-        elements = {element.id: element for element in found}
+        rows = await db.scalars(select(Element).where(Element.id.in_(element_ids)))
+        elements = {element.id: element for element in rows}
 
     def element_label(element_id: UUID | None) -> str | None:
         element = elements.get(element_id) if element_id else None
