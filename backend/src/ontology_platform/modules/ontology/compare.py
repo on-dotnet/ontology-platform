@@ -155,7 +155,7 @@ async def compare(
             str(element.id): service.element_out(element, ontology.base_iri).model_dump(
                 mode="json", by_alias=True
             )
-            for element in await service._elements(db, ontology_id)
+            for element in await service._elements(db, ontology_id, all_kinds=True)
             if element.status == "active"
         }
     elif to == from_release:

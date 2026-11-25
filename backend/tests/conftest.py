@@ -19,6 +19,7 @@ from pydantic import SecretStr
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from external_source import external_source  # noqa: F401  (registers the fixture)
 from ontology_platform import models  # noqa: F401  (registers every module's tables)
 from ontology_platform.main import create_app
 from ontology_platform.modules.identity import service as identity_service

@@ -12,6 +12,7 @@ from sqlalchemy import (
     CheckConstraint,
     Double,
     ForeignKey,
+    Index,
     String,
     Text,
     UniqueConstraint,
@@ -27,19 +28,38 @@ from ontology_platform.db import Base
 
 SCHEMA = "ontology"
 
-Kind = Literal["entity_type", "relation_type", "property", "constraint", "axiom"]
+# The semantic kinds make up the ontology; the binding kinds (spec 003, 6.2) tie it to data and
+# are never exported as OWL.
+SemanticKind = Literal["entity_type", "relation_type", "property", "constraint", "axiom"]
+BindingKind = Literal["type_binding", "property_binding", "relation_binding"]
+Kind = Literal[
+    "entity_type",
+    "relation_type",
+    "property",
+    "constraint",
+    "axiom",
+    "type_binding",
+    "property_binding",
+    "relation_binding",
+]
 Datatype = Literal["string", "integer", "decimal", "boolean", "date", "dateTime"]
 ElementStatus = Literal["active", "deprecated"]
 Origin = Literal["ai", "manual", "import"]
-ChangeSetSource = Literal["ai_extraction", "ai_assistant", "manual", "import"]
+ChangeSetSource = Literal["ai_extraction", "ai_assistant", "manual", "import", "ai_binding", "mcp"]
 ChangeSetStatus = Literal["open", "merged", "rejected"]
 ChangeOp = Literal["create", "update", "delete", "restore"]
 Decision = Literal["pending", "accepted", "rejected"]
-ItemFlag = Literal["evidence_not_found", "possible_duplicate", "non_standard"]
+ItemFlag = Literal["evidence_not_found", "possible_duplicate", "non_standard", "key_unverified"]
 # non_standard: an axiom that OWL API (and so Protégé) rewrites when it reads it.
+# key_unverified: a proposed binding key without a primary key or unique constraint behind it.
 ElementFlag = Literal["non_standard"]
 
 KINDS: tuple[Kind, ...] = get_args(Kind)
+SEMANTIC_KINDS: tuple[SemanticKind, ...] = get_args(SemanticKind)
+BINDING_KINDS: tuple[BindingKind, ...] = get_args(BindingKind)
+# Kinds without a name or IRI of their own.
+UNNAMED_KINDS: tuple[Kind, ...] = ("axiom", *BINDING_KINDS)
+EvidenceKind = Literal["document", "catalog"]
 DATATYPES: tuple[Datatype, ...] = get_args(Datatype)
 ITEM_FLAGS: tuple[ItemFlag, ...] = get_args(ItemFlag)
 ELEMENT_FLAGS: tuple[ElementFlag, ...] = get_args(ElementFlag)
@@ -52,6 +72,11 @@ def _one_of(column: str, values: tuple[str, ...]) -> str:
 
 # Which columns each kind uses (spec 001 3.1, relaxed by 002 3.1: OWL allows a relation or
 # property without domain, range or datatype, and imported elements may lack a Chinese label).
+_BINDING_ONLY = (
+    " AND datatype IS NULL AND unit IS NULL AND rules IS NULL AND turtle IS NULL"
+    " AND inverse_id IS NULL AND subject_id IS NOT NULL AND binding IS NOT NULL"
+    " AND local_name IS NULL AND label_zh IS NULL AND iri IS NULL"
+)
 _KIND_COLUMNS = {
     "entity_type": (
         "domain_id IS NULL AND range_id IS NULL AND inverse_id IS NULL"
@@ -76,14 +101,27 @@ _KIND_COLUMNS = {
         " AND inverse_id IS NULL AND datatype IS NULL AND unit IS NULL AND rules IS NULL"
         " AND turtle IS NOT NULL AND local_name IS NULL AND label_zh IS NULL AND iri IS NULL"
     ),
+    # Bindings (spec 003, 6.2): subject_id is the element bound; a property binding hangs under
+    # its type binding (parent_id), a relation binding joins two type bindings (domain, range).
+    "type_binding": "parent_id IS NULL AND domain_id IS NULL AND range_id IS NULL" + _BINDING_ONLY,
+    "property_binding": (
+        "parent_id IS NOT NULL AND domain_id IS NULL AND range_id IS NULL" + _BINDING_ONLY
+    ),
+    "relation_binding": (
+        "parent_id IS NULL AND domain_id IS NOT NULL AND range_id IS NOT NULL" + _BINDING_ONLY
+    ),
 }
 ELEMENT_KIND_COLUMNS = " OR ".join(
-    f"(kind = '{kind}' AND {columns})" for kind, columns in _KIND_COLUMNS.items()
+    f"(kind = '{kind}' AND {columns}"
+    + ("" if kind in BINDING_KINDS else " AND binding IS NULL")
+    + ")"
+    for kind, columns in _KIND_COLUMNS.items()
 )
 # Elements created in the platform need a Chinese label; imported ones (explicit IRI) may not.
+_UNNAMED = _one_of("kind", UNNAMED_KINDS)
 ELEMENT_NAMING = (
-    "(kind = 'axiom') = (local_name IS NULL)"
-    " AND (kind = 'axiom' OR label_zh IS NOT NULL OR iri IS NOT NULL)"
+    f"({_UNNAMED}) = (local_name IS NULL)"
+    f" AND ({_UNNAMED} OR label_zh IS NOT NULL OR iri IS NOT NULL)"
 )
 CHANGE_ITEM_TARGET = (
     "(op = 'create' AND target_element_id IS NULL AND target_revision IS NULL)"
@@ -135,6 +173,28 @@ class Element(Base):
         CheckConstraint(ELEMENT_KIND_COLUMNS, name="kind_columns"),
         CheckConstraint(ELEMENT_NAMING, name="naming"),
         CheckConstraint("revision >= 1", name="revision"),
+        # One active binding per bound thing (spec 003, 6.2).
+        Index(
+            "uq_elements_active_type_binding",
+            "subject_id",
+            unique=True,
+            postgresql_where=text("kind = 'type_binding' AND status = 'active'"),
+        ),
+        Index(
+            "uq_elements_active_property_binding",
+            "parent_id",
+            "subject_id",
+            unique=True,
+            postgresql_where=text("kind = 'property_binding' AND status = 'active'"),
+        ),
+        Index(
+            "uq_elements_active_relation_binding",
+            "subject_id",
+            "domain_id",
+            "range_id",
+            unique=True,
+            postgresql_where=text("kind = 'relation_binding' AND status = 'active'"),
+        ),
         {"schema": SCHEMA},
     )
 
@@ -183,6 +243,9 @@ class Element(Base):
         default=list,
         server_default=text("'[]'::jsonb"),
     )
+    # Bindings: where the bound element lives in a data source (camelCase JSON, see
+    # schemas.Binding). None for the semantic kinds.
+    binding: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
     status: Mapped[str] = mapped_column(String(16), default="active", server_default="active")
     origin: Mapped[str] = mapped_column(String(16))
     # Optimistic lock: incremented on every change.
@@ -210,6 +273,8 @@ class ChangeSet(Base):
     document_id: Mapped[UUID | None] = mapped_column(index=True)
     status: Mapped[str] = mapped_column(String(16), default="open", server_default="open")
     created_by: Mapped[UUID | None]
+    # identity.access_tokens.id when proposed over MCP; no foreign key across modules.
+    token_id: Mapped[UUID | None] = mapped_column(index=True)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     merged_by: Mapped[UUID | None]
     merged_at: Mapped[datetime | None]
@@ -273,6 +338,14 @@ class Evidence(Base):
             " OR (char_start >= 0 AND char_end >= char_start)",
             name="char_range",
         ),
+        CheckConstraint(_one_of("kind", get_args(EvidenceKind)), name="kind"),
+        CheckConstraint(
+            "(kind = 'document' AND document_id IS NOT NULL AND chunk_id IS NOT NULL"
+            " AND source IS NULL)"
+            " OR (kind = 'catalog' AND document_id IS NULL AND chunk_id IS NULL"
+            " AND source IS NOT NULL)",
+            name="kind_columns",
+        ),
         {"schema": SCHEMA},
     )
 
@@ -281,9 +354,13 @@ class Evidence(Base):
         ForeignKey("ontology.change_items.id", ondelete="CASCADE"),
         index=True,
     )
+    # A passage of a document, or a fact of a data source's catalog (spec 003, 6.3).
+    kind: Mapped[str] = mapped_column(String(16), default="document", server_default="document")
     # documents.documents.id and documents.chunks.id; no foreign keys across modules.
-    document_id: Mapped[UUID]
-    chunk_id: Mapped[UUID]
+    document_id: Mapped[UUID | None]
+    chunk_id: Mapped[UUID | None]
+    # Catalog evidence: {dataSourceId, schema, table, column, fact}.
+    source: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
     quote: Mapped[str] = mapped_column(String(500))
     char_start: Mapped[int | None]
     char_end: Mapped[int | None]
@@ -313,6 +390,8 @@ class Release(Base):
     header: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
     turtle: Mapped[str] = mapped_column(Text)
     turtle_sha256: Mapped[str] = mapped_column(String(64))
+    # Semantic elements only; bindings are counted apart (spec 003, 6.4).
     element_count: Mapped[int]
+    binding_count: Mapped[int] = mapped_column(default=0, server_default=text("0"))
     created_by: Mapped[UUID | None]
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())

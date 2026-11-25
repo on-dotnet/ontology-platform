@@ -51,12 +51,35 @@ M2_PATHS = {
 }
 
 
+# /mcp is deliberately not in the document (spec 003, 9.2); the optional R2RML export (6c)
+# adds its own path when it lands.
+M3_PATHS = {
+    "/api/auth/tokens",
+    "/api/auth/tokens/{id}",
+    "/api/data-sources",
+    "/api/data-sources/test",
+    "/api/data-sources/{id}",
+    "/api/data-sources/{id}/archive",
+    "/api/data-sources/{id}/test",
+    "/api/data-sources/{id}/catalog/refresh",
+    "/api/data-sources/{id}/catalog/schemas",
+    "/api/data-sources/{id}/catalog/tables",
+    "/api/data-sources/{id}/catalog/tables/{schema}/{table}",
+    "/api/ontologies/{id}/binding-suggestions",
+    "/api/binding-suggestions/{id}",
+    "/api/ontologies/{id}/objects/types",
+    "/api/ontologies/{id}/objects/search",
+    "/api/ontologies/{id}/objects/{typeId}/{key}",
+    "/api/ontologies/{id}/objects/{typeId}/{key}/related",
+}
+
+
 def test_openapi_export_documents_the_api(capsys: pytest.CaptureFixture[str]) -> None:
     openapi.main()
 
     document = json.loads(capsys.readouterr().out)
 
-    assert set(document["paths"]) == M0_PATHS | M1_PATHS | M2_PATHS
+    assert set(document["paths"]) == M0_PATHS | M1_PATHS | M2_PATHS | M3_PATHS
     login_responses = document["paths"]["/api/auth/login"]["post"]["responses"]
     assert "application/problem+json" in login_responses["401"]["content"]
     assert "application/problem+json" in login_responses["422"]["content"]

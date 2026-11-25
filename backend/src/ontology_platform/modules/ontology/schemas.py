@@ -20,6 +20,7 @@ from ontology_platform.modules.ontology.models import (
     Decision,
     ElementFlag,
     ElementStatus,
+    EvidenceKind,
     ItemFlag,
     Kind,
     Origin,
@@ -122,6 +123,63 @@ class ConstraintRuleFields(_RuleValues):
     class_ref: Ref | None = None
 
 
+# ---------- data bindings (spec 003, 6.2) ----------
+
+KEY_COLUMNS_MAX = 8
+Identifier = Annotated[str, StringConstraints(min_length=1, max_length=128)]
+Columns = Annotated[list[Identifier], Field(min_length=1, max_length=KEY_COLUMNS_MAX)]
+
+
+class ForeignKeyJoin(CamelModel):
+    """`side = source`: the source table's `columns` refer to the target table's `references`;
+    `side = target`: the other way round."""
+
+    kind: Literal["foreign_key"]
+    side: Literal["source", "target"]
+    columns: Columns
+    references: Columns
+
+
+class LinkTableJoin(CamelModel):
+    """A link table whose two column groups match the key columns of source and target."""
+
+    kind: Literal["link_table"]
+    schema_name: Identifier = Field(alias="schema")
+    table: Identifier
+    source_columns: Columns
+    target_columns: Columns
+
+
+Join = Annotated[ForeignKeyJoin | LinkTableJoin, Field(discriminator="kind")]
+
+
+class TableBinding(CamelModel):
+    """type_binding: an object type to a table or view and its key columns."""
+
+    target: Literal["table"]
+    data_source_id: UUID
+    schema_name: Identifier = Field(alias="schema")
+    table: Identifier
+    key_columns: Columns
+
+
+class ColumnBinding(CamelModel):
+    """property_binding: a property to a column of its type binding's table."""
+
+    target: Literal["column"]
+    column: Identifier
+
+
+class JoinBinding(CamelModel):
+    """relation_binding: a relation to a foreign key or a link table."""
+
+    target: Literal["join"]
+    join: Join
+
+
+Binding = Annotated[TableBinding | ColumnBinding | JoinBinding, Field(discriminator="target")]
+
+
 class ElementFields(CamelModel):
     """Proposed or edited fields of an element; every field is optional.
 
@@ -151,15 +209,47 @@ class ElementFields(CamelModel):
     auto_shape: bool | None = None
     rules: list[ConstraintRuleFields] | None = Field(default=None, max_length=RULES_MAX)
     turtle: str | None = Field(default=None, max_length=TURTLE_MAX_LENGTH)
+    # Bindings: the element bound (an element id or temp_ref), and where it lives in the data.
+    subject_ref: Ref | None = None
+    binding: Binding | None = None
+
+
+CatalogFact = Literal["table", "column", "primary_key", "foreign_key", "sample"]
+
+
+class CatalogEvidenceSource(CamelModel):
+    """Which fact of a data source's catalog a binding suggestion rests on (spec 003, 6.3)."""
+
+    data_source_id: UUID
+    schema_name: Identifier = Field(alias="schema")
+    table: Identifier
+    column: Identifier | None = None
+    fact: CatalogFact
 
 
 class EvidenceIn(CamelModel):
-    document_id: UUID
-    chunk_id: UUID
+    """A passage of a document (`kind = document`) or a catalog fact (`kind = catalog`)."""
+
+    kind: EvidenceKind = "document"
+    document_id: UUID | None = None
+    chunk_id: UUID | None = None
+    source: CatalogEvidenceSource | None = None
     quote: str = Field(min_length=1, max_length=500)
     # Position in the chunk text; both null when the quote was not found.
     char_start: int | None = Field(default=None, ge=0)
     char_end: int | None = Field(default=None, ge=0)
+
+    @model_validator(mode="after")
+    def fits_its_kind(self) -> Self:
+        document = self.document_id is not None and self.chunk_id is not None
+        if self.kind == "document" and (not document or self.source is not None):
+            raise ValueError("Document evidence needs documentId and chunkId and no source")
+        position = (self.document_id, self.chunk_id, self.char_start, self.char_end)
+        if self.kind == "catalog" and (
+            self.source is None or any(value is not None for value in position)
+        ):
+            raise ValueError("Catalog evidence needs a source and no document position")
+        return self
 
 
 class ProposedItem(CamelModel):
@@ -235,6 +325,8 @@ class Element(CamelModel):
     turtle: str | None
     subject_id: UUID | None
     flags: list[ElementFlag]
+    # Default for snapshots of releases published before M3, which have no such key.
+    binding: Binding | None = None
     status: ElementStatus
     origin: Origin
     revision: int
@@ -253,8 +345,10 @@ class ElementCopy(Element):
 
 class Evidence(CamelModel):
     id: UUID
-    document_id: UUID
-    chunk_id: UUID
+    kind: EvidenceKind
+    document_id: UUID | None
+    chunk_id: UUID | None
+    source: CatalogEvidenceSource | None
     quote: str
     char_start: int | None
     char_end: int | None
@@ -504,6 +598,8 @@ class Impact(CamelModel):
     properties: list[ElementRef]
     constraints: list[ElementRef]
     axioms: list[ElementRef]
+    # Active bindings of the element (spec 003, 6.5); filled in by M3 batch 4a.
+    bindings: list[ElementRef] = Field(default_factory=list)
     inverse: ElementRef | None
     cascade: list[CascadeChange]
 
@@ -575,7 +671,9 @@ class ReleaseSummary(CamelModel):
     version: int
     title: str
     notes: str | None
+    # Semantic elements; bindings are counted apart.
     element_count: int
+    binding_count: int
     is_active: bool
     created_by: UUID | None
     created_at: datetime

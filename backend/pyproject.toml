@@ -8,6 +8,9 @@ dependencies = [
     "alembic>=1.16",
     "annotated-types>=0.7",
     "argon2-cffi>=25.1",
+    # AES-256-GCM and HKDF for data source credentials (Apache-2.0 OR BSD-3-Clause, PyCA).
+    # Checked on the Docker host, whose CPU lacks SSE4.2/AVX/AES-NI (spec 003, 5.4).
+    "cryptography>=46,<51",
     "fastapi>=0.120",
     "httpx2>=2.16",
     "openai>=3.57",

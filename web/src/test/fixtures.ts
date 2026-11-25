@@ -169,6 +169,7 @@ export function releaseFixture(overrides: Partial<ReleaseSummary> = {}): Release
     title: '首版',
     notes: null,
     elementCount: 4,
+    bindingCount: 0,
     isActive: false,
     createdBy: null,
     createdAt: CREATED_AT,

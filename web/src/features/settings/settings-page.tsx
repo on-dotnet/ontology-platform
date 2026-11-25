@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AiServiceCard } from '@/features/ai/ai-status';
 import { useCurrentUser } from '@/features/auth/api';
+import { McpAccessCard } from '@/features/mcp/mcp-access-card';
+import { AccessTokensCard } from '@/features/tokens/access-tokens-card';
 
 import { LanguageSelector, ThemeSelector } from './preference-controls';
 import { ReviewModeCard } from './review-mode-card';
@@ -59,6 +61,10 @@ export function SettingsPage() {
         <AiServiceCard />
 
         <ReviewModeCard />
+
+        <AccessTokensCard />
+
+        <McpAccessCard />
 
         <Card>
           <CardContent className="flex items-center gap-4">

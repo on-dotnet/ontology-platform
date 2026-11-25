@@ -95,12 +95,57 @@ export interface paths {
         };
         /**
          * Me
-         * @description The signed-in user.
+         * @description The signed-in user, or the owner of the access token.
          */
         get: operations["me_api_auth_me_get"];
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Tokens
+         * @description The user's access tokens; `owner=all` lists everyone's and needs the admin role. Neither
+         *     the tokens themselves nor their hashes are ever returned.
+         */
+        get: operations["list_tokens_api_auth_tokens_get"];
+        put?: never;
+        /**
+         * Create Token
+         * @description Create an access token. This response is the only time the token is shown.
+         */
+        post: operations["create_token_api_auth_tokens_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/tokens/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Revoke Token
+         * @description Revoke a token at once: one's own, or anyone's for an admin.
+         */
+        delete: operations["revoke_token_api_auth_tokens__id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -746,6 +791,51 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ontologies/{id}/binding-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Binding Suggestions
+         * @description The user's latest requests about the ontology, newest first.
+         */
+        get: operations["list_binding_suggestions_api_ontologies__id__binding_suggestions_get"];
+        put?: never;
+        /**
+         * Create Binding Suggestion
+         * @description Ask the AI to suggest bindings to the tables of a data source. The result comes from a
+         *     background job: a change set waiting for review; poll the request for it.
+         */
+        post: operations["create_binding_suggestion_api_ontologies__id__binding_suggestions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/binding-suggestions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Binding Suggestion
+         * @description One of the user's own requests (404 `binding_suggestion.not_found` for others').
+         */
+        get: operations["get_binding_suggestion_api_binding_suggestions__id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/workbench/summary": {
         parameters: {
             query?: never;
@@ -763,10 +853,319 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/data-sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Data Sources
+         * @description Every data source. Viewers get `connection` and `catalog` as null.
+         */
+        get: operations["list_data_sources_api_data_sources_get"];
+        put?: never;
+        /**
+         * Create Data Source
+         * @description Save a data source. The password is stored encrypted and never returned.
+         */
+        post: operations["create_data_source_api_data_sources_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/data-sources/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check Connection
+         * @description Test connection settings that are not saved yet.
+         */
+        post: operations["check_connection_api_data_sources_test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/data-sources/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Data Source */
+        get: operations["get_data_source_api_data_sources__id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Data Source
+         * @description Change the given fields; 409 `datasource.stale` when `revision` is not the current one.
+         */
+        patch: operations["update_data_source_api_data_sources__id__patch"];
+        trace?: never;
+    };
+    "/api/data-sources/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Archive Data Source
+         * @description Archive the data source and erase its credentials; refused while bindings use it.
+         */
+        post: operations["archive_data_source_api_data_sources__id__archive_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/data-sources/{id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check Data Source */
+        post: operations["check_data_source_api_data_sources__id__test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/data-sources/{id}/catalog/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Catalog
+         * @description Read the catalog again in the background; poll the data source for the result.
+         */
+        post: operations["refresh_catalog_api_data_sources__id__catalog_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/data-sources/{id}/catalog/schemas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Catalog Schemas */
+        get: operations["list_catalog_schemas_api_data_sources__id__catalog_schemas_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/data-sources/{id}/catalog/tables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Catalog Tables
+         * @description Tables and views of the cached catalog, by schema and name.
+         */
+        get: operations["list_catalog_tables_api_data_sources__id__catalog_tables_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/data-sources/{id}/catalog/tables/{schema}/{table}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Catalog Table
+         * @description One table with its columns, primary key and foreign keys.
+         */
+        get: operations["get_catalog_table_api_data_sources__id__catalog_tables__schema___table__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/objects/types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Object Types
+         * @description The bound object types of the release in effect, with what can be filtered and followed.
+         */
+        get: operations["list_object_types_api_ontologies__id__objects_types_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/objects/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Search Objects
+         * @description List the objects of a type: filter, sort and page. A read, although it is a POST.
+         */
+        post: operations["search_objects_api_ontologies__id__objects_search_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/objects/{typeId}/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Object
+         * @description One object by type and primary key, with the relations it can be followed along.
+         */
+        get: operations["get_object_api_ontologies__id__objects__typeId___key__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/objects/{typeId}/{key}/related": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Related Objects
+         * @description One hop along a relation; `typeId` of the page is the type of the related objects.
+         */
+        get: operations["list_related_objects_api_ontologies__id__objects__typeId___key__related_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AccessToken */
+        AccessToken: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Prefix */
+            prefix: string;
+            /** Scopes */
+            scopes: ("ontology:read" | "objects:read" | "changes:propose")[];
+            owner: components["schemas"]["TokenOwner"];
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /**
+             * Expiresat
+             * Format: date-time
+             */
+            expiresAt: string;
+            /** Lastusedat */
+            lastUsedAt: string | null;
+            /** Revokedat */
+            revokedAt: string | null;
+        };
+        /** AccessTokenCreate */
+        AccessTokenCreate: {
+            /** Name */
+            name: string;
+            /** Scopes */
+            scopes: ("ontology:read" | "objects:read" | "changes:propose")[];
+            /**
+             * Expiresindays
+             * @default 90
+             */
+            expiresInDays: number;
+        };
+        /**
+         * AccessTokenCreated
+         * @description The only response that ever carries the token itself.
+         */
+        AccessTokenCreated: {
+            /** Token */
+            token: string;
+            info: components["schemas"]["AccessToken"];
+        };
         /** Activity */
         Activity: {
             /** Id */
@@ -848,6 +1247,66 @@ export interface components {
             message: string;
             context: components["schemas"]["AssistantContext"];
         };
+        /** BindingSuggestion */
+        BindingSuggestion: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Ontologyid
+             * Format: uuid
+             */
+            ontologyId: string;
+            /**
+             * Datasourceid
+             * Format: uuid
+             */
+            dataSourceId: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "running" | "succeeded" | "failed";
+            /** Step */
+            step: ("catalog" | "match" | "columns" | "changeset") | null;
+            /** Changesetid */
+            changeSetId: string | null;
+            /** Proposed */
+            proposed: number;
+            /** Dropped */
+            dropped: number;
+            /** Samplessent */
+            samplesSent: boolean;
+            /** Errorcode */
+            errorCode: string | null;
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /** Finishedat */
+            finishedAt: string | null;
+        };
+        /**
+         * BindingSuggestionCreate
+         * @description Which tables to look at: `tables` or `schemas` (one of them), and optionally which
+         *     object types to suggest bindings for (default: every type without a binding).
+         */
+        BindingSuggestionCreate: {
+            /**
+             * Datasourceid
+             * Format: uuid
+             */
+            dataSourceId: string;
+            /** Tables */
+            tables?: components["schemas"]["TableRef"][] | null;
+            /** Schemas */
+            schemas?: string[] | null;
+            /** Typeids */
+            typeIds?: string[] | null;
+        };
         /** Body_import_into_ontology_api_ontologies__id__import_post */
         Body_import_into_ontology_api_ontologies__id__import_post: {
             /** File */
@@ -872,6 +1331,16 @@ export interface components {
              */
             ontologyId: string;
         };
+        /** BoundTypeRef */
+        BoundTypeRef: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string;
+        };
         /** BulkDecision */
         BulkDecision: {
             /** Itemids */
@@ -894,6 +1363,132 @@ export interface components {
             op: "delete" | "update";
             element: components["schemas"]["ElementRef"];
         };
+        /** CatalogColumn */
+        CatalogColumn: {
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /**
+             * Family
+             * @enum {string}
+             */
+            family: "string" | "opaque" | "integer" | "decimal" | "boolean" | "date" | "dateTime" | "other";
+            /** Nullable */
+            nullable: boolean;
+            /** Comment */
+            comment: string | null;
+            /** Position */
+            position: number;
+        };
+        /**
+         * CatalogEvidenceSource
+         * @description Which fact of a data source's catalog a binding suggestion rests on (spec 003, 6.3).
+         */
+        CatalogEvidenceSource: {
+            /**
+             * Datasourceid
+             * Format: uuid
+             */
+            dataSourceId: string;
+            /** Schema */
+            schema: string;
+            /** Table */
+            table: string;
+            /** Column */
+            column?: string | null;
+            /**
+             * Fact
+             * @enum {string}
+             */
+            fact: "table" | "column" | "primary_key" | "foreign_key" | "sample";
+        };
+        /** CatalogForeignKey */
+        CatalogForeignKey: {
+            /** Name */
+            name: string | null;
+            /** Columns */
+            columns: string[];
+            /** Refschema */
+            refSchema: string;
+            /** Reftable */
+            refTable: string;
+            /** Refcolumns */
+            refColumns: string[];
+        };
+        /** CatalogInfo */
+        CatalogInfo: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "never" | "refreshing" | "ready" | "failed";
+            /** Refreshedat */
+            refreshedAt: string | null;
+            /** Errorcode */
+            errorCode: string | null;
+            /** Tablecount */
+            tableCount: number;
+        };
+        /** CatalogSchema */
+        CatalogSchema: {
+            /** Name */
+            name: string;
+            /** Tablecount */
+            tableCount: number;
+        };
+        /** CatalogTable */
+        CatalogTable: {
+            /** Schema */
+            schema: string;
+            /** Name */
+            name: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "table" | "view" | "materialized_view" | "foreign_table";
+            /** Comment */
+            comment: string | null;
+            /** Columncount */
+            columnCount: number;
+            boundType: components["schemas"]["BoundTypeRef"] | null;
+            /** Columns */
+            columns: components["schemas"]["CatalogColumn"][];
+            /** Primarykey */
+            primaryKey: string[] | null;
+            /** Foreignkeys */
+            foreignKeys: components["schemas"]["CatalogForeignKey"][];
+            /**
+             * Refreshedat
+             * Format: date-time
+             */
+            refreshedAt: string;
+        };
+        /** CatalogTableBrief */
+        CatalogTableBrief: {
+            /** Schema */
+            schema: string;
+            /** Name */
+            name: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "table" | "view" | "materialized_view" | "foreign_table";
+            /** Comment */
+            comment: string | null;
+            /** Columncount */
+            columnCount: number;
+            boundType: components["schemas"]["BoundTypeRef"] | null;
+        };
+        /** CatalogTablePage */
+        CatalogTablePage: {
+            /** Items */
+            items: components["schemas"]["CatalogTableBrief"][];
+            /** Nextcursor */
+            nextCursor: string | null;
+        };
         /** ChangeItem */
         ChangeItem: {
             /**
@@ -912,7 +1507,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Targetelementid */
             targetElementId: string | null;
             /** Tempref */
@@ -930,7 +1525,7 @@ export interface components {
             /** Rationale */
             rationale: string | null;
             /** Flags */
-            flags: ("evidence_not_found" | "possible_duplicate" | "non_standard")[];
+            flags: ("evidence_not_found" | "possible_duplicate" | "non_standard" | "key_unverified")[];
             /** Note */
             note: string | null;
             /** Decidedby */
@@ -961,7 +1556,7 @@ export interface components {
              * Source
              * @enum {string}
              */
-            source: "ai_extraction" | "ai_assistant" | "manual" | "import";
+            source: "ai_extraction" | "ai_assistant" | "manual" | "import" | "ai_binding" | "mcp";
             /** Documentid */
             documentId: string | null;
             /**
@@ -1002,7 +1597,7 @@ export interface components {
              * Source
              * @enum {string}
              */
-            source: "ai_extraction" | "ai_assistant" | "manual" | "import";
+            source: "ai_extraction" | "ai_assistant" | "manual" | "import" | "ai_binding" | "mcp";
             /** Documentid */
             documentId: string | null;
             /**
@@ -1044,6 +1639,19 @@ export interface components {
             /** Charcount */
             charCount: number;
         };
+        /**
+         * ColumnBinding
+         * @description property_binding: a property to a column of its type binding's table.
+         */
+        ColumnBinding: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            target: "column";
+            /** Column */
+            column: string;
+        };
         /** CompareCounts */
         CompareCounts: {
             /** Breaking */
@@ -1071,6 +1679,69 @@ export interface components {
             /** Changes */
             changes: components["schemas"]["ElementChange"][];
             counts: components["schemas"]["CompareCounts"];
+        };
+        /** Connection */
+        Connection: {
+            /** Host */
+            host: string;
+            /** Port */
+            port: number;
+            /** Database */
+            database: string;
+            /** Username */
+            username: string;
+            /**
+             * Sslmode
+             * @enum {string}
+             */
+            sslMode: "disable" | "prefer" | "require" | "verify-full";
+            /** Schemas */
+            schemas: string[];
+        };
+        /** ConnectionTest */
+        ConnectionTest: {
+            /** Ok */
+            ok: boolean;
+            /** Code */
+            code: string | null;
+            /** Reason */
+            reason: ("unreachable" | "auth_failed" | "database_missing" | "ssl" | "timeout") | null;
+            /** Warnings */
+            warnings: "account_can_write"[];
+            /** Serverversion */
+            serverVersion: string | null;
+        };
+        /**
+         * ConnectionTestRequest
+         * @description Connection settings that are not saved yet. While editing, leave out `password` and give
+         *     `dataSourceId` to test with the stored one.
+         */
+        ConnectionTestRequest: {
+            /**
+             * Kind
+             * @constant
+             */
+            kind: "postgresql";
+            /** Host */
+            host: string;
+            /** Port */
+            port: number;
+            /** Database */
+            database: string;
+            /** Username */
+            username: string;
+            /** Password */
+            password?: string | null;
+            /** Datasourceid */
+            dataSourceId?: string | null;
+            /**
+             * Sslmode
+             * @default prefer
+             * @enum {string}
+             */
+            sslMode: "disable" | "prefer" | "require" | "verify-full";
+            /** Schemas */
+            schemas?: string[];
         };
         /** ConstraintRule */
         ConstraintRule: {
@@ -1149,6 +1820,111 @@ export interface components {
             pathRef: string;
             /** Classref */
             classRef?: string | null;
+        };
+        /** DataSource */
+        DataSource: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Kind
+             * @constant
+             */
+            kind: "postgresql";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "archived";
+            connection: components["schemas"]["Connection"] | null;
+            /** Hascredential */
+            hasCredential: boolean;
+            /** Credentialupdatedat */
+            credentialUpdatedAt: string | null;
+            /** Allowsamples */
+            allowSamples: boolean;
+            lastTest: components["schemas"]["LastTest"] | null;
+            catalog: components["schemas"]["CatalogInfo"] | null;
+            /** Boundtypecount */
+            boundTypeCount: number | null;
+            /** Revision */
+            revision: number;
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /**
+             * Updatedat
+             * Format: date-time
+             */
+            updatedAt: string;
+        };
+        /** DataSourceCreate */
+        DataSourceCreate: {
+            /** Name */
+            name: string;
+            /**
+             * Kind
+             * @constant
+             */
+            kind: "postgresql";
+            /** Host */
+            host: string;
+            /** Port */
+            port: number;
+            /** Database */
+            database: string;
+            /** Username */
+            username: string;
+            /**
+             * Password
+             * Format: password
+             */
+            password: string;
+            /**
+             * Sslmode
+             * @default prefer
+             * @enum {string}
+             */
+            sslMode: "disable" | "prefer" | "require" | "verify-full";
+            /** Schemas */
+            schemas?: string[];
+            /**
+             * Allowsamples
+             * @default false
+             */
+            allowSamples: boolean;
+        };
+        /**
+         * DataSourcePatch
+         * @description Only the given fields change; leaving out `password` keeps the stored one.
+         */
+        DataSourcePatch: {
+            /** Name */
+            name?: string | null;
+            /** Host */
+            host?: string | null;
+            /** Port */
+            port?: number | null;
+            /** Database */
+            database?: string | null;
+            /** Username */
+            username?: string | null;
+            /** Password */
+            password?: string | null;
+            /** Sslmode */
+            sslMode?: ("disable" | "prefer" | "require" | "verify-full") | null;
+            /** Schemas */
+            schemas?: string[] | null;
+            /** Allowsamples */
+            allowSamples?: boolean | null;
+            /** Revision */
+            revision: number;
         };
         /** DecisionCounts */
         DecisionCounts: {
@@ -1242,7 +2018,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Targetelementid */
             targetElementId?: string | null;
             /** Targetrevision */
@@ -1288,7 +2064,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Localname */
             localName: string | null;
             /** Iri */
@@ -1331,6 +2107,8 @@ export interface components {
             subjectId: string | null;
             /** Flags */
             flags: "non_standard"[];
+            /** Binding */
+            binding?: (components["schemas"]["TableBinding"] | components["schemas"]["ColumnBinding"] | components["schemas"]["JoinBinding"]) | null;
             /**
              * Status
              * @enum {string}
@@ -1365,7 +2143,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Label */
             label: string;
             /** Iri */
@@ -1399,7 +2177,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Localname */
             localName: string | null;
             /** Iri */
@@ -1442,6 +2220,8 @@ export interface components {
             subjectId: string | null;
             /** Flags */
             flags: "non_standard"[];
+            /** Binding */
+            binding?: (components["schemas"]["TableBinding"] | components["schemas"]["ColumnBinding"] | components["schemas"]["JoinBinding"]) | null;
             /**
              * Status
              * @enum {string}
@@ -1514,6 +2294,10 @@ export interface components {
             rules?: components["schemas"]["ConstraintRuleFields"][] | null;
             /** Turtle */
             turtle?: string | null;
+            /** Subjectref */
+            subjectRef?: string | null;
+            /** Binding */
+            binding?: (components["schemas"]["TableBinding"] | components["schemas"]["ColumnBinding"] | components["schemas"]["JoinBinding"]) | null;
         };
         /** ElementRef */
         ElementRef: {
@@ -1526,7 +2310,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Label */
             label: string;
             /** Iri */
@@ -1540,15 +2324,15 @@ export interface components {
              */
             id: string;
             /**
-             * Documentid
-             * Format: uuid
+             * Kind
+             * @enum {string}
              */
-            documentId: string;
-            /**
-             * Chunkid
-             * Format: uuid
-             */
-            chunkId: string;
+            kind: "document" | "catalog";
+            /** Documentid */
+            documentId: string | null;
+            /** Chunkid */
+            chunkId: string | null;
+            source: components["schemas"]["CatalogEvidenceSource"] | null;
             /** Quote */
             quote: string;
             /** Charstart */
@@ -1568,6 +2352,43 @@ export interface components {
             before: unknown;
             /** After */
             after: unknown;
+        };
+        /** Filter */
+        Filter: {
+            /**
+             * Propertyid
+             * Format: uuid
+             */
+            propertyId: string;
+            /**
+             * Op
+             * @enum {string}
+             */
+            op: "eq" | "ne" | "lt" | "le" | "gt" | "ge" | "contains" | "startsWith" | "in" | "isNull" | "notNull";
+            /** Value */
+            value?: components["schemas"]["FilterValue"] | components["schemas"]["FilterValue"][] | null;
+        };
+        FilterValue: string | number | boolean;
+        /**
+         * ForeignKeyJoin
+         * @description `side = source`: the source table's `columns` refer to the target table's `references`;
+         *     `side = target`: the other way round.
+         */
+        ForeignKeyJoin: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "foreign_key";
+            /**
+             * Side
+             * @enum {string}
+             */
+            side: "source" | "target";
+            /** Columns */
+            columns: string[];
+            /** References */
+            references: string[];
         };
         /** Graph */
         Graph: {
@@ -1644,6 +2465,8 @@ export interface components {
             constraints: components["schemas"]["ElementRef"][];
             /** Axioms */
             axioms: components["schemas"]["ElementRef"][];
+            /** Bindings */
+            bindings?: components["schemas"]["ElementRef"][];
             inverse: components["schemas"]["ElementRef"] | null;
             /** Cascade */
             cascade: components["schemas"]["CascadeChange"][];
@@ -1734,12 +2557,58 @@ export interface components {
             /** Keptfields */
             keptFields: string[];
         };
+        /**
+         * JoinBinding
+         * @description relation_binding: a relation to a foreign key or a link table.
+         */
+        JoinBinding: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            target: "join";
+            /** Join */
+            join: components["schemas"]["ForeignKeyJoin"] | components["schemas"]["LinkTableJoin"];
+        };
         /** LangText */
         LangText: {
             /** Lang */
             lang?: string | null;
             /** Text */
             text: string;
+        };
+        /** LastTest */
+        LastTest: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Ok */
+            ok: boolean;
+            /** Code */
+            code: string | null;
+            /** Warnings */
+            warnings: "account_can_write"[];
+        };
+        /**
+         * LinkTableJoin
+         * @description A link table whose two column groups match the key columns of source and target.
+         */
+        LinkTableJoin: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "link_table";
+            /** Schema */
+            schema: string;
+            /** Table */
+            table: string;
+            /** Sourcecolumns */
+            sourceColumns: string[];
+            /** Targetcolumns */
+            targetColumns: string[];
         };
         /** LoginRequest */
         LoginRequest: {
@@ -1779,6 +2648,163 @@ export interface components {
              * @enum {string}
              */
             code: "changeset.stale_target" | "changeset.dependency_skipped" | "changeset.invalid_item" | "changeset.has_dependents";
+        };
+        /** ObjectDetail */
+        ObjectDetail: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Key */
+            key: string;
+            /** Values */
+            values: {
+                [key: string]: components["schemas"]["Scalar"] | null;
+            };
+            /** Truncated */
+            truncated: string[];
+            source: components["schemas"]["ObjectSource"];
+            release: components["schemas"]["ReleaseRef"];
+            /** Relations */
+            relations: components["schemas"]["ObjectRelation"][];
+        };
+        /** ObjectPage */
+        ObjectPage: {
+            release: components["schemas"]["ReleaseRef"];
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Items */
+            items: components["schemas"]["ObjectRow"][];
+            /** Nextcursor */
+            nextCursor: string | null;
+        };
+        /** ObjectProperty */
+        ObjectProperty: {
+            /**
+             * Propertyid
+             * Format: uuid
+             */
+            propertyId: string;
+            /** Label */
+            label: string;
+            /**
+             * Datatype
+             * @enum {string}
+             */
+            datatype: "string" | "integer" | "decimal" | "boolean" | "date" | "dateTime";
+            /** Unit */
+            unit: string | null;
+            /** Ops */
+            ops: ("eq" | "ne" | "lt" | "le" | "gt" | "ge" | "contains" | "startsWith" | "in" | "isNull" | "notNull")[];
+        };
+        /** ObjectRelation */
+        ObjectRelation: {
+            /**
+             * Relationid
+             * Format: uuid
+             */
+            relationId: string;
+            /** Label */
+            label: string;
+            /**
+             * Direction
+             * @enum {string}
+             */
+            direction: "out" | "in";
+            /**
+             * Othertypeid
+             * Format: uuid
+             */
+            otherTypeId: string;
+            /** Othertypelabel */
+            otherTypeLabel: string;
+        };
+        /** ObjectRow */
+        ObjectRow: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Key */
+            key: string;
+            /** Values */
+            values: {
+                [key: string]: components["schemas"]["Scalar"] | null;
+            };
+            /** Truncated */
+            truncated: string[];
+            source: components["schemas"]["ObjectSource"];
+        };
+        /** ObjectSearch */
+        ObjectSearch: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Filters */
+            filters?: components["schemas"]["Filter"][];
+            /** Sort */
+            sort?: components["schemas"]["Sort"][];
+            /**
+             * Limit
+             * @default 50
+             */
+            limit: number;
+            /** Cursor */
+            cursor?: string | null;
+        };
+        /**
+         * ObjectSource
+         * @description Where an object comes from: the data source, the table and the primary key.
+         */
+        ObjectSource: {
+            /**
+             * Datasourceid
+             * Format: uuid
+             */
+            dataSourceId: string;
+            /** Datasourcename */
+            dataSourceName: string;
+            /** Schema */
+            schema: string;
+            /** Table */
+            table: string;
+            /** Key */
+            key: components["schemas"]["SourceKey"][];
+        };
+        /** ObjectTypeInfo */
+        ObjectTypeInfo: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Label */
+            label: string;
+            /** Localname */
+            localName: string | null;
+            /** Iri */
+            iri: string | null;
+            /** Keycolumns */
+            keyColumns: string[];
+            /** Problem */
+            problem: ("source_mismatch" | "source_disabled") | null;
+            /** Properties */
+            properties: components["schemas"]["ObjectProperty"][];
+            /** Relations */
+            relations: components["schemas"]["ObjectRelation"][];
+        };
+        /** ObjectTypeList */
+        ObjectTypeList: {
+            release: components["schemas"]["ReleaseRef"];
+            /** Items */
+            items: components["schemas"]["ObjectTypeInfo"][];
         };
         /** OntologyCreate */
         OntologyCreate: {
@@ -1940,6 +2966,16 @@ export interface components {
             /** Message */
             message: string;
         };
+        /** ReleaseRef */
+        ReleaseRef: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Version */
+            version: number;
+        };
         /** ReleaseSummary */
         ReleaseSummary: {
             /**
@@ -1960,6 +2996,8 @@ export interface components {
             notes: string | null;
             /** Elementcount */
             elementCount: number;
+            /** Bindingcount */
+            bindingCount: number;
             /** Isactive */
             isActive: boolean;
             /** Createdby */
@@ -1975,6 +3013,28 @@ export interface components {
          * @enum {string}
          */
         Role: "admin" | "editor" | "reviewer" | "viewer";
+        Scalar: string | number | boolean;
+        /** Sort */
+        Sort: {
+            /**
+             * Propertyid
+             * Format: uuid
+             */
+            propertyId: string;
+            /**
+             * Direction
+             * @default asc
+             * @enum {string}
+             */
+            direction: "asc" | "desc";
+        };
+        /** SourceKey */
+        SourceKey: {
+            /** Column */
+            column: string;
+            /** Value */
+            value: string;
+        };
         /** Synonym */
         Synonym: {
             /**
@@ -1984,6 +3044,45 @@ export interface components {
             lang: "zh" | "en";
             /** Text */
             text: string;
+        };
+        /**
+         * TableBinding
+         * @description type_binding: an object type to a table or view and its key columns.
+         */
+        TableBinding: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            target: "table";
+            /**
+             * Datasourceid
+             * Format: uuid
+             */
+            dataSourceId: string;
+            /** Schema */
+            schema: string;
+            /** Table */
+            table: string;
+            /** Keycolumns */
+            keyColumns: string[];
+        };
+        /** TableRef */
+        TableRef: {
+            /** Schema */
+            schema: string;
+            /** Name */
+            name: string;
+        };
+        /** TokenOwner */
+        TokenOwner: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Displayname */
+            displayName: string;
         };
         /**
          * TurtleEdit
@@ -2205,6 +3304,171 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_tokens_api_auth_tokens_get: {
+        parameters: {
+            query?: {
+                owner?: "me" | "all";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessToken"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    create_token_api_auth_tokens_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccessTokenCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessTokenCreated"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    revoke_token_api_auth_tokens__id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
                 };
             };
         };
@@ -2765,7 +4029,7 @@ export interface operations {
     list_elements_api_ontologies__id__elements_get: {
         parameters: {
             query?: {
-                kind?: ("entity_type" | "relation_type" | "property" | "constraint" | "axiom") | null;
+                kind?: ("entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding") | null;
                 q?: string | null;
                 status?: "active" | "deprecated" | "all";
             };
@@ -4183,6 +5447,186 @@ export interface operations {
             };
         };
     };
+    list_binding_suggestions_api_ontologies__id__binding_suggestions_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BindingSuggestion"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    create_binding_suggestion_api_ontologies__id__binding_suggestions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BindingSuggestionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BindingSuggestion"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    get_binding_suggestion_api_binding_suggestions__id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BindingSuggestion"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
     get_summary_api_workbench_summary_get: {
         parameters: {
             query?: never;
@@ -4203,6 +5647,1046 @@ export interface operations {
             };
             /** @description Unauthorized */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_data_sources_api_data_sources_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataSource"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    create_data_source_api_data_sources_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataSourceCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataSource"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    check_connection_api_data_sources_test_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectionTestRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionTest"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    get_data_source_api_data_sources__id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataSource"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    update_data_source_api_data_sources__id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataSourcePatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataSource"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    archive_data_source_api_data_sources__id__archive_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataSource"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    check_data_source_api_data_sources__id__test_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionTest"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    refresh_catalog_api_data_sources__id__catalog_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataSource"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    list_catalog_schemas_api_data_sources__id__catalog_schemas_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogSchema"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    list_catalog_tables_api_data_sources__id__catalog_tables_get: {
+        parameters: {
+            query?: {
+                schema?: string | null;
+                q?: string | null;
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogTablePage"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    get_catalog_table_api_data_sources__id__catalog_tables__schema___table__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                schema: string;
+                table: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogTable"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    list_object_types_api_ontologies__id__objects_types_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObjectTypeList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+        };
+    };
+    search_objects_api_ontologies__id__objects_search_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ObjectSearch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObjectPage"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_object_api_ontologies__id__objects__typeId___key__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                typeId: string;
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObjectDetail"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_related_objects_api_ontologies__id__objects__typeId___key__related_get: {
+        parameters: {
+            query: {
+                relationId: string;
+                direction?: "out" | "in";
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path: {
+                id: string;
+                typeId: string;
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObjectPage"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
                 headers: {
                     [name: string]: unknown;
                 };
