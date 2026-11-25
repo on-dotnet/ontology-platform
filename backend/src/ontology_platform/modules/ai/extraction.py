@@ -677,11 +677,11 @@ def _types_lines(
             f"- {ids.get(item.ref, item.ref)} | {item.label_zh} | {', '.join(item.synonyms)}"
             for item in found
         ]
-    lines.append("\nCandidate terms (category | name | first sentence):")
+    lines.append("\nCandidate terms (category | name | definition | first sentence):")
     for term in terms:
         sentence = first.get(term.name)
         context = f"[{sentence.ref}] {sentence.line}" if sentence is not None else ""
-        lines.append(f"- {term.category} | {term.name} | {context}")
+        lines.append(f"- {term.category} | {term.name} | {term.definition or ''} | {context}")
     return lines
 
 

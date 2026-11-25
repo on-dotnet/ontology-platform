@@ -199,7 +199,7 @@ def relation(domain: str, range_: str, label: str, sentence: str | None) -> Rela
 
 
 def outputs(types: list[EntityTypeOut], rels: RelationsOut) -> dict[str, list[BaseModel]]:
-    term = TermOut(name="炉次", category="entity")
+    term = TermOut(name="炉次", definition=None, category="entity")
     return {
         "extract.terms": [TermsOut(terms=[term])],
         "extract.types": [TypesOut(entity_types=types)],
@@ -474,9 +474,11 @@ async def test_references_to_elements_that_are_not_types_are_dropped() -> None:
 
 
 def term(
-    name: str, category: Literal["entity", "attribute", "relation", "value", "other"] = "entity"
+    name: str,
+    category: Literal["entity", "attribute", "relation", "value", "other"] = "entity",
+    definition: str | None = None,
 ) -> TermOut:
-    return TermOut(name=name, category=category)
+    return TermOut(name=name, definition=definition, category=category)
 
 
 def types_texts(gateway: ScriptedGateway) -> list[str]:
@@ -488,7 +490,9 @@ async def test_few_terms_are_typed_in_one_call_each_with_its_first_sentence() ->
         {
             "extract.terms": [
                 TermsOut(terms=[term("炉次")]),
-                TermsOut(terms=[term("浇次", category="other"), term("铁水罐")]),
+                TermsOut(
+                    terms=[term("浇次", "other", definition="连续浇铸的炉次"), term("铁水罐")]
+                ),
             ],
             "extract.types": [TypesOut(entity_types=[])],
             "extract.relations": [RelationsOut(relations=[], properties=[])] * 2,
@@ -515,10 +519,10 @@ async def test_few_terms_are_typed_in_one_call_each_with_its_first_sentence() ->
         "Existing entity types (id | label | synonyms):\n"
         "- E1 | 钢种 | 牌号\n"
         "\n"
-        "Candidate terms (category | name | first sentence):\n"
-        "- entity | 炉次 | [0.1] 每个炉次。\n"
-        "- other | 浇次 | [1.1] 一个浇次由若干个炉次的钢水连续浇铸而成。\n"
-        "- entity | 铁水罐 | "
+        "Candidate terms (category | name | definition | first sentence):\n"
+        "- entity | 炉次 |  | [0.1] 每个炉次。\n"
+        "- other | 浇次 | 连续浇铸的炉次 | [1.1] 一个浇次由若干个炉次的钢水连续浇铸而成。\n"
+        "- entity | 铁水罐 |  | "
     ]
 
 

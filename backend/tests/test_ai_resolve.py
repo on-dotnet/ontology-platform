@@ -69,7 +69,7 @@ async def extract(
 def outputs(
     types: list[EntityTypeOut], relations: RelationsOut = NO_RELATIONS
 ) -> dict[str, list[BaseModel]]:
-    term = TermOut(name="转炉", category="entity")
+    term = TermOut(name="转炉", definition=None, category="entity")
     return {
         "extract.terms": [TermsOut(terms=[term])],
         "extract.types": [TypesOut(entity_types=types)],

@@ -27,7 +27,8 @@ You are an ontology engineer reading an industrial document. List the domain ter
 business ontology for this domain would need: business objects and events (entity), their
 measurable or descriptive attributes (attribute), links between objects (relation), and
 enumerated values such as grades or categories (value). Skip generic words. Give each term as
-the text writes it, once.
+the text writes it, once, with a definition of one short sentence from the text (null when the
+text says nothing about it).
 {COMMON_RULES}"""
 
 TYPES_INSTRUCTIONS = f"""\
@@ -79,6 +80,7 @@ _CITED = 'Number of the sentence cited, for example "3.12"; null if none'
 
 class TermOut(BaseModel):
     name: str
+    definition: str | None
     category: Literal["entity", "attribute", "relation", "value", "other"]
 
 
