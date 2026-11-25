@@ -13,7 +13,12 @@ from fastapi.responses import JSONResponse
 
 from ontology_platform.db import DbSession
 from ontology_platform.errors import PROBLEM_MEDIA_TYPE, problem_responses
-from ontology_platform.modules.identity.api import CurrentUser, client_ip, require_role
+from ontology_platform.modules.identity.api import (
+    CurrentUser,
+    client_ip,
+    require_role,
+    require_scope,
+)
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.identity.service import Principal
 from ontology_platform.modules.ontology import (
@@ -31,6 +36,8 @@ from ontology_platform.settings import Settings, get_settings
 
 Creator = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.EDITOR, Role.REVIEWER))]
 Reviewer = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.REVIEWER))]
+# Published versions are also open to access tokens with ontology:read (spec 003 appendix).
+ReleaseReader = Annotated[Principal, Depends(require_scope("ontology:read"))]
 AppSettings = Annotated[Settings, Depends(get_settings)]
 ExportFormat = Annotated[Literal["turtle"], Query(alias="format")]
 REVIEWER_ROLES = frozenset({Role.ADMIN, Role.REVIEWER})
@@ -472,7 +479,7 @@ async def publish_release(
 @router.get("/releases/{id}", responses=problem_responses(401, 404, 422))
 async def get_release(
     id: UUID,
-    user: CurrentUser,
+    user: ReleaseReader,
     db: DbSession,
 ) -> schemas.ReleaseSummary:
     """One published version."""
@@ -486,7 +493,7 @@ async def get_release(
 )
 async def export_release(
     id: UUID,
-    user: CurrentUser,
+    user: ReleaseReader,
     db: DbSession,
     export_format: ExportFormat = "turtle",
 ) -> Response:

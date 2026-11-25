@@ -17,21 +17,23 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from http import HTTPStatus
-from typing import Any, Literal
+from typing import Any, Literal, cast
 from uuid import UUID, uuid4
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ontology_platform.errors import AppError
+from ontology_platform.errors import AppError, not_implemented
 from ontology_platform.modules.audit import service as audit
 from ontology_platform.modules.ontology import mergeplan, rules, schemas
 from ontology_platform.modules.ontology.axiom_rules import axiom_problem
 from ontology_platform.modules.ontology.models import (
+    BINDING_KINDS,
     ELEMENT_FLAGS,
     ITEM_FLAGS,
     KINDS,
+    SEMANTIC_KINDS,
     ChangeItem,
     ChangeSet,
     ChangeSetSource,
@@ -40,6 +42,7 @@ from ontology_platform.modules.ontology.models import (
     Element,
     ElementStatus,
     Evidence,
+    EvidenceKind,
     Kind,
     Ontology,
     Release,
@@ -147,8 +150,18 @@ async def _ontology_or_404(
     return ontology
 
 
-async def _elements(db: AsyncSession, ontology_id: UUID) -> list[Element]:
+async def _elements(
+    db: AsyncSession, ontology_id: UUID, *, all_kinds: bool = False
+) -> list[Element]:
+    """The ontology's elements, semantic kinds only unless `all_kinds`.
+
+    Bindings (spec 003, 6.1) are seen only where a caller asks for them: merging, publishing,
+    comparing, impact and change set checks. Export, diffing, the graph, alignment and the
+    assistant's context keep the default, so they cannot pick up bindings by accident.
+    """
     statement = select(Element).where(Element.ontology_id == ontology_id)
+    if not all_kinds:
+        statement = statement.where(Element.kind.in_(SEMANTIC_KINDS))
     return sorted((await db.scalars(statement)).all(), key=_kind_order)
 
 
@@ -157,6 +170,40 @@ async def _active_elements(db: AsyncSession, ontology_id: UUID) -> list[Element]
 
 
 # ---------- interface for other modules ----------
+
+
+def ensure_no_binding_items(items: Sequence[schemas.ProposedItem | schemas.EditItem]) -> None:
+    """Binding items are accepted by the API models from M3 batch 1 on, but merging them arrives
+    with batch 4a (spec 003, 6.6). Until then they stop here, before any rule table that does
+    not know their kinds; every way to a change set (edits, imports, assistant, cascades) passes
+    through `create_change_set`, and manual edits check first."""
+    if any(item.kind in BINDING_KINDS for item in items):
+        raise not_implemented("Data bindings")
+
+
+async def count_mcp_change_sets(db: AsyncSession, token_id: UUID, *, since: datetime) -> int:
+    """Change sets proposed through one access token since `since` (spec 003, 9.4)."""
+    statement = (
+        select(func.count())
+        .select_from(ChangeSet)
+        .where(ChangeSet.token_id == token_id, ChangeSet.created_at >= since)
+    )
+    return await db.scalar(statement) or 0
+
+
+async def count_open_mcp_change_sets(db: AsyncSession, user_id: UUID) -> int:
+    """Open change sets one user proposed over MCP (spec 003, 9.4)."""
+    statement = (
+        select(func.count())
+        .select_from(ChangeSet)
+        .where(
+            ChangeSet.source == "mcp",
+            ChangeSet.status == "open",
+            ChangeSet.created_by == user_id,
+        )
+    )
+    return await db.scalar(statement) or 0
+
 
 # What a merge of an AI-extracted change set does with each item, as a pure function of plain
 # data (spec 004, 5.2): the evaluation applies proposals with it, without a database.
@@ -207,17 +254,21 @@ async def create_change_set(
     document_id: UUID | None,
     created_by: UUID | None,
     items: list[schemas.ProposedItem],
+    token_id: UUID | None = None,
 ) -> UUID:
     """Add an open change set with `items` (in order) to the caller's transaction.
+
+    `token_id` is the access token an MCP proposal came through (source `mcp`).
 
     Raises `InvalidProposalError` when a temp_ref is repeated, a reference is neither an object
     type of the ontology nor the temp_ref of an object type created in this change set, or an
     update does not target an element of the ontology. Nothing is committed.
     """
+    ensure_no_binding_items(items)
     ontology = await db.get(Ontology, ontology_id)
     if ontology is None:
         raise _ontology_not_found()
-    elements = {element.id: element for element in await _elements(db, ontology_id)}
+    elements = {element.id: element for element in await _elements(db, ontology_id, all_kinds=True)}
 
     created_kinds: dict[str, Kind] = {}
     for position, item in enumerate(items, start=1):
@@ -241,6 +292,7 @@ async def create_change_set(
         document_id=document_id,
         status="open",
         created_by=created_by,
+        token_id=token_id,
         created_at=_now(),
     )
     db.add(change_set)
@@ -249,11 +301,13 @@ async def create_change_set(
     audit.record(
         db,
         "changeset.created",
-        # AI change sets are the platform's work, not the uploader's.
-        actor_id=created_by if source in ("manual", "import") else None,
+        # AI change sets are the platform's work, not the uploader's; an MCP proposal is the
+        # token owner's, made through that token.
+        actor_id=created_by if source in ("manual", "import", "mcp") else None,
         target_type="change_set",
         target_id=str(change_set.id),
-        detail={"source": source, "items": len(items)},
+        detail={"source": source, "items": len(items)}
+        | ({"tokenId": str(token_id)} if token_id is not None else {}),
     )
     rows: list[tuple[ChangeItem, schemas.ProposedItem]] = []
     for seq, item in enumerate(items, start=1):
@@ -283,7 +337,13 @@ async def create_change_set(
                 Evidence(
                     id=uuid4(),
                     change_item_id=row.id,
+                    kind=evidence.kind,
                     document_id=evidence.document_id,
+                    source=(
+                        evidence.source.model_dump(mode="json", by_alias=True)
+                        if evidence.source is not None
+                        else None
+                    ),
                     chunk_id=evidence.chunk_id,
                     quote=evidence.quote,
                     char_start=evidence.char_start,
@@ -565,6 +625,7 @@ def _element_data(element: Element, base_iri: str) -> dict[str, Any]:
         "turtle": element.turtle,
         "subject_id": element.subject_id,
         "flags": [flag for flag in element.flags if flag in ELEMENT_FLAGS],
+        "binding": element.binding,
         "status": element.status,
         "origin": element.origin,
         "revision": element.revision,
@@ -600,7 +661,7 @@ async def list_elements(
     """Elements of one status (active by default), optionally of one kind and matching `q` in
     names, labels, synonyms, the IRI or an axiom's text."""
     ontology = await _ontology_or_404(db, ontology_id)
-    elements = await _elements(db, ontology_id)
+    elements = await _elements(db, ontology_id, all_kinds=kind in BINDING_KINDS)
     if status != "all":
         elements = [element for element in elements if element.status == status]
     if kind is not None:
@@ -773,7 +834,13 @@ async def _evidence_by_item(
         grouped[evidence.change_item_id].append(
             schemas.Evidence(
                 id=evidence.id,
+                kind=cast(EvidenceKind, evidence.kind),
                 document_id=evidence.document_id,
+                source=(
+                    schemas.CatalogEvidenceSource.model_validate(evidence.source)
+                    if evidence.source is not None
+                    else None
+                ),
                 chunk_id=evidence.chunk_id,
                 quote=evidence.quote,
                 char_start=evidence.char_start,
@@ -1166,7 +1233,10 @@ async def _edit_problems(
     item: ChangeItem,
     fields: schemas.ElementFields,
 ) -> list[str]:
-    elements = {element.id: element for element in await _elements(db, change_set.ontology_id)}
+    elements = {
+        element.id: element
+        for element in await _elements(db, change_set.ontology_id, all_kinds=True)
+    }
     target = elements.get(item.target_element_id) if item.target_element_id else None
     kind = item.kind
     problems = rules.field_problems(

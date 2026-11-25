@@ -1,7 +1,7 @@
 """AI binding suggestion requests (owner: ai module, spec 003 section 8).
 
 Revision ID: 0010
-Revises: 0008 (until 0009, the ontology bindings, is written; spec 003 section 16)
+Revises: 0009
 Create Date: 2026-11-25
 """
 
@@ -12,9 +12,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision: str = "0010"
-# TODO(M3 batch 1): becomes "0009" in the commit that adds v0009_ontology_bindings, which waits
-# for the alignment PR (#48) to land. Nothing of this branch is merged before then.
-down_revision: str | None = "0008"
+down_revision: str | None = "0009"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

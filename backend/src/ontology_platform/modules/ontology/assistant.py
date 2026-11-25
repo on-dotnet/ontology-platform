@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.ontology import editing, expert, rules, schemas, service
-from ontology_platform.modules.ontology.models import Element, Kind, Ontology
+from ontology_platform.modules.ontology.models import ChangeSetSource, Element, Kind, Ontology
 
 # Above this many elements the model only sees those the message names and their neighbours.
 CONTEXT_ELEMENTS_MAX = 400
@@ -307,9 +307,15 @@ async def propose(
     message: str,
     created_by: UUID,
     items: Sequence[schemas.ProposedItem],
+    source: ChangeSetSource = "ai_assistant",
+    title: str | None = None,
+    token_id: UUID | None = None,
 ) -> Proposal:
     """Check the assistant's operations and turn those that pass into a change set waiting for
-    review. Nothing is committed: the caller does."""
+    review. Nothing is committed: the caller does.
+
+    MCP proposals (spec 003, 9.4) go through the same checks with `source="mcp"`, their own
+    `title` and the access token they came through."""
     ontology = await service._ontology_or_404(db, ontology_id, lock=True)
     elements = await service._elements(db, ontology_id)
     by_id = {element.id: element for element in elements}
@@ -338,10 +344,11 @@ async def propose(
     change_set_id = await service.create_change_set(
         db,
         ontology_id=ontology_id,
-        title=_title(message),
-        source="ai_assistant",
+        title=title if title is not None else _title(message),
+        source=source,
         document_id=None,
         created_by=created_by,
         items=with_cascade,
+        token_id=token_id,
     )
     return Proposal(change_set_id=change_set_id, dropped=dropped)

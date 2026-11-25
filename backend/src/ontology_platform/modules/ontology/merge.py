@@ -603,7 +603,7 @@ async def _apply_change_set(
     if any(item.decision == "pending" for item in items):
         raise AppError(409, "changeset.pending_items", "Every item needs a decision first.")
     now = _now()
-    elements = await _elements(db, ontology.id)
+    elements = await _elements(db, ontology.id, all_kinds=True)
     # Under the ontology lock: the plan made here is the one that is applied.
     plan = _plan(change_set, ontology, elements, items)
     seen = resolution_token == plan.token

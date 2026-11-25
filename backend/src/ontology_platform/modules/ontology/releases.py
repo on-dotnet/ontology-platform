@@ -16,7 +16,13 @@ from sqlalchemy.orm import defer
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
 from ontology_platform.modules.ontology import rules, schemas
-from ontology_platform.modules.ontology.models import DATATYPES, Element, Ontology, Release
+from ontology_platform.modules.ontology.models import (
+    DATATYPES,
+    SEMANTIC_KINDS,
+    Element,
+    Ontology,
+    Release,
+)
 from ontology_platform.modules.ontology.service import (
     ReleaseInvalidError,
     _elements,
@@ -112,6 +118,7 @@ def _release_out(release: Release, active_release_id: UUID | None) -> schemas.Re
         title=release.title,
         notes=release.notes,
         element_count=release.element_count,
+        binding_count=release.binding_count,
         is_active=release.id == active_release_id,
         created_by=release.created_by,
         created_at=release.created_at,
@@ -155,22 +162,25 @@ async def publish_release(
     """Check the working version, then store an immutable snapshot as the next version and make
     it the current one. Raises `ReleaseInvalidError` when the checks fail."""
     ontology = await _ontology_or_404(db, ontology_id, lock=True)
-    elements = await _elements(db, ontology_id)
+    elements = await _elements(db, ontology_id, all_kinds=True)
     problems = release_problems(elements)
     if problems:
         raise ReleaseInvalidError(problems)
+    # Bindings are part of the snapshot (spec 003, 6.4) but neither of the Turtle nor of the
+    # element count; the export must not rely on bindings having no IRI.
     snapshot = [
         element_out(element, ontology.base_iri)
         for element in elements
         if element.status == "active"
     ]
+    semantic = [element for element in snapshot if element.kind in SEMANTIC_KINDS]
     latest = await db.scalar(
         select(func.max(Release.version)).where(Release.ontology_id == ontology_id),
     )
     version = (latest or 0) + 1
     now = _now()
     header = header_of(ontology)
-    turtle = await asyncio.to_thread(export_turtle, header, snapshot, version=version, created=now)
+    turtle = await asyncio.to_thread(export_turtle, header, semantic, version=version, created=now)
     release = Release(
         id=uuid4(),
         ontology_id=ontology_id,
@@ -181,7 +191,8 @@ async def publish_release(
         header={"ontologyIri": header.ontology_iri, "prefixes": header.prefix_map()},
         turtle=turtle,
         turtle_sha256=hashlib.sha256(turtle.encode()).hexdigest(),
-        element_count=len(snapshot),
+        element_count=len(semantic),
+        binding_count=len(snapshot) - len(semantic),
         created_by=actor,
         created_at=now,
     )
@@ -195,7 +206,12 @@ async def publish_release(
         actor_id=actor,
         target_type="release",
         target_id=str(release.id),
-        detail={"ontologyId": str(ontology_id), "version": version, "elementCount": len(snapshot)},
+        detail={
+            "ontologyId": str(ontology_id),
+            "version": version,
+            "elementCount": len(semantic),
+            "bindingCount": len(snapshot) - len(semantic),
+        },
         ip=ip,
     )
     await db.commit()

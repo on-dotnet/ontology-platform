@@ -271,7 +271,7 @@ def _ref(view: _View) -> schemas.ElementRef:
 async def impact(db: AsyncSession, ontology_id: UUID, element_id: UUID) -> schemas.Impact:
     """Active elements that refer to the element, and what deleting it would change."""
     ontology = await service._ontology_or_404(db, ontology_id)
-    views = _views(ontology, await service._elements(db, ontology_id))
+    views = _views(ontology, await service._elements(db, ontology_id, all_kinds=True))
     target = views.get(element_id)
     if target is None:
         raise _not_found()
@@ -450,8 +450,9 @@ async def save_edits(
     ip: str | None,
 ) -> schemas.EditResult:
     """Save `body.items` as a manual change set; merge it when `body.apply` and `may_apply`."""
+    service.ensure_no_binding_items(body.items)
     ontology = await service._ontology_or_404(db, ontology_id, lock=True)
-    elements = await service._elements(db, ontology_id)
+    elements = await service._elements(db, ontology_id, all_kinds=True)
     checked = await _check_items(db, ontology, elements, body)
     own_count = len(checked.items)
     if checked.deletes:
