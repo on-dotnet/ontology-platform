@@ -37,7 +37,7 @@ import time
 import tomllib
 import traceback
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime, timedelta
 from typing import Any, cast
@@ -86,6 +86,7 @@ INVALID_ITEM = "changeset.invalid_item"
 DEPENDENCY_SKIPPED = "changeset.dependency_skipped"
 STALE_TARGET = "changeset.stale_target"
 BASE_IRI = "https://eval.invalid/"
+_REF_KIND = "entity_type"  # what parentRef, domainRef and rangeRef point at
 _EPOCH = datetime(2000, 1, 1, tzinfo=UTC)
 
 
@@ -132,13 +133,50 @@ class WorkingVersion:
             for seq, proposal in enumerate(proposals, start=1)
         ]
         plan = plan_merge(items, self._plan_elements(), base_iri=BASE_IRI)
-        applied: dict[str, UUID | None] = {}  # temp_ref -> element, None when skipped
-        skipped: list[str] = []
-        for item, proposal in zip(items, proposals, strict=True):
-            outcome = self._apply(item, proposal, plan.get(item.id), applied)
-            if outcome is not None:
-                skipped.append(outcome)
-        return skipped
+        proposal_of = {item.id: proposal for item, proposal in zip(items, proposals, strict=True)}
+        creates = {item.temp_ref: item for item in items if item.op == "create" and item.temp_ref}
+        outcomes: dict[UUID, str | None] = {}
+        made: dict[UUID, UUID] = {}  # item -> the element it created or went into
+        visiting: set[UUID] = set()
+        start = len(self.elements)
+
+        def apply(item: PlanItem) -> str | None:
+            if item.id in outcomes:
+                return outcomes[item.id]
+            visiting.add(item.id)
+            try:
+                outcome, element_id = self._apply(
+                    item, proposal_of[item.id], plan.get(item.id), resolve
+                )
+            finally:
+                visiting.discard(item.id)
+            outcomes[item.id] = outcome
+            if element_id is not None:
+                made[item.id] = element_id
+            return outcome
+
+        def resolve(ref: str) -> tuple[str | None, UUID | None]:
+            # As the merge does: an item made in the same change set is applied first, wherever
+            # it stands (the model may list a subtype before its parent).
+            dependency = creates.get(ref)
+            if dependency is None:
+                element_id = _uuid(ref)
+                element = next((e for e in self.elements if e.id == element_id), None)
+                if element is None or element.kind != _REF_KIND:
+                    return INVALID_ITEM, None
+                return None, element.id
+            if dependency.kind != _REF_KIND or dependency.id in visiting:
+                return INVALID_ITEM, None
+            if apply(dependency) is not None:
+                return DEPENDENCY_SKIPPED, None
+            return None, made[dependency.id]
+
+        for item in items:
+            apply(item)
+        # New elements keep the order of their items, whatever order dependencies made them in.
+        seq_of = {made[item.id]: item.seq for item in items if item.id in made}
+        self.elements[start:] = sorted(self.elements[start:], key=lambda e: seq_of[e.id])
+        return [code for item in items if (code := outcomes[item.id]) is not None]
 
     def _plan_elements(self) -> list[PlanElement]:
         return [
@@ -170,46 +208,38 @@ class WorkingVersion:
         item: PlanItem,
         proposal: Proposal,
         resolution: Resolution | None,
-        applied: dict[str, UUID | None],
-    ) -> str | None:
+        resolve: Callable[[str], tuple[str | None, UUID | None]],
+    ) -> tuple[str | None, UUID | None]:
+        """The code the item is skipped with (or None) and the element it went into."""
         by_id = {element.id: element for element in self.elements}
         if item.op != "create":
             target = by_id.get(item.target_element_id) if item.target_element_id else None
-            if target is None or item.op == "restore":
-                return INVALID_ITEM  # nothing is deleted in a run, so nothing to restore
+            if target is None or target.kind != item.kind or item.op == "restore":
+                return INVALID_ITEM, None  # nothing is deleted in a run, so nothing to restore
             if resolution is None and target.revision != item.target_revision:
-                return STALE_TARGET
+                return STALE_TARGET, None
             self._add_to(target, item.fields, None, name_it=False)
-            return None
+            return None, target.id
         refs: dict[str, UUID | None] = {}
         for name in ("parent_ref", "domain_ref", "range_ref"):
             ref = getattr(item.fields, name)
             if ref is None:
                 continue
-            if ref in applied:
-                if applied[ref] is None:
-                    self._skip(item, applied)
-                    return DEPENDENCY_SKIPPED
-                refs[name] = applied[ref]
-                continue
-            element_id = _uuid(ref)
-            if element_id is None or element_id not in by_id:
-                self._skip(item, applied)
-                return INVALID_ITEM
+            outcome, element_id = resolve(ref)
+            if outcome is not None:
+                return outcome, None
             refs[name] = element_id
+        by_id = {element.id: element for element in self.elements}  # resolving may add some
         if resolution is not None and resolution.mode == "into" and resolution.element_id:
             self._add_to(by_id[resolution.element_id], item.fields, refs.get("parent_ref"))
-            if item.temp_ref:
-                applied[item.temp_ref] = resolution.element_id
-            return None
+            return None, resolution.element_id
         local_name = (
             resolution.local_name
             if resolution is not None and resolution.mode == "rename" and resolution.local_name
             else item.fields.local_name or ""
         )
         if local_name in {element.local_name for element in self.elements}:
-            self._skip(item, applied)
-            return INVALID_ITEM
+            return INVALID_ITEM, None
         element_id = self._new_id(item.kind, local_name)
         self.elements.append(
             KnownElement(
@@ -227,14 +257,7 @@ class WorkingVersion:
         if refs.get("parent_ref") is not None:
             self.parents[element_id] = cast(UUID, refs["parent_ref"])
         self.flags[element_id] = tuple(proposal.flags)
-        if item.temp_ref:
-            applied[item.temp_ref] = element_id
-        return None
-
-    @staticmethod
-    def _skip(item: PlanItem, applied: dict[str, UUID | None]) -> None:
-        if item.temp_ref:
-            applied[item.temp_ref] = None
+        return None, element_id
 
     def _new_id(self, kind: str, local_name: str) -> UUID:
         used = {element.id for element in self.elements}
@@ -793,6 +816,9 @@ def evaluate(
     if mode not in {"record", "replay"}:
         raise ValueError(f"Unknown mode: {mode}")
     settings = Settings()
+    scenarios = bundle.get("scenarios") or SCENARIOS
+    if not isinstance(scenarios, list | tuple) or not all(isinstance(s, str) for s in scenarios):
+        raise ValueError(f"Scenarios must be a list of names: {scenarios!r}")
     models = _models(settings, mode, bundle.get("manifest"))
     files = {path: base64.b64decode(value) for path, value in bundle["files"].items()}
     if mode == "replay":
@@ -804,7 +830,6 @@ def evaluate(
         on_invalid=lambda index: log(f"recording {index} is not readable, skipped"),
     )
     gateway = ReplayGateway(recordings, inner)
-    scenarios = bundle.get("scenarios") or SCENARIOS
     try:
         result = asyncio.run(run_case(files, gateway, models, scenarios))
     except (AiError, ReplayMissError, ExpectedError) as exc:

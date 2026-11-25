@@ -186,8 +186,8 @@ def test_merge_counts_report_skipped_items_and_duplicates() -> None:
         create("entity_type", "new:BOF", "氧气转炉"),
         create("relation_type", "new:a", "使用", domainRef="new:Heat", rangeRef="new:Ladle"),
         create("relation_type", "new:b", "使用", domainRef="new:Heat", rangeRef="new:Ladle"),
-        create("relation_type", "new:c", "使用", domainRef="new:Ghost", rangeRef="new:Ladle"),
-        create("property", "new:d", "温度", domainRef="new:c"),
+        create("entity_type", "new:Orphan", "孤儿", parentRef="new:Ghost"),
+        create("property", "new:d", "温度", domainRef="new:Orphan"),
     ]
     version = WorkingVersion()
     skipped = version.merge(proposals)
@@ -206,6 +206,37 @@ def test_merge_counts_report_skipped_items_and_duplicates() -> None:
         # 氧气转炉 is no name of the expected 转炉 group: unexpected, not a duplicate.
         "groups": ["炉次 / 炉次", "钢包 / 盛钢桶"],
     }
+
+
+def test_an_item_referencing_one_listed_after_it_is_merged_as_the_merge_does() -> None:
+    proposals = [
+        create("entity_type", "new:Converter", "转炉", parentRef="new:Equipment"),
+        create(
+            "relation_type", "new:smelts", "冶炼", domainRef="new:Heat", rangeRef="new:Converter"
+        ),
+        create("entity_type", "new:Equipment", "设备"),
+        create("entity_type", "new:Heat", "炉次"),
+    ]
+    version = WorkingVersion()
+    assert version.merge(proposals) == []
+
+    # Elements keep the order of their items, as the ids the model is shown are derived in.
+    names = [e.local_name for e in version.elements]
+    assert names == ["Converter", "smelts", "Equipment", "Heat"]
+    converter, smelts, equipment, heat = version.elements
+    assert version.parents == {converter.id: equipment.id}
+    assert (smelts.domain_id, smelts.range_id) == (heat.id, converter.id)
+
+
+def test_a_reference_to_an_element_of_another_kind_is_an_invalid_item() -> None:
+    proposals = [
+        create("entity_type", "new:Heat", "炉次"),
+        create("relation_type", "new:smelts", "冶炼", domainRef="new:Heat", rangeRef="new:Heat"),
+        create("property", "new:weight", "装入量", domainRef="new:smelts"),
+    ]
+    version = WorkingVersion()
+    assert version.merge(proposals) == ["changeset.invalid_item"]
+    assert [e.local_name for e in version.elements] == ["Heat", "smelts"]
 
 
 # ---------------------------------------------------------------- properties and hierarchy
