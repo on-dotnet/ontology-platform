@@ -400,14 +400,20 @@
     "relation_type": "关系",
     "property": "属性",
     "constraint": "约束",
-    "axiom": "高级公理"
+    "axiom": "高级公理",
+    "type_binding": "类型绑定",
+    "property_binding": "属性绑定",
+    "relation_binding": "关系绑定"
   },
   "kind": {
     "entity_type": "对象类型",
     "relation_type": "关系",
     "property": "属性",
     "constraint": "约束",
-    "axiom": "高级公理"
+    "axiom": "高级公理",
+    "type_binding": "类型绑定",
+    "property_binding": "属性绑定",
+    "relation_binding": "关系绑定"
   },
   "datatypes": {
     "string": "文本",
@@ -588,7 +594,9 @@
       "ai_extraction": "资料识别",
       "import": "导入",
       "manual": "手工",
-      "ai_assistant": "AI 助手"
+      "ai_assistant": "AI 助手",
+      "ai_binding": "AI 绑定建议",
+      "mcp": "MCP"
     },
     "acceptAll": "接受全部（{{count}}）",
     "allAccepted": "已接受 {{count}} 项",
@@ -1054,7 +1062,10 @@
       "not_authenticated": "登录已失效，请重新登录。",
       "csrf_failed": "页面已过期，请刷新页面后重试。",
       "rate_limited": "尝试次数过多，请稍后再试。",
-      "forbidden": "你没有执行此操作的权限，请联系平台管理员。"
+      "forbidden": "你没有执行此操作的权限，请联系平台管理员。",
+      "invalid_token": "访问令牌无效、已过期或已撤销。",
+      "token_not_allowed": "这个接口不接受访问令牌。",
+      "insufficient_scope": "访问令牌没有所需的作用域。"
     },
     "validation": {
       "failed": "填写的内容不完整或格式不正确，请检查后重试。"
@@ -1100,7 +1111,54 @@
       "unavailable": "AI 识别暂不可用，资料已保存，可稍后重试。",
       "invalid_output": "AI 返回的结果不符合要求，资料已保存，请稍后重试。"
     },
+    "token": {
+      "limit_reached": "有效的访问令牌已达 10 个，请先撤销不用的令牌。",
+      "scope_not_allowed": "你的角色不能申请这个作用域。",
+      "not_found": "访问令牌不存在，或不属于你。"
+    },
+    "datasource": {
+      "not_found": "数据源不存在。",
+      "name_taken": "已有同名的数据源，请换一个名称。",
+      "stale": "数据源已被其他人修改，请刷新后再改。",
+      "in_use": "还有数据绑定在使用这个数据源，不能归档。",
+      "archived": "数据源已归档，不能再修改或使用。",
+      "platform_database": "不能把平台自己的数据库作为数据源。",
+      "credential_unreadable": "保存的口令无法读取，请重新填写口令。",
+      "connect_failed": "无法连接到数据源，请检查地址、账号和口令后重试。"
+    },
+    "catalog": {
+      "not_ready": "还没有读取目录，请先读取目录。",
+      "too_large": "表或列太多，请在数据源里填写模式范围后再读取。",
+      "table_not_found": "目录里没有这张表，请重新读取目录。"
+    },
+    "binding": {
+      "invalid": "数据绑定的设置不完整或不正确，请检查后重试。",
+      "duplicate": "这个元素已经有数据绑定了。",
+      "type_mismatch": "列的类型与属性的数据类型不相容，请换一列。",
+      "cross_source": "关系两端的表必须在同一个数据源里。"
+    },
+    "binding_suggestion": {
+      "scope_too_large": "范围太大（最多 200 张表、4,000 列），请缩小范围后重试。",
+      "not_found": "这次 AI 绑定建议不存在。"
+    },
+    "query": {
+      "no_release": "本体还没有发布版本，发布后才能查询数据。",
+      "type_not_bound": "这个对象类型在当前版本里还没有绑定数据。",
+      "object_not_found": "没有找到这个对象。",
+      "invalid_filter": "筛选条件不适用于这个属性，请检查后重试。",
+      "invalid_cursor": "翻页信息已失效，请重新查询。",
+      "release_changed": "本体刚发布了新版本，请重新查询。",
+      "timeout": "查询超时，请增加筛选条件后重试。",
+      "busy": "这个数据源上排队的查询太多，请稍后重试。",
+      "source_unavailable": "无法连接到数据源，请稍后重试或联系管理员。",
+      "source_mismatch": "数据源里的表或列已经变了，请联系管理员更新数据绑定。",
+      "source_disabled": "数据源已归档或口令不可用，请联系管理员。"
+    },
+    "mcp": {
+      "rate_limited": "请求太频繁，请稍后再试。"
+    },
     "http": {
+      "not_implemented": "这项功能还在开发中，暂时不能使用。",
       "400": "请求的内容不正确，请检查后重试。",
       "401": "登录已失效，请重新登录。",
       "403": "你没有执行此操作的权限，请联系平台管理员。",

@@ -1381,6 +1381,28 @@ export interface components {
             /** Position */
             position: number;
         };
+        /**
+         * CatalogEvidenceSource
+         * @description Which fact of a data source's catalog a binding suggestion rests on (spec 003, 6.3).
+         */
+        CatalogEvidenceSource: {
+            /**
+             * Datasourceid
+             * Format: uuid
+             */
+            dataSourceId: string;
+            /** Schema */
+            schema: string;
+            /** Table */
+            table: string;
+            /** Column */
+            column?: string | null;
+            /**
+             * Fact
+             * @enum {string}
+             */
+            fact: "table" | "column" | "primary_key" | "foreign_key" | "sample";
+        };
         /** CatalogForeignKey */
         CatalogForeignKey: {
             /** Name */
@@ -1485,7 +1507,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Targetelementid */
             targetElementId: string | null;
             /** Tempref */
@@ -1503,7 +1525,7 @@ export interface components {
             /** Rationale */
             rationale: string | null;
             /** Flags */
-            flags: ("evidence_not_found" | "possible_duplicate" | "non_standard")[];
+            flags: ("evidence_not_found" | "possible_duplicate" | "non_standard" | "key_unverified")[];
             /** Note */
             note: string | null;
             /** Decidedby */
@@ -1534,7 +1556,7 @@ export interface components {
              * Source
              * @enum {string}
              */
-            source: "ai_extraction" | "ai_assistant" | "manual" | "import";
+            source: "ai_extraction" | "ai_assistant" | "manual" | "import" | "ai_binding" | "mcp";
             /** Documentid */
             documentId: string | null;
             /**
@@ -1575,7 +1597,7 @@ export interface components {
              * Source
              * @enum {string}
              */
-            source: "ai_extraction" | "ai_assistant" | "manual" | "import";
+            source: "ai_extraction" | "ai_assistant" | "manual" | "import" | "ai_binding" | "mcp";
             /** Documentid */
             documentId: string | null;
             /**
@@ -1616,6 +1638,19 @@ export interface components {
             heading: string | null;
             /** Charcount */
             charCount: number;
+        };
+        /**
+         * ColumnBinding
+         * @description property_binding: a property to a column of its type binding's table.
+         */
+        ColumnBinding: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            target: "column";
+            /** Column */
+            column: string;
         };
         /** CompareCounts */
         CompareCounts: {
@@ -1983,7 +2018,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Targetelementid */
             targetElementId?: string | null;
             /** Targetrevision */
@@ -2029,7 +2064,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Localname */
             localName: string | null;
             /** Iri */
@@ -2072,6 +2107,8 @@ export interface components {
             subjectId: string | null;
             /** Flags */
             flags: "non_standard"[];
+            /** Binding */
+            binding?: (components["schemas"]["TableBinding"] | components["schemas"]["ColumnBinding"] | components["schemas"]["JoinBinding"]) | null;
             /**
              * Status
              * @enum {string}
@@ -2106,7 +2143,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Label */
             label: string;
             /** Iri */
@@ -2140,7 +2177,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Localname */
             localName: string | null;
             /** Iri */
@@ -2183,6 +2220,8 @@ export interface components {
             subjectId: string | null;
             /** Flags */
             flags: "non_standard"[];
+            /** Binding */
+            binding?: (components["schemas"]["TableBinding"] | components["schemas"]["ColumnBinding"] | components["schemas"]["JoinBinding"]) | null;
             /**
              * Status
              * @enum {string}
@@ -2255,6 +2294,10 @@ export interface components {
             rules?: components["schemas"]["ConstraintRuleFields"][] | null;
             /** Turtle */
             turtle?: string | null;
+            /** Subjectref */
+            subjectRef?: string | null;
+            /** Binding */
+            binding?: (components["schemas"]["TableBinding"] | components["schemas"]["ColumnBinding"] | components["schemas"]["JoinBinding"]) | null;
         };
         /** ElementRef */
         ElementRef: {
@@ -2267,7 +2310,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
             /** Label */
             label: string;
             /** Iri */
@@ -2281,15 +2324,15 @@ export interface components {
              */
             id: string;
             /**
-             * Documentid
-             * Format: uuid
+             * Kind
+             * @enum {string}
              */
-            documentId: string;
-            /**
-             * Chunkid
-             * Format: uuid
-             */
-            chunkId: string;
+            kind: "document" | "catalog";
+            /** Documentid */
+            documentId: string | null;
+            /** Chunkid */
+            chunkId: string | null;
+            source: components["schemas"]["CatalogEvidenceSource"] | null;
             /** Quote */
             quote: string;
             /** Charstart */
@@ -2326,6 +2369,27 @@ export interface components {
             value?: components["schemas"]["FilterValue"] | components["schemas"]["FilterValue"][] | null;
         };
         FilterValue: string | number | boolean;
+        /**
+         * ForeignKeyJoin
+         * @description `side = source`: the source table's `columns` refer to the target table's `references`;
+         *     `side = target`: the other way round.
+         */
+        ForeignKeyJoin: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "foreign_key";
+            /**
+             * Side
+             * @enum {string}
+             */
+            side: "source" | "target";
+            /** Columns */
+            columns: string[];
+            /** References */
+            references: string[];
+        };
         /** Graph */
         Graph: {
             /** Nodes */
@@ -2401,6 +2465,8 @@ export interface components {
             constraints: components["schemas"]["ElementRef"][];
             /** Axioms */
             axioms: components["schemas"]["ElementRef"][];
+            /** Bindings */
+            bindings?: components["schemas"]["ElementRef"][];
             inverse: components["schemas"]["ElementRef"] | null;
             /** Cascade */
             cascade: components["schemas"]["CascadeChange"][];
@@ -2491,6 +2557,19 @@ export interface components {
             /** Keptfields */
             keptFields: string[];
         };
+        /**
+         * JoinBinding
+         * @description relation_binding: a relation to a foreign key or a link table.
+         */
+        JoinBinding: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            target: "join";
+            /** Join */
+            join: components["schemas"]["ForeignKeyJoin"] | components["schemas"]["LinkTableJoin"];
+        };
         /** LangText */
         LangText: {
             /** Lang */
@@ -2511,6 +2590,25 @@ export interface components {
             code: string | null;
             /** Warnings */
             warnings: "account_can_write"[];
+        };
+        /**
+         * LinkTableJoin
+         * @description A link table whose two column groups match the key columns of source and target.
+         */
+        LinkTableJoin: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "link_table";
+            /** Schema */
+            schema: string;
+            /** Table */
+            table: string;
+            /** Sourcecolumns */
+            sourceColumns: string[];
+            /** Targetcolumns */
+            targetColumns: string[];
         };
         /** LoginRequest */
         LoginRequest: {
@@ -2898,6 +2996,8 @@ export interface components {
             notes: string | null;
             /** Elementcount */
             elementCount: number;
+            /** Bindingcount */
+            bindingCount: number;
             /** Isactive */
             isActive: boolean;
             /** Createdby */
@@ -2944,6 +3044,28 @@ export interface components {
             lang: "zh" | "en";
             /** Text */
             text: string;
+        };
+        /**
+         * TableBinding
+         * @description type_binding: an object type to a table or view and its key columns.
+         */
+        TableBinding: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            target: "table";
+            /**
+             * Datasourceid
+             * Format: uuid
+             */
+            dataSourceId: string;
+            /** Schema */
+            schema: string;
+            /** Table */
+            table: string;
+            /** Keycolumns */
+            keyColumns: string[];
         };
         /** TableRef */
         TableRef: {
@@ -3907,7 +4029,7 @@ export interface operations {
     list_elements_api_ontologies__id__elements_get: {
         parameters: {
             query?: {
-                kind?: ("entity_type" | "relation_type" | "property" | "constraint" | "axiom") | null;
+                kind?: ("entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding") | null;
                 q?: string | null;
                 status?: "active" | "deprecated" | "all";
             };

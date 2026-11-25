@@ -91,7 +91,7 @@ function ontologyServer(extra: Record<string, RouteHandler> = {}) {
           itemId: 'item-1',
           op: 'create',
           mergedAt: '2026-11-21T08:00:00Z',
-          evidence: [{ id: 'ev-1', documentId: 'doc-converter', chunkId: 'chunk-1', quote: '钢水温度不得低于 1580℃', charStart: 2, charEnd: 15 }],
+          evidence: [{ id: 'ev-1', kind: 'document', source: null, documentId: 'doc-converter', chunkId: 'chunk-1', quote: '钢水温度不得低于 1580℃', charStart: 2, charEnd: 15 }],
         },
       ]);
     },
