@@ -45,6 +45,7 @@ SUMMARY_FIELDS = {
 }
 ELEMENT_FIELDS = {
     "id",
+    "binding",
     "ontologyId",
     "kind",
     "localName",
@@ -308,7 +309,17 @@ async def test_element_detail_shows_merged_provenance(
     assert source["changeSetTitle"] == "识别：连铸规程.docx"
     assert source["op"] == "create"
     [quote] = source["evidence"]
-    assert set(quote) == {"id", "documentId", "chunkId", "quote", "charStart", "charEnd"}
+    assert set(quote) == {
+        "id",
+        "kind",
+        "documentId",
+        "chunkId",
+        "source",
+        "quote",
+        "charStart",
+        "charEnd",
+    }
+    assert (quote["kind"], quote["source"]) == ("document", None)
     assert quote["documentId"] == str(DOCUMENT_ID)
     assert quote["quote"] == "原文引语"
     other = await add_ontology(db, key="other")

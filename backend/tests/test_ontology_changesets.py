@@ -142,8 +142,10 @@ async def test_create_change_set_stores_items_in_order(
     assert first["evidence"] == [
         {
             "id": first["evidence"][0]["id"],
+            "kind": "document",
             "documentId": str(DOCUMENT_ID),
             "chunkId": str(CHUNK_ID),
+            "source": None,
             "quote": "原文引语",
             "charStart": 0,
             "charEnd": 4,

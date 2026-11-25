@@ -17,6 +17,8 @@ function items(): ChangeItem[] {
       evidence: [
         {
           id: 'ev-ladle',
+          kind: 'document',
+          source: null,
           documentId: 'doc-converter',
           chunkId: 'chunk-1',
           quote: QUOTE,
@@ -32,7 +34,7 @@ function items(): ChangeItem[] {
       proposed: { localName: 'Slab', labelZh: '板坯', labelEn: 'Slab', synonyms: [{ lang: 'zh', text: '连铸坯' }] },
       confidence: 0.85,
       flags: ['evidence_not_found'],
-      evidence: [{ id: 'ev-slab', documentId: 'doc-converter', chunkId: 'chunk-1', quote: '板坯是连铸的产品', charStart: null, charEnd: null }],
+      evidence: [{ id: 'ev-slab', kind: 'document', source: null, documentId: 'doc-converter', chunkId: 'chunk-1', quote: '板坯是连铸的产品', charStart: null, charEnd: null }],
     }),
     itemFixture({
       id: 'item-holds',
@@ -648,7 +650,7 @@ describe('change item pagination', () => {
       tempRef: `new:N${index}`,
       proposed: { localName: `N${index}`, labelZh: `项目${String(index + 1).padStart(3, '0')}`, ...(index < 70 ? {} : { domainRef: 'el-molten-steel', datatype: 'decimal' }) },
       confidence: 0.9,
-      evidence: [{ id: `ev-${index}`, documentId: 'doc-converter', chunkId: 'chunk-1', quote: QUOTE, charStart: null, charEnd: null }],
+      evidence: [{ id: `ev-${index}`, kind: 'document', source: null, documentId: 'doc-converter', chunkId: 'chunk-1', quote: QUOTE, charStart: null, charEnd: null }],
     }),
   );
 

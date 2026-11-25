@@ -18,7 +18,8 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError
-from ontology_platform.modules.ontology import expert, rules, schemas, service
+from ontology_platform.modules.ontology import axiom_rules, expert, rules, schemas, service
+from ontology_platform.modules.ontology import merge as merging
 from ontology_platform.modules.ontology.models import Element, Kind, Ontology
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError
 
@@ -143,7 +144,7 @@ def _with_fields(
         # The old subject must stop pulling the axiom into the cascade. The new one needs no
         # binding here: a subject is always mentioned, and mentions are read from the fragment.
         try:
-            subject = service.normalize_axiom(fields.turtle, prefixes).subject
+            subject = axiom_rules.normalize_axiom(fields.turtle, prefixes).subject
         except RdfInputError:
             subject = None
         changes["subject_id"] = subjects.get(subject) if subject is not None else None
@@ -172,7 +173,7 @@ def _mentioned_iris(fields: schemas.ElementFields, prefixes: Mapping[str, str]) 
     if not fields.turtle:
         return frozenset()
     try:
-        return service.normalize_axiom(fields.turtle, prefixes).mentions
+        return axiom_rules.normalize_axiom(fields.turtle, prefixes).mentions
     except RdfInputError:
         # Saves check fragments before the cascade; one that does not parse mentions nothing.
         return frozenset()
@@ -193,7 +194,7 @@ class _Cascade:
                 ids.add(view.subject_id)
             if view.kind == "axiom" and view.turtle:
                 try:
-                    mentions = service.normalize_axiom(view.turtle, prefixes).mentions
+                    mentions = axiom_rules.normalize_axiom(view.turtle, prefixes).mentions
                 except RdfInputError:
                     # A stored axiom always parses; if one does not, it mentions nothing usable.
                     mentions = frozenset()
@@ -270,7 +271,7 @@ def _ref(view: _View) -> schemas.ElementRef:
 async def impact(db: AsyncSession, ontology_id: UUID, element_id: UUID) -> schemas.Impact:
     """Active elements that refer to the element, and what deleting it would change."""
     ontology = await service._ontology_or_404(db, ontology_id)
-    views = _views(ontology, await service._elements(db, ontology_id))
+    views = _views(ontology, await service._elements(db, ontology_id, all_kinds=True))
     target = views.get(element_id)
     if target is None:
         raise _not_found()
@@ -449,8 +450,9 @@ async def save_edits(
     ip: str | None,
 ) -> schemas.EditResult:
     """Save `body.items` as a manual change set; merge it when `body.apply` and `may_apply`."""
+    service.ensure_no_binding_items(body.items)
     ontology = await service._ontology_or_404(db, ontology_id, lock=True)
-    elements = await service._elements(db, ontology_id)
+    elements = await service._elements(db, ontology_id, all_kinds=True)
     checked = await _check_items(db, ontology, elements, body)
     own_count = len(checked.items)
     if checked.deletes:
@@ -471,7 +473,7 @@ async def save_edits(
         rows = await service._items(db, change_set)
         for row in rows:
             service._decide(row, "accepted", actor, now)
-        merge = await service._apply_change_set(db, change_set, ontology, actor=actor, ip=ip)
+        merge = await merging._apply_change_set(db, change_set, ontology, actor=actor, ip=ip)
         if merge.skipped:
             # Read the rows before the rollback expires them.
             error = _skipped(merge.skipped, rows, own_count)

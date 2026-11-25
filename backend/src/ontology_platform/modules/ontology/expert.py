@@ -14,7 +14,7 @@ from rdflib.namespace import DCTERMS
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError
-from ontology_platform.modules.ontology import importing, schemas, service
+from ontology_platform.modules.ontology import axiom_rules, importing, schemas, service
 from ontology_platform.modules.ontology.models import Element, Ontology
 from ontology_platform.modules.ontology.rdf import reader, writer
 from ontology_platform.modules.ontology.rdf.diff import Change, diff, keep_lost_lists
@@ -87,10 +87,10 @@ def _check(
     ontology: Ontology,
     elements: Sequence[Element],
     turtle: str,
-) -> service.NormalizedAxiom:
+) -> axiom_rules.NormalizedAxiom:
     prefixes = service.header_of(ontology).prefix_map()
     try:
-        axiom = service.normalize_axiom(turtle, prefixes)
+        axiom = axiom_rules.normalize_axiom(turtle, prefixes)
     except RdfInputError as error:
         raise AppError(422, "axiom.invalid", error.detail) from error
     # Compared with what the export alone brings back, so that an ontology whose round trip is
@@ -118,7 +118,7 @@ async def check_axiom(
     turtle: str,
     *,
     replacing: UUID | None = None,
-) -> service.NormalizedAxiom:
+) -> axiom_rules.NormalizedAxiom:
     """The axiom as it will be stored, or 422: `axiom.invalid` when the fragment does not parse,
     is not exactly one axiom or is already there; `axiom.maps_to_element` when, after an export
     and a fresh import, it would create or change elements rather than stay one axiom.

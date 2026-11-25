@@ -24,9 +24,32 @@ export function highlightRange(
  * section. Quotes without a position are flagged as "not found in the source".
  */
 export function EvidenceExcerpt({ evidence, className }: { evidence: Evidence; className?: string }) {
+  // Catalog evidence (M3 data bindings) has no document passage; batch 4a shows it its own way.
+  if (evidence.documentId === null || evidence.chunkId === null) return null;
+  return (
+    <DocumentExcerpt
+      evidence={evidence}
+      documentId={evidence.documentId}
+      chunkId={evidence.chunkId}
+      className={className}
+    />
+  );
+}
+
+function DocumentExcerpt({
+  evidence,
+  documentId,
+  chunkId,
+  className,
+}: {
+  evidence: Evidence;
+  documentId: string;
+  chunkId: string;
+  className?: string;
+}) {
   const { t } = useTranslation();
-  const chunk = useChunk(evidence.documentId, evidence.chunkId);
-  const document = useDocument(evidence.documentId);
+  const chunk = useChunk(documentId, chunkId);
+  const document = useDocument(documentId);
   const boxRef = useRef<HTMLElement>(null);
   const markRef = useRef<HTMLElement>(null);
   const parts = chunk.data ? highlightRange(chunk.data.text, evidence.charStart, evidence.charEnd) : null;

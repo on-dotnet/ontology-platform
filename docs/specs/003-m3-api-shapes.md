@@ -39,7 +39,7 @@ type DataSource = {
   allowSamples: boolean;
   lastTest: { at: string; ok: boolean; code: string | null; warnings: TestWarning[] } | null;
   catalog: { status: CatalogStatus; refreshedAt: string | null; errorCode: string | null; tableCount: number } | null;   // viewer 为 null
-  boundTypeCount: number;                // 工作版本里绑定到它的对象类型数
+  boundTypeCount: number | null;         // 工作版本里绑定到它的对象类型数；无法确定时为 null
   revision: number; createdAt: string; updatedAt: string;
 };
 type DataSourceCreate = {
@@ -50,7 +50,11 @@ type DataSourceCreate = {
 type DataSourcePatch = Partial<Omit<DataSourceCreate, 'kind'>> & { revision: number };
 // 用未保存的参数测试；编辑时不带 password 而带 dataSourceId，表示沿用已保存的口令
 type ConnectionTestRequest = Omit<DataSourceCreate, 'name' | 'password' | 'allowSamples'> & { password?: string; dataSourceId?: string };
-type ConnectionTest = { ok: boolean; code: string | null; warnings: TestWarning[]; serverVersion: string | null };
+type ConnectionTest = {
+  ok: boolean; code: string | null;
+  reason: 'unreachable' | 'auth_failed' | 'database_missing' | 'ssl' | 'timeout' | null;   // code 为 datasource.connect_failed 时
+  warnings: TestWarning[]; serverVersion: string | null;
+};
 
 type ColumnFamily = 'string' | 'opaque' | 'integer' | 'decimal' | 'boolean' | 'date' | 'dateTime' | 'other';   // opaque：uuid、枚举
 type CatalogColumn = { name: string; type: string; family: ColumnFamily; nullable: boolean; comment: string | null; position: number };
@@ -155,9 +159,9 @@ type BindingSuggestion = {
 
 // ---------- 对象查询（批次 5） ----------
 type ReleaseRef = { id: string; version: number };
-type Scalar = string | number | boolean;
+type Scalar = string | number | boolean;   // 结果里的取值：decimal 一律是字符串
 type FilterOp = 'eq' | 'ne' | 'lt' | 'le' | 'gt' | 'ge' | 'contains' | 'startsWith' | 'in' | 'isNull' | 'notNull';
-type Filter = { propertyId: string; op: FilterOp; value?: Scalar | Scalar[] };
+type Filter = { propertyId: string; op: FilterOp; value?: Scalar | Scalar[] };   // 筛选值的小数可以写成数字或字符串
 // 运算符与数据类型：string 可用全部；数值、日期、时间不可用 contains / startsWith；boolean 只有 eq / ne / isNull / notNull；
 // 绑到 opaque 族的列（uuid、枚举）的 string 属性只有 eq / ne / in / isNull / notNull。每个属性实际能用的见 ObjectTypeInfo 的 ops。
 type ObjectTypeInfo = {

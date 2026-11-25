@@ -13,15 +13,31 @@ from fastapi.responses import JSONResponse
 
 from ontology_platform.db import DbSession
 from ontology_platform.errors import PROBLEM_MEDIA_TYPE, problem_responses
-from ontology_platform.modules.identity.api import CurrentUser, client_ip, require_role
+from ontology_platform.modules.identity.api import (
+    CurrentUser,
+    client_ip,
+    require_role,
+    require_scope,
+)
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.identity.service import Principal
-from ontology_platform.modules.ontology import compare, editing, expert, importing, schemas, service
+from ontology_platform.modules.ontology import (
+    compare,
+    editing,
+    expert,
+    importing,
+    merge,
+    releases,
+    schemas,
+    service,
+)
 from ontology_platform.modules.ontology.models import ChangeSetStatus, Kind
 from ontology_platform.settings import Settings, get_settings
 
 Creator = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.EDITOR, Role.REVIEWER))]
 Reviewer = Annotated[Principal, Depends(require_role(Role.ADMIN, Role.REVIEWER))]
+# Published versions are also open to access tokens with ontology:read (spec 003 appendix).
+ReleaseReader = Annotated[Principal, Depends(require_scope("ontology:read"))]
 AppSettings = Annotated[Settings, Depends(get_settings)]
 ExportFormat = Annotated[Literal["turtle"], Query(alias="format")]
 REVIEWER_ROLES = frozenset({Role.ADMIN, Role.REVIEWER})
@@ -373,7 +389,7 @@ async def merge_change_set(
     `changeset.pending_items` while any item is undecided, 403 `changeset.self_review` in
     separate review mode for one's own change set, and 409 `changeset.resolution_changed`
     when the merge would not do what the `resolutionToken` sent with it stands for."""
-    return await service.merge_change_set(
+    return await merge.merge_change_set(
         db,
         id,
         actor=user.id,
@@ -430,7 +446,7 @@ async def list_releases(
     db: DbSession,
 ) -> list[schemas.ReleaseSummary]:
     """Published versions, newest first."""
-    return await service.list_releases(db, id)
+    return await releases.list_releases(db, id)
 
 
 @router.post(
@@ -449,7 +465,7 @@ async def publish_release(
     """Publish the working version as the next version and make it current. When the checks
     fail: 422 `release.invalid` with a `problems` list."""
     try:
-        return await service.publish_release(
+        return await releases.publish_release(
             db,
             id,
             body,
@@ -463,11 +479,11 @@ async def publish_release(
 @router.get("/releases/{id}", responses=problem_responses(401, 404, 422))
 async def get_release(
     id: UUID,
-    user: CurrentUser,
+    user: ReleaseReader,
     db: DbSession,
 ) -> schemas.ReleaseSummary:
     """One published version."""
-    return await service.get_release(db, id)
+    return await releases.get_release(db, id)
 
 
 @router.get(
@@ -477,12 +493,12 @@ async def get_release(
 )
 async def export_release(
     id: UUID,
-    user: CurrentUser,
+    user: ReleaseReader,
     db: DbSession,
     export_format: ExportFormat = "turtle",
 ) -> Response:
     """The Turtle stored when the version was published."""
-    turtle, filename = await service.export_release(db, id)
+    turtle, filename = await releases.export_release(db, id)
     return _turtle(turtle, filename)
 
 
@@ -497,4 +513,4 @@ async def activate_release(
     db: DbSession,
 ) -> schemas.ReleaseSummary:
     """Make this version the current one (also used to roll back)."""
-    return await service.activate_release(db, id, actor=user.id, ip=client_ip(request))
+    return await releases.activate_release(db, id, actor=user.id, ip=client_ip(request))

@@ -4,16 +4,32 @@ import { useCurrentUser, type Role } from './api';
 const UPLOAD_ROLES: readonly Role[] = ['admin', 'editor', 'reviewer'];
 /** Roles allowed to review and merge change sets, publish and activate releases. */
 const REVIEW_ROLES: readonly Role[] = ['admin', 'reviewer'];
+/** Roles allowed to create, change and archive data sources (spec 003, section 13). */
+const DATA_SOURCE_ADMIN_ROLES: readonly Role[] = ['admin'];
+/**
+ * Roles allowed to browse a data source's catalog, ask for AI binding suggestions, edit bindings
+ * and give an access token the `changes:propose` scope (spec 003, section 13).
+ */
+const CATALOG_ROLES: readonly Role[] = ['admin', 'editor', 'reviewer'];
 
 export interface Permissions {
   canUpload: boolean;
   canReview: boolean;
+  canManageDataSources: boolean;
+  canBrowseCatalog: boolean;
+  canEditBindings: boolean;
+  canProposeViaMcp: boolean;
 }
 
 export function permissionsFor(role: Role | undefined): Permissions {
+  const has = (roles: readonly Role[]) => role !== undefined && roles.includes(role);
   return {
-    canUpload: role !== undefined && UPLOAD_ROLES.includes(role),
-    canReview: role !== undefined && REVIEW_ROLES.includes(role),
+    canUpload: has(UPLOAD_ROLES),
+    canReview: has(REVIEW_ROLES),
+    canManageDataSources: has(DATA_SOURCE_ADMIN_ROLES),
+    canBrowseCatalog: has(CATALOG_ROLES),
+    canEditBindings: has(CATALOG_ROLES),
+    canProposeViaMcp: has(CATALOG_ROLES),
   };
 }
 

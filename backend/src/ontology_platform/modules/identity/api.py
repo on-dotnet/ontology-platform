@@ -8,13 +8,14 @@ requests whose X-CSRF-Token header does not match the session (403).
 import hmac
 from collections.abc import Awaitable, Callable
 from typing import Annotated
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, Query, Request, Response
 
 from ontology_platform.db import DbSession
 from ontology_platform.errors import AppError, problem_responses
-from ontology_platform.modules.identity import service
-from ontology_platform.modules.identity.models import Role
+from ontology_platform.modules.identity import schemas, service, tokens
+from ontology_platform.modules.identity.models import Role, TokenScope
 from ontology_platform.modules.identity.schemas import LoginRequest, UserInfo
 from ontology_platform.modules.identity.service import AuthContext, IssuedSession, Principal
 from ontology_platform.settings import Settings, get_settings
@@ -80,6 +81,28 @@ def require_role(*roles: Role) -> Callable[[Principal], Awaitable[Principal]]:
         return user
 
     return check_role
+
+
+def require_scope(scope: TokenScope) -> Callable[[AuthContext], Awaitable[Principal]]:
+    """Dependency factory for the few routes that also accept an access token holding `scope`
+    (spec 003, section 4; the appendix lists them). Every other route refuses tokens.
+
+    Token authentication arrives with batch 2; until then this is the session check.
+    """
+
+    async def check_scope(context: CurrentSession) -> Principal:
+        return context.principal
+
+    return check_scope
+
+
+async def require_principal(context: CurrentSession) -> Principal:
+    """A cookie session or any valid access token, whatever its scopes: only for the routes the
+    appendix opens to every token (`/api/auth/me`). Token authentication arrives with batch 2."""
+    return context.principal
+
+
+AnyPrincipal = Annotated[Principal, Depends(require_principal)]
 
 
 def _set_session_cookies(response: Response, settings: Settings, issued: IssuedSession) -> None:
@@ -162,7 +185,43 @@ async def logout(
 
 
 @router.get("/me", responses=problem_responses(401))
-async def me(user: CurrentUser, response: Response) -> UserInfo:
-    """The signed-in user."""
+async def me(user: AnyPrincipal, response: Response) -> UserInfo:
+    """The signed-in user, or the owner of the access token."""
     response.headers["Cache-Control"] = "no-store"
     return _user_info(user)
+
+
+# ---------- access tokens (spec 003 §4) ----------
+# Managed with a cookie session only: a token can never list, create or revoke tokens.
+
+
+@router.get("/tokens", responses=problem_responses(401, 403, 422))
+async def list_tokens(
+    user: CurrentUser,
+    db: DbSession,
+    response: Response,
+    owner: Annotated[tokens.TokenOwnerFilter, Query()] = "me",
+) -> list[schemas.AccessToken]:
+    """The user's access tokens; `owner=all` lists everyone's and needs the admin role. Neither
+    the tokens themselves nor their hashes are ever returned."""
+    response.headers["Cache-Control"] = "no-store"
+    return await tokens.list_tokens(db, actor=user, owner=owner)
+
+
+@router.post("/tokens", status_code=201, responses=problem_responses(401, 403, 409, 422))
+async def create_token(
+    body: schemas.AccessTokenCreate,
+    request: Request,
+    response: Response,
+    user: CurrentUser,
+    db: DbSession,
+) -> schemas.AccessTokenCreated:
+    """Create an access token. This response is the only time the token is shown."""
+    response.headers["Cache-Control"] = "no-store"
+    return await tokens.create_token(db, body, actor=user, ip=client_ip(request))
+
+
+@router.delete("/tokens/{id}", status_code=204, responses=problem_responses(401, 403, 404, 422))
+async def revoke_token(id: UUID, request: Request, user: CurrentUser, db: DbSession) -> None:
+    """Revoke a token at once: one's own, or anyone's for an admin."""
+    await tokens.revoke_token(db, id, actor=user, ip=client_ip(request))

@@ -1,12 +1,17 @@
 """API models of the ai module."""
 
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Self
 from uuid import UUID
 
-from pydantic import StringConstraints
+from pydantic import Field, StringConstraints, model_validator
 
-from ontology_platform.modules.ai.models import MESSAGE_MAX_LENGTH, AssistantStatus, AssistantStep
+from ontology_platform.modules.ai.models import (
+    MESSAGE_MAX_LENGTH,
+    AssistantStatus,
+    AssistantStep,
+    BindingSuggestionStep,
+)
 from ontology_platform.schemas import CamelModel
 
 
@@ -49,6 +54,56 @@ class AssistantRequest(CamelModel):
     # Proposed operations left out because they failed the checks.
     dropped: int
     change_set_id: UUID | None
+    error_code: str | None
+    created_at: datetime
+    finished_at: datetime | None
+
+
+# ---------- AI binding suggestions (spec 003 §8) ----------
+
+SUGGESTION_TABLES_MAX = 200
+SUGGESTION_SCHEMAS_MAX = 50
+SUGGESTION_TYPES_MAX = 300
+Identifier = Annotated[str, StringConstraints(min_length=1, max_length=128)]
+
+
+class TableRef(CamelModel):
+    schema_name: Identifier = Field(alias="schema")
+    name: Identifier
+
+
+class BindingSuggestionCreate(CamelModel):
+    """Which tables to look at: `tables` or `schemas` (one of them), and optionally which
+    object types to suggest bindings for (default: every type without a binding)."""
+
+    data_source_id: UUID
+    tables: list[TableRef] | None = Field(
+        default=None, min_length=1, max_length=SUGGESTION_TABLES_MAX
+    )
+    schemas: list[Identifier] | None = Field(
+        default=None, min_length=1, max_length=SUGGESTION_SCHEMAS_MAX
+    )
+    type_ids: list[UUID] | None = Field(default=None, min_length=1, max_length=SUGGESTION_TYPES_MAX)
+
+    @model_validator(mode="after")
+    def one_scope(self) -> Self:
+        if (self.tables is None) == (self.schemas is None):
+            raise ValueError("Give exactly one of tables and schemas")
+        return self
+
+
+class BindingSuggestion(CamelModel):
+    id: UUID
+    ontology_id: UUID
+    data_source_id: UUID
+    status: AssistantStatus
+    # The step running or reached: catalog, match, columns, changeset.
+    step: BindingSuggestionStep | None
+    # Null when no suggestion passed the checks.
+    change_set_id: UUID | None
+    proposed: int
+    dropped: int
+    samples_sent: bool
     error_code: str | None
     created_at: datetime
     finished_at: datetime | None

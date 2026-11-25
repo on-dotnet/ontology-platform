@@ -38,6 +38,9 @@ export const kindTone: Record<ElementKind, BadgeTone> = {
   property: 'success',
   constraint: 'neutral',
   axiom: 'neutral',
+  type_binding: 'neutral',
+  property_binding: 'neutral',
+  relation_binding: 'neutral',
 };
 
 type KindFilter = ElementKind | 'all';

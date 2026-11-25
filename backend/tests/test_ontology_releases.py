@@ -31,6 +31,7 @@ RELEASE_FIELDS = {
     "title",
     "notes",
     "elementCount",
+    "bindingCount",
     "isActive",
     "createdBy",
     "createdAt",
@@ -141,7 +142,12 @@ async def test_publish_increments_the_version(client: AsyncClient, db: AsyncSess
     statement = select(AuditEvent).where(AuditEvent.action == "release.published")
     events = (await db.scalars(statement.order_by(AuditEvent.id))).all()
     assert [event.target_id for event in events] == [v1["id"], v2["id"]]
-    assert events[0].detail == {"ontologyId": str(steel.id), "version": 1, "elementCount": 3}
+    assert events[0].detail == {
+        "ontologyId": str(steel.id),
+        "version": 1,
+        "elementCount": 3,
+        "bindingCount": 0,
+    }
 
 
 async def test_release_export_is_the_stored_turtle(client: AsyncClient, db: AsyncSession) -> None:

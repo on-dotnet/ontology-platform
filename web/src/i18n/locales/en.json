@@ -400,14 +400,20 @@
     "relation_type": "Relations",
     "property": "Properties",
     "constraint": "Constraints",
-    "axiom": "Advanced axioms"
+    "axiom": "Advanced axioms",
+    "type_binding": "Type binding",
+    "property_binding": "Property binding",
+    "relation_binding": "Relation binding"
   },
   "kind": {
     "entity_type": "Object type",
     "relation_type": "Relation",
     "property": "Property",
     "constraint": "Constraint",
-    "axiom": "Advanced axiom"
+    "axiom": "Advanced axiom",
+    "type_binding": "Type binding",
+    "property_binding": "Property binding",
+    "relation_binding": "Relation binding"
   },
   "datatypes": {
     "string": "Text",
@@ -588,7 +594,9 @@
       "ai_extraction": "Document analysis",
       "import": "Import",
       "manual": "Manual",
-      "ai_assistant": "AI assistant"
+      "ai_assistant": "AI assistant",
+      "ai_binding": "AI binding suggestions",
+      "mcp": "MCP"
     },
     "acceptAll": "Accept all ({{count}})",
     "allAccepted": "Items accepted: {{count}}",
@@ -1054,7 +1062,10 @@
       "not_authenticated": "Your session has ended. Sign in again.",
       "csrf_failed": "This page has expired. Refresh the page and try again.",
       "rate_limited": "Too many attempts. Try again later.",
-      "forbidden": "You do not have permission for this action. Contact your platform administrator."
+      "forbidden": "You do not have permission for this action. Contact your platform administrator.",
+      "invalid_token": "The access token is not valid, has expired or was revoked.",
+      "token_not_allowed": "This endpoint does not accept access tokens.",
+      "insufficient_scope": "The access token lacks the required scope."
     },
     "validation": {
       "failed": "Some fields are missing or invalid. Check them and try again."
@@ -1100,7 +1111,54 @@
       "unavailable": "AI analysis is temporarily unavailable. The document is saved; try again later.",
       "invalid_output": "AI returned a result in an unexpected format. The document is saved; try again later."
     },
+    "token": {
+      "limit_reached": "You already have 10 valid access tokens. Revoke one you no longer use first.",
+      "scope_not_allowed": "Your role cannot request this scope.",
+      "not_found": "The access token does not exist or is not yours."
+    },
+    "datasource": {
+      "not_found": "The data source does not exist.",
+      "name_taken": "A data source with this name already exists. Choose another name.",
+      "stale": "Someone else changed the data source. Refresh and try again.",
+      "in_use": "Data bindings still use this data source, so it cannot be archived.",
+      "archived": "The data source is archived and can no longer be changed or used.",
+      "platform_database": "The platform's own database cannot be a data source.",
+      "credential_unreadable": "The stored password cannot be read. Enter the password again.",
+      "connect_failed": "Could not connect to the data source. Check the address, account and password, then try again."
+    },
+    "catalog": {
+      "not_ready": "The catalog has not been read yet. Read the catalog first.",
+      "too_large": "There are too many tables or columns. Limit the schemas of the data source and read again.",
+      "table_not_found": "The catalog does not have this table. Read the catalog again."
+    },
+    "binding": {
+      "invalid": "The data binding is incomplete or not valid. Check it and try again.",
+      "duplicate": "This element already has a data binding.",
+      "type_mismatch": "The column's type does not fit the property's datatype. Choose another column.",
+      "cross_source": "Both tables of a relation must be in the same data source."
+    },
+    "binding_suggestion": {
+      "scope_too_large": "The scope is too large (at most 200 tables and 4,000 columns). Narrow it and try again.",
+      "not_found": "This AI binding suggestion does not exist."
+    },
+    "query": {
+      "no_release": "The ontology has no published version yet. Publish one to query data.",
+      "type_not_bound": "This object type has no data binding in the current version.",
+      "object_not_found": "The object was not found.",
+      "invalid_filter": "The filter does not fit this property. Check it and try again.",
+      "invalid_cursor": "The page position has expired. Run the query again.",
+      "release_changed": "A new version of the ontology was just published. Run the query again.",
+      "timeout": "The query timed out. Add filters and try again.",
+      "busy": "Too many queries are waiting for this data source. Try again later.",
+      "source_unavailable": "Could not connect to the data source. Try again later or contact your administrator.",
+      "source_mismatch": "Tables or columns in the data source have changed. Ask your administrator to update the data binding.",
+      "source_disabled": "The data source is archived or its password is not available. Contact your administrator."
+    },
+    "mcp": {
+      "rate_limited": "Too many requests. Try again later."
+    },
     "http": {
+      "not_implemented": "This feature is still being built and cannot be used yet.",
       "400": "The request is not valid. Check your input and try again.",
       "401": "Your session has ended. Sign in again.",
       "403": "You do not have permission for this action. Contact your platform administrator.",
