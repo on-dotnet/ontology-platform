@@ -1,0 +1,262 @@
+# 设备点检与维修案例包（开发集）的期望识别结果，用于 ./dev.ps1 eval 计算准确率与召回率（Python 标准库 tomllib 读取）。
+# 本文件写于任何模型运行之前，只依据 samples/maintenance 的 6 份资料原文，未参考任何模型输出。
+# 本案例包是开发集：可用于调试识别效果，结论不作为留出评测的依据。
+#
+# 匹配规则：模型给出的中文名、英文名或任一同义词，规范化（去空白、全角转半角、小写）后
+# 与 names 中任一项相同即算命中。
+# core = true 的项计入召回率；core = false 为可接受项：识别出来不算错，没识别出来也不扣召回。
+# 关系不计较方向与名称：A→B 与 B→A 都算命中。domain、range 用对应对象类型 names 的第一个名字。
+# 属性按 domain（对象类型主名）+ 属性名匹配；层级为子类 → 父类。
+#
+# 收录标准（参照钢铁冶金案例包，换成本领域说法）。对象类型收录以下几类，依据都要在资料原文里找得到：
+#   1. 有标识的事物：原文给出编号（设备编号、标准编号、路线编号、记录号、工单号、报修单编号、
+#      备件编码、领用单号、供应商编号、计划编号、油品编码、计量器具编号、检验报告编号、证书编号等）。
+#   2. 原文逐个记录数据的记录或事件：原文写明对每一次记录日期、结果、实测值，或称为“一条……记录”
+#      “一张……单”（点检记录、润滑记录、领用单、退库单）。
+#   3. 设备与备件、油品、计量器具等实物：设备台账中有设备编号的单台设备；设备上的部位与部件
+#      （主轴、液压站、辐射管、润滑点、点检部位）不算，除非原文另给它编号和数据。
+#   4. 原文写明由哪些有标识事物组成的计划或单据（点检计划“每一条计划行对应一台设备的一个点检项目”，
+#      保养计划“每一行写明设备编号”）。
+# 不收录：点检、保养、润滑、派工、验收、外委、复查等作业步骤（其数据记在点检记录、维修工单等对象上）；
+#   状态与取值（点检分级、点检结果、工单类型、工单来源、紧急程度、工单状态、保养等级、设备等级、
+#   备件重要性与专业分类、校准状态标识、检验结论）；只作为执行者出现的人员与部门（操作者、班组长、
+#   维修班、设备工程师、设备责任人、维修负责人、计量室、检验机构、车间）；没有自身数据的部位与部件
+#   （点检部位、点检项目、润滑点、安全附件）；按类别给出的参考表（三级点检对照、类别代码表、
+#   考核指标表、关键备件清单本身）；KPI 与统计表（MTBF、MTTR、返修率）。
+# 拿不准的一律 core = false（例如设备档案、润滑标准、使用登记证、外委维修合同、故障分析报告、
+#   测点、点检员、日点检任务、特种设备的三个类别）。
+# 同一事物在原文里逐字出现的全称或别称并入同一项的 names（机台＝设备；点检基准书＝点检标准；
+# 工单、维修单＝维修工单；故障报修单＝报修单；备品备件、配件＝备件；PM计划、保养计划＝预防性维护计划）。
+# “设备台账”原文定义为每台设备一条记录的设备主数据，并入设备；“设备档案”另存随机资料、检验报告等
+# 附件，单列为可接受项。
+# 关系收录两端都符合上述标准、且原文一句话、列表项或表格行直接写明两者联系的；表格列里记录另一事物
+# 的编号（所用备件编码、来源单据号、关联工单号、标准编号、适用设备、供应商编号）算写明联系。
+
+entity_types = [
+  { names = ["设备", "机台", "设备台账", "Equipment"], core = true },
+  { names = ["特种设备", "SpecialEquipment"], core = true },
+  { names = ["点检标准", "点检基准书", "InspectionStandard"], core = true },
+  { names = ["点检路线", "InspectionRoute"], core = true },
+  { names = ["点检计划", "月度点检计划", "InspectionPlan"], core = true },
+  { names = ["点检记录", "InspectionRecord"], core = true },
+  { names = ["维修工单", "工单", "维修单", "WorkOrder"], core = true },
+  { names = ["报修单", "故障报修单", "RepairRequest"], core = true },
+  { names = ["备件", "备品备件", "配件", "SparePart"], core = true },
+  { names = ["领用单", "备件领用单", "MaterialRequisition"], core = true },
+  { names = ["退库单", "MaterialReturn"], core = true },
+  { names = ["供应商", "备件供应商", "Supplier"], core = true },
+  { names = ["预防性维护计划", "PM计划", "保养计划", "PreventiveMaintenancePlan"], core = true },
+  { names = ["油品", "Lubricant"], core = true },
+  { names = ["润滑记录", "LubricationRecord"], core = true },
+  { names = ["计量器具", "MeasuringInstrument"], core = true },
+  { names = ["检验报告", "定期检验报告", "InspectionReport"], core = true },
+  { names = ["特种设备作业人员证", "OperatorCertificate"], core = true },
+  { names = ["设备档案", "EquipmentFile"], core = false },
+  { names = ["起重机械", "LiftingMachinery"], core = false },
+  { names = ["场（厂）内专用机动车辆", "IndustrialVehicle"], core = false },
+  { names = ["压力容器", "PressureVessel"], core = false },
+  { names = ["润滑标准", "LubricationStandard"], core = false },
+  { names = ["使用登记证", "RegistrationCertificate"], core = false },
+  { names = ["外委维修合同", "维修合同", "OutsourcedRepairContract"], core = false },
+  { names = ["故障分析报告", "FailureAnalysisReport"], core = false },
+  { names = ["测点", "MeasurementPoint"], core = false },
+  { names = ["点检员", "Inspector"], core = false },
+  { names = ["日点检任务", "DailyInspectionTask"], core = false },
+]
+
+relations = [
+  { domain = "点检标准", range = "设备", core = true },        # 01 §7.2 每条点检标准包括设备编号；05 点检标准表设备编号列
+  { domain = "点检路线", range = "设备", core = true },        # 01 §4.7 把同一区域内若干台设备的点检项目串接成路线
+  { domain = "点检计划", range = "点检标准", core = true },    # 01 §9.2 根据已批准的点检标准按点检路线汇总生成
+  { domain = "点检计划", range = "点检路线", core = true },    # 01 §4.8/§9.2 根据点检标准和点检路线编制
+  { domain = "点检计划", range = "设备", core = true },        # 01 §9.2 每一条计划行对应一台设备的一个点检项目
+  { domain = "点检记录", range = "点检标准", core = true },    # 05 点检记录表标准编号列
+  { domain = "点检记录", range = "设备", core = true },        # 01 §11.1 点检记录写明设备编号
+  { domain = "点检记录", range = "维修工单", core = true },    # 01 §13.1 点检记录记维修工单号，维修工单记来源点检记录号
+  { domain = "维修工单", range = "设备", core = true },        # 02 §6.2 维修工单包括设备编号
+  { domain = "维修工单", range = "报修单", core = true },      # 02 §5.3 报修单转为维修工单，工单带出报修单号
+  { domain = "维修工单", range = "备件", core = true },        # 05 维修工单表所用备件编码列
+  { domain = "领用单", range = "维修工单", core = true },      # 02 §8.2、03 §8.1 领用单填写关联的维修工单号
+  { domain = "维修工单", range = "预防性维护计划", core = true }, # 04 §6.2 按保养计划行生成预防维修工单，来源单据号填计划编号
+  { domain = "报修单", range = "设备", core = true },          # 02 §5.2 报修单写明设备编号
+  { domain = "领用单", range = "备件", core = true },          # 03 §8.1 领用单写明备件编码
+  { domain = "退库单", range = "领用单", core = true },        # 03 §9 退库单注明原领用单号
+  { domain = "退库单", range = "备件", core = true },          # 03 §9 退库单注明备件编码
+  { domain = "备件", range = "供应商", core = true },          # 03 §11 关键备件清单供应商编号列
+  { domain = "备件", range = "设备", core = true },            # 03 §11 关键备件清单适用设备列
+  { domain = "预防性维护计划", range = "设备", core = true },  # 04 §6.2 保养计划每一行写明设备编号
+  { domain = "润滑记录", range = "设备", core = true },        # 04 §4 润滑记录记录设备编号
+  { domain = "润滑记录", range = "油品", core = true },        # 04 §4 润滑记录记录油品
+  { domain = "计量器具", range = "设备", core = true },        # 06 §6.1 计量器具台账登记所安装设备的设备编号
+  { domain = "检验报告", range = "特种设备", core = true },    # 06 §5.2 在用特种设备清单检验报告编号列；§5.4 录入该设备记录
+  { domain = "特种设备作业人员证", range = "特种设备", core = true }, # 06 §5.5 持证表允许操作的设备列
+  { domain = "点检路线", range = "点检标准", core = false },   # 01 §7.4 点检标准中的点检项目纳入相应点检路线
+  { domain = "点检记录", range = "点检员", core = false },     # 05 点检记录表点检员列
+  { domain = "点检路线", range = "点检员", core = false },     # 01 §8.2 路线负责人（点检员）
+  { domain = "维修工单", range = "外委维修合同", core = false }, # 02 §12.2 外委维修合同编号记入维修工单
+  { domain = "维修工单", range = "故障分析报告", core = false }, # 02 §13.1 故障分析报告编号记入对应的维修工单
+  { domain = "维修工单", range = "检验报告", core = false },   # 06 §5.4 检验报告的整改意见开立维修工单落实
+  { domain = "维修工单", range = "维修工单", core = false },   # 02 §7、§11 关联工单号、返修工单关联原工单号
+  { domain = "润滑标准", range = "设备", core = false },       # 04 §8.2 润滑标准表设备编号列
+  { domain = "润滑标准", range = "油品", core = false },       # 04 §8.2 润滑标准表油品编码列
+  { domain = "设备", range = "油品", core = false },           # 04 §8.2 每台设备的润滑点使用规定油品（经润滑标准）
+  { domain = "计量器具", range = "备件", core = false },       # 06 §6.1 从备件库领用的热电偶、压力表安装前须校准并赋计量器具编号
+  { domain = "检验报告", range = "设备", core = false },       # 06 §5.4 检验报告编号录入该设备的记录
+  { domain = "使用登记证", range = "特种设备", core = false }, # 06 §4 每台特种设备一证
+  { domain = "设备档案", range = "设备", core = false },       # 01 §4.2 每台设备另有一份设备档案
+  { domain = "测点", range = "设备", core = false },           # 01 §14.1/§14.4 设备关键部位的测点
+  { domain = "日点检任务", range = "设备", core = false },     # 01 §9.3 日常点检任务按机台推送
+]
+
+properties = [
+  # 设备（01 §4.2；05 设备台账）
+  { domain = "设备", names = ["设备编号", "EquipmentCode"], core = true },
+  { domain = "设备", names = ["设备名称", "EquipmentName"], core = true },
+  { domain = "设备", names = ["型号", "Model"], core = true },
+  { domain = "设备", names = ["所在车间", "Workshop"], core = true },
+  { domain = "设备", names = ["设备等级", "EquipmentGrade"], core = true },
+  { domain = "设备", names = ["启用日期", "CommissioningDate"], core = true },
+  { domain = "设备", names = ["使用状态", "UsageStatus"], core = true },
+  { domain = "设备", names = ["设备责任人", "责任人", "ResponsiblePerson"], core = false },
+  { domain = "设备", names = ["所属产线", "ProductionLine"], core = false },
+  # 特种设备（06 §5.2）
+  { domain = "特种设备", names = ["使用登记证编号", "RegistrationNumber"], core = true },
+  { domain = "特种设备", names = ["检验周期", "InspectionCycle"], core = true },
+  { domain = "特种设备", names = ["上次检验日期", "LastInspectionDate"], core = true },
+  { domain = "特种设备", names = ["下次检验日期", "NextInspectionDate"], core = true },
+  { domain = "特种设备", names = ["类别", "Category"], core = false },
+  { domain = "特种设备", names = ["检验结论", "InspectionConclusion"], core = false },
+  # 点检标准（01 §7.2、§7.3；05 点检标准）
+  { domain = "点检标准", names = ["标准编号", "StandardCode"], core = true },
+  { domain = "点检标准", names = ["点检部位", "InspectionPart"], core = true },
+  { domain = "点检标准", names = ["点检项目", "InspectionItem"], core = true },
+  { domain = "点检标准", names = ["点检方法", "InspectionMethod"], core = true },
+  { domain = "点检标准", names = ["判定基准", "Criterion"], core = true },
+  { domain = "点检标准", names = ["点检周期", "周期", "InspectionCycle"], core = true },
+  { domain = "点检标准", names = ["点检分级", "InspectionLevel"], core = true },
+  { domain = "点检标准", names = ["点检时设备状态", "EquipmentStateDuringInspection"], core = false },
+  # 点检路线（01 §4.7、§8.2）
+  { domain = "点检路线", names = ["路线编号", "RouteCode"], core = true },
+  { domain = "点检路线", names = ["路线名称", "RouteName"], core = true },
+  { domain = "点检路线", names = ["覆盖区域", "CoverageArea"], core = true },
+  { domain = "点检路线", names = ["执行频次", "Frequency"], core = true },
+  { domain = "点检路线", names = ["设备数量", "EquipmentCount"], core = false },
+  { domain = "点检路线", names = ["路线负责人", "RouteOwner"], core = false },
+  # 点检计划（01 §9、§18）
+  { domain = "点检计划", names = ["计划编号", "PlanCode"], core = false },
+  { domain = "点检计划", names = ["计划日期", "PlanDate"], core = false },
+  # 点检记录（01 §4.9、§11.1；05 点检记录）
+  { domain = "点检记录", names = ["记录号", "RecordCode"], core = true },
+  { domain = "点检记录", names = ["点检日期", "点检日期和时间", "InspectionDate"], core = true },
+  { domain = "点检记录", names = ["点检结果", "InspectionResult"], core = true },
+  { domain = "点检记录", names = ["实测数值", "实测值", "MeasuredValue"], core = true },
+  { domain = "点检记录", names = ["异常描述", "AbnormalityDescription"], core = true },
+  { domain = "点检记录", names = ["现场处置情况", "处置情况", "OnSiteHandling"], core = true },
+  { domain = "点检记录", names = ["复查结论", "RecheckConclusion"], core = false },
+  # 维修工单（02 §6.2；05 维修工单）
+  { domain = "维修工单", names = ["工单号", "维修工单号", "WorkOrderCode"], core = true },
+  { domain = "维修工单", names = ["工单类型", "WorkOrderType"], core = true },
+  { domain = "维修工单", names = ["工单来源", "WorkOrderSource"], core = true },
+  { domain = "维修工单", names = ["故障现象或作业内容", "故障现象", "FaultDescription"], core = true },
+  { domain = "维修工单", names = ["紧急程度", "Urgency"], core = true },
+  { domain = "维修工单", names = ["开立日期", "OpenDate"], core = true },
+  { domain = "维修工单", names = ["停机时长", "DowntimeHours"], core = true },
+  { domain = "维修工单", names = ["工单状态", "WorkOrderStatus"], core = true },
+  { domain = "维修工单", names = ["来源单据号", "SourceDocumentNumber"], core = false },
+  { domain = "维修工单", names = ["停机开始时间", "DowntimeStart"], core = false },
+  { domain = "维修工单", names = ["停机结束时间", "DowntimeEnd"], core = false },
+  { domain = "维修工单", names = ["故障原因", "FailureCause"], core = false },
+  { domain = "维修工单", names = ["处理措施", "CorrectiveAction"], core = false },
+  { domain = "维修工单", names = ["维修负责人", "RepairLead"], core = false },
+  { domain = "维修工单", names = ["验收人", "Acceptor"], core = false },
+  # 报修单（02 §3.2、§5.2）
+  { domain = "报修单", names = ["报修单编号", "报修单号", "RepairRequestCode"], core = true },
+  { domain = "报修单", names = ["故障发生时间", "FaultTime"], core = true },
+  { domain = "报修单", names = ["故障现象", "FaultDescription"], core = true },
+  { domain = "报修单", names = ["是否停机", "IsStopped"], core = true },
+  { domain = "报修单", names = ["报修人", "Reporter"], core = true },
+  { domain = "报修单", names = ["联系电话", "ContactPhone"], core = false },
+  # 备件（03 §5、§7.3）
+  { domain = "备件", names = ["备件编码", "SparePartCode"], core = true },
+  { domain = "备件", names = ["备件名称", "SparePartName"], core = true },
+  { domain = "备件", names = ["规格型号", "Specification"], core = true },
+  { domain = "备件", names = ["重要性", "Criticality"], core = true },
+  { domain = "备件", names = ["单位", "Unit"], core = true },
+  { domain = "备件", names = ["安全库存", "SafetyStock"], core = true },
+  { domain = "备件", names = ["当前库存", "CurrentStock"], core = true },
+  { domain = "备件", names = ["在途数量", "InTransitQuantity"], core = false },
+  { domain = "备件", names = ["类别代码", "CategoryCode"], core = false },
+  { domain = "备件", names = ["采购周期", "LeadTime"], core = false },
+  # 领用单（03 §8.1；05 备件领用）
+  { domain = "领用单", names = ["领用单号", "RequisitionCode"], core = true },
+  { domain = "领用单", names = ["数量", "Quantity"], core = true },
+  { domain = "领用单", names = ["领用人", "Requester"], core = true },
+  { domain = "领用单", names = ["领用日期", "RequisitionDate"], core = true },
+  { domain = "领用单", names = ["退库数量", "ReturnedQuantity"], core = false },
+  # 退库单（03 §4、§9）
+  { domain = "退库单", names = ["退库单号", "ReturnCode"], core = true },
+  { domain = "退库单", names = ["退库数量", "ReturnedQuantity"], core = true },
+  # 供应商（03 §10.2）
+  { domain = "供应商", names = ["供应商编号", "SupplierCode"], core = true },
+  { domain = "供应商", names = ["供应商名称", "SupplierName"], core = true },
+  { domain = "供应商", names = ["主要供应品类", "MainCategories"], core = true },
+  { domain = "供应商", names = ["平均采购周期", "AverageLeadTime"], core = true },
+  # 预防性维护计划（04 §4、§6.2、§6.3）
+  { domain = "预防性维护计划", names = ["计划编号", "PlanCode"], core = true },
+  { domain = "预防性维护计划", names = ["保养等级", "MaintenanceLevel"], core = true },
+  { domain = "预防性维护计划", names = ["计划日期", "PlanDate"], core = true },
+  { domain = "预防性维护计划", names = ["执行人", "Executor"], core = false },
+  # 油品（04 §4、§8.3）
+  { domain = "油品", names = ["油品编码", "LubricantCode"], core = true },
+  { domain = "油品", names = ["油品名称", "LubricantName"], core = true },
+  { domain = "油品", names = ["牌号", "Grade"], core = true },
+  { domain = "油品", names = ["标识色", "ColorCode"], core = true },
+  { domain = "油品", names = ["主要用途", "MainUse"], core = true },
+  # 润滑记录（04 §4、§8.4）
+  { domain = "润滑记录", names = ["润滑记录编号", "记录编号", "LubricationRecordCode"], core = true },
+  { domain = "润滑记录", names = ["润滑点", "LubricationPoint"], core = true },
+  { domain = "润滑记录", names = ["加油量", "Amount"], core = true },
+  { domain = "润滑记录", names = ["执行人", "Executor"], core = true },
+  { domain = "润滑记录", names = ["日期", "润滑日期", "LubricationDate"], core = true },
+  # 润滑标准（04 §4、§8.2）
+  { domain = "润滑标准", names = ["润滑点", "LubricationPoint"], core = false },
+  { domain = "润滑标准", names = ["润滑方式", "LubricationMethod"], core = false },
+  { domain = "润滑标准", names = ["加油量", "Amount"], core = false },
+  { domain = "润滑标准", names = ["周期", "润滑周期", "Cycle"], core = false },
+  # 计量器具（06 §4、§6.4）
+  { domain = "计量器具", names = ["计量器具编号", "InstrumentCode"], core = true },
+  { domain = "计量器具", names = ["名称", "计量器具名称", "InstrumentName"], core = true },
+  { domain = "计量器具", names = ["规格", "Specification"], core = true },
+  { domain = "计量器具", names = ["校准周期", "CalibrationCycle"], core = true },
+  { domain = "计量器具", names = ["上次校准日期", "校准日期", "LastCalibrationDate"], core = true },
+  { domain = "计量器具", names = ["有效期至", "校准有效期", "ValidUntil"], core = true },
+  { domain = "计量器具", names = ["校准方式", "CalibrationMethod"], core = true },
+  { domain = "计量器具", names = ["状态", "状态标识", "Status"], core = true },
+  # 检验报告（06 §4、§5.4）
+  { domain = "检验报告", names = ["检验报告编号", "ReportCode"], core = true },
+  { domain = "检验报告", names = ["检验结论", "结论", "InspectionConclusion"], core = true },
+  { domain = "检验报告", names = ["下次检验日期", "NextInspectionDate"], core = true },
+  # 特种设备作业人员证（06 §5.5）
+  { domain = "特种设备作业人员证", names = ["证书编号", "CertificateCode"], core = true },
+  { domain = "特种设备作业人员证", names = ["作业项目", "OperationItem"], core = true },
+  { domain = "特种设备作业人员证", names = ["有效期至", "ValidUntil"], core = true },
+  { domain = "特种设备作业人员证", names = ["姓名", "HolderName"], core = true },
+  # 外委维修合同（02 §12.2）
+  { domain = "外委维修合同", names = ["外委维修合同编号", "合同编号", "ContractCode"], core = false },
+  # 故障分析报告（02 §13.1）
+  { domain = "故障分析报告", names = ["故障分析报告编号", "ReportCode"], core = false },
+  { domain = "故障分析报告", names = ["直接原因", "DirectCause"], core = false },
+  { domain = "故障分析报告", names = ["根本原因", "RootCause"], core = false },
+  { domain = "故障分析报告", names = ["纠正措施", "CorrectiveAction"], core = false },
+  # 测点（01 §14.3）
+  { domain = "测点", names = ["警戒值", "AlertValue"], core = false },
+  { domain = "测点", names = ["停机值", "ShutdownValue"], core = false },
+]
+
+hierarchy = [
+  { child = "特种设备", parent = "设备", core = true },               # 06 §4 特种设备同时是设备台账中的设备，具有设备编号
+  { child = "起重机械", parent = "特种设备", core = false },          # 06 §4 本公司涉及起重机械、场（厂）内专用机动车辆和压力容器三类
+  { child = "场（厂）内专用机动车辆", parent = "特种设备", core = false }, # 同上
+  { child = "压力容器", parent = "特种设备", core = false },          # 同上
+  { child = "日点检任务", parent = "点检计划", core = false },        # 01 §4.8 点检计划分为年度点检计划、月度点检计划和日点检任务
+]
