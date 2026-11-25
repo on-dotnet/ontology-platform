@@ -147,6 +147,45 @@ async def test_extraction_writes_one_open_change_set(app: FastAPI, db: AsyncSess
     assert stored.progress == {"step": "changeset", "done": 1, "total": 1}
 
 
+async def test_a_type_named_as_a_deleted_one_is_proposed_as_its_restore(
+    app: FastAPI, db: AsyncSession
+) -> None:
+    ontology = await add_ontology(db)
+    grade = element(ontology, "entity_type", "SteelGrade", "钢种")
+    deleted = element(ontology, "entity_type", "Heat", "炉次", status="deprecated", revision=2)
+    await add_elements(db, grade, deleted)
+    document, _ = await add_document(db, ontology)
+    extract = make_extractor(factory(app), ScriptedGateway(outputs(grade)), MODELS)
+
+    change_set_id = await extract(document.id, held)
+
+    assert change_set_id is not None
+    detail = await ontology_service.get_change_set(db, change_set_id)
+    by_kind = {(item.op, item.kind): item for item in detail.items}
+    assert set(by_kind) == {
+        ("restore", "entity_type"),
+        ("update", "entity_type"),
+        ("create", "relation_type"),
+    }
+    restore = by_kind["restore", "entity_type"]
+    assert restore.target_element_id == deleted.id
+    # The relation hangs on the restored type, not on a new one.
+    assert by_kind["create", "relation_type"].proposed.domain_ref == str(deleted.id)
+
+
+async def test_alignment_candidates_keep_deleted_elements_apart(db: AsyncSession) -> None:
+    ontology = await add_ontology(db)
+    heat = element(ontology, "entity_type", "Heat", "炉次")
+    gone = element(ontology, "entity_type", "Converter", "转炉", status="deprecated")
+    await add_elements(db, heat, gone)
+
+    candidates = await ontology_service.list_alignment_candidates(db, ontology.id)
+
+    assert [e.local_name for e in candidates.active] == ["Heat"]
+    assert [e.local_name for e in candidates.deleted] == ["Converter"]
+    assert candidates.pending == []
+
+
 async def test_a_replayed_job_reuses_the_change_set(app: FastAPI, db: AsyncSession) -> None:
     ontology = await add_ontology(db)
     grade = element(ontology, "entity_type", "SteelGrade", "钢种")

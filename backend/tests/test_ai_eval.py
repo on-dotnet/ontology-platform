@@ -13,11 +13,12 @@ from pydantic import BaseModel
 
 from ontology_platform.modules.ai.eval import (
     ExpectedError,
-    accept,
+    WorkingVersion,
     check_expected,
     dump_elements,
     evaluate,
     load_elements,
+    merge_counts,
     parse_expected,
     run_case,
     score,
@@ -50,7 +51,22 @@ def create(kind: str, temp: str, label: str, **fields: object) -> Proposal:
     )
 
 
-def test_accept_then_score() -> None:
+def merged(
+    proposals: Sequence[Proposal],
+    *,
+    known: Sequence[KnownElement] = (),
+    parents: dict[UUID, UUID] | None = None,
+) -> list[KnownElement]:
+    """The elements after merging one change set with everything accepted."""
+    version = WorkingVersion()
+    version.elements = list(known)
+    assert version.merge(proposals) == []
+    if parents is not None:
+        parents.update(version.parents)
+    return version.elements
+
+
+def test_merge_then_score() -> None:
     proposals = [
         create("entity_type", "new:Heat", "冶炼炉次", synonyms=[{"lang": "en", "text": "Heat"}]),
         create("entity_type", "new:Cast", "浇次"),
@@ -59,7 +75,7 @@ def test_accept_then_score() -> None:
             "relation_type", "new:inSequence", "属于", domainRef="new:Cast", rangeRef="new:Heat"
         ),
     ]
-    known = accept([], proposals)
+    known = merged(proposals)
     result = score(known, EXPECTED)
 
     assert result["entityTypes"]["predicted"] == 3
@@ -84,9 +100,9 @@ def test_updates_add_synonyms_to_existing_elements() -> None:
         target_element_id=element.id,
         fields={"synonyms": [{"lang": "zh", "text": "钢卷"}]},
     )
-    [merged] = accept([element], [update])
-    assert merged.synonyms == ("钢卷",)
-    assert score([merged], EXPECTED)["entityTypes"]["missedCore"] == ["炉次", "浇次"]
+    [updated] = merged([update], known=[element])
+    assert updated.synonyms == ("钢卷",)
+    assert score([updated], EXPECTED)["entityTypes"]["missedCore"] == ["炉次", "浇次"]
 
 
 def test_unmatched_relations_are_listed_by_their_ends() -> None:
@@ -95,7 +111,7 @@ def test_unmatched_relations_are_listed_by_their_ends() -> None:
         create("entity_type", "new:Crane", "行车"),
         create("relation_type", "new:lifts", "吊运", domainRef="new:Crane", rangeRef="new:Heat"),
     ]
-    result = score(accept([], proposals), EXPECTED)
+    result = score(merged(proposals), EXPECTED)
     assert result["relations"]["unmatched"] == ["行车 → 炉次（吊运）"]
 
 
@@ -107,10 +123,145 @@ def test_saved_elements_score_the_same_after_loading() -> None:
             "relation_type", "new:inSequence", "属于", domainRef="new:Cast", rangeRef="new:Heat"
         ),
     ]
-    known = accept([], proposals)
+    known = merged(proposals)
     saved = json.loads(json.dumps(dump_elements(known)))
     assert load_elements(saved) == known
     assert score(load_elements(saved), EXPECTED) == score(known, EXPECTED)
+
+
+# ---------------------------------------------------------------- merging by the merge plan
+
+
+def test_change_sets_are_merged_by_the_merge_plan() -> None:
+    version = WorkingVersion()
+    first = [
+        create("entity_type", "new:Converter", "转炉", definitionZh="炼钢设备"),
+        create("entity_type", "new:Heat", "炉次"),
+        create(
+            "relation_type", "new:smelts", "冶炼", domainRef="new:Heat", rangeRef="new:Converter"
+        ),
+        create("property", "new:weight", "装入量", domainRef="new:Heat"),
+    ]
+    # Identified against the same baseline: the second proposes the same concepts again.
+    second = [
+        create("entity_type", "new:BOF", "转炉", synonyms=[{"lang": "zh", "text": "氧气转炉"}]),
+        create("entity_type", "new:Heat", "炉次"),
+        create("relation_type", "new:makes", "冶炼", domainRef="new:Heat", rangeRef="new:BOF"),
+        create("property", "new:weight", "出钢量", domainRef="new:Heat"),
+    ]
+    assert version.merge(first) == []
+    assert version.merge(second) == []
+
+    by_kind = sorted((e.kind, e.label_zh, e.local_name) for e in version.elements)
+    assert by_kind == [
+        ("entity_type", "炉次", "Heat"),
+        ("entity_type", "转炉", "Converter"),
+        ("property", "出钢量", "weight2"),  # another property: renamed, not skipped
+        ("property", "装入量", "weight"),
+        ("relation_type", "冶炼", "smelts"),
+    ]
+    [converter] = [e for e in version.elements if e.label_zh == "转炉"]
+    assert (converter.synonyms, converter.definition_zh) == (("氧气转炉",), "炼钢设备")
+    assert converter.revision == 2
+
+
+def test_merge_counts_report_skipped_items_and_duplicates() -> None:
+    expected = {
+        "entity_types": [
+            {"names": ["钢包", "盛钢桶"], "core": True},
+            {"names": ["炉次"], "core": True},
+            {"names": ["转炉"], "core": True},
+        ],
+        "relations": [{"domain": "炉次", "range": "转炉", "core": True}],
+    }
+    marked = create("entity_type", "new:Vessel", "盛钢桶")
+    marked.flags.append("possible_duplicate")
+    proposals = [
+        create("entity_type", "new:Ladle", "钢包"),
+        marked,
+        create("entity_type", "new:Heat", "炉次"),
+        # One change set only sees the working version: the plan does not merge within it.
+        create("entity_type", "new:Heat2", "炉次"),
+        create("entity_type", "new:Converter", "转炉"),
+        create("entity_type", "new:BOF", "氧气转炉"),
+        create("relation_type", "new:a", "使用", domainRef="new:Heat", rangeRef="new:Ladle"),
+        create("relation_type", "new:b", "使用", domainRef="new:Heat", rangeRef="new:Ladle"),
+        create("entity_type", "new:Orphan", "孤儿", parentRef="new:Ghost"),
+        create("property", "new:d", "温度", domainRef="new:Orphan"),
+    ]
+    version = WorkingVersion()
+    skipped = version.merge(proposals)
+    counts = merge_counts(version, skipped, expected)
+
+    assert counts["skippedByCode"] == {
+        "changeset.dependency_skipped": 1,
+        "changeset.invalid_item": 1,
+    }
+    assert (counts["skipped"], counts["duplicateRelations"]) == (2, 1)
+    assert counts["duplicateTypeGroups"] == {
+        "total": 2,
+        "sameMainName": 1,
+        "marked": 1,
+        "unmarked": 0,
+        # 氧气转炉 is no name of the expected 转炉 group: unexpected, not a duplicate.
+        "groups": ["炉次 / 炉次", "钢包 / 盛钢桶"],
+    }
+
+
+def test_an_item_referencing_one_listed_after_it_is_merged_as_the_merge_does() -> None:
+    proposals = [
+        create("entity_type", "new:Converter", "转炉", parentRef="new:Equipment"),
+        create(
+            "relation_type", "new:smelts", "冶炼", domainRef="new:Heat", rangeRef="new:Converter"
+        ),
+        create("entity_type", "new:Equipment", "设备"),
+        create("entity_type", "new:Heat", "炉次"),
+    ]
+    version = WorkingVersion()
+    assert version.merge(proposals) == []
+
+    # Elements keep the order of their items, as the ids the model is shown are derived in.
+    names = [e.local_name for e in version.elements]
+    assert names == ["Converter", "smelts", "Equipment", "Heat"]
+    converter, smelts, equipment, heat = version.elements
+    assert version.parents == {converter.id: equipment.id}
+    assert (smelts.domain_id, smelts.range_id) == (heat.id, converter.id)
+
+
+def test_a_reference_to_an_element_of_another_kind_is_an_invalid_item() -> None:
+    proposals = [
+        create("entity_type", "new:Heat", "炉次"),
+        create("relation_type", "new:smelts", "冶炼", domainRef="new:Heat", rangeRef="new:Heat"),
+        create("property", "new:weight", "装入量", domainRef="new:smelts"),
+    ]
+    version = WorkingVersion()
+    assert version.merge(proposals) == ["changeset.invalid_item"]
+    assert [e.local_name for e in version.elements] == ["Heat", "smelts"]
+
+    # The same for an element of an earlier change set, by its id, and for an update.
+    smelts = version.elements[1]
+    later = [
+        create("property", "new:temperature", "温度", domainRef=str(smelts.id)),
+        Proposal(
+            op="update",
+            kind="entity_type",
+            target_element_id=smelts.id,
+            target_revision=smelts.revision,
+            fields={"synonyms": [{"lang": "zh", "text": "熔炼"}]},
+        ),
+    ]
+    assert version.merge(later) == ["changeset.invalid_item", "changeset.invalid_item"]
+    assert [e.local_name for e in version.elements] == ["Heat", "smelts"]
+
+
+def test_items_referencing_each_other_in_a_loop_are_skipped_as_the_merge_does() -> None:
+    proposals = [
+        create("entity_type", "new:A", "甲", parentRef="new:B"),
+        create("entity_type", "new:B", "乙", parentRef="new:A"),
+    ]
+    version = WorkingVersion()
+    assert version.merge(proposals) == ["changeset.dependency_skipped", "changeset.invalid_item"]
+    assert version.elements == []
 
 
 # ---------------------------------------------------------------- properties and hierarchy
@@ -134,16 +285,15 @@ EXPECTED_MORE = {
 }
 
 
-def test_accepted_ids_follow_from_names_so_that_reruns_prompt_the_same() -> None:
+def test_merged_ids_follow_from_names_so_that_reruns_prompt_the_same() -> None:
     def run() -> tuple[list[KnownElement], dict[UUID, UUID]]:
         parents: dict[UUID, UUID] = {}
-        known = accept(
-            [],
+        known = merged(
             [
                 create("entity_type", "new:Equipment", "设备"),
                 create("entity_type", "new:Converter", "转炉", parentRef="new:Equipment"),
             ],
-            parents,
+            parents=parents,
         )
         return known, parents
 
@@ -162,7 +312,7 @@ def test_properties_count_by_their_type_and_name() -> None:
         create("property", "new:liningAge", "炉龄", domainRef="new:Heat"),  # acceptable
         create("property", "new:colour", "颜色", domainRef="new:Heat"),
     ]
-    result = score(accept([], proposals), EXPECTED_MORE)["properties"]
+    result = score(merged(proposals), EXPECTED_MORE)["properties"]
     assert result == {
         "predicted": 4,
         "precision": 0.5,
@@ -180,7 +330,7 @@ def test_hierarchy_counts_child_parent_pairs_in_their_direction() -> None:
         create("entity_type", "new:Heat", "炉次", parentRef="new:Coil"),
     ]
     parents: dict[UUID, UUID] = {}
-    known = accept([], proposals, parents)
+    known = merged(proposals, parents=parents)
     result = score(known, EXPECTED_MORE, parents)["hierarchy"]
     assert result == {
         "predicted": 2,
@@ -203,7 +353,7 @@ def test_a_case_without_the_new_sections_scores_as_before() -> None:
         create("property", "new:weight", "重量", domainRef="new:Heat"),
     ]
     parents: dict[UUID, UUID] = {}
-    result = score(accept([], proposals, parents), EXPECTED, parents)
+    result = score(merged(proposals, parents=parents), EXPECTED, parents)
     assert set(result) == {"entityTypes", "relations", "properties", "hierarchy"}
     assert result["properties"] == {"predicted": 1}
     assert result["hierarchy"] == {"predicted": 1}
@@ -215,7 +365,8 @@ _HEAT_ID = re.compile(r"^- ([0-9a-f-]{36}) \| 炉次", re.MULTILINE)
 
 
 class ModelStandIn:
-    """Answers like a model would: the second document reuses the first one's type by its id."""
+    """Answers like a model would: the second document reuses the first one's type by its id
+    when it is shown one, and proposes it again otherwise."""
 
     def __init__(self) -> None:
         self.calls = 0
@@ -235,7 +386,8 @@ class ModelStandIn:
         second = "b.md" in text.splitlines()[0]
         if purpose == "extract.terms":
             return schema.model_validate({"terms": []})
-        heat = _HEAT_ID.findall(text)[0] if second else "new:Heat"
+        shown = _HEAT_ID.findall(text)
+        heat = shown[0] if second and shown else "new:Heat"
         if purpose == "extract.types":
             types = [_type(heat, "炉次", "Heat", "每个炉次有炉号")]
             if second:
@@ -291,7 +443,12 @@ MODELS = ExtractionModels(standard="m-standard", reasoning="m-reasoning")
 
 
 def _scores(result: dict[str, Any]) -> dict[str, Any]:
-    return {key: value for key, value in result.items() if key != "usage"}
+    """Without the usage, which differs between recording and replaying, also nested."""
+    return {
+        key: _scores(value) if key == "sameBaseline" else value
+        for key, value in result.items()
+        if key != "usage"
+    }
 
 
 async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> None:
@@ -299,8 +456,17 @@ async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> Non
     recorder = ReplayGateway({}, model)
     recorded = await run_case(CASE_FILES, recorder, MODELS)
     assert recorded["relations"]["recall"] == 1.0
-    assert model.calls == 6  # terms, types and relations of each document
+    # Terms, types and relations of each document, and two more: in the same-baseline scenario
+    # b.md is shown no 炉次 of a.md, so its types and relations calls see another input.
+    assert model.calls == 8
     assert recorded["usage"]["documents"]["docs/b.md"]["extract.types"]["calls"] == 1
+    assert recorded["sameBaseline"]["usage"]["total"] == {
+        "calls": 2,
+        "replayed": 4,
+        "seconds": recorded["sameBaseline"]["usage"]["total"]["seconds"],
+        "inputTokens": 0,
+        "outputTokens": 0,
+    }
 
     recordings = load_recordings(text for _, text in recorder.recording_files())
     replayed = await run_case(CASE_FILES, ReplayGateway(recordings, None), MODELS)
@@ -308,6 +474,38 @@ async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> Non
     assert _scores(replayed) == _scores(recorded)
     assert replayed["usage"]["total"]["calls"] == 0
     assert replayed["usage"]["total"]["replayed"] == 6
+
+
+async def test_the_same_baseline_scenario_merges_what_documents_proposed_twice() -> None:
+    result = await run_case(CASE_FILES, ReplayGateway({}, ModelStandIn()), MODELS)
+
+    same = result["sameBaseline"]
+    # Both documents proposed 炉次; merging the second change set puts it into the first one's.
+    assert same["entityTypes"]["predicted"] == 2
+    assert same["relations"]["recall"] == 1.0
+    assert same["merge"] == {
+        "review": "acceptAll",
+        "skipped": 0,
+        "skippedByCode": {},
+        "duplicateRelations": 0,
+        "duplicateTypeGroups": {
+            "total": 0,
+            "sameMainName": 0,
+            "marked": 0,
+            "unmarked": 0,
+            "groups": [],
+        },
+    }
+    assert same["proposals"] == result["proposals"] + 1  # b.md proposes 炉次 once more
+
+
+async def test_the_same_baseline_scenario_can_be_left_out() -> None:
+    model = ModelStandIn()
+    result = await run_case(CASE_FILES, ReplayGateway({}, model), MODELS, ["sequential"])
+    assert "sameBaseline" not in result
+    assert model.calls == 6
+    with pytest.raises(ValueError, match="sequential"):
+        await run_case(CASE_FILES, ReplayGateway({}, model), MODELS, ["sameBaseline"])
 
 
 async def test_a_case_without_answers_is_run_but_not_scored_and_can_be_scored_later() -> None:
@@ -363,6 +561,13 @@ def test_a_run_that_recorded_nothing_leaves_the_models_file_alone() -> None:
     assert output["files"] == []
 
 
+def test_scenarios_must_be_a_list_of_names() -> None:
+    model = ModelStandIn()
+    with pytest.raises(ValueError, match="list of names"):
+        evaluate({**_bundle(CASE_FILES), "scenarios": "sequential"}, model)
+    assert model.calls == 0
+
+
 def test_malformed_answers_fail_before_any_model_call() -> None:
     model = ModelStandIn()
     wrong_child = 'hierarchy = [{ child = "炉", parent = "浇次", core = true }]\n'
@@ -397,7 +602,7 @@ def test_sections_without_a_denominator_score_none() -> None:
         **EXPECTED_MORE,
         "hierarchy": [{"child": "转炉", "parent": "设备", "core": False}],
     }
-    result = score(accept([], [create("entity_type", "new:Heat", "炉次")]), expected, {})
+    result = score(merged([create("entity_type", "new:Heat", "炉次")]), expected, {})
     assert result["properties"]["precision"] is None  # nothing predicted
     assert result["hierarchy"]["recall"] is None  # no core pair
 

@@ -1,5 +1,6 @@
 """Staged extraction with a scripted model: alignment, references, evidence grounding, progress."""
 
+import unicodedata
 from collections.abc import Sequence
 from typing import Any
 from uuid import UUID, uuid4
@@ -1050,3 +1051,198 @@ def test_an_existing_id_given_to_a_type_of_its_one_character_label_is_kept() -> 
 
     # Not a mistaken id: the parent given it stands for 钢.
     assert billet.fields["parentRef"] == str(steel.id)
+
+
+# ---------- direct evidence by sentence (spec 004, section 8) ----------
+
+
+def named_relation(item: RelationOut, local_name: str) -> RelationOut:
+    return item.model_copy(update={"local_name": local_name})
+
+
+def _wrap(line: str, width: int) -> str:
+    """Breaks a line where a page of `width` display columns would (full-width counts twice)."""
+    rows, row, used = [], "", 0
+    for char in line:
+        size = 2 if unicodedata.east_asian_width(char) in "WF" else 1
+        if row and used + size > width:
+            rows.append(row)
+            row, used = "", 0
+        row += char
+        used += size
+    return "\n".join([*rows, row])
+
+
+@pytest.mark.parametrize("width", [30, 36, 50])
+def test_the_core_steel_relations_survive_hard_wrapped_lines(width: int) -> None:
+    text = "\n".join(_wrap(line, width) for line in STEEL_LINES)
+    chunks = [ChunkText(id=uuid4(), seq=0, text=text)]
+    rels = RelationsOut(
+        relations=[
+            relation(domain, range_, f"关系{index}", [quote(0, text)])
+            for index, (domain, range_, text) in enumerate(STEEL_CORE_RELATIONS)
+        ],
+        properties=[],
+    )
+    proposals = build_proposals(chunks, [], _steel_types("缺陷记录", ["钢卷表面缺陷"]), rels)
+
+    kept = [p.fields["labelZh"] for p in proposals if p.kind == "relation_type"]
+    assert kept == [f"关系{index}" for index in range(len(STEEL_CORE_RELATIONS))]
+
+
+def test_two_sentences_of_one_line_are_no_direct_evidence() -> None:
+    # A Markdown or Word line is a paragraph: its sentences are units of their own.
+    chunk = ChunkText(id=uuid4(), seq=0, text="每个炉次在转炉冶炼。钢水随后装入钢包，运往精炼炉。")
+    types = [
+        entity("new:Heat", "炉次", "Heat"),
+        entity("new:Ladle", "钢包", "Ladle"),
+        entity("new:Refiner", "精炼炉", "Refiner"),
+    ]
+    rels = RelationsOut(
+        relations=[
+            relation("new:Heat", "new:Ladle", "使用", [quote(0, "钢水随后装入钢包")]),
+            relation("new:Ladle", "new:Refiner", "运往", [quote(0, "钢水随后装入钢包")]),
+            # A quote over two sentences takes both of them.
+            relation("new:Heat", "new:Refiner", "经过", [quote(0, "在转炉冶炼。钢水随后")]),
+        ],
+        properties=[],
+    )
+    proposals = build_proposals([chunk], [], types, rels)
+
+    assert [p.fields["labelZh"] for p in proposals if p.kind == "relation_type"] == [
+        "运往",
+        "经过",
+    ]
+
+
+# ---------- relations: the range is part of what makes one existing ----------
+
+
+def test_a_relation_with_an_existing_label_domain_and_range_is_not_proposed_again() -> None:
+    heat = KnownElement(id=uuid4(), kind="entity_type", local_name="Heat", label_zh="炉次")
+    grade = KnownElement(id=uuid4(), kind="entity_type", local_name="Grade", label_zh="钢种")
+    smelts = KnownElement(
+        id=uuid4(),
+        kind="relation_type",
+        local_name="smelts",
+        label_zh="冶炼",
+        domain_id=heat.id,
+        range_id=grade.id,
+    )
+    rels = RelationsOut(
+        relations=[relation(str(heat.id), str(grade.id), "冶炼", [quote(0, "只冶炼一个钢种")])],
+        properties=[],
+    )
+    assert build_proposals([CHUNK_A], [heat, grade, smelts], [], rels) == []
+
+
+# ---------- deleted types (spec 004, section 5.6) ----------
+
+DELETED_CONVERTER = KnownElement(
+    id=uuid4(),
+    kind="entity_type",
+    local_name="Converter",
+    label_zh="转炉",
+    synonyms=("氧气转炉",),
+    revision=3,
+)
+CONVERTER_CHUNK = ChunkText(id=uuid4(), seq=0, text="每个炉次都在一座转炉上冶炼。")
+
+
+def test_a_type_named_as_a_deleted_one_restores_it() -> None:
+    types = [
+        entity(
+            "new:BOF",
+            "转炉",
+            "BOF",
+            definition_zh="把铁水炼成钢水的炉子",
+            synonyms=["炼钢转炉", "氧气转炉"],
+            quotes=[quote(0, "一座转炉")],
+        ),
+        entity("new:Heat", "炉次", "Heat", quotes=[quote(0, "每个炉次")]),
+    ]
+    rels = RelationsOut(
+        relations=[relation("new:Heat", "new:BOF", "冶炼于", [quote(0, "每个炉次都在一座转炉")])],
+        properties=[prop("new:BOF", "公称容量")],
+    )
+    proposals = build_proposals([CONVERTER_CHUNK], [], types, rels, deleted=[DELETED_CONVERTER])
+
+    [restore] = [p for p in proposals if p.op == "restore"]
+    assert (restore.kind, restore.target_element_id, restore.target_revision) == (
+        "entity_type",
+        DELETED_CONVERTER.id,
+        3,
+    )
+    # Only additions: the new synonym, and the definition the deleted type did not have.
+    assert restore.fields == {
+        "synonyms": [{"lang": "zh", "text": "炼钢转炉"}],
+        "definitionZh": "把铁水炼成钢水的炉子",
+    }
+    assert [e.chunk_id for e in restore.evidence] == [CONVERTER_CHUNK.id]
+    [smelted_in] = [p for p in proposals if p.kind == "relation_type"]
+    [capacity] = [p for p in proposals if p.kind == "property"]
+    converter = str(DELETED_CONVERTER.id)
+    assert (smelted_in.fields["rangeRef"], capacity.fields["domainRef"]) == (converter, converter)
+    assert [p.fields["labelZh"] for p in proposals if p.op == "create"] == [
+        "炉次",
+        "冶炼于",
+        "公称容量",
+    ]
+
+
+def test_a_restore_is_proposed_even_with_nothing_to_add() -> None:
+    types = [entity("new:Converter", "转炉", "Converter", quotes=[quote(0, "一座转炉")])]
+    proposals = build_proposals(
+        [CONVERTER_CHUNK], [], types, NO_RELATIONS, deleted=[DELETED_CONVERTER]
+    )
+    assert [(p.op, p.fields) for p in proposals] == [("restore", {})]
+
+
+def test_two_types_named_as_one_deleted_type_give_one_restore() -> None:
+    types = [
+        entity("new:Converter", "转炉", "Converter", synonyms=["炼钢炉"]),
+        entity("new:BOF", "转炉", "BOF", synonyms=["顶吹转炉"]),
+    ]
+    proposals = build_proposals(
+        [CONVERTER_CHUNK], [], types, NO_RELATIONS, deleted=[DELETED_CONVERTER]
+    )
+    [restore] = proposals
+    assert [s["text"] for s in restore.fields["synonyms"]] == ["炼钢炉", "顶吹转炉"]
+
+
+def test_an_active_type_of_the_name_wins_over_a_deleted_one() -> None:
+    active = KnownElement(id=uuid4(), kind="entity_type", local_name="Converter2", label_zh="转炉")
+    types = [entity("new:Converter", "转炉", "Converter", synonyms=["炼钢炉"])]
+    proposals = build_proposals(
+        [CONVERTER_CHUNK], [active], types, NO_RELATIONS, deleted=[DELETED_CONVERTER]
+    )
+    assert [(p.op, p.target_element_id) for p in proposals] == [("update", active.id)]
+
+
+def test_deleted_elements_hold_their_local_names_and_do_not_align_otherwise() -> None:
+    deleted_relation = KnownElement(
+        id=uuid4(), kind="relation_type", local_name="smeltedIn", label_zh="冶炼于"
+    )
+    types = [
+        # Another name: a new type, which may not take the deleted type's local name.
+        entity("new:Converter", "电炉", "Converter"),
+        entity("new:Heat", "炉次", "Heat"),
+    ]
+    rels = RelationsOut(
+        relations=[
+            named_relation(
+                relation("new:Heat", "new:Converter", "冶炼于", [quote(0, "每个炉次")]),
+                "smeltedIn",
+            )
+        ],
+        properties=[],
+    )
+    chunk = ChunkText(id=uuid4(), seq=0, text="每个炉次都在一座电炉上冶炼。")
+    proposals = build_proposals(
+        [chunk], [], types, rels, deleted=[DELETED_CONVERTER, deleted_relation]
+    )
+    assert [(p.op, p.fields["localName"]) for p in proposals] == [
+        ("create", "Converter2"),
+        ("create", "Heat"),
+        ("create", "smeltedIn2"),
+    ]
