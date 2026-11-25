@@ -1,0 +1,461 @@
+# 药品批生产（片剂）留出案例包的期望识别结果，用于 ./dev.ps1 eval 计算准确率与召回率（Python 标准库 tomllib 读取）。
+# 本文件是留出集答案：写于任何模型在本案例包上运行之前，只依据 6 份资料原文（工艺规程、批生产记录管理规程、
+# 物料接收取样与检验规程、偏差与CAPA管理规程、设备与洁净区台账、成品检验与放行规程），没有参考识别代码、
+# 提示词或任何模型输出。
+#
+# 匹配规则：模型给出的中文名、英文名或任一同义词，规范化（去空白、全角转半角、小写）后与 names 中任一项相同即算命中。
+# core = true 的项计入召回率；core = false 为可接受项：识别出来不算错，没识别出来也不扣召回。
+# 关系不计较方向与名称：A→B 与 B→A 都算命中。domain、range 用对应对象类型 names 的第一个名字。
+# 层级（hierarchy）是子类 → 父类，方向要对。
+#
+# 收录标准（参照钢铁案例包的标准，改写成药品批生产的说法）。对象类型收录以下几类，依据都要在资料原文里找得到：
+#   1. 有标识的事物：原文给出编号（批号、物料批号、设备编号、房间编号、器具编号、偏差编号、CAPA编号、
+#      请验单编号、检验报告单编号、放行单编号、留样编号、考察编号等）。
+#   2. 原文逐个记录数据的记录或事件：原文写明对每一个记录测量值、时间、结果，或称为“……记录”“每次……填写”
+#      （设备清洁记录、称量配料记录、压片中间控制记录、发运记录等）。
+#   3. 物料在其中被加工、盛装的生产设备：设备台账里能单独运行的设备；设备内部部件（冲模、滤袋）不算核心。
+#      台账统一按“设备”建模即可，具体设备类别（压片机、流化床干燥机等）作为可接受项。
+#   4. 物料在各工序的形态，且原文记录了它的测量值（总混颗粒、素片、包衣片）。
+#   5. 原文写明由哪些有标识的事物组成的单据（批生产记录由各工序表单组成、清场合格证编号由房间编号和批号组成）。
+#      关键工艺参数表、成品检验项目与标准规定这类按工序或产品给出的参考表不算核心。
+# 不收录：工艺步骤与操作（称量配料、湿法制粒、干燥、整粒、总混、压片、包衣、内包装、外包装、清场、取样、
+#   请验、复验、放行操作等，其数据在原文里记在别的对象上；“工序”这一概念作为可接受项）；状态与取值
+#   （待验/合格/不合格、在用/停用、偏差等级微小/主要/重大、根本原因类别、审核结论合格/不合格/待定、
+#   供应商评价A/B/C、清洁类型）；只作为执行者出现的人员与部门（质量受权人、QA、QC、中控员、班组长、
+#   物料部、设备工程部等）；没有自身数据的部件与公用系统（滤袋、冲头、纯化水系统、空调净化系统）；
+#   只出现一次、没有自身数据的单据与台账（偏差台账、CAPA台账、留样台账、销毁记录、销售订单、送货单）；
+#   标签（称量标签、中间产品标签、已取样标签、箱签）。
+# 拿不准的处理：拿不准是不是对象类型、但建了也说得过去的，以 core = false 收入；拿不准是否“一定会建”的按 false。
+# 同一事物在原文里逐字出现的全称、简称或别称并入同一项的 names（如“批生产记录/批记录/BPR”“素片/片芯”
+# “总混颗粒/待压颗粒”“请验单/检验申请单”“供应商/供货单位”“物料批号/接收编号”）。
+# 名字相近但原文区分的不合并：检验报告单（本公司 QC 对物料出具，JC-年月-流水号）、供应商检验报告书（COA，
+# 只作参考）、成品检验报告书（JC-CP-批号）、中间产品检验报告单是四种东西；物料放行单与成品放行单是两种东西；
+# 请验单（物料）、中间产品请验单、成品请验单是三种东西。
+# 关系收录两端都是本文件里的对象类型、且原文有一句话、一个列表项或一个表格行直接写明两者联系的；表格列里记录
+# 另一事物的编号（设备台账的“所在房间编号”、清洁记录的“上一批号”）算写明联系。每条关系后注明原文依据。
+# 属性收录原文写明对该类型记录的数据项；数据项若是另一对象类型的编号（如清洁记录里的“设备编号”），按关系处理。
+
+entity_types = [
+  # ---- 批与产品 ----
+  { names = ["批", "生产批", "批次", "成品批", "Batch"], core = true },          # 01 §5.1 批的划分、§5.2 批号；02 §7.2 “每个成品批都能追溯到所用的每一个物料批”
+  { names = ["产品", "Product"], core = true },                                   # 01 §4.1 产品名称、产品代码、规格等
+  { names = ["成品", "Finished Product"], core = false },                         # 06 §4 “成品：完成全部生产工序（包括外包装）的产品”；放行对象是批
+  { names = ["处方", "Formula"], core = false },                                  # 01 §4.2 处方表（产品与物料的用量）
+  { names = ["工序", "Process Step"], core = false },                             # 设备台账“所属工序”、01 §6.2 各工序设备；按标准为工艺步骤，只作可接受项
+
+  # ---- 物料与供应商 ----
+  { names = ["物料", "原辅包", "Material"], core = true },                        # 03 §4 “物料：原料、辅料和包装材料的统称……合称‘原辅包’”
+  { names = ["原料", "Active Ingredient"], core = true },                         # 03 §4；合格供应商名录“类别”
+  { names = ["辅料", "Excipient"], core = true },                                 # 03 §4
+  { names = ["包装材料", "Packaging Material"], core = true },                    # 03 §4
+  { names = ["原辅料"], core = false },                                           # 03 §4 “原料和辅料合称原辅料”
+  { names = ["物料批", "到货批", "Material Lot"], core = true },                  # 03 §4 物料批号；§5.2 物料批号表
+  { names = ["供应商", "供货单位", "Supplier"], core = true },                    # 03 §4、§5.1 合格供应商名录、§5.11 供应商档案与评价
+  { names = ["生产商", "Manufacturer"], core = false },                           # 03 §5.1 名录“生产商”列
+  { names = ["合格供应商名录", "Approved Supplier List"], core = false },         # 03 §5.1
+  { names = ["物料接收记录", "接收记录", "Material Receipt Record"], core = false },  # 03 §5.2 “物料批号写入物料接收记录”
+  { names = ["请验单", "检验申请单", "Inspection Request"], core = true },        # 03 §5.3 编号 QY-年月-流水号
+  { names = ["取样记录", "Sampling Record"], core = false },                      # 03 §5.4 “每次取样填写取样记录”；06 §5.1
+  { names = ["检验报告单", "Inspection Report"], core = true },                   # 03 §5.5 编号 JC-年月-流水号
+  { names = ["供应商检验报告书", "COA"], core = false },                          # 03 §4 “供应商随货提供的检验报告书（COA）只作为参考”
+  { names = ["物料放行单", "Material Release Note"], core = false },              # 03 §5.6 “QA……签发物料放行单”
+  { names = ["领料单", "Material Requisition"], core = false },                   # 02 §5.1 R-PR-001-02；03 §5.10
+  { names = ["留样", "Retained Sample"], core = true },                           # 06 §5.6 留样编号 LY-批号；03 §5.8 物料留样
+
+  # ---- 批生产记录及其表单 ----
+  { names = ["批生产指令", "批生产指令单", "Batch Production Order"], core = true },  # 01 §5.2；02 §5.1 R-PR-001-01
+  { names = ["批生产记录", "批记录", "BPR", "Batch Production Record"], core = true },  # 02 §4 定义
+  { names = ["批包装记录", "Batch Packaging Record"], core = false },             # 02 §4 “是批生产记录的组成部分”
+  { names = ["称量配料记录", "Weighing Record"], core = true },                   # 02 §7.2 逐项记录物料批号、检验报告单编号和实际称量量
+  { names = ["制粒干燥记录"], core = false },                                     # 02 §5.1 R-PR-001-04
+  { names = ["整粒总混记录"], core = false },                                     # 02 §5.1 R-PR-001-05
+  { names = ["压片记录", "Compression Record"], core = true },                    # 02 §5.1 每台压片机1份；§7.2 注明压片机设备编号、产量
+  { names = ["压片中间控制记录", "In-Process Control Record"], core = true },     # 01 §7.5 片重、硬度、厚度和脆碎度记入；02 §5.1
+  { names = ["包衣记录", "Coating Record"], core = false },                       # 02 §5.1 每锅1份；§7.2 锅号
+  { names = ["内包装记录"], core = false },                                       # 02 §5.1 R-PR-001-09
+  { names = ["外包装记录"], core = false },                                       # 02 §5.1 R-PR-001-10；§7.2 分日登记数量
+  { names = ["中间产品请验单"], core = false },                                   # 02 §5.1 R-PR-001-11；§7.5
+  { names = ["中间产品交接单"], core = false },                                   # 02 §7.5 核对品名、批号、桶数和净重
+  { names = ["中间产品检验报告单"], core = false },                               # 02 §5.2 附入批记录
+  { names = ["清场记录", "Line Clearance Record"], core = false },                # 02 §5.1 每间每次1份；§8
+  { names = ["清场合格证", "Line Clearance Certificate"], core = true },          # 02 §8 编号=房间编号+批号，有效期72小时
+  { names = ["物料平衡计算表", "Material Balance Sheet"], core = true },          # 02 §9 每个阶段按物料平衡计算表计算，附计算示例
+  { names = ["批生产记录审核单", "Batch Record Review Form"], core = true },      # 02 §5.1 R-PR-001-15；§10 写明偏差处理结论
+
+  # ---- 中间产品 ----
+  { names = ["中间产品", "Intermediate Product"], core = true },                  # 01 §9 中间产品及检测项目、存放与流转
+  { names = ["总混颗粒", "待压颗粒", "Final Blend"], core = true },               # 01 §9.1 混合均匀度、含量；02 §7.5 “待压颗粒即总混颗粒”
+  { names = ["素片", "片芯", "Core Tablet"], core = true },                       # 01 §7.5 “此时的产品称为素片，也称片芯”；§9.1 检测项目
+  { names = ["包衣片", "Coated Tablet"], core = true },                           # 01 §7.6、§9.1 包衣增重、崩解时限、含量
+  { names = ["湿颗粒", "Wet Granules"], core = false },                           # 01 §9.1 只检外观
+  { names = ["干颗粒", "Dry Granules"], core = false },                           # 01 §9.1 干燥失重
+  { names = ["铝塑板", "Blister"], core = false },                                # 01 §6.2 内包装产出；§7.7 密封性检查；§10.1 按数量计算
+  { names = ["容器", "桶"], core = false },                                       # 01 §7.5 容器标签注明批号、压片机编号、桶号和净重
+
+  # ---- 设备、计量器具、房间 ----
+  { names = ["设备", "生产设备", "Equipment"], core = true },                     # 05 设备台账
+  { names = ["压片机", "高速旋转式压片机", "Tablet Press"], core = false },       # 05 设备台账 EQ-YP-001/002；02 §7.2 每台压片机一份记录
+  { names = ["湿法混合制粒机", "High Shear Granulator"], core = false },          # 05 设备台账 EQ-ZL-003；01 §5.1
+  { names = ["流化床干燥机", "Fluid Bed Dryer"], core = false },                  # 05 设备台账 EQ-GZ-001/002
+  { names = ["料斗混合机", "Bin Blender"], core = false },                        # 05 设备台账 EQ-ZH-001
+  { names = ["高效包衣机", "包衣机", "Coater"], core = false },                   # 05 设备台账 EQ-BY-001；02 §7.6 “包衣机的温度与喷液记录”
+  { names = ["铝塑泡罩包装机", "铝塑包装机", "Blister Packaging Machine"], core = false },  # 05 设备台账 EQ-NB-001；02 §7.6
+  { names = ["冲模", "Punch and Die"], core = false },                            # 01 §7.5；04 §7 更换全套冲模、累计使用次数（设备部件，只作可接受项）
+  { names = ["计量器具", "Measuring Instrument"], core = true },                  # 05 计量器具校准记录：器具编号 JL-xxx
+  { names = ["计量器具校准记录", "校准记录", "Calibration Record"], core = false },  # 05 计量器具校准记录表；04 §5.4 “校准记录”
+  { names = ["房间", "操作间", "洁净区房间", "Room"], core = true },              # 05 洁净区房间清单；02 §7.3 操作间编号
+  { names = ["设备清洁记录", "清洁记录", "Cleaning Record"], core = true },       # 05 设备清洁记录：清洁记录号 QJ-xxxx-xxx
+
+  # ---- 偏差与 CAPA ----
+  { names = ["偏差", "异常事件", "异常情况", "Deviation"], core = true },         # 04 §4 定义；§6.1 偏差台账
+  { names = ["偏差报告", "偏差（异常事件）报告单", "Deviation Report"], core = false },  # 04 §4、§5.1
+  { names = ["CAPA", "纠正预防措施", "Corrective and Preventive Action"], core = true },  # 04 §4；§6.2 CAPA台账
+  { names = ["纠正措施", "Corrective Action"], core = false },                    # 04 §4 “纠正措施和预防措施合称纠正预防措施，即CAPA”
+  { names = ["预防措施", "Preventive Action"], core = false },                    # 04 §4
+  { names = ["变更", "变更申请", "Change"], core = false },                       # 04 §5.10 变更编号记入CAPA台账
+
+  # ---- 成品检验、放行、留样、稳定性、发运 ----
+  { names = ["成品请验单"], core = false },                                       # 06 §5.1
+  { names = ["成品检验报告书", "Finished Product Test Report"], core = true },    # 06 §5.2 编号 JC-CP-批号
+  { names = ["成品放行审核单"], core = false },                                   # 06 §5.4
+  { names = ["成品放行单", "放行单", "Release Certificate"], core = true },       # 06 §5.4 编号 FX-年月-流水号；§5.5 放行记录
+  { names = ["放行记录", "产品放行", "Product Release"], core = false },          # 06 §5.5 放行记录表（每批一行）
+  { names = ["持续稳定性考察", "稳定性考察", "Stability Study"], core = true },   # 06 §5.7 考察编号 WD-xxxx-xx
+  { names = ["不合格品处理单", "Nonconformance Disposition"], core = false },     # 06 §5.8 编号 BHG-年月-流水号
+  { names = ["发运记录", "Shipment Record"], core = true },                       # 06 §5.9 写明产品名称、规格、批号、数量、收货单位、发运日期和运输方式
+  { names = ["关键工艺参数", "工艺参数", "Critical Process Parameter"], core = false },  # 01 §8 参考表，只作可接受项
+]
+
+relations = [
+  # ---- 核心 ----
+  { domain = "批", range = "产品", core = true },                    # 06 §5.5 “甲氧芬片各批次的放行情况”；02 §7.2 页眉填写产品名称、规格和批号
+  { domain = "批", range = "物料批", core = true },                  # 02 §7.2 “每个成品批都能追溯到所用的每一个物料批”；“2611035批使用的甲氧芬物料批号为Y2611004”
+  { domain = "批", range = "设备", core = true },                    # 01 §5.1 “用同一台湿法混合制粒机制备……为一个批”；04 §5.7 使用该设备的所有批次
+  { domain = "批", range = "批生产记录", core = true },              # 02 §4 “批生产记录：一个批次的产品从投料到包装完成的全部生产记录”
+  { domain = "批", range = "批生产指令", core = true },              # 01 §5.2 “批号由生产部在下达批生产指令时分配”
+  { domain = "批", range = "偏差", core = true },                    # 04 §6.1 偏差台账：涉及批号列
+  { domain = "批", range = "中间产品", core = true },                # 01 §6.1 中间产品状态标识标明品名、批号
+  { domain = "批", range = "成品检验报告书", core = true },          # 06 §5.2 编号 JC-CP-批号；§5.5 放行记录表
+  { domain = "批", range = "成品放行单", core = true },              # 06 §5.5 放行记录表：批号—放行单编号
+  { domain = "批", range = "留样", core = true },                    # 06 §5.6 留样编号格式为LY-批号
+  { domain = "批", range = "持续稳定性考察", core = true },          # 06 §5.7 考察表：考察批次列
+  { domain = "批", range = "清场合格证", core = true },              # 02 §8 清场合格证编号由房间编号和批号组成
+  { domain = "批", range = "设备清洁记录", core = true },            # 05 设备清洁记录：上一批号列
+  { domain = "批", range = "发运记录", core = true },                # 06 §5.9 发运记录写明……批号
+  { domain = "物料批", range = "物料", core = true },                # 03 §5.2 物料批号表：物料代码列
+  { domain = "物料批", range = "偏差", core = true },                # 04 §6.1 偏差台账：涉及批号“物料批F2611010”
+  { domain = "物料批", range = "请验单", core = true },              # 03 §5.3 请验单内容包括……物料批号
+  { domain = "物料批", range = "检验报告单", core = true },          # 01 §7.1 核对物料批号、检验报告单编号；02 §7.2
+  { domain = "物料批", range = "称量配料记录", core = true },        # 02 §7.2 称量配料记录中须逐项记录每种物料的物料批号
+  { domain = "物料", range = "供应商", core = true },                # 03 §5.1 合格供应商名录：物料代码—供应商
+  { domain = "物料", range = "产品", core = true },                  # 01 §4.2 处方表：物料代码、物料名称、每批用量
+  { domain = "请验单", range = "检验报告单", core = true },          # 03 §5.5 “请验单QY-2611-012对应检验报告单JC-2611-012”
+  { domain = "设备", range = "房间", core = true },                  # 05 设备台账：所在房间编号列
+  { domain = "设备", range = "设备清洁记录", core = true },          # 05 设备清洁记录：设备编号列
+  { domain = "设备", range = "计量器具", core = true },              # 05 计量器具校准记录：所属设备编号列
+  { domain = "设备", range = "偏差", core = true },                  # 04 §6.1 偏差台账：涉及设备或房间列
+  { domain = "设备", range = "压片记录", core = true },              # 02 §7.2 “每台压片机各填写一份压片记录……注明压片机的设备编号”
+  { domain = "设备", range = "压片中间控制记录", core = true },      # 02 §7.2 同上
+  { domain = "房间", range = "偏差", core = true },                  # 04 §6.1 偏差台账：涉及设备或房间列（D-201、D-206）
+  { domain = "房间", range = "清场合格证", core = true },            # 02 §8 编号由房间编号和批号组成；副本留在操作间
+  { domain = "偏差", range = "CAPA", core = true },                  # 04 §6.1 CAPA编号列；§6.2 来源列
+  { domain = "偏差", range = "批生产记录", core = true },            # 02 §10 偏差编号须在发生工序的记录中注明
+  { domain = "批生产记录", range = "批生产记录审核单", core = true },  # 02 §11.1 车间主任按批生产记录审核单逐项审核
+  { domain = "持续稳定性考察", range = "产品", core = true },        # 06 §5.7 考察表：产品列
+
+  # ---- 可接受 ----
+  { domain = "批", range = "房间", core = false },                   # 01 §7.9 同一操作间同一时间只能进行一个批次的生产
+  { domain = "批", range = "批生产记录审核单", core = false },       # 02 §10 “该批的批生产记录审核单”
+  { domain = "批", range = "不合格品处理单", core = false },         # 06 §5.8 处理单写明批号
+  { domain = "批", range = "放行记录", core = false },               # 06 §5.5 放行记录表
+  { domain = "批", range = "成品放行审核单", core = false },         # 06 §5.4
+  { domain = "批", range = "压片记录", core = false },               # 02 §7.2 每份工序记录的页眉填写批号
+  { domain = "批", range = "包衣记录", core = false },               # 02 §7.2
+  { domain = "批", range = "称量配料记录", core = false },           # 02 §7.2
+  { domain = "批", range = "物料平衡计算表", core = false },         # 02 §9 计算示例：批号 2611033
+  { domain = "批", range = "容器", core = false },                   # 01 §7.5 容器标签注明批号
+  { domain = "物料批", range = "供应商", core = false },             # 03 §5.3 请验单含供应商、供应商批号
+  { domain = "物料批", range = "留样", core = false },               # 03 §5.8 留样标签注明物料批号
+  { domain = "物料批", range = "物料放行单", core = false },         # 03 §5.6
+  { domain = "物料批", range = "物料接收记录", core = false },       # 03 §5.2 物料批号写入物料接收记录
+  { domain = "物料批", range = "领料单", core = false },             # 01 §7.1 凭领料单按批发放
+  { domain = "物料", range = "生产商", core = false },               # 03 §5.1 名录：生产商列
+  { domain = "物料", range = "处方", core = false },                 # 01 §4.2
+  { domain = "产品", range = "处方", core = false },                 # 01 §4.2
+  { domain = "物料", range = "合格供应商名录", core = false },       # 03 §5.1
+  { domain = "供应商", range = "合格供应商名录", core = false },     # 03 §5.1
+  { domain = "供应商", range = "供应商检验报告书", core = false },   # 03 §4
+  { domain = "检验报告单", range = "物料放行单", core = false },     # 03 §5.6 QA审核检验报告单和接收记录后签发物料放行单
+  { domain = "检验报告单", range = "称量配料记录", core = false },   # 02 §7.2 称量配料记录记录检验报告单编号
+  { domain = "请验单", range = "取样记录", core = false },           # 03 §5.4 收到请验单后由取样员取样
+  { domain = "设备", range = "工序", core = false },                 # 05 设备台账：所属工序列
+  { domain = "设备", range = "批生产记录", core = false },           # 02 §7.3 每道工序开工前在记录中填写所用设备编号
+  { domain = "设备", range = "容器", core = false },                 # 01 §7.5 容器标签注明压片机编号
+  { domain = "设备", range = "素片", core = false },                 # 01 §6.2 压片：压片机……产出素片
+  { domain = "设备", range = "总混颗粒", core = false },             # 01 §6.2 总混：料斗混合机……产出总混颗粒
+  { domain = "设备", range = "包衣片", core = false },               # 01 §6.2 薄膜包衣：高效包衣机……产出包衣片
+  { domain = "房间", range = "批生产记录", core = false },           # 02 §7.3 记录中填写操作间编号
+  { domain = "房间", range = "计量器具", core = false },             # 05 计量器具校准记录：备注“安装于D-206”
+  { domain = "房间", range = "清场记录", core = false },             # 02 §5.1 清场记录每间每次1份
+  { domain = "房间", range = "中间产品", core = false },             # 01 §6.1 中间产品经中间站（D-205）暂存
+  { domain = "计量器具", range = "计量器具校准记录", core = false }, # 05 计量器具校准记录
+  { domain = "设备清洁记录", range = "偏差", core = false },         # 05 设备清洁记录：备注“见DEV-2026-041”
+  { domain = "清场合格证", range = "清场记录", core = false },       # 02 §8 清场记录……QA检查合格后签发清场合格证
+  { domain = "清场合格证", range = "批生产记录", core = false },     # 02 §8 正本附入本批批记录
+  { domain = "偏差", range = "偏差报告", core = false },             # 04 §5.1
+  { domain = "偏差", range = "压片记录", core = false },             # 02 §10 2611035批的压片记录中注明“见DEV-2026-041”
+  { domain = "偏差", range = "批生产记录审核单", core = false },     # 02 §10 审核单上须写明DEV-2026-041的处理结论和关闭日期
+  { domain = "偏差", range = "放行记录", core = false },             # 06 §5.5 放行记录表：有关偏差列
+  { domain = "偏差报告", range = "批生产记录", core = false },       # 02 §10 偏差报告复印件附在批记录
+  { domain = "CAPA", range = "变更", core = false },                 # 04 §5.10 变更编号记入CAPA台账
+  { domain = "批生产记录", range = "称量配料记录", core = false },   # 02 §5.1 批生产记录所用表单
+  { domain = "批生产记录", range = "压片记录", core = false },       # 02 §5.1
+  { domain = "批生产记录", range = "压片中间控制记录", core = false },  # 02 §5.1
+  { domain = "批生产记录", range = "包衣记录", core = false },       # 02 §5.1
+  { domain = "批生产记录", range = "批包装记录", core = false },     # 02 §4 批包装记录是批生产记录的组成部分
+  { domain = "批生产记录", range = "中间产品检验报告单", core = false },  # 02 §5.2 附入批记录
+  { domain = "中间产品", range = "中间产品请验单", core = false },   # 02 §7.5
+  { domain = "中间产品", range = "中间产品交接单", core = false },   # 02 §7.5
+  { domain = "中间产品", range = "中间产品检验报告单", core = false },  # 02 §5.2、§7.7
+  { domain = "成品检验报告书", range = "放行记录", core = false },   # 06 §5.5 放行记录表：成品检验报告书编号列
+  { domain = "成品放行单", range = "放行记录", core = false },       # 06 §5.5 放行记录表：放行单编号列
+  { domain = "成品检验报告书", range = "成品放行审核单", core = false },  # 06 §5.4 审核内容：成品检验报告书
+  { domain = "批生产记录审核单", range = "成品放行审核单", core = false },  # 06 §5.4 审核内容：批记录审核结论
+  { domain = "发运记录", range = "产品", core = false },             # 06 §5.9 发运记录写明产品名称、规格
+  { domain = "发运记录", range = "成品放行单", core = false },       # 06 §5.9 成品发运只能凭放行单
+]
+
+properties = [
+  # 批
+  { domain = "批", names = ["批号", "生产批号", "产品批号", "BatchNumber"], core = true },  # 01 §5.2
+  { domain = "批", names = ["生产日期", "ProductionDate"], core = false },        # 01 §7.8 小盒上打印批号、生产日期和有效期
+  { domain = "批", names = ["有效期", "ExpiryDate"], core = false },              # 01 §7.7、§7.8
+  { domain = "批", names = ["放行结论"], core = false },                          # 06 §5.5
+  { domain = "批", names = ["放行日期"], core = false },                          # 06 §5.5
+  { domain = "批", names = ["批记录审核结论"], core = false },                    # 06 §5.5
+
+  # 产品
+  { domain = "产品", names = ["产品名称", "ProductName"], core = true },          # 01 §4.1
+  { domain = "产品", names = ["产品代码", "ProductCode"], core = true },          # 01 §4.1
+  { domain = "产品", names = ["规格", "Strength"], core = true },                 # 01 §4.1
+  { domain = "产品", names = ["剂型", "DosageForm"], core = false },              # 01 §4.1
+  { domain = "产品", names = ["有效期", "ShelfLife"], core = false },             # 01 §4.1 36个月
+  { domain = "产品", names = ["贮藏", "StorageCondition"], core = false },        # 01 §4.1
+  { domain = "产品", names = ["包装规格"], core = false },                        # 01 §4.1
+  { domain = "产品", names = ["理论批量"], core = false },                        # 01 §4.1
+  { domain = "产品", names = ["性状"], core = false },                            # 01 §4.1
+
+  # 处方
+  { domain = "处方", names = ["每1000片用量"], core = false },                    # 01 §4.2
+  { domain = "处方", names = ["每批用量"], core = false },                        # 01 §4.2
+  { domain = "处方", names = ["作用"], core = false },                            # 01 §4.2
+
+  # 物料
+  { domain = "物料", names = ["物料代码", "MaterialCode"], core = true },         # 01 §4.2；03 §5.1
+  { domain = "物料", names = ["物料名称", "MaterialName"], core = true },         # 03 §5.1
+  { domain = "物料", names = ["类别"], core = false },                            # 03 §5.1
+  { domain = "物料", names = ["复验期"], core = false },                          # 03 §5.9
+
+  # 物料批
+  { domain = "物料批", names = ["物料批号", "接收编号", "LotNumber"], core = true },  # 03 §4、§5.2
+  { domain = "物料批", names = ["供应商批号", "SupplierLotNumber"], core = true },    # 03 §5.2
+  { domain = "物料批", names = ["到货数量"], core = true },                       # 03 §5.2
+  { domain = "物料批", names = ["件数"], core = false },                          # 03 §5.2
+  { domain = "物料批", names = ["到货日期", "ReceiptDate"], core = true },        # 03 §5.2
+
+  # 供应商
+  { domain = "供应商", names = ["评价结果"], core = false },                      # 03 §5.11 A、B、C三级
+  { domain = "供应商", names = ["批准日期"], core = false },                      # 03 §5.1 名录：批准日期列
+
+  # 请验单
+  { domain = "请验单", names = ["请验单编号", "RequestNumber"], core = true },    # 03 §5.3 QY-年月-流水号
+  { domain = "请验单", names = ["数量"], core = false },                          # 03 §5.3
+  { domain = "请验单", names = ["件数"], core = false },                          # 03 §5.3
+  { domain = "请验单", names = ["供应商批号"], core = false },                    # 03 §5.3
+  { domain = "请验单", names = ["到货日期"], core = false },                      # 03 §5.3
+  { domain = "请验单", names = ["标准样张编号"], core = false },                  # 03 §5.3
+
+  # 取样记录
+  { domain = "取样记录", names = ["取样人"], core = false },                      # 03 §5.4
+  { domain = "取样记录", names = ["取样日期"], core = false },                    # 03 §5.4
+  { domain = "取样记录", names = ["取样量"], core = false },                      # 03 §5.4
+
+  # 检验报告单
+  { domain = "检验报告单", names = ["检验报告单编号", "ReportNumber"], core = true },  # 03 §5.5 JC-年月-流水号
+  { domain = "检验报告单", names = ["检验依据"], core = false },                  # 03 §5.5
+  { domain = "检验报告单", names = ["检验项目"], core = false },                  # 03 §5.5
+  { domain = "检验报告单", names = ["标准规定"], core = false },                  # 03 §5.5
+  { domain = "检验报告单", names = ["检验结果", "TestResult"], core = true },     # 03 §5.5
+  { domain = "检验报告单", names = ["结论", "Conclusion"], core = true },         # 03 §5.5
+
+  # 留样
+  { domain = "留样", names = ["留样编号", "SampleNumber"], core = true },         # 06 §5.6 LY-批号
+  { domain = "留样", names = ["留样量"], core = false },                          # 03 §5.8；06 §5.6
+  { domain = "留样", names = ["留样日期"], core = false },                        # 03 §5.8
+
+  # 批生产记录与表单
+  { domain = "批生产记录", names = ["发放页数"], core = false },                  # 02 §6
+  { domain = "批生产记录", names = ["领用人"], core = false },                    # 02 §6
+  { domain = "称量配料记录", names = ["实际称量量"], core = true },               # 02 §7.2
+  { domain = "称量配料记录", names = ["计算结果"], core = false },                # 01 §4.2 折算公式和计算结果记入称量配料记录
+  { domain = "称量配料记录", names = ["称量人"], core = false },                  # 01 §7.1
+  { domain = "称量配料记录", names = ["复核人"], core = false },                  # 01 §7.1
+  { domain = "制粒干燥记录", names = ["进风温度"], core = false },                # 01 §7.3
+  { domain = "制粒干燥记录", names = ["物料温度"], core = false },                # 01 §7.3
+  { domain = "制粒干燥记录", names = ["风门开度"], core = false },                # 01 §7.3
+  { domain = "制粒干燥记录", names = ["搅拌电机电流值"], core = false },          # 01 §7.2
+  { domain = "压片记录", names = ["产量"], core = true },                         # 01 §5.1；02 §7.2 两份记录的产量之和
+  { domain = "压片记录", names = ["主压力"], core = false },                      # 01 §8；02 §7.6
+  { domain = "压片记录", names = ["转台转速"], core = false },                    # 01 §8
+  { domain = "压片中间控制记录", names = ["平均片重", "片重"], core = false },    # 01 §7.5、§8
+  { domain = "压片中间控制记录", names = ["硬度"], core = false },                # 01 §7.5
+  { domain = "压片中间控制记录", names = ["厚度"], core = false },                # 01 §7.5
+  { domain = "压片中间控制记录", names = ["脆碎度"], core = false },              # 01 §7.5
+  { domain = "包衣记录", names = ["锅号"], core = false },                        # 01 §7.6；02 §7.2
+  { domain = "包衣记录", names = ["片床温度"], core = false },                    # 01 §8
+  { domain = "包衣记录", names = ["喷液速率"], core = false },                    # 01 §8
+  { domain = "包衣记录", names = ["雾化压力"], core = false },                    # 01 §8
+  { domain = "外包装记录", names = ["数量"], core = false },                      # 02 §7.2 分日登记数量
+  { domain = "物料平衡计算表", names = ["物料平衡", "MaterialBalance"], core = true },  # 02 §9
+  { domain = "物料平衡计算表", names = ["收率", "Yield"], core = true },          # 02 §9
+  { domain = "物料平衡计算表", names = ["阶段"], core = false },                  # 02 §9
+  { domain = "物料平衡计算表", names = ["取样量"], core = false },                # 02 §9
+  { domain = "物料平衡计算表", names = ["可收集的尾料"], core = false },          # 02 §9
+  { domain = "物料平衡计算表", names = ["结论"], core = false },                  # 02 §9
+  { domain = "批生产记录审核单", names = ["审核结论", "批记录审核结论", "ReviewConclusion"], core = true },  # 02 §11.2
+  { domain = "批生产记录审核单", names = ["处理结论"], core = false },            # 02 §10
+  { domain = "清场合格证", names = ["编号", "CertificateNumber"], core = true },  # 02 §8 D-206-2611035
+  { domain = "清场合格证", names = ["有效期"], core = false },                    # 02 §8 72小时
+  { domain = "中间产品交接单", names = ["桶数"], core = false },                  # 02 §7.5
+  { domain = "中间产品交接单", names = ["净重"], core = false },                  # 02 §7.5
+
+  # 中间产品
+  { domain = "中间产品", names = ["数量"], core = false },                        # 01 §6.1 状态标识标明品名、批号、数量
+  { domain = "中间产品", names = ["存放期限"], core = false },                    # 01 §9.2
+  { domain = "中间产品", names = ["检测项目"], core = false },                    # 01 §9.1
+  { domain = "总混颗粒", names = ["混合均匀度"], core = true },                   # 01 §7.4、§9.1
+  { domain = "总混颗粒", names = ["含量"], core = true },                         # 01 §9.1
+  { domain = "总混颗粒", names = ["干燥失重"], core = false },                    # 01 §9.1
+  { domain = "素片", names = ["平均片重", "片重"], core = true },                 # 01 §9.1
+  { domain = "素片", names = ["硬度"], core = true },                             # 01 §9.1
+  { domain = "素片", names = ["片重差异"], core = false },                        # 01 §9.1
+  { domain = "素片", names = ["厚度"], core = false },                            # 01 §9.1
+  { domain = "素片", names = ["脆碎度"], core = false },                          # 01 §9.1
+  { domain = "素片", names = ["崩解时限"], core = false },                        # 01 §9.1
+  { domain = "包衣片", names = ["包衣增重"], core = true },                       # 01 §7.6、§9.1
+  { domain = "包衣片", names = ["崩解时限"], core = false },                      # 01 §9.1
+  { domain = "包衣片", names = ["含量"], core = false },                          # 01 §9.1
+  { domain = "干颗粒", names = ["干燥失重"], core = false },                      # 01 §7.3、§9.1
+  { domain = "容器", names = ["桶号"], core = false },                            # 01 §7.5
+  { domain = "容器", names = ["净重"], core = false },                            # 01 §7.5
+
+  # 设备
+  { domain = "设备", names = ["设备编号", "EquipmentNumber"], core = true },      # 05 设备台账
+  { domain = "设备", names = ["设备名称", "EquipmentName"], core = true },        # 05 设备台账
+  { domain = "设备", names = ["型号", "Model"], core = true },                    # 05 设备台账
+  { domain = "设备", names = ["启用日期"], core = true },                         # 05 设备台账
+  { domain = "设备", names = ["状态", "Status"], core = false },                  # 05 设备台账 在用/停用
+  { domain = "设备", names = ["所属工序"], core = false },                        # 05 设备台账
+  { domain = "设备", names = ["清洁有效期"], core = false },                      # 02 §7.3
+
+  # 计量器具
+  { domain = "计量器具", names = ["器具编号", "InstrumentNumber"], core = true }, # 05 计量器具校准记录
+  { domain = "计量器具", names = ["器具名称"], core = false },                    # 05
+  { domain = "计量器具", names = ["量程", "Range"], core = true },                # 05
+  { domain = "计量器具", names = ["校准日期", "CalibrationDate"], core = true },  # 05
+  { domain = "计量器具", names = ["有效期至", "校准有效期"], core = true },       # 05；02 §7.3
+  { domain = "计量器具", names = ["证书编号"], core = false },                    # 05
+  { domain = "计量器具", names = ["校准方式"], core = false },                    # 05
+  { domain = "计量器具", names = ["结论"], core = false },                        # 05
+  { domain = "计量器具校准记录", names = ["校准日期"], core = false },            # 05
+  { domain = "计量器具校准记录", names = ["有效期至"], core = false },            # 05
+  { domain = "计量器具校准记录", names = ["证书编号"], core = false },            # 05
+  { domain = "计量器具校准记录", names = ["校准方式"], core = false },            # 05
+  { domain = "计量器具校准记录", names = ["结论"], core = false },                # 05
+
+  # 房间
+  { domain = "房间", names = ["房间编号", "操作间编号", "RoomNumber"], core = true },  # 05 洁净区房间清单；02 §7.3
+  { domain = "房间", names = ["房间名称", "RoomName"], core = true },             # 05
+  { domain = "房间", names = ["洁净级别", "CleanlinessGrade"], core = true },     # 05
+  { domain = "房间", names = ["压差要求"], core = true },                         # 05
+  { domain = "房间", names = ["温度要求"], core = false },                        # 05
+  { domain = "房间", names = ["相对湿度要求"], core = false },                    # 05
+  { domain = "房间", names = ["所在区域"], core = false },                        # 05
+
+  # 设备清洁记录
+  { domain = "设备清洁记录", names = ["清洁记录号", "CleaningRecordNumber"], core = true },  # 05 设备清洁记录
+  { domain = "设备清洁记录", names = ["清洁类型"], core = true },                 # 05
+  { domain = "设备清洁记录", names = ["清洁日期", "CleaningDate"], core = true }, # 05
+  { domain = "设备清洁记录", names = ["有效期至"], core = true },                 # 05
+  { domain = "设备清洁记录", names = ["清洁人"], core = false },                  # 05
+  { domain = "设备清洁记录", names = ["检查人"], core = false },                  # 05
+  { domain = "设备清洁记录", names = ["备注"], core = false },                    # 05
+
+  # 偏差
+  { domain = "偏差", names = ["偏差编号", "DeviationNumber"], core = true },      # 04 §5.2、§6.1
+  { domain = "偏差", names = ["发现日期"], core = true },                         # 04 §6.1
+  { domain = "偏差", names = ["偏差描述", "Description"], core = true },          # 04 §6.1
+  { domain = "偏差", names = ["等级", "Severity"], core = true },                 # 04 §5.3、§6.1
+  { domain = "偏差", names = ["状态"], core = false },                            # 04 §6.1
+  { domain = "偏差", names = ["关闭日期"], core = false },                        # 04 §5.9
+  { domain = "偏差", names = ["根本原因"], core = false },                        # 04 §5.4、§5.5
+  { domain = "偏差报告", names = ["发生时间"], core = false },                    # 04 §5.1
+  { domain = "偏差报告", names = ["地点"], core = false },                        # 04 §5.1
+  { domain = "偏差报告", names = ["应急措施"], core = false },                    # 04 §5.1
+
+  # CAPA
+  { domain = "CAPA", names = ["CAPA编号", "CAPANumber"], core = true },           # 04 §5.2、§6.2
+  { domain = "CAPA", names = ["措施内容"], core = true },                         # 04 §5.6、§6.2
+  { domain = "CAPA", names = ["计划完成日期", "DueDate"], core = true },          # 04 §5.6、§6.2
+  { domain = "CAPA", names = ["责任部门"], core = false },                        # 04 §6.2
+  { domain = "CAPA", names = ["责任人"], core = false },                          # 04 §5.6
+  { domain = "CAPA", names = ["状态"], core = false },                            # 04 §6.2
+  { domain = "CAPA", names = ["来源"], core = false },                            # 04 §6.2
+  { domain = "CAPA", names = ["有效性评估结论"], core = false },                  # 04 §5.6
+
+  # 成品检验、放行、稳定性、不合格品、发运
+  { domain = "成品检验报告书", names = ["成品检验报告书编号", "ReportNumber"], core = true },  # 06 §5.2、§5.5
+  { domain = "成品检验报告书", names = ["检验项目"], core = false },              # 06 §5.2
+  { domain = "成品检验报告书", names = ["检验结果"], core = false },              # 06 §5.2
+  { domain = "成品放行单", names = ["放行单编号", "ReleaseNumber"], core = true }, # 06 §5.4、§5.5
+  { domain = "成品放行单", names = ["放行日期"], core = false },                  # 06 §5.5
+  { domain = "放行记录", names = ["放行结论"], core = false },                    # 06 §5.5
+  { domain = "放行记录", names = ["放行日期"], core = false },                    # 06 §5.5
+  { domain = "放行记录", names = ["批记录审核结论"], core = false },              # 06 §5.5
+  { domain = "持续稳定性考察", names = ["考察编号", "StudyNumber"], core = true }, # 06 §5.7
+  { domain = "持续稳定性考察", names = ["起始日期", "StartDate"], core = true },  # 06 §5.7
+  { domain = "持续稳定性考察", names = ["考察时间点"], core = false },            # 06 §5.7
+  { domain = "持续稳定性考察", names = ["进度"], core = false },                  # 06 §5.7
+  { domain = "持续稳定性考察", names = ["考察条件"], core = false },              # 06 §5.7
+  { domain = "不合格品处理单", names = ["编号"], core = false },                  # 06 §5.8 BHG-年月-流水号
+  { domain = "不合格品处理单", names = ["数量"], core = false },                  # 06 §5.8
+  { domain = "不合格品处理单", names = ["不合格原因"], core = false },            # 06 §5.8
+  { domain = "不合格品处理单", names = ["处理意见"], core = false },              # 06 §5.8
+  { domain = "发运记录", names = ["数量", "Quantity"], core = true },             # 06 §5.9
+  { domain = "发运记录", names = ["收货单位", "Consignee"], core = true },        # 06 §5.9
+  { domain = "发运记录", names = ["发运日期", "ShipDate"], core = true },         # 06 §5.9
+  { domain = "发运记录", names = ["运输方式"], core = false },                    # 06 §5.9
+]
+
+hierarchy = [
+  { child = "原料", parent = "物料", core = true },             # 03 §4 “物料：原料、辅料和包装材料的统称”
+  { child = "辅料", parent = "物料", core = true },             # 03 §4
+  { child = "包装材料", parent = "物料", core = true },         # 03 §4
+  { child = "原料", parent = "原辅料", core = false },          # 03 §4 “原料和辅料合称原辅料”
+  { child = "辅料", parent = "原辅料", core = false },          # 03 §4
+  { child = "原辅料", parent = "物料", core = false },          # 03 §4
+  { child = "总混颗粒", parent = "中间产品", core = true },     # 01 §9.1 中间产品表；§9.2 中间产品存放期限按总混颗粒、素片和包衣片规定
+  { child = "素片", parent = "中间产品", core = true },         # 01 §9.1、§9.2
+  { child = "包衣片", parent = "中间产品", core = true },       # 01 §9.1、§9.2
+  { child = "湿颗粒", parent = "中间产品", core = false },      # 01 §9.1
+  { child = "干颗粒", parent = "中间产品", core = false },      # 01 §9.1
+  { child = "成品", parent = "产品", core = false },            # 06 §4 “成品：完成全部生产工序（包括外包装）的产品”
+  { child = "纠正措施", parent = "CAPA", core = false },        # 04 §4 “纠正措施和预防措施合称纠正预防措施，即CAPA”
+  { child = "预防措施", parent = "CAPA", core = false },        # 04 §4
+  { child = "压片机", parent = "设备", core = false },          # 05 设备台账
+  { child = "湿法混合制粒机", parent = "设备", core = false },  # 05 设备台账
+  { child = "流化床干燥机", parent = "设备", core = false },    # 05 设备台账
+  { child = "料斗混合机", parent = "设备", core = false },      # 05 设备台账
+  { child = "高效包衣机", parent = "设备", core = false },      # 05 设备台账
+  { child = "铝塑泡罩包装机", parent = "设备", core = false },  # 05 设备台账
+]
