@@ -1,6 +1,6 @@
 """Merging a change set into the working version (spec 001 3.4, 002 3.5).
 
-Moved out of service.py unchanged. The merge plan (mergeplan.py) and its wiring stay where the
+Moved out of service.py. The merge plan (mergeplan.py) and its wiring stay where the
 change set views read them too; this module depends on service, never the other way round.
 """
 
@@ -30,6 +30,7 @@ from ontology_platform.modules.ontology.service import (
     _ensure_not_own,
     _ensure_open,
     _items,
+    _links,
     _now,
     _ontology_or_404,
     _plan,
@@ -78,6 +79,7 @@ class _Merge:
             if iri is not None:
                 self._iris[iri] = element
         self._creates = {item.temp_ref: item for item in items if item.temp_ref is not None}
+        self._items = {item.id: item for item in items}
         self._restores = {
             item.target_element_id: item
             for item in items
@@ -300,8 +302,15 @@ class _Merge:
             item.applied_element_id = element.id
             return None
         resolution = self._plan.get(item.id)
-        if resolution is not None and resolution.mode == "into":
+        if resolution is not None and resolution.mode == "into" and resolution.item_id is None:
             return self._into(item, fields, resolved, resolution)
+        if resolution is not None and resolution.mode == "into":
+            joined = await self._joined(resolution.item_id)
+            if joined is not None:
+                self._add_to(joined, fields, resolved.get("parent_ref"), name_it=True)
+                item.applied_element_id = joined.id
+                return None
+            # The item it was to go into was not applied: it is created on its own.
         renamed = resolution is not None and resolution.mode == "rename"
         local_name = resolution.local_name if resolution and renamed else fields.local_name
         if local_name is None or local_name in self._local_names:
@@ -346,6 +355,17 @@ class _Merge:
         self._iris[iri] = element
         item.applied_element_id = element.id
         return None
+
+    async def _joined(self, item_id: UUID | None) -> Element | None:
+        """The element an accepted item of this change set made, applying it first: an object
+        type, relation or property that another item of the change set goes into."""
+        other = self._items.get(item_id) if item_id else None
+        if other is None or other.decision != "accepted" or other.id in self._visiting:
+            return None
+        if await self.apply(other) is not None or other.applied_element_id is None:
+            return None
+        element = self._elements.get(other.applied_element_id)
+        return element if element is not None and element.kind == other.kind else None
 
     def _into(
         self,
@@ -605,7 +625,7 @@ async def _apply_change_set(
     now = _now()
     elements = await _elements(db, ontology.id, all_kinds=True)
     # Under the ontology lock: the plan made here is the one that is applied.
-    plan = _plan(change_set, ontology, elements, items)
+    plan = _plan(change_set, ontology, elements, items, await _links(db, change_set, items))
     seen = resolution_token == plan.token
     if not seen and (resolution_token is not None or plan.needs_token):
         raise AppError(

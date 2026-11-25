@@ -1,5 +1,6 @@
 """The merge plan of an AI-extracted change set: a pure function of items and elements."""
 
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID, uuid4
@@ -10,6 +11,8 @@ from ontology_platform.modules.ai.extraction import normalize
 from ontology_platform.modules.ontology.mergeplan import (
     PlanElement,
     PlanItem,
+    PlanMatch,
+    PlanMatchedBy,
     Resolution,
     changes_the_merge,
     name_key,
@@ -466,3 +469,153 @@ def test_a_parent_that_would_close_a_loop_is_named_among_the_kept_fields() -> No
     item = new_type(1, "Converter2", "转炉", parent_ref=str(bof.id))
 
     assert plan([item], [converter, bof])[item.id].kept_fields == ("parentRef",)
+
+
+# ---------- alignment records (spec 004, 5.3 and 5.5; PR 3) ----------
+
+
+def recorded(item: PlanItem, **values: Any) -> PlanItem:
+    """`item` with its alignment record and the reviewer's decision on it."""
+
+    decision = values.pop("decision", None)
+    matched_by = values.pop("matched_by", ())
+    match = PlanMatch(**values) if values else None
+    return replace(item, match=match, match_decision=decision, matched_by=matched_by)
+
+
+@pytest.mark.parametrize(
+    ("kind", "decision", "other", "goes_into"),
+    [
+        ("same", None, None, True),  # the model judged it the same
+        ("possible", None, None, False),  # a possible duplicate stays apart until decided
+        ("possible", "same", None, True),  # the reviewer merged it
+        ("same", "different", None, False),  # the reviewer kept it apart
+        ("possible", None, "same", True),  # the other side's reviewer merged it
+        ("same", "same", "different", False),  # kept apart on either side wins
+    ],
+)
+def test_a_type_recorded_as_the_same_as_an_element_goes_into_it(
+    kind: str, decision: str | None, other: str | None, goes_into: bool
+) -> None:
+    ladle = existing("entity_type", "Ladle", "钢包", revision=2)
+    item = recorded(
+        new_type(1, "TeemingLadle", "钢水包"),
+        kind=kind,
+        element_id=ladle.id,
+        other_decision=other,
+        decision=decision,
+    )
+    expected = Resolution("into", element_id=ladle.id, element_revision=2)
+    assert (plan([item], [ladle])[item.id] == expected) is goes_into
+
+
+def test_a_type_recorded_as_another_change_sets_item_goes_where_that_item_went() -> None:
+    ladle = existing("entity_type", "Ladle", "钢包")
+    other_item = uuid4()
+    merged = recorded(
+        new_type(1, "TeemingLadle", "钢水包"),
+        kind="same",
+        item_id=other_item,
+        item_element_id=ladle.id,
+    )
+    pending = recorded(new_type(1, "TeemingLadle", "钢水包"), kind="same", item_id=other_item)
+    assert plan([merged], [ladle])[merged.id].element_id == ladle.id
+    # The other item is still pending: created as proposed; the other merges into it later.
+    assert plan([pending], [ladle])[pending.id] == Resolution("create")
+
+
+def test_a_type_that_a_merged_item_recorded_goes_into_what_that_item_became() -> None:
+
+    ladle = existing("entity_type", "Ladle", "钢包")
+    pot = existing("entity_type", "Pot", "铁水罐", created_at=T0 + timedelta(days=1))
+    entries = (
+        PlanMatchedBy("same", pot.id, None, T0 + timedelta(days=2)),
+        PlanMatchedBy("same", ladle.id, None, T0 + timedelta(days=1)),
+        PlanMatchedBy("possible", pot.id, None, T0),
+    )
+    item = recorded(new_type(1, "TeemingLadle", "钢水包"), matched_by=entries)
+    # The oldest record that is in effect.
+    assert plan([item], [ladle, pot])[item.id].element_id == ladle.id
+    kept = recorded(new_type(1, "TeemingLadle", "钢水包"), matched_by=entries, decision="different")
+    assert plan([kept], [ladle, pot])[kept.id] == Resolution("create")
+
+
+def test_a_type_merged_into_an_item_of_its_own_change_set_waits_for_that_item() -> None:
+    ladle = existing("entity_type", "Ladle", "钢包")
+    first = new_type(1, "TeemingLadle", "钢水包")
+    second = recorded(
+        new_type(2, "Pot", "盛钢桶"), kind="possible", item_id=first.id, decision="same"
+    )
+    result = plan([first, second], [ladle])
+    assert result[second.id] == Resolution("into", item_id=first.id)
+    assert changes_the_merge([first, second], result)
+    # An item of the change set that goes into an element takes this one with it.
+    into_ladle = new_type(1, "Ladle2", "钢包")
+    follower = recorded(
+        new_type(2, "Pot", "盛钢桶"), kind="possible", item_id=into_ladle.id, decision="same"
+    )
+    assert plan([into_ladle, follower], [ladle])[follower.id].element_id == ladle.id
+    # The token tells the two plans apart.
+    token = plan_token([first, second], [ladle], result)
+    assert token != plan_token([first, second], [ladle], plan([first], [ladle]))
+
+
+def test_a_record_of_a_deleted_element_is_no_reason_to_go_into_it() -> None:
+    gone = existing("entity_type", "Ladle", "钢包", status="deprecated")
+    item = recorded(new_type(1, "TeemingLadle", "钢水包"), kind="same", element_id=gone.id)
+    assert plan([item], [gone])[item.id] == Resolution("create")
+
+
+def test_a_name_record_holds_while_the_main_names_agree() -> None:
+    issue = existing("entity_type", "SparePartsIssue", "备件领用单")
+    record = {"kind": "name", "item_id": uuid4(), "item_element_id": issue.id}
+    slip = recorded(new_type(1, "IssueSlip", "领用单"), item_label_zh="领用单", **record)
+    assert plan([slip], [issue])[slip.id].element_id == issue.id
+    # No "keep apart" for it: renaming one side is what undoes it (spec 004, 5.5).
+    kept = recorded(
+        new_type(1, "IssueSlip", "领用单"), item_label_zh="领用单", decision="different", **record
+    )
+    assert plan([kept], [issue])[kept.id].element_id == issue.id
+    renamed = recorded(new_type(1, "IssueSlip", "领料单"), item_label_zh="领用单", **record)
+    assert plan([renamed], [issue])[renamed.id] == Resolution("create")
+
+
+def test_relations_of_two_items_of_one_concept_in_a_change_set_become_one() -> None:
+    heat = existing("entity_type", "Heat", "炉次")
+    ladle = new_type(1, "Ladle", "钢包")
+    pot = recorded(new_type(2, "Pot", "钢水包"), kind="same", item_id=ladle.id)
+
+    def uses(seq: int, ref: str, local_name: str) -> PlanItem:
+        return proposed(
+            seq,
+            "create",
+            "relation_type",
+            temp_ref=f"new:{local_name}",
+            local_name=local_name,
+            label_zh="使用",
+            domain_ref=str(heat.id),
+            range_ref=ref,
+        )
+
+    first, second = uses(3, "new:Ladle", "usesLadle"), uses(4, "new:Pot", "usesPot")
+    result = plan([ladle, pot, first, second], [heat])
+    assert result[pot.id] == Resolution("into", item_id=ladle.id)
+    assert result[first.id] == Resolution("create")
+    assert result[second.id] == Resolution("into", item_id=first.id)
+
+
+def test_a_records_decision_is_not_taken_for_a_record_of_another_pair() -> None:
+    ladle = existing("entity_type", "Ladle", "钢包")
+    other = existing("entity_type", "Pot", "铁水罐")
+    entry = PlanMatchedBy("possible", ladle.id, None, T0)
+    # The item's own record points at 铁水罐; its "same" is about that pair, not about 钢包.
+    item = recorded(
+        new_type(1, "Teeming", "钢水包"),
+        kind="possible",
+        element_id=other.id,
+        decision="same",
+        matched_by=(entry,),
+    )
+    assert plan([item], [ladle, other])[item.id].element_id == other.id
+    alone = recorded(new_type(1, "Teeming", "钢水包"), decision="same", matched_by=(entry,))
+    assert plan([alone], [ladle, other])[alone.id].element_id == ladle.id

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { ArrowLeft, CheckCheck, GitMerge, Network, Quote, Undo2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCheck, Combine, GitMerge, Network, Quote, Undo2 } from 'lucide-react';
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -33,14 +33,17 @@ import {
   decideItems,
   highConfidencePending,
   isAiSource,
+  matchPlace,
   mergeChangeSet,
   patchItem,
   rejectChangeSet,
   replaceItemInCache,
+  sameConceptPending,
   useChangeSet,
   type ChangeItem,
   type ChangeSetDetail,
-  type Decision,
+  type ItemMatch,
+  type ItemPatch,
   type MergeResult,
 } from './api';
 import { ChangeItemCard } from './change-item-card';
@@ -137,6 +140,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
   const blockedAsSubmitter = own && !selfReview;
   const canReview = permissions.canReview && !blockedAsSubmitter;
   const [withdrawing, setWithdrawing] = useState(false);
+  const [mergingSame, setMergingSame] = useState(false);
   const pendingHintId = useId();
   const wide = useMediaQuery(DESKTOP_QUERY);
   const evidencePanelId = useId();
@@ -175,6 +179,8 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
   const pendingCount = pending.length;
   // AI proposals are bulk-accepted only when confident; imports and manual edits as a whole.
   const bulkItems = acceptsAll(changeSet.source) ? pending : isAi ? highConfidencePending(changeSet.items) : [];
+  // Items recorded as concepts already there are accepted on their own, after a list (spec 004, 5.4).
+  const sameConceptItems = changeSet.source === 'ai_extraction' ? sameConceptPending(changeSet.items) : [];
 
   const refreshDetail = () => queryClient.invalidateQueries({ queryKey: changeSetKeys.detail(changeSet.id) });
   const markListStale = () => queryClient.invalidateQueries({ queryKey: [...changeSetKeys.all, 'list'], refetchType: 'none' });
@@ -186,7 +192,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
   };
 
   const decide = useMutation({
-    mutationFn: ({ itemId, decision }: { itemId: string; decision: Decision }) => patchItem(changeSet.id, itemId, { decision }),
+    mutationFn: ({ itemId, patch }: { itemId: string; patch: ItemPatch }) => patchItem(changeSet.id, itemId, patch),
     onSuccess: applyItem,
     onError: (error) => toast.error(t('review.decideFailed'), message(error)),
   });
@@ -235,6 +241,12 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                 <Button variant="secondary" loading={bulk.isPending} onClick={() => bulk.mutate(bulkItems.map((item) => item.id))}>
                   {bulk.isPending ? null : <CheckCheck aria-hidden />}
                   {t(isAi ? 'review.acceptHighConfidence' : 'review.acceptAll', { count: bulkItems.length })}
+                </Button>
+              ) : null}
+              {sameConceptItems.length > 0 ? (
+                <Button variant="secondary" disabled={bulk.isPending} onClick={() => setMergingSame(true)}>
+                  <Combine aria-hidden />
+                  {t('review.matchBulk.button', { count: sameConceptItems.length })}
                 </Button>
               ) : null}
               <Button
@@ -321,6 +333,7 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                   <Fragment key={item.id}>
                     <ChangeItemCard
                       item={item}
+                      changeSetId={changeSet.id}
                       context={context}
                       isAi={isAi}
                       selected={isAi && (wide ? item.id === selected?.id : item.id === selectedId)}
@@ -328,7 +341,8 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
                       evidencePanelId={wide ? undefined : evidencePanelId}
                       canDecide={canDecide}
                       busy={busyItemId === item.id || bulk.isPending || merge.isPending}
-                      onDecide={(decision) => decide.mutate({ itemId: item.id, decision })}
+                      onDecide={(decision) => decide.mutate({ itemId: item.id, patch: { decision } })}
+                      onDecideMatch={(matchDecision) => decide.mutate({ itemId: item.id, patch: { matchDecision } })}
                       onEdit={() => setEditing(item)}
                       impactOntologyId={isOpen ? changeSet.ontologyId : undefined}
                     />
@@ -343,6 +357,10 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
           {isAi && wide && selected ? <EvidencePanel key={selected.id} item={selected} context={context} /> : null}
         </div>
       )}
+
+      {canDecide ? (
+        <SameConceptDialog changeSet={changeSet} items={sameConceptItems} context={context} open={mergingSame && sameConceptItems.length > 0} onOpenChange={setMergingSame} />
+      ) : null}
 
       {canWithdraw ? <WithdrawDialog changeSet={changeSet} open={withdrawing} onOpenChange={setWithdrawing} /> : null}
 
@@ -414,6 +432,76 @@ function WithdrawDialog({ changeSet, open, onOpenChange }: WithdrawDialogProps) 
             <Button variant="destructive" loading={withdraw.isPending} onClick={() => withdraw.mutate()}>
               {withdraw.isPending ? null : <Undo2 aria-hidden />}
               {t('review.withdrawConfirm')}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface SameConceptDialogProps {
+  changeSet: ChangeSetDetail;
+  items: readonly (ChangeItem & { match: ItemMatch })[];
+  context: RefContext;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+/** Lists where each same-concept item goes, then accepts them together once the reviewer confirms. */
+function SameConceptDialog({ changeSet, items, context, open, onOpenChange }: SameConceptDialogProps) {
+  const { t } = useTranslation();
+  const message = useErrorMessage();
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const accept = useMutation({
+    mutationFn: (itemIds: string[]) => decideItems(changeSet.id, itemIds, 'accepted'),
+    onSuccess: async (_, itemIds) => {
+      onOpenChange(false);
+      toast.success(t('review.matchBulk.accepted', { count: itemIds.length }));
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: changeSetKeys.detail(changeSet.id) }),
+        queryClient.invalidateQueries({ queryKey: [...changeSetKeys.all, 'list'], refetchType: 'none' }),
+      ]);
+    },
+  });
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) accept.reset();
+        onOpenChange(next);
+      }}
+    >
+      <DialogContent closeLabel={t('common.close')}>
+        <DialogTitle>{t('review.matchBulk.title')}</DialogTitle>
+        <DialogDescription>{t('review.matchBulk.description')}</DialogDescription>
+        <div className="mt-5 space-y-4">
+          <ul className="max-h-72 space-y-1.5 overflow-y-auto text-sm">
+            {items.map((item) => (
+              <li key={item.id} className="flex flex-wrap items-center gap-x-1.5">
+                <span className="font-medium text-foreground">{itemLabel(item, context)}</span>
+                <ArrowRight className="size-3.5 text-muted-foreground" aria-hidden />
+                <span className="sr-only">{t('review.matchBulk.into')}</span>
+                <span className="font-medium text-foreground">{item.match.label}</span>
+                <span className="text-muted-foreground">
+                  {t('review.matchBulk.place', {
+                    place: t(`review.matchBulk.places.${matchPlace(item.match, changeSet.id)}`, { title: item.match.changeSetTitle ?? '' }),
+                  })}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {accept.isError ? (
+            <InlineNotice tone="error" title={t('review.matchBulk.failedTitle')}>
+              {message(accept.error)}
+            </InlineNotice>
+          ) : null}
+          <div className="flex justify-end gap-2">
+            <DialogClose className={buttonVariants({ variant: 'secondary' })}>{t('common.cancel')}</DialogClose>
+            <Button loading={accept.isPending} onClick={() => accept.mutate(items.map((item) => item.id))}>
+              {accept.isPending ? null : <CheckCheck aria-hidden />}
+              {t('review.matchBulk.confirm', { count: items.length })}
             </Button>
           </div>
         </div>

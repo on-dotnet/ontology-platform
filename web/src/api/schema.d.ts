@@ -464,7 +464,8 @@ export interface paths {
          * @description Decide, edit or annotate one item. `edited` is checked against the item's kind
          *     (422 `changeset.invalid_edit`); a merged or rejected change set answers 409
          *     `changeset.closed`; in separate review mode, 403 `changeset.self_review` for a decision or
-         *     an edit on one's own change set.
+         *     an edit on one's own change set. `matchDecision` (spec 004, 5.5) is the reviewer's
+         *     conclusion about the item's alignment record: 422 `changeset.no_match` when there is none.
          */
         patch: operations["update_item_api_change_sets__id__items__itemId__patch"];
         trace?: never;
@@ -1537,6 +1538,7 @@ export interface components {
             /** Evidence */
             evidence: components["schemas"]["Evidence"][];
             resolution: components["schemas"]["ItemResolution"] | null;
+            match: components["schemas"]["ItemMatch"] | null;
         };
         /** ChangeSetDetail */
         ChangeSetDetail: {
@@ -2534,6 +2536,38 @@ export interface components {
             edited?: components["schemas"]["ElementFields"] | null;
             /** Note */
             note?: string | null;
+            /** Matchdecision */
+            matchDecision?: ("same" | "different") | null;
+        };
+        /**
+         * ItemMatch
+         * @description An item's alignment record (spec 004, 5.5), or one synthesized from a merged item of
+         *     another change set that recorded this item.
+         *
+         *     The other side is an element (`elementId`) or a change item (`itemId`, with its change set).
+         */
+        ItemMatch: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "same" | "possible" | "name";
+            /** Elementid */
+            elementId: string | null;
+            /** Itemid */
+            itemId: string | null;
+            /** Changesetid */
+            changeSetId: string | null;
+            /** Changesettitle */
+            changeSetTitle: string | null;
+            /** Label */
+            label: string;
+            /** Reason */
+            reason: string | null;
+            /** Decision */
+            decision: ("same" | "different") | null;
+            /** Keptapart */
+            keptApart: boolean;
         };
         /**
          * ItemResolution

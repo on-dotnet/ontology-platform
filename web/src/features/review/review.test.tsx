@@ -825,3 +825,331 @@ describe('what a merge does with items proposed against an older baseline', () =
     expect(within(card(/变流器/)).getByText('已改用局部名 Converter2')).toBeInTheDocument();
   });
 });
+
+describe('alignment records on the review page', () => {
+  const OTHER_SET = '识别：出钢操作规程.docx';
+  const create: ItemResolution = { mode: 'create', elementId: null, elementLabel: null, localName: null, keptFields: [] };
+
+  function aligned(): ChangeItem[] {
+    // Only the alignment record carries a reason here, as for items extracted after PR 4.
+    const items: ChangeItem[] = [
+      itemFixture({
+        id: 'item-bof',
+        tempRef: 'new:Bof',
+        proposed: { localName: 'Bof', labelZh: '转炉', synonyms: [] },
+        confidence: 0.95,
+        resolution: { mode: 'into', elementId: 'el-converter', elementLabel: '转炉', localName: null, keptFields: [] },
+        match: {
+          kind: 'same',
+          elementId: 'el-converter',
+          itemId: null,
+          changeSetId: null,
+          changeSetTitle: null,
+          label: '转炉',
+          reason: '两者都指吹氧炼钢的炉子。',
+          decision: null,
+          keptApart: false,
+        },
+      }),
+      itemFixture({
+        id: 'item-taphole',
+        seq: 2,
+        tempRef: 'new:TapHole',
+        proposed: { localName: 'TapHole', labelZh: '出钢口', synonyms: [] },
+        confidence: 0.9,
+        flags: ['possible_duplicate'],
+        resolution: create,
+        match: {
+          kind: 'possible',
+          elementId: null,
+          itemId: 'item-other-taphole',
+          changeSetId: 'cs-other',
+          changeSetTitle: OTHER_SET,
+          label: '出钢孔',
+          reason: '名称相近，所指部位相同。',
+          decision: null,
+          keptApart: false,
+        },
+      }),
+      itemFixture({
+        id: 'item-ladle-car',
+        seq: 3,
+        tempRef: 'new:SteelLadle',
+        proposed: { localName: 'SteelLadle', labelZh: '钢水包', synonyms: [] },
+        confidence: 0.9,
+        flags: ['possible_duplicate'],
+        resolution: create,
+        match: {
+          kind: 'possible',
+          elementId: null,
+          itemId: 'item-ladle',
+          changeSetId: 'cs-converter',
+          changeSetTitle: '识别：转炉炼钢工艺规程.docx',
+          label: '钢包',
+          reason: null,
+          decision: null,
+          keptApart: false,
+        },
+      }),
+      itemFixture({ id: 'item-ladle', seq: 4, resolution: create }),
+      itemFixture({
+        id: 'item-slag',
+        seq: 5,
+        tempRef: 'new:Slag',
+        proposed: { localName: 'Slag', labelZh: '炉渣', synonyms: [] },
+        confidence: 0.9,
+        flags: ['possible_duplicate'],
+        resolution: create,
+        match: {
+          kind: 'possible',
+          elementId: 'el-slag',
+          itemId: null,
+          changeSetId: null,
+          changeSetTitle: null,
+          label: '渣',
+          reason: '都是冶炼的副产物。',
+          decision: null,
+          keptApart: true,
+        },
+      }),
+      itemFixture({
+        id: 'item-eaf',
+        seq: 6,
+        tempRef: 'new:Eaf',
+        proposed: { localName: 'Eaf', labelZh: '电弧炉', synonyms: [] },
+        confidence: 0.95,
+        resolution: create,
+        match: {
+          kind: 'same',
+          elementId: null,
+          itemId: 'item-other-eaf',
+          changeSetId: 'cs-other',
+          changeSetTitle: OTHER_SET,
+          label: '电炉',
+          reason: '同一种炼钢炉的两种叫法。',
+          decision: null,
+          keptApart: false,
+        },
+      }),
+    ];
+    return items.map((item) => (item.match ? { ...item, rationale: null } : item));
+  }
+
+  /** Applies match decisions as the server does: "same" goes into the other one, "different" creates. */
+  function alignmentServer(initial = changeSetFixture(aligned()), user?: UserInfo) {
+    let state = initial;
+    const update = (next: ChangeItem[]) => {
+      state = { ...state, items: next, counts: countDecisions(next) };
+    };
+    const intoOther = (item: ChangeItem): ItemResolution => ({
+      mode: 'into',
+      elementId: item.match?.elementId ?? null,
+      elementLabel: item.match?.label ?? null,
+      localName: null,
+      keptFields: [],
+    });
+    return reviewServer({
+      initial,
+      ...(user ? { user } : {}),
+      extra: {
+        'GET /api/change-sets/:id': () => state,
+        'PATCH /api/change-sets/:id/items/:itemId': ({ params, body }) => {
+          const patch = body as ItemPatch;
+          update(
+            state.items.map((item) => {
+              if (item.id !== params.itemId) return item;
+              if (patch.matchDecision === undefined || item.match === null) {
+                return { ...item, ...(patch.decision ? { decision: patch.decision } : {}) };
+              }
+              const decision = patch.matchDecision;
+              const same = decision === 'same' || (decision === null && item.match.kind === 'same');
+              return { ...item, match: { ...item.match, decision }, resolution: same ? intoOther(item) : create };
+            }),
+          );
+          return state.items.find((item) => item.id === params.itemId);
+        },
+        'POST /api/change-sets/:id/decisions': ({ body }) => {
+          const { itemIds, decision } = body as { itemIds: string[]; decision: ChangeItem['decision'] };
+          update(state.items.map((item) => (itemIds.includes(item.id) ? { ...item, decision } : item)));
+          return state;
+        },
+      },
+    });
+  }
+
+  it('says who the item matches, why, and in which place', async () => {
+    alignmentServer();
+    renderApp('/review/cs-converter');
+
+    const bof = await screen.findByRole('article', { name: /^转炉/ });
+    expect(within(bof).getByText('模型判为与已有元素“转炉”是同一概念')).toBeInTheDocument();
+    expect(within(bof).getByText('理由：两者都指吹氧炼钢的炉子。')).toBeInTheDocument();
+    // The model's reason carries the AI label next to it, besides the card's own.
+    expect(within(bof).getAllByText('AI 建议')).toHaveLength(2);
+    expect(within(bof).getByText('合并时将并入已有的“转炉”')).toBeInTheDocument();
+
+    const taphole = card(/^出钢口/);
+    expect(within(taphole).getByText(`可能与变更集《${OTHER_SET}》里的“出钢孔”重复`)).toBeInTheDocument();
+    expect(within(taphole).getByText('理由：名称相近，所指部位相同。')).toBeInTheDocument();
+
+    const ladleCar = card(/^钢水包/);
+    expect(within(ladleCar).getByText('可能与本变更集里的“钢包”重复')).toBeInTheDocument();
+    // Found without the model: no reason, so no second AI label.
+    expect(within(ladleCar).queryByText(/^理由：/)).not.toBeInTheDocument();
+    expect(within(ladleCar).getAllByText('AI 建议')).toHaveLength(1);
+
+    // An item without a record shows nothing about one.
+    expect(within(card(/^钢包/)).queryByText(/同一概念|重复/)).not.toBeInTheDocument();
+  });
+
+  it('does not attribute a same-concept record without a reason to the model', async () => {
+    const records = aligned().map((item) =>
+      item.id === 'item-eaf' && item.match ? { ...item, match: { ...item.match, reason: null } } : item,
+    );
+    alignmentServer(changeSetFixture(records));
+    renderApp('/review/cs-converter');
+
+    const eaf = await screen.findByRole('article', { name: /^电弧炉/ });
+    expect(within(eaf).getByText(`与变更集《${OTHER_SET}》里的“电炉”是同一概念`)).toBeInTheDocument();
+    expect(within(eaf).queryByText(/模型判为/)).not.toBeInTheDocument();
+    expect(within(eaf).queryByText(/^理由：/)).not.toBeInTheDocument();
+    expect(within(eaf).getAllByText('AI 建议')).toHaveLength(1);
+  });
+
+  it('merges a possible duplicate or keeps it apart, and pressing the decision again clears it', async () => {
+    const user = userEvent.setup();
+    const api = alignmentServer();
+    renderApp('/review/cs-converter');
+
+    const ladleCar = await screen.findByRole('article', { name: /^钢水包/ });
+    await user.click(within(ladleCar).getByRole('button', { name: '并入' }));
+
+    await waitFor(() => expect(within(card(/^钢水包/)).getByRole('button', { name: '并入' })).toHaveAttribute('aria-pressed', 'true'));
+    expect(api.calls('PATCH', '/api/change-sets/cs-converter/items/item-ladle-car')[0]?.body).toEqual({ matchDecision: 'same' });
+    expect(within(card(/^钢水包/)).getByText('已确认并入')).toBeInTheDocument();
+    // It goes into what another item of this change set creates.
+    expect(within(card(/^钢水包/)).getByText('合并时将并入本变更集里的“钢包”')).toBeInTheDocument();
+
+    await user.click(within(card(/^钢水包/)).getByRole('button', { name: '并入' }));
+    await waitFor(() => expect(within(card(/^钢水包/)).getByRole('button', { name: '并入' })).toHaveAttribute('aria-pressed', 'false'));
+    expect(api.calls('PATCH', '/api/change-sets/cs-converter/items/item-ladle-car')[1]?.body).toEqual({ matchDecision: null });
+
+    const taphole = card(/^出钢口/);
+    expect(within(taphole).getByRole('button', { name: '可能重复' })).toBeInTheDocument();
+    await user.click(within(taphole).getByRole('button', { name: '保持分开' }));
+
+    await waitFor(() => expect(within(card(/^出钢口/)).getByRole('button', { name: '保持分开' })).toHaveAttribute('aria-pressed', 'true'));
+    expect(api.calls('PATCH', '/api/change-sets/cs-converter/items/item-taphole')[0]?.body).toEqual({ matchDecision: 'different' });
+    expect(within(card(/^出钢口/)).getByText('已确认保持分开，合并时照常新建')).toBeInTheDocument();
+    // Kept apart: the duplicate flag is gone.
+    expect(within(card(/^出钢口/)).queryByRole('button', { name: '可能重复' })).not.toBeInTheDocument();
+  });
+
+  it('keeps apart what the model took for the same concept', async () => {
+    const user = userEvent.setup();
+    const api = alignmentServer();
+    renderApp('/review/cs-converter');
+
+    const bof = await screen.findByRole('article', { name: /^转炉/ });
+    // The model already said "same": only keeping apart is offered.
+    expect(within(bof).queryByRole('button', { name: '并入' })).not.toBeInTheDocument();
+    await user.click(within(bof).getByRole('button', { name: '保持分开' }));
+
+    await waitFor(() => expect(within(card(/^转炉/)).getByRole('button', { name: '保持分开' })).toHaveAttribute('aria-pressed', 'true'));
+    expect(api.calls('PATCH', '/api/change-sets/cs-converter/items/item-bof')[0]?.body).toEqual({ matchDecision: 'different' });
+    expect(within(card(/^转炉/)).queryByText(/合并时将并入/)).not.toBeInTheDocument();
+  });
+
+  it('only shows the other reviewer’s conclusion when they kept the two apart', async () => {
+    alignmentServer();
+    renderApp('/review/cs-converter');
+
+    const slag = await screen.findByRole('article', { name: /^炉渣/ });
+    expect(within(slag).getByText('可能与已有元素“渣”重复')).toBeInTheDocument();
+    expect(within(slag).getByText('对方的审核人已定为保持分开，合并时照常新建')).toBeInTheDocument();
+    expect(within(slag).queryByRole('button', { name: '并入' })).not.toBeInTheDocument();
+    expect(within(slag).queryByRole('button', { name: '保持分开' })).not.toBeInTheDocument();
+  });
+
+  it('offers no alignment decisions to viewers', async () => {
+    alignmentServer(changeSetFixture(aligned()), userWithRole('viewer'));
+    renderApp('/review/cs-converter');
+
+    const taphole = await screen.findByRole('article', { name: /^出钢口/ });
+    expect(within(taphole).getByText(`可能与变更集《${OTHER_SET}》里的“出钢孔”重复`)).toBeInTheDocument();
+    expect(within(taphole).queryByRole('button', { name: '并入' })).not.toBeInTheDocument();
+    expect(within(taphole).queryByRole('button', { name: '保持分开' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /并入已有元素/ })).not.toBeInTheDocument();
+  });
+
+  it('leaves items with a record out of the high-confidence bulk accept', async () => {
+    const user = userEvent.setup();
+    const api = alignmentServer();
+    renderApp('/review/cs-converter');
+
+    await user.click(await screen.findByRole('button', { name: '接受全部高置信度项（1）' }));
+
+    await waitFor(() => expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')).toHaveLength(1));
+    expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')[0]?.body).toEqual({ itemIds: ['item-ladle'], decision: 'accepted' });
+  });
+
+  it('accepts the items the model took for the same concept after listing where each goes', async () => {
+    const user = userEvent.setup();
+    const api = alignmentServer();
+    renderApp('/review/cs-converter');
+
+    await user.click(await screen.findByRole('button', { name: '并入已有元素（2）' }));
+
+    const dialog = await screen.findByRole('dialog', { name: '并入已有元素' });
+    const rows = within(dialog).getAllByRole('listitem');
+    expect(rows.map((row) => row.textContent)).toEqual(['转炉将并入转炉（已有元素）', `电弧炉将并入电炉（变更集《${OTHER_SET}》）`]);
+    // Nothing is sent before the reviewer confirms.
+    expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')).toHaveLength(0);
+
+    await user.click(within(dialog).getByRole('button', { name: '接受这 2 项' }));
+
+    await waitFor(() => expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')).toHaveLength(1));
+    expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')[0]?.body).toEqual({ itemIds: ['item-bof', 'item-eaf'], decision: 'accepted' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(within(card(/^电弧炉/)).getByRole('button', { name: '接受' })).toHaveAttribute('aria-pressed', 'true'));
+    expect(screen.queryByRole('button', { name: /并入已有元素/ })).not.toBeInTheDocument();
+  });
+
+  it('counts only undecided same-concept items not kept apart', async () => {
+    const user = userEvent.setup();
+    const records = aligned().map((item) =>
+      item.id === 'item-eaf' && item.match ? { ...item, match: { ...item.match, keptApart: true } } : item,
+    );
+    alignmentServer(changeSetFixture(records));
+    renderApp('/review/cs-converter');
+
+    expect(await screen.findByRole('button', { name: '并入已有元素（1）' })).toBeInTheDocument();
+    await user.click(within(card(/^转炉/)).getByRole('button', { name: '保持分开' }));
+
+    await waitFor(() => expect(screen.queryByRole('button', { name: /并入已有元素/ })).not.toBeInTheDocument());
+  });
+
+  it('offers neither merging nor keeping apart for a record of the same main name', async () => {
+    const records = aligned().map((item) =>
+      item.id === 'item-eaf' && item.match ? { ...item, match: { ...item.match, kind: 'name' as const, reason: null } } : item,
+    );
+    alignmentServer(changeSetFixture(records));
+    renderApp('/review/cs-converter');
+
+    await screen.findByRole('article', { name: /^电弧炉/ });
+    const eaf = card(/^电弧炉/);
+    expect(within(eaf).getByText(`与变更集《${OTHER_SET}》里的“电炉”主名称相同，合并时随它并入同一元素`)).toBeInTheDocument();
+    expect(within(eaf).queryByRole('button', { name: '保持分开' })).not.toBeInTheDocument();
+    expect(within(eaf).queryByRole('button', { name: '并入' })).not.toBeInTheDocument();
+    // Not part of the same-concept bulk accept either: the merge follows the name.
+    expect(await screen.findByRole('button', { name: '并入已有元素（1）' })).toBeInTheDocument();
+  });
+
+  it('offers no same-concept bulk accept outside AI extraction', async () => {
+    alignmentServer(changeSetFixture(aligned(), { source: 'ai_assistant' }));
+    renderApp('/review/cs-converter');
+
+    await screen.findByRole('article', { name: /^转炉/ });
+    expect(screen.queryByRole('button', { name: /并入已有元素/ })).not.toBeInTheDocument();
+  });
+});

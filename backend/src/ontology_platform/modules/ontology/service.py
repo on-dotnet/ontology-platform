@@ -55,6 +55,7 @@ DEPENDENCY_SKIPPED = "changeset.dependency_skipped"
 INVALID_ITEM = "changeset.invalid_item"
 HAS_DEPENDENTS = "changeset.has_dependents"
 RESOLUTION_CHANGED = "changeset.resolution_changed"
+NO_MATCH = "changeset.no_match"
 # The kinds M1's AI extraction aligns its proposals with.
 _ALIGNMENT_KINDS = ("entity_type", "relation_type", "property")
 
@@ -211,6 +212,10 @@ plan_merge = mergeplan.plan_merge
 PlanItem = mergeplan.PlanItem
 PlanElement = mergeplan.PlanElement
 Resolution = mergeplan.Resolution
+PlanMatch = mergeplan.PlanMatch
+PlanMatchedBy = mergeplan.PlanMatchedBy
+RecordedItem = mergeplan.RecordedItem
+link_records = mergeplan.link_records
 
 
 async def ontology_exists(db: AsyncSession, ontology_id: UUID) -> bool:
@@ -231,7 +236,7 @@ async def list_alignment_elements(db: AsyncSession, ontology_id: UUID) -> list[s
 
 @dataclass(frozen=True, slots=True)
 class PendingCandidate:
-    """A create item of another pending change set (spec 004, 4.1; filled from PR 3 on)."""
+    """A create item of another open change set (spec 004, 4.1), with its effective fields."""
 
     item_id: UUID
     change_set_id: UUID
@@ -245,7 +250,8 @@ class PendingCandidate:
 class AlignmentCandidates:
     """What an extraction aligns with: `active` as `list_alignment_elements`; `deleted` object
     types, relations and properties, which a new type of the same main name restores and whose
-    local names stay taken; `pending` items of other open change sets (empty until PR 3)."""
+    local names stay taken; `pending` create items of the open change sets that are not
+    rejected, which an extraction judges against but never references."""
 
     active: list[schemas.ElementCopy]
     deleted: list[schemas.ElementCopy]
@@ -261,11 +267,43 @@ async def list_alignment_candidates(db: AsyncSession, ontology_id: UUID) -> Alig
         for element in await _elements(db, ontology_id)
         if element.kind in _ALIGNMENT_KINDS
     ]
+    rows = await db.execute(
+        select(ChangeItem, ChangeSet)
+        .join(ChangeSet, ChangeSet.id == ChangeItem.change_set_id)
+        .where(
+            ChangeSet.ontology_id == ontology_id,
+            ChangeSet.status == "open",
+            ChangeItem.op == "create",
+            ChangeItem.kind.in_(_ALIGNMENT_KINDS),
+            ChangeItem.decision != "rejected",
+        )
+        .order_by(ChangeSet.created_at, ChangeSet.id, ChangeItem.seq)
+    )
+    pending = [
+        PendingCandidate(
+            item_id=item.id,
+            change_set_id=change_set.id,
+            change_set_title=change_set.title,
+            kind=item.kind,
+            temp_ref=item.temp_ref,
+            fields=rules.effective_fields(item.proposed, item.edited),
+        )
+        for item, change_set in rows
+    ]
     return AlignmentCandidates(
         active=[copy for copy in copies if copy.status == "active"],
         deleted=[copy for copy in copies if copy.status != "active"],
-        pending=[],
+        pending=pending,
     )
+
+
+async def lock_ontology(db: AsyncSession, ontology_id: UUID) -> None:
+    """Hold the ontology's lock for the rest of the caller's transaction.
+
+    Merges take the same lock: an extraction that checks for late candidates and writes its
+    change set under it sees every merge and change set written before it (spec 004, 7.3).
+    """
+    await _ontology_or_404(db, ontology_id, lock=True)
 
 
 async def count_entity_types(db: AsyncSession) -> int:
@@ -322,6 +360,7 @@ async def create_change_set(
         problem = _proposal_problem(item, elements, created_kinds)
         if problem:
             raise InvalidProposalError(f"Item {position}: {problem}.")
+    await _check_matches(db, ontology_id, items, elements, created_kinds)
 
     change_set = ChangeSet(
         id=uuid4(),
@@ -367,9 +406,19 @@ async def create_change_set(
             rationale=item.rationale,
             flags=list(dict.fromkeys(item.flags)),
         )
+        if item.match is not None:
+            row.match_kind = item.match.kind
+            row.match_element_id = item.match.element_id
+            row.match_item_id = item.match.item_id
+            row.match_reason = rules.clean_text(item.match.reason)
         db.add(row)
         rows.append((row, item))
     await db.flush()
+    # A record of an object type of this change set points at its row, now that it has one.
+    ids = {row.temp_ref: row.id for row, _ in rows if row.temp_ref is not None}
+    for row, item in rows:
+        if item.match is not None and item.match.temp_ref is not None:
+            row.match_item_id = ids[item.match.temp_ref]
     for row, item in rows:
         for evidence in item.evidence:
             db.add(
@@ -390,6 +439,51 @@ async def create_change_set(
                 ),
             )
     return change_set.id
+
+
+async def _check_matches(
+    db: AsyncSession,
+    ontology_id: UUID,
+    items: Sequence[schemas.ProposedItem],
+    elements: Mapping[UUID, Element],
+    created_kinds: Mapping[str, Kind],
+) -> None:
+    """Alignment records only on new object types, pointing at exactly one object type."""
+    wanted = {item.match.item_id for item in items if item.match and item.match.item_id}
+    others: set[UUID] = set()
+    if wanted:
+        statement = (
+            select(ChangeItem.id)
+            .join(ChangeSet, ChangeSet.id == ChangeItem.change_set_id)
+            .where(
+                ChangeItem.id.in_(wanted),
+                ChangeItem.kind == "entity_type",
+                ChangeItem.op == "create",
+                ChangeSet.ontology_id == ontology_id,
+            )
+        )
+        others = set((await db.scalars(statement)).all())
+    for position, item in enumerate(items, start=1):
+        match = item.match
+        if match is None:
+            continue
+        given = [match.element_id, match.item_id, match.temp_ref]
+        element = elements.get(match.element_id) if match.element_id else None
+        if item.op != "create" or item.kind != "entity_type":
+            problem = "only a new object type has an alignment record"
+        elif sum(value is not None for value in given) != 1:
+            problem = "an alignment record names exactly one other side"
+        elif match.element_id is not None and (element is None or element.kind != "entity_type"):
+            problem = "the aligned element is not an object type of the ontology"
+        elif match.item_id is not None and match.item_id not in others:
+            problem = "the aligned item is not a new object type of the ontology"
+        elif match.temp_ref is not None and (
+            created_kinds.get(match.temp_ref) != "entity_type" or match.temp_ref == item.temp_ref
+        ):
+            problem = "the aligned temp_ref is not another object type of the change set"
+        else:
+            continue
+        raise InvalidProposalError(f"Item {position}: {problem}.")
 
 
 def item_references(
@@ -960,7 +1054,7 @@ def _plan_elements(elements: Sequence[Element], base_iri: str) -> list[mergeplan
     ]
 
 
-def _plan_items(items: Sequence[ChangeItem]) -> list[mergeplan.PlanItem]:
+def _plan_items(items: Sequence[ChangeItem], links: "_Links") -> list[mergeplan.PlanItem]:
     return [
         mergeplan.PlanItem(
             id=item.id,
@@ -973,9 +1067,84 @@ def _plan_items(items: Sequence[ChangeItem]) -> list[mergeplan.PlanItem]:
             target_revision=item.target_revision,
             fields=rules.effective_fields(item.proposed, item.edited),
             edited=item.edited is not None,
+            match=links.matches.get(item.id),
+            match_decision=item.match_decision,
+            matched_by=links.matched_by.get(item.id, ()),
         )
         for item in items
     ]
+
+
+@dataclass(frozen=True, slots=True)
+class _Links:
+    """The alignment records around a change set's items (spec 004, 5.3 and 5.5).
+
+    `others` are the items the records point at, with their change sets; `reverse` the items
+    of other change sets whose records point at an item here.
+    """
+
+    others: Mapping[UUID, tuple[ChangeItem, ChangeSet]]
+    reverse: Mapping[UUID, Sequence[tuple[ChangeItem, ChangeSet]]]
+    matches: Mapping[UUID, mergeplan.PlanMatch]
+    matched_by: Mapping[UUID, tuple[mergeplan.PlanMatchedBy, ...]]
+
+
+_NO_LINKS = _Links({}, {}, {}, {})
+
+
+def _counts_for(other: ChangeItem, item: ChangeItem) -> bool:
+    """Whether the other item's reviewer decided about this pair: about its own record of this
+    item, or (without a record of its own) about the record shown from this side."""
+    return other.match_item_id == item.id or other.match_kind is None
+
+
+def _merged_into(other: ChangeItem, change_set: ChangeSet) -> UUID | None:
+    if change_set.status != "merged" or other.decision != "accepted":
+        return None
+    return other.applied_element_id
+
+
+async def _links(db: AsyncSession, change_set: ChangeSet, items: Sequence[ChangeItem]) -> _Links:
+    ids = [item.id for item in items]
+    wanted = {item.match_item_id for item in items if item.match_item_id}
+    others: dict[UUID, tuple[ChangeItem, ChangeSet]] = {}
+    joined = select(ChangeItem, ChangeSet).join(ChangeSet, ChangeSet.id == ChangeItem.change_set_id)
+    if wanted:
+        rows = await db.execute(joined.where(ChangeItem.id.in_(wanted)))
+        others = {item.id: (item, owner) for item, owner in rows}
+    reverse: dict[UUID, list[tuple[ChangeItem, ChangeSet]]] = defaultdict(list)
+    if ids:
+        rows = await db.execute(
+            joined.where(
+                ChangeItem.match_item_id.in_(ids), ChangeItem.change_set_id != change_set.id
+            ).order_by(ChangeSet.merged_at, ChangeItem.seq)
+        )
+        for other, owner in rows:
+            if other.match_item_id is not None:
+                reverse[other.match_item_id].append((other, owner))
+    # The same resolution of records as the evaluation's (spec 004, 5.2): one pure function.
+    matches, matched_by = mergeplan.link_records(
+        [_recorded(item, change_set) for item in items],
+        {item_id: _recorded(other, owner) for item_id, (other, owner) in others.items()},
+        [_recorded(other, owner) for entries in reverse.values() for other, owner in entries],
+    )
+    return _Links(others, reverse, matches, matched_by)
+
+
+def _recorded(item: ChangeItem, change_set: ChangeSet) -> mergeplan.RecordedItem:
+    fields = rules.effective_fields(item.proposed, item.edited)
+    return mergeplan.RecordedItem(
+        id=item.id,
+        change_set_id=change_set.id,
+        match_kind=item.match_kind,
+        match_element_id=item.match_element_id,
+        match_item_id=item.match_item_id,
+        match_decision=item.match_decision,
+        label_zh=fields.label_zh,
+        label_en=fields.label_en,
+        merged_into=_merged_into(item, change_set),
+        merged_at=change_set.merged_at,
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -996,11 +1165,12 @@ def _plan(
     ontology: Ontology,
     elements: Sequence[Element],
     items: Sequence[ChangeItem],
+    links: _Links = _NO_LINKS,
 ) -> _Plan:
     """Only what the extraction proposes is planned; other sources say exactly what they do."""
     if change_set.source != "ai_extraction":
         return _NO_PLAN
-    plan_items = _plan_items(items)
+    plan_items = _plan_items(items, links)
     plan_elements = _plan_elements(elements, ontology.base_iri)
     resolutions = mergeplan.plan_merge(plan_items, plan_elements, base_iri=ontology.base_iri)
     return _Plan(
@@ -1015,12 +1185,10 @@ def _resolution_out(
     element: Element | None = None,
     local_name: str | None = None,
     kept_fields: Sequence[str] = (),
+    label: str | None = None,
 ) -> schemas.ItemResolution:
-    label = (
-        rules.display_label(element.label_zh, element.label_en, element.local_name)
-        if element is not None
-        else None
-    )
+    if element is not None:
+        label = rules.display_label(element.label_zh, element.label_en, element.local_name)
     return schemas.ItemResolution.model_validate(
         {
             "mode": mode,
@@ -1065,35 +1233,127 @@ def _applied_resolutions(
     return out
 
 
+def _item_label(item: ChangeItem) -> str:
+    fields = rules.effective_fields(item.proposed, item.edited)
+    return rules.display_label(fields.label_zh, fields.label_en, fields.local_name)
+
+
 async def _resolutions(
     db: AsyncSession,
     change_set: ChangeSet,
     items: Sequence[ChangeItem],
-) -> tuple[dict[UUID, schemas.ItemResolution], str]:
-    """The resolution of each item for the API, and the token of the plan (spec 004, 5.4)."""
+) -> tuple[dict[UUID, schemas.ItemResolution], str, _Links]:
+    """The resolution of each item for the API, the token of the plan (spec 004, 5.4), and the
+    alignment records around the items."""
     if change_set.source != "ai_extraction" or change_set.status == "rejected":
-        return {}, _NO_PLAN.token
+        return {}, _NO_PLAN.token, await _links(db, change_set, items)
     ontology = await _ontology_or_404(db, change_set.ontology_id)
     elements = await _elements(db, ontology.id)
     by_id = {element.id: element for element in elements}
+    links = await _links(db, change_set, items)
     if change_set.status == "merged":
-        return _applied_resolutions(change_set, items, by_id), _NO_PLAN.token
-    plan = _plan(change_set, ontology, elements, items)
+        return _applied_resolutions(change_set, items, by_id), _NO_PLAN.token, links
+    plan = _plan(change_set, ontology, elements, items, links)
+    by_item = {item.id: item for item in items}
     out: dict[UUID, schemas.ItemResolution] = {}
     for item_id, resolution in plan.resolutions.items():
         element = by_id.get(resolution.element_id) if resolution.element_id else None
+        joined = by_item.get(resolution.item_id) if resolution.item_id else None
         out[item_id] = _resolution_out(
-            resolution.mode, element, resolution.local_name, resolution.kept_fields
+            resolution.mode,
+            element,
+            resolution.local_name,
+            resolution.kept_fields,
+            label=_item_label(joined) if joined is not None else None,
         )
-    return out, plan.token
+    return out, plan.token, links
+
+
+async def _matches_out(
+    db: AsyncSession, items: Sequence[ChangeItem], links: _Links
+) -> dict[UUID, schemas.ItemMatch]:
+    """Each item's own alignment record, or one made from a merged item that recorded it."""
+    element_ids = {item.match_element_id for item in items if item.match_element_id}
+    element_ids |= {
+        other.applied_element_id
+        for entries in links.reverse.values()
+        for other, _ in entries
+        if other.applied_element_id
+    }
+    elements: dict[UUID, Element] = {}
+    if element_ids:
+        rows = await db.scalars(select(Element).where(Element.id.in_(element_ids)))
+        elements = {element.id: element for element in rows}
+
+    def element_label(element_id: UUID | None) -> str | None:
+        element = elements.get(element_id) if element_id else None
+        if element is None:
+            return None
+        return rules.display_label(element.label_zh, element.label_en, element.local_name)
+
+    out: dict[UUID, schemas.ItemMatch] = {}
+    for item in items:
+        data: dict[str, Any] | None = None
+        if item.match_kind is not None:
+            found = links.others.get(item.match_item_id) if item.match_item_id else None
+            other, owner = found if found is not None else (None, None)
+            label = element_label(item.match_element_id)
+            if other is not None:
+                label = _item_label(other)
+            if label is None:
+                continue  # the other side is gone (a deleted change set)
+            if (
+                other is not None
+                and owner is not None
+                and owner.id != item.change_set_id
+                and (other.decision == "rejected" or owner.status == "rejected")
+            ):
+                continue  # the plan does not follow a rejected item either
+            data = {
+                "kind": item.match_kind,
+                "element_id": item.match_element_id,
+                "item_id": other.id if other is not None else None,
+                "change_set_id": owner.id if owner is not None else None,
+                "change_set_title": owner.title if owner is not None else None,
+                "label": label,
+                "reason": item.match_reason,
+                "kept_apart": other is not None
+                and _counts_for(other, item)
+                and other.match_decision == "different",
+            }
+        else:
+            merged = [
+                (other, owner)
+                for other, owner in links.reverse.get(item.id, ())
+                if _merged_into(other, owner) is not None and other.match_kind is not None
+            ]
+            if merged:
+                other, owner = merged[0]
+                data = {
+                    "kind": other.match_kind,
+                    "element_id": other.applied_element_id,
+                    "item_id": other.id,
+                    "change_set_id": owner.id,
+                    "change_set_title": owner.title,
+                    "label": element_label(other.applied_element_id) or _item_label(other),
+                    "reason": other.match_reason,
+                    "kept_apart": other.match_decision == "different",
+                }
+        if data is not None:
+            data["decision"] = item.match_decision
+            out[item.id] = schemas.ItemMatch.model_validate(data)
+    return out
 
 
 async def _items_out(
     db: AsyncSession,
+    change_set: ChangeSet,
     items: Sequence[ChangeItem],
     resolutions: Mapping[UUID, schemas.ItemResolution],
+    links: _Links,
 ) -> list[schemas.ChangeItem]:
     evidence = await _evidence_by_item(db, [item.id for item in items])
+    matches = await _matches_out(db, items, links)
     target_ids = {item.target_element_id for item in items if item.target_element_id}
     targets: dict[UUID, Element] = {}
     if target_ids:
@@ -1125,6 +1385,7 @@ async def _items_out(
                     "applied_element_id": item.applied_element_id,
                     "evidence": evidence.get(item.id, []),
                     "resolution": resolutions.get(item.id),
+                    "match": matches.get(item.id),
                 },
             ),
         )
@@ -1209,11 +1470,11 @@ async def _detail(db: AsyncSession, change_set: ChangeSet) -> schemas.ChangeSetD
     items = await _items(db, change_set)
     counts = _counts(Counter(item.decision for item in items))
     data = _summary_data(change_set, counts)
-    resolutions, token = await _resolutions(db, change_set, items)
+    resolutions, token, links = await _resolutions(db, change_set, items)
     return schemas.ChangeSetDetail.model_validate(
         {
             **data,
-            "items": await _items_out(db, items, resolutions),
+            "items": await _items_out(db, change_set, items, resolutions, links),
             "resolution_token": token,
         }
     )
@@ -1332,11 +1593,15 @@ async def update_item(
     actor: UUID,
     review_mode: ReviewMode,
 ) -> schemas.ChangeItem:
-    """Set the decision, the reviewer's edit and/or the note of one item."""
+    """Set the decision, the reviewer's edit, the alignment decision and/or the note of one item.
+
+    The alignment decision (spec 004, 5.5) is written on this item only, never on the other
+    side, whose change set may be merged already.
+    """
     change_set = await _change_set_or_404(db, change_set_id, lock=True)
     _ensure_open(change_set)
     given = patch.model_fields_set
-    if patch.decision is not None or "edited" in given:
+    if patch.decision is not None or "edited" in given or "match_decision" in given:
         _ensure_not_own(change_set, actor, review_mode)
     item = await db.scalar(
         select(ChangeItem).where(
@@ -1356,14 +1621,36 @@ async def update_item(
             if problems:
                 raise AppError(422, "changeset.invalid_edit", "; ".join(problems) + ".")
             item.edited = edited
+    if "match_decision" in given:
+        if patch.match_decision is not None and not await _has_match(db, item):
+            raise AppError(422, NO_MATCH, "The item has no alignment record to decide on.")
+        if patch.match_decision is not None and item.match_kind == mergeplan.NAME:
+            # The same main name leaves nothing to decide; renaming one of the two undoes it.
+            raise AppError(422, NO_MATCH, "A record of the same main name takes no decision.")
+        item.match_decision = patch.match_decision
     if patch.decision is not None:
         _decide(item, patch.decision, actor, _now())
     if "note" in given:
         item.note = rules.clean_text(patch.note)
     await db.commit()
     # The plan covers the whole change set: editing one item can change how others resolve.
-    resolutions, _ = await _resolutions(db, change_set, await _items(db, change_set))
-    return (await _items_out(db, [item], resolutions))[0]
+    items = await _items(db, change_set)
+    resolutions, _, links = await _resolutions(db, change_set, items)
+    return (await _items_out(db, change_set, [item], resolutions, links))[0]
+
+
+async def _has_match(db: AsyncSession, item: ChangeItem) -> bool:
+    """Whether the item has an alignment record, or a merged item of another change set has
+    one of it (spec 004, 5.5)."""
+    if item.match_kind is not None:
+        return True
+    statement = (
+        select(func.count())
+        .select_from(ChangeItem)
+        .join(ChangeSet, ChangeSet.id == ChangeItem.change_set_id)
+        .where(ChangeItem.match_item_id == item.id, ChangeSet.status == "merged")
+    )
+    return bool(await db.scalar(statement))
 
 
 async def decide_items(

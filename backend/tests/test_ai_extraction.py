@@ -1,7 +1,8 @@
 """Staged extraction with a scripted model: alignment, references, evidence grounding, progress."""
 
+import re
 import unicodedata
-from collections.abc import Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -11,22 +12,28 @@ from pydantic import BaseModel
 from ontology_platform.modules.ai.extraction import (
     TYPES_BATCH_TERMS,
     ChunkText,
+    Decision,
     ExtractionModels,
     Extractor,
     KnownElement,
+    PendingType,
     Proposal,
+    ProposedMatch,
     batches,
     build_proposals,
     merge_types,
     normalize,
+    resolve_requests,
 )
 from ontology_platform.modules.ai.gateway import InputFile
 from ontology_platform.modules.ai.prompts import (
+    DecisionOut,
     EntityTypeOut,
     PropertyOut,
     Quote,
     RelationOut,
     RelationsOut,
+    ResolveOut,
     TermOut,
     TermsOut,
     TypesOut,
@@ -42,11 +49,87 @@ EXISTING_GRADE = KnownElement(
 )
 
 
-class ScriptedGateway:
-    """Returns canned outputs per purpose and records what it was asked."""
+def judge(
+    verdicts: Mapping[str, tuple[str | None, str]] | None = None,
+    default: str | None = "different",
+) -> Callable[[str], ResolveOut]:
+    """A scripted resolve call: answers by the labels it finds in the call's input.
 
-    def __init__(self, outputs: dict[str, list[BaseModel]]) -> None:
+    `verdicts` maps the label of a type to judge to (the label of its candidate, the verdict);
+    other types get `default` with no candidate, or no answer at all when it is None.
+    """
+
+    def answer(text: str) -> ResolveOut:
+        rows: list[DecisionOut] = []
+        asked: list[tuple[str, str, dict[str, str]]] = []
+        for line in text.splitlines():
+            found = re.match(r"(\s*)([TC]\d+) \| ([^|]*) \|", line)
+            if found is None:
+                continue
+            alias, label = found[2], found[3].strip()
+            if alias.startswith("T"):
+                asked.append((alias, label, {}))
+            else:
+                asked[-1][2][label] = alias
+        for alias, label, candidates in asked:
+            if verdicts and label in verdicts:
+                candidate, verdict = verdicts[label]
+                chosen = candidates[candidate] if candidate is not None else None
+            elif default is not None:
+                chosen, verdict = None, default
+            else:
+                continue
+            rows.append(
+                DecisionOut(type=alias, candidate=chosen, verdict=verdict, reason="理由")  # type: ignore[arg-type]
+            )
+        return ResolveOut(decisions=rows)
+
+    return answer
+
+
+def decide(
+    types: Sequence[EntityTypeOut],
+    known: Sequence[KnownElement],
+    verdicts: Mapping[str, tuple[str | None, str]] | None = None,
+    default: str | None = "different",
+    pending: Sequence[PendingType] = (),
+) -> dict[int, list[Decision]]:
+    """The answers `judge` would give, as `build_proposals` takes them."""
+    names = {str(e.id): e.label_zh for e in known} | {str(p.item_id): p.label_zh for p in pending}
+    out: dict[int, list[Decision]] = {}
+    for request in resolve_requests(known, types, pending=pending):
+        label = types[request.index].label_zh
+        if verdicts and label in verdicts:
+            wanted, verdict = verdicts[label]
+            key = next(
+                (
+                    c.key
+                    for c in request.candidates
+                    if (types[int(c.key[1])].label_zh if c.key[0] == "run" else names[c.key[1]])
+                    == wanted
+                ),
+                None,
+            )
+            out[request.index] = [Decision(verdict, key, "理由")]  # type: ignore[arg-type]
+        elif default is not None:
+            out[request.index] = [Decision(default)]  # type: ignore[arg-type]
+    return out
+
+
+class ScriptedGateway:
+    """Returns canned outputs per purpose and records what it was asked.
+
+    A resolve call without canned outputs is answered by `resolver` (by default: every type
+    is a different concept from its candidates).
+    """
+
+    def __init__(
+        self,
+        outputs: dict[str, list[BaseModel]],
+        resolver: Callable[[str], ResolveOut] | None = None,
+    ) -> None:
         self.outputs = {purpose: list(items) for purpose, items in outputs.items()}
+        self.resolver = resolver or judge()
         self.calls: list[tuple[str, str]] = []
         self.texts: list[tuple[str, str]] = []
 
@@ -63,6 +146,10 @@ class ScriptedGateway:
     ) -> T:
         self.calls.append((purpose, model))
         self.texts.append((purpose, text))
+        if purpose == "extract.resolve" and purpose not in self.outputs:
+            answer = self.resolver(text)
+            assert isinstance(answer, schema)
+            return answer
         result = self.outputs[purpose].pop(0)
         assert isinstance(result, schema)
         return result
@@ -201,15 +288,25 @@ async def test_quote_found_in_another_chunk_than_cited() -> None:
     assert by_label(proposals, "浇次").evidence[0].chunk_id == CHUNK_B.id
 
 
-async def test_existing_type_matched_by_synonym_only_gets_new_synonyms() -> None:
+async def test_a_type_named_as_an_existing_synonym_is_judged_and_recorded_as_the_same() -> None:
+    # Was `_shares_name` (#33): a label that is an existing type's synonym aligned it. Now the
+    # pair is a candidate (0.9) and the model judges; "same" is a recorded, new item that the
+    # merge plan puts into the existing type (spec 004, 4.3).
     types = [entity("new:Grade", "牌号", "Grade", synonyms=["钢号"], quotes=[quote(0, "一个钢种")])]
-    proposals, _ = await run(
-        ScriptedGateway(outputs(types, RelationsOut(relations=[], properties=[]))), [EXISTING_GRADE]
+    gateway = ScriptedGateway(
+        outputs(types, RelationsOut(relations=[], properties=[])),
+        judge({"牌号": ("钢种", "same")}),
     )
+    proposals, _ = await run(gateway, [EXISTING_GRADE])
 
-    [update] = proposals
-    assert (update.op, update.target_element_id) == ("update", EXISTING_GRADE.id)
-    assert update.fields == {"synonyms": [{"lang": "zh", "text": "钢号"}]}
+    [created] = proposals
+    assert (created.op, created.temp_ref, created.flags) == ("create", "new:Grade", [])
+    assert created.match == ProposedMatch("same", element_id=EXISTING_GRADE.id, reason="理由")
+    assert created.fields["synonyms"] == [{"lang": "zh", "text": "钢号"}]
+    # One call, with the candidate's names.
+    [(_, text)] = [entry for entry in gateway.texts if entry[0] == "extract.resolve"]
+    assert "T1 | 牌号 | 钢号 |" in text
+    assert "C1 | 钢种 | 牌号 |" in text
 
 
 async def test_existing_type_without_news_produces_nothing() -> None:
@@ -304,9 +401,10 @@ async def test_a_new_type_can_have_an_existing_parent() -> None:
 
 
 async def test_updates_of_one_existing_type_are_merged() -> None:
+    # `_maybe_update` stays for types of the existing type's main name (G1).
     types = [
         entity(str(EXISTING_GRADE.id), "钢种", "SteelGrade", synonyms=["钢级"]),
-        entity("new:Grade", "牌号", "Grade", synonyms=["钢号", "钢级"]),
+        entity("new:Grade", "钢种", "Grade", synonyms=["钢号", "钢级"]),
     ]
     gateway = ScriptedGateway(outputs(types, RelationsOut(relations=[], properties=[])))
     proposals, _ = await run(gateway, known=[EXISTING_GRADE])
@@ -463,11 +561,14 @@ def test_a_later_batch_does_not_extend_a_ref_an_earlier_batch_gave_to_two_types(
     assert by_label(proposals, "行车").fields["synonyms"] == []
 
 
-async def test_new_types_sharing_a_name_become_one_type() -> None:
+async def test_new_types_judged_the_same_are_recorded_for_the_merge() -> None:
+    # Was the merge of new types by shared names (#7): now candidates the model judges. A new
+    # type judged the same as an earlier one of this document stays an item with that record
+    # (spec 004, 4.3), which the reviewer can overturn; the merge plan puts it into the other.
     types = [
         entity("new:LadleFurnace", "LF精炼炉", "LadleFurnace", synonyms=["精炼炉"]),
         entity("new:Ladle", "钢包", "Ladle"),
-        # Another name of the same furnace: merged, its names kept as synonyms.
+        # Another name of the same furnace.
         entity("new:Refiner", "精炼炉", "Refiner", synonyms=["LF炉"]),
         entity("new:Converter", "转炉", "Converter", label_en="Converter"),
         entity("new:BOF", "顶底复吹转炉", "BOF", label_en="converter"),
@@ -478,15 +579,26 @@ async def test_new_types_sharing_a_name_become_one_type() -> None:
         ],
         properties=[],
     )
-    proposals, _ = await run(ScriptedGateway(outputs(types, rels)))
+    resolver = judge({"精炼炉": ("LF精炼炉", "same"), "顶底复吹转炉": ("转炉", "same")})
+    proposals, _ = await run(ScriptedGateway(outputs(types, rels), resolver))
 
     created = [p for p in proposals if p.kind == "entity_type"]
-    assert [p.fields["labelZh"] for p in created] == ["LF精炼炉", "钢包", "转炉"]
-    furnace = by_label(proposals, "LF精炼炉")
-    assert [s["text"] for s in furnace.fields["synonyms"]] == ["精炼炉", "LF炉"]
-    assert [s["text"] for s in by_label(proposals, "转炉").fields["synonyms"]] == ["顶底复吹转炉"]
+    assert [p.fields["labelZh"] for p in created] == [
+        "LF精炼炉",
+        "钢包",
+        "精炼炉",
+        "转炉",
+        "顶底复吹转炉",
+    ]
+    assert by_label(proposals, "精炼炉").match == ProposedMatch(
+        "same", temp_ref="new:LadleFurnace", reason="理由"
+    )
+    assert by_label(proposals, "顶底复吹转炉").match == ProposedMatch(
+        "same", temp_ref="new:Converter", reason="理由"
+    )
+    # The relation keeps the type it was given; the merge plan puts both into one element.
     [link] = [p for p in proposals if p.kind == "relation_type"]
-    assert link.fields["rangeRef"] == "new:LadleFurnace"
+    assert link.fields["rangeRef"] == "new:Refiner"
 
 
 def prop(domain: str, label: str) -> PropertyOut:
@@ -517,7 +629,7 @@ LADLE_CHUNK = ChunkText(
     ("label", "name", "created"),
     [
         ("行车", "Crane", ["钢包", "行车", "精炼炉"]),  # a second new type
-        ("牌号", "Grade", ["钢包", "精炼炉"]),  # an existing type, matched by its synonym
+        ("钢种", "Grade", ["钢包", "精炼炉"]),  # an existing type, by its main name (G1)
     ],
 )
 def test_types_sharing_a_ref_but_not_a_name_are_kept_and_the_ref_resolves_to_none(
@@ -550,7 +662,7 @@ def test_types_sharing_a_ref_and_a_name_are_one_type_the_ref_resolves_to() -> No
         entity("new:Ladle", "钢包", "Ladle", synonyms=["盛钢桶"]),
         entity("new:Furnace", "精炼炉", "Furnace", parent="new:Ladle"),
         entity("new:Grade", "钢种", "Grade"),
-        entity("new:Grade", "牌号", "Grade"),  # both names of the existing type
+        entity("new:Grade", "钢种", "Grade", synonyms=["牌号"]),  # both the existing type (G1)
     ]
     rels = RelationsOut(
         relations=[
@@ -754,24 +866,34 @@ async def test_relations_need_a_quote_whose_line_names_both_types() -> None:
     assert "- new:Ladle | 盛钢桶 | 钢包 | \n" in relations_text
 
 
-async def test_only_names_of_two_characters_or_more_and_labels_merge_types() -> None:
+async def test_one_character_matches_are_at_most_possible_duplicates() -> None:
+    # Was MIN_NAME and the merge of new types by name (#7, #33): one-character names neither
+    # merged nor flagged. Now every pair the shortlist finds is judged; one found only through
+    # a one-character name is at most a possible duplicate (G4).
     types = [
         entity("new:Converter", "转炉", "Converter", synonyms=["炉"]),
-        entity("new:Reheater", "加热炉", "Reheater", synonyms=["炉"]),  # one character: no
-        entity("new:Furnace", "炉", "Furnace"),  # one character, even as a label: no
+        entity("new:Reheater", "加热炉", "Reheater", synonyms=["炉"]),  # judged same: G4
+        entity("new:Furnace", "炉", "Furnace"),  # judged same: G4
         entity("new:Refiner", "精炼炉", "Refiner", synonyms=["LF炉"]),
-        entity("new:LF", "LF精炼炉", "LF", synonyms=["LF炉"]),  # synonym against synonym: no
+        entity("new:LF", "LF精炼炉", "LF", synonyms=["LF炉"]),  # judged unsure
         entity("new:Return", "回炉处理", "Return", quotes=[quote(0, "每个炉次只冶炼一个钢种")]),
         entity(
             "new:SlabReturn",
-            "板坯回炉",
+            "回炉处理",
             "SlabReturn",
-            synonyms=["回炉处理"],  # names the earlier type's label: the same concept
+            synonyms=["板坯回炉"],  # the main name of the earlier type (G1): joins it
             quotes=[quote(1, "一个浇次由若干个炉次"), quote(1, "没有这句话")],
         ),
     ]
+    resolver = judge(
+        {
+            "加热炉": ("转炉", "same"),
+            "炉": ("转炉", "same"),
+            "LF精炼炉": ("精炼炉", "unsure"),
+        }
+    )
     proposals, _ = await run(
-        ScriptedGateway(outputs(types, RelationsOut(relations=[], properties=[])))
+        ScriptedGateway(outputs(types, RelationsOut(relations=[], properties=[])), resolver)
     )
 
     assert [p.fields["labelZh"] for p in proposals] == [
@@ -787,10 +909,13 @@ async def test_only_names_of_two_characters_or_more_and_labels_merge_types() -> 
     # Located quotes of the merged term are kept as evidence; unlocated ones are not.
     assert [e.chunk_id for e in merged.evidence] == [CHUNK_A.id, CHUNK_B.id]
     assert merged.flags == []
-    # Sharing only a synonym is left to the reviewer, marked as a possible duplicate.
     # (Types without quotes also carry evidence_not_found.)
     flagged = [p.fields["labelZh"] for p in proposals if "possible_duplicate" in p.flags]
-    assert flagged == ["LF精炼炉"]
+    assert flagged == ["加热炉", "炉", "LF精炼炉"]
+    converter = by_label(proposals, "转炉").temp_ref
+    assert [by_label(proposals, label).match for label in ("加热炉", "炉")] == [
+        ProposedMatch("possible", temp_ref=converter, reason="理由")
+    ] * 2
 
 
 async def test_relation_evidence_uses_every_name_and_needs_two_separate_mentions() -> None:
@@ -803,7 +928,7 @@ async def test_relation_evidence_uses_every_name_and_needs_two_separate_mentions
         id=uuid4(), kind="entity_type", local_name="Converter", label_zh="转炉设备"
     )
     types = [
-        # Matches the existing type by a synonym: its label 转炉 is checked too.
+        # Judged the same as the existing type: its names and the type's own are checked.
         entity("new:BOF", "转炉", "BOF", synonyms=["转炉设备"]),
         entity("new:Pot", "铁水罐", "Pot"),
         # Its short synonym 成分要求 lies inside 钢种成分要求 and is no separate mention either.
@@ -823,7 +948,7 @@ async def test_relation_evidence_uses_every_name_and_needs_two_separate_mentions
         ],
         properties=[],
     )
-    gateway = ScriptedGateway(outputs(types, rels))
+    gateway = ScriptedGateway(outputs(types, rels), judge({"转炉": ("转炉设备", "same")}))
     extractor = Extractor(gateway, ExtractionModels(standard="std", reasoning="deep"))
 
     async def progress(step: str, done: int, total: int) -> None:
@@ -838,7 +963,8 @@ async def test_relation_evidence_uses_every_name_and_needs_two_separate_mentions
     )
 
     [link] = [p for p in proposals if p.kind == "relation_type"]
-    assert (link.fields["labelZh"], link.fields["rangeRef"]) == ("运入", str(converter.id))
+    # The merge plan puts new:BOF into the existing type (spec 004, 5.3).
+    assert (link.fields["labelZh"], link.fields["rangeRef"]) == ("运入", "new:BOF")
 
 
 # Lines of samples/steel/docs, verbatim, that state the nine core relations of the expected list.
@@ -943,34 +1069,70 @@ def test_a_name_only_inside_a_longer_name_is_no_evidence() -> None:
     assert [p.kind for p in proposals] == ["entity_type", "entity_type"]
 
 
-# Alignment with existing types by name (#33): the same names as the other rules.
+# Alignment with existing types (#33 and #31), now candidates, judgements and guardrails
+# (spec 004, 4.3 and 4.4).
 CONVERTER = KnownElement(
     id=uuid4(), kind="entity_type", local_name="Converter", label_zh="转炉", synonyms=("炉",)
 )
 NO_RELATIONS = RelationsOut(relations=[], properties=[])
 
 
-def test_a_shared_one_character_synonym_does_not_align_a_type() -> None:
+@pytest.mark.parametrize(
+    ("verdict", "flagged"), [("different", False), ("same", True), (None, True)]
+)
+def test_a_shared_one_character_synonym_is_at_most_a_possible_duplicate(
+    verdict: str | None, flagged: bool
+) -> None:
+    # Was `_shares_synonym` (#33). 炉 is the only name shared: judged different, nothing; judged
+    # the same, still only a possible duplicate (G4); not judged at all, one too (G5).
     types = [entity("new:ReheatingFurnace", "加热炉", "ReheatingFurnace", synonyms=["炉"])]
-    [created] = build_proposals([LADLE_CHUNK], [CONVERTER], types, NO_RELATIONS)
+    verdicts = {"加热炉": ("转炉", verdict)} if verdict else None
+    decisions = decide(types, [CONVERTER], verdicts, default=None)
+    [created] = build_proposals(
+        [LADLE_CHUNK], [CONVERTER], types, NO_RELATIONS, decisions=decisions
+    )
 
     assert (created.op, created.fields["labelZh"]) == ("create", "加热炉")
-    assert "possible_duplicate" not in created.flags
+    assert ("possible_duplicate" in created.flags) is flagged
+    assert (created.match is not None) is flagged
 
 
 def test_a_mistaken_id_and_a_shared_one_character_synonym_do_not_align_a_type() -> None:
+    # `mistaken_id` (#31), now G3 and G4: without a judgement (G5) or judged the same, the type
+    # is a possible duplicate of the converter.
     types = [entity(str(CONVERTER.id), "加热炉", "ReheatingFurnace", synonyms=["炉"])]
-    [created] = build_proposals([LADLE_CHUNK], [CONVERTER], types, NO_RELATIONS)
+    for decisions in (None, decide(types, [CONVERTER], {"加热炉": ("转炉", "same")})):
+        [created] = build_proposals(
+            [LADLE_CHUNK], [CONVERTER], types, NO_RELATIONS, decisions=decisions
+        )
+        assert (created.op, created.fields["labelZh"]) == ("create", "加热炉")
+        assert "possible_duplicate" in created.flags
+        assert created.match is not None
+        assert created.match.element_id == CONVERTER.id
 
-    assert (created.op, created.fields["labelZh"]) == ("create", "加热炉")
-    assert "possible_duplicate" in created.flags
+
+def test_a_nominated_type_is_at_most_a_possible_duplicate() -> None:
+    # G3: the types stage gave 行车 the id of 钢种, whose names it does not share at all.
+    types = [entity(str(EXISTING_GRADE.id), "行车", "Crane")]
+    [request] = resolve_requests([EXISTING_GRADE], types)
+    assert [(c.key, c.nominated) for c in request.candidates] == [
+        (("element", str(EXISTING_GRADE.id)), True)
+    ]
+    decisions = decide(types, [EXISTING_GRADE], {"行车": ("钢种", "same")})
+    [created] = build_proposals(
+        [LADLE_CHUNK], [EXISTING_GRADE], types, NO_RELATIONS, decisions=decisions
+    )
+    assert created.match == ProposedMatch("possible", element_id=EXISTING_GRADE.id, reason="理由")
+    assert created.flags == ["possible_duplicate", "evidence_not_found"]
 
 
 def test_an_existing_local_name_does_not_align_a_type() -> None:
     types = [entity("new:Furnace", "加热炉", "ReheatingFurnace", label_en="Converter")]
     [created] = build_proposals([LADLE_CHUNK], [CONVERTER], types, NO_RELATIONS)
 
-    assert (created.op, created.fields["labelZh"]) == ("create", "加热炉")
+    # Local names take no part in the shortlist: no candidate, nothing to judge.
+    assert resolve_requests([CONVERTER], types) == []
+    assert (created.op, created.fields["labelZh"], created.match) == ("create", "加热炉", None)
 
 
 def test_a_one_character_label_aligns_only_with_the_same_label() -> None:
@@ -980,10 +1142,13 @@ def test_a_one_character_label_aligns_only_with_the_same_label() -> None:
         entity("new:MoltenSteel", "钢水", "MoltenSteel", synonyms=["钢"]),
         entity("new:Furnace", "炉", "Furnace"),
     ]
-    proposals = build_proposals([LADLE_CHUNK], [steel, CONVERTER], types, NO_RELATIONS)
+    decisions = decide(types, [steel, CONVERTER], {"炉": ("转炉", "unsure")})
+    proposals = build_proposals(
+        [LADLE_CHUNK], [steel, CONVERTER], types, NO_RELATIONS, decisions=decisions
+    )
 
-    # 钢 is the whole name of both: one type. A one-character synonym aligns nothing, and a
-    # one-character synonym of an existing type (炉 of 转炉) may mean it: a reviewer decides.
+    # 钢 is the whole main name of both: one type, without asking (G1, any length). The other
+    # pairs are judged: 钢水 is a different concept, 炉 may be 转炉.
     assert [(p.op, p.fields.get("labelZh")) for p in proposals] == [
         ("update", None),
         ("create", "钢水"),
@@ -995,23 +1160,35 @@ def test_a_one_character_label_aligns_only_with_the_same_label() -> None:
     assert "possible_duplicate" in proposals[2].flags
 
 
-def test_the_label_of_a_type_aligned_by_name_becomes_a_synonym() -> None:
+def test_a_type_whose_synonym_is_an_existing_label_is_judged() -> None:
+    # Was `_shares_name` (#33): a synonym that is an existing label aligned the type.
     equipment = KnownElement(
         id=uuid4(), kind="entity_type", local_name="ConverterUnit", label_zh="转炉设备"
     )
     types = [entity("new:Converter", "转炉", "Converter", synonyms=["转炉设备"])]
-    [update] = build_proposals([LADLE_CHUNK], [equipment], types, NO_RELATIONS)
+    for verdict, match in (
+        ("same", ProposedMatch("same", element_id=equipment.id, reason="理由")),
+        ("different", None),
+    ):
+        decisions = decide(types, [equipment], {"转炉": ("转炉设备", verdict)})
+        [created] = build_proposals(
+            [LADLE_CHUNK], [equipment], types, NO_RELATIONS, decisions=decisions
+        )
+        assert (created.op, created.match) == ("create", match)
 
-    assert (update.op, update.target_element_id) == ("update", equipment.id)
-    assert update.fields == {"synonyms": [{"lang": "zh", "text": "转炉"}]}
 
-
-def test_the_label_of_a_type_aligned_by_its_id_becomes_a_synonym() -> None:
+def test_an_existing_id_given_to_a_type_of_another_main_name_is_judged() -> None:
+    # Was alignment by id plus a shared name (#31, #33). 钢号 has 钢种 as a synonym: a candidate
+    # by name, so it is judged as any other (G3 does not cap it).
     types = [entity(str(EXISTING_GRADE.id), "钢号", "Grade", synonyms=["钢种"])]
-    [update] = build_proposals([LADLE_CHUNK], [EXISTING_GRADE], types, NO_RELATIONS)
+    decisions = decide(types, [EXISTING_GRADE], {"钢号": ("钢种", "same")})
+    [created] = build_proposals(
+        [LADLE_CHUNK], [EXISTING_GRADE], types, NO_RELATIONS, decisions=decisions
+    )
 
-    assert (update.op, update.target_element_id) == ("update", EXISTING_GRADE.id)
-    assert update.fields == {"synonyms": [{"lang": "zh", "text": "钢号"}]}
+    assert (created.op, created.fields["labelZh"]) == ("create", "钢号")
+    assert created.match == ProposedMatch("same", element_id=EXISTING_GRADE.id, reason="理由")
+    assert "possible_duplicate" not in created.flags
 
 
 STEELMAKING_CONVERTER = KnownElement(
@@ -1024,21 +1201,32 @@ STEELMAKING_CONVERTER = KnownElement(
     ["new:ElectricFurnace", str(STEELMAKING_CONVERTER.id)],
     ids=["new-ref", "existing-id"],  # stable ids: the uuid differs per xdist worker
 )
-def test_a_shared_synonym_alone_does_not_align_a_type(ref: str) -> None:
+def test_a_shared_synonym_alone_leaves_the_judgement_to_the_model(ref: str) -> None:
+    # Was `_shares_synonym` (#33): a shared synonym (炼钢炉) flagged the type. Now it is a
+    # candidate (0.8): judged different, nothing is flagged; without a judgement, it is (G5).
     types = [entity(ref, "电炉", "ElectricFurnace", synonyms=["炼钢炉"])]
-    [created] = build_proposals([LADLE_CHUNK], [STEELMAKING_CONVERTER], types, NO_RELATIONS)
+    for decisions, flagged in (
+        (decide(types, [STEELMAKING_CONVERTER], {"电炉": ("转炉", "different")}), False),
+        (None, True),
+    ):
+        [created] = build_proposals(
+            [LADLE_CHUNK], [STEELMAKING_CONVERTER], types, NO_RELATIONS, decisions=decisions
+        )
+        assert (created.op, created.fields["labelZh"]) == ("create", "电炉")
+        assert ("possible_duplicate" in created.flags) is flagged
 
-    assert (created.op, created.fields["labelZh"]) == ("create", "电炉")
-    # With the converter's id the flag also follows from the mistaken id.
-    assert "possible_duplicate" in created.flags
 
-
-def test_a_synonym_that_is_an_existing_label_aligns_a_type() -> None:
+def test_a_synonym_that_is_an_existing_label_is_judged_the_same() -> None:
     types = [entity("new:Bof", "氧气转炉", "Bof", synonyms=["转炉"])]
-    [update] = build_proposals([LADLE_CHUNK], [STEELMAKING_CONVERTER], types, NO_RELATIONS)
+    decisions = decide(types, [STEELMAKING_CONVERTER], {"氧气转炉": ("转炉", "same")})
+    [created] = build_proposals(
+        [LADLE_CHUNK], [STEELMAKING_CONVERTER], types, NO_RELATIONS, decisions=decisions
+    )
 
-    assert (update.op, update.target_element_id) == ("update", STEELMAKING_CONVERTER.id)
-    assert update.fields == {"synonyms": [{"lang": "zh", "text": "氧气转炉"}]}
+    assert created.op == "create"
+    assert created.match == ProposedMatch(
+        "same", element_id=STEELMAKING_CONVERTER.id, reason="理由"
+    )
 
 
 def test_an_existing_id_given_to_a_type_of_its_one_character_label_is_kept() -> None:

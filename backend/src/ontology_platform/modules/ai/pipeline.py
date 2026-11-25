@@ -7,7 +7,7 @@ line): nothing reaches the ontology until a reviewer merges the change set.
 """
 
 import base64
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from typing import Any, cast
 from uuid import UUID
 
@@ -15,13 +15,18 @@ from annotated_types import MaxLen
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ontology_platform.errors import AppError
+from ontology_platform.modules.ai.candidates import Names
 from ontology_platform.modules.ai.extraction import (
     ChunkText,
     ExtractionModels,
     Extractor,
     Kind,
     KnownElement,
+    LateCandidate,
+    PendingType,
     Proposal,
+    ProposedMatch,
+    mark_late_candidates,
 )
 from ontology_platform.modules.ai.gateway import AiError, InputFile, ModelGateway
 from ontology_platform.modules.ai.prompts import TRANSCRIBE_INSTRUCTIONS, TranscriptOut
@@ -35,6 +40,7 @@ from ontology_platform.modules.ontology.schemas import (
     EvidenceIn,
     ProposedItem,
 )
+from ontology_platform.modules.ontology.schemas import ProposedMatch as ProposedMatchIn
 
 TITLE = "识别：{filename}"
 QUOTE_MAX = 500
@@ -63,7 +69,85 @@ def known_element(element: ElementCopy) -> KnownElement:
         domain_id=element.domain_id,
         range_id=element.range_id,
         revision=element.revision,
+        parent_id=element.parent_id,
     )
+
+
+def pending_types(
+    candidates: Sequence[ontology.PendingCandidate], known: Sequence[KnownElement]
+) -> list[PendingType]:
+    """The object types other open change sets propose, as the resolve call shows them: with
+    their parent's name and the names of what their change set hangs on them."""
+    labels = {str(element.id): element.label_zh for element in known}
+    for item in candidates:
+        if item.kind == "entity_type" and item.temp_ref:
+            labels[f"{item.change_set_id}/{item.temp_ref}"] = _label(item.fields)
+    members: dict[str, list[str]] = {}
+    for item in candidates:
+        domain = item.fields.domain_ref
+        if item.kind != "entity_type" and domain is not None:
+            members.setdefault(f"{item.change_set_id}/{domain}", []).append(_label(item.fields))
+    out: list[PendingType] = []
+    for item in candidates:
+        if item.kind != "entity_type":
+            continue
+        parent = item.fields.parent_ref
+        own = f"{item.change_set_id}/{item.temp_ref}"
+        out.append(
+            PendingType(
+                item_id=item.item_id,
+                change_set_id=item.change_set_id,
+                change_set_title=item.change_set_title,
+                label_zh=_label(item.fields),
+                label_en=item.fields.label_en,
+                synonyms=tuple(synonym.text for synonym in item.fields.synonyms or []),
+                definition_zh=item.fields.definition_zh,
+                parent_label=(
+                    labels.get(parent) or labels.get(f"{item.change_set_id}/{parent}")
+                    if parent
+                    else None
+                ),
+                members=tuple(members.get(own, [])),
+            )
+        )
+    return out
+
+
+def _label(fields: ElementFields) -> str:
+    return fields.label_zh or fields.label_en or fields.local_name or ""
+
+
+def late_candidates(
+    before: ontology.AlignmentCandidates, now: ontology.AlignmentCandidates
+) -> list[LateCandidate]:
+    """Object types that appeared while the document was being identified (spec 004, 7.3)."""
+    seen_elements = {element.id for element in before.active}
+    seen_items = {item.item_id for item in before.pending}
+    late: list[LateCandidate] = [
+        (
+            ProposedMatch("possible", element_id=element.id),
+            Names.of(element.label_zh, element.label_en, (s.text for s in element.synonyms)),
+            element.label_zh,
+            element.label_en,
+        )
+        for element in now.active
+        if element.kind == "entity_type" and element.id not in seen_elements
+    ]
+    late += [
+        (
+            ProposedMatch("possible", item_id=item.item_id),
+            Names.of(
+                item.fields.label_zh,
+                item.fields.label_en,
+                (s.text for s in item.fields.synonyms or []),
+            ),
+            item.fields.label_zh,
+            item.fields.label_en,
+        )
+        for item in now.pending
+        if item.kind == "entity_type" and item.item_id not in seen_items
+    ]
+    return late
 
 
 def _limits() -> dict[str, int]:
@@ -108,6 +192,17 @@ def to_item(proposal: Proposal, document_id: UUID) -> ProposedItem:
         confidence=proposal.confidence,
         rationale=proposal.rationale,
         flags=list(proposal.flags),
+        match=(
+            ProposedMatchIn(
+                kind=proposal.match.kind,
+                element_id=proposal.match.element_id,
+                item_id=proposal.match.item_id,
+                temp_ref=proposal.match.temp_ref,
+                reason=proposal.match.reason,
+            )
+            if proposal.match is not None
+            else None
+        ),
         evidence=[
             EvidenceIn(
                 document_id=document_id,
@@ -140,6 +235,7 @@ def make_extractor(
             candidates = await ontology.list_alignment_candidates(db, ontology_id)
             known = [known_element(element) for element in candidates.active]
             deleted = [known_element(element) for element in candidates.deleted]
+            pending = pending_types(candidates.pending, known)
 
         async def progress(step: str, done: int, total: int) -> None:
             async with session_factory.begin() as db:
@@ -156,10 +252,10 @@ def make_extractor(
                 known=known,
                 progress=progress,
                 deleted=deleted,
+                pending=pending,
             )
         except AiError as exc:
             raise job_error(exc) from exc
-        items = [to_item(proposal, document_id) for proposal in proposals]
 
         async with session_factory.begin() as db:
             # Lost the job to a newer execution: it rebuilt the chunks this evidence points at.
@@ -169,8 +265,14 @@ def make_extractor(
             if document.change_set_id is not None:
                 return document.change_set_id
             await documents.set_progress(db, document_id, "changeset", 1, 1)
-            if not items:
+            if not proposals:
                 return None
+            # Under the ontology's lock, merges and other change sets wait: what appeared
+            # since the identification started is checked once more, without a model.
+            await ontology.lock_ontology(db, ontology_id)
+            now = await ontology.list_alignment_candidates(db, ontology_id)
+            mark_late_candidates(proposals, late_candidates(candidates, now))
+            items = [to_item(proposal, document_id) for proposal in proposals]
             change_set_id = await ontology.create_change_set(
                 db,
                 ontology_id=ontology_id,

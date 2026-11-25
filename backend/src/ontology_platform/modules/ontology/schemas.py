@@ -23,6 +23,8 @@ from ontology_platform.modules.ontology.models import (
     EvidenceKind,
     ItemFlag,
     Kind,
+    MatchDecision,
+    MatchKind,
     Origin,
 )
 from ontology_platform.schemas import CamelModel
@@ -252,6 +254,17 @@ class EvidenceIn(CamelModel):
         return self
 
 
+class ProposedMatch(CamelModel):
+    """An alignment record proposed with an item (spec 004, 4.3): exactly one of an element,
+    an item of another open change set, or the temp_ref of an object type of this one."""
+
+    kind: MatchKind
+    element_id: UUID | None = None
+    item_id: UUID | None = None
+    temp_ref: Ref | None = None
+    reason: str | None = Field(default=None, max_length=2000)
+
+
 class ProposedItem(CamelModel):
     """One proposed change, as passed to `service.create_change_set`."""
 
@@ -267,6 +280,7 @@ class ProposedItem(CamelModel):
     rationale: str | None = None
     flags: list[str] = Field(default_factory=list)
     evidence: list[EvidenceIn] = Field(default_factory=list)
+    match: ProposedMatch | None = None
 
 
 # ---------- ontology ----------
@@ -411,6 +425,27 @@ class ItemResolution(CamelModel):
     kept_fields: list[str]
 
 
+class ItemMatch(CamelModel):
+    """An item's alignment record (spec 004, 5.5), or one synthesized from a merged item of
+    another change set that recorded this item.
+
+    The other side is an element (`elementId`) or a change item (`itemId`, with its change set).
+    """
+
+    kind: MatchKind
+    element_id: UUID | None
+    item_id: UUID | None
+    change_set_id: UUID | None
+    change_set_title: str | None
+    label: str
+    # The model's reason; None for a record of the write-time recheck.
+    reason: str | None
+    # The reviewer's conclusion, written on this item.
+    decision: MatchDecision | None
+    # The other item's reviewer kept the two apart: merging is not offered.
+    kept_apart: bool
+
+
 class ChangeItem(CamelModel):
     # No defaults on purpose: change set routes drop unset fields so that `proposed`, `edited`
     # and `before` only carry the keys that were given, and every other field must be set.
@@ -434,6 +469,7 @@ class ChangeItem(CamelModel):
     applied_element_id: UUID | None
     evidence: list[Evidence]
     resolution: ItemResolution | None
+    match: ItemMatch | None
 
 
 class DecisionCounts(CamelModel):
@@ -470,6 +506,8 @@ class ItemDecisionPatch(CamelModel):
     decision: Decision | None = None
     edited: ElementFields | None = None
     note: str | None = Field(default=None, max_length=2000)
+    # The reviewer's conclusion about the item's alignment record; null clears it.
+    match_decision: MatchDecision | None = None
 
 
 class BulkDecision(CamelModel):

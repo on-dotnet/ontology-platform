@@ -55,6 +55,128 @@ class PlanElement:
 
 
 @dataclass(frozen=True, slots=True)
+class PlanMatch:
+    """The alignment record of an item (spec 004, 4.3): what it was found to be the same as.
+
+    The other side is an element, or a create item: of this change set, or of another one, in
+    which case the caller fills in the element that item was merged into (None while it is
+    pending) and the decision its reviewer wrote on it.
+    """
+
+    kind: str  # same | possible | name
+    element_id: UUID | None = None
+    item_id: UUID | None = None
+    item_element_id: UUID | None = None
+    other_decision: str | None = None
+    # The other item's labels: a "name" record holds only while the main names agree.
+    item_label_zh: str | None = None
+    item_label_en: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class PlanMatchedBy:
+    """A merged item of another change set whose record points at this item."""
+
+    kind: str
+    element_id: UUID  # what the other item was merged into
+    decision: str | None
+    created_at: datetime
+    label_zh: str | None = None
+    label_en: str | None = None
+
+
+# A record of guardrail G1: the main name of a pending item, which the merge follows.
+NAME = "name"
+
+
+@dataclass(frozen=True, slots=True)
+class RecordedItem:
+    """A create item as alignment records see it (spec 004, 5.3), from the database or the
+    evaluation alike: its own record, its labels, and what became of it."""
+
+    id: UUID
+    change_set_id: UUID
+    match_kind: str | None = None
+    match_element_id: UUID | None = None
+    match_item_id: UUID | None = None
+    match_decision: str | None = None
+    label_zh: str | None = None
+    label_en: str | None = None
+    # Accepted and merged: the element it went to, and when its change set was merged.
+    merged_into: UUID | None = None
+    merged_at: datetime | None = None
+
+
+def _counts_for(other: RecordedItem, item_id: UUID) -> bool:
+    """Whether the other item's reviewer decided about this pair: about its own record of this
+    item, or (without a record of its own) about the record shown from this side."""
+    return other.match_item_id == item_id or other.match_kind is None
+
+
+def link_records(
+    items: Sequence[RecordedItem],
+    others: Mapping[UUID, RecordedItem],
+    reverse: Sequence[RecordedItem],
+) -> tuple[dict[UUID, PlanMatch], dict[UUID, tuple[PlanMatchedBy, ...]]]:
+    """The records of a change set's items as the plan takes them (`PlanItem.match` and
+    `matched_by`). `others` holds the items the records point at, of this change set or
+    another; `reverse` the items of other change sets whose records point at one here."""
+    matches: dict[UUID, PlanMatch] = {}
+    for item in items:
+        if item.match_kind is None:
+            continue
+        other = others.get(item.match_item_id) if item.match_item_id else None
+        same_set = other is not None and other.change_set_id == item.change_set_id
+        matches[item.id] = PlanMatch(
+            item.match_kind,
+            element_id=item.match_element_id,
+            item_id=other.id if other is not None else None,
+            item_element_id=None if other is None or same_set else other.merged_into,
+            other_decision=(
+                other.match_decision if other is not None and _counts_for(other, item.id) else None
+            ),
+            item_label_zh=other.label_zh if other is not None else None,
+            item_label_en=other.label_en if other is not None else None,
+        )
+    matched_by: dict[UUID, list[PlanMatchedBy]] = {}
+    for other in reverse:
+        if (
+            other.match_item_id is None
+            or other.match_kind is None
+            or other.merged_into is None
+            or other.merged_at is None
+        ):
+            continue
+        matched_by.setdefault(other.match_item_id, []).append(
+            PlanMatchedBy(
+                other.match_kind,
+                other.merged_into,
+                other.match_decision,
+                other.merged_at,
+                other.label_zh,
+                other.label_en,
+            )
+        )
+    return matches, {key: tuple(value) for key, value in matched_by.items()}
+
+
+def _same_labels(fields: ElementFields, label_zh: str | None, label_en: str | None) -> bool:
+    proposed_zh, other_zh = name_key(fields.label_zh or ""), name_key(label_zh or "")
+    if proposed_zh and other_zh:
+        return proposed_zh == other_zh
+    proposed_en, other_en = name_key(fields.label_en or ""), name_key(label_en or "")
+    return bool(proposed_en) and proposed_en == other_en
+
+
+def _in_effect(item: "PlanItem", record: PlanMatch) -> bool:
+    """A "name" record holds while both main names agree (no "keep apart": renaming one side
+    undoes it, spec 004, 5.5); the others by their effective conclusion."""
+    if record.kind == NAME:
+        return _same_labels(item.fields, record.item_label_zh, record.item_label_en)
+    return same_concept(record.kind, item.match_decision, record.other_decision)
+
+
+@dataclass(frozen=True, slots=True)
 class PlanItem:
     """A change item with the fields a merge applies (the reviewer's edit over the proposal)."""
 
@@ -68,6 +190,10 @@ class PlanItem:
     target_revision: int | None
     fields: ElementFields
     edited: bool
+    match: PlanMatch | None = None
+    # The reviewer's conclusion about the item's alignment: same | different.
+    match_decision: str | None = None
+    matched_by: tuple[PlanMatchedBy, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -80,6 +206,19 @@ class Resolution:
     local_name: str | None = None
     # into, update: fields (wire names) the element already has a value for, which stays.
     kept_fields: tuple[str, ...] = ()
+    # into: an item of this change set whose new element this one goes into (no element yet).
+    item_id: UUID | None = None
+
+
+def same_concept(kind: str, *decisions: str | None) -> bool:
+    """The effective conclusion of an alignment record (spec 004, 5.3).
+
+    Either side kept apart: not the same. Otherwise either side merged: the same. Without a
+    decision, the record itself: "same" is, "possible" is not.
+    """
+    if "different" in decisions:
+        return False
+    return "same" in decisions or kind == "same"
 
 
 def name_key(text: str) -> str:
@@ -158,38 +297,95 @@ def plan_merge(
         resolution = plan.get(by_ref[ref].id) if ref in by_ref else None
         return resolution.element_id if resolution and resolution.mode == "into" else None
 
+    def active_type(element_id: UUID | None) -> PlanElement | None:
+        element = by_id.get(element_id) if element_id else None
+        ok = element is not None and element.kind == "entity_type" and element.status == "active"
+        return element if ok else None
+
+    by_item = {item.id: item for item in creates}
     # Object types first: relations and properties are the same as existing ones only once
-    # their ends are known.
+    # their ends are known. An object type is an active one of the same main name, or what its
+    # alignment record says it is (spec 004, 5.3).
     for item in creates:
         if item.kind != "entity_type":
             continue
         target = next(
             (e for e in active if e.kind == "entity_type" and same_name(item.fields, e)), None
         )
+        record = item.match
+        if target is None and record is not None and _in_effect(item, record):
+            target = active_type(record.element_id) or active_type(record.item_element_id)
+            other = by_item.get(record.item_id) if record.item_id else None
+            if target is None and other is not None and other.seq < item.seq:
+                found = plan.get(other.id)
+                if found is not None and found.mode == "into":
+                    plan[item.id] = found
+                else:
+                    plan[item.id] = Resolution("into", item_id=other.id)
+                continue
+        if target is None:
+            # The reviewer's decision counts for such a record only when the item has none of
+            # its own: otherwise it is about that one.
+            own = item.match_decision if item.match is None else None
+            reverse = sorted(
+                (
+                    entry
+                    for entry in item.matched_by
+                    if (
+                        _same_labels(item.fields, entry.label_zh, entry.label_en)
+                        if entry.kind == NAME
+                        else same_concept(entry.kind, entry.decision, own)
+                    )
+                    and active_type(entry.element_id) is not None
+                ),
+                key=lambda entry: entry.created_at,
+            )
+            target = active_type(reverse[0].element_id) if reverse else None
         if target is not None:
             into(item, target)
+
+    def node(ref: str | None) -> UUID | None:
+        """What a reference ends up at: an element, or the item of this change set creating it."""
+        found = endpoint(ref)
+        if found is not None or ref is None or ref not in by_ref:
+            return found
+        current = by_ref[ref]
+        while (resolution := plan.get(current.id)) is not None and resolution.item_id:
+            current = by_item[resolution.item_id]
+        return current.id
+
+    # Relations and properties: the same as an active one, or as an earlier one of this change
+    # set once their ends are resolved (two items of one concept each bring their own).
+    seen: dict[tuple[str, UUID, UUID | None, str], UUID] = {}
     for item in creates:
         if item.kind == "entity_type":
             continue
         domain = endpoint(item.fields.domain_ref)
-        if domain is None:
-            continue
         range_ = endpoint(item.fields.range_ref) if item.kind == "relation_type" else None
-        if item.kind == "relation_type" and range_ is None:
+        if domain is not None and (item.kind != "relation_type" or range_ is not None):
+            target = next(
+                (
+                    e
+                    for e in active
+                    if e.kind == item.kind
+                    and e.domain_id == domain
+                    and e.range_id == range_
+                    and same_name(item.fields, e)
+                ),
+                None,
+            )
+            if target is not None:
+                into(item, target)
+                continue
+        domain_node = node(item.fields.domain_ref)
+        range_node = node(item.fields.range_ref) if item.kind == "relation_type" else None
+        if domain_node is None or (item.kind == "relation_type" and range_node is None):
             continue
-        target = next(
-            (
-                e
-                for e in active
-                if e.kind == item.kind
-                and e.domain_id == domain
-                and e.range_id == range_
-                and same_name(item.fields, e)
-            ),
-            None,
-        )
-        if target is not None:
-            into(item, target)
+        key = (item.kind, domain_node, range_node, name_key(item.fields.label_zh or ""))
+        if key[3] and key in seen:
+            plan[item.id] = Resolution("into", item_id=seen[key])
+        else:
+            seen.setdefault(key, item.id)
 
     # Local names: an item keeps the one it asks for when it is free. Every creation reserves
     # its name before any other is chosen, so that a renamed item never takes a name a later
@@ -315,7 +511,8 @@ def plan_token(
             continue
         resolution = plan.get(item.id)
         if resolution is not None and resolution.mode != "create":
-            target = str(resolution.element_id) if resolution.element_id else None
+            target_id = resolution.element_id or resolution.item_id
+            target = str(target_id) if target_id else None
             entries.append(
                 [
                     str(item.id),

@@ -1,4 +1,4 @@
-"""Instructions and structured-output schemas for the staged extraction (spec 001 §4).
+"""Instructions and structured-output schemas for the staged extraction (spec 001 §4, 004 §4).
 
 Prompts are in English (models follow them best) but ask for labels in the source language.
 Every schema field is required (nullable where optional) so that strict structured outputs work.
@@ -132,6 +132,37 @@ class PropertyOut(BaseModel):
 class RelationsOut(BaseModel):
     relations: list[RelationOut]
     properties: list[PropertyOut]
+
+
+RESOLVE_INSTRUCTIONS = """\
+You are an ontology engineer. Each object type below was just identified in a document and is
+listed with its candidates: types it might be the same as (existing ones, types proposed by
+other documents, or types of this document). For each type, decide whether one of its
+candidates is the same concept.
+Same concept means the same kind of thing under another name: an abbreviation, a fuller name,
+a synonym or a name used by another department (for example "car" and "automobile", or
+"invoice" and "bill"). These are not the same concept: a kind of something and that something
+("sports car" and "car"), a whole and its parts ("car" and "engine"), a process and the
+equipment that performs it ("painting" and "paint booth"), a thing and the record of it
+("shipment" and "shipping note"), and two kinds of one thing that share a general name.
+Answer per type, in one line: "same" with the candidate it is; "different" with candidate null
+when no candidate is the same concept; "unsure" with the candidate it may be when the names,
+definitions and context are not enough to tell. Do not guess: answer unsure instead.
+Give the reason in at most 30 characters, in the language of the names.
+"""
+
+
+class DecisionOut(BaseModel):
+    type: str = Field(description="id of the type judged (T1, T2, ...)")
+    candidate: str | None = Field(
+        description='id of the candidate (C1, C2, ...); null when the verdict is "different"'
+    )
+    verdict: Literal["same", "different", "unsure"]
+    reason: str
+
+
+class ResolveOut(BaseModel):
+    decisions: list[DecisionOut]
 
 
 TRANSCRIBE_INSTRUCTIONS = """\

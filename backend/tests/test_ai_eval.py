@@ -5,6 +5,7 @@ import json
 import re
 import tomllib
 from collections.abc import Sequence
+from dataclasses import replace
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -17,16 +18,26 @@ from ontology_platform.modules.ai.eval import (
     check_expected,
     dump_elements,
     evaluate,
+    item_id,
     load_elements,
     merge_counts,
     parse_expected,
+    pending_of,
     run_case,
     score,
 )
-from ontology_platform.modules.ai.extraction import ExtractionModels, KnownElement, Proposal
+from ontology_platform.modules.ai.extraction import (
+    ExtractionModels,
+    KnownElement,
+    Proposal,
+    ProposedMatch,
+    build_proposals,
+)
 from ontology_platform.modules.ai.gateway import AiUnavailableError, InputFile
+from ontology_platform.modules.ai.prompts import RelationsOut
 from ontology_platform.modules.ai.replay import ReplayGateway, ReplayMissError, load_recordings
 from ontology_platform.settings import Settings
+from test_ai_extraction import entity, judge
 
 EXPECTED = {
     "entity_types": [
@@ -197,7 +208,12 @@ def test_merge_counts_report_skipped_items_and_duplicates() -> None:
         "changeset.dependency_skipped": 1,
         "changeset.invalid_item": 1,
     }
-    assert (counts["skipped"], counts["duplicateRelations"]) == (2, 1)
+    # The two 使用 of one change set have the same ends and label: the plan puts the second into
+    # the first (spec 004, PR 3), so no duplicate is left.
+    assert (counts["skipped"], counts["duplicateRelations"]) == (2, 0)
+    [uses] = [e for e in version.elements if e.kind == "relation_type"]
+    version.elements.append(replace(uses, id=uuid4(), local_name="uses2"))
+    assert merge_counts(version, skipped, expected)["duplicateRelations"] == 1
     assert counts["duplicateTypeGroups"] == {
         "total": 2,
         "sameMainName": 1,
@@ -384,6 +400,9 @@ class ModelStandIn:
     ) -> T:
         self.calls += 1
         second = "b.md" in text.splitlines()[0]
+        if purpose == "extract.resolve":
+            # Each type judged a different concept from its candidates.
+            return schema.model_validate(judge()(text).model_dump())
         if purpose == "extract.terms":
             return schema.model_validate({"terms": []})
         shown = _HEAT_ID.findall(text)
@@ -456,12 +475,14 @@ async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> Non
     recorder = ReplayGateway({}, model)
     recorded = await run_case(CASE_FILES, recorder, MODELS)
     assert recorded["relations"]["recall"] == 1.0
-    # Terms, types and relations of each document, and two more: in the same-baseline scenario
-    # b.md is shown no 炉次 of a.md, so its types and relations calls see another input.
-    assert model.calls == 8
+    # Terms, types and relations of each document, the resolve call of b.md (浇次 and 炉次), and
+    # three more: in the same-baseline scenario b.md is shown no 炉次 of a.md, so its types and
+    # relations calls see another input, and its resolve call sees 炉次 as a pending item as well.
+    # The by-flags review of the sequential scenario repeats the same inputs: all replayed.
+    assert model.calls == 10
     assert recorded["usage"]["documents"]["docs/b.md"]["extract.types"]["calls"] == 1
     assert recorded["sameBaseline"]["usage"]["total"] == {
-        "calls": 2,
+        "calls": 3,
         "replayed": 4,
         "seconds": recorded["sameBaseline"]["usage"]["total"]["seconds"],
         "inputTokens": 0,
@@ -473,7 +494,7 @@ async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> Non
 
     assert _scores(replayed) == _scores(recorded)
     assert replayed["usage"]["total"]["calls"] == 0
-    assert replayed["usage"]["total"]["replayed"] == 6
+    assert replayed["usage"]["total"]["replayed"] == 7  # with the resolve call of b.md
 
 
 async def test_the_same_baseline_scenario_merges_what_documents_proposed_twice() -> None:
@@ -488,6 +509,7 @@ async def test_the_same_baseline_scenario_merges_what_documents_proposed_twice()
         "skipped": 0,
         "skippedByCode": {},
         "duplicateRelations": 0,
+        "sameKeptApart": 0,
         "duplicateTypeGroups": {
             "total": 0,
             "sameMainName": 0,
@@ -503,7 +525,7 @@ async def test_the_same_baseline_scenario_can_be_left_out() -> None:
     model = ModelStandIn()
     result = await run_case(CASE_FILES, ReplayGateway({}, model), MODELS, ["sequential"])
     assert "sameBaseline" not in result
-    assert model.calls == 6
+    assert model.calls == 7  # with the resolve call of b.md
     with pytest.raises(ValueError, match="sequential"):
         await run_case(CASE_FILES, ReplayGateway({}, model), MODELS, ["sameBaseline"])
 
@@ -515,7 +537,7 @@ async def test_a_case_without_answers_is_run_but_not_scored_and_can_be_scored_la
     assert result["scored"] is False
     assert result["entityTypes"] == {"predicted": 2}
     assert result["relations"] == {"predicted": 1}
-    assert result["usage"]["total"]["calls"] == 6
+    assert result["usage"]["total"]["calls"] == 7  # with the resolve call of b.md
 
     expected = tomllib.loads(CASE_FILES["eval/expected.toml"].decode())
     parents = {UUID(c): UUID(p) for c, p in result["parents"].items()}
@@ -613,3 +635,71 @@ async def test_replay_only_fails_on_the_first_call_it_has_no_recording_for() -> 
     recordings = load_recordings(text for _, text in recorder.recording_files())
     with pytest.raises(ReplayMissError, match=r"docs/b\.md.*extract\.terms"):
         await run_case(CASE_FILES, ReplayGateway(recordings, None), MODELS)
+
+
+def test_a_type_recorded_as_the_same_as_an_earlier_change_sets_item_goes_into_it() -> None:
+    def created(label: str, local_name: str, **values: Any) -> Proposal:
+        return Proposal(
+            op="create",
+            kind="entity_type",
+            temp_ref=f"new:{local_name}",
+            fields={
+                "localName": local_name,
+                "labelZh": label,
+                "labelEn": None,
+                "definitionZh": None,
+                "synonyms": [],
+                "parentRef": None,
+            },
+            **values,
+        )
+
+    first = [created("领用单", "IssueSlip")]
+    second = [
+        created(
+            "备件领用单",
+            "SparePartsIssue",
+            match=ProposedMatch("same", item_id=item_id("a", 1)),
+        )
+    ]
+    version = WorkingVersion()
+    assert version.merge(first, "a") == []
+    assert version.merge(second, "b") == []
+    [slip] = [e for e in version.elements if e.kind == "entity_type"]
+    assert (slip.label_zh, slip.synonyms) == ("领用单", ("备件领用单",))
+
+
+def test_a_type_of_a_pending_items_main_name_follows_where_that_item_went() -> None:
+    # The first change set's 领用单 was judged the same as 备件领用单 and went into it; the third
+    # one's 领用单 has the main name of that pending item (G1) and has to follow it there.
+    def created(label: str, local_name: str, **values: Any) -> Proposal:
+        return Proposal(
+            op="create",
+            kind="entity_type",
+            temp_ref=f"new:{local_name}",
+            fields={
+                "localName": local_name,
+                "labelZh": label,
+                "labelEn": None,
+                "definitionZh": None,
+                "synonyms": [],
+                "parentRef": None,
+            },
+            **values,
+        )
+
+    issue = [created("备件领用单", "SparePartsIssue")]
+    slip = [created("领用单", "IssueSlip", match=ProposedMatch("same", item_id=item_id("a", 1)))]
+    pending = pending_of("b", slip, [])
+    third = build_proposals(
+        [],
+        [],
+        [entity("new:IssueSlip", "领用单", "IssueSlip")],
+        RelationsOut(relations=[], properties=[]),
+        pending=pending,
+    )
+    assert third[0].match == ProposedMatch("name", item_id=item_id("b", 1))
+    version = WorkingVersion()
+    for label, proposals in (("a", issue), ("b", slip), ("c", third)):
+        assert version.merge(proposals, label) == []
+    assert [e.label_zh for e in version.elements if e.kind == "entity_type"] == ["备件领用单"]

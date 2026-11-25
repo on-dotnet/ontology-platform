@@ -6,7 +6,7 @@ baseline), issue #36 (one-character names of new types) and related cases.
 """
 
 import hashlib
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -29,6 +29,7 @@ from ontology_platform.modules.ai.prompts import (
     Quote,
     RelationOut,
     RelationsOut,
+    ResolveOut,
     TermsOut,
     TypesOut,
 )
@@ -43,14 +44,6 @@ from test_ontology_support import accept_and_merge, add_elements, add_ontology, 
 
 MODELS = ExtractionModels(standard="std", reasoning="deep")
 NO_RELATIONS = RelationsOut(relations=[], properties=[])
-
-
-def delivered_by(change: str) -> pytest.MarkDecorator:
-    """Marks what a later change of spec 004 (section 11) delivers.
-
-    Strict: the change that makes the test pass has to remove the mark.
-    """
-    return pytest.mark.xfail(strict=True, reason=f"spec 004, section 11: {change}")
 
 
 async def add_document(db: AsyncSession, ontology: Ontology, filename: str, text: str) -> UUID:
@@ -80,10 +73,13 @@ def named[T: (RelationOut, PropertyOut)](item: T, local_name: str, quotes: list[
 async def identify(
     app: FastAPI,
     scripts: Sequence[tuple[UUID, list[EntityTypeOut], RelationsOut]],
+    resolver: Callable[[str], ResolveOut] | None = None,
 ) -> list[UUID]:
     """Identify every document before anything is merged: they all see the same baseline.
 
     This is what uploading several documents at once does; the worker takes them one by one.
+    Each sees the change sets of the earlier ones as pending; `resolver` answers the resolve
+    calls (by default: every type is a different concept from its candidates).
     """
     outputs: dict[str, list[BaseModel]] = {
         "extract.terms": [TermsOut(terms=[]) for _ in scripts],
@@ -91,7 +87,7 @@ async def identify(
         "extract.relations": [relations for _, _, relations in scripts],
     }
     session_factory: async_sessionmaker[AsyncSession] = app.state.session_factory
-    extract = make_extractor(session_factory, ScriptedGateway(outputs), MODELS)
+    extract = make_extractor(session_factory, ScriptedGateway(outputs, resolver), MODELS)
     change_sets: list[UUID] = []
     for document_id, _, _ in scripts:
         change_set_id = await extract(document_id, held)
@@ -206,7 +202,6 @@ async def test_documents_naming_one_concept_give_one_type_and_keep_what_hangs_on
 CHUNK = ChunkText(id=uuid4(), seq=0, text="钢水由钢包吊运至精炼炉。每个炉次使用一座转炉冶炼。")
 
 
-@delivered_by("PR 3")
 def test_new_types_with_the_same_one_character_name_become_one_type() -> None:
     types = [
         entity("new:Steel", "钢", "Steel"),
@@ -218,7 +213,6 @@ def test_new_types_with_the_same_one_character_name_become_one_type() -> None:
     assert [p.fields["labelZh"] for p in proposals] == ["钢"]
 
 
-@delivered_by("PR 3")
 @pytest.mark.parametrize("furnace_first", [False, True], ids=["synonym-first", "label-first"])
 def test_a_one_character_name_that_is_another_new_types_synonym_is_a_possible_duplicate(
     furnace_first: bool,

@@ -468,7 +468,41 @@
       "renameDone": "Created as {{localName}}",
       "restored": "“{{name}}” was restored by another change set",
       "restoredDescription": "It is not restored again; only synonyms and a definition it lacks are added.",
-      "kept": "The existing element keeps its {{fields}}."
+      "kept": "The existing element keeps its {{fields}}.",
+      "intoPending": "Will be merged into “{{name}}” of this change set"
+    },
+    "match": {
+      "same": "The model took this for the same concept as {{target}}",
+      "sameNoReason": "Same concept as {{target}}",
+      "name": "Same main name as {{target}}: the merge puts both into one element",
+      "possible": "Possibly a duplicate of {{target}}",
+      "target": {
+        "element": "the existing element “{{label}}”",
+        "sameChangeSet": "“{{label}}” in this change set",
+        "otherChangeSet": "“{{label}}” in change set “{{title}}”"
+      },
+      "decidedSame": "Confirmed as the same concept",
+      "decidedDifferent": "Kept apart: created as proposed when merged",
+      "keptApart": "The other reviewer kept the two apart: created as proposed when merged",
+      "mergeInto": "Merge into it",
+      "keepApart": "Keep apart"
+    },
+    "matchBulk": {
+      "button": "Merge into existing elements ({{count}})",
+      "title": "Merge into existing elements",
+      "description": "These items are the same concepts as existing ones. Once you confirm, they are accepted together, and merging adds them to those elements instead of creating new ones.",
+      "into": " goes into ",
+      "place": " ({{place}})",
+      "places": {
+        "element": "existing element",
+        "sameChangeSet": "this change set",
+        "otherChangeSet": "change set “{{title}}”"
+      },
+      "confirm_one": "Accept this item",
+      "confirm_other": "Accept these {{count}} items",
+      "accepted_one": "{{count}} item accepted; merging adds it to its element",
+      "accepted_other": "{{count}} items accepted; merging adds them to their elements",
+      "failedTitle": "Not accepted"
     },
     "mergedTitle": "Merged into the ontology",
     "mergedDescription": "Changes applied to the working ontology: {{count}}.",
