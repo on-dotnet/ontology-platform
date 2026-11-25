@@ -93,7 +93,7 @@
 
 1. 运行 `./dev.ps1 init-env`，在生成的本机配置文件里填 `OP_OPENAI_API_KEY`。
 2. Docker 主机访问不了 OpenAI 时，填 `OP_AI_PROXY=http://用户:口令@本机IP:端口`，指向本机已有的代理（例如 Clash Verge 的 mixed-port，需开启"允许局域网连接"并设置认证）。代理只作用于模型调用，不影响数据库、依赖下载等其他流量。
-3. `./dev.ps1 ai-check`：发一次最小的结构化调用，只输出"可用 / 不可用"和错误类型，不打印 Key 和代理。
+3. `./dev.ps1 ai-check`：对 `OP_AI_MODEL`、`OP_AI_REASONING_MODEL` 各发一次最小的结构化调用，带上识别时用的推理强度（`OP_AI_EFFORT`、`OP_AI_REASONING_EFFORT`），只输出"可用 / 不可用"、模型、强度和错误类型，不打印 Key 和代理。兼容服务不认 `reasoning.effort` 时，这里会报 HTTP 400，把两个强度设为 `default` 即可。
 4. `./dev.ps1 eval [案例]`：识别评测，见下一节。
 
 未配置 Key 时平台照常运行，资料可以上传，但识别会以 `ai.not_configured` 失败；配置好后在资料页重试即可。
@@ -123,7 +123,7 @@
 - 准确率 = 命中任一期望项（含 `core = false`）的预测数 / 预测总数；召回率 = 找到的 `core = true` 项 / `core = true` 项总数。属性与层级没有分母时（没有预测，或没有 `core` 项）记 `null`，屏幕上显示 `-`；类型与关系沿用以前的口径（没有预测记 0）。没有 `properties`、`hierarchy` 段的案例只报预测数量，类型与关系的分数与以前的算法相同。
 - 答案在调用模型之前先检查：缺字段、两端不是某个类型的第一个名字，都会直接失败并指出是哪一条。
 
-结果还包括证据定位率（提议的引文都能在原文找到的比例），以及每份资料、每个阶段的模型调用次数（含重试；回放命中记 0 次，另计 `replayed`）、耗时和输入输出 token，汇总在 `usage`。改了 `expected.toml` 想重新打分而不重跑，可把结果里的 `elements`、`parents` 和新的期望答案经 `--rescore` 重新计分（见 `ai/eval.py` 开头的说明）；结果顶层是顺序场景，同基线场景用 `sameBaseline.elements` 和 `sameBaseline.parents`。
+结果还包括证据定位率（`groundedShare`：没有 `evidence_not_found` 标记的项的比例）、证据字面核验率（`literalShare`：模型所引的那一句里出现该项名称的比例，关系要两端都出现；按类型、关系、属性分列，规格 004 第 7.2 节），以及每份资料、每个阶段的模型调用次数（含重试；回放命中记 0 次，另计 `replayed`）、耗时和输入、输出、推理 token，汇总在 `usage`；`recorded…` 各项是每次调用录制时的耗时与 token，回放的调用也计入，用来比较两次运行的用量（PR 4 之前的录制没有耗时和推理 token）。录制的键包含推理强度（`OP_AI_EFFORT`、`OP_AI_REASONING_EFFORT`），`models.json` 记下录制时的强度供回放使用。改了 `expected.toml` 想重新打分而不重跑，可把结果里的 `elements`、`parents` 和新的期望答案经 `--rescore` 重新计分（见 `ai/eval.py` 开头的说明）；结果顶层是顺序场景，同基线场景用 `sameBaseline.elements` 和 `sameBaseline.parents`。
 
 **不入库的资料**。脱敏后的真实资料不提交进仓库，放在 `.verification/private-docs/<名称>/`（`.verification/` 已被 Git 忽略），结构同案例包：`docs/` 放资料，`eval/expected.toml` 可以没有。把目录路径当作案例参数：
 
