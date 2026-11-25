@@ -25,6 +25,12 @@ x-api-env: &api-env
   OP_DOCUMENTS_DIR: /data/documents
   # single (default): reviewers merge their own changes; separate: another reviewer decides.
   OP_REVIEW_MODE: ${OP_REVIEW_MODE:-}
+  # External data sources (M3). Empty values mean the defaults in settings.py.
+  # Earlier OP_SECRET_KEY values while credentials are re-encrypted (key rotation).
+  OP_SECRET_KEY_PREVIOUS: ${OP_SECRET_KEY_PREVIOUS:-}
+  OP_QUERY_TIMEOUT_SECONDS: ${OP_QUERY_TIMEOUT_SECONDS:-}
+  OP_QUERY_MAX_ROWS: ${OP_QUERY_MAX_ROWS:-}
+  OP_MCP_ALLOWED_ORIGINS: ${OP_MCP_ALLOWED_ORIGINS:-}
 
 services:
   postgres:

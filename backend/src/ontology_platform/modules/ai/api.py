@@ -9,10 +9,10 @@ from fastapi import APIRouter, Depends, Query, Request
 
 from ontology_platform.db import DbSession
 from ontology_platform.errors import problem_responses
-from ontology_platform.modules.ai import assistant, schemas
+from ontology_platform.modules.ai import assistant, binding_suggest, schemas
 from ontology_platform.modules.ai.gateway import ModelGateway, OpenAIGateway
 from ontology_platform.modules.ai.schemas import AiStatus
-from ontology_platform.modules.identity.api import CurrentUser, require_role
+from ontology_platform.modules.identity.api import CurrentUser, client_ip, require_role
 from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.identity.service import Principal
 from ontology_platform.settings import Settings, get_settings
@@ -98,3 +98,50 @@ async def list_assistant_requests(
 ) -> list[schemas.AssistantRequest]:
     """The user's latest requests about the ontology, newest first."""
     return await assistant.list_requests(db, id, user_id=user.id, limit=limit)
+
+
+# ---------- AI binding suggestions (spec 003 §8) ----------
+# Editors and above: suggestions read the catalog, which viewers may not browse.
+
+
+@router.post(
+    "/ontologies/{id}/binding-suggestions",
+    status_code=202,
+    responses=problem_responses(401, 403, 404, 409, 422),
+)
+async def create_binding_suggestion(
+    id: UUID,
+    body: schemas.BindingSuggestionCreate,
+    request: Request,
+    user: Creator,
+    db: DbSession,
+) -> schemas.BindingSuggestion:
+    """Ask the AI to suggest bindings to the tables of a data source. The result comes from a
+    background job: a change set waiting for review; poll the request for it."""
+    return await binding_suggest.create_request(
+        db, id, body, user_id=user.id, ip=client_ip(request)
+    )
+
+
+@router.get("/binding-suggestions/{id}", responses=problem_responses(401, 403, 404, 422))
+async def get_binding_suggestion(
+    id: UUID,
+    user: Creator,
+    db: DbSession,
+) -> schemas.BindingSuggestion:
+    """One of the user's own requests (404 `binding_suggestion.not_found` for others')."""
+    return await binding_suggest.get_request(db, id, user_id=user.id)
+
+
+@router.get(
+    "/ontologies/{id}/binding-suggestions",
+    responses=problem_responses(401, 403, 422),
+)
+async def list_binding_suggestions(
+    id: UUID,
+    user: Creator,
+    db: DbSession,
+    limit: Annotated[int, Query(ge=1, le=50)] = 20,
+) -> list[schemas.BindingSuggestion]:
+    """The user's latest requests about the ontology, newest first."""
+    return await binding_suggest.list_requests(db, id, user_id=user.id, limit=limit)

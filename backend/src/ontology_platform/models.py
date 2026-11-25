@@ -6,6 +6,7 @@ one by one. Add new modules here.
 
 from ontology_platform.modules.ai import models as ai_models
 from ontology_platform.modules.audit import models as audit_models
+from ontology_platform.modules.connectors import models as connectors_models
 from ontology_platform.modules.documents import models as documents_models
 from ontology_platform.modules.identity import models as identity_models
 from ontology_platform.modules.jobs import models as jobs_models
@@ -14,6 +15,7 @@ from ontology_platform.modules.ontology import models as ontology_models
 __all__ = [
     "ai_models",
     "audit_models",
+    "connectors_models",
     "documents_models",
     "identity_models",
     "jobs_models",

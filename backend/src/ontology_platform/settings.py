@@ -52,6 +52,25 @@ class Settings(BaseSettings):
     # Who may decide a change set (M2): in `separate` mode nobody reviews their own.
     review_mode: Literal["single", "separate"] = "single"
 
+    # External data sources (M3, spec 003 section 5).
+    # Earlier values of OP_SECRET_KEY, comma separated, while credentials are re-encrypted.
+    secret_key_previous: SecretStr | None = None
+    query_timeout_seconds: int = Field(default=15, ge=1, le=120)
+    query_max_rows: int = Field(default=1000, ge=1, le=100_000)
+    # Browser origins allowed to call /mcp, comma separated; empty means the platform's own.
+    mcp_allowed_origins: str = ""
+
+    @property
+    def previous_secret_keys(self) -> list[SecretStr]:
+        if self.secret_key_previous is None:
+            return []
+        values = self.secret_key_previous.get_secret_value().split(",")
+        return [SecretStr(value.strip()) for value in values if value.strip()]
+
+    @property
+    def mcp_origins(self) -> list[str]:
+        return [origin.strip() for origin in self.mcp_allowed_origins.split(",") if origin.strip()]
+
     @property
     def ai_configured(self) -> bool:
         return self.openai_api_key is not None and bool(self.openai_api_key.get_secret_value())
