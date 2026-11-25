@@ -91,6 +91,38 @@
 1. 运行 `./dev.ps1 init-env`，在生成的本机配置文件里填 `OP_OPENAI_API_KEY`。
 2. Docker 主机访问不了 OpenAI 时，填 `OP_AI_PROXY=http://用户:口令@本机IP:端口`，指向本机已有的代理（例如 Clash Verge 的 mixed-port，需开启"允许局域网连接"并设置认证）。代理只作用于模型调用，不影响数据库、依赖下载等其他流量。
 3. `./dev.ps1 ai-check`：发一次最小的结构化调用，只输出"可用 / 不可用"和错误类型，不打印 Key 和代理。
-4. `./dev.ps1 eval [案例]`：用 `samples/<案例>/docs` 的资料跑一遍真实识别，按 `samples/<案例>/eval/expected.toml` 打分（对象类型与关系的准确率和召回率、证据定位率），结果存到 `.verification/eval/`。会消耗模型额度，不在门禁里运行。
+4. `./dev.ps1 eval [案例]`：识别评测，见下一节。
 
 未配置 Key 时平台照常运行，资料可以上传，但识别会以 `ai.not_configured` 失败；配置好后在资料页重试即可。
+
+## 识别评测
+
+`./dev.ps1 eval [案例]` 用 `samples/<案例>/docs` 的资料按顺序跑一遍识别（每份资料的提议全部接受，后面的资料与前面的结果对齐），按 `samples/<案例>/eval/expected.toml` 打分，结果存到 `.verification/eval/<案例>-<时间>.json`。不在门禁里运行。
+
+**录制与回放**。每次模型调用按"用途、模型、提示词、输入文字、输出结构的 JSON Schema、附件"的哈希录制，存在 `.verification/eval/recordings/<案例>/<哈希>.json`，另有 `models.json` 记下最近一次有新录制的运行用的模型。录制文件里是哈希、用途、模型名、资料名、模型的结构化输出和调用次数、token 数，没有 Key 和代理地址。哈希不含服务地址：同一个模型名换了服务商，回放的仍是原来的输出。
+
+- 默认：有录制的调用直接回放，没有的才调用模型并录下来。只为输入变了的调用付费：改了某个阶段的提示词，付这个阶段和输入受它影响的后续调用；改了确定性的后处理（如 `build_proposals`），第一份资料和各资料的 terms 阶段不受影响，从第二份资料起 types、relations 阶段的提示词里有前面资料接受的元素，结果变了就要重新调用。资料、分块和接受后元素的 id 由名称派生，同样的输入每次得到同样的提示词。
+- `-Replay`：只回放。任何一次调用没有录制就失败，并说明是哪份资料、哪个阶段。容器拿不到 Key 和代理，模型用 `models.json` 里记的，所以在没有本机私有配置的 worktree 里也能跑。
+- `-Recordings <目录>`：换一个录制目录。在别的 worktree 里用主检出目录的录制：`./dev.ps1 eval steel -Replay -Recordings <主检出目录>/.verification/eval/recordings/steel`。
+- 想全部重新调用模型，换一个空目录或删掉录制目录。录制不会自动清理，过时的只是不再命中。
+
+**期望答案的格式**（TOML，规范化规则：去空白、全角转半角、小写）：
+
+- `entity_types = [{ names = [...], core = true|false }]`：模型给出的中文名、英文名、本地名或任一同义词与 `names` 中任一项相同即命中。
+- `relations = [{ domain, range, core }]`：两端用对象类型 `names` 的第一个名字，不计较方向和名称。
+- `properties = [{ domain, names, core }]`（可选）：`domain` 用对象类型 `names` 的第一个名字；属性所属类型是这一项、且名称与 `names` 任一项相同才命中。
+- `hierarchy = [{ child, parent, core }]`（可选）：子类与父类都用对象类型的第一个名字，方向要对。
+- 准确率 = 命中任一期望项（含 `core = false`）的预测数 / 预测总数；召回率 = 找到的 `core = true` 项 / `core = true` 项总数。属性与层级没有分母时（没有预测，或没有 `core` 项）记 `null`，屏幕上显示 `-`；类型与关系沿用以前的口径（没有预测记 0）。没有 `properties`、`hierarchy` 段的案例只报预测数量，类型与关系的分数与以前的算法相同。
+- 答案在调用模型之前先检查：缺字段、两端不是某个类型的第一个名字，都会直接失败并指出是哪一条。
+
+结果还包括证据定位率（提议的引文都能在原文找到的比例），以及每份资料、每个阶段的模型调用次数（含重试；回放命中记 0 次，另计 `replayed`）、耗时和输入输出 token，汇总在 `usage`。改了 `expected.toml` 想重新打分而不重跑，可把结果里的 `elements`、`parents` 和新的期望答案经 `--rescore` 重新计分（见 `ai/eval.py` 开头的说明）。
+
+**不入库的资料**。脱敏后的真实资料不提交进仓库，放在 `.verification/private-docs/<名称>/`（`.verification/` 已被 Git 忽略），结构同案例包：`docs/` 放资料，`eval/expected.toml` 可以没有。把目录路径当作案例参数：
+
+```powershell
+./dev.ps1 eval .verification/private-docs/<名称>
+```
+
+参数里带 `/` 或 `\` 就按目录处理，结果存为 `.verification/eval/dir-<名称>-<时间>.json`，录制存在 `.verification/eval/recordings/dir-<名称>/`，都不出 `.verification/`。没有 `eval/expected.toml` 时只做识别：输出识别出的元素、各阶段耗时与 token，并提示"没有答案，未打分"；答案后补上以后，加 `-Replay` 再跑一次即可打分，不再调用模型。注意：评测时资料内容会发给配置的模型服务（经 `OP_AI_BASE_URL`、`OP_AI_PROXY` 配置的地址），资料要先脱敏，且只能交给允许接收它的服务。
+
+案例包的规则（答案先写、留出集只用来测量）见 [samples/README.md](../samples/README.md)。
