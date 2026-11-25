@@ -11,6 +11,7 @@ export type Decision = ChangeItem['decision'];
 export type ChangeOp = ChangeItem['op'];
 export type ChangeSetSource = ChangeSetDetail['source'];
 export type ItemFlag = ChangeItem['flags'][number];
+export type ItemResolution = NonNullable<ChangeItem['resolution']>;
 export type ItemPatch = components['schemas']['ItemDecisionPatch'];
 export type MergeResult = components['schemas']['MergeResult'];
 export type SkipCode = MergeResult['skipped'][number]['code'];
@@ -43,8 +44,17 @@ export async function decideItems(changeSetId: string, itemIds: string[], decisi
   await unwrap(api.POST('/api/change-sets/{id}/decisions', { params: { path: { id: changeSetId } }, body: { itemIds, decision } }));
 }
 
-export function mergeChangeSet(changeSetId: string): Promise<MergeResult> {
-  return unwrap(api.POST('/api/change-sets/{id}/merge', { params: { path: { id: changeSetId } } }));
+/**
+ * Merges with the token of the detail the reviewer was shown. If the working version changed so
+ * that the merge would now do something else, the server refuses it (409 `changeset.resolution_changed`).
+ */
+export function mergeChangeSet(changeSetId: string, resolutionToken: string): Promise<MergeResult> {
+  return unwrap(api.POST('/api/change-sets/{id}/merge', { params: { path: { id: changeSetId } }, body: { resolutionToken } }));
+}
+
+/** A merge would not add the item as proposed: it goes into an existing element or is renamed. */
+export function mergesDifferently(item: ChangeItem): boolean {
+  return item.op === 'create' && item.resolution !== null && item.resolution.mode !== 'create';
 }
 
 /** Rejects the whole change set; its creator may do so to withdraw it, whatever their role. */
@@ -92,9 +102,18 @@ export function confidenceTier(confidence: number): ConfidenceTier {
   return 'low';
 }
 
-/** Pending items safe to accept in bulk: confidence ≥ 0.8 and no flags. */
+/**
+ * Pending items safe to accept in bulk: confidence ≥ 0.8 and no flags. Items a merge would not add as
+ * proposed (into an existing element, renamed) and restores are decided one by one (spec 004, 5.4).
+ */
 export function highConfidencePending(items: readonly ChangeItem[]): ChangeItem[] {
   return items.filter(
-    (item) => item.decision === 'pending' && item.confidence !== null && item.confidence >= HIGH_CONFIDENCE && item.flags.length === 0,
+    (item) =>
+      item.decision === 'pending' &&
+      item.confidence !== null &&
+      item.confidence >= HIGH_CONFIDENCE &&
+      item.flags.length === 0 &&
+      !mergesDifferently(item) &&
+      item.op !== 'restore',
   );
 }

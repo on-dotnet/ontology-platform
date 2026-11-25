@@ -54,6 +54,7 @@ ITEM_FIELDS = {
     "decidedAt",
     "appliedElementId",
     "evidence",
+    "resolution",
 }
 
 
@@ -755,18 +756,27 @@ async def test_merge_skips_stale_updates(client: AsyncClient, db: AsyncSession) 
         steel,
         [proposal("update", "entity_type", target=heat.id, label_en="Heat")],
     )
+    third = await open_change_set(
+        db,
+        steel,
+        [proposal("update", "entity_type", target=heat.id, label_en="Melt")],
+    )
     await sign_in(client, db, Role.REVIEWER)
     assert await accept_and_merge(client, second) == {"applied": 1, "skipped": []}
-    [item] = await change_set_items(client, first)
+    [item] = await change_set_items(client, third)
 
-    result = await accept_and_merge(client, first)
+    replacing = await accept_and_merge(client, third)
+    adding = await accept_and_merge(client, first)
 
+    # Replacing a value depends on what the value was: the element changed since, so skipped.
     stale = {"itemId": item["id"], "code": "changeset.stale_target"}
-    assert result == {"applied": 0, "skipped": [stale]}
+    assert replacing == {"applied": 0, "skipped": [stale]}
+    # Filling in a definition where there is none does not (spec 004, 5.6).
+    assert adding == {"applied": 1, "skipped": []}
     current = (await elements_by_name(db, steel))["Heat"]
-    assert current.revision == 2
+    assert current.revision == 3
     assert current.label_en == "Heat"
-    assert current.definition_zh is None
+    assert current.definition_zh == "一次冶炼。"
 
 
 async def test_merge_skips_invalid_items(client: AsyncClient, db: AsyncSession) -> None:
@@ -795,11 +805,16 @@ async def test_merge_skips_invalid_items(client: AsyncClient, db: AsyncSession) 
 
     result = await accept_and_merge(client, change_set_id)
 
+    # 重复的炉次 is not 炉次, so it is created; Heat being taken, under another local name
+    # (spec 004, 5.2). The others stay invalid.
+    invalid = [ids[0], ids[2], ids[3], ids[4]]
     assert result == {
-        "applied": 1,
-        "skipped": [{"itemId": item_id, "code": "changeset.invalid_item"} for item_id in ids[:5]],
+        "applied": 2,
+        "skipped": [{"itemId": item_id, "code": "changeset.invalid_item"} for item_id in invalid],
     }
-    assert set(await elements_by_name(db, steel)) == {"Heat", "Gone", "Ladle"}
+    elements = await elements_by_name(db, steel)
+    assert set(elements) == {"Heat", "Heat2", "Gone", "Ladle"}
+    assert elements["Heat2"].label_zh == "重复的炉次"
 
 
 async def test_merge_rejects_cycles_in_the_type_hierarchy(
@@ -907,3 +922,347 @@ async def test_merge_update_merges_synonyms(client: AsyncClient, db: AsyncSessio
     assert second["before"]["datatype"] == "decimal"
     merged = await change_set_items(client, change_set_id)
     assert [item["appliedElementId"] for item in merged] == [str(ladle.id), str(weight.id)]
+
+
+# ---------- merging what the extraction proposed against an older baseline (spec 004) ----------
+
+
+def bof(local_name: str = "Bof", **fields: Any) -> ProposedItem:
+    return proposal(
+        "create",
+        "entity_type",
+        temp_ref="new:Bof",
+        local_name=local_name,
+        label_zh="转炉",
+        **fields,
+    )
+
+
+async def post_merge(client: AsyncClient, change_set_id: UUID, token: str | None) -> Response:
+    return await client.post(
+        f"/api/change-sets/{change_set_id}/merge",
+        json=None if token is None else {"resolutionToken": token},
+        headers=csrf_headers(client),
+    )
+
+
+async def detail_of(client: AsyncClient, change_set_id: UUID) -> dict[str, Any]:
+    response = await client.get(f"/api/change-sets/{change_set_id}")
+    assert response.status_code == 200
+    body: dict[str, Any] = response.json()
+    return body
+
+
+def resolution(mode: str, **values: Any) -> dict[str, Any]:
+    empty: dict[str, Any] = {
+        "elementId": None,
+        "elementLabel": None,
+        "localName": None,
+        "keptFields": [],
+    }
+    return {"mode": mode, **empty, **values}
+
+
+async def test_the_detail_says_what_a_merge_will_do_and_the_merge_does_it(
+    client: AsyncClient,
+    db: AsyncSession,
+) -> None:
+    steel = await add_ontology(db)
+    equipment = element(steel, "entity_type", "Equipment", "设备")
+    converter = element(
+        steel,
+        "entity_type",
+        "Converter",
+        "转炉",
+        definition_zh="炼钢设备。",
+        synonyms=[{"lang": "zh", "text": "氧气转炉"}],
+    )
+    ladle = element(steel, "entity_type", "Ladle", "钢包")
+    await add_elements(db, equipment, converter, ladle)
+    items = [
+        bof(
+            label_en="Converter",
+            definition_zh="吹氧炼钢的炉子。",
+            # 转炉 is its label and 氧气 转炉 one of its synonyms, spaced differently.
+            synonyms=[
+                {"lang": "en", "text": "BOF"},
+                {"lang": "zh", "text": "转炉"},
+                {"lang": "zh", "text": "氧气 转炉"},
+            ],
+            parent_ref=str(equipment.id),
+        ),
+        # Another concept that asks for a local name already in use.
+        proposal("create", "entity_type", local_name="Converter", label_zh="变流器"),
+        proposal(
+            "create",
+            "relation_type",
+            local_name="tapsInto",
+            label_zh="出钢至",
+            domain_ref="new:Bof",
+            range_ref=str(ladle.id),
+        ),
+        proposal(
+            "create",
+            "property",
+            local_name="capacity",
+            label_zh="公称容量",
+            domain_ref="new:Bof",
+            datatype="decimal",
+            unit="t",
+        ),
+    ]
+    change_set_id = await open_change_set(db, steel, items)
+    await sign_in(client, db, Role.REVIEWER)
+
+    shown = await detail_of(client, change_set_id)
+    result = await accept_and_merge(client, change_set_id)
+
+    assert [item["resolution"] for item in shown["items"]] == [
+        resolution(
+            "into",
+            elementId=str(converter.id),
+            elementLabel="转炉",
+            keptFields=["definitionZh"],
+        ),
+        resolution("rename", localName="Converter2"),
+        resolution("create"),
+        resolution("create"),
+    ]
+    assert result == {"applied": 4, "skipped": []}
+    elements = await elements_by_name(db, steel)
+    assert set(elements) == {
+        "Equipment",
+        "Converter",
+        "Ladle",
+        "Converter2",
+        "tapsInto",
+        "capacity",
+    }
+    merged_into = elements["Converter"]
+    # Added: the synonym that is none of its names, the missing English label and parent.
+    # Kept: its own definition.
+    assert merged_into.synonyms == [
+        {"lang": "zh", "text": "氧气转炉"},
+        {"lang": "en", "text": "BOF"},
+    ]
+    assert (merged_into.label_en, merged_into.parent_id) == ("Converter", equipment.id)
+    assert merged_into.definition_zh == "炼钢设备。"
+    assert merged_into.revision == 2
+    assert elements["Converter2"].label_zh == "变流器"
+    # What referred to the proposed type refers to the element it went into.
+    assert elements["tapsInto"].domain_id == converter.id
+    assert elements["capacity"].domain_id == converter.id
+    after = await detail_of(client, change_set_id)
+    assert [item["appliedElementId"] for item in after["items"]][:2] == [
+        str(converter.id),
+        str(elements["Converter2"].id),
+    ]
+    # What happened, read back from the result; which fields were kept is not recorded.
+    assert [item["resolution"] for item in after["items"]] == [
+        resolution("into", elementId=str(converter.id), elementLabel="转炉"),
+        resolution("rename", localName="Converter2"),
+        resolution("create"),
+        resolution("create"),
+    ]
+
+
+async def test_a_merge_that_would_not_do_what_was_shown_changes_nothing(
+    client: AsyncClient,
+    db: AsyncSession,
+) -> None:
+    steel = await add_ontology(db)
+    first = await open_change_set(db, steel, [bof("Converter")])
+    second = await open_change_set(db, steel, [bof("BofConverter")])
+    await sign_in(client, db, Role.REVIEWER)
+    [item] = await change_set_items(client, second)
+    assert (await decide(client, second, [item["id"]], "accepted")).status_code == 200
+    # The reviewer of the second change set sees a plain creation, then the first is merged.
+    shown = await detail_of(client, second)
+    assert await accept_and_merge(client, first) == {"applied": 1, "skipped": []}
+
+    with_old_token = await post_merge(client, second, shown["resolutionToken"])
+    without_token = await post_merge(client, second, None)
+
+    for response in (with_old_token, without_token):
+        assert response.status_code == 409
+        assert response.headers["content-type"] == PROBLEM_JSON
+        assert response.json()["code"] == "changeset.resolution_changed"
+    again = await detail_of(client, second)
+    assert again["status"] == "open"
+    assert again["resolutionToken"] != shown["resolutionToken"]
+    assert again["items"][0]["resolution"]["mode"] == "into"
+    assert set(await elements_by_name(db, steel)) == {"Converter"}
+    merged = await post_merge(client, second, again["resolutionToken"])
+    assert merged.json() == {"applied": 1, "skipped": []}
+    assert set(await elements_by_name(db, steel)) == {"Converter"}
+
+
+async def test_a_target_that_changed_since_it_was_shown_refuses_the_merge(
+    client: AsyncClient,
+    db: AsyncSession,
+) -> None:
+    steel = await add_ontology(db)
+    converter = element(steel, "entity_type", "Converter", "转炉")
+    await add_elements(db, converter)
+    into = await open_change_set(db, steel, [bof(definition_zh="吹氧炼钢的炉子。")])
+    other = await open_change_set(
+        db,
+        steel,
+        [proposal("update", "entity_type", target=converter.id, definition_zh="炼钢设备。")],
+    )
+    await sign_in(client, db, Role.REVIEWER)
+    [item] = await change_set_items(client, into)
+    assert (await decide(client, into, [item["id"]], "accepted")).status_code == 200
+    # Shown: the definition will be added. By the merge the element has one, which it keeps.
+    shown = await detail_of(client, into)
+    assert shown["items"][0]["resolution"]["keptFields"] == []
+    assert await accept_and_merge(client, other) == {"applied": 1, "skipped": []}
+
+    refused = await post_merge(client, into, shown["resolutionToken"])
+
+    assert refused.status_code == 409
+    assert refused.json()["code"] == "changeset.resolution_changed"
+    again = await detail_of(client, into)
+    assert again["items"][0]["resolution"]["keptFields"] == ["definitionZh"]
+    assert (await post_merge(client, into, again["resolutionToken"])).status_code == 200
+    assert (await elements_by_name(db, steel))["Converter"].definition_zh == "炼钢设备。"
+
+
+async def test_an_update_the_reviewer_edited_keeps_the_optimistic_lock(
+    client: AsyncClient,
+    db: AsyncSession,
+) -> None:
+    steel = await add_ontology(db)
+    heat = element(steel, "entity_type", "Heat", "炉次")
+    await add_elements(db, heat)
+    synonyms = [{"lang": "zh", "text": "熔炼号"}]
+    edited = await open_change_set(
+        db, steel, [proposal("update", "entity_type", target=heat.id, synonyms=synonyms)]
+    )
+    other = await open_change_set(
+        db,
+        steel,
+        [proposal("update", "entity_type", target=heat.id, definition_zh="一次冶炼。")],
+    )
+    await sign_in(client, db, Role.REVIEWER)
+    [item] = await change_set_items(client, edited)
+    body = {"edited": {"synonyms": [{"lang": "zh", "text": "炉号"}]}}
+    assert (await patch_item(client, edited, item["id"], body)).status_code == 200
+    assert await accept_and_merge(client, other) == {"applied": 1, "skipped": []}
+
+    result = await accept_and_merge(client, edited)
+
+    # What the reviewer wrote was written against the element as it was then.
+    stale = {"itemId": item["id"], "code": "changeset.stale_target"}
+    assert result == {"applied": 0, "skipped": [stale]}
+
+
+async def test_restoring_what_another_change_set_restored_adds_what_is_left(
+    client: AsyncClient,
+    db: AsyncSession,
+) -> None:
+    steel = await add_ontology(db)
+    gone = element(steel, "entity_type", "Converter", "转炉", status="deprecated")
+    await add_elements(db, gone)
+    gone_id = gone.id
+
+    def restore(synonym: str) -> ProposedItem:
+        return proposal(
+            "restore", "entity_type", target=gone_id, synonyms=[{"lang": "zh", "text": synonym}]
+        )
+
+    first = await open_change_set(db, steel, [restore("氧气转炉")])
+    second = await open_change_set(db, steel, [restore("顶吹转炉")])
+    await sign_in(client, db, Role.REVIEWER)
+
+    assert await accept_and_merge(client, first) == {"applied": 1, "skipped": []}
+    shown = await detail_of(client, second)
+    result = await accept_and_merge(client, second)
+
+    assert shown["items"][0]["resolution"]["mode"] == "update"
+    assert result == {"applied": 1, "skipped": []}
+    restored = (await elements_by_name(db, steel))["Converter"]
+    assert restored.status == "active"
+    assert [synonym["text"] for synonym in restored.synonyms] == ["氧气转炉", "顶吹转炉"]
+
+
+async def test_only_what_the_extraction_proposed_is_resolved(
+    client: AsyncClient,
+    db: AsyncSession,
+) -> None:
+    steel = await add_ontology(db)
+    converter = element(steel, "entity_type", "Converter", "转炉")
+    await add_elements(db, converter)
+    change_set_id = await service.create_change_set(
+        db,
+        ontology_id=steel.id,
+        title="导入",
+        source="import",
+        document_id=None,
+        created_by=None,
+        items=[bof("Converter")],
+    )
+    await db.commit()
+    await sign_in(client, db, Role.REVIEWER)
+
+    shown = await detail_of(client, change_set_id)
+    [item] = shown["items"]
+    assert (await decide(client, change_set_id, [item["id"]], "accepted")).status_code == 200
+    merged = await post_merge(client, change_set_id, None)
+
+    # An import says exactly what it creates: a clash is an invalid item, as it always was.
+    assert item["resolution"] is None
+    invalid = {"itemId": item["id"], "code": "changeset.invalid_item"}
+    assert merged.json() == {"applied": 0, "skipped": [invalid]}
+
+
+async def test_a_merge_with_nothing_new_to_show_needs_no_token(
+    client: AsyncClient,
+    db: AsyncSession,
+) -> None:
+    steel = await add_ontology(db)
+    heat = element(steel, "entity_type", "Heat", "炉次")
+    await add_elements(db, heat)
+    synonyms = [{"lang": "zh", "text": "熔炼号"}]
+    items = [
+        bof(),
+        proposal("update", "entity_type", target=heat.id, synonyms=synonyms),
+    ]
+    change_set_id = await open_change_set(db, steel, items)
+    await sign_in(client, db, Role.REVIEWER)
+    ids = [item["id"] for item in await change_set_items(client, change_set_id)]
+    assert (await decide(client, change_set_id, ids, "accepted")).status_code == 200
+
+    wrong = await post_merge(client, change_set_id, "not-the-token")
+    merged = await post_merge(client, change_set_id, None)
+
+    # A token that does not match is refused even where none is needed: it stands for
+    # something the reviewer was shown that is not so.
+    assert wrong.status_code == 409
+    assert wrong.json()["code"] == "changeset.resolution_changed"
+    # Callers that predate the token keep working while a merge does what it always did.
+    assert merged.status_code == 200
+    assert merged.json() == {"applied": 2, "skipped": []}
+
+
+async def test_restores_without_fields_of_one_type_are_both_applied(
+    client: AsyncClient,
+    db: AsyncSession,
+) -> None:
+    steel = await add_ontology(db)
+    gone = element(steel, "entity_type", "Converter", "转炉", status="deprecated")
+    await add_elements(db, gone)
+    restore = proposal("restore", "entity_type", target=gone.id)
+    first = await open_change_set(db, steel, [restore])
+    second = await open_change_set(db, steel, [restore])
+    await sign_in(client, db, Role.REVIEWER)
+
+    assert await accept_and_merge(client, first) == {"applied": 1, "skipped": []}
+    shown = await detail_of(client, second)
+    result = await accept_and_merge(client, second)
+
+    assert shown["items"][0]["resolution"]["mode"] == "update"
+    assert result == {"applied": 1, "skipped": []}
+    restored = (await elements_by_name(db, steel))["Converter"]
+    # Nothing to add: the second restore leaves the element as the first one made it.
+    assert (restored.status, restored.revision) == ("active", 2)

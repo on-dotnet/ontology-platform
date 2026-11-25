@@ -138,6 +138,7 @@ export function itemFixture(overrides: Partial<ChangeItem> = {}): ChangeItem {
     decidedAt: null,
     appliedElementId: null,
     evidence: [],
+    resolution: null,
     ...overrides,
   };
 }
@@ -155,6 +156,7 @@ export function changeSetFixture(items: ChangeItem[], overrides: Partial<ChangeS
     createdAt: CREATED_AT,
     mergedAt: null,
     items,
+    resolutionToken: 'token-1',
     ...overrides,
   };
 }

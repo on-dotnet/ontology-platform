@@ -60,6 +60,13 @@ type ChangeItem = {
   note: string | null; decidedBy: string | null; decidedAt: string | null;
   appliedElementId: string | null;
   evidence: Evidence[];
+  resolution: ItemResolution | null;   // 规格 004 第 5.4 节：AI 识别的变更集里，合并时会怎样（合并后为实际结果）
+};
+type ItemResolution = {
+  mode: 'create' | 'into' | 'rename' | 'update';
+  elementId: string | null; elementLabel: string | null;   // into、update：并入或追加到的元素
+  localName: string | null;                                // rename：合并时使用的局部名
+  keptFields: string[];                                    // 目标已有值、合并时保持不变的字段
 };
 type ChangeSetSummary = {
   id: string; ontologyId: string; title: string;
@@ -68,7 +75,8 @@ type ChangeSetSummary = {
   counts: { total: number; pending: number; accepted: number; rejected: number };
   createdAt: string; mergedAt: string | null;
 };
-type ChangeSetDetail = ChangeSetSummary & { items: ChangeItem[] };
+type ChangeSetDetail = ChangeSetSummary & { items: ChangeItem[]; resolutionToken: string };
+type MergeRequest = { resolutionToken?: string | null };   // 合并时带上详情里的 resolutionToken
 type ItemDecisionPatch = { decision?: 'pending' | 'accepted' | 'rejected'; edited?: ElementFields | null; note?: string | null };
 type BulkDecision = { itemIds: string[]; decision: 'pending' | 'accepted' | 'rejected' };
 type MergeResult = { applied: number; skipped: { itemId: string; code: 'changeset.stale_target' | 'changeset.dependency_skipped' | 'changeset.invalid_item' }[] };
@@ -103,7 +111,7 @@ type WorkbenchSummary = {
 };
 ```
 
-错误码补充：`ontology.not_found`、`ontology.key_taken`、`element.not_found`、`changeset.not_found`、`changeset.closed`（已合并或已拒绝的变更集不能再改）、`changeset.pending_items`、`changeset.invalid_edit`、`release.not_found`、`release.invalid`、`documents.not_found`、`documents.too_large`、`documents.unsupported_type`、`documents.not_failed`、`documents.needs_ocr`、`documents.unreadable`（读不出文字：文件损坏、解析进程异常退出，或扫描件转写后仍没有文字）、`documents.parse_timeout`（解析超过 180 秒）、`documents.too_long`（分块后超过 200,000 字，`charCount` 为实际字数）、`documents.too_many_pages`（扫描件超过 100 页，`pageCount` 为实际页数）、`ai.not_configured`、`ai.unavailable`、`ai.invalid_output`（模型返回的结构不合规）、`internal.error`（资料处理时的意外错误）。资料的 `errorCode` 取上面 `documents.*`、`ai.*`、`ontology.not_found`、`changeset.invalid_item` 或 `internal.error` 之一。
+错误码补充：`ontology.not_found`、`ontology.key_taken`、`element.not_found`、`changeset.not_found`、`changeset.closed`（已合并或已拒绝的变更集不能再改）、`changeset.pending_items`、`changeset.invalid_edit`、`changeset.resolution_changed`（本体在审核人打开变更集之后有了变化，合并结果会与页面上显示的不同）、`release.not_found`、`release.invalid`、`documents.not_found`、`documents.too_large`、`documents.unsupported_type`、`documents.not_failed`、`documents.needs_ocr`、`documents.unreadable`（读不出文字：文件损坏、解析进程异常退出，或扫描件转写后仍没有文字）、`documents.parse_timeout`（解析超过 180 秒）、`documents.too_long`（分块后超过 200,000 字，`charCount` 为实际字数）、`documents.too_many_pages`（扫描件超过 100 页，`pageCount` 为实际页数）、`ai.not_configured`、`ai.unavailable`、`ai.invalid_output`（模型返回的结构不合规）、`internal.error`（资料处理时的意外错误）。资料的 `errorCode` 取上面 `documents.*`、`ai.*`、`ontology.not_found`、`changeset.invalid_item` 或 `internal.error` 之一。
 
 补充约定：
 

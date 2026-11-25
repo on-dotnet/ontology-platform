@@ -367,16 +367,19 @@ async def merge_change_set(
     user: Reviewer,
     db: DbSession,
     settings: AppSettings,
+    body: schemas.MergeRequest | None = None,
 ) -> schemas.MergeResult:
     """Apply the accepted items in one transaction and report the skipped ones. Answers 409
     `changeset.pending_items` while any item is undecided, 403 `changeset.self_review` in
-    separate review mode for one's own change set."""
+    separate review mode for one's own change set, and 409 `changeset.resolution_changed`
+    when the merge would not do what the `resolutionToken` sent with it stands for."""
     return await service.merge_change_set(
         db,
         id,
         actor=user.id,
         ip=client_ip(request),
         review_mode=settings.review_mode,
+        resolution_token=body.resolution_token if body else None,
     )
 
 

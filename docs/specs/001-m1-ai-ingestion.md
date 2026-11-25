@@ -143,7 +143,7 @@ worker 用 `SELECT … FOR UPDATE SKIP LOCKED` 领取任务，运行期间每 15
 | `GET /api/change-sets/{id}` | 详情：全部项及其证据 | viewer |
 | `PATCH /api/change-sets/{id}/items/{itemId}` | `{ decision?, edited?, note? }`；`edited` 按 kind 校验 | reviewer |
 | `POST /api/change-sets/{id}/decisions` | 批量：`{ itemIds, decision }` | reviewer |
-| `POST /api/change-sets/{id}/merge` | 在一个事务里应用已接受的项，返回 `{ applied, skipped: [{ itemId, code }] }`；仍有 `pending` 项时返回 409 `changeset.pending_items` | reviewer |
+| `POST /api/change-sets/{id}/merge` | `{ resolutionToken? }`；在一个事务里应用已接受的项，返回 `{ applied, skipped: [{ itemId, code }] }`；仍有 `pending` 项时返回 409 `changeset.pending_items`；合并结果与令牌所代表的不同时返回 409 `changeset.resolution_changed`（见规格 004 第 5.4 节） | reviewer |
 | `POST /api/change-sets/{id}/reject` | 整体拒绝 | reviewer |
 | `GET /api/ontologies/{id}/releases` | 版本列表 | viewer |
 | `POST /api/ontologies/{id}/releases` | `{ title, notes? }`；先做校验（见第 6 节），不通过返回 422 `release.invalid` 并附问题列表 | reviewer |
@@ -162,6 +162,7 @@ worker 用 `SELECT … FOR UPDATE SKIP LOCKED` 领取任务，运行期间每 15
 - `create` 生成新元素（`origin=ai`）；`temp_ref` 先解析为本次新建元素的 id。
 - `update` 按目标元素的 `revision` 做乐观锁：元素在变更集生成后被改过的项跳过，`code` 为 `changeset.stale_target`。
 - 引用指向被拒绝或被跳过的项时，该项同样跳过，`code` 为 `changeset.dependency_skipped`。
+- AI 识别的变更集按合并计划应用（规格 004 第 5 节）：新建项与工作版本里的活动元素是同一个（对象类型比主名称；关系比定义域、值域和主名称；属性比定义域和主名称。主名称是中文名，任一方没有中文名时用英文名）时并入它，只追加、不覆盖；局部名被占用（含已删除的元素）时改名；只加同义词、只补空定义的更新项不判过期。变更集详情里每一项的 `resolution` 写明合并时会怎样，合并请求带上详情里的 `resolutionToken`。
 - 合并后变更集状态为 `merged`，写审计。
 
 审计动作：`ontology.created`、`document.uploaded`、`changeset.merged`、`changeset.rejected`、`release.published`、`release.activated`。

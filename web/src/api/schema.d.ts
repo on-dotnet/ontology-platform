@@ -457,7 +457,8 @@ export interface paths {
          * Merge Change Set
          * @description Apply the accepted items in one transaction and report the skipped ones. Answers 409
          *     `changeset.pending_items` while any item is undecided, 403 `changeset.self_review` in
-         *     separate review mode for one's own change set.
+         *     separate review mode for one's own change set, and 409 `changeset.resolution_changed`
+         *     when the merge would not do what the `resolutionToken` sent with it stands for.
          */
         post: operations["merge_change_set_api_change_sets__id__merge_post"];
         delete?: never;
@@ -940,6 +941,7 @@ export interface components {
             appliedElementId: string | null;
             /** Evidence */
             evidence: components["schemas"]["Evidence"][];
+            resolution: components["schemas"]["ItemResolution"] | null;
         };
         /** ChangeSetDetail */
         ChangeSetDetail: {
@@ -979,6 +981,8 @@ export interface components {
             mergedAt: string | null;
             /** Items */
             items: components["schemas"]["ChangeItem"][];
+            /** Resolutiontoken */
+            resolutionToken: string;
         };
         /** ChangeSetSummary */
         ChangeSetSummary: {
@@ -1708,6 +1712,28 @@ export interface components {
             /** Note */
             note?: string | null;
         };
+        /**
+         * ItemResolution
+         * @description What a merge does with an item of an AI-extracted change set (spec 004, section 5).
+         *
+         *     For an open change set this is the plan against the working version as it is now; for a
+         *     merged one, what happened.
+         */
+        ItemResolution: {
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "create" | "into" | "rename" | "update";
+            /** Elementid */
+            elementId: string | null;
+            /** Elementlabel */
+            elementLabel: string | null;
+            /** Localname */
+            localName: string | null;
+            /** Keptfields */
+            keptFields: string[];
+        };
         /** LangText */
         LangText: {
             /** Lang */
@@ -1721,6 +1747,18 @@ export interface components {
             username: string;
             /** Password */
             password: string;
+        };
+        /**
+         * MergeRequest
+         * @description `resolutionToken` of the change set detail the reviewer was shown.
+         *
+         *     A merge that would do something else by now (another change set was merged meanwhile) is
+         *     refused with 409 `changeset.resolution_changed`. Without a token, only a merge that
+         *     behaves as merges did before there were resolutions is allowed.
+         */
+        MergeRequest: {
+            /** Resolutiontoken */
+            resolutionToken?: string | null;
         };
         /** MergeResult */
         MergeResult: {
@@ -3169,7 +3207,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MergeRequest"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

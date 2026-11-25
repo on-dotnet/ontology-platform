@@ -12,6 +12,7 @@ import { cn } from '@/lib/cn';
 import type { ChangeItem, Decision, ElementFields } from './api';
 import { AiSuggestionBadge, ConfidenceBadge, DecisionBadge, FlagTips, OpBadge } from './item-badges';
 import { ItemImpact } from './item-impact';
+import { ResolutionNotice } from './resolution-notice';
 import {
   COMPARED_FIELDS,
   effectiveFields,
@@ -68,7 +69,8 @@ export function ChangeItemCard({
   const isAxiom = item.kind === 'axiom';
   const localName = isAxiom ? null : fields.localName;
   // Delete and restore show what the target holds now, so the reviewer sees what goes away or comes back.
-  const showsCurrent = item.op === 'delete' || item.op === 'restore';
+  // A restore that another change set already did only adds to the element (see its notice).
+  const showsCurrent = item.op === 'delete' || (item.op === 'restore' && item.resolution?.mode !== 'update');
 
   // Pressing the active decision again returns the item to "pending".
   const toggle = (decision: Exclude<Decision, 'pending'>) => onDecide(item.decision === decision ? 'pending' : decision);
@@ -103,6 +105,7 @@ export function ChangeItemCard({
       </h3>
 
       {showsCurrent ? <p className="mt-1.5 text-xs font-medium text-muted-foreground">{t(`review.currentValue.${item.op}`)}</p> : null}
+      {item.resolution ? <ResolutionNotice item={item} resolution={item.resolution} /> : null}
       <ItemFacts item={item} fields={fields} context={context} />
       {item.op === 'update' || item.op === 'restore' ? (
         <UpdateComparison kind={item.kind} before={item.before} after={effectiveFields(item)} context={context} />

@@ -299,6 +299,24 @@ class Graph(CamelModel):
 # ---------- change sets ----------
 
 
+class ItemResolution(CamelModel):
+    """What a merge does with an item of an AI-extracted change set (spec 004, section 5).
+
+    For an open change set this is the plan against the working version as it is now; for a
+    merged one, what happened.
+    """
+
+    # into: the item's content goes into an existing element that is the same thing.
+    # rename: created under another local name, the proposed one being taken.
+    # update: additions to an element (synonyms, a definition where there is none).
+    mode: Literal["create", "into", "rename", "update"]
+    element_id: UUID | None
+    element_label: str | None
+    local_name: str | None
+    # Fields (wire names) the element already has a value for; that value stays.
+    kept_fields: list[str]
+
+
 class ChangeItem(CamelModel):
     # No defaults on purpose: change set routes drop unset fields so that `proposed`, `edited`
     # and `before` only carry the keys that were given, and every other field must be set.
@@ -321,6 +339,7 @@ class ChangeItem(CamelModel):
     decided_at: datetime | None
     applied_element_id: UUID | None
     evidence: list[Evidence]
+    resolution: ItemResolution | None
 
 
 class DecisionCounts(CamelModel):
@@ -347,6 +366,8 @@ class ChangeSetSummary(CamelModel):
 
 class ChangeSetDetail(ChangeSetSummary):
     items: list[ChangeItem]
+    # Digest of the items' resolutions; a merge sends it back (see `MergeRequest`).
+    resolution_token: str
 
 
 class ItemDecisionPatch(CamelModel):
@@ -360,6 +381,17 @@ class ItemDecisionPatch(CamelModel):
 class BulkDecision(CamelModel):
     item_ids: list[UUID] = Field(max_length=5000)
     decision: Decision
+
+
+class MergeRequest(CamelModel):
+    """`resolutionToken` of the change set detail the reviewer was shown.
+
+    A merge that would do something else by now (another change set was merged meanwhile) is
+    refused with 409 `changeset.resolution_changed`. Without a token, only a merge that
+    behaves as merges did before there were resolutions is allowed.
+    """
+
+    resolution_token: str | None = Field(default=None, max_length=64)
 
 
 class MergeSkip(CamelModel):

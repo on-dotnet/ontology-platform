@@ -450,6 +450,20 @@
     "merge": "Merge into ontology",
     "mergedToast": "Merged into the ontology",
     "mergeFailedTitle": "The change set was not merged",
+    "resolutionChangedTitle": "Merging would no longer do what the page shows",
+    "resolutionChangedDescription": "The ontology or this change set changed after you looked at it. What each item below will do when merged has been updated. Look it over, then merge again.",
+    "resolution": {
+      "into": "Will be merged into the existing “{{name}}”",
+      "intoDescription": "Nothing new is created: only synonyms and content it lacks are added, and relations and properties referring to this item will refer to it.",
+      "intoMemberDescription": "Nothing new is created: only synonyms and content it lacks are added.",
+      "intoDone": "Merged into the existing “{{name}}”",
+      "rename": "Another element already uses the local name {{wanted}}",
+      "renameDescription": "It will be created as {{localName}}.",
+      "renameDone": "Created as {{localName}}",
+      "restored": "“{{name}}” was restored by another change set",
+      "restoredDescription": "It is not restored again; only synonyms and a definition it lacks are added.",
+      "kept": "The existing element keeps its {{fields}}."
+    },
     "mergedTitle": "Merged into the ontology",
     "mergedDescription": "Changes applied to the working ontology: {{count}}.",
     "mergedWithSkipsTitle": "Merged, {{skipped}} skipped",
@@ -1063,7 +1077,8 @@
       "dependency_skipped": "an item it refers to was rejected or skipped",
       "invalid_item": "its content is incomplete or invalid",
       "has_dependents": "other elements still refer to it, so it was not deleted",
-      "self_review": "Separate review mode is on: another reviewer must decide change sets you submitted."
+      "self_review": "Separate review mode is on: another reviewer must decide change sets you submitted.",
+      "resolution_changed": "Merging would no longer do what the page shows. Review it again, then merge."
     },
     "release": {
       "not_found": "The release does not exist or was deleted.",
