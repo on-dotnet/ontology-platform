@@ -16,7 +16,11 @@ PAGE_MAX = 200
 CURSOR_MAX_LENGTH = 2048
 KEY_MAX_LENGTH = 1024
 
+# Values in results: decimals are strings, to keep their precision.
 type Scalar = str | int | bool
+# Values in filters may also be JSON numbers with a fraction (agents send them as such); the
+# platform turns them into decimals and checks them against the column's type family.
+type FilterValue = str | int | float | bool
 FilterOp = Literal[
     "eq", "ne", "lt", "le", "gt", "ge", "contains", "startsWith", "in", "isNull", "notNull"
 ]
@@ -34,7 +38,7 @@ class Filter(CamelModel):
     property_id: UUID
     op: FilterOp
     # One value, the list of `in` (at most 100), or nothing for isNull / notNull.
-    value: Scalar | list[Scalar] | None = None
+    value: FilterValue | list[FilterValue] | None = None
 
 
 class Sort(CamelModel):

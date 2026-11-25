@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from sqlalchemy import select as sql_select
+from sqlalchemy import tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import not_implemented
@@ -71,6 +72,8 @@ async def get_data_source_ref(
             "kind": row.kind,
             "status": row.status,
             "allow_samples": row.allow_samples,
+            "has_credential": row.secret is not None,
+            "catalog_status": row.catalog_status,
         }
     )
 
@@ -88,8 +91,10 @@ async def get_catalog_table(
             CatalogTable.table_name == table.name,
         )
     )
-    if row is None:
-        return None
+    return _catalog_copy(row) if row is not None else None
+
+
+def _catalog_copy(row: CatalogTable) -> schemas.CatalogTableCopy:
     return schemas.CatalogTableCopy.model_validate(
         {
             "data_source_id": row.data_source_id,
@@ -105,9 +110,34 @@ async def get_catalog_table(
     )
 
 
+async def list_catalog_tables_for(
+    db: AsyncSession,
+    data_source_id: UUID,
+    *,
+    schema_names: tuple[str, ...] | None = None,
+    tables: tuple[TableRef, ...] | None = None,
+) -> tuple[schemas.CatalogTableCopy, ...]:
+    """Cached catalog tables of the given schemas, or the given tables, by schema and name.
+    With neither, every cached table. Tables the cache does not have are left out."""
+    statement = sql_select(CatalogTable).where(CatalogTable.data_source_id == data_source_id)
+    if schema_names is not None:
+        statement = statement.where(CatalogTable.schema_name.in_(schema_names))
+    if tables is not None:
+        wanted = {(table.schema, table.name) for table in tables}
+        statement = statement.where(
+            tuple_(CatalogTable.schema_name, CatalogTable.table_name).in_(wanted)
+        )
+    statement = statement.order_by(CatalogTable.schema_name, CatalogTable.table_name)
+    return tuple(_catalog_copy(row) for row in await db.scalars(statement))
+
+
 async def select(db: AsyncSession, query: SelectQuery) -> Rows:
     """Run one generated SELECT in a read-only transaction, with the statement timeout and the
-    row limit of the settings. Cancelling the awaiting task cancels the statement."""
+    row limit of the settings. Cancelling the awaiting task cancels the statement.
+
+    Raises the `connectors.errors` exceptions: SourceDisabledError, SourceUnavailableError,
+    SourceBusyError, QueryTimeoutError, SourceMismatchError, InvalidValueError.
+    """
     raise not_implemented("Reading from data sources")
 
 
@@ -117,7 +147,8 @@ async def sample_values(
     table: TableRef,
     columns: tuple[str, ...],
 ) -> dict[str, tuple[Value, ...]]:
-    """A few distinct values per column, only for data sources that allow samples."""
+    """A few distinct values per column, only for data sources that allow samples. Raises the
+    same exceptions as `select`, and SourceDisabledError while samples are switched off."""
     raise not_implemented("Reading sample values")
 
 
@@ -165,7 +196,7 @@ async def archive_data_source(
     raise not_implemented("Archiving data sources")
 
 
-async def test_connection(
+async def check_connection(
     db: AsyncSession,
     body: schemas.ConnectionTestRequest,
     *,
@@ -176,7 +207,7 @@ async def test_connection(
     raise not_implemented("Testing connections")
 
 
-async def test_data_source(
+async def check_data_source(
     db: AsyncSession,
     data_source_id: UUID,
     *,

@@ -13,13 +13,15 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from httpx import AsyncClient, Response
-from pydantic import SecretStr
+from pydantic import SecretStr, ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ontology_platform.modules.ai.schemas import BindingSuggestionCreate
 from ontology_platform.modules.connectors import service as connectors
 from ontology_platform.modules.connectors.models import CatalogTable, DataSource
 from ontology_platform.modules.connectors.statements import TableRef
 from ontology_platform.modules.identity.models import Role
+from ontology_platform.modules.query.schemas import ObjectSearch
 from ontology_platform.settings import Settings
 from support import csrf_headers
 from test_ontology_support import sign_in
@@ -103,17 +105,20 @@ async def test_roles_come_before_the_missing_implementations(
                 assert response.json()["code"] == "auth.forbidden"
 
 
+@pytest.mark.parametrize("too_long", [False, True])
 async def test_the_data_source_password_is_not_echoed_by_validation_errors(
-    client: AsyncClient, db: AsyncSession
+    client: AsyncClient, db: AsyncSession, too_long: bool
 ) -> None:
     await sign_in(client, db, Role.ADMIN)
-    secret = "s3cret-" + uuid4().hex
-    body = {**DATA_SOURCE, "password": secret, "port": "not-a-port"}
+    secret = "s3cret-" + uuid4().hex + ("x" * 1024 if too_long else "")
+    body = {**DATA_SOURCE, "password": secret}
+    if not too_long:
+        body["port"] = "not-a-port"
 
     response = await client.post("/api/data-sources", json=body, headers=csrf_headers(client))
 
     assert response.status_code == 422
-    assert secret not in response.text
+    assert secret[:40] not in response.text
 
 
 async def test_mcp_needs_an_access_token_even_with_a_session(
@@ -176,6 +181,7 @@ async def test_the_catalog_read_other_modules_use_already_works(db: AsyncSession
 
     assert ref is not None
     assert (ref.name, ref.status, ref.allow_samples) == ("MES", "active", False)
+    assert (ref.has_credential, ref.catalog_status) == (False, "never")
     assert "host" not in ref.model_dump()
     assert "username" not in ref.model_dump()
     assert table is not None
@@ -183,6 +189,15 @@ async def test_the_catalog_read_other_modules_use_already_works(db: AsyncSession
     assert (table.schema_name, table.primary_key) == ("mes", ("heat_no",))
     assert table.columns[0].family == "string"
     assert await connectors.get_data_source_ref(db, uuid4()) is None
+    by_schema = await connectors.list_catalog_tables_for(db, source.id, schema_names=("mes",))
+    by_table = await connectors.list_catalog_tables_for(
+        db, source.id, tables=(TableRef("mes", "heat"), TableRef("mes", "coil"))
+    )
+    assert [t.name for t in by_schema] == ["heat"]
+    assert [t.name for t in by_table] == ["heat"]
+    assert await connectors.list_catalog_tables_for(db, source.id, schema_names=("qms",)) == ()
+    with pytest.raises(ValidationError):
+        table.columns[0].name = "x"
 
 
 async def test_unknown_table_usage_is_not_reported_as_unused(
@@ -222,3 +237,21 @@ def test_previous_secret_keys_are_split_and_kept_secret() -> None:
 
     assert [key.get_secret_value() for key in settings.previous_secret_keys] == ["old-1", "old-2"]
     assert "old-1" not in repr(settings)
+
+
+@pytest.mark.parametrize(
+    "scope",
+    [{}, {"schemas": ["mes"], "tables": [{"schema": "mes", "name": "heat"}]}],
+)
+def test_a_binding_suggestion_names_exactly_one_scope(scope: dict[str, Any]) -> None:
+    with pytest.raises(ValidationError):
+        BindingSuggestionCreate.model_validate({"dataSourceId": ID, **scope})
+    assert BindingSuggestionCreate.model_validate({"dataSourceId": ID, "schemas": ["mes"]})
+
+
+def test_filters_accept_decimal_numbers() -> None:
+    search = ObjectSearch.model_validate(
+        {"typeId": ID, "filters": [{"propertyId": ID, "op": "gt", "value": 7.85}]}
+    )
+
+    assert search.filters[0].value == 7.85

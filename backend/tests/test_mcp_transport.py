@@ -12,16 +12,16 @@ from test_ontology_support import sign_in
 
 
 async def test_mcp_refuses_requests_without_a_token(client: AsyncClient) -> None:
-    response = await client.post("/mcp", json={"jsonrpc": "2.0", "id": 1})
+    response = await client.post("/mcp", json={})
 
     assert response.status_code == 401
     assert response.headers["WWW-Authenticate"] == "Bearer"
 
 
 @pytest.mark.xfail(strict=True, reason="M3 batch 6a: the MCP transport and tools")
-async def test_mcp_answers_a_valid_token(
-    app: FastAPI, client: AsyncClient, db: AsyncSession
-) -> None:
+async def test_mcp_takes_a_valid_token(app: FastAPI, client: AsyncClient, db: AsyncSession) -> None:
+    """Only that a valid token gets past authentication into an implemented endpoint; what a
+    well-formed request looks like is batch 6a's to write from the specification."""
     await sign_in(client, db, Role.VIEWER)
     created = await client.post(
         "/api/auth/tokens",
@@ -31,16 +31,6 @@ async def test_mcp_answers_a_valid_token(
     token = created.json()["token"]
 
     async with make_client(app) as agent:
-        response = await agent.post(
-            "/mcp",
-            json={"jsonrpc": "2.0", "id": 1, "method": "server/discover"},
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Accept": "application/json, text/event-stream",
-                "MCP-Protocol-Version": "2026-07-28",
-                "Mcp-Method": "server/discover",
-            },
-        )
+        response = await agent.post("/mcp", json={}, headers={"Authorization": f"Bearer {token}"})
 
-    assert response.status_code == 200
-    assert response.headers["content-type"].startswith("application/json")
+    assert response.status_code not in (401, 501)

@@ -96,6 +96,15 @@ def require_scope(scope: TokenScope) -> Callable[[AuthContext], Awaitable[Princi
     return check_scope
 
 
+async def require_principal(context: CurrentSession) -> Principal:
+    """A cookie session or any valid access token, whatever its scopes: only for the routes the
+    appendix opens to every token (`/api/auth/me`). Token authentication arrives with batch 2."""
+    return context.principal
+
+
+AnyPrincipal = Annotated[Principal, Depends(require_principal)]
+
+
 def _set_session_cookies(response: Response, settings: Settings, issued: IssuedSession) -> None:
     max_age = settings.session_absolute_days * 24 * 3600
     secure = settings.secure_cookies
@@ -176,8 +185,8 @@ async def logout(
 
 
 @router.get("/me", responses=problem_responses(401))
-async def me(user: CurrentUser, response: Response) -> UserInfo:
-    """The signed-in user."""
+async def me(user: AnyPrincipal, response: Response) -> UserInfo:
+    """The signed-in user, or the owner of the access token."""
     response.headers["Cache-Control"] = "no-store"
     return _user_info(user)
 

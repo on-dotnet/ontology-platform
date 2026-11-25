@@ -95,7 +95,7 @@ export interface paths {
         };
         /**
          * Me
-         * @description The signed-in user.
+         * @description The signed-in user, or the owner of the access token.
          */
         get: operations["me_api_auth_me_get"];
         put?: never;
@@ -886,10 +886,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Test Connection
+         * Check Connection
          * @description Test connection settings that are not saved yet.
          */
-        post: operations["test_connection_api_data_sources_test_post"];
+        post: operations["check_connection_api_data_sources_test_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -946,8 +946,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Test Data Source */
-        post: operations["test_data_source_api_data_sources__id__test_post"];
+        /** Check Data Source */
+        post: operations["check_data_source_api_data_sources__id__test_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2319,8 +2319,9 @@ export interface components {
              */
             op: "eq" | "ne" | "lt" | "le" | "gt" | "ge" | "contains" | "startsWith" | "in" | "isNull" | "notNull";
             /** Value */
-            value?: components["schemas"]["Scalar"] | components["schemas"]["Scalar"][] | null;
+            value?: components["schemas"]["FilterValue"] | components["schemas"]["FilterValue"][] | null;
         };
+        FilterValue: string | number | boolean;
         /** Graph */
         Graph: {
             /** Nodes */
@@ -5580,7 +5581,7 @@ export interface operations {
             };
         };
     };
-    test_connection_api_data_sources_test_post: {
+    check_connection_api_data_sources_test_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -5827,7 +5828,7 @@ export interface operations {
             };
         };
     };
-    test_data_source_api_data_sources__id__test_post: {
+    check_data_source_api_data_sources__id__test_post: {
         parameters: {
             query?: never;
             header?: never;
