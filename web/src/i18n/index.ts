@@ -8,6 +8,31 @@ import zhCN from './locales/zh-CN.json';
 
 export const SUPPORTED_LOCALES = ['zh-CN', 'en'] as const;
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
+
+type Messages = Record<string, unknown>;
+
+// Namespaces added from M3 on live in their own files (locales/<locale>/<namespace>.json), so that
+// batches working in parallel do not all edit one file. Each file becomes a top-level key of the
+// single `translation` namespace: locales/zh-CN/tokens.json is `t('tokens.…')`.
+const namespaceFiles = import.meta.glob<Messages>('./locales/*/*.json', { eager: true, import: 'default' });
+
+function withNamespaces(locale: Locale, base: Messages): Messages {
+  const merged: Messages = { ...base };
+  for (const [path, messages] of Object.entries(namespaceFiles)) {
+    const match = /^\.\/locales\/([^/]+)\/([^/]+)\.json$/.exec(path);
+    if (!match || match[1] !== locale) continue;
+    const namespace = match[2] as string;
+    if (namespace in base) throw new Error(`i18n namespace "${namespace}" is already a key of ${locale}.json`);
+    merged[namespace] = messages;
+  }
+  return merged;
+}
+
+/** Every message of every locale, as i18next gets them. */
+export const resources = {
+  'zh-CN': { translation: withNamespaces('zh-CN', zhCN) },
+  en: { translation: withNamespaces('en', en) },
+} as const;
 export const DEFAULT_LOCALE: Locale = 'zh-CN';
 export const LOCALE_STORAGE_KEY = 'op.locale';
 
@@ -51,10 +76,7 @@ i18n.on('languageChanged', (language) => {
 });
 
 void i18n.use(initReactI18next).init({
-  resources: {
-    'zh-CN': { translation: zhCN },
-    en: { translation: en },
-  },
+  resources,
   lng: detectLocale(),
   fallbackLng: DEFAULT_LOCALE,
   supportedLngs: [...SUPPORTED_LOCALES],

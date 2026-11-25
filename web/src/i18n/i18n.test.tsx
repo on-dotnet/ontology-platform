@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { LanguageSelector } from '@/features/settings/preference-controls';
 import { renderWithProviders } from '@/test/utils';
 
-import { LOCALE_STORAGE_KEY, matchLocale } from './index';
+import { LOCALE_STORAGE_KEY, matchLocale, resources } from './index';
 import en from './locales/en.json';
 import zhCN from './locales/zh-CN.json';
 
@@ -45,6 +45,17 @@ describe('i18n', () => {
   });
 
   it('has the same keys in every locale', () => {
-    expect(flattenKeys(en).sort()).toEqual(flattenKeys(zhCN).sort());
+    // Everything i18next gets, including the per-namespace files of locales/<locale>/.
+    expect(flattenKeys(resources.en.translation).sort()).toEqual(flattenKeys(resources['zh-CN'].translation).sort());
+  });
+
+  it('adds the per-namespace files as their own top-level keys', () => {
+    const added = ['datasources', 'bindings', 'explore', 'tokens', 'mcp'];
+    for (const locale of [resources['zh-CN'].translation, resources.en.translation]) {
+      expect(Object.keys(locale)).toEqual(expect.arrayContaining(added));
+    }
+    for (const namespace of added) {
+      expect(namespace in zhCN || namespace in en).toBe(false);
+    }
   });
 });
