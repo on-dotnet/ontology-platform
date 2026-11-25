@@ -503,6 +503,7 @@ async def test_the_same_baseline_scenario_merges_what_documents_proposed_twice()
         "skipped": 0,
         "skippedByCode": {},
         "duplicateRelations": 0,
+        "sameKeptApart": 0,
         "duplicateTypeGroups": {
             "total": 0,
             "sameMainName": 0,

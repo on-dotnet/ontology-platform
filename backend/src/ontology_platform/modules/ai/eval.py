@@ -118,6 +118,7 @@ class WorkingVersion:
         self.decisions: dict[UUID, str] = {}
         self.records: dict[UUID, list[PlanMatchedBy]] = {}
         self._merges = 0
+        self.same_kept_apart = 0
 
     def copy(self) -> "WorkingVersion":
         other = WorkingVersion()
@@ -129,6 +130,7 @@ class WorkingVersion:
         other.made, other.decisions = dict(self.made), dict(self.decisions)
         other.records = {key: list(value) for key, value in self.records.items()}
         other._merges = self._merges
+        other.same_kept_apart = self.same_kept_apart
         return other
 
     def known(self) -> list[KnownElement]:
@@ -171,6 +173,7 @@ class WorkingVersion:
                     other_decision=self.decisions.get(other) if other else None,
                 )
                 decision = decide(proposal, record) if decide is not None else None
+                self.same_kept_apart += record.kind == "same" and decision == "different"
             items.append(
                 PlanItem(
                     id=own,
@@ -443,6 +446,8 @@ def merge_counts(
         "skipped": len(skipped),
         "skippedByCode": dict(sorted(codes.items())),
         "duplicateRelations": duplicate_relations,
+        # Items the model judged the same that the reviewer kept apart (by-flags review).
+        "sameKeptApart": version.same_kept_apart,
     }
     if expected is None:
         return counts
