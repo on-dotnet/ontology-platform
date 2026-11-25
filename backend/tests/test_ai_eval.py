@@ -5,6 +5,7 @@ import json
 import re
 import tomllib
 from collections.abc import Sequence
+from dataclasses import replace
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -207,7 +208,12 @@ def test_merge_counts_report_skipped_items_and_duplicates() -> None:
         "changeset.dependency_skipped": 1,
         "changeset.invalid_item": 1,
     }
-    assert (counts["skipped"], counts["duplicateRelations"]) == (2, 1)
+    # The two 使用 of one change set have the same ends and label: the plan puts the second into
+    # the first (spec 004, PR 3), so no duplicate is left.
+    assert (counts["skipped"], counts["duplicateRelations"]) == (2, 0)
+    [uses] = [e for e in version.elements if e.kind == "relation_type"]
+    version.elements.append(replace(uses, id=uuid4(), local_name="uses2"))
+    assert merge_counts(version, skipped, expected)["duplicateRelations"] == 1
     assert counts["duplicateTypeGroups"] == {
         "total": 2,
         "sameMainName": 1,
@@ -692,7 +698,7 @@ def test_a_type_of_a_pending_items_main_name_follows_where_that_item_went() -> N
         RelationsOut(relations=[], properties=[]),
         pending=pending,
     )
-    assert third[0].match == ProposedMatch("same", item_id=item_id("b", 1))
+    assert third[0].match == ProposedMatch("name", item_id=item_id("b", 1))
     version = WorkingVersion()
     for label, proposals in (("a", issue), ("b", slip), ("c", third)):
         assert version.merge(proposals, label) == []

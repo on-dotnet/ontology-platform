@@ -119,7 +119,7 @@ class ProposedEvidence:
 class ProposedMatch:
     """What a new object type was aligned with (spec 004, 4.3): one of the three targets."""
 
-    kind: Literal["same", "possible"]
+    kind: Literal["same", "possible", "name"]
     element_id: UUID | None = None  # an element of the working version
     item_id: UUID | None = None  # a create item of another open change set
     temp_ref: str | None = None  # a new type of this change set
@@ -817,7 +817,6 @@ def _conclude(
     """The guardrails G2 and G4 to G7 applied to the model's answer for one type."""
     by_key = {candidate.key: candidate for candidate in request.candidates}
     rows = [row for row in given or () if row.candidate is None or row.candidate in by_key]
-    best = max(request.candidates, key=lambda candidate: candidate.score.value)
 
     def strongest(keys: Iterable[CandidateKey]) -> Candidate:
         return max((by_key[key] for key in keys), key=lambda c: c.score.value)
@@ -835,9 +834,12 @@ def _conclude(
         return _Conclusion("unsure", strongest(sames), reason)  # G6
     if unsures:
         return _Conclusion("unsure", strongest(unsures), reason)
-    if any(row.verdict == "different" for row in rows):
+    covered = {row.candidate for row in rows if row.verdict == "different"}
+    if None in covered or set(by_key) <= covered:
         return _Conclusion("different", None, None)
-    return _Conclusion("unsure", best, None)  # G5: no usable answer
+    # G5: the candidates left without an answer (all of them when there is none).
+    rest = [candidate for candidate in request.candidates if candidate.key not in covered]
+    return _Conclusion("unsure", max(rest, key=lambda c: c.score.value), None)
 
 
 # ---------------------------------------------------------------------------- proposals
@@ -999,17 +1001,31 @@ def build_proposals(
     proposal_of: dict[int, Proposal] = {}  # index of a type -> the new type it is part of
     mistaken: set[str] = set()  # existing ids given to types of another main name
 
-    def related(item: EntityTypeOut) -> Callable[[CandidateKey], bool]:
-        """G7: whether a candidate is the type's parent or child."""
+    def root_of(index: int) -> CandidateKey:
+        """Where a type of the types stage lands, as a candidate key."""
+        fate = fates[index]
+        if fate.element is not None:
+            return ("element", str(fate.element.id))
+        return ("run", str(fate.root if fate.kind == "run" else index))
+
+    def target_of(ref: str | None) -> CandidateKey | None:
+        """Where a parent reference lands: an existing type, or the new type it is part of."""
+        if ref is None:
+            return None
+        found = {root_of(i) for i, other in enumerate(types) if other.ref == ref}
+        if not found and builder.known_type(ref) is not None:
+            return ("element", ref)
+        return next(iter(found)) if len(found) == 1 else None
+
+    def related(index: int) -> Callable[[CandidateKey], bool]:
+        """G7: whether a candidate is the type's parent or child, wherever the refs land."""
+        parent = target_of(types[index].parent)
 
         def check(key: CandidateKey) -> bool:
+            if key == parent:
+                return True
             kind, value = key
-            if kind == "element":
-                return item.parent == value
-            if kind == "run":
-                other = types[int(value)]
-                return item.parent == other.ref or other.parent == item.ref
-            return False
+            return kind == "run" and target_of(types[int(value)].parent) == root_of(index)
 
         return check
 
@@ -1029,21 +1045,12 @@ def build_proposals(
         request = requests.get(index)
         conclusion = (
             _conclude(
-                request, decisions.get(index) if decisions is not None else None, related(item)
+                request, decisions.get(index) if decisions is not None else None, related(index)
             )
             if request is not None
             else None
         )
         target = conclusion.candidate if conclusion is not None else None
-        if conclusion is not None and target is not None and conclusion.verdict == "same":
-            kind, value = target.key
-            if kind == "run":
-                # The same concept as an earlier type of this document: one item, as for G1.
-                joined = proposal_of[int(value)]
-                _join(builder, joined, item)
-                proposal_of[index] = joined
-                became.append((item, joined.temp_ref or ""))
-                continue
         local_name = builder.unique_name(item.local_name, _PASCAL, "EntityType")
         temp_ref = f"new:{local_name}"
         became.append((item, temp_ref))
@@ -1078,7 +1085,7 @@ def build_proposals(
         if fate.pending is not None:
             # G1 with a pending item: recorded, so that the merge follows that item wherever it
             # goes, also into an element of another main name (spec 004, 5.3).
-            proposal.match = ProposedMatch("same", item_id=fate.pending.item_id)
+            proposal.match = ProposedMatch("name", item_id=fate.pending.item_id)
         proposal_of[index] = proposal
         new_types.append((item, proposal))
         builder.add(proposal, item.quotes, item.confidence)

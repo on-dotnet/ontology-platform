@@ -2,7 +2,7 @@
 
 - 级别：L2（AI 写入路径与审核流程）
 - 关联：议题 #40（含 #36）、#39（评测地基）、#41（总计划）；[001 M1 规格](001-m1-ai-ingestion.md) 第 4、5 节
-- 状态：设计已由主会话确认（2026-11-25，第 12 节）。PR 1、PR 2 已合并；PR 3 实现中（实现取舍见第 4.3、6 节末尾）；PR 4、PR 5 待做。
+- 状态：设计已由主会话确认（2026-11-25，第 12 节）。PR 1、PR 2 已合并；PR 3 实现中（实现说明见第 4.3、6 节末尾）；PR 4、PR 5 待做。
 
 名词：**名称**指中文名、英文名和同义词；**主名称**指中文名（任一方没有中文名时用英文名；导入的元素两者都没有时，沿用现在的做法以局部名充当）；比较前都按 `normalize` 规范化（NFKC、小写、去空白）。**待审项**指同一本体其他待审变更集里未被拒绝的新建项。
 
@@ -123,7 +123,7 @@ parse → terms → types → resolve → relations → changeset          （�
 | 拿不准（含 G3–G7） | 任一种 | 新建，加 `possible_duplicate`，记下疑似的是哪一个和理由；审核人可以改成并入（第 5.5 节） |
 | 不同概念或没有候选 | — | 新建 |
 
-PR 3 的实现取舍：目标是**本次的另一个新类型**且模型判为同一概念时，与 G1 一样合并为一项（后者的名称并入前者的同义词），不另建带记录的项；一份资料内的两项若都保留，挂在它们上面的关系会在同一次合并里各建一条、成为重复关系，而合并计划只认已存在的关系。拿不准的仍是带记录、可以并入的新建项，审核人点"并入"时合并计划把它并入同一变更集里那一项将新建的元素（`ItemResolution` 的 `elementId` 为空、`elementLabel` 为那一项的名称）。
+PR 3 的实现说明：（1）目标是本次的另一个新类型时，"同一概念"与"可能重复"都保留为带记录的新建项（`match_item_id` 指向本变更集里那一项）；按记录并入时，合并计划把它并入那一项将新建的元素（`ItemResolution` 的 `elementId` 为空、`elementLabel` 为那一项的名称），同一变更集里解析后端点与中文名都相同的关系和属性也并入前一项，不会成为重复关系。（2）G1 对上待审项时记一条 `name` 记录指向那一项（`match_kind = name`，没有理由，界面不提供"保持分开"）：合并计划只在双方当前的主名称仍相同时认它，跟随那一项的去向——那一项按"同一概念"并入了别的名称的元素时，本项也并入那里，否则同名的类型会因工作版本里已没有这个主名称的元素而重复新建。改名使它失效，与第 5.5 节"主名称相同的两个类型没有保持分开"一致。（3）合并时"同一个"的取法按顺序：主名称相同的活动类型、本项自己的记录、记录了本项的已合并项（取最早的）；本项有自己的记录时，它的 `match_decision` 只对自己的记录算数。
 
 模型判为同一概念时仍然新建一项而不直接改写成对已有元素的 `update`，原因有三：审核人看得到这是一次经模型判断的对齐，并能推翻它；挂在这个类型上的关系和属性引用的是这一项，审核人拒绝它时它们按现有的依赖规则一起跳过，不会悄悄挂到已有元素上；活动元素、待审项、同批新类型三种目标走同一套机制。
 
@@ -337,7 +337,7 @@ PR 3 的实现取舍：关系阶段的目录不超过 120 个时照旧全部给�
 **迁移**（只写要加什么）。编号规则：编号在 PR 转 ready 前按当时 main 的迁移头确定；合并前 main 的迁移头变了，就改自己这份未合并迁移的编号和 `down_revision`，已合并的迁移不动。M3 预留了 v0007–v0010。
 
 - PR 1、PR 2 不需要迁移。
-- PR 3：`ontology.change_items` 增加五个可空列：`match_kind`（`same`／`possible`）、`match_element_id`（外键指向 `ontology.elements`；元素只会标记删除，不会物理删除）、`match_item_id`（外键指向 `ontology.change_items`，对方被删除时置空）、`match_reason`（文本）、`match_decision`（`same`／`different`，审核人的结论）；两个取值集合各加检查约束；`match_item_id` 加索引。都是只加不删，上一版程序照常运行。
+- PR 3：`ontology.change_items` 增加五个可空列：`match_kind`（`same`／`possible`／`name`，`name` 见第 4.3 节末尾）、`match_element_id`（外键指向 `ontology.elements`；元素只会标记删除，不会物理删除）、`match_item_id`（外键指向 `ontology.change_items`，对方被删除时置空）、`match_reason`（文本）、`match_decision`（`same`／`different`，审核人的结论）；两个取值集合各加检查约束；`match_item_id` 加索引。都是只加不删，上一版程序照常运行。
 - PR 4（可选）：`ai.runs` 增加可空列 `reasoning_tokens`。
 
 **标记**：不新增。`possible_duplicate` 含义不变。
@@ -363,12 +363,13 @@ type ChangeSetDetail = { /* 现有字段 */ resolutionToken: string };
 
 // PR 3
 type ItemMatch = {
-  kind: 'same' | 'possible';
+  kind: 'same' | 'possible' | 'name';
   elementId: string | null;        // 对方是工作版本里的元素
   itemId: string | null; changeSetId: string | null; changeSetTitle: string | null;  // 对方是变更项
   label: string;                   // 对方的显示名
   reason: string | null;           // 模型的理由；补查得到的为 null
   decision: 'same' | 'different' | null;
+  keptApart: boolean;              // 对方的审核人已定为保持分开：不再提供"并入"
 };
 type ChangeItem = { /* … */ match: ItemMatch | null };   // 本项自己的记录；没有时由记录了本项的已合并项合成
 type ItemDecisionPatch = { /* … */ matchDecision?: 'same' | 'different' | null };   // 写在本项的 match_decision 上

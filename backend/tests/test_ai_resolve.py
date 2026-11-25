@@ -187,7 +187,7 @@ async def test_pending_items_are_candidates_and_those_of_the_same_main_name_are_
     assert "C1 | 钢水包 | 大包 |" in text
     assert [(p.fields["labelZh"], p.match) for p in proposals] == [
         ("钢包", ProposedMatch("same", item_id=ladle.item_id, reason="理由")),
-        ("转炉", ProposedMatch("same", item_id=converter.item_id)),
+        ("转炉", ProposedMatch("name", item_id=converter.item_id)),
     ]
 
 
@@ -283,3 +283,26 @@ def test_relations_hang_on_a_type_judged_the_same_as_an_existing_one() -> None:
     ]
     assert isinstance(proposals[0].match, ProposedMatch)
     assert proposals[0].match.element_id == CONVERTER.id
+
+
+def test_a_type_is_not_the_same_as_a_parent_given_by_a_ref_that_landed_elsewhere() -> None:
+    # G7 once the refs are resolved: new:Converter is the existing 转炉 (G1).
+    types = [
+        entity("new:Converter", "转炉", "Converter"),
+        entity("new:Bof", "氧气转炉", "Bof", parent="new:Converter"),
+    ]
+    decisions = decide(types, [CONVERTER], {"氧气转炉": ("转炉", "same")})
+    [created] = build_proposals([CHUNK], [CONVERTER], types, NO_RELATIONS, decisions=decisions)
+    assert created.match == ProposedMatch("possible", element_id=CONVERTER.id, reason="理由")
+
+
+def test_a_verdict_of_different_about_one_candidate_leaves_the_others_unjudged() -> None:
+    # G5: only the candidate named is different; the one left without an answer is unsure.
+    types = [entity("new:Bof", "氧气转炉", "Bof", synonyms=["转炉炉体"])]
+    [request] = resolve_requests([CONVERTER, FURNACE], types)
+    named = next(c.key for c in request.candidates if c.key[1] == str(FURNACE.id))
+    decisions = {0: [Decision("different", named)]}
+    [created] = build_proposals(
+        [CHUNK], [CONVERTER, FURNACE], types, NO_RELATIONS, decisions=decisions
+    )
+    assert created.match == ProposedMatch("possible", element_id=CONVERTER.id)

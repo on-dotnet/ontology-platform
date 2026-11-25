@@ -564,3 +564,58 @@ def test_a_record_of_a_deleted_element_is_no_reason_to_go_into_it() -> None:
     gone = existing("entity_type", "Ladle", "钢包", status="deprecated")
     item = recorded(new_type(1, "TeemingLadle", "钢水包"), kind="same", element_id=gone.id)
     assert plan([item], [gone])[item.id] == Resolution("create")
+
+
+def test_a_name_record_holds_while_the_main_names_agree() -> None:
+    issue = existing("entity_type", "SparePartsIssue", "备件领用单")
+    record = {"kind": "name", "item_id": uuid4(), "item_element_id": issue.id}
+    slip = recorded(new_type(1, "IssueSlip", "领用单"), item_label_zh="领用单", **record)
+    assert plan([slip], [issue])[slip.id].element_id == issue.id
+    # No "keep apart" for it: renaming one side is what undoes it (spec 004, 5.5).
+    kept = recorded(
+        new_type(1, "IssueSlip", "领用单"), item_label_zh="领用单", decision="different", **record
+    )
+    assert plan([kept], [issue])[kept.id].element_id == issue.id
+    renamed = recorded(new_type(1, "IssueSlip", "领料单"), item_label_zh="领用单", **record)
+    assert plan([renamed], [issue])[renamed.id] == Resolution("create")
+
+
+def test_relations_of_two_items_of_one_concept_in_a_change_set_become_one() -> None:
+    heat = existing("entity_type", "Heat", "炉次")
+    ladle = new_type(1, "Ladle", "钢包")
+    pot = recorded(new_type(2, "Pot", "钢水包"), kind="same", item_id=ladle.id)
+
+    def uses(seq: int, ref: str, local_name: str) -> PlanItem:
+        return proposed(
+            seq,
+            "create",
+            "relation_type",
+            temp_ref=f"new:{local_name}",
+            local_name=local_name,
+            label_zh="使用",
+            domain_ref=str(heat.id),
+            range_ref=ref,
+        )
+
+    first, second = uses(3, "new:Ladle", "usesLadle"), uses(4, "new:Pot", "usesPot")
+    result = plan([ladle, pot, first, second], [heat])
+    assert result[pot.id] == Resolution("into", item_id=ladle.id)
+    assert result[first.id] == Resolution("create")
+    assert result[second.id] == Resolution("into", item_id=first.id)
+
+
+def test_a_records_decision_is_not_taken_for_a_record_of_another_pair() -> None:
+    ladle = existing("entity_type", "Ladle", "钢包")
+    other = existing("entity_type", "Pot", "铁水罐")
+    entry = PlanMatchedBy("possible", ladle.id, None, T0)
+    # The item's own record points at 铁水罐; its "same" is about that pair, not about 钢包.
+    item = recorded(
+        new_type(1, "Teeming", "钢水包"),
+        kind="possible",
+        element_id=other.id,
+        decision="same",
+        matched_by=(entry,),
+    )
+    assert plan([item], [ladle, other])[item.id].element_id == other.id
+    alone = recorded(new_type(1, "Teeming", "钢水包"), decision="same", matched_by=(entry,))
+    assert plan([alone], [ladle, other])[alone.id].element_id == ladle.id

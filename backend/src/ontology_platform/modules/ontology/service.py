@@ -214,6 +214,8 @@ PlanElement = mergeplan.PlanElement
 Resolution = mergeplan.Resolution
 PlanMatch = mergeplan.PlanMatch
 PlanMatchedBy = mergeplan.PlanMatchedBy
+RecordedItem = mergeplan.RecordedItem
+link_records = mergeplan.link_records
 
 
 async def ontology_exists(db: AsyncSession, ontology_id: UUID) -> bool:
@@ -1120,36 +1122,29 @@ async def _links(db: AsyncSession, change_set: ChangeSet, items: Sequence[Change
         for other, owner in rows:
             if other.match_item_id is not None:
                 reverse[other.match_item_id].append((other, owner))
-    matches: dict[UUID, mergeplan.PlanMatch] = {}
-    for item in items:
-        if item.match_kind is None:
-            continue
-        found = others.get(item.match_item_id) if item.match_item_id else None
-        other_decision = item_element = None
-        if found is not None:
-            other, owner = found
-            other_decision = other.match_decision if _counts_for(other, item) else None
-            if owner.id != change_set.id:
-                item_element = _merged_into(other, owner)
-        matches[item.id] = mergeplan.PlanMatch(
-            item.match_kind,
-            element_id=item.match_element_id,
-            item_id=item.match_item_id if found is not None else None,
-            item_element_id=item_element,
-            other_decision=other_decision,
-        )
-    matched_by: dict[UUID, tuple[mergeplan.PlanMatchedBy, ...]] = {}
-    for item_id, entries in reverse.items():
-        matched_by[item_id] = tuple(
-            mergeplan.PlanMatchedBy(
-                cast(str, other.match_kind), element_id, other.match_decision, owner.merged_at
-            )
-            for other, owner in entries
-            if (element_id := _merged_into(other, owner)) is not None
-            and owner.merged_at is not None
-            and other.match_kind is not None
-        )
+    # The same resolution of records as the evaluation's (spec 004, 5.2): one pure function.
+    matches, matched_by = mergeplan.link_records(
+        [_recorded(item, change_set) for item in items],
+        {item_id: _recorded(other, owner) for item_id, (other, owner) in others.items()},
+        [_recorded(other, owner) for entries in reverse.values() for other, owner in entries],
+    )
     return _Links(others, reverse, matches, matched_by)
+
+
+def _recorded(item: ChangeItem, change_set: ChangeSet) -> mergeplan.RecordedItem:
+    fields = rules.effective_fields(item.proposed, item.edited)
+    return mergeplan.RecordedItem(
+        id=item.id,
+        change_set_id=change_set.id,
+        match_kind=item.match_kind,
+        match_element_id=item.match_element_id,
+        match_item_id=item.match_item_id,
+        match_decision=item.match_decision,
+        label_zh=fields.label_zh,
+        label_en=fields.label_en,
+        merged_into=_merged_into(item, change_set),
+        merged_at=change_set.merged_at,
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -1307,6 +1302,13 @@ async def _matches_out(
                 label = _item_label(other)
             if label is None:
                 continue  # the other side is gone (a deleted change set)
+            if (
+                other is not None
+                and owner is not None
+                and owner.id != item.change_set_id
+                and (other.decision == "rejected" or owner.status == "rejected")
+            ):
+                continue  # the plan does not follow a rejected item either
             data = {
                 "kind": item.match_kind,
                 "element_id": item.match_element_id,

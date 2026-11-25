@@ -561,13 +561,14 @@ def test_a_later_batch_does_not_extend_a_ref_an_earlier_batch_gave_to_two_types(
     assert by_label(proposals, "行车").fields["synonyms"] == []
 
 
-async def test_new_types_judged_the_same_become_one_type() -> None:
+async def test_new_types_judged_the_same_are_recorded_for_the_merge() -> None:
     # Was the merge of new types by shared names (#7): now candidates the model judges. A new
-    # type judged the same as an earlier one of this document joins it, as for G1.
+    # type judged the same as an earlier one of this document stays an item with that record
+    # (spec 004, 4.3), which the reviewer can overturn; the merge plan puts it into the other.
     types = [
         entity("new:LadleFurnace", "LF精炼炉", "LadleFurnace", synonyms=["精炼炉"]),
         entity("new:Ladle", "钢包", "Ladle"),
-        # Another name of the same furnace: merged, its names kept as synonyms.
+        # Another name of the same furnace.
         entity("new:Refiner", "精炼炉", "Refiner", synonyms=["LF炉"]),
         entity("new:Converter", "转炉", "Converter", label_en="Converter"),
         entity("new:BOF", "顶底复吹转炉", "BOF", label_en="converter"),
@@ -582,12 +583,22 @@ async def test_new_types_judged_the_same_become_one_type() -> None:
     proposals, _ = await run(ScriptedGateway(outputs(types, rels), resolver))
 
     created = [p for p in proposals if p.kind == "entity_type"]
-    assert [p.fields["labelZh"] for p in created] == ["LF精炼炉", "钢包", "转炉"]
-    furnace = by_label(proposals, "LF精炼炉")
-    assert [s["text"] for s in furnace.fields["synonyms"]] == ["精炼炉", "LF炉"]
-    assert [s["text"] for s in by_label(proposals, "转炉").fields["synonyms"]] == ["顶底复吹转炉"]
+    assert [p.fields["labelZh"] for p in created] == [
+        "LF精炼炉",
+        "钢包",
+        "精炼炉",
+        "转炉",
+        "顶底复吹转炉",
+    ]
+    assert by_label(proposals, "精炼炉").match == ProposedMatch(
+        "same", temp_ref="new:LadleFurnace", reason="理由"
+    )
+    assert by_label(proposals, "顶底复吹转炉").match == ProposedMatch(
+        "same", temp_ref="new:Converter", reason="理由"
+    )
+    # The relation keeps the type it was given; the merge plan puts both into one element.
     [link] = [p for p in proposals if p.kind == "relation_type"]
-    assert link.fields["rangeRef"] == "new:LadleFurnace"
+    assert link.fields["rangeRef"] == "new:Refiner"
 
 
 def prop(domain: str, label: str) -> PropertyOut:
@@ -868,9 +879,9 @@ async def test_one_character_matches_are_at_most_possible_duplicates() -> None:
         entity("new:Return", "回炉处理", "Return", quotes=[quote(0, "每个炉次只冶炼一个钢种")]),
         entity(
             "new:SlabReturn",
-            "板坯回炉",
+            "回炉处理",
             "SlabReturn",
-            synonyms=["回炉处理"],  # judged the same concept as the earlier type
+            synonyms=["板坯回炉"],  # the main name of the earlier type (G1): joins it
             quotes=[quote(1, "一个浇次由若干个炉次"), quote(1, "没有这句话")],
         ),
     ]
@@ -879,7 +890,6 @@ async def test_one_character_matches_are_at_most_possible_duplicates() -> None:
             "加热炉": ("转炉", "same"),
             "炉": ("转炉", "same"),
             "LF精炼炉": ("精炼炉", "unsure"),
-            "板坯回炉": ("回炉处理", "same"),
         }
     )
     proposals, _ = await run(

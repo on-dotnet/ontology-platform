@@ -54,7 +54,7 @@ def upgrade() -> None:
     op.create_check_constraint(
         op.f("ck_change_items_match_kind"),
         TABLE,
-        "match_kind IS NULL OR match_kind IN ('same', 'possible')",
+        "match_kind IS NULL OR match_kind IN ('same', 'possible', 'name')",
         schema=SCHEMA,
     )
     op.create_check_constraint(

@@ -1129,6 +1129,22 @@ describe('alignment records on the review page', () => {
     await waitFor(() => expect(screen.queryByRole('button', { name: /并入已有元素/ })).not.toBeInTheDocument());
   });
 
+  it('offers neither merging nor keeping apart for a record of the same main name', async () => {
+    const records = aligned().map((item) =>
+      item.id === 'item-eaf' && item.match ? { ...item, match: { ...item.match, kind: 'name' as const, reason: null } } : item,
+    );
+    alignmentServer(changeSetFixture(records));
+    renderApp('/review/cs-converter');
+
+    await screen.findByRole('article', { name: /^电弧炉/ });
+    const eaf = card(/^电弧炉/);
+    expect(within(eaf).getByText(`与变更集《${OTHER_SET}》里的“电炉”主名称相同，合并时随它并入同一元素`)).toBeInTheDocument();
+    expect(within(eaf).queryByRole('button', { name: '保持分开' })).not.toBeInTheDocument();
+    expect(within(eaf).queryByRole('button', { name: '并入' })).not.toBeInTheDocument();
+    // Not part of the same-concept bulk accept either: the merge follows the name.
+    expect(await screen.findByRole('button', { name: '并入已有元素（1）' })).toBeInTheDocument();
+  });
+
   it('offers no same-concept bulk accept outside AI extraction', async () => {
     alignmentServer(changeSetFixture(aligned(), { source: 'ai_assistant' }));
     renderApp('/review/cs-converter');

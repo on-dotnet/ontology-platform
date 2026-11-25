@@ -71,7 +71,7 @@ type ItemResolution = {
   keptFields: string[];                                    // 目标已有值、合并时保持不变的字段
 };
 type ItemMatch = {
-  kind: 'same' | 'possible';           // 模型判为同一概念／可能重复（含补查得到的）
+  kind: 'same' | 'possible' | 'name';   // 模型判为同一概念／可能重复（含补查得到的）／与待审项主名称相同（规格 004 第 4.3 节末尾）
   elementId: string | null;            // 对方是工作版本里的元素
   itemId: string | null; changeSetId: string | null; changeSetTitle: string | null;   // 对方是变更项（可以是本变更集里的）
   label: string;                       // 对方的显示名

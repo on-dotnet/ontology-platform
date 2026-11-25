@@ -26,8 +26,15 @@ interface MatchNoticeProps {
 export function MatchNotice({ item, match, changeSetId, canDecide, busy, onDecide }: MatchNoticeProps) {
   const { t } = useTranslation();
   const target = t(`review.match.target.${matchPlace(match, changeSetId)}`, { label: match.label, title: match.changeSetTitle ?? '' });
-  // Without a reason the record was not the model's call (same main name, or found by the lookup).
-  const titleKey = match.kind === 'possible' ? 'review.match.possible' : match.reason ? 'review.match.same' : 'review.match.sameNoReason';
+  // Without a reason the record was not the model's call (found by the write-time lookup).
+  const titleKey =
+    match.kind === 'name'
+      ? 'review.match.name'
+      : match.kind === 'possible'
+        ? 'review.match.possible'
+        : match.reason
+          ? 'review.match.same'
+          : 'review.match.sameNoReason';
   const settled = match.decision !== null || match.keptApart || item.appliedElementId !== null;
   const conclusion =
     match.decision === 'same'
@@ -40,7 +47,8 @@ export function MatchNotice({ item, match, changeSetId, canDecide, busy, onDecid
   // Merging is for a possible duplicate; it would not take effect once the other side was kept apart.
   // A conclusion already given can always be pressed again to clear it.
   const offersMerge = (match.kind === 'possible' && !match.keptApart) || match.decision === 'same';
-  const offersKeepApart = !match.keptApart || match.decision === 'different';
+  // A record of the same main name has no "keep apart": renaming one of the two undoes it (spec 004, 5.5).
+  const offersKeepApart = match.kind !== 'name' && (!match.keptApart || match.decision === 'different');
   const toggle = (decision: Exclude<MatchDecision, null>) => onDecide(match.decision === decision ? null : decision);
 
   const actions =

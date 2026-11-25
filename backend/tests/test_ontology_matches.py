@@ -287,3 +287,44 @@ async def test_a_type_proposed_meanwhile_is_marked_when_the_change_set_is_writte
         other["id"],
         None,
     )
+
+
+async def test_a_type_of_a_pending_items_main_name_follows_it_until_renamed(
+    app: FastAPI, client: AsyncClient, db: AsyncSession
+) -> None:
+    # 领用单 of the second document went into 备件领用单; the third document's 领用单 follows
+    # it there (a "name" record), unless a reviewer renames it.
+    for rename, types in ((False, 1), (True, 2)):
+        ontology = await add_ontology(db, "steel" if not rename else "steel2")
+        documents = [
+            await add_document(db, ontology, f"{name}.md", text)
+            for name, text in (("a", "备件领用单。"), ("b", "领用单。"), ("c", "领用单一式两份。"))
+        ]
+        relations = RelationsOut(relations=[], properties=[])
+        issue = entity("new:Issue", "备件领用单", "Issue", quotes=[quote(0, "备件领用单")])
+        slip = entity("new:Slip", "领用单", "Slip", quotes=[quote(0, "领用单")])
+        change_sets = await identify(
+            app,
+            [
+                (documents[0], [issue], relations),
+                (documents[1], [slip], relations),
+                (documents[2], [slip], relations),
+            ],
+            judge({"领用单": ("备件领用单", "same")}),
+        )
+        await sign_in(client, db, Role.ADMIN)
+        third = item_labelled(await detail(client, change_sets[2]), "领用单")
+        assert (third["match"]["kind"], third["match"]["changeSetId"]) == (
+            "name",
+            str(change_sets[1]),
+        )
+        assert await merged(client, change_sets[0]) == []
+        assert await merged(client, change_sets[1]) == []
+        if rename:
+            response = await patch_item(
+                client, change_sets[2], third["id"], {"edited": {"labelZh": "领料单"}}
+            )
+            assert response.status_code == 200
+        assert await merged(client, change_sets[2]) == []
+        found = [e for e in await working_version(db, ontology.id) if e.kind == "entity_type"]
+        assert len(found) == types

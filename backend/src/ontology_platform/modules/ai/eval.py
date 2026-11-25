@@ -69,9 +69,9 @@ from ontology_platform.modules.ontology.schemas import ElementFields
 from ontology_platform.modules.ontology.service import (
     PlanElement,
     PlanItem,
-    PlanMatch,
-    PlanMatchedBy,
+    RecordedItem,
     Resolution,
+    link_records,
     plan_merge,
 )
 from ontology_platform.settings import Settings
@@ -112,11 +112,9 @@ class WorkingVersion:
         # Flags of the item that created an element: whether a duplicate was marked ("aligned":
         # the item carried an alignment record).
         self.flags: dict[UUID, tuple[str, ...]] = {}
-        # Merged items: the element each went into or created, the decision its reviewer wrote,
-        # and the records that point at items of other change sets (spec 004, 5.3).
-        self.made: dict[UUID, UUID] = {}
-        self.decisions: dict[UUID, str] = {}
-        self.records: dict[UUID, list[PlanMatchedBy]] = {}
+        # Merged items as alignment records see them (spec 004, 5.3): what each became, the
+        # decision its reviewer wrote, and its own record.
+        self.recorded: dict[UUID, RecordedItem] = {}
         self._merges = 0
         self.same_kept_apart = 0
 
@@ -127,8 +125,7 @@ class WorkingVersion:
             dict(self.parents),
             dict(self.flags),
         )
-        other.made, other.decisions = dict(self.made), dict(self.decisions)
-        other.records = {key: list(value) for key, value in self.records.items()}
+        other.recorded = dict(self.recorded)
         other._merges = self._merges
         other.same_kept_apart = self.same_kept_apart
         return other
@@ -156,24 +153,47 @@ class WorkingVersion:
             for index, proposal in enumerate(proposals)
             if proposal.op == "create" and proposal.temp_ref
         }
-        merged_at = self._merges
+        change_set = stable_id("changeset", label)
+        decisions: list[str | None] = []
+        recorded: list[RecordedItem] = []
+        for seq, proposal in enumerate(proposals, start=1):
+            record = proposal.match
+            decision = decide(proposal, record) if decide is not None and record else None
+            if record is not None and record.kind == "same" and decision == "different":
+                self.same_kept_apart += 1
+            decisions.append(decision)
+            other = None
+            if record is not None:
+                other = record.item_id or (by_ref.get(record.temp_ref) if record.temp_ref else None)
+            recorded.append(
+                RecordedItem(
+                    id=ids[seq - 1],
+                    change_set_id=change_set,
+                    match_kind=record.kind if record else None,
+                    match_element_id=record.element_id if record else None,
+                    match_item_id=other,
+                    match_decision=decision,
+                    label_zh=proposal.fields.get("labelZh"),
+                    label_en=proposal.fields.get("labelEn"),
+                )
+            )
+        # The same resolution of records as the merge's (`ontology.service`), on plain data.
+        here = {item.id: item for item in recorded}
+        wanted = {item.match_item_id for item in recorded if item.match_item_id}
+        matches, matched_by = link_records(
+            recorded,
+            {
+                key: here.get(key) or self.recorded[key]
+                for key in wanted
+                if key in here or key in self.recorded
+            },
+            [item for item in self.recorded.values() if item.match_item_id in here],
+        )
         items: list[PlanItem] = []
         for seq, proposal in enumerate(proposals, start=1):
             own = ids[seq - 1]
-            record = proposal.match
-            match: PlanMatch | None = None
-            decision: str | None = None
-            if record is not None:
-                other = record.item_id or (by_ref.get(record.temp_ref) if record.temp_ref else None)
-                match = PlanMatch(
-                    record.kind,
-                    element_id=record.element_id,
-                    item_id=other,
-                    item_element_id=self.made.get(other) if other else None,
-                    other_decision=self.decisions.get(other) if other else None,
-                )
-                decision = decide(proposal, record) if decide is not None else None
-                self.same_kept_apart += record.kind == "same" and decision == "different"
+            match = matches.get(own)
+            decision = decisions[seq - 1]
             items.append(
                 PlanItem(
                     id=own,
@@ -188,7 +208,7 @@ class WorkingVersion:
                     edited=False,
                     match=match,
                     match_decision=decision,
-                    matched_by=tuple(self.records.get(own, ())),
+                    matched_by=matched_by.get(own, ()),
                 )
             )
         plan = plan_merge(items, self._plan_elements(), base_iri=BASE_IRI)
@@ -245,22 +265,11 @@ class WorkingVersion:
             element_id: item.seq for item in reversed(items) if (element_id := made.get(item.id))
         }
         self.elements[start:] = sorted(self.elements[start:], key=lambda e: seq_of[e.id])
-        for item in items:
-            if item.id not in made:
-                continue
-            self.made[item.id] = made[item.id]
-            if item.match_decision is not None:
-                self.decisions[item.id] = item.match_decision
-            record = item.match
-            if record is not None and record.item_id and record.item_id not in by_item:
-                self.records.setdefault(record.item_id, []).append(
-                    PlanMatchedBy(
-                        record.kind,
-                        made[item.id],
-                        item.match_decision,
-                        _EPOCH + timedelta(seconds=merged_at),
-                    )
-                )
+        merged_at = _EPOCH + timedelta(seconds=self._merges)
+        for item in recorded:
+            self.recorded[item.id] = replace(
+                item, merged_into=made.get(item.id), merged_at=merged_at
+            )
         return [code for item in items if (code := outcomes[item.id]) is not None]
 
     def _plan_elements(self) -> list[PlanElement]:

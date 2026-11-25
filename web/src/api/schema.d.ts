@@ -2551,7 +2551,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "same" | "possible";
+            kind: "same" | "possible" | "name";
             /** Elementid */
             elementId: string | null;
             /** Itemid */

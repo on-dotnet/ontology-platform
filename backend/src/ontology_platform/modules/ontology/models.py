@@ -50,7 +50,9 @@ ChangeSetStatus = Literal["open", "merged", "rejected"]
 ChangeOp = Literal["create", "update", "delete", "restore"]
 Decision = Literal["pending", "accepted", "rejected"]
 ItemFlag = Literal["evidence_not_found", "possible_duplicate", "non_standard", "key_unverified"]
-MatchKind = Literal["same", "possible"]
+# same: the same concept (model); possible: may be (model, or the write-time recheck); name: the
+# main name of a pending item (guardrail G1), which a merge follows while the names agree.
+MatchKind = Literal["same", "possible", "name"]
 MatchDecision = Literal["same", "different"]
 # non_standard: an axiom that OWL API (and so Protégé) rewrites when it reads it.
 # key_unverified: a proposed binding key without a primary key or unique constraint behind it.
@@ -296,7 +298,7 @@ class ChangeItem(Base):
             name="confidence",
         ),
         CheckConstraint(
-            "match_kind IS NULL OR match_kind IN ('same', 'possible')", name="match_kind"
+            "match_kind IS NULL OR match_kind IN ('same', 'possible', 'name')", name="match_kind"
         ),
         CheckConstraint(
             "match_decision IS NULL OR match_decision IN ('same', 'different')",
