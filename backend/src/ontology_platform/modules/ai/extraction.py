@@ -48,6 +48,8 @@ Verdict = Literal["same", "different", "unsure"]
 BATCH_CHARS = 8000
 # Candidate terms per call of the types stage: a large document's terms would not fit one call.
 TYPES_BATCH_TERMS = 150
+# Sentences shown per term to the types stage: the first ones it occurs in.
+TERM_SENTENCES = 3
 UNFOUND_PENALTY = 0.5
 # Local names stay well below the 128 characters the ontology allows, leaving room for "new:".
 NAME_MAX = 100
@@ -429,7 +431,7 @@ class Extractor:
     ) -> list[EntityTypeOut]:
         """Types in batches of terms; later batches see the types found so far and reuse them.
 
-        Each term is shown with the first sentence it occurs in, and the short ids the call
+        Each term is shown with the first sentences it occurs in, and the short ids the call
         sees are turned back into the existing types' ids, so later code sees ids only.
         """
         sentences = [(normalize(s.text), s) for s in sentences_of(chunks)]
@@ -448,11 +450,11 @@ class Extractor:
                 + [item.ref for item in found if _as_uuid(item.ref) is not None]
             )
             keys = {term.name: normalize(term.name) for term in group}
-            first = {
-                name: next((s for text, s in sentences if key in text), None)
+            occurs = {
+                name: [s for text, s in sentences if key in text][:TERM_SENTENCES]
                 for name, key in keys.items()
             }
-            lines = _types_lines(context, found, group, aliases, first)
+            lines = _types_lines(context, found, group, aliases, occurs)
             result = await self.gateway.structured(
                 purpose="extract.types",
                 model=self.models.reasoning,
@@ -659,10 +661,10 @@ def _types_lines(
     found: Sequence[EntityTypeOut],
     terms: Sequence[TermOut],
     ids: Mapping[str, str],
-    first: Mapping[str, Sentence | None],
+    occurs: Mapping[str, Sequence[Sentence]],
 ) -> list[str]:
     """The types-stage input: existing types by short id (`ids`), the types of earlier batches
-    and the terms, each with the first sentence it occurs in (`first`)."""
+    and the terms, each with the first sentences it occurs in (`occurs`)."""
     lines = ["Existing entity types (id | label | synonyms):"]
     lines += [
         f"- {ids[str(element.id)]} | {element.label_zh} | {', '.join(element.synonyms)}"
@@ -677,10 +679,9 @@ def _types_lines(
             f"- {ids.get(item.ref, item.ref)} | {item.label_zh} | {', '.join(item.synonyms)}"
             for item in found
         ]
-    lines.append("\nCandidate terms (category | name | definition | first sentence):")
+    lines.append("\nCandidate terms (category | name | definition | sentences):")
     for term in terms:
-        sentence = first.get(term.name)
-        context = f"[{sentence.ref}] {sentence.line}" if sentence is not None else ""
+        context = "; ".join(f"[{s.ref}] {s.line}" for s in occurs.get(term.name, ()))
         lines.append(f"- {term.category} | {term.name} | {term.definition or ''} | {context}")
     return lines
 

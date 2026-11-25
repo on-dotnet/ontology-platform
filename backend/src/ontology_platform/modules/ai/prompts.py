@@ -57,7 +57,7 @@ Existing entity types are listed with short ids (E1, E2, ...); reuse them instea
 duplicates (refer to an existing type by its id). Refer to a new type as "new:<Name>", where
 <Name> is a PascalCase English name. Give a concise English label, and a definition of one
 sentence, or null. Attributes, values and relations are not entity types.
-Each term is shown with the first sentence it occurs in; cite the sentence that best shows
+Each term is shown with the first sentences it occurs in; cite the sentence that best shows
 the type.
 {COMMON_RULES}{CITE_RULE}"""
 

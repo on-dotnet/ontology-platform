@@ -485,7 +485,7 @@ def types_texts(gateway: ScriptedGateway) -> list[str]:
     return [text for purpose, text in gateway.texts if purpose == "extract.types"]
 
 
-async def test_few_terms_are_typed_in_one_call_each_with_its_first_sentence() -> None:
+async def test_few_terms_are_typed_in_one_call_each_with_its_first_sentences() -> None:
     gateway = ScriptedGateway(
         {
             "extract.terms": [
@@ -519,8 +519,8 @@ async def test_few_terms_are_typed_in_one_call_each_with_its_first_sentence() ->
         "Existing entity types (id | label | synonyms):\n"
         "- E1 | 钢种 | 牌号\n"
         "\n"
-        "Candidate terms (category | name | definition | first sentence):\n"
-        "- entity | 炉次 |  | [0.1] 每个炉次。\n"
+        "Candidate terms (category | name | definition | sentences):\n"
+        "- entity | 炉次 |  | [0.1] 每个炉次。; [1.1] 一个浇次由若干个炉次的钢水连续浇铸而成。\n"
         "- other | 浇次 | 连续浇铸的炉次 | [1.1] 一个浇次由若干个炉次的钢水连续浇铸而成。\n"
         "- entity | 铁水罐 |  | "
     ]
@@ -1623,3 +1623,22 @@ async def test_a_short_id_the_call_did_not_show_points_nowhere() -> None:
     assert by_label(proposals, "浇次").fields["parentRef"] == "new:Heat"
     [number] = [p for p in proposals if p.kind == "property"]
     assert number.fields["domainRef"] == heat.temp_ref == "new:Heat"
+
+
+async def test_a_term_is_shown_with_at_most_three_sentences() -> None:
+    chunk = ChunkText(id=uuid4(), seq=0, text="钢包一。钢包二。钢包三。钢包四。")
+    gateway = ScriptedGateway(
+        {
+            "extract.terms": [TermsOut(terms=[term("钢包")])],
+            "extract.types": [TypesOut(entity_types=[])],
+            "extract.relations": [RelationsOut(relations=[], properties=[])],
+        }
+    )
+    extractor = Extractor(gateway, ExtractionModels(standard="std", reasoning="deep"))
+
+    async def progress(step: str, done: int, total: int) -> None:
+        pass
+
+    await extractor.run(document_id=DOC, title="t", chunks=[chunk], known=[], progress=progress)
+    [text] = types_texts(gateway)
+    assert text.endswith("- entity | 钢包 |  | [0.1] 钢包一。; [0.2] 钢包二。; [0.3] 钢包三。")
