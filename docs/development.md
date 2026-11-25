@@ -116,4 +116,12 @@
 
 结果还包括证据定位率（提议的引文都能在原文找到的比例），以及每份资料、每个阶段的模型调用次数（含重试；回放命中记 0 次，另计 `replayed`）、耗时和输入输出 token，汇总在 `usage`。改了 `expected.toml` 想重新打分而不重跑，可把结果里的 `elements`、`parents` 和新的期望答案经 `--rescore` 重新计分（见 `ai/eval.py` 开头的说明）。
 
+**不入库的资料**。脱敏后的真实资料不提交进仓库，放在 `.verification/private-docs/<名称>/`（`.verification/` 已被 Git 忽略），结构同案例包：`docs/` 放资料，`eval/expected.toml` 可以没有。把目录路径当作案例参数：
+
+```powershell
+./dev.ps1 eval .verification/private-docs/<名称>
+```
+
+参数里带 `/` 或 `\` 就按目录处理，结果存为 `.verification/eval/dir-<名称>-<时间>.json`，录制存在 `.verification/eval/recordings/dir-<名称>/`，都不出 `.verification/`。没有 `eval/expected.toml` 时只做识别：输出识别出的元素、各阶段耗时与 token，并提示"没有答案，未打分"；答案后补上以后，加 `-Replay` 再跑一次即可打分，不再调用模型。注意：评测时资料内容会发给配置的模型服务（经 `OP_AI_BASE_URL`、`OP_AI_PROXY` 配置的地址），资料要先脱敏，且只能交给允许接收它的服务。
+
 案例包的规则（答案先写、留出集只用来测量）见 [samples/README.md](../samples/README.md)。

@@ -21,8 +21,10 @@
   gen-api           从后端导出 OpenAPI，并生成前端类型 web/src/api/schema.d.ts
   fmt <文件...>     用容器里的 ruff 修复并格式化指定的 backend 文件（经标准输入，只改这些文件）
   ai-check          在容器里实际调用一次模型，只显示能否连通，不显示地址与 Key
-  eval [案例] [-Replay] [-Recordings <目录>]
+  eval [案例|目录] [-Replay] [-Recordings <目录>]
                     识别 samples/<案例>（默认 steel）并按期望答案打分，结果存 .verification/eval/。
+                    也可给一个结构相同的目录（带 / 或 \，如 .verification/private-docs/<名称>），
+                    结果与录制以 dir-<目录名> 命名；没有 eval/expected.toml 时只识别、不打分。
                     模型调用按输入录制在 .verification/eval/recordings/<案例>/：输入没变的调用回放录制，
                     只有新的调用付费。-Replay 只回放（有调用没录过就失败，不用模型 Key）；
                     -Recordings 换一个录制目录，例如 worktree 里用主检出目录的录制
@@ -392,10 +394,23 @@ function Invoke-Fmt([string[]]$Files) {
 
 # Scores extraction on a case pack. Rootless Docker cannot bind-mount local folders, so documents
 # and recordings go in as JSON on stdin; the result and new recordings come back on stdout.
+# A case is a name under samples/ or the path of a folder laid out the same way (docs/ and,
+# optionally, eval/expected.toml), e.g. .verification/private-docs/<name>/ for documents that
+# must not be committed. Results and recordings of a folder case are named "dir-<folder>".
 function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
     if (-not $Case) { $Case = 'steel' }
-    $caseDir = Join-Path $Root "samples/$Case"
-    if (-not (Test-Path -LiteralPath (Join-Path $caseDir 'eval/expected.toml'))) { Stop-Dev "找不到 samples/$Case/eval/expected.toml" }
+    $asPath = [IO.Path]::GetFullPath($Case, (Get-Location).Path)
+    if ($Case -match '[\\/]') {
+        if (-not (Test-Path -LiteralPath (Join-Path $asPath 'docs') -PathType Container)) { Stop-Dev "目录里没有 docs/：$asPath" }
+        $caseDir = $asPath
+        $Case = 'dir-' + ((Split-Path -Leaf $asPath) -replace '[^\w.-]', '-')
+    } else {
+        $caseDir = Join-Path $Root "samples/$Case"
+        if (-not (Test-Path -LiteralPath (Join-Path $caseDir 'docs') -PathType Container)) { Stop-Dev "找不到 samples/$Case/docs" }
+    }
+    $answers = Join-Path $caseDir 'eval/expected.toml'
+    $hasAnswers = Test-Path -LiteralPath $answers -PathType Leaf
+    if (-not $hasAnswers) { Write-Note "没有 eval/expected.toml：只做识别，不打分" }
     $RecordingsDir = $RecordingsDir ? [IO.Path]::GetFullPath($RecordingsDir, (Get-Location).Path) : (Join-Path $Root ".verification/eval/recordings/$Case")
     if ($ReplayOnly -and -not (Test-Path -LiteralPath $RecordingsDir -PathType Container)) { Stop-Dev "只回放需要录制，目录不存在：$RecordingsDir" }
     Confirm-BaseImages
@@ -404,7 +419,7 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
     foreach ($item in Get-ChildItem -LiteralPath (Join-Path $caseDir 'docs') -File) {
         $files["docs/$($item.Name)"] = [Convert]::ToBase64String([IO.File]::ReadAllBytes($item.FullName))
     }
-    $files['eval/expected.toml'] = [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $caseDir 'eval/expected.toml')))
+    if ($hasAnswers) { $files['eval/expected.toml'] = [Convert]::ToBase64String([IO.File]::ReadAllBytes($answers)) }
     $recordingTexts = @()
     $manifest = $null
     if (Test-Path -LiteralPath $RecordingsDir -PathType Container) {
@@ -424,7 +439,7 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
     [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
     $OutputEncoding = [Text.UTF8Encoding]::new($false)
     try {
-        Write-Step "识别 samples/$Case（$($ReplayOnly ? '只回放' : '有录制就回放')，录制目录 $RecordingsDir；进度显示在下方）"
+        Write-Step "识别 $caseDir（$($ReplayOnly ? '只回放' : '有录制就回放')，录制目录 $RecordingsDir；进度显示在下方）"
         $output = $bundle | docker compose @composeArgs run --rm -T --no-deps @noModel --name (New-TempName 'eval') api python -m ontology_platform.modules.ai.eval
         $code = $LASTEXITCODE
     } finally {
@@ -447,9 +462,12 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
     }
     Set-Content -LiteralPath $outFile -Encoding utf8NoBOM -Value $reply.result
     $result = $reply.result | ConvertFrom-Json
+    if (-not $result.scored) { Write-Note '没有答案，未打分；补上 eval/expected.toml 后用 -Replay 重跑即可打分，不再调用模型' }
     foreach ($section in 'entityTypes', 'relations', 'properties', 'hierarchy') {
         $numbers = $result.$section
-        if ($numbers.PSObject.Properties['precision']) {
+        if (-not $result.scored) {
+            Write-Host ("  {0,-12} 识别出 {1,4}" -f $section, $numbers.predicted)
+        } elseif ($numbers.PSObject.Properties['precision']) {
             Write-Host ("  {0,-12} 预测 {1,4}  准确率 {2}  召回率 {3}" -f $section, $numbers.predicted, $numbers.precision, $numbers.recall)
         } else {
             Write-Host ("  {0,-12} 预测 {1,4}  （期望答案没有这一段，不计分）" -f $section, $numbers.predicted)

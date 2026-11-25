@@ -2,6 +2,7 @@
 
 import json
 import re
+import tomllib
 from collections.abc import Sequence
 from typing import Any
 from uuid import UUID, uuid4
@@ -301,6 +302,23 @@ async def test_a_replayed_run_scores_the_same_without_calling_the_model() -> Non
     assert _scores(replayed) == _scores(recorded)
     assert replayed["usage"]["total"]["calls"] == 0
     assert replayed["usage"]["total"]["replayed"] == 6
+
+
+async def test_a_case_without_answers_is_run_but_not_scored_and_can_be_scored_later() -> None:
+    unanswered = {path: data for path, data in CASE_FILES.items() if path.startswith("docs/")}
+    result = await run_case(unanswered, ReplayGateway({}, ModelStandIn()), MODELS)
+
+    assert result["scored"] is False
+    assert result["entityTypes"] == {"predicted": 2}
+    assert result["relations"] == {"predicted": 1}
+    assert result["usage"]["total"]["calls"] == 6
+
+    expected = tomllib.loads(CASE_FILES["eval/expected.toml"].decode())
+    parents = {UUID(c): UUID(p) for c, p in result["parents"].items()}
+    later = score(load_elements(result["elements"]), expected, parents)
+    scored = await run_case(CASE_FILES, ReplayGateway({}, ModelStandIn()), MODELS)
+    assert scored["scored"] is True
+    assert {key: scored[key] for key in later} == later
 
 
 async def test_replay_only_fails_on_the_first_call_it_has_no_recording_for() -> None:

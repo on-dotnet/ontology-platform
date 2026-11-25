@@ -6,7 +6,8 @@ Reads a JSON bundle on stdin:
    "mode": "record" | "replay"}
 Runs the model over every document in order, accepting every proposal so that later documents
 align with what earlier ones produced, then scores entity types, relations and, when
-eval/expected.toml has them, properties and hierarchy (format in docs/development.md).
+eval/expected.toml has them, properties and hierarchy (format in docs/development.md). A case
+without eval/expected.toml (private documents whose answers come later) is run and not scored.
 
 Model calls go through `ReplayGateway`: a call whose input was recorded is answered from the
 recording. "record" calls the model for the others and returns their recordings; "replay"
@@ -355,7 +356,9 @@ def _usage(gateway: ReplayGateway) -> dict[str, Any]:
 async def run_case(
     files: Mapping[str, bytes], gateway: ReplayGateway, models: ExtractionModels
 ) -> dict[str, Any]:
-    expected = tomllib.loads(files["eval/expected.toml"].decode("utf-8"))
+    """Runs a case; without eval/expected.toml it only counts what was found (`scored` false)."""
+    answers = files.get("eval/expected.toml")
+    expected = tomllib.loads(answers.decode("utf-8")) if answers is not None else None
     extractor = Extractor(gateway, models)
     known: list[KnownElement] = []
     parents: dict[UUID, UUID] = {}
@@ -393,7 +396,17 @@ async def run_case(
         ungrounded += sum("evidence_not_found" in p.flags for p in proposals)
         known = accept(known, proposals, parents)
 
-    result = score(known, expected, parents)
+    if expected is not None:
+        result = {"scored": True, **score(known, expected, parents)}
+    else:
+        types = {e.id for e in known if e.kind == "entity_type"}
+        result = {
+            "scored": False,
+            "entityTypes": {"predicted": len(types)},
+            "relations": {"predicted": sum(e.kind == "relation_type" for e in known)},
+            "properties": {"predicted": sum(e.kind == "property" for e in known)},
+            "hierarchy": {"predicted": sum(child in types for child in parents)},
+        }
     result["models"] = asdict(models)
     result["proposals"] = proposals_total
     result["groundedShare"] = (
