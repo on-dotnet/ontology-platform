@@ -399,7 +399,6 @@ async def test_a_type_deleted_earlier_can_be_identified_again(
 # ---------- relations: what counts as the same relation, and as direct evidence ----------
 
 
-@delivered_by("PR 2")
 def test_a_relation_with_an_existing_label_and_domain_but_another_range_is_proposed() -> None:
     heat = KnownElement(id=uuid4(), kind="entity_type", local_name="Heat", label_zh="炉次")
     ladle = KnownElement(id=uuid4(), kind="entity_type", local_name="Ladle", label_zh="钢包")
@@ -432,7 +431,6 @@ def test_a_relation_with_an_existing_label_and_domain_but_another_range_is_propo
     ]
 
 
-@delivered_by("PR 2")
 def test_relation_evidence_does_not_depend_on_where_the_lines_wrap() -> None:
     sentence = "每个炉次的钢水出钢后装入钢包，随后由行车吊运至精炼炉。"
     # Text extracted from a PDF breaks lines where the page does, here after 随后.
