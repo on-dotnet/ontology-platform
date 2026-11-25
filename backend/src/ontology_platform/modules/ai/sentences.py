@@ -16,7 +16,7 @@ MAX_UNIT = 300
 WRAP_SHARE = 0.8
 WRAP_PERCENTILE = 0.9
 
-_ENDS = frozenset("。！？；!?;")  # noqa: RUF001 (full-width punctuation)
+_ENDS = frozenset("。！？；!?;")
 _CLOSERS = frozenset("”’」』）)】》\"'")  # noqa: RUF001
 # A line starting like this is a list item, table row or heading of its own.
 _MARKER = re.compile(r"\s*(?:[-*•|#]|\d+(?:[.．](?!\d)|、))")  # noqa: RUF001
