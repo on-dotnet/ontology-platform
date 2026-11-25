@@ -21,7 +21,11 @@
   gen-api           从后端导出 OpenAPI，并生成前端类型 web/src/api/schema.d.ts
   fmt <文件...>     用容器里的 ruff 修复并格式化指定的 backend 文件（经标准输入，只改这些文件）
   ai-check          在容器里实际调用一次模型，只显示能否连通，不显示地址与 Key
-  eval [案例]       用真实模型识别 samples/<案例>（默认 steel）并按期望答案打分，结果存 .verification/eval/（会产生模型费用）
+  eval [案例] [-Replay] [-Recordings <目录>]
+                    识别 samples/<案例>（默认 steel）并按期望答案打分，结果存 .verification/eval/。
+                    模型调用按输入录制在 .verification/eval/recordings/<案例>/：输入没变的调用回放录制，
+                    只有新的调用付费。-Replay 只回放（有调用没录过就失败，不用模型 Key）；
+                    -Recordings 换一个录制目录，例如 worktree 里用主检出目录的录制
   owl-check         Protégé 往返检查：样例与开发栈当前版本经平台导出，由 OWL API（断网）读写后再导回，
                     除已知改写外不得有差异；报告存 .verification/owl-check/
   ci [-Report]      完整门禁：compose 校验后，test-api、test-web、构建运行镜像三项同时运行，
@@ -41,7 +45,9 @@
 param(
     [Parameter(Position = 0)][string]$Command = 'help',
     [Parameter(Position = 1, ValueFromRemainingArguments = $true)][string[]]$Rest = @(),
-    [switch]$Report
+    [switch]$Report,
+    [switch]$Replay,
+    [string]$Recordings = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -384,11 +390,14 @@ function Invoke-Fmt([string[]]$Files) {
     }
 }
 
-# Scores extraction on a case pack with the real model. Files travel as base64 JSON on stdin.
-function Invoke-Eval([string]$Case) {
+# Scores extraction on a case pack. Rootless Docker cannot bind-mount local folders, so documents
+# and recordings go in as JSON on stdin; the result and new recordings come back on stdout.
+function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
     if (-not $Case) { $Case = 'steel' }
     $caseDir = Join-Path $Root "samples/$Case"
     if (-not (Test-Path -LiteralPath (Join-Path $caseDir 'eval/expected.toml'))) { Stop-Dev "找不到 samples/$Case/eval/expected.toml" }
+    $RecordingsDir = $RecordingsDir ? [IO.Path]::GetFullPath($RecordingsDir, (Get-Location).Path) : (Join-Path $Root ".verification/eval/recordings/$Case")
+    if ($ReplayOnly -and -not (Test-Path -LiteralPath $RecordingsDir -PathType Container)) { Stop-Dev "只回放需要录制，目录不存在：$RecordingsDir" }
     Confirm-BaseImages
     Invoke-Compose build api
     $files = @{}
@@ -396,22 +405,58 @@ function Invoke-Eval([string]$Case) {
         $files["docs/$($item.Name)"] = [Convert]::ToBase64String([IO.File]::ReadAllBytes($item.FullName))
     }
     $files['eval/expected.toml'] = [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $caseDir 'eval/expected.toml')))
-    $bundle = @{ files = $files } | ConvertTo-Json -Compress
+    $recordingTexts = @()
+    $manifest = $null
+    if (Test-Path -LiteralPath $RecordingsDir -PathType Container) {
+        foreach ($item in Get-ChildItem -LiteralPath $RecordingsDir -Filter '*.json' -File) {
+            $text = [IO.File]::ReadAllText($item.FullName, [Text.Encoding]::UTF8)
+            if ($item.Name -eq 'models.json') { $manifest = $text } else { $recordingTexts += $text }
+        }
+    }
+    $mode = $ReplayOnly ? 'replay' : 'record'
+    $bundle = @{ files = $files; recordings = $recordingTexts; manifest = $manifest; mode = $mode } | ConvertTo-Json -Compress -Depth 4
     $outDir = New-Item -ItemType Directory -Force -Path (Join-Path $Root '.verification/eval')
-    $outFile = Join-Path $outDir "$Case-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
+    $outFile = Join-Path $outDir "$Case$($ReplayOnly ? '-replay' : '')-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
     $composeArgs = Get-ComposeArgs
+    # Replay never reaches the model: the container gets no key and no proxy.
+    $noModel = $ReplayOnly ? @('-e', 'OP_OPENAI_API_KEY=', '-e', 'OP_AI_PROXY=') : @()
     $previousConsole = [Console]::OutputEncoding
     [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+    $OutputEncoding = [Text.UTF8Encoding]::new($false)
     try {
-        Write-Step "识别 samples/$Case（进度显示在下方）"
-        $result = $bundle | docker compose @composeArgs run --rm -T --no-deps --name (New-TempName 'eval') api python -m ontology_platform.modules.ai.eval
+        Write-Step "识别 samples/$Case（$($ReplayOnly ? '只回放' : '有录制就回放')，录制目录 $RecordingsDir；进度显示在下方）"
+        $output = $bundle | docker compose @composeArgs run --rm -T --no-deps @noModel --name (New-TempName 'eval') api python -m ontology_platform.modules.ai.eval
         $code = $LASTEXITCODE
     } finally {
         [Console]::OutputEncoding = $previousConsole
     }
-    if ($code -ne 0) { Stop-Dev "评测失败，退出码 $code" }
-    Set-Content -LiteralPath $outFile -Encoding utf8NoBOM -Value ($result -join "`n")
-    $result | Out-Host
+    try { $reply = ($output -join "`n") | ConvertFrom-Json } catch { $reply = $null }
+    if (-not $reply -or -not $reply.PSObject.Properties['files']) { Stop-Dev "评测没有返回结果，退出码 $code" }
+    # Recordings paid for are kept even when the run failed later.
+    $saved = 0
+    foreach ($file in @($reply.files)) {
+        if ($file.name -notmatch '^([0-9a-f]{64}|models)\.json$') { Stop-Dev "评测返回了意外的文件名：$($file.name)" }
+        if (-not (Test-Path -LiteralPath $RecordingsDir)) { New-Item -ItemType Directory -Force -Path $RecordingsDir | Out-Null }
+        Set-Content -LiteralPath (Join-Path $RecordingsDir $file.name) -Encoding utf8NoBOM -NoNewline -Value $file.content
+        if ($file.name -ne 'models.json') { $saved++ }
+    }
+    if ($saved -gt 0) { Write-Ok "新录制 $saved 次模型调用，存到 $RecordingsDir" }
+    if ($code -ne 0 -or -not $reply.PSObject.Properties['result']) {
+        $detail = $reply.PSObject.Properties['error'] ? $reply.error : "退出码 $code"
+        Stop-Dev "评测失败：$detail"
+    }
+    Set-Content -LiteralPath $outFile -Encoding utf8NoBOM -Value $reply.result
+    $result = $reply.result | ConvertFrom-Json
+    foreach ($section in 'entityTypes', 'relations', 'properties', 'hierarchy') {
+        $numbers = $result.$section
+        if ($numbers.PSObject.Properties['precision']) {
+            Write-Host ("  {0,-12} 预测 {1,4}  准确率 {2}  召回率 {3}" -f $section, $numbers.predicted, $numbers.precision, $numbers.recall)
+        } else {
+            Write-Host ("  {0,-12} 预测 {1,4}  （期望答案没有这一段，不计分）" -f $section, $numbers.predicted)
+        }
+    }
+    $total = $result.usage.total
+    Write-Host ("  证据定位率 {0}；模型调用 {1} 次、回放 {2} 次，输入 {3} / 输出 {4} token，{5} 秒" -f $result.groundedShare, $total.calls, $total.replayed, $total.inputTokens, $total.outputTokens, $total.seconds)
     Write-Ok "结果已保存到 $outFile"
 }
 
@@ -575,7 +620,7 @@ try {
         'ci' { Invoke-Ci }
         'psql' { Invoke-Compose exec postgres psql -U ontology -d ontology }
         'fmt' { Invoke-Fmt $Rest }
-        'eval' { Invoke-Eval ($Rest | Select-Object -First 1) }
+        'eval' { Invoke-Eval ($Rest | Select-Object -First 1) $Replay.IsPresent $Recordings }
         'owl-check' { Invoke-OwlCheck }
         'ai-check' {
             Confirm-BaseImages
