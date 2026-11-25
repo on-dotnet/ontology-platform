@@ -205,7 +205,9 @@ async def test_a_possible_duplicate_within_one_change_set_can_be_merged_into_the
                 ],
                 RelationsOut(
                     relations=[
-                        named(relation("new:Teeming", "new:Refiner", "运自", None), "comesFrom", "0.1")
+                        named(
+                            relation("new:Teeming", "new:Refiner", "运自", None), "comesFrom", "0.1"
+                        )
                     ],
                     properties=[],
                 ),
