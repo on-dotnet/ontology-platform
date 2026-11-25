@@ -244,9 +244,7 @@ async def test_a_type_proposed_meanwhile_is_marked_when_the_change_set_is_writte
     document = await add_document(db, ontology, "吊运规程.md", LADLE_TEXT)
     outputs: dict[str, list[BaseModel]] = {
         "extract.terms": [TermsOut(terms=[])],
-        "extract.types": [
-            TypesOut(entity_types=[entity("new:Ladle", "钢包", sentence="0.1")])
-        ],
+        "extract.types": [TypesOut(entity_types=[entity("new:Ladle", "钢包", sentence="0.1")])],
         "extract.relations": [RelationsOut(relations=[], properties=[])],
     }
     written: list[UUID] = []
