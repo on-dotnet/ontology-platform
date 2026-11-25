@@ -468,7 +468,40 @@
       "renameDone": "已改用局部名 {{localName}}",
       "restored": "“{{name}}”已被其他变更集恢复",
       "restoredDescription": "合并时不再恢复，只补上它还没有的同义词和定义。",
-      "kept": "已有元素的{{fields}}保持不变。"
+      "kept": "已有元素的{{fields}}保持不变。",
+      "intoPending": "合并时将并入本变更集里的“{{name}}”"
+    },
+    "match": {
+      "same": "模型判为与{{target}}是同一概念",
+      "sameNoReason": "与{{target}}是同一概念",
+      "possible": "可能与{{target}}重复",
+      "target": {
+        "element": "已有元素“{{label}}”",
+        "sameChangeSet": "本变更集里的“{{label}}”",
+        "otherChangeSet": "变更集《{{title}}》里的“{{label}}”"
+      },
+      "decidedSame": "已确认并入",
+      "decidedDifferent": "已确认保持分开，合并时照常新建",
+      "keptApart": "对方的审核人已定为保持分开，合并时照常新建",
+      "mergeInto": "并入",
+      "keepApart": "保持分开"
+    },
+    "matchBulk": {
+      "button": "并入已有元素（{{count}}）",
+      "title": "并入已有元素",
+      "description": "以下各项与已有的概念相同。确认后一起接受，合并时它们不再新建，而是并入对应的元素。",
+      "into": "将并入",
+      "place": "（{{place}}）",
+      "places": {
+        "element": "已有元素",
+        "sameChangeSet": "本变更集",
+        "otherChangeSet": "变更集《{{title}}》"
+      },
+      "confirm_one": "接受这 {{count}} 项",
+      "confirm_other": "接受这 {{count}} 项",
+      "accepted_one": "已接受 {{count}} 项，合并时将并入对应的元素",
+      "accepted_other": "已接受 {{count}} 项，合并时将并入对应的元素",
+      "failedTitle": "没有接受"
     },
     "mergedTitle": "已合并到本体",
     "mergedDescription": "已把 {{count}} 项修改应用到本体的工作版本。",

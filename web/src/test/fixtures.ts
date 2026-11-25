@@ -139,6 +139,7 @@ export function itemFixture(overrides: Partial<ChangeItem> = {}): ChangeItem {
     appliedElementId: null,
     evidence: [],
     resolution: null,
+    match: null,
     ...overrides,
   };
 }

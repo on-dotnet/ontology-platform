@@ -30,7 +30,8 @@ export function ResolutionNotice({ item, resolution }: ResolutionNoticeProps) {
     return merged ? (
       <Notice merged title={t('review.resolution.intoDone', { name })} />
     ) : (
-      <Notice title={t('review.resolution.into', { name })}>
+      // No element yet: it goes into what another item of this change set creates.
+      <Notice title={t(resolution.elementId === null ? 'review.resolution.intoPending' : 'review.resolution.into', { name })}>
         <p>{t(intoKey, { name })}</p>
         {keptNote ? <p>{keptNote}</p> : null}
       </Notice>

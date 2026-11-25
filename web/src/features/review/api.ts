@@ -12,6 +12,8 @@ export type ChangeOp = ChangeItem['op'];
 export type ChangeSetSource = ChangeSetDetail['source'];
 export type ItemFlag = ChangeItem['flags'][number];
 export type ItemResolution = NonNullable<ChangeItem['resolution']>;
+export type ItemMatch = NonNullable<ChangeItem['match']>;
+export type MatchDecision = ItemMatch['decision'];
 export type ItemPatch = components['schemas']['ItemDecisionPatch'];
 export type MergeResult = components['schemas']['MergeResult'];
 export type SkipCode = MergeResult['skipped'][number]['code'];
@@ -104,7 +106,8 @@ export function confidenceTier(confidence: number): ConfidenceTier {
 
 /**
  * Pending items safe to accept in bulk: confidence ≥ 0.8 and no flags. Items a merge would not add as
- * proposed (into an existing element, renamed) and restores are decided one by one (spec 004, 5.4).
+ * proposed (into an existing element, renamed), items with an alignment record and restores are decided
+ * one by one (spec 004, 5.4).
  */
 export function highConfidencePending(items: readonly ChangeItem[]): ChangeItem[] {
   return items.filter(
@@ -114,6 +117,29 @@ export function highConfidencePending(items: readonly ChangeItem[]): ChangeItem[
       item.confidence >= HIGH_CONFIDENCE &&
       item.flags.length === 0 &&
       !mergesDifferently(item) &&
+      item.match === null &&
       item.op !== 'restore',
   );
+}
+
+/**
+ * Pending items recorded as the same concept as an element or another item, unless a reviewer
+ * kept the two apart: offered as one explicit bulk accept that lists where each goes (spec 004, 5.4).
+ */
+export function sameConceptPending(items: readonly ChangeItem[]): (ChangeItem & { match: ItemMatch })[] {
+  return items.filter(
+    (item): item is ChangeItem & { match: ItemMatch } =>
+      item.decision === 'pending' && item.match?.kind === 'same' && item.match.decision !== 'different' && !item.match.keptApart,
+  );
+}
+
+export type MatchPlace = 'element' | 'sameChangeSet' | 'otherChangeSet';
+
+/**
+ * Where the other side of a record is: an element of the working version, or an item of this or
+ * another change set. A record synthesized from a merged item names that item's change set.
+ */
+export function matchPlace(match: ItemMatch, changeSetId: string): MatchPlace {
+  if (match.itemId === null || match.changeSetId === null) return 'element';
+  return match.changeSetId === changeSetId ? 'sameChangeSet' : 'otherChangeSet';
 }

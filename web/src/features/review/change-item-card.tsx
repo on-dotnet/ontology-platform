@@ -9,9 +9,10 @@ import { DATATYPES, turtleSummary } from '@/features/ontologies/api';
 import { ConstraintRules, TurtleBlock } from '@/features/ontology/element-content';
 import { cn } from '@/lib/cn';
 
-import type { ChangeItem, Decision, ElementFields } from './api';
+import type { ChangeItem, Decision, ElementFields, MatchDecision } from './api';
 import { AiSuggestionBadge, ConfidenceBadge, DecisionBadge, FlagTips, OpBadge } from './item-badges';
 import { ItemImpact } from './item-impact';
+import { MatchNotice } from './match-notice';
 import { ResolutionNotice } from './resolution-notice';
 import {
   COMPARED_FIELDS,
@@ -28,6 +29,8 @@ import {
 
 interface ChangeItemCardProps {
   item: ChangeItem;
+  /** The change set the item belongs to. */
+  changeSetId: string;
   context: RefContext;
   /** The change set was proposed by AI: items carry the AI label and confidence. */
   isAi: boolean;
@@ -39,6 +42,8 @@ interface ChangeItemCardProps {
   canDecide: boolean;
   busy: boolean;
   onDecide: (decision: Decision) => void;
+  /** The reviewer's conclusion on the item's alignment record; null clears it. */
+  onDecideMatch: (decision: MatchDecision) => void;
   onEdit: () => void;
   /** Offers the impact summary of updates and deletes, loaded from this ontology when opened. */
   impactOntologyId?: string;
@@ -47,6 +52,7 @@ interface ChangeItemCardProps {
 /** One proposed change with its operation, AI label and confidence, flags, decision buttons and evidence entry. */
 export function ChangeItemCard({
   item,
+  changeSetId,
   context,
   isAi,
   selected,
@@ -55,6 +61,7 @@ export function ChangeItemCard({
   canDecide,
   busy,
   onDecide,
+  onDecideMatch,
   onEdit,
   impactOntologyId,
 }: ChangeItemCardProps) {
@@ -72,6 +79,9 @@ export function ChangeItemCard({
   // A restore that another change set already did only adds to the element (see its notice).
   const showsCurrent = item.op === 'delete' || (item.op === 'restore' && item.resolution?.mode !== 'update');
 
+  // Once the reviewer kept the two apart, there is no duplicate left to check.
+  const flags = item.match?.decision === 'different' ? item.flags.filter((flag) => flag !== 'possible_duplicate') : item.flags;
+
   // Pressing the active decision again returns the item to "pending".
   const toggle = (decision: Exclude<Decision, 'pending'>) => onDecide(item.decision === decision ? 'pending' : decision);
 
@@ -88,7 +98,7 @@ export function ChangeItemCard({
         <OpBadge op={item.op} />
         {isAi ? <AiSuggestionBadge /> : null}
         {isAi && item.confidence !== null ? <ConfidenceBadge confidence={item.confidence} /> : null}
-        <FlagTips flags={item.flags} />
+        <FlagTips flags={flags} />
         {item.edited ? <Badge tone="neutral">{t('review.edited')}</Badge> : null}
         {!canDecide ? <DecisionBadge decision={item.decision} /> : null}
       </div>
@@ -105,6 +115,9 @@ export function ChangeItemCard({
       </h3>
 
       {showsCurrent ? <p className="mt-1.5 text-xs font-medium text-muted-foreground">{t(`review.currentValue.${item.op}`)}</p> : null}
+      {item.match ? (
+        <MatchNotice item={item} match={item.match} changeSetId={changeSetId} canDecide={canDecide} busy={busy} onDecide={onDecideMatch} />
+      ) : null}
       {item.resolution ? <ResolutionNotice item={item} resolution={item.resolution} /> : null}
       <ItemFacts item={item} fields={fields} context={context} />
       {item.op === 'update' || item.op === 'restore' ? (
