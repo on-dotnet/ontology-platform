@@ -450,6 +450,20 @@
     "merge": "合并到本体",
     "mergedToast": "已合并到本体",
     "mergeFailedTitle": "没有合并到本体",
+    "resolutionChangedTitle": "合并结果已与页面上显示的不同",
+    "resolutionChangedDescription": "本体或这个变更集在你看过之后有了变化，下面各项“合并时将……”的说明已按最新情况更新。请再看一遍，确认后再点“合并到本体”。",
+    "resolution": {
+      "into": "合并时将并入已有的“{{name}}”",
+      "intoDescription": "不再新建，只补上它还没有的同义词和内容；引用这一项的关系和属性改为指向它。",
+      "intoMemberDescription": "不再新建，只补上它还没有的同义词和内容。",
+      "intoDone": "已并入已有的“{{name}}”",
+      "rename": "局部名 {{wanted}} 已被本体里的其他元素使用",
+      "renameDescription": "合并时改用局部名 {{localName}}。",
+      "renameDone": "已改用局部名 {{localName}}",
+      "restored": "“{{name}}”已被其他变更集恢复",
+      "restoredDescription": "合并时不再恢复，只补上它还没有的同义词和定义。",
+      "kept": "已有元素的{{fields}}保持不变。"
+    },
     "mergedTitle": "已合并到本体",
     "mergedDescription": "已把 {{count}} 项修改应用到本体的工作版本。",
     "mergedWithSkipsTitle": "已合并，{{skipped}} 项被跳过",
@@ -1063,7 +1077,8 @@
       "dependency_skipped": "它引用的项被拒绝或被跳过",
       "invalid_item": "内容不完整或不合法",
       "has_dependents": "仍有其他元素引用它，没有删除",
-      "self_review": "当前为异人审核模式，不能审核自己提交的变更集，请让其他审核人处理。"
+      "self_review": "当前为异人审核模式，不能审核自己提交的变更集，请让其他审核人处理。",
+      "resolution_changed": "合并结果已与页面上显示的不同，请重新查看后再合并。"
     },
     "release": {
       "not_found": "版本不存在或已被删除。",

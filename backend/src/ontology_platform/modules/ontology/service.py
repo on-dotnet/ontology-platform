@@ -2,8 +2,8 @@
 
 The HTTP operations commit their own transaction. The functions other modules call
 (`get_ontology`, `list_alignment_elements`, `create_change_set`, `count_entity_types`,
-`count_open_change_sets`) never commit: `create_change_set` only adds to the caller's
-transaction.
+`count_open_change_sets`, `plan_merge`) never commit: `create_change_set` only adds to the
+caller's transaction, and `plan_merge` touches no database at all.
 
 Change sets are the only way the working version changes (AGENTS.md, "AI 不直接改本体").
 """
@@ -28,7 +28,7 @@ from sqlalchemy.orm import defer
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
-from ontology_platform.modules.ontology import rules, schemas
+from ontology_platform.modules.ontology import mergeplan, rules, schemas
 from ontology_platform.modules.ontology.models import (
     DATATYPES,
     ELEMENT_FLAGS,
@@ -56,6 +56,7 @@ STALE_TARGET = "changeset.stale_target"
 DEPENDENCY_SKIPPED = "changeset.dependency_skipped"
 INVALID_ITEM = "changeset.invalid_item"
 HAS_DEPENDENTS = "changeset.has_dependents"
+RESOLUTION_CHANGED = "changeset.resolution_changed"
 # The kinds M1's AI extraction aligns its proposals with.
 _ALIGNMENT_KINDS = ("entity_type", "relation_type", "property")
 
@@ -161,6 +162,13 @@ async def _active_elements(db: AsyncSession, ontology_id: UUID) -> list[Element]
 
 
 # ---------- interface for other modules ----------
+
+# What a merge of an AI-extracted change set does with each item, as a pure function of plain
+# data (spec 004, 5.2): the evaluation applies proposals with it, without a database.
+plan_merge = mergeplan.plan_merge
+PlanItem = mergeplan.PlanItem
+PlanElement = mergeplan.PlanElement
+Resolution = mergeplan.Resolution
 
 
 async def ontology_exists(db: AsyncSession, ontology_id: UUID) -> bool:
@@ -825,7 +833,165 @@ def _before(element: Element) -> schemas.ElementFields:
     return schemas.ElementFields.model_validate(data)
 
 
-async def _items_out(db: AsyncSession, items: Sequence[ChangeItem]) -> list[schemas.ChangeItem]:
+def _plan_elements(elements: Sequence[Element], base_iri: str) -> list[mergeplan.PlanElement]:
+    return [
+        mergeplan.PlanElement(
+            id=element.id,
+            kind=element.kind,
+            status=element.status,
+            local_name=element.local_name,
+            iri=iri_of(element, base_iri),
+            label_zh=element.label_zh,
+            label_en=element.label_en,
+            definition_zh=element.definition_zh,
+            definition_en=element.definition_en,
+            parent_id=element.parent_id,
+            domain_id=element.domain_id,
+            range_id=element.range_id,
+            datatype=element.datatype,
+            unit=element.unit,
+            required=element.required,
+            multiple=element.multiple,
+            revision=element.revision,
+            created_at=element.created_at,
+        )
+        for element in elements
+    ]
+
+
+def _plan_items(items: Sequence[ChangeItem]) -> list[mergeplan.PlanItem]:
+    return [
+        mergeplan.PlanItem(
+            id=item.id,
+            seq=item.seq,
+            op=item.op,
+            kind=item.kind,
+            decision=item.decision,
+            temp_ref=item.temp_ref,
+            target_element_id=item.target_element_id,
+            target_revision=item.target_revision,
+            fields=rules.effective_fields(item.proposed, item.edited),
+            edited=item.edited is not None,
+        )
+        for item in items
+    ]
+
+
+@dataclass(frozen=True, slots=True)
+class _Plan:
+    """The merge plan of a change set against the working version, and its token."""
+
+    resolutions: Mapping[UUID, mergeplan.Resolution]
+    token: str
+    # Whether merging needs the token: the plan does what merges did not do before.
+    needs_token: bool
+
+
+_NO_PLAN = _Plan({}, mergeplan.plan_token([], [], {}), needs_token=False)
+
+
+def _plan(
+    change_set: ChangeSet,
+    ontology: Ontology,
+    elements: Sequence[Element],
+    items: Sequence[ChangeItem],
+) -> _Plan:
+    """Only what the extraction proposes is planned; other sources say exactly what they do."""
+    if change_set.source != "ai_extraction":
+        return _NO_PLAN
+    plan_items = _plan_items(items)
+    plan_elements = _plan_elements(elements, ontology.base_iri)
+    resolutions = mergeplan.plan_merge(plan_items, plan_elements, base_iri=ontology.base_iri)
+    return _Plan(
+        resolutions,
+        mergeplan.plan_token(plan_items, plan_elements, resolutions),
+        mergeplan.changes_the_merge(plan_items, resolutions),
+    )
+
+
+def _resolution_out(
+    mode: str,
+    element: Element | None = None,
+    local_name: str | None = None,
+    kept_fields: Sequence[str] = (),
+) -> schemas.ItemResolution:
+    label = (
+        rules.display_label(element.label_zh, element.label_en, element.local_name)
+        if element is not None
+        else None
+    )
+    return schemas.ItemResolution.model_validate(
+        {
+            "mode": mode,
+            "element_id": element.id if element is not None else None,
+            "element_label": label,
+            "local_name": local_name,
+            "kept_fields": list(kept_fields),
+        }
+    )
+
+
+def _applied_resolutions(
+    change_set: ChangeSet,
+    items: Sequence[ChangeItem],
+    elements: Mapping[UUID, Element],
+) -> dict[UUID, schemas.ItemResolution]:
+    """What a merge did with the items it created elements for, read back from the result.
+
+    An item went into an element it did not create: one older than the merge, or one that an
+    earlier item of the change set created. Otherwise a local name other than the proposed
+    one means it was renamed. Which fields an element kept is not recorded.
+    """
+    out: dict[UUID, schemas.ItemResolution] = {}
+    if change_set.merged_at is None:
+        return out
+    made_here: set[UUID] = set()
+    for item in sorted(items, key=lambda item: item.seq):
+        if item.op != "create" or item.kind not in mergeplan.PLANNED_KINDS:
+            continue
+        element = elements.get(item.applied_element_id) if item.applied_element_id else None
+        if element is None:
+            continue
+        wanted = rules.effective_fields(item.proposed, item.edited).local_name
+        # Elements a merge creates carry the merge's own timestamp, so older means strictly.
+        if element.created_at < change_set.merged_at or element.id in made_here:
+            out[item.id] = _resolution_out("into", element)
+        elif element.local_name != wanted:
+            out[item.id] = _resolution_out("rename", local_name=element.local_name)
+        else:
+            out[item.id] = _resolution_out("create")
+        made_here.add(element.id)
+    return out
+
+
+async def _resolutions(
+    db: AsyncSession,
+    change_set: ChangeSet,
+    items: Sequence[ChangeItem],
+) -> tuple[dict[UUID, schemas.ItemResolution], str]:
+    """The resolution of each item for the API, and the token of the plan (spec 004, 5.4)."""
+    if change_set.source != "ai_extraction" or change_set.status == "rejected":
+        return {}, _NO_PLAN.token
+    ontology = await _ontology_or_404(db, change_set.ontology_id)
+    elements = await _elements(db, ontology.id)
+    by_id = {element.id: element for element in elements}
+    if change_set.status == "merged":
+        return _applied_resolutions(change_set, items, by_id), _NO_PLAN.token
+    plan = _plan(change_set, ontology, elements, items)
+    out: dict[UUID, schemas.ItemResolution] = {}
+    for item_id, resolution in plan.resolutions.items():
+        element = by_id.get(resolution.element_id) if resolution.element_id else None
+        out[item_id] = _resolution_out(
+            resolution.mode, element, resolution.local_name, resolution.kept_fields
+        )
+    return out, plan.token
+
+
+async def _items_out(
+    db: AsyncSession,
+    items: Sequence[ChangeItem],
+    resolutions: Mapping[UUID, schemas.ItemResolution],
+) -> list[schemas.ChangeItem]:
     evidence = await _evidence_by_item(db, [item.id for item in items])
     target_ids = {item.target_element_id for item in items if item.target_element_id}
     targets: dict[UUID, Element] = {}
@@ -857,6 +1023,7 @@ async def _items_out(db: AsyncSession, items: Sequence[ChangeItem]) -> list[sche
                     "decided_at": item.decided_at,
                     "applied_element_id": item.applied_element_id,
                     "evidence": evidence.get(item.id, []),
+                    "resolution": resolutions.get(item.id),
                 },
             ),
         )
@@ -941,7 +1108,14 @@ async def _detail(db: AsyncSession, change_set: ChangeSet) -> schemas.ChangeSetD
     items = await _items(db, change_set)
     counts = _counts(Counter(item.decision for item in items))
     data = _summary_data(change_set, counts)
-    return schemas.ChangeSetDetail.model_validate({**data, "items": await _items_out(db, items)})
+    resolutions, token = await _resolutions(db, change_set, items)
+    return schemas.ChangeSetDetail.model_validate(
+        {
+            **data,
+            "items": await _items_out(db, items, resolutions),
+            "resolution_token": token,
+        }
+    )
 
 
 async def get_change_set(db: AsyncSession, change_set_id: UUID) -> schemas.ChangeSetDetail:
@@ -1083,7 +1257,9 @@ async def update_item(
     if "note" in given:
         item.note = rules.clean_text(patch.note)
     await db.commit()
-    return (await _items_out(db, [item]))[0]
+    # The plan covers the whole change set: editing one item can change how others resolve.
+    resolutions, _ = await _resolutions(db, change_set, await _items(db, change_set))
+    return (await _items_out(db, [item], resolutions))[0]
 
 
 async def decide_items(
@@ -1203,8 +1379,11 @@ class _Merge:
         elements: Sequence[Element],
         items: Sequence[ChangeItem],
         now: datetime,
+        plan: Mapping[UUID, mergeplan.Resolution],
     ) -> None:
         self._db = db
+        # Made before anything is applied and followed as it is: what the reviewer was shown.
+        self._plan = plan
         self._change_set = change_set
         self._base_iri = ontology.base_iri
         self._prefixes = header_of(ontology).prefix_map()
@@ -1264,6 +1443,9 @@ class _Merge:
     async def _apply(self, item: ChangeItem) -> str | None:
         kind = item.kind
         target: Element | None = None
+        resolution = self._plan.get(item.id)
+        if resolution is not None and resolution.mode == "update":
+            return self._append(item, resolution)
         if item.op in ("update", "restore"):
             problem, target = self._target(item)
             if problem is not None:
@@ -1434,9 +1616,14 @@ class _Merge:
             self._elements[element.id] = element
             item.applied_element_id = element.id
             return None
-        if fields.local_name is None or fields.local_name in self._local_names:
+        resolution = self._plan.get(item.id)
+        if resolution is not None and resolution.mode == "into":
+            return self._into(item, fields, resolved, resolution)
+        renamed = resolution is not None and resolution.mode == "rename"
+        local_name = resolution.local_name if resolution and renamed else fields.local_name
+        if local_name is None or local_name in self._local_names:
             return INVALID_ITEM
-        iri = fields.iri if fields.iri is not None else self._base_iri + fields.local_name
+        iri = fields.iri if fields.iri is not None else self._base_iri + local_name
         if iri in self._iris:
             return INVALID_ITEM
         member = kind in rules.RULE_PATH_KINDS
@@ -1445,7 +1632,7 @@ class _Merge:
             id=uuid4(),
             ontology_id=self._change_set.ontology_id,
             kind=kind,
-            local_name=fields.local_name,
+            local_name=local_name,
             iri=fields.iri,
             label_zh=rules.clean_text(fields.label_zh),
             label_en=rules.clean_text(fields.label_en),
@@ -1472,10 +1659,99 @@ class _Merge:
         self._db.add(element)
         await self._db.flush()
         self._elements[element.id] = element
-        self._local_names.add(fields.local_name)
+        self._local_names.add(local_name)
         self._iris[iri] = element
         item.applied_element_id = element.id
         return None
+
+    def _into(
+        self,
+        item: ChangeItem,
+        fields: schemas.ElementFields,
+        resolved: dict[str, UUID | None],
+        resolution: mergeplan.Resolution,
+    ) -> str | None:
+        """Instead of creating a second element for the same thing, add to the first.
+
+        Items that refer to this one end up referring to that element, through
+        `applied_element_id`.
+        """
+        target = self._elements.get(resolution.element_id) if resolution.element_id else None
+        if target is None or target.kind != item.kind or target.status != "active":
+            return INVALID_ITEM
+        self._add_to(target, fields, resolved.get("parent_ref"), name_it=True)
+        item.applied_element_id = target.id
+        return None
+
+    def _append(self, item: ChangeItem, resolution: mergeplan.Resolution) -> str | None:
+        """An update that only adds: applied whatever the target's revision is by now."""
+        target = self._elements.get(resolution.element_id) if resolution.element_id else None
+        if target is None or target.kind != item.kind or target.status != "active":
+            return INVALID_ITEM
+        fields = rules.effective_fields(item.proposed, item.edited)
+        if rules.field_problems(
+            item.kind,
+            "update",
+            fields,
+            target_local_name=target.local_name,
+            target_imported=target.iri is not None,
+        ):
+            return INVALID_ITEM
+        self._add_to(target, fields, None, name_it=False)
+        item.applied_element_id = target.id
+        return None
+
+    def _add_to(
+        self,
+        target: Element,
+        fields: schemas.ElementFields,
+        parent_id: UUID | None,
+        *,
+        name_it: bool,
+    ) -> None:
+        """Add what `fields` knows and `target` lacks. Nothing the element has is replaced.
+
+        `name_it`: the fields describe an element of their own, whose label is one more name
+        of the target when it is none of its names yet.
+        """
+        labels = {mergeplan.name_key(text) for text in (target.label_zh, target.label_en) if text}
+        known = labels | {mergeplan.name_key(entry["text"]) for entry in target.synonyms}
+        added: list[dict[str, Any]] = []
+        label = rules.clean_text(fields.label_zh)
+        if name_it and label is not None and mergeplan.name_key(label) not in known:
+            added.append({"lang": "zh", "text": label})
+        added += [
+            {"lang": synonym.lang, "text": synonym.text}
+            for synonym in fields.synonyms or []
+            # Compared as names are compared everywhere: 高 炉 is the 高炉 it already has.
+            if mergeplan.name_key(synonym.text) not in known
+        ]
+        # Compared in the merged form: tidying up the element's own list is no change.
+        current = rules.merge_synonyms(target.synonyms)
+        synonyms = rules.merge_synonyms(current, added)
+        changed = synonyms != current
+        if changed:
+            target.synonyms = synonyms
+        for column in ("definition_zh", "definition_en", "label_en", "unit"):
+            if column == "label_en" and not name_it:
+                continue
+            if column == "unit" and target.kind != "property":
+                continue
+            value = rules.clean_text(getattr(fields, column))
+            if value is not None and not getattr(target, column):
+                setattr(target, column, value)
+                changed = True
+        if (
+            target.kind == "entity_type"
+            and target.parent_id is None
+            and parent_id is not None
+            and not self._has_ancestor(parent_id, target.id)
+        ):
+            target.parent_id = parent_id
+            changed = True
+        if changed:
+            target.revision += 1
+            target.updated_at = self._now
 
     def _has_ancestor(self, start: UUID, ancestor: UUID) -> bool:
         current: UUID | None = start
@@ -1601,8 +1877,14 @@ async def merge_change_set(
     actor: UUID,
     ip: str | None,
     review_mode: ReviewMode,
+    resolution_token: str | None = None,
 ) -> schemas.MergeResult:
     """Apply the accepted items to the working version in one transaction.
+
+    Items of an AI-extracted change set are applied as planned against the working version
+    (`mergeplan`): into an element that is the same thing, under another local name, or as
+    additions. `resolution_token` is the token of the plan the reviewer saw; if the plan is
+    another one by now, nothing is applied (409 `changeset.resolution_changed`).
 
     Creates, updates and restores come first (axioms after elements, so that an axiom finds the
     element it is about), deletes last. Skipped items: `changeset.stale_target` when the target
@@ -1616,7 +1898,9 @@ async def merge_change_set(
     change_set = await _change_set_or_404(db, change_set_id, lock=True)
     _ensure_open(change_set)
     _ensure_not_own(change_set, actor, review_mode)
-    result = await _apply_change_set(db, change_set, ontology, actor=actor, ip=ip)
+    result = await _apply_change_set(
+        db, change_set, ontology, actor=actor, ip=ip, resolution_token=resolution_token
+    )
     await db.commit()
     return result
 
@@ -1628,6 +1912,7 @@ async def _apply_change_set(
     *,
     actor: UUID,
     ip: str | None,
+    resolution_token: str | None = None,
 ) -> schemas.MergeResult:
     """The merge without the commit: the caller holds the ontology and change set locks and
     decides whether to commit (a manual edit rolls back when any item was skipped)."""
@@ -1635,7 +1920,17 @@ async def _apply_change_set(
     if any(item.decision == "pending" for item in items):
         raise AppError(409, "changeset.pending_items", "Every item needs a decision first.")
     now = _now()
-    merge = _Merge(db, change_set, ontology, await _elements(db, ontology.id), items, now)
+    elements = await _elements(db, ontology.id)
+    # Under the ontology lock: the plan made here is the one that is applied.
+    plan = _plan(change_set, ontology, elements, items)
+    seen = resolution_token == plan.token
+    if not seen and (resolution_token is not None or plan.needs_token):
+        raise AppError(
+            409,
+            RESOLUTION_CHANGED,
+            "The working version changed since the change set was shown; review it again.",
+        )
+    merge = _Merge(db, change_set, ontology, elements, items, now, plan.resolutions)
     accepted = [item for item in items if item.decision == "accepted"]
     ordered = [
         *(item for item in accepted if item.op != "delete" and item.kind != "axiom"),

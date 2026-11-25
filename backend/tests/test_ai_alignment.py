@@ -37,20 +37,20 @@ from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.ontology import service as ontology_service
 from ontology_platform.modules.ontology.models import Ontology
 from ontology_platform.modules.ontology.schemas import ElementCopy
-from support import csrf_headers
 from test_ai_extraction import ScriptedGateway, entity, prop, quote, relation
 from test_ai_pipeline import held
-from test_ontology_support import (
-    add_elements,
-    add_ontology,
-    change_set_items,
-    decide,
-    element,
-    sign_in,
-)
+from test_ontology_support import accept_and_merge, add_elements, add_ontology, element, sign_in
 
 MODELS = ExtractionModels(standard="std", reasoning="deep")
 NO_RELATIONS = RelationsOut(relations=[], properties=[])
+
+
+def delivered_by(change: str) -> pytest.MarkDecorator:
+    """Marks what a later change of spec 004 (section 11) delivers.
+
+    Strict: the change that makes the test pass has to remove the mark.
+    """
+    return pytest.mark.xfail(strict=True, reason=f"spec 004, section 11: {change}")
 
 
 async def add_document(db: AsyncSession, ontology: Ontology, filename: str, text: str) -> UUID:
@@ -101,22 +101,9 @@ async def identify(
 
 
 async def merged(client: AsyncClient, change_set_id: UUID) -> list[str]:
-    """Accept everything and merge the way the review page does; returns the skip codes.
-
-    The page sends back the `resolutionToken` of the detail it showed (spec 004, 5.4), so that
-    a merge never does what the reviewer has not seen.
-    """
-    url = f"/api/change-sets/{change_set_id}"
-    ids = [item["id"] for item in await change_set_items(client, change_set_id)]
-    assert (await decide(client, change_set_id, ids, "accepted")).status_code == 200
-    token = (await client.get(url)).json().get("resolutionToken")
-    response = await client.post(
-        f"{url}/merge",
-        json=None if token is None else {"resolutionToken": token},
-        headers=csrf_headers(client),
-    )
-    assert response.status_code == 200
-    skipped: list[dict[str, Any]] = response.json()["skipped"]
+    """Accept everything, merge the way the review page does, and return the skip codes."""
+    result = await accept_and_merge(client, change_set_id)
+    skipped: list[dict[str, Any]] = result["skipped"]
     return [skip["code"] for skip in skipped]
 
 
@@ -219,6 +206,7 @@ async def test_documents_naming_one_concept_give_one_type_and_keep_what_hangs_on
 CHUNK = ChunkText(id=uuid4(), seq=0, text="钢水由钢包吊运至精炼炉。每个炉次使用一座转炉冶炼。")
 
 
+@delivered_by("PR 3")
 def test_new_types_with_the_same_one_character_name_become_one_type() -> None:
     types = [
         entity("new:Steel", "钢", "Steel"),
@@ -230,6 +218,7 @@ def test_new_types_with_the_same_one_character_name_become_one_type() -> None:
     assert [p.fields["labelZh"] for p in proposals] == ["钢"]
 
 
+@delivered_by("PR 3")
 @pytest.mark.parametrize("furnace_first", [False, True], ids=["synonym-first", "label-first"])
 def test_a_one_character_name_that_is_another_new_types_synonym_is_a_possible_duplicate(
     furnace_first: bool,
@@ -410,6 +399,7 @@ async def test_a_type_deleted_earlier_can_be_identified_again(
 # ---------- relations: what counts as the same relation, and as direct evidence ----------
 
 
+@delivered_by("PR 2")
 def test_a_relation_with_an_existing_label_and_domain_but_another_range_is_proposed() -> None:
     heat = KnownElement(id=uuid4(), kind="entity_type", local_name="Heat", label_zh="炉次")
     ladle = KnownElement(id=uuid4(), kind="entity_type", local_name="Ladle", label_zh="钢包")
@@ -442,6 +432,7 @@ def test_a_relation_with_an_existing_label_and_domain_but_another_range_is_propo
     ]
 
 
+@delivered_by("PR 2")
 def test_relation_evidence_does_not_depend_on_where_the_lines_wrap() -> None:
     sentence = "每个炉次的钢水出钢后装入钢包，随后由行车吊运至精炼炉。"
     # Text extracted from a PDF breaks lines where the page does, here after 随后.

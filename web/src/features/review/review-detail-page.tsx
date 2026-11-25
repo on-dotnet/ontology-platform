@@ -5,6 +5,7 @@ import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { InfoTip } from '@/components/feedback/hint-tip';
+import { isApiError } from '@/api/errors';
 import { InlineNotice } from '@/components/feedback/inline-notice';
 import { useToast } from '@/components/feedback/toast';
 import { PageHeader } from '@/components/layout/page-header';
@@ -200,7 +201,9 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
   });
 
   const merge = useMutation({
-    mutationFn: () => mergeChangeSet(changeSet.id),
+    mutationFn: () => mergeChangeSet(changeSet.id, changeSet.resolutionToken),
+    // Another change set was merged since the page loaded: show what the merge would do now.
+    onError: (error) => (isResolutionChanged(error) ? refreshDetail() : undefined),
     onSuccess: async (result) => {
       setMergeResult(result);
       toast.success(t('review.mergedToast', { count: result.applied }));
@@ -287,7 +290,11 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
 
       <div className="space-y-4">
         {mergeResult ? <MergeResultNotice result={mergeResult} items={changeSet.items} context={context} /> : null}
-        {merge.isError ? (
+        {merge.isError && isResolutionChanged(merge.error) ? (
+          <InlineNotice tone="warning" title={t('review.resolutionChangedTitle')}>
+            {t('review.resolutionChangedDescription')}
+          </InlineNotice>
+        ) : merge.isError ? (
           <ErrorState error={merge.error} title={t('review.mergeFailedTitle')} onRetry={canDecide ? () => merge.mutate() : undefined} />
         ) : null}
       </div>
@@ -355,6 +362,10 @@ function ChangeSetReview({ changeSet, elements, language, own, selfReview }: Cha
       ) : null}
     </>
   );
+}
+
+function isResolutionChanged(error: unknown): boolean {
+  return isApiError(error) && error.code === 'changeset.resolution_changed';
 }
 
 interface WithdrawDialogProps {

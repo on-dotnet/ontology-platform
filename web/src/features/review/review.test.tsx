@@ -6,7 +6,7 @@ import { changeSetFixture, documentFixture, elementFixture, itemFixture, ontolog
 import type { UserInfo } from '@/features/auth/api';
 import { mockApi, problemResponse, renderApp, userWithRole, type RouteHandler } from '@/test/utils';
 
-import { countDecisions, type ChangeItem, type ChangeSetDetail, type ItemPatch } from './api';
+import { countDecisions, type ChangeItem, type ChangeSetDetail, type ItemPatch, type ItemResolution } from './api';
 
 const CHUNK_TEXT = '第一章 总则\n钢包是盛装和运送钢水的容器，使用前应烘烤至规定温度。\n板坯由连铸机生产。';
 const QUOTE = '钢包是盛装和运送钢水的容器';
@@ -703,3 +703,123 @@ describe('change item pagination', () => {
   });
 });
 
+
+describe('what a merge does with items proposed against an older baseline', () => {
+  const converter: ItemResolution = {
+    mode: 'into',
+    elementId: 'el-converter',
+    elementLabel: '转炉',
+    localName: null,
+    keptFields: ['definitionZh'],
+  };
+
+  function planned(): ChangeItem[] {
+    return [
+      itemFixture({ resolution: { ...converter, elementLabel: '钢包', elementId: 'el-ladle', keptFields: [] } }),
+      itemFixture({
+        id: 'item-converter',
+        seq: 2,
+        tempRef: 'new:Bof',
+        proposed: { localName: 'Bof', labelZh: '转炉', definitionZh: '吹氧炼钢的炉子。', synonyms: [] },
+        resolution: converter,
+      }),
+      itemFixture({
+        id: 'item-inverter',
+        seq: 3,
+        tempRef: 'new:Converter',
+        proposed: { localName: 'Converter', labelZh: '变流器', synonyms: [] },
+        resolution: { mode: 'rename', elementId: null, elementLabel: null, localName: 'Converter2', keptFields: [] },
+      }),
+      itemFixture({
+        id: 'item-tundish',
+        seq: 4,
+        tempRef: 'new:Tundish',
+        proposed: { localName: 'Tundish', labelZh: '中间包', synonyms: [] },
+        resolution: { mode: 'create', elementId: null, elementLabel: null, localName: null, keptFields: [] },
+      }),
+      itemFixture({
+        id: 'item-taps',
+        seq: 5,
+        kind: 'relation_type',
+        tempRef: 'new:tapsInto',
+        proposed: { localName: 'tapsInto', labelZh: '出钢至', domainRef: 'new:Bof', rangeRef: 'el-ladle' },
+        resolution: { ...converter, elementId: 'el-taps', elementLabel: '出钢至', keptFields: [] },
+      }),
+    ];
+  }
+
+  it('says on the card what the merge will do and leaves those items out of the bulk accept', async () => {
+    const user = userEvent.setup();
+    const api = reviewServer({ initial: changeSetFixture(planned()) });
+    renderApp('/review/cs-converter');
+
+    const into = await screen.findByRole('article', { name: /^转炉/ });
+    expect(within(into).getByText('合并时将并入已有的“转炉”')).toBeInTheDocument();
+    expect(within(into).getByText(/引用这一项的关系和属性改为指向它/)).toBeInTheDocument();
+    expect(within(into).getByText('已有元素的中文定义保持不变。')).toBeInTheDocument();
+    const renamed = card(/变流器/);
+    expect(within(renamed).getByText('局部名 Converter 已被本体里的其他元素使用')).toBeInTheDocument();
+    expect(within(renamed).getByText('合并时改用局部名 Converter2。')).toBeInTheDocument();
+    // Nothing refers to a relation: its note says only what is added.
+    const taps = card(/^出钢至/);
+    expect(within(taps).getByText('合并时将并入已有的“出钢至”')).toBeInTheDocument();
+    expect(within(taps).queryByText(/改为指向/)).not.toBeInTheDocument();
+    // A plain creation says nothing extra.
+    expect(within(card(/中间包/)).queryByText(/合并时/)).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '接受全部高置信度项（1）' }));
+
+    await waitFor(() => expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')).toHaveLength(1));
+    expect(api.calls('POST', '/api/change-sets/cs-converter/decisions')[0]?.body).toEqual({
+      itemIds: ['item-tundish'],
+      decision: 'accepted',
+    });
+  });
+
+  it('merges with the token of what it shows, and reloads the plan when the ontology moved on', async () => {
+    const user = userEvent.setup();
+    const shown = changeSetFixture(
+      planned().map((item) => ({ ...item, decision: 'accepted' as const })),
+      { resolutionToken: 'token-shown' },
+    );
+    const moved = { ...shown, resolutionToken: 'token-moved' };
+    let current = shown;
+    const api = reviewServer({
+      initial: shown,
+      extra: {
+        'GET /api/change-sets/:id': () => current,
+        'POST /api/change-sets/:id/merge': ({ body }) =>
+          (body as { resolutionToken: string }).resolutionToken === current.resolutionToken
+            ? { applied: 4, skipped: [] }
+            : problemResponse(409, 'changeset.resolution_changed'),
+      },
+    });
+    renderApp('/review/cs-converter');
+    await screen.findByRole('article', { name: /变流器/ });
+    current = moved;
+
+    await user.click(screen.getByRole('button', { name: '合并到本体' }));
+
+    const notice = await screen.findByText('合并结果已与页面上显示的不同');
+    expect(notice.closest('[role="status"]')).toHaveTextContent('确认后再点“合并到本体”');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(api.calls('POST', '/api/change-sets/cs-converter/merge')[0]?.body).toEqual({ resolutionToken: 'token-shown' });
+    await waitFor(() => expect(api.calls('GET', '/api/change-sets/cs-converter').length).toBeGreaterThan(1));
+
+    await user.click(screen.getByRole('button', { name: '合并到本体' }));
+
+    expect(await screen.findByText('已合并到本体')).toBeInTheDocument();
+    expect(api.calls('POST', '/api/change-sets/cs-converter/merge')[1]?.body).toEqual({ resolutionToken: 'token-moved' });
+  });
+
+  it('says what happened once the change set is merged', async () => {
+    const done = planned().map((item) => ({ ...item, decision: 'accepted' as const, appliedElementId: 'el-any' }));
+    reviewServer({ initial: changeSetFixture(done, { status: 'merged', mergedAt: '2026-11-25T08:00:00Z' }) });
+    renderApp('/review/cs-converter');
+
+    const into = await screen.findByRole('article', { name: /^转炉/ });
+    expect(within(into).getByText('已并入已有的“转炉”')).toBeInTheDocument();
+    expect(within(into).queryByText(/保持不变/)).not.toBeInTheDocument();
+    expect(within(card(/变流器/)).getByText('已改用局部名 Converter2')).toBeInTheDocument();
+  });
+});

@@ -169,8 +169,17 @@ async def decide_by_seq(
 
 
 async def merge(client: AsyncClient, change_set_id: UUID) -> Response:
+    """Merge the way the review page does: with the token of the detail it shows.
+
+    A merge that would do something the reviewer has not seen is refused (spec 004, 5.4), so
+    a merge without the token only works while nothing has to be shown.
+    """
+    url = f"/api/change-sets/{change_set_id}"
+    detail = await client.get(url)
+    token = detail.json().get("resolutionToken") if detail.status_code == 200 else None
     return await client.post(
-        f"/api/change-sets/{change_set_id}/merge",
+        f"{url}/merge",
+        json=None if token is None else {"resolutionToken": token},
         headers=csrf_headers(client),
     )
 
