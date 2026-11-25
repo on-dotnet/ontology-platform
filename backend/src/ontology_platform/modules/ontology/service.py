@@ -229,6 +229,45 @@ async def list_alignment_elements(db: AsyncSession, ontology_id: UUID) -> list[s
     ]
 
 
+@dataclass(frozen=True, slots=True)
+class PendingCandidate:
+    """A create item of another pending change set (spec 004, 4.1; filled from PR 3 on)."""
+
+    item_id: UUID
+    change_set_id: UUID
+    change_set_title: str
+    kind: str
+    temp_ref: str | None
+    fields: schemas.ElementFields
+
+
+@dataclass(frozen=True, slots=True)
+class AlignmentCandidates:
+    """What an extraction aligns with: `active` as `list_alignment_elements`; `deleted` object
+    types, relations and properties, which a new type of the same main name restores and whose
+    local names stay taken; `pending` items of other open change sets (empty until PR 3)."""
+
+    active: list[schemas.ElementCopy]
+    deleted: list[schemas.ElementCopy]
+    pending: list[PendingCandidate]
+
+
+async def list_alignment_candidates(db: AsyncSession, ontology_id: UUID) -> AlignmentCandidates:
+    ontology = await db.get(Ontology, ontology_id)
+    if ontology is None:
+        return AlignmentCandidates([], [], [])
+    copies = [
+        schemas.ElementCopy.model_validate(_element_data(element, ontology.base_iri))
+        for element in await _elements(db, ontology_id)
+        if element.kind in _ALIGNMENT_KINDS
+    ]
+    return AlignmentCandidates(
+        active=[copy for copy in copies if copy.status == "active"],
+        deleted=[copy for copy in copies if copy.status != "active"],
+        pending=[],
+    )
+
+
 async def count_entity_types(db: AsyncSession) -> int:
     """Active object types across all ontologies."""
     statement = (

@@ -52,7 +52,7 @@ def job_error(exc: AiError) -> Exception:
 def known_element(element: ElementCopy) -> KnownElement:
     return KnownElement(
         id=element.id,
-        kind=cast(Kind, element.kind),  # list_alignment_elements returns only these kinds
+        kind=cast(Kind, element.kind),  # alignment candidates are only of these kinds
         # Alignment elements are never axioms, so they have a local name; imported ones may
         # lack a Chinese label and are matched by the name the platform shows instead.
         local_name=element.local_name or "",
@@ -137,10 +137,9 @@ def make_extractor(
                 ChunkText(id=c.id, seq=c.seq, text=c.text, page=c.page, heading=c.heading)
                 for c in await documents.list_chunks(db, document_id)
             ]
-            known = [
-                known_element(element)
-                for element in await ontology.list_alignment_elements(db, ontology_id)
-            ]
+            candidates = await ontology.list_alignment_candidates(db, ontology_id)
+            known = [known_element(element) for element in candidates.active]
+            deleted = [known_element(element) for element in candidates.deleted]
 
         async def progress(step: str, done: int, total: int) -> None:
             async with session_factory.begin() as db:
@@ -156,6 +155,7 @@ def make_extractor(
                 chunks=chunks,
                 known=known,
                 progress=progress,
+                deleted=deleted,
             )
         except AiError as exc:
             raise job_error(exc) from exc

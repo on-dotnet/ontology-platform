@@ -21,13 +21,16 @@
   gen-api           从后端导出 OpenAPI，并生成前端类型 web/src/api/schema.d.ts
   fmt <文件...>     用容器里的 ruff 修复并格式化指定的 backend 文件（经标准输入，只改这些文件）
   ai-check          在容器里实际调用一次模型，只显示能否连通，不显示地址与 Key
-  eval [案例|目录] [-Replay] [-Recordings <目录>]
+  eval [案例|目录] [-Replay] [-Recordings <目录>] [-Sequential]
                     识别 samples/<案例>（默认 steel）并按期望答案打分，结果存 .verification/eval/。
                     也可给一个结构相同的目录（带 / 或 \，如 .verification/private-docs/<名称>），
                     结果与录制以 dir-<目录名> 命名；没有 eval/expected.toml 时只识别、不打分。
                     模型调用按输入录制在 .verification/eval/recordings/<案例>/：输入没变的调用回放录制，
                     只有新的调用付费。-Replay 只回放（有调用没录过就失败，不用模型 Key）；
-                    -Recordings 换一个录制目录，例如 worktree 里用主检出目录的录制
+                    -Recordings 换一个录制目录，例如 worktree 里用主检出目录的录制。
+                    跑两个场景（规格 004 第 10 节）：顺序场景每份资料的变更集合并后再识别下一份；同基线场景
+                    全部对着起始本体识别完再依次合并。都按合并计划全部接受，并报告跳过的项、重复的类型与关系；
+                    -Sequential 只跑顺序场景（例如同基线场景还没有录制时只回放）
   owl-check         Protégé 往返检查：样例与开发栈当前版本经平台导出，由 OWL API（断网）读写后再导回，
                     除已知改写外不得有差异；报告存 .verification/owl-check/
   schema-check      检查 web/src/api/schema.d.ts 与后端当前的 OpenAPI 一致（按 gen-api 的办法生成后比较，
@@ -52,7 +55,8 @@ param(
     [Parameter(Position = 1, ValueFromRemainingArguments = $true)][string[]]$Rest = @(),
     [switch]$Report,
     [switch]$Replay,
-    [string]$Recordings = ''
+    [string]$Recordings = '',
+    [switch]$Sequential
 )
 
 $ErrorActionPreference = 'Stop'
@@ -456,7 +460,7 @@ function Invoke-Fmt([string[]]$Files) {
 # A case is a name under samples/ or the path of a folder laid out the same way (docs/ and,
 # optionally, eval/expected.toml), e.g. .verification/private-docs/<name>/ for documents that
 # must not be committed. Results and recordings of a folder case are named "dir-<folder>".
-function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
+function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir, [bool]$SequentialOnly) {
     if (-not $Case) { $Case = 'steel' }
     $asPath = [IO.Path]::GetFullPath($Case, (Get-Location).Path).TrimEnd('\', '/')
     $isFolder = $Case -match '[\\/]'
@@ -491,7 +495,8 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
         }
     }
     $mode = $ReplayOnly ? 'replay' : 'record'
-    $bundle = @{ files = $files; recordings = $recordingTexts; manifest = $manifest; mode = $mode } | ConvertTo-Json -Compress -Depth 4
+    $scenarios = $SequentialOnly ? @('sequential') : @('sequential', 'sameBaseline')
+    $bundle = @{ files = $files; recordings = $recordingTexts; manifest = $manifest; mode = $mode; scenarios = $scenarios } | ConvertTo-Json -Compress -Depth 4
     $outDir = New-Item -ItemType Directory -Force -Path (Join-Path $Root '.verification/eval')
     $outFile = Join-Path $outDir "$Case$($ReplayOnly ? '-replay' : '')-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
     $composeArgs = Get-ComposeArgs
@@ -525,6 +530,14 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
     Set-Content -LiteralPath $outFile -Encoding utf8NoBOM -Value $reply.result
     $result = $reply.result | ConvertFrom-Json
     if (-not $result.scored) { Write-Note '没有答案，未打分；补上 eval/expected.toml 后用 -Replay 重跑即可打分，不再调用模型' }
+    Show-EvalScenario '顺序场景' $result
+    if ($result.PSObject.Properties['sameBaseline']) { Show-EvalScenario '同基线场景' $result.sameBaseline }
+    Write-Ok "结果已保存到 $outFile"
+}
+
+# Scores, merge counts and usage of one scenario of an evaluation result.
+function Show-EvalScenario([string]$Title, $result) {
+    Write-Host "  $Title"
     foreach ($section in 'entityTypes', 'relations', 'properties', 'hierarchy') {
         $numbers = $result.$section
         if (-not $result.scored) {
@@ -538,9 +551,15 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
             Write-Host ("  {0,-12} 预测 {1,4}  （期望答案没有这一段，不计分）" -f $section, $numbers.predicted)
         }
     }
+    $merge = $result.merge
+    $line = "  合并（全部接受）：跳过 {0} 项，重复关系 {1} 条" -f $merge.skipped, $merge.duplicateRelations
+    if ($merge.PSObject.Properties['duplicateTypeGroups']) {
+        $groups = $merge.duplicateTypeGroups
+        $line += "；重复类型 {0} 组（主名称相同 {1}、有标记 {2}、无标记 {3}）" -f $groups.total, $groups.sameMainName, $groups.marked, $groups.unmarked
+    }
+    Write-Host $line
     $total = $result.usage.total
     Write-Host ("  证据定位率 {0}；模型调用 {1} 次、回放 {2} 次，输入 {3} / 输出 {4} token，{5} 秒" -f $result.groundedShare, $total.calls, $total.replayed, $total.inputTokens, $total.outputTokens, $total.seconds)
-    Write-Ok "结果已保存到 $outFile"
 }
 
 # A value from dev/mirrors.cn.env, unless mirrors are switched off.
@@ -704,7 +723,7 @@ try {
         'ci' { Invoke-Ci }
         'psql' { Invoke-Compose exec postgres psql -U ontology -d ontology }
         'fmt' { Invoke-Fmt $Rest }
-        'eval' { Invoke-Eval ($Rest | Select-Object -First 1) $Replay.IsPresent $Recordings }
+        'eval' { Invoke-Eval ($Rest | Select-Object -First 1) $Replay.IsPresent $Recordings $Sequential.IsPresent }
         'owl-check' { Invoke-OwlCheck }
         'ai-check' {
             Confirm-BaseImages

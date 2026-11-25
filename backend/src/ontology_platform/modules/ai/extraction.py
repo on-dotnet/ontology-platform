@@ -26,6 +26,7 @@ from ontology_platform.modules.ai.prompts import (
     TermsOut,
     TypesOut,
 )
+from ontology_platform.modules.ai.sentences import covering, split_sentences
 
 Kind = Literal["entity_type", "relation_type", "property"]
 ProgressFn = Callable[[str, int, int], Awaitable[None]]
@@ -79,7 +80,7 @@ class ProposedEvidence:
 class Proposal:
     """One change item. `fields` uses the API's camelCase element field names (api-shapes)."""
 
-    op: Literal["create", "update"]
+    op: Literal["create", "update", "restore"]
     kind: Kind
     fields: dict[str, Any]
     target_element_id: UUID | None = None
@@ -135,13 +136,15 @@ class Extractor:
         chunks: Sequence[ChunkText],
         known: Sequence[KnownElement],
         progress: ProgressFn,
+        deleted: Sequence[KnownElement] = (),
     ) -> list[Proposal]:
+        """`deleted` elements are not shown to the model; see `build_proposals`."""
         groups = batches(chunks)
         terms = await self._terms(document_id, title, groups, progress)
         types = await self._types(document_id, title, terms, known, progress)
         relations = await self._relations(document_id, title, groups, types, known, progress)
         await progress("changeset", 0, 1)
-        proposals = build_proposals(chunks, known, types, relations)
+        proposals = build_proposals(chunks, known, types, relations, deleted=deleted)
         await progress("changeset", 1, 1)
         return proposals
 
@@ -299,15 +302,29 @@ def merge_types(
 
 
 class _Builder:
-    def __init__(self, chunks: Sequence[ChunkText], known: Sequence[KnownElement]) -> None:
+    def __init__(
+        self,
+        chunks: Sequence[ChunkText],
+        known: Sequence[KnownElement],
+        deleted: Sequence[KnownElement] = (),
+    ) -> None:
         self.by_seq = {chunk.seq: chunk for chunk in chunks}
         self.by_id = {chunk.id: chunk for chunk in chunks}
         self.chunks = list(chunks)
         self.known = list(known)
         self.known_ids = {str(element.id): element for element in known}
-        self.used_names = {element.local_name for element in known}
+        self.deleted_types = [element for element in deleted if element.kind == "entity_type"]
+        # A deleted element keeps its local name: a merge would find it taken.
+        self.used_names = {element.local_name for element in (*known, *deleted)}
         self.proposals: list[Proposal] = []
+        # The one update or restore per existing element; see `_maybe_update`.
         self.updates: dict[UUID, Proposal] = {}
+        self._units: dict[UUID, list[tuple[int, int]]] = {}
+
+    def units(self, chunk: ChunkText) -> list[tuple[int, int]]:
+        if chunk.id not in self._units:
+            self._units[chunk.id] = split_sentences(chunk.text)
+        return self._units[chunk.id]
 
     def ground(self, quotes: Sequence[Quote]) -> tuple[list[ProposedEvidence], bool]:
         """Locate each quote; returns the evidence and whether every quote was found."""
@@ -333,20 +350,22 @@ class _Builder:
     def states_link(
         self, evidence: Sequence[ProposedEvidence], domain: set[str], range_: set[str]
     ) -> bool:
-        """Whether a located quote's line names both ends (by any of their normalized names).
+        """Whether the sentences a located quote touches name both ends (by any of their names).
 
-        A line is the unit of direct evidence: a sentence group, list item or table row. Only
-        the longest mentions count, and the two ends need mentions that do not overlap: a name
-        inside a longer name (钢种 in 钢种成分要求) is not a mention of its own, and a type
-        related to itself has to be named twice.
+        A sentence (`sentences.split_sentences`: a sentence, list item or table row, however
+        the file broke its lines) is the unit of direct evidence. Only the longest mentions
+        count, and the two ends need mentions that do not overlap: a name inside a longer name
+        (钢种 in 钢种成分要求) is not a mention of its own, and a type related to itself has to
+        be named twice.
         """
         for item in evidence:
             chunk = self.by_id.get(item.chunk_id)
             if chunk is None or item.char_start is None or item.char_end is None:
                 continue
-            start = chunk.text.rfind("\n", 0, item.char_start) + 1
-            end = chunk.text.find("\n", item.char_end)
-            line = normalize(chunk.text[start : end if end != -1 else len(chunk.text)])
+            span = covering(self.units(chunk), item.char_start, item.char_end)
+            if span is None:
+                continue
+            line = normalize(chunk.text[span[0] : span[1]])
             mentions = [
                 (span, side)
                 for side, names in enumerate((domain, range_))
@@ -384,10 +403,17 @@ class _Builder:
         labels: Sequence[str],
         domain: UUID | None = None,
         synonyms: Sequence[str] = (),
+        range_: UUID | None = None,
     ) -> KnownElement | None:
-        """The first existing element of the kind that shares a name with the given ones."""
+        """The first existing element of the kind that shares a name with the given ones.
+
+        With `domain` (and `range_`), only elements with those ends: a relation of another
+        range is another link (炉次 使用 钢包, 炉次 使用 转炉).
+        """
         for element in self.known:
             if element.kind != kind or (domain is not None and element.domain_id != domain):
+                continue
+            if range_ is not None and element.range_id != range_:
                 continue
             if _shares_name(labels, synonyms, element):
                 return element
@@ -416,8 +442,15 @@ def build_proposals(
     known: Sequence[KnownElement],
     types: Sequence[EntityTypeOut],
     relations: RelationsOut,
+    *,
+    deleted: Sequence[KnownElement] = (),
 ) -> list[Proposal]:
-    builder = _Builder(chunks, known)
+    """Change items from the model's output, aligned with the existing elements `known`.
+
+    `deleted` are elements of the ontology that were deleted. A new type with the main name of
+    a deleted type restores it instead (spec 004, 5.6), and their local names stay taken.
+    """
+    builder = _Builder(chunks, known, deleted)
     # Each type the model gave -> the type it is in the change set: an existing id or our
     # temp_ref. The model sometimes gives one ref to two types; see `resolve`.
     became: list[tuple[EntityTypeOut, str]] = []
@@ -443,6 +476,14 @@ def build_proposals(
         if existing is not None:
             became.append((item, str(existing.id)))
             _maybe_update(builder, existing, item, item.quotes)
+            continue
+        restored = next(
+            (e for e in builder.deleted_types if normalize(e.label_zh) == normalize(item.label_zh)),
+            None,
+        )
+        if restored is not None:
+            became.append((item, str(restored.id)))
+            _maybe_update(builder, restored, item, item.quotes, op="restore")
             continue
         # A new type with a label that is a name of an earlier new type, or with a name that is
         # that type's label, is the same concept. Synonyms alone do not merge: two kinds of one
@@ -528,7 +569,7 @@ def build_proposals(
     # A model type's names count only for the type it became, whatever ref it shares.
     names_of: dict[str, set[str]] = {
         str(element.id): _element_keys(element)
-        for element in known
+        for element in (*known, *builder.deleted_types)
         if element.kind == "entity_type"
     }
     for item, target in became:
@@ -551,8 +592,14 @@ def build_proposals(
         ):
             continue  # no direct evidence: no quote's line names both types
         seen_relations.add(key)
-        domain_uuid = _as_uuid(domain)
-        if domain_uuid and builder.match_known("relation_type", [relation.label_zh], domain_uuid):
+        domain_uuid, range_uuid = _as_uuid(domain), _as_uuid(range_)
+        if (
+            domain_uuid
+            and range_uuid
+            and builder.match_known(
+                "relation_type", [relation.label_zh], domain_uuid, range_=range_uuid
+            )
+        ):
             continue
         local_name = builder.unique_name(relation.local_name, _CAMEL, "relatedTo")
         builder.add(
@@ -695,13 +742,15 @@ def _maybe_update(
     element: KnownElement,
     item: EntityTypeOut,
     quotes: Sequence[Quote],
+    op: Literal["update", "restore"] = "update",
 ) -> None:
     """Propose adding synonyms or a missing definition to an existing type; nothing otherwise.
 
     The model's Chinese label is a name the source uses for the type, so it is added as a
     synonym when it is none of the type's names yet. Several model types can land on the same
     existing type. They become one update: two updates of one element in a change set would
-    make the second look stale at merge time.
+    make the second look stale at merge time. A deleted type is restored with the same
+    additions, and restored even without any.
     """
     previous = builder.updates.get(element.id)
     known = {normalize(s) for s in (*element.synonyms, element.label_zh, element.label_en or "")}
@@ -721,16 +770,18 @@ def _maybe_update(
         and (previous is None or "definitionZh" not in previous.fields)
     ):
         fields["definitionZh"] = item.definition_zh
-    if not fields:
-        return
     if previous is not None:
-        previous.fields.setdefault("synonyms", []).extend(fields.pop("synonyms", []))
-        previous.fields.update(fields)
-        evidence, _ = builder.ground(quotes)
-        previous.evidence.extend(evidence)
+        if fields:
+            if "synonyms" in fields:
+                previous.fields.setdefault("synonyms", []).extend(fields.pop("synonyms"))
+            previous.fields.update(fields)
+            evidence, _ = builder.ground(quotes)
+            previous.evidence.extend(evidence)
+        return
+    if not fields and op == "update":
         return
     proposal = Proposal(
-        op="update",
+        op=op,
         kind="entity_type",
         target_element_id=element.id,
         target_revision=element.revision,
