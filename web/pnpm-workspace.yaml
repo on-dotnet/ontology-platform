@@ -4,3 +4,13 @@
 # native binaries (rolldown, lightningcss, tailwind oxide) arrive as optional dependencies.
 strictDepBuilds: true
 allowBuilds: {}
+
+# The latest releases of these two packages do not declare support for ESLint 10 / TypeScript 6 yet.
+# Each exception names the exact package version, so it stops applying once that package is upgraded.
+# Remove an entry when upstream releases support (issue #42). Meanwhile `scripts/lint-selfcheck.mjs`
+# only covers the ESLint plugins; for openapi-typescript, run `./dev.ps1 gen-api` and check that
+# schema.d.ts does not change unexpectedly.
+peerDependencyRules:
+  allowedVersions:
+    'eslint-plugin-jsx-a11y@6.10.2>eslint': '^10'
+    'openapi-typescript@7.13.0>typescript': '~6.0'

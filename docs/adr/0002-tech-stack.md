@@ -21,6 +21,7 @@
 ## 修订
 
 - 2026-11-23（M1）：AI 层原定"OpenAI Responses API + pydantic-ai"。M1 的分阶段抽取只需要"指令 + 文本 → Pydantic 结构"的单次调用，官方 SDK 的 `responses.parse` 已直接支持，再加一层框架只增加依赖和排错成本，因此改为直接用官方 SDK。pydantic-ai 等智能体框架推迟到 M2 的问答与智能体功能时再评估。
+- 2026-11-25：前端工具链升到 ESLint 10 和 TypeScript 6。原因是 ESLint 9 已于 2026-08-06 停止维护，TypeScript 停在 5.9。TypeScript 7 和 oxlint 暂不引入：7.0 没有稳定的编程接口（7.1 才有），`openapi-typescript`、`typescript-eslint` 都依赖它，等 7.1 的编程接口稳定后再评估。`eslint-plugin-jsx-a11y` 6.10.2 和 `openapi-typescript` 7.13.0 尚未声明支持新版本，在 `web/pnpm-workspace.yaml` 里按包和版本放行，并由 `web/scripts/lint-selfcheck.mjs` 确认无障碍与 Hooks 规则仍会报错；上游支持后撤销放行（议题 #42）。
 
 ## 被否决的方案
 
