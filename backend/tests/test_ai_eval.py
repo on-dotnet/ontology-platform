@@ -18,12 +18,14 @@ from ontology_platform.modules.ai.eval import (
     dump_elements,
     evaluate,
     load_elements,
+    parse_expected,
     run_case,
     score,
 )
 from ontology_platform.modules.ai.extraction import ExtractionModels, KnownElement, Proposal
 from ontology_platform.modules.ai.gateway import AiUnavailableError, InputFile
 from ontology_platform.modules.ai.replay import ReplayGateway, ReplayMissError, load_recordings
+from ontology_platform.settings import Settings
 
 EXPECTED = {
     "entity_types": [
@@ -347,10 +349,12 @@ def _bundle(files: dict[str, bytes], **extra: Any) -> dict[str, Any]:
 def test_a_failed_run_still_returns_the_calls_it_paid_for() -> None:
     output, code = evaluate(_bundle(CASE_FILES), FailsAfter(good=2))
     assert code == 1
-    assert output["error"].startswith("AiUnavailableError")
+    assert output["error"] == "AiUnavailableError: Model call failed: InternalServerError"
     names = [file["name"] for file in output["files"]]
     assert len(names) == 3  # two recordings and the models
     assert names[-1] == "models.json"
+    models = json.loads(output["files"][-1]["content"])["models"]
+    assert models == {"standard": Settings().ai_model, "reasoning": Settings().ai_reasoning_model}
 
 
 def test_a_run_that_recorded_nothing_leaves_the_models_file_alone() -> None:
@@ -378,6 +382,14 @@ def test_answers_are_checked_for_every_field_they_need() -> None:
         check_expected({**good, "entity_types": [{"names": ["炉次"]}]})
     with pytest.raises(ExpectedError, match=r"properties\[0\] needs names"):
         check_expected({**good, "properties": [{"domain": "炉次", "core": True}]})
+    # a string would be read character by character
+    with pytest.raises(ExpectedError, match=r"entity_types\[0\] needs names \(a list\)"):
+        check_expected({**good, "entity_types": [{"names": "炉次", "core": True}]})
+    # score divides by the number of core entries
+    with pytest.raises(ExpectedError, match="relations needs at least one core entry"):
+        check_expected({**good, "relations": [{**good["relations"][0], "core": False}]})
+    with pytest.raises(ExpectedError, match="not valid TOML"):
+        parse_expected("entity_types = [")
 
 
 def test_sections_without_a_denominator_score_none() -> None:

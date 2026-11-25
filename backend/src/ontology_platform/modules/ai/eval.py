@@ -178,16 +178,26 @@ class ExpectedError(ValueError):
     """eval/expected.toml is malformed; the message names the entry."""
 
 
+def _names_list(value: Any) -> bool:
+    return isinstance(value, list) and bool(value) and all(isinstance(n, str) for n in value)
+
+
 def check_expected(expected: Mapping[str, Any]) -> None:
-    """Fails on the first malformed entry: a missing field, or an end that names no type."""
+    """Fails on the first malformed entry: a missing field, or an end that names no type.
+
+    Also on what `score` cannot divide by: types and relations need a core entry each.
+    """
     types = expected.get("entity_types")
     if not types or not isinstance(types, list):
         raise ExpectedError("entity_types is missing or empty")
     first_names: set[str] = set()
     for index, entry in enumerate(types):
-        if not entry.get("names") or not isinstance(entry.get("core"), bool):
-            raise ExpectedError(f"entity_types[{index}] needs names and core")
+        if not _names_list(entry.get("names")) or not isinstance(entry.get("core"), bool):
+            raise ExpectedError(f"entity_types[{index}] needs names (a list) and core")
         first_names.add(normalize(entry["names"][0]))
+    for section in ("entity_types", "relations"):
+        if not any(entry.get("core") is True for entry in expected.get(section, [])):
+            raise ExpectedError(f"{section} needs at least one core entry")
     ends = {
         "relations": ("domain", "range"),
         "properties": ("domain",),
@@ -197,16 +207,23 @@ def check_expected(expected: Mapping[str, Any]) -> None:
         for index, entry in enumerate(expected.get(section, [])):
             if not isinstance(entry.get("core"), bool):
                 raise ExpectedError(f"{section}[{index}] needs core")
-            if section == "properties" and not entry.get("names"):
-                raise ExpectedError(f"{section}[{index}] needs names")
+            if section == "properties" and not _names_list(entry.get("names")):
+                raise ExpectedError(f"{section}[{index}] needs names (a list)")
             for field in fields:
                 if normalize(str(entry.get(field, ""))) not in first_names:
                     raise ExpectedError(
                         f"{section}[{index}].{field} = {entry.get(field)!r} is not the first "
                         "name of an entity type"
                     )
-    if "relations" not in expected:
-        raise ExpectedError("relations is missing")
+
+
+def parse_expected(text: str) -> dict[str, Any]:
+    try:
+        expected = tomllib.loads(text)
+    except tomllib.TOMLDecodeError as exc:
+        raise ExpectedError(f"eval/expected.toml is not valid TOML: {exc}") from None
+    check_expected(expected)
+    return expected
 
 
 def score(
@@ -394,9 +411,8 @@ async def run_case(
 ) -> dict[str, Any]:
     """Runs a case; without eval/expected.toml it only counts what was found (`scored` false)."""
     answers = files.get("eval/expected.toml")
-    expected = tomllib.loads(answers.decode("utf-8")) if answers is not None else None
-    if expected is not None:
-        check_expected(expected)  # before paying for any call
+    # Checked before paying for any call.
+    expected = parse_expected(answers.decode("utf-8")) if answers is not None else None
     extractor = Extractor(gateway, models)
     known: list[KnownElement] = []
     parents: dict[UUID, UUID] = {}
@@ -512,7 +528,7 @@ def main() -> int:
     if "--rescore" in sys.argv[1:]:
         known = load_elements(bundle["elements"])
         parents = {UUID(c): UUID(p) for c, p in bundle.get("parents", {}).items()}
-        expected = tomllib.loads(bundle["expected"])
+        expected = parse_expected(bundle["expected"])
         print(json.dumps(score(known, expected, parents), ensure_ascii=False))
         return 0
     output, code = evaluate(bundle)
