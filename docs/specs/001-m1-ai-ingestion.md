@@ -114,7 +114,7 @@ worker 用 `SELECT … FOR UPDATE SKIP LOCKED` 领取任务，运行期间每 15
    - **直接证据**：关系所引的那一句（一个列表项、一个表格行各算一句）里要分别出现两端对象类型的名称或同义词，否则丢弃；不换用别的句子。句子的切分见规格 004 第 8 节（`ai/sentences.py`）：句末标点、空行、列表与表格与标题的记号是边界，被排版折断的行接回原句，所以 PDF 硬换行不再拆开一句话；Markdown、Word 的一行是一段，同段不同句不算。只算最长的出现：落在另一处更长出现里的名称不算（“钢种成分要求”里的“钢种”“成分要求”都不另算），两端的出现不能重叠，类型与自身的关系要出现两次；一个字的名称不算，所以只有一个字名称的类型不会有关系。编号不存在的关系因此直接丢弃，不带 `evidence_not_found` 进入变更集。
    - 变更集标题为"识别：{资料名}"。
 
-所有模型调用都要求**结构化输出**（JSON Schema 由 Pydantic 模型生成），提示词里写明：只依据给定原文，证据用句子编号引用、不抄写原文，不确定时降低置信度。模型名取自配置：`terms`、`resolve` 与 `relations` 用 `OP_AI_MODEL`，`types` 用 `OP_AI_REASONING_MODEL`；推理强度分别取 `OP_AI_EFFORT`（默认 `low`）与 `OP_AI_REASONING_EFFORT`（默认 `default`，即不传参数、用服务端缺省），见规格 004 第 7.3 节。
+所有模型调用都要求**结构化输出**（JSON Schema 由 Pydantic 模型生成），提示词里写明：只依据给定原文，不确定时降低置信度；`types`、`relations` 的证据用句子编号引用、不抄写原文，`terms` 给逐字引语。模型名取自配置：`terms`、`resolve` 与 `relations` 用 `OP_AI_MODEL`，`types` 用 `OP_AI_REASONING_MODEL`。推理强度：`resolve` 与 `relations` 取 `OP_AI_EFFORT`（默认 `low`），`types` 取 `OP_AI_REASONING_EFFORT`（默认 `default`，即不传参数、用服务端缺省），`terms` 不设强度，见规格 004 第 7.3 节。
 
 模型调用一律走流式（Responses 流）：常见的代理会切断约 60 秒没有数据的连接，而一次识别常要一到两分钟。`OP_AI_TIMEOUT_SECONDS` 因此限制的是两次数据之间的等待，不是整次调用。
 

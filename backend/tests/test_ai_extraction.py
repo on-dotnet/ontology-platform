@@ -479,9 +479,10 @@ def term(
     category: Literal["entity", "attribute", "relation", "value", "other"] = "entity",
     definition: str | None = None,
     quotes: Sequence[Quote] = (),
+    english: str | None = None,
 ) -> TermOut:
     return TermOut(
-        name=name, english=None, definition=definition, category=category, quotes=list(quotes)
+        name=name, english=english, definition=definition, category=category, quotes=list(quotes)
     )
 
 
@@ -529,6 +530,52 @@ async def test_few_terms_are_typed_in_one_call_each_with_its_first_sentences() -
         "- other | 浇次 |  | 连续浇铸的炉次 | [1.1] 一个浇次由若干个炉次的钢水连续浇铸而成。\n"
         "- entity | 铁水罐 |  |  | "
     ]
+
+
+async def test_term_sentences_follow_the_located_quotes_else_the_name() -> None:
+    first = ChunkText(
+        id=uuid4(), seq=0, text="钢包在精炼炉等待。\n钢包吊运至连铸机。\n钢包返回转炉。\n钢包清理。"
+    )
+    second = ChunkText(id=uuid4(), seq=1, text="钢水由钢包盛装。\n行车吊运钢包。")
+    ladle_quotes = [
+        Quote(chunk=0, text="钢包吊运至连铸机"),
+        Quote(chunk=0, text="钢水由钢包盛装"),  # names the wrong chunk: found in the other
+        Quote(chunk=0, text="钢包返回转炉"),
+        Quote(chunk=0, text="钢包清理"),  # a fourth sentence: at most three are shown
+    ]
+    gateway = ScriptedGateway(
+        {
+            "extract.terms": [
+                TermsOut(
+                    terms=[
+                        term("钢包", english="Ladle", quotes=ladle_quotes[:2]),
+                        # Its quote is not in the text: the sentences naming it stand in.
+                        term("行车", quotes=[Quote(chunk=1, text="行车把钢包吊走")]),
+                        # A repeated term adds its quotes to the first one's.
+                        term("钢包", quotes=ladle_quotes[2:]),
+                    ]
+                )
+            ],
+            "extract.types": [TypesOut(entity_types=[])],
+            "extract.relations": [RelationsOut(relations=[], properties=[])],
+        }
+    )
+    extractor = Extractor(gateway, ExtractionModels(standard="std", reasoning="deep"))
+
+    async def progress(step: str, done: int, total: int) -> None:
+        pass
+
+    await extractor.run(
+        document_id=DOC, title="t", chunks=[first, second], known=[], progress=progress
+    )
+
+    [text] = types_texts(gateway)
+    assert text.endswith(
+        "Candidate terms (category | name | english | definition | sentences):\n"
+        "- entity | 钢包 | Ladle |  | "
+        "[0.2] 钢包吊运至连铸机。; [1.1] 钢水由钢包盛装。; [0.3] 钢包返回转炉。\n"
+        "- entity | 行车 |  |  | [1.2] 行车吊运钢包。"
+    )
 
 
 async def test_many_terms_are_typed_in_batches_that_see_earlier_types() -> None:

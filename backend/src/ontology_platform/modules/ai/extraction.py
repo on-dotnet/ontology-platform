@@ -693,12 +693,18 @@ def _types_lines(
 def _term_sentences(
     term: TermOut, chunks: Sequence[ChunkText], sentences: Sequence[tuple[str, Sentence]]
 ) -> list[Sentence]:
-    """The sentences a term's located quotes are in, at most `TERM_SENTENCES`; without any,
-    the first sentences that contain its name. `sentences` pairs each with its normalized text.
+    """The sentences a term's located quotes are in (a quote is looked for in the chunk it
+    names first, then in the others), at most `TERM_SENTENCES`; when no quote is located, the
+    first sentences that contain its name. `sentences` pairs each with its normalized text.
     """
     by_seq = {chunk.seq: chunk for chunk in chunks}
+    by_chunk: dict[UUID, list[Sentence]] = {}
+    for _, sentence in sentences:
+        by_chunk.setdefault(sentence.chunk.id, []).append(sentence)
     found: list[Sentence] = []
     for quote in term.quotes:
+        if len(found) >= TERM_SENTENCES:
+            break
         cited = by_seq.get(quote.chunk)
         for chunk in [*([cited] if cited else []), *(c for c in chunks if c is not cited)]:
             located = locate_quote(quote.text, chunk.text)
@@ -706,11 +712,8 @@ def _term_sentences(
                 continue
             found += [
                 s
-                for _, s in sentences
-                if s.chunk.id == chunk.id
-                and s.start < located.char_end
-                and located.char_start < s.end
-                and s not in found
+                for s in by_chunk.get(chunk.id, ())
+                if s.start < located.char_end and located.char_start < s.end and s not in found
             ]
             break
     if not found:

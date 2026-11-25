@@ -2,8 +2,9 @@
 
 Prompts are in English (models follow them best) but ask for labels in the source language.
 Every schema field is required (nullable where optional) so that strict structured outputs work.
-Outputs are kept short (spec 004, 7.2): evidence is cited by sentence number instead of being
-copied, existing types go by short ids (E1, E2), and items carry no rationale.
+Outputs are kept short (spec 004, 7.2): the types and relations stages cite evidence by sentence
+number instead of copying it, existing types go by short ids (E1, E2), and items carry no
+rationale. The terms stage keeps its verbatim quotes (see TERMS_RULES).
 """
 
 from typing import Literal
