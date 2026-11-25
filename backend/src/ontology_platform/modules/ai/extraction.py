@@ -24,7 +24,6 @@ from ontology_platform.modules.ai.candidates import (
     shortlist,
 )
 from ontology_platform.modules.ai.candidates import normalize as normalize
-from ontology_platform.modules.ai.evidence import locate_quote
 from ontology_platform.modules.ai.gateway import ModelGateway
 from ontology_platform.modules.ai.prompts import (
     RELATIONS_INSTRUCTIONS,
@@ -32,7 +31,6 @@ from ontology_platform.modules.ai.prompts import (
     TERMS_INSTRUCTIONS,
     TYPES_INSTRUCTIONS,
     EntityTypeOut,
-    Quote,
     RelationsOut,
     ResolveOut,
     TermOut,
@@ -49,7 +47,6 @@ Verdict = Literal["same", "different", "unsure"]
 BATCH_CHARS = 8000
 # Candidate terms per call of the types stage: a large document's terms would not fit one call.
 TYPES_BATCH_TERMS = 150
-MAX_QUOTES = 3
 UNFOUND_PENALTY = 0.5
 # Local names stay well below the 128 characters the ontology allows, leaving room for "new:".
 NAME_MAX = 100
@@ -66,6 +63,10 @@ RESOLVE_MEMBERS = 5
 REASON_MAX = 200
 _PASCAL = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 _CAMEL = re.compile(r"^[a-z][A-Za-z0-9]*$")
+# A cited sentence number, "3.12" (chunk 3, sentence 12), with or without brackets.
+_SENTENCE_REF = re.compile(r"^\[?\s*(\d+)\s*\.\s*(\d+)\s*\]?$")
+# Short ids of existing types in prompts (spec 004, 7.2): E1, E2, ...
+_ALIAS = "E{}"
 
 
 @dataclass(frozen=True)
@@ -282,6 +283,63 @@ def render_chunks(chunks: Iterable[ChunkText]) -> str:
     return "\n\n".join(f"[chunk {chunk.seq}]\n{chunk.text}" for chunk in chunks)
 
 
+@dataclass(frozen=True)
+class Sentence:
+    """A sentence unit of a chunk (`sentences.split_sentences`) and its number, "seq.n"."""
+
+    ref: str
+    chunk: ChunkText
+    start: int
+    end: int
+
+    @property
+    def text(self) -> str:
+        return self.chunk.text[self.start : self.end]
+
+    @property
+    def line(self) -> str:
+        """The text on one line: a unit can span the lines a layout broke it into."""
+        return " ".join(part.strip() for part in self.text.split("\n") if part.strip())
+
+
+def sentences_of(chunks: Iterable[ChunkText]) -> list[Sentence]:
+    return [
+        Sentence(f"{chunk.seq}.{number}", chunk, start, end)
+        for chunk in chunks
+        for number, (start, end) in enumerate(split_sentences(chunk.text), start=1)
+    ]
+
+
+def render_sentences(chunks: Iterable[ChunkText]) -> str:
+    """The text of a call that cites evidence: every sentence after its number (spec 004, 7.2)."""
+    blocks: dict[int, list[str]] = {}
+    for sentence in sentences_of(chunks):
+        blocks.setdefault(sentence.chunk.seq, []).append(f"[{sentence.ref}] {sentence.line}")
+    return "\n\n".join("\n".join(lines) for lines in blocks.values())
+
+
+def sentence_ref(value: str | None) -> str | None:
+    """The canonical form "seq.n" of a cited number, or None when it is not one."""
+    found = _SENTENCE_REF.match(value.strip()) if value else None
+    return f"{int(found[1])}.{int(found[2])}" if found else None
+
+
+def _aliases(ids: Iterable[str]) -> dict[str, str]:
+    """Short ids (E1, E2, ...) for existing types' ids, in order, each id once."""
+    out: dict[str, str] = {}
+    for value in ids:
+        if value not in out:
+            out[value] = _ALIAS.format(len(out) + 1)
+    return out
+
+
+def _unalias(value: str | None, ids: Mapping[str, str]) -> str | None:
+    """The id a short id in the model's output stands for; other refs are kept as they are."""
+    if value is None:
+        return None
+    return ids.get(value.strip().strip("[]").upper(), value.strip())
+
+
 class Extractor:
     def __init__(
         self, gateway: ModelGateway, models: ExtractionModels, threshold: float = THRESHOLD
@@ -306,7 +364,7 @@ class Extractor:
         self.last = RunStats()
         groups = batches(chunks)
         terms = await self._terms(document_id, title, groups, progress)
-        types = await self._types(document_id, title, terms, known, progress)
+        types = await self._types(document_id, title, terms, known, chunks, progress)
         requests = resolve_requests(
             known, types, deleted=deleted, pending=pending, threshold=self.threshold
         )
@@ -348,8 +406,6 @@ class Extractor:
                 key = normalize(term.name)
                 if key and key not in found:
                     found[key] = term
-                elif key:
-                    found[key].quotes.extend(term.quotes)
             await progress("terms", index, len(groups))
         return list(found.values())
 
@@ -359,9 +415,15 @@ class Extractor:
         title: str,
         terms: list[TermOut],
         known: Sequence[KnownElement],
+        chunks: Sequence[ChunkText],
         progress: ProgressFn,
     ) -> list[EntityTypeOut]:
-        """Types in batches of terms; later batches see the types found so far and reuse them."""
+        """Types in batches of terms; later batches see the types found so far and reuse them.
+
+        Each term is shown with the first sentence it occurs in, and the short ids the call
+        sees are turned back into the existing types' ids, so later code sees ids only.
+        """
+        sentences = [(normalize(s.text), s) for s in sentences_of(chunks)]
         existing = [element for element in known if element.kind == "entity_type"]
         groups = [
             terms[start : start + TYPES_BATCH_TERMS]
@@ -372,16 +434,35 @@ class Extractor:
         for index, group in enumerate(groups, start=1):
             context = types_context(known, [term.name for term in group], self.threshold)
             self.last.trimmed["extract.types"] += len(existing) - len(context)
+            aliases = _aliases(
+                [str(element.id) for element in context]
+                + [item.ref for item in found if _as_uuid(item.ref) is not None]
+            )
+            first = {
+                term.name: next((s for text, s in sentences if normalize(term.name) in text), None)
+                for term in group
+            }
+            lines = _types_lines(context, found, group, aliases, first)
             result = await self.gateway.structured(
                 purpose="extract.types",
                 model=self.models.reasoning,
                 instructions=TYPES_INSTRUCTIONS,
-                text=f"Document: {title}\n\n" + "\n".join(_types_lines(context, found, group)),
+                text=f"Document: {title}\n\n" + "\n".join(lines),
                 schema=TypesOut,
                 document_id=document_id,
                 effort=self.models.reasoning_effort,
             )
-            found = merge_types(found, result.entity_types)
+            ids = {alias: value for value, alias in aliases.items()}
+            batch = [
+                item.model_copy(
+                    update={
+                        "ref": _unalias(item.ref, ids),
+                        "parent": _unalias(item.parent, ids),
+                    }
+                )
+                for item in result.entity_types
+            ]
+            found = merge_types(found, batch)
             await progress("types", index, len(groups))
         return found
 
@@ -427,7 +508,8 @@ class Extractor:
         known: Sequence[KnownElement],
         progress: ProgressFn,
     ) -> RelationsOut:
-        catalog = relations_catalog(types, known)
+        catalog, aliases = relations_catalog(types, known)
+        ids = {alias: value for value, alias in aliases.items()}
         merged = RelationsOut(relations=[], properties=[])
         await progress("relations", 0, len(groups))
         for index, group in enumerate(groups, start=1):
@@ -440,13 +522,20 @@ class Extractor:
                 purpose="extract.relations",
                 model=self.models.standard,
                 instructions=RELATIONS_INSTRUCTIONS,
-                text=f"Document: {title}\n\n{header}\n\n{render_chunks(group)}",
+                text=f"Document: {title}\n\n{header}\n\n{render_sentences(group)}",
                 schema=RelationsOut,
                 document_id=document_id,
                 effort=self.models.standard_effort,
             )
-            merged.relations.extend(result.relations)
-            merged.properties.extend(result.properties)
+            merged.relations.extend(
+                r.model_copy(
+                    update={"domain": _unalias(r.domain, ids), "range": _unalias(r.range, ids)}
+                )
+                for r in result.relations
+            )
+            merged.properties.extend(
+                p.model_copy(update={"domain": _unalias(p.domain, ids)}) for p in result.properties
+            )
             await progress("relations", index, len(groups))
         return merged
 
@@ -498,10 +587,19 @@ CatalogLine = tuple[str, frozenset[str], bool]
 
 def relations_catalog(
     types: Sequence[EntityTypeOut], known: Sequence[KnownElement]
-) -> list[CatalogLine]:
+) -> tuple[list[CatalogLine], dict[str, str]]:
+    """The catalog of types, and the short ids (E1, E2, ...) its existing types go by."""
+    ids = _aliases(
+        [t.ref for t in types if _as_uuid(t.ref) is not None]
+        + [str(e.id) for e in known if e.kind == "entity_type"]
+    )
+
+    def shown(ref: str) -> str:
+        return ids.get(ref, ref)
+
     lines: list[CatalogLine] = [
         (
-            f"- {t.ref} | {t.label_zh} | {', '.join(t.synonyms)} | {t.definition_zh or ''}",
+            f"- {shown(t.ref)} | {t.label_zh} | {', '.join(t.synonyms)} | {t.definition_zh or ''}",
             frozenset(_mention_keys([t.label_zh, t.label_en or "", *t.synonyms])),
             True,
         )
@@ -510,7 +608,7 @@ def relations_catalog(
     refs = {t.ref for t in types}
     lines += [
         (
-            f"- {element.id} | {element.label_zh} | {', '.join(element.synonyms)} | "
+            f"- {shown(str(element.id))} | {element.label_zh} | {', '.join(element.synonyms)} | "
             f"{element.definition_zh or ''}",
             frozenset(_mention_keys([element.label_zh, element.label_en or "", *element.synonyms])),
             False,
@@ -518,7 +616,7 @@ def relations_catalog(
         for element in known
         if element.kind == "entity_type" and str(element.id) not in refs
     ]
-    return lines
+    return lines, ids
 
 
 def catalog_for(catalog: Sequence[CatalogLine], group: Sequence[ChunkText]) -> list[CatalogLine]:
@@ -547,11 +645,17 @@ def _mention_keys(names: Iterable[str]) -> set[str]:
 
 
 def _types_lines(
-    existing: Sequence[KnownElement], found: Sequence[EntityTypeOut], terms: Sequence[TermOut]
+    existing: Sequence[KnownElement],
+    found: Sequence[EntityTypeOut],
+    terms: Sequence[TermOut],
+    ids: Mapping[str, str],
+    first: Mapping[str, Sentence | None],
 ) -> list[str]:
+    """The types-stage input: existing types by short id (`ids`), the types of earlier batches
+    and the terms, each with the first sentence it occurs in (`first`)."""
     lines = ["Existing entity types (id | label | synonyms):"]
     lines += [
-        f"- {element.id} | {element.label_zh} | {', '.join(element.synonyms)}"
+        f"- {ids[str(element.id)]} | {element.label_zh} | {', '.join(element.synonyms)}"
         for element in existing
     ] or ["- (none)"]
     if found:
@@ -559,14 +663,15 @@ def _types_lines(
             "\nEntity types proposed from earlier terms of this document; reuse their ref "
             "instead of proposing duplicates (ref | label | synonyms):"
         )
-        lines += [f"- {item.ref} | {item.label_zh} | {', '.join(item.synonyms)}" for item in found]
-    lines.append("\nCandidate terms (category | name | english | definition | quotes):")
+        lines += [
+            f"- {ids.get(item.ref, item.ref)} | {item.label_zh} | {', '.join(item.synonyms)}"
+            for item in found
+        ]
+    lines.append("\nCandidate terms (category | name | first sentence):")
     for term in terms:
-        quotes = "; ".join(f"[chunk {q.chunk}] {q.text}" for q in term.quotes[:MAX_QUOTES])
-        lines.append(
-            f"- {term.category} | {term.name} | {term.english or ''} | "
-            f"{term.definition or ''} | {quotes}"
-        )
+        sentence = first.get(term.name)
+        context = f"[{sentence.ref}] {sentence.line}" if sentence is not None else ""
+        lines.append(f"- {term.category} | {term.name} | {context}")
     return lines
 
 
@@ -598,7 +703,7 @@ def merge_types(
                     *other.synonyms,
                     *(value for value in item.synonyms if normalize(value) not in seen),
                 ],
-                "quotes": [*other.quotes, *item.quotes],
+                "sentence": other.sentence or item.sentence,
                 "label_en": other.label_en or item.label_en,
                 "definition_zh": other.definition_zh or item.definition_zh,
                 "parent": other.parent or item.parent,
@@ -895,32 +1000,57 @@ class _Builder:
         # The one update or restore per existing element; see `_maybe_update`.
         self.updates: dict[UUID, Proposal] = {}
         self._units: dict[UUID, list[tuple[int, int]]] = {}
+        self.sentences = sentences_of(chunks)
+        self.by_ref = {sentence.ref: sentence for sentence in self.sentences}
+        self._normalized: dict[str, str] = {}
 
     def units(self, chunk: ChunkText) -> list[tuple[int, int]]:
         if chunk.id not in self._units:
             self._units[chunk.id] = split_sentences(chunk.text)
         return self._units[chunk.id]
 
-    def ground(self, quotes: Sequence[Quote]) -> tuple[list[ProposedEvidence], bool]:
-        """Locate each quote; returns the evidence and whether every quote was found."""
-        evidence: list[ProposedEvidence] = []
-        all_found = bool(quotes)
-        for quote in quotes[:MAX_QUOTES]:
-            candidates = [self.by_seq[quote.chunk]] if quote.chunk in self.by_seq else []
-            candidates += [chunk for chunk in self.chunks if chunk not in candidates]
-            for chunk in candidates:
-                located = locate_quote(quote.text, chunk.text)
-                if located:
-                    evidence.append(
-                        ProposedEvidence(chunk.id, quote.text, located.char_start, located.char_end)
-                    )
-                    break
-            else:
-                all_found = False
-                fallback = self.by_seq.get(quote.chunk) or (self.chunks[0] if self.chunks else None)
-                if fallback is not None:
-                    evidence.append(ProposedEvidence(fallback.id, quote.text[:500], None, None))
-        return evidence, all_found
+    def cite(self, ref: str | None) -> ProposedEvidence | None:
+        """The evidence a cited sentence number stands for; None when there is no such sentence."""
+        key = sentence_ref(ref)
+        found = self.by_ref.get(key) if key is not None else None
+        if found is None:
+            return None
+        return ProposedEvidence(found.chunk.id, found.text, found.start, found.end)
+
+    def naming(self, names: set[str], prefer: set[str] = frozenset()) -> ProposedEvidence | None:
+        """The first sentence naming one of `names`; one that also names one of `prefer` first."""
+        naming = [s for s in self.sentences if any(name in self._text(s) for name in names)]
+        best = next((s for s in naming if any(name in self._text(s) for name in prefer)), None)
+        found = best or next(iter(naming), None)
+        if found is None:
+            return None
+        return ProposedEvidence(found.chunk.id, found.text, found.start, found.end)
+
+    def evidence_for(
+        self, ref: str | None, names: set[str], prefer: set[str] = frozenset()
+    ) -> tuple[ProposedEvidence | None, bool, bool]:
+        """The evidence of a type or property that cites `ref`, whether the cited sentence names
+        it (the literal check) and whether the evidence counts as found (spec 004, 7.2).
+
+        A number the document does not have is evidence not found. A sentence that does not
+        name the item gives way to the first sentence that does (for a property, preferably
+        one naming its type as well, `prefer`); when none does, the cited sentence is kept and
+        the evidence counts as not found, so that the item is flagged.
+        """
+        cited = self.cite(ref)
+        if cited is None:
+            return None, False, False
+        if self.names_cited([cited], names):
+            return cited, True, True
+        other = self.naming(names, prefer)
+        if other is not None:
+            return other, False, True
+        return cited, False, False
+
+    def _text(self, sentence: Sentence) -> str:
+        if sentence.ref not in self._normalized:
+            self._normalized[sentence.ref] = normalize(sentence.text)
+        return self._normalized[sentence.ref]
 
     def states_link(
         self, evidence: Sequence[ProposedEvidence], domain: set[str], range_: set[str]
@@ -1002,11 +1132,17 @@ class _Builder:
                 return element
         return None
 
-    def add(self, proposal: Proposal, quotes: Sequence[Quote], confidence: float) -> None:
-        evidence, all_found = self.ground(quotes)
-        proposal.evidence = evidence
+    def add(
+        self,
+        proposal: Proposal,
+        evidence: ProposedEvidence | None,
+        found: bool,
+        confidence: float,
+    ) -> None:
+        """Adds a proposal; evidence that was not found flags it and lowers its confidence."""
+        proposal.evidence = [evidence] if evidence is not None else []
         proposal.confidence = max(0.0, min(1.0, confidence))
-        if not all_found:
+        if not found:
             proposal.flags.append("evidence_not_found")
             proposal.confidence = round(proposal.confidence * UNFOUND_PENALTY, 3)
         self.proposals.append(proposal)
@@ -1083,16 +1219,20 @@ def build_proposals(
         return check
 
     for index, (item, fate) in enumerate(zip(types, fates, strict=True)):
-        cited, _ = builder.ground(item.quotes)
-        names = [item.label_zh, item.label_en or "", *item.synonyms]
-        checked("entity_type", builder.names_cited(cited, _literal_keys(names)))
+        names = _literal_keys([item.label_zh, item.label_en or "", *item.synonyms])
+        if fate.element is not None:
+            names |= _literal_keys(
+                [fate.element.label_zh, fate.element.label_en or "", *fate.element.synonyms]
+            )
+        evidence, literal_ok, found = builder.evidence_for(item.sentence, names)
+        checked("entity_type", literal_ok)
         if fate.element is not None:
             became.append((item, str(fate.element.id)))
             op: Literal["update", "restore"] = "update" if fate.kind == "existing" else "restore"
-            _maybe_update(builder, fate.element, item, item.quotes, op=op)
+            _maybe_update(builder, fate.element, item, (evidence, found), op=op)
             continue
         if fate.kind == "run":
-            _join(builder, proposal_of[fate.root], item)
+            _join(proposal_of[fate.root], item, evidence if found else None)
             proposal_of[index] = proposal_of[fate.root]
             became.append((item, proposal_of[index].temp_ref or ""))
             continue
@@ -1107,14 +1247,13 @@ def build_proposals(
             else None
         )
         target = conclusion.candidate if conclusion is not None else None
-        local_name = builder.unique_name(item.local_name, _PASCAL, "EntityType")
+        local_name = builder.unique_name(_type_local_name(item), _PASCAL, "EntityType")
         temp_ref = f"new:{local_name}"
         became.append((item, temp_ref))
         proposal = Proposal(
             op="create",
             kind="entity_type",
             temp_ref=temp_ref,
-            rationale=item.rationale,
             fields={
                 "localName": local_name,
                 "labelZh": item.label_zh,
@@ -1144,7 +1283,7 @@ def build_proposals(
             proposal.match = ProposedMatch("name", item_id=fate.pending.item_id)
         proposal_of[index] = proposal
         new_types.append((item, proposal))
-        builder.add(proposal, item.quotes, item.confidence)
+        builder.add(proposal, evidence, found, item.confidence)
 
     targets: dict[str, set[str]] = {}
     for item, target_ref in became:
@@ -1195,13 +1334,13 @@ def build_proposals(
         key = (domain, range_, normalize(relation.label_zh))
         if key in seen_relations:
             continue
-        evidence, _ = builder.ground(relation.quotes)
-        stated = builder.states_link(
-            evidence, names_of.get(domain, set()), names_of.get(range_, set())
+        cited = builder.cite(relation.sentence)
+        stated = cited is not None and builder.states_link(
+            [cited], names_of.get(domain, set()), names_of.get(range_, set())
         )
         checked("relation_type", stated)
         if not stated:
-            continue  # no direct evidence: no quote's sentence names both types
+            continue  # no direct evidence: the cited sentence does not name both types
         seen_relations.add(key)
         domain_uuid, range_uuid = _as_uuid(domain), _as_uuid(range_)
         if (
@@ -1215,11 +1354,10 @@ def build_proposals(
             Proposal(
                 op="create",
                 kind="relation_type",
-                rationale=relation.rationale,
                 fields={
                     "localName": local_name,
                     "labelZh": relation.label_zh,
-                    "labelEn": relation.label_en,
+                    "labelEn": _label_en(relation.local_name),
                     "definitionZh": relation.definition_zh,
                     "synonyms": [],
                     "domainRef": domain,
@@ -1228,7 +1366,8 @@ def build_proposals(
                     "multiple": relation.multiple,
                 },
             ),
-            relation.quotes,
+            cited,
+            True,
             relation.confidence,
         )
 
@@ -1241,9 +1380,13 @@ def build_proposals(
         if prop_key in seen_properties:
             continue
         seen_properties.add(prop_key)
-        cited, _ = builder.ground(prop.quotes)
-        names = [prop.label_zh, prop.label_en or ""]
-        checked("property", builder.names_cited(cited, _literal_keys(names)))
+        label_en = _label_en(prop.local_name)
+        evidence, literal_ok, found = builder.evidence_for(
+            prop.sentence,
+            _literal_keys([prop.label_zh, label_en or ""]),
+            names_of.get(domain, set()),
+        )
+        checked("property", literal_ok)
         domain_uuid = _as_uuid(domain)
         if domain_uuid and builder.match_known("property", prop.label_zh, domain_uuid):
             continue
@@ -1252,11 +1395,10 @@ def build_proposals(
             Proposal(
                 op="create",
                 kind="property",
-                rationale=prop.rationale,
                 fields={
                     "localName": local_name,
                     "labelZh": prop.label_zh,
-                    "labelEn": prop.label_en,
+                    "labelEn": label_en,
                     "definitionZh": prop.definition_zh,
                     "synonyms": [],
                     "domainRef": domain,
@@ -1266,7 +1408,8 @@ def build_proposals(
                     "multiple": prop.multiple,
                 },
             ),
-            prop.quotes,
+            evidence,
+            found,
             prop.confidence,
         )
     return builder.proposals
@@ -1336,7 +1479,7 @@ def _synonyms(values: Iterable[str], label: str) -> list[dict[str, str]]:
     return out
 
 
-def _join(builder: _Builder, proposal: Proposal, item: EntityTypeOut) -> None:
+def _join(proposal: Proposal, item: EntityTypeOut, evidence: ProposedEvidence | None) -> None:
     """Another type of this document is the same new type: its names and evidence join it."""
     fields = proposal.fields
     names = {normalize(fields["labelZh"]), normalize(fields.get("labelEn") or "")}
@@ -1346,15 +1489,15 @@ def _join(builder: _Builder, proposal: Proposal, item: EntityTypeOut) -> None:
         for s in _synonyms([item.label_zh, item.label_en or "", *item.synonyms], fields["labelZh"])
         if normalize(s["text"]) not in names
     ]
-    evidence, _ = builder.ground(item.quotes)
-    proposal.evidence += [e for e in evidence if e.char_start is not None]
+    if evidence is not None:
+        proposal.evidence.append(evidence)
 
 
 def _maybe_update(
     builder: _Builder,
     element: KnownElement,
     item: EntityTypeOut,
-    quotes: Sequence[Quote],
+    cited: tuple[ProposedEvidence | None, bool],
     op: Literal["update", "restore"] = "update",
 ) -> None:
     """Propose adding synonyms or a missing definition to an existing type; nothing otherwise.
@@ -1363,8 +1506,9 @@ def _maybe_update(
     synonym when it is none of the type's names yet. Several model types can land on the same
     existing type. They become one update: two updates of one element in a change set would
     make the second look stale at merge time. A deleted type is restored with the same
-    additions, and restored even without any.
+    additions, and restored even without any. `cited` is the evidence and whether it was found.
     """
+    evidence, found = cited
     previous = builder.updates.get(element.id)
     known = {normalize(s) for s in (*element.synonyms, element.label_zh, element.label_en or "")}
     if previous is not None:
@@ -1388,8 +1532,8 @@ def _maybe_update(
             if "synonyms" in fields:
                 previous.fields.setdefault("synonyms", []).extend(fields.pop("synonyms"))
             previous.fields.update(fields)
-            evidence, _ = builder.ground(quotes)
-            previous.evidence.extend(evidence)
+            if evidence is not None and found:
+                previous.evidence.append(evidence)
         return
     if not fields and op == "update":
         return
@@ -1398,11 +1542,25 @@ def _maybe_update(
         kind="entity_type",
         target_element_id=element.id,
         target_revision=element.revision,
-        rationale=item.rationale,
         fields=fields,
     )
     builder.updates[element.id] = proposal
-    builder.add(proposal, quotes, item.confidence)
+    builder.add(proposal, evidence, found, item.confidence)
+
+
+def _type_local_name(item: EntityTypeOut) -> str:
+    """A new type's local name: from its ref "new:<Name>", else from its English label."""
+    if item.ref.startswith("new:"):
+        return item.ref.removeprefix("new:").strip()
+    words = re.findall(r"[A-Za-z0-9]+", item.label_en or "")
+    return "".join(word[:1].upper() + word[1:] for word in words)
+
+
+def _label_en(local_name: str) -> str | None:
+    """The English label of a relation or property, from its camelCase local name."""
+    if not _CAMEL.match(local_name):
+        return None
+    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", local_name).lower()
 
 
 def _as_uuid(value: str) -> UUID | None:

@@ -941,7 +941,11 @@ def resolve_counts(
     }
 
 
-_LITERAL_KINDS = {"entityTypes": "entity_type", "relations": "relation_type", "properties": "property"}
+_LITERAL_KINDS = {
+    "entityTypes": "entity_type",
+    "relations": "relation_type",
+    "properties": "property",
+}
 
 
 def literal_share(counts: Counter[str]) -> dict[str, Any]:

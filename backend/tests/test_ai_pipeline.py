@@ -33,7 +33,7 @@ from ontology_platform.modules.documents.parsers import ScanPart
 from ontology_platform.modules.jobs.runner import JobContext, JobLeaseLostError, RetryableJobError
 from ontology_platform.modules.ontology import service as ontology_service
 from ontology_platform.modules.ontology.models import ChangeSet, Element, Ontology
-from test_ai_extraction import ScriptedGateway, entity, quote, relation
+from test_ai_extraction import ScriptedGateway, entity, relation
 from test_ontology_support import add_elements, add_ontology, element
 
 MODELS = ExtractionModels(standard="std", reasoning="deep")
@@ -91,12 +91,12 @@ async def add_document(db: AsyncSession, ontology: Ontology) -> tuple[Document, 
 
 
 def outputs(grade: Element, *, empty: bool = False) -> dict[str, list[BaseModel]]:
-    term = TermOut(name="炉次", english="Heat", definition=None, category="entity", quotes=[])
+    term = TermOut(name="炉次", category="entity")
     types = [
-        entity("new:Heat", "炉次", "Heat", quotes=[quote(0, "每个炉次只冶炼一个钢种")]),
-        entity(str(grade.id), "钢种", "SteelGrade", synonyms=["牌号", "钢级"]),
+        entity("new:Heat", "炉次", sentence="0.1"),
+        entity(str(grade.id), "钢种", synonyms=["牌号", "钢级"]),
     ]
-    relations = [relation("new:Heat", str(grade.id), "冶炼", [quote(0, "炉次只冶炼一个钢种")])]
+    relations = [relation("new:Heat", str(grade.id), "冶炼", "0.1")]
     return {
         "extract.terms": [TermsOut(terms=[] if empty else [term])],
         "extract.types": [TypesOut(entity_types=[] if empty else types)],
@@ -132,7 +132,7 @@ async def test_extraction_writes_one_open_change_set(app: FastAPI, db: AsyncSess
     heat = next(item for item in detail.items if item.temp_ref == "new:Heat")
     [evidence] = heat.evidence
     assert (evidence.document_id, evidence.chunk_id) == (document.id, chunk.id)
-    assert TEXT[evidence.char_start : evidence.char_end] == "每个炉次只冶炼一个钢种"
+    assert TEXT[evidence.char_start : evidence.char_end] == "每个炉次只冶炼一个钢种。"
     event = await db.scalar(select(AuditEvent).where(AuditEvent.action == "changeset.created"))
     assert event is not None
     assert (event.actor_id, event.target_id) == (None, str(change_set_id))
