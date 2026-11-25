@@ -650,7 +650,7 @@ describe('change item pagination', () => {
       tempRef: `new:N${index}`,
       proposed: { localName: `N${index}`, labelZh: `项目${String(index + 1).padStart(3, '0')}`, ...(index < 70 ? {} : { domainRef: 'el-molten-steel', datatype: 'decimal' }) },
       confidence: 0.9,
-      evidence: [{ id: `ev-`, kind: 'document', source: null, documentId: 'doc-converter', chunkId: 'chunk-1', quote: QUOTE, charStart: null, charEnd: null }],
+      evidence: [{ id: `ev-${index}`, kind: 'document', source: null, documentId: 'doc-converter', chunkId: 'chunk-1', quote: QUOTE, charStart: null, charEnd: null }],
     }),
   );
 

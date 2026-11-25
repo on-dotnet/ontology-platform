@@ -244,8 +244,9 @@ class EvidenceIn(CamelModel):
         document = self.document_id is not None and self.chunk_id is not None
         if self.kind == "document" and (not document or self.source is not None):
             raise ValueError("Document evidence needs documentId and chunkId and no source")
+        position = (self.document_id, self.chunk_id, self.char_start, self.char_end)
         if self.kind == "catalog" and (
-            self.source is None or self.document_id or self.chunk_id or self.char_start is not None
+            self.source is None or any(value is not None for value in position)
         ):
             raise ValueError("Catalog evidence needs a source and no document position")
         return self
