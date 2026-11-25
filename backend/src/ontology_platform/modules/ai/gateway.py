@@ -67,6 +67,7 @@ class ModelGateway(Protocol):
         schema: type[T],
         files: Sequence[InputFile] = (),
         document_id: Any = None,
+        effort: str | None = None,
     ) -> T: ...
 
     async def ping(self) -> bool: ...
@@ -105,6 +106,8 @@ class _Call[T: BaseModel]:
     message: Any
     schema: type[T]
     document_id: Any
+    # `reasoning.effort`; None sends no reasoning parameter (the service's default).
+    effort: str | None = None
 
 
 class OpenAIGateway:
@@ -159,6 +162,7 @@ class OpenAIGateway:
         schema: type[T],
         files: Sequence[InputFile] = (),
         document_id: Any = None,
+        effort: str | None = None,
     ) -> T:
         client = self._get_client()
         content: list[dict[str, Any]] = [{"type": "input_text", "text": text}]
@@ -172,7 +176,7 @@ class OpenAIGateway:
         )
         # The SDK's input TypedDicts overlap, so mypy cannot pick one for a literal message.
         message: Any = {"role": "user", "content": content}
-        call = _Call(purpose, model, instructions, message, schema, document_id)
+        call = _Call(purpose, model, instructions, message, schema, document_id, effort)
         for delay in (*self._retry_delays, None):
             try:
                 return await self._attempt(client, call)
@@ -185,6 +189,9 @@ class OpenAIGateway:
     async def _attempt[T: BaseModel](self, client: AsyncOpenAI, call: "_Call[T]") -> T:
         started = time.monotonic()
         usage: Any = None
+        extra: dict[str, Any] = {}
+        if call.effort is not None:
+            extra["reasoning"] = {"effort": call.effort}
         try:
             # Streamed, so that tokens keep the connection busy: proxies that drop idle
             # connections (about a minute is common) would otherwise cut long calls.
@@ -194,6 +201,7 @@ class OpenAIGateway:
                 instructions=call.instructions,
                 input=[call.message],
                 text_format=call.schema,
+                **extra,
             ) as stream:
                 final: Any = None
                 async for event in stream:

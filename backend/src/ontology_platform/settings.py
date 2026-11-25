@@ -12,6 +12,15 @@ DEV_ADMIN_PASSWORD = "admin12345"  # noqa: S105
 DEV_DATABASE_PASSWORD = "ontology-dev-only"  # noqa: S105
 DEV_DATABASE_URL = f"postgresql+psycopg://ontology:{DEV_DATABASE_PASSWORD}@postgres:5432/ontology"
 
+# Reasoning effort of model calls (spec 004, 7.3). Which values a model accepts varies; "default"
+# sends none and leaves the service's default, for compatible services without the parameter.
+Effort = Literal["default", "none", "minimal", "low", "medium", "high", "xhigh"]
+
+
+def effort_value(effort: Effort) -> str | None:
+    """The `reasoning.effort` to send, or None to send no reasoning parameter."""
+    return None if effort == "default" else effort
+
 
 def _secret_problem(name: str, value: SecretStr, default: str, min_length: int) -> str | None:
     secret = value.get_secret_value()
@@ -42,6 +51,9 @@ class Settings(BaseSettings):
     ai_base_url: str | None = None
     ai_model: str = "gpt-6.2-sol"
     ai_reasoning_model: str = "gpt-6.2-astra"
+    # `ai_effort` for the terms, resolve and relations stages; `ai_reasoning_effort` for types.
+    ai_effort: Effort = "low"
+    ai_reasoning_effort: Effort = "default"
     # Model calls are streamed, so this bounds the wait between two events, not a whole call.
     ai_timeout_seconds: float = Field(default=120, gt=0)
 
