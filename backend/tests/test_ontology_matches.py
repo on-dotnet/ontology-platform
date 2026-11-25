@@ -318,6 +318,11 @@ async def test_a_type_of_a_pending_items_main_name_follows_it_until_renamed(
             "name",
             str(change_sets[1]),
         )
+        # No "keep apart" for the same main name (spec 004, 5.5).
+        refused = await patch_item(
+            client, change_sets[2], third["id"], {"matchDecision": "different"}
+        )
+        assert (refused.status_code, refused.json()["code"]) == (422, "changeset.no_match")
         assert await merged(client, change_sets[0]) == []
         assert await merged(client, change_sets[1]) == []
         if rename:

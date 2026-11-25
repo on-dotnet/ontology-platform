@@ -1624,6 +1624,9 @@ async def update_item(
     if "match_decision" in given:
         if patch.match_decision is not None and not await _has_match(db, item):
             raise AppError(422, NO_MATCH, "The item has no alignment record to decide on.")
+        if patch.match_decision is not None and item.match_kind == mergeplan.NAME:
+            # The same main name leaves nothing to decide; renaming one of the two undoes it.
+            raise AppError(422, NO_MATCH, "A record of the same main name takes no decision.")
         item.match_decision = patch.match_decision
     if patch.decision is not None:
         _decide(item, patch.decision, actor, _now())

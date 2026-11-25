@@ -35,7 +35,8 @@ export function MatchNotice({ item, match, changeSetId, canDecide, busy, onDecid
         : match.reason
           ? 'review.match.same'
           : 'review.match.sameNoReason';
-  const settled = match.decision !== null || match.keptApart || item.appliedElementId !== null;
+  // A record of the same main name leaves nothing to decide.
+  const settled = match.kind === 'name' || match.decision !== null || match.keptApart || item.appliedElementId !== null;
   const conclusion =
     match.decision === 'same'
       ? t('review.match.decidedSame')
