@@ -10,6 +10,7 @@ grounding are deterministic code, not model output.
 import re
 from collections import Counter
 from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
+from collections.abc import Set as AbstractSet
 from dataclasses import dataclass, field
 from typing import Any, Literal
 from uuid import UUID
@@ -67,6 +68,7 @@ _CAMEL = re.compile(r"^[a-z][A-Za-z0-9]*$")
 _SENTENCE_REF = re.compile(r"^\[?\s*(\d+)\s*\.\s*(\d+)\s*\]?$")
 # Short ids of existing types in prompts (spec 004, 7.2): E1, E2, ...
 _ALIAS = "E{}"
+_ALIAS_LIKE = re.compile(r"^E\d+$")
 
 
 @dataclass(frozen=True)
@@ -218,9 +220,9 @@ class RunStats:
     pairs: list[JudgedPair] = field(default_factory=list)
     # Existing types left out of a stage's prompts by the size limits, per stage.
     trimmed: Counter[str] = field(default_factory=Counter)
-    # Evidence checked literally (spec 004, 7.2), per kind: "<kind>" counts the items whose
-    # evidence was checked, "<kind>:ok" those whose cited sentence names them (both ends, for
-    # a relation).
+    # Evidence checked literally (spec 004, 7.2), per kind: "<kind>" counts the items of the
+    # model's output (not the proposals: items that turn out to exist already count too),
+    # "<kind>:ok" those whose cited sentence names them (both ends, for a relation).
     literal: Counter[str] = field(default_factory=Counter)
 
 
@@ -334,10 +336,17 @@ def _aliases(ids: Iterable[str]) -> dict[str, str]:
 
 
 def _unalias(value: str | None, ids: Mapping[str, str]) -> str | None:
-    """The id a short id in the model's output stands for; other refs are kept as they are."""
+    """The id a short id in the model's output stands for; other refs are kept as they are.
+
+    A short id this call did not show is marked unknown: left as it is, it could be taken for
+    a short id that a later call gives an existing type, and point there.
+    """
     if value is None:
         return None
-    return ids.get(value.strip().strip("[]").upper(), value.strip())
+    key = value.strip().strip("[]").upper()
+    if key in ids:
+        return ids[key]
+    return f"unknown:{key}" if _ALIAS_LIKE.match(key) else value.strip()
 
 
 class Extractor:
@@ -438,9 +447,10 @@ class Extractor:
                 [str(element.id) for element in context]
                 + [item.ref for item in found if _as_uuid(item.ref) is not None]
             )
+            keys = {term.name: normalize(term.name) for term in group}
             first = {
-                term.name: next((s for text, s in sentences if normalize(term.name) in text), None)
-                for term in group
+                name: next((s for text, s in sentences if key in text), None)
+                for name, key in keys.items()
             }
             lines = _types_lines(context, found, group, aliases, first)
             result = await self.gateway.structured(
@@ -988,9 +998,7 @@ class _Builder:
         known: Sequence[KnownElement],
         deleted: Sequence[KnownElement] = (),
     ) -> None:
-        self.by_seq = {chunk.seq: chunk for chunk in chunks}
         self.by_id = {chunk.id: chunk for chunk in chunks}
-        self.chunks = list(chunks)
         self.known = list(known)
         self.known_ids = {str(element.id): element for element in known}
         self.deleted_types = [element for element in deleted if element.kind == "entity_type"]
@@ -1017,7 +1025,9 @@ class _Builder:
             return None
         return ProposedEvidence(found.chunk.id, found.text, found.start, found.end)
 
-    def naming(self, names: set[str], prefer: set[str] = frozenset()) -> ProposedEvidence | None:
+    def naming(
+        self, names: AbstractSet[str], prefer: AbstractSet[str] = frozenset()
+    ) -> ProposedEvidence | None:
         """The first sentence naming one of `names`; one that also names one of `prefer` first."""
         naming = [s for s in self.sentences if any(name in self._text(s) for name in names)]
         best = next((s for s in naming if any(name in self._text(s) for name in prefer)), None)
@@ -1027,7 +1037,7 @@ class _Builder:
         return ProposedEvidence(found.chunk.id, found.text, found.start, found.end)
 
     def evidence_for(
-        self, ref: str | None, names: set[str], prefer: set[str] = frozenset()
+        self, ref: str | None, names: AbstractSet[str], prefer: AbstractSet[str] = frozenset()
     ) -> tuple[ProposedEvidence | None, bool, bool]:
         """The evidence of a type or property that cites `ref`, whether the cited sentence names
         it (the literal check) and whether the evidence counts as found (spec 004, 7.2).
@@ -1042,7 +1052,8 @@ class _Builder:
             return None, False, False
         if self.names_cited([cited], names):
             return cited, True, True
-        other = self.naming(names, prefer)
+        # One-character names occur everywhere: they find no other sentence.
+        other = self.naming({name for name in names if len(name) >= MIN_NAME}, prefer)
         if other is not None:
             return other, False, True
         return cited, False, False
@@ -1055,7 +1066,7 @@ class _Builder:
     def states_link(
         self, evidence: Sequence[ProposedEvidence], domain: set[str], range_: set[str]
     ) -> bool:
-        """Whether the sentences a located quote touches name both ends (by any of their names).
+        """Whether the cited sentences name both ends (by any of their names).
 
         A sentence (`sentences.split_sentences`: a sentence, list item or table row, however
         the file broke its lines) is the unit of direct evidence. Only the longest mentions
@@ -1089,7 +1100,7 @@ class _Builder:
                 return True
         return False
 
-    def names_cited(self, evidence: Sequence[ProposedEvidence], names: set[str]) -> bool:
+    def names_cited(self, evidence: Sequence[ProposedEvidence], names: AbstractSet[str]) -> bool:
         """Whether a sentence that located evidence touches contains one of the (normalized)
         names: the literal check of a type's or property's evidence (spec 004, 7.2)."""
         for item in evidence:
@@ -1489,7 +1500,7 @@ def _join(proposal: Proposal, item: EntityTypeOut, evidence: ProposedEvidence | 
         for s in _synonyms([item.label_zh, item.label_en or "", *item.synonyms], fields["labelZh"])
         if normalize(s["text"]) not in names
     ]
-    if evidence is not None:
+    if evidence is not None and evidence not in proposal.evidence:
         proposal.evidence.append(evidence)
 
 
@@ -1532,7 +1543,7 @@ def _maybe_update(
             if "synonyms" in fields:
                 previous.fields.setdefault("synonyms", []).extend(fields.pop("synonyms"))
             previous.fields.update(fields)
-            if evidence is not None and found:
+            if evidence is not None and found and evidence not in previous.evidence:
                 previous.evidence.append(evidence)
         return
     if not fields and op == "update":
@@ -1550,8 +1561,9 @@ def _maybe_update(
 
 def _type_local_name(item: EntityTypeOut) -> str:
     """A new type's local name: from its ref "new:<Name>", else from its English label."""
-    if item.ref.startswith("new:"):
-        return item.ref.removeprefix("new:").strip()
+    name = item.ref.removeprefix("new:").strip() if item.ref.startswith("new:") else ""
+    if _PASCAL.match(name):
+        return name
     words = re.findall(r"[A-Za-z0-9]+", item.label_en or "")
     return "".join(word[:1].upper() + word[1:] for word in words)
 

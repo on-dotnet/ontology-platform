@@ -4,7 +4,7 @@ import re
 import unicodedata
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID, uuid4
 
 import pytest
@@ -374,7 +374,6 @@ async def test_relations_resolve_refs_and_drop_unknown_types() -> None:
         properties=[
             PropertyOut(
                 label_zh="出钢温度",
-                label_en="Tapping temperature",
                 local_name="tapping temperature",  # not camelCase: replaced
                 domain="new:Heat",
                 datatype="decimal",
@@ -383,7 +382,6 @@ async def test_relations_resolve_refs_and_drop_unknown_types() -> None:
                 multiple=False,
                 definition_zh=None,
                 confidence=0.7,
-                rationale="r",
                 sentence="1.2",
             )
         ],
@@ -399,6 +397,7 @@ async def test_relations_resolve_refs_and_drop_unknown_types() -> None:
     assert relations[1].fields["localName"] == "belongsTo2"  # unique within the ontology
     [prop] = [p for p in proposals if p.kind == "property"]
     assert prop.fields["localName"] == "attribute"
+    assert prop.fields["labelEn"] is None  # nothing to split a non-camelCase name into
     assert (prop.fields["datatype"], prop.fields["unit"], prop.fields["required"]) == (
         "decimal",
         "℃",
@@ -474,8 +473,10 @@ async def test_references_to_elements_that_are_not_types_are_dropped() -> None:
     assert [p.kind for p in proposals] == ["entity_type"]
 
 
-def term(name: str, category: str = "entity") -> TermOut:
-    return TermOut(name=name, category=category)  # type: ignore[arg-type]
+def term(
+    name: str, category: Literal["entity", "attribute", "relation", "value", "other"] = "entity"
+) -> TermOut:
+    return TermOut(name=name, category=category)
 
 
 def types_texts(gateway: ScriptedGateway) -> list[str]:
@@ -535,7 +536,7 @@ async def test_many_terms_are_typed_in_batches_that_see_earlier_types() -> None:
             synonyms=["熔炼炉次"],
             definition_zh="一次冶炼",
             parent="new:Furnace",
-            sentence="0.1",
+            sentence="1.1",
         ),
         entity("new:Cast", "浇次"),
     ]
@@ -565,7 +566,7 @@ async def test_many_terms_are_typed_in_batches_that_see_earlier_types() -> None:
     assert heat.fields["definitionZh"] == "一次冶炼"
     assert heat.fields["parentRef"] == "new:Furnace"
     # One sentence per type: the first batch's stays (spec 004, 7.2).
-    assert len(heat.evidence) == 1
+    assert [e.quote for e in heat.evidence] == ["每个炉次只冶炼一个钢种。"]
 
 
 def test_a_single_batch_of_types_is_kept_as_the_model_returned_it() -> None:
@@ -1453,7 +1454,9 @@ def test_deleted_elements_hold_their_local_names_and_do_not_align_otherwise() ->
 
 
 async def test_stages_use_the_configured_efforts() -> None:
-    gateway = ScriptedGateway(outputs([], RelationsOut(relations=[], properties=[])))
+    # 牌号 is a synonym of the existing 钢种: a candidate, so there is a resolve call too.
+    types = [entity("new:Grade", "牌号")]
+    gateway = ScriptedGateway(outputs(types, RelationsOut(relations=[], properties=[])))
     extractor = Extractor(
         gateway,
         ExtractionModels(
@@ -1464,10 +1467,13 @@ async def test_stages_use_the_configured_efforts() -> None:
     async def progress(step: str, done: int, total: int) -> None:
         pass
 
-    await extractor.run(document_id=DOC, title="t", chunks=[CHUNK_A], known=[], progress=progress)
+    await extractor.run(
+        document_id=DOC, title="t", chunks=[CHUNK_A], known=[EXISTING_GRADE], progress=progress
+    )
     assert gateway.efforts == [
         ("extract.terms", "low"),
         ("extract.types", None),
+        ("extract.resolve", "low"),
         ("extract.relations", "low"),
     ]
 
@@ -1582,3 +1588,34 @@ def test_sentence_numbers_are_read_with_or_without_brackets() -> None:
         None,
         None,
     ]
+
+
+async def test_a_short_id_the_call_did_not_show_points_nowhere() -> None:
+    # The calls show eight existing types, E1 to E8; the model gave a new type the short id
+    # E9. It stays a new type, and what refers to E9 refers to it, not to an existing type.
+    known = [
+        KnownElement(id=uuid4(), kind="entity_type", local_name=f"T{n}", label_zh=f"设备{n}")
+        for n in range(1, 10)
+    ]
+    types = [
+        entity("E9", "炉次", label_en="Heat", sentence="0.1"),
+        entity("new:Cast", "浇次", parent="E9", sentence="1.1"),
+    ]
+    rels = RelationsOut(
+        relations=[],
+        properties=[prop("E9", "炉号").model_copy(update={"sentence": "0.1"})],
+    )
+    gateway = ScriptedGateway(
+        {
+            "extract.terms": [TermsOut(terms=[])],
+            "extract.types": [TypesOut(entity_types=types)],
+            "extract.relations": [rels],
+        }
+    )
+    proposals, _ = await run(gateway, known[:8])
+
+    heat = by_label(proposals, "炉次")
+    assert (heat.op, heat.fields["localName"]) == ("create", "Heat")
+    assert by_label(proposals, "浇次").fields["parentRef"] == "new:Heat"
+    [number] = [p for p in proposals if p.kind == "property"]
+    assert number.fields["domainRef"] == heat.temp_ref == "new:Heat"
