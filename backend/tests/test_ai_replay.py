@@ -5,8 +5,9 @@ from collections.abc import Sequence
 from types import SimpleNamespace
 from typing import Any
 
+import httpx2
 import pytest
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 from ontology_platform.modules.ai.gateway import InputFile
 from ontology_platform.modules.ai.replay import (
@@ -17,6 +18,8 @@ from ontology_platform.modules.ai.replay import (
     load_recordings,
 )
 from ontology_platform.settings import Settings
+from test_ai_gateway import Answer as GatewayAnswer
+from test_ai_gateway import client_with, stream
 
 
 class Answer(BaseModel):
@@ -167,6 +170,21 @@ async def test_a_replayed_run_reports_no_calls_at_all() -> None:
         0,
     )
     assert replayer.new_recordings == {}
+
+
+async def test_metered_gateway_counts_a_retried_call_end_to_end() -> None:
+    responses = [httpx2.Response(500, json={"error": {"message": "x"}}), stream('{"value": 7}')]
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        return responses.pop(0)
+
+    settings = Settings(openai_api_key=SecretStr("sk-test"), ai_model="m")
+    gateway = MeteredGateway(settings, http_client=client_with(handler), retry_delays=(0,))
+    answer = await gateway.structured(
+        purpose="test", model="m", instructions="i", text="t", schema=GatewayAnswer
+    )
+    assert answer == GatewayAnswer(value=7)
+    assert gateway.take_usage() == (2, 11, 3)  # the failed attempt reports no usage
 
 
 async def test_metered_gateway_sums_the_usage_of_every_attempt() -> None:

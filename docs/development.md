@@ -99,9 +99,9 @@
 
 `./dev.ps1 eval [案例]` 用 `samples/<案例>/docs` 的资料按顺序跑一遍识别（每份资料的提议全部接受，后面的资料与前面的结果对齐），按 `samples/<案例>/eval/expected.toml` 打分，结果存到 `.verification/eval/<案例>-<时间>.json`。不在门禁里运行。
 
-**录制与回放**。每次模型调用按"用途、模型、提示词、输入文字、输出结构的 JSON Schema、附件"的哈希录制，存在 `.verification/eval/recordings/<案例>/<哈希>.json`，另有 `models.json` 记下录制时用的模型。录制文件里只有哈希、模型的结构化输出和调用次数、token 数，没有 Key 和代理地址。
+**录制与回放**。每次模型调用按"用途、模型、提示词、输入文字、输出结构的 JSON Schema、附件"的哈希录制，存在 `.verification/eval/recordings/<案例>/<哈希>.json`，另有 `models.json` 记下最近一次有新录制的运行用的模型。录制文件里是哈希、用途、模型名、资料名、模型的结构化输出和调用次数、token 数，没有 Key 和代理地址。哈希不含服务地址：同一个模型名换了服务商，回放的仍是原来的输出。
 
-- 默认：有录制的调用直接回放，没有的才调用模型并录下来。只改了确定性的后处理（如 `build_proposals`）时重跑不花钱；只改了某个阶段的提示词时，只为这个阶段和输入受它影响的后续调用付费。资料、分块和接受后元素的 id 由名称派生，同样的输入每次得到同样的提示词。
+- 默认：有录制的调用直接回放，没有的才调用模型并录下来。只为输入变了的调用付费：改了某个阶段的提示词，付这个阶段和输入受它影响的后续调用；改了确定性的后处理（如 `build_proposals`），第一份资料和各资料的 terms 阶段不受影响，从第二份资料起 types、relations 阶段的提示词里有前面资料接受的元素，结果变了就要重新调用。资料、分块和接受后元素的 id 由名称派生，同样的输入每次得到同样的提示词。
 - `-Replay`：只回放。任何一次调用没有录制就失败，并说明是哪份资料、哪个阶段。容器拿不到 Key 和代理，模型用 `models.json` 里记的，所以在没有本机私有配置的 worktree 里也能跑。
 - `-Recordings <目录>`：换一个录制目录。在别的 worktree 里用主检出目录的录制：`./dev.ps1 eval steel -Replay -Recordings <主检出目录>/.verification/eval/recordings/steel`。
 - 想全部重新调用模型，换一个空目录或删掉录制目录。录制不会自动清理，过时的只是不再命中。
@@ -110,9 +110,10 @@
 
 - `entity_types = [{ names = [...], core = true|false }]`：模型给出的中文名、英文名、本地名或任一同义词与 `names` 中任一项相同即命中。
 - `relations = [{ domain, range, core }]`：两端用对象类型 `names` 的第一个名字，不计较方向和名称。
-- `properties = [{ domain, names, core }]`（可选）：属性所属类型是 `domain` 那一项、且名称与 `names` 任一项相同才命中。
+- `properties = [{ domain, names, core }]`（可选）：`domain` 用对象类型 `names` 的第一个名字；属性所属类型是这一项、且名称与 `names` 任一项相同才命中。
 - `hierarchy = [{ child, parent, core }]`（可选）：子类与父类都用对象类型的第一个名字，方向要对。
-- 准确率 = 命中任一期望项（含 `core = false`）的预测数 / 预测总数；召回率 = 找到的 `core = true` 项 / `core = true` 项总数。没有 `properties`、`hierarchy` 段的案例只报预测数量，类型与关系的分数与以前的算法相同。
+- 准确率 = 命中任一期望项（含 `core = false`）的预测数 / 预测总数；召回率 = 找到的 `core = true` 项 / `core = true` 项总数。属性与层级没有分母时（没有预测，或没有 `core` 项）记 `null`，屏幕上显示 `-`；类型与关系沿用以前的口径（没有预测记 0）。没有 `properties`、`hierarchy` 段的案例只报预测数量，类型与关系的分数与以前的算法相同。
+- 答案在调用模型之前先检查：缺字段、两端不是某个类型的第一个名字，都会直接失败并指出是哪一条。
 
 结果还包括证据定位率（提议的引文都能在原文找到的比例），以及每份资料、每个阶段的模型调用次数（含重试；回放命中记 0 次，另计 `replayed`）、耗时和输入输出 token，汇总在 `usage`。改了 `expected.toml` 想重新打分而不重跑，可把结果里的 `elements`、`parents` 和新的期望答案经 `--rescore` 重新计分（见 `ai/eval.py` 开头的说明）。
 

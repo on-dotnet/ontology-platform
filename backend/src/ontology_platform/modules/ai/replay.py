@@ -2,16 +2,18 @@
 
 A call is keyed by the hash of everything the model sees: purpose, model, instructions, text,
 the JSON Schema of the output and the attached files. A key that was recorded returns the
-recorded output; the model is called only for new keys. After a change to deterministic
-post-processing nothing is called again, after a change to one stage's prompt only that stage's
-calls (and the calls whose input depends on their output). Recordings hold the structured output,
-the hash and the usage of the call, nothing about how the model was reached.
+recorded output; the model is called only for new keys, that is for calls whose input changed:
+after a change to one stage's prompt, that stage's calls and the later ones whose input depends
+on their output; after a change to post-processing, the later documents' calls that show what
+earlier documents produced. Recordings hold the structured output, the hash, the purpose, model
+and document name and the usage of the call, nothing about how the model was reached. The base
+URL is not part of the key: the same model name at another provider replays the same outputs.
 """
 
 import hashlib
 import json
 import time
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from typing import Any
 
 from pydantic import BaseModel
@@ -51,11 +53,22 @@ def call_key(
     return hashlib.sha256(encoded).hexdigest()
 
 
-def load_recordings(texts: Iterable[str]) -> dict[str, dict[str, Any]]:
-    """Records by key, from the texts of recording files; other formats are skipped."""
+def load_recordings(
+    texts: Iterable[str], on_invalid: Callable[[int], None] | None = None
+) -> dict[str, dict[str, Any]]:
+    """Records by key, from the texts of recording files.
+
+    Other formats are skipped silently; text that is not JSON is skipped and reported by its
+    position, since one damaged file should cost one call, not the whole run.
+    """
     records: dict[str, dict[str, Any]] = {}
-    for text in texts:
-        record = json.loads(text)
+    for index, text in enumerate(texts):
+        try:
+            record = json.loads(text)
+        except json.JSONDecodeError:
+            if on_invalid is not None:
+                on_invalid(index)
+            continue
         if isinstance(record, dict) and record.get("format") == FORMAT and "key" in record:
             records[record["key"]] = record
     return records
@@ -134,6 +147,8 @@ class ReplayGateway:
             files=files,
             document_id=document_id,
         )
+        # Usage since the last take is this call's: extraction makes its calls one at a time.
+        # Concurrent calls through one gateway would need usage handed back per call instead.
         attempts, input_tokens, output_tokens = _take_usage(self._inner)
         stage["calls"] += attempts
         stage["inputTokens"] += input_tokens

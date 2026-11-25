@@ -45,7 +45,7 @@ from ontology_platform.modules.ai.extraction import (
     Proposal,
     normalize,
 )
-from ontology_platform.modules.ai.gateway import AiError
+from ontology_platform.modules.ai.gateway import AiError, ModelGateway
 from ontology_platform.modules.ai.replay import (
     MeteredGateway,
     ReplayGateway,
@@ -170,7 +170,43 @@ def _names(element: KnownElement) -> set[str]:
 
 
 def _ratio(hits: int, total: int) -> float | None:
+    """None when there is nothing to divide by (no predictions, or no core entries)."""
     return round(hits / total, 3) if total else None
+
+
+class ExpectedError(ValueError):
+    """eval/expected.toml is malformed; the message names the entry."""
+
+
+def check_expected(expected: Mapping[str, Any]) -> None:
+    """Fails on the first malformed entry: a missing field, or an end that names no type."""
+    types = expected.get("entity_types")
+    if not types or not isinstance(types, list):
+        raise ExpectedError("entity_types is missing or empty")
+    first_names: set[str] = set()
+    for index, entry in enumerate(types):
+        if not entry.get("names") or not isinstance(entry.get("core"), bool):
+            raise ExpectedError(f"entity_types[{index}] needs names and core")
+        first_names.add(normalize(entry["names"][0]))
+    ends = {
+        "relations": ("domain", "range"),
+        "properties": ("domain",),
+        "hierarchy": ("child", "parent"),
+    }
+    for section, fields in ends.items():
+        for index, entry in enumerate(expected.get(section, [])):
+            if not isinstance(entry.get("core"), bool):
+                raise ExpectedError(f"{section}[{index}] needs core")
+            if section == "properties" and not entry.get("names"):
+                raise ExpectedError(f"{section}[{index}] needs names")
+            for field in fields:
+                if normalize(str(entry.get(field, ""))) not in first_names:
+                    raise ExpectedError(
+                        f"{section}[{index}].{field} = {entry.get(field)!r} is not the first "
+                        "name of an entity type"
+                    )
+    if "relations" not in expected:
+        raise ExpectedError("relations is missing")
 
 
 def score(
@@ -359,6 +395,8 @@ async def run_case(
     """Runs a case; without eval/expected.toml it only counts what was found (`scored` false)."""
     answers = files.get("eval/expected.toml")
     expected = tomllib.loads(answers.decode("utf-8")) if answers is not None else None
+    if expected is not None:
+        check_expected(expected)  # before paying for any call
     extractor = Extractor(gateway, models)
     known: list[KnownElement] = []
     parents: dict[UUID, UUID] = {}
@@ -424,34 +462,49 @@ def _models(settings: Settings, mode: str, manifest: str | None) -> ExtractionMo
     return ExtractionModels(standard=settings.ai_model, reasoning=settings.ai_reasoning_model)
 
 
-def _files(gateway: ReplayGateway, mode: str, models: ExtractionModels) -> list[dict[str, str]]:
+def _files(gateway: ReplayGateway, models: ExtractionModels) -> list[dict[str, str]]:
     files = [{"name": name, "content": text} for name, text in gateway.recording_files()]
-    if mode == "record":
+    # Only a run that recorded something says which models the recordings are for: a run that
+    # failed before its first answer (no key, wrong model) must not redirect later replays.
+    if files:
         manifest = json.dumps({"models": asdict(models)}, indent=1)
         files.append({"name": MANIFEST, "content": manifest})
     return files
 
 
-def evaluate(bundle: dict[str, Any]) -> tuple[dict[str, Any], int]:
-    """Runs a bundle; returns the object for stdout and the exit code."""
+def evaluate(
+    bundle: dict[str, Any], inner: ModelGateway | None = None
+) -> tuple[dict[str, Any], int]:
+    """Runs a bundle; returns the object for stdout and the exit code.
+
+    `inner` is the gateway for calls that were not recorded ("record" only); by default the
+    real one.
+    """
     mode = bundle.get("mode", "record")
     if mode not in {"record", "replay"}:
         raise ValueError(f"Unknown mode: {mode}")
     settings = Settings()
     models = _models(settings, mode, bundle.get("manifest"))
     files = {path: base64.b64decode(value) for path, value in bundle["files"].items()}
-    inner = MeteredGateway(settings) if mode == "record" else None
-    gateway = ReplayGateway(load_recordings(bundle.get("recordings", [])), inner)
+    if mode == "replay":
+        inner = None
+    elif inner is None:
+        inner = MeteredGateway(settings)
+    recordings = load_recordings(
+        bundle.get("recordings", []),
+        on_invalid=lambda index: log(f"recording {index} is not readable, skipped"),
+    )
+    gateway = ReplayGateway(recordings, inner)
     try:
         result = asyncio.run(run_case(files, gateway, models))
-    except (AiError, ReplayMissError) as exc:
+    except (AiError, ReplayMissError, ExpectedError) as exc:
         error = f"{type(exc).__name__}: {exc}"
-        return {"error": error, "files": _files(gateway, mode, models)}, 1
+        return {"error": error, "files": _files(gateway, models)}, 1
     except Exception as exc:
         traceback.print_exc()
-        return {"error": type(exc).__name__, "files": _files(gateway, mode, models)}, 1
+        return {"error": type(exc).__name__, "files": _files(gateway, models)}, 1
     text = json.dumps(result, ensure_ascii=False, indent=2)
-    return {"result": text, "files": _files(gateway, mode, models)}, 0
+    return {"result": text, "files": _files(gateway, models)}, 0
 
 
 def main() -> int:

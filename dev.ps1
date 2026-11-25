@@ -399,8 +399,9 @@ function Invoke-Fmt([string[]]$Files) {
 # must not be committed. Results and recordings of a folder case are named "dir-<folder>".
 function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
     if (-not $Case) { $Case = 'steel' }
-    $asPath = [IO.Path]::GetFullPath($Case, (Get-Location).Path)
-    if ($Case -match '[\\/]') {
+    $asPath = [IO.Path]::GetFullPath($Case, (Get-Location).Path).TrimEnd('\', '/')
+    $isFolder = $Case -match '[\\/]'
+    if ($isFolder) {
         if (-not (Test-Path -LiteralPath (Join-Path $asPath 'docs') -PathType Container)) { Stop-Dev "目录里没有 docs/：$asPath" }
         $caseDir = $asPath
         $Case = 'dir-' + ((Split-Path -Leaf $asPath) -replace '[^\w.-]', '-')
@@ -410,6 +411,8 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
     }
     $answers = Join-Path $caseDir 'eval/expected.toml'
     $hasAnswers = Test-Path -LiteralPath $answers -PathType Leaf
+    # A case pack in samples/ is scored against answers written first (samples/README.md).
+    if (-not $hasAnswers -and -not $isFolder) { Stop-Dev "找不到 samples/$Case/eval/expected.toml" }
     if (-not $hasAnswers) { Write-Note "没有 eval/expected.toml：只做识别，不打分" }
     $RecordingsDir = $RecordingsDir ? [IO.Path]::GetFullPath($RecordingsDir, (Get-Location).Path) : (Join-Path $Root ".verification/eval/recordings/$Case")
     if ($ReplayOnly -and -not (Test-Path -LiteralPath $RecordingsDir -PathType Container)) { Stop-Dev "只回放需要录制，目录不存在：$RecordingsDir" }
@@ -468,7 +471,10 @@ function Invoke-Eval([string]$Case, [bool]$ReplayOnly, [string]$RecordingsDir) {
         if (-not $result.scored) {
             Write-Host ("  {0,-12} 识别出 {1,4}" -f $section, $numbers.predicted)
         } elseif ($numbers.PSObject.Properties['precision']) {
-            Write-Host ("  {0,-12} 预测 {1,4}  准确率 {2}  召回率 {3}" -f $section, $numbers.predicted, $numbers.precision, $numbers.recall)
+            # null: nothing to divide by (no predictions, or no core entries)
+            $precision = $null -eq $numbers.precision ? '-' : $numbers.precision
+            $recall = $null -eq $numbers.recall ? '-' : $numbers.recall
+            Write-Host ("  {0,-12} 预测 {1,4}  准确率 {2}  召回率 {3}" -f $section, $numbers.predicted, $precision, $recall)
         } else {
             Write-Host ("  {0,-12} 预测 {1,4}  （期望答案没有这一段，不计分）" -f $section, $numbers.predicted)
         }

@@ -1,5 +1,6 @@
 """Scoring of the extraction evaluation: synonyms count, direction does not, only core recalls."""
 
+import base64
 import json
 import re
 import tomllib
@@ -11,14 +12,17 @@ import pytest
 from pydantic import BaseModel
 
 from ontology_platform.modules.ai.eval import (
+    ExpectedError,
     accept,
+    check_expected,
     dump_elements,
+    evaluate,
     load_elements,
     run_case,
     score,
 )
 from ontology_platform.modules.ai.extraction import ExtractionModels, KnownElement, Proposal
-from ontology_platform.modules.ai.gateway import InputFile
+from ontology_platform.modules.ai.gateway import AiUnavailableError, InputFile
 from ontology_platform.modules.ai.replay import ReplayGateway, ReplayMissError, load_recordings
 
 EXPECTED = {
@@ -319,6 +323,71 @@ async def test_a_case_without_answers_is_run_but_not_scored_and_can_be_scored_la
     scored = await run_case(CASE_FILES, ReplayGateway({}, ModelStandIn()), MODELS)
     assert scored["scored"] is True
     assert {key: scored[key] for key in later} == later
+
+
+class FailsAfter(ModelStandIn):
+    """A model that answers `good` calls, then fails as a provider outage would."""
+
+    def __init__(self, good: int) -> None:
+        super().__init__()
+        self.good = good
+
+    async def structured[T: BaseModel](self, **call: Any) -> T:
+        if self.calls >= self.good:
+            self.calls += 1
+            raise AiUnavailableError("Model call failed: InternalServerError", retryable=False)
+        return await super().structured(**call)
+
+
+def _bundle(files: dict[str, bytes], **extra: Any) -> dict[str, Any]:
+    encoded = {path: base64.b64encode(data).decode() for path, data in files.items()}
+    return {"files": encoded, "mode": "record", **extra}
+
+
+def test_a_failed_run_still_returns_the_calls_it_paid_for() -> None:
+    output, code = evaluate(_bundle(CASE_FILES), FailsAfter(good=2))
+    assert code == 1
+    assert output["error"].startswith("AiUnavailableError")
+    names = [file["name"] for file in output["files"]]
+    assert len(names) == 3  # two recordings and the models
+    assert names[-1] == "models.json"
+
+
+def test_a_run_that_recorded_nothing_leaves_the_models_file_alone() -> None:
+    output, code = evaluate(_bundle(CASE_FILES), FailsAfter(good=0))
+    assert code == 1
+    assert output["files"] == []
+
+
+def test_malformed_answers_fail_before_any_model_call() -> None:
+    model = ModelStandIn()
+    wrong_child = 'hierarchy = [{ child = "炉", parent = "浇次", core = true }]\n'
+    answers = CASE_FILES["eval/expected.toml"] + wrong_child.encode()
+    output, code = evaluate(_bundle({**CASE_FILES, "eval/expected.toml": answers}), model)
+    assert code == 1
+    assert "hierarchy[0].child" in output["error"]
+    assert model.calls == 0
+
+
+def test_answers_are_checked_for_every_field_they_need() -> None:
+    good: dict[str, Any] = tomllib.loads(CASE_FILES["eval/expected.toml"].decode())
+    check_expected(good)
+    with pytest.raises(ExpectedError, match="relations"):
+        check_expected({"entity_types": good["entity_types"]})
+    with pytest.raises(ExpectedError, match=r"entity_types\[0\]"):
+        check_expected({**good, "entity_types": [{"names": ["炉次"]}]})
+    with pytest.raises(ExpectedError, match=r"properties\[0\] needs names"):
+        check_expected({**good, "properties": [{"domain": "炉次", "core": True}]})
+
+
+def test_sections_without_a_denominator_score_none() -> None:
+    expected = {
+        **EXPECTED_MORE,
+        "hierarchy": [{"child": "转炉", "parent": "设备", "core": False}],
+    }
+    result = score(accept([], [create("entity_type", "new:Heat", "炉次")]), expected, {})
+    assert result["properties"]["precision"] is None  # nothing predicted
+    assert result["hierarchy"]["recall"] is None  # no core pair
 
 
 async def test_replay_only_fails_on_the_first_call_it_has_no_recording_for() -> None:

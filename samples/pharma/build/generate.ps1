@@ -45,9 +45,12 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "生成失败，退出码 $LASTEXITCODE" }
     $result = Join-Path $scratch 'docs.zip'
     [IO.File]::WriteAllBytes($result, [Convert]::FromBase64String(($output -join '').Trim()))
+    # Unpack first, replace the old documents only once that worked.
+    $fresh = Join-Path $scratch 'docs'
+    [IO.Compression.ZipFile]::ExtractToDirectory($result, $fresh)
     New-Item -ItemType Directory -Force -Path $docs | Out-Null
     Get-ChildItem -LiteralPath $docs -File | Remove-Item
-    [IO.Compression.ZipFile]::ExtractToDirectory($result, $docs)
+    Get-ChildItem -LiteralPath $fresh -File | Move-Item -Destination $docs
     Get-ChildItem -LiteralPath $docs -File | ForEach-Object { '{0,8:N0} 字节  {1}' -f $_.Length, $_.Name }
 } finally {
     Remove-Item -Recurse -Force -LiteralPath $scratch
