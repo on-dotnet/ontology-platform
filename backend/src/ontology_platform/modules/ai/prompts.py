@@ -139,14 +139,12 @@ You are an ontology engineer. Each object type below was just identified in a do
 listed with its candidates: types it might be the same as (existing ones, types proposed by
 other documents, or types of this document). For each type, decide whether one of its
 candidates is the same concept.
-Same concept means what the types stage puts into one type: several terms naming the same
-thing, such as a short and a qualified name, an abbreviation, a synonym, a name used by another
-department, and a thing and the record of it (for example "car" and "automobile", "invoice" and
-"bill", "delivery" and "delivery record"). A record of another thing is a different concept
-("machine" and "repair record"). These are not the same concept either: a kind of something
-and that something ("sports car" and "car"), a whole and its parts ("car" and "engine"), a
-process and the equipment that performs it ("painting" and "paint booth"), and two kinds of
-one thing that share a general name.
+Same concept means the same kind of thing under another name: an abbreviation, a fuller name,
+a synonym or a name used by another department (for example "car" and "automobile", or
+"invoice" and "bill"). These are not the same concept: a kind of something and that something
+("sports car" and "car"), a whole and its parts ("car" and "engine"), a process and the
+equipment that performs it ("painting" and "paint booth"), a thing and the record of it
+("shipment" and "shipping note"), and two kinds of one thing that share a general name.
 Answer per type, in one line: "same" with the candidate it is; "different" with candidate null
 when no candidate is the same concept; "unsure" with the candidate it may be when the names,
 definitions and context are not enough to tell. Do not guess: answer unsure instead.
