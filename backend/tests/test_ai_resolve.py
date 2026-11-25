@@ -180,13 +180,14 @@ async def test_pending_items_are_candidates_and_those_of_the_same_main_name_are_
     gateway = ScriptedGateway(outputs(types), judge({"钢包": ("钢水包", "same")}))
     proposals, extractor = await extract(gateway, [], [ladle, converter])
 
-    # 转炉 has the main name of a pending item (G1): created as usual, the merge joins them.
+    # 转炉 has the main name of a pending item (G1): not judged, created with a record of it, so
+    # that the merge follows that item.
     assert [r.index for r in extractor.last.requests] == [0]
     [(_, text)] = [entry for entry in gateway.texts if entry[0] == "extract.resolve"]
     assert "C1 | 钢水包 | 大包 |" in text
     assert [(p.fields["labelZh"], p.match) for p in proposals] == [
         ("钢包", ProposedMatch("same", item_id=ladle.item_id, reason="理由")),
-        ("转炉", None),
+        ("转炉", ProposedMatch("same", item_id=converter.item_id)),
     ]
 
 

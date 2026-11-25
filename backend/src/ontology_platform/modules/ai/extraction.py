@@ -585,14 +585,14 @@ class _Fate:
 
     existing / restore: the type is that element (G1, or the model reused its id and the main
     names agree). run: the same main name as the earlier type at `root`. new: a new type, to be
-    judged against its candidates unless a pending item has its main name (`pending_name`).
+    judged against its candidates unless a pending item has its main name (`pending`).
     """
 
     kind: Literal["existing", "restore", "run", "new"]
     element: KnownElement | None = None
     root: int = -1
     claimed: KnownElement | None = None  # an existing id given to a type of another main name
-    pending_name: bool = False
+    pending: PendingType | None = None
 
 
 def _known_names(element: KnownElement) -> Names:
@@ -641,8 +641,8 @@ def _fates(
         if root >= 0:
             fates.append(_Fate("run", root=root))
             continue
-        pending_name = any(_same(item, p.label_zh, p.label_en) for p in pending)
-        fates.append(_Fate("new", claimed=claimed, pending_name=pending_name))
+        named = next((p for p in pending if _same(item, p.label_zh, p.label_en)), None)
+        fates.append(_Fate("new", claimed=claimed, pending=named))
     return fates
 
 
@@ -680,7 +680,7 @@ def resolve_requests(
             run_names.setdefault(root, []).extend([joined.label_en or "", *joined.synonyms])
     requests: list[ResolveRequest] = []
     for index, (item, fate) in enumerate(zip(types, fates, strict=True)):
-        if fate.kind != "new" or fate.pending_name:
+        if fate.kind != "new" or fate.pending is not None:
             continue
         earlier = [
             (("run", str(j)), Names.of(types[j].label_zh, types[j].label_en, run_names[j]))
@@ -1075,6 +1075,10 @@ def build_proposals(
             proposal.match = match
             if conclusion.verdict == "unsure":
                 proposal.flags.append("possible_duplicate")
+        if fate.pending is not None:
+            # G1 with a pending item: recorded, so that the merge follows that item wherever it
+            # goes, also into an element of another main name (spec 004, 5.3).
+            proposal.match = ProposedMatch("same", item_id=fate.pending.item_id)
         proposal_of[index] = proposal
         new_types.append((item, proposal))
         builder.add(proposal, item.quotes, item.confidence)

@@ -906,6 +906,12 @@ def resolve_counts(
     low, high = _THRESHOLDS
     return {
         "all": summary(pairs),
+        # Every pair not judged different, to read what the model merged or doubted.
+        "notDifferent": [
+            f"{p.names[0]} / {p.candidate_names[0]}: {p.verdict}"
+            for p in pairs
+            if p.verdict != "different"
+        ],
         "band": {
             "from": low,
             "below": high,

@@ -17,17 +17,26 @@ from ontology_platform.modules.ai.eval import (
     check_expected,
     dump_elements,
     evaluate,
+    item_id,
     load_elements,
     merge_counts,
     parse_expected,
+    pending_of,
     run_case,
     score,
 )
-from ontology_platform.modules.ai.extraction import ExtractionModels, KnownElement, Proposal
+from ontology_platform.modules.ai.extraction import (
+    ExtractionModels,
+    KnownElement,
+    Proposal,
+    ProposedMatch,
+    build_proposals,
+)
 from ontology_platform.modules.ai.gateway import AiUnavailableError, InputFile
+from ontology_platform.modules.ai.prompts import RelationsOut
 from ontology_platform.modules.ai.replay import ReplayGateway, ReplayMissError, load_recordings
 from ontology_platform.settings import Settings
-from test_ai_extraction import judge
+from test_ai_extraction import entity, judge
 
 EXPECTED = {
     "entity_types": [
@@ -619,3 +628,71 @@ async def test_replay_only_fails_on_the_first_call_it_has_no_recording_for() -> 
     recordings = load_recordings(text for _, text in recorder.recording_files())
     with pytest.raises(ReplayMissError, match=r"docs/b\.md.*extract\.terms"):
         await run_case(CASE_FILES, ReplayGateway(recordings, None), MODELS)
+
+
+def test_a_type_recorded_as_the_same_as_an_earlier_change_sets_item_goes_into_it() -> None:
+    def created(label: str, local_name: str, **values: Any) -> Proposal:
+        return Proposal(
+            op="create",
+            kind="entity_type",
+            temp_ref=f"new:{local_name}",
+            fields={
+                "localName": local_name,
+                "labelZh": label,
+                "labelEn": None,
+                "definitionZh": None,
+                "synonyms": [],
+                "parentRef": None,
+            },
+            **values,
+        )
+
+    first = [created("领用单", "IssueSlip")]
+    second = [
+        created(
+            "备件领用单",
+            "SparePartsIssue",
+            match=ProposedMatch("same", item_id=item_id("a", 1)),
+        )
+    ]
+    version = WorkingVersion()
+    assert version.merge(first, "a") == []
+    assert version.merge(second, "b") == []
+    [slip] = [e for e in version.elements if e.kind == "entity_type"]
+    assert (slip.label_zh, slip.synonyms) == ("领用单", ("备件领用单",))
+
+
+def test_a_type_of_a_pending_items_main_name_follows_where_that_item_went() -> None:
+    # The first change set's 领用单 was judged the same as 备件领用单 and went into it; the third
+    # one's 领用单 has the main name of that pending item (G1) and has to follow it there.
+    def created(label: str, local_name: str, **values: Any) -> Proposal:
+        return Proposal(
+            op="create",
+            kind="entity_type",
+            temp_ref=f"new:{local_name}",
+            fields={
+                "localName": local_name,
+                "labelZh": label,
+                "labelEn": None,
+                "definitionZh": None,
+                "synonyms": [],
+                "parentRef": None,
+            },
+            **values,
+        )
+
+    issue = [created("备件领用单", "SparePartsIssue")]
+    slip = [created("领用单", "IssueSlip", match=ProposedMatch("same", item_id=item_id("a", 1)))]
+    pending = pending_of("b", slip, [])
+    third = build_proposals(
+        [],
+        [],
+        [entity("new:IssueSlip", "领用单", "IssueSlip")],
+        RelationsOut(relations=[], properties=[]),
+        pending=pending,
+    )
+    assert third[0].match == ProposedMatch("same", item_id=item_id("b", 1))
+    version = WorkingVersion()
+    for label, proposals in (("a", issue), ("b", slip), ("c", third)):
+        assert version.merge(proposals, label) == []
+    assert [e.label_zh for e in version.elements if e.kind == "entity_type"] == ["备件领用单"]

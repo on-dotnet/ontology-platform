@@ -91,9 +91,9 @@ async def test_the_previous_release_still_writes_and_reads_change_items(
         "proposed": {"localName": "Ladle", "labelZh": "钢包"},
         "decision": "pending",
     }
-    await db.execute(insert(ChangeItem.__table__).values(**old_columns))
+    await db.execute(insert(ChangeItem).values(**old_columns))
     await db.commit()
-    columns = [ChangeItem.__table__.c[name] for name in old_columns]
+    columns = [getattr(ChangeItem, name) for name in old_columns]
     [row] = (await db.execute(select(*columns).where(ChangeItem.id == item_id))).all()
     assert row.seq == 1
     stored = await db.get(ChangeItem, item_id)
