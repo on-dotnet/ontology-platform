@@ -30,6 +30,8 @@ const expected = [
 const eslint = new ESLint({ cwd: fileURLToPath(new URL('..', import.meta.url)) });
 // Type-aware rules only accept files that a tsconfig includes, so the snippet borrows a real path.
 const [result] = await eslint.lintText(violations, { filePath: 'src/main.tsx' });
+const fatal = result.messages.find((m) => m.fatal);
+assert.ok(!fatal, `could not lint the snippet, check the borrowed path: ${fatal?.message}`);
 const errors = new Set(result.messages.filter((m) => m.severity === 2).map((m) => m.ruleId));
 const missing = expected.filter((rule) => !errors.has(rule));
 assert.equal(
