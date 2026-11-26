@@ -9,11 +9,11 @@ subject_id	subject_label	predicate_id	object_id	mapping_justification	comment
 stl:LineSegmentCode	冷轧机组段码	skos:exactMatch	stl:LineSegmentCode	semapv:ManualMappingCuration	由工艺层 PR 收录，用于涂镀分类或冷轧机组段码。
 stl:code/unit-type	机组类型	skos:broadMatch	stl:code/equipment-type	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。
 stl:UnitTypeCode	机组类型代码	skos:broadMatch	stl:EquipmentTypeCode	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。
-stl:code/unit-type/BOF	转炉	skos:exactMatch	stl:code/equipment-type/BOF	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
-stl:code/unit-type/EAF	电弧炉	skos:exactMatch	stl:code/equipment-type/EAF	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
-stl:code/unit-type/LF	钢包精炼炉	skos:exactMatch	stl:code/equipment-type/LF	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
-stl:code/unit-type/RH	真空循环脱气装置	skos:exactMatch	stl:code/equipment-type/RH	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
-stl:code/unit-type/CC	板坯连铸机	skos:exactMatch	stl:code/equipment-type/CC	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
+stl:code/unit-type/BOF	转炉	skos:exactMatch	stl:code/equipment-type/BOF	semapv:ManualMappingCuration	原机组类型迁入共享设备类型方案，保留设备的工艺用途。
+stl:code/unit-type/EAF	电弧炉	skos:exactMatch	stl:code/equipment-type/EAF	semapv:ManualMappingCuration	原机组类型迁入共享设备类型方案，保留设备的工艺用途。
+stl:code/unit-type/LF	钢包精炼炉	skos:exactMatch	stl:code/equipment-type/LF	semapv:ManualMappingCuration	原机组类型迁入共享设备类型方案，保留设备的工艺用途。
+stl:code/unit-type/RH	真空循环脱气装置	skos:exactMatch	stl:code/equipment-type/RH	semapv:ManualMappingCuration	原机组类型迁入共享设备类型方案，保留设备的工艺用途。
+stl:code/unit-type/CC	板坯连铸机	skos:exactMatch	stl:code/equipment-type/CC	semapv:ManualMappingCuration	保留板坯连铸机的含义，归入共享设备类型方案的连铸机组。
 stl:code/unit-type/HSM	热连轧机组	skos:exactMatch	stl:code/equipment-type/HSM	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
 stl:code/unit-type/PLTCM	酸洗冷连轧机组	skos:exactMatch	stl:code/equipment-type/PLTCM	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
 stl:code/unit-type/CAL	连续退火机组	skos:exactMatch	stl:code/equipment-type/CAL	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
@@ -96,7 +96,7 @@ stl:code/measurement-item/IMPACT	冲击吸收能量	skos:exactMatch	stl:code/mea
 stl:code/measurement-item/COATMASS	单位面积镀层质量	skos:exactMatch	stl:code/measurement-item/COATMASS	semapv:ManualMappingCuration	核心层沿用。
 stl:code/measurement-item/THICKNESS	厚度	skos:exactMatch	stl:code/measurement-item/THICKNESS	semapv:ManualMappingCuration	核心层沿用。
 stl:code/measurement-item/WIDTH	宽度	skos:exactMatch	stl:code/measurement-item/WIDTH	semapv:ManualMappingCuration	核心层沿用。
-stl:code/measurement-item/CASTSPEED	拉速	skos:exactMatch	stl:code/measurement-item/CASTSPEED	semapv:ManualMappingCuration	由工艺层 PR 收录，与铸流的拉速属性和读数约束一起定义。
+stl:code/measurement-item/CASTSPEED	拉速	skos:exactMatch	stl:code/measurement-item/CASTSPEED	semapv:ManualMappingCuration	沿用拉速测量项，铸造模块以 castingSpeed 记录其读数。
 stl:code/defect-type	缺陷类型	skos:exactMatch	stl:code/defect-type	semapv:ManualMappingCuration	核心层沿用。
 stl:DefectTypeCode	缺陷类型代码	skos:exactMatch	stl:DefectTypeCode	semapv:ManualMappingCuration	核心层沿用。
 stl:code/defect-type/COATLOW	镀层质量不足	skos:exactMatch	stl:code/defect-type/COATLOW	semapv:ManualMappingCuration	由工艺层 PR 收录，用于涂镀分类或冷轧机组段码。
@@ -247,37 +247,37 @@ stl:startLength	母卷区段起点	skos:exactMatch	stl:startLength	semapv:Manual
 stl:endLength	母卷区段终点	skos:exactMatch	stl:endLength	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
 stl:coatingType	镀层类型	skos:exactMatch	stl:coatingType	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
 stl:Heat	炉次	skos:exactMatch	stl:Heat	semapv:ManualMappingCuration	保留制造记录身份，并明确属于物料批。
-stl:CastSequence	浇次	skos:exactMatch	stl:CastSequence	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:Slab	板坯	skos:exactMatch	stl:Slab	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
+stl:CastSequence	浇次	skos:exactMatch	stl:CastSequence	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:Slab	板坯	skos:exactMatch	stl:Slab	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
 stl:HeatContribution	炉次来源记录	skos:exactMatch	stl:HeatContribution	semapv:ManualMappingCuration	核心层沿用。
-stl:Steelmaking	炼钢执行	skos:exactMatch	stl:Steelmaking	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:Refining	炉外精炼	skos:exactMatch	stl:Refining	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:ContinuousCasting	连铸执行	skos:exactMatch	stl:ContinuousCasting	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:CuttingPlan	切割计划	skos:exactMatch	stl:CuttingPlan	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:Cutting	切割执行	skos:exactMatch	stl:Cutting	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:producedOnFurnace	冶炼炉座	skos:exactMatch	stl:producedOnFurnace	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:castOn	连浇铸机	skos:exactMatch	stl:castOn	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:castIn	所属浇次	skos:exactMatch	stl:castIn	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
+stl:Steelmaking	炼钢执行	skos:exactMatch	stl:Steelmaking	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:Refining	炉外精炼	skos:exactMatch	stl:Refining	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:ContinuousCasting	连铸执行	skos:exactMatch	stl:ContinuousCasting	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:CuttingPlan	切割计划	skos:exactMatch	stl:CuttingPlan	semapv:ManualMappingCuration	同名沿用，计划切序与目标长度记录在计划上。
+stl:Cutting	切割执行	skos:exactMatch	stl:Cutting	semapv:ManualMappingCuration	同名沿用，切割执行记录实际产出。
+stl:producedOnFurnace	冶炼炉座	skos:exactMatch	stl:producedOnFurnace	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:castOn	连浇铸机	skos:exactMatch	stl:castOn	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:castIn	所属浇次	skos:exactMatch	stl:castIn	semapv:ManualMappingCuration	同名沿用，炉次指向所属浇次。
 stl:steelGrade	冶炼钢种	skos:exactMatch	stl:steelGrade	semapv:ManualMappingCuration	炉次与实物件均可给出内部钢种。
-stl:numberingHeat	编号炉次	skos:exactMatch	stl:numberingHeat	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
+stl:numberingHeat	编号炉次	skos:exactMatch	stl:numberingHeat	semapv:ManualMappingCuration	同名沿用，以此炉次编号；钢水来源另由 sourceHeat 记录。
 stl:sourceHeat	来源炉次	skos:exactMatch	stl:sourceHeat	semapv:ManualMappingCuration	沿用钢水来源关系，放宽至所有实物件。
 stl:contribution	炉次来源明细	skos:exactMatch	stl:contribution	semapv:ManualMappingCuration	核心层沿用。
 stl:contributedHeat	贡献炉次	skos:exactMatch	stl:contributedHeat	semapv:ManualMappingCuration	核心层沿用。
 stl:evidenceLevel	来源证据等级	skos:exactMatch	stl:evidenceLevel	semapv:ManualMappingCuration	证据等级推广至所有来源份额明细。
 stl:share	来源份额	skos:exactMatch	stl:share	semapv:ManualMappingCuration	份额数值推广至所有来源份额明细。
 stl:shareBasis	份额基准	skos:exactMatch	stl:shareBasis	semapv:ManualMappingCuration	计算份额的分母口径推广至所有来源份额明细。
-stl:isTransitionSlab	明确标为过渡坯	skos:exactMatch	stl:isTransitionSlab	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:positionInHeat	炉内出坯次序	skos:exactMatch	stl:positionInHeat	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:positionInSequence	浇次内出坯次序	skos:exactMatch	stl:positionInSequence	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:heatPositionInSequence	浇次内炉序	skos:exactMatch	stl:heatPositionInSequence	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:previousGrade	过渡前钢种	skos:exactMatch	stl:previousGrade	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:nextGrade	过渡后钢种	skos:exactMatch	stl:nextGrade	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:strandNumber	流号	skos:exactMatch	stl:strandNumber	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:sequenceInStrand	流内序号	skos:exactMatch	stl:sequenceInStrand	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:strandCount	流数	skos:exactMatch	stl:strandCount	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:forProductionOrder	切割计划服务的生产订单	skos:exactMatch	stl:forProductionOrder	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:cuttingSequence	计划切序	skos:exactMatch	stl:cuttingSequence	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:plannedLength	计划切割长度	skos:exactMatch	stl:plannedLength	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
+stl:isTransitionSlab	明确标为过渡坯	skos:exactMatch	stl:isTransitionSlab	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:positionInHeat	炉内出坯次序	skos:exactMatch	stl:positionInHeat	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:positionInSequence	浇次内出坯次序	skos:exactMatch	stl:positionInSequence	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:heatPositionInSequence	浇次内炉序	skos:exactMatch	stl:heatPositionInSequence	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:previousGrade	过渡前钢种	skos:exactMatch	stl:previousGrade	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:nextGrade	过渡后钢种	skos:exactMatch	stl:nextGrade	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:strandNumber	流号	skos:exactMatch	stl:strandNumber	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:sequenceInStrand	流内序号	skos:exactMatch	stl:sequenceInStrand	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:strandCount	流数	skos:exactMatch	stl:strandCount	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:forProductionOrder	切割计划服务的生产订单	skos:exactMatch	stl:forProductionOrder	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:cuttingSequence	计划切序	skos:exactMatch	stl:cuttingSequence	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
+stl:plannedLength	计划切割长度	skos:exactMatch	stl:plannedLength	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
 stl:actualLength	实测长度	skos:exactMatch	stl:actualLength	semapv:ManualMappingCuration	各工序均可记录实测长度。
-stl:castingSpeed	拉速	skos:exactMatch	stl:castingSpeed	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
-stl:processedHeat	处理炉次	skos:exactMatch	stl:processedHeat	semapv:ManualMappingCuration	由工艺层 PR 收录，保留炼钢或铸造专用语义。
+stl:castingSpeed	拉速	skos:exactMatch	stl:castingSpeed	semapv:ManualMappingCuration	沿用铸流拉速及其米每分钟的计量口径。
+stl:processedHeat	处理炉次	skos:exactMatch	stl:processedHeat	semapv:ManualMappingCuration	同名沿用，记录本次作业所处理的炉次。

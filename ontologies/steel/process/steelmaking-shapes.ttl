@@ -1,0 +1,38 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/process/steelmaking-shapes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/steelmaking-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "炼钢数据约束"@zh, "Steelmaking data constraints"@en ;
+    rdfs:comment "核对炉次的生成工序、精炼处理对象与方法，以及装料明细的归属。"@zh, "Checks the origin of a heat, the heat and method of a refining treatment, and the endpoints of a charge line."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:SteelmakingHeatOriginShape a sh:PropertyShape ; sh:targetClass stl:Heat ;
+    sh:path prov:wasGeneratedBy ; sh:qualifiedValueShape [ sh:class stl:Steelmaking ] ; sh:qualifiedMinCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "炉次至少应能追溯到一次生成它的炼钢作业，可同时记录其他生成活动。"@zh .
+
+stl:SteelmakingRefiningHeatShape a sh:PropertyShape ; sh:targetClass stl:Refining ;
+    sh:path stl:processedHeat ; sh:minCount 1 ; sh:class stl:Heat ;
+    sh:severity sh:Violation ; rdfs:comment "精炼实绩应标明实际处理的炉次，供按炉次还原精炼路线。"@zh .
+
+stl:SteelmakingRefiningMethodShape a sh:PropertyShape ; sh:targetClass stl:Refining ;
+    sh:path stl:refiningMethod ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "一次精炼实绩至少应记录一种实际采用的精炼方法。"@zh .
+
+stl:SteelmakingRefiningMethodSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:refiningMethod ;
+    sh:path skos:inScheme ; sh:hasValue <code/refining-method> ;
+    sh:severity sh:Violation ; rdfs:comment "精炼方法所引用的每个代码都应属于炉外精炼方法方案。"@zh .
+
+stl:SteelmakingChargeLotShape a sh:PropertyShape ; sh:targetClass stl:ChargeComponent ;
+    sh:path stl:allocatedLot ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stl:MaterialLot ;
+    sh:severity sh:Violation ; rdfs:comment "一项装料明细应对应一个取料批次，以便分别核算同次装料中各批的用量。"@zh .
+
+stl:SteelmakingChargeOperationShape a sh:PropertyShape ; sh:targetClass stl:ChargeComponent ;
+    sh:path stl:allocationOperation ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stl:Operation ;
+    sh:severity sh:Violation ; rdfs:comment "一项装料明细应归到一次实际作业，同批分次投入可分别登记明细。"@zh .

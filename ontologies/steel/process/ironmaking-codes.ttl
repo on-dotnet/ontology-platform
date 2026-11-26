@@ -1,0 +1,133 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/process/ironmaking-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/ironmaking-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "炼铁代码"@zh, "Ironmaking codes"@en ;
+    rdfs:comment "定义铁水预处理方法，并为共享代码表补充炼铁设备、工序、物料与样品代码。"@zh, "Defines hot metal pretreatment methods and extends the shared classifications for equipment, processes, materials and samples used in ironmaking."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+# Equipment types
+<code/equipment-type/COKOV> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "COKOV"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "焦炉"@zh, "Coke oven"@en ; skos:prefLabel "焦炉"@zh, "Coke oven"@en ;
+    skos:definition "以炭化室容纳装炉煤并在隔绝空气的条件下供热成焦的炉体。"@zh, "An oven that holds a coal charge in a carbonization chamber and heats it in the absence of air to make coke."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/SINT> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "SINT"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "烧结机"@zh, "Sintering machine"@en ; skos:prefLabel "烧结机"@zh, "Sintering machine"@en ;
+    skos:definition "承托烧结料层并使气流穿过料层，使混合料逐层烧结的设备。"@zh, "Equipment that supports the burden bed and draws gas through it as the sintering zone progresses."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/PELLET> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "PELLET"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "球团设备"@zh, "Pelletizing equipment"@en ; skos:prefLabel "球团设备"@zh, "Pelletizing equipment"@en ;
+    skos:definition "用于铁矿细料造球或使生球固结的设备总类。"@zh, "Equipment for forming fine iron ore into green balls or hardening those balls into pellets."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/BALL> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:broader <code/equipment-type/PELLET> ;
+    skos:notation "BALL"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "造球机"@zh, "Balling unit"@en ; skos:prefLabel "造球机"@zh, "Balling unit"@en ;
+    skos:definition "通过盘内或筒内滚动使润湿矿粉逐渐聚集成生球的设备。"@zh, "A unit that builds green balls by rolling moist ore fines in a disc or drum."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/INDUR> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:broader <code/equipment-type/PELLET> ;
+    skos:notation "INDUR"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "球团焙烧设备"@zh, "Pellet induration unit"@en ; skos:prefLabel "球团焙烧设备"@zh, "Pellet induration unit"@en ;
+    skos:definition "对生球进行热处理，使其固结并取得入炉所需强度的设备。"@zh, "A unit that heat-treats green pellets to develop the strength required for furnace charging."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/BF> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "BF"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "高炉"@zh, "Blast furnace"@en ; skos:prefLabel "高炉"@zh, "Blast furnace"@en ; skos:altLabel "BF"@en ;
+    skos:definition "炉料从炉顶下降、风从炉身下部鼓入，能连续还原并熔炼含铁炉料的竖炉。"@zh, "A shaft furnace in which a descending burden is reduced and melted with the aid of blast supplied through tuyeres near its base."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/HMLADLE> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "HMLADLE"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "铁水罐"@zh, "Hot metal ladle"@en ; skos:prefLabel "铁水罐"@zh, "Hot metal ladle"@en ; skos:altLabel "铁水包"@zh ;
+    skos:definition "具有耐火内衬、用于接收和转运液态生铁的容器。"@zh, "A refractory-lined vessel for receiving and transferring liquid iron."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/HMDES> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "HMDES"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "铁水脱硫站"@zh, "Hot metal desulfurization station"@en ; skos:prefLabel "铁水脱硫站"@zh, "Hot metal desulfurization station"@en ;
+    skos:definition "具备脱硫剂加入和反应条件，供铁水在装入炼钢炉前脱硫的工位。"@zh, "A station equipped to introduce reagents and carry out sulfur removal from hot metal before steelmaking."@en ;
+    dcterms:source <source/industry-practice> .
+
+# Process types classify route segments
+<code/process-type/COKING> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "COKING"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "炼焦"@zh, "Coking"@en ; skos:prefLabel "炼焦"@zh, "Coking"@en ;
+    skos:definition "路线中由装炉煤经炭化得到焦炭的工序段类别。"@zh, "A route segment for carbonizing a coal charge into coke."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/SINTER> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "SINTER"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "烧结"@zh, "Sintering"@en ; skos:prefLabel "烧结"@zh, "Sintering"@en ;
+    skos:definition "将含铁混合细料在料层内烧结成块的工序段类别。"@zh, "A route segment for agglomerating a bed of mixed iron-bearing fines by sintering."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/PELLET> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "PELLET"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "球团生产"@zh, "Pelletizing"@en ; skos:prefLabel "球团生产"@zh, "Pelletizing"@en ;
+    skos:definition "将含铁细料造球、固结为球团矿的工序段类别。"@zh, "A route segment for balling fine iron-bearing feed and hardening it into pellets."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/BFIRON> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "BFIRON"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "高炉炼铁"@zh, "Blast furnace ironmaking"@en ; skos:prefLabel "高炉炼铁"@zh, "Blast furnace ironmaking"@en ;
+    skos:definition "在高炉内还原和熔炼炉料以获得铁水的工序段类别。"@zh, "A route segment for reducing and melting the burden in a blast furnace to produce hot metal."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/BFCHARGE> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "BFCHARGE"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "高炉装料"@zh, "Blast furnace charging"@en ; skos:prefLabel "高炉装料"@zh, "Blast furnace charging"@en ;
+    skos:definition "从炉顶向高炉送入配好的炉料的工序段类别。"@zh, "A route segment for introducing a prepared charge through the top of a blast furnace."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/BFTAP> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "BFTAP"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "高炉出铁"@zh, "Blast furnace tapping"@en ; skos:prefLabel "高炉出铁"@zh, "Blast furnace tapping"@en ;
+    skos:definition "开启出铁口使炉缸内铁水流出并进入接铁容器的工序段类别。"@zh, "A route segment for opening a taphole and draining the hearth into receiving vessels."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/HMPT> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "HMPT"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "铁水预处理"@zh, "Hot metal pretreatment"@en ; skos:prefLabel "铁水预处理"@zh, "Hot metal pretreatment"@en ;
+    skos:definition "在炼钢装料前处理铁水，以脱除指定杂质的工序段类别。"@zh, "A route segment for removing selected impurities from hot metal before charging it to a steelmaking furnace."@en ;
+    dcterms:source <source/industry-practice> .
+
+# Material categories, physical forms and samples
+<code/material-category/COAL> a skos:Concept ; skos:inScheme <code/material-category> ; skos:topConceptOf <code/material-category> ;
+    skos:notation "COAL"^^stl:MaterialCategoryCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "煤"@zh, "Coal"@en ; skos:prefLabel "煤"@zh, "Coal"@en ;
+    skos:definition "按煤料接收、配混或投用的固体原燃料，可供炼焦或作为喷吹用煤。"@zh, "Solid feedstock or fuel handled as coal, including coal for coking or injection."@en ;
+    dcterms:source <source/industry-practice> .
+<code/product-form/PIG> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "PIG"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "生铁块"@zh, "Cast iron pig"@en ; skos:prefLabel "生铁块"@zh, "Cast iron pig"@en ;
+    skos:definition "液态生铁铸成的可搬运固体块形，用于描述交货形态或单块实物的外形。"@zh, "The discrete cast block form of solidified pig iron used to specify delivery form or describe an individual piece."@en ;
+    dcterms:source <std/ybt-5296-2011> .
+<code/sample-type/HOTMETAL> a skos:Concept ; skos:inScheme <code/sample-type> ; skos:topConceptOf <code/sample-type> ;
+    skos:notation "HOTMETAL"^^stl:SampleTypeCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "铁水样"@zh, "Hot metal sample"@en ; skos:prefLabel "铁水样"@zh, "Hot metal sample"@en ;
+    skos:definition "从出铁流或接铁容器内铁水取得、用于表征所取铁水批的样品。"@zh, "A sample drawn from the tapping stream or a receiving vessel to characterize the hot metal lot sampled."@en ;
+    dcterms:source <std/gbt-20066-2006> .
+
+# Pretreatment methods are classified by the impurity removed
+<code/pretreatment-method> a skos:ConceptScheme ;
+    rdfs:label "铁水预处理方法"@zh, "Hot metal pretreatment method"@en ; skos:prefLabel "铁水预处理方法"@zh, "Hot metal pretreatment method"@en ;
+    skos:definition "按炼钢装料前的处理所要脱除的杂质，对铁水预处理方法分类。"@zh, "Classifies hot metal pretreatment methods by the impurity targeted for removal before the steelmaking charge."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> .
+stl:PretreatmentMethodCode a rdfs:Datatype ;
+    rdfs:label "铁水预处理方法代码"@zh, "Hot metal pretreatment method code"@en ; skos:prefLabel "铁水预处理方法代码"@zh, "Hot metal pretreatment method code"@en ;
+    skos:definition "铁水预处理方法代码表中主记号所用的字面量类型。"@zh, "The literal datatype of primary notations in the hot metal pretreatment method scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> .
+<code/pretreatment-method/DES> a skos:Concept ; skos:inScheme <code/pretreatment-method> ; skos:topConceptOf <code/pretreatment-method> ;
+    skos:notation "DES"^^stl:PretreatmentMethodCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "铁水脱硫"@zh, "Hot metal desulfurization"@en ; skos:prefLabel "铁水脱硫"@zh, "Hot metal desulfurization"@en ;
+    skos:definition "在炼钢前使铁水中的硫与处理剂反应并从金属相中分离的处理方法。"@zh, "A pretreatment in which sulfur reacts with an added reagent and separates from the liquid iron before steelmaking."@en ;
+    dcterms:source <source/industry-practice> .
+<code/pretreatment-method/DEP> a skos:Concept ; skos:inScheme <code/pretreatment-method> ; skos:topConceptOf <code/pretreatment-method> ;
+    skos:notation "DEP"^^stl:PretreatmentMethodCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "铁水脱磷"@zh, "Hot metal dephosphorization"@en ; skos:prefLabel "铁水脱磷"@zh, "Hot metal dephosphorization"@en ;
+    skos:definition "在炼钢前氧化铁水中的磷并使其进入炉渣的处理方法。"@zh, "A pretreatment that oxidizes phosphorus in hot metal and transfers it to slag before steelmaking."@en ;
+    dcterms:source <source/industry-practice> .
+<code/pretreatment-method/DESI> a skos:Concept ; skos:inScheme <code/pretreatment-method> ; skos:topConceptOf <code/pretreatment-method> ;
+    skos:notation "DESI"^^stl:PretreatmentMethodCode ; rdfs:isDefinedBy <ontology/process/ironmaking-codes> ;
+    rdfs:label "铁水脱硅"@zh, "Hot metal desiliconization"@en ; skos:prefLabel "铁水脱硅"@zh, "Hot metal desiliconization"@en ;
+    skos:definition "在铁水送入后续脱磷或炼钢作业前，氧化并除去部分溶解硅的处理方法。"@zh, "A pretreatment that oxidizes and removes dissolved silicon from the hot metal ahead of dephosphorization or steelmaking."@en ;
+    dcterms:source <source/industry-practice> .

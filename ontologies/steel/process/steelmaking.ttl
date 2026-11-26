@@ -1,0 +1,120 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/process/steelmaking> a owl:Ontology ;
+    owl:versionIRI <ontology/process/steelmaking/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "炼钢与炉外精炼"@zh, "Steelmaking and secondary refining"@en ;
+    rdfs:comment "描述从金属炉料到一炉钢水的作业、装料明细、出钢实绩及该炉后续接受的精炼处理。"@zh, "Describes how metallic charges become heats of steel, with charge lines, tapping results and subsequent refining treatments."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+# Primary operations and identifiable steps
+stl:Steelmaking a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "炼钢执行"@zh, "Steelmaking operation"@en ; skos:prefLabel "炼钢执行"@zh, "Steelmaking operation"@en ;
+    skos:definition "将金属炉料冶炼成一炉钢水的作业，其取料按投入批次追踪，出钢时确立炉次身份。"@zh, "An operation that converts metallic feed into a heat of steel, linking the charged lots to the heat identified at tapping."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:ConverterSteelmaking a owl:Class ; rdfs:subClassOf stl:Steelmaking ;
+    rdfs:label "转炉炼钢"@zh, "Converter steelmaking"@en ; skos:prefLabel "转炉炼钢"@zh, "Converter steelmaking"@en ;
+    skos:definition "在转炉内吹炼金属熔池，使碳等元素氧化并以出钢结束一个炉次的冶炼作业。"@zh, "A steelmaking operation in which gas is blown through or onto the converter bath to oxidize carbon and other constituents before tapping."@en ;
+    dcterms:source <std/ybt-6393-2025> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:ElectricArcFurnaceSteelmaking a owl:Class ; rdfs:subClassOf stl:Steelmaking ;
+    rdfs:label "电弧炉炼钢"@zh, "Electric arc furnace steelmaking"@en ; skos:prefLabel "电弧炉炼钢"@zh, "Electric arc furnace steelmaking"@en ;
+    skos:definition "以电极产生的电弧向金属炉料供热，在电弧炉中熔炼并产出一炉钢水的作业。"@zh, "An operation that uses heat from electrode arcs to melt and refine a metallic charge in an electric arc furnace and tap a heat of steel."@en ;
+    dcterms:source <std/ybt-6339-2025> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:Charging a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "炼钢装料"@zh, "Steel furnace charging"@en ; skos:prefLabel "炼钢装料"@zh, "Steel furnace charging"@en ;
+    skos:definition "将备好的炉料实际送入炼钢炉的作业，以一次投料或连续给料的一个区间为边界。"@zh, "The delivery of furnace feed into a steelmaking furnace in one discrete charge or a recorded interval of continuous feeding."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:ScrapBasketCharge a owl:Class ; rdfs:subClassOf stl:Charging ;
+    rdfs:label "单篮废钢装料"@zh, "Scrap basket charge"@en ; skos:prefLabel "单篮废钢装料"@zh, "Scrap basket charge"@en ;
+    skos:definition "将一个料篮中的废钢卸入炼钢炉的一次装料，同篮可包含多个来源批次。"@zh, "A single discharge of a scrap basket into a steelmaking furnace, potentially delivering scrap from several source lots."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:Tapping a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "出钢"@zh, "Steel tapping"@en ; skos:prefLabel "出钢"@zh, "Steel tapping"@en ;
+    skos:definition "将炉内炼成的钢水排入接收钢包的作业，以实际流出的钢水计量该次出钢量。"@zh, "The discharge of molten steel from the steelmaking furnace into a receiving ladle or ladles, measured by the steel that leaves the furnace."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:Refining a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "炉外精炼"@zh, "Secondary refining"@en ; skos:prefLabel "炉外精炼"@zh, "Secondary refining"@en ;
+    skos:definition "出钢后在钢包或专用容器中对炉次钢水实施的处理，可调整其成分、温度、溶解气体或夹杂物状态。"@zh, "A treatment of a tapped heat in a ladle or separate vessel to adjust steel chemistry, temperature, dissolved gases or inclusions."@en ;
+    dcterms:source <std/iso-4529-2023> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:AlloyAddition a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "合金加入"@zh, "Alloy addition"@en ; skos:prefLabel "合金加入"@zh, "Alloy addition"@en ;
+    skos:definition "为调整钢液成分而向熔池或出钢钢流加入合金料的一次作业，可按投用批次追溯所加合金。"@zh, "An addition of alloying material to a bath or tapping stream to adjust the chemistry of the steel, traceable to the lots used."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:CoredWireFeeding a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "包芯线喂入"@zh, "Cored wire feeding"@en ; skos:prefLabel "包芯线喂入"@zh, "Cored wire feeding"@en ;
+    skos:definition "将包芯线送入钢液，使线芯材料在熔池中释放的一次作业，可按实际送入长度核算用线。"@zh, "An operation that feeds cored wire into molten steel to release its contents in the bath, with wire use traceable by the length fed."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+
+# Feedstocks, products and charge allocation
+stl:Scrap a owl:Class ; rdfs:subClassOf stl:MaterialLot ; rdfs:seeAlso <code/material-category/SCRAP> ;
+    rdfs:label "废钢批"@zh, "Steel scrap lot"@en ; skos:prefLabel "废钢批"@zh, "Steel scrap lot"@en ;
+    skos:definition "由加工余料、回收钢件等形成，以熔炼回用为目的而收集和投用的一批金属料。"@zh, "A lot of steel offcuts, recovered steel items or other steel scrap collected and charged for remelting."@en ;
+    dcterms:source <std/gbt-4223-2017> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:Ferroalloy a owl:Class ; rdfs:subClassOf stl:MaterialLot ; rdfs:seeAlso <code/material-category/FERROALLOY> ;
+    rdfs:label "铁合金批"@zh, "Ferroalloy lot"@en ; skos:prefLabel "铁合金批"@zh, "Ferroalloy lot"@en ;
+    skos:definition "以铁和一种或多种其他元素制成、作为合金化或脱氧等添加料管理的一批物料。"@zh, "A lot of an alloy of iron with one or more other elements supplied as an addition for purposes such as alloying or deoxidation."@en ;
+    dcterms:source <std/astm-a941-26a> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:DirectReducedIron a owl:Class ; rdfs:subClassOf stl:MaterialLot ; rdfs:seeAlso <code/material-category/DRI> ;
+    rdfs:label "直接还原铁批"@zh, "Direct reduced iron lot"@en ; skos:prefLabel "直接还原铁批"@zh, "Direct reduced iron lot"@en ;
+    skos:definition "由铁矿原料在固态脱氧得到、按批向炼钢工序供应金属铁的炉料。"@zh, "A lot of metallic furnace feed obtained by removing oxygen from iron ore in the solid state."@en ;
+    dcterms:source <std/gbt-20565-2022> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:LiquidSteel a owl:Class ; rdfs:subClassOf stl:MaterialLot ; rdfs:seeAlso <code/material-category/STEEL> ;
+    rdfs:label "钢水批"@zh, "Liquid steel lot"@en ; skos:prefLabel "钢水批"@zh, "Liquid steel lot"@en ;
+    skos:definition "按共同的处理、盛装或交接边界追踪的一批液态钢，可对应整炉或其中一部分。"@zh, "A quantity of molten steel tracked within a common treatment, containment or transfer boundary, comprising all or part of a heat."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:RetainedHeelLot a owl:Class ; rdfs:subClassOf stl:LiquidSteel ;
+    rdfs:label "留钢批"@zh, "Retained steel heel lot"@en ; skos:prefLabel "留钢批"@zh, "Retained steel heel lot"@en ;
+    skos:definition "出钢后有意留在炉内、作为后续炉次投入继续核算的一份钢水。"@zh, "Molten steel deliberately retained in the furnace at tapping and accounted for as input to a later heat."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:SteelmakingSlag a owl:Class ; rdfs:subClassOf stl:MaterialLot ; rdfs:seeAlso <code/material-category/SLAG> ;
+    rdfs:label "炼钢渣批"@zh, "Steelmaking slag lot"@en ; skos:prefLabel "炼钢渣批"@zh, "Steelmaking slag lot"@en ;
+    skos:definition "在炼钢或炉外精炼中形成的渣相物料，按出渣、收集或处置边界作为一批跟踪。"@zh, "Slag formed in primary or secondary steelmaking and tracked as a lot through removal, collection or disposal."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:ChargeComponent a owl:Class ; rdfs:subClassOf stl:LotAllocation ;
+    rdfs:label "装料明细"@zh, "Furnace charge line"@en ; skos:prefLabel "装料明细"@zh, "Furnace charge line"@en ;
+    skos:definition "登记一次炼钢装料中某一来源批实际投用情况的明细，分次投入同一批时可分别记项。"@zh, "A line recording one source lot's contribution to an actual furnace charge. Separate additions from the same lot can have their own lines."@en ;
+    skos:scopeNote "用 allocatedLot、allocationOperation 和 consumedQuantity 对应取料批次、执行和实投质量。工序的 consumedLot 直接指向物料批。"@zh ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+
+# Heat identity, treatment method and measured quantities
+stl:processedHeat a owl:ObjectProperty ; rdfs:domain stl:Operation ; rdfs:range stl:Heat ;
+    rdfs:label "处理炉次"@zh, "Processed heat"@en ; skos:prefLabel "处理炉次"@zh, "Processed heat"@en ;
+    skos:definition "指明一次工序实际处理的炉次，使冶炼、精炼和浇注实绩可按钢水身份串联。"@zh, "Identifies a heat actually processed by an operation so its steelmaking, refining and casting history can be followed."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:producedOnFurnace a owl:ObjectProperty ; rdfs:domain stl:Heat ; rdfs:range stl:Equipment ;
+    rdfs:label "冶炼炉座"@zh, "Producing furnace"@en ; skos:prefLabel "冶炼炉座"@zh, "Producing furnace"@en ;
+    skos:definition "从炉次指向冶炼并出钢形成该炉次的炉座，用于按设备追溯钢水的来源。"@zh, "Links a heat to the furnace that made and tapped it, identifying the physical source of the steel."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:refiningMethod a owl:ObjectProperty ; rdfs:domain stl:Refining ; rdfs:range skos:Concept ; rdfs:seeAlso <code/refining-method> ;
+    rdfs:label "炉外精炼方法"@zh, "Refining method"@en ; skos:prefLabel "炉外精炼方法"@zh, "Refining method"@en ;
+    skos:definition "标识一次炉外精炼对钢水实际采用的处理方法，例如钢包炉精炼或真空循环处理。"@zh, "Identifies the method applied in a secondary refining operation, such as ladle furnace treatment or vacuum circulation."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:chargePosition a owl:DatatypeProperty ; rdfs:domain stl:ChargeComponent ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "装料次序"@zh, "Charge addition position"@en ; skos:prefLabel "装料次序"@zh, "Charge addition position"@en ;
+    skos:definition "标明该明细所记炉料在所属作业中实际投入的先后位置，同一轮投入的料批可取相同次序。"@zh, "The position of the recorded addition in the charging order of its operation. Lots added together can share a position."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:tappingTemperature a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:Steelmaking stl:Tapping ) ] ; rdfs:range xsd:decimal ;
+    stl:unit unit:DEG_C ; stl:quantityKind quantitykind:CelsiusTemperature ;
+    rdfs:label "出钢温度"@zh, "Steel tapping temperature"@en ; skos:prefLabel "出钢温度"@zh, "Steel tapping temperature"@en ;
+    skos:definition "本次出钢实绩采用的钢水温度，以摄氏度表示。逐次测温的时刻和测点保存在观测记录中。"@zh, "The steel temperature reported for a tap in degrees Celsius. Individual readings at distinct times or points are recorded as observations."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:tappedSteelMass a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:Steelmaking stl:Tapping ) ] ; rdfs:range xsd:decimal ;
+    stl:unit unit:TONNE ; stl:quantityKind quantitykind:Mass ;
+    rdfs:label "出钢量"@zh, "Tapped steel mass"@en ; skos:prefLabel "出钢量"@zh, "Tapped steel mass"@en ;
+    skos:definition "本次出钢实际排入接收钢包的钢水总质量，以吨计，炉内留钢单独核算。"@zh, "Total mass of steel discharged to receiving ladles in this tap, in tonnes, with the retained heel accounted for separately."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:carryoverSlagMass a owl:DatatypeProperty ; rdfs:domain stl:Tapping ; rdfs:range xsd:decimal ; stl:unit unit:TONNE ; stl:quantityKind quantitykind:Mass ;
+    rdfs:label "出钢下渣量"@zh, "Slag carryover mass"@en ; skos:prefLabel "出钢下渣量"@zh, "Slag carryover mass"@en ;
+    skos:definition "出钢期间随钢流进入接收钢包的炉渣质量，以吨计。"@zh, "Mass of furnace slag carried into the receiving ladle or ladles with the steel during a tap, in tonnes."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .
+stl:fedWireLength a owl:DatatypeProperty ; rdfs:domain stl:CoredWireFeeding ; rdfs:range xsd:decimal ; stl:unit unit:M ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "实际喂线长度"@zh, "Wire length fed"@en ; skos:prefLabel "实际喂线长度"@zh, "Wire length fed"@en ;
+    skos:definition "本次喂线实际送入钢液的包芯线长度，以米计。"@zh, "Length of cored wire actually delivered into the steel during the feeding operation, in metres."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking> .

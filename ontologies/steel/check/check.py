@@ -8,7 +8,7 @@ from pathlib import Path
 
 import rdflib
 from pyshacl import validate
-from rdflib import DCTERMS, Graph, Literal, Namespace, OWL, RDF, RDFS, SH, SKOS, URIRef, XSD
+from rdflib import DCTERMS, Graph, Literal, Namespace, OWL, PROV, RDF, RDFS, SH, SKOS, URIRef, XSD
 from rdflib.compare import isomorphic, to_canonical_graph
 from rdflib.paths import Path as RDFPath
 from rdflib.plugins.sparql import prepareQuery
@@ -322,6 +322,13 @@ def check_core(graph, errors):
     for name in ("MaterialClass", "unitType", "code/unit-type"):
         if (STL[name], None, None) in graph:
             errors.append(f"核心层不得复用 {name}")
+    for term, parent in ((STL.MaterialLot, STL.Material), (STL.MaterialPiece, STL.Material),
+                         (STL.Heat, STL.ManufacturingRecord), (STL.Heat, STL.MaterialLot),
+                         (STL.Operation, PROV.Activity)):
+        if (term, RDFS.subClassOf, parent) not in graph:
+            errors.append(f"核心层缺少 {local(term)} rdfs:subClassOf {local(parent)}")
+    if set(graph.objects(STL.LotFormationRule, RDFS.isDefinedBy)) != {STL["ontology/core/quality"]}:
+        errors.append("LotFormationRule 的 rdfs:isDefinedBy 应为 ontology/core/quality")
     for name, domain, target in (("derivedFrom", STL.Material, STL.Material),
                                  ("sourceHeat", STL.MaterialPiece, STL.Heat)):
         if set(graph.objects(STL[name], RDFS.domain)) != {domain} or set(graph.objects(STL[name], RDFS.range)) != {target}:

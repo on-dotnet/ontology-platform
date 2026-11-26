@@ -1,0 +1,20 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX item: <https://w3id.org/ontology-platform/steel/code/measurement-item/>
+
+SELECT ?heatId ?stepId ?method ?started ?ended ?pointId ?sampled ?temperature WHERE {
+  VALUES ?heat { <urn:synthetic:steel:heat/H12600017> }
+  ?heat dcterms:identifier ?heatId .
+  ?step a/rdfs:subClassOf* stl:Refining ; stl:processedHeat ?heat ; stl:refiningMethod/skos:notation ?method ;
+        stl:actualStartAt ?started ; stl:actualEndAt ?ended ; dcterms:identifier ?stepId .
+  OPTIONAL {
+    ?step stl:performedOn ?unit .
+    ?observation a/rdfs:subClassOf* stl:Observation ; stl:measuredObject ?heat ; stl:measurementItem item:TEMP ;
+                 stl:measuredAtPoint ?point ; stl:sampledAt ?sampled ; stl:temperature ?temperature .
+    ?point stl:partOf ?unit ; dcterms:identifier ?pointId .
+    FILTER (?sampled >= ?started && ?sampled <= ?ended)
+  }
+}
+ORDER BY ?started ?stepId ?sampled ?pointId ?temperature

@@ -1,0 +1,135 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix eq: <urn:synthetic:steel:equipment/> .
+@prefix run: <urn:synthetic:steel:blastfurnaceoperation/> .
+@prefix burden: <urn:synthetic:steel:blastfurnacecharging/> .
+@prefix tap: <urn:synthetic:steel:blastfurnacetapping/> .
+@prefix metal: <urn:synthetic:steel:hotmetal/> .
+@prefix coke: <urn:synthetic:steel:coke/> .
+@prefix sinter: <urn:synthetic:steel:sinter/> .
+@prefix pellet: <urn:synthetic:steel:pellet/> .
+@prefix scrap: <urn:synthetic:steel:scrap/> .
+@prefix alloy: <urn:synthetic:steel:ferroalloy/> .
+@prefix sample: <urn:synthetic:steel:sample/> .
+@prefix analysis: <urn:synthetic:steel:chemicalanalysis/> .
+@prefix result: <urn:synthetic:steel:elementresult/> .
+@prefix bof: <urn:synthetic:steel:convertersteelmaking/> .
+@prefix eaf: <urn:synthetic:steel:electricarcfurnacesteelmaking/> .
+@prefix charge: <urn:synthetic:steel:charging/> .
+@prefix heat: <urn:synthetic:steel:heat/> .
+@prefix seq: <urn:synthetic:steel:castsequence/> .
+@prefix ref: <urn:synthetic:steel:refining/> .
+@prefix point: <urn:synthetic:steel:measurementpoint/> .
+@prefix obs: <urn:synthetic:steel:observation/> .
+@prefix ingot: <urn:synthetic:steel:ingot/> .
+@prefix pour: <urn:synthetic:steel:ingotcasting/> .
+@prefix cast: <urn:synthetic:steel:continuouscasting/> .
+@prefix cut: <urn:synthetic:steel:cutting/> .
+@prefix plan: <urn:synthetic:steel:cuttingplan/> .
+@prefix slab: <urn:synthetic:steel:slab/> .
+
+# Synthetic lot analyses and shop readings. The query day is a local civil day in UTC+08:00.
+eq:BF1 a stl:Equipment ; dcterms:identifier "BF1" ; stl:equipmentType <code/equipment-type/BF> .
+eq:BF2 a stl:Equipment ; dcterms:identifier "BF2" ; stl:equipmentType <code/equipment-type/BF> .
+eq:HL1 a stl:Equipment ; dcterms:identifier "HL1" ; stl:equipmentType <code/equipment-type/HMLADLE> .
+eq:BOF1 a stl:Equipment ; dcterms:identifier "BOF1" ; stl:equipmentType <code/equipment-type/BOF> .
+eq:EAF2 a stl:Equipment ; dcterms:identifier "EAF2" ; stl:equipmentType <code/equipment-type/EAF> .
+eq:LF1 a stl:Equipment ; dcterms:identifier "LF1" ; stl:equipmentType <code/equipment-type/LF> .
+eq:RH1 a stl:Equipment ; dcterms:identifier "RH1" ; stl:equipmentType <code/equipment-type/RH> .
+eq:CC1 a stl:Equipment ; dcterms:identifier "CC1" ; stl:equipmentType <code/equipment-type/CC> .
+eq:MD1 a stl:Equipment ; dcterms:identifier "MD1" ; stl:equipmentType <code/equipment-type/INGOTMOULD> .
+
+coke:K01 a stl:Coke ; dcterms:identifier "K01" ; stl:materialCategory <code/material-category/COKE> ; stl:cokeReactivityIndex 25.4 .
+sinter:N01 a stl:Sinter ; dcterms:identifier "N01" ; stl:materialCategory <code/material-category/SINTER> ; stl:sinterBasicity 1.85 .
+pellet:P01 a stl:Pellet ; dcterms:identifier "P01" ; stl:materialCategory <code/material-category/PELLET> ; stl:oreTumbleIndex 95.7 .
+coke:K02 a stl:Coke ; dcterms:identifier "K02" ; stl:materialCategory <code/material-category/COKE> .
+coke:K03 a stl:Coke ; dcterms:identifier "K03" ; stl:cokeReactivityIndex 24.1 .
+run:B01 a stl:BlastFurnaceOperation ; stl:performedOn eq:BF1 .
+run:B02 a stl:BlastFurnaceOperation ; stl:performedOn eq:BF2 .
+run:B03 a stl:BlastFurnaceOperation ; stl:performedOn eq:BF1 ; stl:consumedLot coke:K03 ;
+    stl:actualStartAt "2026-11-18T09:00:00+08:00"^^xsd:dateTime ; stl:actualEndAt "2026-11-18T10:00:00+08:00"^^xsd:dateTime .
+run:B04 a stl:BlastFurnaceOperation ; stl:performedOn eq:BF1 ; stl:consumedLot coke:K02 ;
+    stl:actualStartAt "2026-11-18T23:00:00+08:00"^^xsd:dateTime ; stl:actualEndAt "2026-11-19T01:00:00+08:00"^^xsd:dateTime .
+burden:B11 a stl:BlastFurnaceCharging ; stl:partOf run:B01 ;
+    stl:actualStartAt "2026-11-18T02:00:00+08:00"^^xsd:dateTime ; stl:consumedLot coke:K01, sinter:N01 .
+<urn:synthetic:steel:lotallocation/L11> a stl:LotAllocation ; stl:allocatedLot pellet:P01 ;
+    stl:allocationOperation burden:B11 ; stl:consumedQuantity 14.5 .
+burden:B12 a stl:BlastFurnaceCharging ; stl:partOf run:B02 ;
+    stl:actualStartAt "2026-11-18T03:00:00+08:00"^^xsd:dateTime ; stl:consumedLot coke:K02 .
+burden:B13 a stl:BlastFurnaceCharging ; stl:partOf run:B01 ;
+    stl:actualStartAt "2026-11-19T00:00:00+08:00"^^xsd:dateTime ; stl:consumedLot coke:K02 .
+
+tap:T01 a stl:BlastFurnaceTapping ; dcterms:identifier "T01" ; stl:partOf run:B01 ;
+    stl:performedOn eq:BF1, eq:HL1 ; stl:tappedHotMetalMass 89.4 .
+tap:T02 a stl:BlastFurnaceTapping ; dcterms:identifier "T02" ; stl:partOf run:B02 ;
+    stl:performedOn eq:BF2 ; stl:tappedHotMetalMass 102.6 .
+metal:I01 a stl:HotMetal ; dcterms:identifier "I01" ; stl:materialCategory <code/material-category/HOTMETAL> ; prov:wasGeneratedBy tap:T01 .
+metal:I02 a stl:HotMetal ; dcterms:identifier "I02" ; stl:materialCategory <code/material-category/HOTMETAL> ; prov:wasGeneratedBy tap:T02 .
+scrap:S01 a stl:Scrap ; dcterms:identifier "S01" ; stl:materialCategory <code/material-category/SCRAP> .
+alloy:A01 a stl:Ferroalloy ; dcterms:identifier "A01" ; stl:materialCategory <code/material-category/FERROALLOY> .
+
+sample:T260000101 a stl:Sample ; dcterms:identifier "T260000101" ; stl:sampleOf coke:K01 .
+sample:T260000102 a stl:Sample ; dcterms:identifier "T260000102" ; stl:sampleOf sinter:N01 .
+sample:T260000103 a stl:Sample ; dcterms:identifier "T260000103" ; stl:sampleOf pellet:P01 .
+sample:T260000104 a stl:Sample ; dcterms:identifier "T260000104" ; stl:sampleOf metal:I01 .
+analysis:A11 a stl:ChemicalAnalysis ; stl:testedSample sample:T260000101 .
+analysis:A12 a stl:ChemicalAnalysis ; stl:testedSample sample:T260000102 .
+analysis:A13 a stl:ChemicalAnalysis ; stl:testedSample sample:T260000103 .
+analysis:A14 a stl:ChemicalAnalysis ; stl:testedSample sample:T260000104 ; stl:analysisType <code/analysis-type/PROCESS> .
+result:E11 a stl:ElementResult ; stl:partOf analysis:A11 ; stl:element <code/chemical-element/S> ; stl:massFraction 0.65 .
+result:E12 a stl:ElementResult ; stl:partOf analysis:A12 ; stl:element <code/chemical-element/FE> ; stl:massFraction 56.8 .
+result:E13 a stl:ElementResult ; stl:partOf analysis:A13 ; stl:element <code/chemical-element/FE> ; stl:massFraction 64.2 .
+result:E14 a stl:ElementResult ; stl:partOf analysis:A14 ; stl:element <code/chemical-element/SI> ; stl:massFraction 0.48 .
+result:E15 a stl:ElementResult ; stl:partOf analysis:A14 ; stl:element <code/chemical-element/S> ; stl:massFraction 0.035 .
+
+bof:M17 a stl:ConverterSteelmaking ; stl:performedOn eq:BOF1 ; stl:consumedLot metal:I01, metal:I02 ; stl:tappingTemperature 1618.0 .
+charge:C17 a stl:Charging ; stl:partOf bof:M17 ; stl:consumedLot scrap:S01 .
+<urn:synthetic:steel:chargecomponent/L17> a stl:ChargeComponent ; stl:allocationOperation charge:C17 ;
+    stl:allocatedLot alloy:A01 ; stl:consumedQuantity 0.24 .
+bof:M18 a stl:ConverterSteelmaking ; stl:performedOn eq:BOF1 .
+eaf:M19 a stl:ElectricArcFurnaceSteelmaking ; stl:performedOn eq:EAF2 ; stl:consumedLot scrap:S01 .
+heat:H12600017 a stl:Heat ; dcterms:identifier "H12600017" ; prov:wasGeneratedBy bof:M17 ;
+    stl:producedOnFurnace eq:BOF1 ; stl:castIn seq:Q1260003 ; stl:heatPositionInSequence "1"^^xsd:positiveInteger .
+heat:H12600018 a stl:Heat ; dcterms:identifier "H12600018" ; prov:wasGeneratedBy bof:M18 ;
+    stl:producedOnFurnace eq:BOF1 ; stl:castIn seq:Q1260003 ; stl:heatPositionInSequence "2"^^xsd:positiveInteger .
+heat:H22600019 a stl:Heat ; dcterms:identifier "H22600019" ; prov:wasGeneratedBy eaf:M19 ; stl:producedOnFurnace eq:EAF2 .
+
+ref:R01 a stl:Refining ; dcterms:identifier "R01" ; stl:processedHeat heat:H12600017 ; stl:performedOn eq:LF1 ;
+    stl:refiningMethod <code/refining-method/LF> ; stl:actualStartAt "2026-11-18T11:00:00Z"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-18T11:24:00Z"^^xsd:dateTime .
+ref:R02 a stl:Refining ; dcterms:identifier "R02" ; stl:processedHeat heat:H12600017 ; stl:performedOn eq:RH1 ;
+    stl:refiningMethod <code/refining-method/RH> ; stl:actualStartAt "2026-11-18T11:35:00Z"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-18T11:55:00Z"^^xsd:dateTime .
+point:LF-IN a stl:MeasurementPoint ; dcterms:identifier "LF-IN" ; stl:partOf eq:LF1 .
+point:LF-OUT a stl:MeasurementPoint ; dcterms:identifier "LF-OUT" ; stl:partOf eq:LF1 .
+point:RH-END a stl:MeasurementPoint ; dcterms:identifier "RH-END" ; stl:partOf eq:RH1 .
+obs:O21 a stl:Observation ; stl:measuredObject heat:H12600017 ; stl:measuredAtPoint point:LF-IN ;
+    stl:measurementItem <code/measurement-item/TEMP> ; stl:temperature 1575.0 ; stl:measurementMethod <code/measurement-method/MANUAL> ;
+    stl:sampledAt "2026-11-18T11:03:00Z"^^xsd:dateTime ; stl:resultAt "2026-11-18T11:03:10Z"^^xsd:dateTime .
+obs:O22 a stl:Observation ; stl:measuredObject heat:H12600017 ; stl:measuredAtPoint point:LF-OUT ;
+    stl:measurementItem <code/measurement-item/TEMP> ; stl:temperature 1591.0 ; stl:measurementMethod <code/measurement-method/MANUAL> ;
+    stl:sampledAt "2026-11-18T11:22:00Z"^^xsd:dateTime ; stl:resultAt "2026-11-18T11:22:10Z"^^xsd:dateTime .
+obs:O23 a stl:Observation ; stl:measuredObject heat:H12600017 ; stl:measuredAtPoint point:RH-END ;
+    stl:measurementItem <code/measurement-item/TEMP> ; stl:temperature 1579.0 ; stl:measurementMethod <code/measurement-method/MANUAL> ;
+    stl:sampledAt "2026-11-18T11:51:00Z"^^xsd:dateTime ; stl:resultAt "2026-11-18T11:51:10Z"^^xsd:dateTime .
+obs:O24 a stl:Observation ; stl:measuredObject heat:H12600018 ; stl:measuredAtPoint point:LF-OUT ;
+    stl:measurementItem <code/measurement-item/TEMP> ; stl:temperature 1576.0 ; stl:measurementMethod <code/measurement-method/MANUAL> ;
+    stl:sampledAt "2026-11-18T11:54:00Z"^^xsd:dateTime ; stl:resultAt "2026-11-18T11:54:10Z"^^xsd:dateTime .
+obs:O25 a stl:Observation ; stl:measuredObject heat:H12600017 ; stl:measuredAtPoint point:RH-END ;
+    stl:measurementItem <code/measurement-item/TEMP> ; stl:temperature 1570.0 ; stl:measurementMethod <code/measurement-method/MANUAL> ;
+    stl:sampledAt "2026-11-18T11:58:00Z"^^xsd:dateTime ; stl:resultAt "2026-11-18T11:58:10Z"^^xsd:dateTime .
+
+seq:Q1260003 a stl:CastSequence ; dcterms:identifier "Q1260003" ; stl:castOn eq:CC1 .
+cast:C03 a stl:ContinuousCasting ; stl:performedOn eq:CC1 ; stl:processedHeat heat:H12600017, heat:H12600018 ; stl:castingSpeed 1.2 .
+plan:P01 a stl:CuttingPlan ; stl:plannedLength 8.0 ; stl:cuttingSequence "1"^^xsd:positiveInteger .
+cut:C01 a stl:Cutting ; stl:partOf cast:C03 ; stl:fulfills plan:P01 ; stl:actualLength 8.01 ; stl:outputPiece slab:S12600017101 .
+slab:S12600017101 a stl:Slab, stl:ContinuouslyCastPiece ; dcterms:identifier "S12600017101" ;
+    stl:producedBy cut:C01 ; stl:productForm <code/product-form/SLAB> ; stl:sourceHeat heat:H12600017 ; stl:numberingHeat heat:H12600017 ;
+    stl:strandNumber "1"^^xsd:positiveInteger ; stl:sequenceInStrand "1"^^xsd:positiveInteger ; stl:positionInHeat "1"^^xsd:positiveInteger ;
+    stl:positionInSequence "1"^^xsd:positiveInteger .
+pour:M01 a stl:IngotCasting ; stl:processedHeat heat:H22600019 ; stl:teemingMethod <code/teeming-method/BOTTOM> .
+ingot:G01 a stl:Ingot ; dcterms:identifier "G01" ; stl:productForm <code/product-form/INGOT> ;
+    stl:producedBy pour:M01 ; stl:teemedInMould eq:MD1 ; stl:sourceHeat heat:H22600019 .

@@ -1,0 +1,135 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/process/ironmaking> a owl:Ontology ;
+    owl:versionIRI <ontology/process/ironmaking/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "炼铁工序与物料"@zh, "Ironmaking operations and materials"@en ;
+    rdfs:comment "从炼焦、烧结和球团追踪高炉用料，再按出铁作业将铁水批追溯到高炉。"@zh, "Tracks coke and prepared ore into the blast furnace and traces hot metal lots back to the tap and furnace of origin."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+# Burden preparation and ironmaking operations
+stl:Coking a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "炼焦"@zh, "Coking"@en ; skos:prefLabel "炼焦"@zh, "Coking"@en ;
+    skos:definition "将装炉煤隔绝空气加热，使挥发组分逸出并结成焦炭的一次生产作业。"@zh, "An operation that heats a coal charge in the absence of air to release volatile matter and form coke."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:Sintering a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "铁矿烧结"@zh, "Iron ore sintering"@en ; skos:prefLabel "铁矿烧结"@zh, "Iron ore sintering"@en ;
+    skos:definition "在含铁细料组成的料层中利用局部熔融使颗粒黏结，再将烧结饼破碎筛分为炉料的作业。"@zh, "An operation that bonds iron-bearing fines by partial melting within a bed and breaks and screens the resulting cake for furnace use."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:Pelletizing a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "铁矿球团生产"@zh, "Iron ore pelletizing"@en ; skos:prefLabel "铁矿球团生产"@zh, "Iron ore pelletizing"@en ;
+    skos:definition "将含铁细料滚制成生球并固结，使颗粒在运输和入炉时保持球形的作业。"@zh, "An operation that rolls fine iron-bearing feed into green balls and hardens them to retain their form during handling and charging."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:BlastFurnaceOperation a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "高炉冶炼作业"@zh, "Blast furnace ironmaking operation"@en ; skos:prefLabel "高炉冶炼作业"@zh, "Blast furnace ironmaking operation"@en ;
+    skos:definition "一座高炉在可识别的运行时段内连续还原、熔化含铁炉料并使铁渣分离的作业。"@zh, "An interval of operation on one blast furnace during which iron-bearing burden is reduced and melted and slag separates from the iron."@en ;
+    skos:scopeNote "用 performedOn 指定高炉，consumedLot 记本时段投入的炉料批。需逐次核对装料时间时，在所属装料作业上记实际时间和用料。"@zh, "Identify the furnace with performedOn and the burden lots with consumedLot. For charge-level timing, record the lots and actual times on the individual charging operations."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:BlastFurnaceCharging a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "高炉装料"@zh, "Blast furnace charging"@en ; skos:prefLabel "高炉装料"@zh, "Blast furnace charging"@en ;
+    skos:definition "从炉顶把可识别的一批或多批炉料送入高炉的一次投料作业。"@zh, "One charging operation in which one or more identified burden lots enter a blast furnace through the furnace top."@en ;
+    skos:scopeNote "用 partOf 归入高炉冶炼作业，用 consumedLot 列出这次实际投入的料批。"@zh, "Link to the enclosing furnace operation with partOf and to the lots charged on this occasion with consumedLot."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:BlastFurnaceTapping a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "高炉出铁"@zh, "Blast furnace tapping"@en ; skos:prefLabel "高炉出铁"@zh, "Blast furnace tapping"@en ;
+    skos:altLabel "铁次"@zh, "blast furnace tap"@en ;
+    skos:definition "在一座高炉上自打开出铁口至封口的一次放铁作业，期间流出的铁水可以分装多罐。"@zh, "One discharge of hot metal from a blast furnace, from opening a taphole until closure, potentially into several receiving vessels."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:HotMetalPretreatment a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "铁水预处理"@zh, "Hot metal pretreatment"@en ; skos:prefLabel "铁水预处理"@zh, "Hot metal pretreatment"@en ;
+    skos:definition "铁水进入炼钢炉以前，为脱除硫、磷或硅等目标杂质而实施的处理作业。"@zh, "An operation on hot metal before it enters a steelmaking furnace to remove targeted impurities such as sulfur, phosphorus or silicon."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+
+# Feed and product lots
+stl:Coal a owl:Class ; rdfs:subClassOf stl:MaterialLot ;
+    rdfs:label "煤批"@zh, "Coal lot"@en ; skos:prefLabel "煤批"@zh, "Coal lot"@en ;
+    skos:definition "作为燃料、还原剂原料或炼焦原料按批验收和投用的煤，可由单种煤或配合煤组成。"@zh, "A lot of coal received and charged as fuel, as a source of reductant or as coking feed, whether from one coal source or a blend."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:CoalBlend a owl:Class ; rdfs:subClassOf stl:Coal, stl:BulkBlend ;
+    rdfs:label "配合煤批"@zh, "Coal blend lot"@en ; skos:prefLabel "配合煤批"@zh, "Coal blend lot"@en ;
+    skos:definition "若干来源煤批按配煤方案实际混合后形成的新煤批，保留各投入煤批的来源关系。"@zh, "A coal lot formed by physically combining source lots to a blending plan and retaining their identities as inputs."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:Coke a owl:Class ; rdfs:subClassOf stl:MaterialLot ;
+    rdfs:label "冶金焦炭批"@zh, "Metallurgical coke lot"@en ; skos:prefLabel "冶金焦炭批"@zh, "Metallurgical coke lot"@en ;
+    skos:definition "煤经炭化得到的多孔富碳物料批，入高炉后供热、参与还原并支撑料柱。"@zh, "A lot of porous carbon-rich material produced by carbonizing coal, used in a blast furnace to supply heat, support the burden and participate in reduction."@en ;
+    dcterms:source <std/gbt-1996-2017> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:IronOre a owl:Class ; rdfs:subClassOf stl:MaterialLot ;
+    rdfs:label "铁矿料批"@zh, "Iron ore lot"@en ; skos:prefLabel "铁矿料批"@zh, "Iron ore lot"@en ;
+    skos:definition "以可还原铁矿物供铁的物料批，可为天然矿、选矿产物，或以矿粉为主料制成的人造块矿。"@zh, "A lot supplying iron in reducible mineral form as natural ore, beneficiated ore or agglomerates made from ore fines."@en ;
+    dcterms:source <std/gbt-20565-2022> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:Sinter a owl:Class ; rdfs:subClassOf stl:IronOre ;
+    rdfs:label "烧结矿批"@zh, "Iron ore sinter lot"@en ; skos:prefLabel "烧结矿批"@zh, "Iron ore sinter lot"@en ;
+    skos:definition "含铁细料在料层中熔结后经破碎、筛分得到的矿料批，颗粒呈不规则块状。"@zh, "A lot of irregular ore agglomerates obtained by crushing and screening the cake formed by sintering iron-bearing fines."@en ;
+    dcterms:source <std/ybt-421-2014> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:Pellet a owl:Class ; rdfs:subClassOf stl:IronOre ;
+    rdfs:label "球团矿批"@zh, "Iron ore pellet lot"@en ; skos:prefLabel "球团矿批"@zh, "Iron ore pellet lot"@en ;
+    skos:definition "细粒含铁料经造球并固结后按批交接的球状矿料，颗粒在装卸与入炉时能保持形状。"@zh, "A lot of hardened balls made from fine iron-bearing feed that retain their form for handling and furnace charging."@en ;
+    dcterms:source <std/gbt-27692-2024> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:Flux a owl:Class ; rdfs:subClassOf stl:MaterialLot ;
+    rdfs:label "熔剂批"@zh, "Flux lot"@en ; skos:prefLabel "熔剂批"@zh, "Flux lot"@en ;
+    skos:definition "按批配入炉料以与脉石或灰分成渣、调节炉渣组成和流动性的材料。"@zh, "A lot of material added to the burden to form slag with gangue or ash and adjust slag composition and flow."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:HotMetal a owl:Class ; rdfs:subClassOf stl:MaterialLot ;
+    rdfs:label "铁水批"@zh, "Hot metal lot"@en ; skos:prefLabel "铁水批"@zh, "Hot metal lot"@en ;
+    skos:definition "一次高炉出铁形成、以该铁次标识来源的液态生铁批，分送到各接铁容器时仍可追到该铁次。"@zh, "A lot of liquid iron originating in one blast furnace tap and traceable to that tap even when divided among receiving vessels."@en ;
+    skos:scopeNote "用 prov:wasGeneratedBy 记出铁作业。成分分析用 Sample.sampleOf 指回铁水批，ChemicalAnalysis.testedSample 指向样品，ElementResult 用 partOf、element 和 massFraction 记录各元素结果。"@zh, "Identify the tap with prov:wasGeneratedBy. Link a sample to the lot with sampleOf and an analysis to the sample with testedSample. Each ElementResult links to the analysis with partOf and reports element and massFraction."@en ;
+    rdfs:seeAlso prov:wasGeneratedBy, stl:sampleOf, stl:ChemicalAnalysis, stl:ElementResult ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:PigIron a owl:Class ; rdfs:subClassOf stl:MaterialLot ;
+    rdfs:label "固态生铁批"@zh, "Solid pig iron lot"@en ; skos:prefLabel "固态生铁批"@zh, "Solid pig iron lot"@en ;
+    skos:definition "铁水凝固后按同一批号接收或交付的生铁，常以铸块形态储运和配入熔炼炉。"@zh, "A lot of pig iron received or delivered after solidification, commonly in cast pieces for storage, transport and remelting."@en ;
+    dcterms:source <std/ybt-5296-2011>, <std/gbt-718-2024> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:BlastFurnaceSlag a owl:Class ; rdfs:subClassOf stl:MaterialLot ;
+    rdfs:label "高炉渣批"@zh, "Blast furnace slag lot"@en ; skos:prefLabel "高炉渣批"@zh, "Blast furnace slag lot"@en ;
+    skos:definition "高炉冶炼中由脉石、燃料灰分与熔剂等形成并与铁水分离、可作为副产品追踪的渣批。"@zh, "A by-product lot formed from gangue, fuel ash and fluxes during blast furnace smelting and collected separately from the molten iron."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+
+# Execution details and reported lot characteristics
+stl:tapHoleLocation a owl:ObjectProperty ; rdfs:domain stl:BlastFurnaceTapping ; rdfs:range stl:Location ;
+    rdfs:label "出铁口位置"@zh, "Taphole location"@en ; skos:prefLabel "出铁口位置"@zh, "Taphole location"@en ;
+    skos:definition "标明该铁次启闭的出铁口在高炉上的位置，可区分同一座高炉的多个出铁口。"@zh, "Identifies the outlet opened and closed for this tap, distinguishing the tapholes of a single furnace."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:tappedHotMetalMass a owl:DatatypeProperty ; rdfs:domain stl:BlastFurnaceTapping ; rdfs:range xsd:decimal ;
+    stl:unit unit:TONNE ; stl:quantityKind quantitykind:Mass ;
+    rdfs:label "铁次出铁量"@zh, "Tapped hot metal mass"@en ; skos:prefLabel "铁次出铁量"@zh, "Tapped hot metal mass"@en ;
+    skos:definition "整个铁次排出的铁水净质量，扣除随流炉渣，分罐接收时合计本铁次送入各罐的铁水。"@zh, "The net mass of liquid iron discharged over one tap, excluding entrained slag and including the portions delivered to all receiving vessels."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:pretreatmentMethod a owl:ObjectProperty ; rdfs:domain stl:HotMetalPretreatment ; rdfs:range skos:Concept ; rdfs:seeAlso <code/pretreatment-method> ;
+    rdfs:label "铁水预处理方法"@zh, "Hot metal pretreatment method"@en ; skos:prefLabel "铁水预处理方法"@zh, "Hot metal pretreatment method"@en ;
+    skos:definition "标明本次预处理针对哪一种杂质进行脱除，联合处理可列出所用的多个方法。"@zh, "Identifies the treatment applied to remove a particular impurity from hot metal, allowing several methods for a combined treatment."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:coalDryAshContent a owl:DatatypeProperty ; rdfs:domain stl:Coal ; rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ; stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "煤的干基灰分"@zh, "Dry-basis ash content of coal"@en ; skos:prefLabel "煤的干基灰分"@zh, "Dry-basis ash content of coal"@en ;
+    skos:definition "煤样灰化后的残留物质量占干煤样质量的百分数，作为该煤批的干基分析值报告。"@zh, "The mass of residue after ashing as a percentage of the dry coal sample mass, reported for the lot on a dry basis."@en ;
+    dcterms:source <std/gbt-212-2008> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:cokeReactivityIndex a owl:DatatypeProperty ; rdfs:domain stl:Coke ; rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ; stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "焦炭反应性指数"@zh, "Coke reactivity index"@en ; skos:prefLabel "焦炭反应性指数"@zh, "Coke reactivity index"@en ;
+    skos:altLabel "CRI"@zh, "CRI"@en ;
+    skos:definition "焦样在二氧化碳反应试验中的质量损失占反应前质量的百分数，用于表征该批焦炭的反应性。"@zh, "The mass lost by a coke sample in the carbon dioxide reaction test as a percentage of its pre-reaction mass, reported for the lot."@en ;
+    dcterms:source <std/gbt-4000-2017> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:cokeStrengthAfterReaction a owl:DatatypeProperty ; rdfs:domain stl:Coke ; rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ; stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "焦炭反应后强度"@zh, "Coke strength after reaction"@en ; skos:prefLabel "焦炭反应后强度"@zh, "Coke strength after reaction"@en ;
+    skos:altLabel "CSR"@zh, "CSR"@en ;
+    skos:definition "反应后的焦样经转鼓处理，留在规定筛孔以上的质量占入鼓焦样质量的百分数。"@zh, "The percentage by mass of the reacted coke charged to the drum that remains above the test sieve after tumbling."@en ;
+    dcterms:source <std/gbt-4000-2017> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:sinterBasicity a owl:DatatypeProperty ; rdfs:domain stl:Sinter ; rdfs:range xsd:decimal ;
+    stl:unit unit:UNITLESS ; stl:quantityKind quantitykind:DimensionlessRatio ;
+    rdfs:label "烧结矿二元碱度"@zh, "Sinter binary basicity"@en ; skos:prefLabel "烧结矿二元碱度"@zh, "Sinter binary basicity"@en ;
+    skos:definition "以同一分析基准的氧化钙质量分数除以二氧化硅质量分数得到的烧结矿批次指标。"@zh, "The ratio of calcium oxide to silicon dioxide mass fractions for a sinter lot, with both reported on the same analytical basis."@en ;
+    dcterms:source <std/ybt-421-2014> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
+stl:oreTumbleIndex a owl:DatatypeProperty ; rdfs:domain stl:IronOre ; rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ; stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "铁矿料转鼓指数"@zh, "Iron ore tumble index"@en ; skos:prefLabel "铁矿料转鼓指数"@zh, "Iron ore tumble index"@en ;
+    skos:definition "块矿、烧结矿或球团矿试样经转鼓试验后保留在指定筛上的质量占原试样质量的百分数。"@zh, "The percentage of a lump ore, sinter or pellet sample retained above the designated sieve after a tumble test, relative to the initial sample mass."@en ;
+    dcterms:source <std/iso-3271-2015> ; rdfs:isDefinedBy <ontology/process/ironmaking> .
