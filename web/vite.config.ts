@@ -29,5 +29,7 @@ export default defineConfig({
     include: ['src/**/*.test.{ts,tsx}'],
     css: false,
     restoreMocks: true,
+    // Must stay above asyncUtilTimeout in src/test/setup.ts, or the test times out before its wait does.
+    testTimeout: 30000,
   },
 });
