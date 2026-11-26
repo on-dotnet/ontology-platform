@@ -7,7 +7,7 @@ from uuid import UUID
 from fastapi import HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ontology_platform.errors import AppError
+from ontology_platform.errors import AppError, not_implemented
 from ontology_platform.modules.connectors import errors as connector_errors
 from ontology_platform.modules.connectors import service as connectors
 from ontology_platform.modules.connectors.schemas import CatalogColumn
@@ -30,6 +30,14 @@ async def until_disconnected[T](request: Request, work: Awaitable[T]) -> T:
     finally:
         task.cancel()
         await asyncio.gather(task, return_exceptions=True)
+
+
+async def serve_read[T](request: Request, operation: str, work: Awaitable[T]) -> T:
+    """Internal callers see the service stub; HTTP clients receive a problem response."""
+    try:
+        return await until_disconnected(request, work)
+    except NotImplementedError:
+        raise not_implemented(operation) from None
 
 
 async def _model(db: AsyncSession, ontology_id: UUID) -> bindings.BoundModel:
@@ -200,3 +208,28 @@ async def related(
         limit=limit,
     )
     return await _page(db, model, target, query, context, key_specs)
+
+
+async def traverse(
+    db: AsyncSession, ontology_id: UUID, body: schemas.PathQuery, *, limit: int = 50
+) -> schemas.PathResult:
+    raise NotImplementedError
+
+
+async def traverse_keys(
+    db: AsyncSession, ontology_id: UUID, body: schemas.PathQuery
+) -> schemas.KeySet:
+    raise NotImplementedError
+
+
+async def scan(
+    db: AsyncSession,
+    ontology_id: UUID,
+    type_id: UUID,
+    filters: Sequence[schemas.Filter],
+    *,
+    property_ids: Sequence[UUID],
+    within: schemas.KeySet | None = None,
+    max_rows: int,
+) -> schemas.ScanResult:
+    raise NotImplementedError

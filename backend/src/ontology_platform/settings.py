@@ -77,6 +77,11 @@ class Settings(BaseSettings):
     # Browser origins allowed to call /mcp, comma separated; empty means the platform's own.
     mcp_allowed_origins: str = ""
 
+    qa_questions_per_hour: int = Field(default=30, gt=0)
+    qa_running_max: int = Field(default=3, gt=0)
+    metric_rows_max: int = Field(default=10_000, gt=0)
+    qa_job_timeout_seconds: int = Field(default=180, gt=0)
+
     @property
     def previous_secret_keys(self) -> list[SecretStr]:
         if self.secret_key_previous is None:

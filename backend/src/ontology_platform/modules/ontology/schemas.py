@@ -9,9 +9,9 @@ from datetime import datetime
 from typing import Annotated, Any, Literal, Self
 from uuid import UUID
 
-from pydantic import ConfigDict, Field, StringConstraints, model_validator
+from pydantic import ConfigDict, Field, StringConstraints, field_validator, model_validator
 
-from ontology_platform.errors import Problem
+from ontology_platform.errors import AppError, Problem
 from ontology_platform.modules.ontology.models import (
     ChangeOp,
     ChangeSetSource,
@@ -125,6 +125,49 @@ class ConstraintRuleFields(_RuleValues):
     class_ref: Ref | None = None
 
 
+MetricAggregate = Literal["count", "sum", "avg", "min", "max", "ratio"]
+FilterOp = Literal[
+    "eq", "ne", "lt", "le", "gt", "ge", "contains", "startsWith", "in", "isNull", "notNull"
+]
+type FilterValue = str | int | float | bool
+
+
+class ReleaseRef(CamelModel):
+    id: UUID
+    version: int
+
+
+class _MetricFilter(CamelModel):
+    op: FilterOp
+    value: FilterValue | list[FilterValue] | None = None
+
+
+class MetricFilter(_MetricFilter):
+    property_id: UUID
+
+
+class MetricFilterFields(_MetricFilter):
+    property_ref: Ref
+
+
+class _MetricDefinition[FilterType](CamelModel):
+    aggregate: MetricAggregate
+    filters: list[FilterType] = Field(default_factory=list, max_length=10)
+    numerator: list[FilterType] = Field(default_factory=list, max_length=10)
+    decimals: int = Field(default=2, ge=0, le=6)
+    percent: bool = False
+
+
+class MetricDefinition(_MetricDefinition[MetricFilter]):
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
+    property_id: UUID | None = None
+
+
+class MetricDefinitionFields(_MetricDefinition[MetricFilterFields]):
+    property_ref: Ref | None = None
+
+
 # ---------- data bindings (spec 003, 6.2) ----------
 
 KEY_COLUMNS_MAX = 8
@@ -214,6 +257,7 @@ class ElementFields(CamelModel):
     # Bindings: the element bound (an element id or temp_ref), and where it lives in the data.
     subject_ref: Ref | None = None
     binding: Binding | None = None
+    metric: MetricDefinitionFields | None = None
 
 
 CatalogFact = Literal["table", "column", "primary_key", "foreign_key", "sample"]
@@ -311,7 +355,7 @@ class OntologyCreate(CamelModel):
     description: str | None = Field(default=None, max_length=2000)
 
 
-class Element(CamelModel):
+class _ElementBase(CamelModel):
     id: UUID
     ontology_id: UUID
     kind: Kind
@@ -348,7 +392,11 @@ class Element(CamelModel):
     updated_at: datetime
 
 
-class ElementCopy(Element):
+class Element(_ElementBase):
+    metric: MetricDefinition | None = None
+
+
+class ElementCopy(_ElementBase):
     """A copy of an element for other modules, which must not get the ORM row.
 
     Detached from the session, so changing it writes nothing; only the top level is frozen.
@@ -591,6 +639,13 @@ class EditItem(CamelModel):
     target_revision: int | None = Field(default=None, ge=1)
     temp_ref: Ref | None = None
     fields: ElementFields = Field(default_factory=ElementFields)
+
+    @field_validator("kind")
+    @classmethod
+    def writable_kind(cls, kind: Kind) -> Kind:
+        if kind == "metric":
+            raise AppError(422, "changeset.invalid_item", "Metric changes are not supported yet.")
+        return kind
 
     @model_validator(mode="after")
     def check_target(self) -> Self:

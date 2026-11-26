@@ -1,5 +1,6 @@
 """API models of the query module (spec 003 appendix, "对象查询")."""
 
+from dataclasses import dataclass
 from typing import Annotated, Literal
 from uuid import UUID
 
@@ -13,6 +14,9 @@ from pydantic import (
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.ontology.models import Datatype
+from ontology_platform.modules.ontology.schemas import FilterOp as FilterOp
+from ontology_platform.modules.ontology.schemas import FilterValue as FilterValue
+from ontology_platform.modules.ontology.schemas import ReleaseRef as ReleaseRef
 from ontology_platform.schemas import CamelModel
 
 FILTERS_MAX = 10
@@ -22,23 +26,13 @@ PAGE_DEFAULT = 50
 PAGE_MAX = 200
 CURSOR_MAX_LENGTH = 2048
 KEY_MAX_LENGTH = 1024
+QA_HOPS_MAX = 5
 
 # Values in results: decimals are strings, to keep their precision.
 type Scalar = str | int | bool
-# Values in filters may also be JSON numbers with a fraction (agents send them as such); the
-# platform turns them into decimals and checks them against the column's type family.
-type FilterValue = str | int | float | bool
-FilterOp = Literal[
-    "eq", "ne", "lt", "le", "gt", "ge", "contains", "startsWith", "in", "isNull", "notNull"
-]
 Direction = Literal["out", "in"]
 Cursor = Annotated[str, StringConstraints(min_length=1, max_length=CURSOR_MAX_LENGTH)]
 TypeProblem = Literal["source_mismatch", "source_disabled"]
-
-
-class ReleaseRef(CamelModel):
-    id: UUID
-    version: int
 
 
 class Filter(CamelModel):
@@ -142,3 +136,68 @@ class ObjectPage(CamelModel):
 class ObjectDetail(ObjectRow):
     release: ReleaseRef
     relations: list[ObjectRelation]
+
+
+class PathHop(CamelModel):
+    relation_id: UUID
+    direction: Direction
+    filters: list[Filter] = Field(default_factory=list, max_length=FILTERS_MAX)
+
+
+class PathQuery(CamelModel):
+    type_id: UUID
+    filters: list[Filter] = Field(max_length=FILTERS_MAX)
+    hops: list[PathHop] = Field(min_length=0, max_length=QA_HOPS_MAX)
+    target: int | None = None
+    limit: int = Field(default=PAGE_DEFAULT, ge=1, le=PAGE_MAX)
+
+
+@dataclass(frozen=True)
+class KeySet:
+    type_id: UUID
+    keys: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class Step:
+    type_id: UUID
+    type_label: str
+    conditions: tuple[str, ...]
+    statements: int
+    rows: int
+    truncated: bool
+
+
+class QueryStep(CamelModel):
+    type_id: UUID
+    type_label: str
+    conditions: list[str]
+    statements: int
+    rows: int
+    truncated: bool
+
+
+StepOut = QueryStep
+
+
+class PathRow(ObjectRow):
+    via: list[str]
+
+
+class PathResult(CamelModel):
+    release: ReleaseRef
+    type_id: UUID
+    items: list[PathRow]
+    total: int
+    truncated: bool
+    tail_type_id: UUID | None
+    tail: list[PathRow]
+    tail_total: int
+    steps: list[StepOut]
+
+
+@dataclass(frozen=True)
+class ScanResult:
+    release: ReleaseRef
+    rows: tuple[ObjectRow, ...]
+    steps: tuple[Step, ...]

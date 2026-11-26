@@ -110,3 +110,48 @@ class BindingSuggestion(Base):
     error_code: Mapped[str | None] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     finished_at: Mapped[datetime | None]
+
+
+class QaQuestionRow(Base):
+    __tablename__ = "qa_questions"
+    __table_args__ = (
+        CheckConstraint("char_length(question) BETWEEN 1 AND 500", name="question"),
+        CheckConstraint("origin IN ('user', 'cq')", name="origin"),
+        CheckConstraint(
+            "status IN ('queued', 'running', 'answered', 'unanswerable', 'failed')", name="status"
+        ),
+        CheckConstraint(
+            "step IS NULL OR step IN ('plan', 'check', 'query', 'answer', 'done')", name="step"
+        ),
+        CheckConstraint(
+            "gap_status IS NULL OR gap_status IN ('queued', 'running', 'done', 'empty', 'failed')",
+            name="gap_status",
+        ),
+        CheckConstraint("gap_dropped >= 0", name="gap_dropped"),
+        Index(None, "asked_by", "created_at"),
+        Index(None, "ontology_id", "created_at"),
+        {"schema": "ai"},
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    ontology_id: Mapped[UUID]
+    question: Mapped[str] = mapped_column(Text)
+    origin: Mapped[str] = mapped_column(String(16))
+    cq_question_id: Mapped[UUID | None]
+    asked_by: Mapped[UUID]
+    status: Mapped[str] = mapped_column(String(16))
+    step: Mapped[str | None] = mapped_column(String(16))
+    release_id: Mapped[UUID | None]
+    release_version: Mapped[int | None]
+    plan: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
+    gaps: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
+    answer: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
+    evidence: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
+    answer_keys: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
+    gap_status: Mapped[str | None] = mapped_column(String(16))
+    gap_change_set_id: Mapped[UUID | None]
+    gap_dropped: Mapped[int] = mapped_column(default=0, server_default="0")
+    gap_error_code: Mapped[str | None] = mapped_column(String(64))
+    error_code: Mapped[str | None] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    finished_at: Mapped[datetime | None]

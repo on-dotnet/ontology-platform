@@ -8,6 +8,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Path, Query, Request
+from pydantic import Field
 
 from ontology_platform.db import DbSession
 from ontology_platform.errors import problem_responses
@@ -21,6 +22,18 @@ ObjectKey = Annotated[str, Path(min_length=1, max_length=schemas.KEY_MAX_LENGTH)
 router = APIRouter(prefix="/api", tags=["query"])
 
 _ERRORS = problem_responses(401, 403, 404, 409, 422, 502, 503, 504)
+
+
+class PathQuery(schemas.PathQuery):
+    # HTTP callers may omit the start filters; service callers supply them explicitly.
+    filters: list[schemas.Filter] = Field(default_factory=list, max_length=schemas.FILTERS_MAX)
+    # A server default keeps limit optional for generated request clients.
+    limit: int = Field(
+        default_factory=lambda: schemas.PAGE_DEFAULT,
+        ge=1,
+        le=schemas.PAGE_MAX,
+        description="Maximum number of returned objects. Defaults to 50.",
+    )
 
 
 @router.get("/ontologies/{id}/objects/types", responses=problem_responses(401, 403, 404, 409, 422))
@@ -44,6 +57,15 @@ async def search_objects(
 ) -> schemas.ObjectPage:
     """List the objects of a type: filter, sort and page. A read, although it is a POST."""
     return await service.until_disconnected(request, service.search(db, id, body))
+
+
+@router.post("/ontologies/{id}/objects/traverse", responses={**_ERRORS, **problem_responses(501)})
+async def traverse_objects(
+    id: UUID, body: PathQuery, request: Request, user: ObjectReader, db: DbSession
+) -> schemas.PathResult:
+    return await service.serve_read(
+        request, "Object traversal", service.traverse(db, id, body, limit=body.limit)
+    )
 
 
 @router.get("/ontologies/{id}/objects/{typeId}/{key}", responses=_ERRORS)

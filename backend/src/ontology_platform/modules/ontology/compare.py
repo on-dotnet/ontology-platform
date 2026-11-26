@@ -38,7 +38,7 @@ _FIELDS = (
     "turtle",
     "binding",
 )
-_REFERENCES = {"parentId", "domainId", "rangeId", "inverseId"}
+_REFERENCES = {"parentId", "domainId", "rangeId", "inverseId", "subjectId"}
 _LEVELS: tuple[schemas.ChangeLevel, ...] = ("breaking", "review", "compatible")
 _DEFAULTS: dict[str, Any] = {
     "synonyms": [],
@@ -76,7 +76,8 @@ def _reference(value: str | None, rows: _Rows) -> dict[str, Any] | None:
 
 def _field_changes(element_id: str, left: _Rows, right: _Rows) -> list[schemas.FieldChange]:
     changes = []
-    for field in _FIELDS:
+    fields = (*_FIELDS, "subjectId", "metric") if right[element_id]["kind"] == "metric" else _FIELDS
+    for field in fields:
         before: Any = left[element_id].get(field, _DEFAULTS.get(field))
         after: Any = right[element_id].get(field, _DEFAULTS.get(field))
         if before == after:
@@ -98,7 +99,7 @@ def _field_level(change: schemas.FieldChange) -> schemas.ChangeLevel:
         return "breaking"
     if (field == "required" and change.after) or (field == "multiple" and not change.after):
         return "breaking"
-    if field in {"autoShape", "rules", "turtle", "binding"}:
+    if field in {"autoShape", "rules", "turtle", "binding", "metric"}:
         # Another key or column of a binding: queries keep working, maybe on other data.
         return "review"
     return "compatible"
