@@ -12,6 +12,109 @@ import { problemResponse, renderApp } from '@/test/utils';
 import { firstPage, heatRow, heatType, mockExplore, release, searchPath, typesPath } from './test-fixtures';
 
 describe('explore published objects', () => {
+  it('opens a bookmarked tab and keeps keyboard, address and history in sync', async () => {
+    mockExplore();
+    const user = userEvent.setup();
+    const { router } = renderApp('/explore?tab=ask');
+    const ask = await screen.findByRole('tab', { name: '问答', selected: true });
+    expect(screen.getByRole('heading', { level: 1, name: '探索' })).toBeVisible();
+    expect(await screen.findByRole('combobox', { name: '本体' })).toBeVisible();
+    expect(screen.getByRole('tabpanel', { name: '问答' })).toHaveTextContent(i18n.t('qa.placeholder'));
+    ask.focus();
+    await user.keyboard('{ArrowRight}');
+    const metrics = await screen.findByRole('tab', { name: '指标与规则', selected: true });
+    expect(metrics).toHaveFocus();
+    expect(router.history.location.href).toBe('/explore?tab=metrics');
+    expect(screen.getByRole('tabpanel', { name: '指标与规则' })).toHaveTextContent(i18n.t('metrics.placeholder'));
+    await user.click(screen.getByRole('tab', { name: '对象' }));
+    expect(await screen.findByRole('table', { name: '炉次' })).toBeVisible();
+    expect(router.history.location.href).toBe('/explore?tab=objects');
+    act(() => router.history.back());
+    expect(await screen.findByRole('tab', { name: '指标与规则', selected: true })).toBeVisible();
+  });
+
+  it('uses the ontology chosen in Q&A for object browsing and remembers it on return', async () => {
+    const copper = ontologyFixture({ id: 'onto-copper', name: '铜冶金' });
+    const ingot = { ...heatType, typeId: 'ingot', label: '铸锭', localName: 'Ingot' };
+    const api = mockExplore({
+      'GET /api/ontologies': () => [ontologyFixture(), copper],
+      [`GET /api/ontologies/${copper.id}/objects/types`]: () => ({ release, items: [ingot] }),
+      [`POST /api/ontologies/${copper.id}/objects/search`]: () => ({ ...firstPage, typeId: ingot.typeId, items: [] }),
+    });
+    const user = userEvent.setup();
+    const view = renderApp('/explore?tab=ask');
+    const selector = await screen.findByRole('combobox', { name: '本体' });
+    expect(selector).toHaveValue(ONTOLOGY_ID);
+    await user.selectOptions(selector, '铜冶金');
+    expect(screen.getByRole('tab', { name: '问答', selected: true })).toBeVisible();
+    expect(view.router.history.location.href).toBe('/explore?tab=ask');
+    await user.click(screen.getByRole('tab', { name: '对象' }));
+    const objects = within(await screen.findByRole('tabpanel', { name: '对象' }));
+    expect(await objects.findByRole('button', { name: '铸锭', pressed: true })).toBeVisible();
+    expect(objects.queryByRole('button', { name: '炉次' })).toBeNull();
+    expect(screen.getByRole('combobox', { name: '本体' })).toHaveValue(copper.id);
+    expect(screen.queryByText('AI 问答即将推出')).toBeNull();
+    expect(api.calls('GET', typesPath)).toHaveLength(0);
+
+    view.unmount();
+    renderApp('/explore?tab=ask');
+    expect(await screen.findByRole('combobox', { name: '本体' })).toHaveValue(copper.id);
+  });
+
+  it('shows the same empty state inside each tab when there are no ontologies', async () => {
+    mockExplore({ 'GET /api/ontologies': () => [] });
+    const user = userEvent.setup();
+    renderApp('/explore');
+    for (const name of ['对象', '问答', '指标与规则']) {
+      await user.click(await screen.findByRole('tab', { name }));
+      const panel = within(await screen.findByRole('tabpanel', { name }));
+      expect(await panel.findByRole('heading', { name: '还没有可探索的本体' })).toBeVisible();
+      expect(panel.queryByText(i18n.t('qa.placeholder'))).toBeNull();
+      expect(panel.queryByText(i18n.t('metrics.placeholder'))).toBeNull();
+    }
+  });
+
+  it('handles a pending ontology list and retries its failure from the current tab', async () => {
+    let finish!: (response: Response) => void;
+    const pending = new Promise<Response>((resolve) => { finish = resolve; });
+    let recovered = false;
+    mockExplore({ 'GET /api/ontologies': () => recovered ? [ontologyFixture()] : pending });
+    const user = userEvent.setup();
+    renderApp('/explore?tab=ask');
+    const ask = within(await screen.findByRole('tabpanel', { name: '问答' }));
+    expect(await ask.findByRole('status')).toHaveTextContent('加载中');
+    await user.click(screen.getByRole('tab', { name: '指标与规则' }));
+    const metrics = within(await screen.findByRole('tabpanel', { name: '指标与规则' }));
+    expect(metrics.getByRole('status')).toHaveTextContent('加载中');
+    finish(problemResponse(503, 'query.busy'));
+    expect(await metrics.findByRole('alert')).toHaveTextContent('数据源正忙');
+    recovered = true;
+    await user.click(metrics.getByRole('button', { name: '重试' }));
+    expect(await metrics.findByText(i18n.t('metrics.placeholder'))).toBeVisible();
+    expect(screen.getByRole('combobox', { name: '本体' })).toHaveValue(ONTOLOGY_ID);
+  });
+
+  it.each(['/explore', '/explore?tab=unknown'])('falls back to objects at %s', async (path) => {
+    mockExplore();
+    const { router } = renderApp(path);
+    expect(await screen.findByRole('tab', { name: '对象', selected: true })).toBeVisible();
+    expect(await screen.findByRole('table', { name: '炉次' })).toBeVisible();
+    expect(router.history.location.href).not.toContain('unknown');
+  });
+
+  it.each(['qa', 'metrics', 'cq'])('loads matching bilingual keys for %s', (namespace) => {
+    // Compare loaded leaves; t() would silently fall back to Chinese for missing English keys.
+    const leaves = (messages: Record<string, unknown>, prefix = ''): string[] =>
+      Object.entries(messages).flatMap(([key, value]) => typeof value === 'string'
+        ? [prefix + key] : leaves(value as Record<string, unknown>, prefix + key + '.'));
+    const keys = (locale: string) => {
+      const messages: unknown = i18n.getResource(locale, 'translation', namespace);
+      expect(messages).toBeDefined();
+      return leaves(messages as Record<string, unknown>).sort();
+    };
+    expect(keys('en')).toEqual(keys('zh-CN'));
+  });
+
   it('switches ontologies, searches bound types and explains unavailable types', async () => {
     const otherId = 'onto-copper';
     const other = { ...heatType, typeId: 'ingot', label: '铸锭' };

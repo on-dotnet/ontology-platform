@@ -8,9 +8,12 @@ import { EmptyState } from '@/components/states/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { TabsList, TabsPanel, TabsTrigger } from '@/components/ui/tabs';
 import { usePublishAssistantSelection } from '@/features/assistant/assistant-selection';
 import { usePermissions } from '@/features/auth/permissions';
+import { MetricsPanel } from '@/features/metrics/metrics-panel';
 import { OntologySelector } from '@/features/ontologies/ontology-selector';
+import { AskPanel } from '@/features/qa/ask-panel';
 import { storage } from '@/lib/storage';
 
 import { useExploreOntologies, useTypes } from './api';
@@ -26,7 +29,7 @@ function ReleaseScope({ releaseId, onRestart, children }: { releaseId: string; o
   return browsingRelease === releaseId ? <div className="space-y-4">{children}</div> : <ReleaseChangedNotice onRestart={onRestart} />;
 }
 
-function PublishedObjects({ id }: { id: string }) {
+function PublishedObjects({ ontologyId: id }: { ontologyId: string }) {
   const { t } = useTranslation();
   const { canEditBindings } = usePermissions();
   const [refresh, setRefresh] = useState(0);
@@ -69,6 +72,18 @@ function PublishedObjects({ id }: { id: string }) {
   );
 }
 
+const tabs = [
+  { value: 'objects', Panel: PublishedObjects },
+  { value: 'ask', Panel: AskPanel },
+  { value: 'metrics', Panel: MetricsPanel },
+] as const;
+
+export type ExploreTab = (typeof tabs)[number]['value'];
+
+export function isExploreTab(value: unknown): value is ExploreTab {
+  return tabs.some((tab) => tab.value === value);
+}
+
 export function ExplorePage() {
   const { t } = useTranslation();
   const [requested, setRequested] = useState(() => storage.get(selectedOntologyKey));
@@ -82,12 +97,20 @@ export function ExplorePage() {
           storage.set(selectedOntologyKey, id);
           setRequested(id);
         }} />} />
-      <QueryResult query={query} keepMetadata>
-        {() => selected ? <PublishedObjects key={selected.id} id={selected.id} /> : (
-          <Card><EmptyState icon={Compass} title={t('explore.noOntologies')} /></Card>
-        )}
-      </QueryResult>
-      <p className="mt-6 text-sm text-muted-foreground">{t('explore.qaComingSoon')}</p>
+      <TabsList activateOnFocus aria-label={t('explore.title')} className="mb-6">
+        {tabs.map(({ value }) => (
+          <TabsTrigger key={value} value={value}>{t(`explore.tabs.${value}`)}</TabsTrigger>
+        ))}
+      </TabsList>
+      {tabs.map(({ value, Panel }) => (
+        <TabsPanel key={value} value={value}>
+          <QueryResult query={query} keepMetadata>
+            {() => selected ? <Panel key={selected.id} ontologyId={selected.id} /> : (
+              <Card><EmptyState icon={Compass} title={t('explore.noOntologies')} /></Card>
+            )}
+          </QueryResult>
+        </TabsPanel>
+      ))}
     </>
   );
 }
