@@ -20,6 +20,7 @@ from ontology_platform.modules.ai.extraction import (
     PendingType,
     Proposal,
     ProposedMatch,
+    RunStats,
     _Builder,
     batches,
     build_proposals,
@@ -300,8 +301,14 @@ async def test_a_cited_sentence_not_naming_the_type_gives_way_to_the_first_that_
     async def progress(step: str, done: int, total: int) -> None:
         pass
 
+    stats = RunStats()
     proposals = await extractor.run(
-        document_id=DOC, title="t", chunks=[CHUNK_A, CHUNK_B], known=[], progress=progress
+        document_id=DOC,
+        title="t",
+        chunks=[CHUNK_A, CHUNK_B],
+        known=[],
+        progress=progress,
+        stats=stats,
     )
     cast = by_label(proposals, "浇次")
     assert cast.flags == []
@@ -311,7 +318,7 @@ async def test_a_cited_sentence_not_naming_the_type_gives_way_to_the_first_that_
         "一个浇次由若干个炉次的钢水连续浇铸而成。",
     )
     # The literal check counts what the model cited.
-    assert extractor.last.literal == {"entity_type": 1, "entity_type:ok": 0}
+    assert stats.literal == {"entity_type": 1, "entity_type:ok": 0}
 
 
 async def test_a_type_no_sentence_names_keeps_the_cited_one_and_is_flagged() -> None:

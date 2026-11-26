@@ -53,6 +53,7 @@ from ontology_platform.modules.ai.extraction import (
     PendingType,
     Proposal,
     ProposedMatch,
+    RunStats,
     normalize,
 )
 from ontology_platform.modules.ai.gateway import AiError, ModelGateway
@@ -742,8 +743,11 @@ def _score_hierarchy(
 _COUNTS = STAGE_COUNTS
 
 
-def _usage(gateway: ReplayGateway, labels: Sequence[str]) -> dict[str, Any]:
-    """Model calls per document and stage, per stage, and in total (of the labelled ones)."""
+def _usage(
+    gateway: ReplayGateway, labels: Sequence[str], elapsed: Mapping[str, float]
+) -> dict[str, Any]:
+    """Model calls per document and stage, per stage, and in total (of the labelled ones), and
+    the seconds each document took from start to finish (`elapsed`)."""
     documents = {name: stages for name, stages in gateway.stats().items() if name in labels}
     stages: dict[str, dict[str, float]] = {}
     total = dict.fromkeys(_COUNTS, 0.0)
@@ -764,6 +768,10 @@ def _usage(gateway: ReplayGateway, labels: Sequence[str]) -> dict[str, Any]:
         "documents": documents,
         "stages": {purpose: tidy(numbers) for purpose, numbers in stages.items()},
         "total": tidy(total),
+        "elapsed": {
+            "documents": {label: elapsed[label] for label in labels if label in elapsed},
+            "total": round(sum(elapsed.get(label, 0.0) for label in labels), 1),
+        },
     }
 
 
@@ -999,6 +1007,7 @@ async def run_case(
     pairs: dict[str, list[JudgedPair]] = {}
     trimmed: dict[str, Counter[str]] = {}
     literal: dict[str, Counter[str]] = {}
+    elapsed: dict[str, float] = {}
 
     async def identify(
         document: _Document,
@@ -1018,6 +1027,7 @@ async def run_case(
             log(f"    {step} {done}/{total}")
 
         started = time.monotonic()
+        stats = RunStats()
         proposals = await extractor.run(
             document_id=document_id,
             title=document.name,
@@ -1025,11 +1035,15 @@ async def run_case(
             known=version.known(),
             progress=progress,
             pending=pending,
+            stats=stats,
         )
-        log(f"    {time.monotonic() - started:.1f} s")
-        pairs.setdefault(scenario, []).extend(extractor.last.pairs)
-        trimmed.setdefault(scenario, Counter()).update(extractor.last.trimmed)
-        literal.setdefault(scenario, Counter()).update(extractor.last.literal)
+        # From start to finish: with batches called at the same time, less than the sum of the
+        # calls' seconds in the usage.
+        elapsed[label] = round(time.monotonic() - started, 1)
+        log(f"    {elapsed[label]:.1f} s")
+        pairs.setdefault(scenario, []).extend(stats.pairs)
+        trimmed.setdefault(scenario, Counter()).update(stats.trimmed)
+        literal.setdefault(scenario, Counter()).update(stats.literal)
         return proposals
 
     async def sequential(review: str) -> tuple[WorkingVersion, list[str], list[Proposal]]:
@@ -1050,7 +1064,7 @@ async def run_case(
 
     version, skipped, proposed = await sequential("acceptAll")
     labels = [document.name for document in documents]
-    result = _scenario(version, skipped, proposed, expected, _usage(gateway, labels))
+    result = _scenario(version, skipped, proposed, expected, _usage(gateway, labels, elapsed))
     result["resolve"] = resolve_counts(
         pairs["sequential/acceptAll"], expected, trimmed["sequential/acceptAll"]
     )
@@ -1059,7 +1073,7 @@ async def run_case(
         result["shortlistRecall"] = shortlist_recall(expected)
         version, skipped, proposed = await sequential("byFlags")
         labels = [_BY_FLAGS.format(name=document.name) for document in documents]
-        result["byFlags"] = _review(version, skipped, expected, _usage(gateway, labels))
+        result["byFlags"] = _review(version, skipped, expected, _usage(gateway, labels, elapsed))
     if "sameBaseline" in scenarios:
         baseline = WorkingVersion()
         identified: list[tuple[str, list[Proposal]]] = []
@@ -1091,7 +1105,7 @@ async def run_case(
             skipped,
             [p for _, proposals in identified for p in proposals],
             expected,
-            _usage(gateway, labels),
+            _usage(gateway, labels, elapsed),
         )
         same["resolve"] = resolve_counts(pairs["sameBaseline"], expected, trimmed["sameBaseline"])
         same["literalShare"] = literal_share(literal["sameBaseline"])

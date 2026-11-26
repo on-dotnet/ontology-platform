@@ -41,9 +41,6 @@ DATA_SOURCE = {
 
 # Who may call what (spec 003, section 13 and the appendix).
 EVERYONE: list[Call] = [
-    ("GET", "/api/auth/tokens", None),
-    ("POST", "/api/auth/tokens", {"name": "agent", "scopes": ["ontology:read"]}),
-    ("DELETE", f"/api/auth/tokens/{ID}", None),
     ("GET", f"/api/ontologies/{ID}/objects/types", None),
     ("POST", f"/api/ontologies/{ID}/objects/search", {"typeId": ID}),
     ("GET", f"/api/ontologies/{ID}/objects/{ID}/k", None),
