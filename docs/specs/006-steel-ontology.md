@@ -38,7 +38,7 @@
 **下沉原则**：
 
 1. **普钢、特钢都会用的放通用层**。特钢厂同样走高炉—转炉—精炼—连铸—轧制，电炉、精炼、模铸、热处理普钢厂也有，所以全部工序都在 `process`，不放普钢层。
-2. **只有一方用的才下沉**。普钢层只放普钢特有的产品族、牌号体系与组批交货口径；特钢层放特冶与重熔链、锻造、特钢产品族、特钢专门的检验评级和更严格的追溯要求。**下沉判定**：一个概念只有在普钢或特钢之一独有时才放进扩展层，判定理由写进该术语的 `rdfs:comment`（以"下沉理由："开头），扩展层模块的本体头 `rdfs:comment` 概述本模块的下沉范围；没有理由的一律留在通用层。
+2. **只有一方用的才下沉**。普钢层只放普钢特有的产品族、牌号体系与组批交货口径；特钢层放特冶与重熔链、锻造、特钢产品族、特钢专门的检验评级和更严格的追溯要求。**下沉判定**：一个概念只有在普钢或特钢之一独有时才放进扩展层，判定理由写进该术语的 `rdfs:comment`（以"下沉理由："开头；适用于扩展层的类、属性和新建的代码方案，扩展层往通用方案里加的代码继承所在模块的理由，不逐条写），扩展层模块的本体头 `rdfs:comment` 概述本模块的下沉范围；没有理由的一律留在通用层。
 3. **差异不复制概念**，按以下顺序选表达方式：
    - 扩展层的概念是通用概念的细分，且有自己的属性或约束 → **子类**（例：`ElectroslagRemelting ⊑ Remelting ⊑ Operation`；`RemeltedIngot ⊑ Ingot`）；
    - 通用概念在扩展层多出要记的事实 → **扩展属性**，定义域仍是通用类（例：特钢层给 `Ingot` 加 `ingotPosition` 头中尾；给 `Forging` 加 `forgingRatio`）；
@@ -100,10 +100,11 @@ ontologies/steel/
              logistics.ttl  codes.ttl  shapes.ttl  standards.ttl
   process/   process.ttl  ironmaking.ttl  steelmaking.ttl  casting.ttl  rolling.ttl
              tubemaking.ttl  heattreatment.ttl  finishing.ttl
-             以及每个模块的 <模块>-codes.ttl、<模块>-shapes.ttl
+             以及每个模块的 <模块>-codes.ttl、<模块>-shapes.ttl；需要时加 <模块>-standards.ttl（书目增量）
   plain/     plain.ttl  products.ttl  quality.ttl  及 -codes、-shapes
   special/   special.ttl  remelting.ttl  forging.ttl  products.ttl  inspection.ttl  及 -codes、-shapes
   mappings/  external.sssom.tsv  IEC 62264 对象名、PROV-O、SOSA、EPCIS 的映射
+             samples-steel-industry.sssom.tsv  #67 术语去向表（第 3 节）
   examples/  <层>.ttl 合成示例数据；<层>-invalid.ttl 每条形状至少一个违例
   cq/<层>/   cqNN.rq 与 cqNN.csv（期望结果）
   check/     check.py、check.ps1：在 op-tmp- 临时容器里自检
@@ -113,7 +114,7 @@ ontologies/steel/
 - 一个模块文件只写本模块的类和属性；代码表单独放 `-codes.ttl`，形状单独放 `-shapes.ttl`，便于不同任务并行写不同文件。
 - **跨模块共享的代码表**（`equipment-type`、`process-type`、`product-form`、`defect-type`、`chemical-element` 等）在核心层 `codes.ttl` 定义方案；各模块在自己的 `-codes.ttl` 里加代码（`skos:inScheme` 指向核心的方案）。
 - **标准书目**放 `core/standards.ttl`，由 PR 2 按全流程范围一次写全（第 8 节）。后续 PR 还需要新条目时，写在本模块的 `<模块>-standards.ttl`，不改 `core/standards.ttl`，并行的 PR 因此不会写同一个文件。
-- **平台导入**：平台单次导入不超过 5 MB、5 万个三元组，且不加载 `owl:imports`（002 第 4.1 节）。所以另提供 `dist/steel.ttl` 单文件。它**只由 `check/check.ps1 -Build` 生成，不手改**：容器里的 `check.py build` 把结果写到标准输出，`check.ps1` 收回后写入 `dist/steel.ttl`。单文件只有一个本体头 `stl:ontology/steel`（带版本 IRI、名称、许可证），不含 `owl:imports` 和各模块的本体头。自检核对：各模块去掉本体头三元组后的并集，与单文件去掉其本体头后的图同构（空白节点按同构比对）；三元组数不超过 50,000、文件不超过 5 MB。
+- **平台导入**：平台单次导入不超过 5 MB、5 万个三元组，且不加载 `owl:imports`（002 第 4.1 节）。所以另提供 `dist/steel.ttl` 单文件。它**只由 `check/check.ps1 -Build` 生成，不手改**：容器里的 `check.py build` 把结果写到标准输出，`check.ps1` 收回后写入 `dist/steel.ttl`。单文件只有一个本体头 `stl:ontology/steel`（带版本 IRI、名称、许可证），不含 `owl:imports` 和各模块的本体头。自检核对：各模块文件（不含层汇总 `core.ttl`、`process.ttl`、`plain.ttl`、`special.ttl` 和根目录 `steel.ttl`，它们只有本体头与 `owl:imports`）去掉本体头三元组后的并集，与单文件去掉其本体头后的图同构（空白节点按同构比对）；三元组数不超过 50,000、文件不超过 5 MB。
 
 ## 6 各层骨架
 
@@ -153,16 +154,16 @@ ontologies/steel/
 | products | 普钢产品族代码（碳素结构钢、低合金高强度结构钢、钢筋、冷轧低碳、热镀层板带、型钢、焊管）；普钢常用标准牌号条目（只写牌号与所属标准，不写成分限值）；`Rebar ⊑ Bar`（钢筋，有表面形状、牌号后缀等自己的属性）；按捆交货的定尺长度与理论重量口径 |
 | quality | 普钢特有的组批维度代码（加进核心的组批规则）、普钢按批判定的口径 |
 
-涂镀（`Coating`、`CoatedCoil`、`coating-type`）与组批规则普特都用，留在通用层。普钢层每一项都要写下沉理由（第 2 节），写不出的上提。
+涂镀（`Coating`、`CoatedCoil`、`coating-type`）与组批规则普特都用，留在通用层。普钢层的类、属性和新建的代码方案都要写下沉理由（第 2 节），写不出的上提。
 
 ### 6.4 special 特钢/特冶
 
 | 模块 | 内容 |
 |---|---|
-| remelting | `VacuumInductionMelting ⊑ Steelmaking`；`Remelting ⊑ Operation` 及 `ElectroslagRemelting`、`ProtectiveAtmosphereElectroslagRemelting`、`VacuumArcRemelting`；`Electrode ⊑ MaterialPiece`、`RemeltedIngot ⊑ Ingot`；`remeltNumber`、`remeltSequence`（第几次重熔）；`melting-route` 代码（代码值如 `VIMESR`、`VIMVAR`、`VIMESRVAR`，原写法 VIM+ESR+VAR 放 `skos:altLabel`）。**重熔链**：每次重熔产出新实物件，`derivedFrom` 指向电极，电极 `derivedFrom` 指向上一步的锭；最初的锭用 `sourceHeat` 指向一次冶炼炉次。沿 `derivedFrom` 链加 `sourceHeat` 可查到炉次，不在每个锭上重复存 |
+| remelting | `VacuumInductionMelting ⊑ Steelmaking`；`Remelting ⊑ Operation` 及 `ElectroslagRemelting`、`ProtectiveAtmosphereElectroslagRemelting`、`VacuumArcRemelting`；`Electrode ⊑ MaterialPiece`、`RemeltedIngot ⊑ Ingot`；`remeltNumber`、`remeltSequence`（第几次重熔）；`meltingRoute`（定义域 `MaterialPiece`，值域 `melting-route` 代码，记在重熔锭及其后的实物件上）；`melting-route` 代码按 `skos:broader` 分"含重熔""不含重熔"两组（代码值如 `VIMESR`、`VIMVAR`、`VIMESRVAR`，原写法 VIM+ESR+VAR 放 `skos:altLabel`）。**重熔链**：每次重熔产出新实物件，`derivedFrom` 指向电极，电极 `derivedFrom` 指向上一步的锭；最初的锭用 `sourceHeat` 指向一次冶炼炉次。沿 `derivedFrom` 链加 `sourceHeat` 可查到炉次，不在每个锭上重复存 |
 | forging | `Forging`（方法代码：自由锻、快锻、径锻、精锻、模锻）、`Cogging`（开坯）、`ForgedProduct`；`forgingRatio`（记录值）与 `initialCrossSectionArea`、`finalCrossSectionArea`（可选，用于核算） |
 | products | 特钢产品族代码（优质碳素结构钢、合金结构钢、齿轮钢、弹簧钢、轴承钢、工模具钢、不锈钢、耐热钢、高温合金）与常用标准牌号条目 |
-| inspection | `InclusionRating`（按夹杂物类别和粗细系列评级）、`MacroExamination`（低倍）与低倍缺陷评级、`MicroExamination`（高倍）下的 `GrainSizeDetermination`、`DecarburizationMeasurement`、`BandedStructureRating`、`HardenabilityTest`（末端淬透性）、`GasContentAnalysis`；`CleanlinessAssessment`（纯净度）；`ndt-acceptance-class`；严格追溯（SHACL，两级）：① 每件特钢实物件沿 `derivedFrom` 链加 `sourceHeat` 可达炉次；② 冶炼路线含重熔步骤的，链中还必须有重熔锭和电极。不经重熔、由连铸或模铸直接成材的特钢只要求 ①。另记 `ingotPosition`（头、中、尾） |
+| inspection | `InclusionRating`（按夹杂物类别和粗细系列评级）、`MacroExamination`（低倍）与低倍缺陷评级、`MicroExamination`（高倍）下的 `GrainSizeDetermination`、`DecarburizationMeasurement`、`BandedStructureRating`、`HardenabilityTest`（末端淬透性）、`GasContentAnalysis`；`CleanlinessAssessment`（纯净度）；`ndt-acceptance-class`；严格追溯（SHACL，两级）：① 每件特钢实物件沿 `derivedFrom` 链加 `sourceHeat` 可达炉次，"特钢实物件"指其钢种（`steelGrade`）的 `steelQualityClass` 属于特殊质量一组的实物件（SHACL-SPARQL 目标，普钢数据不会被选中）；② `meltingRoute` 属于"含重熔"组的实物件，链中还必须有重熔锭和电极。不经重熔、由连铸或模铸直接成材的特钢只要求 ①。另记 `ingotPosition`（头、中、尾） |
 
 ## 7 代码表与 SHACL
 
@@ -185,7 +186,7 @@ ontologies/steel/
 - 以公开标准为骨架，只引用编号和名称，不抄正文；定义一律自己写。
 - 书目条目**只写编号、中英文名称、版次（发布年份）、现行状态、官方链接、代替关系**（字段同 #67 的 `standards.ttl`），不写正文、范围、限值或摘要。
 - **每条书目在写入前核实**：由 Codex 联网核对官方目录（std.samr.gov.cn、hbba.sacinfo.org.cn、iso.org、astm.org、webstore.iec.ch 等）并附访问过的链接，Claude 抽查不少于 10%，抽查条数、比例与结果写进 PR 描述；抽查有错则整表返工。查不到的不入库，对应概念的来源写"行业通用"。
-- 覆盖方向：术语与分类、牌号与统一数字代号、原燃料、各类产品、取样与化学分析、力学试验、金相与低倍、无损检测、热处理、锻造、质量证明与交货、制造运营（IEC 62264 及对应国标）、计量单位。
+- 覆盖方向：术语与分类（含钢分类的国家标准，补上文首名词说明里暂不写编号的分类依据）、牌号与统一数字代号、原燃料、各类产品、取样与化学分析、力学试验、金相与低倍、无损检测、热处理、锻造、质量证明与交货、制造运营（IEC 62264 及对应国标）、计量单位。
 
 ## 9 能力问题（CQ）
 
@@ -209,7 +210,7 @@ ontologies/steel/
 | | P6 | 某无缝钢管来自哪支圆坯；某热处理装炉批包含哪些实物件、用什么工艺 |
 | plain | N1 | 某普钢订单行的牌号所属产品族、标准版次，以及满足该牌号的内部钢种 |
 | | N2 | 某钢筋检验批按哪些普钢组批维度组成、包含哪些捆，每捆的定尺长度与理论重量 |
-| special | S1 | 某重熔锻材的完整熔炼链：材 → 锻件 → 重熔锭 → 电极 → 一次冶炼炉次，以及冶炼路线；另一件连铸直接成材的特钢棒材追溯到炉次 |
+| special | S1 | 某重熔锻材的完整熔炼链：材 → 锻件 → 重熔锭 → 电极 → 初锭（一次冶炼浇成的锭）→ 一次冶炼炉次，以及冶炼路线；另一件连铸直接成材的特钢棒材追溯到炉次 |
 | | S2 | 某锻件的锻造方法与锻造比 |
 | | S3 | 某炉次的夹杂物评级、低倍与高倍结果，是否满足规格要求 |
 | | S4 | 某批棒材的探伤方法、验收等级与结果；不合格件的锭位置（头、中、尾） |
@@ -224,14 +225,14 @@ ontologies/steel/
 1. 所有 `.ttl` 能用 rdflib 解析；每个模块有本体头、版本 IRI、许可证。
 2. **标签与定义齐全**：每个 `stl:` 类、属性、代码方案都有中英 `rdfs:label`（与 `skos:prefLabel` 相同）、中英 `skos:definition`、`dcterms:source`、`rdfs:isDefinedBy`；代码按第 6 节的要求（来源可继承方案）；同一术语只在一个模块定义。
 3. **无悬空引用**：用到的每个 `stl:` IRI 都有定义；外部 IRI 只来自第 4 节的词汇，QUDT 单位只来自登记清单；`dcterms:source` 都指向书目条目或"行业通用"。
-4. **分层依赖**：通用层不引用扩展层 IRI，`plain` 与 `special` 互不引用；扩展层没有改通用层术语的定义（只能加子类、属性、代码、形状）；扩展层的每个术语都有以"下沉理由："开头的 `rdfs:comment`。
+4. **分层依赖**：通用层不引用扩展层 IRI，`plain` 与 `special` 互不引用；扩展层没有改通用层术语的定义（只能加子类、属性、代码、形状）；扩展层的类、属性和新建的代码方案都有以"下沉理由："开头的 `rdfs:comment`。
 5. 代码规则：代码值格式、IRI 等于方案加代码值、方案内唯一、`skos:inScheme` 正确。
 6. SHACL：`examples/<层>.ttl` 合规；`examples/<层>-invalid.ttl` 中每个形状都报出预期的违例，没有意外违例。
 7. CQ：每个查询有结果，与期望 CSV 一致（S5 期望为空）。
 8. `dist/steel.ttl` 去掉本体头后与各模块并集（去掉各模块本体头）同构，本体头只有 `stl:ontology/steel` 一个且无 `owl:imports`；三元组数不超过 50,000、文件不超过 5 MB。
 9. 与 `samples/steel-industry/ontology/` 的同名术语比对、#67 术语去向表是否完整（第 3 节），目录缺失时报错。
 
-**每个 PR 的验收**：自检通过；`reviewer` 复审没有必须修的项；`./dev.ps1 ci -Report` 通过；Claude 抽查定义与来源不少于 10%（看定义是否原创、来源编号是否在核实过的书目里）。
+**每个 PR 的验收**：自检通过（PR 2 在自检脚本之前，改为在 `op-tmp-` 容器里用 rdflib 解析 `standards.ttl` 并检查每条书目的字段齐全，命令与结果写进 PR 描述；PR 3 的自检再覆盖它）；`reviewer` 复审没有必须修的项；`./dev.ps1 ci -Report` 通过；Claude 抽查定义与来源不少于 10%（看定义是否原创、来源编号是否在核实过的书目里）。
 
 **整体验收**（最后一个 PR）：`dist/steel.ttl` 导入平台再导出，原文件每个三元组都在导出里、再导入差异为空（002 第 4 节的往返规则）；在开发栈实际导入并发布后运行 `./dev.ps1 owl-check`，它会把开发栈里每个本体的当前发布版本一并纳入往返检查，不需要改 `dev.ps1`。
 
