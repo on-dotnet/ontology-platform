@@ -8,7 +8,9 @@ import i18n from '@/i18n';
 import { createMediaQueryList, resetBrowserFontSize } from './media';
 
 // The first render of a route loads its code-split chunk, which can take over a second in CI containers.
-configure({ asyncUtilTimeout: 3000 });
+// The Docker host is shared: the gate runs pytest next to vitest, and other worktrees or Codex tasks may
+// run their own container tests at the same time, so waits of 3 s have timed out (#49). A real miss still fails.
+configure({ asyncUtilTimeout: 10000 });
 
 // --- jsdom gaps -------------------------------------------------------------
 
