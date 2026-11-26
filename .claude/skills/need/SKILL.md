@@ -45,7 +45,7 @@ disable-model-invocation: true
 ## 4 实现
 
 1. 每一项先写会失败的测试，运行一次看到它失败，再写实现让它通过。
-2. 派给 Codex 的部分按 AGENTS.md"Codex 分工"写任务单、派发、审查；测试由 Claude 运行。
+2. 派给 Codex 的部分按 [dispatch-codex](../dispatch-codex/SKILL.md) 技能写任务单、派发、验收。
 3. 每完成清单里的一项：提交、推送，用 `gh pr edit --body-file` 勾掉该项。
 4. 与本需求无关的问题用 `gh issue create --label backlog` 记录后继续。
 
@@ -60,4 +60,4 @@ disable-model-invocation: true
 
 ## 6 转为可评审
 
-`gh pr ready` 之前，PR 描述必须包含：验证命令与结果（含门禁汇总）、未验证项、是否含数据库迁移、回滚方式。用户说"合并"后再合并（`gh pr merge --squash --delete-branch`），合并前确认 `local-ci` 为 success。
+`gh pr ready` 之前，PR 描述必须包含：验证命令与结果（含门禁汇总）、未验证项、是否含数据库迁移、回滚方式。合并按 [review-pr](../review-pr/SKILL.md) 技能：L0、L1 在复审没有必须修的项、最终 HEAD 的 `local-ci` 为 success 后由开发会话自己合并；L2 做到 ready 后停下，由主会话或用户审过再合并。

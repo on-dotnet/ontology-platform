@@ -23,7 +23,7 @@ AI Native 的本体智能平台：用户把资料和数据交给平台，AI 识�
 代码在本机 Windows，容器跑在 Docker 主机 10.16.0.13（上下文 `linux013-rootless`）。在 PowerShell 7 中从仓库根目录运行：
 
 ```powershell
-./dev.ps1 up          # 构建并启动 postgres、api、web；平台地址 http://10.16.0.13:28080
+./dev.ps1 up          # 构建并启动 postgres、api、web（开发栈只有一套，同一时间只让一个工作区运行）；平台地址 http://10.16.0.13:28080
 ./dev.ps1 status      # 状态与地址
 ./dev.ps1 logs api    # 最近日志
 ./dev.ps1 test-api tests/test_x.py   # 开发中：只跑受影响的后端测试文件
@@ -31,7 +31,7 @@ AI Native 的本体智能平台：用户把资料和数据交给平台，AI 识�
 ./dev.ps1 test-web    # 前端：eslint、tsc、vitest
 ./dev.ps1 lock api    # 重新生成 backend/uv.lock（web 同理）
 ./dev.ps1 gen-api     # 由后端 OpenAPI 生成 web/src/api/schema.d.ts
-./dev.ps1 ci -Report  # 完整门禁（三项同时跑），结果写成提交状态 local-ci
+./dev.ps1 ci -Report  # 校验 Compose 配置，运行后端与前端测试、构建镜像并核对接口类型，结果写入提交状态 local-ci
 ./dev.ps1 images      # 列出本项目镜像及所属工作区
 ./dev.ps1 clean-images  # 删除已不存在的工作区留下的 ontology/* 镜像标签
 ```
@@ -51,45 +51,26 @@ AI Native 的本体智能平台：用户把资料和数据交给平台，AI 识�
 
 ## 5 工作方式
 
-- **语言**：与用户的一切沟通都用简体中文，包括最终答复、过程中的进度说明、等待说明、计划与任务列表条目、子代理和 Codex 的汇报转述。代码标识符、命令、路径、日志原文保持原样。上下文被压缩后的第一批输出尤其要检查。
-- 提需求用 `/need <一句话需求>`（[.claude/skills/need](.claude/skills/need/SKILL.md)）：先出理解卡，确认后再动手。验证按 [verify](.claude/skills/verify/SKILL.md)。
-- **分支**：长期分支只有 `main`。每个需求从最新 main 开一条短分支（`feat/`、`fix/`、`chore/`），经 PR 合并，合并后删除分支。每个会话一次一个分支。
-- **工作区**：会话默认在自己的 git worktree 里工作，不在主检出目录里改代码。几个会话可以同时开发、同时跑测试，镜像按工作区区分，互不覆盖（做法见[开发手册](docs/development.md)"并行开发"一节）。
-- 先读后改：动手前读相关代码、测试和本文件指向的文档。
-- 先写会失败的测试，再写实现。开发中只跑受影响的测试：`./dev.ps1 test-api tests/<文件>.py`、改了前端时 `./dev.ps1 test-web`。不手动跑后端全量，全量只在门禁里跑一次。在 PR 描述里贴出命令和结果。
-- **复审与门禁的顺序**：复审和受影响的测试同时进行；复审没有必须修的项之后，再对最终 HEAD 运行一次 `./dev.ps1 ci -Report`，要求成功（提交状态 `local-ci` 为 success）。按复审意见修改后，第二轮复审只看修改的部分。门禁之后 HEAD 又变了，就重新运行。
-- 涉及 L2 范围先停下来问。
-- 进度写在 PR 描述里。发现与当前任务无关的问题，用 `gh issue create --label backlog` 记录后继续，不扩大范围。
-- 提交与发 PR：`git add`、`git commit`、`git push`、`gh pr create` 各自单独执行，不用 `;` 串成一条；较长的提交信息或 PR 正文先写到 `.verification/` 下的文件，再用 `git commit -F`、`gh pr create --body-file`。
-- GitHub Actions 没有额度，不查看、不排查 Actions；门禁以 `./dev.ps1 ci -Report` 写的提交状态 `local-ci` 为准。
-
-### 并行与子代理
-
-- 一个任务里文件范围互不重叠、彼此不等对方结果的部分，交给子代理同时做。同一批文件只有一个写入者；拆不干净就不拆。
-- 任务说明写全：只许改哪些路径；不许做 git 写操作；能运行哪些命令；验收标准；最后报告什么（改了哪些文件、测试汇总行原文、没做到的、拿不准的取舍）。
-- 子代理不提交：主会话读过 diff、跑过受影响的测试后才提交。子代理的结论要核对，不能直接当作"已验证"。
-- 复审交给 `reviewer` 子代理，与受影响的测试同时进行；门禁在复审通过之后跑（见上）。
-
-### Codex 分工
-
-用户提需求并参与理解卡与最终验收；Claude 负责需求分析、拆任务、规格、架构把关、审查、集成与验收；Codex（`openai/codex-plugin-cc` 插件调用本机 codex CLI）作为开发工程师写代码。
-
-- **开工前定执行者**：理解卡里逐项写明由谁做（Codex、Claude、子代理）及理由、Codex 的强度。用户确认理解卡即确认分工。
-- **适合派给 Codex**：工作量大、规则清楚、能按文件切开的活，例如按规格实现接口与测试、按界面规范实现页面、实现某个数据源连接器。几行的小改、需要在多处之间权衡的设计，由 Claude 直接做。L2 的设计决策不交给 Codex。
-- **先搭共享骨架**：共享文件（类型、接口、路由、i18n 键、一条会失败的测试）由 Claude 先建好；并行的批次按文件范围拆开，互不重叠。
-- **任务单**放在 `.verification/codex/<名称>.md`，写明负责的路径、不许碰的路径、禁止任何 git 写操作、禁止运行的命令、验收标准、报告内容。
-- **派发**：`node <插件目录>/scripts/codex-companion.mjs task --background --write --fresh --effort <low|medium|high> --cwd <仓库> --prompt-file <任务单>`。机械改写用 medium，按复审意见小修用 low，需要设计的用 high。进度看 `status --all` 和 `jobs/<任务>.log`。
-- **测试由 Claude 跑**：Codex 的沙箱里启动 docker 会失败，凡经 `./dev.ps1` 的测试由 Claude 运行，失败的输出再交给 Codex 修。
-- **审查不省**：读 diff，运行受影响的测试，派 `reviewer` 复审；界面改动按界面规范第 12 节走查并截图。已知问题：放宽测试断言、为改一处去改生成逻辑、用隐晦写法实现关键条件。
-- **提交由 Claude 做**，提交信息里注明哪些部分由 Codex 完成。
+- **语言**：与用户沟通一律用简体中文，包括最终答复、进度、等待、计划、任务条目和转述。保留标识符、命令、路径、日志原文，压缩上下文后尤其要检查首批输出。
+- **需求与分工**：用户通过 [need](.claude/skills/need/SKILL.md) 的 `/need <一句话需求>` 提需求、确认理解卡并参与最终验收。Claude 分析需求、拆任务、定规格、把关架构、审查、集成和验收。理解卡逐项写明 Claude、Codex 或子代理的分工、理由及 Codex 强度，确认后开工。
+- **分支与工作区**：长期分支只有 `main`。每个需求从最新 main 开 `feat/`、`fix/` 或 `chore/` 短分支，经 PR 合并后删除。每个会话一次一个分支，默认在自己的 worktree 开发和测试，不在主检出目录改代码。镜像按工作区隔离（见开发手册"并行开发"）。
+- **粒度**：一个 PR 控制在约 1500 行或半天以内，按"一条用户能用的功能从后端到界面"纵切，不按文件路径横切成大批次。
+- **先读后改**：动手前读相关代码、测试和本文件指向的文档；先写会失败的测试，再写实现。
+- **并行开发**：Claude 先搭共享骨架，定好跨模块的调用方、入口函数和签名，建好类型、接口、路由、i18n 键和一条会失败的测试。文件范围互不重叠且无依赖的任务交给子代理并行，同一批文件只有一个写入者；拆不干净就不拆。
+- **子代理**：任务单写清可改的路径、允许的命令、禁止 git 写操作、验收标准及报告内容（改动文件、测试汇总行原文、未完成项和待定取舍）。主会话核对仓库后再转述结论，读过 diff、跑过受影响的测试后才提交。
+- **Codex**：工作量大、规则清楚、能按文件切开的活派给 Codex；几行的小改、涉及多处的设计权衡和 L2 设计由 Claude 负责。用 `desktop-dispatch:send` 派发，`desktop-dispatch:wait` 在后台等待并在结束时唤醒会话。Codex 经用户在桌面端批准后可以自己跑容器测试，任务正文要写明具体命令和申请提权的那句话；用户不在线时由 Claude 跑。Codex 的产出要读过 diff、核对过测试结果后由 Claude 提交，提交信息注明哪些部分由 Codex 完成。
+- **复审与验证**：按 [verify](.claude/skills/verify/SKILL.md) 同时派 `reviewer` 复审并跑受影响的测试，后端全量只在门禁中跑。第二轮复审只看修改的部分。没有必须修的项后，对最终 HEAD 跑一次 `./dev.ps1 ci -Report`，HEAD 变更后重跑。GitHub Actions 没有额度，不查看、不排查；门禁以提交状态 `local-ci` 为准。
+- **提交与 PR**：进度、验证命令和结果写进 PR 描述。无关问题用 `gh issue create --label backlog` 记录后继续，不扩大范围。`git add`、`git commit`、`git push`、`gh pr create` 各自单独执行，不用 `;` 串成一条。长提交信息或 PR 正文先写入 `.verification/`，再用 `git commit -F` 或 `gh pr create --body-file`。
+- **合并**：确认 PR 分支包含最新 main，使门禁覆盖即将合并的代码。最终 HEAD 的 `local-ci` 为 success 且复审没有必须修的项后，L0、L1 由开发会话自己合并，L2 的开发会话做到 ready 后停下，由主会话或用户审过再合并。合并用 `gh pr merge <n> --squash --match-head-commit <sha>`。
+- 派 Codex 见 [dispatch-codex](.claude/skills/dispatch-codex/SKILL.md)。审查合并 PR 统一按 [review-pr](.claude/skills/review-pr/SKILL.md) 执行，包括 `/need` 的合并步骤。
 
 ## 6 级别定义
 
-- **L0**：文案、样式、纯文档。
-- **L1**：新页面、新接口、新查询、新连接器的只读能力；表结构保持原样。
-- **L2**：数据库迁移；认证、权限、会话、CSRF；AI 写入路径与审核流程；发布与回滚；外部数据源连接与凭据；`compose.yaml`、`dev.ps1`、`.claude/settings.json`。
+按 PR 实际改动的路径取最高级别，里程碑不整体定级。拿不准按高一级。涉及 L2 范围先停下来问，再动手。
 
-拿不准按高一级。
+- **L0**：文案、样式、纯文档。
+- **L1**：纯界面功能、新页面、新接口（含只读接口）、新查询、连接器的只读能力；表结构保持原样。
+- **L2**：仅限数据库迁移；认证、权限、会话、CSRF；AI 写入路径与审核流程；发布与回滚；外部数据源连接与凭据；`compose.yaml`、`dev.ps1`；规则本身，即 `AGENTS.md` 与 `.claude/` 下的文件（技能、子代理、授权规则 `.claude/settings.json`）。
 
 ## 7 代码约定
 
