@@ -71,9 +71,7 @@ def _new_token() -> str:
 
 def _allowed_scopes(role: Role, scopes: list[str]) -> frozenset[TokenScope]:
     return frozenset(
-        cast(TokenScope, scope)
-        for scope in scopes
-        if scope in TOKEN_SCOPES and role in SCOPE_ROLES[cast(TokenScope, scope)]
+        scope for scope in scopes if scope in TOKEN_SCOPES and role in SCOPE_ROLES[scope]
     )
 
 
