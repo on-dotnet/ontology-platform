@@ -57,6 +57,10 @@ class Settings(BaseSettings):
     ai_reasoning_effort: Effort = "default"
     # Model calls are streamed, so this bounds the wait between two events, not a whole call.
     ai_timeout_seconds: float = Field(default=120, gt=0)
+    # Concurrency (spec 004, 7.3): jobs a worker runs at once, and model calls a process makes at
+    # once, the batches of one document and different documents together.
+    worker_concurrency: int = Field(default=3, ge=1, le=8)
+    ai_max_concurrent_calls: int = Field(default=4, ge=1, le=32)
 
     # Uploaded documents (M1).
     documents_dir: str = "/data/documents"

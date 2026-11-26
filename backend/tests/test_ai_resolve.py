@@ -17,6 +17,7 @@ from ontology_platform.modules.ai.extraction import (
     PendingType,
     Proposal,
     ProposedMatch,
+    RunStats,
     build_proposals,
     catalog_for,
     mark_late_candidates,
@@ -53,8 +54,9 @@ async def extract(
     known: list[KnownElement],
     pending: list[PendingType] | None = None,
     chunks: list[ChunkText] | None = None,
-) -> tuple[list[Proposal], Extractor]:
+) -> tuple[list[Proposal], RunStats]:
     extractor = Extractor(gateway, ExtractionModels(standard="std", reasoning="deep"))
+    stats = RunStats()
     proposals = await extractor.run(
         document_id=uuid4(),
         title="t",
@@ -62,8 +64,9 @@ async def extract(
         known=known,
         progress=nothing,
         pending=pending or [],
+        stats=stats,
     )
-    return proposals, extractor
+    return proposals, stats
 
 
 def outputs(
@@ -100,12 +103,12 @@ async def test_types_of_more_than_one_batch_are_judged_in_several_calls() -> Non
     ]
     types = [entity(f"new:N{n}", f"设备{n:03d}型") for n in range(RESOLVE_BATCH + 5)]
     gateway = ScriptedGateway(outputs(types))
-    _, extractor = await extract(gateway, known)
+    _, stats = await extract(gateway, known)
     calls = [text for purpose, text in gateway.texts if purpose == "extract.resolve"]
     assert len(calls) == 2
     assert calls[0].count("\nT") == RESOLVE_BATCH
-    assert len(extractor.last.requests) == RESOLVE_BATCH + 5
-    assert all(len(r.candidates) <= 3 for r in extractor.last.requests)
+    assert len(stats.requests) == RESOLVE_BATCH + 5
+    assert all(len(r.candidates) <= 3 for r in stats.requests)
 
 
 async def test_answers_about_what_was_not_asked_are_ignored() -> None:
@@ -178,11 +181,11 @@ async def test_pending_items_are_candidates_and_those_of_the_same_main_name_are_
     converter = pending_type("转炉")
     types = [entity("new:Ladle", "钢包"), entity("new:Converter", "转炉")]
     gateway = ScriptedGateway(outputs(types), judge({"钢包": ("钢水包", "same")}))
-    proposals, extractor = await extract(gateway, [], [ladle, converter])
+    proposals, stats = await extract(gateway, [], [ladle, converter])
 
     # 转炉 has the main name of a pending item (G1): not judged, created with a record of it, so
     # that the merge follows that item.
-    assert [r.index for r in extractor.last.requests] == [0]
+    assert [r.index for r in stats.requests] == [0]
     [(_, text)] = [entry for entry in gateway.texts if entry[0] == "extract.resolve"]
     assert "C1 | 钢水包 | 大包 |" in text
     assert [(p.fields["labelZh"], p.match) for p in proposals] == [
@@ -216,8 +219,8 @@ async def test_the_trimmed_types_are_counted() -> None:
         for n in range(TYPES_CONTEXT_MAX + 10)
     ]
     gateway = ScriptedGateway(outputs([]))
-    _, extractor = await extract(gateway, known)
-    assert extractor.last.trimmed["extract.types"] > 0
+    _, stats = await extract(gateway, known)
+    assert stats.trimmed["extract.types"] > 0
     [(_, text)] = [entry for entry in gateway.texts if entry[0] == "extract.types"]
     assert text.count("\n- ") <= TYPES_CONTEXT_MAX + 1  # the term line is the one more
 

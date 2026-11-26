@@ -7,6 +7,8 @@ and bounded by deterministic guardrails (spec 004, section 4). Reference checks 
 grounding are deterministic code, not model output.
 """
 
+import asyncio
+import logging
 import re
 from collections import Counter
 from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
@@ -41,6 +43,8 @@ from ontology_platform.modules.ai.prompts import (
 )
 from ontology_platform.modules.ai.sentences import covering, split_sentences
 from ontology_platform.settings import Settings, effort_value
+
+logger = logging.getLogger(__name__)
 
 Kind = Literal["entity_type", "relation_type", "property"]
 ProgressFn = Callable[[str, int, int], Awaitable[None]]
@@ -228,7 +232,7 @@ class JudgedPair:
 
 @dataclass
 class RunStats:
-    """What the last run decided, for the evaluation."""
+    """What one run decided, for the evaluation (`Extractor.run`'s `stats`)."""
 
     requests: list[ResolveRequest] = field(default_factory=list)
     decisions: dict[int, list[Decision]] = field(default_factory=dict)
@@ -364,14 +368,48 @@ def _unalias(value: str | None, ids: Mapping[str, str]) -> str | None:
     return f"unknown:{key}" if _ALIAS_LIKE.match(key) else value.strip()
 
 
+async def _in_order[T](
+    calls: Sequence[Callable[[], Awaitable[T]]], step: str, progress: ProgressFn
+) -> list[T]:
+    """Makes independent calls at the same time (spec 004, 7.3): the results in the calls'
+    order, whatever order they finish in, and the progress counting the finished ones.
+
+    The first failure cancels the calls still running and is raised as it is, not in a group:
+    callers tell retryable model errors and a lost lease apart as with one call at a time.
+    """
+    finished = 0
+    # Progress is written one at a time, so the count it shows only goes up.
+    lock = asyncio.Lock()
+
+    async def one(call: Callable[[], Awaitable[T]]) -> T:
+        nonlocal finished
+        result = await call()
+        async with lock:
+            finished += 1
+            await progress(step, finished, len(calls))
+        return result
+
+    await progress(step, 0, len(calls))
+    try:
+        async with asyncio.TaskGroup() as group:
+            tasks = [group.create_task(one(call)) for call in calls]
+    except BaseExceptionGroup as failed:
+        # The first to fail, not the earliest batch; the others are only logged.
+        for other in failed.exceptions[1:]:
+            logger.warning("Another %s call failed as well: %r", step, other)
+        raise failed.exceptions[0] from None
+    return [task.result() for task in tasks]
+
+
 class Extractor:
+    """Stateless between runs, so that one extractor serves the jobs a worker runs at once."""
+
     def __init__(
         self, gateway: ModelGateway, models: ExtractionModels, threshold: float = THRESHOLD
     ) -> None:
         self.gateway = gateway
         self.models = models
         self.threshold = threshold
-        self.last = RunStats()
 
     async def run(
         self,
@@ -383,21 +421,32 @@ class Extractor:
         progress: ProgressFn,
         deleted: Sequence[KnownElement] = (),
         pending: Sequence[PendingType] = (),
+        stats: RunStats | None = None,
     ) -> list[Proposal]:
-        """`deleted` and `pending` are not shown to the types stage; see `build_proposals`."""
-        self.last = RunStats()
+        """`deleted` and `pending` are not shown to the types stage; see `build_proposals`.
+
+        `stats` receives what this run decided, for the evaluation.
+        """
+        stats = stats if stats is not None else RunStats()
         groups = batches(chunks)
         terms = await self._terms(document_id, title, groups, progress)
-        types = await self._types(document_id, title, terms, known, chunks, progress)
-        requests = resolve_requests(
-            known, types, deleted=deleted, pending=pending, threshold=self.threshold
+        types = await self._types(document_id, title, terms, known, chunks, progress, stats)
+        # Pure computation, in a thread: other jobs' heartbeats keep running meanwhile.
+        requests = await asyncio.to_thread(
+            resolve_requests,
+            known,
+            types,
+            deleted=deleted,
+            pending=pending,
+            threshold=self.threshold,
         )
         decisions = await self._resolve(document_id, title, types, requests, known, pending)
-        self.last.requests, self.last.decisions = requests, decisions
-        self.last.pairs = judged_pairs(types, requests, decisions, known, pending)
-        relations = await self._relations(document_id, title, groups, types, known, progress)
+        stats.requests, stats.decisions = requests, decisions
+        stats.pairs = judged_pairs(types, requests, decisions, known, pending)
+        relations = await self._relations(document_id, title, groups, types, known, progress, stats)
         await progress("changeset", 0, 1)
-        proposals = build_proposals(
+        proposals = await asyncio.to_thread(
+            build_proposals,
             chunks,
             known,
             types,
@@ -406,7 +455,7 @@ class Extractor:
             pending=pending,
             decisions=decisions,
             threshold=self.threshold,
-            literal=self.last.literal,
+            literal=stats.literal,
         )
         await progress("changeset", 1, 1)
         return proposals
@@ -414,10 +463,10 @@ class Extractor:
     async def _terms(
         self, document_id: UUID, title: str, groups: list[list[ChunkText]], progress: ProgressFn
     ) -> list[TermOut]:
-        found: dict[str, TermOut] = {}
-        await progress("terms", 0, len(groups))
-        for index, group in enumerate(groups, start=1):
-            result = await self.gateway.structured(
+        """One call per batch, all at the same time; merged in batch order."""
+
+        def call(group: list[ChunkText]) -> Callable[[], Awaitable[TermsOut]]:
+            return lambda: self.gateway.structured(
                 purpose="extract.terms",
                 model=self.models.standard,
                 instructions=TERMS_INSTRUCTIONS,
@@ -425,13 +474,16 @@ class Extractor:
                 schema=TermsOut,
                 document_id=document_id,
             )
+
+        results = await _in_order([call(group) for group in groups], "terms", progress)
+        found: dict[str, TermOut] = {}
+        for result in results:
             for term in result.terms:
                 key = normalize(term.name)
                 if key and key not in found:
                     found[key] = term
                 elif key:
                     found[key].quotes.extend(term.quotes)
-            await progress("terms", index, len(groups))
         return list(found.values())
 
     async def _types(
@@ -442,8 +494,10 @@ class Extractor:
         known: Sequence[KnownElement],
         chunks: Sequence[ChunkText],
         progress: ProgressFn,
+        stats: RunStats,
     ) -> list[EntityTypeOut]:
-        """Types in batches of terms; later batches see the types found so far and reuse them.
+        """Types in batches of terms; later batches see the types found so far and reuse them,
+        so these calls are made one after the other.
 
         Each term is shown with the first sentences it occurs in, and the short ids the call
         sees are turned back into the existing types' ids, so later code sees ids only.
@@ -458,7 +512,7 @@ class Extractor:
         await progress("types", 0, len(groups))
         for index, group in enumerate(groups, start=1):
             context = types_context(known, [term.name for term in group], self.threshold)
-            self.last.trimmed["extract.types"] += len(existing) - len(context)
+            stats.trimmed["extract.types"] += len(existing) - len(context)
             aliases = _aliases(
                 [str(element.id) for element in context]
                 + [item.ref for item in found if _as_uuid(item.ref) is not None]
@@ -529,18 +583,19 @@ class Extractor:
         types: list[EntityTypeOut],
         known: Sequence[KnownElement],
         progress: ProgressFn,
+        stats: RunStats,
     ) -> RelationsOut:
+        """One call per batch, all at the same time; merged in batch order."""
         catalog, aliases = relations_catalog(types, known)
         ids = {alias: value for value, alias in aliases.items()}
-        merged = RelationsOut(relations=[], properties=[])
-        await progress("relations", 0, len(groups))
-        for index, group in enumerate(groups, start=1):
+
+        def call(group: list[ChunkText]) -> Callable[[], Awaitable[RelationsOut]]:
             lines = catalog_for(catalog, group)
-            self.last.trimmed["extract.relations"] += len(catalog) - len(lines)
+            stats.trimmed["extract.relations"] += len(catalog) - len(lines)
             header = "Entity types (ref | label | synonyms | definition):\n" + "\n".join(
                 line[0] for line in lines
             )
-            result = await self.gateway.structured(
+            return lambda: self.gateway.structured(
                 purpose="extract.relations",
                 model=self.models.standard,
                 instructions=RELATIONS_INSTRUCTIONS,
@@ -549,6 +604,10 @@ class Extractor:
                 document_id=document_id,
                 effort=self.models.standard_effort,
             )
+
+        results = await _in_order([call(group) for group in groups], "relations", progress)
+        merged = RelationsOut(relations=[], properties=[])
+        for result in results:
             merged.relations.extend(
                 r.model_copy(
                     update={"domain": _unalias(r.domain, ids), "range": _unalias(r.range, ids)}
@@ -558,7 +617,6 @@ class Extractor:
             merged.properties.extend(
                 p.model_copy(update={"domain": _unalias(p.domain, ids)}) for p in result.properties
             )
-            await progress("relations", index, len(groups))
         return merged
 
 
