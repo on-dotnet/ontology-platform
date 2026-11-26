@@ -41,11 +41,8 @@ DATA_SOURCE = {
 
 # Who may call what (spec 003, section 13 and the appendix).
 EVERYONE: list[Call] = []
-EDITORS: list[Call] = [
-    ("POST", f"/api/ontologies/{ID}/binding-suggestions", {"dataSourceId": ID, "schemas": ["mes"]}),
-    ("GET", f"/api/binding-suggestions/{ID}", None),
-    ("GET", f"/api/ontologies/{ID}/binding-suggestions", None),
-]
+# The binding suggestion routes (batch 4b) are tested in test_ai_binding_suggest.py.
+EDITORS: list[Call] = []
 ADMINS: list[Call] = []
 ALL_CALLS = [*EVERYONE, *EDITORS, *ADMINS]
 

@@ -279,6 +279,7 @@ type ElementInfo = ElementBrief & {
 | `binding.type_mismatch` | 422 | 列的类型与属性的数据类型不相容 |
 | `binding.cross_source` | 422 | 关系两端的表不在同一个数据源 |
 | `binding_suggestion.scope_too_large` | 422 | 范围超过 200 张表或 4,000 列 |
+| `binding_suggestion.scope_empty` | 422 | 所选的模式或表在目录缓存里一张表都没有 |
 | `binding_suggestion.not_found` | 404 | 请求不存在，或不属于当前用户 |
 | `query.no_release` | 409 | 本体没有生效的发布版本 |
 | `query.type_not_bound` | 409 | 这个类型在生效版本里没有绑定 |
