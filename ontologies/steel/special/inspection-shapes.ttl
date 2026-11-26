@@ -1,0 +1,122 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/special/inspection-shapes> a owl:Ontology ;
+    owl:versionIRI <ontology/special/inspection-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "特钢检验与逐件追溯约束"@zh, "Specialty inspection and piece traceability constraints"@en ;
+    rdfs:comment "核对特钢分项评级的代码与系列，检查一次炉次来源及重熔路线的锭电极链。"@zh, "Checks rating categories and series, primary heat provenance and the ingot-to-electrode chain of remelted products."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:InclusionTypeSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:inclusionType ;
+    sh:path skos:inScheme ; sh:hasValue <code/inclusion-type> ;
+    sh:severity sh:Violation ; rdfs:comment "夹杂物形态类别应属于显微评级的类别方案。"@zh .
+
+stl:InclusionSeriesSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:inclusionSeries ;
+    sh:path skos:inScheme ; sh:hasValue <code/inclusion-series> ;
+    sh:severity sh:Violation ; rdfs:comment "评级的粗细系列应属于夹杂物系列方案。"@zh .
+
+stl:MacroDefectSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:ratedMacroDefect ;
+    sh:path skos:inScheme ; sh:hasValue <code/macro-defect-type> ;
+    sh:severity sh:Violation ; rdfs:comment "低倍缺陷应取自锭材截面分项评级方案。"@zh .
+
+stl:NdtAcceptanceSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:ndtAcceptanceClass ;
+    sh:path skos:inScheme ; sh:hasValue <code/ndt-acceptance-class> ;
+    sh:severity sh:Violation ; rdfs:comment "探伤验收等级应取自锻轧棒材超声等级方案。"@zh .
+
+stl:IngotPositionSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:ingotPosition, stl:intervalIngotPosition ;
+    sh:path skos:inScheme ; sh:hasValue <code/ingot-position> ;
+    sh:severity sh:Violation ; rdfs:comment "钢锭及其来源区段涉及的部位应取自钢锭轴向部位方案。"@zh .
+
+stl:InclusionRatedTypeShape a sh:PropertyShape ; sh:targetClass stl:InclusionRatingResult ;
+    sh:path stl:inclusionType ; sh:minCount 1 ; sh:maxCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "一条分项夹杂物评级结果应恰好对应一种形态类别。"@zh .
+
+stl:InclusionRatingExaminationShape a sh:PropertyShape ; sh:targetClass stl:InclusionRatingResult ;
+    sh:path stl:resultOfInspection ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stl:InclusionRating ;
+    sh:severity sh:Violation ; rdfs:comment "分项夹杂物评级应归属实际出具它的那次夹杂物显微检验。"@zh .
+
+stl:MacroRatedDefectShape a sh:PropertyShape ; sh:targetClass stl:MacroDefectRating ;
+    sh:path stl:ratedMacroDefect ; sh:minCount 1 ; sh:maxCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "一个低倍缺陷级别应明确对应一个受评缺陷。"@zh .
+
+stl:MacroRatingExaminationShape a sh:PropertyShape ; sh:targetClass stl:MacroDefectRating ;
+    sh:path stl:resultOfInspection ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stl:MacroExamination ;
+    sh:severity sh:Violation ; rdfs:comment "一项低倍缺陷评级应能指回出具它的那次锭材低倍检验。"@zh .
+
+stl:GasAnalysisRemeltShape a sh:PropertyShape ; sh:targetClass stl:GasContentAnalysis ;
+    sh:path stl:analysedRemelt ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stl:Remelting ;
+    sh:severity sh:Violation ; rdfs:comment "每次逐锭气体分析应明确对应一项实际重熔作业。"@zh .
+
+stl:CleanlinessEvidenceShape a sh:PropertyShape ; sh:targetClass stl:CleanlinessAssessment ;
+    sh:path stl:cleanlinessEvidence ; sh:minCount 1 ; sh:class stl:InspectionResult ;
+    sh:severity sh:Violation ; rdfs:comment "综合评价应指明用来作出纯净度结论的检验结果。"@zh .
+
+stl:InclusionSeriesAssignmentShape a sh:NodeShape ; sh:targetClass stl:InclusionRatingResult ;
+    sh:severity sh:Violation ; rdfs:comment "A 至 D 类每条分项评级须选定一个粗细系列，单颗粒 DS 类直接按粒径评级。"@zh ;
+    sh:sparql [ sh:message "请核对本条评级的形态类别与系列。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX t: <https://w3id.org/ontology-platform/steel/code/inclusion-type/>
+        SELECT DISTINCT $this WHERE {
+          $this stl:inclusionType ?type .
+          FILTER ((?type IN (t:A, t:B, t:C, t:D) &&
+                   (NOT EXISTS { $this stl:inclusionSeries ?s } ||
+                    EXISTS { $this stl:inclusionSeries ?s, ?other . FILTER (?s != ?other) })) ||
+                  (?type = t:DS && EXISTS { $this stl:inclusionSeries ?any }))
+        }
+    """ ] .
+
+stl:SpecialPieceHeatTraceShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX quality: <https://w3id.org/ontology-platform/steel/code/steel-class-quality/>
+        SELECT DISTINCT ?this WHERE {
+          ?this rdf:type/rdfs:subClassOf* stl:MaterialPiece ;
+                stl:steelGrade/stl:steelQualityClass quality:SPECIAL .
+        }
+    """ ] ;
+    sh:severity sh:Violation ; rdfs:comment "内部钢种标为特殊质量的每一实物件，均应沿直接来源回到记录了一次炉次的实物，起件本身也可直接注明炉次。"@zh ;
+    sh:sparql [ sh:message "特钢实物件缺少可到达的一次冶炼炉次。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT $this WHERE {
+          FILTER NOT EXISTS {
+            $this stl:derivedFrom*/stl:sourceHeat ?heat .
+            ?heat rdf:type/rdfs:subClassOf* stl:Heat .
+          }
+        }
+    """ ] .
+
+stl:RemeltingRouteTraceShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        PREFIX route: <https://w3id.org/ontology-platform/steel/code/melting-route/>
+        SELECT DISTINCT ?this WHERE {
+          ?this rdf:type/rdfs:subClassOf* stl:MaterialPiece ;
+                stl:meltingRoute/skos:broader+ route:REMELT .
+        }
+    """ ] ;
+    sh:severity sh:Violation ; rdfs:comment "含重熔路线的实物件应能追到重熔锭及该锭上游的电极，受查实物本身也可以是重熔锭。"@zh ;
+    sh:sparql [ sh:message "该重熔路线缺少相连的重熔锭与电极。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT $this WHERE {
+          FILTER NOT EXISTS {
+            $this stl:derivedFrom* ?ingot .
+            ?ingot rdf:type/rdfs:subClassOf* stl:RemeltedIngot ;
+                   stl:derivedFrom+ ?electrode .
+            ?electrode rdf:type/rdfs:subClassOf* stl:Electrode .
+          }
+        }
+    """ ] .

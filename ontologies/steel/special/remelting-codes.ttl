@@ -1,0 +1,123 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/special/remelting-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/special/remelting-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "特冶作业与冶炼路线代码"@zh, "Special melting operation and melting route codes"@en ;
+    rdfs:comment "登记一次真空熔炼与重熔所用的设备、工序段和按是否经过重熔分组的特钢冶炼路线。"@zh, "Registers special melting equipment, route segments and special steel melting sequences grouped by whether they include remelting."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/melting-route> a skos:ConceptScheme ;
+    rdfs:label "冶炼路线"@zh, "Melting route"@en ; skos:prefLabel "冶炼路线"@zh, "Melting route"@en ;
+    skos:definition "按一次冶炼、炉外精炼和各道重熔的实际先后标识路线，以是否含自耗重熔分组。"@zh, "Classifies actual sequences of primary melting, secondary refining and remelting according to whether they include a consumable electrode remelt."@en ;
+    rdfs:comment "下沉理由：特钢的实物追溯须按有无重熔及各次重熔的次序区别同一牌号的冶炼履历。"@zh ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/remelting-codes> .
+
+stl:MeltingRouteCode a rdfs:Datatype ;
+    rdfs:label "冶炼路线代码"@zh, "Melting route code"@en ; skos:prefLabel "冶炼路线代码"@zh, "Melting route code"@en ;
+    skos:definition "用于记录冶炼路线方案内主记号的字面量类型。"@zh, "Datatype of the primary notations in the melting route scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/remelting-codes> .
+
+<code/melting-route/REMELT> a skos:Concept ; skos:inScheme <code/melting-route> ; skos:topConceptOf <code/melting-route> ;
+    skos:notation "REMELT"^^stl:MeltingRouteCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "含重熔路线"@zh, "Routes with remelting"@en ; skos:prefLabel "含重熔路线"@zh, "Routes with remelting"@en ;
+    skos:definition "归集一次冶炼后又经过一道或多道自耗电极重熔的路线。"@zh, "Groups routes with at least one consumable electrode remelting pass after primary melting."@en .
+
+<code/melting-route/DIRECT> a skos:Concept ; skos:inScheme <code/melting-route> ; skos:topConceptOf <code/melting-route> ;
+    skos:notation "DIRECT"^^stl:MeltingRouteCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "不含重熔路线"@zh, "Routes without remelting"@en ; skos:prefLabel "不含重熔路线"@zh, "Routes without remelting"@en ;
+    skos:definition "归集一次冶炼后直接浇铸或经炉外精炼再浇铸、后续未进行自耗重熔的路线。"@zh, "Groups routes in which primary steel is cast with or without secondary refining and undergoes no consumable electrode remelt."@en .
+
+<code/melting-route/VIMESR> a skos:Concept ; skos:inScheme <code/melting-route> ; skos:broader <code/melting-route/REMELT> ;
+    skos:notation "VIMESR"^^stl:MeltingRouteCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "真空感应熔炼—电渣重熔"@zh, "Vacuum induction melting followed by electroslag remelting"@en ; skos:prefLabel "真空感应熔炼—电渣重熔"@zh, "Vacuum induction melting followed by electroslag remelting"@en ;
+    skos:altLabel "VIM+ESR"@en ;
+    skos:definition "一次真空感应熔炼后，制备电极并进行一道电渣重熔。"@zh, "The primary vacuum induction melt supplies an electrode for one electroslag remelt."@en .
+
+<code/melting-route/VIMVAR> a skos:Concept ; skos:inScheme <code/melting-route> ; skos:broader <code/melting-route/REMELT> ;
+    skos:notation "VIMVAR"^^stl:MeltingRouteCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "真空感应熔炼—真空自耗重熔"@zh, "Vacuum induction melting followed by vacuum arc remelting"@en ; skos:prefLabel "真空感应熔炼—真空自耗重熔"@zh, "Vacuum induction melting followed by vacuum arc remelting"@en ;
+    skos:altLabel "VIM+VAR"@en ;
+    skos:definition "一次真空感应熔炼后，制备电极并进行一道真空自耗电弧重熔。"@zh, "The primary vacuum induction melt supplies an electrode for one vacuum arc remelt."@en .
+
+<code/melting-route/VIMESRVAR> a skos:Concept ; skos:inScheme <code/melting-route> ; skos:broader <code/melting-route/REMELT> ;
+    skos:notation "VIMESRVAR"^^stl:MeltingRouteCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "真空感应熔炼—电渣重熔—真空自耗重熔"@zh, "Vacuum induction melting followed by electroslag and vacuum arc remelting"@en ; skos:prefLabel "真空感应熔炼—电渣重熔—真空自耗重熔"@zh, "Vacuum induction melting followed by electroslag and vacuum arc remelting"@en ;
+    skos:altLabel "VIM+ESR+VAR"@en ;
+    skos:definition "一次真空感应熔炼后依次进行电渣和真空自耗两道重熔，电渣锭成为制备下一道自耗电极的来源。"@zh, "A primary vacuum induction melt undergoes electroslag remelting. The electroslag ingot then supplies the electrode for vacuum arc remelting."@en .
+
+<code/melting-route/VIMPESR> a skos:Concept ; skos:inScheme <code/melting-route> ; skos:broader <code/melting-route/VIMESR> ;
+    skos:notation "VIMPESR"^^stl:MeltingRouteCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "真空感应熔炼—保护气氛电渣重熔"@zh, "Vacuum induction melting followed by protective atmosphere electroslag remelting"@en ; skos:prefLabel "真空感应熔炼—保护气氛电渣重熔"@zh, "Vacuum induction melting followed by protective atmosphere electroslag remelting"@en ;
+    skos:altLabel "VIM+PESR"@en ;
+    skos:definition "真空感应熔炼后制备的电极，在保护气氛下进行电渣重熔。"@zh, "An electrode prepared from a primary vacuum induction melt undergoes electroslag remelting under a protective atmosphere."@en .
+
+<code/melting-route/EAFESR> a skos:Concept ; skos:inScheme <code/melting-route> ; skos:broader <code/melting-route/REMELT> ;
+    skos:notation "EAFESR"^^stl:MeltingRouteCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "电弧炉冶炼—电渣重熔"@zh, "Electric arc melting followed by electroslag remelting"@en ; skos:prefLabel "电弧炉冶炼—电渣重熔"@zh, "Electric arc melting followed by electroslag remelting"@en ;
+    skos:altLabel "EAF+ESR"@en ;
+    skos:definition "将电弧炉一次冶炼所得钢水浇成初锭，由初锭制备自耗电极，再经一道电渣重熔成锭。"@zh, "Steel from a primary electric arc furnace heat is cast into ingots that supply the consumable electrodes for one electroslag remelt."@en .
+
+<code/melting-route/EAFLFVD> a skos:Concept ; skos:inScheme <code/melting-route> ; skos:broader <code/melting-route/DIRECT> ;
+    skos:notation "EAFLFVD"^^stl:MeltingRouteCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "电炉冶炼—钢包炉精炼—真空脱气"@zh, "Electric arc melting followed by ladle furnace refining and vacuum degassing"@en ; skos:prefLabel "电炉冶炼—钢包炉精炼—真空脱气"@zh, "Electric arc melting followed by ladle furnace refining and vacuum degassing"@en ;
+    skos:altLabel "EAF+LF+VD"@en ;
+    skos:definition "电弧炉出钢后依次经钢包炉精炼和真空脱气，再浇成供加工的坯或锭。"@zh, "Steel from an electric arc furnace is refined in a ladle furnace, vacuum degassed and cast into stock for further processing."@en .
+
+<code/process-type/VIM> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/STEELMAKE> ;
+    skos:notation "VIM"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "真空感应熔炼工序"@zh, "Vacuum induction melting segment"@en ; skos:prefLabel "真空感应熔炼工序"@zh, "Vacuum induction melting segment"@en ;
+    skos:definition "以真空感应炉完成一次冶炼的工艺路线段。"@zh, "A route segment for primary melting in a vacuum induction furnace."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/process-type/REMELT> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "REMELT"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "重熔工序"@zh, "Remelting segment"@en ; skos:prefLabel "重熔工序"@zh, "Remelting segment"@en ;
+    skos:definition "以自耗电极为金属来源、经再熔凝形成新锭的工艺路线段。"@zh, "A route segment producing a new ingot by melting and resolidifying a consumable electrode."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/process-type/ESR> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/REMELT> ;
+    skos:notation "ESR"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "电渣重熔工序"@zh, "Electroslag remelting segment"@en ; skos:prefLabel "电渣重熔工序"@zh, "Electroslag remelting segment"@en ;
+    skos:definition "工艺路线中利用熔渣电阻热熔化自耗电极的重熔段。"@zh, "A remelting segment using resistive heating in a slag bath to melt the electrode."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/process-type/PESR> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/ESR> ;
+    skos:notation "PESR"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "保护气氛电渣重熔工序"@zh, "Protective atmosphere electroslag remelting segment"@en ; skos:prefLabel "保护气氛电渣重熔工序"@zh, "Protective atmosphere electroslag remelting segment"@en ;
+    skos:definition "工艺路线中在受控气氛保护下完成电渣重熔的工序段。"@zh, "An electroslag remelting segment carried out under a controlled protective atmosphere."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/process-type/VAR> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/REMELT> ;
+    skos:notation "VAR"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "真空自耗重熔工序"@zh, "Vacuum arc remelting segment"@en ; skos:prefLabel "真空自耗重熔工序"@zh, "Vacuum arc remelting segment"@en ;
+    skos:definition "工艺路线中在真空下以电弧熔化电极的重熔段。"@zh, "A remelting segment in which an arc melts the electrode under vacuum."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/equipment-type/VIM> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "VIM"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "真空感应熔炼炉"@zh, "Vacuum induction melting furnace"@en ; skos:prefLabel "真空感应熔炼炉"@zh, "Vacuum induction melting furnace"@en ;
+    skos:definition "在可抽真空的炉室内用感应加热熔化金属炉料的炉子。"@zh, "A furnace using induction heating to melt a metallic charge in an evacuable chamber."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/equipment-type/ESR> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "ESR"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "电渣重熔炉"@zh, "Electroslag remelting furnace"@en ; skos:prefLabel "电渣重熔炉"@zh, "Electroslag remelting furnace"@en ;
+    skos:definition "利用熔渣发热熔化自耗电极并在结晶器中凝固成锭的设备。"@zh, "A furnace using a heated slag bath to melt a consumable electrode and a mould to solidify the metal into an ingot."@en ;
+    dcterms:source <std/gbt-10067-8-2016> .
+
+<code/equipment-type/PESR> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:broader <code/equipment-type/ESR> ;
+    skos:notation "PESR"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "保护气氛电渣重熔炉"@zh, "Protective atmosphere electroslag furnace"@en ; skos:prefLabel "保护气氛电渣重熔炉"@zh, "Protective atmosphere electroslag furnace"@en ;
+    skos:definition "配有重熔区气氛保护装置的电渣重熔炉。"@zh, "An electroslag remelting furnace equipped to maintain a protective atmosphere over the remelting zone."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/equipment-type/VAR> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "VAR"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/special/remelting-codes> ;
+    rdfs:label "真空自耗电弧炉"@zh, "Vacuum arc remelting furnace"@en ; skos:prefLabel "真空自耗电弧炉"@zh, "Vacuum arc remelting furnace"@en ;
+    skos:definition "在抽真空的炉室内通过电弧熔化电极，在结晶器内形成新锭的设备。"@zh, "A furnace that melts a consumable electrode by an arc in an evacuated chamber and forms an ingot in a mould."@en ;
+    dcterms:source <source/industry-practice> .

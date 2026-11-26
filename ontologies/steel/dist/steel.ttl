@@ -66,6 +66,18 @@ stl:Area a owl:Class ;
     skos:prefLabel "Area"@en,
         "生产区域"@zh .
 
+stl:BandedStructureRating a owl:Class ;
+    rdfs:label "Bearing steel carbide banding examination"@en,
+        "轴承钢碳化物带状评级检验"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
+    rdfs:comment "下沉理由：高碳铬轴承钢按碳化物带状项目交验，其评级对象和标尺有别于普钢铁素体与珠光体的组织带。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:subClassOf stl:MicroExamination ;
+    skos:definition "An examination grading the concentration of carbides in bands along the working direction on a longitudinal bearing steel specimen."@en,
+        "在高碳铬轴承钢纵向观察面上评定碳化物沿加工方向聚集成带的程度并出具级别的检验。"@zh ;
+    skos:prefLabel "Bearing steel carbide banding examination"@en,
+        "轴承钢碳化物带状评级检验"@zh .
+
 stl:BarPeeling a owl:Class ;
     rdfs:label "Bar peeling"@en,
         "棒材扒皮"@zh ;
@@ -313,6 +325,14 @@ stl:ChemicalElementCode a rdfs:Datatype ;
     skos:prefLabel "chemical element analyte code"@en,
         "化学元素分析项代码"@zh .
 
+stl:CleanlinessEvidenceShape a sh:PropertyShape ;
+    rdfs:comment "综合评价应指明用来作出纯净度结论的检验结果。"@zh ;
+    sh:class stl:InspectionResult ;
+    sh:minCount 1 ;
+    sh:path stl:cleanlinessEvidence ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:CleanlinessAssessment .
+
 stl:CoalBlend a owl:Class ;
     rdfs:label "Coal blend lot"@en,
         "配合煤批"@zh ;
@@ -353,6 +373,21 @@ stl:CoatingTypeSchemeShape a sh:PropertyShape ;
     sh:path skos:inScheme ;
     sh:severity sh:Violation ;
     sh:targetObjectsOf stl:coatingType .
+
+stl:Cogging a owl:Class ;
+    rdfs:label "Cogging"@en,
+        "锻造开坯"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-42602-2023> ;
+    rdfs:comment "下沉理由：特钢锭的锻造开坯须在从铸态锭到后续加工用坯的履历中单列，并保留锻造比。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging> ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/process-type/COG> ;
+    rdfs:subClassOf stl:Forging ;
+    skos:altLabel "开坯"@zh,
+        "开坯锻造"@zh ;
+    skos:definition "A primary forging operation that works successive sections of an ingot or large blank to produce smaller-section stock for further processing."@en,
+        "将锭或大断面坯料逐段锻压，制成供后续加工的较小断面坯料的初步锻造作业。"@zh ;
+    skos:prefLabel "Cogging"@en,
+        "锻造开坯"@zh .
 
 stl:CoilJoining a owl:Class ;
     rdfs:label "Coil joining"@en,
@@ -919,6 +954,14 @@ stl:ElectricArcFurnaceSteelmaking a owl:Class ;
     skos:prefLabel "Electric arc furnace steelmaking"@en,
         "电弧炉炼钢"@zh .
 
+stl:ElectrodeSourceIngotShape a sh:PropertyShape ;
+    rdfs:comment "沿重熔链制备的自耗电极须记录其直接来源锭，可以是初锭或上一道次的重熔锭。"@zh ;
+    sh:path stl:derivedFrom ;
+    sh:qualifiedMinCount 1 ;
+    sh:qualifiedValueShape [ sh:class stl:Ingot ] ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Electrode .
+
 stl:EquipmentTypeCode a rdfs:Datatype ;
     rdfs:label "Equipment type code"@en,
         "设备类型代码"@zh ;
@@ -941,6 +984,15 @@ stl:Ferroalloy a owl:Class ;
     skos:prefLabel "Ferroalloy lot"@en,
         "铁合金批"@zh .
 
+stl:FinalCrossSectionAreaShape a sh:PropertyShape ;
+    rdfs:comment "填写锻后截面积时应给出一个大于零的十进制数，单位为平方毫米。"@zh ;
+    sh:datatype xsd:decimal ;
+    sh:maxCount 1 ;
+    sh:minExclusive 0.0 ;
+    sh:path stl:finalCrossSectionArea ;
+    sh:severity sh:Violation ;
+    sh:targetSubjectsOf stl:finalCrossSectionArea .
+
 stl:FinishedProduct a owl:Class ;
     rdfs:label "Finished product"@en,
         "成品"@zh ;
@@ -962,6 +1014,56 @@ stl:Flux a owl:Class ;
         "按批配入炉料以与脉石或灰分成渣、调节炉渣组成和流动性的材料。"@zh ;
     skos:prefLabel "Flux lot"@en,
         "熔剂批"@zh .
+
+stl:ForgedProduct a owl:Class ;
+    rdfs:label "Forged product"@en,
+        "锻件"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-8541-2012> ;
+    rdfs:comment "下沉理由：特钢锻件的件号把来源锭、锻造作业及锻后加工件连接成逐件谱系。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging> ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/product-form/FORGING> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:definition "An individually traceable steel piece shaped by forging, whether it leaves the operation as a blank for further working or as a deliverable forging."@en,
+        "经锻造取得其形状并可单件追踪的钢件，可作为后续加工的坯件或交货件。"@zh ;
+    skos:prefLabel "Forged product"@en,
+        "锻件"@zh ;
+    skos:scopeNote "ForgedProduct identifies a piece by its forging process and stl:Bar by its bar cross section. A finished forged bar can belong to both classes. Each length subsequently cut from it is a new material piece."@en,
+        "锻件按锻造成形工艺识别，棒材（stl:Bar）按棒状截面识别。同一支锻制成品棒可同时归入两类。后续切分所得的每一段都是新的实物件。"@zh .
+
+stl:ForgingMethodCode a rdfs:Datatype ;
+    rdfs:label "Forging method code"@en,
+        "锻造方法代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:definition "Datatype of the primary notations in the forging method scheme."@en,
+        "用于记录锻造方法方案内主记号的字面量类型。"@zh ;
+    skos:prefLabel "Forging method code"@en,
+        "锻造方法代码"@zh .
+
+stl:ForgingMethodSchemeShape a sh:PropertyShape ;
+    rdfs:comment "作业的锻造方法代码应属于锻造方法方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/forging-method> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:forgingMethod .
+
+stl:ForgingMethodShape a sh:PropertyShape ;
+    rdfs:comment "每次锻造作业应给出一种实际采用的主要锻造方法。"@zh ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path stl:forgingMethod ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Forging .
+
+stl:ForgingRatioShape a sh:PropertyShape ;
+    rdfs:comment "一次锻造作业应记录一个大于零的十进制锻造比。"@zh ;
+    sh:datatype xsd:decimal ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:minExclusive 0.0 ;
+    sh:path stl:forgingRatio ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Forging .
 
 stl:FullHardCoil a owl:Class ;
     rdfs:label "Full-hard coil"@en,
@@ -999,6 +1101,15 @@ stl:Galvanizing a owl:Class ;
     skos:prefLabel "Galvanizing"@en,
         "镀锌"@zh .
 
+stl:GasAnalysisRemeltShape a sh:PropertyShape ;
+    rdfs:comment "每次逐锭气体分析应明确对应一项实际重熔作业。"@zh ;
+    sh:class stl:Remelting ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path stl:analysedRemelt ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:GasContentAnalysis .
+
 stl:GrindingDepthShape a sh:PropertyShape ;
     rdfs:comment "最大修磨深度按去除量记录，应为非负的十进制毫米数。"@zh ;
     sh:datatype xsd:decimal ;
@@ -1006,6 +1117,18 @@ stl:GrindingDepthShape a sh:PropertyShape ;
     sh:path stl:maximumGrindingDepth ;
     sh:severity sh:Violation ;
     sh:targetSubjectsOf stl:maximumGrindingDepth .
+
+stl:HardenabilityTest a owl:Class ;
+    rdfs:label "End-quench hardenability test"@en,
+        "末端淬透性试验"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-225-2006> ;
+    rdfs:comment "下沉理由：保证淬透性的齿轮钢等需按端距核对整条硬度带，普钢常规硬度验收无需端淬曲线。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:subClassOf stl:MechanicalTest ;
+    skos:definition "A test measuring hardness at distances from the quenched end of a specimen to evaluate the response of a guaranteed-hardenability grade."@en,
+        "从单端淬火试样上取得一系列规定端距处的硬度，用于评定保证淬透性钢的端淬响应。"@zh ;
+    skos:prefLabel "End-quench hardenability test"@en,
+        "末端淬透性试验"@zh .
 
 stl:HeatTreatmentHoldOrderShape a sh:PropertyShape ;
     rdfs:comment "同一次保温同时记有实际开始和结束时刻时，结束不得早于开始。"@zh ;
@@ -1077,6 +1200,92 @@ stl:ImpactTest a owl:Class ;
     skos:prefLabel "Impact test"@en,
         "冲击试验"@zh .
 
+stl:InclusionRatedTypeShape a sh:PropertyShape ;
+    rdfs:comment "一条分项夹杂物评级结果应恰好对应一种形态类别。"@zh ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path stl:inclusionType ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:InclusionRatingResult .
+
+stl:InclusionRatingExaminationShape a sh:PropertyShape ;
+    rdfs:comment "分项夹杂物评级应归属实际出具它的那次夹杂物显微检验。"@zh ;
+    sh:class stl:InclusionRating ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path stl:resultOfInspection ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:InclusionRatingResult .
+
+stl:InclusionSeriesAssignmentShape a sh:NodeShape ;
+    rdfs:comment "A 至 D 类每条分项评级须选定一个粗细系列，单颗粒 DS 类直接按粒径评级。"@zh ;
+    sh:severity sh:Violation ;
+    sh:sparql [ sh:message "请核对本条评级的形态类别与系列。"@zh ;
+            sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX t: <https://w3id.org/ontology-platform/steel/code/inclusion-type/>
+        SELECT DISTINCT $this WHERE {
+          $this stl:inclusionType ?type .
+          FILTER ((?type IN (t:A, t:B, t:C, t:D) &&
+                   (NOT EXISTS { $this stl:inclusionSeries ?s } ||
+                    EXISTS { $this stl:inclusionSeries ?s, ?other . FILTER (?s != ?other) })) ||
+                  (?type = t:DS && EXISTS { $this stl:inclusionSeries ?any }))
+        }
+    """ ] ;
+    sh:targetClass stl:InclusionRatingResult .
+
+stl:InclusionSeriesCode a rdfs:Datatype ;
+    rdfs:label "Inclusion thickness series code"@en,
+        "夹杂物粗细系列代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Datatype of primary notations in the inclusion thickness series scheme."@en,
+        "标记夹杂物粗细系列方案中主记号的字面量类型。"@zh ;
+    skos:prefLabel "Inclusion thickness series code"@en,
+        "夹杂物粗细系列代码"@zh .
+
+stl:InclusionSeriesSchemeShape a sh:PropertyShape ;
+    rdfs:comment "评级的粗细系列应属于夹杂物系列方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/inclusion-series> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:inclusionSeries .
+
+stl:InclusionTypeCode a rdfs:Datatype ;
+    rdfs:label "Inclusion morphology category code"@en,
+        "夹杂物形态类别代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Datatype of primary notations in the inclusion morphology category scheme."@en,
+        "标记夹杂物形态类别方案中主记号的字面量类型。"@zh ;
+    skos:prefLabel "Inclusion morphology category code"@en,
+        "夹杂物形态类别代码"@zh .
+
+stl:InclusionTypeSchemeShape a sh:PropertyShape ;
+    rdfs:comment "夹杂物形态类别应属于显微评级的类别方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/inclusion-type> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:inclusionType .
+
+stl:IngotPositionCode a rdfs:Datatype ;
+    rdfs:label "Axial position on an ingot code"@en,
+        "钢锭轴向部位代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Datatype of primary notations in the axial position on an ingot scheme."@en,
+        "标记钢锭轴向部位方案中主记号的字面量类型。"@zh ;
+    skos:prefLabel "Axial position on an ingot code"@en,
+        "钢锭轴向部位代码"@zh .
+
+stl:IngotPositionSchemeShape a sh:PropertyShape ;
+    rdfs:comment "钢锭及其来源区段涉及的部位应取自钢锭轴向部位方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/ingot-position> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:ingotPosition,
+        stl:intervalIngotPosition .
+
 stl:IngotTeemingMethodShape a sh:PropertyShape ;
     rdfs:comment "每次模铸作业应给出本次实际采用的浇注方式。"@zh ;
     sh:maxCount 1 ;
@@ -1084,6 +1293,15 @@ stl:IngotTeemingMethodShape a sh:PropertyShape ;
     sh:path stl:teemingMethod ;
     sh:severity sh:Violation ;
     sh:targetClass stl:IngotCasting .
+
+stl:InitialCrossSectionAreaShape a sh:PropertyShape ;
+    rdfs:comment "填写锻前截面积时应给出一个大于零的十进制数，单位为平方毫米。"@zh ;
+    sh:datatype xsd:decimal ;
+    sh:maxCount 1 ;
+    sh:minExclusive 0.0 ;
+    sh:path stl:initialCrossSectionArea ;
+    sh:severity sh:Violation ;
+    sh:targetSubjectsOf stl:initialCrossSectionArea .
 
 stl:InlineInspection a owl:Class ;
     rdfs:label "In-line inspection"@en,
@@ -1157,6 +1375,40 @@ stl:LotFormationDimensionCode a rdfs:Datatype ;
         "标识“组批维度”方案中主记号的字面量类型。"@zh ;
     skos:prefLabel "Lot formation dimension code"@en,
         "组批维度代码"@zh .
+
+stl:MacroDefectSchemeShape a sh:PropertyShape ;
+    rdfs:comment "低倍缺陷应取自锭材截面分项评级方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/macro-defect-type> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:ratedMacroDefect .
+
+stl:MacroDefectTypeCode a rdfs:Datatype ;
+    rdfs:label "Rated ingot product macrodefect code"@en,
+        "锭材低倍受评缺陷类别代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1979-2025> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Datatype of primary notations in the rated ingot product macrodefect scheme."@en,
+        "标记锭材低倍受评缺陷类别方案中主记号的字面量类型。"@zh ;
+    skos:prefLabel "Rated ingot product macrodefect code"@en,
+        "锭材低倍受评缺陷类别代码"@zh .
+
+stl:MacroRatedDefectShape a sh:PropertyShape ;
+    rdfs:comment "一个低倍缺陷级别应明确对应一个受评缺陷。"@zh ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path stl:ratedMacroDefect ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:MacroDefectRating .
+
+stl:MacroRatingExaminationShape a sh:PropertyShape ;
+    rdfs:comment "一项低倍缺陷评级应能指回出具它的那次锭材低倍检验。"@zh ;
+    sh:class stl:MacroExamination ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path stl:resultOfInspection ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:MacroDefectRating .
 
 stl:Marking a owl:Class ;
     rdfs:label "Marking"@en,
@@ -1233,16 +1485,30 @@ stl:MeasuringInstrument a owl:Class ;
     skos:prefLabel "Measuring instrument"@en,
         "测量仪器"@zh .
 
-stl:MetallographicExamination a owl:Class ;
-    rdfs:label "Metallographic examination"@en,
-        "金相检验"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-13298-2015> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
-    rdfs:subClassOf stl:InspectionActivityRecord ;
-    skos:definition "An examination documenting material structure on a prepared surface with traceable fields or ratings."@en,
-        "通过观察制备表面，记录材料组织特征、相应视场或评级结果的检验。"@zh ;
-    skos:prefLabel "Metallographic examination"@en,
-        "金相检验"@zh .
+stl:MeltingRouteCode a rdfs:Datatype ;
+    rdfs:label "Melting route code"@en,
+        "冶炼路线代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:definition "Datatype of the primary notations in the melting route scheme."@en,
+        "用于记录冶炼路线方案内主记号的字面量类型。"@zh ;
+    skos:prefLabel "Melting route code"@en,
+        "冶炼路线代码"@zh .
+
+stl:MeltingRouteDetailShape a sh:PropertyShape ;
+    rdfs:comment "实物件须引用能沿上位关系归入含重熔或不含重熔组的具体路线。"@zh ;
+    sh:path [ sh:oneOrMorePath skos:broader ] ;
+    sh:qualifiedMinCount 1 ;
+    sh:qualifiedValueShape [ sh:in ( <https://w3id.org/ontology-platform/steel/code/melting-route/REMELT> <https://w3id.org/ontology-platform/steel/code/melting-route/DIRECT> ) ] ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:meltingRoute .
+
+stl:MeltingRouteSchemeShape a sh:PropertyShape ;
+    rdfs:comment "实物件引用的冶炼路线代码须属于冶炼路线方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/melting-route> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:meltingRoute .
 
 stl:Micrograph a owl:Class ;
     rdfs:label "Micrograph"@en,
@@ -1264,6 +1530,23 @@ stl:MovementEventTypeCode a rdfs:Datatype ;
         "标识“移动事件类型”方案中主记号的字面量类型。"@zh ;
     skos:prefLabel "movement event type code"@en,
         "移动事件类型代码"@zh .
+
+stl:NdtAcceptanceClassCode a rdfs:Datatype ;
+    rdfs:label "Ultrasonic acceptance class for wrought bars code"@en,
+        "锻轧棒材超声验收等级代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-4162-2022> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Datatype of primary notations in the ultrasonic acceptance class for wrought bars scheme."@en,
+        "标记锻轧棒材超声验收等级方案中主记号的字面量类型。"@zh ;
+    skos:prefLabel "Ultrasonic acceptance class for wrought bars code"@en,
+        "锻轧棒材超声验收等级代码"@zh .
+
+stl:NdtAcceptanceSchemeShape a sh:PropertyShape ;
+    rdfs:comment "探伤验收等级应取自锻轧棒材超声等级方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/ndt-acceptance-class> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:ndtAcceptanceClass .
 
 stl:NdtMethodCode a rdfs:Datatype ;
     rdfs:label "Nondestructive testing method code"@en,
@@ -1494,6 +1777,20 @@ stl:ProductionInterruption a owl:Class ;
     skos:prefLabel "Production interruption"@en,
         "生产中断事件"@zh .
 
+stl:ProtectiveAtmosphereElectroslagRemelting a owl:Class ;
+    rdfs:label "Protective atmosphere electroslag remelting"@en,
+        "保护气氛电渣重熔"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特冶电渣重熔记录须能区分带保护气氛的工艺变体。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting> ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/process-type/PESR> ;
+    rdfs:subClassOf stl:ElectroslagRemelting ;
+    skos:altLabel "PESR"@en ;
+    skos:definition "An electroslag remelting pass using a controlled protective atmosphere to isolate the remelting zone from ambient air."@en,
+        "在受控保护气氛下进行的电渣重熔作业，保护气体隔离周围空气与重熔区。"@zh ;
+    skos:prefLabel "Protective atmosphere electroslag remelting"@en,
+        "保护气氛电渣重熔"@zh .
+
 stl:RatingComparisonCode a rdfs:Datatype ;
     rdfs:label "Rating comparison operator code"@en,
         "评级比较关系代码"@zh ;
@@ -1618,6 +1915,126 @@ stl:RefiningMethodCode a rdfs:Datatype ;
         "标识炉外精炼方法方案中主记号的字面量类型。"@zh ;
     skos:prefLabel "Secondary refining method code"@en,
         "炉外精炼方法代码"@zh .
+
+stl:RemeltElectrodeLineageShape a sh:NodeShape ;
+    rdfs:comment "每件产出锭的直接来源电极都须登记为本炉投入，每件投入电极也须出现在本炉至少一件产出锭的直接来源中。"@zh ;
+    sh:severity sh:Violation ;
+    sh:sparql [ sh:message "本炉投入的电极与本炉产出锭登记的直接来源电极不一致。"@zh ;
+            sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT DISTINCT $this WHERE {
+          $this stl:inputPiece ?input ; (stl:outputPiece|^stl:producedBy) ?ingot .
+          ?input a/rdfs:subClassOf* stl:Electrode .
+          ?ingot a/rdfs:subClassOf* stl:RemeltedIngot ; stl:derivedFrom ?source .
+          ?source a/rdfs:subClassOf* stl:Electrode .
+          FILTER (NOT EXISTS { $this stl:inputPiece ?source } ||
+                  NOT EXISTS {
+                    $this (stl:outputPiece|^stl:producedBy) ?output .
+                    ?output a/rdfs:subClassOf* stl:RemeltedIngot ; stl:derivedFrom ?input .
+                  })
+        }
+    """ ] ;
+    sh:targetClass stl:Remelting .
+
+stl:RemeltInputElectrodeShape a sh:PropertyShape ;
+    rdfs:comment "每次重熔作业的投入件中须至少登记一件实际熔入的自耗电极。"@zh ;
+    sh:path stl:inputPiece ;
+    sh:qualifiedMinCount 1 ;
+    sh:qualifiedValueShape [ sh:class stl:Electrode ] ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Remelting .
+
+stl:RemeltNumberShape a sh:PropertyShape ;
+    rdfs:comment "每次重熔作业须记录一个非空的重熔炉号。"@zh ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:minLength 1 ;
+    sh:path stl:remeltNumber ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Remelting .
+
+stl:RemeltOutputShape a sh:PropertyShape ;
+    rdfs:comment "每次重熔至少产出一件重熔锭，产出关系可由作业或锭记录。"@zh ;
+    sh:path [ sh:alternativePath ( stl:outputPiece [ sh:inversePath stl:producedBy ] ) ] ;
+    sh:qualifiedMinCount 1 ;
+    sh:qualifiedValueShape [ sh:class stl:RemeltedIngot ] ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Remelting .
+
+stl:RemeltRecordOwnerShape a sh:NodeShape ;
+    rdfs:comment "承载重熔炉号或重熔道次的记录必须是重熔作业。"@zh ;
+    sh:class stl:Remelting ;
+    sh:severity sh:Violation ;
+    sh:targetSubjectsOf stl:remeltNumber,
+        stl:remeltSequence .
+
+stl:RemeltSequenceShape a sh:PropertyShape ;
+    rdfs:comment "每次作业须用一个正整数标明它是该冶炼链上的第几次重熔，首次为一。"@zh ;
+    sh:datatype xsd:positiveInteger ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path stl:remeltSequence ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Remelting .
+
+stl:RemeltedIngotElectrodeShape a sh:PropertyShape ;
+    rdfs:comment "每件重熔锭的直接来源中至少有一件实际熔入的自耗电极。"@zh ;
+    sh:path stl:derivedFrom ;
+    sh:qualifiedMinCount 1 ;
+    sh:qualifiedValueShape [ sh:class stl:Electrode ] ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:RemeltedIngot .
+
+stl:RemeltedIngotRouteShape a sh:PropertyShape ;
+    rdfs:comment "每件重熔锭，以及沿直接来源链可追溯到重熔锭的每件实物件，都须注明一条含重熔组下的具体冶炼路线。"@zh ;
+    sh:maxCount 1 ;
+    sh:path stl:meltingRoute ;
+    sh:qualifiedMinCount 1 ;
+    sh:qualifiedValueShape [ sh:property [ sh:hasValue <https://w3id.org/ontology-platform/steel/code/melting-route/REMELT> ;
+                    sh:path [ sh:oneOrMorePath skos:broader ] ] ] ;
+    sh:severity sh:Violation ;
+    sh:target [ a sh:SPARQLTarget ;
+            sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT DISTINCT ?this WHERE {
+          ?this a/rdfs:subClassOf* stl:MaterialPiece .
+          ?this stl:derivedFrom+/a/rdfs:subClassOf* stl:RemeltedIngot .
+        }
+    """ ] ;
+    sh:targetClass stl:RemeltedIngot .
+
+stl:RemeltingRouteTraceShape a sh:NodeShape ;
+    rdfs:comment "含重熔路线的实物件应能追到重熔锭及该锭上游的电极，受查实物本身也可以是重熔锭。"@zh ;
+    sh:severity sh:Violation ;
+    sh:sparql [ sh:message "该重熔路线缺少相连的重熔锭与电极。"@zh ;
+            sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT $this WHERE {
+          FILTER NOT EXISTS {
+            $this stl:derivedFrom* ?ingot .
+            ?ingot rdf:type/rdfs:subClassOf* stl:RemeltedIngot ;
+                   stl:derivedFrom+ ?electrode .
+            ?electrode rdf:type/rdfs:subClassOf* stl:Electrode .
+          }
+        }
+    """ ] ;
+    sh:target [ a sh:SPARQLTarget ;
+            sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        PREFIX route: <https://w3id.org/ontology-platform/steel/code/melting-route/>
+        SELECT DISTINCT ?this WHERE {
+          ?this rdf:type/rdfs:subClassOf* stl:MaterialPiece ;
+                stl:meltingRoute/skos:broader+ route:REMELT .
+        }
+    """ ] .
 
 stl:RetainedHeelLot a owl:Class ;
     rdfs:label "Retained steel heel lot"@en,
@@ -1835,6 +2252,59 @@ stl:SizingAndReducing a owl:Class ;
         "使管料通过轧辊孔型，校准其外径或将其减小到目标尺寸的一次作业。"@zh ;
     skos:prefLabel "Tube sizing and reducing"@en,
         "钢管定径与减径"@zh .
+
+stl:SpecialGradeEditionShape a sh:PropertyShape ;
+    rdfs:comment "归入特钢产品族的牌号须指向一个确定的标准版次，便于区分跨版次的同名牌号。"@zh ;
+    sh:class stl:StandardEdition ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path stl:definedIn ;
+    sh:severity sh:Violation ;
+    sh:targetSubjectsOf stl:specialProductFamily .
+
+stl:SpecialPieceHeatTraceShape a sh:NodeShape ;
+    rdfs:comment "内部钢种标为特殊质量的每一实物件，均应沿直接来源回到记录了一次炉次的实物，起件本身也可直接注明炉次。"@zh ;
+    sh:severity sh:Violation ;
+    sh:sparql [ sh:message "特钢实物件缺少可到达的一次冶炼炉次。"@zh ;
+            sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT $this WHERE {
+          FILTER NOT EXISTS {
+            $this stl:derivedFrom*/stl:sourceHeat ?heat .
+            ?heat rdf:type/rdfs:subClassOf* stl:Heat .
+          }
+        }
+    """ ] ;
+    sh:target [ a sh:SPARQLTarget ;
+            sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX quality: <https://w3id.org/ontology-platform/steel/code/steel-class-quality/>
+        SELECT DISTINCT ?this WHERE {
+          ?this rdf:type/rdfs:subClassOf* stl:MaterialPiece ;
+                stl:steelGrade/stl:steelQualityClass quality:SPECIAL .
+        }
+    """ ] .
+
+stl:SpecialProductFamilyCode a rdfs:Datatype ;
+    rdfs:label "Special steel product family code"@en,
+        "特钢产品族代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:definition "The datatype of primary notations in the special steel product family scheme."@en,
+        "标记特钢产品族方案内代码主记号的字面量类型。"@zh ;
+    skos:prefLabel "Special steel product family code"@en,
+        "特钢产品族代码"@zh .
+
+stl:SpecialProductFamilySchemeShape a sh:PropertyShape ;
+    rdfs:comment "作为特钢产品族取值的代码须属于特钢产品族方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/special-product-family> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:specialProductFamily .
 
 stl:SpecificationRevision a owl:Class ;
     rdfs:label "Specification revision"@en,
@@ -2124,6 +2594,35 @@ stl:TubeWeldingMethodShape a sh:PropertyShape ;
     sh:path stl:weldMethod ;
     sh:severity sh:Violation ;
     sh:targetClass stl:TubeWelding .
+
+stl:VacuumArcRemelting a owl:Class ;
+    rdfs:label "Vacuum arc remelting"@en,
+        "真空自耗电弧重熔"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特冶路线按道次追踪真空自耗作业，同一条路线可在电渣重熔后继续真空自耗重熔。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting> ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/process-type/VAR> ;
+    rdfs:subClassOf stl:Remelting ;
+    skos:altLabel "VAR"@en,
+        "真空自耗重熔"@zh ;
+    skos:definition "A remelting pass in which an arc melts a consumable electrode under vacuum and metal entering the pool solidifies in a mould as a new ingot."@en,
+        "在真空下以电弧熔化自耗电极，使落入熔池的金属在结晶器内凝固成新锭的作业。"@zh ;
+    skos:prefLabel "Vacuum arc remelting"@en,
+        "真空自耗电弧重熔"@zh .
+
+stl:VacuumInductionMelting a owl:Class ;
+    rdfs:label "Vacuum induction melting"@en,
+        "真空感应熔炼"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特冶路线需区分生成一次炉次的真空感应熔炼和随后按道次记录的自耗重熔。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting> ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/process-type/VIM> ;
+    rdfs:subClassOf stl:Steelmaking ;
+    skos:altLabel "VIM"@en ;
+    skos:definition "A primary steelmaking operation in which induction heating melts the charge in a vacuum furnace and its composition is adjusted."@en,
+        "在真空感应炉中用感应加热熔化炉料并调成所需成分的一次冶炼作业。"@zh ;
+    skos:prefLabel "Vacuum induction melting"@en,
+        "真空感应熔炼"@zh .
 
 stl:Weighing a owl:Class ;
     rdfs:label "Weighing"@en,
@@ -3003,17 +3502,18 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "edge crack"@en,
         "边裂"@zh .
 
-<https://w3id.org/ontology-platform/steel/code/defect-type/FORGED> a skos:Concept ;
-    rdfs:label "Forging defects"@en,
-        "锻件缺陷"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Groups flaws characterized by forging flow, forging geometry or internal integrity."@en,
-        "归集与锻压流动、锻件轮廓或锻件内部完整性有关的缺陷。"@zh ;
+<https://w3id.org/ontology-platform/steel/code/defect-type/FORGELAP> a skos:Concept ;
+    rdfs:label "Forging lap"@en,
+        "锻造折叠"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/defect-type/FORGED> ;
+    skos:definition "A discontinuity where surface metal folds over during forging and is pressed into the workpiece without bonding."@en,
+        "锻压时表层金属翻折并压入锻件，在折叠处留下未结合的界面。"@zh ;
     skos:inScheme <https://w3id.org/ontology-platform/steel/code/defect-type> ;
-    skos:notation "FORGED"^^stl:DefectTypeCode ;
-    skos:prefLabel "Forging defects"@en,
-        "锻件缺陷"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/defect-type> .
+    skos:notation "FORGELAP"^^stl:DefectTypeCode ;
+    skos:prefLabel "Forging lap"@en,
+        "锻造折叠"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/defect-type/LONG> a skos:Concept ;
     rdfs:label "Long product defects"@en,
@@ -3050,6 +3550,19 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "scratch"@en,
         "划伤"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/defect-type> .
+
+<https://w3id.org/ontology-platform/steel/code/defect-type/UNDERFILL> a skos:Concept ;
+    rdfs:label "Forging underfill"@en,
+        "模锻欠充满"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/defect-type/FORGED> ;
+    skos:definition "A missing portion of the intended forged contour where metal failed to fill part of the die impression."@en,
+        "模锻时金属未充满模膛某一部位，使锻件在该处缺少应成形的轮廓。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/defect-type> ;
+    skos:notation "UNDERFILL"^^stl:DefectTypeCode ;
+    skos:prefLabel "Forging underfill"@en,
+        "模锻欠充满"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/delivery-condition/ANNEALED> a skos:Concept ;
     rdfs:label "Annealed"@en,
@@ -3443,6 +3956,32 @@ stl:coatingMass a owl:DatatypeProperty ;
         "精整线"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
+<https://w3id.org/ontology-platform/steel/code/equipment-type/FORGEHAM> a skos:Concept ;
+    rdfs:label "Forging hammer"@en,
+        "锻锤"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:definition "A machine that transfers impact energy from a falling or driven ram to stock through forging tools."@en,
+        "以锤头冲击通过锻造工具向坯料传递变形能量的设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "FORGEHAM"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Forging hammer"@en,
+        "锻锤"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/FORGEPRESS> a skos:Concept ;
+    rdfs:label "Forging press"@en,
+        "锻造压力机"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:definition "A press whose working stroke applies forming loads to stock through forging tools."@en,
+        "以压力行程使锻造工具对坯料施加变形载荷的设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "FORGEPRESS"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Forging press"@en,
+        "锻造压力机"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
 <https://w3id.org/ontology-platform/steel/code/equipment-type/GRIND> a skos:Concept ;
     rdfs:label "Conditioning grinder"@en,
         "修磨机"@zh ;
@@ -3579,6 +4118,19 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "packing line"@en,
         "包装机组"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/PESR> a skos:Concept ;
+    rdfs:label "Protective atmosphere electroslag furnace"@en,
+        "保护气氛电渣重熔炉"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/equipment-type/ESR> ;
+    skos:definition "An electroslag remelting furnace equipped to maintain a protective atmosphere over the remelting zone."@en,
+        "配有重熔区气氛保护装置的电渣重熔炉。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "PESR"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Protective atmosphere electroslag furnace"@en,
+        "保护气氛电渣重熔炉"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/equipment-type/PIERCER> a skos:Concept ;
     rdfs:label "Tube billet piercer"@en,
@@ -3780,6 +4332,19 @@ stl:coatingMass a owl:DatatypeProperty ;
         "中间包"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
+<https://w3id.org/ontology-platform/steel/code/equipment-type/VAR> a skos:Concept ;
+    rdfs:label "Vacuum arc remelting furnace"@en,
+        "真空自耗电弧炉"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:definition "A furnace that melts a consumable electrode by an arc in an evacuated chamber and forms an ingot in a mould."@en,
+        "在抽真空的炉室内通过电弧熔化电极，在结晶器内形成新锭的设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "VAR"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Vacuum arc remelting furnace"@en,
+        "真空自耗电弧炉"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
 <https://w3id.org/ontology-platform/steel/code/equipment-type/VD> a skos:Concept ;
     rdfs:label "Ladle vacuum degasser"@en,
         "钢包真空脱气装置"@zh ;
@@ -3791,6 +4356,19 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:notation "VD"^^stl:EquipmentTypeCode ;
     skos:prefLabel "Ladle vacuum degasser"@en,
         "钢包真空脱气装置"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/VIM> a skos:Concept ;
+    rdfs:label "Vacuum induction melting furnace"@en,
+        "真空感应熔炼炉"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:definition "A furnace using induction heating to melt a metallic charge in an evacuable chamber."@en,
+        "在可抽真空的炉室内用感应加热熔化金属炉料的炉子。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "VIM"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Vacuum induction melting furnace"@en,
+        "真空感应熔炼炉"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
 <https://w3id.org/ontology-platform/steel/code/equipment-type/VOD> a skos:Concept ;
@@ -3820,6 +4398,68 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Wire rod mill"@en,
         "线材轧机"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/forging-method/DIE> a skos:Concept ;
+    rdfs:label "Impression-die forging"@en,
+        "模锻"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:definition "Forces stock to flow into a shaped die impression that defines the forged contour."@en,
+        "将坯料置于有型腔的锻模中施力，使金属流动并取得型腔限定的轮廓。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/forging-method> ;
+    skos:notation "DIE"^^stl:ForgingMethodCode ;
+    skos:prefLabel "Impression-die forging"@en,
+        "模锻"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/forging-method> .
+
+<https://w3id.org/ontology-platform/steel/code/forging-method/OPEN> a skos:Concept ;
+    rdfs:label "Open-die forging"@en,
+        "自由锻"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:definition "Deforms stock between anvils or general-purpose tools, allowing it to flow in directions unconstrained by the tooling."@en,
+        "使用砧块或通用工具施力，使坯料能沿未受工具约束的方向流动成形。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/forging-method> ;
+    skos:notation "OPEN"^^stl:ForgingMethodCode ;
+    skos:prefLabel "Open-die forging"@en,
+        "自由锻"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/forging-method> .
+
+<https://w3id.org/ontology-platform/steel/code/forging-method/PRECISION> a skos:Concept ;
+    rdfs:label "Precision forging"@en,
+        "精密锻造"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:altLabel "精锻"@zh ;
+    skos:definition "Controls tooling and stock deformation to forge a piece close to the required final shape and dimensions."@en,
+        "通过控制模具和坯料变形使锻件接近所需的最终形状与尺寸。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/forging-method> ;
+    skos:notation "PRECISION"^^stl:ForgingMethodCode ;
+    skos:prefLabel "Precision forging"@en,
+        "精密锻造"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/forging-method> .
+
+<https://w3id.org/ontology-platform/steel/code/forging-method/RADIAL> a skos:Concept ;
+    rdfs:label "Radial forging"@en,
+        "径向锻造"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:altLabel "径锻"@zh ;
+    skos:definition "Shapes successive sections of a workpiece by repeated radial blows from dies arranged around it."@en,
+        "由坯料周围布置的锻模沿径向反复压下，使坯料断面逐段成形。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/forging-method> ;
+    skos:notation "RADIAL"^^stl:ForgingMethodCode ;
+    skos:prefLabel "Radial forging"@en,
+        "径向锻造"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/forging-method> .
+
+<https://w3id.org/ontology-platform/steel/code/forging-method/RAPID> a skos:Concept ;
+    rdfs:label "Rapid forging"@en,
+        "快锻"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:definition "Uses repeated short press strokes with stock feed to deform successive portions of the workpiece."@en,
+        "利用快锻机短行程连续压下，配合送进使坯料逐段变形。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/forging-method> ;
+    skos:notation "RAPID"^^stl:ForgingMethodCode ;
+    skos:prefLabel "Rapid forging"@en,
+        "快锻"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/forging-method> .
 
 <https://w3id.org/ontology-platform/steel/code/heat-treatment-process/AGE> a skos:Concept ;
     rdfs:label "Ageing treatment"@en,
@@ -3912,6 +4552,126 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Tempering"@en,
         "回火"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/heat-treatment-process> .
+
+<https://w3id.org/ontology-platform/steel/code/inclusion-series/THICK> a skos:Concept ;
+    rdfs:label "Thick series"@en,
+        "粗系"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Rating series for the larger transverse sizes within a given category."@en,
+        "在一个夹杂物类别中用于较大横向尺寸组的评级系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/inclusion-series> ;
+    skos:notation "THICK"^^stl:InclusionSeriesCode ;
+    skos:prefLabel "Thick series"@en,
+        "粗系"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/inclusion-series> .
+
+<https://w3id.org/ontology-platform/steel/code/inclusion-series/THIN> a skos:Concept ;
+    rdfs:label "Thin series"@en,
+        "细系"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Rating series for the smaller transverse sizes within a given category."@en,
+        "在一个夹杂物类别中用于较小横向尺寸组的评级系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/inclusion-series> ;
+    skos:notation "THIN"^^stl:InclusionSeriesCode ;
+    skos:prefLabel "Thin series"@en,
+        "细系"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/inclusion-series> .
+
+<https://w3id.org/ontology-platform/steel/code/inclusion-type/A> a skos:Concept ;
+    rdfs:label "Type A, sulphide type"@en,
+        "A 类硫化物型"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Sulphide-type morphology appearing as elongated streaks along the working direction."@en,
+        "随加工方向伸长、呈条带的硫化物型夹杂物形态组。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/inclusion-type> ;
+    skos:notation "A"^^stl:InclusionTypeCode ;
+    skos:prefLabel "Type A, sulphide type"@en,
+        "A 类硫化物型"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/inclusion-type> .
+
+<https://w3id.org/ontology-platform/steel/code/inclusion-type/B> a skos:Concept ;
+    rdfs:label "Type B, aluminate type"@en,
+        "B 类氧化铝型"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Aluminate-type morphology with angular particles aligned in discontinuous strings."@en,
+        "多个棱角状颗粒沿加工方向排成断续列的氧化铝型形态组。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/inclusion-type> ;
+    skos:notation "B"^^stl:InclusionTypeCode ;
+    skos:prefLabel "Type B, aluminate type"@en,
+        "B 类氧化铝型"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/inclusion-type> .
+
+<https://w3id.org/ontology-platform/steel/code/inclusion-type/C> a skos:Concept ;
+    rdfs:label "Type C, silicate type"@en,
+        "C 类硅酸盐型"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Silicate-type morphology with elongated inclusions drawn out along the working direction."@en,
+        "沿加工方向延展成细长条的硅酸盐型夹杂物形态组。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/inclusion-type> ;
+    skos:notation "C"^^stl:InclusionTypeCode ;
+    skos:prefLabel "Type C, silicate type"@en,
+        "C 类硅酸盐型"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/inclusion-type> .
+
+<https://w3id.org/ontology-platform/steel/code/inclusion-type/D> a skos:Concept ;
+    rdfs:label "Type D, globular oxide type"@en,
+        "D 类球状氧化物型"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Oxide-type morphology appearing as dispersed round or nearly round sections."@en,
+        "在观察面上分散分布、以圆形或近圆形截面出现的氧化物型形态组。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/inclusion-type> ;
+    skos:notation "D"^^stl:InclusionTypeCode ;
+    skos:prefLabel "Type D, globular oxide type"@en,
+        "D 类球状氧化物型"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/inclusion-type> .
+
+<https://w3id.org/ontology-platform/steel/code/inclusion-type/DS> a skos:Concept ;
+    rdfs:label "Type DS, single globular inclusion"@en,
+        "DS 类单颗粒球状型"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Category used to rate an individual large globular inclusion by its own size."@en,
+        "对观察面上的单个较大球状颗粒按其自身尺寸单独评级的类别。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/inclusion-type> ;
+    skos:notation "DS"^^stl:InclusionTypeCode ;
+    skos:prefLabel "Type DS, single globular inclusion"@en,
+        "DS 类单颗粒球状型"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/inclusion-type> .
+
+<https://w3id.org/ontology-platform/steel/code/ingot-position/HEAD> a skos:Concept ;
+    rdfs:label "Ingot head"@en,
+        "锭头"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Upper end of the ingot in its solidification orientation, used to trace head material."@en,
+        "原锭凝固时的上端区域，用于追踪头部材料去向。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/ingot-position> ;
+    skos:notation "HEAD"^^stl:IngotPositionCode ;
+    skos:prefLabel "Ingot head"@en,
+        "锭头"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/ingot-position> .
+
+<https://w3id.org/ontology-platform/steel/code/ingot-position/MIDDLE> a skos:Concept ;
+    rdfs:label "Ingot middle"@en,
+        "锭中"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Main body of the ingot between its head and foot."@en,
+        "原锭头部与尾部之间的主体区域。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/ingot-position> ;
+    skos:notation "MIDDLE"^^stl:IngotPositionCode ;
+    skos:prefLabel "Ingot middle"@en,
+        "锭中"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/ingot-position> .
+
+<https://w3id.org/ontology-platform/steel/code/ingot-position/TAIL> a skos:Concept ;
+    rdfs:label "Ingot foot"@en,
+        "锭尾"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Lower end of the ingot in its solidification orientation, used to trace foot material."@en,
+        "原锭凝固时的下端区域，用于追踪底部材料去向。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/ingot-position> ;
+    skos:notation "TAIL"^^stl:IngotPositionCode ;
+    skos:prefLabel "Ingot foot"@en,
+        "锭尾"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/ingot-position> .
 
 <https://w3id.org/ontology-platform/steel/code/inspection-document-type/T21> a skos:Concept ;
     rdfs:label "declaration of compliance with the order"@en,
@@ -4066,6 +4826,30 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Material specification"@en,
         "规格"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/lot-formation-dimension> .
+
+<https://w3id.org/ontology-platform/steel/code/macro-defect-type/CENTPOR> a skos:Concept ;
+    rdfs:label "Central porosity"@en,
+        "中心疏松"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Macrostructural item concerning porosity concentrated in the central region of a section."@en,
+        "疏松集中在截面中心区域的低倍评级项目。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/macro-defect-type> ;
+    skos:notation "CENTPOR"^^stl:MacroDefectTypeCode ;
+    skos:prefLabel "Central porosity"@en,
+        "中心疏松"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/macro-defect-type> .
+
+<https://w3id.org/ontology-platform/steel/code/macro-defect-type/GENPOR> a skos:Concept ;
+    rdfs:label "General porosity"@en,
+        "一般疏松"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Macrostructural item concerning dispersed porosity in multiple regions of a section."@en,
+        "截面多处出现分散疏松的低倍评级项目。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/macro-defect-type> ;
+    skos:notation "GENPOR"^^stl:MacroDefectTypeCode ;
+    skos:prefLabel "General porosity"@en,
+        "一般疏松"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/macro-defect-type> .
 
 <https://w3id.org/ontology-platform/steel/code/material-category/COAL> a skos:Concept ;
     rdfs:label "Coal"@en,
@@ -4299,6 +5083,71 @@ stl:coatingMass a owl:DatatypeProperty ;
         "手工"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/measurement-method> .
 
+<https://w3id.org/ontology-platform/steel/code/melting-route/EAFESR> a skos:Concept ;
+    rdfs:label "Electric arc melting followed by electroslag remelting"@en,
+        "电弧炉冶炼—电渣重熔"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:altLabel "EAF+ESR"@en ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/melting-route/REMELT> ;
+    skos:definition "Steel from a primary electric arc furnace heat is cast into ingots that supply the consumable electrodes for one electroslag remelt."@en,
+        "将电弧炉一次冶炼所得钢水浇成初锭，由初锭制备自耗电极，再经一道电渣重熔成锭。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/melting-route> ;
+    skos:notation "EAFESR"^^stl:MeltingRouteCode ;
+    skos:prefLabel "Electric arc melting followed by electroslag remelting"@en,
+        "电弧炉冶炼—电渣重熔"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/melting-route/EAFLFVD> a skos:Concept ;
+    rdfs:label "Electric arc melting followed by ladle furnace refining and vacuum degassing"@en,
+        "电炉冶炼—钢包炉精炼—真空脱气"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:altLabel "EAF+LF+VD"@en ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/melting-route/DIRECT> ;
+    skos:definition "Steel from an electric arc furnace is refined in a ladle furnace, vacuum degassed and cast into stock for further processing."@en,
+        "电弧炉出钢后依次经钢包炉精炼和真空脱气，再浇成供加工的坯或锭。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/melting-route> ;
+    skos:notation "EAFLFVD"^^stl:MeltingRouteCode ;
+    skos:prefLabel "Electric arc melting followed by ladle furnace refining and vacuum degassing"@en,
+        "电炉冶炼—钢包炉精炼—真空脱气"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/melting-route/VIMESRVAR> a skos:Concept ;
+    rdfs:label "Vacuum induction melting followed by electroslag and vacuum arc remelting"@en,
+        "真空感应熔炼—电渣重熔—真空自耗重熔"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:altLabel "VIM+ESR+VAR"@en ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/melting-route/REMELT> ;
+    skos:definition "A primary vacuum induction melt undergoes electroslag remelting. The electroslag ingot then supplies the electrode for vacuum arc remelting."@en,
+        "一次真空感应熔炼后依次进行电渣和真空自耗两道重熔，电渣锭成为制备下一道自耗电极的来源。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/melting-route> ;
+    skos:notation "VIMESRVAR"^^stl:MeltingRouteCode ;
+    skos:prefLabel "Vacuum induction melting followed by electroslag and vacuum arc remelting"@en,
+        "真空感应熔炼—电渣重熔—真空自耗重熔"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/melting-route/VIMPESR> a skos:Concept ;
+    rdfs:label "Vacuum induction melting followed by protective atmosphere electroslag remelting"@en,
+        "真空感应熔炼—保护气氛电渣重熔"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:altLabel "VIM+PESR"@en ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/melting-route/VIMESR> ;
+    skos:definition "An electrode prepared from a primary vacuum induction melt undergoes electroslag remelting under a protective atmosphere."@en,
+        "真空感应熔炼后制备的电极，在保护气氛下进行电渣重熔。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/melting-route> ;
+    skos:notation "VIMPESR"^^stl:MeltingRouteCode ;
+    skos:prefLabel "Vacuum induction melting followed by protective atmosphere electroslag remelting"@en,
+        "真空感应熔炼—保护气氛电渣重熔"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/melting-route/VIMVAR> a skos:Concept ;
+    rdfs:label "Vacuum induction melting followed by vacuum arc remelting"@en,
+        "真空感应熔炼—真空自耗重熔"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:altLabel "VIM+VAR"@en ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/melting-route/REMELT> ;
+    skos:definition "The primary vacuum induction melt supplies an electrode for one vacuum arc remelt."@en,
+        "一次真空感应熔炼后，制备电极并进行一道真空自耗电弧重熔。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/melting-route> ;
+    skos:notation "VIMVAR"^^stl:MeltingRouteCode ;
+    skos:prefLabel "Vacuum induction melting followed by vacuum arc remelting"@en,
+        "真空感应熔炼—真空自耗重熔"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/movement-event-type/DISPATCH> a skos:Concept ;
     rdfs:label "dispatch"@en,
         "出厂"@zh ;
@@ -4346,6 +5195,30 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "set-down"@en,
         "释放落位"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/movement-event-type> .
+
+<https://w3id.org/ontology-platform/steel/code/ndt-acceptance-class/A> a skos:Concept ;
+    rdfs:label "Bar ultrasonic class A"@en,
+        "棒材超声 A 级"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Designates the conditions identified as class A in the cited edition for bar ultrasonic inspection."@en,
+        "表示该次棒材超声交验采用所引版次中标作 A 的判读条件。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/ndt-acceptance-class> ;
+    skos:notation "A"^^stl:NdtAcceptanceClassCode ;
+    skos:prefLabel "Bar ultrasonic class A"@en,
+        "棒材超声 A 级"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/ndt-acceptance-class> .
+
+<https://w3id.org/ontology-platform/steel/code/ndt-acceptance-class/B> a skos:Concept ;
+    rdfs:label "Bar ultrasonic class B"@en,
+        "棒材超声 B 级"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Designates the conditions identified as class B in the cited edition for bar ultrasonic inspection."@en,
+        "表示该次棒材超声交验采用所引版次中标作 B 的判读条件。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/ndt-acceptance-class> ;
+    skos:notation "B"^^stl:NdtAcceptanceClassCode ;
+    skos:prefLabel "Bar ultrasonic class B"@en,
+        "棒材超声 B 级"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/ndt-acceptance-class> .
 
 <https://w3id.org/ontology-platform/steel/code/ndt-method/ET> a skos:Concept ;
     rdfs:label "Eddy current testing"@en,
@@ -6543,19 +7416,6 @@ stl:indicationPosition a owl:DatatypeProperty ;
     skos:prefLabel "Indication position"@en,
         "显示位置"@zh .
 
-stl:inputPiece a owl:ObjectProperty ;
-    rdfs:label "Input piece"@en,
-        "投入件"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iec-62264-2-2026> ;
-    rdfs:domain stl:Operation ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
-    rdfs:range stl:MaterialPiece ;
-    rdfs:subPropertyOf prov:used ;
-    skos:definition "Identifies an actual input piece used by this execution."@en,
-        "列出一次执行实际使用的一件源实物。"@zh ;
-    skos:prefLabel "Input piece"@en,
-        "投入件"@zh .
-
 stl:inspectedPiece a owl:ObjectProperty ;
     rdfs:label "Examined piece"@en,
         "受检实物件"@zh ;
@@ -7057,20 +7917,6 @@ stl:previousSpecification a owl:ObjectProperty ;
     skos:prefLabel "Previous specification"@en,
         "处置前规格"@zh .
 
-stl:producedBy a owl:ObjectProperty ;
-    rdfs:label "Produced by"@en,
-        "产出工序"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:MaterialPiece ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    rdfs:range stl:Operation ;
-    rdfs:subPropertyOf prov:wasGeneratedBy ;
-    owl:inverseOf stl:outputPiece ;
-    skos:definition "Identifies the operation responsible for the birth of the piece under its current identifier."@en,
-        "从新取得身份的件指向直接产出该件的实际作业。"@zh ;
-    skos:prefLabel "Produced by"@en,
-        "产出工序"@zh .
-
 stl:producedOnFurnace a owl:ObjectProperty ;
     rdfs:label "Producing furnace"@en,
         "冶炼炉座"@zh ;
@@ -7280,18 +8126,6 @@ stl:resultForField a owl:ObjectProperty ;
         "指向视场级评级实际评定的那一观察区域。"@zh ;
     skos:prefLabel "Field evaluated"@en,
         "评级所据视场"@zh .
-
-stl:resultOfInspection a owl:ObjectProperty ;
-    rdfs:label "Originating inspection"@en,
-        "结果所属检验"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:InspectionResult ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
-    rdfs:range stl:InspectionActivityRecord ;
-    skos:definition "Identifies the specific inspection that yielded a separately identifiable result."@en,
-        "指向产生某一独立结果的那一次检验记录。"@zh ;
-    skos:prefLabel "Originating inspection"@en,
-        "结果所属检验"@zh .
 
 stl:retainedUntilOn a owl:DatatypeProperty ;
     rdfs:label "Retention end date"@en,
@@ -7694,50 +8528,61 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D80F99D3A7E05397BE0A0AB82A> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-10067-8-2016> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 10067.8-2016" ;
-    dcterms:issued "2016"^^xsd:gYear ;
-    dcterms:title "Basic specifications for electroheat installations—Part 8: Electroslag remelting furnaces"@en,
-        "电热装置基本技术条件 第8部分：电渣重熔炉"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81301D3A7E05397BE0A0AB82A> .
+<https://w3id.org/ontology-platform/steel/std/gbt-1221-2007/grade/06Cr25Ni20> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1221-2007> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "06Cr25Ni20" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1221-2007> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/HEATRES> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-1220-2007> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 1220-2007" ;
-    dcterms:issued "2007"^^xsd:gYear ;
-    dcterms:title "Stainless steel bars"@en,
-        "不锈钢棒"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D7F4DBD3A7E05397BE0A0AB82A> .
+<https://w3id.org/ontology-platform/steel/std/gbt-1221-2007/grade/42Cr9Si2> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1221-2007> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "42Cr9Si2" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1221-2007> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/HEATRES> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-1221-2007> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 1221-2007" ;
-    dcterms:issued "2007"^^xsd:gYear ;
-    dcterms:title "Heat-resistant steel bars"@en,
-        "耐热钢棒"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D767B5D3A7E05397BE0A0AB82A> .
+<https://w3id.org/ontology-platform/steel/std/gbt-1222-2016/grade/60CrMnB> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1222-2016> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "60CrMnB" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1222-2016> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/SPRING> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-1222-2025> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 1222-2025" ;
-    dcterms:issued "2025"^^xsd:gYear ;
-    dcterms:title "Spring steels"@en,
-        "弹簧钢"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=42BA7D06A4F0E936E06397BE0A0ACDC9> .
+<https://w3id.org/ontology-platform/steel/std/gbt-1222-2016/grade/60Si2Mn> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1222-2016> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "60Si2Mn" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1222-2016> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/SPRING> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-1299-2025> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 1299-2025" ;
-    dcterms:issued "2025"^^xsd:gYear ;
-    dcterms:title "Tool and mould steels"@en,
-        "工模具钢"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=TyyZXROMMjw%3D&mode=p> .
+<https://w3id.org/ontology-platform/steel/std/gbt-1222-2016/grade/65Mn> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1222-2016> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "65Mn" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1222-2016> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/SPRING> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-1299-2025/grade/4CrNi4Mo> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1299-2025> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "4CrNi4Mo" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1299-2025> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/TOOLDIE> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-1299-2025/grade/Cr12Mo1V1> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1299-2025> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "Cr12Mo1V1" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1299-2025> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/TOOLDIE> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-1299-2025/grade/Cr12MoV> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1299-2025> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "Cr12MoV" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1299-2025> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/TOOLDIE> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-13241-2017> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -7773,15 +8618,26 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1499-2-2018> ;
     stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/REBAR> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-14992-2025> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 14992-2025" ;
-    dcterms:issued "2025"^^xsd:gYear ;
-    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-14992-2005> ;
-    dcterms:title "Superalloys and intermetallic compounds—Designation and chemical composition"@en,
-        "高温合金和金属间化合物 牌号及化学成分"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA213286400D16E06397BE0A0A8119> .
+<https://w3id.org/ontology-platform/steel/std/gbt-14992-2005/grade/GH4169> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-14992-2005> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "GH4169" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-14992-2005> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/SUPERALLOY> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-14992-2025/grade/GH2130> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-14992-2025> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "GH2130" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-14992-2025> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/SUPERALLOY> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-14992-2025/grade/GH2132> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-14992-2025> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "GH2132" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-14992-2025> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/SUPERALLOY> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-15711-2018> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -7825,24 +8681,26 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=75BDFF36F3E78F0AD38F6D9AD55D0240> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 18254-2016" ;
-    dcterms:issued "2016"^^xsd:gYear ;
-    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-18254-2002> ;
-    dcterms:title "High-carbon chromium bearing steel"@en,
-        "高碳铬轴承钢"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D8111ED3A7E05397BE0A0AB82A> .
+<https://w3id.org/ontology-platform/steel/std/gbt-18254-2016/grade/GCr15> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "GCr15" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/BEARING> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-1979-2025> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 1979-2025" ;
-    dcterms:issued "2025"^^xsd:gYear ;
-    dcterms:title "Evaluation of macrostructural defects in structural steels—Acid etching method and ultrasonic testing method"@en,
-        "结构钢低倍组织缺陷评定 酸浸法和超声检测法"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA2132868B0D16E06397BE0A0A8119> .
+<https://w3id.org/ontology-platform/steel/std/gbt-18254-2016/grade/GCr15SiMn> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "GCr15SiMn" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/BEARING> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-18254-2016/grade/GCr18Mo> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "GCr18Mo" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/BEARING> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-2006-2008> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -7889,6 +8747,20 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=C3386C490CC38B79E05397BE0A0AC288> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-20878-2024/grade/022Cr17Ni12Mo2> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-20878-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "022Cr17Ni12Mo2" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-20878-2024> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/STAINLESS> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-20878-2024/grade/06Cr19Ni10> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-20878-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "06Cr19Ni10" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-20878-2024> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/STAINLESS> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-2102-2022> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 2102-2022" ;
@@ -7915,24 +8787,6 @@ stl:specimenOrientation a owl:DatatypeProperty ;
         "钢的脱碳层深度测定法"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=8AA1F5D36E86A8DBE05397BE0A0AB19B> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-225-2006> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 225-2006" ;
-    dcterms:issued "2006"^^xsd:gYear ;
-    dcterms:title "Steel - Hardenability test by end quenching（Jominy test）"@en,
-        "钢 淬透性的末端淬火试验方法（Jominy 试验）"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=hUuK8utaag0%3D&mode=p> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-226-2015> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 226-2015" ;
-    dcterms:issued "2015"^^xsd:gYear ;
-    dcterms:title "Test method for macrostructure and defect of steel by etching"@en,
-        "钢的低倍组织及缺陷酸蚀检验法"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D809E7D3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-2272-2020> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -8028,14 +8882,19 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=BmnpzqdA4e0%3D&mode=p> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-3077-2015> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 3077-2015" ;
-    dcterms:issued "2015"^^xsd:gYear ;
-    dcterms:title "Alloy structure steels"@en,
-        "合金结构钢"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=LWoKmnMVfLA%3D&mode=p> .
+<https://w3id.org/ontology-platform/steel/std/gbt-3077-2015/grade/40Cr> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-3077-2015> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "40Cr" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-3077-2015> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/ALLOYSTR> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-3077-2015/grade/42CrMo> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-3077-2015> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "42CrMo" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-3077-2015> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/ALLOYSTR> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-3101-1993> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -8177,15 +9036,6 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA213285560D16E06397BE0A0A8119> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-42602-2023> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 42602-2023" ;
-    dcterms:issued "2023"^^xsd:gYear ;
-    dcterms:title "Specification of forging of heavy steel forgings"@en,
-        "大型锻钢件的锻造规范"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=FC816D04FED462EBE05397BE0A0AD5FA> .
-
 <https://w3id.org/ontology-platform/steel/std/gbt-4336-2016> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 4336-2016" ;
@@ -8225,14 +9075,19 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-5213-2019> ;
     stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/COLDLC> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-5216-2014> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 5216-2014" ;
-    dcterms:issued "2014"^^xsd:gYear ;
-    dcterms:title "Structural steel with specified hardenability bands"@en,
-        "保证淬透性结构钢"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D7ED65D3A7E05397BE0A0AB82A> .
+<https://w3id.org/ontology-platform/steel/std/gbt-5216-2014/grade/20CrMoH> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-5216-2014> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "20CrMoH" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-5216-2014> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/GEAR> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-5216-2014/grade/22CrMoH> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-5216-2014> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "22CrMoH" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-5216-2014> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/GEAR> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-5611-2017> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -8290,14 +9145,19 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=027A6096AF8E643EE06397BE0A0A0867> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-699-2015> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 699-2015" ;
-    dcterms:issued "2015"^^xsd:gYear ;
-    dcterms:title "Quality carbon structure steels"@en,
-        "优质碳素结构钢"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=l39338zzV54%3D&mode=p> .
+<https://w3id.org/ontology-platform/steel/std/gbt-699-2015/grade/20> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-699-2015> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "20" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-699-2015> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/QUALITYCS> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-699-2015/grade/45> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-699-2015> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:notation "45" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-699-2015> ;
+    stl:specialProductFamily <https://w3id.org/ontology-platform/steel/code/special-product-family/QUALITYCS> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-700-2006/grade/Q195> a stl:StandardGrade ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-700-2006> ;
@@ -8369,15 +9229,6 @@ stl:specimenOrientation a owl:DatatypeProperty ;
         "输送流体用无缝钢管"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D82D1DD3A7E05397BE0A0AB82A> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-8541-2012> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 8541-2012" ;
-    dcterms:issued "2012"^^xsd:gYear ;
-    dcterms:title "Terminology of forging and stamping"@en,
-        "锻压术语"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=enPXniyMfX0%3D&mode=p> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-9711-2023> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -8673,15 +9524,6 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     dcterms:title "冷轧带材精整与处理生产线 开卷机、卷取机"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F214EDBB19E05397BE0A0AB44A> .
-
-<https://w3id.org/ontology-platform/steel/std/jis-g-0701-1957> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "JIS G 0701:1957" ;
-    dcterms:issued "1957"^^xsd:gYear ;
-    dcterms:title "Symbols of forming ratio for steel forging"@en,
-        "钢材锻造作业中锻造比的表示方法"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://webdesk.jsa.or.jp/books/W11M0090/index/?bunsyo_id=JIS+G+0701%3A1957> .
 
 <https://w3id.org/ontology-platform/steel/std/ybt-153-2015> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -9249,6 +10091,20 @@ stl:DeliveryCondition a owl:Class ;
     skos:prefLabel "Delivery condition"@en,
         "交货状态要求"@zh .
 
+stl:ElectroslagRemelting a owl:Class ;
+    rdfs:label "Electroslag remelting"@en,
+        "电渣重熔"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10067-8-2016> ;
+    rdfs:comment "下沉理由：特冶追溯须能将采用熔渣的重熔道次与真空电弧重熔道次分别标识。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting> ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/process-type/ESR> ;
+    rdfs:subClassOf stl:Remelting ;
+    skos:altLabel "ESR"@en ;
+    skos:definition "A remelting pass in which heat generated by current flowing through molten slag melts the electrode. Metal droplets pass through the slag and solidify into an ingot."@en,
+        "利用电流流经熔渣产生的热量熔化自耗电极，金属熔滴穿过渣层后汇集并凝固成锭的作业。"@zh ;
+    skos:prefLabel "Electroslag remelting"@en,
+        "电渣重熔"@zh .
+
 stl:ExaminationCoverage a owl:Class ;
     rdfs:label "Examination coverage"@en,
         "检测覆盖范围"@zh ;
@@ -9299,6 +10155,18 @@ stl:HotMetalPretreatment a owl:Class ;
     skos:prefLabel "Hot metal pretreatment"@en,
         "铁水预处理"@zh .
 
+stl:InclusionRating a owl:Class ;
+    rdfs:label "Micrographic inclusion rating"@en,
+        "非金属夹杂物显微评级检验"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> ;
+    rdfs:comment "下沉理由：轴承等疲劳敏感用途要求保存类别与系列各自的评级，普钢常规验收无需这一组逐项纯净度证据。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:subClassOf stl:MicroExamination ;
+    skos:definition "A specialty steel microexamination reporting inclusion ratings by morphological category and applicable thickness series."@en,
+        "在特钢交验试样的观察面上按夹杂物形态类别及适用系列评级，可为同一次检验出具多个结果。"@zh ;
+    skos:prefLabel "Micrographic inclusion rating"@en,
+        "非金属夹杂物显微评级检验"@zh .
+
 stl:LiquidSteel a owl:Class ;
     rdfs:label "Liquid steel lot"@en,
         "钢水批"@zh ;
@@ -9333,6 +10201,19 @@ stl:LocalGrinding a owl:Class ;
     skos:prefLabel "Local grinding"@en,
         "局部修磨"@zh .
 
+stl:MacroExamination a owl:Class ;
+    rdfs:label "Macroexamination for ingot product acceptance"@en,
+        "锭材低倍交验"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1979-2025>,
+        <https://w3id.org/ontology-platform/steel/std/gbt-226-2015> ;
+    rdfs:comment "下沉理由：锭材交验须把分项缺陷级别追溯到取料钢锭，普钢连铸坯的低倍检验另有坯样口径。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:subClassOf stl:MetallographicExamination ;
+    skos:definition "Examination of a traceable specialty ingot product section for the individual macrostructural defects specified at acceptance."@en,
+        "在保留锭源的特钢交验试料截面上显现宏观组织，按订货规格分别记录受评缺陷的检验。"@zh ;
+    skos:prefLabel "Macroexamination for ingot product acceptance"@en,
+        "锭材低倍交验"@zh .
+
 stl:MaterialAggregation a owl:Class ;
     rdfs:label "Material aggregation"@en,
         "实物聚合作业"@zh ;
@@ -9365,17 +10246,6 @@ stl:MovementOrder a owl:Class ;
         "为待移实物约定目的地和计划时段的指令。"@zh ;
     skos:prefLabel "Movement order"@en,
         "移库指令"@zh .
-
-stl:NondestructiveTest a owl:Class ;
-    rdfs:label "Nondestructive test"@en,
-        "无损检测"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
-    rdfs:subClassOf stl:InspectionActivityRecord ;
-    skos:definition "An examination record for locating surface or internal discontinuities while preserving the item's usability."@en,
-        "在保留受检件使用能力的条件下查找表面或内部不连续的检测记录。"@zh ;
-    skos:prefLabel "Nondestructive test"@en,
-        "无损检测"@zh .
 
 stl:PersonnelRole a owl:Class ;
     rdfs:label "Personnel role"@en,
@@ -9577,6 +10447,19 @@ stl:allocationOperation a owl:ObjectProperty ;
     skos:prefLabel "Allocation operation"@en,
         "投用执行"@zh .
 
+stl:analysedRemelt a owl:ObjectProperty ;
+    rdfs:label "Remelting stage analysed"@en,
+        "气体分析所据重熔作业"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：逐次重熔气体复核须标明可独立追溯的重熔阶段。"@zh ;
+    rdfs:domain stl:GasContentAnalysis ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:range stl:Remelting ;
+    skos:definition "Identifies the remelting run represented by the analysed sample, distinguishing successive runs within one heat genealogy."@en,
+        "指明供气体复核的试样所代表的那次重熔，使同一炉次多次重熔的结果可区分。"@zh ;
+    skos:prefLabel "Remelting stage analysed"@en,
+        "气体分析所据重熔作业"@zh .
+
 stl:analysisType a owl:ObjectProperty ;
     rdfs:label "Analysis type"@en,
         "分析类型"@zh ;
@@ -9645,6 +10528,19 @@ stl:castOn a owl:ObjectProperty ;
     skos:prefLabel "Cast on"@en,
         "连浇铸机"@zh .
 
+stl:cleanlinessEvidence a owl:ObjectProperty ;
+    rdfs:label "Cleanliness assessment evidence"@en,
+        "纯净度评价依据"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
+    rdfs:comment "下沉理由：特钢纯净度综合交验须能复查组成评价的各项检验结果。"@zh ;
+    rdfs:domain stl:CleanlinessAssessment ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:range stl:InspectionResult ;
+    skos:definition "Identifies an inclusion rating or another measured indicator used as evidence in a cleanliness assessment."@en,
+        "指出纯净度评价实际采用的一项夹杂物评级或其他受控指标的实测结果。"@zh ;
+    skos:prefLabel "Cleanliness assessment evidence"@en,
+        "纯净度评价依据"@zh .
+
 stl:coatingType a owl:ObjectProperty ;
     rdfs:label "Coating type"@en,
         "涂镀层类型"@zh ;
@@ -9685,6 +10581,19 @@ stl:coatingType a owl:ObjectProperty ;
     skos:notation "COLDMILL"^^stl:EquipmentTypeCode ;
     skos:prefLabel "Cold rolling mill"@en,
         "冷轧机"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
+
+<https://w3id.org/ontology-platform/steel/code/equipment-type/ESR> a skos:Concept ;
+    rdfs:label "Electroslag remelting furnace"@en,
+        "电渣重熔炉"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10067-8-2016> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:definition "A furnace using a heated slag bath to melt a consumable electrode and a mould to solidify the metal into an ingot."@en,
+        "利用熔渣发热熔化自耗电极并在结晶器中凝固成锭的设备。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/equipment-type> ;
+    skos:notation "ESR"^^stl:EquipmentTypeCode ;
+    skos:prefLabel "Electroslag remelting furnace"@en,
+        "电渣重熔炉"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
 <https://w3id.org/ontology-platform/steel/code/material-category/DRI> a skos:Concept ;
@@ -9752,6 +10661,19 @@ stl:coatingType a owl:ObjectProperty ;
         "钢"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/material-category> .
 
+<https://w3id.org/ontology-platform/steel/code/melting-route/VIMESR> a skos:Concept ;
+    rdfs:label "Vacuum induction melting followed by electroslag remelting"@en,
+        "真空感应熔炼—电渣重熔"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:altLabel "VIM+ESR"@en ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/melting-route/REMELT> ;
+    skos:definition "The primary vacuum induction melt supplies an electrode for one electroslag remelt."@en,
+        "一次真空感应熔炼后，制备电极并进行一道电渣重熔。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/melting-route> ;
+    skos:notation "VIMESR"^^stl:MeltingRouteCode ;
+    skos:prefLabel "Vacuum induction melting followed by electroslag remelting"@en,
+        "真空感应熔炼—电渣重熔"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/ndt-method/UT> a skos:Concept ;
     rdfs:label "Ultrasonic testing"@en,
         "超声检测"@zh ;
@@ -9792,6 +10714,19 @@ stl:coatingType a owl:ObjectProperty ;
         "涂镀"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
 
+<https://w3id.org/ontology-platform/steel/code/process-type/COG> a skos:Concept ;
+    rdfs:label "Cogging segment"@en,
+        "锻造开坯工序"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/FORGE> ;
+    skos:definition "A forging segment that progressively breaks down an ingot or large blank into stock for further forming."@en,
+        "对锭或大断面坯料逐段锻压，为后续成形准备坯料的锻造段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "COG"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Cogging segment"@en,
+        "锻造开坯工序"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/process-type/COLDROLL> a skos:Concept ;
     rdfs:label "Cold rolling"@en,
         "冷轧"@zh ;
@@ -9830,6 +10765,45 @@ stl:coatingType a owl:ObjectProperty ;
         "检验"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
 
+<https://w3id.org/ontology-platform/steel/code/process-type/PESR> a skos:Concept ;
+    rdfs:label "Protective atmosphere electroslag remelting segment"@en,
+        "保护气氛电渣重熔工序"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/ESR> ;
+    skos:definition "An electroslag remelting segment carried out under a controlled protective atmosphere."@en,
+        "工艺路线中在受控气氛保护下完成电渣重熔的工序段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "PESR"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Protective atmosphere electroslag remelting segment"@en,
+        "保护气氛电渣重熔工序"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/VAR> a skos:Concept ;
+    rdfs:label "Vacuum arc remelting segment"@en,
+        "真空自耗重熔工序"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/REMELT> ;
+    skos:definition "A remelting segment in which an arc melts the electrode under vacuum."@en,
+        "工艺路线中在真空下以电弧熔化电极的重熔段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "VAR"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Vacuum arc remelting segment"@en,
+        "真空自耗重熔工序"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/VIM> a skos:Concept ;
+    rdfs:label "Vacuum induction melting segment"@en,
+        "真空感应熔炼工序"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/STEELMAKE> ;
+    skos:definition "A route segment for primary melting in a vacuum induction furnace."@en,
+        "以真空感应炉完成一次冶炼的工艺路线段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "VIM"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Vacuum induction melting segment"@en,
+        "真空感应熔炼工序"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/product-form/BEAMBLANK> a skos:Concept ;
     rdfs:label "Beam blank"@en,
         "异型坯"@zh ;
@@ -9853,6 +10827,19 @@ stl:coatingType a owl:ObjectProperty ;
     skos:notation "BLOOM"^^stl:ProductFormCode ;
     skos:prefLabel "Bloom"@en,
         "大方坯"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/product-form/FORGING> a skos:Concept ;
+    rdfs:label "Forging form"@en,
+        "锻件形态"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-8541-2012> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:definition "The form of a forged piece that can be transferred individually as a blank or finished product."@en,
+        "以锻造取得可单件交接或继续加工的坯件或成品形状。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/product-form> ;
+    skos:notation "FORGING"^^stl:ProductFormCode ;
+    skos:prefLabel "Forging form"@en,
+        "锻件形态"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
 
 <https://w3id.org/ontology-platform/steel/code/product-form/INGOT> a skos:Concept ;
@@ -9942,18 +10929,6 @@ stl:defectType a owl:ObjectProperty ;
     skos:prefLabel "Defect type"@en,
         "缺陷类型"@zh .
 
-stl:definedIn a owl:ObjectProperty ;
-    rdfs:label "Defined in"@en,
-        "定义版次"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-221-2008> ;
-    rdfs:domain stl:StandardGrade ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/specification> ;
-    rdfs:range stl:StandardEdition ;
-    skos:definition "Identifies the edition within which the grade designation is defined."@en,
-        "指出使该标准牌号名称及其解释有据可查的标准版次。"@zh ;
-    skos:prefLabel "Defined in"@en,
-        "定义版次"@zh .
-
 stl:dispositionType a owl:ObjectProperty ;
     rdfs:label "Disposition type"@en,
         "处置类型"@zh ;
@@ -9978,6 +10953,21 @@ stl:element a owl:ObjectProperty ;
         "指定质量分数结果或限值涉及的元素及其分析口径。"@zh ;
     skos:prefLabel "Element analyte"@en,
         "元素项目"@zh .
+
+stl:forgingRatio a owl:DatatypeProperty ;
+    rdfs:label "Forging ratio"@en,
+        "锻造比"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/jis-g-0701-1957> ;
+    rdfs:comment "下沉理由：特钢锻件需保留作业实记的变形程度，以便按所用锻造方式核查。"@zh ;
+    rdfs:domain stl:Forging ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "A recorded measure of deformation using the dimensional ratio applicable to the operation. For drawing out, the ratio may be expressed as initial area divided by final area."@en,
+        "按本次锻造方式适用的尺寸比口径记录的变形程度，例如拔长可用锻前与锻后截面积之比表示。"@zh ;
+    skos:prefLabel "Forging ratio"@en,
+        "锻造比"@zh ;
+    stl:quantityKind quantitykind:DimensionlessRatio ;
+    stl:unit unit:UNITLESS .
 
 stl:formationDimension a owl:ObjectProperty ;
     rdfs:label "Lot formation dimension"@en,
@@ -10014,6 +11004,47 @@ stl:heatPositionInSequence a owl:DatatypeProperty ;
     skos:prefLabel "Heat position within casting sequence"@en,
         "浇次内炉序"@zh .
 
+stl:inclusionSeries a owl:ObjectProperty ;
+    rdfs:label "Rated inclusion series"@en,
+        "受评夹杂物系列"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> ;
+    rdfs:comment "下沉理由：同类夹杂物的粗、细系列在特钢交验中分别评定。"@zh ;
+    rdfs:domain stl:InclusionRatingResult ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/inclusion-series> ;
+    skos:definition "Identifies the thickness series for a rated morphology when the method distinguishes such series."@en,
+        "在方法细分粗细的形态类别内，标明本结果对应的厚度系列。"@zh ;
+    skos:prefLabel "Rated inclusion series"@en,
+        "受评夹杂物系列"@zh .
+
+stl:ingotPosition a owl:ObjectProperty ;
+    rdfs:label "Tracked ingot position"@en,
+        "追溯锭位"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特钢不合格件需定位到来源钢锭的头、中、尾段。"@zh ;
+    rdfs:domain stl:Ingot ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/ingot-position> ;
+    skos:definition "Identifies an axial zone tracked on an ingot. Source intervals distinguish outputs taken from different zones of the same ingot."@en,
+        "登记钢锭上有来源追踪记录的轴向部位，一锭可涉及多个部位，具体产出由来源区段区分。"@zh ;
+    skos:prefLabel "Tracked ingot position"@en,
+        "追溯锭位"@zh .
+
+stl:inputPiece a owl:ObjectProperty ;
+    rdfs:label "Input piece"@en,
+        "投入件"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iec-62264-2-2026> ;
+    rdfs:domain stl:Operation ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
+    rdfs:range stl:MaterialPiece ;
+    rdfs:subPropertyOf prov:used ;
+    skos:definition "Identifies an actual input piece used by this execution."@en,
+        "列出一次执行实际使用的一件源实物。"@zh ;
+    skos:prefLabel "Input piece"@en,
+        "投入件"@zh .
+
 stl:inspectionDocumentType a owl:ObjectProperty ;
     rdfs:label "Inspection document type"@en,
         "检验文件类型"@zh ;
@@ -10026,6 +11057,20 @@ stl:inspectionDocumentType a owl:ObjectProperty ;
         "给出交货时出具的证明文件所属的检验文件型式。"@zh ;
     skos:prefLabel "Inspection document type"@en,
         "检验文件类型"@zh .
+
+stl:intervalIngotPosition a owl:ObjectProperty ;
+    rdfs:label "Ingot position of source interval"@en,
+        "来源区段锭位"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特钢探伤异议须落实到逐件取材的锭位，仅记录整锭涉及的部位无法区分同锭产出。"@zh ;
+    rdfs:domain stl:SourceInterval ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/ingot-position> ;
+    skos:definition "Identifies the ingot zone of the interval allocated to a particular output piece."@en,
+        "标记某一产出实际占用的锭体区段，使多件同锭的交验记录仍可逐件回查。"@zh ;
+    skos:prefLabel "Ingot position of source interval"@en,
+        "来源区段锭位"@zh .
 
 stl:materialCategory a owl:ObjectProperty ;
     rdfs:label "Material category"@en,
@@ -10086,6 +11131,20 @@ stl:movedPiece a owl:ObjectProperty ;
     skos:prefLabel "Moved piece"@en,
         "移动实物"@zh .
 
+stl:ndtAcceptanceClass a owl:ObjectProperty ;
+    rdfs:label "Bar inspection acceptance class"@en,
+        "棒材探伤验收等级"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-4162-2022> ;
+    rdfs:comment "下沉理由：特钢锻轧棒材按订单指定等级逐支探伤，普钢检验无须承担该棒材方法的分级口径。"@zh ;
+    rdfs:domain stl:NondestructiveTest ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/ndt-acceptance-class> ;
+    skos:definition "Identifies the acceptance class used to interpret indications in an ultrasonic examination of forged or rolled bars."@en,
+        "指出本次锻轧棒材超声检验据以判读显示的验收级别，实际判定记在质量判定记录上。"@zh ;
+    skos:prefLabel "Bar inspection acceptance class"@en,
+        "棒材探伤验收等级"@zh .
+
 stl:ndtMethod a owl:ObjectProperty ;
     rdfs:label "Nondestructive method"@en,
         "无损检测方法"@zh ;
@@ -10098,18 +11157,6 @@ stl:ndtMethod a owl:ObjectProperty ;
         "标识检查工件内部或表面时采用的无损检测方法。"@zh ;
     skos:prefLabel "Nondestructive method"@en,
         "无损检测方法"@zh .
-
-stl:outputPiece a owl:ObjectProperty ;
-    rdfs:label "Output piece"@en,
-        "产出件"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iec-62264-2-2026> ;
-    rdfs:domain stl:Operation ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
-    rdfs:range stl:MaterialPiece ;
-    skos:definition "Identifies a piece given its own output identity by this execution."@en,
-        "列出因本次执行而获得独立身份的一件产出物。"@zh ;
-    skos:prefLabel "Output piece"@en,
-        "产出件"@zh .
 
 stl:performedOn a owl:ObjectProperty ;
     rdfs:label "Performed on"@en,
@@ -10160,6 +11207,20 @@ stl:processedHeat a owl:ObjectProperty ;
         "指明一次工序实际处理的炉次，使冶炼、精炼和浇注实绩可按钢水身份串联。"@zh ;
     skos:prefLabel "Processed heat"@en,
         "处理炉次"@zh .
+
+stl:producedBy a owl:ObjectProperty ;
+    rdfs:label "Produced by"@en,
+        "产出工序"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:MaterialPiece ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    rdfs:range stl:Operation ;
+    rdfs:subPropertyOf prov:wasGeneratedBy ;
+    owl:inverseOf stl:outputPiece ;
+    skos:definition "Identifies the operation responsible for the birth of the piece under its current identifier."@en,
+        "从新取得身份的件指向直接产出该件的实际作业。"@zh ;
+    skos:prefLabel "Produced by"@en,
+        "产出工序"@zh .
 
 stl:rebarNominalDiameter a owl:DatatypeProperty ;
     rdfs:label "Nominal rebar diameter"@en,
@@ -10221,14 +11282,14 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://www.dinmedia.de/de/norm/din-en-10079/93163915> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-11261-2006> a stl:StandardEdition ;
+<https://w3id.org/ontology-platform/steel/std/gbt-1220-2007> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 11261-2006" ;
-    dcterms:issued "2006"^^xsd:gYear ;
-    dcterms:title "Steel and iron Determination of oxygen content The pulse heating inert gas fusion-infra-red absorption method"@en,
-        "钢铁 氧含量的测定 脉冲加热惰气熔融-红外线吸收法"@zh ;
+    dcterms:identifier "GB/T 1220-2007" ;
+    dcterms:issued "2007"^^xsd:gYear ;
+    dcterms:title "Stainless steel bars"@en,
+        "不锈钢棒"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=OzPD%2B7jzD2U%3D&mode=p> .
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D7F4DBD3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-1499-1-2017> a stl:StandardEdition ;
     dcterms:description "废止"@zh ;
@@ -10238,15 +11299,6 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
         "钢筋混凝土用钢 第1部分：热轧光圆钢筋"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D828B7D3A7E05397BE0A0AB82A> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-14992-2005> a stl:StandardEdition ;
-    dcterms:description "废止"@zh ;
-    dcterms:identifier "GB/T 14992-2005" ;
-    dcterms:issued "2005"^^xsd:gYear ;
-    dcterms:title "Classification and designation for superalloys and high temperature intermetallic materials"@en,
-        "高温合金和金属间化合物高温材料的分类和牌号"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=ofmER4fK6Kw%3D&mode=p> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-17616-2013> a stl:StandardEdition ;
     dcterms:description "废止"@zh ;
@@ -10285,15 +11337,6 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=28045D84DA459055E06397BE0A0A7C5C> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-20124-2006> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 20124-2006" ;
-    dcterms:issued "2006"^^xsd:gYear ;
-    dcterms:title "Steel and iron -- Determination of nitrogen content -- Thermal conductimetric method after fusion in a current of inert gas (Routine method)"@en,
-        "钢铁 氮含量的测定 惰性气体熔融热导法（常规方法）"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7FEADD3A7E05397BE0A0AB82A> .
-
 <https://w3id.org/ontology-platform/steel/std/gbt-20878-2007> a stl:StandardEdition ;
     dcterms:description "废止"@zh ;
     dcterms:identifier "GB/T 20878-2007" ;
@@ -10321,15 +11364,6 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA213285530D16E06397BE0A0A8119> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-223-82-2018> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 223.82-2018" ;
-    dcterms:issued "2018"^^xsd:gYear ;
-    dcterms:title "Steel and iron—Determination of hydrogen content—Thermal conductivity/infrared method after fusion under inert gas"@en,
-        "钢铁 氢含量的测定 惰性气体熔融-热导或红外法"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D82B6FD3A7E05397BE0A0AB82A> .
-
 <https://w3id.org/ontology-platform/steel/std/gbt-223-85-2009> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 223.85-2009" ;
@@ -10347,6 +11381,24 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
         "钢铁及合金 总碳含量的测定 感应炉燃烧后红外吸收法"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7D6E6D3A7E05397BE0A0AB82A> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-225-2006> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 225-2006" ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:title "Steel - Hardenability test by end quenching（Jominy test）"@en,
+        "钢 淬透性的末端淬火试验方法（Jominy 试验）"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=hUuK8utaag0%3D&mode=p> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-226-2015> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 226-2015" ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:title "Test method for macrostructure and defect of steel by etching"@en,
+        "钢的低倍组织及缺陷酸蚀检验法"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D809E7D3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-228-2-2015> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -10428,6 +11480,15 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
         "钢板卷道路运输捆绑固定要求"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=aX%2FtBa9GxdI%3D&mode=p> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-42602-2023> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 42602-2023" ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:title "Specification of forging of heavy steel forgings"@en,
+        "大型锻钢件的锻造规范"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=FC816D04FED462EBE05397BE0A0AD5FA> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-4340-1-2024> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -10663,16 +11724,17 @@ stl:Billet a owl:Class ;
     skos:prefLabel "Billet"@en,
         "小钢坯"@zh .
 
-stl:ChemicalAnalysis a owl:Class ;
-    rdfs:label "Chemical analysis"@en,
-        "化学分析"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/isots-6084-2022> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
-    rdfs:subClassOf stl:InspectionActivityRecord ;
-    skos:definition "An analysis grouping element determinations for a sample under one stated analytical purpose."@en,
-        "按同一用途对所取样品报告一组元素测定值的分析记录。"@zh ;
-    skos:prefLabel "Chemical analysis"@en,
-        "化学分析"@zh .
+stl:CleanlinessAssessment a owl:Class ;
+    rdfs:label "Specialty steel cleanliness assessment"@en,
+        "特钢纯净度综合评价"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
+    rdfs:comment "下沉理由：轴承等疲劳敏感产品需要按规格把夹杂物评级与其他证据汇合出证，普钢常规化学分析仅逐项报告元素结果。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:subClassOf stl:InspectionResult ;
+    skos:definition "An assessment combining the inclusion ratings of one acceptance subject with other inspection results required by its cleanliness specification."@en,
+        "将一个交验对象的分项夹杂物评级与规格所需的其他检验结果汇集为可追溯的纯净度评价。"@zh ;
+    skos:prefLabel "Specialty steel cleanliness assessment"@en,
+        "特钢纯净度综合评价"@zh .
 
 stl:Coal a owl:Class ;
     rdfs:label "Coal lot"@en,
@@ -10741,6 +11803,20 @@ stl:ElementResult a owl:Class ;
         "元素结果"@zh ;
     skos:scopeNote "Use partOf to identify the analysis, and element and massFraction to record one analyte and its mass percentage."@en,
         "用 partOf 关联本次化学分析，用 element 和 massFraction 记录一项元素及其质量百分数。"@zh .
+
+stl:GasContentAnalysis a owl:Class ;
+    rdfs:label "Gas content analysis at a remelting stage"@en,
+        "特冶重熔阶段气体分析"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-11261-2006>,
+        <https://w3id.org/ontology-platform/steel/std/gbt-20124-2006>,
+        <https://w3id.org/ontology-platform/steel/std/gbt-223-82-2018> ;
+    rdfs:comment "下沉理由：特冶逐锭验收须区分同一初炼炉次在各次重熔后的气体分析结果。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:subClassOf stl:ChemicalAnalysis ;
+    skos:definition "An analysis of oxygen, nitrogen or hydrogen in material sampled at an identified remelting stage, providing per-element results for ingot cleanliness review."@en,
+        "测定指定重熔阶段试样的氧、氮或氢含量，保留重熔实绩与分元素结果，供逐锭纯净度复核。"@zh ;
+    skos:prefLabel "Gas content analysis at a remelting stage"@en,
+        "特冶重熔阶段气体分析"@zh .
 
 stl:HardnessTest a owl:Class ;
     rdfs:label "Hardness test"@en,
@@ -10820,6 +11896,17 @@ stl:MeasurementPoint a owl:Class ;
     skos:scopeNote "Use partOf to identify the equipment on which the point is located."@en,
         "用 partOf 关联布设测点的设备。"@zh .
 
+stl:MetallographicExamination a owl:Class ;
+    rdfs:label "Metallographic examination"@en,
+        "金相检验"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-13298-2015> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
+    rdfs:subClassOf stl:InspectionActivityRecord ;
+    skos:definition "An examination documenting material structure on a prepared surface with traceable fields or ratings."@en,
+        "通过观察制备表面，记录材料组织特征、相应视场或评级结果的检验。"@zh ;
+    skos:prefLabel "Metallographic examination"@en,
+        "金相检验"@zh .
+
 stl:MetallographicField a owl:Class ;
     rdfs:label "Metallographic field"@en,
         "金相视场"@zh ;
@@ -10830,6 +11917,29 @@ stl:MetallographicField a owl:Class ;
         "在试样观察面上按位置和放大倍数界定并单独登记的观察区域。"@zh ;
     skos:prefLabel "Metallographic field"@en,
         "金相视场"@zh .
+
+stl:MicroExamination a owl:Class ;
+    rdfs:label "Microexamination for specialty steel acceptance"@en,
+        "特钢显微组织交验"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
+    rdfs:comment "下沉理由：轴承钢等产品的显微交验按夹杂物系列或碳化物形态分项出证，普钢金相观察沿用通用金相检验类。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:subClassOf stl:MetallographicExamination ;
+    skos:definition "Examination of a traceable specimen surface for the particular microscopic features specified for acceptance of a specialty steel product."@en,
+        "依照特钢产品规格，在可追溯试料的观察面上对指定显微特征作分项交验的检验。"@zh ;
+    skos:prefLabel "Microexamination for specialty steel acceptance"@en,
+        "特钢显微组织交验"@zh .
+
+stl:NondestructiveTest a owl:Class ;
+    rdfs:label "Nondestructive test"@en,
+        "无损检测"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
+    rdfs:subClassOf stl:InspectionActivityRecord ;
+    skos:definition "An examination record for locating surface or internal discontinuities while preserving the item's usability."@en,
+        "在保留受检件使用能力的条件下查找表面或内部不连续的检测记录。"@zh ;
+    skos:prefLabel "Nondestructive test"@en,
+        "无损检测"@zh .
 
 stl:Package a owl:Class ;
     rdfs:label "Package"@en,
@@ -10997,6 +12107,18 @@ stl:castingSpeed a owl:DatatypeProperty ;
     stl:quantityKind quantitykind:LinearVelocity ;
     stl:unit unit:M-PER-MIN .
 
+<https://w3id.org/ontology-platform/steel/code/defect-type/FORGED> a skos:Concept ;
+    rdfs:label "Forging defects"@en,
+        "锻件缺陷"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Groups flaws characterized by forging flow, forging geometry or internal integrity."@en,
+        "归集与锻压流动、锻件轮廓或锻件内部完整性有关的缺陷。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/defect-type> ;
+    skos:notation "FORGED"^^stl:DefectTypeCode ;
+    skos:prefLabel "Forging defects"@en,
+        "锻件缺陷"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/defect-type> .
+
 <https://w3id.org/ontology-platform/steel/code/equipment-type/PELLET> a skos:Concept ;
     rdfs:label "Pelletizing equipment"@en,
         "球团设备"@zh ;
@@ -11023,18 +12145,43 @@ stl:castingSpeed a owl:DatatypeProperty ;
         "焊管机组"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
-<https://w3id.org/ontology-platform/steel/code/process-type/STEELMAKE> a skos:Concept ;
-    rdfs:label "Primary steelmaking"@en,
-        "炼钢"@zh ;
+<https://w3id.org/ontology-platform/steel/code/melting-route/DIRECT> a skos:Concept ;
+    rdfs:label "Routes without remelting"@en,
+        "不含重熔路线"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:definition "Groups routes in which primary steel is cast with or without secondary refining and undergoes no consumable electrode remelt."@en,
+        "归集一次冶炼后直接浇铸或经炉外精炼再浇铸、后续未进行自耗重熔的路线。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/melting-route> ;
+    skos:notation "DIRECT"^^stl:MeltingRouteCode ;
+    skos:prefLabel "Routes without remelting"@en,
+        "不含重熔路线"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/melting-route> .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/ESR> a skos:Concept ;
+    rdfs:label "Electroslag remelting segment"@en,
+        "电渣重熔工序"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/steelmaking-codes> ;
-    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> ;
-    skos:definition "A route segment in which metallic feed is made into a heat of molten steel."@en,
-        "将金属炉料冶炼为一炉钢水的路线工序段。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/REMELT> ;
+    skos:definition "A remelting segment using resistive heating in a slag bath to melt the electrode."@en,
+        "工艺路线中利用熔渣电阻热熔化自耗电极的重熔段。"@zh ;
     skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
-    skos:notation "STEELMAKE"^^stl:ProcessTypeCode ;
-    skos:prefLabel "Primary steelmaking"@en,
-        "炼钢"@zh .
+    skos:notation "ESR"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Electroslag remelting segment"@en,
+        "电渣重熔工序"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/FORGE> a skos:Concept ;
+    rdfs:label "Forging segment"@en,
+        "锻造工序"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-8541-2012> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> ;
+    skos:definition "A route segment that shapes steel stock by plastic deformation under forging loads."@en,
+        "以锻压使钢料发生塑性变形的工艺路线段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "FORGE"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Forging segment"@en,
+        "锻造工序"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/product-form/ROUNDBIL> a skos:Concept ;
     rdfs:label "Round billet"@en,
@@ -11060,6 +12207,71 @@ stl:castingSpeed a owl:DatatypeProperty ;
     skos:prefLabel "Tube or pipe"@en,
         "管材"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/special-product-family/ALLOYSTR> a skos:Concept ;
+    rdfs:label "Alloy structural steel"@en,
+        "合金结构钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-3077-2015> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:definition "Alloy steels selected for the strength, toughness or hardenability required by structural components."@en,
+        "通过合金化获得结构件所需强度、韧性或淬透性的钢材系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/special-product-family> ;
+    skos:notation "ALLOYSTR"^^stl:SpecialProductFamilyCode ;
+    skos:prefLabel "Alloy structural steel"@en,
+        "合金结构钢"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/special-product-family> .
+
+<https://w3id.org/ontology-platform/steel/code/special-product-family/GEAR> a skos:Concept ;
+    rdfs:label "Gear steel"@en,
+        "齿轮钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:definition "Steels selected for gears with regard to flank wear resistance and load capacity at the tooth root."@en,
+        "按齿轮服役条件选用的钢材系列，选材时考虑齿面耐磨性与齿根承载能力。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/special-product-family> ;
+    skos:notation "GEAR"^^stl:SpecialProductFamilyCode ;
+    skos:prefLabel "Gear steel"@en,
+        "齿轮钢"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/special-product-family> .
+
+<https://w3id.org/ontology-platform/steel/code/special-product-family/HEATRES> a skos:Concept ;
+    rdfs:label "Heat-resistant steel"@en,
+        "耐热钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1221-2007> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:definition "Steels selected for elevated-temperature strength or oxidation resistance in hot-service components."@en,
+        "供高温部件按高温强度或抗氧化性能选用的钢材系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/special-product-family> ;
+    skos:notation "HEATRES"^^stl:SpecialProductFamilyCode ;
+    skos:prefLabel "Heat-resistant steel"@en,
+        "耐热钢"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/special-product-family> .
+
+<https://w3id.org/ontology-platform/steel/code/special-product-family/QUALITYCS> a skos:Concept ;
+    rdfs:label "Quality carbon structural steel"@en,
+        "优质碳素结构钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-699-2015> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:definition "Carbon steels supplied by quality carbon structural steel grade for mechanical components."@en,
+        "以优质碳素结构钢牌号供货、用于制造机械结构零件的碳钢系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/special-product-family> ;
+    skos:notation "QUALITYCS"^^stl:SpecialProductFamilyCode ;
+    skos:prefLabel "Quality carbon structural steel"@en,
+        "优质碳素结构钢"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/special-product-family> .
+
+<https://w3id.org/ontology-platform/steel/code/special-product-family/STAINLESS> a skos:Concept ;
+    rdfs:label "Stainless steel"@en,
+        "不锈钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1220-2007> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:definition "Stainless grades selected for resistance to corrosion in the intended environment."@en,
+        "以在指定介质中耐腐蚀为主要选材依据的不锈钢系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/special-product-family> ;
+    skos:notation "STAINLESS"^^stl:SpecialProductFamilyCode ;
+    skos:prefLabel "Stainless steel"@en,
+        "不锈钢"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/special-product-family> .
 
 <https://w3id.org/ontology-platform/steel/code/weld-method/SAW> a skos:Concept ;
     rdfs:label "Submerged arc welding"@en,
@@ -11096,18 +12308,17 @@ stl:createdAt a owl:DatatypeProperty ;
     skos:prefLabel "Created at"@en,
         "创建时刻"@zh .
 
-stl:derivedFrom a owl:ObjectProperty ;
-    rdfs:label "Derived from"@en,
-        "直接来源物料"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:domain stl:Material ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    rdfs:range stl:Material ;
-    rdfs:subPropertyOf prov:wasDerivedFrom ;
-    skos:definition "Identifies one immediate source lot or piece from which the current material was split, combined or transformed."@en,
-        "指向经一步分取、合并或加工形成当前物料的直接来源批或件。"@zh ;
-    skos:prefLabel "Derived from"@en,
-        "直接来源物料"@zh .
+stl:definedIn a owl:ObjectProperty ;
+    rdfs:label "Defined in"@en,
+        "定义版次"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-221-2008> ;
+    rdfs:domain stl:StandardGrade ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/specification> ;
+    rdfs:range stl:StandardEdition ;
+    skos:definition "Identifies the edition within which the grade designation is defined."@en,
+        "指出使该标准牌号名称及其解释有据可查的标准版次。"@zh ;
+    skos:prefLabel "Defined in"@en,
+        "定义版次"@zh .
 
 stl:equipmentType a owl:ObjectProperty ;
     rdfs:label "Equipment type"@en,
@@ -11134,6 +12345,35 @@ stl:evidenceLevel a owl:ObjectProperty ;
         "指明认定一个直接来源份额所采用的证据类别。"@zh ;
     skos:prefLabel "Contribution evidence level"@en,
         "来源证据等级"@zh .
+
+stl:finalCrossSectionArea a owl:DatatypeProperty ;
+    rdfs:label "Final cross-sectional area"@en,
+        "锻后截面积"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/jis-g-0701-1957> ;
+    rdfs:comment "下沉理由：特钢锻造履历可保留与锻前截面配对、用于核查变形程度的终了截面。"@zh ;
+    rdfs:domain stl:Forging ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The cross-sectional area after this forging operation, recorded in square millimetres on the same measurement basis as the initial section."@en,
+        "作业结束时，与锻前截面采用相同核算口径的锻料截面积，以平方毫米记录。"@zh ;
+    skos:prefLabel "Final cross-sectional area"@en,
+        "锻后截面积"@zh ;
+    stl:quantityKind quantitykind:Area ;
+    stl:unit unit:MilliM2 .
+
+stl:forgingMethod a owl:ObjectProperty ;
+    rdfs:label "Forging method"@en,
+        "锻造方法"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-8541-2012> ;
+    rdfs:comment "下沉理由：特钢锻造履历需能区分自由锻、径锻和模锻等作业方法。"@zh ;
+    rdfs:domain stl:Forging ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/forging-method> ;
+    skos:definition "Identifies the principal forming method used in a forging operation for retrieval in the history of its output pieces."@en,
+        "指明一次锻造作业采用的主要成形方法，供按作业查询锻件的加工履历。"@zh ;
+    skos:prefLabel "Forging method"@en,
+        "锻造方法"@zh .
 
 stl:grossMass a owl:DatatypeProperty ;
     rdfs:label "Gross mass"@en,
@@ -11162,6 +12402,35 @@ stl:heatTreatmentMethod a owl:ObjectProperty ;
         "用热处理工艺代码标明作业实际采用的方法，或装炉批所经历的方法。"@zh ;
     skos:prefLabel "Heat treatment method"@en,
         "热处理方法"@zh .
+
+stl:inclusionType a owl:ObjectProperty ;
+    rdfs:label "Rated inclusion category"@en,
+        "受评夹杂物类别"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> ;
+    rdfs:comment "下沉理由：特钢纯净度验收分别核对各形态类别的评级。"@zh ;
+    rdfs:domain stl:InclusionRatingResult ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/inclusion-type> ;
+    skos:definition "Identifies the inclusion morphology for which this level was reported."@en,
+        "标明本条评级观察到的夹杂物形态类别，决定应选用的分类标尺。"@zh ;
+    skos:prefLabel "Rated inclusion category"@en,
+        "受评夹杂物类别"@zh .
+
+stl:initialCrossSectionArea a owl:DatatypeProperty ;
+    rdfs:label "Initial cross-sectional area"@en,
+        "锻前截面积"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/jis-g-0701-1957> ;
+    rdfs:comment "下沉理由：特钢锻造履历可保留计算本次锻造比时采用的初始截面。"@zh ;
+    rdfs:domain stl:Forging ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The cross-sectional area of the stock before this forging operation, recorded in square millimetres for checking deformation."@en,
+        "作业开始时用于核算本次锻造变形的坯料截面积，以平方毫米记录。"@zh ;
+    skos:prefLabel "Initial cross-sectional area"@en,
+        "锻前截面积"@zh ;
+    stl:quantityKind quantitykind:Area ;
+    stl:unit unit:MilliM2 .
 
 stl:isConfirmed a owl:DatatypeProperty ;
     rdfs:label "Movement confirmed"@en,
@@ -11269,6 +12538,18 @@ stl:numberingHeat a owl:ObjectProperty ;
     skos:prefLabel "Numbering heat"@en,
         "编号炉次"@zh .
 
+stl:outputPiece a owl:ObjectProperty ;
+    rdfs:label "Output piece"@en,
+        "产出件"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iec-62264-2-2026> ;
+    rdfs:domain stl:Operation ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/manufacturing> ;
+    rdfs:range stl:MaterialPiece ;
+    skos:definition "Identifies a piece given its own output identity by this execution."@en,
+        "列出因本次执行而获得独立身份的一件产出物。"@zh ;
+    skos:prefLabel "Output piece"@en,
+        "产出件"@zh .
+
 stl:plainProductFamily a owl:ObjectProperty ;
     rdfs:label "Commodity steel ordering family"@en,
         "普钢订货产品族"@zh ;
@@ -11282,6 +12563,20 @@ stl:plainProductFamily a owl:ObjectProperty ;
         "指明该版次牌号可用于哪些普钢产品族，一种结构钢牌号可适用于多类交货产品。"@zh ;
     skos:prefLabel "Commodity steel ordering family"@en,
         "普钢订货产品族"@zh .
+
+stl:ratedMacroDefect a owl:ObjectProperty ;
+    rdfs:label "Rated macrodefect"@en,
+        "受评低倍缺陷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1979-2025> ;
+    rdfs:comment "下沉理由：锭材低倍交验按缺陷类别逐项对照特钢规格。"@zh ;
+    rdfs:domain stl:MacroDefectRating ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/macro-defect-type> ;
+    skos:definition "Identifies the discontinuity graded by a single macrostructural rating on an ingot product section."@en,
+        "指出一条锭材低倍评级针对的组织缺陷，使同一试料上的不同评级可分别判读。"@zh ;
+    skos:prefLabel "Rated macrodefect"@en,
+        "受评低倍缺陷"@zh .
 
 stl:rebarLotAssessmentBasis a owl:ObjectProperty ;
     rdfs:label "Rebar lot assessment basis"@en,
@@ -11336,6 +12631,44 @@ stl:refiningMethod a owl:ObjectProperty ;
     skos:prefLabel "Refining method"@en,
         "炉外精炼方法"@zh .
 
+stl:remeltNumber a owl:DatatypeProperty ;
+    rdfs:label "Remelt number"@en,
+        "重熔炉号"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特冶需分别检索一次冶炼炉次、各道重熔的炉号以及逐锭件号。"@zh ;
+    rdfs:domain stl:Remelting ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting> ;
+    rdfs:range xsd:string ;
+    skos:definition "The business identifier assigned to a remelting run so the run can be retrieved from its output ingots."@en,
+        "生产记录分配给一次重熔作业的业务编号，用于从产出锭回查该次炉作业。"@zh ;
+    skos:prefLabel "Remelt number"@en,
+        "重熔炉号"@zh .
+
+stl:remeltSequence a owl:DatatypeProperty ;
+    rdfs:label "Remelt sequence number"@en,
+        "重熔道次"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特冶材料可能先后经历多次重熔，须能按冶金顺序区分各道作业。"@zh ;
+    rdfs:domain stl:Remelting ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting> ;
+    rdfs:range xsd:positiveInteger ;
+    skos:definition "The ordinal of this remelting operation in the material lineage, counted from one at the first remelt after primary melting."@en,
+        "沿该件物料的冶炼链，自一次冶炼之后按先后为重熔作业编排的序号，第一次重熔记为一。"@zh ;
+    skos:prefLabel "Remelt sequence number"@en,
+        "重熔道次"@zh .
+
+stl:resultOfInspection a owl:ObjectProperty ;
+    rdfs:label "Originating inspection"@en,
+        "结果所属检验"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:InspectionResult ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
+    rdfs:range stl:InspectionActivityRecord ;
+    skos:definition "Identifies the specific inspection that yielded a separately identifiable result."@en,
+        "指向产生某一独立结果的那一次检验记录。"@zh ;
+    skos:prefLabel "Originating inspection"@en,
+        "结果所属检验"@zh .
+
 stl:sampleOf a owl:ObjectProperty ;
     rdfs:label "Sample of"@en,
         "取样对象"@zh ;
@@ -11360,6 +12693,29 @@ stl:shareBasis a owl:ObjectProperty ;
     skos:prefLabel "Share basis"@en,
         "份额基准"@zh .
 
+stl:specialProductFamily a owl:ObjectProperty ;
+    rdfs:label "Special steel product family"@en,
+        "特钢产品族"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特钢订货同时按材料系列和零件用途选牌号，例如保证淬透性的结构钢牌号可用于齿轮。"@zh ;
+    rdfs:domain stl:StandardGrade ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/special-product-family> ;
+    skos:definition "Identifies a special steel or superalloy product family under which an edition-specific grade may be ordered. A grade may serve several families."@en,
+        "指出特定标准版次中的牌号可按哪个特钢或高温合金产品系列订货。同一牌号可用于多个系列。"@zh ;
+    skos:prefLabel "Special steel product family"@en,
+        "特钢产品族"@zh .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-10067-8-2016> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 10067.8-2016" ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:title "Basic specifications for electroheat installations—Part 8: Electroslag remelting furnaces"@en,
+        "电热装置基本技术条件 第8部分：电渣重熔炉"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81301D3A7E05397BE0A0AB82A> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-10623-2008> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 10623-2008" ;
@@ -11369,6 +12725,15 @@ stl:shareBasis a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D76CF8D3A7E05397BE0A0AB82A> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-11261-2006> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 11261-2006" ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:title "Steel and iron Determination of oxygen content The pulse heating inert gas fusion-infra-red absorption method"@en,
+        "钢铁 氧含量的测定 脉冲加热惰气熔融-红外线吸收法"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=OzPD%2B7jzD2U%3D&mode=p> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-11263-2024> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 11263-2024" ;
@@ -11377,6 +12742,15 @@ stl:shareBasis a owl:ObjectProperty ;
         "热轧H型钢和剖分T型钢"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=25940C3CEEF98A9AE06397BE0A0A525A> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-1222-2025> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 1222-2025" ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:title "Spring steels"@en,
+        "弹簧钢"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=42BA7D06A4F0E936E06397BE0A0ACDC9> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-12603-2005> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -11414,6 +12788,15 @@ stl:shareBasis a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81F6CD3A7E05397BE0A0AB82A> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-20124-2006> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 20124-2006" ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:title "Steel and iron -- Determination of nitrogen content -- Thermal conductimetric method after fusion in a current of inert gas (Routine method)"@en,
+        "钢铁 氮含量的测定 惰性气体熔融热导法（常规方法）"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7FEADD3A7E05397BE0A0AB82A> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-20566-2006> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 20566-2006" ;
@@ -11450,6 +12833,15 @@ stl:shareBasis a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D75B53D3A7E05397BE0A0AB82A> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-223-82-2018> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 223.82-2018" ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:title "Steel and iron—Determination of hydrogen content—Thermal conductivity/infrared method after fusion under inert gas"@en,
+        "钢铁 氢含量的测定 惰性气体熔融-热导或红外法"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D82B6FD3A7E05397BE0A0AB82A> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-232-2024> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 232-2024" ;
@@ -11485,15 +12877,6 @@ stl:shareBasis a owl:ObjectProperty ;
         "焦炭反应性及反应后强度试验方法"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81FE3D3A7E05397BE0A0AB82A> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-4162-2022> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 4162-2022" ;
-    dcterms:issued "2022"^^xsd:gYear ;
-    dcterms:title "Method for ultrasonic testing of forged and rolled steel bars"@en,
-        "锻轧钢棒超声检测方法"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=DD3D95E5C0BA71EBE05397BE0A0AF33F> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-4223-2017> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -11684,6 +13067,17 @@ stl:ChargeComponent a owl:Class ;
         "装料明细"@zh ;
     skos:scopeNote "用 allocatedLot、allocationOperation 和 consumedQuantity 对应取料批次、执行和实投质量。工序的 consumedLot 直接指向物料批。"@zh .
 
+stl:ChemicalAnalysis a owl:Class ;
+    rdfs:label "Chemical analysis"@en,
+        "化学分析"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/isots-6084-2022> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
+    rdfs:subClassOf stl:InspectionActivityRecord ;
+    skos:definition "An analysis grouping element determinations for a sample under one stated analytical purpose."@en,
+        "按同一用途对所取样品报告一组元素测定值的分析记录。"@zh ;
+    skos:prefLabel "Chemical analysis"@en,
+        "化学分析"@zh .
+
 stl:CuttingPlan a owl:Class ;
     rdfs:label "Cutting plan"@en,
         "切割计划"@zh ;
@@ -11694,6 +13088,19 @@ stl:CuttingPlan a owl:Class ;
         "在开切前指定拟切件的切序和目标长度的计划，实际完成的切割可引用它。"@zh ;
     skos:prefLabel "Cutting plan"@en,
         "切割计划"@zh .
+
+stl:Electrode a owl:Class ;
+    rdfs:label "Consumable remelting electrode"@en,
+        "重熔自耗电极"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特冶须在来源锭和本次重熔锭之间保留实际投入电极的实物身份。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:altLabel "自耗电极"@zh ;
+    skos:definition "An individually tracked electrode prepared from ingot stock and consumed as metal feed for a new ingot during remelting."@en,
+        "由来源锭制备、以独立件号投入重熔作业并向新锭供应金属的电极。"@zh ;
+    skos:prefLabel "Consumable remelting electrode"@en,
+        "重熔自耗电极"@zh .
 
 stl:HollowShell a owl:Class ;
     rdfs:label "Hollow shell"@en,
@@ -11719,17 +13126,6 @@ stl:HotRolling a owl:Class ;
         "在钢的热加工温度范围内轧制坯料，可产出板带、棒线材或型钢。"@zh ;
     skos:prefLabel "Hot rolling"@en,
         "热轧"@zh .
-
-stl:Ingot a owl:Class ;
-    rdfs:label "Steel ingot"@en,
-        "钢锭"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
-    rdfs:subClassOf stl:SemiFinishedProduct ;
-    skos:definition "A discrete body of solidified steel tracked as one ingot, with its production method identified by its generating operation."@en,
-        "钢液凝固成一个可单独交接的锭体，锭的具体生产方法由产出作业记录。"@zh ;
-    skos:prefLabel "Steel ingot"@en,
-        "钢锭"@zh .
 
 stl:InspectionLot a owl:Class ;
     rdfs:label "Inspection lot"@en,
@@ -11763,6 +13159,18 @@ stl:IronOre a owl:Class ;
         "以可还原铁矿物供铁的物料批，可为天然矿、选矿产物，或以矿粉为主料制成的人造块矿。"@zh ;
     skos:prefLabel "Iron ore lot"@en,
         "铁矿料批"@zh .
+
+stl:MacroDefectRating a owl:Class ;
+    rdfs:label "Ingot product macrodefect rating"@en,
+        "锭材低倍缺陷评级结果"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1979-2025> ;
+    rdfs:comment "下沉理由：锭材验收须将分项评级与取自特定锭的截面配对，普钢坯样的评级方案独立。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:subClassOf stl:RatingResult ;
+    skos:definition "A level assigned to one defect category on a section in an ingot product macroexamination."@en,
+        "在一项锭材低倍交验中对一个缺陷类别给出的级别，同一截面可分别报告多类缺陷。"@zh ;
+    skos:prefLabel "Ingot product macrodefect rating"@en,
+        "锭材低倍缺陷评级结果"@zh .
 
 stl:MillCertificate a owl:Class ;
     rdfs:label "Mill certificate"@en,
@@ -11823,6 +13231,18 @@ stl:Refining a owl:Class ;
         "出钢后在钢包或专用容器中对炉次钢水实施的处理，可调整其成分、温度、溶解气体或夹杂物状态。"@zh ;
     skos:prefLabel "Secondary refining"@en,
         "炉外精炼"@zh .
+
+stl:RemeltedIngot a owl:Class ;
+    rdfs:label "Remelted ingot"@en,
+        "重熔锭"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特冶须逐锭注明所走的冶炼路线，并把锭关联至直接供料的电极。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting> ;
+    rdfs:subClassOf stl:Ingot ;
+    skos:definition "An individually identified ingot solidified in one consumable electrode remelting pass, available as stock for another electrode or for forging."@en,
+        "自耗电极经一道重熔后凝固形成、有独立件号并可继续加工为下一道电极或锻坯的锭。"@zh ;
+    skos:prefLabel "Remelted ingot"@en,
+        "重熔锭"@zh .
 
 stl:Rolling a owl:Class ;
     rdfs:label "Rolling"@en,
@@ -11908,6 +13328,32 @@ stl:Tapping a owl:Class ;
         "低合金高强度结构钢"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/plain-product-family> .
 
+<https://w3id.org/ontology-platform/steel/code/process-type/REMELT> a skos:Concept ;
+    rdfs:label "Remelting segment"@en,
+        "重熔工序"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> ;
+    skos:definition "A route segment producing a new ingot by melting and resolidifying a consumable electrode."@en,
+        "以自耗电极为金属来源、经再熔凝形成新锭的工艺路线段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "REMELT"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Remelting segment"@en,
+        "重熔工序"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/process-type/STEELMAKE> a skos:Concept ;
+    rdfs:label "Primary steelmaking"@en,
+        "炼钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/steelmaking-codes> ;
+    skos:broader <https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> ;
+    skos:definition "A route segment in which metallic feed is made into a heat of molten steel."@en,
+        "将金属炉料冶炼为一炉钢水的路线工序段。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "STEELMAKE"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Primary steelmaking"@en,
+        "炼钢"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/product-form/COIL> a skos:Concept ;
     rdfs:label "Steel coil"@en,
         "钢卷"@zh ;
@@ -11919,6 +13365,58 @@ stl:Tapping a owl:Class ;
     skos:prefLabel "Steel coil"@en,
         "钢卷"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/product-form> .
+
+<https://w3id.org/ontology-platform/steel/code/special-product-family/BEARING> a skos:Concept ;
+    rdfs:label "Bearing steel"@en,
+        "轴承钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:definition "Steels for bearing rings, rolling elements and other components subject to cyclic contact stress."@en,
+        "用于制造滚动轴承套圈、滚动体等承受循环接触应力零件的钢材系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/special-product-family> ;
+    skos:notation "BEARING"^^stl:SpecialProductFamilyCode ;
+    skos:prefLabel "Bearing steel"@en,
+        "轴承钢"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/special-product-family> .
+
+<https://w3id.org/ontology-platform/steel/code/special-product-family/SPRING> a skos:Concept ;
+    rdfs:label "Spring steel"@en,
+        "弹簧钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1222-2025> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:definition "Steels for spring elements that undergo repeated elastic deformation under load."@en,
+        "用于制造在反复载荷下依靠弹性变形工作的弹簧元件的钢材系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/special-product-family> ;
+    skos:notation "SPRING"^^stl:SpecialProductFamilyCode ;
+    skos:prefLabel "Spring steel"@en,
+        "弹簧钢"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/special-product-family> .
+
+<https://w3id.org/ontology-platform/steel/code/special-product-family/SUPERALLOY> a skos:Concept ;
+    rdfs:label "Superalloy"@en,
+        "高温合金"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-14992-2025> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:definition "Alloys selected for strength and environmental resistance in load-bearing hot components, including nickel-base superalloys."@en,
+        "供高温承载部件按高温强度和环境耐受能力选用的合金系列，包括镍基高温合金。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/special-product-family> ;
+    skos:notation "SUPERALLOY"^^stl:SpecialProductFamilyCode ;
+    skos:prefLabel "Superalloy"@en,
+        "高温合金"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/special-product-family> .
+
+<https://w3id.org/ontology-platform/steel/code/special-product-family/TOOLDIE> a skos:Concept ;
+    rdfs:label "Tool and die steel"@en,
+        "工模具钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1299-2025> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:definition "Steels for cutting tools, gauges or forming dies, selected for the performance of the cutting edge or working surface."@en,
+        "供刃具、量具或成形模具选材的钢材系列，使用时关注刃口或工作面的性能。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/special-product-family> ;
+    skos:notation "TOOLDIE"^^stl:SpecialProductFamilyCode ;
+    skos:prefLabel "Tool and die steel"@en,
+        "工模具钢"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/special-product-family> .
 
 <https://w3id.org/ontology-platform/steel/code/test-type/HARDNESS> a skos:Concept ;
     rdfs:label "Hardness test"@en,
@@ -11955,6 +13453,20 @@ stl:contributionOutput a owl:ObjectProperty ;
         "标识一条来源份额明细所解释的产出件或产出批。"@zh ;
     skos:prefLabel "Output receiving contribution"@en,
         "贡献对应产出"@zh .
+
+stl:meltingRoute a owl:ObjectProperty ;
+    rdfs:label "Melting route"@en,
+        "冶炼路线"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特钢追溯需按实物件区分含重熔和直接成材路线，以判断应追查的来源环节。"@zh ;
+    rdfs:domain stl:MaterialPiece ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/melting-route> ;
+    skos:definition "Identifies the coded sequence of melting and refining stages for a piece, including remelted ingots, their downstream products and pieces made by a direct route."@en,
+        "关联描述该件物料冶炼历程的具体路线代码，可在重熔锭、后续加工件或直接成材的特钢实物件上记录。"@zh ;
+    skos:prefLabel "Melting route"@en,
+        "冶炼路线"@zh .
 
 stl:partOf a owl:ObjectProperty ;
     rdfs:label "Part of"@en,
@@ -12083,6 +13595,15 @@ stl:startLength a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D82C58D3A7E05397BE0A0AB82A> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-14992-2005> a stl:StandardEdition ;
+    dcterms:description "废止"@zh ;
+    dcterms:identifier "GB/T 14992-2005" ;
+    dcterms:issued "2005"^^xsd:gYear ;
+    dcterms:title "Classification and designation for superalloys and high temperature intermetallic materials"@en,
+        "高温合金和金属间化合物高温材料的分类和牌号"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=ofmER4fK6Kw%3D&mode=p> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-15574-2016> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 15574-2016" ;
@@ -12110,16 +13631,6 @@ stl:startLength a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=ERTJ0NLXoBg%3D&mode=p> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-20878-2024> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 20878-2024" ;
-    dcterms:issued "2024"^^xsd:gYear ;
-    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-20878-2007> ;
-    dcterms:title "Stainless steels—Designation and chemical composition"@en,
-        "不锈钢 牌号及化学成分"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=1E5A13A77F7ABC8DE06397BE0A0A87E8> .
-
 <https://w3id.org/ontology-platform/steel/std/gbt-247-2025> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 247-2025" ;
@@ -12128,6 +13639,15 @@ stl:startLength a owl:DatatypeProperty ;
         "钢板和钢带包装、标志及质量证明书的一般要求"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=3B46A026CCD6469CE06397BE0A0AEEB8> .
+
+<https://w3id.org/ontology-platform/steel/std/jis-g-0701-1957> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "JIS G 0701:1957" ;
+    dcterms:issued "1957"^^xsd:gYear ;
+    dcterms:title "Symbols of forming ratio for steel forging"@en,
+        "钢材锻造作业中锻造比的表示方法"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://webdesk.jsa.or.jp/books/W11M0090/index/?bunsyo_id=JIS+G+0701%3A1957> .
 
 <https://w3id.org/ontology-platform/steel/std/ybt-421-2014> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -12233,17 +13753,6 @@ stl:LotAllocation a owl:Class ;
     skos:prefLabel "Lot allocation"@en,
         "批料投用记录"@zh .
 
-stl:RatingResult a owl:Class ;
-    rdfs:label "Rating result"@en,
-        "评级结果"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
-    rdfs:subClassOf stl:InspectionResult ;
-    skos:definition "A grade assigned to one or more observations on an identified scale under a stated method."@en,
-        "在指定标尺和方法下对一次观察或一组观察给出的等级。"@zh ;
-    skos:prefLabel "Rating result"@en,
-        "评级结果"@zh .
-
 stl:RouteStep a owl:Class ;
     rdfs:label "Route step"@en,
         "路线步骤"@zh ;
@@ -12254,17 +13763,6 @@ stl:RouteStep a owl:Class ;
         "某工艺段在一条路线中的一次占位，同段可在不同顺位重复出现。"@zh ;
     skos:prefLabel "Route step"@en,
         "路线步骤"@zh .
-
-stl:SourceInterval a owl:Class ;
-    rdfs:label "Source interval"@en,
-        "来源区段"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    rdfs:subClassOf stl:ManufacturingRecord ;
-    skos:definition "A record locating the material of one output along a specified immediate source piece."@en,
-        "在一个产出与一个来源件之间按来源件坐标界定材料取自何处的记录。"@zh ;
-    skos:prefLabel "Source interval"@en,
-        "来源区段"@zh .
 
 stl:SteelTube a owl:Class ;
     rdfs:label "Steel tube"@en,
@@ -12340,6 +13838,19 @@ stl:actualStartAt a owl:DatatypeProperty ;
         "焊管"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/plain-product-family> .
 
+stl:derivedFrom a owl:ObjectProperty ;
+    rdfs:label "Derived from"@en,
+        "直接来源物料"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:domain stl:Material ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    rdfs:range stl:Material ;
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    skos:definition "Identifies one immediate source lot or piece from which the current material was split, combined or transformed."@en,
+        "指向经一步分取、合并或加工形成当前物料的直接来源批或件。"@zh ;
+    skos:prefLabel "Derived from"@en,
+        "直接来源物料"@zh .
+
 stl:endLength a owl:DatatypeProperty ;
     rdfs:label "End along source coil"@en,
         "母卷区段终点"@zh ;
@@ -12376,15 +13887,6 @@ stl:measurementItem a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=027A6096AF72643EE06397BE0A0A0867> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 10561-2023" ;
-    dcterms:issued "2023"^^xsd:gYear ;
-    dcterms:title "Determination of content of nonmetallic inclusions in steel—Micrographic method using standard diagrams"@en,
-        "钢中非金属夹杂物含量的测定 标准评级图显微检验法"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=FC816D05008B62EBE05397BE0A0AD5FA> .
-
 <https://w3id.org/ontology-platform/steel/std/gbt-13304-2-2008> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 13304.2-2008" ;
@@ -12412,6 +13914,15 @@ stl:measurementItem a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3SDoo8yHFRo%3D&mode=p> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-5216-2014> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 5216-2014" ;
+    dcterms:issued "2014"^^xsd:gYear ;
+    dcterms:title "Structural steel with specified hardenability bands"@en,
+        "保证淬透性结构钢"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D7ED65D3A7E05397BE0A0AB82A> .
+
 <https://w3id.org/ontology-platform/steel/std/isots-6084-2022> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "ISO/TS 6084:2022" ;
@@ -12429,16 +13940,17 @@ stl:measurementItem a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/hb/search/stdHBDetailed?id=B783196B1952A04CE05397BE0A0A5803> .
 
-stl:InspectionResult a owl:Class ;
-    rdfs:label "Inspection result"@en,
-        "检验结果"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
-    rdfs:subClassOf stl:ManufacturingRecord ;
-    skos:definition "A reading, rating or finding that can be cited separately from the inspection record that produced it."@en,
-        "检验后可脱离原记录而单独引用的一项读数、评级或文字结论。"@zh ;
-    skos:prefLabel "Inspection result"@en,
-        "检验结果"@zh .
+stl:InclusionRatingResult a owl:Class ;
+    rdfs:label "Inclusion rating by category"@en,
+        "分项夹杂物评级结果"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> ;
+    rdfs:comment "下沉理由：逐项记录使轴承钢等产品能按订货要求分别核对各类夹杂物的最不利评级。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
+    rdfs:subClassOf stl:RatingResult ;
+    skos:definition "A reported level for one morphological category and, where applicable, one thickness series in an inclusion examination."@en,
+        "在一次显微评级中针对一种夹杂物形态类别、在适用时针对一个粗细系列报告的级别。"@zh ;
+    skos:prefLabel "Inclusion rating by category"@en,
+        "分项夹杂物评级结果"@zh .
 
 stl:PropertyRequirement a owl:Class ;
     rdfs:label "Property requirement"@en,
@@ -12475,16 +13987,16 @@ stl:Shipment a owl:Class ;
     skos:prefLabel "Shipment"@en,
         "发运单"@zh .
 
-stl:Steelmaking a owl:Class ;
-    rdfs:label "Steelmaking operation"@en,
-        "炼钢执行"@zh ;
+stl:SourceInterval a owl:Class ;
+    rdfs:label "Source interval"@en,
+        "来源区段"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/steelmaking> ;
-    rdfs:subClassOf stl:Operation ;
-    skos:definition "An operation that converts metallic feed into a heat of steel, linking the charged lots to the heat identified at tapping."@en,
-        "将金属炉料冶炼成一炉钢水的作业，其取料按投入批次追踪，出钢时确立炉次身份。"@zh ;
-    skos:prefLabel "Steelmaking operation"@en,
-        "炼钢执行"@zh .
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    skos:definition "A record locating the material of one output along a specified immediate source piece."@en,
+        "在一个产出与一个来源件之间按来源件坐标界定材料取自何处的记录。"@zh ;
+    skos:prefLabel "Source interval"@en,
+        "来源区段"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/plain-product-family/SECTION> a skos:Concept ;
     rdfs:label "Rolled structural sections"@en,
@@ -12525,6 +14037,15 @@ stl:occurredAt a owl:DatatypeProperty ;
     skos:prefLabel "Occurred at"@en,
         "发生时刻"@zh .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-1221-2007> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 1221-2007" ;
+    dcterms:issued "2007"^^xsd:gYear ;
+    dcterms:title "Heat-resistant steel bars"@en,
+        "耐热钢棒"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D767B5D3A7E05397BE0A0AB82A> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-13298-2015> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 13298-2015" ;
@@ -12534,6 +14055,25 @@ stl:occurredAt a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D80A02D3A7E05397BE0A0AB82A> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-14992-2025> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 14992-2025" ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-14992-2005> ;
+    dcterms:title "Superalloys and intermetallic compounds—Designation and chemical composition"@en,
+        "高温合金和金属间化合物 牌号及化学成分"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA213286400D16E06397BE0A0A8119> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-1979-2025> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 1979-2025" ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:title "Evaluation of macrostructural defects in structural steels—Acid etching method and ultrasonic testing method"@en,
+        "结构钢低倍组织缺陷评定 酸浸法和超声检测法"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA2132868B0D16E06397BE0A0A8119> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-229-2020> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 229-2020" ;
@@ -12542,6 +14082,33 @@ stl:occurredAt a owl:DatatypeProperty ;
         "金属材料 夏比摆锤冲击试验方法"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=B13990C15C6C5DDAE05397BE0A0A0D35> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-3077-2015> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 3077-2015" ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:title "Alloy structure steels"@en,
+        "合金结构钢"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=LWoKmnMVfLA%3D&mode=p> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-4162-2022> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 4162-2022" ;
+    dcterms:issued "2022"^^xsd:gYear ;
+    dcterms:title "Method for ultrasonic testing of forged and rolled steel bars"@en,
+        "锻轧钢棒超声检测方法"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=DD3D95E5C0BA71EBE05397BE0A0AF33F> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-699-2015> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 699-2015" ;
+    dcterms:issued "2015"^^xsd:gYear ;
+    dcterms:title "Quality carbon structure steels"@en,
+        "优质碳素结构钢"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=l39338zzV54%3D&mode=p> .
 
 <https://w3id.org/ontology-platform/steel/std/iso-4529-2023> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -12577,6 +14144,17 @@ stl:Coil a owl:Class ;
     skos:prefLabel "Steel coil"@en,
         "钢卷"@zh .
 
+stl:Ingot a owl:Class ;
+    rdfs:label "Steel ingot"@en,
+        "钢锭"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/casting> ;
+    rdfs:subClassOf stl:SemiFinishedProduct ;
+    skos:definition "A discrete body of solidified steel tracked as one ingot, with its production method identified by its generating operation."@en,
+        "钢液凝固成一个可单独交接的锭体，锭的具体生产方法由产出作业记录。"@zh ;
+    skos:prefLabel "Steel ingot"@en,
+        "钢锭"@zh .
+
 stl:MaterialTransformation a owl:Class ;
     rdfs:label "Material transformation"@en,
         "物料转换作业"@zh ;
@@ -12587,6 +14165,28 @@ stl:MaterialTransformation a owl:Class ;
         "消耗或改变投入物料并产生可区分产出物料的一次作业。"@zh ;
     skos:prefLabel "Material transformation"@en,
         "物料转换作业"@zh .
+
+stl:RatingResult a owl:Class ;
+    rdfs:label "Rating result"@en,
+        "评级结果"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
+    rdfs:subClassOf stl:InspectionResult ;
+    skos:definition "A grade assigned to one or more observations on an identified scale under a stated method."@en,
+        "在指定标尺和方法下对一次观察或一组观察给出的等级。"@zh ;
+    skos:prefLabel "Rating result"@en,
+        "评级结果"@zh .
+
+stl:Steelmaking a owl:Class ;
+    rdfs:label "Steelmaking operation"@en,
+        "炼钢执行"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/steelmaking> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation that converts metallic feed into a heat of steel, linking the charged lots to the heat identified at tapping."@en,
+        "将金属炉料冶炼成一炉钢水的作业，其取料按投入批次追踪，出钢时确立炉次身份。"@zh ;
+    skos:prefLabel "Steelmaking operation"@en,
+        "炼钢执行"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> a skos:ConceptScheme ;
     rdfs:label "Delivery bundle mass basis"@en,
@@ -12599,6 +14199,28 @@ stl:MaterialTransformation a owl:Class ;
     skos:prefLabel "Delivery bundle mass basis"@en,
         "交货捆计重方式"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/inclusion-series> a skos:ConceptScheme ;
+    rdfs:label "Inclusion thickness series"@en,
+        "夹杂物粗细系列"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> ;
+    rdfs:comment "下沉理由：特钢夹杂物逐类交验时须保留粗细系列，才能匹配同系列的订货要求。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Series distinguishing transverse size within a rated inclusion category."@en,
+        "对同一夹杂物类别按其横向尺寸分别使用的评级系列。"@zh ;
+    skos:prefLabel "Inclusion thickness series"@en,
+        "夹杂物粗细系列"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/macro-defect-type> a skos:ConceptScheme ;
+    rdfs:label "Rated ingot product macrodefect"@en,
+        "锭材低倍受评缺陷类别"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1979-2025> ;
+    rdfs:comment "下沉理由：特钢锭材交验需把各项低倍缺陷的观察结果对应到规定的评级项目。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Distinguishes features graded separately on a macrostructural section from an ingot product."@en,
+        "区分锭材低倍截面上需分别给出级别的组织缺陷。"@zh ;
+    skos:prefLabel "Rated ingot product macrodefect"@en,
+        "锭材低倍受评缺陷类别"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/measurement-method> a skos:ConceptScheme ;
     rdfs:label "measurement acquisition method"@en,
         "采集方式"@zh ;
@@ -12608,6 +14230,29 @@ stl:MaterialTransformation a owl:Class ;
         "标识现场观测的读数经人或设备取得的方式。"@zh ;
     skos:prefLabel "measurement acquisition method"@en,
         "采集方式"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/melting-route/REMELT> a skos:Concept ;
+    rdfs:label "Routes with remelting"@en,
+        "含重熔路线"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:definition "Groups routes with at least one consumable electrode remelting pass after primary melting."@en,
+        "归集一次冶炼后又经过一道或多道自耗电极重熔的路线。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/melting-route> ;
+    skos:notation "REMELT"^^stl:MeltingRouteCode ;
+    skos:prefLabel "Routes with remelting"@en,
+        "含重熔路线"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/melting-route> .
+
+<https://w3id.org/ontology-platform/steel/code/ndt-acceptance-class> a skos:ConceptScheme ;
+    rdfs:label "Ultrasonic acceptance class for wrought bars"@en,
+        "锻轧棒材超声验收等级"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-4162-2022> ;
+    rdfs:comment "下沉理由：特钢棒材逐支交验要记录指定验收级别，与通用的探伤方法和判定结论分别查询。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Distinguishes the acceptance classes used to evaluate indications under an identified bar test method and edition."@en,
+        "按所引棒材检测方法和版次区分用来判读显示的等级。"@zh ;
+    skos:prefLabel "Ultrasonic acceptance class for wrought bars"@en,
+        "锻轧棒材超声验收等级"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/plain-product-family/REBAR> a skos:Concept ;
     rdfs:label "Reinforcing bar"@en,
@@ -12676,6 +14321,16 @@ stl:MaterialTransformation a owl:Class ;
     skos:prefLabel "Shipment transport mode"@en,
         "发运运输方式"@zh .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-1222-2016> a stl:StandardEdition ;
+    dcterms:description "废止"@zh ;
+    dcterms:identifier "GB/T 1222-2016" ;
+    dcterms:isReplacedBy <https://w3id.org/ontology-platform/steel/std/gbt-1222-2025> ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:title "Spring steels"@en,
+        "弹簧钢"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D8170BD3A7E05397BE0A0AB82A> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-20066-2006> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 20066-2006" ;
@@ -12684,6 +14339,28 @@ stl:MaterialTransformation a owl:Class ;
         "钢和铁 化学成分测定用试样的取样和制样方法"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=6jxSfPicV3E%3D&mode=p> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-8541-2012> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 8541-2012" ;
+    dcterms:issued "2012"^^xsd:gYear ;
+    dcterms:title "Terminology of forging and stamping"@en,
+        "锻压术语"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=enPXniyMfX0%3D&mode=p> .
+
+stl:Forging a owl:Class ;
+    rdfs:label "Forging operation"@en,
+        "锻造作业"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-8541-2012> ;
+    rdfs:comment "下沉理由：特钢锻件的制造记录须能逐次查到所用的锻造方法和锻造比。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging> ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/process-type/FORGE> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "An operation in which hammer blows or applied pressure plastically deform solid steel stock to produce a forged blank or forging."@en,
+        "用锤击或施压使固态钢料发生塑性变形、制得锻坯或锻件的一次作业。"@zh ;
+    skos:prefLabel "Forging operation"@en,
+        "锻造作业"@zh .
 
 stl:MovementEvent a owl:Class ;
     rdfs:label "Movement event"@en,
@@ -12709,6 +14386,25 @@ stl:SteelGrade a owl:Class ;
     skos:prefLabel "Internal steel grade"@en,
         "内部钢种"@zh .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-1299-2025> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 1299-2025" ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:title "Tool and mould steels"@en,
+        "工模具钢"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=TyyZXROMMjw%3D&mode=p> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-20878-2024> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 20878-2024" ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-20878-2007> ;
+    dcterms:title "Stainless steels—Designation and chemical composition"@en,
+        "不锈钢 牌号及化学成分"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=1E5A13A77F7ABC8DE06397BE0A0A87E8> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-5213-2019> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 5213-2019" ;
@@ -12717,6 +14413,17 @@ stl:SteelGrade a owl:Class ;
         "冷轧低碳钢板及钢带"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=Lb63thr9SCE%3D&mode=p> .
+
+stl:InspectionResult a owl:Class ;
+    rdfs:label "Inspection result"@en,
+        "检验结果"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    skos:definition "A reading, rating or finding that can be cited separately from the inspection record that produced it."@en,
+        "检验后可脱离原记录而单独引用的一项读数、评级或文字结论。"@zh ;
+    skos:prefLabel "Inspection result"@en,
+        "检验结果"@zh .
 
 stl:Location a owl:Class ;
     rdfs:label "Location"@en,
@@ -12900,6 +14607,17 @@ stl:Slab a owl:Class ;
     skos:prefLabel "Slab"@en,
         "板坯"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/ingot-position> a skos:ConceptScheme ;
+    rdfs:label "Axial position on an ingot"@en,
+        "钢锭轴向部位"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：追查特钢锻材的探伤异常时，要区分来自同一锭体的不同轴向部位。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Locates material along the original ingot axis as established at casting or solidification, retaining that orientation after working."@en,
+        "按浇注或凝固时确定的锭体轴向划分来源部位，后续翻转或锻造仍沿用原锭方向。"@zh ;
+    skos:prefLabel "Axial position on an ingot"@en,
+        "钢锭轴向部位"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/personnel-role> a skos:ConceptScheme ;
     rdfs:label "Personnel role"@en,
         "人员角色"@zh ;
@@ -12941,17 +14659,6 @@ stl:ContinuouslyCastPiece a owl:Class ;
     skos:prefLabel "Continuously cast piece"@en,
         "连铸坯"@zh ;
     skos:scopeNote "连铸路线与坯形可同时标注，例如一件实物同时属于连铸坯与板坯。初轧所得坯件只按其坯形归类。"@zh .
-
-stl:MechanicalTest a owl:Class ;
-    rdfs:label "Mechanical test"@en,
-        "力学试验"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10623-2008> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
-    rdfs:subClassOf stl:InspectionActivityRecord ;
-    skos:definition "A record of a method-specific test of the mechanical response of a specimen."@en,
-        "在指定试样上按确定方法取得力学响应的试验记录。"@zh ;
-    skos:prefLabel "Mechanical test"@en,
-        "力学试验"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/inspection-document-type> a skos:ConceptScheme ;
     rdfs:label "inspection document type"@en,
@@ -13067,6 +14774,17 @@ stl:MaterialSpecification a owl:Class ;
     skos:prefLabel "Material specification"@en,
         "物料规格"@zh .
 
+stl:MechanicalTest a owl:Class ;
+    rdfs:label "Mechanical test"@en,
+        "力学试验"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10623-2008> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
+    rdfs:subClassOf stl:InspectionActivityRecord ;
+    skos:definition "A record of a method-specific test of the mechanical response of a specimen."@en,
+        "在指定试样上按确定方法取得力学响应的试验记录。"@zh ;
+    skos:prefLabel "Mechanical test"@en,
+        "力学试验"@zh .
+
 stl:Sample a owl:Class ;
     rdfs:label "Sample"@en,
         "样品"@zh ;
@@ -13089,6 +14807,16 @@ stl:Sample a owl:Class ;
         "列出组建检验批时可要求成员相同的特征，每条组批规则选用其中适用的维度。"@zh ;
     skos:prefLabel "Lot formation dimension"@en,
         "组批维度"@zh .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 18254-2016" ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-18254-2002> ;
+    dcterms:title "High-carbon chromium bearing steel"@en,
+        "高碳铬轴承钢"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D8111ED3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-700-2006> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -13124,6 +14852,19 @@ stl:QualityDisposition a owl:Class ;
     skos:scopeNote "Downgrading, reassignment and concession retain their own conditions and refer to the same material identity before and after the action."@en,
         "降级、改判和让步接收各自保留适用条件，处置前后沿用同一实物身份。"@zh .
 
+stl:Remelting a owl:Class ;
+    rdfs:label "Remelting operation"@en,
+        "重熔作业"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特冶的多次熔炼须逐次标识重熔炉号和道次，并追溯该次产出的新锭。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting> ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/process-type/REMELT> ;
+    rdfs:subClassOf stl:Operation ;
+    skos:definition "One pass in a melting route in which metal from one or more consumable electrodes is melted and solidified into a new ingot."@en,
+        "将一件或多件自耗电极重新熔化并凝固成新锭的一次作业，在冶炼链中占一个重熔道次。"@zh ;
+    skos:prefLabel "Remelting operation"@en,
+        "重熔作业"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/coating-type> a skos:ConceptScheme ;
     rdfs:label "Coating type"@en,
         "涂镀层类型"@zh ;
@@ -13134,6 +14875,48 @@ stl:QualityDisposition a owl:Class ;
         "按覆层材料区分钢材表面的金属镀层和有机涂层，并在需要时区分热浸、电沉积等成层方式。"@zh ;
     skos:prefLabel "Coating type"@en,
         "涂镀层类型"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/forging-method> a skos:ConceptScheme ;
+    rdfs:label "Forging method"@en,
+        "锻造方法"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-8541-2012> ;
+    rdfs:comment "下沉理由：特钢锻造作业的逐件履历须能按所记锻造方法查回锻造比。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/forging-codes> ;
+    skos:definition "Identifies the principal forging method by tooling, mode of force application or forming objective."@en,
+        "按作业实际采用的工具、施力方式或成形目的标识主要锻造方法。"@zh ;
+    skos:prefLabel "Forging method"@en,
+        "锻造方法"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/inclusion-type> a skos:ConceptScheme ;
+    rdfs:label "Inclusion morphology category"@en,
+        "夹杂物形态类别"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> ;
+    rdfs:comment "下沉理由：疲劳敏感特钢交验分别报告各类夹杂物级别。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
+    skos:definition "Groups micrographic ratings by the appearance of inclusions on a polished section. The morphology is assigned optically."@en,
+        "按金相观察面上夹杂物的形态对显微评级分组，类别名称不代表逐粒作过化学鉴定。"@zh ;
+    skos:prefLabel "Inclusion morphology category"@en,
+        "夹杂物形态类别"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/melting-route> a skos:ConceptScheme ;
+    rdfs:label "Melting route"@en,
+        "冶炼路线"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：特钢的实物追溯须按有无重熔及各次重熔的次序区别同一牌号的冶炼履历。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting-codes> ;
+    skos:definition "Classifies actual sequences of primary melting, secondary refining and remelting according to whether they include a consumable electrode remelt."@en,
+        "按一次冶炼、炉外精炼和各道重熔的实际先后标识路线，以是否含自耗重熔分组。"@zh ;
+    skos:prefLabel "Melting route"@en,
+        "冶炼路线"@zh .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-10561-2023> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 10561-2023" ;
+    dcterms:issued "2023"^^xsd:gYear ;
+    dcterms:title "Determination of content of nonmetallic inclusions in steel—Micrographic method using standard diagrams"@en,
+        "钢中非金属夹杂物含量的测定 标准评级图显微检验法"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=FC816D05008B62EBE05397BE0A0AD5FA> .
 
 stl:Material a owl:Class ;
     rdfs:label "Material"@en,
@@ -13157,18 +14940,6 @@ stl:Event a owl:Class ;
         "在生产或交付履历中能够按实际发生时间定位的一次业务事实。"@zh ;
     skos:prefLabel "Event"@en,
         "事件"@zh .
-
-<https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> a skos:Concept ;
-    rdfs:label "Material transformation"@en,
-        "物料转换"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Work that consumes or alters input material to produce separately identifiable output material."@en,
-        "以一项或多项物料为投入，产生可独立识别的新物料的作业类型。"@zh ;
-    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
-    skos:notation "TRANSFORM"^^stl:ProcessTypeCode ;
-    skos:prefLabel "Material transformation"@en,
-        "物料转换"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
 
 <https://w3id.org/ontology-platform/steel/code/refining-method> a skos:ConceptScheme ;
     rdfs:label "Secondary refining method"@en,
@@ -13266,6 +15037,18 @@ stl:Observation a owl:Class ;
     skos:prefLabel "Commodity steel product family"@en,
         "普钢产品族"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/process-type/TRANSFORM> a skos:Concept ;
+    rdfs:label "Material transformation"@en,
+        "物料转换"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Work that consumes or alters input material to produce separately identifiable output material."@en,
+        "以一项或多项物料为投入，产生可独立识别的新物料的作业类型。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/process-type> ;
+    skos:notation "TRANSFORM"^^stl:ProcessTypeCode ;
+    skos:prefLabel "Material transformation"@en,
+        "物料转换"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/process-type> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 7232-2023" ;
@@ -13274,16 +15057,6 @@ stl:Observation a owl:Class ;
         "金属热处理 术语"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=027A6096AEE6643EE06397BE0A0A0867> .
-
-<https://w3id.org/ontology-platform/steel/code/defect-type> a skos:ConceptScheme ;
-    rdfs:label "defect type"@en,
-        "缺陷类型"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Classifies observed flaws and groups product-specific defects by the form of material inspected."@en,
-        "按观察到的异常给缺陷分类，产品分组用于归集依赖产品形态的缺陷。"@zh ;
-    skos:prefLabel "defect type"@en,
-        "缺陷类型"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/ndt-method> a skos:ConceptScheme ;
     rdfs:label "Nondestructive testing method"@en,
@@ -13314,6 +15087,16 @@ stl:Observation a owl:Class ;
     skos:prefLabel "sample type"@en,
         "样品类型"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/defect-type> a skos:ConceptScheme ;
+    rdfs:label "defect type"@en,
+        "缺陷类型"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Classifies observed flaws and groups product-specific defects by the form of material inspected."@en,
+        "按观察到的异常给缺陷分类，产品分组用于归集依赖产品形态的缺陷。"@zh ;
+    skos:prefLabel "defect type"@en,
+        "缺陷类型"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/test-type> a skos:ConceptScheme ;
     rdfs:label "Test type"@en,
         "试验类型"@zh ;
@@ -13333,6 +15116,17 @@ stl:Observation a owl:Class ;
         "标识一次观测、在线测量或试验结果所量取的具体指标。"@zh ;
     skos:prefLabel "measurement item"@en,
         "测量项"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/special-product-family> a skos:ConceptScheme ;
+    rdfs:label "Special steel product family"@en,
+        "特钢产品族"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：齿轮、轴承、工模具和高温部件等订货用途与特钢及特冶材料系列交叉，需在本层表达其选材关系。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/products-codes> ;
+    skos:definition "Groups special steel and superalloy grades by material series or component application. A grade may belong to several families."@en,
+        "按材料系列或零件用途归集特钢和高温合金牌号；一个牌号可适用于多个产品族。"@zh ;
+    skos:prefLabel "Special steel product family"@en,
+        "特钢产品族"@zh .
 
 stl:MaterialLot a owl:Class ;
     rdfs:label "Material lot"@en,
@@ -13372,17 +15166,6 @@ stl:MaterialLot a owl:Class ;
         "钢筋混凝土用钢 第2部分：热轧带肋钢筋"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=1BD5B9878E5A2FCEE06397BE0A0A10CC> .
-
-stl:StandardGrade a owl:Class ;
-    rdfs:label "Standard grade designation"@en,
-        "标准牌号"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-221-2008> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/specification> ;
-    rdfs:subClassOf stl:ManufacturingObject ;
-    skos:definition "A designation scoped to the particular edition of the product standard that names it."@en,
-        "在一份确定版次的产品标准内具有指定名称的牌号条目。"@zh ;
-    skos:prefLabel "Standard grade designation"@en,
-        "标准牌号"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/material-category> a skos:ConceptScheme ;
     rdfs:label "Material category"@en,
@@ -13437,6 +15220,17 @@ stl:Operation a owl:Class ;
         "现场某项工序的一次实施，投入、产出和执行设备均可归到本次作业。"@zh ;
     skos:prefLabel "Operation"@en,
         "工序执行"@zh .
+
+stl:StandardGrade a owl:Class ;
+    rdfs:label "Standard grade designation"@en,
+        "标准牌号"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-221-2008> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/specification> ;
+    rdfs:subClassOf stl:ManufacturingObject ;
+    skos:definition "A designation scoped to the particular edition of the product standard that names it."@en,
+        "在一份确定版次的产品标准内具有指定名称的牌号条目。"@zh ;
+    skos:prefLabel "Standard grade designation"@en,
+        "标准牌号"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/chemical-element> a skos:ConceptScheme ;
     rdfs:label "chemical element analyte"@en,

@@ -1,0 +1,30 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+PREFIX quality: <https://w3id.org/ontology-platform/steel/code/steel-class-quality/>
+PREFIX route: <https://w3id.org/ontology-platform/steel/code/melting-route/>
+
+SELECT DISTINCT ?piece ?missing WHERE {
+  {
+    ?piece rdf:type/rdfs:subClassOf* stl:MaterialPiece ;
+      stl:steelGrade/stl:steelQualityClass quality:SPECIAL .
+    FILTER NOT EXISTS {
+      ?piece stl:derivedFrom*/stl:sourceHeat ?heat .
+      ?heat rdf:type/rdfs:subClassOf* stl:Heat .
+    }
+    BIND("HEAT" AS ?missing)
+  } UNION {
+    ?piece rdf:type/rdfs:subClassOf* stl:MaterialPiece ;
+      stl:meltingRoute/skos:broader+ route:REMELT .
+    FILTER NOT EXISTS {
+      ?piece stl:derivedFrom* ?ingot .
+      ?ingot rdf:type/rdfs:subClassOf* stl:RemeltedIngot ;
+             stl:derivedFrom+ ?electrode .
+      ?electrode rdf:type/rdfs:subClassOf* stl:Electrode .
+    }
+    BIND("REMELT_CHAIN" AS ?missing)
+  }
+}
+ORDER BY ?piece ?missing

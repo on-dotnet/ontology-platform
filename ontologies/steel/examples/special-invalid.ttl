@@ -1,0 +1,121 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# EXPECT <urn:synthetic:steel:remelting/S91> <https://w3id.org/ontology-platform/steel/RemeltNumberShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:remelting/S91> <https://w3id.org/ontology-platform/steel/RemeltSequenceShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:remelting/S91> <https://w3id.org/ontology-platform/steel/RemeltOutputShape> QualifiedMinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:remelting/S91> <https://w3id.org/ontology-platform/steel/RemeltInputElectrodeShape> QualifiedMinCountConstraintComponent
+<urn:synthetic:steel:remelting/S91> a stl:Remelting .
+
+# EXPECT <urn:synthetic:steel:ingot/I91> <https://w3id.org/ontology-platform/steel/RemeltRecordOwnerShape> ClassConstraintComponent
+<urn:synthetic:steel:ingot/I91> a stl:Ingot ; stl:remeltNumber "S91" .
+
+# EXPECT <urn:synthetic:steel:remeltedingot/R91> <https://w3id.org/ontology-platform/steel/RemeltedIngotRouteShape> QualifiedMinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:remeltedingot/R91> <https://w3id.org/ontology-platform/steel/RemeltedIngotElectrodeShape> QualifiedMinCountConstraintComponent
+<urn:synthetic:steel:remeltedingot/R91> a stl:RemeltedIngot ; stl:meltingRoute <code/melting-route/EAFLFVD> ;
+    stl:derivedFrom <urn:synthetic:steel:ingot/I92> .
+
+# EXPECT <urn:synthetic:steel:electrode/E91> <https://w3id.org/ontology-platform/steel/ElectrodeSourceIngotShape> QualifiedMinCountConstraintComponent
+<urn:synthetic:steel:electrode/E91> a stl:Electrode .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/forging-method/OPEN> <https://w3id.org/ontology-platform/steel/MeltingRouteSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/forging-method/OPEN> <https://w3id.org/ontology-platform/steel/MeltingRouteDetailShape> QualifiedMinCountConstraintComponent
+<urn:synthetic:steel:materialpiece/P91> a stl:MaterialPiece ; stl:meltingRoute <code/forging-method/OPEN> .
+
+# EXPECT <urn:synthetic:steel:forging/K91> <https://w3id.org/ontology-platform/steel/ForgingMethodShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:forging/K91> <https://w3id.org/ontology-platform/steel/ForgingRatioShape> MinCountConstraintComponent
+<urn:synthetic:steel:forging/K91> a stl:Forging .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/melting-route/EAFLFVD> <https://w3id.org/ontology-platform/steel/ForgingMethodSchemeShape> HasValueConstraintComponent
+# EXPECT <urn:synthetic:steel:forging/K92> <https://w3id.org/ontology-platform/steel/ForgingRatioShape> MinExclusiveConstraintComponent
+# EXPECT <urn:synthetic:steel:forging/K92> <https://w3id.org/ontology-platform/steel/InitialCrossSectionAreaShape> MinExclusiveConstraintComponent
+# EXPECT <urn:synthetic:steel:forging/K92> <https://w3id.org/ontology-platform/steel/FinalCrossSectionAreaShape> MinExclusiveConstraintComponent
+<urn:synthetic:steel:forging/K92> a stl:Forging ; stl:forgingMethod <code/melting-route/EAFLFVD> ;
+    stl:forgingRatio 0.0 ; stl:initialCrossSectionArea 0.0 ; stl:finalCrossSectionArea 0.0 .
+
+# EXPECT <urn:synthetic:steel:standardgrade/G91> <https://w3id.org/ontology-platform/steel/SpecialGradeEditionShape> MinCountConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/steel-class-quality/BASIC> <https://w3id.org/ontology-platform/steel/SpecialProductFamilySchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:standardgrade/G91> a stl:StandardGrade ; stl:specialProductFamily <code/steel-class-quality/BASIC> .
+
+# A direct-route bar lacks a heat. A second bar reaches a heat, but its electrode is on a sibling branch.
+
+# EXPECT <urn:synthetic:steel:bar/B91> <https://w3id.org/ontology-platform/steel/SpecialPieceHeatTraceShape> SPARQLConstraintComponent
+<urn:synthetic:steel:bar/B91> a stl:Bar ; stl:steelGrade <urn:synthetic:steel:steelgrade/G92> ;
+    stl:meltingRoute <code/melting-route/EAFLFVD> .
+
+# EXPECT <urn:synthetic:steel:bar/B92> <https://w3id.org/ontology-platform/steel/RemeltingRouteTraceShape> SPARQLConstraintComponent
+<urn:synthetic:steel:bar/B92> a stl:Bar ; stl:steelGrade <urn:synthetic:steel:steelgrade/G92> ;
+    stl:meltingRoute <code/melting-route/VIMESR> ; stl:derivedFrom <urn:synthetic:steel:remeltedingot/R91>, <urn:synthetic:steel:electrode/E93> .
+<urn:synthetic:steel:steelgrade/G92> a stl:SteelGrade ; stl:steelQualityClass <code/steel-class-quality/SPECIAL> .
+<urn:synthetic:steel:electrode/E93> a stl:Electrode ; stl:derivedFrom <urn:synthetic:steel:ingot/I92> .
+<urn:synthetic:steel:ingot/I92> a stl:Ingot ; stl:sourceHeat <urn:synthetic:steel:heat/H92> .
+<urn:synthetic:steel:heat/H92> a stl:Heat ; prov:wasGeneratedBy <urn:synthetic:steel:steelmaking/V92> .
+<urn:synthetic:steel:steelmaking/V92> a stl:Steelmaking .
+
+# The heat is known for both pieces. One chain lacks an electrode and the other a remelted ingot.
+# EXPECT <urn:synthetic:steel:bar/B93> <https://w3id.org/ontology-platform/steel/RemeltingRouteTraceShape> SPARQLConstraintComponent
+<urn:synthetic:steel:bar/B93> a stl:Bar ; stl:steelGrade <urn:synthetic:steel:steelgrade/G92> ;
+    stl:meltingRoute <code/melting-route/VIMPESR> ; stl:derivedFrom <urn:synthetic:steel:remeltedingot/R91> .
+# EXPECT <urn:synthetic:steel:bar/B94> <https://w3id.org/ontology-platform/steel/RemeltingRouteTraceShape> SPARQLConstraintComponent
+<urn:synthetic:steel:bar/B94> a stl:Bar ; stl:steelGrade <urn:synthetic:steel:steelgrade/G92> ;
+    stl:meltingRoute <code/melting-route/VIMESR> ; stl:derivedFrom <urn:synthetic:steel:electrode/E93> .
+
+# Both electrodes exist, but the ingot cites a different electrode from the one charged.
+# EXPECT <urn:synthetic:steel:electroslagremelting/S93> <https://w3id.org/ontology-platform/steel/RemeltElectrodeLineageShape> SPARQLConstraintComponent
+<urn:synthetic:steel:electroslagremelting/S93> a stl:ElectroslagRemelting ; stl:remeltNumber "S93" ; stl:remeltSequence "1"^^xsd:positiveInteger ;
+    stl:inputPiece <urn:synthetic:steel:electrode/E93> ; stl:outputPiece <urn:synthetic:steel:remeltedingot/R93> .
+<urn:synthetic:steel:electrode/E94> a stl:Electrode ; stl:derivedFrom <urn:synthetic:steel:ingot/I92> .
+<urn:synthetic:steel:remeltedingot/R93> a stl:RemeltedIngot ; stl:meltingRoute <code/melting-route/VIMESR> ;
+    stl:derivedFrom <urn:synthetic:steel:electrode/E94> .
+
+# A remelted ancestor identifies downstream material even when its own route is missing or miscoded.
+# EXPECT <urn:synthetic:steel:forgedproduct/F95> <https://w3id.org/ontology-platform/steel/RemeltedIngotRouteShape> QualifiedMinCountConstraintComponent
+<urn:synthetic:steel:forgedproduct/F95> a stl:ForgedProduct ; stl:derivedFrom <urn:synthetic:steel:remeltedingot/R93> .
+# EXPECT <urn:synthetic:steel:forgedproduct/F96> <https://w3id.org/ontology-platform/steel/RemeltedIngotRouteShape> QualifiedMinCountConstraintComponent
+<urn:synthetic:steel:forgedproduct/F96> a stl:ForgedProduct ; stl:derivedFrom <urn:synthetic:steel:remeltedingot/R93> ; stl:meltingRoute <code/melting-route/EAFLFVD> .
+
+<urn:synthetic:steel:inclusionrating/T91> a stl:InclusionRating .
+<urn:synthetic:steel:macroexamination/T91> a stl:MacroExamination .
+
+# EXPECT <urn:synthetic:steel:inclusionratingresult/ID91> <https://w3id.org/ontology-platform/steel/InclusionRatedTypeShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:inclusionratingresult/ID91> <https://w3id.org/ontology-platform/steel/InclusionRatingExaminationShape> ClassConstraintComponent
+<urn:synthetic:steel:inclusionratingresult/ID91> a stl:InclusionRatingResult ;
+    stl:resultOfInspection <urn:synthetic:steel:macroexamination/T91> .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/ingot-position/HEAD> <https://w3id.org/ontology-platform/steel/InclusionTypeSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/inclusion-type/B> <https://w3id.org/ontology-platform/steel/InclusionSeriesSchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:inclusionratingresult/ID92> a stl:InclusionRatingResult ;
+    stl:inclusionType <code/ingot-position/HEAD> ; stl:inclusionSeries <code/inclusion-type/B> ;
+    stl:resultOfInspection <urn:synthetic:steel:inclusionrating/T91> .
+
+# EXPECT <urn:synthetic:steel:inclusionratingresult/ID93> <https://w3id.org/ontology-platform/steel/InclusionSeriesAssignmentShape> SPARQLConstraintComponent
+<urn:synthetic:steel:inclusionratingresult/ID93> a stl:InclusionRatingResult ; stl:inclusionType <code/inclusion-type/A> ;
+    stl:resultOfInspection <urn:synthetic:steel:inclusionrating/T91> .
+
+# EXPECT <urn:synthetic:steel:inclusionratingresult/ID94> <https://w3id.org/ontology-platform/steel/InclusionSeriesAssignmentShape> SPARQLConstraintComponent
+<urn:synthetic:steel:inclusionratingresult/ID94> a stl:InclusionRatingResult ;
+    stl:inclusionType <code/inclusion-type/DS> ; stl:inclusionSeries <code/inclusion-series/THICK> ;
+    stl:resultOfInspection <urn:synthetic:steel:inclusionrating/T91> .
+
+# EXPECT <urn:synthetic:steel:macrodefectrating/M91> <https://w3id.org/ontology-platform/steel/MacroRatedDefectShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:macrodefectrating/M91> <https://w3id.org/ontology-platform/steel/MacroRatingExaminationShape> ClassConstraintComponent
+<urn:synthetic:steel:macrodefectrating/M91> a stl:MacroDefectRating ;
+    stl:resultOfInspection <urn:synthetic:steel:inclusionrating/T91> .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/inclusion-type/B> <https://w3id.org/ontology-platform/steel/MacroDefectSchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:macrodefectrating/M92> a stl:MacroDefectRating ; stl:ratedMacroDefect <code/inclusion-type/B> ;
+    stl:resultOfInspection <urn:synthetic:steel:macroexamination/T91> .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/inclusion-type/B> <https://w3id.org/ontology-platform/steel/IngotPositionSchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:ingot/I93> a stl:Ingot ; stl:ingotPosition <code/inclusion-type/B> .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/ndt-method/UT> <https://w3id.org/ontology-platform/steel/NdtAcceptanceSchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:nondestructivetest/U91> a stl:NondestructiveTest ; stl:ndtAcceptanceClass <code/ndt-method/UT> .
+
+# EXPECT <urn:synthetic:steel:gascontentanalysis/G91> <https://w3id.org/ontology-platform/steel/GasAnalysisRemeltShape> MinCountConstraintComponent
+<urn:synthetic:steel:gascontentanalysis/G91> a stl:GasContentAnalysis .
+
+# EXPECT <urn:synthetic:steel:cleanlinessassessment/C91> <https://w3id.org/ontology-platform/steel/CleanlinessEvidenceShape> MinCountConstraintComponent
+<urn:synthetic:steel:cleanlinessassessment/C91> a stl:CleanlinessAssessment .
