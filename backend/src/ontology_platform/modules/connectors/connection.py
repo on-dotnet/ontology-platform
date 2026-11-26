@@ -87,6 +87,15 @@ APPLICATION_NAME = "ontology-platform-connector"
 CONNECT_TIMEOUT_SECONDS = 5
 LOCK_TIMEOUT_MS = 2_000
 IDLE_IN_TRANSACTION_TIMEOUT_MS = 60_000
+# A network that drops packets without a reset would leave the cancel and rollback that follow
+# a client-side timeout waiting on the socket; keepalives and a send timeout end that wait.
+_SOCKET_OPTIONS: dict[str, int] = {
+    "keepalives": 1,
+    "keepalives_idle": 10,
+    "keepalives_interval": 5,
+    "keepalives_count": 3,
+    "tcp_user_timeout": 30_000,
+}
 # Statements per data source and process at the same time, and how long one waits for a turn.
 MAX_CONCURRENT = 4
 QUEUE_SECONDS = 5.0
@@ -94,8 +103,8 @@ TEXT_LIMIT = 2_000
 SAMPLE_ROWS = 20
 SAMPLES_PER_COLUMN = 5
 SAMPLE_TEXT_LIMIT = 64
-# Statements a catalog read is given time for (identity check, relations, then three per schema
-# in typical scopes); past that the read is cancelled.
+# A time budget, not a statement limit: a catalog read gets this many statement timeouts in all
+# (identity check, relations, then three per schema in typical scopes); past that it is cancelled.
 CATALOG_STATEMENTS = 12
 
 # psycopg logs failed connection attempts at DEBUG with host, port and the server's message,
@@ -233,9 +242,10 @@ def _connect_failure(exc: BaseException, params: ConnectionParams) -> ConnectFai
         return ConnectFailedError("timeout")
     sqlstate = getattr(exc, "sqlstate", None)
     message = str(exc).lower()
+    # libpq quotes these names; replacing only the quoted form leaves the words around them.
     for name in (params.host, params.username, params.database):
         if name:
-            message = message.replace(name.lower(), "")
+            message = message.replace(f'"{name.lower()}"', '""')
     if sqlstate in ("28P01", "28000") or "authentication failed" in message:
         reason = "auth_failed"
     elif sqlstate == "3D000" or ("database" in message and "does not exist" in message):
@@ -273,6 +283,7 @@ async def _open(params: ConnectionParams, settings: Settings) -> psycopg.AsyncCo
                 connect_timeout=CONNECT_TIMEOUT_SECONDS,
                 application_name=APPLICATION_NAME,
                 options=_options(settings),
+                **_SOCKET_OPTIONS,
             )
     # ValueError covers settings libpq cannot take at all, such as lone surrogates in a password.
     except (psycopg.Error, OSError, TimeoutError, ValueError) as exc:
@@ -580,6 +591,8 @@ class _Renderer:
             case "contains" | "starts_with":
                 if not isinstance(value, str):
                     raise ValueError(f"`{condition.operator}` takes a string")
+                if self.columns.spec(condition.column).family != "string":
+                    raise ValueError(f"`{condition.operator}` applies to text columns only")
                 # autoescape: SQLAlchemy escapes %, _ and its escape character "/" in the value
                 # and renders ESCAPE '/'; the value stays a bound parameter.
                 if condition.operator == "contains":

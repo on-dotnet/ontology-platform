@@ -339,3 +339,21 @@ async def test_blank_padded_keys_compare_without_casting_the_column(
     assert result.rows == (("A1      ",),)
     [statement] = [text for text, _ in seen if "codes" in text]
     assert "AS character(8))" in statement
+
+
+@pytest.mark.parametrize("operator", ["contains", "starts_with"])
+async def test_text_operators_take_text_columns_only(
+    db: AsyncSession, external_source: ExternalSource, operator: str
+) -> None:
+    row = await _source(db, external_source, "slab")
+
+    with pytest.raises(ValueError, match="text columns"):
+        await service.select(
+            db,
+            SelectQuery(
+                row.id,
+                TableRef("mes", "slab"),
+                (ColumnRef("slab_no"),),
+                where=(Condition(ColumnRef("weight_t"), operator, "1"),),  # type: ignore[arg-type]
+            ),
+        )

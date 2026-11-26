@@ -58,6 +58,42 @@ async def _replace_catalog(
     row.catalog_refreshed_at = now
 
 
+async def _record(
+    db: AsyncSession,
+    job: JobContext,
+    source_id: UUID,
+    revision: int,
+    tables: list[DiscoveredTable] | None,
+    failure: ConnectorError | None,
+) -> None:
+    """Store what a refresh read, under the data source's row lock, if it still applies."""
+    row = await db.get(DataSource, source_id, with_for_update=True, populate_existing=True)
+    if row is None or row.status == "archived" or row.catalog_status != "refreshing":
+        return
+    if row.revision != revision:
+        # The settings changed while reading: what was read may be another database.
+        await queue.enqueue(db, REFRESH_CATALOG, {"dataSourceId": str(source_id)})
+        await job.check_lease(db)
+        return
+    detail: dict[str, str | int]
+    if failure is not None or tables is None:
+        code = _error_code(failure) if failure is not None else "datasource.connect_failed"
+        row.catalog_status = "failed"
+        row.catalog_error_code = code
+        detail = {"errorCode": code}
+    else:
+        await _replace_catalog(db, row, tables)
+        detail = {"tableCount": len(tables)}
+    audit.record(
+        db,
+        "datasource.catalog_refreshed",
+        target_type="data_source",
+        target_id=str(source_id),
+        detail=detail,
+    )
+    await job.check_lease(db)
+
+
 def register_handlers(
     session_factory: async_sessionmaker[AsyncSession],
     settings: Settings,
@@ -76,11 +112,15 @@ def register_handlers(
             if row is None or row.status == "archived" or row.catalog_status != "refreshing":
                 return
             revision = row.revision
+            schema_names = tuple(row.schemas)
             tables: list[DiscoveredTable] | None = None
             failure: ConnectorError | None = None
             unexpected: Exception | None = None
             try:
-                tables = await connection.read_catalog(db, connection.params_of(row), row.schemas)
+                params = connection.params_of(row)
+                # Not idle in a transaction on the platform database while the source is read.
+                await db.commit()
+                tables = await connection.read_catalog(db, params, schema_names)
             except ConnectorError as error:
                 failure = error
             except Exception as error:
@@ -88,31 +128,8 @@ def register_handlers(
                 # does not wait for ever, then let the runner log and fail the job.
                 unexpected = error
         async with session_factory.begin() as db:
-            row = await db.get(DataSource, source_id, with_for_update=True, populate_existing=True)
-            if row is None or row.status == "archived" or row.catalog_status != "refreshing":
-                return
-            if row.revision != revision:
-                # The settings changed while reading: what was read may be another database.
-                await queue.enqueue(db, REFRESH_CATALOG, {"dataSourceId": str(source_id)})
-                await job.check_lease(db)
-                return
-            detail: dict[str, str | int]
-            if failure is not None or tables is None:
-                code = _error_code(failure) if failure is not None else "datasource.connect_failed"
-                row.catalog_status = "failed"
-                row.catalog_error_code = code
-                detail = {"errorCode": code}
-            else:
-                await _replace_catalog(db, row, tables)
-                detail = {"tableCount": len(tables)}
-            audit.record(
-                db,
-                "datasource.catalog_refreshed",
-                target_type="data_source",
-                target_id=str(source_id),
-                detail=detail,
-            )
-            await job.check_lease(db)
+            await _record(db, job, source_id, revision, tables, failure)
+        # Raised even when the result was dropped, so that a bug is never a quiet success.
         if unexpected is not None:
             raise unexpected
 

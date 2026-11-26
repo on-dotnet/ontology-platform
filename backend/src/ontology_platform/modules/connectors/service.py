@@ -362,6 +362,10 @@ async def update_data_source(
         row.secret = sealed.secret
         row.secret_key_id = sealed.key_id
         row.credential_updated_at = now
+        # The new password answers that failure; the page stops asking for one again.
+        if row.catalog_error_code == "datasource.credential_unreadable":
+            row.catalog_error_code = None
+            row.catalog_status = "ready" if row.catalog_refreshed_at is not None else "never"
     if body.password is not None or changes.keys() & {"host", "port", "database", "username"}:
         row.last_test_at = row.last_test_ok = row.last_test_code = None
         row.last_test_warnings = []

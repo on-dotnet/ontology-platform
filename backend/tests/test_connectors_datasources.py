@@ -335,6 +335,35 @@ async def test_patch_invalidates_only_affected_connection_results(
         assert row.last_test_warnings == []
 
 
+@pytest.mark.parametrize(
+    ("refreshed", "code", "status"),
+    [
+        (True, "datasource.credential_unreadable", "ready"),
+        (False, "datasource.credential_unreadable", "never"),
+        (True, "datasource.connect_failed", "failed"),
+    ],
+)
+async def test_a_new_password_clears_only_an_unreadable_credential_failure(
+    client: AsyncClient, db: AsyncSession, refreshed: bool, code: str, status: str
+) -> None:
+    await sign_in(client, db, Role.ADMIN)
+    source = await _create(client)
+    row = await _stored(db, source)
+    row.catalog_status, row.catalog_error_code = "failed", code
+    row.catalog_refreshed_at = datetime.now(UTC) if refreshed else None
+    await db.commit()
+
+    renamed = await _patch(client, source, name="Renamed")
+    source = renamed.json()
+    response = await _patch(client, source, password="replacement-password")
+
+    assert renamed.json()["catalog"]["errorCode"] == code
+    assert response.status_code == 200
+    assert response.json()["catalog"]["status"] == status
+    expected = None if status != "failed" else code
+    assert response.json()["catalog"]["errorCode"] == expected
+
+
 async def test_concurrent_creates_keep_one_source_and_one_audit_event(
     client: AsyncClient, db: AsyncSession
 ) -> None:

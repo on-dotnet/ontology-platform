@@ -14,6 +14,7 @@ from typing import Any, get_type_hints
 
 import psycopg
 import pytest
+from pydantic import SecretStr
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql.psycopg import PGDialectAsync_psycopg
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -354,6 +355,65 @@ async def test_cancelling_the_call_cancels_the_statement(
     assert await _active(external_source) == []
 
 
+SLEEP = "SELECT pg_sleep(5)::text, 'op_deadline'"
+
+
+async def _sleeping(source: ExternalSource) -> list[tuple[Any, ...]]:
+    return admin_rows(
+        source,
+        "SELECT pid FROM pg_stat_activity WHERE application_name = %s AND state = 'active' "
+        "AND query LIKE '%%op_deadline%%'",
+        APPLICATION_NAME,
+    )
+
+
+async def _gone(source: ExternalSource) -> bool:
+    for _ in range(50):
+        if not await _sleeping(source):
+            return True
+        await asyncio.sleep(0.1)
+    return False
+
+
+def _short_deadline(monkeypatch: pytest.MonkeyPatch) -> None:
+    # The statement timeout alone would let the statement finish; only the deadline stops it.
+    configure(monkeypatch, query_timeout_seconds=60)
+    monkeypatch.setattr(connection, "_deadline", lambda *, statements: 1.0)
+
+
+async def test_a_catalog_read_past_its_deadline_is_cancelled(
+    db: AsyncSession, external_source: ExternalSource, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _short_deadline(monkeypatch)
+
+    def slow_catalog(conn: Any, schema_names: tuple[str, ...]) -> list[Any]:
+        conn.execute(text(SLEEP))
+        return []
+
+    monkeypatch.setattr(connection.catalog, "inspect_catalog", slow_catalog)
+    started = time.monotonic()
+
+    with pytest.raises(QueryTimeoutError):
+        await connection.read_catalog(db, reader_params(external_source), ("mes",))
+
+    assert time.monotonic() - started < 4
+    assert await _gone(external_source)
+
+
+async def test_a_connection_test_past_its_deadline_is_a_timeout(
+    db: AsyncSession, external_source: ExternalSource, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _short_deadline(monkeypatch)
+    monkeypatch.setattr(connection, "_SERVER_VERSION", text(SLEEP))
+    started = time.monotonic()
+
+    result = await connection.test_connection(db, reader_params(external_source))
+
+    assert (result.ok, result.reason) == (False, "timeout")
+    assert time.monotonic() - started < 4
+    assert await _gone(external_source)
+
+
 async def test_more_than_four_statements_per_source_wait_then_get_busy(
     app: Any, external_source: ExternalSource, slow_view: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -460,3 +520,27 @@ async def test_driver_errors_while_setting_up_the_connection_do_not_leave_the_co
     assert marker not in str(error)
     assert marker not in repr(error)
     assert marker not in caplog.text
+
+
+
+@pytest.mark.parametrize(
+    ("database", "message", "reason"),
+    [
+        ("data", "FATAL:  database \"data\" does not exist", "database_missing"),
+        (
+            "authentication",
+            "FATAL:  password authentication failed for user \"a\"",
+            "auth_failed",
+        ),
+    ],
+)
+def test_short_names_do_not_hide_the_failure_reason(
+    database: str, message: str, reason: str
+) -> None:
+    params = connection.ConnectionParams(
+        host="h", port=5432, database=database, username="a", password=SecretStr("x")
+    )
+
+    failure = connection._connect_failure(psycopg.OperationalError(message), params)
+
+    assert failure.reason == reason
