@@ -27,7 +27,7 @@ def _platform(settings: Settings, **changes: object) -> ConnectionParams:
         "port": url.port or 5432,
         "database": url.database or "",
         "username": url.username or "",
-        "password": SecretStr(url.password or ""),  # type: ignore[arg-type]
+        "password": SecretStr(url.password or ""),
     }
     values.update(changes)
     return ConnectionParams(**values)  # type: ignore[arg-type]

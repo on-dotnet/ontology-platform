@@ -108,7 +108,7 @@ def test_select_query_has_only_structured_fields() -> None:
     }
     for cls in (SelectQuery, TableRef, ColumnRef, Condition, SortKey, Join):
         assert dataclasses.is_dataclass(cls)
-        assert cls.__dataclass_params__.frozen  # type: ignore[attr-defined]
+        assert vars(cls)["__dataclass_params__"].frozen
     assert statements.Operator.__args__ == (  # type: ignore[attr-defined]
         "eq",
         "ne",
