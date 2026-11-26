@@ -70,6 +70,13 @@ _PASCAL = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 _CAMEL = re.compile(r"^[a-z][A-Za-z0-9]*$")
 # A cited sentence number, "3.12" (chunk 3, sentence 12), with or without brackets.
 _SENTENCE_REF = re.compile(r"^\[?\s*(\d+)\s*\.\s*(\d+)\s*\]?$")
+# A relation may cite a run of consecutive sentences of one chunk, "3.12-3.14" (#58): an
+# introducing sentence and its list items, or a table header and a row, may name both ends
+# only together. At most RUN_MAX sentence units.
+_SENTENCE_RUN = re.compile(
+    r"^\[?\s*(\d+)\s*\.\s*(\d+)\s*[-–—~]\s*(\d+)\s*\.\s*(\d+)\s*\]?$"
+)
+RUN_MAX = 3
 # Short ids of existing types in prompts (spec 004, 7.2): E1, E2, ...
 _ALIAS = "E{}"
 _ALIAS_LIKE = re.compile(r"^E\d+$")
@@ -1062,6 +1069,22 @@ class _Builder:
             return None
         return ProposedEvidence(found.chunk.id, found.text, found.start, found.end)
 
+    def cite_run(self, ref: str | None) -> ProposedEvidence | None:
+        """The evidence of a relation: one cited sentence, or a run of at most RUN_MAX
+        consecutive sentences of one chunk; None when the run is not one."""
+        found = _SENTENCE_RUN.match(ref.strip()) if ref else None
+        if found is None:
+            return self.cite(ref)
+        chunk, first, last_chunk, last = (int(group) for group in found.groups())
+        if chunk != last_chunk or not 0 <= last - first < RUN_MAX:
+            return None
+        start = self.by_ref.get(f"{chunk}.{first}")
+        end = self.by_ref.get(f"{chunk}.{last}")
+        if start is None or end is None:
+            return None
+        text = start.chunk.text[start.start : end.end]
+        return ProposedEvidence(start.chunk.id, text, start.start, end.end)
+
     def naming(
         self, names: AbstractSet[str], prefer: AbstractSet[str] = frozenset()
     ) -> ProposedEvidence | None:
@@ -1382,13 +1405,13 @@ def build_proposals(
         key = (domain, range_, normalize(relation.label_zh))
         if key in seen_relations:
             continue
-        cited = builder.cite(relation.sentence)
+        cited = builder.cite_run(relation.sentence)
         stated = cited is not None and builder.states_link(
             [cited], names_of.get(domain, set()), names_of.get(range_, set())
         )
         checked("relation_type", stated)
         if not stated:
-            continue  # no direct evidence: the cited sentence does not name both types
+            continue  # no direct evidence: the cited sentences do not name both types
         seen_relations.add(key)
         domain_uuid, range_uuid = _as_uuid(domain), _as_uuid(range_)
         if (

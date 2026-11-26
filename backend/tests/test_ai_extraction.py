@@ -30,6 +30,8 @@ from ontology_platform.modules.ai.extraction import (
 )
 from ontology_platform.modules.ai.gateway import InputFile
 from ontology_platform.modules.ai.prompts import (
+    RELATIONS_INSTRUCTIONS,
+    TYPES_INSTRUCTIONS,
     DecisionOut,
     EntityTypeOut,
     PropertyOut,
@@ -1606,6 +1608,59 @@ def test_relations_take_short_ids_and_only_the_cited_sentence_counts() -> None:
     assert (smelts.fields["labelZh"], smelts.fields["labelEn"]) == ("冶炼", "belongs to")
     assert smelts.evidence[0].quote == "每个炉次只冶炼一个钢种。"
     assert (literal["relation_type"], literal["relation_type:ok"]) == (2, 1)
+
+
+def test_a_relation_can_cite_a_short_run_of_sentences_of_one_chunk() -> None:
+    # An introducing sentence and its list items name the two ends only together (#58).
+    listed = "炉次的去向有两种：\n- 回炉；\n- 送往钢种调整工位。"
+    chunk = ChunkText(id=uuid4(), seq=0, text=listed + "\n炉次按计划组织生产。")
+    other = ChunkText(id=uuid4(), seq=1, text="钢种见下表。")
+    rels = RelationsOut(
+        relations=[
+            relation("new:Heat", str(EXISTING_GRADE.id), "调整", "0.1-0.3"),
+            # More than three units, across chunks, backwards, or naming one end only: dropped.
+            relation("new:Heat", str(EXISTING_GRADE.id), "过长", "[0.1-0.4]"),
+            relation("new:Heat", str(EXISTING_GRADE.id), "跨块", "0.3-1.1"),
+            relation("new:Heat", str(EXISTING_GRADE.id), "倒序", "0.3-0.1"),
+            relation("new:Heat", str(EXISTING_GRADE.id), "一端", "0.1-0.2"),
+        ],
+        properties=[],
+    )
+    literal: Counter[str] = Counter()
+    proposals = build_proposals(
+        [chunk, other],
+        [EXISTING_GRADE],
+        [entity("new:Heat", "炉次", sentence="0.1")],
+        rels,
+        literal=literal,
+    )
+    [kept] = [p for p in proposals if p.kind == "relation_type"]
+    assert kept.fields["labelZh"] == "调整"
+    [evidence] = kept.evidence
+    assert (evidence.char_start, evidence.char_end) == (0, len(listed))
+    assert evidence.quote == listed
+    assert (literal["relation_type"], literal["relation_type:ok"]) == (5, 1)
+
+
+def test_types_and_properties_still_cite_one_sentence() -> None:
+    chunk = ChunkText(id=uuid4(), seq=0, text="炉次按计划组织生产。\n每个炉次记录出钢重量。")
+    weight = prop("new:Heat", "出钢重量").model_copy(update={"sentence": "0.1-0.2"})
+    proposals = build_proposals(
+        [chunk],
+        [],
+        [entity("new:Heat", "炉次", sentence="0.1-0.2")],
+        RelationsOut(relations=[], properties=[weight]),
+    )
+    # A run is not a sentence number: no evidence, flagged.
+    assert all(p.flags == ["evidence_not_found"] for p in proposals)
+    assert all(p.evidence == [] for p in proposals)
+
+
+def test_the_relations_prompt_allows_a_short_run_of_sentences() -> None:
+    assert "3.12-3.14" in RELATIONS_INSTRUCTIONS
+    assert "3.12-3.14" in (RelationOut.model_fields["sentence"].description or "")
+    assert "3.12-3.14" not in TYPES_INSTRUCTIONS
+    assert "3.12-3.14" not in (PropertyOut.model_fields["sentence"].description or "")
 
 
 async def test_short_ids_in_the_output_stand_for_the_existing_types() -> None:

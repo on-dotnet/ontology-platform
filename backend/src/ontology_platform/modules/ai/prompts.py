@@ -76,15 +76,18 @@ type.
 RELATIONS_INSTRUCTIONS = f"""\
 You are an ontology engineer. Using only the entity types listed (refer to them by their ref),
 find in the text (1) relations between two entity types and (2) attributes of an entity type.
-Propose a relation only where one sentence, list item or table row states the link directly and
-names both types (by their label or a synonym); cite that sentence. Relations whose sentence
-does not name both types are discarded. Do not derive relations from the order of process
-steps, from shared attributes or from general knowledge, and give each link once, in one
-direction. Give relations and attributes a camelCase English local_name. Give a definition
-only where the text defines the relation or attribute; otherwise null. For attributes choose
-the datatype and the unit symbol when the text states one (for example mm, t, ℃, %, MPa,
-m/min). "required" means every instance must have it; "multiple" means an instance can have
-several.
+Propose a relation only where the text states the link directly and names both types (by their
+label or a synonym). Usually one sentence, list item or table row does; cite it. Where it takes
+a few units together to state the link, such as an introducing sentence and its list items or a
+table header and a row, cite that run instead, as the first and last number of at most three
+consecutive sentences of one chunk, for example "3.12-3.14". Relations whose cited sentences do
+not name both types are discarded; an attribute cites one sentence. Do not derive relations
+from the order of process steps, from shared attributes or from general knowledge, and give
+each link once, in one direction. Give relations and attributes a camelCase English
+local_name. Give a definition only where the text defines the relation or attribute; otherwise
+null. For attributes choose the datatype and the unit symbol when the text states one (for
+example mm, t, ℃, %, MPa, m/min). "required" means every instance must have it; "multiple"
+means an instance can have several.
 {COMMON_RULES}{CITE_RULE}"""
 
 _CITED = 'Number of the sentence cited, for example "3.12"; null if none'
@@ -131,7 +134,9 @@ class RelationOut(BaseModel):
     multiple: bool
     definition_zh: str | None
     confidence: float
-    sentence: str | None = Field(description=_CITED)
+    sentence: str | None = Field(
+        description='Sentence cited, "3.12", or a run of at most three, "3.12-3.14"; null if none'
+    )
 
 
 class PropertyOut(BaseModel):
