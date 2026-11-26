@@ -14,7 +14,7 @@ from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.modules.audit.models import AuditEvent
-from ontology_platform.modules.identity.models import Role, User
+from ontology_platform.modules.identity.models import AccessToken, Role, User
 from ontology_platform.modules.ontology import service
 from ontology_platform.modules.ontology.models import ChangeItem, ChangeSet, Element, Ontology
 from ontology_platform.modules.ontology.schemas import ElementFields, ProposedItem
@@ -500,6 +500,10 @@ async def test_ten_change_sets_per_token_and_hour(
     # The limit is the token's: the same owner's other token still may.
     other, other_id = await new_token(client, db, Role.EDITOR, PROPOSE)
     assert other_id != setup.token_id
+    assert (
+        await db.scalar(select(AccessToken.user_id).where(AccessToken.id == UUID(other_id)))
+        == setup.owner_id
+    )
     assert _content(await _propose(app, other, arguments(11)))["changeSetId"]
     assert len(await _change_sets(db)) == 11
 

@@ -475,12 +475,14 @@ PROPOSAL_TITLE_PREFIX = "MCP："
 PROPOSAL_TITLE_LENGTH = 60
 
 ElementRef = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=128)]
-_REF = "An element id, or the tempRef of an element an earlier operation creates; null clears it."
+_REF = "An element id, or the tempRef of an element an earlier operation creates."
 
 
 class ProposedFields(Arguments):
-    """The fields an operation sets. Only the keys given are changed: null clears a text, a
-    reference or the unit, and leaves required and multiple as they are."""
+    """The fields an operation sets. Only the keys given are changed. null clears labelEn,
+    definitionZh, definitionEn, unit, parent and inverse; a required value (localName, labelZh,
+    domain, range, datatype, turtle) cannot be cleared, and null leaves the synonyms, required
+    and multiple as they are."""
 
     local_name: str | None = Field(default=None, max_length=128)
     label_zh: str | None = Field(default=None, max_length=200)
