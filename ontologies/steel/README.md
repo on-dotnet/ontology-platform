@@ -91,7 +91,7 @@ pwsh -NoProfile -File ontologies/steel/check/check.ps1
 pwsh -NoProfile -File ontologies/steel/check/check.ps1 -Build
 ```
 
-自检在临时容器中运行，逐项核对以下内容。
+自检在临时容器中运行，主要核对以下内容。
 
 - Turtle 语法、本体头、版本和许可证。
 - 类、属性与代码的标签、定义、来源及模块归属。

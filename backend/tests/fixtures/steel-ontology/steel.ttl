@@ -10488,7 +10488,7 @@ stl:bundleCutLength a owl:DatatypeProperty ;
     rdfs:label "Ordered length per bundled piece"@en,
         "捆内单支定尺"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-11263-2024>,
-        <https://w3id.org/ontology-platform/steel/std/gbt-702-2017> ;
+        <https://w3id.org/ontology-platform/steel/std/gbt-702-2026> ;
     rdfs:domain stl:Bundle ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/finishing> ;
     rdfs:range xsd:decimal ;
@@ -11532,17 +11532,14 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D75D46D3A7E05397BE0A0AB82A> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-702-2026> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 702-2026" ;
-    dcterms:issued "2026"^^xsd:gYear ;
-    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-702-2017>,
-        <https://w3id.org/ontology-platform/steel/std/gbt-905-1994>,
-        <https://w3id.org/ontology-platform/steel/std/gbt-908-2019> ;
-    dcterms:title "Dimensions, shape, weight and tolerances of steel bars"@en,
-        "钢棒尺寸、外形、重量及允许偏差"@zh ;
+<https://w3id.org/ontology-platform/steel/std/gbt-702-2017> a stl:StandardEdition ;
+    dcterms:description "废止"@zh ;
+    dcterms:identifier "GB/T 702-2017" ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:title "Hot-rolled steel bars—Dimensions,shape,weight and tolerances"@en,
+        "热轧钢棒尺寸、外形、重量及允许偏差"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=OmF02s7kDno%3D&mode=p> .
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81C41D3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-706-2026> a stl:StandardEdition ;
     dcterms:description "即将实施"@zh ;
@@ -12874,14 +12871,17 @@ stl:specialProductFamily a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=LCsCZ0c8eO0%3D&mode=p> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-702-2017> a stl:StandardEdition ;
-    dcterms:description "废止"@zh ;
-    dcterms:identifier "GB/T 702-2017" ;
-    dcterms:issued "2017"^^xsd:gYear ;
-    dcterms:title "Hot-rolled steel bars—Dimensions,shape,weight and tolerances"@en,
-        "热轧钢棒尺寸、外形、重量及允许偏差"@zh ;
+<https://w3id.org/ontology-platform/steel/std/gbt-702-2026> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 702-2026" ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-702-2017>,
+        <https://w3id.org/ontology-platform/steel/std/gbt-905-1994>,
+        <https://w3id.org/ontology-platform/steel/std/gbt-908-2019> ;
+    dcterms:title "Dimensions, shape, weight and tolerances of steel bars"@en,
+        "钢棒尺寸、外形、重量及允许偏差"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81C41D3A7E05397BE0A0AB82A> .
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=OmF02s7kDno%3D&mode=p> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-706-2016> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;

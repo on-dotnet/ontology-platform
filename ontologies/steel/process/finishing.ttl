@@ -57,7 +57,7 @@ stl:maximumGrindingDepth a owl:DatatypeProperty ; rdfs:domain stl:LocalGrinding 
 stl:bundleCutLength a owl:DatatypeProperty ; rdfs:domain stl:Bundle ; rdfs:range xsd:decimal ; stl:unit unit:M ; stl:quantityKind quantitykind:Length ;
     rdfs:label "捆内单支定尺"@zh, "Ordered length per bundled piece"@en ; skos:prefLabel "捆内单支定尺"@zh, "Ordered length per bundled piece"@en ;
     skos:definition "捆内各支长材共同约定的交货长度，以米计。"@zh, "The agreed delivery length in metres of each piece in the bundle."@en ;
-    dcterms:source <std/gbt-702-2017>, <std/gbt-11263-2024> ; rdfs:isDefinedBy <ontology/process/finishing> .
+    dcterms:source <std/gbt-702-2026>, <std/gbt-11263-2024> ; rdfs:isDefinedBy <ontology/process/finishing> .
 
 stl:bundlePieceCount a owl:DatatypeProperty ; rdfs:domain stl:Bundle ; rdfs:range xsd:nonNegativeInteger ; stl:unit unit:NUM ; stl:quantityKind quantitykind:Count ;
     rdfs:label "交货捆支数"@zh, "Delivered pieces per bundle"@en ; skos:prefLabel "交货捆支数"@zh, "Delivered pieces per bundle"@en ;

@@ -15,16 +15,17 @@ from test_ontology_import import export, lost, upload
 from test_ontology_support import change_set_items, decide, merge, sign_in
 
 BUNDLE = Path(__file__).parent / "fixtures" / "steel-ontology" / "steel.ttl"
-ROOT = Path(__file__).resolve().parents[2]
-DIGEST = "89fc033d9e396736688c65d4bd275ef6e1815285842fa6d2f9259527104b0b66"
+DIST = Path(__file__).resolve().parents[2] / "ontologies" / "steel" / "dist" / "steel.ttl"
+DIGEST = "11ada5052331aa42c9feb200ffc97aa7eaf387db605a6b3c4029d5fe31253072"
 # The decisions endpoint takes at most 5000 items per request.
 BATCH = 5000
 
 
 def test_fixture_matches_dist() -> None:
     content = BUNDLE.read_bytes()
-    if (ROOT / "backend").is_dir():
-        assert (ROOT / "ontologies" / "steel" / "dist" / "steel.ttl").read_bytes() == content
+    # Only a repository checkout has dist; the test image checks the digest alone.
+    if DIST.is_file():
+        assert DIST.read_bytes() == content
     assert sha256(content).hexdigest() == DIGEST
 
 
@@ -40,6 +41,7 @@ async def test_bundle_round_trip(client: AsyncClient, db: AsyncSession) -> None:
     assert {w["code"] for w in result["warnings"]} <= {"multiple_parents", "unsupported_shape"}
     change_set_id = result["changeSetId"]
     ids = [item["id"] for item in await change_set_items(client, change_set_id)]
+    assert ids
     for start in range(0, len(ids), BATCH):
         decided = await decide(client, change_set_id, ids[start : start + BATCH], "accepted")
         assert decided.status_code == 200, decided.text
