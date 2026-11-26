@@ -1,0 +1,39 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+# Each boundary contributes actual UTC minutes minus planned UTC minutes.
+SELECT ?orderId ?plannedStart ?actualStart
+       (SUM(IF(?boundary = "start", ?signedMinutes, 0)) AS ?startDifferenceMinutes)
+       ?plannedEnd ?actualEnd
+       (SUM(IF(?boundary = "end", ?signedMinutes, 0)) AS ?endDifferenceMinutes) WHERE {
+  {
+    SELECT ?order (MIN(?start) AS ?actualStart) (MAX(?end) AS ?actualEnd) WHERE {
+      VALUES ?order { <urn:synthetic:steel:productionorder/W26000001> }
+      ?operation a/rdfs:subClassOf* stl:Operation ; stl:fulfills ?order ;
+                 stl:actualStartAt ?start ; stl:actualEndAt ?end .
+    }
+    GROUP BY ?order
+  }
+  ?order dcterms:identifier ?orderId ; stl:plannedStartAt ?plannedStart ; stl:plannedEndAt ?plannedEnd .
+  VALUES (?boundary ?actual) { ("start" false) ("start" true) ("end" false) ("end" true) }
+  BIND(IF(?boundary = "start", IF(?actual, ?actualStart, ?plannedStart),
+                               IF(?actual, ?actualEnd, ?plannedEnd)) AS ?instant)
+
+  # Count days from a March-based epoch so the leap day falls at the end of a year.
+  BIND(YEAR(?instant) - IF(MONTH(?instant) <= 2, 1, 0) AS ?year)
+  BIND(MONTH(?instant) + IF(MONTH(?instant) <= 2, 9, -3) AS ?month)
+  BIND(365 * ?year + FLOOR(?year / 4) - FLOOR(?year / 100) + FLOOR(?year / 400)
+       + FLOOR((153 * ?month + 2) / 5) + DAY(?instant) - 1 AS ?day)
+
+  # Apply the offset sign to both fields, including offsets such as -00:30.
+  BIND(REPLACE(TZ(?instant), "^Z$", "+00:00") AS ?zone)
+  BIND(xsd:integer(REPLACE(?zone, "^([-+])([0-9]{2}):[0-9]{2}$", "$1$2")) AS ?zoneHours)
+  BIND(xsd:integer(REPLACE(?zone, "^([-+])[0-9]{2}:([0-9]{2})$", "$1$2")) AS ?zoneMinutes)
+  BIND(?day * 1440 + (HOURS(?instant) - ?zoneHours) * 60
+       + MINUTES(?instant) - ?zoneMinutes + SECONDS(?instant) / 60 AS ?utcMinutes)
+  BIND(IF(?actual, ?utcMinutes, -?utcMinutes) AS ?signedMinutes)
+}
+GROUP BY ?orderId ?plannedStart ?actualStart ?plannedEnd ?actualEnd
+ORDER BY ?orderId

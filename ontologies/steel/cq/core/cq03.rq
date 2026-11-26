@@ -1,0 +1,12 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?lineId ?grade ?editionId ?specificationId ?pieceId WHERE {
+  VALUES ?line { <urn:synthetic:steel:salesorderline/D26000002-010> }
+  ?line dcterms:identifier ?lineId ; stl:requiresSpecification ?specification .
+  ?specification dcterms:identifier ?specificationId ; stl:requiresGrade ?requiredGrade .
+  ?requiredGrade skos:notation ?grade ; stl:definedIn/dcterms:identifier ?editionId .
+  ?piece stl:allocatedTo ?line ; dcterms:identifier ?pieceId .
+}
+ORDER BY ?grade ?editionId ?specificationId ?pieceId

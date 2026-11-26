@@ -1,0 +1,23 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX mat: <https://w3id.org/ontology-platform/steel/code/material-category/>
+
+SELECT DISTINCT ?heatId ?category ?lotId ?tapId ?furnaceId WHERE {
+  VALUES ?heat { <urn:synthetic:steel:heat/H12600017> }
+  ?heat dcterms:identifier ?heatId ; prov:wasGeneratedBy ?melt .
+  ?melt a/rdfs:subClassOf* stl:Steelmaking .
+  ?use stl:partOf* ?melt ; (stl:consumedLot|^stl:allocationOperation/stl:allocatedLot) ?lot .
+  VALUES (?kind ?class) { (mat:HOTMETAL stl:HotMetal) (mat:SCRAP stl:Scrap) (mat:FERROALLOY stl:Ferroalloy) }
+  FILTER (EXISTS { ?lot stl:materialCategory ?kind } || EXISTS { ?lot a/rdfs:subClassOf* ?class })
+  ?lot dcterms:identifier ?lotId .
+  ?kind skos:notation ?category .
+  OPTIONAL {
+    ?lot prov:wasGeneratedBy ?tap .
+    ?tap a/rdfs:subClassOf* stl:BlastFurnaceTapping ; dcterms:identifier ?tapId ; stl:performedOn ?furnace .
+    ?furnace stl:equipmentType <https://w3id.org/ontology-platform/steel/code/equipment-type/BF> ; dcterms:identifier ?furnaceId .
+  }
+}
+ORDER BY STR(?category) ?lotId ?tapId ?furnaceId

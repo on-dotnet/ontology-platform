@@ -1,0 +1,11 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?certificateId ?pieceId ?editionId ?documentType WHERE {
+  VALUES ?certificate { <urn:synthetic:steel:millcertificate/Z26000001> }
+  ?certificate dcterms:identifier ?certificateId ; stl:coversPiece/dcterms:identifier ?pieceId ;
+               stl:applicableStandard/dcterms:identifier ?editionId ;
+               stl:inspectionDocumentType/skos:notation ?documentType .
+}
+ORDER BY ?pieceId ?editionId ?documentType

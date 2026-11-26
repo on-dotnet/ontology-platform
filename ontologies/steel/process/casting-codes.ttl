@@ -1,0 +1,93 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/process/casting-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/casting-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "铸造代码表"@zh, "Casting code schemes"@en ;
+    rdfs:comment "登记锭模浇注方式，并为共享方案补充铸造设备、工序、坯形与拉速测量项。"@zh, "Defines ingot teeming methods and adds equipment, process, product form and strand speed codes to shared schemes."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/teeming-method> a skos:ConceptScheme ;
+    rdfs:label "模铸浇注方式"@zh, "Ingot teeming method"@en ; skos:prefLabel "模铸浇注方式"@zh, "Ingot teeming method"@en ;
+    skos:definition "按钢流进入锭模的路径区分模铸作业，据此可查询钢锭实际采用的浇法。"@zh, "Classifies ingot teeming by the path of the steel into the mould cavity so that the pouring method can be traced for each ingot."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting-codes> .
+
+stl:TeemingMethodCode a rdfs:Datatype ;
+    rdfs:label "模铸浇注方式代码"@zh, "Ingot teeming method code"@en ; skos:prefLabel "模铸浇注方式代码"@zh, "Ingot teeming method code"@en ;
+    skos:definition "模铸浇注方式方案中各项主记号的字面量类型。"@zh, "Datatype of the primary notations used for ingot teeming methods."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting-codes> .
+
+<code/equipment-type/CASTER> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "CASTER"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "连铸机"@zh, "Continuous caster"@en ; skos:prefLabel "连铸机"@zh, "Continuous caster"@en ;
+    skos:definition "由结晶器、拉坯与支承设备组成，可将连续供入的钢水凝固并引出为铸流。"@zh, "A machine that forms and supports a solidifying steel strand and withdraws it as liquid steel is supplied."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/CC> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:broader <code/equipment-type/CASTER> ;
+    skos:notation "CC"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "板坯连铸机"@zh, "Continuous slab caster"@en ; skos:prefLabel "板坯连铸机"@zh, "Continuous slab caster"@en ;
+    skos:definition "用于连续浇出宽扁矩形板坯铸流的连铸机。"@zh, "A caster configured to withdraw broad flat rectangular strands for slabs."@en ;
+    skos:altLabel "CC"@zh, "CC"@en ; dcterms:source <source/industry-practice> .
+<code/equipment-type/BCC> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:broader <code/equipment-type/CASTER> ;
+    skos:notation "BCC"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "方坯连铸机"@zh, "Square billet caster"@en ; skos:prefLabel "方坯连铸机"@zh, "Square billet caster"@en ;
+    skos:definition "使用方形断面结晶器连续浇出方坯铸流的设备。"@zh, "A caster fitted with moulds that form square billet strands."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/BLCC> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:broader <code/equipment-type/CASTER> ;
+    skos:notation "BLCC"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "大方坯连铸机"@zh, "Bloom caster"@en ; skos:prefLabel "大方坯连铸机"@zh, "Bloom caster"@en ;
+    skos:definition "用于浇出大方坯或大矩形坯铸流的连铸机。"@zh, "A caster configured to form large square or rectangular strands for blooms."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/RCC> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:broader <code/equipment-type/CASTER> ;
+    skos:notation "RCC"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "圆坯连铸机"@zh, "Round billet caster"@en ; skos:prefLabel "圆坯连铸机"@zh, "Round billet caster"@en ;
+    skos:definition "用圆形结晶器形成并引出圆截面铸流的连铸机。"@zh, "A caster that withdraws a round strand formed in a circular mould."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/TUNDISH> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "TUNDISH"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "中间包"@zh, "Tundish"@en ; skos:prefLabel "中间包"@zh, "Tundish"@en ;
+    skos:definition "接收钢包来钢并向一个或多个连铸结晶器稳定分配钢流的容器。"@zh, "A vessel that receives steel from a ladle and regulates its distribution to one or more caster moulds."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/INGOTMOULD> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "INGOTMOULD"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "锭模"@zh, "Ingot mould"@en ; skos:prefLabel "锭模"@zh, "Ingot mould"@en ;
+    skos:definition "模铸时容纳浇入的钢水、限定单个锭体外形的可单独识别的模具。"@zh, "A separately identifiable mould that contains the charge of liquid steel and shapes a single teemed ingot."@en ;
+    skos:altLabel "钢锭模"@zh, "ingot mold"@en ; dcterms:source <source/industry-practice> .
+
+<code/process-type/CC> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "CC"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "连续铸钢"@zh, "Continuous casting"@en ; skos:prefLabel "连续铸钢"@zh, "Continuous casting"@en ;
+    skos:definition "在连续供钢的同时引出逐渐凝固的铸流，获得可切分的坯料。"@zh, "Forms a continuously withdrawn steel strand that can be cut into lengths."@en .
+<code/process-type/INGOTCAST> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "INGOTCAST"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "模铸"@zh, "Ingot casting"@en ; skos:prefLabel "模铸"@zh, "Ingot casting"@en ;
+    skos:definition "向独立锭模分浇钢水，使各模内的钢分别凝固成锭。"@zh, "Distributes liquid steel into discrete moulds for solidification as individual ingots."@en .
+<code/process-type/CUT> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "CUT"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "切割"@zh, "Cutting"@en ; skos:prefLabel "切割"@zh, "Cutting"@en ;
+    skos:definition "把一段铸流或已有实物件分切成可以各自识别的坯件。"@zh, "Separates a strand or an existing piece into individually identifiable lengths."@en .
+
+<code/product-form/BLOOM> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "BLOOM"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "大方坯"@zh, "Bloom"@en ; skos:prefLabel "大方坯"@zh, "Bloom"@en ;
+    skos:definition "以方形或矩形的大断面坯料形态交接，供后续开坯或轧制。"@zh, "A large square or rectangular semiproduct supplied for breakdown or rolling."@en ;
+    dcterms:source <std/iso-6929-2013> .
+
+<code/teeming-method/TOP> a skos:Concept ; skos:inScheme <code/teeming-method> ; skos:topConceptOf <code/teeming-method> ;
+    skos:notation "TOP"^^stl:TeemingMethodCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "上注"@zh, "Top pouring"@en ; skos:prefLabel "上注"@zh, "Top pouring"@en ;
+    skos:definition "钢流从锭模上口直接进入模腔，在模内逐渐积满。"@zh, "Liquid steel enters the mould cavity directly through its open top."@en .
+<code/teeming-method/BOTTOM> a skos:Concept ; skos:inScheme <code/teeming-method> ; skos:topConceptOf <code/teeming-method> ;
+    skos:notation "BOTTOM"^^stl:TeemingMethodCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "下注"@zh, "Bottom pouring"@en ; skos:prefLabel "下注"@zh, "Bottom pouring"@en ;
+    skos:definition "钢流经中注管和底部流道进入锭模，从模底向上充型。"@zh, "Steel travels through a trumpet and bottom runners before rising in the mould cavity."@en ;
+    skos:altLabel "底注"@zh, "uphill teeming"@en .
+
+<code/measurement-item/CASTSPEED> a skos:Concept ; skos:inScheme <code/measurement-item> ; skos:topConceptOf <code/measurement-item> ;
+    skos:notation "CASTSPEED"^^stl:MeasurementItemCode ; rdfs:isDefinedBy <ontology/process/casting-codes> ;
+    rdfs:label "拉速"@zh, "casting speed"@en ; skos:prefLabel "拉速"@zh, "casting speed"@en ;
+    skos:definition "标识所测的量为单位时间内沿拉坯方向引出的铸流长度。"@zh, "Identifies a reading of the length of strand withdrawn in the casting direction per unit time."@en ;
+    skos:altLabel "拉坯速度"@zh .

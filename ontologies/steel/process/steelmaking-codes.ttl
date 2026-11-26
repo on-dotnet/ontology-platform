@@ -1,0 +1,138 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/process/steelmaking-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/steelmaking-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "炼钢代码"@zh, "Steelmaking codes"@en ;
+    rdfs:comment "登记炼钢设备、工序段、炉料形态与炉外精炼方法，供路线和实绩记录引用。"@zh, "Provides equipment, process, feedstock form and refining method codes for steelmaking routes and production records."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+# Primary furnaces, secondary treatment stations and ladles
+<code/equipment-type/BOF> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "BOF"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "氧气转炉"@zh, "Basic oxygen furnace"@en ; skos:prefLabel "氧气转炉"@zh, "Basic oxygen furnace"@en ;
+    skos:definition "使用氧气吹炼金属熔池并可倾动出钢的炼钢炉座。"@zh, "A tilting primary steelmaking furnace fitted to blow oxygen into or onto the bath."@en ;
+    dcterms:source <std/ybt-6393-2025> .
+<code/equipment-type/EAF> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "EAF"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "电弧炉"@zh, "Electric arc furnace"@en ; skos:prefLabel "电弧炉"@zh, "Electric arc furnace"@en ;
+    skos:definition "借助电极产生的电弧供热，以金属炉料冶炼钢水的炉座。"@zh, "A steelmaking furnace equipped with electrodes that supply arc heat to its metallic charge."@en ;
+    dcterms:source <std/ybt-6339-2025> .
+<code/equipment-type/LF> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "LF"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "钢包精炼炉"@zh, "Ladle furnace"@en ; skos:prefLabel "钢包精炼炉"@zh, "Ladle furnace"@en ;
+    skos:definition "在钢包上方配置电极，可对包内钢液补热并进行精炼的工位。"@zh, "A secondary treatment station with electrodes above the ladle for reheating and refining the bath."@en ;
+    dcterms:source <std/ybt-6394-2025> .
+<code/equipment-type/RH> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "RH"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "真空循环脱气装置"@zh, "Vacuum circulation degasser"@en ; skos:prefLabel "真空循环脱气装置"@zh, "Vacuum circulation degasser"@en ;
+    skos:definition "以浸渍管连接真空室与钢包，供钢液升入真空室并返回钢包的处理装置。"@zh, "A degasser with snorkels through which steel rises into a vacuum chamber and returns to the ladle."@en ;
+    dcterms:source <std/iso-4529-2023> .
+<code/equipment-type/VD> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "VD"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "钢包真空脱气装置"@zh, "Ladle vacuum degasser"@en ; skos:prefLabel "钢包真空脱气装置"@zh, "Ladle vacuum degasser"@en ;
+    skos:definition "在盛钢钢包上建立减压环境，使包内钢液脱气的处理装置。"@zh, "A treatment unit that applies vacuum above the bath in a ladle to remove dissolved gases."@en ;
+    dcterms:source <std/iso-4529-2023> .
+<code/equipment-type/VOD> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "VOD"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "真空吹氧脱碳装置"@zh, "Vacuum oxygen decarburization unit"@en ; skos:prefLabel "真空吹氧脱碳装置"@zh, "Vacuum oxygen decarburization unit"@en ;
+    skos:definition "配置供氧和抽真空系统，可在减压条件下对钢液吹氧脱碳的工位。"@zh, "A station equipped to blow oxygen into molten steel under vacuum for decarburization."@en ;
+    dcterms:source <std/iso-4529-2023> .
+<code/equipment-type/AOD> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "AOD"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "氩氧脱碳炉"@zh, "Argon oxygen decarburization converter"@en ; skos:prefLabel "氩氧脱碳炉"@zh, "Argon oxygen decarburization converter"@en ;
+    skos:definition "设有风口，可向钢液送入氧气和稀释气体以控制脱碳的精炼炉。"@zh, "A refining vessel with tuyeres supplying oxygen and diluting gas for controlled decarburization."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/CASOB> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "CASOB"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "浸罩吹氩成分微调与吹氧装置"@zh, "Sealed argon bubbling and oxygen blowing station"@en ; skos:prefLabel "浸罩吹氩成分微调与吹氧装置"@zh, "Sealed argon bubbling and oxygen blowing station"@en ;
+    skos:altLabel "CAS-OB"@zh, "CAS-OB"@en ;
+    skos:definition "以浸罩隔开钢包内局部钢面，配有加料与供氧设施的钢水处理站。"@zh, "A ladle station with an immersed bell, facilities for alloy additions, and an oxygen supply for chemical heating."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/LADLE> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "LADLE"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "钢包"@zh, "Steel ladle"@en ; skos:prefLabel "钢包"@zh, "Steel ladle"@en ;
+    skos:definition "有耐火衬里，用于承接、运送或处理钢水并向下一工位供钢的容器。"@zh, "A refractory-lined vessel that receives, carries or treats molten steel and delivers it to a subsequent station."@en ;
+    dcterms:source <source/industry-practice> .
+
+# Route segment types and metallic feedstock form
+<code/process-type/STEELMAKE> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "STEELMAKE"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "炼钢"@zh, "Primary steelmaking"@en ; skos:prefLabel "炼钢"@zh, "Primary steelmaking"@en ;
+    skos:definition "将金属炉料冶炼为一炉钢水的路线工序段。"@zh, "A route segment in which metallic feed is made into a heat of molten steel."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/BOF> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/STEELMAKE> ;
+    skos:notation "BOF"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "氧气转炉炼钢"@zh, "Basic oxygen steelmaking"@en ; skos:prefLabel "氧气转炉炼钢"@zh, "Basic oxygen steelmaking"@en ;
+    skos:definition "在氧气转炉内吹炼金属熔池并出钢的路线工序段。"@zh, "A primary steelmaking segment in which a converter heat is blown with oxygen and tapped."@en ;
+    dcterms:source <std/ybt-6393-2025> .
+<code/process-type/EAF> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/STEELMAKE> ;
+    skos:notation "EAF"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "电弧炉炼钢"@zh, "Electric arc steelmaking"@en ; skos:prefLabel "电弧炉炼钢"@zh, "Electric arc steelmaking"@en ;
+    skos:definition "以电弧炉熔炼炉料并出钢的路线工序段。"@zh, "A primary steelmaking segment in which a charge is melted and refined in an electric arc furnace."@en ;
+    dcterms:source <std/ybt-6339-2025> .
+<code/process-type/CHARGE> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "CHARGE"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "炼钢装料"@zh, "Steel furnace charging"@en ; skos:prefLabel "炼钢装料"@zh, "Steel furnace charging"@en ;
+    skos:definition "把备好的金属料或辅料送入炼钢炉的工序段。"@zh, "A route segment delivering metallic feed or other charge materials to a steelmaking furnace."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/STEELTAP> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "STEELTAP"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "出钢"@zh, "Steel tapping"@en ; skos:prefLabel "出钢"@zh, "Steel tapping"@en ;
+    skos:definition "把钢水从炼钢炉排入接收钢包的工序段。"@zh, "A segment transferring molten steel from the primary furnace to a receiving ladle."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/REFINE> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "REFINE"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "炉外精炼"@zh, "Secondary refining"@en ; skos:prefLabel "炉外精炼"@zh, "Secondary refining"@en ;
+    skos:definition "在一次冶炼出钢之后继续处理炉次钢水的工序段，具体处理方法由精炼实绩记录。"@zh, "A route segment treating a tapped heat, with the particular refining method recorded on the execution."@en ;
+    dcterms:source <std/iso-4529-2023> .
+<code/process-type/ALLOYADD> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "ALLOYADD"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "合金加入"@zh, "Alloy addition"@en ; skos:prefLabel "合金加入"@zh, "Alloy addition"@en ;
+    skos:definition "向钢水加入合金料以调整钢液成分的工序段。"@zh, "A route segment introducing alloying material into molten steel to adjust its composition."@en ;
+    dcterms:source <source/industry-practice> .
+<code/product-form/HBI> a skos:Concept ; skos:inScheme <code/product-form> ; skos:topConceptOf <code/product-form> ;
+    skos:notation "HBI"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "热压块铁"@zh, "Hot briquetted iron"@en ; skos:prefLabel "热压块铁"@zh, "Hot briquetted iron"@en ;
+    skos:definition "直接还原铁在热态压实后形成的致密块状炉料形态。"@zh, "The dense briquette form obtained by compacting direct reduced iron while it is hot."@en ;
+    dcterms:source <std/gbt-20565-2022> .
+
+# Treatment methods applied after primary steelmaking
+<code/refining-method> a skos:ConceptScheme ;
+    rdfs:label "炉外精炼方法"@zh, "Secondary refining method"@en ; skos:prefLabel "炉外精炼方法"@zh, "Secondary refining method"@en ;
+    skos:definition "按出钢后处理钢液的工艺原理区分精炼方法，同一炉次可依次接受多种处理。"@zh, "Classifies treatments of tapped steel by how they act on the bath. A heat can undergo a succession of these treatments."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> .
+stl:RefiningMethodCode a rdfs:Datatype ;
+    rdfs:label "炉外精炼方法代码"@zh, "Secondary refining method code"@en ; skos:prefLabel "炉外精炼方法代码"@zh, "Secondary refining method code"@en ;
+    skos:definition "标识炉外精炼方法方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the secondary refining method scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> .
+<code/refining-method/LF> a skos:Concept ; skos:inScheme <code/refining-method> ; skos:topConceptOf <code/refining-method> ;
+    skos:notation "LF"^^stl:RefiningMethodCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "钢包炉精炼"@zh, "Ladle furnace refining"@en ; skos:prefLabel "钢包炉精炼"@zh, "Ladle furnace refining"@en ;
+    skos:definition "在钢包炉工位利用电弧补热能力，配合搅拌、造渣或加合金处理钢液的方法。"@zh, "Ladle treatment using a furnace station with arc reheating and facilities for stirring, slag treatment or alloy additions."@en ;
+    dcterms:source <std/ybt-6394-2025> .
+<code/refining-method/RH> a skos:Concept ; skos:inScheme <code/refining-method> ; skos:topConceptOf <code/refining-method> ;
+    skos:notation "RH"^^stl:RefiningMethodCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "真空循环精炼"@zh, "Vacuum circulation refining"@en ; skos:prefLabel "真空循环精炼"@zh, "Vacuum circulation refining"@en ;
+    skos:definition "使钢水在钢包与真空室间循环，分批暴露于低压环境以脱气或脱碳的方法。"@zh, "Refining by circulating steel between the ladle and a vacuum chamber to expose successive portions to reduced pressure for degassing or decarburization."@en .
+<code/refining-method/VD> a skos:Concept ; skos:inScheme <code/refining-method> ; skos:topConceptOf <code/refining-method> ;
+    skos:notation "VD"^^stl:RefiningMethodCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "钢包真空脱气"@zh, "Ladle vacuum degassing"@en ; skos:prefLabel "钢包真空脱气"@zh, "Ladle vacuum degassing"@en ;
+    skos:definition "将钢包内钢液暴露于减压环境，使溶解气体逸出的精炼方法。"@zh, "Degassing by reducing the pressure above the bath while the steel remains in the ladle."@en .
+<code/refining-method/VOD> a skos:Concept ; skos:inScheme <code/refining-method> ; skos:topConceptOf <code/refining-method> ;
+    skos:notation "VOD"^^stl:RefiningMethodCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "真空吹氧脱碳"@zh, "Vacuum oxygen decarburization"@en ; skos:prefLabel "真空吹氧脱碳"@zh, "Vacuum oxygen decarburization"@en ;
+    skos:definition "在减压环境向钢液供氧，使熔池中的碳以一氧化碳逸出的精炼方法。"@zh, "A refining treatment that blows oxygen into molten steel under reduced pressure to remove carbon as carbon monoxide."@en .
+<code/refining-method/AOD> a skos:Concept ; skos:inScheme <code/refining-method> ; skos:topConceptOf <code/refining-method> ;
+    skos:notation "AOD"^^stl:RefiningMethodCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "氩氧脱碳"@zh, "Argon oxygen decarburization"@en ; skos:prefLabel "氩氧脱碳"@zh, "Argon oxygen decarburization"@en ;
+    skos:definition "向钢液送氧并配用氩气等稀释气体，降低一氧化碳分压以促进脱碳的方法。"@zh, "Decarburization by blowing oxygen with a diluting gas such as argon to lower the partial pressure of carbon monoxide."@en .
+<code/refining-method/CASOB> a skos:Concept ; skos:inScheme <code/refining-method> ; skos:topConceptOf <code/refining-method> ;
+    skos:notation "CASOB"^^stl:RefiningMethodCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
+    rdfs:label "浸罩吹氩成分微调与吹氧加热"@zh, "Composition adjustment by sealed argon bubbling with oxygen blowing"@en ; skos:prefLabel "浸罩吹氩成分微调与吹氧加热"@zh, "Composition adjustment by sealed argon bubbling with oxygen blowing"@en ;
+    skos:altLabel "CAS-OB"@zh, "CAS-OB"@en ;
+    skos:definition "在浸罩保护的钢面进行合金微调，以吹氩促进混匀，并可配合供氧实现化学升温的方法。"@zh, "Composition trimming under an immersed bell using argon stirring to mix additions, with oxygen blowing available for chemical heating."@en .

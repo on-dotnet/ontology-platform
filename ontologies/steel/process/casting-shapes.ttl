@@ -1,0 +1,100 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/process/casting-shapes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/casting-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "铸造数据约束"@zh, "Casting data constraints"@en ;
+    rdfs:comment "校验连铸坯的炉源、连浇炉序、模铸用模和拉速读数。"@zh, "Checks heat traceability for continuously cast pieces, heat order, ingot mould identity and casting speed observations."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:CastPieceSourceHeatShape a sh:PropertyShape ; sh:targetClass stl:ContinuouslyCastPiece ;
+    sh:target [ a sh:SPARQLTarget ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT DISTINCT ?this WHERE {
+          ?this (stl:producedBy|^stl:outputPiece)/stl:partOf*/a/rdfs:subClassOf* stl:ContinuousCasting .
+        }
+    """ ] ;
+    sh:path stl:sourceHeat ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "连铸坯应至少记录一个实际供钢炉次；换炉过渡时可以列出多个炉次。"@zh .
+
+stl:CastNumberingHeatShape a sh:PropertyShape ; sh:targetSubjectsOf stl:sequenceInStrand, stl:numberingHeat ;
+    sh:path stl:numberingHeat ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stl:Heat ;
+    sh:severity sh:Violation ; rdfs:comment "使用按炉、按流编序的坯件应引用唯一的编号炉次；实际供钢的所有炉次由 sourceHeat 分别记录。"@zh .
+
+stl:CastSequenceCasterShape a sh:PropertyShape ; sh:targetClass stl:CastSequence ;
+    sh:path stl:castOn ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stl:Equipment ;
+    sh:severity sh:Violation ; rdfs:comment "一条浇次记录应标识承接这组炉次的那一台铸机设备。"@zh .
+
+stl:CastHeatPositionShape a sh:PropertyShape ; sh:targetSubjectsOf stl:castIn ;
+    sh:path stl:heatPositionInSequence ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:positiveInteger ;
+    sh:severity sh:Violation ; rdfs:comment "已记入浇次的炉次应给出一个正整数炉序。"@zh .
+
+stl:CastSequenceUniquePositionShape a sh:NodeShape ; sh:targetObjectsOf stl:castIn ;
+    sh:severity sh:Violation ; rdfs:comment "在同一连续浇次内，一个炉序只能分配给一个炉次。"@zh ;
+    sh:sparql [ sh:message "同一浇次中有不同炉次占用了同一炉序。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        SELECT DISTINCT $this WHERE {
+          ?first stl:castIn $this ; stl:heatPositionInSequence ?a .
+          ?second stl:castIn $this ; stl:heatPositionInSequence ?b .
+          FILTER (!sameTerm(?first, ?second) && ?a = ?b)
+        }
+    """ ] .
+
+stl:IngotTeemingMethodShape a sh:PropertyShape ; sh:targetClass stl:IngotCasting ;
+    sh:path stl:teemingMethod ; sh:minCount 1 ; sh:maxCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "每次模铸作业应给出本次实际采用的浇注方式。"@zh .
+
+stl:TeemingMethodSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:teemingMethod ;
+    sh:path skos:inScheme ; sh:hasValue <code/teeming-method> ;
+    sh:severity sh:Violation ; rdfs:comment "模铸的浇注方式应引用模铸浇注方式方案中的代码。"@zh .
+
+stl:CastIngotMouldShape a sh:NodeShape ; sh:targetClass stl:Ingot ; sh:targetSubjectsOf stl:teemedInMould ;
+    sh:severity sh:Violation ; rdfs:comment "已知由模铸作业产出的锭应逐锭关联实际充型的唯一锭模；已记锭模的锭也应能回到该模铸作业。"@zh ;
+    sh:sparql [ sh:message "请核对该模铸锭的产出作业和逐锭记录的锭模设备。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX eq: <https://w3id.org/ontology-platform/steel/code/equipment-type/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        SELECT DISTINCT $this WHERE {
+          { $this stl:producedBy/a/rdfs:subClassOf* stl:IngotCasting .
+            FILTER NOT EXISTS {
+              $this stl:teemedInMould ?mould .
+              ?mould a/rdfs:subClassOf* stl:Equipment ; stl:equipmentType/skos:broader* eq:INGOTMOULD .
+            }
+          } UNION {
+            $this stl:teemedInMould ?mould .
+            FILTER NOT EXISTS { $this stl:producedBy/a/rdfs:subClassOf* stl:IngotCasting }
+          } UNION {
+            $this stl:teemedInMould ?first, ?second . FILTER (!sameTerm(?first, ?second))
+          }
+        }
+    """ ] .
+
+stl:CastingSpeedValueShape a sh:PropertyShape ; sh:targetSubjectsOf stl:castingSpeed ;
+    sh:path stl:castingSpeed ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "拉速记录铸流的引出速率，按非负十进制数填写，单位为米每分钟。"@zh .
+
+stl:CastingSpeedReadingShape a sh:NodeShape ; sh:targetClass stl:Observation ; sh:targetSubjectsOf stl:measurementItem ;
+    sh:severity sh:Violation ; rdfs:comment "拉速测量项应有拉速读数，且不能混入其他测量项的读数；其他测量项的观测也不能混入拉速。"@zh ;
+    sh:sparql [ sh:message "拉速读数与观测的测量项不一致。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX item: <https://w3id.org/ontology-platform/steel/code/measurement-item/>
+        SELECT DISTINCT $this WHERE {
+          { $this stl:measurementItem item:CASTSPEED .
+            FILTER (NOT EXISTS { $this stl:castingSpeed ?speed } ||
+                    EXISTS { $this ?property ?other .
+                             FILTER (?property IN (stl:temperature, stl:activeOxygen, stl:tensileStrength,
+                                                   stl:impactEnergy, stl:coatingMass, stl:thickness, stl:width)) })
+          } UNION {
+            $this stl:castingSpeed ?speed .
+            FILTER NOT EXISTS { $this stl:measurementItem item:CASTSPEED }
+          }
+        }
+    """ ] .

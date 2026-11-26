@@ -1,0 +1,211 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/core/material> a owl:Ontology ;
+    owl:versionIRI <ontology/core/material/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "物料与来源追溯"@zh, "Material and provenance"@en ;
+    rdfs:comment "描述物料批和实物件的身份、组成、直接来源，以及用于说明来源份额的证据。"@zh, "Describes the identity, composition and direct sources of material lots and pieces, including the evidence for source shares."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+# Material identity, lots and pieces
+stl:Material a owl:Class ; rdfs:subClassOf stl:ManufacturingObject, prov:Entity ;
+    rdfs:label "物料"@zh, "Material"@en ; skos:prefLabel "物料"@zh, "Material"@en ;
+    skos:definition "在生产履历中按批或按件追踪的物质实体，可作为工序的投入或产出。"@zh, "A physical entity tracked as a lot or an individual piece as it enters or leaves manufacturing operations."@en ;
+    dcterms:source <std/iec-62264-1-2013> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:MaterialSpecification a owl:Class ; rdfs:subClassOf stl:ManufacturingObject ;
+    rdfs:label "物料规格"@zh, "Material specification"@en ; skos:prefLabel "物料规格"@zh, "Material specification"@en ;
+    skos:definition "说明一类可订购或领用物料应具备哪些特征的规格，可归集牌号、尺寸及验收要求。"@zh, "A reusable specification stating the characteristics required of material for ordering or use, such as grade, dimensions and acceptance conditions."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:MaterialLot a owl:Class ; rdfs:subClassOf stl:Material ;
+    rdfs:label "物料批"@zh, "Material lot"@en ; skos:prefLabel "物料批"@zh, "Material lot"@en ;
+    skos:definition "在给定生产条件或共同来源下按一批管理、以该批身份追踪成分、状态和数量的物料。"@zh, "A quantity of material tracked under one lot identity for its composition, condition and quantity on the basis of its origin or production conditions."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:MaterialPiece a owl:Class ; rdfs:subClassOf stl:Material ;
+    rdfs:label "实物件"@zh, "Material piece"@en ; skos:prefLabel "实物件"@zh, "Material piece"@en ;
+    skos:definition "具有单件身份、能够称量或搬运并一直沿用其编号的物料实体。"@zh, "An item that can be weighed or moved under a single identity throughout its life."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:Heat a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord, stl:MaterialLot ;
+    rdfs:label "炉次"@zh, "Heat"@en ; skos:prefLabel "炉次"@zh, "Heat"@en ;
+    skos:altLabel "炼钢炉次"@zh, "熔炼炉次"@zh ;
+    skos:definition "一座炼钢炉一次冶炼出钢所确立的钢水批身份，精炼和浇注可继续引用该身份。"@zh, "A steel batch identity established at one furnace tapping and carried into refining and casting records."@en ;
+    dcterms:source <std/gbt-20566-2006> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:MaterialSublot a owl:Class ; rdfs:subClassOf stl:MaterialLot ;
+    rdfs:label "物料子批"@zh, "Material sublot"@en ; skos:prefLabel "物料子批"@zh, "Material sublot"@en ;
+    skos:definition "从母批划出、可单独搬运或称量且保留母批归属的物料份额。"@zh, "A separately handled portion of a lot that retains an explicit link to its parent lot."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:BulkBlend a owl:Class ; rdfs:subClassOf stl:MaterialLot ;
+    rdfs:label "混合料批"@zh, "Blended lot"@en ; skos:prefLabel "混合料批"@zh, "Blended lot"@en ;
+    skos:definition "汇合多个来源批后取得独立身份并保留各来源贡献的物料批。"@zh, "A lot formed by combining source lots while retaining their individual contributions."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:RecoveredLot a owl:Class ; rdfs:subClassOf stl:MaterialLot ;
+    rdfs:label "回收料批"@zh, "Recovered lot"@en ; skos:prefLabel "回收料批"@zh, "Recovered lot"@en ;
+    skos:definition "从已知制造或分选作业返回、可重新投用的独立物料批。"@zh, "A reusable lot recovered from an identifiable production or sorting operation."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:SemiFinishedProduct a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "半成品"@zh, "Semi-finished product"@en ; skos:prefLabel "半成品"@zh, "Semi-finished product"@en ;
+    skos:definition "已具有独立件号、仍需按既定生产路线继续加工的中间产品。"@zh, "An individually identified intermediate product intended for further processing along its production route."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:FinishedProduct a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "成品"@zh, "Finished product"@en ; skos:prefLabel "成品"@zh, "Finished product"@en ;
+    skos:definition "已完成规定制造路线、以当前形态供检验或交付的产品件。"@zh, "A product piece that has completed its specified manufacturing route and is available in that form for inspection or delivery."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:Package a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "包装件"@zh, "Package"@en ; skos:prefLabel "包装件"@zh, "Package"@en ;
+    skos:definition "按包装号整体移交且成员仍可追踪的物流实物件。"@zh, "An identified handling piece transferred as a unit while retaining the identity of its contents."@en ;
+    dcterms:source <std/wbt-1092-2018> ; rdfs:isDefinedBy <ontology/core/material> .
+
+# Material use, source shares and source intervals
+stl:LotAllocation a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "批料投用记录"@zh, "Lot allocation"@en ; skos:prefLabel "批料投用记录"@zh, "Lot allocation"@en ;
+    skos:definition "把一个投入批的一定用量分配给一次执行的明细。"@zh, "A line allocating a stated quantity from one source lot to one execution."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:MassBalance a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "物料平衡"@zh, "Material balance"@en ; skos:prefLabel "物料平衡"@zh, "Material balance"@en ;
+    skos:definition "在同一作业边界内对照投料、成品、副产物及损耗的核算记录。"@zh, "A reconciliation of inputs, products, coproducts and loss across one stated process boundary."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:SourceContribution a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "来源份额记录"@zh, "Source contribution"@en ; skos:prefLabel "来源份额记录"@zh, "Source contribution"@en ;
+    skos:definition "为一个产出和一个直接来源保存计量依据、份额或份额未知状态的记录。"@zh, "A record associating one output with one direct source and the evidence for its share."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:HeatContribution a owl:Class ; rdfs:subClassOf stl:SourceContribution ;
+    rdfs:label "炉次来源记录"@zh, "Heat contribution"@en ; skos:prefLabel "炉次来源记录"@zh, "Heat contribution"@en ;
+    skos:definition "说明一个产出物料从某个供钢炉次取得钢水及其份额依据的来源明细。"@zh, "A source contribution identifying one heat that supplied liquid steel to an output and the evidence for its share."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:SourceInterval a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "来源区段"@zh, "Source interval"@en ; skos:prefLabel "来源区段"@zh, "Source interval"@en ;
+    skos:definition "在一个产出与一个来源件之间按来源件坐标界定材料取自何处的记录。"@zh, "A record locating the material of one output along a specified immediate source piece."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:Weighing a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "称量作业"@zh, "Weighing"@en ; skos:prefLabel "称量作业"@zh, "Weighing"@en ;
+    skos:definition "在指定衡器上对一个批或一件实物完成称量并留下读数的作业。"@zh, "An operation that obtains a scale reading for a specified lot or piece."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+
+# Specification, category and whole-part relationships
+stl:materialCategory a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:Material stl:MaterialSpecification ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/material-category> ;
+    rdfs:label "物料类别"@zh, "Material category"@en ; skos:prefLabel "物料类别"@zh, "Material category"@en ;
+    skos:definition "根据物料类别代码标明物料或其规格所代表的料种，例如焦炭或废钢。"@zh, "Classifies a material or its specification by material category, such as coke or scrap."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:definedMaterial a owl:ObjectProperty ; rdfs:domain stl:Material ; rdfs:range stl:MaterialSpecification ;
+    rdfs:label "采用的物料规格"@zh, "Governing material specification"@en ; skos:prefLabel "采用的物料规格"@zh, "Governing material specification"@en ;
+    skos:definition "指明实际物料归属的规格，该规格可供多个批次或实物件共同引用。"@zh, "Identifies the reusable specification under which a physical lot or piece is identified."@en ;
+    dcterms:source <std/iec-62264-2-2026> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:productForm a owl:ObjectProperty ; rdfs:domain stl:MaterialPiece ; rdfs:range skos:Concept ; rdfs:seeAlso <code/product-form> ;
+    rdfs:label "实物产品形态"@zh, "Physical product form"@en ; skos:prefLabel "实物产品形态"@zh, "Physical product form"@en ;
+    skos:definition "标识实物件在当前身份下的几何或交货形态。"@zh, "Identifies the physical product form associated with the current piece identity."@en ;
+    dcterms:source <std/gbt-15574-2016> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:steelGrade a owl:ObjectProperty ; rdfs:domain stl:Material ; rdfs:range stl:SteelGrade ;
+    rdfs:label "所属内部钢种"@zh, "Internal grade of material"@en ; skos:prefLabel "所属内部钢种"@zh, "Internal grade of material"@en ;
+    skos:definition "指明生产中用于识别该物料的内部钢种，适用于炉次及其后续产品。"@zh, "Identifies the internal steel grade assigned in production to a material such as a heat or a product piece."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:hasPart a owl:ObjectProperty ; owl:inverseOf stl:partOf ;
+    rdfs:label "包含组成部分"@zh, "Has part"@en ; skos:prefLabel "包含组成部分"@zh, "Has part"@en ;
+    skos:definition "列出在所述组成关系中属于当前整体的一个部分。"@zh, "Identifies a constituent belonging to the stated whole."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:partOf a owl:ObjectProperty ;
+    rdfs:label "所属整体"@zh, "Part of"@en ; skos:prefLabel "所属整体"@zh, "Part of"@en ;
+    skos:definition "指出物件、条目或子执行所直接隶属的整体，例如包装件、订单或上一级作业。"@zh, "Identifies the immediate whole containing a component, entry or suboperation, such as a package, order or parent operation."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:parentLot a owl:ObjectProperty ; rdfs:domain stl:MaterialSublot ; rdfs:range stl:MaterialLot ;
+    rdfs:label "母批"@zh, "Parent lot"@en ; skos:prefLabel "母批"@zh, "Parent lot"@en ;
+    skos:definition "指出本子批按量划出的直接母批。"@zh, "Identifies the immediate lot from which a sublot was set apart."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+
+# Genealogy and evidence
+stl:derivedFrom a owl:ObjectProperty ; rdfs:subPropertyOf prov:wasDerivedFrom ; rdfs:domain stl:Material ; rdfs:range stl:Material ;
+    rdfs:label "直接来源物料"@zh, "Derived from"@en ; skos:prefLabel "直接来源物料"@zh, "Derived from"@en ;
+    skos:definition "指向经一步分取、合并或加工形成当前物料的直接来源批或件。"@zh, "Identifies one immediate source lot or piece from which the current material was split, combined or transformed."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:producedBy a owl:ObjectProperty ; rdfs:subPropertyOf prov:wasGeneratedBy ; rdfs:domain stl:MaterialPiece ; rdfs:range stl:Operation ; owl:inverseOf stl:outputPiece ;
+    rdfs:label "产出工序"@zh, "Produced by"@en ; skos:prefLabel "产出工序"@zh, "Produced by"@en ;
+    skos:definition "从新取得身份的件指向直接产出该件的实际作业。"@zh, "Identifies the operation responsible for the birth of the piece under its current identifier."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:sourceHeat a owl:ObjectProperty ; rdfs:domain stl:MaterialPiece ; rdfs:range stl:Heat ;
+    rdfs:label "来源炉次"@zh, "Source heat"@en ; skos:prefLabel "来源炉次"@zh, "Source heat"@en ;
+    skos:definition "指明向这件实物供应钢水的炼钢炉次，换炉时可有多个来源。"@zh, "Identifies a steelmaking heat that supplied liquid steel to the piece, including each contributing heat at a heat transition."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:contribution a owl:ObjectProperty ; rdfs:domain stl:Material ; rdfs:range stl:SourceContribution ; owl:inverseOf stl:contributionOutput ;
+    rdfs:label "来源份额明细"@zh, "Source contribution entry"@en ; skos:prefLabel "来源份额明细"@zh, "Source contribution entry"@en ;
+    skos:definition "从产出批或件指向说明其中一个直接来源及其份额依据的明细。"@zh, "Links an output lot or piece to the entry explaining one direct source and the basis for its share."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:contributionInput a owl:ObjectProperty ; rdfs:domain stl:SourceContribution ; rdfs:range stl:Material ;
+    rdfs:label "贡献对应来源"@zh, "Contributing input"@en ; skos:prefLabel "贡献对应来源"@zh, "Contributing input"@en ;
+    skos:definition "指明某项份额证据涉及的一个直接投入批或投入件。"@zh, "Identifies the input lot or piece whose share in the specified output is being described."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:contributionOutput a owl:ObjectProperty ; rdfs:domain stl:SourceContribution ; rdfs:range stl:Material ;
+    rdfs:label "贡献对应产出"@zh, "Output receiving contribution"@en ; skos:prefLabel "贡献对应产出"@zh, "Output receiving contribution"@en ;
+    skos:definition "标识一条来源份额明细所解释的产出件或产出批。"@zh, "Identifies the output piece or lot whose origins the contribution describes."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:contributedHeat a owl:ObjectProperty ; rdfs:subPropertyOf stl:contributionInput ; rdfs:domain stl:HeatContribution ; rdfs:range stl:Heat ;
+    rdfs:label "贡献炉次"@zh, "Contributing heat"@en ; skos:prefLabel "贡献炉次"@zh, "Contributing heat"@en ;
+    skos:definition "指出本条炉源份额明细所描述的实际供钢炉次。"@zh, "Identifies the heat whose contribution the individual entry describes."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:evidenceLevel a owl:ObjectProperty ; rdfs:domain stl:SourceContribution ; rdfs:range skos:Concept ; rdfs:seeAlso <code/contribution-evidence> ;
+    rdfs:label "来源证据等级"@zh, "Contribution evidence level"@en ; skos:prefLabel "来源证据等级"@zh, "Contribution evidence level"@en ;
+    skos:definition "指明认定一个直接来源份额所采用的证据类别。"@zh, "Identifies the evidence supporting the share attributed to one immediate source."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:shareBasis a owl:ObjectProperty ; rdfs:domain stl:SourceContribution ; rdfs:range skos:Concept ; rdfs:seeAlso <code/share-basis> ;
+    rdfs:label "份额基准"@zh, "Share basis"@en ; skos:prefLabel "份额基准"@zh, "Share basis"@en ;
+    skos:definition "标明直接来源占比以产出质量还是产出长度为分母。"@zh, "Identifies whether the output mass or length is the denominator for a direct source share."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:share a owl:DatatypeProperty ; rdfs:domain stl:SourceContribution ; rdfs:range xsd:decimal ; stl:unit unit:PERCENT ; stl:quantityKind quantitykind:DimensionlessRatio ;
+    rdfs:label "来源份额"@zh, "Contribution share"@en ; skos:prefLabel "来源份额"@zh, "Contribution share"@en ;
+    skos:definition "将按长度或质量计量的单个直接来源占产出的比例表示为百分数。"@zh, "Gives the percentage of an output attributed to one immediate source on the specified mass or length basis."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:allocatedLot a owl:ObjectProperty ; rdfs:domain stl:LotAllocation ; rdfs:range stl:MaterialLot ;
+    rdfs:label "配入来源批"@zh, "Allocated source lot"@en ; skos:prefLabel "配入来源批"@zh, "Allocated source lot"@en ;
+    skos:definition "标明某次定量投料明细实际取料的批次。"@zh, "Identifies the source lot drawn upon in a quantified charge allocation."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:allocationOperation a owl:ObjectProperty ; rdfs:domain stl:LotAllocation ; rdfs:range stl:Operation ;
+    rdfs:label "投用执行"@zh, "Allocation operation"@en ; skos:prefLabel "投用执行"@zh, "Allocation operation"@en ;
+    skos:definition "指定接收这笔定量投料的实际作业。"@zh, "Identifies the execution receiving the material in this allocation."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:intervalSource a owl:ObjectProperty ; rdfs:domain stl:SourceInterval ; rdfs:range stl:MaterialPiece ;
+    rdfs:label "区段来源件"@zh, "Source of interval"@en ; skos:prefLabel "区段来源件"@zh, "Source of interval"@en ;
+    skos:definition "给出定义区段坐标的直接来源件。"@zh, "Identifies the immediate source piece on which the interval coordinates are defined."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:intervalOutput a owl:ObjectProperty ; rdfs:domain stl:SourceInterval ; rdfs:range stl:MaterialPiece ;
+    rdfs:label "区段产出件"@zh, "Output of source interval"@en ; skos:prefLabel "区段产出件"@zh, "Output of source interval"@en ;
+    skos:definition "指明利用该来源区段生成的直接下游件。"@zh, "Identifies the immediate output piece made using the specified source interval."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:sourceStart a owl:DatatypeProperty ; rdfs:domain stl:SourceInterval ; rdfs:range xsd:decimal ; stl:unit unit:M ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "来源区段起点"@zh, "Source interval start"@en ; skos:prefLabel "来源区段起点"@zh, "Source interval start"@en ;
+    skos:definition "给出区段起点距所指来源件约定起端的纵向距离。"@zh, "Gives the start distance along the source piece from its designated origin."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:sourceEnd a owl:DatatypeProperty ; rdfs:domain stl:SourceInterval ; rdfs:range xsd:decimal ; stl:unit unit:M ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "来源区段终点"@zh, "Source interval end"@en ; skos:prefLabel "来源区段终点"@zh, "Source interval end"@en ;
+    skos:definition "给出同一区段终点距来源件同一零点的纵向距离。"@zh, "Gives the end distance along the source piece from the same origin as the start."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+
+# Dimensions and mass
+stl:thickness a owl:DatatypeProperty ; rdfs:range xsd:decimal ; stl:unit unit:MilliM ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "厚度"@zh, "Thickness"@en ; skos:prefLabel "厚度"@zh, "Thickness"@en ;
+    skos:definition "沿材料两相对表面之间的厚度方向量得或规定的距离，以毫米计。"@zh, "The measured or specified distance between opposite faces in the thickness direction, expressed in millimetres."@en ;
+    dcterms:source <std/gbt-709-2019> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:width a owl:DatatypeProperty ; rdfs:range xsd:decimal ; stl:unit unit:MilliM ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "宽度"@zh, "Width"@en ; skos:prefLabel "宽度"@zh, "Width"@en ;
+    skos:definition "沿材料横向量得或规定的宽度，以毫米计。"@zh, "The measured or specified transverse dimension of the material, expressed in millimetres."@en ;
+    dcterms:source <std/gbt-709-2019> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:actualLength a owl:DatatypeProperty ; rdfs:range xsd:decimal ; stl:unit unit:M ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "实测长度"@zh, "Actual length"@en ; skos:prefLabel "实测长度"@zh, "Actual length"@en ;
+    skos:definition "沿材料纵向实际量得的长度，以米计，可记在实物或对应的作业实绩上。"@zh, "The measured longitudinal extent of material in metres, recorded against the piece or the associated operation."@en ;
+    dcterms:source <std/gbt-709-2019> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:grossMass a owl:DatatypeProperty ; rdfs:domain stl:MaterialPiece ; rdfs:range xsd:decimal ; stl:unit unit:TONNE ; stl:quantityKind quantitykind:Mass ;
+    rdfs:label "毛重"@zh, "Gross mass"@en ; skos:prefLabel "毛重"@zh, "Gross mass"@en ;
+    skos:definition "给出按规定称量边界连同包装或承载附属物一并称得的质量。"@zh, "Gives the mass weighed with the packaging or ancillary load included within the stated boundary."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:netMass a owl:DatatypeProperty ; rdfs:domain stl:MaterialPiece ; rdfs:range xsd:decimal ; stl:unit unit:TONNE ; stl:quantityKind quantitykind:Mass ;
+    rdfs:label "净重"@zh, "Net mass"@en ; skos:prefLabel "净重"@zh, "Net mass"@en ;
+    skos:definition "给出扣除包装及相应皮重后属于实物本身的质量。"@zh, "Gives the mass of the material piece after the applicable tare has been excluded."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/material> .
+stl:theoreticalMass a owl:DatatypeProperty ; rdfs:domain stl:MaterialPiece ; rdfs:range xsd:decimal ; stl:unit unit:TONNE ; stl:quantityKind quantitykind:Mass ;
+    rdfs:label "理论重量"@zh, "Theoretical mass"@en ; skos:prefLabel "理论重量"@zh, "Theoretical mass"@en ;
+    skos:definition "给出按规定几何尺寸与密度等依据计算的计重值。"@zh, "Gives the calculated piece mass using the applicable dimensional and density basis."@en ;
+    dcterms:source <std/gbt-709-2019> ; rdfs:isDefinedBy <ontology/core/material> .

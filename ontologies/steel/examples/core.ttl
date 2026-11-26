@@ -1,0 +1,199 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix piece: <urn:synthetic:steel:materialpiece/> .
+@prefix lot: <urn:synthetic:steel:materiallot/> .
+@prefix heat: <urn:synthetic:steel:heat/> .
+@prefix src: <urn:synthetic:steel:sourcecontribution/> .
+@prefix op: <urn:synthetic:steel:operation/> .
+@prefix eq: <urn:synthetic:steel:equipment/> .
+@prefix seg: <urn:synthetic:steel:processsegment/> .
+@prefix po: <urn:synthetic:steel:productionorder/> .
+@prefix order: <urn:synthetic:steel:salesorder/> .
+@prefix line: <urn:synthetic:steel:salesorderline/> .
+@prefix spec: <urn:synthetic:steel:materialspecification/> .
+@prefix grade: <urn:synthetic:steel:standardgrade/> .
+@prefix ed: <urn:synthetic:steel:standardedition/> .
+@prefix bound: <urn:synthetic:steel:compositionlimit/> .
+@prefix sample: <urn:synthetic:steel:sample/> .
+@prefix tensile: <urn:synthetic:steel:tensiletest/> .
+@prefix impact: <urn:synthetic:steel:impacttest/> .
+@prefix obs: <urn:synthetic:steel:observation/> .
+@prefix point: <urn:synthetic:steel:measurementpoint/> .
+@prefix inspection: <urn:synthetic:steel:inspectionlot/> .
+@prefix rule: <urn:synthetic:steel:lotformationrule/> .
+@prefix decision: <urn:synthetic:steel:qualitydecision/> .
+@prefix act: <urn:synthetic:steel:qualitydisposition/> .
+@prefix cert: <urn:synthetic:steel:millcertificate/> .
+@prefix crane: <urn:synthetic:steel:crane/> .
+@prefix loc: <urn:synthetic:steel:storagelocation/> .
+@prefix area: <urn:synthetic:steel:storagearea/> .
+@prefix move: <urn:synthetic:steel:movementevent/> .
+@prefix transfer: <urn:synthetic:steel:movementorder/> .
+
+# DEMO-B and EX-PROD are fictional. All dimensions, limits and readings are synthetic.
+ed:ED24 a stl:StandardEdition ; dcterms:identifier "EX-PROD 2024" ; dcterms:issued "2024"^^xsd:gYear .
+ed:ED26 a stl:StandardEdition ; dcterms:identifier "EX-PROD 2026" ; dcterms:issued "2026"^^xsd:gYear .
+grade:G24 a stl:StandardGrade ; skos:notation "DEMO-B" ; stl:definedIn ed:ED24 .
+grade:G26 a stl:StandardGrade ; skos:notation "DEMO-B" ; stl:definedIn ed:ED26 .
+spec:B01 a stl:MaterialSpecification ; dcterms:identifier "B01" ;
+    stl:requiresGrade grade:G24 ; stl:applicableStandard ed:ED24 .
+spec:B02 a stl:MaterialSpecification ; dcterms:identifier "B02" ;
+    stl:requiresGrade grade:G26 ; stl:applicableStandard ed:ED26 ; stl:hasPart bound:K02 .
+bound:K02 a stl:CompositionLimit ; stl:element <code/chemical-element/C> ;
+    stl:lowerLimit 0.12 ; stl:upperLimit 0.21 ;
+    rdfs:comment "碳含量上下限为合成示例值。"@zh .
+
+order:D26000001 a stl:SalesOrder ; dcterms:identifier "D26000001" ; stl:hasPart line:D26000001-010 ;
+    stl:serialNumber "1"^^xsd:positiveInteger ; stl:createdAt "2026-11-17T08:30:00+08:00"^^xsd:dateTime .
+order:D26000002 a stl:SalesOrder ; dcterms:identifier "D26000002" ; stl:hasPart line:D26000002-010 ;
+    stl:serialNumber "2"^^xsd:positiveInteger ; stl:createdAt "2026-11-17T09:30:00+08:00"^^xsd:dateTime .
+line:D26000001-010 a stl:SalesOrderLine ; dcterms:identifier "D26000001-010" ; stl:requiresSpecification spec:B01 ;
+    stl:partOf order:D26000001 ; stl:lineNumber "10"^^xsd:positiveInteger .
+line:D26000002-010 a stl:SalesOrderLine ; dcterms:identifier "D26000002-010" ; stl:requiresSpecification spec:B02 ;
+    stl:partOf order:D26000002 ; stl:lineNumber "10"^^xsd:positiveInteger .
+po:W26000001 a stl:ProductionOrder ; dcterms:identifier "W26000001" ; stl:forOrderLine line:D26000001-010 ;
+    stl:serialNumber "1"^^xsd:positiveInteger ; stl:createdAt "2026-11-17T15:00:00+08:00"^^xsd:dateTime ;
+    stl:plannedStartAt "2026-11-19T01:20:00+09:30"^^xsd:dateTime ;
+    stl:plannedEndAt "2026-11-18T16:25:00Z"^^xsd:dateTime .
+po:W26000002 a stl:ProductionOrder ; dcterms:identifier "W26000002" ; stl:forOrderLine line:D26000001-010 ;
+    stl:serialNumber "2"^^xsd:positiveInteger ; stl:createdAt "2026-11-17T16:00:00+08:00"^^xsd:dateTime ;
+    stl:plannedStartAt "2026-11-18T23:30:00+08:00"^^xsd:dateTime ;
+    stl:plannedEndAt "2026-11-19T01:00:00+08:00"^^xsd:dateTime .
+
+heat:H12600001 a stl:Heat ; dcterms:identifier "H12600001" ; prov:wasGeneratedBy op:M01 ;
+    stl:serialNumber "1"^^xsd:positiveInteger ; stl:createdAt "2026-11-18T22:40:00+08:00"^^xsd:dateTime .
+heat:H12600002 a stl:Heat ; dcterms:identifier "H12600002" ; prov:wasGeneratedBy op:M02 ;
+    stl:serialNumber "2"^^xsd:positiveInteger ; stl:createdAt "2026-11-18T23:25:00+08:00"^^xsd:dateTime .
+lot:L01 a stl:MaterialLot ; dcterms:identifier "L01" .
+eq:BOF1 a stl:Equipment ; dcterms:identifier "BOF1" ; rdfs:label "一号转炉"@zh ; stl:unitNumber "1"^^xsd:positiveInteger .
+eq:CC1 a stl:Equipment ; dcterms:identifier "CC1" ; rdfs:label "一号连铸机"@zh ; stl:unitNumber "1"^^xsd:positiveInteger .
+eq:HSM1 a stl:Equipment ; dcterms:identifier "HSM1" ; rdfs:label "一号热连轧机组"@zh ; stl:unitNumber "1"^^xsd:positiveInteger .
+eq:CC2 a stl:Equipment ; dcterms:identifier "CC2" ; rdfs:label "二号连铸机"@zh ; stl:unitNumber "2"^^xsd:positiveInteger .
+seg:G01 a stl:ProcessSegment ; rdfs:label "浇铸成形"@zh .
+seg:G02 a stl:ProcessSegment ; rdfs:label "轧制与分切"@zh .
+
+op:M01 a stl:Operation ; dcterms:identifier "M01" ; stl:performedOn eq:BOF1 ;
+    stl:actualStartAt "2026-11-18T22:00:00+08:00"^^xsd:dateTime ; stl:actualEndAt "2026-11-18T22:40:00+08:00"^^xsd:dateTime .
+op:M02 a stl:Operation ; dcterms:identifier "M02" ; stl:performedOn eq:BOF1 ;
+    stl:actualStartAt "2026-11-18T22:45:00+08:00"^^xsd:dateTime ; stl:actualEndAt "2026-11-18T23:25:00+08:00"^^xsd:dateTime .
+op:M11 a stl:Operation ; dcterms:identifier "M11" ; stl:fulfills po:W26000001 ;
+    stl:executesSegment seg:G01 ; stl:performedOn eq:CC1 ;
+    stl:consumedLot heat:H12600001, heat:H12600002, lot:L01 ; stl:outputPiece piece:P10 ;
+    stl:actualStartAt "2026-11-18T23:56:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-19T00:03:00+08:00"^^xsd:dateTime .
+op:M12 a stl:Operation ; dcterms:identifier "M12" ; stl:fulfills po:W26000001 ;
+    stl:executesSegment seg:G02 ; stl:performedOn eq:HSM1 ;
+    stl:inputPiece piece:P10 ; stl:outputPiece piece:P31, piece:P32 ;
+    stl:actualStartAt "2026-11-19T00:07:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-19T00:21:00+08:00"^^xsd:dateTime .
+op:M13 a stl:Operation ; dcterms:identifier "M13" ; stl:fulfills po:W26000002 ;
+    stl:executesSegment seg:G01 ; stl:performedOn eq:CC2 ; stl:consumedLot heat:H12600001 ; stl:outputPiece piece:P40 ;
+    stl:actualStartAt "2026-11-18T23:30:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-19T01:05:00+08:00"^^xsd:dateTime .
+
+piece:P10 a stl:MaterialPiece ; dcterms:identifier "P10" ; stl:producedBy op:M11 ;
+    stl:derivedFrom heat:H12600001, heat:H12600002, lot:L01 ; stl:sourceHeat heat:H12600001, heat:H12600002 ;
+    stl:createdAt "2026-11-19T00:03:00+08:00"^^xsd:dateTime .
+piece:P31 a stl:MaterialPiece ; dcterms:identifier "P31" ; stl:producedBy op:M12 ;
+    stl:derivedFrom piece:P10 ; stl:netMass 6.2 ; stl:allocatedTo line:D26000002-010 ;
+    stl:createdAt "2026-11-19T00:21:00+08:00"^^xsd:dateTime .
+piece:P32 a stl:MaterialPiece ; dcterms:identifier "P32" ; stl:producedBy op:M12 ;
+    stl:derivedFrom piece:P10 ; stl:netMass 5.8 ; stl:allocatedTo line:D26000002-010 ;
+    stl:createdAt "2026-11-19T00:21:00+08:00"^^xsd:dateTime .
+piece:P40 a stl:MaterialPiece ; dcterms:identifier "P40" ; stl:producedBy op:M13 ;
+    stl:derivedFrom heat:H12600001 ; stl:sourceHeat heat:H12600001 ; stl:allocatedTo line:D26000001-010 ;
+    stl:createdAt "2026-11-19T01:05:00+08:00"^^xsd:dateTime .
+
+src:C01 a stl:SourceContribution ; stl:contributionOutput piece:P10 ; stl:contributionInput heat:H12600001 ;
+    stl:share 68.0 ; stl:shareBasis <code/share-basis/MASS> ; stl:evidenceLevel <code/contribution-evidence/MEASURED> .
+src:C02 a stl:SourceContribution ; stl:contributionOutput piece:P10 ; stl:contributionInput heat:H12600002 ;
+    stl:share 30.0 ; stl:shareBasis <code/share-basis/MASS> ; stl:evidenceLevel <code/contribution-evidence/ESTIMATED> .
+src:C03 a stl:SourceContribution ; stl:contributionOutput piece:P10 ; stl:contributionInput lot:L01 ;
+    stl:evidenceLevel <code/contribution-evidence/UNKNOWN> .
+src:C04 a stl:SourceContribution ; stl:contributionOutput piece:P40 ; stl:contributionInput heat:H12600001 ;
+    stl:share 100.0 ; stl:shareBasis <code/share-basis/MASS> ; stl:evidenceLevel <code/contribution-evidence/MEASURED> .
+
+point:PT01 a stl:MeasurementPoint ; stl:partOf eq:HSM1 .
+obs:O01 a stl:Observation ; stl:measuredObject piece:P31 ; stl:measuredAtPoint point:PT01 ;
+    stl:measurementItem <code/measurement-item/WIDTH> ; stl:width 910.0 ;
+    stl:measurementMethod <code/measurement-method/AUTOMATIC> ;
+    stl:sampledAt "2026-11-19T00:22:00+08:00"^^xsd:dateTime ; stl:resultAt "2026-11-19T00:22:03+08:00"^^xsd:dateTime .
+sample:T260000001 a stl:Sample ; dcterms:identifier "T260000001" ; stl:sampleOf piece:P31 ; stl:sampleType <code/sample-type/MECHANICAL> ;
+    stl:serialNumber "1"^^xsd:positiveInteger ; stl:createdAt "2026-11-19T00:30:00+08:00"^^xsd:dateTime ;
+    stl:sampledAt "2026-11-19T00:30:00+08:00"^^xsd:dateTime .
+sample:T260000002 a stl:Sample ; dcterms:identifier "T260000002" ; stl:sampleOf piece:P31 ; stl:sampleType <code/sample-type/MECHANICAL> ;
+    stl:serialNumber "2"^^xsd:positiveInteger ; stl:createdAt "2026-11-19T00:32:00+08:00"^^xsd:dateTime ;
+    stl:sampledAt "2026-11-19T00:32:00+08:00"^^xsd:dateTime .
+sample:T260000003 a stl:Sample ; dcterms:identifier "T260000003" ; stl:sampleOf piece:P32 ; stl:sampleType <code/sample-type/MECHANICAL> ;
+    stl:serialNumber "3"^^xsd:positiveInteger ; stl:createdAt "2026-11-19T00:34:00+08:00"^^xsd:dateTime ; stl:sampledAt "2026-11-19T00:34:00+08:00"^^xsd:dateTime .
+tensile:T01 a stl:TensileTest ; dcterms:identifier "T01" ; stl:testedSample sample:T260000001 ;
+    stl:testType <code/test-type/TENSILE> ; stl:methodStandard <std/gbt-228-1-2021> ;
+    stl:tensileStrength 455.0 ; stl:resultAt "2026-11-19T00:55:00+08:00"^^xsd:dateTime .
+impact:T02 a stl:ImpactTest ; dcterms:identifier "T02" ; stl:testedSample sample:T260000002 ;
+    stl:testType <code/test-type/IMPACT> ; stl:methodStandard <std/gbt-229-2020> ;
+    stl:impactEnergy 38.0 ; stl:resultAt "2026-11-19T01:05:00+08:00"^^xsd:dateTime .
+tensile:T03 a stl:TensileTest ; dcterms:identifier "T03" ; stl:testedSample sample:T260000003 ;
+    stl:testType <code/test-type/TENSILE> ; stl:methodStandard <std/gbt-228-1-2021> ; stl:tensileStrength 496.0 .
+
+inspection:L26000001 a stl:InspectionLot ; dcterms:identifier "L26000001" ; stl:lotMember piece:P31 ;
+    stl:serialNumber "1"^^xsd:positiveInteger ; stl:createdAt "2026-11-19T00:27:00+08:00"^^xsd:dateTime .
+inspection:L26000002 a stl:InspectionLot ; dcterms:identifier "L26000002" ; stl:lotMember piece:P40 ; stl:formationRule rule:F01 ;
+    stl:serialNumber "2"^^xsd:positiveInteger ; stl:createdAt "2026-11-19T01:10:00+08:00"^^xsd:dateTime .
+rule:F01 a stl:LotFormationRule ; stl:formationDimension <code/lot-formation-dimension/HEAT> .
+decision:Q01 a stl:QualityDecision ; dcterms:identifier "Q01" ; stl:assessedObject inspection:L26000001 ;
+    stl:assessedSpecification spec:B01 ; stl:applicableStandard ed:ED24 ; stl:judgementResult <code/judgement-result/NONCONFORM> ;
+    stl:occurredAt "2026-11-19T01:15:00+08:00"^^xsd:dateTime .
+decision:Q02 a stl:QualityDecision ; dcterms:identifier "Q02" ; stl:assessedObject piece:P32 ;
+    stl:assessedSpecification spec:B02 ; stl:applicableStandard ed:ED26 ; stl:judgementResult <code/judgement-result/CONFORM> ;
+    stl:occurredAt "2026-11-19T01:18:00+08:00"^^xsd:dateTime .
+act:N26000001 a stl:QualityDisposition ; dcterms:identifier "N26000001" ; stl:assessedObject piece:P31 ; stl:respondsTo decision:Q01 ;
+    stl:serialNumber "1"^^xsd:positiveInteger ; stl:createdAt "2026-11-19T01:20:00+08:00"^^xsd:dateTime ;
+    stl:dispositionType <code/disposition-type/HOLD> ; stl:approvedByRole "质量审核员" ; stl:reason "原订单的检验判定未通过，待评审可用规格。" ;
+    stl:previousSpecification spec:B01 ; stl:nextSpecification spec:B01 ; stl:previousOrderLine line:D26000001-010 ; stl:nextOrderLine line:D26000001-010 ;
+    stl:occurredAt "2026-11-19T01:20:00+08:00"^^xsd:dateTime .
+act:N26000002 a stl:QualityDisposition ; dcterms:identifier "N26000002" ; stl:assessedObject piece:P31 ; stl:respondsTo decision:Q01 ;
+    stl:serialNumber "2"^^xsd:positiveInteger ; stl:createdAt "2026-11-19T02:00:00+08:00"^^xsd:dateTime ;
+    stl:dispositionType <code/disposition-type/REASSIGN> ; stl:approvedByRole "质量审核员" ; stl:reason "复核通过，改配采用新版次的订单行。" ;
+    stl:previousSpecification spec:B01 ; stl:nextSpecification spec:B02 ; stl:previousOrderLine line:D26000001-010 ; stl:nextOrderLine line:D26000002-010 ;
+    stl:occurredAt "2026-11-19T02:00:00+08:00"^^xsd:dateTime .
+cert:Z26000001 a stl:MillCertificate ; dcterms:identifier "Z26000001" ; stl:coversPiece piece:P31, piece:P32 ;
+    stl:serialNumber "1"^^xsd:positiveInteger ; stl:createdAt "2026-11-19T02:30:00+08:00"^^xsd:dateTime ;
+    stl:applicableStandard ed:ED26, <std/en-10204-2004> ; stl:inspectionDocumentType <code/inspection-document-type/T31> .
+cert:Z26000002 a stl:MillCertificate ; dcterms:identifier "Z26000002" ; stl:coversPiece piece:P40 ;
+    stl:serialNumber "2"^^xsd:positiveInteger ; stl:createdAt "2026-11-19T02:40:00+08:00"^^xsd:dateTime ;
+    stl:applicableStandard ed:ED24 ; stl:inspectionDocumentType <code/inspection-document-type/T22> .
+
+area:CY1 a stl:StorageArea ; dcterms:identifier "CY1" .
+crane:CRCY11 a stl:Crane ; dcterms:identifier "CRCY11" ; stl:locatedIn area:CY1 ; stl:unitNumber "1"^^xsd:positiveInteger .
+loc:CY1-01011 a stl:StorageLocation ; dcterms:identifier "CY1-01011" ; stl:locatedIn area:CY1 ;
+    stl:row "1"^^xsd:positiveInteger ; stl:column "1"^^xsd:positiveInteger ; stl:tier "1"^^xsd:positiveInteger .
+loc:CY1-01021 a stl:StorageLocation ; dcterms:identifier "CY1-01021" ; stl:locatedIn area:CY1 ;
+    stl:row "1"^^xsd:positiveInteger ; stl:column "2"^^xsd:positiveInteger ; stl:tier "1"^^xsd:positiveInteger .
+loc:CY1-01031 a stl:StorageLocation ; dcterms:identifier "CY1-01031" ; stl:locatedIn area:CY1 ;
+    stl:row "1"^^xsd:positiveInteger ; stl:column "3"^^xsd:positiveInteger ; stl:tier "1"^^xsd:positiveInteger .
+transfer:U01 a stl:MovementOrder ; stl:movedPiece piece:P31 ; stl:destination loc:CY1-01031 .
+move:V11 a stl:MovementEvent ; dcterms:identifier "V11" ; stl:movedPiece piece:P31 ; stl:fulfills transfer:U01 ;
+    stl:movementType <code/movement-event-type/LIFT> ; stl:performedOn crane:CRCY11 ; stl:eventLocation loc:CY1-01011 ;
+    stl:occurredAt "2026-11-19T03:02:00+08:00"^^xsd:dateTime ; stl:isConfirmed true .
+move:V12 a stl:MovementEvent ; dcterms:identifier "V12" ; stl:movedPiece piece:P31 ; stl:fulfills transfer:U01 ;
+    stl:movementType <code/movement-event-type/RELEASE> ; stl:performedOn crane:CRCY11 ; stl:eventLocation loc:CY1-01021 ;
+    stl:occurredAt "2026-11-19T03:08:00+08:00"^^xsd:dateTime ; stl:isConfirmed true .
+move:V13 a stl:MovementEvent ; dcterms:identifier "V13" ; stl:movedPiece piece:P31 ;
+    stl:movementType <code/movement-event-type/LIFT> ; stl:performedOn crane:CRCY11 ; stl:eventLocation loc:CY1-01021 ;
+    stl:occurredAt "2026-11-19T03:12:00+08:00"^^xsd:dateTime ; stl:isConfirmed false .
+move:V14 a stl:MovementEvent ; dcterms:identifier "V14" ; stl:movedPiece piece:P32 ;
+    stl:movementType <code/movement-event-type/LIFT> ; stl:performedOn crane:CRCY11 ; stl:eventLocation loc:CY1-01011 ;
+    stl:occurredAt "2026-11-19T03:16:00+08:00"^^xsd:dateTime ; stl:isConfirmed true .
+
+<urn:synthetic:steel:transportunit/TR1> a stl:TransportUnit ; dcterms:identifier "TR1" .
+<urn:synthetic:steel:shipment/F26000001> a stl:Shipment ; dcterms:identifier "F26000001" ;
+    stl:loadedOn <urn:synthetic:steel:transportunit/TR1> .
+move:V15 a stl:MovementEvent ; dcterms:identifier "V15" ; stl:movedPiece piece:P40 ;
+    stl:movementType <code/movement-event-type/LOAD> ; stl:eventLocation loc:CY1-01031 ;
+    stl:triggeredBy <urn:synthetic:steel:shipment/F26000001> ; stl:isConfirmed true ;
+    stl:occurredAt "2026-11-19T04:00:00+08:00"^^xsd:dateTime .

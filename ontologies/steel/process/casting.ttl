@@ -1,0 +1,146 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/process/casting> a owl:Ontology ;
+    owl:versionIRI <ontology/process/casting/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "铸造工序与坯锭"@zh, "Casting operations and semiproducts"@en ;
+    rdfs:comment "描述连铸浇次、铸流切分和模铸，并区分坯形、形成工艺和逐件来源。"@zh, "Describes casting sequences, strand cutting and ingot teeming, distinguishing product form, production method and piece provenance."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:ContinuousCasting a owl:Class ; rdfs:subClassOf stl:MaterialTransformation ;
+    rdfs:label "连铸执行"@zh, "Continuous casting"@en ; skos:prefLabel "连铸执行"@zh, "Continuous casting"@en ;
+    skos:definition "使钢水在结晶器中形成坯壳并连续引出铸流的一次生产作业。"@zh, "An operation that forms a shell around liquid steel in a mould and continuously withdraws the resulting strand."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:Cutting a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "切割执行"@zh, "Cutting"@en ; skos:prefLabel "切割执行"@zh, "Cutting"@en ;
+    skos:definition "将铸流或既有坯件分切成可逐件识别的实物的实际作业，既可初切也可再次切分。"@zh, "An operation that separates a strand or an existing piece into identifiable lengths, including a subsequent cut of an earlier piece."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:CuttingPlan a owl:Class ; rdfs:subClassOf stl:Plan ;
+    rdfs:label "切割计划"@zh, "Cutting plan"@en ; skos:prefLabel "切割计划"@zh, "Cutting plan"@en ;
+    skos:definition "在开切前指定拟切件的切序和目标长度的计划，实际完成的切割可引用它。"@zh, "A plan assigning an order and target lengths to intended cuts that can be referenced by their execution."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:IngotCasting a owl:Class ; rdfs:subClassOf stl:MaterialTransformation ;
+    rdfs:label "模铸作业"@zh, "Ingot casting"@en ; skos:prefLabel "模铸作业"@zh, "Ingot casting"@en ;
+    skos:definition "将钢水分浇到一个或多个锭模内，待其在各模内凝固成锭的一次铸造作业。"@zh, "An operation that distributes liquid steel to one or more ingot moulds for solidification into individual ingots."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:CastSequence a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "浇次"@zh, "Casting sequence"@en ; skos:prefLabel "浇次"@zh, "Casting sequence"@en ;
+    skos:altLabel "连浇炉数组"@zh, "cast sequence"@en ;
+    skos:definition "记录一台连铸机连续接浇的一炉或多炉钢水及各炉的接浇顺序。"@zh, "A record of one or more heats fed to a caster in one uninterrupted sequence, preserving the order of the heats."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:ContinuouslyCastPiece a owl:Class ; rdfs:subClassOf stl:SemiFinishedProduct ;
+    rdfs:label "连铸坯"@zh, "Continuously cast piece"@en ; skos:prefLabel "连铸坯"@zh, "Continuously cast piece"@en ;
+    skos:scopeNote "连铸路线与坯形可同时标注，例如一件实物同时属于连铸坯与板坯。初轧所得坯件只按其坯形归类。"@zh ;
+    skos:definition "从钢的连续铸流切下、或将这类坯再次切分取得的独立铸态坯件。"@zh, "An individually tracked length cut from a continuously cast steel strand or recut from that length while it retains its as-cast form."@en ;
+    dcterms:source <std/ybt-2011-2014> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:Slab a owl:Class ; rdfs:subClassOf stl:SemiFinishedProduct ;
+    rdfs:label "板坯"@zh, "Slab"@en ; skos:prefLabel "板坯"@zh, "Slab"@en ;
+    skos:definition "具有宽扁矩形截面、通常供轧板或轧带的独立坯件，可来自铸流分切或开坯。"@zh, "A separately tracked, wide, flat rectangular semiproduct for working into plate or strip, obtained by cutting a strand or by primary working."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:Bloom a owl:Class ; rdfs:subClassOf stl:SemiFinishedProduct ;
+    rdfs:label "大方坯"@zh, "Bloom"@en ; skos:prefLabel "大方坯"@zh, "Bloom"@en ;
+    skos:definition "作为大断面坯料交接的方形或矩形钢坯，可供开坯或直接轧制重型断面产品。"@zh, "A square or rectangular semiproduct supplied as large-section stock for breakdown or direct working into heavy sections."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:Billet a owl:Class ; rdfs:subClassOf stl:SemiFinishedProduct ;
+    rdfs:label "小钢坯"@zh, "Billet"@en ; skos:prefLabel "小钢坯"@zh, "Billet"@en ;
+    skos:definition "以较小实心断面交接、供轧棒线材或进一步成形的钢坯，断面形状另行记录。"@zh, "A relatively small solid steel semiproduct supplied as feedstock for bars, rods or other wrought products, with its section identified separately."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:RoundBillet a owl:Class ; rdfs:subClassOf stl:Billet ;
+    rdfs:label "圆坯"@zh, "Round billet"@en ; skos:prefLabel "圆坯"@zh, "Round billet"@en ;
+    skos:definition "用公称直径描述圆形截面的实心坯料，可供穿孔或其他成形作业。"@zh, "A solid billet with a circular section specified by nominal diameter, suitable for piercing or other forming operations."@en ;
+    dcterms:source <std/gbt-15574-2016> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:BeamBlank a owl:Class ; rdfs:subClassOf stl:SemiFinishedProduct ;
+    rdfs:label "异型坯"@zh, "Beam blank"@en ; skos:prefLabel "异型坯"@zh, "Beam blank"@en ;
+    skos:altLabel "梁坯"@zh ;
+    skos:definition "截面已具梁腹和翼缘雏形、供进一步轧成梁材的钢坯。"@zh, "A steel semiproduct with a web and flange preform in its cross-section for subsequent rolling into a beam."@en ;
+    dcterms:source <std/en-10079-2007> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:Ingot a owl:Class ; rdfs:subClassOf stl:SemiFinishedProduct ;
+    rdfs:label "钢锭"@zh, "Steel ingot"@en ; skos:prefLabel "钢锭"@zh, "Steel ingot"@en ;
+    skos:definition "钢液凝固成一个可单独交接的锭体，锭的具体生产方法由产出作业记录。"@zh, "A discrete body of solidified steel tracked as one ingot, with its production method identified by its generating operation."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/casting> .
+
+stl:castOn a owl:ObjectProperty ; rdfs:domain stl:CastSequence ; rdfs:range stl:Equipment ;
+    rdfs:label "连浇铸机"@zh, "Cast on"@en ; skos:prefLabel "连浇铸机"@zh, "Cast on"@en ;
+    skos:definition "标识实际承接这一连续浇次的铸机。"@zh, "Identifies the caster on which the sequence of heats was poured."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:castIn a owl:ObjectProperty ; rdfs:domain stl:Heat ; rdfs:range stl:CastSequence ;
+    rdfs:label "所属浇次"@zh, "Cast in"@en ; skos:prefLabel "所属浇次"@zh, "Cast in"@en ;
+    skos:definition "从一炉钢水指向实际接浇该炉钢水的连铸浇次。"@zh, "Links a heat to the casting sequence that received its liquid steel."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:numberingHeat a owl:ObjectProperty ; rdfs:domain stl:Slab ; rdfs:range stl:Heat ;
+    rdfs:label "编号炉次"@zh, "Numbering heat"@en ; skos:prefLabel "编号炉次"@zh, "Numbering heat"@en ;
+    skos:definition "标识编制板坯件号所依据的炉次，实际供钢炉次由来源关系另记。"@zh, "Identifies the heat used to assign the slab identifier independently of which heats supplied the steel."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:previousGrade a owl:ObjectProperty ; rdfs:domain stl:Slab ; rdfs:range stl:SteelGrade ;
+    rdfs:label "过渡前钢种"@zh, "Preceding steel grade"@en ; skos:prefLabel "过渡前钢种"@zh, "Preceding steel grade"@en ;
+    skos:definition "标识换钢种的过渡区开始前供钢炉次的内部钢种。"@zh, "Identifies the internal grade of the outgoing heat at a transition between steel grades."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:nextGrade a owl:ObjectProperty ; rdfs:domain stl:Slab ; rdfs:range stl:SteelGrade ;
+    rdfs:label "过渡后钢种"@zh, "Following steel grade"@en ; skos:prefLabel "过渡后钢种"@zh, "Following steel grade"@en ;
+    skos:definition "标识换钢种的过渡区后继供钢炉次的内部钢种。"@zh, "Identifies the internal grade of the incoming heat at a transition between steel grades."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:forProductionOrder a owl:ObjectProperty ; rdfs:domain stl:CuttingPlan ; rdfs:range stl:ProductionOrder ;
+    rdfs:label "切割计划服务的生产订单"@zh, "For production order"@en ; skos:prefLabel "切割计划服务的生产订单"@zh, "For production order"@en ;
+    skos:definition "从切割计划指向提出所需坯件的生产订单。"@zh, "Identifies the production order whose required pieces are scheduled in the cutting plan."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:teemingMethod a owl:ObjectProperty ; rdfs:domain stl:IngotCasting ; rdfs:range skos:Concept ;
+    rdfs:label "模铸浇注方式"@zh, "Ingot teeming method"@en ; skos:prefLabel "模铸浇注方式"@zh, "Ingot teeming method"@en ;
+    rdfs:seeAlso <code/teeming-method> ;
+    skos:definition "按钢液进入锭模的路径标明一次模铸所用的浇注方式。"@zh, "Classifies an ingot casting operation by the route through which liquid steel enters the mould."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:teemedInMould a owl:ObjectProperty ; rdfs:domain stl:Ingot ; rdfs:range stl:Equipment ;
+    rdfs:label "浇注所用锭模"@zh, "Teemed in mould"@en ; skos:prefLabel "浇注所用锭模"@zh, "Teemed in mould"@en ;
+    skos:definition "标识浇成该锭时实际充型的那一只锭模，同一作业浇出的各锭分别关联各自的模具。"@zh, "Identifies the individual mould filled for this ingot so that ingots from a shared teeming operation retain their own mould identities."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+
+stl:heatPositionInSequence a owl:DatatypeProperty ; rdfs:domain stl:Heat ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "浇次内炉序"@zh, "Heat position within casting sequence"@en ; skos:prefLabel "浇次内炉序"@zh, "Heat position within casting sequence"@en ;
+    skos:definition "给出一炉钢水在所属连续浇次中的接浇顺位，首炉记为一。"@zh, "Gives the one-based ordinal of the heat in the order in which the caster received the heats."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:isTransitionSlab a owl:DatatypeProperty ; rdfs:domain stl:Slab ; rdfs:range xsd:boolean ;
+    rdfs:label "明确标为过渡坯"@zh, "Marked as transition slab"@en ; skos:prefLabel "明确标为过渡坯"@zh, "Marked as transition slab"@en ;
+    skos:definition "记录生产资料是否将这件板坯明确标为换炉过渡坯，首尾顺位本身不作此标记。"@zh, "Records an explicit designation of a slab as a heat-transition piece independently of its position at either end of a heat."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:positionInHeat a owl:DatatypeProperty ; rdfs:domain stl:Slab ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "炉内出坯次序"@zh, "Slab position within heat"@en ; skos:prefLabel "炉内出坯次序"@zh, "Slab position within heat"@en ;
+    skos:definition "标明板坯在同炉同流中的实际出坯次序，再次分切所得坯沿用原坯的次序。"@zh, "Records the original casting position on a strand within a heat, retained by pieces recut from the original slab."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:positionInSequence a owl:DatatypeProperty ; rdfs:domain stl:Slab ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "浇次内出坯次序"@zh, "Slab position within casting sequence"@en ; skos:prefLabel "浇次内出坯次序"@zh, "Slab position within casting sequence"@en ;
+    skos:definition "标明板坯在同一流的整个浇次内按实际出坯先后所处的位置。"@zh, "Records the casting position of a slab on one strand counted across the full casting sequence."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:strandNumber a owl:DatatypeProperty ; rdfs:domain stl:Slab ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "流号"@zh, "Strand number"@en ; skos:prefLabel "流号"@zh, "Strand number"@en ;
+    skos:definition "标识该板坯所属铸流在铸机各流中的编号。"@zh, "Identifies the numbered strand of the caster from which the slab originated."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:sequenceInStrand a owl:DatatypeProperty ; rdfs:domain stl:Slab ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "流内序号"@zh, "Strand piece number"@en ; skos:prefLabel "流内序号"@zh, "Strand piece number"@en ;
+    skos:definition "标明在同一编号炉次和同一流下为该件分配的序号，二次切割时为新件分配新号。"@zh, "Records the piece number allocated within a numbering heat and strand, including a new number for each recut piece."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:strandCount a owl:DatatypeProperty ; rdfs:domain stl:Equipment ; rdfs:range xsd:nonNegativeInteger ;
+    rdfs:label "流数"@zh, "Number of strands"@en ; skos:prefLabel "流数"@zh, "Number of strands"@en ;
+    stl:unit unit:NUM ; stl:quantityKind quantitykind:Count ;
+    skos:definition "给出一台连铸机配置的铸流条数。"@zh, "Counts the strand positions provided by a caster."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:cuttingSequence a owl:DatatypeProperty ; rdfs:domain stl:CuttingPlan ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "计划切序"@zh, "Planned cut sequence"@en ; skos:prefLabel "计划切序"@zh, "Planned cut sequence"@en ;
+    skos:definition "给出拟实施的切割在计划中的顺位，供对照实际切分记录。"@zh, "Gives the scheduled position of an intended cut for comparison with the cuts performed."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:plannedLength a owl:DatatypeProperty ; rdfs:domain stl:CuttingPlan ; rdfs:range xsd:decimal ;
+    rdfs:label "计划切割长度"@zh, "Planned cut length"@en ; skos:prefLabel "计划切割长度"@zh, "Planned cut length"@en ;
+    stl:unit unit:M ; stl:quantityKind quantitykind:Length ;
+    skos:definition "给出切割计划为拟产出件安排的目标长度，以米记录。"@zh, "Gives the target length in metres specified for the piece in a planned cut."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .
+stl:castingSpeed a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:ContinuousCasting stl:Cutting stl:Observation ) ] ; rdfs:range xsd:decimal ;
+    rdfs:label "拉速"@zh, "Casting speed"@en ; skos:prefLabel "拉速"@zh, "Casting speed"@en ;
+    stl:unit unit:M-PER-MIN ; stl:quantityKind quantitykind:LinearVelocity ;
+    skos:altLabel "拉坯速度"@zh ;
+    skos:definition "以米每分钟表示对应时段铸流沿出坯方向的引出速度，可记在作业实绩或测量记录上。"@zh, "Strand withdrawal speed in metres per minute for the interval covered by a casting or cutting operation or by an observation."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/casting> .

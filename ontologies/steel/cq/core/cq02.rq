@@ -1,0 +1,19 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+# Each percentage describes the immediate recipient shown in its row.
+SELECT DISTINCT ?recipientId ?sourceId ?sourceKind ?sharePercent ?basis ?evidence WHERE {
+  <urn:synthetic:steel:materialpiece/P31> stl:derivedFrom* ?recipient .
+  ?recipient dcterms:identifier ?recipientId ; (stl:derivedFrom|stl:sourceHeat) ?source .
+  ?source a/rdfs:subClassOf* stl:MaterialLot ; dcterms:identifier ?sourceId .
+  BIND(IF(EXISTS { ?source a/rdfs:subClassOf* stl:Heat }, "Heat", "MaterialLot") AS ?sourceKind)
+  OPTIONAL {
+    ?entry stl:contributionOutput ?recipient ; stl:contributionInput ?source ;
+           stl:evidenceLevel/skos:notation ?evidence .
+    OPTIONAL { ?entry stl:share ?sharePercent }
+    OPTIONAL { ?entry stl:shareBasis/skos:notation ?basis }
+  }
+}
+ORDER BY ?recipientId ?sourceId

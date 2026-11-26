@@ -1,0 +1,162 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Each EXPECT identifies the focus node, the named source shape and the SHACL component.
+
+# EXPECT <urn:synthetic:steel:operation/M90> <https://w3id.org/ontology-platform/steel/CoreEventPlanTimesShape> MaxCountConstraintComponent
+<urn:synthetic:steel:operation/M90> a stl:Operation ;
+    stl:plannedStartAt "2026-11-19T08:00:00+08:00"^^xsd:dateTime .
+
+# EXPECT <urn:synthetic:steel:productionorder/W90> <https://w3id.org/ontology-platform/steel/CorePlanActualTimesShape> MaxCountConstraintComponent
+<urn:synthetic:steel:productionorder/W90> a stl:ProductionOrder ;
+    stl:actualEndAt "2026-11-19T09:00:00+08:00"^^xsd:dateTime .
+
+# EXPECT <urn:synthetic:steel:event/V90> <https://w3id.org/ontology-platform/steel/CoreInstantShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel:event/V90> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+<urn:synthetic:steel:event/V90> a stl:Event ;
+    stl:recordedAt "2026-11-19T09:00:00+08:00" ; stl:occurredAt "2026-11-19T09:00:00"^^xsd:dateTime .
+
+# EXPECT <urn:synthetic:steel:compositionlimit/K90> <https://w3id.org/ontology-platform/steel/CoreCompositionBoundsShape> LessThanOrEqualsConstraintComponent
+<urn:synthetic:steel:compositionlimit/K90> a stl:CompositionLimit ;
+    stl:lowerLimit 0.8 ; stl:upperLimit 0.3 .
+
+# EXPECT <urn:synthetic:steel:materialpiece/P90> <https://w3id.org/ontology-platform/steel/CoreMassShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel:materialpiece/P90> <https://w3id.org/ontology-platform/steel/CoreMassShape> MinInclusiveConstraintComponent
+# EXPECT <urn:synthetic:steel:materialpiece/P90> <https://w3id.org/ontology-platform/steel/CoreSourceHeatShape> ClassConstraintComponent
+<urn:synthetic:steel:materialpiece/P90> a stl:MaterialPiece ;
+    stl:netMass -1 ; stl:sourceHeat <urn:synthetic:steel:equipment/E90> .
+
+# EXPECT <urn:synthetic:steel:sourcecontribution/C90> <https://w3id.org/ontology-platform/steel/CoreContributionInputShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel:sourcecontribution/C90> <https://w3id.org/ontology-platform/steel/CoreContributionInputShape> ClassConstraintComponent
+# EXPECT <urn:synthetic:steel:sourcecontribution/C90> <https://w3id.org/ontology-platform/steel/CoreContributionOutputShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel:sourcecontribution/C90> <https://w3id.org/ontology-platform/steel/CoreContributionOutputShape> ClassConstraintComponent
+# EXPECT <urn:synthetic:steel:sourcecontribution/C90> <https://w3id.org/ontology-platform/steel/CoreShareShape> MinInclusiveConstraintComponent
+# EXPECT <urn:synthetic:steel:sourcecontribution/C90> <https://w3id.org/ontology-platform/steel/CoreFractionBasisShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:sourcecontribution/C90> <https://w3id.org/ontology-platform/steel/CoreContributionEvidenceShape> MinCountConstraintComponent
+<urn:synthetic:steel:sourcecontribution/C90> a stl:SourceContribution ;
+    stl:contributionInput <urn:synthetic:steel:equipment/E90>, <urn:synthetic:steel:materialpiece/P90> ;
+    stl:contributionOutput <urn:synthetic:steel:equipment/E90>, <urn:synthetic:steel:materialpiece/P90> ;
+    stl:share -0.5 .
+
+# EXPECT <urn:synthetic:steel:sourcecontribution/C91> <https://w3id.org/ontology-platform/steel/CoreShareShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel:sourcecontribution/C91> <https://w3id.org/ontology-platform/steel/CoreShareShape> MaxInclusiveConstraintComponent
+# EXPECT <urn:synthetic:steel:sourcecontribution/C91> <https://w3id.org/ontology-platform/steel/CoreFractionBasisShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel:sourcecontribution/C91> <https://w3id.org/ontology-platform/steel/CoreContributionEvidenceShape> MaxCountConstraintComponent
+<urn:synthetic:steel:sourcecontribution/C91> a stl:SourceContribution ;
+    stl:share 101 ; stl:shareBasis <code/share-basis/MASS>, <code/share-basis/LENGTH> ;
+    stl:evidenceLevel <code/contribution-evidence/ESTIMATED>, <code/contribution-evidence/MEASURED> .
+
+# EXPECT <urn:synthetic:steel:sample/S90> <https://w3id.org/ontology-platform/steel/CoreSampleSourceShape> MinCountConstraintComponent
+<urn:synthetic:steel:sample/S90> a stl:Sample ;
+    stl:sampleType <code/judgement-result/PENDING> .
+
+# EXPECT <urn:synthetic:steel:observation/O90> <https://w3id.org/ontology-platform/steel/CoreObservedObjectShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:observation/O90> <https://w3id.org/ontology-platform/steel/CoreObservationItemShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:observation/O90> <https://w3id.org/ontology-platform/steel/CoreObservationPointShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:observation/O90> <https://w3id.org/ontology-platform/steel/CoreObservationSampleTimeShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:observation/O90> <https://w3id.org/ontology-platform/steel/CoreObservationResultTimeShape> MinCountConstraintComponent
+<urn:synthetic:steel:observation/O90> a stl:Observation ;
+    stl:measurementMethod <code/judgement-result/PENDING> .
+
+# EXPECT <urn:synthetic:steel:observation/O91> <https://w3id.org/ontology-platform/steel/CoreObservationMethodShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:observation/O91> <https://w3id.org/ontology-platform/steel/CoreObservationItemShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel:observation/O91> <https://w3id.org/ontology-platform/steel/CoreObservationPointShape> ClassConstraintComponent
+# EXPECT <urn:synthetic:steel:observation/O91> <https://w3id.org/ontology-platform/steel/CoreReadingShape> SPARQLConstraintComponent
+<urn:synthetic:steel:observation/O91> a stl:Observation ;
+    stl:measurementItem <code/measurement-item/TEMP>, <code/judgement-result/PENDING> ;
+    stl:measuredObject <urn:synthetic:steel:materialpiece/P90> ; stl:measuredAtPoint <urn:synthetic:steel:equipment/E90> ;
+    stl:width 5.0 ; stl:sampledAt "2026-11-19T08:00:00Z"^^xsd:dateTime ;
+    stl:resultAt "2026-11-19T08:01:00Z"^^xsd:dateTime .
+
+# EXPECT <urn:synthetic:steel:qualitydecision/Q90> <https://w3id.org/ontology-platform/steel/CoreDecisionObjectShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:qualitydecision/Q90> <https://w3id.org/ontology-platform/steel/CoreDecisionResultShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:qualitydecision/Q90> <https://w3id.org/ontology-platform/steel/CoreDecisionBasisShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:qualitydecision/Q90> <https://w3id.org/ontology-platform/steel/CoreDecisionTimeShape> MinCountConstraintComponent
+<urn:synthetic:steel:qualitydecision/Q90> a stl:QualityDecision .
+
+# EXPECT <urn:synthetic:steel:movementevent/V91> <https://w3id.org/ontology-platform/steel/CoreMovementPieceShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:movementevent/V91> <https://w3id.org/ontology-platform/steel/CoreMovementActionShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:movementevent/V91> <https://w3id.org/ontology-platform/steel/CoreMovementTimeShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:movementevent/V91> <https://w3id.org/ontology-platform/steel/CoreConfirmationShape> DatatypeConstraintComponent
+<urn:synthetic:steel:movementevent/V91> a stl:MovementEvent ;
+    stl:isConfirmed "yes" .
+
+# EXPECT <urn:synthetic:steel:millcertificate/Z90> <https://w3id.org/ontology-platform/steel/CoreCertificatePieceShape> ClassConstraintComponent
+<urn:synthetic:steel:millcertificate/Z90> a stl:MillCertificate ;
+    stl:coversPiece <urn:synthetic:steel:equipment/E90> .
+
+# EXPECT <urn:synthetic:steel:tensiletest/T90> <https://w3id.org/ontology-platform/steel/CoreTestMethodShape> MinCountConstraintComponent
+<urn:synthetic:steel:tensiletest/T90> a stl:TensileTest ;
+    stl:testType <code/judgement-result/PENDING> .
+
+# EXPECT <urn:synthetic:steel:productionorder/TZ01> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+<urn:synthetic:steel:productionorder/TZ01> a stl:ProductionOrder ; stl:plannedStartAt "2026-11-19T10:00:00"^^xsd:dateTime .
+# EXPECT <urn:synthetic:steel:productionorder/TZ02> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+<urn:synthetic:steel:productionorder/TZ02> a stl:ProductionOrder ; stl:plannedEndAt "2026-11-19T10:00:00"^^xsd:dateTime .
+# EXPECT <urn:synthetic:steel:operation/TZ03> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+<urn:synthetic:steel:operation/TZ03> a stl:Operation ; stl:actualStartAt "2026-11-19T10:00:00"^^xsd:dateTime .
+# EXPECT <urn:synthetic:steel:operation/TZ04> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+<urn:synthetic:steel:operation/TZ04> a stl:Operation ; stl:actualEndAt "2026-11-19T10:00:00"^^xsd:dateTime .
+# EXPECT <urn:synthetic:steel:materialpiece/TZ05> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+<urn:synthetic:steel:materialpiece/TZ05> a stl:MaterialPiece ; stl:createdAt "2026-11-19T10:00:00"^^xsd:dateTime .
+# EXPECT <urn:synthetic:steel:event/TZ06> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+<urn:synthetic:steel:event/TZ06> a stl:Event ; stl:recordedAt "2026-11-19T10:00:00"^^xsd:dateTime .
+# EXPECT <urn:synthetic:steel:sample/TZ07> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+<urn:synthetic:steel:sample/TZ07> a stl:Sample ; stl:sampledAt "2026-11-19T10:00:00"^^xsd:dateTime ; stl:sampleOf <urn:synthetic:steel:materialpiece/P90> .
+# EXPECT <urn:synthetic:steel:tensiletest/TZ08> <https://w3id.org/ontology-platform/steel/CoreInstantShape> PatternConstraintComponent
+<urn:synthetic:steel:tensiletest/TZ08> a stl:TensileTest ; stl:resultAt "2026-11-19T10:00:00"^^xsd:dateTime ; stl:methodStandard <std/gbt-228-1-2021> .
+
+# Wrong-scheme values are validated at the code IRI via sh:targetObjectsOf.
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreFormationDimensionSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreEquipmentTypeSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreProcessTypeSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreProductFormSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreMaterialCategorySchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreElementSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreSampleTypeSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreAnalysisTypeSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreTestTypeSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreNdtMethodSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreDefectTypeSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/share-basis/MASS> <https://w3id.org/ontology-platform/steel/CoreJudgementResultSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreDispositionTypeSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreInspectionDocumentTypeSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreSteelClassByCompositionSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreSteelQualityClassSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreSteelUseClassSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreMeasurementItemSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreMeasurementMethodSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreEvidenceLevelSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreShareBasisSchemeShape> HasValueConstraintComponent
+# EXPECT <https://w3id.org/ontology-platform/steel/code/judgement-result/PENDING> <https://w3id.org/ontology-platform/steel/CoreMovementTypeSchemeShape> HasValueConstraintComponent
+
+<urn:synthetic:steel:qualitydecision/Q91> a stl:QualityDecision ;
+    stl:assessedObject <urn:synthetic:steel:materialpiece/P90> ; stl:assessedSpecification <urn:synthetic:steel:materialspecification/B90> ; stl:occurredAt "2026-11-19T08:00:00Z"^^xsd:dateTime ; stl:judgementResult <code/share-basis/MASS> .
+<urn:synthetic:steel:movementevent/V92> a stl:MovementEvent ;
+    stl:movedPiece <urn:synthetic:steel:materialpiece/P90> ; stl:occurredAt "2026-11-19T08:00:00Z"^^xsd:dateTime ; stl:movementType <code/judgement-result/PENDING> .
+<urn:synthetic:steel:equipment/E90> a stl:Equipment ;
+    stl:equipmentType <code/judgement-result/PENDING> .
+<urn:synthetic:steel:processsegment/G90> a stl:ProcessSegment ;
+    stl:processType <code/judgement-result/PENDING> .
+<urn:synthetic:steel:materialpiece/P90> a stl:MaterialPiece ;
+    stl:productForm <code/judgement-result/PENDING> ; stl:materialCategory <code/judgement-result/PENDING> .
+<urn:synthetic:steel:compositionlimit/K90> a stl:CompositionLimit ;
+    stl:element <code/judgement-result/PENDING> .
+<urn:synthetic:steel:chemicalanalysis/A90> a stl:ChemicalAnalysis ;
+    stl:analysisType <code/judgement-result/PENDING> .
+<urn:synthetic:steel:nondestructivetest/T91> a stl:NondestructiveTest ;
+    stl:ndtMethod <code/judgement-result/PENDING> .
+<urn:synthetic:steel:defect/F90> a stl:Defect ;
+    stl:defectType <code/judgement-result/PENDING> .
+<urn:synthetic:steel:qualitydisposition/N90> a stl:QualityDisposition ;
+    stl:dispositionType <code/judgement-result/PENDING> .
+<urn:synthetic:steel:millcertificate/Z90> a stl:MillCertificate ;
+    stl:inspectionDocumentType <code/judgement-result/PENDING> .
+<urn:synthetic:steel:standardgrade/G90> a stl:StandardGrade ;
+    stl:steelClassByComposition <code/judgement-result/PENDING> ; stl:steelQualityClass <code/judgement-result/PENDING> ; stl:steelUseClass <code/judgement-result/PENDING> .
+<urn:synthetic:steel:sourcecontribution/C92> a stl:SourceContribution ;
+    stl:evidenceLevel <code/judgement-result/PENDING> ; stl:shareBasis <code/judgement-result/PENDING> .
+<urn:synthetic:steel:lotformationrule/F90> a stl:LotFormationRule ; stl:formationDimension <code/judgement-result/PENDING> .
+<urn:synthetic:steel:materialspecification/B90> a stl:MaterialSpecification .

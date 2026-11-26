@@ -1,0 +1,31 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/process/ironmaking-shapes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/ironmaking-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "炼铁数据约束"@zh, "Ironmaking data constraints"@en ;
+    rdfs:comment "检查铁水批的出铁来源、铁次的炉座与出铁量，以及预处理方法的代码归属。"@zh, "Checks the tap of origin, furnace identity, tapped mass and classification of pretreatment methods."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:HotMetalTapShape a sh:PropertyShape ; sh:targetClass stl:HotMetal ;
+    sh:path prov:wasGeneratedBy ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stl:BlastFurnaceTapping ;
+    sh:severity sh:Violation ; rdfs:comment "按铁次建批的铁水应指向生成该批的唯一出铁作业；同一铁次可以分罐接收。"@zh .
+
+stl:TapBlastFurnaceShape a sh:PropertyShape ; sh:targetClass stl:BlastFurnaceTapping ;
+    sh:path ( stl:performedOn stl:equipmentType ) ; sh:hasValue <code/equipment-type/BF> ;
+    sh:severity sh:Violation ; rdfs:comment "每个铁次应能沿执行设备及其类型找到高炉，以便追溯铁水来源。"@zh .
+
+stl:TappedHotMetalMassShape a sh:PropertyShape ; sh:targetSubjectsOf stl:tappedHotMetalMass ;
+    sh:path stl:tappedHotMetalMass ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "记录出铁量时，按吨填写本铁次的非负十进制质量。"@zh .
+
+stl:PretreatmentMethodSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:pretreatmentMethod ;
+    sh:path skos:inScheme ; sh:hasValue <code/pretreatment-method> ;
+    sh:severity sh:Violation ; rdfs:comment "铁水预处理作业引用的方法应属于铁水预处理方法代码表。"@zh .
