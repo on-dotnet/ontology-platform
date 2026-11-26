@@ -53,7 +53,9 @@ def test_sealed_credentials_open_only_for_their_row_and_key() -> None:
     assert sealed.secret[:1] == b"\x01"
     assert len(sealed.key_id) == 16
     assert sealed.key_id == current_key_id(settings)
-    assert open_password(settings, row_id, sealed.secret, sealed.key_id).get_secret_value() == marker
+    assert (
+        open_password(settings, row_id, sealed.secret, sealed.key_id).get_secret_value() == marker
+    )
     with pytest.raises(CredentialUnreadableError):
         open_password(settings, uuid4(), sealed.secret, sealed.key_id)  # moved to another row
     tampered = sealed.secret[:-1] + bytes([sealed.secret[-1] ^ 1])
@@ -78,15 +80,27 @@ async def test_rekey_leaves_only_the_new_key(db: AsyncSession) -> None:
     rows = []
     for index in range(3):
         row = DataSource(
-            id=uuid4(), name=f"rekey {index}", kind="postgresql", host="h", port=5432,
-            database="d", username="u",
+            id=uuid4(),
+            name=f"rekey {index}",
+            kind="postgresql",
+            host="h",
+            port=5432,
+            database="d",
+            username="u",
         )
         sealed = seal(old, row.id, SecretStr(f"pw-{index}"))
         row.secret, row.secret_key_id = sealed.secret, sealed.key_id
         rows.append(row)
     lost = DataSource(
-        id=uuid4(), name="lost key", kind="postgresql", host="h", port=5432, database="d",
-        username="u", secret=b"\x01" + bytes(40), secret_key_id="0" * 16,
+        id=uuid4(),
+        name="lost key",
+        kind="postgresql",
+        host="h",
+        port=5432,
+        database="d",
+        username="u",
+        secret=b"\x01" + bytes(40),
+        secret_key_id="0" * 16,
     )
     db.add_all([*rows, lost])
     await db.commit()
@@ -101,7 +115,8 @@ async def test_rekey_leaves_only_the_new_key(db: AsyncSession) -> None:
     after = _settings(NEW_KEY)  # OP_SECRET_KEY_PREVIOUS removed
     for index, row in enumerate(rows):
         stored = await db.get(DataSource, row.id, populate_existing=True)
-        assert stored is not None and stored.secret is not None
+        assert stored is not None
+        assert stored.secret is not None
         password = open_password(after, row.id, stored.secret, stored.secret_key_id)
         assert password.get_secret_value() == f"pw-{index}"
     assert (await rekey(db, rotating)).rekeyed == 0
@@ -149,7 +164,12 @@ async def _run_jobs(factory: async_sessionmaker[AsyncSession]) -> None:
 async def _stored_text(db: AsyncSession) -> str:
     """Everything the platform keeps about the flow, as text."""
     parts: list[str] = []
-    for table in ("audit.events", "jobs.jobs", "connectors.data_sources", "connectors.catalog_tables"):
+    for table in (
+        "audit.events",
+        "jobs.jobs",
+        "connectors.data_sources",
+        "connectors.catalog_tables",
+    ):
         rows = await db.execute(text(f"SELECT to_jsonb(t)::text FROM {table} t"))  # noqa: S608
         parts.extend(row[0] for row in rows)
     return "\n".join(parts)
@@ -180,7 +200,9 @@ async def test_passwords_hosts_and_users_never_show(
         "schemas": ["mes"],
     }
 
-    created = await call("POST", "/api/data-sources", json={**connection, "name": "MES", "password": bad})
+    created = await call(
+        "POST", "/api/data-sources", json={**connection, "name": "MES", "password": bad}
+    )
     assert created.status_code == 201
     source = created.json()
     base = f"/api/data-sources/{source['id']}"
@@ -218,10 +240,7 @@ async def test_passwords_hosts_and_users_never_show(
     assert archived.json()["status"] == "archived"
     assert archived.json()["hasCredential"] is False
     stored = await _stored_text(db)
-    logs = "\n".join(
-        [record.getMessage() for record in caplog.records]
-        + [caplog.text]
-    )
+    logs = "\n".join([record.getMessage() for record in caplog.records] + [caplog.text])
     for marker in markers:
         for response in call.responses:
             assert marker not in response.text, response.request.url
@@ -229,7 +248,8 @@ async def test_passwords_hosts_and_users_never_show(
         assert marker not in logs
         assert marker not in stored
     job_rows = (await db.execute(select(Job.error_code, Job.error_detail))).all()
-    assert job_rows and all(detail is None for _, detail in job_rows)
+    assert job_rows
+    assert all(detail is None for _, detail in job_rows)
 
 
 async def test_a_wrong_key_reads_as_credential_unreadable(

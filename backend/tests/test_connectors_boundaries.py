@@ -27,7 +27,11 @@ SQL_LITERAL = re.compile(
 
 
 def _files_outside_connectors() -> list[Path]:
-    return [path for path in sorted(ROOT.rglob("*.py")) if path.relative_to(ROOT).parts[0] != "connectors"]
+    return [
+        path
+        for path in sorted(ROOT.rglob("*.py"))
+        if path.relative_to(ROOT).parts[0] != "connectors"
+    ]
 
 
 def _external_data_files() -> list[Path]:
@@ -43,7 +47,11 @@ def driver_uses(source: str) -> list[str]:
             found += [alias.name for alias in node.names if alias.name.split(".")[0] in DRIVERS]
         elif isinstance(node, ast.ImportFrom) and (node.module or "").split(".")[0] in DRIVERS:
             found.append(node.module or "")
-        elif isinstance(node, ast.ImportFrom) and node.module and node.module.startswith("sqlalchemy"):
+        elif (
+            isinstance(node, ast.ImportFrom)
+            and node.module
+            and node.module.startswith("sqlalchemy")
+        ):
             found += [
                 f"{node.module}.{alias.name}"
                 for alias in node.names

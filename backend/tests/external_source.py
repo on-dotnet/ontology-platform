@@ -55,9 +55,7 @@ def external_source() -> Iterator[ExternalSource]:
     reader, writer = f"op_ext_reader_{suffix}", f"op_ext_writer_{suffix}"
     reader_password, writer_password = secrets.token_urlsafe(18), secrets.token_urlsafe(18)
     server_dsn = libpq_dsn(admin_url.render_as_string(hide_password=False))
-    database_dsn = libpq_dsn(
-        admin_url.set(database=database).render_as_string(hide_password=False)
-    )
+    database_dsn = libpq_dsn(admin_url.set(database=database).render_as_string(hide_password=False))
     with psycopg.connect(server_dsn, autocommit=True) as conn:
         conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(database)))
         for role, password in ((reader, reader_password), (writer, writer_password)):

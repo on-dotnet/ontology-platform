@@ -274,7 +274,7 @@ async def _cancel(conn: AsyncConnection) -> None:
         driver = raw.driver_connection
         if isinstance(driver, psycopg.AsyncConnection):
             await driver.cancel_safe(timeout=CONNECT_TIMEOUT_SECONDS)
-    except Exception:  # noqa: BLE001, S110  (the connection is closed right after anyway)
+    except Exception:  # noqa: S110  (the connection is closed right after anyway)
         pass
 
 
@@ -486,9 +486,7 @@ class _Renderer:
         ]
 
     @staticmethod
-    def _table(
-        ref: TableRef, names: set[str], specs: dict[str, schemas.CatalogColumn]
-    ) -> Any:
+    def _table(ref: TableRef, names: set[str], specs: dict[str, schemas.CatalogColumn]) -> Any:
         missing = names - specs.keys()
         if missing:
             raise SourceMismatchError
@@ -562,8 +560,10 @@ class _Renderer:
             if key.descending:
                 beyond = col.is_not(None) if value is None else col < self.param(key.column, value)
             else:
-                beyond = false() if value is None else or_(
-                    col > self.param(key.column, value), col.is_(None)
+                beyond = (
+                    false()
+                    if value is None
+                    else or_(col > self.param(key.column, value), col.is_(None))
                 )
             branches.append(and_(*equal, beyond) if equal else beyond)
             equal.append(col.is_(None) if value is None else col == self.param(key.column, value))

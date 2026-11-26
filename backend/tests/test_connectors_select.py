@@ -24,8 +24,12 @@ from ontology_platform.modules.connectors.statements import (
     TableRef,
     Value,
 )
-from test_connectors_support import add_source, admin_rows, cache_table
-from test_connectors_support import scratch_fixture  # noqa: F401  (registers the fixture)
+from test_connectors_support import (
+    add_source,
+    admin_rows,
+    cache_table,
+    scratch_fixture,  # noqa: F401  (registers the fixture)
+)
 
 
 async def _source(db: AsyncSession, source: ExternalSource, *tables: str, **kw: Any) -> DataSource:
@@ -69,14 +73,15 @@ async def test_enum_columns_bind_as_their_enum(
 
     def where(*conditions: Condition) -> SelectQuery:
         return SelectQuery(
-            row.id, TableRef("mes", "coil"), (ColumnRef("coil_no"), ColumnRef("status")),
-            where=conditions, limit=1000,
+            row.id,
+            TableRef("mes", "coil"),
+            (ColumnRef("coil_no"), ColumnRef("status")),
+            where=conditions,
+            limit=1000,
         )
 
     equal = await service.select(db, where(Condition(ColumnRef("status"), "eq", status)))
-    among = await service.select(
-        db, where(Condition(ColumnRef("status"), "in", tuple(expected)))
-    )
+    among = await service.select(db, where(Condition(ColumnRef("status"), "in", tuple(expected))))
     other = await service.select(db, where(Condition(ColumnRef("status"), "ne", status)))
     with pytest.raises(InvalidValueError) as raised:
         await service.select(db, where(Condition(ColumnRef("status"), "eq", "no-such-status")))
@@ -117,7 +122,7 @@ async def test_keyset_pages_cover_every_row_once_with_nulls(
     direction = "DESC NULLS FIRST" if descending else "ASC NULLS LAST"
     expected = admin_rows(
         external_source,
-        f"SELECT weight_t, coil_no FROM mes.coil ORDER BY weight_t {direction}, coil_no",
+        f"SELECT weight_t, coil_no FROM mes.coil ORDER BY weight_t {direction}, coil_no",  # noqa: S608
     )
     assert any(weight is None for weight, _ in expected), "the sample needs a NULL weight"
     order = (SortKey(ColumnRef("weight_t"), descending), SortKey(ColumnRef("coil_no")))
@@ -185,7 +190,8 @@ async def test_text_and_null_operators_match_the_database(
     }[operator]
     column = "heat_no" if operator in ("starts_with", "contains") else "cast_no"
     expected = admin_rows(
-        external_source, f"SELECT heat_no FROM mes.heat WHERE {predicate} ORDER BY 1"
+        external_source,
+        f"SELECT heat_no FROM mes.heat WHERE {predicate} ORDER BY 1",  # noqa: S608
     )
 
     result = await service.select(
@@ -252,4 +258,6 @@ async def test_archived_sources_are_disabled(
     await db.commit()
 
     with pytest.raises(SourceDisabledError):
-        await service.select(db, SelectQuery(row.id, TableRef("mes", "heat"), (ColumnRef("heat_no"),)))
+        await service.select(
+            db, SelectQuery(row.id, TableRef("mes", "heat"), (ColumnRef("heat_no"),))
+        )

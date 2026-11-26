@@ -39,9 +39,9 @@ from test_connectors_support import (
     configure,
     external_statements,
     reader_params,
+    scratch_fixture,  # noqa: F401  (registers the fixture)
     writer_params,
 )
-from test_connectors_support import scratch_fixture  # noqa: F401  (registers the fixture)
 
 WRITES = [
     "INSERT INTO mes.casting_sequence (cast_no) VALUES ('OP-TEST')",
@@ -63,7 +63,7 @@ def _counts(source: ExternalSource) -> dict[str, int]:
     )
     counts = {}
     for (name,) in tables:
-        [(count,)] = admin_rows(source, f'SELECT count(*) FROM mes."{name}"')
+        [(count,)] = admin_rows(source, f'SELECT count(*) FROM mes."{name}"')  # noqa: S608
         counts[name] = count
     return counts
 
@@ -91,7 +91,14 @@ def test_select_query_has_only_structured_fields() -> None:
     }
     assert fields == {
         "SelectQuery": {
-            "data_source_id", "table", "columns", "join", "where", "order_by", "after", "limit"
+            "data_source_id",
+            "table",
+            "columns",
+            "join",
+            "where",
+            "order_by",
+            "after",
+            "limit",
         },
         "TableRef": {"schema", "name"},
         "ColumnRef": {"name", "side"},
@@ -103,7 +110,17 @@ def test_select_query_has_only_structured_fields() -> None:
         assert dataclasses.is_dataclass(cls)
         assert cls.__dataclass_params__.frozen  # type: ignore[attr-defined]
     assert statements.Operator.__args__ == (  # type: ignore[attr-defined]
-        "eq", "ne", "lt", "le", "gt", "ge", "contains", "starts_with", "in", "is_null", "not_null"
+        "eq",
+        "ne",
+        "lt",
+        "le",
+        "gt",
+        "ge",
+        "contains",
+        "starts_with",
+        "in",
+        "is_null",
+        "not_null",
     )
 
 
@@ -184,9 +201,7 @@ async def test_the_session_default_holds_without_the_read_only_transaction(
 # ---------- ③ a whole flow sends nothing but SELECTs ----------
 
 
-async def test_a_flow_sends_only_selects(
-    db: AsyncSession, external_source: ExternalSource
-) -> None:
+async def test_a_flow_sends_only_selects(db: AsyncSession, external_source: ExternalSource) -> None:
     row = await add_source(db, external_source, allow_samples=True)
     for table in ("heat", "casting_sequence"):
         await cache_table(db, row.id, external_source, "mes", table)
@@ -230,8 +245,9 @@ async def test_a_flow_sends_only_selects(
     assert tables
     assert len(seen) > 6
     kinds = {statement.split(None, 1)[0].upper() for statement, _ in seen}
-    assert kinds <= {"SELECT", "SHOW"}, [s for s, _ in seen if not s.lstrip().upper().startswith(
-        ("SELECT", "SHOW"))]
+    assert kinds <= {"SELECT", "SHOW"}, [
+        s for s, _ in seen if not s.lstrip().upper().startswith(("SELECT", "SHOW"))
+    ]
 
 
 # ---------- ④ filter values are values ----------
@@ -277,7 +293,7 @@ def slow_view(external_source: ExternalSource, scratch: str) -> str:
     """The schema of a view whose every read takes 30 seconds."""
     admin_rows(
         external_source,
-        f"CREATE VIEW {scratch}.slow AS SELECT 1 AS x FROM pg_sleep(30);"
+        f"CREATE VIEW {scratch}.slow AS SELECT 1 AS x FROM pg_sleep(30);"  # noqa: S608
         f'GRANT SELECT ON {scratch}.slow TO "{external_source.reader}"',
     )
     return scratch
@@ -304,7 +320,9 @@ async def test_a_statement_past_the_timeout_is_cancelled(
     started = time.monotonic()
 
     with pytest.raises(QueryTimeoutError):
-        await service.select(db, SelectQuery(row.id, TableRef(slow_view, "slow"), (ColumnRef("x"),)))
+        await service.select(
+            db, SelectQuery(row.id, TableRef(slow_view, "slow"), (ColumnRef("x"),))
+        )
 
     assert time.monotonic() - started < 10
     assert await _active(external_source) == []
@@ -391,7 +409,7 @@ async def test_long_text_is_cut_and_marked(
 ) -> None:
     admin_rows(
         external_source,
-        f"CREATE TABLE {scratch}.long (id int PRIMARY KEY, body text);"
+        f"CREATE TABLE {scratch}.long (id int PRIMARY KEY, body text);"  # noqa: S608
         f"INSERT INTO {scratch}.long VALUES (1, repeat('炉', 2500)), (2, 'short');"
         f'GRANT SELECT ON {scratch}.long TO "{external_source.reader}"',
     )

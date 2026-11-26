@@ -71,9 +71,7 @@ def reader_params(source: ExternalSource, **changes: Any) -> ConnectionParams:
 
 
 def writer_params(source: ExternalSource) -> ConnectionParams:
-    return reader_params(
-        source, username=source.writer, password=SecretStr(source.writer_password)
-    )
+    return reader_params(source, username=source.writer, password=SecretStr(source.writer_password))
 
 
 def admin_rows(source: ExternalSource, statement: str, *args: Any) -> list[tuple[Any, ...]]:

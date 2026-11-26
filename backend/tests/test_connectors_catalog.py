@@ -319,8 +319,7 @@ async def test_refresh_caches_the_steel_sample(
             (fk.name or "", fk.columns, fk.ref_schema, fk.ref_table, fk.ref_columns)
             for fk in table.foreign_keys
         ) == [
-            (name, [col], "mes", target, [ref])
-            for name, col, target, ref in REFERENCES[table.name]
+            (name, [col], "mes", target, [ref]) for name, col, target, ref in REFERENCES[table.name]
         ]
     heat = await client.get(f"{BASE}/{source}/catalog/tables/mes/heat")
     assert heat.status_code == 200
@@ -758,7 +757,8 @@ async def test_browse_cached_tables_by_schema_search_cursor_and_working_type(
         result.extend(items)
         cursor = page.json()["nextCursor"]
         if size == 3:
-            assert isinstance(cursor, str) and cursor
+            assert isinstance(cursor, str)
+            assert cursor
             params["cursor"] = cursor
         else:
             assert cursor is None

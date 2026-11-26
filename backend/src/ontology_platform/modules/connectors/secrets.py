@@ -65,7 +65,9 @@ def open_password(
 ) -> SecretStr:
     """The stored password; CredentialUnreadableError when no configured key opens it. Called
     right before connecting, and by `rekey`."""
-    keys = {key.id: key for key in map(_derive, [settings.secret_key, *settings.previous_secret_keys])}
+    keys = {
+        key.id: key for key in map(_derive, [settings.secret_key, *settings.previous_secret_keys])
+    }
     key = keys.get(key_id or "")
     if key is None or len(secret) <= 1 + _NONCE_BYTES or secret[:1] != _VERSION:
         raise CredentialUnreadableError

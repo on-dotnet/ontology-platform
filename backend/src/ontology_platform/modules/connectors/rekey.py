@@ -37,7 +37,8 @@ async def rekey(db: AsyncSession, settings: Settings) -> RekeyResult:
     )
     rekeyed = unreadable = 0
     for row in rows:
-        assert row.secret is not None
+        if row.secret is None:
+            continue
         try:
             password = open_password(settings, row.id, row.secret, row.secret_key_id)
         except CredentialUnreadableError:
@@ -58,7 +59,7 @@ async def _main() -> None:
             result = await rekey(db, settings)
     finally:
         await engine.dispose()
-    print(f"re-encrypted: {result.rekeyed}, unreadable: {result.unreadable}")  # noqa: T201
+    print(f"re-encrypted: {result.rekeyed}, unreadable: {result.unreadable}")
 
 
 if __name__ == "__main__":
