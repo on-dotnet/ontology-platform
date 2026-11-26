@@ -1,0 +1,12 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?lineId ?grade ?family ?edition ?internalGrade WHERE {
+  VALUES ?line { <urn:synthetic:steel:salesorderline/D26000061-010> }
+  ?line a stl:SalesOrderLine ; dcterms:identifier ?lineId ; stl:requiresSpecification/stl:requiresGrade ?designation .
+  ?designation a stl:StandardGrade ; skos:notation ?grade ; stl:definedIn/dcterms:identifier ?edition ;
+      stl:plainProductFamily/skos:notation ?family .
+  ?internal a stl:SteelGrade ; stl:satisfies ?designation ; dcterms:identifier ?internalGrade .
+}
+ORDER BY ?grade ?family ?edition ?internalGrade

@@ -1,0 +1,12 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?lotId ?dimension ?bundleId ?length ?theoreticalMass WHERE {
+  VALUES ?lot { <urn:synthetic:steel:inspectionlot/L26000061> }
+  ?lot a stl:InspectionLot ; dcterms:identifier ?lotId ; stl:formationRule ?rule ; stl:lotMember ?bundle .
+  ?rule a stl:LotFormationRule ; stl:formationDimension/skos:notation ?dimension .
+  ?bundle a stl:Bundle ; dcterms:identifier ?bundleId ;
+      stl:bundleCutLength ?length ; stl:theoreticalMass ?theoreticalMass .
+}
+ORDER BY STR(?dimension) ?bundleId

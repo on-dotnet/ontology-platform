@@ -1,0 +1,47 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix line: <urn:synthetic:steel:salesorderline/> .
+@prefix spec: <urn:synthetic:steel:materialspecification/> .
+@prefix internal: <urn:synthetic:steel:steelgrade/> .
+@prefix heat: <urn:synthetic:steel:heat/> .
+@prefix bar: <urn:synthetic:steel:rebar/> .
+@prefix bundle: <urn:synthetic:steel:bundle/> .
+@prefix lot: <urn:synthetic:steel:inspectionlot/> .
+@prefix rule: <urn:synthetic:steel:lotformationrule/> .
+
+# The two editions use the same designation. Only two internal grades satisfy the ordered edition.
+line:D26000061-010 a stl:SalesOrderLine ; dcterms:identifier "D26000061-010" ; stl:requiresSpecification spec:S61 .
+spec:S61 a stl:MaterialSpecification ; dcterms:identifier "S61" ;
+    stl:requiresGrade <std/gb-1499-2-2024/grade/HRB400E> ; stl:applicableStandard <std/gb-1499-2-2024> .
+internal:G6101 a stl:SteelGrade ; dcterms:identifier "G6101" ; stl:satisfies <std/gb-1499-2-2024/grade/HRB400E> .
+internal:G6102 a stl:SteelGrade ; dcterms:identifier "G6102" ; stl:satisfies <std/gb-1499-2-2024/grade/HRB400E> .
+internal:G6103 a stl:SteelGrade ; dcterms:identifier "G6103" ; stl:satisfies <std/gbt-1499-2-2018/grade/HRB400E> .
+
+# Only the individually traced bars are listed. Counts and delivery quantities are synthetic.
+heat:H12600061 a stl:Heat ; dcterms:identifier "H12600061" ; stl:steelGrade internal:G6101 ;
+    prov:wasGeneratedBy <urn:synthetic:steel:convertersteelmaking/C61> .
+<urn:synthetic:steel:convertersteelmaking/C61> a stl:ConverterSteelmaking .
+bar:R6101 a stl:Rebar, stl:Bar ; dcterms:identifier "R6101" ; stl:sourceHeat heat:H12600061 ;
+    stl:rebarSurface <code/rebar-surface/RIBBED> ; stl:rebarGradeSuffix "E" ; stl:rebarNominalDiameter 16.0 .
+bar:R6102 a stl:Rebar, stl:Bar ; dcterms:identifier "R6102" ; stl:sourceHeat heat:H12600061 ;
+    stl:rebarSurface <code/rebar-surface/RIBBED> ; stl:rebarGradeSuffix "E" ; stl:rebarNominalDiameter 16.0 .
+bundle:B6101 a stl:Bundle ; dcterms:identifier "B6101" ; stl:hasPart bar:R6101 ; stl:sourceHeat heat:H12600061 ;
+    stl:definedMaterial spec:S61 ; stl:allocatedTo line:D26000061-010 ; stl:bundleCutLength 12.0 ;
+    stl:bundlePieceCount "125"^^xsd:nonNegativeInteger ; stl:theoreticalMass 2.370 ; stl:netMass 2.361 ;
+    stl:bundleMassBasis <code/bundle-mass-basis/THEORY> .
+bundle:B6102 a stl:Bundle ; dcterms:identifier "B6102" ; stl:hasPart bar:R6102 ; stl:sourceHeat heat:H12600061 ;
+    stl:definedMaterial spec:S61 ; stl:allocatedTo line:D26000061-010 ; stl:bundleCutLength 12.0 ;
+    stl:bundlePieceCount "150"^^xsd:nonNegativeInteger ; stl:theoreticalMass 2.844 ; stl:netMass 2.832 ;
+    stl:bundleMassBasis <code/bundle-mass-basis/THEORY> .
+
+rule:R61 a stl:LotFormationRule ; stl:applicableStandard <std/gb-1499-2-2024> ;
+    stl:formationDimension <code/lot-formation-dimension/HEAT>, <code/lot-formation-dimension/SPEC>,
+        <code/lot-formation-dimension/REBARGRADE>, <code/lot-formation-dimension/REBARMASS> .
+lot:L26000061 a stl:InspectionLot ; dcterms:identifier "L26000061" ;
+    stl:formationRule rule:R61 ; stl:lotMember bundle:B6101, bundle:B6102 .
+<urn:synthetic:steel:qualitydecision/J61> a stl:QualityDecision ; stl:assessedObject lot:L26000061 ;
+    stl:assessedSpecification spec:S61 ; stl:rebarLotAssessmentBasis <code/rebar-lot-basis/SEISMIC>, <code/rebar-lot-basis/MASSDEV> ;
+    stl:judgementResult <code/judgement-result/CONFORM> ; stl:occurredAt "2026-06-02T10:00:00+08:00"^^xsd:dateTime .

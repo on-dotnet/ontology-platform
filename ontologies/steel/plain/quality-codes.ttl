@@ -1,0 +1,43 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/plain/quality-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/plain/quality-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "普钢交验批代码"@zh, "Commodity steel inspection lot codes"@en ;
+    rdfs:comment "向通用组批方案补充钢筋牌号和限重分批单元，登记钢筋整批交验所据检验项目。"@zh, "Extends shared lot dimensions with reinforcing grade and mass-limited grouping and registers bases for assessing whole reinforcing bar lots."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/lot-formation-dimension/REBARGRADE> a skos:Concept ; skos:inScheme <code/lot-formation-dimension> ; skos:topConceptOf <code/lot-formation-dimension> ;
+    skos:notation "REBARGRADE"^^stl:LotFormationDimensionCode ; rdfs:isDefinedBy <ontology/plain/quality-codes> ;
+    rdfs:label "同一钢筋牌号"@zh, "Same reinforcing bar grade"@en ; skos:prefLabel "同一钢筋牌号"@zh, "Same reinforcing bar grade"@en ;
+    skos:definition "各成员须属同一产品标准版次下的同一钢筋牌号，牌号有抗震后缀时一并核对。"@zh, "Members must share the same reinforcing grade in the same edition, including any seismic suffix."@en ;
+    dcterms:source <std/gb-1499-2-2024> .
+
+<code/lot-formation-dimension/REBARMASS> a skos:Concept ; skos:inScheme <code/lot-formation-dimension> ; skos:topConceptOf <code/lot-formation-dimension> ;
+    skos:notation "REBARMASS"^^stl:LotFormationDimensionCode ; rdfs:isDefinedBy <ontology/plain/quality-codes> ;
+    rdfs:label "按钢筋批重上限组批"@zh, "Mass-limited rebar lot"@en ; skos:prefLabel "按钢筋批重上限组批"@zh, "Mass-limited rebar lot"@en ;
+    skos:definition "成员归属同一限重分批单元，追加交验捆时按适用规则核对累计重量。"@zh, "Members share one lot allocation bounded by mass. The cumulative mass is checked as bundles are added."@en ;
+    dcterms:source <std/gb-1499-2-2024> .
+
+<code/rebar-lot-basis> a skos:ConceptScheme ;
+    rdfs:label "钢筋交验批判定基准"@zh, "Rebar lot assessment basis"@en ; skos:prefLabel "钢筋交验批判定基准"@zh, "Rebar lot assessment basis"@en ;
+    skos:definition "区分钢筋产品检验中用于整批判定的证据口径，判定结论另记在判定记录上。"@zh, "Distinguishes kinds of product inspection evidence used to assess a reinforcing bar lot. The decision records the outcome."@en ;
+    rdfs:comment "下沉理由：钢筋按批交验需区分公称米重偏差和抗震钢筋性能证据，这些项目取决于钢筋产品标准。"@zh ;
+    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/quality-codes> .
+stl:RebarLotBasisCode a rdfs:Datatype ;
+    rdfs:label "钢筋交验批判定基准代码"@zh, "Rebar lot assessment basis code"@en ; skos:prefLabel "钢筋交验批判定基准代码"@zh, "Rebar lot assessment basis code"@en ;
+    skos:definition "用于标记钢筋交验批判定基准方案内主记号的字面量类型。"@zh, "Datatype for the primary notations in the rebar lot assessment basis scheme."@en ;
+    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/quality-codes> .
+
+<code/rebar-lot-basis/MASSDEV> a skos:Concept ; skos:inScheme <code/rebar-lot-basis> ; skos:topConceptOf <code/rebar-lot-basis> ;
+    skos:notation "MASSDEV"^^stl:RebarLotBasisCode ; rdfs:isDefinedBy <ontology/plain/quality-codes> ;
+    rdfs:label "钢筋重量偏差"@zh, "Rebar mass deviation"@en ; skos:prefLabel "钢筋重量偏差"@zh, "Rebar mass deviation"@en ;
+    skos:definition "以本批钢筋试样的实测质量相对其公称长度计重值的偏差作为判定依据。"@zh, "Uses the difference between measured sample mass and the nominal mass for the sampled length as a basis for assessing the lot."@en .
+<code/rebar-lot-basis/SEISMIC> a skos:Concept ; skos:inScheme <code/rebar-lot-basis> ; skos:topConceptOf <code/rebar-lot-basis> ;
+    skos:notation "SEISMIC"^^stl:RebarLotBasisCode ; rdfs:isDefinedBy <ontology/plain/quality-codes> ;
+    rdfs:label "钢筋抗震性能"@zh, "Seismic performance of reinforcing bars"@en ; skos:prefLabel "钢筋抗震性能"@zh, "Seismic performance of reinforcing bars"@en ;
+    skos:definition "以该批抗震钢筋试样的强度关系和延性检验结果作为批判定依据。"@zh, "Uses strength relationship and ductility results from seismic reinforcing bar samples to assess their lot."@en .
