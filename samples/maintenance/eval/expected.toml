@@ -23,17 +23,20 @@
 #   维修班、设备工程师、设备责任人、维修负责人、计量室、检验机构、车间）；没有自身数据的部位与部件
 #   （点检部位、点检项目、润滑点、安全附件）；按类别给出的参考表（三级点检对照、类别代码表、
 #   考核指标表、关键备件清单本身）；KPI 与统计表（MTBF、MTTR、返修率）。
-# 拿不准的一律 core = false（例如设备档案、润滑标准、使用登记证、外委维修合同、故障分析报告、
+# 拿不准的一律 core = false（例如润滑标准、使用登记证、外委维修合同、故障分析报告、
 #   测点、点检员、日点检任务、特种设备的三个类别）。
 # 同一事物在原文里逐字出现的全称或别称并入同一项的 names（机台＝设备；点检基准书＝点检标准；
-# 工单、维修单＝维修工单；故障报修单＝报修单；备品备件、配件＝备件；PM计划、保养计划＝预防性维护计划）。
-# “设备台账”原文定义为每台设备一条记录的设备主数据，并入设备；“设备档案”另存随机资料、检验报告等
-# 附件，单列为可接受项。
+# 工单、维修单＝维修工单；故障报修单＝报修单；备品备件、配件＝备件；PM计划、保养计划、月度预防性维护计划＝预防性维护计划）。
+# “设备台账”原文定义为每台设备一条记录的设备主数据，并入设备；“设备档案”也并入设备：01 §4.2 写明
+# “设备台账和设备档案是同一张设备主数据的两种视图”，“设备档案”即指设备台账中该台设备的记录及其附件
+# （#58 修订，原先单列为可接受项）。
+# #58 补充的可接受项：外委维修报告（02 §12.3 写明每份报告记故障原因、更换的部件和测试数据，作为
+# 对应维修工单的附件）。
 # 关系收录两端都符合上述标准、且原文一句话、列表项或表格行直接写明两者联系的；表格列里记录另一事物
 # 的编号（所用备件编码、来源单据号、关联工单号、标准编号、适用设备、供应商编号）算写明联系。
 
 entity_types = [
-  { names = ["设备", "机台", "设备台账", "Equipment"], core = true },
+  { names = ["设备", "机台", "设备台账", "设备档案", "Equipment"], core = true },
   { names = ["特种设备", "SpecialEquipment"], core = true },
   { names = ["点检标准", "点检基准书", "InspectionStandard"], core = true },
   { names = ["点检路线", "InspectionRoute"], core = true },
@@ -45,13 +48,12 @@ entity_types = [
   { names = ["领用单", "备件领用单", "MaterialRequisition"], core = true },
   { names = ["退库单", "MaterialReturn"], core = true },
   { names = ["供应商", "备件供应商", "Supplier"], core = true },
-  { names = ["预防性维护计划", "PM计划", "保养计划", "PreventiveMaintenancePlan"], core = true },
+  { names = ["预防性维护计划", "PM计划", "保养计划", "月度预防性维护计划", "PreventiveMaintenancePlan"], core = true },
   { names = ["油品", "Lubricant"], core = true },
   { names = ["润滑记录", "LubricationRecord"], core = true },
   { names = ["计量器具", "MeasuringInstrument"], core = true },
   { names = ["检验报告", "定期检验报告", "InspectionReport"], core = true },
   { names = ["特种设备作业人员证", "OperatorCertificate"], core = true },
-  { names = ["设备档案", "EquipmentFile"], core = false },
   { names = ["起重机械", "LiftingMachinery"], core = false },
   { names = ["场（厂）内专用机动车辆", "IndustrialVehicle"], core = false },
   { names = ["压力容器", "PressureVessel"], core = false },
@@ -59,6 +61,7 @@ entity_types = [
   { names = ["使用登记证", "RegistrationCertificate"], core = false },
   { names = ["外委维修合同", "维修合同", "OutsourcedRepairContract"], core = false },
   { names = ["故障分析报告", "FailureAnalysisReport"], core = false },
+  { names = ["外委维修报告", "维修报告", "OutsourcedRepairReport"], core = false },
   { names = ["测点", "MeasurementPoint"], core = false },
   { names = ["点检员", "Inspector"], core = false },
   { names = ["日点检任务", "DailyInspectionTask"], core = false },
@@ -95,6 +98,7 @@ relations = [
   { domain = "点检路线", range = "点检员", core = false },     # 01 §8.2 路线负责人（点检员）
   { domain = "维修工单", range = "外委维修合同", core = false }, # 02 §12.2 外委维修合同编号记入维修工单
   { domain = "维修工单", range = "故障分析报告", core = false }, # 02 §13.1 故障分析报告编号记入对应的维修工单
+  { domain = "维修工单", range = "外委维修报告", core = false }, # 02 §12.3 维修报告作为维修工单的附件
   { domain = "维修工单", range = "检验报告", core = false },   # 06 §5.4 检验报告的整改意见开立维修工单落实
   { domain = "维修工单", range = "维修工单", core = false },   # 02 §7、§11 关联工单号、返修工单关联原工单号
   { domain = "润滑标准", range = "设备", core = false },       # 04 §8.2 润滑标准表设备编号列
@@ -103,7 +107,6 @@ relations = [
   { domain = "计量器具", range = "备件", core = false },       # 06 §6.1 从备件库领用的热电偶、压力表安装前须校准并赋计量器具编号
   { domain = "检验报告", range = "设备", core = false },       # 06 §5.4 检验报告编号录入该设备的记录
   { domain = "使用登记证", range = "特种设备", core = false }, # 06 §4 每台特种设备一证
-  { domain = "设备档案", range = "设备", core = false },       # 01 §4.2 每台设备另有一份设备档案
   { domain = "测点", range = "设备", core = false },           # 01 §14.1/§14.4 设备关键部位的测点
   { domain = "日点检任务", range = "设备", core = false },     # 01 §9.3 日常点检任务按机台推送
 ]

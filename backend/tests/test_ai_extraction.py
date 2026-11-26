@@ -20,6 +20,7 @@ from ontology_platform.modules.ai.extraction import (
     PendingType,
     Proposal,
     ProposedMatch,
+    _Builder,
     batches,
     build_proposals,
     merge_types,
@@ -30,6 +31,10 @@ from ontology_platform.modules.ai.extraction import (
 )
 from ontology_platform.modules.ai.gateway import InputFile
 from ontology_platform.modules.ai.prompts import (
+    RECORD_RULE,
+    RELATIONS_INSTRUCTIONS,
+    RESOLVE_INSTRUCTIONS,
+    TYPES_INSTRUCTIONS,
     DecisionOut,
     EntityTypeOut,
     PropertyOut,
@@ -1606,6 +1611,126 @@ def test_relations_take_short_ids_and_only_the_cited_sentence_counts() -> None:
     assert (smelts.fields["labelZh"], smelts.fields["labelEn"]) == ("冶炼", "belongs to")
     assert smelts.evidence[0].quote == "每个炉次只冶炼一个钢种。"
     assert (literal["relation_type"], literal["relation_type:ok"]) == (2, 1)
+
+
+def test_a_relation_can_cite_a_short_run_of_sentences_of_one_chunk() -> None:
+    # An introducing sentence and its list items name the two ends only together (#58).
+    listed = "炉次的去向有两种：\n- 回炉；\n- 送往钢种调整工位。"
+    chunk = ChunkText(id=uuid4(), seq=0, text=listed + "\n炉次按计划组织生产。")
+    other = ChunkText(id=uuid4(), seq=1, text="钢种见下表。")
+    rels = RelationsOut(
+        relations=[
+            relation("new:Heat", str(EXISTING_GRADE.id), "调整", "0.1-0.3"),
+            # More than three units, across chunks, backwards, or naming one end only: dropped.
+            relation("new:Heat", str(EXISTING_GRADE.id), "过长", "[0.1-0.4]"),
+            relation("new:Heat", str(EXISTING_GRADE.id), "跨块", "0.3-1.1"),
+            relation("new:Heat", str(EXISTING_GRADE.id), "倒序", "0.3-0.1"),
+            relation("new:Heat", str(EXISTING_GRADE.id), "一端", "0.1-0.2"),
+        ],
+        properties=[],
+    )
+    literal: Counter[str] = Counter()
+    proposals = build_proposals(
+        [chunk, other],
+        [EXISTING_GRADE],
+        [entity("new:Heat", "炉次", sentence="0.1")],
+        rels,
+        literal=literal,
+    )
+    [kept] = [p for p in proposals if p.kind == "relation_type"]
+    assert kept.fields["labelZh"] == "调整"
+    [evidence] = kept.evidence
+    assert (evidence.char_start, evidence.char_end) == (0, len(listed))
+    assert evidence.quote == listed
+    assert (literal["relation_type"], literal["relation_type:ok"]) == (5, 1)
+
+
+def test_a_run_is_one_chunk_forwards_and_at_most_three_units() -> None:
+    first = ChunkText(id=uuid4(), seq=0, text="甲。\n乙。\n丙。\n丁。")
+    second = ChunkText(id=uuid4(), seq=1, text="戊。\n己。\n庚。\n辛。")
+    builder = _Builder([first, second], [])
+    run = builder.cite_run("0.2-0.4")
+    assert run is not None
+    assert (run.chunk_id, run.quote) == (first.id, "乙。\n丙。\n丁。")
+    assert builder.cite_run("0.3") == builder.cite("0.3")
+    for ref in ("0.4-1.1", "0.3-1.4", "0.3-0.1", "0.1-0.4", "0.3-0.5", "0.1-", None):
+        assert builder.cite_run(ref) is None, ref
+
+
+def test_a_run_does_not_join_names_across_units() -> None:
+    # "钢种" would only appear by gluing the end of one unit to the start of the next.
+    glued = ChunkText(id=uuid4(), seq=0, text="炉次见下钢\n\n种类一。")
+    # The same run with the name inside one unit is direct evidence.
+    whole = ChunkText(id=uuid4(), seq=1, text="炉次见下\n\n钢种类一。")
+    rels = RelationsOut(
+        relations=[
+            relation("new:Heat", str(EXISTING_GRADE.id), "拼接", "0.1-0.2"),
+            relation("new:Heat", str(EXISTING_GRADE.id), "完整", "1.1-1.2"),
+        ],
+        properties=[],
+    )
+    proposals = build_proposals(
+        [glued, whole], [EXISTING_GRADE], [entity("new:Heat", "炉次", sentence="0.1")], rels
+    )
+    assert [p.fields["labelZh"] for p in proposals if p.kind == "relation_type"] == ["完整"]
+
+
+def test_types_and_properties_still_cite_one_sentence() -> None:
+    chunk = ChunkText(id=uuid4(), seq=0, text="炉次按计划组织生产。\n每个炉次记录出钢重量。")
+    weight = prop("new:Heat", "出钢重量").model_copy(update={"sentence": "0.1-0.2"})
+    proposals = build_proposals(
+        [chunk],
+        [],
+        [entity("new:Heat", "炉次", sentence="0.1-0.2")],
+        RelationsOut(relations=[], properties=[weight]),
+    )
+    # A run is not a sentence number: no evidence, flagged.
+    assert all(p.flags == ["evidence_not_found"] for p in proposals)
+    assert all(p.evidence == [] for p in proposals)
+
+
+def test_the_relations_prompt_allows_a_short_run_of_sentences() -> None:
+    assert "3.12-3.14" in RELATIONS_INSTRUCTIONS
+    assert "3.12-3.14" in (RelationOut.model_fields["sentence"].description or "")
+    assert "3.12-3.14" not in TYPES_INSTRUCTIONS
+    assert "3.12-3.14" not in (PropertyOut.model_fields["sentence"].description or "")
+    # The shared citing rule must not tell the relations stage to cite one sentence only.
+    assert "Cite the one sentence" not in RELATIONS_INSTRUCTIONS
+
+
+def test_types_and_resolve_judge_a_thing_and_its_record_alike() -> None:
+    # #57: the types stage merged a thing and its record, resolve called them different.
+    assert RECORD_RULE in TYPES_INSTRUCTIONS
+    assert RECORD_RULE in RESOLVE_INSTRUCTIONS
+    assert "a thing and the record of it (" not in RESOLVE_INSTRUCTIONS
+    assert "identified and kept track of" in RECORD_RULE
+    # An event and its numbered record stay one concept (the number identifies the event).
+    assert "even when the record has a number" in RECORD_RULE
+
+
+def test_the_types_prompt_names_what_is_not_a_type() -> None:
+    # The three granularity rules of #58, and identity not only by a number.
+    rules = " ".join(TYPES_INSTRUCTIONS.split())
+    for phrase in (
+        "by an action noun",
+        "Registers, ledgers, directories, lists",
+        "which documents are kept, by whom and for how long",
+        "stays a type even without a number of its own",
+        "Requests, applications, permits and notifications",
+        "Lines or items of a plan",
+        "a role that an existing kind of thing plays",
+        "differ only by period or frequency",
+        "not the only one",
+    ):
+        assert phrase in rules
+    # Kinds told apart by a category stay types (a subclass of equipment, say).
+    assert "differ only by period, frequency or category" not in rules
+
+
+def test_the_prompts_give_examples_in_generic_words_only() -> None:
+    cjk = re.compile(r"[一-鿿]")
+    for prompt in (TYPES_INSTRUCTIONS, RESOLVE_INSTRUCTIONS, RELATIONS_INSTRUCTIONS):
+        assert not cjk.search(prompt)
 
 
 async def test_short_ids_in_the_output_stand_for_the_existing_types() -> None:

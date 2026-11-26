@@ -19,8 +19,8 @@ Rules:
 """
 
 CITE_RULE = """\
-- Sentences are numbered like [3.12] (chunk 3, sentence 12). Cite the one sentence that supports
-  an item by its number, for example "3.12"; never copy text. Use null when none does.
+- Sentences are numbered like [3.12] (chunk 3, sentence 12). Cite evidence by number, for
+  example "3.12"; never copy text. Use null when no sentence supports an item.
 """
 
 # The terms stage is not trimmed (spec 004, 7.2, PR 4): without definitions and quotes the model
@@ -43,48 +43,83 @@ measurable or descriptive attributes (attribute), links between objects (relatio
 enumerated values such as grades or categories (value). Skip generic words.
 {TERMS_RULES}"""
 
+# One reading of "a thing and the record of it" for the types and resolve stages (#57, #58):
+# the two stages used to answer it in opposite ways. Examples come from other fields than the
+# case packs, so that the evaluation is not flattered.
+RECORD_RULE = """\
+A thing and the record of it are one concept unless the record is identified and kept track of
+on its own. An event known only through its record (every occurrence is one record) is one
+concept with the record, named by the record, even when the record has a number: the number
+identifies the occurrence ("hospital admission" and "admission record"). Master data kept for
+each thing under the thing's own number is the thing ("customer" and "customer master
+record"). A record with an identity of its own, different from the thing's, is a different
+concept ("patient" and "insurance card").
+"""
+
 TYPES_INSTRUCTIONS = f"""\
 You are an ontology engineer. From the candidate terms below, decide which are entity types
 (classes of business objects or events that have their own identity), and arrange them into a
 shallow hierarchy only where the text supports an "is a kind of" relation.
-An entity type is a class whose individual members are told apart and kept track of: physical
-things (equipment, containers, materials and products), records and documents, and events that
-the text treats as occurrences in their own right, each with an identifier or with data
-recorded for it (for example "every delivery is recorded with its date and quantity").
+An entity type is a class whose members are identified and kept track of one by one: usually
+each has a number or code of its own, or the text lists the data recorded for every single one
+(for example "every loan is recorded with the borrower and the due date"). A number is the
+most common evidence, not the only one. Such members are physical things (equipment,
+containers, materials and products), events that the text treats as occurrences in their own
+right, and records, documents and plans of which every single one is kept track of (a
+consignment note; a timetable whose lines each name a train).
 These are not entity types:
-- Process steps and operations, usually named by a verb (for example unpacking, sorting,
-  sealing, starting a machine). Data recorded at a step belongs, as attributes, to the object
-  or event it is recorded for. Make a step a type only when the text records each occurrence
-  of it as a record of its own.
-- Outcomes, statuses, the possible results of a decision, quality levels and other categories
-  (these are values); measurable quantities (attributes); people, roles and departments
-  mentioned only as the one who acts; parts or zones of equipment and input materials that have
-  no data of their own.
-One concept is one type. When several terms name the same thing (a short and a qualified name,
-a thing and the record of it), propose one type, name it by the general term the text uses
-most, and put the other names in synonyms. A process and the equipment that performs it are
-different concepts; keep the equipment, and the process only if it is an event as defined
-above.
+- Process steps, operations and activities, whether named by a verb or by an action noun (for
+  example unpacking, sealing, cleaning, labelling, auditing). When the text writes the data of
+  each occurrence on a document of another kind (a ticket, a consignment note), propose that
+  document, not the activity. An event that the text defines as an occurrence and records
+  each time, with what it concerns, who and when, stays a type even without a number of its
+  own.
+- Outcomes, statuses, the possible values of a decision, quality levels and other categories
+  (these are values). A kind of activity or record told apart only by its level, frequency or
+  result (daily and weekly rounds) is a value of an attribute, not a type of its own.
+- Measurable quantities (attributes).
+- People, roles and departments mentioned only as the one who acts; a role that an existing
+  kind of thing plays (a preferred carrier, a guarantor who is also a customer); places such
+  as a ward or a reading room that the text names only as where something happens.
+- Parts, points and zones of equipment and input materials, even when a standard or plan
+  refers to them, unless each one is identified and kept track of on its own. Lines or items
+  of a plan, list or standard (an order line, a checklist item) are part of the document that
+  contains them.
+- Registers, ledgers, directories, lists, tables, statistics, charts and analysis reports that
+  collect or summarise entries about other things (a price list, a list of members, a weekly
+  summary); propose the things they list instead. A table that says which documents are kept,
+  by whom and for how long does not make each document it names a type.
+- Requests, applications, permits and notifications that are not kept track of one by one;
+  what they ask for or record belongs, as attributes, to the object they concern.
+One concept is one type. When several terms name the same thing (a short and a qualified
+name), propose one type, name it by the general term the text uses most, and put the other
+names in synonyms. Plans, reports or records that differ only by period or frequency (a
+weekly and a monthly timetable) are one type; the period is an attribute.
+{RECORD_RULE}A process and the equipment that performs it are different concepts; keep the
+equipment, and the process only if it is an event as defined above.
 Existing entity types are listed with short ids (E1, E2, ...); reuse them instead of proposing
 duplicates (refer to an existing type by its id). Refer to a new type as "new:<Name>", where
 <Name> is a PascalCase English name. Give a concise English label, and a definition of one
 sentence, or null. Attributes, values and relations are not entity types.
-Each term is shown with the sentences it was found in; cite the sentence that best shows the
-type.
+Each term is shown with the sentences it was found in; cite the one sentence that best shows
+the type.
 {COMMON_RULES}{CITE_RULE}"""
 
 RELATIONS_INSTRUCTIONS = f"""\
 You are an ontology engineer. Using only the entity types listed (refer to them by their ref),
 find in the text (1) relations between two entity types and (2) attributes of an entity type.
-Propose a relation only where one sentence, list item or table row states the link directly and
-names both types (by their label or a synonym); cite that sentence. Relations whose sentence
-does not name both types are discarded. Do not derive relations from the order of process
-steps, from shared attributes or from general knowledge, and give each link once, in one
-direction. Give relations and attributes a camelCase English local_name. Give a definition
-only where the text defines the relation or attribute; otherwise null. For attributes choose
-the datatype and the unit symbol when the text states one (for example mm, t, ℃, %, MPa,
-m/min). "required" means every instance must have it; "multiple" means an instance can have
-several.
+Propose a relation only where the text states the link directly and names both types (by their
+label or a synonym). Usually one sentence, list item or table row does; cite it. Where it takes
+a few units together to state the link, such as an introducing sentence and its list items or a
+table header and the row right after it, cite that run instead, as the first and last number
+of at most three consecutive sentences of one chunk, for example "3.12-3.14". Relations whose
+cited sentences do not name both types are discarded; an attribute cites one sentence. Do not
+derive relations from the order of process steps, from shared attributes or from general
+knowledge, and give each link once, in one direction. Give relations and attributes a
+camelCase English local_name. Give a definition only where the text defines the relation or
+attribute; otherwise null. For attributes choose the datatype and the unit symbol when the
+text states one (for example mm, t, ℃, %, MPa, m/min). "required" means every instance must
+have it; "multiple" means an instance can have several.
 {COMMON_RULES}{CITE_RULE}"""
 
 _CITED = 'Number of the sentence cited, for example "3.12"; null if none'
@@ -131,7 +166,9 @@ class RelationOut(BaseModel):
     multiple: bool
     definition_zh: str | None
     confidence: float
-    sentence: str | None = Field(description=_CITED)
+    sentence: str | None = Field(
+        description='Sentence cited, "3.12", or a run of at most three, "3.12-3.14"; null if none'
+    )
 
 
 class PropertyOut(BaseModel):
@@ -152,7 +189,7 @@ class RelationsOut(BaseModel):
     properties: list[PropertyOut]
 
 
-RESOLVE_INSTRUCTIONS = """\
+RESOLVE_INSTRUCTIONS = f"""\
 You are an ontology engineer. Each object type below was just identified in a document and is
 listed with its candidates: types it might be the same as (existing ones, types proposed by
 other documents, or types of this document). For each type, decide whether one of its
@@ -161,11 +198,12 @@ Same concept means the same kind of thing under another name: an abbreviation, a
 a synonym or a name used by another department (for example "car" and "automobile", or
 "invoice" and "bill"). These are not the same concept: a kind of something and that something
 ("sports car" and "car"), a whole and its parts ("car" and "engine"), a process and the
-equipment that performs it ("painting" and "paint booth"), a thing and the record of it
-("shipment" and "shipping note"), and two kinds of one thing that share a general name.
-Answer per type, in one line: "same" with the candidate it is; "different" with candidate null
-when no candidate is the same concept; "unsure" with the candidate it may be when the names,
-definitions and context are not enough to tell. Do not guess: answer unsure instead.
+equipment that performs it ("painting" and "paint booth"), and two kinds of one thing that
+share a general name.
+{RECORD_RULE}Answer per type, in one line: "same" with the candidate it is; "different" with
+candidate null when no candidate is the same concept; "unsure" with the candidate it may be
+when the names, definitions and context are not enough to tell. Do not guess: answer unsure
+instead.
 Give the reason in at most 30 characters, in the language of the names.
 """
 
