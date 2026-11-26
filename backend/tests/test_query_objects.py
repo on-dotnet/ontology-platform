@@ -163,7 +163,12 @@ async def test_filter_operators_match_external_primary_keys(
     )
     await cache_table(db, catalog.source.id, external_source, scratch, "filter_coil")
     number = element(
-        catalog.ontology, "property", "number", "卷号", domain_id=catalog.coil.id, datatype="integer"
+        catalog.ontology,
+        "property",
+        "number",
+        "卷号",
+        domain_id=catalog.coil.id,
+        datatype="integer",
     )
     await add_elements(db, number)
     bindings = catalog.coil_bindings(scratch, "filter_coil")
