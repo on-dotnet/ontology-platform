@@ -1,0 +1,494 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/core/quality> a owl:Ontology ;
+    owl:versionIRI <ontology/core/quality/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "钢铁本体：质量检验"@zh, "Steel ontology: inspection and quality"@en ;
+    rdfs:comment "描述取样、测量、检验结果及其对应的规格判定、处置与质量证明书。"@zh, "Relates samples, measurements and test results to the specifications used for decisions, the dispositions taken and the certificates issued."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+# Sampling and specimens
+stl:SamplingPlan a owl:Class ; rdfs:subClassOf stl:Plan ;
+    rdfs:label "取样计划"@zh, "Sampling plan"@en ; skos:prefLabel "取样计划"@zh, "Sampling plan"@en ;
+    skos:definition "在取样前确定待取批次、取样部位和取样频次的计划。"@zh, "A plan identifying lots, locations and frequency for sampling before inspection starts."@en ;
+    dcterms:source <std/gbt-10322-1-2023> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:Sampling a owl:Class ; rdfs:subClassOf stl:Operation, sosa:Sampling ;
+    rdfs:label "取样作业"@zh, "Sampling"@en ; skos:prefLabel "取样作业"@zh, "Sampling"@en ;
+    skos:definition "从实际物料取出代表性样品并留下取样位置和时点的执行。"@zh, "An operation obtaining representative sample material at an identifiable place and time."@en ;
+    dcterms:source <std/gbt-20066-2006> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:Sample a owl:Class ; rdfs:subClassOf sosa:Sample ;
+    rdfs:label "样品"@zh, "Sample"@en ; skos:prefLabel "样品"@zh, "Sample"@en ;
+    skos:definition "从可追溯物料件或物料批中取得、供后续检验使用的材料。"@zh, "Material taken from a traceable piece or lot for subsequent examination."@en ;
+    skos:scopeNote "样品可以代表铁矿石、焦炭、铁水或钢水等物料批，也可以取自一件成材。"@zh, "A sample can represent an ore, coke, hot metal or steel lot, or an individual product."@en ;
+    dcterms:source <std/gbt-20066-2006> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:SampleIncrement a owl:Class ; rdfs:subClassOf stl:Sample ;
+    rdfs:label "份样"@zh, "Sample increment"@en ; skos:prefLabel "份样"@zh, "Sample increment"@en ;
+    skos:definition "从一批物料的一个部位或在一个时刻取出、可用于制备组合样的一份材料。"@zh, "A portion taken at one point or time in a lot that can contribute to a composite sample."@en ;
+    dcterms:source <std/gbt-10322-1-2023> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:CompositeSample a owl:Class ; rdfs:subClassOf stl:Sample ;
+    rdfs:label "组合样"@zh, "Composite sample"@en ; skos:prefLabel "组合样"@zh, "Composite sample"@en ;
+    skos:definition "把来自同一取样计划的多份份样合并后用于一次测定的样品。"@zh, "A sample formed by combining increments from a sampling plan for a joint determination."@en ;
+    dcterms:source <std/gbt-10322-1-2023> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:RetainedSample a owl:Class ; rdfs:subClassOf stl:Sample ;
+    rdfs:label "留样"@zh, "Retained sample"@en ; skos:prefLabel "留样"@zh, "Retained sample"@en ;
+    skos:definition "为复核或争议检验保存至指定期限并可重新定位的样品。"@zh, "A sample kept at an identifiable location until a specified retention date for review or dispute testing."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:SamplePreparation a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "制样作业"@zh, "Sample preparation"@en ; skos:prefLabel "制样作业"@zh, "Sample preparation"@en ;
+    skos:definition "把取得的样品加工到某项检验所需形状或状态的作业。"@zh, "An operation preparing sampled material to the shape or condition required for an examination."@en ;
+    dcterms:source <std/gbt-2975-2018> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:TestPiece a owl:Class ; rdfs:subClassOf stl:Sample ;
+    rdfs:label "试样"@zh, "Test piece"@en ; skos:prefLabel "试样"@zh, "Test piece"@en ;
+    skos:definition "从样品制备、具有可识别几何或表面并直接接受试验的部分。"@zh, "An identifiable portion prepared with the geometry or surface required for direct testing."@en ;
+    dcterms:source <std/gbt-2975-2018> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:sampleCollectedBy a owl:ObjectProperty ; rdfs:domain stl:Sample ; rdfs:range stl:Sampling ;
+    rdfs:subPropertyOf sosa:isResultOf ;
+    rdfs:label "取样作业来源"@zh, "Collecting sampling operation"@en ; skos:prefLabel "取样作业来源"@zh, "Collecting sampling operation"@en ;
+    skos:definition "指向实际取得该样品的一次取样作业。"@zh, "Identifies the sampling operation that physically obtained this sample."@en ;
+    dcterms:source <std/iso-14284-2022> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:sampleOf a owl:ObjectProperty ; rdfs:domain stl:Sample ;
+    rdfs:label "取样对象"@zh, "Sample of"@en ; skos:prefLabel "取样对象"@zh, "Sample of"@en ;
+    skos:definition "指出样品实际取自哪一件实物或哪一批物料，炉次是可取样的一种物料批。"@zh, "Identifies the individual piece or material lot from which the sample was taken, including a heat sampled as a lot."@en ;
+    dcterms:source <std/iso-14284-2022> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:sampleType a owl:ObjectProperty ; rdfs:domain stl:Sample ; rdfs:range skos:Concept ;
+    rdfs:label "样品类型"@zh, "Sample type"@en ; skos:prefLabel "样品类型"@zh, "Sample type"@en ;
+    skos:definition "以取样所在环节或所取样材类别标记样品。"@zh, "Classifies a sample by its collection stage or the material taken."@en ;
+    rdfs:seeAlso <code/sample-type> ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:samplePosition a owl:DatatypeProperty ; rdfs:domain stl:Sample ; rdfs:range xsd:string ;
+    rdfs:label "取样位置"@zh, "Sampling position"@en ; skos:prefLabel "取样位置"@zh, "Sampling position"@en ;
+    skos:definition "以被取样物料为参照说明样品取自哪个部位及方位。"@zh, "Locates the sample on its source material using the stated position and orientation."@en ;
+    dcterms:source <std/gbt-2975-2018> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:sampledAt a owl:DatatypeProperty ; rdfs:range xsd:dateTime ;
+    rdfs:label "取样时间"@zh, "Sampled at"@en ; skos:prefLabel "取样时间"@zh, "Sampled at"@en ;
+    skos:definition "样品从物料中取出或现场测点采得该读数的时刻。"@zh, "Gives the instant of physical sampling or acquisition of the sensor reading."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:preparedFromSample a owl:ObjectProperty ; rdfs:domain stl:TestPiece ; rdfs:range stl:Sample ;
+    rdfs:label "制样来源样品"@zh, "Parent sample"@en ; skos:prefLabel "制样来源样品"@zh, "Parent sample"@en ;
+    skos:definition "指出制取试样所用的直接来源样品。"@zh, "Identifies the immediate sample from which the specimen was prepared."@en ;
+    dcterms:source <std/gbt-2975-2018> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:specimenOrientation a owl:DatatypeProperty ; rdfs:domain stl:TestPiece ; rdfs:range xsd:string ;
+    rdfs:label "试样方向"@zh, "Specimen orientation"@en ; skos:prefLabel "试样方向"@zh, "Specimen orientation"@en ;
+    skos:definition "保留试样轴或受检面相对产品参考方向的取向表述。"@zh, "Records the specimen axis or examination plane relative to the product reference direction."@en ;
+    dcterms:source <std/gbt-2975-2018> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:retainedUntilOn a owl:DatatypeProperty ; rdfs:domain stl:RetainedSample ; rdfs:range xsd:date ;
+    rdfs:label "留样截至日期"@zh, "Retention end date"@en ; skos:prefLabel "留样截至日期"@zh, "Retention end date"@en ;
+    skos:definition "给出该留样按约定至少应保存到的日期。"@zh, "Gives the date through which the retained sample is to be kept."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+
+# Measurements
+stl:Observation a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord, sosa:Observation ;
+    rdfs:label "测量"@zh, "Observation"@en ; skos:prefLabel "测量"@zh, "Observation"@en ;
+    skos:definition "针对指定对象在特定测点和取样时点取得某一测量项读数的记录。"@zh, "A record tying one measured item and reading to an object, measurement point and acquisition time."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:MeasurementPoint a owl:Class ;
+    rdfs:label "测点"@zh, "Measurement point"@en ; skos:prefLabel "测点"@zh, "Measurement point"@en ;
+    skos:definition "设备上可单独标识读数采集处的物理点位。"@zh, "An identifiable position on equipment at which a reading is taken."@en ;
+    skos:scopeNote "用 partOf 关联布设测点的设备。"@zh, "Use partOf to identify the equipment on which the point is located."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:measuredObject a owl:ObjectProperty ; rdfs:domain stl:Observation ;
+    rdfs:label "被测对象"@zh, "Observed object"@en ; skos:prefLabel "被测对象"@zh, "Observed object"@en ;
+    skos:definition "指出一次测量所针对的物料批、实物件或在工况测量中接受监测的设备。"@zh, "Identifies the material lot, individual piece or operating asset whose condition the observation records."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:measurementItem a owl:ObjectProperty ; rdfs:domain stl:Observation ; rdfs:range skos:Concept ;
+    rdfs:label "测量项"@zh, "Measured item"@en ; skos:prefLabel "测量项"@zh, "Measured item"@en ;
+    skos:definition "用代码指定这次读数代表的被测特性。"@zh, "Identifies by code the characteristic represented by the reading."@en ;
+    rdfs:seeAlso <code/measurement-item> ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:measuredAtPoint a owl:ObjectProperty ; rdfs:domain stl:Observation ; rdfs:range stl:MeasurementPoint ;
+    rdfs:label "测量点位"@zh, "Measured at point"@en ; skos:prefLabel "测量点位"@zh, "Measured at point"@en ;
+    skos:definition "指出读数实际采自机组上的哪个已标识测点。"@zh, "Identifies the equipment measurement point from which the reading was acquired."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:measurementMethod a owl:ObjectProperty ; rdfs:domain stl:Observation ; rdfs:range skos:Concept ;
+    rdfs:label "测量方式"@zh, "Measurement method"@en ; skos:prefLabel "测量方式"@zh, "Measurement method"@en ;
+    skos:definition "用采集方式代码说明读数由人工取得或自动采集。"@zh, "Classifies the acquisition of a reading as manual or automatic."@en ;
+    rdfs:seeAlso <code/measurement-method> ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:temperature a owl:DatatypeProperty ; rdfs:domain stl:Observation ; rdfs:range xsd:decimal ;
+    stl:unit unit:DEG_C ; stl:quantityKind quantitykind:CelsiusTemperature ;
+    rdfs:label "温度"@zh, "Temperature"@en ; skos:prefLabel "温度"@zh, "Temperature"@en ;
+    skos:definition "给出该测点在现场采样时刻获得的摄氏温度。"@zh, "Gives the Celsius temperature obtained at the point and instant of acquisition."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:activeOxygen a owl:DatatypeProperty ; rdfs:domain stl:Observation ; rdfs:range xsd:decimal ;
+    stl:unit unit:PPM ; stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "钢水活性氧"@zh, "Active oxygen in liquid steel"@en ; skos:prefLabel "钢水活性氧"@zh, "Active oxygen in liquid steel"@en ;
+    skos:definition "记录在线测氧在钢水中取得并以质量百万分数表达的活性氧读数。"@zh, "Gives the in-process active oxygen reading in liquid steel expressed in parts per million by mass."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:resultAt a owl:DatatypeProperty ; rdfs:range xsd:dateTime ;
+    rdfs:label "出结果时间"@zh, "Result available at"@en ; skos:prefLabel "出结果时间"@zh, "Result available at"@en ;
+    skos:definition "给出该批检验信息或读数成为可用结果的时点。"@zh, "Gives the instant at which the measurement or inspection result became available."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+
+# Inspections and results
+stl:InspectionInstruction a owl:Class ; rdfs:subClassOf stl:Plan ;
+    rdfs:label "检验指令"@zh, "Inspection instruction"@en ; skos:prefLabel "检验指令"@zh, "Inspection instruction"@en ;
+    skos:definition "把指定检验要求派给检验岗位并给出待检对象的指令。"@zh, "A plan assigning a required examination and its subject to an inspection station."@en ;
+    dcterms:source <std/gbt-20720-3-2022> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:InspectionActivityRecord a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "检验记录"@zh, "Inspection activity record"@en ; skos:prefLabel "检验记录"@zh, "Inspection activity record"@en ;
+    skos:definition "记录一次具体检验及其采用的方法、对象和所得证据的载体。"@zh, "A record for an individual inspection identifying its subject, method and resulting evidence."@en ;
+    dcterms:source <std/gbt-20720-3-2022> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:InspectionResult a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "检验结果"@zh, "Inspection result"@en ; skos:prefLabel "检验结果"@zh, "Inspection result"@en ;
+    skos:definition "检验后可脱离原记录而单独引用的一项读数、评级或文字结论。"@zh, "A reading, rating or finding that can be cited separately from the inspection record that produced it."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:InspectionReport a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "检验报告"@zh, "Inspection report"@en ; skos:prefLabel "检验报告"@zh, "Inspection report"@en ;
+    skos:definition "汇集特定受检对象的检验方法、结果和签发信息的文件。"@zh, "A document collecting methods, findings and issue information for an identified inspection subject."@en ;
+    dcterms:source <std/iso-10474-2013> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:Retest a owl:Class ; rdfs:subClassOf stl:InspectionActivityRecord ;
+    rdfs:label "复验记录"@zh, "Retest record"@en ; skos:prefLabel "复验记录"@zh, "Retest record"@en ;
+    skos:definition "按已引用的复验条款追加试验并保留与首次结果联系的记录。"@zh, "A record linking additional testing authorized by a retest provision to the original outcome."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:ChemicalAnalysis a owl:Class ; rdfs:subClassOf stl:InspectionActivityRecord ;
+    rdfs:label "化学分析"@zh, "Chemical analysis"@en ; skos:prefLabel "化学分析"@zh, "Chemical analysis"@en ;
+    skos:definition "按同一用途对所取样品报告一组元素测定值的分析记录。"@zh, "An analysis grouping element determinations for a sample under one stated analytical purpose."@en ;
+    dcterms:source <std/isots-6084-2022> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:ElementResult a owl:Class ; rdfs:subClassOf stl:InspectionResult ;
+    rdfs:label "元素结果"@zh, "Element result"@en ; skos:prefLabel "元素结果"@zh, "Element result"@en ;
+    skos:definition "在一次成分分析中对应指定元素及其分析口径的单条含量结果。"@zh, "A single content determination for the specified element and reporting basis within an analysis."@en ;
+    skos:scopeNote "用 partOf 关联本次化学分析，用 element 和 massFraction 记录一项元素及其质量百分数。"@zh, "Use partOf to identify the analysis, and element and massFraction to record one analyte and its mass percentage."@en ;
+    dcterms:source <std/isots-6084-2022> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:MechanicalTest a owl:Class ; rdfs:subClassOf stl:InspectionActivityRecord ;
+    rdfs:label "力学试验"@zh, "Mechanical test"@en ; skos:prefLabel "力学试验"@zh, "Mechanical test"@en ;
+    skos:definition "在指定试样上按确定方法取得力学响应的试验记录。"@zh, "A record of a method-specific test of the mechanical response of a specimen."@en ;
+    dcterms:source <std/gbt-10623-2008> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:TensileTest a owl:Class ; rdfs:subClassOf stl:MechanicalTest ;
+    rdfs:label "拉伸试验"@zh, "Tensile test"@en ; skos:prefLabel "拉伸试验"@zh, "Tensile test"@en ;
+    skos:definition "对有原始截面和标距的试样施加轴向拉力并记录强度或伸长的试验。"@zh, "A test applying axial tension to a specimen of known initial section and gauge length to obtain strength or elongation."@en ;
+    dcterms:source <std/gbt-228-1-2021> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:ImpactTest a owl:Class ; rdfs:subClassOf stl:MechanicalTest ;
+    rdfs:label "冲击试验"@zh, "Impact test"@en ; skos:prefLabel "冲击试验"@zh, "Impact test"@en ;
+    skos:definition "在规定温度下冲断试样并记录其吸收能量的力学试验。"@zh, "A mechanical test that breaks a specimen under impact and records absorbed energy at a specified temperature."@en ;
+    dcterms:source <std/gbt-229-2020> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:HardnessTest a owl:Class ; rdfs:subClassOf stl:MechanicalTest ;
+    rdfs:label "硬度试验"@zh, "Hardness test"@en ; skos:prefLabel "硬度试验"@zh, "Hardness test"@en ;
+    skos:definition "以明确的标尺、载荷和测点取得材料硬度读数的试验。"@zh, "A test determining material hardness at a stated location under the conditions of a specified scale."@en ;
+    dcterms:source <std/gbt-230-1-2018> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:BendTest a owl:Class ; rdfs:subClassOf stl:MechanicalTest ;
+    rdfs:label "弯曲试验"@zh, "Bend test"@en ; skos:prefLabel "弯曲试验"@zh, "Bend test"@en ;
+    skos:definition "按规定弯心条件使试样弯曲并检查受拉面完整性的试验。"@zh, "A test bending a specimen under specified former conditions and assessing the integrity of its tensile surface."@en ;
+    dcterms:source <std/gbt-232-2024> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:CoatingTest a owl:Class ; rdfs:subClassOf stl:InspectionActivityRecord ;
+    rdfs:label "镀层试验"@zh, "Coating test"@en ; skos:prefLabel "镀层试验"@zh, "Coating test"@en ;
+    skos:definition "以镀层试样为对象检测单位面积覆层质量的实验室记录。"@zh, "A laboratory inspection record determining coating mass per unit area of a coated specimen."@en ;
+    dcterms:source <std/gbt-1839-2025> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:DimensionalInspection a owl:Class ; rdfs:subClassOf stl:InspectionActivityRecord ;
+    rdfs:label "尺寸检验"@zh, "Dimensional inspection"@en ; skos:prefLabel "尺寸检验"@zh, "Dimensional inspection"@en ;
+    skos:definition "在规定部位测量截面或长度并对照尺寸规格的检验记录。"@zh, "An inspection measuring length or cross-sectional dimensions at defined positions for comparison with dimensional requirements."@en ;
+    dcterms:source <std/gbt-709-2019> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:SurfaceInspection a owl:Class ; rdfs:subClassOf stl:InspectionActivityRecord ;
+    rdfs:label "表面检验"@zh, "Surface inspection"@en ; skos:prefLabel "表面检验"@zh, "Surface inspection"@en ;
+    skos:definition "在有界表面区域内检查外观、记录缺陷位置与形态的检验。"@zh, "An examination of a defined surface area recording the position and appearance of imperfections."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:NondestructiveTest a owl:Class ; rdfs:subClassOf stl:InspectionActivityRecord ;
+    rdfs:label "无损检测"@zh, "Nondestructive test"@en ; skos:prefLabel "无损检测"@zh, "Nondestructive test"@en ;
+    skos:definition "在保留受检件使用能力的条件下查找表面或内部不连续的检测记录。"@zh, "An examination record for locating surface or internal discontinuities while preserving the item's usability."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:ReferenceBlock a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "对比试块"@zh, "Reference block"@en ; skos:prefLabel "对比试块"@zh, "Reference block"@en ;
+    skos:definition "带有已知反射体或特征、用于核对检测灵敏度的实物件。"@zh, "An identifiable block with known features used to establish or check examination sensitivity."@en ;
+    dcterms:source <std/gbt-4162-2022> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:TestIndication a owl:Class ; rdfs:subClassOf stl:InspectionResult ;
+    rdfs:label "检测显示"@zh, "Test indication"@en ; skos:prefLabel "检测显示"@zh, "Test indication"@en ;
+    skos:definition "仪器或检验介质在一个位置给出的可评定响应。"@zh, "A localized response detected by an instrument or inspection medium and submitted for interpretation."@en ;
+    dcterms:source <std/gbt-15822-1-2024> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:ExaminationCoverage a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "检测覆盖范围"@zh, "Examination coverage"@en ; skos:prefLabel "检测覆盖范围"@zh, "Examination coverage"@en ;
+    skos:definition "记载某次检测在工件哪些区域实施、哪些区域未覆盖的空间范围。"@zh, "A record identifying the regions of a piece covered or excluded by a particular examination."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:MetallographicExamination a owl:Class ; rdfs:subClassOf stl:InspectionActivityRecord ;
+    rdfs:label "金相检验"@zh, "Metallographic examination"@en ; skos:prefLabel "金相检验"@zh, "Metallographic examination"@en ;
+    skos:definition "通过观察制备表面，记录材料组织特征、相应视场或评级结果的检验。"@zh, "An examination documenting material structure on a prepared surface with traceable fields or ratings."@en ;
+    dcterms:source <std/gbt-13298-2015> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:MetallographicField a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "金相视场"@zh, "Metallographic field"@en ; skos:prefLabel "金相视场"@zh, "Metallographic field"@en ;
+    skos:definition "在试样观察面上按位置和放大倍数界定并单独登记的观察区域。"@zh, "A record identifying a particular area on a prepared specimen surface by position and magnification."@en ;
+    dcterms:source <std/gbt-13298-2015> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:Micrograph a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "金相图像"@zh, "Micrograph"@en ; skos:prefLabel "金相图像"@zh, "Micrograph"@en ;
+    skos:definition "保留试样、视场与成像条件之间联系的一幅显微图像记录。"@zh, "An image record linked to the specimen, field and conditions of microscopic observation."@en ;
+    dcterms:source <std/gbt-13298-2015> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:inspectedPiece a owl:ObjectProperty ; rdfs:domain stl:InspectionActivityRecord ; rdfs:range stl:MaterialPiece ;
+    rdfs:label "受检实物件"@zh, "Examined piece"@en ; skos:prefLabel "受检实物件"@zh, "Examined piece"@en ;
+    skos:definition "指向按本记录接受整件或局部检验的实物。"@zh, "Identifies the piece examined in whole or in part under this inspection record."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:testedSample a owl:ObjectProperty ; rdfs:range stl:Sample ;
+    rdfs:label "受检样品"@zh, "Tested sample"@en ; skos:prefLabel "受检样品"@zh, "Tested sample"@en ;
+    skos:definition "指明本次分析或试验实际取用的样品。"@zh, "Identifies the sample actually used for the recorded analysis or test."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:testType a owl:ObjectProperty ; rdfs:domain stl:InspectionActivityRecord ; rdfs:range skos:Concept ;
+    rdfs:label "试验类型"@zh, "Test type"@en ; skos:prefLabel "试验类型"@zh, "Test type"@en ;
+    skos:definition "标明检验记录执行的试验类别以便跨产品检索。"@zh, "Classifies the test documented by an inspection record for retrieval across products."@en ;
+    rdfs:seeAlso <code/test-type> ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:ndtMethod a owl:ObjectProperty ; rdfs:domain stl:NondestructiveTest ; rdfs:range skos:Concept ;
+    rdfs:label "无损检测方法"@zh, "Nondestructive method"@en ; skos:prefLabel "无损检测方法"@zh, "Nondestructive method"@en ;
+    skos:definition "标识检查工件内部或表面时采用的无损检测方法。"@zh, "Identifies the nondestructive method used to examine the surface or interior of the item."@en ;
+    rdfs:seeAlso <code/ndt-method> ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:methodStandard a owl:ObjectProperty ; rdfs:range stl:StandardEdition ;
+    rdfs:label "方法标准"@zh, "Method standard"@en ; skos:prefLabel "方法标准"@zh, "Method standard"@en ;
+    skos:definition "指明取样、分析或试验所采用或所要求的方法标准版次。"@zh, "Identifies the edition of the method standard used or required for sampling, analysis or testing."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:resultOfInspection a owl:ObjectProperty ; rdfs:domain stl:InspectionResult ; rdfs:range stl:InspectionActivityRecord ;
+    rdfs:label "结果所属检验"@zh, "Originating inspection"@en ; skos:prefLabel "结果所属检验"@zh, "Originating inspection"@en ;
+    skos:definition "指向产生某一独立结果的那一次检验记录。"@zh, "Identifies the specific inspection that yielded a separately identifiable result."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:analysisType a owl:ObjectProperty ; rdfs:domain stl:ChemicalAnalysis ; rdfs:range skos:Concept ;
+    rdfs:label "分析类型"@zh, "Analysis type"@en ; skos:prefLabel "分析类型"@zh, "Analysis type"@en ;
+    skos:definition "按用途区分供炉次判定、过程控制或成品检验的成分分析。"@zh, "Classifies an analysis by its use in heat assessment, process control or product testing."@en ;
+    rdfs:seeAlso <code/analysis-type> ;
+    dcterms:source <std/isots-6084-2022> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:element a owl:ObjectProperty ; rdfs:range skos:Concept ;
+    rdfs:label "元素项目"@zh, "Element analyte"@en ; skos:prefLabel "元素项目"@zh, "Element analyte"@en ;
+    skos:definition "指定质量分数结果或限值涉及的元素及其分析口径。"@zh, "Identifies the elemental constituent and reporting basis of a content result or limit."@en ;
+    rdfs:seeAlso <code/chemical-element> ;
+    dcterms:source <std/isots-6084-2022> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:massFraction a owl:DatatypeProperty ; rdfs:domain stl:ElementResult ; rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ; stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "元素质量百分数"@zh, "Elemental mass percentage"@en ; skos:prefLabel "元素质量百分数"@zh, "Elemental mass percentage"@en ;
+    skos:definition "给出某元素按所述分析口径占样品质量的百分数。"@zh, "Gives the analyte mass as a percentage of sample mass on the stated analytical basis."@en ;
+    dcterms:source <std/gbt-3102-8-1993> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:tensileStrength a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:MechanicalTest stl:Observation ) ] ; rdfs:range xsd:decimal ;
+    stl:unit unit:MegaPA ; stl:quantityKind quantitykind:Stress ;
+    rdfs:label "抗拉强度"@zh, "Tensile strength"@en ; skos:prefLabel "抗拉强度"@zh, "Tensile strength"@en ;
+    skos:definition "记录试样在拉伸中承受最大力时按其原始截面折算的应力。"@zh, "Gives the engineering stress corresponding to peak force in the tensile determination."@en ;
+    dcterms:source <std/gbt-228-1-2021> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:upperYieldStrength a owl:DatatypeProperty ; rdfs:domain stl:MechanicalTest ; rdfs:range xsd:decimal ;
+    stl:unit unit:MegaPA ; stl:quantityKind quantitykind:Stress ;
+    rdfs:label "上屈服强度"@zh, "Upper yield strength"@en ; skos:prefLabel "上屈服强度"@zh, "Upper yield strength"@en ;
+    skos:definition "给出出现明显屈服时首次降力之前的最高工程应力。"@zh, "Gives the highest engineering stress before the first force drop at discontinuous yielding."@en ;
+    dcterms:source <std/gbt-228-1-2021> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:lowerYieldStrength a owl:DatatypeProperty ; rdfs:domain stl:MechanicalTest ; rdfs:range xsd:decimal ;
+    stl:unit unit:MegaPA ; stl:quantityKind quantitykind:Stress ;
+    rdfs:label "下屈服强度"@zh, "Lower yield strength"@en ; skos:prefLabel "下屈服强度"@zh, "Lower yield strength"@en ;
+    skos:definition "给出剔除初始瞬态影响后屈服阶段测得的最低工程应力。"@zh, "Gives the lowest engineering stress during yielding once initial transient effects are excluded."@en ;
+    dcterms:source <std/gbt-228-1-2021> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:elongationAfterFracture a owl:DatatypeProperty ; rdfs:domain stl:MechanicalTest ; rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ; stl:quantityKind quantitykind:DimensionlessRatio ;
+    rdfs:label "断后伸长率"@zh, "Elongation after fracture"@en ; skos:prefLabel "断后伸长率"@zh, "Elongation after fracture"@en ;
+    skos:definition "给出拉断后永久标距增量相对原始标距的百分比。"@zh, "Expresses permanent gauge extension after fracture as a percentage of initial gauge length."@en ;
+    dcterms:source <std/gbt-228-1-2021> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:impactEnergy a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:MechanicalTest stl:Observation ) ] ; rdfs:range xsd:decimal ;
+    stl:unit unit:J ; stl:quantityKind quantitykind:Energy ;
+    rdfs:label "冲击吸收功"@zh, "Impact energy"@en ; skos:prefLabel "冲击吸收功"@zh, "Impact energy"@en ;
+    skos:definition "给出试样在规定冲击条件下一次冲断所吸收的能量。"@zh, "Gives the energy absorbed when the specimen breaks under the specified impact conditions."@en ;
+    dcterms:source <std/gbt-229-2020> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:hardnessRecordValue a owl:DatatypeProperty ; rdfs:domain stl:HardnessTest ; rdfs:range xsd:string ;
+    rdfs:label "硬度报告记号"@zh, "Reported hardness notation"@en ; skos:prefLabel "硬度报告记号"@zh, "Reported hardness notation"@en ;
+    skos:definition "保存试验报告中的完整硬度表示，含硬度数、标尺及原报告给出的条件。"@zh, "Preserves the reported hardness designation with its number, scale and any stated test conditions."@en ;
+    dcterms:source <std/gbt-230-1-2018> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:rockwellCHardness a owl:DatatypeProperty ; rdfs:domain stl:HardnessTest ; rdfs:range xsd:decimal ;
+    stl:unit unit:UNITLESS ; stl:quantityKind quantitykind:Dimensionless ;
+    rdfs:label "洛氏 C 标尺硬度数"@zh, "Rockwell C hardness number"@en ; skos:prefLabel "洛氏 C 标尺硬度数"@zh, "Rockwell C hardness number"@en ;
+    skos:definition "记录在洛氏 C 标尺上报告的硬度数以便与同标尺要求比较。"@zh, "Gives the numerical result on the Rockwell C scale for comparison with requirements on that scale."@en ;
+    dcterms:source <std/gbt-230-1-2018> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:coatingMass a owl:DatatypeProperty ; rdfs:range xsd:decimal ;
+    stl:unit unit:GM-PER-M2 ; stl:quantityKind quantitykind:MassPerArea ;
+    rdfs:label "单位面积镀层质量"@zh, "Coating mass per area"@en ; skos:prefLabel "单位面积镀层质量"@zh, "Coating mass per area"@en ;
+    skos:definition "给出受检表面上的镀层质量按对应面积归一化的值。"@zh, "Gives coating mass normalized to the corresponding examined surface area."@en ;
+    dcterms:source <std/gbt-1839-2025> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:indicationPosition a owl:DatatypeProperty ; rdfs:domain stl:TestIndication ; rdfs:range xsd:string ;
+    rdfs:label "显示位置"@zh, "Indication position"@en ; skos:prefLabel "显示位置"@zh, "Indication position"@en ;
+    skos:definition "以受检件基准表述检测响应所在的位置。"@zh, "Locates the detected response relative to an identified reference on the examined piece."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:coverageDescription a owl:DatatypeProperty ; rdfs:domain stl:ExaminationCoverage ; rdfs:range xsd:string ;
+    rdfs:label "覆盖部位说明"@zh, "Coverage description"@en ; skos:prefLabel "覆盖部位说明"@zh, "Coverage description"@en ;
+    skos:definition "说明本次检测覆盖的区域、基准位置及排除段。"@zh, "Locates the examined regions and any excluded portions relative to a defined reference."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:fieldMagnification a owl:DatatypeProperty ; rdfs:domain stl:MetallographicField ; rdfs:range xsd:decimal ;
+    stl:unit unit:UNITLESS ; stl:quantityKind quantitykind:DimensionlessRatio ;
+    rdfs:label "视场放大倍数"@zh, "Field magnification"@en ; skos:prefLabel "视场放大倍数"@zh, "Field magnification"@en ;
+    skos:definition "记录制取该观察视场图像时使用的线性放大倍数。"@zh, "Gives the linear magnification used to image the field."@en ;
+    dcterms:source <std/gbt-13298-2015> ; rdfs:isDefinedBy <ontology/core/quality> .
+
+# Ratings
+stl:RatingScale a owl:Class ; rdfs:subClassOf skos:ConceptScheme ;
+    rdfs:label "评级标尺"@zh, "Rating scale"@en ; skos:prefLabel "评级标尺"@zh, "Rating scale"@en ;
+    skos:definition "在特定方法版次下规定级别顺序与含义的有序尺度。"@zh, "An ordered scale whose grades and their interpretation are fixed by a particular method edition."@en ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:ReferenceRatingLevel a owl:Class ; rdfs:subClassOf skos:Concept ;
+    rdfs:label "评级标尺级别"@zh, "Reference rating level"@en ; skos:prefLabel "评级标尺级别"@zh, "Reference rating level"@en ;
+    skos:definition "在一把确定标尺内有明确标记、可被报告结果或验收条款独立引用的级别。"@zh, "A designated level within one identified scale that a reported result or acceptance clause can cite independently."@en ;
+    skos:scopeNote "用 skos:inScheme 指明本级别所属的评级标尺。"@zh, "Use skos:inScheme to identify the rating scale to which the level belongs."@en ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:RatingResult a owl:Class ; rdfs:subClassOf stl:InspectionResult ;
+    rdfs:label "评级结果"@zh, "Rating result"@en ; skos:prefLabel "评级结果"@zh, "Rating result"@en ;
+    skos:definition "在指定标尺和方法下对一次观察或一组观察给出的等级。"@zh, "A grade assigned to one or more observations on an identified scale under a stated method."@en ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:RatingRequirement a owl:Class ;
+    rdfs:label "级别验收要求"@zh, "Rating acceptance requirement"@en ; skos:prefLabel "级别验收要求"@zh, "Rating acceptance requirement"@en ;
+    skos:definition "用指定标尺上的参照级别与比较条件表达的质量验收要求。"@zh, "An acceptance requirement expressed against a reference level and comparison condition on an identified rating scale."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:ratingScale a owl:ObjectProperty ; rdfs:domain stl:RatingResult ; rdfs:range stl:RatingScale ;
+    rdfs:label "采用评级标尺"@zh, "Rating scale used"@en ; skos:prefLabel "采用评级标尺"@zh, "Rating scale used"@en ;
+    skos:definition "把具体评级结果与解释其等级所需的标尺关联。"@zh, "Identifies the scale on which a particular rating can be interpreted."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:scaleEdition a owl:ObjectProperty ; rdfs:domain stl:RatingScale ; rdfs:range stl:StandardEdition ;
+    rdfs:label "标尺依据版次"@zh, "Edition defining scale"@en ; skos:prefLabel "标尺依据版次"@zh, "Edition defining scale"@en ;
+    skos:definition "指明给出这把评级标尺及其等级解释的具体文件版次。"@zh, "Identifies the edition defining the scale and the interpretation of its grades."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:assignedRatingLevel a owl:ObjectProperty ; rdfs:domain stl:RatingResult ; rdfs:range stl:ReferenceRatingLevel ;
+    rdfs:label "实评级别"@zh, "Assigned rating level"@en ; skos:prefLabel "实评级别"@zh, "Assigned rating level"@en ;
+    skos:definition "指出该评价对象在本次检验中实际取得的一个标尺级别。"@zh, "Identifies the reference level actually assigned to the evaluated subject in this examination."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:specifiedRatingLevel a owl:ObjectProperty ; rdfs:domain stl:RatingRequirement ; rdfs:range stl:ReferenceRatingLevel ;
+    rdfs:label "验收基准级别"@zh, "Specified reference level"@en ; skos:prefLabel "验收基准级别"@zh, "Specified reference level"@en ;
+    skos:definition "指出验收条款用作比较基准的标尺级别。"@zh, "Identifies the scale level used as the comparison reference by an acceptance requirement."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:scaleRank a owl:DatatypeProperty ; rdfs:domain stl:ReferenceRatingLevel ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "标尺内序位"@zh, "Rank within rating scale"@en ; skos:prefLabel "标尺内序位"@zh, "Rank within rating scale"@en ;
+    skos:definition "在方法文件明确给出顺序时，记录某个级别在该标尺内从一开始的序位。"@zh, "Records the one-based position of a level within its own scale when the governing document defines an order."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:ratingDesignation a owl:DatatypeProperty ; rdfs:domain stl:RatingResult ; rdfs:range xsd:string ;
+    rdfs:label "评定级别原记号"@zh, "Reported rating designation"@en ; skos:prefLabel "评定级别原记号"@zh, "Reported rating designation"@en ;
+    skos:definition "保存所用标尺上的原始等级记号以支持数字与字母分级。"@zh, "Preserves the reported grade notation on the cited scale including alphanumeric grades."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:resultForField a owl:ObjectProperty ; rdfs:domain stl:RatingResult ; rdfs:range stl:MetallographicField ;
+    rdfs:label "评级所据视场"@zh, "Field evaluated"@en ; skos:prefLabel "评级所据视场"@zh, "Field evaluated"@en ;
+    skos:definition "指向视场级评级实际评定的那一观察区域。"@zh, "Identifies the observed field assessed by a field-level rating."@en ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/core/quality> .
+
+# Inspection lots, decisions and dispositions
+stl:LotFormationRule a owl:Class ;
+    rdfs:label "组批规则"@zh, "Lot formation rule"@en ; skos:prefLabel "组批规则"@zh, "Lot formation rule"@en ;
+    skos:definition "规定哪些组批维度必须一致，才能将实物归入同一检验批的规则。"@zh, "A rule specifying which characteristics pieces must share to be grouped in one inspection lot."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:InspectionLot a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "检验批"@zh, "Inspection lot"@en ; skos:prefLabel "检验批"@zh, "Inspection lot"@en ;
+    skos:definition "按组批规则将物料归在一起、据以共用检验结果或作出批次判定的批记录。"@zh, "A lot record grouping material under a formation rule for shared inspection results or a lot-level decision."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:formationRule a owl:ObjectProperty ; rdfs:domain stl:InspectionLot ; rdfs:range stl:LotFormationRule ;
+    rdfs:label "采用的组批规则"@zh, "Applied lot formation rule"@en ; skos:prefLabel "采用的组批规则"@zh, "Applied lot formation rule"@en ;
+    skos:definition "指出建立这个检验批时实际采用的组批规则。"@zh, "Identifies the rule used to group the material in this inspection lot."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:formationDimension a owl:ObjectProperty ; rdfs:domain stl:LotFormationRule ; rdfs:range skos:Concept ;
+    rdfs:label "组批维度"@zh, "Lot formation dimension"@en ; skos:prefLabel "组批维度"@zh, "Lot formation dimension"@en ;
+    skos:definition "指明该规则要求批内成员一致的特征，例如炉号、物料规格或交货状态。"@zh, "Identifies a characteristic that members must share under the rule, such as heat identity, material specification or delivery condition."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:lotMember a owl:ObjectProperty ; rdfs:domain stl:InspectionLot ; rdfs:range stl:MaterialPiece ;
+    rdfs:label "检验批成员"@zh, "Inspection lot member"@en ; skos:prefLabel "检验批成员"@zh, "Inspection lot member"@en ;
+    skos:definition "列出与同批成员共同接受规定检验或判定的一件实物。"@zh, "Identifies a piece grouped with other members for lot inspection or assessment."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:QualityDecision a owl:Class ; rdfs:subClassOf stl:Event ;
+    rdfs:label "质量判定"@zh, "Quality decision"@en ; skos:prefLabel "质量判定"@zh, "Quality decision"@en ;
+    skos:definition "按指定规格及适用标准版次，对一件实物或一个检验批作出符合性结论的事件。"@zh, "An event determining whether a piece or inspection lot conforms to a cited material specification under the applicable standard edition."@en ;
+    dcterms:source <std/iso-404-2013> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:DecisionEvidence a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "判定依据明细"@zh, "Decision evidence item"@en ; skos:prefLabel "判定依据明细"@zh, "Decision evidence item"@en ;
+    skos:definition "把判定采用的检验结果与所依据的规格要求对应起来的一条判定明细。"@zh, "A decision entry linking the cited inspection result with the requirement against which it was evaluated."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:Defect a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "缺陷"@zh, "Defect"@en ; skos:prefLabel "缺陷"@zh, "Defect"@en ;
+    skos:definition "在实际物料上确认、可单独定位并被质量处置引用的一项缺陷记录。"@zh, "A record of an identified imperfection on actual material that can be located and cited in a disposition."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:QualityDisposition a owl:Class ; rdfs:subClassOf stl:Event ;
+    rdfs:label "质量处置"@zh, "Quality disposition"@en ; skos:prefLabel "质量处置"@zh, "Quality disposition"@en ;
+    skos:definition "在判定后授权对特定实物或检验批采取处理措施，并记录适用条件的事件。"@zh, "An event authorizing how a particular piece or inspection lot may be handled under stated conditions following a quality decision."@en ;
+    skos:scopeNote "降级、改判和让步接收各自保留适用条件，处置前后沿用同一实物身份。"@zh, "Downgrading, reassignment and concession retain their own conditions and refer to the same material identity before and after the action."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:assessedObject a owl:ObjectProperty ;
+    rdfs:label "质量处理对象"@zh, "Assessed object"@en ; skos:prefLabel "质量处理对象"@zh, "Assessed object"@en ;
+    skos:definition "指出本次质量判定或处置直接适用的单件或检验批。"@zh, "Identifies the individual piece or inspection lot directly subject to the quality action."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:assessedSpecification a owl:ObjectProperty ; rdfs:domain stl:QualityDecision ; rdfs:range stl:MaterialSpecification ;
+    rdfs:label "判定依据规格"@zh, "Specification for assessment"@en ; skos:prefLabel "判定依据规格"@zh, "Specification for assessment"@en ;
+    skos:definition "指出质量判定实际用于对照检验结果的物料规格。"@zh, "Identifies the material specification used to assess the inspection evidence."@en ;
+    dcterms:source <std/iso-404-2013> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:inspectionEvidence a owl:ObjectProperty ; rdfs:domain stl:QualityDecision ; rdfs:range stl:ManufacturingRecord ;
+    rdfs:label "判定所据记录"@zh, "Inspection evidence for decision"@en ; skos:prefLabel "判定所据记录"@zh, "Inspection evidence for decision"@en ;
+    skos:definition "指向该次判定实际采信的试验、结果或判定依据明细。"@zh, "Identifies a test record, result or evidence entry actually used in reaching this decision."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:evidenceCriterion a owl:ObjectProperty ; rdfs:domain stl:DecisionEvidence ;
+    rdfs:label "所据验收判据"@zh, "Evidence criterion"@en ; skos:prefLabel "所据验收判据"@zh, "Evidence criterion"@en ;
+    skos:definition "指向该条判定明细实际用来解释检验结果的验收条款或规格要求。"@zh, "Identifies the acceptance provision or specification requirement used to interpret the cited result."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:evidenceResult a owl:ObjectProperty ; rdfs:domain stl:DecisionEvidence ; rdfs:range stl:InspectionResult ;
+    rdfs:label "所据检验结果"@zh, "Inspection evidence result"@en ; skos:prefLabel "所据检验结果"@zh, "Inspection evidence result"@en ;
+    skos:definition "给出判定明细引用的那条检验结果。"@zh, "Identifies the individual inspection result cited as decision evidence."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:judgementResult a owl:ObjectProperty ; rdfs:domain stl:QualityDecision ; rdfs:range skos:Concept ;
+    rdfs:label "判定结果"@zh, "Judgement result"@en ; skos:prefLabel "判定结果"@zh, "Judgement result"@en ;
+    skos:definition "记录本次判定对受检对象是否满足规格所作的结论。"@zh, "Encodes the current conformity conclusion for the assessed subject."@en ;
+    rdfs:seeAlso <code/judgement-result> ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:respondsTo a owl:ObjectProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range stl:QualityDecision ;
+    rdfs:label "处置依据的判定"@zh, "Responds to decision"@en ; skos:prefLabel "处置依据的判定"@zh, "Responds to decision"@en ;
+    skos:definition "指明本项处置所响应的那一次质量判定。"@zh, "Identifies the particular quality decision prompting the disposition."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:dispositionType a owl:ObjectProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range skos:Concept ;
+    rdfs:label "处置类型"@zh, "Disposition type"@en ; skos:prefLabel "处置类型"@zh, "Disposition type"@en ;
+    skos:definition "用代码规定对本项质量问题获准采取的处置方式。"@zh, "Identifies the category of action authorized by the disposition."@en ;
+    rdfs:seeAlso <code/disposition-type> ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:reason a owl:DatatypeProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range xsd:string ;
+    rdfs:label "处置原因"@zh, "Disposition reason"@en ; skos:prefLabel "处置原因"@zh, "Disposition reason"@en ;
+    skos:definition "说明授权本次处置所基于的异常、偏差或业务事实。"@zh, "Records the facts or deviations motivating the authorized action."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:defect a owl:ObjectProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range stl:Defect ;
+    rdfs:label "涉及缺陷"@zh, "Referenced defect"@en ; skos:prefLabel "涉及缺陷"@zh, "Referenced defect"@en ;
+    skos:definition "把一项处置与有实物证据的具体缺陷关联。"@zh, "Identifies an individual defect cited in support of the disposition."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:defectType a owl:ObjectProperty ; rdfs:range skos:Concept ;
+    rdfs:label "缺陷类型"@zh, "Defect type"@en ; skos:prefLabel "缺陷类型"@zh, "Defect type"@en ;
+    skos:definition "标明实际观察到的异常属于哪类缺陷。"@zh, "Identifies the controlled defect category applicable to an observed imperfection."@en ;
+    rdfs:seeAlso <code/defect-type> ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:previousSpecification a owl:ObjectProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range stl:MaterialSpecification ;
+    rdfs:label "处置前规格"@zh, "Previous specification"@en ; skos:prefLabel "处置前规格"@zh, "Previous specification"@en ;
+    skos:definition "说明此次处置发生前实物按哪份物料规格管理。"@zh, "Identifies the specification assigned to the material before the action took effect."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:nextSpecification a owl:ObjectProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range stl:MaterialSpecification ;
+    rdfs:label "处置后规格"@zh, "Resulting specification"@en ; skos:prefLabel "处置后规格"@zh, "Resulting specification"@en ;
+    skos:definition "说明此次处置生效后实物将按哪份规格管理。"@zh, "Identifies the specification assigned to the material after the action took effect."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:previousOrderLine a owl:ObjectProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range stl:SalesOrderLine ;
+    rdfs:label "处置前订单行"@zh, "Previous order line"@en ; skos:prefLabel "处置前订单行"@zh, "Previous order line"@en ;
+    skos:definition "保留处置生效之前该实物所分配的订单行。"@zh, "Identifies the order item allocated to the material before disposition."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:nextOrderLine a owl:ObjectProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range stl:SalesOrderLine ;
+    rdfs:label "处置后订单行"@zh, "Resulting order line"@en ; skos:prefLabel "处置后订单行"@zh, "Resulting order line"@en ;
+    skos:definition "给出处置生效后应承接该实物的订单行。"@zh, "Identifies the order item assigned the material after disposition."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:approvedByRole a owl:DatatypeProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range xsd:string ;
+    rdfs:label "批准角色"@zh, "Approving role"@en ; skos:prefLabel "批准角色"@zh, "Approving role"@en ;
+    skos:definition "记录对该次处置作出批准的业务角色名称。"@zh, "Names the business role that approved the disposition."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:applicableOrderLine a owl:ObjectProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range stl:SalesOrderLine ;
+    rdfs:label "适用订单行"@zh, "Applicable order line"@en ; skos:prefLabel "适用订单行"@zh, "Applicable order line"@en ;
+    skos:definition "限定获准按本处置接收或使用材料的订单行。"@zh, "Identifies an order item covered by the authorization to accept or use the material."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:applicableQuantity a owl:DatatypeProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range xsd:nonNegativeInteger ;
+    stl:unit unit:NUM ; stl:quantityKind quantitykind:Count ;
+    rdfs:label "适用件数"@zh, "Authorised piece count"@en ; skos:prefLabel "适用件数"@zh, "Authorised piece count"@en ;
+    skos:definition "给出在所述限制条件内获准接收的实物件数。"@zh, "Counts the pieces covered by the conditional acceptance authorization."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:validUntilOn a owl:DatatypeProperty ; rdfs:domain stl:QualityDisposition ; rdfs:range xsd:date ;
+    rdfs:label "有效期至"@zh, "Valid through"@en ; skos:prefLabel "有效期至"@zh, "Valid through"@en ;
+    skos:definition "给出许可处置条件仍然有效的最后日期。"@zh, "Gives the final calendar date covered by the authorization."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/quality> .
+
+# Delivery documents
+stl:MillCertificate a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "质量证明书"@zh, "Mill certificate"@en ; skos:prefLabel "质量证明书"@zh, "Mill certificate"@en ;
+    skos:altLabel "质保书"@zh, "mill test certificate"@en ;
+    skos:definition "明确列出所覆盖的交货材料并为其提供检验依据或结果的质量文件。"@zh, "A delivery document supplying inspection evidence or results for the material within its stated coverage."@en ;
+    dcterms:source <std/en-10204-2004> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:coversPiece a owl:ObjectProperty ; rdfs:domain stl:MillCertificate ; rdfs:range stl:MaterialPiece ;
+    rdfs:label "覆盖实物"@zh, "Covered piece"@en ; skos:prefLabel "覆盖实物"@zh, "Covered piece"@en ;
+    skos:definition "列明一件由该质量证明书明确覆盖的实物。"@zh, "Identifies a piece explicitly included in the certificate's scope."@en ;
+    dcterms:source <std/iso-10474-2013> ; rdfs:isDefinedBy <ontology/core/quality> .
+stl:inspectionDocumentType a owl:ObjectProperty ; rdfs:domain stl:MillCertificate ; rdfs:range skos:Concept ;
+    rdfs:label "检验文件类型"@zh, "Inspection document type"@en ; skos:prefLabel "检验文件类型"@zh, "Inspection document type"@en ;
+    skos:definition "给出交货时出具的证明文件所属的检验文件型式。"@zh, "Identifies the inspection document type used for the certificate delivered."@en ;
+    rdfs:seeAlso <code/inspection-document-type> ;
+    dcterms:source <std/en-10204-2004> ; rdfs:isDefinedBy <ontology/core/quality> .

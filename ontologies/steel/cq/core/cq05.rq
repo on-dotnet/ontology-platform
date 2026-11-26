@@ -1,0 +1,15 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?at ?dispositionId ?action ?previousSpecId ?nextSpecId ?previousLineId ?nextLineId WHERE {
+  VALUES ?piece { <urn:synthetic:steel:materialpiece/P31> }
+  ?disposition a stl:QualityDisposition ; (stl:assessedObject|stl:assessedObject/stl:lotMember) ?piece ;
+               dcterms:identifier ?dispositionId ; stl:occurredAt ?at ;
+               stl:dispositionType/skos:notation ?action .
+  OPTIONAL { ?disposition stl:previousSpecification/dcterms:identifier ?previousSpecId }
+  OPTIONAL { ?disposition stl:nextSpecification/dcterms:identifier ?nextSpecId }
+  OPTIONAL { ?disposition stl:previousOrderLine/dcterms:identifier ?previousLineId }
+  OPTIONAL { ?disposition stl:nextOrderLine/dcterms:identifier ?nextLineId }
+}
+ORDER BY ?at ?dispositionId

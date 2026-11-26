@@ -1,0 +1,223 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/core/specification> a owl:Ontology ;
+    owl:versionIRI <ontology/core/specification/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "牌号与验收规格"@zh, "Grades and acceptance requirements"@en ;
+    rdfs:comment "描述标准版次、钢种、标准牌号及订单采用的成分、尺寸、性能和交货要求。"@zh, "Describes standard editions, internal and standard grades, and the composition, dimensions, properties and delivery conditions specified for an order."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+# Edition-specific designations and contractual documents
+stl:StandardEdition a owl:Class ; rdfs:subClassOf stl:ManufacturingObject, dcterms:BibliographicResource ;
+    rdfs:label "标准版次"@zh, "Standard edition"@en ; skos:prefLabel "标准版次"@zh, "Standard edition"@en ;
+    skos:definition "标识某一具体版本标准的书目资源，可供订单、证明书及试验记录精确引用。"@zh, "A bibliographic resource identifying the exact edition cited by an order, test or certificate."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:StandardGrade a owl:Class ; rdfs:subClassOf stl:ManufacturingObject ;
+    rdfs:label "标准牌号"@zh, "Standard grade designation"@en ; skos:prefLabel "标准牌号"@zh, "Standard grade designation"@en ;
+    skos:definition "在一份确定版次的产品标准内具有指定名称的牌号条目。"@zh, "A designation scoped to the particular edition of the product standard that names it."@en ;
+    dcterms:source <std/gbt-221-2008> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:SteelGrade a owl:Class ; rdfs:subClassOf stl:ManufacturingObject ;
+    rdfs:label "内部钢种"@zh, "Internal steel grade"@en ; skos:prefLabel "内部钢种"@zh, "Internal steel grade"@en ;
+    skos:definition "用于组织内部冶炼与生产、可以对应多个公开牌号的钢种身份。"@zh, "A producer's grade identity used to organize production and relate it to published designations."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:TechnicalAgreement a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "订货技术协议"@zh, "Order technical agreement"@en ; skos:prefLabel "订货技术协议"@zh, "Order technical agreement"@en ;
+    skos:definition "对指定订单补充产品标准要求并保留版本的双方约定。"@zh, "A versioned agreement supplementing product-standard requirements for specified orders."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:OrderAmendment a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "订单变更单"@zh, "Order amendment"@en ; skos:prefLabel "订单变更单"@zh, "Order amendment"@en ;
+    skos:definition "记录已订项目的数量、规格或交期经确认发生改变的单据。"@zh, "A document recording an agreed alteration to quantity, specification or delivery terms of an existing order item."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:SpecificationRevision a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "规格修订记录"@zh, "Specification revision"@en ; skos:prefLabel "规格修订记录"@zh, "Specification revision"@en ;
+    skos:definition "记载哪些规格条款从何时以新版替换旧版的一次修订。"@zh, "A record identifying which specification provisions a revision supersedes and when it takes effect."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+
+# Requirements for material acceptance
+stl:Requirement a owl:Class ; rdfs:subClassOf stl:ManufacturingObject ;
+    rdfs:label "验收要求"@zh, "Acceptance requirement"@en ; skos:prefLabel "验收要求"@zh, "Acceptance requirement"@en ;
+    skos:definition "能独立指明适用对象、判定依据和验收条件的一项要求。"@zh, "A separately referenceable condition specifying what must be assessed for acceptance."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:AcceptanceCriterion a owl:Class ; rdfs:subClassOf stl:ManufacturingObject ;
+    rdfs:label "验收判据"@zh, "Acceptance criterion"@en ; skos:prefLabel "验收判据"@zh, "Acceptance criterion"@en ;
+    skos:definition "可被多个判定引用、说明如何用检验结果判断一项要求的规则。"@zh, "A reusable rule stating how inspection evidence determines satisfaction of a requirement."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:CompositionLimit a owl:Class ; rdfs:subClassOf stl:Requirement ;
+    rdfs:label "成分界限"@zh, "Composition limit"@en ; skos:prefLabel "成分界限"@zh, "Composition limit"@en ;
+    skos:definition "针对规格中的一个元素及分析口径约定质量分数边界的条目。"@zh, "A limit entry bounding the mass fraction of one element on the analytical basis specified."@en ;
+    dcterms:source <std/gbt-20878-2024> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:PropertyRequirement a owl:Class ; rdfs:subClassOf stl:Requirement ;
+    rdfs:label "性能要求"@zh, "Property requirement"@en ; skos:prefLabel "性能要求"@zh, "Property requirement"@en ;
+    skos:definition "针对一项材料性能规定验收界限、试验方法及试验条件的要求。"@zh, "An acceptance requirement setting bounds for a material property under an identified test method and test conditions."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:DimensionRequirement a owl:Class ; rdfs:subClassOf stl:Requirement ;
+    rdfs:label "尺寸要求"@zh, "Dimension requirement"@en ; skos:prefLabel "尺寸要求"@zh, "Dimension requirement"@en ;
+    skos:definition "给定一种尺寸的公称值及验收偏差或极限的规格条目。"@zh, "A specification item defining a nominal dimension and its permitted deviations or limits."@en ;
+    dcterms:source <std/gbt-709-2019> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:DeliveryCondition a owl:Class ; rdfs:subClassOf stl:Requirement ;
+    rdfs:label "交货状态要求"@zh, "Delivery condition"@en ; skos:prefLabel "交货状态要求"@zh, "Delivery condition"@en ;
+    skos:definition "规定交付时材料应处于何种加工或热处理状态的一项交货要求。"@zh, "A delivery requirement specifying the processing or heat treatment condition in which material is to be supplied."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:InspectionRequirement a owl:Class ; rdfs:subClassOf stl:Requirement ;
+    rdfs:label "检验要求"@zh, "Inspection requirement"@en ; skos:prefLabel "检验要求"@zh, "Inspection requirement"@en ;
+    skos:definition "规定检验项目、方法、覆盖对象和适用判据的一项验收要求。"@zh, "A requirement defining an examination, its scope, its method and the criterion to apply."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:SamplingRequirement a owl:Class ; rdfs:subClassOf stl:InspectionRequirement ;
+    rdfs:label "取样要求"@zh, "Sampling requirement"@en ; skos:prefLabel "取样要求"@zh, "Sampling requirement"@en ;
+    skos:definition "规定取样单元、位置、方向或份数的检验要求。"@zh, "A requirement defining the sampling unit, position, orientation or number of samples."@en ;
+    dcterms:source <std/gbt-2975-2018> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:RetestRule a owl:Class ; rdfs:subClassOf stl:InspectionRequirement ;
+    rdfs:label "复验规则"@zh, "Retest rule"@en ; skos:prefLabel "复验规则"@zh, "Retest rule"@en ;
+    skos:definition "规定首次结果出现特定情形后可增加哪些试样或试验的要求。"@zh, "A condition specifying the additional sampling or testing allowed following a particular initial outcome."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:ShapeRequirement a owl:Class ; rdfs:subClassOf stl:Requirement ;
+    rdfs:label "外形要求"@zh, "Shape requirement"@en ; skos:prefLabel "外形要求"@zh, "Shape requirement"@en ;
+    skos:definition "限制直线度、平直度等几何形状偏离的验收条目。"@zh, "A condition limiting deviations in product geometry such as straightness or flatness."@en ;
+    dcterms:source <std/gbt-709-2019> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:SurfaceRequirement a owl:Class ; rdfs:subClassOf stl:Requirement ;
+    rdfs:label "表面要求"@zh, "Surface requirement"@en ; skos:prefLabel "表面要求"@zh, "Surface requirement"@en ;
+    skos:definition "为指定表面区域规定状态、可接受缺陷或修整条件的条目。"@zh, "An acceptance condition for surface finish, permissible imperfections or conditioning of a defined area."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:TensileRequirement a owl:Class ; rdfs:subClassOf stl:PropertyRequirement ;
+    rdfs:label "拉伸性能要求"@zh, "Tensile requirement"@en ; skos:prefLabel "拉伸性能要求"@zh, "Tensile requirement"@en ;
+    skos:definition "限定规定方向或温度下材料拉伸响应的规格条目。"@zh, "A specification item governing tensile properties for a stated orientation or temperature."@en ;
+    dcterms:source <std/gbt-228-1-2021> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:ImpactRequirement a owl:Class ; rdfs:subClassOf stl:PropertyRequirement ;
+    rdfs:label "冲击性能要求"@zh, "Impact requirement"@en ; skos:prefLabel "冲击性能要求"@zh, "Impact requirement"@en ;
+    skos:definition "为指定温度、试样尺寸和取向规定冲击吸收能量条件的条目。"@zh, "A requirement for absorbed impact energy at a specified temperature, specimen size and orientation."@en ;
+    dcterms:source <std/gbt-229-2020> ; rdfs:isDefinedBy <ontology/core/specification> .
+
+# Order, grade and edition references
+stl:requiresSpecification a owl:ObjectProperty ; rdfs:domain stl:SalesOrderLine ; rdfs:range stl:MaterialSpecification ;
+    rdfs:label "订货规格"@zh, "Required material specification"@en ; skos:prefLabel "订货规格"@zh, "Required material specification"@en ;
+    skos:definition "标明该订单行明确订购的物料规格。"@zh, "Identifies the material specification ordered on this line."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:requiresGrade a owl:ObjectProperty ; rdfs:domain stl:MaterialSpecification ; rdfs:range stl:StandardGrade ;
+    rdfs:label "要求牌号"@zh, "Required grade"@en ; skos:prefLabel "要求牌号"@zh, "Required grade"@en ;
+    skos:definition "指出履行一份物料规格所需采用的标准牌号条目。"@zh, "Identifies a standard grade required to fulfil the material specification."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:definedIn a owl:ObjectProperty ; rdfs:domain stl:StandardGrade ; rdfs:range stl:StandardEdition ;
+    rdfs:label "定义版次"@zh, "Defined in"@en ; skos:prefLabel "定义版次"@zh, "Defined in"@en ;
+    skos:definition "指出使该标准牌号名称及其解释有据可查的标准版次。"@zh, "Identifies the edition within which the grade designation is defined."@en ;
+    dcterms:source <std/gbt-221-2008> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:satisfies a owl:ObjectProperty ; rdfs:domain stl:SteelGrade ; rdfs:range stl:StandardGrade ;
+    rdfs:label "满足牌号"@zh, "Satisfies grade"@en ; skos:prefLabel "满足牌号"@zh, "Satisfies grade"@en ;
+    skos:definition "从内部钢种指向其能够满足要求的版次化标准牌号。"@zh, "Relates an internal grade to a designation whose edition-specific requirements it can meet."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:applicableStandard a owl:ObjectProperty ; rdfs:range stl:StandardEdition ;
+    rdfs:label "适用标准版次"@zh, "Applicable standard edition"@en ; skos:prefLabel "适用标准版次"@zh, "Applicable standard edition"@en ;
+    skos:definition "指明订货、判定或交付采用的标准及其确切版次。"@zh, "Identifies the exact standard edition governing a specification, decision or delivery."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:editionEffectiveOn a owl:DatatypeProperty ; rdfs:domain stl:StandardEdition ; rdfs:range xsd:date ;
+    rdfs:label "版次实施日期"@zh, "Edition effective date"@en ; skos:prefLabel "版次实施日期"@zh, "Edition effective date"@en ;
+    skos:definition "记录该标准版次开始实施的日历日期以核对订货依据。"@zh, "Gives the calendar date from which the cited edition takes effect."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:requirementClause a owl:DatatypeProperty ; rdfs:domain stl:Requirement ; rdfs:range xsd:string ;
+    rdfs:label "要求条款定位符"@zh, "Requirement clause reference"@en ; skos:prefLabel "要求条款定位符"@zh, "Requirement clause reference"@en ;
+    skos:definition "保留标准版次或技术协议内定位一项要求的条款标识。"@zh, "Preserves the clause reference locating a requirement within its edition or agreement."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:numericDesignation a owl:DatatypeProperty ; rdfs:domain stl:StandardGrade ; rdfs:range xsd:string ;
+    rdfs:label "统一数字代号"@zh, "Unified numerical designation"@en ; skos:prefLabel "统一数字代号"@zh, "Unified numerical designation"@en ;
+    skos:definition "给出标准牌号在钢铁及合金统一数字代号体系中的代号，按原写法保留前导零。"@zh, "Records the unified numerical designation assigned to a grade under the iron, steel and alloy designation system, preserving leading zeros."@en ;
+    dcterms:source <std/gbt-17616-2025> ; rdfs:isDefinedBy <ontology/core/specification> .
+
+# Independent grade classification axes
+stl:steelClassByComposition a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:SteelGrade stl:StandardGrade ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/steel-class-composition> ;
+    rdfs:label "按化学成分分类"@zh, "Steel class by composition"@en ; skos:prefLabel "按化学成分分类"@zh, "Steel class by composition"@en ;
+    skos:definition "按化学成分将内部钢种或标准牌号归入钢分类体系中的类别。"@zh, "Classifies an internal steel grade or standard designation on the chemical composition axis."@en ;
+    dcterms:source <std/gbt-13304-1-2008> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:steelQualityClass a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:SteelGrade stl:StandardGrade ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/steel-class-quality> ;
+    rdfs:label "质量等级类别"@zh, "Steel quality class"@en ; skos:prefLabel "质量等级类别"@zh, "Steel quality class"@en ;
+    skos:definition "按主要质量等级将内部钢种或标准牌号归类，用于区分不同层次的冶金质量要求。"@zh, "Classifies an internal steel grade or standard designation by the main quality class applicable to it."@en ;
+    dcterms:source <std/gbt-13304-2-2008> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:steelUseClass a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:SteelGrade stl:StandardGrade ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/steel-class-use> ;
+    rdfs:label "用途类别"@zh, "Steel use class"@en ; skos:prefLabel "用途类别"@zh, "Steel use class"@en ;
+    skos:definition "按主要使用特性或用途将内部钢种或标准牌号归类。"@zh, "Classifies an internal steel grade or standard designation by its main application characteristics or intended use."@en ;
+    dcterms:source <std/gbt-13304-2-2008> ; rdfs:isDefinedBy <ontology/core/specification> .
+
+# Delivery and inspection criteria
+stl:deliveryCondition a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:MaterialSpecification stl:DeliveryCondition ) ] ; rdfs:range skos:Concept ; rdfs:seeAlso <code/delivery-condition> ;
+    rdfs:label "要求交货状态"@zh, "Required delivery condition"@en ; skos:prefLabel "要求交货状态"@zh, "Required delivery condition"@en ;
+    skos:definition "以交货状态代码标明规格或交货条款要求材料具备的加工或热处理状态。"@zh, "Identifies the processing or treatment condition called for by the specification or delivery provision."@en ;
+    dcterms:source <std/gbt-17505-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:specifiedForm a owl:ObjectProperty ; rdfs:domain stl:MaterialSpecification ; rdfs:range skos:Concept ; rdfs:seeAlso <code/product-form> ;
+    rdfs:label "要求产品形态"@zh, "Required product form"@en ; skos:prefLabel "要求产品形态"@zh, "Required product form"@en ;
+    skos:definition "给出订单物料应以何种产品形态交付。"@zh, "Identifies the product form a delivery specification requires."@en ;
+    dcterms:source <std/gbt-15574-2016> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:surfaceCondition a owl:ObjectProperty ; rdfs:domain stl:SurfaceRequirement ; rdfs:range skos:Concept ; rdfs:seeAlso <code/surface-condition> ;
+    rdfs:label "要求表面状态"@zh, "Required surface condition"@en ; skos:prefLabel "要求表面状态"@zh, "Required surface condition"@en ;
+    skos:definition "标识所引条款规定的交付表面类别。"@zh, "Identifies the surface condition prescribed by the applicable delivery provision."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:governedByCriterion a owl:ObjectProperty ; rdfs:domain stl:InspectionRequirement ; rdfs:range stl:AcceptanceCriterion ;
+    rdfs:label "采用验收判据"@zh, "Governing acceptance criterion"@en ; skos:prefLabel "采用验收判据"@zh, "Governing acceptance criterion"@en ;
+    skos:definition "指定某项检验要求用来判读证据的验收规则。"@zh, "Identifies the rule used to interpret evidence for an inspection requirement."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:requiredSampleCount a owl:DatatypeProperty ; rdfs:domain stl:SamplingRequirement ; rdfs:range xsd:nonNegativeInteger ; stl:unit unit:NUM ; stl:quantityKind quantitykind:Count ;
+    rdfs:label "要求样品数"@zh, "Required sample count"@en ; skos:prefLabel "要求样品数"@zh, "Required sample count"@en ;
+    skos:definition "记录在该抽样单元内按条款应取的样品件数。"@zh, "Gives the number of samples required from a sampling unit under the applicable provision."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+
+# Composition, dimensions and properties
+stl:lowerLimit a owl:DatatypeProperty ; rdfs:domain stl:CompositionLimit ; rdfs:range xsd:decimal ; stl:unit unit:PERCENT ; stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "成分下限"@zh, "Minimum elemental content"@en ; skos:prefLabel "成分下限"@zh, "Minimum elemental content"@en ;
+    skos:definition "给出一条成分要求允许的元素质量百分数下界。"@zh, "Gives the lowest elemental mass percentage permitted by the composition requirement."@en ;
+    dcterms:source <std/gbt-20878-2024> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:upperLimit a owl:DatatypeProperty ; rdfs:domain stl:CompositionLimit ; rdfs:range xsd:decimal ; stl:unit unit:PERCENT ; stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "成分上限"@zh, "Maximum elemental content"@en ; skos:prefLabel "成分上限"@zh, "Maximum elemental content"@en ;
+    skos:definition "给出一条成分要求允许的元素质量百分数上界。"@zh, "Gives the highest elemental mass percentage permitted by the composition requirement."@en ;
+    dcterms:source <std/gbt-20878-2024> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:nominalDimension a owl:DatatypeProperty ; rdfs:domain stl:DimensionRequirement ; rdfs:range xsd:decimal ; stl:unit unit:MilliM ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "公称尺寸"@zh, "Nominal dimension"@en ; skos:prefLabel "公称尺寸"@zh, "Nominal dimension"@en ;
+    skos:definition "记录一项尺寸要求在施加上、下偏差前的基准值。"@zh, "Gives the reference dimension to which upper and lower deviations are applied."@en ;
+    dcterms:source <std/gbt-709-2019> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:lowerDeviation a owl:DatatypeProperty ; rdfs:domain stl:DimensionRequirement ; rdfs:range xsd:decimal ; stl:unit unit:MilliM ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "尺寸下偏差"@zh, "Lower dimensional deviation"@en ; skos:prefLabel "尺寸下偏差"@zh, "Lower dimensional deviation"@en ;
+    skos:definition "给出允许最小尺寸减去公称尺寸所得的有符号差值。"@zh, "Gives the signed difference between the smallest permitted dimension and its nominal value."@en ;
+    dcterms:source <std/gbt-709-2019> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:upperDeviation a owl:DatatypeProperty ; rdfs:domain stl:DimensionRequirement ; rdfs:range xsd:decimal ; stl:unit unit:MilliM ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "尺寸上偏差"@zh, "Upper dimensional deviation"@en ; skos:prefLabel "尺寸上偏差"@zh, "Upper dimensional deviation"@en ;
+    skos:definition "给出允许最大尺寸减去公称尺寸所得的有符号差值。"@zh, "Gives the signed difference between the largest permitted dimension and its nominal value."@en ;
+    dcterms:source <std/gbt-709-2019> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:minimumCoatingMass a owl:DatatypeProperty ; rdfs:domain stl:MaterialSpecification ; rdfs:range xsd:decimal ; stl:unit unit:GM-PER-M2 ; stl:quantityKind quantitykind:MassPerArea ;
+    rdfs:label "最低单位面积镀层质量"@zh, "Minimum coating mass per area"@en ; skos:prefLabel "最低单位面积镀层质量"@zh, "Minimum coating mass per area"@en ;
+    skos:definition "记录订货规格允许的单位面积镀层质量下界。"@zh, "Gives the minimum coating mass per area accepted by the material specification."@en ;
+    dcterms:source <std/gbt-2518-2019> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:dimensionItem a owl:ObjectProperty ; rdfs:domain stl:DimensionRequirement ; rdfs:range skos:Concept ; rdfs:seeAlso <code/measurement-item> ;
+    rdfs:label "受控尺寸项"@zh, "Specified dimension item"@en ; skos:prefLabel "受控尺寸项"@zh, "Specified dimension item"@en ;
+    skos:definition "标明该尺寸条款所限制的几何量，例如宽度或厚度。"@zh, "Identifies the dimensional characteristic, such as width or thickness, to which the tolerance applies."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:requiredProperty a owl:ObjectProperty ; rdfs:domain stl:PropertyRequirement ; rdfs:range skos:Concept ; rdfs:seeAlso <code/measurement-item> ;
+    rdfs:label "要求的性能项"@zh, "Required property"@en ; skos:prefLabel "要求的性能项"@zh, "Required property"@en ;
+    skos:definition "标明性能要求所约束的测量项，例如抗拉强度或冲击吸收能量。"@zh, "Identifies the measured property, such as tensile strength or absorbed impact energy, governed by the requirement."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:testCondition a owl:DatatypeProperty ; rdfs:domain stl:PropertyRequirement ; rdfs:range xsd:string ;
+    rdfs:label "规定试验条件"@zh, "Specified test condition"@en ; skos:prefLabel "规定试验条件"@zh, "Specified test condition"@en ;
+    skos:definition "记录解释性能界限所需的条件，例如试样取向或加载方式。"@zh, "Describes a condition needed to interpret a property limit, such as specimen orientation or loading mode."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:specifiedTestTemperature a owl:DatatypeProperty ; rdfs:domain stl:PropertyRequirement ; rdfs:range xsd:decimal ; stl:unit unit:DEG_C ; stl:quantityKind quantitykind:CelsiusTemperature ;
+    rdfs:label "规定试验温度"@zh, "Specified test temperature"@en ; skos:prefLabel "规定试验温度"@zh, "Specified test temperature"@en ;
+    skos:definition "给出该性能要求对应的规定试验温度。"@zh, "Gives the temperature at which the specified performance requirement applies."@en ;
+    dcterms:source <std/gbt-228-2-2015> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:minimumTensileStrength a owl:DatatypeProperty ; rdfs:domain stl:TensileRequirement ; rdfs:range xsd:decimal ; stl:unit unit:MegaPA ; stl:quantityKind quantitykind:Stress ;
+    rdfs:label "最低抗拉强度"@zh, "Minimum tensile strength"@en ; skos:prefLabel "最低抗拉强度"@zh, "Minimum tensile strength"@en ;
+    skos:definition "给出适用厚度和取向条件下规定的抗拉强度下限。"@zh, "Gives the lower tensile strength limit for the applicable thickness and orientation."@en ;
+    dcterms:source <std/gbt-700-2006> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:minimumImpactEnergy a owl:DatatypeProperty ; rdfs:domain stl:ImpactRequirement ; rdfs:range xsd:decimal ; stl:unit unit:J ; stl:quantityKind quantitykind:Energy ;
+    rdfs:label "最低冲击吸收能量"@zh, "Minimum absorbed impact energy"@en ; skos:prefLabel "最低冲击吸收能量"@zh, "Minimum absorbed impact energy"@en ;
+    skos:definition "记录所引条款要求达到的冲击吸收能量下界。"@zh, "Gives the specified lower bound for absorbed impact energy under the referenced provision."@en ;
+    dcterms:source <std/gbt-1591-2018> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:maximumTensileStrength a owl:DatatypeProperty ; rdfs:domain stl:TensileRequirement ; rdfs:range xsd:decimal ; stl:unit unit:MegaPA ; stl:quantityKind quantitykind:Stress ;
+    rdfs:label "最高抗拉强度"@zh, "Maximum tensile strength"@en ; skos:prefLabel "最高抗拉强度"@zh, "Maximum tensile strength"@en ;
+    skos:definition "给出在规定试验条件下订货条款允许的抗拉强度上界，以兆帕计。"@zh, "Gives the upper bound in megapascals accepted for tensile strength under the specified test conditions."@en ;
+    dcterms:source <std/gbt-700-2006> ; rdfs:isDefinedBy <ontology/core/specification> .
+stl:maximumImpactEnergy a owl:DatatypeProperty ; rdfs:domain stl:ImpactRequirement ; rdfs:range xsd:decimal ; stl:unit unit:J ; stl:quantityKind quantitykind:Energy ;
+    rdfs:label "最高冲击吸收能量"@zh, "Maximum absorbed impact energy"@en ; skos:prefLabel "最高冲击吸收能量"@zh, "Maximum absorbed impact energy"@en ;
+    skos:definition "给出条款明确规定时同一试验条件下允许的冲击吸收能量上界，以焦耳计。"@zh, "Gives the upper bound in joules for absorbed impact energy when the applicable provision specifies one."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/specification> .
