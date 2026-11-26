@@ -40,10 +40,11 @@ HEADER_MISMATCH = -32020
 UNSUPPORTED_PROTOCOL_VERSION = -32022
 
 INSTRUCTIONS = (
-    "Read-only access to the platform's published ontologies and the business objects bound "
-    "to them. Start with list_ontologies, look terms up with search_elements and get_element, "
-    "then read data with search_objects, get_object and get_related_objects. Every result "
-    "comes from the release in effect and names its version."
+    "Access to the platform's published ontologies and the business objects bound to them. "
+    "Start with list_ontologies, look terms up with search_elements and get_element, then read "
+    "data with search_objects, get_object and get_related_objects. Every result comes from the "
+    "release in effect and names its version. propose_changes submits changes as a change set "
+    "for people to review; it never changes an ontology itself."
 )
 ENCODED_HEADER = re.compile(r"=\?base64\?([A-Za-z0-9+/=]*)\?=")
 

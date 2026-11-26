@@ -1,5 +1,6 @@
 """The MCP tools (spec 003, 9.3): names, input schemas and handlers, independent of the
-transport. Everything reads the release in effect; nothing here writes.
+transport. The read tools read the release in effect; the one tool that writes, propose_changes
+(9.4), only ever makes a change set waiting for review, through `ontology.assistant.propose`.
 
 Ontology tools read `ontology.bindings.released_ontology`, which has no bindings, so their
 results never name a table or a column. Object tools hand over to the query service and return
@@ -13,6 +14,7 @@ import hashlib
 import json
 from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
+from datetime import UTC, datetime, timedelta
 from typing import Annotated, Any, Literal, cast
 from uuid import UUID
 
@@ -25,15 +27,17 @@ from pydantic import (
     ValidationError,
     model_validator,
 )
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
 from ontology_platform.modules.identity.models import TokenScope
 from ontology_platform.modules.identity.tokens import TokenContext
-from ontology_platform.modules.ontology import bindings, releases, rules
+from ontology_platform.modules.ontology import assistant, bindings, releases, rules
 from ontology_platform.modules.ontology import service as ontology
-from ontology_platform.modules.ontology.schemas import ElementCopy
+from ontology_platform.modules.ontology.models import Datatype
+from ontology_platform.modules.ontology.schemas import ElementCopy, ElementFields, ProposedItem
 from ontology_platform.modules.query import schemas as query_schemas
 from ontology_platform.modules.query import service as query
 from ontology_platform.schemas import CamelModel
@@ -65,6 +69,7 @@ class UnknownToolError(Exception):
 class Context:
     db: AsyncSession
     request: Request
+    token: TokenContext
     # Set once the ontology argument is resolved, for the audit.
     ontology_id: UUID | None = None
 
@@ -459,6 +464,173 @@ async def get_related_objects(
     return _dump(page)
 
 
+# ---------- proposing changes (spec 003, 9.4) ----------
+
+# Per access token and hour, and open at a time per owner.
+PROPOSALS_PER_HOUR = 10
+OPEN_PROPOSALS_MAX = 20
+OPERATIONS_MAX = 50
+RATIONALE_MAX_LENGTH = 2000
+PROPOSAL_TITLE_PREFIX = "MCP："
+PROPOSAL_TITLE_LENGTH = 60
+
+ElementRef = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=128)]
+_REF = "An element id, or the tempRef of an element an earlier operation creates; null clears it."
+
+
+class ProposedFields(Arguments):
+    """The fields an operation sets. Only the keys given are changed; null clears a value."""
+
+    local_name: str | None = Field(default=None, max_length=128)
+    label_zh: str | None = Field(default=None, max_length=200)
+    label_en: str | None = Field(default=None, max_length=200)
+    definition_zh: str | None = Field(default=None, max_length=4000)
+    definition_en: str | None = Field(default=None, max_length=4000)
+    synonyms_zh: list[str] | None = Field(
+        default=None, description="Replaces the synonyms of both languages when given."
+    )
+    synonyms_en: list[str] | None = Field(
+        default=None, description="Replaces the synonyms of both languages when given."
+    )
+    parent: ElementRef | None = Field(default=None, description=_REF)
+    domain: ElementRef | None = Field(default=None, description=_REF)
+    range: ElementRef | None = Field(default=None, description=_REF)
+    inverse: ElementRef | None = Field(default=None, description=_REF)
+    datatype: Datatype | None = None
+    unit: str | None = Field(default=None, max_length=32)
+    required: bool | None = None
+    multiple: bool | None = None
+    turtle: str | None = Field(default=None, description="The Turtle fragment of an axiom.")
+
+
+class ProposedOperation(Arguments):
+    op: Literal["create", "update", "delete"]
+    # Bindings come from a data source's catalog (ontology.binding_proposals), never from here;
+    # constraints are edited in their form.
+    kind: Literal["entity_type", "relation_type", "property", "axiom"]
+    target: str | None = Field(
+        default=None,
+        max_length=100,
+        description="The id of the element an update or delete changes.",
+    )
+    temp_ref: ElementRef | None = Field(
+        default=None,
+        description='For a create: "new:<localName>", for later operations to refer to.',
+    )
+    fields: ProposedFields = Field(default_factory=ProposedFields)
+    rationale: str = Field(min_length=1, max_length=RATIONALE_MAX_LENGTH, description="Why.")
+
+
+class ProposeChangesArguments(OntologyArguments):
+    title: str = Field(min_length=1, max_length=300, description="What the change set is about.")
+    operations: list[ProposedOperation] = Field(min_length=1, max_length=OPERATIONS_MAX)
+
+
+_RENAMED = {
+    "parent": "parent_ref",
+    "domain": "domain_ref",
+    "range": "range_ref",
+    "inverse": "inverse_ref",
+}
+_SYNONYMS = {"synonyms_zh": "zh", "synonyms_en": "en"}
+
+
+def _proposed_item(operation: ProposedOperation) -> ProposedItem | None:
+    """The operation as an ontology change item; None when its fields do not make one."""
+    given = operation.fields
+    values: dict[str, Any] = {}
+    if operation.op != "delete":
+        for name in given.model_fields_set - _SYNONYMS.keys():
+            values[_RENAMED.get(name, name)] = getattr(given, name)
+        if given.model_fields_set & _SYNONYMS.keys():
+            values["synonyms"] = [
+                {"lang": lang, "text": text}
+                for name, lang in _SYNONYMS.items()
+                for text in getattr(given, name) or []
+            ]
+    creates = operation.op == "create"
+    try:
+        return ProposedItem(
+            op=operation.op,
+            kind=operation.kind,
+            target_element_id=None if creates or not operation.target else UUID(operation.target),
+            temp_ref=operation.temp_ref if creates else None,
+            proposed=ElementFields.model_validate(values),
+            rationale=operation.rationale,
+        )
+    except ValueError:  # a malformed id, or fields that do not validate
+        return None
+
+
+def _proposal_title(title: str) -> str:
+    text = " ".join(title.split())
+    if len(text) > PROPOSAL_TITLE_LENGTH:
+        text = text[:PROPOSAL_TITLE_LENGTH] + "…"
+    return PROPOSAL_TITLE_PREFIX + text
+
+
+async def _working_ontology(ctx: Context, reference: str) -> UUID:
+    match = next(
+        (
+            summary
+            for summary in await ontology.list_ontologies(ctx.db)
+            if reference in (str(summary.id), summary.key)
+        ),
+        None,
+    )
+    if match is None:
+        raise AppError(404, "ontology.not_found", "Ontology not found.")
+    ctx.ontology_id = match.id
+    return match.id
+
+
+def _lock_key(owner: UUID) -> int:
+    # A transaction-level advisory lock per owner: a signed 64-bit key from the namespace and id.
+    digest = hashlib.sha256(b"mcp.propose_changes:" + owner.bytes).digest()
+    return int.from_bytes(digest[:8], "big", signed=True)
+
+
+async def propose_changes(ctx: Context, arguments: ProposeChangesArguments) -> dict[str, Any]:
+    ontology_id = await _working_ontology(ctx, arguments.ontology)
+    owner = ctx.token.principal.id
+    # One owner's proposals one at a time, so that two calls cannot both pass the limits.
+    await ctx.db.execute(select(func.pg_advisory_xact_lock(_lock_key(owner))))
+    since = datetime.now(UTC) - timedelta(hours=1)
+    if (
+        await ontology.count_mcp_change_sets(ctx.db, ctx.token.token_id, since=since)
+        >= PROPOSALS_PER_HOUR
+        or await ontology.count_open_mcp_change_sets(ctx.db, owner) >= OPEN_PROPOSALS_MAX
+    ):
+        raise ToolError(
+            "mcp.rate_limited",
+            f"At most {PROPOSALS_PER_HOUR} change sets per token and hour, and "
+            f"{OPEN_PROPOSALS_MAX} open ones per user; try again later.",
+        )
+    items = [_proposed_item(operation) for operation in arguments.operations]
+    proposal = await assistant.propose(
+        ctx.db,
+        ontology_id,
+        message=arguments.title,
+        created_by=owner,
+        items=[item for item in items if item is not None],
+        source="mcp",
+        title=_proposal_title(arguments.title),
+        token_id=ctx.token.token_id,
+    )
+    dropped = proposal.dropped + items.count(None)
+    content: dict[str, Any] = {
+        "changeSetId": str(proposal.change_set_id) if proposal.change_set_id else None,
+        "proposed": len(items) - dropped,
+        "dropped": dropped,
+    }
+    if dropped:
+        content["notice"] = (
+            f"{dropped} of the {len(items)} operations failed the checks of a manual edit "
+            "(fields, references, names in use) and were left out."
+        )
+    return content
+
+
 # ---------- the tool list ----------
 
 type Handler = Callable[[Context, Any], Awaitable[dict[str, Any]]]
@@ -549,6 +721,27 @@ TOOLS: dict[str, Tool] = {
             GetRelatedObjectsArguments,
             get_related_objects,
         ),
+        Tool(
+            "propose_changes",
+            "Propose ontology changes",
+            "Propose changes to an ontology's working version: create, edit or delete object "
+            "types, relations, properties and advanced axioms, each with its reason. They become "
+            "one change set that people review; nothing changes until they merge it. Operations "
+            "that fail the checks of a manual edit are left out and counted; deletes take along "
+            "what depends on them. Bindings to data cannot be proposed. At most "
+            f"{PROPOSALS_PER_HOUR} change sets per token and hour, {OPEN_PROPOSALS_MAX} open "
+            "per user.",
+            "changes:propose",
+            ProposeChangesArguments,
+            propose_changes,
+            items=None,
+            annotations={
+                "readOnlyHint": False,
+                "destructiveHint": False,
+                "idempotentHint": False,
+                "openWorldHint": False,
+            },
+        ),
     )
 }
 
@@ -628,7 +821,7 @@ async def call(
     tool = TOOLS.get(name)
     if tool is None:
         raise UnknownToolError(name)
-    ctx = Context(db, request)
+    ctx = Context(db, request, token)
 
     async def audited(code: str) -> None:
         audit.record(
