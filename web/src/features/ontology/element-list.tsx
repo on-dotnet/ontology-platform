@@ -41,6 +41,7 @@ export const kindTone: Record<ElementKind, BadgeTone> = {
   type_binding: 'neutral',
   property_binding: 'neutral',
   relation_binding: 'neutral',
+  metric: 'info',
 };
 
 type KindFilter = ElementKind | 'all';

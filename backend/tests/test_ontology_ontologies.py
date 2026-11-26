@@ -46,6 +46,7 @@ SUMMARY_FIELDS = {
 ELEMENT_FIELDS = {
     "id",
     "binding",
+    "metric",
     "ontologyId",
     "kind",
     "localName",

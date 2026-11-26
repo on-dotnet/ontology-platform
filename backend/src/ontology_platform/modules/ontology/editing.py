@@ -28,7 +28,13 @@ from ontology_platform.modules.ontology import (
     service,
 )
 from ontology_platform.modules.ontology import merge as merging
-from ontology_platform.modules.ontology.models import BINDING_KINDS, Element, Kind, Ontology
+from ontology_platform.modules.ontology.models import (
+    BINDING_KINDS,
+    SEMANTIC_KINDS,
+    Element,
+    Kind,
+    Ontology,
+)
 from ontology_platform.modules.ontology.rdf.reader import RdfInputError
 
 # Reference keys of item fields and the columns they set.
@@ -197,7 +203,9 @@ class _Cascade:
     def __init__(self, views: Mapping[UUID, _View], prefixes: Mapping[str, str]) -> None:
         self.views = views
         self.incoming: defaultdict[UUID, list[_View]] = defaultdict(list)
-        by_iri = {view.iri: view.id for view in views.values() if view.iri}
+        by_iri = {
+            view.iri: view.id for view in views.values() if view.iri and view.kind in SEMANTIC_KINDS
+        }
         for view in views.values():
             if view.status != "active":
                 continue
@@ -411,7 +419,7 @@ def _add_cascade(ontology: Ontology, elements: Sequence[Element], checked: _Chec
     subjects = {
         view.iri: view.id
         for view in views.values()
-        if view.iri and view.kind != "axiom" and view.status == "active"
+        if view.iri and view.kind in SEMANTIC_KINDS and view.status == "active"
     }
     for item in checked.items:
         if item.op in ("update", "restore") and item.target_element_id is not None:

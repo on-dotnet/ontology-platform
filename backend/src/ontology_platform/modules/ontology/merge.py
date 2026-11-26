@@ -18,6 +18,7 @@ from ontology_platform.modules.ontology import binding_rules, mergeplan, rules, 
 from ontology_platform.modules.ontology.axiom_rules import NormalizedAxiom, normalize_axiom
 from ontology_platform.modules.ontology.models import (
     BINDING_KINDS,
+    SEMANTIC_KINDS,
     ChangeItem,
     ChangeSet,
     Element,
@@ -331,7 +332,7 @@ class _Merge:
         if axiom.subject is None:
             return None
         element = self._iris.get(axiom.subject)
-        if element is None or element.kind == "axiom" or element.status != "active":
+        if element is None or element.kind not in SEMANTIC_KINDS or element.status != "active":
             return None
         return element.id
 
@@ -709,7 +710,9 @@ async def _apply_change_set(
         )
     merge = _Merge(db, change_set, ontology, elements, items, now, plan.resolutions)
     accepted = [item for item in items if item.decision == "accepted"]
-    semantic = [item for item in accepted if item.kind not in BINDING_KINDS]
+    # Unsupported items must also be skipped when reached through another item's reference.
+    merge.outcomes.update((item.id, INVALID_ITEM) for item in accepted if item.kind == "metric")
+    semantic = [item for item in accepted if item.kind in SEMANTIC_KINDS]
     bound = [item for item in accepted if item.kind in BINDING_KINDS]
     ordered = [
         *(item for item in semantic if item.op != "delete" and item.kind != "axiom"),

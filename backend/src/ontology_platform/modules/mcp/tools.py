@@ -44,11 +44,11 @@ from ontology_platform.schemas import CamelModel
 
 # A single tool result above this size is cut short (spec 003, 9.3).
 RESULT_LIMIT_BYTES = 256 * 1024
-ELEMENT_KINDS = ("entity_type", "relation_type", "property", "constraint")
+ELEMENT_KINDS = ("entity_type", "relation_type", "property", "constraint", "metric")
 ELEMENTS_DEFAULT = 20
 ELEMENTS_MAX = 100
 
-type ElementKind = Literal["entity_type", "relation_type", "property", "constraint"]
+type ElementKind = Literal["entity_type", "relation_type", "property", "constraint", "metric"]
 Ref = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
 
 
@@ -95,7 +95,7 @@ class SearchElementsArguments(OntologyArguments):
         max_length=200,
         description="Matched against names, synonyms, definitions and local names.",
     )
-    kinds: list[ElementKind] | None = Field(default=None, max_length=4)
+    kinds: list[ElementKind] | None = Field(default=None, max_length=len(ELEMENT_KINDS))
     limit: int = Field(default=ELEMENTS_DEFAULT, ge=1, le=ELEMENTS_MAX)
     cursor: str | None = Field(default=None, max_length=500)
 
@@ -366,13 +366,11 @@ async def get_element(ctx: Context, arguments: GetElementArguments) -> dict[str,
         ]
         info["children"] = [
             {"id": str(e.id), "label": _label(e)}
-            for e in sorted(elements, key=_order)
-            if e.kind == "entity_type" and e.parent_id == found.id
+            for e in _of(elements, "entity_type", "parent_id", [found.id])
         ]
         info["constraints"] = [
             {"id": str(e.id), "label": _label(e), "ruleCount": len(e.rules or [])}
-            for e in sorted(elements, key=_order)
-            if e.kind == "constraint" and e.domain_id == found.id
+            for e in _of(elements, "constraint", "domain_id", [found.id])
         ]
         info["hasData"] = found.id in released.bound_type_ids
     return info

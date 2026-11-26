@@ -41,11 +41,14 @@ Kind = Literal[
     "type_binding",
     "property_binding",
     "relation_binding",
+    "metric",
 ]
 Datatype = Literal["string", "integer", "decimal", "boolean", "date", "dateTime"]
 ElementStatus = Literal["active", "deprecated"]
 Origin = Literal["ai", "manual", "import"]
-ChangeSetSource = Literal["ai_extraction", "ai_assistant", "manual", "import", "ai_binding", "mcp"]
+ChangeSetSource = Literal[
+    "ai_extraction", "ai_assistant", "manual", "import", "ai_binding", "mcp", "ai_qa"
+]
 ChangeSetStatus = Literal["open", "merged", "rejected"]
 ChangeOp = Literal["create", "update", "delete", "restore"]
 Decision = Literal["pending", "accepted", "rejected"]
@@ -114,10 +117,15 @@ _KIND_COLUMNS = {
     "relation_binding": (
         "parent_id IS NULL AND domain_id IS NOT NULL AND range_id IS NOT NULL" + _BINDING_ONLY
     ),
+    "metric": (
+        "parent_id IS NULL AND domain_id IS NULL AND range_id IS NULL AND inverse_id IS NULL"
+        " AND datatype IS NULL AND rules IS NULL AND turtle IS NULL AND subject_id IS NOT NULL"
+    ),
 }
 ELEMENT_KIND_COLUMNS = " OR ".join(
     f"(kind = '{kind}' AND {columns}"
     + ("" if kind in BINDING_KINDS else " AND binding IS NULL")
+    + (" AND metric IS NOT NULL" if kind == "metric" else " AND metric IS NULL")
     + ")"
     for kind, columns in _KIND_COLUMNS.items()
 )
@@ -250,6 +258,7 @@ class Element(Base):
     # Bindings: where the bound element lives in a data source (camelCase JSON, see
     # schemas.Binding). None for the semantic kinds.
     binding: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
+    metric: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
     status: Mapped[str] = mapped_column(String(16), default="active", server_default="active")
     origin: Mapped[str] = mapped_column(String(16))
     # Optimistic lock: incremented on every change.
