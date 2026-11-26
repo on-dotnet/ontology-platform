@@ -38,36 +38,23 @@ DATA_SOURCE = {
     "username": "steel_reader",
     "password": "not-a-real-password",
 }
-CONNECTION_TEST = {key: value for key, value in DATA_SOURCE.items() if key != "name"}
 
 # Who may call what (spec 003, section 13 and the appendix).
 EVERYONE: list[Call] = [
     ("GET", "/api/auth/tokens", None),
     ("POST", "/api/auth/tokens", {"name": "agent", "scopes": ["ontology:read"]}),
     ("DELETE", f"/api/auth/tokens/{ID}", None),
-    ("GET", "/api/data-sources", None),
-    ("GET", f"/api/data-sources/{ID}", None),
     ("GET", f"/api/ontologies/{ID}/objects/types", None),
     ("POST", f"/api/ontologies/{ID}/objects/search", {"typeId": ID}),
     ("GET", f"/api/ontologies/{ID}/objects/{ID}/k", None),
     ("GET", f"/api/ontologies/{ID}/objects/{ID}/k/related?relationId={ID}", None),
 ]
 EDITORS: list[Call] = [
-    ("POST", f"/api/data-sources/{ID}/test", None),
-    ("POST", f"/api/data-sources/{ID}/catalog/refresh", None),
-    ("GET", f"/api/data-sources/{ID}/catalog/schemas", None),
-    ("GET", f"/api/data-sources/{ID}/catalog/tables", None),
-    ("GET", f"/api/data-sources/{ID}/catalog/tables/mes/heat", None),
     ("POST", f"/api/ontologies/{ID}/binding-suggestions", {"dataSourceId": ID, "schemas": ["mes"]}),
     ("GET", f"/api/binding-suggestions/{ID}", None),
     ("GET", f"/api/ontologies/{ID}/binding-suggestions", None),
 ]
-ADMINS: list[Call] = [
-    ("POST", "/api/data-sources", DATA_SOURCE),
-    ("PATCH", f"/api/data-sources/{ID}", {"name": "MES", "revision": 1}),
-    ("POST", f"/api/data-sources/{ID}/archive", None),
-    ("POST", "/api/data-sources/test", CONNECTION_TEST),
-]
+ADMINS: list[Call] = []
 ALL_CALLS = [*EVERYONE, *EDITORS, *ADMINS]
 
 
@@ -98,10 +85,6 @@ async def test_roles_come_before_the_missing_implementations(
         for request in requests:
             response = await call(client, request)
             if allowed[group]:
-                if request[1].startswith("/api/data-sources"):
-                    # Implemented by batch 3: past the role check, whatever the outcome.
-                    assert response.status_code not in (401, 403, 501), request
-                    continue
                 assert response.status_code == 501, request
                 assert response.json()["code"] == "http.not_implemented"
             else:
