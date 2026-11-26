@@ -32,12 +32,12 @@ export function ArchiveDialog({ source, onClose, onArchived }: {
         {archive.isError && (
           <InlineNotice tone="error" className="mt-4">
             {message(archive.error)}
-            {inUse && count !== null && <p>{t('datasources.archive.count', { count })}</p>}
+            {inUse && count !== null && count > 0 && <p>{t('datasources.archive.count', { count })}</p>}
           </InlineNotice>
         )}
         <div className="mt-6 flex flex-wrap justify-end gap-2">
           <Button variant="secondary" disabled={archive.isPending} onClick={onClose}>{t('datasources.cancel')}</Button>
-          <Button variant="destructive" loading={archive.isPending} onClick={() => archive.mutate()}>
+          <Button variant="destructive" loading={archive.isPending} disabled={inUse} onClick={() => archive.mutate()}>
             {t('datasources.archive.confirm')}
           </Button>
         </div>

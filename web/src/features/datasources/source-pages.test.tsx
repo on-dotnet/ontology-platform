@@ -80,11 +80,13 @@ describe('saved connection and archive', () => {
     renderApp(`/data/${source.id}`);
     expect(await screen.findByText('已保存')).toBeVisible();
     expect(screen.getByText('口令更新时间').nextElementSibling?.querySelector('time')).toHaveAttribute('datetime', at);
-    expect(screen.getByRole('alert')).toHaveTextContent('请重新填写口令');
+    expect(screen.getByText('保存的口令无法读取，请重新填写口令。')).toBeVisible();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(document.body).not.toHaveTextContent(unexpectedValue);
     await user.click(screen.getByRole('button', { name: '重新填写口令' }));
     const dialog = within(await screen.findByRole('dialog'));
     expect(dialog.getByLabelText(/^口令/)).toHaveValue('');
+    expect(dialog.getByLabelText(/^口令/)).toHaveFocus();
     expect(screen.queryByDisplayValue(unexpectedValue)).not.toBeInTheDocument();
     expect(document.body).not.toHaveTextContent(unexpectedValue);
   });
@@ -100,7 +102,7 @@ describe('saved connection and archive', () => {
     await user.click(await screen.findByRole('button', { name: '测试连接' }));
     expect(await screen.findByText('连接成功')).toBeInTheDocument();
     expect(screen.getByText(/16\.4/)).toBeInTheDocument();
-    expect(screen.getByText('该账号有写权限，建议换用只读账号')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '注意' })).toHaveAccessibleDescription('该账号有写权限，建议换用只读账号');
     expect(api.calls('POST', `/api/data-sources/${source.id}/test`).map((call) => call.body)).toEqual([undefined]);
     expect(screen.queryByRole('button', { name: '更多操作' })).not.toBeInTheDocument();
   });
@@ -121,7 +123,8 @@ describe('saved connection and archive', () => {
     const at = '2026-11-23T09:04:00Z';
     source = { ...source, lastTest: { at, ok: false, code: 'datasource.connect_failed', warnings: [] } };
     await act(() => queryClient.refetchQueries({ queryKey: sourceKey(source.id), exact: true }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('无法连接到数据源');
+    expect(await screen.findByText(/无法连接到数据源/)).toBeVisible();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(screen.queryByText('连接成功')).not.toBeInTheDocument();
     expect(screen.queryByText(/16\.4/)).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: '最近一次测试' }).parentElement?.querySelector('time')).toHaveAttribute('datetime', at);
@@ -144,7 +147,7 @@ describe('saved connection and archive', () => {
     renderApp(`/data/${source.id}`);
     await user.click(await screen.findByRole('button', { name: '测试连接' }));
     const feedback = await screen.findByRole('region', { name: '本次连接测试' });
-    expect(feedback).toHaveTextContent('认证失败，请检查用户名和口令。');
+    expect(within(feedback).getByRole('alert')).toHaveTextContent('认证失败，请检查用户名和口令。');
     expect(feedback.querySelector('time')).toBeNull();
     const history = screen.getByRole('region', { name: '最近一次测试' });
     expect(history.querySelector('time')).toHaveAttribute('datetime', at);
@@ -164,10 +167,13 @@ describe('saved connection and archive', () => {
     const notice = await screen.findByRole('alert');
     expect(notice).toHaveTextContent('保存的口令无法读取，请重新填写口令。');
     await user.click(within(notice).getByRole('button', { name: '重新填写口令' }));
-    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    const password = within(await screen.findByRole('dialog')).getByLabelText(/^口令/);
+    expect(password).toHaveFocus();
+    expect(password).toBeRequired();
+    expect(password).not.toHaveAttribute('placeholder');
   });
 
-  it.each([4, null])('explains an archive conflict with a bound type count of %s', async (boundTypeCount) => {
+  it.each([4, 0, null])('explains an archive conflict with a bound type count of %s', async (boundTypeCount) => {
     const user = userEvent.setup();
     const source = makeSource({ boundTypeCount });
     const api = mockApi({
@@ -183,8 +189,12 @@ describe('saved connection and archive', () => {
     await user.click(dialog.getByRole('button', { name: '归档数据源' }));
     const notice = await dialog.findByRole('alert');
     expect(notice).toHaveTextContent('还有数据绑定在使用这个数据源，不能归档。');
-    if (boundTypeCount === null) expect(notice).not.toHaveTextContent(/\d/);
+    if (boundTypeCount === null || boundTypeCount === 0) expect(notice).not.toHaveTextContent(/\d/);
     else expect(notice).toHaveTextContent('4 个对象类型');
+    const confirm = dialog.getByRole('button', { name: '归档数据源' });
+    expect(confirm).toBeDisabled();
+    await user.click(confirm);
+    expect(api.calls('POST', `/api/data-sources/${source.id}/archive`)).toHaveLength(1);
   });
 
   it('updates the detail and removes all actions after archive', async () => {

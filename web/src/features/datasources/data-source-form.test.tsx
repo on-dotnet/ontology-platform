@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { mockApi, problemResponse, renderApp, type RouteHandler } from '@/test/utils';
 
 import { sourceKey } from './api';
+import { initialForm, patchRequest } from './data-source-form';
 import { makeSource } from './test-fixtures';
 
 const collection = '/api/data-sources';
@@ -20,7 +21,9 @@ async function openForm(mode: 'create' | 'edit', routes: Record<string, RouteHan
     [`GET ${collection}/:id`]: () => source,
     ...routes,
   });
-  const user = userEvent.setup();
+  // These tests type whole connection settings; without the per-key pause they stay well inside
+  // the time limit when the test host is busy.
+  const user = userEvent.setup({ delay: null });
   const { queryClient } = renderApp(mode === 'create' ? '/data' : `/data/${source.id}`);
   if (mode === 'create') {
     await user.click(await screen.findByRole('button', { name: '新建数据源' }));
@@ -60,22 +63,27 @@ describe('data source dialog', () => {
     await user.click(samples);
     expect(form.getByRole('status')).toHaveTextContent(sampleWarning);
     expect(form.getByRole('status')).toHaveClass('bg-warning-soft');
-    await user.type(form.getByRole('textbox', { name: '主机' }), 'reports.example.test');
-    await user.type(form.getByRole('textbox', { name: '数据库' }), 'quality');
-    await user.type(form.getByRole('textbox', { name: '用户名' }), 'reports_reader');
+    await user.type(form.getByRole('textbox', { name: '主机' }), ' reports.example.test ');
+    await user.type(form.getByRole('textbox', { name: '数据库' }), ' quality ');
+    await user.type(form.getByRole('textbox', { name: '用户名' }), ' reports_reader ');
     const password = form.getByLabelText(/^口令/);
     expect(password).toHaveAttribute('type', 'password');
     await user.type(password, newPassword);
     await user.selectOptions(ssl, 'verify-full');
-    await user.type(form.getByRole('textbox', { name: '模式名 1' }), 'mes');
+    await user.type(form.getByRole('textbox', { name: '模式名 1' }), ' mes ');
     await user.click(form.getByRole('button', { name: '添加模式' }));
-    await user.type(form.getByRole('textbox', { name: '模式名 2' }), 'archive,2025');
+    await user.type(form.getByRole('textbox', { name: '模式名 2' }), ' archive,2025 ');
+    await user.click(form.getByRole('button', { name: '添加模式' }));
+    await user.type(form.getByRole('textbox', { name: '模式名 3' }), '   ');
     await user.click(form.getByRole('button', { name: '测试连接' }));
     expect(await form.findByText(/连接成功/)).toBeInTheDocument();
-    const warning = form.getByText(/该账号有写权限，建议换用只读账号/);
-    expect(warning.closest('[role="status"]')).toHaveClass('bg-warning-soft');
+    const warning = form.getByRole('button', { name: '注意' });
+    expect(warning).toHaveAccessibleDescription('该账号有写权限，建议换用只读账号');
+    await user.click(warning);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('该账号有写权限，建议换用只读账号');
     expect(form.getByText(/16\.4/)).toBeInTheDocument();
-    expect(dialog).not.toHaveTextContent(newPassword.trim());
+    expect(screen.queryAllByDisplayValue(newPassword.trim())).toEqual([password]);
+    expect(document.body).not.toHaveTextContent(newPassword.trim());
     const connection = {
       kind: 'postgresql', host: 'reports.example.test', port: 5432, database: 'quality',
       username: 'reports_reader', password: newPassword, sslMode: 'verify-full', schemas: ['mes', 'archive,2025'],
@@ -89,6 +97,8 @@ describe('data source dialog', () => {
     await user.click(save);
     finishRefresh?.();
     expect(await screen.findByRole('heading', { name: saved.name })).toBeInTheDocument();
+    expect(screen.queryAllByDisplayValue(newPassword.trim())).toHaveLength(0);
+    expect(document.body).not.toHaveTextContent(newPassword.trim());
     expect(api.calls('POST', collection).map((r) => r.body)).toEqual([{ ...connection, name: saved.name, allowSamples: true }]);
   });
 
@@ -99,10 +109,14 @@ describe('data source dialog', () => {
     await user.type(port, '65536');
     await user.tab();
     expect(port).toHaveAccessibleDescription('请输入 1 到 65535 之间的整数。');
+    await user.type(form.getByRole('textbox', { name: '数据库' }), '   ');
+    await user.type(form.getByRole('textbox', { name: '用户名' }), '   ');
     await user.click(form.getByRole('button', { name: '测试连接' }));
     expect(form.getByRole('alert')).toHaveTextContent('请检查标出的字段后重试。');
     await user.click(form.getByRole('button', { name: '保存数据源' }));
     expect(form.getByRole('textbox', { name: '名称' })).toHaveAccessibleDescription('请填写名称。');
+    expect(form.getByRole('textbox', { name: '数据库' })).toHaveAccessibleDescription('请填写数据库。');
+    expect(form.getByRole('textbox', { name: '用户名' })).toHaveAccessibleDescription('请填写用户名。');
     expect(form.getByLabelText(/^口令/)).toHaveAccessibleDescription('请填写口令。');
     expect(api.calls('POST', testPath)).toHaveLength(0);
     expect(api.calls('POST', collection)).toHaveLength(0);
@@ -119,9 +133,13 @@ describe('data source dialog', () => {
     expect(password).toHaveValue('');
     expect(password).toHaveAttribute('type', 'password');
     expect(password).toHaveAttribute('placeholder', '已保存，留空表示不修改');
+    expect(password).not.toBeRequired();
     const name = form.getByRole('textbox', { name: '名称' });
     await user.clear(name);
     await user.type(name, '用户修改');
+    for (const label of ['数据库', '用户名', '模式名 1']) {
+      await user.type(form.getByRole('textbox', { name: label }), ' ');
+    }
     current = makeSource({
       name: '后台修改', revision: 9,
       connection: { host: 'elsewhere.example.test', port: 1234, database: 'new', username: 'new', sslMode: 'require', schemas: [] },
@@ -140,6 +158,43 @@ describe('data source dialog', () => {
     expect(await form.findByRole('alert')).toHaveTextContent('数据源已被其他人修改，请刷新后再改。');
     expect(name).toHaveValue('用户修改');
     expect(api.calls('PATCH', `${collection}/${source.id}`).map((r) => r.body)).toEqual([{ name: '用户修改', revision: 3 }]);
+  });
+
+  it('preserves untouched legacy connection fields and sends an explicit whitespace correction', () => {
+    const source = makeSource({
+      connection: { host: ' db ', port: 5432, database: ' steel ', username: ' reader ', sslMode: 'prefer', schemas: [' mes '] },
+    });
+    const form = { ...initialForm(source), name: '新名称' };
+    expect(patchRequest(form, source)).toEqual({ revision: 3, name: '新名称' });
+    expect(patchRequest({ ...form, database: 'steel', schemas: [{ id: 0, name: 'mes' }] }, source)).toEqual({
+      revision: 3, name: '新名称', database: 'steel', schemas: ['mes'],
+    });
+  });
+
+  it.each(['lastTest', 'catalog'] as const)('requires a replacement password when %s records an unreadable credential', async (origin) => {
+    const code = 'datasource.credential_unreadable';
+    const source = makeSource(origin === 'lastTest'
+      ? { lastTest: { at: '2026-11-23T09:00:00Z', ok: false, code, warnings: [] } }
+      : { catalog: { status: 'failed', errorCode: code, refreshedAt: null, tableCount: 0 } });
+    const { form, user, api } = await openForm('edit', {
+      [`GET ${collection}/:id`]: () => source,
+      [`PATCH ${collection}/:id`]: () => makeSource({ revision: source.revision + 1 }),
+    });
+    const password = form.getByLabelText(/^口令/);
+    expect(password).toBeRequired();
+    expect(password).toHaveValue('');
+    expect(password).not.toHaveAttribute('placeholder');
+    await user.click(form.getByRole('button', { name: '测试连接' }));
+    expect(password).toHaveAccessibleDescription('请填写口令。');
+    expect(api.calls('POST', testPath)).toHaveLength(0);
+    await user.click(form.getByRole('button', { name: '保存数据源' }));
+    expect(password).toHaveFocus();
+    expect(api.calls('PATCH', `${collection}/${source.id}`)).toHaveLength(0);
+    await user.type(password, newPassword);
+    await user.click(form.getByRole('button', { name: '保存数据源' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(api.calls('PATCH', `${collection}/${source.id}`).map((r) => r.body))
+      .toEqual([{ password: newPassword, revision: source.revision }]);
   });
 
   it('reopens a successfully saved edit with the new name and fresh connection feedback', async () => {

@@ -28,15 +28,15 @@ export type SourceForm = ReturnType<typeof initialForm>;
 export type TextField = 'name' | 'host' | 'port' | 'database' | 'username' | 'password';
 export type Operation = 'test' | 'save';
 
-export function validationErrors(form: SourceForm, editing: boolean, operation: Operation) {
+export function validationErrors(form: SourceForm, passwordRequired: boolean, operation: Operation) {
   const errors: Partial<Record<TextField, 'required' | 'invalidPort'>> = {};
   if (operation === 'save' && !form.name.trim()) errors.name = 'required';
   if (!form.host.trim()) errors.host = 'required';
   const port = Number(form.port);
   if (!Number.isInteger(port) || port < 1 || port > 65535) errors.port = 'invalidPort';
-  if (!form.database) errors.database = 'required';
-  if (!form.username) errors.username = 'required';
-  if (!editing && !form.password) errors.password = 'required';
+  if (!form.database.trim()) errors.database = 'required';
+  if (!form.username.trim()) errors.username = 'required';
+  if (passwordRequired && !form.password) errors.password = 'required';
   return errors;
 }
 
@@ -44,10 +44,10 @@ function connectionFields(form: SourceForm) {
   return {
     host: form.host.trim(),
     port: Number(form.port),
-    database: form.database,
-    username: form.username,
+    database: form.database.trim(),
+    username: form.username.trim(),
     sslMode: form.sslMode,
-    schemas: form.schemas.map((row) => row.name).filter((name) => name.length > 0),
+    schemas: form.schemas.map((row) => row.name.trim()).filter((name) => name.length > 0),
   };
 }
 
@@ -74,14 +74,17 @@ export function patchRequest(form: SourceForm, source: DataSource): Patch {
   const connection = connectionFields(form);
   const previous = source.connection;
   const name = form.name.trim();
-  if (name !== source.name) patch.name = name;
-  if (connection.host !== previous?.host) patch.host = connection.host;
+  if (form.name !== source.name && name !== source.name) patch.name = name;
+  // Older sources may contain padding. Normalize a field only when the user edits it.
+  for (const field of ['host', 'database', 'username'] as const) {
+    if (form[field] !== previous?.[field] && connection[field] !== previous?.[field]) patch[field] = connection[field];
+  }
   if (connection.port !== previous?.port) patch.port = connection.port;
-  if (connection.database !== previous?.database) patch.database = connection.database;
-  if (connection.username !== previous?.username) patch.username = connection.username;
   if (connection.sslMode !== previous?.sslMode) patch.sslMode = connection.sslMode;
-  if (connection.schemas.length !== previous?.schemas.length ||
-      connection.schemas.some((schema, index) => schema !== previous.schemas[index])) {
+  const savedSchemas = previous?.schemas ?? [];
+  const matchesSaved = (names: string[]) =>
+    names.length === savedSchemas.length && names.every((schema, index) => schema === savedSchemas[index]);
+  if (!matchesSaved(form.schemas.map((row) => row.name)) && !matchesSaved(connection.schemas)) {
     patch.schemas = connection.schemas;
   }
   if (form.allowSamples !== source.allowSamples) patch.allowSamples = form.allowSamples;

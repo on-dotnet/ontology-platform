@@ -9,6 +9,7 @@ import { jsonResponse, mockApi, problemResponse, renderApp, userWithRole } from 
 import { makeSource } from './test-fixtures';
 
 const refreshedAt = '2026-04-08T10:20:30Z';
+const nextRefreshedAt = '2026-04-08T10:25:30Z';
 const ready: components['schemas']['CatalogInfo'] = { status: 'ready', refreshedAt, errorCode: null, tableCount: 2 };
 const heat: components['schemas']['CatalogTableBrief'] = {
   schema: 'steel', name: 'heat', kind: 'table', columnCount: 2, comment: null,
@@ -74,21 +75,23 @@ describe('data source catalog', () => {
 
   it('shows the localized failure and retries the refresh', async () => {
     const user = userEvent.setup();
-    const source = makeSource({ catalog: { ...ready, status: 'failed', errorCode: 'datasource.connect_failed' } });
+    const source = makeSource({ catalog: { status: 'failed', refreshedAt: null, tableCount: 0, errorCode: 'datasource.connect_failed' } });
     const endpoint = `/api/data-sources/${source.id}`;
     let accepted = false;
     const api = mockApi({
       [`GET ${endpoint}`]: () => accepted ? { ...source, catalog: ready } : source,
       [`POST ${endpoint}/catalog/refresh`]: () => accepted
-        ? jsonResponse({ ...source, catalog: { ...ready, status: 'refreshing' } }, 202)
+        ? jsonResponse({ ...source, catalog: { status: 'refreshing', refreshedAt: null, tableCount: 0, errorCode: null } }, 202)
         : problemResponse(409, 'datasource.credential_unreadable'),
       [`GET ${endpoint}/catalog/schemas`]: () => [{ name: 'steel', tableCount: 2 }],
     });
     renderApp(`/data/${source.id}`);
     const catalog = within(await panel());
-    expect(catalog.getByRole('alert')).toHaveTextContent('无法连接到数据源，请检查地址、账号和口令后重试。');
+    expect(catalog.getByText('无法连接到数据源，请检查地址、账号和口令后重试。')).toBeVisible();
+    expect(catalog.queryByRole('alert')).toBeNull();
+    expect(api.requests.filter(({ path }) => path.includes('/catalog/'))).toEqual([]);
     await user.click(catalog.getByRole('button', { name: '重试' }));
-    expect(await catalog.findByText('保存的口令无法读取，请重新填写口令。')).toBeVisible();
+    expect(await catalog.findByRole('alert')).toHaveTextContent('保存的口令无法读取，请重新填写口令。');
     expect(catalog.queryByText('无法连接到数据源，请检查地址、账号和口令后重试。')).toBeNull();
     expect(api.calls('POST', `${endpoint}/catalog/refresh`)).toHaveLength(1);
     accepted = true;
@@ -101,21 +104,49 @@ describe('data source catalog', () => {
   it('shows a scope warning for an oversized catalog and an edit action for the admin', async () => {
     const user = userEvent.setup();
     const source = makeSource({ catalog: { ...ready, status: 'failed', errorCode: 'catalog.too_large' } });
-    mockApi({ 'GET /api/data-sources/:id': () => source });
+    mockApi({
+      'GET /api/data-sources/:id': () => source,
+      'GET /api/data-sources/:id/catalog/schemas': () => [{ name: 'steel', tableCount: 2 }],
+    });
     renderApp(`/data/${source.id}`);
-    const warning = within(await panel()).getByRole('status');
-    expect(warning).toHaveTextContent('表或列太多，请在数据源里填写模式范围后再读取。');
-    await user.click(within(warning).getByRole('button', { name: '编辑数据源' }));
-    expect(await screen.findByRole('dialog')).toBeVisible();
+    const catalog = within(await panel());
+    expect(catalog.getByText('表或列太多，请在数据源里填写模式范围后再读取。')).toBeVisible();
+    expect(await catalog.findByRole('treeitem', { name: 'steel' })).toBeVisible();
+    expect(catalog.queryByRole('status')).toBeNull();
+    await user.click(catalog.getByRole('button', { name: '编辑数据源' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toBeVisible();
+    expect(within(dialog).getByLabelText(/^口令/)).not.toBeRequired();
   });
 
-  it('explains the viewer role restriction without requesting catalog data', async () => {
-    const source = makeSource({ connection: null, catalog: null });
+  it('opens password repair for an unreadable credential reported by the refresh request', async () => {
+    const user = userEvent.setup();
+    const source = makeSource();
+    mockApi({
+      'GET /api/data-sources/:id': () => source,
+      'POST /api/data-sources/:id/catalog/refresh': () => problemResponse(409, 'datasource.credential_unreadable'),
+    });
+    renderApp(`/data/${source.id}`);
+    const catalog = within(await panel());
+    await user.click(catalog.getByRole('button', { name: '读取目录' }));
+    expect(await catalog.findByRole('alert')).toHaveTextContent('保存的口令无法读取，请重新填写口令。');
+    await user.click(catalog.getByRole('button', { name: '编辑数据源' }));
+    const password = within(await screen.findByRole('dialog')).getByLabelText(/^口令/);
+    expect(password).toBeRequired();
+    expect(password).toHaveFocus();
+    expect(password).not.toHaveAttribute('placeholder');
+  });
+
+  it.each(['redacted', 'full'] as const)('restricts the viewer detail page with a %s source response', async (response) => {
+    const source = response === 'redacted' ? makeSource({ connection: null, catalog: null }) : makeSource({ catalog: ready });
     const api = mockApi({ 'GET /api/data-sources/:id': () => source }, { user: userWithRole('viewer') });
     renderApp(`/data/${source.id}`);
     const catalog = within(await panel());
     expect(catalog.getByText('浏览数据源的目录需要编辑者以上角色')).toBeVisible();
     expect(catalog.queryByRole('button')).toBeNull();
+    expect(screen.queryByRole('button', { name: '测试连接' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '更多操作' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: '连接信息' })).toBeNull();
     expect(api.requests.filter(({ path }) => path.includes('/catalog/'))).toEqual([]);
   });
 
@@ -160,9 +191,13 @@ describe('data source catalog', () => {
     const user = userEvent.setup();
     const source = makeSource({ catalog: ready });
     let accepted = false;
+    let refreshed = false;
     const api = mockApi({
-      'GET /api/data-sources/:id': () => source,
-      'GET /api/data-sources/:id/catalog/schemas': () => [{ name: accepted ? 'mes' : 'steel', tableCount: 2 }],
+      'GET /api/data-sources/:id': () => {
+        refreshed = accepted;
+        return refreshed ? { ...source, catalog: { ...ready, refreshedAt: nextRefreshedAt } } : source;
+      },
+      'GET /api/data-sources/:id/catalog/schemas': () => [{ name: refreshed ? 'mes' : 'steel', tableCount: 2 }],
       'POST /api/data-sources/:id/catalog/refresh': () => accepted
         ? jsonResponse({ ...source, catalog: { ...ready, status: 'refreshing' } }, 202)
         : problemResponse(403, 'auth.csrf_failed'),
@@ -355,14 +390,20 @@ describe('data source catalog', () => {
   });
 
   it('discards fresh client-side catalog entries when the server catalog is replaced', async () => {
-    const user = userEvent.setup();
-    const source = makeSource({ catalog: ready });
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const initialCatalog = { ...ready, tableCount: 1 };
+    const source = makeSource({ catalog: initialCatalog });
+    const busy = { ...source, catalog: { ...initialCatalog, status: 'refreshing' } };
+    let started = false;
     let refreshed = false;
     mockApi({
-      'GET /api/data-sources/:id': () => source,
+      'GET /api/data-sources/:id': () => refreshed
+        ? { ...source, catalog: { ...ready, refreshedAt: nextRefreshedAt, tableCount: 3 } }
+        : started ? busy : source,
       'POST /api/data-sources/:id/catalog/refresh': () => {
-        refreshed = true;
-        return jsonResponse({ ...source, catalog: { ...ready, status: 'refreshing' } }, 202);
+        started = true;
+        return jsonResponse(busy, 202);
       },
       'GET /api/data-sources/:id/catalog/schemas': () => refreshed
         ? [{ name: 'steel', tableCount: 2 }, { name: 'mes', tableCount: 1 }]
@@ -370,14 +411,28 @@ describe('data source catalog', () => {
       'GET /api/data-sources/:id/catalog/tables': () => ({
         items: refreshed ? [heat, { ...heat, name: 'casting' }] : [heat], nextCursor: null,
       }),
-      'GET /api/data-sources/:id/catalog/tables/steel/heat': () => ({ ...detail, comment: refreshed ? '新表注释' : '旧表注释' }),
+      'GET /api/data-sources/:id/catalog/tables/steel/heat': () => ({
+        ...detail, refreshedAt: refreshed ? nextRefreshedAt : refreshedAt, comment: refreshed ? '新表注释' : '旧表注释',
+      }),
     });
     renderApp(`/data/${source.id}`);
     await user.click(await screen.findByRole('treeitem', { name: 'steel' }));
     await user.click(await screen.findByRole('treeitem', { name: 'heat' }));
     expect(await screen.findByText('旧表注释')).toBeVisible();
     await user.click(screen.getByRole('button', { name: '读取目录' }));
+    const region = await panel();
+    const catalog = within(region);
+    expect(await catalog.findByRole('status')).toHaveTextContent('正在读取目录');
+    await act(() => vi.advanceTimersByTimeAsync(10_100));
+    expect(catalog.getByText('仍在读取')).toBeVisible();
+    expect(catalog.getByText('上次读取')).toBeVisible();
+    expect(region.querySelector('time')).toHaveAttribute('datetime', refreshedAt);
+    expect(catalog.getByRole('treeitem', { name: 'heat', selected: true })).toBeVisible();
+    expect(catalog.getByText('旧表注释')).toBeVisible();
+    refreshed = true;
+    await act(() => vi.advanceTimersByTimeAsync(1000));
     expect(await screen.findByRole('treeitem', { name: 'mes' })).toBeVisible();
+    expect(region.querySelector('time')).toHaveAttribute('datetime', nextRefreshedAt);
     const schema = await screen.findByRole('treeitem', { name: 'steel', expanded: false });
     await user.click(schema);
     expect(await screen.findByRole('treeitem', { name: 'casting' })).toBeVisible();

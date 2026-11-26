@@ -9,6 +9,7 @@ import { InlineNotice } from '@/components/feedback/inline-notice';
 import { EmptyState } from '@/components/states/empty-state';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { RelativeTime } from '@/components/ui/relative-time';
 import { Skeleton } from '@/components/ui/skeleton';
 import { meQueryKey } from '@/features/auth/api';
 import { codeMessage, useErrorMessage } from '@/i18n/error-message';
@@ -19,10 +20,10 @@ import { CatalogBrowser, catalogKey } from './catalog-browser';
 interface CatalogPanelProps {
   source: DataSource;
   canBrowse: boolean;
-  onEdit?: () => void;
+  onEdit?: (repairPassword: boolean) => void;
 }
 
-function ReadingCatalog() {
+function ReadingCatalog({ hasSnapshot }: { hasSnapshot: boolean }) {
   const { t } = useTranslation();
   const [slow, setSlow] = useState(false);
   useEffect(() => {
@@ -31,14 +32,16 @@ function ReadingCatalog() {
   }, []);
   return (
     <div className="space-y-3">
-      <div aria-busy="true" className="space-y-3">
-        <Skeleton className="h-10 w-full" />
-        <div className="grid gap-4 md:grid-cols-3">
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32 md:col-span-2" />
+      {!hasSnapshot && (
+        <div aria-busy="true" className="space-y-3">
+          <Skeleton className="h-10 w-full" />
+          <div className="grid gap-4 md:grid-cols-3">
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32 md:col-span-2" />
+          </div>
         </div>
-      </div>
-      <span role="status" aria-live="polite" className={slow ? 'text-sm text-muted-foreground' : 'sr-only'}>
+      )}
+      <span role="status" aria-live="polite" className={hasSnapshot || slow ? 'text-sm text-muted-foreground' : 'sr-only'}>
         {t(slow ? 'datasources.catalog.stillReading' : 'datasources.catalog.loading')}
       </span>
     </div>
@@ -75,19 +78,16 @@ function SourceCatalog({ source, canBrowse, onEdit }: CatalogPanelProps) {
   const canRefresh = allowed && source.status === 'active';
   const refresh = useMutation({
     mutationFn: () => unwrapCatalog(api.POST('/api/data-sources/{id}/catalog/refresh', { params: { path: { id } } })),
-    onSuccess: async (updated) => {
-      client.removeQueries({ queryKey: catalogKey(id) });
-      await rememberSource(client, updated);
-    },
+    onSuccess: (updated) => rememberSource(client, updated),
   });
   const postFailed = refresh.isError && canRefresh;
   const catalogFailed = canRefresh && catalog.status === 'failed';
-  // refreshedAt records the last successful snapshot even if a later job was interrupted by archive.
-  const archived = source.status === 'archived';
-  const showSnapshot = catalog?.status === 'ready' || (archived && Boolean(catalog?.refreshedAt));
-  if (allowed && archived && !showSnapshot) return null;
-  const errorCode = postFailed && isApiError(refresh.error) ? refresh.error.code : catalog?.errorCode;
+  const refreshedAt = allowed ? catalog.refreshedAt : null;
+  if (allowed && source.status === 'archived' && !refreshedAt) return null;
+  const postCode = isApiError(refresh.error) ? refresh.error.code : null;
+  const errorCode = postFailed ? postCode : catalog?.errorCode;
   const tooLarge = errorCode === 'catalog.too_large';
+  const repairPassword = errorCode === 'datasource.credential_unreadable';
   const refreshButton = (primary = false) => (
     <Button variant={primary ? 'primary' : 'secondary'} loading={refresh.isPending} onClick={() => refresh.mutate()}>
       <RefreshCw aria-hidden />{t('datasources.catalog.refresh')}
@@ -98,7 +98,15 @@ function SourceCatalog({ source, canBrowse, onEdit }: CatalogPanelProps) {
     <section aria-labelledby={titleId}>
       <Card>
         <CardHeader className="flex-row items-center justify-between gap-4">
-          <CardTitle id={titleId}>{t('datasources.catalog.title')}</CardTitle>
+          <div>
+            <CardTitle id={titleId}>{t('datasources.catalog.title')}</CardTitle>
+            {refreshedAt && (
+              <dl className="flex flex-wrap gap-x-2 text-sm text-muted-foreground">
+                <dt>{t('datasources.catalog.lastRead')}</dt>
+                <dd><RelativeTime value={refreshedAt} /></dd>
+              </dl>
+            )}
+          </div>
           {canRefresh && catalog.status === 'ready' && !postFailed && refreshButton()}
         </CardHeader>
         <CardContent className="space-y-4">
@@ -109,10 +117,11 @@ function SourceCatalog({ source, canBrowse, onEdit }: CatalogPanelProps) {
               {(postFailed || catalogFailed) && (
                 <InlineNotice
                   tone={tooLarge ? 'warning' : 'error'}
+                  announce={postFailed}
                   action={canRefresh && (
                     <div className="flex flex-wrap gap-2">
-                      {onEdit && (tooLarge || errorCode === 'datasource.credential_unreadable') && (
-                        <Button size="sm" variant="secondary" onClick={onEdit}>{t('datasources.catalog.edit')}</Button>
+                      {onEdit && (tooLarge || repairPassword) && (
+                        <Button size="sm" variant="secondary" onClick={() => onEdit(repairPassword)}>{t('datasources.catalog.edit')}</Button>
                       )}
                       <Button size="sm" variant="secondary" loading={refresh.isPending} onClick={() => refresh.mutate()}>
                         {t('datasources.catalog.retry')}
@@ -131,9 +140,9 @@ function SourceCatalog({ source, canBrowse, onEdit }: CatalogPanelProps) {
                   action={refreshButton(true)}
                 />
               )}
-              {canRefresh && catalog.status === 'refreshing' && <ReadingCatalog />}
-              {showSnapshot && (
-                <CatalogBrowser key={catalog.refreshedAt} id={id} refreshedAt={catalog.refreshedAt} unwrapCatalog={unwrapCatalog} />
+              {canRefresh && catalog.status === 'refreshing' && <ReadingCatalog hasSnapshot={Boolean(refreshedAt)} />}
+              {refreshedAt && (
+                <CatalogBrowser key={refreshedAt} id={id} refreshedAt={refreshedAt} unwrapCatalog={unwrapCatalog} />
               )}
             </>
           )}

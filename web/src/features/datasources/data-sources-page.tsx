@@ -34,7 +34,7 @@ export function DataSourcesPage() {
   );
   return (
     <>
-      <PageHeader title={t('datasources.title')} actions={query.data?.length === 0 ? null : create} />
+      <PageHeader title={t('datasources.title')} info={t('datasources.form.description')} actions={query.data?.length === 0 ? null : create} />
       <QueryState query={query}>
         {(sources) => sources.length ? <SourceTable sources={sources} canBrowse={canBrowseCatalog} /> : (
           <Card>

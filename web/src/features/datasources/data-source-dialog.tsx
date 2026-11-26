@@ -22,18 +22,26 @@ import {
 
 interface DataSourceDialogProps {
   source?: DataSource;
+  repairPassword?: boolean;
   onClose: () => void;
   onSaved: (source: DataSource) => void | Promise<void>;
 }
 
 const maxLengths = { name: 100, host: 255, database: 128, username: 128, password: 1024 };
 
-export function DataSourceDialog({ source, onClose, onSaved }: DataSourceDialogProps) {
+function focusPassword(input: HTMLInputElement | null) {
+  input?.focus();
+}
+
+export function DataSourceDialog({ source, repairPassword, onClose, onSaved }: DataSourceDialogProps) {
   const { t } = useTranslation();
   const message = useErrorMessage();
   const id = useId();
   // The revision and comparison values belong to the draft opened by the user.
   const [initial] = useState(source);
+  const needsNewPassword = repairPassword || initial?.lastTest?.code === 'datasource.credential_unreadable'
+    || initial?.catalog?.errorCode === 'datasource.credential_unreadable';
+  const passwordRequired = !initial || needsNewPassword;
   const [form, setForm] = useState(() => initialForm(initial));
   const [touched, setTouched] = useState<Partial<Record<TextField, boolean>>>({});
   const [attempted, setAttempted] = useState<Operation | null>(null);
@@ -56,7 +64,7 @@ export function DataSourceDialog({ source, onClose, onSaved }: DataSourceDialogP
     setAttempted(operation);
     setError(null);
     setResult(null);
-    const errors = validationErrors(form, Boolean(initial), operation);
+    const errors = validationErrors(form, passwordRequired, operation);
     const [invalidField] = Object.keys(errors);
     if (invalidField) {
       const input = formRef.current?.elements.namedItem(invalidField);
@@ -93,12 +101,12 @@ export function DataSourceDialog({ source, onClose, onSaved }: DataSourceDialogP
     void run('save');
   }
 
-  const errors = validationErrors(form, Boolean(initial), 'save');
-  const showSummary = attempted && Object.keys(validationErrors(form, Boolean(initial), attempted)).length > 0;
+  const errors = validationErrors(form, passwordRequired, 'save');
+  const showSummary = attempted && Object.keys(validationErrors(form, passwordRequired, attempted)).length > 0;
 
   function input(field: TextField) {
     const label = t(`datasources.fields.${field}`);
-    const required = field !== 'password' || !initial;
+    const required = field !== 'password' || passwordRequired;
     const attemptedField = attempted === 'save' || (attempted === 'test' && field !== 'name');
     const problem = (touched[field] || attemptedField) && errors[field];
     const inputId = `${id}-${field}`;
@@ -116,8 +124,9 @@ export function DataSourceDialog({ source, onClose, onSaved }: DataSourceDialogP
           aria-invalid={problem ? true : undefined}
           aria-describedby={problem ? `${inputId}-error` : undefined}
           {...(field === 'port' ? { min: 1, max: 65535, step: 1 } : { maxLength: maxLengths[field] })}
+          ref={field === 'password' && needsNewPassword ? focusPassword : undefined}
           autoComplete={field === 'password' ? 'new-password' : 'off'}
-          placeholder={field === 'password' && initial?.hasCredential ? t('datasources.form.savedPassword') : undefined}
+          placeholder={field === 'password' && initial?.hasCredential && !needsNewPassword ? t('datasources.form.savedPassword') : undefined}
         />
         {problem && (
           <p className="text-sm text-error-strong" id={`${inputId}-error`}>

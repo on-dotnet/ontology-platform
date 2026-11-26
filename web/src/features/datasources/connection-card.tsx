@@ -16,7 +16,7 @@ import { codeMessage, useErrorMessage } from '@/i18n/error-message';
 import { listKey, sourceKey, type DataSource } from './api';
 import { ConnectionTestResult } from './connection-test-result';
 
-type ConnectionCardProps = { source: DataSource; onEdit?: () => void };
+type ConnectionCardProps = { source: DataSource; onRepairPassword?: () => void };
 
 export function ConnectionCard(props: ConnectionCardProps) {
   const { source } = props;
@@ -25,7 +25,7 @@ export function ConnectionCard(props: ConnectionCardProps) {
   return <ConnectionDetails key={settings} {...props} />;
 }
 
-function ConnectionDetails({ source, onEdit }: ConnectionCardProps) {
+function ConnectionDetails({ source, onRepairPassword }: ConnectionCardProps) {
   const { t, i18n } = useTranslation();
   const client = useQueryClient();
   const message = useErrorMessage();
@@ -62,8 +62,8 @@ function ConnectionDetails({ source, onEdit }: ConnectionCardProps) {
   ] as const;
   // The POST has no timestamp. Only the saved result can be paired with the time of a recorded test.
   const local = test.data?.observedAt === at ? test.data?.result : null;
-  const repair = onEdit && (
-    <Button size="sm" variant="secondary" onClick={onEdit}>{t('datasources.connection.reenter')}</Button>
+  const repair = onRepairPassword && (
+    <Button size="sm" variant="secondary" onClick={onRepairPassword}>{t('datasources.connection.reenter')}</Button>
   );
   const feedbackCode = isApiError(test.error) ? test.error.code : local?.code;
   const repairFeedback = feedbackCode === 'datasource.credential_unreadable' ? repair : undefined;
@@ -98,7 +98,7 @@ function ConnectionDetails({ source, onEdit }: ConnectionCardProps) {
             ) : <span className="text-sm text-muted-foreground">{t('datasources.status.untested')}</span>}
           </div>
           {lastTest && !lastTest.ok && (
-            <InlineNotice tone="error" action={lastTest.code === 'datasource.credential_unreadable' && !repairFeedback ? repair : undefined}>
+            <InlineNotice tone="error" announce={false} action={lastTest.code === 'datasource.credential_unreadable' && !repairFeedback ? repair : undefined}>
               {codeMessage(i18n, lastTest.code, 'errors.datasource.connect_failed')}
             </InlineNotice>
           )}

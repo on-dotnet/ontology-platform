@@ -36,10 +36,9 @@ function SourceDetail({ source, canManage, canBrowse }: { source: DataSource; ca
   const { t } = useTranslation();
   const client = useQueryClient();
   const toast = useToast();
-  const [dialog, setDialog] = useState<'edit' | 'archive' | null>(null);
+  const [dialog, setDialog] = useState<'edit' | 'repair' | 'archive' | null>(null);
   const active = source.status === 'active';
   const editable = active && canManage && source.connection !== null;
-  const edit = editable ? () => setDialog('edit') : undefined;
   async function saved(updated: DataSource) {
     await rememberSource(client, updated);
     setDialog(null);
@@ -57,7 +56,7 @@ function SourceDetail({ source, canManage, canBrowse }: { source: DataSource; ca
                 <Ellipsis aria-hidden />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                {edit && <DropdownMenuItem onClick={edit}><Pencil aria-hidden />{t('datasources.edit')}</DropdownMenuItem>}
+                {editable && <DropdownMenuItem onClick={() => setDialog('edit')}><Pencil aria-hidden />{t('datasources.edit')}</DropdownMenuItem>}
                 <DropdownMenuItem onClick={() => setDialog('archive')}><Archive aria-hidden />{t('datasources.archive.action')}</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -65,10 +64,15 @@ function SourceDetail({ source, canManage, canBrowse }: { source: DataSource; ca
         </>
       } />
       <div className="space-y-6">
-        {canBrowse && source.connection && <ConnectionCard source={source} onEdit={edit} />}
-        <CatalogPanel source={source} canBrowse={canBrowse} onEdit={edit} />
+        {canBrowse && source.connection && (
+          <ConnectionCard source={source} onRepairPassword={editable ? () => setDialog('repair') : undefined} />
+        )}
+        <CatalogPanel source={source} canBrowse={canBrowse}
+          onEdit={editable ? (repairPassword) => setDialog(repairPassword ? 'repair' : 'edit') : undefined} />
       </div>
-      {editable && dialog === 'edit' && <DataSourceDialog source={source} onSaved={saved} onClose={() => setDialog(null)} />}
+      {editable && (dialog === 'edit' || dialog === 'repair') && (
+        <DataSourceDialog source={source} repairPassword={dialog === 'repair'} onSaved={saved} onClose={() => setDialog(null)} />
+      )}
       {active && canManage && dialog === 'archive' && <ArchiveDialog source={source} onArchived={saved} onClose={() => setDialog(null)} />}
     </>
   );
