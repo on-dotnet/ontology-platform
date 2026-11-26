@@ -10,6 +10,7 @@ import { ConstraintRules, TurtleBlock } from '@/features/ontology/element-conten
 import { cn } from '@/lib/cn';
 
 import type { ChangeItem, Decision, ElementFields, MatchDecision } from './api';
+import { BindingComparison, BindingNotices, bindingSentence, isBindingKind } from './binding-item';
 import { AiSuggestionBadge, ConfidenceBadge, DecisionBadge, FlagTips, OpBadge } from './item-badges';
 import { ItemImpact } from './item-impact';
 import { MatchNotice } from './match-notice';
@@ -72,15 +73,19 @@ export function ChangeItemCard({
   const { targetElementId } = item;
   const hasImpact = impactOntologyId !== undefined && targetElementId !== null && (item.op === 'update' || item.op === 'delete');
   const fields = shownFields(item);
-  const label = itemLabel(item, context);
+  const isBinding = isBindingKind(item.kind);
+  const label = isBinding ? bindingSentence(t, item, context) : itemLabel(item, context);
   const isAxiom = item.kind === 'axiom';
-  const localName = isAxiom ? null : fields.localName;
+  const localName = isAxiom || isBinding ? null : fields.localName;
   // Delete and restore show what the target holds now, so the reviewer sees what goes away or comes back.
   // A restore that another change set already did only adds to the element (see its notice).
   const showsCurrent = item.op === 'delete' || (item.op === 'restore' && item.resolution?.mode !== 'update');
 
-  // Once the reviewer kept the two apart, there is no duplicate left to check.
-  const flags = item.match?.decision === 'different' ? item.flags.filter((flag) => flag !== 'possible_duplicate') : item.flags;
+  // Once the reviewer kept the two apart, there is no duplicate left to check. An unverified key
+  // has a notice of its own in the card.
+  const flags = item.flags.filter(
+    (flag) => flag !== 'key_unverified' && !(flag === 'possible_duplicate' && item.match?.decision === 'different'),
+  );
 
   // Pressing the active decision again returns the item to "pending".
   const toggle = (decision: Exclude<Decision, 'pending'>) => onDecide(item.decision === decision ? 'pending' : decision);
@@ -119,8 +124,9 @@ export function ChangeItemCard({
         <MatchNotice item={item} match={item.match} changeSetId={changeSetId} canDecide={canDecide} busy={busy} onDecide={onDecideMatch} />
       ) : null}
       {item.resolution ? <ResolutionNotice item={item} resolution={item.resolution} /> : null}
-      <ItemFacts item={item} fields={fields} context={context} />
-      {item.op === 'update' || item.op === 'restore' ? (
+      {isBinding ? <BindingNotices item={item} context={context} /> : <ItemFacts item={item} fields={fields} context={context} />}
+      {isBinding && item.op === 'update' ? <BindingComparison item={item} /> : null}
+      {!isBinding && (item.op === 'update' || item.op === 'restore') ? (
         <UpdateComparison kind={item.kind} before={item.before} after={effectiveFields(item)} context={context} />
       ) : null}
       {/* The rules above are the new ones; an update that changes them shows what they replace. */}

@@ -12,6 +12,7 @@ import { Dialog, DialogDescription, DialogTitle, SheetContent } from '@/componen
 import { RelativeTime } from '@/components/ui/relative-time';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePermissions } from '@/features/auth/permissions';
+import { BindingSection } from '@/features/bindings/binding-section';
 import { EvidenceExcerpt } from '@/features/documents/evidence-excerpt';
 import {
   elementName,
@@ -241,6 +242,8 @@ function ElementDetailContent({ ontologyId, element, related, onSelect }: Elemen
               </QueryState>
             </Section>
           )}
+
+          {element.kind === 'entity_type' ? <BindingSection ontologyId={ontologyId} type={element} all={related.data} /> : null}
 
           <Section title={t('ontologyPage.impact.title')}>
             <ReferencedBy ontologyId={ontologyId} element={element} all={related.data} onSelect={onSelect} />
