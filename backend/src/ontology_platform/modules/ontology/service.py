@@ -371,8 +371,8 @@ async def create_change_set(
             db, elements.values(), [_proposed(item) for item in items]
         )
         if found:
-            index, problem = found[0]
-            raise InvalidBindingError(problem.code, f"Item {index + 1}: {problem.message}.")
+            index, broken = found[0]
+            raise InvalidBindingError(broken.code, f"Item {index + 1}: {broken.message}.")
 
     change_set = ChangeSet(
         id=uuid4(),

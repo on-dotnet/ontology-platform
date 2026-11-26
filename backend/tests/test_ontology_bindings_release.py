@@ -33,7 +33,8 @@ from test_ontology_support import accept_and_merge, change_set_items, publish, s
 
 
 async def _snapshot(db: AsyncSession, release_id: str) -> list[dict[str, Any]]:
-    rows = await db.scalar(select(Release.snapshot).where(Release.id == UUID(release_id)))
+    statement = select(Release.snapshot).where(Release.id == UUID(release_id))
+    rows: list[dict[str, Any]] | None = await db.scalar(statement)
     assert rows is not None
     return rows
 

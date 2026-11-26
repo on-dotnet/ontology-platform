@@ -338,7 +338,7 @@ async def _view(
     entity: Element,
     active: Sequence[Element],
     by_id: Mapping[UUID, Element],
-    tables: Mapping[UUID | None, Element],
+    tables: Mapping[UUID, Element],
     pending: Mapping[UUID, set[UUID]],
 ) -> schemas.TypeBindingView:
     lineage = _ancestors(entity, by_id)
@@ -356,14 +356,16 @@ async def _view(
         source = await checks.source(source_id) or schemas.BoundDataSource(
             id=UUID(source_id), name="", status="archived"
         )
-        table_view = schemas.TableBindingView(
-            element_id=own.id,
-            revision=own.revision,
-            data_source=source,
-            schema_name=str(table_binding["schema"]),
-            table=str(table_binding["table"]),
-            key_columns=keys,
-            check=table_check,
+        table_view = schemas.TableBindingView.model_validate(
+            {
+                "element_id": own.id,
+                "revision": own.revision,
+                "data_source": source,
+                "schema_name": str(table_binding["schema"]),
+                "table": str(table_binding["table"]),
+                "key_columns": keys,
+                "check": table_check,
+            }
         )
     columns = {
         e.subject_id: e
@@ -413,10 +415,11 @@ async def _view(
     for relation in active:
         if relation.kind != "relation_type":
             continue
-        for direction, here, there in (
+        ends: tuple[tuple[Literal["out", "in"], UUID | None, UUID | None], ...] = (
             ("out", relation.domain_id, relation.range_id),
             ("in", relation.range_id, relation.domain_id),
-        ):
+        )
+        for direction, here, there in ends:
             other = by_id.get(there) if there is not None else None
             if here not in lineage or other is None:
                 continue
