@@ -45,7 +45,7 @@ function hookInput(tool, command, cwd) {
 
 for (const tool of ['Bash', 'PowerShell']) {
   test(`${tool}: down in a worktree is blocked`, () => {
-    for (const cmd of ['./dev.ps1 down', '.\\dev.ps1 down', 'pwsh -File dev.ps1 down', '& "C:/x y/dev.ps1" down', './DEV.PS1 Down', './dev.ps1 "down"']) {
+    for (const cmd of ['./dev.ps1 down', '.\\dev.ps1 down', 'pwsh -File dev.ps1 down', '& "C:/x y/dev.ps1" down', './DEV.PS1 Down', './dev.ps1 "down"', '.\\dev down', './dev.ps1 -Report down']) {
       const r = run(hookInput(tool, cmd, worktree));
       assert.equal(r.code, 2, cmd);
       assert.match(r.stderr, /down/);
@@ -64,7 +64,7 @@ for (const tool of ['Bash', 'PowerShell']) {
 
   test(`${tool}: reset is blocked in any directory`, () => {
     for (const cwd of [worktree, mainCheckout, noRepo]) {
-      for (const cmd of ['./dev.ps1 reset', '.\\dev.ps1 reset', 'pwsh -File dev.ps1 reset', 'pwsh -File "C:\\repo\\dev.ps1" reset', "& './dev.ps1' reset", "./dev.ps1 'reset'"]) {
+      for (const cmd of ['./dev.ps1 reset', '.\\dev.ps1 reset', 'pwsh -File dev.ps1 reset', 'pwsh -File "C:\\repo\\dev.ps1" reset', "& './dev.ps1' reset", "./dev.ps1 'reset'", './dev reset', './dev.ps1 -Command reset']) {
         const r = run(hookInput(tool, cmd, cwd));
         assert.equal(r.code, 2, `${cmd} @ ${cwd}`);
         assert.match(r.stderr, /reset/);
@@ -82,6 +82,8 @@ for (const tool of ['Bash', 'PowerShell']) {
       './dev.ps1 status',
       './dev.ps1 downgrade',
       './dev.ps1 reset-foo',
+      './dev.ps1 test-api tests/test_x.py -k down',
+      'npm run dev',
       'git log --oneline',
     ]) {
       assert.equal(run(hookInput(tool, cmd, worktree)).code, 0, cmd);
@@ -89,7 +91,9 @@ for (const tool of ['Bash', 'PowerShell']) {
   });
 
   test(`${tool}: text mentioning down is blocked conservatively in a worktree`, () => {
-    assert.equal(run(hookInput(tool, "Write-Output './dev.ps1 down'", worktree)).code, 2);
+    const r = run(hookInput(tool, "Write-Output './dev.ps1 down'", worktree));
+    assert.equal(r.code, 2);
+    assert.match(r.stderr, /只是提到/);
   });
 }
 
