@@ -278,7 +278,10 @@ function Invoke-E2e {
     }
     Write-Step '构建 api、web 与 test-e2e 镜像（纳入当前工作区代码）'
     Invoke-Compose build api web
-    Invoke-Compose --profile tools build test-e2e
+    # package.json is the one source of the version: compose passes it to the e2e stage's FROM.
+    $callerPlaywright = $env:OP_PLAYWRIGHT_VERSION
+    $env:OP_PLAYWRIGHT_VERSION = $version
+    try { Invoke-Compose --profile tools build test-e2e } finally { $env:OP_PLAYWRIGHT_VERSION = $callerPlaywright }
 
     $prefix = New-TempName 'e2e'
     $db = "$prefix-db"
@@ -311,7 +314,8 @@ function Invoke-E2e {
         if ($LASTEXITCODE -ne 0 -or -not (Wait-Container $web @('wget', '-q', '-O', '/dev/null', 'http://127.0.0.1:8080/healthz') 60)) { Stop-Dev '临时 web 未就绪' }
 
         Write-Step "运行 Playwright 冒烟测试（临时容器 $runner）"
-        docker run --name $runner --network $prefix -e E2E_BASE_URL=http://web:8080 `
+        # Docker's default 64 MB /dev/shm is tight for Chromium; --init reaps its child processes.
+        docker run --name $runner --network $prefix --init --shm-size=1g -e E2E_BASE_URL=http://web:8080 `
             -e "E2E_USERNAME=$($fixture.E2E_USERNAME)" -e "E2E_PASSWORD=$($fixture.E2E_PASSWORD)" `
             "ontology/test-e2e:$ImageTag" 2>&1 | Tee-Object -Variable lines | Out-Host
         $code = $LASTEXITCODE
@@ -322,7 +326,8 @@ function Invoke-E2e {
         }
     } finally {
         try { [Console]::OutputEncoding = $previousConsole } catch { }
-        docker rm -f $runner $web $api $db *> $null
+        # -v: only these containers' anonymous volumes (none while tmpfs covers the image VOLUMEs).
+        docker rm -f -v $runner $web $api $db *> $null
         docker network rm $prefix *> $null
     }
     $counts = @($lines | ForEach-Object { "$_".Trim() } | Where-Object { $_ -match '^\d+ (passed|failed|flaky|skipped|did not run|interrupted)\b' })

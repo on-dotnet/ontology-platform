@@ -133,7 +133,10 @@ services:
     build:
       context: ./web
       target: e2e
-      args: *build-args
+      args:
+        <<: *build-args
+        # Set by ./dev.ps1 e2e from the exact @playwright/test version in web/package.json.
+        PLAYWRIGHT_VERSION: ${OP_PLAYWRIGHT_VERSION:-}
     image: ontology/test-e2e:${OP_IMAGE_TAG:-local}
 
 volumes:

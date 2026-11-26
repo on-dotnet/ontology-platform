@@ -35,8 +35,15 @@ test('the review page opens for the entered ontology', async ({ page }) => {
   await expect(page.getByText('这个本体还没有变更集')).toBeVisible();
 });
 
-test('the explore page opens', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '探索' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: '探索' })).toBeVisible();
+test.describe('explore', () => {
+  // The seeded ontologies have no release: the api answers 409 query.no_release by design and the
+  // page turns that into its empty state.
+  test.use({ expectedFailedLoads: [{ status: 409, path: /^\/api\/ontologies\/[0-9a-f-]{36}\/objects\/types$/ }] });
+
+  test('the explore page opens', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '探索' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: '探索' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: '本体还没有发布版本' })).toBeVisible();
+  });
 });

@@ -1,6 +1,6 @@
-import { credentials, expect, SIGNED_OUT, test } from './support';
+import { credentials, expect, SIGNED_OUT, SIGNED_OUT_CHECK, test } from './support';
 
-test.use({ storageState: SIGNED_OUT });
+test.use({ storageState: SIGNED_OUT, expectedFailedLoads: [SIGNED_OUT_CHECK] });
 
 test('signed out, a page redirects to the sign-in form', async ({ page }) => {
   await page.goto('/ontology');

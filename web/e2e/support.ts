@@ -18,18 +18,34 @@ export function credentials(): { username: string; password: string } {
   return { username, password };
 }
 
-// A signed-out page asks /api/auth/me first and gets 401; the browser logs that as a failed load.
-function expectedWhileSignedOut(message: ConsoleMessage): boolean {
-  return message.text().includes('status of 401') && message.location().url.endsWith('/api/auth/me');
+/** An API answer a test expects to be an error; the browser logs it as a failed load anyway. */
+export interface ExpectedFailedLoad {
+  status: number;
+  path: RegExp;
 }
 
-/** Every test fails if the page logged a console error or threw, apart from the expected 401 above. */
-export const test = base.extend<{ consoleErrors: string[] }>({
+/** A signed-out page asks who is signed in first. */
+export const SIGNED_OUT_CHECK: ExpectedFailedLoad = { status: 401, path: /^\/api\/auth\/me$/ };
+
+// The text is Chromium's own (English in the e2e image, whatever the page locale).
+function isExpectedFailedLoad(message: ConsoleMessage, expected: readonly ExpectedFailedLoad[]): boolean {
+  const url = message.location().url;
+  if (!url) return false;
+  const path = new URL(url).pathname;
+  return expected.some(({ status, path: pattern }) => message.text().includes(`status of ${status} `) && pattern.test(path));
+}
+
+/**
+ * Every test fails if the page logged a console error or threw. A test lists the error answers
+ * it expects in `expectedFailedLoads`; nothing else is let through.
+ */
+export const test = base.extend<{ expectedFailedLoads: ExpectedFailedLoad[]; consoleErrors: string[] }>({
+  expectedFailedLoads: [[], { option: true }],
   consoleErrors: [
-    async ({ page }, use) => {
+    async ({ page, expectedFailedLoads }, use) => {
       const errors: string[] = [];
       page.on('console', (message) => {
-        if (message.type() === 'error' && !expectedWhileSignedOut(message)) {
+        if (message.type() === 'error' && !isExpectedFailedLoad(message, expectedFailedLoads)) {
           errors.push(`${message.text()} (${message.location().url})`);
         }
       });
