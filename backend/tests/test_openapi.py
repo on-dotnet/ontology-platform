@@ -72,6 +72,7 @@ M3_PATHS = {
     "/api/ontologies/{id}/objects/search",
     "/api/ontologies/{id}/objects/{typeId}/{key}",
     "/api/ontologies/{id}/objects/{typeId}/{key}/related",
+    "/api/releases/{id}/r2rml",
 }
 
 
