@@ -118,6 +118,7 @@ function ReleasesTable({ ontology, canReview }: { ontology: OntologySummary; can
                     <TableHead>{t('releases.columns.version')}</TableHead>
                     <TableHead>{t('releases.columns.title')}</TableHead>
                     <TableHead numeric>{t('releases.columns.elements')}</TableHead>
+                  <TableHead numeric>{t('releases.columns.bindings')}</TableHead>
                     <TableHead>{t('releases.columns.publishedAt')}</TableHead>
                     <TableHead>{t('releases.columns.current')}</TableHead>
                     <TableHead className="text-right">{t('releases.columns.actions')}</TableHead>
@@ -137,6 +138,7 @@ function ReleasesTable({ ontology, canReview }: { ontology: OntologySummary; can
                           {release.notes ? <p className="line-clamp-1 text-xs text-muted-foreground">{release.notes}</p> : null}
                         </TableCell>
                         <TableCell numeric>{release.elementCount}</TableCell>
+                        <TableCell numeric>{release.bindingCount}</TableCell>
                         <TableCell className="whitespace-nowrap text-muted-foreground">
                           <RelativeTime value={release.createdAt} />
                         </TableCell>

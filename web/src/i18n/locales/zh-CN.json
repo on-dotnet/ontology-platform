@@ -444,6 +444,34 @@
       "rejected": "已拒绝"
     },
     "noSource": "手动提交",
+    "submittedBy": "提交人：{{name}}",
+    "unknownSubmitter": "已不存在的用户",
+    "binding": {
+      "type": "{{subject}} → {{target}}",
+      "property": "属性 {{subject}} → {{target}}",
+      "relation": "关系 {{subject}} → {{target}}",
+      "table": "表 {{table}}（主键 {{keys}}）",
+      "column": "列 {{column}}",
+      "foreignKeySource": "外键（在起点表）{{columns}} → {{references}}",
+      "foreignKeyTarget": "外键（在终点表）{{columns}} → {{references}}",
+      "linkTable": "连接表 {{table}}（起点 {{source}}；终点 {{target}}）",
+      "field": "绑定",
+      "keyUnverified": {
+        "title": "请确认主键列",
+        "description": "这张表没有主键约束，请确认所选的列能唯一确定一行。主键选错会让查询结果出错。"
+      },
+      "dependencyRejected": "所属的表绑定未被接受，这一项不会生效"
+    },
+    "catalogEvidence": {
+      "label": "目录依据",
+      "facts": {
+        "table": "表",
+        "column": "列",
+        "primary_key": "主键",
+        "foreign_key": "外键",
+        "sample": "样本值"
+      }
+    },
     "backToList": "返回变更集列表",
     "detailTitle": "变更集",
     "detailInfo": "逐项接受、修改或拒绝变更集里的修改。全部决定后，把接受的项合并到本体的工作版本。",
@@ -522,6 +550,10 @@
     "confidencePercent": "AI 的置信度为 {{percent}}",
     "confidencePercentShort": "（{{percent}}）",
     "flags": {
+      "key_unverified": {
+        "label": "主键未经约束确认",
+        "description": "这张表没有主键约束，请确认所选的列能唯一确定一行。"
+      },
       "evidence_not_found": {
         "label": "未找到证据原文",
         "description": "AI 引用的话没有在原文中找到，置信度已降低。请对照原文核实后再决定。"
@@ -852,6 +884,7 @@
         "properties": "属性（{{count}}）",
         "constraints": "约束（{{count}}）",
         "axioms": "公理（{{count}}）",
+        "bindings": "数据绑定（{{count}}）",
         "inverse": "互逆关系"
       }
     },
@@ -924,6 +957,7 @@
       "version": "版本",
       "title": "标题",
       "elements": "元素数",
+      "bindings": "绑定数",
       "publishedAt": "发布时间",
       "current": "是否当前",
       "actions": "操作"
@@ -965,7 +999,8 @@
         "invalid_range": "终点对象类型（值域）不存在或已停用",
         "invalid_datatype": "数据类型不是平台支持的类型",
         "invalid_local_name": "局部名不符合命名规则",
-        "missing_label": "缺少中文名称"
+        "missing_label": "缺少中文名称",
+        "invalid_binding": "绑定引用的元素已不存在，或与所绑的类型、列数、唯一性不再相符"
       }
     },
     "activate": {
@@ -998,7 +1033,7 @@
       "levelInfoLabel": "关于“{{level}}”",
       "levelInfo": {
         "breaking": "删除了元素，或改了数据类型、单位、定义域、值域、父类型、互逆关系等，依赖它们的数据和查询可能失效。",
-        "review": "约束和高级公理的变化，请确认它们符合预期。",
+        "review": "约束、高级公理和数据绑定内容的变化，请确认它们符合预期。",
         "compatible": "新增、恢复，或名称、定义、同义词等变化，不影响已有的数据和查询。"
       },
       "change": {
@@ -1010,6 +1045,7 @@
       "fields": {
         "rules": "约束规则",
         "turtle": "Turtle 片段",
+        "binding": "绑定",
         "other": "其他字段"
       },
       "rulesChanged": "规则有变化",

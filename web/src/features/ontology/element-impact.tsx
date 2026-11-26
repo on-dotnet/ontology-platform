@@ -55,6 +55,7 @@ export function ReferencedBy({ ontologyId, element, all, onSelect }: ReferencedB
           { key: 'properties', refs: data.properties },
           { key: 'constraints', refs: data.constraints },
           { key: 'axioms', refs: data.axioms },
+          { key: 'bindings', refs: data.bindings ?? [] },
           { key: 'inverse', refs: data.inverse ? [data.inverse] : [] },
         ].filter((group) => group.refs.length > 0);
         if (groups.length === 0) return <p className="text-sm text-muted-foreground">{t('ontologyPage.impact.none')}</p>;
@@ -64,19 +65,26 @@ export function ReferencedBy({ ontologyId, element, all, onSelect }: ReferencedB
               <div key={group.key} className="contents">
                 <dt className="text-muted-foreground">{t(`ontologyPage.impact.groups.${group.key}`, { count: group.refs.length })}</dt>
                 <dd className="flex min-w-0 flex-wrap gap-x-3 gap-y-1">
-                  {group.refs.map((ref) => (
-                    <button
-                      key={ref.id}
-                      type="button"
-                      onClick={() => onSelect(ref.id)}
-                      className={cn(
-                        'max-w-full truncate rounded text-left font-medium text-primary-strong hover:underline',
-                        ref.kind === 'axiom' && 'font-mono text-xs',
-                      )}
-                    >
-                      {refName(ref, byId, language)}
-                    </button>
-                  ))}
+                  {group.refs.map((ref) =>
+                    // Bindings have no detail panel of their own: they are shown in their type's.
+                    group.key === 'bindings' ? (
+                      <span key={ref.id} className="max-w-full truncate font-medium text-foreground">
+                        {ref.label || '—'}
+                      </span>
+                    ) : (
+                      <button
+                        key={ref.id}
+                        type="button"
+                        onClick={() => onSelect(ref.id)}
+                        className={cn(
+                          'max-w-full truncate rounded text-left font-medium text-primary-strong hover:underline',
+                          ref.kind === 'axiom' && 'font-mono text-xs',
+                        )}
+                      >
+                        {refName(ref, byId, language)}
+                      </button>
+                    ),
+                  )}
                 </dd>
               </div>
             ))}

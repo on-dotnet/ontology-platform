@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DATATYPES, type Datatype, type ElementKind, type OntologySummary } from '@/features/ontologies/api';
+import { bindingTarget, type BindingValue } from '@/features/review/binding-item';
 import { cn } from '@/lib/cn';
 
 import {
@@ -88,6 +89,7 @@ const FIELD_LABEL_KEYS: Record<string, string> = {
   autoShape: 'review.fields.autoShape',
   rules: 'releases.compare.fields.rules',
   turtle: 'releases.compare.fields.turtle',
+  binding: 'releases.compare.fields.binding',
 };
 
 function fieldLabel(t: TFunction, field: string, kind: ElementKind): string {
@@ -101,6 +103,14 @@ function fieldLabel(t: TFunction, field: string, kind: ElementKind): string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/** A binding as the comparison sends it (the element's `binding` column, camelCase). */
+function isBindingValue(value: unknown): value is BindingValue {
+  if (!isRecord(value)) return false;
+  if (value.target === 'table') return typeof value.schema === 'string' && typeof value.table === 'string' && Array.isArray(value.keyColumns);
+  if (value.target === 'column') return typeof value.column === 'string';
+  return value.target === 'join' && isRecord(value.join);
 }
 
 function isDatatype(value: string): value is Datatype {
@@ -117,6 +127,7 @@ export function formatFieldValue(t: TFunction, field: string, value: unknown): s
     const texts = value.flatMap((synonym) => (isRecord(synonym) && typeof synonym.text === 'string' ? [synonym.text] : []));
     return texts.length > 0 ? texts.join(t('common.listSeparator')) : t('releases.compare.none');
   }
+  if (field === 'binding' && isBindingValue(value)) return bindingTarget(t, value);
   if (typeof value === 'boolean') return t(value ? 'releases.compare.yes' : 'releases.compare.no');
   if (field === 'datatype' && typeof value === 'string' && isDatatype(value)) return t(`datatypes.${value}`);
   if (typeof value === 'string') return value.trim() ? value : t('releases.compare.empty');

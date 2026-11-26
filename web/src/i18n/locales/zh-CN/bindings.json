@@ -1,3 +1,99 @@
 {
-  "title": "数据绑定"
+  "title": "数据绑定",
+  "info": "绑定的修改经审核并发布后，探索页才会使用。",
+  "empty": "还没有绑定数据",
+  "bind": "绑定数据",
+  "edit": "编辑绑定",
+  "loadFailed": "无法读取绑定",
+  "pending": {
+    "title": "有待审核的绑定修改",
+    "link": "去审核"
+  },
+  "table": {
+    "dataSource": "数据源",
+    "table": "表",
+    "keyColumns": "主键列",
+    "archived": "已归档"
+  },
+  "properties": {
+    "title": "属性与列",
+    "property": "属性",
+    "column": "列",
+    "inherited": "继承",
+    "unbound": "未绑定"
+  },
+  "relations": {
+    "title": "关系",
+    "out": "{{relation}} → {{type}}",
+    "in": "{{type}} → {{relation}}",
+    "unbound": "未绑定",
+    "foreignKey": "外键 {{columns}} → {{references}}",
+    "linkTable": "连接表 {{table}}"
+  },
+  "check": {
+    "missing_table": "目录里找不到这张表，可能已被改名或删除",
+    "missing_column": "目录里找不到这一列，可能已被改名",
+    "type_mismatch": "列的类型与属性的数据类型不相容",
+    "catalog_unavailable": "还没有读取这个数据源的目录，无法核对"
+  },
+  "form": {
+    "createTitle": "绑定数据：{{type}}",
+    "editTitle": "编辑绑定：{{type}}",
+    "visibility": {
+      "title": "数据对所有登录用户可见",
+      "description": "绑定并发布后，这些列的数据对平台的所有登录用户可见。"
+    },
+    "dataSource": "数据源",
+    "dataSourcePlaceholder": "选择数据源",
+    "noDataSources": "还没有可用的数据源，请管理员在数据页添加。",
+    "catalogNotReady": "这个数据源还没有读取目录，请先在数据页读取目录。",
+    "table": "表",
+    "tableSearch": "搜索表名",
+    "noTables": "没有找到表",
+    "view": "视图",
+    "keyColumns": "主键列",
+    "keyColumnsHint": "默认取表的主键；视图没有主键时，请选能唯一确定一行的列。",
+    "propertiesTitle": "属性对应的列",
+    "propertiesHint": "只列出与属性数据类型相容的列。",
+    "noColumn": "不绑定",
+    "noCompatibleColumn": "没有类型相容的列",
+    "staleColumn": "原绑定列 {{column}} 已缺失或类型不相容。",
+    "unavailableKey": "{{column}} 已不能作为主键。",
+    "removeKey": "移除主键列",
+    "relationsTitle": "关系",
+    "relationsHint": "关系另一端的类型绑定后才能绑定关系。",
+    "otherTypeUnbound": "{{type}} 还没有绑定数据",
+    "joinKind": "连接方式",
+    "joinKinds": {
+      "none": "不绑定",
+      "foreign_key": "外键",
+      "link_table": "连接表"
+    },
+    "side": "外键所在的表",
+    "sides": {
+      "source": "起点表（{{table}}）",
+      "target": "终点表（{{table}}）"
+    },
+    "columns": "外键列",
+    "references": "被引用的列",
+    "linkTable": "连接表",
+    "sourceColumns": "对应起点的列",
+    "endpointKeys": "主键顺序：{{keys}}",
+    "targetColumns": "对应终点的列",
+    "appliesAtOnce": "保存后立即生效。",
+    "submitsForReview": "保存后提交审核，审核通过后生效。",
+    "save": "保存",
+    "saved": "已保存绑定",
+    "dependenciesChanged": "这次换表涉及的绑定已有变动。请重新打开编辑窗口，核对最新绑定后再换表。",
+    "errors": {
+      "dataSourceRequired": "请选择数据源",
+      "tableRequired": "请选择表",
+      "keyRequired": "请至少选择一个主键列",
+      "keyTooMany": "主键列最多 8 个",
+      "joinColumnsRequired": "请选择连接的列",
+      "joinTooMany": "每侧最多可选 8 个连接列",
+      "linkColumnsMismatch": "请按两端的主键选择连接列：起点 {{sourceKeys}} 列，终点 {{targetKeys}} 列。",
+      "columnsMismatch": "两侧的列数要相等"
+    }
+  }
 }
