@@ -93,7 +93,7 @@ stl:FullHardCoil a owl:Class ; rdfs:subClassOf stl:ColdRolledCoil ;
     skos:altLabel "轧硬卷"@zh ;
     skos:definition "冷轧减薄后保留加工硬化状态、尚未经退火的带钢卷。"@zh, "A coil of cold-reduced strip that retains its work-hardened condition before annealing."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
-stl:AnnealedCoil a owl:Class ; rdfs:subClassOf stl:Coil ;
+stl:AnnealedCoil a owl:Class ; rdfs:subClassOf stl:ColdRolledCoil ;
     rdfs:label "退火卷"@zh, "Annealed coil"@en ; skos:prefLabel "退火卷"@zh, "Annealed coil"@en ;
     skos:definition "以卷为实物件跟踪、带钢已完成退火热循环的钢卷，可由连续或成批退火取得。"@zh, "A coil of strip identified after an annealing cycle, whether the strip was annealed continuously or in a batch."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
@@ -101,11 +101,11 @@ stl:CoatedCoil a owl:Class ; rdfs:subClassOf stl:Coil ;
     rdfs:label "涂镀钢卷"@zh, "Coated coil"@en ; skos:prefLabel "涂镀钢卷"@zh, "Coated coil"@en ;
     skos:definition "带钢表面带有金属镀层、有机涂层或两者组合，并以卷形按件跟踪的钢材。"@zh, "A coil of steel strip bearing a metallic coating, an organic coating or a combination of layers."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
-stl:GalvanizedCoil a owl:Class ; rdfs:subClassOf stl:CoatedCoil ;
+stl:GalvanizedCoil a owl:Class ; rdfs:subClassOf stl:CoatedCoil, stl:ColdRolledCoil ;
     rdfs:label "镀锌卷"@zh, "Galvanized coil"@en ; skos:prefLabel "镀锌卷"@zh, "Galvanized coil"@en ;
     skos:definition "以卷为单元交接的镀锌带钢，镀层以锌或锌基合金为主要成分，具体类别可随卷记录。"@zh, "A coil of strip bearing a zinc or zinc-alloy coating whose particular coating type can be recorded for the piece."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .
-stl:RecoiledCoil a owl:Class ; rdfs:subClassOf stl:Coil ;
+stl:RecoiledCoil a owl:Class ; rdfs:subClassOf stl:ColdRolledCoil ;
     rdfs:label "重卷卷"@zh, "Recoiled coil"@en ; skos:prefLabel "重卷卷"@zh, "Recoiled coil"@en ;
     skos:definition "将原卷带钢展开后再次卷取，并在重卷出口取得独立件号的钢卷。"@zh, "A coil assigned its own piece identity after strip from existing coils is unwound and wound again."@en ;
     dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling> .

@@ -37,7 +37,7 @@ stl:AnnealedCoil a owl:Class ;
         "退火卷"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
-    rdfs:subClassOf stl:Coil ;
+    rdfs:subClassOf stl:ColdRolledCoil ;
     skos:definition "A coil of strip identified after an annealing cycle, whether the strip was annealed continuously or in a batch."@en,
         "以卷为实物件跟踪、带钢已完成退火热循环的钢卷，可由连续或成批退火取得。"@zh ;
     skos:prefLabel "Annealed coil"@en,
@@ -948,7 +948,8 @@ stl:GalvanizedCoil a owl:Class ;
         "镀锌卷"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
-    rdfs:subClassOf stl:CoatedCoil ;
+    rdfs:subClassOf stl:CoatedCoil,
+        stl:ColdRolledCoil ;
     skos:definition "A coil of strip bearing a zinc or zinc-alloy coating whose particular coating type can be recorded for the piece."@en,
         "以卷为单元交接的镀锌带钢，镀层以锌或锌基合金为主要成分，具体类别可随卷记录。"@zh ;
     skos:prefLabel "Galvanized coil"@en,
@@ -1450,7 +1451,7 @@ stl:RecoiledCoil a owl:Class ;
         "重卷卷"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
-    rdfs:subClassOf stl:Coil ;
+    rdfs:subClassOf stl:ColdRolledCoil ;
     skos:definition "A coil assigned its own piece identity after strip from existing coils is unwound and wound again."@en,
         "将原卷带钢展开后再次卷取，并在重卷出口取得独立件号的钢卷。"@zh ;
     skos:prefLabel "Recoiled coil"@en,
@@ -8878,17 +8879,6 @@ stl:Coating a owl:Class ;
     skos:prefLabel "Coating"@en,
         "涂镀"@zh .
 
-stl:ColdRolledCoil a owl:Class ;
-    rdfs:label "Cold-line coil"@en,
-        "冷轧段钢卷"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
-    rdfs:subClassOf stl:Coil ;
-    skos:definition "A coil identified at the exit of cold rolling or a subsequent finishing operation, such as annealing, coating or recoiling."@en,
-        "在冷轧或其后续精整工序的出口按件登记的钢卷，常见产线包括退火线、涂镀线和重卷线。"@zh ;
-    skos:prefLabel "Cold-line coil"@en,
-        "冷轧段钢卷"@zh .
-
 stl:ColdRolling a owl:Class ;
     rdfs:label "Cold rolling"@en,
         "冷轧"@zh ;
@@ -11705,6 +11695,17 @@ stl:BlastFurnaceTapping a owl:Class ;
     skos:prefLabel "Blast furnace tapping"@en,
         "高炉出铁"@zh .
 
+stl:ColdRolledCoil a owl:Class ;
+    rdfs:label "Cold-line coil"@en,
+        "冷轧段钢卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:Coil ;
+    skos:definition "A coil identified at the exit of cold rolling or a subsequent finishing operation, such as annealing, coating or recoiling."@en,
+        "在冷轧或其后续精整工序的出口按件登记的钢卷，常见产线包括退火线、涂镀线和重卷线。"@zh ;
+    skos:prefLabel "Cold-line coil"@en,
+        "冷轧段钢卷"@zh .
+
 stl:DimensionRequirement a owl:Class ;
     rdfs:label "Dimension requirement"@en,
         "尺寸要求"@zh ;
@@ -12027,6 +12028,17 @@ stl:occurredAt a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://www.iso.org/standard/80050.html> .
 
+stl:Coil a owl:Class ;
+    rdfs:label "Steel coil"@en,
+        "钢卷"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:definition "An individually tracked length of flat steel strip wound for handling as a unit, at the hot mill, cold mill or a later operation."@en,
+        "将一段带钢沿长度方向卷绕成可整体吊运、按件跟踪的实物，卷形可出现在热轧、冷轧及后续作业中。"@zh ;
+    skos:prefLabel "Steel coil"@en,
+        "钢卷"@zh .
+
 stl:MaterialTransformation a owl:Class ;
     rdfs:label "Material transformation"@en,
         "物料转换作业"@zh ;
@@ -12131,17 +12143,6 @@ stl:SteelGrade a owl:Class ;
         "列出组建检验批时可要求成员相同的特征，每条组批规则选用其中适用的维度。"@zh ;
     skos:prefLabel "Lot formation dimension"@en,
         "组批维度"@zh .
-
-stl:Coil a owl:Class ;
-    rdfs:label "Steel coil"@en,
-        "钢卷"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
-    rdfs:subClassOf stl:MaterialPiece ;
-    skos:definition "An individually tracked length of flat steel strip wound for handling as a unit, at the hot mill, cold mill or a later operation."@en,
-        "将一段带钢沿长度方向卷绕成可整体吊运、按件跟踪的实物，卷形可出现在热轧、冷轧及后续作业中。"@zh ;
-    skos:prefLabel "Steel coil"@en,
-        "钢卷"@zh .
 
 stl:Location a owl:Class ;
     rdfs:label "Location"@en,
