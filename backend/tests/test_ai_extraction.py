@@ -1659,15 +1659,20 @@ def test_a_run_is_one_chunk_forwards_and_at_most_three_units() -> None:
 
 def test_a_run_does_not_join_names_across_units() -> None:
     # "钢种" would only appear by gluing the end of one unit to the start of the next.
-    chunk = ChunkText(id=uuid4(), seq=0, text="炉次见下钢\n\n种类一。")
+    glued = ChunkText(id=uuid4(), seq=0, text="炉次见下钢\n\n种类一。")
+    # The same run with the name inside one unit is direct evidence.
+    whole = ChunkText(id=uuid4(), seq=1, text="炉次见下\n\n钢种类一。")
     rels = RelationsOut(
-        relations=[relation("new:Heat", str(EXISTING_GRADE.id), "拼接", "0.1-0.2")],
+        relations=[
+            relation("new:Heat", str(EXISTING_GRADE.id), "拼接", "0.1-0.2"),
+            relation("new:Heat", str(EXISTING_GRADE.id), "完整", "1.1-1.2"),
+        ],
         properties=[],
     )
     proposals = build_proposals(
-        [chunk], [EXISTING_GRADE], [entity("new:Heat", "炉次", sentence="0.1")], rels
+        [glued, whole], [EXISTING_GRADE], [entity("new:Heat", "炉次", sentence="0.1")], rels
     )
-    assert [p for p in proposals if p.kind == "relation_type"] == []
+    assert [p.fields["labelZh"] for p in proposals if p.kind == "relation_type"] == ["完整"]
 
 
 def test_types_and_properties_still_cite_one_sentence() -> None:
