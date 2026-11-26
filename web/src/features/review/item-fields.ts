@@ -44,9 +44,23 @@ export function refLabel(ref: string | null | undefined, context: RefContext): s
   return item ? fieldsLabel(effectiveFields(item), context.language) : undefined;
 }
 
-/** Display name of an item: its proposed or current name; axioms are named by their Turtle. */
+/** Short "subject → place" of a binding, as the server labels binding elements (e.g. "炉次 → mes.heat"). */
+function bindingLabel(fields: ElementFields, context: RefContext): string | undefined {
+  const { binding } = fields;
+  if (!binding) return undefined;
+  const subject = refLabel(fields.subjectRef, context) ?? '—';
+  let place: string;
+  if (binding.target === 'table') place = `${binding.schema}.${binding.table}`;
+  else if (binding.target === 'column') place = binding.column;
+  else if (binding.join.kind === 'foreign_key') place = binding.join.columns.join(', ');
+  else place = `${binding.join.schema}.${binding.join.table}`;
+  return `${subject} → ${place}`;
+}
+
+/** Display name of an item: its proposed or current name; axioms are named by their Turtle, bindings by what they bind. */
 export function itemLabel(item: ChangeItem, context: RefContext): string {
-  const own = fieldsLabel(shownFields(item), context.language);
+  const fields = shownFields(item);
+  const own = fieldsLabel(fields, context.language) ?? bindingLabel(fields, context);
   if (own) return own;
   const target = item.targetElementId ? context.elementsById.get(item.targetElementId) : undefined;
   return (target ? elementName(target, context.language) : '') || '—';

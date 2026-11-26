@@ -384,3 +384,47 @@ describe('publish dialog summary', () => {
     expect(api.calls('GET', '/api/ontologies/onto-steel/compare')).toHaveLength(0);
   });
 });
+
+describe('bindings in releases', () => {
+  it('counts the bindings of each release apart from its elements', async () => {
+    releasesServer({
+      extra: {
+        'GET /api/ontologies/:id/releases': () => [
+          releaseFixture({ id: 'rel-two', version: 2, title: '绑定 MES', isActive: true, elementCount: 9, bindingCount: 5 }),
+        ],
+      },
+    });
+    renderApp('/releases?ontology=onto-steel');
+
+    await screen.findByRole('table', { name: '版本列表' });
+    expect(screen.getByRole('columnheader', { name: '绑定数' })).toBeInTheDocument();
+    expect(within(row('v2')).getByText('9')).toBeInTheDocument();
+    expect(within(row('v2')).getByText('5')).toBeInTheDocument();
+  });
+
+  it('lists added, removed and changed bindings with what they bind', async () => {
+    const changes = [
+      elementChangeFixture({ elementId: 'bd-heat', kind: 'type_binding', label: '炉次 → mes.heat', iri: null, change: 'added', level: 'compatible' }),
+      elementChangeFixture({ elementId: 'bd-remark', kind: 'property_binding', label: '备注 → remark', iri: null, change: 'removed', level: 'breaking' }),
+      elementChangeFixture({
+        elementId: 'bd-weight',
+        kind: 'property_binding',
+        label: '重量 → weight_kg',
+        iri: null,
+        change: 'changed',
+        level: 'review',
+        fields: [{ field: 'binding', before: { target: 'column', column: 'weight_t' }, after: { target: 'column', column: 'weight_kg' } }],
+      }),
+    ];
+    releasesServer({ extra: { 'GET /api/ontologies/:id/compare': () => comparisonFixture(changes) } });
+    renderApp('/releases?ontology=onto-steel');
+
+    const breaking = await screen.findByRole('region', { name: '不兼容 1 项' });
+    expect(entry(breaking, '备注 → remark')).toHaveTextContent('属性绑定');
+    expect(entry(breaking, '备注 → remark')).toHaveTextContent('删除');
+    const review = screen.getByRole('region', { name: '需确认 1 项' });
+    expect(entry(review, '重量 → weight_kg')).toHaveTextContent('绑定：列 weight_t改为列 weight_kg');
+    const compatible = screen.getByRole('region', { name: '兼容 1 项' });
+    expect(entry(compatible, '炉次 → mes.heat')).toHaveTextContent('类型绑定');
+  });
+});
