@@ -958,7 +958,8 @@ _LITERAL_KINDS = {
 
 def literal_share(counts: Counter[str]) -> dict[str, Any]:
     """The share of items whose cited sentence names them (spec 004, 7.2 and 10, item 7):
-    per kind, and over all checked items (`all`), with the number checked (`checked`)."""
+    per kind, and over all checked items (`all`), with the number checked (`checked`) and
+    the relations kept only with their table's name and header row (`relationsByTable`, #60)."""
     out: dict[str, Any] = {
         name: _ratio(counts[f"{kind}:ok"], counts[kind]) for name, kind in _LITERAL_KINDS.items()
     }
@@ -966,6 +967,7 @@ def literal_share(counts: Counter[str]) -> dict[str, Any]:
     passed = sum(counts[f"{kind}:ok"] for kind in _LITERAL_KINDS.values())
     out["all"] = _ratio(passed, total)
     out["checked"] = total
+    out["relationsByTable"] = counts["relation_type:table"]
     return out
 
 
