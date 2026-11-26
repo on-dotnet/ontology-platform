@@ -1279,6 +1279,8 @@ async def test_change_sets_name_their_submitter(client: AsyncClient, db: AsyncSe
     steel = await add_ontology(db)
     admin = await db.scalar(select(User).where(User.username == ADMIN_USERNAME))
     assert admin is not None
+    # A display name of its own, so that the user name could not pass for it.
+    admin.display_name = "管理员甲"
     ids = {}
     for source, created_by in (("mcp", admin.id), ("manual", admin.id), ("manual", uuid4())):
         ids[source if created_by == admin.id else "gone"] = await service.create_change_set(
@@ -1299,8 +1301,8 @@ async def test_change_sets_name_their_submitter(client: AsyncClient, db: AsyncSe
 
     names = {row["id"]: row["createdByName"] for row in listed}
     assert names == {
-        str(ids["mcp"]): admin.display_name,
-        str(ids["manual"]): admin.display_name,
+        str(ids["mcp"]): "管理员甲",
+        str(ids["manual"]): "管理员甲",
         str(ids["gone"]): None,
     }
-    assert detail["createdByName"] == admin.display_name
+    assert detail["createdByName"] == "管理员甲"

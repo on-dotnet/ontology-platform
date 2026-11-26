@@ -340,8 +340,9 @@ async def create_change_set(
 
     Raises `InvalidProposalError` when a temp_ref is repeated, a reference is neither an object
     type of the ontology nor the temp_ref of an object type created in this change set, or an
-    update does not target an element of the ontology, and `InvalidBindingError` when a binding
-    item breaks the binding rules or does not fit the cached catalog. Nothing is committed.
+    update does not target an element of the ontology; for a binding item these and the binding
+    rules (including the cached catalog) raise `InvalidBindingError`, a subclass with the
+    `binding.*` codes. Nothing is committed.
     """
     ontology = await db.get(Ontology, ontology_id)
     if ontology is None:

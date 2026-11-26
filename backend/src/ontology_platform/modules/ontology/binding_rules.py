@@ -533,9 +533,7 @@ async def edit_problems(
     items of its change set. Rejected items do not take part: the change set leaves the
     working version without them, whatever the reviewer edits here."""
     taking_part = [s for s in siblings if s.id == item_id or not s.rejected]
-    items = [
-        replace(s.item, fields=fields) if s.id == item_id else s.item for s in taking_part
-    ]
+    items = [replace(s.item, fields=fields) if s.id == item_id else s.item for s in taking_part]
     position = next(i for i, s in enumerate(taking_part) if s.id == item_id)
     found = await proposal_problems(db, elements, items, only=position)
     return [problem for _, problem in found]

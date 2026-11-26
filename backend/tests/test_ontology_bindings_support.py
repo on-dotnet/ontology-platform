@@ -114,7 +114,9 @@ async def steel(db: AsyncSession) -> Steel:
         multiple=True,
         iri=ontology.base_iri + "externalId",
     )
-    cast_no = element(ontology, "property", "castNo", "浇次号", domain_id=cast.id, datatype="string")
+    cast_no = element(
+        ontology, "property", "castNo", "浇次号", domain_id=cast.id, datatype="string"
+    )
     batch_code = element(
         ontology, "property", "batchCode", "批次号", domain_id=batch.id, datatype="string"
     )
@@ -166,9 +168,7 @@ async def steel(db: AsyncSession) -> Steel:
                 [("cast_no", "character varying(20)", "string"), ("seq", "integer", "integer")],
                 primary_key=["cast_no"],
             ),
-            _table(
-                mes, "heat_v", [("heat_no", "character varying(20)", "string")], kind="view"
-            ),
+            _table(mes, "heat_v", [("heat_no", "character varying(20)", "string")], kind="view"),
             _table(
                 mes,
                 "heat_cast",

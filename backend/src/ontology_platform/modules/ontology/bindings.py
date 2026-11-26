@@ -226,15 +226,15 @@ async def _join_check(
     if target_table is None:
         return check
     holder, other = (
-        (source_table, target_table) if join.get("side") == "source" else (target_table, source_table)
+        (source_table, target_table)
+        if join.get("side") == "source"
+        else (target_table, source_table)
     )
     found = _has(holder, join["columns"]) and _has(other, join["references"])
     return "ok" if found else "missing_column"
 
 
-def _related_types(
-    items: Iterable[ChangeItem], elements: Mapping[UUID, Element]
-) -> set[UUID]:
+def _related_types(items: Iterable[ChangeItem], elements: Mapping[UUID, Element]) -> set[UUID]:
     """The object types an open change set's binding items are about."""
 
     def type_of(binding_id: UUID | None) -> UUID | None:
@@ -312,12 +312,11 @@ async def binding_views(
     for item, change_set_id in open_items:
         by_change_set.setdefault(change_set_id, []).append(item)
     pending = {
-        change_set_id: _related_types(items, by_id) for change_set_id, items in by_change_set.items()
+        change_set_id: _related_types(items, by_id)
+        for change_set_id, items in by_change_set.items()
     }
     checks = _Checks(db)
-    return [
-        await _view(checks, element, active, by_id, tables, pending) for element in types
-    ]
+    return [await _view(checks, element, active, by_id, tables, pending) for element in types]
 
 
 def _element_name(element: Element) -> str:
@@ -373,7 +372,9 @@ async def _view(
     }
     properties: list[schemas.PropertyBindingView] = []
     for prop in active:
-        if prop.kind != "property" or (prop.domain_id is not None and prop.domain_id not in lineage):
+        if prop.kind != "property" or (
+            prop.domain_id is not None and prop.domain_id not in lineage
+        ):
             continue
         bound = columns.get(prop.id)
         column_view: schemas.ColumnBindingView | None = None
@@ -419,9 +420,7 @@ async def _view(
             other = by_id.get(there) if there is not None else None
             if here not in lineage or other is None:
                 continue
-            relations.append(
-                await _relation_view(checks, relation, direction, other, own, active)
-            )
+            relations.append(await _relation_view(checks, relation, direction, other, own, active))
     relations.sort(key=lambda r: (r.direction != "out", r.label, str(r.relation_id)))
     return schemas.TypeBindingView(
         type_id=entity.id,
@@ -584,10 +583,8 @@ async def _release_in_effect(
     release's Turtle, which can be megabytes, is not read."""
     if isinstance(ontology, str):
         ontology = rules.parse_id(ontology) or ontology
-    if isinstance(ontology, UUID):
-        condition = Ontology.id == ontology
-    else:
-        condition = Ontology.key == ontology
+    by_id = isinstance(ontology, UUID)
+    condition = Ontology.id == ontology if by_id else Ontology.key == ontology
     row = (
         await db.execute(
             select(Ontology, Release)

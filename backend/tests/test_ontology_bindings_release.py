@@ -185,9 +185,7 @@ async def test_publishing_checks_the_bindings(client: AsyncClient, db: AsyncSess
     await sign_in(client, db, Role.ADMIN)
     await bind(client, s)
     # 重量 moves to 浇次 behind the binding's back: 炉次's table no longer fits it.
-    await db.execute(
-        update(Element).where(Element.id == s.weight.id).values(domain_id=s.cast.id)
-    )
+    await db.execute(update(Element).where(Element.id == s.weight.id).values(domain_id=s.cast.id))
     await db.commit()
     weight = next(row for row in await bindings(db, s.ontology) if row.subject_id == s.weight.id)
 
@@ -224,9 +222,7 @@ async def test_comparing_rates_binding_changes(client: AsyncClient, db: AsyncSes
     )
 
     assert compared.status_code == 200, compared.json()
-    changes = {
-        (change["kind"], change["change"]): change for change in compared.json()["changes"]
-    }
+    changes = {(change["kind"], change["change"]): change for change in compared.json()["changes"]}
     assert set(changes) == {
         ("type_binding", "changed"),
         ("property_binding", "removed"),
@@ -434,5 +430,6 @@ async def test_the_binding_view_is_read_by_any_signed_in_user(
     assert (heat["table"]["schema"], heat["table"]["check"]) == ("mes", "ok")
     assert heat["relations"][0]["join"]["join"] == foreign_key()["join"]
     assert one.status_code == 200
+    assert [view["typeId"] for view in one.json()] == [str(s.batch.id)]
     assert one.json()[0]["table"] is None
     assert (not_a_type.status_code, not_a_type.json()["code"]) == (404, "element.not_found")

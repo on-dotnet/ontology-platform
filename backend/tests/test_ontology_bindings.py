@@ -37,8 +37,8 @@ from test_ontology_bindings_support import (
     type_binding,
 )
 from test_ontology_support import (
-    add_elements,
     accept_and_merge,
+    add_elements,
     add_ontology,
     change_set_items,
     decide_by_seq,
@@ -351,9 +351,7 @@ async def test_one_active_binding_per_bound_thing(client: AsyncClient, db: Async
     s = await steel(db)
     await sign_in(client, db, Role.ADMIN)
     await bind(client, s)
-    [heat_binding] = [
-        row for row in await bindings(db, s.ontology) if row.subject_id == s.heat.id
-    ]
+    [heat_binding] = [row for row in await bindings(db, s.ontology) if row.subject_id == s.heat.id]
 
     again = await save(client, s.ontology, [type_binding(s.heat, table(s.mes, "heat_v"))])
     twice = await save(
@@ -375,9 +373,7 @@ async def test_only_the_key_columns_of_a_type_binding_change(
     s = await steel(db)
     await sign_in(client, db, Role.ADMIN)
     await bind(client, s)
-    [heat_binding] = [
-        row for row in await bindings(db, s.ontology) if row.subject_id == s.heat.id
-    ]
+    [heat_binding] = [row for row in await bindings(db, s.ontology) if row.subject_id == s.heat.id]
 
     moved = await save(
         client, s.ontology, [change("update", heat_binding, binding=table(s.mes, "heat_v"))]
@@ -400,9 +396,7 @@ async def test_only_the_key_columns_of_a_type_binding_change(
     assert updated.revision == 2
 
 
-async def test_a_table_is_replaced_in_one_change_set(
-    client: AsyncClient, db: AsyncSession
-) -> None:
+async def test_a_table_is_replaced_in_one_change_set(client: AsyncClient, db: AsyncSession) -> None:
     s = await steel(db)
     await sign_in(client, db, Role.ADMIN)
     await bind(client, s)
@@ -439,9 +433,7 @@ async def test_a_new_binding_cannot_hang_under_a_binding_the_save_deletes(
     s = await steel(db)
     await sign_in(client, db, Role.ADMIN)
     await bind(client, s)
-    [heat_binding] = [
-        row for row in await bindings(db, s.ontology) if row.subject_id == s.heat.id
-    ]
+    [heat_binding] = [row for row in await bindings(db, s.ontology) if row.subject_id == s.heat.id]
 
     response = await save(
         client,
@@ -602,9 +594,7 @@ async def test_a_binding_update_shows_its_values_before(
     s = await steel(db)
     await sign_in(client, db, Role.ADMIN)
     await bind(client, s)
-    [heat_binding] = [
-        row for row in await bindings(db, s.ontology) if row.subject_id == s.heat.id
-    ]
+    [heat_binding] = [row for row in await bindings(db, s.ontology) if row.subject_id == s.heat.id]
 
     response = await save(
         client,
@@ -734,4 +724,3 @@ async def test_a_merge_keeps_one_active_binding_per_type(
     ]
     [only] = await bindings(db, s.ontology)
     assert only.binding == table(s.mes)
-
