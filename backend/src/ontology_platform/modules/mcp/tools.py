@@ -397,7 +397,21 @@ def _property(released: bindings.ReleasedOntology, reference: str) -> str:
 
 async def search_objects(ctx: Context, arguments: SearchObjectsArguments) -> dict[str, Any]:
     type_id, released = await _type(ctx, arguments.ontology, arguments.type)
-    body = query_schemas.ObjectSearch.model_validate(
+    try:
+        body = _object_search(type_id, released, arguments)
+    except ValidationError as exc:
+        # Arguments the tool accepted but the query service's own model refuses.
+        raise _invalid(exc) from None
+    page = await query.until_disconnected(
+        ctx.request, query.search(ctx.db, released.ontology_id, body)
+    )
+    return _dump(page)
+
+
+def _object_search(
+    type_id: UUID, released: bindings.ReleasedOntology, arguments: SearchObjectsArguments
+) -> query_schemas.ObjectSearch:
+    return query_schemas.ObjectSearch.model_validate(
         {
             "typeId": type_id,
             "filters": [
@@ -412,10 +426,6 @@ async def search_objects(ctx: Context, arguments: SearchObjectsArguments) -> dic
             "cursor": arguments.cursor,
         }
     )
-    page = await query.until_disconnected(
-        ctx.request, query.search(ctx.db, released.ontology_id, body)
-    )
-    return _dump(page)
 
 
 async def get_object(ctx: Context, arguments: GetObjectArguments) -> dict[str, Any]:
@@ -642,10 +652,9 @@ async def call(
             raise ToolError("auth.insufficient_scope", "The access token lacks a scope.")
         try:
             parsed = tool.arguments.model_validate(dict(arguments))
-            content = await tool.run(ctx, parsed)
         except ValidationError as exc:
-            # Arguments the tool accepted but the query service's own models refuse.
             raise _invalid(exc) from None
+        content = await tool.run(ctx, parsed)
         outcome = Outcome(_fit(content, tool.items), is_error=False)
     except (AppError, ToolError) as exc:
         message = exc.detail if isinstance(exc, AppError) else exc.message

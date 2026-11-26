@@ -2,13 +2,14 @@
 `mcp.tool_called`)."""
 
 import base64
+import dataclasses
 import json
 from dataclasses import dataclass
 from typing import Any
 from uuid import uuid4
 
 import pytest
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,7 +20,7 @@ from ontology_platform.modules.identity.models import Role
 from ontology_platform.modules.mcp import tools
 from ontology_platform.modules.ontology.models import Element
 from support import csrf_headers, make_client
-from test_mcp_support import call_tool, new_token, tool_error
+from test_mcp_support import call_tool, new_token, rpc, tool_error
 from test_ontology_support import add_elements, add_ontology, element
 from test_query_support import QueryCatalog, make_catalog, publish_bindings
 
@@ -506,3 +507,37 @@ async def test_an_empty_object_cursor_is_refused_and_audited(
         await db.scalars(select(AuditEvent).where(AuditEvent.action == "mcp.tool_called"))
     )
     assert [event.detail["code"] for event in events] == ["validation.failed"]
+
+
+@pytest.mark.parametrize(
+    ("failure", "status", "code"),
+    [
+        (RuntimeError("boom"), 500, "internal.error"),
+        (HTTPException(499), 499, "mcp.client_disconnected"),
+    ],
+)
+async def test_an_unexpected_failure_is_audited_and_propagates(
+    app: FastAPI,
+    db: AsyncSession,
+    published: Published,
+    monkeypatch: pytest.MonkeyPatch,
+    failure: Exception,
+    status: int,
+    code: str,
+) -> None:
+    async def fail(ctx: tools.Context, arguments: Any) -> dict[str, Any]:
+        raise failure
+
+    tool = tools.TOOLS["list_ontologies"]
+    monkeypatch.setitem(tools.TOOLS, "list_ontologies", dataclasses.replace(tool, run=fail))
+
+    async with make_client(app, raise_app_exceptions=False) as agent:
+        response = await rpc(
+            agent, published.token, "tools/call", {"name": "list_ontologies", "arguments": {}}
+        )
+
+    assert response.status_code == status
+    events = list(
+        await db.scalars(select(AuditEvent).where(AuditEvent.action == "mcp.tool_called"))
+    )
+    assert [event.detail["code"] for event in events] == [code]
