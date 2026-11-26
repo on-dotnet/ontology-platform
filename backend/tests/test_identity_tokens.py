@@ -22,6 +22,7 @@ from test_ontology_support import sign_in
 
 TOKEN_PATTERN = re.compile(r"op_pat_[A-Za-z0-9_-]{43}")
 ALL_SCOPES = ["ontology:read", "objects:read", "changes:propose"]
+INVALID_TOKEN_CHALLENGE = 'Bearer error="invalid_token"'
 
 
 async def create(
@@ -279,6 +280,8 @@ async def test_a_revoked_token_is_refused_at_once(
     assert revoked.status_code == 204
     assert after.status_code == 401
     assert after.json()["code"] == "auth.invalid_token"
+    # RFC 6750, section 3; the same challenge as /mcp gives (issue #65).
+    assert after.headers["WWW-Authenticate"] == INVALID_TOKEN_CHALLENGE
 
 
 async def test_an_expired_token_is_refused(
@@ -344,6 +347,7 @@ async def test_an_invalid_token_does_not_fall_back_to_the_cookie(
     response = await client.get("/api/auth/me", headers={"Authorization": authorization})
     assert response.status_code == 401
     assert response.json()["code"] == "auth.invalid_token"
+    assert response.headers["WWW-Authenticate"] == INVALID_TOKEN_CHALLENGE
     # Not even on routes that do not take tokens.
     response = await client.get("/api/ontologies", headers={"Authorization": authorization})
     assert response.status_code == 401

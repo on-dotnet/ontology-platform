@@ -62,7 +62,12 @@ class TokenContext:
 
 def invalid_token() -> AppError:
     # Unknown, expired, revoked or owner deactivated: deliberately indistinguishable.
-    return AppError(401, "auth.invalid_token", "Invalid access token.")
+    return AppError(
+        401,
+        "auth.invalid_token",
+        "Invalid access token.",
+        headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+    )
 
 
 def _new_token() -> str:
