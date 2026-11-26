@@ -145,6 +145,8 @@ async def run_worker(
         running.discard(task)
         error = None if task.cancelled() else task.exception()
         if error is not None:
+            # Taking the exception silences asyncio's warning: log every one, raise the first.
+            logger.error("Worker %s stops after an error", worker_id, exc_info=error)
             failed.append(error)
 
     try:

@@ -8,6 +8,7 @@ grounding are deterministic code, not model output.
 """
 
 import asyncio
+import logging
 import re
 from collections import Counter
 from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
@@ -42,6 +43,8 @@ from ontology_platform.modules.ai.prompts import (
 )
 from ontology_platform.modules.ai.sentences import covering, split_sentences
 from ontology_platform.settings import Settings, effort_value
+
+logger = logging.getLogger(__name__)
 
 Kind = Literal["entity_type", "relation_type", "property"]
 ProgressFn = Callable[[str, int, int], Awaitable[None]]
@@ -391,6 +394,9 @@ async def _in_order[T](
         async with asyncio.TaskGroup() as group:
             tasks = [group.create_task(one(call)) for call in calls]
     except BaseExceptionGroup as failed:
+        # The first to fail, not the earliest batch; the others are only logged.
+        for other in failed.exceptions[1:]:
+            logger.warning("Another %s call failed as well: %r", step, other)
         raise failed.exceptions[0] from None
     return [task.result() for task in tasks]
 

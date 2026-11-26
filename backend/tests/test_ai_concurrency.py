@@ -333,3 +333,5 @@ def test_the_concurrency_settings_have_their_defaults_and_bounds() -> None:
         Settings(worker_concurrency=0)
     with pytest.raises(ValueError, match="ai_max_concurrent_calls"):
         Settings(ai_max_concurrent_calls=0)
+    with pytest.raises(ValueError, match="ai_max_concurrent_calls"):
+        Settings(ai_max_concurrent_calls=33)

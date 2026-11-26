@@ -115,9 +115,10 @@ def _add_recorded(stage: dict[str, Any], record: Mapping[str, Any]) -> None:
 class ReplayGateway:
     """Answers recorded calls from `recordings`; others go to `inner`, or fail if it is None.
 
-    `labels` names documents by their id, for statistics and for the message of a miss. When
-    `inner` has `take_usage` (see `MeteredGateway`), paid calls are counted with their attempts
-    and tokens; replayed calls count as no call.
+    `labels` names documents by their id, for statistics and for the message of a miss. Paid
+    calls are counted with their attempts and tokens: those of a `MeteredGateway` per call, also
+    when calls run at the same time; a stand-in may report them with `take_usage`. Replayed
+    calls count as no call. A call that fails counts nothing: the evaluation stops on it.
     """
 
     def __init__(
