@@ -1,0 +1,95 @@
+# On each release, translate these fixture references to the short references in QaContext.
+# TOML has no null. Omitted start, target, metric and filter operands stand for null.
+[refs]
+T1 = "Heat"
+T2 = "Coil"
+P1 = "steelGrade"
+P2 = "passed"
+R1 = "castIn"
+R2 = "producesSlab"
+R3 = "rolledIn"
+R4 = "producesCoil"
+R5 = "inspects"
+M1 = "inspectionPassRate"
+
+[Q1.plan]
+intent = "objects"
+start = "T1"
+filters = [{ property = "P1", op = "eq", value = "Q235B" }]
+path = []
+missing = []
+assumptions = []
+
+[Q1.answer]
+answer = "筛选出的炉次均属于 Q235B。列表中每项对应一个炉次。可以按炉次编号核对证据。"
+cited_keys = ["K1"]
+counterpoints = []
+
+[Q2.plan]
+intent = "objects"
+start = "T1"
+filters = [{ property = "P1", op = "eq", value = "Q235B" }]
+path = [
+    { relation = "R1", direction = "out", filters = [] },
+    { relation = "R2", direction = "out", filters = [] },
+    { relation = "R3", direction = "out", filters = [] },
+    { relation = "R4", direction = "out", filters = [] },
+    { relation = "R5", direction = "in", filters = [{ property = "P2", op = "eq", value = "false" }] },
+]
+target = 4
+missing = []
+assumptions = ["把不合格理解为检验记录的是否合格为假。"]
+
+[Q2.answer]
+answer = "这两个钢卷均有不合格记录。检验次数按记录统计。同一钢卷可以有多次检验。"
+cited_keys = ["K1", "K2"]
+counterpoints = ["W240101201 有两次检验都不合格。"]
+
+[Q3.plan]
+intent = "metric"
+start = "T1"
+filters = [{ property = "P1", op = "eq", value = "Q235B" }]
+path = [
+    { relation = "R1", direction = "out", filters = [] },
+    { relation = "R2", direction = "out", filters = [] },
+    { relation = "R3", direction = "out", filters = [] },
+    { relation = "R4", direction = "out", filters = [] },
+    { relation = "R5", direction = "in", filters = [] },
+]
+metric = "M1"
+missing = []
+assumptions = ["按检验记录统计。"]
+
+[Q3.answer]
+answer = "合格率按检验记录计算。分母取所有匹配记录。分子只取合格记录。"
+cited_keys = []
+counterpoints = []
+
+[Q4.plan]
+intent = "rules"
+start = "T1"
+filters = [{ property = "P1", op = "eq", value = "Q235B" }]
+path = [
+    { relation = "R1", direction = "out", filters = [] },
+    { relation = "R2", direction = "out", filters = [] },
+    { relation = "R3", direction = "out", filters = [] },
+    { relation = "R4", direction = "out", filters = [] },
+    { relation = "R5", direction = "in", filters = [] },
+]
+missing = []
+assumptions = []
+
+[Q4.answer]
+answer = "有检验记录的屈服强度低于要求。其余力学性能检查均通过。违规明细见证据。"
+cited_keys = []
+counterpoints = []
+
+[Q5.plan]
+intent = "unanswerable"
+filters = []
+path = []
+missing = [
+    { kind = "entity_type", label_zh = "表面缺陷", description = "问题涉及的表面缺陷尚未建模。", near = [] },
+    { kind = "relation_type", label_zh = "钢卷表面缺陷", description = "缺少钢卷到表面缺陷的关系。", near = ["T2"] },
+]
+assumptions = []

@@ -88,11 +88,16 @@ M3_PATHS = {
 ONTOLOGY = "/api/ontologies/{id}"
 CQ = "/competency-questions"
 # What an authorized caller gets from operations that are no longer stubs (nothing released yet).
-M4_IMPLEMENTED = {
-    f"{ONTOLOGY}/objects/traverse": (409, "query.no_release"),
-    f"{ONTOLOGY}/metrics": (409, "query.no_release"),
-    f"{ONTOLOGY}/metrics/{{metricId}}/evaluate": (409, "query.no_release"),
-    f"{ONTOLOGY}/rules/check": (409, "query.no_release"),
+QA_LIST = f"{ONTOLOGY}/qa/questions"
+QA_DETAIL = "/api/qa/questions/{id}"
+M4_IMPLEMENTED: dict[tuple[str, str], tuple[int, str | None]] = {
+    ("post", f"{ONTOLOGY}/objects/traverse"): (409, "query.no_release"),
+    ("get", f"{ONTOLOGY}/metrics"): (409, "query.no_release"),
+    ("post", f"{ONTOLOGY}/metrics/{{metricId}}/evaluate"): (409, "query.no_release"),
+    ("post", f"{ONTOLOGY}/rules/check"): (409, "query.no_release"),
+    ("post", QA_LIST): (409, "query.no_release"),
+    ("get", QA_LIST): (200, None),
+    ("get", QA_DETAIL): (200, None),
 }
 M4_OPERATIONS = {
     f"{ONTOLOGY}/objects/traverse": {"post": 200},
@@ -124,7 +129,11 @@ def test_openapi_export_documents_the_api(capsys: pytest.CaptureFixture[str]) ->
         for method, success in methods.items():
             responses = paths[path][method]["responses"]
             assert "schema" in responses[str(success)]["content"]["application/json"]
-            assert "application/problem+json" in responses["501"]["content"]
+            if path in (QA_LIST, QA_DETAIL):
+                assert "501" not in responses
+                assert "application/problem+json" in responses["403"]["content"]
+            else:
+                assert "application/problem+json" in responses["501"]["content"]
     media = paths[ONTOLOGY + CQ + "/import"]["post"]["requestBody"]["content"]
     assert {"text/plain", "multipart/form-data"} <= media.keys()
     schemas = document["components"]["schemas"]
@@ -204,10 +213,20 @@ async def test_m4_stub_permissions(client: AsyncClient, db: AsyncSession, caller
             elif detail and caller in ("viewer", "reviewer"):
                 assert_problem(response, 404, "qa.not_found")
             else:
-                assert_problem(response, *M4_IMPLEMENTED.get(path, (501, "http.not_implemented")))
+                status, code = M4_IMPLEMENTED.get((method, path), (501, "http.not_implemented"))
+                if code is not None:
+                    assert_problem(response, status, code)
+                else:
+                    assert response.status_code == status, response.text
+                    if path == QA_DETAIL:
+                        assert response.json()["id"] == str(question.id)
+                    else:
+                        expected = [str(question.id)] if caller == "editor" else []
+                        assert [q["id"] for q in response.json()["items"]] == expected
     if caller in ("viewer", "editor", "reviewer", "admin"):
         response = await client.get(f"/api/ontologies/{ontology.id}/qa/questions?askedBy=all")
         if caller == "admin":
-            assert_problem(response, 501, "http.not_implemented")
+            assert response.status_code == 200
+            assert [q["id"] for q in response.json()["items"]] == [str(question.id)]
         else:
             assert_problem(response, 403, "auth.forbidden")

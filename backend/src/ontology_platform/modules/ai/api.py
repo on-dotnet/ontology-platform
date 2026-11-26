@@ -159,15 +159,20 @@ async def _qa_response(operation: Awaitable[schemas.QaQuestion]) -> schemas.QaQu
 @router.post(
     "/ontologies/{id}/qa/questions",
     status_code=202,
-    responses=problem_responses(401, 403, 404, 409, 422, 429, 501),
+    responses=problem_responses(401, 403, 404, 409, 422, 429),
 )
 async def create_qa_question(
-    id: UUID, body: schemas.QaQuestionCreate, user: CurrentUser, db: DbSession
+    id: UUID,
+    body: schemas.QaQuestionCreate,
+    user: CurrentUser,
+    db: DbSession,
+    settings: AppSettings,
 ) -> schemas.QaQuestion:
-    return await _qa_response(qa.create_question(db, id, body, user_id=user.id))
+    db.info["qa_settings"] = settings
+    return await qa.create_question(db, id, body, user_id=user.id)
 
 
-@router.get("/ontologies/{id}/qa/questions", responses=problem_responses(401, 403, 422, 501))
+@router.get("/ontologies/{id}/qa/questions", responses=problem_responses(401, 403, 422))
 async def list_qa_questions(
     id: UUID,
     user: CurrentUser,
@@ -181,7 +186,7 @@ async def list_qa_questions(
     )
 
 
-@router.get("/qa/questions/{id}", responses=problem_responses(401, 403, 404, 422, 501))
+@router.get("/qa/questions/{id}", responses=problem_responses(401, 403, 404, 422))
 async def get_qa_question(id: UUID, user: CurrentUser, db: DbSession) -> schemas.QaQuestion:
     return await qa.get_question(db, id, actor=user)
 
