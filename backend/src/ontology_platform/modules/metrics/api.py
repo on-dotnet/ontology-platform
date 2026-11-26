@@ -8,7 +8,7 @@ from ontology_platform.db import DbSession
 from ontology_platform.errors import problem_responses
 from ontology_platform.modules.identity.api import require_scope
 from ontology_platform.modules.metrics import schemas, service
-from ontology_platform.modules.query.service import serve_read
+from ontology_platform.modules.query.service import until_disconnected
 
 router = APIRouter(
     prefix="/api/ontologies/{id}",
@@ -32,9 +32,7 @@ async def evaluate_metric(
     db: DbSession,
 ) -> schemas.MetricValue:
     within = body.within.to_key_set() if body.within is not None else None
-    return await serve_read(
-        request, "Metric evaluation", service.evaluate(db, id, metricId, within=within)
-    )
+    return await until_disconnected(request, service.evaluate(db, id, metricId, within=within))
 
 
 @router.post("/rules/check", responses=_ERRORS)
@@ -42,8 +40,14 @@ async def check_rules(
     id: UUID, body: schemas.RuleCheckRequest, request: Request, db: DbSession
 ) -> schemas.RuleReport:
     within = body.within.to_key_set() if body.within is not None else None
-    return await serve_read(
+    return await until_disconnected(
         request,
-        "Rule check",
-        service.check_rules(db, id, body.type_id, within=within, limit=body.limit),
+        service.check_rules(
+            db,
+            id,
+            body.type_id,
+            within=within,
+            limit=body.limit,
+            language=request.headers.get("accept-language", "zh"),
+        ),
     )

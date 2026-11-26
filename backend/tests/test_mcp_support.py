@@ -27,6 +27,8 @@ READ_TOOLS = [
     "search_objects",
     "get_object",
     "get_related_objects",
+    "evaluate_metric",
+    "check_rules",
 ]
 
 # JSON-RPC and MCP error codes of the revision.

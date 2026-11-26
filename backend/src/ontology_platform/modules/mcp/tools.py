@@ -35,10 +35,17 @@ from ontology_platform.errors import AppError
 from ontology_platform.modules.audit import service as audit
 from ontology_platform.modules.identity.models import TokenScope
 from ontology_platform.modules.identity.tokens import TokenContext
+from ontology_platform.modules.metrics import service as metrics
+from ontology_platform.modules.metrics.schemas import MetricValue, RuleReport
 from ontology_platform.modules.ontology import assistant, bindings, releases, rules
 from ontology_platform.modules.ontology import service as ontology
 from ontology_platform.modules.ontology.models import Datatype
-from ontology_platform.modules.ontology.schemas import ElementCopy, ElementFields, ProposedItem
+from ontology_platform.modules.ontology.schemas import (
+    IRI_MAX_LENGTH,
+    ElementCopy,
+    ElementFields,
+    ProposedItem,
+)
 from ontology_platform.modules.query import schemas as query_schemas
 from ontology_platform.modules.query import service as query
 from ontology_platform.schemas import CamelModel
@@ -143,6 +150,33 @@ class GetRelatedObjectsArguments(GetObjectArguments):
     direction: query_schemas.Direction = "out"
     limit: int = Field(default=query_schemas.PAGE_DEFAULT, ge=1, le=query_schemas.PAGE_MAX)
     cursor: query_schemas.Cursor | None = None
+
+
+ObjectKeys = Annotated[list[str], Field(max_length=100)]
+ReleasedElementRef = Annotated[
+    str, StringConstraints(strip_whitespace=True, min_length=1, max_length=IRI_MAX_LENGTH)
+]
+
+
+class WithinArgument(Arguments):
+    type: ReleasedElementRef = Field(description="The object type's id, IRI or local name.")
+    keys: ObjectKeys = Field(description="Encoded object keys from search results.")
+
+
+class EvaluateMetricArguments(OntologyArguments):
+    metric: ReleasedElementRef = Field(description="The metric's id, IRI or local name.")
+    within: WithinArgument | None = None
+
+
+class CheckRulesArguments(OntologyArguments):
+    type: ReleasedElementRef = Field(description="The object type's id, IRI or local name.")
+    keys: ObjectKeys | None = Field(default=None, description="Encoded object keys to check.")
+    limit: int = Field(
+        default=query_schemas.PAGE_DEFAULT,
+        ge=1,
+        le=query_schemas.PAGE_MAX,
+        description="Maximum number of violation samples per rule.",
+    )
 
 
 # ---------- the released ontology ----------
@@ -488,6 +522,54 @@ async def get_related_objects(
     return _dump(page)
 
 
+# ---------- metrics and rules ----------
+
+
+def _metric_result(
+    released: bindings.ReleasedOntology, result: MetricValue | RuleReport
+) -> dict[str, Any]:
+    # An alias may point to a different element if a release changes after lookup.
+    if result.release.id != released.release_id:
+        raise AppError(409, "query.release_changed", "The active release has changed.")
+    return _dump(result)
+
+
+async def evaluate_metric(ctx: Context, arguments: EvaluateMetricArguments) -> dict[str, Any]:
+    released = await _released(ctx, arguments.ontology)
+    metric = _element(released, arguments.metric, ["metric"], metrics=await _metrics(ctx, released))
+    if metric is None:
+        raise AppError(404, "metric.not_found", "Metric not found in the active release.")
+    within = None
+    if arguments.within is not None:
+        subject = _element(released, arguments.within.type, ["entity_type"])
+        if subject is None:
+            raise _element_not_found()
+        within = query_schemas.KeySet(subject.id, tuple(arguments.within.keys))
+    value = await query.until_disconnected(
+        ctx.request, metrics.evaluate(ctx.db, released.ontology_id, metric.id, within=within)
+    )
+    return _metric_result(released, value)
+
+
+async def check_rules(ctx: Context, arguments: CheckRulesArguments) -> dict[str, Any]:
+    type_id, released = await _type(ctx, arguments.ontology, arguments.type)
+    within = (
+        query_schemas.KeySet(type_id, tuple(arguments.keys)) if arguments.keys is not None else None
+    )
+    report = await query.until_disconnected(
+        ctx.request,
+        metrics.check_rules(
+            ctx.db,
+            released.ontology_id,
+            type_id,
+            within=within,
+            limit=arguments.limit,
+            language=ctx.request.headers.get("accept-language", "zh"),
+        ),
+    )
+    return _metric_result(released, report)
+
+
 # ---------- proposing changes (spec 003, 9.4) ----------
 
 # Per access token and hour, and open at a time per owner.
@@ -749,6 +831,25 @@ TOOLS: dict[str, Tool] = {
             "objects:read",
             GetRelatedObjectsArguments,
             get_related_objects,
+        ),
+        Tool(
+            "evaluate_metric",
+            "Evaluate a metric",
+            "Calculate a published metric, optionally for a set of objects. " + _RELEASE,
+            "objects:read",
+            EvaluateMetricArguments,
+            evaluate_metric,
+            items=None,
+        ),
+        Tool(
+            "check_rules",
+            "Check rules",
+            "Check constraints on objects of a type and return violation counts and samples. "
+            + _RELEASE,
+            "objects:read",
+            CheckRulesArguments,
+            check_rules,
+            items="results",
         ),
         Tool(
             "propose_changes",
