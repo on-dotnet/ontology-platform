@@ -1,0 +1,68 @@
+{
+  "placeholder": "即将支持用业务问题查询已发布的数据，并查看答案依据。",
+  "question": "你的问题",
+  "ask": "提问",
+  "questionLimit": "问题最多可写 500 字。",
+  "recent": "我最近的问题",
+  "tryAsking": "试试问",
+  "example": "有哪些对象符合当前的质量要求？",
+  "progress": {
+    "plan": "计划",
+    "query": "查询",
+    "answer": "回答"
+  },
+  "queued": "等待回答",
+  "conclusion": "结论",
+  "facts": "事实",
+  "assumptions": "假设",
+  "counterpoints": "留意点",
+  "evidence": {
+    "title": "查看依据",
+    "elements": "本体元素",
+    "bindings": "数据绑定",
+    "steps": "查询步骤",
+    "rows": "答案对象",
+    "tail": "终点依据",
+    "documents": "资料出处",
+    "version": "依据版本 v{{version}}"
+  },
+  "unanswerable": "当前版本还答不了这个问题。",
+  "missingElements": "缺少的本体元素",
+  "missingBindings": "缺少的数据绑定",
+  "gapSource": "问答缺口",
+  "propose": "生成变更提议",
+  "bind": "去绑定数据",
+  "reviewProposal": "去审核变更提议",
+  "gapEmpty": "没有可提议的变更，请补充问题中的业务名称或关系。",
+  "askAgain": "再问一次",
+  "retry": "重试",
+  "publish": "去发布",
+  "settings": "去设置",
+  "rowsNotShared": "数据源未允许把结果行发给 AI，因此没有文字说明。你仍可查看事实和依据。",
+  "dataNotice": "允许取样本值时，回答涉及的结果行（最多 50 行）会发送给已配置的 AI 模型。",
+  "answerUnavailable": "暂时无法生成文字说明，可先查看事实和依据。",
+  "citedUnknown": "部分引用无法核实，已省略。",
+  "rowsTruncated": "只显示部分结果，合计数包含全部匹配记录。",
+  "errors": {
+    "http": {
+      "not_implemented": "此功能尚未开放，请稍后再试。"
+    },
+    "query": {
+      "no_release": "本体还没有发布，请先发布一个版本。",
+      "too_many_rows": "匹配的数据过多，请缩小问题范围或增加筛选条件。"
+    },
+    "ai": {
+      "not_configured": "AI 尚未配置，请联系管理员在设置中配置后再试。",
+      "unavailable": "AI 暂时无法回答，请稍后重试。",
+      "invalid_output": "未能得到可用的回答，请换一种问法后重试。"
+    },
+    "qa": {
+      "not_found": "找不到这个问题，请从最近问题中重新选择。",
+      "rate_limited": "当前提问过于频繁，请在 {{time}} 后再试。",
+      "invalid_plan": "无法按这些条件查询，请换一种问法或调整筛选条件。",
+      "too_many_queries": "这个问题涉及的数据关联过多，请缩小范围后重试。",
+      "timeout": "本次问答超时，请缩小问题范围后重试。",
+      "not_unanswerable": "只有缺少本体元素的问题才能生成变更提议，请查看问题的依据。"
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "placeholder": "即将支持计算已发布的指标，并查看违反约束的对象。",
+  "title": "指标",
+  "kind": "指标",
+  "name": "指标名称",
+  "definition": "指标定义",
+  "subject": "主体类型",
+  "aggregate": "聚合方式",
+  "aggregates": {
+    "count": "计数",
+    "sum": "求和",
+    "avg": "平均值",
+    "min": "最小值",
+    "max": "最大值",
+    "ratio": "占比"
+  },
+  "property": "计算属性",
+  "filters": "总体筛选条件",
+  "numerator": "分子筛选条件",
+  "decimals": "小数位数",
+  "percent": "显示为百分数",
+  "create": "新建指标",
+  "edit": "编辑指标",
+  "evaluate": "计算指标值",
+  "value": "指标值",
+  "population": "总体记录数",
+  "matched": "符合条件的记录数",
+  "emptyPopulation": "没有符合条件的记录，无法计算该指标值。",
+  "noMetrics": "当前版本还没有指标。",
+  "noConstraints": "这个对象类型还没有约束。",
+  "rules": "规则检查",
+  "chooseType": "选择对象类型",
+  "check": "检查规则",
+  "constraint": "约束",
+  "violations": "违反条数",
+  "objects": "违反约束的对象",
+  "expected": "要求值",
+  "actual": "实测值",
+  "unchecked": "未检查项",
+  "reasons": {
+    "path_not_property": "这项约束没有指定可检查的属性。",
+    "path_not_bound": "这个属性还没有绑定数据。",
+    "check_not_supported": "暂时无法检查这项要求。",
+    "value_mismatch": "数据值与约束要求的类型不一致。"
+  },
+  "errors": {
+    "query": {
+      "no_release": "本体还没有发布，请先发布一个版本再计算指标或检查规则。"
+    },
+    "changeset": {
+      "invalid_item": "指标变更未能保存，请检查定义后重试。"
+    },
+    "metric": {
+      "not_found": "当前版本没有这个指标，请重新选择。",
+      "invalid": "指标定义有误，请检查主体类型、计算属性和筛选条件。",
+      "too_many_rows": "计算涉及的记录过多，请增加筛选条件。"
+    }
+  }
+}

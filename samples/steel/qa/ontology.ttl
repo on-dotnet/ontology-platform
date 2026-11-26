@@ -1,0 +1,55 @@
+@prefix ex: <urn:synthetic:metals:> .
+@prefix platform: <https://w3id.org/ontology-platform/vocab#> .
+@prefix op: <urn:ontology-platform:vocabulary:> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+# 仅合成示例；通用运行时不含这些行业类。
+ex:Heat a owl:Class ; rdfs:label "炉次"@zh .
+ex:CastingSequence a owl:Class ; rdfs:label "浇次"@zh .
+ex:Slab a owl:Class ; rdfs:label "板坯"@zh .
+ex:RollingEvent a owl:Class ; rdfs:label "轧制事件"@zh .
+ex:Coil a owl:Class ; rdfs:label "钢卷"@zh .
+ex:castIn a owl:ObjectProperty ; rdfs:domain ex:Heat ; rdfs:range ex:CastingSequence ; rdfs:label "对应浇次"@zh .
+ex:producesSlab a owl:ObjectProperty ; rdfs:domain ex:CastingSequence ; rdfs:range ex:Slab ; rdfs:label "产出板坯"@zh .
+ex:rolledIn a owl:ObjectProperty ; rdfs:domain ex:Slab ; rdfs:range ex:RollingEvent ; rdfs:label "参与轧制"@zh .
+ex:producesCoil a owl:ObjectProperty ; rdfs:domain ex:RollingEvent ; rdfs:range ex:Coil ; rdfs:label "产出钢卷"@zh .
+op:externalId a owl:DatatypeProperty ; rdfs:range xsd:string .
+op:organizationId a owl:DatatypeProperty ; rdfs:range xsd:string .
+op:siteId a owl:DatatypeProperty ; rdfs:range xsd:string .
+op:synthetic a owl:DatatypeProperty ; rdfs:range xsd:boolean .
+op:weight a owl:DatatypeProperty ; rdfs:range xsd:decimal .
+
+ex:steelGrade a owl:DatatypeProperty ; rdfs:domain ex:Heat ; rdfs:range xsd:string ; rdfs:label "钢种"@zh .
+ex:coilStatus a owl:DatatypeProperty ; rdfs:domain ex:Coil ; rdfs:range xsd:string ; rdfs:label "状态"@zh .
+ex:thickness a owl:DatatypeProperty ; rdfs:domain ex:Coil ; rdfs:range xsd:decimal ; rdfs:label "厚度"@zh ; platform:unit "mm" .
+
+ex:QualityInspection a owl:Class ; rdfs:label "质量检验"@zh .
+ex:yieldStrength a owl:DatatypeProperty ; rdfs:domain ex:QualityInspection ; rdfs:range xsd:integer ;
+    rdfs:label "屈服强度"@zh ; platform:unit "MPa" .
+ex:tensileStrength a owl:DatatypeProperty ; rdfs:domain ex:QualityInspection ; rdfs:range xsd:integer ;
+    rdfs:label "抗拉强度"@zh ; platform:unit "MPa" .
+ex:elongation a owl:DatatypeProperty ; rdfs:domain ex:QualityInspection ; rdfs:range xsd:decimal ;
+    rdfs:label "断后伸长率"@zh ; platform:unit "%" .
+ex:impactEnergy a owl:DatatypeProperty ; rdfs:domain ex:QualityInspection ; rdfs:range xsd:integer ;
+    rdfs:label "冲击功"@zh ; platform:unit "J" .
+ex:passed a owl:DatatypeProperty ; rdfs:domain ex:QualityInspection ; rdfs:range xsd:boolean ; rdfs:label "是否合格"@zh .
+ex:inspectionDate a owl:DatatypeProperty ; rdfs:domain ex:QualityInspection ; rdfs:range xsd:date ; rdfs:label "检验日期"@zh .
+ex:inspects a owl:ObjectProperty ; rdfs:domain ex:QualityInspection ; rdfs:range ex:Coil ; rdfs:label "检验对象"@zh .
+
+ex:SteelGradeShape a sh:NodeShape ; sh:targetClass ex:Heat ; rdfs:label "钢种可选值"@zh ;
+    sh:property [ sh:path ex:steelGrade ; sh:in ("Q235B" "Q275B") ] .
+
+ex:YieldStrengthShape a sh:NodeShape ; sh:targetClass ex:QualityInspection ; rdfs:label "ReH ≥ 235"@zh ;
+    sh:property [ sh:path ex:yieldStrength ; sh:minInclusive 235 ; sh:message "资料 04 第 2 节：ReH ≥ 235 MPa。"@zh ] .
+ex:TensileStrengthShape a sh:NodeShape ; sh:targetClass ex:QualityInspection ; rdfs:label "370 ≤ Rm ≤ 500"@zh ;
+    sh:property [ sh:path ex:tensileStrength ; sh:minInclusive 370 ; sh:maxInclusive 500 ;
+        sh:message "资料 04 第 2 节：370 ≤ Rm ≤ 500 MPa。"@zh ] .
+ex:ElongationShape a sh:NodeShape ; sh:targetClass ex:QualityInspection ; rdfs:label "A ≥ 26"@zh ;
+    sh:property [ sh:path ex:elongation ; sh:minInclusive 26 ; sh:message "资料 04 第 2 节：A ≥ 26%。"@zh ] .
+ex:ImpactEnergyShape a sh:NodeShape ; sh:targetClass ex:QualityInspection ; rdfs:label "KV2 ≥ 27"@zh ;
+    sh:property [ sh:path ex:impactEnergy ; sh:minInclusive 27 ; sh:message "资料 04 第 2 节：KV2 ≥ 27 J。"@zh ] .
