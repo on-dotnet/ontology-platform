@@ -28,6 +28,7 @@ from ontology_platform.modules.ontology import (
     expert,
     importing,
     merge,
+    r2rml,
     releases,
     schemas,
     service,
@@ -514,6 +515,17 @@ async def export_release(
 ) -> Response:
     """The Turtle stored when the version was published."""
     turtle, filename = await releases.export_release(db, id)
+    return _turtle(turtle, filename)
+
+
+@router.get(
+    "/releases/{id}/r2rml",
+    response_class=TurtleResponse,
+    responses=problem_responses(401, 403, 404, 422),
+)
+async def export_release_r2rml(id: UUID, user: Creator, db: DbSession) -> Response:
+    """Download the R2RML mapping for this published version."""
+    turtle, filename = await r2rml.export_release(db, id)
     return _turtle(turtle, filename)
 
 
