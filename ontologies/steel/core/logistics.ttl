@@ -1,0 +1,193 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/core/logistics> a owl:Ontology ;
+    owl:versionIRI <ontology/core/logistics/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "钢铁本体：仓储与发运"@zh, "Steel ontology: storage and shipping"@en ;
+    rdfs:comment "描述库区与库位、搬运指令与实绩、库存核对以及发运交接。"@zh, "Describes storage positions, planned and confirmed movements, inventory reconciliation and shipment handover."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+# Storage and handling
+stl:Location a owl:Class ;
+    rdfs:label "位置"@zh, "Location"@en ; skos:prefLabel "位置"@zh, "Location"@en ;
+    skos:definition "可标识作业发生处、设备所在处或物料存放处的空间对象。"@zh, "An identifiable place where work occurs, equipment is situated or material is stored."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:StorageArea a owl:Class ; rdfs:subClassOf stl:Location ;
+    rdfs:label "库区"@zh, "Storage area"@en ; skos:prefLabel "库区"@zh, "Storage area"@en ;
+    skos:definition "仓库或堆场内用于组织库位和分派搬运设备的区域。"@zh, "A zone within a warehouse or yard that groups storage positions and the equipment assigned to serve them."@en ;
+    dcterms:source <std/ybt-4878-2020> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:StorageLocation a owl:Class ; rdfs:subClassOf stl:Location ;
+    rdfs:label "库位"@zh, "Storage location"@en ; skos:prefLabel "库位"@zh, "Storage location"@en ;
+    skos:definition "库区内可单独寻址并落放实物的位置，堆垛时可用行、列和层定位。"@zh, "An addressable place to deposit material in a storage area, identifiable by row, column and tier in a stack."@en ;
+    dcterms:source <std/ybt-4878-2020> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:Crane a owl:Class ; rdfs:subClassOf stl:Equipment ;
+    rdfs:label "天车"@zh, "Overhead crane"@en ; skos:prefLabel "天车"@zh, "Overhead crane"@en ;
+    skos:altLabel "桥式起重机"@zh, "bridge crane"@en ;
+    skos:definition "在吊起和落位事件之间实际承载并搬运物料的桥式起重设备。"@zh, "An overhead lifting asset carrying material between its pick-up and set-down events."@en ;
+    dcterms:source <std/wbt-1091-2018> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:MovementOrder a owl:Class ; rdfs:subClassOf stl:Plan ;
+    rdfs:label "移库指令"@zh, "Movement order"@en ; skos:prefLabel "移库指令"@zh, "Movement order"@en ;
+    skos:definition "为待移实物约定目的地和计划时段的指令。"@zh, "An instruction assigning a destination and planned window to a material move."@en ;
+    dcterms:source <std/wbt-1091-2018> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:MovementEvent a owl:Class ; rdfs:subClassOf stl:Event ;
+    rdfs:label "移动事件"@zh, "Movement event"@en ; skos:prefLabel "移动事件"@zh, "Movement event"@en ;
+    skos:definition "记录某件实物一次吊起、落位、装车或出厂动作及其发生时间的事件。"@zh, "A handling event identifying when a piece was lifted, set down, loaded or dispatched."@en ;
+    skos:scopeNote "按发生时间取最近的已确认事件。吊起后实物由执行天车承载，落位后以实际落点为库位，装车后可由发运单追到运输载具。"@zh, "Use the latest confirmed occurrence. After a lift the crane carries the piece, after set-down its location is the actual destination, and after loading its carrier can be traced through the shipment."@en ;
+    dcterms:source <std/wbt-1091-2018> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:locatedIn a owl:ObjectProperty ; rdfs:range stl:Location ;
+    rdfs:label "所属区域"@zh, "Located in"@en ; skos:prefLabel "所属区域"@zh, "Located in"@en ;
+    skos:definition "给出设备或库位归属的库区等空间位置。"@zh, "Identifies the containing place for a storage position or an assigned asset."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:row a owl:DatatypeProperty ; rdfs:domain stl:StorageLocation ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "库位行"@zh, "Storage row"@en ; skos:prefLabel "库位行"@zh, "Storage row"@en ;
+    skos:definition "记录库位在所属库区坐标系中的行序号。"@zh, "Gives the row ordinal of the position within its storage area."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:column a owl:DatatypeProperty ; rdfs:domain stl:StorageLocation ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "库位列"@zh, "Storage column"@en ; skos:prefLabel "库位列"@zh, "Storage column"@en ;
+    skos:definition "记录库位在所属库区坐标系中的列序号。"@zh, "Gives the column ordinal of the position within its storage area."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:tier a owl:DatatypeProperty ; rdfs:domain stl:StorageLocation ; rdfs:range xsd:positiveInteger ;
+    rdfs:label "库位层"@zh, "Storage tier"@en ; skos:prefLabel "库位层"@zh, "Storage tier"@en ;
+    skos:definition "记录库位所在的堆放层序号。"@zh, "Gives the storage tier ordinal of the position."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:movedPiece a owl:ObjectProperty ; rdfs:range stl:MaterialPiece ;
+    rdfs:label "移动实物"@zh, "Moved piece"@en ; skos:prefLabel "移动实物"@zh, "Moved piece"@en ;
+    skos:definition "指明指令所要搬运或事件中实际移动的实物件。"@zh, "Identifies the piece designated for a move or involved in the actual event."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:destination a owl:ObjectProperty ; rdfs:domain stl:MovementOrder ; rdfs:range stl:Location ;
+    rdfs:label "计划目的地"@zh, "Planned destination"@en ; skos:prefLabel "计划目的地"@zh, "Planned destination"@en ;
+    skos:definition "给出移库指令拟将物料送达的计划位置。"@zh, "Identifies the intended destination under the movement instruction."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:movementType a owl:ObjectProperty ; rdfs:domain stl:MovementEvent ; rdfs:range skos:Concept ;
+    rdfs:label "移动事件类型"@zh, "Movement event type"@en ; skos:prefLabel "移动事件类型"@zh, "Movement event type"@en ;
+    skos:definition "说明本次已发生的搬运动作在移动代码表中的类别。"@zh, "Identifies the type of physical movement documented by the event."@en ;
+    rdfs:seeAlso <code/movement-event-type> ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:eventLocation a owl:ObjectProperty ; rdfs:domain stl:MovementEvent ; rdfs:range stl:Location ;
+    rdfs:label "移动发生位置"@zh, "Movement event location"@en ; skos:prefLabel "移动发生位置"@zh, "Movement event location"@en ;
+    skos:definition "指向该次动作实际发生处，吊起时为起吊位置，落位时为到达位置。"@zh, "Identifies where the action occurred, giving the pick-up position for a lift or the actual destination for a set-down."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:isConfirmed a owl:DatatypeProperty ; rdfs:domain stl:MovementEvent ; rdfs:range xsd:boolean ;
+    rdfs:label "移动已确认"@zh, "Movement confirmed"@en ; skos:prefLabel "移动已确认"@zh, "Movement confirmed"@en ;
+    skos:definition "标明现场或业务记录是否已确认该次实际搬运。"@zh, "Indicates whether the actual movement has been confirmed."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+
+# Transport and delivery
+stl:TransportUnit a owl:Class ; rdfs:subClassOf stl:Equipment ;
+    rdfs:label "运输载具"@zh, "Transport unit"@en ; skos:prefLabel "运输载具"@zh, "Transport unit"@en ;
+    skos:definition "承载装运货物并可作为一次装运交接对象的运输设备。"@zh, "An identifiable carrier that holds goods during a shipment handover."@en ;
+    dcterms:source <std/wbt-1091-2018> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:LoadPosition a owl:Class ; rdfs:subClassOf stl:Location ;
+    rdfs:label "装载位置"@zh, "Load position"@en ; skos:prefLabel "装载位置"@zh, "Load position"@en ;
+    skos:definition "在特定运输载具内可定位某个交货单元的位置。"@zh, "An addressable position for a handling unit on an identified carrier."@en ;
+    dcterms:source <std/gbt-42230-2022> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:LoadingPlan a owl:Class ; rdfs:subClassOf stl:Plan ;
+    rdfs:label "装载计划"@zh, "Loading plan"@en ; skos:prefLabel "装载计划"@zh, "Loading plan"@en ;
+    skos:definition "将待运单元预分配到运输载具及其装载位置的计划。"@zh, "A plan assigning handling units to a transport vehicle and its load positions."@en ;
+    dcterms:source <std/wbt-1091-2018> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:Shipment a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "发运单"@zh, "Shipment"@en ; skos:prefLabel "发运单"@zh, "Shipment"@en ;
+    skos:definition "以发运单号归集一次对外交货及其所含包装件的凭证。"@zh, "A document identifying an outbound consignment and the packages handed over within it."@en ;
+    dcterms:source <std/wbt-1091-2018> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:ShipmentLine a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "发运明细"@zh, "Shipment line"@en ; skos:prefLabel "发运明细"@zh, "Shipment line"@en ;
+    skos:definition "把发运单中的一项货物、交付数量与对应订单行相联系的明细。"@zh, "A line associating a shipped item and delivered quantity with the corresponding order item."@en ;
+    skos:scopeNote "用 partOf 关联所属发运单，交货订单行由 deliveryOrderLine 指明。"@zh, "Use partOf to identify the shipment and deliveryOrderLine to identify the order item served."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:PackingList a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "装箱清单"@zh, "Packing list"@en ; skos:prefLabel "装箱清单"@zh, "Packing list"@en ;
+    skos:definition "在交接时列明各包装编号及所装成员的文件。"@zh, "A document listing package identifiers and their members at handover."@en ;
+    dcterms:source <std/wbt-1092-2018> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:DeliveryReceipt a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "收货凭证"@zh, "Delivery receipt"@en ; skos:prefLabel "收货凭证"@zh, "Delivery receipt"@en ;
+    skos:definition "由接收方确认本次交付内容、实收量和交接日期的凭证。"@zh, "A document acknowledging the items and quantities handed over to the recipient on a stated date."@en ;
+    dcterms:source <std/wbt-1091-2018> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:plannedLoadPosition a owl:ObjectProperty ; rdfs:domain stl:LoadingPlan ; rdfs:range stl:LoadPosition ;
+    rdfs:label "计划装载位置"@zh, "Planned load position"@en ; skos:prefLabel "计划装载位置"@zh, "Planned load position"@en ;
+    skos:definition "指明装载计划为待运货物安排的载具内位置。"@zh, "Identifies a position on the carrier assigned to goods by the loading plan."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:positionOnUnit a owl:ObjectProperty ; rdfs:domain stl:LoadPosition ; rdfs:range stl:TransportUnit ;
+    rdfs:label "装载位置所属载具"@zh, "Carrier of load position"@en ; skos:prefLabel "装载位置所属载具"@zh, "Carrier of load position"@en ;
+    skos:definition "标识提供这个装载位置的具体运输载具。"@zh, "Identifies the particular carrier on which this loading position is located."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:shippedPackage a owl:ObjectProperty ; rdfs:domain stl:Shipment ; rdfs:range stl:Package ;
+    rdfs:label "发运包装件"@zh, "Shipped package"@en ; skos:prefLabel "发运包装件"@zh, "Shipped package"@en ;
+    skos:definition "列明在该发运单下实际交运的有编号包装件。"@zh, "Identifies a numbered package dispatched under the shipment document."@en ;
+    dcterms:source <std/wbt-1091-2018> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:loadedOn a owl:ObjectProperty ; rdfs:domain stl:Shipment ; rdfs:range stl:TransportUnit ;
+    rdfs:label "装运载具"@zh, "Loaded carrier"@en ; skos:prefLabel "装运载具"@zh, "Loaded carrier"@en ;
+    skos:definition "给出承载本次发运货物的实际载具。"@zh, "Identifies a carrier physically loaded with goods for the shipment."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:accompaniedBy a owl:ObjectProperty ; rdfs:domain stl:Shipment ; rdfs:range stl:MillCertificate ;
+    rdfs:label "随货质量证明书"@zh, "Accompanied by certificate"@en ; skos:prefLabel "随货质量证明书"@zh, "Accompanied by certificate"@en ;
+    skos:definition "指出随本次发运一同交付的质量证明书。"@zh, "Identifies a mill certificate accompanying the consignment."@en ;
+    dcterms:source <std/gbt-247-2025> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:triggeredBy a owl:ObjectProperty ; rdfs:domain stl:MovementEvent ; rdfs:range stl:Shipment ;
+    rdfs:label "触发移动的发运单"@zh, "Triggered by shipment"@en ; skos:prefLabel "触发移动的发运单"@zh, "Triggered by shipment"@en ;
+    skos:definition "指明触发实际装车或出厂移动事件的发运单。"@zh, "Identifies the shipment document triggering the movement event."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:deliveryOrderLine a owl:ObjectProperty ; rdfs:domain stl:ShipmentLine ; rdfs:range stl:SalesOrderLine ;
+    rdfs:label "交货对应订单行"@zh, "Delivered order item"@en ; skos:prefLabel "交货对应订单行"@zh, "Delivered order item"@en ;
+    skos:definition "把一次发运明细对应到所履行的订货项目。"@zh, "Identifies the order item fulfilled by a particular shipment line."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:dispatchedMass a owl:DatatypeProperty ; rdfs:domain stl:ShipmentLine ; rdfs:range xsd:decimal ;
+    stl:unit unit:TONNE ; stl:quantityKind quantitykind:Mass ;
+    rdfs:label "发运质量"@zh, "Dispatched mass"@en ; skos:prefLabel "发运质量"@zh, "Dispatched mass"@en ;
+    skos:definition "记录该发运明细在交接时计入的实际净质量。"@zh, "Gives the actual net mass credited to the shipment line at handover."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:receivedShipment a owl:ObjectProperty ; rdfs:domain stl:DeliveryReceipt ; rdfs:range stl:Shipment ;
+    rdfs:label "签收发运单"@zh, "Shipment acknowledged"@en ; skos:prefLabel "签收发运单"@zh, "Shipment acknowledged"@en ;
+    skos:definition "指明收货凭证确认收到的发运单。"@zh, "Identifies the shipment acknowledged by a delivery receipt."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:receivedOn a owl:DatatypeProperty ; rdfs:domain stl:DeliveryReceipt ; rdfs:range xsd:date ;
+    rdfs:label "签收日期"@zh, "Receipt date"@en ; skos:prefLabel "签收日期"@zh, "Receipt date"@en ;
+    skos:definition "记录收货方确认接收本次交付的日期。"@zh, "Gives the date on which the recipient acknowledged the delivery."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+
+# Stock records
+stl:StockReceipt a owl:Class ; rdfs:subClassOf stl:Event ;
+    rdfs:label "入库接收事件"@zh, "Stock receipt"@en ; skos:prefLabel "入库接收事件"@zh, "Stock receipt"@en ;
+    skos:definition "以交接确认的时刻登记一批或一件物料被仓库接收的事件。"@zh, "An event marking confirmed receipt of a lot or piece into warehouse custody."@en ;
+    dcterms:source <std/wbt-1091-2018> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:StockIssue a owl:Class ; rdfs:subClassOf stl:Event ;
+    rdfs:label "出库交接事件"@zh, "Stock issue"@en ; skos:prefLabel "出库交接事件"@zh, "Stock issue"@en ;
+    skos:definition "以实际交接为准确认库存物料离开仓库保管的事件。"@zh, "An event documenting physical handover of stock out of warehouse custody."@en ;
+    dcterms:source <std/wbt-1091-2018> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:StockReservation a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "库存预留"@zh, "Stock reservation"@en ; skos:prefLabel "库存预留"@zh, "Stock reservation"@en ;
+    skos:definition "为指定需求锁定一定可用库存及有效期的记录。"@zh, "A time-bounded allocation of available stock to an identified demand."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:Stocktake a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "盘点作业"@zh, "Stocktake"@en ; skos:prefLabel "盘点作业"@zh, "Stocktake"@en ;
+    skos:definition "在一个盘点范围和截止时点核实实际库存的作业。"@zh, "An operation checking physical stock within a defined scope at a specified cut-off."@en ;
+    dcterms:source <std/ybt-4878-2020> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:StocktakeLine a owl:Class ; rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "盘点明细"@zh, "Stocktake line"@en ; skos:prefLabel "盘点明细"@zh, "Stocktake line"@en ;
+    skos:definition "记录一个盘点范围内某件或某批的账面量与实点量的明细。"@zh, "A line comparing book and counted stock for one lot or piece within a stocktake."@en ;
+    skos:scopeNote "用 partOf 指向盘点作业，账面量与实盘量须对应同一物料、位置和截止时点。"@zh, "Use partOf to identify the stocktake. Compare book and counted stock for the same material, location and cut-off."@en ;
+    dcterms:source <std/ybt-4878-2020> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:stockMaterial a owl:ObjectProperty ; rdfs:range stl:Material ;
+    rdfs:label "库存记录涉及物料"@zh, "Material in stock record"@en ; skos:prefLabel "库存记录涉及物料"@zh, "Material in stock record"@en ;
+    skos:definition "指明收发、预留或盘点记录所涉及的实际物料批或实物件。"@zh, "Identifies the actual lot or piece covered by a receipt, issue, reservation or stocktake entry."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:stockLocation a owl:ObjectProperty ; rdfs:range stl:Location ;
+    rdfs:label "库存记录对应位置"@zh, "Location in stock record"@en ; skos:prefLabel "库存记录对应位置"@zh, "Location in stock record"@en ;
+    skos:definition "指明一次收发交接或盘点明细以哪个库存位置为准。"@zh, "Identifies the stock location to which a receipt, issue or stocktake entry refers."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:bookMass a owl:DatatypeProperty ; rdfs:domain stl:StocktakeLine ; rdfs:range xsd:decimal ;
+    stl:unit unit:TONNE ; stl:quantityKind quantitykind:Mass ;
+    rdfs:label "账面质量"@zh, "Book stock mass"@en ; skos:prefLabel "账面质量"@zh, "Book stock mass"@en ;
+    skos:definition "记录同一盘点截止时点库存账载的质量。"@zh, "Gives the mass recorded in inventory at the same stocktake cut-off."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .
+stl:countedMass a owl:DatatypeProperty ; rdfs:domain stl:StocktakeLine ; rdfs:range xsd:decimal ;
+    stl:unit unit:TONNE ; stl:quantityKind quantitykind:Mass ;
+    rdfs:label "实盘质量"@zh, "Counted stock mass"@en ; skos:prefLabel "实盘质量"@zh, "Counted stock mass"@en ;
+    skos:definition "记录盘点时在所述位置实点确认的物料质量。"@zh, "Gives the physical stock mass established at the indicated location in a stocktake."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/core/logistics> .

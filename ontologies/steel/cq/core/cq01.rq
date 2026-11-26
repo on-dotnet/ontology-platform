@@ -1,0 +1,16 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+# Follow the target's genealogy, then list all material flows of each contributing execution.
+SELECT DISTINCT ?operationId ?segment ?started ?ended ?equipmentId ?inputId ?outputId WHERE {
+  <urn:synthetic:steel:materialpiece/P31> stl:derivedFrom*/stl:producedBy ?operation .
+  ?operation dcterms:identifier ?operationId ;
+             stl:executesSegment/rdfs:label ?segment ;
+             stl:actualStartAt ?started ; stl:actualEndAt ?ended ;
+             stl:performedOn/dcterms:identifier ?equipmentId ;
+             (stl:inputPiece|stl:consumedLot)/dcterms:identifier ?inputId ;
+             stl:outputPiece/dcterms:identifier ?outputId .
+  FILTER(LANGMATCHES(LANG(?segment), "zh"))
+}
+ORDER BY ?started ?operationId ?inputId ?outputId

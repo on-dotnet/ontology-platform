@@ -1,0 +1,232 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/core/shapes> a owl:Ontology ; owl:versionIRI <ontology/core/shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "核心层数据约束"@zh, "Core data constraints"@en ;
+    rdfs:comment "约束物料来源、作业时间、检验与物流记录的通用结构。"@zh, "Checks the shared structure of material provenance, execution times, inspection and movement records."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:CoreInstantShape a sh:PropertyShape ; sh:targetSubjectsOf stl:plannedStartAt, stl:plannedEndAt, stl:actualStartAt, stl:actualEndAt, stl:occurredAt, stl:createdAt, stl:recordedAt, stl:sampledAt, stl:resultAt ;
+    sh:path [ sh:alternativePath ( stl:plannedStartAt stl:plannedEndAt stl:actualStartAt stl:actualEndAt stl:occurredAt stl:createdAt stl:recordedAt stl:sampledAt stl:resultAt ) ] ; sh:datatype xsd:dateTime ; sh:pattern "(Z|[+-][0-9]{2}:[0-9]{2})$" ;
+    sh:severity sh:Violation ; rdfs:comment "每个时间点都应使用带时区的日期时间，便于跨班次和跨地点比较。"@zh .
+
+stl:CoreEventPlanTimesShape a sh:PropertyShape ; sh:targetClass stl:Event ;
+    sh:path [ sh:alternativePath ( stl:plannedStartAt stl:plannedEndAt ) ] ; sh:maxCount 0 ;
+    sh:severity sh:Violation ; rdfs:comment "执行和事件记录只记实绩，计划起止时间属于关联的计划。"@zh .
+
+stl:CorePlanActualTimesShape a sh:PropertyShape ; sh:targetClass stl:Plan ;
+    sh:path [ sh:alternativePath ( stl:actualStartAt stl:actualEndAt stl:occurredAt ) ] ; sh:maxCount 0 ;
+    sh:severity sh:Violation ; rdfs:comment "计划上的起止是安排时间，实际发生时刻应记录在执行或事件上。"@zh .
+
+stl:CoreCompositionBoundsShape a sh:PropertyShape ; sh:targetSubjectsOf stl:lowerLimit ;
+    sh:path stl:lowerLimit ; sh:lessThanOrEquals stl:upperLimit ;
+    sh:severity sh:Violation ; rdfs:comment "同一成分限值同时给出上下界时，下界应小于或等于上界。"@zh .
+
+stl:CoreMassShape a sh:PropertyShape ; sh:targetSubjectsOf stl:grossMass, stl:netMass, stl:theoreticalMass ;
+    sh:path [ sh:alternativePath ( stl:grossMass stl:netMass stl:theoreticalMass ) ] ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "实物件的毛重、净重和理论重量均应为非负十进制数。"@zh .
+
+stl:CoreSourceHeatShape a sh:PropertyShape ; sh:targetSubjectsOf stl:sourceHeat ;
+    sh:path stl:sourceHeat ; sh:class stl:Heat ;
+    sh:severity sh:Violation ; rdfs:comment "实物件记录的每个钢水来源都应指向炉次。"@zh .
+
+stl:CoreContributionInputShape a sh:PropertyShape ; sh:targetSubjectsOf stl:contributionInput ;
+    sh:path stl:contributionInput ; sh:class stl:Material ; sh:maxCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "一条份额明细的投入端至多指向一个来源物料。"@zh .
+
+stl:CoreContributionOutputShape a sh:PropertyShape ; sh:targetSubjectsOf stl:contributionOutput ;
+    sh:path stl:contributionOutput ; sh:class stl:Material ; sh:maxCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "同一条份额明细至多解释一个产出物料。"@zh .
+
+stl:CoreContributionEvidenceShape a sh:PropertyShape ; sh:targetClass stl:SourceContribution ;
+    sh:path stl:evidenceLevel ; sh:minCount 1 ; sh:maxCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "每条来源明细都应给出一个证据等级，份额未知时也可记录来源。"@zh .
+
+stl:CoreShareShape a sh:PropertyShape ; sh:targetSubjectsOf stl:share ;
+    sh:path stl:share ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 100.0 ;
+    sh:severity sh:Violation ; rdfs:comment "来源份额按百分数记录，取值从零到一百。"@zh .
+
+stl:CoreFractionBasisShape a sh:PropertyShape ; sh:targetSubjectsOf stl:share ;
+    sh:path stl:shareBasis ; sh:minCount 1 ; sh:maxCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "记录数值份额时应标明唯一的计算基准，供其他记录按相同口径比较。"@zh .
+
+stl:CoreSampleSourceShape a sh:PropertyShape ; sh:targetClass stl:Sample ;
+    sh:path stl:sampleOf ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "样品应能指回取样对象，混合样可记录多个来源。"@zh .
+
+stl:CoreObservedObjectShape a sh:PropertyShape ; sh:targetClass stl:Observation ;
+    sh:path stl:measuredObject ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "测量记录应指出被测对象。"@zh .
+
+stl:CoreObservationItemShape a sh:PropertyShape ; sh:targetClass stl:Observation ;
+    sh:path stl:measurementItem ; sh:minCount 1 ; sh:maxCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "一次观测应标明一个测量项。"@zh .
+
+stl:CoreObservationPointShape a sh:PropertyShape ; sh:targetClass stl:Observation ;
+    sh:path stl:measuredAtPoint ; sh:minCount 1 ; sh:class stl:MeasurementPoint ;
+    sh:severity sh:Violation ; rdfs:comment "现场观测应指向记录读数的测点。"@zh .
+
+stl:CoreObservationMethodShape a sh:PropertyShape ; sh:targetClass stl:Observation ;
+    sh:path stl:measurementMethod ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "应记录读数的采集方式。"@zh .
+
+stl:CoreObservationSampleTimeShape a sh:PropertyShape ; sh:targetClass stl:Observation ;
+    sh:path stl:sampledAt ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "观测应记录取得读数所代表样本或信号的时刻。"@zh .
+
+stl:CoreObservationResultTimeShape a sh:PropertyShape ; sh:targetClass stl:Observation ;
+    sh:path stl:resultAt ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "观测应记录可取得结果的时刻。"@zh .
+
+stl:CoreDecisionObjectShape a sh:PropertyShape ; sh:targetClass stl:QualityDecision ;
+    sh:path stl:assessedObject ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "判定应标明被评定的对象。"@zh .
+
+stl:CoreDecisionResultShape a sh:PropertyShape ; sh:targetClass stl:QualityDecision ;
+    sh:path stl:judgementResult ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "判定应记载结论，待判也应有相应的结果代码。"@zh .
+
+stl:CoreDecisionBasisShape a sh:PropertyShape ; sh:targetClass stl:QualityDecision ;
+    sh:path stl:assessedSpecification ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "判定应能追溯至所依据的规格。"@zh .
+
+stl:CoreDecisionTimeShape a sh:PropertyShape ; sh:targetClass stl:QualityDecision ;
+    sh:path stl:occurredAt ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "判定应记录作出结论的时刻。"@zh .
+
+stl:CoreMovementPieceShape a sh:PropertyShape ; sh:targetClass stl:MovementEvent ;
+    sh:path stl:movedPiece ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "移动事件应指明搬运的实物件。"@zh .
+
+stl:CoreMovementActionShape a sh:PropertyShape ; sh:targetClass stl:MovementEvent ;
+    sh:path stl:movementType ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "移动事件应标明执行的动作。"@zh .
+
+stl:CoreMovementTimeShape a sh:PropertyShape ; sh:targetClass stl:MovementEvent ;
+    sh:path stl:occurredAt ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "移动事件应记录现场发生时刻，以便还原实物位置。"@zh .
+
+stl:CoreConfirmationShape a sh:PropertyShape ; sh:targetSubjectsOf stl:isConfirmed ;
+    sh:path stl:isConfirmed ; sh:datatype xsd:boolean ;
+    sh:severity sh:Violation ; rdfs:comment "事件的确认状态应使用布尔值。"@zh .
+
+stl:CoreCertificatePieceShape a sh:PropertyShape ; sh:targetSubjectsOf stl:coversPiece ;
+    sh:path stl:coversPiece ; sh:class stl:MaterialPiece ;
+    sh:severity sh:Violation ; rdfs:comment "证明书逐件列出的交货对象应为实物件。"@zh .
+
+stl:CoreTestMethodShape a sh:PropertyShape ; sh:targetClass stl:MechanicalTest ;
+    sh:path stl:methodStandard ; sh:minCount 1 ;
+    sh:severity sh:Warning ; rdfs:comment "建议力学试验引用所用方法标准的版次，以便比较不同批次的结果。"@zh .
+
+stl:CoreReadingShape a sh:NodeShape ; sh:targetSubjectsOf stl:measurementItem ; sh:severity sh:Violation ;
+    rdfs:comment "核心测量项应使用对应的读数属性，同一观测不能混入另一测量项的读数。"@zh ;
+    sh:sparql [ sh:message "测量项与读数属性不一致。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX item: <https://w3id.org/ontology-platform/steel/code/measurement-item/>
+        SELECT DISTINCT $this WHERE {
+          { $this stl:measurementItem item:TEMP . BIND(stl:temperature AS ?expected) }
+          UNION { $this stl:measurementItem item:OXYACT . BIND(stl:activeOxygen AS ?expected) }
+          UNION { $this stl:measurementItem item:TENSILE . BIND(stl:tensileStrength AS ?expected) }
+          UNION { $this stl:measurementItem item:IMPACT . BIND(stl:impactEnergy AS ?expected) }
+          UNION { $this stl:measurementItem item:COATMASS . BIND(stl:coatingMass AS ?expected) }
+          UNION { $this stl:measurementItem item:THICKNESS . BIND(stl:thickness AS ?expected) }
+          UNION { $this stl:measurementItem item:WIDTH . BIND(stl:width AS ?expected) }
+          FILTER (NOT EXISTS { $this ?expected ?reading } ||
+                  EXISTS { $this ?actual ?other .
+                           FILTER (?actual IN (stl:temperature, stl:activeOxygen, stl:tensileStrength, stl:impactEnergy, stl:coatingMass, stl:thickness, stl:width) && ?actual != ?expected) })
+        }
+    """ ] .
+
+stl:CoreEquipmentTypeSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:equipmentType ;
+    sh:path skos:inScheme ; sh:hasValue <code/equipment-type> ;
+    sh:severity sh:Violation ; rdfs:comment "设备类型的取值应属于设备类型代码表。"@zh .
+
+stl:CoreProcessTypeSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:processType ;
+    sh:path skos:inScheme ; sh:hasValue <code/process-type> ;
+    sh:severity sh:Violation ; rdfs:comment "工序类型的取值应属于工序类型代码表。"@zh .
+
+stl:CoreProductFormSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:productForm ;
+    sh:path skos:inScheme ; sh:hasValue <code/product-form> ;
+    sh:severity sh:Violation ; rdfs:comment "产品形态的取值应属于产品形态代码表。"@zh .
+
+stl:CoreMaterialCategorySchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:materialCategory ;
+    sh:path skos:inScheme ; sh:hasValue <code/material-category> ;
+    sh:severity sh:Violation ; rdfs:comment "物料类别的取值应属于物料类别代码表。"@zh .
+
+stl:CoreElementSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:element ;
+    sh:path skos:inScheme ; sh:hasValue <code/chemical-element> ;
+    sh:severity sh:Violation ; rdfs:comment "元素项目的取值应属于元素项目代码表。"@zh .
+
+stl:CoreSampleTypeSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:sampleType ;
+    sh:path skos:inScheme ; sh:hasValue <code/sample-type> ;
+    sh:severity sh:Violation ; rdfs:comment "样品类型的取值应属于样品类型代码表。"@zh .
+
+stl:CoreAnalysisTypeSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:analysisType ;
+    sh:path skos:inScheme ; sh:hasValue <code/analysis-type> ;
+    sh:severity sh:Violation ; rdfs:comment "分析类型的取值应属于分析类型代码表。"@zh .
+
+stl:CoreTestTypeSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:testType ;
+    sh:path skos:inScheme ; sh:hasValue <code/test-type> ;
+    sh:severity sh:Violation ; rdfs:comment "试验类型的取值应属于试验类型代码表。"@zh .
+
+stl:CoreNdtMethodSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:ndtMethod ;
+    sh:path skos:inScheme ; sh:hasValue <code/ndt-method> ;
+    sh:severity sh:Violation ; rdfs:comment "无损检测方法的取值应属于无损检测方法代码表。"@zh .
+
+stl:CoreDefectTypeSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:defectType ;
+    sh:path skos:inScheme ; sh:hasValue <code/defect-type> ;
+    sh:severity sh:Violation ; rdfs:comment "缺陷类型的取值应属于缺陷类型代码表。"@zh .
+
+stl:CoreJudgementResultSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:judgementResult ;
+    sh:path skos:inScheme ; sh:hasValue <code/judgement-result> ;
+    sh:severity sh:Violation ; rdfs:comment "判定结果的取值应属于判定结果代码表。"@zh .
+
+stl:CoreDispositionTypeSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:dispositionType ;
+    sh:path skos:inScheme ; sh:hasValue <code/disposition-type> ;
+    sh:severity sh:Violation ; rdfs:comment "处置类型的取值应属于处置类型代码表。"@zh .
+
+stl:CoreInspectionDocumentTypeSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:inspectionDocumentType ;
+    sh:path skos:inScheme ; sh:hasValue <code/inspection-document-type> ;
+    sh:severity sh:Violation ; rdfs:comment "检验文件类型的取值应属于检验文件类型代码表。"@zh .
+
+stl:CoreSteelClassByCompositionSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:steelClassByComposition ;
+    sh:path skos:inScheme ; sh:hasValue <code/steel-class-composition> ;
+    sh:severity sh:Violation ; rdfs:comment "钢的化学成分分类的取值应属于钢的化学成分分类代码表。"@zh .
+
+stl:CoreSteelQualityClassSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:steelQualityClass ;
+    sh:path skos:inScheme ; sh:hasValue <code/steel-class-quality> ;
+    sh:severity sh:Violation ; rdfs:comment "钢的质量分类的取值应属于钢的质量分类代码表。"@zh .
+
+stl:CoreSteelUseClassSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:steelUseClass ;
+    sh:path skos:inScheme ; sh:hasValue <code/steel-class-use> ;
+    sh:severity sh:Violation ; rdfs:comment "钢的用途分类的取值应属于钢的用途分类代码表。"@zh .
+
+stl:CoreMeasurementItemSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:measurementItem ;
+    sh:path skos:inScheme ; sh:hasValue <code/measurement-item> ;
+    sh:severity sh:Violation ; rdfs:comment "测量项的取值应属于测量项代码表。"@zh .
+
+stl:CoreMeasurementMethodSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:measurementMethod ;
+    sh:path skos:inScheme ; sh:hasValue <code/measurement-method> ;
+    sh:severity sh:Violation ; rdfs:comment "测量方式的取值应属于测量方式代码表。"@zh .
+
+stl:CoreEvidenceLevelSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:evidenceLevel ;
+    sh:path skos:inScheme ; sh:hasValue <code/contribution-evidence> ;
+    sh:severity sh:Violation ; rdfs:comment "来源证据等级的取值应属于来源证据等级代码表。"@zh .
+
+stl:CoreShareBasisSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:shareBasis ;
+    sh:path skos:inScheme ; sh:hasValue <code/share-basis> ;
+    sh:severity sh:Violation ; rdfs:comment "份额基准的取值应属于份额基准代码表。"@zh .
+
+stl:CoreMovementTypeSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:movementType ;
+    sh:path skos:inScheme ; sh:hasValue <code/movement-event-type> ;
+    sh:severity sh:Violation ; rdfs:comment "移动事件类型的取值应属于移动事件类型代码表。"@zh .
+
+stl:CoreFormationDimensionSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:formationDimension ;
+    sh:path skos:inScheme ; sh:hasValue <code/lot-formation-dimension> ;
+    sh:severity sh:Violation ; rdfs:comment "组批规则引用的每个维度都应属于组批维度代码表。"@zh .

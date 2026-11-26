@@ -1,0 +1,22 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX move: <https://w3id.org/ontology-platform/steel/code/movement-event-type/>
+
+SELECT ?pieceId ?eventId ?action ?at ?currentPositionId WHERE {
+  VALUES ?piece { <urn:synthetic:steel:materialpiece/P31> }
+  ?piece dcterms:identifier ?pieceId .
+  ?event stl:movedPiece ?piece ; stl:isConfirmed true ; stl:occurredAt ?at ;
+         dcterms:identifier ?eventId ; stl:movementType/skos:notation ?action .
+  FILTER NOT EXISTS {
+    ?later stl:movedPiece ?piece ; stl:isConfirmed true ; stl:occurredAt ?laterAt .
+    FILTER(?laterAt > ?at)
+  }
+  OPTIONAL {
+    { ?event stl:movementType move:RELEASE ; stl:eventLocation ?position }
+    UNION { ?event stl:movementType move:LIFT ; stl:performedOn ?position }
+    UNION { ?event stl:movementType move:LOAD ; stl:triggeredBy/stl:loadedOn ?position }
+    ?position dcterms:identifier ?currentPositionId .
+  }
+}
+ORDER BY ?at ?eventId ?currentPositionId

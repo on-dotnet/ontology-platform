@@ -1,0 +1,13 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<ontology/core> a owl:Ontology ;
+    owl:versionIRI <ontology/core/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "钢铁冶金核心层"@zh, "Steel manufacturing core"@en ;
+    rdfs:comment "汇集跨工序共享的制造、物料、规格、质量、物流、代码、约束与标准书目。"@zh, "Collects the manufacturing, material, specification, quality and logistics vocabularies with their shared codes, constraints and bibliography."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> ;
+    owl:imports <ontology/core/manufacturing>, <ontology/core/material>, <ontology/core/specification>,
+        <ontology/core/quality>, <ontology/core/logistics>, <ontology/core/codes>,
+        <ontology/core/shapes>, <ontology/core/standards> .

@@ -1,0 +1,15 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?sampleId ?testId ?testType ?metric ?value ?unit ?decisionId ?judgement ?specificationId WHERE {
+  VALUES ?piece { <urn:synthetic:steel:materialpiece/P31> }
+  ?sample stl:sampleOf ?piece ; dcterms:identifier ?sampleId .
+  ?test stl:testedSample ?sample ; dcterms:identifier ?testId ;
+        stl:testType/skos:notation ?testType ; ?metric ?value .
+  ?metric stl:unit ?unit .
+  ?decision a stl:QualityDecision ; (stl:assessedObject|stl:assessedObject/stl:lotMember) ?piece ;
+            dcterms:identifier ?decisionId ; stl:judgementResult/skos:notation ?judgement ;
+            stl:assessedSpecification/dcterms:identifier ?specificationId .
+}
+ORDER BY ?sampleId ?testId ?metric ?decisionId
