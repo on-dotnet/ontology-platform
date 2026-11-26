@@ -152,7 +152,8 @@ async def test_a_type_its_properties_and_relations_are_bound_in_one_save(
     heat_binding = next(row for row in by_kind["type_binding"] if row.subject_id == s.heat.id)
     cast_binding = next(row for row in by_kind["type_binding"] if row.subject_id == s.cast.id)
     assert heat_binding.binding == table(s.mes)
-    assert heat_binding.local_name is None and heat_binding.label_zh is None
+    assert heat_binding.local_name is None
+    assert heat_binding.label_zh is None
     assert {(row.subject_id, row.parent_id) for row in by_kind["property_binding"]} == {
         (s.weight.id, heat_binding.id),
         (s.external_id.id, heat_binding.id),
@@ -711,7 +712,8 @@ async def test_a_merge_keeps_one_active_binding_per_type(
         ],
         apply=False,
     )
-    assert first.status_code == 200 and second.status_code == 200
+    assert first.status_code == 200
+    assert second.status_code == 200
 
     merged_first = await accept_and_merge(client, first.json()["changeSetId"])
     merged_second = await accept_and_merge(client, second.json()["changeSetId"])

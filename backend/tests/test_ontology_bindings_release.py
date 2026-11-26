@@ -84,7 +84,8 @@ async def test_a_release_holds_its_bindings_but_not_in_its_turtle(
     assert kinds.count("relation_binding") == 1
     heat_binding = next(row for row in snapshot if row["subjectId"] == str(s.heat.id))
     assert heat_binding["binding"] == table(s.mes)
-    assert heat_binding["localName"] is None and heat_binding["iri"] is None
+    assert heat_binding["localName"] is None
+    assert heat_binding["iri"] is None
 
 
 async def test_bindings_reach_a_release_only_once_merged_and_published(
@@ -99,16 +100,19 @@ async def test_bindings_reach_a_release_only_once_merged_and_published(
     while_open = (await publish(client, s.ontology, "未审核")).json()
     assert while_open["bindingCount"] == 0
     model = await ontology_bindings.bound_model(db, s.ontology.id)
-    assert model is not None and model.types == ()
+    assert model is not None
+    assert model.types == ()
 
     await accept_and_merge(client, pending.json()["changeSetId"])
     merged_only = await ontology_bindings.bound_model(db, s.ontology.id)
-    assert merged_only is not None and merged_only.types == ()
+    assert merged_only is not None
+    assert merged_only.types == ()
 
     published = (await publish(client, s.ontology, "绑定")).json()
     model = await ontology_bindings.bound_model(db, s.ontology.id)
     assert published["bindingCount"] == 5
-    assert model is not None and model.version == published["version"]
+    assert model is not None
+    assert model.version == published["version"]
     assert {bound.type_id for bound in model.types} == {s.heat.id, s.cast.id}
 
     activated = await client.post(
@@ -116,8 +120,10 @@ async def test_bindings_reach_a_release_only_once_merged_and_published(
     )
     assert activated.status_code == 200, activated.json()
     rolled_back = await ontology_bindings.bound_model(db, s.ontology.id)
-    assert rolled_back is not None and rolled_back.version == first["version"]
-    assert rolled_back.types == () and rolled_back.relations == ()
+    assert rolled_back is not None
+    assert rolled_back.version == first["version"]
+    assert rolled_back.types == ()
+    assert rolled_back.relations == ()
 
 
 async def test_without_a_release_there_is_no_bound_model(db: AsyncSession) -> None:
@@ -171,7 +177,8 @@ async def test_the_released_ontology_is_the_semantic_part_of_the_release(
     by_key = await ontology_bindings.released_ontology(db, s.ontology.key)
     by_text = await ontology_bindings.released_ontology(db, str(s.ontology.id))
 
-    assert by_id is not None and by_id == by_key == by_text
+    assert by_id is not None
+    assert by_id == by_key == by_text
     assert by_id.description == s.ontology.description
     assert (by_id.key, by_id.name, by_id.version) == ("steel", "钢铁冶金", release["version"])
     assert len(by_id.elements) == 9
@@ -375,14 +382,16 @@ async def test_the_binding_view_of_a_type_checks_the_catalog(
     by_property = {p.property_id: p for p in heat.properties}
     assert set(by_property) == {s.weight.id, s.external_id.id, s.batch_code.id, s.remark.id}
     weight = by_property[s.weight.id]
-    assert weight.inherited is False and weight.column is not None
+    assert weight.inherited is False
+    assert weight.column is not None
     assert (weight.column.column, weight.column.column_type, weight.column.check) == (
         "weight_t",
         "numeric(8,2)",
         "ok",
     )
     renamed = by_property[s.external_id.id].column
-    assert renamed is not None and renamed.check == "missing_column"
+    assert renamed is not None
+    assert renamed.check == "missing_column"
     assert by_property[s.batch_code.id].inherited is True
     assert by_property[s.batch_code.id].column is None
     [relation] = heat.relations
@@ -391,7 +400,8 @@ async def test_the_binding_view_of_a_type_checks_the_catalog(
         "out",
         s.cast.id,
     )
-    assert relation.join is not None and relation.join.check == "ok"
+    assert relation.join is not None
+    assert relation.join.check == "ok"
     assert heat.open_change_set_ids == [UUID(pending.json()["changeSetId"])]
     [cast_view] = [view for view in every if view.type_id == s.cast.id]
     assert [r.direction for r in cast_view.relations] == ["in"]
