@@ -155,6 +155,7 @@ const sourceTone: Record<ChangeSetSource, BadgeTone> = {
   manual: 'neutral',
   ai_binding: 'info',
   mcp: 'secondary',
+  ai_qa: 'info',
 };
 
 /** Where a change set comes from: document analysis, import, manual edits or the AI assistant. */

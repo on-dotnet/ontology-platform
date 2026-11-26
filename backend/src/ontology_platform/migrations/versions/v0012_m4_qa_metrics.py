@@ -143,16 +143,19 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.execute("DELETE FROM ontology.change_sets WHERE source = 'ai_qa'")
-    metrics = "(SELECT id FROM ontology.elements WHERE kind = 'metric')"
-    op.execute(
-        "DELETE FROM ontology.change_items"
-        f" WHERE kind = 'metric' OR target_element_id IN {metrics}"
-    )
     # No foreign key to a metric may survive, whatever kind the referring item has.
-    for column in ("applied_element_id", "match_element_id"):
-        op.execute(
-            f"UPDATE ontology.change_items SET {column} = NULL WHERE {column} IN {metrics}"
-        )
+    op.execute(
+        "DELETE FROM ontology.change_items WHERE kind = 'metric' OR target_element_id IN"
+        " (SELECT id FROM ontology.elements WHERE kind = 'metric')"
+    )
+    op.execute(
+        "UPDATE ontology.change_items SET applied_element_id = NULL WHERE applied_element_id IN"
+        " (SELECT id FROM ontology.elements WHERE kind = 'metric')"
+    )
+    op.execute(
+        "UPDATE ontology.change_items SET match_element_id = NULL WHERE match_element_id IN"
+        " (SELECT id FROM ontology.elements WHERE kind = 'metric')"
+    )
     op.execute("DELETE FROM ontology.elements WHERE kind = 'metric'")
     # Old readers validate every entry, including releases that contained no metrics.
     op.execute(
