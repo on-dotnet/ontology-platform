@@ -6,14 +6,16 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { elementName, useImpact, type ElementRef, type Impact } from '@/features/ontologies/api';
 import { CascadeList } from '@/features/ontology/element-impact';
 import { kindTone } from '@/features/ontology/element-list';
+import { directMetricRefs } from '@/features/ontology/metric-definition';
 import { cn } from '@/lib/cn';
 
 import type { ChangeItem } from './api';
 import type { RefContext } from './item-fields';
 
 /** Elements that refer to the target directly, each once. */
-function directRefs(impact: Impact): ElementRef[] {
-  const refs = [...impact.subtypes, ...impact.relations, ...impact.properties, ...impact.constraints, ...impact.axioms];
+function directRefs(impact: Impact, context: RefContext): ElementRef[] {
+  const refs = [...impact.subtypes, ...impact.relations, ...impact.properties, ...impact.constraints, ...impact.axioms,
+    ...directMetricRefs(impact, context.elementsById)];
   if (impact.inverse) refs.push(impact.inverse);
   return [...new Map(refs.map((ref) => [ref.id, ref])).values()];
 }
@@ -40,7 +42,7 @@ export function ItemImpact({ ontologyId, item, context }: ItemImpactProps) {
     <QueryState query={impact} loading={<Skeleton className="h-16 rounded-lg" />}>
       {(data) => {
         if (item.op === 'delete') return <CascadeList cascade={data.cascade} nameOf={nameOf} />;
-        const refs = directRefs(data);
+        const refs = directRefs(data, context);
         if (refs.length === 0) return <p className="text-sm text-muted-foreground">{t('review.impact.none')}</p>;
         const label = t('review.impact.referencedBy', { count: refs.length });
         return (

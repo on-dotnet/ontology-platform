@@ -14,6 +14,7 @@ import { cn } from '@/lib/cn';
 
 import { isStale, useSaveErrorMessage, useSaveEdits } from './edit-actions';
 import { kindTone } from './element-list';
+import { directMetricRefs } from './metric-definition';
 
 type CascadeEntry = Impact['cascade'][number];
 
@@ -36,7 +37,7 @@ interface ReferencedByProps {
   ontologyId: string;
   element: Pick<Element, 'id'>;
   /** Active elements, for names in the reader's language. */
-  all: readonly Element[] | undefined;
+  all: readonly Element[];
   onSelect: (id: string) => void;
 }
 
@@ -45,7 +46,7 @@ export function ReferencedBy({ ontologyId, element, all, onSelect }: ReferencedB
   const { t, i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? i18n.language;
   const impact = useImpact(ontologyId, element.id);
-  const byId = new Map((all ?? []).map((item) => [item.id, item]));
+  const byId = new Map(all.map((item) => [item.id, item]));
   return (
     <QueryState query={impact} loading={<Skeleton className="h-16 rounded-lg" />}>
       {(data) => {
@@ -54,6 +55,7 @@ export function ReferencedBy({ ontologyId, element, all, onSelect }: ReferencedB
           { key: 'relations', refs: data.relations },
           { key: 'properties', refs: data.properties },
           { key: 'constraints', refs: data.constraints },
+          { key: 'metrics', refs: directMetricRefs(data, byId) },
           { key: 'axioms', refs: data.axioms },
           { key: 'bindings', refs: data.bindings ?? [] },
           { key: 'inverse', refs: data.inverse ? [data.inverse] : [] },
@@ -63,7 +65,9 @@ export function ReferencedBy({ ontologyId, element, all, onSelect }: ReferencedB
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
             {groups.map((group) => (
               <div key={group.key} className="contents">
-                <dt className="text-muted-foreground">{t(`ontologyPage.impact.groups.${group.key}`, { count: group.refs.length })}</dt>
+                <dt className="text-muted-foreground">
+                  {t(group.key === 'metrics' ? 'ontologyMetric.references' : `ontologyPage.impact.groups.${group.key}`, { count: group.refs.length })}
+                </dt>
                 <dd className="flex min-w-0 flex-wrap gap-x-3 gap-y-1">
                   {group.refs.map((ref) =>
                     // Bindings have no detail panel of their own: they are shown in their type's.
