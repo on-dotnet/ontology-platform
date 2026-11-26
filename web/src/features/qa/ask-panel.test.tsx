@@ -80,13 +80,15 @@ it('submits once, refreshes history, polls the three stages and stops at an answ
 it('opens a history item and resumes polling the newest on return', async () => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
   const items = [queued, { ...answered, id: 'older', question: '上周的产量？' }];
-  const api = qaServer(items);
+  const api = qaServer(items, {
+    'GET /api/ontologies/:id/metrics': () => ({ release: { id: 'release-3', version: 3 }, items: [] }),
+  });
   renderApp(askTab);
   expect(await screen.findByRole('heading', { name: queued.question })).toBeVisible();
   fireEvent.click(screen.getByRole('button', { name: /上周的产量/ }));
   expect(await screen.findByRole('heading', { name: '上周的产量？' })).toBeVisible();
   fireEvent.click(screen.getByRole('tab', { name: '指标与规则' }));
-  await screen.findByText(i18n.t('metrics.placeholder'));
+  await within(screen.getByRole('tabpanel', { name: '指标与规则' })).findByRole('heading', { name: '指标' });
   const before = api.calls('GET', detailPath).length;
   await tick();
   expect(api.calls('GET', detailPath)).toHaveLength(before);
