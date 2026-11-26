@@ -4,6 +4,7 @@ import {
   ArrowRightLeft,
   Box,
   Braces,
+  Calculator,
   ChevronDown,
   Download,
   Ellipsis,
@@ -62,6 +63,7 @@ const kindIcons: Record<FormKind, LucideIcon> = {
   relation_type: ArrowRightLeft,
   property: Tag,
   constraint: ShieldCheck,
+  metric: Calculator,
 };
 
 interface OntologyPageProps {

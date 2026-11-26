@@ -307,6 +307,9 @@ function NameCell({ element, language, nameOf, showSubject, onSelect }: NameCell
     const target = nameOf(element.domainId);
     // Nothing while names load: "unknown type" would be wrong for a moment.
     detail = target === null ? null : t('ontologyPage.list.target', { name: target ?? t('review.unknownType') });
+  } else if (element.kind === 'metric') {
+    const subject = nameOf(element.subjectId);
+    detail = subject ? t('ontologyMetric.listSubject', { name: subject }) : null;
   } else if (isAxiom && showSubject) {
     const subject = nameOf(element.subjectId);
     detail = subject ? t('ontologyPage.list.subject', { name: subject }) : null;

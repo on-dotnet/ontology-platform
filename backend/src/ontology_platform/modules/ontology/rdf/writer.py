@@ -269,7 +269,8 @@ def build_graph(
     graph = Graph(bind_namespaces="none")
     _header(graph, state, version, created)
     for element in sorted(state.active_elements(), key=lambda e: e.iri):
-        _element_triples(graph, state, element)
+        if element.kind != "metric":
+            _element_triples(graph, state, element)
     _auto_shapes(graph, state)
     if axioms is None:
         for axiom in state.axioms:

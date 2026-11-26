@@ -25,7 +25,7 @@ from ontology_platform.modules.connectors import service as connectors
 from ontology_platform.modules.connectors.schemas import CatalogTableCopy
 from ontology_platform.modules.connectors.service import TableUsage
 from ontology_platform.modules.connectors.statements import TableRef
-from ontology_platform.modules.ontology import binding_rules, rules, schemas, service
+from ontology_platform.modules.ontology import binding_rules, releases, rules, schemas, service
 from ontology_platform.modules.ontology.models import (
     BINDING_KINDS,
     SEMANTIC_KINDS,
@@ -599,7 +599,24 @@ class ReleasedMetrics:
 
 
 async def released_metrics(db: AsyncSession, ontology_id: UUID) -> ReleasedMetrics:
-    raise NotImplementedError
+    release, elements = await releases.metric_elements(db, ontology_id)
+    return ReleasedMetrics(
+        release=release,
+        metrics=tuple(
+            MetricCopy(
+                id=element.id,
+                local_name=element.local_name,
+                label_zh=element.label_zh,
+                label_en=element.label_en,
+                definition_zh=element.definition_zh,
+                definition_en=element.definition_en,
+                subject_id=element.subject_id,
+                unit=element.unit,
+                metric=element.metric,
+            )
+            for element in elements
+        ),
+    )
 
 
 async def _release_in_effect(

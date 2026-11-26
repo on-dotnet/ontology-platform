@@ -87,6 +87,8 @@ M3_PATHS = {
 
 ONTOLOGY = "/api/ontologies/{id}"
 CQ = "/competency-questions"
+# What an authorized caller gets from operations that are no longer stubs (nothing released yet).
+M4_IMPLEMENTED = {f"{ONTOLOGY}/objects/traverse": (409, "query.no_release")}
 M4_OPERATIONS = {
     f"{ONTOLOGY}/objects/traverse": {"post": 200},
     f"{ONTOLOGY}/metrics": {"get": 200},
@@ -197,7 +199,7 @@ async def test_m4_stub_permissions(client: AsyncClient, db: AsyncSession, caller
             elif detail and caller in ("viewer", "reviewer"):
                 assert_problem(response, 404, "qa.not_found")
             else:
-                assert_problem(response, 501, "http.not_implemented")
+                assert_problem(response, *M4_IMPLEMENTED.get(path, (501, "http.not_implemented")))
     if caller in ("viewer", "editor", "reviewer", "admin"):
         response = await client.get(f"/api/ontologies/{ontology.id}/qa/questions?askedBy=all")
         if caller == "admin":

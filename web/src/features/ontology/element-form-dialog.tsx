@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
+import { isApiError } from '@/api/errors';
 import { DATATYPES, elementName, ontologyKeys, useElementDetail, useElements, type Element, type EditItem } from '@/features/ontologies/api';
 import { useErrorMessage } from '@/i18n/error-message';
 
@@ -35,6 +36,7 @@ import {
   type RuleForm,
 } from './element-form';
 import { RuleEditor } from './rule-editor';
+import { MetricEditor, metricProperties, validateMetric } from './metric-editor';
 
 /** A new element of a kind, or an existing element to change. */
 export type FormTarget = { kind: FormKind; elementId?: undefined } | { kind?: undefined; elementId: string };
@@ -159,8 +161,11 @@ function ElementFormBody({ ontologyId, kind, element: current, elements, onDone,
   const [reloading, setReloading] = useState(false);
   // The local name follows the English name until the user types one of their own.
   const [ownLocalName, setOwnLocalName] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [numeratorOpen, setNumeratorOpen] = useState(false);
+  const unfinishedFilter = filtersOpen || (form.metric.aggregate === 'ratio' && numeratorOpen);
 
-  const dirty = JSON.stringify(form) !== JSON.stringify(initial);
+  const dirty = unfinishedFilter || JSON.stringify(form) !== JSON.stringify(initial);
   useEffect(() => onDirtyChange(dirty), [dirty, onDirtyChange]);
 
   const mode: FormMode = { kind, creating: !element, imported: element?.explicitIri ?? false, autoShape: element?.autoShape ?? true };
@@ -171,6 +176,9 @@ function ElementFormBody({ ontologyId, kind, element: current, elements, onDone,
     return path?.kind === 'property' ? path.datatype : null;
   };
   const errors = validateElementForm(mode, form, pathDatatype);
+  const properties = kind === 'metric' ? metricProperties(elements, form.subjectRef, language) : [];
+  if (kind === 'metric') Object.assign(errors, validateMetric(byId.get(form.subjectRef), form.metric, properties));
+  if (unfinishedFilter) errors.filterDraft = 'ontologyMetric.finishFilter';
   const errorKeys = Object.keys(errors);
 
   const fieldId = (key: string) => `${baseId}-${key.replace(/[^A-Za-z0-9_-]/g, '-')}`;
@@ -225,7 +233,8 @@ function ElementFormBody({ ontologyId, kind, element: current, elements, onDone,
     }
   };
 
-  const title = element ? t('ontologyPage.form.editTitle', { name: elementName(element, language) || '—' }) : t(`ontologyPage.form.createTitle.${kind}`);
+  const title = element ? t('ontologyPage.form.editTitle', { name: elementName(element, language) || '—' })
+    : t(kind === 'metric' ? 'ontologyMetric.create' : `ontologyPage.form.createTitle.${kind}`);
 
   // ---------- controls ----------
 
@@ -257,7 +266,7 @@ function ElementFormBody({ ontologyId, kind, element: current, elements, onDone,
     />
   );
 
-  const refSelect = (name: 'parentRef' | 'domainRef' | 'rangeRef' | 'inverseRef', options: readonly Element[], emptyLabel: string) => {
+  const refSelect = (name: 'parentRef' | 'domainRef' | 'rangeRef' | 'inverseRef' | 'subjectRef', options: readonly Element[], emptyLabel: string) => {
     const value = form[name];
     const known = value === '' || options.some((option) => option.id === value);
     return (
@@ -341,7 +350,7 @@ function ElementFormBody({ ontologyId, kind, element: current, elements, onDone,
     <>
       <DialogTitle>{title}</DialogTitle>
       <DialogDescription>{apply ? t('ontologyPage.form.appliesDescription') : t('ontologyPage.form.reviewDescription')}</DialogDescription>
-      <form noValidate onSubmit={handleSubmit} className="mt-5 space-y-4">
+      <form id={baseId} noValidate onSubmit={handleSubmit} className="mt-5 space-y-4">
         {submitted && errorKeys.length > 0 ? (
           <InlineNotice tone="error">{t('review.edit.validationSummary', { count: errorKeys.length })}</InlineNotice>
         ) : null}
@@ -362,7 +371,7 @@ function ElementFormBody({ ontologyId, kind, element: current, elements, onDone,
             </InlineNotice>
           ) : (
             <InlineNotice tone="error" title={t('ontologyPage.form.failedTitle')}>
-              {message(mutation.error)}
+              {isApiError(mutation.error) && mutation.error.code === 'metric.invalid' ? t('ontologyMetric.invalid') : message(mutation.error)}
             </InlineNotice>
           )
         ) : null}
@@ -416,6 +425,7 @@ function ElementFormBody({ ontologyId, kind, element: current, elements, onDone,
             refSelect('domainRef', types, t('review.edit.chooseType')),
           )}
           {field('rangeRef', t('review.fields.rangeRef'), refSelect('rangeRef', types, t('review.edit.chooseType')))}
+          {field('subjectRef', t('ontologyMetric.subject'), refSelect('subjectRef', types, t('review.edit.chooseType')))}
           {field('inverseRef', t('review.fields.inverseRef'), refSelect('inverseRef', inverseOptions, t('ontologyPage.form.noInverse')))}
           {field(
             'datatype',
@@ -471,13 +481,20 @@ function ElementFormBody({ ontologyId, kind, element: current, elements, onDone,
           />
         ) : null}
 
-        <div className="flex justify-end gap-2 pt-2">
-          <DialogClose className={buttonVariants({ variant: 'secondary' })}>{t('common.cancel')}</DialogClose>
-          <Button type="submit" loading={mutation.isPending}>
-            {apply ? t('ontologyPage.edit.save') : t('ontologyPage.edit.submitForReview')}
-          </Button>
-        </div>
       </form>
+      {kind === 'metric' && (
+        <div className="mt-4 space-y-2">
+          <MetricEditor key={form.subjectRef} metric={form.metric} properties={properties} onChange={(metric) => set('metric', metric)} fieldId={fieldId}
+            errorFor={errorFor} onTouch={touch} onFiltersOpen={setFiltersOpen} onNumeratorOpen={setNumeratorOpen} />
+          {errorFor('filterDraft') && <p id={fieldId('filterDraft')} tabIndex={-1} className="text-sm text-error-strong">{errorFor('filterDraft')}</p>}
+        </div>
+      )}
+      <div className="mt-4 flex justify-end gap-2 pt-2">
+        <DialogClose className={buttonVariants({ variant: 'secondary' })}>{t('common.cancel')}</DialogClose>
+        <Button form={baseId} type="submit" loading={mutation.isPending}>
+          {apply ? t('ontologyPage.edit.save') : t('ontologyPage.edit.submitForReview')}
+        </Button>
+      </div>
     </>
   );
 }
