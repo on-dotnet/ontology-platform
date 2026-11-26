@@ -189,3 +189,11 @@ move:V13 a stl:MovementEvent ; dcterms:identifier "V13" ; stl:movedPiece piece:P
 move:V14 a stl:MovementEvent ; dcterms:identifier "V14" ; stl:movedPiece piece:P32 ;
     stl:movementType <code/movement-event-type/LIFT> ; stl:performedOn crane:CRCY11 ; stl:eventLocation loc:CY1-01011 ;
     stl:occurredAt "2026-11-19T03:16:00+08:00"^^xsd:dateTime ; stl:isConfirmed true .
+
+<urn:synthetic:steel:transportunit/TR1> a stl:TransportUnit ; dcterms:identifier "TR1" .
+<urn:synthetic:steel:shipment/F26000001> a stl:Shipment ; dcterms:identifier "F26000001" ;
+    stl:loadedOn <urn:synthetic:steel:transportunit/TR1> .
+move:V15 a stl:MovementEvent ; dcterms:identifier "V15" ; stl:movedPiece piece:P40 ;
+    stl:movementType <code/movement-event-type/LOAD> ; stl:eventLocation loc:CY1-01031 ;
+    stl:triggeredBy <urn:synthetic:steel:shipment/F26000001> ; stl:isConfirmed true ;
+    stl:occurredAt "2026-11-19T04:00:00+08:00"^^xsd:dateTime .

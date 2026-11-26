@@ -1,0 +1,42 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX mat: <https://w3id.org/ontology-platform/steel/code/material-category/>
+
+SELECT DISTINCT ?furnaceId ?category ?lotId ?item ?value ?unit WHERE {
+  VALUES ?furnace { <urn:synthetic:steel:equipment/BF1> }
+  ?furnace dcterms:identifier ?furnaceId .
+  VALUES (?dayStart ?dayEnd) { ("2026-11-18T00:00:00+08:00"^^xsd:dateTime "2026-11-19T00:00:00+08:00"^^xsd:dateTime) }
+  {
+    ?run a/rdfs:subClassOf* stl:BlastFurnaceOperation ; stl:performedOn ?furnace .
+    ?charge a/rdfs:subClassOf* stl:BlastFurnaceCharging ; stl:partOf+ ?run ; stl:actualStartAt ?started .
+    BIND(?started AS ?ended)
+  } UNION {
+    # Without individual charge times, use only runs wholly attributable to this day.
+    ?charge a/rdfs:subClassOf* stl:BlastFurnaceOperation ; stl:performedOn ?furnace ;
+            stl:actualStartAt ?started ; stl:actualEndAt ?ended .
+  }
+  FILTER (?started >= ?dayStart && ?started < ?dayEnd && ?ended >= ?started && ?ended <= ?dayEnd)
+  ?charge (stl:consumedLot|^stl:allocationOperation/stl:allocatedLot) ?lot .
+  VALUES (?kind ?class) { (mat:COKE stl:Coke) (mat:SINTER stl:Sinter) (mat:PELLET stl:Pellet) }
+  FILTER (EXISTS { ?lot stl:materialCategory ?kind } || EXISTS { ?lot a/rdfs:subClassOf* ?class })
+  ?lot dcterms:identifier ?lotId .
+  ?kind skos:notation ?category .
+  OPTIONAL {
+    {
+      ?analysis a stl:ChemicalAnalysis ; stl:testedSample/stl:sampleOf ?lot .
+      ?result a stl:ElementResult ; stl:partOf ?analysis ; stl:element/skos:notation ?element ; stl:massFraction ?value .
+      BIND(STR(?element) AS ?item)
+      stl:massFraction stl:unit ?unitIri .
+    } UNION {
+      VALUES ?metric { stl:cokeReactivityIndex stl:cokeStrengthAfterReaction stl:sinterBasicity stl:oreTumbleIndex }
+      ?lot ?metric ?value .
+      ?metric stl:unit ?unitIri .
+      BIND(STRAFTER(STR(?metric), STR(stl:)) AS ?item)
+    }
+    BIND(STRAFTER(STR(?unitIri), "http://qudt.org/vocab/unit/") AS ?unit)
+  }
+}
+ORDER BY STR(?category) ?lotId ?item ?value

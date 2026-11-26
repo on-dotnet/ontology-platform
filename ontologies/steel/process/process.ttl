@@ -1,0 +1,14 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+<ontology/process> a owl:Ontology ;
+    owl:versionIRI <ontology/process/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "钢铁冶金通用工艺层"@zh, "Common steelmaking processes"@en ;
+    rdfs:comment "普钢和特钢共用的炼铁、炼钢和铸造工序，以及这些工序使用的代码和数据约束。"@zh,
+        "Ironmaking, steelmaking and casting operations shared across steel grades, with their codes and data constraints."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> ;
+    owl:imports <ontology/process/ironmaking>, <ontology/process/ironmaking-codes>, <ontology/process/ironmaking-shapes>,
+        <ontology/process/steelmaking>, <ontology/process/steelmaking-codes>, <ontology/process/steelmaking-shapes>,
+        <ontology/process/casting>, <ontology/process/casting-codes>, <ontology/process/casting-shapes> .

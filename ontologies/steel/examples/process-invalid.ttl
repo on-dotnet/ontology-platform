@@ -1,0 +1,73 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# EXPECT <urn:synthetic:steel:hotmetal/B90> <https://w3id.org/ontology-platform/steel/HotMetalTapShape> MinCountConstraintComponent
+<urn:synthetic:steel:hotmetal/B90> a stl:HotMetal .
+
+# EXPECT <urn:synthetic:steel:blastfurnacetapping/T90> <https://w3id.org/ontology-platform/steel/TapBlastFurnaceShape> HasValueConstraintComponent
+# EXPECT <urn:synthetic:steel:blastfurnacetapping/T90> <https://w3id.org/ontology-platform/steel/TappedHotMetalMassShape> MinInclusiveConstraintComponent
+<urn:synthetic:steel:blastfurnacetapping/T90> a stl:BlastFurnaceTapping ; stl:tappedHotMetalMass -0.5 .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/equipment-type/BF> <https://w3id.org/ontology-platform/steel/PretreatmentMethodSchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:hotmetalpretreatment/P90> a stl:HotMetalPretreatment ; stl:pretreatmentMethod <code/equipment-type/BF> .
+
+# EXPECT <urn:synthetic:steel:heat/H90> <https://w3id.org/ontology-platform/steel/SteelmakingHeatOriginShape> QualifiedMinCountConstraintComponent
+<urn:synthetic:steel:heat/H90> a stl:Heat ; prov:wasGeneratedBy <urn:synthetic:steel:tapping/T91> .
+<urn:synthetic:steel:tapping/T91> a stl:Tapping .
+
+# EXPECT <urn:synthetic:steel:refining/R90> <https://w3id.org/ontology-platform/steel/SteelmakingRefiningHeatShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:refining/R90> <https://w3id.org/ontology-platform/steel/SteelmakingRefiningMethodShape> MinCountConstraintComponent
+<urn:synthetic:steel:refining/R90> a stl:Refining .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/equipment-type/LF> <https://w3id.org/ontology-platform/steel/SteelmakingRefiningMethodSchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:refining/R91> a stl:Refining ; stl:processedHeat <urn:synthetic:steel:heat/H90> ;
+    stl:refiningMethod <code/equipment-type/LF> .
+
+# EXPECT <urn:synthetic:steel:chargecomponent/L90> <https://w3id.org/ontology-platform/steel/SteelmakingChargeLotShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:chargecomponent/L90> <https://w3id.org/ontology-platform/steel/SteelmakingChargeOperationShape> MinCountConstraintComponent
+<urn:synthetic:steel:chargecomponent/L90> a stl:ChargeComponent .
+
+# EXPECT <urn:synthetic:steel:continuouslycastpiece/B91> <https://w3id.org/ontology-platform/steel/CastPieceSourceHeatShape> MinCountConstraintComponent
+<urn:synthetic:steel:continuouslycastpiece/B91> a stl:ContinuouslyCastPiece .
+
+# EXPECT <urn:synthetic:steel:slab/B92> <https://w3id.org/ontology-platform/steel/CastPieceSourceHeatShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:slab/B92> <https://w3id.org/ontology-platform/steel/CastNumberingHeatShape> MinCountConstraintComponent
+<urn:synthetic:steel:slab/B92> a stl:Slab ; stl:producedBy <urn:synthetic:steel:cutting/C92> ;
+    stl:sequenceInStrand "1"^^xsd:positiveInteger .
+<urn:synthetic:steel:cutting/C92> a stl:Cutting ; stl:partOf <urn:synthetic:steel:continuouscasting/C92> .
+<urn:synthetic:steel:continuouscasting/C92> a stl:ContinuousCasting .
+
+# EXPECT <urn:synthetic:steel:slab/B93> <https://w3id.org/ontology-platform/steel/CastNumberingHeatShape> MaxCountConstraintComponent
+<urn:synthetic:steel:slab/B93> a stl:Slab ; stl:numberingHeat <urn:synthetic:steel:heat/H91>, <urn:synthetic:steel:heat/H92> .
+
+# EXPECT <urn:synthetic:steel:castsequence/Q90> <https://w3id.org/ontology-platform/steel/CastSequenceCasterShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:castsequence/Q90> <https://w3id.org/ontology-platform/steel/CastSequenceUniquePositionShape> SPARQLConstraintComponent
+<urn:synthetic:steel:castsequence/Q90> a stl:CastSequence .
+<urn:synthetic:steel:steelmaking/M91> a stl:Steelmaking .
+<urn:synthetic:steel:steelmaking/M92> a stl:Steelmaking .
+<urn:synthetic:steel:heat/H91> a stl:Heat ; prov:wasGeneratedBy <urn:synthetic:steel:steelmaking/M91> ;
+    stl:castIn <urn:synthetic:steel:castsequence/Q90> ; stl:heatPositionInSequence "1"^^xsd:positiveInteger .
+<urn:synthetic:steel:heat/H92> a stl:Heat ; prov:wasGeneratedBy <urn:synthetic:steel:steelmaking/M92> ;
+    stl:castIn <urn:synthetic:steel:castsequence/Q90> ; stl:heatPositionInSequence "01"^^xsd:positiveInteger .
+
+# EXPECT <urn:synthetic:steel:heat/H90> <https://w3id.org/ontology-platform/steel/CastHeatPositionShape> MinCountConstraintComponent
+<urn:synthetic:steel:heat/H90> stl:castIn <urn:synthetic:steel:castsequence/Q90> .
+
+# EXPECT <urn:synthetic:steel:ingotcasting/M90> <https://w3id.org/ontology-platform/steel/IngotTeemingMethodShape> MinCountConstraintComponent
+<urn:synthetic:steel:ingotcasting/M90> a stl:IngotCasting .
+# EXPECT <urn:synthetic:steel:ingot/G90> <https://w3id.org/ontology-platform/steel/CastIngotMouldShape> SPARQLConstraintComponent
+<urn:synthetic:steel:ingot/G90> a stl:Ingot ; stl:producedBy <urn:synthetic:steel:ingotcasting/M90> .
+# EXPECT <https://w3id.org/ontology-platform/steel/code/equipment-type/INGOTMOULD> <https://w3id.org/ontology-platform/steel/TeemingMethodSchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:ingotcasting/M91> a stl:IngotCasting ; stl:teemingMethod <code/equipment-type/INGOTMOULD> .
+
+# EXPECT <urn:synthetic:steel:cutting/C90> <https://w3id.org/ontology-platform/steel/CastingSpeedValueShape> MinInclusiveConstraintComponent
+<urn:synthetic:steel:cutting/C90> a stl:Cutting ; stl:castingSpeed -1.2 .
+
+# EXPECT <urn:synthetic:steel:observation/O90> <https://w3id.org/ontology-platform/steel/CastingSpeedReadingShape> SPARQLConstraintComponent
+<urn:synthetic:steel:observation/O90> a stl:Observation ; stl:measurementItem <code/measurement-item/CASTSPEED> ;
+    stl:measuredObject <urn:synthetic:steel:heat/H91> ; stl:measuredAtPoint <urn:synthetic:steel:measurementpoint/PT90> ;
+    stl:measurementMethod <code/measurement-method/AUTOMATIC> ;
+    stl:sampledAt "2026-11-18T12:00:00Z"^^xsd:dateTime ; stl:resultAt "2026-11-18T12:00:01Z"^^xsd:dateTime .
+<urn:synthetic:steel:measurementpoint/PT90> a stl:MeasurementPoint .
