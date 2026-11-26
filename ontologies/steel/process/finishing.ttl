@@ -1,0 +1,50 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/process/finishing> a owl:Ontology ;
+    owl:versionIRI <ontology/process/finishing/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "精整工序"@zh, "Finishing operations"@en ;
+    rdfs:comment "描述交付或后续加工前的矫形、剪切、表面修整、在线检验和标记。"@zh, "Describes shape correction, shearing, surface conditioning, in-line inspection and marking before delivery or further processing."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:Straightening a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "矫直"@zh, "Straightening"@en ; skos:prefLabel "矫直"@zh, "Straightening"@en ;
+    skos:definition "对弯曲、扭转或不平的钢材施加校正变形，使其更接近规定几何形状的作业。"@zh, "An operation that corrects bend, twist or lack of flatness in a steel product by applying deformation."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .
+stl:Shearing a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "剪切"@zh, "Shearing"@en ; skos:prefLabel "剪切"@zh, "Shearing"@en ;
+    skos:definition "利用相对运动的剪刃分开钢材的作业，可按长度切断、沿纵向分条或剪除边部。"@zh, "An operation that separates steel between moving blades, for example to cut lengths, slit strip or trim edges."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .
+stl:SurfaceConditioning a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "表面修整"@zh, "Surface conditioning"@en ; skos:prefLabel "表面修整"@zh, "Surface conditioning"@en ;
+    skos:definition "从钢材表面去除材料以清理表层或消除局部缺陷的作业，包括修磨和扒皮。"@zh, "An operation that removes surface metal to clean the surface or eliminate local flaws, including grinding and peeling."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .
+stl:LocalGrinding a owl:Class ; rdfs:subClassOf stl:SurfaceConditioning ;
+    rdfs:label "局部修磨"@zh, "Local grinding"@en ; skos:prefLabel "局部修磨"@zh, "Local grinding"@en ;
+    skos:definition "用磨具从钢材指定部位去除表层金属的作业，可按处理区域复核去除深度。"@zh, "An operation that uses an abrasive tool to remove metal from a designated area of a steel piece, where removal depth can be checked."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .
+stl:BarPeeling a owl:Class ; rdfs:subClassOf stl:SurfaceConditioning ;
+    rdfs:label "棒材扒皮"@zh, "Bar peeling"@en ; skos:prefLabel "棒材扒皮"@zh, "Bar peeling"@en ;
+    skos:definition "用切削刀具沿棒材外周连续去除表层，使加工后的圆周表面露出基体金属的作业。"@zh, "A machining operation that cuts a continuous layer from the circumference of a bar to expose the underlying metal."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .
+stl:InlineInspection a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "在线检验"@zh, "In-line inspection"@en ; skos:prefLabel "在线检验"@zh, "In-line inspection"@en ;
+    skos:definition "在钢材通过生产线时检查其尺寸、表面或内部质量的作业，可关联该次过线取得的多项检验记录。"@zh, "An operation that checks dimensions, surface condition or internal soundness as steel passes along the line and can group several inspection records for that pass."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .
+stl:Marking a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "标记"@zh, "Marking"@en ; skos:prefLabel "标记"@zh, "Marking"@en ;
+    skos:definition "在钢材或其标签上施加可辨识标记的作业，用于识别实物或定位需要复查的部位。"@zh, "An operation that marks steel or its tag to identify a piece or locate an area for follow-up inspection."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .
+
+stl:maximumGrindingDepth a owl:DatatypeProperty ; rdfs:domain stl:LocalGrinding ; rdfs:range xsd:decimal ;
+    rdfs:label "最大修磨深度"@zh, "Maximum grinding depth"@en ; skos:prefLabel "最大修磨深度"@zh, "Maximum grinding depth"@en ;
+    stl:unit unit:MilliM ; stl:quantityKind quantitykind:Length ;
+    skos:definition "一次局部修磨在所处理区域内相对于原表面测得的最大去除深度，以毫米计。"@zh, "The greatest depth removed within the area of a local grinding operation, measured in millimetres from the original surface."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing> .

@@ -1,0 +1,27 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/process/heattreatment-shapes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/heattreatment-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "热处理数据约束"@zh, "Heat treatment data constraints"@en ;
+    rdfs:comment "核对装炉批的实物件和工艺、代码所属方案及保温阶段起止时刻的顺序。"@zh, "Checks load membership, treatment methods and their scheme, and the order of hold start and end times."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:HeatTreatmentLoadPieceShape a sh:PropertyShape ; sh:targetClass stl:HeatTreatmentLoad ;
+    sh:path [ sh:alternativePath ( stl:hasPart [ sh:inversePath stl:partOf ] ) ] ;
+    sh:qualifiedValueShape [ sh:class stl:MaterialPiece ] ; sh:qualifiedMinCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "每个装炉批至少应包含一件实物件，可从批列出成员，也可由实物件指回装炉批。"@zh .
+stl:HeatTreatmentLoadMethodShape a sh:PropertyShape ; sh:targetClass stl:HeatTreatmentLoad ;
+    sh:path stl:heatTreatmentMethod ; sh:minCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "每个装炉批至少要记录一种实际采用的热处理工艺。"@zh .
+stl:HeatTreatmentMethodSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:heatTreatmentMethod ;
+    sh:path skos:inScheme ; sh:hasValue <code/heat-treatment-process> ;
+    sh:severity sh:Violation ; rdfs:comment "装炉批或作业引用的每个热处理方法都应来自热处理工艺代码方案。"@zh .
+stl:HeatTreatmentHoldOrderShape a sh:PropertyShape ; sh:targetClass stl:HeatTreatmentHold ;
+    sh:path stl:actualStartAt ; sh:lessThanOrEquals stl:actualEndAt ;
+    sh:severity sh:Violation ; rdfs:comment "同一次保温同时记有实际开始和结束时刻时，结束不得早于开始。"@zh .

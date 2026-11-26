@@ -1,0 +1,70 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/process/tubemaking> a owl:Ontology ;
+    owl:versionIRI <ontology/process/tubemaking/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "制管工序与管材"@zh, "Tube making operations and products"@en ;
+    rdfs:comment "描述从管坯穿孔轧管和由板带焊接制管的作业、管件及其截面尺寸。"@zh, "Describes operations, pieces and section dimensions in the pierced-billet and welded flat-stock routes to steel tubes."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:Piercing a owl:Class ; rdfs:subClassOf stl:MaterialTransformation ;
+    rdfs:label "管坯穿孔"@zh, "Tube billet piercing"@en ; skos:prefLabel "管坯穿孔"@zh, "Tube billet piercing"@en ;
+    skos:definition "使实心管坯沿轴向形成贯通内孔、得到可单独跟踪的毛管的一次作业。"@zh, "An operation that opens an axial bore through a solid tube billet and produces an individually traceable hollow shell."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
+stl:TubeRolling a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "轧管"@zh, "Tube rolling"@en ; skos:prefLabel "轧管"@zh, "Tube rolling"@en ;
+    skos:definition "用轧辊使已有内孔的管料延伸，并改变其壁厚和截面尺寸的一次作业。"@zh, "An operation that elongates hollow stock between rolls and changes its wall thickness and section dimensions."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
+stl:TubeWelding a owl:Class ; rdfs:subClassOf stl:MaterialTransformation ;
+    rdfs:label "管体焊接"@zh, "Tube seam welding"@en ; skos:prefLabel "管体焊接"@zh, "Tube seam welding"@en ;
+    skos:definition "将已成形板带的相邻边缘沿纵缝或螺旋缝焊合，使管体闭合的一次作业。"@zh, "An operation that closes a tube body by welding the adjoining edges of formed plate or strip along a longitudinal or helical seam."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
+stl:SizingAndReducing a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "钢管定径与减径"@zh, "Tube sizing and reducing"@en ; skos:prefLabel "钢管定径与减径"@zh, "Tube sizing and reducing"@en ;
+    skos:definition "使管料通过轧辊孔型，校准其外径或将其减小到目标尺寸的一次作业。"@zh, "An operation that passes tubular stock through roll grooves to size the outside diameter or reduce it to a target size."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
+
+stl:TubeBillet a owl:Class ; rdfs:subClassOf stl:SemiFinishedProduct ;
+    rdfs:label "制管用实心管坯"@zh, "Solid tube billet"@en ; skos:prefLabel "制管用实心管坯"@zh, "Solid tube billet"@en ;
+    skos:definition "供无缝制管开孔的单件实心钢坯，按其制管用途识别，截面和制坯方式可另行记录。"@zh, "An individual solid steel billet intended for opening a bore in seamless tube making, identifiable by that use regardless of section or billet production route."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
+stl:HollowShell a owl:Class ; rdfs:subClassOf stl:SemiFinishedProduct ;
+    rdfs:label "毛管"@zh, "Hollow shell"@en ; skos:prefLabel "毛管"@zh, "Hollow shell"@en ;
+    skos:definition "实心管坯穿孔后得到的空心中间件，保留单件身份供后续延伸、轧管或定径作业引用。"@zh, "An individually tracked hollow intermediate produced by piercing a solid billet and supplied for elongation, rolling or sizing."@en ;
+    skos:altLabel "穿孔毛管"@zh, "pierced shell"@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
+stl:SteelTube a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "钢管"@zh, "Steel tube"@en ; skos:prefLabel "钢管"@zh, "Steel tube"@en ;
+    skos:definition "沿长度方向具有封闭中空截面、可按件追踪尺寸和来源的钢管材。"@zh, "An individual steel product with a closed hollow section along its length, whose dimensions and material history can be traced by piece."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
+stl:SeamlessTube a owl:Class ; rdfs:subClassOf stl:SteelTube ;
+    rdfs:label "无缝钢管"@zh, "Seamless steel tube"@en ; skos:prefLabel "无缝钢管"@zh, "Seamless steel tube"@en ;
+    skos:definition "由钢坯开孔并加工管壁制得的钢管，管壁沿周向连续，无闭合管体的制造焊缝。"@zh, "A steel tube made by forming a bore in stock and working the wall, with circumferential continuity and no seam joining edges to close the body."@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
+stl:WeldedPipe a owl:Class ; rdfs:subClassOf stl:SteelTube ;
+    rdfs:label "焊接钢管"@zh, "Welded steel pipe"@en ; skos:prefLabel "焊接钢管"@zh, "Welded steel pipe"@en ;
+    skos:definition "由钢板或钢带成形并焊合边缘制得的钢管，其管壁含有闭合管体的制造焊缝。"@zh, "A steel tube made by forming plate or strip and welding its edges together, leaving a manufacturing seam in the wall."@en ;
+    skos:altLabel "焊管"@zh, "welded steel tube"@en ;
+    dcterms:source <std/iso-6929-2013> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
+
+stl:weldMethod a owl:ObjectProperty ; rdfs:domain stl:TubeWelding ; rdfs:range skos:Concept ; rdfs:seeAlso <code/weld-method> ;
+    rdfs:label "制管焊接方法"@zh, "Tube seam welding method"@en ; skos:prefLabel "制管焊接方法"@zh, "Tube seam welding method"@en ;
+    skos:definition "从一次管体焊接作业指向实际用于接合管边的焊接方法代码。"@zh, "Identifies the method actually used to join the tube edges in a seam welding operation."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
+stl:tubeOutsideDiameter a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:SteelTube stl:HollowShell ) ] ; rdfs:range xsd:decimal ;
+    stl:unit unit:MilliM ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "管外径"@zh, "Tube outside diameter"@en ; skos:prefLabel "管外径"@zh, "Tube outside diameter"@en ;
+    skos:definition "圆形钢管或毛管在给定截面上沿直径方向两外表面间的距离，以毫米计。"@zh, "The distance across the outside surfaces of a round tube or shell on a diameter of a given section, in millimetres."@en ;
+    dcterms:source <std/gbt-17395-2024> ; rdfs:isDefinedBy <ontology/process/tubemaking> .
+stl:tubeWallThickness a owl:DatatypeProperty ; rdfs:subPropertyOf stl:thickness ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:SteelTube stl:HollowShell ) ] ; rdfs:range xsd:decimal ;
+    stl:unit unit:MilliM ; stl:quantityKind quantitykind:Length ;
+    rdfs:label "管壁厚度"@zh, "Tube wall thickness"@en ; skos:prefLabel "管壁厚度"@zh, "Tube wall thickness"@en ;
+    skos:definition "钢管或毛管在给定位置沿壁厚方向从内表面到外表面的距离，以毫米计。"@zh, "The distance through the wall of a tube or shell from the inside surface to the outside at a given position, in millimetres."@en ;
+    dcterms:source <std/gbt-17395-2024> ; rdfs:isDefinedBy <ontology/process/tubemaking> .

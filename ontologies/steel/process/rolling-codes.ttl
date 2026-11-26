@@ -1,0 +1,224 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/process/rolling-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/rolling-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "轧制与涂镀代码"@zh, "Rolling and coating codes"@en ;
+    rdfs:comment "登记涂镀层类别，以及轧制相关的设备、工序、卷材交货形态和板带缺陷。"@zh, "Defines coating types and adds rolling equipment, processes, coil forms and flat product defects to the shared schemes."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/coating-type> a skos:ConceptScheme ;
+    rdfs:label "涂镀层类型"@zh, "Coating type"@en ; skos:prefLabel "涂镀层类型"@zh, "Coating type"@en ;
+    skos:altLabel "镀层类型"@zh ;
+    skos:definition "按覆层材料区分钢材表面的金属镀层和有机涂层，并在需要时区分热浸、电沉积等成层方式。"@zh, "Classifies surface layers on steel by coating material and, where it distinguishes the type, by the deposition method."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling-codes> .
+stl:CoatingTypeCode a rdfs:Datatype ;
+    rdfs:label "涂镀层类型代码"@zh, "Coating type code"@en ; skos:prefLabel "涂镀层类型代码"@zh, "Coating type code"@en ;
+    skos:altLabel "镀层类型代码"@zh ;
+    skos:definition "标记涂镀层类型方案中各项主记号的字面量类型。"@zh, "Datatype for the primary notations in the coating type scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling-codes> .
+stl:LineSegmentCode a rdfs:Datatype ;
+    rdfs:label "冷轧机组段码"@zh, "Cold-line segment code"@en ; skos:prefLabel "冷轧机组段码"@zh, "Cold-line segment code"@en ;
+    skos:definition "冷轧段卷号中表示产出机组类型的一段代码，可作为设备类型代码项的附加记号。"@zh, "Datatype for the segment of a cold-line coil identifier indicating its producing line type, used as an additional notation of that equipment type."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/rolling-codes> .
+
+<code/equipment-type/REHEATFURN> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "REHEATFURN"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "坯料加热炉"@zh, "Stock reheating furnace"@en ; skos:prefLabel "坯料加热炉"@zh, "Stock reheating furnace"@en ;
+    skos:definition "在轧制前加热钢坯或钢锭，使装入的钢料以所需热状态出炉。"@zh, "A furnace that heats steel stock or ingots for delivery to a rolling mill."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/HSM> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "HSM"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "热连轧机组"@zh, "Hot strip mill"@en ; skos:prefLabel "热连轧机组"@zh, "Hot strip mill"@en ;
+    skos:altLabel "热连轧"@zh, "HSM"@zh, "HSM"@en ;
+    skos:definition "通过连续布置的轧机机架把热坯轧成带钢，出口可配冷却和卷取设备。"@zh, "A rolling line with successive stands that reduce hot stock to strip for cooling and coiling."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/PLATE> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "PLATE"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "中厚板轧机"@zh, "Plate mill"@en ; skos:prefLabel "中厚板轧机"@zh, "Plate mill"@en ;
+    skos:definition "逐块轧制坯料，通过减薄或展宽轧出按张流转的中厚钢板。"@zh, "A mill that reduces or spreads individual pieces of stock to produce discrete plates."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/COLDMILL> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "COLDMILL"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "冷轧机"@zh, "Cold rolling mill"@en ; skos:prefLabel "冷轧机"@zh, "Cold rolling mill"@en ;
+    skos:definition "在冷加工条件下通过轧辊控制钢料减薄量或截面形状的设备。"@zh, "A mill that reduces or shapes steel through rolls under cold-working conditions."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/PLTCM> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:broader <code/equipment-type/COLDMILL> ;
+    skos:notation "PLTCM"^^stl:EquipmentTypeCode, "PL"^^stl:LineSegmentCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "酸洗冷连轧机组"@zh, "Pickling line and tandem cold mill"@en ; skos:prefLabel "酸洗冷连轧机组"@zh, "Pickling line and tandem cold mill"@en ;
+    skos:altLabel "酸轧机组"@zh, "PLTCM"@zh, "PLTCM"@en ;
+    skos:definition "将酸洗线与多机架冷连轧机连接，使带钢除鳞后连续进入减薄机架。"@zh, "A coupled line feeding descaled strip from the pickling section directly into successive cold reduction stands."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/CAL> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "CAL"^^stl:EquipmentTypeCode, "CA"^^stl:LineSegmentCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "连续退火机组"@zh, "Continuous annealing line"@en ; skos:prefLabel "连续退火机组"@zh, "Continuous annealing line"@en ;
+    skos:altLabel "连退机组"@zh, "CAL"@zh, "CAL"@en ;
+    skos:definition "使展开的钢带连续通过各温控区，在运行中完成退火的机组。"@zh, "A line that anneals moving strip as it passes through successive temperature-controlled zones."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/CGL> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "CGL"^^stl:EquipmentTypeCode, "CG"^^stl:LineSegmentCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "连续热镀锌机组"@zh, "Continuous hot-dip galvanizing line"@en ; skos:prefLabel "连续热镀锌机组"@zh, "Continuous hot-dip galvanizing line"@en ;
+    skos:altLabel "CGL"@zh, "CGL"@en ;
+    skos:definition "使带钢连续通过熔融锌或锌合金镀浴，并控制带出镀层的机组。"@zh, "A line that passes moving strip through a molten zinc or zinc-alloy bath and controls the deposited coating."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/RCL> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "RCL"^^stl:EquipmentTypeCode, "RC"^^stl:LineSegmentCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "重卷机组"@zh, "Recoiling line"@en ; skos:prefLabel "重卷机组"@zh, "Recoiling line"@en ;
+    skos:altLabel "RCL"@zh, "RCL"@en ;
+    skos:definition "将已有钢卷开卷并按后续加工或交货需要重新卷取的设备。"@zh, "A line that unwinds existing coils and rewinds the strip for a subsequent process or delivery."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/BAR> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "BAR"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "棒材轧机"@zh, "Bar mill"@en ; skos:prefLabel "棒材轧机"@zh, "Bar mill"@en ;
+    skos:definition "使用适配棒材断面的轧辊孔型将坯料沿长度轧制成棒材的设备。"@zh, "A mill with roll passes that shape stock into solid bar sections."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/WRM> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "WRM"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "线材轧机"@zh, "Wire rod mill"@en ; skos:prefLabel "线材轧机"@zh, "Wire rod mill"@en ;
+    skos:altLabel "WRM"@zh, "WRM"@en ;
+    skos:definition "以连续道次将坯料轧成小断面线材，并向成圈收集设备送出线材。"@zh, "A mill that reduces stock in successive passes and delivers small-section wire rod for collection in coils."@en ;
+    dcterms:source <source/industry-practice> .
+<code/equipment-type/SECT> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "SECT"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "型钢轧机"@zh, "Section mill"@en ; skos:prefLabel "型钢轧机"@zh, "Section mill"@en ;
+    skos:definition "利用成形轧辊将坯料逐道轧出型钢预定截面轮廓的设备。"@zh, "A mill that progressively develops a defined section profile using shaped rolls."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/process-type/REHEAT> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "REHEAT"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "坯料加热"@zh, "Stock reheating"@en ; skos:prefLabel "坯料加热"@zh, "Stock reheating"@en ;
+    skos:definition "将坯或锭在变形加工前加热至可加工状态。"@zh, "Heating stock or ingots to prepare them for a forming step."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/HOTROLL> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "HOTROLL"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "热轧"@zh, "Hot rolling"@en ; skos:prefLabel "热轧"@zh, "Hot rolling"@en ;
+    skos:definition "在热加工温区用轧辊改变钢料厚度或断面。"@zh, "Rolling steel in its hot-working range to alter thickness or section."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/BREAKDOWN> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/HOTROLL> ;
+    skos:notation "BREAKDOWN"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "初轧开坯"@zh, "Breakdown rolling"@en ; skos:prefLabel "初轧开坯"@zh, "Breakdown rolling"@en ;
+    skos:definition "将钢锭或大断面钢坯热轧成后续成形工序所用的坯件。"@zh, "Hot rolling ingots or large semiproducts into stock for further forming."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/PLATEROLL> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/HOTROLL> ;
+    skos:notation "PLATEROLL"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "中厚板轧制"@zh, "Plate rolling"@en ; skos:prefLabel "中厚板轧制"@zh, "Plate rolling"@en ;
+    skos:definition "将热坯轧成可逐张追踪的中厚板，可包括展宽与减薄道次。"@zh, "Hot rolling stock into individual plates through spreading or reduction passes."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/BARROLL> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/HOTROLL> ;
+    skos:notation "BARROLL"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "棒材热轧"@zh, "Hot bar rolling"@en ; skos:prefLabel "棒材热轧"@zh, "Hot bar rolling"@en ;
+    skos:definition "把热坯逐道轧成规定棒材断面。"@zh, "Hot rolling stock through passes that develop a specified bar section."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/RODROLL> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/HOTROLL> ;
+    skos:notation "RODROLL"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "线材轧制"@zh, "Wire rod rolling"@en ; skos:prefLabel "线材轧制"@zh, "Wire rod rolling"@en ;
+    skos:definition "将热坯连续轧成小断面线材并以盘条形态收集。"@zh, "Hot rolling stock into small-section rod for collection in loops."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/SECTROLL> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/HOTROLL> ;
+    skos:notation "SECTROLL"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "型钢热轧"@zh, "Hot section rolling"@en ; skos:prefLabel "型钢热轧"@zh, "Hot section rolling"@en ;
+    skos:definition "以成形轧辊将热坯轧成规定轮廓的型钢。"@zh, "Hot rolling stock through shaped rolls to form a specified section profile."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/COLDROLL> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "COLDROLL"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "冷轧"@zh, "Cold rolling"@en ; skos:prefLabel "冷轧"@zh, "Cold rolling"@en ;
+    skos:definition "在再结晶温度以下对钢料施加轧制变形。"@zh, "Rolling steel below its recrystallization temperature."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/PICKLECOLD> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/COLDROLL> ;
+    skos:notation "PICKLECOLD"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "酸洗冷连轧"@zh, "Coupled pickling and cold rolling"@en ; skos:prefLabel "酸洗冷连轧"@zh, "Coupled pickling and cold rolling"@en ;
+    skos:definition "使带钢在相连的酸洗与冷轧段连续完成除鳞和减薄。"@zh, "Descaling and reducing strip in coupled pickling and cold rolling sections."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/ANNEAL> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/HEATTREAT> ;
+    skos:notation "ANNEAL"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "退火"@zh, "Annealing"@en ; skos:prefLabel "退火"@zh, "Annealing"@en ;
+    skos:definition "用受控的加热和冷却循环调整钢材组织或缓解加工硬化。"@zh, "Applying a controlled thermal cycle to change the microstructure or relieve work hardening."@en ;
+    dcterms:source <std/gbt-7232-2023> .
+<code/process-type/COAT> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "COAT"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "涂镀"@zh, "Coating"@en ; skos:prefLabel "涂镀"@zh, "Coating"@en ;
+    skos:definition "在钢材表面施加金属镀层或有机涂层以获得所需的表面性能。"@zh, "Applying a metallic or organic layer to obtain the required surface properties."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/GALV> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/COAT> ;
+    skos:notation "GALV"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "镀锌"@zh, "Galvanizing"@en ; skos:prefLabel "镀锌"@zh, "Galvanizing"@en ;
+    skos:definition "在钢材表面形成锌或锌合金镀层。"@zh, "Applying zinc or zinc alloy as a surface coating on steel."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/RECOIL> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "RECOIL"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "重卷"@zh, "Recoiling"@en ; skos:prefLabel "重卷"@zh, "Recoiling"@en ;
+    skos:definition "将已有钢卷展开后重新卷绕，形成可识别的出口卷。"@zh, "Unwinding and rewinding strip to form an identifiable output coil."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/COILSPLIT> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "COILSPLIT"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "分卷"@zh, "Coil splitting"@en ; skos:prefLabel "分卷"@zh, "Coil splitting"@en ;
+    skos:definition "以一卷为母卷取得多个具有各自身份的产出卷。"@zh, "Producing multiple separately tracked coils from one parent coil."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/COILJOIN> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/TRANSFORM> ;
+    skos:notation "COILJOIN"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "合卷"@zh, "Coil joining"@en ; skos:prefLabel "合卷"@zh, "Coil joining"@en ;
+    skos:definition "把多卷的带钢接续为一个具有多个来源的产出卷。"@zh, "Joining strip from several coils into one output with multiple sources."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/product-form/HRC> a skos:Concept ; skos:inScheme <code/product-form> ; skos:broader <code/product-form/COIL> ;
+    skos:notation "HRC"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "热轧卷"@zh, "Hot-rolled coil"@en ; skos:prefLabel "热轧卷"@zh, "Hot-rolled coil"@en ;
+    skos:altLabel "HRC"@zh, "HRC"@en ;
+    skos:definition "以热轧后卷取的带钢卷形交接的实物形态。"@zh, "Coiled strip in the form obtained by winding the output of hot rolling."@en ;
+    dcterms:source <std/iso-6929-2013> .
+<code/product-form/CRC> a skos:Concept ; skos:inScheme <code/product-form> ; skos:broader <code/product-form/COIL> ;
+    skos:notation "CRC"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "冷轧卷"@zh, "Cold-rolled coil"@en ; skos:prefLabel "冷轧卷"@zh, "Cold-rolled coil"@en ;
+    skos:altLabel "CRC"@zh, "CRC"@en ;
+    skos:definition "以冷轧减薄的带钢卷形交接的实物形态。"@zh, "Cold-reduced steel strip supplied in coiled form."@en ;
+    dcterms:source <std/iso-6929-2013> .
+<code/product-form/COATEDCOIL> a skos:Concept ; skos:inScheme <code/product-form> ; skos:broader <code/product-form/COIL> ;
+    skos:notation "COATEDCOIL"^^stl:ProductFormCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "涂镀卷"@zh, "Coated coil"@en ; skos:prefLabel "涂镀卷"@zh, "Coated coil"@en ;
+    skos:definition "以卷形交接、表面带有金属镀层或有机涂层的带钢。"@zh, "Coiled strip supplied with a metallic or organic surface layer."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/coating-type/GI> a skos:Concept ; skos:inScheme <code/coating-type> ; skos:topConceptOf <code/coating-type> ;
+    skos:notation "GI"^^stl:CoatingTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "纯锌镀层"@zh, "Zinc coating"@en ; skos:prefLabel "纯锌镀层"@zh, "Zinc coating"@en ;
+    skos:altLabel "GI"@zh, "GI"@en ;
+    skos:definition "带钢热浸锌后形成的以锌为主的镀层，可与再经合金化处理的锌铁镀层区分。"@zh, "A predominantly zinc layer left by hot dipping, distinct from a subsequently alloyed zinc-iron layer."@en ;
+    dcterms:source <std/gbt-2518-2019> .
+<code/coating-type/GA> a skos:Concept ; skos:inScheme <code/coating-type> ; skos:topConceptOf <code/coating-type> ;
+    skos:notation "GA"^^stl:CoatingTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "锌铁合金镀层"@zh, "Galvannealed coating"@en ; skos:prefLabel "锌铁合金镀层"@zh, "Galvannealed coating"@en ;
+    skos:altLabel "GA"@zh, "GA"@en ;
+    skos:definition "热镀锌后通过合金化处理，使锌层与基板中的铁形成锌铁合金镀层。"@zh, "A zinc-iron coating formed by alloying a hot-dip zinc deposit with iron from the substrate."@en ;
+    dcterms:source <std/gbt-2518-2019> .
+<code/coating-type/ZM> a skos:Concept ; skos:inScheme <code/coating-type> ; skos:topConceptOf <code/coating-type> ;
+    skos:notation "ZM"^^stl:CoatingTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "锌铝镁镀层"@zh, "Zinc-aluminium-magnesium coating"@en ; skos:prefLabel "锌铝镁镀层"@zh, "Zinc-aluminium-magnesium coating"@en ;
+    skos:altLabel "ZM"@zh, "ZM"@en ;
+    skos:definition "以锌为基、铝和镁为合金组分的热浸金属镀层。"@zh, "A hot-dip metallic layer based on zinc and alloyed with aluminium and magnesium."@en ;
+    dcterms:source <source/industry-practice> .
+<code/coating-type/EG> a skos:Concept ; skos:inScheme <code/coating-type> ; skos:topConceptOf <code/coating-type> ;
+    skos:notation "EG"^^stl:CoatingTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "电镀锌层"@zh, "Electrodeposited zinc coating"@en ; skos:prefLabel "电镀锌层"@zh, "Electrodeposited zinc coating"@en ;
+    skos:altLabel "EG"@zh, "EG"@en ;
+    skos:definition "利用电解沉积在钢基板表面形成的锌层。"@zh, "A zinc layer deposited on a steel substrate by electroplating."@en ;
+    dcterms:source <source/industry-practice> .
+<code/coating-type/ORGANIC> a skos:Concept ; skos:inScheme <code/coating-type> ; skos:topConceptOf <code/coating-type> ;
+    skos:notation "ORGANIC"^^stl:CoatingTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "有机涂层"@zh, "Organic coating"@en ; skos:prefLabel "有机涂层"@zh, "Organic coating"@en ;
+    skos:definition "由有机涂料在钢基板或其金属镀层表面形成的膜层。"@zh, "A film formed from an organic coating material on steel or on an underlying metallic layer."@en ;
+    dcterms:source <source/industry-practice> .
+
+<code/defect-type/COATLOW> a skos:Concept ; skos:inScheme <code/defect-type> ; skos:broader <code/defect-type/FLAT> ;
+    skos:notation "COATLOW"^^stl:DefectTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "镀层质量不足"@zh, "Low coating mass"@en ; skos:prefLabel "镀层质量不足"@zh, "Low coating mass"@en ;
+    skos:definition "按约定的单面或双面合计口径，单位面积镀层质量低于适用要求的缺陷。"@zh, "A coating mass per unit area below the applicable requirement on its specified single-face or combined-face basis."@en ;
+    dcterms:source <source/industry-practice> .
+<code/defect-type/BARESPOT> a skos:Concept ; skos:inScheme <code/defect-type> ; skos:broader <code/defect-type/FLAT> ;
+    skos:notation "BARESPOT"^^stl:DefectTypeCode ; rdfs:isDefinedBy <ontology/process/rolling-codes> ;
+    rdfs:label "漏镀"@zh, "Bare spot"@en ; skos:prefLabel "漏镀"@zh, "Bare spot"@en ;
+    skos:definition "要求镀层覆盖的表面因局部缺镀而露出基板的缺陷。"@zh, "Local exposure of the substrate where coating coverage is required."@en ;
+    dcterms:source <source/industry-practice> .

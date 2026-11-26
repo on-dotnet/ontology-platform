@@ -1,0 +1,17 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/process/finishing-shapes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/finishing-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "精整数据约束"@zh, "Finishing data constraints"@en ;
+    rdfs:comment "校验局部修磨的实测去除深度。"@zh, "Checks the measured depth of material removed by local grinding."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:GrindingDepthShape a sh:PropertyShape ; sh:targetSubjectsOf stl:maximumGrindingDepth ;
+    sh:path stl:maximumGrindingDepth ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ;
+    sh:severity sh:Violation ; rdfs:comment "最大修磨深度按去除量记录，应为非负的十进制毫米数。"@zh .
