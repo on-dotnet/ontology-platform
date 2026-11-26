@@ -8,7 +8,7 @@ Only proposals and edits compare a binding with the cached catalog (`catalog_pro
 cache can be out of date by the time a change set is merged or published.
 """
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from typing import Any
 from uuid import UUID
@@ -21,6 +21,7 @@ from ontology_platform.modules.connectors.schemas import CatalogTableCopy
 from ontology_platform.modules.connectors.statements import TableRef
 from ontology_platform.modules.ontology.models import BINDING_KINDS, Element
 from ontology_platform.modules.ontology.schemas import (
+    Binding,
     ElementFields,
     ForeignKeyJoin,
     JoinBinding,
@@ -84,7 +85,7 @@ def _unique(columns: Iterable[str]) -> bool:
     return len(set(listed)) == len(listed)
 
 
-def _value_problems(binding: TableBinding | JoinBinding | Any) -> list[str]:
+def _value_problems(binding: Binding) -> list[str]:
     if isinstance(binding, TableBinding) and not _unique(binding.key_columns):
         return ["keyColumns has a column twice"]
     if isinstance(binding, JoinBinding):
@@ -144,7 +145,7 @@ def shape_problems(
     return problems
 
 
-def stored(binding: TableBinding | Any) -> dict[str, Any]:
+def stored(binding: Binding) -> dict[str, Any]:
     """A binding as `elements.binding` and the snapshots hold it (camelCase JSON)."""
     data: dict[str, Any] = binding.model_dump(mode="json", by_alias=True)
     return data
@@ -510,3 +511,31 @@ async def proposal_problems(
         problems = node_problems(node, nodes) or await catalog_problems(db, node, nodes, catalog)
         found.extend((position, problem) for problem in problems)
     return found
+
+
+@dataclass(frozen=True, slots=True)
+class Sibling:
+    """An item of the change set a reviewer edits, with its effective fields."""
+
+    id: UUID
+    rejected: bool
+    item: Proposed
+
+
+async def edit_problems(
+    db: AsyncSession,
+    elements: Iterable[Element],
+    siblings: Sequence[Sibling],
+    item_id: UUID,
+    fields: ElementFields,
+) -> list[Problem]:
+    """What is wrong with a binding item once a reviewer gives it `fields`, among the other
+    items of its change set. Rejected items do not take part: the change set leaves the
+    working version without them, whatever the reviewer edits here."""
+    taking_part = [s for s in siblings if s.id == item_id or not s.rejected]
+    items = [
+        replace(s.item, fields=fields) if s.id == item_id else s.item for s in taking_part
+    ]
+    position = next(i for i, s in enumerate(taking_part) if s.id == item_id)
+    found = await proposal_problems(db, elements, items, only=position)
+    return [problem for _, problem in found]

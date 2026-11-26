@@ -94,7 +94,13 @@ async def steel(db: AsyncSession) -> Steel:
     cast = element(ontology, "entity_type", "Cast", "浇次")
     await add_elements(db, heat, cast)
     weight = element(
-        ontology, "property", "weight", "重量", domain_id=heat.id, datatype="decimal"
+        ontology,
+        "property",
+        "weight",
+        "重量",
+        domain_id=heat.id,
+        datatype="decimal",
+        unit="t",
     )
     # Without a domain, as OWL allows for imported elements (the steel sample has externalId);
     # as an import reads them back, so that exporting and importing again changes nothing.

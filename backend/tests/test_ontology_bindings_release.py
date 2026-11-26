@@ -147,10 +147,12 @@ async def test_the_bound_model_describes_the_release_in_effect(
     assert heat is not None
     assert (heat.label, heat.local_name, heat.data_source_id) == ("炉次", "Heat", s.mes.id)
     assert (heat.schema, heat.table, heat.key_columns) == ("mes", "heat", ("heat_no",))
-    assert [(p.property_id, p.label, p.datatype, p.column) for p in heat.properties] == [
-        (s.external_id.id, "外部编号", "string", "heat_no"),
-        (s.weight.id, "重量", "decimal", "weight_t"),
+    assert heat.iri == s.ontology.base_iri + "Heat"
+    assert [(p.property_id, p.label, p.datatype, p.unit, p.column) for p in heat.properties] == [
+        (s.external_id.id, "外部编号", "string", None, "heat_no"),
+        (s.weight.id, "重量", "decimal", "t", "weight_t"),
     ]
+    assert await ontology_bindings.bound_model(db, s.ontology.key) == model
     [relation] = model.relations
     assert (relation.relation_id, relation.label) == (s.in_cast.id, "对应浇次")
     assert (relation.source_type_id, relation.target_type_id) == (s.heat.id, s.cast.id)
@@ -167,8 +169,10 @@ async def test_the_released_ontology_is_the_semantic_part_of_the_release(
 
     by_id = await ontology_bindings.released_ontology(db, s.ontology.id)
     by_key = await ontology_bindings.released_ontology(db, s.ontology.key)
+    by_text = await ontology_bindings.released_ontology(db, str(s.ontology.id))
 
-    assert by_id is not None and by_id == by_key
+    assert by_id is not None and by_id == by_key == by_text
+    assert by_id.description == s.ontology.description
     assert (by_id.key, by_id.name, by_id.version) == ("steel", "钢铁冶金", release["version"])
     assert len(by_id.elements) == 9
     assert all(element.binding is None for element in by_id.elements)

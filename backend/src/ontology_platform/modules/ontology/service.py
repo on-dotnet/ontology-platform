@@ -359,6 +359,9 @@ async def create_change_set(
         created_kinds[item.temp_ref] = item.kind
     for position, item in enumerate(items, start=1):
         problem = _proposal_problem(item, elements, created_kinds)
+        if problem and item.kind in BINDING_KINDS:
+            # The binding error codes cover bad references too (spec 003 appendix).
+            raise InvalidBindingError(binding_rules.INVALID, f"Item {position}: {problem}.")
         if problem:
             raise InvalidProposalError(f"Item {position}: {problem}.")
     await _check_matches(db, ontology_id, items, elements, created_kinds)
@@ -1634,32 +1637,27 @@ async def _edit_problems(
         if _closes_parent_loop(fields.parent_ref, own_key, elements, creates):
             problems.append("parentRef would make the type hierarchy circular")
     if kind in BINDING_KINDS and not problems and item.op != "delete":
-        # Rejected items do not take part: the change set leaves the working version without
-        # them, whatever the reviewer edits here.
-        taking_part = [
-            sibling
-            for sibling in siblings
-            if sibling.id == item.id or sibling.decision != "rejected"
-        ]
-        proposed = [
-            binding_rules.Proposed(
-                op=sibling.op,
-                kind=sibling.kind,
-                target_id=sibling.target_element_id,
-                temp_ref=sibling.temp_ref,
-                fields=(
-                    fields
-                    if sibling.id == item.id
-                    else rules.effective_fields(sibling.proposed, sibling.edited)
-                ),
-            )
-            for sibling in taking_part
-        ]
-        position = next(i for i, sibling in enumerate(taking_part) if sibling.id == item.id)
-        found = await binding_rules.proposal_problems(
-            db, elements.values(), proposed, only=position
+        found = await binding_rules.edit_problems(
+            db,
+            elements.values(),
+            [
+                binding_rules.Sibling(
+                    id=sibling.id,
+                    rejected=sibling.decision == "rejected",
+                    item=binding_rules.Proposed(
+                        op=sibling.op,
+                        kind=sibling.kind,
+                        target_id=sibling.target_element_id,
+                        temp_ref=sibling.temp_ref,
+                        fields=rules.effective_fields(sibling.proposed, sibling.edited),
+                    ),
+                )
+                for sibling in siblings
+            ],
+            item.id,
+            fields,
         )
-        problems.extend(problem.message for _, problem in found)
+        problems.extend(problem.message for problem in found)
     return problems
 
 

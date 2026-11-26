@@ -18,6 +18,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import defer
 
 from ontology_platform.errors import AppError
 from ontology_platform.modules.connectors import service as connectors
@@ -489,6 +490,7 @@ class BoundProperty:
     local_name: str
     label: str
     datatype: Datatype | None
+    unit: str | None
     column: str
 
 
@@ -500,6 +502,7 @@ class BoundType:
     binding_id: UUID
     local_name: str
     label: str
+    iri: str | None
     data_source_id: UUID
     schema: str
     table: str
@@ -566,17 +569,21 @@ class ReleasedOntology:
     ontology_id: UUID
     key: str
     name: str
+    description: str | None
     release_id: UUID
     version: int
     published_at: datetime
-    elements: tuple[schemas.Element, ...]
+    elements: tuple[schemas.ElementCopy, ...]
     bound_type_ids: frozenset[UUID]
 
 
 async def _release_in_effect(
     db: AsyncSession, ontology: UUID | str
 ) -> tuple[Ontology, Release] | None:
-    """The ontology (by id, or by key) and its active release."""
+    """The ontology (by id, by its id as text, or by key) and its active release. The
+    release's Turtle, which can be megabytes, is not read."""
+    if isinstance(ontology, str):
+        ontology = rules.parse_id(ontology) or ontology
     if isinstance(ontology, UUID):
         condition = Ontology.id == ontology
     else:
@@ -586,6 +593,7 @@ async def _release_in_effect(
             select(Ontology, Release)
             .join(Release, Release.id == Ontology.active_release_id)
             .where(condition)
+            .options(defer(Release.turtle))
         )
     ).first()
     return (row[0], row[1]) if row is not None else None
@@ -620,6 +628,7 @@ def _model(release: Release) -> BoundModel:
                 local_name=str(prop.get("localName") or ""),
                 label=_label(prop),
                 datatype=prop.get("datatype"),
+                unit=prop.get("unit"),
                 column=str(row["binding"]["column"]),
             )
         )
@@ -638,6 +647,7 @@ def _model(release: Release) -> BoundModel:
                 binding_id=UUID(str(row["id"])),
                 local_name=str(subject.get("localName") or ""),
                 label=_label(subject),
+                iri=subject.get("iri"),
                 data_source_id=UUID(str(binding["dataSourceId"])),
                 schema=str(binding["schema"]),
                 table=str(binding["table"]),
@@ -677,10 +687,11 @@ def _model(release: Release) -> BoundModel:
     )
 
 
-async def bound_model(db: AsyncSession, ontology_id: UUID) -> BoundModel | None:
-    """The bindings of the release in effect; None when the ontology has no release in effect
-    (or does not exist). A release published before M3 has no bindings: its model is empty."""
-    found = await _release_in_effect(db, ontology_id)
+async def bound_model(db: AsyncSession, ontology: UUID | str) -> BoundModel | None:
+    """The bindings of the release in effect of the ontology (by id or by key); None when it
+    has no release in effect (or does not exist). A release published before M3 has no
+    bindings: its model is empty."""
+    found = await _release_in_effect(db, ontology)
     return _model(found[1]) if found is not None else None
 
 
@@ -708,7 +719,7 @@ async def released_ontology(db: AsyncSession, ontology: UUID | str) -> ReleasedO
         return None
     row, release = found
     elements = tuple(
-        schemas.Element.model_validate({**_SNAPSHOT_DEFAULTS, **element})
+        schemas.ElementCopy.model_validate({**_SNAPSHOT_DEFAULTS, **element})
         for element in release.snapshot
         if element["kind"] in SEMANTIC_KINDS
     )
@@ -721,6 +732,7 @@ async def released_ontology(db: AsyncSession, ontology: UUID | str) -> ReleasedO
         ontology_id=row.id,
         key=row.key,
         name=row.name,
+        description=row.description,
         release_id=release.id,
         version=release.version,
         published_at=release.created_at,

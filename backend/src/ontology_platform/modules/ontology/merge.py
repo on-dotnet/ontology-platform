@@ -661,12 +661,14 @@ async def merge_change_set(
     additions. `resolution_token` is the token of the plan the reviewer saw; if the plan is
     another one by now, nothing is applied (409 `changeset.resolution_changed`).
 
-    Creates, updates and restores come first (axioms after elements, so that an axiom finds the
-    element it is about), deletes last. Skipped items: `changeset.stale_target` when the target
-    changed after the item was proposed, `changeset.dependency_skipped` when a reference
-    resolves to a rejected or skipped item (also transitively), `changeset.has_dependents` when
-    a deleted element is still in use, `changeset.invalid_item` when the fields do not form a
-    valid element, a reference is unusable, or the type hierarchy would become circular.
+    The order (spec 003, 6.3): creates, updates and restores of semantic elements (axioms after
+    the others, so that an axiom finds the element it is about); binding deletes; binding
+    creates, updates and restores, type bindings first; semantic deletes last. Skipped items:
+    `changeset.stale_target` when the target changed after the item was proposed,
+    `changeset.dependency_skipped` when a reference resolves to a rejected or skipped item (also
+    transitively), `changeset.has_dependents` when a deleted element is still in use,
+    `changeset.invalid_item` when the fields do not form a valid element, a reference is
+    unusable, or the type hierarchy would become circular.
     """
     change_set = await _change_set_or_404(db, change_set_id)
     ontology = await _ontology_or_404(db, change_set.ontology_id, lock=True)
@@ -719,9 +721,11 @@ async def _apply_change_set(
     # binding would otherwise create the new one next to the old and skip it as a duplicate.
     merge.apply_deletes([item for item in bound if item.op == "delete"])
     await db.flush()
-    for item in bound:
-        if item.op != "delete":
-            await merge.apply(item)
+    # Type bindings first: a column or relation binding is checked against the key columns of
+    # its type bindings as this change set leaves them, also when it names them by id.
+    changing = [item for item in bound if item.op != "delete"]
+    for item in sorted(changing, key=lambda item: BINDING_KINDS.index(item.kind)):
+        await merge.apply(item)
     # Semantic elements leave last, after the bindings that referred to them.
     merge.apply_deletes([item for item in semantic if item.op == "delete"])
     skipped = [

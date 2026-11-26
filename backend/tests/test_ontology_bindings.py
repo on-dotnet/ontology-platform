@@ -38,6 +38,7 @@ from test_ontology_bindings_support import (
 )
 from test_ontology_support import (
     add_elements,
+    accept_and_merge,
     add_ontology,
     change_set_items,
     decide_by_seq,
@@ -224,7 +225,7 @@ _RULES: dict[str, tuple[Callable[[Steel], list[dict[str, Any]]], int, str]] = {
     "a type binding of a property": (
         lambda s: [type_binding(s.weight, table(s.mes))],
         422,
-        "changeset.invalid_item",
+        "binding.invalid",
     ),
     "column not in the table": (
         lambda s: [*_heat(s), property_binding(s.weight, "heat", "weight_kg")],
@@ -249,7 +250,7 @@ _RULES: dict[str, tuple[Callable[[Steel], list[dict[str, Any]]], int, str]] = {
     "property under no type binding": (
         lambda s: [property_binding(s.weight, s.heat, "weight_t")],
         422,
-        "changeset.invalid_item",
+        "binding.invalid",
     ),
     "relation the wrong way round": (
         lambda s: [*_with_cast(s), relation_binding(s.in_cast, "cast", "heat")],
@@ -675,3 +676,62 @@ async def test_the_assistant_deletes_bindings_along_with_their_element(
         ("delete", "property"),
         ("delete", "property_binding"),
     ]
+
+
+async def test_type_bindings_change_before_what_hangs_under_them(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    s = await steel(db)
+    await sign_in(client, db, Role.ADMIN)
+    await bind(client, s)
+    rows = {row.subject_id: row for row in await bindings(db, s.ontology)}
+    heat, cast = rows[s.heat.id], rows[s.cast.id]
+
+    # The relation binding comes first and names the type binding by id; it needs the two key
+    # columns the item after it gives that type binding.
+    response = await save(
+        client,
+        s.ontology,
+        [
+            change("delete", rows[s.in_cast.id]),
+            relation_binding(
+                s.in_cast, heat, cast, link_table(["heat_no", "cast_no"], ["cast_no"])
+            ),
+            change("update", heat, binding=table(s.mes, keys=["heat_no", "cast_no"])),
+        ],
+    )
+
+    assert response.status_code == 200, response.json()
+    [relation] = [row for row in await bindings(db, s.ontology) if row.kind == "relation_binding"]
+    assert relation.binding == link_table(["heat_no", "cast_no"], ["cast_no"])
+
+
+async def test_a_merge_keeps_one_active_binding_per_type(
+    client: AsyncClient, db: AsyncSession
+) -> None:
+    s = await steel(db)
+    await sign_in(client, db, Role.ADMIN)
+    first = await save(client, s.ontology, [type_binding(s.heat, table(s.mes))], apply=False)
+    second = await save(
+        client,
+        s.ontology,
+        [
+            type_binding(s.heat, table(s.mes, "heat_v"), "view"),
+            property_binding(s.external_id, "view", "heat_no"),
+        ],
+        apply=False,
+    )
+    assert first.status_code == 200 and second.status_code == 200
+
+    merged_first = await accept_and_merge(client, first.json()["changeSetId"])
+    merged_second = await accept_and_merge(client, second.json()["changeSetId"])
+
+    assert merged_first["skipped"] == []
+    items = await change_set_items(client, second.json()["changeSetId"])
+    assert merged_second["skipped"] == [
+        {"itemId": items[0]["id"], "code": "changeset.invalid_item"},
+        {"itemId": items[1]["id"], "code": "changeset.dependency_skipped"},
+    ]
+    [only] = await bindings(db, s.ontology)
+    assert only.binding == table(s.mes)
+
