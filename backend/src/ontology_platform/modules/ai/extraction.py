@@ -256,7 +256,8 @@ class RunStats:
     # Evidence checked literally (spec 004, 7.2), per kind: "<kind>" counts the items of the
     # model's output (not the proposals: items that turn out to exist already count too),
     # "<kind>:ok" those whose cited sentence names them (both ends, for a relation), and
-    # "relation_type:table" the relations kept only with their table's name and header row.
+    # "relation_type:table" the relations of the output stated only with their table's name and
+    # header row (those that exist already too).
     literal: Counter[str] = field(default_factory=Counter)
 
 
@@ -1225,9 +1226,12 @@ class _Builder:
                 continue
             # Units are normalized one by one and kept apart, so that no name is made up of the
             # end of one unit and the start of the next.
+            read_with = [normalize(text) for text in context]
+            # Mentions starting past this offset are in the cited text, not in the context.
+            own = len("\x00".join(read_with)) if read_with else -1
             line = "\x00".join(
                 [
-                    *(normalize(text) for text in context),
+                    *read_with,
                     *(
                         normalize(chunk.text[start:end])
                         for start, end in self.units(chunk)
@@ -1245,8 +1249,14 @@ class _Builder:
                 for span, side in mentions
                 if not any(_inside(span, other) for other, _ in mentions)
             ]
+            # A type related to itself is not stated by the context alone (a table named after
+            # it with two columns of its numbers): the cited text names it at least once.
+            itself = domain == range_
             if any(
-                a_side == 0 and b_side == 1 and (a[1] <= b[0] or b[1] <= a[0])
+                a_side == 0
+                and b_side == 1
+                and (a[1] <= b[0] or b[1] <= a[0])
+                and (not itself or a[0] > own or b[0] > own)
                 for a, a_side in longest
                 for b, b_side in longest
             ):
@@ -1260,39 +1270,46 @@ class _Builder:
         A row names the things of its table by numbers: the table's name says what each row
         is, and the header row what each number is of. The name is the chunk's heading, which
         reviewers see with every passage. It counts for table rows only: a section's title is
-        no evidence for every sentence in the section.
+        no evidence for every sentence in the section, so a citation that takes in prose too is
+        read by the header row alone. Rows are lines of the text, not units: a cell that ends a
+        sentence cuts its row into several units. A table without a header row is not read.
         """
         chunk = self.by_id.get(item.chunk_id)
         if chunk is None or item.char_start is None or item.char_end is None:
             return None
-        units = self.units(chunk)
         end = max(item.char_end, item.char_start + 1)
-        rows = [
+        lines = _lines_of(chunk.text)
+        cited = [
             index
-            for index, (start, stop) in enumerate(units)
-            if start < end and item.char_start < stop and _TABLE_ROW.match(chunk.text[start:stop])
+            for index, (start, stop) in enumerate(lines)
+            if start < end and item.char_start < stop and chunk.text[start:stop].strip()
         ]
+        rows = [index for index in cited if _TABLE_ROW.match(chunk.text[slice(*lines[index])])]
         if not rows:
             return None
-        names = [chunk.heading] if chunk.heading else []
-        passage = None
         found = self._header(chunk, rows[-1])
-        if found is not None:
-            where, (start, stop) = found
-            # A header row the citation touches is read with it already.
-            if where is not chunk or not (start < end and item.char_start < stop):
-                names.append(where.text[start:stop])
-                passage = ProposedEvidence(where.id, where.text[start:stop], start, stop)
+        if found is None:
+            return None
+        names = [chunk.heading] if chunk.heading and len(rows) == len(cited) else []
+        passage = None
+        where, (start, stop) = found
+        # A header row the citation touches is read with it already.
+        if where is not chunk or not (start < end and item.char_start < stop):
+            names.append(where.text[start:stop])
+            passage = ProposedEvidence(where.id, where.text[start:stop], start, stop)
         return TableContext(tuple(names), passage)
 
     def _header(self, chunk: ChunkText, index: int) -> tuple[ChunkText, tuple[int, int]] | None:
-        """The header row of the table that unit `index` of `chunk` is a row of: the row above
-        the table's rule row (`| --- |`). A long table goes on over the chunks of one page and
-        heading (a workbook's sheet), so the search goes on into the chunks before."""
+        """The header row of the table that line `index` of `chunk` is a row of: the row above
+        the table's rule row (`| --- |`), or the line itself when the rule row follows it. A
+        long table goes on over the chunks of one page and heading (a workbook's sheet), so the
+        search goes on into the chunks before."""
+        lines = _lines_of(chunk.text)
+        if index + 1 < len(lines) and _TABLE_RULE.match(chunk.text[slice(*lines[index + 1])]):
+            return chunk, lines[index]
         below_rule = False
         while True:
-            units = self.units(chunk)
-            for start, stop in reversed(units[: index + 1]):
+            for start, stop in reversed(lines[: index + 1]):
                 text = chunk.text[start:stop]
                 if not _TABLE_ROW.match(text):
                     return None
@@ -1302,7 +1319,13 @@ class _Builder:
             previous = self.by_seq.get(chunk.seq - 1)
             if previous is None or (previous.page, previous.heading) != (chunk.page, chunk.heading):
                 return None
-            chunk, index = previous, len(self.units(previous)) - 1
+            chunk = previous
+            lines = _lines_of(chunk.text)
+            # The chunker ends a chunk after a line break: the empty line that leaves is no
+            # blank line of the text, one after it is (and ends the table).
+            if chunk.text.endswith("\n"):
+                lines.pop()
+            index = len(lines) - 1
 
     def names_cited(self, evidence: Sequence[ProposedEvidence], names: AbstractSet[str]) -> bool:
         """Whether a sentence that located evidence touches contains one of the (normalized)
@@ -1555,10 +1578,16 @@ def build_proposals(
         checked("relation_type", stated)
         # Cited table rows are read with their table's name and header row (#60). Counted
         # apart: the literal share keeps measuring what the cited text names by itself.
-        table = builder.table_context(cited) if cited is not None and not stated else None
-        if table is not None and builder.states_link([cited] if cited else [], *ends, table.names):
-            counts["relation_type:table"] += 1
-            stated = True
+        table = None
+        if cited is not None and not stated:
+            table = builder.table_context(cited)
+            if (
+                table is not None
+                and table.names
+                and builder.states_link([cited], *ends, table.names)
+            ):
+                counts["relation_type:table"] += 1
+                stated = True
         if not stated:
             continue  # no direct evidence: the cited sentences do not name both types
         seen_relations.add(key)
@@ -1671,6 +1700,18 @@ def mark_late_candidates(
             )
             if "possible_duplicate" not in proposal.flags:
                 proposal.flags.append("possible_duplicate")
+
+
+def _lines_of(text: str) -> list[tuple[int, int]]:
+    """The (start, end) of every line of `text`, without surrounding whitespace."""
+    spans: list[tuple[int, int]] = []
+    start = 0
+    for line in text.split("\n"):
+        stripped = line.strip()
+        offset = start + len(line) - len(line.lstrip())
+        spans.append((offset, offset + len(stripped)))
+        start += len(line) + 1
+    return spans
 
 
 def _mentions(line: str, names: set[str]) -> list[tuple[int, int]]:

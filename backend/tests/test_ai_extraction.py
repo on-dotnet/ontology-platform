@@ -47,6 +47,9 @@ from ontology_platform.modules.ai.prompts import (
     TermsOut,
     TypesOut,
 )
+from ontology_platform.modules.ai.sentences import split_sentences
+from ontology_platform.modules.documents.chunking import chunk_pages
+from ontology_platform.modules.documents.parsers import ParsedPage
 from ontology_platform.settings import Settings
 
 DOC = uuid4()
@@ -1813,6 +1816,123 @@ def test_table_context_keeps_the_longest_and_separate_mentions() -> None:
         ),
     )
     assert [p.fields["labelZh"] for p in proposals if p.kind == "relation_type"] == ["领用"]
+
+
+def test_a_table_row_cut_at_a_sentence_end_is_still_a_row_of_its_table() -> None:
+    # A cell ending a sentence cuts its row into units; the piece after the cut and the rows
+    # below it are still rows of the table.
+    text = (
+        "| 记录号 | 关联工单号 | 备注 |\n"
+        "| --- | --- | --- |\n"
+        "| DJJL-01 | WO-0086 | 漏油。已更换密封 |\n"
+        "| DJJL-02 | WO-0087 | |"
+    )
+    units = [text[start:end] for start, end in split_sentences(text)]
+    assert units[2:4] == ["| DJJL-01 | WO-0086 | 漏油。", "已更换密封 |"]
+    sheet = ChunkText(id=uuid4(), seq=0, text=text, heading="点检记录")
+    proposals = build_proposals(
+        [sheet],
+        [],
+        _SHEET_TYPES,
+        _sheet_relations(
+            ("new:Record", "new:Order", "整改工单", "0.4"),
+            ("new:Record", "new:Order", "关联工单", "0.5"),
+        ),
+    )
+    kept = [p for p in proposals if p.kind == "relation_type"]
+    assert [p.fields["labelZh"] for p in kept] == ["整改工单", "关联工单"]
+    header = text.split("\n")[0]
+    assert [e.quote for e in kept[0].evidence] == ["已更换密封 |", header]
+    assert [e.quote for e in kept[1].evidence] == [text.split("\n")[3], header]
+
+
+def test_the_header_row_is_found_across_the_chunker_line_break() -> None:
+    # The chunker ends a chunk after a line break; a blank line there ends the table.
+    page = ParsedPage(number=None, heading="点检记录", text=_SHEET)
+    first, *rest = chunk_pages([page], max_chars=len("\n".join(_SHEET.split("\n")[:3])) + 2)
+    assert first.text.endswith("|\n")
+    chunks = [
+        ChunkText(id=uuid4(), seq=seq, text=part.text, heading=part.heading)
+        for seq, part in enumerate([first, *rest])
+    ]
+    apart = ChunkText(id=uuid4(), seq=0, text=first.text + "\n", heading="点检记录")
+    after = ChunkText(id=uuid4(), seq=1, text=chunks[1].text, heading="点检记录")
+    proposals = build_proposals(
+        chunks, [], _SHEET_TYPES, _sheet_relations(("new:Record", "new:Order", "关联", "1.1"))
+    )
+    [kept] = [p for p in proposals if p.kind == "relation_type"]
+    assert [e.quote for e in kept.evidence] == [_SHEET.split("\n")[3], _SHEET.split("\n")[0]]
+    dropped = build_proposals(
+        [apart, after], [], _SHEET_TYPES, _sheet_relations(("new:Record", "new:Order", "关联", "1.1"))
+    )
+    assert [p for p in dropped if p.kind == "relation_type"] == []
+
+
+def test_the_header_row_is_not_looked_for_past_prose_in_the_chunk_before() -> None:
+    lines = _SHEET.split("\n")
+    # The chunk before ends with a paragraph: the rows that follow are of another table.
+    first = ChunkText(
+        id=uuid4(), seq=0, text="\n".join([*lines[:3], "", "以上为十一月记录。"]), heading="点检记录"
+    )
+    rest = ChunkText(id=uuid4(), seq=1, text="\n".join(lines[3:]), heading="点检记录")
+    proposals = build_proposals(
+        [first, rest],
+        [],
+        _SHEET_TYPES,
+        _sheet_relations(("new:Record", "new:Order", "关联工单", "1.1")),
+    )
+    assert [p for p in proposals if p.kind == "relation_type"] == []
+
+
+def test_rows_with_no_header_row_are_not_read_by_the_table_name() -> None:
+    rows = ChunkText(id=uuid4(), seq=0, text="| DJJL-01 | 工单 WO-0086 |", heading="点检记录")
+    proposals = build_proposals(
+        [rows], [], _SHEET_TYPES, _sheet_relations(("new:Record", "new:Order", "关联", "0.1"))
+    )
+    assert [p for p in proposals if p.kind == "relation_type"] == []
+
+
+def test_the_table_name_does_not_count_for_prose_cited_with_a_row() -> None:
+    text = "发现异常时开立工单。\n| 记录号 | 点检日期 |\n| --- | --- |\n| DJJL-01 | 2026-11-02 |"
+    chunk = ChunkText(id=uuid4(), seq=0, text=text, heading="点检记录")
+    proposals = build_proposals(
+        [chunk],
+        [],
+        _SHEET_TYPES,
+        _sheet_relations(("new:Record", "new:Order", "关联工单", "0.1-0.3")),
+    )
+    assert [p for p in proposals if p.kind == "relation_type"] == []
+
+
+def test_a_type_related_to_itself_needs_a_mention_in_the_cited_row() -> None:
+    # 设备 is named by the table name and twice by the header row, never by the row itself.
+    sheet = ChunkText(
+        id=uuid4(),
+        seq=0,
+        text="| 设备编码 | 上级设备编码 |\n| --- | --- |\n| E-01 | E-00 |",
+        heading="设备台账",
+    )
+    proposals = build_proposals(
+        [sheet],
+        [],
+        [entity("new:Equipment", "设备", sentence="0.1")],
+        _sheet_relations(("new:Equipment", "new:Equipment", "上级设备", "0.3")),
+    )
+    assert [p for p in proposals if p.kind == "relation_type"] == []
+
+
+def test_a_cited_header_row_is_the_header_of_its_own_table() -> None:
+    # Two tables with no blank line between: the cited header row is not read by the first's.
+    text = (
+        "| 序号 | 数量 |\n| --- | --- |\n| 1 | 2 |\n"
+        "| 记录号 | 关联工单号 |\n| --- | --- |\n| DJJL-01 | WO-0086 |"
+    )
+    chunk = ChunkText(id=uuid4(), seq=0, text=text, heading="点检记录")
+    proposals = build_proposals(
+        [chunk], [], _SHEET_TYPES, _sheet_relations(("new:Record", "new:Order", "关联", "0.4"))
+    )
+    [kept] = [p for p in proposals if p.kind == "relation_type"]
+    assert [e.quote for e in kept.evidence] == [text.split("\n")[3]]
 
 
 def test_types_and_properties_still_cite_one_sentence() -> None:
