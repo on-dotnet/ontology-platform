@@ -1,0 +1,12 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<ontology/plain> a owl:Ontology ;
+    owl:versionIRI <ontology/plain/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "普钢扩展层"@zh, "Commodity steel extension"@en ;
+    rdfs:comment "收录普钢订货的产品族与版次牌号、钢筋定尺成捆交货和按批交验的口径。"@zh, "Covers product families and edition-specific grades for commodity steel orders, fixed-length bundles and lot acceptance of reinforcing bars."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> ;
+    owl:imports <ontology/plain/products>, <ontology/plain/products-codes>, <ontology/plain/products-shapes>,
+        <ontology/plain/quality>, <ontology/plain/quality-codes>, <ontology/plain/quality-shapes> .
