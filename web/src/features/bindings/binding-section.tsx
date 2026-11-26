@@ -17,6 +17,7 @@ import { usePagination } from '@/lib/pagination';
 
 import { tableName, useBindingViews, type CatalogCheck, type Join, type TableBindingView, type TypeBindingView } from './api';
 import { BindingDialog } from './binding-dialog';
+import { SuggestBindingsDialog } from './suggest/suggest-bindings-dialog';
 
 export interface BindingSectionProps {
   ontologyId: string;
@@ -39,6 +40,7 @@ function ActiveBindingSection({ ontologyId, type, all }: BindingSectionProps) {
   const { t } = useTranslation();
   const titleId = useId();
   const { canEditBindings } = usePermissions();
+  const [suggestOpen, setSuggestOpen] = useState(false);
   const [editing, setEditing] = useState<{ view: TypeBindingView; all: readonly Element[] } | null>(null);
   const views = useBindingViews(ontologyId, type.id);
 
@@ -80,10 +82,20 @@ function ActiveBindingSection({ ontologyId, type, all }: BindingSectionProps) {
                 </InlineNotice>
               ) : null}
               {canEditBindings ? (
-                <Button variant="secondary" size="sm" aria-haspopup="dialog" disabled={!all}
-                  onClick={() => { if (all) setEditing({ view, all }); }}>
-                  {t(view.table ? 'bindings.edit' : 'bindings.bind')}
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="secondary" size="sm" aria-haspopup="dialog" disabled={!all}
+                    onClick={() => { if (all) setEditing({ view, all }); }}>
+                    {t(view.table ? 'bindings.edit' : 'bindings.bind')}
+                  </Button>
+                  {!view.table && (
+                    <Button variant="secondary" size="sm" aria-haspopup="dialog" onClick={() => setSuggestOpen(true)}>
+                      {t('bindings.suggest.title')}
+                    </Button>
+                  )}
+                  {!view.table && suggestOpen && (
+                    <SuggestBindingsDialog open onOpenChange={setSuggestOpen} ontologyId={ontologyId} typeIds={[type.id]} />
+                  )}
+                </div>
               ) : null}
             </>
           );

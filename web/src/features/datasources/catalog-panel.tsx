@@ -12,6 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { Skeleton } from '@/components/ui/skeleton';
 import { meQueryKey } from '@/features/auth/api';
+import { usePermissions } from '@/features/auth/permissions';
+import { SuggestBindingsDialog } from '@/features/bindings/suggest/suggest-bindings-dialog';
 import { codeMessage, useErrorMessage } from '@/i18n/error-message';
 
 import { rememberSource, sourceKey, type DataSource } from './api';
@@ -55,6 +57,8 @@ function SourceCatalog({ source, canBrowse, onEdit }: CatalogPanelProps) {
   const client = useQueryClient();
   const { id, catalog } = source;
   const [denied, setDenied] = useState(false);
+  const { canEditBindings } = usePermissions();
+  const [suggestOpen, setSuggestOpen] = useState(false);
   const allowed = !denied && canBrowse && catalog !== null;
   const needsCatalogInfo = !denied && canBrowse && catalog === null;
   useEffect(() => {
@@ -97,7 +101,7 @@ function SourceCatalog({ source, canBrowse, onEdit }: CatalogPanelProps) {
   return (
     <section aria-labelledby={titleId}>
       <Card>
-        <CardHeader className="flex-row items-center justify-between gap-4">
+        <CardHeader className="flex-row flex-wrap items-center justify-between gap-4">
           <div>
             <CardTitle id={titleId}>{t('datasources.catalog.title')}</CardTitle>
             {refreshedAt && (
@@ -107,7 +111,18 @@ function SourceCatalog({ source, canBrowse, onEdit }: CatalogPanelProps) {
               </dl>
             )}
           </div>
-          {canRefresh && catalog.status === 'ready' && !postFailed && refreshButton()}
+          {canRefresh && catalog.status === 'ready' && !postFailed && (
+            <div className="flex flex-wrap gap-2">
+              {refreshButton()}
+              {canEditBindings && (
+                <Button aria-haspopup="dialog" onClick={() => setSuggestOpen(true)}>{t('bindings.suggest.title')}</Button>
+              )}
+            </div>
+          )}
+          {/* Outside the condition: a refresh started elsewhere must not close a running suggestion. */}
+          {canEditBindings && suggestOpen && (
+            <SuggestBindingsDialog open onOpenChange={setSuggestOpen} dataSourceId={id} />
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
           {!allowed ? (

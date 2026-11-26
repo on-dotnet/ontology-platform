@@ -5,6 +5,42 @@
   "bind": "Bind data",
   "edit": "Edit binding",
   "loadFailed": "Could not load the bindings",
+  "suggest": {
+    "scope": "Suggestion scope",
+    "bySchema": "By schema",
+    "byTable": "By table",
+    "tableCount": "Tables: {{count}}",
+    "selectedTableCount": "Tables selected: {{count}}",
+    "tooManySchemas": "Select at most 50 schemas at a time.",
+    "submit": "Generate binding suggestions",
+    "title": "Suggest bindings with AI",
+    "noOntologies": "Create or import an ontology to request binding suggestions.",
+    "noSources": "No active data source has a ready catalog. Read a catalog on the Data page first.",
+    "modelInputs": "The model will receive table names, column names, types, and comments.",
+    "modelInputsWithSamples": "The model will receive table names, column names, types, comments, and up to 5 sample values per column.",
+    "sampleEvidence": "Sample values will appear as evidence on the review page, where all signed-in users can see them.",
+    "progress": "Binding suggestion progress",
+    "queued": "Waiting to start",
+    "currentStep": "Current step: {{step}}",
+    "steps": {
+      "catalog": "Read the catalog",
+      "match": "Match types to tables",
+      "columns": "Match properties and relationships",
+      "changeset": "Create a change set"
+    },
+    "proposed_one": "{{count}} binding suggestion is ready for review",
+    "proposed_other": "{{count}} binding suggestions are ready for review",
+    "dropped_one": "{{count}} suggestion could not be used and was skipped",
+    "dropped_other": "{{count}} suggestions could not be used and were skipped",
+    "none": "No usable binding suggestions were found",
+    "failed": "AI binding suggestions are temporarily unavailable. Existing bindings are unaffected.",
+    "manual": "Bind manually",
+    "ai": {
+      "not_configured": "The model service has not been configured. Ask a platform administrator to set it up, then try again.",
+      "unavailable": "The model service could not be reached. Try again later.",
+      "invalid_output": "The model returned suggestions in an unexpected format. Try again."
+    }
+  },
   "pending": {
     "title": "Binding changes are waiting for review",
     "link": "Go to review"
