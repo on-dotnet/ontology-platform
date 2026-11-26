@@ -1,0 +1,180 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/special/products-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/special/products-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "特钢产品族与标准牌号"@zh, "Special steel product families and standard grades"@en ;
+    rdfs:comment "收录特钢和高温合金的产品族，以及可按版次查证的代表牌号。"@zh,
+        "Registers product families for special steels and superalloys and representative grades traceable to specific standard editions."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/special-product-family> a skos:ConceptScheme ;
+    rdfs:label "特钢产品族"@zh, "Special steel product family"@en ;
+    skos:prefLabel "特钢产品族"@zh, "Special steel product family"@en ;
+    skos:definition "按材料系列或零件用途归集特钢和高温合金牌号；一个牌号可适用于多个产品族。"@zh,
+        "Groups special steel and superalloy grades by material series or component application. A grade may belong to several families."@en ;
+    rdfs:comment "下沉理由：齿轮、轴承、工模具和高温部件等订货用途与特钢及特冶材料系列交叉，需在本层表达其选材关系。"@zh ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+stl:SpecialProductFamilyCode a rdfs:Datatype ;
+    rdfs:label "特钢产品族代码"@zh, "Special steel product family code"@en ;
+    skos:prefLabel "特钢产品族代码"@zh, "Special steel product family code"@en ;
+    skos:definition "标记特钢产品族方案内代码主记号的字面量类型。"@zh,
+        "The datatype of primary notations in the special steel product family scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<code/special-product-family/QUALITYCS> a skos:Concept ;
+    skos:inScheme <code/special-product-family> ; skos:topConceptOf <code/special-product-family> ;
+    skos:notation "QUALITYCS"^^stl:SpecialProductFamilyCode ;
+    rdfs:label "优质碳素结构钢"@zh, "Quality carbon structural steel"@en ; skos:prefLabel "优质碳素结构钢"@zh, "Quality carbon structural steel"@en ;
+    skos:definition "以优质碳素结构钢牌号供货、用于制造机械结构零件的碳钢系列。"@zh, "Carbon steels supplied by quality carbon structural steel grade for mechanical components."@en ;
+    dcterms:source <std/gbt-699-2015> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<code/special-product-family/ALLOYSTR> a skos:Concept ;
+    skos:inScheme <code/special-product-family> ; skos:topConceptOf <code/special-product-family> ;
+    skos:notation "ALLOYSTR"^^stl:SpecialProductFamilyCode ;
+    rdfs:label "合金结构钢"@zh, "Alloy structural steel"@en ; skos:prefLabel "合金结构钢"@zh, "Alloy structural steel"@en ;
+    skos:definition "通过合金化获得结构件所需强度、韧性或淬透性的钢材系列。"@zh, "Alloy steels selected for the strength, toughness or hardenability required by structural components."@en ;
+    dcterms:source <std/gbt-3077-2015> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<code/special-product-family/GEAR> a skos:Concept ;
+    skos:inScheme <code/special-product-family> ; skos:topConceptOf <code/special-product-family> ;
+    skos:notation "GEAR"^^stl:SpecialProductFamilyCode ;
+    rdfs:label "齿轮钢"@zh, "Gear steel"@en ; skos:prefLabel "齿轮钢"@zh, "Gear steel"@en ;
+    skos:definition "按齿轮服役条件选用的钢材系列，选材时考虑齿面耐磨性与齿根承载能力。"@zh, "Steels selected for gears with regard to flank wear resistance and load capacity at the tooth root."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<code/special-product-family/SPRING> a skos:Concept ;
+    skos:inScheme <code/special-product-family> ; skos:topConceptOf <code/special-product-family> ;
+    skos:notation "SPRING"^^stl:SpecialProductFamilyCode ;
+    rdfs:label "弹簧钢"@zh, "Spring steel"@en ; skos:prefLabel "弹簧钢"@zh, "Spring steel"@en ;
+    skos:definition "用于制造在反复载荷下依靠弹性变形工作的弹簧元件的钢材系列。"@zh, "Steels for spring elements that undergo repeated elastic deformation under load."@en ;
+    dcterms:source <std/gbt-1222-2025> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<code/special-product-family/BEARING> a skos:Concept ;
+    skos:inScheme <code/special-product-family> ; skos:topConceptOf <code/special-product-family> ;
+    skos:notation "BEARING"^^stl:SpecialProductFamilyCode ;
+    rdfs:label "轴承钢"@zh, "Bearing steel"@en ; skos:prefLabel "轴承钢"@zh, "Bearing steel"@en ;
+    skos:definition "用于制造滚动轴承套圈、滚动体等承受循环接触应力零件的钢材系列。"@zh, "Steels for bearing rings, rolling elements and other components subject to cyclic contact stress."@en ;
+    dcterms:source <std/gbt-18254-2016> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<code/special-product-family/TOOLDIE> a skos:Concept ;
+    skos:inScheme <code/special-product-family> ; skos:topConceptOf <code/special-product-family> ;
+    skos:notation "TOOLDIE"^^stl:SpecialProductFamilyCode ;
+    rdfs:label "工模具钢"@zh, "Tool and die steel"@en ; skos:prefLabel "工模具钢"@zh, "Tool and die steel"@en ;
+    skos:definition "供刃具、量具或成形模具选材的钢材系列，使用时关注刃口或工作面的性能。"@zh, "Steels for cutting tools, gauges or forming dies, selected for the performance of the cutting edge or working surface."@en ;
+    dcterms:source <std/gbt-1299-2025> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<code/special-product-family/STAINLESS> a skos:Concept ;
+    skos:inScheme <code/special-product-family> ; skos:topConceptOf <code/special-product-family> ;
+    skos:notation "STAINLESS"^^stl:SpecialProductFamilyCode ;
+    rdfs:label "不锈钢"@zh, "Stainless steel"@en ; skos:prefLabel "不锈钢"@zh, "Stainless steel"@en ;
+    skos:definition "以在指定介质中耐腐蚀为主要选材依据的不锈钢系列。"@zh, "Stainless grades selected for resistance to corrosion in the intended environment."@en ;
+    dcterms:source <std/gbt-1220-2007> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<code/special-product-family/HEATRES> a skos:Concept ;
+    skos:inScheme <code/special-product-family> ; skos:topConceptOf <code/special-product-family> ;
+    skos:notation "HEATRES"^^stl:SpecialProductFamilyCode ;
+    rdfs:label "耐热钢"@zh, "Heat-resistant steel"@en ; skos:prefLabel "耐热钢"@zh, "Heat-resistant steel"@en ;
+    skos:definition "供高温部件按高温强度或抗氧化性能选用的钢材系列。"@zh, "Steels selected for elevated-temperature strength or oxidation resistance in hot-service components."@en ;
+    dcterms:source <std/gbt-1221-2007> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<code/special-product-family/SUPERALLOY> a skos:Concept ;
+    skos:inScheme <code/special-product-family> ; skos:topConceptOf <code/special-product-family> ;
+    skos:notation "SUPERALLOY"^^stl:SpecialProductFamilyCode ;
+    rdfs:label "高温合金"@zh, "Superalloy"@en ; skos:prefLabel "高温合金"@zh, "Superalloy"@en ;
+    skos:definition "供高温承载部件按高温强度和环境耐受能力选用的合金系列，包括镍基高温合金。"@zh, "Alloys selected for strength and environmental resistance in load-bearing hot components, including nickel-base superalloys."@en ;
+    dcterms:source <std/gbt-14992-2025> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+# Edition-specific grade designations
+<std/gbt-699-2015/grade/20> a stl:StandardGrade ; skos:notation "20" ;
+    stl:definedIn <std/gbt-699-2015> ; stl:specialProductFamily <code/special-product-family/QUALITYCS> ;
+    dcterms:source <std/gbt-699-2015> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-699-2015/grade/45> a stl:StandardGrade ; skos:notation "45" ;
+    stl:definedIn <std/gbt-699-2015> ; stl:specialProductFamily <code/special-product-family/QUALITYCS> ;
+    dcterms:source <std/gbt-699-2015> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-3077-2015/grade/40Cr> a stl:StandardGrade ; skos:notation "40Cr" ;
+    stl:definedIn <std/gbt-3077-2015> ; stl:specialProductFamily <code/special-product-family/ALLOYSTR> ;
+    dcterms:source <std/gbt-3077-2015> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-3077-2015/grade/42CrMo> a stl:StandardGrade ; skos:notation "42CrMo" ;
+    stl:definedIn <std/gbt-3077-2015> ; stl:specialProductFamily <code/special-product-family/ALLOYSTR> ;
+    dcterms:source <std/gbt-3077-2015> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-5216-2014/grade/20CrMoH> a stl:StandardGrade ; skos:notation "20CrMoH" ;
+    stl:definedIn <std/gbt-5216-2014> ; stl:specialProductFamily <code/special-product-family/GEAR> ;
+    dcterms:source <std/gbt-5216-2014> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-5216-2014/grade/22CrMoH> a stl:StandardGrade ; skos:notation "22CrMoH" ;
+    stl:definedIn <std/gbt-5216-2014> ; stl:specialProductFamily <code/special-product-family/GEAR> ;
+    dcterms:source <std/gbt-5216-2014> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-1222-2016/grade/60Si2Mn> a stl:StandardGrade ; skos:notation "60Si2Mn" ;
+    stl:definedIn <std/gbt-1222-2016> ; stl:specialProductFamily <code/special-product-family/SPRING> ;
+    dcterms:source <std/gbt-1222-2016> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-1222-2016/grade/60CrMnB> a stl:StandardGrade ; skos:notation "60CrMnB" ;
+    stl:definedIn <std/gbt-1222-2016> ; stl:specialProductFamily <code/special-product-family/SPRING> ;
+    dcterms:source <std/gbt-1222-2016> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-1222-2016/grade/65Mn> a stl:StandardGrade ; skos:notation "65Mn" ;
+    stl:definedIn <std/gbt-1222-2016> ; stl:specialProductFamily <code/special-product-family/SPRING> ;
+    dcterms:source <std/gbt-1222-2016> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-18254-2016/grade/GCr15> a stl:StandardGrade ; skos:notation "GCr15" ;
+    stl:definedIn <std/gbt-18254-2016> ; stl:specialProductFamily <code/special-product-family/BEARING> ;
+    dcterms:source <std/gbt-18254-2016> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-18254-2016/grade/GCr15SiMn> a stl:StandardGrade ; skos:notation "GCr15SiMn" ;
+    stl:definedIn <std/gbt-18254-2016> ; stl:specialProductFamily <code/special-product-family/BEARING> ;
+    dcterms:source <std/gbt-18254-2016> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-18254-2016/grade/GCr18Mo> a stl:StandardGrade ; skos:notation "GCr18Mo" ;
+    stl:definedIn <std/gbt-18254-2016> ; stl:specialProductFamily <code/special-product-family/BEARING> ;
+    dcterms:source <std/gbt-18254-2016> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-20878-2024/grade/06Cr19Ni10> a stl:StandardGrade ; skos:notation "06Cr19Ni10" ;
+    stl:definedIn <std/gbt-20878-2024> ; stl:specialProductFamily <code/special-product-family/STAINLESS> ;
+    dcterms:source <std/gbt-20878-2024> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-20878-2024/grade/022Cr17Ni12Mo2> a stl:StandardGrade ; skos:notation "022Cr17Ni12Mo2" ;
+    stl:definedIn <std/gbt-20878-2024> ; stl:specialProductFamily <code/special-product-family/STAINLESS> ;
+    dcterms:source <std/gbt-20878-2024> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-1221-2007/grade/06Cr25Ni20> a stl:StandardGrade ; skos:notation "06Cr25Ni20" ;
+    stl:definedIn <std/gbt-1221-2007> ; stl:specialProductFamily <code/special-product-family/HEATRES> ;
+    dcterms:source <std/gbt-1221-2007> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-1221-2007/grade/42Cr9Si2> a stl:StandardGrade ; skos:notation "42Cr9Si2" ;
+    stl:definedIn <std/gbt-1221-2007> ; stl:specialProductFamily <code/special-product-family/HEATRES> ;
+    dcterms:source <std/gbt-1221-2007> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-14992-2005/grade/GH4169> a stl:StandardGrade ; skos:notation "GH4169" ;
+    stl:definedIn <std/gbt-14992-2005> ; stl:specialProductFamily <code/special-product-family/SUPERALLOY> ;
+    dcterms:source <std/gbt-14992-2005> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-14992-2025/grade/GH2130> a stl:StandardGrade ; skos:notation "GH2130" ;
+    stl:definedIn <std/gbt-14992-2025> ; stl:specialProductFamily <code/special-product-family/SUPERALLOY> ;
+    dcterms:source <std/gbt-14992-2025> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-14992-2025/grade/GH2132> a stl:StandardGrade ; skos:notation "GH2132" ;
+    stl:definedIn <std/gbt-14992-2025> ; stl:specialProductFamily <code/special-product-family/SUPERALLOY> ;
+    dcterms:source <std/gbt-14992-2025> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-1299-2025/grade/Cr12MoV> a stl:StandardGrade ; skos:notation "Cr12MoV" ;
+    stl:definedIn <std/gbt-1299-2025> ; stl:specialProductFamily <code/special-product-family/TOOLDIE> ;
+    dcterms:source <std/gbt-1299-2025> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-1299-2025/grade/Cr12Mo1V1> a stl:StandardGrade ; skos:notation "Cr12Mo1V1" ;
+    stl:definedIn <std/gbt-1299-2025> ; stl:specialProductFamily <code/special-product-family/TOOLDIE> ;
+    dcterms:source <std/gbt-1299-2025> ; rdfs:isDefinedBy <ontology/special/products-codes> .
+
+<std/gbt-1299-2025/grade/4CrNi4Mo> a stl:StandardGrade ; skos:notation "4CrNi4Mo" ;
+    stl:definedIn <std/gbt-1299-2025> ; stl:specialProductFamily <code/special-product-family/TOOLDIE> ;
+    dcterms:source <std/gbt-1299-2025> ; rdfs:isDefinedBy <ontology/special/products-codes> .

@@ -1,0 +1,84 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/special/remelting-shapes> a owl:Ontology ;
+    owl:versionIRI <ontology/special/remelting-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "重熔作业与物料约束"@zh, "Remelting operation and material constraints"@en ;
+    rdfs:comment "核对重熔作业的编号、道次和冶炼路线，并检查投入电极与产出锭的直接来源是否相符。"@zh, "Checks remelt numbers, pass order and melting routes, and reconciles electrode inputs with the direct sources of the output ingots."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:RemeltNumberShape a sh:PropertyShape ; sh:targetClass stl:Remelting ;
+    sh:path stl:remeltNumber ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ;
+    sh:severity sh:Violation ; rdfs:comment "每次重熔作业须记录一个非空的重熔炉号。"@zh .
+
+stl:RemeltSequenceShape a sh:PropertyShape ; sh:targetClass stl:Remelting ;
+    sh:path stl:remeltSequence ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:positiveInteger ;
+    sh:severity sh:Violation ; rdfs:comment "每次作业须用一个正整数标明它是该冶炼链上的第几次重熔，首次为一。"@zh .
+
+stl:RemeltRecordOwnerShape a sh:NodeShape ; sh:targetSubjectsOf stl:remeltNumber, stl:remeltSequence ;
+    sh:class stl:Remelting ; sh:severity sh:Violation ;
+    rdfs:comment "承载重熔炉号或重熔道次的记录必须是重熔作业。"@zh .
+
+stl:RemeltInputElectrodeShape a sh:PropertyShape ; sh:targetClass stl:Remelting ;
+    sh:path stl:inputPiece ; sh:qualifiedValueShape [ sh:class stl:Electrode ] ; sh:qualifiedMinCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "每次重熔作业的投入件中须至少登记一件实际熔入的自耗电极。"@zh .
+
+stl:RemeltOutputShape a sh:PropertyShape ; sh:targetClass stl:Remelting ;
+    sh:path [ sh:alternativePath ( stl:outputPiece [ sh:inversePath stl:producedBy ] ) ] ;
+    sh:qualifiedValueShape [ sh:class stl:RemeltedIngot ] ; sh:qualifiedMinCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "每次重熔至少产出一件重熔锭，产出关系可由作业或锭记录。"@zh .
+
+stl:RemeltedIngotElectrodeShape a sh:PropertyShape ; sh:targetClass stl:RemeltedIngot ;
+    sh:path stl:derivedFrom ; sh:qualifiedValueShape [ sh:class stl:Electrode ] ; sh:qualifiedMinCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "每件重熔锭的直接来源中至少有一件实际熔入的自耗电极。"@zh .
+
+stl:RemeltElectrodeLineageShape a sh:NodeShape ; sh:targetClass stl:Remelting ;
+    sh:severity sh:Violation ; rdfs:comment "每件产出锭的直接来源电极都须登记为本炉投入，每件投入电极也须出现在本炉至少一件产出锭的直接来源中。"@zh ;
+    sh:sparql [ sh:message "本炉投入的电极与本炉产出锭登记的直接来源电极不一致。"@zh ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT DISTINCT $this WHERE {
+          $this stl:inputPiece ?input ; (stl:outputPiece|^stl:producedBy) ?ingot .
+          ?input a/rdfs:subClassOf* stl:Electrode .
+          ?ingot a/rdfs:subClassOf* stl:RemeltedIngot ; stl:derivedFrom ?source .
+          ?source a/rdfs:subClassOf* stl:Electrode .
+          FILTER (NOT EXISTS { $this stl:inputPiece ?source } ||
+                  NOT EXISTS {
+                    $this (stl:outputPiece|^stl:producedBy) ?output .
+                    ?output a/rdfs:subClassOf* stl:RemeltedIngot ; stl:derivedFrom ?input .
+                  })
+        }
+    """ ] .
+
+stl:ElectrodeSourceIngotShape a sh:PropertyShape ; sh:targetClass stl:Electrode ;
+    sh:path stl:derivedFrom ; sh:qualifiedValueShape [ sh:class stl:Ingot ] ; sh:qualifiedMinCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "沿重熔链制备的自耗电极须记录其直接来源锭，可以是初锭或上一道次的重熔锭。"@zh .
+
+stl:MeltingRouteSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:meltingRoute ;
+    sh:path skos:inScheme ; sh:hasValue <code/melting-route> ;
+    sh:severity sh:Violation ; rdfs:comment "实物件引用的冶炼路线代码须属于冶炼路线方案。"@zh .
+
+stl:MeltingRouteDetailShape a sh:PropertyShape ; sh:targetObjectsOf stl:meltingRoute ;
+    sh:path [ sh:oneOrMorePath skos:broader ] ;
+    sh:qualifiedValueShape [ sh:in ( <code/melting-route/REMELT> <code/melting-route/DIRECT> ) ] ; sh:qualifiedMinCount 1 ;
+    sh:severity sh:Violation ; rdfs:comment "实物件须引用能沿上位关系归入含重熔或不含重熔组的具体路线。"@zh .
+
+stl:RemeltedIngotRouteShape a sh:PropertyShape ; sh:targetClass stl:RemeltedIngot ;
+    sh:target [ a sh:SPARQLTarget ; sh:select """
+        PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT DISTINCT ?this WHERE {
+          ?this a/rdfs:subClassOf* stl:MaterialPiece .
+          ?this stl:derivedFrom+/a/rdfs:subClassOf* stl:RemeltedIngot .
+        }
+    """ ] ;
+    sh:path stl:meltingRoute ; sh:maxCount 1 ;
+    sh:qualifiedValueShape [ sh:property [ sh:path [ sh:oneOrMorePath skos:broader ] ; sh:hasValue <code/melting-route/REMELT> ] ] ;
+    sh:qualifiedMinCount 1 ; sh:severity sh:Violation ;
+    rdfs:comment "每件重熔锭，以及沿直接来源链可追溯到重熔锭的每件实物件，都须注明一条含重熔组下的具体冶炼路线。"@zh .

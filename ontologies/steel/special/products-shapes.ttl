@@ -1,0 +1,22 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/special/products-shapes> a owl:Ontology ;
+    owl:versionIRI <ontology/special/products-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "特钢产品族与牌号约束"@zh, "Special steel family and grade constraints"@en ;
+    rdfs:comment "检查归入特钢产品族的牌号所用的标准版次和产品族代码。"@zh,
+        "Checks the standard edition and family code for grades assigned to special steel product families."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:SpecialGradeEditionShape a sh:PropertyShape ; sh:targetSubjectsOf stl:specialProductFamily ;
+    sh:path stl:definedIn ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stl:StandardEdition ;
+    sh:severity sh:Violation ; rdfs:comment "归入特钢产品族的牌号须指向一个确定的标准版次，便于区分跨版次的同名牌号。"@zh .
+
+stl:SpecialProductFamilySchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:specialProductFamily ;
+    sh:path skos:inScheme ; sh:hasValue <code/special-product-family> ;
+    sh:severity sh:Violation ; rdfs:comment "作为特钢产品族取值的代码须属于特钢产品族方案。"@zh .

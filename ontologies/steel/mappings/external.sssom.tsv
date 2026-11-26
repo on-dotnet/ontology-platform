@@ -51,3 +51,7 @@ stl:CoilSplitting	分卷	skos:closeMatch	epcis:TransformationEvent	Transformatio
 stl:CoilJoining	合卷	skos:closeMatch	epcis:TransformationEvent	TransformationEvent	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	多件来源卷接合形成新卷时，可以在一个转换事件中关联各投入卷与产出卷。
 stl:Packing	包装	skos:closeMatch	epcis:AggregationEvent	AggregationEvent	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	可以用聚合事件登记装包形成的父子关系，成员实物保留各自的标识。
 stl:HeatTreatmentLoad	热处理装炉批	skos:broadMatch	iec62264:MaterialLot	Material Lot	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	使用同一装炉批号跟踪共同处理的一组实物，是按制造条件建立的物料批。
+stl:Remelting	重熔作业	skos:broadMatch	prov:Activity	Activity	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	重熔道次使用电极并生成新的钢锭，可在溯源记录中作为活动引用。
+stl:RemeltedIngot	重熔锭	skos:broadMatch	prov:Entity	Entity	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	每道重熔独立产出的锭都有自身身份和直接电极来源。
+stl:InclusionRating	非金属夹杂物显微评级检验	skos:broadMatch	sosa:Observation	Observation	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	对试样观察面上的夹杂物按类别与系列评级，可作为特定检验对象的一次观测。
+stl:InclusionRatingResult	分项夹杂物评级结果	skos:broadMatch	sosa:Result	Result	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	形态类别和适用系列共同限定这一显微观测所报告的单项结果。

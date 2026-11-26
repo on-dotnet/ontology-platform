@@ -1,0 +1,114 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/special/inspection> a owl:Ontology ;
+    owl:versionIRI <ontology/special/inspection/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "特钢检验与追溯"@zh, "Specialty steel inspection and traceability"@en ;
+    rdfs:comment "描述低倍、特钢显微分项评级、端淬与纯净度交验，以及棒材探伤后的逐件锭位追踪。"@zh, "Describes macroexaminations, specialty steel micrographic ratings, hardenability and cleanliness assessments, and ingot positions traced from inspected bars."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:MacroExamination a owl:Class ; rdfs:subClassOf stl:MetallographicExamination ;
+    rdfs:label "低倍检验"@zh, "Macroexamination"@en ; skos:prefLabel "低倍检验"@zh, "Macroexamination"@en ;
+    skos:definition "在取自可追溯实物件的横截面试样上经酸蚀等方法显现宏观组织，按订货规格逐类评定缺陷级别的检验；与高倍检验的区别在于用肉眼或低倍放大观察整个截面。"@zh, "Examination of a transverse section from a traceable piece, revealed by etching or similar methods, in which each specified macrostructural defect category is rated against the order; unlike microexamination it views the whole section by eye or at low magnification."@en ;
+    rdfs:comment "下沉理由：按缺陷类别逐项给出低倍级别并对照订货要求出证，是特钢棒材、锻材交验的常规项目；普钢产品通常不要求分项低倍级别，需要时用通用金相检验和评级结果记录即可。"@zh ;
+    dcterms:source <std/gbt-226-2015>, <std/gbt-1979-2025> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:MacroDefectRating a owl:Class ; rdfs:subClassOf stl:RatingResult ;
+    rdfs:label "低倍缺陷评级结果"@zh, "Macrodefect rating"@en ; skos:prefLabel "低倍缺陷评级结果"@zh, "Macrodefect rating"@en ;
+    skos:definition "在一次低倍检验中对一个缺陷类别给出的级别，同一截面可分别报告多类缺陷。"@zh, "A level assigned to one defect category on a section in a macroexamination; one section may report several categories."@en ;
+    rdfs:comment "下沉理由：分项低倍级别只在特钢交验中逐类对照订货要求；普钢不出具分项低倍级别。"@zh ;
+    dcterms:source <std/gbt-1979-2025> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:MicroExamination a owl:Class ; rdfs:subClassOf stl:MetallographicExamination ;
+    rdfs:label "特钢显微组织交验"@zh, "Microexamination for specialty steel acceptance"@en ; skos:prefLabel "特钢显微组织交验"@zh, "Microexamination for specialty steel acceptance"@en ;
+    skos:definition "依照特钢产品规格，在可追溯试料的观察面上对指定显微特征作分项交验的检验。"@zh, "Examination of a traceable specimen surface for the particular microscopic features specified for acceptance of a specialty steel product."@en ;
+    rdfs:comment "下沉理由：本类只作为特钢分项显微评级（夹杂物分级、碳化物带状评级）的上位类；普钢的金相观察不需要这一分组，直接用通用金相检验类。"@zh ;
+    dcterms:source <std/gbt-18254-2016> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:InclusionRating a owl:Class ; rdfs:subClassOf stl:MicroExamination ;
+    rdfs:label "非金属夹杂物显微评级检验"@zh, "Micrographic inclusion rating"@en ; skos:prefLabel "非金属夹杂物显微评级检验"@zh, "Micrographic inclusion rating"@en ;
+    skos:definition "在特钢交验试样的观察面上按夹杂物形态类别及适用系列评级，可为同一次检验出具多个结果。"@zh, "A specialty steel microexamination reporting inclusion ratings by morphological category and applicable thickness series."@en ;
+    rdfs:comment "下沉理由：轴承等疲劳敏感用途要求保存类别与系列各自的评级，普钢常规验收无需这一组逐项纯净度证据。"@zh ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:InclusionRatingResult a owl:Class ; rdfs:subClassOf stl:RatingResult ;
+    rdfs:label "分项夹杂物评级结果"@zh, "Inclusion rating by category"@en ; skos:prefLabel "分项夹杂物评级结果"@zh, "Inclusion rating by category"@en ;
+    skos:definition "在一次显微评级中针对一种夹杂物形态类别、在适用时针对一个粗细系列报告的级别。"@zh, "A reported level for one morphological category and, where applicable, one thickness series in an inclusion examination."@en ;
+    rdfs:comment "下沉理由：逐项记录使轴承钢等产品能按订货要求分别核对各类夹杂物的最不利评级。"@zh ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:BandedStructureRating a owl:Class ; rdfs:subClassOf stl:MicroExamination ;
+    rdfs:label "轴承钢碳化物带状评级检验"@zh, "Bearing steel carbide banding examination"@en ; skos:prefLabel "轴承钢碳化物带状评级检验"@zh, "Bearing steel carbide banding examination"@en ;
+    skos:definition "在高碳铬轴承钢纵向观察面上评定碳化物沿加工方向聚集成带的程度并出具级别的检验。"@zh, "An examination grading the concentration of carbides in bands along the working direction on a longitudinal bearing steel specimen."@en ;
+    rdfs:comment "下沉理由：高碳铬轴承钢按碳化物带状项目交验，其评级对象和标尺有别于普钢铁素体与珠光体的组织带。"@zh ;
+    dcterms:source <std/gbt-18254-2016> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:HardenabilityTest a owl:Class ; rdfs:subClassOf stl:MechanicalTest ;
+    rdfs:label "末端淬透性试验"@zh, "End-quench hardenability test"@en ; skos:prefLabel "末端淬透性试验"@zh, "End-quench hardenability test"@en ;
+    skos:definition "从单端淬火试样上取得一系列规定端距处的硬度，用于评定保证淬透性钢的端淬响应。"@zh, "A test measuring hardness at distances from the quenched end of a specimen to evaluate the response of a guaranteed-hardenability grade."@en ;
+    rdfs:comment "下沉理由：保证淬透性的齿轮钢等需按端距核对整条硬度带，普钢常规硬度验收无需端淬曲线。"@zh ;
+    dcterms:source <std/gbt-225-2006> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:CleanlinessAssessment a owl:Class ; rdfs:subClassOf stl:InspectionResult ;
+    rdfs:label "特钢纯净度综合评价"@zh, "Specialty steel cleanliness assessment"@en ; skos:prefLabel "特钢纯净度综合评价"@zh, "Specialty steel cleanliness assessment"@en ;
+    skos:definition "将一个交验对象的分项夹杂物评级与规格所需的其他检验结果汇集为可追溯的纯净度评价。"@zh, "An assessment combining the inclusion ratings of one acceptance subject with other inspection results required by its cleanliness specification."@en ;
+    rdfs:comment "下沉理由：轴承等疲劳敏感产品需要按规格把夹杂物评级与其他证据汇合出证，普钢常规化学分析仅逐项报告元素结果。"@zh ;
+    dcterms:source <std/gbt-18254-2016> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:GasContentAnalysis a owl:Class ; rdfs:subClassOf stl:ChemicalAnalysis ;
+    rdfs:label "气体含量分析"@zh, "Gas content analysis"@en ; skos:prefLabel "气体含量分析"@zh, "Gas content analysis"@en ;
+    skos:definition "测定特钢试样中氧、氮或氢含量的化学分析，按元素报告结果；试样来自重熔锭时可同时指明所代表的重熔作业。"@zh, "A chemical analysis of oxygen, nitrogen or hydrogen in a specialty steel sample, reporting per-element results; when the sample comes from a remelted ingot it may also identify the remelting run it represents."@en ;
+    rdfs:comment "下沉理由：特钢订货对氧、氮、氢含量单独出证，重熔材还须区分同一初炼炉次各道重熔后的结果；普钢的气体元素按通用化学分析逐元素报告即可。"@zh ;
+    dcterms:source <std/gbt-11261-2006>, <std/gbt-20124-2006>, <std/gbt-223-82-2018> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:analysedRemelt a owl:ObjectProperty ; rdfs:domain stl:GasContentAnalysis ; rdfs:range stl:Remelting ;
+    rdfs:label "气体分析所据重熔作业"@zh, "Remelting stage analysed"@en ; skos:prefLabel "气体分析所据重熔作业"@zh, "Remelting stage analysed"@en ;
+    skos:definition "指明供气体复核的试样所代表的那次重熔，使同一炉次多次重熔的结果可区分。"@zh, "Identifies the remelting run represented by the analysed sample, distinguishing successive runs within one heat genealogy."@en ;
+    rdfs:comment "下沉理由：逐次重熔气体复核须标明可独立追溯的重熔阶段。"@zh ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:inclusionType a owl:ObjectProperty ; rdfs:domain stl:InclusionRatingResult ; rdfs:range skos:Concept ; rdfs:seeAlso <code/inclusion-type> ;
+    rdfs:label "受评夹杂物类别"@zh, "Rated inclusion category"@en ; skos:prefLabel "受评夹杂物类别"@zh, "Rated inclusion category"@en ;
+    skos:definition "标明本条评级观察到的夹杂物形态类别，决定应选用的分类标尺。"@zh, "Identifies the inclusion morphology for which this level was reported."@en ;
+    rdfs:comment "下沉理由：特钢纯净度验收分别核对各形态类别的评级。"@zh ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:inclusionSeries a owl:ObjectProperty ; rdfs:domain stl:InclusionRatingResult ; rdfs:range skos:Concept ; rdfs:seeAlso <code/inclusion-series> ;
+    rdfs:label "受评夹杂物系列"@zh, "Rated inclusion series"@en ; skos:prefLabel "受评夹杂物系列"@zh, "Rated inclusion series"@en ;
+    skos:definition "在方法细分粗细的形态类别内，标明本结果对应的厚度系列。"@zh, "Identifies the thickness series for a rated morphology when the method distinguishes such series."@en ;
+    rdfs:comment "下沉理由：同类夹杂物的粗、细系列在特钢交验中分别评定。"@zh ;
+    dcterms:source <std/gbt-10561-2023> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:ratedMacroDefect a owl:ObjectProperty ; rdfs:domain stl:MacroDefectRating ; rdfs:range skos:Concept ; rdfs:seeAlso <code/macro-defect-type> ;
+    rdfs:label "受评低倍缺陷"@zh, "Rated macrodefect"@en ; skos:prefLabel "受评低倍缺陷"@zh, "Rated macrodefect"@en ;
+    skos:definition "指出一条低倍评级针对的组织缺陷，使同一试料上的不同评级可分别判读。"@zh, "Identifies the discontinuity graded by a single macrostructural rating on a section."@en ;
+    rdfs:comment "下沉理由：低倍检验按缺陷类别逐项对照特钢规格。"@zh ;
+    dcterms:source <std/gbt-1979-2025> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:ndtAcceptanceClass a owl:ObjectProperty ; rdfs:domain stl:NondestructiveTest ; rdfs:range skos:Concept ; rdfs:seeAlso <code/ndt-acceptance-class> ;
+    rdfs:label "棒材探伤验收等级"@zh, "Bar inspection acceptance class"@en ; skos:prefLabel "棒材探伤验收等级"@zh, "Bar inspection acceptance class"@en ;
+    skos:definition "指出本次锻轧棒材超声检验据以判读显示的验收级别，实际判定记在质量判定记录上。"@zh, "Identifies the acceptance class used to interpret indications in an ultrasonic examination of forged or rolled bars."@en ;
+    rdfs:comment "下沉理由：特钢锻轧棒材按订单指定等级逐支探伤，普钢检验无须承担该棒材方法的分级口径。"@zh ;
+    dcterms:source <std/gbt-4162-2022> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:ingotPosition a owl:ObjectProperty ; rdfs:domain stl:Ingot ; rdfs:range skos:Concept ; rdfs:seeAlso <code/ingot-position> ;
+    rdfs:label "追溯锭位"@zh, "Tracked ingot position"@en ; skos:prefLabel "追溯锭位"@zh, "Tracked ingot position"@en ;
+    skos:definition "登记钢锭上有来源追踪记录的轴向部位，一锭可涉及多个部位，具体产出由来源区段区分。"@zh, "Identifies an axial zone tracked on an ingot. Source intervals distinguish outputs taken from different zones of the same ingot."@en ;
+    rdfs:comment "下沉理由：特钢不合格件需定位到来源钢锭的头、中、尾段。"@zh ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:intervalIngotPosition a owl:ObjectProperty ; rdfs:domain stl:SourceInterval ; rdfs:range skos:Concept ; rdfs:seeAlso <code/ingot-position> ;
+    rdfs:label "来源区段锭位"@zh, "Ingot position of source interval"@en ; skos:prefLabel "来源区段锭位"@zh, "Ingot position of source interval"@en ;
+    skos:definition "标记某一产出实际占用的锭体区段，使多件同锭的交验记录仍可逐件回查。"@zh, "Identifies the ingot zone of the interval allocated to a particular output piece."@en ;
+    rdfs:comment "下沉理由：特钢探伤异议须落实到逐件取材的锭位，仅记录整锭涉及的部位无法区分同锭产出。"@zh ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/special/inspection> .
+
+stl:cleanlinessEvidence a owl:ObjectProperty ; rdfs:domain stl:CleanlinessAssessment ; rdfs:range stl:InspectionResult ;
+    rdfs:label "纯净度评价依据"@zh, "Cleanliness assessment evidence"@en ; skos:prefLabel "纯净度评价依据"@zh, "Cleanliness assessment evidence"@en ;
+    skos:definition "指出纯净度评价实际采用的一项夹杂物评级或其他受控指标的实测结果。"@zh, "Identifies an inclusion rating or another measured indicator used as evidence in a cleanliness assessment."@en ;
+    rdfs:comment "下沉理由：特钢纯净度综合交验须能复查组成评价的各项检验结果。"@zh ;
+    dcterms:source <std/gbt-18254-2016> ; rdfs:isDefinedBy <ontology/special/inspection> .

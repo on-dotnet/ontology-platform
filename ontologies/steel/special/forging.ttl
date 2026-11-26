@@ -1,0 +1,67 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+
+<ontology/special/forging> a owl:Ontology ;
+    owl:versionIRI <ontology/special/forging/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "特钢锻造"@zh, "Special steel forging"@en ;
+    rdfs:comment "描述特钢锻造与锻造开坯、锻件的实物身份，以及作业上记录的锻造方法、锻造比和核算截面积。"@zh, "Describes special steel forging and cogging, the identity of forged pieces and the method, forming ratio and cross sections recorded for a run."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:Forging a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "锻造作业"@zh, "Forging operation"@en ; skos:prefLabel "锻造作业"@zh, "Forging operation"@en ;
+    rdfs:seeAlso <code/process-type/FORGE> ;
+    skos:definition "用锤击或施压使固态钢料发生塑性变形、制得锻坯或锻件的一次作业。"@zh, "An operation in which hammer blows or applied pressure plastically deform solid steel stock to produce a forged blank or forging."@en ;
+    rdfs:comment "下沉理由：特钢锻件的制造记录须能逐次查到所用的锻造方法和锻造比。"@zh ;
+    dcterms:source <std/gbt-8541-2012> ; rdfs:isDefinedBy <ontology/special/forging> .
+
+stl:Cogging a owl:Class ; rdfs:subClassOf stl:Forging ;
+    rdfs:label "锻造开坯"@zh, "Cogging"@en ; skos:prefLabel "锻造开坯"@zh, "Cogging"@en ;
+    skos:altLabel "开坯"@zh, "开坯锻造"@zh ;
+    rdfs:seeAlso <code/process-type/COG> ;
+    skos:definition "将锭或大断面坯料逐段锻压，制成供后续加工的较小断面坯料的初步锻造作业。"@zh, "A primary forging operation that works successive sections of an ingot or large blank to produce smaller-section stock for further processing."@en ;
+    rdfs:comment "下沉理由：特钢锭的锻造开坯须在从铸态锭到后续加工用坯的履历中单列，并保留锻造比。"@zh ;
+    dcterms:source <std/gbt-42602-2023> ; rdfs:isDefinedBy <ontology/special/forging> .
+
+stl:ForgedProduct a owl:Class ; rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "锻件"@zh, "Forged product"@en ; skos:prefLabel "锻件"@zh, "Forged product"@en ;
+    rdfs:seeAlso <code/product-form/FORGING> ;
+    skos:definition "经锻造取得其形状并可单件追踪的钢件，可作为后续加工的坯件或交货件。"@zh, "An individually traceable steel piece shaped by forging, whether it leaves the operation as a blank for further working or as a deliverable forging."@en ;
+    skos:scopeNote "锻件按锻造成形工艺识别，棒材（stl:Bar）按棒状截面识别。同一支锻制成品棒可同时归入两类。后续切分所得的每一段都是新的实物件。"@zh,
+        "ForgedProduct identifies a piece by its forging process and stl:Bar by its bar cross section. A finished forged bar can belong to both classes. Each length subsequently cut from it is a new material piece."@en ;
+    rdfs:comment "下沉理由：特钢锻件的件号把来源锭、锻造作业及锻后加工件连接成逐件谱系。"@zh ;
+    dcterms:source <std/gbt-8541-2012> ; rdfs:isDefinedBy <ontology/special/forging> .
+
+stl:forgingMethod a owl:ObjectProperty ; rdfs:domain stl:Forging ; rdfs:range skos:Concept ;
+    rdfs:label "锻造方法"@zh, "Forging method"@en ; skos:prefLabel "锻造方法"@zh, "Forging method"@en ;
+    rdfs:seeAlso <code/forging-method> ;
+    skos:definition "指明一次锻造作业采用的主要成形方法，供按作业查询锻件的加工履历。"@zh, "Identifies the principal forming method used in a forging operation for retrieval in the history of its output pieces."@en ;
+    rdfs:comment "下沉理由：特钢锻造履历需能区分自由锻、径锻和模锻等作业方法。"@zh ;
+    dcterms:source <std/gbt-8541-2012> ; rdfs:isDefinedBy <ontology/special/forging> .
+
+stl:forgingRatio a owl:DatatypeProperty ; rdfs:domain stl:Forging ; rdfs:range xsd:decimal ;
+    rdfs:label "锻造比"@zh, "Forging ratio"@en ; skos:prefLabel "锻造比"@zh, "Forging ratio"@en ;
+    stl:unit unit:UNITLESS ; stl:quantityKind quantitykind:DimensionlessRatio ;
+    skos:definition "按本次锻造方式适用的尺寸比口径记录的变形程度，例如拔长可用锻前与锻后截面积之比表示。"@zh, "A recorded measure of deformation using the dimensional ratio applicable to the operation. For drawing out, the ratio may be expressed as initial area divided by final area."@en ;
+    rdfs:comment "下沉理由：特钢锻件需保留作业实记的变形程度，以便按所用锻造方式核查。"@zh ;
+    dcterms:source <std/jis-g-0701-1957> ; rdfs:isDefinedBy <ontology/special/forging> .
+
+stl:initialCrossSectionArea a owl:DatatypeProperty ; rdfs:domain stl:Forging ; rdfs:range xsd:decimal ;
+    rdfs:label "锻前截面积"@zh, "Initial cross-sectional area"@en ; skos:prefLabel "锻前截面积"@zh, "Initial cross-sectional area"@en ;
+    stl:unit unit:MilliM2 ; stl:quantityKind quantitykind:Area ;
+    skos:definition "作业开始时用于核算本次锻造变形的坯料截面积，以平方毫米记录。"@zh, "The cross-sectional area of the stock before this forging operation, recorded in square millimetres for checking deformation."@en ;
+    rdfs:comment "下沉理由：特钢锻造履历可保留计算本次锻造比时采用的初始截面。"@zh ;
+    dcterms:source <std/jis-g-0701-1957> ; rdfs:isDefinedBy <ontology/special/forging> .
+
+stl:finalCrossSectionArea a owl:DatatypeProperty ; rdfs:domain stl:Forging ; rdfs:range xsd:decimal ;
+    rdfs:label "锻后截面积"@zh, "Final cross-sectional area"@en ; skos:prefLabel "锻后截面积"@zh, "Final cross-sectional area"@en ;
+    stl:unit unit:MilliM2 ; stl:quantityKind quantitykind:Area ;
+    skos:definition "作业结束时，与锻前截面采用相同核算口径的锻料截面积，以平方毫米记录。"@zh, "The cross-sectional area after this forging operation, recorded in square millimetres on the same measurement basis as the initial section."@en ;
+    rdfs:comment "下沉理由：特钢锻造履历可保留与锻前截面配对、用于核查变形程度的终了截面。"@zh ;
+    dcterms:source <std/jis-g-0701-1957> ; rdfs:isDefinedBy <ontology/special/forging> .

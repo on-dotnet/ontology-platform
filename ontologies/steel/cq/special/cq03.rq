@@ -1,0 +1,25 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+# Keep each reported result paired with the specification and decision that cite it.
+SELECT ?heatId ?testId ?examination ?method ?category ?series ?defect ?rating ?assessedId ?specId ?judgement WHERE {
+  VALUES ?heat { <urn:synthetic:steel:heat/H71> }
+  ?heat dcterms:identifier ?heatId .
+  VALUES ?base { stl:MacroExamination stl:MicroExamination }
+  ?test a ?kind ; stl:testedSample/stl:sampleOf ?sampledPiece ; dcterms:identifier ?testId ;
+        stl:methodStandard/dcterms:identifier ?method .
+  ?kind rdfs:subClassOf* ?base ; rdfs:label ?examination .
+  FILTER (LANG(?examination) = "zh")
+  ?sampledPiece (stl:derivedFrom*/stl:sourceHeat)? ?heat .
+  ?result stl:resultOfInspection ?test ; stl:ratingDesignation ?rating .
+  OPTIONAL { ?result stl:inclusionType/skos:notation ?category }
+  OPTIONAL { ?result stl:inclusionSeries/skos:notation ?series }
+  OPTIONAL { ?result stl:ratedMacroDefect/skos:notation ?defect }
+  ?decision stl:inspectionEvidence ?result ; stl:assessedObject ?assessed ;
+            stl:assessedSpecification/dcterms:identifier ?specId ; stl:judgementResult/skos:notation ?judgement .
+  ?assessed a/rdfs:subClassOf* stl:InspectionLot ; dcterms:identifier ?assessedId ; stl:lotMember ?sampledPiece ;
+            stl:formationRule/stl:formationDimension <https://w3id.org/ontology-platform/steel/code/lot-formation-dimension/HEAT> .
+}
+ORDER BY ?testId ?category ?series ?defect ?rating
