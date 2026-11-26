@@ -25,6 +25,7 @@
 ./dev.ps1 test-api     # 后端全量（ruff、mypy、pytest），一般交给门禁
 ./dev.ps1 fmt <文件…>  # 在容器里用 ruff 修正并格式化指定的后端文件
 ./dev.ps1 test-web     # 前端检查（eslint、tsc、vitest 同时跑）
+./dev.ps1 e2e          # 端到端冒烟（Playwright + Chromium）：自起一套 op-tmp-e2e-* 临时 postgres/api/web，用 web/e2e/e2e.env 的测试账号，跑完全部删除；不在门禁里
 ./dev.ps1 lock api     # 改了 backend/pyproject.toml 之后
 ./dev.ps1 lock web     # 改了 web/package.json 之后
 ./dev.ps1 gen-api      # 改了后端接口之后，同步前端类型
