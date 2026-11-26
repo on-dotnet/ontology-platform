@@ -41,6 +41,7 @@ from test_connectors_support import (
     reader_params,
     writer_params,
 )
+from test_connectors_support import scratch_fixture  # noqa: F401  (registers the fixture)
 
 WRITES = [
     "INSERT INTO mes.casting_sequence (cast_no) VALUES ('OP-TEST')",
@@ -272,20 +273,21 @@ async def test_sql_in_filter_values_is_compared_literally(
 
 
 @pytest.fixture
-def slow_view(external_source: ExternalSource) -> str:
+def slow_view(external_source: ExternalSource, scratch: str) -> str:
+    """The schema of a view whose every read takes 30 seconds."""
     admin_rows(
         external_source,
-        "CREATE OR REPLACE VIEW mes.op_test_slow AS SELECT 1 AS x FROM pg_sleep(30);"
-        f'GRANT SELECT ON mes.op_test_slow TO "{external_source.reader}"',
+        f"CREATE VIEW {scratch}.slow AS SELECT 1 AS x FROM pg_sleep(30);"
+        f'GRANT SELECT ON {scratch}.slow TO "{external_source.reader}"',
     )
-    return "op_test_slow"
+    return scratch
 
 
 async def _active(source: ExternalSource) -> list[tuple[Any, ...]]:
     return admin_rows(
         source,
         "SELECT pid FROM pg_stat_activity WHERE application_name = %s AND state = 'active' "
-        "AND datname = current_database() AND query LIKE '%%op_test_slow%%'",
+        "AND datname = current_database() AND query LIKE '%%op_test_%%'",
         APPLICATION_NAME,
     )
 
@@ -298,11 +300,11 @@ async def test_a_statement_past_the_timeout_is_cancelled(
 ) -> None:
     configure(monkeypatch, query_timeout_seconds=1)
     row = await add_source(db, external_source)
-    await cache_table(db, row.id, external_source, "mes", slow_view)
+    await cache_table(db, row.id, external_source, slow_view, "slow")
     started = time.monotonic()
 
     with pytest.raises(QueryTimeoutError):
-        await service.select(db, SelectQuery(row.id, TableRef("mes", slow_view), (ColumnRef("x"),)))
+        await service.select(db, SelectQuery(row.id, TableRef(slow_view, "slow"), (ColumnRef("x"),)))
 
     assert time.monotonic() - started < 10
     assert await _active(external_source) == []
@@ -312,8 +314,8 @@ async def test_cancelling_the_call_cancels_the_statement(
     db: AsyncSession, external_source: ExternalSource, slow_view: str
 ) -> None:
     row = await add_source(db, external_source)
-    await cache_table(db, row.id, external_source, "mes", slow_view)
-    query = SelectQuery(row.id, TableRef("mes", slow_view), (ColumnRef("x"),))
+    await cache_table(db, row.id, external_source, slow_view, "slow")
+    query = SelectQuery(row.id, TableRef(slow_view, "slow"), (ColumnRef("x"),))
     task = asyncio.create_task(service.select(db, query))
     for _ in range(100):
         if await _active(external_source):
@@ -339,8 +341,8 @@ async def test_more_than_four_statements_per_source_wait_then_get_busy(
     factory = app.state.session_factory
     async with factory() as setup:
         row = await add_source(setup, external_source)
-        await cache_table(setup, row.id, external_source, "mes", slow_view)
-    query = SelectQuery(row.id, TableRef("mes", slow_view), (ColumnRef("x"),))
+        await cache_table(setup, row.id, external_source, slow_view, "slow")
+    query = SelectQuery(row.id, TableRef(slow_view, "slow"), (ColumnRef("x"),))
 
     async def run() -> Any:
         async with factory() as db:
@@ -385,23 +387,22 @@ async def test_results_stop_at_the_row_limit(
 
 
 async def test_long_text_is_cut_and_marked(
-    db: AsyncSession, external_source: ExternalSource
+    db: AsyncSession, external_source: ExternalSource, scratch: str
 ) -> None:
     admin_rows(
         external_source,
-        "CREATE TABLE IF NOT EXISTS mes.op_test_long (id int PRIMARY KEY, body text);"
-        "INSERT INTO mes.op_test_long VALUES (1, repeat('炉', 2500)), (2, 'short') "
-        "ON CONFLICT DO NOTHING;"
-        f'GRANT SELECT ON mes.op_test_long TO "{external_source.reader}"',
+        f"CREATE TABLE {scratch}.long (id int PRIMARY KEY, body text);"
+        f"INSERT INTO {scratch}.long VALUES (1, repeat('炉', 2500)), (2, 'short');"
+        f'GRANT SELECT ON {scratch}.long TO "{external_source.reader}"',
     )
     row = await add_source(db, external_source)
-    await cache_table(db, row.id, external_source, "mes", "op_test_long")
+    await cache_table(db, row.id, external_source, scratch, "long")
 
     result = await service.select(
         db,
         SelectQuery(
             row.id,
-            TableRef("mes", "op_test_long"),
+            TableRef(scratch, "long"),
             (ColumnRef("id"), ColumnRef("body")),
             order_by=(SortKey(ColumnRef("id")),),
         ),

@@ -1,5 +1,6 @@
 """Helpers shared by the connection-layer tests. This module has no tests of its own."""
 
+import secrets
 from collections.abc import Iterator
 from contextlib import contextmanager
 from typing import Any
@@ -161,3 +162,18 @@ def external_statements() -> Iterator[list[tuple[str, Any]]]:
         yield seen
     finally:
         event.remove(Engine, "before_cursor_execute", record)
+
+
+@pytest.fixture(name="scratch")
+def scratch_fixture(external_source: ExternalSource) -> Iterator[str]:
+    """A schema of the external database for one test's own objects, readable by the reader and
+    dropped afterwards, so that the steel sample in `mes` stays exactly as loaded."""
+    schema = f"op_test_{secrets.token_hex(4)}"
+    admin_rows(
+        external_source,
+        f'CREATE SCHEMA "{schema}"; GRANT USAGE ON SCHEMA "{schema}" TO "{external_source.reader}"',
+    )
+    try:
+        yield schema
+    finally:
+        admin_rows(external_source, f'DROP SCHEMA "{schema}" CASCADE')

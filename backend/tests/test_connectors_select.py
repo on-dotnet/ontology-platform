@@ -25,6 +25,7 @@ from ontology_platform.modules.connectors.statements import (
     Value,
 )
 from test_connectors_support import add_source, admin_rows, cache_table
+from test_connectors_support import scratch_fixture  # noqa: F401  (registers the fixture)
 
 
 async def _source(db: AsyncSession, source: ExternalSource, *tables: str, **kw: Any) -> DataSource:
@@ -203,7 +204,7 @@ async def test_text_and_null_operators_match_the_database(
 
 
 async def test_columns_missing_from_the_cache_or_the_source_are_a_mismatch(
-    db: AsyncSession, external_source: ExternalSource
+    db: AsyncSession, external_source: ExternalSource, scratch: str
 ) -> None:
     row = await _source(db, external_source, "heat")
     uncached = SelectQuery(row.id, TableRef("mes", "coil"), (ColumnRef("coil_no"),))
@@ -211,12 +212,12 @@ async def test_columns_missing_from_the_cache_or_the_source_are_a_mismatch(
     # The cache says the table is there, the database no longer has it.
     admin_rows(
         external_source,
-        "CREATE TABLE IF NOT EXISTS mes.op_test_gone (id int);"
-        f'GRANT SELECT ON mes.op_test_gone TO "{external_source.reader}"',
+        f"CREATE TABLE {scratch}.gone (id int);"
+        f'GRANT SELECT ON {scratch}.gone TO "{external_source.reader}"',
     )
-    await cache_table(db, row.id, external_source, "mes", "op_test_gone")
-    admin_rows(external_source, "DROP TABLE mes.op_test_gone")
-    dropped = SelectQuery(row.id, TableRef("mes", "op_test_gone"), (ColumnRef("id"),))
+    await cache_table(db, row.id, external_source, scratch, "gone")
+    admin_rows(external_source, f"DROP TABLE {scratch}.gone")
+    dropped = SelectQuery(row.id, TableRef(scratch, "gone"), (ColumnRef("id"),))
 
     for query in (uncached, unknown_column, dropped):
         with pytest.raises(SourceMismatchError):

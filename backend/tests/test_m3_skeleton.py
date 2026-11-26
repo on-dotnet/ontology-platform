@@ -98,6 +98,10 @@ async def test_roles_come_before_the_missing_implementations(
         for request in requests:
             response = await call(client, request)
             if allowed[group]:
+                if request[1].startswith("/api/data-sources"):
+                    # Implemented by batch 3: past the role check, whatever the outcome.
+                    assert response.status_code not in (401, 403, 501), request
+                    continue
                 assert response.status_code == 501, request
                 assert response.json()["code"] == "http.not_implemented"
             else:
