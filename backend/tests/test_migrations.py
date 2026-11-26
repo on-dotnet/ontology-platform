@@ -3,14 +3,19 @@
 The model modules are imported so that their tables are registered on Base.metadata.
 """
 
+from uuid import uuid4
+
+import psycopg
+import pytest
 from alembic import command
 from alembic.autogenerate import compare_metadata
 from alembic.migration import MigrationContext
+from psycopg.types.json import Jsonb
 from sqlalchemy import create_engine, inspect
 
 from ontology_platform import models  # noqa: F401  (registers every module's tables)
 from ontology_platform.db import Base
-from support import PUBLIC_SEARCH_PATH, alembic_config, truncate_tables
+from support import PUBLIC_SEARCH_PATH, alembic_config, libpq_dsn, truncate_tables
 
 SCHEMAS = {table.schema for table in Base.metadata.tables.values()}
 
@@ -53,3 +58,103 @@ def test_downgrade_and_upgrade_again(database_url: str) -> None:
     command.upgrade(config, "head")
 
     assert remaining == set()
+
+
+def test_m4_downgrade_preserves_legacy_items_and_snapshots(database_url: str) -> None:
+    truncate_tables(database_url)
+    config = alembic_config(database_url)
+    dsn = libpq_dsn(database_url)
+    ontology, subject, metric, manual, qa = (uuid4() for _ in range(5))
+    survivors = [{"kind": "entity_type", "id": str(subject)}, {"kind": "axiom", "turtle": "x"}]
+    metric_entry = {"kind": "metric", "id": str(metric), "metric": {"aggregate": "count"}}
+    with psycopg.connect(dsn) as conn:
+        conn.execute(
+            "INSERT INTO ontology.ontologies (id, key, name, base_iri)"
+            " VALUES (%s, 'steel', 'Steel', 'urn:steel:')",
+            (ontology,),
+        )
+        conn.execute(
+            "INSERT INTO ontology.elements (id, ontology_id, kind, local_name, label_zh, origin)"
+            " VALUES (%s, %s, 'entity_type', 'Heat', '炉次', 'manual')",
+            (subject, ontology),
+        )
+        conn.execute(
+            "INSERT INTO ontology.elements"
+            " (id, ontology_id, kind, local_name, label_zh, origin, subject_id, unit, metric)"
+            " VALUES (%s, %s, 'metric', 'heatCount', '炉次数', 'manual', %s, '炉', %s)",
+            (metric, ontology, subject, Jsonb(metric_entry["metric"])),
+        )
+        conn.execute(
+            "INSERT INTO ontology.change_sets (id, ontology_id, title, source)"
+            " VALUES (%s, %s, 'manual', 'manual'), (%s, %s, 'gap', 'ai_qa')",
+            (manual, ontology, qa, ontology),
+        )
+        conn.execute(
+            "INSERT INTO ontology.change_items"
+            " (id, change_set_id, seq, op, kind, proposed, applied_element_id) VALUES"
+            " (gen_random_uuid(), %s, 1, 'create', 'metric', '{}', %s),"
+            " (gen_random_uuid(), %s, 2, 'create', 'property', '{}', %s),"
+            " (gen_random_uuid(), %s, 3, 'create', 'entity_type', '{}', %s),"
+            " (gen_random_uuid(), %s, 1, 'create', 'property', '{}', NULL)",
+            (manual, metric, manual, metric, manual, subject, qa),
+        )
+        # References to the metric from items of other kinds must not block its removal.
+        conn.execute(
+            "UPDATE ontology.change_items SET match_kind = 'possible', match_element_id = %s"
+            " WHERE seq = 3",
+            (metric,),
+        )
+        conn.execute(
+            "INSERT INTO ontology.change_items"
+            " (id, change_set_id, seq, op, kind, proposed, target_element_id, target_revision)"
+            " VALUES (gen_random_uuid(), %s, 4, 'update', 'property', '{}', %s, 1)",
+            (manual, metric),
+        )
+        mixed = [survivors[0] | {"metric": None}, metric_entry, survivors[1] | {"metric": None}]
+        conn.execute(
+            "INSERT INTO ontology.releases"
+            " (id, ontology_id, version, title, snapshot, turtle, turtle_sha256, element_count)"
+            " VALUES (gen_random_uuid(), %s, 1, 'mixed', %s, '', '', 2),"
+            " (gen_random_uuid(), %s, 2, 'no metrics', %s, '', '', 1)",
+            (ontology, Jsonb(mixed), ontology, Jsonb([survivors[0] | {"metric": None}])),
+        )
+        with (
+            pytest.raises(psycopg.errors.CheckViolation, match="ck_elements_kind_columns"),
+            conn.transaction(),
+        ):
+            conn.execute("UPDATE ontology.elements SET metric = '{}' WHERE id = %s", (subject,))
+        with (
+            pytest.raises(psycopg.errors.CheckViolation, match="ck_elements_kind_columns"),
+            conn.transaction(),
+        ):
+            conn.execute("UPDATE ontology.elements SET subject_id = NULL WHERE id = %s", (metric,))
+
+    command.downgrade(config, "0011")
+    try:
+        with psycopg.connect(dsn, autocommit=True) as conn:
+            assert conn.execute("SELECT id FROM ontology.elements").fetchall() == [(subject,)]
+            assert conn.execute("SELECT id FROM ontology.change_sets").fetchall() == [(manual,)]
+            items = conn.execute(
+                "SELECT seq, applied_element_id, match_element_id"
+                " FROM ontology.change_items ORDER BY seq"
+            )
+            assert items.fetchall() == [(2, None, None), (3, subject, None)]
+            snapshots = conn.execute("SELECT snapshot FROM ontology.releases ORDER BY version")
+            assert snapshots.fetchall() == [(survivors,), ([survivors[0]],)]
+            dropped = conn.execute("SELECT to_regclass('ai.qa_questions'), to_regnamespace('cq')")
+            assert dropped.fetchone() == (None, None)
+            with pytest.raises(psycopg.errors.CheckViolation, match='"ck_elements_kind"'):
+                conn.execute(
+                    "INSERT INTO ontology.elements"
+                    " (id, ontology_id, kind, local_name, label_zh, origin, subject_id)"
+                    " VALUES (%s, %s, 'metric', 'heatCount', '炉次数', 'manual', %s)",
+                    (metric, ontology, subject),
+                )
+            with pytest.raises(psycopg.errors.CheckViolation, match="ck_elements_kind_columns"):
+                conn.execute("UPDATE ontology.elements SET unit = 'kg' WHERE id = %s", (subject,))
+            with pytest.raises(psycopg.errors.CheckViolation, match="ck_change_items_kind"):
+                conn.execute("UPDATE ontology.change_items SET kind = 'metric' WHERE seq = 2")
+            with pytest.raises(psycopg.errors.CheckViolation, match="ck_change_sets_source"):
+                conn.execute("UPDATE ontology.change_sets SET source = 'ai_qa'")
+    finally:
+        command.upgrade(config, "head")

@@ -11,11 +11,13 @@ from ontology_platform.errors import install_error_handlers
 from ontology_platform.modules.ai.api import router as ai_router
 from ontology_platform.modules.connectors.api import router as connectors_router
 from ontology_platform.modules.connectors.service import register_usage_provider
+from ontology_platform.modules.cq.api import router as cq_router
 from ontology_platform.modules.documents.api import router as documents_router
 from ontology_platform.modules.health.api import router as health_router
 from ontology_platform.modules.identity import service as identity_service
 from ontology_platform.modules.identity.api import router as auth_router
 from ontology_platform.modules.mcp.api import router as mcp_router
+from ontology_platform.modules.metrics.api import router as metrics_router
 from ontology_platform.modules.ontology import bindings as ontology_bindings
 from ontology_platform.modules.ontology.api import router as ontology_router
 from ontology_platform.modules.query.api import router as query_router
@@ -64,6 +66,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(workbench_router)
     app.include_router(connectors_router)
     app.include_router(query_router)
+    app.include_router(metrics_router)
+    app.include_router(cq_router)
     app.include_router(mcp_router)
     return app
 

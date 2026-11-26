@@ -529,6 +529,8 @@ def _proposal_problem(
     elements: dict[UUID, Element],
     created_kinds: dict[str, Kind],
 ) -> str | None:
+    if item.kind == "metric":
+        return "metric changes are not supported yet"
     if item.op == "create":
         if item.target_element_id is not None:
             return "a create item has no target element"
@@ -793,6 +795,7 @@ def _element_data(element: Element, base_iri: str) -> dict[str, Any]:
         "subject_id": element.subject_id,
         "flags": [flag for flag in element.flags if flag in ELEMENT_FLAGS],
         "binding": element.binding,
+        "metric": element.metric,
         "status": element.status,
         "origin": element.origin,
         "revision": element.revision,
@@ -828,7 +831,8 @@ async def list_elements(
     """Elements of one status (active by default), optionally of one kind and matching `q` in
     names, labels, synonyms, the IRI or an axiom's text."""
     ontology = await _ontology_or_404(db, ontology_id)
-    elements = await _elements(db, ontology_id, all_kinds=kind in BINDING_KINDS)
+    all_kinds = kind is not None and kind not in SEMANTIC_KINDS
+    elements = await _elements(db, ontology_id, all_kinds=all_kinds)
     if status != "all":
         elements = [element for element in elements if element.status == status]
     if kind is not None:
@@ -1030,6 +1034,19 @@ def stored_rule_fields(rule: dict[str, Any]) -> dict[str, Any]:
     return data
 
 
+def _metric_fields(definition: dict[str, Any]) -> dict[str, Any]:
+    def refs(row: dict[str, Any]) -> dict[str, Any]:
+        return {
+            ("propertyRef" if key == "propertyId" else key): value for key, value in row.items()
+        }
+
+    fields = refs(definition)
+    for key in ("filters", "numerator"):
+        if key in fields:
+            fields[key] = [refs(condition) for condition in fields[key]]
+    return fields
+
+
 def _before(element: Element) -> schemas.ElementFields:
     """The element's current values as item fields, with only the keys its kind uses."""
     if element.kind == "axiom":
@@ -1057,6 +1074,10 @@ def _before(element: Element) -> schemas.ElementFields:
     elif element.kind == "constraint":
         data["domain_ref"] = _ref(element.domain_id)
         data["rules"] = [stored_rule_fields(rule) for rule in element.rules or []]
+    elif element.kind == "metric":
+        data["subject_ref"] = _ref(element.subject_id)
+        data["unit"] = element.unit
+        data["metric"] = _metric_fields(element.metric or {})
     else:
         data["domain_ref"] = _ref(element.domain_id)
         if element.kind == "relation_type":
@@ -1115,6 +1136,7 @@ def _plan_items(items: Sequence[ChangeItem], links: "_Links") -> list[mergeplan.
             matched_by=links.matched_by.get(item.id, ()),
         )
         for item in items
+        if item.kind != "metric"
     ]
 
 
@@ -1291,7 +1313,7 @@ async def _resolutions(
     if change_set.source != "ai_extraction" or change_set.status == "rejected":
         return {}, _NO_PLAN.token, await _links(db, change_set, items)
     ontology = await _ontology_or_404(db, change_set.ontology_id)
-    elements = await _elements(db, ontology.id)
+    elements = await _elements(db, ontology.id, all_kinds=True)
     by_id = {element.id: element for element in elements}
     links = await _links(db, change_set, items)
     if change_set.status == "merged":
@@ -1690,6 +1712,8 @@ async def update_item(
     if item is None:
         raise _change_set_not_found()
     if "edited" in given:
+        if item.kind == "metric":
+            raise InvalidProposalError("Metric changes are not supported yet.")
         if patch.edited is None:
             item.edited = None
         else:

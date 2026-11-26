@@ -64,6 +64,10 @@ def release_problems(elements: Sequence[Element]) -> list[schemas.ReleaseProblem
     for element in active_elements:
         if element.kind == "axiom":
             continue  # checked when merged; kept as written
+        if element.kind == "metric":
+            if not active(element.subject_id, "entity_type"):
+                report("release.invalid_domain", element, "The subject type is missing or inactive")
+            continue
         if element.kind in BINDING_KINDS:
             # Bindings have no names; the rules they were merged under must still hold.
             for problem in binding_rules.node_problems(nodes[str(element.id)], nodes):
@@ -173,14 +177,14 @@ async def publish_release(
     problems = release_problems(elements)
     if problems:
         raise ReleaseInvalidError(problems)
-    # Bindings are part of the snapshot (spec 003, 6.4) but neither of the Turtle nor of the
-    # element count; the export must not rely on bindings having no IRI.
+    # Only semantic elements contribute to the Turtle and element count.
     snapshot = [
         element_out(element, ontology.base_iri)
         for element in elements
         if element.status == "active"
     ]
     semantic = [element for element in snapshot if element.kind in SEMANTIC_KINDS]
+    binding_count = sum(element.kind in BINDING_KINDS for element in snapshot)
     latest = await db.scalar(
         select(func.max(Release.version)).where(Release.ontology_id == ontology_id),
     )
@@ -199,7 +203,7 @@ async def publish_release(
         turtle=turtle,
         turtle_sha256=hashlib.sha256(turtle.encode()).hexdigest(),
         element_count=len(semantic),
-        binding_count=len(snapshot) - len(semantic),
+        binding_count=binding_count,
         created_by=actor,
         created_at=now,
     )
@@ -217,7 +221,7 @@ async def publish_release(
             "ontologyId": str(ontology_id),
             "version": version,
             "elementCount": len(semantic),
-            "bindingCount": len(snapshot) - len(semantic),
+            "bindingCount": release.binding_count,
         },
         ip=ip,
     )

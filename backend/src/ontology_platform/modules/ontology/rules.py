@@ -22,6 +22,7 @@ KIND_REFS: dict[str, tuple[str, ...]] = {
     "property": ("domain_ref",),
     "constraint": ("domain_ref",),
     "axiom": (),
+    "metric": ("subject_ref",),
     **binding_rules.REFS,
 }
 # Mandatory references of elements made in the platform. Imported elements (explicit IRI) may
@@ -32,6 +33,7 @@ REQUIRED_REFS: dict[str, tuple[str, ...]] = {
     "property": ("domain_ref",),
     "constraint": ("domain_ref",),
     "axiom": (),
+    "metric": ("subject_ref",),
     **binding_rules.REFS,
 }
 # The kinds each reference of a semantic element may point at; see `ref_targets`.
@@ -40,10 +42,10 @@ REF_TARGETS: dict[str, tuple[str, ...]] = {
     "domain_ref": ("entity_type",),
     "range_ref": ("entity_type",),
     "inverse_ref": ("relation_type",),
+    "subject_ref": ("entity_type",),
 }
 RULE_PATH_KINDS = ("relation_type", "property")
 _PASCAL_KINDS = ("entity_type", "constraint")
-_PROPERTY_FIELDS = ("datatype", "unit")
 _MEMBER_FIELDS = ("required", "multiple")
 
 
@@ -59,7 +61,7 @@ def wire_name(field: str) -> str:
 
 
 def local_name_problem(kind: str, local_name: str, *, imported: bool = False) -> str | None:
-    """Object types and constraints are PascalCase, relations and properties camelCase.
+    """Object types and constraints are PascalCase, relations, properties and metrics camelCase.
 
     Local names of imported elements only identify them in the platform (their IRI comes with
     the file), so the case conventions do not apply to them.
@@ -71,7 +73,7 @@ def local_name_problem(kind: str, local_name: str, *, imported: bool = False) ->
     if kind in _PASCAL_KINDS and not local_name[0].isupper():
         return "localName of an object type or constraint must be PascalCase"
     if kind not in _PASCAL_KINDS and not local_name[0].islower():
-        return "localName of a relation or property must be camelCase"
+        return "localName of a relation, property or metric must be camelCase"
     return None
 
 
@@ -99,7 +101,9 @@ def _kind_problems(kind: str, fields: ElementFields) -> list[str]:
         if name not in KIND_REFS[kind] and getattr(fields, name) is not None:
             problems.append(f"{wire_name(name)} does not apply to {kind}")
     checks = [
-        *((name, kind == "property") for name in _PROPERTY_FIELDS),
+        ("datatype", kind == "property"),
+        ("unit", kind in ("property", "metric")),
+        ("metric", kind == "metric"),
         *((name, kind in RULE_PATH_KINDS) for name in _MEMBER_FIELDS),
         ("auto_shape", kind in ("entity_type", *RULE_PATH_KINDS)),
         ("rules", kind == "constraint"),
@@ -165,7 +169,7 @@ def field_problems(
         problems.extend(
             f"{wire_name(name)} is required"
             for name in REQUIRED_REFS[kind]
-            if getattr(fields, name) is None and (not imported or kind == "constraint")
+            if getattr(fields, name) is None and (not imported or kind in ("constraint", "metric"))
         )
         if kind == "property" and fields.datatype is None and not imported:
             problems.append("datatype is required")
@@ -186,7 +190,7 @@ def field_problems(
         for name in REQUIRED_REFS[kind]
         if name in given
         and getattr(fields, name) is None
-        and (not target_imported or kind == "constraint")
+        and (not target_imported or kind in ("constraint", "metric"))
     )
     clears_datatype = "datatype" in given and fields.datatype is None
     if kind == "property" and clears_datatype and not target_imported:

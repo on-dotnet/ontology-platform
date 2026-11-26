@@ -37,7 +37,7 @@ from ontology_platform.modules.ontology.models import (
     Ontology,
     Release,
 )
-from ontology_platform.modules.ontology.schemas import JoinBinding
+from ontology_platform.modules.ontology.schemas import JoinBinding, MetricDefinition, ReleaseRef
 
 
 def _label(row: Mapping[str, Any]) -> str:
@@ -577,6 +577,29 @@ class ReleasedOntology:
     published_at: datetime
     elements: tuple[schemas.ElementCopy, ...]
     bound_type_ids: frozenset[UUID]
+
+
+@dataclass(frozen=True, slots=True)
+class MetricCopy:
+    id: UUID
+    local_name: str
+    label_zh: str
+    label_en: str | None
+    definition_zh: str | None
+    definition_en: str | None
+    subject_id: UUID
+    unit: str | None
+    metric: MetricDefinition
+
+
+@dataclass(frozen=True, slots=True)
+class ReleasedMetrics:
+    release: ReleaseRef
+    metrics: tuple[MetricCopy, ...]
+
+
+async def released_metrics(db: AsyncSession, ontology_id: UUID) -> ReleasedMetrics:
+    raise NotImplementedError
 
 
 async def _release_in_effect(

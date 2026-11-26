@@ -2,14 +2,15 @@
 
 import asyncio
 import time
+from collections.abc import Awaitable
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request
 
 from ontology_platform.db import DbSession
-from ontology_platform.errors import problem_responses
-from ontology_platform.modules.ai import assistant, binding_suggest, schemas
+from ontology_platform.errors import not_implemented, problem_responses
+from ontology_platform.modules.ai import assistant, binding_suggest, qa, qa_gap, schemas
 from ontology_platform.modules.ai.gateway import ModelGateway, OpenAIGateway
 from ontology_platform.modules.ai.schemas import AiStatus
 from ontology_platform.modules.identity.api import CurrentUser, client_ip, require_role
@@ -145,3 +146,54 @@ async def list_binding_suggestions(
 ) -> list[schemas.BindingSuggestion]:
     """The user's latest requests about the ontology, newest first."""
     return await binding_suggest.list_requests(db, id, user_id=user.id, limit=limit)
+
+
+async def _qa_response(operation: Awaitable[schemas.QaQuestion]) -> schemas.QaQuestion:
+    # HTTP exposes a problem response for the same stub that internal callers invoke directly.
+    try:
+        return await operation
+    except NotImplementedError as exc:
+        raise not_implemented("Question answering") from exc
+
+
+@router.post(
+    "/ontologies/{id}/qa/questions",
+    status_code=202,
+    responses=problem_responses(401, 403, 404, 409, 422, 429, 501),
+)
+async def create_qa_question(
+    id: UUID, body: schemas.QaQuestionCreate, user: CurrentUser, db: DbSession
+) -> schemas.QaQuestion:
+    return await _qa_response(qa.create_question(db, id, body, user_id=user.id))
+
+
+@router.get("/ontologies/{id}/qa/questions", responses=problem_responses(401, 403, 422, 501))
+async def list_qa_questions(
+    id: UUID,
+    user: CurrentUser,
+    db: DbSession,
+    asked_by: Annotated[qa.AskedBy, Query(alias="askedBy")] = "me",
+    limit: Annotated[int, Query(ge=1, le=50)] = 20,
+    cursor: str | None = None,
+) -> schemas.QaQuestionList:
+    return await qa.list_questions(
+        db, id, actor=user, asked_by=asked_by, limit=limit, cursor=cursor
+    )
+
+
+@router.get("/qa/questions/{id}", responses=problem_responses(401, 403, 404, 422, 501))
+async def get_qa_question(id: UUID, user: CurrentUser, db: DbSession) -> schemas.QaQuestion:
+    return await qa.get_question(db, id, actor=user)
+
+
+@router.post(
+    "/qa/questions/{id}/gap-proposal",
+    status_code=202,
+    responses={
+        200: {"model": schemas.QaQuestion},
+        **problem_responses(401, 403, 404, 409, 422, 501),
+    },
+)
+async def create_qa_gap_proposal(id: UUID, user: Creator, db: DbSession) -> schemas.QaQuestion:
+    await qa.require_visible(db, id, user)
+    return await _qa_response(qa_gap.create_gap_proposal(db, id, user_id=user.id))

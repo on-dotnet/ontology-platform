@@ -879,6 +879,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ontologies/{id}/qa/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Qa Questions */
+        get: operations["list_qa_questions_api_ontologies__id__qa_questions_get"];
+        put?: never;
+        /** Create Qa Question */
+        post: operations["create_qa_question_api_ontologies__id__qa_questions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/qa/questions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Qa Question */
+        get: operations["get_qa_question_api_qa_questions__id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/qa/questions/{id}/gap-proposal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Qa Gap Proposal */
+        post: operations["create_qa_gap_proposal_api_qa_questions__id__gap_proposal_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/workbench/summary": {
         parameters: {
             query?: never;
@@ -1115,6 +1167,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ontologies/{id}/objects/traverse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Traverse Objects */
+        post: operations["traverse_objects_api_ontologies__id__objects_traverse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ontologies/{id}/objects/{typeId}/{key}": {
         parameters: {
             query?: never;
@@ -1147,6 +1216,177 @@ export interface paths {
          * @description One hop along a relation; `typeId` of the page is the type of the related objects.
          */
         get: operations["list_related_objects_api_ontologies__id__objects__typeId___key__related_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Metrics */
+        get: operations["list_metrics_api_ontologies__id__metrics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/metrics/{metricId}/evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Evaluate Metric */
+        post: operations["evaluate_metric_api_ontologies__id__metrics__metricId__evaluate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/rules/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check Rules */
+        post: operations["check_rules_api_ontologies__id__rules_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/competency-questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Competency Questions */
+        get: operations["list_competency_questions_api_ontologies__id__competency_questions_get"];
+        put?: never;
+        /** Create Competency Question */
+        post: operations["create_competency_question_api_ontologies__id__competency_questions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/competency-questions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Patch Competency Question */
+        patch: operations["patch_competency_question_api_competency_questions__id__patch"];
+        trace?: never;
+    };
+    "/api/competency-questions/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive Competency Question */
+        post: operations["archive_competency_question_api_competency_questions__id__archive_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/competency-questions/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import Competency Questions */
+        post: operations["import_competency_questions_api_ontologies__id__competency_questions_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/competency-questions/{id}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check Competency Question */
+        post: operations["check_competency_question_api_competency_questions__id__check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/competency-questions/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check Competency Questions */
+        post: operations["check_competency_questions_api_ontologies__id__competency_questions_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ontologies/{id}/competency-questions/coverage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Competency Question Coverage */
+        get: operations["competency_question_coverage_api_ontologies__id__competency_questions_coverage_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1565,7 +1805,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding" | "metric";
             /** Targetelementid */
             targetElementId: string | null;
             /** Tempref */
@@ -1615,7 +1855,7 @@ export interface components {
              * Source
              * @enum {string}
              */
-            source: "ai_extraction" | "ai_assistant" | "manual" | "import" | "ai_binding" | "mcp";
+            source: "ai_extraction" | "ai_assistant" | "manual" | "import" | "ai_binding" | "mcp" | "ai_qa";
             /** Documentid */
             documentId: string | null;
             /**
@@ -1658,7 +1898,7 @@ export interface components {
              * Source
              * @enum {string}
              */
-            source: "ai_extraction" | "ai_assistant" | "manual" | "import" | "ai_binding" | "mcp";
+            source: "ai_extraction" | "ai_assistant" | "manual" | "import" | "ai_binding" | "mcp" | "ai_qa";
             /** Documentid */
             documentId: string | null;
             /**
@@ -1761,6 +2001,66 @@ export interface components {
             /** Changes */
             changes: components["schemas"]["ElementChange"][];
             counts: components["schemas"]["CompareCounts"];
+        };
+        /** CompetencyQuestion */
+        CompetencyQuestion: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Ontologyid
+             * Format: uuid
+             */
+            ontologyId: string;
+            /** Text */
+            text: string;
+            expect: components["schemas"]["CqExpect"];
+            /** Note */
+            note: string | null;
+            /** Position */
+            position: number;
+            /** Revision */
+            revision: number;
+            lastCheck: components["schemas"]["CqCheck"] | null;
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /**
+             * Updatedat
+             * Format: date-time
+             */
+            updatedAt: string;
+            /** Archivedat */
+            archivedAt: string | null;
+        };
+        /** CompetencyQuestionCreate */
+        CompetencyQuestionCreate: {
+            /** Text */
+            text: string;
+            expect: components["schemas"]["CqExpectInput"];
+            /** Note */
+            note?: string;
+        };
+        /** CompetencyQuestionList */
+        CompetencyQuestionList: {
+            /** Items */
+            items: components["schemas"]["CompetencyQuestion"][];
+        };
+        /** CompetencyQuestionPatch */
+        CompetencyQuestionPatch: {
+            /** Revision */
+            revision: number;
+            /** Text */
+            text?: string;
+            expect?: components["schemas"]["CqExpectInput"];
+            /** Note */
+            note?: string;
+            /** Position */
+            position?: number;
         };
         /** Connection */
         Connection: {
@@ -1902,6 +2202,133 @@ export interface components {
             pathRef: string;
             /** Classref */
             classRef?: string | null;
+        };
+        /** CoverageElement */
+        CoverageElement: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string;
+            /** Present */
+            present: boolean;
+            /** Bound */
+            bound: boolean;
+        };
+        /** CoverageItem */
+        CoverageItem: {
+            /**
+             * Questionid
+             * Format: uuid
+             */
+            questionId: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ok" | "element_missing" | "binding_missing" | "never_checked";
+            /** Elements */
+            elements: components["schemas"]["CoverageElement"][];
+        };
+        /** CqCheck */
+        CqCheck: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Questionid
+             * Format: uuid
+             */
+            questionId: string;
+            release: components["schemas"]["ReleaseRef"];
+            /** Stale */
+            stale: boolean;
+            /**
+             * Qaquestionid
+             * Format: uuid
+             */
+            qaQuestionId: string;
+            /**
+             * Result
+             * @enum {string}
+             */
+            result: "pending" | "pass" | "fail" | "unanswerable" | "error";
+            detail: components["schemas"]["CqCheckDetail"] | null;
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /** Finishedat */
+            finishedAt: string | null;
+        };
+        /** CqCheckDetail */
+        CqCheckDetail: {
+            /** Missing */
+            missing: string[];
+            /** Extra */
+            extra: string[];
+            /** Actual */
+            actual: string | null;
+            /** Errorcode */
+            errorCode: string | null;
+        };
+        /** CqCheckList */
+        CqCheckList: {
+            /** Checks */
+            checks: components["schemas"]["CqCheck"][];
+        };
+        /** CqCoverage */
+        CqCoverage: {
+            release: components["schemas"]["ReleaseRef"] | null;
+            /** Items */
+            items: components["schemas"]["CoverageItem"][];
+        };
+        /** CqExpect */
+        CqExpect: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "answerable" | "objects" | "number";
+            /** Typeid */
+            typeId: string | null;
+            /** Keys */
+            keys: string[];
+            /** Number */
+            number: string | null;
+            /** Tolerance */
+            tolerance: string;
+        };
+        /** CqExpectInput */
+        CqExpectInput: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "answerable" | "objects" | "number";
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId?: string;
+            /** Keys */
+            keys?: string[];
+            /** Number */
+            number?: string;
+            /** Tolerance */
+            tolerance?: string;
+        };
+        /** CqImportResult */
+        CqImportResult: {
+            /** Created */
+            created: number;
+            /** Skipped */
+            skipped: number;
         };
         /** DataSource */
         DataSource: {
@@ -2100,7 +2527,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding" | "metric";
             /** Targetelementid */
             targetElementId?: string | null;
             /** Targetrevision */
@@ -2146,7 +2573,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding" | "metric";
             /** Localname */
             localName: string | null;
             /** Iri */
@@ -2213,6 +2640,7 @@ export interface components {
              * Format: date-time
              */
             updatedAt: string;
+            metric?: components["schemas"]["MetricDefinition"] | null;
         };
         /** ElementChange */
         ElementChange: {
@@ -2225,7 +2653,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding" | "metric";
             /** Label */
             label: string;
             /** Iri */
@@ -2259,7 +2687,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding" | "metric";
             /** Localname */
             localName: string | null;
             /** Iri */
@@ -2326,6 +2754,7 @@ export interface components {
              * Format: date-time
              */
             updatedAt: string;
+            metric?: components["schemas"]["MetricDefinition"] | null;
             /** Provenance */
             provenance: components["schemas"]["Provenance"][];
         };
@@ -2380,6 +2809,7 @@ export interface components {
             subjectRef?: string | null;
             /** Binding */
             binding?: (components["schemas"]["TableBinding"] | components["schemas"]["ColumnBinding"] | components["schemas"]["JoinBinding"]) | null;
+            metric?: components["schemas"]["MetricDefinitionFields"] | null;
         };
         /** ElementRef */
         ElementRef: {
@@ -2392,7 +2822,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding";
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding" | "metric";
             /** Label */
             label: string;
             /** Iri */
@@ -2421,6 +2851,17 @@ export interface components {
             charStart: number | null;
             /** Charend */
             charEnd: number | null;
+        };
+        /** FailedCheck */
+        FailedCheck: {
+            /**
+             * Check
+             * @enum {string}
+             */
+            check: "minCount" | "minInclusive" | "maxInclusive" | "minExclusive" | "maxExclusive" | "allowedValues" | "minLength" | "maxLength" | "pattern";
+            /** Expected */
+            expected: components["schemas"]["Scalar"] | components["schemas"]["Scalar"][];
+            actual: components["schemas"]["Scalar"] | null;
         };
         /**
          * FieldChange
@@ -2701,6 +3142,16 @@ export interface components {
              */
             check: "ok" | "missing_table" | "missing_column" | "type_mismatch" | "catalog_unavailable";
         };
+        /** KeySet */
+        KeySet: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Keys */
+            keys: string[];
+        };
         /** LangText */
         LangText: {
             /** Lang */
@@ -2779,6 +3230,151 @@ export interface components {
              * @enum {string}
              */
             code: "changeset.stale_target" | "changeset.dependency_skipped" | "changeset.invalid_item" | "changeset.has_dependents";
+        };
+        /** MetricDefinition */
+        MetricDefinition: {
+            /**
+             * Aggregate
+             * @enum {string}
+             */
+            aggregate: "count" | "sum" | "avg" | "min" | "max" | "ratio";
+            /** Filters */
+            filters: components["schemas"]["MetricFilter"][];
+            /** Numerator */
+            numerator: components["schemas"]["MetricFilter"][];
+            /**
+             * Decimals
+             * @default 2
+             */
+            decimals: number;
+            /**
+             * Percent
+             * @default false
+             */
+            percent: boolean;
+            /** Propertyid */
+            propertyId: string | null;
+        };
+        /** MetricDefinitionFields */
+        MetricDefinitionFields: {
+            /**
+             * Aggregate
+             * @enum {string}
+             */
+            aggregate: "count" | "sum" | "avg" | "min" | "max" | "ratio";
+            /** Filters */
+            filters?: components["schemas"]["MetricFilterFields"][];
+            /** Numerator */
+            numerator?: components["schemas"]["MetricFilterFields"][];
+            /**
+             * Decimals
+             * @default 2
+             */
+            decimals: number;
+            /**
+             * Percent
+             * @default false
+             */
+            percent: boolean;
+            /** Propertyref */
+            propertyRef?: string | null;
+        };
+        /** MetricEvaluate */
+        MetricEvaluate: {
+            within?: components["schemas"]["KeySet"] | null;
+        };
+        /** MetricFilter */
+        MetricFilter: {
+            /**
+             * Op
+             * @enum {string}
+             */
+            op: "eq" | "ne" | "lt" | "le" | "gt" | "ge" | "contains" | "startsWith" | "in" | "isNull" | "notNull";
+            /** Value */
+            value?: components["schemas"]["FilterValue"] | components["schemas"]["FilterValue"][] | null;
+            /**
+             * Propertyid
+             * Format: uuid
+             */
+            propertyId: string;
+        };
+        /** MetricFilterFields */
+        MetricFilterFields: {
+            /**
+             * Op
+             * @enum {string}
+             */
+            op: "eq" | "ne" | "lt" | "le" | "gt" | "ge" | "contains" | "startsWith" | "in" | "isNull" | "notNull";
+            /** Value */
+            value?: components["schemas"]["FilterValue"] | components["schemas"]["FilterValue"][] | null;
+            /** Propertyref */
+            propertyRef: string;
+        };
+        /** MetricInfo */
+        MetricInfo: {
+            /**
+             * Metricid
+             * Format: uuid
+             */
+            metricId: string;
+            /** Label */
+            label: string;
+            /** Definition */
+            definition: string | null;
+            /** Unit */
+            unit: string | null;
+            /**
+             * Subjecttypeid
+             * Format: uuid
+             */
+            subjectTypeId: string;
+            /** Subjecttypelabel */
+            subjectTypeLabel: string;
+            /**
+             * Aggregate
+             * @enum {string}
+             */
+            aggregate: "count" | "sum" | "avg" | "min" | "max" | "ratio";
+            /** Bound */
+            bound: boolean;
+        };
+        /** MetricList */
+        MetricList: {
+            release: components["schemas"]["ReleaseRef"];
+            /** Items */
+            items: components["schemas"]["MetricInfo"][];
+        };
+        /** MetricValue */
+        MetricValue: {
+            release: components["schemas"]["ReleaseRef"];
+            /**
+             * Metricid
+             * Format: uuid
+             */
+            metricId: string;
+            /** Label */
+            label: string;
+            /** Unit */
+            unit: string | null;
+            /**
+             * Aggregate
+             * @enum {string}
+             */
+            aggregate: "count" | "sum" | "avg" | "min" | "max" | "ratio";
+            /** Value */
+            value: string | null;
+            /** Display */
+            display: string | null;
+            /** Population */
+            population: number;
+            /** Matched */
+            matched: number | null;
+            /** Nulls */
+            nulls: number;
+            /** Reason */
+            reason: "empty_population" | null;
+            /** Steps */
+            steps: components["schemas"]["QueryStep"][];
         };
         /** ObjectDetail */
         ObjectDetail: {
@@ -2990,6 +3586,82 @@ export interface components {
              */
             updatedAt: string;
         };
+        /** PathHop */
+        PathHop: {
+            /**
+             * Relationid
+             * Format: uuid
+             */
+            relationId: string;
+            /**
+             * Direction
+             * @enum {string}
+             */
+            direction: "out" | "in";
+            /** Filters */
+            filters?: components["schemas"]["Filter"][];
+        };
+        /** PathQuery */
+        PathQuery: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Filters */
+            filters?: components["schemas"]["Filter"][];
+            /** Hops */
+            hops: components["schemas"]["PathHop"][];
+            /** Target */
+            target?: number | null;
+            /**
+             * Limit
+             * @description Maximum number of returned objects. Defaults to 50.
+             */
+            limit?: number;
+        };
+        /** PathResult */
+        PathResult: {
+            release: components["schemas"]["ReleaseRef"];
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Items */
+            items: components["schemas"]["PathRow"][];
+            /** Total */
+            total: number;
+            /** Truncated */
+            truncated: boolean;
+            /** Tailtypeid */
+            tailTypeId: string | null;
+            /** Tail */
+            tail: components["schemas"]["PathRow"][];
+            /** Tailtotal */
+            tailTotal: number;
+            /** Steps */
+            steps: components["schemas"]["QueryStep"][];
+        };
+        /** PathRow */
+        PathRow: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Key */
+            key: string;
+            /** Values */
+            values: {
+                [key: string]: components["schemas"]["Scalar"] | null;
+            };
+            /** Truncated */
+            truncated: string[];
+            source: components["schemas"]["ObjectSource"];
+            /** Via */
+            via: string[];
+        };
         /** PlatformSettings */
         PlatformSettings: {
             /**
@@ -3058,6 +3730,302 @@ export interface components {
             mergedAt: string;
             /** Evidence */
             evidence: components["schemas"]["Evidence"][];
+        };
+        /** QaAnswer */
+        QaAnswer: {
+            /** Text */
+            text: string | null;
+            facts: components["schemas"]["QaFacts"];
+            /** Citedkeys */
+            citedKeys: string[];
+            /** Counterpoints */
+            counterpoints: string[];
+            /** Notes */
+            notes: ("cited_unknown" | "answer_unavailable" | "rows_not_shared" | "rows_truncated")[];
+        };
+        /** QaAsker */
+        QaAsker: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Displayname */
+            displayName: string;
+        };
+        /** QaDocumentEvidence */
+        QaDocumentEvidence: {
+            /**
+             * Documentid
+             * Format: uuid
+             */
+            documentId: string;
+            /** Documentname */
+            documentName: string;
+            /** Chunk */
+            chunk: number;
+            /** Quote */
+            quote: string;
+        };
+        /** QaElementRef */
+        QaElementRef: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string;
+        };
+        /** QaEvidence */
+        QaEvidence: {
+            release: components["schemas"]["ReleaseRef"];
+            /** Elements */
+            elements: components["schemas"]["QaEvidenceElement"][];
+            /** Bindings */
+            bindings: components["schemas"]["QaEvidenceBinding"][];
+            /** Steps */
+            steps: components["schemas"]["QueryStep"][];
+            /** Rows */
+            rows: components["schemas"]["PathRow"][];
+            /** Truncated */
+            truncated: boolean;
+            /** Tail */
+            tail: components["schemas"]["PathRow"][];
+            metric: components["schemas"]["MetricValue"] | null;
+            rules: components["schemas"]["RuleReport"] | null;
+        };
+        /** QaEvidenceBinding */
+        QaEvidenceBinding: {
+            /** Schema */
+            schema: string;
+            /** Table */
+            table: string;
+            /** Keycolumns */
+            keyColumns: string[];
+        };
+        /** QaEvidenceElement */
+        QaEvidenceElement: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding" | "metric";
+            /** Iri */
+            iri: string | null;
+            /** Documents */
+            documents: components["schemas"]["QaDocumentEvidence"][];
+        };
+        /** QaFactMetric */
+        QaFactMetric: {
+            /** Label */
+            label: string;
+            /** Display */
+            display: string | null;
+        };
+        /** QaFactObject */
+        QaFactObject: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Label */
+            label: string;
+            /** Key */
+            key: string;
+        };
+        /** QaFacts */
+        QaFacts: {
+            /** Count */
+            count: number | null;
+            metric: components["schemas"]["QaFactMetric"] | null;
+            /** Objects */
+            objects: components["schemas"]["QaFactObject"][];
+            /** Violations */
+            violations: number | null;
+        };
+        /** QaGapProposal */
+        QaGapProposal: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "running" | "done" | "empty" | "failed";
+            /** Changesetid */
+            changeSetId: string | null;
+            /** Dropped */
+            dropped: number;
+            /** Errorcode */
+            errorCode: string | null;
+        };
+        /** QaGaps */
+        QaGaps: {
+            /** Elements */
+            elements: components["schemas"]["QaMissingElement"][];
+            /** Bindings */
+            bindings: components["schemas"]["QaTypeRef"][];
+        };
+        /** QaMissingElement */
+        QaMissingElement: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "entity_type" | "relation_type" | "property" | "metric";
+            /** Labelzh */
+            labelZh: string;
+            /** Description */
+            description: string;
+            /** Near */
+            near: components["schemas"]["QaElementRef"][];
+        };
+        /** QaPlan */
+        QaPlan: {
+            /**
+             * Intent
+             * @enum {string}
+             */
+            intent: "objects" | "count" | "metric" | "rules";
+            start: components["schemas"]["QaPlanStart"] | null;
+            /** Hops */
+            hops: components["schemas"]["QaPlanHop"][];
+            /** Target */
+            target: number;
+            /** Metricid */
+            metricId: string | null;
+            /** Description */
+            description: string;
+            /** Assumptions */
+            assumptions: string[];
+        };
+        /** QaPlanHop */
+        QaPlanHop: {
+            /**
+             * Relationid
+             * Format: uuid
+             */
+            relationId: string;
+            /**
+             * Direction
+             * @enum {string}
+             */
+            direction: "out" | "in";
+            /** Filters */
+            filters?: components["schemas"]["Filter"][];
+            /** Label */
+            label: string;
+            /**
+             * Targettypeid
+             * Format: uuid
+             */
+            targetTypeId: string;
+            /** Targetlabel */
+            targetLabel: string;
+        };
+        /** QaPlanStart */
+        QaPlanStart: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Label */
+            label: string;
+            /** Filters */
+            filters: components["schemas"]["Filter"][];
+        };
+        /** QaQuestion */
+        QaQuestion: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Ontologyid
+             * Format: uuid
+             */
+            ontologyId: string;
+            /** Question */
+            question: string;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "user" | "cq";
+            /** Cqquestionid */
+            cqQuestionId: string | null;
+            askedBy: components["schemas"]["QaAsker"];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "running" | "answered" | "unanswerable" | "failed";
+            /** Step */
+            step: ("plan" | "check" | "query" | "answer" | "done") | null;
+            release: components["schemas"]["ReleaseRef"] | null;
+            plan: components["schemas"]["QaPlan"] | null;
+            gaps: components["schemas"]["QaGaps"] | null;
+            answer: components["schemas"]["QaAnswer"] | null;
+            evidence: components["schemas"]["QaEvidence"] | null;
+            gapProposal: components["schemas"]["QaGapProposal"] | null;
+            /** Errorcode */
+            errorCode: string | null;
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /** Finishedat */
+            finishedAt: string | null;
+        };
+        /** QaQuestionCreate */
+        QaQuestionCreate: {
+            /** Question */
+            question: string;
+        };
+        /** QaQuestionList */
+        QaQuestionList: {
+            /** Items */
+            items: components["schemas"]["QaQuestion"][];
+            /** Nextcursor */
+            nextCursor: string | null;
+        };
+        /** QaTypeRef */
+        QaTypeRef: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Label */
+            label: string;
+        };
+        /** QueryStep */
+        QueryStep: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Typelabel */
+            typeLabel: string;
+            /** Conditions */
+            conditions: string[];
+            /** Statements */
+            statements: number;
+            /** Rows */
+            rows: number;
+            /** Truncated */
+            truncated: boolean;
         };
         /**
          * RdfValue
@@ -3182,6 +4150,69 @@ export interface components {
          * @enum {string}
          */
         Role: "admin" | "editor" | "reviewer" | "viewer";
+        /** RuleCheckRequest */
+        RuleCheckRequest: {
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            within?: components["schemas"]["KeySet"] | null;
+            /**
+             * Limit
+             * @description Maximum number of violation samples per rule. Defaults to 50.
+             */
+            limit?: number;
+        };
+        /** RuleReport */
+        RuleReport: {
+            release: components["schemas"]["ReleaseRef"];
+            /**
+             * Typeid
+             * Format: uuid
+             */
+            typeId: string;
+            /** Scanned */
+            scanned: number;
+            /** Checkedrules */
+            checkedRules: number;
+            /** Uncheckedrules */
+            uncheckedRules: number;
+            /** Results */
+            results: components["schemas"]["RuleResult"][];
+            /** Steps */
+            steps: components["schemas"]["QueryStep"][];
+        };
+        /** RuleResult */
+        RuleResult: {
+            /**
+             * Constraintid
+             * Format: uuid
+             */
+            constraintId: string;
+            /** Constraintlabel */
+            constraintLabel: string;
+            /** Propertyid */
+            propertyId: string | null;
+            /** Propertylabel */
+            propertyLabel: string | null;
+            /** Checks */
+            checks: ("minCount" | "minInclusive" | "maxInclusive" | "minExclusive" | "maxExclusive" | "allowedValues" | "minLength" | "maxLength" | "pattern")[];
+            /** Unchecked */
+            unchecked: components["schemas"]["Unchecked"][];
+            /** Message */
+            message: string | null;
+            /** Violations */
+            violations: number;
+            /** Samples */
+            samples: components["schemas"]["RuleSample"][];
+        };
+        /** RuleSample */
+        RuleSample: {
+            object: components["schemas"]["ObjectRow"];
+            /** Failed */
+            failed: components["schemas"]["FailedCheck"][];
+        };
         Scalar: string | number | boolean;
         /** Sort */
         Sort: {
@@ -3302,6 +4333,16 @@ export interface components {
             relations: components["schemas"]["RelationBindingView"][];
             /** Openchangesetids */
             openChangeSetIds: string[];
+        };
+        /** Unchecked */
+        Unchecked: {
+            /** Check */
+            check: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "path_not_property" | "path_not_bound" | "check_not_supported" | "value_mismatch";
         };
         /** UserInfo */
         UserInfo: {
@@ -4240,7 +5281,7 @@ export interface operations {
     list_elements_api_ontologies__id__elements_get: {
         parameters: {
             query?: {
-                kind?: ("entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding") | null;
+                kind?: ("entity_type" | "relation_type" | "property" | "constraint" | "axiom" | "type_binding" | "property_binding" | "relation_binding" | "metric") | null;
                 q?: string | null;
                 status?: "active" | "deprecated" | "all";
             };
@@ -5956,6 +6997,309 @@ export interface operations {
             };
         };
     };
+    list_qa_questions_api_ontologies__id__qa_questions_get: {
+        parameters: {
+            query?: {
+                askedBy?: "me" | "all";
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaQuestionList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    create_qa_question_api_ontologies__id__qa_questions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QaQuestionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaQuestion"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_qa_question_api_qa_questions__id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaQuestion"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    create_qa_gap_proposal_api_qa_questions__id__gap_proposal_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaQuestion"];
+                };
+            };
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaQuestion"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     get_summary_api_workbench_summary_get: {
         parameters: {
             query?: never;
@@ -6828,6 +8172,113 @@ export interface operations {
             };
         };
     };
+    traverse_objects_api_ontologies__id__objects_traverse_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PathQuery"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PathResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     get_object_api_ontologies__id__objects__typeId___key__get: {
         parameters: {
             query?: never;
@@ -7016,6 +8467,906 @@ export interface operations {
             };
             /** @description Gateway Timeout */
             504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_metrics_api_ontologies__id__metrics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    evaluate_metric_api_ontologies__id__metrics__metricId__evaluate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                metricId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetricEvaluate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricValue"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    check_rules_api_ontologies__id__rules_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RuleCheckRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RuleReport"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_competency_questions_api_ontologies__id__competency_questions_get: {
+        parameters: {
+            query?: {
+                archived?: boolean;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompetencyQuestionList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    create_competency_question_api_ontologies__id__competency_questions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompetencyQuestionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompetencyQuestion"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    patch_competency_question_api_competency_questions__id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompetencyQuestionPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompetencyQuestion"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    archive_competency_question_api_competency_questions__id__archive_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompetencyQuestion"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    import_competency_questions_api_ontologies__id__competency_questions_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description TOML with up to 50 questions, at most 64 KiB. */
+        requestBody: {
+            content: {
+                "text/plain": string;
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CqImportResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    check_competency_question_api_competency_questions__id__check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CqCheck"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    check_competency_questions_api_ontologies__id__competency_questions_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CqCheckList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    competency_question_coverage_api_ontologies__id__competency_questions_coverage_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CqCoverage"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblem"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
                 headers: {
                     [name: string]: unknown;
                 };

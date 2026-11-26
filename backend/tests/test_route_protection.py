@@ -86,6 +86,11 @@ TOKEN_ROUTES = {
     ("post", "/api/ontologies/{id}/objects/search"),
     ("get", "/api/ontologies/{id}/objects/{typeId}/{key}"),
     ("get", "/api/ontologies/{id}/objects/{typeId}/{key}/related"),
+    # Spec 007 appendix "接口与角色": the M4 operations with scope `objects:read`.
+    ("post", "/api/ontologies/{id}/objects/traverse"),
+    ("get", "/api/ontologies/{id}/metrics"),
+    ("post", "/api/ontologies/{id}/metrics/{metricId}/evaluate"),
+    ("post", "/api/ontologies/{id}/rules/check"),
 }
 # Probes that read no credentials at all, so there is nothing for a token to unlock.
 PUBLIC_ROUTES = {("get", "/api/health"), ("get", "/api/health/ready")}

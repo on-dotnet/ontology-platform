@@ -1,10 +1,10 @@
 """API models of the ai module."""
 
 from datetime import datetime
-from typing import Annotated, Self
+from typing import Annotated, Literal, Self
 from uuid import UUID
 
-from pydantic import Field, StringConstraints, model_validator
+from pydantic import ConfigDict, Field, StringConstraints, model_validator
 
 from ontology_platform.modules.ai.models import (
     MESSAGE_MAX_LENGTH,
@@ -12,6 +12,18 @@ from ontology_platform.modules.ai.models import (
     AssistantStep,
     BindingSuggestionStep,
 )
+from ontology_platform.modules.metrics.schemas import MetricValue, RuleReport
+from ontology_platform.modules.ontology.models import Kind
+from ontology_platform.modules.query.schemas import (
+    FILTERS_MAX,
+    QA_HOPS_MAX,
+    Filter,
+    KeySet,
+    PathHop,
+    PathRow,
+    StepOut,
+)
+from ontology_platform.modules.query.schemas import ReleaseRef as ReleaseRef
 from ontology_platform.schemas import CamelModel
 
 
@@ -107,3 +119,152 @@ class BindingSuggestion(CamelModel):
     error_code: str | None
     created_at: datetime
     finished_at: datetime | None
+
+
+QaOrigin = Literal["user", "cq"]
+QaStatus = Literal["queued", "running", "answered", "unanswerable", "failed"]
+QaStep = Literal["plan", "check", "query", "answer", "done"]
+QaIntent = Literal["objects", "count", "metric", "rules"]
+QaNote = Literal["cited_unknown", "answer_unavailable", "rows_not_shared", "rows_truncated"]
+
+
+class QaQuestionCreate(CamelModel):
+    question: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
+
+
+class QaTypeRef(CamelModel):
+    type_id: UUID
+    label: str
+
+
+class QaPlanStart(QaTypeRef):
+    filters: list[Filter] = Field(max_length=FILTERS_MAX)
+
+
+class QaPlanHop(PathHop):
+    label: str
+    target_type_id: UUID
+    target_label: str
+
+
+class QaPlan(CamelModel):
+    intent: QaIntent
+    start: QaPlanStart | None
+    hops: list[QaPlanHop] = Field(max_length=QA_HOPS_MAX)
+    target: int
+    metric_id: UUID | None
+    description: str
+    assumptions: list[str]
+
+
+class QaElementRef(CamelModel):
+    id: UUID
+    label: str
+
+
+class QaMissingElement(CamelModel):
+    kind: Literal["entity_type", "relation_type", "property", "metric"]
+    label_zh: str
+    description: str
+    near: list[QaElementRef]
+
+
+class QaGaps(CamelModel):
+    elements: list[QaMissingElement]
+    bindings: list[QaTypeRef]
+
+
+class QaDocumentEvidence(CamelModel):
+    document_id: UUID
+    document_name: str
+    chunk: int
+    quote: str
+
+
+class QaEvidenceElement(QaElementRef):
+    kind: Kind
+    iri: str | None
+    documents: list[QaDocumentEvidence] = Field(max_length=2)
+
+
+class QaEvidenceBinding(CamelModel):
+    schema_name: str = Field(alias="schema")
+    table: str
+    key_columns: list[str]
+
+
+class QaEvidence(CamelModel):
+    release: ReleaseRef
+    elements: list[QaEvidenceElement]
+    bindings: list[QaEvidenceBinding]
+    steps: list[StepOut]
+    rows: list[PathRow] = Field(max_length=50)
+    truncated: bool
+    tail: list[PathRow] = Field(max_length=50)
+    metric: MetricValue | None
+    rules: RuleReport | None
+
+
+class QaFactMetric(CamelModel):
+    label: str
+    display: str | None
+
+
+class QaFactObject(QaTypeRef):
+    key: str
+
+
+class QaFacts(CamelModel):
+    count: int | None
+    metric: QaFactMetric | None
+    objects: list[QaFactObject] = Field(max_length=50)
+    violations: int | None
+
+
+class QaAnswer(CamelModel):
+    text: str | None
+    facts: QaFacts
+    cited_keys: list[str]
+    counterpoints: list[str]
+    notes: list[QaNote]
+
+
+class QaGapProposal(CamelModel):
+    status: Literal["queued", "running", "done", "empty", "failed"]
+    change_set_id: UUID | None
+    dropped: int
+    error_code: str | None
+
+
+class QaAsker(CamelModel):
+    id: UUID
+    display_name: str
+
+
+class QaQuestion(CamelModel):
+    model_config = ConfigDict(frozen=True)
+
+    id: UUID
+    ontology_id: UUID
+    question: str
+    origin: QaOrigin
+    cq_question_id: UUID | None
+    asked_by: QaAsker
+    status: QaStatus
+    step: QaStep | None
+    release: ReleaseRef | None
+    plan: QaPlan | None
+    gaps: QaGaps | None
+    answer: QaAnswer | None
+    evidence: QaEvidence | None
+    gap_proposal: QaGapProposal | None
+    error_code: str | None
+    created_at: datetime
+    finished_at: datetime | None
+    # Competency checks need every key, even when the evidence shown to users is truncated.
+    answer_keys: KeySet | None = Field(default=None, exclude=True, repr=False)
+
+
+class QaQuestionList(CamelModel):
+    items: list[QaQuestion]
+    next_cursor: str | None
