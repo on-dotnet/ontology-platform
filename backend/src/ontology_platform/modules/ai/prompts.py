@@ -43,28 +43,57 @@ measurable or descriptive attributes (attribute), links between objects (relatio
 enumerated values such as grades or categories (value). Skip generic words.
 {TERMS_RULES}"""
 
+# One reading of "a thing and the record of it" for the types and resolve stages (#57, #58):
+# the two stages used to answer it in opposite ways.
+RECORD_RULE = """\
+A thing and the record of it are one concept unless the record is identified and kept track of
+on its own. An event known only through its record (every occurrence is one record) is one
+concept with the record, named by the record ("delivery" and "delivery record"). Master data
+kept for each thing under the thing's own number is the thing ("machine" and "machine
+register"). A record with an identity of its own, different from the thing's, is a different
+concept ("employee" and "work permit").
+"""
+
 TYPES_INSTRUCTIONS = f"""\
 You are an ontology engineer. From the candidate terms below, decide which are entity types
 (classes of business objects or events that have their own identity), and arrange them into a
 shallow hierarchy only where the text supports an "is a kind of" relation.
-An entity type is a class whose individual members are told apart and kept track of: physical
-things (equipment, containers, materials and products), records and documents, and events that
-the text treats as occurrences in their own right, each with an identifier or with data
-recorded for it (for example "every delivery is recorded with its date and quantity").
+An entity type is a class whose members are identified and kept track of one by one: usually
+each has a number or code of its own, or the text lists the data recorded for every single one
+(for example "every delivery is recorded with its date and quantity"). A number is the most
+common evidence, not the only one. Such members are physical things (equipment, containers,
+materials and products), events that the text treats as occurrences in their own right, and
+records, documents and plans of which every single one is kept track of (a delivery note; a
+plan whose lines each name an item).
 These are not entity types:
-- Process steps and operations, usually named by a verb (for example unpacking, sorting,
-  sealing, starting a machine). Data recorded at a step belongs, as attributes, to the object
-  or event it is recorded for. Make a step a type only when the text records each occurrence
-  of it as a record of its own.
+- Process steps, operations and activities, whether named by a verb or by an action noun (for
+  example unpacking, sealing, inspection, calibration, review, stocktaking, evaluation). When
+  the data of each occurrence is written on another record (a work order, a report), propose
+  that record, not the activity. Make an activity a type only when the text keeps track of
+  each occurrence of it one by one (for example "a record is made of every run").
 - Outcomes, statuses, the possible results of a decision, quality levels and other categories
-  (these are values); measurable quantities (attributes); people, roles and departments
-  mentioned only as the one who acts; parts or zones of equipment and input materials that have
-  no data of their own.
-One concept is one type. When several terms name the same thing (a short and a qualified name,
-a thing and the record of it), propose one type, name it by the general term the text uses
-most, and put the other names in synonyms. A process and the equipment that performs it are
-different concepts; keep the equipment, and the process only if it is an event as defined
-above.
+  (these are values). A kind of activity or record told apart only by its level, frequency or
+  result (routine and specialist checks) is a value of an attribute, not a type of its own.
+- Measurable quantities (attributes).
+- People, roles and departments mentioned only as the one who acts; a role that an existing
+  kind of thing plays (a backup vendor, a contractor that is a vendor); places such as stores
+  or rooms that the text names only as where something happens.
+- Parts, points and zones of equipment and input materials, even when a standard or plan
+  refers to them, unless each one is identified and kept track of on its own. Lines or items
+  of a plan, list or standard (a plan line, a checklist item) are part of the document that
+  contains them.
+- Registers, ledgers, directories, lists, tables, statistics, charts and analysis reports that
+  collect or summarise entries about other things (a list of approved vendors, a stock table, a
+  monthly summary); propose the things they list instead. A row of a table of records to keep
+  (record name, owner, retention period) is not a type.
+- Requests, applications, permits and notifications that are not kept track of one by one;
+  what they ask for or record belongs, as attributes, to the object they concern.
+One concept is one type. When several terms name the same thing (a short and a qualified
+name), propose one type, name it by the general term the text uses most, and put the other
+names in synonyms. Plans, reports or records that differ only by period or frequency (an
+annual and a monthly plan) are one type; the period is an attribute.
+{RECORD_RULE}A process and the equipment that performs it are different concepts; keep the
+equipment, and the process only if it is an event as defined above.
 Existing entity types are listed with short ids (E1, E2, ...); reuse them instead of proposing
 duplicates (refer to an existing type by its id). Refer to a new type as "new:<Name>", where
 <Name> is a PascalCase English name. Give a concise English label, and a definition of one
@@ -157,7 +186,7 @@ class RelationsOut(BaseModel):
     properties: list[PropertyOut]
 
 
-RESOLVE_INSTRUCTIONS = """\
+RESOLVE_INSTRUCTIONS = f"""\
 You are an ontology engineer. Each object type below was just identified in a document and is
 listed with its candidates: types it might be the same as (existing ones, types proposed by
 other documents, or types of this document). For each type, decide whether one of its
@@ -166,9 +195,9 @@ Same concept means the same kind of thing under another name: an abbreviation, a
 a synonym or a name used by another department (for example "car" and "automobile", or
 "invoice" and "bill"). These are not the same concept: a kind of something and that something
 ("sports car" and "car"), a whole and its parts ("car" and "engine"), a process and the
-equipment that performs it ("painting" and "paint booth"), a thing and the record of it
-("shipment" and "shipping note"), and two kinds of one thing that share a general name.
-Answer per type, in one line: "same" with the candidate it is; "different" with candidate null
+equipment that performs it ("painting" and "paint booth"), and two kinds of one thing that
+share a general name.
+{RECORD_RULE}Answer per type, in one line: "same" with the candidate it is; "different" with candidate null
 when no candidate is the same concept; "unsure" with the candidate it may be when the names,
 definitions and context are not enough to tell. Do not guess: answer unsure instead.
 Give the reason in at most 30 characters, in the language of the names.

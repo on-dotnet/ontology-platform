@@ -30,7 +30,9 @@ from ontology_platform.modules.ai.extraction import (
 )
 from ontology_platform.modules.ai.gateway import InputFile
 from ontology_platform.modules.ai.prompts import (
+    RECORD_RULE,
     RELATIONS_INSTRUCTIONS,
+    RESOLVE_INSTRUCTIONS,
     TYPES_INSTRUCTIONS,
     DecisionOut,
     EntityTypeOut,
@@ -1661,6 +1663,38 @@ def test_the_relations_prompt_allows_a_short_run_of_sentences() -> None:
     assert "3.12-3.14" in (RelationOut.model_fields["sentence"].description or "")
     assert "3.12-3.14" not in TYPES_INSTRUCTIONS
     assert "3.12-3.14" not in (PropertyOut.model_fields["sentence"].description or "")
+
+
+def test_types_and_resolve_judge_a_thing_and_its_record_alike() -> None:
+    # #57: the types stage merged a thing and its record, resolve called them different.
+    assert RECORD_RULE in TYPES_INSTRUCTIONS
+    assert RECORD_RULE in RESOLVE_INSTRUCTIONS
+    assert "a thing and the record of it (" not in RESOLVE_INSTRUCTIONS
+    assert "identified and kept track of" in RECORD_RULE
+
+
+def test_the_types_prompt_names_what_is_not_a_type() -> None:
+    # The three granularity rules of #58, and identity not only by a number.
+    rules = " ".join(TYPES_INSTRUCTIONS.split())
+    for phrase in (
+        "by an action noun",
+        "Registers, ledgers, directories, lists",
+        "table of records to keep",
+        "Requests, applications, permits and notifications",
+        "Lines or items of a plan",
+        "a role that an existing kind of thing plays",
+        "differ only by period or frequency",
+        "not the only one",
+    ):
+        assert phrase in rules
+    # Kinds told apart by a category stay types (a subclass of equipment, say).
+    assert "differ only by period, frequency or category" not in rules
+
+
+def test_the_prompts_give_examples_in_generic_words_only() -> None:
+    cjk = re.compile(r"[一-鿿]")
+    for prompt in (TYPES_INSTRUCTIONS, RESOLVE_INSTRUCTIONS, RELATIONS_INSTRUCTIONS):
+        assert not cjk.search(prompt)
 
 
 async def test_short_ids_in_the_output_stand_for_the_existing_types() -> None:
