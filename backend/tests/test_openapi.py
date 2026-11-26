@@ -88,7 +88,12 @@ M3_PATHS = {
 ONTOLOGY = "/api/ontologies/{id}"
 CQ = "/competency-questions"
 # What an authorized caller gets from operations that are no longer stubs (nothing released yet).
-M4_IMPLEMENTED = {f"{ONTOLOGY}/objects/traverse": (409, "query.no_release")}
+M4_IMPLEMENTED = {
+    f"{ONTOLOGY}/objects/traverse": (409, "query.no_release"),
+    f"{ONTOLOGY}/metrics": (409, "query.no_release"),
+    f"{ONTOLOGY}/metrics/{{metricId}}/evaluate": (409, "query.no_release"),
+    f"{ONTOLOGY}/rules/check": (409, "query.no_release"),
+}
 M4_OPERATIONS = {
     f"{ONTOLOGY}/objects/traverse": {"post": 200},
     f"{ONTOLOGY}/metrics": {"get": 200},

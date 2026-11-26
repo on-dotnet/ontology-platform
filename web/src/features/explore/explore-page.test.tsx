@@ -13,7 +13,10 @@ import { firstPage, heatRow, heatType, mockExplore, release, searchPath, typesPa
 
 describe('explore published objects', () => {
   it('opens a bookmarked tab and keeps keyboard, address and history in sync', async () => {
-    mockExplore({ [`GET /api/ontologies/${ONTOLOGY_ID}/qa/questions`]: () => ({ items: [], nextCursor: null }) });
+    mockExplore({
+      [`GET /api/ontologies/${ONTOLOGY_ID}/qa/questions`]: () => ({ items: [], nextCursor: null }),
+      [`GET /api/ontologies/${ONTOLOGY_ID}/metrics`]: () => ({ release, items: [] }),
+    });
     const user = userEvent.setup();
     const { router } = renderApp('/explore?tab=ask');
     const ask = await screen.findByRole('tab', { name: '问答', selected: true });
@@ -25,7 +28,7 @@ describe('explore published objects', () => {
     const metrics = await screen.findByRole('tab', { name: '指标与规则', selected: true });
     expect(metrics).toHaveFocus();
     expect(router.history.location.href).toBe('/explore?tab=metrics');
-    expect(screen.getByRole('tabpanel', { name: '指标与规则' })).toHaveTextContent(i18n.t('metrics.placeholder'));
+    expect(await within(screen.getByRole('tabpanel', { name: '指标与规则' })).findByRole('heading', { name: '指标' })).toBeVisible();
     await user.click(screen.getByRole('tab', { name: '对象' }));
     expect(await screen.findByRole('table', { name: '炉次' })).toBeVisible();
     expect(router.history.location.href).toBe('/explore?tab=objects');
@@ -71,7 +74,7 @@ describe('explore published objects', () => {
       const panel = within(await screen.findByRole('tabpanel', { name }));
       expect(await panel.findByRole('heading', { name: '还没有可探索的本体' })).toBeVisible();
       expect(panel.queryByRole('textbox', { name: i18n.t('qa.question') })).toBeNull();
-      expect(panel.queryByText(i18n.t('metrics.placeholder'))).toBeNull();
+      expect(panel.queryByRole('heading', { name: '指标' })).toBeNull();
     }
   });
 
@@ -79,7 +82,10 @@ describe('explore published objects', () => {
     let finish!: (response: Response) => void;
     const pending = new Promise<Response>((resolve) => { finish = resolve; });
     let recovered = false;
-    mockExplore({ 'GET /api/ontologies': () => recovered ? [ontologyFixture()] : pending });
+    mockExplore({
+      'GET /api/ontologies': () => recovered ? [ontologyFixture()] : pending,
+      [`GET /api/ontologies/${ONTOLOGY_ID}/metrics`]: () => ({ release, items: [] }),
+    });
     const user = userEvent.setup();
     renderApp('/explore?tab=ask');
     const ask = within(await screen.findByRole('tabpanel', { name: '问答' }));
@@ -91,7 +97,7 @@ describe('explore published objects', () => {
     expect(await metrics.findByRole('alert')).toHaveTextContent('数据源正忙');
     recovered = true;
     await user.click(metrics.getByRole('button', { name: '重试' }));
-    expect(await metrics.findByText(i18n.t('metrics.placeholder'))).toBeVisible();
+    expect(await metrics.findByRole('heading', { name: '指标' })).toBeVisible();
     expect(screen.getByRole('combobox', { name: '本体' })).toHaveValue(ONTOLOGY_ID);
   });
 

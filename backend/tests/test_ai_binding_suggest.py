@@ -3,6 +3,7 @@ into a change set for review, the checks that drop what the catalog or the ontol
 have, sample values only where the data source allows them, and failures."""
 
 import json
+import re
 import tomllib
 from collections.abc import Sequence
 from pathlib import Path
@@ -480,8 +481,10 @@ async def test_the_model_sees_metadata_only_without_samples_or_where_the_source_
     everything = "\n".join(text for _, text in gateway.texts)
     assert "heat_no" in everything
     assert "numeric(8,2)" in everything
+    # Element ids are random hex and can contain the port's digits by chance.
+    visible = re.sub(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", "", everything)
     for secret in SECRETS:
-        assert secret not in everything
+        assert secret not in visible
     assert '"samples"' not in everything
     row = await stored(app, body["id"])
     assert row.samples_sent is False
