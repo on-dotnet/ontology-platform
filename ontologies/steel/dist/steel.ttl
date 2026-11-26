@@ -1102,10 +1102,9 @@ stl:Galvanizing a owl:Class ;
         "镀锌"@zh .
 
 stl:GasAnalysisRemeltShape a sh:PropertyShape ;
-    rdfs:comment "每次逐锭气体分析应明确对应一项实际重熔作业。"@zh ;
+    rdfs:comment "气体分析指明所据重熔时，只能对应一项实际的重熔作业；不经重熔的特钢可以不填。"@zh ;
     sh:class stl:Remelting ;
     sh:maxCount 1 ;
-    sh:minCount 1 ;
     sh:path stl:analysedRemelt ;
     sh:severity sh:Violation ;
     sh:targetClass stl:GasContentAnalysis .
@@ -1377,21 +1376,21 @@ stl:LotFormationDimensionCode a rdfs:Datatype ;
         "组批维度代码"@zh .
 
 stl:MacroDefectSchemeShape a sh:PropertyShape ;
-    rdfs:comment "低倍缺陷应取自锭材截面分项评级方案。"@zh ;
+    rdfs:comment "低倍缺陷应取自低倍受评缺陷类别方案。"@zh ;
     sh:hasValue <https://w3id.org/ontology-platform/steel/code/macro-defect-type> ;
     sh:path skos:inScheme ;
     sh:severity sh:Violation ;
     sh:targetObjectsOf stl:ratedMacroDefect .
 
 stl:MacroDefectTypeCode a rdfs:Datatype ;
-    rdfs:label "Rated ingot product macrodefect code"@en,
-        "锭材低倍受评缺陷类别代码"@zh ;
+    rdfs:label "Rated macrodefect code"@en,
+        "低倍受评缺陷类别代码"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1979-2025> ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
-    skos:definition "Datatype of primary notations in the rated ingot product macrodefect scheme."@en,
-        "标记锭材低倍受评缺陷类别方案中主记号的字面量类型。"@zh ;
-    skos:prefLabel "Rated ingot product macrodefect code"@en,
-        "锭材低倍受评缺陷类别代码"@zh .
+    skos:definition "Datatype of primary notations in the rated macrodefect scheme."@en,
+        "标记低倍受评缺陷类别方案中主记号的字面量类型。"@zh ;
+    skos:prefLabel "Rated macrodefect code"@en,
+        "低倍受评缺陷类别代码"@zh .
 
 stl:MacroRatedDefectShape a sh:PropertyShape ;
     rdfs:comment "一个低倍缺陷级别应明确对应一个受评缺陷。"@zh ;
@@ -1402,7 +1401,7 @@ stl:MacroRatedDefectShape a sh:PropertyShape ;
     sh:targetClass stl:MacroDefectRating .
 
 stl:MacroRatingExaminationShape a sh:PropertyShape ;
-    rdfs:comment "一项低倍缺陷评级应能指回出具它的那次锭材低倍检验。"@zh ;
+    rdfs:comment "一项低倍缺陷评级应能指回出具它的那次低倍检验。"@zh ;
     sh:class stl:MacroExamination ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -10094,7 +10093,7 @@ stl:DeliveryCondition a owl:Class ;
 stl:ElectroslagRemelting a owl:Class ;
     rdfs:label "Electroslag remelting"@en,
         "电渣重熔"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-10067-8-2016> ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
     rdfs:comment "下沉理由：特冶追溯须能将采用熔渣的重熔道次与真空电弧重熔道次分别标识。"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/remelting> ;
     rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/process-type/ESR> ;
@@ -10202,17 +10201,17 @@ stl:LocalGrinding a owl:Class ;
         "局部修磨"@zh .
 
 stl:MacroExamination a owl:Class ;
-    rdfs:label "Macroexamination for ingot product acceptance"@en,
-        "锭材低倍交验"@zh ;
+    rdfs:label "Macroexamination"@en,
+        "低倍检验"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1979-2025>,
         <https://w3id.org/ontology-platform/steel/std/gbt-226-2015> ;
-    rdfs:comment "下沉理由：锭材交验须把分项缺陷级别追溯到取料钢锭，普钢连铸坯的低倍检验另有坯样口径。"@zh ;
+    rdfs:comment "下沉理由：按缺陷类别逐项给出低倍级别并对照订货要求出证，是特钢棒材、锻材交验的常规项目；普钢产品通常不要求分项低倍级别，需要时用通用金相检验和评级结果记录即可。"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
     rdfs:subClassOf stl:MetallographicExamination ;
-    skos:definition "Examination of a traceable specialty ingot product section for the individual macrostructural defects specified at acceptance."@en,
-        "在保留锭源的特钢交验试料截面上显现宏观组织，按订货规格分别记录受评缺陷的检验。"@zh ;
-    skos:prefLabel "Macroexamination for ingot product acceptance"@en,
-        "锭材低倍交验"@zh .
+    skos:definition "Examination of a transverse section from a traceable piece, revealed by etching or similar methods, in which each specified macrostructural defect category is rated against the order; unlike microexamination it views the whole section by eye or at low magnification."@en,
+        "在取自可追溯实物件的横截面试样上经酸蚀等方法显现宏观组织，按订货规格逐类评定缺陷级别的检验；与高倍检验的区别在于用肉眼或低倍放大观察整个截面。"@zh ;
+    skos:prefLabel "Macroexamination"@en,
+        "低倍检验"@zh .
 
 stl:MaterialAggregation a owl:Class ;
     rdfs:label "Material aggregation"@en,
@@ -11282,6 +11281,15 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://www.dinmedia.de/de/norm/din-en-10079/93163915> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-10067-8-2016> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 10067.8-2016" ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:title "Basic specifications for electroheat installations—Part 8: Electroslag remelting furnaces"@en,
+        "电热装置基本技术条件 第8部分：电渣重熔炉"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81301D3A7E05397BE0A0AB82A> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-1220-2007> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 1220-2007" ;
@@ -11805,18 +11813,18 @@ stl:ElementResult a owl:Class ;
         "用 partOf 关联本次化学分析，用 element 和 massFraction 记录一项元素及其质量百分数。"@zh .
 
 stl:GasContentAnalysis a owl:Class ;
-    rdfs:label "Gas content analysis at a remelting stage"@en,
-        "特冶重熔阶段气体分析"@zh ;
+    rdfs:label "Gas content analysis"@en,
+        "气体含量分析"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-11261-2006>,
         <https://w3id.org/ontology-platform/steel/std/gbt-20124-2006>,
         <https://w3id.org/ontology-platform/steel/std/gbt-223-82-2018> ;
-    rdfs:comment "下沉理由：特冶逐锭验收须区分同一初炼炉次在各次重熔后的气体分析结果。"@zh ;
+    rdfs:comment "下沉理由：特钢订货对氧、氮、氢含量单独出证，重熔材还须区分同一初炼炉次各道重熔后的结果；普钢的气体元素按通用化学分析逐元素报告即可。"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
     rdfs:subClassOf stl:ChemicalAnalysis ;
-    skos:definition "An analysis of oxygen, nitrogen or hydrogen in material sampled at an identified remelting stage, providing per-element results for ingot cleanliness review."@en,
-        "测定指定重熔阶段试样的氧、氮或氢含量，保留重熔实绩与分元素结果，供逐锭纯净度复核。"@zh ;
-    skos:prefLabel "Gas content analysis at a remelting stage"@en,
-        "特冶重熔阶段气体分析"@zh .
+    skos:definition "A chemical analysis of oxygen, nitrogen or hydrogen in a specialty steel sample, reporting per-element results; when the sample comes from a remelted ingot it may also identify the remelting run it represents."@en,
+        "测定特钢试样中氧、氮或氢含量的化学分析，按元素报告结果；试样来自重熔锭时可同时指明所代表的重熔作业。"@zh ;
+    skos:prefLabel "Gas content analysis"@en,
+        "气体含量分析"@zh .
 
 stl:HardnessTest a owl:Class ;
     rdfs:label "Hardness test"@en,
@@ -11922,7 +11930,7 @@ stl:MicroExamination a owl:Class ;
     rdfs:label "Microexamination for specialty steel acceptance"@en,
         "特钢显微组织交验"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-18254-2016> ;
-    rdfs:comment "下沉理由：轴承钢等产品的显微交验按夹杂物系列或碳化物形态分项出证，普钢金相观察沿用通用金相检验类。"@zh ;
+    rdfs:comment "下沉理由：本类只作为特钢分项显微评级（夹杂物分级、碳化物带状评级）的上位类；普钢的金相观察不需要这一分组，直接用通用金相检验类。"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
     rdfs:subClassOf stl:MetallographicExamination ;
     skos:definition "Examination of a traceable specimen surface for the particular microscopic features specified for acceptance of a specialty steel product."@en,
@@ -12568,13 +12576,13 @@ stl:ratedMacroDefect a owl:ObjectProperty ;
     rdfs:label "Rated macrodefect"@en,
         "受评低倍缺陷"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1979-2025> ;
-    rdfs:comment "下沉理由：锭材低倍交验按缺陷类别逐项对照特钢规格。"@zh ;
+    rdfs:comment "下沉理由：低倍检验按缺陷类别逐项对照特钢规格。"@zh ;
     rdfs:domain stl:MacroDefectRating ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
     rdfs:range skos:Concept ;
     rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/macro-defect-type> ;
-    skos:definition "Identifies the discontinuity graded by a single macrostructural rating on an ingot product section."@en,
-        "指出一条锭材低倍评级针对的组织缺陷，使同一试料上的不同评级可分别判读。"@zh ;
+    skos:definition "Identifies the discontinuity graded by a single macrostructural rating on a section."@en,
+        "指出一条低倍评级针对的组织缺陷，使同一试料上的不同评级可分别判读。"@zh ;
     skos:prefLabel "Rated macrodefect"@en,
         "受评低倍缺陷"@zh .
 
@@ -12706,15 +12714,6 @@ stl:specialProductFamily a owl:ObjectProperty ;
         "指出特定标准版次中的牌号可按哪个特钢或高温合金产品系列订货。同一牌号可用于多个系列。"@zh ;
     skos:prefLabel "Special steel product family"@en,
         "特钢产品族"@zh .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-10067-8-2016> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 10067.8-2016" ;
-    dcterms:issued "2016"^^xsd:gYear ;
-    dcterms:title "Basic specifications for electroheat installations—Part 8: Electroslag remelting furnaces"@en,
-        "电热装置基本技术条件 第8部分：电渣重熔炉"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81301D3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-10623-2008> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -13161,16 +13160,16 @@ stl:IronOre a owl:Class ;
         "铁矿料批"@zh .
 
 stl:MacroDefectRating a owl:Class ;
-    rdfs:label "Ingot product macrodefect rating"@en,
-        "锭材低倍缺陷评级结果"@zh ;
+    rdfs:label "Macrodefect rating"@en,
+        "低倍缺陷评级结果"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1979-2025> ;
-    rdfs:comment "下沉理由：锭材验收须将分项评级与取自特定锭的截面配对，普钢坯样的评级方案独立。"@zh ;
+    rdfs:comment "下沉理由：分项低倍级别只在特钢交验中逐类对照订货要求；普钢不出具分项低倍级别。"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection> ;
     rdfs:subClassOf stl:RatingResult ;
-    skos:definition "A level assigned to one defect category on a section in an ingot product macroexamination."@en,
-        "在一项锭材低倍交验中对一个缺陷类别给出的级别，同一截面可分别报告多类缺陷。"@zh ;
-    skos:prefLabel "Ingot product macrodefect rating"@en,
-        "锭材低倍缺陷评级结果"@zh .
+    skos:definition "A level assigned to one defect category on a section in a macroexamination; one section may report several categories."@en,
+        "在一次低倍检验中对一个缺陷类别给出的级别，同一截面可分别报告多类缺陷。"@zh ;
+    skos:prefLabel "Macrodefect rating"@en,
+        "低倍缺陷评级结果"@zh .
 
 stl:MillCertificate a owl:Class ;
     rdfs:label "Mill certificate"@en,
@@ -14211,15 +14210,15 @@ stl:Steelmaking a owl:Class ;
         "夹杂物粗细系列"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/macro-defect-type> a skos:ConceptScheme ;
-    rdfs:label "Rated ingot product macrodefect"@en,
-        "锭材低倍受评缺陷类别"@zh ;
+    rdfs:label "Rated macrodefect"@en,
+        "低倍受评缺陷类别"@zh ;
     dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1979-2025> ;
-    rdfs:comment "下沉理由：特钢锭材交验需把各项低倍缺陷的观察结果对应到规定的评级项目。"@zh ;
+    rdfs:comment "下沉理由：特钢交验需把各项低倍缺陷的观察结果对应到规定的评级项目。"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/special/inspection-codes> ;
-    skos:definition "Distinguishes features graded separately on a macrostructural section from an ingot product."@en,
-        "区分锭材低倍截面上需分别给出级别的组织缺陷。"@zh ;
-    skos:prefLabel "Rated ingot product macrodefect"@en,
-        "锭材低倍受评缺陷类别"@zh .
+    skos:definition "Distinguishes features graded separately on a macrostructural section of a piece."@en,
+        "区分低倍截面上需分别给出级别的组织缺陷。"@zh ;
+    skos:prefLabel "Rated macrodefect"@en,
+        "低倍受评缺陷类别"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/measurement-method> a skos:ConceptScheme ;
     rdfs:label "measurement acquisition method"@en,

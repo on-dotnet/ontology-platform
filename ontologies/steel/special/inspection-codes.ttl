@@ -8,7 +8,7 @@
 <ontology/special/inspection-codes> a owl:Ontology ;
     owl:versionIRI <ontology/special/inspection-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
     rdfs:label "特钢检验代码"@zh, "Specialty steel inspection codes"@en ;
-    rdfs:comment "登记夹杂物形态与系列、锭材低倍分项、棒材探伤验收等级及锭源部位。"@zh, "Registers inclusion morphologies and series, macrodefect items, ultrasonic acceptance classes and ingot zones."@en ;
+    rdfs:comment "登记夹杂物形态与系列、低倍分项、棒材探伤验收等级及锭源部位。"@zh, "Registers inclusion morphologies and series, macrodefect items, ultrasonic acceptance classes and ingot zones."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
 <code/inclusion-type> a skos:ConceptScheme ;
@@ -67,13 +67,13 @@ stl:InclusionSeriesCode a rdfs:Datatype ;
     skos:definition "在一个夹杂物类别中用于较大横向尺寸组的评级系列。"@zh, "Rating series for the larger transverse sizes within a given category."@en .
 
 <code/macro-defect-type> a skos:ConceptScheme ;
-    rdfs:label "锭材低倍受评缺陷类别"@zh, "Rated ingot product macrodefect"@en ; skos:prefLabel "锭材低倍受评缺陷类别"@zh, "Rated ingot product macrodefect"@en ;
-    skos:definition "区分锭材低倍截面上需分别给出级别的组织缺陷。"@zh, "Distinguishes features graded separately on a macrostructural section from an ingot product."@en ;
-    rdfs:comment "下沉理由：特钢锭材交验需把各项低倍缺陷的观察结果对应到规定的评级项目。"@zh ;
+    rdfs:label "低倍受评缺陷类别"@zh, "Rated macrodefect"@en ; skos:prefLabel "低倍受评缺陷类别"@zh, "Rated macrodefect"@en ;
+    skos:definition "区分低倍截面上需分别给出级别的组织缺陷。"@zh, "Distinguishes features graded separately on a macrostructural section of a piece."@en ;
+    rdfs:comment "下沉理由：特钢交验需把各项低倍缺陷的观察结果对应到规定的评级项目。"@zh ;
     dcterms:source <std/gbt-1979-2025> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
 stl:MacroDefectTypeCode a rdfs:Datatype ;
-    rdfs:label "锭材低倍受评缺陷类别代码"@zh, "Rated ingot product macrodefect code"@en ; skos:prefLabel "锭材低倍受评缺陷类别代码"@zh, "Rated ingot product macrodefect code"@en ;
-    skos:definition "标记锭材低倍受评缺陷类别方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the rated ingot product macrodefect scheme."@en ;
+    rdfs:label "低倍受评缺陷类别代码"@zh, "Rated macrodefect code"@en ; skos:prefLabel "低倍受评缺陷类别代码"@zh, "Rated macrodefect code"@en ;
+    skos:definition "标记低倍受评缺陷类别方案中主记号的字面量类型。"@zh, "Datatype of primary notations in the rated macrodefect scheme."@en ;
     dcterms:source <std/gbt-1979-2025> ; rdfs:isDefinedBy <ontology/special/inspection-codes> .
 
 <code/macro-defect-type/CENTPOR> a skos:Concept ; skos:inScheme <code/macro-defect-type> ; skos:topConceptOf <code/macro-defect-type> ;

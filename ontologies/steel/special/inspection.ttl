@@ -8,25 +8,25 @@
 <ontology/special/inspection> a owl:Ontology ;
     owl:versionIRI <ontology/special/inspection/0.1.0> ; owl:versionInfo "0.1.0" ;
     rdfs:label "特钢检验与追溯"@zh, "Specialty steel inspection and traceability"@en ;
-    rdfs:comment "描述锭材低倍、特钢显微分项评级、端淬与纯净度交验，以及棒材探伤后的逐件锭位追踪。"@zh, "Describes ingot product macroexaminations, specialty steel micrographic ratings, hardenability and cleanliness assessments, and ingot positions traced from inspected bars."@en ;
+    rdfs:comment "描述低倍、特钢显微分项评级、端淬与纯净度交验，以及棒材探伤后的逐件锭位追踪。"@zh, "Describes macroexaminations, specialty steel micrographic ratings, hardenability and cleanliness assessments, and ingot positions traced from inspected bars."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
 stl:MacroExamination a owl:Class ; rdfs:subClassOf stl:MetallographicExamination ;
-    rdfs:label "锭材低倍交验"@zh, "Macroexamination for ingot product acceptance"@en ; skos:prefLabel "锭材低倍交验"@zh, "Macroexamination for ingot product acceptance"@en ;
-    skos:definition "在保留锭源的特钢交验试料截面上显现宏观组织，按订货规格分别记录受评缺陷的检验。"@zh, "Examination of a traceable specialty ingot product section for the individual macrostructural defects specified at acceptance."@en ;
-    rdfs:comment "下沉理由：锭材交验须把分项缺陷级别追溯到取料钢锭，普钢连铸坯的低倍检验另有坯样口径。"@zh ;
+    rdfs:label "低倍检验"@zh, "Macroexamination"@en ; skos:prefLabel "低倍检验"@zh, "Macroexamination"@en ;
+    skos:definition "在取自可追溯实物件的横截面试样上经酸蚀等方法显现宏观组织，按订货规格逐类评定缺陷级别的检验；与高倍检验的区别在于用肉眼或低倍放大观察整个截面。"@zh, "Examination of a transverse section from a traceable piece, revealed by etching or similar methods, in which each specified macrostructural defect category is rated against the order; unlike microexamination it views the whole section by eye or at low magnification."@en ;
+    rdfs:comment "下沉理由：按缺陷类别逐项给出低倍级别并对照订货要求出证，是特钢棒材、锻材交验的常规项目；普钢产品通常不要求分项低倍级别，需要时用通用金相检验和评级结果记录即可。"@zh ;
     dcterms:source <std/gbt-226-2015>, <std/gbt-1979-2025> ; rdfs:isDefinedBy <ontology/special/inspection> .
 
 stl:MacroDefectRating a owl:Class ; rdfs:subClassOf stl:RatingResult ;
-    rdfs:label "锭材低倍缺陷评级结果"@zh, "Ingot product macrodefect rating"@en ; skos:prefLabel "锭材低倍缺陷评级结果"@zh, "Ingot product macrodefect rating"@en ;
-    skos:definition "在一项锭材低倍交验中对一个缺陷类别给出的级别，同一截面可分别报告多类缺陷。"@zh, "A level assigned to one defect category on a section in an ingot product macroexamination."@en ;
-    rdfs:comment "下沉理由：锭材验收须将分项评级与取自特定锭的截面配对，普钢坯样的评级方案独立。"@zh ;
+    rdfs:label "低倍缺陷评级结果"@zh, "Macrodefect rating"@en ; skos:prefLabel "低倍缺陷评级结果"@zh, "Macrodefect rating"@en ;
+    skos:definition "在一次低倍检验中对一个缺陷类别给出的级别，同一截面可分别报告多类缺陷。"@zh, "A level assigned to one defect category on a section in a macroexamination; one section may report several categories."@en ;
+    rdfs:comment "下沉理由：分项低倍级别只在特钢交验中逐类对照订货要求；普钢不出具分项低倍级别。"@zh ;
     dcterms:source <std/gbt-1979-2025> ; rdfs:isDefinedBy <ontology/special/inspection> .
 
 stl:MicroExamination a owl:Class ; rdfs:subClassOf stl:MetallographicExamination ;
     rdfs:label "特钢显微组织交验"@zh, "Microexamination for specialty steel acceptance"@en ; skos:prefLabel "特钢显微组织交验"@zh, "Microexamination for specialty steel acceptance"@en ;
     skos:definition "依照特钢产品规格，在可追溯试料的观察面上对指定显微特征作分项交验的检验。"@zh, "Examination of a traceable specimen surface for the particular microscopic features specified for acceptance of a specialty steel product."@en ;
-    rdfs:comment "下沉理由：轴承钢等产品的显微交验按夹杂物系列或碳化物形态分项出证，普钢金相观察沿用通用金相检验类。"@zh ;
+    rdfs:comment "下沉理由：本类只作为特钢分项显微评级（夹杂物分级、碳化物带状评级）的上位类；普钢的金相观察不需要这一分组，直接用通用金相检验类。"@zh ;
     dcterms:source <std/gbt-18254-2016> ; rdfs:isDefinedBy <ontology/special/inspection> .
 
 stl:InclusionRating a owl:Class ; rdfs:subClassOf stl:MicroExamination ;
@@ -60,9 +60,9 @@ stl:CleanlinessAssessment a owl:Class ; rdfs:subClassOf stl:InspectionResult ;
     dcterms:source <std/gbt-18254-2016> ; rdfs:isDefinedBy <ontology/special/inspection> .
 
 stl:GasContentAnalysis a owl:Class ; rdfs:subClassOf stl:ChemicalAnalysis ;
-    rdfs:label "特冶重熔阶段气体分析"@zh, "Gas content analysis at a remelting stage"@en ; skos:prefLabel "特冶重熔阶段气体分析"@zh, "Gas content analysis at a remelting stage"@en ;
-    skos:definition "测定指定重熔阶段试样的氧、氮或氢含量，保留重熔实绩与分元素结果，供逐锭纯净度复核。"@zh, "An analysis of oxygen, nitrogen or hydrogen in material sampled at an identified remelting stage, providing per-element results for ingot cleanliness review."@en ;
-    rdfs:comment "下沉理由：特冶逐锭验收须区分同一初炼炉次在各次重熔后的气体分析结果。"@zh ;
+    rdfs:label "气体含量分析"@zh, "Gas content analysis"@en ; skos:prefLabel "气体含量分析"@zh, "Gas content analysis"@en ;
+    skos:definition "测定特钢试样中氧、氮或氢含量的化学分析，按元素报告结果；试样来自重熔锭时可同时指明所代表的重熔作业。"@zh, "A chemical analysis of oxygen, nitrogen or hydrogen in a specialty steel sample, reporting per-element results; when the sample comes from a remelted ingot it may also identify the remelting run it represents."@en ;
+    rdfs:comment "下沉理由：特钢订货对氧、氮、氢含量单独出证，重熔材还须区分同一初炼炉次各道重熔后的结果；普钢的气体元素按通用化学分析逐元素报告即可。"@zh ;
     dcterms:source <std/gbt-11261-2006>, <std/gbt-20124-2006>, <std/gbt-223-82-2018> ; rdfs:isDefinedBy <ontology/special/inspection> .
 
 stl:analysedRemelt a owl:ObjectProperty ; rdfs:domain stl:GasContentAnalysis ; rdfs:range stl:Remelting ;
@@ -85,8 +85,8 @@ stl:inclusionSeries a owl:ObjectProperty ; rdfs:domain stl:InclusionRatingResult
 
 stl:ratedMacroDefect a owl:ObjectProperty ; rdfs:domain stl:MacroDefectRating ; rdfs:range skos:Concept ; rdfs:seeAlso <code/macro-defect-type> ;
     rdfs:label "受评低倍缺陷"@zh, "Rated macrodefect"@en ; skos:prefLabel "受评低倍缺陷"@zh, "Rated macrodefect"@en ;
-    skos:definition "指出一条锭材低倍评级针对的组织缺陷，使同一试料上的不同评级可分别判读。"@zh, "Identifies the discontinuity graded by a single macrostructural rating on an ingot product section."@en ;
-    rdfs:comment "下沉理由：锭材低倍交验按缺陷类别逐项对照特钢规格。"@zh ;
+    skos:definition "指出一条低倍评级针对的组织缺陷，使同一试料上的不同评级可分别判读。"@zh, "Identifies the discontinuity graded by a single macrostructural rating on a section."@en ;
+    rdfs:comment "下沉理由：低倍检验按缺陷类别逐项对照特钢规格。"@zh ;
     dcterms:source <std/gbt-1979-2025> ; rdfs:isDefinedBy <ontology/special/inspection> .
 
 stl:ndtAcceptanceClass a owl:ObjectProperty ; rdfs:domain stl:NondestructiveTest ; rdfs:range skos:Concept ; rdfs:seeAlso <code/ndt-acceptance-class> ;

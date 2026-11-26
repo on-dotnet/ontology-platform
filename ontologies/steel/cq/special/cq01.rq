@@ -17,10 +17,8 @@ SELECT ?barId ?route ?outputId ?outputKind ?sourceId ?remeltNumber ?pass ?heatId
   ?output dcterms:identifier ?outputId ; (stl:derivedFrom|stl:sourceHeat) ?source .
   ?source dcterms:identifier ?sourceId ; (stl:derivedFrom*/stl:sourceHeat)? ?heat .
   {
-    SELECT ?output (GROUP_CONCAT(?label; SEPARATOR=" / ") AS ?outputKind) WHERE {
-      { SELECT DISTINCT ?output ?label WHERE {
-          ?output rdf:type/rdfs:label ?label . FILTER (LANG(?label) = "zh")
-        } ORDER BY ?output ?label }
+    SELECT ?output (MIN(?label) AS ?outputKind) WHERE {
+      ?output rdf:type/rdfs:label ?label . FILTER (LANG(?label) = "zh")
     } GROUP BY ?output
   }
   ?heat rdf:type/rdfs:subClassOf* stl:Heat ; dcterms:identifier ?heatId .

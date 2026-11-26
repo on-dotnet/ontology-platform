@@ -114,8 +114,9 @@
 # EXPECT <https://w3id.org/ontology-platform/steel/code/ndt-method/UT> <https://w3id.org/ontology-platform/steel/NdtAcceptanceSchemeShape> HasValueConstraintComponent
 <urn:synthetic:steel:nondestructivetest/U91> a stl:NondestructiveTest ; stl:ndtAcceptanceClass <code/ndt-method/UT> .
 
-# EXPECT <urn:synthetic:steel:gascontentanalysis/G91> <https://w3id.org/ontology-platform/steel/GasAnalysisRemeltShape> MinCountConstraintComponent
-<urn:synthetic:steel:gascontentanalysis/G91> a stl:GasContentAnalysis .
+# EXPECT <urn:synthetic:steel:gascontentanalysis/G91> <https://w3id.org/ontology-platform/steel/GasAnalysisRemeltShape> ClassConstraintComponent
+<urn:synthetic:steel:ingotcasting/P91> a stl:IngotCasting ; stl:teemingMethod <code/teeming-method/BOTTOM> .
+<urn:synthetic:steel:gascontentanalysis/G91> a stl:GasContentAnalysis ; stl:analysedRemelt <urn:synthetic:steel:ingotcasting/P91> .
 
 # EXPECT <urn:synthetic:steel:cleanlinessassessment/C91> <https://w3id.org/ontology-platform/steel/CleanlinessEvidenceShape> MinCountConstraintComponent
 <urn:synthetic:steel:cleanlinessassessment/C91> a stl:CleanlinessAssessment .

@@ -22,7 +22,7 @@ stl:InclusionSeriesSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:inclu
 
 stl:MacroDefectSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:ratedMacroDefect ;
     sh:path skos:inScheme ; sh:hasValue <code/macro-defect-type> ;
-    sh:severity sh:Violation ; rdfs:comment "低倍缺陷应取自锭材截面分项评级方案。"@zh .
+    sh:severity sh:Violation ; rdfs:comment "低倍缺陷应取自低倍受评缺陷类别方案。"@zh .
 
 stl:NdtAcceptanceSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:ndtAcceptanceClass ;
     sh:path skos:inScheme ; sh:hasValue <code/ndt-acceptance-class> ;
@@ -46,11 +46,11 @@ stl:MacroRatedDefectShape a sh:PropertyShape ; sh:targetClass stl:MacroDefectRat
 
 stl:MacroRatingExaminationShape a sh:PropertyShape ; sh:targetClass stl:MacroDefectRating ;
     sh:path stl:resultOfInspection ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stl:MacroExamination ;
-    sh:severity sh:Violation ; rdfs:comment "一项低倍缺陷评级应能指回出具它的那次锭材低倍检验。"@zh .
+    sh:severity sh:Violation ; rdfs:comment "一项低倍缺陷评级应能指回出具它的那次低倍检验。"@zh .
 
 stl:GasAnalysisRemeltShape a sh:PropertyShape ; sh:targetClass stl:GasContentAnalysis ;
-    sh:path stl:analysedRemelt ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stl:Remelting ;
-    sh:severity sh:Violation ; rdfs:comment "每次逐锭气体分析应明确对应一项实际重熔作业。"@zh .
+    sh:path stl:analysedRemelt ; sh:maxCount 1 ; sh:class stl:Remelting ;
+    sh:severity sh:Violation ; rdfs:comment "气体分析指明所据重熔时，只能对应一项实际的重熔作业；不经重熔的特钢可以不填。"@zh .
 
 stl:CleanlinessEvidenceShape a sh:PropertyShape ; sh:targetClass stl:CleanlinessAssessment ;
     sh:path stl:cleanlinessEvidence ; sh:minCount 1 ; sh:class stl:InspectionResult ;
