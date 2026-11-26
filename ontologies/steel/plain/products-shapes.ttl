@@ -10,7 +10,7 @@
 <ontology/plain/products-shapes> a owl:Ontology ;
     owl:versionIRI <ontology/plain/products-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
     rdfs:label "普钢产品交货约束"@zh, "Commodity steel product delivery constraints"@en ;
-    rdfs:comment "核对普钢牌号所关联的标准版次和产品族，以及钢筋的表面与直径，以及按捆交货的定尺和计重依据。"@zh, "Checks the edition and ordering family of commodity grades, surface and diameter of reinforcing bars, and cut length and mass basis for bundles."@en ;
+    rdfs:comment "核对普钢牌号的标准版次和产品族，以及钢筋的表面形状和公称直径。"@zh, "Checks the standard edition and ordering family of commodity steel grades and the surface pattern and nominal diameter of reinforcing bars."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
 stl:PlainGradeEditionShape a sh:PropertyShape ; sh:targetSubjectsOf stl:plainProductFamily ;
@@ -32,19 +32,3 @@ stl:RebarSurfaceSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:rebarSur
 stl:RebarDiameterShape a sh:PropertyShape ; sh:targetClass stl:Rebar ;
     sh:path stl:rebarNominalDiameter ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0.0 ;
     sh:severity sh:Violation ; rdfs:comment "钢筋公称直径一经给出，应是一个大于零的十进制毫米数。"@zh .
-
-stl:BundleLengthShape a sh:PropertyShape ; sh:targetClass stl:Bundle ;
-    sh:path stl:bundleCutLength ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0.0 ;
-    sh:severity sh:Violation ; rdfs:comment "定尺交货捆须标明一个正的单支定尺长度，以米计。"@zh .
-
-stl:BundlePieceCountShape a sh:PropertyShape ; sh:targetClass stl:Bundle ;
-    sh:path stl:bundlePieceCount ; sh:maxCount 1 ; sh:datatype xsd:nonNegativeInteger ;
-    sh:severity sh:Violation ; rdfs:comment "交货捆的实交支数按整支清点，填写时须为非负整数。"@zh .
-
-stl:BundleMassBasisShape a sh:PropertyShape ; sh:targetClass stl:Bundle ;
-    sh:path stl:bundleMassBasis ; sh:minCount 1 ; sh:maxCount 1 ;
-    sh:severity sh:Violation ; rdfs:comment "定尺交货捆须明确一个整捆结算所用的计重方式。"@zh .
-
-stl:BundleMassBasisSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:bundleMassBasis ;
-    sh:path skos:inScheme ; sh:hasValue <code/bundle-mass-basis> ;
-    sh:severity sh:Violation ; rdfs:comment "捆的计重依据须取自交货捆计重方式方案。"@zh .

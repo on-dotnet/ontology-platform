@@ -8,7 +8,7 @@
 <ontology/process/finishing-codes> a owl:Ontology ;
     owl:versionIRI <ontology/process/finishing-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
     rdfs:label "精整设备与工序代码"@zh, "Finishing equipment and process codes"@en ;
-    rdfs:comment "给设备类型和工序类型方案增加精整线及其常用作业类型。"@zh, "Extends shared schemes with finishing line equipment and operations."@en ;
+    rdfs:comment "登记精整设备和工序类型，以及定尺交货捆的理论计重和实际计重代码。"@zh, "Registers finishing equipment and operation types, and the theoretical and actual mass bases for fixed-length delivery bundles."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
 <code/equipment-type/FINLINE> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
@@ -47,3 +47,21 @@
     skos:notation "MARK"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
     rdfs:label "标记"@zh, "Marking"@en ; skos:prefLabel "标记"@zh, "Marking"@en ;
     skos:definition "在实物或所附标签上施加身份或位置标记的工序段。"@zh ; dcterms:source <source/industry-practice> .
+
+<code/bundle-mass-basis> a skos:ConceptScheme ;
+    rdfs:label "交货捆计重方式"@zh, "Delivery bundle mass basis"@en ; skos:prefLabel "交货捆计重方式"@zh, "Delivery bundle mass basis"@en ;
+    skos:definition "区分定尺长材按捆交货时使用的理论计重和实际计重。"@zh, "Distinguishes calculated and weighed mass for the delivery of fixed-length bundles."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing-codes> .
+stl:BundleMassBasisCode a rdfs:Datatype ;
+    rdfs:label "交货捆计重方式代码"@zh, "Delivery bundle mass basis code"@en ; skos:prefLabel "交货捆计重方式代码"@zh, "Delivery bundle mass basis code"@en ;
+    skos:definition "用于标记交货捆计重方式方案内主记号的字面量类型。"@zh, "Datatype for the primary notations in the delivery bundle mass basis scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/finishing-codes> .
+
+<code/bundle-mass-basis/THEORY> a skos:Concept ; skos:inScheme <code/bundle-mass-basis> ; skos:topConceptOf <code/bundle-mass-basis> ;
+    skos:notation "THEORY"^^stl:BundleMassBasisCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
+    rdfs:label "理论计重"@zh, "Theoretical mass"@en ; skos:prefLabel "理论计重"@zh, "Theoretical mass"@en ;
+    skos:definition "按公称单位长度质量、单支定尺及实交支数计算整捆交货重量。"@zh, "Determines delivered mass from nominal mass per unit length, cut length and piece count."@en .
+<code/bundle-mass-basis/ACTUAL> a skos:Concept ; skos:inScheme <code/bundle-mass-basis> ; skos:topConceptOf <code/bundle-mass-basis> ;
+    skos:notation "ACTUAL"^^stl:BundleMassBasisCode ; rdfs:isDefinedBy <ontology/process/finishing-codes> ;
+    rdfs:label "实际计重"@zh, "Actual mass"@en ; skos:prefLabel "实际计重"@zh, "Actual mass"@en ;
+    skos:definition "按称量取得的整捆质量扣除包装皮重后结算。"@zh, "Settles on the weighed mass of the bundle after deducting packaging tare."@en .

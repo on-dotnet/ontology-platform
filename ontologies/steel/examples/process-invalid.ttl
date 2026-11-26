@@ -80,6 +80,15 @@
 # EXPECT <urn:synthetic:steel:localgrinding/G90> <https://w3id.org/ontology-platform/steel/GrindingDepthShape> MinInclusiveConstraintComponent
 <urn:synthetic:steel:localgrinding/G90> a stl:LocalGrinding ; stl:maximumGrindingDepth -0.3 .
 
+# EXPECT <urn:synthetic:steel:bundle/B91> <https://w3id.org/ontology-platform/steel/BundleLengthShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:bundle/B91> <https://w3id.org/ontology-platform/steel/BundleMassBasisShape> MinCountConstraintComponent
+<urn:synthetic:steel:bundle/B91> a stl:Bundle .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/packing-form/BUNDLE> <https://w3id.org/ontology-platform/steel/BundleMassBasisSchemeShape> HasValueConstraintComponent
+# EXPECT <urn:synthetic:steel:bundle/B92> <https://w3id.org/ontology-platform/steel/BundlePieceCountShape> DatatypeConstraintComponent
+<urn:synthetic:steel:bundle/B92> a stl:Bundle ; stl:bundleCutLength 12.0 ;
+    stl:bundleMassBasis <code/packing-form/BUNDLE> ; stl:bundlePieceCount "several" .
+
 # EXPECT <urn:synthetic:steel:seamlesstube/T90> <https://w3id.org/ontology-platform/steel/SeamlessTubeStockShape> QualifiedMinCountConstraintComponent
 # EXPECT <urn:synthetic:steel:seamlesstube/T90> <https://w3id.org/ontology-platform/steel/TubeDimensionValueShape> MinExclusiveConstraintComponent
 <urn:synthetic:steel:seamlesstube/T90> a stl:SeamlessTube ; stl:derivedFrom <urn:synthetic:steel:plate/P90> ;
