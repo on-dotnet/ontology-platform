@@ -8,7 +8,7 @@
 <ontology/plain/products-codes> a owl:Ontology ;
     owl:versionIRI <ontology/plain/products-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
     rdfs:label "普钢产品代码与牌号"@zh, "Commodity steel product codes and grades"@en ;
-    rdfs:comment "登记普钢订货产品族、钢筋表面、定尺捆计重方式，以及按产品标准版次区分的常用牌号。"@zh, "Registers commodity steel ordering families, bar surfaces, delivery mass bases and common grades distinguished by product standard edition."@en ;
+    rdfs:comment "登记普钢订货产品族、钢筋表面形状及按产品标准版次区分的常用牌号。"@zh, "Registers commodity steel ordering families, reinforcing bar surface patterns and common grades by product standard edition."@en ;
     dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
 
 <code/plain-product-family> a skos:ConceptScheme ;
@@ -77,25 +77,6 @@ stl:RebarSurfaceCode a rdfs:Datatype ;
     rdfs:label "带肋"@zh, "Ribbed"@en ; skos:prefLabel "带肋"@zh, "Ribbed"@en ;
     skos:definition "外周带有轧制凸肋以增强混凝土黏结的钢筋表面形状。"@zh, "A bar surface with rolled ribs for bonding to concrete."@en ;
     dcterms:source <std/gb-1499-2-2024> .
-
-<code/bundle-mass-basis> a skos:ConceptScheme ;
-    rdfs:label "交货捆计重方式"@zh, "Delivery bundle mass basis"@en ; skos:prefLabel "交货捆计重方式"@zh, "Delivery bundle mass basis"@en ;
-    skos:definition "区分普钢定尺长材整捆交接时所采用的计重依据。"@zh, "Distinguishes how the delivered mass of a fixed-length bundle is determined."@en ;
-    rdfs:comment "下沉理由：成捆普钢长材交货可在按定尺支数理计和整捆实称之间选择，需在捆号上保留依据。"@zh ;
-    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
-stl:BundleMassBasisCode a rdfs:Datatype ;
-    rdfs:label "交货捆计重方式代码"@zh, "Delivery bundle mass basis code"@en ; skos:prefLabel "交货捆计重方式代码"@zh, "Delivery bundle mass basis code"@en ;
-    skos:definition "用于标记交货捆计重方式方案内主记号的字面量类型。"@zh, "Datatype for the primary notations in the delivery bundle mass basis scheme."@en ;
-    dcterms:source <std/gb-1499-2-2024> ; rdfs:isDefinedBy <ontology/plain/products-codes> .
-
-<code/bundle-mass-basis/THEORY> a skos:Concept ; skos:inScheme <code/bundle-mass-basis> ; skos:topConceptOf <code/bundle-mass-basis> ;
-    skos:notation "THEORY"^^stl:BundleMassBasisCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
-    rdfs:label "理论计重"@zh, "Theoretical mass"@en ; skos:prefLabel "理论计重"@zh, "Theoretical mass"@en ;
-    skos:definition "按公称单位长度质量、单支定尺及实交支数计算整捆交货重量。"@zh, "Determines delivered mass from nominal mass per unit length, cut length and piece count."@en .
-<code/bundle-mass-basis/ACTUAL> a skos:Concept ; skos:inScheme <code/bundle-mass-basis> ; skos:topConceptOf <code/bundle-mass-basis> ;
-    skos:notation "ACTUAL"^^stl:BundleMassBasisCode ; rdfs:isDefinedBy <ontology/plain/products-codes> ;
-    rdfs:label "实际计重"@zh, "Actual mass"@en ; skos:prefLabel "实际计重"@zh, "Actual mass"@en ;
-    skos:definition "按称量取得的整捆质量扣除包装皮重后结算。"@zh, "Settles on the weighed mass of the bundle after deducting packaging tare."@en .
 
 # Grade IRIs include the defining edition. Ordering families record applicable product lines.
 # Quality class under GB/T 13304.2 is not asserted here: the per-grade grouping could not be checked against the standard text.

@@ -85,8 +85,9 @@ bar:B73 a stl:Bar ; dcterms:identifier "B73" ; stl:steelGrade grade:G73 ;
     stl:derivedFrom <urn:synthetic:steel:continuouslycastpiece/C73> ; stl:meltingRoute <code/melting-route/EAFLFVD> .
 bar:B74 a stl:Bar ; dcterms:identifier "B74" ; stl:steelGrade grade:G73 ;
     stl:derivedFrom <urn:synthetic:steel:continuouslycastpiece/C73> ; stl:meltingRoute <code/melting-route/EAFLFVD> .
-<urn:synthetic:steel:package/P73> a stl:Package ; dcterms:identifier "P73" ;
-    dcterms:type <code/packing-form/BUNDLE> ; stl:hasPart bar:B73, bar:B74 .
+<urn:synthetic:steel:bundle/P73> a stl:Bundle ; dcterms:identifier "P73" ; stl:hasPart bar:B73, bar:B74 ;
+    stl:bundleCutLength 6.0 ; stl:bundlePieceCount "2"^^xsd:nonNegativeInteger ;
+    stl:bundleMassBasis <code/bundle-mass-basis/ACTUAL> .
 
 # Each decision cites the tested piece, specification and individual evidence.
 spec:S71 a stl:MaterialSpecification ; dcterms:identifier "S71" ; stl:requiresGrade <std/gbt-18254-2016/grade/GCr15> .
