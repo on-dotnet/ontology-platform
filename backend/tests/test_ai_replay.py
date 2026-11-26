@@ -1,5 +1,6 @@
 """Recording and replay of model calls: same input, no second call; a miss names its place."""
 
+import asyncio
 import json
 from collections.abc import Sequence
 from types import SimpleNamespace
@@ -232,3 +233,30 @@ async def test_the_effort_reaches_the_model_and_keys_the_recording() -> None:
     await gateway.structured(**ask(), effort="low")
     await gateway.structured(**ask())
     assert seen == ["low", None]
+
+
+async def test_concurrent_calls_each_count_their_own_attempts_and_tokens() -> None:
+    class Interleaved(MeteredGateway):
+        """Call "tN" makes N attempts of 10*N input and N output tokens, interleaved."""
+
+        async def structured[T: BaseModel](self, **call: Any) -> T:
+            n = int(call["text"][-1])
+            record = SimpleNamespace(purpose=call["purpose"], model="m", document_id=None)
+            for _ in range(n):
+                await asyncio.sleep(0.01)
+                usage = SimpleNamespace(input_tokens=10 * n, output_tokens=n)
+                await self._record(record, 0.0, usage, None)  # type: ignore[arg-type]
+            answer: T = call["schema"].model_validate({"items": [call["text"]]})
+            return answer
+
+    gateway = ReplayGateway({}, Interleaved(Settings(openai_api_key=None)))
+    await asyncio.gather(*(gateway.structured(**ask(text=f"t{n}")) for n in (3, 1, 2)))
+
+    records = {r["output"]["items"][0]: r for r in gateway.new_recordings.values()}
+    for n in (1, 2, 3):
+        record = records[f"t{n}"]
+        assert (record["attempts"], record["inputTokens"], record["outputTokens"]) == (
+            n,
+            10 * n * n,
+            n * n,
+        )

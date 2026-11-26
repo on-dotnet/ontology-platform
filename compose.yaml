@@ -26,6 +26,10 @@ x-api-env: &api-env
   # "default" sends none (for compatible services without the parameter).
   OP_AI_EFFORT: ${OP_AI_EFFORT:-}
   OP_AI_REASONING_EFFORT: ${OP_AI_REASONING_EFFORT:-}
+  # Concurrency: jobs a worker runs at once (default 3, 1-8) and model calls a process makes at
+  # once (default 4), the batches of one document and different documents together.
+  OP_WORKER_CONCURRENCY: ${OP_WORKER_CONCURRENCY:-}
+  OP_AI_MAX_CONCURRENT_CALLS: ${OP_AI_MAX_CONCURRENT_CALLS:-}
   OP_DOCUMENTS_DIR: /data/documents
   # single (default): reviewers merge their own changes; separate: another reviewer decides.
   OP_REVIEW_MODE: ${OP_REVIEW_MODE:-}

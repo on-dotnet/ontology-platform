@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
@@ -202,3 +203,175 @@ async def test_claim_order_and_delayed_jobs(db: AsyncSession) -> None:
         assert claimed.id == expected
         await service.succeed(db, claimed.id)
     assert await service.claim(db, "a") is None
+
+
+async def _statuses(db: AsyncSession, ids: list[UUID]) -> list[tuple[str, str | None]]:
+    out: list[tuple[str, str | None]] = []
+    for job_id in ids:
+        job = await db.get(Job, job_id, populate_existing=True)
+        assert job is not None
+        out.append((job.status, job.error_code))
+    return out
+
+
+async def test_a_worker_runs_up_to_its_concurrency_at_once(app: FastAPI, db: AsyncSession) -> None:
+    stop = asyncio.Event()
+    ids = [await service.enqueue(db, "test.parallel", {"n": n}) for n in range(3)]
+    await db.commit()
+    running, peak, done = 0, 0, 0
+    two = asyncio.Event()
+
+    async def handle(context: JobContext) -> None:
+        nonlocal running, peak, done
+        running += 1
+        peak = max(peak, running)
+        if running == 2:
+            two.set()
+        await two.wait()  # one job at a time would never get past this
+        await asyncio.sleep(0.02)
+        running -= 1
+        done += 1
+        if done == 3:
+            stop.set()
+
+    register("test.parallel", handle)
+    async with asyncio.timeout(5):
+        await run_worker(
+            app.state.session_factory, "a", stop_event=stop, poll_interval=0.01, concurrency=2
+        )
+    assert peak == 2
+    assert await _statuses(db, ids) == [("succeeded", None)] * 3
+
+
+async def test_jobs_at_the_same_time_succeed_retry_and_fail_as_alone(
+    app: FastAPI, db: AsyncSession
+) -> None:
+    stop = asyncio.Event()
+    outcomes = ("success", "retry", "bug")
+    ids = [await service.enqueue(db, f"test.together.{o}", {}) for o in outcomes]
+    await db.commit()
+    started = 0
+    everyone = asyncio.Event()
+
+    def handler(outcome: str) -> Callable[[JobContext], Awaitable[None]]:
+        async def handle(context: JobContext) -> None:
+            nonlocal started
+            started += 1
+            if started == len(outcomes):
+                everyone.set()
+                stop.set()
+            await everyone.wait()
+            if outcome == "retry":
+                raise RetryableJobError("ai.offline")
+            if outcome == "bug":
+                raise RuntimeError("unexpected detail")
+
+        return handle
+
+    for outcome in outcomes:
+        register(f"test.together.{outcome}", handler(outcome))
+    async with asyncio.timeout(5):
+        await run_worker(
+            app.state.session_factory, "a", stop_event=stop, poll_interval=0.01, concurrency=3
+        )
+    assert await _statuses(db, ids) == [
+        ("succeeded", None),
+        ("queued", "ai.offline"),
+        ("failed", "internal.error"),
+    ]
+
+
+async def test_stopping_lets_the_jobs_in_progress_finish(app: FastAPI, db: AsyncSession) -> None:
+    stop = asyncio.Event()
+    ids = [await service.enqueue(db, "test.finish", {}) for _ in range(2)]
+    await db.commit()
+    finished: list[UUID] = []
+    started = 0
+
+    async def handle(context: JobContext) -> None:
+        nonlocal started
+        started += 1
+        if started == 2:
+            stop.set()
+        await asyncio.sleep(0.05)
+        finished.append(context.id)
+
+    register("test.finish", handle)
+    async with asyncio.timeout(5):
+        await run_worker(
+            app.state.session_factory, "a", stop_event=stop, poll_interval=0.01, concurrency=2
+        )
+    assert sorted(finished) == sorted(ids)
+    assert await _statuses(db, ids) == [("succeeded", None)] * 2
+
+
+async def test_each_job_at_the_same_time_keeps_its_own_heartbeat_and_lease(
+    app: FastAPI, db: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    stop = asyncio.Event()
+    lost = await service.enqueue(db, "test.lease.lost", {})
+    kept = await service.enqueue(db, "test.lease.kept", {})
+    await db.commit()
+    monkeypatch.setattr(runner, "HEARTBEAT_INTERVAL", 0.01)
+    heartbeat = service.heartbeat
+    renewed: set[UUID] = set()
+    both = asyncio.Event()
+
+    async def observe(session: AsyncSession, claimed_id: UUID, owner: str) -> bool:
+        updated = await heartbeat(session, claimed_id, owner)
+        if updated:
+            renewed.add(claimed_id)
+            if renewed == {lost, kept}:
+                both.set()
+        return updated
+
+    async def lose(context: JobContext) -> None:
+        await both.wait()
+        raise JobLeaseLostError
+
+    async def keep(context: JobContext) -> None:
+        await both.wait()
+        await asyncio.sleep(0.05)  # after the other job lost its lease
+        stop.set()
+
+    monkeypatch.setattr(service, "heartbeat", observe)
+    register("test.lease.lost", lose)
+    register("test.lease.kept", keep)
+    async with asyncio.timeout(5):
+        await run_worker(
+            app.state.session_factory, "a", stop_event=stop, poll_interval=0.01, concurrency=2
+        )
+    # The lost job is left to the execution that owns it now; the other one finished normally.
+    assert await _statuses(db, [lost, kept]) == [("running", None), ("succeeded", None)]
+
+
+async def test_an_error_recording_an_outcome_stops_the_worker_after_the_others(
+    app: FastAPI, db: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    broken = await service.enqueue(db, "test.broken", {})
+    other = await service.enqueue(db, "test.other", {})
+    await db.commit()
+    succeed = service.succeed
+
+    async def fail_for_one(session: AsyncSession, job_id: UUID) -> None:
+        if job_id == broken:
+            raise RuntimeError("database gone")
+        await succeed(session, job_id)
+
+    started = asyncio.Event()
+
+    async def quick(context: JobContext) -> None:
+        await started.wait()
+
+    async def slow(context: JobContext) -> None:
+        started.set()
+        await asyncio.sleep(0.1)
+
+    monkeypatch.setattr(service, "succeed", fail_for_one)
+    register("test.broken", quick)
+    register("test.other", slow)
+    # No stop: as with one job at a time, the error ends the worker, once the other job is done.
+    with pytest.raises(RuntimeError, match="database gone"):
+        async with asyncio.timeout(5):
+            await run_worker(app.state.session_factory, "a", poll_interval=0.01, concurrency=2)
+    assert await _statuses(db, [broken, other]) == [("running", None), ("succeeded", None)]
