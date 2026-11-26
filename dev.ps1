@@ -41,6 +41,8 @@
   images            列出本项目的镜像（ontology/*）及其所属工作区
   clean-images      删除已不存在的工作区留下的 ontology/* 镜像标签（只删本项目的，不 prune）
   psql              打开开发库的 psql
+  seed-steel        装载冶金样例库：在开发用 postgres 里建库 steel_mes 与只读账号 steel_reader，
+                    执行 samples/steel/relational 的两个 SQL 文件（每次重建 mes 模式，不碰平台的库）
   init-env          由 .env.example 生成本机私有配置 .env.local（已存在则不动；由用户本人运行）
   reset             删除开发栈及其数据卷（只能由用户本人运行，会二次确认）
 
@@ -692,6 +694,67 @@ function Invoke-Images([switch]$Clean) {
     }
 }
 
+# 冶金样例库（规格 003 第 11 节）：在开发用 postgres 里建库 steel_mes 和只读账号 steel_reader。
+# 只动这个库和这个账号，不碰平台自己的库；每次重建 mes 模式，可以重复运行。
+$SteelReaderPassword = 'steel-reader-dev-only'
+function Invoke-SeedSteel {
+    if ((Get-Setting 'OP_ENV' 'development') -eq 'production') { Stop-Dev 'OP_ENV=production 时不装载样例库' }
+    $files = @('01-schema.sql', '02-data.sql')
+    $sources = @()
+    foreach ($name in $files) {
+        $sample = Join-Path $Root "samples/steel/relational/$name"
+        $copy = Join-Path $Root "backend/tests/fixtures/connectors/steel/$name"
+        if (-not (Test-Path -LiteralPath $sample) -or -not (Test-Path -LiteralPath $copy)) { Stop-Dev "缺少 $name" }
+        if ((Get-FileHash -LiteralPath $sample).Hash -ne (Get-FileHash -LiteralPath $copy).Hash) {
+            Stop-Dev "samples/steel/relational/$name 与测试副本 backend/tests/fixtures/connectors/steel/$name 不一致"
+        }
+        $sources += [IO.File]::ReadAllText($sample, [Text.UTF8Encoding]::new($false))
+    }
+    if (-not (Wait-Healthy @('postgres') 15)) { Stop-Dev 'postgres 没有运行，请先运行 ./dev.ps1 up' }
+
+    # CREATE DATABASE cannot run inside a transaction, so the account and the database come first.
+    $setup = @"
+SELECT 'CREATE ROLE steel_reader' WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'steel_reader') \gexec
+ALTER ROLE steel_reader LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD '$SteelReaderPassword';
+ALTER ROLE steel_reader SET default_transaction_read_only = on;
+SELECT 'CREATE DATABASE steel_mes' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'steel_mes') \gexec
+"@
+    # One transaction: a failure leaves the previous mes schema as it was.
+    $load = @(
+        'DROP SCHEMA IF EXISTS mes CASCADE;'
+        $sources
+        @'
+REVOKE ALL ON DATABASE steel_mes FROM PUBLIC;
+GRANT CONNECT ON DATABASE steel_mes TO steel_reader;
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA mes FROM PUBLIC;
+GRANT USAGE ON SCHEMA mes TO steel_reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA mes TO steel_reader;
+SELECT c.relname AS "表", c.relkind AS "种类",
+       CASE WHEN c.relkind = 'r' THEN (xpath('/row/n/text()', query_to_xml(
+           format('SELECT count(*) AS n FROM mes.%I', c.relname), false, true, '')))[1]::text END AS "行数"
+FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = 'mes' AND c.relkind IN ('r', 'v') ORDER BY 1;
+'@
+    ) -join "`n"
+
+    $composeArgs = Get-ComposeArgs
+    $previousConsole = [Console]::OutputEncoding
+    $OutputEncoding = [Text.UTF8Encoding]::new($false)
+    try {
+        [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+        Write-Step '建立只读账号 steel_reader 与库 steel_mes'
+        $setup | docker compose @composeArgs exec -T postgres psql -U ontology -d postgres -v ON_ERROR_STOP=1 -q | Out-Host
+        if ($LASTEXITCODE -ne 0) { Stop-Dev "建立账号与库失败，退出码 $LASTEXITCODE" }
+        Write-Step '重建 mes 模式并装入样例数据'
+        $load | docker compose @composeArgs exec -T postgres psql -U ontology -d steel_mes -v ON_ERROR_STOP=1 --single-transaction -q | Out-Host
+        if ($LASTEXITCODE -ne 0) { Stop-Dev "装载样例数据失败，退出码 $LASTEXITCODE" }
+    } finally {
+        [Console]::OutputEncoding = $previousConsole
+    }
+    Write-Ok '样例库已就绪。在界面上新建数据源：主机 postgres，端口 5432，库 steel_mes，用户 steel_reader，口令见 docs/development.md'
+}
+
 function Invoke-Reset {
     Write-Note '将删除开发栈的全部容器和数据卷（数据库内容会丢失）。'
     $answer = Read-Host '确认删除请输入 RESET'
@@ -722,6 +785,7 @@ try {
         'schema-check' { exit (Invoke-SchemaCheck) }
         'ci' { Invoke-Ci }
         'psql' { Invoke-Compose exec postgres psql -U ontology -d ontology }
+        'seed-steel' { Invoke-SeedSteel }
         'fmt' { Invoke-Fmt $Rest }
         'eval' { Invoke-Eval ($Rest | Select-Object -First 1) $Replay.IsPresent $Recordings $Sequential.IsPresent }
         'owl-check' { Invoke-OwlCheck }
