@@ -1,0 +1,21 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/plain/quality-shapes> a owl:Ontology ;
+    owl:versionIRI <ontology/plain/quality-shapes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "普钢按批判定约束"@zh, "Commodity steel lot assessment constraints"@en ;
+    rdfs:comment "校验钢筋按批判定所指的检验批及判定基准代码归属。"@zh, "Checks the inspection lot and code scheme used in a reinforcing bar lot decision."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:RebarLotDecisionTargetShape a sh:PropertyShape ; sh:targetSubjectsOf stl:rebarLotAssessmentBasis ;
+    sh:path stl:assessedObject ; sh:minCount 1 ; sh:class stl:InspectionLot ;
+    sh:severity sh:Violation ; rdfs:comment "采用钢筋按批判定基准时，每个被判定对象都须是检验批。"@zh .
+
+stl:RebarLotBasisSchemeShape a sh:PropertyShape ; sh:targetObjectsOf stl:rebarLotAssessmentBasis ;
+    sh:path skos:inScheme ; sh:hasValue <code/rebar-lot-basis> ;
+    sh:severity sh:Violation ; rdfs:comment "钢筋交验批判定引用的基准须属于钢筋交验批判定基准方案。"@zh .

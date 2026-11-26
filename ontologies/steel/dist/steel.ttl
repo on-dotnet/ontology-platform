@@ -66,17 +66,6 @@ stl:Area a owl:Class ;
     skos:prefLabel "Area"@en,
         "生产区域"@zh .
 
-stl:Bar a owl:Class ;
-    rdfs:label "Steel bar"@en,
-        "棒材"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
-    rdfs:subClassOf stl:MaterialPiece ;
-    skos:definition "An individually tracked solid long product with a round, square, flat or other bar section."@en,
-        "具有圆形、方形、扁形或其他棒材断面、可按件交接的实心长条钢材。"@zh ;
-    skos:prefLabel "Steel bar"@en,
-        "棒材"@zh .
-
 stl:BarPeeling a owl:Class ;
     rdfs:label "Bar peeling"@en,
         "棒材扒皮"@zh ;
@@ -146,6 +135,49 @@ stl:BreakdownRolling a owl:Class ;
         "把热钢锭或大断面坯初轧成供后续成形使用的较小断面坯料的作业。"@zh ;
     skos:prefLabel "Breakdown rolling"@en,
         "初轧开坯"@zh .
+
+stl:BundleLengthShape a sh:PropertyShape ;
+    rdfs:comment "定尺交货捆须标明一个正的单支定尺长度，以米计。"@zh ;
+    sh:datatype xsd:decimal ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:minExclusive 0.0 ;
+    sh:path stl:bundleCutLength ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Bundle .
+
+stl:BundleMassBasisCode a rdfs:Datatype ;
+    rdfs:label "Delivery bundle mass basis code"@en,
+        "交货捆计重方式代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Datatype for the primary notations in the delivery bundle mass basis scheme."@en,
+        "用于标记交货捆计重方式方案内主记号的字面量类型。"@zh ;
+    skos:prefLabel "Delivery bundle mass basis code"@en,
+        "交货捆计重方式代码"@zh .
+
+stl:BundleMassBasisSchemeShape a sh:PropertyShape ;
+    rdfs:comment "捆的计重依据须取自交货捆计重方式方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:bundleMassBasis .
+
+stl:BundleMassBasisShape a sh:PropertyShape ;
+    rdfs:comment "定尺交货捆须明确一个整捆结算所用的计重方式。"@zh ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path stl:bundleMassBasis ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Bundle .
+
+stl:BundlePieceCountShape a sh:PropertyShape ;
+    rdfs:comment "交货捆的实交支数按整支清点，填写时须为非负整数。"@zh ;
+    sh:datatype xsd:nonNegativeInteger ;
+    sh:maxCount 1 ;
+    sh:path stl:bundlePieceCount ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Bundle .
 
 stl:CastHeatPositionShape a sh:PropertyShape ;
     rdfs:comment "已记入浇次的炉次应给出一个正整数炉序。"@zh ;
@@ -1354,6 +1386,32 @@ stl:PigIron a owl:Class ;
     skos:prefLabel "Solid pig iron lot"@en,
         "固态生铁批"@zh .
 
+stl:PlainGradeEditionShape a sh:PropertyShape ;
+    rdfs:comment "归入普钢产品族的牌号须关联一个确定的产品标准版次，以区分跨版次的同名牌号。"@zh ;
+    sh:class stl:StandardEdition ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path stl:definedIn ;
+    sh:severity sh:Violation ;
+    sh:targetSubjectsOf stl:plainProductFamily .
+
+stl:PlainProductFamilyCode a rdfs:Datatype ;
+    rdfs:label "Commodity steel product family code"@en,
+        "普钢产品族代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Datatype for the primary notations in the commodity steel product family scheme."@en,
+        "用于标记普钢产品族方案内主记号的字面量类型。"@zh ;
+    skos:prefLabel "Commodity steel product family code"@en,
+        "普钢产品族代码"@zh .
+
+stl:PlainProductFamilySchemeShape a sh:PropertyShape ;
+    rdfs:comment "牌号引用的订货产品族须属于普钢产品族方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/plain-product-family> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:plainProductFamily .
+
 stl:Plate a owl:Class ;
     rdfs:label "Steel plate"@en,
         "中厚钢板"@zh ;
@@ -1445,6 +1503,66 @@ stl:RatingComparisonCode a rdfs:Datatype ;
         "标识“评级比较关系”方案中主记号的字面量类型。"@zh ;
     skos:prefLabel "Rating comparison operator code"@en,
         "评级比较关系代码"@zh .
+
+stl:RebarDiameterShape a sh:PropertyShape ;
+    rdfs:comment "钢筋公称直径一经给出，应是一个大于零的十进制毫米数。"@zh ;
+    sh:datatype xsd:decimal ;
+    sh:maxCount 1 ;
+    sh:minExclusive 0.0 ;
+    sh:path stl:rebarNominalDiameter ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Rebar .
+
+stl:RebarLotBasisCode a rdfs:Datatype ;
+    rdfs:label "Rebar lot assessment basis code"@en,
+        "钢筋交验批判定基准代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/quality-codes> ;
+    skos:definition "Datatype for the primary notations in the rebar lot assessment basis scheme."@en,
+        "用于标记钢筋交验批判定基准方案内主记号的字面量类型。"@zh ;
+    skos:prefLabel "Rebar lot assessment basis code"@en,
+        "钢筋交验批判定基准代码"@zh .
+
+stl:RebarLotBasisSchemeShape a sh:PropertyShape ;
+    rdfs:comment "钢筋交验批判定引用的基准须属于钢筋交验批判定基准方案。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/rebar-lot-basis> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:rebarLotAssessmentBasis .
+
+stl:RebarLotDecisionTargetShape a sh:PropertyShape ;
+    rdfs:comment "采用钢筋按批判定基准时，每个被判定对象都须是检验批。"@zh ;
+    sh:class stl:InspectionLot ;
+    sh:minCount 1 ;
+    sh:path stl:assessedObject ;
+    sh:severity sh:Violation ;
+    sh:targetSubjectsOf stl:rebarLotAssessmentBasis .
+
+stl:RebarSurfaceCode a rdfs:Datatype ;
+    rdfs:label "Rebar surface pattern code"@en,
+        "钢筋表面形状代码"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024>,
+        <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Datatype for the primary notations in the rebar surface pattern scheme."@en,
+        "用于标记钢筋表面形状方案内主记号的字面量类型。"@zh ;
+    skos:prefLabel "Rebar surface pattern code"@en,
+        "钢筋表面形状代码"@zh .
+
+stl:RebarSurfaceSchemeShape a sh:PropertyShape ;
+    rdfs:comment "钢筋表面形状须引用钢筋表面形状方案中的代码。"@zh ;
+    sh:hasValue <https://w3id.org/ontology-platform/steel/code/rebar-surface> ;
+    sh:path skos:inScheme ;
+    sh:severity sh:Violation ;
+    sh:targetObjectsOf stl:rebarSurface .
+
+stl:RebarSurfaceShape a sh:PropertyShape ;
+    rdfs:comment "每支钢筋须有一个表面形状代码，以便区分光圆和带肋产品。"@zh ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path stl:rebarSurface ;
+    sh:severity sh:Violation ;
+    sh:targetClass stl:Rebar .
 
 stl:RecoiledCoil a owl:Class ;
     rdfs:label "Recoiled coil"@en,
@@ -2298,6 +2416,30 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "product analysis"@en,
         "成品分析"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/analysis-type> .
+
+<https://w3id.org/ontology-platform/steel/code/bundle-mass-basis/ACTUAL> a skos:Concept ;
+    rdfs:label "Actual mass"@en,
+        "实际计重"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Settles on the weighed mass of the bundle after deducting packaging tare."@en,
+        "按称量取得的整捆质量扣除包装皮重后结算。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> ;
+    skos:notation "ACTUAL"^^stl:BundleMassBasisCode ;
+    skos:prefLabel "Actual mass"@en,
+        "实际计重"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> .
+
+<https://w3id.org/ontology-platform/steel/code/bundle-mass-basis/THEORY> a skos:Concept ;
+    rdfs:label "Theoretical mass"@en,
+        "理论计重"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Determines delivered mass from nominal mass per unit length, cut length and piece count."@en,
+        "按公称单位长度质量、单支定尺及实交支数计算整捆交货重量。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> ;
+    skos:notation "THEORY"^^stl:BundleMassBasisCode ;
+    skos:prefLabel "Theoretical mass"@en,
+        "理论计重"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> .
 
 <https://w3id.org/ontology-platform/steel/code/chemical-element/AL> a skos:Concept ;
     rdfs:label "Total aluminium"@en,
@@ -3887,6 +4029,32 @@ stl:coatingMass a owl:DatatypeProperty ;
         "炉次"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/lot-formation-dimension> .
 
+<https://w3id.org/ontology-platform/steel/code/lot-formation-dimension/REBARGRADE> a skos:Concept ;
+    rdfs:label "Same reinforcing bar grade"@en,
+        "同一钢筋牌号"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/quality-codes> ;
+    skos:definition "Members must share the same reinforcing grade in the same edition, including any seismic suffix."@en,
+        "各成员须属同一产品标准版次下的同一钢筋牌号，牌号有抗震后缀时一并核对。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/lot-formation-dimension> ;
+    skos:notation "REBARGRADE"^^stl:LotFormationDimensionCode ;
+    skos:prefLabel "Same reinforcing bar grade"@en,
+        "同一钢筋牌号"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/lot-formation-dimension> .
+
+<https://w3id.org/ontology-platform/steel/code/lot-formation-dimension/REBARMASS> a skos:Concept ;
+    rdfs:label "Mass-limited rebar lot"@en,
+        "按钢筋批重上限组批"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/quality-codes> ;
+    skos:definition "Members share one lot allocation bounded by mass. The cumulative mass is checked as bundles are added."@en,
+        "成员归属同一限重分批单元，追加交验捆时按适用规则核对累计重量。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/lot-formation-dimension> ;
+    skos:notation "REBARMASS"^^stl:LotFormationDimensionCode ;
+    skos:prefLabel "Mass-limited rebar lot"@en,
+        "按钢筋批重上限组批"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/lot-formation-dimension> .
+
 <https://w3id.org/ontology-platform/steel/code/lot-formation-dimension/SPEC> a skos:Concept ;
     rdfs:label "Material specification"@en,
         "规格"@zh ;
@@ -4279,18 +4447,6 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Visual testing"@en,
         "目视检测"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/ndt-method> .
-
-<https://w3id.org/ontology-platform/steel/code/packing-form/BUNDLE> a skos:Concept ;
-    rdfs:label "Bundle"@en,
-        "捆"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Several lengths secured together by strapping form one counted handling unit."@en,
-        "若干条、根或支用带材捆扎成一个可计件的搬运单元。"@zh ;
-    skos:inScheme <https://w3id.org/ontology-platform/steel/code/packing-form> ;
-    skos:notation "BUNDLE"^^stl:PackingFormCode ;
-    skos:prefLabel "Bundle"@en,
-        "捆"@zh ;
-    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/packing-form> .
 
 <https://w3id.org/ontology-platform/steel/code/packing-form/COILUNIT> a skos:Concept ;
     rdfs:label "Single-coil package"@en,
@@ -5154,6 +5310,56 @@ stl:coatingMass a owl:DatatypeProperty ;
     skos:prefLabel "Less than"@en,
         "小于"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/rating-comparison> .
+
+<https://w3id.org/ontology-platform/steel/code/rebar-lot-basis/MASSDEV> a skos:Concept ;
+    rdfs:label "Rebar mass deviation"@en,
+        "钢筋重量偏差"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/quality-codes> ;
+    skos:definition "Uses the difference between measured sample mass and the nominal mass for the sampled length as a basis for assessing the lot."@en,
+        "以本批钢筋试样的实测质量相对其公称长度计重值的偏差作为判定依据。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/rebar-lot-basis> ;
+    skos:notation "MASSDEV"^^stl:RebarLotBasisCode ;
+    skos:prefLabel "Rebar mass deviation"@en,
+        "钢筋重量偏差"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/rebar-lot-basis> .
+
+<https://w3id.org/ontology-platform/steel/code/rebar-lot-basis/SEISMIC> a skos:Concept ;
+    rdfs:label "Seismic performance of reinforcing bars"@en,
+        "钢筋抗震性能"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/quality-codes> ;
+    skos:definition "Uses strength relationship and ductility results from seismic reinforcing bar samples to assess their lot."@en,
+        "以该批抗震钢筋试样的强度关系和延性检验结果作为批判定依据。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/rebar-lot-basis> ;
+    skos:notation "SEISMIC"^^stl:RebarLotBasisCode ;
+    skos:prefLabel "Seismic performance of reinforcing bars"@en,
+        "钢筋抗震性能"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/rebar-lot-basis> .
+
+<https://w3id.org/ontology-platform/steel/code/rebar-surface/PLAIN> a skos:Concept ;
+    rdfs:label "Plain round"@en,
+        "光圆"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "A smooth round bar surface in contact with concrete."@en,
+        "以光滑圆周表面与混凝土接触的钢筋表面形状。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/rebar-surface> ;
+    skos:notation "PLAIN"^^stl:RebarSurfaceCode ;
+    skos:prefLabel "Plain round"@en,
+        "光圆"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/rebar-surface> .
+
+<https://w3id.org/ontology-platform/steel/code/rebar-surface/RIBBED> a skos:Concept ;
+    rdfs:label "Ribbed"@en,
+        "带肋"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "A bar surface with rolled ribs for bonding to concrete."@en,
+        "外周带有轧制凸肋以增强混凝土黏结的钢筋表面形状。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/rebar-surface> ;
+    skos:notation "RIBBED"^^stl:RebarSurfaceCode ;
+    skos:prefLabel "Ribbed"@en,
+        "带肋"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/rebar-surface> .
 
 <https://w3id.org/ontology-platform/steel/code/refining-method/AOD> a skos:Concept ;
     rdfs:label "Argon oxygen decarburization"@en,
@@ -6030,18 +6236,6 @@ stl:defect a owl:ObjectProperty ;
         "把一项处置与有实物证据的具体缺陷关联。"@zh ;
     skos:prefLabel "Referenced defect"@en,
         "涉及缺陷"@zh .
-
-stl:definedIn a owl:ObjectProperty ;
-    rdfs:label "Defined in"@en,
-        "定义版次"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-221-2008> ;
-    rdfs:domain stl:StandardGrade ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/specification> ;
-    rdfs:range stl:StandardEdition ;
-    skos:definition "Identifies the edition within which the grade designation is defined."@en,
-        "指出使该标准牌号名称及其解释有据可查的标准版次。"@zh ;
-    skos:prefLabel "Defined in"@en,
-        "定义版次"@zh .
 
 stl:definedMaterial a owl:ObjectProperty ;
     rdfs:label "Governing material specification"@en,
@@ -6935,6 +7129,19 @@ stl:reason a owl:DatatypeProperty ;
     skos:prefLabel "Disposition reason"@en,
         "处置原因"@zh .
 
+stl:rebarGradeSuffix a owl:DatatypeProperty ;
+    rdfs:label "Rebar grade suffix"@en,
+        "钢筋牌号后缀"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:comment "下沉理由：带肋钢筋交验时需识别牌号中的抗震标识，其含义由钢筋产品标准约定。"@zh ;
+    rdfs:domain stl:Rebar ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:range xsd:string ;
+    skos:definition "Records the suffix of the grade used for this bar, such as E for seismic performance in HRB400E."@en,
+        "记录该支钢筋所用牌号的附加字母，例如 HRB400E 的 E 表示有抗震性能要求。"@zh ;
+    skos:prefLabel "Rebar grade suffix"@en,
+        "钢筋牌号后缀"@zh .
+
 stl:receivedOn a owl:DatatypeProperty ;
     rdfs:label "Receipt date"@en,
         "签收日期"@zh ;
@@ -7434,25 +7641,40 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://www.boutique.afnor.org/en-gb/standard/nf-en-10346/continuously-hotdip-coated-steel-flat-products-for-cold-forming-technical-d/fa202499/607164> .
 
-<https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB 1499.1-2024" ;
-    dcterms:issued "2024"^^xsd:gYear ;
-    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-1499-1-2017> ;
-    dcterms:title "Steel for the reinforcement of concrete—Part 1:Hot rolled plain bars"@en,
-        "钢筋混凝土用钢 第1部分：热轧光圆钢筋"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=GJ733S1WRs0%3D&mode=p> .
+<https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024/grade/HPB300> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "HPB300" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/REBAR> .
 
-<https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB 1499.2-2024" ;
-    dcterms:issued "2024"^^xsd:gYear ;
-    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-1499-2-2018> ;
-    dcterms:title "Steel for the reinforcement of concrete—Part 2:Hot rolled ribbed bars"@en,
-        "钢筋混凝土用钢 第2部分：热轧带肋钢筋"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=1BD5B9878E5A2FCEE06397BE0A0A10CC> .
+<https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024/grade/HRB400> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "HRB400" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/REBAR> .
+
+<https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024/grade/HRB400E> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "HRB400E" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/REBAR> .
+
+<https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024/grade/HRB500> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "HRB500" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/REBAR> .
+
+<https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024/grade/HRB500E> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "HRB500E" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/REBAR> .
 
 <https://w3id.org/ontology-platform/steel/std/gb-3100-1993> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -7480,15 +7702,6 @@ stl:specimenOrientation a owl:DatatypeProperty ;
         "电热装置基本技术条件 第8部分：电渣重熔炉"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81301D3A7E05397BE0A0AB82A> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-11263-2024> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 11263-2024" ;
-    dcterms:issued "2024"^^xsd:gYear ;
-    dcterms:title "Hot rolled H and cut T section steel"@en,
-        "热轧H型钢和剖分T型钢"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=25940C3CEEF98A9AE06397BE0A0A525A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-1220-2007> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -7553,6 +7766,13 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=71691F8D50759C4335EDC75BBC0347EB> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-1499-2-2018/grade/HRB400E> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1499-2-2018> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "HRB400E" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1499-2-2018> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/REBAR> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-14992-2025> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 14992-2025" ;
@@ -7571,6 +7791,30 @@ stl:specimenOrientation a owl:DatatypeProperty ;
         "钢中非金属夹杂物的检验 塔形发纹酸浸法"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D82AECD3A7E05397BE0A0AB82A> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-1591-2018/grade/Q355B> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1591-2018> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "Q355B" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1591-2018> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/HSLA>,
+        <https://w3id.org/ontology-platform/steel/code/plain-product-family/SECTION> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-1591-2018/grade/Q355C> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1591-2018> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "Q355C" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1591-2018> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/HSLA>,
+        <https://w3id.org/ontology-platform/steel/code/plain-product-family/SECTION> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-1591-2018/grade/Q355D> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1591-2018> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "Q355D" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-1591-2018> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/HSLA>,
+        <https://w3id.org/ontology-platform/steel/code/plain-product-family/SECTION> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-18253-2018> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -7644,15 +7888,6 @@ stl:specimenOrientation a owl:DatatypeProperty ;
         "企业控制系统集成 第4部分：制造运行管理集成的对象模型属性"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=C3386C490CC38B79E05397BE0A0AC288> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-2101-2017> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 2101-2017" ;
-    dcterms:issued "2017"^^xsd:gYear ;
-    dcterms:title "General requirment of acceptance, packaging, marking and certification for section steel"@en,
-        "型钢验收、包装、标志及质量证明书的一般规定"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D8141DD3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-2102-2022> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -7753,6 +7988,27 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=208E903AB62179F3E06397BE0A0AB2B9> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-2518-2019/grade/DX51D-Z> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "DX51D+Z" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/HOTDIP> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-2518-2019/grade/DX52D-Z> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "DX52D+Z" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/HOTDIP> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-2518-2019/grade/DX53D-Z> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "DX53D+Z" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/HOTDIP> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-26639-2011> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 26639-2011" ;
@@ -7780,15 +8036,6 @@ stl:specimenOrientation a owl:DatatypeProperty ;
         "合金结构钢"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=LWoKmnMVfLA%3D&mode=p> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-3091-2025> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 3091-2025" ;
-    dcterms:issued "2025"^^xsd:gYear ;
-    dcterms:title "Welded steel pipes for low pressure fluid delivery"@en,
-        "低压流体输送用焊接钢管"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=31DA5F377C658F08E06397BE0A0A4CFB> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-3101-1993> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -7957,14 +8204,26 @@ stl:specimenOrientation a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=49FD1852CB35C31FE06397BE0A0A1304> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-5213-2019> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 5213-2019" ;
-    dcterms:issued "2019"^^xsd:gYear ;
-    dcterms:title "Cold rolled low carbon steel sheet and strip"@en,
-        "冷轧低碳钢板及钢带"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=Lb63thr9SCE%3D&mode=p> .
+<https://w3id.org/ontology-platform/steel/std/gbt-5213-2019/grade/DC01> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-5213-2019> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "DC01" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-5213-2019> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/COLDLC> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-5213-2019/grade/DC03> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-5213-2019> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "DC03" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-5213-2019> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/COLDLC> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-5213-2019/grade/DC04> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-5213-2019> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "DC04" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-5213-2019> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/COLDLC> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-5216-2014> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -8039,6 +8298,40 @@ stl:specimenOrientation a owl:DatatypeProperty ;
         "优质碳素结构钢"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=l39338zzV54%3D&mode=p> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-700-2006/grade/Q195> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-700-2006> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "Q195" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-700-2006> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/CARBONSTR>,
+        <https://w3id.org/ontology-platform/steel/code/plain-product-family/WELDPIPE> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-700-2006/grade/Q215A> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-700-2006> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "Q215A" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-700-2006> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/CARBONSTR>,
+        <https://w3id.org/ontology-platform/steel/code/plain-product-family/WELDPIPE> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-700-2006/grade/Q235A> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-700-2006> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "Q235A" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-700-2006> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/CARBONSTR>,
+        <https://w3id.org/ontology-platform/steel/code/plain-product-family/SECTION>,
+        <https://w3id.org/ontology-platform/steel/code/plain-product-family/WELDPIPE> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-700-2006/grade/Q235B> a stl:StandardGrade ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-700-2006> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:notation "Q235B" ;
+    stl:definedIn <https://w3id.org/ontology-platform/steel/std/gbt-700-2006> ;
+    stl:plainProductFamily <https://w3id.org/ontology-platform/steel/code/plain-product-family/CARBONSTR>,
+        <https://w3id.org/ontology-platform/steel/code/plain-product-family/SECTION>,
+        <https://w3id.org/ontology-platform/steel/code/plain-product-family/WELDPIPE> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-708-2026> a stl:StandardEdition ;
     dcterms:description "即将实施"@zh ;
@@ -8801,6 +9094,17 @@ stl:AcceptanceCriterion a owl:Class ;
     skos:prefLabel "Acceptance criterion"@en,
         "验收判据"@zh .
 
+stl:Bar a owl:Class ;
+    rdfs:label "Steel bar"@en,
+        "棒材"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-6929-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/process/rolling> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:definition "An individually tracked solid long product with a round, square, flat or other bar section."@en,
+        "具有圆形、方形、扁形或其他棒材断面、可按件交接的实心长条钢材。"@zh ;
+    skos:prefLabel "Steel bar"@en,
+        "棒材"@zh .
+
 stl:BeamBlank a owl:Class ;
     rdfs:label "Beam blank"@en,
         "异型坯"@zh ;
@@ -9073,17 +9377,6 @@ stl:NondestructiveTest a owl:Class ;
     skos:prefLabel "Nondestructive test"@en,
         "无损检测"@zh .
 
-stl:Package a owl:Class ;
-    rdfs:label "Package"@en,
-        "包装件"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/wbt-1092-2018> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
-    rdfs:subClassOf stl:MaterialPiece ;
-    skos:definition "An identified handling piece transferred as a unit while retaining the identity of its contents."@en,
-        "按包装号整体移交且成员仍可追踪的物流实物件。"@zh ;
-    skos:prefLabel "Package"@en,
-        "包装件"@zh .
-
 stl:PersonnelRole a owl:Class ;
     rdfs:label "Personnel role"@en,
         "人员角色"@zh ;
@@ -9297,16 +9590,6 @@ stl:analysisType a owl:ObjectProperty ;
     skos:prefLabel "Analysis type"@en,
         "分析类型"@zh .
 
-stl:assessedObject a owl:ObjectProperty ;
-    rdfs:label "Assessed object"@en,
-        "质量处理对象"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
-    skos:definition "Identifies the individual piece or inspection lot directly subject to the quality action."@en,
-        "指出本次质量判定或处置直接适用的单件或检验批。"@zh ;
-    skos:prefLabel "Assessed object"@en,
-        "质量处理对象"@zh .
-
 stl:assessedSpecification a owl:ObjectProperty ;
     rdfs:label "Specification for assessment"@en,
         "判定依据规格"@zh ;
@@ -9318,6 +9601,37 @@ stl:assessedSpecification a owl:ObjectProperty ;
         "指出质量判定实际用于对照检验结果的物料规格。"@zh ;
     skos:prefLabel "Specification for assessment"@en,
         "判定依据规格"@zh .
+
+stl:bundleCutLength a owl:DatatypeProperty ;
+    rdfs:label "Ordered length per bundled piece"@en,
+        "捆内单支定尺"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024>,
+        <https://w3id.org/ontology-platform/steel/std/gbt-11263-2024> ;
+    rdfs:comment "下沉理由：普钢长材按捆交货时，以捆内单支的约定定尺配合支数核算整捆理论重量。"@zh ;
+    rdfs:domain stl:Bundle ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The ordered cut length in metres of each individual length in this delivery bundle."@en,
+        "本交货捆内每支长材约定的定尺长度，以米计。"@zh ;
+    skos:prefLabel "Ordered length per bundled piece"@en,
+        "捆内单支定尺"@zh ;
+    stl:quantityKind quantitykind:Length ;
+    stl:unit unit:M .
+
+stl:bundlePieceCount a owl:DatatypeProperty ;
+    rdfs:label "Delivered pieces per bundle"@en,
+        "交货捆支数"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-2101-2017> ;
+    rdfs:comment "下沉理由：普钢定尺捆的交货清点和理计以同一定尺下的实交支数为依据。"@zh ;
+    rdfs:domain stl:Bundle ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:range xsd:nonNegativeInteger ;
+    skos:definition "The count of steel lengths delivered in a fixed-length bundle, as checked against the bundle tag and delivery quantity."@en,
+        "给出定尺交货捆中实交长材的支数，用于对照捆牌和交货数量。"@zh ;
+    skos:prefLabel "Delivered pieces per bundle"@en,
+        "交货捆支数"@zh ;
+    stl:quantityKind quantitykind:Count ;
+    stl:unit unit:NUM .
 
 stl:castOn a owl:ObjectProperty ;
     rdfs:label "Cast on"@en,
@@ -9452,6 +9766,18 @@ stl:coatingType a owl:ObjectProperty ;
     skos:prefLabel "Ultrasonic testing"@en,
         "超声检测"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/ndt-method> .
+
+<https://w3id.org/ontology-platform/steel/code/packing-form/BUNDLE> a skos:Concept ;
+    rdfs:label "Bundle"@en,
+        "捆"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Several lengths secured together by strapping form one counted handling unit."@en,
+        "若干条、根或支用带材捆扎成一个可计件的搬运单元。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/packing-form> ;
+    skos:notation "BUNDLE"^^stl:PackingFormCode ;
+    skos:prefLabel "Bundle"@en,
+        "捆"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/packing-form> .
 
 <https://w3id.org/ontology-platform/steel/code/process-type/COAT> a skos:Concept ;
     rdfs:label "Coating"@en,
@@ -9615,6 +9941,18 @@ stl:defectType a owl:ObjectProperty ;
         "标明实际观察到的异常属于哪类缺陷。"@zh ;
     skos:prefLabel "Defect type"@en,
         "缺陷类型"@zh .
+
+stl:definedIn a owl:ObjectProperty ;
+    rdfs:label "Defined in"@en,
+        "定义版次"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-221-2008> ;
+    rdfs:domain stl:StandardGrade ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/specification> ;
+    rdfs:range stl:StandardEdition ;
+    skos:definition "Identifies the edition within which the grade designation is defined."@en,
+        "指出使该标准牌号名称及其解释有据可查的标准版次。"@zh ;
+    skos:prefLabel "Defined in"@en,
+        "定义版次"@zh .
 
 stl:dispositionType a owl:ObjectProperty ;
     rdfs:label "Disposition type"@en,
@@ -9823,6 +10161,22 @@ stl:processedHeat a owl:ObjectProperty ;
     skos:prefLabel "Processed heat"@en,
         "处理炉次"@zh .
 
+stl:rebarNominalDiameter a owl:DatatypeProperty ;
+    rdfs:label "Nominal rebar diameter"@en,
+        "钢筋公称直径"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024>,
+        <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:comment "下沉理由：带肋钢筋按公称截面计算理论重量和归并规格，肋顶外径不能代表该尺寸。"@zh ;
+    rdfs:domain stl:Rebar ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:range xsd:decimal ;
+    skos:definition "The diameter in millimetres corresponding to the nominal section of a reinforcing bar, including ribbed bars."@en,
+        "以毫米记录钢筋公称截面对应的直径，带肋钢筋也依此识别规格。"@zh ;
+    skos:prefLabel "Nominal rebar diameter"@en,
+        "钢筋公称直径"@zh ;
+    stl:quantityKind quantitykind:Length ;
+    stl:unit unit:MilliM .
+
 stl:sampleType a owl:ObjectProperty ;
     rdfs:label "Sample type"@en,
         "样品类型"@zh ;
@@ -9885,15 +10239,6 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D828B7D3A7E05397BE0A0AB82A> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-1499-2-2018> a stl:StandardEdition ;
-    dcterms:description "废止"@zh ;
-    dcterms:identifier "GB/T 1499.2-2018" ;
-    dcterms:issued "2018"^^xsd:gYear ;
-    dcterms:title "Steel for the reinforcement of concrete—Part 2:Hot rolled ribbed bars"@en,
-        "钢筋混凝土用钢 第2部分：热轧带肋钢筋"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D82C58D3A7E05397BE0A0AB82A> .
-
 <https://w3id.org/ontology-platform/steel/std/gbt-14992-2005> a stl:StandardEdition ;
     dcterms:description "废止"@zh ;
     dcterms:identifier "GB/T 14992-2005" ;
@@ -9902,15 +10247,6 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
         "高温合金和金属间化合物高温材料的分类和牌号"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=ofmER4fK6Kw%3D&mode=p> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-1591-2018> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 1591-2018" ;
-    dcterms:issued "2018"^^xsd:gYear ;
-    dcterms:title "High strength low alloy structural steels"@en,
-        "低合金高强度结构钢"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/search/stdPage?q=%E4%BD%8E%E5%90%88%E9%87%91%E9%AB%98%E5%BC%BA%E5%BA%A6%E7%BB%93%E6%9E%84%E9%92%A2> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-17616-2013> a stl:StandardEdition ;
     dcterms:description "废止"@zh ;
@@ -10039,6 +10375,15 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81236D3A7E05397BE0A0AB82A> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-3091-2025> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 3091-2025" ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:title "Welded steel pipes for low pressure fluid delivery"@en,
+        "低压流体输送用焊接钢管"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=31DA5F377C658F08E06397BE0A0A4CFB> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-3102-1-1993> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 3102.1-1993" ;
@@ -10140,15 +10485,6 @@ stl:sequenceInStrand a owl:DatatypeProperty ;
         "钢棒尺寸、外形、重量及允许偏差"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=OmF02s7kDno%3D&mode=p> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-706-2016> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 706-2016" ;
-    dcterms:issued "2016"^^xsd:gYear ;
-    dcterms:title "Hot rolled section steel"@en,
-        "热轧型钢"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81430D3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-706-2026> a stl:StandardEdition ;
     dcterms:description "即将实施"@zh ;
@@ -10451,17 +10787,6 @@ stl:IngotCasting a owl:Class ;
     skos:prefLabel "Ingot casting"@en,
         "模铸作业"@zh .
 
-stl:InspectionLot a owl:Class ;
-    rdfs:label "Inspection lot"@en,
-        "检验批"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-17505-2016> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
-    rdfs:subClassOf stl:ManufacturingRecord ;
-    skos:definition "A lot record grouping material under a formation rule for shared inspection results or a lot-level decision."@en,
-        "按组批规则将物料归在一起、据以共用检验结果或作出批次判定的批记录。"@zh ;
-    skos:prefLabel "Inspection lot"@en,
-        "检验批"@zh .
-
 stl:LoadPosition a owl:Class ;
     rdfs:label "Load position"@en,
         "装载位置"@zh ;
@@ -10505,6 +10830,17 @@ stl:MetallographicField a owl:Class ;
         "在试样观察面上按位置和放大倍数界定并单独登记的观察区域。"@zh ;
     skos:prefLabel "Metallographic field"@en,
         "金相视场"@zh .
+
+stl:Package a owl:Class ;
+    rdfs:label "Package"@en,
+        "包装件"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/wbt-1092-2018> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/material> ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    skos:definition "An identified handling piece transferred as a unit while retaining the identity of its contents."@en,
+        "按包装号整体移交且成员仍可追踪的物流实物件。"@zh ;
+    skos:prefLabel "Package"@en,
+        "包装件"@zh .
 
 stl:RatingScale a owl:Class ;
     rdfs:label "Rating scale"@en,
@@ -10608,6 +10944,30 @@ stl:WorkUnit a owl:Class ;
         "工作中心内能承担某段具体作业的资源单元。"@zh ;
     skos:prefLabel "Work unit"@en,
         "工作单元"@zh .
+
+stl:assessedObject a owl:ObjectProperty ;
+    rdfs:label "Assessed object"@en,
+        "质量处理对象"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
+    skos:definition "Identifies the individual piece or inspection lot directly subject to the quality action."@en,
+        "指出本次质量判定或处置直接适用的单件或检验批。"@zh ;
+    skos:prefLabel "Assessed object"@en,
+        "质量处理对象"@zh .
+
+stl:bundleMassBasis a owl:ObjectProperty ;
+    rdfs:label "Delivery bundle mass basis"@en,
+        "交货捆计重方式"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:comment "下沉理由：定尺普钢长材可按尺寸和支数理计或按净重实计，交货捆需标明选用的口径。"@zh ;
+    rdfs:domain stl:Bundle ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> ;
+    skos:definition "Identifies the mass used for settlement of this bundle, either theoreticalMass or the weighed netMass after tare."@en,
+        "标明结算本捆时采用的质量口径，理论值取 theoreticalMass，实际值取扣皮后的 netMass。"@zh ;
+    skos:prefLabel "Delivery bundle mass basis"@en,
+        "交货捆计重方式"@zh .
 
 stl:castIn a owl:ObjectProperty ;
     rdfs:label "Cast in"@en,
@@ -10909,6 +11269,49 @@ stl:numberingHeat a owl:ObjectProperty ;
     skos:prefLabel "Numbering heat"@en,
         "编号炉次"@zh .
 
+stl:plainProductFamily a owl:ObjectProperty ;
+    rdfs:label "Commodity steel ordering family"@en,
+        "普钢订货产品族"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：碳素结构钢、型钢和通用焊管等普钢订货系列可交叉使用牌号，需从牌号查到适用系列。"@zh ;
+    rdfs:domain stl:StandardGrade ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/plain-product-family> ;
+    skos:definition "Identifies a commodity steel product family for which the edition-specific grade can be ordered. A structural grade may serve several families."@en,
+        "指明该版次牌号可用于哪些普钢产品族，一种结构钢牌号可适用于多类交货产品。"@zh ;
+    skos:prefLabel "Commodity steel ordering family"@en,
+        "普钢订货产品族"@zh .
+
+stl:rebarLotAssessmentBasis a owl:ObjectProperty ;
+    rdfs:label "Rebar lot assessment basis"@en,
+        "钢筋按批判定基准"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:comment "下沉理由：钢筋批验收须区分按公称米重核对的重量偏差和抗震钢筋的性能检验，以说明整批判定所据项目。"@zh ;
+    rdfs:domain stl:QualityDecision ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/quality> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/rebar-lot-basis> ;
+    skos:definition "Identifies a product inspection basis used to assess a reinforcing bar lot. Several bases may support one decision."@en,
+        "标明整批钢筋判定所采用的产品检验项目口径，可结合多个基准作出一次判定。"@zh ;
+    skos:prefLabel "Rebar lot assessment basis"@en,
+        "钢筋按批判定基准"@zh .
+
+stl:rebarSurface a owl:ObjectProperty ;
+    rdfs:label "Rebar surface pattern"@en,
+        "钢筋表面形状"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024>,
+        <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:comment "下沉理由：光圆和带肋是钢筋产品标准区分配筋用材的特征，验收时需单列。"@zh ;
+    rdfs:domain stl:Rebar ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:range skos:Concept ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/rebar-surface> ;
+    skos:definition "Identifies the surface pattern of a reinforcing bar by the geometry around its perimeter."@en,
+        "标明钢筋按外周表面几何形状归入的产品类别。"@zh ;
+    skos:prefLabel "Rebar surface pattern"@en,
+        "钢筋表面形状"@zh .
+
 stl:recordedAt a owl:DatatypeProperty ;
     rdfs:label "Recorded at"@en,
         "登记时刻"@zh ;
@@ -10966,6 +11369,15 @@ stl:shareBasis a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D76CF8D3A7E05397BE0A0AB82A> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-11263-2024> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 11263-2024" ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:title "Hot rolled H and cut T section steel"@en,
+        "热轧H型钢和剖分T型钢"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=25940C3CEEF98A9AE06397BE0A0A525A> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-12603-2005> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 12603-2005" ;
@@ -11019,6 +11431,15 @@ stl:shareBasis a owl:ObjectProperty ;
         "企业控制系统集成 第3部分：制造运行管理的活动模型"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn//gb/search/gbDetailed?id=DAB8B40045E9896BE05397BE0A0A0B32> .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-2101-2017> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 2101-2017" ;
+    dcterms:issued "2017"^^xsd:gYear ;
+    dcterms:title "General requirment of acceptance, packaging, marking and certification for section steel"@en,
+        "型钢验收、包装、标志及质量证明书的一般规定"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D8141DD3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-221-2008> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -11083,14 +11504,14 @@ stl:shareBasis a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=LCsCZ0c8eO0%3D&mode=p> .
 
-<https://w3id.org/ontology-platform/steel/std/gbt-700-2006> a stl:StandardEdition ;
+<https://w3id.org/ontology-platform/steel/std/gbt-706-2016> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 700-2006" ;
-    dcterms:issued "2006"^^xsd:gYear ;
-    dcterms:title "Carbon structural steels"@en,
-        "碳素结构钢"@zh ;
+    dcterms:identifier "GB/T 706-2016" ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:title "Hot rolled section steel"@en,
+        "热轧型钢"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D7C7C2D3A7E05397BE0A0AB82A> .
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D81430D3A7E05397BE0A0AB82A> .
 
 <https://w3id.org/ontology-platform/steel/std/iec-62264-3-2016> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -11310,6 +11731,17 @@ stl:Ingot a owl:Class ;
     skos:prefLabel "Steel ingot"@en,
         "钢锭"@zh .
 
+stl:InspectionLot a owl:Class ;
+    rdfs:label "Inspection lot"@en,
+        "检验批"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-17505-2016> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    skos:definition "A lot record grouping material under a formation rule for shared inspection results or a lot-level decision."@en,
+        "按组批规则将物料归在一起、据以共用检验结果或作出批次判定的批记录。"@zh ;
+    skos:prefLabel "Inspection lot"@en,
+        "检验批"@zh .
+
 stl:InspectionRequirement a owl:Class ;
     rdfs:label "Inspection requirement"@en,
         "检验要求"@zh ;
@@ -11436,6 +11868,45 @@ stl:Tapping a owl:Class ;
     skos:prefLabel "Flat product defects"@en,
         "板带缺陷"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/defect-type> .
+
+<https://w3id.org/ontology-platform/steel/code/plain-product-family/COLDLC> a skos:Concept ;
+    rdfs:label "Cold-rolled low-carbon sheet and strip"@en,
+        "冷轧低碳钢板带"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-5213-2019> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Cold-rolled low-carbon flat products ordered by grade for the intended forming operation."@en,
+        "按冷轧低碳板带的成形用途选取牌号的产品系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/plain-product-family> ;
+    skos:notation "COLDLC"^^stl:PlainProductFamilyCode ;
+    skos:prefLabel "Cold-rolled low-carbon sheet and strip"@en,
+        "冷轧低碳钢板带"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/plain-product-family> .
+
+<https://w3id.org/ontology-platform/steel/code/plain-product-family/HOTDIP> a skos:Concept ;
+    rdfs:label "Hot-dip coated sheet and strip"@en,
+        "热镀层板带"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Flat products supplied with a designation identifying the substrate and hot-dip coating."@en,
+        "以板带基材与热浸镀层的组合标明交货品种的产品系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/plain-product-family> ;
+    skos:notation "HOTDIP"^^stl:PlainProductFamilyCode ;
+    skos:prefLabel "Hot-dip coated sheet and strip"@en,
+        "热镀层板带"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/plain-product-family> .
+
+<https://w3id.org/ontology-platform/steel/code/plain-product-family/HSLA> a skos:Concept ;
+    rdfs:label "High-strength low-alloy structural steel"@en,
+        "低合金高强度结构钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-1591-2018> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Structural products ordered by high-strength low-alloy grade and its delivery conditions."@en,
+        "按低合金高强度结构钢牌号和相应交货条件订货的产品系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/plain-product-family> ;
+    skos:notation "HSLA"^^stl:PlainProductFamilyCode ;
+    skos:prefLabel "High-strength low-alloy structural steel"@en,
+        "低合金高强度结构钢"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/plain-product-family> .
 
 <https://w3id.org/ontology-platform/steel/code/product-form/COIL> a skos:Concept ;
     rdfs:label "Steel coil"@en,
@@ -11603,6 +12074,15 @@ stl:startLength a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://www.dinmedia.de/en/standard/din-en-10204/59682782> .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-1499-2-2018> a stl:StandardEdition ;
+    dcterms:description "废止"@zh ;
+    dcterms:identifier "GB/T 1499.2-2018" ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:title "Steel for the reinforcement of concrete—Part 2:Hot rolled ribbed bars"@en,
+        "钢筋混凝土用钢 第2部分：热轧带肋钢筋"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D82C58D3A7E05397BE0A0AB82A> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-15574-2016> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 15574-2016" ;
@@ -11648,15 +12128,6 @@ stl:startLength a owl:DatatypeProperty ;
         "钢板和钢带包装、标志及质量证明书的一般要求"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=3B46A026CCD6469CE06397BE0A0AEEB8> .
-
-<https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> a stl:StandardEdition ;
-    dcterms:description "现行"@zh ;
-    dcterms:identifier "GB/T 2518-2019" ;
-    dcterms:issued "2019"^^xsd:gYear ;
-    dcterms:title "Continuously hot-dip zinc and zinc alloy coated steel sheet and strip"@en,
-        "连续热镀锌和锌合金镀层钢板及钢带"@zh ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
-    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=996A838ABFD28372E05397BE0A0AD949> .
 
 <https://w3id.org/ontology-platform/steel/std/ybt-421-2014> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -11843,6 +12314,32 @@ stl:actualStartAt a owl:DatatypeProperty ;
         "连铸机"@zh ;
     skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/equipment-type> .
 
+<https://w3id.org/ontology-platform/steel/code/plain-product-family/CARBONSTR> a skos:Concept ;
+    rdfs:label "Carbon structural steel"@en,
+        "碳素结构钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-700-2006> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Products ordered by carbon structural steel grade for general structural use."@en,
+        "供一般结构件选材，按碳素结构钢牌号订货的产品系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/plain-product-family> ;
+    skos:notation "CARBONSTR"^^stl:PlainProductFamilyCode ;
+    skos:prefLabel "Carbon structural steel"@en,
+        "碳素结构钢"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/plain-product-family> .
+
+<https://w3id.org/ontology-platform/steel/code/plain-product-family/WELDPIPE> a skos:Concept ;
+    rdfs:label "Welded pipe"@en,
+        "焊管"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-3091-2025> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Commodity welded pipe ordered by service, pipe dimensions and steel grade."@en,
+        "按焊接钢管的用途、管体尺寸和材料牌号订货的普钢系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/plain-product-family> ;
+    skos:notation "WELDPIPE"^^stl:PlainProductFamilyCode ;
+    skos:prefLabel "Welded pipe"@en,
+        "焊管"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/plain-product-family> .
+
 stl:endLength a owl:DatatypeProperty ;
     rdfs:label "End along source coil"@en,
         "母卷区段终点"@zh ;
@@ -11954,6 +12451,19 @@ stl:PropertyRequirement a owl:Class ;
     skos:prefLabel "Property requirement"@en,
         "性能要求"@zh .
 
+stl:Rebar a owl:Class ;
+    rdfs:label "Reinforcing bar"@en,
+        "钢筋"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024>,
+        <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:comment "下沉理由：混凝土配筋用普钢棒材按光圆或带肋及钢筋公称直径交验，需要在棒材上细分。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:subClassOf stl:Bar ;
+    skos:definition "A commodity steel bar supplied for reinforcement of concrete and designated by nominal diameter."@en,
+        "普钢产品标准中供钢筋混凝土配筋使用的条状钢材，以公称直径标示规格。"@zh ;
+    skos:prefLabel "Reinforcing bar"@en,
+        "钢筋"@zh .
+
 stl:Shipment a owl:Class ;
     rdfs:label "Shipment"@en,
         "发运单"@zh ;
@@ -11975,6 +12485,20 @@ stl:Steelmaking a owl:Class ;
         "将金属炉料冶炼成一炉钢水的作业，其取料按投入批次追踪，出钢时确立炉次身份。"@zh ;
     skos:prefLabel "Steelmaking operation"@en,
         "炼钢执行"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/plain-product-family/SECTION> a skos:Concept ;
+    rdfs:label "Rolled structural sections"@en,
+        "型钢"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-11263-2024>,
+        <https://w3id.org/ontology-platform/steel/std/gbt-706-2016> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Commodity steel ordered by structural section profile, grade and delivery length."@en,
+        "按型钢截面规格、材质和交货长度订货的普钢系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/plain-product-family> ;
+    skos:notation "SECTION"^^stl:PlainProductFamilyCode ;
+    skos:prefLabel "Rolled structural sections"@en,
+        "型钢"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/plain-product-family> .
 
 <https://w3id.org/ontology-platform/steel/code/process-type/HOTROLL> a skos:Concept ;
     rdfs:label "Hot rolling"@en,
@@ -12028,6 +12552,20 @@ stl:occurredAt a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://www.iso.org/standard/80050.html> .
 
+stl:Bundle a owl:Class ;
+    rdfs:label "Fixed-length delivery bundle"@en,
+        "定尺交货捆"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024>,
+        <https://w3id.org/ontology-platform/steel/std/gbt-2101-2017> ;
+    rdfs:comment "下沉理由：普钢长材的定尺成捆交货要把单支定尺、支数和整捆计重方式关联到同一包装件。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products> ;
+    rdfs:seeAlso <https://w3id.org/ontology-platform/steel/code/packing-form/BUNDLE> ;
+    rdfs:subClassOf stl:Package ;
+    skos:definition "An identified package of commodity steel lengths counted to one ordered cut length and transferred on an agreed mass basis."@en,
+        "以捆号移交的一组定尺普钢长材，每支按同一交货长度清点，整捆按约定方式计重。"@zh ;
+    skos:prefLabel "Fixed-length delivery bundle"@en,
+        "定尺交货捆"@zh .
+
 stl:Coil a owl:Class ;
     rdfs:label "Steel coil"@en,
         "钢卷"@zh ;
@@ -12050,6 +12588,17 @@ stl:MaterialTransformation a owl:Class ;
     skos:prefLabel "Material transformation"@en,
         "物料转换作业"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/bundle-mass-basis> a skos:ConceptScheme ;
+    rdfs:label "Delivery bundle mass basis"@en,
+        "交货捆计重方式"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:comment "下沉理由：成捆普钢长材交货可在按定尺支数理计和整捆实称之间选择，需在捆号上保留依据。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Distinguishes how the delivered mass of a fixed-length bundle is determined."@en,
+        "区分普钢定尺长材整捆交接时所采用的计重依据。"@zh ;
+    skos:prefLabel "Delivery bundle mass basis"@en,
+        "交货捆计重方式"@zh .
+
 <https://w3id.org/ontology-platform/steel/code/measurement-method> a skos:ConceptScheme ;
     rdfs:label "measurement acquisition method"@en,
         "采集方式"@zh ;
@@ -12059,6 +12608,43 @@ stl:MaterialTransformation a owl:Class ;
         "标识现场观测的读数经人或设备取得的方式。"@zh ;
     skos:prefLabel "measurement acquisition method"@en,
         "采集方式"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/plain-product-family/REBAR> a skos:Concept ;
+    rdfs:label "Reinforcing bar"@en,
+        "钢筋"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024>,
+        <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Bars ordered for concrete reinforcement by nominal diameter and reinforcing grade."@en,
+        "按配筋用途、公称直径及钢筋牌号交货的产品系列。"@zh ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/plain-product-family> ;
+    skos:notation "REBAR"^^stl:PlainProductFamilyCode ;
+    skos:prefLabel "Reinforcing bar"@en,
+        "钢筋"@zh ;
+    skos:topConceptOf <https://w3id.org/ontology-platform/steel/code/plain-product-family> .
+
+<https://w3id.org/ontology-platform/steel/code/rebar-lot-basis> a skos:ConceptScheme ;
+    rdfs:label "Rebar lot assessment basis"@en,
+        "钢筋交验批判定基准"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:comment "下沉理由：钢筋按批交验需区分公称米重偏差和抗震钢筋性能证据，这些项目取决于钢筋产品标准。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/quality-codes> ;
+    skos:definition "Distinguishes kinds of product inspection evidence used to assess a reinforcing bar lot. The decision records the outcome."@en,
+        "区分钢筋产品检验中用于整批判定的证据口径，判定结论另记在判定记录上。"@zh ;
+    skos:prefLabel "Rebar lot assessment basis"@en,
+        "钢筋交验批判定基准"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/rebar-surface> a skos:ConceptScheme ;
+    rdfs:label "Rebar surface pattern"@en,
+        "钢筋表面形状"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024>,
+        <https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> ;
+    rdfs:comment "下沉理由：光圆和带肋是钢筋产品交验时的分类，直接关联钢筋与混凝土的黏结特征。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Classifies the surface of concrete reinforcing bars by their external geometry."@en,
+        "按混凝土配筋用钢筋的外周几何特征区分钢筋表面。"@zh ;
+    skos:prefLabel "Rebar surface pattern"@en,
+        "钢筋表面形状"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/share-basis> a skos:ConceptScheme ;
     rdfs:label "contribution share basis"@en,
@@ -12112,17 +12698,6 @@ stl:MovementEvent a owl:Class ;
     skos:scopeNote "Use the latest confirmed occurrence. After a lift the crane carries the piece, after set-down its location is the actual destination, and after loading its carrier can be traced through the shipment."@en,
         "按发生时间取最近的已确认事件。吊起后实物由执行天车承载，落位后以实际落点为库位，装车后可由发运单追到运输载具。"@zh .
 
-stl:StandardGrade a owl:Class ;
-    rdfs:label "Standard grade designation"@en,
-        "标准牌号"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-221-2008> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/specification> ;
-    rdfs:subClassOf stl:ManufacturingObject ;
-    skos:definition "A designation scoped to the particular edition of the product standard that names it."@en,
-        "在一份确定版次的产品标准内具有指定名称的牌号条目。"@zh ;
-    skos:prefLabel "Standard grade designation"@en,
-        "标准牌号"@zh .
-
 stl:SteelGrade a owl:Class ;
     rdfs:label "Internal steel grade"@en,
         "内部钢种"@zh ;
@@ -12134,15 +12709,14 @@ stl:SteelGrade a owl:Class ;
     skos:prefLabel "Internal steel grade"@en,
         "内部钢种"@zh .
 
-<https://w3id.org/ontology-platform/steel/code/lot-formation-dimension> a skos:ConceptScheme ;
-    rdfs:label "Lot formation dimension"@en,
-        "组批维度"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
-    skos:definition "Identifies characteristics that a lot formation rule can require members of an inspection lot to share."@en,
-        "列出组建检验批时可要求成员相同的特征，每条组批规则选用其中适用的维度。"@zh ;
-    skos:prefLabel "Lot formation dimension"@en,
-        "组批维度"@zh .
+<https://w3id.org/ontology-platform/steel/std/gbt-5213-2019> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 5213-2019" ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:title "Cold rolled low carbon steel sheet and strip"@en,
+        "冷轧低碳钢板及钢带"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=Lb63thr9SCE%3D&mode=p> .
 
 stl:Location a owl:Class ;
     rdfs:label "Location"@en,
@@ -12153,17 +12727,6 @@ stl:Location a owl:Class ;
         "可标识作业发生处、设备所在处或物料存放处的空间对象。"@zh ;
     skos:prefLabel "Location"@en,
         "位置"@zh .
-
-stl:QualityDecision a owl:Class ;
-    rdfs:label "Quality decision"@en,
-        "质量判定"@zh ;
-    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-404-2013> ;
-    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
-    rdfs:subClassOf stl:Event ;
-    skos:definition "An event determining whether a piece or inspection lot conforms to a cited material specification under the applicable standard edition."@en,
-        "按指定规格及适用标准版次，对一件实物或一个检验批作出符合性结论的事件。"@zh ;
-    skos:prefLabel "Quality decision"@en,
-        "质量判定"@zh .
 
 stl:Requirement a owl:Class ;
     rdfs:label "Acceptance requirement"@en,
@@ -12268,6 +12831,15 @@ stl:SourceContribution a owl:Class ;
     skos:prefLabel "Steel quality class"@en,
         "钢的质量等级类别"@zh .
 
+<https://w3id.org/ontology-platform/steel/std/gbt-1591-2018> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 1591-2018" ;
+    dcterms:issued "2018"^^xsd:gYear ;
+    dcterms:title "High strength low alloy structural steels"@en,
+        "低合金高强度结构钢"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/search/stdPage?q=%E4%BD%8E%E5%90%88%E9%87%91%E9%AB%98%E5%BC%BA%E5%BA%A6%E7%BB%93%E6%9E%84%E9%92%A2> .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-228-1-2021> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 228.1-2021" ;
@@ -12294,6 +12866,17 @@ stl:SourceContribution a owl:Class ;
         "企业控制系统集成 第1部分：模型与术语"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://webstore.iec.ch/en/publication/6675> .
+
+stl:QualityDecision a owl:Class ;
+    rdfs:label "Quality decision"@en,
+        "质量判定"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/iso-404-2013> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/quality> ;
+    rdfs:subClassOf stl:Event ;
+    skos:definition "An event determining whether a piece or inspection lot conforms to a cited material specification under the applicable standard edition."@en,
+        "按指定规格及适用标准版次，对一件实物或一个检验批作出符合性结论的事件。"@zh ;
+    skos:prefLabel "Quality decision"@en,
+        "质量判定"@zh .
 
 stl:SemiFinishedProduct a owl:Class ;
     rdfs:label "Semi-finished product"@en,
@@ -12336,6 +12919,16 @@ stl:Slab a owl:Class ;
         "按管边的接合工艺划分制管焊接方法，部分方法再按制造焊缝的走向细分。"@zh ;
     skos:prefLabel "Tube seam welding methods"@en,
         "管体焊接方法"@zh .
+
+<https://w3id.org/ontology-platform/steel/std/gb-1499-1-2024> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB 1499.1-2024" ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-1499-1-2017> ;
+    dcterms:title "Steel for the reinforcement of concrete—Part 1:Hot rolled plain bars"@en,
+        "钢筋混凝土用钢 第1部分：热轧光圆钢筋"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=GJ733S1WRs0%3D&mode=p> .
 
 stl:ContinuouslyCastPiece a owl:Class ;
     rdfs:label "Continuously cast piece"@en,
@@ -12400,6 +12993,15 @@ stl:MechanicalTest a owl:Class ;
         "记录试样轴线相对于材料加工方向或产品几何轴的取向。"@zh ;
     skos:prefLabel "Specimen orientation"@en,
         "试样取向"@zh .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-2518-2019> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 2518-2019" ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:title "Continuously hot-dip zinc and zinc alloy coated steel sheet and strip"@en,
+        "连续热镀锌和锌合金镀层钢板及钢带"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=996A838ABFD28372E05397BE0A0AD949> .
 
 <https://w3id.org/ontology-platform/steel/std/gbt-709-2019> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
@@ -12477,6 +13079,25 @@ stl:Sample a owl:Class ;
         "样品"@zh ;
     skos:scopeNote "A sample can represent an ore, coke, hot metal or steel lot, or an individual product."@en,
         "样品可以代表铁矿石、焦炭、铁水或钢水等物料批，也可以取自一件成材。"@zh .
+
+<https://w3id.org/ontology-platform/steel/code/lot-formation-dimension> a skos:ConceptScheme ;
+    rdfs:label "Lot formation dimension"@en,
+        "组批维度"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/codes> ;
+    skos:definition "Identifies characteristics that a lot formation rule can require members of an inspection lot to share."@en,
+        "列出组建检验批时可要求成员相同的特征，每条组批规则选用其中适用的维度。"@zh ;
+    skos:prefLabel "Lot formation dimension"@en,
+        "组批维度"@zh .
+
+<https://w3id.org/ontology-platform/steel/std/gbt-700-2006> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB/T 700-2006" ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:title "Carbon structural steels"@en,
+        "碳素结构钢"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailedCNF?id=71F772D7C7C2D3A7E05397BE0A0AB82A> .
 
 stl:Plan a owl:Class ;
     rdfs:label "Plan"@en,
@@ -12634,6 +13255,17 @@ stl:Observation a owl:Class ;
         "热处理工艺"@zh ;
     skos:scopeNote "主代码采用本方案的英文助记码。"@zh .
 
+<https://w3id.org/ontology-platform/steel/code/plain-product-family> a skos:ConceptScheme ;
+    rdfs:label "Commodity steel product family"@en,
+        "普钢产品族"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/source/industry-practice> ;
+    rdfs:comment "下沉理由：这些系列用于普钢大宗订单选材，其中结构钢牌号可跨型钢、焊管等交货品种。"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/plain/products-codes> ;
+    skos:definition "Groups applicable grades by material series, use or finished product specification in commodity steel orders. Families may overlap."@en,
+        "按普钢订货采用的材质系列、产品用途或成品交货标准归集适用牌号，产品族可以交叉。"@zh ;
+    skos:prefLabel "Commodity steel product family"@en,
+        "普钢产品族"@zh .
+
 <https://w3id.org/ontology-platform/steel/std/gbt-7232-2023> a stl:StandardEdition ;
     dcterms:description "现行"@zh ;
     dcterms:identifier "GB/T 7232-2023" ;
@@ -12730,6 +13362,27 @@ stl:MaterialLot a owl:Class ;
         "钢产品 词汇"@zh ;
     rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
     rdfs:seeAlso <https://www.iso.org/standard/52949.html> .
+
+<https://w3id.org/ontology-platform/steel/std/gb-1499-2-2024> a stl:StandardEdition ;
+    dcterms:description "现行"@zh ;
+    dcterms:identifier "GB 1499.2-2024" ;
+    dcterms:issued "2024"^^xsd:gYear ;
+    dcterms:replaces <https://w3id.org/ontology-platform/steel/std/gbt-1499-2-2018> ;
+    dcterms:title "Steel for the reinforcement of concrete—Part 2:Hot rolled ribbed bars"@en,
+        "钢筋混凝土用钢 第2部分：热轧带肋钢筋"@zh ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/standards> ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=1BD5B9878E5A2FCEE06397BE0A0A10CC> .
+
+stl:StandardGrade a owl:Class ;
+    rdfs:label "Standard grade designation"@en,
+        "标准牌号"@zh ;
+    dcterms:source <https://w3id.org/ontology-platform/steel/std/gbt-221-2008> ;
+    rdfs:isDefinedBy <https://w3id.org/ontology-platform/steel/ontology/core/specification> ;
+    rdfs:subClassOf stl:ManufacturingObject ;
+    skos:definition "A designation scoped to the particular edition of the product standard that names it."@en,
+        "在一份确定版次的产品标准内具有指定名称的牌号条目。"@zh ;
+    skos:prefLabel "Standard grade designation"@en,
+        "标准牌号"@zh .
 
 <https://w3id.org/ontology-platform/steel/code/material-category> a skos:ConceptScheme ;
     rdfs:label "Material category"@en,
