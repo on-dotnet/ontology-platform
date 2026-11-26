@@ -1,0 +1,19 @@
+# Entry point importing the eight local modules of the steel industry sample pack.
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<module/steel-industry> a owl:Ontology ;
+    owl:versionIRI <module/steel-industry/0.1.0> ;
+    owl:versionInfo "0.1.0" ;
+    rdfs:label "钢铁行业通用本体"@zh, "Steel industry ontology"@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> ;
+    owl:imports <module/core>,
+        <module/steelmaking>,
+        <module/rolling>,
+        <module/quality>,
+        <module/logistics>,
+        <module/codes>,
+        <module/standards>,
+        <module/shapes> .

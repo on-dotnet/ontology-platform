@@ -1,0 +1,51 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX move: <https://w3id.org/ontology-platform/steel/code/movement-event-type/>
+
+# The latest snapshot includes every confirmed event. Each group key is always bound.
+SELECT ?coil ?snapshot (IF(?snapshot = "latest", "", ?cutoff) AS ?asOf) ?lastMovement ?location ?lastLiftAt ?liftCrane ?lastReleaseAt ?releaseCrane
+WHERE {
+  {
+    SELECT ?piece ?coil ?ordinal ?snapshot ?cutoff (MAX(?time) AS ?latestAt)
+           (MAX(?liftTime) AS ?lastLiftAt) (MAX(?releaseTime) AS ?lastReleaseAt)
+    WHERE {
+      VALUES ?coil { "CCG126000802" }
+      VALUES (?ordinal ?snapshot ?cutoff) {
+        (1 "before"    "2026-11-16T13:16:00+08:00"^^xsd:dateTime)
+        (2 "inTransit" "2026-11-16T13:20:00+08:00"^^xsd:dateTime)
+        (3 "landed"    "2026-11-16T13:23:00+08:00"^^xsd:dateTime)
+        (4 "latest"    "9999-12-31T23:59:59+08:00"^^xsd:dateTime)
+      }
+      ?piece dct:identifier ?coil .
+      OPTIONAL {
+        ?event a stl:MovementEvent ; stl:movedPiece ?piece ; stl:isConfirmed true ; stl:occurredAt ?time .
+        OPTIONAL { ?event stl:movementType move:LIFT ; stl:occurredAt ?liftTime }
+        OPTIONAL { ?event stl:movementType move:RELEASE ; stl:occurredAt ?releaseTime }
+        FILTER (?snapshot = "latest" || ?time <= ?cutoff)
+      }
+    }
+    GROUP BY ?piece ?coil ?ordinal ?snapshot ?cutoff
+  }
+  OPTIONAL {
+    ?last a stl:MovementEvent ; stl:movedPiece ?piece ; stl:isConfirmed true ;
+          stl:occurredAt ?eventTime ; stl:movementType ?kind .
+    ?kind skos:notation ?lastMovement .
+    OPTIONAL { ?last stl:movementType move:LIFT ; stl:performedOn/dct:identifier ?onCrane }
+    OPTIONAL { ?last stl:movementType move:RELEASE ; stl:eventLocation/dct:identifier ?inBay }
+    FILTER (?eventTime = ?latestAt)
+    BIND(COALESCE(?onCrane, ?inBay) AS ?location)
+  }
+  OPTIONAL {
+    ?lift a stl:MovementEvent ; stl:movedPiece ?piece ; stl:isConfirmed true ; stl:movementType move:LIFT ;
+          stl:occurredAt ?lifted ; stl:performedOn/dct:identifier ?liftCrane .
+    FILTER (?lifted = ?lastLiftAt)
+  }
+  OPTIONAL {
+    ?release a stl:MovementEvent ; stl:movedPiece ?piece ; stl:isConfirmed true ; stl:movementType move:RELEASE ;
+             stl:occurredAt ?released ; stl:performedOn/dct:identifier ?releaseCrane .
+    FILTER (?released = ?lastReleaseAt)
+  }
+}
+ORDER BY ?coil ?ordinal

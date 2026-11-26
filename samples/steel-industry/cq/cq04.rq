@@ -1,0 +1,13 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+
+# Keep the immediate mother and the hot coil on the same ancestry path.
+SELECT DISTINCT ?coil ?mother ?hotCoil ?slab
+WHERE {
+  VALUES ?coil { "CCA126000812" "CCG126000801" "CCG126000802" }
+  ?finished dct:identifier ?coil ; stl:derivedFrom ?parent .
+  ?parent dct:identifier ?mother ; stl:derivedFrom* ?hot .
+  ?hot a stl:HotRolledCoil ; dct:identifier ?hotCoil ; stl:derivedFrom+ ?castPiece .
+  ?castPiece a stl:Slab ; dct:identifier ?slab .
+}
+ORDER BY ?coil ?mother ?hotCoil ?slab

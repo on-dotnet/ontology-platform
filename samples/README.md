@@ -3,6 +3,7 @@
 | 目录 | 内容 | 用途 |
 |---|---|---|
 | [steel/](steel) | 钢铁冶金案例：本体（炉次、浇次、板坯、轧制事件、钢卷）、约束、术语、单位、合成数据（含一份不合规数据）；4 份 Markdown 资料与期望答案 | 案例演示、校验测试；AI 识别评测的开发集（小、Markdown） |
+| [steel-industry/](steel-industry) | 钢铁全流程通用层案例包（[规格 005](../docs/specs/005-steel-industry-pack.md)）：炼钢到发运的本体、代码表、SHACL 约束、标准书目、SSSOM 映射、合成数据与反例、14 个能力问题与自检脚本；11 份资料（PDF、Word、Excel）与期望答案 | 通用层本体的参考实现；AI 识别评测的开发集（全流程、规模最大） |
 | [maintenance/](maintenance) | 制造企业设备点检与维修案例包：6 份资料（PDF、Word、Excel）与期望答案 | AI 识别评测的开发集（真实格式） |
 | [pharma/](pharma) | 药品批生产（片剂）案例包：6 份资料（PDF、Word、Excel）与期望答案 | AI 识别评测的留出集，只用来测量 |
 | [owl-features/](owl-features) | 21 个 OWL 特性样例，从 IRI、类、属性到限制、基数、属性链、导入、身份、时间与复杂公理 | 导入导出往返测试（M2：全部导入再导出不丢内容） |
@@ -13,11 +14,12 @@
 
 一个案例包是 `samples/<案例>/` 下的 `docs/`（资料）与 `eval/expected.toml`（期望答案），由 `./dev.ps1 eval <案例>` 运行和打分，答案格式见[开发手册](../docs/development.md)"识别评测"一节。
 
-三个案例包的角色：
+四个案例包的角色：
 
 | 案例包 | 角色 | 能不能看模型输出、对着它改规则和提示词 |
 |---|---|---|
 | `steel` | 开发集：小，全是 Markdown，分数接近饱和 | 能 |
+| `steel-industry` | 开发集：11 份资料覆盖钢铁全流程，编码、单位、计划与实绩、换钢种等难点集中 | 能 |
 | `maintenance` | 开发集：PDF（硬换行、表格、页眉页脚）、Word、Excel，规模与 `pharma` 相当，会触发分批 | 能 |
 | `pharma` | 留出集：格式与 `maintenance` 同类，领域不同 | 不能，只用来测量 |
 

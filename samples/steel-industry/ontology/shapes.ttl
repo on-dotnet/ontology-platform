@@ -1,0 +1,1645 @@
+# SHACL constraints for identifiers, genealogy, event times, measurements and dispositions.
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://w3id.org/ontology-platform/steel/module/shapes> a owl:Ontology ;
+    owl:versionIRI <https://w3id.org/ontology-platform/steel/module/shapes/0.1.0> ;
+    owl:versionInfo "0.1.0" ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> ;
+    sh:declare
+        [ sh:prefix "stl" ; sh:namespace "https://w3id.org/ontology-platform/steel/"^^xsd:anyURI ],
+        [ sh:prefix "dcterms" ; sh:namespace "http://purl.org/dc/terms/"^^xsd:anyURI ],
+        [ sh:prefix "rdf" ; sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI ],
+        [ sh:prefix "rdfs" ; sh:namespace "http://www.w3.org/2000/01/rdf-schema#"^^xsd:anyURI ],
+        [ sh:prefix "skos" ; sh:namespace "http://www.w3.org/2004/02/skos/core#"^^xsd:anyURI ],
+        [ sh:prefix "xsd" ; sh:namespace "http://www.w3.org/2001/XMLSchema#"^^xsd:anyURI ],
+        [ sh:prefix "disposition" ; sh:namespace "https://w3id.org/ontology-platform/steel/code/disposition-type/"^^xsd:anyURI ],
+        [ sh:prefix "evidence" ; sh:namespace "https://w3id.org/ontology-platform/steel/code/contribution-evidence/"^^xsd:anyURI ],
+        [ sh:prefix "analysis" ; sh:namespace "https://w3id.org/ontology-platform/steel/code/analysis-type/"^^xsd:anyURI ],
+        [ sh:prefix "item" ; sh:namespace "https://w3id.org/ontology-platform/steel/code/measurement-item/"^^xsd:anyURI ],
+        [ sh:prefix "unitType" ; sh:namespace "https://w3id.org/ontology-platform/steel/code/unit-type/"^^xsd:anyURI ],
+        [ sh:prefix "quantitykind" ; sh:namespace "http://qudt.org/vocab/quantitykind/"^^xsd:anyURI ],
+        [ sh:prefix "unit" ; sh:namespace "http://qudt.org/vocab/unit/"^^xsd:anyURI ] .
+
+# Primary identifiers and explicit numbering facts
+
+
+stl:IdentifierRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:Heat, stl:CastSequence, stl:Slab, stl:HotRolledCoil, stl:FullHardCoil,
+        stl:AnnealedCoil, stl:GalvanizedCoil, stl:RecoiledCoil, stl:Package, stl:Sample,
+        stl:InspectionLot, stl:QualityDisposition, stl:MillCertificate, stl:SalesOrder,
+        stl:SalesOrderLine, stl:ProductionOrder, stl:Shipment, stl:Equipment, stl:Crane, stl:StorageArea,
+        stl:StorageLocation, stl:SteelGrade ;
+    sh:path dcterms:identifier ;
+    sh:minCount 1 ;
+    sh:message "A numbered record needs its primary identifier." .
+
+stl:IdentifierSingleShape a sh:PropertyShape ;
+    sh:targetClass stl:Heat, stl:CastSequence, stl:Slab, stl:HotRolledCoil, stl:FullHardCoil,
+        stl:AnnealedCoil, stl:GalvanizedCoil, stl:RecoiledCoil, stl:Package, stl:Sample,
+        stl:InspectionLot, stl:QualityDisposition, stl:MillCertificate, stl:SalesOrder,
+        stl:SalesOrderLine, stl:ProductionOrder, stl:Shipment, stl:Equipment, stl:Crane, stl:StorageArea,
+        stl:StorageLocation, stl:SteelGrade ;
+    sh:path dcterms:identifier ;
+    sh:maxCount 1 ;
+    sh:message "Only one primary identifier is allowed." .
+
+stl:IdentifierStringShape a sh:PropertyShape ;
+    sh:targetClass stl:Heat, stl:CastSequence, stl:Slab, stl:HotRolledCoil, stl:FullHardCoil,
+        stl:AnnealedCoil, stl:GalvanizedCoil, stl:RecoiledCoil, stl:Package, stl:Sample,
+        stl:InspectionLot, stl:QualityDisposition, stl:MillCertificate, stl:SalesOrder,
+        stl:SalesOrderLine, stl:ProductionOrder, stl:Shipment, stl:Equipment, stl:Crane, stl:StorageArea,
+        stl:StorageLocation, stl:SteelGrade ;
+    sh:path dcterms:identifier ;
+    sh:datatype xsd:string ;
+    sh:message "The primary identifier is a string." .
+
+stl:IdentifierUniqueShape a sh:NodeShape ;
+    sh:targetClass stl:Heat, stl:CastSequence, stl:Slab, stl:HotRolledCoil, stl:FullHardCoil,
+        stl:AnnealedCoil, stl:GalvanizedCoil, stl:RecoiledCoil, stl:Package, stl:Sample,
+        stl:InspectionLot, stl:QualityDisposition, stl:MillCertificate, stl:SalesOrder,
+        stl:SalesOrderLine, stl:ProductionOrder, stl:Shipment, stl:Equipment, stl:Crane, stl:StorageArea,
+        stl:StorageLocation, stl:SteelGrade ;
+    sh:sparql [
+        sh:message "The primary identifier is already in use in the same numbered class." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id ; rdf:type/rdfs:subClassOf* ?numberedClass .
+    ?other dcterms:identifier ?id ; rdf:type/rdfs:subClassOf* ?numberedClass .
+    FILTER (?other != $this && ?numberedClass IN (stl:Heat, stl:CastSequence, stl:Slab, stl:HotRolledCoil, stl:FullHardCoil, stl:AnnealedCoil, stl:GalvanizedCoil, stl:RecoiledCoil, stl:Package, stl:Sample, stl:InspectionLot, stl:QualityDisposition, stl:MillCertificate, stl:SalesOrder, stl:SalesOrderLine, stl:ProductionOrder, stl:Shipment, stl:Equipment, stl:Crane, stl:StorageArea, stl:StorageLocation, stl:SteelGrade))
+}
+"""
+    ] .
+
+stl:HeatIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:Heat ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^H[1-9][0-9]{7}$" ;
+    sh:message "Expected the Heat identifier format." .
+
+stl:CastSequenceIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:CastSequence ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^Q[1-9][0-9]{6}$" ;
+    sh:message "Expected the CastSequence identifier format." .
+
+stl:SlabIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^S[1-9][0-9]{7}[1-9][0-9]{2}$" ;
+    sh:message "Expected the Slab identifier format." .
+
+stl:HotRolledCoilIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:HotRolledCoil ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^R[1-9][0-9]{8}$" ;
+    sh:message "Expected the HotRolledCoil identifier format." .
+
+stl:FullHardCoilIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:FullHardCoil ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^CPL[1-9][0-9]{8}$" ;
+    sh:message "Expected the FullHardCoil identifier format." .
+
+stl:AnnealedCoilIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:AnnealedCoil ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^CCA[1-9][0-9]{8}$" ;
+    sh:message "Expected the AnnealedCoil identifier format." .
+
+stl:GalvanizedCoilIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:GalvanizedCoil ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^CCG[1-9][0-9]{8}$" ;
+    sh:message "Expected the GalvanizedCoil identifier format." .
+
+stl:RecoiledCoilIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:RecoiledCoil ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^CRC[1-9][0-9]{8}$" ;
+    sh:message "Expected the RecoiledCoil identifier format." .
+
+stl:PackageIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:Package ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^P[0-9]{9}$" ;
+    sh:message "Expected the Package identifier format." .
+
+stl:SampleIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:Sample ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^T[0-9]{9}$" ;
+    sh:message "Expected the Sample identifier format." .
+
+stl:InspectionLotIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:InspectionLot ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^L[0-9]{8}$" ;
+    sh:message "Expected the InspectionLot identifier format." .
+
+stl:QualityDispositionIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:QualityDisposition ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^N[0-9]{8}$" ;
+    sh:message "Expected the QualityDisposition identifier format." .
+
+stl:MillCertificateIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:MillCertificate ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^Z[0-9]{8}$" ;
+    sh:message "Expected the MillCertificate identifier format." .
+
+stl:SalesOrderIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:SalesOrder ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^D[0-9]{8}$" ;
+    sh:message "Expected the SalesOrder identifier format." .
+
+stl:SalesOrderLineIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:SalesOrderLine ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^D[0-9]{8}-[0-9]{3}$" ;
+    sh:message "Expected the SalesOrderLine identifier format." .
+
+stl:ProductionOrderIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:ProductionOrder ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^W[0-9]{8}$" ;
+    sh:message "Expected the ProductionOrder identifier format." .
+
+stl:ShipmentIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:Shipment ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^F[0-9]{8}$" ;
+    sh:message "Expected the Shipment identifier format." .
+
+stl:EquipmentIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:Equipment ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^((BOF|EAF|LF|RH|CC|HSM|PLTCM|CAL|CGL|RCL|PCK)[1-9]|CR[A-Z][A-Z0-9]{2}[1-9])$" ;
+    sh:message "Expected the Equipment identifier format." .
+
+stl:CraneIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:Crane ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^CR[A-Z][A-Z0-9]{2}[1-9]$" ;
+    sh:message "Expected the Crane identifier format." .
+
+stl:StorageAreaIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:StorageArea ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^[A-Z][A-Z0-9]{2}$" ;
+    sh:message "Expected the StorageArea identifier format." .
+
+stl:StorageLocationIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:StorageLocation ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^[A-Z][A-Z0-9]{2}-[0-9]{5}$" ;
+    sh:message "Expected the StorageLocation identifier format." .
+
+stl:SteelGradeIdentifierShape a sh:PropertyShape ;
+    sh:targetClass stl:SteelGrade ;
+    sh:path dcterms:identifier ;
+    sh:pattern "^G[0-9]{4}$" ;
+    sh:message "Expected the SteelGrade identifier format." .
+
+stl:EquipmentIdentifierFamilyShape a sh:NodeShape ;
+    sh:targetClass stl:Equipment ;
+    sh:sparql [
+        sh:message "Crane identifiers are reserved for cranes." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    FILTER (REGEX(STR(?id), "^CR[A-Z][A-Z0-9]{2}[1-9]$"))
+    FILTER NOT EXISTS { $this rdf:type/rdfs:subClassOf* stl:Crane }
+}
+"""
+    ] .
+
+stl:CreatedAtOwnerShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:createdAt ;
+    sh:or ( [ sh:class stl:MaterialPiece ] [ sh:class stl:Sample ] [ sh:class stl:Heat ]
+        [ sh:class stl:CastSequence ] [ sh:class stl:SalesOrder ] [ sh:class stl:SalesOrderLine ]
+        [ sh:class stl:Plan ] [ sh:class stl:InspectionLot ] [ sh:class stl:QualityDisposition ]
+        [ sh:class stl:MillCertificate ] [ sh:class stl:Shipment ] ) ;
+    sh:message "Use the creation instant on a physical item or a business document." .
+
+stl:CreatedAtRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:MaterialPiece, stl:Heat, stl:CastSequence, stl:Sample, stl:InspectionLot,
+        stl:QualityDisposition, stl:MillCertificate, stl:SalesOrder, stl:ProductionOrder, stl:Shipment ;
+    sh:path stl:createdAt ;
+    sh:minCount 1 ;
+    sh:message "A numbered record must state its createdAt." .
+
+stl:CreatedAtSingleShape a sh:PropertyShape ;
+    sh:targetClass stl:MaterialPiece, stl:Heat, stl:CastSequence, stl:Sample, stl:InspectionLot,
+        stl:QualityDisposition, stl:MillCertificate, stl:SalesOrder, stl:ProductionOrder, stl:Shipment ;
+    sh:path stl:createdAt ;
+    sh:maxCount 1 ;
+    sh:message "A record has only one createdAt." .
+
+stl:PieceCreationTimeShape a sh:NodeShape ;
+    sh:targetClass stl:MaterialPiece ;
+    sh:sparql [
+        sh:message "The piece must have a producing operation whose end time equals its creation time." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:createdAt ?created .
+    OPTIONAL {
+        $this stl:producedBy ?operation .
+        OPTIONAL { ?operation stl:actualEndAt ?end }
+    }
+    FILTER (!BOUND(?end) || ?end != ?created)
+}
+"""
+    ] .
+
+stl:SerialNumberRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:Heat, stl:CastSequence, stl:HotRolledCoil, stl:FullHardCoil, stl:AnnealedCoil,
+        stl:GalvanizedCoil, stl:RecoiledCoil, stl:Package, stl:Sample, stl:InspectionLot,
+        stl:QualityDisposition, stl:MillCertificate, stl:SalesOrder, stl:ProductionOrder, stl:Shipment,
+        stl:SteelGrade ;
+    sh:path stl:serialNumber ;
+    sh:minCount 1 ;
+    sh:message "A numbered record must state its serialNumber." .
+
+stl:SerialNumberSingleShape a sh:PropertyShape ;
+    sh:targetClass stl:Heat, stl:CastSequence, stl:HotRolledCoil, stl:FullHardCoil, stl:AnnealedCoil,
+        stl:GalvanizedCoil, stl:RecoiledCoil, stl:Package, stl:Sample, stl:InspectionLot,
+        stl:QualityDisposition, stl:MillCertificate, stl:SalesOrder, stl:ProductionOrder, stl:Shipment,
+        stl:SteelGrade ;
+    sh:path stl:serialNumber ;
+    sh:maxCount 1 ;
+    sh:message "A record has only one serialNumber." .
+
+stl:LineNumberRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:SalesOrderLine ;
+    sh:path stl:lineNumber ;
+    sh:minCount 1 ;
+    sh:message "A numbered record must state its lineNumber." .
+
+stl:LineNumberSingleShape a sh:PropertyShape ;
+    sh:targetClass stl:SalesOrderLine ;
+    sh:path stl:lineNumber ;
+    sh:maxCount 1 ;
+    sh:message "A record has only one lineNumber." .
+
+stl:IdentifierYearShape a sh:NodeShape ;
+    sh:targetClass stl:Heat, stl:CastSequence, stl:HotRolledCoil, stl:FullHardCoil, stl:AnnealedCoil,
+        stl:GalvanizedCoil, stl:RecoiledCoil, stl:Package, stl:Sample, stl:InspectionLot,
+        stl:QualityDisposition, stl:MillCertificate, stl:SalesOrder, stl:ProductionOrder, stl:Shipment ;
+    sh:sparql [
+        sh:message "The year segment must match the creation instant at UTC+08:00." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id ; stl:createdAt ?instant .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^(H[1-9][0-9]{7}|Q[1-9][0-9]{6}|R[1-9][0-9]{8}|C(PL|CA|CG|RC)[1-9][0-9]{8}|[PT][0-9]{9}|[LNZDWF][0-9]{8})$")) && DATATYPE(?instant) = xsd:dateTime)
+    FILTER (REGEX(STR(?instant), "(Z|[+-][0-9]{2}:[0-9]{2})$"))
+    BIND(IF(STRSTARTS(?id, "C"), 5,
+            IF(SUBSTR(?id, 1, 1) IN ("H", "Q", "R"), 3, 2)) AS ?yearStart)
+    BIND(YEAR(?instant) AS ?year)
+    BIND(xsd:dateTime(CONCAT(STR(?year), "-01-01T00:00:00+08:00")) AS ?start)
+    BIND(xsd:dateTime(CONCAT(STR(?year + 1), "-01-01T00:00:00+08:00")) AS ?next)
+    BIND(IF(?instant < ?start, ?year - 1, IF(?instant >= ?next, ?year + 1, ?year)) AS ?localYear)
+    FILTER (SUBSTR(?id, ?yearStart, 2) != SUBSTR(STR(?localYear), 3, 2))
+}
+"""
+    ] .
+
+stl:IdentifierSerialShape a sh:NodeShape ;
+    sh:targetClass stl:Heat, stl:CastSequence, stl:HotRolledCoil, stl:FullHardCoil, stl:AnnealedCoil,
+        stl:GalvanizedCoil, stl:RecoiledCoil, stl:Package, stl:Sample, stl:InspectionLot,
+        stl:QualityDisposition, stl:MillCertificate, stl:SalesOrder, stl:ProductionOrder, stl:Shipment,
+        stl:SteelGrade ;
+    sh:sparql [
+        sh:message "The serial segment must equal the explicit serial number." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id ; stl:serialNumber ?number .
+    FILTER (((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^(H[1-9][0-9]{7}|Q[1-9][0-9]{6}|R[1-9][0-9]{8}|C(PL|CA|CG|RC)[1-9][0-9]{8}|[PT][0-9]{9}|[LNZDWF][0-9]{8})$")) || (DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^G[0-9]{4}$"))) && DATATYPE(?number) = xsd:positiveInteger)
+    BIND(IF(STRSTARTS(?id, "C"), 5,
+            IF(SUBSTR(?id, 1, 1) IN ("H", "Q", "R"), 3, 2)) AS ?yearStart)
+    BIND(IF(STRSTARTS(?id, "G"), 2, ?yearStart + 2) AS ?serialStart)
+    FILTER (xsd:integer(SUBSTR(?id, ?serialStart)) != ?number)
+}
+"""
+    ] .
+
+stl:HeatFurnaceShape a sh:NodeShape ;
+    sh:targetClass stl:Heat ;
+    sh:sparql [
+        sh:message "The furnace ordinal differs from the heat identifier." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:producedOnFurnace/stl:unitNumber ?number .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^H[1-9][0-9]{7}$")))
+    FILTER (DATATYPE(?number) = xsd:positiveInteger && xsd:integer(SUBSTR(?id, 2, 1)) != ?number)
+}
+"""
+    ] .
+
+stl:CasterNumberShape a sh:NodeShape ;
+    sh:targetClass stl:CastSequence ;
+    sh:sparql [
+        sh:message "The caster ordinal differs from the cast identifier." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:castOn/stl:unitNumber ?number .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^Q[1-9][0-9]{6}$")))
+    FILTER (DATATYPE(?number) = xsd:positiveInteger && xsd:integer(SUBSTR(?id, 2, 1)) != ?number)
+}
+"""
+    ] .
+
+stl:SlabHeatShape a sh:NodeShape ;
+    sh:targetClass stl:Slab ;
+    sh:sparql [
+        sh:message "The slab must carry its numbering heat's suffix." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:numberingHeat/dcterms:identifier ?parent .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^S[1-9][0-9]{7}[1-9][0-9]{2}$")))
+    FILTER ((DATATYPE(?parent) = xsd:string && REGEX(STR(?parent), "^H[1-9][0-9]{7}$")) && SUBSTR(?id, 2, 8) != SUBSTR(?parent, 2, 8))
+}
+"""
+    ] .
+
+stl:SlabStrandShape a sh:NodeShape ;
+    sh:targetClass stl:Slab ;
+    sh:sparql [
+        sh:message "The strand segment differs from the recorded strand." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:strandNumber ?number .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^S[1-9][0-9]{7}[1-9][0-9]{2}$")))
+    FILTER (DATATYPE(?number) = xsd:positiveInteger && xsd:integer(SUBSTR(?id, 10, 1)) != ?number)
+}
+"""
+    ] .
+
+stl:SlabSequenceShape a sh:NodeShape ;
+    sh:targetClass stl:Slab ;
+    sh:sparql [
+        sh:message "The slab sequence segment differs from the recorded strand sequence." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:sequenceInStrand ?number .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^S[1-9][0-9]{7}[1-9][0-9]{2}$")))
+    FILTER (DATATYPE(?number) = xsd:positiveInteger && xsd:integer(SUBSTR(?id, 11, 2)) != ?number)
+}
+"""
+    ] .
+
+stl:HotMillNumberShape a sh:NodeShape ;
+    sh:targetClass stl:HotRolledCoil ;
+    sh:sparql [
+        sh:message "The hot mill ordinal differs from the production unit segment." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:producedBy/stl:performedOn/stl:unitNumber ?number .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^R[1-9][0-9]{8}$")))
+    FILTER (DATATYPE(?number) = xsd:positiveInteger && xsd:integer(SUBSTR(?id, 2, 1)) != ?number)
+}
+"""
+    ] .
+
+stl:ColdMillSegmentShape a sh:NodeShape ;
+    sh:targetClass stl:FullHardCoil, stl:AnnealedCoil, stl:GalvanizedCoil, stl:RecoiledCoil ;
+    sh:sparql [
+        sh:message "The cold line segment or ordinal differs from the producing equipment." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:producedBy/stl:performedOn ?machine .
+    OPTIONAL { ?machine stl:unitNumber ?number }
+    OPTIONAL {
+        ?machine stl:unitType ?type .
+        ?type skos:inScheme <https://w3id.org/ontology-platform/steel/code/unit-type> .
+    }
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^C(PL|CA|CG|RC)[1-9][0-9]{8}$")))
+    FILTER ((BOUND(?number) && DATATYPE(?number) = xsd:positiveInteger && xsd:integer(SUBSTR(?id, 4, 1)) != ?number)
+            || (BOUND(?type) && NOT EXISTS {
+                ?type skos:notation ?segment .
+                FILTER (DATATYPE(?segment) = stl:LineSegmentCode && STR(?segment) = SUBSTR(?id, 2, 2))
+            }))
+}
+"""
+    ] .
+
+stl:EquipmentOrdinalShape a sh:NodeShape ;
+    sh:targetClass stl:Equipment ;
+    sh:sparql [
+        sh:message "The suffix differs from the equipment ordinal." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:unitNumber ?number .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^((BOF|EAF|LF|RH|CC|HSM|PLTCM|CAL|CGL|RCL|PCK)[1-9]|CR[A-Z][A-Z0-9]{2}[1-9])$")))
+    FILTER (DATATYPE(?number) = xsd:positiveInteger && xsd:integer(SUBSTR(?id, STRLEN(?id), 1)) != ?number)
+}
+"""
+    ] .
+
+stl:EquipmentTypeShape a sh:NodeShape ;
+    sh:targetClass stl:Equipment ;
+    sh:sparql [
+        sh:message "The machine identifier differs from the unit type." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:unitType/skos:notation ?typeCode .
+    FILTER (DATATYPE(?typeCode) = stl:UnitTypeCode)
+    FILTER NOT EXISTS { $this rdf:type/rdfs:subClassOf* stl:Crane }
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^(BOF|EAF|LF|RH|CC|HSM|PLTCM|CAL|CGL|RCL|PCK)[1-9]$")))
+    FILTER (SUBSTR(?id, 1, STRLEN(?id) - 1) != STR(?typeCode))
+}
+"""
+    ] .
+
+stl:CraneAreaShape a sh:NodeShape ;
+    sh:targetClass stl:Crane ;
+    sh:sparql [
+        sh:message "The crane identifier must identify its storage area." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:locatedIn/dcterms:identifier ?area .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^CR[A-Z][A-Z0-9]{2}[1-9]$")))
+    FILTER (REGEX(STR(?area), "^[A-Z][A-Z0-9]{2}$") && SUBSTR(?id, 3, 3) != STR(?area))
+}
+"""
+    ] .
+
+stl:LocationAreaShape a sh:NodeShape ;
+    sh:targetClass stl:StorageLocation ;
+    sh:sparql [
+        sh:message "The location prefix differs from its storage area." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:locatedIn/dcterms:identifier ?area .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^[A-Z][A-Z0-9]{2}-[0-9]{5}$")))
+    FILTER (REGEX(STR(?area), "^[A-Z][A-Z0-9]{2}$") && SUBSTR(?id, 1, 3) != STR(?area))
+}
+"""
+    ] .
+
+stl:LocationRowShape a sh:NodeShape ;
+    sh:targetClass stl:StorageLocation ;
+    sh:sparql [
+        sh:message "The row segment differs from the recorded coordinate." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:row ?number .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^[A-Z][A-Z0-9]{2}-[0-9]{5}$")))
+    FILTER (DATATYPE(?number) = xsd:positiveInteger && ?number != xsd:integer(SUBSTR(?id, 5, 2)))
+}
+"""
+    ] .
+
+stl:LocationColumnShape a sh:NodeShape ;
+    sh:targetClass stl:StorageLocation ;
+    sh:sparql [
+        sh:message "The column segment differs from the recorded coordinate." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:column ?number .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^[A-Z][A-Z0-9]{2}-[0-9]{5}$")))
+    FILTER (DATATYPE(?number) = xsd:positiveInteger && ?number != xsd:integer(SUBSTR(?id, 7, 2)))
+}
+"""
+    ] .
+
+stl:LocationTierShape a sh:NodeShape ;
+    sh:targetClass stl:StorageLocation ;
+    sh:sparql [
+        sh:message "The tier segment differs from the recorded coordinate." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:tier ?number .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^[A-Z][A-Z0-9]{2}-[0-9]{5}$")))
+    FILTER (DATATYPE(?number) = xsd:positiveInteger && ?number != xsd:integer(SUBSTR(?id, 9, 1)))
+}
+"""
+    ] .
+
+stl:OrderLineParentShape a sh:NodeShape ;
+    sh:targetClass stl:SalesOrderLine ;
+    sh:sparql [
+        sh:message "The order line prefix differs from the sales order." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:partOf/dcterms:identifier ?parent .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^D[0-9]{8}-[0-9]{3}$")))
+    FILTER ((DATATYPE(?parent) = xsd:string && REGEX(STR(?parent), "^D[0-9]{8}$")) && SUBSTR(?id, 1, 9) != STR(?parent))
+}
+"""
+    ] .
+
+stl:OrderLineNumberShape a sh:NodeShape ;
+    sh:targetClass stl:SalesOrderLine ;
+    sh:sparql [
+        sh:message "The order line suffix differs from the line number." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this dcterms:identifier ?id .
+    $this stl:lineNumber ?number .
+    FILTER ((DATATYPE(?id) = xsd:string && REGEX(STR(?id), "^D[0-9]{8}-[0-9]{3}$")))
+    FILTER (DATATYPE(?number) = xsd:positiveInteger && xsd:integer(SUBSTR(?id, 11, 3)) != ?number)
+}
+"""
+    ] .
+
+# Required facts behind readable identifier segments
+
+
+stl:FurnaceFactShape a sh:PropertyShape ;
+    sh:targetClass stl:Heat ;
+    sh:path stl:producedOnFurnace ;
+    sh:minCount 1 ;
+    sh:message "State the Furnace fact carried by the identifier." .
+
+stl:CasterFactShape a sh:PropertyShape ;
+    sh:targetClass stl:CastSequence ;
+    sh:path stl:castOn ;
+    sh:minCount 1 ;
+    sh:message "State the Caster fact carried by the identifier." .
+
+stl:StrandFactShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path stl:strandNumber ;
+    sh:minCount 1 ;
+    sh:message "State the Strand fact carried by the identifier." .
+
+stl:StrandSequenceFactShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path stl:sequenceInStrand ;
+    sh:minCount 1 ;
+    sh:message "State the StrandSequence fact carried by the identifier." .
+
+stl:ProductionUnitFactShape a sh:PropertyShape ;
+    sh:targetClass stl:HotRolledCoil, stl:FullHardCoil, stl:AnnealedCoil, stl:GalvanizedCoil,
+        stl:RecoiledCoil ;
+    sh:path ( stl:producedBy stl:performedOn ) ;
+    sh:minCount 1 ;
+    sh:message "State the ProductionUnit fact carried by the identifier." .
+
+stl:EquipmentNumberFactShape a sh:PropertyShape ;
+    sh:targetClass stl:Equipment ;
+    sh:path stl:unitNumber ;
+    sh:minCount 1 ;
+    sh:message "State the EquipmentNumber fact carried by the identifier." .
+
+stl:StorageAreaFactShape a sh:PropertyShape ;
+    sh:targetClass stl:Crane, stl:StorageLocation ;
+    sh:path stl:locatedIn ;
+    sh:minCount 1 ;
+    sh:message "State the StorageArea fact carried by the identifier." .
+
+stl:LocationRowFactShape a sh:PropertyShape ;
+    sh:targetClass stl:StorageLocation ;
+    sh:path stl:row ;
+    sh:minCount 1 ;
+    sh:message "State the LocationRow fact carried by the identifier." .
+
+stl:LocationColumnFactShape a sh:PropertyShape ;
+    sh:targetClass stl:StorageLocation ;
+    sh:path stl:column ;
+    sh:minCount 1 ;
+    sh:message "State the LocationColumn fact carried by the identifier." .
+
+stl:LocationTierFactShape a sh:PropertyShape ;
+    sh:targetClass stl:StorageLocation ;
+    sh:path stl:tier ;
+    sh:minCount 1 ;
+    sh:message "State the LocationTier fact carried by the identifier." .
+
+stl:ParentOrderFactShape a sh:PropertyShape ;
+    sh:targetClass stl:SalesOrderLine ;
+    sh:path stl:partOf ;
+    sh:minCount 1 ;
+    sh:message "State the ParentOrder fact carried by the identifier." .
+
+stl:MachineTypeFactShape a sh:NodeShape ;
+    sh:targetClass stl:Equipment ;
+    sh:sparql [
+        sh:message "Ordinary production equipment must state its unit type." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    FILTER NOT EXISTS { $this rdf:type/rdfs:subClassOf* stl:Crane }
+    FILTER NOT EXISTS { $this stl:unitType ?type }
+}
+"""
+    ] .
+
+# Typed targets of identity and production references
+
+
+stl:SlabNumberingHeatClassShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path stl:numberingHeat ;
+    sh:class stl:Heat ;
+    sh:message "The slab reference must resolve to a typed heat." .
+
+stl:SlabSourceHeatClassShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path stl:sourceHeat ;
+    sh:class stl:Heat ;
+    sh:message "The slab reference must resolve to a typed heat." .
+
+stl:HeatFurnaceClassShape a sh:PropertyShape ;
+    sh:targetClass stl:Heat ;
+    sh:path stl:producedOnFurnace ;
+    sh:class stl:Equipment ;
+    sh:message "The furnace reference must resolve to equipment." .
+
+stl:HeatFurnaceTypeShape a sh:NodeShape ;
+    sh:targetClass stl:Heat ;
+    sh:sparql [
+        sh:message "The heat must be produced on a BOF or EAF." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:producedOnFurnace ?furnace .
+    ?furnace rdf:type/rdfs:subClassOf* stl:Equipment .
+    OPTIONAL { ?furnace stl:unitType ?type }
+    FILTER (!BOUND(?type) || ?type NOT IN (unitType:BOF, unitType:EAF))
+}
+"""
+    ] .
+
+stl:CasterClassShape a sh:PropertyShape ;
+    sh:targetClass stl:CastSequence ;
+    sh:path stl:castOn ;
+    sh:class stl:Equipment ;
+    sh:message "The cast must reference a typed caster." .
+
+stl:CasterTypeShape a sh:NodeShape ;
+    sh:targetClass stl:CastSequence ;
+    sh:sparql [
+        sh:message "The casting sequence must use equipment with unit type CC." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:castOn ?caster .
+    ?caster rdf:type/rdfs:subClassOf* stl:Equipment .
+    OPTIONAL { ?caster stl:unitType ?type }
+    FILTER (!BOUND(?type) || !sameTerm(?type, unitType:CC))
+}
+"""
+    ] .
+
+stl:CoilOperationClassShape a sh:PropertyShape ;
+    sh:targetClass stl:HotRolledCoil, stl:FullHardCoil, stl:AnnealedCoil, stl:GalvanizedCoil,
+        stl:RecoiledCoil ;
+    sh:path stl:producedBy ;
+    sh:class stl:Operation ;
+    sh:message "The producing record must be an operation." .
+
+stl:CoilEquipmentClassShape a sh:PropertyShape ;
+    sh:targetClass stl:HotRolledCoil, stl:FullHardCoil, stl:AnnealedCoil, stl:GalvanizedCoil,
+        stl:RecoiledCoil ;
+    sh:path ( stl:producedBy stl:performedOn ) ;
+    sh:class stl:Equipment ;
+    sh:message "The producing operation must identify a typed item of equipment." .
+
+stl:HotMillTypeShape a sh:NodeShape ;
+    sh:targetClass stl:HotRolledCoil ;
+    sh:sparql [
+        sh:message "A hot rolled coil must identify a hot strip mill as its production equipment." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:producedBy/stl:performedOn ?machine .
+    ?machine rdf:type/rdfs:subClassOf* stl:Equipment .
+    FILTER NOT EXISTS { ?machine stl:unitType <https://w3id.org/ontology-platform/steel/code/unit-type/HSM> }
+}
+"""
+    ] .
+
+# Slab identity, cutting and melt genealogy
+
+
+stl:SlabNumberingHeatRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path stl:numberingHeat ;
+    sh:minCount 1 ;
+    sh:message "The slab must state its numberingHeat relationship." .
+
+stl:SlabNumberingHeatLimitShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path stl:numberingHeat ;
+    sh:maxCount 1 ;
+    sh:message "The slab exceeds the permitted number of numberingHeat relationships." .
+
+stl:SlabSourceHeatRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path stl:sourceHeat ;
+    sh:minCount 1 ;
+    sh:message "The slab must state its sourceHeat relationship." .
+
+stl:SlabSourceHeatLimitShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path stl:sourceHeat ;
+    sh:maxCount 2 ;
+    sh:message "The slab exceeds the permitted number of sourceHeat relationships." .
+
+stl:SlabProducedByRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path stl:producedBy ;
+    sh:minCount 1 ;
+    sh:message "The slab must state its producedBy relationship." .
+
+stl:SlabProducedByLimitShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path stl:producedBy ;
+    sh:maxCount 1 ;
+    sh:message "The slab exceeds the permitted number of producedBy relationships." .
+
+stl:SlabCuttingShape a sh:PropertyShape ;
+    sh:targetClass stl:Slab ;
+    sh:path stl:producedBy ;
+    sh:class stl:Cutting ;
+    sh:message "The slab must identify its cutting execution." .
+
+stl:SourceContributionShape a sh:NodeShape ;
+    sh:targetClass stl:Slab ;
+    sh:sparql [
+        sh:message "Each source of a mixed slab must have a heat contribution." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:sourceHeat ?first, ?second .
+    FILTER (?first != ?second)
+    FILTER NOT EXISTS { $this stl:sourceHeat ?third . FILTER (?third != ?first && ?third != ?second) }
+    FILTER NOT EXISTS {
+        $this stl:contribution ?entry .
+        ?entry rdf:type/rdfs:subClassOf* stl:HeatContribution ; stl:contributedHeat ?first .
+    }
+}
+"""
+    ] .
+
+stl:ContributionSourceShape a sh:NodeShape ;
+    sh:targetClass stl:Slab ;
+    sh:sparql [
+        sh:message "A contribution must refer to a declared source heat of its slab." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:contribution/stl:contributedHeat ?heat .
+    FILTER NOT EXISTS { $this stl:sourceHeat ?heat }
+}
+"""
+    ] .
+
+stl:ContributionContributedHeatRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:HeatContribution ;
+    sh:path stl:contributedHeat ;
+    sh:minCount 1 ;
+    sh:message "Each contribution must record contributedHeat." .
+
+stl:ContributionContributedHeatSingleShape a sh:PropertyShape ;
+    sh:targetClass stl:HeatContribution ;
+    sh:path stl:contributedHeat ;
+    sh:maxCount 1 ;
+    sh:message "Each contribution has only one contributedHeat." .
+
+stl:ContributionEvidenceLevelRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:HeatContribution ;
+    sh:path stl:evidenceLevel ;
+    sh:minCount 1 ;
+    sh:message "Each contribution must record evidenceLevel." .
+
+stl:ContributionEvidenceLevelSingleShape a sh:PropertyShape ;
+    sh:targetClass stl:HeatContribution ;
+    sh:path stl:evidenceLevel ;
+    sh:maxCount 1 ;
+    sh:message "Each contribution has only one evidenceLevel." .
+
+stl:ShareBasisRequiredShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:share ;
+    sh:sparql [
+        sh:message "A reported share must identify its length or mass basis." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    FILTER NOT EXISTS { $this stl:shareBasis ?basis }
+}
+"""
+    ] .
+
+stl:ShareBasisCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:shareBasis ;
+    sh:sparql [
+        sh:message "The shareBasis value must belong to the share-basis scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:shareBasis ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/share-basis> }
+}
+"""
+    ] .
+
+stl:UnknownContributionShareShape a sh:NodeShape ;
+    sh:targetClass stl:HeatContribution ;
+    sh:sparql [
+        sh:message "An unknown contribution has no numeric share." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:evidenceLevel evidence:UNKNOWN ; stl:share ?share .
+}
+"""
+    ] .
+
+# Temporal domains, dates and numeric representation
+
+
+stl:PlanAttributesShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:plannedLength, stl:plannedStartAt, stl:plannedEndAt, stl:cuttingSequence,
+        stl:destination ;
+    sh:class stl:Plan ;
+    sh:message "Planned lengths, cut sequences, destinations and instants belong to plans." .
+
+stl:ActualAttributesShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:actualStartAt, stl:actualEndAt, stl:occurredAt ;
+    sh:class stl:Event ;
+    sh:message "Actual event instants belong to an explicitly typed event or event subclass." .
+
+stl:ActualLengthOwnerShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:actualLength ;
+    sh:or ( [ sh:class stl:Cutting ] [ sh:class stl:Coil ] ) ;
+    sh:message "Record actual length on a cutting operation or a coil." .
+
+stl:PlanEventDisjointShape a sh:NodeShape ;
+    sh:targetClass stl:Plan ;
+    sh:sparql [
+        sh:message "A plan and its execution must be distinct records." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this rdf:type/rdfs:subClassOf* stl:Event .
+}
+"""
+    ] .
+
+stl:InstantDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:createdAt, stl:plannedStartAt, stl:plannedEndAt, stl:actualStartAt,
+        stl:actualEndAt, stl:occurredAt, stl:sampledAt, stl:resultAt, stl:recordedAt ;
+    sh:path [ sh:alternativePath ( stl:createdAt stl:plannedStartAt stl:plannedEndAt stl:actualStartAt stl:actualEndAt stl:occurredAt stl:sampledAt stl:resultAt stl:recordedAt ) ] ;
+    sh:datatype xsd:dateTime ;
+    sh:message "Use xsd:dateTime for time instants." .
+
+stl:InstantTimezoneShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:createdAt, stl:plannedStartAt, stl:plannedEndAt, stl:actualStartAt,
+        stl:actualEndAt, stl:occurredAt, stl:sampledAt, stl:resultAt, stl:recordedAt ;
+    sh:sparql [
+        sh:message "The instant must state its UTC offset or Z." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this ?path ?value WHERE {
+    $this ?path ?value .
+    FILTER (?path IN (stl:createdAt, stl:plannedStartAt, stl:plannedEndAt, stl:actualStartAt, stl:actualEndAt, stl:occurredAt, stl:sampledAt, stl:resultAt, stl:recordedAt) && DATATYPE(?value) = xsd:dateTime)
+    FILTER (!REGEX(STR(?value), "(Z|[+-][0-9]{2}:[0-9]{2})$"))
+}
+"""
+    ] .
+
+stl:DateDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:issuedOn, stl:validUntilOn ;
+    sh:path [ sh:alternativePath ( stl:issuedOn stl:validUntilOn ) ] ;
+    sh:datatype xsd:date ;
+    sh:message "Use xsd:date for calendar dates." .
+
+stl:UnitNumberDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:unitNumber ;
+    sh:path stl:unitNumber ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for unitNumber." .
+
+stl:SerialNumberDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:serialNumber ;
+    sh:path stl:serialNumber ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for serialNumber." .
+
+stl:LineNumberDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:lineNumber ;
+    sh:path stl:lineNumber ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for lineNumber." .
+
+stl:StrandNumberDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:strandNumber ;
+    sh:path stl:strandNumber ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for strandNumber." .
+
+stl:SequenceInStrandDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:sequenceInStrand ;
+    sh:path stl:sequenceInStrand ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for sequenceInStrand." .
+
+stl:StrandCountDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:strandCount ;
+    sh:path stl:strandCount ;
+    sh:datatype xsd:nonNegativeInteger ;
+    sh:message "Use xsd:nonNegativeInteger for strandCount." .
+
+stl:CuttingSequenceDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:cuttingSequence ;
+    sh:path stl:cuttingSequence ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for cuttingSequence." .
+
+stl:PositionInHeatDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:positionInHeat ;
+    sh:path stl:positionInHeat ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for positionInHeat." .
+
+stl:HeatPositionInSequenceDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:heatPositionInSequence ;
+    sh:path stl:heatPositionInSequence ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for the heat ordinal in the cast." .
+
+stl:PositionInSequenceDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:positionInSequence ;
+    sh:path stl:positionInSequence ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for positionInSequence." .
+
+stl:ApplicableQuantityDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:applicableQuantity ;
+    sh:path stl:applicableQuantity ;
+    sh:datatype xsd:nonNegativeInteger ;
+    sh:message "Use xsd:nonNegativeInteger for applicableQuantity." .
+
+stl:RowDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:row ;
+    sh:path stl:row ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for row." .
+
+stl:ColumnDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:column ;
+    sh:path stl:column ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for column." .
+
+stl:TierDatatypeShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:tier ;
+    sh:path stl:tier ;
+    sh:datatype xsd:positiveInteger ;
+    sh:message "Use xsd:positiveInteger for tier." .
+
+stl:PlannedLengthDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:plannedLength ;
+    sh:path stl:plannedLength ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for plannedLength." .
+
+stl:ActualLengthDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:actualLength ;
+    sh:path stl:actualLength ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for actualLength." .
+
+stl:SegmentBoundsShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:startLength ;
+    sh:path stl:startLength ;
+    sh:lessThanOrEquals stl:endLength ;
+    sh:message "The start of a source interval must not exceed its end." .
+
+stl:SegmentStartRequiredShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:endLength ;
+    sh:path stl:startLength ;
+    sh:minCount 1 ;
+    sh:message "A source interval with an end must also have a start." .
+
+stl:SegmentEndRequiredShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:startLength ;
+    sh:path stl:endLength ;
+    sh:minCount 1 ;
+    sh:message "A source interval with a start must also have an end." .
+
+stl:StartLengthDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:startLength ;
+    sh:path stl:startLength ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for startLength." .
+
+stl:EndLengthDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:endLength ;
+    sh:path stl:endLength ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for endLength." .
+
+stl:ThicknessDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:thickness ;
+    sh:path stl:thickness ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for thickness." .
+
+stl:WidthDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:width ;
+    sh:path stl:width ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for width." .
+
+stl:NetMassDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:netMass ;
+    sh:path stl:netMass ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for netMass." .
+
+stl:GrossMassDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:grossMass ;
+    sh:path stl:grossMass ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for grossMass." .
+
+stl:TheoreticalMassDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:theoreticalMass ;
+    sh:path stl:theoreticalMass ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for theoreticalMass." .
+
+stl:TemperatureDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:temperature ;
+    sh:path stl:temperature ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for temperature." .
+
+stl:MassFractionDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:massFraction ;
+    sh:path stl:massFraction ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for massFraction." .
+
+stl:ActiveOxygenDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:activeOxygen ;
+    sh:path stl:activeOxygen ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for activeOxygen." .
+
+stl:ElongationAfterFractureDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:elongationAfterFracture ;
+    sh:path stl:elongationAfterFracture ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for elongationAfterFracture." .
+
+stl:LowerYieldStrengthDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:lowerYieldStrength ;
+    sh:path stl:lowerYieldStrength ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for lowerYieldStrength." .
+
+stl:UpperYieldStrengthDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:upperYieldStrength ;
+    sh:path stl:upperYieldStrength ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for upperYieldStrength." .
+
+stl:LowerLimitDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:lowerLimit ;
+    sh:path stl:lowerLimit ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for lowerLimit." .
+
+stl:UpperLimitDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:upperLimit ;
+    sh:path stl:upperLimit ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for upperLimit." .
+
+stl:TensileStrengthDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:tensileStrength ;
+    sh:path stl:tensileStrength ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for tensileStrength." .
+
+stl:ImpactEnergyDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:impactEnergy ;
+    sh:path stl:impactEnergy ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for impactEnergy." .
+
+stl:CoatingMassDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:coatingMass ;
+    sh:path stl:coatingMass ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for coatingMass." .
+
+stl:MinimumCoatingMassDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:minimumCoatingMass ;
+    sh:path stl:minimumCoatingMass ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for minimumCoatingMass." .
+
+stl:CastingSpeedDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:castingSpeed ;
+    sh:path stl:castingSpeed ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for castingSpeed." .
+
+stl:ShareDecimalShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:share ;
+    sh:path stl:share ;
+    sh:datatype xsd:decimal ;
+    sh:message "Use an xsd:decimal value for share." .
+
+stl:NumericUnitShape a sh:NodeShape ;
+    sh:targetSubjectsOf rdfs:range ;
+    sh:sparql [
+        sh:message "A quantity needs one QUDT unit. Counts use unit:NUM." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this rdfs:range ?datatype .
+    FILTER (?datatype IN (xsd:decimal, xsd:nonNegativeInteger))
+    FILTER (
+        NOT EXISTS {
+            $this stl:unit ?iri .
+            FILTER (isIRI(?iri) && STRSTARTS(STR(?iri), "http://qudt.org/vocab/unit/")
+                    && STRLEN(STRAFTER(STR(?iri), "http://qudt.org/vocab/unit/")) > 0
+                    && (?datatype != xsd:nonNegativeInteger || ?iri = unit:NUM))
+        }
+        || EXISTS { $this stl:unit ?a, ?b . FILTER (!sameTerm(?a, ?b)) }
+    )
+}
+"""
+    ] .
+
+stl:NumericQuantityKindShape a sh:NodeShape ;
+    sh:targetSubjectsOf rdfs:range ;
+    sh:sparql [
+        sh:message "A quantity needs one QUDT quantity kind. Counts use quantitykind:Count." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this rdfs:range ?datatype .
+    FILTER (?datatype IN (xsd:decimal, xsd:nonNegativeInteger))
+    FILTER (
+        NOT EXISTS {
+            $this stl:quantityKind ?iri .
+            FILTER (isIRI(?iri) && STRSTARTS(STR(?iri), "http://qudt.org/vocab/quantitykind/")
+                    && STRLEN(STRAFTER(STR(?iri), "http://qudt.org/vocab/quantitykind/")) > 0
+                    && (?datatype != xsd:nonNegativeInteger || ?iri = quantitykind:Count))
+        }
+        || EXISTS { $this stl:quantityKind ?a, ?b . FILTER (!sameTerm(?a, ?b)) }
+    )
+}
+"""
+    ] .
+
+# Code references, chemical results and conditional release
+
+
+stl:UnitTypeCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:unitType ;
+    sh:sparql [
+        sh:message "The unitType value must be a concept in the unit-type scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:unitType ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/unit-type> }
+}
+"""
+    ] .
+
+stl:DispositionTypeCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:dispositionType ;
+    sh:sparql [
+        sh:message "The dispositionType value must be a concept in the disposition-type scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:dispositionType ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/disposition-type> }
+}
+"""
+    ] .
+
+stl:JudgementResultCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:judgementResult ;
+    sh:sparql [
+        sh:message "The judgementResult value must be a concept in the judgement-result scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:judgementResult ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/judgement-result> }
+}
+"""
+    ] .
+
+stl:HeatAnalysisLimitShape a sh:NodeShape ;
+    sh:targetClass stl:Heat ;
+    sh:sparql [
+        sh:message "Only one distinct heat analysis may represent the heat." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT $this WHERE {
+    ?analysis rdf:type/rdfs:subClassOf* stl:ChemicalAnalysis ;
+        stl:analysisType analysis:HEAT ;
+        stl:testedSample/stl:sampleOf $this .
+}
+GROUP BY $this
+HAVING (COUNT(DISTINCT ?analysis) > 1)
+"""
+    ] .
+
+stl:HeatAnalysisSampleSourceShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:analysisType ;
+    sh:sparql [
+        sh:message "A heat analysis needs a tested sample. Every tested sample must come from a heat." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:analysisType analysis:HEAT .
+    OPTIONAL {
+        $this stl:testedSample ?sample .
+        OPTIONAL { ?sample stl:sampleOf ?source }
+    }
+    FILTER (!BOUND(?source) || NOT EXISTS { ?source rdf:type/rdfs:subClassOf* stl:Heat })
+}
+"""
+    ] .
+
+stl:AnalysisTypeCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:analysisType ;
+    sh:sparql [
+        sh:message "The analysisType value must be a concept in the analysis-type scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:analysisType ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/analysis-type> }
+}
+"""
+    ] .
+
+stl:SampleTypeSingleShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:sampleType ;
+    sh:path stl:sampleType ;
+    sh:maxCount 1 ;
+    sh:message "Record at most one sample type per sample." .
+
+stl:SampleTypeCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:sampleType ;
+    sh:sparql [
+        sh:message "The sampleType value must be a concept in the sample-type scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:sampleType ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/sample-type> }
+}
+"""
+    ] .
+
+stl:EvidenceLevelCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:evidenceLevel ;
+    sh:sparql [
+        sh:message "The evidenceLevel value must be a concept in the contribution-evidence scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:evidenceLevel ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/contribution-evidence> }
+}
+"""
+    ] .
+
+stl:InspectionDocumentTypeCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:inspectionDocumentType ;
+    sh:sparql [
+        sh:message "The inspectionDocumentType value must be a concept in the inspection-document-type scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:inspectionDocumentType ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/inspection-document-type> }
+}
+"""
+    ] .
+
+stl:CoatingTypeCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:coatingType ;
+    sh:sparql [
+        sh:message "The coatingType value must be a concept in the coating-type scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:coatingType ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/coating-type> }
+}
+"""
+    ] .
+
+stl:MovementTypeCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:movementType ;
+    sh:sparql [
+        sh:message "The movementType value must be a concept in the movement-event-type scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:movementType ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/movement-event-type> }
+}
+"""
+    ] .
+
+stl:ElementCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:element ;
+    sh:sparql [
+        sh:message "The element value must be a concept in the chemical-element scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:element ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/chemical-element> }
+}
+"""
+    ] .
+
+stl:MeasurementMethodCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:measurementMethod ;
+    sh:sparql [
+        sh:message "The measurementMethod value must belong to the measurement-method scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:measurementMethod ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/measurement-method> }
+}
+"""
+    ] .
+
+stl:MeasurementItemCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:measurementItem ;
+    sh:sparql [
+        sh:message "The measurementItem value must be a concept in the measurement-item scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:measurementItem ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/measurement-item> }
+}
+"""
+    ] .
+
+stl:MeasurementItemValueShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:measurementItem ;
+    sh:sparql [
+        sh:message "Use the value property for the recorded measurement item and no other measured quantity." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:measurementItem ?item .
+    OPTIONAL {
+        $this ?property ?value .
+        FILTER (?property IN (
+            stl:temperature, stl:activeOxygen, stl:tensileStrength, stl:impactEnergy,
+            stl:coatingMass, stl:thickness, stl:width, stl:castingSpeed,
+            stl:lowerYieldStrength, stl:upperYieldStrength, stl:elongationAfterFracture,
+            stl:massFraction, stl:lowerLimit, stl:upperLimit, stl:share, stl:minimumCoatingMass,
+            stl:netMass, stl:grossMass, stl:theoreticalMass,
+            stl:plannedLength, stl:actualLength, stl:startLength, stl:endLength,
+            stl:strandCount, stl:applicableQuantity
+        ))
+    }
+    FILTER (!BOUND(?property) || !(
+        (?item = item:TEMP && ?property = stl:temperature)
+        || (?item = item:OXYACT && ?property = stl:activeOxygen)
+        || (?item = item:TENSILE && ?property = stl:tensileStrength)
+        || (?item = item:IMPACT && ?property = stl:impactEnergy)
+        || (?item = item:COATMASS && ?property = stl:coatingMass)
+        || (?item = item:THICKNESS && ?property = stl:thickness)
+        || (?item = item:WIDTH && ?property = stl:width)
+        || (?item = item:CASTSPEED && ?property = stl:castingSpeed)
+    ))
+}
+"""
+    ] .
+
+stl:DefectTypeCodeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:defectType ;
+    sh:sparql [
+        sh:message "The defectType value must be a concept in the defect-type scheme." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:defectType ?value .
+    FILTER NOT EXISTS { ?value skos:inScheme <https://w3id.org/ontology-platform/steel/code/defect-type> }
+}
+"""
+    ] .
+
+stl:ElementFractionRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:ElementResult ;
+    sh:path stl:massFraction ;
+    sh:minCount 1 ;
+    sh:message "Every element result needs a percentage mass fraction." .
+
+stl:ActiveOxygenOwnerShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:activeOxygen ;
+    sh:class stl:Observation ;
+    sh:message "An active oxygen reading in ppm belongs to an observation." .
+
+stl:ObservationMeasuredObjectRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:Observation ;
+    sh:path stl:measuredObject ;
+    sh:minCount 1 ;
+    sh:message "An observation must identify the measured heat or piece." .
+
+stl:ObservationMeasurementItemRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:Observation ;
+    sh:path stl:measurementItem ;
+    sh:minCount 1 ;
+    sh:message "An observation must identify the measured quantity." .
+
+stl:ObservationMeasuredAtPointRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:Observation ;
+    sh:path stl:measuredAtPoint ;
+    sh:minCount 1 ;
+    sh:message "An observation must identify its measurement point." .
+
+stl:ObservationSampledAtRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:Observation ;
+    sh:path stl:sampledAt ;
+    sh:minCount 1 ;
+    sh:message "An observation must state the sampling time." .
+
+stl:QualityDecisionAssessedObjectRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:QualityDecision ;
+    sh:path stl:assessedObject ;
+    sh:minCount 1 ;
+    sh:message "A quality decision must identify the assessed object." .
+
+stl:QualityDecisionJudgementResultRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:QualityDecision ;
+    sh:path stl:judgementResult ;
+    sh:minCount 1 ;
+    sh:message "A quality decision must state its result." .
+
+stl:QualityDecisionAssessedSpecificationRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:QualityDecision ;
+    sh:path stl:assessedSpecification ;
+    sh:minCount 1 ;
+    sh:message "A quality decision must identify the material specification used for assessment." .
+
+stl:QualityDecisionOccurredAtRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:QualityDecision ;
+    sh:path stl:occurredAt ;
+    sh:minCount 1 ;
+    sh:message "A quality decision must state the decision time." .
+
+stl:MovementEventMovementTypeRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:MovementEvent ;
+    sh:path stl:movementType ;
+    sh:minCount 1 ;
+    sh:message "A movement event must state its movement type." .
+
+stl:MovementEventMovedPieceRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:MovementEvent ;
+    sh:path stl:movedPiece ;
+    sh:minCount 1 ;
+    sh:message "A movement event must identify the moved piece." .
+
+stl:MovementEventOccurredAtRequiredShape a sh:PropertyShape ;
+    sh:targetClass stl:MovementEvent ;
+    sh:path stl:occurredAt ;
+    sh:minCount 1 ;
+    sh:message "A movement event must state when it occurred." .
+
+stl:ConcessionApplicableOrderLineShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:dispositionType ;
+    sh:sparql [
+        sh:message "A concession must state applicableOrderLine." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:dispositionType disposition:CONCESSION .
+    FILTER NOT EXISTS { $this stl:applicableOrderLine ?bound }
+}
+"""
+    ] .
+
+stl:ConcessionApplicableQuantityShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:dispositionType ;
+    sh:sparql [
+        sh:message "A concession must state applicableQuantity." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:dispositionType disposition:CONCESSION .
+    FILTER NOT EXISTS { $this stl:applicableQuantity ?bound }
+}
+"""
+    ] .
+
+stl:ConcessionValidUntilOnShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:dispositionType ;
+    sh:sparql [
+        sh:message "A concession must state validUntilOn." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:dispositionType disposition:CONCESSION .
+    FILTER NOT EXISTS { $this stl:validUntilOn ?bound }
+}
+"""
+    ] .
+
+stl:ConcessionOrderClassShape a sh:PropertyShape ;
+    sh:targetSubjectsOf stl:applicableOrderLine ;
+    sh:path stl:applicableOrderLine ;
+    sh:class stl:SalesOrderLine ;
+    sh:message "The concession scope must identify a sales order line." .
+
+# Fixed units for numeric properties
+
+
+stl:OrdinalMetadataShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:unit, stl:quantityKind ;
+    sh:sparql [
+        sh:message "Ordinals carry neither a unit nor a quantity kind." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this rdfs:subPropertyOf*/rdfs:range xsd:positiveInteger .
+}
+"""
+    ] .
+
+stl:PropertyUnitShape a sh:NodeShape ;
+    sh:targetSubjectsOf stl:unit ;
+    sh:sparql [
+        sh:message "The unit must agree with the quantity's documented storage unit, including on subproperties." ;
+        sh:prefixes <https://w3id.org/ontology-platform/steel/module/shapes> ;
+        sh:select """
+SELECT DISTINCT $this WHERE {
+    $this stl:unit ?unit ; rdfs:subPropertyOf* ?property .
+    FILTER (isIRI(?unit) && STRSTARTS(STR(?unit), "http://qudt.org/vocab/unit/"))
+    FILTER (
+        (?property IN (stl:applicableQuantity, stl:strandCount) && ?unit != unit:NUM)
+        ||     (?property IN (stl:thickness, stl:width) && ?unit != unit:MilliM)
+        ||     (?property IN (stl:startLength, stl:endLength, stl:plannedLength, stl:actualLength) && ?unit != unit:M)
+        ||     (?property IN (stl:grossMass, stl:netMass, stl:theoreticalMass) && ?unit != unit:TONNE)
+        ||     (?property IN (stl:temperature) && ?unit != unit:DEG_C)
+        ||     (?property IN (stl:massFraction, stl:lowerLimit, stl:upperLimit, stl:share, stl:elongationAfterFracture) && ?unit != unit:PERCENT)
+        ||     (?property IN (stl:activeOxygen) && ?unit != unit:PPM)
+        ||     (?unit = unit:PPM && NOT EXISTS { $this rdfs:subPropertyOf* stl:activeOxygen })
+        ||     (?property IN (stl:tensileStrength, stl:lowerYieldStrength, stl:upperYieldStrength) && ?unit != unit:MegaPA)
+        ||     (?property IN (stl:impactEnergy) && ?unit != unit:J)
+        ||     (?property IN (stl:coatingMass, stl:minimumCoatingMass) && ?unit != unit:GM-PER-M2)
+        ||     (?property IN (stl:castingSpeed) && ?unit != unit:M-PER-MIN)
+    )
+}
+"""
+    ] .

@@ -1,0 +1,390 @@
+# Manufacturing identities, orders, equipment, plans, executions and shared quantities.
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<module/core> a owl:Ontology ;
+    owl:versionIRI <module/core/0.1.0> ;
+    owl:versionInfo "0.1.0" ;
+    rdfs:label "制造骨架"@zh, "Manufacturing core"@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:ManufacturingRecord a owl:Class ;
+    rdfs:label "制造记录"@zh, "Manufacturing record"@en ;
+    skos:prefLabel "制造记录"@zh, "Manufacturing record"@en ;
+    skos:definition "记录制造活动中的业务事实、计划或凭证的对象。"@zh,
+        "A record retaining a fact, plan or document associated with manufacturing."@en .
+
+stl:Event a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "事件"@zh, "Event"@en ;
+    skos:prefLabel "事件"@zh, "Event"@en ;
+    skos:definition "在特定时间实际发生并可独立追记的业务活动。"@zh,
+        "An occurrence that can be identified and timed independently."@en .
+
+stl:Operation a owl:Class ;
+    rdfs:subClassOf stl:Event, prov:Activity ;
+    rdfs:label "工序执行"@zh, "Operation"@en ;
+    skos:prefLabel "工序执行"@zh, "Operation"@en ;
+    skos:definition "在生产现场实施的一次加工或作业，可关联多件投入和产出。"@zh,
+        "One execution of a shop-floor process with identifiable inputs and outputs."@en ;
+    dcterms:source <std/iec-62264-2-2026> .
+
+stl:Plan a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "计划"@zh, "Plan"@en ;
+    skos:prefLabel "计划"@zh, "Plan"@en ;
+    skos:definition "约定未来作业的目标、时间或所需资源的记录。"@zh,
+        "A record setting objectives, timing or resources for future work."@en ;
+    owl:disjointWith stl:Event .
+
+stl:MaterialPiece a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "实物件"@zh, "Material piece"@en ;
+    skos:prefLabel "实物件"@zh, "Material piece"@en ;
+    skos:definition "从产生到消耗具有稳定身份且可单独称量或搬运的一件物料。"@zh,
+        "An individually identifiable item of material that can be weighed or moved."@en ;
+    skos:scopeNote "同一实物件可重新分配订单；加工产生新的实物件时另赋编码。"@zh .
+
+stl:Equipment a owl:Class ;
+    rdfs:label "设备"@zh, "Equipment"@en ;
+    skos:prefLabel "设备"@zh, "Equipment"@en ;
+    skos:definition "在生产或搬运作业中可独立识别和调度的物理装置。"@zh,
+        "A physical asset identified and assigned to processing or handling work."@en ;
+    dcterms:source <std/iec-62264-1-2013> .
+
+stl:Location a owl:Class ;
+    rdfs:label "位置"@zh, "Location"@en ;
+    skos:prefLabel "位置"@zh, "Location"@en ;
+    skos:definition "用于识别作业发生处或物料停放处的空间对象。"@zh,
+        "A place identifiable as the site of an operation or material storage."@en .
+
+stl:SalesOrder a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "销售订单"@zh, "Sales order"@en ;
+    skos:prefLabel "销售订单"@zh, "Sales order"@en ;
+    skos:definition "以一份业务编号归集客户订货要求的单据。"@zh,
+        "A commercial document grouping customer requirements under one identifier."@en .
+
+stl:SalesOrderLine a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "订单行"@zh, "Sales order line"@en ;
+    skos:prefLabel "订单行"@zh, "Sales order line"@en ;
+    skos:definition "一份销售订单内能够独立指定规格并分配实物的订货项目。"@zh,
+        "An order item to which a specification and physical pieces can be assigned."@en .
+
+stl:ProductionOrder a owl:Class ;
+    rdfs:subClassOf stl:Plan ;
+    rdfs:label "生产订单"@zh, "Production order"@en ;
+    skos:prefLabel "生产订单"@zh, "Production order"@en ;
+    skos:definition "为满足需求而下达、可由一次或多次工序执行完成的制造计划。"@zh,
+        "An instruction planning the manufacturing work needed to fulfil demand."@en .
+
+stl:SteelGrade a owl:Class ;
+    rdfs:label "内部钢种"@zh, "Internal steel grade"@en ;
+    skos:prefLabel "内部钢种"@zh, "Internal steel grade"@en ;
+    skos:definition "以厂内身份组织生产的一类钢，可与多个标准牌号建立符合关系。"@zh,
+        "An internally identified grade used to organise production across product designations."@en .
+
+stl:StandardGrade a owl:Class ;
+    rdfs:label "标准牌号"@zh, "Standard grade designation"@en ;
+    skos:prefLabel "标准牌号"@zh, "Standard grade designation"@en ;
+    skos:definition "由一个确定版次的产品标准定义并命名的牌号条目。"@zh,
+        "A named grade as defined in one particular edition of a product standard."@en ;
+    skos:scopeNote "相同牌号名称在不同产品标准或版次下分别建条目。"@zh .
+
+stl:StandardEdition a owl:Class ;
+    rdfs:label "标准版次"@zh, "Standard edition"@en ;
+    skos:prefLabel "标准版次"@zh, "Standard edition"@en ;
+    skos:definition "标识特定年份版本并可被订单、试验或证明书引用的标准书目条目。"@zh,
+        "A bibliographic entry identifying a particular edition of a standard."@en .
+
+stl:MaterialSpecification a owl:Class ;
+    rdfs:label "物料规格"@zh, "Material specification"@en ;
+    skos:prefLabel "物料规格"@zh, "Material specification"@en ;
+    skos:definition "限定交付物料的牌号、尺寸或其他验收要求的要求集合。"@zh,
+        "A set of grade, dimensional or other acceptance requirements for material."@en .
+
+stl:ProcessSegment a owl:Class ;
+    rdfs:label "工序定义"@zh, "Process segment"@en ;
+    skos:prefLabel "工序定义"@zh, "Process segment"@en ;
+    skos:definition "描述一类可安排作业的制造步骤，供不同次执行复用。"@zh,
+        "A reusable description of a manufacturing step that can be scheduled and executed."@en ;
+    dcterms:source <std/iec-62264-2-2026> ;
+    skos:altLabel "工艺段"@zh .
+
+stl:unit a owl:AnnotationProperty ;
+    rdfs:label "计量单位"@zh, "Unit of measure"@en ;
+    skos:prefLabel "计量单位"@zh, "Unit of measure"@en ;
+    skos:definition "标明一个数值属性的所有取值共同采用的计量单位。"@zh,
+        "Identifies the common unit of every value of a numeric property."@en .
+
+stl:quantityKind a owl:AnnotationProperty ;
+    rdfs:label "量的种类"@zh, "Quantity kind"@en ;
+    skos:prefLabel "量的种类"@zh, "Quantity kind"@en ;
+    skos:definition "标明一个数值属性所表达的物理量或计数量的种类。"@zh,
+        "Identifies the kind of physical quantity or count expressed by a numeric property."@en .
+
+stl:unitNumber a owl:DatatypeProperty ;
+    rdfs:domain stl:Equipment ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "设备序号"@zh, "Equipment number"@en ;
+    skos:prefLabel "设备序号"@zh, "Equipment number"@en ;
+    skos:definition "设备在同一类型或所属库区内的本地序号。"@zh,
+        "Local ordinal of equipment within its type or storage area."@en .
+
+stl:unitType a owl:ObjectProperty ;
+    rdfs:domain stl:Equipment ;
+    rdfs:range skos:Concept ;
+    rdfs:label "机组类型"@zh, "Unit type"@en ;
+    skos:prefLabel "机组类型"@zh, "Unit type"@en ;
+    skos:definition "将机组关联到表示其工艺用途的类型代码。"@zh,
+        "Associates a production unit with its functional type code."@en .
+
+stl:performedOn a owl:ObjectProperty ;
+    rdfs:domain stl:Event ;
+    rdfs:range stl:Equipment ;
+    rdfs:label "执行设备"@zh, "Performed on"@en ;
+    skos:prefLabel "执行设备"@zh, "Performed on"@en ;
+    skos:definition "标识执行工序或搬运动作的设备，如轧制机组或吊运天车。"@zh,
+        "Identifies the equipment that carried out an operation or handling event."@en .
+
+stl:producedBy a owl:ObjectProperty ;
+    rdfs:domain stl:MaterialPiece ;
+    rdfs:range stl:Operation ;
+    rdfs:label "产出工序"@zh, "Produced by"@en ;
+    skos:prefLabel "产出工序"@zh, "Produced by"@en ;
+    skos:definition "指向使一件实物获得当前身份的工序执行。"@zh,
+        "Links a piece to the operation that first produced it under this identity."@en ;
+    rdfs:subPropertyOf prov:wasGeneratedBy ;
+    owl:inverseOf stl:outputPiece .
+
+stl:inputPiece a owl:ObjectProperty ;
+    rdfs:domain stl:Operation ;
+    rdfs:range stl:MaterialPiece ;
+    rdfs:label "投入件"@zh, "Input piece"@en ;
+    skos:prefLabel "投入件"@zh, "Input piece"@en ;
+    skos:definition "指向一次执行消耗或加工的实物。"@zh,
+        "Identifies a piece consumed or processed during an operation."@en .
+
+stl:outputPiece a owl:ObjectProperty ;
+    rdfs:domain stl:Operation ;
+    rdfs:range stl:MaterialPiece ;
+    rdfs:label "产出件"@zh, "Output piece"@en ;
+    skos:prefLabel "产出件"@zh, "Output piece"@en ;
+    skos:definition "指向一次执行直接产出的、具有独立身份的实物。"@zh,
+        "Identifies an individually tracked piece directly produced by an operation."@en ;
+    skos:scopeNote "分别记录子卷卷取执行时，各子执行关联本卷产出，总执行可经组成关系汇总这些产出。"@zh .
+
+stl:derivedFrom a owl:ObjectProperty ;
+    rdfs:domain stl:MaterialPiece ;
+    rdfs:range stl:MaterialPiece ;
+    rdfs:label "直接来源件"@zh, "Derived from"@en ;
+    skos:prefLabel "直接来源件"@zh, "Derived from"@en ;
+    skos:definition "沿单道加工步骤指向产出件所来自的每件直接投入。"@zh,
+        "Links an output piece to each immediate source piece across one processing step."@en ;
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    skos:scopeNote "多步追溯沿本属性逐段进行；焊接合卷可有多个直接来源。"@zh .
+
+stl:fulfills a owl:ObjectProperty ;
+    rdfs:domain stl:Event ;
+    rdfs:range stl:Plan ;
+    rdfs:label "落实计划"@zh, "Fulfils plan"@en ;
+    skos:prefLabel "落实计划"@zh, "Fulfils plan"@en ;
+    skos:definition "指向一次执行或事件所落实的计划或指令。"@zh,
+        "Identifies the plan or instruction implemented by an actual event."@en .
+
+stl:partOf a owl:ObjectProperty ;
+    rdfs:label "所属整体"@zh, "Part of"@en ;
+    skos:prefLabel "所属整体"@zh, "Part of"@en ;
+    skos:definition "从组成部分指向包含它的整体。"@zh,
+        "Links a constituent to the whole of which it forms a part."@en ;
+    skos:scopeNote "测点属于机组，订单行属于销售订单，元素结果属于化学分析，成分限值属于物料规格。子执行属于父执行，包括出钢与炼钢、切割与连铸、卷取与分卷。包装件所含钢卷通过逆属性 hasPart 记录。生产订单服务的订单行用 forOrderLine，检验批成员用 lotMember，证明书覆盖范围用 coversPiece。"@zh .
+
+stl:hasPart a owl:ObjectProperty ;
+    owl:inverseOf stl:partOf ;
+    rdfs:label "包含组成部分"@zh, "Has part"@en ;
+    skos:prefLabel "包含组成部分"@zh, "Has part"@en ;
+    skos:definition "从整体指向构成它的部分，例如从包装件指向装入的钢卷。"@zh,
+        "Links a whole to a constituent, such as a package to a coil it contains."@en .
+
+stl:forOrderLine a owl:ObjectProperty ;
+    rdfs:domain stl:ProductionOrder ;
+    rdfs:range stl:SalesOrderLine ;
+    rdfs:label "服务订单行"@zh, "For order line"@en ;
+    skos:prefLabel "服务订单行"@zh, "For order line"@en ;
+    skos:definition "标识生产订单要满足的销售订单行。"@zh,
+        "Identifies the sales order line whose demand a production order is to fulfil."@en .
+
+stl:definedIn a owl:ObjectProperty ;
+    rdfs:domain stl:StandardGrade ;
+    rdfs:range stl:StandardEdition ;
+    rdfs:label "定义版次"@zh, "Defined in"@en ;
+    skos:prefLabel "定义版次"@zh, "Defined in"@en ;
+    skos:definition "标识给出该牌号定义的产品标准版次。"@zh,
+        "Identifies the product standard edition defining a grade designation."@en .
+
+stl:satisfies a owl:ObjectProperty ;
+    rdfs:domain stl:SteelGrade ;
+    rdfs:range stl:StandardGrade ;
+    rdfs:label "满足牌号"@zh, "Satisfies grade"@en ;
+    skos:prefLabel "满足牌号"@zh, "Satisfies grade"@en ;
+    skos:definition "标识一个内部钢种能够满足的带版次标准牌号。"@zh,
+        "Links an internal grade to an edition-specific designation it can satisfy."@en .
+
+stl:requiresSpecification a owl:ObjectProperty ;
+    rdfs:domain stl:SalesOrderLine ;
+    rdfs:range stl:MaterialSpecification ;
+    rdfs:label "订货规格"@zh, "Required material specification"@en ;
+    skos:prefLabel "订货规格"@zh, "Required material specification"@en ;
+    skos:definition "指向归集该订单行的牌号、标准版次、尺寸与验收限值的物料规格。"@zh,
+        "Identifies the material specification defining the grade, standard editions, dimensions and acceptance limits for an order line."@en .
+
+stl:requiresGrade a owl:ObjectProperty ;
+    rdfs:domain stl:MaterialSpecification ;
+    rdfs:range stl:StandardGrade ;
+    rdfs:label "要求牌号"@zh, "Required grade"@en ;
+    skos:prefLabel "要求牌号"@zh, "Required grade"@en ;
+    skos:definition "标识物料规格所要求的带版次标准牌号。"@zh,
+        "Identifies the edition-specific grade required by a material specification."@en .
+
+stl:allocatedTo a owl:ObjectProperty ;
+    rdfs:domain stl:MaterialPiece ;
+    rdfs:range stl:SalesOrderLine ;
+    rdfs:label "分配订单行"@zh, "Allocated to"@en ;
+    skos:prefLabel "分配订单行"@zh, "Allocated to"@en ;
+    skos:definition "指出实物当前为哪一订货项目配料。"@zh,
+        "Identifies the order line to which a piece is currently allocated."@en .
+
+stl:createdAt a owl:DatatypeProperty ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "创建时刻"@zh, "Created at"@en ;
+    skos:prefLabel "创建时刻"@zh, "Created at"@en ;
+    skos:definition "标识实物件或业务单据取得其编号时的创建时刻。"@zh,
+        "Time at which a physical item or business document was created under its identifier."@en ;
+    skos:scopeNote "编码中 YY 取创建时刻在 +08:00 时区的年份后两位。实物件的创建时刻等于产出工序的 actualEndAt。"@zh .
+
+stl:serialNumber a owl:DatatypeProperty ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "流水号"@zh, "Serial number"@en ;
+    skos:prefLabel "流水号"@zh, "Serial number"@en ;
+    skos:definition "标识在编码规则指定的编号序列内分配给对象的正整数。"@zh,
+        "Positive ordinal assigned within the numbering series for an object."@en .
+
+stl:lineNumber a owl:DatatypeProperty ;
+    rdfs:domain stl:SalesOrderLine ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "订单行号"@zh, "Order line number"@en ;
+    skos:prefLabel "订单行号"@zh, "Order line number"@en ;
+    skos:definition "标识一项订货在其销售订单内的行序号。"@zh,
+        "Ordinal identifying one item within a sales order."@en .
+
+stl:plannedStartAt a owl:DatatypeProperty ;
+    rdfs:domain stl:Plan ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "计划开始时刻"@zh, "Planned start"@en ;
+    skos:prefLabel "计划开始时刻"@zh, "Planned start"@en ;
+    skos:definition "计划为作业安排的开始时刻。"@zh,
+        "Time at which the plan schedules the work to start."@en .
+
+stl:plannedEndAt a owl:DatatypeProperty ;
+    rdfs:domain stl:Plan ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "计划结束时刻"@zh, "Planned end"@en ;
+    skos:prefLabel "计划结束时刻"@zh, "Planned end"@en ;
+    skos:definition "计划为作业安排的完成时刻。"@zh,
+        "Time at which the plan schedules the work to finish."@en .
+
+stl:actualStartAt a owl:DatatypeProperty ;
+    rdfs:domain stl:Event ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "实际开始时刻"@zh, "Actual start"@en ;
+    skos:prefLabel "实际开始时刻"@zh, "Actual start"@en ;
+    skos:definition "现场执行实际开始的时刻。"@zh,
+        "Time at which execution actually began."@en .
+
+stl:actualEndAt a owl:DatatypeProperty ;
+    rdfs:domain stl:Event ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "实际结束时刻"@zh, "Actual end"@en ;
+    skos:prefLabel "实际结束时刻"@zh, "Actual end"@en ;
+    skos:definition "现场执行实际完成的时刻。"@zh,
+        "Time at which execution actually finished."@en .
+
+stl:occurredAt a owl:DatatypeProperty ;
+    rdfs:domain stl:Event ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "发生时刻"@zh, "Occurred at"@en ;
+    skos:prefLabel "发生时刻"@zh, "Occurred at"@en ;
+    skos:definition "记录离散业务事件在现场发生的时刻。"@zh,
+        "Time at which an individual business event took place."@en ;
+    rdfs:seeAlso <http://www.w3.org/2006/time#Instant> .
+
+stl:recordedAt a owl:DatatypeProperty ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "登记时刻"@zh, "Recorded at"@en ;
+    skos:prefLabel "登记时刻"@zh, "Recorded at"@en ;
+    skos:definition "记录业务信息进入记录系统的时刻。"@zh,
+        "Time at which information was entered into the record system."@en .
+
+stl:issuedOn a owl:DatatypeProperty ;
+    rdfs:range xsd:date ;
+    rdfs:label "签发日期"@zh, "Issue date"@en ;
+    skos:prefLabel "签发日期"@zh, "Issue date"@en ;
+    skos:definition "记录业务单据正式签发的公历日期。"@zh,
+        "Calendar date on which a business document was issued."@en .
+
+stl:thickness a owl:DatatypeProperty ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:MilliM ;
+    stl:quantityKind quantitykind:Length ;
+    rdfs:label "厚度"@zh, "Thickness"@en ;
+    skos:prefLabel "厚度"@zh, "Thickness"@en ;
+    skos:definition "沿带材或板坯厚度方向测得或规定的尺寸。"@zh,
+        "Measured or specified dimension through the thickness of strip or slab."@en .
+
+stl:width a owl:DatatypeProperty ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:MilliM ;
+    stl:quantityKind quantitykind:Length ;
+    rdfs:label "宽度"@zh, "Width"@en ;
+    skos:prefLabel "宽度"@zh, "Width"@en ;
+    skos:definition "沿带材或板坯横向测得或规定的尺寸。"@zh,
+        "Measured or specified transverse dimension of strip or slab."@en .
+
+stl:grossMass a owl:DatatypeProperty ;
+    rdfs:domain stl:MaterialPiece ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:TONNE ;
+    stl:quantityKind quantitykind:Mass ;
+    rdfs:label "毛重"@zh, "Gross mass"@en ;
+    skos:prefLabel "毛重"@zh, "Gross mass"@en ;
+    skos:definition "实物连同其包装和随件附件一起称得的质量。"@zh,
+        "Mass weighed with the packaging and accompanying accessories."@en .
+
+stl:netMass a owl:DatatypeProperty ;
+    rdfs:domain stl:MaterialPiece ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:TONNE ;
+    stl:quantityKind quantitykind:Mass ;
+    rdfs:label "净重"@zh, "Net mass"@en ;
+    skos:prefLabel "净重"@zh, "Net mass"@en ;
+    skos:definition "扣除包装和附件后归属于材料本身的质量。"@zh,
+        "Mass attributable to the material after packaging and accessories are excluded."@en .
+
+stl:theoreticalMass a owl:DatatypeProperty ;
+    rdfs:domain stl:MaterialPiece ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:TONNE ;
+    stl:quantityKind quantitykind:Mass ;
+    rdfs:label "理论重量"@zh, "Theoretical mass"@en ;
+    skos:prefLabel "理论重量"@zh, "Theoretical mass"@en ;
+    skos:definition "依据名义尺寸、密度等约定条件推算的质量。"@zh,
+        "Mass calculated from nominal dimensions, density and stated assumptions."@en .

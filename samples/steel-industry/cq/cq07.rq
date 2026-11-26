@@ -1,0 +1,50 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX analysisType: <https://w3id.org/ontology-platform/steel/code/analysis-type/>
+
+# Compare the heat analysis with the percentage limits of the ordered specification.
+SELECT ?heat ?orderLine ?grade ?edition ?sample ?element ?lowerPct ?upperPct ?valuePct
+       ?elementResult ?required ?measured ?within ?assessment
+WHERE {
+  VALUES (?heat ?orderLine) { ("H22600123" "D26001235-020") }
+  ?line a stl:SalesOrderLine ; dct:identifier ?orderLine ; stl:requiresSpecification ?spec .
+  ?orderedGrade skos:notation ?grade ; stl:definedIn ?requestedEdition .
+  ?requestedEdition dct:identifier ?edition .
+  ?spec a stl:MaterialSpecification ; stl:requiresGrade ?orderedGrade ; stl:applicableStandard ?requestedEdition .
+  ?analysis a stl:ChemicalAnalysis ; stl:analysisType analysisType:HEAT ; stl:testedSample ?specimen .
+  ?specimen dct:identifier ?sample ; stl:sampleOf ?batch .
+  ?batch a stl:Heat ; dct:identifier ?heat .
+  {
+    SELECT ?spec ?analysis (COUNT(*) AS ?required)
+           (SUM(IF(?readings = 1, 1, 0)) AS ?measured)
+           (SUM(IF(?readings = 1 && ?observed >= ?low && ?observed <= ?high, 1, 0)) AS ?within)
+    WHERE {
+      {
+        SELECT ?spec ?analysis ?item ?low ?high (COUNT(?reading) AS ?readings) (MAX(?reading) AS ?observed)
+        WHERE {
+          ?analysis a stl:ChemicalAnalysis ; stl:analysisType analysisType:HEAT .
+          ?requirement a stl:CompositionLimit ; stl:partOf ?spec ; stl:element ?item ;
+                       stl:lowerLimit ?low ; stl:upperLimit ?high .
+          OPTIONAL {
+            ?result a stl:ElementResult ; stl:partOf ?analysis ; stl:element ?item ; stl:massFraction ?reading .
+          }
+        }
+        GROUP BY ?spec ?analysis ?item ?low ?high
+      }
+    }
+    GROUP BY ?spec ?analysis
+  }
+  ?limit a stl:CompositionLimit ; stl:partOf ?spec ; stl:element ?chemical ;
+         stl:lowerLimit ?lowerPct ; stl:upperLimit ?upperPct .
+  ?chemical skos:notation ?element .
+  OPTIONAL {
+    ?entry a stl:ElementResult ; stl:partOf ?analysis ; stl:element ?chemical ; stl:massFraction ?valuePct .
+  }
+  BIND(IF(!BOUND(?valuePct), "MISSING",
+       IF(EXISTS { ?other a stl:ElementResult ; stl:partOf ?analysis ; stl:element ?chemical ; stl:massFraction ?otherValue .
+                   FILTER (?other != ?entry || !sameTerm(?otherValue, ?valuePct)) },
+          "AMBIGUOUS", IF(?valuePct >= ?lowerPct && ?valuePct <= ?upperPct, "WITHIN", "OUTSIDE"))) AS ?elementResult)
+  BIND(IF(?within < ?measured, "OUTSIDE", IF(?measured < ?required, "INCOMPLETE", "WITHIN")) AS ?assessment)
+}
+ORDER BY ?heat ?orderLine ?sample ?element ?valuePct

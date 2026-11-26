@@ -1,0 +1,20 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX item: <https://w3id.org/ontology-platform/steel/code/measurement-item/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+# The refining interval, unit and sample time identify the relevant readings.
+SELECT ?heat ?equipment ?point ?method ?sampledAt ?resultAt ?temperature
+WHERE {
+  VALUES ?heat { "H22600123" }
+  ?batch a stl:Heat ; dct:identifier ?heat .
+  ?treatment a stl:Refining ; stl:processedHeat ?batch ; stl:performedOn ?unit ;
+             stl:actualStartAt ?start ; stl:actualEndAt ?end .
+  ?unit dct:identifier ?equipment .
+  ?reading a stl:Observation ; stl:measuredObject ?batch ; stl:measurementItem item:TEMP ;
+           stl:measuredAtPoint ?probe ; stl:sampledAt ?sampledAt ; stl:resultAt ?resultAt ;
+           stl:measurementMethod/skos:notation ?method ; stl:temperature ?temperature .
+  ?probe stl:partOf ?unit ; dct:identifier ?point .
+  FILTER (?start <= ?sampledAt && ?sampledAt <= ?end)
+}
+ORDER BY ?sampledAt ?point ?resultAt
