@@ -1863,7 +1863,10 @@ def test_the_header_row_is_found_across_the_chunker_line_break() -> None:
     [kept] = [p for p in proposals if p.kind == "relation_type"]
     assert [e.quote for e in kept.evidence] == [_SHEET.split("\n")[3], _SHEET.split("\n")[0]]
     dropped = build_proposals(
-        [apart, after], [], _SHEET_TYPES, _sheet_relations(("new:Record", "new:Order", "关联", "1.1"))
+        [apart, after],
+        [],
+        _SHEET_TYPES,
+        _sheet_relations(("new:Record", "new:Order", "关联", "1.1")),
     )
     assert [p for p in dropped if p.kind == "relation_type"] == []
 
@@ -1872,7 +1875,10 @@ def test_the_header_row_is_not_looked_for_past_prose_in_the_chunk_before() -> No
     lines = _SHEET.split("\n")
     # The chunk before ends with a paragraph: the rows that follow are of another table.
     first = ChunkText(
-        id=uuid4(), seq=0, text="\n".join([*lines[:3], "", "以上为十一月记录。"]), heading="点检记录"
+        id=uuid4(),
+        seq=0,
+        text="\n".join([*lines[:3], "", "以上为十一月记录。"]),
+        heading="点检记录",
     )
     rest = ChunkText(id=uuid4(), seq=1, text="\n".join(lines[3:]), heading="点检记录")
     proposals = build_proposals(
