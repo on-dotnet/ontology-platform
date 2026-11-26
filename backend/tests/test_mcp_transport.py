@@ -271,7 +271,7 @@ async def test_unknown_methods_are_not_found(client: AsyncClient, token: str, me
 
 
 async def test_an_unknown_tool_is_an_invalid_params_error(client: AsyncClient, token: str) -> None:
-    response = await rpc(client, token, "tools/call", {"name": "propose_changes", "arguments": {}})
+    response = await rpc(client, token, "tools/call", {"name": "drop_ontology", "arguments": {}})
 
     rpc_error(response, 400, INVALID_PARAMS)
 
@@ -321,12 +321,13 @@ async def test_the_tool_list_is_the_same_for_every_token(
     assert result["cacheScope"] == "public"
     assert result["ttlMs"] > 0
     assert "nextCursor" not in result
-    assert [tool["name"] for tool in result["tools"]] == READ_TOOLS
+    assert [tool["name"] for tool in result["tools"]] == [*READ_TOOLS, "propose_changes"]
     for tool in result["tools"]:
         assert tool["title"]
         assert tool["description"]
         assert tool["inputSchema"]["type"] == "object"
-        assert tool["annotations"]["readOnlyHint"] is True
+        # Only propose_changes writes, and only a change set for review (test_mcp_propose.py).
+        assert tool["annotations"]["readOnlyHint"] is (tool["name"] != "propose_changes")
         assert tool["annotations"]["openWorldHint"] is False
 
 
