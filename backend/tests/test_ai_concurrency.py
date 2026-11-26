@@ -28,6 +28,7 @@ from ontology_platform.modules.ai.gateway import (
 )
 from ontology_platform.modules.ai.prompts import (
     EntityTypeOut,
+    Quote,
     RelationOut,
     RelationsOut,
     ResolveOut,
@@ -125,7 +126,11 @@ class Gateway:
 
 def _term(name: str, chunk: int, quote: str) -> TermOut:
     return TermOut(
-        name=name, english=None, definition=None, category="entity", quotes=[{"chunk": chunk, "text": quote}]
+        name=name,
+        english=None,
+        definition=None,
+        category="entity",
+        quotes=[Quote(chunk=chunk, text=quote)],
     )
 
 
