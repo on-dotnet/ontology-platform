@@ -60,7 +60,7 @@ async def list_types(db: AsyncSession, ontology_id: UUID) -> schemas.ObjectTypeL
                 key_columns=list(bound.key_columns),
                 problem=table.problem,
                 properties=table.properties(),
-                relations=[info for info, _ in relations.get(bound.type_id, [])],
+                relations=relations.get(bound.type_id, []),
             )
         )
     return schemas.ObjectTypeList(release=_release(model), items=items)
@@ -150,7 +150,7 @@ async def get_object(
     return schemas.ObjectDetail(
         **row.model_dump(),
         release=_release(model),
-        relations=[info for info, _ in planner.relations(model, type_id).get(type_id, [])],
+        relations=planner.relations(model, type_id).get(type_id, []),
     )
 
 
@@ -179,10 +179,10 @@ async def related(
     origin = await catalog.table(planner.bound_type(model, type_id))
     origin.require_available()
     parts = tokens.decode_key(key, origin.key_specs())
-    other, relation = planner.resolve_relation(model, type_id, relation_id, direction)
-    target = await catalog.table(other)
+    step = planner.resolve_relation(model, type_id, relation_id, direction)
+    target = await catalog.table(step.other)
     target.require_available()
-    join, names = planner.hop_join(origin, target, relation, direction)
+    join, names = planner.hop_join(origin, target, step.relation, step.direction)
     joined = await catalog.table_columns(target.bound.data_source_id, join.table)
     try:
         key_specs = [joined[name] for name in names]

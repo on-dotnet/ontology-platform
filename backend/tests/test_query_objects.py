@@ -145,6 +145,62 @@ async def test_text_filters_compare_literal_values_and_preserve_the_source(
     assert admin_rows(external_source, snapshot) == before
 
 
+async def test_filter_operators_match_external_primary_keys(
+    client: AsyncClient, db: AsyncSession, external_source: ExternalSource, scratch: str
+) -> None:
+    catalog = await make_catalog(client, db, external_source)
+    target = f'"{scratch}".filter_coil'
+    admin_rows(
+        external_source,
+        f"CREATE TABLE {target} (coil_no integer PRIMARY KEY, status mes.coil_status)",
+    )
+    admin_rows(external_source, f'GRANT SELECT ON {target} TO "{external_source.reader}"')
+    admin_rows(
+        external_source,
+        f"INSERT INTO {target} VALUES "  # noqa: S608
+        "(1, 'shipped'), (2, NULL), (3, 'produced'), "
+        "(4, 'inspected'), (5, NULL), (6, 'shipped')",
+    )
+    await cache_table(db, catalog.source.id, external_source, scratch, "filter_coil")
+    number = element(
+        catalog.ontology, "property", "number", "卷号", domain_id=catalog.coil.id, datatype="integer"
+    )
+    await add_elements(db, number)
+    bindings = catalog.coil_bindings(scratch, "filter_coil")
+    bindings.append(property_binding(number, "coil", "coil_no"))
+    await publish_bindings(client, catalog, bindings)
+
+    status = catalog.status
+    for prop, condition, predicate in (
+        (number, {"op": "lt", "value": 3}, "coil_no < 3"),
+        (number, {"op": "in", "value": [2, 6]}, "coil_no IN (2, 6)"),
+        (
+            status,
+            {"op": "in", "value": ["produced", "shipped"]},
+            "status IN ('produced', 'shipped')",
+        ),
+        (status, {"op": "isNull"}, "status IS NULL"),
+        (status, {"op": "notNull"}, "status IS NOT NULL"),
+        (status, {"op": "ne", "value": "shipped"}, "status <> 'shipped'"),
+    ):
+        sql = f"SELECT coil_no FROM {target} WHERE {predicate}"  # noqa: S608
+        expected = {str(key) for (key,) in admin_rows(external_source, sql)}
+        assert 0 < len(expected) < 6, predicate
+        response = await search(
+            client,
+            catalog,
+            catalog.coil,
+            filters=[{"propertyId": str(prop.id), **condition}],
+            limit=6,
+        )
+        assert response.status_code == 200, response.text
+        page = response.json()
+        assert page["nextCursor"] is None, predicate
+        keys = [row["source"]["key"][0]["value"] for row in page["items"]]
+        assert len(keys) == len(expected), predicate
+        assert set(keys) == expected, predicate
+
+
 async def test_exact_scalar_values_and_filters_on_the_external_table(
     client: AsyncClient, db: AsyncSession, external_source: ExternalSource, scratch: str
 ) -> None:

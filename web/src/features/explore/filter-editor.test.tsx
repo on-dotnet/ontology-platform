@@ -12,6 +12,8 @@ const properties: components['schemas']['ObjectProperty'][] = [
   { propertyId: 'weight', label: '重量', datatype: 'decimal', unit: 'kg', ops: ['gt', 'in'] },
   { propertyId: 'count', label: '数量', datatype: 'integer', unit: null, ops: ['eq', 'in'] },
   { propertyId: 'active', label: '生效', datatype: 'boolean', unit: null, ops: ['ne', 'isNull', 'notNull'] },
+  { propertyId: 'day', label: '日期', datatype: 'date', unit: null, ops: ['eq', 'in'] },
+  { propertyId: 'time', label: '时间', datatype: 'dateTime', unit: null, ops: ['eq', 'in'] },
 ];
 
 function setup(filters: Filter[] = []) {
@@ -29,6 +31,39 @@ function setup(filters: Filter[] = []) {
 }
 
 describe('FilterEditor', () => {
+  it.each([
+    ['day', '2024-02-29'],
+    ['time', '2024-02-29T08:30:00+08:00'],
+  ])('shows the %s example for both single and multiple values', async (id, example) => {
+    const { user, open, property, operator } = setup();
+    await open();
+    await user.selectOptions(property(), id);
+    expect(screen.getByRole('textbox', { name: '筛选值' })).toHaveAttribute('placeholder', example);
+    await user.selectOptions(operator(), 'in');
+    expect(screen.getByRole('textbox', { name: '筛选值（每行一个）' })).toHaveAttribute('placeholder', example);
+  });
+
+  it.each([
+    { op: 'eq', invalid: '2024-02-30', valid: '2024-02-29', expected: '2024-02-29' },
+    { op: 'in', invalid: '2024-02-28\n2023-02-29', valid: '2024-02-28\n2024-02-29', expected: ['2024-02-28', '2024-02-29'] },
+  ])('keeps invalid calendar dates out of a $op filter', async ({ op, invalid, valid, expected }) => {
+    const { user, open, property, operator, apply, onChange } = setup();
+    await open();
+    await user.selectOptions(property(), 'day');
+    await user.selectOptions(operator(), op);
+    const input = screen.getByRole('textbox');
+    await user.click(input);
+    await user.paste(invalid);
+    await user.tab();
+    expect(input).toHaveAccessibleDescription('请输入有效日期，格式为 YYYY-MM-DD');
+    await apply();
+    expect(onChange).not.toHaveBeenCalled();
+    await user.clear(input);
+    await user.paste(valid);
+    await apply();
+    expect(onChange).toHaveBeenCalledExactlyOnceWith([{ propertyId: 'day', op, value: expected }]);
+  });
+
   it('offers only the selected property operators and discards an abandoned draft', async () => {
     const { user, open, property, operator, onChange } = setup();
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();

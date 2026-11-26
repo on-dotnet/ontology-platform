@@ -1,6 +1,6 @@
 """Plan a read using the active bindings and detached catalog metadata."""
 
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from uuid import UUID
 
@@ -115,32 +115,48 @@ class Catalog:
         return Table(bound, source.name if source else "", columns, problem)
 
 
+@dataclass(frozen=True, slots=True)
+class RelationStep:
+    relation: BoundRelation
+    direction: schemas.Direction
+    origin: BoundType
+    other: BoundType
+
+
+def _relation_steps(model: BoundModel, origin: UUID | None) -> Iterator[RelationStep]:
+    types = {bound.type_id: bound for bound in model.types}
+    for relation in model.relations:
+        source = types.get(relation.source_type_id)
+        target = types.get(relation.target_type_id)
+        if source is None or target is None:
+            continue
+        if origin is None or origin == source.type_id:
+            yield RelationStep(relation, "out", source, target)
+        if origin is None or origin == target.type_id:
+            yield RelationStep(relation, "in", target, source)
+
+
 def relations(
     model: BoundModel, origin: UUID | None = None
-) -> dict[UUID, list[tuple[schemas.ObjectRelation, BoundRelation]]]:
-    types = {bound.type_id: bound for bound in model.types}
-    result: dict[UUID, list[tuple[schemas.ObjectRelation, BoundRelation]]] = {}
-    for relation in model.relations:
-        source = types[relation.source_type_id]
-        target = types[relation.target_type_id]
-        if origin is None or origin == source.type_id:
-            outward = schemas.ObjectRelation(
+) -> dict[UUID, list[schemas.ObjectRelation]]:
+    outgoing = {(r.relation_id, r.source_type_id, r.target_type_id) for r in model.relations}
+    result: dict[UUID, list[schemas.ObjectRelation]] = {}
+    for step in _relation_steps(model, origin):
+        relation = step.relation
+        label = relation.label
+        if step.direction == "in":
+            if (relation.inverse_id, step.origin.type_id, step.other.type_id) in outgoing:
+                continue
+            label = relation.inverse_label or label
+        result.setdefault(step.origin.type_id, []).append(
+            schemas.ObjectRelation(
                 relation_id=relation.relation_id,
-                label=relation.label,
-                direction="out",
-                other_type_id=target.type_id,
-                other_type_label=target.label,
+                label=label,
+                direction=step.direction,
+                other_type_id=step.other.type_id,
+                other_type_label=step.other.label,
             )
-            result.setdefault(source.type_id, []).append((outward, relation))
-        if origin is None or origin == target.type_id:
-            inward = schemas.ObjectRelation(
-                relation_id=relation.inverse_id or relation.relation_id,
-                label=relation.inverse_label or relation.label,
-                direction="in",
-                other_type_id=source.type_id,
-                other_type_label=source.label,
-            )
-            result.setdefault(target.type_id, []).append((inward, relation))
+        )
     return result
 
 
@@ -153,20 +169,22 @@ def _property(properties: dict[UUID, BoundProperty], property_id: UUID) -> Bound
 
 def resolve_relation(
     model: BoundModel, origin: UUID, relation_id: UUID, direction: schemas.Direction
-) -> tuple[BoundType, BoundRelation]:
-    matches = [
-        (info, relation)
-        for info, relation in relations(model, origin).get(origin, [])
-        if (info.relation_id, info.direction) == (relation_id, direction)
-    ]
+) -> RelationStep:
+    exact = []
+    aliases = []
+    for step in _relation_steps(model, origin):
+        if step.relation.relation_id == relation_id and step.direction == direction:
+            exact.append(step)
+        elif step.relation.inverse_id == relation_id and step.direction != direction:
+            aliases.append(step)
+    matches = exact or aliases
     if not matches:
         raise AppError(409, "query.type_not_bound", "The requested relation is not bound here.")
     if len(matches) > 1:
         raise AppError(
             409, "query.source_mismatch", "The requested relation has ambiguous bindings."
         )
-    info, relation = matches[0]
-    return bound_type(model, info.other_type_id), relation
+    return matches[0]
 
 
 def search_terms(

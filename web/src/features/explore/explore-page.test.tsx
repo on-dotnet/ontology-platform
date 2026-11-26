@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 import type { components } from '@/api/schema';
 import { ontologyKeys } from '@/features/ontologies/api';
+import i18n from '@/i18n';
+import { formatDateTime } from '@/lib/format';
 import { ONTOLOGY_ID, ontologyFixture } from '@/test/fixtures';
 import { problemResponse, renderApp } from '@/test/utils';
 
@@ -67,6 +69,15 @@ describe('explore published objects', () => {
     expect(screen.queryByText('unbound-value')).toBeNull();
   });
 
+  it('localizes the column unit punctuation when the language changes', async () => {
+    mockExplore();
+    renderApp('/explore');
+    expect(await screen.findByRole('columnheader', { name: '重量（t）' })).toBeVisible();
+    await act(async () => { await i18n.changeLanguage('en'); });
+    expect(screen.getByRole('columnheader', { name: '重量 (t)' })).toBeVisible();
+    expect(screen.getByRole('columnheader', { name: '钢种' })).toBeVisible();
+  });
+
   it('posts filters, removes their chips and clears an empty filtered result', async () => {
     const api = mockExplore({
       [`POST ${searchPath}`]: ({ body }) => (body as components['schemas']['ObjectSearch']).filters?.length
@@ -91,30 +102,46 @@ describe('explore published objects', () => {
     expect(await screen.findByRole('table', { name: '炉次' })).toBeVisible();
     await waitFor(() => expect(api.calls('POST', searchPath).at(-1)?.body).toMatchObject({ filters: [] }));
     await add();
+    const clear = () => screen.getByRole('button', { name: '清除筛选' });
+    expect(clear()).toHaveClass('bg-primary');
+    await user.click(screen.getByRole('button', { name: '添加筛选' }));
+    expect(screen.getByRole('button', { name: '应用筛选' })).toHaveClass('bg-primary');
+    expect(clear()).toHaveClass('bg-card', 'border-border');
+    expect(clear()).not.toHaveClass('bg-primary');
+    await user.click(screen.getByRole('button', { name: '取消' }));
+    expect(clear()).toHaveClass('bg-primary');
     await user.click(screen.getByRole('button', { name: '清除筛选' }));
     expect(await screen.findByRole('table', { name: '炉次' })).toBeVisible();
     expect(screen.queryByRole('button', { name: /移除.*Q999/ })).toBeNull();
   });
 
-  it('keeps date-only values on their calendar day and formats timestamps with the shared time control', async () => {
+  it('shows calendar dates, preserves unzoned times and formats zoned times as absolute instants', async () => {
     const properties: components['schemas']['ObjectProperty'][] = [
       { propertyId: 'day', label: '生产日', datatype: 'date', unit: null, ops: ['eq'] },
       { propertyId: 'dateColumn', label: '日期列', datatype: 'dateTime', unit: null, ops: ['eq'] },
       { propertyId: 'time', label: '出炉时间', datatype: 'dateTime', unit: null, ops: ['eq'] },
+      { propertyId: 'local', label: '现场时间', datatype: 'dateTime', unit: null, ops: ['eq'] },
+      { propertyId: 'utc', label: 'UTC', datatype: 'dateTime', unit: null, ops: ['eq'] },
     ];
-    const time = '2024-03-02T08:30:00Z';
+    const time = '2024-03-02T00:30:00+08:00';
+    const local = '2024-03-10T02:30:45.123456';
+    const utc = '2024-03-01T16:30:00Z';
     mockExplore({
       [`GET ${typesPath}`]: () => ({ release, items: [{ ...heatType, properties }] }),
       [`POST ${searchPath}`]: () => ({
-        ...firstPage, items: [{ ...heatRow, values: { day: '2024-03-01', dateColumn: '2024-03-01', time } }],
+        ...firstPage, items: [{ ...heatRow, values: { day: '2024-03-01', dateColumn: '2024-03-01', time, local, utc } }],
       }),
     });
     renderApp('/explore');
     const table = await screen.findByRole('table', { name: '炉次' });
     const dates = table.querySelectorAll('time[datetime="2024-03-01"]');
     expect(dates).toHaveLength(2);
-    for (const date of dates) expect(date).toHaveTextContent('2024年3月1日');
-    expect(table.querySelector(`time[datetime="${time}"]`)).toBeVisible();
+    for (const date of dates) expect(date.textContent).toBe('2024年3月1日');
+    expect(table.querySelector(`time[datetime="${local}"]`)?.textContent).toBe(local);
+    const expected = formatDateTime(utc, 'zh-CN');
+    for (const instant of [time, utc]) {
+      expect(table.querySelector(`time[datetime="${instant}"]`)?.textContent).toBe(expected);
+    }
   });
 
   it('sends the cursor, ends pagination at null and starts a changed sort on the first page', async () => {

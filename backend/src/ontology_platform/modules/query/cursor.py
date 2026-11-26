@@ -29,6 +29,7 @@ def _encode(data: object, limit: int) -> str:
         raw = b"\x00" + zlib.compress(raw)
     encoded = base64.urlsafe_b64encode(raw).rstrip(b"=").decode("ascii")
     if len(encoded) > limit:
+        # Even compressed, long text sort values can exceed the 2048-character cursor limit.
         raise errors.source_mismatch()
     return encoded
 
@@ -97,10 +98,10 @@ def read_page(
             raise ValueError
         if any(value is not None and not isinstance(value, str) for value in position):
             raise ValueError
-        if UUID(version) != release:
-            raise AppError(409, "query.release_changed", "The active release has changed.")
         if request != context:
             raise ValueError
+        if UUID(version) != release:
+            raise AppError(409, "query.release_changed", "The active release has changed.")
         return position
     except (ValueError, RecursionError):
         raise errors.invalid_cursor() from None

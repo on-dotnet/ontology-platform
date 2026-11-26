@@ -1,5 +1,5 @@
 import { Plus, X } from 'lucide-react';
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { components } from '@/api/schema';
@@ -17,6 +17,7 @@ interface FilterEditorProps {
   properties: Property[];
   filters: Filter[];
   onChange: (filters: Filter[]) => void;
+  onExpandedChange?: (expanded: boolean) => void;
 }
 
 const maxFilters = 10;
@@ -28,6 +29,13 @@ function draftFor(property: Property, op = property.ops[0]) {
 }
 
 type Parsed = { filter: Filter } | { error: string };
+
+function isCalendarDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith('0000-')) return false;
+  const date = new Date(value);
+  // Date normalizes some impossible days into the next month.
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
 
 function parseFilter(property: Property, op: Filter['op'], raw: string): Parsed {
   const condition = { propertyId: property.propertyId, op };
@@ -55,6 +63,10 @@ function parseFilter(property: Property, op: Filter['op'], raw: string): Parsed 
       case 'boolean':
         values.push(entry === 'true');
         break;
+      case 'date':
+        if (!isCalendarDate(entry)) return { error: 'explore.filter.invalidDate' };
+        values.push(entry);
+        break;
       default:
         values.push(entry);
     }
@@ -62,7 +74,7 @@ function parseFilter(property: Property, op: Filter['op'], raw: string): Parsed 
   return { filter: { ...condition, value: op === 'in' ? values : values[0] } };
 }
 
-export function FilterEditor({ properties, filters, onChange }: FilterEditorProps) {
+export function FilterEditor({ properties, filters, onChange, onExpandedChange }: FilterEditorProps) {
   const { t, i18n } = useTranslation();
   const id = useId();
   const toggle = useRef<HTMLButtonElement>(null);
@@ -72,6 +84,7 @@ export function FilterEditor({ properties, filters, onChange }: FilterEditorProp
   const selected = available.find((property) => property.propertyId === draft?.propertyId);
   const atLimit = filters.length >= maxFilters;
   const expanded = !!draft && !!selected && selected.ops.includes(draft.op) && !atLimit;
+  useEffect(() => { onExpandedChange?.(expanded); }, [expanded, onExpandedChange]);
   const parsed = expanded ? parseFilter(selected, draft.op, draft.raw) : null;
   const error = touched && parsed && 'error' in parsed ? parsed.error : null;
   const valueId = `${id}-value`;
@@ -95,6 +108,9 @@ export function FilterEditor({ properties, filters, onChange }: FilterEditorProp
     'aria-describedby': error ? errorId : undefined,
     onBlur: () => setTouched(true),
   };
+  const datatype = selected?.datatype;
+  const placeholder = datatype === 'date' || datatype === 'dateTime'
+    ? t(`explore.filter.${datatype}Example`) : undefined;
   function setValue(raw: string) {
     if (draft) setDraft({ ...draft, raw });
   }
@@ -177,7 +193,7 @@ export function FilterEditor({ properties, filters, onChange }: FilterEditorProp
               <div className="grid min-w-0 flex-auto gap-1">
                 <Label htmlFor={valueId} required>{t(draft.op === 'in' ? 'explore.filter.values' : 'explore.filter.value')}</Label>
                 {draft.op === 'in' ? (
-                  <Textarea {...valueProps} name="value" onChange={(event) => setValue(event.target.value)} />
+                  <Textarea {...valueProps} name="value" placeholder={placeholder} onChange={(event) => setValue(event.target.value)} />
                 ) : selected.datatype === 'boolean' ? (
                   <NativeSelect {...valueProps} name="value" onChange={(event) => setValue(event.target.value)}>
                     <option value="true">{t('explore.yes')}</option>
@@ -185,7 +201,7 @@ export function FilterEditor({ properties, filters, onChange }: FilterEditorProp
                   </NativeSelect>
                 ) : (
                   <Input
-                    {...valueProps} name="value" type={selected.datatype === 'date' ? 'date' : 'text'}
+                    {...valueProps} name="value" type="text" placeholder={placeholder}
                     onChange={(event) => setValue(event.target.value)}
                   />
                 )}

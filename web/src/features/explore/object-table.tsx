@@ -1,4 +1,5 @@
 import { ArrowDown, ArrowUp, ArrowUpDown, Rows3 } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { components } from '@/api/schema';
@@ -43,6 +44,7 @@ interface ObjectTableProps {
 export function ObjectTable({ id, releaseId, type, criteria, onChange, onOpen, onRestart, cursor, onPage }: ObjectTableProps) {
   const { t } = useTranslation();
   const { filters, sort } = criteria;
+  const [filterExpanded, setFilterExpanded] = useState(false);
   const query = useSearch(id, releaseId, { typeId: type.typeId, filters, sort, cursor, limit: 50 });
   function change(next: Criteria) {
     onPage(null);
@@ -50,7 +52,8 @@ export function ObjectTable({ id, releaseId, type, criteria, onChange, onOpen, o
   }
   return (
     <div className="space-y-4">
-      <FilterEditor properties={type.properties} filters={filters} onChange={(next) => change({ filters: next, sort })} />
+      <FilterEditor properties={type.properties} filters={filters} onChange={(next) => change({ filters: next, sort })}
+        onExpandedChange={setFilterExpanded} />
       <QueryResult query={query} id={id} onRestart={onRestart} onFirstPage={cursor !== null ? () => onPage(null) : undefined}>
         {(page) => (
           <>
@@ -68,7 +71,7 @@ export function ObjectTable({ id, releaseId, type, criteria, onChange, onOpen, o
                           aria-sort={index === 0 ? (direction === 'asc' ? 'ascending' : 'descending') : undefined}>
                           <button type="button" className="inline-flex cursor-pointer items-center gap-1 rounded hover:text-primary-strong"
                             onClick={() => change({ filters, sort: toggleSort(sort, property.propertyId) })}>
-                            {property.label}{property.unit && <span>({property.unit})</span>}
+                            {property.unit ? t('explore.columnWithUnit', { label: property.label, unit: property.unit }) : property.label}
                             <Icon aria-hidden className="size-3.5" />
                             {direction && <>
                               <span aria-hidden>{index + 1}</span>
@@ -100,7 +103,8 @@ export function ObjectTable({ id, releaseId, type, criteria, onChange, onOpen, o
               </div>
             ) : (
               <EmptyState icon={Rows3} title={t(filters.length ? 'explore.noMatches' : 'explore.noRows')}
-                action={filters.length > 0 && <Button onClick={() => change({ filters: [], sort })}>{t('explore.clearFilters')}</Button>} />
+                action={filters.length > 0 && <Button variant={filterExpanded ? 'secondary' : 'primary'}
+                  onClick={() => change({ filters: [], sort })}>{t('explore.clearFilters')}</Button>} />
             )}
             {(cursor !== null || page.nextCursor !== null) && (
               <div className="flex flex-wrap justify-end gap-2">

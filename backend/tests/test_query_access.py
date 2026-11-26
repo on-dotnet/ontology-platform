@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from external_source import ExternalSource
 from ontology_platform.modules.identity.models import Role
 from test_connectors_support import admin_rows, external_statements
+from test_ontology_bindings_support import foreign_key, relation_binding
 from test_ontology_support import sign_in
 from test_query_support import assert_problem, make_catalog, publish_bindings, search
 
@@ -38,7 +39,7 @@ async def test_every_role_can_query_and_follow_the_displayed_inverse(
     types = {item["typeId"]: item for item in listed.json()["items"]}
     [inverse] = types[str(catalog.coil.id)]["relations"]
     assert inverse == {
-        "relationId": str(catalog.inspections.id),
+        "relationId": str(catalog.inspected_coil.id),
         "label": catalog.inspections.label_zh,
         "direction": "in",
         "otherTypeId": str(catalog.inspection.id),
@@ -74,6 +75,68 @@ async def test_every_role_can_query_and_follow_the_displayed_inverse(
     assert [row["source"]["key"][0]["value"] for row in related.json()["items"]] == [
         key for (key,) in expected
     ]
+
+
+async def test_inverse_alias_returns_the_same_objects_in_the_opposite_direction(
+    client: AsyncClient, db: AsyncSession, external_source: ExternalSource
+) -> None:
+    catalog = await make_catalog(client, db, external_source)
+    await publish_bindings(client, catalog)
+    for origin, direction, alias_direction in [
+        (catalog.coil, "in", "out"),
+        (catalog.inspection, "out", "in"),
+    ]:
+        first = await search(client, catalog, origin, limit=1)
+        assert first.status_code == 200, first.text
+        [row] = first.json()["items"]
+        url = f"{catalog.url}/{origin.id}/{row['key']}/related"
+        bound = await client.get(
+            url, params={"relationId": str(catalog.inspected_coil.id), "direction": direction}
+        )
+        alias = await client.get(
+            url, params={"relationId": str(catalog.inspections.id), "direction": alias_direction}
+        )
+        assert bound.status_code == 200, bound.text
+        assert bound.json()["items"]
+        assert bound.json()["nextCursor"] is None
+        assert alias.status_code == 200, alias.text
+        assert alias.json() == bound.json()
+
+
+async def test_bound_inverse_pair_lists_only_outgoing_relations(
+    client: AsyncClient, db: AsyncSession, external_source: ExternalSource
+) -> None:
+    catalog = await make_catalog(client, db, external_source)
+    reverse = relation_binding(
+        catalog.inspections,
+        "coil",
+        "inspection",
+        foreign_key(["coil_no"], ["coil_no"], side="target"),
+    )
+    await publish_bindings(client, catalog, [*catalog.bindings(), reverse])
+    listed = await client.get(f"{catalog.url}/types")
+    assert listed.status_code == 200, listed.text
+    types = {item["typeId"]: item for item in listed.json()["items"]}
+    for origin, relation, target in [
+        (catalog.coil, catalog.inspections, catalog.inspection),
+        (catalog.inspection, catalog.inspected_coil, catalog.coil),
+    ]:
+        expected = [
+            {
+                "relationId": str(relation.id),
+                "direction": "out",
+                "label": relation.label_zh,
+                "otherTypeId": str(target.id),
+                "otherTypeLabel": target.label_zh,
+            }
+        ]
+        assert types[str(origin.id)]["relations"] == expected
+        first = await search(client, catalog, origin, limit=1)
+        assert first.status_code == 200, first.text
+        [row] = first.json()["items"]
+        detail = await client.get(f"{catalog.url}/{origin.id}/{row['key']}")
+        assert detail.status_code == 200, detail.text
+        assert detail.json()["relations"] == expected
 
 
 async def test_cookie_search_requires_the_matching_csrf_header(

@@ -19,7 +19,7 @@ from ontology_platform.modules.connectors.schemas import (
 )
 from ontology_platform.modules.connectors.statements import Rows, SelectQuery
 from ontology_platform.modules.ontology import bindings
-from ontology_platform.modules.query import schemas, service
+from ontology_platform.modules.query import planner, schemas, service
 
 
 def published_table(monkeypatch: pytest.MonkeyPatch) -> bindings.BoundModel:
@@ -164,12 +164,14 @@ async def test_clipped_sort_value_never_becomes_a_continuation(
     assert (error.value.status, error.value.code) == (409, "query.source_mismatch")
 
 
+@pytest.mark.parametrize("use_alias", [False, True], ids=["bound-id", "inverse-alias"])
 async def test_a_hop_never_silently_picks_between_two_target_types(
-    monkeypatch: pytest.MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch, use_alias: bool
 ) -> None:
     model = published_table(monkeypatch)
     origin = model.types[0]
     other = replace(origin, type_id=uuid4(), binding_id=uuid4())
+    inverse_id = uuid4()
     relation = bindings.BoundRelation(
         uuid4(),
         uuid4(),
@@ -178,8 +180,8 @@ async def test_a_hop_never_silently_picks_between_two_target_types(
         origin.type_id,
         origin.type_id,
         bindings.ForeignKeyHop("source", ("id",), ("id",)),
-        None,
-        None,
+        inverse_id,
+        "Previous",
     )
     model = replace(
         model,
@@ -195,13 +197,80 @@ async def test_a_hop_never_silently_picks_between_two_target_types(
             model.ontology_id,
             origin.type_id,
             "WyIxIl0",
-            relation_id=relation.relation_id,
-            direction="out",
+            relation_id=inverse_id if use_alias else relation.relation_id,
+            direction="in" if use_alias else "out",
             limit=1,
             cursor=None,
         )
     assert (error.value.status, error.value.code) == (409, "query.source_mismatch")
     read.assert_not_awaited()
+
+
+def test_explicit_binding_wins_over_its_inverse_alias(monkeypatch: pytest.MonkeyPatch) -> None:
+    model = published_table(monkeypatch)
+    origin = model.types[0].type_id
+    next_id, previous_id = uuid4(), uuid4()
+    next_step = bindings.BoundRelation(
+        next_id,
+        uuid4(),
+        "next",
+        "Next",
+        origin,
+        origin,
+        bindings.ForeignKeyHop("source", ("next_id",), ("id",)),
+        previous_id,
+        "Previous",
+    )
+    previous_step = replace(
+        next_step,
+        relation_id=previous_id,
+        binding_id=uuid4(),
+        local_name="previous",
+        label="Previous",
+        join=bindings.ForeignKeyHop("source", ("previous_id",), ("id",)),
+        inverse_id=next_id,
+        inverse_label="Next",
+    )
+    model = replace(model, relations=(next_step, previous_step))
+    directions: tuple[schemas.Direction, ...] = ("in", "out")
+    for bound in model.relations:
+        for direction in directions:
+            step = planner.resolve_relation(model, origin, bound.relation_id, direction)
+            assert (step.relation, step.direction) == (bound, direction)
+
+
+def test_missing_relation_endpoints_do_not_hide_valid_relations(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    model = published_table(monkeypatch)
+    origin = model.types[0]
+    target = replace(origin, type_id=uuid4(), binding_id=uuid4())
+    relation = bindings.BoundRelation(
+        uuid4(),
+        uuid4(),
+        "next",
+        "Next",
+        origin.type_id,
+        target.type_id,
+        bindings.ForeignKeyHop("source", ("id",), ("id",)),
+        None,
+        None,
+    )
+    model = replace(
+        model,
+        types=(origin, target),
+        relations=(
+            replace(relation, relation_id=uuid4(), source_type_id=uuid4()),
+            replace(relation, relation_id=uuid4(), target_type_id=uuid4()),
+            relation,
+        ),
+    )
+    listed = planner.relations(model)
+    assert set(listed) == {origin.type_id, target.type_id}
+    [outward] = listed[origin.type_id]
+    [inward] = listed[target.type_id]
+    assert (outward.relation_id, outward.direction) == (relation.relation_id, "out")
+    assert (inward.relation_id, inward.direction) == (relation.relation_id, "in")
 
 
 @pytest.mark.parametrize("limit", [0, 201])

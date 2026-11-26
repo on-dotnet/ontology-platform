@@ -12,6 +12,7 @@ from sqlalchemy.engine import Engine, ExceptionContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from external_source import ExternalSource
+from ontology_platform.errors import AppError
 from ontology_platform.modules.connectors import connection
 from ontology_platform.modules.connectors.errors import (
     ConnectorError,
@@ -22,6 +23,8 @@ from ontology_platform.modules.connectors.errors import (
 )
 from ontology_platform.modules.connectors.models import CatalogTable
 from ontology_platform.modules.identity.models import Role
+from ontology_platform.modules.query import schemas
+from ontology_platform.modules.query.cursor import encode_page
 from support import csrf_headers
 from test_connectors_support import (
     add_source,
@@ -214,6 +217,19 @@ async def test_retired_enum_primary_key_is_not_found_for_detail_and_one_hop(
     assert states == ["22P02", "22P02"]
 
 
+def test_malformed_filter_raises_app_error_for_direct_callers() -> None:
+    with pytest.raises(AppError) as error:
+        schemas.Filter.model_validate({"propertyId": str(uuid4()), "op": "eq", "value": {}})
+    assert (error.value.status, error.value.code) == (422, "query.invalid_filter")
+
+
+def test_sort_value_exceeding_the_cursor_limit_raises_source_mismatch() -> None:
+    text = "".join(chr(0x4E00 + index) for index in range(2000))
+    with pytest.raises(AppError) as error:
+        encode_page(uuid4(), {}, [text])
+    assert (error.value.status, error.value.code) == (409, "query.source_mismatch")
+
+
 async def test_invalid_filters_are_rejected_before_external_sql(
     client: AsyncClient, db: AsyncSession, external_source: ExternalSource
 ) -> None:
@@ -391,6 +407,8 @@ async def test_malformed_key_and_cursor_and_changed_release(
     assert released.json()["id"] != first.json()["release"]["id"]
     outdated = await search(client, catalog, catalog.coil, limit=1, cursor=cursor)
     assert_problem(outdated, 409, "query.release_changed")
+    wrong_type = await search(client, catalog, catalog.inspection, cursor=cursor)
+    assert_problem(wrong_type, 422, "query.invalid_cursor")
 
 
 async def test_a_missing_ontology_is_distinct_from_an_unpublished_one(

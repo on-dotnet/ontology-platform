@@ -53,6 +53,7 @@ class Filter(CamelModel):
         try:
             return handler(value)
         except ValidationError:
+            # Bad operands raise AppError even in model_validate, bypassing validation.failed.
             raise AppError(422, "query.invalid_filter", "The filter is invalid.") from None
 
 
