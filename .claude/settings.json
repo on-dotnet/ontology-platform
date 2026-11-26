@@ -28,6 +28,12 @@
       "Bash(docker inspect*)",
       "Bash(docker compose ps*)",
       "Bash(docker compose logs*)",
+      "Bash(gh pr diff*)",
+      "Bash(gh pr checks*)",
+      "Bash(gh pr status*)",
+      "Bash(git worktree list*)",
+      "Bash(git merge-base*)",
+      "Bash(git rev-parse*)",
       "PowerShell(git status*)",
       "PowerShell(git diff*)",
       "PowerShell(git log*)",
@@ -62,7 +68,13 @@
       "PowerShell(./dev.ps1 lock*)",
       "PowerShell(./dev.ps1 test*)",
       "PowerShell(./dev.ps1 gen-api*)",
-      "PowerShell(./dev.ps1 ci*)"
+      "PowerShell(./dev.ps1 ci*)",
+      "PowerShell(gh pr diff*)",
+      "PowerShell(gh pr checks*)",
+      "PowerShell(gh pr status*)",
+      "PowerShell(git worktree list*)",
+      "PowerShell(git merge-base*)",
+      "PowerShell(git rev-parse*)"
     ],
     "deny": [
       "Bash(git push *--force*)",
@@ -88,6 +100,21 @@
       "PowerShell(docker volume prune*)",
       "PowerShell(docker volume rm*)",
       "Read(**/.env.local)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-dev-commands.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }
