@@ -1,0 +1,18 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+
+# Compare two head slabs. Transition status is an explicit fact, independent of ordinal.
+SELECT ?slab ?transition ?numberingHeat ?strand ?positionInHeat ?positionInSequence
+       ?sequence ?sourceHeat ?sourceGrade ?sourcePosition ?previousGrade ?nextGrade
+WHERE {
+  VALUES ?slab { "S22600123201" "S12600125101" }
+  ?piece a stl:Slab ; dct:identifier ?slab ; stl:isTransitionSlab ?transition ;
+         stl:numberingHeat/dct:identifier ?numberingHeat ; stl:sourceHeat ?source ;
+         stl:strandNumber ?strand ; stl:positionInHeat ?positionInHeat .
+  OPTIONAL { ?piece stl:positionInSequence ?positionInSequence }
+  ?source dct:identifier ?sourceHeat ; stl:castIn/dct:identifier ?sequence ;
+          stl:steelGrade/dct:identifier ?sourceGrade ; stl:heatPositionInSequence ?sourcePosition .
+  OPTIONAL { ?piece stl:previousGrade/dct:identifier ?previousGrade }
+  OPTIONAL { ?piece stl:nextGrade/dct:identifier ?nextGrade }
+}
+ORDER BY ?slab ?sourcePosition ?sourceHeat

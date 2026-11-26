@@ -1,0 +1,24 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+# The two exits belong to one split. Follow each exit to its own tested and shipped coil.
+SELECT ?hotCoil ?splitCoil ?startLength ?endLength ?finishedCoil ?judgement ?shipment ?issuedOn
+WHERE {
+  VALUES ?hotCoil { "R126000457" }
+  ?hot a stl:HotRolledCoil ; dct:identifier ?hotCoil .
+  ?split a stl:CoilSplitting ; stl:inputPiece ?hot .
+  ?split (^stl:partOf)*/stl:outputPiece ?exit .
+  ?exit stl:derivedFrom ?hot ; dct:identifier ?splitCoil ;
+        stl:startLength ?startLength ; stl:endLength ?endLength .
+  OPTIONAL {
+    ?finished stl:derivedFrom* ?exit ; dct:identifier ?finishedCoil .
+    ?decision a stl:QualityDecision ; stl:assessedObject ?finished ;
+              stl:judgementResult/skos:notation ?judgement .
+    OPTIONAL {
+      ?dispatch a stl:Shipment ; stl:shippedPackage/stl:hasPart ?finished ;
+                dct:identifier ?shipment ; stl:issuedOn ?issuedOn .
+    }
+  }
+}
+ORDER BY ?splitCoil ?finishedCoil ?shipment

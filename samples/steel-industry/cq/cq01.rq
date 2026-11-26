@@ -1,0 +1,19 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+# Follow the shipped member through its package and each material transformation.
+SELECT ?shipment ?coil ?slab ?heat ?evidence ?share ?shareBasis
+WHERE {
+  VALUES ?shipment { "F26000777" }
+  ?dispatch a stl:Shipment ; dct:identifier ?shipment ; stl:shippedPackage/stl:hasPart ?finished .
+  ?finished dct:identifier ?coil ; stl:derivedFrom+ ?castPiece .
+  ?castPiece a stl:Slab ; dct:identifier ?slab ; stl:sourceHeat ?source .
+  ?source dct:identifier ?heat .
+  OPTIONAL {
+    ?castPiece stl:contribution ?record .
+    ?record stl:contributedHeat ?source ; stl:evidenceLevel/skos:notation ?evidence .
+    OPTIONAL { ?record stl:share ?share ; stl:shareBasis/skos:notation ?shareBasis }
+  }
+}
+ORDER BY ?shipment ?coil ?slab ?heat

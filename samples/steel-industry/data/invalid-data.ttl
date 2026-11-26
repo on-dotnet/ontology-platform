@@ -1,0 +1,1120 @@
+# Synthetic counterexamples and their exact SHACL results.
+# Unmarked records provide valid linked context. Repeated EXPECT lines retain multiplicity.
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix disposition: <https://w3id.org/ontology-platform/steel/code/disposition-type/> .
+@prefix analysis: <https://w3id.org/ontology-platform/steel/code/analysis-type/> .
+@prefix sampleType: <https://w3id.org/ontology-platform/steel/code/sample-type/> .
+@prefix item: <https://w3id.org/ontology-platform/steel/code/measurement-item/> .
+@prefix basis: <https://w3id.org/ontology-platform/steel/code/share-basis/> .
+@prefix element: <https://w3id.org/ontology-platform/steel/code/chemical-element/> .
+@prefix evidence: <https://w3id.org/ontology-platform/steel/code/contribution-evidence/> .
+@prefix unitType: <https://w3id.org/ontology-platform/steel/code/unit-type/> .
+@prefix op: <urn:ontology-platform:vocabulary:> .
+
+<urn:synthetic:steel-industry:equipment/BOF1> a stl:Equipment ;
+    dcterms:identifier "BOF1" ;
+    stl:unitNumber "1"^^xsd:positiveInteger ;
+    stl:unitType unitType:BOF ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:equipment/BOF2> a stl:Equipment ;
+    dcterms:identifier "BOF2" ;
+    stl:unitNumber "2"^^xsd:positiveInteger ;
+    stl:unitType unitType:BOF ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:equipment/CC1> a stl:Equipment ;
+    dcterms:identifier "CC1" ;
+    stl:unitNumber "1"^^xsd:positiveInteger ;
+    stl:unitType unitType:CC ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:equipment/HSM1> a stl:Equipment ;
+    dcterms:identifier "HSM1" ;
+    stl:unitNumber "1"^^xsd:positiveInteger ;
+    stl:unitType unitType:HSM ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:equipment/CAL1> <https://w3id.org/ontology-platform/steel/EquipmentNumberFactShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:equipment/CAL1> a stl:Equipment ;
+    dcterms:identifier "CAL1" ;
+    stl:unitType unitType:CAL ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:equipment/PLTCM1> a stl:Equipment ;
+    dcterms:identifier "PLTCM1" ;
+    stl:unitNumber "1"^^xsd:positiveInteger ;
+    stl:unitType unitType:PLTCM ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:storagearea/CY1> a stl:StorageArea ;
+    dcterms:identifier "CY1" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heat/H22600992> <https://w3id.org/ontology-platform/steel/HeatAnalysisLimitShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:heat/H22600992> a stl:Heat ;
+    dcterms:identifier "H22600992" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "992"^^xsd:positiveInteger ;
+    stl:producedOnFurnace <urn:synthetic:steel-industry:equipment/BOF2> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:heat/H22600993> a stl:Heat ;
+    dcterms:identifier "H22600993" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "993"^^xsd:positiveInteger ;
+    stl:producedOnFurnace <urn:synthetic:steel-industry:equipment/BOF2> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:heat/H22600994> a stl:Heat ;
+    dcterms:identifier "H22600994" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "994"^^xsd:positiveInteger ;
+    stl:producedOnFurnace <urn:synthetic:steel-industry:equipment/BOF2> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:cutting/NEG-CUT> a stl:Cutting ;
+    stl:actualEndAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:cutting/NEG-CUT2> a stl:Cutting ;
+    stl:actualEndAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:hotrolling/NEG-HOT> a stl:HotRolling ;
+    stl:actualEndAt "2026-11-03T02:00:00Z"^^xsd:dateTime ;
+    stl:performedOn <urn:synthetic:steel-industry:equipment/HSM1> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:annealing/NEG-ANNEAL> a stl:Annealing ;
+    stl:actualEndAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:performedOn <urn:synthetic:steel-industry:equipment/CAL1> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:picklingandcoldrolling/NEG-PICK> a stl:PicklingAndColdRolling ;
+    stl:actualEndAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:performedOn <urn:synthetic:steel-industry:equipment/PLTCM1> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:salesorder/D26009990> a stl:SalesOrder ;
+    dcterms:identifier "D26009990" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9990"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heat/BAD-HEAT> <https://w3id.org/ontology-platform/steel/HeatIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:heat/BAD-HEAT> a stl:Heat ;
+    dcterms:identifier "BAD-HEAT" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    stl:producedOnFurnace <urn:synthetic:steel-industry:equipment/BOF2> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:castsequence/BAD-CASTSEQUENCE> <https://w3id.org/ontology-platform/steel/CastSequenceIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:castsequence/BAD-CASTSEQUENCE> a stl:CastSequence ;
+    dcterms:identifier "BAD-CASTSEQUENCE" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    stl:castOn <urn:synthetic:steel-industry:equipment/CC1> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:slab/BAD-SLAB> <https://w3id.org/ontology-platform/steel/SlabIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:slab/BAD-SLAB> a stl:Slab ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    dcterms:identifier "BAD-SLAB" ;
+    stl:numberingHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:sourceHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:strandNumber "2"^^xsd:positiveInteger ;
+    stl:sequenceInStrand "1"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:cutting/NEG-CUT> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:hotrolledcoil/BAD-HOTROLLEDCOIL> <https://w3id.org/ontology-platform/steel/HotRolledCoilIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:hotrolledcoil/BAD-HOTROLLEDCOIL> a stl:HotRolledCoil ;
+    dcterms:identifier "BAD-HOTROLLEDCOIL" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:hotrolling/NEG-HOT> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:fullhardcoil/BAD-FULLHARDCOIL> <https://w3id.org/ontology-platform/steel/FullHardCoilIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:fullhardcoil/BAD-FULLHARDCOIL> a stl:FullHardCoil ;
+    dcterms:identifier "BAD-FULLHARDCOIL" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:picklingandcoldrolling/NEG-PICK> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:annealedcoil/BAD-ANNEALEDCOIL> <https://w3id.org/ontology-platform/steel/AnnealedCoilIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:annealedcoil/BAD-ANNEALEDCOIL> a stl:AnnealedCoil ;
+    dcterms:identifier "BAD-ANNEALEDCOIL" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:picklingandcoldrolling/NEG-PICK> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:galvanizedcoil/BAD-GALVANIZEDCOIL> <https://w3id.org/ontology-platform/steel/GalvanizedCoilIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:galvanizedcoil/BAD-GALVANIZEDCOIL> a stl:GalvanizedCoil ;
+    dcterms:identifier "BAD-GALVANIZEDCOIL" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:picklingandcoldrolling/NEG-PICK> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:recoiledcoil/BAD-RECOILEDCOIL> <https://w3id.org/ontology-platform/steel/RecoiledCoilIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:recoiledcoil/BAD-RECOILEDCOIL> a stl:RecoiledCoil ;
+    dcterms:identifier "BAD-RECOILEDCOIL" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:picklingandcoldrolling/NEG-PICK> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:package/BAD-PACKAGE> <https://w3id.org/ontology-platform/steel/PackageIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:package/BAD-PACKAGE> a stl:Package ;
+    stl:producedBy <urn:synthetic:steel-industry:packing/NEG-PACK> ;
+    dcterms:identifier "BAD-PACKAGE" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:sample/BAD-SAMPLE> <https://w3id.org/ontology-platform/steel/SampleIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:sample/BAD-SAMPLE> a stl:Sample ;
+    dcterms:identifier "BAD-SAMPLE" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:inspectionlot/BAD-INSPECTIONLOT> <https://w3id.org/ontology-platform/steel/InspectionLotIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:inspectionlot/BAD-INSPECTIONLOT> a stl:InspectionLot ;
+    dcterms:identifier "BAD-INSPECTIONLOT" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:qualitydisposition/BAD-QUALITYDISPOSITION> <https://w3id.org/ontology-platform/steel/QualityDispositionIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:qualitydisposition/BAD-QUALITYDISPOSITION> a stl:QualityDisposition ;
+    dcterms:identifier "BAD-QUALITYDISPOSITION" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:millcertificate/BAD-MILLCERTIFICATE> <https://w3id.org/ontology-platform/steel/MillCertificateIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:millcertificate/BAD-MILLCERTIFICATE> a stl:MillCertificate ;
+    dcterms:identifier "BAD-MILLCERTIFICATE" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:salesorder/BAD-SALESORDER> <https://w3id.org/ontology-platform/steel/SalesOrderIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:salesorder/BAD-SALESORDER> a stl:SalesOrder ;
+    dcterms:identifier "BAD-SALESORDER" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:salesorderline/BAD-SALESORDERLINE> <https://w3id.org/ontology-platform/steel/SalesOrderLineIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:salesorderline/BAD-SALESORDERLINE> a stl:SalesOrderLine ;
+    dcterms:identifier "BAD-SALESORDERLINE" ;
+    stl:partOf <urn:synthetic:steel-industry:salesorder/D26009990> ;
+    stl:lineNumber "10"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:productionorder/BAD-PRODUCTIONORDER> <https://w3id.org/ontology-platform/steel/ProductionOrderIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:productionorder/BAD-PRODUCTIONORDER> a stl:ProductionOrder ;
+    dcterms:identifier "BAD-PRODUCTIONORDER" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:shipment/BAD-SHIPMENT> <https://w3id.org/ontology-platform/steel/ShipmentIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:shipment/BAD-SHIPMENT> a stl:Shipment ;
+    dcterms:identifier "BAD-SHIPMENT" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:equipment/BAD-EQUIPMENT> <https://w3id.org/ontology-platform/steel/EquipmentIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:equipment/BAD-EQUIPMENT> a stl:Equipment ;
+    dcterms:identifier "BAD-EQUIPMENT" ;
+    stl:unitNumber "1"^^xsd:positiveInteger ;
+    stl:unitType unitType:BOF ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:crane/BOF8> <https://w3id.org/ontology-platform/steel/CraneIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:crane/BOF8> a stl:Crane ;
+    dcterms:identifier "BOF8" ;
+    stl:unitNumber "8"^^xsd:positiveInteger ;
+    stl:locatedIn <urn:synthetic:steel-industry:storagearea/CY1> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:storagearea/BAD-STORAGEAREA> <https://w3id.org/ontology-platform/steel/StorageAreaIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:storagearea/BAD-STORAGEAREA> a stl:StorageArea ;
+    dcterms:identifier "BAD-STORAGEAREA" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:storagelocation/BAD-STORAGELOCATION> <https://w3id.org/ontology-platform/steel/StorageLocationIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:storagelocation/BAD-STORAGELOCATION> a stl:StorageLocation ;
+    dcterms:identifier "BAD-STORAGELOCATION" ;
+    stl:locatedIn <urn:synthetic:steel-industry:storagearea/CY1> ;
+    stl:row "3"^^xsd:positiveInteger ;
+    stl:column "12"^^xsd:positiveInteger ;
+    stl:tier "1"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:steelgrade/BAD-STEELGRADE> <https://w3id.org/ontology-platform/steel/SteelGradeIdentifierShape> PatternConstraintComponent
+<urn:synthetic:steel-industry:steelgrade/BAD-STEELGRADE> a stl:SteelGrade ;
+    dcterms:identifier "BAD-STEELGRADE" ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heat/UNNUMBERED-REFERENCE> <https://w3id.org/ontology-platform/steel/IdentifierRequiredShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:heat/UNNUMBERED-REFERENCE> a stl:Heat ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1"^^xsd:positiveInteger ;
+    stl:producedOnFurnace <urn:synthetic:steel-industry:equipment/BOF2> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:salesorder/D26009980> <https://w3id.org/ontology-platform/steel/IdentifierSingleShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:salesorder/D26009980> <https://w3id.org/ontology-platform/steel/IdentifierYearShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:salesorder/D26009980> a stl:SalesOrder ;
+    dcterms:identifier "D26009980", "D25009980" ;
+    stl:createdAt "2025-12-31T16:05:00Z"^^xsd:dateTime ;
+    stl:serialNumber "9980"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:inspectionlot/L26009981> <https://w3id.org/ontology-platform/steel/IdentifierStringShape> DatatypeConstraintComponent
+<urn:synthetic:steel-industry:inspectionlot/L26009981> a stl:InspectionLot ;
+    dcterms:identifier "L26009981"@en ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9981"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:sample/T260009901> <https://w3id.org/ontology-platform/steel/IdentifierUniqueShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:sample/T260009901> a stl:Sample ;
+    dcterms:identifier "T260009901" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9901"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:sample/DUPLICATE-PRIMARY-IDENTIFIER> <https://w3id.org/ontology-platform/steel/IdentifierUniqueShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:sample/DUPLICATE-PRIMARY-IDENTIFIER> a stl:Sample ;
+    dcterms:identifier "T260009901" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9901"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:equipment/CRCY17> <https://w3id.org/ontology-platform/steel/EquipmentIdentifierFamilyShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:equipment/CRCY17> a stl:Equipment ;
+    dcterms:identifier "CRCY17" ;
+    stl:unitNumber "7"^^xsd:positiveInteger ;
+    stl:unitType unitType:BOF ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:productionorder/W26009982> <https://w3id.org/ontology-platform/steel/CreatedAtRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:productionorder/W26009982> <https://w3id.org/ontology-platform/steel/SerialNumberRequiredShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:productionorder/W26009982> a stl:ProductionOrder ;
+    dcterms:identifier "W26009982" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:shipment/F26009983> <https://w3id.org/ontology-platform/steel/CreatedAtSingleShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:shipment/F26009983> <https://w3id.org/ontology-platform/steel/SerialNumberSingleShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:shipment/F26009983> <https://w3id.org/ontology-platform/steel/IdentifierSerialShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:shipment/F26009983> a stl:Shipment ;
+    dcterms:identifier "F26009983" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime, "2026-11-04T00:00:00Z"^^xsd:dateTime ;
+    stl:serialNumber "9983"^^xsd:positiveInteger, "9984"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:salesorderline/D26009990-050> <https://w3id.org/ontology-platform/steel/LineNumberRequiredShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:salesorderline/D26009990-050> a stl:SalesOrderLine ;
+    dcterms:identifier "D26009990-050" ;
+    stl:partOf <urn:synthetic:steel-industry:salesorder/D26009990> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:salesorderline/D26009990-020> <https://w3id.org/ontology-platform/steel/LineNumberSingleShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:salesorderline/D26009990-020> <https://w3id.org/ontology-platform/steel/OrderLineNumberShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:salesorderline/D26009990-020> a stl:SalesOrderLine ;
+    dcterms:identifier "D26009990-020" ;
+    stl:partOf <urn:synthetic:steel-industry:salesorder/D26009990> ;
+    stl:lineNumber "20"^^xsd:positiveInteger, "30"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:steelgrade/G9997> <https://w3id.org/ontology-platform/steel/SerialNumberDatatypeShape> DatatypeConstraintComponent
+<urn:synthetic:steel-industry:steelgrade/G9997> a stl:SteelGrade ;
+    dcterms:identifier "G9997" ;
+    stl:serialNumber 0.5 ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heat/H22600991> <https://w3id.org/ontology-platform/steel/HeatFurnaceShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:heat/H22600991> a stl:Heat ;
+    dcterms:identifier "H22600991" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "991"^^xsd:positiveInteger ;
+    stl:producedOnFurnace <urn:synthetic:steel-industry:equipment/BOF1> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:castsequence/Q2260991> <https://w3id.org/ontology-platform/steel/CasterNumberShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:castsequence/Q2260991> a stl:CastSequence ;
+    dcterms:identifier "Q2260991" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "991"^^xsd:positiveInteger ;
+    stl:castOn <urn:synthetic:steel-industry:equipment/CC1> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:castsequence/Q1260995> <https://w3id.org/ontology-platform/steel/CasterTypeShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:castsequence/Q1260995> a stl:CastSequence ;
+    dcterms:identifier "Q1260995" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "995"^^xsd:positiveInteger ;
+    stl:castOn <urn:synthetic:steel-industry:equipment/BOF1> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992201> <https://w3id.org/ontology-platform/steel/SlabHeatShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992201> <https://w3id.org/ontology-platform/steel/SlabStrandShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992201> <https://w3id.org/ontology-platform/steel/SlabSequenceShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:slab/S22600992201> a stl:Slab ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    dcterms:identifier "S22600992201" ;
+    stl:numberingHeat <urn:synthetic:steel-industry:heat/H22600993> ;
+    stl:sourceHeat <urn:synthetic:steel-industry:heat/H22600993> ;
+    stl:strandNumber "1"^^xsd:positiveInteger ;
+    stl:sequenceInStrand "2"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:cutting/NEG-CUT> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:hotrolledcoil/R226009960> <https://w3id.org/ontology-platform/steel/HotMillNumberShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:hotrolledcoil/R226009960> a stl:HotRolledCoil ;
+    dcterms:identifier "R226009960" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9960"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:hotrolling/NEG-HOT> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:fullhardcoil/CPL126009994> <https://w3id.org/ontology-platform/steel/ColdMillSegmentShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:fullhardcoil/CPL126009994> a stl:FullHardCoil ;
+    dcterms:identifier "CPL126009994" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9994"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:annealing/NEG-ANNEAL> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:fullhardcoil/CCA126009984> <https://w3id.org/ontology-platform/steel/FullHardCoilIdentifierShape> PatternConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:fullhardcoil/CCA126009984> <https://w3id.org/ontology-platform/steel/ColdMillSegmentShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:fullhardcoil/CCA126009984> a stl:FullHardCoil ;
+    dcterms:identifier "CCA126009984" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9984"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:picklingandcoldrolling/NEG-PICK> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:equipment/LF8> <https://w3id.org/ontology-platform/steel/EquipmentTypeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:equipment/LF8> <https://w3id.org/ontology-platform/steel/EquipmentOrdinalShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:equipment/LF8> a stl:Equipment ;
+    dcterms:identifier "LF8" ;
+    stl:unitNumber "7"^^xsd:positiveInteger ;
+    stl:unitType unitType:RH ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:crane/CRCY28> <https://w3id.org/ontology-platform/steel/CraneAreaShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:crane/CRCY28> a stl:Crane ;
+    dcterms:identifier "CRCY28" ;
+    stl:unitNumber "8"^^xsd:positiveInteger ;
+    stl:locatedIn <urn:synthetic:steel-industry:storagearea/CY1> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:storagelocation/CY2-04132> <https://w3id.org/ontology-platform/steel/LocationAreaShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:storagelocation/CY2-04132> <https://w3id.org/ontology-platform/steel/LocationRowShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:storagelocation/CY2-04132> <https://w3id.org/ontology-platform/steel/LocationColumnShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:storagelocation/CY2-04132> <https://w3id.org/ontology-platform/steel/LocationTierShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:storagelocation/CY2-04132> a stl:StorageLocation ;
+    dcterms:identifier "CY2-04132" ;
+    stl:locatedIn <urn:synthetic:steel-industry:storagearea/CY1> ;
+    stl:row "3"^^xsd:positiveInteger ;
+    stl:column "12"^^xsd:positiveInteger ;
+    stl:tier "1"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:salesorderline/D26009991-010> <https://w3id.org/ontology-platform/steel/OrderLineParentShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:salesorderline/D26009991-010> a stl:SalesOrderLine ;
+    dcterms:identifier "D26009991-010" ;
+    stl:partOf <urn:synthetic:steel-industry:salesorder/D26009990> ;
+    stl:lineNumber "10"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heat/H22600996> <https://w3id.org/ontology-platform/steel/FurnaceFactShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:heat/H22600996> a stl:Heat ;
+    dcterms:identifier "H22600996" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "996"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:castsequence/Q1260992> <https://w3id.org/ontology-platform/steel/CasterFactShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:castsequence/Q1260992> a stl:CastSequence ;
+    dcterms:identifier "Q1260992" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "992"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992202> <https://w3id.org/ontology-platform/steel/StrandFactShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992202> <https://w3id.org/ontology-platform/steel/StrandSequenceFactShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992202> <https://w3id.org/ontology-platform/steel/SlabNumberingHeatRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992202> <https://w3id.org/ontology-platform/steel/SlabSourceHeatRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992202> <https://w3id.org/ontology-platform/steel/SlabProducedByRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992202> <https://w3id.org/ontology-platform/steel/PieceCreationTimeShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:slab/S22600992202> a stl:Slab ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    dcterms:identifier "S22600992202" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:fullhardcoil/CPL126009995> <https://w3id.org/ontology-platform/steel/ProductionUnitFactShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:fullhardcoil/CPL126009995> a stl:FullHardCoil ;
+    stl:producedBy <urn:synthetic:steel-industry:hotrolling/NEG-MISSING-MILL> ;
+    dcterms:identifier "CPL126009995" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9995"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:equipment/RH9> <https://w3id.org/ontology-platform/steel/EquipmentNumberFactShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:equipment/RH9> <https://w3id.org/ontology-platform/steel/MachineTypeFactShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:equipment/RH9> a stl:Equipment ;
+    dcterms:identifier "RH9" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:storagelocation/CY1-05033> <https://w3id.org/ontology-platform/steel/StorageAreaFactShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:storagelocation/CY1-05033> <https://w3id.org/ontology-platform/steel/LocationRowFactShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:storagelocation/CY1-05033> <https://w3id.org/ontology-platform/steel/LocationColumnFactShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:storagelocation/CY1-05033> <https://w3id.org/ontology-platform/steel/LocationTierFactShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:storagelocation/CY1-05033> a stl:StorageLocation ;
+    dcterms:identifier "CY1-05033" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:salesorderline/D26009990-040> <https://w3id.org/ontology-platform/steel/ParentOrderFactShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:salesorderline/D26009990-040> a stl:SalesOrderLine ;
+    dcterms:identifier "D26009990-040" ;
+    stl:lineNumber "40"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992203> <https://w3id.org/ontology-platform/steel/SlabNumberingHeatLimitShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992203> <https://w3id.org/ontology-platform/steel/SlabSourceHeatLimitShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992203> <https://w3id.org/ontology-platform/steel/SlabProducedByLimitShape> MaxCountConstraintComponent
+<urn:synthetic:steel-industry:slab/S22600992203> a stl:Slab ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    dcterms:identifier "S22600992203" ;
+    stl:numberingHeat <urn:synthetic:steel-industry:heat/H22600992>, <urn:synthetic:steel-industry:heat/UNNUMBERED-REFERENCE> ;
+    stl:sourceHeat <urn:synthetic:steel-industry:heat/H22600992>, <urn:synthetic:steel-industry:heat/H22600993>, <urn:synthetic:steel-industry:heat/H22600994> ;
+    stl:strandNumber "2"^^xsd:positiveInteger ;
+    stl:sequenceInStrand "3"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:cutting/NEG-CUT>, <urn:synthetic:steel-industry:cutting/NEG-CUT2> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992204> <https://w3id.org/ontology-platform/steel/SlabCuttingShape> ClassConstraintComponent
+<urn:synthetic:steel-industry:slab/S22600992204> a stl:Slab ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    dcterms:identifier "S22600992204" ;
+    stl:numberingHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:sourceHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:strandNumber "2"^^xsd:positiveInteger ;
+    stl:sequenceInStrand "4"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:hotrolling/NEG-HOT> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:heatcontribution/NEG-MIX> a stl:HeatContribution ;
+    stl:contributedHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:evidenceLevel evidence:UNKNOWN ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:heatcontribution/NEG-STRAY> a stl:HeatContribution ;
+    stl:contributedHeat <urn:synthetic:steel-industry:heat/H22600994> ;
+    stl:evidenceLevel evidence:ESTIMATED ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992205> <https://w3id.org/ontology-platform/steel/SourceContributionShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992205> <https://w3id.org/ontology-platform/steel/ContributionSourceShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:slab/S22600992205> a stl:Slab ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    dcterms:identifier "S22600992205" ;
+    stl:numberingHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:sourceHeat <urn:synthetic:steel-industry:heat/H22600992>, <urn:synthetic:steel-industry:heat/H22600993> ;
+    stl:strandNumber "2"^^xsd:positiveInteger ;
+    stl:sequenceInStrand "5"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:cutting/NEG-CUT> ;
+    stl:contribution <urn:synthetic:steel-industry:heatcontribution/NEG-MIX>, <urn:synthetic:steel-industry:heatcontribution/NEG-STRAY> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heatcontribution/NEG-EMPTY> <https://w3id.org/ontology-platform/steel/ContributionContributedHeatRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:heatcontribution/NEG-EMPTY> <https://w3id.org/ontology-platform/steel/ContributionEvidenceLevelRequiredShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:heatcontribution/NEG-EMPTY> a stl:HeatContribution ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heatcontribution/NEG-MULTIPLE> <https://w3id.org/ontology-platform/steel/ContributionContributedHeatSingleShape> MaxCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:heatcontribution/NEG-MULTIPLE> <https://w3id.org/ontology-platform/steel/ContributionEvidenceLevelSingleShape> MaxCountConstraintComponent
+<urn:synthetic:steel-industry:heatcontribution/NEG-MULTIPLE> a stl:HeatContribution ;
+    stl:contributedHeat <urn:synthetic:steel-industry:heat/H22600992>, <urn:synthetic:steel-industry:heat/H22600993> ;
+    stl:evidenceLevel evidence:MEASURED, evidence:ESTIMATED ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heatcontribution/NEG-UNKNOWN> <https://w3id.org/ontology-platform/steel/ShareBasisRequiredShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:heatcontribution/NEG-UNKNOWN> <https://w3id.org/ontology-platform/steel/UnknownContributionShareShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:heatcontribution/NEG-UNKNOWN> a stl:HeatContribution ;
+    stl:contributedHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:share 0.5 ;
+    stl:evidenceLevel evidence:UNKNOWN ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heatcontribution/NEG-BASIS> <https://w3id.org/ontology-platform/steel/ShareBasisCodeShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:heatcontribution/NEG-BASIS> a stl:HeatContribution ;
+    stl:contributedHeat <urn:synthetic:steel-industry:heat/H22600993> ;
+    stl:share 0.5 ;
+    stl:shareBasis unitType:BOF ;
+    stl:evidenceLevel evidence:ESTIMATED ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:cutting/NEG-PLAN-ON-EXECUTION> <https://w3id.org/ontology-platform/steel/PlanAttributesShape> ClassConstraintComponent
+<urn:synthetic:steel-industry:cutting/NEG-PLAN-ON-EXECUTION> a stl:Cutting ;
+    stl:plannedStartAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:movementorder/NEG-ACTUAL-ON-PLAN> <https://w3id.org/ontology-platform/steel/ActualAttributesShape> ClassConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:movementorder/NEG-ACTUAL-ON-PLAN> <https://w3id.org/ontology-platform/steel/ActualLengthOwnerShape> OrConstraintComponent
+<urn:synthetic:steel-industry:movementorder/NEG-ACTUAL-ON-PLAN> a stl:MovementOrder ;
+    stl:actualLength 1.2 ;
+    stl:occurredAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:cuttingplan/NEG-DUAL-TYPE> <https://w3id.org/ontology-platform/steel/PlanEventDisjointShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:cuttingplan/NEG-DUAL-TYPE> a stl:CuttingPlan, stl:Cutting ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:hotrolling/NEG-LENGTH-ON-ROLLING> <https://w3id.org/ontology-platform/steel/ActualLengthOwnerShape> OrConstraintComponent
+<urn:synthetic:steel-industry:hotrolling/NEG-LENGTH-ON-ROLLING> a stl:HotRolling ;
+    stl:actualLength 700.0 ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-TIME> <https://w3id.org/ontology-platform/steel/ActiveOxygenDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-TIME> <https://w3id.org/ontology-platform/steel/InstantDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-TIME> <https://w3id.org/ontology-platform/steel/InstantTimezoneShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:observation/NEG-TIME> a stl:Observation ;
+    stl:measuredObject <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:measurementItem item:OXYACT ;
+    stl:measuredAtPoint <urn:synthetic:steel-industry:measurementpoint/NEG-LANCE> ;
+    stl:activeOxygen "1" ;
+    stl:sampledAt "2026-11-02" ;
+    stl:resultAt "2026-11-02T08:00:00"^^xsd:dateTime ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-DATE> <https://w3id.org/ontology-platform/steel/DateDatatypeShape> DatatypeConstraintComponent
+<urn:synthetic:steel-industry:manufacturingrecord/NEG-DATE> a stl:ManufacturingRecord ;
+    stl:issuedOn "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/UnitNumberDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/SerialNumberDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/LineNumberDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/StrandNumberDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/SequenceInStrandDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/StrandCountDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/PositionInHeatDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/HeatPositionInSequenceDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/PositionInSequenceDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/ApplicableQuantityDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/RowDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/ColumnDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/TierDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/StartLengthDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/EndLengthDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/ThicknessDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/WidthDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/NetMassDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/GrossMassDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/TheoreticalMassDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/TemperatureDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/LowerLimitDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/UpperLimitDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/TensileStrengthDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/LowerYieldStrengthDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/UpperYieldStrengthDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/ElongationAfterFractureDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/ImpactEnergyDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/CoatingMassDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/MinimumCoatingMassDecimalShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/CastingSpeedDecimalShape> DatatypeConstraintComponent
+<urn:synthetic:steel-industry:manufacturingrecord/NEG-NUMERIC> a stl:ManufacturingRecord ;
+    stl:unitNumber "1" ;
+    stl:serialNumber "1" ;
+    stl:lineNumber "1" ;
+    stl:strandNumber "1" ;
+    stl:sequenceInStrand "1" ;
+    stl:strandCount "1" ;
+    stl:positionInHeat "1" ;
+    stl:heatPositionInSequence "1" ;
+    stl:positionInSequence "1" ;
+    stl:applicableQuantity "1" ;
+    stl:row "1" ;
+    stl:column "1" ;
+    stl:tier "1" ;
+    stl:startLength "1" ;
+    stl:endLength "1" ;
+    stl:thickness "1" ;
+    stl:width "1" ;
+    stl:netMass "1" ;
+    stl:grossMass "1" ;
+    stl:theoreticalMass "1" ;
+    stl:temperature 25 ;
+    stl:lowerLimit "1" ;
+    stl:upperLimit "1" ;
+    stl:tensileStrength "1" ;
+    stl:lowerYieldStrength "1" ;
+    stl:upperYieldStrength "1" ;
+    stl:elongationAfterFracture "1" ;
+    stl:impactEnergy "1" ;
+    stl:coatingMass "1" ;
+    stl:minimumCoatingMass "1" ;
+    stl:castingSpeed "1" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:cuttingplan/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/CuttingSequenceDatatypeShape> DatatypeConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:cuttingplan/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/PlannedLengthDecimalShape> DatatypeConstraintComponent
+<urn:synthetic:steel-industry:cuttingplan/NEG-NUMERIC> a stl:CuttingPlan ;
+    stl:cuttingSequence "1" ;
+    stl:plannedLength "1" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:cutting/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/ActualLengthDecimalShape> DatatypeConstraintComponent
+<urn:synthetic:steel-industry:cutting/NEG-NUMERIC> a stl:Cutting ;
+    stl:actualLength "1" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:elementresult/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/MassFractionDecimalShape> DatatypeConstraintComponent
+<urn:synthetic:steel-industry:elementresult/NEG-NUMERIC> a stl:ElementResult ;
+    stl:massFraction "1" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heatcontribution/NEG-NUMERIC> <https://w3id.org/ontology-platform/steel/ShareDecimalShape> DatatypeConstraintComponent
+<urn:synthetic:steel-industry:heatcontribution/NEG-NUMERIC> a stl:HeatContribution ;
+    stl:contributedHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:evidenceLevel evidence:ESTIMATED ;
+    stl:shareBasis basis:MASS ;
+    stl:share "1" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-METADATA> <https://w3id.org/ontology-platform/steel/NumericUnitShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:manufacturingrecord/NEG-METADATA> rdfs:range xsd:decimal ;
+    stl:quantityKind <http://qudt.org/vocab/quantitykind/MassFraction> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-AMBIGUOUS-METADATA> <https://w3id.org/ontology-platform/steel/NumericQuantityKindShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:manufacturingrecord/NEG-AMBIGUOUS-METADATA> rdfs:range xsd:decimal ;
+    stl:unit <http://qudt.org/vocab/unit/PERCENT> ;
+    stl:quantityKind <http://qudt.org/vocab/quantitykind/MassFraction>, "mass fraction" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/UnitTypeCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/DispositionTypeCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/JudgementResultCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/AnalysisTypeCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/SampleTypeCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/EvidenceLevelCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/InspectionDocumentTypeCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/CoatingTypeCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/MovementTypeCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/ElementCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/MeasurementItemCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/MeasurementItemValueShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/MeasurementMethodCodeShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> <https://w3id.org/ontology-platform/steel/DefectTypeCodeShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:manufacturingrecord/NEG-CODE-SCHEMES> a stl:ManufacturingRecord ;
+    stl:unitType "UNREGISTERED" ;
+    stl:dispositionType "UNREGISTERED" ;
+    stl:judgementResult "UNREGISTERED" ;
+    stl:analysisType "UNREGISTERED" ;
+    stl:sampleType "UNREGISTERED" ;
+    stl:evidenceLevel "UNREGISTERED" ;
+    stl:inspectionDocumentType "UNREGISTERED" ;
+    stl:coatingType "UNREGISTERED" ;
+    stl:movementType "UNREGISTERED" ;
+    stl:element "UNREGISTERED" ;
+    stl:measurementItem "UNREGISTERED" ;
+    stl:measurementMethod "manual" ;
+    stl:defectType "UNREGISTERED" ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:elementresult/NEG-PPM> <https://w3id.org/ontology-platform/steel/ActiveOxygenOwnerShape> ClassConstraintComponent
+<urn:synthetic:steel-industry:elementresult/NEG-PPM> a stl:ElementResult ;
+    stl:element element:O ;
+    stl:massFraction 0.001 ;
+    stl:activeOxygen 10.0 ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:elementresult/NEG-MISSING-FRACTION> <https://w3id.org/ontology-platform/steel/ElementFractionRequiredShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:elementresult/NEG-MISSING-FRACTION> a stl:ElementResult ;
+    stl:element element:C ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:qualitydisposition/N26009991> <https://w3id.org/ontology-platform/steel/ConcessionApplicableOrderLineShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:qualitydisposition/N26009991> <https://w3id.org/ontology-platform/steel/ConcessionApplicableQuantityShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:qualitydisposition/N26009991> <https://w3id.org/ontology-platform/steel/ConcessionValidUntilOnShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:qualitydisposition/N26009991> a stl:QualityDisposition ;
+    dcterms:identifier "N26009991" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9991"^^xsd:positiveInteger ;
+    stl:dispositionType disposition:CONCESSION ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:qualitydisposition/N26009992> <https://w3id.org/ontology-platform/steel/ConcessionOrderClassShape> ClassConstraintComponent
+<urn:synthetic:steel-industry:qualitydisposition/N26009992> a stl:QualityDisposition ;
+    dcterms:identifier "N26009992" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9992"^^xsd:positiveInteger ;
+    stl:dispositionType disposition:CONCESSION ;
+    stl:applicableOrderLine <urn:synthetic:steel-industry:salesorder/D26009990> ;
+    stl:applicableQuantity "0"^^xsd:nonNegativeInteger ;
+    stl:validUntilOn "2026-12-31"^^xsd:date ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992206> <https://w3id.org/ontology-platform/steel/SlabNumberingHeatClassShape> ClassConstraintComponent
+<urn:synthetic:steel-industry:slab/S22600992206> a stl:Slab ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    dcterms:identifier "S22600992206" ;
+    stl:numberingHeat <urn:synthetic:steel-industry:heat/DANGLING-HEAT> ;
+    stl:sourceHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:strandNumber "2"^^xsd:positiveInteger ;
+    stl:sequenceInStrand "6"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:cutting/NEG-CUT> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992207> <https://w3id.org/ontology-platform/steel/SlabSourceHeatClassShape> ClassConstraintComponent
+<urn:synthetic:steel-industry:slab/S22600992207> a stl:Slab ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    dcterms:identifier "S22600992207" ;
+    stl:numberingHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:sourceHeat "H22600992" ;
+    stl:strandNumber "2"^^xsd:positiveInteger ;
+    stl:sequenceInStrand "7"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:cutting/NEG-CUT> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heat/H22600997> <https://w3id.org/ontology-platform/steel/HeatFurnaceClassShape> ClassConstraintComponent
+<urn:synthetic:steel-industry:heat/H22600997> a stl:Heat ;
+    dcterms:identifier "H22600997" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "997"^^xsd:positiveInteger ;
+    stl:producedOnFurnace <urn:synthetic:steel-industry:equipment/DANGLING-FURNACE> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:heat/H12600998> <https://w3id.org/ontology-platform/steel/HeatFurnaceTypeShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:heat/H12600998> a stl:Heat ;
+    dcterms:identifier "H12600998" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "998"^^xsd:positiveInteger ;
+    stl:producedOnFurnace <urn:synthetic:steel-industry:equipment/CC1> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:castsequence/Q1260998> <https://w3id.org/ontology-platform/steel/CasterClassShape> ClassConstraintComponent
+<urn:synthetic:steel-industry:castsequence/Q1260998> a stl:CastSequence ;
+    dcterms:identifier "Q1260998" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "998"^^xsd:positiveInteger ;
+    stl:castOn <urn:synthetic:steel-industry:equipment/DANGLING-CASTER> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:hotrolling/NEG-UNRESOLVED-MILL> a stl:HotRolling ;
+    stl:actualEndAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:performedOn <urn:synthetic:steel-industry:equipment/DANGLING-MILL> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:hotrolledcoil/R126009961> <https://w3id.org/ontology-platform/steel/CoilEquipmentClassShape> ClassConstraintComponent
+<urn:synthetic:steel-industry:hotrolledcoil/R126009961> a stl:HotRolledCoil ;
+    dcterms:identifier "R126009961" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9961"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:hotrolling/NEG-UNRESOLVED-MILL> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:manufacturingrecord/NEG-UNTYPED-OPERATION> a stl:Event ;
+    stl:actualEndAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:performedOn <urn:synthetic:steel-industry:equipment/PLTCM1> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:fullhardcoil/CPL126009996> <https://w3id.org/ontology-platform/steel/CoilOperationClassShape> ClassConstraintComponent
+<urn:synthetic:steel-industry:fullhardcoil/CPL126009996> a stl:FullHardCoil ;
+    dcterms:identifier "CPL126009996" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9996"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:manufacturingrecord/NEG-UNTYPED-OPERATION> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:hotrolledcoil/R126009962> <https://w3id.org/ontology-platform/steel/HotMillTypeShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:hotrolledcoil/R126009962> a stl:HotRolledCoil ;
+    dcterms:identifier "R126009962" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9962"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:annealing/NEG-ANNEAL> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:salesorderline/D26009990-010> a stl:SalesOrderLine ;
+    dcterms:identifier "D26009990-010" ;
+    stl:partOf <urn:synthetic:steel-industry:salesorder/D26009990> ;
+    stl:lineNumber "10"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:qualitydisposition/N26009993> <https://w3id.org/ontology-platform/steel/ApplicableQuantityDatatypeShape> DatatypeConstraintComponent
+<urn:synthetic:steel-industry:qualitydisposition/N26009993> a stl:QualityDisposition ;
+    dcterms:identifier "N26009993" ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9993"^^xsd:positiveInteger ;
+    stl:dispositionType disposition:CONCESSION ;
+    stl:applicableOrderLine <urn:synthetic:steel-industry:salesorderline/D26009990-010> ;
+    stl:applicableQuantity 0.5 ;
+    stl:validUntilOn "2026-12-31"^^xsd:date ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:manufacturingrecord/NEG-WIDTH-UNIT> <https://w3id.org/ontology-platform/steel/PropertyUnitShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:manufacturingrecord/NEG-WIDTH-UNIT> rdfs:range xsd:decimal ;
+    rdfs:subPropertyOf stl:width ;
+    stl:unit <http://qudt.org/vocab/unit/M> ;
+    stl:quantityKind <http://qudt.org/vocab/quantitykind/Length> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:package/P260009989> <https://w3id.org/ontology-platform/steel/IdentifierYearShape> SPARQLConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:package/P260009989> <https://w3id.org/ontology-platform/steel/IdentifierSerialShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:package/P260009989> a stl:Package ;
+    stl:producedBy <urn:synthetic:steel-industry:packing/NEG-PACK-PRIOR-YEAR> ;
+    dcterms:identifier "P260009989" ;
+    stl:createdAt "2025-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "9988"^^xsd:positiveInteger ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:hotrolling/NEG-MISSING-MILL> a stl:HotRolling ;
+    stl:actualEndAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:packing/NEG-PACK> a stl:Packing ;
+    stl:actualEndAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:packing/NEG-PACK-PRIOR-YEAR> a stl:Packing ;
+    stl:actualEndAt "2025-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:measurementpoint/NEG-LANCE> a stl:MeasurementPoint ;
+    stl:partOf <urn:synthetic:steel-industry:equipment/BOF2> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:measurementpoint/NEG-CREATED-AT> <https://w3id.org/ontology-platform/steel/CreatedAtOwnerShape> OrConstraintComponent
+<urn:synthetic:steel-industry:measurementpoint/NEG-CREATED-AT> a stl:MeasurementPoint ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:slab/S22600992208> <https://w3id.org/ontology-platform/steel/PieceCreationTimeShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:slab/S22600992208> a stl:Slab ;
+    dcterms:identifier "S22600992208" ;
+    stl:createdAt "2026-11-03T10:01:00+08:00"^^xsd:dateTime ;
+    stl:numberingHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:sourceHeat <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:strandNumber "2"^^xsd:positiveInteger ;
+    stl:sequenceInStrand "8"^^xsd:positiveInteger ;
+    stl:producedBy <urn:synthetic:steel-industry:cutting/NEG-CUT> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-MISSING> <https://w3id.org/ontology-platform/steel/ObservationMeasuredObjectRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-MISSING> <https://w3id.org/ontology-platform/steel/ObservationMeasurementItemRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-MISSING> <https://w3id.org/ontology-platform/steel/ObservationMeasuredAtPointRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-MISSING> <https://w3id.org/ontology-platform/steel/ObservationSampledAtRequiredShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:observation/NEG-MISSING> a stl:Observation ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:qualitydecision/NEG-MISSING> <https://w3id.org/ontology-platform/steel/QualityDecisionAssessedObjectRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:qualitydecision/NEG-MISSING> <https://w3id.org/ontology-platform/steel/QualityDecisionJudgementResultRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:qualitydecision/NEG-MISSING> <https://w3id.org/ontology-platform/steel/QualityDecisionAssessedSpecificationRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:qualitydecision/NEG-MISSING> <https://w3id.org/ontology-platform/steel/QualityDecisionOccurredAtRequiredShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:qualitydecision/NEG-MISSING> a stl:QualityDecision ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:movementevent/NEG-MISSING> <https://w3id.org/ontology-platform/steel/MovementEventMovementTypeRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:movementevent/NEG-MISSING> <https://w3id.org/ontology-platform/steel/MovementEventMovedPieceRequiredShape> MinCountConstraintComponent
+# EXPECT <urn:synthetic:steel-industry:movementevent/NEG-MISSING> <https://w3id.org/ontology-platform/steel/MovementEventOccurredAtRequiredShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:movementevent/NEG-MISSING> a stl:MovementEvent ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-WRONG-VALUE> <https://w3id.org/ontology-platform/steel/MeasurementItemValueShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:observation/NEG-WRONG-VALUE> a stl:Observation ;
+    stl:measuredObject <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:measurementItem item:TEMP ;
+    stl:measuredAtPoint <urn:synthetic:steel-industry:measurementpoint/NEG-LANCE> ;
+    stl:sampledAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:activeOxygen 350.0 ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-EXTRA-VALUE> <https://w3id.org/ontology-platform/steel/MeasurementItemValueShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:observation/NEG-EXTRA-VALUE> a stl:Observation ;
+    stl:measuredObject <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:measurementItem item:TEMP ;
+    stl:measuredAtPoint <urn:synthetic:steel-industry:measurementpoint/NEG-LANCE> ;
+    stl:sampledAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:temperature 1610.0 ;
+    stl:activeOxygen 350.0 ;
+    op:synthetic true .
+
+# This fixture-only item belongs to the scheme but has no item-to-property mapping.
+<urn:synthetic:steel-industry:concept/NEG-UNMAPPED> a skos:Concept ;
+    skos:inScheme <https://w3id.org/ontology-platform/steel/code/measurement-item> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-UNMAPPED> <https://w3id.org/ontology-platform/steel/MeasurementItemValueShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:observation/NEG-UNMAPPED> a stl:Observation ;
+    stl:measuredObject <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:measurementItem <urn:synthetic:steel-industry:concept/NEG-UNMAPPED> ;
+    stl:measuredAtPoint <urn:synthetic:steel-industry:measurementpoint/NEG-LANCE> ;
+    stl:sampledAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:temperature 1610.0 ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-NO-VALUE> <https://w3id.org/ontology-platform/steel/MeasurementItemValueShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:observation/NEG-NO-VALUE> a stl:Observation ;
+    stl:measuredObject <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:measurementItem item:TEMP ;
+    stl:measuredAtPoint <urn:synthetic:steel-industry:measurementpoint/NEG-LANCE> ;
+    stl:sampledAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-TEMP-EXTRA-COUNT> <https://w3id.org/ontology-platform/steel/MeasurementItemValueShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:observation/NEG-TEMP-EXTRA-COUNT> a stl:Observation ;
+    stl:measuredObject <urn:synthetic:steel-industry:heat/H22600992> ;
+    stl:measurementItem item:TEMP ;
+    stl:measuredAtPoint <urn:synthetic:steel-industry:measurementpoint/NEG-LANCE> ;
+    stl:sampledAt "2026-11-03T10:02:00+08:00"^^xsd:dateTime ;
+    stl:temperature 1610.0 ;
+    stl:strandCount "2"^^xsd:nonNegativeInteger ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:observation/NEG-TENSILE-EXTRA-YIELD> <https://w3id.org/ontology-platform/steel/MeasurementItemValueShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:observation/NEG-TENSILE-EXTRA-YIELD> a stl:Observation ;
+    stl:measuredObject <urn:synthetic:steel-industry:coil/NEG-REVERSED-INTERVAL> ;
+    stl:measurementItem item:TENSILE ;
+    stl:measuredAtPoint <urn:synthetic:steel-industry:measurementpoint/NEG-TEST-BENCH> ;
+    stl:sampledAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:tensileStrength 405.0 ;
+    stl:upperYieldStrength 280.0 ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:measurementpoint/NEG-TEST-BENCH> a stl:MeasurementPoint ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:coil/NEG-REVERSED-INTERVAL> <https://w3id.org/ontology-platform/steel/SegmentBoundsShape> LessThanOrEqualsConstraintComponent
+<urn:synthetic:steel-industry:coil/NEG-REVERSED-INTERVAL> a stl:Coil ;
+    stl:startLength 101.0 ;
+    stl:endLength 100.0 ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:producedBy <urn:synthetic:steel-industry:cutting/NEG-CUT> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:coil/NEG-START-ONLY> <https://w3id.org/ontology-platform/steel/SegmentEndRequiredShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:coil/NEG-START-ONLY> a stl:Coil ;
+    stl:startLength 0.0 ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:producedBy <urn:synthetic:steel-industry:cutting/NEG-CUT> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:coil/NEG-END-ONLY> <https://w3id.org/ontology-platform/steel/SegmentStartRequiredShape> MinCountConstraintComponent
+<urn:synthetic:steel-industry:coil/NEG-END-ONLY> a stl:Coil ;
+    stl:endLength 100.0 ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:producedBy <urn:synthetic:steel-industry:cutting/NEG-CUT> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:sample/T260009910> a stl:Sample ;
+    dcterms:identifier "T260009910" ;
+    stl:serialNumber "9910"^^xsd:positiveInteger ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:sampleOf <urn:synthetic:steel-industry:heat/H22600992> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:chemicalanalysis/NEG-HEAT-9910> a stl:ChemicalAnalysis ;
+    stl:testedSample <urn:synthetic:steel-industry:sample/T260009910> ;
+    stl:analysisType analysis:HEAT ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:sample/T260009911> a stl:Sample ;
+    dcterms:identifier "T260009911" ;
+    stl:serialNumber "9911"^^xsd:positiveInteger ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:sampleOf <urn:synthetic:steel-industry:heat/H22600992> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:chemicalanalysis/NEG-HEAT-9911> a stl:ChemicalAnalysis ;
+    stl:testedSample <urn:synthetic:steel-industry:sample/T260009911> ;
+    stl:analysisType analysis:HEAT ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:sample/T260009912> <https://w3id.org/ontology-platform/steel/SampleTypeSingleShape> MaxCountConstraintComponent
+<urn:synthetic:steel-industry:sample/T260009912> a stl:Sample ;
+    dcterms:identifier "T260009912" ;
+    stl:serialNumber "9912"^^xsd:positiveInteger ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:sampleType sampleType:MECHANICAL, sampleType:COATING ;
+    stl:sampleOf <urn:synthetic:steel-industry:coil/NEG-REVERSED-INTERVAL> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:chemicalanalysis/NEG-HEAT-PIECE> <https://w3id.org/ontology-platform/steel/HeatAnalysisSampleSourceShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:chemicalanalysis/NEG-HEAT-PIECE> a stl:ChemicalAnalysis ;
+    stl:analysisType analysis:HEAT ;
+    stl:testedSample <urn:synthetic:steel-industry:sample/T260009912> ;
+    op:synthetic true .
+
+<urn:synthetic:steel-industry:sample/T260009913> a stl:Sample ;
+    dcterms:identifier "T260009913" ;
+    stl:serialNumber "9913"^^xsd:positiveInteger ;
+    stl:createdAt "2026-11-03T10:00:00+08:00"^^xsd:dateTime ;
+    stl:sampleOf <urn:synthetic:steel-industry:heat/H22600994> ;
+    op:synthetic true .
+
+# A second, unsourced sample must still fail when the first has a heat source.
+# EXPECT <urn:synthetic:steel-industry:chemicalanalysis/NEG-HEAT-MISSING-SOURCE> <https://w3id.org/ontology-platform/steel/HeatAnalysisSampleSourceShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:chemicalanalysis/NEG-HEAT-MISSING-SOURCE> a stl:ChemicalAnalysis ;
+    stl:analysisType analysis:HEAT ;
+    stl:testedSample <urn:synthetic:steel-industry:sample/T260009913>,
+        <urn:synthetic:steel-industry:sample/T260009901> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:chemicalanalysis/NEG-HEAT-NO-SAMPLE> <https://w3id.org/ontology-platform/steel/HeatAnalysisSampleSourceShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:chemicalanalysis/NEG-HEAT-NO-SAMPLE> a stl:ChemicalAnalysis ;
+    stl:analysisType analysis:HEAT ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:property/NEG-YIELD-UNIT> <https://w3id.org/ontology-platform/steel/PropertyUnitShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:property/NEG-YIELD-UNIT> rdfs:subPropertyOf stl:upperYieldStrength ;
+    stl:unit <http://qudt.org/vocab/unit/KiloPA> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:property/NEG-COUNT-UNIT> <https://w3id.org/ontology-platform/steel/NumericUnitShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:property/NEG-COUNT-UNIT> rdfs:range xsd:nonNegativeInteger ;
+    stl:unit <http://qudt.org/vocab/unit/M> ;
+    stl:quantityKind <http://qudt.org/vocab/quantitykind/Count> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:property/NEG-COUNT-KIND> <https://w3id.org/ontology-platform/steel/NumericQuantityKindShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:property/NEG-COUNT-KIND> rdfs:range xsd:nonNegativeInteger ;
+    stl:unit <http://qudt.org/vocab/unit/NUM> ;
+    stl:quantityKind <http://qudt.org/vocab/quantitykind/Length> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:property/NEG-ORDINAL-UNIT> <https://w3id.org/ontology-platform/steel/OrdinalMetadataShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:property/NEG-ORDINAL-UNIT> rdfs:range xsd:positiveInteger ;
+    stl:unit <http://qudt.org/vocab/unit/NUM> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:property/NEG-ORDINAL-KIND> <https://w3id.org/ontology-platform/steel/OrdinalMetadataShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:property/NEG-ORDINAL-KIND> rdfs:range xsd:positiveInteger ;
+    stl:quantityKind <http://qudt.org/vocab/quantitykind/Count> ;
+    op:synthetic true .
+
+# EXPECT <urn:synthetic:steel-industry:property/NEG-CHEMISTRY-PPM> <https://w3id.org/ontology-platform/steel/PropertyUnitShape> SPARQLConstraintComponent
+<urn:synthetic:steel-industry:property/NEG-CHEMISTRY-PPM> rdfs:range xsd:decimal ;
+    rdfs:subPropertyOf stl:massFraction ;
+    stl:unit <http://qudt.org/vocab/unit/PPM> ;
+    stl:quantityKind <http://qudt.org/vocab/quantitykind/MassFraction> ;
+    op:synthetic true .

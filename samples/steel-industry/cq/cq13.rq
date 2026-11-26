@@ -1,0 +1,20 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+# The specified dimensions apply even before a coil is allocated.
+SELECT DISTINCT ?orderLine ?grade ?edition ?thickness ?width ?coil
+WHERE {
+  VALUES ?orderLine { "D26001236-010" }
+  ?line a stl:SalesOrderLine ; dct:identifier ?orderLine ; stl:requiresSpecification ?spec .
+  ?spec a stl:MaterialSpecification ; stl:requiresGrade ?required ; stl:applicableStandard ?standard ;
+        stl:thickness ?thickness ; stl:width ?width .
+  ?required skos:notation ?grade ; stl:definedIn ?standard .
+  ?standard dct:identifier ?edition .
+  OPTIONAL {
+    VALUES ?coilClass { stl:Coil stl:HotRolledCoil stl:ColdRolledCoil stl:FullHardCoil
+                        stl:AnnealedCoil stl:GalvanizedCoil stl:RecoiledCoil }
+    ?piece a ?coilClass ; stl:allocatedTo ?line ; dct:identifier ?coil .
+  }
+}
+ORDER BY ?orderLine ?coil

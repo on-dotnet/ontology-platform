@@ -1,0 +1,11 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?certificate ?coil ?standard ?documentType
+WHERE {
+  VALUES ?certificate { "Z26000210" }
+  ?document a stl:MillCertificate ; dct:identifier ?certificate ; stl:coversPiece/dct:identifier ?coil ;
+            stl:applicableStandard/dct:identifier ?standard ; stl:inspectionDocumentType/skos:notation ?documentType .
+}
+ORDER BY ?certificate ?coil ?standard ?documentType

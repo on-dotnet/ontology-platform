@@ -1,0 +1,114 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX unitType: <https://w3id.org/ontology-platform/steel/code/unit-type/>
+
+# Compare encoded production facts with casting and material records.
+# An absent fact or malformed code is a separate violation.
+SELECT DISTINCT ?identifier ?inconsistency
+WHERE {
+  {
+    ?piece a stl:Heat ; dct:identifier ?identifier ; stl:producedOnFurnace/stl:unitNumber ?furnace .
+    FILTER (REGEX(?identifier, "^H[1-9][0-9]{7}$") && xsd:integer(SUBSTR(?identifier, 2, 1)) != ?furnace)
+    BIND("heatFurnace" AS ?inconsistency)
+  }
+  UNION {
+    ?piece a stl:Heat ; dct:identifier ?identifier ; stl:producedOnFurnace/stl:unitType ?type .
+    FILTER (REGEX(?identifier, "^H[1-9][0-9]{7}$") && ?type NOT IN (unitType:BOF, unitType:EAF))
+    BIND("heatFurnaceType" AS ?inconsistency)
+  }
+  UNION {
+    ?cast a stl:CastSequence ; dct:identifier ?identifier ; stl:castOn/stl:unitNumber ?caster .
+    FILTER (REGEX(?identifier, "^Q[1-9][0-9]{6}$") && xsd:integer(SUBSTR(?identifier, 2, 1)) != ?caster)
+    BIND("casterNumber" AS ?inconsistency)
+  }
+  UNION {
+    ?cast a stl:CastSequence ; dct:identifier ?identifier ; stl:castOn/stl:unitType ?type .
+    FILTER (REGEX(?identifier, "^Q[1-9][0-9]{6}$") && ?type != unitType:CC)
+    BIND("casterType" AS ?inconsistency)
+  }
+  UNION {
+    ?piece a stl:Slab ; dct:identifier ?identifier ; stl:numberingHeat/dct:identifier ?heat .
+    FILTER (REGEX(?identifier, "^S[1-9][0-9]{7}[1-9][0-9]{2}$") && REGEX(?heat, "^H[1-9][0-9]{7}$") &&
+            SUBSTR(?identifier, 2, 8) != SUBSTR(?heat, 2, 8))
+    BIND("slabHeat" AS ?inconsistency)
+  }
+  UNION {
+    VALUES (?property ?offset ?width ?inconsistency) {
+      (stl:strandNumber 10 1 "slabStrand")
+      (stl:sequenceInStrand 11 2 "slabSequence")
+    }
+    ?piece a stl:Slab ; dct:identifier ?identifier ; ?property ?number .
+    FILTER (REGEX(?identifier, "^S[1-9][0-9]{7}[1-9][0-9]{2}$") &&
+            xsd:integer(SUBSTR(?identifier, ?offset, ?width)) != ?number)
+  }
+  UNION {
+    ?piece a stl:HotRolledCoil ; dct:identifier ?identifier ; stl:producedBy/stl:performedOn/stl:unitNumber ?mill .
+    FILTER (REGEX(?identifier, "^R[1-9][0-9]{8}$") && xsd:integer(SUBSTR(?identifier, 2, 1)) != ?mill)
+    BIND("hotMill" AS ?inconsistency)
+  }
+  UNION {
+    ?piece a stl:HotRolledCoil ; dct:identifier ?identifier ; stl:producedBy/stl:performedOn/stl:unitType ?type .
+    FILTER (REGEX(?identifier, "^R[1-9][0-9]{8}$") && ?type != unitType:HSM)
+    BIND("hotMillType" AS ?inconsistency)
+  }
+  UNION {
+    VALUES (?state ?expectedSegment) {
+      (stl:FullHardCoil "PL") (stl:AnnealedCoil "CA")
+      (stl:GalvanizedCoil "CG") (stl:RecoiledCoil "RC")
+    }
+    ?piece a ?state ; dct:identifier ?identifier .
+    FILTER (REGEX(?identifier, "^C(PL|CA|CG|RC)[1-9][0-9]{8}$") && SUBSTR(?identifier, 2, 2) != ?expectedSegment)
+    BIND("coilState" AS ?inconsistency)
+  }
+  UNION {
+    VALUES ?state { stl:FullHardCoil stl:AnnealedCoil stl:GalvanizedCoil stl:RecoiledCoil }
+    ?piece a ?state ; dct:identifier ?identifier ; stl:producedBy/stl:performedOn ?equipment .
+    OPTIONAL { ?equipment stl:unitNumber ?number }
+    OPTIONAL { ?equipment stl:unitType ?type }
+    FILTER (REGEX(?identifier, "^C(PL|CA|CG|RC)[1-9][0-9]{8}$"))
+    FILTER ((BOUND(?number) && xsd:integer(SUBSTR(?identifier, 4, 1)) != ?number) ||
+            (BOUND(?type) && NOT EXISTS {
+              ?type skos:notation ?segment .
+              FILTER (DATATYPE(?segment) = stl:LineSegmentCode && STR(?segment) = SUBSTR(?identifier, 2, 2))
+            }))
+    BIND("coilUnit" AS ?inconsistency)
+  }
+  UNION {
+    # Independent facts: an absent timestamp does not hide a serial mismatch, or vice versa.
+    VALUES (?state ?format ?yearStart) {
+      (stl:Heat           "^H[1-9][0-9]{7}$"   3)
+      (stl:HotRolledCoil  "^R[1-9][0-9]{8}$"   3)
+      (stl:CastSequence   "^Q[1-9][0-9]{6}$"   3)
+      (stl:FullHardCoil   "^C(PL|CA|CG|RC)[1-9][0-9]{8}$" 5)
+      (stl:AnnealedCoil   "^C(PL|CA|CG|RC)[1-9][0-9]{8}$" 5)
+      (stl:GalvanizedCoil "^C(PL|CA|CG|RC)[1-9][0-9]{8}$" 5)
+      (stl:RecoiledCoil   "^C(PL|CA|CG|RC)[1-9][0-9]{8}$" 5)
+      (stl:Package        "^P[0-9]{9}$"        2)
+      (stl:Sample         "^T[0-9]{9}$"        2)
+    }
+    ?piece a ?state ; dct:identifier ?identifier .
+    FILTER (REGEX(?identifier, ?format))
+    {
+      ?piece stl:createdAt ?instant .
+      FILTER (DATATYPE(?instant) = xsd:dateTime && REGEX(STR(?instant), "(Z|[+-][0-9]{2}:[0-9]{2})$"))
+      BIND(YEAR(?instant) AS ?year)
+      BIND(xsd:dateTime(CONCAT(STR(?year), "-01-01T00:00:00+08:00")) AS ?yearStartAt)
+      BIND(xsd:dateTime(CONCAT(STR(?year + 1), "-01-01T00:00:00+08:00")) AS ?nextYearAt)
+      BIND(IF(?instant < ?yearStartAt, ?year - 1, IF(?instant >= ?nextYearAt, ?year + 1, ?year)) AS ?localYear)
+      BIND(xsd:integer(SUBSTR(STR(?localYear), 3, 2)) AS ?recorded)
+      BIND("creationYear" AS ?inconsistency)
+    }
+    UNION {
+      ?piece stl:serialNumber ?recorded .
+      FILTER (DATATYPE(?recorded) = xsd:positiveInteger)
+      BIND("serialNumber" AS ?inconsistency)
+    }
+    BIND(IF(?inconsistency = "creationYear", SUBSTR(?identifier, ?yearStart, 2),
+            SUBSTR(?identifier, ?yearStart + 2)) AS ?digits)
+    FILTER (xsd:integer(?digits) != ?recorded)
+  }
+  FILTER (DATATYPE(?identifier) = xsd:string)
+}
+ORDER BY ?identifier ?inconsistency

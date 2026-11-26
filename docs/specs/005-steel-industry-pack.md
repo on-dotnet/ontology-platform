@@ -63,6 +63,7 @@
 - 通用层基址：`https://w3id.org/ontology-platform/steel/`，前缀 `stl:`（第 13 节待确认）。用斜杠结尾，术语直接接在后面：`stl:Heat` 即 `https://w3id.org/ontology-platform/steel/Heat`。
 - 代码表：`stl:code/<方案名>`；代码：`stl:code/<方案名>/<代码值>`。例：`stl:code/disposition-type/DEGRADE`。代码的 IRI 等于方案 IRI 加 `/` 加代码值，只看 IRI 就知道它属于哪张表、取值是什么。
 - 标准书目条目：`stl:std/<机构>-<编号>-<年份>`，全部小写，点和斜杠换成连字符。例：GB/T 228.1-2021 → `stl:std/gbt-228-1-2021`；EN 10204:2004 → `stl:std/en-10204-2004`。每个版次一个条目，新版用 `dcterms:replaces` 指向旧版。
+- 标准牌号：`stl:std/<书目条目本地名>/grade/<牌号>`，牌号里 `A–Z`、`0–9` 以外的字符换成 `-`，原写法存 `skos:notation`。例：GB/T 2518-2019 的 DX51D+Z → `stl:std/gbt-2518-2019/grade/DX51D-Z`。牌号是公开标准里的事实，放通用层 `standards.ttl`，不放合成数据。
 - 模块本体 IRI：`stl:module/<模块名>`，版本 IRI 加 `/<语义化版本>`。
 - 样例数据（个体）：`urn:synthetic:steel-industry:<类的本地名小写>/<编码>`，例 `urn:synthetic:steel-industry:heat/H22600123`。合成数据永远不用 `stl:` 命名空间，避免与本体术语混在一起。
 - IRI 一经发布不改、不复用。改名只改标签；概念作废用 `owl:deprecated true` 加 `dcterms:isReplacedBy`。
@@ -128,7 +129,7 @@
 | 库位 | `stl:StorageLocation` | 库区代码 3 + `-` + 行 2 + 列 2 + 层 1 | 9 | `CY1-03121` | 行、列、层 → `stl:row`、`stl:column`、`stl:tier`；库区 → `stl:locatedIn` |
 | 内部钢种 | `stl:SteelGrade` | `G` + 流水 4 | 5 | `G1023` | **不带成分含义**，成分范围见钢种规范 |
 
-**板坯编码里的炉次段**是最容易误读的一处：它只表示"这块坯按哪个炉次编号"（`stl:numberingHeat`，恰好一个），不表示"钢水来自哪个炉次"（`stl:sourceHeat`，一到两个）。换炉过渡坯的两个来源炉次见第 8.1 节。
+**板坯编码里的炉次段**是最容易误读的一处：它只表示"这块坯按哪个炉次编号"（`stl:numberingHeat`，恰好一个），不表示"钢水来自哪个炉次"（`stl:sourceHeat`，一到两个）。换炉过渡坯的两个来源炉次见第 8.1 节。板坯编码的序号段（`stl:sequenceInStrand`）是编号用的号，和实物在炉内的出坯次序（`stl:positionInHeat`，第 8.1 节）分开存：普通坯两者相等；二次切割产出的新坯取同炉同流下一个未用的序号，出坯次序不变。
 
 **标准牌号不是编码**。Q235B、DC04、DX51D+Z 这类名称由产品标准规定，建模为 `stl:StandardGrade`，名称存 `skos:notation`、所属标准用 `stl:definedIn` 指向书目条目（同一名称在不同标准、不同版次里是不同条目）。一个内部钢种可以满足多个标准牌号（`stl:satisfies`），订单行要求的是标准牌号加标准版次。
 
@@ -136,7 +137,7 @@
 
 规则：
 
-- 代码值只用大写字母和数字，2–10 位；可读的英文缩写或单词，不用无意义的流水号；在本方案内唯一，发布后不改、不复用。
+- 代码值只用大写字母和数字，1–10 位；可读的英文缩写或单词，有通行符号的用符号（化学元素用元素符号的大写：`C`、`SI`、`MN`、`P`、`S`，酸溶铝 `ALS`），不用无意义的流水号；在本方案内唯一，发布后不改、不复用。
 - 每个代码有 `skos:notation`（数据类型 `stl:<方案名驼峰>Code`，例 `stl:DispositionTypeCode`）、中英文 `skos:prefLabel`、`skos:definition`，用 `skos:inScheme` 指向方案。
 - 代码之间有上下位时用 `skos:broader`；需要互斥说明时在 `skos:scopeNote` 里写明和谁的区别。
 - 数据里引用代码用对象属性指向代码 IRI（如 `stl:dispositionType stl:code/disposition-type/DEGRADE`），不存代码字符串。
@@ -146,11 +147,13 @@
 
 | 方案 | 代码 |
 |---|---|
-| `unit-type` 机组类型 | `BOF` 转炉、`LF` 钢包精炼炉、`RH` 真空循环脱气、`CC` 板坯连铸机、`HSM` 热连轧机、`PLTCM` 酸洗冷连轧、`CAL` 连续退火、`CGL` 连续热镀锌、`RCL` 重卷、`PCK` 包装 |
+| `unit-type` 机组类型 | `BOF` 转炉、`EAF` 电弧炉（通用层留口，样例数据不用）、`LF` 钢包精炼炉、`RH` 真空循环脱气、`CC` 板坯连铸机、`HSM` 热连轧机、`PLTCM` 酸洗冷连轧、`CAL` 连续退火、`CGL` 连续热镀锌、`RCL` 重卷、`PCK` 包装 |
 | `disposition-type` 质量处置类型 | `RELEASE` 放行；`HOLD` 封闭待处理；`DEGRADE` 降级：同一实物改为较低一档的质量规格，原订单是否保留另行决定；`REASSIGN` 改判：把实物重新指定为另一物料规格或另一订单，原规格作废；`CONCESSION` 让步接收：规格不变，经批准在限定订单、数量和期限内接收偏差；`REWORK` 返修；`SCRAP` 报废 |
 | `judgement-result` 判定结果 | `CONFORM` 合格、`NONCONFORM` 不合格、`PENDING` 待判 |
-| `analysis-type` 化学分析类型 | `HEAT` 熔炼分析（钢水样，代表整炉）、`PRODUCT` 成品分析（取自成品，按成品化学成分允许偏差判定） |
-| `sample-type` 样品类型 | `ENDPOINT` 转炉终点样、`REFINING` 精炼过程样、`TUNDISH` 中间包样、`PRODUCT` 成品样、`MECHANICAL` 力学性能样 |
+| `analysis-type` 化学分析类型 | `HEAT` 熔炼分析（代表整炉、用于判定的那一次，一个炉次只有一条，通常取精炼结束后的钢水样）、`PROCESS` 过程分析（转炉终点样、精炼过程样等，只用于工艺控制，不用于判定）、`PRODUCT` 成品分析（取自成品，按成品化学成分允许偏差判定） |
+| `sample-type` 样品类型 | `ENDPOINT` 转炉终点样、`REFINING` 精炼工位取的钢水样（含精炼过程中和精炼结束时取的样）、`TUNDISH` 中间包样、`PRODUCT` 成品样、`MECHANICAL` 力学性能样、`COATING` 镀层试样。样品类型说"在哪里、取的什么"，分析类型说"做什么用"：精炼结束样是 `REFINING` 样品，它的分析可以是 `HEAT` |
+| `share-basis` 份额基准 | `LENGTH` 按长度、`MASS` 按质量 |
+| `measurement-method` 采集方式 | `MANUAL` 手工、`AUTOMATIC` 自动 |
 | `contribution-evidence` 来源证据等级 | `MEASURED` 有测量依据的份额、`ESTIMATED` 按规则估算、`UNKNOWN` 知道来源但份额未知 |
 | `inspection-document-type` 检验文件类型 | `T21`、`T22`、`T31`、`T32`，对应 EN 10204:2004 的 2.1、2.2、3.1、3.2（标准原写法放 `skos:altLabel`） |
 | `coating-type` 镀层类型 | `GI` 纯锌镀层、`GA` 锌铁合金镀层（镀锌卷是一个类，镀层种类是代码，不各建一类） |
@@ -167,6 +170,7 @@
 | 实际发生 | `actualStartAt`、`actualEndAt`、`occurredAt` | 执行与事件 |
 | 取样 | `sampledAt` | 样品、测量 |
 | 出结果 | `resultAt` | 分析与试验结果 |
+| 创建 | `createdAt` | 实物件与单据；编码的 `YY` 取它的年份。实物件的 `createdAt` 等于产出它的工序的 `actualEndAt`（SHACL 检查） |
 | 系统登记 | `recordedAt` | 任何记录，可选 |
 
 3. 计划时间和实际时间不出现在同一个对象上（第 8.4 节）。时长不存，由开始、结束算出；资料里两个时间口径不一致时，按资料原样分别保留，不合并。
@@ -174,8 +178,10 @@
 ## 7 单位与数值
 
 1. 每个数值属性只有一个单位，用 `stl:unit` 注在属性定义上（QUDT 单位 IRI），数据里只存数字（`xsd:decimal`）。不同单位的同一量（mm 与 m）是两个属性，或统一到一个单位，不混用。
-2. 首批单位：长度 `unit:MilliM`（厚、宽）与 `unit:M`（长）、质量 `unit:TONNE`、温度 `unit:DEG_C`、化学成分 `unit:PERCENT`（质量分数）与 `unit:PPM`（N、H、O）、强度 `unit:MegaPA`、冲击功 `unit:J`、拉速 `unit:M-PER-MIN`、镀层质量 `unit:GM-PER-M2`。写本体时逐个对 QUDT 3.5.4 核对 IRI 确实存在。
-3. 化学成分不为每个元素各建一个属性：一次分析（`stl:ChemicalAnalysis`）下挂多条元素结果（`stl:ElementResult`），每条有元素代码（`stl:code/chemical-element/MN`）、数值、单位。
+   - **序号不是数值属性**：设备序号、流号、流内序号、订单行号、库位的行列层、炉内顺序等是位置或编号的一部分，用 `xsd:positiveInteger`，不带 `stl:unit`、`stl:quantityKind`。
+   - **件数**（让步接收的卷数、铸机流数）是计数：用 `xsd:nonNegativeInteger`，带 `stl:unit unit:NUM`、`stl:quantityKind quantitykind:Count`。
+2. 首批单位：长度 `unit:MilliM`（厚、宽）与 `unit:M`（长）、质量 `unit:TONNE`、温度 `unit:DEG_C`、化学成分 `unit:PERCENT`（质量分数，N、H、O 也用它，与产品标准的写法一致）、在线测氧 `unit:PPM`（只用于测量，不用于成分分析）、强度 `unit:MegaPA`、冲击功 `unit:J`、拉速 `unit:M-PER-MIN`、镀层质量 `unit:GM-PER-M2`。写本体时逐个对 QUDT 3.5.4 核对 IRI 确实存在。
+3. 化学成分不为每个元素各建一个属性：一次分析（`stl:ChemicalAnalysis`）下挂多条元素结果（`stl:ElementResult`），每条有元素代码（`stl:code/chemical-element/MN`）和质量分数；成分限值同样用质量分数，比较时不换算单位。
 4. 质量要分清**毛重、净重、理论重量**（三个属性），不用一个"重量"。
 
 ## 8 难点的建模
@@ -187,7 +193,7 @@
 - 板坯有 `numberingHeat`（恰好 1 个，编码用）和 `sourceHeat`（1–2 个，钢水来源）。
 - 两个来源时，用 `stl:HeatContribution` 记每个来源：炉次、证据等级（`contribution-evidence`）、份额（可选，必须同时给份额的基准：长度或质量）。
 - `isTransitionSlab` 表示资料或系统明确标为过渡坯。只凭"是一炉的头坯或尾坯"不能推出是过渡坯。
-- 位置分开存：在炉次内的顺序 `positionInHeat`、在浇次内的顺序 `positionInSequence`；换钢种的过渡坯另记前后两个钢种。
+- 位置分开存：在炉次内的顺序 `positionInHeat`（同一炉次、同一流内的出坯次序，多流铸机每流各自从 1 起）、在浇次内的顺序 `positionInSequence`（同一浇次、同一流内的出坯次序，只用于板坯）；炉次在浇次中的炉序另用 `heatPositionInSequence`，不与板坯共用属性；换钢种的过渡坯另记前后两个钢种（各一个属性，不写进说明文字）。
 
 ### 8.2 切割与重新赋号
 
@@ -215,6 +221,7 @@
 
 - 每次测量（`stl:Observation`）有：被测对象（炉次或实物件）、测量项（代码）、测点（`stl:MeasurementPoint`，属于某机组）、`sampledAt`、`resultAt`、数值、单位、方法（手工或自动）。
 - 同一炉次的多次测量靠测点、测量项和取样时间区分；消息到达时间不能代替取样时间。
+- 测量项代码与存值的属性一一对应（如 `TEMP` 只配 `stl:temperature`），SHACL 检查两者一致。
 
 ### 8.7 库区位置与移动
 
@@ -233,7 +240,7 @@
 | CQ4 | 某冷轧段钢卷的母卷、热轧卷、板坯分别是什么 | A、B |
 | CQ5 | 某热轧卷分出了哪些卷，各自的判定结果和发运单 | B |
 | CQ6 | 某卷经过哪些处置，处置前后的规格、订单行，让步的适用范围 | B |
-| CQ7 | 某炉次熔炼分析是否满足订单行牌号在指定标准版次下的成分范围 | A |
+| CQ7 | 某炉次的熔炼分析是否满足订单行物料规格的成分范围（规格注明所依据的牌号与标准版次；样例数据里的限值是合成示例值，不抄标准正文） | A |
 | CQ8 | 某炉次精炼期间各测点的温度，按取样时间排序 | A |
 | CQ9 | 某卷的力学性能结果、取样位置、试验方法标准 | B |
 | CQ10 | 某质量证明书覆盖哪些卷、依据哪些标准版次、检验文件类型 | B |
@@ -267,7 +274,7 @@ samples/steel-industry/
   eval/expected.toml   期望识别结果
 ```
 
-首批规模（上限，不追求更多）：约 60 个类、80 个属性、12 张代码表。模块之间只经 `stl:` 术语引用，不互相复制定义。
+首批规模（不追求更多）：约 60 个类、110 个属性、14 张代码表。属性超出时先查有没有可合并的，不为凑数合并语义不同的属性。模块之间只经 `stl:` 术语引用，不互相复制定义。
 
 ### 10.1 评测资料
 

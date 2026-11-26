@@ -1,0 +1,22 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+
+# Identify the immediate predecessor by casting order, even if recorded ordinals have gaps.
+SELECT ?sequence ?position ?heat ?grade ?changedFromHeat
+WHERE {
+  VALUES ?sequence { "Q1260045" }
+  ?cast a stl:CastSequence ; dct:identifier ?sequence .
+  ?current a stl:Heat ; stl:castIn ?cast ; stl:heatPositionInSequence ?position ;
+           dct:identifier ?heat ; stl:steelGrade ?currentGrade .
+  ?currentGrade dct:identifier ?grade .
+  OPTIONAL {
+    ?previous a stl:Heat ; stl:castIn ?cast ; stl:heatPositionInSequence ?p ;
+              dct:identifier ?changedFromHeat ; stl:steelGrade ?priorGrade .
+    FILTER (?p < ?position && ?priorGrade != ?currentGrade)
+    FILTER NOT EXISTS {
+      ?middle stl:castIn ?cast ; stl:heatPositionInSequence ?m .
+      FILTER (?p < ?m && ?m < ?position)
+    }
+  }
+}
+ORDER BY ?position ?heat

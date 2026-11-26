@@ -1,0 +1,305 @@
+# Heats, refining, continuous casting, slab genealogy and cutting plans and executions.
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<module/steelmaking> a owl:Ontology ;
+    owl:versionIRI <module/steelmaking/0.1.0> ;
+    owl:versionInfo "0.1.0" ;
+    rdfs:label "炼钢与连铸"@zh, "Steelmaking and casting"@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:Heat a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "炉次"@zh, "Heat"@en ;
+    skos:prefLabel "炉次"@zh, "Heat"@en ;
+    skos:definition "一座炼钢炉一次出钢所形成的一批钢水的身份，用于关联该炉的处理和产出。"@zh,
+        "The identity of a batch of liquid steel tapped from one furnace in one heat."@en ;
+    skos:altLabel "熔炼炉次"@zh, "melt"@en .
+
+stl:CastSequence a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "浇次"@zh, "Casting sequence"@en ;
+    skos:prefLabel "浇次"@zh, "Casting sequence"@en ;
+    skos:definition "同一铸机连续浇注的一组炉次及其先后次序。"@zh,
+        "An ordered series of heats cast without a break on one caster."@en ;
+    skos:altLabel "连浇炉数组"@zh, "cast sequence"@en .
+
+stl:Slab a owl:Class ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "板坯"@zh, "Slab"@en ;
+    skos:prefLabel "板坯"@zh, "Slab"@en ;
+    skos:definition "连续铸坯切分形成、可单独编号和跟踪的扁平半成品。"@zh,
+        "An individually tracked flat semi-finished piece cut from a cast strand."@en .
+
+stl:HeatContribution a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "炉次来源记录"@zh, "Heat contribution"@en ;
+    skos:prefLabel "炉次来源记录"@zh, "Heat contribution"@en ;
+    skos:definition "将一块坯与一个实际供钢炉次及其份额证据关联的记录。"@zh,
+        "A record linking one slab to one contributing heat and its share evidence."@en .
+
+stl:Steelmaking a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "炼钢执行"@zh, "Steelmaking operation"@en ;
+    skos:prefLabel "炼钢执行"@zh, "Steelmaking operation"@en ;
+    skos:definition "将炉料炼成一个炉次钢水的实际作业。"@zh,
+        "An execution that converts a furnace charge into a heat of liquid steel."@en .
+
+stl:Refining a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "炉外精炼"@zh, "Secondary refining"@en ;
+    skos:prefLabel "炉外精炼"@zh, "Secondary refining"@en ;
+    skos:definition "出钢后在炉外装置中对一个炉次实施处理的作业。"@zh,
+        "Treatment of a heat in secondary equipment after tapping."@en .
+
+stl:ContinuousCasting a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "连铸执行"@zh, "Continuous casting"@en ;
+    skos:prefLabel "连铸执行"@zh, "Continuous casting"@en ;
+    skos:definition "由铸机将钢水连续凝固成铸流的实际作业。"@zh,
+        "An operation solidifying liquid steel into strands on a caster."@en .
+
+stl:CuttingPlan a owl:Class ;
+    rdfs:subClassOf stl:Plan ;
+    rdfs:label "切割计划"@zh, "Cutting plan"@en ;
+    skos:prefLabel "切割计划"@zh, "Cutting plan"@en ;
+    skos:definition "给定切割先后及目标长度、可与切割实绩核对的计划。"@zh,
+        "A plan specifying cutting order and target lengths for comparison with execution."@en .
+
+stl:Cutting a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "切割执行"@zh, "Cutting"@en ;
+    skos:prefLabel "切割执行"@zh, "Cutting"@en ;
+    skos:definition "在铸流或已有板坯上完成一次切分并形成新实物的作业。"@zh,
+        "An actual cut of a strand or an existing slab producing a new piece."@en .
+
+stl:producedOnFurnace a owl:ObjectProperty ;
+    rdfs:domain stl:Heat ;
+    rdfs:range stl:Equipment ;
+    rdfs:label "冶炼炉座"@zh, "Produced on furnace"@en ;
+    skos:prefLabel "冶炼炉座"@zh, "Produced on furnace"@en ;
+    skos:definition "标识该炉次钢水出自的炼钢炉座。"@zh,
+        "Identifies the primary steelmaking furnace that supplied the heat."@en .
+
+stl:castOn a owl:ObjectProperty ;
+    rdfs:domain stl:CastSequence ;
+    rdfs:range stl:Equipment ;
+    rdfs:label "连浇铸机"@zh, "Cast on"@en ;
+    skos:prefLabel "连浇铸机"@zh, "Cast on"@en ;
+    skos:definition "标识承接该浇次的连铸机。"@zh,
+        "Identifies the caster used for a casting sequence."@en .
+
+stl:castIn a owl:ObjectProperty ;
+    rdfs:domain stl:Heat ;
+    rdfs:range stl:CastSequence ;
+    rdfs:label "所属浇次"@zh, "Cast in"@en ;
+    skos:prefLabel "所属浇次"@zh, "Cast in"@en ;
+    skos:definition "标识该炉次所参与的连续浇注序列。"@zh,
+        "Identifies the casting sequence in which the heat was cast."@en .
+
+stl:steelGrade a owl:ObjectProperty ;
+    rdfs:domain stl:Heat ;
+    rdfs:range stl:SteelGrade ;
+    rdfs:label "冶炼钢种"@zh, "Internal grade of heat"@en ;
+    skos:prefLabel "冶炼钢种"@zh, "Internal grade of heat"@en ;
+    skos:definition "标识该炉次按哪一内部钢种组织生产。"@zh,
+        "Identifies the internal grade under which the heat was produced."@en .
+
+stl:numberingHeat a owl:ObjectProperty ;
+    rdfs:domain stl:Slab ;
+    rdfs:range stl:Heat ;
+    rdfs:label "编号炉次"@zh, "Numbering heat"@en ;
+    skos:prefLabel "编号炉次"@zh, "Numbering heat"@en ;
+    skos:definition "标识用于编制该板坯号的唯一炉次。"@zh,
+        "Identifies the single heat selected for the slab identifier."@en ;
+    skos:scopeNote "编码取此炉次的炉号段；实际钢水来源另记在 sourceHeat 上。"@zh .
+
+stl:sourceHeat a owl:ObjectProperty ;
+    rdfs:domain stl:Slab ;
+    rdfs:range stl:Heat ;
+    rdfs:label "来源炉次"@zh, "Source heat"@en ;
+    skos:prefLabel "来源炉次"@zh, "Source heat"@en ;
+    skos:definition "指向实际向该坯供给钢水的一个或两个炉次。"@zh,
+        "Identifies a heat whose liquid steel contributed to the slab."@en .
+
+stl:contribution a owl:ObjectProperty ;
+    rdfs:domain stl:Slab ;
+    rdfs:range stl:HeatContribution ;
+    rdfs:label "炉次来源明细"@zh, "Heat contribution record"@en ;
+    skos:prefLabel "炉次来源明细"@zh, "Heat contribution record"@en ;
+    skos:definition "把板坯关联到分炉记录的来源证据。"@zh,
+        "Links a slab to its evidence record for one contributing heat."@en .
+
+stl:contributedHeat a owl:ObjectProperty ;
+    rdfs:domain stl:HeatContribution ;
+    rdfs:range stl:Heat ;
+    rdfs:label "贡献炉次"@zh, "Contributing heat"@en ;
+    skos:prefLabel "贡献炉次"@zh, "Contributing heat"@en ;
+    skos:definition "标识一条来源明细所描述的供钢炉次。"@zh,
+        "Identifies the heat described by a single contribution record."@en .
+
+stl:evidenceLevel a owl:ObjectProperty ;
+    rdfs:domain stl:HeatContribution ;
+    rdfs:range skos:Concept ;
+    rdfs:label "来源证据等级"@zh, "Contribution evidence level"@en ;
+    skos:prefLabel "来源证据等级"@zh, "Contribution evidence level"@en ;
+    skos:definition "说明某来源的份额是实测、估算还是未知。"@zh,
+        "Classifies the evidence for a share as measured, estimated or unknown."@en .
+
+stl:share a owl:DatatypeProperty ;
+    rdfs:domain stl:HeatContribution ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ;
+    stl:quantityKind quantitykind:DimensionlessRatio ;
+    rdfs:label "来源份额"@zh, "Contribution share"@en ;
+    skos:prefLabel "来源份额"@zh, "Contribution share"@en ;
+    skos:definition "给出在指定长度或质量基准下一个炉次对板坯的百分比。"@zh,
+        "Percentage contributed by a heat on the stated length or mass basis."@en ;
+    skos:scopeNote "证据为 UNKNOWN 时留空；记录份额时同时给出计算基准。"@zh .
+
+stl:shareBasis a owl:ObjectProperty ;
+    rdfs:domain stl:HeatContribution ;
+    rdfs:range skos:Concept ;
+    rdfs:label "份额基准"@zh, "Share basis"@en ;
+    skos:prefLabel "份额基准"@zh, "Share basis"@en ;
+    skos:definition "说明来源份额按长度或质量计算。"@zh,
+        "Identifies length or mass as the basis for calculating a share."@en .
+
+stl:isTransitionSlab a owl:DatatypeProperty ;
+    rdfs:domain stl:Slab ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "明确标为过渡坯"@zh, "Marked as transition slab"@en ;
+    skos:prefLabel "明确标为过渡坯"@zh, "Marked as transition slab"@en ;
+    skos:definition "记录资料是否明确将该坯标为跨炉过渡坯。"@zh,
+        "Records whether the slab was explicitly designated a transition slab."@en ;
+    skos:scopeNote "首坯或尾坯的顺序本身不能作为已标记过渡坯的证据。"@zh .
+
+stl:positionInHeat a owl:DatatypeProperty ;
+    rdfs:domain stl:Slab ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "炉内出坯次序"@zh, "Slab position within heat"@en ;
+    skos:prefLabel "炉内出坯次序"@zh, "Slab position within heat"@en ;
+    skos:definition "表示板坯在同一炉次、同一流上的出坯次序，各流从一开始计序。"@zh,
+        "Casting position of a slab within a heat, counted from one on each strand."@en ;
+    skos:scopeNote "普通坯的出坯次序与 sequenceInStrand 相同。二次切割产出的新坯沿用原坯的出坯次序，另取编码序号。"@zh .
+
+stl:positionInSequence a owl:DatatypeProperty ;
+    rdfs:domain stl:Slab ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "浇次内出坯次序"@zh, "Slab position within casting sequence"@en ;
+    skos:prefLabel "浇次内出坯次序"@zh, "Slab position within casting sequence"@en ;
+    skos:definition "表示板坯在同一浇次、同一流内的出坯次序。"@zh,
+        "Casting position of a slab on its strand over the entire casting sequence."@en .
+
+stl:heatPositionInSequence a owl:DatatypeProperty ;
+    rdfs:domain stl:Heat ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "浇次内炉序"@zh, "Heat position within casting sequence"@en ;
+    skos:prefLabel "浇次内炉序"@zh, "Heat position within casting sequence"@en ;
+    skos:definition "表示该炉钢水在所属浇次中排在第几炉浇注。"@zh,
+        "Ordinal at which a heat was cast within its casting sequence."@en .
+
+stl:previousGrade a owl:ObjectProperty ;
+    rdfs:domain stl:Slab ;
+    rdfs:range stl:SteelGrade ;
+    rdfs:label "过渡前钢种"@zh, "Preceding steel grade"@en ;
+    skos:prefLabel "过渡前钢种"@zh, "Preceding steel grade"@en ;
+    skos:definition "标识换钢种过渡区前一炉的内部钢种。"@zh,
+        "Internal grade of the preceding heat at a grade transition."@en .
+
+stl:nextGrade a owl:ObjectProperty ;
+    rdfs:domain stl:Slab ;
+    rdfs:range stl:SteelGrade ;
+    rdfs:label "过渡后钢种"@zh, "Following steel grade"@en ;
+    skos:prefLabel "过渡后钢种"@zh, "Following steel grade"@en ;
+    skos:definition "标识换钢种过渡区后一炉的内部钢种。"@zh,
+        "Internal grade of the following heat at a grade transition."@en .
+
+stl:strandNumber a owl:DatatypeProperty ;
+    rdfs:domain stl:Slab ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "流号"@zh, "Strand number"@en ;
+    skos:prefLabel "流号"@zh, "Strand number"@en ;
+    skos:definition "标识连铸机上产出该板坯的铸流。"@zh,
+        "Ordinal identifying the caster strand that produced the slab."@en .
+
+stl:sequenceInStrand a owl:DatatypeProperty ;
+    rdfs:domain stl:Slab ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "流内序号"@zh, "Strand piece number"@en ;
+    skos:prefLabel "流内序号"@zh, "Strand piece number"@en ;
+    skos:definition "记录编号炉次在该流内用于板坯编序的块号。"@zh,
+        "Piece ordinal on the numbered heat and strand used for slab identification."@en ;
+    skos:scopeNote "普通坯取 positionInHeat 的值作为编码序号。二次切割产出的每块新坯取同一编号炉次、同一流的下一个未用序号，positionInHeat 保留原值。"@zh .
+
+stl:strandCount a owl:DatatypeProperty ;
+    rdfs:domain stl:Equipment ;
+    rdfs:range xsd:nonNegativeInteger ;
+    stl:unit unit:NUM ;
+    stl:quantityKind quantitykind:Count ;
+    rdfs:label "流数"@zh, "Number of strands"@en ;
+    skos:prefLabel "流数"@zh, "Number of strands"@en ;
+    skos:definition "表示连铸机可同时浇注的铸流总数。"@zh,
+        "Number of casting strands served by the caster."@en .
+
+stl:forProductionOrder a owl:ObjectProperty ;
+    rdfs:domain stl:CuttingPlan ;
+    rdfs:range stl:ProductionOrder ;
+    rdfs:label "切割计划服务的生产订单"@zh, "For production order"@en ;
+    skos:prefLabel "切割计划服务的生产订单"@zh, "For production order"@en ;
+    skos:definition "从切割计划指向提出板坯需求的生产订单。"@zh,
+        "Identifies the production order whose slab requirements the cutting plan is intended to meet."@en .
+
+stl:cuttingSequence a owl:DatatypeProperty ;
+    rdfs:domain stl:CuttingPlan ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "计划切序"@zh, "Planned cut sequence"@en ;
+    skos:prefLabel "计划切序"@zh, "Planned cut sequence"@en ;
+    skos:definition "标识某计划切口在切割安排内的先后次序。"@zh,
+        "Ordinal of a planned cut in the cutting schedule."@en .
+
+stl:plannedLength a owl:DatatypeProperty ;
+    rdfs:domain stl:CuttingPlan ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:M ;
+    stl:quantityKind quantitykind:Length ;
+    rdfs:label "计划切割长度"@zh, "Planned cut length"@en ;
+    skos:prefLabel "计划切割长度"@zh, "Planned cut length"@en ;
+    skos:definition "切割计划为产出板坯指定的目标长度。"@zh,
+        "Target length set for the slab by the cutting plan."@en .
+
+stl:actualLength a owl:DatatypeProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( stl:Cutting stl:Coil ) ] ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:M ;
+    stl:quantityKind quantitykind:Length ;
+    rdfs:label "实测长度"@zh, "Actual length"@en ;
+    skos:prefLabel "实测长度"@zh, "Actual length"@en ;
+    skos:definition "切割执行记录的实切长度或钢卷在产出机组出口计得的卷长。"@zh,
+        "Measured length of a completed cut or of a coil at the exit of its producing line."@en .
+
+stl:castingSpeed a owl:DatatypeProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( stl:ContinuousCasting stl:Cutting stl:Observation ) ] ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:M-PER-MIN ;
+    stl:quantityKind quantitykind:LinearVelocity ;
+    rdfs:label "拉速"@zh, "Casting speed"@en ;
+    skos:prefLabel "拉速"@zh, "Casting speed"@en ;
+    skos:definition "铸流在连续浇注过程中沿出坯方向的移动速率。"@zh,
+        "Rate of strand withdrawal during continuous casting."@en ;
+    skos:scopeNote "随切割实绩取得的读数适用于该次切割对应的拉坯时段。"@zh .
+
+stl:processedHeat a owl:ObjectProperty ;
+    rdfs:domain stl:Operation ;
+    rdfs:range stl:Heat ;
+    rdfs:label "处理炉次"@zh, "Processed heat"@en ;
+    skos:prefLabel "处理炉次"@zh, "Processed heat"@en ;
+    skos:definition "标识一次冶炼、精炼或连铸作业实际处理的炉次。"@zh,
+        "Identifies a heat processed by a steelmaking, refining or casting operation."@en .

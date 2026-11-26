@@ -1,0 +1,1741 @@
+# Synthetic steel manufacturing records for two traceability scenarios and one ordinary release.
+# Instants use UTC+08:00. Quantities use the units declared in the ontology.
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix op: <urn:ontology-platform:vocabulary:> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix std: <https://w3id.org/ontology-platform/steel/std/> .
+
+@prefix unitType: <https://w3id.org/ontology-platform/steel/code/unit-type/> .
+@prefix evidence: <https://w3id.org/ontology-platform/steel/code/contribution-evidence/> .
+@prefix basis: <https://w3id.org/ontology-platform/steel/code/share-basis/> .
+@prefix method: <https://w3id.org/ontology-platform/steel/code/measurement-method/> .
+@prefix coating: <https://w3id.org/ontology-platform/steel/code/coating-type/> .
+@prefix item: <https://w3id.org/ontology-platform/steel/code/measurement-item/> .
+@prefix sampleType: <https://w3id.org/ontology-platform/steel/code/sample-type/> .
+@prefix analysisType: <https://w3id.org/ontology-platform/steel/code/analysis-type/> .
+@prefix chemical: <https://w3id.org/ontology-platform/steel/code/chemical-element/> .
+@prefix judgement: <https://w3id.org/ontology-platform/steel/code/judgement-result/> .
+@prefix disposition: <https://w3id.org/ontology-platform/steel/code/disposition-type/> .
+@prefix inspection: <https://w3id.org/ontology-platform/steel/code/inspection-document-type/> .
+@prefix move: <https://w3id.org/ontology-platform/steel/code/movement-event-type/> .
+@prefix defectCode: <https://w3id.org/ontology-platform/steel/code/defect-type/> .
+
+@prefix annealedCoil: <urn:synthetic:steel-industry:annealedcoil/> .
+@prefix annealing: <urn:synthetic:steel-industry:annealing/> .
+@prefix castSequence: <urn:synthetic:steel-industry:castsequence/> .
+@prefix chemicalAnalysis: <urn:synthetic:steel-industry:chemicalanalysis/> .
+@prefix coilSplitting: <urn:synthetic:steel-industry:coilsplitting/> .
+@prefix coatingTest: <urn:synthetic:steel-industry:coatingtest/> .
+@prefix compositionLimit: <urn:synthetic:steel-industry:compositionlimit/> .
+@prefix continuousCasting: <urn:synthetic:steel-industry:continuouscasting/> .
+@prefix crane: <urn:synthetic:steel-industry:crane/> .
+@prefix cutting: <urn:synthetic:steel-industry:cutting/> .
+@prefix cuttingPlan: <urn:synthetic:steel-industry:cuttingplan/> .
+@prefix defect: <urn:synthetic:steel-industry:defect/> .
+@prefix elementResult: <urn:synthetic:steel-industry:elementresult/> .
+@prefix equipment: <urn:synthetic:steel-industry:equipment/> .
+@prefix fullHardCoil: <urn:synthetic:steel-industry:fullhardcoil/> .
+@prefix galvanizedCoil: <urn:synthetic:steel-industry:galvanizedcoil/> .
+@prefix galvanizing: <urn:synthetic:steel-industry:galvanizing/> .
+@prefix heat: <urn:synthetic:steel-industry:heat/> .
+@prefix heatContribution: <urn:synthetic:steel-industry:heatcontribution/> .
+@prefix hotRolledCoil: <urn:synthetic:steel-industry:hotrolledcoil/> .
+@prefix hotRolling: <urn:synthetic:steel-industry:hotrolling/> .
+@prefix inspectionLot: <urn:synthetic:steel-industry:inspectionlot/> .
+@prefix materialSpecification: <urn:synthetic:steel-industry:materialspecification/> .
+@prefix measurementPoint: <urn:synthetic:steel-industry:measurementpoint/> .
+@prefix mechanicalTest: <urn:synthetic:steel-industry:mechanicaltest/> .
+@prefix millCertificate: <urn:synthetic:steel-industry:millcertificate/> .
+@prefix movementEvent: <urn:synthetic:steel-industry:movementevent/> .
+@prefix movementOrder: <urn:synthetic:steel-industry:movementorder/> .
+@prefix observation: <urn:synthetic:steel-industry:observation/> .
+@prefix package: <urn:synthetic:steel-industry:package/> .
+@prefix operation: <urn:synthetic:steel-industry:operation/> .
+@prefix packing: <urn:synthetic:steel-industry:packing/> .
+@prefix picklingAndColdRolling: <urn:synthetic:steel-industry:picklingandcoldrolling/> .
+@prefix productionOrder: <urn:synthetic:steel-industry:productionorder/> .
+@prefix qualityDecision: <urn:synthetic:steel-industry:qualitydecision/> .
+@prefix qualityDisposition: <urn:synthetic:steel-industry:qualitydisposition/> .
+@prefix refining: <urn:synthetic:steel-industry:refining/> .
+@prefix salesOrder: <urn:synthetic:steel-industry:salesorder/> .
+@prefix salesOrderLine: <urn:synthetic:steel-industry:salesorderline/> .
+@prefix sample: <urn:synthetic:steel-industry:sample/> .
+@prefix shipment: <urn:synthetic:steel-industry:shipment/> .
+@prefix slab: <urn:synthetic:steel-industry:slab/> .
+@prefix steelGrade: <urn:synthetic:steel-industry:steelgrade/> .
+@prefix steelmaking: <urn:synthetic:steel-industry:steelmaking/> .
+@prefix storageArea: <urn:synthetic:steel-industry:storagearea/> .
+@prefix storageLocation: <urn:synthetic:steel-industry:storagelocation/> .
+
+# Equipment, measuring points and storage addresses.
+
+equipment:BOF1 a stl:Equipment ;
+    op:synthetic true ;
+    dct:identifier "BOF1" ;
+    stl:unitType unitType:BOF ;
+    stl:unitNumber "1"^^xsd:positiveInteger .
+
+equipment:BOF2 a stl:Equipment ;
+    op:synthetic true ;
+    dct:identifier "BOF2" ;
+    stl:unitType unitType:BOF ;
+    stl:unitNumber "2"^^xsd:positiveInteger .
+
+equipment:LF1 a stl:Equipment ;
+    op:synthetic true ;
+    dct:identifier "LF1" ;
+    stl:unitType unitType:LF ;
+    stl:unitNumber "1"^^xsd:positiveInteger .
+
+equipment:RH1 a stl:Equipment ;
+    op:synthetic true ;
+    dct:identifier "RH1" ;
+    stl:unitType unitType:RH ;
+    stl:unitNumber "1"^^xsd:positiveInteger .
+
+equipment:CC1 a stl:Equipment ;
+    op:synthetic true ;
+    dct:identifier "CC1" ;
+    stl:unitType unitType:CC ;
+    stl:unitNumber "1"^^xsd:positiveInteger ;
+    stl:strandCount "2"^^xsd:nonNegativeInteger .
+
+equipment:HSM1 a stl:Equipment ;
+    op:synthetic true ;
+    dct:identifier "HSM1" ;
+    stl:unitType unitType:HSM ;
+    stl:unitNumber "1"^^xsd:positiveInteger .
+
+equipment:PLTCM1 a stl:Equipment ;
+    op:synthetic true ;
+    dct:identifier "PLTCM1" ;
+    stl:unitType unitType:PLTCM ;
+    stl:unitNumber "1"^^xsd:positiveInteger .
+
+equipment:CAL1 a stl:Equipment ;
+    op:synthetic true ;
+    dct:identifier "CAL1" ;
+    stl:unitType unitType:CAL ;
+    stl:unitNumber "1"^^xsd:positiveInteger .
+
+equipment:CGL1 a stl:Equipment ;
+    op:synthetic true ;
+    dct:identifier "CGL1" ;
+    stl:unitType unitType:CGL ;
+    stl:unitNumber "1"^^xsd:positiveInteger .
+
+equipment:RCL1 a stl:Equipment ;
+    op:synthetic true ;
+    dct:identifier "RCL1" ;
+    stl:unitType unitType:RCL ;
+    stl:unitNumber "1"^^xsd:positiveInteger .
+
+equipment:PCK1 a stl:Equipment ;
+    op:synthetic true ;
+    dct:identifier "PCK1" ;
+    stl:unitType unitType:PCK ;
+    stl:unitNumber "1"^^xsd:positiveInteger .
+
+measurementPoint:RH1-LADLE a stl:MeasurementPoint ;
+    op:synthetic true ;
+    dct:identifier "RH1-LADLE" ;
+    stl:partOf equipment:RH1 .
+
+measurementPoint:BOF2-ENDPOINT a stl:MeasurementPoint ;
+    op:synthetic true ;
+    dct:identifier "BOF2-ENDPOINT" ;
+    stl:partOf equipment:BOF2 .
+
+storageArea:CY1 a stl:StorageArea ;
+    op:synthetic true ;
+    dct:identifier "CY1" .
+
+crane:CRCY12 a stl:Crane ;
+    op:synthetic true ;
+    dct:identifier "CRCY12" ;
+    stl:locatedIn storageArea:CY1 ;
+    stl:unitNumber "2"^^xsd:positiveInteger .
+
+storageLocation:CY1-03121 a stl:StorageLocation ;
+    op:synthetic true ;
+    dct:identifier "CY1-03121" ;
+    stl:locatedIn storageArea:CY1 ;
+    stl:row "3"^^xsd:positiveInteger ;
+    stl:column "12"^^xsd:positiveInteger ;
+    stl:tier "1"^^xsd:positiveInteger .
+
+storageLocation:CY1-05022 a stl:StorageLocation ;
+    op:synthetic true ;
+    dct:identifier "CY1-05022" ;
+    stl:locatedIn storageArea:CY1 ;
+    stl:row "5"^^xsd:positiveInteger ;
+    stl:column "2"^^xsd:positiveInteger ;
+    stl:tier "2"^^xsd:positiveInteger .
+
+# Internal grades refer to public designations in a specific standard edition.
+
+steelGrade:G1023 a stl:SteelGrade ;
+    op:synthetic true ;
+    dct:identifier "G1023" ;
+    stl:serialNumber "1023"^^xsd:positiveInteger ;
+    stl:satisfies <std/gbt-700-2006/grade/Q235B> .
+
+steelGrade:G2051 a stl:SteelGrade ;
+    op:synthetic true ;
+    dct:identifier "G2051" ;
+    stl:serialNumber "2051"^^xsd:positiveInteger ;
+    stl:satisfies <std/gbt-5213-2019/grade/DC01>, <std/gbt-5213-2019/grade/DC04>, <std/gbt-2518-2019/grade/DX51D-Z> .
+
+# Sales and production orders. The ledger gives dates only for order creation.
+# The synthetic creation instants for those documents use the start of that date.
+
+salesOrder:D26001235 a stl:SalesOrder ;
+    op:synthetic true ;
+    dct:identifier "D26001235" ;
+    stl:createdAt "2026-11-01T00:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1235"^^xsd:positiveInteger ;
+    stl:issuedOn "2026-11-01"^^xsd:date .
+
+salesOrder:D26001236 a stl:SalesOrder ;
+    op:synthetic true ;
+    dct:identifier "D26001236" ;
+    stl:createdAt "2026-11-01T00:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1236"^^xsd:positiveInteger ;
+    stl:issuedOn "2026-11-01"^^xsd:date .
+
+salesOrder:D26001237 a stl:SalesOrder ;
+    op:synthetic true ;
+    dct:identifier "D26001237" ;
+    stl:createdAt "2026-11-03T00:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1237"^^xsd:positiveInteger ;
+    stl:issuedOn "2026-11-03"^^xsd:date .
+
+salesOrderLine:D26001235-010 a stl:SalesOrderLine ;
+    op:synthetic true ;
+    dct:identifier "D26001235-010" ;
+    stl:partOf salesOrder:D26001235 ;
+    stl:lineNumber "10"^^xsd:positiveInteger ;
+    rdfs:comment "交付计划日 2026-11-18"@zh ;
+    stl:requiresSpecification materialSpecification:SPEC-A-DC04 .
+
+materialSpecification:SPEC-A-DC04 a stl:MaterialSpecification ;
+    op:synthetic true ;
+    dct:identifier "SPEC-A-DC04" ;
+    rdfs:comment "退火卷，换钢种混合区板坯须另审"@zh ;
+    stl:requiresGrade <std/gbt-5213-2019/grade/DC04> ;
+    stl:applicableStandard std:gbt-5213-2019 ;
+    stl:thickness 1.00 ;
+    stl:width 1220.0 .
+
+salesOrderLine:D26001235-020 a stl:SalesOrderLine ;
+    op:synthetic true ;
+    dct:identifier "D26001235-020" ;
+    stl:partOf salesOrder:D26001235 ;
+    stl:lineNumber "20"^^xsd:positiveInteger ;
+    rdfs:comment "交付计划日 2026-11-18"@zh ;
+    stl:requiresSpecification materialSpecification:SPEC-A-DC01 .
+
+materialSpecification:SPEC-A-DC01 a stl:MaterialSpecification ;
+    op:synthetic true ;
+    dct:identifier "SPEC-A-DC01" ;
+    rdfs:comment "退火卷，接改判料须附处置单"@zh ;
+    stl:requiresGrade <std/gbt-5213-2019/grade/DC01> ;
+    stl:applicableStandard std:gbt-5213-2019 ;
+    stl:thickness 1.00 ;
+    stl:width 1220.0 .
+
+salesOrderLine:D26001236-010 a stl:SalesOrderLine ;
+    op:synthetic true ;
+    dct:identifier "D26001236-010" ;
+    stl:partOf salesOrder:D26001236 ;
+    stl:lineNumber "10"^^xsd:positiveInteger ;
+    rdfs:comment "交付计划日 2026-11-22"@zh ;
+    stl:requiresSpecification materialSpecification:SPEC-B-GI .
+
+materialSpecification:SPEC-B-GI a stl:MaterialSpecification ;
+    op:synthetic true ;
+    dct:identifier "SPEC-B-GI" ;
+    rdfs:comment "每卷双面镀层质量合计至少100 g/m²（示例限值），逐卷拉伸、逐卷取镀层试片"@zh ;
+    stl:requiresGrade <std/gbt-2518-2019/grade/DX51D-Z> ;
+    stl:applicableStandard std:gbt-2518-2019 ;
+    stl:thickness 0.90 ;
+    stl:width 1220.0 ;
+    stl:coatingType coating:GI ;
+    stl:minimumCoatingMass 100.0 .
+
+salesOrderLine:D26001237-010 a stl:SalesOrderLine ;
+    op:synthetic true ;
+    dct:identifier "D26001237-010" ;
+    stl:partOf salesOrder:D26001237 ;
+    stl:lineNumber "10"^^xsd:positiveInteger ;
+    rdfs:comment "交付计划日 2026-11-24"@zh ;
+    stl:requiresSpecification materialSpecification:SPEC-C-HR .
+
+materialSpecification:SPEC-C-HR a stl:MaterialSpecification ;
+    op:synthetic true ;
+    dct:identifier "SPEC-C-HR" ;
+    rdfs:comment "热轧卷交货，取横向拉伸样"@zh ;
+    stl:requiresGrade <std/gbt-700-2006/grade/Q235B> ;
+    stl:applicableStandard std:gbt-700-2006 ;
+    stl:thickness 3.20 ;
+    stl:width 1250.0 .
+
+productionOrder:W26004321 a stl:ProductionOrder ;
+    op:synthetic true ;
+    dct:identifier "W26004321" ;
+    stl:createdAt "2026-11-01T00:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4321"^^xsd:positiveInteger ;
+    stl:forOrderLine salesOrderLine:D26001235-010 ;
+    stl:plannedStartAt "2026-11-02T07:15:00+08:00"^^xsd:dateTime ;
+    stl:plannedEndAt "2026-11-02T10:10:00+08:00"^^xsd:dateTime .
+
+productionOrder:W26004322 a stl:ProductionOrder ;
+    op:synthetic true ;
+    dct:identifier "W26004322" ;
+    stl:createdAt "2026-11-02T00:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4322"^^xsd:positiveInteger ;
+    stl:forOrderLine salesOrderLine:D26001235-020 ;
+    stl:plannedStartAt "2026-11-04T08:00:00+08:00"^^xsd:dateTime ;
+    stl:plannedEndAt "2026-11-13T16:00:00+08:00"^^xsd:dateTime .
+
+productionOrder:W26004323 a stl:ProductionOrder ;
+    op:synthetic true ;
+    dct:identifier "W26004323" ;
+    stl:createdAt "2026-11-02T00:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4323"^^xsd:positiveInteger ;
+    stl:forOrderLine salesOrderLine:D26001236-010 ;
+    stl:plannedStartAt "2026-11-03T07:00:00+08:00"^^xsd:dateTime ;
+    stl:plannedEndAt "2026-11-15T18:00:00+08:00"^^xsd:dateTime .
+
+productionOrder:W26004324 a stl:ProductionOrder ;
+    op:synthetic true ;
+    dct:identifier "W26004324" ;
+    stl:createdAt "2026-11-04T00:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4324"^^xsd:positiveInteger ;
+    stl:forOrderLine salesOrderLine:D26001237-010 ;
+    stl:plannedStartAt "2026-11-11T06:30:00+08:00"^^xsd:dateTime ;
+    stl:plannedEndAt "2026-11-20T16:00:00+08:00"^^xsd:dateTime .
+
+# Furnace, tapping and refining executions. The heat number is issued at the start of melting.
+
+steelmaking:BOF-A1 a stl:Steelmaking ;
+    op:synthetic true ;
+    dct:identifier "BOF-A1" ;
+    stl:performedOn equipment:BOF2 ;
+    stl:processedHeat heat:H22600121 ;
+    stl:actualStartAt "2026-11-02T05:32:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-02T06:15:00+08:00"^^xsd:dateTime .
+
+operation:TAP-H22600121 a stl:Operation ;
+    op:synthetic true ;
+    dct:identifier "TAP-H22600121" ;
+    rdfs:label "出钢"@zh, "Tapping"@en ;
+    stl:partOf steelmaking:BOF-A1 ;
+    stl:performedOn equipment:BOF2 ;
+    stl:processedHeat heat:H22600121 ;
+    stl:actualStartAt "2026-11-02T06:09:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-02T06:15:00+08:00"^^xsd:dateTime .
+
+heat:H22600121 a stl:Heat ;
+    op:synthetic true ;
+    dct:identifier "H22600121" ;
+    stl:createdAt "2026-11-02T05:32:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "121"^^xsd:positiveInteger ;
+    stl:producedOnFurnace equipment:BOF2 ;
+    stl:steelGrade steelGrade:G1023 ;
+    stl:castIn castSequence:Q1260045 ;
+    stl:heatPositionInSequence "1"^^xsd:positiveInteger .
+
+steelmaking:BOF-A2 a stl:Steelmaking ;
+    op:synthetic true ;
+    dct:identifier "BOF-A2" ;
+    stl:performedOn equipment:BOF2 ;
+    stl:processedHeat heat:H22600122 ;
+    stl:actualStartAt "2026-11-02T06:22:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-02T07:05:00+08:00"^^xsd:dateTime .
+
+operation:TAP-H22600122 a stl:Operation ;
+    op:synthetic true ;
+    dct:identifier "TAP-H22600122" ;
+    rdfs:label "出钢"@zh, "Tapping"@en ;
+    stl:partOf steelmaking:BOF-A2 ;
+    stl:performedOn equipment:BOF2 ;
+    stl:processedHeat heat:H22600122 ;
+    stl:actualStartAt "2026-11-02T06:59:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-02T07:05:00+08:00"^^xsd:dateTime .
+
+heat:H22600122 a stl:Heat ;
+    op:synthetic true ;
+    dct:identifier "H22600122" ;
+    stl:createdAt "2026-11-02T06:22:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "122"^^xsd:positiveInteger ;
+    stl:producedOnFurnace equipment:BOF2 ;
+    stl:steelGrade steelGrade:G1023 ;
+    stl:castIn castSequence:Q1260045 ;
+    stl:heatPositionInSequence "2"^^xsd:positiveInteger .
+
+steelmaking:BOF-A3 a stl:Steelmaking ;
+    op:synthetic true ;
+    dct:identifier "BOF-A3" ;
+    stl:performedOn equipment:BOF2 ;
+    stl:processedHeat heat:H22600123 ;
+    stl:fulfills productionOrder:W26004321 ;
+    stl:actualStartAt "2026-11-02T07:17:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-02T08:02:00+08:00"^^xsd:dateTime .
+
+operation:TAP-H22600123 a stl:Operation ;
+    op:synthetic true ;
+    dct:identifier "TAP-H22600123" ;
+    rdfs:label "出钢"@zh, "Tapping"@en ;
+    stl:partOf steelmaking:BOF-A3 ;
+    stl:performedOn equipment:BOF2 ;
+    stl:processedHeat heat:H22600123 ;
+    stl:actualStartAt "2026-11-02T07:56:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-02T08:02:00+08:00"^^xsd:dateTime .
+
+heat:H22600123 a stl:Heat ;
+    op:synthetic true ;
+    dct:identifier "H22600123" ;
+    stl:createdAt "2026-11-02T07:17:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "123"^^xsd:positiveInteger ;
+    stl:producedOnFurnace equipment:BOF2 ;
+    stl:steelGrade steelGrade:G2051 ;
+    stl:castIn castSequence:Q1260045 ;
+    stl:heatPositionInSequence "3"^^xsd:positiveInteger .
+
+steelmaking:BOF-B a stl:Steelmaking ;
+    op:synthetic true ;
+    dct:identifier "BOF-B" ;
+    stl:performedOn equipment:BOF2 ;
+    stl:processedHeat heat:H22600124 ;
+    stl:fulfills productionOrder:W26004323 ;
+    stl:actualStartAt "2026-11-03T07:03:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-03T07:45:00+08:00"^^xsd:dateTime .
+
+operation:TAP-H22600124 a stl:Operation ;
+    op:synthetic true ;
+    dct:identifier "TAP-H22600124" ;
+    rdfs:label "出钢"@zh, "Tapping"@en ;
+    stl:partOf steelmaking:BOF-B ;
+    stl:performedOn equipment:BOF2 ;
+    stl:processedHeat heat:H22600124 ;
+    stl:actualStartAt "2026-11-03T07:39:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-03T07:45:00+08:00"^^xsd:dateTime .
+
+heat:H22600124 a stl:Heat ;
+    op:synthetic true ;
+    dct:identifier "H22600124" ;
+    stl:createdAt "2026-11-03T07:03:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "124"^^xsd:positiveInteger ;
+    stl:producedOnFurnace equipment:BOF2 ;
+    stl:steelGrade steelGrade:G2051 ;
+    stl:castIn castSequence:Q1260046 ;
+    stl:heatPositionInSequence "1"^^xsd:positiveInteger .
+
+steelmaking:BOF-C a stl:Steelmaking ;
+    op:synthetic true ;
+    dct:identifier "BOF-C" ;
+    stl:performedOn equipment:BOF1 ;
+    stl:processedHeat heat:H12600125 ;
+    stl:fulfills productionOrder:W26004324 ;
+    stl:actualStartAt "2026-11-11T06:34:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-11T07:15:00+08:00"^^xsd:dateTime .
+
+operation:TAP-H12600125 a stl:Operation ;
+    op:synthetic true ;
+    dct:identifier "TAP-H12600125" ;
+    rdfs:label "出钢"@zh, "Tapping"@en ;
+    stl:partOf steelmaking:BOF-C ;
+    stl:performedOn equipment:BOF1 ;
+    stl:processedHeat heat:H12600125 ;
+    stl:actualStartAt "2026-11-11T07:10:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-11T07:15:00+08:00"^^xsd:dateTime .
+
+heat:H12600125 a stl:Heat ;
+    op:synthetic true ;
+    dct:identifier "H12600125" ;
+    stl:createdAt "2026-11-11T06:34:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "125"^^xsd:positiveInteger ;
+    stl:producedOnFurnace equipment:BOF1 ;
+    stl:steelGrade steelGrade:G1023 ;
+    stl:castIn castSequence:Q1260047 ;
+    stl:heatPositionInSequence "1"^^xsd:positiveInteger .
+
+refining:精炼实绩十一月007 a stl:Refining ;
+    op:synthetic true ;
+    dct:identifier "精炼实绩十一月007" ;
+    stl:performedOn equipment:RH1 ;
+    stl:processedHeat heat:H22600123 ;
+    stl:actualStartAt "2026-11-02T08:08:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-02T08:36:00+08:00"^^xsd:dateTime .
+
+refining:精炼实绩十一月008 a stl:Refining ;
+    op:synthetic true ;
+    dct:identifier "精炼实绩十一月008" ;
+    stl:performedOn equipment:RH1 ;
+    stl:processedHeat heat:H22600124 ;
+    stl:actualStartAt "2026-11-03T07:51:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-03T08:16:00+08:00"^^xsd:dateTime .
+
+refining:精炼实绩十一月009 a stl:Refining ;
+    op:synthetic true ;
+    dct:identifier "精炼实绩十一月009" ;
+    stl:performedOn equipment:LF1 ;
+    stl:processedHeat heat:H12600125 ;
+    stl:actualStartAt "2026-11-11T07:22:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-11T07:48:00+08:00"^^xsd:dateTime .
+
+# Casting times are recorded for each heat on its own sequence.
+
+castSequence:Q1260045 a stl:CastSequence ;
+    op:synthetic true ;
+    dct:identifier "Q1260045" ;
+    stl:createdAt "2026-11-02T07:26:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "45"^^xsd:positiveInteger ;
+    stl:castOn equipment:CC1 .
+
+continuousCasting:CAST-H22600121 a stl:ContinuousCasting ;
+    op:synthetic true ;
+    dct:identifier "CAST-H22600121" ;
+    stl:performedOn equipment:CC1 ;
+    stl:processedHeat heat:H22600121 ;
+    stl:actualStartAt "2026-11-02T07:26:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-02T08:06:00+08:00"^^xsd:dateTime .
+
+continuousCasting:CAST-H22600122 a stl:ContinuousCasting ;
+    op:synthetic true ;
+    dct:identifier "CAST-H22600122" ;
+    stl:performedOn equipment:CC1 ;
+    stl:processedHeat heat:H22600122 ;
+    stl:actualStartAt "2026-11-02T08:06:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-02T08:46:00+08:00"^^xsd:dateTime .
+
+continuousCasting:CAST-H22600123 a stl:ContinuousCasting ;
+    op:synthetic true ;
+    dct:identifier "CAST-H22600123" ;
+    stl:performedOn equipment:CC1 ;
+    stl:processedHeat heat:H22600123 ;
+    stl:actualStartAt "2026-11-02T08:46:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-02T09:26:00+08:00"^^xsd:dateTime .
+
+castSequence:Q1260046 a stl:CastSequence ;
+    op:synthetic true ;
+    dct:identifier "Q1260046" ;
+    stl:createdAt "2026-11-03T08:28:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "46"^^xsd:positiveInteger ;
+    stl:castOn equipment:CC1 .
+
+continuousCasting:CAST-H22600124 a stl:ContinuousCasting ;
+    op:synthetic true ;
+    dct:identifier "CAST-H22600124" ;
+    stl:performedOn equipment:CC1 ;
+    stl:processedHeat heat:H22600124 ;
+    stl:actualStartAt "2026-11-03T08:28:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-03T09:09:00+08:00"^^xsd:dateTime .
+
+castSequence:Q1260047 a stl:CastSequence ;
+    op:synthetic true ;
+    dct:identifier "Q1260047" ;
+    stl:createdAt "2026-11-11T08:06:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "47"^^xsd:positiveInteger ;
+    stl:castOn equipment:CC1 .
+
+continuousCasting:CAST-H12600125 a stl:ContinuousCasting ;
+    op:synthetic true ;
+    dct:identifier "CAST-H12600125" ;
+    stl:performedOn equipment:CC1 ;
+    stl:processedHeat heat:H12600125 ;
+    stl:actualStartAt "2026-11-11T08:06:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-11T08:46:00+08:00"^^xsd:dateTime .
+
+# Each cut instantiates a plan and produces one slab. The first two heats have no cumulative strand count in the ledger.
+
+cuttingPlan:切计十一月045乙 a stl:CuttingPlan ;
+    op:synthetic true ;
+    dct:identifier "切计十一月045乙" ;
+    stl:forProductionOrder productionOrder:W26004321 ;
+    stl:cuttingSequence "1"^^xsd:positiveInteger ;
+    stl:plannedLength 9.800 ;
+    stl:plannedStartAt "2026-11-02T09:18:00+08:00"^^xsd:dateTime ;
+    stl:plannedEndAt "2026-11-02T09:21:00+08:00"^^xsd:dateTime .
+
+cutting:切实十一月045乙 a stl:Cutting ;
+    op:synthetic true ;
+    dct:identifier "切实十一月045乙" ;
+    stl:performedOn equipment:CC1 ;
+    stl:partOf continuousCasting:CAST-H22600123 ;
+    stl:fulfills cuttingPlan:切计十一月045乙 ;
+    stl:outputPiece slab:S22600123201 ;
+    stl:actualStartAt "2026-11-02T09:19:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-02T09:22:00+08:00"^^xsd:dateTime ;
+    stl:actualLength 9.760 ;
+    stl:castingSpeed 1.02 .
+
+slab:S22600123201 a stl:Slab ;
+    op:synthetic true ;
+    dct:identifier "S22600123201" ;
+    stl:createdAt "2026-11-02T09:22:00+08:00"^^xsd:dateTime ;
+    stl:producedBy cutting:切实十一月045乙 ;
+    stl:numberingHeat heat:H22600123 ;
+    stl:sourceHeat heat:H22600122, heat:H22600123 ;
+    stl:strandNumber "2"^^xsd:positiveInteger ;
+    stl:sequenceInStrand "1"^^xsd:positiveInteger ;
+    stl:positionInHeat "1"^^xsd:positiveInteger ;
+    stl:isTransitionSlab true ;
+    stl:previousGrade steelGrade:G1023 ;
+    stl:nextGrade steelGrade:G2051 ;
+    stl:contribution heatContribution:S22600123201-H22600122, heatContribution:S22600123201-H22600123 ;
+    stl:allocatedTo salesOrderLine:D26001235-020 ;
+    stl:thickness 220.0 ;
+    stl:width 1250.0 .
+
+heatContribution:S22600123201-H22600122 a stl:HeatContribution ;
+    op:synthetic true ;
+    dct:identifier "S22600123201-H22600122" ;
+    stl:contributedHeat heat:H22600122 ;
+    stl:evidenceLevel evidence:UNKNOWN .
+
+heatContribution:S22600123201-H22600123 a stl:HeatContribution ;
+    op:synthetic true ;
+    dct:identifier "S22600123201-H22600123" ;
+    stl:contributedHeat heat:H22600123 ;
+    stl:evidenceLevel evidence:UNKNOWN .
+
+cuttingPlan:切计十一月046甲 a stl:CuttingPlan ;
+    op:synthetic true ;
+    dct:identifier "切计十一月046甲" ;
+    stl:forProductionOrder productionOrder:W26004323 ;
+    stl:cuttingSequence "1"^^xsd:positiveInteger ;
+    stl:plannedLength 10.400 ;
+    stl:plannedStartAt "2026-11-03T09:03:00+08:00"^^xsd:dateTime ;
+    stl:plannedEndAt "2026-11-03T09:06:00+08:00"^^xsd:dateTime .
+
+cutting:切实十一月046甲 a stl:Cutting ;
+    op:synthetic true ;
+    dct:identifier "切实十一月046甲" ;
+    stl:performedOn equipment:CC1 ;
+    stl:partOf continuousCasting:CAST-H22600124 ;
+    stl:fulfills cuttingPlan:切计十一月046甲 ;
+    stl:outputPiece slab:S22600124101 ;
+    stl:actualStartAt "2026-11-03T09:04:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-03T09:07:00+08:00"^^xsd:dateTime ;
+    stl:actualLength 10.390 ;
+    stl:castingSpeed 1.04 .
+
+slab:S22600124101 a stl:Slab ;
+    op:synthetic true ;
+    dct:identifier "S22600124101" ;
+    stl:createdAt "2026-11-03T09:07:00+08:00"^^xsd:dateTime ;
+    stl:producedBy cutting:切实十一月046甲 ;
+    stl:numberingHeat heat:H22600124 ;
+    stl:sourceHeat heat:H22600124 ;
+    stl:strandNumber "1"^^xsd:positiveInteger ;
+    stl:sequenceInStrand "1"^^xsd:positiveInteger ;
+    stl:positionInHeat "1"^^xsd:positiveInteger ;
+    stl:positionInSequence "1"^^xsd:positiveInteger ;
+    stl:isTransitionSlab false ;
+    stl:contribution heatContribution:S22600124101-H22600124 ;
+    stl:thickness 220.0 ;
+    stl:width 1280.0 .
+
+heatContribution:S22600124101-H22600124 a stl:HeatContribution ;
+    op:synthetic true ;
+    dct:identifier "S22600124101-H22600124" ;
+    stl:contributedHeat heat:H22600124 ;
+    stl:evidenceLevel evidence:ESTIMATED ;
+    stl:share 100.0 ;
+    stl:shareBasis basis:LENGTH .
+
+cuttingPlan:切计十一月047甲 a stl:CuttingPlan ;
+    op:synthetic true ;
+    dct:identifier "切计十一月047甲" ;
+    stl:forProductionOrder productionOrder:W26004324 ;
+    stl:cuttingSequence "1"^^xsd:positiveInteger ;
+    stl:plannedLength 9.600 ;
+    stl:plannedStartAt "2026-11-11T08:42:00+08:00"^^xsd:dateTime ;
+    stl:plannedEndAt "2026-11-11T08:45:00+08:00"^^xsd:dateTime .
+
+cutting:切实十一月047甲 a stl:Cutting ;
+    op:synthetic true ;
+    dct:identifier "切实十一月047甲" ;
+    stl:performedOn equipment:CC1 ;
+    stl:partOf continuousCasting:CAST-H12600125 ;
+    stl:fulfills cuttingPlan:切计十一月047甲 ;
+    stl:outputPiece slab:S12600125101 ;
+    stl:actualStartAt "2026-11-11T08:43:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-11T08:46:00+08:00"^^xsd:dateTime ;
+    stl:actualLength 9.592 ;
+    stl:castingSpeed 1.00 .
+
+slab:S12600125101 a stl:Slab ;
+    op:synthetic true ;
+    dct:identifier "S12600125101" ;
+    stl:createdAt "2026-11-11T08:46:00+08:00"^^xsd:dateTime ;
+    stl:producedBy cutting:切实十一月047甲 ;
+    stl:numberingHeat heat:H12600125 ;
+    stl:sourceHeat heat:H12600125 ;
+    stl:strandNumber "1"^^xsd:positiveInteger ;
+    stl:sequenceInStrand "1"^^xsd:positiveInteger ;
+    stl:positionInHeat "1"^^xsd:positiveInteger ;
+    stl:positionInSequence "1"^^xsd:positiveInteger ;
+    stl:isTransitionSlab false ;
+    stl:contribution heatContribution:S12600125101-H12600125 ;
+    stl:thickness 220.0 ;
+    stl:width 1280.0 .
+
+heatContribution:S12600125101-H12600125 a stl:HeatContribution ;
+    op:synthetic true ;
+    dct:identifier "S12600125101-H12600125" ;
+    stl:contributedHeat heat:H12600125 ;
+    stl:evidenceLevel evidence:MEASURED ;
+    stl:share 100.0 ;
+    stl:shareBasis basis:LENGTH .
+
+# Hot and cold rolling. Segment bounds use inlet metres, and actualLength on a coil is its outlet length.
+
+hotRolling:热实十一月456 a stl:HotRolling ;
+    op:synthetic true ;
+    dct:identifier "热实十一月456" ;
+    stl:performedOn equipment:HSM1 ;
+    stl:fulfills productionOrder:W26004322 ;
+    stl:inputPiece slab:S22600123201 ;
+    stl:outputPiece hotRolledCoil:R126000456 ;
+    stl:actualStartAt "2026-11-04T08:04:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-04T08:15:00+08:00"^^xsd:dateTime .
+
+hotRolledCoil:R126000456 a stl:HotRolledCoil ;
+    op:synthetic true ;
+    dct:identifier "R126000456" ;
+    stl:createdAt "2026-11-04T08:15:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "456"^^xsd:positiveInteger ;
+    stl:producedBy hotRolling:热实十一月456 ;
+    stl:derivedFrom slab:S22600123201 ;
+    stl:thickness 3.00 ;
+    stl:width 1230.0 ;
+    stl:actualLength 700.000 ;
+    stl:netMass 20.28 .
+
+hotRolling:热实十一月457 a stl:HotRolling ;
+    op:synthetic true ;
+    dct:identifier "热实十一月457" ;
+    stl:performedOn equipment:HSM1 ;
+    stl:fulfills productionOrder:W26004323 ;
+    stl:inputPiece slab:S22600124101 ;
+    stl:outputPiece hotRolledCoil:R126000457 ;
+    stl:actualStartAt "2026-11-05T10:20:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-05T10:31:00+08:00"^^xsd:dateTime .
+
+hotRolledCoil:R126000457 a stl:HotRolledCoil ;
+    op:synthetic true ;
+    dct:identifier "R126000457" ;
+    stl:createdAt "2026-11-05T10:31:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "457"^^xsd:positiveInteger ;
+    stl:producedBy hotRolling:热实十一月457 ;
+    stl:derivedFrom slab:S22600124101 ;
+    stl:thickness 2.90 ;
+    stl:width 1240.0 ;
+    stl:actualLength 800.000 ;
+    stl:netMass 22.58 .
+
+hotRolling:热实十一月458 a stl:HotRolling ;
+    op:synthetic true ;
+    dct:identifier "热实十一月458" ;
+    stl:performedOn equipment:HSM1 ;
+    stl:fulfills productionOrder:W26004324 ;
+    stl:inputPiece slab:S12600125101 ;
+    stl:outputPiece hotRolledCoil:R126000458 ;
+    stl:actualStartAt "2026-11-12T09:50:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-12T10:03:00+08:00"^^xsd:dateTime .
+
+hotRolledCoil:R126000458 a stl:HotRolledCoil ;
+    op:synthetic true ;
+    dct:identifier "R126000458" ;
+    stl:createdAt "2026-11-12T10:03:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "458"^^xsd:positiveInteger ;
+    stl:producedBy hotRolling:热实十一月458 ;
+    stl:derivedFrom slab:S12600125101 ;
+    stl:thickness 3.20 ;
+    stl:width 1250.0 ;
+    stl:actualLength 647.000 ;
+    stl:netMass 20.32 ;
+    stl:allocatedTo salesOrderLine:D26001237-010 .
+
+picklingAndColdRolling:酸实十一月789 a stl:PicklingAndColdRolling ;
+    op:synthetic true ;
+    dct:identifier "酸实十一月789" ;
+    stl:performedOn equipment:PLTCM1 ;
+    stl:fulfills productionOrder:W26004322 ;
+    stl:inputPiece hotRolledCoil:R126000456 ;
+    stl:outputPiece fullHardCoil:CPL126000789 ;
+    stl:actualStartAt "2026-11-07T07:28:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-07T07:41:00+08:00"^^xsd:dateTime .
+
+fullHardCoil:CPL126000789 a stl:FullHardCoil ;
+    op:synthetic true ;
+    dct:identifier "CPL126000789" ;
+    stl:createdAt "2026-11-07T07:41:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "789"^^xsd:positiveInteger ;
+    stl:producedBy picklingAndColdRolling:酸实十一月789 ;
+    stl:derivedFrom hotRolledCoil:R126000456 ;
+    stl:startLength 0.000 ;
+    stl:endLength 700.000 ;
+    stl:thickness 1.00 ;
+    stl:width 1220.0 ;
+    stl:actualLength 2090.400 ;
+    stl:netMass 20.02 .
+
+annealing:退实十一月812 a stl:Annealing ;
+    op:synthetic true ;
+    dct:identifier "退实十一月812" ;
+    stl:performedOn equipment:CAL1 ;
+    stl:fulfills productionOrder:W26004322 ;
+    stl:inputPiece fullHardCoil:CPL126000789 ;
+    stl:outputPiece annealedCoil:CCA126000812 ;
+    stl:actualStartAt "2026-11-10T07:32:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-10T07:45:00+08:00"^^xsd:dateTime .
+
+annealedCoil:CCA126000812 a stl:AnnealedCoil ;
+    op:synthetic true ;
+    dct:identifier "CCA126000812" ;
+    stl:createdAt "2026-11-10T07:45:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "812"^^xsd:positiveInteger ;
+    stl:producedBy annealing:退实十一月812 ;
+    stl:derivedFrom fullHardCoil:CPL126000789 ;
+    stl:thickness 1.00 ;
+    stl:width 1220.0 ;
+    stl:actualLength 2082.100 ;
+    stl:netMass 19.94 ;
+    stl:allocatedTo salesOrderLine:D26001235-020 .
+
+coilSplitting:酸实十一月790 a stl:CoilSplitting, stl:PicklingAndColdRolling ;
+    op:synthetic true ;
+    dct:identifier "酸实十一月790" ;
+    stl:performedOn equipment:PLTCM1 ;
+    stl:fulfills productionOrder:W26004323 ;
+    stl:inputPiece hotRolledCoil:R126000457 ;
+    stl:actualStartAt "2026-11-08T09:06:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-08T09:21:00+08:00"^^xsd:dateTime .
+
+operation:COIL-CPL126000790 a stl:Operation ;
+    op:synthetic true ;
+    dct:identifier "COIL-CPL126000790" ;
+    rdfs:label "子卷卷取"@zh, "Exit coiling"@en ;
+    rdfs:comment "合成的卷取子执行，用于记录该子卷的产出时刻。台账只记录所属的分卷执行。"@zh ;
+    stl:performedOn equipment:PLTCM1 ;
+    stl:partOf coilSplitting:酸实十一月790 ;
+    stl:outputPiece fullHardCoil:CPL126000790 ;
+    stl:actualStartAt "2026-11-08T09:06:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-08T09:15:00+08:00"^^xsd:dateTime .
+
+fullHardCoil:CPL126000790 a stl:FullHardCoil ;
+    op:synthetic true ;
+    dct:identifier "CPL126000790" ;
+    stl:createdAt "2026-11-08T09:15:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "790"^^xsd:positiveInteger ;
+    stl:producedBy operation:COIL-CPL126000790 ;
+    stl:derivedFrom hotRolledCoil:R126000457 ;
+    stl:startLength 0.000 ;
+    stl:endLength 398.000 ;
+    stl:thickness 0.90 ;
+    stl:width 1220.0 ;
+    stl:actualLength 1275.000 ;
+    stl:netMass 10.99 .
+
+operation:COIL-CPL126000791 a stl:Operation ;
+    op:synthetic true ;
+    dct:identifier "COIL-CPL126000791" ;
+    rdfs:label "子卷卷取"@zh, "Exit coiling"@en ;
+    rdfs:comment "合成的卷取子执行，用于记录该子卷的产出时刻。台账只记录所属的分卷执行。"@zh ;
+    stl:performedOn equipment:PLTCM1 ;
+    stl:partOf coilSplitting:酸实十一月790 ;
+    stl:outputPiece fullHardCoil:CPL126000791 ;
+    stl:actualStartAt "2026-11-08T09:12:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-08T09:21:00+08:00"^^xsd:dateTime .
+
+fullHardCoil:CPL126000791 a stl:FullHardCoil ;
+    op:synthetic true ;
+    dct:identifier "CPL126000791" ;
+    stl:createdAt "2026-11-08T09:21:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "791"^^xsd:positiveInteger ;
+    stl:producedBy operation:COIL-CPL126000791 ;
+    stl:derivedFrom hotRolledCoil:R126000457 ;
+    stl:startLength 398.000 ;
+    stl:endLength 800.000 ;
+    stl:thickness 0.90 ;
+    stl:width 1220.0 ;
+    stl:actualLength 1287.800 ;
+    stl:netMass 11.10 .
+
+galvanizing:镀实十一月801 a stl:Galvanizing ;
+    op:synthetic true ;
+    dct:identifier "镀实十一月801" ;
+    stl:performedOn equipment:CGL1 ;
+    stl:fulfills productionOrder:W26004323 ;
+    stl:inputPiece fullHardCoil:CPL126000790 ;
+    stl:outputPiece galvanizedCoil:CCG126000801 ;
+    stl:actualStartAt "2026-11-12T10:35:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-12T10:46:00+08:00"^^xsd:dateTime .
+
+galvanizedCoil:CCG126000801 a stl:GalvanizedCoil ;
+    op:synthetic true ;
+    dct:identifier "CCG126000801" ;
+    stl:createdAt "2026-11-12T10:46:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "801"^^xsd:positiveInteger ;
+    stl:producedBy galvanizing:镀实十一月801 ;
+    stl:derivedFrom fullHardCoil:CPL126000790 ;
+    stl:thickness 0.91 ;
+    stl:width 1220.0 ;
+    stl:actualLength 1268.000 ;
+    stl:netMass 11.09 ;
+    stl:coatingType coating:GI ;
+    stl:allocatedTo salesOrderLine:D26001236-010 .
+
+galvanizing:镀实十一月802 a stl:Galvanizing ;
+    op:synthetic true ;
+    dct:identifier "镀实十一月802" ;
+    stl:performedOn equipment:CGL1 ;
+    stl:fulfills productionOrder:W26004323 ;
+    stl:inputPiece fullHardCoil:CPL126000791 ;
+    stl:outputPiece galvanizedCoil:CCG126000802 ;
+    stl:actualStartAt "2026-11-12T10:47:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-12T10:59:00+08:00"^^xsd:dateTime .
+
+galvanizedCoil:CCG126000802 a stl:GalvanizedCoil ;
+    op:synthetic true ;
+    dct:identifier "CCG126000802" ;
+    stl:createdAt "2026-11-12T10:59:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "802"^^xsd:positiveInteger ;
+    stl:producedBy galvanizing:镀实十一月802 ;
+    stl:derivedFrom fullHardCoil:CPL126000791 ;
+    stl:thickness 0.91 ;
+    stl:width 1220.0 ;
+    stl:actualLength 1280.500 ;
+    stl:netMass 11.19 ;
+    stl:coatingType coating:GI ;
+    stl:allocatedTo salesOrderLine:D26001236-010 .
+
+# The endpoint probe records oxygen in ppm. Ladle readings use the RH measuring point.
+
+observation:BOF2-END-TEMP a stl:Observation ;
+    op:synthetic true ;
+    dct:identifier "BOF2-END-TEMP" ;
+    stl:measuredObject heat:H22600123 ;
+    stl:measurementItem item:TEMP ;
+    stl:measuredAtPoint measurementPoint:BOF2-ENDPOINT ;
+    stl:sampledAt "2026-11-02T07:52:00+08:00"^^xsd:dateTime ;
+    stl:resultAt "2026-11-02T07:53:00+08:00"^^xsd:dateTime ;
+    stl:measurementMethod method:AUTOMATIC ;
+    stl:temperature 1670.0 .
+
+observation:BOF2-END-OXYGEN a stl:Observation ;
+    op:synthetic true ;
+    dct:identifier "BOF2-END-OXYGEN" ;
+    stl:measuredObject heat:H22600123 ;
+    stl:measurementItem item:OXYACT ;
+    stl:measuredAtPoint measurementPoint:BOF2-ENDPOINT ;
+    stl:sampledAt "2026-11-02T07:52:00+08:00"^^xsd:dateTime ;
+    stl:resultAt "2026-11-02T07:53:00+08:00"^^xsd:dateTime ;
+    stl:measurementMethod method:AUTOMATIC ;
+    stl:activeOxygen 490.0 .
+
+observation:RH-A3-01 a stl:Observation ;
+    op:synthetic true ;
+    dct:identifier "RH-A3-01" ;
+    stl:measuredObject heat:H22600123 ;
+    stl:measurementItem item:TEMP ;
+    stl:measuredAtPoint measurementPoint:RH1-LADLE ;
+    stl:sampledAt "2026-11-02T08:10:00+08:00"^^xsd:dateTime ;
+    stl:resultAt "2026-11-02T08:11:00+08:00"^^xsd:dateTime ;
+    stl:measurementMethod method:MANUAL ;
+    stl:temperature 1621.0 .
+
+observation:RH-A3-02 a stl:Observation ;
+    op:synthetic true ;
+    dct:identifier "RH-A3-02" ;
+    stl:measuredObject heat:H22600123 ;
+    stl:measurementItem item:TEMP ;
+    stl:measuredAtPoint measurementPoint:RH1-LADLE ;
+    stl:sampledAt "2026-11-02T08:21:00+08:00"^^xsd:dateTime ;
+    stl:resultAt "2026-11-02T08:22:00+08:00"^^xsd:dateTime ;
+    stl:measurementMethod method:MANUAL ;
+    stl:temperature 1612.0 .
+
+observation:RH-A3-03 a stl:Observation ;
+    op:synthetic true ;
+    dct:identifier "RH-A3-03" ;
+    stl:measuredObject heat:H22600123 ;
+    stl:measurementItem item:TEMP ;
+    stl:measuredAtPoint measurementPoint:RH1-LADLE ;
+    stl:sampledAt "2026-11-02T08:33:00+08:00"^^xsd:dateTime ;
+    stl:resultAt "2026-11-02T08:34:00+08:00"^^xsd:dateTime ;
+    stl:measurementMethod method:MANUAL ;
+    stl:temperature 1605.0 .
+
+# Inspection lots, samples and laboratory evidence. Sample 4559 was reserved at 07:48 before collection.
+# Each galvanized coil has one registered sample plate, shared by the tensile and coating determinations.
+
+inspectionLot:L26000320 a stl:InspectionLot ;
+    op:synthetic true ;
+    dct:identifier "L26000320" ;
+    stl:createdAt "2026-11-10T08:18:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "320"^^xsd:positiveInteger ;
+    stl:lotMember annealedCoil:CCA126000812 .
+
+inspectionLot:L26000321 a stl:InspectionLot ;
+    op:synthetic true ;
+    dct:identifier "L26000321" ;
+    stl:createdAt "2026-11-12T11:18:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "321"^^xsd:positiveInteger ;
+    stl:lotMember galvanizedCoil:CCG126000801 .
+
+inspectionLot:L26000322 a stl:InspectionLot ;
+    op:synthetic true ;
+    dct:identifier "L26000322" ;
+    stl:createdAt "2026-11-12T12:04:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "322"^^xsd:positiveInteger ;
+    stl:lotMember galvanizedCoil:CCG126000802 .
+
+inspectionLot:L26000323 a stl:InspectionLot ;
+    op:synthetic true ;
+    dct:identifier "L26000323" ;
+    stl:createdAt "2026-11-15T15:10:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "323"^^xsd:positiveInteger ;
+    stl:lotMember hotRolledCoil:R126000458 .
+
+sample:T260004559 a stl:Sample ;
+    op:synthetic true ;
+    dct:identifier "T260004559" ;
+    stl:createdAt "2026-11-02T07:48:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4559"^^xsd:positiveInteger ;
+    stl:sampleOf heat:H22600123 ;
+    stl:sampleType sampleType:REFINING ;
+    stl:sampledAt "2026-11-02T08:28:00+08:00"^^xsd:dateTime ;
+    stl:samplePosition "RH1钢包测点" .
+
+sample:T260004560 a stl:Sample ;
+    op:synthetic true ;
+    dct:identifier "T260004560" ;
+    stl:createdAt "2026-11-02T07:52:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4560"^^xsd:positiveInteger ;
+    stl:sampleOf heat:H22600123 ;
+    stl:sampleType sampleType:ENDPOINT ;
+    stl:sampledAt "2026-11-02T07:52:00+08:00"^^xsd:dateTime ;
+    stl:samplePosition "BOF2炉内终点测点" .
+
+sample:T260004561 a stl:Sample ;
+    op:synthetic true ;
+    dct:identifier "T260004561" ;
+    stl:createdAt "2026-11-02T08:37:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4561"^^xsd:positiveInteger ;
+    stl:sampleOf heat:H22600123 ;
+    stl:sampleType sampleType:REFINING ;
+    stl:sampledAt "2026-11-02T08:37:00+08:00"^^xsd:dateTime ;
+    stl:samplePosition "RH1钢包测点" .
+
+sample:T260004562 a stl:Sample ;
+    op:synthetic true ;
+    dct:identifier "T260004562" ;
+    stl:createdAt "2026-11-10T08:20:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4562"^^xsd:positiveInteger ;
+    stl:sampleOf annealedCoil:CCA126000812 ;
+    stl:sampleType sampleType:MECHANICAL ;
+    stl:sampledAt "2026-11-10T08:20:00+08:00"^^xsd:dateTime ;
+    stl:samplePosition "卷尾切样板（横向）" .
+
+sample:T260004563 a stl:Sample ;
+    op:synthetic true ;
+    dct:identifier "T260004563" ;
+    stl:createdAt "2026-11-11T08:24:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4563"^^xsd:positiveInteger ;
+    stl:sampleOf heat:H12600125 ;
+    stl:sampleType sampleType:TUNDISH ;
+    stl:sampledAt "2026-11-11T08:24:00+08:00"^^xsd:dateTime ;
+    stl:samplePosition "CC1浇次Q1260047中间包丙" .
+
+sample:T260004567 a stl:Sample ;
+    op:synthetic true ;
+    dct:identifier "T260004567" ;
+    stl:createdAt "2026-11-12T11:20:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4567"^^xsd:positiveInteger ;
+    stl:sampleOf galvanizedCoil:CCG126000801 ;
+    stl:sampleType sampleType:MECHANICAL ;
+    stl:sampledAt "2026-11-12T11:20:00+08:00"^^xsd:dateTime ;
+    stl:samplePosition "卷尾切样板（横向）" .
+
+sample:T260004568 a stl:Sample ;
+    op:synthetic true ;
+    dct:identifier "T260004568" ;
+    stl:createdAt "2026-11-12T12:08:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4568"^^xsd:positiveInteger ;
+    stl:sampleOf galvanizedCoil:CCG126000802 ;
+    stl:sampleType sampleType:MECHANICAL ;
+    stl:sampledAt "2026-11-12T12:08:00+08:00"^^xsd:dateTime ;
+    stl:samplePosition "卷尾切样板（横向）" .
+
+sample:T260004569 a stl:Sample ;
+    op:synthetic true ;
+    dct:identifier "T260004569" ;
+    stl:createdAt "2026-11-15T15:20:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4569"^^xsd:positiveInteger ;
+    stl:sampleOf hotRolledCoil:R126000458 ;
+    stl:sampleType sampleType:MECHANICAL ;
+    stl:sampledAt "2026-11-15T15:20:00+08:00"^^xsd:dateTime ;
+    stl:samplePosition "卷尾切样板（横向）" .
+
+# Completed analyses retain their final report time. Each element retains its own release time and method.
+
+chemicalAnalysis:化验十一月560 a stl:ChemicalAnalysis ;
+    op:synthetic true ;
+    dct:identifier "化验十一月560" ;
+    stl:testedSample sample:T260004560 ;
+    stl:analysisType analysisType:PROCESS ;
+    stl:resultAt "2026-11-02T07:55:00+08:00"^^xsd:dateTime .
+
+elementResult:化验十一月560-C a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "化验十一月560-C" ;
+    stl:partOf chemicalAnalysis:化验十一月560 ;
+    stl:element chemical:C ;
+    stl:massFraction 0.041 ;
+    stl:resultAt "2026-11-02T07:55:00+08:00"^^xsd:dateTime ;
+    stl:methodStandard std:gbt-4336-2016 .
+
+elementResult:化验十一月560-SI a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "化验十一月560-SI" ;
+    stl:partOf chemicalAnalysis:化验十一月560 ;
+    stl:element chemical:SI ;
+    stl:massFraction 0.014 ;
+    stl:resultAt "2026-11-02T07:55:00+08:00"^^xsd:dateTime ;
+    stl:methodStandard std:gbt-4336-2016 .
+
+elementResult:化验十一月560-MN a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "化验十一月560-MN" ;
+    stl:partOf chemicalAnalysis:化验十一月560 ;
+    stl:element chemical:MN ;
+    stl:massFraction 0.145 ;
+    stl:resultAt "2026-11-02T07:55:00+08:00"^^xsd:dateTime ;
+    stl:methodStandard std:gbt-4336-2016 .
+
+elementResult:化验十一月560-P a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "化验十一月560-P" ;
+    stl:partOf chemicalAnalysis:化验十一月560 ;
+    stl:element chemical:P ;
+    stl:massFraction 0.010 ;
+    stl:resultAt "2026-11-02T07:55:00+08:00"^^xsd:dateTime ;
+    stl:methodStandard std:gbt-4336-2016 .
+
+elementResult:化验十一月560-S a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "化验十一月560-S" ;
+    stl:partOf chemicalAnalysis:化验十一月560 ;
+    stl:element chemical:S ;
+    stl:massFraction 0.009 ;
+    stl:resultAt "2026-11-02T07:55:00+08:00"^^xsd:dateTime ;
+    stl:methodStandard std:gbt-4336-2016 .
+
+chemicalAnalysis:化验十一月561 a stl:ChemicalAnalysis ;
+    op:synthetic true ;
+    dct:identifier "化验十一月561" ;
+    stl:testedSample sample:T260004561 ;
+    stl:analysisType analysisType:HEAT ;
+    stl:resultAt "2026-11-02T09:50:00+08:00"^^xsd:dateTime .
+
+elementResult:化验十一月561-C a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "化验十一月561-C" ;
+    stl:partOf chemicalAnalysis:化验十一月561 ;
+    stl:element chemical:C ;
+    stl:massFraction 0.019 ;
+    stl:resultAt "2026-11-02T08:44:00+08:00"^^xsd:dateTime ;
+    stl:methodStandard std:gbt-4336-2016 .
+
+elementResult:化验十一月561-SI a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "化验十一月561-SI" ;
+    stl:partOf chemicalAnalysis:化验十一月561 ;
+    stl:element chemical:SI ;
+    stl:massFraction 0.018 ;
+    stl:resultAt "2026-11-02T08:44:00+08:00"^^xsd:dateTime ;
+    stl:methodStandard std:gbt-4336-2016 .
+
+elementResult:化验十一月561-MN a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "化验十一月561-MN" ;
+    stl:partOf chemicalAnalysis:化验十一月561 ;
+    stl:element chemical:MN ;
+    stl:massFraction 0.182 ;
+    stl:resultAt "2026-11-02T08:44:00+08:00"^^xsd:dateTime ;
+    stl:methodStandard std:gbt-4336-2016 .
+
+elementResult:化验十一月561-P a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "化验十一月561-P" ;
+    stl:partOf chemicalAnalysis:化验十一月561 ;
+    stl:element chemical:P ;
+    stl:massFraction 0.010 ;
+    stl:resultAt "2026-11-02T08:44:00+08:00"^^xsd:dateTime ;
+    stl:methodStandard std:gbt-4336-2016 .
+
+elementResult:化验十一月561-S a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "化验十一月561-S" ;
+    stl:partOf chemicalAnalysis:化验十一月561 ;
+    stl:element chemical:S ;
+    stl:massFraction 0.008 ;
+    stl:resultAt "2026-11-02T08:44:00+08:00"^^xsd:dateTime ;
+    stl:methodStandard std:gbt-4336-2016 .
+
+elementResult:化验十一月561-ALS a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "化验十一月561-ALS" ;
+    stl:partOf chemicalAnalysis:化验十一月561 ;
+    stl:element chemical:ALS ;
+    stl:massFraction 0.032 ;
+    stl:resultAt "2026-11-02T09:50:00+08:00"^^xsd:dateTime .
+
+# Supplementary product analysis on the ordinary hot-coil route, outside the ledger extract.
+
+sample:T260004570 a stl:Sample ;
+    op:synthetic true ;
+    dct:identifier "T260004570" ;
+    stl:createdAt "2026-11-15T15:25:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "4570"^^xsd:positiveInteger ;
+    stl:sampleOf hotRolledCoil:R126000458 ;
+    stl:sampleType sampleType:PRODUCT ;
+    stl:sampledAt "2026-11-15T15:25:00+08:00"^^xsd:dateTime ;
+    stl:samplePosition "卷尾" .
+
+chemicalAnalysis:C-PRODUCT a stl:ChemicalAnalysis ;
+    op:synthetic true ;
+    dct:identifier "C-PRODUCT" ;
+    stl:testedSample sample:T260004570 ;
+    stl:analysisType analysisType:PRODUCT ;
+    stl:resultAt "2026-11-15T16:40:00+08:00"^^xsd:dateTime .
+
+elementResult:C-PRODUCT-N a stl:ElementResult ;
+    op:synthetic true ;
+    dct:identifier "C-PRODUCT-N" ;
+    stl:partOf chemicalAnalysis:C-PRODUCT ;
+    stl:element chemical:N ;
+    stl:massFraction 0.0033 .
+
+# Synthetic order limits.
+# These invented mass percentages apply only to the DC01 order line. They are not standard limits.
+
+compositionLimit:ORDER-A-C a stl:CompositionLimit ;
+    op:synthetic true ;
+    dct:identifier "ORDER-A-C" ;
+    stl:partOf materialSpecification:SPEC-A-DC01 ;
+    stl:element chemical:C ;
+    stl:lowerLimit 0.000 ;
+    stl:upperLimit 0.090 .
+
+compositionLimit:ORDER-A-SI a stl:CompositionLimit ;
+    op:synthetic true ;
+    dct:identifier "ORDER-A-SI" ;
+    stl:partOf materialSpecification:SPEC-A-DC01 ;
+    stl:element chemical:SI ;
+    stl:lowerLimit 0.000 ;
+    stl:upperLimit 0.090 .
+
+compositionLimit:ORDER-A-MN a stl:CompositionLimit ;
+    op:synthetic true ;
+    dct:identifier "ORDER-A-MN" ;
+    stl:partOf materialSpecification:SPEC-A-DC01 ;
+    stl:element chemical:MN ;
+    stl:lowerLimit 0.100 ;
+    stl:upperLimit 0.550 .
+
+compositionLimit:ORDER-A-P a stl:CompositionLimit ;
+    op:synthetic true ;
+    dct:identifier "ORDER-A-P" ;
+    stl:partOf materialSpecification:SPEC-A-DC01 ;
+    stl:element chemical:P ;
+    stl:lowerLimit 0.000 ;
+    stl:upperLimit 0.030 .
+
+compositionLimit:ORDER-A-S a stl:CompositionLimit ;
+    op:synthetic true ;
+    dct:identifier "ORDER-A-S" ;
+    stl:partOf materialSpecification:SPEC-A-DC01 ;
+    stl:element chemical:S ;
+    stl:lowerLimit 0.000 ;
+    stl:upperLimit 0.025 .
+
+compositionLimit:ORDER-A-ALS a stl:CompositionLimit ;
+    op:synthetic true ;
+    dct:identifier "ORDER-A-ALS" ;
+    stl:partOf materialSpecification:SPEC-A-DC01 ;
+    stl:element chemical:ALS ;
+    stl:lowerLimit 0.010 ;
+    stl:upperLimit 0.070 .
+
+# Tensile tests and laboratory coating tests cite their own method and result time.
+
+mechanicalTest:TENSILE-812 a stl:MechanicalTest ;
+    op:synthetic true ;
+    dct:identifier "TENSILE-812" ;
+    stl:testedSample sample:T260004562 ;
+    stl:methodStandard std:gbt-228-1-2021 ;
+    stl:resultAt "2026-11-10T10:04:00+08:00"^^xsd:dateTime ;
+    stl:lowerYieldStrength 207.0 ;
+    stl:tensileStrength 318.0 ;
+    stl:elongationAfterFracture 37.0 .
+
+mechanicalTest:TENSILE-801 a stl:MechanicalTest ;
+    op:synthetic true ;
+    dct:identifier "TENSILE-801" ;
+    stl:testedSample sample:T260004567 ;
+    stl:methodStandard std:gbt-228-1-2021 ;
+    stl:resultAt "2026-11-12T13:24:00+08:00"^^xsd:dateTime ;
+    stl:tensileStrength 329.0 ;
+    stl:elongationAfterFracture 34.0 .
+
+coatingTest:COATING-801 a stl:CoatingTest ;
+    op:synthetic true ;
+    dct:identifier "COATING-801" ;
+    stl:testedSample sample:T260004567 ;
+    stl:methodStandard std:gbt-1839-2025 ;
+    stl:resultAt "2026-11-12T14:05:00+08:00"^^xsd:dateTime ;
+    stl:coatingMass 104.0 .
+
+mechanicalTest:TENSILE-802 a stl:MechanicalTest ;
+    op:synthetic true ;
+    dct:identifier "TENSILE-802" ;
+    stl:testedSample sample:T260004568 ;
+    stl:methodStandard std:gbt-228-1-2021 ;
+    stl:resultAt "2026-11-12T13:46:00+08:00"^^xsd:dateTime ;
+    stl:tensileStrength 331.0 ;
+    stl:elongationAfterFracture 33.0 .
+
+coatingTest:COATING-802 a stl:CoatingTest ;
+    op:synthetic true ;
+    dct:identifier "COATING-802" ;
+    stl:testedSample sample:T260004568 ;
+    stl:methodStandard std:gbt-1839-2025 ;
+    stl:resultAt "2026-11-12T14:28:00+08:00"^^xsd:dateTime ;
+    stl:coatingMass 98.0 .
+
+mechanicalTest:TENSILE-458 a stl:MechanicalTest ;
+    op:synthetic true ;
+    dct:identifier "TENSILE-458" ;
+    stl:testedSample sample:T260004569 ;
+    stl:methodStandard std:gbt-228-1-2021 ;
+    stl:resultAt "2026-11-15T16:32:00+08:00"^^xsd:dateTime ;
+    rdfs:comment "上屈服强度 278 MPa、抗拉强度 421 MPa 和断后伸长率 31% 均摘自台账第 171 行的判定理由，原文引用了样品 T260004569 的拉伸报告。"@zh ;
+    stl:upperYieldStrength 278.0 ;
+    stl:tensileStrength 421.0 ;
+    stl:elongationAfterFracture 31.0 .
+
+# Decisions and dispositions use the material specification that applied at the time.
+
+defect:COAT-802 a stl:Defect ;
+    op:synthetic true ;
+    dct:identifier "COAT-802" ;
+    rdfs:label "镀层质量低于订单下限"@zh, "Coating mass below the order minimum"@en ;
+    stl:defectType defectCode:COATLOW .
+
+qualityDecision:判定十一月081 a stl:QualityDecision ;
+    op:synthetic true ;
+    dct:identifier "判定十一月081" ;
+    stl:assessedObject slab:S22600123201 ;
+    stl:assessedSpecification materialSpecification:SPEC-A-DC04 ;
+    stl:judgementResult judgement:NONCONFORM ;
+    stl:occurredAt "2026-11-02T12:20:00+08:00"^^xsd:dateTime ;
+    rdfs:comment "已确认前后炉成分混合，不满足原订单用坯条件"@zh .
+
+qualityDecision:判定十一月082 a stl:QualityDecision ;
+    op:synthetic true ;
+    dct:identifier "判定十一月082" ;
+    stl:assessedObject annealedCoil:CCA126000812 ;
+    stl:assessedSpecification materialSpecification:SPEC-A-DC01 ;
+    stl:judgementResult judgement:CONFORM ;
+    stl:occurredAt "2026-11-10T11:08:00+08:00"^^xsd:dateTime ;
+    rdfs:comment "成品按本行规格审结"@zh .
+
+qualityDecision:判定十一月083 a stl:QualityDecision ;
+    op:synthetic true ;
+    dct:identifier "判定十一月083" ;
+    stl:assessedObject galvanizedCoil:CCG126000801 ;
+    stl:assessedSpecification materialSpecification:SPEC-B-GI ;
+    stl:judgementResult judgement:CONFORM ;
+    stl:occurredAt "2026-11-12T15:00:00+08:00"^^xsd:dateTime ;
+    rdfs:comment "本卷结果及订货要求核对合格"@zh .
+
+qualityDecision:判定十一月084 a stl:QualityDecision ;
+    op:synthetic true ;
+    dct:identifier "判定十一月084" ;
+    stl:assessedObject galvanizedCoil:CCG126000802 ;
+    stl:assessedSpecification materialSpecification:SPEC-B-GI ;
+    stl:judgementResult judgement:NONCONFORM ;
+    stl:occurredAt "2026-11-12T15:08:00+08:00"^^xsd:dateTime ;
+    rdfs:comment "双面合计98 g/m²，低于本行示例下限100 g/m²"@zh .
+
+qualityDecision:判定十一月085 a stl:QualityDecision ;
+    op:synthetic true ;
+    dct:identifier "判定十一月085" ;
+    stl:assessedObject hotRolledCoil:R126000458 ;
+    stl:assessedSpecification materialSpecification:SPEC-C-HR ;
+    stl:judgementResult judgement:CONFORM ;
+    stl:occurredAt "2026-11-15T17:15:00+08:00"^^xsd:dateTime ;
+    rdfs:comment "据 T260004569 拉伸报告，上屈服强度278 MPa、抗拉强度421 MPa、断后伸长率31 %，本卷符合订货要求"@zh .
+
+qualityDisposition:N26000088 a stl:QualityDisposition ;
+    op:synthetic true ;
+    dct:identifier "N26000088" ;
+    stl:createdAt "2026-11-02T13:05:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "88"^^xsd:positiveInteger ;
+    stl:assessedObject slab:S22600123201 ;
+    stl:respondsTo qualityDecision:判定十一月081 ;
+    stl:dispositionType disposition:REASSIGN ;
+    stl:previousSpecification materialSpecification:SPEC-A-DC04 ;
+    stl:nextSpecification materialSpecification:SPEC-A-DC01 ;
+    stl:previousOrderLine salesOrderLine:D26001235-010 ;
+    stl:nextOrderLine salesOrderLine:D26001235-020 ;
+    stl:reason "混合成分，改按另一订单行组织生产，保留坯号" ;
+    stl:approvedByRole "质量改判审批岗" ;
+    stl:occurredAt "2026-11-02T13:05:00+08:00"^^xsd:dateTime .
+
+qualityDisposition:N26000089 a stl:QualityDisposition ;
+    op:synthetic true ;
+    dct:identifier "N26000089" ;
+    stl:createdAt "2026-11-13T09:45:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "89"^^xsd:positiveInteger ;
+    stl:assessedObject galvanizedCoil:CCG126000802 ;
+    stl:respondsTo qualityDecision:判定十一月084 ;
+    stl:dispositionType disposition:CONCESSION ;
+    stl:previousSpecification materialSpecification:SPEC-B-GI ;
+    stl:nextSpecification materialSpecification:SPEC-B-GI ;
+    stl:previousOrderLine salesOrderLine:D26001236-010 ;
+    stl:nextOrderLine salesOrderLine:D26001236-010 ;
+    stl:reason "镀层质量偏低，按接收方书面确认批准限定交货" ;
+    stl:approvedByRole "授权让步审批岗" ;
+    stl:occurredAt "2026-11-13T09:45:00+08:00"^^xsd:dateTime ;
+    stl:defect defect:COAT-802 ;
+    stl:applicableOrderLine salesOrderLine:D26001236-010 ;
+    stl:applicableQuantity "1"^^xsd:nonNegativeInteger ;
+    stl:validUntilOn "2026-12-31"^^xsd:date .
+
+qualityDisposition:N26000090 a stl:QualityDisposition ;
+    op:synthetic true ;
+    dct:identifier "N26000090" ;
+    stl:createdAt "2026-11-13T10:16:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "90"^^xsd:positiveInteger ;
+    stl:assessedObject annealedCoil:CCA126000812 ;
+    stl:respondsTo qualityDecision:判定十一月082 ;
+    stl:dispositionType disposition:RELEASE ;
+    stl:previousSpecification materialSpecification:SPEC-A-DC01 ;
+    stl:nextSpecification materialSpecification:SPEC-A-DC01 ;
+    stl:previousOrderLine salesOrderLine:D26001235-020 ;
+    stl:nextOrderLine salesOrderLine:D26001235-020 ;
+    stl:reason "本卷判定合格，放行" ;
+    stl:approvedByRole "成品放行岗" ;
+    stl:occurredAt "2026-11-13T10:16:00+08:00"^^xsd:dateTime .
+
+qualityDisposition:N26000091 a stl:QualityDisposition ;
+    op:synthetic true ;
+    dct:identifier "N26000091" ;
+    stl:createdAt "2026-11-13T10:20:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "91"^^xsd:positiveInteger ;
+    stl:assessedObject galvanizedCoil:CCG126000801 ;
+    stl:respondsTo qualityDecision:判定十一月083 ;
+    stl:dispositionType disposition:RELEASE ;
+    stl:previousSpecification materialSpecification:SPEC-B-GI ;
+    stl:nextSpecification materialSpecification:SPEC-B-GI ;
+    stl:previousOrderLine salesOrderLine:D26001236-010 ;
+    stl:nextOrderLine salesOrderLine:D26001236-010 ;
+    stl:reason "本卷单独放行" ;
+    stl:approvedByRole "成品放行岗" ;
+    stl:occurredAt "2026-11-13T10:20:00+08:00"^^xsd:dateTime .
+
+qualityDisposition:N26000092 a stl:QualityDisposition ;
+    op:synthetic true ;
+    dct:identifier "N26000092" ;
+    stl:createdAt "2026-11-15T17:23:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "92"^^xsd:positiveInteger ;
+    stl:assessedObject hotRolledCoil:R126000458 ;
+    stl:respondsTo qualityDecision:判定十一月085 ;
+    stl:dispositionType disposition:HOLD ;
+    stl:previousSpecification materialSpecification:SPEC-C-HR ;
+    stl:nextSpecification materialSpecification:SPEC-C-HR ;
+    stl:previousOrderLine salesOrderLine:D26001237-010 ;
+    stl:nextOrderLine salesOrderLine:D26001237-010 ;
+    stl:reason "性能判定合格，因卷牌受损暂封，待核实实物身份" ;
+    stl:approvedByRole "质量值班岗" ;
+    stl:occurredAt "2026-11-15T17:23:00+08:00"^^xsd:dateTime .
+
+qualityDisposition:N26000093 a stl:QualityDisposition ;
+    op:synthetic true ;
+    dct:identifier "N26000093" ;
+    stl:createdAt "2026-11-16T09:20:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "93"^^xsd:positiveInteger ;
+    stl:assessedObject hotRolledCoil:R126000458 ;
+    stl:respondsTo qualityDecision:判定十一月085 ;
+    stl:dispositionType disposition:RELEASE ;
+    stl:previousSpecification materialSpecification:SPEC-C-HR ;
+    stl:nextSpecification materialSpecification:SPEC-C-HR ;
+    stl:previousOrderLine salesOrderLine:D26001237-010 ;
+    stl:nextOrderLine salesOrderLine:D26001237-010 ;
+    stl:reason "已按卷芯原标识和卷取实绩核实卷号，补牌复核后解除N26000092封闭，按原订单放行" ;
+    stl:approvedByRole "成品放行岗" ;
+    stl:occurredAt "2026-11-16T09:20:00+08:00"^^xsd:dateTime .
+
+# Package contents and mill certificate coverage are recorded independently.
+
+packing:PACK-A a stl:Packing ;
+    op:synthetic true ;
+    dct:identifier "PACK-A" ;
+    stl:performedOn equipment:PCK1 ;
+    stl:inputPiece annealedCoil:CCA126000812 ;
+    stl:outputPiece package:P260001233 ;
+    stl:fulfills productionOrder:W26004322 ;
+    stl:actualEndAt "2026-11-13T11:10:00+08:00"^^xsd:dateTime .
+
+package:P260001233 a stl:Package ;
+    op:synthetic true ;
+    dct:identifier "P260001233" ;
+    stl:createdAt "2026-11-13T11:10:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1233"^^xsd:positiveInteger ;
+    stl:producedBy packing:PACK-A ;
+    stl:hasPart annealedCoil:CCA126000812 ;
+    stl:allocatedTo salesOrderLine:D26001235-020 ;
+    stl:netMass 19.94 ;
+    stl:grossMass 20.02 .
+
+packing:PACK-801 a stl:Packing ;
+    op:synthetic true ;
+    dct:identifier "PACK-801" ;
+    stl:performedOn equipment:PCK1 ;
+    stl:inputPiece galvanizedCoil:CCG126000801 ;
+    stl:outputPiece package:P260001234 ;
+    stl:fulfills productionOrder:W26004323 ;
+    stl:actualEndAt "2026-11-13T13:20:00+08:00"^^xsd:dateTime .
+
+package:P260001234 a stl:Package ;
+    op:synthetic true ;
+    dct:identifier "P260001234" ;
+    stl:createdAt "2026-11-13T13:20:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1234"^^xsd:positiveInteger ;
+    stl:producedBy packing:PACK-801 ;
+    stl:hasPart galvanizedCoil:CCG126000801 ;
+    stl:allocatedTo salesOrderLine:D26001236-010 ;
+    stl:netMass 11.09 ;
+    stl:grossMass 11.16 .
+
+packing:PACK-802 a stl:Packing ;
+    op:synthetic true ;
+    dct:identifier "PACK-802" ;
+    stl:performedOn equipment:PCK1 ;
+    stl:inputPiece galvanizedCoil:CCG126000802 ;
+    stl:outputPiece package:P260001235 ;
+    stl:fulfills productionOrder:W26004323 ;
+    stl:actualEndAt "2026-11-13T14:10:00+08:00"^^xsd:dateTime .
+
+package:P260001235 a stl:Package ;
+    op:synthetic true ;
+    dct:identifier "P260001235" ;
+    stl:createdAt "2026-11-13T14:10:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1235"^^xsd:positiveInteger ;
+    stl:producedBy packing:PACK-802 ;
+    stl:hasPart galvanizedCoil:CCG126000802 ;
+    stl:allocatedTo salesOrderLine:D26001236-010 ;
+    stl:netMass 11.19 ;
+    stl:grossMass 11.26 .
+
+packing:PACK-C a stl:Packing ;
+    op:synthetic true ;
+    dct:identifier "PACK-C" ;
+    stl:performedOn equipment:PCK1 ;
+    stl:inputPiece hotRolledCoil:R126000458 ;
+    stl:outputPiece package:P260001236 ;
+    stl:fulfills productionOrder:W26004324 ;
+    stl:actualEndAt "2026-11-16T10:40:00+08:00"^^xsd:dateTime .
+
+package:P260001236 a stl:Package ;
+    op:synthetic true ;
+    dct:identifier "P260001236" ;
+    stl:createdAt "2026-11-16T10:40:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "1236"^^xsd:positiveInteger ;
+    stl:producedBy packing:PACK-C ;
+    stl:hasPart hotRolledCoil:R126000458 ;
+    stl:allocatedTo salesOrderLine:D26001237-010 ;
+    stl:netMass 20.32 ;
+    stl:grossMass 20.40 .
+
+millCertificate:Z26000209 a stl:MillCertificate ;
+    op:synthetic true ;
+    dct:identifier "Z26000209" ;
+    stl:createdAt "2026-11-13T12:00:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "209"^^xsd:positiveInteger ;
+    stl:issuedOn "2026-11-13"^^xsd:date ;
+    stl:coversPiece annealedCoil:CCA126000812 ;
+    stl:inspectionDocumentType inspection:T31 ;
+    stl:applicableStandard std:gbt-5213-2019, std:en-10204-2004 .
+
+millCertificate:Z26000210 a stl:MillCertificate ;
+    op:synthetic true ;
+    dct:identifier "Z26000210" ;
+    stl:createdAt "2026-11-13T14:35:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "210"^^xsd:positiveInteger ;
+    stl:issuedOn "2026-11-13"^^xsd:date ;
+    stl:coversPiece galvanizedCoil:CCG126000801, galvanizedCoil:CCG126000802 ;
+    stl:inspectionDocumentType inspection:T31 ;
+    stl:applicableStandard std:gbt-2518-2019, std:en-10204-2004 .
+
+millCertificate:Z26000211 a stl:MillCertificate ;
+    op:synthetic true ;
+    dct:identifier "Z26000211" ;
+    stl:createdAt "2026-11-16T11:25:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "211"^^xsd:positiveInteger ;
+    stl:issuedOn "2026-11-16"^^xsd:date ;
+    stl:coversPiece hotRolledCoil:R126000458 ;
+    stl:inspectionDocumentType inspection:T31 ;
+    stl:applicableStandard std:gbt-700-2006, std:en-10204-2004 .
+
+# A confirmed lift places the coil on the crane until the confirmed release.
+
+movementOrder:移库十一月052 a stl:MovementOrder ;
+    op:synthetic true ;
+    dct:identifier "移库十一月052" ;
+    stl:movedPiece galvanizedCoil:CCG126000802 ;
+    stl:destination storageLocation:CY1-05022 ;
+    stl:plannedStartAt "2026-11-16T13:15:00+08:00"^^xsd:dateTime ;
+    stl:plannedEndAt "2026-11-16T13:25:00+08:00"^^xsd:dateTime .
+
+movementEvent:吊运十一月181 a stl:MovementEvent ;
+    op:synthetic true ;
+    dct:identifier "吊运十一月181" ;
+    stl:movedPiece galvanizedCoil:CCG126000802 ;
+    stl:movementType move:LIFT ;
+    stl:eventLocation storageLocation:CY1-03121 ;
+    stl:performedOn crane:CRCY12 ;
+    stl:isConfirmed true ;
+    stl:occurredAt "2026-11-16T13:17:00+08:00"^^xsd:dateTime ;
+    stl:fulfills movementOrder:移库十一月052 .
+
+movementEvent:吊运十一月182 a stl:MovementEvent ;
+    op:synthetic true ;
+    dct:identifier "吊运十一月182" ;
+    stl:movedPiece galvanizedCoil:CCG126000802 ;
+    stl:movementType move:RELEASE ;
+    stl:eventLocation storageLocation:CY1-05022 ;
+    stl:performedOn crane:CRCY12 ;
+    stl:isConfirmed true ;
+    stl:occurredAt "2026-11-16T13:23:00+08:00"^^xsd:dateTime ;
+    stl:fulfills movementOrder:移库十一月052 .
+
+# Shipments record loading and confirmed departure separately. The synthetic shipment document opens at loading.
+
+shipment:F26000777 a stl:Shipment ;
+    op:synthetic true ;
+    dct:identifier "F26000777" ;
+    stl:createdAt "2026-11-17T09:10:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "777"^^xsd:positiveInteger ;
+    stl:issuedOn "2026-11-17"^^xsd:date ;
+    stl:shippedPackage package:P260001233 ;
+    stl:accompaniedBy millCertificate:Z26000209 .
+
+movementEvent:LOAD-A a stl:MovementEvent ;
+    op:synthetic true ;
+    dct:identifier "LOAD-A" ;
+    stl:movedPiece annealedCoil:CCA126000812 ;
+    stl:movementType move:LOAD ;
+    stl:isConfirmed true ;
+    stl:occurredAt "2026-11-17T09:10:00+08:00"^^xsd:dateTime ;
+    stl:triggeredBy shipment:F26000777 .
+
+movementEvent:DISPATCH-A a stl:MovementEvent ;
+    op:synthetic true ;
+    dct:identifier "DISPATCH-A" ;
+    stl:movedPiece annealedCoil:CCA126000812 ;
+    stl:movementType move:DISPATCH ;
+    stl:isConfirmed true ;
+    stl:occurredAt "2026-11-17T09:42:00+08:00"^^xsd:dateTime ;
+    stl:triggeredBy shipment:F26000777 .
+
+shipment:F26000778 a stl:Shipment ;
+    op:synthetic true ;
+    dct:identifier "F26000778" ;
+    stl:createdAt "2026-11-18T08:30:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "778"^^xsd:positiveInteger ;
+    stl:issuedOn "2026-11-18"^^xsd:date ;
+    stl:shippedPackage package:P260001234 ;
+    stl:accompaniedBy millCertificate:Z26000210 .
+
+movementEvent:LOAD-801 a stl:MovementEvent ;
+    op:synthetic true ;
+    dct:identifier "LOAD-801" ;
+    stl:movedPiece galvanizedCoil:CCG126000801 ;
+    stl:movementType move:LOAD ;
+    stl:isConfirmed true ;
+    stl:occurredAt "2026-11-18T08:30:00+08:00"^^xsd:dateTime ;
+    stl:triggeredBy shipment:F26000778 .
+
+movementEvent:DISPATCH-801 a stl:MovementEvent ;
+    op:synthetic true ;
+    dct:identifier "DISPATCH-801" ;
+    stl:movedPiece galvanizedCoil:CCG126000801 ;
+    stl:movementType move:DISPATCH ;
+    stl:isConfirmed true ;
+    stl:occurredAt "2026-11-18T09:00:00+08:00"^^xsd:dateTime ;
+    stl:triggeredBy shipment:F26000778 .
+
+shipment:F26000779 a stl:Shipment ;
+    op:synthetic true ;
+    dct:identifier "F26000779" ;
+    stl:createdAt "2026-11-20T13:30:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "779"^^xsd:positiveInteger ;
+    stl:issuedOn "2026-11-20"^^xsd:date ;
+    stl:shippedPackage package:P260001235 ;
+    stl:accompaniedBy millCertificate:Z26000210 .
+
+movementEvent:LOAD-802 a stl:MovementEvent ;
+    op:synthetic true ;
+    dct:identifier "LOAD-802" ;
+    stl:movedPiece galvanizedCoil:CCG126000802 ;
+    stl:movementType move:LOAD ;
+    stl:isConfirmed true ;
+    stl:occurredAt "2026-11-20T13:30:00+08:00"^^xsd:dateTime ;
+    stl:triggeredBy shipment:F26000779 .
+
+movementEvent:DISPATCH-802 a stl:MovementEvent ;
+    op:synthetic true ;
+    dct:identifier "DISPATCH-802" ;
+    stl:movedPiece galvanizedCoil:CCG126000802 ;
+    stl:movementType move:DISPATCH ;
+    stl:isConfirmed true ;
+    stl:occurredAt "2026-11-20T14:05:00+08:00"^^xsd:dateTime ;
+    stl:triggeredBy shipment:F26000779 .
+
+shipment:F26000780 a stl:Shipment ;
+    op:synthetic true ;
+    dct:identifier "F26000780" ;
+    stl:createdAt "2026-11-21T10:20:00+08:00"^^xsd:dateTime ;
+    stl:serialNumber "780"^^xsd:positiveInteger ;
+    stl:issuedOn "2026-11-21"^^xsd:date ;
+    stl:shippedPackage package:P260001236 ;
+    stl:accompaniedBy millCertificate:Z26000211 .
+
+movementEvent:发运事件十一月201 a stl:MovementEvent ;
+    op:synthetic true ;
+    dct:identifier "发运事件十一月201" ;
+    stl:movedPiece hotRolledCoil:R126000458 ;
+    stl:movementType move:LOAD ;
+    stl:isConfirmed true ;
+    stl:occurredAt "2026-11-21T10:20:00+08:00"^^xsd:dateTime ;
+    stl:triggeredBy shipment:F26000780 .
+
+movementEvent:发运事件十一月202 a stl:MovementEvent ;
+    op:synthetic true ;
+    dct:identifier "发运事件十一月202" ;
+    stl:movedPiece hotRolledCoil:R126000458 ;
+    stl:movementType move:DISPATCH ;
+    stl:isConfirmed true ;
+    stl:occurredAt "2026-11-21T10:58:00+08:00"^^xsd:dateTime ;
+    stl:triggeredBy shipment:F26000780 .

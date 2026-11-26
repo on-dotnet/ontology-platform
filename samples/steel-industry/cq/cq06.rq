@@ -1,0 +1,31 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+# Include dispositions on ancestors but retain the identity of the piece actually affected.
+SELECT ?coil ?affectedPiece ?disposition ?type
+       ?previousSpecification ?previousGrade ?previousEdition ?previousOrderLine
+       ?nextSpecification ?nextGrade ?nextEdition ?nextOrderLine ?applicableOrderLine ?quantity ?validUntil
+WHERE {
+  VALUES ?coil { "CCA126000812" "CCG126000801" "CCG126000802" }
+  ?finished dct:identifier ?coil ; stl:derivedFrom* ?target .
+  ?target dct:identifier ?affectedPiece .
+  ?action a stl:QualityDisposition ; stl:assessedObject ?target ; dct:identifier ?disposition ;
+          stl:dispositionType/skos:notation ?type ; stl:occurredAt ?when .
+  OPTIONAL {
+    ?action stl:previousSpecification ?priorSpec .
+    ?priorSpec dct:identifier ?previousSpecification ; stl:requiresGrade ?priorGrade .
+    ?priorGrade skos:notation ?previousGrade ; stl:definedIn/dct:identifier ?previousEdition .
+  }
+  OPTIONAL {
+    ?action stl:nextSpecification ?newSpec .
+    ?newSpec dct:identifier ?nextSpecification ; stl:requiresGrade ?newGrade .
+    ?newGrade skos:notation ?nextGrade ; stl:definedIn/dct:identifier ?nextEdition .
+  }
+  OPTIONAL { ?action stl:previousOrderLine/dct:identifier ?previousOrderLine }
+  OPTIONAL { ?action stl:nextOrderLine/dct:identifier ?nextOrderLine }
+  OPTIONAL { ?action stl:applicableOrderLine/dct:identifier ?applicableOrderLine }
+  OPTIONAL { ?action stl:applicableQuantity ?quantity }
+  OPTIONAL { ?action stl:validUntilOn ?validUntil }
+}
+ORDER BY ?coil ?when ?disposition

@@ -1,0 +1,16 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX sampleType: <https://w3id.org/ontology-platform/steel/code/sample-type/>
+
+# Only the test performed on the sample supplies its test method.
+SELECT ?coil ?sample ?samplePosition ?sampledAt ?tensileStrength ?elongationAfterFracture ?methodStandard
+WHERE {
+  VALUES ?coil { "CCG126000801" "CCG126000802" }
+  ?finished dct:identifier ?coil .
+  ?specimen a stl:Sample ; stl:sampleOf ?finished ; stl:sampleType sampleType:MECHANICAL ;
+            dct:identifier ?sample ; stl:samplePosition ?samplePosition ; stl:sampledAt ?sampledAt .
+  ?test a stl:MechanicalTest ; stl:testedSample ?specimen ; stl:tensileStrength ?tensileStrength ;
+        stl:methodStandard/dct:identifier ?methodStandard .
+  OPTIONAL { ?test stl:elongationAfterFracture ?elongationAfterFracture }
+}
+ORDER BY ?coil ?sample ?methodStandard

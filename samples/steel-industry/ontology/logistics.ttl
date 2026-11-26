@@ -1,0 +1,152 @@
+# Storage positions, planned transfers, confirmed handling events and dispatch documents.
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<module/logistics> a owl:Ontology ;
+    owl:versionIRI <module/logistics/0.1.0> ;
+    owl:versionInfo "0.1.0" ;
+    rdfs:label "仓储与发运"@zh, "Storage and shipping"@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:StorageArea a owl:Class ;
+    rdfs:subClassOf stl:Location ;
+    rdfs:label "库区"@zh, "Storage area"@en ;
+    skos:prefLabel "库区"@zh, "Storage area"@en ;
+    skos:definition "包含一组库位且可分配搬运设备的仓储区域。"@zh,
+        "A storage zone containing locations and served by handling equipment."@en .
+
+stl:StorageLocation a owl:Class ;
+    rdfs:subClassOf stl:Location ;
+    rdfs:label "库位"@zh, "Storage location"@en ;
+    skos:prefLabel "库位"@zh, "Storage location"@en ;
+    skos:definition "以库区、行、列和层标识的可落放实物的位置。"@zh,
+        "A position identified by area, row, column and tier where material can be deposited."@en .
+
+stl:Crane a owl:Class ;
+    rdfs:subClassOf stl:Equipment ;
+    rdfs:label "天车"@zh, "Overhead crane"@en ;
+    skos:prefLabel "天车"@zh, "Overhead crane"@en ;
+    skos:definition "在库区内吊运实物并在吊起至落位期间承载实物的设备。"@zh,
+        "Lifting equipment carrying a piece between pick-up and set-down."@en ;
+    skos:altLabel "桥式起重机"@zh, "bridge crane"@en .
+
+stl:MovementOrder a owl:Class ;
+    rdfs:subClassOf stl:Plan ;
+    rdfs:label "移库指令"@zh, "Movement order"@en ;
+    skos:prefLabel "移库指令"@zh, "Movement order"@en ;
+    skos:definition "指定待移动实物及计划目的地的作业指令。"@zh,
+        "An instruction identifying material to move and its planned destination."@en .
+
+stl:MovementEvent a owl:Class ;
+    rdfs:subClassOf stl:Event ;
+    rdfs:label "移动事件"@zh, "Movement event"@en ;
+    skos:prefLabel "移动事件"@zh, "Movement event"@en ;
+    skos:definition "对实物的一次搬运动作及其发生时间、地点的记录。"@zh,
+        "A recorded handling action on a piece at a particular time and place."@en ;
+    skos:scopeNote "吊起后至下一次确认落位前，实物由天车承载；移库指令只记录目的地。"@zh .
+
+stl:Shipment a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "发运单"@zh, "Shipment"@en ;
+    skos:prefLabel "发运单"@zh, "Shipment"@en ;
+    skos:definition "标识一次对外发运及其所含包装件的单据。"@zh,
+        "A document identifying a dispatch and its included packages."@en .
+
+stl:accompaniedBy a owl:ObjectProperty ;
+    rdfs:domain stl:Shipment ;
+    rdfs:range stl:MillCertificate ;
+    rdfs:label "随货质量证明书"@zh, "Accompanied by certificate"@en ;
+    skos:prefLabel "随货质量证明书"@zh, "Accompanied by certificate"@en ;
+    skos:definition "标识随该发运单所列货物一同交付的质量证明书。"@zh,
+        "Identifies the mill certificate supplied with the goods listed on the shipment."@en .
+
+stl:triggeredBy a owl:ObjectProperty ;
+    rdfs:domain stl:MovementEvent ;
+    rdfs:range stl:Shipment ;
+    rdfs:label "触发移动的发运单"@zh, "Triggered by shipment"@en ;
+    skos:prefLabel "触发移动的发运单"@zh, "Triggered by shipment"@en ;
+    skos:definition "标识触发本次装车或出厂移动事件的发运单。"@zh,
+        "Identifies the shipment document that triggered the loading or dispatch event."@en .
+
+stl:destination a owl:ObjectProperty ;
+    rdfs:domain stl:MovementOrder ;
+    rdfs:range stl:Location ;
+    rdfs:label "计划目的地"@zh, "Planned destination"@en ;
+    skos:prefLabel "计划目的地"@zh, "Planned destination"@en ;
+    skos:definition "指明移库指令要求将实物运往的位置。"@zh,
+        "Identifies the location to which the movement order directs the piece."@en .
+
+stl:movedPiece a owl:ObjectProperty ;
+    rdfs:range stl:MaterialPiece ;
+    rdfs:label "移动实物"@zh, "Moved piece"@en ;
+    skos:prefLabel "移动实物"@zh, "Moved piece"@en ;
+    skos:definition "标识指令要求搬运或移动事件实际涉及的实物。"@zh,
+        "Identifies the piece assigned to a move or involved in an actual movement."@en .
+
+stl:movementType a owl:ObjectProperty ;
+    rdfs:domain stl:MovementEvent ;
+    rdfs:range skos:Concept ;
+    rdfs:label "移动事件类型"@zh, "Movement event type"@en ;
+    skos:prefLabel "移动事件类型"@zh, "Movement event type"@en ;
+    skos:definition "标识发生的是吊起、落位、装车或出厂等动作。"@zh,
+        "Classifies the recorded action such as lift, set-down, loading or dispatch."@en .
+
+stl:eventLocation a owl:ObjectProperty ;
+    rdfs:domain stl:MovementEvent ;
+    rdfs:range stl:Location ;
+    rdfs:label "移动发生位置"@zh, "Movement event location"@en ;
+    skos:prefLabel "移动发生位置"@zh, "Movement event location"@en ;
+    skos:definition "指向实物吊起时的起点或释放时实际到达的位置。"@zh,
+        "Identifies the pick-up point or actual set-down location of the piece."@en .
+
+stl:isConfirmed a owl:DatatypeProperty ;
+    rdfs:domain stl:MovementEvent ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "移动已确认"@zh, "Movement confirmed"@en ;
+    skos:prefLabel "移动已确认"@zh, "Movement confirmed"@en ;
+    skos:definition "标明本次实际移动是否已获现场确认。"@zh,
+        "Records whether the physical movement has been confirmed."@en .
+
+stl:locatedIn a owl:ObjectProperty ;
+    rdfs:range stl:Location ;
+    rdfs:label "所属区域"@zh, "Located in"@en ;
+    skos:prefLabel "所属区域"@zh, "Located in"@en ;
+    skos:definition "标识库位或设备所属的空间区域。"@zh,
+        "Identifies the area containing a storage location or its assigned equipment."@en .
+
+stl:row a owl:DatatypeProperty ;
+    rdfs:domain stl:StorageLocation ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "库位行"@zh, "Storage row"@en ;
+    skos:prefLabel "库位行"@zh, "Storage row"@en ;
+    skos:definition "标识库位在库区平面布置中的行序号。"@zh,
+        "Row ordinal of a storage position within its area."@en .
+
+stl:column a owl:DatatypeProperty ;
+    rdfs:domain stl:StorageLocation ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "库位列"@zh, "Storage column"@en ;
+    skos:prefLabel "库位列"@zh, "Storage column"@en ;
+    skos:definition "标识库位在所在行内的列序号。"@zh,
+        "Column ordinal of a storage position within its row."@en .
+
+stl:tier a owl:DatatypeProperty ;
+    rdfs:domain stl:StorageLocation ;
+    rdfs:range xsd:positiveInteger ;
+    rdfs:label "库位层"@zh, "Storage tier"@en ;
+    skos:prefLabel "库位层"@zh, "Storage tier"@en ;
+    skos:definition "标识库位在同一平面位置的垂直层序号。"@zh,
+        "Vertical tier ordinal at a horizontal storage position."@en .
+
+stl:shippedPackage a owl:ObjectProperty ;
+    rdfs:domain stl:Shipment ;
+    rdfs:range stl:Package ;
+    rdfs:label "发运包装件"@zh, "Shipped package"@en ;
+    skos:prefLabel "发运包装件"@zh, "Shipped package"@en ;
+    skos:definition "标识发运单本次实际交运的包装件。"@zh,
+        "Identifies an individual package dispatched under the shipment document."@en .

@@ -1,0 +1,12 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dct: <http://purl.org/dc/terms/>
+
+# A positive difference is a short cut, in metres.
+SELECT ?slab ?plan ?cutting ?plannedLength ?actualLength (?plannedLength - ?actualLength AS ?plannedMinusActual)
+WHERE {
+  VALUES ?slab { "S22600123201" }
+  ?piece a stl:Slab ; dct:identifier ?slab ; stl:producedBy ?execution .
+  ?execution a stl:Cutting ; dct:identifier ?cutting ; stl:actualLength ?actualLength ; stl:fulfills ?instruction .
+  ?instruction a stl:CuttingPlan ; dct:identifier ?plan ; stl:plannedLength ?plannedLength .
+}
+ORDER BY ?slab ?plan ?cutting

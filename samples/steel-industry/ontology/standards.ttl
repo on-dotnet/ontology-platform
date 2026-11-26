@@ -1,0 +1,128 @@
+# Bibliographic records identify individual editions. Status reflects the catalogue snapshot of 2026-11-25.
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<module/standards> a owl:Ontology ;
+    owl:versionIRI <module/standards/0.1.0> ;
+    owl:versionInfo "0.1.0" ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<std/gbt-700-2006> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 700-2006" ;
+    dcterms:title "碳素结构钢"@zh ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7C7C2D3A7E05397BE0A0AB82A> .
+
+<std/gbt-708-2026> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 708-2026" ;
+    dcterms:title "冷轧钢板及钢带的尺寸、外形、重量及允许偏差"@zh ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "即将实施"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=52AF72FB02B3403AE06397BE0A0AD6A8> ;
+    dcterms:replaces <std/gbt-708-2019> .
+
+<std/gbt-708-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 708-2019" ;
+    dcterms:title "冷轧钢板和钢带的尺寸、外形、重量及允许偏差"@zh ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=8531C702DB326551E05397BE0A0ACD16> .
+
+<std/gbt-2518-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 2518-2019" ;
+    dcterms:title "连续热镀锌和锌合金镀层钢板及钢带"@zh ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=996A838ABFD28372E05397BE0A0AD949> .
+
+<std/gbt-5213-2019> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 5213-2019" ;
+    dcterms:title "冷轧低碳钢板及钢带"@zh ;
+    dcterms:issued "2019"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=Lb63thr9SCE%3D&mode=p> .
+
+<std/gbt-222-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 222-2025" ;
+    dcterms:title "钢及合金 成品化学成分允许偏差"@zh ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA213285530D16E06397BE0A0A8119> .
+
+<std/gbt-4336-2016> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 4336-2016" ;
+    dcterms:title "碳素钢和中低合金钢 多元素含量的测定 火花放电原子发射光谱法（常规法）"@zh ;
+    dcterms:issued "2016"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=QStH8NELbmA%3D&mode=p> .
+
+<std/gbt-20066-2006> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 20066-2006" ;
+    dcterms:title "钢和铁 化学成分测定用试样的取样和制样方法"@zh ;
+    dcterms:issued "2006"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=6jxSfPicV3E%3D&mode=p> .
+
+<std/gbt-228-1-2021> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 228.1-2021" ;
+    dcterms:title "金属材料 拉伸试验 第1部分:室温试验方法"@zh ;
+    dcterms:issued "2021"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=D4BEFFF4EB12B241E05397BE0A0AF581> .
+
+<std/gbt-229-2020> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 229-2020" ;
+    dcterms:title "金属材料 夏比摆锤冲击试验方法"@zh ;
+    dcterms:issued "2020"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=B13990C15C6C5DDAE05397BE0A0A0D35> .
+
+<std/gbt-1839-2025> a stl:StandardEdition ;
+    dcterms:identifier "GB/T 1839-2025" ;
+    dcterms:title "钢产品镀锌层质量试验方法"@zh ;
+    dcterms:issued "2025"^^xsd:gYear ;
+    dcterms:description "现行"@zh ;
+    rdfs:seeAlso <https://std.samr.gov.cn/gb/search/gbDetailed?id=3DBA213286420D16E06397BE0A0A8119> .
+
+<std/en-10204-2004> a stl:StandardEdition ;
+    dcterms:identifier "EN 10204:2004" ;
+    dcterms:title "Metallic products — Types of inspection documents"@en ;
+    dcterms:issued "2004"^^xsd:gYear ;
+    dcterms:description "现行（DIN 实施版标为 CURRENT）"@zh ;
+    rdfs:seeAlso <https://www.dinmedia.de/en/standard/din-en-10204/59682782> .
+
+<std/iec-62264-1-2013> a stl:StandardEdition ;
+    dcterms:identifier "IEC 62264-1:2013" ;
+    dcterms:title "Enterprise-control system integration - Part 1: Models and terminology"@en ;
+    dcterms:issued "2013"^^xsd:gYear ;
+    dcterms:description "IEC 在售出版版"@zh ;
+    rdfs:seeAlso <https://webstore.iec.ch/en/publication/6675> .
+
+<std/iec-62264-2-2026> a stl:StandardEdition ;
+    dcterms:identifier "IEC 62264-2:2026" ;
+    dcterms:title "Enterprise-Control System Integration - Part 2: Object models and relationships for interfaces between manufacturing operations and business functions"@en ;
+    dcterms:issued "2026"^^xsd:gYear ;
+    dcterms:description "IEC 在售出版版"@zh ;
+    rdfs:seeAlso <https://webstore.iec.ch/en/publication/75127> .
+
+<std/gbt-700-2006/grade/Q235B> a stl:StandardGrade ;
+    skos:notation "Q235B" ;
+    stl:definedIn <std/gbt-700-2006> .
+
+<std/gbt-5213-2019/grade/DC01> a stl:StandardGrade ;
+    skos:notation "DC01" ;
+    stl:definedIn <std/gbt-5213-2019> .
+
+<std/gbt-5213-2019/grade/DC04> a stl:StandardGrade ;
+    skos:notation "DC04" ;
+    stl:definedIn <std/gbt-5213-2019> .
+
+<std/gbt-2518-2019/grade/DX51D-Z> a stl:StandardGrade ;
+    skos:notation "DX51D+Z" ;
+    stl:definedIn <std/gbt-2518-2019> .

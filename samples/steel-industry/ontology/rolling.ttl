@@ -1,0 +1,162 @@
+# Flat-product states, rolling and finishing operations, and source-coil intervals.
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<module/rolling> a owl:Ontology ;
+    owl:versionIRI <module/rolling/0.1.0> ;
+    owl:versionInfo "0.1.0" ;
+    rdfs:label "轧制与精整"@zh, "Rolling and finishing"@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:Coil a owl:Class ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "钢卷"@zh, "Steel coil"@en ;
+    skos:prefLabel "钢卷"@zh, "Steel coil"@en ;
+    skos:definition "卷取为卷状并独立编号的带钢实物。"@zh,
+        "A wound strip product tracked as an individual piece."@en .
+
+stl:HotRolledCoil a owl:Class ;
+    rdfs:subClassOf stl:Coil ;
+    rdfs:label "热轧卷"@zh, "Hot-rolled coil"@en ;
+    skos:prefLabel "热轧卷"@zh, "Hot-rolled coil"@en ;
+    skos:definition "板坯经热轧并卷取形成的钢卷。"@zh,
+        "A coil produced by hot rolling and coiling a slab."@en .
+
+stl:ColdRolledCoil a owl:Class ;
+    rdfs:subClassOf stl:Coil ;
+    rdfs:label "冷轧段钢卷"@zh, "Cold-line coil"@en ;
+    skos:prefLabel "冷轧段钢卷"@zh, "Cold-line coil"@en ;
+    skos:definition "在酸轧及后续冷轧精整线上形成并取得独立编号的钢卷。"@zh,
+        "A coil identified at the output of a cold rolling or downstream finishing line."@en .
+
+stl:FullHardCoil a owl:Class ;
+    rdfs:subClassOf stl:ColdRolledCoil ;
+    rdfs:label "冷硬卷"@zh, "Full-hard coil"@en ;
+    skos:prefLabel "冷硬卷"@zh, "Full-hard coil"@en ;
+    skos:definition "冷轧变形后尚未退火的卷状带钢。"@zh,
+        "A coil of cold-reduced strip before annealing."@en ;
+    skos:altLabel "轧硬卷"@zh .
+
+stl:AnnealedCoil a owl:Class ;
+    rdfs:subClassOf stl:ColdRolledCoil ;
+    rdfs:label "退火卷"@zh, "Annealed coil"@en ;
+    skos:prefLabel "退火卷"@zh, "Annealed coil"@en ;
+    skos:definition "从退火机组产出且具有独立身份的钢卷。"@zh,
+        "An individually identified coil delivered by an annealing line."@en ;
+    skos:altLabel "连退卷"@zh .
+
+stl:GalvanizedCoil a owl:Class ;
+    rdfs:subClassOf stl:ColdRolledCoil ;
+    rdfs:label "镀锌卷"@zh, "Galvanized coil"@en ;
+    skos:prefLabel "镀锌卷"@zh, "Galvanized coil"@en ;
+    skos:definition "热镀后产出的含锌镀层钢卷，镀层类别另行记录。"@zh,
+        "A coil produced with a zinc-based hot-dip coating whose type is recorded separately."@en ;
+    dcterms:source <std/gbt-2518-2019> .
+
+stl:RecoiledCoil a owl:Class ;
+    rdfs:subClassOf stl:ColdRolledCoil ;
+    rdfs:label "重卷卷"@zh, "Recoiled coil"@en ;
+    skos:prefLabel "重卷卷"@zh, "Recoiled coil"@en ;
+    skos:definition "重卷作业后作为新实物件登记的钢卷。"@zh,
+        "A coil registered as a new piece at the exit of a recoiling line."@en .
+
+stl:HotRolling a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "热轧执行"@zh, "Hot rolling"@en ;
+    skos:prefLabel "热轧执行"@zh, "Hot rolling"@en ;
+    skos:definition "将加热后的板坯轧制为带钢并卷取的作业。"@zh,
+        "An execution that rolls a heated slab into strip and coils it."@en .
+
+stl:PicklingAndColdRolling a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "酸轧执行"@zh, "Pickling and cold rolling"@en ;
+    skos:prefLabel "酸轧执行"@zh, "Pickling and cold rolling"@en ;
+    skos:definition "酸洗除鳞后进行冷连轧并形成出口钢卷的作业。"@zh,
+        "An execution that pickles strip, cold reduces it and produces exit coils."@en .
+
+stl:Annealing a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "退火执行"@zh, "Annealing"@en ;
+    skos:prefLabel "退火执行"@zh, "Annealing"@en ;
+    skos:definition "在退火机组实施热处理并登记产出件的作业。"@zh,
+        "Heat treatment on an annealing line with identified output material."@en .
+
+stl:Galvanizing a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "镀锌执行"@zh, "Galvanizing"@en ;
+    skos:prefLabel "镀锌执行"@zh, "Galvanizing"@en ;
+    skos:definition "在连续镀线上为带钢施加含锌镀层的作业。"@zh,
+        "An execution applying a zinc-based coating on a continuous line."@en .
+
+stl:Recoiling a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "重卷执行"@zh, "Recoiling"@en ;
+    skos:prefLabel "重卷执行"@zh, "Recoiling"@en ;
+    skos:definition "带钢开卷后重新卷取为出口钢卷的作业。"@zh,
+        "An execution unwinding strip and winding it into an exit coil."@en .
+
+stl:CoilSplitting a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "分卷"@zh, "Coil splitting"@en ;
+    skos:prefLabel "分卷"@zh, "Coil splitting"@en ;
+    skos:definition "一次执行从同一母卷形成两件或更多独立钢卷。"@zh,
+        "An operation producing two or more individually identified coils from a parent coil."@en .
+
+stl:CoilJoining a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "合卷"@zh, "Coil joining"@en ;
+    skos:prefLabel "合卷"@zh, "Coil joining"@en ;
+    skos:definition "把来自多件钢卷的带钢接续并卷取为一件产出卷的作业。"@zh,
+        "An operation joining strip from multiple input coils into a single output coil."@en .
+
+stl:Packing a owl:Class ;
+    rdfs:subClassOf stl:Operation ;
+    rdfs:label "包装执行"@zh, "Packing"@en ;
+    skos:prefLabel "包装执行"@zh, "Packing"@en ;
+    skos:definition "把可单独跟踪的实物装成有独立编号的包装件的作业。"@zh,
+        "An operation grouping one or more pieces into an identified package."@en ;
+    skos:altLabel "包装"@zh .
+
+stl:Package a owl:Class ;
+    rdfs:subClassOf stl:MaterialPiece ;
+    rdfs:label "包装件"@zh, "Package"@en ;
+    skos:prefLabel "包装件"@zh, "Package"@en ;
+    skos:definition "将一件或多件实物包装后形成、可整体发运的物流单元。"@zh,
+        "An identified handling unit containing one or more pieces for shipment."@en .
+
+stl:startLength a owl:DatatypeProperty ;
+    rdfs:domain stl:Coil ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:M ;
+    stl:quantityKind quantitykind:Length ;
+    rdfs:label "母卷区段起点"@zh, "Start along source coil"@en ;
+    skos:prefLabel "母卷区段起点"@zh, "Start along source coil"@en ;
+    skos:definition "从直接母卷规定的起算端量到本卷来源区段起点的长度。"@zh,
+        "Distance from the source coil reference end to the start of the interval used."@en ;
+    skos:scopeNote "单一来源卷的分段坐标，以母卷开头为零点。"@zh .
+
+stl:endLength a owl:DatatypeProperty ;
+    rdfs:domain stl:Coil ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:M ;
+    stl:quantityKind quantitykind:Length ;
+    rdfs:label "母卷区段终点"@zh, "End along source coil"@en ;
+    skos:prefLabel "母卷区段终点"@zh, "End along source coil"@en ;
+    skos:definition "从直接母卷规定的起算端量到本卷来源区段终点的长度。"@zh,
+        "Distance from the source coil reference end to the end of the interval used."@en ;
+    skos:scopeNote "终点与起点共用母卷和零点；相邻区段可共用边界。"@zh .
+
+stl:coatingType a owl:ObjectProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( stl:GalvanizedCoil stl:MaterialSpecification ) ] ;
+    rdfs:range skos:Concept ;
+    rdfs:label "镀层类型"@zh, "Coating type"@en ;
+    skos:prefLabel "镀层类型"@zh, "Coating type"@en ;
+    skos:definition "标识镀锌卷实际具有或物料规格要求的镀层类型代码。"@zh,
+        "Identifies the type of coating present on a galvanized coil or required by a material specification."@en .

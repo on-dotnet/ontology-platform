@@ -1,0 +1,491 @@
+# Sampling, observations, results, edition-specific quality decisions and authorised dispositions.
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<module/quality> a owl:Ontology ;
+    owl:versionIRI <module/quality/0.1.0> ;
+    owl:versionInfo "0.1.0" ;
+    rdfs:label "检验与质量"@zh, "Inspection and quality"@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:Sample a owl:Class ;
+    rdfs:subClassOf sosa:Sample ;
+    rdfs:label "样品"@zh, "Sample"@en ;
+    skos:prefLabel "样品"@zh, "Sample"@en ;
+    skos:definition "从可追溯的炉次或实物取得、供检验分析的代表性材料。"@zh,
+        "Representative material taken from a traceable heat or piece for analysis or testing."@en ;
+    dcterms:source <std/gbt-20066-2006> .
+
+stl:Observation a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord, sosa:Observation ;
+    rdfs:label "测量"@zh, "Observation"@en ;
+    skos:prefLabel "测量"@zh, "Observation"@en ;
+    skos:definition "在指定测点和取样时刻针对某一对象与测量项取得读数的记录。"@zh,
+        "A reading of a specified item on a subject at an identified point and sampling time."@en .
+
+stl:MeasurementPoint a owl:Class ;
+    rdfs:label "测点"@zh, "Measurement point"@en ;
+    skos:prefLabel "测点"@zh, "Measurement point"@en ;
+    skos:definition "从属于某台设备、可区分现场测量位置的点位。"@zh,
+        "An identified point on equipment distinguishing where a reading was taken."@en .
+
+stl:ChemicalAnalysis a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "化学分析"@zh, "Chemical analysis"@en ;
+    skos:prefLabel "化学分析"@zh, "Chemical analysis"@en ;
+    skos:definition "在同一取样和分析口径下归集多项元素测定结果的记录。"@zh,
+        "A determination grouping elemental results obtained on one sample and analytical basis."@en .
+
+stl:ElementResult a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "元素结果"@zh, "Element result"@en ;
+    skos:prefLabel "元素结果"@zh, "Element result"@en ;
+    skos:definition "一次化学分析中针对一个元素及其计量口径报告的含量。"@zh,
+        "The reported content of one element on a stated basis in a chemical analysis."@en .
+
+stl:CompositionLimit a owl:Class ;
+    rdfs:label "成分界限"@zh, "Composition limit"@en ;
+    skos:prefLabel "成分界限"@zh, "Composition limit"@en ;
+    skos:definition "某一牌号或订货规格下对指定元素含量施加的上界或下界。"@zh,
+        "An upper or lower bound on one element for a grade or order specification."@en .
+
+stl:MechanicalTest a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "力学试验"@zh, "Mechanical test"@en ;
+    skos:prefLabel "力学试验"@zh, "Mechanical test"@en ;
+    skos:definition "按指定方法在样品上取得材料力学性能结果的检验记录。"@zh,
+        "A test record reporting mechanical properties of a sample under a stated method."@en .
+
+stl:CoatingTest a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "镀层试验"@zh, "Coating test"@en ;
+    skos:prefLabel "镀层试验"@zh, "Coating test"@en ;
+    skos:definition "在实验室按指定试验方法测定镀层试样单位面积镀层质量的记录。"@zh,
+        "A laboratory determination of coating mass per unit area on a specimen under a specified test method."@en ;
+    dcterms:source <std/gbt-1839-2025> .
+
+stl:InspectionLot a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "检验批"@zh, "Inspection lot"@en ;
+    skos:prefLabel "检验批"@zh, "Inspection lot"@en ;
+    skos:definition "为实施同一组检验或作出批次判定而归集的材料集合。"@zh,
+        "A group of material treated together for inspection or a lot-level decision."@en .
+
+stl:QualityDecision a owl:Class ;
+    rdfs:subClassOf stl:Event ;
+    rdfs:label "质量判定"@zh, "Quality decision"@en ;
+    skos:prefLabel "质量判定"@zh, "Quality decision"@en ;
+    skos:definition "将实物或检验批的检验结果与指定版次规格核对后形成的结论。"@zh,
+        "A finding on a piece or lot against requirements in an identified specification edition."@en .
+
+stl:QualityDisposition a owl:Class ;
+    rdfs:subClassOf stl:Event ;
+    rdfs:label "质量处置"@zh, "Quality disposition"@en ;
+    skos:prefLabel "质量处置"@zh, "Quality disposition"@en ;
+    skos:definition "经授权对一件实物或一批材料的处理方式及其适用条件所作的决定。"@zh,
+        "An authorised action on a piece or lot with its conditions of application."@en .
+
+stl:MillCertificate a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "质量证明书"@zh, "Mill certificate"@en ;
+    skos:prefLabel "质量证明书"@zh, "Mill certificate"@en ;
+    skos:definition "对明列材料提供检验依据及结果的交货文件。"@zh,
+        "A delivery document presenting inspection evidence for explicitly covered material."@en ;
+    skos:altLabel "质保书"@zh, "mill test certificate"@en ;
+    dcterms:source <std/en-10204-2004> .
+
+stl:Defect a owl:Class ;
+    rdfs:subClassOf stl:ManufacturingRecord ;
+    rdfs:label "缺陷"@zh, "Defect"@en ;
+    skos:prefLabel "缺陷"@zh, "Defect"@en ;
+    skos:definition "在实物上识别并可供质量处置引用的一项异常。"@zh,
+        "An identified imperfection on material that can be cited in a disposition."@en .
+
+stl:sampleOf a owl:ObjectProperty ;
+    rdfs:domain stl:Sample ;
+    rdfs:label "取样对象"@zh, "Sample of"@en ;
+    skos:prefLabel "取样对象"@zh, "Sample of"@en ;
+    skos:definition "指出样品实际取自的炉次或实物件。"@zh,
+        "Identifies the heat or individual piece from which a sample was taken."@en .
+
+stl:sampleType a owl:ObjectProperty ;
+    rdfs:domain stl:Sample ;
+    rdfs:range skos:Concept ;
+    rdfs:label "样品类型"@zh, "Sample type"@en ;
+    skos:prefLabel "样品类型"@zh, "Sample type"@en ;
+    skos:definition "标识样品在生产或检验流程中的取样类别。"@zh,
+        "Identifies the process stage or testing purpose of a sample."@en .
+
+stl:samplePosition a owl:DatatypeProperty ;
+    rdfs:domain stl:Sample ;
+    rdfs:range xsd:string ;
+    rdfs:label "取样位置"@zh, "Sampling position"@en ;
+    skos:prefLabel "取样位置"@zh, "Sampling position"@en ;
+    skos:definition "说明取样点在被取样材料上的位置与方位。"@zh,
+        "Describes the location and orientation from which the specimen was taken."@en .
+
+stl:measuredObject a owl:ObjectProperty ;
+    rdfs:domain stl:Observation ;
+    rdfs:label "被测对象"@zh, "Observed object"@en ;
+    skos:prefLabel "被测对象"@zh, "Observed object"@en ;
+    skos:definition "指明现场测量所针对的炉次或实物。"@zh,
+        "Identifies the heat or piece targeted by a reading."@en .
+
+stl:measurementItem a owl:ObjectProperty ;
+    rdfs:domain stl:Observation ;
+    rdfs:range skos:Concept ;
+    rdfs:label "测量项"@zh, "Measured item"@en ;
+    skos:prefLabel "测量项"@zh, "Measured item"@en ;
+    skos:definition "标识一次测量所观察的特性代码。"@zh,
+        "Identifies the characteristic observed in a measurement."@en .
+
+stl:measuredAtPoint a owl:ObjectProperty ;
+    rdfs:domain stl:Observation ;
+    rdfs:range stl:MeasurementPoint ;
+    rdfs:label "测量点位"@zh, "Measured at point"@en ;
+    skos:prefLabel "测量点位"@zh, "Measured at point"@en ;
+    skos:definition "说明某次读数取自哪个设备测点。"@zh,
+        "Links a reading to its physical point on the equipment."@en .
+
+stl:measurementMethod a owl:ObjectProperty ;
+    rdfs:domain stl:Observation ;
+    rdfs:range skos:Concept ;
+    rdfs:label "测量方式"@zh, "Measurement method"@en ;
+    skos:prefLabel "测量方式"@zh, "Measurement method"@en ;
+    skos:definition "记录读数由人工操作还是自动采集。"@zh,
+        "Describes manual or automatic acquisition of the reading."@en .
+
+stl:temperature a owl:DatatypeProperty ;
+    rdfs:domain stl:Observation ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:DEG_C ;
+    stl:quantityKind quantitykind:CelsiusTemperature ;
+    rdfs:label "温度"@zh, "Temperature"@en ;
+    skos:prefLabel "温度"@zh, "Temperature"@en ;
+    skos:definition "记录在指定测点和取样时刻读得的温度。"@zh,
+        "Temperature read at the stated point and sampling time."@en .
+
+stl:activeOxygen a owl:DatatypeProperty ;
+    rdfs:domain stl:Observation ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:PPM ;
+    stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "钢水活性氧"@zh, "Active oxygen in liquid steel"@en ;
+    skos:prefLabel "钢水活性氧"@zh, "Active oxygen in liquid steel"@en ;
+    skos:definition "在线测氧仪在钢水测点取得并以质量百万分数报告的溶解氧读数。"@zh,
+        "Dissolved oxygen reading from an in-process probe in liquid steel, reported in parts per million by mass."@en .
+
+stl:sampledAt a owl:DatatypeProperty ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "取样时间"@zh, "Sampled at"@en ;
+    skos:prefLabel "取样时间"@zh, "Sampled at"@en ;
+    skos:definition "样品取出或传感器取得现场读数的时刻。"@zh,
+        "Time at which material or a sensor reading was taken."@en .
+
+stl:resultAt a owl:DatatypeProperty ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "出结果时间"@zh, "Result available at"@en ;
+    skos:prefLabel "出结果时间"@zh, "Result available at"@en ;
+    skos:definition "分析、试验或测量结果可供使用的时刻。"@zh,
+        "Time when a measurement, analysis or test result became available."@en .
+
+stl:analysisType a owl:ObjectProperty ;
+    rdfs:domain stl:ChemicalAnalysis ;
+    rdfs:range skos:Concept ;
+    rdfs:label "分析类型"@zh, "Analysis type"@en ;
+    skos:prefLabel "分析类型"@zh, "Analysis type"@en ;
+    skos:definition "标识该次化学分析的用途，包括熔炼分析、过程分析和成品分析。"@zh,
+        "Classifies a chemical analysis by its use for heat assessment, process control or product assessment."@en .
+
+stl:testedSample a owl:ObjectProperty ;
+    rdfs:range stl:Sample ;
+    rdfs:label "受检样品"@zh, "Tested sample"@en ;
+    skos:prefLabel "受检样品"@zh, "Tested sample"@en ;
+    skos:definition "指向提供分析或试验结果的具体样品。"@zh,
+        "Identifies the sample used to obtain an analysis or test result."@en .
+
+stl:element a owl:ObjectProperty ;
+    rdfs:range skos:Concept ;
+    rdfs:label "元素项目"@zh, "Element analyte"@en ;
+    skos:prefLabel "元素项目"@zh, "Element analyte"@en ;
+    skos:definition "指明结果或成分界限所涉及的元素及其分析口径。"@zh,
+        "Identifies the element and analytical basis of a result or composition bound."@en .
+
+stl:massFraction a owl:DatatypeProperty ;
+    rdfs:domain stl:ElementResult ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ;
+    stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "元素质量百分数"@zh, "Elemental mass percentage"@en ;
+    skos:prefLabel "元素质量百分数"@zh, "Elemental mass percentage"@en ;
+    skos:definition "以钢样总质量为基准给出某元素的质量百分数。"@zh,
+        "Elemental content expressed as a percentage of sample mass."@en .
+
+stl:lowerLimit a owl:DatatypeProperty ;
+    rdfs:domain stl:CompositionLimit ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ;
+    stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "成分下限"@zh, "Minimum elemental content"@en ;
+    skos:prefLabel "成分下限"@zh, "Minimum elemental content"@en ;
+    skos:definition "规定该元素在指定要求下允许的最低质量百分数。"@zh,
+        "Lowest mass percentage allowed for the element under the specified requirement."@en .
+
+stl:upperLimit a owl:DatatypeProperty ;
+    rdfs:domain stl:CompositionLimit ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ;
+    stl:quantityKind quantitykind:MassFraction ;
+    rdfs:label "成分上限"@zh, "Maximum elemental content"@en ;
+    skos:prefLabel "成分上限"@zh, "Maximum elemental content"@en ;
+    skos:definition "规定该元素在指定要求下允许的最高质量百分数。"@zh,
+        "Highest mass percentage allowed for the element under the specified requirement."@en .
+
+stl:tensileStrength a owl:DatatypeProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( stl:MechanicalTest stl:Observation ) ] ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:MegaPA ;
+    stl:quantityKind quantitykind:Stress ;
+    rdfs:label "抗拉强度"@zh, "Tensile strength"@en ;
+    skos:prefLabel "抗拉强度"@zh, "Tensile strength"@en ;
+    skos:definition "由拉伸试验最大力和试样原始截面积得到的强度值。"@zh,
+        "Strength obtained from the maximum tensile force and original specimen cross-section."@en ;
+    dcterms:source <std/gbt-228-1-2021> .
+
+stl:elongationAfterFracture a owl:DatatypeProperty ;
+    rdfs:domain stl:MechanicalTest ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:PERCENT ;
+    stl:quantityKind quantitykind:DimensionlessRatio ;
+    rdfs:label "断后伸长率"@zh, "Elongation after fracture"@en ;
+    skos:prefLabel "断后伸长率"@zh, "Elongation after fracture"@en ;
+    skos:definition "拉伸试样断裂后标距的永久伸长量占原始标距的百分比。"@zh,
+        "Permanent increase in gauge length after fracture as a percentage of the original gauge length."@en ;
+    dcterms:source <std/gbt-228-1-2021> .
+
+stl:upperYieldStrength a owl:DatatypeProperty ;
+    rdfs:domain stl:MechanicalTest ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:MegaPA ;
+    stl:quantityKind quantitykind:Stress ;
+    rdfs:label "上屈服强度"@zh, "Upper yield strength"@en ;
+    skos:prefLabel "上屈服强度"@zh, "Upper yield strength"@en ;
+    skos:definition "拉伸试验中，试样发生屈服、力首次下降前达到的最大应力。"@zh,
+        "Maximum stress reached before the first drop in force as the specimen yields in a tensile test."@en ;
+    dcterms:source <std/gbt-228-1-2021> .
+
+stl:lowerYieldStrength a owl:DatatypeProperty ;
+    rdfs:domain stl:MechanicalTest ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:MegaPA ;
+    stl:quantityKind quantitykind:Stress ;
+    rdfs:label "下屈服强度"@zh, "Lower yield strength"@en ;
+    skos:prefLabel "下屈服强度"@zh, "Lower yield strength"@en ;
+    skos:definition "拉伸试验中略去初始瞬态效应后，试样在屈服阶段达到的最低应力。"@zh,
+        "Lowest stress reached during yielding in a tensile test after the initial transient effects."@en ;
+    dcterms:source <std/gbt-228-1-2021> .
+
+stl:impactEnergy a owl:DatatypeProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( stl:MechanicalTest stl:Observation ) ] ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:J ;
+    stl:quantityKind quantitykind:Energy ;
+    rdfs:label "冲击吸收功"@zh, "Impact energy"@en ;
+    skos:prefLabel "冲击吸收功"@zh, "Impact energy"@en ;
+    skos:definition "试样在规定条件下接受冲击时所吸收的能量。"@zh,
+        "Energy absorbed by the test specimen in an impact test under the stated conditions."@en ;
+    dcterms:source <std/gbt-229-2020> .
+
+stl:coatingMass a owl:DatatypeProperty ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:GM-PER-M2 ;
+    stl:quantityKind quantitykind:MassPerArea ;
+    rdfs:label "单位面积镀层质量"@zh, "Coating mass per area"@en ;
+    skos:prefLabel "单位面积镀层质量"@zh, "Coating mass per area"@en ;
+    skos:definition "报告镀层相对于受检表面积的质量。"@zh,
+        "Mass of coating per unit area on the inspected material."@en ;
+    dcterms:source <std/gbt-1839-2025> .
+
+stl:minimumCoatingMass a owl:DatatypeProperty ;
+    rdfs:domain stl:MaterialSpecification ;
+    rdfs:range xsd:decimal ;
+    stl:unit unit:GM-PER-M2 ;
+    stl:quantityKind quantitykind:MassPerArea ;
+    rdfs:label "最低单位面积镀层质量"@zh, "Minimum coating mass per area"@en ;
+    skos:prefLabel "最低单位面积镀层质量"@zh, "Minimum coating mass per area"@en ;
+    skos:definition "规定物料规格要求达到的单位面积镀层质量下限。"@zh,
+        "Minimum coating mass per unit area required by the material specification."@en .
+
+stl:methodStandard a owl:ObjectProperty ;
+    rdfs:range stl:StandardEdition ;
+    rdfs:label "方法标准"@zh, "Method standard"@en ;
+    skos:prefLabel "方法标准"@zh, "Method standard"@en ;
+    skos:definition "指明采样、分析或试验所采用的方法标准版次。"@zh,
+        "Identifies the edition governing the sampling, analytical or testing method."@en .
+
+stl:assessedObject a owl:ObjectProperty ;
+    rdfs:label "质量处理对象"@zh, "Assessed object"@en ;
+    skos:prefLabel "质量处理对象"@zh, "Assessed object"@en ;
+    skos:definition "指向某个质量判定或处置针对的实物件或检验批。"@zh,
+        "Identifies the piece or inspection lot addressed by a decision or disposition."@en .
+
+stl:assessedSpecification a owl:ObjectProperty ;
+    rdfs:domain stl:QualityDecision ;
+    rdfs:range stl:MaterialSpecification ;
+    rdfs:label "判定依据规格"@zh, "Specification for assessment"@en ;
+    skos:prefLabel "判定依据规格"@zh, "Specification for assessment"@en ;
+    skos:definition "标识作出本次质量判定时核对的物料规格。"@zh,
+        "Identifies the material specification against which the quality decision was made."@en .
+
+stl:judgementResult a owl:ObjectProperty ;
+    rdfs:domain stl:QualityDecision ;
+    rdfs:range skos:Concept ;
+    rdfs:label "判定结果"@zh, "Judgement result"@en ;
+    skos:prefLabel "判定结果"@zh, "Judgement result"@en ;
+    skos:definition "标识实物或检验批对要求的符合性结论。"@zh,
+        "Identifies the conformity finding for a piece or inspection lot."@en .
+
+stl:respondsTo a owl:ObjectProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range stl:QualityDecision ;
+    rdfs:label "处置依据的判定"@zh, "Responds to decision"@en ;
+    skos:prefLabel "处置依据的判定"@zh, "Responds to decision"@en ;
+    skos:definition "标识本次质量处置所依据的质量判定。"@zh,
+        "Identifies the quality decision on which the disposition is based."@en .
+
+stl:dispositionType a owl:ObjectProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range skos:Concept ;
+    rdfs:label "处置类型"@zh, "Disposition type"@en ;
+    skos:prefLabel "处置类型"@zh, "Disposition type"@en ;
+    skos:definition "标识质量处置要求采取的业务行动。"@zh,
+        "Specifies the business action authorised by a disposition."@en .
+
+stl:reason a owl:DatatypeProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range xsd:string ;
+    rdfs:label "处置原因"@zh, "Disposition reason"@en ;
+    skos:prefLabel "处置原因"@zh, "Disposition reason"@en ;
+    skos:definition "记录导致本次质量处置的事实或偏差说明。"@zh,
+        "Describes the condition or deviation motivating the disposition."@en .
+
+stl:defect a owl:ObjectProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range stl:Defect ;
+    rdfs:label "涉及缺陷"@zh, "Referenced defect"@en ;
+    skos:prefLabel "涉及缺陷"@zh, "Referenced defect"@en ;
+    skos:definition "标识本次处置所依据的具体缺陷记录。"@zh,
+        "Identifies a particular recorded defect underlying the action."@en .
+
+stl:defectType a owl:ObjectProperty ;
+    rdfs:range skos:Concept ;
+    rdfs:label "缺陷类型"@zh, "Defect type"@en ;
+    skos:prefLabel "缺陷类型"@zh, "Defect type"@en ;
+    skos:definition "标识实物异常所属的缺陷类别。"@zh,
+        "Classifies an observed material imperfection."@en .
+
+stl:previousOrderLine a owl:ObjectProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range stl:SalesOrderLine ;
+    rdfs:label "处置前订单行"@zh, "Previous order line"@en ;
+    skos:prefLabel "处置前订单行"@zh, "Previous order line"@en ;
+    skos:definition "标识实物在处置生效前所分配的订单行。"@zh,
+        "Identifies the allocation in force before the disposition."@en .
+
+stl:nextOrderLine a owl:ObjectProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range stl:SalesOrderLine ;
+    rdfs:label "处置后订单行"@zh, "Resulting order line"@en ;
+    skos:prefLabel "处置后订单行"@zh, "Resulting order line"@en ;
+    skos:definition "标识实物在处置生效后所分配的订单行。"@zh,
+        "Identifies the allocation resulting from the disposition."@en .
+
+stl:previousSpecification a owl:ObjectProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range stl:MaterialSpecification ;
+    rdfs:label "处置前规格"@zh, "Previous specification"@en ;
+    skos:prefLabel "处置前规格"@zh, "Previous specification"@en ;
+    skos:definition "标识实物在处置生效前适用的物料规格。"@zh,
+        "Identifies the material specification applicable before the disposition."@en .
+
+stl:nextSpecification a owl:ObjectProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range stl:MaterialSpecification ;
+    rdfs:label "处置后规格"@zh, "Resulting specification"@en ;
+    skos:prefLabel "处置后规格"@zh, "Resulting specification"@en ;
+    skos:definition "标识实物在处置生效后适用的物料规格。"@zh,
+        "Identifies the material specification applicable after the disposition."@en .
+
+stl:applicableOrderLine a owl:ObjectProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range stl:SalesOrderLine ;
+    rdfs:label "适用订单行"@zh, "Applicable order line"@en ;
+    skos:prefLabel "适用订单行"@zh, "Applicable order line"@en ;
+    skos:definition "标识处置获准适用的订单行范围。"@zh,
+        "Identifies the order line for which the disposition is authorised."@en .
+
+stl:applicableQuantity a owl:DatatypeProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range xsd:nonNegativeInteger ;
+    stl:unit unit:NUM ;
+    stl:quantityKind quantitykind:Count ;
+    rdfs:label "适用件数"@zh, "Authorised piece count"@en ;
+    skos:prefLabel "适用件数"@zh, "Authorised piece count"@en ;
+    skos:definition "给出本次处置允许按所述条件接收的实物件数。"@zh,
+        "Number of pieces authorised for acceptance under the disposition."@en .
+
+stl:validUntilOn a owl:DatatypeProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range xsd:date ;
+    rdfs:label "有效期至"@zh, "Valid through"@en ;
+    skos:prefLabel "有效期至"@zh, "Valid through"@en ;
+    skos:definition "规定本次处置仍可适用的最后一个公历日期。"@zh,
+        "Last calendar date on which the disposition remains applicable."@en .
+
+stl:approvedByRole a owl:DatatypeProperty ;
+    rdfs:domain stl:QualityDisposition ;
+    rdfs:range xsd:string ;
+    rdfs:label "批准角色"@zh, "Approving role"@en ;
+    skos:prefLabel "批准角色"@zh, "Approving role"@en ;
+    skos:definition "记录批准该次处置的业务角色。"@zh,
+        "Identifies the business role authorising the disposition."@en .
+
+stl:lotMember a owl:ObjectProperty ;
+    rdfs:domain stl:InspectionLot ;
+    rdfs:range stl:MaterialPiece ;
+    rdfs:label "检验批成员"@zh, "Inspection lot member"@en ;
+    skos:prefLabel "检验批成员"@zh, "Inspection lot member"@en ;
+    skos:definition "指向归入该检验批进行检验或批次判定的一件实物。"@zh,
+        "Identifies a piece assigned to an inspection lot for testing or a lot-level decision."@en .
+
+stl:coversPiece a owl:ObjectProperty ;
+    rdfs:domain stl:MillCertificate ;
+    rdfs:range stl:MaterialPiece ;
+    rdfs:label "覆盖实物"@zh, "Covered piece"@en ;
+    skos:prefLabel "覆盖实物"@zh, "Covered piece"@en ;
+    skos:definition "指向质量证明书明列的、由其检验结果覆盖的一件实物。"@zh,
+        "Identifies an individual piece explicitly covered by the mill certificate."@en .
+
+stl:inspectionDocumentType a owl:ObjectProperty ;
+    rdfs:domain stl:MillCertificate ;
+    rdfs:range skos:Concept ;
+    rdfs:label "检验文件类型"@zh, "Inspection document type"@en ;
+    skos:prefLabel "检验文件类型"@zh, "Inspection document type"@en ;
+    skos:definition "标识交付证明书所采用的检验文件类别。"@zh,
+        "Identifies the inspection document category of the certificate."@en ;
+    dcterms:source <std/en-10204-2004> .
+
+stl:applicableStandard a owl:ObjectProperty ;
+    rdfs:range stl:StandardEdition ;
+    rdfs:label "适用标准版次"@zh, "Applicable standard edition"@en ;
+    skos:prefLabel "适用标准版次"@zh, "Applicable standard edition"@en ;
+    skos:definition "指明物料规格、质量判定或交货文件所适用的具体标准版次。"@zh,
+        "Identifies a standard edition applicable to a material specification, quality decision or delivery document."@en .
