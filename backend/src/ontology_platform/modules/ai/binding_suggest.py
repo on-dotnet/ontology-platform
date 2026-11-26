@@ -659,7 +659,7 @@ def _join(
             refs = [c.strip() for c in fk.references]
             if len(columns) != len(refs) or not _has(holder, columns) or not _has(referenced, refs):
                 return None
-            join: JoinBinding = ForeignKeyJoin(
+            join: ForeignKeyJoin | LinkTableJoin = ForeignKeyJoin(
                 kind="foreign_key", side=fk.side, columns=columns, references=refs
             )
             evidence = _foreign_key_evidence(plan.source, holder, columns, referenced, refs)
