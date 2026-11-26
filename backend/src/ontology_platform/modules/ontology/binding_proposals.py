@@ -139,13 +139,13 @@ async def _select(
         pending = {ref for queue in waiting.values() for p in queue if (ref := items[p].temp_ref)}
         checked = {p: item for p, item in kept.items() if not _refers(item, pending)}
         shape = {
-            position: problem
+            position: issue
             for position, item in checked.items()
-            if (problem := service._proposal_problem(item, elements, created)) is not None
+            if (issue := service._proposal_problem(item, elements, created)) is not None
         }
         if shape:
-            for position, problem in shape.items():
-                drop(position, binding_rules.INVALID, problem)
+            for position, issue in shape.items():
+                drop(position, binding_rules.INVALID, issue)
             continue
         positions = sorted(checked)
         problems = await binding_rules.proposal_problems(

@@ -36,6 +36,7 @@ from ontology_platform.modules.ai.models import BindingSuggestion
 from ontology_platform.modules.audit.models import AuditEvent
 from ontology_platform.modules.connectors import config as connectors_config
 from ontology_platform.modules.connectors import jobs as connectors_jobs
+from ontology_platform.modules.connectors import service as connectors_service
 from ontology_platform.modules.connectors.errors import SourceDisabledError
 from ontology_platform.modules.connectors.models import CatalogTable, DataSource
 from ontology_platform.modules.identity.models import Role
@@ -425,7 +426,12 @@ async def test_the_evidence_comes_from_the_catalog_and_matches_it(
 
     def facts(kind: str, subject: Element) -> list[tuple[Any, ...]]:
         return sorted(
-            (e.source["fact"], e.source.get("column"), e.source["table"], e.quote)
+            (
+                (e.source or {})["fact"],
+                (e.source or {}).get("column"),
+                (e.source or {})["table"],
+                e.quote,
+            )
             for e in evidence[items[(kind, str(subject.id))].id]
         )
 
@@ -435,7 +441,7 @@ async def test_the_evidence_comes_from_the_catalog_and_matches_it(
             await db.scalars(select(Evidence).where(Evidence.change_item_id == item.id))
         )
     assert all(
-        e.kind == "catalog" and e.source["dataSourceId"] == str(s.mes.id)
+        e.kind == "catalog" and (e.source or {})["dataSourceId"] == str(s.mes.id)
         for found in evidence.values()
         for e in found
     )
@@ -464,7 +470,7 @@ async def test_the_model_sees_metadata_only_without_samples_or_where_the_source_
     async def no_reads(*_: Any) -> Any:
         raise AssertionError("no rows may be read while samples are off")
 
-    monkeypatch.setattr(binding_suggest.connectors, "sample_values", no_reads)
+    monkeypatch.setattr(connectors_service, "sample_values", no_reads)
     gateway = heat_gateway(s)
     body = await ask(client, s)
     await answer(app, body["id"], gateway)
@@ -504,7 +510,7 @@ async def test_samples_are_read_once_per_table_sent_and_kept_as_evidence_when_al
         reads.append((table.name, columns))
         return {name: ("H24-001", "H24-002") if name == "heat_no" else () for name in columns}
 
-    monkeypatch.setattr(binding_suggest.connectors, "sample_values", sample_values)
+    monkeypatch.setattr(connectors_service, "sample_values", sample_values)
     gateway = heat_gateway(s)
     body = await ask(client, s)
     await answer(app, body["id"], gateway)
@@ -523,7 +529,7 @@ async def test_samples_are_read_once_per_table_sent_and_kept_as_evidence_when_al
         if item.proposed["subjectRef"] == str(s.external_id.id)
     )
     found = list(await db.scalars(select(Evidence).where(Evidence.change_item_id == external.id)))
-    assert sorted((e.source["fact"], e.quote) for e in found) == [
+    assert sorted(((e.source or {})["fact"], e.quote) for e in found) == [
         ("column", "heat_no character varying(20) NOT NULL"),
         ("sample", "heat_no：H24-001、H24-002"),
     ]
@@ -546,7 +552,7 @@ async def test_samples_switched_off_after_the_request_are_not_read(
         calls.append(args)
         raise SourceDisabledError
 
-    monkeypatch.setattr(binding_suggest.connectors, "sample_values", switched_off)
+    monkeypatch.setattr(connectors_service, "sample_values", switched_off)
     body = await ask(client, s)
     await answer(app, body["id"], heat_gateway(s))
 
@@ -1044,7 +1050,7 @@ async def test_samples_switched_off_while_the_job_runs_are_not_sent(
     async def switched_off(*_: Any) -> bool:
         return False
 
-    monkeypatch.setattr(binding_suggest.connectors, "sample_values", sample_values)
+    monkeypatch.setattr(connectors_service, "sample_values", sample_values)
     monkeypatch.setattr(binding_suggest, "_samples_allowed", switched_off)
     gateway = heat_gateway(s)
     body = await ask(client, s)
@@ -1076,7 +1082,7 @@ async def test_a_table_shared_by_a_type_and_its_subtype_is_sampled_once(
         reads.append(table.name)
         return dict.fromkeys(columns, ())
 
-    monkeypatch.setattr(binding_suggest.connectors, "sample_values", sample_values)
+    monkeypatch.setattr(connectors_service, "sample_values", sample_values)
     gateway = CatalogGateway(
         [table_match(s.batch, "heat"), table_match(s.heat, "heat")],
         {
