@@ -256,3 +256,35 @@ def joined_key(
                 raise errors.source_mismatch()
         conditions.append(Condition(ColumnRef(col.name, "joined"), "eq", value))
     return tuple(conditions)
+
+
+def joined_batch(
+    origin: Table, keys: Sequence[tuple[Value, ...]], specs: Sequence[CatalogColumn]
+) -> tuple[Condition, ...]:
+    if len(specs) != len(origin.bound.key_columns):
+        raise errors.source_mismatch()
+    if len(specs) != 1:
+        (key,) = keys
+        return joined_key(origin, key, specs)
+    converted: list[Value] = []
+    for key in keys:
+        (condition,) = joined_key(origin, key, specs)
+        value = condition.value
+        if value is None or isinstance(value, tuple):
+            raise errors.source_mismatch()
+        converted.append(value)
+    return (Condition(ColumnRef(specs[0].name, "joined"), "in", tuple(converted)),)
+
+
+def primary_key_terms(
+    table: Table, filters: Sequence[schemas.Filter]
+) -> tuple[tuple[Condition, ...], tuple[SortKey, ...]]:
+    # A metric scan can combine two independently validated filter groups.
+    properties = {prop.property_id: prop for prop in table.bound.properties}
+    conditions = []
+    for item in filters:
+        prop = _property(properties, item.property_id)
+        if prop.datatype is None:
+            raise errors.source_mismatch()
+        conditions.append(values.condition(item, table.columns[prop.column], prop.datatype))
+    return tuple(conditions), tuple(SortKey(ColumnRef(name)) for name in table.bound.key_columns)
