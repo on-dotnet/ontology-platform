@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from typing import Annotated, Any, Literal, cast
 from uuid import UUID
 
-from fastapi import Request
+from fastapi import HTTPException, Request
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -124,7 +124,7 @@ class SearchObjectsArguments(OntologyArguments):
     )
     sort: list[SortArgument] = Field(default_factory=list, max_length=query_schemas.SORT_MAX)
     limit: int = Field(default=query_schemas.PAGE_DEFAULT, ge=1, le=query_schemas.PAGE_MAX)
-    cursor: str | None = Field(default=None, max_length=query_schemas.CURSOR_MAX_LENGTH)
+    cursor: query_schemas.Cursor | None = None
 
 
 class GetObjectArguments(OntologyArguments):
@@ -136,7 +136,7 @@ class GetRelatedObjectsArguments(GetObjectArguments):
     relation: Ref = Field(description="The relation's id, IRI or local name.")
     direction: query_schemas.Direction = "out"
     limit: int = Field(default=query_schemas.PAGE_DEFAULT, ge=1, le=query_schemas.PAGE_MAX)
-    cursor: str | None = Field(default=None, max_length=query_schemas.CURSOR_MAX_LENGTH)
+    cursor: query_schemas.Cursor | None = None
 
 
 # ---------- the released ontology ----------
@@ -204,6 +204,7 @@ def _brief(element: ElementCopy, by_id: Mapping[UUID, ElementCopy]) -> dict[str,
         "parent": _name(element.parent_id, by_id),
         "domain": _name(element.domain_id, by_id),
         "range": _name(element.range_id, by_id),
+        "inverse": _name(element.inverse_id, by_id),
         "datatype": element.datatype,
         "unit": element.unit,
     }
@@ -238,7 +239,13 @@ def _decode_cursor(cursor: str) -> list[Any]:
         payload = json.loads(base64.urlsafe_b64decode(cursor.encode()))
     except (ValueError, binascii.Error):
         payload = None
-    if not isinstance(payload, list) or len(payload) != 3 or not isinstance(payload[2], int):
+    if (
+        not isinstance(payload, list)
+        or len(payload) != 3
+        or not all(isinstance(part, str) for part in payload[:2])
+        or type(payload[2]) is not int
+        or payload[2] < 0
+    ):
         raise AppError(422, "query.invalid_cursor", "The cursor does not match the request.")
     return payload
 
@@ -339,6 +346,8 @@ async def get_element(ctx: Context, arguments: GetElementArguments) -> dict[str,
         "required": found.required,
         "multiple": found.multiple,
     }
+    if found.kind == "constraint":
+        info["rules"] = [rule.model_dump(mode="json", by_alias=True) for rule in found.rules or []]
     if found.kind == "entity_type":
         lineage = _lineage(found, by_id)
         info["properties"] = [
@@ -610,34 +619,45 @@ async def call(
     if tool is None:
         raise UnknownToolError(name)
     ctx = Context(db, request)
+
+    async def audited(code: str) -> None:
+        audit.record(
+            db,
+            "mcp.tool_called",
+            actor_id=token.principal.id,
+            target_type="access_token",
+            target_id=str(token.token_id),
+            detail={
+                "tool": tool.name,
+                "tokenId": str(token.token_id),
+                "ontology": str(ctx.ontology_id) if ctx.ontology_id is not None else None,
+                "code": code,
+            },
+            ip=ip,
+        )
+        await db.commit()
+
     try:
         if tool.scope not in token.scopes:
             raise ToolError("auth.insufficient_scope", "The access token lacks a scope.")
         try:
             parsed = tool.arguments.model_validate(dict(arguments))
+            content = await tool.run(ctx, parsed)
         except ValidationError as exc:
+            # Arguments the tool accepted but the query service's own models refuse.
             raise _invalid(exc) from None
-        outcome = Outcome(_fit(await tool.run(ctx, parsed), tool.items), is_error=False)
-        code = "ok"
+        outcome = Outcome(_fit(content, tool.items), is_error=False)
     except (AppError, ToolError) as exc:
-        code = exc.code
         message = exc.detail if isinstance(exc, AppError) else exc.message
-        outcome = Outcome({"code": code, "message": message}, is_error=True)
         # Whatever the failure left in the session must not reach the audit's commit.
         await db.rollback()
-    audit.record(
-        db,
-        "mcp.tool_called",
-        actor_id=token.principal.id,
-        target_type="access_token",
-        target_id=str(token.token_id),
-        detail={
-            "tool": tool.name,
-            "tokenId": str(token.token_id),
-            "ontology": str(ctx.ontology_id) if ctx.ontology_id is not None else None,
-            "code": code,
-        },
-        ip=ip,
-    )
-    await db.commit()
+        await audited(exc.code)
+        return Outcome({"code": exc.code, "message": message}, is_error=True)
+    except Exception as exc:
+        # A disconnect (499) or a fault still leaves its trace before it propagates.
+        await db.rollback()
+        disconnected = isinstance(exc, HTTPException) and exc.status_code == 499
+        await audited("mcp.client_disconnected" if disconnected else "internal.error")
+        raise
+    await audited("ok")
     return outcome

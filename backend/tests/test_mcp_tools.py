@@ -1,9 +1,11 @@
 """The read-only MCP tools (spec 003, 9.3; section 15, "MCP", "令牌" ⑤ and the audit of
 `mcp.tool_called`)."""
 
+import base64
 import json
 from dataclasses import dataclass
 from typing import Any
+from uuid import uuid4
 
 import pytest
 from fastapi import FastAPI
@@ -274,7 +276,7 @@ async def test_search_objects_filters_and_sorts_like_the_query_api(
         "typeId": str(catalog.coil.id),
         "filters": [{"propertyId": str(catalog.status.id), "op": "notNull"}],
         "sort": [{"propertyId": str(catalog.status.id), "direction": "desc"}],
-        "limit": 3,
+        "limit": 1,
     }
     api_page = await client.post(
         f"{catalog.url}/search", json=api_body, headers=csrf_headers(client)
@@ -290,10 +292,12 @@ async def test_search_objects_filters_and_sorts_like_the_query_api(
             type="Coil",
             filters=[{"propertyId": "coilStatus", "op": "notNull"}],
             sort=[{"propertyId": "coilStatus", "direction": "desc"}],
-            limit=3,
+            limit=1,
         )
     )
     assert content == api_page.json()
+    # One per page, so the second page is always compared.
+    assert content["nextCursor"] is not None
 
     if content["nextCursor"] is not None:
         api_next = await client.post(
@@ -310,7 +314,7 @@ async def test_search_objects_filters_and_sorts_like_the_query_api(
                 type="Coil",
                 filters=[{"propertyId": "coilStatus", "op": "notNull"}],
                 sort=[{"propertyId": "coilStatus", "direction": "desc"}],
-                limit=3,
+                limit=1,
                 cursor=content["nextCursor"],
             )
         )
@@ -435,3 +439,70 @@ async def test_every_tool_call_is_audited_without_secrets(
         assert token not in dumped
         assert token[:20] not in dumped
         assert "FILTER-VALUE-7731" not in dumped
+
+
+async def test_search_elements_refuses_a_cursor_of_another_question(
+    app: FastAPI, published: Published
+) -> None:
+    first = _structured(
+        await _tool(app, published.token, "search_elements", ontology="steel", limit=2)
+    )
+    cursor = first["nextCursor"]
+    assert cursor is not None
+    release_id, question, _ = json.loads(base64.urlsafe_b64decode(cursor))
+    forged = [
+        base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()
+        for payload in (
+            [release_id, question, -2],
+            [release_id, question, True],
+            [release_id, question],
+        )
+    ]
+    for bad in (*forged, "not a cursor"):
+        result = await _tool(
+            app, published.token, "search_elements", ontology="steel", limit=2, cursor=bad
+        )
+        tool_error(result, "query.invalid_cursor")
+
+    other_question = await _tool(
+        app, published.token, "search_elements", ontology="steel", query="钢卷", cursor=cursor
+    )
+    tool_error(other_question, "query.invalid_cursor")
+
+    stale = base64.urlsafe_b64encode(json.dumps([str(uuid4()), question, 2]).encode()).decode()
+    changed = await _tool(
+        app, published.token, "search_elements", ontology="steel", limit=2, cursor=stale
+    )
+    tool_error(changed, "query.release_changed")
+
+
+async def test_a_single_result_over_the_limit_is_a_tool_error(
+    app: FastAPI, published: Published, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(tools, "RESULT_LIMIT_BYTES", 64)
+
+    result = await _tool(app, published.token, "get_element", ontology="steel", id="Coil")
+
+    tool_error(result, "mcp.result_too_large")
+
+
+async def test_get_element_names_the_inverse_relation(app: FastAPI, published: Published) -> None:
+    relation = _structured(
+        await _tool(app, published.token, "get_element", ontology="steel", id="inspectedCoil")
+    )
+
+    assert relation["inverse"] == "质检记录"
+
+
+async def test_an_empty_object_cursor_is_refused_and_audited(
+    app: FastAPI, db: AsyncSession, published: Published
+) -> None:
+    result = await _tool(
+        app, published.token, "search_objects", ontology="steel", type="Coil", cursor=""
+    )
+
+    tool_error(result, "validation.failed")
+    events = list(
+        await db.scalars(select(AuditEvent).where(AuditEvent.action == "mcp.tool_called"))
+    )
+    assert [event.detail["code"] for event in events] == ["validation.failed"]

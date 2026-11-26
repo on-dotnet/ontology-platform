@@ -85,7 +85,10 @@ def _server_version() -> str:
 
 def _same_origin(origin: str, request: Request) -> bool:
     """Whether `origin` names this host. nginx passes `Host` without the port, so the port is
-    compared only when the Host header carries one."""
+    compared only when the Host header carries one. Origin and Host both come from the
+    caller, so this stops ordinary pages, not DNS rebinding: that is covered by the bearer
+    token, which a browser never attaches by itself (cookies are refused here). Revisit if
+    /mcp ever accepts cookies."""
     parts = urlsplit(origin)
     host = request.headers.get("host", "")
     if not parts.hostname or not host:
@@ -230,15 +233,18 @@ async def handle(request: Request, db: AsyncSession, settings: Settings) -> Resp
         method: str = body["method"]
         params: dict[str, Any] = body.get("params", {})
         if "id" not in body:
-            # A notification: nothing is answered and nothing here needs one.
+            # A notification: nothing is answered, but every POST names the revision.
+            if request.headers.get("mcp-protocol-version") not in SUPPORTED_VERSIONS:
+                return Response(status_code=400)
             return Response(status_code=202)
         id_: JsonId = body["id"]
         version = _check_headers(request, method, params, id_)
         _check_meta(params, version, id_)
         if method not in ("server/discover", "tools/list", "tools/call"):
             raise RpcError(404, METHOD_NOT_FOUND, "Method not found.", id_=id_)
-        # Discovery and the tool list need some read scope; each tool checks its own.
-        if not context.scopes & {"ontology:read", "objects:read"}:
+        # Discovery and the tool list need some scope the owner still holds; each tool checks
+        # its own, so a token for proposals alone can still discover (batch 6b).
+        if not context.scopes:
             return _insufficient_scope()
         if method == "server/discover":
             return _result(id_, _discover())

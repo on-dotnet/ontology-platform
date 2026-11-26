@@ -328,3 +328,32 @@ async def test_the_tool_list_is_the_same_for_every_token(
         assert tool["inputSchema"]["type"] == "object"
         assert tool["annotations"]["readOnlyHint"] is True
         assert tool["annotations"]["openWorldHint"] is False
+
+
+@pytest.mark.parametrize(
+    ("origin", "status"),
+    [("http://testserver:28080", 200), ("http://testserver:9999", 403), ("http://testserver", 403)],
+)
+async def test_the_port_is_compared_when_the_host_names_one(
+    app: FastAPI, client: AsyncClient, db: AsyncSession, origin: str, status: int
+) -> None:
+    token, _ = await new_token(client, db, Role.VIEWER, ["ontology:read"])
+    request_headers = {**headers(token, "server/discover"), "Host": "testserver:28080"}
+    request_headers["Origin"] = origin
+
+    async with make_client(app) as agent:
+        response = await agent.post(
+            "/mcp", json=message("server/discover"), headers=request_headers
+        )
+
+    assert response.status_code == status, response.text
+
+
+async def test_a_notification_still_names_the_revision(client: AsyncClient, token: str) -> None:
+    body = {"jsonrpc": "2.0", "method": "notifications/cancelled", "params": {"requestId": 1}}
+    request_headers = headers(token, "notifications/cancelled")
+    del request_headers["MCP-Protocol-Version"]
+
+    response = await client.post("/mcp", json=body, headers=request_headers)
+
+    assert response.status_code == 400
