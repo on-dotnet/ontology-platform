@@ -4,7 +4,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 # The sequence and the mould-cast piece are independent subjects.
-SELECT ?sequenceId ?position ?heatId ?ingotId ?method ?mouldId WHERE {
+SELECT DISTINCT ?sequenceId ?position ?heatId ?ingotId ?method ?mouldId WHERE {
   {
     VALUES ?sequence { <urn:synthetic:steel:castsequence/Q1260003> }
     ?sequence dcterms:identifier ?sequenceId .
@@ -12,7 +12,7 @@ SELECT ?sequenceId ?position ?heatId ?ingotId ?method ?mouldId WHERE {
     BIND(1 AS ?branch)
   } UNION {
     VALUES ?ingot { <urn:synthetic:steel:ingot/G01> }
-    ?ingot dcterms:identifier ?ingotId ; stl:producedBy ?pour ; stl:teemedInMould/dcterms:identifier ?mouldId .
+    ?ingot dcterms:identifier ?ingotId ; (stl:producedBy|^stl:outputPiece) ?pour ; stl:teemedInMould/dcterms:identifier ?mouldId .
     ?pour a/rdfs:subClassOf* stl:IngotCasting ; stl:teemingMethod/skos:notation ?method .
     BIND(2 AS ?branch)
   }

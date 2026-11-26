@@ -16,7 +16,7 @@
     skos:notation "BOF"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
     rdfs:label "氧气转炉"@zh, "Basic oxygen furnace"@en ; skos:prefLabel "氧气转炉"@zh, "Basic oxygen furnace"@en ;
     skos:definition "使用氧气吹炼金属熔池并可倾动出钢的炼钢炉座。"@zh, "A tilting primary steelmaking furnace fitted to blow oxygen into or onto the bath."@en ;
-    dcterms:source <std/ybt-6393-2025> .
+    dcterms:source <source/industry-practice> .
 <code/equipment-type/EAF> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
     skos:notation "EAF"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
     rdfs:label "电弧炉"@zh, "Electric arc furnace"@en ; skos:prefLabel "电弧炉"@zh, "Electric arc furnace"@en ;
@@ -26,7 +26,7 @@
     skos:notation "LF"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
     rdfs:label "钢包精炼炉"@zh, "Ladle furnace"@en ; skos:prefLabel "钢包精炼炉"@zh, "Ladle furnace"@en ;
     skos:definition "在钢包上方配置电极，可对包内钢液补热并进行精炼的工位。"@zh, "A secondary treatment station with electrodes above the ladle for reheating and refining the bath."@en ;
-    dcterms:source <std/ybt-6394-2025> .
+    dcterms:source <source/industry-practice> .
 <code/equipment-type/RH> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
     skos:notation "RH"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
     rdfs:label "真空循环脱气装置"@zh, "Vacuum circulation degasser"@en ; skos:prefLabel "真空循环脱气装置"@zh, "Vacuum circulation degasser"@en ;
@@ -69,7 +69,7 @@
     skos:notation "BOF"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
     rdfs:label "氧气转炉炼钢"@zh, "Basic oxygen steelmaking"@en ; skos:prefLabel "氧气转炉炼钢"@zh, "Basic oxygen steelmaking"@en ;
     skos:definition "在氧气转炉内吹炼金属熔池并出钢的路线工序段。"@zh, "A primary steelmaking segment in which a converter heat is blown with oxygen and tapped."@en ;
-    dcterms:source <std/ybt-6393-2025> .
+    dcterms:source <source/industry-practice> .
 <code/process-type/EAF> a skos:Concept ; skos:inScheme <code/process-type> ; skos:broader <code/process-type/STEELMAKE> ;
     skos:notation "EAF"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
     rdfs:label "电弧炉炼钢"@zh, "Electric arc steelmaking"@en ; skos:prefLabel "电弧炉炼钢"@zh, "Electric arc steelmaking"@en ;
@@ -114,7 +114,7 @@ stl:RefiningMethodCode a rdfs:Datatype ;
     skos:notation "LF"^^stl:RefiningMethodCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
     rdfs:label "钢包炉精炼"@zh, "Ladle furnace refining"@en ; skos:prefLabel "钢包炉精炼"@zh, "Ladle furnace refining"@en ;
     skos:definition "在钢包炉工位利用电弧补热能力，配合搅拌、造渣或加合金处理钢液的方法。"@zh, "Ladle treatment using a furnace station with arc reheating and facilities for stirring, slag treatment or alloy additions."@en ;
-    dcterms:source <std/ybt-6394-2025> .
+    dcterms:source <source/industry-practice> .
 <code/refining-method/RH> a skos:Concept ; skos:inScheme <code/refining-method> ; skos:topConceptOf <code/refining-method> ;
     skos:notation "RH"^^stl:RefiningMethodCode ; rdfs:isDefinedBy <ontology/process/steelmaking-codes> ;
     rdfs:label "真空循环精炼"@zh, "Vacuum circulation refining"@en ; skos:prefLabel "真空循环精炼"@zh, "Vacuum circulation refining"@en ;

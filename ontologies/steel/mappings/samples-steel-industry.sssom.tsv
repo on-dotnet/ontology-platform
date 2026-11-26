@@ -6,7 +6,7 @@
 #   skos: "http://www.w3.org/2004/02/skos/core#"
 #   semapv: "https://w3id.org/semapv/vocab/"
 subject_id	subject_label	predicate_id	object_id	mapping_justification	comment
-stl:LineSegmentCode	冷轧机组段码	skos:exactMatch	stl:LineSegmentCode	semapv:ManualMappingCuration	由工艺层 PR 收录，用于涂镀分类或冷轧机组段码。
+stl:LineSegmentCode	冷轧机组段码	skos:exactMatch	stl:LineSegmentCode	semapv:ManualMappingCuration	沿用冷轧机组段码的数据类型，供设备代码的备用记号使用。
 stl:code/unit-type	机组类型	skos:broadMatch	stl:code/equipment-type	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。
 stl:UnitTypeCode	机组类型代码	skos:broadMatch	stl:EquipmentTypeCode	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。
 stl:code/unit-type/BOF	转炉	skos:exactMatch	stl:code/equipment-type/BOF	semapv:ManualMappingCuration	原机组类型迁入共享设备类型方案，保留设备的工艺用途。
@@ -14,11 +14,11 @@ stl:code/unit-type/EAF	电弧炉	skos:exactMatch	stl:code/equipment-type/EAF	sem
 stl:code/unit-type/LF	钢包精炼炉	skos:exactMatch	stl:code/equipment-type/LF	semapv:ManualMappingCuration	原机组类型迁入共享设备类型方案，保留设备的工艺用途。
 stl:code/unit-type/RH	真空循环脱气装置	skos:exactMatch	stl:code/equipment-type/RH	semapv:ManualMappingCuration	原机组类型迁入共享设备类型方案，保留设备的工艺用途。
 stl:code/unit-type/CC	板坯连铸机	skos:exactMatch	stl:code/equipment-type/CC	semapv:ManualMappingCuration	保留板坯连铸机的含义，归入共享设备类型方案的连铸机组。
-stl:code/unit-type/HSM	热连轧机组	skos:exactMatch	stl:code/equipment-type/HSM	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
-stl:code/unit-type/PLTCM	酸洗冷连轧机组	skos:exactMatch	stl:code/equipment-type/PLTCM	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
-stl:code/unit-type/CAL	连续退火机组	skos:exactMatch	stl:code/equipment-type/CAL	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
-stl:code/unit-type/CGL	连续热镀锌机组	skos:exactMatch	stl:code/equipment-type/CGL	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
-stl:code/unit-type/RCL	重卷机组	skos:exactMatch	stl:code/equipment-type/RCL	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。该工序的设备代码由工艺层 PR 收录。
+stl:code/unit-type/HSM	热连轧机组	skos:exactMatch	stl:code/equipment-type/HSM	semapv:ManualMappingCuration	沿用机组类型的含义，代码归入覆盖全流程的设备类型方案。
+stl:code/unit-type/PLTCM	酸洗冷连轧机组	skos:exactMatch	stl:code/equipment-type/PLTCM	semapv:ManualMappingCuration	沿用机组类型的含义，代码归入覆盖全流程的设备类型方案。
+stl:code/unit-type/CAL	连续退火机组	skos:exactMatch	stl:code/equipment-type/CAL	semapv:ManualMappingCuration	沿用机组类型的含义，代码归入覆盖全流程的设备类型方案。
+stl:code/unit-type/CGL	连续热镀锌机组	skos:exactMatch	stl:code/equipment-type/CGL	semapv:ManualMappingCuration	沿用机组类型的含义，代码归入覆盖全流程的设备类型方案。
+stl:code/unit-type/RCL	重卷机组	skos:exactMatch	stl:code/equipment-type/RCL	semapv:ManualMappingCuration	沿用机组类型的含义，代码归入覆盖全流程的设备类型方案。
 stl:code/unit-type/PCK	包装机组	skos:exactMatch	stl:code/equipment-type/PCK	semapv:ManualMappingCuration	机组类型归入覆盖全流程的设备类型方案。
 stl:code/disposition-type	质量处置类型	skos:exactMatch	stl:code/disposition-type	semapv:ManualMappingCuration	核心层沿用。
 stl:DispositionTypeCode	质量处置类型代码	skos:exactMatch	stl:DispositionTypeCode	semapv:ManualMappingCuration	核心层沿用。
@@ -66,10 +66,10 @@ stl:code/inspection-document-type/T21	符合订单声明	skos:exactMatch	stl:cod
 stl:code/inspection-document-type/T22	试验报告	skos:exactMatch	stl:code/inspection-document-type/T22	semapv:ManualMappingCuration	核心层沿用。
 stl:code/inspection-document-type/T31	3.1 检验证书	skos:exactMatch	stl:code/inspection-document-type/T31	semapv:ManualMappingCuration	核心层沿用。
 stl:code/inspection-document-type/T32	3.2 检验证书	skos:exactMatch	stl:code/inspection-document-type/T32	semapv:ManualMappingCuration	核心层沿用。
-stl:code/coating-type	镀层类型	skos:exactMatch	stl:code/coating-type	semapv:ManualMappingCuration	由工艺层 PR 收录，用于涂镀分类或冷轧机组段码。
-stl:CoatingTypeCode	镀层类型代码	skos:exactMatch	stl:CoatingTypeCode	semapv:ManualMappingCuration	由工艺层 PR 收录，用于涂镀分类或冷轧机组段码。
-stl:code/coating-type/GI	纯锌镀层	skos:exactMatch	stl:code/coating-type/GI	semapv:ManualMappingCuration	由工艺层 PR 收录，用于涂镀分类或冷轧机组段码。
-stl:code/coating-type/GA	锌铁合金镀层	skos:exactMatch	stl:code/coating-type/GA	semapv:ManualMappingCuration	由工艺层 PR 收录，用于涂镀分类或冷轧机组段码。
+stl:code/coating-type	镀层类型	skos:exactMatch	stl:code/coating-type	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:CoatingTypeCode	镀层类型代码	skos:exactMatch	stl:CoatingTypeCode	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:code/coating-type/GI	纯锌镀层	skos:exactMatch	stl:code/coating-type/GI	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:code/coating-type/GA	锌铁合金镀层	skos:exactMatch	stl:code/coating-type/GA	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
 stl:code/movement-event-type	移动事件类型	skos:exactMatch	stl:code/movement-event-type	semapv:ManualMappingCuration	核心层沿用。
 stl:MovementEventTypeCode	移动事件类型代码	skos:exactMatch	stl:MovementEventTypeCode	semapv:ManualMappingCuration	核心层沿用。
 stl:code/movement-event-type/LIFT	吊起	skos:exactMatch	stl:code/movement-event-type/LIFT	semapv:ManualMappingCuration	核心层沿用。
@@ -99,10 +99,10 @@ stl:code/measurement-item/WIDTH	宽度	skos:exactMatch	stl:code/measurement-item
 stl:code/measurement-item/CASTSPEED	拉速	skos:exactMatch	stl:code/measurement-item/CASTSPEED	semapv:ManualMappingCuration	沿用拉速测量项，铸造模块以 castingSpeed 记录其读数。
 stl:code/defect-type	缺陷类型	skos:exactMatch	stl:code/defect-type	semapv:ManualMappingCuration	核心层沿用。
 stl:DefectTypeCode	缺陷类型代码	skos:exactMatch	stl:DefectTypeCode	semapv:ManualMappingCuration	核心层沿用。
-stl:code/defect-type/COATLOW	镀层质量不足	skos:exactMatch	stl:code/defect-type/COATLOW	semapv:ManualMappingCuration	由工艺层 PR 收录，用于涂镀分类或冷轧机组段码。
+stl:code/defect-type/COATLOW	镀层质量不足	skos:exactMatch	stl:code/defect-type/COATLOW	semapv:ManualMappingCuration	沿用同名的涂镀缺陷代码。
 stl:code/defect-type/SCRATCH	划伤	skos:exactMatch	stl:code/defect-type/SCRATCH	semapv:ManualMappingCuration	核心层沿用。
 stl:code/defect-type/EDGECRACK	边裂	skos:exactMatch	stl:code/defect-type/EDGECRACK	semapv:ManualMappingCuration	核心层沿用。
-stl:code/defect-type/BARESPOT	漏镀	skos:exactMatch	stl:code/defect-type/BARESPOT	semapv:ManualMappingCuration	由工艺层 PR 收录，用于涂镀分类或冷轧机组段码。
+stl:code/defect-type/BARESPOT	漏镀	skos:exactMatch	stl:code/defect-type/BARESPOT	semapv:ManualMappingCuration	沿用同名的涂镀缺陷代码。
 stl:ManufacturingRecord	制造记录	skos:exactMatch	stl:ManufacturingRecord	semapv:ManualMappingCuration	核心层沿用。
 stl:Event	事件	skos:exactMatch	stl:Event	semapv:ManualMappingCuration	核心层沿用。
 stl:Operation	工序执行	skos:exactMatch	stl:Operation	semapv:ManualMappingCuration	核心层沿用。
@@ -227,25 +227,25 @@ stl:lotMember	检验批成员	skos:exactMatch	stl:lotMember	semapv:ManualMapping
 stl:coversPiece	覆盖实物	skos:exactMatch	stl:coversPiece	semapv:ManualMappingCuration	核心层沿用。
 stl:inspectionDocumentType	检验文件类型	skos:exactMatch	stl:inspectionDocumentType	semapv:ManualMappingCuration	核心层沿用。
 stl:applicableStandard	适用标准版次	skos:exactMatch	stl:applicableStandard	semapv:ManualMappingCuration	核心层沿用。
-stl:Coil	钢卷	skos:exactMatch	stl:Coil	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:HotRolledCoil	热轧卷	skos:exactMatch	stl:HotRolledCoil	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:ColdRolledCoil	冷轧段钢卷	skos:exactMatch	stl:ColdRolledCoil	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:FullHardCoil	冷硬卷	skos:exactMatch	stl:FullHardCoil	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:AnnealedCoil	退火卷	skos:exactMatch	stl:AnnealedCoil	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:GalvanizedCoil	镀锌卷	skos:exactMatch	stl:GalvanizedCoil	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:RecoiledCoil	重卷卷	skos:exactMatch	stl:RecoiledCoil	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:HotRolling	热轧执行	skos:exactMatch	stl:HotRolling	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:PicklingAndColdRolling	酸轧执行	skos:exactMatch	stl:PicklingAndColdRolling	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:Annealing	退火执行	skos:exactMatch	stl:Annealing	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:Galvanizing	镀锌执行	skos:exactMatch	stl:Galvanizing	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:Recoiling	重卷执行	skos:exactMatch	stl:Recoiling	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:CoilSplitting	分卷	skos:exactMatch	stl:CoilSplitting	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:CoilJoining	合卷	skos:exactMatch	stl:CoilJoining	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:Packing	包装执行	skos:exactMatch	stl:Packing	semapv:ManualMappingCuration	由工艺层 PR 收录包装执行，成员与包装件的关系沿用核心层物料属性。
+stl:Coil	钢卷	skos:exactMatch	stl:Coil	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:HotRolledCoil	热轧卷	skos:exactMatch	stl:HotRolledCoil	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:ColdRolledCoil	冷轧段钢卷	skos:exactMatch	stl:ColdRolledCoil	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:FullHardCoil	冷硬卷	skos:exactMatch	stl:FullHardCoil	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:AnnealedCoil	退火卷	skos:exactMatch	stl:AnnealedCoil	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:GalvanizedCoil	镀锌卷	skos:exactMatch	stl:GalvanizedCoil	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:RecoiledCoil	重卷卷	skos:exactMatch	stl:RecoiledCoil	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:HotRolling	热轧执行	skos:exactMatch	stl:HotRolling	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:PicklingAndColdRolling	酸轧执行	skos:exactMatch	stl:PicklingAndColdRolling	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:Annealing	退火执行	skos:exactMatch	stl:Annealing	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:Galvanizing	镀锌执行	skos:exactMatch	stl:Galvanizing	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:Recoiling	重卷执行	skos:exactMatch	stl:Recoiling	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:CoilSplitting	分卷	skos:exactMatch	stl:CoilSplitting	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:CoilJoining	合卷	skos:exactMatch	stl:CoilJoining	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:Packing	包装执行	skos:exactMatch	stl:Packing	semapv:ManualMappingCuration	沿用包装执行，包装件与成员的关系使用核心层物料属性。
 stl:Package	包装件	skos:exactMatch	stl:Package	semapv:ManualMappingCuration	核心层沿用。
-stl:startLength	母卷区段起点	skos:exactMatch	stl:startLength	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:endLength	母卷区段终点	skos:exactMatch	stl:endLength	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
-stl:coatingType	镀层类型	skos:exactMatch	stl:coatingType	semapv:ManualMappingCuration	由工艺层 PR 收录，保留铸轧、成材或包装作业的专用语义。
+stl:startLength	母卷区段起点	skos:exactMatch	stl:startLength	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:endLength	母卷区段终点	skos:exactMatch	stl:endLength	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
+stl:coatingType	镀层类型	skos:exactMatch	stl:coatingType	semapv:ManualMappingCuration	沿用同名术语及其工艺含义。
 stl:Heat	炉次	skos:exactMatch	stl:Heat	semapv:ManualMappingCuration	保留制造记录身份，并明确属于物料批。
 stl:CastSequence	浇次	skos:exactMatch	stl:CastSequence	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。
 stl:Slab	板坯	skos:exactMatch	stl:Slab	semapv:ManualMappingCuration	同名沿用，保留案例中的工艺含义。

@@ -47,3 +47,7 @@ stl:MovementEvent	移动事件	skos:closeMatch	epcis:ObjectEvent	ObjectEvent	sem
 stl:HotMetal	铁水批	skos:broadMatch	iec62264:MaterialLot	Material Lot	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	按铁次标识并追溯的铁水是物料批的一种。
 stl:processedHeat	处理炉次	skos:broadMatch	prov:used	used	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	精炼或浇注作业实际处理的钢水批是该活动使用的实体。
 stl:CastSequence	浇次	skos:broadMatch	prov:Entity	Entity	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	连浇多炉钢水时用于标识和排列炉次的生产记录可以作为溯源实体引用。
+stl:CoilSplitting	分卷	skos:closeMatch	epcis:TransformationEvent	TransformationEvent	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	将母卷分出新的子卷时，转换事件可列出投入母卷和各子卷标识。
+stl:CoilJoining	合卷	skos:closeMatch	epcis:TransformationEvent	TransformationEvent	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	多件来源卷接合形成新卷时，可以在一个转换事件中关联各投入卷与产出卷。
+stl:Packing	包装	skos:closeMatch	epcis:AggregationEvent	AggregationEvent	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	可以用聚合事件登记装包形成的父子关系，成员实物保留各自的标识。
+stl:HeatTreatmentLoad	热处理装炉批	skos:broadMatch	iec62264:MaterialLot	Material Lot	semapv:BackgroundKnowledgeBasedMatching	钢铁本体编写组	2026-11-26	使用同一装炉批号跟踪共同处理的一组实物，是按制造条件建立的物料批。

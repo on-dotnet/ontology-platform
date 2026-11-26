@@ -1,0 +1,70 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<ontology/process/heattreatment-codes> a owl:Ontology ;
+    owl:versionIRI <ontology/process/heattreatment-codes/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "热处理代码"@zh, "Heat treatment codes"@en ;
+    rdfs:comment "登记热处理炉、热处理工序段及装炉批和作业采用的热处理工艺。"@zh, "Provides codes for a heat treatment furnace, a heat treatment route segment and the methods applied to furnace loads."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+<code/equipment-type/HTFURN> a skos:Concept ; skos:inScheme <code/equipment-type> ; skos:topConceptOf <code/equipment-type> ;
+    skos:notation "HTFURN"^^stl:EquipmentTypeCode ; rdfs:isDefinedBy <ontology/process/heattreatment-codes> ;
+    rdfs:label "热处理炉"@zh, "Heat treatment furnace"@en ; skos:prefLabel "热处理炉"@zh, "Heat treatment furnace"@en ;
+    skos:definition "能控制炉内温度历程，供固态钢材进行热处理的炉子，包括间歇式和连续式炉。"@zh, "A batch or continuous furnace that controls the thermal conditions under which solid steel is heat treated."@en ;
+    dcterms:source <source/industry-practice> .
+<code/process-type/HEATTREAT> a skos:Concept ; skos:inScheme <code/process-type> ; skos:topConceptOf <code/process-type> ;
+    skos:notation "HEATTREAT"^^stl:ProcessTypeCode ; rdfs:isDefinedBy <ontology/process/heattreatment-codes> ;
+    rdfs:label "热处理"@zh, "Heat treatment"@en ; skos:prefLabel "热处理"@zh, "Heat treatment"@en ;
+    skos:definition "安排钢材按给定温度历程改变组织或性能的路线工序段。"@zh, "A route segment specifying a thermal cycle to change the microstructure or properties of steel."@en ;
+    dcterms:source <std/gbt-7232-2023> .
+
+<code/heat-treatment-process> a skos:ConceptScheme ;
+    rdfs:label "热处理工艺"@zh, "Heat treatment process"@en ; skos:prefLabel "热处理工艺"@zh, "Heat treatment process"@en ;
+    skos:definition "按对钢材施加的热循环及其冶金目的区分热处理方法，供装炉批和作业引用。"@zh, "Classifies heat treatment methods by the thermal cycle applied to the steel and its metallurgical purpose, for use on loads and runs."@en ;
+    skos:scopeNote "主代码采用本方案的英文助记码。"@zh ;
+    dcterms:source <std/gbt-12603-2005> ; rdfs:isDefinedBy <ontology/process/heattreatment-codes> .
+stl:HeatTreatmentProcessCode a rdfs:Datatype ;
+    rdfs:label "热处理工艺代码"@zh, "Heat treatment process code"@en ; skos:prefLabel "热处理工艺代码"@zh, "Heat treatment process code"@en ;
+    skos:definition "标识热处理工艺方案中主记号的字面量类型。"@zh, "Datatype of the primary notations in the heat treatment process scheme."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/heattreatment-codes> .
+
+<code/heat-treatment-process/NORMALIZE> a skos:Concept ; skos:inScheme <code/heat-treatment-process> ; skos:topConceptOf <code/heat-treatment-process> ;
+    skos:notation "NORMALIZE"^^stl:HeatTreatmentProcessCode ; rdfs:isDefinedBy <ontology/process/heattreatment-codes> ;
+    rdfs:label "正火"@zh, "Normalizing"@en ; skos:prefLabel "正火"@zh, "Normalizing"@en ;
+    skos:definition "使钢奥氏体化后在空气中冷却，利用冷却时的转变调整组织。"@zh, "A treatment in which austenitized steel cools in air and develops its microstructure as the austenite transforms."@en ;
+    dcterms:source <std/gbt-7232-2023> .
+<code/heat-treatment-process/ANNEAL> a skos:Concept ; skos:inScheme <code/heat-treatment-process> ; skos:topConceptOf <code/heat-treatment-process> ;
+    skos:notation "ANNEAL"^^stl:HeatTreatmentProcessCode ; rdfs:isDefinedBy <ontology/process/heattreatment-codes> ;
+    rdfs:label "退火"@zh, "Annealing"@en ; skos:prefLabel "退火"@zh, "Annealing"@en ;
+    skos:definition "通过加热、保温和受控冷却使钢软化、降低残余应力或取得后续加工所需组织的方法。"@zh, "A thermal cycle of heating, holding and controlled cooling to soften steel, relieve residual stress or prepare its microstructure for further working."@en ;
+    dcterms:source <std/gbt-7232-2023> .
+<code/heat-treatment-process/QUENCH> a skos:Concept ; skos:inScheme <code/heat-treatment-process> ; skos:topConceptOf <code/heat-treatment-process> ;
+    skos:notation "QUENCH"^^stl:HeatTreatmentProcessCode ; rdfs:isDefinedBy <ontology/process/heattreatment-codes> ;
+    rdfs:label "淬火"@zh, "Quench hardening"@en ; skos:prefLabel "淬火"@zh, "Quench hardening"@en ;
+    skos:definition "在钢奥氏体化后，以足以形成所需硬化组织的速度使工件冷却的方法。"@zh, "A treatment that cools austenitized steel fast enough to develop the intended hardened microstructure."@en ;
+    dcterms:source <std/gbt-7232-2023> .
+<code/heat-treatment-process/TEMPER> a skos:Concept ; skos:inScheme <code/heat-treatment-process> ; skos:topConceptOf <code/heat-treatment-process> ;
+    skos:notation "TEMPER"^^stl:HeatTreatmentProcessCode ; rdfs:isDefinedBy <ontology/process/heattreatment-codes> ;
+    rdfs:label "回火"@zh, "Tempering"@en ; skos:prefLabel "回火"@zh, "Tempering"@en ;
+    skos:definition "在低于奥氏体开始形成的温度下重新加热淬硬钢，调整其硬度、强度和韧性的方法。"@zh, "A treatment that reheats hardened steel below the onset of austenite formation to adjust its hardness, strength and toughness."@en ;
+    dcterms:source <std/gbt-7232-2023> .
+<code/heat-treatment-process/QT> a skos:Concept ; skos:inScheme <code/heat-treatment-process> ; skos:topConceptOf <code/heat-treatment-process> ;
+    skos:notation "QT"^^stl:HeatTreatmentProcessCode ; rdfs:isDefinedBy <ontology/process/heattreatment-codes> ;
+    rdfs:label "调质"@zh, "Quenching and high-temperature tempering"@en ; skos:prefLabel "调质"@zh, "Quenching and high-temperature tempering"@en ;
+    skos:altLabel "Q&T"@en ;
+    skos:definition "先将钢淬硬，再作高温回火以获得所需强度和韧性配合的复合热处理。"@zh, "A combined treatment in which high-temperature tempering follows quench hardening to obtain a balance of strength and toughness."@en ;
+    dcterms:source <std/gbt-7232-2023> .
+<code/heat-treatment-process/SOLUTION> a skos:Concept ; skos:inScheme <code/heat-treatment-process> ; skos:topConceptOf <code/heat-treatment-process> ;
+    skos:notation "SOLUTION"^^stl:HeatTreatmentProcessCode ; rdfs:isDefinedBy <ontology/process/heattreatment-codes> ;
+    rdfs:label "固溶处理"@zh, "Solution treatment"@en ; skos:prefLabel "固溶处理"@zh, "Solution treatment"@en ;
+    skos:definition "通过加热使可溶相进入基体，再以能保留所需固溶状态的速度冷却工件的方法。"@zh, "A treatment that dissolves soluble phases into the matrix at temperature and cools the workpiece at a rate that retains the intended solid solution."@en ;
+    dcterms:source <std/gbt-7232-2023> .
+<code/heat-treatment-process/AGE> a skos:Concept ; skos:inScheme <code/heat-treatment-process> ; skos:topConceptOf <code/heat-treatment-process> ;
+    skos:notation "AGE"^^stl:HeatTreatmentProcessCode ; rdfs:isDefinedBy <ontology/process/heattreatment-codes> ;
+    rdfs:label "时效处理"@zh, "Ageing treatment"@en ; skos:prefLabel "时效处理"@zh, "Ageing treatment"@en ;
+    skos:definition "使钢在室温或升高的温度下停留，利用随时间发生的溶质重新分布或析出调整性能的方法。"@zh, "A treatment that allows time for solute redistribution or precipitation at ambient or elevated temperature to change the properties of the steel."@en ;
+    dcterms:source <std/gbt-7232-2023> .

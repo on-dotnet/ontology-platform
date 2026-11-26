@@ -1,0 +1,46 @@
+@base <https://w3id.org/ontology-platform/steel/> .
+@prefix stl: <https://w3id.org/ontology-platform/steel/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<ontology/process/heattreatment> a owl:Ontology ;
+    owl:versionIRI <ontology/process/heattreatment/0.1.0> ; owl:versionInfo "0.1.0" ;
+    rdfs:label "热处理作业与装炉批"@zh, "Heat treatment operations and furnace loads"@en ;
+    rdfs:comment "记录热处理作业、实际装炉的工件、采用的工艺和各次保温的温度与起止时刻。"@zh, "Records heat treatment runs, the pieces charged together, the methods applied and the temperature and timing of individual holds."@en ;
+    dcterms:license <https://www.apache.org/licenses/LICENSE-2.0> .
+
+stl:HeatTreatment a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "热处理作业"@zh, "Heat treatment"@en ; skos:prefLabel "热处理作业"@zh, "Heat treatment"@en ;
+    skos:definition "使固态钢材经历受控的温度历程，以获得所需组织或性能的一次实际作业。"@zh, "An operation that subjects solid steel to a controlled thermal cycle to obtain the intended microstructure or properties."@en ;
+    dcterms:source <std/gbt-7232-2023> ; rdfs:isDefinedBy <ontology/process/heattreatment> .
+stl:HeatTreatmentLoad a owl:Class ; rdfs:subClassOf stl:MaterialLot ;
+    rdfs:label "热处理装炉批"@zh, "Heat treatment furnace load"@en ; skos:prefLabel "热处理装炉批"@zh, "Heat treatment furnace load"@en ;
+    skos:definition "一次装入同一台热处理炉、按该次装炉共同追踪的一批实物件，各件保留各自的身份。"@zh, "A material lot comprising the individually identifiable pieces charged together into one heat treatment furnace on one occasion."@en ;
+    skos:scopeNote "用 hasPart 列出装炉实物件，也可从实物件用 partOf 指回装炉批。"@zh ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/heattreatment> .
+stl:HeatTreatmentHold a owl:Class ; rdfs:subClassOf stl:Operation ;
+    rdfs:label "热处理保温阶段"@zh, "Heat treatment hold"@en ; skos:prefLabel "热处理保温阶段"@zh, "Heat treatment hold"@en ;
+    skos:definition "一次热处理中使工件在某一温度范围内持续停留的一段实际作业，每次独立保温可分别计时。"@zh, "A stage of a heat treatment run during which the work is held within a temperature range. Each hold in a multistage cycle can be timed separately."@en ;
+    skos:scopeNote "用 partOf 指向热处理作业，保温时长由本阶段的 actualEndAt 与 actualStartAt 相减得到。"@zh ;
+    dcterms:source <std/gbt-7232-2023> ; rdfs:isDefinedBy <ontology/process/heattreatment> .
+
+stl:treatedLoad a owl:ObjectProperty ; rdfs:subPropertyOf prov:used ; rdfs:domain stl:HeatTreatment ; rdfs:range stl:HeatTreatmentLoad ;
+    rdfs:label "实际处理的装炉批"@zh, "Treated furnace load"@en ; skos:prefLabel "实际处理的装炉批"@zh, "Treated furnace load"@en ;
+    skos:definition "指明一次热处理作业实际加工了哪个装炉批，以便从作业查到各装炉实物件。"@zh, "Identifies a furnace load actually processed in a heat treatment run so that the pieces in that charge can be retrieved."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/heattreatment> .
+stl:heatTreatmentMethod a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:HeatTreatment stl:HeatTreatmentLoad ) ] ;
+    rdfs:range skos:Concept ; rdfs:seeAlso <code/heat-treatment-process> ;
+    rdfs:label "热处理方法"@zh, "Heat treatment method"@en ; skos:prefLabel "热处理方法"@zh, "Heat treatment method"@en ;
+    skos:definition "用热处理工艺代码标明作业实际采用的方法，或装炉批所经历的方法。"@zh, "Identifies by process code a method applied in a heat treatment run or undergone by a furnace load."@en ;
+    dcterms:source <std/gbt-12603-2005> ; rdfs:isDefinedBy <ontology/process/heattreatment> .
+stl:heatTreatmentTemperature a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( stl:HeatTreatment stl:HeatTreatmentHold ) ] ; rdfs:range xsd:decimal ;
+    stl:unit unit:DEG_C ; stl:quantityKind quantitykind:CelsiusTemperature ;
+    rdfs:label "热处理温度"@zh, "Heat treatment temperature"@en ; skos:prefLabel "热处理温度"@zh, "Heat treatment temperature"@en ;
+    skos:definition "热处理实绩中记录的工件保温温度，以摄氏度计，多段保温可按阶段分别记录。"@zh, "The holding temperature of the workpiece reported for a treatment run, in degrees Celsius. For a cycle with several holds the value is recorded on the corresponding hold."@en ;
+    dcterms:source <source/industry-practice> ; rdfs:isDefinedBy <ontology/process/heattreatment> .

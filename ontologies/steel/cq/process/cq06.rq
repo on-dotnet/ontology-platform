@@ -1,0 +1,29 @@
+PREFIX stl: <https://w3id.org/ontology-platform/steel/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX form: <https://w3id.org/ontology-platform/steel/code/product-form/>
+
+SELECT DISTINCT ?tubeId ?shellId ?roundBilletId ?loadId ?memberId ?method WHERE {
+  {
+    VALUES ?tube { <urn:synthetic:steel:seamlesstube/T61> <urn:synthetic:steel:seamlesstube/T62> }
+    ?tube dcterms:identifier ?tubeId ; stl:derivedFrom+ ?billet .
+    FILTER (EXISTS { ?tube a/rdfs:subClassOf* stl:SeamlessTube } || EXISTS { ?tube stl:productForm/skos:broader* form:SEAMLESS })
+    ?billet dcterms:identifier ?roundBilletId .
+    FILTER (EXISTS { ?billet a/rdfs:subClassOf* stl:RoundBillet } || EXISTS { ?billet stl:productForm/skos:broader* form:ROUNDBIL })
+    OPTIONAL {
+      ?tube stl:derivedFrom+ ?shell .
+      ?shell stl:derivedFrom+ ?billet ; dcterms:identifier ?shellId .
+      FILTER (EXISTS { ?shell a/rdfs:subClassOf* stl:HollowShell } || EXISTS { ?shell stl:productForm/skos:broader* form:SHELL })
+    }
+    BIND(1 AS ?branch)
+  } UNION {
+    VALUES ?load { <urn:synthetic:steel:heattreatmentload/L61> }
+    ?load a/rdfs:subClassOf* stl:HeatTreatmentLoad ; dcterms:identifier ?loadId ;
+          (stl:hasPart|^stl:partOf) ?member ; stl:heatTreatmentMethod/skos:notation ?method .
+    ?member a/rdfs:subClassOf* stl:MaterialPiece ; dcterms:identifier ?memberId .
+    BIND(2 AS ?branch)
+  }
+}
+ORDER BY ?branch COALESCE(?tubeId, ?loadId) COALESCE(?roundBilletId, ?memberId)
+         COALESCE(?shellId, "") COALESCE(STR(?method), "")

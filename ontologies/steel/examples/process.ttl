@@ -133,3 +133,92 @@ slab:S12600017101 a stl:Slab, stl:ContinuouslyCastPiece ; dcterms:identifier "S1
 pour:M01 a stl:IngotCasting ; stl:processedHeat heat:H22600019 ; stl:teemingMethod <code/teeming-method/BOTTOM> .
 ingot:G01 a stl:Ingot ; dcterms:identifier "G01" ; stl:productForm <code/product-form/INGOT> ;
     stl:producedBy pour:M01 ; stl:teemedInMould eq:MD1 ; stl:sourceHeat heat:H22600019 .
+
+@prefix hr: <urn:synthetic:steel:hotrolling/> .
+@prefix hc: <urn:synthetic:steel:hotrolledcoil/> .
+@prefix plate: <urn:synthetic:steel:plate/> .
+@prefix bar: <urn:synthetic:steel:bar/> .
+@prefix billet: <urn:synthetic:steel:billet/> .
+@prefix round: <urn:synthetic:steel:roundbillet/> .
+@prefix shell: <urn:synthetic:steel:hollowshell/> .
+@prefix tube: <urn:synthetic:steel:seamlesstube/> .
+@prefix load: <urn:synthetic:steel:heattreatmentload/> .
+
+# Cut-to-length plate shares the coil's slab ancestry through one more transformation.
+eq:HSM1 a stl:Equipment ; dcterms:identifier "HSM1" ; stl:equipmentType <code/equipment-type/HSM> .
+<urn:synthetic:steel:reheating/F40> a stl:Reheating ; stl:inputPiece slab:S12600017101 ; stl:reheatingDischargeTemperature 1200.0 .
+hr:R40 a stl:HotRolling ; stl:inputPiece slab:S12600017101 ; stl:outputPiece hc:R126000001 ; stl:performedOn eq:HSM1 ;
+    stl:finishRollingTemperature 890.0 ; stl:coilingTemperature 610.0 .
+hc:R126000001 a stl:HotRolledCoil ; dcterms:identifier "R126000001" ; stl:productForm <code/product-form/HRC> ;
+    stl:derivedFrom slab:S12600017101 ; stl:producedBy hr:R40 ; stl:thickness 10.0 ; stl:width 1500.0 .
+<urn:synthetic:steel:shearing/S41> a stl:Shearing ; stl:inputPiece hc:R126000001 ; stl:outputPiece plate:P41 .
+plate:P41 a stl:Plate ; dcterms:identifier "P41" ; stl:productForm <code/product-form/PLATE> ;
+    stl:derivedFrom hc:R126000001 ; stl:producedBy <urn:synthetic:steel:shearing/S41> ; stl:thickness 10.0 ; stl:width 1500.0 .
+
+# After the plate is cut, the remaining length is rewound under a new identity.
+eq:RCL1 a stl:Equipment ; dcterms:identifier "RCL1" ; stl:equipmentType <code/equipment-type/RCL> .
+<urn:synthetic:steel:recoiling/R42> a stl:Recoiling ; stl:performedOn eq:RCL1 ; stl:inputPiece hc:R126000001 ;
+    stl:outputPiece <urn:synthetic:steel:recoiledcoil/CRC126000042> .
+<urn:synthetic:steel:recoiledcoil/CRC126000042> a stl:RecoiledCoil ; dcterms:identifier "CRC126000042" ;
+    stl:producedBy <urn:synthetic:steel:recoiling/R42> ; stl:derivedFrom hc:R126000001 ; stl:startLength 12.0 ; stl:endLength 120.0 .
+
+eq:PLTCM1 a stl:Equipment ; dcterms:identifier "PLTCM1" ; stl:equipmentType <code/equipment-type/PLTCM> .
+<urn:synthetic:steel:picklingandcoldrolling/R43> a stl:PicklingAndColdRolling ; stl:performedOn eq:PLTCM1 ;
+    stl:inputPiece <urn:synthetic:steel:recoiledcoil/CRC126000042> ;
+    stl:outputPiece <urn:synthetic:steel:fullhardcoil/CPL126000043> ; stl:reductionRatio 80.0 .
+<urn:synthetic:steel:fullhardcoil/CPL126000043> a stl:FullHardCoil ; dcterms:identifier "CPL126000043" ; stl:thickness 2.0 ;
+    stl:derivedFrom <urn:synthetic:steel:recoiledcoil/CRC126000042> ; stl:producedBy <urn:synthetic:steel:picklingandcoldrolling/R43> .
+eq:CGL1 a stl:Equipment ; dcterms:identifier "CGL1" ; stl:equipmentType <code/equipment-type/CGL> .
+<urn:synthetic:steel:galvanizing/G44> a stl:Galvanizing ; stl:performedOn eq:CGL1 ; stl:inputPiece <urn:synthetic:steel:fullhardcoil/CPL126000043> ;
+    stl:outputPiece <urn:synthetic:steel:galvanizedcoil/CCG126000044> .
+<urn:synthetic:steel:galvanizedcoil/CCG126000044> a stl:GalvanizedCoil ; dcterms:identifier "CCG126000044" ;
+    stl:derivedFrom <urn:synthetic:steel:fullhardcoil/CPL126000043> ; stl:producedBy <urn:synthetic:steel:galvanizing/G44> ;
+    stl:productForm <code/product-form/COATEDCOIL> ; stl:coatingType <code/coating-type/GI> .
+point:Z44 a stl:MeasurementPoint ; stl:partOf eq:CGL1 .
+obs:Z44 a stl:Observation ; stl:measuredObject <urn:synthetic:steel:galvanizedcoil/CCG126000044> ;
+    stl:measurementItem <code/measurement-item/COATMASS> ; stl:coatingMass 68.0 ; stl:measuredAtPoint point:Z44 ;
+    stl:measurementMethod <code/measurement-method/AUTOMATIC> ; stl:sampledAt "2026-11-19T09:00:00Z"^^xsd:dateTime ;
+    stl:resultAt "2026-11-19T09:00:01Z"^^xsd:dateTime .
+
+eaf:M20 a stl:ElectricArcFurnaceSteelmaking ; stl:performedOn eq:EAF2 .
+heat:H22600020 a stl:Heat ; dcterms:identifier "H22600020" ; prov:wasGeneratedBy eaf:M20 ; stl:producedOnFurnace eq:EAF2 .
+billet:B40 a stl:Billet, stl:ContinuouslyCastPiece ; dcterms:identifier "B40" ; stl:productForm <code/product-form/SQBILLET> ;
+    stl:sourceHeat heat:H22600020 ; stl:numberingHeat heat:H22600020 ; stl:strandNumber "1"^^xsd:positiveInteger .
+hr:R41 a stl:HotRolling ; stl:inputPiece billet:B40 ; stl:outputPiece bar:B41 .
+bar:B41 a stl:Bar ; dcterms:identifier "B41" ; stl:productForm <code/product-form/BAR> ;
+    stl:derivedFrom billet:B40 ; stl:producedBy hr:R41 .
+<urn:synthetic:steel:localgrinding/G41> a stl:LocalGrinding ; stl:inputPiece bar:B41 ; stl:maximumGrindingDepth 0.4 .
+
+# An ingot may be identified from the caster's output list alone.
+pour:M61 a stl:IngotCasting ; stl:processedHeat heat:H22600019 ; stl:teemingMethod <code/teeming-method/BOTTOM> ; stl:outputPiece ingot:G61 .
+ingot:G61 a stl:Ingot ; dcterms:identifier "G61" ; stl:sourceHeat heat:H22600019 ; stl:teemedInMould eq:MD1 .
+<urn:synthetic:steel:breakdownrolling/R61> a stl:BreakdownRolling ; stl:inputPiece ingot:G61 ; stl:outputPiece round:R61 .
+round:R61 a stl:RoundBillet, stl:BreakdownRolledStock ; dcterms:identifier "R61" ; stl:productForm <code/product-form/ROUNDBIL> ;
+    stl:derivedFrom ingot:G61 ; stl:producedBy <urn:synthetic:steel:breakdownrolling/R61> .
+<urn:synthetic:steel:piercing/P61> a stl:Piercing ; stl:inputPiece round:R61 ; stl:outputPiece shell:S61 .
+shell:S61 a stl:HollowShell ; dcterms:identifier "S61" ; stl:productForm <code/product-form/SHELL> ;
+    stl:derivedFrom round:R61 ; stl:producedBy <urn:synthetic:steel:piercing/P61> .
+<urn:synthetic:steel:tuberolling/R62> a stl:TubeRolling ; stl:inputPiece shell:S61 ; stl:outputPiece tube:T61 .
+tube:T61 a stl:SeamlessTube ; dcterms:identifier "T61" ; stl:productForm <code/product-form/SEAMLESS> ;
+    stl:tubeOutsideDiameter 114.0 ; stl:tubeWallThickness 8.0 ;
+    stl:derivedFrom shell:S61 ; stl:producedBy <urn:synthetic:steel:tuberolling/R62> .
+
+# Membership is independent of the heats supplying the individual pieces.
+load:L61 a stl:HeatTreatmentLoad ; dcterms:identifier "L61" ; stl:heatTreatmentMethod <code/heat-treatment-process/NORMALIZE> ;
+    stl:hasPart tube:T61 .
+bar:B41 stl:partOf load:L61 .
+eq:HTFURN1 a stl:Equipment ; dcterms:identifier "HTFURN1" ; stl:equipmentType <code/equipment-type/HTFURN> .
+<urn:synthetic:steel:heattreatment/H61> a stl:HeatTreatment ; stl:treatedLoad load:L61 ; stl:performedOn eq:HTFURN1 .
+<urn:synthetic:steel:heattreatmenthold/H61> a stl:HeatTreatmentHold ; stl:partOf <urn:synthetic:steel:heattreatment/H61> ;
+    stl:heatTreatmentTemperature 880.0 ; stl:actualStartAt "2026-11-19T08:15:00+08:00"^^xsd:dateTime ;
+    stl:actualEndAt "2026-11-19T08:45:00+08:00"^^xsd:dateTime .
+
+# These intermediate pieces are identified by product form alone.
+<urn:synthetic:steel:materialpiece/R62> a stl:MaterialPiece ; dcterms:identifier "R62" ;
+    stl:productForm <code/product-form/ROUNDBIL> ; stl:derivedFrom ingot:G01 .
+<urn:synthetic:steel:materialpiece/S62> a stl:MaterialPiece ; dcterms:identifier "S62" ;
+    stl:productForm <code/product-form/SHELL> ; stl:derivedFrom <urn:synthetic:steel:materialpiece/R62> .
+tube:T62 a stl:SeamlessTube ; dcterms:identifier "T62" ; stl:derivedFrom <urn:synthetic:steel:materialpiece/S62> .
+
+# A second length from the round billet was rolled into bar stock.
+bar:B42 a stl:Bar ; dcterms:identifier "B42" ; stl:derivedFrom <urn:synthetic:steel:materialpiece/R62> .

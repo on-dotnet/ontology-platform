@@ -71,3 +71,46 @@
     stl:measurementMethod <code/measurement-method/AUTOMATIC> ;
     stl:sampledAt "2026-11-18T12:00:00Z"^^xsd:dateTime ; stl:resultAt "2026-11-18T12:00:01Z"^^xsd:dateTime .
 <urn:synthetic:steel:measurementpoint/PT90> a stl:MeasurementPoint .
+
+# EXPECT <urn:synthetic:steel:ingot/G91> <https://w3id.org/ontology-platform/steel/CastIngotMouldShape> SPARQLConstraintComponent
+<urn:synthetic:steel:ingotcasting/M92> a stl:IngotCasting ; stl:teemingMethod <code/teeming-method/TOP> ;
+    stl:outputPiece <urn:synthetic:steel:ingot/G91> .
+<urn:synthetic:steel:ingot/G91> a stl:Ingot .
+
+# EXPECT <urn:synthetic:steel:localgrinding/G90> <https://w3id.org/ontology-platform/steel/GrindingDepthShape> MinInclusiveConstraintComponent
+<urn:synthetic:steel:localgrinding/G90> a stl:LocalGrinding ; stl:maximumGrindingDepth -0.3 .
+
+# EXPECT <urn:synthetic:steel:seamlesstube/T90> <https://w3id.org/ontology-platform/steel/SeamlessTubeStockShape> QualifiedMinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:seamlesstube/T90> <https://w3id.org/ontology-platform/steel/TubeDimensionValueShape> MinExclusiveConstraintComponent
+<urn:synthetic:steel:seamlesstube/T90> a stl:SeamlessTube ; stl:derivedFrom <urn:synthetic:steel:plate/P90> ;
+    stl:tubeWallThickness 0.0 .
+<urn:synthetic:steel:plate/P90> a stl:Plate .
+
+# EXPECT <urn:synthetic:steel:tubewelding/W90> <https://w3id.org/ontology-platform/steel/TubeWeldingMethodShape> MinCountConstraintComponent
+<urn:synthetic:steel:tubewelding/W90> a stl:TubeWelding .
+# EXPECT <https://w3id.org/ontology-platform/steel/code/equipment-type/ERW> <https://w3id.org/ontology-platform/steel/WeldMethodSchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:tubewelding/W91> a stl:TubeWelding ; stl:weldMethod <code/equipment-type/ERW> .
+
+# EXPECT <urn:synthetic:steel:heattreatmentload/L90> <https://w3id.org/ontology-platform/steel/HeatTreatmentLoadPieceShape> QualifiedMinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:heattreatmentload/L90> <https://w3id.org/ontology-platform/steel/HeatTreatmentLoadMethodShape> MinCountConstraintComponent
+<urn:synthetic:steel:heattreatmentload/L90> a stl:HeatTreatmentLoad ; stl:hasPart <urn:synthetic:steel:equipment/F90> .
+<urn:synthetic:steel:equipment/F90> a stl:Equipment .
+# EXPECT <https://w3id.org/ontology-platform/steel/code/process-type/HEATTREAT> <https://w3id.org/ontology-platform/steel/HeatTreatmentMethodSchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:heattreatment/H90> a stl:HeatTreatment ; stl:heatTreatmentMethod <code/process-type/HEATTREAT> .
+
+# EXPECT <urn:synthetic:steel:heattreatmenthold/H90> <https://w3id.org/ontology-platform/steel/HeatTreatmentHoldOrderShape> LessThanOrEqualsConstraintComponent
+<urn:synthetic:steel:heattreatmenthold/H90> a stl:HeatTreatmentHold ;
+    stl:actualStartAt "2026-11-19T15:30:00Z"^^xsd:dateTime ; stl:actualEndAt "2026-11-19T15:00:00Z"^^xsd:dateTime .
+
+# EXPECT <urn:synthetic:steel:coil/C90> <https://w3id.org/ontology-platform/steel/CoilSourceStockShape> QualifiedMinCountConstraintComponent
+# EXPECT <urn:synthetic:steel:coil/C90> <https://w3id.org/ontology-platform/steel/CoilSourceIntervalShape> LessThanOrEqualsConstraintComponent
+<urn:synthetic:steel:coil/C90> a stl:Coil ; stl:derivedFrom <urn:synthetic:steel:plate/P90> ;
+    stl:startLength 8.0 ; stl:endLength 5.0 .
+
+# EXPECT <https://w3id.org/ontology-platform/steel/code/equipment-type/CGL> <https://w3id.org/ontology-platform/steel/CoatingTypeSchemeShape> HasValueConstraintComponent
+<urn:synthetic:steel:materialspecification/S90> a stl:MaterialSpecification ; stl:coatingType <code/equipment-type/CGL> .
+
+# EXPECT <urn:synthetic:steel:coil/C91> <https://w3id.org/ontology-platform/steel/CoilSourceIntervalEndShape> MinCountConstraintComponent
+<urn:synthetic:steel:coil/C91> a stl:Coil ; stl:derivedFrom <urn:synthetic:steel:slab/B93> ; stl:startLength 0.0 .
+# EXPECT <urn:synthetic:steel:coil/C92> <https://w3id.org/ontology-platform/steel/CoilSourceIntervalShape> MinCountConstraintComponent
+<urn:synthetic:steel:coil/C92> a stl:Coil ; stl:derivedFrom <urn:synthetic:steel:slab/B93> ; stl:endLength 10.0 .

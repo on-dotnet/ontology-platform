@@ -63,14 +63,14 @@ stl:CastIngotMouldShape a sh:NodeShape ; sh:targetClass stl:Ingot ; sh:targetSub
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
         SELECT DISTINCT $this WHERE {
-          { $this stl:producedBy/a/rdfs:subClassOf* stl:IngotCasting .
+          { $this (stl:producedBy|^stl:outputPiece)/a/rdfs:subClassOf* stl:IngotCasting .
             FILTER NOT EXISTS {
               $this stl:teemedInMould ?mould .
               ?mould a/rdfs:subClassOf* stl:Equipment ; stl:equipmentType/skos:broader* eq:INGOTMOULD .
             }
           } UNION {
             $this stl:teemedInMould ?mould .
-            FILTER NOT EXISTS { $this stl:producedBy/a/rdfs:subClassOf* stl:IngotCasting }
+            FILTER NOT EXISTS { $this (stl:producedBy|^stl:outputPiece)/a/rdfs:subClassOf* stl:IngotCasting }
           } UNION {
             $this stl:teemedInMould ?first, ?second . FILTER (!sameTerm(?first, ?second))
           }
